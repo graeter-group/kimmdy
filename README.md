@@ -24,6 +24,7 @@ b) Rate Calculation: Using these distances, for each bond a rupture rate based o
 
 c) Kinetic Monte Carlo: These rates will be used as input for a KMC step, determining
     i) which bond breaks (current implementation: rejection-free) and ii) the corresponding time step of that transition.
+
 d) Adjustment of the topology accorinding to the break (removal of bonds, angles, pairs, dihedrals in topology)
 
 e) Continuation of Simulation at that point (be aware of the system's time jump due to the Monte Carlo Step)
