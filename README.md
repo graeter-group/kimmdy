@@ -15,12 +15,17 @@ Software requirments:
 - Tested with Python 2.7. Uses the modules: logging, numpy, random, subprocess, os
 
 Scheme:
+
 a) Do all-atom MD of your tensed protein (constant force) for a first, shorter sampling run. Default: 1ns simulation time (see paper for details)
+
 During this time, the bond elongation of possbile bond rupture rates will be monitored.
+
 b) Rate Calculation: Using these distances, for each bond a rupture rate based on Transition State Theory will be calculated.
+
 c) Kinetic Monte Carlo: These rates will be used as input for a KMC step, determining
     i) which bond breaks (current implementation: rejection-free) and ii) the corresponding time step of that transition.
 d) Adjustment of the topology accorinding to the break (removal of bonds, angles, pairs, dihedrals in topology)
+
 e) Continuation of Simulation at that point (be aware of the system's time jump due to the Monte Carlo Step)
 
 
