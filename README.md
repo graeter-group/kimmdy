@@ -16,13 +16,13 @@ Journal of Chemical Theory and Computation
 DOI: 10.1021/acs.jctc.9b00786 
 
 
-Overall function: Enabling (Homolytic) Bond Scission in Tensed Proteins in all-atom MD simulations.
+### Overall function: Enabling (Homolytic) Bond Scission in Tensed Proteins in all-atom MD simulations.
 
 Software requirments:
 - To be used with a Gromacs version that is patched with Plumed. Tested for Gromacs 2018.1 patched with Plumed 2.4.2 (see www.plumed.org)
 - Tested with Python 2.7. Uses the modules: logging, numpy, random, subprocess, os
 
-Scheme:
+### Scheme:
 
 a) Do all-atom MD of your tensed protein (constant force) for a first, shorter sampling run. Default: 1ns simulation time (see paper for details)
 
@@ -38,7 +38,7 @@ d) Adjustment of the topology accorinding to the break (removal of bonds, angles
 e) Continuation of Simulation at that point (be aware of the system's time jump due to the Monte Carlo Step)
 
 
-Short manual, how to use KIMMDY as provided in this folder:
+### Short manual, how to use KIMMDY as provided in this folder:
 
 1) Set-up regularly your pulling MD simulation (constant force) in Gromacs. There are example files provided for an individual collagen triple helix, that can be used for a quick exemplary test of KIMMDY. However, it is highly recommended to adjust these to your system at hand and consider general MD best practices before using KIMMDY.
 2) Before the actual programm can be used, a "plumedfile" has to be generated that contains the distances that should be monitored during the main run, i.e. the bond elongation of all possible bond rupture candidates. An exemplary function to generate this file is provided in the "functions.py" module under the name "write_conditions_in_plumedfile(topfile, indexfile, indexgroup, parameterfile)". Based on the indexfile and the topology, it takes all C_a - N and C_a - C bonds in the backbone as candidates. As stated in the paper, this is a reasonable choice for collagen-based material.
