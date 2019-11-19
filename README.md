@@ -8,8 +8,11 @@ This is a short readme / manual to KIMMDY
 ### Current version: 1.0, lastly updated on 31/03/2019
 ### Please cite paper accordingly if KIMMDY is used (https://doi.org/10.1021/acs.jctc.9b00786):  
 Hybrid Kinetic Monte Carlo / Molecular Dynamics Simulations of Bond Scissions in Proteins
+
 Benedikt Rennekamp, Fabian Kutzki, Agnieszka Obarska-Kosinska, Christopher Zapp, and Frauke Gräter
+
 Journal of Chemical Theory and Computation
+
 DOI: 10.1021/acs.jctc.9b00786 
 
 
