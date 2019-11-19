@@ -6,7 +6,12 @@ This is a short readme / manual to KIMMDY
 ### Python Pipeline for hybrid reactive Kinetic Monte Carlo / Molecular Dynamics Simulations (KIMMDY)
 ### by Benedikt Rennekamp. Heidelberg Institute of Theoretical Studies (HITS)
 ### Current version: 1.0, lastly updated on 31/03/2019
-### Please cite paper accordingly if used. 
+### Please cite paper accordingly if KIMMDY is used (https://doi.org/10.1021/acs.jctc.9b00786):  
+Hybrid Kinetic Monte Carlo / Molecular Dynamics Simulations of Bond Scissions in Proteins
+Benedikt Rennekamp, Fabian Kutzki, Agnieszka Obarska-Kosinska, Christopher Zapp, and Frauke Gräter
+Journal of Chemical Theory and Computation
+DOI: 10.1021/acs.jctc.9b00786 
+
 
 Overall function: Enabling (Homolytic) Bond Scission in Tensed Proteins in all-atom MD simulations.
 
@@ -41,7 +46,7 @@ In a similar way, the dissociation energies are provided in an extra file 'ediss
 4) In the main.py-file, you can provide a few parameters (input file names, choosing if you like an automated equilibration, how many runs you like to conduct). See the commented code for more details. After choosing these parameters, you can start the program by executing main.py. 
 For each run, a subfolder in the current working directory will be created and named by the number i of the run ('run_i'). 
 5) The current implementation provides a basic logging functionality, storing essential steps and results in 'log.log' for each run. More information will be printed if you change the log-level to 'debug' in the main function.
-6) As an output, rKMC/MD will yield the bond that breaks after the cycle, the corresponding time evolution due to the Kinetic Monte Carlo Step and the adjusted topology 'broken_topol.top', from which the simulation can be continued (together with the state-file 'run_x.cpt').
+6) As an output, KIMMDY will yield the bond that breaks after the cycle, the corresponding time evolution due to the Kinetic Monte Carlo Step and the adjusted topology 'broken_topol.top', from which the simulation can be continued (together with the state-file 'run_x.cpt').
 Note that this new topology will be written to the original directory and not the newly created sub-directory of the individual run.
 7) An exemplary automated continuation of the simulation is also provided in the code.
 
