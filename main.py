@@ -151,9 +151,6 @@ def run(n, max_nbr_of_stops, nbr_of_stops_after_break, dt, steps, equil_and_min,
         print("Time first loop: --- %s seconds ---" % (time.time() - start_time))
         list_of_nbrs_and_atomtypes = []
         list_of_rates = []
-        ctr_backbone_C_C = 0
-        ctr_backbone_C_N = 0
-        ctr_crosslink = 0
         
         ##go through all possible breakpairs, calculate their rupture rates
         for j in range(len(list_of_breakpairs_and_distances)):
@@ -175,14 +172,7 @@ def run(n, max_nbr_of_stops, nbr_of_stops_after_break, dt, steps, equil_and_min,
             residuenumbers.append(dic_of_nbrs_to_resnr[breakpair[0]])
             residuenumbers.append(dic_of_nbrs_to_resnr[breakpair[1]])
             aminoacid = dic_of_nbrs_to_resname[breakpair[1]]
-               
-            if 'N' in atomnames:
-                ctr_backbone_C_N += 1
-            elif 'C' in atomnames:
-                ctr_backbone_C_C +=1
-            else:
-                ctr_crosslink += 1
-        
+           
             
             #calculate rupture probabilties
             k = func.calc_av_rate(distances, aminoacid, atomtypes, atomnames, filepath_bonds, filepath_edis)
