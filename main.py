@@ -54,29 +54,28 @@ trrfile         string              trajectory of the simulation, cut into parts
 
 
 
-import functions as func      #Own Module: all functions except interaction with terminal / outside world
-import Automized_run as auto  #Own Module: all functions interacting with the terminal / outside world
+import functions as func      #all functions except interaction with terminal
+import Automized_run as auto  #all functions interacting with the terminal
 import logging
+import time
 
-
-def run(n, max_nbr_of_stops, equil_and_min, kinetic = True, rejection = False):
+def run(n, max_nbr_of_stops, nbr_of_stops_after_break, dt, steps, equil_and_min, kinetic, rejection = False):
     
     #start logging and create directory to save files
     print("#####Info: Start run_" + str(n)+'#####')
     dir_name = "run_" + str(n)
     auto.create_dir(dir_name)    #creates directory to store files
     auto.change_to_dir(dir_name)
-    
+
     log = logging.getLogger()
     for hdlr in log.handlers[:]:  # remove old handlers i.o.t. create a new logfile when starting a new run
         log.removeHandler(hdlr)
-    logging.basicConfig(filename='log.log', level=logging.INFO, format='%(asctime)s %(message)s', datefmt='%d/%m/%Y %I:%M:%S %p')
+
+    logging.basicConfig(filename='log.log', level=logging.DEBUG, format='%(asctime)s %(message)s', datefmt='%d/%m/%Y %I:%M:%S %p')
     logging.info("####---Started run" + str(n)+" of Reactive MD ---#####")
 
-    #initialize some counters
-    nbr_of_stops = 0
-    counter_length = len(str(max_nbr_of_stops))
-    counter = "{0:0={counter_length}d}".format(nbr_of_stops, counter_length=counter_length)
+    filepath_bonds = "../../ffbonded.itp"
+    filepath_edis = "../../edissoc_analysis.dat"
 
     ### energy minimization, nvt and npt equilibration, if needed. 
     if equil_and_min:
@@ -85,7 +84,8 @@ def run(n, max_nbr_of_stops, equil_and_min, kinetic = True, rejection = False):
         outgro = 'min' + str(n) + '.gro'
         mdpfile = '../min.mdp'
         tprfile = "em" + str(n) + ".tpr"    
-        auto.do_energy_minimisation(grofile,topfile,mdpfile,tprfile,outgro) 
+        auto.do_energy_minimisation(grofile,topfile,mdpfile,tprfile,outgro)
+    
 
         grofile = outgro
         outgro = 'nvt' + str(n) + '.gro'
@@ -99,34 +99,36 @@ def run(n, max_nbr_of_stops, equil_and_min, kinetic = True, rejection = False):
         mdpfile = '../p_equil.mdp'
         auto.do_equilibration(grofile,topfile,mdpfile,tprfile,outgro)
 
-    #Choose input options for (first) production run
-    filepath_bonds = "../ffbonded.itp"
-    filepath_edis = "../edissoc.dat"
-        
+    #Options for (first) production run
+    nbr_of_stops = 0
+    counter_length = len(str(max_nbr_of_stops))
+    counter = "{0:0={counter_length}d}".format(nbr_of_stops, counter_length=counter_length)
     trrfile = str(counter) + 'run' + str(n) + '.trr'
     tprfile = str(counter) + 'run' + str(n) + '.tpr'
     edrfile = 'run' + str(n) + '.edr'
-    topfile = '../topol.top'
-    indexfile = '../index_backbone.ndx'
-    grofile = '../npt.gro'  #use npt.gro for centered version
+    topfile = '../topol_modified.top'
+    #get data from topfile for later atomtype identification
+    
+    #grofile = 'solvated_big_min' + str(n) + '.gro'
+    grofile = '../gro_modified.gro'  #use npt.gro for centered version
     if equil_and_min:
         grofile = outgro
 
-    #Short run to equilbrate beforehand under the (lower or) same force such that this phase won't be used for the distance sampling
-    mdpfile = "../pullf1500_equil.mdp" 
-    auto.do_production_run(grofile,topfile,mdpfile, indexfile, tprfile,trrfile)
+    indexfile = '../index_pull.ndx'
 
-    #More input files for main run
+    #Short run to equilbrate beforehand under lower or same force
+    #mdpfile = "../pullf1500_equil.mdp" 
+    #auto.do_production_run(grofile,topfile,mdpfile, indexfile, tprfile,trrfile)
+
     mdpfile = "../pullf1500.mdp"
-    oldcpt = "state.cpt"
-    plumedfile = "../plumed.dat"
+    oldcpt = "../state.cpt"
+    plumedfile = "../plumed.dat" 
     datafile = "distances.dat"
-    oldtpr = tprfile
+    oldtpr = '../npt.tpr'
     nbr_of_stops += 1
     counter = "{0:0={counter_length}d}".format(nbr_of_stops, counter_length=counter_length)
     newtrr = str(counter) + 'run' + str(n) + '.trr'
     newtpr = str(counter) + 'run' + str(n) + '.tpr'
-    
     #First main run
     auto.continue_run(oldcpt, mdpfile, oldtpr, newtpr, topfile, indexfile, newtrr, plumedfile)
 
@@ -135,42 +137,60 @@ def run(n, max_nbr_of_stops, equil_and_min, kinetic = True, rejection = False):
     continuation = True
     ruptured_bonds = []
     first_break = True
-    while continuation: 
-        logging.info('------ Simulation paused --------')
-        #func.del_backup_files_and_step_files ()  #clean up folder, enable if needed
+    while continuation:
+        start_time = time.time()      
+        logging.info('------ Simulation paused (e.g. due to conditional stop) --------')
+        func.del_backup_files_and_step_files ()
         nbr_of_stops += 1
         counter = "{0:0={counter_length}d}".format(nbr_of_stops, counter_length=counter_length)
+        logfile = 'md.log'
+        list_of_breakpairs_and_distances = func.find_distances(plumedfile, datafile) #func.find_breakpairs_and_av_distance(distfile, indexfile) , uses gmx distance # func.find_breakpairs_with_distances(logfile)
 
-        #read out bond distances and atomtypes
-        list_of_breakpairs_and_distances = func.find_distances(plumedfile, datafile)
-        dic_of_nbrs_to_atomtypes = func.identify_atomtypes(topfile)
+        dic_of_nbrs_to_atomtypes, dic_of_nbrs_to_atomnames, dic_of_nbrs_to_resnr,dic_of_nbrs_to_resname = func.identify_atomtypes(topfile)
 
+        print("Time first loop: --- %s seconds ---" % (time.time() - start_time))
         list_of_nbrs_and_atomtypes = []
         list_of_rates = []
+        ctr_backbone_C_C = 0
+        ctr_backbone_C_N = 0
+        ctr_crosslink = 0
         
         ##go through all possible breakpairs, calculate their rupture rates
         for j in range(len(list_of_breakpairs_and_distances)):
-            if rejection == True: #don't need all rates if rejection MC. Not used yet. 
+            if rejection == True: #don't need all rates if rejection MC. T.b.d.: Put conditions in nicer order
                 break
             
             #get parameters (distances, atomtypes etc) for current potential breakpair
             breakpair = [list_of_breakpairs_and_distances[j][0], list_of_breakpairs_and_distances[j][1]]
+
             distances = list_of_breakpairs_and_distances[j][2:]
             
             atomtypes = []
             atomtypes.append(dic_of_nbrs_to_atomtypes[breakpair[0]])
             atomtypes.append(dic_of_nbrs_to_atomtypes[breakpair[1]])
-            
-            r_0, k_f = func.find_bond_param(atomtypes, filepath_bonds) #read out from gromacs force field
-            E_dis = func.find_Edis(atomtypes, filepath_edis)  #read out from gromacs force field
+            atomnames = []
+            atomnames.append(dic_of_nbrs_to_atomnames[breakpair[0]])
+            atomnames.append(dic_of_nbrs_to_atomnames[breakpair[1]])
+            residuenumbers = []
+            residuenumbers.append(dic_of_nbrs_to_resnr[breakpair[0]])
+            residuenumbers.append(dic_of_nbrs_to_resnr[breakpair[1]])
+            aminoacid = dic_of_nbrs_to_resname[breakpair[1]]
+               
+            if 'N' in atomnames:
+                ctr_backbone_C_N += 1
+            elif 'C' in atomnames:
+                ctr_backbone_C_C +=1
+            else:
+                ctr_crosslink += 1
+        
             
             #calculate rupture probabilties
-            k = func.calc_av_rate(distances, float(r_0), float(E_dis), float(k_f))
+            k = func.calc_av_rate(distances, aminoacid, atomtypes, atomnames, filepath_bonds, filepath_edis)
             list_of_rates.append(k)
             list_of_nbrs_and_atomtypes.append([breakpair, atomtypes])
             
-            print ('Info: For ' + str(breakpair) +' ' + str(atomtypes) + ' calculated rupture rate using ' + str((len(distances))) + ' distances per bond: ' + str(k) + ' per ps.')
-            logging.info('For ' + str(breakpair) + ' ' +  str(atomtypes) + ' calculated rupture rate using ' + str((len(distances))) + ' distances per bond: ' + str(k) + ' per ps.')
+            #print ('Info: For ' + str(breakpair) +' ' + str(atomnames) + ' in residue ' + str(residuenumbers) + ' calculated rupture rate using ' + str((len(distances))) + ' distances per bond: ' + str(k) + ' per ps.')
+            logging.info('For ' + str(breakpair) + ' ' +  str(atomnames) + ' in residue ' + str(residuenumbers) + ' calculated rupture rate using ' + str((len(distances))) + ' distances per bond: ' + str(k) + ' per ps.')
 
 
         #Rejection-free kinetic MC scheme
@@ -187,8 +207,9 @@ def run(n, max_nbr_of_stops, equil_and_min, kinetic = True, rejection = False):
             newtop = '../broken_topol.top'
             func.modify_top (topfile, newtop, breakpair)
             topfile = newtop
+        
                 
-        #Rejection Kinetic Monte carlo Scheme. #Try-out implemenation, not used yet but left here for exploration.
+        #Rejection Kinetic Monte carlo Scheme. #Try-out implemenation, not used yet. 
         if rejection == True:
             #find one reaction candidate, calculate rate only for that one and do MC to see if accepted
             r_0 = 0.1 #[1/ps] #Estimated upper rate limit
@@ -196,20 +217,19 @@ def run(n, max_nbr_of_stops, equil_and_min, kinetic = True, rejection = False):
             print ("---Info: RKMC Transition accepted? " + str(rupture) + "---")
             logging.info("--- RKMC Transition accepted? = " + str(rupture) + "---")
             if rupture:
-                rupture_time = rupture_time = delta_t / 1000.0 #convert ps to ns 
+                rupture_time = (nbr_of_stops*dt*steps) + delta_t        
                 if first_break:
+                    max_nbr_of_stops = nbr_of_stops + nbr_of_stops_after_break
                     first_rupture = nbr_of_stops
                     first_rupture_time = rupture_time
                     first_break = False                     
                 ruptured_bonds.append([breakpair, atomtypes, rupture_time])
-                newtop = '../broken_topol.top'
+                newtop = 'broken_topol_hyper_new_test.top'
                 func.modify_top (topfile, newtop, breakpair)
                 topfile = newtop
-                
-  
+            
         logging.info('###End of sub-run evaluation: In this run the following bonds ruptured (or were already ruptured): ' + str(ruptured_bonds))
         print('###End of sub-run evaluation: Info: In this run the following bonds ruptured (or were already ruptured): ' + str(ruptured_bonds))
-
 
         ### Note: In principle, it is sufficient for one cycle of rKMC/MD to stop here.
         #In the following, a sample implemenation of the continued simulation is provided. However, this has to be adjusted to the system at hand.
@@ -217,35 +237,44 @@ def run(n, max_nbr_of_stops, equil_and_min, kinetic = True, rejection = False):
         #If you like to continue manually your simulation, simply use the new topology ('broken_topol.top') that was created and your desired other input files.
         #See paper for more details!
 
+        oldcpt = "state.cpt"
+        oldtpr = tprfile
 
         ###choose input parameters for next run
             
-        #Decide what to do next
-        equilrun_after_break = True #run with shorter timestep after the breackage to stabilize transition.
-        modify_plumed = True   #use to modify your plumed-file for a secondary rupture. Excludes the already ruptured bond from the candidates.
+        #Decide what to do next (depending on the method and if rupture happened or not)
+        if kinetic == True:
+            equilrun_after_break = True
+            modify = True
+        elif rupture:
+            equilrun_after_break = True
+            modify = True
+        else:
+            equilrun_after_break = False
+            modify = False
 
-        oldcpt = "state.cpt"
-        oldtpr = tprfile
-        
-        #short equilibration after rupture. Uses a shorter timestep and harmonic bonds instead of Morse to stabilize transition   
+        #short equilibration after rupture. Uses harmonic bonds instead of Morse to stabilize transition   
         if equilrun_after_break:
-            mdpfile = '../broken_equil_f1000.mdp'
+            mdpfile = '../pullfdist18a_broken_equil.mdp'
             newtpr = str(counter) +'run' + str(n) + '_equil' + '.tpr'
             newtrr = str(counter) +'run' + str(n) + '_equil' + '.trr'
             outgro = str(counter) + 'run' + str(n) + '_equil' + '.gro'
-            auto.equilibration_after_break(oldcpt, mdpfile, oldtpr, newtpr, topfile, indexfile, outgro, newtrr)
+            auto.energy_min_after_break(oldcpt, mdpfile, oldtpr, newtpr, topfile, indexfile, outgro, newtrr)
             oldtpr = outgro #continue afterwards with new gro from min (i.e. new ensemble!) instead of old tpr
+            oldcpt = 'state.cpt'
             nbr_of_stops += 1
             counter = "{0:0={counter_length}d}".format(nbr_of_stops, counter_length=counter_length)
 
         #rupture happened: change plumed-inputfile etc.
-        if modify_plumed:    
+        if modify:    
             newtpr = str(counter) +'run' + str(n) + '_rupture' + '.tpr'
             newtrr = str(counter) + 'run' + str(n) + '_ruptrue' + '.trr'
             plumedfile_new= str(counter) + 'plumed'+ str(n) + '.dat'
             distancefile_new = str(counter) + 'distances'+ str(n) + '.dat'
             func.modify_plumedfile(plumedfile, plumedfile_new, distancefile_new, ruptured_bonds)
-            mdpfile = '../pullf1000_broken.mdp'
+            
+            logging.info("First rupture event happpend at subrun: " + str(first_rupture) + " which corresponds to: " + str(first_rupture_time) + " ps" + "where the MC jump contributed " + str(delta_t) + " ps.")
+            print("Info: First rupture event happpend at subrun:" + str(first_rupture) + " which corresponds to: " +  str(first_rupture_time) + " ps where the MC jump contributed " + str(delta_t) + " ps.")
             logging.info("Since rupture event happend, will use the following mdp-file for next run: " + mdpfile)
             print("Info: Since rupture event happend, will use the following mdp-file for next run: " + mdpfile)
             newtpr = str(counter) +'run' + str(n) + '_broken' + '.tpr'
@@ -257,12 +286,11 @@ def run(n, max_nbr_of_stops, equil_and_min, kinetic = True, rejection = False):
 
 
         #next subrun
-        auto.continue_run(oldcpt, mdpfile, oldtpr, newtpr, topfile, indexfile, newtrr, plumedfile_new)
-
+        #auto.continue_run(oldcpt, mdpfile, oldtpr, newtpr, topfile, indexfile, newtrr, plumedfile_new)
+        print("Total calculation time in this subrun: --- %s seconds ---" % (time.time() - start_time)) 
         #conditions to stop the loop: error occured or specified max number of runs reached
-        print('Info: ### Sub-run with current number of stops = ' + str(nbr_of_stops) + ' finished. Starting again evalution of possible bond ruptures.###')
-        logging.info('Sub-run with current number of stops = ' + str(nbr_of_stops) +' finished. Starting again evalution of possible bond ruptures.###')
-        logfile = 'md.log'
+        print('Info: ### Sub-run with current number of stops = ' + str(nbr_of_stops) + ' finished. Starting evalution of possible bond ruptures.###')
+        logging.info('Sub-run with current number of stops = ' + str(nbr_of_stops) +' finished. Starting evalution of possible bond ruptures.###')
         error = func.check_if_error_occured(logfile)   #bool #true if error occured
         if nbr_of_stops >= max_nbr_of_stops:
             continuation = False
@@ -277,7 +305,13 @@ def run(n, max_nbr_of_stops, equil_and_min, kinetic = True, rejection = False):
 
 
 if __name__ == "__main__":
-    max_nbr_of_stops = 1 #how many times the simulation may stop and continue again (mamximum)
-    equil_and_min = False #Do energy min, NVT and NPT equilibration if true
-    for i in range (4, 5):    #choose how many runs you like to conduct. Will create subfolders for each run, labeled by number: run_i 
-        run(i, max_nbr_of_stops, equil_and_min)
+    max_nbr_of_stops = 0 #how many time the simulation may stop and continue again (mamximum)
+    nbr_of_stops_after_break = 0 #number of continuation of the simulation after first break
+    #nbr_of_av = 1 #how many distances shall be averaged for the calculation of the transistion probability
+    dt = 0.002 #[ps] #simulation time step
+    steps = 200000  #number of steps per subrun
+    equil_and_min = False #Do temp_equil, p_equil and energy min if true
+    kinetic = True #Do hybrid event-driven kinetic MC scheme if true
+    rejection = False #if true, do rejection KMC if not rejection-free
+    for i in range (1, 3):
+        run(i, max_nbr_of_stops, nbr_of_stops_after_break, dt, steps, equil_and_min, kinetic, rejection)
