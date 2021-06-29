@@ -6,8 +6,10 @@ This modules contains all python-internal functions, i.e. all except the ones th
 import numpy as np
 import logging
 import random
+import Automized_run as auto  #all functions interacting with the terminal
 import pprint as pp
 import MDAnalysis
+import pandas as pd
 
 def get_data_from_file(filepath):
     file = open(filepath, 'r')
@@ -32,7 +34,10 @@ def store_linelist_to_file(data, filepath):
 
 def identify_atomtypes(filepath):
 
-    dic_of_atoms_to_groups = {}
+    dic_of_nbrs_to_types= {}
+    dic_of_nbrs_to_names= {}
+    dic_of_nbrs_to_resnr = {}
+    dic_of_nbrs_to_resname = {}
     file = open(filepath, 'r')
     atoms = False
     
@@ -60,10 +65,16 @@ def identify_atomtypes(filepath):
         line_array = np.asarray(line.split())
         nbr = line_array[0]
         atomtype = line_array[1]
-        dic_of_atoms_to_groups.update({nbr:atomtype})    
+        atomname = line_array[4]
+        resnr = line_array[2]
+        resname = line_array[3]
+        dic_of_nbrs_to_types.update({nbr:atomtype})
+        dic_of_nbrs_to_names.update({nbr:atomname})
+        dic_of_nbrs_to_resnr.update({nbr:resnr})
+        dic_of_nbrs_to_resname.update({nbr:resname}) 
     file.close()
 
-    return dic_of_atoms_to_groups          
+    return dic_of_nbrs_to_types, dic_of_nbrs_to_names, dic_of_nbrs_to_resnr, dic_of_nbrs_to_resname          
  
 
 def find_bond_param(atomtypes, filepath):
@@ -94,85 +105,155 @@ def find_bond_param(atomtypes, filepath):
             print ('Found no entry for ' + str(atomtypes))
             logging.info('Found no entry for ' + str(atomtypes))
 
-    print ('Info: Considering ' + str(atomtypes) + ': r_0 = ' + str(r_0))
+    #print ('Info: Considering ' + str(atomtypes) + ': r_0 = ' + str(r_0))
     logging.info ('Considering' + str(atomtypes) + ': r_0 = ' + str(r_0))
     
     return r_0, k_f
 
-def find_Edis(atomtypes, filepath):
+def find_Edis(atomnames, filepath):
     #reads dissociation energy from edissoc.dat (gromacs)
 
     data_all, data_array = get_data_from_file(filepath)
-    comb1 = [atomtypes[0], atomtypes[1]]
-    comb2 = [atomtypes[1], atomtypes[0]]
+    comb1 = [atomnames[0], atomnames[1]]
+    comb2 = [atomnames[1], atomnames[0]]
     Edis = 0
     for i in range(len(data_array)):
         if list(data_array[i][:2]) == comb1 or list(data_array[i][:2]) == comb2 : #or data_array[i][:2] == (atomtype2, atomtype1)) :
             Edis = data_array[i][2]
-    if not Edis:
-        #print("Info: Used simplified atom types to determine dissociaton energy for morse potential")
-        logging.debug("Used simplified atom types to determine dissociaton energy for morse potential")
-        comb1 = [atomtypes[0][0], atomtypes[1][0]]
-        comb2 = [atomtypes[1][0], atomtypes[0][0]]
+    if not Edis:        
+        comb1 = [atomnames[0][0], atomnames[1][0]]
+        comb2 = [atomnames[1][0], atomnames[0][0]]
         for i in range(len(data_array)):
             if list(data_array[i][:2]) == comb1 or list(data_array[i][:2]) == comb2 : #or data_array[i][:2] == (atomtype2, atomtype1)) :
                 Edis = data_array[i][2]
+        print("Info: Used simplified atom types to determine dissociaton energy for morse potential leading to E_dis = " + str(Edis))
+        logging.info("Used simplified atom types to determine dissociaton energy for morse potential leading to E_dis = " + str(Edis))
     #print ('E_dis = ' + str(Edis))
     logging.debug('E_dis = ' + str(Edis))
     if not Edis:
-        print("Warning: No morse dissociation energy found. Used 350 as default value")
-        logging.warning("No morse dissociation energy found. Used 350 as default value")
+        print("Warning: No morse dissociation energy found. Used 350 as default value. Atoms were: " + str (atomnames))
+        logging.warning("No morse dissociation energy found. Used 350 as default value. Atoms were: " + str (atomnames))
         Edis = 350   #default value in same order of magnitude
     return Edis
 
-
-
+"""
+def process_line(line):
+    line_split = []
+    ctr += 1
+    if header:
+        header = False
+        continue
+    line_split = np.asarray(line.split())
+    for k in range(1, nbr_of_pairs + 1): #shift by +1 i.o.t. leave out time (first entry)
+        distance = float(line_split[k])
+        list_of_pairs_and_distances[k-1].append(distance)    
+"""
 def find_distances (plumedfile, datafile):
     data_all, data_array = get_data_from_file(plumedfile)
     
     #get all pairs from plumedfile
-    list_of_pairs_and_distances = []
-    nbr_of_pairs = 0
+    nbr_of_pairs = len(data_all) - 4 #4 extra lines in plumed file
+    #print(len(data_all))
+    pairs = np.empty((nbr_of_pairs,2))
+    shift = 0
     for i in range(len(data_all)):
         if 'DISTANCE' in data_all[i]:
             if 'broken' in data_all[i]: #leave out already broken distances
+                print (data_all[i])
                 continue
             split1 = data_all[i].split(',')
             atom2 = split1[-1][:-2]
             split2 = split1[0].split('=')
             atom1 = split2[-1]
-            nbr_of_pairs += 1 
-            list_of_pairs_and_distances.append([str(atom1), str(atom2)])
-   
+            #nbr_of_pairs += 1
+            pair = [str(atom1), str(atom2)]
+            pairs[i - shift][0] = atom1
+            pairs[i - shift][1] = atom2
+        else:
+            shift += 1
+            
     #get all distances from datafile
     #Note: Open file line by line i.o.t. to avoid memory error  
     list_of_distances = []
     header = True #used to skip header
+    num_lines = sum(1 for line in open(datafile)) -1 #subtract 1 for header
+    print(num_lines)
+    distances = np.empty((nbr_of_pairs, num_lines))
     ctr = 0
     with open (datafile) as f:
         for line in f:
             line_split = []
-            ctr += 1
             if header:
                 header = False
                 continue
             line_split = np.asarray(line.split())
             for k in range(1, nbr_of_pairs + 1): #shift by +1 i.o.t. leave out time (first entry)
                 distance = float(line_split[k])
-                list_of_pairs_and_distances[k-1].append(distance)
-    nbr_of_data_points = ctr - 1
+                distances[k-1][ctr] = distance
+            ctr += 1
+    nbr_of_data_points = ctr 
 
     print ('Collected distances from ' + str(datafile) + ' for ' + str(nbr_of_pairs) + ' pairs with ' + str(nbr_of_data_points) + ' distances per pair.')
     logging.info('Collected distances from ' + str(datafile) + ' for ' + str(nbr_of_pairs) + ' pairs with ' + str(nbr_of_data_points) + ' distances per pair.')
     
-    return list_of_pairs_and_distances
-              
+    return pairs, distances
 
-def calc_transition_rate(r_curr, r_0, E_dis, k_f):
+
+def force_correction_factor(aminoacid, atomnames):
+    df_forces = pd.read_csv('../../av_forces_per_bondtype.csv')
+    df_cross = pd.read_csv('../../av_forces_per_bondtype_cross.csv')
+    average = df_forces.force.loc[(df_forces.aminoacid == 'all averaged').tolist()]
+    average = np.mean(average)
+    atomnames.sort()
+    #account for new atomnames introduced for differen dissociation energies
+    if 'CE5' in atomnames:
+        atomnames = [sub.replace('CE5', 'CE') for sub in atomnames]
+    if 'CE4' in atomnames:
+        atomnames = [sub.replace('CE4', 'CE') for sub in atomnames]
+    if 'CD5' in atomnames:
+        atomnames = [sub.replace('CD5', 'CD') for sub in atomnames]
+    if 'CD4' in atomnames:
+        atomnames = [sub.replace('CD4', 'CD') for sub in atomnames]
+    
+    bondtype = atomnames[0] + '-' + atomnames[1]
+    #backbone bonds in standard residues
+    if 'N' in atomnames and aminoacid not in ['L5Y', 'L4Y', 'DOP']:
+        #print (aminoacid, atomnames)
+        baseline = float(df_forces.force.loc[(df_forces.aminoacid == aminoacid) & (df_forces.bondtype == 'CA-N').tolist()])
+    elif 'C' in atomnames and aminoacid not in ['L5Y', 'L4Y', 'DOP']:
+        baseline = float(df_forces.force.loc[(df_forces.aminoacid == aminoacid) & (df_forces.bondtype == 'CA-C').tolist()])
+    elif 'N' in atomnames and aminoacid == 'DOP': #Dopas are made of TYR or PHE, average as proxy
+        baseline1 = float(df_forces.force.loc[(df_forces.aminoacid == 'PHE') & (df_forces.bondtype == 'CA-N').tolist()])
+        baseline2 = float(df_forces.force.loc[(df_forces.aminoacid == 'TYR') & (df_forces.bondtype == 'CA-N').tolist()])
+        baseline = np.average([baseline1, baseline2])
+    elif 'C' in atomnames and aminoacid == 'DOP': #Dopas are made of TYR or PHE, average as proxy
+        baseline1 = float(df_forces.force.loc[(df_forces.aminoacid == 'PHE') & (df_forces.bondtype == 'CA-C').tolist()])
+        baseline2 = float(df_forces.force.loc[(df_forces.aminoacid == 'TYR') & (df_forces.bondtype == 'CA-C').tolist()])
+        baseline = np.average([baseline1, baseline2])
+    #backbone bond in crosslink residues  
+    elif aminoacid in ['L5Y', 'L4Y'] and 'N' in atomnames:
+        baseline = float(df_forces.force.loc[(df_forces.aminoacid == 'LYS') & (df_forces.bondtype == 'CA-N').tolist()])
+    elif aminoacid in ['L5Y', 'L4Y'] and 'C' in atomnames:
+        baseline = float(df_forces.force.loc[(df_forces.aminoacid == 'LYS') & (df_forces.bondtype == 'CA-C').tolist()])
+    #crosslink bonds
+    elif aminoacid in ['L5Y', 'L4Y']:     
+        baseline = float(df_cross.force.loc[(df_cross.aminoacid == aminoacid) & (df_cross.bondtype ==  bondtype ).tolist()])
+        print (aminoacid, bondtype, baseline)
+    #sanity check / fall-back option
+    else:
+        baseline = average #get 0 as delta e.g. for crosslinks / other bonds where no correction is implemented
+        logging.info('No correction used for bond in ' + str(aminoacid))
+        print('No correction used for bond in ' + str(aminoacid))
+     
+    delta = average - baseline
+    #print(average, baseline, aminoacid, atomtypes, delta)
+    return delta
+
+def calc_transition_rate(r_curr, r_0, E_dis, k_f, aminoacid, atomnames):
     #parameters
     kT = 2.479      #k_B T at 310K #in Gromacs units kj *mol^-1
     #tau =  0.16    #unfitted / theoretical pre-exponential factor #h/kT = 0.16 ps from transition state theory 
-    k_0 =  0.288    #pre-exponential factor #from fitting averaged C_a - N data to gromacs data, see paper  #or: 1/2pi sqrt(k/m)
+    k_0 =  0.288    #pre-exponential factor #from fitting averaged C_a - N data to gromacs data, see KIMMDY paper  #or: 1/2pi sqrt(k/m)
     
     #calculates energy barrier crossing rate [in ps]; barrier based on the model V = V_morse - F*X
     
@@ -183,12 +264,14 @@ def calc_transition_rate(r_curr, r_0, E_dis, k_f):
         
     #calculate current force in bond F = -del V / del x
     if r_curr > r_infl:
-        logging.debug('Used maximum force for bond Evans model since position behind inflection point found')
+        logging.info('Used maximum force for bond Evans model since position behind inflection point found')
         F = 2*beta*E_dis*np.exp(-beta*(r_infl-r_0))*(1-np.exp(-beta*(r_infl-r_0)))
     else:
         F = 2*beta*E_dis*np.exp(-beta*(r_curr-r_0))*(1-np.exp(-beta*(r_curr-r_0)))
-    logging.debug('Calculated force in bond F = ' + str(F))
-
+        
+    delta = force_correction_factor(aminoacid, atomnames)
+    F = F + delta
+    logging.debug('Average bond elongation of ' + str(r_curr-r_0) + ' nm leads to calculated force in bond F = ' + str(F) + ' after applying correction of ' + str(delta))
     
     #calculate extrema of shifted potential i.o.t. get barrier hight
     rmin = r_0 - 1/beta * np.log((beta * E_dis + np.sqrt(beta**2 * E_dis **2 - 2*E_dis*beta*F))/(2*beta*E_dis))
@@ -205,12 +288,16 @@ def calc_transition_rate(r_curr, r_0, E_dis, k_f):
         pass
     if F <= 0.0:  #negative force: Vmax -> infinity impliying k -> 0
         k = 0.0
-        logging.info('Found negative force, most likely due to compression. Rate replaced with zero.')
+        logging.debug('Found negative force, most likely due to compression. Rate replaced with zero.')
 
     return k, F   
 
     
-def calc_av_rate(distances, r_0, E_dis, k_f):
+def calc_av_rate(distances, aminoacid, atomtypes, atomnames, filepath_bonds, filepath_edis):
+
+    r_0, k_f = find_bond_param(atomtypes, filepath_bonds) #read out from gromacs force field
+    E_dis = find_Edis(atomnames, filepath_edis)  #read out from edissoc file
+    
     #average distances first, if necessary
     dist = []
     if len(distances) > 1:    
@@ -218,10 +305,26 @@ def calc_av_rate(distances, r_0, E_dis, k_f):
     else:
         r_av = float(distances[0])
         print (r_av)
-    k, F = calc_transition_rate(r_av, r_0, E_dis, k_f)
-    print(r_av, k,F)
+    k, F = calc_transition_rate(r_av, float(r_0), float(E_dis), float(k_f), aminoacid, atomnames)
+    #print(r_av, k,F)
+    #print("Average distance first, calculate force leads to force: " +str(F))
+    logging.info("Average distance first, calculate force leads to force: " +str(F))
 
     return k
+
+def calc_rate_afterwards_av(distances, r_0, E_dis, k_f):
+    #average distances first, if necessary
+    dist = []
+    k_all = []
+    F_all = []
+    for dist in distances:
+        r_av = dist
+        k, F = calc_transition_rate(r_av, r_0, E_dis, k_f)
+        k_all.append(k)
+        F_all.append(F)
+    #print(r_av, k,F)
+    print("Calculating forces, average results lead to: " +str(np.mean(F_all)))
+    logging.info("Calculating forces, average results lead to: " +str(np.mean(F_all)))
 
 
 def delete_bonded_interactions(oldtop, newtop, breakpair):
@@ -562,7 +665,7 @@ def modify_plumedfile(plumedfile, plumedfile_new, distancefile_new, ruptured_bon
     for i in range (nbr_of_ruptures):
         rupture_pairs.append(ruptured_bonds[i][0])
 
-    file = open(plumedfile_new, "wr")   #open in  append mode
+    file = open(plumedfile_new, "w")   #open in  append mode
     with open (plumedfile) as f:
         for line in f:
             if 'ATOMS=' in line:
@@ -592,34 +695,38 @@ def modify_plumedfile(plumedfile, plumedfile_new, distancefile_new, ruptured_bon
 def find_candidates(grofile, trrfile, cutoff_distance, reaction_time, radical):
     topology = grofile
     trajectory = trrfile
-    radical_atom = u.select_atoms('bynum ' + str(radical))
-    
+    print ('Using ' + str(grofile) + ' and ' + str(trrfile) + ' to find a reaction candidate')
+    logging.info('Using ' + str(grofile) + ' and ' + str(trrfile) + ' to find a reaction candidate')
+    distance = cutoff_distance
     u = MDAnalysis.Universe(topology, trajectory)
-    print (u, ' with frames in trajectory = ' + str(len(u.trajectory)))
-    logging.info (u, ' with frames in trajectory = ' + str(len(u.trajectory)))
+    protein = u.select_atoms('not resname SOL') #ignore solvent etc. problem: Unusual residues such as DOPA won't work with selection 'protein'
+    radical_atom = protein.select_atoms('bynum ' + str(radical))[0]
+    print (protein, 'protein atoms with frames in trajectory = ' + str(len(u.trajectory)))
+    logging.debug (protein, 'protein atoms with frames in trajectory = ' + str(len(u.trajectory)))
     candidates = np.array([])
     time = np.array([])
     frame_ctr = 0
     distances_rad = np.array([])
 
     # at t = 0
-    nearR = u.select_atoms('around ' + str(distance) + ' bynum '+ str(radical))
+    nearR = protein.select_atoms('around ' + str(distance) + ' bynum '+ str(radical))
     H_nearR = nearR.select_atoms('type H')
     print ('H-Atoms nearby '+ str(radical) +' (max. distance = '+str(distance) + ' Angstroem) at point of breakage: ')
     for atom in H_nearR:
         print (atom)
 
-    u_curr = u.select_atoms('around ' + str(distance) + ' bynum '+str(radical), updating = True)
-    u_currH = u_curr.select_atoms('type H', updating = True)
+    curr = protein.select_atoms('around ' + str(distance) + ' bynum '+str(radical), updating = True)
+    currH = curr.select_atoms('type H', updating = True)
 
     for ts in u.trajectory:
         if u.trajectory.time > reaction_time:
             break
-        H_nearR += u_currH
+        H_nearR += currH
         time = np.append(time, u.trajectory.time)
-        candidates = np.append(candidates, len(u_curr))
+        #candidates = np.append(candidates, len(curr))
         frame_ctr += 1
-        radical_pos = np.split(radical_atom.position,3)
+        #print radical_atom
+        #radical_pos = np.split(radical_atom.position,3)
     
         
             
@@ -654,12 +761,20 @@ def find_candidates(grofile, trrfile, cutoff_distance, reaction_time, radical):
             #print (atom.index, 'has average distance to radical [Angstroem]: ' + str(av_distance))
 
     min_dist = np.amin(list_av_dist)
-    min_candidate = dist_dic[min_dist]
+    min_candidate = str(dist_dic[min_dist].index +1) # +1 since index and atom number is shifted 
     
     print ('Average distances and their respective atoms: ', dist_dic)
+    logging.info('Average distances and their respective atoms: ', dist_dic)
     print (' Candidate with smallest average distance ' + str(min_dist) + ' = ' + str (min_candidate))
+    logging.info(' Candidate with smallest average distance ' + str(min_dist) + ' = ' + str (min_candidate))
 
     return min_candidate
+
+    def find_candidate_partner(candidate, reference_topology):
+
+        
+
+        return candidate_partner
 
     
 
@@ -681,8 +796,8 @@ def do_kinetic_mc(list_of_nbrs_and_atomtypes, list_of_rates):
     u = random.random()
     delta_t = np.log(1/u)/total_rate
 
-    print ('Rate = ' + str(rate) + ', breakpair = ' + str (breakpair) + ', atomtypes = ' + str(atomtypes) + 'jump [ps] = ' + str(delta_t))
-    logging.info(('Rate = ' + str(rate) + ', breakpair = ' + str (breakpair) + ', atomtypes = ' + str(atomtypes) + 'jump [ps] = ' + str(delta_t)))
+    print ('Rate = ' + str(rate) + ', breakpair = ' + str (breakpair) + ', atomtypes = ' + str(atomtypes) + 'jump [ps] = ' + str(delta_t) + 'with total Rate = ' + str(total_rate))
+    logging.info('Rate = ' + str(rate) + ', breakpair = ' + str (breakpair) + ', atomtypes = ' + str(atomtypes) + 'jump [ps] = ' + str(delta_t) + 'with total Rate = ' + str(total_rate))
 
     return breakpair, atomtypes, delta_t
 
