@@ -11,7 +11,8 @@ import os
 def do_production_run(grofile, topfile, mdpfile, indexfile, tprfile, trrfile):
 
     run_shell_cmd(f'gmx grompp -p {topfile} -c {grofile} -r {grofile} -f {mdpfile} -n {indexfile} -o {tprfile} -maxwarn 5')
-    run_shell_cmd(f'gmx grompp -p {topfile} -c {grofile} -r {grofile} -f {mdpfile} -n {indexfile} -o {tprfile} -maxwarn 5'f'mpirun mdrun_mpi -v -s {tprfile} -o {trrfile}')
+    run_shell_cmd(f'mpirun mdrun_mpi -v -s {tprfile} -o {trrfile}')
+
 
 
 def do_equilibration(grofile, topfile, mdpfile, tprfile, outgro):
