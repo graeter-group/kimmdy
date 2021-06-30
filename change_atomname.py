@@ -12,15 +12,15 @@ newgro_file = 'gro_modified.gro'
 top_all, top_array = func.get_data_from_file(topfile)
 gro_all, gro_array = func.get_data_from_file(grofile)
 
-residues = ['L4Y', 'L5Y' ] #where to make changes
+residues = ['L4Y', 'L5Y']  # where to make changes
 
 
 for i in range(len(top_all)):
-    
+
      if 'GLY' in top_all[i]:
         if 'CA' in top_all[i]:
             top_all[i] = top_all[i].replace(' CA', 'CAG')
- 
+
     if 'L4Y' in top_all[i]:
         if 'CD' in top_all[i]:
             top_all[i] = top_all[i].replace(' CD', 'CD4')
