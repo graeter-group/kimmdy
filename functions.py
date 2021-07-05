@@ -214,8 +214,8 @@ def find_distances(plumedfile, datafile):
 
 
 def force_correction_factor(aminoacid, atomnames):
-    df_forces = pd.read_csv('../../av_forces_per_bondtype.csv')
-    df_cross = pd.read_csv('../../av_forces_per_bondtype_cross.csv')
+    df_forces = pd.read_csv('../example/av_forces_per_bondtype.csv')
+    df_cross = pd.read_csv('../example/av_forces_per_bondtype_cross.csv')
     average = df_forces.force.loc[(
         df_forces.aminoacid == 'all averaged').tolist()]
     average = np.mean(average)
@@ -232,11 +232,10 @@ def force_correction_factor(aminoacid, atomnames):
 
     bondtype = atomnames[0] + '-' + atomnames[1]
     # backbone bonds in standard residues
-    if 'N' in atomnames and aminoacid not in ['L5Y', 'L4Y', 'DOP']:
-        #print (aminoacid, atomnames)
+    if 'N' in atomnames and aminoacid not in ['L5Y', 'L4Y', 'DOP', 'ACE', 'NME']:
         baseline = float(df_forces.force.loc[(df_forces.aminoacid == aminoacid) & (
             df_forces.bondtype == 'CA-N').tolist()])
-    elif 'C' in atomnames and aminoacid not in ['L5Y', 'L4Y', 'DOP']:
+    elif 'C' in atomnames and aminoacid not in ['L5Y', 'L4Y', 'DOP','ACE', 'NME']:
         baseline = float(df_forces.force.loc[(df_forces.aminoacid == aminoacid) & (
             df_forces.bondtype == 'CA-C').tolist()])
     elif 'N' in atomnames and aminoacid == 'DOP':  # Dopas are made of TYR or PHE, average as proxy
@@ -265,7 +264,7 @@ def force_correction_factor(aminoacid, atomnames):
         print(aminoacid, bondtype, baseline)
     # sanity check / fall-back option
     else:
-        # get 0 as delta e.g. for crosslinks / other bonds where no correction is implemented
+        # get 0 as delta e.g. for crosslinks / other bonds where no correction is implemented, e.g. caps
         baseline = average
         logging.info('No correction used for bond in ' + str(aminoacid))
         print('No correction used for bond in ' + str(aminoacid))

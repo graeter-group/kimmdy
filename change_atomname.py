@@ -6,7 +6,7 @@ import functions as func
 
 topfile = 'topol.top'
 newtop_file = 'topol_modified.top'
-grofile = 'lin_comm_grps2018.gro'
+grofile = 'npt.gro'
 newgro_file = 'gro_modified.gro'
 
 top_all, top_array = func.get_data_from_file(topfile)
@@ -21,13 +21,13 @@ for i in range(len(top_all)):
         if 'CA' in top_all[i]:
             top_all[i] = top_all[i].replace(' CA', 'CAG')
 
-    if 'L4Y' in top_all[i]:
+     if 'L4Y' in top_all[i]:
         if 'CD' in top_all[i]:
             top_all[i] = top_all[i].replace(' CD', 'CD4')
         if 'CE' in top_all[i]:
             top_all[i] = top_all[i].replace(' CE', 'CE4')
 
-    if 'L5Y' in top_all[i]:
+     if 'L5Y' in top_all[i]:
         if 'CD' in top_all[i]:
             top_all[i] = top_all[i].replace(' CD', 'CD5')
         if 'CE' in top_all[i]:
