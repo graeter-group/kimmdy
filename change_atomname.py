@@ -17,17 +17,17 @@ residues = ['L4Y', 'L5Y']  # where to make changes
 
 for i in range(len(top_all)):
 
-     if 'GLY' in top_all[i]:
+    if 'GLY' in top_all[i]:
         if 'CA' in top_all[i]:
             top_all[i] = top_all[i].replace(' CA', 'CAG')
 
-     if 'L4Y' in top_all[i]:
+    if 'L4Y' in top_all[i]:
         if 'CD' in top_all[i]:
             top_all[i] = top_all[i].replace(' CD', 'CD4')
         if 'CE' in top_all[i]:
             top_all[i] = top_all[i].replace(' CE', 'CE4')
 
-     if 'L5Y' in top_all[i]:
+    if 'L5Y' in top_all[i]:
         if 'CD' in top_all[i]:
             top_all[i] = top_all[i].replace(' CD', 'CD5')
         if 'CE' in top_all[i]:
@@ -37,17 +37,17 @@ func.store_linelist_to_file(top_all, newtop_file)
 
 for i in range(len(gro_all)):
 
-     if 'GLY' in gro_all[i]:
+    if 'GLY' in gro_all[i]:
         if 'CD' in gro_all[i]:
             gro_all[i] = gro_all[i].replace(' CA', 'CAG')
 
-     if 'L4Y' in gro_all[i]:
+    if 'L4Y' in gro_all[i]:
         if 'CD' in gro_all[i]:
             gro_all[i] = gro_all[i].replace(' CD', 'CD4')
         if 'CE' in gro_all[i]:
             gro_all[i] = gro_all[i].replace(' CE', 'CE4')
 
-     if 'L5Y' in gro_all[i]:
+    if 'L5Y' in gro_all[i]:
         if 'CD' in gro_all[i]:
             gro_all[i] = gro_all[i].replace(' CD', 'CD5')
         if 'CE' in gro_all[i]:
