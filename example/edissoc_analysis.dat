@@ -1,0 +1,26 @@
+C	O	743
+C	OA	360
+C	OM	551
+CA	C	362     ; backbone as average from ALA (363.9) and Proline (360.5), default before was 348
+CAG	C	356	; GLY backbone as chemically different and most common in collagen
+C	H	412
+CA	N	409  ; updated, default before was 305
+CAG	N 	409 ; same value for GLY with updated atom name CAG
+C	N	430  ; updated, default before was 305
+CD5	CE5	335   ; for L5Y crosslink 
+CD4	CE4	364   ; for L4Y Crosslink 
+CB	CG	368 ; CH2_CH3 calculation 
+CG	CD4	378 ; in crosslink L4Y
+CG	CD5	372 ; in crosslinks L5Y
+CE5	NZ	340 ; in L5Y connecting to L4Y
+CE4	NZ	374 ; in L4Y connecting to L5Y
+CA	CB	368 ; added analogous to neighboring CH2-CH2
+C	S	259
+C	CB	348
+CB	CB	480
+CR5	CR5	480
+CR6	CR6	480
+NR5 	CR5	459
+N	H	388
+O	H	463
+S	S	264

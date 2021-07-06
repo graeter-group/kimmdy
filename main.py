@@ -76,8 +76,8 @@ def run(n, max_nbr_of_stops, nbr_of_stops_after_break, dt, steps, equil_and_min,
                         format='%(asctime)s %(message)s', datefmt='%d/%m/%Y %I:%M:%S %p')
     logging.info("####---Started run" + str(n)+" of Reactive MD ---#####")
 
-    filepath_bonds = "../../ffbonded.itp"
-    filepath_edis = "../../edissoc_analysis.dat"
+    filepath_bonds = "../example/ffbonded.itp"
+    filepath_edis = "../example/edissoc_analysis.dat"
 
     # energy minimization, nvt and npt equilibration, if needed.
     if equil_and_min:
@@ -108,25 +108,25 @@ def run(n, max_nbr_of_stops, nbr_of_stops_after_break, dt, steps, equil_and_min,
     trrfile = str(counter) + 'run' + str(n) + '.trr'
     tprfile = str(counter) + 'run' + str(n) + '.tpr'
     edrfile = 'run' + str(n) + '.edr'
-    topfile = '../topol_modified.top'
+    topfile = '../example/topol_modified.top'
     # get data from topfile for later atomtype identification
 
     #grofile = 'solvated_big_min' + str(n) + '.gro'
-    grofile = '../gro_modified.gro'  # use npt.gro for centered version
+    grofile = '../example/gro_modified.gro'  # use npt.gro for centered version
     if equil_and_min:
         grofile = outgro
 
-    indexfile = '../index_pull.ndx'
+    indexfile = '../example/index_pull.ndx'
 
     # Short run to equilbrate beforehand under lower or same force
-    #mdpfile = "../pullf1500_equil.mdp"
-    #auto.do_production_run(grofile,topfile,mdpfile, indexfile, tprfile,trrfile)
+    mdpfile = "../example/pullf1500_equil.mdp"
+    auto.do_production_run(grofile,topfile,mdpfile, indexfile, tprfile,trrfile)
 
-    mdpfile = "../pullf1500.mdp"
-    oldcpt = "../state.cpt"
-    plumedfile = "../plumed.dat"
+    mdpfile = "../example/pullf1500.mdp"
+    oldcpt = "state.cpt"
+    plumedfile = "../example/plumed.dat"
     datafile = "distances.dat"
-    oldtpr = '../npt.tpr'
+    oldtpr = tprfile
     nbr_of_stops += 1
     counter = "{0:0={counter_length}d}".format(
         nbr_of_stops, counter_length=counter_length)
@@ -134,7 +134,7 @@ def run(n, max_nbr_of_stops, nbr_of_stops_after_break, dt, steps, equil_and_min,
     newtpr = str(counter) + 'run' + str(n) + '.tpr'
     # First main run
     auto.continue_run(oldcpt, mdpfile, oldtpr, newtpr,
-                      topfile, indexfile, newtrr, plumedfile)
+                      #topfile, indexfile, newtrr, plumedfile)
 
     # let it run until it stops then run again
     continuation = True
@@ -149,9 +149,7 @@ def run(n, max_nbr_of_stops, nbr_of_stops_after_break, dt, steps, equil_and_min,
         counter = "{0:0={counter_length}d}".format(
             nbr_of_stops, counter_length=counter_length)
         logfile = 'md.log'
-        # func.find_breakpairs_and_av_distance(distfile, indexfile) , uses gmx distance # func.find_breakpairs_with_distances(logfile)
-        list_of_breakpairs_and_distances = func.find_distances(
-            plumedfile, datafile)
+        breakpairs, distances_all = func.find_distances(plumedfile, datafile)
 
         dic_of_nbrs_to_atomtypes, dic_of_nbrs_to_atomnames, dic_of_nbrs_to_resnr, dic_of_nbrs_to_resname = func.identify_atomtypes(
             topfile)
@@ -162,25 +160,17 @@ def run(n, max_nbr_of_stops, nbr_of_stops_after_break, dt, steps, equil_and_min,
         list_of_rates = []
 
         # go through all possible breakpairs, calculate their rupture rates
-        for j in range(len(list_of_breakpairs_and_distances)):
+        for j in range(len(breakpairs)):
             if rejection == True:  # don't need all rates if rejection MC. T.b.d.: Put conditions in nicer order
                 break
 
             # get parameters (distances, atomtypes etc) for current potential breakpair
-            breakpair = [list_of_breakpairs_and_distances[j]
-                         [0], list_of_breakpairs_and_distances[j][1]]
+            breakpair = [str(int(breakpairs[j][0])), str(int(breakpairs[j][1]))]
+            distances = distances_all[j][:]
 
-            distances = list_of_breakpairs_and_distances[j][2:]
-
-            atomtypes = []
-            atomtypes.append(dic_of_nbrs_to_atomtypes[breakpair[0]])
-            atomtypes.append(dic_of_nbrs_to_atomtypes[breakpair[1]])
-            atomnames = []
-            atomnames.append(dic_of_nbrs_to_atomnames[breakpair[0]])
-            atomnames.append(dic_of_nbrs_to_atomnames[breakpair[1]])
-            residuenumbers = []
-            residuenumbers.append(dic_of_nbrs_to_resnr[breakpair[0]])
-            residuenumbers.append(dic_of_nbrs_to_resnr[breakpair[1]])
+            atomtypes = [dic_of_nbrs_to_atomtypes[breakpair[0]], dic_of_nbrs_to_atomtypes[breakpair[1]]]
+            atomnames = [dic_of_nbrs_to_atomnames[breakpair[0]], dic_of_nbrs_to_atomnames[breakpair[1]]]
+            residuenumbers = [dic_of_nbrs_to_resnr[breakpair[0]], dic_of_nbrs_to_resnr[breakpair[1]]]
             aminoacid = dic_of_nbrs_to_resname[breakpair[1]]
 
             # calculate rupture probabilties
@@ -206,7 +196,7 @@ def run(n, max_nbr_of_stops, nbr_of_stops_after_break, dt, steps, equil_and_min,
                 first_break = False
             ruptured_bonds.append([breakpair, atomtypes, rupture_time])
             newtop = '../broken_topol.top'
-            func.modify_top(topfile, newtop, breakpair)
+            func.delete_bonded_interactions(topfile, newtop, breakpair)
             topfile = newtop
 
         # Rejection Kinetic Monte carlo Scheme. #Try-out implemenation, not used yet.
@@ -226,8 +216,8 @@ def run(n, max_nbr_of_stops, nbr_of_stops_after_break, dt, steps, equil_and_min,
                     first_rupture_time = rupture_time
                     first_break = False
                 ruptured_bonds.append([breakpair, atomtypes, rupture_time])
-                newtop = 'broken_topol_hyper_new_test.top'
-                func.modify_top(topfile, newtop, breakpair)
+                newtop = 'broken_topol_new_test.top'
+                func.delete_bonded_interactions(topfile, newtop, breakpair)
                 topfile = newtop
 
         logging.info(
