@@ -11,7 +11,7 @@ import os
 def do_production_run(grofile, topfile, mdpfile, indexfile, tprfile, trrfile):
 
     run_shell_cmd(f'gmx grompp -p {topfile} -c {grofile} -r {grofile} -f {mdpfile} -n {indexfile} -o {tprfile} -maxwarn 5')
-    run_shell_cmd(f'mpirun mdrun_mpi -v -s {tprfile} -o {trrfile}')
+    run_shell_cmd(f'gmx mdrun -v -s {tprfile} -o {trrfile}') # use mpirun mdrun_mpi on cluster
 
 
 
@@ -29,7 +29,7 @@ def do_energy_minimisation(grofile, topfile, mdpfile, tprfile, outgro):
 
 def energy_min_after_break(oldcpt, newmdp, oldtpr, newtpr, newtop, indexfile, outgro, newtrr):
     run_shell_cmd(f' gmx grompp -f {newmdp} -p {newtop} -n {indexfile} -c {oldtpr} -r {oldtpr} -o {newtpr} -t {oldcpt} -maxwarn 5')
-    run_shell_cmd(f'mpirun mdrun_mpi -v -s {newtpr} -c {outgro}  -o {newtrr}')  # use mpirun mdrun_mpi on cluster
+    run_shell_cmd(f'gmx mdrun -v -s {newtpr} -c {outgro}  -o {newtrr}')  # use mpirun mdrun_mpi on cluster
 
 
 def do_plumed_run(grofile, topfile, mdpfile, indexfile, tprfile, trrfile, plumedfile):
@@ -41,7 +41,7 @@ def do_plumed_run(grofile, topfile, mdpfile, indexfile, tprfile, trrfile, plumed
 
 def continue_run(oldcpt, newmdp, oldtpr, newtpr, newtop, indexfile, newtrr, plumedfile):
     run_shell_cmd(f' gmx grompp -f {newmdp} -p {newtop} -n {indexfile} -c {oldtpr} -r {oldtpr} -o {newtpr} -t {oldcpt} -maxwarn 75')
-    run_shell_cmd(f'mpirun mdrun_mpi -maxh 22.0 -v -s {newtpr} -o {newtrr} -plumed {plumedfile}')  # use mpirun mdrun_mpi on cluster
+    run_shell_cmd(f'gmx mdrun -maxh 22.0 -v -s {newtpr} -o {newtrr} -plumed {plumedfile}')  # use mpirun mdrun_mpi on cluster
 
 
 def create_dir(dir_name):
