@@ -75,3 +75,8 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+
+# tooling
+node_modules
+package-lock.json
+
