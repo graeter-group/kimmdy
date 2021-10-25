@@ -1,6 +1,9 @@
 # editors / tooling
 .vscode
 
+# our own program output
+kimmdy.log
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
