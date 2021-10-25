@@ -20,17 +20,19 @@ def default_decision_strategy(rates):
 @dataclass
 class RunManager:
     config: Config
-    state: State = State.IDLE
     tasks: queue.Queue
-    iteration: int = 0
+    iteration: int
     trj: Path
     top: Path
     measurements: Path
     rates: list
+    state: State
 
     def __init__(self, input_file: Path):
         self.config = Config(input_file)
         self.tasks = queue.Queue()
+        self.state = State.IDLE
+        self.iteration = 0
 
     def run(self):
         logging.info("Start run")

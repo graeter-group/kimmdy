@@ -1,0 +1,6 @@
+experiment: "Experiment 1"
+run: 1
+# cwd:               # optional, current working directory by default 
+reactions:
+  - homolysis
+  - hat

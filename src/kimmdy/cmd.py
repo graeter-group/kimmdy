@@ -2,6 +2,8 @@ import argparse
 import logging
 import sys
 
+from kimmdy.runmanager import RunManager
+
 # TODO: The current trend seems to be less hierarchical module structures,
 # so I made cmd a file instead of a folder.
 # We can discuss this.
@@ -17,7 +19,7 @@ def get_args():
         "--loglevel",
         "-l",
         type=str,
-        help="logging level (DEBUG, INFO, WARNING, ERROR)",
+        help="logging level (CRITICAL, ERROR, WARNING, INFO, DEBUG)",
         default="DEBUG",
     )
     parser.add_argument(
@@ -38,8 +40,13 @@ def get_args():
 def kimmdy_run():
     """Run KIMMDY with a configuration generated form the specified input file."""
     args = get_args()
-    logging.info("KIMMDY is running with options:")
+    logging.info("KIMMDY is running with these command line options:")
     logging.info(args)
+
+    run = RunManager(args.input)
+
+    logging.info("Configuration from input file:")
+    logging.info(run.config)
 
 
 if __name__ == "__main__":
