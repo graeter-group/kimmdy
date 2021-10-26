@@ -4,7 +4,8 @@ from dataclasses import dataclass
 
 @dataclass
 class ConversionRecipe:
-    pass
+    type: str
+    atom_idx: list[(int, int)]
 
 
 class Reaction(ABC):

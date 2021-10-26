@@ -1,5 +1,5 @@
 import logging
-from kimmdy.reaction import Reaction, ConvertionRecipe
+from kimmdy.reaction import Reaction, ConversionRecipe
 
 class Homolysis(Reaction):
     """Homolytic bond breaking leading to 2 radicals"""
@@ -11,5 +11,6 @@ class Homolysis(Reaction):
 
     def get_recipe():
         logging.info("Generating convertion recipe for reaction: homolysis")
+        rcipe = ConversionRecipe("move", [(1, 2)])
 
 
