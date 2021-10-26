@@ -37,7 +37,7 @@ def get_args():
     return args
 
 
-def kimmdy_run():
+def kimmdy():
     """Run KIMMDY with a configuration generated form the specified input file."""
     args = get_args()
     logging.info("KIMMDY is running with these command line options:")
@@ -50,5 +50,5 @@ def kimmdy_run():
 
 
 if __name__ == "__main__":
-    kimmdy_run()
+    kimmdy()
 
