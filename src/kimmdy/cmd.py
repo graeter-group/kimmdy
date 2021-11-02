@@ -1,12 +1,7 @@
 import argparse
 import logging
-import sys
-
 from kimmdy.runmanager import RunManager
-
-# TODO: The current trend seems to be less hierarchical module structures,
-# so I made cmd a file instead of a folder.
-# We can discuss this.
+import sys
 
 
 def get_args():

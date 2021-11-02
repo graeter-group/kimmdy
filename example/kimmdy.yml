@@ -1,5 +1,14 @@
 experiment: "Experiment 1"
 run: 1
 # cwd:               # optional, current working directory by default 
+top: 'topol.top'
+gro: 'protein.gro'
+minimization:
+  mdp: 'minim.mdp'
+  tpr: 'minim.tpr'
+equilibration:
+  mdp: 'eq.mdp'
+  tpr: 'eq.tpr'
 reactions:
   - homolysis
+
