@@ -1,3 +1,4 @@
+dryrun: true
 experiment: "Experiment 1"
 run: 1
 # cwd:               # optional, current working directory by default 
@@ -7,8 +8,12 @@ minimization:
   mdp: 'minim.mdp'
   tpr: 'minim.tpr'
 equilibration:
-  mdp: 'eq.mdp'
-  tpr: 'eq.tpr'
+  nvt:
+    mdp: 'nvt.mdp'
+    tpr: 'nvt.tpr'
+  npt:
+    mdp: 'npt.mdp'
+    tpr: 'npt.tpr'
 reactions:
   - homolysis
 
