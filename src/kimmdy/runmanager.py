@@ -69,6 +69,9 @@ class RunManager:
         t = self.tasks.get()
         t.f(**t.kwargs)
 
+    def _get_candiates(self):
+        pass
+
     def _run_md_minim(self):
         logging.info("Start minimization md")
         self.state = State.MD
