@@ -1,3 +1,4 @@
+from __future__ import annotations
 import logging
 import queue
 from pathlib import Path
@@ -36,7 +37,7 @@ class RunManager:
     top: Path
     measurements: Path
     rates: list
-    # md: MDManager
+    md: MDManager
 
     def __init__(self, input_file: Path):
         self.config = Config(input_file)
@@ -127,9 +128,9 @@ class MDManager:
     def equilibration(self, runmgr: RunManager, ensemble: str):
         topfile = runmgr.config.top
         grofile = runmgr.config.gro
-        outgro = ensemble + '_' + str(runmgr.iteration) + ".gro"
+        outgro = ensemble + "_" + str(runmgr.iteration) + ".gro"
         mdpfile = runmgr.config.equilibration[ensemble]["mdp"]
-        tprfile = ensemble + '_' + str(runmgr.iteration) + ".tpr"
+        tprfile = ensemble + "_" + str(runmgr.iteration) + ".tpr"
 
         if runmgr.config.dryrun:
             logging.info("Pretending to run equilibration")

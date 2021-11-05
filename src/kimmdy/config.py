@@ -36,7 +36,7 @@ class Config:
             if self.raw is None:
                 raise ValueError("Could not read input file")
 
-        self.dryrun = raw.get("dryrun") 
+        self.dryrun = raw.get("dryrun")
         self.experiment = raw.get("experiment")
         self.cwd = Path(cwd) if (cwd := raw.get("cwd")) else Path.cwd()
         self.reactions = raw.get("reactions")
