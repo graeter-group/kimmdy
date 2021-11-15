@@ -1,7 +1,7 @@
 dryrun: true
 experiment: "Experiment 1"
 run: 1
-cwd: /home/riedmiki/phd/repos/kimmdy/example/kimmdy.yml        # optional, current working directory by default 
+#cwd:         # optional, current working directory by default 
 top: 'topol.top'
 gro: 'protein.gro'
 plumed:
@@ -14,10 +14,7 @@ equilibration:
   # maybe not necessary
   nvt:
     mdp: 'nvt.mdp'
-    tpr: 'nvt.tpr'
-  npt:
-    mdp: 'npt.mdp'
-    tpr: 'npt.tpr'
+    # tpr: 'nvt.tpr' <--- Inconsistent config
 reactions:
   - homolysis
   - hat
