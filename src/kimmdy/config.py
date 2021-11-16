@@ -29,7 +29,7 @@ type_scheme = {
 }
 
 
-class Config(object):
+class Config:
     """
     Internal representation of the configuration generated
     from the input file, which enables validation before running
