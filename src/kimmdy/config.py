@@ -71,8 +71,6 @@ class Config:
 
         if input_file is not None:
             Config.cwd = Path(cwd) if (cwd := raw.get("cwd")) else input_file.parent
-            print("CWD:  ",Config.cwd)
-            print("inp:  ",input_file.parent)
             self._cast_types()
             self._validate()
 
@@ -115,13 +113,13 @@ class Config:
         """Validates attributes read from config file."""
         attr_names = filter(lambda s: s[0] != "_", self.__dir__())
         for attr_name in attr_names:
+            logging.debug("validating:", attr_name)
             attr = self.__getattribute__(attr_name)
             if isinstance(attr, Config):
                 attr._validate()
 
             # Check files from scheme
             if isinstance(attr, Path):
-                print("PATH:  ",attr)
                 if not attr.is_absolute():
                     attr = Config.cwd / attr
                     self.__setattr__(attr_name, attr)
@@ -129,11 +127,10 @@ class Config:
 
             # Check config for consistency
             if attr_name in ["nvt", "npt"]:
-                print("validating:", attr_name)
                 for necessary_f in ["mdp", "tpr"]:
                     assert necessary_f in attr.__dir__(), f"{necessary_f} for {attr_name} is missing in config!"
 
             # Checks
             if attr_name == "reactions":
-                print(f"DUMMY VALIDATION: There are {len(attr)} reactions!")
+                logging.info(f"DUMMY VALIDATION: There are {len(attr)} reactions!")
  
