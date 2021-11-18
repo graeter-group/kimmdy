@@ -34,13 +34,24 @@ class Config:
     Internal representation of the configuration generated
     from the input file, which enables validation before running
     and computationally expensive operations.
+    All settings read from the input file are accessible through nested attributes.
+
+    Parameters
+    ----------
+    input_file : Path
+        Path to the config yaml file.
+    recursive_dict : dict
+        For internal use only, used in reading settings in recursively.
+    type_scheme : dict
+        dict containing types for casting and validating settings.
+    
     """
 
     cwd: Path
 
     def __init__(
         self, input_file: Path = None, recursive_dict=None, type_scheme=type_scheme
-    ):
+    ): 
         if input_file is None and recursive_dict is None:
             m = "Error: No input file was provided!"
             logging.error(m)
