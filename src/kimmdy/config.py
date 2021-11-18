@@ -45,6 +45,10 @@ class Config:
             m = "Error: No input file was provided!"
             logging.error(m)
             raise ValueError(m)
+        
+        if input_file is not None and not isinstance(input_file, Path):
+            logging.warn("Warning: Config input file was not type pathlib.Path, attemptin conversion..")
+            Path(input_file)
 
         self.type_scheme = type_scheme
         if self.type_scheme is None:
