@@ -66,7 +66,7 @@ class Config:
                     val = Config(
                         recursive_dict=val, type_scheme=self.type_scheme.get(name)
                     )
-                logging.debug("Set attribute:", name, val)
+                logging.debug(f"Set attribute: {name}, {val}")
                 self.__setattr__(name, val)
 
         if input_file is not None:
@@ -78,6 +78,10 @@ class Config:
         repr = self.__dict__.copy()
         repr.pop("type_scheme")
         return str(repr)
+
+    def attr(self, attribute):
+        """Alias for self.__getattribute__"""
+        return self.__getattribute__(attribute)
 
     def _cast_types(self):
         """Casts types defined in `type_scheme` to raw attributes."""
@@ -113,7 +117,7 @@ class Config:
         """Validates attributes read from config file."""
         attr_names = filter(lambda s: s[0] != "_", self.__dir__())
         for attr_name in attr_names:
-            logging.debug("validating:", attr_name)
+            logging.debug(f"validating: {attr_name}")
             attr = self.__getattribute__(attr_name)
             if isinstance(attr, Config):
                 attr._validate()
@@ -128,9 +132,10 @@ class Config:
             # Check config for consistency
             if attr_name in ["nvt", "npt"]:
                 for necessary_f in ["mdp", "tpr"]:
-                    assert necessary_f in attr.__dir__(), f"{necessary_f} for {attr_name} is missing in config!"
+                    assert (
+                        necessary_f in attr.__dir__()
+                    ), f"{necessary_f} for {attr_name} is missing in config!"
 
             # Checks
             if attr_name == "reactions":
                 logging.info(f"DUMMY VALIDATION: There are {len(attr)} reactions!")
- 

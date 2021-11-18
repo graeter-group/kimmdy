@@ -113,7 +113,7 @@ class MDManager:
         topfile = runmgr.config.top
         grofile = runmgr.config.gro
         outgro = "min" + str(runmgr.iteration) + ".gro"
-        mdpfile = runmgr.config.minimization["mdp"]
+        mdpfile = runmgr.config.minimization.mdp
         tprfile = "em" + str(runmgr.iteration) + ".tpr"
 
         if runmgr.config.dryrun:
@@ -129,7 +129,7 @@ class MDManager:
         topfile = runmgr.config.top
         grofile = runmgr.config.gro
         outgro = ensemble + "_" + str(runmgr.iteration) + ".gro"
-        mdpfile = runmgr.config.equilibration[ensemble]["mdp"]
+        mdpfile = runmgr.config.equilibration.attr(ensemble).mdp
         tprfile = ensemble + "_" + str(runmgr.iteration) + ".tpr"
 
         if runmgr.config.dryrun:

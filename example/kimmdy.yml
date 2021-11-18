@@ -1,7 +1,7 @@
 dryrun: true
 experiment: "Experiment 1"
 run: 1
-cwd: /home/riedmiki/phd/repos/kimmdy/example/kimmdy.yml        # optional, current working directory by default 
+# cwd:        # optional, current working directory by default 
 top: 'topol.top'
 gro: 'protein.gro'
 plumed:
