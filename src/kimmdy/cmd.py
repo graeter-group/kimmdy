@@ -10,7 +10,7 @@ def get_cmdline_args():
     """Parse command line arguments and configure logger"""
     parser = argparse.ArgumentParser(description="Welcome to KIMMDY")
     parser.add_argument(
-        "--input", "-i", type=str, help="kimmdy input file", default="kimmdy.yml"
+        "--input", "-i", type=str, help="kimmdy input file", default="../example/minimal_example/test_1/kimmdy.yml"
     )
     parser.add_argument(
         "--loglevel",
@@ -20,7 +20,7 @@ def get_cmdline_args():
         default="DEBUG",
     )
     parser.add_argument(
-        "--logfile", "-f", type=str, help="logfile", default="kimmdy.log"
+        "--logfile", "-f", type=str, help="logfile", default="../example/minimal_example/test_1/kimmdy.log"
     )
     return parser.parse_args()
 
@@ -31,9 +31,9 @@ def configure_logging(args, color=True):
         logging.addLevelName(logging.ERROR, "\033[31mERROR\033[00m")
         logging.addLevelName(logging.WARNING, "\033[33mWARN\033[00m")
     logging.basicConfig(
-        encoding="utf-8",
+        #encoding="utf-8",
         level=getattr(logging, args.loglevel.upper()),
-        handlers=[logging.FileHandler(args.logfile), logging.StreamHandler(sys.stdout)],
+        handlers=[logging.FileHandler(args.logfile,encoding="utf-8",mode='w'), logging.StreamHandler(sys.stdout)],
         format="\033[34m %(asctime)s\033[00m: %(levelname)s: %(message)s",
         datefmt="%d-%m-%Y %H:%M",
     )
