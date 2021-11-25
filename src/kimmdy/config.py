@@ -23,11 +23,16 @@ class Config:
     dryrun: bool
     experiment: str
     cwd: Path
-    reactions: list[str]
     top: Path
     gro: Path
-    minimization: dict
-    equilibration: dict
+    idx: Path
+    plumed: dict
+    #minimization: dict
+    #equilibration: dict
+    equilibrium: dict
+    prod: dict
+    changer: dict
+    reactions: dict 
 
     def __init__(self, input_file: Path):
         with open(input_file, "r") as f:
@@ -38,15 +43,23 @@ class Config:
 
         self.dryrun = raw.get("dryrun")
         self.experiment = raw.get("experiment")
+        self.iterations = raw.get("iterations")
         self.cwd = Path(cwd) if (cwd := raw.get("cwd")) else Path.cwd()
-        self.reactions = raw.get("reactions")
         self.top = Path(raw.get("top"))
         self.gro = Path(raw.get("gro"))
+        self.idx = Path(raw.get("idx"))
+        self.plumed = raw.get("plumed")
         self.minimization = raw.get("minimization")
         self.equilibration = raw.get("equilibration")
+        self.equilibrium = raw.get("equilibrium")
+        self.prod = raw.get("prod")
+        self.changer = raw.get("changer")
+        self.reactions = raw.get("reactions")
+
+        
 
         self._validate()
 
     def _validate(self):
         for p in [self.top, self.gro]:
-            check_file_exists(p)
+            check_file_exists(Path(self.cwd,p))
