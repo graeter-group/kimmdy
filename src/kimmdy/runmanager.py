@@ -74,8 +74,8 @@ class RunManager:
     rates: list
     md: MDManager
 
-    def __init__(self, input_file: Path):
-        self.config = Config(input_file)
+    def __init__(self, input_file: Path or str):
+        self.config = Config(Path(input_file))
         self.tasks = queue.Queue()
         self.iteration = 0
         self.iterations=self.config.iterations

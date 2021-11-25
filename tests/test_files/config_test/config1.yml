@@ -1,7 +1,7 @@
 dryrun: true
 experiment: "Experiment 1"
 run: 1
-# cwd:        # optional, current working directory by default 
+#cwd:         # optional, current working directory by default 
 top: 'topol.top'
 gro: 'protein.gro'
 plumed:
@@ -15,9 +15,6 @@ equilibration:
   nvt:
     mdp: 'nvt.mdp'
     tpr: 'nvt.tpr'
-  npt:
-    mdp: 'npt.mdp'
-    tpr: 'npt.tpr'
 reactions:
   - homolysis
   - hat
