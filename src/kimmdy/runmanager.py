@@ -39,14 +39,7 @@ def default_decision_strategy(list_of_rates,list_of_recipes):
     #print ('Rate = ' + str(rate) + ', breakpair = ' + str (breakpair) + ', atomtypes = ' + str(atomtypes) + 'jump [ps] = ' + str(delta_t))
     #logging.info(('Rate = ' + str(rate) + ', breakpair = ' + str (breakpair) + ', atomtypes = ' + str(atomtypes) + 'jump [ps] = ' + str(delta_t)))
 
-    #return breakpair, atomtypes, delta_t
-
-    ### moved to changer
-    #rupture_time = delta_t / 1000.0 #convert ps to ns                          
-    #newtop = '../broken_topol.top'
-    # modify_top (topfile, newtop, breakpair)  
-    #topfile = newtop
-    
+ 
 class State(Enum):
     IDLE = auto()
     MD = auto()
@@ -88,8 +81,8 @@ class RunManager:
         self.config.cwd.mkdir(parents=True,exist_ok=True)
         os.chdir(self.config.cwd)
 
-        self.plumeddat = self.config.plumed['dat']
-        self.plumeddist = self.config.plumed['distances']
+        self.plumeddat = self.config.plumed.dat
+        self.plumeddist = self.config.plumed.distances
         # self.md = MDManager()
 
     def run(self):
@@ -122,7 +115,7 @@ class RunManager:
     def _run_md_minim(self):
         logging.info("Start minimization md")
         self.state = State.MD
-        self.md = MDManager(self.top,self.config.gro,self.iteration,self.config.dryrun,self.config.minimization["mdp"])
+        self.md = MDManager(self.top,self.config.gro,self.iteration,self.config.dryrun,self.config.minimization.mdp)
         self.md.minimzation()
         self.state = State.IDLE
         logging.info("Done minimizing")
@@ -130,7 +123,7 @@ class RunManager:
     def _run_md_eq(self, ensemble):
         logging.info("Start equilibration md")
         self.state = State.MD
-        self.md = MDManager(self.top,self.config.gro,self.iteration,self.config.dryrun,self.config.equilibration[ensemble]["mdp"])
+        self.md = MDManager(self.top,self.config.gro,self.iteration,self.config.dryrun,self.config.equilibration[ensemble].mdp)
         self.md.equilibration(ensemble)
         self.state = State.IDLE
         logging.info("Done equilibrating")
@@ -138,7 +131,7 @@ class RunManager:
     def _run_md_equil(self,it):
         logging.info("Start equilibration MD")
         self.state = State.MD
-        self.md = MDManager(self.top,self.structure,self.config.idx,self.config.equilibrium['mdp'],it,'equilibrium',self.config.dryrun)
+        self.md = MDManager(self.top,self.structure,self.config.idx,self.config.equilibrium.mdp,it,'equilibrium',self.config.dryrun)
         self.structure = self.md.equilibrium()
         self.state = State.IDLE
         logging.info("Done equilibrating")
@@ -146,7 +139,7 @@ class RunManager:
     def _run_md_prod(self,it):
         logging.info("Start production MD")
         self.state = State.MD
-        self.md = MDManager(self.top,self.structure,self.config.idx,self.config.prod['mdp'],it,'pull',self.config.dryrun)
+        self.md = MDManager(self.top,self.structure,self.config.idx,self.config.prod.mdp,it,'pull',self.config.dryrun)
         self.structure = self.md.production('state.cpt', self.plumeddat)
         self.state = State.IDLE
         logging.info("Done simulating")
@@ -154,7 +147,7 @@ class RunManager:
     def _run_md_relax(self,it):
         logging.info("Start relaxation MD")
         self.state = State.MD
-        self.md = MDManager(self.top,self.structure,self.config.idx,self.config.changer['coordinates']['md']['mdp'],it,'relax',self.config.dryrun)
+        self.md = MDManager(self.top,self.structure,self.config.idx,self.config.changer.coordinates.md.mdp,it,'relax',self.config.dryrun)
         self.structure = self.md.relaxation('state.cpt')
         self.state = State.IDLE
         logging.info("Done simulating")
@@ -162,9 +155,9 @@ class RunManager:
     def _query_reactions(self):
         logging.info("Query reactions")
         self.state = State.REACTION
-        if 'homolysis' in self.config.reactions:
+        if hasattr(self.config.reactions,'homolysis'):
             self.reaction = Homolysis()
-            self.rates,self.recipes = self.reaction.rupturerates(self.plumeddat,self.plumeddist,self.top,self.config.reactions['homolysis']['bonds'],self.config.reactions['homolysis']['edis'])
+            self.rates,self.recipes = self.reaction.rupturerates(self.plumeddat,self.plumeddist,self.top,self.config.reactions.homolysis.bonds,self.config.reactions.homolysis.edis)
         logging.info("Rates and Recipes:")
         logging.info(self.rates[0:10])
         logging.info(self.recipes[0:10])
@@ -180,12 +173,15 @@ class RunManager:
         logging.info(f"Start Recipe {it}")
         logging.info(f"Breakpair: {self.chosen_recipe.atom_idx}")
         self.changer = ChangeManager(it,self.chosen_recipe.atom_idx)  
-        self.top = self.changer.modify_top(self.top,f"topol_{it}.top")  #self.top.replace(".top","_0.top")
+        newtop=os.path.splitext(self.top)[0]+str(it)+"_.top"   # there must be a better way to do this :/
+        self.top = self.changer.modify_top(self.top,newtop) 
         logging.info(f"Wrote new topology to {self.top}")
-        self.plumeddat, self.plumeddist = self.changer.modify_plumed(self.plumeddat,self.plumeddat.replace(".dat",f"_{it}.dat"),self.plumeddist.replace(".dat",f"_{it}.dat"))
+        newplumeddat=os.path.splitext(self.plumeddat)[0]+str(it)+"_.dat"
+        newplumeddist=os.path.splitext(self.plumeddist)[0]+str(it)+"_.dat"
+        self.plumeddat, self.plumeddist = self.changer.modify_plumed(self.plumeddat,newplumeddat,newplumeddist)  
         logging.info(f"Wrote new plumedfile to {self.plumeddat}")
-        logging.info(f"Looking for md in {self.config.changer['coordinates'].keys()}")
-        if 'md' in self.config.changer['coordinates'].keys():
+        logging.info(f"Looking for md in {self.config.changer.coordinates.__dict__}")
+        if hasattr(self.config.changer.coordinates,'md'):
             self.tasks.put(Task(self._run_md_relax,{'it':it}))
         self.state = State.IDLE
         

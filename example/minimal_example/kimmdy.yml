@@ -1,7 +1,7 @@
 dryrun: false
 experiment: "Experiment 1"
 iterations: 1
-cwd: '../example/minimal_example/'              # optional, current working directory by default 
+  #cwd: '../example/minimal_example/test_1'              # optional, current working directory by default 
 top: 'topol.top'
 gro: 'npt.gro'
 idx: 'index_backbone.ndx'

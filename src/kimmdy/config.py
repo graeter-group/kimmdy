@@ -15,17 +15,21 @@ def check_file_exists(p: Path):
 type_scheme = {
     "dryrun": bool,
     "experiment": str,
-    "run": int,
+    "iterations": int,
     "cwd": Path,
     "top": Path,
     "gro": Path,
+    "idx": Path,
     "plumed": {"dat": Path, "distances": Path},
-    "minimization": {"mdp": Path, "tpr": Path},
-    "equilibration": {
-        "nvt": {"mdp": Path, "tpr": Path},
-        "npt": {"mdp": Path, "tpr": Path},
-    },
-    "reactions": list,
+    #"minimization": {"mdp": Path, "tpr": Path},
+    #"equilibration": {
+    #    "nvt": {"mdp": Path, "tpr": Path},
+    #    "npt": {"mdp": Path, "tpr": Path},
+    #},
+    "equilibrium": {"mdp": Path},
+    "prod": {"mdp": Path},
+    "changer":{"coordinates":{"md": {"mdp": Path}}},
+    "reactions": {"homolysis":{"edis": Path, "bonds": Path}}
 }
 
 
@@ -142,7 +146,9 @@ class Config:
                 if not attr.is_absolute():
                     attr = Config.cwd / attr
                     self.__setattr__(attr_name, attr)
-                check_file_exists(attr)
+                if not str(attr) in ["distances.dat"]:          #distances.dat wouldn't exist prior to the run
+                    logging.debug(attr)
+                    check_file_exists(attr)
 
             # Check config for consistency
             if attr_name in ["nvt", "npt"]:
@@ -152,5 +158,5 @@ class Config:
                     ), f"{necessary_f} for {attr_name} is missing in config!"
 
             # Checks
-            if attr_name == "reactions":
-                logging.info(f"DUMMY VALIDATION: There are {len(attr)} reactions!")
+            if attr_name == "reactions":               # changed reactions to be no longer a list but it yields a wrong value
+                logging.info(f"DUMMY VALIDATION: There are {len(attr.__dict__)} reactions!")
