@@ -103,7 +103,7 @@ class Reaction(ABC):
         list_of_distances = []
         header = True #used to skip header
         ctr = 0
-        with open (datafile) as f:
+        with open(datafile) as f:
             for line in f:
                 line_split = []
                 ctr += 1
