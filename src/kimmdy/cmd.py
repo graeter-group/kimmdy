@@ -10,7 +10,7 @@ def get_cmdline_args():
     """Parse command line arguments and configure logger"""
     parser = argparse.ArgumentParser(description="Welcome to KIMMDY")
     parser.add_argument(
-        "--input", "-i", type=str, help="kimmdy input file", default="../example/minimal_example/test_1/kimmdy.yml"
+        "--input", "-i", type=str, help="kimmdy input file", default="kimmdy.yml"
     )
     parser.add_argument(
         "--loglevel",
@@ -20,7 +20,7 @@ def get_cmdline_args():
         default="DEBUG",
     )
     parser.add_argument(
-        "--logfile", "-f", type=str, help="logfile", default="../example/minimal_example/test_1/kimmdy.log"
+        "--logfile", "-f", type=str, help="logfile", default="kimmdy.log"
     )
     return parser.parse_args()
 
