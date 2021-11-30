@@ -19,6 +19,5 @@ equilibration:
     mdp: 'npt.mdp'  # <-- Missing file
     tpr: 'npt.tpr'
 reactions:
-  - homolysis
-  - hat
+  dummy:
 

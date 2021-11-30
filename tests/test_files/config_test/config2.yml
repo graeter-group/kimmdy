@@ -16,6 +16,5 @@ equilibration:
     mdp: 'nvt.mdp'
     # tpr: 'nvt.tpr' <--- Inconsistent config
 reactions:
-  - homolysis
-  - hat
+  dummy:
 

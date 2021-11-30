@@ -16,6 +16,5 @@ equilibration:
     mdp: 'nvt.mdp'
     tpr: 'nvt.tpr'
 reactions:
-  - homolysis
-  - hat
+  dummy:
 
