@@ -5,6 +5,16 @@
 kimmdy.log
 test_0/
 test_1/
+\#*\#
+mdout.mdp
+*.log
+*.xtc
+*.trr
+*.cpt
+*.xvg
+*.edr
+*.tpr
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
