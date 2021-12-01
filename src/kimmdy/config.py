@@ -14,7 +14,7 @@ def check_file_exists(p: Path):
 
 type_scheme = {
     "dryrun": bool,
-    "experiment": str,
+    "name": str,
     "iterations": int,
     "out": Path,
     "top": Path,
@@ -52,6 +52,7 @@ class Config:
     """
 
     cwd: Path
+    out: Path
 
     def __init__(
         self, input_file: Path = None, recursive_dict=None, type_scheme=type_scheme
@@ -94,6 +95,22 @@ class Config:
             Config.cwd = (
                 Path(cwd) if (cwd := raw.get("cwd")) else input_file.parent.resolve()
             )
+            Config.out = (
+                Path(out) if (out := raw.get("out")) else self.cwd / self.name
+            )
+            # make sure Config.out is empty
+            while Config.out.exists():
+                logging.info(f"Output dir {Config.out} exists, incrementing name")
+                out_end = Config.out.name[-3:]
+                if out_end.isdigit():
+                    Config.out = Config.out.with_name(
+                        f"{Config.out.name[:-3]}{int(out_end)+1:03}"
+                    )
+                else:
+                    Config.out = Config.out.with_name(Config.out.name+"_001")
+            Config.out.mkdir()
+            logging.info(f"Created output dir {Config.out}")
+
             self._cast_types()
             self._validate()
 
@@ -137,7 +154,7 @@ class Config:
                     raise ValueError(e)
 
             else:
-                logging.info(
+                logging.debug(
                     f"{to_type} conversion found for attribute {attr_name} and not executed."
                 )
 
@@ -152,9 +169,7 @@ class Config:
 
             # Check files from scheme
             if isinstance(attr, Path):
-                if not attr.is_absolute():
-                    attr = Config.cwd / attr
-                    self.__setattr__(attr_name, attr)
+                self.__setattr__(attr_name, attr.resolve())
                 if not str(attr) in [
                     "distances.dat"
                 ]:  # distances.dat wouldn't exist prior to the run
@@ -173,5 +188,5 @@ class Config:
                 attr_name == "reactions"
             ):  # changed reactions to be no longer a list but it yields a wrong value
                 logging.info(
-                    f"DUMMY VALIDATION: There are {len(attr.__dict__)-1} reactions!"
+                    f"DUMMY VALIDATION: There are {len(attr.__dict__)-2} reactions!"
                 )

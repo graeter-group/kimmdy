@@ -2,8 +2,8 @@ import subprocess as sp
 import numpy as np
 
 
-def run_shell_cmd(s):
-    sp.run(s, shell=True)
+def run_shell_cmd(s, cwd=None):
+    sp.run(s, shell=True, cwd=cwd)
 
 
 def get_shell_stdout(s):

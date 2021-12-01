@@ -1,15 +1,13 @@
 dryrun: false
 experiment: "Experiment 1"
 iterations: 1
-  #cwd: '../example/minimal_example/test_1'              # optional, current working directory by default 
+out: 'out'              # optional, current working directory by default 
 top: 'topol.top'
 gro: 'npt.gro'
 idx: 'index_backbone.ndx'
 plumed:
   dat: 'plumed.dat'
   distances: 'distances.dat'
-minimization: false
-equilibration: false
 equilibrium:
   mdp: 'pullf1500_equil.mdp'
 prod:
