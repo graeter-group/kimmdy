@@ -1,7 +1,8 @@
 dryrun: false
-experiment: "Experiment 1"
+name: "Experiment_001"
 iterations: 1
-out: 'out'              # optional, current working directory by default 
+# out: 'out'                  # optional, current working directory by default 
+# ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
 top: 'topol.top'
 gro: 'npt.gro'
 idx: 'index_backbone.ndx'

@@ -5,15 +5,15 @@ title                    = Pulling simulation
 integrator  = md
 dt          = 0.0002   ; 0.2fs
 tinit       = 0
-nsteps      = 100000    ; 
+nsteps      = 1000    ; 
 nstcomm     = 10
 ; Output parameters
-nstxout     = 1000      ; every  x ps
-nstvout     = 1000 
-nstfout     = 1000
-nstxtcout   = 500       ; every x ps
-nstlog	    = 1000
-nstenergy   = 1000
+nstxout     = 100      ; every  x ps
+nstvout     = 100 
+nstfout     = 100
+nstxtcout   = 100       ; every x ps
+nstlog	    = 100
+nstenergy   = 100
 ; Bond parameters
 constraint_algorithm    = lincs
 constraints             = h-bonds

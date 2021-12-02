@@ -13,23 +13,9 @@ import subprocess as sp
 
 
 class MDManager:
-    # def __init__(self):
-        # self.topfile = top
-        # self.struct = struct
-        
-        # self.indexfile = idx
-        # self.mdpfile = mdppath
-        # self.it = str(iteration)
-
-        # self.outgro = basename + self.it + ".gro"
-        # self.outtpr = basename + self.it + ".tpr"
-        # self.outtrr = basename + self.it + ".trr"
-
     def dummy_step(self, out_dir, top, gro):
-        run_shell_cmd(
-            "pwd>./pwd.pwd", out_dir
-        )
-    
+        run_shell_cmd("pwd>./pwd.pwd", out_dir)
+
     def write_mdp(self):
         pass
 
@@ -40,13 +26,6 @@ class MDManager:
             f"gmx grompp -p {top} -c {gro} -r {gro} -f {mdp} -o {tpr}", out_dir
         )
         run_shell_cmd(f"gmx mdrun -s {tpr} -c {outgro}", out_dir)
-    
-    def _minimzation(self):
-
-        run_shell_cmd(
-            f"gmx grompp -p {self.topfile} -c {self.grofile} -r {self.grofile} -f {self.mdpfile} -o {self.tprfile}"
-        )
-        run_shell_cmd(f"gmx mdrun -s {self.tprfile} -c {self.outgro}")
 
     def equilibration(self, out_dir, top, gro, mdp):
         tpr = out_dir / "equil.tpr"
@@ -62,33 +41,26 @@ class MDManager:
         outgro = out_dir / "equil.gro"
         outtrr = out_dir / "equil.trr"
         run_shell_cmd(
-            f"gmx grompp -p {top} -c {gro} -f {mdp} -n {idx} -o {tpr} -maxwarn 5", out_dir
+            f"gmx grompp -p {top} -c {gro} -f {mdp} -n {idx} -o {tpr} -maxwarn 5",
+            out_dir,
         )
         run_shell_cmd(
             f"gmx mdrun -v -s {tpr} -c {outgro} -o {outtrr}", out_dir
         )  # use mpirun mdrun_mpi on cluster / several nodes are used
 
-    def production(self, out_dir, top, gro, mdp, idx, cpt, dat):
+    def production(self, out_dir, top, gro, mdp, idx, cpt, plumed_dat):
         """normal pulling md"""
         tpr = out_dir / "prod.tpr"
         outgro = out_dir / "prod.gro"
         outtrr = out_dir / "prod.trr"
         run_shell_cmd(
-            f" gmx grompp -p {top} -c {gro} -f {mdp} -n {idx} -t {cpt} -o {tpr} -maxwarn 5", out_dir
+            f" gmx grompp -p {top} -c {gro} -f {mdp} -n {idx} -t {cpt} -o {tpr} -maxwarn 5",
+            out_dir,
         )
         run_shell_cmd(
-            f"gmx mdrun -v -s {tpr} -c {outgro} -plumed {dat} -o {outtrr}", out_dir
+            f"gmx mdrun -v -s {tpr} -c {outgro} -plumed {plumed_dat} -o {outtrr}",
+            out_dir,
         )  # use mpirun mdrun_mpi on cluster
-    
-    def _production(self, cpt, plumedfile):
-        """normal pulling md"""
-        run_shell_cmd(
-            f" gmx grompp -p {self.topfile} -c {self.struct} -f {self.mdpfile} -n {self.indexfile} -t {cpt} -o {self.outtpr} -maxwarn 5"
-        )
-        run_shell_cmd(
-            f"gmx mdrun -v -s {self.outtpr} -c {self.outgro} -plumed {plumedfile} -o {self.outtrr}"
-        )  # use mpirun mdrun_mpi on cluster
-        return self.outgro
 
     def relaxation(self, out_dir, top, gro, mdp, idx, cpt):
         """equil after break -->> called from changer"""
@@ -96,18 +68,9 @@ class MDManager:
         outgro = out_dir / "relax.gro"
         outtrr = out_dir / "relax.trr"
         run_shell_cmd(
-            f" gmx grompp -p {top} -c {gro} -f {mdp} -n {idx} -t {cpt} -o {tpr} -maxwarn 5", out_dir
+            f" gmx grompp -p {top} -c {gro} -f {mdp} -n {idx} -t {cpt} -o {tpr} -maxwarn 5",
+            out_dir,
         )
         run_shell_cmd(
             f"gmx mdrun -v -s {tpr} -c {outgro} -o {outtrr}", out_dir
         )  # use mpirun mdrun_mpi on cluster / several nodes are used
-
-    def _relaxation(self, cpt):
-        """equil after break -->> called from changer"""
-        run_shell_cmd(
-            f" gmx grompp -p {self.topfile} -c {self.struct} -f {self.mdpfile} -n {self.indexfile} -t {cpt} -o {self.outtpr} -maxwarn 5"
-        )
-        run_shell_cmd(
-            f"gmx mdrun -v -s {self.outtpr} -c {self.outgro} -o {self.outtrr}"
-        )  # use mpirun mdrun_mpi on cluster / several nodes are used
-        return self.outgro

@@ -3,8 +3,7 @@ from kimmdy.utils import store_linelist_to_file, get_data_from_file
 
 
 class ChangeManager:
-    def __init__(self, iteration, breakpair):
-        self.it = str(iteration)
+    def __init__(self, breakpair):
         self.breakpair = breakpair
 
     def modify_top(self, oldtop, newtop):

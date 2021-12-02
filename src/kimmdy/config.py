@@ -17,6 +17,7 @@ type_scheme = {
     "name": str,
     "iterations": int,
     "out": Path,
+    "ff": Path,
     "top": Path,
     "gro": Path,
     "idx": Path,
@@ -95,9 +96,7 @@ class Config:
             Config.cwd = (
                 Path(cwd) if (cwd := raw.get("cwd")) else input_file.parent.resolve()
             )
-            Config.out = (
-                Path(out) if (out := raw.get("out")) else self.cwd / self.name
-            )
+            Config.out = Path(out) if (out := raw.get("out")) else self.cwd / self.name
             # make sure Config.out is empty
             while Config.out.exists():
                 logging.info(f"Output dir {Config.out} exists, incrementing name")
@@ -107,9 +106,15 @@ class Config:
                         f"{Config.out.name[:-3]}{int(out_end)+1:03}"
                     )
                 else:
-                    Config.out = Config.out.with_name(Config.out.name+"_001")
+                    Config.out = Config.out.with_name(Config.out.name + "_001")
             Config.out.mkdir()
             logging.info(f"Created output dir {Config.out}")
+
+            if not hasattr(self, "ff"):
+                ffs = list(self.cwd.glob("*.ff"))
+                assert len(ffs) == 1, "Wrong count of forcefields"
+                assert ffs[0].is_dir(), "Forcefield should be a directory!"
+                self.ff = ffs[0].resolve()
 
             self._cast_types()
             self._validate()

@@ -16,12 +16,12 @@ class Homolysis(Reaction):
         recipe = ConversionRecipe(ConversionType.BREAK, [(1, 2)])
         return recipe
 
-    def rupturerates(
-        self, plumedfile, datafile, topfile, filepath_bonds, filepath_edis
-    ):
+    def rupturerates(self, plumed_dat, distances_dat, top, ffbonded_itp, edissoc_dat):
         # read out bond distances and atomtypes
-        list_of_breakpairs_and_distances = self.find_distances(plumedfile, datafile)
-        dic_of_nbrs_to_atomtypes = identify_atomtypes(topfile)
+        list_of_breakpairs_and_distances = self.find_distances(
+            plumed_dat, distances_dat
+        )
+        dic_of_nbrs_to_atomtypes = identify_atomtypes(top)
 
         list_of_recipes = []
         list_of_rates = []
@@ -44,10 +44,10 @@ class Homolysis(Reaction):
             atomtypes.append(dic_of_nbrs_to_atomtypes[breakpair[1]])
 
             r_0, k_f = self.find_bond_param(
-                atomtypes, filepath_bonds
+                atomtypes, ffbonded_itp
             )  # read out from gromacs force field
             E_dis = self.find_Edis(
-                atomtypes, filepath_edis
+                atomtypes, edissoc_dat
             )  # read out from gromacs force field
 
             # calculate rupture probabilties
