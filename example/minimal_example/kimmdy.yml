@@ -1,7 +1,6 @@
 dryrun: false
-name: "Experiment_001"
 iterations: 1
-# out: 'out'                  # optional, current working directory by default 
+out: 'test_out_001'
 # ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
 top: 'topol.top'
 gro: 'npt.gro'

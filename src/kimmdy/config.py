@@ -14,7 +14,6 @@ def check_file_exists(p: Path):
 
 type_scheme = {
     "dryrun": bool,
-    "name": str,
     "iterations": int,
     "out": Path,
     "ff": Path,
@@ -52,8 +51,8 @@ class Config:
 
     """
 
-    cwd: Path
-    out: Path
+    # cwd: Path
+    # out: Path
 
     def __init__(
         self, input_file: Path = None, recursive_dict=None, type_scheme=type_scheme
@@ -93,22 +92,22 @@ class Config:
                 self.__setattr__(name, val)
 
         if input_file is not None:
-            Config.cwd = (
+            self.cwd = (
                 Path(cwd) if (cwd := raw.get("cwd")) else input_file.parent.resolve()
             )
-            Config.out = Path(out) if (out := raw.get("out")) else self.cwd / self.name
-            # make sure Config.out is empty
-            while Config.out.exists():
-                logging.info(f"Output dir {Config.out} exists, incrementing name")
-                out_end = Config.out.name[-3:]
+            self.out = Path(out) if (out := raw.get("out")) else self.cwd / self.name
+            # make sure self.out is empty
+            while self.out.exists():
+                logging.info(f"Output dir {self.out} exists, incrementing name")
+                out_end = self.out.name[-3:]
                 if out_end.isdigit():
-                    Config.out = Config.out.with_name(
-                        f"{Config.out.name[:-3]}{int(out_end)+1:03}"
+                    self.out = self.out.with_name(
+                        f"{self.out.name[:-3]}{int(out_end)+1:03}"
                     )
                 else:
-                    Config.out = Config.out.with_name(Config.out.name + "_001")
-            Config.out.mkdir()
-            logging.info(f"Created output dir {Config.out}")
+                    self.out = self.out.with_name(self.out.name + "_001")
+            self.out.mkdir()
+            logging.info(f"Created output dir {self.out}")
 
             if not hasattr(self, "ff"):
                 ffs = list(self.cwd.glob("*.ff"))
