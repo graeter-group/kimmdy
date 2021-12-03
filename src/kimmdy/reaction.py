@@ -15,8 +15,8 @@ class ConversionType(Enum):
 @dataclass
 class ConversionRecipe:
     type: ConversionType
-    atom_idx: list  # old definition made some problems
-    atom_type: list
+    atom_idx: tuple[tuple[int, int]]  # reactions[atm_to_move, target]
+    atom_type: list #TODO: remove
 
 
 class Reaction(ABC):

@@ -108,7 +108,9 @@ class RunManager:
 
     def run(self):
         logging.info("Start run")
-        # TODO: Make task order dynamic
+        # TODO: Make task order dynamic: iterate over seq in config
+        # golbal step counter for dirs
+        # LATER: counter for groups as defined initially
 
         self.tasks.put(Task(self._run_md_equil))
 
