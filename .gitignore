@@ -1,6 +1,10 @@
 # editors / tooling
 .vscode
 
+# our own program output
+kimmdy.log
+test_out*/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -75,3 +79,8 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+
+# tooling
+node_modules
+package-lock.json
+

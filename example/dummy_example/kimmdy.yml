@@ -1,0 +1,25 @@
+dryrun: true
+experiment: "Experiment 1"
+iterations: 1
+# out:        # optional, current working directory by default 
+top: 'topol.top'
+gro: 'protein.gro'
+plumed:
+  dat: 'plumed.dat'
+  distances: 'distances.dat'
+minimization:
+  mdp: 'minim.mdp'
+  tpr: 'minim.tpr'
+equilibration:
+  nvt:
+    mdp: 'nvt.mdp'
+    tpr: 'nvt.tpr'
+  npt:
+    mdp: 'npt.mdp'
+    tpr: 'npt.tpr'
+reactions:
+  homolysis:
+    edis: 'edissoc.dat'
+    bonds: 'ffbonded.itp'
+  dummy:  # known reactions need the expected files
+
