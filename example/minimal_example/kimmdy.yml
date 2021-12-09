@@ -20,4 +20,10 @@ reactions:
   homolysis:
     edis: 'edissoc.dat'
     bonds: 'ffbonded.itp'
-
+sequence:
+  - equilibrium
+  - 
+    mult: 1
+    tasks:
+      - prod
+      - reactions

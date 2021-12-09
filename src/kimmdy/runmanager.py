@@ -89,7 +89,8 @@ class RunManager:
 
     def __init__(self, input_file: Path):
         self.config = Config(Path(input_file))
-        self.tasks = queue.Queue()
+        self.tasks = queue.Queue()     # 
+        self.crr_tasks = queue.Queue() # priority queue
         self.iteration = 0
         self.iterations = self.config.iterations
         self.state = State.IDLE
@@ -118,12 +119,9 @@ class RunManager:
         for step in self.filehist[::-1]:
             for io in (step["out"], step["in"]):
                 if f_type in io.keys():
-                    # if f_type in self.ambiguos_suffs: # suffix was ambiguos
-                    #     logging.warn(f"{f_type} ambiguos! Please specify full file name!")
+                    if f_type in self.ambiguos_suffs: # suffix was ambiguos
+                        logging.warn(f"{f_type} ambiguos! Please specify full file name!")
                     return io[f_type]
-                # elif f_type[-3:] in io.keys():
-                #     logging.debug(f"Full file name {f_type} given, but only suffix found.")
-                #     return io[f_type[-3:]]
         else:
             m = f"File {f_type} requested but not found!"
             logging.error(m)
@@ -131,22 +129,13 @@ class RunManager:
 
     def run(self):
         logging.info("Start run")
-        # TODO: Make task order dynamic: iterate over seq in config
-        # golbal step counter for dirs
-        # LATER: counter for groups as defined initially
+        logging.info("Building task list")
+        
+        for task in self.config.sequence:
+            logging.debug(f"Put Task: {self.task_mapping[task]}")
+            self.tasks.put(Task(self.task_mapping[task]))
 
-        self.tasks.put(Task(self._run_md_equil))
-
-        for _ in range(self.iterations):
-            self.tasks.put(Task(self._run_md_prod))
-            self.tasks.put(Task(self._query_reactions))
-            self.tasks.put(Task(self._decide_reaction))
-            self.tasks.put(Task(self._run_recipe))
-
-            # self.tasks.put(Task(self._dummy, {}))
-            # self.tasks.put(Task(self._run_md_minim, {}))
-
-        while (self.state is not State.DONE) or (self.iteration < self.iterations):
+        while not ((self.state is State.DONE) or (self.iteration > self.iterations)):
             next(self)
 
         logging.info(
@@ -158,10 +147,13 @@ class RunManager:
         return self
 
     def __next__(self):
-        if self.tasks.empty():
+        if self.tasks.empty() and self.crr_tasks.empty():
             self.state = State.DONE
             return
-        task = self.tasks.get()
+        if not self.crr_tasks.empty():
+            task = self.crr_tasks.get()
+        else:
+            task = self.tasks.get()
         if self.config.dryrun:
             logging.info(f"Pretending to run: {task.name} with args: {task.kwargs}")
             return
@@ -318,6 +310,7 @@ class RunManager:
         self.chosen_recipe = decision_strategy(self.reaction_results)
         logging.info("Chosen recipe is:")
         logging.info(self.chosen_recipe)
+        self.crr_tasks.put(Task(self._run_recipe))
         return None, None
 
     def _run_recipe(self):
@@ -346,5 +339,5 @@ class RunManager:
         if hasattr(self.config, "changer"):
             if hasattr(self.config.changer, "coordinates"):
                 if hasattr(self.config.changer.coordinates, "md"):
-                    self.tasks.put(Task(self._run_md_relax))
+                    self.crr_tasks.put(Task(self._run_md_relax))
         return in_d, out_dir

@@ -1,7 +1,7 @@
 import yaml
 import logging
 from pathlib import Path
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 
 def check_file_exists(p: Path):
@@ -9,6 +9,20 @@ def check_file_exists(p: Path):
         m = "File not found: " + str(p)
         logging.error(m)
         raise LookupError(m)
+
+
+class Sequence(list):
+    def __init__(self, tasks: list):
+        list.__init__(self)
+        for task in tasks:
+            if isinstance(task, dict):
+                for _ in range(task["mult"]):
+                    assert isinstance(
+                        task["tasks"], list
+                    ), "Grouped tasks must be a list!"
+                    self.extend(task["tasks"])
+            else:
+                self.append(task)
 
 
 type_scheme = {
@@ -31,6 +45,7 @@ type_scheme = {
     "prod": {"mdp": Path},
     "changer": {"coordinates": {"md": {"mdp": Path}}},
     "reactions": {"homolysis": {"edis": Path, "bonds": Path}},
+    "sequence": Sequence,
 }
 
 # classes for static code analysis
@@ -236,33 +251,36 @@ class Config:
 
     def _validate(self):
         """Validates attributes read from config file."""
-        attr_names = filter(lambda s: s[0] != "_", self.__dir__())
-        for attr_name in attr_names:
-            logging.debug(f"validating: {attr_name}")
-            attr = self.__getattribute__(attr_name)
-            if isinstance(attr, Config):
-                attr._validate()
+        try:
+            attr_names = filter(lambda s: s[0] != "_", self.__dir__())
+            for attr_name in attr_names:
+                logging.debug(f"validating: {attr_name}")
+                attr = self.attr(attr_name)
+                if isinstance(attr, Config):
+                    attr._validate()
 
-            # Check files from scheme
-            if isinstance(attr, Path):
-                self.__setattr__(attr_name, attr.resolve())
-                if not str(attr) in [
-                    "distances.dat"
-                ]:  # distances.dat wouldn't exist prior to the run
-                    logging.debug(attr)
-                    check_file_exists(attr)
+                # Check files from scheme
+                if isinstance(attr, Path):
+                    self.__setattr__(attr_name, attr.resolve())
+                    if not str(attr) in [
+                        "distances.dat"
+                    ]:  # distances.dat wouldn't exist prior to the run
+                        logging.debug(attr)
+                        check_file_exists(attr)
 
-            # Check config for consistency
-            if attr_name in ["nvt", "npt"]:
-                for necessary_f in ["mdp", "tpr"]:
-                    assert (
-                        necessary_f in attr.__dir__()
-                    ), f"{necessary_f} for {attr_name} is missing in config!"
+                # Check config for consistency
+                if attr_name in ["nvt", "npt"]:
+                    for necessary_f in ["mdp", "tpr"]:
+                        assert (
+                            necessary_f in attr.__dir__()
+                        ), f"{necessary_f} for {attr_name} is missing in config!"
 
-            # Checks
-            if (
-                attr_name == "reactions"
-            ):  # changed reactions to be no longer a list but it yields a wrong value
-                logging.info(
-                    f"DUMMY VALIDATION: There are {len(attr.__dict__)-2} reactions!"
-                )
+                # Validate sequence
+                if isinstance(attr, Sequence):
+                    for task in attr:
+                        assert hasattr(
+                            self, task
+                        ), f"Task {task} listed in sequence, but not defined!"
+        except AssertionError as e:
+            logging.error(f"Validating input failed!\n{e}")
+            raise ValueError(e)
