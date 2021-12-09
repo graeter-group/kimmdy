@@ -7,39 +7,33 @@ from dataclasses import dataclass
 from typing import Callable
 from kimmdy.utils import run_shell_cmd, identify_atomtypes
 from kimmdy.config import Config
-from kimmdy.reaction import ConversionType, ConversionRecipe
 from kimmdy.reactions.homolysis import Homolysis
+from kimmdy.reaction import ReactionResult
 from kimmdy.mdmanager import MDManager
 from kimmdy.changemanager import ChangeManager
 from pprint import pformat
-
-import os
-import numpy as np
 import random
 
 
-def default_decision_strategy(list_of_rates, list_of_recipes):
+def default_decision_strategy(reaction_result: ReactionResult):
+    """
+    A decision strategy takes a ReactionResult and returns the tuple of atom indices to affect
+    """
     # compare e.g. https://en.wikipedia.org/wiki/Kinetic_Monte_Carlo#Rejection-free_KMC
 
-    total_rate = sum(list_of_rates)  # sum all rates
+    rates = reaction_result.rates
+    recipe = reaction_result.recipe
+
+    total_rate = sum(rates)
     random.seed()
     t = random.random()  # t in [0.0,1.0)
     rate_running_sum = 0
-    for i in range(len(list_of_rates)):
-        rate_running_sum += list_of_rates[i]
+    for i in range(len(rates)):
+        rate_running_sum += rates[i]
         if (t * total_rate) <= rate_running_sum:
-            idx = i
-            # breakpair = list_of_recipes[i][1]
-            # atomtypes = list_of_recipes[i][2]
-            # rate = list_of_rates[i]
-            break
-    u = random.random()
-    delta_t = np.log(1 / u) / total_rate
+            return recipe.atom_idx[i]
 
-    return list_of_recipes[idx]
-
-    # print ('Rate = ' + str(rate) + ', breakpair = ' + str (breakpair) + ', atomtypes = ' + str(atomtypes) + 'jump [ps] = ' + str(delta_t))
-    # logging.info(('Rate = ' + str(rate) + ', breakpair = ' + str (breakpair) + ', atomtypes = ' + str(atomtypes) + 'jump [ps] = ' + str(delta_t)))
+    logging.error("Exited the decisison strategy without returning an atom index.")
 
 
 class State(Enum):
@@ -260,6 +254,8 @@ class RunManager:
     def _query_reactions(self):
         logging.info("Query reactions")
         self.state = State.REACTION
+        in_d = None
+        out_dir = None
         if hasattr(self.config.reactions, "homolysis"):
             self.reaction = Homolysis()
 
@@ -270,24 +266,29 @@ class RunManager:
                 "ffbonded_itp": self.config.reactions.homolysis.bonds,
                 "edissoc_dat": self.config.reactions.homolysis.edis,
             }
-            self.rates, self.recipes = self.reaction.rupturerates(**in_d)
+            self.reaction_result = self.reaction.get_reaction_result(**in_d)
+            self.rates = self.reaction_result.rates
+            self.recipe = self.reaction_result.recipe
 
         logging.info("Rates and Recipes:")
-        logging.info(self.rates[0:10])
-        logging.info(self.recipes[0:10])
-        logging.info("Reaction done")
-        return in_d, None
+        # TODO: this would fail with a out of range error,
+        # we need a way of writing out results
+        # logging.info(self.rates[0:10])
+        # logging.info(self.recipe.type)
+        # logging.info(self.recipe.atom_idx[0:10])
+        # logging.info("Reaction done")
+        return in_d, out_dir
 
     def _decide_reaction(self, decision_strategy=default_decision_strategy):
         logging.info("Decide on a reaction")
-        self.chosen_recipe = decision_strategy(self.rates, self.recipes)
+        self.chosen_recipe = decision_strategy(self.reaction_result)
         logging.info("Chosen recipe is:")
         logging.info(self.chosen_recipe)
         return None, None
 
     def _run_recipe(self):
         logging.info(f"Start Recipe in step {self.iteration}")
-        logging.info(f"Breakpair: {self.chosen_recipe.atom_idx}")
+        logging.info(f"Breakpair: {self.chosen_recipe.recipe.atom_idx}")
         out_dir = self.config.out / f"recipe_{self.iteration}"
         out_dir.mkdir()
         (out_dir / self.config.ff.name).symlink_to(self.config.ff)
