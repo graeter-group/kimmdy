@@ -3,18 +3,7 @@
 
 # our own program output
 kimmdy.log
-test_0/
-test_1/
-\#*\#
-mdout.mdp
-*.log
-*.xtc
-*.trr
-*.cpt
-*.xvg
-*.edr
-*.tpr
-
+test_out*/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

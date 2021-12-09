@@ -14,22 +14,22 @@ def check_file_exists(p: Path):
 
 type_scheme = {
     "dryrun": bool,
-    "experiment": str,
     "iterations": int,
-    "cwd": Path,
+    "out": Path,
+    "ff": Path,
     "top": Path,
     "gro": Path,
     "idx": Path,
-    "plumed": {"dat": Path, "distances": Path},
-    #"minimization": {"mdp": Path, "tpr": Path},
-    #"equilibration": {
-    #    "nvt": {"mdp": Path, "tpr": Path},
-    #    "npt": {"mdp": Path, "tpr": Path},
-    #},
+    "plumed": {"dat": Path},
+    "minimization": {"mdp": Path, "tpr": Path},
+    "equilibration": {
+        "nvt": {"mdp": Path, "tpr": Path},
+        "npt": {"mdp": Path, "tpr": Path},
+    },
     "equilibrium": {"mdp": Path},
     "prod": {"mdp": Path},
-    "changer":{"coordinates":{"md": {"mdp": Path}}},
-    "reactions": {"homolysis":{"edis": Path, "bonds": Path}}
+    "changer": {"coordinates": {"md": {"mdp": Path}}},
+    "reactions": {"homolysis": {"edis": Path, "bonds": Path}},
 }
 
 
@@ -48,21 +48,24 @@ class Config:
         For internal use only, used in reading settings in recursively.
     type_scheme : dict
         dict containing types for casting and validating settings.
-    
+
     """
 
-    cwd: Path
+    # cwd: Path
+    # out: Path
 
     def __init__(
         self, input_file: Path = None, recursive_dict=None, type_scheme=type_scheme
-    ): 
+    ):
         if input_file is None and recursive_dict is None:
             m = "Error: No input file was provided!"
             logging.error(m)
             raise ValueError(m)
-        
+
         if input_file is not None and not isinstance(input_file, Path):
-            logging.warn("Warning: Config input file was not type pathlib.Path, attemptin conversion..")
+            logging.warn(
+                "Warning: Config input file was not type pathlib.Path, attemptin conversion.."
+            )
             Path(input_file)
 
         self.type_scheme = type_scheme
@@ -89,7 +92,29 @@ class Config:
                 self.__setattr__(name, val)
 
         if input_file is not None:
-            Config.cwd = Path(cwd) if (cwd := raw.get("cwd")) else input_file.parent
+            self.cwd = (
+                Path(cwd) if (cwd := raw.get("cwd")) else input_file.parent.resolve()
+            )
+            self.out = Path(out) if (out := raw.get("out")) else self.cwd / self.name
+            # make sure self.out is empty
+            while self.out.exists():
+                logging.info(f"Output dir {self.out} exists, incrementing name")
+                out_end = self.out.name[-3:]
+                if out_end.isdigit():
+                    self.out = self.out.with_name(
+                        f"{self.out.name[:-3]}{int(out_end)+1:03}"
+                    )
+                else:
+                    self.out = self.out.with_name(self.out.name + "_001")
+            self.out.mkdir()
+            logging.info(f"Created output dir {self.out}")
+
+            if not hasattr(self, "ff"):
+                ffs = list(self.cwd.glob("*.ff"))
+                assert len(ffs) == 1, "Wrong count of forcefields"
+                assert ffs[0].is_dir(), "Forcefield should be a directory!"
+                self.ff = ffs[0].resolve()
+
             self._cast_types()
             self._validate()
 
@@ -110,6 +135,11 @@ class Config:
             attr = self.__getattribute__(attr_name)
 
             if to_type is not None:
+                if attr is None:
+                    raise ValueError(
+                        f"ERROR in inputfile: Missing settings for {attr_name}"
+                    )
+
                 # nested:
                 if isinstance(to_type, dict):
                     attr._cast_types()
@@ -128,7 +158,7 @@ class Config:
                     raise ValueError(e)
 
             else:
-                logging.info(
+                logging.debug(
                     f"{to_type} conversion found for attribute {attr_name} and not executed."
                 )
 
@@ -143,10 +173,10 @@ class Config:
 
             # Check files from scheme
             if isinstance(attr, Path):
-                if not attr.is_absolute():
-                    attr = Config.cwd / attr
-                    self.__setattr__(attr_name, attr)
-                if not str(attr) in ["distances.dat"]:          #distances.dat wouldn't exist prior to the run
+                self.__setattr__(attr_name, attr.resolve())
+                if not str(attr) in [
+                    "distances.dat"
+                ]:  # distances.dat wouldn't exist prior to the run
                     logging.debug(attr)
                     check_file_exists(attr)
 
@@ -158,5 +188,9 @@ class Config:
                     ), f"{necessary_f} for {attr_name} is missing in config!"
 
             # Checks
-            if attr_name == "reactions":               # changed reactions to be no longer a list but it yields a wrong value
-                logging.info(f"DUMMY VALIDATION: There are {len(attr.__dict__)} reactions!")
+            if (
+                attr_name == "reactions"
+            ):  # changed reactions to be no longer a list but it yields a wrong value
+                logging.info(
+                    f"DUMMY VALIDATION: There are {len(attr.__dict__)-2} reactions!"
+                )
