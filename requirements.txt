@@ -1,4 +1,5 @@
 pytest
 tox
 black
+hypothesis
 -e .
