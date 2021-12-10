@@ -1,19 +1,26 @@
 import logging
 from kimmdy.reaction import Reaction, ConversionRecipe, ConversionType, ReactionResult
-from kimmdy.utils import identify_atomtypes, find_distances, find_Edis, find_bond_param, calc_av_rate
+from kimmdy.utils import (
+    identify_atomtypes,
+    find_distances,
+    find_Edis,
+    find_bond_param,
+    calc_av_rate,
+)
 
 
 class Homolysis(Reaction):
     """Homolytic bond breaking leading to 2 radicals.
     Implemented according to kimmdy 1.0
     """
-    def get_reaction_result(self, plumed_dat, distances_dat, top, ffbonded_itp, edissoc_dat):
+
+    def get_reaction_result(
+        self, plumed_dat, distances_dat, top, ffbonded_itp, edissoc_dat
+    ):
         logging.info("Getting recipe for reaction: homolysis")
 
         # read out bond distances and atomtypes
-        list_of_breakpairs_and_distances = find_distances(
-            plumed_dat, distances_dat
-        )
+        list_of_breakpairs_and_distances = find_distances(plumed_dat, distances_dat)
         dic_of_nbrs_to_atomtypes = identify_atomtypes(top)
 
         result = ReactionResult(recipes=[], rates=[])
@@ -51,7 +58,8 @@ class Homolysis(Reaction):
                 logging.info(k)
 
             result.rates.append(k)
-            result.recipes.append(ConversionRecipe(type=ConversionType.BREAK, atom_idx=breakpair))
+            result.recipes.append(
+                ConversionRecipe(type=ConversionType.BREAK, atom_idx=breakpair)
+            )
 
         return result
-

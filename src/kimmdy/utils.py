@@ -200,15 +200,13 @@ def check_gmx_version():
 
 ## from kimmdy
 def get_data_from_file(filepath):
-    file = open(filepath, "r")
-    data_all = []  # array with each entry corresponding to one (string) line
-    data_array = []  # array of all lines with each subarray containing one value
-    settings = []
-    for line in file:
-        data_all.append(line)
-        line_array = np.asarray(line.split())
-        data_array.append(line_array)
-    file.close()
+    with open(filepath, 'r') as f:
+        data_all = []  # array with each entry corresponding to one (string) line
+        data_array = []  # array of all lines with each subarray containing one value
+        for line in f:
+            data_all.append(line)
+            line_array = np.asarray(line.split())
+            data_array.append(line_array)
 
     return data_all, data_array
 
@@ -221,7 +219,6 @@ def store_linelist_to_file(data, filepath):
 
 
 def identify_atomtypes(filepath):
-
     dic_of_atoms_to_groups = {}
     file = open(filepath, "r")
     atoms = False

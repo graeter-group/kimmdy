@@ -33,7 +33,7 @@ class ReactionResult:
     rates : list of rates
     """
     recipes: list[ConversionRecipe] = field(default_factory=list)
-    rates: list = field(default_factory=list)
+    rates: list[float] = field(default_factory=list)
 
 
 class Reaction(ABC):
