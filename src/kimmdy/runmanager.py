@@ -14,21 +14,24 @@ import random
 
 
 def default_decision_strategy(reaction_results: list[ReactionResult]) -> ConversionRecipe:
-    """A decision strategy.
+    """Rejection-Free Monte Carlo.
     takes a list of ReactionResults and choses a recipe.
+
+    Parameters
+    ---------
+    reaction_reults: list[ReactionResults]
+        from which one will be choosen
     """
-    # compare e.g. https://en.wikipedia.org/wiki/Kinetic_Monte_Carlo#Rejection-free_KMC
+    # compare e.g. <https://en.wikipedia.org/wiki/Kinetic_Monte_Carlo#Rejection-free_KMC>
    
     # flatten the list of rates form the reaction results
-    rates = [rate
-        for reaction in reaction_results
-        for rate in reaction.rates
-    ]
-
-    recipes = [recipe
-        for reaction in reaction_results
-        for recipe in reaction.recipes
-    ]
+    rates = []
+    recipes = []
+    for reaction in reaction_results:
+        for rate in reaction.rates:
+            rates.append(rate)
+        for recipe in reaction.recipes:
+            recipes.append(recipe)
 
     total_rate = sum(rates)
     random.seed()
@@ -57,6 +60,10 @@ class State(Enum):
 
 
 class Task:
+    """A task to be performed as as a step in the RunManager.
+    consists of a function and it's keyword arguments and is
+    itself callable.
+    """
     def __init__(self, f, kwargs={}):
         self.f = f
         self.kwargs = kwargs
@@ -70,6 +77,10 @@ class Task:
 
 
 class RunManager:
+    """The RunManager, a central piece.
+    Manages the queue of tasks, communicates with the
+    rest of the program and keeps track of global state.
+    """
     reaction_results: list[ReactionResult]
 
     def __init__(self, input_file: Path):
@@ -86,10 +97,8 @@ class RunManager:
         # self.trj = self.config.cwd / ("prod_" + str(self.iteration) + ".trj")
         # self.plumeddat = self.config.plumed.dat
         # self.plumeddist = self.config.plumed.distances
-
         self.filehist: list[dict[str, dict[str, Path]]] = []
         self.ambiguos_suffs = ["dat", "xvg", "log", "trr"]
-
         # index initilial files
         self.filehist.append({"in": dict(), "out": dict()})
         self.filehist[-1]["in"]["top"] = self.config.top
@@ -313,7 +322,7 @@ class RunManager:
             "plumed_dat": self.get_latest("plumed.dat"),
         }
 
-        changer = ChangeManager(self.chosen_recipe.atom_idx)
+        changer = ChangeManager(self.chosen_recipe)
         newtop = out_dir / "topol_mod.top"
         newplumeddat = out_dir / "plumed.dat"
         newplumeddist = out_dir / "distances.dat"
