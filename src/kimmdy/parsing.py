@@ -3,7 +3,7 @@ from collections.abc import Iterable
 from typing import Generator
 
 def is_comment(l : str):
-    return(len(l) == 0 or l[0] in ['#', '\n'])
+    return(len(l) == 0 or l[0] in ['#', '\n', ';'])
 
 def get_sections(seq : Iterable[str], section_marker : str) -> Generator[list[str], None, None]:
     data = []
@@ -17,16 +17,16 @@ def get_sections(seq : Iterable[str], section_marker : str) -> Generator[list[st
     if data:
         yield data
 
-def read_topol(path : Path) :
+def read_topol(path : Path) -> dict[str, list[list[str]]]:
     with open(path, 'r') as f:
         sections = get_sections(f, '[')
-        return { title.strip('[] \n'): content for title, *content in sections }
+        return { title.strip('[] \n'): [c.split() for c in content] for title, *content in sections }
 
-def write_topol(d : dict[str, str], outfile : Path):
+def write_topol(d : dict[str, list[list[str]]], outfile : Path):
     with open(outfile, 'w') as f:
-        for key, value in d.items():
-            s = f'[ {key} ]\n'
+        for title, content in d.items():
+            s = f'[ {title} ]\n'
             f.write(s)
-            s = '\n'.join(value) + '\n\n'
+            s = '\n'.join([' '.join(c) for c in content]) + '\n\n'
             f.write(s)
 
