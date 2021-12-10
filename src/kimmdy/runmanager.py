@@ -3,9 +3,7 @@ import logging
 import queue
 from pathlib import Path
 from enum import Enum, auto
-from dataclasses import dataclass
 from typing import Callable
-from kimmdy.utils import run_shell_cmd, identify_atomtypes
 from kimmdy.config import Config
 from kimmdy.reactions.homolysis import Homolysis
 from kimmdy.reaction import ReactionResult, ConversionRecipe, ConversionType
@@ -49,6 +47,9 @@ def default_decision_strategy(reaction_results: list[ReactionResult]) -> Convers
 
 
 class State(Enum):
+    """State of the system.
+    one of IDLE, MD, REACTION, DONE.
+    """
     IDLE = auto()
     MD = auto()
     REACTION = auto()
@@ -69,13 +70,15 @@ class Task:
 
 
 class RunManager:
+    reaction_results: list[ReactionResult]
+
     def __init__(self, input_file: Path):
         self.config = Config(Path(input_file))
         self.tasks = queue.Queue()
         self.iteration = 0
         self.iterations = self.config.iterations
         self.state = State.IDLE
-        self.rates = []
+        self.reaction_results = []
         self.md = MDManager()
         # self.measurements = Path("measurements")
         # self.structure = self.config.gro
@@ -268,6 +271,8 @@ class RunManager:
         self.state = State.REACTION
         in_d = None
         out_dir = None
+
+        # TODO: this could be more elegant
         if hasattr(self.config.reactions, "homolysis"):
             self.reaction = Homolysis()
 
@@ -278,9 +283,7 @@ class RunManager:
                 "ffbonded_itp": self.config.reactions.homolysis.bonds,
                 "edissoc_dat": self.config.reactions.homolysis.edis,
             }
-            self.reaction_result = self.reaction.get_reaction_result(**in_d)
-            self.rates = self.reaction_result.rates
-            self.recipe = self.reaction_result.recipe
+            self.reaction_results.append(self.reaction.get_reaction_result(**in_d))
 
         logging.info("Rates and Recipes:")
         # TODO: this would fail with a out of range error,
@@ -291,16 +294,16 @@ class RunManager:
         # logging.info("Reaction done")
         return in_d, out_dir
 
-    def _decide_reaction(self, decision_strategy=default_decision_strategy):
+    def _decide_reaction(self, decision_strategy: Callable[[list[ReactionResult]], ConversionRecipe] =default_decision_strategy):
         logging.info("Decide on a reaction")
-        self.chosen_recipe = decision_strategy(self.reaction_result)
+        self.chosen_recipe = decision_strategy(self.reaction_results)
         logging.info("Chosen recipe is:")
         logging.info(self.chosen_recipe)
         return None, None
 
     def _run_recipe(self):
         logging.info(f"Start Recipe in step {self.iteration}")
-        logging.info(f"Breakpair: {self.chosen_recipe.recipe.atom_idx}")
+        logging.info(f"Breakpair: {self.chosen_recipe.atom_idx}")
         out_dir = self.config.out / f"recipe_{self.iteration}"
         out_dir.mkdir()
         (out_dir / self.config.ff.name).symlink_to(self.config.ff)

@@ -26,6 +26,11 @@ class ConversionRecipe:
 class ReactionResult:
     """A ReactionResult
     encompasses a list of transformations and their rates.
+
+    Parameters
+    ----------
+    recipes : list of ConversionRecipes
+    rates : list of rates
     """
     recipes: list[ConversionRecipe] = field(default_factory=list)
     rates: list = field(default_factory=list)
