@@ -5,7 +5,7 @@ import logging
 
 def find_bond_param(atomtypes, filepath):
     # reads bond parameters vom gromacs forcefield file #based on ff.bonded.itp from amber99sb-ildn.ff
-    data_all, data_array = get_data_from_file(filepath)
+    _, data_array = get_data_from_file(filepath)
     comb1 = [atomtypes[0], atomtypes[1]]
     comb2 = [atomtypes[1], atomtypes[0]]
 
@@ -35,7 +35,7 @@ def find_bond_param(atomtypes, filepath):
 def find_Edis(atomtypes, filepath):
     # reads dissociation energy from edissoc.dat (gromacs)
 
-    data_all, data_array = get_data_from_file(filepath)
+    _, data_array = get_data_from_file(filepath)
     comb1 = [atomtypes[0], atomtypes[1]]
     comb2 = [atomtypes[1], atomtypes[0]]
     Edis = 0

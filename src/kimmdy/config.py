@@ -1,8 +1,6 @@
 import yaml
 import logging
 from pathlib import Path
-from dataclasses import dataclass
-from pprint import pprint
 
 
 def check_file_exists(p: Path):
@@ -13,6 +11,8 @@ def check_file_exists(p: Path):
 
 
 type_scheme = {
+    "experiment": str,
+    "run": int,
     "dryrun": bool,
     "iterations": int,
     "out": Path,
@@ -20,7 +20,7 @@ type_scheme = {
     "top": Path,
     "gro": Path,
     "idx": Path,
-    "plumed": {"dat": Path},
+    "plumed": {"dat": Path, "distances": Path},
     "minimization": {"mdp": Path, "tpr": Path},
     "equilibration": {
         "nvt": {"mdp": Path, "tpr": Path},
@@ -32,6 +32,50 @@ type_scheme = {
     "reactions": {"homolysis": {"edis": Path, "bonds": Path}},
 }
 
+# classes for static code analysis
+class PlumedConfig:
+    dat: Path
+    distances: Path
+
+
+class MinimizationConfig:
+    mdp: Path
+    tpr: Path
+
+
+class NvtConfig:
+    mdp: Path
+    tpr: Path
+
+
+class NptConfig:
+    mdp: Path
+    tpr: Path
+
+
+class EquilibrationConfig:
+    nvt: NvtConfig
+    npt: NptConfig
+
+
+class MdConfig:
+    mdp: Path
+
+class CoordinatesConfig:
+    md: MdConfig
+
+class ChangerConfig:
+    coordinates: CoordinatesConfig
+
+class HomolysisConfig:
+    edis: Path
+    bonds: Path
+
+class ReactionsConfig:
+    homolysis: HomolysisConfig
+
+class ProdConfig:
+    mdp: Path
 
 class Config:
     """
@@ -51,8 +95,24 @@ class Config:
 
     """
 
-    # cwd: Path
-    # out: Path
+    # attributes for static code analysis
+    run: int
+    experiment: str
+    name: str
+    dryrun: bool
+    iterations: int
+    out: Path
+    ff: Path
+    top: Path
+    gro: Path
+    idx: Path
+    plumed: PlumedConfig
+    minimization: MinimizationConfig
+    equilibration: EquilibrationConfig
+    equilibrium: MdConfig
+    changer: ChangerConfig
+    reactions: ReactionsConfig
+    prod: ProdConfig
 
     def __init__(
         self, input_file: Path = None, recursive_dict=None, type_scheme=type_scheme
