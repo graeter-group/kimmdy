@@ -8,32 +8,44 @@ from typing import Callable
 from kimmdy.utils import run_shell_cmd, identify_atomtypes
 from kimmdy.config import Config
 from kimmdy.reactions.homolysis import Homolysis
-from kimmdy.reaction import ReactionResult
+from kimmdy.reaction import ReactionResult, ConversionRecipe, ConversionType
 from kimmdy.mdmanager import MDManager
 from kimmdy.changemanager import ChangeManager
 from pprint import pformat
 import random
 
 
-def default_decision_strategy(reaction_result: ReactionResult):
-    """
-    A decision strategy takes a ReactionResult and returns the tuple of atom indices to affect
+def default_decision_strategy(reaction_results: list[ReactionResult]) -> ConversionRecipe:
+    """A decision strategy.
+    takes a list of ReactionResults and choses a recipe.
     """
     # compare e.g. https://en.wikipedia.org/wiki/Kinetic_Monte_Carlo#Rejection-free_KMC
+   
+    # flatten the list of rates form the reaction results
+    rates = [rate
+        for reaction in reaction_results
+        for rate in reaction.rates
+    ]
 
-    rates = reaction_result.rates
-    recipe = reaction_result.recipe
+    recipes = [recipe
+        for reaction in reaction_results
+        for recipe in reaction.recipes
+    ]
 
     total_rate = sum(rates)
     random.seed()
     t = random.random()  # t in [0.0,1.0)
     rate_running_sum = 0
+
+    # if nothing is choosen, return a ConversionRecipe that
+    # does not do anything (move atom 0 to atom 0).
+    result = ConversionRecipe(ConversionType.MOVE, (0, 0))
     for i in range(len(rates)):
         rate_running_sum += rates[i]
         if (t * total_rate) <= rate_running_sum:
-            return recipe.atom_idx[i]
+            result = recipes[i]
 
-    logging.error("Exited the decisison strategy without returning an atom index.")
+    return result
 
 
 class State(Enum):
