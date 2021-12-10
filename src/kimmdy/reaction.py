@@ -10,20 +10,24 @@ class ConversionType(Enum):
 
 @dataclass
 class ConversionRecipe:
-    """
-    atom_idx is a list with tuples indicating atoms
-    being moved (from, to) a position for ConversionType.MOVE
-    and and in the case of type == ConversionType.BREAK
-    they indicate a bond (from, to) being broken.
+    """A ConversionReipe.
+    encompasses a single transformation, e.g. moving one
+    atom or braking one bond.
+
+    Parameters
+    ----------
+    type : ConversionType.BREAK or .MOVE
+    atom_idx : (from, to)
     """
     type: ConversionType
-    atom_type: list = field(default_factory=list)
-    atom_idx: list[tuple[int, int]] = field(default_factory=list) 
-
+    atom_idx: tuple[int, int]
 
 @dataclass
 class ReactionResult:
-    recipe: ConversionRecipe
+    """A ReactionResult
+    encompasses a list of transformations and their rates.
+    """
+    recipes: list[ConversionRecipe] = field(default_factory=list)
     rates: list = field(default_factory=list)
 
 
