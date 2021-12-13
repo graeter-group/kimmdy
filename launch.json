@@ -6,7 +6,7 @@
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/src/kimmdy/cmd.py",
-            "console": "integratedTerminal",
+            // "console": "integratedTerminal",
             "cwd": "${workspaceFolder}/example/short_example/"
         }
     ]
