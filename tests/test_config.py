@@ -1,7 +1,7 @@
-from kimmdy.config import Config
 from pathlib import Path
 import pytest
 import os
+from kimmdy.config import Config
 
 
 def test_parse_config1_casting():

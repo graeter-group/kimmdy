@@ -1,13 +1,11 @@
 from __future__ import annotations
-from dataclasses import field
 import logging
 from pathlib import Path
 import queue
 from enum import Enum, auto
 from typing import Callable
-from kimmdy.config import Config
-from kimmdy.reactions.homolysis import Homolysis
 from kimmdy.reaction import ReactionResult, ConversionRecipe
+from kimmdy.config import Config
 import kimmdy.mdmanager as md
 import kimmdy.changemanager as changer
 from kimmdy.tasks import Task, TaskFiles, TaskMapping

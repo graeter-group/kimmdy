@@ -1,7 +1,8 @@
 from __future__ import annotations
-import logging
 from kimmdy.tasks import TaskFiles
 from kimmdy.utils import run_shell_cmd
+
+import subprocess as sp
 
 
 def dummy_step(files):
