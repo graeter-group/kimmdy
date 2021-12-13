@@ -29,7 +29,7 @@ class Sequence(list):
 
 type_scheme = {
     "experiment": str,
-    "run": int,
+    ""
     "dryrun": bool,
     "iterations": int,
     "out": Path,
