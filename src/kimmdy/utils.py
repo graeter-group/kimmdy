@@ -63,7 +63,6 @@ def find_Edis(atomtypes, filepath):
     return Edis
 
 
-
 def find_distances(plumedfile, datafile):
     data_all, data_array = get_data_from_file(plumedfile)
 
@@ -105,7 +104,6 @@ def find_distances(plumedfile, datafile):
     # logging.info('Collected distances from ' + str(datafile) + ' for ' + str(nbr_of_pairs) + ' pairs with ' + str(nbr_of_data_points) + ' distances per pair.')
 
     return list_of_pairs_and_distances
-
 
 
 def calc_transition_rate(r_curr, r_0, E_dis, k_f):
@@ -170,6 +168,7 @@ def calc_transition_rate(r_curr, r_0, E_dis, k_f):
 
     return k, F  # [0,1]
 
+
 def calc_av_rate(distances, r_0, E_dis, k_f):
     # average distances first, if necessary
     dist = []
@@ -195,12 +194,23 @@ def get_shell_stdout(s):
 
 
 def check_gmx_version():
-    return get_shell_stdout("gmx --quiet --version")
+    try:
+        version = [l for l in get_shell_stdout("gmx --quiet --version").split("\n") if "GROMACS version:" in l][0]
+    except Exception as e:
+        m = "No system gromacs detected. With error: " + str(e)
+        logging.error(m)
+        raise SystemError(m)
+    if not "MODIFIED" in version:
+        m = "GROMACS version does not contain MODIFIED, aborting due to lack of PLUMED patch."
+        logging.error(m)
+        logging.error("Version was: " + version)
+        raise SystemError(m)
+    return version
 
 
 ## from kimmdy
 def get_data_from_file(filepath):
-    with open(filepath, 'r') as f:
+    with open(filepath, "r") as f:
         data_all = []  # array with each entry corresponding to one (string) line
         data_array = []  # array of all lines with each subarray containing one value
         for line in f:
