@@ -156,11 +156,11 @@ def get_config() -> BaseConfig:
         Welcome to KIMMDY!
         Usage:
         -  `kimmdy help` for this help text
-        -  `kimmdy` to run kimmdy loooking for a kimmdy.yml configuration file
+        -  `kimmdy` to run kimmdy looking for a kimmdy.yml configuration file
         -  `kimmdy <path>` to use a different configuration file
         -  `kimmdy <...>` with configuration keyword=value pairs
             to overwrite the configuration from the command line.
-            Nested arguments in kimmdy.yml can be accessed with `.`.
+            Nested arguments in kimmdy.yaml can be accessed with `.`.
             e.g. `kimmdy logging.loglevel=DEBUG`.
         """
         )
