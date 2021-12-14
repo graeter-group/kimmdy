@@ -1,13 +1,12 @@
-import argparse
 import logging
 from pathlib import Path
 from kimmdy.config import Config
+import sys
 
 from omegaconf.omegaconf import OmegaConf
 from kimmdy.runmanager import RunManager
 from kimmdy.utils import check_gmx_version
 from kimmdy.config import BaseConfig, get_config
-import sys
 
 
 def get_cmdline_args():
@@ -45,13 +44,16 @@ def configure_logging(args, color=True):
         logging.addLevelName(logging.INFO, "\033[35mINFO\033[00m")
         logging.addLevelName(logging.ERROR, "\033[31mERROR\033[00m")
         logging.addLevelName(logging.WARNING, "\033[33mWARN\033[00m")
+        format="\033[34m %(asctime)s\033[00m: %(levelname)s: %(message)s"
+    else:
+        format="%(asctime): %(levelname)s: %(message)s"
     logging.basicConfig(
         level=getattr(logging, args.loglevel.upper()),
         handlers=[
             logging.FileHandler(conf.logging.logfile, encoding="utf-8", mode="w"),
             logging.StreamHandler(sys.stdout),
         ],
-        format="\033[34m %(asctime)s\033[00m: %(levelname)s: %(message)s",
+        format=format,
         datefmt="%d-%m-%Y %H:%M",
     )
 

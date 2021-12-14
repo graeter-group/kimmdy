@@ -4,6 +4,7 @@ from omegaconf.errors import ValidationError, MissingMandatoryValue
 from omegaconf import OmegaConf
 from pathlib import Path
 import logging
+import sys
 
 
 def check_file_exists(p: str):
@@ -118,6 +119,7 @@ class LoggingConf:
     loglevel: str = "DEBUG"
     color: bool = True
 
+
 @dataclass
 class BaseConfig:
     run: int
@@ -137,36 +139,67 @@ class BaseConfig:
     changer: ChangerConfig
     reactions: ReactionsConfig
     prod: ProdConfig
-    input: str
     logging: LoggingConf = LoggingConf()
 
 
-def get_config(args) -> BaseConfig:
+def get_config() -> BaseConfig:
     """Get the configuration object.
     The BaseConfig is merged with command line arguments and the configuration read from the yaml file.
     All settings read from the input file are accessible through nested attributes.
     """
+    args = sys.argv[1:]  # first argument is the program name
+    arglist = [a.replace("-", "") for a in args]
+
+    if "h" in arglist or "help" in arglist:
+        print(
+            """
+        Welcome to KIMMDY!
+        Usage:
+        -  `kimmdy help` for this help text
+        -  `kimmdy` to run kimmdy loooking for a kimmdy.yml configuration file
+        -  `kimmdy <path>` to use a different configuration file
+        -  `kimmdy <...>` with configuration keyword=value pairs
+            to overwrite the configuration from the command line.
+            Nested arguments in kimmdy.yml can be accessed with `.`.
+            e.g. `kimmdy logging.loglevel=DEBUG`.
+        """
+        )
+        exit()
+
     try:
         base_conf = OmegaConf.structured(BaseConfig)
-        yaml_conf = OmegaConf.load(args.input)
-        # cli_confg currently empty because arparse handles
-        # the command line interface
-        cli_conf = OmegaConf.from_cli()
+        input = "kimmdy.yaml"
+        if arglist and (".yml" in arglist[0] or ".yaml" in arglist[0]):
+            input = arglist[0]
+            arglist = arglist[1:]
+        yaml_conf = OmegaConf.load(input)
+        cli_conf = OmegaConf.from_cli(arglist)
         conf = OmegaConf.merge(base_conf, yaml_conf, cli_conf)
-        print(OmegaConf.to_yaml(conf))
     except MissingMandatoryValue as e:
         logging.error("Missing configuration:")
         logging.error(e)
+        raise MissingMandatoryValue(e)
     except ValidationError as e:
         logging.error("Error parsing configuration:")
         logging.error(e)
+        raise ValidationError(e)
 
+    # The OmegaConf config object will have like an instance of our BaseConfig,
+    # but the type checker does not know that.
+    # By telling it that the return type of this function
+    # is BaseConfig, we get static type checking in the
+    # rest of the program, but have to ignore the 2 following warnings.
     validate_config(conf)
-
     return conf
 
 
 def validate_config(conf: BaseConfig):
-    for f in [conf.ff, conf.gro, conf.idx, conf.top]:
+    for f in [
+        conf.ff,
+        conf.gro,
+        conf.idx,
+        conf.top,
+        conf.equilibrium.mdp,
+        conf.prod.mdp,
+    ]:
         check_file_exists(f)
-
