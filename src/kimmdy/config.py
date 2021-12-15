@@ -62,21 +62,27 @@ class EquilibrationConfig:
 class MdConfig:
     mdp: Path
 
+
 class CoordinatesConfig:
     md: MdConfig
 
+
 class ChangerConfig:
     coordinates: CoordinatesConfig
+
 
 class HomolysisConfig:
     edis: Path
     bonds: Path
 
+
 class ReactionsConfig:
     homolysis: HomolysisConfig
 
+
 class ProdConfig:
     mdp: Path
+
 
 @dataclass
 class Config:
@@ -158,9 +164,13 @@ class Config:
 
         if input_file is not None:
             self.cwd = (
-                Path(cwd) if (cwd := self.raw.get("cwd")) else input_file.parent.resolve()
+                Path(cwd)
+                if (cwd := self.raw.get("cwd"))
+                else input_file.parent.resolve()
             )
-            self.out = Path(out) if (out := self.raw.get("out")) else self.cwd / self.name
+            self.out = (
+                Path(out) if (out := self.raw.get("out")) else self.cwd / self.name
+            )
             # make sure self.out is empty
             while self.out.exists():
                 logging.info(f"Output dir {self.out} exists, incrementing name")
