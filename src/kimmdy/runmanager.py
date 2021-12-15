@@ -13,7 +13,9 @@ from pprint import pformat
 import random
 
 
-def default_decision_strategy(reaction_results: list[ReactionResult]) -> ConversionRecipe:
+def default_decision_strategy(
+    reaction_results: list[ReactionResult],
+) -> ConversionRecipe:
     """Rejection-Free Monte Carlo.
     takes a list of ReactionResults and choses a recipe.
 
@@ -23,7 +25,7 @@ def default_decision_strategy(reaction_results: list[ReactionResult]) -> Convers
         from which one will be choosen
     """
     # compare e.g. <https://en.wikipedia.org/wiki/Kinetic_Monte_Carlo#Rejection-free_KMC>
-   
+
     # flatten the list of rates form the reaction results
     rates = []
     recipes = []
@@ -53,6 +55,7 @@ class State(Enum):
     """State of the system.
     one of IDLE, MD, REACTION, DONE.
     """
+
     IDLE = auto()
     MD = auto()
     REACTION = auto()
@@ -64,6 +67,7 @@ class Task:
     consists of a function and it's keyword arguments and is
     itself callable.
     """
+
     def __init__(self, f, kwargs={}):
         self.f = f
         self.kwargs = kwargs
@@ -81,6 +85,7 @@ class RunManager:
     Manages the queue of tasks, communicates with the
     rest of the program and keeps track of global state.
     """
+
     reaction_results: list[ReactionResult]
 
     def __init__(self, input_file: Path):
@@ -305,7 +310,12 @@ class RunManager:
         # logging.info("Reaction done")
         return in_d, out_dir
 
-    def _decide_reaction(self, decision_strategy: Callable[[list[ReactionResult]], ConversionRecipe] =default_decision_strategy):
+    def _decide_reaction(
+        self,
+        decision_strategy: Callable[
+            [list[ReactionResult]], ConversionRecipe
+        ] = default_decision_strategy,
+    ):
         logging.info("Decide on a reaction")
         self.chosen_recipe = decision_strategy(self.reaction_results)
         logging.info("Chosen recipe is:")
@@ -329,7 +339,9 @@ class RunManager:
         newplumeddist = out_dir / "distances.dat"
         changer.modify_top(self.chosen_recipe, in_d["top"], newtop)
         logging.info(f"Wrote new topology to {newtop.parts[-3:]}")
-        changer.modify_plumed(self.chosen_recipe, in_d["plumed_dat"], newplumeddat, newplumeddist)
+        changer.modify_plumed(
+            self.chosen_recipe, in_d["plumed_dat"], newplumeddat, newplumeddist
+        )
         logging.info(f"Wrote new plumedfile to {newplumeddat.parts[-3:]}")
         logging.info(f"Looking for md in {self.config.changer.coordinates.__dict__}")
         # TODO: clean this up, maybe make function for this in config
