@@ -1,6 +1,6 @@
 import logging
 from kimmdy.reaction import ConversionRecipe, ConversionType, Topology
-from kimmdy.parsing import read_topol, write_topol
+from kimmdy.parsing import read_plumed, write_plumed, read_topol, write_topol
 from pathlib import Path
 
 
@@ -11,14 +11,12 @@ def modify_top(recipe: ConversionRecipe, oldtop: Path, newtop: Path):
     if recipe.type == ConversionType.BREAK:
         topology = break_bond_top(topology, recipe.atom_idx)
     elif recipe.type == ConversionType.MOVE:
-        raise NotImplementedError(
-            "Topology Changer for moving Atoms is not implemented yet."
-        )
+        topology = move_bond_top(topology, recipe.atom_idx)
 
     write_topol(topology, newtop)
 
 
-def break_bond_top(topology: Topology, breakpair: tuple[int, int]):
+def break_bond_top(topology: Topology, breakpair: tuple[int, int]) -> Topology:
     # remove bond, angles and dihedrals where breakpair was involved
     topology["bonds"] = [
         bond
@@ -43,8 +41,34 @@ def break_bond_top(topology: Topology, breakpair: tuple[int, int]):
     return topology
 
 
-def move_ebond_top(topology: Topology, movepair: tuple[int, int]):
-    pass
+def move_bond_top(topology: Topology, movepair: tuple[int, int]) -> Topology:
+    raise NotImplementedError(
+        "Topology Changer for moving Atoms is not implemented yet."
+    )
+
+
+def break_bond_plumed(plumeddat, breakpair, newplumeddist):
+    new_distances = []
+    broken_distances = []
+    for line in plumeddat["distances"]:
+        if breakpair[0] in line["atoms"] or breakpair[1] in line["atoms"]:
+            broken_distances.append(line["id"])
+        else:
+            new_distances.append(line)
+
+    plumeddat["distances"] = new_distances
+
+    for line in plumeddat["prints"]:
+        line["ARG"] = [id for id in line["ARG"] if not id in broken_distances]
+        line["FIlE"] = newplumeddist
+
+    return plumeddat
+
+
+def move_bond_plumed(plumeddat, movepair, newplumeddist):
+    raise NotImplementedError(
+        "Plumeddat Changer for moving Atoms is not implemented yet."
+    )
 
 
 def modify_plumed(
@@ -53,31 +77,15 @@ def modify_plumed(
     newplumeddat: Path,
     newplumeddist: Path,
 ):
-    broken_distnbr = []
 
-    breakpair = recipe.atom_idx
+    logging.info(
+        f"Reading: {oldplumeddat} and writing modified plumed input to {newplumeddat}. Also writing {newplumeddist}."
+    )
+    plumeddat = read_plumed(oldplumeddat)
 
-    file = open(newplumeddat, "w")  # open in  append mode
-    with open(oldplumeddat) as f:
-        for line in f:
-            if "ATOMS=" in line:
-                split1 = line.split(",")
-                atom2 = split1[-1][:-2]
-                split2 = split1[0].split("=")
-                atom1 = split2[-1]
-                split3 = split2[0].split(":")
-                dist_nbr = split3[0]
-                if [atom1, atom2] in breakpair:
-                    line = "# --already broken-- " + line
-                    broken_distnbr.append(dist_nbr)
-            if "PRINT" in line:
-                line.find(dist_nbr)
-                for dist_nbr in broken_distnbr:
-                    line = line.replace(dist_nbr + ",", "")
-                split = line.split()
-                file_old = split[-1]
-                line = line.replace(file_old, "FILE=" + str(newplumeddist))
+    if recipe.type == ConversionType.BREAK:
+        plumeddat = break_bond_plumed(plumeddat, recipe.atom_idx, newplumeddist)
+    elif recipe.type == ConversionType.MOVE:
+        plumeddat = move_bond_plumed(plumeddat, recipe.atom_idx, newplumeddist)
 
-            file.write(line)
-    file.close()
-    return newplumeddat, newplumeddist
+    write_plumed(plumeddat, newplumeddat)
