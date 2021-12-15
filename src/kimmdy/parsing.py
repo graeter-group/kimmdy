@@ -59,9 +59,7 @@ def read_plumed(path: Path):
                 )
             if "PRINT" in l[:5]:
                 l = l.split()
-                d = {
-                    "PRINT": l[0]
-                }
+                d = {"PRINT": l[0]}
                 for x in l[1:]:
                     key, value = x.split("=")
                     d[key] = value
@@ -82,5 +80,6 @@ def write_plumed(d, path: Path):
         for l in d["distances"]:
             f.write(f"{l['id']}: {l['keyword']} ATOMS={','.join(l['atoms'])}\n")
         for l in d["prints"]:
-            f.write(f"{l['PRINT']} ARG={','.join(l['ARG'])} STRIDE={str(l['STRIDE'])} FILE={str(l['FILE'])}\n")
-
+            f.write(
+                f"{l['PRINT']} ARG={','.join(l['ARG'])} STRIDE={str(l['STRIDE'])} FILE={str(l['FILE'])}\n"
+            )

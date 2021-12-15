@@ -1,7 +1,7 @@
 import yaml
 import logging
 from pathlib import Path
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 def check_file_exists(p: Path):
@@ -136,22 +136,19 @@ class Config:
             )
             Path(input_file)
 
-        if input_file is None:
-            m = "No input file found. Please supply it from the command line or make sure kimmdy.yml exists."
-            logging.error(m)
-            raise FileNotFoundError(m)
-
         self.type_scheme = type_scheme
         if self.type_scheme is None:
             self.type_scheme = {}
 
-        with open(input_file, "r") as f:
-            self.raw = yaml.safe_load(f)
-            if self.raw is None:
-                m = "Error: Could not read input file"
-                logging.error(m)
-                raise ValueError(m)
-            recursive_dict = self.raw
+        if input_file is not None:
+            with open(input_file, "r") as f:
+                raw = yaml.safe_load(f)
+                self.raw = raw
+                if self.raw is None:
+                    m = "Error: Could not read input file"
+                    logging.error(m)
+                    raise ValueError(m)
+                recursive_dict = raw
 
         if recursive_dict is not None:
             for name, val in recursive_dict.items():
