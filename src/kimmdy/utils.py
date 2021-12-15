@@ -195,7 +195,11 @@ def get_shell_stdout(s):
 
 def check_gmx_version():
     try:
-        version = [l for l in get_shell_stdout("gmx --quiet --version").split("\n") if "GROMACS version:" in l][0]
+        version = [
+            l
+            for l in get_shell_stdout("gmx --quiet --version").split("\n")
+            if "GROMACS version:" in l
+        ][0]
     except Exception as e:
         m = "No system gromacs detected. With error: " + str(e)
         logging.error(m)

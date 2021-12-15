@@ -48,8 +48,11 @@ def move_ebond_top(topology: Topology, movepair: tuple[int, int]):
 
 
 def modify_plumed(
-    recipe: ConversionRecipe, oldplumeddat: Path, newplumeddat: Path, newplumeddist: Path
-):  
+    recipe: ConversionRecipe,
+    oldplumeddat: Path,
+    newplumeddat: Path,
+    newplumeddist: Path,
+):
     broken_distnbr = []
 
     breakpair = recipe.atom_idx
