@@ -7,6 +7,7 @@ class ConversionType(Enum):
     BREAK = auto()
     MOVE = auto()
 
+Topology = dict[str, list[list[str]]]
 
 @dataclass
 class ConversionRecipe:

@@ -8,7 +8,7 @@ from kimmdy.config import Config
 from kimmdy.reactions.homolysis import Homolysis
 from kimmdy.reaction import ReactionResult, ConversionRecipe, ConversionType
 from kimmdy.mdmanager import MDManager
-from kimmdy.changemanager import ChangeManager
+import kimmdy.changemanager as changer
 from pprint import pformat
 import random
 
@@ -107,8 +107,8 @@ class RunManager:
         self.filehist[-1]["in"]["plumed_dat"] = self.config.plumed.dat
         self.filehist[-1]["in"]["distances_dat"] = self.config.plumed.distances
 
-    def get_latest(self, f_type: str):
-        """Returns path to latest file of given type, or None if not found.
+    def get_latest(self, f_type: str) -> Path:
+        """Returns path to latest file of given type, raises an error if the file is not found.
         For .dat files (in general ambiuos extensions) use full file name.
         """
         f_type = f_type.replace(".", "_")
@@ -122,7 +122,9 @@ class RunManager:
                 #     logging.debug(f"Full file name {f_type} given, but only suffix found.")
                 #     return io[f_type[-3:]]
         else:
-            logging.error(f"File {f_type} requested but not found!")
+            m = f"File {f_type} requested but not found!"
+            logging.error(m)
+            raise FileNotFoundError(m)
 
     def run(self):
         logging.info("Start run")
@@ -322,13 +324,12 @@ class RunManager:
             "plumed_dat": self.get_latest("plumed.dat"),
         }
 
-        changer = ChangeManager(self.chosen_recipe)
         newtop = out_dir / "topol_mod.top"
         newplumeddat = out_dir / "plumed.dat"
         newplumeddist = out_dir / "distances.dat"
-        changer.modify_top(in_d["top"], newtop)
+        changer.modify_top(self.chosen_recipe, in_d["top"], newtop)
         logging.info(f"Wrote new topology to {newtop.parts[-3:]}")
-        changer.modify_plumed(in_d["plumed_dat"], newplumeddat, newplumeddist)
+        changer.modify_plumed(self.chosen_recipe, in_d["plumed_dat"], newplumeddat, newplumeddist)
         logging.info(f"Wrote new plumedfile to {newplumeddat.parts[-3:]}")
         logging.info(f"Looking for md in {self.config.changer.coordinates.__dict__}")
         # TODO: clean this up, maybe make function for this in config
