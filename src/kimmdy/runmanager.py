@@ -89,8 +89,8 @@ class RunManager:
 
     def __init__(self, input_file: Path):
         self.config = Config(Path(input_file))
-        self.tasks = queue.Queue()     # 
-        self.crr_tasks = queue.Queue() # priority queue
+        self.tasks = queue.Queue()  #
+        self.crr_tasks = queue.Queue()  # priority queue
         self.iteration = 0
         self.iterations = self.config.iterations
         self.state = State.IDLE
@@ -111,16 +111,26 @@ class RunManager:
         self.filehist[-1]["in"]["plumed_dat"] = self.config.plumed.dat
         self.filehist[-1]["in"]["distances_dat"] = self.config.plumed.distances
 
-    def get_latest(self, f_type: str) -> Path:
-        """Returns path to latest file of given type, raises an error if the file is not found.
+        self.task_mapping = {
+            "equilibrium": self._run_md_equil,
+            "prod": self._run_md_prod,
+            "minimization": self._run_md_minim,
+            "relax": self._run_md_relax,
+            "reactions": self._query_reactions,
+        }
+
+    def get_latest(self, f_type: str):
+        """Returns path to latest file of given type, or None if not found.
         For .dat files (in general ambiuos extensions) use full file name.
         """
         f_type = f_type.replace(".", "_")
         for step in self.filehist[::-1]:
             for io in (step["out"], step["in"]):
                 if f_type in io.keys():
-                    if f_type in self.ambiguos_suffs: # suffix was ambiguos
-                        logging.warn(f"{f_type} ambiguos! Please specify full file name!")
+                    if f_type in self.ambiguos_suffs:  # suffix was ambiguos
+                        logging.warn(
+                            f"{f_type} ambiguos! Please specify full file name!"
+                        )
                     return io[f_type]
         else:
             m = f"File {f_type} requested but not found!"
@@ -130,7 +140,7 @@ class RunManager:
     def run(self):
         logging.info("Start run")
         logging.info("Building task list")
-        
+
         for task in self.config.sequence:
             logging.debug(f"Put Task: {self.task_mapping[task]}")
             self.tasks.put(Task(self.task_mapping[task]))
