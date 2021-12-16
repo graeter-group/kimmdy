@@ -59,7 +59,7 @@ class Homolysis(Reaction):
 
             result.rates.append(k)
             result.recipes.append(
-                ConversionRecipe(type=ConversionType.BREAK, atom_idx=breakpair)
+                ConversionRecipe(type=[ConversionType.BREAK], atom_idx=[breakpair])
             )
 
         return result
