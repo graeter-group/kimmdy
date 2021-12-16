@@ -8,8 +8,6 @@ class ConversionType(Enum):
     MOVE = auto()
 
 
-
-
 @dataclass
 class ConversionRecipe:
     """A ConversionReipe.
@@ -21,6 +19,7 @@ class ConversionRecipe:
     type : ConversionType.BREAK or .MOVE
     atom_idx : (from, to)
     """
+
     type: list[ConversionType] = field(default_factory=list)
     atom_idx: list[tuple[int, int]] = field(default_factory=list)
 
@@ -35,6 +34,7 @@ class ReactionResult:
     recipes : list of ConversionRecipes
     rates : list of rates
     """
+
     recipes: list[ConversionRecipe] = field(default_factory=list)
     rates: list[float] = field(default_factory=list)
 
