@@ -22,9 +22,8 @@ class ConversionRecipe:
     type : ConversionType.BREAK or .MOVE
     atom_idx : (from, to)
     """
-
-    type: ConversionType
-    atom_idx: tuple[int, int]
+    type: list[ConversionType]
+    atom_idx: list[tuple[int, int]]
 
 
 @dataclass
@@ -37,7 +36,6 @@ class ReactionResult:
     recipes : list of ConversionRecipes
     rates : list of rates
     """
-
     recipes: list[ConversionRecipe] = field(default_factory=list)
     rates: list[float] = field(default_factory=list)
 
