@@ -1,6 +1,6 @@
 import logging
-from kimmdy.reaction import ConversionRecipe, ConversionType, Topology
-from kimmdy.parsing import read_plumed, write_plumed, read_topol, write_topol
+from kimmdy.reaction import ConversionRecipe, ConversionType
+from kimmdy.parsing import read_plumed, write_plumed, read_topol, write_topol, Topology
 from pathlib import Path
 
 
@@ -8,16 +8,19 @@ def modify_top(recipe: ConversionRecipe, oldtop: Path, newtop: Path):
     logging.info(f"Reading: {oldtop} and writing modified topology to {newtop}.")
     topology = read_topol(oldtop)
 
-    if recipe.type == ConversionType.BREAK:
-        topology = break_bond_top(topology, recipe.atom_idx)
-    elif recipe.type == ConversionType.MOVE:
-        topology = move_bond_top(topology, recipe.atom_idx)
+    for type, pair in zip(recipe.type, recipe.atom_idx):
+        if type == ConversionType.BREAK:
+            topology = break_bond_top(topology, pair)
+        elif type == ConversionType.MOVE:
+            topology = move_bond_top(topology, pair)
 
     write_topol(topology, newtop)
 
 
 def break_bond_top(topology: Topology, breakpair: tuple[int, int]) -> Topology:
-    # remove bond, angles and dihedrals where breakpair was involved
+    """Break bonds in topology.
+    removes bond, angles and dihedrals where breakpair was involved
+    """
     topology["bonds"] = [
         bond
         for bond in topology["bonds"]
@@ -83,9 +86,10 @@ def modify_plumed(
     )
     plumeddat = read_plumed(oldplumeddat)
 
-    if recipe.type == ConversionType.BREAK:
-        plumeddat = break_bond_plumed(plumeddat, recipe.atom_idx, newplumeddist)
-    elif recipe.type == ConversionType.MOVE:
-        plumeddat = move_bond_plumed(plumeddat, recipe.atom_idx, newplumeddist)
+    for type, pair in zip(recipe.type, recipe.atom_idx):
+        if type == ConversionType.BREAK:
+            plumeddat = break_bond_plumed(plumeddat, pair, newplumeddist)
+        elif type == ConversionType.MOVE:
+            plumeddat = move_bond_plumed(plumeddat, pair, newplumeddist)
 
     write_plumed(plumeddat, newplumeddat)
