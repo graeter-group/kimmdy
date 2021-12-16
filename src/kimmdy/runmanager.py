@@ -135,7 +135,7 @@ class RunManager:
             logging.debug(f"Put Task: {self.task_mapping[task]}")
             self.tasks.put(Task(self.task_mapping[task]))
 
-        while not ((self.state is State.DONE) or (self.iteration > self.iterations)):
+        while not ((self.state is State.DONE) or (self.iteration >= self.iterations)):
             next(self)
 
         logging.info(
@@ -154,6 +154,7 @@ class RunManager:
             task = self.crr_tasks.get()
         else:
             task = self.tasks.get()
+            self.iteration += 1
         if self.config.dryrun:
             logging.info(f"Pretending to run: {task.name} with args: {task.kwargs}")
             return
@@ -170,7 +171,6 @@ class RunManager:
         if in_d is None:
             in_d = {}
         self.filehist.append({"in": in_d, "out": out_d})
-        self.iteration += 1
 
     def _dummy(self):
         logging.info("Start dummy task")

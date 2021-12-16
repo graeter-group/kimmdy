@@ -1,5 +1,5 @@
 dryrun: false
-iterations: 1
+iterations: 3
 out: 'test_out_001'
 ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
 top: 'topol.top'

@@ -6,7 +6,7 @@ from dataclasses import dataclass
 
 def check_file_exists(p: Path):
     if not p.exists():
-        m = "File not found: " + str(p)
+        m = "File not found: " + str(p.resolve())
         logging.error(m)
         raise LookupError(m)
 
@@ -269,8 +269,8 @@ class Config:
                         check_file_exists(attr)
 
                 # Check config for consistency
-                if attr_name in ["nvt", "npt"]:
-                    for necessary_f in ["mdp", "tpr"]:
+                if attr_name == "plumed":
+                    for necessary_f in ["dat", "distances"]:
                         assert (
                             necessary_f in attr.__dir__()
                         ), f"{necessary_f} for {attr_name} is missing in config!"
