@@ -7,7 +7,7 @@ from typing import Callable
 from kimmdy.config import Config
 from kimmdy.reactions.homolysis import Homolysis
 from kimmdy.reaction import ReactionResult, ConversionRecipe, ConversionType
-from kimmdy.mdmanager import MDManager
+import kimmdy.mdmanager as md
 import kimmdy.changemanager as changer
 from pprint import pformat
 import random
@@ -40,9 +40,8 @@ def default_decision_strategy(
     t = random.random()  # t in [0.0,1.0)
     rate_running_sum = 0
 
-    # if nothing is choosen, return a ConversionRecipe that
-    # does not do anything (move atom 0 to atom 0).
-    result = ConversionRecipe(ConversionType.MOVE, (0, 0))
+    # if nothing is choosen, return an empty ConversionRecipe
+    result = ConversionRecipe()
     for i in range(len(rates)):
         rate_running_sum += rates[i]
         if (t * total_rate) <= rate_running_sum:
@@ -95,7 +94,6 @@ class RunManager:
         self.iterations = self.config.iterations
         self.state = State.IDLE
         self.reaction_results = []
-        self.md = MDManager()
         # self.measurements = Path("measurements")
         # self.structure = self.config.gro
         # self.top = self.config.top
@@ -139,7 +137,7 @@ class RunManager:
 
         self.tasks.put(Task(self._run_md_equil))
 
-        for i in range(self.iterations):
+        for _ in range(self.iterations):
             self.tasks.put(Task(self._run_md_prod))
             self.tasks.put(Task(self._query_reactions))
             self.tasks.put(Task(self._decide_reaction))
@@ -191,7 +189,7 @@ class RunManager:
             "gro": self.get_latest("gro"),
         }
         # perform step
-        self.md.dummy_step(out_dir, **in_d)
+        md.dummy_step(out_dir, **in_d)
 
         return in_d, out_dir
 
@@ -208,7 +206,7 @@ class RunManager:
             "idx": self.config.idx,
         }
         # perform step
-        self.md.equilibrium(out_dir, **in_d)
+        md.equilibrium(out_dir, **in_d)
         logging.info("Done equilibrating")
         return in_d, out_dir
 
@@ -224,7 +222,7 @@ class RunManager:
             "mdp": self.config.minimization.mdp,
         }
         # perform step
-        self.md.minimzation(out_dir, **in_d)
+        md.minimzation(out_dir, **in_d)
         logging.info("Done minimizing")
         return in_d, out_dir
 
@@ -241,7 +239,7 @@ class RunManager:
             "gro": self.get_latest("gro"),
         }
         # perform step
-        self.md.equilibration(out_dir, **in_d)
+        md.equilibration(out_dir, **in_d)
         logging.info("Done equilibrating")
         return in_d, out_dir
 
@@ -260,7 +258,7 @@ class RunManager:
             "plumed_dat": self.get_latest("plumed_dat"),
         }
         # perform step
-        self.md.production(out_dir, **in_d)
+        md.production(out_dir, **in_d)
         logging.info("Done minimizing")
         return in_d, out_dir
 
@@ -278,7 +276,7 @@ class RunManager:
             "cpt": self.get_latest("cpt"),
         }
         # perform step
-        self.md.relaxation(out_dir, **in_d)
+        md.relaxation(out_dir, **in_d)
         logging.info("Done simulating")
         return in_d, out_dir
 

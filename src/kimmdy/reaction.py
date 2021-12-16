@@ -8,7 +8,6 @@ class ConversionType(Enum):
     MOVE = auto()
 
 
-Topology = dict[str, list[list[str]]]
 
 
 @dataclass
@@ -22,8 +21,8 @@ class ConversionRecipe:
     type : ConversionType.BREAK or .MOVE
     atom_idx : (from, to)
     """
-    type: list[ConversionType]
-    atom_idx: list[tuple[int, int]]
+    type: list[ConversionType] = field(default_factory=list)
+    atom_idx: list[tuple[int, int]] = field(default_factory=list)
 
 
 @dataclass

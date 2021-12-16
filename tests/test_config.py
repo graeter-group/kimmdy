@@ -27,7 +27,7 @@ def test_parse_config2_missing_tpr_in_nvt():
     assert input_f.exists(), "Input file not found"
 
     with pytest.raises(AssertionError):
-        config = Config(input_f)
+        _ = Config(input_f)
 
 
 def test_parse_config3_missing_npt_mdp_file():
@@ -35,7 +35,7 @@ def test_parse_config3_missing_npt_mdp_file():
     assert input_f.exists(), "Input file not found"
 
     with pytest.raises(LookupError):
-        config = Config(input_f)
+        _ = Config(input_f)
 
 
 if __name__ == "__main__":
