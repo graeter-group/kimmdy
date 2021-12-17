@@ -1,5 +1,4 @@
 from __future__ import annotations
-import logging
 from kimmdy.utils import run_shell_cmd
 
 
