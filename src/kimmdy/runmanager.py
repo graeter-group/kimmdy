@@ -14,7 +14,7 @@ import random
 from dataclasses import dataclass, field
 
 # file types of which there will be multiple files per type
-AMBIGUOUS_SUFFS = ["dat", "xvg", "log", "trr"]
+AMBIGUOUS_SUFFS = [".dat", ".xvg", ".log", ".trr"]
 
 
 def default_decision_strategy(
@@ -74,7 +74,9 @@ class TaskFiles:
     """
 
     input: dict[str, Path] = field(default_factory=dict)
-    outputdir: (Path | None) = None
+    output: dict[str, Path] = field(default_factory=dict)
+    outputdir: Path = Path()
+    # default outputdir is current working directory
 
 
 class Task:
@@ -105,8 +107,8 @@ class RunManager:
 
     def __init__(self, config: Config):
         self.config = config
-        self.tasks = queue.Queue()  # tasks from config
-        self.crr_tasks = queue.Queue()  # current tasks
+        self.tasks: queue.Queue[Task] = queue.Queue()  # tasks from config
+        self.crr_tasks: queue.Queue[Task] = queue.Queue()  # current tasks
         self.iteration = 0
         self.iterations = self.config.iterations
         self.state = State.IDLE
@@ -117,13 +119,18 @@ class RunManager:
         # self.trj = self.config.cwd / ("prod_" + str(self.iteration) + ".trj")
         # self.plumeddat = self.config.plumed.dat
         # self.plumeddist = self.config.plumed.distances
-        self.filehist: list[dict[str, dict[str, Path]]] = []
-        self.filehist.append({"in": dict(), "out": dict()})
-        self.filehist[-1]["in"]["top"] = self.config.top
-        self.filehist[-1]["in"]["gro"] = self.config.gro
-        self.filehist[-1]["in"]["idx"] = self.config.idx
-        self.filehist[-1]["in"]["plumed_dat"] = self.config.plumed.dat
-        self.filehist[-1]["in"]["distances_dat"] = self.config.plumed.distances
+        self.filehist: list[TaskFiles] = []
+        self.filehist.append(
+            TaskFiles(
+                input={
+                    "top": self.config.top,
+                    "gro": self.config.gro,
+                    "idx": self.config.idx,
+                    "plumed.dat": self.config.plumed.dat,
+                    "distances.dat": self.config.plumed.distances,
+                }
+            )
+        )
 
         self.task_mapping: dict[str, Callable[..., TaskFiles]] = {
             "equilibrium": self._run_md_equil,
@@ -133,21 +140,22 @@ class RunManager:
             "reactions": self._query_reactions,
         }
 
-    def get_latest(self, f_type: str):
-        """Returns path to latest file of given type, or None if not found.
-        For .dat files (in general ambiuos extensions) use full file name.
+    def get_latest(self, suffix: str):
+        """Returns path to latest file of given type.
+        For .dat files (in general ambiguous extensions) use full file name.
+        Errors if file is nof found.
         """
-        f_type = f_type.replace(".", "_")
-        for step in self.filehist[::-1]:
-            for io in (step["out"], step["in"]):
-                if f_type in io.keys():
-                    if f_type in AMBIGUOUS_SUFFS:
-                        logging.warn(
-                            f"{f_type} ambiguous! Please specify full file name!"
-                        )
-                    return io[f_type]
+        # TODO we shouldn't have to step backwards through the complete
+        # history of IO actions. We should just be able to maintain a dictionary
+        # of the latest file for each type.
+        if suffix in AMBIGUOUS_SUFFS:
+            logging.warn(f"{suffix} ambiguous! Please specify full file name!")
+        for step in reversed(self.filehist):
+            for path in list(step.input.values()) + list(step.output.values()):
+                if suffix in str(path):
+                    return path
         else:
-            m = f"File {f_type} requested but not found!"
+            m = f"File {suffix} requested but not found!"
             logging.error(m)
             raise FileNotFoundError(m)
 
@@ -182,33 +190,39 @@ class RunManager:
         if self.config.dryrun:
             logging.info(f"Pretending to run: {task.name} with args: {task.kwargs}")
             return
-        task_files = task()
+        files = task()
 
-        if task_files.outputdir:
-            for p in task_files.outputdir.iterdir():
-                p_k = p.suffix[1:]  # strip dot
-                if p_k in AMBIGUOUS_SUFFS:
-                    p_k = p.name.replace(".", "_")
-                out_d[p_k] = p
+        if files.outputdir:
+            # list files written by the task
+            for path in files.outputdir.iterdir():
+                suffix = path.suffix
+                if suffix in AMBIGUOUS_SUFFS:
+                    suffix = path.name
+                files.output[suffix] = path
 
-        self.filehist.append(task_files)
+        # TODO Ohhh, I might be trying to implement the same thing twice
+        # Need to clarify what part is responsible of keeping track of
+        # the files a task needs and creates!
+        self.filehist.append(files)
 
     def _dummy(self):
         logging.info("Start dummy task")
-        out_dir = self.config.out / f"dummy_{self.iteration}"
-        out_dir.mkdir()
-        in_d = {
+        files = TaskFiles()
+        files.outputdir = self.config.out / f"dummy_{self.iteration}"
+        files.outputdir.mkdir()
+        files.input = {
             "top": self.get_latest("top"),
             "gro": self.get_latest("gro"),
         }
         # perform step
-        md.dummy_step(out_dir, **in_d)
-
-        return in_d, out_dir
+        files = md.dummy_step(files)
+        return files
 
     def _run_md_equil(self) -> TaskFiles:
         logging.info("Start equilibration MD")
         self.state = State.MD
+        files = TaskFiles()
+        # TODO
         out_dir = self.config.out / f"equil_{self.iteration}"
         out_dir.mkdir()
         (out_dir / self.config.ff.name).symlink_to(self.config.ff)
@@ -219,9 +233,9 @@ class RunManager:
             "idx": self.config.idx,
         }
         # perform step
-        md.equilibrium(out_dir, **in_d)
+        files = md.equilibrium(files)
         logging.info("Done equilibrating")
-        return in_d, out_dir
+        return files
 
     def _run_md_minim(self) -> TaskFiles:
         logging.info("Start minimization md")

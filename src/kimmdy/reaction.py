@@ -16,8 +16,8 @@ class ConversionRecipe:
 
     Parameters
     ----------
-    type : ConversionType.BREAK or .MOVE
-    atom_idx : (from, to)
+    type : list[ConversionType.BREAK or .MOVE]
+    atom_idx : list[(from, to)]
     """
 
     type: list[ConversionType] = field(default_factory=list)

@@ -1,27 +1,53 @@
 from __future__ import annotations
+import logging
+from kimmdy.runmanager import TaskFiles
 from kimmdy.utils import run_shell_cmd
 
 
-def dummy_step(out_dir, top, gro):
-    run_shell_cmd("pwd>./pwd.pwd", out_dir)
+def dummy_step(files):
+    run_shell_cmd("pwd>./pwd.pwd", files.outputdir)
 
 
 def write_mdp():
     pass
 
 
-def minimzation(out_dir, top, gro, mdp):
-    tpr = out_dir / "minimization.tpr"
-    outgro = out_dir / "minimized.gro"
-    run_shell_cmd(f"gmx grompp -p {top} -c {gro} -r {gro} -f {mdp} -o {tpr}", out_dir)
-    run_shell_cmd(f"gmx mdrun -s {tpr} -c {outgro}", out_dir)
+def minimzation(files: TaskFiles):
+    outputdir = files.outputdir
+    if not outputdir:
+        m = f"No output directory given for the current task"
+        logging.error(m)
+        raise FileNotFoundError(m)
+
+    top = files.input["top"]
+    gro = files.input["gro"]
+    mdp = files.input["mdp"]
+    outgro = outputdir / "minimized.gro"
+    outgro = outputdir / "minimized.gro"
+    tpr = outputdir / "minimization.tpr"
+    files.output = {"tpr": tpr, "outgro": outgro}
+    run_shell_cmd(f"gmx grompp -p {top} -c {gro} -r {gro} -f {mdp} -o {tpr}", outputdir)
+    run_shell_cmd(f"gmx mdrun -s {tpr} -c {outgro}", outputdir)
+    # TODO not sure if it is necessary to return the files here.
+    # will they already have changed in the calling scope due to mutability?
+    return files
 
 
-def equilibration(out_dir, top, gro, mdp):
-    tpr = out_dir / "equil.tpr"
-    outgro = out_dir / "equil.gro"
-    run_shell_cmd(f"gmx grompp -p {top} -c {gro} -r {gro} -f {mdp} -o {tpr}", out_dir)
-    run_shell_cmd(f"gmx mdrun -v -s {tpr} -c {outgro}", out_dir)
+def equilibration(files):
+    outputdir = files.outputdir
+    if not outputdir:
+        m = f"No output directory given for the current task"
+        logging.error(m)
+        raise FileNotFoundError(m)
+    gro = files.input["gro"]
+    top = files.input["top"]
+    mdp = files.input["mdp"]
+    tpr = outputdir / "equil.tpr"
+    outgro = outputdir / "equil.gro"
+    files.output = {"tpr": tpr, "gro": outgro}
+    run_shell_cmd(f"gmx grompp -p {top} -c {gro} -r {gro} -f {mdp} -o {tpr}", outputdir)
+    run_shell_cmd(f"gmx mdrun -v -s {tpr} -c {outgro}", outputdir)
+    return files
 
 
 def equilibrium(out_dir, top, gro, mdp, idx):
