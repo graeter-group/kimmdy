@@ -77,13 +77,13 @@ class TaskFiles:
     outputdir: (Path | None) = None
 
 
-class Task():
+class Task:
     """A task to be performed as as a step in the RunManager.
     consists of a function and it's keyword arguments and is
     itself callable.
     """
 
-    def __init__(self, f : Callable[..., TaskFiles], kwargs={}):
+    def __init__(self, f: Callable[..., TaskFiles], kwargs={}):
         self.f = f
         self.kwargs = kwargs
         self.name = self.f.__name__
@@ -93,9 +93,6 @@ class Task():
 
     def __repr__(self) -> str:
         return str(self.f) + " args: " + str(self.kwargs)
-
-
-
 
 
 class RunManager:
@@ -108,7 +105,7 @@ class RunManager:
 
     def __init__(self, config: Config):
         self.config = config
-        self.tasks = queue.Queue() # tasks from config
+        self.tasks = queue.Queue()  # tasks from config
         self.crr_tasks = queue.Queue()  # current tasks
         self.iteration = 0
         self.iterations = self.config.iterations
@@ -128,7 +125,7 @@ class RunManager:
         self.filehist[-1]["in"]["plumed_dat"] = self.config.plumed.dat
         self.filehist[-1]["in"]["distances_dat"] = self.config.plumed.distances
 
-        self.task_mapping : dict[str, Callable[..., TaskFiles]] = {
+        self.task_mapping: dict[str, Callable[..., TaskFiles]] = {
             "equilibrium": self._run_md_equil,
             "prod": self._run_md_prod,
             "minimization": self._run_md_minim,
