@@ -13,6 +13,8 @@ from pprint import pformat
 import random
 from dataclasses import dataclass, field
 
+# file types of which there will be multiple files per type
+AMBIGUOUS_SUFFS = ["dat", "xvg", "log", "trr"]
 
 def default_decision_strategy(
     reaction_results: list[ReactionResult],
@@ -113,8 +115,6 @@ class RunManager:
         # self.plumeddat = self.config.plumed.dat
         # self.plumeddist = self.config.plumed.distances
         self.filehist: list[dict[str, dict[str, Path]]] = []
-        self.ambiguous_suffs = ["dat", "xvg", "log", "trr"]
-        # index initilial files
         self.filehist.append({"in": dict(), "out": dict()})
         self.filehist[-1]["in"]["top"] = self.config.top
         self.filehist[-1]["in"]["gro"] = self.config.gro
@@ -138,7 +138,7 @@ class RunManager:
         for step in self.filehist[::-1]:
             for io in (step["out"], step["in"]):
                 if f_type in io.keys():
-                    if f_type in self.ambiguous_suffs:  # suffix was ambiguous
+                    if f_type in AMBIGUOUS_SUFFS:  # suffix was ambiguous
                         logging.warn(
                             f"{f_type} ambiguous! Please specify full file name!"
                         )
@@ -185,7 +185,7 @@ class RunManager:
         if out_dir is not None:
             for p in out_dir.iterdir():
                 p_k = p.suffix[1:]  # strip dot
-                if p_k in self.ambiguous_suffs:
+                if p_k in AMBIGUOUS_SUFFS:
                     p_k = p.name.replace(".", "_")
                 out_d[p_k] = p
 
