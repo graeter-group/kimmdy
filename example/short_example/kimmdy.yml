@@ -1,5 +1,5 @@
 dryrun: false
-iterations: 1
+iterations: 3
 out: 'test_out_001'
 ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
 top: 'topol.top'
@@ -20,15 +20,11 @@ reactions:
   homolysis:
     edis: 'edissoc.dat'
     bonds: 'ffbonded.itp'
-# sequence:
-#   - equil
-#   - group:
-#       mult: 4
-#       tasks:
-#       - prod
-#       - reaction
-#       - prod
-#  - group:
-#     mult: 4
-#     tasks: [prod, reaction]
+sequence:
+  - equilibrium
+  - 
+    mult: 1
+    tasks:
+      - prod
+      - reactions
 

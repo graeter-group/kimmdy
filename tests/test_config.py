@@ -1,44 +1,62 @@
 from kimmdy.config import Config
 from pathlib import Path
 import pytest
+import os
 
 
 def test_parse_config1_casting():
-    c1 = Path(__file__).parent / "test_files/config_test/config1.yml"
-    assert c1.exists(), "Input file not found"
+    try:
+        input_f = Path(__file__).parent / "test_files/config_test/config1.yml"
+        os.chdir(input_f.parent)
+        assert input_f.exists(), "Input file not found"
 
-    config = Config(c1)
+        config = Config(input_f)
 
-    assert config.dryrun is True
-    assert isinstance(config.dryrun, bool)
+        assert config.dryrun is True
+        assert isinstance(config.dryrun, bool)
 
-    assert config.experiment == "Experiment 1"
+        assert config.iterations == 3
 
-    assert config.run == 1
+        assert isinstance(config.cwd, Path)
+        assert isinstance(config.out, Path)
 
-    assert isinstance(config.cwd, Path)
-
-    assert isinstance(config.plumed, Config)
-    assert isinstance(config.plumed.dat, Path)
-
-
-def test_parse_config2_missing_tpr_in_nvt():
-    input_f = Path(__file__).parent / "test_files/config_test/config2.yml"
-    assert input_f.exists(), "Input file not found"
-
-    with pytest.raises(AssertionError):
-        _ = Config(input_f)
+        assert isinstance(config.plumed, Config)
+        assert isinstance(config.plumed.dat, Path)
+    finally:
+        for d in input_f.parent.glob("test_config_1*"):
+            # [f.unlink() for f in d.iterdir()]
+            d.rmdir()
 
 
-def test_parse_config3_missing_npt_mdp_file():
-    input_f = Path(__file__).parent / "test_files/config_test/config3.yml"
-    assert input_f.exists(), "Input file not found"
+def test_parse_config2_missing_dat_in_plumed():
+    try:
+        input_f = Path(__file__).parent / "test_files/config_test/config2.yml"
+        os.chdir(input_f.parent)
+        assert input_f.exists(), "Input file not found"
 
-    with pytest.raises(LookupError):
-        _ = Config(input_f)
+        with pytest.raises(ValueError):
+            config = Config(input_f)
+    finally:
+        for d in input_f.parent.glob("test_config_2*"):
+            [f.unlink() for f in d.iterdir()]
+            d.rmdir()
+
+
+def test_parse_config3_missing_mdp_file():
+    try:
+        input_f = Path(__file__).parent / "test_files/config_test/config3.yml"
+        os.chdir(input_f.parent)
+        assert input_f.exists(), "Input file not found"
+
+        with pytest.raises(LookupError):
+            Config(input_f)
+    finally:
+        for d in input_f.parent.glob("test_config_3*"):
+            [f.unlink() for f in d.iterdir()]
+            d.rmdir()
 
 
 if __name__ == "__main__":
     test_parse_config1_casting()
-    test_parse_config2_missing_tpr_in_nvt()
-    test_parse_config3_missing_npt_mdp_file()
+    test_parse_config2_missing_dat_in_plumed()
+    test_parse_config3_missing_mdp_file()
