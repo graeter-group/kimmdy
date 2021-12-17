@@ -87,8 +87,8 @@ class RunManager:
 
     reaction_results: list[ReactionResult]
 
-    def __init__(self, input_file: Path):
-        self.config = Config(Path(input_file))
+    def __init__(self, config : Config):
+        self.config = config
         self.tasks = queue.Queue()  #
         self.crr_tasks = queue.Queue()  # priority queue
         self.iteration = 0

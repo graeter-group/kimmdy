@@ -1,5 +1,6 @@
 import argparse
 import logging
+from kimmdy.config import Config
 from kimmdy.runmanager import RunManager
 from kimmdy.utils import check_gmx_version
 import sys
@@ -50,7 +51,8 @@ def kimmdy():
     logging.info("KIMMDY is running with these command line options:")
     logging.info(args)
 
-    runmgr = RunManager(args.input)
+    config = Config(args.input)
+    runmgr = RunManager(config)
 
     logging.info("Configuration from input file:")
     logging.info(json.dumps(runmgr.config.raw, sort_keys=True, indent=4))
