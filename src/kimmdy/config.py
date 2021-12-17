@@ -99,6 +99,10 @@ class ProdConfig:
     mdp: Path
 
 
+class SequenceConfig(list):
+    tasks: list
+
+
 @dataclass
 class Config:
     """Internal representation of the configuration generated
@@ -116,6 +120,7 @@ class Config:
         dict containing types for casting and validating settings.
 
     """
+
     run: int
     experiment: str
     name: str
@@ -133,6 +138,7 @@ class Config:
     changer: ChangerConfig
     reactions: ReactionsConfig
     prod: ProdConfig
+    sequence: SequenceConfig
 
     def __init__(
         self, input_file: Path = None, recursive_dict=None, type_scheme=type_scheme

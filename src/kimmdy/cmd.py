@@ -52,12 +52,14 @@ def kimmdy():
     logging.info(args)
 
     config = Config(args.input)
-    runmgr = RunManager(config)
 
     logging.info("Configuration from input file:")
-    logging.info(json.dumps(runmgr.config.raw, sort_keys=True, indent=4))
+    # logging.info(json.dumps(config.raw, sort_keys=True, indent=4))
+    logging.info(repr(config))
     logging.debug("Using system GROMACS:")
     logging.debug(check_gmx_version())
+
+    runmgr = RunManager(config)
     runmgr.run()
 
 

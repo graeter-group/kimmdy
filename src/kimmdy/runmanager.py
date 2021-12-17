@@ -16,6 +16,7 @@ from dataclasses import dataclass, field
 # file types of which there will be multiple files per type
 AMBIGUOUS_SUFFS = ["dat", "xvg", "log", "trr"]
 
+
 def default_decision_strategy(
     reaction_results: list[ReactionResult],
 ) -> ConversionRecipe:
@@ -64,32 +65,37 @@ class State(Enum):
     DONE = auto()
 
 
-class Task:
+@dataclass
+class TaskFiles:
+    """Input and Output files and directories
+    belonging to a task in the sequence of tasks.
+    A function or method that wants to be callable as a Task
+    has to return a TaskFiles object.
+    """
+
+    input: dict[str, Path] = field(default_factory=dict)
+    outputdir: (Path | None) = None
+
+
+class Task():
     """A task to be performed as as a step in the RunManager.
     consists of a function and it's keyword arguments and is
     itself callable.
     """
 
-    def __init__(self, f, kwargs={}):
+    def __init__(self, f : Callable[..., TaskFiles], kwargs={}):
         self.f = f
         self.kwargs = kwargs
         self.name = self.f.__name__
 
-    def __call__(self):
+    def __call__(self) -> TaskFiles:
         return self.f(**self.kwargs)
 
     def __repr__(self) -> str:
         return str(self.f) + " args: " + str(self.kwargs)
 
 
-@dataclass
-class StepFiles:
-    """Input and Output files and directories
-    belonging to step in the sequence of tasks.
-    """
 
-    input: dict = field(default_factory=dict)
-    output: dict = field(default_factory=dict)
 
 
 class RunManager:
@@ -102,8 +108,8 @@ class RunManager:
 
     def __init__(self, config: Config):
         self.config = config
-        self.tasks = queue.Queue()  #
-        self.crr_tasks = queue.Queue()  # priority queue
+        self.tasks = queue.Queue() # tasks from config
+        self.crr_tasks = queue.Queue()  # current tasks
         self.iteration = 0
         self.iterations = self.config.iterations
         self.state = State.IDLE
@@ -122,7 +128,7 @@ class RunManager:
         self.filehist[-1]["in"]["plumed_dat"] = self.config.plumed.dat
         self.filehist[-1]["in"]["distances_dat"] = self.config.plumed.distances
 
-        self.task_mapping = {
+        self.task_mapping : dict[str, Callable[..., TaskFiles]] = {
             "equilibrium": self._run_md_equil,
             "prod": self._run_md_prod,
             "minimization": self._run_md_minim,
@@ -138,7 +144,7 @@ class RunManager:
         for step in self.filehist[::-1]:
             for io in (step["out"], step["in"]):
                 if f_type in io.keys():
-                    if f_type in AMBIGUOUS_SUFFS:  # suffix was ambiguous
+                    if f_type in AMBIGUOUS_SUFFS:
                         logging.warn(
                             f"{f_type} ambiguous! Please specify full file name!"
                         )
@@ -156,7 +162,7 @@ class RunManager:
             logging.debug(f"Put Task: {self.task_mapping[task]}")
             self.tasks.put(Task(self.task_mapping[task]))
 
-        while not ((self.state is State.DONE) or (self.iteration >= self.iterations)):
+        while not (self.state is State.DONE or self.iteration >= self.iterations):
             next(self)
 
         logging.info(
@@ -179,19 +185,16 @@ class RunManager:
         if self.config.dryrun:
             logging.info(f"Pretending to run: {task.name} with args: {task.kwargs}")
             return
-        in_d, out_dir = task()
+        task_files = task()
 
-        out_d = {}
-        if out_dir is not None:
-            for p in out_dir.iterdir():
+        if task_files.outputdir:
+            for p in task_files.outputdir.iterdir():
                 p_k = p.suffix[1:]  # strip dot
                 if p_k in AMBIGUOUS_SUFFS:
                     p_k = p.name.replace(".", "_")
                 out_d[p_k] = p
 
-        if in_d is None:
-            in_d = {}
-        self.filehist.append({"in": in_d, "out": out_d})
+        self.filehist.append(task_files)
 
     def _dummy(self):
         logging.info("Start dummy task")
@@ -206,7 +209,7 @@ class RunManager:
 
         return in_d, out_dir
 
-    def _run_md_equil(self):
+    def _run_md_equil(self) -> TaskFiles:
         logging.info("Start equilibration MD")
         self.state = State.MD
         out_dir = self.config.out / f"equil_{self.iteration}"
@@ -223,7 +226,7 @@ class RunManager:
         logging.info("Done equilibrating")
         return in_d, out_dir
 
-    def _run_md_minim(self):
+    def _run_md_minim(self) -> TaskFiles:
         logging.info("Start minimization md")
         self.state = State.MD
         out_dir = self.config.out / f"min_{self.iteration}"
@@ -239,7 +242,7 @@ class RunManager:
         logging.info("Done minimizing")
         return in_d, out_dir
 
-    def _run_md_eq(self):
+    def _run_md_eq(self) -> TaskFiles:
         # TODO combine w/ other equilibration?
         logging.info("Start _run_md_eq MD")
         self.state = State.MD
@@ -256,7 +259,7 @@ class RunManager:
         logging.info("Done equilibrating")
         return in_d, out_dir
 
-    def _run_md_prod(self):
+    def _run_md_prod(self) -> TaskFiles:
         logging.info("Start production MD")
         self.state = State.MD
         out_dir = self.config.out / f"prod_{self.iteration}"
@@ -275,7 +278,7 @@ class RunManager:
         logging.info("Done minimizing")
         return in_d, out_dir
 
-    def _run_md_relax(self):
+    def _run_md_relax(self) -> TaskFiles:
         logging.info("Start relaxation MD")
         self.state = State.MD
         out_dir = self.config.out / f"prod_{self.iteration}"
@@ -334,7 +337,7 @@ class RunManager:
         self.crr_tasks.put(Task(self._run_recipe))
         return None, None
 
-    def _run_recipe(self):
+    def _run_recipe(self) -> TaskFiles:
         logging.info(f"Start Recipe in step {self.iteration}")
         logging.info(f"Breakpair: {self.chosen_recipe.atom_idx}")
         out_dir = self.config.out / f"recipe_{self.iteration}"
