@@ -11,6 +11,7 @@ import kimmdy.mdmanager as md
 import kimmdy.changemanager as changer
 from pprint import pformat
 import random
+from dataclasses import dataclass, field
 
 
 def default_decision_strategy(
@@ -79,6 +80,16 @@ class Task:
         return str(self.f) + " args: " + str(self.kwargs)
 
 
+@dataclass
+class StepFiles:
+    """Input and Output files and directories
+    belonging to step in the sequence of tasks.
+    """
+
+    input: dict = field(default_factory=dict)
+    output: dict = field(default_factory=dict)
+
+
 class RunManager:
     """The RunManager, a central piece.
     Manages the queue of tasks, communicates with the
@@ -87,7 +98,7 @@ class RunManager:
 
     reaction_results: list[ReactionResult]
 
-    def __init__(self, config : Config):
+    def __init__(self, config: Config):
         self.config = config
         self.tasks = queue.Queue()  #
         self.crr_tasks = queue.Queue()  # priority queue
@@ -102,7 +113,7 @@ class RunManager:
         # self.plumeddat = self.config.plumed.dat
         # self.plumeddist = self.config.plumed.distances
         self.filehist: list[dict[str, dict[str, Path]]] = []
-        self.ambiguos_suffs = ["dat", "xvg", "log", "trr"]
+        self.ambiguous_suffs = ["dat", "xvg", "log", "trr"]
         # index initilial files
         self.filehist.append({"in": dict(), "out": dict()})
         self.filehist[-1]["in"]["top"] = self.config.top
@@ -127,9 +138,9 @@ class RunManager:
         for step in self.filehist[::-1]:
             for io in (step["out"], step["in"]):
                 if f_type in io.keys():
-                    if f_type in self.ambiguos_suffs:  # suffix was ambiguos
+                    if f_type in self.ambiguous_suffs:  # suffix was ambiguous
                         logging.warn(
-                            f"{f_type} ambiguos! Please specify full file name!"
+                            f"{f_type} ambiguous! Please specify full file name!"
                         )
                     return io[f_type]
         else:
@@ -174,7 +185,7 @@ class RunManager:
         if out_dir is not None:
             for p in out_dir.iterdir():
                 p_k = p.suffix[1:]  # strip dot
-                if p_k in self.ambiguos_suffs:
+                if p_k in self.ambiguous_suffs:
                     p_k = p.name.replace(".", "_")
                 out_d[p_k] = p
 
@@ -229,7 +240,7 @@ class RunManager:
         return in_d, out_dir
 
     def _run_md_eq(self):
-        # TODO: combine w/ other equilibration?
+        # TODO combine w/ other equilibration?
         logging.info("Start _run_md_eq MD")
         self.state = State.MD
         out_dir = self.config.out / f"equil_{self.iteration}"
@@ -288,7 +299,7 @@ class RunManager:
         in_d = None
         out_dir = None
 
-        # TODO: this could be more elegant
+        # TODO this could be more elegant
         if hasattr(self.config.reactions, "homolysis"):
             self.reaction = Homolysis()
 
@@ -302,7 +313,7 @@ class RunManager:
             self.reaction_results.append(self.reaction.get_reaction_result(**in_d))
 
         logging.info("Rates and Recipes:")
-        # TODO: this would fail with a out of range error,
+        # TODO this would fail with a out of range error,
         # we need a way of writing out results
         # logging.info(self.rates[0:10])
         # logging.info(self.recipe.type)
@@ -345,7 +356,7 @@ class RunManager:
         )
         logging.info(f"Wrote new plumedfile to {newplumeddat.parts[-3:]}")
         logging.info(f"Looking for md in {self.config.changer.coordinates.__dict__}")
-        # TODO: clean this up, maybe make function for this in config
+        # TODO clean this up, maybe make function for this in config
         if hasattr(self.config, "changer"):
             if hasattr(self.config.changer, "coordinates"):
                 if hasattr(self.config.changer.coordinates, "md"):
