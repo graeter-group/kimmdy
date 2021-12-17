@@ -44,9 +44,9 @@ def configure_logging(args, color=True):
         logging.addLevelName(logging.INFO, "\033[35mINFO\033[00m")
         logging.addLevelName(logging.ERROR, "\033[31mERROR\033[00m")
         logging.addLevelName(logging.WARNING, "\033[33mWARN\033[00m")
-        format="\033[34m %(asctime)s\033[00m: %(levelname)s: %(message)s"
+        format = "\033[34m %(asctime)s\033[00m: %(levelname)s: %(message)s"
     else:
-        format="%(asctime): %(levelname)s: %(message)s"
+        format = "%(asctime): %(levelname)s: %(message)s"
     logging.basicConfig(
         level=getattr(logging, args.loglevel.upper()),
         handlers=[

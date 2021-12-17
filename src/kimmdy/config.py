@@ -7,52 +7,25 @@ import logging
 import sys
 
 
-def check_file_exists(p: str):
-    path = Path(p)
-    if not path.exists():
-        m = "File not found: " + p
+def check_file_exists(p: Path):
+    if not p.exists():
+        m = "File not found: " + str(p.resolve())
         logging.error(m)
         raise LookupError(m)
 
 
-class Sequence(list):
-    def __init__(self, tasks: list):
-        list.__init__(self)
-        for task in tasks:
-            if isinstance(task, dict):
-                for _ in range(task["mult"]):
-                    assert isinstance(
-                        task["tasks"], list
-                    ), "Grouped tasks must be a list!"
-                    self.extend(task["tasks"])
-            else:
-                self.append(task)
+@dataclass
+class TaskConfig:
+    tasks: (str | list[TaskConfig])
+    mult: int = 1
 
 
-type_scheme = {
-    "experiment": str,
-    ""
-    "dryrun": bool,
-    "iterations": int,
-    "out": Path,
-    "ff": Path,
-    "top": Path,
-    "gro": Path,
-    "idx": Path,
-    "plumed": {"dat": Path, "distances": Path},
-    "minimization": {"mdp": Path, "tpr": Path},
-    "equilibration": {
-        "nvt": {"mdp": Path, "tpr": Path},
-        "npt": {"mdp": Path, "tpr": Path},
-    },
-    "equilibrium": {"mdp": Path},
-    "prod": {"mdp": Path},
-    "changer": {"coordinates": {"md": {"mdp": Path}}},
-    "reactions": {},
-    "sequence": Sequence,
-}
+@dataclass
+class SequenceConfig:
+    tasks: list[TaskConfig] = field(default_factory=list)
 
-# classes for static code analysis
+
+@dataclass
 class PlumedConfig:
     dat: str
     distances: str
@@ -111,6 +84,15 @@ class ReactionsConfig:
 @dataclass
 class ProdConfig:
     mdp: str
+
+
+@dataclass
+class Config:
+    """Internal representation of the configuration generated
+    from the input file, which enables validation before running
+    and computationally expensive operations.
+    All settings read from the input file are accessible through nested attributes.
+    """
 
 
 @dataclass
@@ -202,4 +184,4 @@ def validate_config(conf: BaseConfig):
         conf.equilibrium.mdp,
         conf.prod.mdp,
     ]:
-        check_file_exists(f)
+        check_file_exists(Path(f))
