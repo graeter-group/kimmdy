@@ -1,4 +1,6 @@
 from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Callable
 
 
 @dataclass
@@ -21,14 +23,20 @@ class Task:
     itself callable.
     """
 
-    def __init__(self, f: Callable[..., TaskFiles], kwargs={}):
+    def __init__(self, f: Callable[[TaskFiles], None], kwargs={}):
         self.f = f
         self.kwargs = kwargs
         self.name = self.f.__name__
 
-    def __call__(self) -> TaskFiles:
+    def __call__(self):
         return self.f(**self.kwargs)
 
     def __repr__(self) -> str:
         return str(self.f) + " args: " + str(self.kwargs)
+
+
+# Type alias to define a mapping between a task name as a string
+# and the RunManager method
+TaskMapping = dict[str, Callable[[TaskFiles], None]]
+
 

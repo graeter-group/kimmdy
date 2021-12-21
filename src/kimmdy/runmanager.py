@@ -9,7 +9,7 @@ from kimmdy.reactions.homolysis import Homolysis
 from kimmdy.reaction import ReactionResult, ConversionRecipe, ConversionType
 import kimmdy.mdmanager as md
 import kimmdy.changemanager as changer
-from kimmdy.tasks import Task, TaskFiles
+from kimmdy.tasks import Task, TaskFiles, TaskMapping
 from pprint import pformat
 import random
 
@@ -100,7 +100,8 @@ class RunManager:
             )
         )
 
-        self.task_mapping: dict[str, Callable[..., TaskFiles]] = {
+
+        self.task_mapping: TaskMapping = {
             "equilibrium": self._run_md_equil,
             "prod": self._run_md_prod,
             "minimization": self._run_md_minim,
@@ -182,69 +183,72 @@ class RunManager:
             "top": self.get_latest("top"),
             "gro": self.get_latest("gro"),
         }
-        # perform step
-        files = md.dummy_step(files)
+        md.dummy_step(files)
         return files
 
     def _run_md_equil(self) -> TaskFiles:
         logging.info("Start equilibration MD")
         self.state = State.MD
         files = TaskFiles()
-        # TODO
-        out_dir = self.config.out / f"equil_{self.iteration}"
-        out_dir.mkdir()
-        (out_dir / self.config.ff.name).symlink_to(self.config.ff)
-        in_d = {
+        outputdir = self.config.out / f"equil_{self.iteration}"
+        outputdir.mkdir()
+        (outputdir / self.config.ff.name).symlink_to(self.config.ff)
+        files.outputdir = outputdir
+        files.input = {
             "top": self.get_latest("top"),
             "gro": self.get_latest("gro"),
             "mdp": self.config.equilibrium.mdp,
             "idx": self.config.idx,
         }
-        # perform step
-        files = md.equilibrium(files)
+        md.equilibrium(files)
         logging.info("Done equilibrating")
         return files
 
     def _run_md_minim(self) -> TaskFiles:
         logging.info("Start minimization md")
         self.state = State.MD
-        out_dir = self.config.out / f"min_{self.iteration}"
-        out_dir.mkdir()
-        (out_dir / self.config.ff.name).symlink_to(self.config.ff)
-        in_d = {
+        files = TaskFiles()
+        outputdir = self.config.out / f"min_{self.iteration}"
+        outputdir.mkdir()
+        (outputdir / self.config.ff.name).symlink_to(self.config.ff)
+        files.outputdir = outputdir
+        files.input = {
             "top": self.get_latest("top"),
             "gro": self.get_latest("gro"),
             "mdp": self.config.minimization.mdp,
         }
         # perform step
-        md.minimzation(out_dir, **in_d)
+        md.minimzation(files)
         logging.info("Done minimizing")
-        return in_d, out_dir
+        return files
 
     def _run_md_eq(self) -> TaskFiles:
         # TODO combine w/ other equilibration?
         logging.info("Start _run_md_eq MD")
         self.state = State.MD
-        out_dir = self.config.out / f"equil_{self.iteration}"
-        out_dir.mkdir()
-        (out_dir / self.config.ff.name).symlink_to(self.config.ff)
-        in_d = {
+        files = TaskFiles()
+        outputdir = self.config.out / f"equil_{self.iteration}"
+        outputdir.mkdir()
+        (outputdir / self.config.ff.name).symlink_to(self.config.ff)
+        files.outputdir = outputdir
+        files.input = {
             "top": self.get_latest("top"),
             "mdp": self.config.equilibrium.mdp,
             "gro": self.get_latest("gro"),
         }
-        # perform step
-        md.equilibration(out_dir, **in_d)
+        md.equilibration(files)
         logging.info("Done equilibrating")
-        return in_d, out_dir
+        return files
 
     def _run_md_prod(self) -> TaskFiles:
         logging.info("Start production MD")
         self.state = State.MD
-        out_dir = self.config.out / f"prod_{self.iteration}"
-        out_dir.mkdir()
-        (out_dir / self.config.ff.name).symlink_to(self.config.ff)
-        in_d = {
+        files = TaskFiles()
+        outputdir = self.config.out / f"prod_{self.iteration}"
+        outputdir.mkdir()
+        (outputdir / self.config.ff.name).symlink_to(self.config.ff)
+        files.outputdir = outputdir
+        files.input = {
             "top": self.get_latest("top"),
             "gro": self.get_latest("gro"),
             "mdp": self.config.prod.mdp,
@@ -252,47 +256,46 @@ class RunManager:
             "cpt": self.get_latest("cpt"),
             "plumed_dat": self.get_latest("plumed_dat"),
         }
-        # perform step
-        md.production(out_dir, **in_d)
+        md.production(files)
         logging.info("Done minimizing")
-        return in_d, out_dir
+        return files
 
     def _run_md_relax(self) -> TaskFiles:
         logging.info("Start relaxation MD")
         self.state = State.MD
-        out_dir = self.config.out / f"prod_{self.iteration}"
-        out_dir.mkdir()
-        (out_dir / self.config.ff.name).symlink_to(self.config.ff)
-        in_d = {
+        files = TaskFiles()
+        outputdir = self.config.out / f"prod_{self.iteration}"
+        outputdir.mkdir()
+        (outputdir / self.config.ff.name).symlink_to(self.config.ff)
+        files.outputdir = outputdir
+        files.input = {
             "top": self.get_latest("top"),
             "gro": self.get_latest("gro"),
             "mdp": self.config.changer.coordinates.md.mdp,
             "idx": self.config.idx,
             "cpt": self.get_latest("cpt"),
         }
-        # perform step
-        md.relaxation(out_dir, **in_d)
+        md.relaxation(files)
         logging.info("Done simulating")
-        return in_d, out_dir
+        return files
 
     def _query_reactions(self):
         logging.info("Query reactions")
         self.state = State.REACTION
-        in_d = None
-        out_dir = None
+        files = TaskFiles()
 
         # TODO this could be more elegant
         if hasattr(self.config.reactions, "homolysis"):
             self.reaction = Homolysis()
 
-            in_d = {
+            files.input = {
                 "plumed_dat": self.get_latest("plumed.dat"),
                 "distances_dat": self.get_latest("distances.dat"),
                 "top": self.get_latest("top"),
                 "ffbonded_itp": self.config.reactions.homolysis.bonds,
                 "edissoc_dat": self.config.reactions.homolysis.edis,
             }
-            self.reaction_results.append(self.reaction.get_reaction_result(**in_d))
+            self.reaction_results.append(self.reaction.get_reaction_result(files.input))
 
         logging.info("Rates and Recipes:")
         # TODO this would fail with a out of range error,
@@ -301,7 +304,7 @@ class RunManager:
         # logging.info(self.recipe.type)
         # logging.info(self.recipe.atom_idx[0:10])
         # logging.info("Reaction done")
-        return in_d, out_dir
+        return files
 
     def _decide_reaction(
         self,
@@ -319,18 +322,18 @@ class RunManager:
     def _run_recipe(self) -> TaskFiles:
         logging.info(f"Start Recipe in step {self.iteration}")
         logging.info(f"Breakpair: {self.chosen_recipe.atom_idx}")
-        out_dir = self.config.out / f"recipe_{self.iteration}"
-        out_dir.mkdir()
-        (out_dir / self.config.ff.name).symlink_to(self.config.ff)
+        outputdir = self.config.out / f"recipe_{self.iteration}"
+        outputdir.mkdir()
+        (outputdir / self.config.ff.name).symlink_to(self.config.ff)
 
         in_d = {
             "top": self.get_latest("top"),
             "plumed_dat": self.get_latest("plumed.dat"),
         }
 
-        newtop = out_dir / "topol_mod.top"
-        newplumeddat = out_dir / "plumed.dat"
-        newplumeddist = out_dir / "distances.dat"
+        newtop = outputdir / "topol_mod.top"
+        newplumeddat = outputdir / "plumed.dat"
+        newplumeddist = outputdir / "distances.dat"
         changer.modify_top(self.chosen_recipe, in_d["top"], newtop)
         logging.info(f"Wrote new topology to {newtop.parts[-3:]}")
         changer.modify_plumed(
