@@ -4,7 +4,6 @@ from kimmdy.config import Config
 from kimmdy.runmanager import RunManager
 from kimmdy.utils import check_gmx_version
 import sys
-import json
 
 
 def get_cmdline_args():
@@ -54,7 +53,6 @@ def kimmdy():
     config = Config(args.input)
 
     logging.info("Configuration from input file:")
-    # logging.info(json.dumps(config.raw, sort_keys=True, indent=4))
     logging.info(repr(config))
     logging.debug("Using system GROMACS:")
     logging.debug(check_gmx_version())

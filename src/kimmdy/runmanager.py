@@ -9,9 +9,9 @@ from kimmdy.reactions.homolysis import Homolysis
 from kimmdy.reaction import ReactionResult, ConversionRecipe, ConversionType
 import kimmdy.mdmanager as md
 import kimmdy.changemanager as changer
+from kimmdy.tasks import Task, TaskFiles
 from pprint import pformat
 import random
-from dataclasses import dataclass, field
 
 # file types of which there will be multiple files per type
 AMBIGUOUS_SUFFS = [".dat", ".xvg", ".log", ".trr"]
@@ -63,38 +63,6 @@ class State(Enum):
     MD = auto()
     REACTION = auto()
     DONE = auto()
-
-
-@dataclass
-class TaskFiles:
-    """Input and Output files and directories
-    belonging to a task in the sequence of tasks.
-    A function or method that wants to be callable as a Task
-    has to return a TaskFiles object.
-    """
-
-    input: dict[str, Path] = field(default_factory=dict)
-    output: dict[str, Path] = field(default_factory=dict)
-    outputdir: Path = Path()
-    # default outputdir is current working directory
-
-
-class Task:
-    """A task to be performed as as a step in the RunManager.
-    consists of a function and it's keyword arguments and is
-    itself callable.
-    """
-
-    def __init__(self, f: Callable[..., TaskFiles], kwargs={}):
-        self.f = f
-        self.kwargs = kwargs
-        self.name = self.f.__name__
-
-    def __call__(self) -> TaskFiles:
-        return self.f(**self.kwargs)
-
-    def __repr__(self) -> str:
-        return str(self.f) + " args: " + str(self.kwargs)
 
 
 class RunManager:

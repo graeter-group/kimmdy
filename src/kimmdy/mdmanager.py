@@ -33,7 +33,7 @@ def minimzation(files: TaskFiles):
     return files
 
 
-def equilibration(files):
+def equilibration(files: TaskFiles):
     outputdir = files.outputdir
     if not outputdir:
         m = f"No output directory given for the current task"
@@ -50,8 +50,9 @@ def equilibration(files):
     return files
 
 
-def equilibrium(out_dir, top, gro, mdp, idx):
+def equilibrium(files: TaskFiles):
     """equilibrium before pulling md"""
+    # out_dir, top, gro, mdp, idx
     tpr = out_dir / "equil.tpr"
     outgro = out_dir / "equil.gro"
     outtrr = out_dir / "equil.trr"
