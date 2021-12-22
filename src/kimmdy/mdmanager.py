@@ -1,63 +1,144 @@
 from __future__ import annotations
+import logging
+from kimmdy.tasks import TaskFiles
 from kimmdy.utils import run_shell_cmd
 
 
-def dummy_step(out_dir, top, gro):
-    run_shell_cmd("pwd>./pwd.pwd", out_dir)
+def dummy_step(files):
+    run_shell_cmd("pwd>./pwd.pwd", files.outputdir)
+
+    return files
 
 
 def write_mdp():
     pass
 
 
-def minimzation(out_dir, top, gro, mdp):
-    tpr = out_dir / "minimization.tpr"
-    outgro = out_dir / "minimized.gro"
-    run_shell_cmd(f"gmx grompp -p {top} -c {gro} -r {gro} -f {mdp} -o {tpr}", out_dir)
-    run_shell_cmd(f"gmx mdrun -s {tpr} -c {outgro}", out_dir)
+def minimzation(files: TaskFiles) -> TaskFiles:
+    outputdir = files.outputdir
+    if not outputdir:
+        m = f"No output directory given for the current task"
+        logging.error(m)
+        raise FileNotFoundError(m)
+
+    top = files.input["top"]
+    gro = files.input["gro"]
+    mdp = files.input["mdp"]
+    outgro = outputdir / "minimized.gro"
+    outgro = outputdir / "minimized.gro"
+    tpr = outputdir / "minimization.tpr"
+
+    files.output = {"tpr": tpr, "outgro": outgro}
+
+    run_shell_cmd(f"gmx grompp -p {top} -c {gro} -r {gro} -f {mdp} -o {tpr}", outputdir)
+    run_shell_cmd(f"gmx mdrun -s {tpr} -c {outgro}", outputdir)
+
+    return files
 
 
-def equilibration(out_dir, top, gro, mdp):
-    tpr = out_dir / "equil.tpr"
-    outgro = out_dir / "equil.gro"
-    run_shell_cmd(f"gmx grompp -p {top} -c {gro} -r {gro} -f {mdp} -o {tpr}", out_dir)
-    run_shell_cmd(f"gmx mdrun -v -s {tpr} -c {outgro}", out_dir)
+def equilibration(files: TaskFiles) -> TaskFiles:
+    outputdir = files.outputdir
+    if not outputdir:
+        m = f"No output directory given for the current task"
+        logging.error(m)
+        raise FileNotFoundError(m)
+
+    gro = files.input["gro"]
+    top = files.input["top"]
+    mdp = files.input["mdp"]
+    tpr = outputdir / "equil.tpr"
+    outgro = outputdir / "equil.gro"
+
+    files.output = {"tpr": tpr, "gro": outgro}
+
+    run_shell_cmd(f"gmx grompp -p {top} -c {gro} -r {gro} -f {mdp} -o {tpr}", outputdir)
+    run_shell_cmd(f"gmx mdrun -v -s {tpr} -c {outgro}", outputdir)
+
+    return files
 
 
-def equilibrium(out_dir, top, gro, mdp, idx):
+def equilibrium(files: TaskFiles):
     """equilibrium before pulling md"""
-    tpr = out_dir / "equil.tpr"
-    outgro = out_dir / "equil.gro"
-    outtrr = out_dir / "equil.trr"
+    outputdir = files.outputdir
+    if not outputdir:
+        m = f"No output directory given for the current task"
+        logging.error(m)
+        raise FileNotFoundError(m)
+
+    top = files.input["top"]
+    gro = files.input["gro"]
+    mdp = files.input["mdp"]
+    idx = files.input["idx"]
+    tpr = outputdir / "equil.tpr"
+    outgro = outputdir / "equil.gro"
+    outtrr = outputdir / "equil.trr"
+
+    files.output = {"tpr": tpr, "gro": outgro, "trr": outtrr}
+
     run_shell_cmd(
         f"gmx grompp -p {top} -c {gro} -f {mdp} -n {idx} -o {tpr} -maxwarn 5",
-        out_dir,
+        outputdir,
     )
-    run_shell_cmd(f"gmx mdrun -v -s {tpr} -c {outgro} -o {outtrr}", out_dir)
+    run_shell_cmd(f"gmx mdrun -v -s {tpr} -c {outgro} -o {outtrr}", outputdir)
+
+    return TaskFiles
 
 
-def production(out_dir, top, gro, mdp, idx, cpt, plumed_dat):
+def production(files: TaskFiles) -> TaskFiles:
     """normal pulling md"""
-    tpr = out_dir / "prod.tpr"
-    outgro = out_dir / "prod.gro"
-    outtrr = out_dir / "prod.trr"
+    outputdir = files.outputdir
+    if not outputdir:
+        m = f"No output directory given for the current task"
+        logging.error(m)
+        raise FileNotFoundError(m)
+
+    top = files.input["top"]
+    gro = files.input["gro"]
+    mdp = files.input["mdp"]
+    idx = files.input["idx"]
+    cpt = files.input["cpt"]
+    plumed_dat = files.input["plumed.dat"]
+    tpr = outputdir / "prod.tpr"
+    outgro = outputdir / "prod.gro"
+    outtrr = outputdir / "prod.trr"
+
+    files.output = {"tpr": tpr, "gro": outgro, "trr": outtrr}
+
     run_shell_cmd(
         f" gmx grompp -p {top} -c {gro} -f {mdp} -n {idx} -t {cpt} -o {tpr} -maxwarn 5",
-        out_dir,
+        outputdir,
     )
     run_shell_cmd(
         f"gmx mdrun -v -s {tpr} -c {outgro} -plumed {plumed_dat} -o {outtrr}",
-        out_dir,
+        outputdir,
     )
 
+    return files
 
-def relaxation(out_dir, top, gro, mdp, idx, cpt):
+
+def relaxation(files: TaskFiles) -> TaskFiles:
     """equil after break -->> called from changer"""
-    tpr = out_dir / "relax.tpr"
-    outgro = out_dir / "relax.gro"
-    outtrr = out_dir / "relax.trr"
+    outputdir = files.outputdir
+    if not outputdir:
+        m = f"No output directory given for the current task"
+        logging.error(m)
+        raise FileNotFoundError(m)
+
+    top = files.input["top"]
+    gro = files.input["gro"]
+    mdp = files.input["mdp"]
+    idx = files.input["idx"]
+    cpt = files.input["cpt"]
+    tpr = outputdir / "relax.tpr"
+    outgro = outputdir / "relax.gro"
+    outtrr = outputdir / "relax.trr"
+
+    files.output = {"tpr": tpr, "gro": outgro, "trr": outtrr}
+
     run_shell_cmd(
         f"gmx grompp -p {top} -c {gro} -f {mdp} -n {idx} -t {cpt} -o {tpr} -maxwarn 5",
-        out_dir,
+        outputdir,
     )
-    run_shell_cmd(f"gmx mdrun -v -s {tpr} -c {outgro} -o {outtrr}", out_dir)
+    run_shell_cmd(f"gmx mdrun -v -s {tpr} -c {outgro} -o {outtrr}", outputdir)
+
+    return files

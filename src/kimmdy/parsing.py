@@ -1,6 +1,6 @@
 from pathlib import Path
 from collections.abc import Iterable
-from typing import Generator
+from typing import Any, Generator
 
 Topology = dict[str, list[list[str]]]
 
@@ -57,9 +57,10 @@ def read_plumed(path: Path):
                         "atoms": d[2].strip("ATOMS=").split(","),
                     }
                 )
-            if "PRINT" in l[:5]:
+            elif "PRINT" in l[:5]:
                 l = l.split()
-                d = {"PRINT": l[0]}
+                d = {}
+                d["PRINT"] = l[0]
                 for x in l[1:]:
                     key, value = x.split("=")
                     d[key] = value
