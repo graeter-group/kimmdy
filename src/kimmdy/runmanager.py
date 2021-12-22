@@ -1,12 +1,11 @@
 from __future__ import annotations
 import logging
 import queue
-from pathlib import Path
 from enum import Enum, auto
 from typing import Callable
 from kimmdy.config import Config
 from kimmdy.reactions.homolysis import Homolysis
-from kimmdy.reaction import ReactionResult, ConversionRecipe, ConversionType
+from kimmdy.reaction import ReactionResult, ConversionRecipe
 import kimmdy.mdmanager as md
 import kimmdy.changemanager as changer
 from kimmdy.tasks import Task, TaskFiles, TaskMapping
@@ -99,7 +98,6 @@ class RunManager:
                 }
             )
         )
-
 
         self.task_mapping: TaskMapping = {
             "equilibrium": self._run_md_equil,
@@ -218,7 +216,7 @@ class RunManager:
             "mdp": self.config.minimization.mdp,
         }
         # perform step
-        md.minimzation(files)
+        files = md.minimzation(files)
         logging.info("Done minimizing")
         return files
 
@@ -236,7 +234,7 @@ class RunManager:
             "mdp": self.config.equilibrium.mdp,
             "gro": self.get_latest("gro"),
         }
-        md.equilibration(files)
+        files = md.equilibration(files)
         logging.info("Done equilibrating")
         return files
 
@@ -254,9 +252,9 @@ class RunManager:
             "mdp": self.config.prod.mdp,
             "idx": self.config.idx,
             "cpt": self.get_latest("cpt"),
-            "plumed_dat": self.get_latest("plumed_dat"),
+            "plumed.dat": self.get_latest("plumed.dat"),
         }
-        md.production(files)
+        files = md.production(files)
         logging.info("Done minimizing")
         return files
 
@@ -275,7 +273,7 @@ class RunManager:
             "idx": self.config.idx,
             "cpt": self.get_latest("cpt"),
         }
-        md.relaxation(files)
+        files = md.relaxation(files)
         logging.info("Done simulating")
         return files
 
@@ -289,13 +287,13 @@ class RunManager:
             self.reaction = Homolysis()
 
             files.input = {
-                "plumed_dat": self.get_latest("plumed.dat"),
-                "distances_dat": self.get_latest("distances.dat"),
+                "plumed.dat": self.get_latest("plumed.dat"),
+                "distances.dat": self.get_latest("distances.dat"),
                 "top": self.get_latest("top"),
-                "ffbonded_itp": self.config.reactions.homolysis.bonds,
-                "edissoc_dat": self.config.reactions.homolysis.edis,
+                "ffbonded.itp": self.config.reactions.homolysis.bonds,
+                "edissoc.dat": self.config.reactions.homolysis.edis,
             }
-            self.reaction_results.append(self.reaction.get_reaction_result(files.input))
+            self.reaction_results.append(self.reaction.get_reaction_result(files))
 
         logging.info("Rates and Recipes:")
         # TODO this would fail with a out of range error,
@@ -322,22 +320,31 @@ class RunManager:
     def _run_recipe(self) -> TaskFiles:
         logging.info(f"Start Recipe in step {self.iteration}")
         logging.info(f"Breakpair: {self.chosen_recipe.atom_idx}")
+
+        files = TaskFiles()
         outputdir = self.config.out / f"recipe_{self.iteration}"
         outputdir.mkdir()
         (outputdir / self.config.ff.name).symlink_to(self.config.ff)
+        files.outputdir = outputdir
 
-        in_d = {
+        files.input = {
             "top": self.get_latest("top"),
-            "plumed_dat": self.get_latest("plumed.dat"),
+            "plumed.dat": self.get_latest("plumed.dat"),
         }
 
         newtop = outputdir / "topol_mod.top"
         newplumeddat = outputdir / "plumed.dat"
         newplumeddist = outputdir / "distances.dat"
-        changer.modify_top(self.chosen_recipe, in_d["top"], newtop)
+        files.output = {
+            "top": newtop,
+            "plumed.dat": newplumeddat,
+            "dist.dat": newplumeddist,
+        }
+
+        changer.modify_top(self.chosen_recipe, files.input["top"], newtop)
         logging.info(f"Wrote new topology to {newtop.parts[-3:]}")
         changer.modify_plumed(
-            self.chosen_recipe, in_d["plumed_dat"], newplumeddat, newplumeddist
+            self.chosen_recipe, files.input["plumed.dat"], newplumeddat, newplumeddist
         )
         logging.info(f"Wrote new plumedfile to {newplumeddat.parts[-3:]}")
         logging.info(f"Looking for md in {self.config.changer.coordinates.__dict__}")
@@ -346,4 +353,4 @@ class RunManager:
             if hasattr(self.config.changer, "coordinates"):
                 if hasattr(self.config.changer.coordinates, "md"):
                     self.crr_tasks.put(Task(self._run_md_relax))
-        return in_d, out_dir
+        return files

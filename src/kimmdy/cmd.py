@@ -31,7 +31,6 @@ def configure_logging(args, color=True):
         logging.addLevelName(logging.ERROR, "\033[31mERROR\033[00m")
         logging.addLevelName(logging.WARNING, "\033[33mWARN\033[00m")
     logging.basicConfig(
-        # encoding="utf-8",
         level=getattr(logging, args.loglevel.upper()),
         handlers=[
             logging.FileHandler(args.logfile, encoding="utf-8", mode="w"),
@@ -44,6 +43,7 @@ def configure_logging(args, color=True):
 
 def kimmdy():
     """Run KIMMDY with a configuration generated form the specified input file."""
+    logging.info("Welcome to KIMMDY")
     args = get_cmdline_args()
     configure_logging(args)
 

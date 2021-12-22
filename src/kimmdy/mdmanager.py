@@ -1,19 +1,20 @@
 from __future__ import annotations
 import logging
-from kimmdy.runmanager import TaskFiles
+from kimmdy.tasks import TaskFiles
 from kimmdy.utils import run_shell_cmd
-
 
 
 def dummy_step(files):
     run_shell_cmd("pwd>./pwd.pwd", files.outputdir)
+
+    return files
 
 
 def write_mdp():
     pass
 
 
-def minimzation(files: TaskFiles):
+def minimzation(files: TaskFiles) -> TaskFiles:
     outputdir = files.outputdir
     if not outputdir:
         m = f"No output directory given for the current task"
@@ -32,8 +33,10 @@ def minimzation(files: TaskFiles):
     run_shell_cmd(f"gmx grompp -p {top} -c {gro} -r {gro} -f {mdp} -o {tpr}", outputdir)
     run_shell_cmd(f"gmx mdrun -s {tpr} -c {outgro}", outputdir)
 
+    return files
 
-def equilibration(files: TaskFiles):
+
+def equilibration(files: TaskFiles) -> TaskFiles:
     outputdir = files.outputdir
     if not outputdir:
         m = f"No output directory given for the current task"
@@ -50,6 +53,8 @@ def equilibration(files: TaskFiles):
 
     run_shell_cmd(f"gmx grompp -p {top} -c {gro} -r {gro} -f {mdp} -o {tpr}", outputdir)
     run_shell_cmd(f"gmx mdrun -v -s {tpr} -c {outgro}", outputdir)
+
+    return files
 
 
 def equilibrium(files: TaskFiles):
@@ -76,8 +81,10 @@ def equilibrium(files: TaskFiles):
     )
     run_shell_cmd(f"gmx mdrun -v -s {tpr} -c {outgro} -o {outtrr}", outputdir)
 
+    return TaskFiles
 
-def production(files: TaskFiles):
+
+def production(files: TaskFiles) -> TaskFiles:
     """normal pulling md"""
     outputdir = files.outputdir
     if not outputdir:
@@ -90,7 +97,7 @@ def production(files: TaskFiles):
     mdp = files.input["mdp"]
     idx = files.input["idx"]
     cpt = files.input["cpt"]
-    plumed_dat = files.input["plumed_dat"]
+    plumed_dat = files.input["plumed.dat"]
     tpr = outputdir / "prod.tpr"
     outgro = outputdir / "prod.gro"
     outtrr = outputdir / "prod.trr"
@@ -106,8 +113,10 @@ def production(files: TaskFiles):
         outputdir,
     )
 
+    return files
 
-def relaxation(files: TaskFiles):
+
+def relaxation(files: TaskFiles) -> TaskFiles:
     """equil after break -->> called from changer"""
     outputdir = files.outputdir
     if not outputdir:
@@ -131,3 +140,5 @@ def relaxation(files: TaskFiles):
         outputdir,
     )
     run_shell_cmd(f"gmx mdrun -v -s {tpr} -c {outgro} -o {outtrr}", outputdir)
+
+    return files

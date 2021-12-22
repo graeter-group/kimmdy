@@ -1,5 +1,6 @@
 import logging
 from kimmdy.reaction import Reaction, ConversionRecipe, ConversionType, ReactionResult
+from kimmdy.tasks import TaskFiles
 from kimmdy.utils import (
     identify_atomtypes,
     find_distances,
@@ -14,10 +15,14 @@ class Homolysis(Reaction):
     Implemented according to kimmdy 1.0
     """
 
-    def get_reaction_result(
-        self, plumed_dat, distances_dat, top, ffbonded_itp, edissoc_dat
-    ):
+    def get_reaction_result(self, files: TaskFiles):
         logging.info("Getting recipe for reaction: homolysis")
+
+        plumed_dat = files.input["plumed.dat"]
+        distances_dat = files.input["distances.dat"]
+        top = files.input["top"]
+        ffbonded_itp = files.input["ffbonded.itp"]
+        edissoc_dat = files.input["edissoc.dat"]
 
         # read out bond distances and atomtypes
         list_of_breakpairs_and_distances = find_distances(plumed_dat, distances_dat)

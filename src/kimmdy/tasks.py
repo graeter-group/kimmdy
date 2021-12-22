@@ -20,15 +20,15 @@ class TaskFiles:
 class Task:
     """A task to be performed as as a step in the RunManager.
     consists of a function and it's keyword arguments and is
-    itself callable.
+    itself callable. Returns a TaskFiles object.
     """
 
-    def __init__(self, f: Callable[[TaskFiles], None], kwargs={}):
+    def __init__(self, f: Callable[..., TaskFiles], kwargs={}):
         self.f = f
         self.kwargs = kwargs
         self.name = self.f.__name__
 
-    def __call__(self):
+    def __call__(self) -> TaskFiles:
         return self.f(**self.kwargs)
 
     def __repr__(self) -> str:
@@ -37,6 +37,4 @@ class Task:
 
 # Type alias to define a mapping between a task name as a string
 # and the RunManager method
-TaskMapping = dict[str, Callable[[TaskFiles], None]]
-
-
+TaskMapping = dict[str, Callable[..., TaskFiles]]
