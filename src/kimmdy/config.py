@@ -99,10 +99,13 @@ class ProdConfig:
     mdp: Path
 
 
+class SequenceConfig(list):
+    tasks: list
+
+
 @dataclass
 class Config:
-    """
-    Internal representation of the configuration generated
+    """Internal representation of the configuration generated
     from the input file, which enables validation before running
     and computationally expensive operations.
     All settings read from the input file are accessible through nested attributes.
@@ -118,7 +121,6 @@ class Config:
 
     """
 
-    # attributes for static code analysis
     run: int
     experiment: str
     name: str
@@ -136,6 +138,7 @@ class Config:
     changer: ChangerConfig
     reactions: ReactionsConfig
     prod: ProdConfig
+    sequence: SequenceConfig
 
     def __init__(
         self, input_file: Path = None, recursive_dict=None, type_scheme=type_scheme
@@ -149,7 +152,7 @@ class Config:
             logging.warn(
                 "Warning: Config input file was not type pathlib.Path, attemptin conversion.."
             )
-            Path(input_file)
+            input_file = Path(input_file)
 
         self.type_scheme = type_scheme
         if self.type_scheme is None:
