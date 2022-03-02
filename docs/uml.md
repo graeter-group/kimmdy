@@ -9,7 +9,66 @@ plantuml -tsvg uml.md
 or preview online with [plantuml](https://plantuml.com).
 
 ## Classes
+### New Diagram
+```
+@startuml
+class           RunManager{
+config : Config
+tasks : Queue
+state : Enum
+filehist : list[TaskFiles]
+iteration
+chosen_recipe
+run()
+run_md_min()
+run_md_eq()
+run_md_pull()
+query_reactions()
+decision_strategy()
+run_recipe(ConversionRecipe)
+next()
+}
+class          Config{
+file paths
+sequence
+...
+__init__()
+}
+class           ConversionRecipe{
+type
+atom_idx
+}
 
+class           Reaction{
+
+}
+class           HAT{
+
+}
+class           HomolyticBreak{
+get_reaction_result()
+}
+class           CoordinateChanger{
+}
+class           TopologyChanger{
+}
+package GROMACS{
+interface GROMACSCli{
+}
+}
+
+Reaction --|> HAT
+Reaction --|> HomolyticBreak
+Config -- RunManager : reads <
+RunManager -right- GROMACSCli : > interacts
+RunManager -- Reaction : > starts
+ConversionRecipe - Reaction: < generates
+CoordinateChanger - RunManager: < starts
+TopologyChanger - RunManager: < starts
+TopologyChanger -[hidden]-> CoordinateChanger
+@enduml
+```
+### Old Diagram
 ```
 @startuml classuml
 class           RunManager{
