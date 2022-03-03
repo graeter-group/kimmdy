@@ -1,17 +1,19 @@
 from pathlib import Path
 from collections.abc import Iterable
-from typing import Any, Generator
+from typing import Generator
 
 Topology = dict[str, list[list[str]]]
 
 
 def is_comment(l: str):
-    return len(l) == 0 or l[0] in ["#", "\n", ";"]
+    return len(l) == 0 or l[0] in ["\n", ";"]
 
 
 def get_sections(
     seq: Iterable[str], section_marker: str
 ) -> Generator[list[str], None, None]:
+    # TODO how about the initial part without a section name?
+    # need sort of like a None section for reading and writing.
     data = []
     for line in seq:
         if is_comment(line):
@@ -26,6 +28,9 @@ def get_sections(
 
 
 def read_topol(path: Path) -> Topology:
+    # TODO look into following #includes
+    # TODO look into sections surrounded by #ifdef
+    # TODO look into [ intermolecule ] section
     with open(path, "r") as f:
         sections = get_sections(f, "[")
         return {

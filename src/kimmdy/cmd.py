@@ -43,9 +43,10 @@ def configure_logging(args, color=True):
 
 def kimmdy():
     """Run KIMMDY with a configuration generated form the specified input file."""
-    logging.info("Welcome to KIMMDY")
     args = get_cmdline_args()
     configure_logging(args)
+
+    logging.info("Welcome to KIMMDY")
 
     logging.info("KIMMDY is running with these command line options:")
     logging.info(args)
