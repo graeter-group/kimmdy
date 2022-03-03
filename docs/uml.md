@@ -9,7 +9,9 @@ plantuml -tsvg uml.md
 or preview online with [plantuml](https://plantuml.com).
 
 ## Classes
+
 ### New Diagram
+
 ```
 @startuml
 class           RunManager{
@@ -68,7 +70,11 @@ TopologyChanger - RunManager: < starts
 TopologyChanger -[hidden]-> CoordinateChanger
 @enduml
 ```
+
+![](uml.svg)
+
 ### Old Diagram
+
 ```
 @startuml classuml
 class           RunManager{
