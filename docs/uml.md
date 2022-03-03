@@ -13,7 +13,7 @@ or preview online with [plantuml](https://plantuml.com).
 ### New Diagram
 
 ```
-@startuml
+@startuml uml
 class           RunManager{
 config : Config
 tasks : Queue
