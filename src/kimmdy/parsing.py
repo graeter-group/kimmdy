@@ -1,9 +1,8 @@
 from pathlib import Path
 from collections.abc import Iterable
-from typing import Any, Generator
+from typing import Generator
 
 Topology = dict[str, list[list[str]]]
-
 
 def is_comment(l: str):
     return len(l) == 0 or l[0] in ["\n", ";"]
