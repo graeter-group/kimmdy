@@ -56,7 +56,7 @@ def kimmdy():
     logging.info("Configuration from input file:")
     logging.info(repr(config))
     logging.debug("Using system GROMACS:")
-    logging.debug(check_gmx_version())
+    logging.debug(check_gmx_version(config))
 
     runmgr = RunManager(config)
     runmgr.run()

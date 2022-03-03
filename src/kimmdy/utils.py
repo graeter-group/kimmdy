@@ -2,6 +2,8 @@ import subprocess as sp
 import numpy as np
 import logging
 
+from kimmdy.config import Config
+
 
 def find_bond_param(atomtypes, filepath):
     # reads bond parameters vom gromacs forcefield file #based on ff.bonded.itp from amber99sb-ildn.ff
@@ -193,7 +195,7 @@ def get_shell_stdout(s):
     return process.stdout
 
 
-def check_gmx_version():
+def check_gmx_version(config: Config):
     try:
         version = [
             l
@@ -208,7 +210,8 @@ def check_gmx_version():
         m = "GROMACS version does not contain MODIFIED, aborting due to lack of PLUMED patch."
         logging.error(m)
         logging.error("Version was: " + version)
-        raise SystemError(m)
+        if not config.dryrun:
+            raise SystemError(m)
     return version
 
 
