@@ -22,8 +22,7 @@ reactions:
     bonds: 'ffbonded.itp'
 sequence:
   - equilibrium
-  - 
-    mult: 1
+  - mult: 2
     tasks:
       - prod
       - reactions
