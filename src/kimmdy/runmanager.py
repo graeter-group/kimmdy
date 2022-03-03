@@ -1,5 +1,7 @@
 from __future__ import annotations
+from dataclasses import field
 import logging
+from pathlib import Path
 import queue
 from enum import Enum, auto
 from typing import Callable
@@ -86,8 +88,7 @@ class RunManager:
         # self.trj = self.config.cwd / ("prod_" + str(self.iteration) + ".trj")
         # self.plumeddat = self.config.plumed.dat
         # self.plumeddist = self.config.plumed.distances
-        self.filehist: list[TaskFiles] = []
-        self.filehist.append(
+        self.filehist: list[TaskFiles] = [
             TaskFiles(
                 input={
                     "top": self.config.top,
@@ -97,7 +98,8 @@ class RunManager:
                     "distances.dat": self.config.plumed.distances,
                 }
             )
-        )
+        ]
+        self.latest_files: dict[str, Path] = self.filehist[0].input
 
         self.task_mapping: TaskMapping = {
             "equilibrium": self._run_md_equil,
@@ -110,18 +112,12 @@ class RunManager:
     def get_latest(self, suffix: str):
         """Returns path to latest file of given type.
         For .dat files (in general ambiguous extensions) use full file name.
-        Errors if file is nof found.
+        Errors if file is not found.
         """
-        # TODO we shouldn't have to step backwards through the complete
-        # history of IO actions. We should just be able to maintain a dictionary
-        # of the latest file for each type.
-        if suffix in AMBIGUOUS_SUFFS:
-            logging.warn(f"{suffix} ambiguous! Please specify full file name!")
-        for step in reversed(self.filehist):
-            for path in list(step.input.values()) + list(step.output.values()):
-                if suffix in str(path):
-                    return path
-        else:
+        try:
+            path = self.latest_files[suffix]
+            return path
+        except Exception:
             m = f"File {suffix} requested but not found!"
             logging.error(m)
             raise FileNotFoundError(m)
@@ -162,14 +158,14 @@ class RunManager:
         if files.outputdir:
             # list files written by the task
             for path in files.outputdir.iterdir():
-                suffix = path.suffix
+                suffix = path.suffix[1:]
                 if suffix in AMBIGUOUS_SUFFS:
                     suffix = path.name
-                files.output[suffix] = path
+                files.output[suffix] = files.outputdir / path
 
-        # TODO Ohhh, I might be trying to implement the same thing twice
-        # Need to clarify what part is responsible of keeping track of
-        # the files a task needs and creates!
+        self.latest_files.update(files.input)
+        self.latest_files.update(files.output)
+        print(self.latest_files)
         self.filehist.append(files)
 
     def _dummy(self):
