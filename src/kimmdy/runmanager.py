@@ -68,11 +68,10 @@ class State(Enum):
 
 class RunManager:
     """The RunManager, a central piece.
+
     Manages the queue of tasks, communicates with the
     rest of the program and keeps track of global state.
     """
-
-    reaction_results: list[ReactionResult]
 
     def __init__(self, config: Config):
         self.config = config
@@ -81,25 +80,18 @@ class RunManager:
         self.iteration = 0
         self.iterations = self.config.iterations
         self.state = State.IDLE
-        self.reaction_results = []
-        # self.measurements = Path("measurements")
-        # self.structure = self.config.gro
-        # self.top = self.config.top
-        # self.trj = self.config.cwd / ("prod_" + str(self.iteration) + ".trj")
-        # self.plumeddat = self.config.plumed.dat
-        # self.plumeddist = self.config.plumed.distances
-        self.filehist: list[TaskFiles] = [
-            TaskFiles(
-                input={
-                    "top": self.config.top,
-                    "gro": self.config.gro,
-                    "idx": self.config.idx,
-                    "plumed.dat": self.config.plumed.dat,
-                    "distances.dat": self.config.plumed.distances,
-                }
-            )
+        self.reaction_results: list[ReactionResult] = []
+        self.latest_files: dict[str, Path] = {
+            "top": self.config.top,
+            "gro": self.config.gro,
+            "idx": self.config.idx,
+            "plumed.dat": self.config.plumed.dat,
+            "distances.dat": self.config.plumed.distances,
+        }
+
+        self.filehist: list[dict[str, TaskFiles]] = [
+            {"setup": TaskFiles(input=self.latest_files)}
         ]
-        self.latest_files: dict[str, Path] = self.filehist[0].input
 
         self.task_mapping: TaskMapping = {
             "equilibrium": self._run_md_equil,
@@ -127,7 +119,7 @@ class RunManager:
 
     def run(self):
         logging.info("Start run")
-        logging.info("Building task list")
+        logging.info("Build task list")
 
         for task in self.config.sequence:
             logging.debug(f"Put Task: {self.task_mapping[task]}")
@@ -140,7 +132,15 @@ class RunManager:
             f"Stop running tasks, state: {self.state}, iteration:{self.iteration}, max:{self.iterations}"
         )
         logging.info("History:")
-        logging.info(pformat(self.filehist))
+        for x in self.filehist:
+            for taskname, taskfiles in x.items():
+                logging.info(
+                    f"""
+                Task: {taskname} with output directory: {taskfiles.outputdir}
+                Task: {taskname}, input:\n{pformat(taskfiles.input)}
+                Task: {taskname}, output:\n{pformat(taskfiles.output)}
+                """
+                )
 
     def __iter__(self):
         return self
@@ -155,13 +155,18 @@ class RunManager:
             task = self.tasks.get()
             self.iteration += 1
         if self.config.dryrun:
-            logging.info(f"Pretending to run: {task.name} with args: {task.kwargs}")
+            logging.info(f"Pretend to run: {task.name} with args: {task.kwargs}")
             return
         logging.debug("Start task: " + pformat(task))
         files = task()
-        self._discover_output_files(files)
+        self._discover_output_files(task.name, files)
 
-    def _discover_output_files(self, files: TaskFiles):
+    def _discover_output_files(self, taskname, files: TaskFiles):
+        """Discover further files written by a task.
+
+        and add those files to the `files` as well as
+        the file history and latest files.
+        """
         # discover other files written by the task
         for path in files.outputdir.iterdir():
             suffix = path.suffix[1:]
@@ -172,7 +177,8 @@ class RunManager:
         logging.debug("Update latest files with: ")
         logging.debug(pformat(files.output))
         self.latest_files.update(files.output)
-        self.filehist.append(files)
+        logging.debug("Append to file history")
+        self.filehist.append({taskname: files})
 
     def _create_task_directory(self, prefix: str) -> TaskFiles:
         files = TaskFiles()
@@ -320,10 +326,13 @@ class RunManager:
         changer.modify_top(self.chosen_recipe, files.input["top"], files.output["top"])
         logging.info(f'Wrote new topology to {files.output["top"].parts[-3:]}')
         changer.modify_plumed(
-            self.chosen_recipe, files.input["plumed.dat"], files.output["plumed.dat"], files.output["plumed.dist"]
+            self.chosen_recipe,
+            files.input["plumed.dat"],
+            files.output["plumed.dat"],
+            files.output["plumed.dist"],
         )
         logging.info(f'Wrote new plumedfile to {files.output["plumed.dat"].parts[-3:]}')
-        logging.info(f'Looking for md in {self.config.changer.coordinates.__dict__}')
+        logging.info(f"Looking for md in {self.config.changer.coordinates.__dict__}")
         # TODO clean this up, maybe make function for this in config
         if hasattr(self.config, "changer"):
             if hasattr(self.config.changer, "coordinates"):

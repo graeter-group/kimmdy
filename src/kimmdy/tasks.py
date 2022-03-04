@@ -38,4 +38,3 @@ class Task:
 # Type alias to define a mapping between a task name as a string
 # and the RunManager method
 TaskMapping = dict[str, Callable[..., TaskFiles]]
-
