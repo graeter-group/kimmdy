@@ -196,6 +196,11 @@ def get_shell_stdout(s):
 
 
 def check_gmx_version(config: Config):
+    """Check for an existing gromacs installation.
+
+    If PLUMED is meant to be used it additionally checks for the keyword 
+    'MODIFIED' in the version name.
+    """
     try:
         version = [
             l
@@ -206,7 +211,7 @@ def check_gmx_version(config: Config):
         m = "No system gromacs detected. With error: " + str(e)
         logging.error(m)
         raise SystemError(m)
-    if not "MODIFIED" in version:
+    if config.plumed and not "MODIFIED" in version:
         m = "GROMACS version does not contain MODIFIED, aborting due to lack of PLUMED patch."
         logging.error(m)
         logging.error("Version was: " + version)
