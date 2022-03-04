@@ -15,7 +15,7 @@ from pprint import pformat
 import random
 
 # file types of which there will be multiple files per type
-AMBIGUOUS_SUFFS = [".dat", ".xvg", ".log", ".trr"]
+AMBIGUOUS_SUFFS = ["dat", "xvg", "log", "trr"]
 
 
 def default_decision_strategy(
@@ -114,8 +114,10 @@ class RunManager:
         For .dat files (in general ambiguous extensions) use full file name.
         Errors if file is not found.
         """
+        logging.debug("Getting latest suffix: " + suffix)
         try:
             path = self.latest_files[suffix]
+            logging.debug("Found: " + str(path))
             return path
         except Exception:
             m = f"File {suffix} requested but not found!"
@@ -153,6 +155,7 @@ class RunManager:
         if self.config.dryrun:
             logging.info(f"Pretending to run: {task.name} with args: {task.kwargs}")
             return
+        logging.debug("Start task: " + pformat(task))
         files = task()
 
         if files.outputdir:
@@ -163,9 +166,9 @@ class RunManager:
                     suffix = path.name
                 files.output[suffix] = files.outputdir / path
 
-        self.latest_files.update(files.input)
+        logging.debug("Update latest files with: ")
+        logging.debug(pformat(files.output))
         self.latest_files.update(files.output)
-        print(self.latest_files)
         self.filehist.append(files)
 
     def _dummy(self):
@@ -251,7 +254,7 @@ class RunManager:
             "plumed.dat": self.get_latest("plumed.dat"),
         }
         files = md.production(files)
-        logging.info("Done minimizing")
+        logging.info("Done with production MD")
         return files
 
     def _run_md_relax(self) -> TaskFiles:
