@@ -39,7 +39,7 @@ def read_topol(path: Path) -> Topology:
         }
 
 
-def write_topol(d: Topology, outfile: Path):
+def write_topol(d: Topology, outfile: Path) -> None:
     with open(outfile, "w") as f:
         for title, content in d.items():
             s = f"[ {title} ]\n"
@@ -48,7 +48,8 @@ def write_topol(d: Topology, outfile: Path):
             f.write(s)
 
 
-def read_plumed(path: Path):
+def read_plumed(path: Path) -> dict:
+    """Read a plumed.dat configuration file."""
     with open(path, "r") as f:
         distances = []
         prints = []
@@ -81,7 +82,8 @@ def read_plumed(path: Path):
         return {"distances": distances, "prints": prints}
 
 
-def write_plumed(d, path: Path):
+def write_plumed(d, path: Path) -> None:
+    """Write a plumed.dat configuration file."""
     with open(path, "w") as f:
         for l in d["distances"]:
             f.write(f"{l['id']}: {l['keyword']} ATOMS={','.join(l['atoms'])}\n")
@@ -89,3 +91,15 @@ def write_plumed(d, path: Path):
             f.write(
                 f"{l['PRINT']} ARG={','.join(l['ARG'])} STRIDE={str(l['STRIDE'])} FILE={str(l['FILE'])}\n"
             )
+
+
+def read_distances_dat(path) -> dict:
+    """Read a distances.dat plumed output file."""
+    with open(path, "r") as f:
+        d = {}
+        distances = []
+        d["spec"] = f.readline()
+        while f:
+            l = f.readline
+            distances.append(l)
+    return d
