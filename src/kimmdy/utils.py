@@ -198,7 +198,7 @@ def get_shell_stdout(s):
 def check_gmx_version(config: Config):
     """Check for an existing gromacs installation.
 
-    If PLUMED is meant to be used it additionally checks for the keyword 
+    If PLUMED is meant to be used it additionally checks for the keyword
     'MODIFIED' in the version name.
     """
     try:
