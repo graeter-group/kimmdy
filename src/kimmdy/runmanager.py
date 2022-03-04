@@ -111,6 +111,7 @@ class RunManager:
 
     def get_latest(self, suffix: str):
         """Returns path to latest file of given type.
+
         For .dat files (in general ambiguous extensions) use full file name.
         Errors if file is not found.
         """
@@ -138,7 +139,8 @@ class RunManager:
         logging.info(
             f"Stop running tasks, state: {self.state}, iteration:{self.iteration}, max:{self.iterations}"
         )
-        logging.info(f"History:\n{pformat(self.filehist)}")
+        logging.info("History:")
+        logging.info(pformat(self.filehist))
 
     def __iter__(self):
         return self
@@ -157,19 +159,27 @@ class RunManager:
             return
         logging.debug("Start task: " + pformat(task))
         files = task()
+        self._discover_output_files(files)
 
-        if files.outputdir:
-            # list files written by the task
-            for path in files.outputdir.iterdir():
-                suffix = path.suffix[1:]
-                if suffix in AMBIGUOUS_SUFFS:
-                    suffix = path.name
-                files.output[suffix] = files.outputdir / path
+    def _discover_output_files(self, files: TaskFiles):
+        # discover other files written by the task
+        for path in files.outputdir.iterdir():
+            suffix = path.suffix[1:]
+            if suffix in AMBIGUOUS_SUFFS:
+                suffix = path.name
+            files.output[suffix] = files.outputdir / path
 
         logging.debug("Update latest files with: ")
         logging.debug(pformat(files.output))
         self.latest_files.update(files.output)
         self.filehist.append(files)
+
+    def _create_task_directory(self, prefix: str) -> TaskFiles:
+        files = TaskFiles()
+        files.outputdir = self.config.out / f"{prefix}_{self.iteration}"
+        files.outputdir.mkdir()
+        (files.outputdir / self.config.ff.name).symlink_to(self.config.ff)
+        return files
 
     def _dummy(self):
         logging.info("Start dummy task")
@@ -186,11 +196,7 @@ class RunManager:
     def _run_md_equil(self) -> TaskFiles:
         logging.info("Start equilibration MD")
         self.state = State.MD
-        files = TaskFiles()
-        outputdir = self.config.out / f"equil_{self.iteration}"
-        outputdir.mkdir()
-        (outputdir / self.config.ff.name).symlink_to(self.config.ff)
-        files.outputdir = outputdir
+        files = self._create_task_directory("equilibration")
         files.input = {
             "top": self.get_latest("top"),
             "gro": self.get_latest("gro"),
@@ -202,13 +208,9 @@ class RunManager:
         return files
 
     def _run_md_minim(self) -> TaskFiles:
-        logging.info("Start minimization md")
+        logging.info("Setup _run_md_minim")
         self.state = State.MD
-        files = TaskFiles()
-        outputdir = self.config.out / f"min_{self.iteration}"
-        outputdir.mkdir()
-        (outputdir / self.config.ff.name).symlink_to(self.config.ff)
-        files.outputdir = outputdir
+        files = self._create_task_directory("minimization")
         files.input = {
             "top": self.get_latest("top"),
             "gro": self.get_latest("gro"),
@@ -220,31 +222,22 @@ class RunManager:
         return files
 
     def _run_md_eq(self) -> TaskFiles:
-        # TODO combine w/ other equilibration?
-        logging.info("Start _run_md_eq MD")
+        logging.info("Setup _run_md_eq MD")
         self.state = State.MD
-        files = TaskFiles()
-        outputdir = self.config.out / f"equil_{self.iteration}"
-        outputdir.mkdir()
-        (outputdir / self.config.ff.name).symlink_to(self.config.ff)
-        files.outputdir = outputdir
+        files = self._create_task_directory("equilibrium")
         files.input = {
             "top": self.get_latest("top"),
             "mdp": self.config.equilibrium.mdp,
             "gro": self.get_latest("gro"),
         }
         files = md.equilibration(files)
-        logging.info("Done equilibrating")
+        logging.info("Done")
         return files
 
     def _run_md_prod(self) -> TaskFiles:
-        logging.info("Start production MD")
+        logging.info("Setup _run_md_prod")
         self.state = State.MD
-        files = TaskFiles()
-        outputdir = self.config.out / f"prod_{self.iteration}"
-        outputdir.mkdir()
-        (outputdir / self.config.ff.name).symlink_to(self.config.ff)
-        files.outputdir = outputdir
+        files = self._create_task_directory("production")
         files.input = {
             "top": self.get_latest("top"),
             "gro": self.get_latest("gro"),
@@ -258,13 +251,9 @@ class RunManager:
         return files
 
     def _run_md_relax(self) -> TaskFiles:
-        logging.info("Start relaxation MD")
+        logging.info("Start _run_md_relax")
         self.state = State.MD
-        files = TaskFiles()
-        outputdir = self.config.out / f"prod_{self.iteration}"
-        outputdir.mkdir()
-        (outputdir / self.config.ff.name).symlink_to(self.config.ff)
-        files.outputdir = outputdir
+        files = self._create_task_directory("relaxation")
         files.input = {
             "top": self.get_latest("top"),
             "gro": self.get_latest("gro"),
@@ -273,7 +262,7 @@ class RunManager:
             "cpt": self.get_latest("cpt"),
         }
         files = md.relaxation(files)
-        logging.info("Done simulating")
+        logging.info("Done with relaxation MD")
         return files
 
     def _query_reactions(self):
@@ -294,13 +283,8 @@ class RunManager:
             }
             self.reaction_results.append(self.reaction.get_reaction_result(files))
 
-        logging.info("Rates and Recipes:")
-        # TODO this would fail with a out of range error,
-        # we need a way of writing out results
-        # logging.info(self.rates[0:10])
-        # logging.info(self.recipe.type)
-        # logging.info(self.recipe.atom_idx[0:10])
-        # logging.info("Reaction done")
+        logging.debug("Rates and Recipes:")
+        # TODO
         return files
 
     def _decide_reaction(
@@ -321,32 +305,25 @@ class RunManager:
         logging.info(f"Breakpair: {self.chosen_recipe.atom_idx}")
 
         files = TaskFiles()
-        outputdir = self.config.out / f"recipe_{self.iteration}"
-        outputdir.mkdir()
-        (outputdir / self.config.ff.name).symlink_to(self.config.ff)
-        files.outputdir = outputdir
-
+        files = self._create_task_directory("recipe")
         files.input = {
             "top": self.get_latest("top"),
             "plumed.dat": self.get_latest("plumed.dat"),
         }
 
-        newtop = outputdir / "topol_mod.top"
-        newplumeddat = outputdir / "plumed.dat"
-        newplumeddist = outputdir / "distances.dat"
         files.output = {
-            "top": newtop,
-            "plumed.dat": newplumeddat,
-            "dist.dat": newplumeddist,
+            "top": files.outputdir / "topol_mod.top",
+            "plumed.dat": files.outputdir / "plumed.dat",
+            "distances.dat": files.outputdir / "distances.dat",
         }
 
-        changer.modify_top(self.chosen_recipe, files.input["top"], newtop)
-        logging.info(f"Wrote new topology to {newtop.parts[-3:]}")
+        changer.modify_top(self.chosen_recipe, files.input["top"], files.output["top"])
+        logging.info(f'Wrote new topology to {files.output["top"].parts[-3:]}')
         changer.modify_plumed(
-            self.chosen_recipe, files.input["plumed.dat"], newplumeddat, newplumeddist
+            self.chosen_recipe, files.input["plumed.dat"], files.output["plumed.dat"], files.output["plumed.dist"]
         )
-        logging.info(f"Wrote new plumedfile to {newplumeddat.parts[-3:]}")
-        logging.info(f"Looking for md in {self.config.changer.coordinates.__dict__}")
+        logging.info(f'Wrote new plumedfile to {files.output["plumed.dat"].parts[-3:]}')
+        logging.info(f'Looking for md in {self.config.changer.coordinates.__dict__}')
         # TODO clean this up, maybe make function for this in config
         if hasattr(self.config, "changer"):
             if hasattr(self.config.changer, "coordinates"):
