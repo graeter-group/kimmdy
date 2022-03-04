@@ -143,11 +143,11 @@ def calc_transition_rate(r_curr, r_0, E_dis, k_f):
 
     # calculate extrema of shifted potential i.o.t. get barrier hight
     rmin = r_0 - 1 / beta * np.log(
-        (beta * E_dis + np.sqrt(beta ** 2 * E_dis ** 2 - 2 * E_dis * beta * F))
+        (beta * E_dis + np.sqrt(beta**2 * E_dis**2 - 2 * E_dis * beta * F))
         / (2 * beta * E_dis)
     )
     rmax = r_0 - 1 / beta * np.log(
-        (beta * E_dis - np.sqrt(beta ** 2 * E_dis ** 2 - 2 * E_dis * beta * F))
+        (beta * E_dis - np.sqrt(beta**2 * E_dis**2 - 2 * E_dis * beta * F))
         / (2 * beta * E_dis)
     )
 
