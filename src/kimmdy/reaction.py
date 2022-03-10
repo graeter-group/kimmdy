@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 from enum import Enum, auto
 from kimmdy.tasks import TaskFiles
 
+
 class ConversionType(Enum):
     BREAK = auto()
     MOVE = auto()
@@ -56,5 +57,3 @@ class Reaction(ABC):
         ```
         """
         return dict()
-
-

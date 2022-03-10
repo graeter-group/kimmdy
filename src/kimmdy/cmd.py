@@ -5,6 +5,7 @@ from kimmdy.runmanager import RunManager
 from kimmdy.utils import check_gmx_version
 import sys
 
+
 def get_cmdline_args():
     """Parse command line arguments and configure logger"""
     parser = argparse.ArgumentParser(description="Welcome to KIMMDY")
@@ -51,7 +52,7 @@ def kimmdy():
     logging.info(args)
 
     config = Config(args.input)
-    
+
     logging.debug("Using system GROMACS:")
     logging.debug(check_gmx_version())
 
