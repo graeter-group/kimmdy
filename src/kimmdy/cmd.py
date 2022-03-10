@@ -7,7 +7,13 @@ import sys
 
 
 def get_cmdline_args():
-    """Parse command line arguments and configure logger"""
+    """Parse command line arguments and configure logger.
+
+    Returns
+    -------
+    Namespace
+        parsed command line arguments
+    """
     parser = argparse.ArgumentParser(description="Welcome to KIMMDY")
     parser.add_argument(
         "--input", "-i", type=str, help="kimmdy input file", default="kimmdy.yml"
@@ -26,6 +32,11 @@ def get_cmdline_args():
 
 
 def configure_logging(args, color=True):
+    """Configure logging.
+
+    Configures the logging module with optional colorcodes
+    for the terminal.
+    """
     if color:
         logging.addLevelName(logging.INFO, "\033[35mINFO\033[00m")
         logging.addLevelName(logging.ERROR, "\033[31mERROR\033[00m")
@@ -42,12 +53,15 @@ def configure_logging(args, color=True):
 
 
 def kimmdy():
-    """Run KIMMDY with a configuration generated form the specified input file."""
+    """Run KIMMDY.
+
+    The configuration is gathered from the input file,
+    which is `kimmdy.yml` by default.
+    """
     args = get_cmdline_args()
     configure_logging(args)
 
     logging.info("Welcome to KIMMDY")
-
     logging.info("KIMMDY is running with these command line options:")
     logging.info(args)
 
@@ -56,7 +70,7 @@ def kimmdy():
     logging.info("Configuration from input file:")
     logging.info(repr(config))
     logging.debug("Using system GROMACS:")
-    logging.debug(check_gmx_version())
+    logging.debug(check_gmx_version(config))
 
     runmgr = RunManager(config)
     runmgr.run()

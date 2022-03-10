@@ -2,6 +2,8 @@ import subprocess as sp
 import numpy as np
 import logging
 
+from kimmdy.config import Config
+
 
 def find_bond_param(atomtypes, filepath):
     # reads bond parameters vom gromacs forcefield file #based on ff.bonded.itp from amber99sb-ildn.ff
@@ -141,11 +143,11 @@ def calc_transition_rate(r_curr, r_0, E_dis, k_f):
 
     # calculate extrema of shifted potential i.o.t. get barrier hight
     rmin = r_0 - 1 / beta * np.log(
-        (beta * E_dis + np.sqrt(beta ** 2 * E_dis ** 2 - 2 * E_dis * beta * F))
+        (beta * E_dis + np.sqrt(beta**2 * E_dis**2 - 2 * E_dis * beta * F))
         / (2 * beta * E_dis)
     )
     rmax = r_0 - 1 / beta * np.log(
-        (beta * E_dis - np.sqrt(beta ** 2 * E_dis ** 2 - 2 * E_dis * beta * F))
+        (beta * E_dis - np.sqrt(beta**2 * E_dis**2 - 2 * E_dis * beta * F))
         / (2 * beta * E_dis)
     )
 
@@ -193,7 +195,12 @@ def get_shell_stdout(s):
     return process.stdout
 
 
-def check_gmx_version():
+def check_gmx_version(config: Config):
+    """Check for an existing gromacs installation.
+
+    If PLUMED is meant to be used it additionally checks for the keyword
+    'MODIFIED' in the version name.
+    """
     try:
         version = [
             l
@@ -204,11 +211,12 @@ def check_gmx_version():
         m = "No system gromacs detected. With error: " + str(e)
         logging.error(m)
         raise SystemError(m)
-    if not "MODIFIED" in version:
+    if config.plumed and not "MODIFIED" in version:
         m = "GROMACS version does not contain MODIFIED, aborting due to lack of PLUMED patch."
         logging.error(m)
         logging.error("Version was: " + version)
-        raise SystemError(m)
+        if not config.dryrun:
+            raise SystemError(m)
     return version
 
 

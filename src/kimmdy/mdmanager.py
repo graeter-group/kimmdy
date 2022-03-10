@@ -6,7 +6,6 @@ from kimmdy.utils import run_shell_cmd
 
 def dummy_step(files):
     run_shell_cmd("pwd>./pwd.pwd", files.outputdir)
-
     return files
 
 
@@ -16,11 +15,6 @@ def write_mdp():
 
 def minimzation(files: TaskFiles) -> TaskFiles:
     outputdir = files.outputdir
-    if not outputdir:
-        m = f"No output directory given for the current task"
-        logging.error(m)
-        raise FileNotFoundError(m)
-
     top = files.input["top"]
     gro = files.input["gro"]
     mdp = files.input["mdp"]
@@ -38,11 +32,6 @@ def minimzation(files: TaskFiles) -> TaskFiles:
 
 def equilibration(files: TaskFiles) -> TaskFiles:
     outputdir = files.outputdir
-    if not outputdir:
-        m = f"No output directory given for the current task"
-        logging.error(m)
-        raise FileNotFoundError(m)
-
     gro = files.input["gro"]
     top = files.input["top"]
     mdp = files.input["mdp"]
@@ -58,12 +47,14 @@ def equilibration(files: TaskFiles) -> TaskFiles:
 
 
 def equilibrium(files: TaskFiles):
-    """equilibrium before pulling md"""
+    """Equilibrium MD simulation.
+
+    Equilibrium simulation before the production simulation,
+    which potentially includes pulling.
+    Will call `gmx grompp` and `mdrun` based on mdp-file specified
+    in files: TaskFiles.
+    """
     outputdir = files.outputdir
-    if not outputdir:
-        m = f"No output directory given for the current task"
-        logging.error(m)
-        raise FileNotFoundError(m)
 
     top = files.input["top"]
     gro = files.input["gro"]
@@ -85,12 +76,14 @@ def equilibrium(files: TaskFiles):
 
 
 def production(files: TaskFiles) -> TaskFiles:
-    """normal pulling md"""
+    """Production MD simulation.
+
+    Potentially with pulling.
+    Will call `gmx grompp` and `mdrun` based on mdp-file specified
+    in files: TaskFiles.
+    """
+
     outputdir = files.outputdir
-    if not outputdir:
-        m = f"No output directory given for the current task"
-        logging.error(m)
-        raise FileNotFoundError(m)
 
     top = files.input["top"]
     gro = files.input["gro"]
@@ -117,13 +110,13 @@ def production(files: TaskFiles) -> TaskFiles:
 
 
 def relaxation(files: TaskFiles) -> TaskFiles:
-    """equil after break -->> called from changer"""
-    outputdir = files.outputdir
-    if not outputdir:
-        m = f"No output directory given for the current task"
-        logging.error(m)
-        raise FileNotFoundError(m)
+    """Relaxation MD simulation.
 
+    To relax / equilibrate after a reaction.
+    Will call `gmx grompp` and `mdrun` based on mdp-file specified
+    in files: TaskFiles.
+    """
+    outputdir = files.outputdir
     top = files.input["top"]
     gro = files.input["gro"]
     mdp = files.input["mdp"]

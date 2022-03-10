@@ -5,8 +5,9 @@ from typing import Callable
 
 @dataclass
 class TaskFiles:
-    """Input and Output files and directories
-    belonging to a task in the sequence of tasks.
+    """Input and Output files and directories.
+
+    Hosts the input and output files belonging to a task.
     A function or method that wants to be callable as a Task
     has to return a TaskFiles object.
     """
@@ -19,8 +20,9 @@ class TaskFiles:
 
 class Task:
     """A task to be performed as as a step in the RunManager.
-    consists of a function and it's keyword arguments and is
-    itself callable. Returns a TaskFiles object.
+
+    A task consists of a function and its keyword arguments and is
+    itself callable. The function must return a TaskFiles object.
     """
 
     def __init__(self, f: Callable[..., TaskFiles], kwargs={}):
@@ -35,6 +37,4 @@ class Task:
         return str(self.f) + " args: " + str(self.kwargs)
 
 
-# Type alias to define a mapping between a task name as a string
-# and the RunManager method
 TaskMapping = dict[str, Callable[..., TaskFiles]]
