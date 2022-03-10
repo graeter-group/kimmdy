@@ -1,5 +1,7 @@
 from __future__ import annotations
+from dataclasses import field
 import logging
+from pathlib import Path
 import queue
 from enum import Enum, auto
 from typing import Callable
@@ -13,7 +15,7 @@ from pprint import pformat
 import random
 
 # file types of which there will be multiple files per type
-AMBIGUOUS_SUFFS = [".dat", ".xvg", ".log", ".trr"]
+AMBIGUOUS_SUFFS = ["dat", "xvg", "log", "trr"]
 
 
 def default_decision_strategy(
@@ -66,11 +68,10 @@ class State(Enum):
 
 class RunManager:
     """The RunManager, a central piece.
+
     Manages the queue of tasks, communicates with the
     rest of the program and keeps track of global state.
     """
-
-    reaction_results: list[ReactionResult]
 
     def __init__(self, config: Config):
         self.config = config
@@ -79,25 +80,18 @@ class RunManager:
         self.iteration = 0
         self.iterations = self.config.iterations
         self.state = State.IDLE
-        self.reaction_results = []
-        # self.measurements = Path("measurements")
-        # self.structure = self.config.gro
-        # self.top = self.config.top
-        # self.trj = self.config.cwd / ("prod_" + str(self.iteration) + ".trj")
-        # self.plumeddat = self.config.plumed.dat
-        # self.plumeddist = self.config.plumed.distances
-        self.filehist: list[TaskFiles] = []
-        self.filehist.append(
-            TaskFiles(
-                input={
-                    "top": self.config.top,
-                    "gro": self.config.gro,
-                    "idx": self.config.idx,
-                    "plumed.dat": self.config.plumed.dat,
-                    "distances.dat": self.config.plumed.distances,
-                }
-            )
-        )
+        self.reaction_results: list[ReactionResult] = []
+        self.latest_files: dict[str, Path] = {
+            "top": self.config.top,
+            "gro": self.config.gro,
+            "idx": self.config.idx,
+            "plumed.dat": self.config.plumed.dat,
+            "distances.dat": self.config.plumed.distances,
+        }
+
+        self.filehist: list[dict[str, TaskFiles]] = [
+            {"setup": TaskFiles(input=self.latest_files)}
+        ]
 
         self.task_mapping: TaskMapping = {
             "equilibrium": self._run_md_equil,
@@ -109,26 +103,23 @@ class RunManager:
 
     def get_latest(self, suffix: str):
         """Returns path to latest file of given type.
+
         For .dat files (in general ambiguous extensions) use full file name.
-        Errors if file is nof found.
+        Errors if file is not found.
         """
-        # TODO we shouldn't have to step backwards through the complete
-        # history of IO actions. We should just be able to maintain a dictionary
-        # of the latest file for each type.
-        if suffix in AMBIGUOUS_SUFFS:
-            logging.warn(f"{suffix} ambiguous! Please specify full file name!")
-        for step in reversed(self.filehist):
-            for path in list(step.input.values()) + list(step.output.values()):
-                if suffix in str(path):
-                    return path
-        else:
+        logging.debug("Getting latest suffix: " + suffix)
+        try:
+            path = self.latest_files[suffix]
+            logging.debug("Found: " + str(path))
+            return path
+        except Exception:
             m = f"File {suffix} requested but not found!"
             logging.error(m)
             raise FileNotFoundError(m)
 
     def run(self):
         logging.info("Start run")
-        logging.info("Building task list")
+        logging.info("Build task list")
 
         for task in self.config.sequence:
             logging.debug(f"Put Task: {self.task_mapping[task]}")
@@ -140,7 +131,16 @@ class RunManager:
         logging.info(
             f"Stop running tasks, state: {self.state}, iteration:{self.iteration}, max:{self.iterations}"
         )
-        logging.info(f"History:\n{pformat(self.filehist)}")
+        logging.info("History:")
+        for x in self.filehist:
+            for taskname, taskfiles in x.items():
+                logging.info(
+                    f"""
+                Task: {taskname} with output directory: {taskfiles.outputdir}
+                Task: {taskname}, input:\n{pformat(taskfiles.input)}
+                Task: {taskname}, output:\n{pformat(taskfiles.output)}
+                """
+                )
 
     def __iter__(self):
         return self
@@ -155,22 +155,37 @@ class RunManager:
             task = self.tasks.get()
             self.iteration += 1
         if self.config.dryrun:
-            logging.info(f"Pretending to run: {task.name} with args: {task.kwargs}")
+            logging.info(f"Pretend to run: {task.name} with args: {task.kwargs}")
             return
+        logging.debug("Start task: " + pformat(task))
         files = task()
+        self._discover_output_files(task.name, files)
 
-        if files.outputdir:
-            # list files written by the task
-            for path in files.outputdir.iterdir():
-                suffix = path.suffix
-                if suffix in AMBIGUOUS_SUFFS:
-                    suffix = path.name
-                files.output[suffix] = path
+    def _discover_output_files(self, taskname, files: TaskFiles):
+        """Discover further files written by a task.
 
-        # TODO Ohhh, I might be trying to implement the same thing twice
-        # Need to clarify what part is responsible of keeping track of
-        # the files a task needs and creates!
-        self.filehist.append(files)
+        and add those files to the `files` as well as
+        the file history and latest files.
+        """
+        # discover other files written by the task
+        for path in files.outputdir.iterdir():
+            suffix = path.suffix[1:]
+            if suffix in AMBIGUOUS_SUFFS:
+                suffix = path.name
+            files.output[suffix] = files.outputdir / path
+
+        logging.debug("Update latest files with: ")
+        logging.debug(pformat(files.output))
+        self.latest_files.update(files.output)
+        logging.debug("Append to file history")
+        self.filehist.append({taskname: files})
+
+    def _create_task_directory(self, prefix: str) -> TaskFiles:
+        files = TaskFiles()
+        files.outputdir = self.config.out / f"{prefix}_{self.iteration}"
+        files.outputdir.mkdir()
+        (files.outputdir / self.config.ff.name).symlink_to(self.config.ff)
+        return files
 
     def _dummy(self):
         logging.info("Start dummy task")
@@ -187,11 +202,7 @@ class RunManager:
     def _run_md_equil(self) -> TaskFiles:
         logging.info("Start equilibration MD")
         self.state = State.MD
-        files = TaskFiles()
-        outputdir = self.config.out / f"equil_{self.iteration}"
-        outputdir.mkdir()
-        (outputdir / self.config.ff.name).symlink_to(self.config.ff)
-        files.outputdir = outputdir
+        files = self._create_task_directory("equilibration")
         files.input = {
             "top": self.get_latest("top"),
             "gro": self.get_latest("gro"),
@@ -203,13 +214,9 @@ class RunManager:
         return files
 
     def _run_md_minim(self) -> TaskFiles:
-        logging.info("Start minimization md")
+        logging.info("Setup _run_md_minim")
         self.state = State.MD
-        files = TaskFiles()
-        outputdir = self.config.out / f"min_{self.iteration}"
-        outputdir.mkdir()
-        (outputdir / self.config.ff.name).symlink_to(self.config.ff)
-        files.outputdir = outputdir
+        files = self._create_task_directory("minimization")
         files.input = {
             "top": self.get_latest("top"),
             "gro": self.get_latest("gro"),
@@ -221,31 +228,22 @@ class RunManager:
         return files
 
     def _run_md_eq(self) -> TaskFiles:
-        # TODO combine w/ other equilibration?
-        logging.info("Start _run_md_eq MD")
+        logging.info("Setup _run_md_eq MD")
         self.state = State.MD
-        files = TaskFiles()
-        outputdir = self.config.out / f"equil_{self.iteration}"
-        outputdir.mkdir()
-        (outputdir / self.config.ff.name).symlink_to(self.config.ff)
-        files.outputdir = outputdir
+        files = self._create_task_directory("equilibrium")
         files.input = {
             "top": self.get_latest("top"),
             "mdp": self.config.equilibrium.mdp,
             "gro": self.get_latest("gro"),
         }
         files = md.equilibration(files)
-        logging.info("Done equilibrating")
+        logging.info("Done")
         return files
 
     def _run_md_prod(self) -> TaskFiles:
-        logging.info("Start production MD")
+        logging.info("Setup _run_md_prod")
         self.state = State.MD
-        files = TaskFiles()
-        outputdir = self.config.out / f"prod_{self.iteration}"
-        outputdir.mkdir()
-        (outputdir / self.config.ff.name).symlink_to(self.config.ff)
-        files.outputdir = outputdir
+        files = self._create_task_directory("production")
         files.input = {
             "top": self.get_latest("top"),
             "gro": self.get_latest("gro"),
@@ -255,17 +253,13 @@ class RunManager:
             "plumed.dat": self.get_latest("plumed.dat"),
         }
         files = md.production(files)
-        logging.info("Done minimizing")
+        logging.info("Done with production MD")
         return files
 
     def _run_md_relax(self) -> TaskFiles:
-        logging.info("Start relaxation MD")
+        logging.info("Start _run_md_relax")
         self.state = State.MD
-        files = TaskFiles()
-        outputdir = self.config.out / f"prod_{self.iteration}"
-        outputdir.mkdir()
-        (outputdir / self.config.ff.name).symlink_to(self.config.ff)
-        files.outputdir = outputdir
+        files = self._create_task_directory("relaxation")
         files.input = {
             "top": self.get_latest("top"),
             "gro": self.get_latest("gro"),
@@ -274,7 +268,7 @@ class RunManager:
             "cpt": self.get_latest("cpt"),
         }
         files = md.relaxation(files)
-        logging.info("Done simulating")
+        logging.info("Done with relaxation MD")
         return files
 
     def _query_reactions(self):
@@ -295,13 +289,8 @@ class RunManager:
             }
             self.reaction_results.append(self.reaction.get_reaction_result(files))
 
-        logging.info("Rates and Recipes:")
-        # TODO this would fail with a out of range error,
-        # we need a way of writing out results
-        # logging.info(self.rates[0:10])
-        # logging.info(self.recipe.type)
-        # logging.info(self.recipe.atom_idx[0:10])
-        # logging.info("Reaction done")
+        logging.debug("Rates and Recipes:")
+        # TODO
         return files
 
     def _decide_reaction(
@@ -322,31 +311,27 @@ class RunManager:
         logging.info(f"Breakpair: {self.chosen_recipe.atom_idx}")
 
         files = TaskFiles()
-        outputdir = self.config.out / f"recipe_{self.iteration}"
-        outputdir.mkdir()
-        (outputdir / self.config.ff.name).symlink_to(self.config.ff)
-        files.outputdir = outputdir
-
+        files = self._create_task_directory("recipe")
         files.input = {
             "top": self.get_latest("top"),
             "plumed.dat": self.get_latest("plumed.dat"),
         }
 
-        newtop = outputdir / "topol_mod.top"
-        newplumeddat = outputdir / "plumed.dat"
-        newplumeddist = outputdir / "distances.dat"
         files.output = {
-            "top": newtop,
-            "plumed.dat": newplumeddat,
-            "dist.dat": newplumeddist,
+            "top": files.outputdir / "topol_mod.top",
+            "plumed.dat": files.outputdir / "plumed.dat",
+            "distances.dat": files.outputdir / "distances.dat",
         }
 
-        changer.modify_top(self.chosen_recipe, files.input["top"], newtop)
-        logging.info(f"Wrote new topology to {newtop.parts[-3:]}")
+        changer.modify_top(self.chosen_recipe, files.input["top"], files.output["top"])
+        logging.info(f'Wrote new topology to {files.output["top"].parts[-3:]}')
         changer.modify_plumed(
-            self.chosen_recipe, files.input["plumed.dat"], newplumeddat, newplumeddist
+            self.chosen_recipe,
+            files.input["plumed.dat"],
+            files.output["plumed.dat"],
+            files.output["plumed.dist"],
         )
-        logging.info(f"Wrote new plumedfile to {newplumeddat.parts[-3:]}")
+        logging.info(f'Wrote new plumedfile to {files.output["plumed.dat"].parts[-3:]}')
         logging.info(f"Looking for md in {self.config.changer.coordinates.__dict__}")
         # TODO clean this up, maybe make function for this in config
         if hasattr(self.config, "changer"):
