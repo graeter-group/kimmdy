@@ -1,6 +1,7 @@
 from pathlib import Path
 from collections.abc import Iterable
 from typing import Generator
+import pandas as pd
 
 Topology = dict[str, list[list[str]]]
 
@@ -93,13 +94,23 @@ def write_plumed(d, path: Path) -> None:
             )
 
 
-def read_distances_dat(path) -> dict:
+def read_distances_dat(distances_dat: Path):
     """Read a distances.dat plumed output file."""
-    with open(path, "r") as f:
-        d = {}
-        distances = []
-        d["spec"] = f.readline()
-        while f:
-            l = f.readline
-            distances.append(l)
-    return d
+    with open(distances_dat, "r") as f:
+        colnames = f.readline()[10:].split()
+
+    return pd.read_csv(distances_dat, delim_whitespace=True, skiprows=1, names=colnames)
+
+
+def read_plumed_distances(plumed_dat: Path, distances_dat: Path):
+    plumed = read_plumed(plumed_dat)
+    # plumed['distances']: [{'id': 'd0', 'keyword': 'DISTANCE', 'atoms': ['5', '7']}
+
+    distances = read_distances_dat(distances_dat)
+    # distances is a pd DataFrame with time and id's -> distance
+
+    atoms = {
+        x["id"]: x["atoms"] for x in plumed["distances"] if x["keyword"] == "DISTANCE"
+    }
+
+    return atoms
