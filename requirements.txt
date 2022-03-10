@@ -3,3 +3,4 @@ tox
 black
 hypothesis
 -e .
+-e ./plugins
