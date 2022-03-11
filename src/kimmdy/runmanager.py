@@ -13,6 +13,7 @@ import kimmdy.changemanager as changer
 from kimmdy.tasks import Task, TaskFiles, TaskMapping
 from pprint import pformat
 import random
+from kimmdy import plugins
 
 # file types of which there will be multiple files per type
 AMBIGUOUS_SUFFS = ["dat", "xvg", "log", "trr"]
@@ -100,6 +101,9 @@ class RunManager:
             "relax": self._run_md_relax,
             "reactions": self._query_reactions,
         }
+
+        logging.debug("Configuration from input file:")
+        logging.debug(pformat(self.config.__dict__))
 
     def get_latest(self, suffix: str):
         """Returns path to latest file of given type.
@@ -276,10 +280,13 @@ class RunManager:
         self.state = State.REACTION
         files = TaskFiles()
 
-        # TODO this could be more elegant
-        if hasattr(self.config.reactions, "homolysis"):
-            self.reaction = Homolysis()
+        reactions = self.config.reactions.get_attributes()
 
+        for react_name in reactions:
+            reaction = plugins[react_name]
+
+            # TODO: Make this general for all reactions.
+            # Maybe with a dict keeping all the newest files.
             files.input = {
                 "plumed.dat": self.get_latest("plumed.dat"),
                 "distances.dat": self.get_latest("distances.dat"),
@@ -287,10 +294,9 @@ class RunManager:
                 "ffbonded.itp": self.config.reactions.homolysis.bonds,
                 "edissoc.dat": self.config.reactions.homolysis.edis,
             }
-            self.reaction_results.append(self.reaction.get_reaction_result(files))
+            self.reaction_results.append(reaction().get_reaction_result(files))
 
-        logging.debug("Rates and Recipes:")
-        # TODO
+        logging.info("Reaction done")
         return files
 
     def _decide_reaction(

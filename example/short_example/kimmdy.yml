@@ -20,6 +20,7 @@ reactions:
   homolysis:
     edis: 'edissoc.dat'
     bonds: 'ffbonded.itp'
+  dummyreaction:
 sequence:
   - equilibrium
   - mult: 2

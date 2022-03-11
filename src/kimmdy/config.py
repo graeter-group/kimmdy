@@ -2,6 +2,8 @@ import yaml
 import logging
 from pathlib import Path
 from dataclasses import dataclass
+from kimmdy import plugins
+from kimmdy.reaction import Reaction
 
 
 def check_file_exists(p: Path):
@@ -44,7 +46,7 @@ type_scheme = {
     "equilibrium": {"mdp": Path},
     "prod": {"mdp": Path},
     "changer": {"coordinates": {"md": {"mdp": Path}}},
-    "reactions": {"homolysis": {"edis": Path, "bonds": Path}},
+    "reactions": {},
     "sequence": Sequence,
 }
 
@@ -149,8 +151,8 @@ class Config:
             raise ValueError(m)
 
         if input_file is not None and not isinstance(input_file, Path):
-            logging.warn(
-                "Warning: Config input file was not type pathlib.Path, attemptin conversion.."
+            logging.debug(
+                "Config input file was not type pathlib.Path, attempting conversion.."
             )
             input_file = Path(input_file)
 
@@ -158,16 +160,29 @@ class Config:
         if self.type_scheme is None:
             self.type_scheme = {}
 
+        # top level before initialization here
         if input_file is not None:
             with open(input_file, "r") as f:
                 raw = yaml.safe_load(f)
-                self.raw = raw
-                if self.raw is None:
-                    m = "Error: Could not read input file"
-                    logging.error(m)
-                    raise ValueError(m)
-                recursive_dict = raw
+            self.raw = raw
+            if self.raw is None:
+                m = "Error: Could not read input file"
+                logging.error(m)
+                raise ValueError(m)
+            recursive_dict = raw
 
+            if len(plugins) > 0:
+                logging.info("Loading Plugins:")
+                for plg_name, plugin in plugins.items():
+                    if isinstance(plugin, Exception):
+                        logging.warn(
+                            f"Plugin {plg_name} could not be loaded!\n{plugin}\n"
+                        )
+                    if issubclass(plugin, Reaction):
+                        self.type_scheme["reactions"].update(plugin().type_scheme)
+                        print(self.type_scheme["reactions"])
+
+        # building config recursively
         if recursive_dict is not None:
             for name, val in recursive_dict.items():
                 if isinstance(val, dict):
@@ -177,6 +192,7 @@ class Config:
                 logging.debug(f"Set attribute: {name}, {val}")
                 self.__setattr__(name, val)
 
+        # top level after initialization here
         if input_file is not None:
             self.cwd = (
                 Path(cwd)
@@ -188,7 +204,7 @@ class Config:
             )
             # make sure self.out is empty
             while self.out.exists():
-                logging.info(f"Output dir {self.out} exists, incrementing name")
+                logging.debug(f"Output dir {self.out} exists, incrementing name")
                 out_end = self.out.name[-3:]
                 if out_end.isdigit():
                     self.out = self.out.with_name(
@@ -208,13 +224,21 @@ class Config:
             self._cast_types()
             self._validate()
 
+    def get_attributes(self):
+        """Get a list of all attributes"""
+        repr = self.__dict__.copy()
+        repr.pop("type_scheme")
+        return list(repr.keys())
+
     def __repr__(self):
         repr = self.__dict__.copy()
         repr.pop("type_scheme")
         return str(repr)
 
     def attr(self, attribute):
-        """Alias for self.__getattribute__"""
+        """Get the value of a specific attribute.
+        Alias for self.__getattribute__
+        """
         return self.__getattribute__(attribute)
 
     def _cast_types(self):
@@ -284,6 +308,15 @@ class Config:
                         assert hasattr(
                             self, task
                         ), f"Task {task} listed in sequence, but not defined!"
+
+                # Validate reaction plugins
+                if attr_name == "reactions":
+                    for r in attr.get_attributes():
+                        assert r in (ks := list(plugins.keys())), (
+                            f"Error: Reaction plugin {r} not found!\n"
+                            + f"Available plugins: {ks}"
+                        )
+
         except AssertionError as e:
             logging.error(f"Validating input failed!\n{e}")
             raise ValueError(e)
