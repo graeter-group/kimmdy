@@ -8,6 +8,7 @@ from kimmdy.utils import (
     find_bond_param,
     calc_av_rate,
 )
+from pathlib import Path
 
 
 class Homolysis(Reaction):
@@ -16,7 +17,7 @@ class Homolysis(Reaction):
     """
 
     def get_reaction_result(self, files: TaskFiles):
-        logging.info("Getting recipe for reaction: homolysis")
+        logging.debug("Getting recipe for reaction: homolysis")
 
         plumed_dat = files.input["plumed.dat"]
         distances_dat = files.input["distances.dat"]
@@ -30,8 +31,8 @@ class Homolysis(Reaction):
 
         result = ReactionResult(recipes=[], rates=[])
 
-        logging.info("Parameters for calc_av_rate:")
-        logging.info(list_of_breakpairs_and_distances[0][0:10])
+        logging.debug("Parameters for calc_av_rate:")
+        logging.debug(list_of_breakpairs_and_distances[0][0:10])
 
         # go through all possible breakpairs, calculate their rupture rates
         for j in range(len(list_of_breakpairs_and_distances)):
@@ -57,10 +58,10 @@ class Homolysis(Reaction):
             # calculate rupture probabilties
             k = calc_av_rate(distances, float(r_0), float(E_dis), float(k_f))
             if j == 0:
-                logging.info(E_dis)
-                logging.info(r_0)
-                logging.info(k_f)
-                logging.info(k)
+                logging.debug(E_dis)
+                logging.debug(r_0)
+                logging.debug(k_f)
+                logging.debug(k)
 
             result.rates.append(k)
             result.recipes.append(
@@ -68,3 +69,7 @@ class Homolysis(Reaction):
             )
 
         return result
+
+    @property
+    def type_scheme(self) -> dict:
+        return {"homolysis": {"edis": Path, "bonds": Path}}
