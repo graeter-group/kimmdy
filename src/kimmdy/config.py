@@ -152,7 +152,7 @@ class Config:
 
         if input_file is not None and not isinstance(input_file, Path):
             logging.debug(
-                "Config input file was not type pathlib.Path, attemptin conversion.."
+                "Config input file was not type pathlib.Path, attempting conversion.."
             )
             input_file = Path(input_file)
 
@@ -308,6 +308,15 @@ class Config:
                         assert hasattr(
                             self, task
                         ), f"Task {task} listed in sequence, but not defined!"
+
+                # Validate reaction plugins
+                if attr_name == "reactions":
+                    for r in attr.get_attributes():
+                        assert r in (ks := list(plugins.keys())), (
+                            f"Error: Reaction plugin {r} not found!\n"
+                            + f"Available plugins: {ks}"
+                        )
+
         except AssertionError as e:
             logging.error(f"Validating input failed!\n{e}")
             raise ValueError(e)

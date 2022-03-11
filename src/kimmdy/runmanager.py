@@ -283,12 +283,7 @@ class RunManager:
         reactions = self.config.reactions.get_attributes()
 
         for react_name in reactions:
-            reaction = plugins.get(react_name)
-            if reaction is None:
-                logging.warning(
-                    f"Reaction {react_name} could not be executed! Plugin not found!"
-                )
-                continue
+            reaction = plugins[react_name]
 
             # TODO: Make this general for all reactions.
             # Maybe with a dict keeping all the newest files.
