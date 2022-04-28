@@ -37,7 +37,7 @@ def read_topol(path: Path) -> Topology:
     with open(path, "r") as f:
         sections = get_sections(f, "\n")
         d = {}
-        for i,(first, second, *rest) in enumerate(sections):
+        for i, (first, second, *rest) in enumerate(sections):
             print(i)
             if "[" in second:
                 key = second.strip("[] \n")
@@ -51,7 +51,7 @@ def read_topol(path: Path) -> Topology:
 def write_topol(d: Topology, outfile: Path):
     with open(outfile, "w") as f:
         for title, content in d.items():
-            if title.startswith('; BLOCK '):
+            if title.startswith("; BLOCK "):
                 f.write(f"\n")
             else:
                 f.write(f"[ {title} ]\n")
