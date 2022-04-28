@@ -6,7 +6,7 @@ Topology = dict[str, list[list[str]]]
 
 
 def is_comment(l: str):
-    return len(l) == 0 or l[0] in ["\n"]
+    return len(l) == 0 or l[0] in ["\n", ";"]
 
 
 def get_sections(
@@ -16,8 +16,8 @@ def get_sections(
     # need sort of like a None section for reading and writing.
     data = []
     for line in seq:
-        if is_comment(line):
-            continue
+        # if is_comment(line):
+        #     continue
         if line.startswith(section_marker):
             if data:
                 yield data
@@ -35,23 +35,26 @@ def read_topol(path: Path) -> Topology:
     # not necessarily a section title. How do we handle
     # secions without a title?
     with open(path, "r") as f:
-        sections = get_sections(f, "[")
+        sections = get_sections(f, "\n")
         d = {}
-        for title, *content in sections:
-            key = title.strip("[] \n")
-            value = [c.split() for c in content]
+        for i,(first, second, *rest) in enumerate(sections):
+            print(i)
+            if "[" in second:
+                key = second.strip("[] \n")
+            else:
+                key = f"; BLOCK {i}"
+            value = [c.split() for c in rest]
             d[key] = value
         return d
 
 
 def write_topol(d: Topology, outfile: Path):
     with open(outfile, "w") as f:
-        if frontmatter := d.pop(";"):
-            s = "\n".join([" ".join(l) for l in frontmatter]) + "\n\n"
-            f.write(s)
         for title, content in d.items():
-            s = f"[ {title} ]\n"
-            f.write(s)
+            if title.startswith('; BLOCK '):
+                f.write(f"\n")
+            else:
+                f.write(f"[ {title} ]\n")
             s = "\n".join([" ".join(l) for l in content]) + "\n\n"
             f.write(s)
 
