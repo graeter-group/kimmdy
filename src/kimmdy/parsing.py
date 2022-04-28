@@ -6,7 +6,7 @@ Topology = dict[str, list[list[str]]]
 
 
 def is_comment(l: str):
-    return len(l) == 0 or l[0] in ["\n", ";"]
+    return len(l) == 0 or l[0] in ["\n"]
 
 
 def get_sections(
@@ -31,20 +31,28 @@ def read_topol(path: Path) -> Topology:
     # TODO look into following #includes
     # TODO look into sections surrounded by #ifdef
     # TODO look into [ intermolecule ] section
+    # TODO also: blank lines seem to be the indicator of a section ending,
+    # not necessarily a section title. How do we handle
+    # secions without a title?
     with open(path, "r") as f:
         sections = get_sections(f, "[")
-        return {
-            title.strip("[] \n"): [c.split() for c in content]
-            for title, *content in sections
-        }
+        d = {}
+        for title, *content in sections:
+            key = title.strip("[] \n")
+            value = [c.split() for c in content]
+            d[key] = value
+        return d
 
 
 def write_topol(d: Topology, outfile: Path):
     with open(outfile, "w") as f:
+        if frontmatter := d.pop(";"):
+            s = "\n".join([" ".join(l) for l in frontmatter]) + "\n\n"
+            f.write(s)
         for title, content in d.items():
             s = f"[ {title} ]\n"
             f.write(s)
-            s = "\n".join([" ".join(c) for c in content]) + "\n\n"
+            s = "\n".join([" ".join(l) for l in content]) + "\n\n"
             f.write(s)
 
 
