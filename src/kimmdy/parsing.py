@@ -12,8 +12,6 @@ def is_comment(l: str):
 def get_sections(
     seq: Iterable[str], section_marker: str
 ) -> Generator[list[str], None, None]:
-    # TODO how about the initial part without a section name?
-    # need sort of like a None section for reading and writing.
     data = []
     for line in seq:
         # if is_comment(line):
@@ -29,11 +27,7 @@ def get_sections(
 
 def read_topol(path: Path) -> Topology:
     # TODO look into following #includes
-    # TODO look into sections surrounded by #ifdef
     # TODO look into [ intermolecule ] section
-    # TODO also: blank lines seem to be the indicator of a section ending,
-    # not necessarily a section title. How do we handle
-    # secions without a title?
     with open(path, "r") as f:
         sections = get_sections(f, "\n")
         d = {}
