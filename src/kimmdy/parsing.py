@@ -38,12 +38,12 @@ def read_topol(path: Path) -> Topology:
         sections = get_sections(f, "\n")
         d = {}
         for i, (first, second, *rest) in enumerate(sections):
-            print(i)
             if "[" in second:
                 key = second.strip("[] \n")
+                value = [c.split() for c in rest]
             else:
                 key = f"; BLOCK {i}"
-            value = [c.split() for c in rest]
+                value = [c.split() for c in [second] + rest]
             d[key] = value
         return d
 
