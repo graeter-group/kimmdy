@@ -3,8 +3,9 @@ from collections.abc import Iterable
 from typing import Generator
 import pandas as pd
 
-# time to experiment
-# what a topplogy is
+# time to experimet with
+# how a .gro topology
+# is represented
 Topology = dict[str, list[list[str]]]
 
 
