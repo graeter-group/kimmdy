@@ -3,6 +3,8 @@ from collections.abc import Iterable
 from typing import Generator
 import pandas as pd
 
+# time to experiment
+# what a topplogy is
 Topology = dict[str, list[list[str]]]
 
 
