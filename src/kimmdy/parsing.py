@@ -17,20 +17,22 @@ def get_sections(
                 # because newlines mark sections
                 data.pop(0)
                 # only yield section if non-empty
-                if data: yield data
+                if data:
+                    yield data
                 data = []
         data.append(line.strip("\n"))
     if data:
         yield data
 
-def extract_section_name(ls: list[str]) -> tuple[str,list[str]]:
+
+def extract_section_name(ls: list[str]) -> tuple[str, list[str]]:
     """takes a list of lines and return a tuple
-       with the name and the lines minus the
-       line that contained the name.
-       Returns the empty string of no name was found.
+    with the name and the lines minus the
+    line that contained the name.
+    Returns the empty string of no name was found.
     """
     for i, l in enumerate(ls):
-        if l and l[0] != ';' and '[' in l:
+        if l and l[0] != ";" and "[" in l:
             name = l.strip("[] \n")
             ls.pop(i)
             return (name, ls)
@@ -46,7 +48,8 @@ def read_topol(path: Path) -> Topology:
         d = {}
         for i, s in enumerate(sections):
             # skip empty sections
-            if s == ['']: continue
+            if s == [""]:
+                continue
             name, content = extract_section_name(s)
             content = [c.split() for c in content if c]
             if not name:
@@ -55,7 +58,7 @@ def read_topol(path: Path) -> Topology:
             # append values in such cases
             if name not in d:
                 d[name] = content
-            else :
+            else:
                 d[name] += content
         return d
 
