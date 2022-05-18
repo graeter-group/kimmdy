@@ -4,18 +4,11 @@ from typing import Generator
 
 Topology = dict[str, list[list[str]]]
 
-
-def is_comment(l: str):
-    return len(l) == 0 or l[0] in ["\n", ";"]
-
-
 def get_sections(
     seq: Iterable[str], section_marker: str
 ) -> Generator[list[str], None, None]:
-    data = []
+    data = ['']
     for line in seq:
-        # if is_comment(line):
-        #     continue
         if line.startswith(section_marker):
             if data:
                 yield data
@@ -31,7 +24,7 @@ def read_topol(path: Path) -> Topology:
     with open(path, "r") as f:
         sections = get_sections(f, "\n")
         d = {}
-        for i, (first, second, *rest) in enumerate(sections):
+        for i, (_, second, *rest) in enumerate(sections):
             if "[" in second:
                 key = second.strip("[] \n")
                 value = [c.split() for c in rest]
@@ -49,7 +42,15 @@ def write_topol(d: Topology, outfile: Path):
                 f.write(f"\n")
             else:
                 f.write(f"[ {title} ]\n")
-            s = "\n".join([" ".join(l) for l in content]) + "\n\n"
+            s = (
+                "\n".join(
+                    [
+                        " ".join([x.ljust(8) if l[0] != ";" else x for x in l])
+                        for l in content
+                    ]
+                )
+                + "\n\n"
+            )
             f.write(s)
 
 
