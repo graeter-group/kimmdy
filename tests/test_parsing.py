@@ -6,12 +6,14 @@ from hypothesis import given, strategies as st
 from kimmdy import parsing
 from pathlib import Path
 
+
 def set_dir():
     try:
         test_dir = Path(__file__).parent / "test_files/test_parsing"
     except NameError:
         test_dir = Path("./tests/test_files/test_parsing")
     os.chdir(test_dir)
+
 
 set_dir()
 
@@ -40,6 +42,7 @@ def test_doubleparse_urea():
     top3 = parsing.read_topol(p2)
     assert top2 == top3
 
+
 #%%
 #### Parsing should be invertible ####
 allowed_text = st.text(
@@ -59,5 +62,3 @@ def test_parser_invertible(d):
     parsing.write_topol(d, p)
     d2 = parsing.read_topol(p)
     assert d == d2
-
-
