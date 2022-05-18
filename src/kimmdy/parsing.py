@@ -1,6 +1,7 @@
 from pathlib import Path
 from collections.abc import Iterable
 from typing import Generator
+import pandas as pd
 
 Topology = dict[str, list[list[str]]]
 
@@ -36,7 +37,7 @@ def read_topol(path: Path) -> Topology:
         return d
 
 
-def write_topol(d: Topology, outfile: Path):
+def write_topol(d: Topology, outfile: Path) -> None:
     with open(outfile, "w") as f:
         for title, content in d.items():
             if title.startswith("; BLOCK "):
@@ -55,7 +56,8 @@ def write_topol(d: Topology, outfile: Path):
             f.write(s)
 
 
-def read_plumed(path: Path):
+def read_plumed(path: Path) -> dict:
+    """Read a plumed.dat configuration file."""
     with open(path, "r") as f:
         distances = []
         prints = []
@@ -88,7 +90,8 @@ def read_plumed(path: Path):
         return {"distances": distances, "prints": prints}
 
 
-def write_plumed(d, path: Path):
+def write_plumed(d, path: Path) -> None:
+    """Write a plumed.dat configuration file."""
     with open(path, "w") as f:
         for l in d["distances"]:
             f.write(f"{l['id']}: {l['keyword']} ATOMS={','.join(l['atoms'])}\n")
@@ -96,3 +99,25 @@ def write_plumed(d, path: Path):
             f.write(
                 f"{l['PRINT']} ARG={','.join(l['ARG'])} STRIDE={str(l['STRIDE'])} FILE={str(l['FILE'])}\n"
             )
+
+
+def read_distances_dat(distances_dat: Path):
+    """Read a distances.dat plumed output file."""
+    with open(distances_dat, "r") as f:
+        colnames = f.readline()[10:].split()
+
+    return pd.read_csv(distances_dat, delim_whitespace=True, skiprows=1, names=colnames)
+
+
+def read_plumed_distances(plumed_dat: Path, distances_dat: Path):
+    plumed = read_plumed(plumed_dat)
+    # plumed['distances']: [{'id': 'd0', 'keyword': 'DISTANCE', 'atoms': ['5', '7']}
+
+    distances = read_distances_dat(distances_dat)
+    # distances is a pd DataFrame with time and id's -> distance
+
+    atoms = {
+        x["id"]: x["atoms"] for x in plumed["distances"] if x["keyword"] == "DISTANCE"
+    }
+
+    return atoms
