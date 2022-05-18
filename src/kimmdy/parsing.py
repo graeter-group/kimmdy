@@ -13,11 +13,29 @@ def get_sections(
     for line in seq:
         if line.startswith(section_marker):
             if data:
-                yield data
+                # first element will be empty
+                # because newlines mark sections
+                data.pop(0)
+                # only yield section if non-empty
+                if data: yield data
                 data = []
         data.append(line.strip("\n"))
     if data:
         yield data
+
+def extract_section_name(ls: list[str]) -> tuple[str,list[str]]:
+    """takes a list of lines and return a tuple
+       with the name and the lines minus the
+       line that contained the name.
+       Returns the empty string of no name was found.
+    """
+    for i, l in enumerate(ls):
+        if l and l[0] != ';' and '[' in l:
+            name = l.strip("[] \n")
+            ls.pop(i)
+            return (name, ls)
+    else:
+        return ("", ls)
 
 
 def read_topol(path: Path) -> Topology:
@@ -26,21 +44,26 @@ def read_topol(path: Path) -> Topology:
     with open(path, "r") as f:
         sections = get_sections(f, "\n")
         d = {}
-        for i, (_, second, *rest) in enumerate(sections):
-            if "[" in second:
-                key = second.strip("[] \n")
-                value = [c.split() for c in rest]
-            else:
-                key = f"; BLOCK {i}"
-                value = [c.split() for c in [second] + rest]
-            d[key] = value
+        for i, s in enumerate(sections):
+            # skip empty sections
+            if s == ['']: continue
+            name, content = extract_section_name(s)
+            content = [c.split() for c in content if c]
+            if not name:
+                name = f"BLOCK {i}"
+            # sections can be duplicated.
+            # append values in such cases
+            if name not in d:
+                d[name] = content
+            else :
+                d[name] += content
         return d
 
 
 def write_topol(d: Topology, outfile: Path) -> None:
     with open(outfile, "w") as f:
         for title, content in d.items():
-            if title.startswith("; BLOCK "):
+            if title.startswith("BLOCK "):
                 f.write(f"\n")
             else:
                 f.write(f"[ {title} ]\n")
