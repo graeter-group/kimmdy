@@ -4,10 +4,11 @@ from typing import Generator
 
 Topology = dict[str, list[list[str]]]
 
+
 def get_sections(
     seq: Iterable[str], section_marker: str
 ) -> Generator[list[str], None, None]:
-    data = ['']
+    data = [""]
     for line in seq:
         if line.startswith(section_marker):
             if data:
