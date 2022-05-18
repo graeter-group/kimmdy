@@ -1,6 +1,7 @@
 from pathlib import Path
 from collections.abc import Iterable
 from typing import Generator
+import pandas as pd
 
 Topology = dict[str, list[list[str]]]
 
@@ -12,11 +13,31 @@ def get_sections(
     for line in seq:
         if line.startswith(section_marker):
             if data:
-                yield data
+                # first element will be empty
+                # because newlines mark sections
+                data.pop(0)
+                # only yield section if non-empty
+                if data:
+                    yield data
                 data = []
         data.append(line.strip("\n"))
     if data:
         yield data
+
+
+def extract_section_name(ls: list[str]) -> tuple[str, list[str]]:
+    """takes a list of lines and return a tuple
+    with the name and the lines minus the
+    line that contained the name.
+    Returns the empty string of no name was found.
+    """
+    for i, l in enumerate(ls):
+        if l and l[0] != ";" and "[" in l:
+            name = l.strip("[] \n")
+            ls.pop(i)
+            return (name, ls)
+    else:
+        return ("", ls)
 
 
 def read_topol(path: Path) -> Topology:
@@ -25,21 +46,27 @@ def read_topol(path: Path) -> Topology:
     with open(path, "r") as f:
         sections = get_sections(f, "\n")
         d = {}
-        for i, (_, second, *rest) in enumerate(sections):
-            if "[" in second:
-                key = second.strip("[] \n")
-                value = [c.split() for c in rest]
+        for i, s in enumerate(sections):
+            # skip empty sections
+            if s == [""]:
+                continue
+            name, content = extract_section_name(s)
+            content = [c.split() for c in content if c]
+            if not name:
+                name = f"BLOCK {i}"
+            # sections can be duplicated.
+            # append values in such cases
+            if name not in d:
+                d[name] = content
             else:
-                key = f"; BLOCK {i}"
-                value = [c.split() for c in [second] + rest]
-            d[key] = value
+                d[name] += content
         return d
 
 
-def write_topol(d: Topology, outfile: Path):
+def write_topol(d: Topology, outfile: Path) -> None:
     with open(outfile, "w") as f:
         for title, content in d.items():
-            if title.startswith("; BLOCK "):
+            if title.startswith("BLOCK "):
                 f.write(f"\n")
             else:
                 f.write(f"[ {title} ]\n")
@@ -55,7 +82,8 @@ def write_topol(d: Topology, outfile: Path):
             f.write(s)
 
 
-def read_plumed(path: Path):
+def read_plumed(path: Path) -> dict:
+    """Read a plumed.dat configuration file."""
     with open(path, "r") as f:
         distances = []
         prints = []
@@ -88,7 +116,8 @@ def read_plumed(path: Path):
         return {"distances": distances, "prints": prints}
 
 
-def write_plumed(d, path: Path):
+def write_plumed(d, path: Path) -> None:
+    """Write a plumed.dat configuration file."""
     with open(path, "w") as f:
         for l in d["distances"]:
             f.write(f"{l['id']}: {l['keyword']} ATOMS={','.join(l['atoms'])}\n")
@@ -96,3 +125,25 @@ def write_plumed(d, path: Path):
             f.write(
                 f"{l['PRINT']} ARG={','.join(l['ARG'])} STRIDE={str(l['STRIDE'])} FILE={str(l['FILE'])}\n"
             )
+
+
+def read_distances_dat(distances_dat: Path):
+    """Read a distances.dat plumed output file."""
+    with open(distances_dat, "r") as f:
+        colnames = f.readline()[10:].split()
+
+    return pd.read_csv(distances_dat, delim_whitespace=True, skiprows=1, names=colnames)
+
+
+def read_plumed_distances(plumed_dat: Path, distances_dat: Path):
+    plumed = read_plumed(plumed_dat)
+    # plumed['distances']: [{'id': 'd0', 'keyword': 'DISTANCE', 'atoms': ['5', '7']}
+
+    distances = read_distances_dat(distances_dat)
+    # distances is a pd DataFrame with time and id's -> distance
+
+    atoms = {
+        x["id"]: x["atoms"] for x in plumed["distances"] if x["keyword"] == "DISTANCE"
+    }
+
+    return atoms
