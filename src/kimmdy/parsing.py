@@ -150,3 +150,28 @@ def read_plumed_distances(plumed_dat: Path, distances_dat: Path):
     }
 
     return atoms
+
+
+#%%
+def read_gro(path: Path):
+    """parse gromacs coordinate file
+    <https://manual.gromacs.org/documentation/current/reference-manual/topologies/topology-file-formats.html#coordinate-file>
+    """
+    widths = [5, 5, 5, 11, 11, 11, 12, 12, 12]
+    with open(path, "r") as f:
+        _ = f.readline()
+        n = int(f.readline().strip())
+        ls = f.readlines()
+        box = ls[-1]
+        box = [float(x) for x in box.split()]
+        ls = ls[:-1]
+        result = []
+        for l in ls:
+            lsplit = []
+            cursor = 0
+            for w in widths:
+                lsplit.append(l[cursor : cursor + w])
+                cursor += w
+            result.append(lsplit)
+        # names=["residuenr","residuename","atomname","atomnr","x","y","z","vx","vy","vz"],
+    return (result, n, box)

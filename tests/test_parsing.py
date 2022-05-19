@@ -86,3 +86,8 @@ top = parsing.read_topol(p)
 top["position_restraints"]
 p2 = Path("parsed_collagen.top")
 parsing.write_topol(top, p2)
+
+
+#%%
+p = Path("collagen-npt.gro")
+ls, n, box = parsing.read_gro(p)
