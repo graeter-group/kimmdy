@@ -62,3 +62,27 @@ def test_parser_invertible(d):
     parsing.write_topol(d, p)
     d2 = parsing.read_topol(p)
     assert d == d2
+
+
+#%%
+if __name__ == "__main__":
+    test_parser_doesnt_crash_on_example()
+    test_doubleparse_urea()
+    test_parser_invertible()
+
+
+#%%
+#### What happens to ifdef sections? ####
+# ifdef within a section works fine
+p = Path("ifdef_test.top")
+top = parsing.read_topol(p)
+
+#%%
+# what about around a section?
+# is it a problem if we bubble up the
+# section name?
+p = Path("collagen.top")
+top = parsing.read_topol(p)
+top["position_restraints"]
+p2 = Path("parsed_collagen.top")
+parsing.write_topol(top, p2)
