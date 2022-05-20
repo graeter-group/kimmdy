@@ -28,7 +28,7 @@ def get_cmdline_args():
     parser.add_argument(
         "--logfile", "-f", type=str, help="logfile", default="kimmdy.log"
     )
-    return parser.parse_args("")
+    return parser.parse_args()
 
 
 def configure_logging(args, color=True):
