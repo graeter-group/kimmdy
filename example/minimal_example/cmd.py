@@ -1,6 +1,5 @@
 import argparse
 import logging
-from pathlib import Path
 from kimmdy.config import Config
 from kimmdy.runmanager import RunManager
 from kimmdy.utils import check_gmx_version
@@ -17,7 +16,7 @@ def get_cmdline_args():
     """
     parser = argparse.ArgumentParser(description="Welcome to KIMMDY")
     parser.add_argument(
-        "--input", "-i", type=str, help="kimmdy input file", default="../../example/minimal_example/kimmdy.yml"
+        "--input", "-i", type=str, help="kimmdy input file", default="kimmdy.yml"
     )
     parser.add_argument(
         "--loglevel",
@@ -53,7 +52,13 @@ def configure_logging(args, color=True):
     )
 
 
-def _run(args):
+def kimmdy():
+    """Run KIMMDY.
+
+    The configuration is gathered from the input file,
+    which is `kimmdy.yml` by default.
+    """
+    args = get_cmdline_args()
     configure_logging(args)
 
     logging.info("Welcome to KIMMDY")
@@ -67,26 +72,6 @@ def _run(args):
 
     runmgr = RunManager(config)
     runmgr.run()
-
-
-def kimmdy_run(
-    input: Path = Path("kimmdy.yml"),
-    loglevel: str = "DEBUG",
-    logfile: Path = Path("kimmdy.log"),
-):
-    """Run KIMMDY from python."""
-    args = argparse.Namespace(input=input, loglevel=loglevel, logfile=logfile)
-    _run(args)
-
-
-def kimmdy():
-    """Run KIMMDY from the command line.
-
-    The configuration is gathered from the input file,
-    which is `kimmdy.yml` by default.
-    """
-    args = get_cmdline_args()
-    _run(args)
 
 
 if __name__ == "__main__":
