@@ -2,6 +2,7 @@ from pathlib import Path
 from collections.abc import Iterable
 from typing import Generator
 import pandas as pd
+from copy import deepcopy
 
 # time to experiment
 # what a topplogy is
@@ -82,6 +83,25 @@ def write_topol(d: Topology, outfile: Path) -> None:
                 + "\n\n"
             )
             f.write(s)
+
+def topol_split_dihedrals(d: Topology):
+    if 'dihedrals' in d.keys():
+        d['propers'] = deepcopy(d['dihedrals'])
+        d['impropers'] = []
+        for i, dih in enumerate(d['propers'][::-1]):
+            if dih[4] == '9':
+                break
+            else:
+                d['impropers'].insert(0,(d['propers'].pop(-1)))
+    return d
+
+def topol_rmv_propers_impropers(d: Topology):
+    if all([x in d.keys() for x in ['propers','impropers']]):
+        d['dihedrals'].clear()
+        d['dihedrals'].extend(d.pop('propers'))
+        d['dihedrals'].extend(d.pop('impropers'))
+    return d
+
 
 
 def read_plumed(path: Path) -> dict:

@@ -192,10 +192,10 @@ Protein             3
   ;  ai    aj    ak    al funct            c0            c1            c2            c3
     1     7     5     6     4
     5     9     7     8     4
+    7    10     9    14     4        180.0000000  4.6024000 2
     7     9    14    16     4        105.4        0.75      1
     9    16    14    15     4
    14    18    16    17     4
-    7    10     9    14     4        180.0000000  4.6024000 2
 
 ; Include Position restraint file
 #ifdef POSRES
