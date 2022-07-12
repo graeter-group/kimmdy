@@ -5,7 +5,7 @@
 kimmdy.log
 test_out*/
 example/example_ala/amber99sb-star-ildnp.ff
-example/example_ala/out
+example/example_ala/test
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

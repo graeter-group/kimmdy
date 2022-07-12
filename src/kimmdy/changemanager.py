@@ -788,39 +788,39 @@ logging.addLevelName(logging.ERROR, "\033[31mERROR\033[00m")
 logging.addLevelName(logging.WARNING, "\033[33mWARN\033[00m")
 logging.basicConfig(level = logging.INFO,format="\033[34m %(asctime)s\033[00m: %(levelname)s: %(message)s", datefmt="%d-%m-%Y %H:%M",)
 
-#%%
-## Running the script
+# #%%
+# ## Running the script
 
-input = ConversionRecipe()
-input.type = ConversionType.MOVE
-     #from, to   ## from is the hydrogen that gets moved, to is the heavy atom it forms a bond with
+# input = ConversionRecipe()
+# input.type = ConversionType.MOVE
+#      #from, to   ## from is the hydrogen that gets moved, to is the heavy atom it forms a bond with
 
-basedir = Path("/hits/fast/mbm/hartmaec/kimmdy/")
-toppath = Path(basedir / "example/example_ala/Ala_delHA_in.top")
-ffdir = Path(basedir / "example/example_ala/amber99sb-star-ildnp.ff")
-inpath = Path(basedir / "example/example_ala/out/loop_8_12/Ala_in.top")
-outpath_tmp = Path(basedir / "example/example_ala/out/Ala_out_tmp.top")
-#outpath= Path(basedir / "example/example_ala/out/Ala_out.top")
+# basedir = Path("/hits/fast/mbm/hartmaec/kimmdy/")
+# toppath = Path(basedir / "example/example_ala/Ala_delHA_in.top")
+# ffdir = Path(basedir / "example/example_ala/amber99sb-star-ildnp.ff")
+# inpath = Path(basedir / "example/example_ala/out/loop_8_12/Ala_in.top")
+# outpath_tmp = Path(basedir / "example/example_ala/out/Ala_out_tmp.top")
+# #outpath= Path(basedir / "example/example_ala/out/Ala_out.top")
 
-topoldict = read_topol(toppath)
-write_topol(topoldict,inpath)
-topoldict = topol_split_dihedrals(topoldict)
+# topoldict = read_topol(toppath)
+# write_topol(topoldict,inpath)
+# topoldict = topol_split_dihedrals(topoldict)
 
 
-logging.debug(topoldict.keys())
+# logging.debug(topoldict.keys())
 
-#inputs_atom_idx = [['8','9'],['8','7']]
-#inputs_atom_idx = [['11','9'],['11','10']]
-inputs_atom_idx = [['8','9'],['12','7'],['8','10']]
+# #inputs_atom_idx = [['8','9'],['8','7']]
+# #inputs_atom_idx = [['11','9'],['11','10']]
+# inputs_atom_idx = [['8','9'],['12','7'],['8','10']]
 
-if input.type == ConversionType.MOVE:
-    for i in range(3):
-        topoldict = read_topol(inpath)
-        topoldict = topol_split_dihedrals(topoldict)
-        input.atom_idx = inputs_atom_idx[i]
-        outpath_specific = Path(basedir / f"example/example_ala/out/loop_8_12/Ala_{'_'.join(input.atom_idx)}_{i}_cleaned.top")
+# if input.type == ConversionType.MOVE:
+#     for i in range(3):
+#         topoldict = read_topol(inpath)
+#         topoldict = topol_split_dihedrals(topoldict)
+#         input.atom_idx = inputs_atom_idx[i]
+#         outpath_specific = Path(basedir / f"example/example_ala/out/loop_8_12/Ala_{'_'.join(input.atom_idx)}_{i}_cleaned.top")
 
-        topoldict = topol_move_atom(input,topoldict,outpath_tmp,ffdir)
-        topoldict = topol_rmv_propers_impropers(topoldict)
-        write_topol(topoldict,outpath_specific)
-        inpath = outpath_specific
+#         topoldict = topol_move_atom(input,topoldict,outpath_tmp,ffdir)
+#         topoldict = topol_rmv_propers_impropers(topoldict)
+#         write_topol(topoldict,outpath_specific)
+#         inpath = outpath_specific

@@ -1,0 +1,31 @@
+dryrun: false
+iterations: 6
+out: 'test_out_001'
+# ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
+top: 'Ala_out.top'
+gro: 'npt.gro'
+#  idx: 'index_backbone.ndx'
+#plumed:
+#  dat: 'plumed.dat'
+#  distances: 'distances.dat'
+equilibrium:
+  mdp: 'md.mdp'
+  #prod:
+  #mdp: 'pullf1500.mdp'
+changer:
+  coordinates:
+    md:
+      mdp: 'md.mdp'
+reactions:
+  dummyreaction:
+    tprpath: 'md.tpr'
+    trrpath: 'md.trr'
+          #    edis: 'edissoc.dat'
+          #    bonds: 'ffbonded.itp'
+sequence:
+  - equilibrium
+  - 
+    mult: 2
+    tasks:
+      - prod
+      - reactions
