@@ -153,6 +153,7 @@ class RunManager:
         return self
 
     def __next__(self):
+        logging.warning("entering __next__")
         if self.tasks.empty() and self.crr_tasks.empty():
             self.state = State.DONE
             return
@@ -164,8 +165,8 @@ class RunManager:
         if self.config.dryrun:
             logging.info(f"Pretend to run: {task.name} with args: {task.kwargs}")
             return
-        logging.debug("Start task: " + pformat(task))
-        files = task()
+        logging.warning("Starting task: " + pformat(task))
+        files = task()                                  #actually running the task here ??
         self._discover_output_files(task.name, files)
 
     def _discover_output_files(self, taskname, files: TaskFiles):
@@ -175,21 +176,22 @@ class RunManager:
         the file history and latest files.
         """
         # discover other files written by the task
-        for path in files.outputdir.iterdir():
-            suffix = path.suffix[1:]
-            if suffix in AMBIGUOUS_SUFFS:
-                suffix = path.name
-            files.output[suffix] = files.outputdir / path
+        if hasattr(files,'outputdir'):
+            for path in files.outputdir.iterdir():
+                suffix = path.suffix[1:]
+                if suffix in AMBIGUOUS_SUFFS:
+                    suffix = path.name
+                files.output[suffix] = files.outputdir / path
 
-        logging.debug("Update latest files with: ")
-        logging.debug(pformat(files.output))
-        self.latest_files.update(files.output)
-        logging.debug("Append to file history")
-        self.filehist.append({taskname: files})
+            logging.debug("Update latest files with: ")
+            logging.debug(pformat(files.output))
+            self.latest_files.update(files.output)
+            logging.debug("Append to file history")
+            self.filehist.append({taskname: files})
 
     def _create_task_directory(self, prefix: str) -> TaskFiles:
         files = TaskFiles()
-        files.outputdir = self.config.out / f"{prefix}_{self.iteration}"
+        files.outputdir = self.config.out / f"{self.iteration}_{prefix}"
         files.outputdir.mkdir()
         (files.outputdir / self.config.ff.name).symlink_to(self.config.ff)
         return files
@@ -197,7 +199,7 @@ class RunManager:
     def _dummy(self):
         logging.info("Start dummy task")
         files = TaskFiles()
-        files.outputdir = self.config.out / f"dummy_{self.iteration}"
+        files.outputdir = self.config.out / f"{self.iteration}_dummy"
         files.outputdir.mkdir()
         files.input = {
             "top": self.get_latest("top"),
@@ -280,7 +282,7 @@ class RunManager:
     def _query_reactions(self):
         logging.info("Query reactions")
         self.state = State.REACTION
-        files = TaskFiles()
+        files = self._create_task_directory("reaction_query")
 
         reactions = self.config.reactions.get_attributes()
 
@@ -309,7 +311,6 @@ class RunManager:
         self.chosen_recipe = decision_strategy(self.reaction_results)
         logging.info("Chosen recipe is:")
         logging.info(self.chosen_recipe)
-        self.crr_tasks.put(Task(self._run_recipe))
         return None, None
 
     def _run_recipe(self) -> TaskFiles:
@@ -320,13 +321,14 @@ class RunManager:
         files = self._create_task_directory("recipe")
         files.input = {
             "top": self.get_latest("top"),
+            "ff": self.get_latest("ff")
         }
 
         files.output = {
             "top": files.outputdir / "topol_mod.top",
         }
 
-        changer.modify_top(self.chosen_recipe, files.input["top"], files.output["top"])
+        changer.modify_top(self.chosen_recipe, files.input["top"], files.output["top"], files.input["ff"])
         logging.info(f'Wrote new topology to {files.output["top"].parts[-3:]}')
         # changer.modify_plumed(
         #     self.chosen_recipe,

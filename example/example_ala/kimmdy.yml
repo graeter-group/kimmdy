@@ -1,5 +1,5 @@
 dryrun: false
-iterations: 6
+iterations: 30
 out: 'test_out_001'
 # ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
 top: 'Ala_out.top'
@@ -13,7 +13,7 @@ prod:
 changer:
   coordinates:
     md:
-      mdp: 'md.mdp'
+      mdp: 'md_slow.mdp'
 reactions:
   HAT:
     #tprpath: 'md.tpr'
@@ -23,6 +23,7 @@ reactions:
 sequence:
   - equilibrium
   - 
-    mult: 1
+    mult: 6
     tasks:
       - reactions
+      - prod

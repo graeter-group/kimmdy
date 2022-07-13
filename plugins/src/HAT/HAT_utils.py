@@ -586,3 +586,12 @@ def cap_single_rad(u, ts, rad, bonded_rad, h_cutoff=3, env_cutoff=7):
         )
 
     return capped_systems[np.nonzero(capped_systems)[0]]
+
+def find_radical(u):
+    """
+    assumes there is a radical
+    """
+    nbonds = {'H':1,'HC':1,'H1':1,'O':1,'N':3,'C':3,'CT':4}
+    for atom in u.atoms:
+        if len(atom.bonded_atoms) < nbonds[atom.type]:
+            return MDA.AtomGroup([atom])  

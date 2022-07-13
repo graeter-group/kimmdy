@@ -1,5 +1,5 @@
 from kimmdy.reaction import Reaction, ReactionResult, ConversionRecipe, ConversionType
-from .HAT_utils import cap_single_rad
+from .HAT_utils import cap_single_rad, find_radical
 import logging
 from pathlib import Path
 import MDAnalysis as MDA
@@ -25,8 +25,10 @@ class HAT_reaction(Reaction):
         u = MDA.Universe(str(tpr),str(trr),topology_format='tpr',format='trr')
 
 
-        rad = u.select_atoms('resname ALA and name CA')
+        rad = find_radical(u)
+        logging.warning(f"{rad} for {tpr}")
         bonded_rad = rad[0].bonded_atoms
+        logging.debug([u,bonded_rad])
         #print(rad)
         #print(bonded_rad)
 
@@ -34,7 +36,7 @@ class HAT_reaction(Reaction):
         #print(rad.elements)
         #print(rad[0].element)
 
-        subsystems = cap_single_rad(u,u.trajectory[10],rad,bonded_rad,h_cutoff=3)
+        subsystems = cap_single_rad(u,u.trajectory[-1],rad,bonded_rad,h_cutoff=2.5)
 
         #print(subsystems)
 
@@ -43,11 +45,13 @@ class HAT_reaction(Reaction):
         for subsystem in subsystems:
             from_H = subsystem['meta']['indices'][0]
             #print(u.atoms[from_H].index + 1,u.atoms[from_H])
-            from_H_nr = u.atoms[from_H].index + 1
-            rad_nr = rad.atoms[0].index +1
-            CR = ConversionRecipe(type=ConversionType.MOVE,atom_idx=[from_H_nr,rad_nr])
-            RR.recipes.append(CR)
-            RR.rates.append(get_reaction_rates())
+            from_H_nr = str(u.atoms[from_H].index + 1)
+            logging.warning(u.atoms[from_H].resname)
+            if u.atoms[from_H].resname == 'ALA':            #doesn't work with capping groups at the moment
+                rad_nr = str(rad.atoms[0].index +1)
+                CR = ConversionRecipe(type=[ConversionType.MOVE],atom_idx=[[from_H_nr,rad_nr]])
+                RR.recipes.append(CR)
+                RR.rates.append(get_reaction_rates())
 
         logging.info(RR)
         return RR

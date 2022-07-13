@@ -95,7 +95,7 @@ def topol_split_dihedrals(d: Topology):
                 d['impropers'].insert(0,(d['propers'].pop(-1)))
     return d
 
-def topol_rmv_propers_impropers(d: Topology):
+def topol_merge_propers_impropers(d: Topology):
     if all([x in d.keys() for x in ['propers','impropers']]):
         d['dihedrals'].clear()
         d['dihedrals'].extend(d.pop('propers'))

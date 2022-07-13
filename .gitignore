@@ -6,6 +6,7 @@ kimmdy.log
 test_out*/
 example/example_ala/amber99sb-star-ildnp.ff
 example/example_ala/test
+*.gif
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
