@@ -17,7 +17,7 @@ def get_cmdline_args():
     """
     parser = argparse.ArgumentParser(description="Welcome to KIMMDY")
     parser.add_argument(
-        "--input", "-i", type=str, help="kimmdy input file", default="../../example/minimal_example/kimmdy.yml"
+        "--input", "-i", type=str, help="kimmdy input file", default="kimmdy.yml"
     )
     parser.add_argument(
         "--loglevel",
@@ -45,7 +45,7 @@ def configure_logging(args, color=True):
     logging.basicConfig(
         level=getattr(logging, args.loglevel.upper()),
         handlers=[
-            logging.FileHandler(args.logfile, encoding="utf-8", mode="w"),
+            logging.FileHandler(args.logfile, encoding="utf-8", mode="a"),
             logging.StreamHandler(sys.stdout),
         ],
         format="\033[34m %(asctime)s\033[00m: %(levelname)s: %(message)s",
@@ -61,6 +61,7 @@ def _run(args):
     logging.info(args)
 
     config = Config(args.input)
+    logging.info(config)
 
     logging.debug("Using system GROMACS:")
     logging.debug(check_gmx_version(config))

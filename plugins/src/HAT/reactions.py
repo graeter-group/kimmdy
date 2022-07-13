@@ -1,5 +1,5 @@
 from kimmdy.reaction import Reaction, ReactionResult, ConversionRecipe, ConversionType
-from HAT_utils import cap_single_rad
+from .HAT_utils import cap_single_rad
 import logging
 from pathlib import Path
 import MDAnalysis as MDA
@@ -16,7 +16,13 @@ class HAT_reaction(Reaction):
             return rng.random()
         logging.info("Starting HAT reaction, will do cool things")
 
-        u = MDA.Universe(files['HAT']['tprpath'],files['HAT']['trjpath'])
+
+        # tpr = files['HAT']['tprpath']
+        # trr = files['HAT']['trrpath']
+        tpr = files.input["tpr"]
+        trr = files.input["trr"]
+        logging.info([str(tpr),str(trr)])
+        u = MDA.Universe(str(tpr),str(trr),topology_format='tpr',format='trr')
 
 
         rad = u.select_atoms('resname ALA and name CA')
@@ -44,21 +50,23 @@ class HAT_reaction(Reaction):
             RR.rates.append(get_reaction_rates())
 
         logging.info(RR)
-        print(RR)
-        return ReactionResult()
+        return RR
 
     @property
     def type_scheme(self):
         """Dict of types of possible entries in config.
         Used to read and check the input config.
         To not use this feature return empty dict
+        {"HAT":{'tprpath': Path, 'trrpath': Path}}
         """
-        return {"HAT":{'tprpath': Path, 'trrpath': Path}}
+        return dict()
 
 
-# tprpath = Path("/hits/fast/mbm/hartmaec/workdir/HAT_reaction/md_Ala_delHA/md.tpr")
-# trjpath = Path("/hits/fast/mbm/hartmaec/workdir/HAT_reaction/md_Ala_delHA/trjout.pdb")
+#tprpath = Path("/hits/fast/mbm/hartmaec/workdir/HAT_reaction/md_Ala_delHA/md.tpr")
+#trrpath = Path("/hits/fast/mbm/hartmaec/workdir/HAT_reaction/md_Ala_delHA/trjout.pdb")
+# tprpath = Path('/hits/fast/mbm/hartmaec/kimmdys/kimmdy_topology/example/example_ala/test_out_012/production_2/prod.tpr')
+# trrpath = Path('/hits/fast/mbm/hartmaec/kimmdys/kimmdy_topology/example/example_ala/test_out_012/production_2/prod.trr')
 
-# files = {"HAT":{'tprpath':tprpath,'trjpath':trjpath}}
+# files = {"HAT":{'tprpath':tprpath,'trrpath':trrpath}}
 
-# dummy_reaction.get_reaction_result(None,files)
+# HAT_reaction.get_reaction_result(None,files)

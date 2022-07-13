@@ -37,7 +37,7 @@ type_scheme = {
     "top": Path,
     "gro": Path,
     "idx": Path,
-    "plumed": {"dat": Path, "distances": Path},
+    "plumed": bool,
     "minimization": {"mdp": Path, "tpr": Path},
     "equilibration": {
         "nvt": {"mdp": Path, "tpr": Path},
@@ -51,9 +51,9 @@ type_scheme = {
 }
 
 # classes for static code analysis
-class PlumedConfig:
-    dat: Path
-    distances: Path
+# class PlumedConfig:
+#     dat: Path
+#     distances: Path
 
 
 class MinimizationConfig:
@@ -133,7 +133,7 @@ class Config:
     top: Path
     gro: Path
     idx: Path
-    plumed: PlumedConfig
+    plumed: bool
     minimization: MinimizationConfig
     equilibration: EquilibrationConfig
     equilibrium: MdConfig
@@ -296,11 +296,11 @@ class Config:
                         check_file_exists(attr)
 
                 # Check config for consistency
-                if attr_name == "plumed":
-                    for necessary_f in ["dat", "distances"]:
-                        assert (
-                            necessary_f in attr.__dir__()
-                        ), f"{necessary_f} for {attr_name} is missing in config!"
+                # if attr_name == "plumed":
+                #     for necessary_f in ["dat", "distances"]:
+                #         assert (
+                #             necessary_f in attr.__dir__()
+                #         ), f"{necessary_f} for {attr_name} is missing in config!"
 
                 # Validate sequence
                 if isinstance(attr, Sequence):

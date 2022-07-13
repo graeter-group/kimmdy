@@ -44,6 +44,7 @@ def default_decision_strategy(
     total_rate = sum(rates)
     random.seed()
     t = random.random()  # t in [0.0,1.0)
+    logging.info(f"Random value t: {t}")
     rate_running_sum = 0
 
     # if nothing is choosen, return an empty ConversionRecipe
@@ -86,8 +87,6 @@ class RunManager:
             "top": self.config.top,
             "gro": self.config.gro,
             "idx": self.config.idx,
-            "plumed.dat": self.config.plumed.dat,
-            "distances.dat": self.config.plumed.distances,
         }
 
         self.filehist: list[dict[str, TaskFiles]] = [
@@ -95,11 +94,11 @@ class RunManager:
         ]
 
         self.task_mapping: TaskMapping = {
-            "equilibrium": self._run_md_equil,
-            "prod": self._run_md_prod,
-            "minimization": self._run_md_minim,
-            "relax": self._run_md_relax,
-            "reactions": self._query_reactions,
+            "equilibrium": [self._run_md_equil],
+            "prod": [self._run_md_prod],
+            "minimization": [self._run_md_minim],
+            "relax": [self._run_md_relax],
+            "reactions": [self._query_reactions,self._decide_reaction,self._run_recipe],
         }
 
         logging.debug("Configuration from input file:")
@@ -125,9 +124,10 @@ class RunManager:
         logging.info("Start run")
         logging.info("Build task list")
 
-        for task in self.config.sequence:
-            logging.debug(f"Put Task: {self.task_mapping[task]}")
-            self.tasks.put(Task(self.task_mapping[task]))
+        for entry in self.config.sequence:           #allows for mapping one config entry to multiple tasks
+            for task in self.task_mapping[entry]:
+                logging.info(f"Put Task: {task}")
+                self.tasks.put(Task(task))
 
         while not (self.state is State.DONE or self.iteration >= self.iterations):
             next(self)
@@ -254,7 +254,6 @@ class RunManager:
             "mdp": self.config.prod.mdp,
             "idx": self.config.idx,
             "cpt": self.get_latest("cpt"),
-            "plumed.dat": self.get_latest("plumed.dat"),
         }
         files = md.production(files)
         logging.info("Done with production MD")
@@ -288,11 +287,9 @@ class RunManager:
             # TODO: Make this general for all reactions.
             # Maybe with a dict keeping all the newest files.
             files.input = {
-                "plumed.dat": self.get_latest("plumed.dat"),
-                "distances.dat": self.get_latest("distances.dat"),
                 "top": self.get_latest("top"),
-                "ffbonded.itp": self.config.reactions.homolysis.bonds,
-                "edissoc.dat": self.config.reactions.homolysis.edis,
+                "tpr": self.get_latest("tpr"),
+                "trr": self.get_latest("trr")
             }
             self.reaction_results.append(reaction().get_reaction_result(files))
 
@@ -320,24 +317,21 @@ class RunManager:
         files = self._create_task_directory("recipe")
         files.input = {
             "top": self.get_latest("top"),
-            "plumed.dat": self.get_latest("plumed.dat"),
         }
 
         files.output = {
             "top": files.outputdir / "topol_mod.top",
-            "plumed.dat": files.outputdir / "plumed.dat",
-            "distances.dat": files.outputdir / "distances.dat",
         }
 
         changer.modify_top(self.chosen_recipe, files.input["top"], files.output["top"])
         logging.info(f'Wrote new topology to {files.output["top"].parts[-3:]}')
-        changer.modify_plumed(
-            self.chosen_recipe,
-            files.input["plumed.dat"],
-            files.output["plumed.dat"],
-            files.output["plumed.dist"],
-        )
-        logging.info(f'Wrote new plumedfile to {files.output["plumed.dat"].parts[-3:]}')
+        # changer.modify_plumed(
+        #     self.chosen_recipe,
+        #     files.input["plumed.dat"],
+        #     files.output["plumed.dat"],
+        #     files.output["plumed.dist"],
+        # )
+        # logging.info(f'Wrote new plumedfile to {files.output["plumed.dat"].parts[-3:]}')
         logging.info(f"Looking for md in {self.config.changer.coordinates.__dict__}")
         # TODO clean this up, maybe make function for this in config
         if hasattr(self.config, "changer"):
