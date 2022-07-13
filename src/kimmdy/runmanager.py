@@ -44,15 +44,18 @@ def default_decision_strategy(
     total_rate = sum(rates)
     random.seed()
     t = random.random()  # t in [0.0,1.0)
-    logging.info(f"Random value t: {t}")
+    logging.debug(f"Random value t: {t}, rates {rates}, total rate {total_rate}")
     rate_running_sum = 0
 
     # if nothing is choosen, return an empty ConversionRecipe
     result = ConversionRecipe()
     for i in range(len(rates)):
         rate_running_sum += rates[i]
+        logging.debug(f"{t*total_rate} compared to {rate_running_sum}: {(t*total_rate) <= rate_running_sum}")
         if (t * total_rate) <= rate_running_sum:
             result = recipes[i]
+            break
+    logging.debug(f"Result: {result}")
 
     return result
 
