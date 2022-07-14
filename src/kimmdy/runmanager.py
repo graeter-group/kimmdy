@@ -283,6 +283,7 @@ class RunManager:
         logging.info("Query reactions")
         self.state = State.REACTION
         files = self._create_task_directory("reaction_query")
+        self.reaction_results: list[ReactionResult] = []                # empty list for every new round of queries
 
         reactions = self.config.reactions.get_attributes()
 
@@ -308,6 +309,7 @@ class RunManager:
         ] = default_decision_strategy,
     ):
         logging.info("Decide on a reaction")
+        logging.warning(f"Available reactions: {self.reaction_results}")
         self.chosen_recipe = decision_strategy(self.reaction_results)
         logging.info("Chosen recipe is:")
         logging.info(self.chosen_recipe)

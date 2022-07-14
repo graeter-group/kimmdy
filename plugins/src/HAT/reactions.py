@@ -36,7 +36,7 @@ class HAT_reaction(Reaction):
         #print(rad.elements)
         #print(rad[0].element)
 
-        subsystems = cap_single_rad(u,u.trajectory[-1],rad,bonded_rad,h_cutoff=2.5)
+        subsystems = cap_single_rad(u,u.trajectory[-2],rad,bonded_rad,h_cutoff=3.5)
 
         #print(subsystems)
 
@@ -53,7 +53,7 @@ class HAT_reaction(Reaction):
                 RR.recipes.append(CR)
                 RR.rates.append(get_reaction_rates())
 
-        logging.info(RR)
+        logging.warning(f"Returning exactly these recipes to runmanager: {RR}")
         return RR
 
     @property

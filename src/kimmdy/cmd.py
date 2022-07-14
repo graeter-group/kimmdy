@@ -45,7 +45,7 @@ def configure_logging(args, color=True):
     logging.basicConfig(
         level=getattr(logging, args.loglevel.upper()),
         handlers=[
-            logging.FileHandler(args.logfile, encoding="utf-8", mode="a"),
+            logging.FileHandler(args.logfile, encoding="utf-8", mode="w"),
             logging.StreamHandler(sys.stdout),
         ],
         format="\033[34m %(asctime)s\033[00m: %(levelname)s: %(message)s",

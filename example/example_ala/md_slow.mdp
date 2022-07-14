@@ -1,20 +1,20 @@
 title                   = OPLS Lysozyme NPT equilibration 
 ; Run parameters
 integrator              = md        ; leap-frog integrator
-nsteps                  = 10000    ; 2 * 100000 = 1000 ps (0.2 ns)
+nsteps                  = 500    ; 2 * 100000 = 1000 ps (0.2 ns)
 dt                      = 0.0002     ; 0.5 fs
 ; Output control
 nstenergy               = 5000      ; save energies every 10.0 ps
 nstlog                  = 5000      ; update log file every 10.0 ps
-nstxout			= 1000
-nstvout			= 1000
-nstfout			= 1000
-nstxout-compressed      = 1000      ; save compressed coordinates every 10.0 ps
+nstxout			= 20
+nstvout			= 20
+nstfout			= 20
+nstxout-compressed      = 20      ; save compressed coordinates every 10.0 ps
 compressed-x-grps       = System    ; save the whole system
 ; Bond parameters
 continuation            = yes       ; Restarting after NPT 
 constraint_algorithm    = lincs     ; holonomic constraints 
-constraints             = h-bonds   ; bonds involving H are constrained
+constraints             = none   ; bonds involving H are constrained
 lincs_iter              = 1         ; accuracy of LINCS
 lincs_order             = 4         ; also related to accuracy
 ; Neighborsearching
