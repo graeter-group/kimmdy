@@ -260,6 +260,8 @@ def cap_aa(atms):
     )
     cap_atms = []
     cap_ix = []
+    cap = MDA.Universe.empty(0).atoms
+    return cap, cap_ix              # dont need caps at the moment
 
     h_bondlength = 1.01
 

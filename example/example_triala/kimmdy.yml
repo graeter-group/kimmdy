@@ -2,18 +2,18 @@ dryrun: false
 iterations: 100
 out: 'test_out_001'
 # ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
-top: 'Ala_out.top'
+top: 'triala_out.top'
 gro: 'npt.gro'
 idx: 'index.ndx'
 plumed: false
 equilibrium:
   mdp: 'md.mdp'
 prod:
-  mdp: 'md.mdp'
+  mdp: 'md_slow.mdp'
 changer:
   coordinates:
     md:
-      mdp: 'md_slow.mdp'
+      mdp: 'minim.mdp'
 reactions:
   HAT:
     #tprpath: 'md.tpr'
@@ -27,3 +27,4 @@ sequence:
     tasks:
       - reactions
       - prod
+      - equilibrium

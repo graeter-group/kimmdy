@@ -4,7 +4,8 @@
 # our own program output
 kimmdy.log
 test_out*/
-example/example_ala/amber99sb-star-ildnp.ff
+dump/
+amber99sb-star-ildnp.ff/
 example/example_ala/test
 *.gif
 *.log

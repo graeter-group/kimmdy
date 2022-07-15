@@ -27,6 +27,7 @@ class HAT_reaction(Reaction):
 
         rad = find_radical(u)
         logging.warning(f"{rad} for {tpr}")
+        logging.warning([u.atoms[:20].elements,u.atoms[:20].types])
         bonded_rad = rad[0].bonded_atoms
         logging.debug([u,bonded_rad])
         #print(rad)
@@ -47,7 +48,7 @@ class HAT_reaction(Reaction):
             #print(u.atoms[from_H].index + 1,u.atoms[from_H])
             from_H_nr = str(u.atoms[from_H].index + 1)
             logging.warning(u.atoms[from_H].resname)
-            if u.atoms[from_H].resname == 'ALA':            #doesn't work with capping groups at the moment
+            if u.atoms[from_H].resname not in ['NME','ACE']:            #doesn't work with capping groups at the moment
                 rad_nr = str(rad.atoms[0].index +1)
                 CR = ConversionRecipe(type=[ConversionType.MOVE],atom_idx=[[from_H_nr,rad_nr]])
                 RR.recipes.append(CR)
