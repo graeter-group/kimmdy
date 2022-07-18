@@ -90,6 +90,7 @@ def production(files: TaskFiles) -> TaskFiles:
     mdp = files.input["mdp"]
     idx = files.input["idx"]
     cpt = files.input["cpt"]
+    plumed_dat = files.input["plumed.dat"]
     tpr = outputdir / "prod.tpr"
     outgro = outputdir / "prod.gro"
     outtrr = outputdir / "prod.trr"
@@ -101,7 +102,7 @@ def production(files: TaskFiles) -> TaskFiles:
         outputdir,
     )
     run_shell_cmd(
-        f"gmx mdrun -v -s {tpr} -c {outgro} -o {outtrr}",
+        f"gmx mdrun -v -s {tpr} -c {outgro} -plumed {plumed_dat} -o {outtrr}",
         outputdir,
     )
 

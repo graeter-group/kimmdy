@@ -1,5 +1,5 @@
 from kimmdy.reaction import Reaction, ReactionResult, ConversionRecipe, ConversionType
-from .HAT_utils import cap_single_rad, find_radical
+from .HAT_utils import cap_single_rad, find_radicals
 import logging
 from pathlib import Path
 import MDAnalysis as MDA
@@ -25,9 +25,13 @@ class HAT_reaction(Reaction):
         u = MDA.Universe(str(tpr),str(trr),topology_format='tpr',format='trr')
 
 
-        rad = find_radical(u)
+        rad = find_radicals(u)
         logging.warning(f"{rad} for {tpr}")
         logging.warning([u.atoms[:20].elements,u.atoms[:20].types])
+        if len(rad.atoms) == 0:     #no radical found
+            logging.info("no radical found, returning zero rate recipe")
+            return ReactionResult(recipes=[],rates=[0])
+
         bonded_rad = rad[0].bonded_atoms
         logging.debug([u,bonded_rad])
         #print(rad)

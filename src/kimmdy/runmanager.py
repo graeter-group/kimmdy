@@ -91,6 +91,10 @@ class RunManager:
             "gro": self.config.gro,
             "idx": self.config.idx,
         }
+        if self.config.plumed:
+            logging.warning(f"plumed settings: {self.config.plumed}")
+            self.latest_files["plumed.dat"] = self.config.plumed.dat
+            self.latest_files["distances.dat"] = self.config.plumed.distances
 
         self.filehist: list[dict[str, TaskFiles]] = [
             {"setup": TaskFiles(input=self.latest_files)}
@@ -260,6 +264,8 @@ class RunManager:
             "idx": self.config.idx,
             "cpt": self.get_latest("cpt"),
         }
+        if self.config.plumed:
+            files.input["plumed.dat"] = self.get_latest("plumed.dat")
         files = md.production(files)
         logging.info("Done with production MD")
         return files
@@ -286,6 +292,7 @@ class RunManager:
         self.reaction_results: list[ReactionResult] = []                # empty list for every new round of queries
 
         reactions = self.config.reactions.get_attributes()
+        logging.warning(f"Trying following reactions: {reactions}")
 
         for react_name in reactions:
             reaction = plugins[react_name]
@@ -297,6 +304,12 @@ class RunManager:
                 "tpr": self.get_latest("tpr"),
                 "trr": self.get_latest("trr")
             }
+            if react_name == 'homolysis':
+                files.input["plumed.dat"] = self.get_latest("plumed.dat")                
+                files.input["distances.dat"] = self.get_latest("distances.dat")
+                files.input["ffbonded.itp"]= self.config.reactions.homolysis.bonds
+                files.input["edissoc.dat"] = self.config.reactions.homolysis.edis
+
             self.reaction_results.append(reaction().get_reaction_result(files))
 
         logging.info("Reaction done")

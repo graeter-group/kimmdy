@@ -35,7 +35,7 @@ def break_bond_top(topology: Topology, breakpair: tuple[int, int]) -> Topology:
     topology["bonds"] = [
         bond
         for bond in topology["bonds"]
-        if not bond[0] in breakpair and not bond[1] in breakpair
+        if not all(x in breakpair for x in [bond[0],bond[1]])
     ]
     topology["pairs"] = [
         pair
@@ -83,11 +83,13 @@ def move_bond_top(topology: Topology, movepair: tuple[int, int], ffdir: Path) ->
     toGraph.build_PADs()
 
     atoms_idxs = toGraph.atoms_idx
+    atoms_idxs_from = fromGraph.atoms_idx
     H_atomtype, H_atomname = toGraph.get_H_ff_at_an(movepair[1])
     toGraph.AtomList[atoms_idxs.index(movepair[0])].atomtype = H_atomtype        # setting the correct atomtype for the HAT hydrogen based on the ff definition
     toGraph.AtomList[atoms_idxs.index(movepair[0])].atomname = H_atomname
-    toGraph.AtomList[atoms_idxs.index(movepair[0])].resname = toGraph.AtomList[atoms_idxs.index(heavy_idx)].resname   # give HAT hydrogen same resname as heavy atom
-    topol_change_at_an(topology,[movepair[0],H_atomtype,H_atomname,toGraph.AtomList[atoms_idxs.index(heavy_idx)].resname])             # changing the atom entry of topology
+    logging.warning([fromGraph.atoms_idx,toGraph.atoms_idx])
+    toGraph.AtomList[atoms_idxs.index(movepair[0])].resname = fromGraph.AtomList[atoms_idxs_from.index(heavy_idx)].resname   # give HAT hydrogen same resname as heavy atom
+    topol_change_at_an(topology,[movepair[0],H_atomtype,H_atomname,toGraph.AtomList[atoms_idxs.index(movepair[0])].resname])             # changing the atom entry of topology
     toGraph.update_atoms_list()
     
  

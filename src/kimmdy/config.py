@@ -37,7 +37,7 @@ type_scheme = {
     "top": Path,
     "gro": Path,
     "idx": Path,
-    "plumed": bool,
+    "plumed": None,
     "minimization": {"mdp": Path, "tpr": Path},
     "equilibration": {
         "nvt": {"mdp": Path, "tpr": Path},
@@ -133,7 +133,7 @@ class Config:
     top: Path
     gro: Path
     idx: Path
-    plumed: bool
+    plumed: None
     minimization: MinimizationConfig
     equilibration: EquilibrationConfig
     equilibrium: MdConfig
