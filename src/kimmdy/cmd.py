@@ -1,5 +1,6 @@
 import argparse
 import logging
+from pathlib import Path
 from kimmdy.config import Config
 from kimmdy.runmanager import RunManager
 from kimmdy.utils import check_gmx_version
@@ -52,8 +53,21 @@ def configure_logging(args, color=True):
     )
 
 
+def kimmdy_run(
+    input: Path = Path("kimmdy.yml"),
+    loglevel: str = "DEBUG",
+    logfile: Path = Path("kimmdy.log"),
+):
+    """Run KIMMDY python."""
+    args = argparse.Namespace(input=input, loglevel=loglevel, logfile=logfile)
+    configure_logging(args)
+    config = Config(args.input)
+    runmgr = RunManager(config)
+    runmgr.run()
+
+
 def kimmdy():
-    """Run KIMMDY.
+    """Run KIMMDY from the command line.
 
     The configuration is gathered from the input file,
     which is `kimmdy.yml` by default.
