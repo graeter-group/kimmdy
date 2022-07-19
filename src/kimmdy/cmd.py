@@ -53,26 +53,7 @@ def configure_logging(args, color=True):
     )
 
 
-def kimmdy_run(
-    input: Path = Path("kimmdy.yml"),
-    loglevel: str = "DEBUG",
-    logfile: Path = Path("kimmdy.log"),
-):
-    """Run KIMMDY from python."""
-    args = argparse.Namespace(input=input, loglevel=loglevel, logfile=logfile)
-    configure_logging(args)
-    config = Config(args.input)
-    runmgr = RunManager(config)
-    runmgr.run()
-
-
-def kimmdy():
-    """Run KIMMDY from the command line.
-
-    The configuration is gathered from the input file,
-    which is `kimmdy.yml` by default.
-    """
-    args = get_cmdline_args()
+def _run(args):
     configure_logging(args)
 
     logging.info("Welcome to KIMMDY")
@@ -86,6 +67,26 @@ def kimmdy():
 
     runmgr = RunManager(config)
     runmgr.run()
+
+
+def kimmdy_run(
+    input: Path = Path("kimmdy.yml"),
+    loglevel: str = "DEBUG",
+    logfile: Path = Path("kimmdy.log"),
+):
+    """Run KIMMDY from python."""
+    args = argparse.Namespace(input=input, loglevel=loglevel, logfile=logfile)
+    _run(args)
+
+
+def kimmdy():
+    """Run KIMMDY from the command line.
+
+    The configuration is gathered from the input file,
+    which is `kimmdy.yml` by default.
+    """
+    args = get_cmdline_args()
+    _run(args)
 
 
 if __name__ == "__main__":
