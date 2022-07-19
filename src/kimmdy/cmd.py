@@ -58,7 +58,7 @@ def kimmdy_run(
     loglevel: str = "DEBUG",
     logfile: Path = Path("kimmdy.log"),
 ):
-    """Run KIMMDY python."""
+    """Run KIMMDY from python."""
     args = argparse.Namespace(input=input, loglevel=loglevel, logfile=logfile)
     configure_logging(args)
     config = Config(args.input)
