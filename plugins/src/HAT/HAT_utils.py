@@ -9,6 +9,7 @@ import numpy as np
 import random
 from scipy.spatial.transform import Rotation
 from tqdm.autonotebook import tqdm
+import logging
 
 # %% Functions
 
@@ -481,6 +482,7 @@ def cap_single_rad(u, ts, rad, bonded_rad, h_cutoff=3, env_cutoff=7):
     """
     # selecting in a smaller env is faster than in whole universe
     #print('Starting cap_single_rad')
+    logging.warning(rad.positions)
     env = u.atoms.select_atoms(
         f"point { str(rad.positions).strip('[ ]') } {env_cutoff}"
     )
@@ -591,11 +593,24 @@ def cap_single_rad(u, ts, rad, bonded_rad, h_cutoff=3, env_cutoff=7):
 
 def find_radicals(u):
     """
-    assumes there is 1/0 radicals
+    finds radicals in a MDAnalysis universe
     """
-    nbonds = {'H':1,'HC':1,'H1':1,'O':1,'N':3,'C':3,'CT':4}
+    nbonds_dict = {
+        ('MG','NA','CO'):0,
+        ('H','HW','HO','HS','HA','HC','H1','H2','H3','HP','H4','H5','HO','H0','HP','O','O2','Cl','Na','I','F','Br'):1,
+        ('NB','NC','OW','OH','OS','SH','S'):2,
+        ('C','CN','CB','CR','CK','CC','CW','CV','C*','CQ','CM','CA','CD','CZ','N','NA','N*','N2'):3,
+        ('CT','N3','P','SO'):4}                                               #compare to atom type perception paper (2006) same as in changemanager.py
+    atoms = []
     for atom in u.atoms:
         if atom.resname == 'SOL':
-            return MDA.Universe.empty(0).atoms  #empty atom group  
-        if len(atom.bonded_atoms) < nbonds[atom.type]:
-            return MDA.AtomGroup([atom])  
+            break  #empty atom group  
+        try:
+            nbonds = [v for k,v in nbonds_dict.items() if atom.type in k][0]
+        except IndexError:
+            raise IndexError("{} not in atomtype dictionary nbonds_dict".format(atom.type))
+        if len(atom.bonded_atoms) < nbonds:
+            atoms.append(MDA.AtomGroup([atom]))
+    if len(atoms) == 0:
+        return [MDA.Universe.empty(0).atoms]
+    return atoms 

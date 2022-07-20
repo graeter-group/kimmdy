@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 printf "1\n1\n " | gmx pdb2gmx -f pep.pdb -o pep.gro -p pep_out.top -ignh
-gmx editconf -f pep.gro -o pep_box.gro -c -d 1.2 -bt dodecahedron
+gmx editconf -f pep.gro -o pep_box.gro -c -d 3 -bt dodecahedron
 gmx solvate -cp pep_box.gro -p pep_out.top -o pep_solv.gro
 
 gmx grompp -f ions.mdp -c pep_solv.gro -p pep_out.top -o pep_out_genion.tpr

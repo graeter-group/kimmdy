@@ -6,6 +6,7 @@ import numpy as np
 rng = np.random.default_rng()
 
 from kimmdy.utils import write_conditions_in_plumedfile
+from kimmdy.cmd import kimmdy_run
 
 
 basedir = Path("/hits/fast/mbm/hartmaec/kimmdys/kimmdy_topology/example/example_rngpeps")
@@ -43,5 +44,8 @@ for i in range(10):
     indexfile = str(currdir / "index.ndx")
     outplumed = str(currdir / "plumed.dat")
     write_conditions_in_plumedfile(topfile, indexfile, 'Backbone',outplumed)
+    kimmdy_run((currdir/"kimmdy.yml"),logfile=(currdir/"kimmdy.log"))
+
+
 
     

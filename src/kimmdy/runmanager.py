@@ -92,9 +92,9 @@ class RunManager:
             "idx": self.config.idx,
         }
         if self.config.plumed:
-            logging.warning(f"plumed settings: {self.config.plumed}")
-            self.latest_files["plumed.dat"] = self.config.plumed.dat
-            self.latest_files["distances.dat"] = self.config.plumed.distances
+            
+            self.latest_files["plumed.dat"] = Path(self.config.cwd / self.config.plumed.dat)
+            self.latest_files["distances.dat"] = Path(self.config.cwd / self.config.plumed.distances)
 
         self.filehist: list[dict[str, TaskFiles]] = [
             {"setup": TaskFiles(input=self.latest_files)}

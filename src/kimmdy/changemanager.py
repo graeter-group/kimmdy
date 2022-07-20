@@ -438,10 +438,20 @@ class localGraph:
         # if None in self.atoms_atomtype:
         #     self.get_atomprop('atomtype')
 
-        bonds = {'H':1,'HC':1,'H1':1,'O':1,'N':3,'C':3,'CT':4} #not exhaustive,yet 
+        nbonds_dict = {
+            ('MG','NA','CO'):0,
+            ('H','HW','HO','HS','HA','HC','H1','H2','H3','HP','H4','H5','HO','H0','HP','O','O2','Cl','Na','I','F','Br'):1,
+            ('NB','NC','OW','OH','OS','SH','S'):2,
+            ('C','CN','CB','CR','CK','CC','CW','CV','C*','CQ','CM','CA','CD','CZ','N','NA','N*','N2'):3,
+            ('CT','N3','P','SO'):4}                                               #compare to atom type perception paper (2006) same as in HAT_utils.py
+        atom_type = self.atoms_atomtype[self.atoms_idx.index(atom_idx)]
+        try:
+            nbonds = [v for k,v in nbonds_dict.items() if atom_type in k][0]
+        except IndexError:
+            raise IndexError("{} not in atomtype dictionary nbonds_dict".format(atom_type))
  
         logging.debug(f"Potential radical with index {atom_idx} is bound to {self.AtomList[self.atoms_idx.index(atom_idx)].bound_to} other atoms")
-        if len(self.AtomList[self.atoms_idx.index(atom_idx)].bound_to) < bonds[self.atoms_atomtype[self.atoms_idx.index(atom_idx)]]:
+        if len(self.AtomList[self.atoms_idx.index(atom_idx)].bound_to) < nbonds:
             logging.info(f"{atom_idx} is a radical")
             return True
         else:
