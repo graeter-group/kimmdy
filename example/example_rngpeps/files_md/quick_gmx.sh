@@ -15,3 +15,4 @@ wait
 gmx grompp -f npt.mdp -c nvt.gro -p pep_out.top -o npt.tpr
 gmx mdrun -v -deffnm npt
 wait
+echo "q" | gmx make_ndx -f npt.gro

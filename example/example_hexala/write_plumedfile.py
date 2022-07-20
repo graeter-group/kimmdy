@@ -13,7 +13,7 @@ def get_data_from_file(filepath):
 
     return data_all, data_array
 
-def write_conditions_in_plumedfile(topfile, indexfile, indexgroup):
+def write_conditions_in_plumedfile(topfile, indexfile, indexgroup,outplumed):
     #use once to create index and plumed file with all necessary entries / conditons.
     # to be adjusted system specific.
     #uses atoms from given indexgroup (and, hardcoded, crosslinks, if not commented out). Skips bonds that include hydrogens or oxygens since they are not break-relevant.
@@ -91,7 +91,7 @@ def write_conditions_in_plumedfile(topfile, indexfile, indexgroup):
 
     #write plumed-file
     print_arg = ''
-    file = open('/hits/fast/mbm/hartmaec/kimmdys/kimmdy_topology/example/example_hexala/plumed.dat', "a")   #open in  append mode
+    file = open(outplumed, "a")   #open in  append mode
     file.write ('#Define distances \n')
     for pair_nbr in range(cond_nconds):
         nbr1 = list_of_non_h_bonds[pair_nbr][0]
@@ -108,4 +108,5 @@ def write_conditions_in_plumedfile(topfile, indexfile, indexgroup):
 topfile = '/hits/fast/mbm/hartmaec/kimmdys/kimmdy_topology/example/example_hexala/hexala_out.top'
 indexfile = '/hits/fast/mbm/hartmaec/kimmdys/kimmdy_topology/example/example_hexala/index.ndx'
 indexgroup = 'Backbone'
-write_conditions_in_plumedfile(topfile, indexfile, indexgroup)
+outplumed = '/hits/fast/mbm/hartmaec/kimmdys/kimmdy_topology/example/example_hexala/plumed.dat'
+write_conditions_in_plumedfile(topfile, indexfile, indexgroup,outplumed)

@@ -5,6 +5,8 @@ import subprocess as sp
 import numpy as np
 rng = np.random.default_rng()
 
+from kimmdy.utils import write_conditions_in_plumedfile
+
 
 basedir = Path("/hits/fast/mbm/hartmaec/kimmdys/kimmdy_topology/example/example_rngpeps")
 del_old = True
@@ -37,5 +39,9 @@ for i in range(10):
 
     shutil.copy2(currdir/f"pep{i}.pdb",currdir/"pep.pdb")
     sp.run("bash quick_gmx.sh",shell=True,cwd=currdir)
+    topfile = str(currdir / "pep_out.top")
+    indexfile = str(currdir / "index.ndx")
+    outplumed = str(currdir / "plumed.dat")
+    write_conditions_in_plumedfile(topfile, indexfile, 'Backbone',outplumed)
 
     
