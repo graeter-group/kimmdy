@@ -12,7 +12,8 @@ from kimmdy.cmd import kimmdy_run
 basedir = Path("/hits/fast/mbm/hartmaec/kimmdys/kimmdy_topology/example/example_rngpeps")
 del_old = True
 
-for i in range(10):
+for i in range(20,30):
+    os.chdir(basedir)
     currdir = basedir / str(i)
     if del_old:
         if currdir.exists():
@@ -44,7 +45,11 @@ for i in range(10):
     indexfile = str(currdir / "index.ndx")
     outplumed = str(currdir / "plumed.dat")
     write_conditions_in_plumedfile(topfile, indexfile, 'Backbone',outplumed)
-    kimmdy_run((currdir/"kimmdy.yml"),logfile=(currdir/"kimmdy.log"))
+    os.chdir(currdir)
+    try:
+        kimmdy_run(logfile=Path(currdir / "kimmdy_01.log"),loglevel="INFO")
+    except:
+        continue
 
 
 

@@ -142,7 +142,8 @@ def write_plumed(d, path: Path) -> None:
     """Write a plumed.dat configuration file."""
     with open(path, "w") as f:
         for l in d["distances"]:
-            f.write(f"{l['id']}: {l['keyword']} ATOMS={','.join(l['atoms'])}\n")
+            f.write(f"{l['id']}: {l['keyword']} ATOMS={','.join(l['atoms'])} \n")
+        f.write("\n")
         for l in d["prints"]:
             f.write(
                 f"{l['PRINT']} ARG={','.join(l['ARG'])} STRIDE={str(l['STRIDE'])} FILE={str(l['FILE'])}\n"

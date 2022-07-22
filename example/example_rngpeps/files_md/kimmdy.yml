@@ -25,7 +25,7 @@ sequence:
   - equilibrium
   - prod
   -
-    mult: 3
+    mult: 10
     tasks:
       - reactions
       - equilibrium

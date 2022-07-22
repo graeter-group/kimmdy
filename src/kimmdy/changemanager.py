@@ -35,23 +35,34 @@ def break_bond_top(topology: Topology, breakpair: tuple[int, int]) -> Topology:
     topology["bonds"] = [
         bond
         for bond in topology["bonds"]
-        if not all(x in breakpair for x in [bond[0],bond[1]])
-    ]
-    topology["pairs"] = [
-        pair
-        for pair in topology["pairs"]
-        if not pair[0] in breakpair and not pair[1] in breakpair
+        if not all(x in [bond[0],bond[1]] for x in breakpair)
     ]
     topology["angles"] = [
         angle
         for angle in topology["angles"]
-        if not angle[0] in breakpair and not angle[1] in breakpair
+        if not all(x in [angle[0],angle[1],angle[2]] for x in breakpair)
     ]
     topology["dihedrals"] = [
         dihedral
         for dihedral in topology["dihedrals"]
-        if not dihedral[1] in breakpair and not dihedral[2] in breakpair
+        if not all(x in [dihedral[0],dihedral[1],dihedral[2],dihedral[3]] for x in breakpair)
     ]
+    dihpairs = [[d[0],d[3]] for d in topology['dihedrals']]
+    logging.warning(dihpairs)
+    for pair in dihpairs:                              # keeping pairs in proper order (which one goes first in the definition)
+        if str_to_int(pair[0]) != 0 and str_to_int(pair[1]) != 0:
+            pair_int = [int(pair[0]),int(pair[1])]
+            if pair_int[0] > pair_int[1]:
+                pair.reverse()
+    dihpairs = sorted(dihpairs,key=eval_bond)
+    logging.warning(dihpairs)
+    logging.warning(topology['pairs'])
+    topology["pairs"] = [
+        pair
+        for pair in topology["pairs"]
+        if pair[:2] in dihpairs
+    ]
+    logging.warning(topology['pairs'])
     return topology
 
 def move_bond_top(topology: Topology, movepair: tuple[int, int], ffdir: Path) -> Topology:
@@ -133,7 +144,7 @@ def break_bond_plumed(plumeddat, breakpair, newplumeddist):
 
     for line in plumeddat["prints"]:
         line["ARG"] = [id for id in line["ARG"] if not id in broken_distances]
-        line["FIlE"] = newplumeddist
+        line["FILE"] = newplumeddist
 
     return plumeddat
 
@@ -148,13 +159,13 @@ def modify_plumed(
     recipe: ConversionRecipe,
     oldplumeddat: Path,
     newplumeddat: Path,
-    newplumeddist: Path,
+    newplumeddist: str,
 ):
 
     logging.info(
-        f"Reading: {oldplumeddat} and writing modified plumed input to {newplumeddat}. Also writing {newplumeddist}."
-    )
-    plumeddat = read_plumed(oldplumeddat)
+        f"Reading: {oldplumeddat} and writing modified plumed input to {newplumeddat}."
+    )           #  Also writing {newplumeddist}.  nonono this is written during the next md run
+    plumeddat = read_plumed(oldplumeddat)   
 
     for type, pair in zip(recipe.type, recipe.atom_idx):
         if type == ConversionType.BREAK:
@@ -184,7 +195,7 @@ def str_to_int(elem):
     try:
         return(int(elem))
     except ValueError:
-        logging.debug("Not all List elements are integers! Returning 0")
+        #logging.debug("Not all List elements are integers! Returning 0")
         return(0)
 
 def eval_bond(entry):

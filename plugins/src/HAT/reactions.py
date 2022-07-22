@@ -45,7 +45,7 @@ class HAT_reaction(Reaction):
                     RR.recipes.append(CR)
                     RR.rates.append(get_reaction_rates())
 
-            logging.warning(f"Returning exactly these recipes to runmanager: {RR}")
+        logging.warning(f"Returning exactly these recipes to runmanager: {RR}")
         return RR
 
     @property

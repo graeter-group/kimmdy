@@ -7,7 +7,7 @@ from enum import Enum, auto
 from typing import Callable
 from kimmdy.config import Config
 from kimmdy.reactions.homolysis import Homolysis
-from kimmdy.reaction import ReactionResult, ConversionRecipe
+from kimmdy.reaction import ReactionResult, ConversionRecipe, ConversionType
 import kimmdy.mdmanager as md
 import kimmdy.changemanager as changer
 from kimmdy.tasks import Task, TaskFiles, TaskMapping
@@ -340,18 +340,23 @@ class RunManager:
         }
 
         files.output = {
-            "top": files.outputdir / "topol_mod.top",
+            "top": files.outputdir / "topol_mod.top"
         }
 
         changer.modify_top(self.chosen_recipe, files.input["top"], files.output["top"], files.input["ff"])
         logging.info(f'Wrote new topology to {files.output["top"].parts[-3:]}')
-        # changer.modify_plumed(
-        #     self.chosen_recipe,
-        #     files.input["plumed.dat"],
-        #     files.output["plumed.dat"],
-        #     files.output["plumed.dist"],
-        # )
-        # logging.info(f'Wrote new plumedfile to {files.output["plumed.dat"].parts[-3:]}')
+        logging.warning(self.chosen_recipe.type)
+        if self.chosen_recipe.type == [ConversionType.BREAK]:
+            files.input["plumed.dat"] = self.get_latest("plumed.dat")
+            files.output["plumed.dat"] = files.outputdir / "plumed_mod.dat"
+            files.output["distances.dat"] = "distances.dat"
+            changer.modify_plumed(
+                self.chosen_recipe,
+                files.input["plumed.dat"],
+                files.output["plumed.dat"],
+                files.output["distances.dat"],
+            )
+            logging.info(f'Wrote new plumedfile to {files.output["plumed.dat"].parts[-3:]}')
         logging.info(f"Looking for md in {self.config.changer.coordinates.__dict__}")
         # TODO clean this up, maybe make function for this in config
         if hasattr(self.config, "changer"):
