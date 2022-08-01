@@ -211,7 +211,7 @@ def check_gmx_version(config: Config):
         m = "No system gromacs detected. With error: " + str(e)
         logging.error(m)
         raise SystemError(m)
-    if 'plumed' in config.get_attributes() and not "MODIFIED" in version:
+    if config.plumed and not "MODIFIED" in version:
         m = "GROMACS version does not contain MODIFIED, aborting due to lack of PLUMED patch."
         logging.error(m)
         logging.error("Version was: " + version)
