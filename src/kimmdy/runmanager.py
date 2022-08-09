@@ -51,6 +51,7 @@ def default_decision_strategy(
     result = ConversionRecipe()
     for i in range(len(rates)):
         rate_running_sum += rates[i]
+
         if (t * total_rate) <= rate_running_sum:
             logging.debug(
                 f"Accepted rate:{t*total_rate} compared to {rate_running_sum}: {(t*total_rate) <= rate_running_sum}"
@@ -302,23 +303,12 @@ class RunManager:
         # empty list for every new round of queries
         self.reaction_results: list[ReactionResult] = []
 
+
         for reaction in self.reactions:
             files = self._create_task_directory(reaction.name)
 
-            # TODO: Make this general for all reactions. Done :)
-            # Maybe with a dict keeping all the newest files.
-            # files.input = {
-            #     "top": self.get_latest("top"),
-            #     "tpr": self.get_latest("tpr"),
-            #     "trr": self.get_latest("trr")
-            # }
-            # if reaction.name == 'homolysis':
-            # files.input["plumed.dat"] = self.get_latest("plumed.dat")
-            # files.input["distances.dat"] = self.get_latest("distances.dat")
-            # files.input["ffbonded.itp"]= self.config.reactions.homolysis.bonds
-            # files.input["edissoc.dat"] = self.config.reactions.homolysis.edis
-
             self.reaction_results.append(reaction.get_reaction_result(files))
+
 
         logging.info("Reaction done")
         return files
@@ -341,10 +331,6 @@ class RunManager:
         logging.info(f"Breakpair: {self.chosen_recipe.atom_idx}")
 
         files = self._create_task_directory("recipe")
-        # files.input = {
-        #     "top": self.get_latest("top"),
-        #     "ff": self.get_latest("ff")
-        # }
 
         files.output = {"top": files.outputdir / "topol_mod.top"}
 
