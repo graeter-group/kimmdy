@@ -48,6 +48,16 @@ class ReactionResult:
 
 
 class Reaction(ABC):
+    """Reaction base class
+    hast a type_scheme, which is a dict of types of possible entries in config.
+    Used to read and check the input config.
+    To not use this feature return empty dict.
+
+    Example:
+    ```python
+    {"homolysis": {"edis": Path, "bonds": Path}}
+    ```
+    """
     type_scheme = dict()
 
     def __init__(self, name, runmng: RunManager):
@@ -61,16 +71,3 @@ class Reaction(ABC):
     @abstractmethod
     def get_reaction_result(self, files: TaskFiles) -> ReactionResult:
         pass
-
-    # @property
-    # def type_scheme(self) -> dict:
-    #     """Dict of types of possible entries in config.
-    #     Used to read and check the input config.
-    #     To not use this feature return empty dict.
-
-    #     Example:
-    #     ```python
-    #     {"homolysis": {"edis": Path, "bonds": Path}}
-    #     ```
-    #     """
-    #     return dict()

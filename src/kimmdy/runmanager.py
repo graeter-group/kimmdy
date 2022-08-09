@@ -95,15 +95,6 @@ class RunManager:
         # TODO: update with HAT
         self.radical_idxs = []
 
-        if self.config.plumed:
-
-            self.latest_files["plumed.dat"] = Path(
-                self.config.cwd / self.config.plumed.dat
-            )
-            self.latest_files["distances.dat"] = Path(
-                self.config.cwd / self.config.plumed.distances
-            )
-
         self.filehist: list[dict[str, TaskFiles]] = [
             {"setup": TaskFiles(runmng=self, input=self.latest_files)}
         ]
@@ -152,11 +143,8 @@ class RunManager:
         logging.info("Start run")
         logging.info("Build task list")
 
-        for (
-            entry
-        ) in (
-            self.config.sequence
-        ):  # allows for mapping one config entry to multiple tasks
+        # allows for mapping one config entry to multiple tasks
+        for entry in self.config.sequence:
             for task in self.task_mapping[entry]:
                 logging.info(f"Put Task: {task}")
                 self.tasks.put(Task(task))
@@ -182,7 +170,6 @@ class RunManager:
         return self
 
     def __next__(self):
-        logging.warning("entering __next__")
         if self.tasks.empty() and self.crr_tasks.empty():
             self.state = State.DONE
             return
@@ -194,8 +181,8 @@ class RunManager:
         if self.config.dryrun:
             logging.info(f"Pretend to run: {task.name} with args: {task.kwargs}")
             return
-        logging.warning("Starting task: " + pformat(task))
-        files = task()  # actually running the task here ??
+        logging.info("Starting task: " + pformat(task))
+        files = task()
         self._discover_output_files(task.name, files)
 
     def _discover_output_files(self, taskname, files: TaskFiles):
@@ -231,10 +218,6 @@ class RunManager:
         files = TaskFiles(self)
         files.outputdir = self.config.out / f"{self.iteration}_dummy"
         files.outputdir.mkdir()
-        # files.input = {
-        #     "top": self.get_latest("top"),
-        #     "gro": self.get_latest("gro"),
-        # }
         md.dummy_step(files)
         return files
 
@@ -276,6 +259,8 @@ class RunManager:
         files.input["mdp"] = self.config.prod.mdp
         files.input["idx"] = self.config.idx
 
+        # TODO: do we need this part with the new automatic get_latest
+        # for missing entries?
         if self.config.plumed:
             files.input["plumed.dat"] = self.get_latest("plumed.dat")
         files = md.production(files)
@@ -299,12 +284,11 @@ class RunManager:
         # empty list for every new round of queries
         self.reaction_results: list[ReactionResult] = []
 
-
         for reaction in self.reactions:
+            # TODO: refactor into Task
             files = self._create_task_directory(reaction.name)
 
             self.reaction_results.append(reaction.get_reaction_result(files))
-
 
         logging.info("Reaction done")
         return files
@@ -316,7 +300,7 @@ class RunManager:
         ] = default_decision_strategy,
     ):
         logging.info("Decide on a reaction")
-        logging.debug(f"Available reactions: {self.reaction_results}")
+        logging.debug(f"Available reaction results: {self.reaction_results}")
         self.chosen_recipe = decision_strategy(self.reaction_results)
         logging.info("Chosen recipe is:")
         logging.info(self.chosen_recipe)
@@ -337,7 +321,7 @@ class RunManager:
             files.input["ff"],
         )
         logging.info(f'Wrote new topology to {files.output["top"].parts[-3:]}')
-        logging.warning(self.chosen_recipe.type)
+        logging.debug(f'Chose recipe: {self.chosen_recipe.type}')
         if self.chosen_recipe.type == [ConversionType.BREAK]:
             self.radical_idxs.extend(self.chosen_recipe["atom_idx"][0])
 

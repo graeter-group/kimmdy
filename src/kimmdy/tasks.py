@@ -33,16 +33,15 @@ class TaskFiles:
     def __post_init__(self, runmng):
         self.input = AutoFillDict(runmng.get_latest)
 
-
-# Explanation
-# class run():
-#     def get_latest(self, s):
-#         return f"latest {s}"
-# runmng = run()
-# files = TaskFiles(runmng)
-# files.input
-# files.input["tpr"]
-# >>> {'top': 'latest top'}
+        # Explanation
+        # class run():
+        #     def get_latest(self, s):
+        #         return f"latest {s}"
+        # runmng = run()
+        # files = TaskFiles(runmng)
+        # files.input
+        # files.input["tpr"]
+        # >>> {'top': 'latest top'}
 
 
 class Task:

@@ -1,6 +1,4 @@
 import logging
-from re import X
-from tkinter import W
 from kimmdy.reaction import ConversionRecipe, ConversionType
 from kimmdy.parsing import (
     read_plumed,

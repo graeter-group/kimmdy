@@ -1,4 +1,3 @@
-#%%
 import argparse
 import logging
 from pathlib import Path
@@ -62,7 +61,7 @@ def _run(args):
     logging.info(args)
 
     config = Config(args.input)
-    logging.info(config)
+    logging.debug(config)
 
     logging.debug("Using system GROMACS:")
     logging.debug(check_gmx_version(config))

@@ -275,6 +275,7 @@ def identify_atomtypes(filepath):
     return dic_of_atoms_to_groups
 
 
+# TODO: replace with our new parsers
 def get_data_from_file(filepath):
     file = open(filepath, "r")
     data_all = []  # array with each entry corresponding to one (string) line
@@ -288,7 +289,7 @@ def get_data_from_file(filepath):
 
     return data_all, data_array
 
-
+# TODO: replace with our new parsers
 def write_conditions_in_plumedfile(topfile, indexfile, indexgroup, outplumed):
     # use once to create index and plumed file with all necessary entries / conditons.
     # to be adjusted system specific.
