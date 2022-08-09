@@ -74,4 +74,3 @@ class Homolysis(Reaction):
             )
 
         return result
-

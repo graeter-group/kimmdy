@@ -1,5 +1,6 @@
-from __future__ import annotations # for 3.7 <= Python version < 3.10
-from typing import TYPE_CHECKING # fixes circular import issues for type hints
+from __future__ import annotations  # for 3.7 <= Python version < 3.10
+from typing import TYPE_CHECKING  # fixes circular import issues for type hints
+
 if TYPE_CHECKING:
     from kimmdy.runmanager import RunManager
     from kimmdy.config import Config

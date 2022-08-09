@@ -2,12 +2,15 @@ from dataclasses import dataclass, field, InitVar
 from pathlib import Path
 from typing import Callable
 
+
 class AutoFillDict(dict):
     def __init__(self, factory):
         self.factory = factory
+
     def __missing__(self, key):
         self[key] = self.factory(key)
         return self[key]
+
 
 @dataclass
 class TaskFiles:
@@ -16,7 +19,7 @@ class TaskFiles:
     Hosts the input and output files belonging to a task.
     A function or method that wants to be callable as a Task
     has to return a TaskFiles object.
-    The input defaultdict is populated on the fly using 
+    The input defaultdict is populated on the fly using
     get_latest of the runmanager to find newest files.
     Files which can not be found by get_latest must be added manually.
     """
@@ -29,6 +32,7 @@ class TaskFiles:
 
     def __post_init__(self, runmng):
         self.input = AutoFillDict(runmng.get_latest)
+
 
 # Explanation
 # class run():

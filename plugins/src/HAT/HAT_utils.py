@@ -13,6 +13,7 @@ import logging
 
 # %% Functions
 
+
 def check_cylinderempty(a, b, t, r_min=0.8, verbose=False):
     """Checks for atoms in a cylinder around a possible HAT reaction path.
     Cylinder begins/ends 10% after/before the end points.
@@ -130,7 +131,10 @@ def find_radical_pos(
         return [rad_1, rad_2]
 
     if len(bonded) in [2, 3]:
-        assert center.element in ["C", "N"], "Element element does not match bond number"
+        assert center.element in [
+            "C",
+            "N",
+        ], "Element element does not match bond number"
 
         # prediction: inverse midpoint between bonded
         # scale to correct bond length, make absolute
@@ -153,7 +157,10 @@ def find_radical_pos(
 
     # Radicals w/ only one bond:
     elif len(bonded) == 1:
-        assert center.element in ["O", "S"], "Element element does not match bond number"
+        assert center.element in [
+            "O",
+            "S",
+        ], "Element element does not match bond number"
         if center.element == "O":
             scale = scale_O
         elif center.element == "S":
@@ -182,6 +189,7 @@ def find_radical_pos(
 
     else:
         raise ValueError(f"Weired count of bonds: {list(bonded)}\nCorrect radicals?")
+
 
 def get_residue(atm):
     """Builds iteratively an atomgroup containing the residue of the given atom.
@@ -215,6 +223,7 @@ def get_residue(atm):
     ), "ERROR: Multiple CA found in one residue!"
     return resid_group
 
+
 def get_res_union(atms):
     """Builds atomgroupe containing union of all residues of given atoms.
     Avoids unnecessary calls to get_residue
@@ -229,6 +238,7 @@ def get_res_union(atms):
         if atm not in res:
             res = res | get_residue(atm)
     return res
+
 
 def cap_aa(atms):
     """Caps aminoacid(s) with amin or amid group.
@@ -262,7 +272,7 @@ def cap_aa(atms):
     cap_atms = []
     cap_ix = []
     cap = MDA.Universe.empty(0).atoms
-    return cap, cap_ix              # dont need caps at the moment
+    return cap, cap_ix  # dont need caps at the moment
 
     h_bondlength = 1.01
 
@@ -418,8 +428,9 @@ def cap_aa(atms):
     else:
         cap = MDA.core.universe.Merge(*cap_atms).atoms
 
-    #print(f"cap: {cap},{len(cap_atms)}")
+    # print(f"cap: {cap},{len(cap_atms)}")
     return cap, cap_ix
+
 
 def _get_charge(atm):
     aa_charge_dict = {
@@ -481,14 +492,14 @@ def cap_single_rad(u, ts, rad, bonded_rad, h_cutoff=3, env_cutoff=7):
         List of capped subsystems
     """
     # selecting in a smaller env is faster than in whole universe
-    #print('Starting cap_single_rad')
+    # print('Starting cap_single_rad')
     logging.warning(rad.positions)
     env = u.atoms.select_atoms(
         f"point { str(rad.positions).strip('[ ]') } {env_cutoff}"
     )
 
     end_poss = find_radical_pos(rad[0], bonded_rad)
-    #print(f" end pos {end_poss}")
+    # print(f" end pos {end_poss}")
 
     hs = []
     for end_pos in end_poss:
@@ -498,7 +509,7 @@ def cap_single_rad(u, ts, rad, bonded_rad, h_cutoff=3, env_cutoff=7):
             )
         )
     hs = sum(hs)
-    #print(f"!!!! hs: {hs}")
+    # print(f"!!!! hs: {hs}")
 
     # hs = (
     #     env.select_atoms(
@@ -513,7 +524,7 @@ def cap_single_rad(u, ts, rad, bonded_rad, h_cutoff=3, env_cutoff=7):
             clashes[h_idx, end_idx] = check_cylinderempty(
                 end_pos, h.position, env.positions, r_min=0.8
             )
-    #print(f"clashes: {clashes}")
+    # print(f"clashes: {clashes}")
     # get whole residues near radical
     rad_alphas = env.select_atoms(f"bonded index {rad[0].ix}")
     # rad_betas = sum([env.select_atoms(f'bonded index {alpha.ix}') for alpha in rad_alphas]) - rad
@@ -554,12 +565,12 @@ def cap_single_rad(u, ts, rad, bonded_rad, h_cutoff=3, env_cutoff=7):
         if "H1" in core.names or "H2" in core.names:  # H1 H2 H3 form NH3+ end
             charge_correction += 1
 
-        #print(h,rad,caps,core)
+        # print(h,rad,caps,core)
         ags = []
-        for ag in [h,rad,caps,core]:
+        for ag in [h, rad, caps, core]:
             if len(ag) > 0:
                 ags.append(ag)
-        #print(f"!!! {ags}")
+        # print(f"!!! {ags}")
         capped_systems[h_idx] = {
             "start_u": MDA.core.universe.Merge(*ags),
             "end_u": MDA.core.universe.Merge(*ags),
@@ -591,27 +602,73 @@ def cap_single_rad(u, ts, rad, bonded_rad, h_cutoff=3, env_cutoff=7):
 
     return capped_systems[np.nonzero(capped_systems)[0]]
 
+
 def find_radicals(u):
     """
     finds radicals in a MDAnalysis universe
     """
-    #FIXME: return single atomgroup
+    # FIXME: return single atomgroup
     nbonds_dict = {
-        ('MG','NA','CO'):0,
-        ('H','HW','HO','HS','HA','HC','H1','H2','H3','HP','H4','H5','HO','H0','HP','O','O2','Cl','Na','I','F','Br'):1,
-        ('NB','NC','OW','OH','OS','SH','S'):2,
-        ('C','CN','CB','CR','CK','CC','CW','CV','C*','CQ','CM','CA','CD','CZ','N','NA','N*','N2'):3,
-        ('CT','N3','P','SO'):4}                                               #compare to atom type perception paper (2006) same as in changemanager.py
+        ("MG", "NA", "CO"): 0,
+        (
+            "H",
+            "HW",
+            "HO",
+            "HS",
+            "HA",
+            "HC",
+            "H1",
+            "H2",
+            "H3",
+            "HP",
+            "H4",
+            "H5",
+            "HO",
+            "H0",
+            "HP",
+            "O",
+            "O2",
+            "Cl",
+            "Na",
+            "I",
+            "F",
+            "Br",
+        ): 1,
+        ("NB", "NC", "OW", "OH", "OS", "SH", "S"): 2,
+        (
+            "C",
+            "CN",
+            "CB",
+            "CR",
+            "CK",
+            "CC",
+            "CW",
+            "CV",
+            "C*",
+            "CQ",
+            "CM",
+            "CA",
+            "CD",
+            "CZ",
+            "N",
+            "NA",
+            "N*",
+            "N2",
+        ): 3,
+        ("CT", "N3", "P", "SO"): 4,
+    }  # compare to atom type perception paper (2006) same as in changemanager.py
     atoms = []
     for atom in u.atoms:
-        if atom.resname == 'SOL':
-            break  #empty atom group  
+        if atom.resname == "SOL":
+            break  # empty atom group
         try:
-            nbonds = [v for k,v in nbonds_dict.items() if atom.type in k][0]
+            nbonds = [v for k, v in nbonds_dict.items() if atom.type in k][0]
         except IndexError:
-            raise IndexError("{} not in atomtype dictionary nbonds_dict".format(atom.type))
+            raise IndexError(
+                "{} not in atomtype dictionary nbonds_dict".format(atom.type)
+            )
         if len(atom.bonded_atoms) < nbonds:
             atoms.append(MDA.AtomGroup([atom]))
     if len(atoms) == 0:
         return [MDA.Universe.empty(0).atoms]
-    return atoms 
+    return atoms

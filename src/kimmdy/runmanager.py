@@ -52,7 +52,9 @@ def default_decision_strategy(
     for i in range(len(rates)):
         rate_running_sum += rates[i]
         if (t * total_rate) <= rate_running_sum:
-            logging.debug(f"Accepted rate:{t*total_rate} compared to {rate_running_sum}: {(t*total_rate) <= rate_running_sum}")
+            logging.debug(
+                f"Accepted rate:{t*total_rate} compared to {rate_running_sum}: {(t*total_rate) <= rate_running_sum}"
+            )
             result = recipes[i]
             break
     logging.debug(f"Result: {result}")
@@ -91,15 +93,19 @@ class RunManager:
             "gro": self.config.gro,
             "idx": self.config.idx,
         }
-        
+
         # If we want to allow starting from radical containing systems this needs to be initialized:
-        #TODO: update with HAT
+        # TODO: update with HAT
         self.radical_idxs = []
 
         if self.config.plumed:
-            
-            self.latest_files["plumed.dat"] = Path(self.config.cwd / self.config.plumed.dat)
-            self.latest_files["distances.dat"] = Path(self.config.cwd / self.config.plumed.distances)
+
+            self.latest_files["plumed.dat"] = Path(
+                self.config.cwd / self.config.plumed.dat
+            )
+            self.latest_files["distances.dat"] = Path(
+                self.config.cwd / self.config.plumed.distances
+            )
 
         self.filehist: list[dict[str, TaskFiles]] = [
             {"setup": TaskFiles(runmng=self, input=self.latest_files)}
@@ -110,7 +116,11 @@ class RunManager:
             "prod": [self._run_md_prod],
             "minimization": [self._run_md_minim],
             "relax": [self._run_md_relax],
-            "reactions": [self._query_reactions,self._decide_reaction,self._run_recipe],
+            "reactions": [
+                self._query_reactions,
+                self._decide_reaction,
+                self._run_recipe,
+            ],
         }
 
         # Instantiate reactions
@@ -145,7 +155,11 @@ class RunManager:
         logging.info("Start run")
         logging.info("Build task list")
 
-        for entry in self.config.sequence:           #allows for mapping one config entry to multiple tasks
+        for (
+            entry
+        ) in (
+            self.config.sequence
+        ):  # allows for mapping one config entry to multiple tasks
             for task in self.task_mapping[entry]:
                 logging.info(f"Put Task: {task}")
                 self.tasks.put(Task(task))
@@ -184,7 +198,7 @@ class RunManager:
             logging.info(f"Pretend to run: {task.name} with args: {task.kwargs}")
             return
         logging.warning("Starting task: " + pformat(task))
-        files = task()                                  #actually running the task here ??
+        files = task()  # actually running the task here ??
         self._discover_output_files(task.name, files)
 
     def _discover_output_files(self, taskname, files: TaskFiles):
@@ -194,7 +208,7 @@ class RunManager:
         the file history and latest files.
         """
         # discover other files written by the task
-        if hasattr(files,'outputdir'):
+        if hasattr(files, "outputdir"):
             for path in files.outputdir.iterdir():
                 suffix = path.suffix[1:]
                 if suffix in AMBIGUOUS_SUFFS:
@@ -208,8 +222,7 @@ class RunManager:
             self.filehist.append({taskname: files})
 
     def _create_task_directory(self, postfix: str) -> TaskFiles:
-        """Creates TaskFiles object, output directory and symlinks ff.
-        """        
+        """Creates TaskFiles object, output directory and symlinks ff."""
         files = TaskFiles(self)
         files.outputdir = self.config.out / f"{self.iteration}_{postfix}"
         files.outputdir.mkdir()
@@ -242,7 +255,7 @@ class RunManager:
         logging.info("Setup _run_md_minim")
         self.state = State.MD
         files = self._create_task_directory("minimization")
-        files.input["mdp"] = self.config.minimization.mdp,
+        files.input["mdp"] = (self.config.minimization.mdp,)
 
         # perform step
         files = md.minimzation(files)
@@ -289,7 +302,7 @@ class RunManager:
         # empty list for every new round of queries
         self.reaction_results: list[ReactionResult] = []
 
-        for reaction in  self.reactions:
+        for reaction in self.reactions:
             files = self._create_task_directory(reaction.name)
 
             # TODO: Make this general for all reactions. Done :)
@@ -300,10 +313,10 @@ class RunManager:
             #     "trr": self.get_latest("trr")
             # }
             # if reaction.name == 'homolysis':
-                # files.input["plumed.dat"] = self.get_latest("plumed.dat")                
-                # files.input["distances.dat"] = self.get_latest("distances.dat")
-                # files.input["ffbonded.itp"]= self.config.reactions.homolysis.bonds
-                # files.input["edissoc.dat"] = self.config.reactions.homolysis.edis
+            # files.input["plumed.dat"] = self.get_latest("plumed.dat")
+            # files.input["distances.dat"] = self.get_latest("distances.dat")
+            # files.input["ffbonded.itp"]= self.config.reactions.homolysis.bonds
+            # files.input["edissoc.dat"] = self.config.reactions.homolysis.edis
 
             self.reaction_results.append(reaction.get_reaction_result(files))
 
@@ -333,15 +346,18 @@ class RunManager:
         #     "ff": self.get_latest("ff")
         # }
 
-        files.output = {
-            "top": files.outputdir / "topol_mod.top"
-        }
+        files.output = {"top": files.outputdir / "topol_mod.top"}
 
-        changer.modify_top(self.chosen_recipe, files.input["top"], files.output["top"], files.input["ff"])
+        changer.modify_top(
+            self.chosen_recipe,
+            files.input["top"],
+            files.output["top"],
+            files.input["ff"],
+        )
         logging.info(f'Wrote new topology to {files.output["top"].parts[-3:]}')
         logging.warning(self.chosen_recipe.type)
         if self.chosen_recipe.type == [ConversionType.BREAK]:
-            self.radical_idxs.extend(self.chosen_recipe['atom_idx'][0])
+            self.radical_idxs.extend(self.chosen_recipe["atom_idx"][0])
 
             # files.input["plumed.dat"] = self.get_latest("plumed.dat")
             files.output["plumed.dat"] = files.outputdir / "plumed_mod.dat"
@@ -352,7 +368,9 @@ class RunManager:
                 files.output["plumed.dat"],
                 files.output["distances.dat"],
             )
-            logging.info(f'Wrote new plumedfile to {files.output["plumed.dat"].parts[-3:]}')
+            logging.info(
+                f'Wrote new plumedfile to {files.output["plumed.dat"].parts[-3:]}'
+            )
         logging.info(f"Looking for md in {self.config.changer.coordinates.__dict__}")
         # TODO clean this up, maybe make function for this in config
         if hasattr(self.config, "changer"):
