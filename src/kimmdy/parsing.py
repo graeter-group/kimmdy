@@ -84,24 +84,25 @@ def write_topol(d: Topology, outfile: Path) -> None:
             )
             f.write(s)
 
+
 def topol_split_dihedrals(d: Topology):
-    if 'dihedrals' in d.keys():
-        d['propers'] = deepcopy(d['dihedrals'])
-        d['impropers'] = []
-        for i, dih in enumerate(d['propers'][::-1]):
-            if dih[4] == '9':
+    if "dihedrals" in d.keys():
+        d["propers"] = deepcopy(d["dihedrals"])
+        d["impropers"] = []
+        for i, dih in enumerate(d["propers"][::-1]):
+            if dih[4] == "9":
                 break
             else:
-                d['impropers'].insert(0,(d['propers'].pop(-1)))
+                d["impropers"].insert(0, (d["propers"].pop(-1)))
     return d
+
 
 def topol_merge_propers_impropers(d: Topology):
-    if all([x in d.keys() for x in ['propers','impropers']]):
-        d['dihedrals'].clear()
-        d['dihedrals'].extend(d.pop('propers'))
-        d['dihedrals'].extend(d.pop('impropers'))
+    if all([x in d.keys() for x in ["propers", "impropers"]]):
+        d["dihedrals"].clear()
+        d["dihedrals"].extend(d.pop("propers"))
+        d["dihedrals"].extend(d.pop("impropers"))
     return d
-
 
 
 def read_plumed(path: Path) -> dict:

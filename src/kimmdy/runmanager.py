@@ -51,7 +51,9 @@ def default_decision_strategy(
     result = ConversionRecipe()
     for i in range(len(rates)):
         rate_running_sum += rates[i]
-        logging.debug(f"{t*total_rate} compared to {rate_running_sum}: {(t*total_rate) <= rate_running_sum}")
+        logging.debug(
+            f"{t*total_rate} compared to {rate_running_sum}: {(t*total_rate) <= rate_running_sum}"
+        )
         if (t * total_rate) <= rate_running_sum:
             result = recipes[i]
             break
@@ -92,9 +94,13 @@ class RunManager:
             "idx": self.config.idx,
         }
         if self.config.plumed:
-            
-            self.latest_files["plumed.dat"] = Path(self.config.cwd / self.config.plumed.dat)
-            self.latest_files["distances.dat"] = Path(self.config.cwd / self.config.plumed.distances)
+
+            self.latest_files["plumed.dat"] = Path(
+                self.config.cwd / self.config.plumed.dat
+            )
+            self.latest_files["distances.dat"] = Path(
+                self.config.cwd / self.config.plumed.distances
+            )
 
         self.filehist: list[dict[str, TaskFiles]] = [
             {"setup": TaskFiles(input=self.latest_files)}
@@ -105,7 +111,11 @@ class RunManager:
             "prod": [self._run_md_prod],
             "minimization": [self._run_md_minim],
             "relax": [self._run_md_relax],
-            "reactions": [self._query_reactions,self._decide_reaction,self._run_recipe],
+            "reactions": [
+                self._query_reactions,
+                self._decide_reaction,
+                self._run_recipe,
+            ],
         }
 
         logging.debug("Configuration from input file:")
@@ -131,7 +141,11 @@ class RunManager:
         logging.info("Start run")
         logging.info("Build task list")
 
-        for entry in self.config.sequence:           #allows for mapping one config entry to multiple tasks
+        for (
+            entry
+        ) in (
+            self.config.sequence
+        ):  # allows for mapping one config entry to multiple tasks
             for task in self.task_mapping[entry]:
                 logging.info(f"Put Task: {task}")
                 self.tasks.put(Task(task))
@@ -170,7 +184,7 @@ class RunManager:
             logging.info(f"Pretend to run: {task.name} with args: {task.kwargs}")
             return
         logging.warning("Starting task: " + pformat(task))
-        files = task()                                  #actually running the task here ??
+        files = task()  # actually running the task here ??
         self._discover_output_files(task.name, files)
 
     def _discover_output_files(self, taskname, files: TaskFiles):
@@ -180,7 +194,7 @@ class RunManager:
         the file history and latest files.
         """
         # discover other files written by the task
-        if hasattr(files,'outputdir'):
+        if hasattr(files, "outputdir"):
             for path in files.outputdir.iterdir():
                 suffix = path.suffix[1:]
                 if suffix in AMBIGUOUS_SUFFS:
@@ -289,7 +303,9 @@ class RunManager:
         logging.info("Query reactions")
         self.state = State.REACTION
         files = self._create_task_directory("reaction_query")
-        self.reaction_results: list[ReactionResult] = []                # empty list for every new round of queries
+        self.reaction_results: list[
+            ReactionResult
+        ] = []  # empty list for every new round of queries
 
         reactions = self.config.reactions.get_attributes()
         logging.warning(f"Trying following reactions: {reactions}")
@@ -302,12 +318,12 @@ class RunManager:
             files.input = {
                 "top": self.get_latest("top"),
                 "tpr": self.get_latest("tpr"),
-                "trr": self.get_latest("trr")
+                "trr": self.get_latest("trr"),
             }
-            if react_name == 'homolysis':
-                files.input["plumed.dat"] = self.get_latest("plumed.dat")                
+            if react_name == "homolysis":
+                files.input["plumed.dat"] = self.get_latest("plumed.dat")
                 files.input["distances.dat"] = self.get_latest("distances.dat")
-                files.input["ffbonded.itp"]= self.config.reactions.homolysis.bonds
+                files.input["ffbonded.itp"] = self.config.reactions.homolysis.bonds
                 files.input["edissoc.dat"] = self.config.reactions.homolysis.edis
 
             self.reaction_results.append(reaction().get_reaction_result(files))
@@ -334,16 +350,16 @@ class RunManager:
 
         files = TaskFiles()
         files = self._create_task_directory("recipe")
-        files.input = {
-            "top": self.get_latest("top"),
-            "ff": self.get_latest("ff")
-        }
+        files.input = {"top": self.get_latest("top"), "ff": self.get_latest("ff")}
 
-        files.output = {
-            "top": files.outputdir / "topol_mod.top"
-        }
+        files.output = {"top": files.outputdir / "topol_mod.top"}
 
-        changer.modify_top(self.chosen_recipe, files.input["top"], files.output["top"], files.input["ff"])
+        changer.modify_top(
+            self.chosen_recipe,
+            files.input["top"],
+            files.output["top"],
+            files.input["ff"],
+        )
         logging.info(f'Wrote new topology to {files.output["top"].parts[-3:]}')
         logging.warning(self.chosen_recipe.type)
         if self.chosen_recipe.type == [ConversionType.BREAK]:
@@ -356,7 +372,9 @@ class RunManager:
                 files.output["plumed.dat"],
                 files.output["distances.dat"],
             )
-            logging.info(f'Wrote new plumedfile to {files.output["plumed.dat"].parts[-3:]}')
+            logging.info(
+                f'Wrote new plumedfile to {files.output["plumed.dat"].parts[-3:]}'
+            )
         logging.info(f"Looking for md in {self.config.changer.coordinates.__dict__}")
         # TODO clean this up, maybe make function for this in config
         if hasattr(self.config, "changer"):
