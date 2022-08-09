@@ -90,6 +90,11 @@ class RunManager:
             "gro": self.config.gro,
             "idx": self.config.idx,
         }
+
+        # If we want to allow starting from radical containing systems this needs to be initialized:
+        # TODO: update with HAT
+        self.radical_idxs = []
+
         if self.config.plumed:
 
             self.latest_files["plumed.dat"] = Path(
@@ -100,7 +105,7 @@ class RunManager:
             )
 
         self.filehist: list[dict[str, TaskFiles]] = [
-            {"setup": TaskFiles(input=self.latest_files)}
+            {"setup": TaskFiles(runmng=self, input=self.latest_files)}
         ]
 
         self.task_mapping: TaskMapping = {
@@ -114,6 +119,15 @@ class RunManager:
                 self._run_recipe,
             ],
         }
+
+        # Instantiate reactions
+        self.reactions = []
+        react_names = self.config.reactions.get_attributes()
+        logging.info("Instantiating Reactions:", *react_names)
+        for react_name in react_names:
+            r = plugins[react_name]
+            reaction = r(react_name, self)
+            self.reactions.append(reaction)
 
         logging.debug("Configuration from input file:")
         logging.debug(pformat(self.config.__dict__))
@@ -204,22 +218,23 @@ class RunManager:
             logging.debug("Append to file history")
             self.filehist.append({taskname: files})
 
-    def _create_task_directory(self, prefix: str) -> TaskFiles:
-        files = TaskFiles()
-        files.outputdir = self.config.out / f"{self.iteration}_{prefix}"
+    def _create_task_directory(self, postfix: str) -> TaskFiles:
+        """Creates TaskFiles object, output directory and symlinks ff."""
+        files = TaskFiles(self)
+        files.outputdir = self.config.out / f"{self.iteration}_{postfix}"
         files.outputdir.mkdir()
         (files.outputdir / self.config.ff.name).symlink_to(self.config.ff)
         return files
 
     def _dummy(self):
         logging.info("Start dummy task")
-        files = TaskFiles()
+        files = TaskFiles(self)
         files.outputdir = self.config.out / f"{self.iteration}_dummy"
         files.outputdir.mkdir()
-        files.input = {
-            "top": self.get_latest("top"),
-            "gro": self.get_latest("gro"),
-        }
+        # files.input = {
+        #     "top": self.get_latest("top"),
+        #     "gro": self.get_latest("gro"),
+        # }
         md.dummy_step(files)
         return files
 
@@ -227,12 +242,8 @@ class RunManager:
         logging.info("Start equilibration MD")
         self.state = State.MD
         files = self._create_task_directory("equilibration")
-        files.input = {
-            "top": self.get_latest("top"),
-            "gro": self.get_latest("gro"),
-            "mdp": self.config.equilibrium.mdp,
-            "idx": self.config.idx,
-        }
+        files.input["mdp"] = self.config.equilibrium.mdp
+        files.input["idx"] = self.config.idx
         md.equilibrium(files)
         logging.info("Done equilibrating")
         return files
@@ -241,11 +252,8 @@ class RunManager:
         logging.info("Setup _run_md_minim")
         self.state = State.MD
         files = self._create_task_directory("minimization")
-        files.input = {
-            "top": self.get_latest("top"),
-            "gro": self.get_latest("gro"),
-            "mdp": self.config.minimization.mdp,
-        }
+        files.input["mdp"] = (self.config.minimization.mdp,)
+
         # perform step
         files = md.minimzation(files)
         logging.info("Done minimizing")
@@ -255,11 +263,8 @@ class RunManager:
         logging.info("Setup _run_md_eq MD")
         self.state = State.MD
         files = self._create_task_directory("equilibrium")
-        files.input = {
-            "top": self.get_latest("top"),
-            "mdp": self.config.equilibrium.mdp,
-            "gro": self.get_latest("gro"),
-        }
+        files.input["mdp"] = self.config.equilibrium.mdp
+
         files = md.equilibration(files)
         logging.info("Done")
         return files
@@ -268,13 +273,9 @@ class RunManager:
         logging.info("Setup _run_md_prod")
         self.state = State.MD
         files = self._create_task_directory("production")
-        files.input = {
-            "top": self.get_latest("top"),
-            "gro": self.get_latest("gro"),
-            "mdp": self.config.prod.mdp,
-            "idx": self.config.idx,
-            "cpt": self.get_latest("cpt"),
-        }
+        files.input["mdp"] = self.config.prod.mdp
+        files.input["idx"] = self.config.idx
+
         if self.config.plumed:
             files.input["plumed.dat"] = self.get_latest("plumed.dat")
         files = md.production(files)
@@ -285,13 +286,9 @@ class RunManager:
         logging.info("Start _run_md_relax")
         self.state = State.MD
         files = self._create_task_directory("relaxation")
-        files.input = {
-            "top": self.get_latest("top"),
-            "gro": self.get_latest("gro"),
-            "mdp": self.config.changer.coordinates.md.mdp,
-            "idx": self.config.idx,
-            "cpt": self.get_latest("cpt"),
-        }
+        files.input["mdp"] = self.config.changer.coordinates.md.mdp
+        files.input["idx"] = self.config.idx
+
         files = md.relaxation(files)
         logging.info("Done with relaxation MD")
         return files
@@ -299,31 +296,15 @@ class RunManager:
     def _query_reactions(self):
         logging.info("Query reactions")
         self.state = State.REACTION
-        files = self._create_task_directory("reaction_query")
-        self.reaction_results: list[
-            ReactionResult
-        ] = []  # empty list for every new round of queries
+        # empty list for every new round of queries
+        self.reaction_results: list[ReactionResult] = []
 
-        reactions = self.config.reactions.get_attributes()
-        logging.warning(f"Trying following reactions: {reactions}")
 
-        for react_name in reactions:
-            reaction = plugins[react_name]
+        for reaction in self.reactions:
+            files = self._create_task_directory(reaction.name)
 
-            # TODO: Make this general for all reactions.
-            # Maybe with a dict keeping all the newest files.
-            files.input = {
-                "top": self.get_latest("top"),
-                "tpr": self.get_latest("tpr"),
-                "trr": self.get_latest("trr"),
-            }
-            if react_name == "homolysis":
-                files.input["plumed.dat"] = self.get_latest("plumed.dat")
-                files.input["distances.dat"] = self.get_latest("distances.dat")
-                files.input["ffbonded.itp"] = self.config.reactions.homolysis.bonds
-                files.input["edissoc.dat"] = self.config.reactions.homolysis.edis
+            self.reaction_results.append(reaction.get_reaction_result(files))
 
-            self.reaction_results.append(reaction().get_reaction_result(files))
 
         logging.info("Reaction done")
         return files
@@ -335,7 +316,7 @@ class RunManager:
         ] = default_decision_strategy,
     ):
         logging.info("Decide on a reaction")
-        logging.warning(f"Available reactions: {self.reaction_results}")
+        logging.debug(f"Available reactions: {self.reaction_results}")
         self.chosen_recipe = decision_strategy(self.reaction_results)
         logging.info("Chosen recipe is:")
         logging.info(self.chosen_recipe)
@@ -345,9 +326,7 @@ class RunManager:
         logging.info(f"Start Recipe in step {self.iteration}")
         logging.info(f"Breakpair: {self.chosen_recipe.atom_idx}")
 
-        files = TaskFiles()
         files = self._create_task_directory("recipe")
-        files.input = {"top": self.get_latest("top"), "ff": self.get_latest("ff")}
 
         files.output = {"top": files.outputdir / "topol_mod.top"}
 
@@ -360,7 +339,9 @@ class RunManager:
         logging.info(f'Wrote new topology to {files.output["top"].parts[-3:]}')
         logging.warning(self.chosen_recipe.type)
         if self.chosen_recipe.type == [ConversionType.BREAK]:
-            files.input["plumed.dat"] = self.get_latest("plumed.dat")
+            self.radical_idxs.extend(self.chosen_recipe["atom_idx"][0])
+
+            # files.input["plumed.dat"] = self.get_latest("plumed.dat")
             files.output["plumed.dat"] = files.outputdir / "plumed_mod.dat"
             files.output["distances.dat"] = "distances.dat"
             changer.modify_plumed(

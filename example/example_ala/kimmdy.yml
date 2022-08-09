@@ -1,6 +1,6 @@
 dryrun: false
 iterations: 100
-out: 'test_out_001'
+name: 'hat_tf_000'
 # ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
 top: 'Ala_out.top'
 gro: 'npt.gro'
@@ -15,7 +15,9 @@ changer:
     md:
       mdp: 'md_slow.mdp'
 reactions:
-  HAT:
+  hat_reaction:
+    frequency_factor: 100000000
+    h_cutoff: 3
     #tprpath: 'md.tpr'
     #trrpath: 'md.trr'
           #    edis: 'edissoc.dat'
@@ -25,5 +27,5 @@ sequence:
   - 
     mult: 10
     tasks:
+      - equilibrium
       - reactions
-      - prod
