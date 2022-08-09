@@ -1,3 +1,4 @@
+#%%
 import argparse
 import logging
 from pathlib import Path
@@ -78,6 +79,7 @@ def kimmdy_run(
     """Run KIMMDY from python."""
     args = argparse.Namespace(input=input, loglevel=loglevel, logfile=logfile)
     _run(args)
+    logging.shutdown()
 
 
 def kimmdy():
@@ -88,7 +90,9 @@ def kimmdy():
     """
     args = get_cmdline_args()
     _run(args)
+    logging.shutdown()
 
 
+#%%
 if __name__ == "__main__":
-    kimmdy()
+    kimmdy_run()

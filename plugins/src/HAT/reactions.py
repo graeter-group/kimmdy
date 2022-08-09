@@ -56,12 +56,3 @@ class HAT_reaction(Reaction):
 
         logging.warning(f"Returning exactly these recipes to runmanager: {RR}")
         return RR
-
-    @property
-    def type_scheme(self):
-        """Dict of types of possible entries in config.
-        Used to read and check the input config.
-        To not use this feature return empty dict
-        {"HAT":{'tprpath': Path, 'trrpath': Path}}
-        """
-        return dict()
