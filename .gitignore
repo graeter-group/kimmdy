@@ -3,13 +3,11 @@
 
 # our own program output
 kimmdy.log
-test_out*/
-dump/
+tmp/
 amber99sb-star-ildnp.ff/
-example/example_ala/test
 *.gif
 *.log
-2*
+example/**/*[0-9][0-9][0-9]/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

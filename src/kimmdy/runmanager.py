@@ -49,11 +49,8 @@ def default_decision_strategy(
 
     # if nothing is choosen, return an empty ConversionRecipe
     result = ConversionRecipe()
-    for i in range(len(rates)):
-        rate_running_sum += rates[i]
-        logging.debug(
-            f"{t*total_rate} compared to {rate_running_sum}: {(t*total_rate) <= rate_running_sum}"
-        )
+    for i, rate in enumerate(rates):
+        rate_running_sum += rate
         if (t * total_rate) <= rate_running_sum:
             result = recipes[i]
             break
