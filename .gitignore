@@ -6,10 +6,10 @@ kimmdy.log
 test_out*/
 dump/
 amber99sb-star-ildnp.ff/
-example/example_ala/test
+example/**/*[0-9][0-9][0-9]/
 *.gif
 *.log
-2*
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

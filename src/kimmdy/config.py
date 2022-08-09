@@ -172,15 +172,16 @@ class Config:
             recursive_dict = raw
 
             if len(plugins) > 0:
-                logging.info("Loading Plugins:")
+                logging.info("Loading Plugins")
                 for plg_name, plugin in plugins.items():
+                    logging.debug(f"Loading {plg_name}")
                     if isinstance(plugin, Exception):
                         logging.warn(
                             f"Plugin {plg_name} could not be loaded!\n{plugin}\n"
                         )
                     if issubclass(plugin, Reaction):
-                        self.type_scheme["reactions"].update(plugin().type_scheme)
-                        print(self.type_scheme["reactions"])
+                        self.type_scheme["reactions"].update(plugin.type_scheme)
+                        logging.debug(self.type_scheme["reactions"])
 
         # building config recursively
         if recursive_dict is not None:

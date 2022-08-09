@@ -595,6 +595,7 @@ def find_radicals(u):
     """
     finds radicals in a MDAnalysis universe
     """
+    #FIXME: return single atomgroup
     nbonds_dict = {
         ('MG','NA','CO'):0,
         ('H','HW','HO','HS','HA','HC','H1','H2','H3','HP','H4','H5','HO','H0','HP','O','O2','Cl','Na','I','F','Br'):1,

@@ -39,7 +39,7 @@ class HAT_reaction(Reaction):
                 from_H = subsystem['meta']['indices'][0]
                 from_H_nr = str(u.atoms[from_H].index + 1)
                 logging.warning(u.atoms[from_H].resname)
-                if u.atoms[from_H].resname not in ['NME','ACE']:            #doesn't work with capping groups at the moment
+                if u.atoms[from_H].resname not in ['NME','ACE']:  #doesn't work with capping groups at the moment
                     rad_nr = str(rad.atoms[0].index +1)
                     CR = ConversionRecipe(type=[ConversionType.MOVE],atom_idx=[[from_H_nr,rad_nr]])
                     RR.recipes.append(CR)
@@ -48,11 +48,4 @@ class HAT_reaction(Reaction):
         logging.warning(f"Returning exactly these recipes to runmanager: {RR}")
         return RR
 
-    @property
-    def type_scheme(self):
-        """Dict of types of possible entries in config.
-        Used to read and check the input config.
-        To not use this feature return empty dict
-        {"HAT":{'tprpath': Path, 'trrpath': Path}}
-        """
-        return dict()
+
