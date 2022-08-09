@@ -2,6 +2,7 @@ from pathlib import Path
 from collections.abc import Iterable
 from typing import Generator
 import pandas as pd
+from copy import deepcopy
 
 # time to experiment
 # what a topplogy is
@@ -84,6 +85,26 @@ def write_topol(d: Topology, outfile: Path) -> None:
             f.write(s)
 
 
+def topol_split_dihedrals(d: Topology):
+    if "dihedrals" in d.keys():
+        d["propers"] = deepcopy(d["dihedrals"])
+        d["impropers"] = []
+        for i, dih in enumerate(d["propers"][::-1]):
+            if dih[4] == "9":
+                break
+            else:
+                d["impropers"].insert(0, (d["propers"].pop(-1)))
+    return d
+
+
+def topol_merge_propers_impropers(d: Topology):
+    if all([x in d.keys() for x in ["propers", "impropers"]]):
+        d["dihedrals"].clear()
+        d["dihedrals"].extend(d.pop("propers"))
+        d["dihedrals"].extend(d.pop("impropers"))
+    return d
+
+
 def read_plumed(path: Path) -> dict:
     """Read a plumed.dat configuration file."""
     with open(path, "r") as f:
@@ -122,7 +143,8 @@ def write_plumed(d, path: Path) -> None:
     """Write a plumed.dat configuration file."""
     with open(path, "w") as f:
         for l in d["distances"]:
-            f.write(f"{l['id']}: {l['keyword']} ATOMS={','.join(l['atoms'])}\n")
+            f.write(f"{l['id']}: {l['keyword']} ATOMS={','.join(l['atoms'])} \n")
+        f.write("\n")
         for l in d["prints"]:
             f.write(
                 f"{l['PRINT']} ARG={','.join(l['ARG'])} STRIDE={str(l['STRIDE'])} FILE={str(l['FILE'])}\n"

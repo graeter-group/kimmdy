@@ -37,7 +37,7 @@ type_scheme = {
     "top": Path,
     "gro": Path,
     "idx": Path,
-    "plumed": {"dat": Path, "distances": Path},
+    "plumed": None,
     "minimization": {"mdp": Path, "tpr": Path},
     "equilibration": {
         "nvt": {"mdp": Path, "tpr": Path},
@@ -51,9 +51,6 @@ type_scheme = {
 }
 
 # classes for static code analysis
-class PlumedConfig:
-    dat: Path
-    distances: Path
 
 
 class MinimizationConfig:
@@ -133,7 +130,7 @@ class Config:
     top: Path
     gro: Path
     idx: Path
-    plumed: PlumedConfig
+    plumed: None
     minimization: MinimizationConfig
     equilibration: EquilibrationConfig
     equilibrium: MdConfig
@@ -172,15 +169,16 @@ class Config:
             recursive_dict = raw
 
             if len(plugins) > 0:
-                logging.info("Loading Plugins:")
+                logging.info("Loading Plugins")
                 for plg_name, plugin in plugins.items():
+                    logging.debug(f"Loading {plg_name}")
                     if isinstance(plugin, Exception):
                         logging.warn(
                             f"Plugin {plg_name} could not be loaded!\n{plugin}\n"
                         )
                     if issubclass(plugin, Reaction):
-                        self.type_scheme["reactions"].update(plugin().type_scheme)
-                        print(self.type_scheme["reactions"])
+                        self.type_scheme["reactions"].update(plugin.type_scheme)
+                        logging.debug(self.type_scheme["reactions"])
 
         # building config recursively
         if recursive_dict is not None:
@@ -294,13 +292,6 @@ class Config:
                     ]:  # distances.dat wouldn't exist prior to the run
                         logging.debug(attr)
                         check_file_exists(attr)
-
-                # Check config for consistency
-                if attr_name == "plumed":
-                    for necessary_f in ["dat", "distances"]:
-                        assert (
-                            necessary_f in attr.__dir__()
-                        ), f"{necessary_f} for {attr_name} is missing in config!"
 
                 # Validate sequence
                 if isinstance(attr, Sequence):

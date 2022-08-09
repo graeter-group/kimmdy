@@ -72,7 +72,7 @@ def equilibrium(files: TaskFiles):
     )
     run_shell_cmd(f"gmx mdrun -v -s {tpr} -c {outgro} -o {outtrr}", outputdir)
 
-    return TaskFiles
+    return files
 
 
 def production(files: TaskFiles) -> TaskFiles:
@@ -98,7 +98,7 @@ def production(files: TaskFiles) -> TaskFiles:
     files.output = {"tpr": tpr, "gro": outgro, "trr": outtrr}
 
     run_shell_cmd(
-        f" gmx grompp -p {top} -c {gro} -f {mdp} -n {idx} -t {cpt} -o {tpr} -maxwarn 5",
+        f" gmx grompp -p {top} -c {gro} -f {mdp} -n {idx} -o {tpr} -maxwarn 5",
         outputdir,
     )
     run_shell_cmd(
