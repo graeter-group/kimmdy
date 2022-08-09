@@ -321,7 +321,7 @@ class RunManager:
             files.input["ff"],
         )
         logging.info(f'Wrote new topology to {files.output["top"].parts[-3:]}')
-        logging.debug(f'Chose recipe: {self.chosen_recipe.type}')
+        logging.debug(f"Chose recipe: {self.chosen_recipe.type}")
         if self.chosen_recipe.type == [ConversionType.BREAK]:
             self.radical_idxs.extend(self.chosen_recipe["atom_idx"][0])
 

@@ -58,6 +58,7 @@ class Reaction(ABC):
     {"homolysis": {"edis": Path, "bonds": Path}}
     ```
     """
+
     type_scheme = dict()
 
     def __init__(self, name, runmng: RunManager):

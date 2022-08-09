@@ -289,6 +289,7 @@ def get_data_from_file(filepath):
 
     return data_all, data_array
 
+
 # TODO: replace with our new parsers
 def write_conditions_in_plumedfile(topfile, indexfile, indexgroup, outplumed):
     # use once to create index and plumed file with all necessary entries / conditons.

@@ -293,7 +293,6 @@ class Config:
                         logging.debug(attr)
                         check_file_exists(attr)
 
-
                 # Validate sequence
                 if isinstance(attr, Sequence):
                     for task in attr:

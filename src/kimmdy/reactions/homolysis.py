@@ -35,9 +35,8 @@ class Homolysis(Reaction):
 
         result = ReactionResult()
 
-
         # go through all possible breakpairs, calculate their rupture rates
-        for i,_ in enumerate(list_of_breakpairs_and_distances):
+        for i, _ in enumerate(list_of_breakpairs_and_distances):
 
             # get parameters (distances, atomtypes etc) for current potential breakpair
             breakpair = (
