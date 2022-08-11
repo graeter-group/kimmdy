@@ -22,6 +22,18 @@ class TaskFiles:
     The input defaultdict is populated on the fly using
     get_latest of the runmanager to find newest files.
     Files which can not be found by get_latest must be added manually.
+
+    Examples
+    --------
+    >>> class run():
+    >>>     def get_latest(self, s):
+    >>>         return f"latest {s}"
+    >>> runmng = run()
+    >>> files = TaskFiles(runmng)
+    >>> files.input
+    >>> files.input["tpr"]
+    {'top': 'latest top'}
+
     """
 
     runmng: InitVar
@@ -32,16 +44,6 @@ class TaskFiles:
 
     def __post_init__(self, runmng):
         self.input = AutoFillDict(runmng.get_latest)
-
-        # Explanation
-        # class run():
-        #     def get_latest(self, s):
-        #         return f"latest {s}"
-        # runmng = run()
-        # files = TaskFiles(runmng)
-        # files.input
-        # files.input["tpr"]
-        # >>> {'top': 'latest top'}
 
 
 class Task:
