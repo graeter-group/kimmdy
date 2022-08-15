@@ -327,12 +327,11 @@ class RunManager:
 
             # files.input["plumed.dat"] = self.get_latest("plumed.dat")
             files.output["plumed.dat"] = files.outputdir / "plumed_mod.dat"
-            files.output["distances.dat"] = "distances.dat"
             changer.modify_plumed(
                 self.chosen_recipe,
                 files.input["plumed.dat"],
                 files.output["plumed.dat"],
-                files.output["distances.dat"],
+                files.input["distances.dat"]
             )
             logging.info(
                 f'Wrote new plumedfile to {files.output["plumed.dat"].parts[-3:]}'
