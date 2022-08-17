@@ -1,5 +1,5 @@
-from kimmdy.parsing import read_topol,read_plumed
-from kimmdy.changemanager import break_bond_top,break_bond_plumed
+from kimmdy.parsing import read_topol,read_plumed, topol_split_dihedrals
+from kimmdy import changemanager
 
 from pathlib import Path
 from copy import deepcopy
@@ -11,7 +11,7 @@ def test_break_bond_top():
     breakpair = (9,15)
     breakpair = (str(breakpair[0]),str(breakpair[1]))
     
-    topology_new = break_bond_top(deepcopy(topology),breakpair)
+    topology_new = changemanager.break_bond_top(deepcopy(topology),breakpair)
     
     diffdict = {}
     for key in topology.keys():
@@ -22,7 +22,8 @@ def test_break_bond_top():
     assert len(diffdict['bonds']) == 1 and all([x in diffdict['bonds'][0] for x in breakpair])
     assert len(diffdict['pairs']) == 13
     assert len(diffdict['angles']) == 5 and all([x in angle for angle in diffdict['angles'] for x in breakpair])
-    assert len(diffdict['dihedrals']) == 15 and all([x in dih for dih in diffdict['dihedrals'] for x in breakpair])  #includes impropers which might change
+    assert len(diffdict['dihedrals']) == 15 and all([x in dih for dih in diffdict['dihedrals'] for x in breakpair])  
+    #includes impropers which might change
 
 def test_break_bond_plumed():
     input_f = Path(__file__).parent / "test_files/test_changemanager/plumed.dat"
@@ -30,13 +31,181 @@ def test_break_bond_plumed():
     breakpair = (9,15)
     breakpair = (str(breakpair[0]),str(breakpair[1]))
 
-    newplumeddat = break_bond_plumed(deepcopy(plumeddat),breakpair,'distances.dat')
+    newplumeddat = changemanager.break_bond_plumed(deepcopy(plumeddat),breakpair,'distances.dat')
 
     oldset = set(tuple(x['atoms']) for x in plumeddat['distances'])
     newset = set(tuple(x['atoms']) for x in newplumeddat['distances'])
     diffs = list(oldset - newset)
     assert len(diffs) == 1 and diffs[0] == breakpair
 
+def test_find_heavy():
+    movepair = ['9','10']
+    topology = {'bonds':[]}
+    for i in range(0,20,2):
+        topology['bonds'].append([str(i),str(i+1)])
+    heavy_idx = changemanager.find_heavy(topology['bonds'],movepair[0])
+    assert heavy_idx == '8'
+
+class TestTopologyMethods():
+    input_f = Path(__file__).parent / "test_files/test_changemanager/hexala_out.top"
+    topology = read_topol(input_f)  
+    topology = topol_split_dihedrals(topology)
+    termdict = {'bonds':[['9','10','1']],'pairs':[['5','10','1'],['8','10','1']],'angles':[['7','9','10','1'],['10','9','15','1']],'propers':[['5','7','9','10','9']],'impropers':[['5','9','7','8','4']]}
 
 
+    def test_topol_remove(self):
+        self.topology = changemanager.topol_remove_terms(self.topology, self.termdict) 
+        for key,val in self.termdict.items():
+            for entry in val:
+                assert entry not in self.topology[key]  
+
+    def test_topol_add(self):
+        self.topology = changemanager.topol_add_terms(self.topology, self.termdict) 
+        
+        for key,val in self.termdict.items():
+            for entry in val:
+                assert entry in self.topology[key]   
+        return
+
+    def test_topol_change_at_an(self):
+        atom = ['10','HX','H9','ALA']
+        changemanager.topol_change_at_an(self.topology,atom)
+        assert self.topology['atoms'][12][1] == 'HX'
+        assert self.topology['atoms'][12][4] == 'H9'
+        atom = ['20','HC','HB1','ALA']
+        changemanager.topol_change_at_an(self.topology,atom)
+        assert self.topology['atoms'][23][4] == 'HB4'
+        return
+
+class TestLocalGraphConstructMethods():
+    input_f = Path(__file__).parent / "test_files/test_changemanager/hexala_out.top"
+    topology = read_topol(input_f)  
+    topology = topol_split_dihedrals(topology)
+
+    input_ff = Path(__file__).parent / "test_files/test_changemanager/amber99sb-star-ildnp.ff"
+    heavy_idx = '9'
+
+    testGraph = changemanager.localGraph(topology, heavy_idx, input_ff)
+
+    def test_construct_graph(self):
+        self.testGraph.construct_graph()
+        assert len(self.testGraph.AtomList) == 16
+        assert len(self.testGraph.atoms_idx) == 16
+        assert len(self.testGraph.BondList) == 15
+
+    def test_order_lists(self):
+        # need to run test_construct_graph beforehand
+        self.testGraph.order_lists()
+        val = 0
+        for atom_idx in self.testGraph.atoms_idx:
+            assert int(atom_idx) > val
+            val = int(atom_idx)
+
+        val = 0
+        for bond in self.testGraph.BondList:
+            assert int(bond[0]) >= val
+            val = int(bond[0])
+        return
+
+    def test_update_atoms_list(self):
+        self.testGraph.update_atoms_list()
+        assert len(self.testGraph.atoms_atomname) == 16 and self.testGraph.atoms_atomname[0] == 'CH3'
+        assert len(self.testGraph.atoms_atomtype) == 16 and self.testGraph.atoms_atomtype[0] == 'CT'
+        assert len(self.testGraph.atoms_resname) == 16 and self.testGraph.atoms_resname[0] == 'ACE'
+
+    def test_update_bound_to(self):
+        self.testGraph.update_bound_to()
+        for atom in self.testGraph.AtomList:
+            assert len(atom.bound_to) > 0
+            for bonded_idx in atom.bound_to:
+                bonded_pos = self.testGraph.atoms_idx.index(bonded_idx)
+                assert any([x == atom.idx for x in self.testGraph.AtomList[bonded_pos].bound_to])
+
+def test_build_PADs():
+    input_f = Path(__file__).parent / "test_files/test_changemanager/hexala_out.top"
+    topology = read_topol(input_f)  
+    topology = topol_split_dihedrals(topology)
+
+    input_ff = Path(__file__).parent / "test_files/test_changemanager/amber99sb-star-ildnp.ff"
+    heavy_idx = '9'
+
+    newGraph = changemanager.localGraph(topology, '29',input_ff)
+    newGraph.construct_graph(depth=20)
+    newGraph.order_lists()
+    newGraph.update_atoms_list()
+    newGraph.update_bound_to()
+    newGraph.build_PADs()
+
+    assert len(newGraph.AtomList) == len(topology['atoms']) - 9
+    assert len(newGraph.BondList) == len(topology['bonds']) - 1
+    assert len(newGraph.PairList) == len(topology['pairs']) - 1
+    assert len(newGraph.AngleList) == len(topology['angles']) - 1
+    assert len(newGraph.ProperList) == len(topology['propers'])  - 1
+    assert len(newGraph.ImproperList) == len(topology['impropers']) - 1
+    return
+
+class TestLocalGraphAddRemoveMethods():
+    testGraph = changemanager.localGraph(None,'1',None)
+
+    def test_add_atom(self):
+        self.testGraph.add_Atom(changemanager.Atom('2'))
+        self.testGraph.add_Atom(changemanager.Atom('3'))
+        self.testGraph.add_Atom(changemanager.Atom('4'))
+        assert len(self.testGraph.AtomList) == 4
+        assert len(self.testGraph.atoms_idx) == 4
+
+    def test_add_bond(self):
+        self.testGraph.add_Bond(['1','2'])
+        self.testGraph.add_Bond(['2','3'])
+        self.testGraph.add_Bond(['3','4'])
+        assert ['2','3'] in self.testGraph.BondList
+        assert len(self.testGraph.BondList) == 3
+
+    def test_remove_terms(self):
+        self.testGraph.topology = {'impropers':[['1','3','2','4']]}
+        self.testGraph.order_lists()
+
+        self.testGraph.update_bound_to()
+        self.testGraph.build_PADs()
+
+        rmvdir = {'bonds':[['1', '2'], ['2', '3'], ['3', '4']],'pairs':[['1', '4']],'angles':[['1', '2', '3'], ['2', '3', '4']],'propers':[['1', '2', '3', '4']],'impropers':[['1','3','2','4']]}
+        self.testGraph.remove_terms(rmvdir)
+        assert self.testGraph.BondList == self.testGraph.PairList == self.testGraph.AngleList == self.testGraph.ProperList == self.testGraph.ImproperList == []
+        return
+
+
+class TestLocalGraphFFMethods():
+    input_ff = Path(__file__).parent / "test_files/test_changemanager/amber99sb-star-ildnp.ff"
+    testGraph = changemanager.localGraph(None,'1',input_ff)
+
+    input_f = Path(__file__).parent / "test_files/test_changemanager/hexala_out.top"
+    topology = read_topol(input_f)  
+    topology = topol_split_dihedrals(topology)
+    fullGraph = changemanager.localGraph(topology, '9', input_ff)
+    fullGraph.construct_graph()
+    fullGraph.order_lists()
+    fullGraph.update_atoms_list()
+    fullGraph.update_bound_to()
+    fullGraph.build_PADs()
+    fullGraph.order_lists()
+
+    def test_ff_AA_todict(self):
+        ffaminoacids = self.testGraph.ff_AA_todict()
+        assert 'ALA' in ffaminoacids.keys()
+        assert all(x in ffaminoacids['GLY']['atoms'] for x in [['N', 'N', '0.41570', '1'], ['H', 'H', '0.27190', '2'], ['CA', 'CT', '0.02520', '3'], ['HA1', 'H1', '0.06980', '4'], ['HA2', 'H1', '0.06980', '5'], ['C', 'C', '0.59730', '6'], ['O', 'O', '0.56790', '7']])
+        assert all(x in ffaminoacids['NME']['bonds'] for x in [['N', 'H'], ['N', 'CH3'], ['CH3', 'HH31'], ['CH3', 'HH32'], ['CH3', 'HH33'], ['C', 'N']])
+
+    def test_get_H_FF_at_an(self):
+        at_an1 = self.fullGraph.get_H_ff_at_an('9')
+        assert at_an1[0] == 'H1'
+        assert at_an1[1] == 'HA'
+        at_an2 = self.fullGraph.get_H_ff_at_an('11')
+        assert at_an2 == ('HC','HB1')
+
+    def test_compare_ff_impropers(self):
+        self.fullGraph.ImproperList.append(['5','9','7','10','4','180.00','4.60240','2'])
+        adddict, rmvdict = self.fullGraph.compare_ff_impropers('9','7')
+        assert adddict['impropers'] == [['5', '9', '7', '8', '4']]
+        assert rmvdict['impropers'] == [['5', '9', '7', '10', '4', '180.00', '4.60240', '2']]
+        pass
 

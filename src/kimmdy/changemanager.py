@@ -79,83 +79,68 @@ def break_bond_top(topology: Topology, breakpair: tuple[int, int]) -> Topology:
 def move_bond_top(
     topology: Topology, movepair: tuple[int, int], ffdir: Path
 ) -> Topology:
+
     topology = topol_split_dihedrals(topology)
-    logging.debug([topology.keys(), topology["bonds"], movepair, ffdir])
     heavy_idx = find_heavy(topology["bonds"], movepair[0])
     logging.debug(f"Heavy atom bound to HAT hydrogen has idx {heavy_idx}")
 
     logging.info(f"---- Dealing with the 'from' part ----")
+
+    # build localGraph and fill it 
     fromGraph = localGraph(topology, heavy_idx, ffdir)
     fromGraph.construct_graph()
+    fromGraph.order_lists()
+    fromGraph.update_atoms_list()
+    fromGraph.update_bound_to()
     fromGraph.build_PADs()
+    fromGraph.order_lists()
 
+    # remove terms with from_H 
     termdict = fromGraph.get_terms_with_atom(movepair[0])
     fromGraph.remove_terms(termdict)
-    topology = topol_remove_terms(
-        topology, termdict
-    )  # removing terms from local graph that include the parting hydrogen
+    topology = topol_remove_terms(topology, termdict)  
 
-    atom_terms = fromGraph.parameterize_around_atom(
-        heavy_idx
-    )  # getting parameters for terms involving the indicated atom (here heavy atom bound to parting hydrogen)
-    topology = topol_add_terms(
-        topology, atom_terms
-    )  # adding those terms to the topology dictionary
+    # parameterize around the new radical from_heavy
+    atom_terms = fromGraph.parameterize_around_atom(heavy_idx)  
+    topology = topol_add_terms(topology, atom_terms)  
+
 
     logging.info(f"---- Dealing with the 'to' part ----\n")
+
+    # build localGraph and fill it 
     toGraph = localGraph(topology, movepair[1], ffdir)
     toGraph.construct_graph()
+    toGraph.order_lists()
+    toGraph.update_atoms_list()
+    toGraph.update_bound_to()
     toGraph.add_Atom(Atom(movepair[0]))
+    toGraph.order_lists()
+    toGraph.update_atoms_list()
     toGraph.add_Bond(deepcopy(movepair))
+    toGraph.update_bound_to()
     toGraph.order_lists()
     toGraph.build_PADs()
+    toGraph.order_lists()
 
-    atoms_idxs = toGraph.atoms_idx
+    # set the correct atomtype,resname for the HAT hydrogen based on the ff definition
     atoms_idxs_from = fromGraph.atoms_idx
-    H_atomtype, H_atomname = toGraph.get_H_ff_at_an(movepair[1])
-    toGraph.AtomList[
-        atoms_idxs.index(movepair[0])
-    ].atomtype = H_atomtype  # setting the correct atomtype for the HAT hydrogen based on the ff definition
-    toGraph.AtomList[atoms_idxs.index(movepair[0])].atomname = H_atomname
-    toGraph.AtomList[atoms_idxs.index(movepair[0])].resname = fromGraph.AtomList[
-        atoms_idxs_from.index(heavy_idx)
-    ].resname  # give HAT hydrogen same resname as heavy atom
-    topol_change_at_an(
-        topology,
-        [
-            movepair[0],
-            H_atomtype,
-            H_atomname,
-            toGraph.AtomList[atoms_idxs.index(movepair[0])].resname,
-        ],
-    )  # changing the atom entry of topology
-    toGraph.update_atoms_list()
+    heavy_resname = fromGraph.AtomList[atoms_idxs_from.index(heavy_idx)].resname  
+    atmdef = toGraph.correct_atomprops(movepair,heavy_resname)
+    topol_change_at_an(topology,atmdef) 
 
+    # this is to stop overwriting bonds,angles for the newly parameterized "from" part if they are next to each other
     atom_terms = toGraph.parameterize_around_atom(movepair[1])
-    mapsection = {"bonds": slice(0, 2), "angles": slice(1, 2), "propers": slice(1, 3)}
-    rmvdict = {"bonds": [], "angles": [], "propers": []}
-    for section in [
-        "bonds",
-        "angles",
-        "propers",
-    ]:  # this is a hotfix to stop overwriting bonds,angles for the newly parameterized "from" part if they are next to each other
-        for term in atom_terms[section]:
-            if movepair[0] in term:
-                continue
-            if heavy_idx in term[mapsection[section]]:
-                rmvdict[section].append(term)
-        for entry in rmvdict[section][::-1]:
-            atom_terms[section].remove(entry)
+    atom_terms = terms_keep_only(movepair)
     topology = topol_add_terms(topology, atom_terms)
 
+    # add pairs of the from_H at the new position
     atom_terms_H = toGraph.get_terms_with_atom(movepair[0], add_function=True)
     for section in ["bonds", "angles", "propers", "impropers"]:
         atom_terms_H[section].clear()
     topology = topol_add_terms(topology, atom_terms_H)
 
-    atom_terms_add, atom_terms_remove = toGraph.compare_ff_impropers(
-        heavy_idx, movepair[1]
-    )
+    # have the right impropers at the to_heavy atom
+    atom_terms_add, atom_terms_remove = toGraph.compare_ff_impropers(heavy_idx, movepair[1])
     topology = topol_add_terms(topology, atom_terms_add)  # no need, yet
     topology = topol_remove_terms(topology, atom_terms_remove)
 
@@ -249,7 +234,7 @@ class localGraph:
             if bond_int[0] > bond_int[1]:
                 bond.reverse()
 
-## Retrieving properties
+## Retrieve properties
     def get_atomprop(self, property):
         for entry in self.topology["atoms"]:
             if entry[0] in self.atoms_idx:
@@ -294,10 +279,6 @@ class localGraph:
                             self.atoms_idx.append(bond[j])
             curratoms = deepcopy(addlist)
 
-        self.order_lists()
-        self.update_atoms_list()
-        self.update_bound_to()
-
     def build_PADs(self):
         """
         in:
@@ -338,7 +319,14 @@ class localGraph:
             else:
                 self.PairList.append([dihedral[3], dihedral[0]])
 
-        self.order_lists()
+    def correct_atomprops(self, movepair, heavy_resname):
+        atoms_idxs = self.atoms_idx
+        H_atomtype, H_atomname = self.get_H_ff_at_an(movepair[1])
+        self.AtomList[atoms_idxs.index(movepair[0])].atomtype = H_atomtype  
+        self.AtomList[atoms_idxs.index(movepair[0])].atomname = H_atomname
+        self.AtomList[atoms_idxs.index(movepair[0])].resname = heavy_resname
+        self.update_atoms_list()
+        return [movepair[0],H_atomtype,H_atomname,self.AtomList[atoms_idxs.index(movepair[0])].resname]
 
 ## Methods related to retrieving ff terms from a LocalGraph that contain a certain atom (search for index)
     def search_terms(self, TypeList, idx: str, center):
@@ -401,15 +389,12 @@ class localGraph:
         if not atom in self.AtomList:
             self.AtomList.append(atom)
             self.atoms_idx.append(atom.idx)
-            self.order_lists()
-            self.update_atoms_list()
         else:
             logging.warning(f"Atom with idx {Atom.idx} already exists!")
 
     def add_Bond(self, bond: list):
         if all(x in self.atoms_idx for x in bond):
             self.BondList.append(bond)
-            self.update_bound_to()
         else:
             logging.warning("Could not establish bond between idxs {bond}!")
 
@@ -870,6 +855,22 @@ def find_heavy(bonds, H_idx: str):
         'Atom from ConversionRecipe not found in "bonds" section of the topology'
     )
 
+def terms_keep_only(movepair,heavy_idx,atom_terms):
+    """
+    this is to stop overwriting bonds,angles for the newly parameterized "from" part if they are next to each other
+    """
+    mapsection = {"bonds": slice(0, 2), "angles": slice(1, 2), "propers": slice(1, 3)}
+    rmvdict = {"bonds": [], "angles": [], "propers": []}
+    for section in rmvdict.keys():  
+        for term in atom_terms[section]:
+            if movepair[0] in term:
+                continue
+            if heavy_idx in term[mapsection[section]]:
+                rmvdict[section].append(term)
+        for entry in rmvdict[section][::-1]:
+            atom_terms[section].remove(entry)
+    return atom_terms
+
 ## operations on the topology dict
 def topol_add_terms(topology, adddict):
     """
@@ -966,9 +967,7 @@ def topol_change_at_an(topology, atom):
             logging.debug(f"changed at/an of {entry} to {atom}")
             entry[1] = atom[1]
             entry[4] = atom[2]
-
-
-
+    return
 
 def modify_plumed(
     recipe: ConversionRecipe,
