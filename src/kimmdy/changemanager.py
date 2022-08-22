@@ -352,7 +352,7 @@ class localGraph:
             "pairs": "1",
             "angles": "1",
             "propers": "9",
-            "impropers": 4,
+            "impropers": "4",
         }
         for section in ["bonds", "pairs", "angles", "propers", "impropers"]:
             termdict_funct[section] = [
@@ -627,7 +627,7 @@ class localGraph:
         self.ff["bondtypes"] = ffbonded["bondtypes"]
         self.ff["angletypes"] = ffbonded["angletypes"]
 
-    def parameterize_prop_terms(self, prop, terms):
+    def parameterize_bonded_terms(self, prop, terms):
         """
         takes a term (bond or angle) and adds the parameters from
         the force field ffbonded.itp file that match the atomtypes
@@ -656,12 +656,9 @@ class localGraph:
 
 
 ## Parameterization
-    def patch_bond(self, bonds, atom_idx):
+    def patch_bond(self, bonds, atom_idx, newfrac = 0.98, SOfrac = 0.955, NCaR_offset = 0.006, CNR_offset = 0.008):
         logging.debug(f"Patching bonds {bonds}")
-        newfrac = (
-            0.98  # factor by which all non-hydrogen bonds of the atom_idx are corrected
-        )
-        SOfrac = 0.955
+        # factor by which all non-hydrogen bonds of the atom_idx are corrected
 
         for bond in bonds:
             partnerpos = 0 if str(atom_idx) == bond[1] else 1
@@ -685,7 +682,7 @@ class localGraph:
                 and radicalname == "CA"
             ):  # N-CA of C-alpha atom_idx
                 logging.debug("!!Found CaR!!")
-                req -= 0.006
+                req -= NCaR_offset
 
             if (
                 partner_atomtype == "C"
@@ -693,7 +690,7 @@ class localGraph:
                 and radicalname == "N"
             ):  # C-N of N atom_idx
                 logging.debug("!!Found bb NR!!")
-                req += 0.008
+                req += CNR_offset
 
             if any(at in ["S", "O"] for at in [radical_atomtype, partner_atomtype]):
                 req = req * (SOfrac / newfrac)  # correcting by a different value
@@ -702,12 +699,8 @@ class localGraph:
             bond[4] = "{:13.6f}".format(k)
             bond.append(" ; patched parameter")
 
-    def patch_angle(self, angles, atom_idx):
-        logging.debug(f"Patching angles {angles}")
-        aromatic_offset = (
-            10  # add this to all angle theteq with a center atom_idx aromatic atom type
-        )
-        newtheteq = 117  # new theteq of all angles around the center atom_idx
+    def patch_angle(self, angles, atom_idx, newtheteq = 117, aromatic_offset = 10  ):
+        logging.debug(f"Patching angles {angles}")        
 
         for angle in angles:
             radical_atomtype = self.atoms_atomtype[self.atoms_idx.index(atom_idx)]
@@ -724,10 +717,9 @@ class localGraph:
             angle[5] = "{:10.6f}".format(k)
             angle.append(" ; patched parameter")
 
-    def patch_dihedral_CA(self, propers, atom_idx):
+    def patch_dihedral_CA(self, propers, atom_idx, phivals = ["1.6279944", "21.068532", "1.447664"], psivals = ["6.556746", "20.284450", "0.297901"]):
+         # phivals and psivals from own MCSA
         logging.debug(f"Attempting to patch propers {propers}")
-        phivals = ["1.6279944", "21.068532", "1.447664"]  # from own MCSA
-        psivals = ["6.556746", "20.284450", "0.297901"]
 
         radical_resname = self.atoms_resname[self.atoms_idx.index(atom_idx)]
         radical_atomname = self.atoms_atomname[self.atoms_idx.index(atom_idx)]
@@ -772,17 +764,17 @@ class localGraph:
 
         return [*phi, *psi]
 
-    def patch_improper(self, atom_idx):
+    def patch_improper(self, atom_idx,newphik = "43.93200"):
+        # same as backbone N improper or 4.6024000
         logging.debug(f"Attempting to patch improper")
-        newphik = "43.93200"  # same as backbone N improper or 4.6024000
+          
         radical_Atom = self.AtomList[self.atoms_idx.index(atom_idx)]
 
         logging.debug(
             f"Potential improper center {atom_idx} is bound to {len(radical_Atom.bound_to)} Atoms."
         )
-        if (
-            len(radical_Atom.bound_to) == 3
-        ):  # this would mean atom_idx went from 4 to 3 partners -> tetrahedral to planar
+        # this would mean atom_idx went from 4 to 3 partners -> tetrahedral to planar
+        if (len(radical_Atom.bound_to) == 3):  
             improper = [
                 radical_Atom.bound_to[0],
                 radical_Atom.bound_to[1],
@@ -799,10 +791,6 @@ class localGraph:
             return []
 
     def parameterize_around_atom(self, atom_idx):
-        # if None in self.atoms_atomtype:
-        #     self.get_atomprop('atomtype')
-        #     self.get_atomprop('atomname')
-        #     self.get_atomprop('resname')
         logging.info(f" --- Parameterizing around atom {atom_idx} ---\n")
         logging.debug(self.atoms_idx)
         logging.debug(self.atoms_atomtype)
@@ -810,24 +798,19 @@ class localGraph:
         logging.debug(self.atoms_resname)
 
         atom_terms = self.get_terms_with_atom(atom_idx, center=True)
-        # don't need pairs (and propers)
         atom_terms["pairs"].clear()
-        # del atom_terms['propers']
 
         # deal with ff
         self.get_ff_sections()
-        atom_terms["bonds"] = self.parameterize_prop_terms(
+        atom_terms["bonds"] = self.parameterize_bonded_terms(
             "bondtypes", atom_terms["bonds"]
         )
-        atom_terms["angles"] = self.parameterize_prop_terms(
+        atom_terms["angles"] = self.parameterize_bonded_terms(
             "angletypes", atom_terms["angles"]
         )
-        atom_terms["propers"] = [
-            [*x, "9"] for x in atom_terms["propers"]
-        ]  # adding function to propers
-        atom_terms["impropers"] = [
-            [*x, "4"] if len(x) == 4 else x for x in atom_terms["impropers"]
-        ]  # adding function to impropers
+         # adding function to propers, impropers
+        atom_terms["propers"] = [[*x, "9"] for x in atom_terms["propers"]] 
+        atom_terms["impropers"] = [[*x, "4"] if len(x) == 4 else x for x in atom_terms["impropers"]]
 
         # apply patches
         if self.is_radical(atom_idx):

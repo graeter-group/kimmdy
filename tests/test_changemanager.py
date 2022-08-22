@@ -207,5 +207,106 @@ class TestLocalGraphFFMethods():
         adddict, rmvdict = self.fullGraph.compare_ff_impropers('9','7')
         assert adddict['impropers'] == [['5', '9', '7', '8', '4']]
         assert rmvdict['impropers'] == [['5', '9', '7', '10', '4', '180.00', '4.60240', '2']]
-        pass
+    
+    def test_get_ff_sections(self):
+        self.testGraph.get_ff_sections()
+        assert self.testGraph.ff['bondtypes'][1] == ['C', 'C', '1', '0.1525', '259408.0', ';', 'new99']
+        assert self.testGraph.ff['angletypes'][-1] == ['CT', 'CC', 'CC', '1', '115.970', '541.070', ';', 'AOK_parm.PYL']
+
+class TestLocalGraphParameterize():
+    input_f = Path(__file__).parent / "test_files/test_changemanager/AlaCaR_out.top"
+    input_ff = Path(__file__).parent / "test_files/test_changemanager/amber99sb-star-ildnp.ff"
+    
+    topology = read_topol(input_f)  
+    topology = topol_split_dihedrals(topology)
+    fullGraph = changemanager.localGraph(topology, '9', input_ff)   
+    fullGraph.construct_graph()
+    fullGraph.order_lists()
+    fullGraph.update_atoms_list()
+    fullGraph.update_bound_to()
+    fullGraph.build_PADs()
+    fullGraph.order_lists()
+    fullGraph.get_ff_sections()
+
+    atom_terms = fullGraph.get_terms_with_atom('9', center=True)
+    atom_terms["pairs"].clear()
+
+
+    def test_search_terms(self):
+        termdict = {}
+        termdict["bonds"] = self.fullGraph.search_terms(self.fullGraph.BondList, '9', False)
+        termdict["propers"] = self.fullGraph.search_terms(self.fullGraph.ProperList, '9', False)
+        termdict["centerpropers"] = self.fullGraph.search_terms(self.fullGraph.ProperList, '9', True)
+        assert termdict["bonds"] == [['7', '9'], ['9', '10'], ['9', '14']]
+        assert termdict["propers"][0] == ['1', '5', '7', '9']
+        assert termdict["centerpropers"] == [['5', '7', '9', '10'], ['5', '7', '9', '14'], ['8', '7', '9', '10'], ['8', '7', '9', '14'], ['7', '9', '10', '11'], ['7', '9', '10', '12'], ['7', '9', '10', '13'], ['14', '9', '10', '11'], ['14', '9', '10', '12'], ['14', '9', '10', '13'], ['7', '9', '14', '15'], ['7', '9', '14', '16'], ['10', '9', '14', '15'], ['10', '9', '14', '16']]
+    
+    def test_add_function_to_terms(self):
+        termdict = {"bonds":[['b1'],['b2']],"pairs":[['p1'],['p2']],"angles":[['a1'],['a2']],"propers":[['p1'],['p2']],"impropers":[['i1'],['i2']]}
+        termdict_funct = self.fullGraph.add_function_to_terms(termdict)
+        funct_dict = {
+            "bonds": "1",
+            "pairs": "1",
+            "angles": "1",
+            "propers": "9",
+            "impropers": "4",
+        }
+        for key,val in termdict_funct.items():
+            for entry in val:
+                assert entry[-1] == funct_dict[key]
+
+    def test_is_radical(self):
+        assert self.fullGraph.is_radical('9')
+        assert not self.fullGraph.is_radical('10')
+
+    def test_parameterize_bonded_terms(self):
+        terms_bond = self.fullGraph.parameterize_bonded_terms('bondtypes',self.fullGraph.BondList)
+        terms_angles = self.fullGraph.parameterize_bonded_terms('angletypes',self.fullGraph.AngleList)
+        assert all([len(x) == 5 for x in terms_bond])
+        assert terms_angles[4] == ['5', '7', '9', '1', '121.900', '418.400']  # C N CA
+
+    def test_patch_bond(self):
+        self.atom_terms["bonds"] = self.fullGraph.parameterize_bonded_terms("bondtypes", self.atom_terms["bonds"])   
+        unpatched_terms = deepcopy(self.atom_terms["bonds"])  
+        newfrac = 0.98
+        NCaR_offset = 0.006
+        self.fullGraph.patch_bond(self.atom_terms["bonds"],'9',newfrac, 0.955, NCaR_offset, CNR_offset = 0.008)
+        assert pytest.approx(float(self.atom_terms["bonds"][0][3]),0.002) == float(unpatched_terms[0][3]) * newfrac  - NCaR_offset
+        assert pytest.approx(float(self.atom_terms["bonds"][1][3]),0.002) == float(unpatched_terms[1][3]) * newfrac
+
+    def test_patch_angle(self):
+        self.atom_terms["angles"] = self.fullGraph.parameterize_bonded_terms("angletypes", self.atom_terms["angles"])   
+        unpatched_terms = deepcopy(self.atom_terms["angles"])  
+        newtheteq = 117
+        self.fullGraph.patch_angle(self.atom_terms["angles"],'9',newtheteq)
+        assert all([int(float(x[4])) == newtheteq for x in self.atom_terms["angles"]])
+
+
+    def test_patch_dihedral_CA(self):
+        # maybe also test whether dihedrals are well formed
+        self.atom_terms["propers"] = [[*x, "9"] for x in self.atom_terms["propers"]]
+        unpatched_terms = deepcopy(self.atom_terms["propers"])
+        phivals = ["1.6279944", "21.068532", "1.447664"]
+        psivals = ["6.556746", "20.284450", "0.297901"]
+        self.atom_terms["propers"] = self.fullGraph.patch_dihedral_CA(self.atom_terms["propers"],'9',phivals,psivals)
+        assert self.atom_terms["propers"][0][6] == phivals[0]
+        assert self.atom_terms["propers"][4][6] == psivals[1]
+
+    def test_patch_improper(self):
+        newphik = "43.93200"
+        self.atom_terms["impropers"] = self.fullGraph.patch_improper('9',newphik)
+        assert self.atom_terms["impropers"] == [['7', '10', '9', '14', '4', '180.0000000', str(newphik), '2', ' ; patched parameter']]
+
+    def test_parameterize_around_atom(self):        
+        atom_terms_rad = self.fullGraph.parameterize_around_atom('9')
+        atom_terms_nonrad = self.fullGraph.parameterize_around_atom('10')
+        for key,val in atom_terms_rad.items():
+            if not key in ['pairs']:
+                assert any(term[-1].endswith('patched parameter') for term in val)
+
+        for key,val in atom_terms_nonrad.items():
+            if not key in ['pairs','impropers']:
+                assert not all(term[-1].endswith('patched parameter') for term in val)
+        
+
 
