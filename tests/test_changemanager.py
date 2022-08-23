@@ -101,7 +101,7 @@ class TestLocalGraphConstructMethods:
     topology = topol_split_dihedrals(topology)
 
     input_ff = (
-        Path(__file__).parent / "test_files/test_changemanager/amber99sb-star-ildnp.ff"
+        Path(__file__).parent / "test_files/assets/amber99sb-star-ildnp.ff"
     )
     heavy_idx = "9"
 
@@ -162,7 +162,7 @@ def test_build_PADs():
     topology = topol_split_dihedrals(topology)
 
     input_ff = (
-        Path(__file__).parent / "test_files/test_changemanager/amber99sb-star-ildnp.ff"
+        Path(__file__).parent / "test_files/assets/amber99sb-star-ildnp.ff"
     )
     heavy_idx = "9"
 
@@ -227,7 +227,7 @@ class TestLocalGraphAddRemoveMethods:
 
 class TestLocalGraphFFMethods:
     input_ff = (
-        Path(__file__).parent / "test_files/test_changemanager/amber99sb-star-ildnp.ff"
+        Path(__file__).parent / "test_files/assets/amber99sb-star-ildnp.ff"
     )
     testGraph = changemanager.localGraph(None, "1", input_ff)
 
@@ -312,7 +312,7 @@ class TestLocalGraphFFMethods:
 class TestLocalGraphParameterize:
     input_f = Path(__file__).parent / "test_files/test_changemanager/AlaCaR_out.top"
     input_ff = (
-        Path(__file__).parent / "test_files/test_changemanager/amber99sb-star-ildnp.ff"
+        Path(__file__).parent / "test_files/assets/amber99sb-star-ildnp.ff"
     )
 
     topology = read_topol(input_f)
