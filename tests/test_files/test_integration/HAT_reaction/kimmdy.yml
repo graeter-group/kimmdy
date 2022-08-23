@@ -1,0 +1,24 @@
+dryrun: false
+iterations: 100
+name: 'hat_tf_000'
+# ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
+top: 'Ala_out.top'
+gro: 'npt.gro'
+idx: 'index.ndx'
+plumed: false
+equilibrium:
+  mdp: 'md.mdp'
+changer:
+  coordinates:
+    md:
+      mdp: 'minim.mdp'
+reactions:
+  HAT:
+sequence:
+  - equilibrium
+  -
+    mult: 3
+    tasks:
+      - reactions
+      - equilibrium
+      
