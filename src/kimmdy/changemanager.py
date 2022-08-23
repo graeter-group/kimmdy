@@ -130,7 +130,7 @@ def move_bond_top(
 
     # this is to stop overwriting bonds,angles for the newly parameterized "from" part if they are next to each other
     atom_terms = toGraph.parameterize_around_atom(movepair[1])
-    atom_terms = terms_keep_only(movepair)
+    atom_terms = terms_keep_only(movepair,heavy_idx,atom_terms)
     topology = topol_add_terms(topology, atom_terms)
 
     # add pairs of the from_H at the new position
@@ -975,6 +975,7 @@ def modify_plumed(
 def break_bond_plumed(plumeddat, breakpair, plumeddist):
     new_distances = []
     broken_distances = []
+    breakpair = [str(x) for x in breakpair]
     for line in plumeddat["distances"]:
         if all(x in line["atoms"] for x in breakpair):
             broken_distances.append(line["id"])
