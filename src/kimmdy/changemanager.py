@@ -81,6 +81,7 @@ def move_bond_top(
 ) -> Topology:
 
     topology = topol_split_dihedrals(topology)
+    movepair = [str(x) for x in movepair]
     heavy_idx = find_heavy(topology["bonds"], movepair[0])
     logging.debug(f"Heavy atom bound to HAT hydrogen has idx {heavy_idx}")
 
@@ -697,7 +698,7 @@ class localGraph:
 
             bond[3] = "{:7.5f}".format(req)  # will carry back to atom_terms
             bond[4] = "{:13.6f}".format(k)
-            bond.append(" ; patched parameter")
+            bond.extend([';', 'patched', 'parameter'])
 
     def patch_angle(self, angles, atom_idx, newtheteq = 117, aromatic_offset = 10  ):
         logging.debug(f"Patching angles {angles}")        
@@ -715,7 +716,7 @@ class localGraph:
 
             angle[4] = "{:11.7f}".format(theteq)  # will carry back to atom_terms
             angle[5] = "{:10.6f}".format(k)
-            angle.append(" ; patched parameter")
+            angle.extend([';', 'patched', 'parameter'])
 
     def patch_dihedral_CA(self, propers, atom_idx, phivals = ["1.6279944", "21.068532", "1.447664"], psivals = ["6.556746", "20.284450", "0.297901"]):
          # phivals and psivals from own MCSA
@@ -746,7 +747,9 @@ class localGraph:
                             "180.000000",
                             phivals[ii],
                             str(ii + 1),
-                            " ; patched parameter",
+                            ';', 
+                            'patched', 
+                            'parameter'
                         ]
                     )
 
@@ -758,7 +761,9 @@ class localGraph:
                             "180.000000",
                             psivals[ii],
                             str(ii + 1),
-                            " ; patched parameter",
+                            ';', 
+                            'patched', 
+                            'parameter'
                         ]
                     )
 
@@ -784,7 +789,9 @@ class localGraph:
                 "180.0000000",
                 newphik,
                 "2",
-                " ; patched parameter",
+                ';', 
+                'patched', 
+                'parameter'
             ]  # improper entry
             return [improper]
         else:

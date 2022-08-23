@@ -295,18 +295,18 @@ class TestLocalGraphParameterize():
     def test_patch_improper(self):
         newphik = "43.93200"
         self.atom_terms["impropers"] = self.fullGraph.patch_improper('9',newphik)
-        assert self.atom_terms["impropers"] == [['7', '10', '9', '14', '4', '180.0000000', str(newphik), '2', ' ; patched parameter']]
+        assert self.atom_terms["impropers"] == [['7', '10', '9', '14', '4', '180.0000000', str(newphik), '2', ';', 'patched', 'parameter']]
 
     def test_parameterize_around_atom(self):        
         atom_terms_rad = self.fullGraph.parameterize_around_atom('9')
         atom_terms_nonrad = self.fullGraph.parameterize_around_atom('10')
         for key,val in atom_terms_rad.items():
             if not key in ['pairs']:
-                assert any(term[-1].endswith('patched parameter') for term in val)
+                assert any(term[-1].endswith('parameter') for term in val)
 
         for key,val in atom_terms_nonrad.items():
             if not key in ['pairs','impropers']:
-                assert not all(term[-1].endswith('patched parameter') for term in val)
+                assert not all(term[-1].endswith('parameter') for term in val)
         
 
 
