@@ -4,7 +4,6 @@
 # our own program output
 kimmdy.log
 tmp/
-amber99sb-star-ildnp.ff/
 *.gif
 *.log
 example/**/*[0-9][0-9][0-9]/
