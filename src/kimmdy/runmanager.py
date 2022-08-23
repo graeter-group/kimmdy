@@ -94,7 +94,7 @@ class RunManager:
         # with the new AutoFillDict??
         if self.config.plumed:
             self.latest_files["plumed.dat"] = self.config.cwd / self.config.plumed.dat
-            #self.latest_files["distances.dat"] = self.config.plumed.distances
+            # self.latest_files["distances.dat"] = self.config.plumed.distances
 
         # If we want to allow starting from radical containing systems this needs to be initialized:
         # TODO: update with HAT
@@ -336,7 +336,7 @@ class RunManager:
                 self.chosen_recipe,
                 files.input["plumed.dat"],
                 files.output["plumed.dat"],
-                files.input["distances.dat"]
+                files.input["distances.dat"],
             )
             logging.info(
                 f'Wrote new plumedfile to {files.output["plumed.dat"].parts[-3:]}'
