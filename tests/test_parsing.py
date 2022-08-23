@@ -43,6 +43,7 @@ def test_doubleparse_urea():
     top3 = parsing.read_topol(p2)
     assert top2 == top3
 
+
 def test_split_dihedrals():
     set_dir()
     top_path = Path("pytest_urea.top")
@@ -50,9 +51,6 @@ def test_split_dihedrals():
     top_tmp = parsing.topol_split_dihedrals(deepcopy(top))
     top_compare = parsing.topol_merge_propers_impropers(deepcopy(top_tmp))
     assert top == top_compare
-
-
-
 
 
 #%%

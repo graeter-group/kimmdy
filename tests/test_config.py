@@ -36,7 +36,7 @@ def test_parse_config2_missing_dat_in_plumed():
 
         with pytest.raises(ValueError):
             config = Config(input_f)
-            if not hasattr(config.plumed,'dat'):
+            if not hasattr(config.plumed, "dat"):
                 raise ValueError
     finally:
         for d in input_f.parent.glob("test_config_2*"):
