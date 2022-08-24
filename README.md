@@ -13,7 +13,9 @@ This is a short readme / manual to KIMMDY
 
 ## First simulation
 * change directory to `example_triala`
-* run kimmdy `kimmdy`
+* `ln -s ../../tests/test_files/assets/amber99sb-star-ildnp.ff ./amber99sb-star-ildnp.ff`
+* run kimmdy `kimmdy -l INFO`
+* check output: `kimmdy.log`, `test_out_00X/`
 
 ## Development
 
