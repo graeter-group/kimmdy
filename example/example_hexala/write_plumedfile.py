@@ -128,12 +128,8 @@ def write_conditions_in_plumedfile(topfile, indexfile, indexgroup, outplumed):
     print("finished writing plumed-file")
 
 
-topfile = "/hits/fast/mbm/hartmaec/kimmdys/kimmdy_topology/example/example_hexala/hexala_out.top"
-indexfile = (
-    "/hits/fast/mbm/hartmaec/kimmdys/kimmdy_topology/example/example_hexala/index.ndx"
-)
+topfile = "example/example_hexala/hexala_out.top"
+indexfile = ("example/example_hexala/index.ndx")
 indexgroup = "Backbone"
-outplumed = (
-    "/hits/fast/mbm/hartmaec/kimmdys/kimmdy_topology/example/example_hexala/plumed.dat"
-)
+outplumed = ("example/example_hexala/plumed.dat")
 write_conditions_in_plumedfile(topfile, indexfile, indexgroup, outplumed)
