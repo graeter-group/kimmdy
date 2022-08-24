@@ -4,11 +4,11 @@ from typing import Callable
 
 
 class AutoFillDict(dict):
-    def __init__(self, factory):
-        self.factory = factory
+    def __init__(self, get_missing : Callable):
+        self.get_missing = get_missing
 
     def __missing__(self, key):
-        self[key] = self.factory(key)
+        self[key] = self.get_missing(key)
         return self[key]
 
 
