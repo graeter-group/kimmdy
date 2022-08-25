@@ -10,9 +10,7 @@ from kimmdy.utils import write_conditions_in_plumedfile
 from kimmdy.cmd import kimmdy_run
 
 
-basedir = Path(
-    "/hits/fast/mbm/hartmaec/kimmdys/kimmdy_topology/example/example_rngpeps"
-)
+basedir = Path("example/example_rngpeps")
 del_old = True
 
 for i in range(20, 30):

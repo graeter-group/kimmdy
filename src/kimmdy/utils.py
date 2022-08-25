@@ -220,6 +220,48 @@ def check_gmx_version(config: Config):
     return version
 
 
+## helpers for changemanager
+def str_to_int(elem):
+    try:
+        return int(elem)
+    except ValueError:
+        # logging.debug("Not all List elements are integers! Returning 0")
+        return 0
+
+
+def sort_bond(entry):
+    return sorted((str_to_int(entry[0]), str_to_int(entry[1])))
+
+
+def sort_angle(entry):
+    return (str_to_int(entry[1]), str_to_int(entry[0]), str_to_int(entry[2]))
+
+
+def sort_dihedral(entry):
+    return (
+        str_to_int(entry[1]),
+        str_to_int(entry[2]),
+        str_to_int(entry[0]),
+        str_to_int(entry[3]),
+    )
+
+
+def sort_improper(entry):
+    return (
+        str_to_int(entry[2]),
+        str_to_int(entry[0]),
+        str_to_int(entry[1]),
+        str_to_int(entry[3]),
+    )
+
+
+def check_idx(object):
+    try:
+        return str_to_int(object.idx)
+    except:
+        raise ValueError("Non Atom object in AtomList")
+
+
 ## from kimmdy
 def get_data_from_file(filepath):
     with open(filepath, "r") as f:

@@ -5,6 +5,7 @@ import string
 from hypothesis import given, strategies as st
 from kimmdy import parsing
 from pathlib import Path
+from copy import deepcopy
 
 
 def set_dir():
@@ -43,6 +44,15 @@ def test_doubleparse_urea():
     assert top2 == top3
 
 
+def test_split_dihedrals():
+    set_dir()
+    top_path = Path("pytest_urea.top")
+    top = parsing.read_topol(top_path)
+    top_tmp = parsing.topol_split_dihedrals(deepcopy(top))
+    top_compare = parsing.topol_merge_propers_impropers(deepcopy(top_tmp))
+    assert top == top_compare
+
+
 #%%
 #### Parsing should be invertible ####
 allowed_text = st.text(
@@ -58,7 +68,8 @@ allowed_text = st.text(
     )
 )
 def test_parser_invertible(d):
-    p = Path("pytest_topol.top")
+    p = Path("tmp/pytest_topol.top")
+    p.parent.mkdir(exist_ok=True)
     parsing.write_topol(d, p)
     d2 = parsing.read_topol(p)
     assert d == d2
