@@ -68,7 +68,8 @@ allowed_text = st.text(
     )
 )
 def test_parser_invertible(d):
-    p = Path("pytest_topol.top")
+    p = Path("tmp/pytest_topol.top")
+    p.parent.mkdir(exist_ok=True)
     parsing.write_topol(d, p)
     d2 = parsing.read_topol(p)
     assert d == d2

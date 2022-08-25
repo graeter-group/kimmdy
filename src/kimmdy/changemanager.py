@@ -605,9 +605,8 @@ class localGraph:
             if not improper_atomname[:4] in ffaminoacids[to_res]["impropers"]:
                 rmvdict["impropers"].append(to_impropers[i])
 
-        for improper_res in ffaminoacids[to_res][
-            "impropers"
-        ]:  # probably need to work on this
+        # TODO: probably need to work on this
+        for improper_res in ffaminoacids[to_res]["impropers"]:  
             if to_atomname == improper_res[2]:
                 improper_res_idx = [
                     self.atoms_idx[self.atoms_atomname.index(x)] for x in improper_res
