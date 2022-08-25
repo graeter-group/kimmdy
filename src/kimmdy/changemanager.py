@@ -9,6 +9,14 @@ from kimmdy.parsing import (
     topol_merge_propers_impropers,
     Topology,
 )
+from kimmdy.utils import (
+    str_to_int,
+    check_idx,
+    sort_bond,
+    sort_angle,
+    sort_dihedral,
+    sort_improper,
+)
 from pathlib import Path
 
 from abc import ABC, abstractmethod
@@ -39,6 +47,7 @@ def break_bond_top(topology: Topology, breakpair: tuple[int, int]) -> Topology:
     """Break bonds in topology.
     removes bond, angles and dihedrals where breakpair was involved
     """
+    breakpair = (str(breakpair[0]), str(breakpair[1]))
     topology["bonds"] = [
         bond
         for bond in topology["bonds"]
@@ -56,8 +65,9 @@ def break_bond_top(topology: Topology, breakpair: tuple[int, int]) -> Topology:
             x in [dihedral[0], dihedral[1], dihedral[2], dihedral[3]] for x in breakpair
         )
     ]
+
+    header = topology["pairs"][0]
     dihpairs = [[d[0], d[3]] for d in topology["dihedrals"]]
-    logging.warning(dihpairs)
     for (
         pair
     ) in (
@@ -67,92 +77,78 @@ def break_bond_top(topology: Topology, breakpair: tuple[int, int]) -> Topology:
             pair_int = [int(pair[0]), int(pair[1])]
             if pair_int[0] > pair_int[1]:
                 pair.reverse()
-    dihpairs = sorted(dihpairs, key=eval_bond)
-    logging.warning(dihpairs)
-    logging.warning(topology["pairs"])
+    dihpairs = sorted(dihpairs, key=sort_bond)
+
     topology["pairs"] = [pair for pair in topology["pairs"] if pair[:2] in dihpairs]
-    logging.warning(topology["pairs"])
+    topology["pairs"].insert(0, header)
+
     return topology
 
 
 def move_bond_top(
     topology: Topology, movepair: tuple[int, int], ffdir: Path
 ) -> Topology:
+
     topology = topol_split_dihedrals(topology)
-    logging.debug([topology.keys(), topology["bonds"], movepair, ffdir])
+    movepair = [str(x) for x in movepair]
     heavy_idx = find_heavy(topology["bonds"], movepair[0])
     logging.debug(f"Heavy atom bound to HAT hydrogen has idx {heavy_idx}")
 
     logging.info(f"---- Dealing with the 'from' part ----")
+
+    # build localGraph and fill it
     fromGraph = localGraph(topology, heavy_idx, ffdir)
     fromGraph.construct_graph()
+    fromGraph.order_lists()
+    fromGraph.update_atoms_list()
+    fromGraph.update_bound_to()
     fromGraph.build_PADs()
+    fromGraph.order_lists()
 
+    # remove terms with from_H
     termdict = fromGraph.get_terms_with_atom(movepair[0])
     fromGraph.remove_terms(termdict)
-    topology = topol_remove_terms(
-        topology, termdict
-    )  # removing terms from local graph that include the parting hydrogen
+    topology = topol_remove_terms(topology, termdict)
 
-    atom_terms = fromGraph.parameterize_around_atom(
-        heavy_idx
-    )  # getting parameters for terms involving the indicated atom (here heavy atom bound to parting hydrogen)
-    topology = topol_add_terms(
-        topology, atom_terms
-    )  # adding those terms to the topology dictionary
-
-    logging.info(f"---- Dealing with the 'to' part ----\n")
-    toGraph = localGraph(topology, movepair[1], ffdir)
-    toGraph.construct_graph()
-    toGraph.add_Atom(Atom(movepair[0]))
-    toGraph.add_Bond(deepcopy(movepair))
-    toGraph.order_lists()
-    toGraph.build_PADs()
-
-    atoms_idxs = toGraph.atoms_idx
-    atoms_idxs_from = fromGraph.atoms_idx
-    H_atomtype, H_atomname = toGraph.get_H_ff_at_an(movepair[1])
-    toGraph.AtomList[
-        atoms_idxs.index(movepair[0])
-    ].atomtype = H_atomtype  # setting the correct atomtype for the HAT hydrogen based on the ff definition
-    toGraph.AtomList[atoms_idxs.index(movepair[0])].atomname = H_atomname
-    logging.warning([fromGraph.atoms_idx, toGraph.atoms_idx])
-    toGraph.AtomList[atoms_idxs.index(movepair[0])].resname = fromGraph.AtomList[
-        atoms_idxs_from.index(heavy_idx)
-    ].resname  # give HAT hydrogen same resname as heavy atom
-    topol_change_at_an(
-        topology,
-        [
-            movepair[0],
-            H_atomtype,
-            H_atomname,
-            toGraph.AtomList[atoms_idxs.index(movepair[0])].resname,
-        ],
-    )  # changing the atom entry of topology
-    toGraph.update_atoms_list()
-
-    atom_terms = toGraph.parameterize_around_atom(movepair[1])
-    mapsection = {"bonds": slice(0, 2), "angles": slice(1, 2), "propers": slice(1, 3)}
-    rmvdict = {"bonds": [], "angles": [], "propers": []}
-    for section in [
-        "bonds",
-        "angles",
-        "propers",
-    ]:  # this is a hotfix to stop overwriting bonds,angles for the newly parameterized "from" part if they are next to each other
-        for term in atom_terms[section]:
-            if movepair[0] in term:
-                continue
-            if heavy_idx in term[mapsection[section]]:
-                rmvdict[section].append(term)
-        for entry in rmvdict[section][::-1]:
-            atom_terms[section].remove(entry)
+    # parameterize around the new radical from_heavy
+    atom_terms = fromGraph.parameterize_around_atom(heavy_idx)
     topology = topol_add_terms(topology, atom_terms)
 
+    logging.info(f"---- Dealing with the 'to' part ----\n")
+
+    # build localGraph and fill it
+    toGraph = localGraph(topology, movepair[1], ffdir)
+    toGraph.construct_graph()
+    toGraph.order_lists()
+    toGraph.update_atoms_list()
+    toGraph.update_bound_to()
+    toGraph.add_Atom(Atom(movepair[0]))
+    toGraph.order_lists()
+    toGraph.update_atoms_list()
+    toGraph.add_Bond(deepcopy(movepair))
+    toGraph.update_bound_to()
+    toGraph.order_lists()
+    toGraph.build_PADs()
+    toGraph.order_lists()
+
+    # set the correct atomtype,resname for the HAT hydrogen based on the ff definition
+    atoms_idxs_from = fromGraph.atoms_idx
+    heavy_resname = fromGraph.AtomList[atoms_idxs_from.index(heavy_idx)].resname
+    atmdef = toGraph.correct_atomprops(movepair, heavy_resname)
+    topol_change_at_an(topology, atmdef)
+
+    # this is to stop overwriting bonds,angles for the newly parameterized "from" part if they are next to each other
+    atom_terms = toGraph.parameterize_around_atom(movepair[1])
+    atom_terms = terms_keep_only(movepair, heavy_idx, atom_terms)
+    topology = topol_add_terms(topology, atom_terms)
+
+    # add pairs of the from_H at the new position
     atom_terms_H = toGraph.get_terms_with_atom(movepair[0], add_function=True)
     for section in ["bonds", "angles", "propers", "impropers"]:
         atom_terms_H[section].clear()
     topology = topol_add_terms(topology, atom_terms_H)
 
+    # have the right impropers at the to_heavy atom
     atom_terms_add, atom_terms_remove = toGraph.compare_ff_impropers(
         heavy_idx, movepair[1]
     )
@@ -161,56 +157,6 @@ def move_bond_top(
 
     topology = topol_merge_propers_impropers(topology)
     return topology
-
-
-def break_bond_plumed(plumeddat, breakpair, newplumeddist):
-    new_distances = []
-    broken_distances = []
-    for line in plumeddat["distances"]:
-        if breakpair[0] in line["atoms"] or breakpair[1] in line["atoms"]:
-            broken_distances.append(line["id"])
-        else:
-            new_distances.append(line)
-
-    plumeddat["distances"] = new_distances
-
-    for line in plumeddat["prints"]:
-        line["ARG"] = [id for id in line["ARG"] if not id in broken_distances]
-        line["FILE"] = newplumeddist
-
-    return plumeddat
-
-
-def move_bond_plumed(plumeddat, movepair, newplumeddist):
-    raise NotImplementedError(
-        "Plumeddat Changer for moving Atoms is not implemented yet."
-    )
-
-
-def modify_plumed(
-    recipe: ConversionRecipe,
-    oldplumeddat: Path,
-    newplumeddat: Path,
-    newplumeddist: str,
-):
-
-    logging.info(
-        f"Reading: {oldplumeddat} and writing modified plumed input to {newplumeddat}."
-    )  #  Also writing {newplumeddist}.  nonono this is written during the next md run
-    plumeddat = read_plumed(oldplumeddat)
-
-    for type, pair in zip(recipe.type, recipe.atom_idx):
-        if type == ConversionType.BREAK:
-            plumeddat = break_bond_plumed(plumeddat, pair, newplumeddist)
-        elif type == ConversionType.MOVE:
-            plumeddat = move_bond_plumed(plumeddat, pair, newplumeddist)
-
-    write_plumed(plumeddat, newplumeddat)
-
-    #%%
-
-
-# new implementation
 
 
 class Atom:
@@ -225,47 +171,6 @@ class Atom:
         self.atomname = atomname
         self.resname = resname
         self.bound_to = []
-
-
-def str_to_int(elem):
-    try:
-        return int(elem)
-    except ValueError:
-        # logging.debug("Not all List elements are integers! Returning 0")
-        return 0
-
-
-def eval_bond(entry):
-    return sorted((str_to_int(entry[0]), str_to_int(entry[1])))
-
-
-def eval_angle(entry):
-    return (str_to_int(entry[1]), str_to_int(entry[0]), str_to_int(entry[2]))
-
-
-def eval_dihedral(entry):
-    return (
-        str_to_int(entry[1]),
-        str_to_int(entry[2]),
-        str_to_int(entry[0]),
-        str_to_int(entry[3]),
-    )
-
-
-def eval_improper(entry):
-    return (
-        str_to_int(entry[2]),
-        str_to_int(entry[0]),
-        str_to_int(entry[1]),
-        str_to_int(entry[3]),
-    )
-
-
-def check_idx(object):
-    try:
-        return str_to_int(object.idx)
-    except:
-        raise ValueError("Non Atom object in AtomList")
 
 
 class localGraph:
@@ -287,6 +192,7 @@ class localGraph:
         self.atoms_atomname = []
         self.atoms_resname = []
 
+    ## Propagate changes to all attributes
     def update_atoms_list(self):
         self.atoms_idx = self.get_AtomList_property("idx")
         self.get_atomprop("atomtype")
@@ -295,49 +201,6 @@ class localGraph:
         self.atoms_atomtype = self.get_AtomList_property("atomtype")
         self.atoms_atomname = self.get_AtomList_property("atomname")
         self.atoms_resname = self.get_AtomList_property("resname")
-
-    def order_lists(self):
-        self.AtomList = sorted(self.AtomList, key=check_idx)
-        self.atoms_idx = sorted(self.atoms_idx, key=str_to_int)
-        self.atoms_atomtype = [
-            x
-            for _, x in sorted(zip(self.atoms_idx, self.atoms_atomtype), key=eval_bond)
-        ]  # not so great solution
-        self.atoms_atomname = [
-            x
-            for _, x in sorted(zip(self.atoms_idx, self.atoms_atomname), key=eval_bond)
-        ]
-        self.atoms_resname = [
-            x for _, x in sorted(zip(self.atoms_idx, self.atoms_resname), key=eval_bond)
-        ]
-        self.BondList = sorted(self.BondList, key=eval_bond)
-        self.PairList = sorted(self.PairList, key=eval_bond)
-        self.AngleList = sorted(self.AngleList, key=eval_angle)
-        self.ProperList = sorted(self.ProperList, key=eval_dihedral)
-        self.ImproperList = sorted(self.ImproperList, key=eval_improper)
-
-        for (
-            bond
-        ) in (
-            self.BondList
-        ):  # keeping bonds in proper order (which one goes first in the definition)
-            bond_int = [int(bond[0]), int(bond[1])]
-            if bond_int[0] > bond_int[1]:
-                bond.reverse()
-
-    def get_AtomList_property(self, property):
-        if property == "idx":
-            return [x.idx for x in self.AtomList]
-        elif property == "bound_to":
-            return [x.bound_to for x in self.AtomList]
-        elif property == "atomtype":
-            return [x.atomtype for x in self.AtomList]
-        elif property == "atomname":
-            return [x.atomname for x in self.AtomList]
-        elif property == "resname":
-            return [x.resname for x in self.AtomList]
-        else:
-            raise ValueError("Can't find property {} in object".format(property))
 
     def update_bound_to(self):
         bound_dict = {}
@@ -353,6 +216,61 @@ class localGraph:
                 bound_dict[atom_idx], key=str_to_int
             )
 
+    def order_lists(self):
+        self.AtomList = sorted(self.AtomList, key=check_idx)
+        self.atoms_idx = sorted(self.atoms_idx, key=str_to_int)
+        self.atoms_atomtype = [
+            x
+            for _, x in sorted(zip(self.atoms_idx, self.atoms_atomtype), key=sort_bond)
+        ]  # not so great solution
+        self.atoms_atomname = [
+            x
+            for _, x in sorted(zip(self.atoms_idx, self.atoms_atomname), key=sort_bond)
+        ]
+        self.atoms_resname = [
+            x for _, x in sorted(zip(self.atoms_idx, self.atoms_resname), key=sort_bond)
+        ]
+        self.BondList = sorted(self.BondList, key=sort_bond)
+        self.PairList = sorted(self.PairList, key=sort_bond)
+        self.AngleList = sorted(self.AngleList, key=sort_angle)
+        self.ProperList = sorted(self.ProperList, key=sort_dihedral)
+        self.ImproperList = sorted(self.ImproperList, key=sort_improper)
+
+        for (
+            bond
+        ) in (
+            self.BondList
+        ):  # keeping bonds in proper order (which one goes first in the definition)
+            bond_int = [int(bond[0]), int(bond[1])]
+            if bond_int[0] > bond_int[1]:
+                bond.reverse()
+
+    ## Retrieve properties
+    def get_atomprop(self, property):
+        for entry in self.topology["atoms"]:
+            if entry[0] in self.atoms_idx:
+                if property == "atomtype":
+                    self.AtomList[self.atoms_idx.index(entry[0])].atomtype = entry[1]
+                elif property == "atomname":
+                    self.AtomList[self.atoms_idx.index(entry[0])].atomname = entry[4]
+                elif property == "resname":
+                    self.AtomList[self.atoms_idx.index(entry[0])].resname = entry[3]
+
+    def get_AtomList_property(self, property):
+        if property == "idx":
+            return [x.idx for x in self.AtomList]
+        elif property == "bound_to":
+            return [x.bound_to for x in self.AtomList]
+        elif property == "atomtype":
+            return [x.atomtype for x in self.AtomList]
+        elif property == "atomname":
+            return [x.atomname for x in self.AtomList]
+        elif property == "resname":
+            return [x.resname for x in self.AtomList]
+        else:
+            raise ValueError("Can't find property {} in object".format(property))
+
+    ## Methods related to filling the LocalGraph attributes from the topology dict
     def construct_graph(self, depth=3):
         """
         searches the bonds section of a topology up to depth bonds deep
@@ -372,15 +290,14 @@ class localGraph:
                             self.atoms_idx.append(bond[j])
             curratoms = deepcopy(addlist)
 
-        self.order_lists()
-        self.update_atoms_list()
-        self.update_bound_to()
-
     def build_PADs(self):
         """
-        build pairs, angles, propers from BondList
-        in an ordered fashion
-        impropers are added from the topology
+        in:
+        - localGraph with AtomList that contains atom objects with bound_to attribute that contains the bonded atom idxs
+        out:
+        - filled AngleList, ProperList
+        - filled PairList as ProperList outer atoms
+        - ImproperList as defined in the topology
         """
         # defining angles
         for atom in self.AtomList:
@@ -417,8 +334,21 @@ class localGraph:
             else:
                 self.PairList.append([dihedral[3], dihedral[0]])
 
-        self.order_lists()
+    def correct_atomprops(self, movepair, heavy_resname):
+        atoms_idxs = self.atoms_idx
+        H_atomtype, H_atomname = self.get_H_ff_at_an(movepair[1])
+        self.AtomList[atoms_idxs.index(movepair[0])].atomtype = H_atomtype
+        self.AtomList[atoms_idxs.index(movepair[0])].atomname = H_atomname
+        self.AtomList[atoms_idxs.index(movepair[0])].resname = heavy_resname
+        self.update_atoms_list()
+        return [
+            movepair[0],
+            H_atomtype,
+            H_atomname,
+            self.AtomList[atoms_idxs.index(movepair[0])].resname,
+        ]
 
+    ## Methods related to retrieving ff terms from a LocalGraph that contain a certain atom (search for index)
     def search_terms(self, TypeList, idx: str, center):
         if TypeList == []:
             return []
@@ -442,7 +372,7 @@ class localGraph:
             "pairs": "1",
             "angles": "1",
             "propers": "9",
-            "impropers": 4,
+            "impropers": "4",
         }
         for section in ["bonds", "pairs", "angles", "propers", "impropers"]:
             termdict_funct[section] = [
@@ -451,6 +381,14 @@ class localGraph:
         return termdict_funct
 
     def get_terms_with_atom(self, idx: str, center=False, add_function=False):
+        """
+        in:
+        - idx:str           = atom index
+        - center:bool       = take angle/dihedral terms with idx in center positions only
+        - add_function:bool = add GROMACS function # to the terms
+        out:
+        - termdict:dict     = bonds,pairs,angles,propers,impropers containing atom idx
+        """
         if not idx in self.atoms_idx:
             return
 
@@ -466,19 +404,17 @@ class localGraph:
             return termdict_funct
         return termdict
 
+    ## Manipulate attributes
     def add_Atom(self, atom: Atom):
         if not atom in self.AtomList:
             self.AtomList.append(atom)
             self.atoms_idx.append(atom.idx)
-            self.order_lists()
-            self.update_atoms_list()
         else:
             logging.warning(f"Atom with idx {Atom.idx} already exists!")
 
     def add_Bond(self, bond: list):
         if all(x in self.atoms_idx for x in bond):
             self.BondList.append(bond)
-            self.update_bound_to()
         else:
             logging.warning("Could not establish bond between idxs {bond}!")
 
@@ -501,10 +437,14 @@ class localGraph:
 
         self.update_bound_to()
 
+    # obsolete?
     def compare_section(self, section, TypeList):
         """
-        checks whether all entries in TypeList are contained in the
-        respective section.
+        in:
+        - topology section
+        - TypeList (e.g, BondList, PairList)
+        out:
+        - ff terms that are in the TypeList but not in the topology section
         """
         typelen = len(TypeList[0])
         missing_terms = deepcopy(TypeList)
@@ -513,7 +453,11 @@ class localGraph:
                 missing_terms.remove(entry[:typelen])
         return missing_terms
 
+    ## obsolete?
     def find_missing_terms(self):
+        """
+        returns ff terms that are not part of the topology dict but in the TypeLists
+        """
         termdict = {}
         termdict["bonds"] = self.compare_section(self.topology["bonds"], self.BondList)
         termdict["pairs"] = self.compare_section(self.topology["pairs"], self.PairList)
@@ -525,19 +469,16 @@ class localGraph:
         )
         return termdict
 
-    def get_atomprop(self, property):
-        for entry in self.topology["atoms"]:
-            if entry[0] in self.atoms_idx:
-                if property == "atomtype":
-                    self.AtomList[self.atoms_idx.index(entry[0])].atomtype = entry[1]
-                elif property == "atomname":
-                    self.AtomList[self.atoms_idx.index(entry[0])].atomname = entry[4]
-                elif property == "resname":
-                    self.AtomList[self.atoms_idx.index(entry[0])].resname = entry[3]
-
+    ## Method that interact with the force field files
     def is_radical(self, atom_idx):
-        # if None in self.atoms_atomtype:
-        #     self.get_atomprop('atomtype')
+        """
+        in:
+        - atom_idx              = index of the atom that is checked for being a radical
+        - self.atoms_atomtype   = atomtypes in the LocalGraph (comes from the topology dict)
+        - nbonds_dict           = # of bonds of amber FF99SB-ILDNP* atomtypes (as written in the paper)
+        out:
+        - bool whether atom_idx is a radical (-> has fewer bonds than would be expected for the atomtype)
+        """
 
         nbonds_dict = {
             ("MG", "NA", "CO"): 0,
@@ -664,9 +605,8 @@ class localGraph:
             if not improper_atomname[:4] in ffaminoacids[to_res]["impropers"]:
                 rmvdict["impropers"].append(to_impropers[i])
 
-        for improper_res in ffaminoacids[to_res][
-            "impropers"
-        ]:  # probably need to work on this
+        # TODO: probably need to work on this
+        for improper_res in ffaminoacids[to_res]["impropers"]:
             if to_atomname == improper_res[2]:
                 improper_res_idx = [
                     self.atoms_idx[self.atoms_atomname.index(x)] for x in improper_res
@@ -706,11 +646,13 @@ class localGraph:
         logging.warn(f"Found no new atomtype for HAT hydrogen!")
 
     def get_ff_sections(self):
-        ffbonded = read_topol(self.ffdir / "ffbonded.itp")  # fringe use?!
+        ffbonded = read_topol(
+            self.ffdir / "ffbonded.itp"
+        )  # not intended use of read_topol but should work fine
         self.ff["bondtypes"] = ffbonded["bondtypes"]
         self.ff["angletypes"] = ffbonded["angletypes"]
 
-    def parameterize_prop_terms(self, prop, terms):
+    def parameterize_bonded_terms(self, prop, terms):
         """
         takes a term (bond or angle) and adds the parameters from
         the force field ffbonded.itp file that match the atomtypes
@@ -737,12 +679,18 @@ class localGraph:
         logging.debug(f"Parameterized these terms: {terms_prm}")
         return terms_prm
 
-    def patch_bond(self, bonds, atom_idx):
+    ## Parameterization
+    def patch_bond(
+        self,
+        bonds,
+        atom_idx,
+        newfrac=0.98,
+        SOfrac=0.955,
+        NCaR_offset=0.006,
+        CNR_offset=0.008,
+    ):
         logging.debug(f"Patching bonds {bonds}")
-        newfrac = (
-            0.98  # factor by which all non-hydrogen bonds of the atom_idx are corrected
-        )
-        SOfrac = 0.955
+        # factor by which all non-hydrogen bonds of the atom_idx are corrected
 
         for bond in bonds:
             partnerpos = 0 if str(atom_idx) == bond[1] else 1
@@ -766,7 +714,7 @@ class localGraph:
                 and radicalname == "CA"
             ):  # N-CA of C-alpha atom_idx
                 logging.debug("!!Found CaR!!")
-                req -= 0.006
+                req -= NCaR_offset
 
             if (
                 partner_atomtype == "C"
@@ -774,21 +722,17 @@ class localGraph:
                 and radicalname == "N"
             ):  # C-N of N atom_idx
                 logging.debug("!!Found bb NR!!")
-                req += 0.008
+                req += CNR_offset
 
             if any(at in ["S", "O"] for at in [radical_atomtype, partner_atomtype]):
                 req = req * (SOfrac / newfrac)  # correcting by a different value
 
             bond[3] = "{:7.5f}".format(req)  # will carry back to atom_terms
             bond[4] = "{:13.6f}".format(k)
-            bond.append(" ; patched parameter")
+            bond.extend([";", "patched", "parameter"])
 
-    def patch_angle(self, angles, atom_idx):
+    def patch_angle(self, angles, atom_idx, newtheteq=117, aromatic_offset=10):
         logging.debug(f"Patching angles {angles}")
-        aromatic_offset = (
-            10  # add this to all angle theteq with a center atom_idx aromatic atom type
-        )
-        newtheteq = 117  # new theteq of all angles around the center atom_idx
 
         for angle in angles:
             radical_atomtype = self.atoms_atomtype[self.atoms_idx.index(atom_idx)]
@@ -803,12 +747,17 @@ class localGraph:
 
             angle[4] = "{:11.7f}".format(theteq)  # will carry back to atom_terms
             angle[5] = "{:10.6f}".format(k)
-            angle.append(" ; patched parameter")
+            angle.extend([";", "patched", "parameter"])
 
-    def patch_dihedral_CA(self, propers, atom_idx):
+    def patch_dihedral_CA(
+        self,
+        propers,
+        atom_idx,
+        phivals=["1.6279944", "21.068532", "1.447664"],
+        psivals=["6.556746", "20.284450", "0.297901"],
+    ):
+        # phivals and psivals from own MCSA
         logging.debug(f"Attempting to patch propers {propers}")
-        phivals = ["1.6279944", "21.068532", "1.447664"]  # from own MCSA
-        psivals = ["6.556746", "20.284450", "0.297901"]
 
         radical_resname = self.atoms_resname[self.atoms_idx.index(atom_idx)]
         radical_atomname = self.atoms_atomname[self.atoms_idx.index(atom_idx)]
@@ -835,7 +784,9 @@ class localGraph:
                             "180.000000",
                             phivals[ii],
                             str(ii + 1),
-                            " ; patched parameter",
+                            ";",
+                            "patched",
+                            "parameter",
                         ]
                     )
 
@@ -847,23 +798,25 @@ class localGraph:
                             "180.000000",
                             psivals[ii],
                             str(ii + 1),
-                            " ; patched parameter",
+                            ";",
+                            "patched",
+                            "parameter",
                         ]
                     )
 
         return [*phi, *psi]
 
-    def patch_improper(self, atom_idx):
+    def patch_improper(self, atom_idx, newphik="43.93200"):
+        # same as backbone N improper or 4.6024000
         logging.debug(f"Attempting to patch improper")
-        newphik = "43.93200"  # same as backbone N improper or 4.6024000
+
         radical_Atom = self.AtomList[self.atoms_idx.index(atom_idx)]
 
         logging.debug(
             f"Potential improper center {atom_idx} is bound to {len(radical_Atom.bound_to)} Atoms."
         )
-        if (
-            len(radical_Atom.bound_to) == 3
-        ):  # this would mean atom_idx went from 4 to 3 partners -> tetrahedral to planar
+        # this would mean atom_idx went from 4 to 3 partners -> tetrahedral to planar
+        if len(radical_Atom.bound_to) == 3:
             improper = [
                 radical_Atom.bound_to[0],
                 radical_Atom.bound_to[1],
@@ -873,17 +826,15 @@ class localGraph:
                 "180.0000000",
                 newphik,
                 "2",
-                " ; patched parameter",
+                ";",
+                "patched",
+                "parameter",
             ]  # improper entry
             return [improper]
         else:
             return []
 
     def parameterize_around_atom(self, atom_idx):
-        # if None in self.atoms_atomtype:
-        #     self.get_atomprop('atomtype')
-        #     self.get_atomprop('atomname')
-        #     self.get_atomprop('resname')
         logging.info(f" --- Parameterizing around atom {atom_idx} ---\n")
         logging.debug(self.atoms_idx)
         logging.debug(self.atoms_atomtype)
@@ -891,24 +842,21 @@ class localGraph:
         logging.debug(self.atoms_resname)
 
         atom_terms = self.get_terms_with_atom(atom_idx, center=True)
-        # don't need pairs (and propers)
         atom_terms["pairs"].clear()
-        # del atom_terms['propers']
 
         # deal with ff
         self.get_ff_sections()
-        atom_terms["bonds"] = self.parameterize_prop_terms(
+        atom_terms["bonds"] = self.parameterize_bonded_terms(
             "bondtypes", atom_terms["bonds"]
         )
-        atom_terms["angles"] = self.parameterize_prop_terms(
+        atom_terms["angles"] = self.parameterize_bonded_terms(
             "angletypes", atom_terms["angles"]
         )
-        atom_terms["propers"] = [
-            [*x, "9"] for x in atom_terms["propers"]
-        ]  # adding function to propers
+        # adding function to propers, impropers
+        atom_terms["propers"] = [[*x, "9"] for x in atom_terms["propers"]]
         atom_terms["impropers"] = [
             [*x, "4"] if len(x) == 4 else x for x in atom_terms["impropers"]
-        ]  # adding function to impropers
+        ]
 
         # apply patches
         if self.is_radical(atom_idx):
@@ -937,6 +885,24 @@ def find_heavy(bonds, H_idx: str):
     )
 
 
+def terms_keep_only(movepair, heavy_idx, atom_terms):
+    """
+    this is to stop overwriting bonds,angles for the newly parameterized "from" part if they are next to each other
+    """
+    mapsection = {"bonds": slice(0, 2), "angles": slice(1, 2), "propers": slice(1, 3)}
+    rmvdict = {"bonds": [], "angles": [], "propers": []}
+    for section in rmvdict.keys():
+        for term in atom_terms[section]:
+            if movepair[0] in term:
+                continue
+            if heavy_idx in term[mapsection[section]]:
+                rmvdict[section].append(term)
+        for entry in rmvdict[section][::-1]:
+            atom_terms[section].remove(entry)
+    return atom_terms
+
+
+## operations on the topology dict
 def topol_add_terms(topology, adddict):
     """
     adds terms from adddict to the topologydict and returns the modified dictionary
@@ -946,11 +912,11 @@ def topol_add_terms(topology, adddict):
     copydict = deepcopy(topology)
     mapsection = {"pairs": 2, "bonds": 2, "angles": 3, "propers": 4, "impropers": 4}
     sortkeys = {
-        "pairs": eval_bond,
-        "bonds": eval_bond,
-        "angles": eval_angle,
-        "propers": eval_dihedral,
-        "impropers": eval_improper,
+        "pairs": sort_bond,
+        "bonds": sort_bond,
+        "angles": sort_angle,
+        "propers": sort_dihedral,
+        "impropers": sort_improper,
     }
     for section in ["pairs", "bonds", "angles", "propers", "impropers"]:
         mapval = mapsection[section]
@@ -1032,47 +998,50 @@ def topol_change_at_an(topology, atom):
             logging.debug(f"changed at/an of {entry} to {atom}")
             entry[1] = atom[1]
             entry[4] = atom[2]
+    return
 
 
-# #%%
-# logging.addLevelName(logging.INFO, "\033[35mINFO\033[00m")
-# logging.addLevelName(logging.ERROR, "\033[31mERROR\033[00m")
-# logging.addLevelName(logging.WARNING, "\033[33mWARN\033[00m")
-# logging.basicConfig(level = logging.INFO,format="\033[34m %(asctime)s\033[00m: %(levelname)s: %(message)s", datefmt="%d-%m-%Y %H:%M",)
+def modify_plumed(
+    recipe: ConversionRecipe,
+    oldplumeddat: Path,
+    newplumeddat: Path,
+    plumeddist: str,
+):
 
-# #%%
-# ## Running the script
+    logging.info(
+        f"Reading: {oldplumeddat} and writing modified plumed input to {newplumeddat}."
+    )
+    plumeddat = read_plumed(oldplumeddat)
 
-# input = ConversionRecipe()
-# input.type = ConversionType.MOVE
-#      #from, to   ## from is the hydrogen that gets moved, to is the heavy atom it forms a bond with
+    for type, pair in zip(recipe.type, recipe.atom_idx):
+        if type == ConversionType.BREAK:
+            plumeddat = break_bond_plumed(plumeddat, pair, plumeddist)
+        elif type == ConversionType.MOVE:
+            plumeddat = move_bond_plumed(plumeddat, pair, plumeddist)
 
-# basedir = Path("/hits/fast/mbm/hartmaec/kimmdy/")
-# toppath = Path(basedir / "example/example_ala/Ala_delHA_in.top")
-# ffdir = Path(basedir / "example/example_ala/amber99sb-star-ildnp.ff")
-# inpath = Path(basedir / "example/example_ala/out/loop_8_12/Ala_in.top")
-# outpath_tmp = Path(basedir / "example/example_ala/out/Ala_out_tmp.top")
-# #outpath= Path(basedir / "example/example_ala/out/Ala_out.top")
-
-# topology = read_topol(toppath)
-# write_topol(topology,inpath)
-# topology = topol_split_dihedrals(topology)
+    write_plumed(plumeddat, newplumeddat)
 
 
-# logging.debug(topology.keys())
+def break_bond_plumed(plumeddat, breakpair, plumeddist):
+    new_distances = []
+    broken_distances = []
+    breakpair = [str(x) for x in breakpair]
+    for line in plumeddat["distances"]:
+        if all(x in line["atoms"] for x in breakpair):
+            broken_distances.append(line["id"])
+        else:
+            new_distances.append(line)
 
-# #inputs_atom_idx = [['8','9'],['8','7']]
-# #inputs_atom_idx = [['11','9'],['11','10']]
-# inputs_atom_idx = [['8','9'],['12','7'],['8','10']]
+    plumeddat["distances"] = new_distances
 
-# if input.type == ConversionType.MOVE:
-#     for i in range(3):
-#         topology = read_topol(inpath)
-#         topology = topol_split_dihedrals(topology)
-#         input.atom_idx = inputs_atom_idx[i]
-#         outpath_specific = Path(basedir / f"example/example_ala/out/loop_8_12/Ala_{'_'.join(input.atom_idx)}_{i}_cleaned.top")
+    for line in plumeddat["prints"]:
+        line["ARG"] = [id for id in line["ARG"] if not id in broken_distances]
+        line["FILE"] = plumeddist
 
-#         topology = topol_move_atom(input,topology,outpath_tmp,ffdir)
-#         topology = topol_rmv_propers_impropers(topology)
-#         write_topol(topology,outpath_specific)
-#         inpath = outpath_specific
+    return plumeddat
+
+
+def move_bond_plumed(plumeddat, movepair, plumeddist):
+    raise NotImplementedError(
+        "Plumeddat Changer for moving Atoms is not implemented yet."
+    )

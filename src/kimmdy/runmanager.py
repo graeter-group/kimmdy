@@ -90,6 +90,11 @@ class RunManager:
             "gro": self.config.gro,
             "idx": self.config.idx,
         }
+        # did we just miss to add this or is there a way around this explicit definition
+        # with the new AutoFillDict??
+        if self.config.plumed:
+            self.latest_files["plumed.dat"] = self.config.cwd / self.config.plumed.dat
+            # self.latest_files["distances.dat"] = self.config.plumed.distances
 
         # If we want to allow starting from radical containing systems this needs to be initialized:
         # TODO: update with HAT
@@ -261,8 +266,7 @@ class RunManager:
 
         # TODO: do we need this part with the new automatic get_latest
         # for missing entries?
-        if self.config.plumed:
-            files.input["plumed.dat"] = self.get_latest("plumed.dat")
+        files.input["plumed.dat"] = self.get_latest("plumed.dat")
         files = md.production(files)
         logging.info("Done with production MD")
         return files
@@ -323,16 +327,16 @@ class RunManager:
         logging.info(f'Wrote new topology to {files.output["top"].parts[-3:]}')
         logging.debug(f"Chose recipe: {self.chosen_recipe.type}")
         if self.chosen_recipe.type == [ConversionType.BREAK]:
-            self.radical_idxs.extend(self.chosen_recipe["atom_idx"][0])
+            # why not add both?
+            self.radical_idxs.extend(self.chosen_recipe.atom_idx[0])
 
             # files.input["plumed.dat"] = self.get_latest("plumed.dat")
             files.output["plumed.dat"] = files.outputdir / "plumed_mod.dat"
-            files.output["distances.dat"] = "distances.dat"
             changer.modify_plumed(
                 self.chosen_recipe,
                 files.input["plumed.dat"],
                 files.output["plumed.dat"],
-                files.output["distances.dat"],
+                files.input["distances.dat"],
             )
             logging.info(
                 f'Wrote new plumedfile to {files.output["plumed.dat"].parts[-3:]}'

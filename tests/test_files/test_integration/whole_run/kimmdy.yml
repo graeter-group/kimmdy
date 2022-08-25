@@ -1,9 +1,9 @@
 dryrun: false
 iterations: 100
-out: 'test_out_001'
-ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
-top: 'hexala_out.top'
-gro: 'npt.gro'
+out: 'whole_run_001'
+# ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
+top: 'IMREE.top'
+gro: 'IMREE_npt.gro'
 idx: 'index.ndx'
 plumed:
   dat: 'plumed.dat'
@@ -25,7 +25,7 @@ sequence:
   - equilibrium
   - prod
   -
-    mult: 3
+    mult: 5
     tasks:
       - reactions
       - equilibrium
