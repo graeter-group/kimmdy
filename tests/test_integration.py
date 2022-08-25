@@ -57,9 +57,7 @@ def test_integration_move_top():
     toppath_compare = (
         Path(__file__).parent / "test_files/test_integration/hexala_move34-29.top"
     )
-    ffdir = (
-        Path(__file__).parent / "test_files/assets/amber99sb-star-ildnp.ff"
-    )
+    ffdir = Path(__file__).parent / "test_files/assets/amber99sb-star-ildnp.ff"
 
     topology = read_topol(toppath)
     topology_compare = read_topol(toppath_compare)
@@ -79,7 +77,10 @@ def test_integration_emptyrun(tmp_path):
     )
     os.chdir(tmpdir)
     Path(tmpdir / "emptyrun.txt").touch()
-    Path(tmpdir / "amber99sb-star-ildnp.ff").symlink_to(Path(__file__).parent / "test_files/assets/amber99sb-star-ildnp.ff",target_is_directory=True)
+    Path(tmpdir / "amber99sb-star-ildnp.ff").symlink_to(
+        Path(__file__).parent / "test_files/assets/amber99sb-star-ildnp.ff",
+        target_is_directory=True,
+    )
     kimmdy_run(tmpdir / "kimmdy_emptyrun.yml")
 
 
@@ -89,7 +90,10 @@ def test_integration_hat_reaction(tmp_path):
         Path(__file__).parent / "test_files/test_integration/HAT_reaction", tmpdir
     )
     os.chdir(tmpdir)
-    Path(tmpdir / "amber99sb-star-ildnp.ff").symlink_to(Path(__file__).parent / "test_files/assets/amber99sb-star-ildnp.ff",target_is_directory=True)
+    Path(tmpdir / "amber99sb-star-ildnp.ff").symlink_to(
+        Path(__file__).parent / "test_files/assets/amber99sb-star-ildnp.ff",
+        target_is_directory=True,
+    )
     kimmdy_run(tmpdir / "kimmdy.yml")
 
 
@@ -99,5 +103,8 @@ def test_integration_whole_run(tmp_path):
         Path(__file__).parent / "test_files/test_integration/whole_run", tmpdir
     )
     os.chdir(tmpdir)
-    Path(tmpdir / "amber99sb-star-ildnp.ff").symlink_to(Path(__file__).parent / "test_files/assets/amber99sb-star-ildnp.ff",target_is_directory=True)
+    Path(tmpdir / "amber99sb-star-ildnp.ff").symlink_to(
+        Path(__file__).parent / "test_files/assets/amber99sb-star-ildnp.ff",
+        target_is_directory=True,
+    )
     kimmdy_run(tmpdir / "kimmdy.yml")

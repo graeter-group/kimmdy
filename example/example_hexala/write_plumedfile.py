@@ -129,7 +129,7 @@ def write_conditions_in_plumedfile(topfile, indexfile, indexgroup, outplumed):
 
 
 topfile = "example/example_hexala/hexala_out.top"
-indexfile = ("example/example_hexala/index.ndx")
+indexfile = "example/example_hexala/index.ndx"
 indexgroup = "Backbone"
-outplumed = ("example/example_hexala/plumed.dat")
+outplumed = "example/example_hexala/plumed.dat"
 write_conditions_in_plumedfile(topfile, indexfile, indexgroup, outplumed)
