@@ -31,7 +31,7 @@ class          Config{
 file paths
 task sequence
 ...
-__init__()
+__init__(configuration_file)
 }
 class           ConversionRecipe{
 type
@@ -56,12 +56,14 @@ interface GROMACS_CLI{
 
 Reaction --|> HAT
 Reaction --|> HomolyticBreak
-Config -- RunManager
+RunManager -right- Config
 RunManager -right- GROMACS_CLI 
 RunManager -- Reaction 
 ConversionRecipe - Reaction
 ChangeManager - RunManager
+Config -[hidden]-> GROMACS_CLI
 @enduml
+
 ```
 
 ![](uml.svg)
