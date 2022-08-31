@@ -13,26 +13,23 @@ or preview online with [plantuml](https://plantuml.com).
 ### New Diagram
 
 ```
-@startuml uml
+@startuml
 class           RunManager{
 config : Config
 tasks : Queue
-state : Enum
-filehist : list[TaskFiles]
-iteration
+state
+file history
 chosen_recipe
 run()
-run_md_min()
-run_md_eq()
-run_md_pull()
+run_MD()
 query_reactions()
-decision_strategy()
-run_recipe(ConversionRecipe)
+decide_reaction()
+execute_recipe(ConversionRecipe)
 next()
 }
 class          Config{
 file paths
-sequence
+task sequence
 ...
 __init__()
 }
@@ -41,33 +38,29 @@ type
 atom_idx
 }
 
-class           Reaction{
-
-}
-class           HAT{
-
-}
-class           HomolyticBreak{
+abstract class           Reaction{
 get_reaction_result()
 }
-class           CoordinateChanger{
+class           HAT{
 }
-class           TopologyChanger{
+class           HomolyticBreak{
 }
+class           ChangeManager{
+modify_connectivity()
+}
+
 package GROMACS{
-interface GROMACSCli{
+interface GROMACS_CLI{
 }
 }
 
 Reaction --|> HAT
 Reaction --|> HomolyticBreak
-Config -- RunManager : reads <
-RunManager -right- GROMACSCli : > interacts
-RunManager -- Reaction : > starts
-ConversionRecipe - Reaction: < generates
-CoordinateChanger - RunManager: < starts
-TopologyChanger - RunManager: < starts
-TopologyChanger -[hidden]-> CoordinateChanger
+Config -- RunManager
+RunManager -right- GROMACS_CLI 
+RunManager -- Reaction 
+ConversionRecipe - Reaction
+ChangeManager - RunManager
 @enduml
 ```
 
