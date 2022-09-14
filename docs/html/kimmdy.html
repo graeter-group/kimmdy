@@ -16,6 +16,7 @@
     <script src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="kimmdy" href="modules.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -54,7 +55,7 @@ and a bound_to variable</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="kimmdy.changemanager.break_bond_top">
-<span class="sig-prename descclassname"><span class="pre">kimmdy.changemanager.</span></span><span class="sig-name descname"><span class="pre">break_bond_top</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topology</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">breakpair</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#kimmdy.changemanager.break_bond_top" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">kimmdy.changemanager.</span></span><span class="sig-name descname"><span class="pre">break_bond_top</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topology</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">breakpair</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#kimmdy.changemanager.break_bond_top" title="Permalink to this definition">¶</a></dt>
 <dd><p>Break bonds in topology.
 removes bond, angles and dihedrals where breakpair was involved</p>
 </dd></dl>
@@ -743,7 +744,7 @@ Returns the empty string of no name was found.</p>
 <span id="kimmdy-reaction-module"></span><h2>kimmdy.reaction module<a class="headerlink" href="#module-kimmdy.reaction" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="kimmdy.reaction.ConversionRecipe">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kimmdy.reaction.</span></span><span class="sig-name descname"><span class="pre">ConversionRecipe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type:</span> <span class="pre">list[kimmdy.reaction.ConversionType]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atom_idx:</span> <span class="pre">list[tuple[int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">int]]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kimmdy.reaction.ConversionRecipe" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kimmdy.reaction.</span></span><span class="sig-name descname"><span class="pre">ConversionRecipe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type:</span> <span class="pre">list[kimmdy.reaction.ConversionType]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atom_idx:</span> <span class="pre">list[tuple[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">str]]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kimmdy.reaction.ConversionRecipe" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A ConversionReipe.
 encompasses a single transformation, e.g. moving one
@@ -758,7 +759,7 @@ atom or braking one bond.</p>
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="kimmdy.reaction.ConversionRecipe.atom_idx">
-<span class="sig-name descname"><span class="pre">atom_idx</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#kimmdy.reaction.ConversionRecipe.atom_idx" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">atom_idx</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#kimmdy.reaction.ConversionRecipe.atom_idx" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -1081,11 +1082,35 @@ Files which can not be found by get_latest must be added manually.</p>
 
 
 <h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">kimmdy</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">kimmdy package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-kimmdy.changemanager">kimmdy.changemanager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-kimmdy.cmd">kimmdy.cmd module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-kimmdy.config">kimmdy.config module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-kimmdy.mdmanager">kimmdy.mdmanager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-kimmdy.misc_helper">kimmdy.misc_helper module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-kimmdy.parsing">kimmdy.parsing module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-kimmdy.reaction">kimmdy.reaction module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-kimmdy.runmanager">kimmdy.runmanager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-kimmdy.tasks">kimmdy.tasks module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-kimmdy.utils">kimmdy.utils module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-kimmdy">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
 
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">kimmdy</a><ul>
+      <li>Previous: <a href="modules.html" title="previous chapter">kimmdy</a></li>
+  </ul></li>
   </ul></li>
 </ul>
 </div>
