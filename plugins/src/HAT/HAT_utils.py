@@ -1,14 +1,7 @@
 # %%
-from itertools import combinations
-from pathlib import Path
-from re import A
-from typing import Union
-
-import MDAnalysis as MDA
+import MDAnalysis as mda
 import numpy as np
-import random
 from scipy.spatial.transform import Rotation
-from tqdm.autonotebook import tqdm
 import logging
 
 # %% Functions
@@ -74,15 +67,15 @@ def check_cylinderempty(a, b, t, r_min=0.8, verbose=False):
 
 
 def find_radical_pos(
-    center: MDA.core.groups.Atom, bonded: MDA.core.groups.AtomGroup, tetrahedral=False
+    center: mda.core.groups.Atom, bonded: mda.core.groups.AtomGroup, tetrahedral=False
 ):
     """Calculates possible radical positions of a given radical atom
 
     Parameters
     ----------
-    center : MDA.core.groups.Atom
+    center : mda.core.groups.Atom
         Radical atom
-    bonded : MDA.core.groups.AtomGroup
+    bonded : mda.core.groups.AtomGroup
         Atom group of bonded atoms. From its length the geometry is predicted.
     tetrahedral : bool
         Whether to assume a tetrahedral conformation around C and N
@@ -197,12 +190,12 @@ def get_residue(atm):
 
     Parameters
     ----------
-    atm : MDA.core.groups.Atom
+    atm : mda.core.groups.Atom
         Starting atom
 
     Returns
     -------
-    MDA.AtomGroup
+    mda.AtomGroup
         Residue
     """
     resid = atm.resid
@@ -230,7 +223,7 @@ def get_res_union(atms):
 
     Parameters
     ----------
-    atms : MDA.core.groups.Atom
+    atms : mda.core.groups.Atom
         Atoms which residues will be unionized.
     """
     res = atms[0].universe.atoms[[]]
@@ -245,12 +238,12 @@ def cap_aa(atms):
 
     Parameters
     ----------
-    atms : MDA.AtomGroup
+    atms : mda.AtomGroup
         All atoms of the aminoacid(s) to cap.
 
     Returns
     -------
-    MDA.AtomGroup
+    mda.AtomGroup
         Capping atoms. Should be used as union with the
         aminoacid residue as capping occures outside this residue.
     List[int]
@@ -271,7 +264,7 @@ def cap_aa(atms):
     )
     cap_atms = []
     cap_ix = []
-    cap = MDA.Universe.empty(0).atoms
+    cap = mda.Universe.empty(0).atoms
     return cap, cap_ix  # dont need caps at the moment
 
     h_bondlength = 1.01
@@ -332,7 +325,7 @@ def cap_aa(atms):
                 h_idxs = (1, 3, 4, 5)
 
                 # make new universe with fixed order
-                u_cap = MDA.core.universe.Merge(cap)
+                u_cap = mda.core.universe.Merge(cap)
                 u_cap.residues[0].resname = "NME"
 
             else:  # LINKER:
@@ -346,7 +339,7 @@ def cap_aa(atms):
                 h_idxs = (0, 1, 2)
 
                 # make new universe with fixed order
-                u_cap = MDA.core.universe.Merge(cap)
+                u_cap = mda.core.universe.Merge(cap)
                 u_cap.residues[0].resname = "GLY"
 
             # scale positions and mutate elements to H
@@ -406,7 +399,7 @@ def cap_aa(atms):
             [cap_ix.append(i) for i in cap.ix]
 
             # make new universe with fixed order
-            u_cap = MDA.core.universe.Merge(cap)
+            u_cap = mda.core.universe.Merge(cap)
             u_cap.residues[0].resname = "ACE"
 
             # scale positions and mutate elements
@@ -424,9 +417,9 @@ def cap_aa(atms):
             cap_atms.append(u_cap.atoms)
 
     if len(cap_atms) == 0:
-        cap = MDA.Universe.empty(0).atoms
+        cap = mda.Universe.empty(0).atoms
     else:
-        cap = MDA.core.universe.Merge(*cap_atms).atoms
+        cap = mda.core.universe.Merge(*cap_atms).atoms
 
     # print(f"cap: {cap},{len(cap_atms)}")
     return cap, cap_ix
@@ -473,13 +466,13 @@ def cap_single_rad(u, ts, rad, bonded_rad, h_cutoff=3, env_cutoff=7):
 
     Parameters
     ----------
-    u : MDA.Universe
+    u : mda.Universe
         Main universe
-    ts : MDAnalysis.coordinates.base.Timestep
+    ts : mdanalysis.coordinates.base.Timestep
         On which timestep to operate
-    rad : MDA.AtomGroup
+    rad : mda.AtomGroup
         Radical atom in its own group
-    bonded_rad : MDA.AtomGroup
+    bonded_rad : mda.AtomGroup
         AtomGroup containing all atoms bonded to the radical
     h_cutoff : float, optional
         Cutoff radius for hydrogen search around radical, by default 3
@@ -572,8 +565,8 @@ def cap_single_rad(u, ts, rad, bonded_rad, h_cutoff=3, env_cutoff=7):
                 ags.append(ag)
         # print(f"!!! {ags}")
         capped_systems[h_idx] = {
-            "start_u": MDA.core.universe.Merge(*ags),
-            "end_u": MDA.core.universe.Merge(*ags),
+            "start_u": mda.core.universe.Merge(*ags),
+            "end_u": mda.core.universe.Merge(*ags),
             "meta": {
                 "translation": translation,
                 "u1_name": rad[0].resname.lower() + "-sim",
@@ -605,7 +598,7 @@ def cap_single_rad(u, ts, rad, bonded_rad, h_cutoff=3, env_cutoff=7):
 
 def find_radicals(u):
     """
-    finds radicals in a MDAnalysis universe
+    finds radicals in a mdanalysis universe
     """
     # FIXME: return single atomgroup
     nbonds_dict = {
@@ -668,7 +661,7 @@ def find_radicals(u):
                 "{} not in atomtype dictionary nbonds_dict".format(atom.type)
             )
         if len(atom.bonded_atoms) < nbonds:
-            atoms.append(MDA.AtomGroup([atom]))
+            atoms.append(mda.AtomGroup([atom]))
     if len(atoms) == 0:
-        return [MDA.Universe.empty(0).atoms]
+        return [mda.Universe.empty(0).atoms]
     return atoms

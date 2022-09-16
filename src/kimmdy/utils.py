@@ -173,7 +173,6 @@ def calc_transition_rate(r_curr, r_0, E_dis, k_f):
 
 def calc_av_rate(distances, r_0, E_dis, k_f):
     # average distances first, if necessary
-    dist = []
     if len(distances) > 1:
         r_av = sum(distances[2:]) / len(distances[2:])
     else:
@@ -263,18 +262,6 @@ def check_idx(object):
 
 
 ## from kimmdy
-def get_data_from_file(filepath):
-    with open(filepath, "r") as f:
-        data_all = []  # array with each entry corresponding to one (string) line
-        data_array = []  # array of all lines with each subarray containing one value
-        for line in f:
-            data_all.append(line)
-            line_array = np.asarray(line.split())
-            data_array.append(line_array)
-
-    return data_all, data_array
-
-
 def store_linelist_to_file(data, filepath):
     file = open(filepath, "w")
     for line in data:

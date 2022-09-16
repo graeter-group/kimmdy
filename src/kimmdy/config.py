@@ -1,3 +1,4 @@
+from __future__ import annotations
 import yaml
 import logging
 from pathlib import Path
@@ -140,7 +141,10 @@ class Config:
     sequence: SequenceConfig
 
     def __init__(
-        self, input_file: Path = None, recursive_dict=None, type_scheme=type_scheme
+        self,
+        input_file: Path | None = None,
+        recursive_dict: dict | None = None,
+        type_scheme=type_scheme,
     ):
         if input_file is None and recursive_dict is None:
             m = "Error: No input file was provided!"
