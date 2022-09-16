@@ -1,9 +1,7 @@
 from kimmdy.reaction import Reaction, ReactionResult, ConversionRecipe, ConversionType
 from .HAT_utils import cap_single_rad, find_radicals
 import logging
-from pathlib import Path
-import MDAnalysis as MDA
-import numpy as np
+import MDAnalysis as mda
 from numpy.random import default_rng
 
 rng = default_rng()
@@ -20,7 +18,7 @@ class HAT_reaction(Reaction):
 
         tpr = files.input["tpr"]
         trr = files.input["trr"]
-        u = MDA.Universe(str(tpr), str(trr), topology_format="tpr", format="trr")
+        u = mda.Universe(str(tpr), str(trr), topology_format="tpr", format="trr")
 
         logging.warning(u.atoms[:40].types)
         rads = find_radicals(u)
