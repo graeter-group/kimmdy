@@ -4,8 +4,6 @@ from typing import Generator
 import pandas as pd
 from copy import deepcopy
 
-# time to experiment
-# what a topplogy is
 Topology = dict[str, list[list[str]]]
 
 
