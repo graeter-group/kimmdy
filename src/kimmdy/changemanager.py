@@ -429,12 +429,12 @@ class localGraph:
             "impropers": self.ImproperList,
         }
         for section in ["pairs", "bonds", "angles", "propers", "impropers"]:
-            try:
-                for term in termdict[section]:
+            for term in termdict[section]:
+                try:
                     graphdict[section].remove(term)
                     logging.debug(f"removed term {term} from graph {section}")
-            except ValueError:
-                logging.warning(f"Couldn't find term {term} in TypeList")
+                except ValueError:
+                    logging.warning(f"Couldn't find term {term} in TypeList")
 
         self.update_bound_to()
 
