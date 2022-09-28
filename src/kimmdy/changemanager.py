@@ -13,7 +13,7 @@ from kimmdy.parsing import (
     Topology,
 )
 from kimmdy.utils import (
-    str_to_int,
+    str_to_int_or_0,
     check_idx,
     sort_bond,
     sort_angle,
@@ -72,7 +72,7 @@ def break_bond_top(topology: Topology, breakpair: tuple[int, int]) -> Topology:
     ) in (
         dihpairs
     ):  # keep pairs in proper order (which one goes first in the definition)
-        if str_to_int(pair[0]) != 0 and str_to_int(pair[1]) != 0:
+        if str_to_int_or_0(pair[0]) != 0 and str_to_int_or_0(pair[1]) != 0:
             pair_int = [int(pair[0]), int(pair[1])]
             if pair_int[0] > pair_int[1]:
                 pair.reverse()
@@ -214,12 +214,12 @@ class localGraph:
                 bound_dict[bond[1]].append(bond[0])
         for atom_idx in self.atoms_idx:
             self.AtomList[self.atoms_idx.index(atom_idx)].bound_to = sorted(
-                bound_dict[atom_idx], key=str_to_int
+                bound_dict[atom_idx], key=str_to_int_or_0
             )
 
     def order_lists(self):
         self.AtomList = sorted(self.AtomList, key=check_idx)
-        self.atoms_idx = sorted(self.atoms_idx, key=str_to_int)
+        self.atoms_idx = sorted(self.atoms_idx, key=str_to_int_or_0)
         self.atoms_atomtype = [
             x
             for _, x in sorted(zip(self.atoms_idx, self.atoms_atomtype), key=sort_bond)
@@ -986,7 +986,7 @@ def topol_change_at_an(topology, atom):
     changing the atoms entry of topology to give the HAT hydrogen the right atomtype and atomname
     """
     for entry in topology["atoms"]:
-        if atom[2] == entry[4] and atom[3] == entry[3] and str_to_int(atom[2][-1]) != 0:
+        if atom[2] == entry[4] and atom[3] == entry[3] and str_to_int_or_0(atom[2][-1]) != 0:
             atom[2] = atom[2][:-1] + str(int(atom[2][-1]) + 1)
     for entry in topology["atoms"]:
         if atom[0] == entry[0]:
