@@ -15,6 +15,7 @@ def check_file_exists(p: Path):
 
 
 class Sequence(list):
+    """A sequence of tasks."""
     def __init__(self, tasks: list):
         list.__init__(self)
         for task in tasks:
@@ -180,7 +181,7 @@ class Config:
                         logging.warn(
                             f"Plugin {plg_name} could not be loaded!\n{plugin}\n"
                         )
-                    if issubclass(plugin, Reaction):
+                    if issubclass(type(plugin), Reaction):
                         self.type_scheme["reactions"].update(plugin.type_scheme)
                         logging.debug(self.type_scheme["reactions"])
 
