@@ -83,11 +83,11 @@ def write_topol(d: Topology, outfile: Path) -> None:
             f.write(s)
 
 
-def topol_split_dihedrals(d: Topology):
+def topol_split_dihedrals(d: Topology) -> Topology:
     if "dihedrals" in d.keys():
         d["propers"] = deepcopy(d["dihedrals"])
         d["impropers"] = []
-        for i, dih in enumerate(d["propers"][::-1]):
+        for dih in d["propers"][::-1]:
             if dih[4] == "9":
                 break
             else:
@@ -95,8 +95,8 @@ def topol_split_dihedrals(d: Topology):
     return d
 
 
-def topol_merge_propers_impropers(d: Topology):
-    if all([x in d.keys() for x in ["propers", "impropers"]]):
+def topol_merge_propers_impropers(d: Topology) -> Topology:
+    if set(["propers", "impropers"]).issubset(d.keys()) :
         d["dihedrals"].clear()
         d["dihedrals"].extend(d.pop("propers"))
         d["dihedrals"].extend(d.pop("impropers"))
