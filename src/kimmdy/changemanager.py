@@ -87,10 +87,22 @@ def move_bond_top(
 ) -> Topology:
     """Move bond in topology.
 
-    Can create new bonds and remove old bonds.
-    It keeps track of affected bonds via a graph representation of the topology
+    Move an atom (typically H for Hydrogen Atom Transfer) to a new location.
+    Creates the new bond and removes the old bond.
+    It keeps track of affected terms in the topology via a graph representation of the topology
     and applies the necessary changes to bonds, angles and dihedrals (proper and improper).
-    Furthermore, it modifies to forcefield to account for radicals.
+    Furthermore, it modifies to function types in the topology to account for radicals.
+
+    Paremeters
+    ----------
+    topology: dict
+        dictionary representation of the topology
+    movepair: tuple[int, int]
+        a tuple of integers with the atoms indices
+        `from`, the atom being moved and
+        `to`, the atom to which the `from` atom will be bound
+    ffdir: Path
+        path to the forcefield directory. Needs to contain aminoacids.rtp.
     """
     movepair_str = [str(x) for x in movepair]
     topology = topol_split_dihedrals(topology)
@@ -393,7 +405,9 @@ class LocalGraph:
         - termdict:dict     = bonds,pairs,angles,propers,impropers containing atom idx
         """
         if idx not in self.atoms_idx:
-            return
+            msg = f"Atom with index {idx} is not in the atoms of the local_graph {self}"
+            logging.error(msg)
+            raise IndexError(msg)
 
         termdict = {}
         termdict["bonds"] = self.search_terms(self.bonds, idx, center)
