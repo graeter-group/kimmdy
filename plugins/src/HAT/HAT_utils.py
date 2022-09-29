@@ -490,6 +490,9 @@ def cap_single_rad(u, ts, rad, bonded_rad, h_cutoff=3, env_cutoff=7):
     env = u.atoms.select_atoms(
         f"point { str(rad.positions).strip('[ ]') } {env_cutoff}"
     )
+    if len(bonded_rad) == 0:
+        logging.warning(rad[0])
+        logging.warning("bad radical??")
 
     end_poss = find_radical_pos(rad[0], bonded_rad)
     # print(f" end pos {end_poss}")
