@@ -15,7 +15,7 @@ changer:
     md:
       mdp: 'minim.mdp'
 reactions:
-  HAT:
+  HAT_dummy:
     #tprpath: 'md.tpr'
     #trrpath: 'md.trr'
           #    edis: 'edissoc.dat'
