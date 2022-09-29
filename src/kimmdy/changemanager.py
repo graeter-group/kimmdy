@@ -114,14 +114,10 @@ def move_bond_top(
 
     # build local graph and fill it
     from_graph = LocalGraph(topology, heavy_idx, ffdir)
-    from_graph.construct_graph()
-    from_graph.order_lists()
-    from_graph.update_atoms_list()
-    from_graph.update_bound_to()
     from_graph.build_PADs()
     from_graph.order_lists()
 
-    # remove terms with from_H
+    # remove terms with from_atom
     termdict = from_graph.get_terms_with_atom(movepair_str[0])
     from_graph.remove_terms(termdict)
     topology = topol_remove_terms(topology, termdict)
@@ -134,10 +130,6 @@ def move_bond_top(
 
     # build localGraph and fill it
     to_graph = LocalGraph(topology, movepair_str[1], ffdir)
-    to_graph.construct_graph()
-    to_graph.order_lists()
-    to_graph.update_atoms_list()
-    to_graph.update_bound_to()
     to_graph.add_atom(Atom(movepair_str[0]))
     to_graph.order_lists()
     to_graph.update_atoms_list()
@@ -159,7 +151,7 @@ def move_bond_top(
     atom_terms = terms_keep_only(movepair_str, heavy_idx, atom_terms)
     topology = topol_add_terms(topology, atom_terms)
 
-    # add pairs of the from_H at the new position
+    # add pairs of the from_atom at the new position
     atom_terms_H = to_graph.get_terms_with_atom(movepair_str[0], add_function=True)
     for section in ["bonds", "angles", "propers", "impropers"]:
         atom_terms_H[section].clear()
@@ -180,8 +172,8 @@ def move_bond_top(
 class Atom:
     """Information about one atom
 
-    A class containing atom information as in the atoms section of the topology
-    and a bound_to variable
+    A class containing atom information as in the atoms section of the topology.
+    An atom keeps a list of which atoms it is bound to.
     """
 
     idx: str
@@ -195,8 +187,6 @@ class LocalGraph:
     def __init__(self, topology: Topology, heavy_idx: str, ffdir: Path):
         self.topology = topology
         self.heavy_idx = heavy_idx
-        # TODO: radicals is never used?
-        self.radicals = []
         self.ffdir = ffdir
         self.ff = {}
 
@@ -211,29 +201,29 @@ class LocalGraph:
         self.atoms_atomname = []
         self.atoms_resname = []
 
-    # Propagate changes to all attributes
-    def update_atoms_list(self):
-        self.atoms_idx = self.get_atoms_property("idx")
-        self.get_atomprop("atomtype")
-        self.get_atomprop("atomname")
-        self.get_atomprop("resname")
-        self.atoms_atomtype = self.get_atoms_property("atomtype")
-        self.atoms_atomname = self.get_atoms_property("atomname")
-        self.atoms_resname = self.get_atoms_property("resname")
+        self.construct_graph()
+        self.order_lists()
+        self.update_atoms_list()
+        self.update_bound_to()
 
-    def update_bound_to(self):
-        bound_dict = {}
-        for atom_idx in self.atoms_idx:
-            bound_dict[atom_idx] = []
-        for bond in self.bonds:
-            if not bond[1] in bound_dict[bond[0]]:
-                bound_dict[bond[0]].append(bond[1])
-            if not bond[0] in bound_dict[bond[1]]:
-                bound_dict[bond[1]].append(bond[0])
-        for atom_idx in self.atoms_idx:
-            self.atoms[self.atoms_idx.index(atom_idx)].bound_to = sorted(
-                bound_dict[atom_idx], key=str_to_int_or_0
-            )
+    def construct_graph(self, depth=3):
+        """
+        searches the bonds section of a topology up to depth bonds deep
+        to create a local graph i.e. filling the self.atoms list and self.bonds list
+        """
+        curratoms = [self.heavy_idx]
+        for _ in range(depth):
+            addlist = []
+            for bond in self.topology["bonds"]:
+                if any(x in bond[:2] for x in curratoms):
+                    if not bond[:2] in self.bonds:
+                        self.bonds.append(bond[:2])
+                    for j in [0, 1]:
+                        if not bond[j] in [x.idx for x in self.atoms]:
+                            addlist.append(bond[j])
+                            self.atoms.append(Atom(bond[j]))
+                            self.atoms_idx.append(bond[j])
+            curratoms = deepcopy(addlist)
 
     def order_lists(self):
         self.atoms = sorted(self.atoms, key=check_idx)
@@ -262,6 +252,30 @@ class LocalGraph:
             if bond_int[0] > bond_int[1]:
                 bond.reverse()
 
+    # Propagate changes to all attributes
+    def update_atoms_list(self):
+        self.atoms_idx = self.get_atoms_property("idx")
+        self.get_atomprop("atomtype")
+        self.get_atomprop("atomname")
+        self.get_atomprop("resname")
+        self.atoms_atomtype = self.get_atoms_property("atomtype")
+        self.atoms_atomname = self.get_atoms_property("atomname")
+        self.atoms_resname = self.get_atoms_property("resname")
+
+    def update_bound_to(self):
+        bound_dict = {}
+        for atom_idx in self.atoms_idx:
+            bound_dict[atom_idx] = []
+        for bond in self.bonds:
+            if not bond[1] in bound_dict[bond[0]]:
+                bound_dict[bond[0]].append(bond[1])
+            if not bond[0] in bound_dict[bond[1]]:
+                bound_dict[bond[1]].append(bond[0])
+        for atom_idx in self.atoms_idx:
+            self.atoms[self.atoms_idx.index(atom_idx)].bound_to = sorted(
+                bound_dict[atom_idx], key=str_to_int_or_0
+            )
+
     # Retrieve properties
     def get_atomprop(self, property: str):
         for entry in self.topology["atoms"]:
@@ -286,26 +300,6 @@ class LocalGraph:
             return [x.resname for x in self.atoms]
         else:
             raise ValueError("Can't find property {} in object".format(property))
-
-    # Methods related to filling the LocalGraph attributes from the topology dict
-    def construct_graph(self, depth=3):
-        """
-        searches the bonds section of a topology up to depth bonds deep
-        to create a local graph i.e. filling the self.atoms list and self.bonds list
-        """
-        curratoms = [self.heavy_idx]
-        for _ in range(depth):
-            addlist = []
-            for bond in self.topology["bonds"]:
-                if any(x in bond[:2] for x in curratoms):
-                    if not bond[:2] in self.bonds:
-                        self.bonds.append(bond[:2])
-                    for j in [0, 1]:
-                        if not bond[j] in [x.idx for x in self.atoms]:
-                            addlist.append(bond[j])
-                            self.atoms.append(Atom(bond[j]))
-                            self.atoms_idx.append(bond[j])
-            curratoms = deepcopy(addlist)
 
     def build_PADs(self):
         """
@@ -509,10 +503,10 @@ class LocalGraph:
         return ffaminoacids
 
     def compare_ff_impropers(self, heavy_idx, to_idx):
+        """look for obsolete patched improper dihedrals
+        and improper dihedrals in the force field that should be in the topology
         """
-        looks for obsolete patched impropers
-        and impropers in the force field that should be in the topology
-        """
+        # improper_bbdict = {('C','CA','N','H'):['180.00','4.60240','2'],('CA','N','C','O'):['180.00','43.93200','2'],('N','CA','C','N'):['105.4','0.75','1']}
         ffaminoacids = self.ff_AA_todict()
         logging.debug(ffaminoacids["ALA"]["impropers"])
 
