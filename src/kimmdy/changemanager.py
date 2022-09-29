@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 import logging
 from typing import Any, Optional
 from kimmdy.reaction import ConversionRecipe, ConversionType
+from kimmdy.constants import ATOMTYPE_BONDORDER
 from kimmdy.parsing import (
     read_plumed,
     write_plumed,
@@ -465,58 +466,10 @@ class LocalGraph:
         """
 
         # compare to atom type perception paper (2006) same as in HAT_utils.py
-        nbonds_dict = {
-            ("MG", "NA", "CO"): 0,
-            (
-                "H",
-                "HW",
-                "HO",
-                "HS",
-                "HA",
-                "HC",
-                "H1",
-                "H2",
-                "H3",
-                "HP",
-                "H4",
-                "H5",
-                "HO",
-                "H0",
-                "HP",
-                "O",
-                "O2",
-                "Cl",
-                "Na",
-                "I",
-                "F",
-                "Br",
-            ): 1,
-            ("NB", "NC", "OW", "OH", "OS", "SH", "S"): 2,
-            (
-                "C",
-                "CN",
-                "CB",
-                "CR",
-                "CK",
-                "CC",
-                "CW",
-                "CV",
-                "C*",
-                "CQ",
-                "CM",
-                "CA",
-                "CD",
-                "CZ",
-                "N",
-                "NA",
-                "N*",
-                "N2",
-            ): 3,
-            ("CT", "N3", "P", "SO"): 4,
-        }
+
         atom_type = self.atoms_atomtype[self.atoms_idx.index(atom_idx)]
         try:
-            nbonds = [v for k, v in nbonds_dict.items() if atom_type in k][0]
+            nbonds = [v for k, v in ATOMTYPE_BONDORDER.items() if atom_type in k][0]
         except IndexError:
             raise IndexError(
                 "{} not in atomtype dictionary nbonds_dict".format(atom_type)
