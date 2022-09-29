@@ -93,7 +93,7 @@ def move_bond_top(
     and applies the necessary changes to bonds, angles and dihedrals (proper and improper).
     Furthermore, it modifies to function types in the topology to account for radicals.
 
-    Paremeters
+    Parameters
     ----------
     topology: dict
         dictionary representation of the topology
@@ -160,7 +160,6 @@ def move_bond_top(
 
     # add pairs of the from_H at the new position
     atom_terms_H = to_graph.get_terms_with_atom(movepair_str[0], add_function=True)
-    # TODO; what about "pairs"?
     for section in ["bonds", "angles", "propers", "impropers"]:
         atom_terms_H[section].clear()
     topology = topol_add_terms(topology, atom_terms_H)
@@ -668,7 +667,15 @@ class LocalGraph:
         NCaR_offset=0.006,
         CNR_offset=0.008,
     ):
-        """Correct all non-hydrogen bonds of the atom_idx by a factor."""
+        """Correct all non-hydrogen bonds of the atom_idx by a factor.
+
+        Parameters
+        ----------
+        newfrac:    factor for r_eq of C,N 
+        SOfrac:     factor for r_eq of S,O
+        NCaR_offset:offset for r_eq of the N-Ca backbone bond for a radical Ca
+        CNR_offset: offset for r_eq of the C-N backbone for for a radical N
+        """
         logging.debug(f"Patching bonds {bonds}")
 
         for bond in bonds:
