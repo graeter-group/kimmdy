@@ -222,11 +222,12 @@ def check_gmx_version(config: Config):
 
 ## helpers for changemanager
 def str_to_int(elem):
-    try:
-        return int(elem)
-    except ValueError:
-        # logging.debug("Not all List elements are integers! Returning 0")
-        return 0
+    return int(elem) if elem.isdigit() else 0
+    #try:
+    #    return int(elem)
+    #except ValueError:
+    #    # logging.debug("Not all List elements are integers! Returning 0")
+    #    return 0
 
 
 def sort_bond(entry):
