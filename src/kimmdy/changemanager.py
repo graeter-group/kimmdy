@@ -263,7 +263,7 @@ class LocalGraph:
                 bond.reverse()
 
     # Retrieve properties
-    def get_atomprop(self, property):
+    def get_atomprop(self, property: str):
         for entry in self.topology["atoms"]:
             if entry[0] in self.atoms_idx:
                 if property == "atomtype":
