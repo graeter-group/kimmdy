@@ -147,10 +147,7 @@ class TestLocalGraphConstructMethods:
             for bonded_idx in atom.bound_to:
                 bonded_pos = self.testGraph.atoms_idx.index(bonded_idx)
                 assert any(
-                    [
-                        x == atom.idx
-                        for x in self.testGraph.atoms[bonded_pos].bound_to
-                    ]
+                    [x == atom.idx for x in self.testGraph.atoms[bonded_pos].bound_to]
                 )
 
 
