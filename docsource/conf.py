@@ -8,20 +8,20 @@ import os
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'kimmdy'
-copyright = '2022, Jannik Buhr, Eric Hartmann, Benedikt Rennekamp, Kai Riedmiller'
-autor = 'Jannik Buhr, Eric Hartmann, Benedikt Rennekamp, Kai Riedmiller'
-release = '2023'
+project = "kimmdy"
+copyright = "2022, Jannik Buhr, Eric Hartmann, Benedikt Rennekamp, Kai Riedmiller"
+autor = "Jannik Buhr, Eric Hartmann, Benedikt Rennekamp, Kai Riedmiller"
+release = "2023"
 
-sys.path.insert(0, os.path.abspath('./src'))
+sys.path.insert(0, os.path.abspath("./src"))
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 # napoleon converts google style or numpy style docstrings to rst
 extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.napoleon',
+    "sphinx.ext.autodoc",
+    "sphinx.ext.napoleon",
 ]
 
 
@@ -41,15 +41,12 @@ napoleon_type_aliases = True
 napoleon_attr_annotations = True
 
 
-
-
-templates_path = ['_templates']
+templates_path = ["_templates"]
 exclude_patterns = []
-
 
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = 'alabaster'
-html_static_path = ['_static']
+html_theme = "alabaster"
+html_static_path = ["_static"]
