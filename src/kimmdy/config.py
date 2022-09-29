@@ -16,6 +16,7 @@ def check_file_exists(p: Path):
 
 class Sequence(list):
     """A sequence of tasks."""
+
     def __init__(self, tasks: list):
         list.__init__(self)
         for task in tasks:

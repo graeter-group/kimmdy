@@ -96,7 +96,7 @@ def topol_split_dihedrals(d: Topology) -> Topology:
 
 
 def topol_merge_propers_impropers(d: Topology) -> Topology:
-    if set(["propers", "impropers"]).issubset(d.keys()) :
+    if set(["propers", "impropers"]).issubset(d.keys()):
         d["dihedrals"].clear()
         d["dihedrals"].extend(d.pop("propers"))
         d["dihedrals"].extend(d.pop("impropers"))

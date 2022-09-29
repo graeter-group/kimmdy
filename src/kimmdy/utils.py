@@ -233,7 +233,11 @@ def sort_bond(entry):
 
 
 def sort_angle(entry):
-    return (str_to_int_or_0(entry[1]), str_to_int_or_0(entry[0]), str_to_int_or_0(entry[2]))
+    return (
+        str_to_int_or_0(entry[1]),
+        str_to_int_or_0(entry[0]),
+        str_to_int_or_0(entry[2]),
+    )
 
 
 def sort_dihedral(entry):
