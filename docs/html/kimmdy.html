@@ -139,7 +139,7 @@ atomtype and atomname returned</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="kimmdy.changemanager.LocalGraph.get_atomprop">
-<span class="sig-name descname"><span class="pre">get_atomprop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">property</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kimmdy.changemanager.LocalGraph.get_atomprop" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_atomprop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">property</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kimmdy.changemanager.LocalGraph.get_atomprop" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -272,10 +272,21 @@ to return the index of the first found bond partner.</p>
 <dt class="sig sig-object py" id="kimmdy.changemanager.move_bond_top">
 <span class="sig-prename descclassname"><span class="pre">kimmdy.changemanager.</span></span><span class="sig-name descname"><span class="pre">move_bond_top</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topology</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">movepair</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ffdir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#kimmdy.changemanager.move_bond_top" title="Permalink to this definition">¶</a></dt>
 <dd><p>Move bond in topology.</p>
-<p>Can create new bonds and remove old bonds.
-It keeps track of affected bonds via a graph representation of the topology
+<p>Move an atom (typically H for Hydrogen Atom Transfer) to a new location.
+Creates the new bond and removes the old bond.
+It keeps track of affected terms in the topology via a graph representation of the topology
 and applies the necessary changes to bonds, angles and dihedrals (proper and improper).
-Furthermore, it modifies to forcefield to account for radicals.</p>
+Furthermore, it modifies to function types in the topology to account for radicals.</p>
+<dl class="simple">
+<dt>topology: dict</dt><dd><p>dictionary representation of the topology</p>
+</dd>
+<dt>movepair: tuple[int, int]</dt><dd><p>a tuple of integers with the atoms indices
+<cite>from</cite>, the atom being moved and
+<cite>to</cite>, the atom to which the <cite>from</cite> atom will be bound</p>
+</dd>
+<dt>ffdir: Path</dt><dd><p>path to the forcefield directory. Needs to contain aminoacids.rtp.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
