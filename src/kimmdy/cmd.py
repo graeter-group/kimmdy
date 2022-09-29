@@ -38,6 +38,20 @@ def configure_logging(args, color=True):
     Configures the logging module with optional colorcodes
     for the terminal.
     """
+
+    if Path(args.logfile).exists():
+        log_curr = Path(args.logfile)
+        while log_curr.exists():
+            out_end = log_curr.name.strip("#")[-3:]
+            if out_end.isdigit():
+                log_curr = log_curr.with_name(
+                    f"#{log_curr.name[:-3]}{int(out_end)+1:03}#"
+                )
+            else:
+                log_curr = log_curr.with_name(f"#{log_curr.name}_001#")
+        
+        Path(args.logfile).rename(log_curr)
+
     if color:
         logging.addLevelName(logging.INFO, "\033[35mINFO\033[00m")
         logging.addLevelName(logging.ERROR, "\033[31mERROR\033[00m")
