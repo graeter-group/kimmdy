@@ -671,7 +671,7 @@ class LocalGraph:
 
         Parameters
         ----------
-        newfrac:    factor for r_eq of C,N 
+        newfrac:    factor for r_eq of C,N
         SOfrac:     factor for r_eq of S,O
         NCaR_offset:offset for r_eq of the N-Ca backbone bond for a radical Ca
         CNR_offset: offset for r_eq of the C-N backbone for for a radical N

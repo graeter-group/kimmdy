@@ -49,7 +49,7 @@ def configure_logging(args, color=True):
                 )
             else:
                 log_curr = log_curr.with_name(f"#{log_curr.name}_001#")
-        
+
         Path(args.logfile).rename(log_curr)
 
     if color:
