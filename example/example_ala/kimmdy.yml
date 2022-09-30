@@ -8,7 +8,7 @@ idx: 'index.ndx'
 plumed: false
 equilibrium:
   mdp: 'md.mdp'
-prod:
+pull:
   mdp: 'md.mdp'
 changer:
   coordinates:

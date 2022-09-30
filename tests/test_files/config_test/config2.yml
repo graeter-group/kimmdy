@@ -10,7 +10,7 @@ plumed:
   distances: 'distances.dat'
 equilibrium:
   mdp: 'pullf1500_equil.mdp'
-prod:
+pull:
   mdp: 'pullf1500.mdp'
 changer:
   coordinates:
@@ -25,6 +25,6 @@ sequence:
   - 
     mult: 1
     tasks:
-      - prod
+      - pull
       - reactions
 

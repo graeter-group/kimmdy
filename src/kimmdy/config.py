@@ -44,7 +44,7 @@ type_scheme = {
         "npt": {"mdp": Path, "tpr": Path},
     },
     "equilibrium": {"mdp": Path},
-    "prod": {"mdp": Path},
+    "pull": {"mdp": Path},
     "changer": {"coordinates": {"md": {"mdp": Path}}},
     "reactions": {},
     "sequence": Sequence,
@@ -94,7 +94,7 @@ class ReactionsConfig:
     homolysis: HomolysisConfig
 
 
-class ProdConfig:
+class PullConfig:
     mdp: Path
 
 
@@ -136,7 +136,7 @@ class Config:
     equilibrium: MdConfig
     changer: ChangerConfig
     reactions: ReactionsConfig
-    prod: ProdConfig
+    pull: PullConfig
     sequence: SequenceConfig
 
     def __init__(
