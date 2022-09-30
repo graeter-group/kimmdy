@@ -107,7 +107,6 @@ class RunManager:
         self.task_mapping: TaskMapping = {
             "equilibrium": [self._run_md_equil],
             "prod": [self._run_md_prod],
-            "minimization": [self._run_md_minim],
             "relax": [self._run_md_relax],
             "reactions": [
                 self._query_reactions,
@@ -226,59 +225,37 @@ class RunManager:
         md.dummy_step(files)
         return files
 
+# if you could pass arguments to _run_md_xx it would be possible to make it one method
+# if the config would be liberalized in regard to md options, you could just give your type of md simulation a name with associated files
     def _run_md_equil(self) -> TaskFiles:
         logging.info("Start equilibration MD")
         self.state = State.MD
+
         files = self._create_task_directory("equilibration")
         files.input["mdp"] = self.config.equilibrium.mdp
-        files.input["idx"] = self.config.idx
-        md.equilibrium(files)
+        files = md.md(files,"","")
         logging.info("Done equilibrating")
         return files
 
-    def _run_md_minim(self) -> TaskFiles:
-        logging.info("Setup _run_md_minim")
-        self.state = State.MD
-        files = self._create_task_directory("minimization")
-        files.input["mdp"] = (self.config.minimization.mdp,)
-
-        # perform step
-        files = md.minimzation(files)
-        logging.info("Done minimizing")
-        return files
-
-    def _run_md_eq(self) -> TaskFiles:
-        logging.info("Setup _run_md_eq MD")
-        self.state = State.MD
-        files = self._create_task_directory("equilibrium")
-        files.input["mdp"] = self.config.equilibrium.mdp
-
-        files = md.equilibration(files)
-        logging.info("Done")
-        return files
-
     def _run_md_prod(self) -> TaskFiles:
-        logging.info("Setup _run_md_prod")
+        logging.info("Start production MD")
         self.state = State.MD
+
         files = self._create_task_directory("production")
         files.input["mdp"] = self.config.prod.mdp
-        files.input["idx"] = self.config.idx
-
-        # TODO: do we need this part with the new automatic get_latest
-        # for missing entries?
-        files.input["plumed.dat"] = self.get_latest("plumed.dat")
-        files = md.production(files)
+        plumed_dat = files.input["plumed.dat"]
+        files = md.md(files,"",f" -plumed {plumed_dat}")
         logging.info("Done with production MD")
         return files
 
     def _run_md_relax(self) -> TaskFiles:
-        logging.info("Start _run_md_relax")
+        logging.info("Start relaxation MD")
         self.state = State.MD
+
         files = self._create_task_directory("relaxation")
         files.input["mdp"] = self.config.changer.coordinates.md.mdp
-        files.input["idx"] = self.config.idx
-
-        files = md.relaxation(files)
+        cpt = files.input["cpt"]
+        files = md.md(files,f" -t {cpt}","")
         logging.info("Done with relaxation MD")
         return files
 
