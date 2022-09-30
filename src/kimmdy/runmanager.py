@@ -106,7 +106,7 @@ class RunManager:
 
         self.task_mapping: TaskMapping = {
             "equilibrium": [self._run_md_equil],
-            "prod": [self._run_md_prod],
+            "pull": [self._run_md_pull],
             "relax": [self._run_md_relax],
             "reactions": [
                 self._query_reactions,
@@ -237,15 +237,15 @@ class RunManager:
         logging.info("Done equilibrating")
         return files
 
-    def _run_md_prod(self) -> TaskFiles:
-        logging.info("Start production MD")
+    def _run_md_pull(self) -> TaskFiles:
+        logging.info("Start pulling MD")
         self.state = State.MD
 
-        files = self._create_task_directory("production")
-        files.input["mdp"] = self.config.prod.mdp
+        files = self._create_task_directory("pulling")
+        files.input["mdp"] = self.config.pull.mdp
         plumed_dat = files.input["plumed.dat"]
         files = md.md(files,"",f" -plumed {plumed_dat}")
-        logging.info("Done with production MD")
+        logging.info("Done with pulling MD")
         return files
 
     def _run_md_relax(self) -> TaskFiles:

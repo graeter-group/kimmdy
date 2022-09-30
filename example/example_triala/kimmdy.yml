@@ -8,7 +8,7 @@ idx: 'index.ndx'
 plumed: false
 equilibrium:
   mdp: 'md.mdp'
-prod:
+pull:
   mdp: 'md_slow.mdp'
 changer:
   coordinates:
@@ -26,5 +26,5 @@ sequence:
     mult: 10
     tasks:
       - reactions
-      - prod
+      - pull
       - equilibrium
