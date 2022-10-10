@@ -340,7 +340,11 @@ class localGraph:
         self.AtomList[atoms_idxs.index(movepair[0])].atomtype = H_atomtype
         self.AtomList[atoms_idxs.index(movepair[0])].atomname = H_atomname
         self.AtomList[atoms_idxs.index(movepair[0])].resname = heavy_resname
-        self.update_atoms_list()
+        self.atoms_atomtype = self.get_AtomList_property("atomtype")
+        self.atoms_atomname = self.get_AtomList_property("atomname")
+        self.atoms_resname = self.get_AtomList_property("resname")
+        logging.debug(f"corrected atomprops: {H_atomtype} should now be in {self.atoms_atomtype} position {atoms_idxs.index(movepair[0])}")
+        logging.debug(f"additional information: {self.atoms_atomname},{vars(self.AtomList[atoms_idxs.index(movepair[0])])}")
         return [
             movepair[0],
             H_atomtype,
