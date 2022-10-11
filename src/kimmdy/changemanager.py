@@ -28,6 +28,7 @@ from copy import deepcopy
 import itertools
 from operator import itemgetter
 import re
+import MDAnalysis as mda
 
 
 def modify_top(recipe: ConversionRecipe, oldtop: Path, newtop: Path, ffdir: Path):
@@ -1049,3 +1050,29 @@ def move_bond_plumed(plumeddat, movepair, plumeddist):
     raise NotImplementedError(
         "Plumeddat Changer for moving Atoms is not implemented yet."
     )
+
+def modify_top_relax(gro: Path, toppath: Path, movepair: list,outtop: Path):
+    logging.info(f"Creating a new topology with input {gro}, {toppath}, {movepair}, {outtop}")
+    movepair = [str(movepair[0]),str(movepair[1])]
+
+    u = mda.Universe(gro)
+    prev_center = str(u.select_atoms(f"around 1.5 id {movepair[0]}").ids[0])        # is this robust?
+    del u
+
+    topdir = read_topol(toppath)
+    for i,bond in enumerate(topdir['bonds']):
+        if movepair[0] in bond:
+            newbond = [*bond[:2],'3',bond[3],'400.0','19.0']           # this assumes an explicitly defined bond
+            bondpos = i
+    topdir['bonds'][bondpos] = newbond
+
+    for pair in topdir['pairs']:
+        if set([prev_center,movepair[0]]) == set(pair[:2]):
+            topdir['pairs'].remove(pair)
+            break
+    
+
+    exclude = [[],['[ exclusions ]'],[prev_center,movepair[0]]]
+    topdir['dihedrals'].extend(exclude)
+
+    write_topol(topdir,outtop)

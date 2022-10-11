@@ -26,7 +26,7 @@ def md(files: TaskFiles, addgrompp: str, addmdrun: str):
     mdp = files.input["mdp"]
     idx = files.input["idx"]
 
-    tpr = outputdir / "equil.tpr"
+    tpr = outputdir / "equil.tpr"           ## correct name?!?!?!
     outgro = outputdir / "equil.gro"
     outtrr = outputdir / "equil.trr"
 

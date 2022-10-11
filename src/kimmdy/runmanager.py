@@ -255,6 +255,10 @@ class RunManager:
         files = self._create_task_directory("relaxation")
         files.input["mdp"] = self.config.changer.coordinates.md.mdp
         cpt = files.input["cpt"]
+
+        if self.chosen_recipe.type == [ConversionType.MOVE]:
+            changer.modify_top_relax(self.get_latest('gro'),self.get_latest('top'),*self.chosen_recipe.atom_idx,files.outputdir/"tmp_topol_relax.top")
+            files.input["top"] = files.outputdir/"tmp_topol_relax.top"          # does this add it to the latest files?
         files = md.md(files,f" -t {cpt}","")
         logging.info("Done with relaxation MD")
         return files
