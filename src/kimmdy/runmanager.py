@@ -198,10 +198,11 @@ class RunManager:
         # discover other files written by the task
         if hasattr(files, "outputdir"):
             for path in files.outputdir.iterdir():
-                suffix = path.suffix[1:]
-                if suffix in AMBIGUOUS_SUFFS:
-                    suffix = path.name
-                files.output[suffix] = files.outputdir / path
+                if not path.name.startswith('tmp_'):     #hiding tmp files
+                    suffix = path.suffix[1:]
+                    if suffix in AMBIGUOUS_SUFFS:
+                        suffix = path.name
+                    files.output[suffix] = files.outputdir / path
 
             logging.debug("Update latest files with: ")
             logging.debug(pformat(files.output))
