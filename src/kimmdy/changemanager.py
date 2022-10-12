@@ -174,7 +174,14 @@ class Atom:
 
 
 class LocalGraph:
-    def __init__(self, topology: Topology, heavy_idx: str, ffdir: Path, add_bond: Optional[tuple[str, str]] = None, depth: int=3):
+    def __init__(
+        self,
+        topology: Topology,
+        heavy_idx: str,
+        ffdir: Path,
+        add_bond: Optional[tuple[str, str]] = None,
+        depth: int = 3,
+    ):
         self.topology = topology
         self.heavy_idx = heavy_idx
         self.ffdir = ffdir
@@ -230,7 +237,8 @@ class LocalGraph:
 
     def order_lists(self):
         # return early on empty topology
-        if not self.atoms_idx: return
+        if not self.atoms_idx:
+            return
         self.atoms = sorted(self.atoms, key=check_idx)
         self.atoms_idx = sorted(self.atoms_idx, key=str_to_int_or_0)
         # TODO: find more elegant solution for ordering multiple properties

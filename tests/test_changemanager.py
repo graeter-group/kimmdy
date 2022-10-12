@@ -171,7 +171,7 @@ class TestLocalGraphAddRemoveMethods:
     input_ff = Path(__file__).parent / "test_files/assets/amber99sb-star-ildnp.ff"
     testGraph = changemanager.LocalGraph(topology, "1", input_ff, None, 3)
     original_graph = deepcopy(testGraph)
-    n_atoms = len(testGraph.get_atoms_property('idx'))
+    n_atoms = len(testGraph.get_atoms_property("idx"))
     n_bonds = len(testGraph.bonds)
 
     def test_add_atom(self):
@@ -183,17 +183,16 @@ class TestLocalGraphAddRemoveMethods:
         assert len(self.testGraph.atoms_idx) == self.n_atoms + 3
 
     def test_add_bond(self):
-        self.testGraph.add_bond([ "9", "10" ])
-        self.testGraph.add_bond([ "10", "11" ])
-        self.testGraph.add_bond([ "11", "12" ])
+        self.testGraph.add_bond(["9", "10"])
+        self.testGraph.add_bond(["10", "11"])
+        self.testGraph.add_bond(["11", "12"])
 
-        assert [ "11", "12" ] in self.testGraph.bonds
+        assert ["11", "12"] in self.testGraph.bonds
         assert len(self.testGraph.bonds) == self.n_bonds + 3
-    
+
     def test_remove_terms(self):
         # TODO: rewrite
         pass
-
 
 
 class TestLocalGraphFFMethods:

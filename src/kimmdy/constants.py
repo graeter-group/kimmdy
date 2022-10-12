@@ -1,4 +1,3 @@
-
 # compare to atom type perception paper (2006) doi:10.1016/j.jmgm.2005.12.005
 ATOMTYPE_BONDORDER = {
     ("MG", "NA", "CO"): 0,
