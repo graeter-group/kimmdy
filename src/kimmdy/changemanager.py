@@ -114,8 +114,6 @@ def move_bond_top(
 
     # build local graph and fill it
     from_graph = LocalGraph(topology, heavy_idx, ffdir)
-    from_graph.build_PADs()
-    from_graph.order_lists()
 
     # remove terms with from_atom
     termdict = from_graph.get_terms_with_atom(movepair_str[0])
@@ -129,15 +127,7 @@ def move_bond_top(
     logging.info("Moving bond in topology: Dealing with the 'to' part")
 
     # build localGraph and fill it
-    to_graph = LocalGraph(topology, movepair_str[1], ffdir)
-    to_graph.add_atom(Atom(movepair_str[0]))
-    to_graph.order_lists()
-    to_graph.update_atoms_list()
-    to_graph.add_bond(deepcopy(movepair_str))
-    to_graph.update_bound_to()
-    to_graph.order_lists()
-    to_graph.build_PADs()
-    to_graph.order_lists()
+    to_graph = LocalGraph(topology, movepair_str[1], ffdir, add_bond=movepair_str)
 
     # set the correct atomtype,resname for the HAT hydrogen based on the ff definition
     atoms_idxs_from = from_graph.atoms_idx
@@ -152,10 +142,10 @@ def move_bond_top(
     topology = topol_add_terms(topology, atom_terms)
 
     # add pairs of the from_atom at the new position
-    atom_terms_H = to_graph.get_terms_with_atom(movepair_str[0], add_function=True)
+    atom_terms_from = to_graph.get_terms_with_atom(movepair_str[0], add_function=True)
     for section in ["bonds", "angles", "propers", "impropers"]:
-        atom_terms_H[section].clear()
-    topology = topol_add_terms(topology, atom_terms_H)
+        atom_terms_from[section].clear()
+    topology = topol_add_terms(topology, atom_terms_from)
 
     # have the right impropers at the to_heavy atom
     atom_terms_add, atom_terms_remove = to_graph.compare_ff_impropers(
@@ -184,7 +174,7 @@ class Atom:
 
 
 class LocalGraph:
-    def __init__(self, topology: Topology, heavy_idx: str, ffdir: Path):
+    def __init__(self, topology: Topology, heavy_idx: str, ffdir: Path, add_bond: Optional[tuple[str, str]] = None, depth: int=3):
         self.topology = topology
         self.heavy_idx = heavy_idx
         self.ffdir = ffdir
@@ -201,10 +191,23 @@ class LocalGraph:
         self.atoms_atomname = []
         self.atoms_resname = []
 
-        self.construct_graph()
+        self.construct_graph(depth)
         self.order_lists()
         self.update_atoms_list()
         self.update_bound_to()
+
+        if add_bond is None:
+            self.build_PADs()
+            self.order_lists()
+        else:
+            self.add_atom(Atom(add_bond[0]))
+            self.order_lists()
+            self.update_atoms_list()
+            self.add_bond(add_bond)
+            self.update_bound_to()
+            self.order_lists()
+            self.build_PADs()
+            self.order_lists()
 
     def construct_graph(self, depth=3):
         """
@@ -226,6 +229,8 @@ class LocalGraph:
             curratoms = deepcopy(addlist)
 
     def order_lists(self):
+        # return early on empty topology
+        if not self.atoms_idx: return
         self.atoms = sorted(self.atoms, key=check_idx)
         self.atoms_idx = sorted(self.atoms_idx, key=str_to_int_or_0)
         # TODO: find more elegant solution for ordering multiple properties
@@ -417,17 +422,17 @@ class LocalGraph:
 
     # Manipulate attributes
     def add_atom(self, atom: Atom):
-        if atom not in self.atoms:
+        if atom.idx not in self.atoms_idx:
             self.atoms.append(atom)
             self.atoms_idx.append(atom.idx)
         else:
-            logging.warning(f"Atom with idx {Atom.idx} already exists!")
+            logging.warning(f"Atom with idx {atom.idx} already exists!")
 
-    def add_bond(self, bond: list):
+    def add_bond(self, bond: list[str]):
         if all(x in self.atoms_idx for x in bond):
             self.bonds.append(bond)
         else:
-            logging.warning("Could not establish bond between idxs {bond}!")
+            logging.warning(f"Could not establish bond between idxs {bond}!")
 
     def remove_terms(self, termdict):
         logging.debug(f"Removing terms {termdict} from local graph.")
