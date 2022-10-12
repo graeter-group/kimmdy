@@ -647,7 +647,8 @@ class localGraph:
                                 f"HAT hydrogen atomtype has been found to be {atom[1]} at its new position."
                             )
                             return (atom[1], H_atomname)
-        logging.warn(f"Found no new atomtype for HAT hydrogen!")
+        logging.warning(f"Found no new atomtype for HAT hydrogen!")
+        # should we raise an error for this case?
 
     def get_ff_sections(self):
         ffbonded = read_topol(
