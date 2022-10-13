@@ -101,51 +101,51 @@ class TestLocalGraphConstructMethods:
     input_ff = Path(__file__).parent / "test_files/assets/amber99sb-star-ildnp.ff"
     heavy_idx = "9"
 
-    testGraph = changemanager.LocalGraph(topology, heavy_idx, input_ff)
+    test_graph = changemanager.LocalGraph(topology, heavy_idx, input_ff)
 
     def test_construct_graph(self):
-        self.testGraph.construct_graph()
-        assert len(self.testGraph.atoms) == 16
-        assert len(self.testGraph.atoms_idx) == 16
-        assert len(self.testGraph.bonds) == 15
+        self.test_graph.construct_graph()
+        assert len(self.test_graph.atoms) == 16
+        assert len(self.test_graph.atoms_idx) == 16
+        assert len(self.test_graph.bonds) == 15
 
     def test_order_lists(self):
         # need to run test_construct_graph beforehand
-        self.testGraph.order_lists()
+        self.test_graph.order_lists()
         val = 0
-        for atom_idx in self.testGraph.atoms_idx:
+        for atom_idx in self.test_graph.atoms_idx:
             assert int(atom_idx) > val
             val = int(atom_idx)
 
         val = 0
-        for bond in self.testGraph.bonds:
+        for bond in self.test_graph.bonds:
             assert int(bond[0]) >= val
             val = int(bond[0])
         return
 
     def test_update_atoms_list(self):
-        self.testGraph.update_atoms_list()
+        self.test_graph.update_atoms_list()
         assert (
-            len(self.testGraph.atoms_atomname) == 16
-            and self.testGraph.atoms_atomname[0] == "CH3"
+            len(self.test_graph.atoms_atomname) == 16
+            and self.test_graph.atoms_atomname[0] == "CH3"
         )
         assert (
-            len(self.testGraph.atoms_atomtype) == 16
-            and self.testGraph.atoms_atomtype[0] == "CT"
+            len(self.test_graph.atoms_atomtype) == 16
+            and self.test_graph.atoms_atomtype[0] == "CT"
         )
         assert (
-            len(self.testGraph.atoms_resname) == 16
-            and self.testGraph.atoms_resname[0] == "ACE"
+            len(self.test_graph.atoms_resname) == 16
+            and self.test_graph.atoms_resname[0] == "ACE"
         )
 
     def test_update_bound_to(self):
-        self.testGraph.update_bound_to()
-        for atom in self.testGraph.atoms:
+        self.test_graph.update_bound_to()
+        for atom in self.test_graph.atoms:
             assert len(atom.bound_to) > 0
             for bonded_idx in atom.bound_to:
-                bonded_pos = self.testGraph.atoms_idx.index(bonded_idx)
+                bonded_pos = self.test_graph.atoms_idx.index(bonded_idx)
                 assert any(
-                    [x == atom.idx for x in self.testGraph.atoms[bonded_pos].bound_to]
+                    [x == atom.idx for x in self.test_graph.atoms[bonded_pos].bound_to]
                 )
 
 
@@ -155,14 +155,14 @@ def test_build_PADs():
     topology = topol_split_dihedrals(topology)
     input_ff = Path(__file__).parent / "test_files/assets/amber99sb-star-ildnp.ff"
 
-    newGraph = changemanager.LocalGraph(topology, "29", input_ff, None, 20)
+    new_graph = changemanager.LocalGraph(topology, "29", input_ff, None, 20)
 
-    assert len(newGraph.atoms) == len(topology["atoms"]) - 9
-    assert len(newGraph.bonds) == len(topology["bonds"]) - 1
-    assert len(newGraph.pairs) == len(topology["pairs"]) - 1
-    assert len(newGraph.angles) == len(topology["angles"]) - 1
-    assert len(newGraph.proper_dihedrals) == len(topology["propers"]) - 1
-    assert len(newGraph.improper_dihedrals) == len(topology["impropers"]) - 1
+    assert len(new_graph.atoms) == len(topology["atoms"]) - 9
+    assert len(new_graph.bonds) == len(topology["bonds"]) - 1
+    assert len(new_graph.pairs) == len(topology["pairs"]) - 1
+    assert len(new_graph.angles) == len(topology["angles"]) - 1
+    assert len(new_graph.proper_dihedrals) == len(topology["propers"]) - 1
+    assert len(new_graph.improper_dihedrals) == len(topology["impropers"]) - 1
 
 
 class TestLocalGraphAddRemoveMethods:
@@ -170,26 +170,26 @@ class TestLocalGraphAddRemoveMethods:
     topology = read_topol(input_f)
     topology = topol_split_dihedrals(topology)
     input_ff = Path(__file__).parent / "test_files/assets/amber99sb-star-ildnp.ff"
-    testGraph = changemanager.LocalGraph(topology, "1", input_ff, None, 3)
-    original_graph = deepcopy(testGraph)
-    n_atoms = len(testGraph.get_atoms_property("idx"))
-    n_bonds = len(testGraph.bonds)
+    test_graph = changemanager.LocalGraph(topology, "1", input_ff, None, 3)
+    original_graph = deepcopy(test_graph)
+    n_atoms = len(test_graph.get_atoms_property("idx"))
+    n_bonds = len(test_graph.bonds)
 
     def test_add_atom(self):
-        self.testGraph.add_atom(changemanager.Atom("10"))
-        self.testGraph.add_atom(changemanager.Atom("11"))
-        self.testGraph.add_atom(changemanager.Atom("12"))
+        self.test_graph.add_atom(changemanager.Atom("10"))
+        self.test_graph.add_atom(changemanager.Atom("11"))
+        self.test_graph.add_atom(changemanager.Atom("12"))
 
-        assert len(self.testGraph.atoms) == self.n_atoms + 3
-        assert len(self.testGraph.atoms_idx) == self.n_atoms + 3
+        assert len(self.test_graph.atoms) == self.n_atoms + 3
+        assert len(self.test_graph.atoms_idx) == self.n_atoms + 3
 
     def test_add_bond(self):
-        self.testGraph.add_bond(["9", "10"])
-        self.testGraph.add_bond(["10", "11"])
-        self.testGraph.add_bond(["11", "12"])
+        self.test_graph.add_bond(["9", "10"])
+        self.test_graph.add_bond(["10", "11"])
+        self.test_graph.add_bond(["11", "12"])
 
-        assert ["11", "12"] in self.testGraph.bonds
-        assert len(self.testGraph.bonds) == self.n_bonds + 3
+        assert ["11", "12"] in self.test_graph.bonds
+        assert len(self.test_graph.bonds) == self.n_bonds + 3
 
     def test_remove_terms(self):
         # TODO: rewrite
@@ -201,18 +201,18 @@ class TestLocalGraphFFMethods:
     input_f = Path(__file__).parent / "test_files/test_changemanager/hexala_out.top"
     topology = read_topol(input_f)
     topology = topol_split_dihedrals(topology)
-    testGraph = changemanager.LocalGraph(topology, "1", input_ff)
+    test_graph = changemanager.LocalGraph(topology, "1", input_ff)
 
-    fullGraph = changemanager.LocalGraph(topology, "9", input_ff)
-    fullGraph.construct_graph()
-    fullGraph.order_lists()
-    fullGraph.update_atoms_list()
-    fullGraph.update_bound_to()
-    fullGraph.build_PADs()
-    fullGraph.order_lists()
+    full_graph = changemanager.LocalGraph(topology, "9", input_ff)
+    full_graph.construct_graph()
+    full_graph.order_lists()
+    full_graph.update_atoms_list()
+    full_graph.update_bound_to()
+    full_graph.build_PADs()
+    full_graph.order_lists()
 
     def test_ff_AA_todict(self):
-        ffaminoacids = self.testGraph.ff_AA_todict()
+        ffaminoacids = self.test_graph.ff_AA_todict()
         assert "ALA" in ffaminoacids.keys()
         assert all(
             x in ffaminoacids["GLY"]["atoms"]
@@ -239,25 +239,25 @@ class TestLocalGraphFFMethods:
         )
 
     def test_get_H_FF_at_an(self):
-        at_an1 = self.fullGraph.get_H_ff_at_an("9")
+        at_an1 = self.full_graph.get_H_ff_at_an("9")
         assert at_an1[0] == "H1"
         assert at_an1[1] == "HA"
-        at_an2 = self.fullGraph.get_H_ff_at_an("11")
+        at_an2 = self.full_graph.get_H_ff_at_an("11")
         assert at_an2 == ("HC", "HB1")
 
     def test_compare_ff_impropers(self):
-        self.fullGraph.improper_dihedrals.append(
+        self.full_graph.improper_dihedrals.append(
             ["5", "9", "7", "10", "4", "180.00", "4.60240", "2"]
         )
-        adddict, rmvdict = self.fullGraph.compare_ff_impropers("9", "7")
+        adddict, rmvdict = self.full_graph.compare_ff_impropers("9", "7")
         assert adddict["impropers"] == [["5", "9", "7", "8", "4"]]
         assert rmvdict["impropers"] == [
             ["5", "9", "7", "10", "4", "180.00", "4.60240", "2"]
         ]
 
     def test_get_ff_sections(self):
-        self.testGraph.get_ff_sections()
-        assert self.testGraph.ff["bondtypes"][1] == [
+        self.test_graph.get_ff_sections()
+        assert self.test_graph.ff["bondtypes"][1] == [
             "C",
             "C",
             "1",
@@ -266,7 +266,7 @@ class TestLocalGraphFFMethods:
             ";",
             "new99",
         ]
-        assert self.testGraph.ff["angletypes"][-1] == [
+        assert self.test_graph.ff["angletypes"][-1] == [
             "CT",
             "CC",
             "CC",
@@ -284,22 +284,22 @@ class TestLocalGraphParameterize:
 
     topology = read_topol(input_f)
     topology = topol_split_dihedrals(topology)
-    fullGraph = changemanager.LocalGraph(topology, "9", input_ff)
-    fullGraph.get_ff_sections()
+    full_graph = changemanager.LocalGraph(topology, "9", input_ff)
+    full_graph.get_ff_sections()
 
-    atom_terms = fullGraph.get_terms_with_atom("9", center=True)
+    atom_terms = full_graph.get_terms_with_atom("9", center=True)
     atom_terms["pairs"].clear()
 
     def test_search_terms(self):
         termdict = {}
-        termdict["bonds"] = self.fullGraph.search_terms(
-            self.fullGraph.bonds, "9", False
+        termdict["bonds"] = self.full_graph.search_terms(
+            self.full_graph.bonds, "9", False
         )
-        termdict["propers"] = self.fullGraph.search_terms(
-            self.fullGraph.proper_dihedrals, "9", False
+        termdict["propers"] = self.full_graph.search_terms(
+            self.full_graph.proper_dihedrals, "9", False
         )
-        termdict["centerpropers"] = self.fullGraph.search_terms(
-            self.fullGraph.proper_dihedrals, "9", True
+        termdict["centerpropers"] = self.full_graph.search_terms(
+            self.full_graph.proper_dihedrals, "9", True
         )
         assert termdict["bonds"] == [["7", "9"], ["9", "10"], ["9", "14"]]
         assert termdict["propers"][0] == ["1", "5", "7", "9"]
@@ -328,7 +328,7 @@ class TestLocalGraphParameterize:
             "propers": [["p1"], ["p2"]],
             "impropers": [["i1"], ["i2"]],
         }
-        termdict_funct = self.fullGraph.add_function_to_terms(termdict)
+        termdict_funct = self.full_graph.add_function_to_terms(termdict)
         funct_dict = {
             "bonds": "1",
             "pairs": "1",
@@ -341,27 +341,27 @@ class TestLocalGraphParameterize:
                 assert entry[-1] == funct_dict[key]
 
     def test_is_radical(self):
-        assert self.fullGraph.is_radical("9")
-        assert not self.fullGraph.is_radical("10")
+        assert self.full_graph.is_radical("9")
+        assert not self.full_graph.is_radical("10")
 
     def test_parameterize_bonded_terms(self):
-        terms_bond = self.fullGraph.parameterize_bonded_terms(
-            "bondtypes", self.fullGraph.bonds
+        terms_bond = self.full_graph.parameterize_bonded_terms(
+            "bondtypes", self.full_graph.bonds
         )
-        terms_angles = self.fullGraph.parameterize_bonded_terms(
-            "angletypes", self.fullGraph.angles
+        terms_angles = self.full_graph.parameterize_bonded_terms(
+            "angletypes", self.full_graph.angles
         )
         assert all([len(x) == 5 for x in terms_bond])
         assert terms_angles[4] == ["5", "7", "9", "1", "121.900", "418.400"]  # C N CA
 
     def test_patch_bond(self):
-        self.atom_terms["bonds"] = self.fullGraph.parameterize_bonded_terms(
+        self.atom_terms["bonds"] = self.full_graph.parameterize_bonded_terms(
             "bondtypes", self.atom_terms["bonds"]
         )
         unpatched_terms = deepcopy(self.atom_terms["bonds"])
         newfrac = 0.98
         NCaR_offset = 0.006
-        self.fullGraph.patch_bond(
+        self.full_graph.patch_bond(
             self.atom_terms["bonds"], "9", newfrac, 0.955, NCaR_offset, CNR_offset=0.008
         )
         assert (
@@ -374,11 +374,11 @@ class TestLocalGraphParameterize:
         )
 
     def test_patch_angle(self):
-        self.atom_terms["angles"] = self.fullGraph.parameterize_bonded_terms(
+        self.atom_terms["angles"] = self.full_graph.parameterize_bonded_terms(
             "angletypes", self.atom_terms["angles"]
         )
         newtheteq = 117
-        self.fullGraph.patch_angle(self.atom_terms["angles"], "9", newtheteq)
+        self.full_graph.patch_angle(self.atom_terms["angles"], "9", newtheteq)
         assert all([int(float(x[4])) == newtheteq for x in self.atom_terms["angles"]])
 
     def test_patch_dihedral_CA(self):
@@ -386,7 +386,7 @@ class TestLocalGraphParameterize:
         self.atom_terms["propers"] = [[*x, "9"] for x in self.atom_terms["propers"]]
         phivals = ["1.6279944", "21.068532", "1.447664"]
         psivals = ["6.556746", "20.284450", "0.297901"]
-        self.atom_terms["propers"] = self.fullGraph.patch_dihedral_CA(
+        self.atom_terms["propers"] = self.full_graph.patch_dihedral_CA(
             self.atom_terms["propers"], "9", phivals, psivals
         )
         assert self.atom_terms["propers"][0][6] == phivals[0]
@@ -394,7 +394,7 @@ class TestLocalGraphParameterize:
 
     def test_patch_improper(self):
         newphik = "43.93200"
-        self.atom_terms["impropers"] = self.fullGraph.patch_improper("9", newphik)
+        self.atom_terms["impropers"] = self.full_graph.patch_improper("9", newphik)
         assert self.atom_terms["impropers"] == [
             [
                 "7",
@@ -412,8 +412,8 @@ class TestLocalGraphParameterize:
         ]
 
     def test_parameterize_around_atom(self):
-        atom_terms_rad = self.fullGraph.parameterize_around_atom("9")
-        atom_terms_nonrad = self.fullGraph.parameterize_around_atom("10")
+        atom_terms_rad = self.full_graph.parameterize_around_atom("9")
+        atom_terms_nonrad = self.full_graph.parameterize_around_atom("10")
         for key, val in atom_terms_rad.items():
             if not key in ["pairs"]:
                 assert any(term[-1].endswith("parameter") for term in val)
