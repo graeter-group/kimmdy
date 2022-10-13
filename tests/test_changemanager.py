@@ -1,8 +1,9 @@
 from kimmdy.parsing import read_topol, read_plumed, topol_split_dihedrals
 from kimmdy import changemanager
+import pytest
 
 from pathlib import Path
-from copy import copy, deepcopy
+from copy import deepcopy
 
 
 def test_break_bond_top():
@@ -284,13 +285,7 @@ class TestLocalGraphParameterize:
     topology = read_topol(input_f)
     topology = topol_split_dihedrals(topology)
     fullGraph = changemanager.LocalGraph(topology, "9", input_ff)
-    # fullGraph.construct_graph()
-    # fullGraph.order_lists()
-    # fullGraph.update_atoms_list()
-    # fullGraph.update_bound_to()
-    # fullGraph.build_PADs()
-    # fullGraph.order_lists()
-    # fullGraph.get_ff_sections()
+    fullGraph.get_ff_sections()
 
     atom_terms = fullGraph.get_terms_with_atom("9", center=True)
     atom_terms["pairs"].clear()
@@ -382,7 +377,6 @@ class TestLocalGraphParameterize:
         self.atom_terms["angles"] = self.fullGraph.parameterize_bonded_terms(
             "angletypes", self.atom_terms["angles"]
         )
-        unpatched_terms = deepcopy(self.atom_terms["angles"])
         newtheteq = 117
         self.fullGraph.patch_angle(self.atom_terms["angles"], "9", newtheteq)
         assert all([int(float(x[4])) == newtheteq for x in self.atom_terms["angles"]])
@@ -390,7 +384,6 @@ class TestLocalGraphParameterize:
     def test_patch_dihedral_CA(self):
         # maybe also test whether dihedrals are well formed
         self.atom_terms["propers"] = [[*x, "9"] for x in self.atom_terms["propers"]]
-        unpatched_terms = deepcopy(self.atom_terms["propers"])
         phivals = ["1.6279944", "21.068532", "1.447664"]
         psivals = ["6.556746", "20.284450", "0.297901"]
         self.atom_terms["propers"] = self.fullGraph.patch_dihedral_CA(
