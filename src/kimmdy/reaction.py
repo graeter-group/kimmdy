@@ -13,7 +13,7 @@ import logging
 
 class ConversionType(Enum):
     BREAK = auto()
-    MOVE = auto()
+    BIND = auto()
 
 
 @dataclass
@@ -24,7 +24,7 @@ class ConversionRecipe:
 
     Parameters
     ----------
-    type : list[ConversionType.BREAK or .MOVE]
+    type : list[ConversionType.BREAK or .BIND]
     atom_idx : list[(from, to)]
     """
 
