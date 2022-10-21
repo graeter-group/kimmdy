@@ -28,6 +28,14 @@ kimmdy.config module
    :undoc-members:
    :show-inheritance:
 
+kimmdy.constants module
+-----------------------
+
+.. automodule:: kimmdy.constants
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 kimmdy.mdmanager module
 -----------------------
 
