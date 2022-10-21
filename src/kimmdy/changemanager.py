@@ -9,8 +9,8 @@ from kimmdy.parsing import (
     write_plumed,
     read_topol,
     write_topol,
-    topol_split_dihedrals,
-    topol_merge_propers_impropers,
+    split_dihedrals,
+    merge_propers_impropers,
     Topology,
 )
 from kimmdy.utils import (
@@ -47,6 +47,7 @@ def remove_bond(topology: Topology, atompair: tuple[int, int]):
 
     removes bond, angles and dihedrals where breakpair was involved.
     Modifies the topology dictionary in place.
+    Furthermore, it modifies to function types in the topology to account for radicals.
     """
     atompair_str = [str(x) for x in atompair]
     topology["bonds"] = [
@@ -78,13 +79,13 @@ def remove_bond(topology: Topology, atompair: tuple[int, int]):
     dihpairs = sorted(dihpairs, key=sort_bond)
 
     topology["pairs"] = [pair for pair in topology["pairs"] if pair[:2] in dihpairs]
+    # TODO; handle parameter update for radicals
 
 
 def add_bond(topology: Topology, atompair: tuple[int, int], ffdir: Path):
-    """Move bond in topology.
+    """Add a bond in topology.
 
     Move an atom (typically H for Hydrogen Atom Transfer) to a new location.
-    Creates the new bond and removes the old bond.
     Modifies the topology dictionary in place.
     It keeps track of affected terms in the topology via a graph representation of the topology
     and applies the necessary changes to bonds, angles and dihedrals (proper and improper).
@@ -101,57 +102,37 @@ def add_bond(topology: Topology, atompair: tuple[int, int], ffdir: Path):
     ffdir: Path
         path to the forcefield directory. Needs to contain aminoacids.rtp.
     """
-    movepair_str = [str(x) for x in movepair]
-    topology = topol_split_dihedrals(topology)
-    heavy_idx = find_heavy(topology["bonds"], movepair_str[0])
-    logging.debug(f"Heavy atom bound to HAT hydrogen has idx {heavy_idx}")
-
-    logging.info("Moving bond in topology: Dealing with the 'from' part")
-
-    # build local graph and fill it
-    from_graph = LocalGraph(topology, heavy_idx, ffdir)
-
-    # remove terms with from_atom
-    termdict = from_graph.get_terms_with_atom(movepair_str[0])
-    from_graph.remove_terms(termdict)
-    topology = topol_remove_terms(topology, termdict)
-
-    # parameterize around the new radical from_heavy
-    atom_terms = from_graph.parameterize_around_atom(heavy_idx)
-    topology = topol_add_terms(topology, atom_terms)
-
-    logging.info("Moving bond in topology: Dealing with the 'to' part")
+    atompair_str = [str(x) for x in atompair]
+    split_dihedrals(topology)
 
     # build localGraph and fill it
-    to_graph = LocalGraph(topology, movepair_str[1], ffdir, add_bond=movepair_str)
+    to_graph = LocalGraph(topology, atompair_str[1], ffdir, add_bond=atompair_str)
 
     # set the correct atomtype,resname for the HAT hydrogen based on the ff definition
-    atoms_idxs_from = from_graph.atoms_idx
-    heavy_resname = from_graph.atoms[atoms_idxs_from.index(heavy_idx)].resname
-    atmdef = to_graph.correct_atomprops(movepair_str, heavy_resname)
+    heavy_resname = atompair_str[0]
+    atmdef = to_graph.correct_atomprops(atompair_str, heavy_resname)
     topol_change_at_an(topology, atmdef)
 
     # this is to prevent overwriting bonds,angles for the newly parameterized "from" part,
     # if they are next to each other
-    atom_terms = to_graph.parameterize_around_atom(movepair_str[1])
-    atom_terms = terms_keep_only(movepair_str, heavy_idx, atom_terms)
+    atom_terms = to_graph.parameterize_around_atom(atompair_str[1])
+    atom_terms = terms_keep_only(atompair_str, heavy_idx, atom_terms)
     topology = topol_add_terms(topology, atom_terms)
 
     # add pairs of the from_atom at the new position
-    atom_terms_from = to_graph.get_terms_with_atom(movepair_str[0], add_function=True)
+    atom_terms_from = to_graph.get_terms_with_atom(atompair_str[0], add_function=True)
     for section in ["bonds", "angles", "propers", "impropers"]:
         atom_terms_from[section].clear()
     topology = topol_add_terms(topology, atom_terms_from)
 
     # have the right impropers at the to_heavy atom
     atom_terms_add, atom_terms_remove = to_graph.compare_ff_impropers(
-        heavy_idx, movepair_str[1]
+        heavy_idx, atompair_str[1]
     )
     topology = topol_add_terms(topology, atom_terms_add)  # no need, yet
     topology = topol_remove_terms(topology, atom_terms_remove)
 
-    topology = topol_merge_propers_impropers(topology)
-    return topology
+    topology = merge_propers_impropers(topology)
 
 
 @dataclass
@@ -160,64 +141,123 @@ class Atom:
 
     A class containing atom information as in the atoms section of the topology.
     An atom keeps a list of which atoms it is bound to.
+
+    From gromacs topology:
+    ; nr type resnr residue atom cgnr charge mass typeB chargeB massB
+    Here: nr = idx, type = atomtype, atom = atomname, residue = resname
     """
 
     idx: str
     atomtype: Optional[str] = None
     atomname: Optional[str] = None
     resname: Optional[str] = None
-    bound_to: list[str] = field(default_factory=list)
+    # bound_to: list[str] = field(default_factory=list)
+    bound_to: list[Atom] = field(default_factory=list)
 
+@dataclass
+class Bond:
+    """Information about one bond
+
+    From gromacs topology:
+    ; ai aj funct c0 c1 c2 c3
+    """
+
+    i: str
+    j: str
+    funct: Optional[str] = None
+
+
+def bond_section_to_bond_dict(ls: list[list[str]]) -> dict:
+    d = {}
+    for l in ls:
+        if l[0] == ';': continue
+        i,j,f = l
+        i,j = sorted([i,j])
+        d[(i,j)] = Bond(i,j,f)
+    return d
+
+def atom_section_to_atom_dict(ls: list[list[str]]) -> dict:
+    d = {}
+    for l in ls:
+        if l[0] == ';': continue
+        d[l[0]] = Atom(l[0], l[1], l[4], l[3])
+    return d
+
+def reciprocal_bonds(d: dict) -> dict:
+    reciproce_dict = {}
+    for k in d.keys():
+        reciproce_dict[k[::-1]] = d[k]
+    return reciproce_dict
+
+def update_bound_to(atom: Atom, bonds: dict, bonds_reciprocal: dict):
+    pass
 
 class LocalGraph:
     def __init__(
         self,
         topology: Topology,
-        heavy_idx: str,
+        # central_atom_idx: str,
+        central_pair: tuple[str, str],
         ffdir: Path,
-        add_bond: Optional[tuple[str, str]] = None,
         depth: int = 3,
     ):
         self.topology = topology
-        self.heavy_idx = heavy_idx
+        self.central_pair = central_pair
+        # self.central_atom_idx = central_atom_idx
         self.ffdir = ffdir
         self.ff = {}
 
-        self.atoms = [Atom(self.heavy_idx)]
-        self.bonds = []
+        # self.atoms = [Atom(self.central_atom_idx)]
+        self.atoms: list[Atom] = []
+        self.bonds: list[Bond] = []
         self.pairs = []
         self.angles = []
         self.proper_dihedrals = []
         self.improper_dihedrals = []
-        self.atoms_idx = [self.heavy_idx]
-        self.atoms_atomtype = []
-        self.atoms_atomname = []
-        self.atoms_resname = []
+        self.topology_bonds = bond_section_to_bond_dict(topology['bonds'])
+        self.topology_bonds_reciprocal = reciprocal_bonds(self.topology_bonds)
+        self.topology_atoms = atom_section_to_atom_dict(topology['atoms'])
 
-        self.construct_graph(depth)
-        self.order_lists()
-        self.update_atoms_list()
-        self.update_bound_to()
+       
+        # add initial two atoms to the graph
+        one, two = [self.topology_atoms[idx] for idx in central_pair]
+        one.bound_to.append(two)
+        two.bound_to.append(one)
+        self.atoms.append(one)
+        self.atoms.append(two)
 
-        if add_bond is None:
-            self.build_PADs()
-            self.order_lists()
-        else:
-            self.add_atom(Atom(add_bond[0]))
-            self.order_lists()
-            self.update_atoms_list()
-            self.add_bond(add_bond)
-            self.update_bound_to()
-            self.order_lists()
-            self.build_PADs()
-            self.order_lists()
+        # add bond if it exists
+        if bond := self.topology_bonds[tuple(sorted([one.idx, two.idx]))]:
+            self.bonds.append(bond)
+
+
+
+        # self.construct_graph(depth)
+        # self.order_lists()
+        # self.update_atoms_list()
+        # self.update_bound_to()
+        # self.build_PADs()
+        # self.order_lists()
+
+    def __repr__(self) -> str:
+        s = '\n'.join([
+            f'atoms: {self.atoms}',
+            f'bonds: {self.bonds}',
+            f'pairs: {self.pairs}',
+            f'angles: {self.angles}',
+            f'proper_dihedrals: {self.proper_dihedrals}',
+            f'improper_dihedrals: {self.improper_dihedrals}',
+            # f'atomdict: {self.topology_atoms}',
+            # f'bondsdict: {self.topology_bonds}',
+                       ])
+        return s
 
     def construct_graph(self, depth=3):
         """
-        searches the bonds section of a topology up to depth bonds deep
+        searches the bonds section of a topology up to `depth` bonds deep
         to create a local graph i.e. filling the self.atoms list and self.bonds list
         """
-        curratoms = [self.heavy_idx]
+        curratoms = [self.central_atom_idx]
         for _ in range(depth):
             addlist = []
             for bond in self.topology["bonds"]:
@@ -233,7 +273,7 @@ class LocalGraph:
 
     def order_lists(self):
         # return early on empty topology
-        if not self.atoms_idx:
+        if not self.atoms:
             return
         self.atoms = sorted(self.atoms, key=check_idx)
         self.atoms_idx = sorted(self.atoms_idx, key=str_to_int_or_0)

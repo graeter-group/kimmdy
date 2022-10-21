@@ -77,6 +77,7 @@ class Reaction(ABC):
         self.name = name
         self.runmng = runmng
         # sub config, settings of this specific reaction:
+        # TODO: does it even need it's own config explicitlye if if can always access the full config anyways?
         self.config: Config = self.runmng.config.reactions.attr(self.name)
 
         logging.debug(f"Reaction {self.name} instatiated.")

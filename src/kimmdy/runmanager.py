@@ -119,7 +119,7 @@ class RunManager:
         # Instantiate reactions
         self.reactions = []
         react_names = self.config.reactions.get_attributes()
-        logging.info("Instantiating Reactions:", *react_names)
+        # logging.info("Instantiating Reactions:", *react_names)
         for react_name in react_names:
             r = plugins[react_name]
             reaction = r(react_name, self)
