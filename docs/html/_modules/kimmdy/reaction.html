@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>kimmdy.reaction &mdash; kimmdy 2023 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> kimmdy
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">kimmdy</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">kimmdy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>kimmdy.reaction</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for kimmdy.reaction</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>  <span class="c1"># for 3.7 &lt;= Python version &lt; 3.10</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span>  <span class="c1"># fixes circular import issues for type hints</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">kimmdy.runmanager</span> <span class="kn">import</span> <span class="n">RunManager</span>
+    <span class="kn">from</span> <span class="nn">kimmdy.config</span> <span class="kn">import</span> <span class="n">Config</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span><span class="p">,</span> <span class="n">auto</span>
+<span class="kn">from</span> <span class="nn">kimmdy.tasks</span> <span class="kn">import</span> <span class="n">TaskFiles</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+
+<div class="viewcode-block" id="ConversionType"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.reaction.ConversionType">[docs]</a><span class="k">class</span> <span class="nc">ConversionType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">BREAK</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">BIND</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Conversion"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.reaction.Conversion">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">Conversion</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;A Conversion.</span>
+<span class="sd">    encompasses a single transformation, breaking of adding one bond.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    type : ConversionType.BREAK or .BIND</span>
+<span class="sd">    atom_idx : tuple(from, to)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nb">type</span><span class="p">:</span> <span class="n">ConversionType</span>
+    <span class="n">atom_idx</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span></div>
+
+
+<span class="n">ConversionRecipe</span> <span class="o">=</span> <span class="nb">list</span><span class="p">[</span><span class="n">Conversion</span><span class="p">]</span>
+<span class="sd">&quot;&quot;&quot;A ConversionReipe.</span>
+
+<span class="sd">is a list of Conversions to encompass one reaction outcome.</span>
+<span class="sd">In the case of breaking a bond it is simply a list of length one,</span>
+<span class="sd">but for e.g. moving an atom from one binding partner to another</span>
+<span class="sd">it is a list with one BREAK and one BIND operation.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="ReactionOutcome"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.reaction.ReactionOutcome">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">ReactionOutcome</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;A ReactionOutcome</span>
+<span class="sd">    encompasses a ConversionRecipe and its rate.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">recipes</span><span class="p">:</span> <span class="n">ConversionRecipe</span>
+    <span class="n">rates</span><span class="p">:</span> <span class="nb">float</span></div>
+
+
+<span class="n">ReactionResult</span> <span class="o">=</span> <span class="nb">list</span><span class="p">[</span><span class="n">ReactionOutcome</span><span class="p">]</span>
+<span class="sd">&quot;&quot;&quot;A ReactionResult</span>
+<span class="sd">encompasses a list of ReactionOutcomes.</span>
+<span class="sd">Each outcome has a ConversionRecipe for changing the topology and a rate</span>
+<span class="sd">at which it is predicted to happen.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="Reaction"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.reaction.Reaction">[docs]</a><span class="k">class</span> <span class="nc">Reaction</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Reaction base class</span>
+<span class="sd">    hast a type_scheme, which is a dict of types of possible entries in config.</span>
+<span class="sd">    Used to read and check the input config.</span>
+<span class="sd">    To not use this feature return empty dict.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">    ```python</span>
+<span class="sd">    {&quot;homolysis&quot;: {&quot;edis&quot;: Path, &quot;bonds&quot;: Path}}</span>
+<span class="sd">    ```</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">type_scheme</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">runmng</span><span class="p">:</span> <span class="n">RunManager</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">runmng</span> <span class="o">=</span> <span class="n">runmng</span>
+        <span class="c1"># sub config, settings of this specific reaction:</span>
+        <span class="c1"># TODO: does it even need it&#39;s own config explicitlye if if can always access the full config anyways?</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">:</span> <span class="n">Config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runmng</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">reactions</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reaction </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> instatiated.&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Reaction.get_reaction_result"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.reaction.Reaction.get_reaction_result">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">get_reaction_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">files</span><span class="p">:</span> <span class="n">TaskFiles</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ReactionResult</span><span class="p">:</span>
+        <span class="k">pass</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Jannik Buhr, Eric Hartmann, Benedikt Rennekamp, Kai Riedmiller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
