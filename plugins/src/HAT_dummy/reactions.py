@@ -25,7 +25,7 @@ class HAT_reaction(Reaction):
         logging.warning(f"{rads} for {tpr}")
         logging.warning([u.atoms[:20].elements, u.atoms[:20].types])
 
-        RR = ReactionResult(recipes=[], rates=[])
+        reaction_result = ReactionResult(recipes=[], rates=[])
         for rad in rads:
             if len(rad.atoms) == 0:
                 logging.info("no radical found, returning zero rate recipe")
@@ -46,11 +46,11 @@ class HAT_reaction(Reaction):
                     "ACE",
                 ]:  # doesn't work with capping groups at the moment
                     rad_nr = str(rad.atoms[0].index + 1)
-                    CR = ConversionRecipe(
-                        type=[ConversionType.MOVE], atom_idx=[[from_H_nr, rad_nr]]
+                    conversion_recipe = ConversionRecipe(
+                        type=[ConversionType.BIND], atom_idx=[[from_H_nr, rad_nr]]
                     )
-                    RR.recipes.append(CR)
-                    RR.rates.append(get_reaction_rates())
+                    reaction_result.recipes.append(conversion_recipe)
+                    reaction_result.rates.append(get_reaction_rates())
 
-        logging.warning(f"Returning exactly these recipes to runmanager: {RR}")
-        return RR
+        logging.warning(f"Returning exactly these recipes to runmanager: {reaction_result}")
+        return reaction_result
