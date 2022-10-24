@@ -26,6 +26,9 @@ class Sequence(list):
             else:
                 self.append(task)
 
+class Mds():
+    def __init__(self):
+        pass
 
 type_scheme = {
     "experiment": str,
@@ -33,56 +36,34 @@ type_scheme = {
     "dryrun": bool,
     "iterations": int,
     "out": Path,
+    "gromacs_alias": str,
     "ff": Path,
     "top": Path,
     "gro": Path,
     "idx": Path,
-    "plumed": None,
-    "minimization": {"mdp": Path, "tpr": Path},
-    "equilibration": {
-        "nvt": {"mdp": Path, "tpr": Path},
-        "npt": {"mdp": Path, "tpr": Path},
-    },
-    "equilibrium": {"mdp": Path},
-    "pull": {"mdp": Path},
-    "changer": {"coordinates": {"md": {"mdp": Path}}},
+    "mds": {},
+    "changer": {"coordinates": {"md": str}},
     "reactions": {},
     "sequence": Sequence,
 }
 
 # classes for static code analysis
 
-
-class MinimizationConfig:
+class MDConfig:
     mdp: Path
-    tpr: Path
+    plumed: Path
 
+class MDinstanceConfig:
+    md: MDConfig
 
-class NvtConfig:
-    mdp: Path
-    tpr: Path
+class MdsConfig:
+    instances: list[MDinstanceConfig]       #wrong??
 
-
-class NptConfig:
-    mdp: Path
-    tpr: Path
-
-
-class EquilibrationConfig:
-    nvt: NvtConfig
-    npt: NptConfig
-
-
-class MdConfig:
-    mdp: Path
-
-
-class CoordinatesConfig:
-    md: MdConfig
-
+class MDrefConfig:
+    md: str
 
 class ChangerConfig:
-    coordinates: CoordinatesConfig
+    coordinates: MDrefConfig
 
 
 class HomolysisConfig:
@@ -122,18 +103,16 @@ class Config:
 
     run: int
     experiment: str
-    name: str
+    name: str           # obsolete??
     dryrun: bool
     iterations: int
     out: Path
+    gromacs_alias: str
     ff: Path
     top: Path
     gro: Path
     idx: Path
-    plumed: None
-    minimization: MinimizationConfig
-    equilibration: EquilibrationConfig
-    equilibrium: MdConfig
+    mds: dict
     changer: ChangerConfig
     reactions: ReactionsConfig
     pull: PullConfig
@@ -294,11 +273,13 @@ class Config:
                         check_file_exists(attr)
 
                 # Validate sequence
+                # do we look for the mds section at the moment?
+                #TODO: write test for new change 
                 if isinstance(attr, Sequence):
                     for task in attr:
-                        assert hasattr(
-                            self, task
-                        ), f"Task {task} listed in sequence, but not defined!"
+                        if not hasattr(self, task):
+                            if hasattr(self,'mds'):
+                                assert hasattr(self.mds,task), f"Task {task} listed in sequence, but not defined!"
 
                 # Validate reaction plugins
                 if attr_name == "reactions":

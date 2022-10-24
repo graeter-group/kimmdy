@@ -1,19 +1,22 @@
 dryrun: false
 iterations: 100
 out: 'test_out_001'
-# ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
+gromacs_alias: 'gmx'
+# ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default
 top: 'triala_out.top'
 gro: 'npt.gro'
 idx: 'index.ndx'
-plumed: false
-equilibrium:
-  mdp: 'md.mdp'
-pull:
-  mdp: 'md.mdp'
+#TODO:
+# * overwrite
+mds:
+  equilibrium1:
+    mdp: 'md.mdp'
+  relax:
+    mdp: 'md_slow.mdp'
 changer:
   coordinates:
-    md:
-      mdp: 'md_slow.mdp'
+    md: 'relax'
+    # points to which md should be performed for relaxation
 reactions:
   HAT:
     #tprpath: 'md.tpr'
@@ -21,9 +24,9 @@ reactions:
           #    edis: 'edissoc.dat'
           #    bonds: 'ffbonded.itp'
 sequence:
-  - equilibrium
-  - 
+  - equilibrium1
+  -
     mult: 3
     tasks:
       - reactions
-      - equilibrium
+      - equilibrium1

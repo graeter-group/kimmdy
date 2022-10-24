@@ -14,14 +14,15 @@ def test_parse_config1_casting():
 
         assert config.dryrun is True
         assert isinstance(config.dryrun, bool)
-
-        assert config.iterations == 3
+        assert config.iterations == 10
 
         assert isinstance(config.cwd, Path)
         assert isinstance(config.out, Path)
 
-        assert isinstance(config.plumed, Config)
-        assert isinstance(config.plumed.dat, str)
+        assert isinstance(config.mds, Config)
+        assert isinstance(config.mds.equilibrium1, Config)
+        assert isinstance(config.mds.pull1.plumed, Config)
+        assert isinstance(config.mds.pull1.plumed.dat, str)
     finally:
         for d in input_f.parent.glob("test_config_1*"):
             # [f.unlink() for f in d.iterdir()]
