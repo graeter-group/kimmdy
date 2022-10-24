@@ -1,30 +1,34 @@
-dryrun: true
-iterations: 3
+dryrun: True
+iterations: 10
 out: 'test_config_1'
-ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
+gromacs_alias: 'gmx'
+# ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default
 top: 'topol.top'
 gro: 'npt.gro'
 idx: 'index_backbone.ndx'
-plumed:
-  dat: 'plumed.dat'
-  distances: 'distances.dat'
-equilibrium:
-  mdp: 'pullf1500_equil.mdp'
-pull:
-  mdp: 'pullf1500.mdp'
+mds:
+  equilibrium1:
+    mdp: 'md.mdp'
+  pull1:
+    mdp: 'pullf1500.mdp'
+    plumed:
+      dat: 'plumed.dat'
+      distances: 'distances.dat'
+  relax:
+    mdp: 'broken_equil_f1000.mdp'
 changer:
   coordinates:
-    md:
-      mdp: 'broken_equil_f1000.mdp'
+    md: 'relax'
+    # points to which md should be performed for relaxation
 reactions:
   homolysis:
     edis: 'edissoc.dat'
     bonds: 'ffbonded.itp'
 sequence:
-  - equilibrium
-  - 
+  - equilibrium1
+  -
     mult: 1
     tasks:
-      - pull
+      - pull1
       - reactions
-
+     

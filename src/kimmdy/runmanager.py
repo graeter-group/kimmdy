@@ -92,8 +92,8 @@ class RunManager:
         }
         # did we just miss to add this or is there a way around this explicit definition
         # with the new AutoFillDict??
-        if self.config.plumed:
-            self.latest_files["plumed.dat"] = self.config.cwd / self.config.plumed.dat
+        #if self.config.plumed:
+        #    self.latest_files["plumed.dat"] = self.config.cwd / self.config.plumed.dat
             # self.latest_files["distances.dat"] = self.config.plumed.distances
 
         # If we want to allow starting from radical containing systems this needs to be initialized:
