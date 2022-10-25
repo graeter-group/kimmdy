@@ -41,7 +41,7 @@ type_scheme = {
     "top": Path,
     "gro": Path,
     "idx": Path,
-    "mds": {},
+    "mds": {'*': {"mdp" : Path,"plumed" : {"dat" : Path, "distances" : Path},"prefix" : str, "overwrite" : str }},
     "changer": {"coordinates": {"md": str}},
     "reactions": {},
     "sequence": Sequence,
@@ -198,6 +198,11 @@ class Config:
                 assert ffs[0].is_dir(), "Forcefield should be a directory!"
                 self.ff = ffs[0].resolve()
 
+            # assert hasattr(self,'mds'), "MD section not defined in config file!"
+            # for attribute in self.mds.get_attributes():
+            #     self.mds.attr(attribute).mdp = Path(self.mds.attr(attribute).mdp)
+            
+
             self._cast_types()
             self._validate()
 
@@ -224,7 +229,7 @@ class Config:
         for attr_name in attr_names:
             to_type = self.type_scheme.get(attr_name)
             attr = self.__getattribute__(attr_name)
-
+        
             if to_type is not None:
                 if attr is None:
                     raise ValueError(
@@ -272,12 +277,14 @@ class Config:
                         logging.debug(attr)
                         check_file_exists(attr)
 
-                # Validate sequence
-                # do we look for the mds section at the moment?
+                
                 #TODO: write test for new change 
+                #TODO: add check for correct definition of new plumed section in yaml
+                # Validate sequence
                 if isinstance(attr, Sequence):
                     for task in attr:
                         if not hasattr(self, task):
+                            # this is not throwing an explicit error if the mds section is missing
                             if hasattr(self,'mds'):
                                 assert hasattr(self.mds,task), f"Task {task} listed in sequence, but not defined!"
 
@@ -292,3 +299,15 @@ class Config:
         except AssertionError as e:
             logging.error(f"Validating input failed!\n{e}")
             raise ValueError(e)
+
+
+        # #update type_scheme for explicit mds instances
+        # assert 'mds' in self.raw.keys(), "MD section not defined in config file!"
+        # new_scheme = {}
+        # for instance in self.raw['mds'].keys():
+        #     new_scheme[instance] = self.type_scheme['mds']['*']
+        # self.type_scheme['mds'] = new_scheme
+                #     if not to_type and attr_name != 'type_scheme':
+                # to_type = self.type_scheme.get('*')
+                # if to_type :
+                #     attr = self.__getattribute__(attr_name)

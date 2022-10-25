@@ -8,9 +8,9 @@ from typing import Callable
 from kimmdy.config import Config
 from kimmdy.reactions.homolysis import Homolysis
 from kimmdy.reaction import ReactionResult, ConversionRecipe, ConversionType
-import kimmdy.mdmanager as md
 import kimmdy.changemanager as changer
 from kimmdy.tasks import Task, TaskFiles, TaskMapping
+from kimmdy.utils import run_shell_cmd
 from pprint import pformat
 import random
 from kimmdy import plugins
@@ -89,7 +89,8 @@ class RunManager:
             "top": self.config.top,
             "gro": self.config.gro,
             "idx": self.config.idx,
-        }
+        }       
+
         # did we just miss to add this or is there a way around this explicit definition
         # with the new AutoFillDict??
         #if self.config.plumed:
@@ -105,9 +106,7 @@ class RunManager:
         ]
 
         self.task_mapping: TaskMapping = {
-            "equilibrium": [self._run_md_equil],
-            "pull": [self._run_md_pull],
-            "relax": [self._run_md_relax],
+            "md": self._run_md,
             "reactions": [
                 self._query_reactions,
                 self._decide_reaction,
@@ -149,9 +148,14 @@ class RunManager:
 
         # allows for mapping one config entry to multiple tasks
         for entry in self.config.sequence:
-            for task in self.task_mapping[entry]:
+            if entry in self.config.mds.get_attributes():
+                task = self.task_mapping['md']
                 logging.info(f"Put Task: {task}")
-                self.tasks.put(Task(task))
+                self.tasks.put(Task(task,kwargs={'instance':entry}))
+            else:
+                for task in self.task_mapping[entry]:
+                    logging.info(f"Put Task: {task}")
+                    self.tasks.put(Task(task))
 
         while not (self.state is State.DONE or self.iteration >= self.iterations):
             next(self)
@@ -222,41 +226,42 @@ class RunManager:
         files = TaskFiles(self)
         files.outputdir = self.config.out / f"{self.iteration}_dummy"
         files.outputdir.mkdir()
-        md.dummy_step(files)
+        run_shell_cmd("pwd>./pwd.pwd", files.outputdir)
         return files
 
 # if you could pass arguments to _run_md_xx it would be possible to make it one method
 # if the config would be liberalized in regard to md options, you could just give your type of md simulation a name with associated files
-    def _run_md_equil(self) -> TaskFiles:
-        logging.info("Start equilibration MD")
+
+    def _run_md(self,instance) -> TaskFiles:
+        """General MD simulation
+        """
+        logging.info(f"Start MD {instance}")
         self.state = State.MD
 
-        files = self._create_task_directory("equilibration")
-        files.input["mdp"] = self.config.equilibrium.mdp
-        files = md.md(files,"","")
-        logging.info("Done equilibrating")
-        return files
+        files = self._create_task_directory(f"{instance}")
+        md_config = self.config.mds.attr(instance)
+        gmx_alias = self.config.gromacs_alias
 
-    def _run_md_pull(self) -> TaskFiles:
-        logging.info("Start pulling MD")
-        self.state = State.MD
+        top = files.input["top"]
+        gro = files.input["gro"]
+        mdp = md_config.mdp
+        idx = files.input["idx"]
 
-        files = self._create_task_directory("pulling")
-        files.input["mdp"] = self.config.pull.mdp
-        plumed_dat = files.input["plumed.dat"]
-        files = md.md(files,"",f" -plumed {plumed_dat}")
+        outputdir = files.outputdir
+        #make maxh and ntomp accessible?
+        maxh = 24
+        ntomp = 2
+
+        grompp_cmd = f"{gmx_alias} grompp -p {top} -c {gro} -f {mdp} -n {idx} -o {instance}.tpr -maxwarn 5"
+        mdrun_cmd = f"{gmx_alias} mdrun -s {instance}.tpr -cpi {instance}.cpt -x {instance}.xtc -o {instance}.trr -cpo {instance}.cpt -c {instance}.gro -g {instance}.log -e {instance}.edr -px {instance}_pullx.xvg -pf {instance}_pullf.xvg -ro {instance}-rotation.xvg -ra {instance}-rotangles.log -rs {instance}-rotslabs.log -rt {instance}-rottorque.log -maxh {maxh} -dlb yes -ntomp {ntomp}"
+
+        if 'plumed' in md_config.get_attributes():
+            mdrun_cmd += f"-plumed {md_config.plumed.dat}"
+
+        run_shell_cmd(grompp_cmd, outputdir)
+        run_shell_cmd(mdrun_cmd, outputdir)
+        
         logging.info("Done with pulling MD")
-        return files
-
-    def _run_md_relax(self) -> TaskFiles:
-        logging.info("Start relaxation MD")
-        self.state = State.MD
-
-        files = self._create_task_directory("relaxation")
-        files.input["mdp"] = self.config.changer.coordinates.md.mdp
-        cpt = files.input["cpt"]
-        files = md.md(files,f" -t {cpt}","")
-        logging.info("Done with relaxation MD")
         return files
 
     def _query_reactions(self):
