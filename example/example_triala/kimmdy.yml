@@ -6,8 +6,6 @@ gromacs_alias: 'gmx'
 top: 'triala_out.top'
 gro: 'npt.gro'
 idx: 'index.ndx'
-#TODO:
-# * overwrite
 mds:
   equilibrium1:
     mdp: 'md.mdp'
@@ -16,7 +14,6 @@ mds:
 changer:
   coordinates:
     md: 'relax'
-    # points to which md should be performed for relaxation
 reactions:
   HAT:
     #tprpath: 'md.tpr'

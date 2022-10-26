@@ -16,8 +16,8 @@ import random
 from kimmdy import plugins
 
 # file types of which there will be multiple files per type
-AMBIGUOUS_SUFFS = ["dat", "xvg", "log", "trr"]
-
+AMBIGUOUS_SUFFS = ["dat", "xvg", "log"] 
+# are there cases where we have multiple trr files?
 
 def default_decision_strategy(
     reaction_results: list[ReactionResult],
@@ -111,6 +111,7 @@ class RunManager:
                 self._query_reactions,
                 self._decide_reaction,
                 self._run_recipe,
+                self._relaxation,
             ],
         }
 
@@ -256,12 +257,12 @@ class RunManager:
         mdrun_cmd = f"{gmx_alias} mdrun -s {instance}.tpr -cpi {instance}.cpt -x {instance}.xtc -o {instance}.trr -cpo {instance}.cpt -c {instance}.gro -g {instance}.log -e {instance}.edr -px {instance}_pullx.xvg -pf {instance}_pullf.xvg -ro {instance}-rotation.xvg -ra {instance}-rotangles.log -rs {instance}-rotslabs.log -rt {instance}-rottorque.log -maxh {maxh} -dlb yes -ntomp {ntomp}"
 
         if 'plumed' in md_config.get_attributes():
-            mdrun_cmd += f"-plumed {md_config.plumed.dat}"
+            mdrun_cmd += f" -plumed {md_config.plumed.dat}"
 
         run_shell_cmd(grompp_cmd, outputdir)
         run_shell_cmd(mdrun_cmd, outputdir)
         
-        logging.info("Done with pulling MD")
+        logging.info("Done with MD {instance}")
         return files
 
     def _query_reactions(self):
@@ -275,8 +276,7 @@ class RunManager:
             files = self._create_task_directory(reaction.name)
 
             self.reaction_results.append(reaction.get_reaction_result(files))
-
-        logging.info("Reaction done")
+      
         return files
 
     def _decide_reaction(
@@ -323,10 +323,16 @@ class RunManager:
             logging.info(
                 f'Wrote new plumedfile to {files.output["plumed.dat"].parts[-3:]}'
             )
-        logging.info(f"Looking for md in {self.config.changer.coordinates.__dict__}")
-        # TODO clean this up, maybe make function for this in config
-        if hasattr(self.config, "changer"):
-            if hasattr(self.config.changer, "coordinates"):
-                if hasattr(self.config.changer.coordinates, "md"):
-                    self.crr_tasks.put(Task(self._run_md_relax))
+        logging.info("Reaction done")
         return files
+
+    def _relaxation(self) -> TaskFiles:
+        #this task generates no files but is only there to generate subtasks
+        logging.info(f"Start Relaxation in step {self.iteration}")
+        logging.info(f"Type of relaxation: {self.config.changer.coordinates}")
+
+        if hasattr(self.config.changer.coordinates, "md"):
+            self.crr_tasks.put(Task(self._run_md,kwargs={'instance':self.config.changer.coordinates.md}))
+        #TODO add atom placement method from Kai as relaxation option
+        logging.info(f"Relaxation done!")
+
