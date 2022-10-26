@@ -163,8 +163,11 @@ class Config:
         if recursive_dict is not None:
             for name, val in recursive_dict.items():
                 if isinstance(val, dict):
+                    recursiv_type_s = self.type_scheme.get(name)
+                    if recursiv_type_s is None:
+                        recursiv_type_s = self.type_scheme.get("*")
                     val = Config(
-                        recursive_dict=val, type_scheme=self.type_scheme.get(name)
+                        recursive_dict=val, type_scheme=recursiv_type_s
                     )
                 logging.debug(f"Set attribute: {name}, {val}")
                 self.__setattr__(name, val)
@@ -223,22 +226,31 @@ class Config:
         """
         return self.__getattribute__(attribute)
 
-    def _cast_types(self):
+    def _cast_types(self, to_type_wildcard=None):
         """Casts types defined in `type_scheme` to raw attributes."""
         attr_names = filter(lambda s: s[0] != "_", self.__dir__())
         for attr_name in attr_names:
             to_type = self.type_scheme.get(attr_name)
             attr = self.__getattribute__(attr_name)
-        
+
+            if attr_name == "type_scheme" or callable(attr):
+                continue
+
+            # handle wildcard attr
+            if to_type_wildcard is not None:
+                to_type = to_type_wildcard
             if to_type is not None:
                 if attr is None:
                     raise ValueError(
                         f"ERROR in inputfile: Missing settings for {attr_name}"
                     )
-
+                    
                 # nested:
                 if isinstance(to_type, dict):
-                    attr._cast_types()
+                    if list(to_type.keys()) == ["*"]:
+                        attr._cast_types(to_type["*"])
+                    else:
+                        attr._cast_types()
                     continue
                 # wrap single element if it should be a list
                 elif to_type is list:
