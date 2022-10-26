@@ -8,7 +8,7 @@ gro: 'npt.gro'
 idx: 'index_backbone.ndx'
 mds:
   equilibrium1:
-    mdp: 'md.mdp'
+    mdp: 'pullf1500_equil.mdp'
   pull1:
     mdp: 'pullf1500.mdp'
     plumed:

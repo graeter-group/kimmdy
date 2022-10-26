@@ -22,7 +22,7 @@ def test_parse_config1_casting():
         assert isinstance(config.mds, Config)
         assert isinstance(config.mds.equilibrium1, Config)
         assert isinstance(config.mds.pull1.plumed, Config)
-        assert isinstance(config.mds.pull1.plumed.dat, str)
+        assert isinstance(config.mds.pull1.plumed.dat, Path)
     finally:
         for d in input_f.parent.glob("test_config_1*"):
             # [f.unlink() for f in d.iterdir()]
@@ -37,7 +37,7 @@ def test_parse_config2_missing_dat_in_plumed():
 
         with pytest.raises(ValueError):
             config = Config(input_f)
-            if not hasattr(config.plumed, "dat"):
+            if not hasattr(config.mds.pull.plumed, "dat"):
                 raise ValueError
     finally:
         for d in input_f.parent.glob("test_config_2*"):
