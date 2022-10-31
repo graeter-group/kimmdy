@@ -14,8 +14,8 @@ mds:
     plumed:
       dat: 'plumed.dat'
       distances: 'distances.dat'
-    relax:
-      mdp: 'minim.mdp'
+  relax:
+    mdp: 'minim.mdp'
 changer:
   coordinates:
     md: 'relax'    
@@ -28,7 +28,7 @@ sequence:
   - equilibrium
   - pull
   -
-    mult: 5
+    mult: 4
     tasks:
       - reactions
       - equilibrium

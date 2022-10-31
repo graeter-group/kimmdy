@@ -91,12 +91,6 @@ class RunManager:
             "idx": self.config.idx,
         }       
 
-        # did we just miss to add this or is there a way around this explicit definition
-        # with the new AutoFillDict??
-        #if self.config.plumed:
-        #    self.latest_files["plumed.dat"] = self.config.cwd / self.config.plumed.dat
-            # self.latest_files["distances.dat"] = self.config.plumed.distances
-
         # If we want to allow starting from radical containing systems this needs to be initialized:
         # TODO: update with HAT
         self.radical_idxs = []
@@ -230,9 +224,6 @@ class RunManager:
         run_shell_cmd("pwd>./pwd.pwd", files.outputdir)
         return files
 
-# if you could pass arguments to _run_md_xx it would be possible to make it one method
-# if the config would be liberalized in regard to md options, you could just give your type of md simulation a name with associated files
-
     def _run_md(self,instance) -> TaskFiles:
         """General MD simulation
         """
@@ -258,6 +249,8 @@ class RunManager:
 
         if 'plumed' in md_config.get_attributes():
             mdrun_cmd += f" -plumed {md_config.plumed.dat}"
+            files.output = {'plumed.dat': md_config.plumed.dat}
+            # add plumed.dat to output to indicate it as current plumed.dat file
 
         run_shell_cmd(grompp_cmd, outputdir)
         run_shell_cmd(mdrun_cmd, outputdir)
@@ -309,8 +302,8 @@ class RunManager:
         logging.info(f'Wrote new topology to {files.output["top"].parts[-3:]}')
         logging.debug(f"Chose recipe: {self.chosen_recipe.type}")
         if self.chosen_recipe.type == [ConversionType.BREAK]:
-            # why not add both?
             self.radical_idxs.extend(self.chosen_recipe.atom_idx[0])
+            #TODO: also change self.radical_idxs for MOVE
 
             # files.input["plumed.dat"] = self.get_latest("plumed.dat")
             files.output["plumed.dat"] = files.outputdir / "plumed_mod.dat"
