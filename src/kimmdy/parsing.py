@@ -3,6 +3,9 @@ from collections.abc import Iterable
 from typing import Generator
 import pandas as pd
 from copy import deepcopy
+import re
+
+from kimmdy.utils import float_or_str
 
 Topology = dict[str, list[list[str]]]
 
@@ -169,3 +172,23 @@ def read_plumed_distances(plumed_dat: Path, distances_dat: Path):
     }
 
     return atoms
+
+def read_xml_ff(path: Path):
+    with open(path, "r") as f:
+        foo = f.readlines()
+    d = {'HEAD':{}}
+
+    for line in foo[1:-1]:
+        if re.search("<\w+>",line):
+            key = line.strip('<> \n')
+            d[key] = {}
+        elif re.search("</\w+>",line):
+            pass
+        else:
+            entry = line.strip('<> \n/').split()[1:]
+            ids, vals = [],[]
+            for x in entry:
+                ids.append(x) if x.startswith('class') else vals.append(x) 
+            subkey = "_".join(x.split('=')[1].strip('"') for x in ids)
+            d[key][subkey]= {key:float_or_str(value) for (key,value) in [x.replace('"','').split('=') for x in vals]}
+    return d
