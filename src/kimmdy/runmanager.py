@@ -16,8 +16,9 @@ import random
 from kimmdy import plugins
 
 # file types of which there will be multiple files per type
-AMBIGUOUS_SUFFS = ["dat", "xvg", "log"] 
+AMBIGUOUS_SUFFS = ["dat", "xvg", "log"]
 # are there cases where we have multiple trr files?
+
 
 def default_decision_strategy(
     reaction_results: list[ReactionResult],
@@ -89,7 +90,7 @@ class RunManager:
             "top": self.config.top,
             "gro": self.config.gro,
             "idx": self.config.idx,
-        }       
+        }
 
         # If we want to allow starting from radical containing systems this needs to be initialized:
         # TODO: update with HAT
@@ -144,9 +145,9 @@ class RunManager:
         # allows for mapping one config entry to multiple tasks
         for entry in self.config.sequence:
             if entry in self.config.mds.get_attributes():
-                task = self.task_mapping['md']
+                task = self.task_mapping["md"]
                 logging.info(f"Put Task: {task}")
-                self.tasks.put(Task(task,kwargs={'instance':entry}))
+                self.tasks.put(Task(task, kwargs={"instance": entry}))
             else:
                 for task in self.task_mapping[entry]:
                     logging.info(f"Put Task: {task}")
@@ -224,9 +225,8 @@ class RunManager:
         run_shell_cmd("pwd>./pwd.pwd", files.outputdir)
         return files
 
-    def _run_md(self,instance) -> TaskFiles:
-        """General MD simulation
-        """
+    def _run_md(self, instance) -> TaskFiles:
+        """General MD simulation"""
         logging.info(f"Start MD {instance}")
         self.state = State.MD
 
@@ -240,21 +240,21 @@ class RunManager:
         idx = files.input["idx"]
 
         outputdir = files.outputdir
-        #make maxh and ntomp accessible?
+        # make maxh and ntomp accessible?
         maxh = 24
         ntomp = 2
 
         grompp_cmd = f"{gmx_alias} grompp -p {top} -c {gro} -f {mdp} -n {idx} -o {instance}.tpr -maxwarn 5"
         mdrun_cmd = f"{gmx_alias} mdrun -s {instance}.tpr -cpi {instance}.cpt -x {instance}.xtc -o {instance}.trr -cpo {instance}.cpt -c {instance}.gro -g {instance}.log -e {instance}.edr -px {instance}_pullx.xvg -pf {instance}_pullf.xvg -ro {instance}-rotation.xvg -ra {instance}-rotangles.log -rs {instance}-rotslabs.log -rt {instance}-rottorque.log -maxh {maxh} -dlb yes -ntomp {ntomp}"
 
-        if 'plumed' in md_config.get_attributes():
+        if "plumed" in md_config.get_attributes():
             mdrun_cmd += f" -plumed {md_config.plumed.dat}"
-            files.output = {'plumed.dat': md_config.plumed.dat}
+            files.output = {"plumed.dat": md_config.plumed.dat}
             # add plumed.dat to output to indicate it as current plumed.dat file
 
         run_shell_cmd(grompp_cmd, outputdir)
         run_shell_cmd(mdrun_cmd, outputdir)
-        
+
         logging.info("Done with MD {instance}")
         return files
 
@@ -269,7 +269,7 @@ class RunManager:
             files = self._create_task_directory(reaction.name)
 
             self.reaction_results.append(reaction.get_reaction_result(files))
-      
+
         return files
 
     def _decide_reaction(
@@ -303,7 +303,7 @@ class RunManager:
         logging.debug(f"Chose recipe: {self.chosen_recipe.type}")
         if self.chosen_recipe.type == [ConversionType.BREAK]:
             self.radical_idxs.extend(self.chosen_recipe.atom_idx[0])
-            #TODO: also change self.radical_idxs for MOVE
+            # TODO: also change self.radical_idxs for MOVE
 
             # files.input["plumed.dat"] = self.get_latest("plumed.dat")
             files.output["plumed.dat"] = files.outputdir / "plumed_mod.dat"
@@ -320,12 +320,16 @@ class RunManager:
         return files
 
     def _relaxation(self) -> TaskFiles:
-        #this task generates no files but is only there to generate subtasks
+        # this task generates no files but is only there to generate subtasks
         logging.info(f"Start Relaxation in step {self.iteration}")
         logging.info(f"Type of relaxation: {self.config.changer.coordinates}")
 
         if hasattr(self.config.changer.coordinates, "md"):
-            self.crr_tasks.put(Task(self._run_md,kwargs={'instance':self.config.changer.coordinates.md}))
-        #TODO add atom placement method from Kai as relaxation option
+            self.crr_tasks.put(
+                Task(
+                    self._run_md,
+                    kwargs={"instance": self.config.changer.coordinates.md},
+                )
+            )
+        # TODO add atom placement method from Kai as relaxation option
         logging.info(f"Relaxation done!")
-

@@ -204,7 +204,9 @@ def check_gmx_version(config: Config):
     try:
         version = [
             l
-            for l in get_shell_stdout(f"{config.gromacs_alias} --quiet --version").split("\n")
+            for l in get_shell_stdout(
+                f"{config.gromacs_alias} --quiet --version"
+            ).split("\n")
             if "GROMACS version:" in l
         ][0]
     except Exception as e:
@@ -213,7 +215,15 @@ def check_gmx_version(config: Config):
         raise SystemError(m)
 
     # i hate this
-    if any('plumed' in y for y in [config.mds.attr(x).get_attributes() for x in config.mds.get_attributes()]) and not "MODIFIED" in version:
+    if (
+        any(
+            "plumed" in y
+            for y in [
+                config.mds.attr(x).get_attributes() for x in config.mds.get_attributes()
+            ]
+        )
+        and not "MODIFIED" in version
+    ):
         m = "GROMACS version does not contain MODIFIED, aborting due to lack of PLUMED patch."
         logging.error(m)
         logging.error("Version was: " + version)
