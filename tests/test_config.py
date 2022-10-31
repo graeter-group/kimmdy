@@ -58,8 +58,35 @@ def test_parse_config3_missing_mdp_file():
             [f.unlink() for f in d.iterdir()]
             d.rmdir()
 
+def test_parse_config4_sequence_missing_entry():
+    input_f = Path(__file__).parent / "test_files/config_test/config4.yml"
+    os.chdir(input_f.parent)
+    assert input_f.exists(), "Input file not found"
+
+    with pytest.raises(AssertionError):
+        Config(input_f)
+
+
+def test_parse_config5_sequence_missing_entry_no_mds():
+    input_f = Path(__file__).parent / "test_files/config_test/config5.yml"
+    os.chdir(input_f.parent)
+    assert input_f.exists(), "Input file not found"
+
+    with pytest.raises(AssertionError):
+        Config(input_f)
+
+def test_parse_config6_changer_bad_reference():
+    input_f = Path(__file__).parent / "test_files/config_test/config6.yml"
+    os.chdir(input_f.parent)
+    assert input_f.exists(), "Input file not found"
+
+    with pytest.raises(AssertionError):
+        Config(input_f)
 
 if __name__ == "__main__":
     test_parse_config1_casting()
     test_parse_config2_missing_dat_in_plumed()
     test_parse_config3_missing_mdp_file()
+    test_parse_config4_sequence_missing_entry()
+    test_parse_config5_sequence_missing_entry_no_mds()
+    test_parse_config6_changer_bad_reference()

@@ -49,16 +49,6 @@ type_scheme = {
 
 # classes for static code analysis
 
-class MDConfig:
-    mdp: Path
-    plumed: Path
-
-class MDinstanceConfig:
-    md: MDConfig
-
-class MdsConfig:
-    instances: list[MDinstanceConfig]       #wrong??
-
 class MDrefConfig:
     md: str
 
@@ -283,22 +273,26 @@ class Config:
                 # Check files from scheme
                 if isinstance(attr, Path):
                     self.__setattr__(attr_name, attr.resolve())
-                    if not str(attr) in [
-                        "distances.dat"
-                    ]:  # distances.dat wouldn't exist prior to the run
+                    # distances.dat wouldn't exist prior to the run
+                    if not str(attr) in ["distances.dat"]:                      
                         logging.debug(attr)
                         check_file_exists(attr)
-
-                
-                #TODO: write test for new change 
-                #TODO: add check for correct definition of new plumed section in yaml
+               
                 # Validate sequence
                 if isinstance(attr, Sequence):
                     for task in attr:
                         if not hasattr(self, task):
-                            # this is not throwing an explicit error if the mds section is missing
                             if hasattr(self,'mds'):
-                                assert hasattr(self.mds,task), f"Task {task} listed in sequence, but not defined!"
+                                if hasattr(self.mds,task):
+                                    continue
+                            raise AssertionError(f"Task {task} listed in sequence, but not defined!")
+
+                # Validate changer reference
+                if attr_name == "raw":
+                    if hasattr(self,'changer'):
+                        if hasattr(self.changer,'coordinates'):
+                            if 'md' in self.changer.coordinates.get_attributes():
+                                assert self.changer.coordinates.md in self.mds.get_attributes(), f"Relax MD {self.changer.coordinates.md} not in MD section!"
 
                 # Validate reaction plugins
                 if attr_name == "reactions":
@@ -310,16 +304,4 @@ class Config:
 
         except AssertionError as e:
             logging.error(f"Validating input failed!\n{e}")
-            raise ValueError(e)
-
-
-        # #update type_scheme for explicit mds instances
-        # assert 'mds' in self.raw.keys(), "MD section not defined in config file!"
-        # new_scheme = {}
-        # for instance in self.raw['mds'].keys():
-        #     new_scheme[instance] = self.type_scheme['mds']['*']
-        # self.type_scheme['mds'] = new_scheme
-                #     if not to_type and attr_name != 'type_scheme':
-                # to_type = self.type_scheme.get('*')
-                # if to_type :
-                #     attr = self.__getattribute__(attr_name)
+            raise AssertionError(e)
