@@ -96,6 +96,7 @@ def test_integration_hat_reaction(tmp_path):
     )
     kimmdy_run(tmpdir / "kimmdy.yml")
 
+
 def test_integration_homolysis_reaction(tmp_path):
     tmpdir = tmp_path / "homolysis"
     shutil.copytree(
@@ -107,6 +108,7 @@ def test_integration_homolysis_reaction(tmp_path):
         target_is_directory=True,
     )
     kimmdy_run(tmpdir / "kimmdy.yml")
+
 
 def test_integration_whole_run(tmp_path):
     tmpdir = tmp_path / "whole_run"

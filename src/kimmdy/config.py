@@ -26,9 +26,11 @@ class Sequence(list):
             else:
                 self.append(task)
 
-class Mds():
+
+class Mds:
     def __init__(self):
         pass
+
 
 type_scheme = {
     "experiment": str,
@@ -41,7 +43,14 @@ type_scheme = {
     "top": Path,
     "gro": Path,
     "idx": Path,
-    "mds": {'*': {"mdp" : Path,"plumed" : {"dat" : Path, "distances" : Path},"prefix" : str, "overwrite" : str }},
+    "mds": {
+        "*": {
+            "mdp": Path,
+            "plumed": {"dat": Path, "distances": Path},
+            "prefix": str,
+            "overwrite": str,
+        }
+    },
     "changer": {"coordinates": {"md": str}},
     "reactions": {},
     "sequence": Sequence,
@@ -49,8 +58,10 @@ type_scheme = {
 
 # classes for static code analysis
 
+
 class MDrefConfig:
     md: str
+
 
 class ChangerConfig:
     coordinates: MDrefConfig
@@ -93,7 +104,7 @@ class Config:
 
     run: int
     experiment: str
-    name: str           # obsolete??
+    name: str  # obsolete??
     dryrun: bool
     iterations: int
     out: Path
@@ -156,9 +167,7 @@ class Config:
                     recursiv_type_s = self.type_scheme.get(name)
                     if recursiv_type_s is None:
                         recursiv_type_s = self.type_scheme.get("*")
-                    val = Config(
-                        recursive_dict=val, type_scheme=recursiv_type_s
-                    )
+                    val = Config(recursive_dict=val, type_scheme=recursiv_type_s)
                 logging.debug(f"Set attribute: {name}, {val}")
                 self.__setattr__(name, val)
 
@@ -194,7 +203,6 @@ class Config:
             # assert hasattr(self,'mds'), "MD section not defined in config file!"
             # for attribute in self.mds.get_attributes():
             #     self.mds.attr(attribute).mdp = Path(self.mds.attr(attribute).mdp)
-            
 
             self._cast_types()
             self._validate()
@@ -234,7 +242,7 @@ class Config:
                     raise ValueError(
                         f"ERROR in inputfile: Missing settings for {attr_name}"
                     )
-                    
+
                 # nested:
                 if isinstance(to_type, dict):
                     if list(to_type.keys()) == ["*"]:
@@ -274,25 +282,30 @@ class Config:
                 if isinstance(attr, Path):
                     self.__setattr__(attr_name, attr.resolve())
                     # distances.dat wouldn't exist prior to the run
-                    if not str(attr) in ["distances.dat"]:                      
+                    if not str(attr) in ["distances.dat"]:
                         logging.debug(attr)
                         check_file_exists(attr)
-               
+
                 # Validate sequence
                 if isinstance(attr, Sequence):
                     for task in attr:
                         if not hasattr(self, task):
-                            if hasattr(self,'mds'):
-                                if hasattr(self.mds,task):
+                            if hasattr(self, "mds"):
+                                if hasattr(self.mds, task):
                                     continue
-                            raise AssertionError(f"Task {task} listed in sequence, but not defined!")
+                            raise AssertionError(
+                                f"Task {task} listed in sequence, but not defined!"
+                            )
 
                 # Validate changer reference
                 if attr_name == "raw":
-                    if hasattr(self,'changer'):
-                        if hasattr(self.changer,'coordinates'):
-                            if 'md' in self.changer.coordinates.get_attributes():
-                                assert self.changer.coordinates.md in self.mds.get_attributes(), f"Relax MD {self.changer.coordinates.md} not in MD section!"
+                    if hasattr(self, "changer"):
+                        if hasattr(self.changer, "coordinates"):
+                            if "md" in self.changer.coordinates.get_attributes():
+                                assert (
+                                    self.changer.coordinates.md
+                                    in self.mds.get_attributes()
+                                ), f"Relax MD {self.changer.coordinates.md} not in MD section!"
 
                 # Validate reaction plugins
                 if attr_name == "reactions":

@@ -4,7 +4,7 @@ from typing import Callable
 
 
 class AutoFillDict(dict):
-    def __init__(self, get_missing : Callable):
+    def __init__(self, get_missing: Callable):
         self.get_missing = get_missing
 
     def __missing__(self, key):
