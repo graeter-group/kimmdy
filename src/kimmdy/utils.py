@@ -219,6 +219,12 @@ def check_gmx_version(config: Config):
     return version
 
 
+def float_or_str(elem):
+    try:
+        return float(elem)
+    except:
+        return elem
+
 ## helpers for changemanager
 def str_to_int_or_0(elem):
     return int(elem) if elem.isdigit() else 0
