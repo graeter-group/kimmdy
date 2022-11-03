@@ -6,7 +6,7 @@
  <HarmonicBondForce>
   <Bond class1="H" class2="N" length="0.101" k="363171.2"/>
  </HarmonicBondForce>
- </PeriodicTorsionForce>
+ <PeriodicTorsionForce>
   <Improper class1="C" class2="*" class3="*" class4="O" periodicity1="2" phase1="3.14159265359" k1="43.932"/>
  </PeriodicTorsionForce>
  <NonbondedForce>
