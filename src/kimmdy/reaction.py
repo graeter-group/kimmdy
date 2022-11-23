@@ -28,7 +28,7 @@ class Conversion:
     """
 
     type: ConversionType
-    atom_idx: tuple[int, int]
+    atom_idx: tuple[str, str]
 
 
 ConversionRecipe = list[Conversion]

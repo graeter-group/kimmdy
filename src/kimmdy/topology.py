@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Optional
 from kimmdy.parsing import TopologyDict
 from itertools import takewhile
+import textwrap
 
 
 @dataclass
@@ -78,7 +79,6 @@ class Bond:
             c2=field_or_none(l, 5),
             c3=field_or_none(l, 6),
         )
-
 
 
 @dataclass
@@ -192,20 +192,19 @@ class Pair:
         )
 
 
-
 class Topology:
     def __init__(self, top: TopologyDict, ffdir: Path) -> None:
         self.top = top
         self.forcefield_directory = ffdir
         self.ff = {}
 
-        self.atoms = []
-        self.bonds = []
-        self.dihedrals = []
-        self.pairs = []
-        self.angles = []
-        self.proper_dihedrals = []
-        self.improper_dihedrals = []
+        self.atoms: list[Atom] = []
+        self.bonds: list[Bond] = []
+        self.dihedrals: list[Dihedral] = []
+        self.pairs: list[Pair] = []
+        self.angles: list[Angle] = []
+        self.proper_dihedrals: list[Dihedral] = []
+        self.improper_dihedrals: list[Dihedral] = []
 
         self._get_atoms()
         self._get_bonds()
@@ -213,53 +212,78 @@ class Topology:
         self._get_angles()
         self._get_dihedrals()
 
+        self._update_dict()
+
         self._initialize_graph()
 
+    def _update_dict(self):
+        self.top["atoms"] = [attributes_to_list(x) for x in self.atoms]
+        self.top["bonds"] = [attributes_to_list(x) for x in self.bonds]
+        self.top["pairs"] = [attributes_to_list(x) for x in self.pairs]
+        self.top["angles"] = [attributes_to_list(x) for x in self.angles]
+        self.top["dihedrals"] = [attributes_to_list(x) for x in self.dihedrals]
+
     def to_dict(self) -> TopologyDict:
+        self._update_dict()
         return self.top
 
     def __repr__(self) -> str:
-        return self.top.__repr__()
+        return textwrap.dedent(f'''\
+        Topology with
+        {len(self.atoms)} atoms,
+        {len(self.bonds)} bonds,
+        {len(self.angles)} angles,
+        {len(self.pairs)} pairs,
+        {len(self.dihedrals)} dihedrals
+        ''')
 
     def __str__(self) -> str:
-        return self.top.__str__()
+        return str(self.atoms)
 
     def _get_atoms(self):
         ls = self.top["atoms"]
         for l in ls:
-            if l[0] != ';':
+            if l[0] != ";":
                 self.atoms.append(Atom.from_top_line(l))
 
     def _get_bonds(self):
         ls = self.top["bonds"]
         for l in ls:
-            if l[0] != ';':
+            if l[0] != ";":
                 self.bonds.append(Bond.from_top_line(l))
 
     def _get_pairs(self):
         ls = self.top["pairs"]
         for l in ls:
-            if l[0] != ';':
+            if l[0] != ";":
                 self.pairs.append(Pair.from_top_line(l))
-                
+
     def _get_angles(self):
         ls = self.top["angles"]
         for l in ls:
-            if l[0] != ';':
+            if l[0] != ";":
                 self.angles.append(Angle.from_top_line(l))
 
     def _get_dihedrals(self):
         ls = self.top["dihedrals"]
         for l in ls:
-            if l[0] != ';':
+            if l[0] != ";":
                 dihedral = Dihedral.from_top_line(l)
                 self.dihedrals.append(dihedral)
-                if dihedral.funct == '9': self.proper_dihedrals.append(dihedral)
-                if dihedral.funct == '4': self.improper_dihedrals.append(dihedral)
-
+                if dihedral.funct == "9":
+                    self.proper_dihedrals.append(dihedral)
+                if dihedral.funct == "4":
+                    self.improper_dihedrals.append(dihedral)
 
     def _initialize_graph(self):
         pass
+
+    def patch_parameters(self):
+        pass
+
+
+def attributes_to_list(obj) -> list[str]:
+    return list(takewhile(lambda x: x is not None, obj.__dict__.values()))
 
 
 def field_or_none(l: list[str], i) -> Optional[str]:
@@ -272,3 +296,6 @@ def field_or_none(l: list[str], i) -> Optional[str]:
 def is_not_comment(c: str):
     return c != ";"
 
+
+def is_not_none(x) -> bool:
+    return x is None

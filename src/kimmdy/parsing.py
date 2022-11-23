@@ -3,11 +3,12 @@ from collections.abc import Iterable
 from typing import Generator
 import pandas as pd
 from copy import deepcopy
+import xml.etree.ElementTree as ET
 import re
 
 from kimmdy.utils import float_or_str
 
-Topology = dict[str, list[list[str]]]
+TopologyDict = dict[str, list[list[str]]]
 
 
 def get_sections(
@@ -44,7 +45,7 @@ def extract_section_name(ls: list[str]) -> tuple[str, list[str]]:
         return ("", ls)
 
 
-def read_topol(path: Path) -> Topology:
+def read_topol(path: Path) -> TopologyDict:
     # TODO look into following #includes
     # TODO look into [ intermolecule ] section
     with open(path, "r") as f:
@@ -67,7 +68,7 @@ def read_topol(path: Path) -> Topology:
         return d
 
 
-def write_topol(top: Topology, outfile: Path):
+def write_topol(top: TopologyDict, outfile: Path):
     with open(outfile, "w") as f:
         for title, content in top.items():
             if title.startswith("BLOCK "):
@@ -86,7 +87,7 @@ def write_topol(top: Topology, outfile: Path):
             f.write(s)
 
 
-def split_dihedrals(top: Topology):
+def split_dihedrals(top: TopologyDict):
     if "dihedrals" in top.keys():
         top["propers"] = deepcopy(top["dihedrals"])
         top["impropers"] = []
@@ -97,7 +98,7 @@ def split_dihedrals(top: Topology):
                 top["impropers"].insert(0, (top["propers"].pop(-1)))
 
 
-def merge_propers_impropers(top: Topology):
+def merge_propers_impropers(top: TopologyDict):
     if set(["propers", "impropers"]).issubset(top.keys()):
         top["dihedrals"].clear()
         top["dihedrals"].extend(top.pop("propers"))
@@ -160,7 +161,7 @@ def read_distances_dat(distances_dat: Path):
 
 def read_plumed_distances(plumed_dat: Path, distances_dat: Path):
     plumed = read_plumed(plumed_dat)
-    # plumed['distances']: [{'id': 'd0', 'keyword': 'DISTANCE', 'atoms': ['5', '7']}
+    # plumed['distances']: [{'id': 'd0', 'keyword': 'DISTANCE', 'atoms': ['5', '7']}]
 
     distances = read_distances_dat(distances_dat)
     # distances is a pd DataFrame with time and id's -> distance
@@ -171,22 +172,8 @@ def read_plumed_distances(plumed_dat: Path, distances_dat: Path):
 
     return atoms
 
-def read_xml_ff(path: Path):
-    with open(path, "r") as f:
-        foo = f.readlines()
-    d = {'HEAD':{}}
+def read_xml_ff(path: Path) -> ET.Element:
+    tree = ET.parse(path)
+    root = tree.getroot()
+    return root
 
-    for line in foo[1:-1]:
-        if re.search("<\w+>",line):
-            key = line.strip('<> \n')
-            d[key] = {}
-        elif re.search("</\w+>",line):
-            pass
-        else:
-            entry = line.strip('<> \n/').split()[1:]
-            ids, vals = [],[]
-            for x in entry:
-                ids.append(x) if x.startswith('class') else vals.append(x) 
-            subkey = "_".join(x.split('=')[1].strip('"') for x in ids)
-            d[key][subkey]= {key:float_or_str(value) for (key,value) in [x.replace('"','').split('=') for x in vals]}
-    return d
