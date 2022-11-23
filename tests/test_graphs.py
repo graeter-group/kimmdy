@@ -1,4 +1,5 @@
 #%%
+from itertools import takewhile
 from pathlib import Path
 import os
 from kimmdy.parsing import read_topol, read_xml_ff
@@ -22,12 +23,20 @@ ffdir = Path("../assets/amber99sb-star-ildnp.ff")
 
 #%%
 top = Topology(hexala_top, ffdir)
-top.improper_dihedrals
+
+#%%
+top
+
+
+#%%
+top.top
+
 
 #%%
 col_top_dict = read_topol(Path('/hits/fast/mbm/buhrjk/phd/col-hydrolysis/col-fibril-crosslinks/run1/topol.top'))
 col_top = Topology(col_top_dict, ffdir)
 
+col_top.bonds[:10]
 
 
 

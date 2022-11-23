@@ -35,14 +35,14 @@ def modify_top(recipe: ConversionRecipe, oldtop: Path, newtop: Path, ffdir: Path
 
     for conversion in recipe:
         if conversion.type == ConversionType.BREAK:
-            remove_bond(topology, conversion.atom_idx)
+            break_bond(topology, conversion.atom_idx)
         elif conversion.type == ConversionType.BIND:
-            add_bond(topology, conversion.atom_idx, ffdir)
+            bind_bond(topology, conversion.atom_idx, ffdir)
 
     write_topol(topology, newtop)
 
 
-def remove_bond(topology: Topology, atompair: tuple[int, int]):
+def break_bond(topology: Topology, atompair: tuple[str, str]):
     """Break bonds in topology.
 
     removes bond, angles and dihedrals where breakpair was involved.
@@ -82,7 +82,7 @@ def remove_bond(topology: Topology, atompair: tuple[int, int]):
     # TODO; handle parameter update for radicals
 
 
-def add_bond(topology: Topology, atompair: tuple[int, int], ffdir: Path):
+def bind_bond(topology: Topology, atompair: tuple[str, str], ffdir: Path):
     """Add a bond in topology.
 
     Move an atom (typically H for Hydrogen Atom Transfer) to a new location.
@@ -189,9 +189,6 @@ def reciprocal_bonds(d: dict) -> dict:
         reciproce_dict[k[::-1]] = d[k]
     return reciproce_dict
 
-def update_bound_to(atom: Atom, bonds: dict, bonds_reciprocal: dict):
-    pass
-
 class LocalGraph:
     def __init__(
         self,
@@ -230,6 +227,10 @@ class LocalGraph:
         if bond := self.topology_bonds[tuple(sorted([one.idx, two.idx]))]:
             self.bonds.append(bond)
 
+        for atom in self.atoms:
+            for key, bond in self.topology_bonds.items():
+                if atom.idx in key:
+                    self.bonds.append(bond)
 
 
         # self.construct_graph(depth)
