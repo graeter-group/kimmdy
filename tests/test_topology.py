@@ -24,7 +24,7 @@ hexala_top = read_topol(Path('hexala.top'))
 ffdir = Path("../assets/amber99sb-star-ildnp.ff")
 
 #%%
-top = Topology(hexala_top, ffdir)
+top = Topology(hexala_top, ffdir, Path('amber99sb_trunc.xml'))
 
 #%%
 top
@@ -59,6 +59,7 @@ for x in xml_ff.iter():
 
 #%%
 patch = read_xml_ff(Path('amber99sb_patches.xml'))
+
 
 #%%
 for x in patch.iter():
