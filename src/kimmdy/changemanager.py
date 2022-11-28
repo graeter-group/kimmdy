@@ -11,8 +11,9 @@ from kimmdy.parsing import (
     write_topol,
     split_dihedrals,
     merge_propers_impropers,
-    Topology,
+    TopologyDict,
 )
+from kimmdy.topology import Topology
 from kimmdy.utils import (
     str_to_int_or_0,
     check_idx,
@@ -29,60 +30,21 @@ from operator import itemgetter
 import re
 
 
-def modify_top(recipe: ConversionRecipe, oldtop: Path, newtop: Path, ffdir: Path):
+def modify_top(recipe: ConversionRecipe, oldtop: Path, newtop: Path, ffdir: Path, ffpatch: Path):
     logging.info(f"Reading: {oldtop} and writing modified topology to {newtop}.")
-    topology = read_topol(oldtop)
+    topologyDict = read_topol(oldtop)
+    topology = Topology(topologyDict, ffdir, ffpatch)
 
     for conversion in recipe:
         if conversion.type == ConversionType.BREAK:
-            break_bond(topology, conversion.atom_idx)
+            topology.break_bond(conversion.atom_idx)
         elif conversion.type == ConversionType.BIND:
-            bind_bond(topology, conversion.atom_idx, ffdir)
+            topology.bind_bond(conversion.atom_idx)
 
-    write_topol(topology, newtop)
-
-
-def break_bond(topology: Topology, atompair: tuple[str, str]):
-    """Break bonds in topology.
-
-    removes bond, angles and dihedrals where breakpair was involved.
-    Modifies the topology dictionary in place.
-    Furthermore, it modifies to function types in the topology to account for radicals.
-    """
-    atompair_str = [str(x) for x in atompair]
-    topology["bonds"] = [
-        bond
-        for bond in topology["bonds"]
-        if not all(x in [bond[0], bond[1]] for x in atompair_str)
-    ]
-    topology["angles"] = [
-        angle
-        for angle in topology["angles"]
-        if not all(x in [angle[0], angle[1], angle[2]] for x in atompair_str)
-    ]
-    topology["dihedrals"] = [
-        dihedral
-        for dihedral in topology["dihedrals"]
-        if not all(
-            x in [dihedral[0], dihedral[1], dihedral[2], dihedral[3]]
-            for x in atompair_str
-        )
-    ]
-
-    dihpairs = [[d[0], d[3]] for d in topology["dihedrals"]]
-    for pair in dihpairs:
-        # keep pairs in proper order (which one goes first in the definition)
-        if str_to_int_or_0(pair[0]) != 0 and str_to_int_or_0(pair[1]) != 0:
-            pair_int = [int(pair[0]), int(pair[1])]
-            if pair_int[0] > pair_int[1]:
-                pair.reverse()
-    dihpairs = sorted(dihpairs, key=sort_bond)
-
-    topology["pairs"] = [pair for pair in topology["pairs"] if pair[:2] in dihpairs]
-    # TODO; handle parameter update for radicals
+    write_topol(topology.top, newtop)
 
 
-def bind_bond(topology: Topology, atompair: tuple[str, str], ffdir: Path):
+def bind_bond(topology: TopologyDict, atompair: tuple[str, str], ffdir: Path):
     """Add a bond in topology.
 
     Move an atom (typically H for Hydrogen Atom Transfer) to a new location.

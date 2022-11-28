@@ -1,8 +1,0 @@
-# Notation for xml files in KIMMDY
-
-- the file format is inspired by OpenFF force field files
-- class refers to the atomtypes of the atoms involved in the term
-- additionally, "*" refers to any atom, "X+" refers to an atom whose atomtype starts with X, "X_R" refers to a radical of atomtype X
-- atomtypes like "C*" occur in amber99sb and should not be confused with "C+"
-- entirely new values of variables are named such as angle="117", if the current value is changed by a factor, the variable is called angle_factor="1.08" or X_factor in general 
-
