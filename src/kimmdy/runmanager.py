@@ -9,7 +9,6 @@ from kimmdy.config import Config
 from kimmdy.reactions.homolysis import Homolysis
 from kimmdy.reaction import ReactionResult, ConversionRecipe, ConversionType
 import kimmdy.changemanager as changer
-from kimmdy import coordinatemanager
 from kimmdy.tasks import Task, TaskFiles, TaskMapping
 from kimmdy.utils import run_shell_cmd
 from pprint import pformat
