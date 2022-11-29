@@ -22,10 +22,10 @@ class HAT_reaction(Reaction):
         trr = files.input["trr"]
         u = MDA.Universe(str(tpr), str(trr), topology_format="tpr", format="trr")
 
-        logging.warning(u.atoms[:40].types)
+        logging.debug(u.atoms[:40].types)
         rads = find_radicals(u)
-        logging.warning(f"{rads} for {tpr}")
-        logging.warning([u.atoms[:20].elements, u.atoms[:20].types])
+        logging.debug(f"{rads} for {tpr}")
+        logging.debug([u.atoms[:20].elements, u.atoms[:20].types])
 
         RR = ReactionResult(recipes=[], rates=[])
         for rad in rads:
