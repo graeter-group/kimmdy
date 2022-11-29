@@ -4,6 +4,9 @@ from typing import Generator
 import pandas as pd
 from copy import deepcopy
 
+from kimmdy.reaction import ReactionResult, ConversionRecipe, ConversionType
+from kimmdy.coordinatemanager import merge_section_slowgrowth
+
 # time to experiment
 # what a topplogy is
 Topology = dict[str, list[list[str]]]
@@ -103,6 +106,63 @@ def topol_merge_propers_impropers(d: Topology):
         d["dihedrals"].extend(d.pop("propers"))
         d["dihedrals"].extend(d.pop("impropers"))
     return d
+
+
+# WIP topol parsers
+def read_topol_with_idx(path: Path, idxs: list[str]) -> Topology:
+    '''reads a reduced topology made of the lines that contain the strings in idxs
+    '''
+    # TODO look into following #includes
+    # TODO look into [ intermolecule ] section
+    with open(path, "r") as f:
+        sections = get_sections(f, "\n")
+        d = {}
+        for i, s in enumerate(sections):
+            # skip empty sections
+            if s == [""]:
+                continue
+            name, content = extract_section_name(s)
+            clist = []
+            for c in content:
+                csplit = c.split()
+                if any([idx in csplit for idx in idxs]) or name == 'atoms':
+                    clist.append(csplit) 
+            content = clist
+            if not name:
+                name = f"BLOCK {i}"
+            # sections can be duplicated.
+            # append values in such cases
+            if name not in d:
+                d[name] = content
+            elif any():
+                d[name] += content
+        return d
+
+def read_topol_mod_slowgrowth(path: Path, CR: ConversionRecipe, state_A_reduced: Topology,ffpath: Path) -> Topology:
+    # TODO look into following #includes
+    # TODO look into [ intermolecule ] section
+    with open(path, "r") as f:
+        sections = get_sections(f, "\n")
+        d = {}
+        for i, s in enumerate(sections):
+            # skip empty sections
+            if s == [""]:
+                continue
+            name, content = extract_section_name(s)
+            clist = []
+            if name in ['bonds','pairs','angles']:
+                content = merge_section_slowgrowth(name,content,CR,state_A_reduced,ffpath)
+            else:
+                content = [c.split() for c in content if c]
+            if not name:
+                name = f"BLOCK {i}"
+            # sections can be duplicated.
+            # append values in such cases
+            if name not in d:
+                d[name] = content
+            else:
+                d[name] += content
+        return d
 
 
 def read_plumed(path: Path) -> dict:
