@@ -90,6 +90,8 @@ class RunManager:
             "top": self.config.top,
             "gro": self.config.gro,
             "idx": self.config.idx,
+            "trr": '',
+            "edr": '',
         }
 
         # If we want to allow starting from radical containing systems this needs to be initialized:
@@ -234,8 +236,11 @@ class RunManager:
         md_config = self.config.mds.attr(instance)
         gmx_alias = self.config.gromacs_alias
 
+        logging.warning(self.latest_files)
         top = files.input["top"]
         gro = files.input["gro"]
+        trr = files.input["trr"]
+        edr = files.input["edr"]
         mdp = md_config.mdp
         idx = files.input["idx"]
 
@@ -245,8 +250,12 @@ class RunManager:
         ntomp = 2
 
         grompp_cmd = f"{gmx_alias} grompp -p {top} -c {gro} -f {mdp} -n {idx} -o {instance}.tpr -maxwarn 5"
+        # only appends these lines if there are trr and edr files 
+        if trr and edr:
+            grompp_cmd +=  f" -t {trr} -e {edr}"
         mdrun_cmd = f"{gmx_alias} mdrun -s {instance}.tpr -cpi {instance}.cpt -x {instance}.xtc -o {instance}.trr -cpo {instance}.cpt -c {instance}.gro -g {instance}.log -e {instance}.edr -px {instance}_pullx.xvg -pf {instance}_pullf.xvg -ro {instance}-rotation.xvg -ra {instance}-rotangles.log -rs {instance}-rotslabs.log -rt {instance}-rottorque.log -maxh {maxh} -dlb yes -ntomp {ntomp}"
-        # like this, the previous checkpoint file would not be used 
+        # like this, the previous checkpoint file would not be used, -t and -e options from grompp
+        # replace the checkpoint file if gen_vel = no in the mdp file
 
         if "plumed" in md_config.get_attributes():
             mdrun_cmd += f" -plumed {md_config.plumed.dat}"
