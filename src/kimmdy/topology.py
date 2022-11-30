@@ -2,7 +2,7 @@ from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Optional, Tuple
 from xml.etree.ElementTree import Element
-from kimmdy.parsing import TopologyDict, read_xml_ff
+from kimmdy.parsing import TopologyDict, read_topol, read_xml_ff
 from itertools import takewhile
 import re
 import textwrap
@@ -209,6 +209,7 @@ class Topology:
             self.patch = read_xml_ff(ffpatch)
         self.forcefield_directory = ffdir
         self.ff = {}
+        self.ff_bondtypes: dict[tuple[str, str], Bond] = {}
 
         self.atoms: dict[str, Atom] = {}
         self.bonds: dict[tuple[str, str], Bond] = {}
@@ -223,6 +224,7 @@ class Topology:
         self._get_pairs()
         self._get_angles()
         self._get_dihedrals()
+        self._get_ff_bonded(ffdir / 'ffbonded.itp')
 
         self._update_dict()
 
@@ -287,6 +289,13 @@ class Topology:
             if l[0] != ";":
                 dihedral = Dihedral.from_top_line(l)
                 self.dihedrals.append(dihedral)
+
+    def _get_ff_bonded(self, bonded_path: Path):
+        bonded = read_topol(bonded_path)
+        for l in bonded['bondtypes']:
+            if l[0] != ";":
+                bond = Bond.from_top_line(l)
+                self.ff_bondtypes[(bond.ai, bond.aj)] = bond
 
     def get_proper_dihedrals(self):
         return [dihedral for dihedral in self.dihedrals if dihedral.funct == '9']
@@ -379,14 +388,18 @@ class Topology:
                     atom_j = self.atoms[bond.aj]
                     patch = match_attr(bondpatches, 'class1', atom_i.type)
                     if patch is not None:
+                        c0 = patch.get('c0')
+                        if c0 is not None:
+                            bond.c0 = c0
+
                         c0_factor = patch.get('c0_factor')
                         if c0_factor is not None:
-                            # ohhhhhhh
-                            # so if we have no c0 initially (because it is not directly in the topology
-                            # but rather in another place in the ff)
-                            # we have to get the value from the forcefield... or not do factors
-                            # and only allow assignments of new values
-                            bond.c0 = str(float(bond.c0) * float(c0_factor))
+                            atomtypes = (atom_i.type.replace('_R', ''), atom_j.type.replace('_R', ''))
+                            bondtype = self.ff_bondtypes.get(atomtypes, None)
+                            if bondtype is None:
+                                bondtype = self.ff_bondtypes.get(atomtypes[::-1], None)
+                            if bondtype is not None and bondtype.c0 is not None:
+                                bond.c0 = str(float(bondtype.c0) * float(c0_factor))
 
 
         self._update_dict()
