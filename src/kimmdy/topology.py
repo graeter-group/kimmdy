@@ -313,29 +313,12 @@ class Topology:
         """
         radical_nrs = tuple(sorted(atompair, key=str_to_int_or_0))
         radical_pair = [self.atoms[radical_nrs[0]], self.atoms[atompair[1]]]
-        # TODO: we can make this faster at some point by assuming
-        # atoms are indexd by number.
-        # Right now I don't think we can safely assume this from
-        # just the topology file
-        
-        # atoms
-        # let's make some radicals
-        # maybe there are patches for atomtypes that become radicals
-        if self.patch:
-            if atompatches := self.patch.findall('Atoms/Atom[@class1]'):
-                for atom in radical_pair:
-                        logging.info(f"Adjust parameters for atom {atom.nr}.")
 
-                        # don't turn a radical into a radical radical
-                        if '_R' in atom.type: continue
 
-                        atom.type = atom.type + '_R'
-                        patch = match_attr(atompatches, 'class1', atom.type)
-                        if patch is not None:
-                            if mass_factor := patch.get('mass_factor'):
-                                atom.mass = str(float(atom.mass) * float(mass_factor))
-                            if charge_factor := patch.get('charge_factor'):
-                                atom.charge = str(float(atom.charge) * float(charge_factor))
+        # bonds
+        # remove bonds
+        removed = self.bonds.pop(radical_nrs, None)
+        logging.info(f"removed bond: {removed}")
 
         # update bound_to
         try:
@@ -344,10 +327,6 @@ class Topology:
         except ValueError as _:
             m = f"tried to remove bond between already disconnected atoms: {radical_pair}."
             logging.warning(m)
-
-        # remove bonds
-        removed = self.bonds.pop(radical_nrs, None)
-        logging.info(f"removed bond: {removed}")
 
         # remove angles
         self.angles = [
@@ -367,15 +346,51 @@ class Topology:
         dihpairs = [tuple(sorted((d.ai, d.al), key=str_to_int_or_0)) for d in self.dihedrals]
         self.pairs = {key: value for key, value in self.pairs.items() if key in dihpairs}
 
-        ## TODO: matching ff patches to atoms might get ugly from here on out
-        # get (unbroken) bonds that the now radicals in the atompair are still involved in
-        for radical in radical_pair:
-            for partner in radical.bound_to_nrs:
-                bond_nrs = sorted([radical.nr, partner], key=str_to_int_or_0)
-                print(bond_nrs)
 
-        # update topology dictionary
+        # if there are not changed parameters for radicals, exit here
+        if self.patch is None:
+            self._update_dict()
+            return
+
+        # Adjust parameters based on patch
+        # atoms
+        if atompatches := self.patch.findall('Atoms/Atom[@class1]'):
+            for atom in radical_pair:
+                    logging.info(f"Adjust parameters for atom {atom.nr}.")
+
+                    # don't turn a radical into a radical radical
+                    if '_R' in atom.type: continue
+
+                    atom.type = atom.type + '_R'
+                    patch = match_attr(atompatches, 'class1', atom.type)
+                    if patch is not None:
+                        if mass_factor := patch.get('mass_factor'):
+                            atom.mass = str(float(atom.mass) * float(mass_factor))
+                        if charge_factor := patch.get('charge_factor'):
+                            atom.charge = str(float(atom.charge) * float(charge_factor))
+
+        # get (unbroken) bonds that the now radicals in the atompair are still involved in
+        if bondpatches := self.patch.findall('HarmonicBondForce/Bond[@class1]'):
+            for radical in radical_pair:
+                for partner in radical.bound_to_nrs:
+                    bond_key = tuple(sorted([radical.nr, partner], key=str_to_int_or_0))
+                    bond = self.bonds[bond_key]
+                    atom_i = self.atoms[bond.ai]
+                    atom_j = self.atoms[bond.aj]
+                    patch = match_attr(bondpatches, 'class1', atom_i.type)
+                    if patch is not None:
+                        c0_factor = patch.get('c0_factor')
+                        if c0_factor is not None:
+                            # ohhhhhhh
+                            # so if we have no c0 initially (because it is not directly in the topology
+                            # but rather in another place in the ff)
+                            # we have to get the value from the forcefield... or not do factors
+                            # and only allow assignments of new values
+                            bond.c0 = str(float(bond.c0) * float(c0_factor))
+
+
         self._update_dict()
+        return
 
 
     def bind_bond(self, atompair: tuple[str, str]):
@@ -459,4 +474,25 @@ def match_attr(patches: list[Element], attr: str, m: str) -> Optional[Element]:
         return matches[0]
     else:
         return None
+
+def match_multi_attr(patches: list[Element], attrs: list[str], m: list[str]) -> Optional[Element]:
+    multimatch = ""
+    for attr in attrs:
+        if value := p.get(attr):
+            multimatch += (value + ' ')
+    print(multimatch)
+    matches = []
+    return None
+
+
+
+
+
+
+
+
+
+
+
+
 
