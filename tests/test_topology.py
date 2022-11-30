@@ -34,8 +34,10 @@ oldtop = deepcopy(top)
 # 9        CT       2        ALA      CA       9        0.0337   12.01   
 # 10       H1       2        ALA      HA       10       0.0823   1.008   
 
+
 #%%
 top.break_bond(('9', '10'))
+
 
 #%%
 ca = top.atoms['9']
