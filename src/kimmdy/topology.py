@@ -1,14 +1,17 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Optional, Tuple
+from xml.etree.ElementTree import Element
 from kimmdy.parsing import TopologyDict, read_xml_ff
 from itertools import takewhile
+import re
 import textwrap
+import logging
 
 from kimmdy.utils import sort_bond, str_to_int_or_0
 
 
-@dataclass
+@dataclass(order=True)
 class Atom:
     """Information about one atom
 
@@ -50,7 +53,7 @@ class Atom:
         )
 
 
-@dataclass
+@dataclass(order=True)
 class Bond:
     """Information about one bond
 
@@ -83,7 +86,7 @@ class Bond:
         )
 
 
-@dataclass
+@dataclass(order=True)
 class Dihedral:
     """Information about one dihedral
 
@@ -126,7 +129,7 @@ class Dihedral:
         )
 
 
-@dataclass
+@dataclass(order=True)
 class Angle:
     """Information about one angle
 
@@ -161,7 +164,7 @@ class Angle:
         )
 
 
-@dataclass
+@dataclass(order=True)
 class Pair:
     """Information about one pair
 
@@ -279,10 +282,12 @@ class Topology:
             if l[0] != ";":
                 dihedral = Dihedral.from_top_line(l)
                 self.dihedrals.append(dihedral)
-                if dihedral.funct == "9":
-                    self.proper_dihedrals.append(dihedral)
-                if dihedral.funct == "4":
-                    self.improper_dihedrals.append(dihedral)
+
+    def get_proper_dihedrals(self):
+        return [dihedral for dihedral in self.dihedrals if dihedral.funct == '9']
+
+    def get_improper_dihedrals(self):
+        return [dihedral for dihedral in self.dihedrals if dihedral.funct == '4']
 
     def _initialize_graph(self):
         pass
@@ -298,8 +303,25 @@ class Topology:
         It modifies to function types and parameters in the topology to account for radicals.
         """
         # atoms
+        # let's make some radicals
+        # maybe there are patches for atomtypes that become radicals
+        if self.patch:
+            if atompatches := self.patch.findall('Atoms/Atom[@class1]'):
+                new_atoms = []
+                for atom in self.atoms:
+                    if atom.nr in atompair:
+                        logging.info(f"Adjust parameters for atom {atom.nr}.")
+                        patch = match_attr(atompatches, 'class1', atom.type + '_R')
+                        if patch is not None:
+                            if mass_factor := patch.get('mass_factor'):
+                                atom.mass = str(float(atom.mass) * float(mass_factor))
+                            if charge_factor := patch.get('charge_factor'):
+                                atom.charge = str(float(atom.charge) * float(charge_factor))
+                    new_atoms.append(atom)
+                self.atoms = new_atoms
 
         # bonds
+        ## TODO: matching ff patches to atoms might get ugly from here on
         self.bonds = [
             bond
             for bond in self.bonds
@@ -313,20 +335,15 @@ class Topology:
             if not all(x in [angle.ai, angle.aj, angle.ak] for x in atompair)
         ]
 
-        # proper dihedrals
-        self.proper_dihedrals = [
+        # proper and improper dihedrals
+        self.dihedrals = [
             dihedral
-            for dihedral in self.proper_dihedrals
+            for dihedral in self.dihedrals
             if not all(x in [dihedral.ai, dihedral.aj, dihedral.ak, dihedral.al] for x in atompair)
         ]
-        # improper dihedrals
-        self.improper_dihedrals = [
-            dihedral
-            for dihedral in self.improper_dihedrals
-            if not all(x in [dihedral.ai, dihedral.aj, dihedral.ak, dihedral.al] for x in atompair)
-        ]
+
         # pairs
-        dihpairs = [[d.ai, d.al] if d.ai < d.al else [d.al, d.ai] for d in self.proper_dihedrals + self.improper_dihedrals]
+        dihpairs = [[d.ai, d.al] if d.ai < d.al else [d.al, d.ai] for d in self.dihedrals]
         self.pairs = [pair for pair in self.pairs if [pair.ai, pair.aj] in dihpairs]
 
         self._update_dict()
@@ -398,3 +415,17 @@ def is_not_comment(c: str):
 
 def is_not_none(x) -> bool:
     return x is None
+
+def match_attr(patches: list[Element], attr: str, m: str) -> Optional[Element]:
+    matches = []
+    for p in patches:
+        if value := p.get(attr):
+            if value == m: return p
+            pattern = value.replace('*', r'.*').replace('+', r'\+')
+            if re.match(pattern, m): matches.append(p)
+    if matches:
+        matches.sort(key=lambda x: x.get(attr))
+        return matches[0]
+    else:
+        return None
+
