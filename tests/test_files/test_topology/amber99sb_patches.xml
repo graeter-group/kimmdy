@@ -1,4 +1,8 @@
 <ForceField>
+ <Atoms>
+  <!-- This is just a test. -->
+  <Atom class1="CT_R" charge_factor="100" mass_factor="10"/>
+ </Atoms>
  <HarmonicBondForce>
   <Bond class1="*_R" class2="*" length_factor="0.98"/>
   <Bond class1="*_R" class2="H+" length_factor="1.00"/>

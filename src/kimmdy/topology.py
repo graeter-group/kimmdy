@@ -309,7 +309,7 @@ class Topology:
         Modifies the topology dictionary in place.
         It modifies to function types and parameters in the topology to account for radicals.
         """
-        radical_pair = [atom for atom in self.atoms if atom.nr in atompair]
+        radical_pair = [self.atoms[atompair[0]], self.atoms[atompair[1]]]
         # TODO: we can make this faster at some point by assuming
         # atoms are indexd by number.
         # Right now I don't think we can safely assume this from
@@ -335,8 +335,12 @@ class Topology:
                                 atom.charge = str(float(atom.charge) * float(charge_factor))
 
         # update bound_to
-        # radical_pair[0].bound_to_nrs.remove(radical_pair[1].nr)
-        # radical_pair[1].bound_to_nrs.remove(radical_pair[0].nr)
+        try:
+            radical_pair[0].bound_to_nrs.remove(radical_pair[1].nr)
+            radical_pair[1].bound_to_nrs.remove(radical_pair[0].nr)
+        except ValueError as _:
+            m = f"tried to remove bond between already disconnected atoms: {radical_pair}."
+            logging.warning(m)
 
         # remove bonds
         self.bonds = [
@@ -367,7 +371,8 @@ class Topology:
         # get (unbroken) bonds that the now radicals in the atompair are still involved in
         for radical in radical_pair:
             for partner in radical.bound_to_nrs:
-                print(radical)
+                bond_nrs = sorted([radical.nr, partner], key=str_to_int_or_0)
+                print(bond_nrs)
 
         # update topology dictionary
         self._update_dict()
