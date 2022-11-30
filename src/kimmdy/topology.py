@@ -1,4 +1,4 @@
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Optional, Tuple
 from xml.etree.ElementTree import Element
@@ -33,6 +33,8 @@ class Atom:
     typeB: Optional[str] = None
     chargeB: Optional[str] = None
     massB: Optional[str] = None
+    # TODO: use this with a local graph representation
+    bound_to_nrs: list[str] = field(default_factory=list)
 
     @classmethod
     def from_top_line(cls, l: list[str]):
@@ -208,7 +210,7 @@ class Topology:
         self.forcefield_directory = ffdir
         self.ff = {}
 
-        self.atoms: list[Atom] = []
+        self.atoms: dict[str, Atom] = {}
         self.bonds: list[Bond] = []
         self.dihedrals: list[Dihedral] = []
         self.pairs: list[Pair] = []
@@ -227,7 +229,7 @@ class Topology:
         self._initialize_graph()
 
     def _update_dict(self):
-        self.top["atoms"] = [attributes_to_list(x) for x in self.atoms]
+        self.top["atoms"] = [attributes_to_list(x) for x in self.atoms.values()]
         self.top["bonds"] = [attributes_to_list(x) for x in self.bonds]
         self.top["pairs"] = [attributes_to_list(x) for x in self.pairs]
         self.top["angles"] = [attributes_to_list(x) for x in self.angles]
@@ -256,7 +258,8 @@ class Topology:
         ls = self.top["atoms"]
         for l in ls:
             if l[0] != ";":
-                self.atoms.append(Atom.from_top_line(l))
+                atom = Atom.from_top_line(l)
+                self.atoms[atom.nr] = atom
 
     def _get_bonds(self):
         ls = self.top["bonds"]
@@ -290,7 +293,11 @@ class Topology:
         return [dihedral for dihedral in self.dihedrals if dihedral.funct == '4']
 
     def _initialize_graph(self):
-        pass
+        for bond in self.bonds:
+            i = bond.ai
+            j = bond.aj
+            self.atoms[i].bound_to_nrs.append(j)
+            self.atoms[j].bound_to_nrs.append(i)
 
     def patch_parameters(self):
         pass
@@ -302,50 +309,67 @@ class Topology:
         Modifies the topology dictionary in place.
         It modifies to function types and parameters in the topology to account for radicals.
         """
+        radical_pair = [atom for atom in self.atoms if atom.nr in atompair]
+        # TODO: we can make this faster at some point by assuming
+        # atoms are indexd by number.
+        # Right now I don't think we can safely assume this from
+        # just the topology file
+        
         # atoms
         # let's make some radicals
         # maybe there are patches for atomtypes that become radicals
         if self.patch:
             if atompatches := self.patch.findall('Atoms/Atom[@class1]'):
-                new_atoms = []
-                for atom in self.atoms:
-                    if atom.nr in atompair:
+                for atom in radical_pair:
                         logging.info(f"Adjust parameters for atom {atom.nr}.")
-                        patch = match_attr(atompatches, 'class1', atom.type + '_R')
+
+                        # don't turn a radical into a radical radical
+                        if '_R' in atom.type: continue
+
+                        atom.type = atom.type + '_R'
+                        patch = match_attr(atompatches, 'class1', atom.type)
                         if patch is not None:
                             if mass_factor := patch.get('mass_factor'):
                                 atom.mass = str(float(atom.mass) * float(mass_factor))
                             if charge_factor := patch.get('charge_factor'):
                                 atom.charge = str(float(atom.charge) * float(charge_factor))
-                    new_atoms.append(atom)
-                self.atoms = new_atoms
 
-        # bonds
-        ## TODO: matching ff patches to atoms might get ugly from here on
+        # update bound_to
+        # radical_pair[0].bound_to_nrs.remove(radical_pair[1].nr)
+        # radical_pair[1].bound_to_nrs.remove(radical_pair[0].nr)
+
+        # remove bonds
         self.bonds = [
             bond
             for bond in self.bonds
             if not all(x in [bond.ai, bond.aj] for x in atompair)
         ]
 
-        # angles
+        # remove angles
         self.angles = [
             angle
             for angle in self.angles
             if not all(x in [angle.ai, angle.aj, angle.ak] for x in atompair)
         ]
 
-        # proper and improper dihedrals
+        # remove proper and improper dihedrals
         self.dihedrals = [
             dihedral
             for dihedral in self.dihedrals
             if not all(x in [dihedral.ai, dihedral.aj, dihedral.ak, dihedral.al] for x in atompair)
         ]
 
-        # pairs
+        # remove pairs
         dihpairs = [[d.ai, d.al] if d.ai < d.al else [d.al, d.ai] for d in self.dihedrals]
         self.pairs = [pair for pair in self.pairs if [pair.ai, pair.aj] in dihpairs]
 
+        ## TODO: matching ff patches to atoms might get ugly from here on out
+        # get (unbroken) bonds that the now radicals in the atompair are still involved in
+        for radical in radical_pair:
+            for partner in radical.bound_to_nrs:
+                print(radical)
+
+        # update topology dictionary
         self._update_dict()
 
 
@@ -365,6 +389,8 @@ class Topology:
             `to`, the atom to which the `from` atom will be bound
         """
         raise NotImplemented("WIP")
+        # TODO: remember to undo the ff patches when atoms are no longer radicals!
+
         # atompair_str = [str(x) for x in atompair]
         # split_dihedrals(topology)
         #
