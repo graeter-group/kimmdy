@@ -4,14 +4,14 @@
   <Atom class1="CT_R" charge_factor="100" mass_factor="10"/>
  </Atoms>
  <HarmonicBondForce>
-  <Bond class1="*_R" class2="*" length_factor="0.98"/>
-  <Bond class1="*_R" class2="H+" length_factor="1.00"/>
-  <Bond class1="O+_R" class2="*" length_factor="0.95"/>
-  <Bond class1="O+" class2="*_R" length_factor="0.95"/>
-  <Bond class1="S+_R" class2="*" length_factor="0.95"/>
-  <Bond class1="S+" class2="*_R" length_factor="0.95"/>
-  <Bond class1="N" class2="CT_R" length_factor="0.94"/>
-  <Bond class1="C" class2="N_R" length_factor="0.92"/>
+  <Bond class1="*_R" class2="*" c0_factor="0.98"/>
+  <Bond class1="*_R" class2="H+" c0_factor="1.00"/>
+  <Bond class1="O+_R" class2="*" c0_factor="0.95"/>
+  <Bond class1="O+" class2="*_R" c0_factor="0.95"/>
+  <Bond class1="S+_R" class2="*" c0_factor="0.95"/>
+  <Bond class1="S+" class2="*_R" c0_factor="0.95"/>
+  <Bond class1="N" class2="CT_R" c0_factor="0.94"/>
+  <Bond class1="C" class2="N_R" c0_factor="0.92"/>
  </HarmonicBondForce>
  <HarmonicAngleForce> 
   <Angle class1="*" class2="*_R" class3="*" angle="117"/>
