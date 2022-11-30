@@ -211,10 +211,10 @@ class Topology:
         self.ff = {}
 
         self.atoms: dict[str, Atom] = {}
-        self.bonds: list[Bond] = []
-        self.dihedrals: list[Dihedral] = []
-        self.pairs: list[Pair] = []
+        self.bonds: dict[tuple[str, str], Bond] = {}
+        self.pairs: dict[tuple[str, str], Pair] = {}
         self.angles: list[Angle] = []
+        self.dihedrals: list[Dihedral] = []
         self.proper_dihedrals: list[Dihedral] = []
         self.improper_dihedrals: list[Dihedral] = []
 
@@ -230,8 +230,8 @@ class Topology:
 
     def _update_dict(self):
         self.top["atoms"] = [attributes_to_list(x) for x in self.atoms.values()]
-        self.top["bonds"] = [attributes_to_list(x) for x in self.bonds]
-        self.top["pairs"] = [attributes_to_list(x) for x in self.pairs]
+        self.top["bonds"] = [attributes_to_list(x) for x in self.bonds.values()]
+        self.top["pairs"] = [attributes_to_list(x) for x in self.pairs.values()]
         self.top["angles"] = [attributes_to_list(x) for x in self.angles]
         self.top["dihedrals"] = [attributes_to_list(x) for x in self.dihedrals]
 
@@ -265,13 +265,15 @@ class Topology:
         ls = self.top["bonds"]
         for l in ls:
             if l[0] != ";":
-                self.bonds.append(Bond.from_top_line(l))
+                bond = Bond.from_top_line(l)
+                self.bonds[(bond.ai, bond.aj)] = bond
 
     def _get_pairs(self):
         ls = self.top["pairs"]
         for l in ls:
             if l[0] != ";":
-                self.pairs.append(Pair.from_top_line(l))
+                pair = Pair.from_top_line(l)
+                self.pairs[(pair.ai), (pair.aj)] = pair
 
     def _get_angles(self):
         ls = self.top["angles"]
@@ -293,7 +295,7 @@ class Topology:
         return [dihedral for dihedral in self.dihedrals if dihedral.funct == '4']
 
     def _initialize_graph(self):
-        for bond in self.bonds:
+        for bond in self.bonds.values():
             i = bond.ai
             j = bond.aj
             self.atoms[i].bound_to_nrs.append(j)
@@ -309,7 +311,8 @@ class Topology:
         Modifies the topology dictionary in place.
         It modifies to function types and parameters in the topology to account for radicals.
         """
-        radical_pair = [self.atoms[atompair[0]], self.atoms[atompair[1]]]
+        radical_nrs = tuple(sorted(atompair, key=str_to_int_or_0))
+        radical_pair = [self.atoms[radical_nrs[0]], self.atoms[atompair[1]]]
         # TODO: we can make this faster at some point by assuming
         # atoms are indexd by number.
         # Right now I don't think we can safely assume this from
@@ -343,11 +346,8 @@ class Topology:
             logging.warning(m)
 
         # remove bonds
-        self.bonds = [
-            bond
-            for bond in self.bonds
-            if not all(x in [bond.ai, bond.aj] for x in atompair)
-        ]
+        removed = self.bonds.pop(radical_nrs, None)
+        logging.info(f"removed bond: {removed}")
 
         # remove angles
         self.angles = [
@@ -364,8 +364,8 @@ class Topology:
         ]
 
         # remove pairs
-        dihpairs = [[d.ai, d.al] if d.ai < d.al else [d.al, d.ai] for d in self.dihedrals]
-        self.pairs = [pair for pair in self.pairs if [pair.ai, pair.aj] in dihpairs]
+        dihpairs = [tuple(sorted((d.ai, d.al), key=str_to_int_or_0)) for d in self.dihedrals]
+        self.pairs = {key: value for key, value in self.pairs.items() if key in dihpairs}
 
         ## TODO: matching ff patches to atoms might get ugly from here on out
         # get (unbroken) bonds that the now radicals in the atompair are still involved in
