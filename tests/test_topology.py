@@ -1,6 +1,6 @@
 #%%
 from copy import deepcopy
-from itertools import takewhile
+from itertools import takewhile, permutations
 from pathlib import Path
 import os
 from xml.etree.ElementTree import Element
@@ -38,6 +38,17 @@ oldtop = deepcopy(top)
 #%%
 top.break_bond(('9', '10'))
 
+#%%
+key = list(top.bonds.keys())[0]
+key
+
+#%%
+perm = permutations(key)
+for p in perm:
+    print(p)
+
+#%%
+top.bonds[('9', '11')]
 
 #%%
 ca = top.atoms['9']
