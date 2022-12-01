@@ -2,7 +2,7 @@ from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Any, Hashable, Optional, Tuple
 from xml.etree.ElementTree import Element
-from kimmdy.parsing import TopologyDict, read_topol, read_xml_ff
+from kimmdy.parsing import TopologyDict, read_topol, read_xml_ff, is_not_comment
 from itertools import takewhile, permutations
 import re
 import textwrap
@@ -38,8 +38,6 @@ class Atom:
 
     @classmethod
     def from_top_line(cls, l: list[str]):
-        l = list(takewhile(is_not_comment, l))
-
         return cls(
             nr=l[0],
             type=l[1],
@@ -75,8 +73,6 @@ class AtomType:
 
     @classmethod
     def from_top_line(cls, l: list[str]):
-        l = list(takewhile(is_not_comment, l))
-
         return cls(
             type=l[0],
             at_num=l[1],
@@ -107,8 +103,6 @@ class Bond:
 
     @classmethod
     def from_top_line(cls, l: list[str]):
-        l = list(takewhile(is_not_comment, l))
-
         return cls(
             ai=l[0],
             aj=l[1],
@@ -146,8 +140,6 @@ class Dihedral:
 
     @classmethod
     def from_top_line(cls, l: list[str]):
-        l = list(takewhile(is_not_comment, l))
-
         return cls(
             ai=l[0],
             aj=l[1],
@@ -184,8 +176,6 @@ class Angle:
 
     @classmethod
     def from_top_line(cls, l: list[str]):
-        l = list(takewhile(is_not_comment, l))
-
         return cls(
             ai=l[0],
             aj=l[1],
@@ -218,8 +208,6 @@ class Pair:
 
     @classmethod
     def from_top_line(cls, l: list[str]):
-        l = list(takewhile(is_not_comment, l))
-
         return cls(
             ai=l[0],
             aj=l[1],
@@ -239,6 +227,7 @@ class FF:
         self.atomtypes: dict[str, AtomType] = {}
         self.bondtypes: dict[tuple[str, str], Bond] = {}
         self.angletypes: dict[tuple[str, str, str], Angle] = {}
+        self.dihedraltypes: dict[tuple[str, str, str, str], Dihedral] = {}
 
 
         nonbonded_path = ffdir / "ffnonbonded.itp"
@@ -251,13 +240,14 @@ class FF:
         bonded_path = ffdir / "ffbonded.itp"
         bonded = read_topol(bonded_path)
         for l in bonded["bondtypes"]:
-            if l[0][0] != ";":
-                bond = Bond.from_top_line(l)
-                self.bondtypes[(bond.ai, bond.aj)] = bond
+            bond = Bond.from_top_line(l)
+            self.bondtypes[(bond.ai, bond.aj)] = bond
         for l in bonded["angletypes"]:
-            if l[0][0] != ";":
-                angle = Angle.from_top_line(l)
-                self.angletypes[(angle.ai, angle.aj, angle.ak)] = angle
+            angle = Angle.from_top_line(l)
+            self.angletypes[(angle.ai, angle.aj, angle.ak)] = angle
+        for l in bonded["dihedraltypes"]:
+            dihedral = Dihedral.from_top_line(l)
+            self.dihedraltypes[(dihedral.ai, dihedral.aj, dihedral.ak, dihedral.al)] = dihedral
 
 
 class Topology:
@@ -323,37 +313,32 @@ class Topology:
     def _get_atoms(self):
         ls = self.top["atoms"]
         for l in ls:
-            if l[0] != ";":
-                atom = Atom.from_top_line(l)
-                self.atoms[atom.nr] = atom
+            atom = Atom.from_top_line(l)
+            self.atoms[atom.nr] = atom
 
     def _get_bonds(self):
         ls = self.top["bonds"]
         for l in ls:
-            if l[0] != ";":
-                bond = Bond.from_top_line(l)
-                self.bonds[(bond.ai, bond.aj)] = bond
+            bond = Bond.from_top_line(l)
+            self.bonds[(bond.ai, bond.aj)] = bond
 
     def _get_pairs(self):
         ls = self.top["pairs"]
         for l in ls:
-            if l[0] != ";":
-                pair = Pair.from_top_line(l)
-                self.pairs[(pair.ai, pair.aj)] = pair
+            pair = Pair.from_top_line(l)
+            self.pairs[(pair.ai, pair.aj)] = pair
 
     def _get_angles(self):
         ls = self.top["angles"]
         for l in ls:
-            if l[0] != ";":
-                angle = Angle.from_top_line(l)
-                self.angles[(angle.ai, angle.aj, angle.ak)] = angle
+            angle = Angle.from_top_line(l)
+            self.angles[(angle.ai, angle.aj, angle.ak)] = angle
 
     def _get_dihedrals(self):
         ls = self.top["dihedrals"]
         for l in ls:
-            if l[0] != ";":
-                dihedral = Dihedral.from_top_line(l)
-                self.dihedrals[(dihedral.ai, dihedral.aj, dihedral.ak, dihedral.al)] = dihedral
+            dihedral = Dihedral.from_top_line(l)
+            self.dihedrals[(dihedral.ai, dihedral.aj, dihedral.ak, dihedral.al)] = dihedral
 
     def get_proper_dihedrals(self):
         return [dihedral for dihedral in self.dihedrals.values() if dihedral.funct == "9"]
@@ -425,7 +410,7 @@ class Topology:
         # atoms
         if atompatches := self.patch.findall("Atoms/Atom[@class1]"):
             for atom in radical_pair:
-                logging.info(f"Adjust parameters for atom {atom.nr}.")
+                logging.info(f"Adjust parameters for atom {atom}.")
 
                 # don't turn a radical into a radical radical
                 if "_R" in atom.type:
@@ -449,7 +434,7 @@ class Topology:
                     atom_j = self.atoms[bond.aj]
                     patch = match_attr(bondpatches, "class1", atom_i.type)
                     if patch is not None:
-                        logging.info(f"Adjust parameters for bond {(bond.ai, bond.aj)}.")
+                        logging.info(f"Adjust parameters for bond {bond}.")
                         c0 = patch.get("c0")
                         if c0 is not None:
                             bond.c0 = c0
@@ -469,9 +454,29 @@ class Topology:
         # get (unbroken) angles that the now radicals in the atompair are still involved in
         if anglepatches := self.patch.findall("HarmonicAngleForce/Angle[@class1]"):
             for radical in radical_pair:
+                angles = []
                 for partner in radical.bound_to_nrs:
-                    pass
+                    for partner_partner in self.atoms[partner].bound_to_nrs:
+                        key = (radical.nr, partner, partner_partner)
+                        angle = get_by_permutations(self.angles, key)
+                        if angle is not None:
+                            logging.info(f"Adjust parameters for angle {angle}.")
+                            print(angle)
+                            angles.append(angle)
 
+        # get (unbroken) angles that the now radicals in the atompair are still involved in
+        if dihedralpatches := self.patch.findall("PeriodicTorsionForce/Proper[@class1]"):
+            for radical in radical_pair:
+                dihedrals = []
+                for partner in radical.bound_to_nrs:
+                    for partner_partner in self.atoms[partner].bound_to_nrs:
+                        for partner_partner_partner in self.atoms[partner_partner].bound_to_nrs:
+                            key = (radical.nr, partner, partner_partner, partner_partner_partner)
+                            dihedral = get_by_permutations(self.dihedrals, key)
+                            if dihedral is not None:
+                                logging.info(f"Adjust parameters for dihedral {dihedral}.")
+                                print(dihedral)
+                                dihedrals.append(dihedral)
 
         self._update_dict()
         return
@@ -536,10 +541,6 @@ def field_or_none(l: list[str], i) -> Optional[str]:
         return l[i]
     except IndexError as _:
         return None
-
-
-def is_not_comment(c: str):
-    return c != ";"
 
 
 def is_not_none(x) -> bool:
