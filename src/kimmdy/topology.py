@@ -1,9 +1,9 @@
 from dataclasses import dataclass, field, replace
 from pathlib import Path
-from typing import Optional, Tuple
+from typing import Any, Hashable, Optional, Tuple
 from xml.etree.ElementTree import Element
 from kimmdy.parsing import TopologyDict, read_topol, read_xml_ff
-from itertools import takewhile
+from itertools import takewhile, permutations
 import re
 import textwrap
 import logging
@@ -199,17 +199,40 @@ class Pair:
         )
 
 
+@dataclass(init=False)
+class FF:
+    """Conainer for parsed forcefield data."""
+
+    def __init__(self, ffdir: Path):
+        self.bondtypes: dict[tuple[str, str], Bond] = {}
+        self.angletypes: dict[tuple[str, str, str], Angle] = {}
+        bonded_path = ffdir / "ffbonded.itp"
+        bonded = read_topol(bonded_path)
+        for l in bonded["bondtypes"]:
+            if l[0] != ";":
+                bond = Bond.from_top_line(l)
+                self.bondtypes[(bond.ai, bond.aj)] = bond
+        for l in bonded["angletypes"]:
+            if l[0] != ";":
+                angle = Angle.from_top_line(l)
+                self.angletypes[(angle.ai, angle.aj, angle.ak)] = angle
+
+
 class Topology:
+    """Smart container for parsed topology data.
+
+    A topology keeps track of connections and applies patches to parameters when bonds are broken or formed.
+    """
+
     def __init__(
         self, top: TopologyDict, ffdir: Path, ffpatch: Optional[Path] = None
     ) -> None:
         self.top = top
+        self.forcefield_directory = ffdir
+        self.ff = FF(ffdir)
         self.patch = None
         if ffpatch:
             self.patch = read_xml_ff(ffpatch)
-        self.forcefield_directory = ffdir
-        self.ff = {}
-        self.ff_bondtypes: dict[tuple[str, str], Bond] = {}
 
         self.atoms: dict[str, Atom] = {}
         self.bonds: dict[tuple[str, str], Bond] = {}
@@ -224,7 +247,6 @@ class Topology:
         self._get_pairs()
         self._get_angles()
         self._get_dihedrals()
-        self._get_ff_bonded(ffdir / 'ffbonded.itp')
 
         self._update_dict()
 
@@ -290,18 +312,11 @@ class Topology:
                 dihedral = Dihedral.from_top_line(l)
                 self.dihedrals.append(dihedral)
 
-    def _get_ff_bonded(self, bonded_path: Path):
-        bonded = read_topol(bonded_path)
-        for l in bonded['bondtypes']:
-            if l[0] != ";":
-                bond = Bond.from_top_line(l)
-                self.ff_bondtypes[(bond.ai, bond.aj)] = bond
-
     def get_proper_dihedrals(self):
-        return [dihedral for dihedral in self.dihedrals if dihedral.funct == '9']
+        return [dihedral for dihedral in self.dihedrals if dihedral.funct == "9"]
 
     def get_improper_dihedrals(self):
-        return [dihedral for dihedral in self.dihedrals if dihedral.funct == '4']
+        return [dihedral for dihedral in self.dihedrals if dihedral.funct == "4"]
 
     def _initialize_graph(self):
         for bond in self.bonds.values():
@@ -322,7 +337,6 @@ class Topology:
         """
         radical_nrs = tuple(sorted(atompair, key=str_to_int_or_0))
         radical_pair = [self.atoms[radical_nrs[0]], self.atoms[atompair[1]]]
-
 
         # bonds
         # remove bonds
@@ -348,63 +362,78 @@ class Topology:
         self.dihedrals = [
             dihedral
             for dihedral in self.dihedrals
-            if not all(x in [dihedral.ai, dihedral.aj, dihedral.ak, dihedral.al] for x in atompair)
+            if not all(
+                x in [dihedral.ai, dihedral.aj, dihedral.ak, dihedral.al]
+                for x in atompair
+            )
         ]
 
         # remove pairs
-        dihpairs = [tuple(sorted((d.ai, d.al), key=str_to_int_or_0)) for d in self.dihedrals]
-        self.pairs = {key: value for key, value in self.pairs.items() if key in dihpairs}
+        dihpairs = [
+            tuple(sorted((d.ai, d.al), key=str_to_int_or_0)) for d in self.dihedrals
+        ]
+        self.pairs = {
+            key: value for key, value in self.pairs.items() if key in dihpairs
+        }
 
-
-        # if there are not changed parameters for radicals, exit here
+        # if there are no changed parameters for radicals, exit here
         if self.patch is None:
             self._update_dict()
             return
 
         # Adjust parameters based on patch
         # atoms
-        if atompatches := self.patch.findall('Atoms/Atom[@class1]'):
+        if atompatches := self.patch.findall("Atoms/Atom[@class1]"):
             for atom in radical_pair:
-                    logging.info(f"Adjust parameters for atom {atom.nr}.")
+                logging.info(f"Adjust parameters for atom {atom.nr}.")
 
-                    # don't turn a radical into a radical radical
-                    if '_R' in atom.type: continue
+                # don't turn a radical into a radical radical
+                if "_R" in atom.type:
+                    continue
 
-                    atom.type = atom.type + '_R'
-                    patch = match_attr(atompatches, 'class1', atom.type)
-                    if patch is not None:
-                        if mass_factor := patch.get('mass_factor'):
-                            atom.mass = str(float(atom.mass) * float(mass_factor))
-                        if charge_factor := patch.get('charge_factor'):
-                            atom.charge = str(float(atom.charge) * float(charge_factor))
+                atom.type = atom.type + "_R"
+                patch = match_attr(atompatches, "class1", atom.type)
+                if patch is not None:
+                    if mass_factor := patch.get("mass_factor"):
+                        atom.mass = str(float(atom.mass) * float(mass_factor))
+                    if charge_factor := patch.get("charge_factor"):
+                        atom.charge = str(float(atom.charge) * float(charge_factor))
 
         # get (unbroken) bonds that the now radicals in the atompair are still involved in
-        if bondpatches := self.patch.findall('HarmonicBondForce/Bond[@class1]'):
+        if bondpatches := self.patch.findall("HarmonicBondForce/Bond[@class1]"):
             for radical in radical_pair:
                 for partner in radical.bound_to_nrs:
                     bond_key = tuple(sorted([radical.nr, partner], key=str_to_int_or_0))
                     bond = self.bonds[bond_key]
                     atom_i = self.atoms[bond.ai]
                     atom_j = self.atoms[bond.aj]
-                    patch = match_attr(bondpatches, 'class1', atom_i.type)
+                    patch = match_attr(bondpatches, "class1", atom_i.type)
                     if patch is not None:
-                        c0 = patch.get('c0')
+                        c0 = patch.get("c0")
                         if c0 is not None:
                             bond.c0 = c0
 
-                        c0_factor = patch.get('c0_factor')
+                        c0_factor = patch.get("c0_factor")
                         if c0_factor is not None:
-                            atomtypes = (atom_i.type.replace('_R', ''), atom_j.type.replace('_R', ''))
-                            bondtype = self.ff_bondtypes.get(atomtypes, None)
-                            if bondtype is None:
-                                bondtype = self.ff_bondtypes.get(atomtypes[::-1], None)
+                            original_atomtypes = (
+                                atom_i.type.removesuffix("_R"),
+                                atom_j.type.removesuffix("_R"),
+                            )
+                            bondtype = get_by_permutations(
+                                self.ff.bondtypes, original_atomtypes
+                            )
                             if bondtype is not None and bondtype.c0 is not None:
                                 bond.c0 = str(float(bondtype.c0) * float(c0_factor))
+
+        # get (unbroken) angles that the now radicals in the atompair are still involved in
+        if anglepatches := self.patch.findall("HarmonicAngleForce/Angle[@class1]"):
+            for radical in radical_pair:
+                for partner in radical.bound_to_nrs:
+                    pass
 
 
         self._update_dict()
         return
-
 
     def bind_bond(self, atompair: tuple[str, str]):
         """Add a bond in topology.
@@ -475,37 +504,38 @@ def is_not_comment(c: str):
 def is_not_none(x) -> bool:
     return x is None
 
+
 def match_attr(patches: list[Element], attr: str, m: str) -> Optional[Element]:
     matches = []
     for p in patches:
         if value := p.get(attr):
-            if value == m: return p
-            pattern = value.replace('*', r'.*').replace('+', r'\+')
-            if re.match(pattern, m): matches.append(p)
+            if value == m:
+                return p
+            pattern = value.replace("*", r".*").replace("+", r"\+")
+            if re.match(pattern, m):
+                matches.append(p)
     if matches:
         matches.sort(key=lambda x: x.get(attr))
         return matches[0]
     else:
         return None
 
-def match_multi_attr(patches: list[Element], attrs: list[str], m: list[str]) -> Optional[Element]:
+
+def match_multi_attr(
+    patches: list[Element], attrs: list[str], m: list[str]
+) -> Optional[Element]:
     multimatch = ""
     for attr in attrs:
         if value := p.get(attr):
-            multimatch += (value + ' ')
+            multimatch += value + " "
     print(multimatch)
     matches = []
     return None
 
 
-
-
-
-
-
-
-
-
-
-
-
+def get_by_permutations(d: dict, key) -> Optional[Any]:
+    for k in permutations(key):
+        value = d.get(k, None)
+        if value is not None:
+            return value
+    return None
