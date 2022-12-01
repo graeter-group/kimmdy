@@ -4,27 +4,28 @@ from typing import Generator
 import pandas as pd
 from copy import deepcopy
 import xml.etree.ElementTree as ET
-import re
-
-from kimmdy.utils import float_or_str
+from itertools import takewhile
 
 TopologyDict = dict[str, list[list[str]]]
 
+def is_not_comment(c: str) -> bool:
+    return c != ';'
 
 def get_sections(
     seq: Iterable[str], section_marker: str
 ) -> Generator[list[str], None, None]:
     data = [""]
     for line in seq:
+        line = ''.join(takewhile(is_not_comment, line))
         if line.startswith(section_marker):
             if data:
                 # first element will be empty
                 # because newlines mark sections
                 data.pop(0)
                 # only yield section if non-empty
-                if data:
+                if len(data) > 0:
                     yield data
-                data = []
+                data = [""]
         data.append(line.strip("\n"))
     if data:
         yield data
@@ -34,7 +35,7 @@ def extract_section_name(ls: list[str]) -> tuple[str, list[str]]:
     """takes a list of lines and return a tuple
     with the name and the lines minus the
     line that contained the name.
-    Returns the empty string of no name was found.
+    Returns the empty string if no name was found.
     """
     for i, l in enumerate(ls):
         if l and l[0] != ";" and "[" in l:
@@ -56,7 +57,7 @@ def read_topol(path: Path) -> TopologyDict:
             if s == [""]:
                 continue
             name, content = extract_section_name(s)
-            content = [c.split() for c in content if c]
+            content = [c.split() for c in content if len(c.split()) > 0]
             if not name:
                 name = f"BLOCK {i}"
             # sections can be duplicated.
