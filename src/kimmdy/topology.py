@@ -219,7 +219,6 @@ class Pair:
         )
 
 
-@dataclass(init=False)
 class FF:
     """Conainer for parsed forcefield data."""
 
@@ -248,6 +247,26 @@ class FF:
         for l in bonded["dihedraltypes"]:
             dihedral = Dihedral.from_top_line(l)
             self.dihedraltypes[(dihedral.ai, dihedral.aj, dihedral.ak, dihedral.al)] = dihedral
+
+    def __repr__(self) -> str:
+        return textwrap.dedent(
+            f"""\
+        ForceField parameters with
+        {len(self.atomtypes)} atomtypes,
+        {len(self.bondtypes)} bondtypes,
+        {len(self.angletypes)} angletypes,
+        {len(self.dihedraltypes)} dihedraltypes
+        """
+        )
+
+class FFPatch():
+    """A container for forcefield patches
+    """
+    def __init__(self, path: Path) -> None:
+        xml = read_xml_ff(path)
+        self.atompatches = xml.findall("Atoms/Atom[@class1]")
+        self.bondpatches = xml.findall("Atoms/Atom[@class1]")
+        self.dihedralpatches = xml.findall("Atoms/Atom[@class1]")
 
 
 class Topology:
