@@ -259,14 +259,38 @@ class FF:
         """
         )
 
-class FFPatch():
+class FFPatches():
     """A container for forcefield patches
     """
     def __init__(self, path: Path) -> None:
         xml = read_xml_ff(path)
-        self.atompatches = xml.findall("Atoms/Atom[@class1]")
-        self.bondpatches = xml.findall("Atoms/Atom[@class1]")
-        self.dihedralpatches = xml.findall("Atoms/Atom[@class1]")
+        self.atompatches = xml.findall("Atoms/Atom")
+        self.bondpatches = xml.findall("Bonds/Bond")
+        self.pairpatches = xml.findall("Pairs/Pair")
+        self.anglepatches = xml.findall("Angles/Angle")
+
+        # damn... <https://manual.gromacs.org/current/reference-manual/functions/bonded-interactions.html#proper-dihedrals-periodic-type>
+        # dihedrals of type 9 can have multiple definitions
+        # so the angle phi is both an identifier and parameter for the dihedral
+        # e.g. in ffbonded
+        # CT  CT  OS  CT    9       0.0      1.60247     3  ; 
+        # CT  CT  OS  CT    9     180.0      0.41840     2  ; 
+        # idea: first match up on atomtypes and phi
+        # if phi does not match add a new dihedral with the new phi
+        # and leave the old one in place
+        self.dihedralpatches = xml.findall("Dihedrals/Dihedral")
+
+    def __repr__(self) -> str:
+        return textwrap.dedent(
+            f"""\
+        ForceField parameter patches with
+        {len(self.atompatches)} atompatches,
+        {len(self.bondpatches)} bondpatches,
+        {len(self.pairpatches)} pairpatches,
+        {len(self.anglepatches)} bondpatches,
+        {len(self.dihedralpatches)} dihedralpatches,
+        """
+        )
 
 
 class Topology:
@@ -281,9 +305,8 @@ class Topology:
         self.top = top
         self.forcefield_directory = ffdir
         self.ff = FF(ffdir)
-        self.patch = None
         if ffpatch:
-            self.patch = read_xml_ff(ffpatch)
+            self.ffpatches = FFPatches(ffpatch)
 
         self.atoms: dict[str, Atom] = {}
         self.bonds: dict[tuple[str, str], Bond] = {}
@@ -372,9 +395,6 @@ class Topology:
             self.atoms[i].bound_to_nrs.append(j)
             self.atoms[j].bound_to_nrs.append(i)
 
-    def patch_parameters(self):
-        pass
-
     def break_bond(self, atompair: tuple[str, str]):
         """Break bonds in topology.
 
@@ -421,13 +441,13 @@ class Topology:
         }
 
         # if there are no changed parameters for radicals, exit here
-        if self.patch is None:
+        if self.ffpatches is None:
             self._update_dict()
             return
 
         # Adjust parameters based on patch
         # atoms
-        if atompatches := self.patch.findall("Atoms/Atom[@class1]"):
+        if atompatches := self.ffpatches.atompatches:
             for atom in radical_pair:
                 logging.info(f"Adjust parameters for atom {atom}.")
 
@@ -585,13 +605,14 @@ def match_attr(patches: list[Element], attr: str, m: str) -> Optional[Element]:
 def match_multi_attr(
     patches: list[Element], attrs: list[str], m: list[str]
 ) -> Optional[Element]:
-    multimatch = ""
-    for attr in attrs:
-        if value := p.get(attr):
-            multimatch += value + " "
-    print(multimatch)
-    matches = []
-    return None
+    raise NotImplementedError('WIP')
+    # multimatch = ""
+    # for attr in attrs:
+    #     if value := p.get(attr):
+    #         multimatch += value + " "
+    # print(multimatch)
+    # matches = []
+    # return None
 
 
 def get_by_permutations(d: dict, key) -> Optional[Any]:
@@ -600,3 +621,12 @@ def get_by_permutations(d: dict, key) -> Optional[Any]:
         if value is not None:
             return value
     return None
+
+def get_element_id(e: Element) -> Optional[str]:
+    id = None
+    if e.tag == "Atom":
+        id = ""
+    elif e.tag == "Bond":
+        id = ""
+    return id
+
