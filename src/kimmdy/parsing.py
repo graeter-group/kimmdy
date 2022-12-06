@@ -5,7 +5,6 @@ import pandas as pd
 from copy import deepcopy
 
 from kimmdy.reaction import ReactionResult, ConversionRecipe, ConversionType
-from kimmdy.coordinatemanager import merge_section_slowgrowth
 
 # time to experiment
 # what a topplogy is
@@ -141,6 +140,7 @@ def read_topol_with_idx(path: Path, idxs: list[str]) -> Topology:
 def read_topol_mod_slowgrowth(path: Path, CR: ConversionRecipe, state_A_reduced: Topology,ffpath: Path) -> Topology:
     # TODO look into following #includes
     # TODO look into [ intermolecule ] section
+    from kimmdy.coordinatemanager import merge_section_slowgrowth
     with open(path, "r") as f:
         sections = get_sections(f, "\n")
         d = {}
