@@ -4,7 +4,7 @@ import numpy as np
 import logging
 
 from kimmdy.utils import find_radical_pos
-from kimmdy.parsing import write_topol, read_topol, Topology, get_sections, extract_section_name
+from kimmdy.parsing import read_topol, Topology
 from kimmdy.reaction import ReactionResult, ConversionRecipe, ConversionType
 
 def place_hydrogen(tpr: Path, trr: Path, recipe: ConversionRecipe):
