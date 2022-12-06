@@ -45,3 +45,10 @@ filter(lambda x: x.funct == '9', top.dihedrals.values()).__next__()
 
 #%%
 
+atoms = []
+for key in map(str, range(1,10)):
+    atoms.append(top.atoms[key])
+
+#%%
+atoms
+
