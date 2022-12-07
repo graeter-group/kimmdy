@@ -542,76 +542,25 @@ class Topology:
         return angles
 
     def _patch_parameters(self, atompair):
+        # TODO: handle this abstractly for different patch types and parameters 
         # Adjust parameters based on patch
         # atoms
         if atompatches := self.ffpatches.atompatches:
             for atom in atompair:
                 logging.info(f"Adjust parameters for atom {atom}.")
-
-                # don't turn a radical into a radical radical
-                if "_R" in atom.type:
-                    continue
-
-                atom.type = atom.type + "_R"
-                print(atom.type)
-                patch = match_attr(atompatches, "class1", atom.type)
-                if patch is not None:
-                    if mass_factor := patch.get("mass_factor"):
-                        atom.mass = str(float(atom.mass) * float(mass_factor))
-                    if charge_factor := patch.get("charge_factor"):
-                        atom.charge = str(float(atom.charge) * float(charge_factor))
+                pass
 
         # get (unbroken) bonds that the now radicals in the atompair are still involved in
         if bondpatches := self.ffpatches.bondpatches:
-            for radical in atompair:
-                for partner in radical.bound_to_nrs:
-                    bond_key = tuple(sorted([radical.nr, partner], key=str_to_int_or_0))
-                    bond = self.bonds[bond_key]
-                    atom_i = self.atoms[bond.ai]
-                    atom_j = self.atoms[bond.aj]
-                    patch = match_attr(bondpatches, "class1", atom_i.type)
-                    if patch is not None:
-                        logging.info(f"Adjust parameters for bond {bond}.")
-                        c0 = patch.get("c0")
-                        if c0 is not None:
-                            bond.c0 = c0
-
-                        c0_factor = patch.get("c0_factor")
-                        if c0_factor is not None:
-                            original_atomtypes = (
-                                atom_i.type.removesuffix("_R"),
-                                atom_j.type.removesuffix("_R"),
-                            )
-                            bondtype = get_by_permutations(
-                                self.ff.bondtypes, original_atomtypes
-                            )
-                            if bondtype is not None and bondtype.c0 is not None:
-                                bond.c0 = str(float(bondtype.c0) * float(c0_factor))
+            pass
 
         # get (unbroken) angles that the now radicals in the atompair are still involved in
         if anglepatches := self.ffpatches.anglepatches:
-            for radical in atompair:
-                angles = []
-                for partner in radical.bound_to_nrs:
-                    for partner_partner in self.atoms[partner].bound_to_nrs:
-                        key = (radical.nr, partner, partner_partner)
-                        angle = get_by_permutations(self.angles, key)
-                        if angle is not None:
-                            logging.info(f"Adjust parameters for angle {angle}.")
-                            angles.append(angle)
+            pass
 
         # get (unbroken) angles that the now radicals in the atompair are still involved in
         if dihedralpatches := self.ffpatches.dihedralpatches:
-            for radical in atompair:
-                dihedrals = []
-                for partner in radical.bound_to_nrs:
-                    for partner_partner in self.atoms[partner].bound_to_nrs:
-                        for partner_partner_partner in self.atoms[partner_partner].bound_to_nrs:
-                            key = (radical.nr, partner, partner_partner, partner_partner_partner)
-                            dihedral = get_by_permutations(self.dihedrals, key)
-                            if dihedral is not None:
-                                logging.info(f"Adjust parameters for dihedral {dihedral}.")
-                                dihedrals.append(dihedral)
+            pass
 
 
 
