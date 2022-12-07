@@ -124,6 +124,8 @@ class Dihedral:
 
     From gromacs topology:
     ';', 'ai', 'aj', 'ak', 'al', 'funct', 'c0', 'c1', 'c2', 'c3', 'c4', 'c5'
+    For proper dihedrals (funct 9): aj < ak
+    For improper dihedrals (funct 4): aj > ak
     """
 
     ai: str
@@ -483,11 +485,11 @@ class Topology:
                 self.angles[key] = Angle(key[0], key[1], key[2], '1')
 
         # add proper and improper dihedrals
-        self.dihedrals = {
-                key:dihedral
-                for key,dihedral in self.dihedrals.items()
-                if not all( x in [dihedral.ai, dihedral.aj, dihedral.ak, dihedral.al] for x in atompair)
-                }
+        all_dihedrals = (self._get_atom_proper_dihedrals(atompair_nrs[0]) +
+                         self._get_atom_proper_dihedrals(atompair_nrs[1]))
+        for key in all_dihedrals:
+            if self.dihedrals.get(key) is None:
+                self.dihedrals[key] = Dihedral(key[0], key[1], key[2], key[3], '9')
 
         # add pairs
         dihpairs = [
@@ -540,6 +542,41 @@ class Topology:
                     else:
                         angles.append((ak, aj, ai))
         return angles
+
+    def _get_atom_proper_dihedrals(self, atom_nr):
+        """
+        each atom has a list of atoms it is bound to.
+        get a list of dihedrals that one atom is involved in
+        based in these lists.
+        """
+        dihedrals = []
+        # atom is at the margin
+        ai = atom_nr
+        for aj in self.atoms[ai].bound_to_nrs:
+            for ak in self.atoms[aj].bound_to_nrs:
+                if ai == ak: continue
+                for al in self.atoms[ak].bound_to_nrs:
+                    if al == ak or aj == al : continue
+                    dihedrals.append((ai, aj, ak, al))
+        # atom is at one of the center positions
+        aj = atom_nr
+        partners = self.atoms[aj].bound_to_nrs
+        for ai in partners:
+            for ak in partners:
+                if ai == ak: continue
+                for al in self.atoms[ak].bound_to_nrs:
+                    if al == ak or aj == al : continue
+                    dihedrals.append((ai, aj, ak, al))
+
+        return dihedrals
+
+    def _get_center_atom_dihedrals(self, atom_nr):
+        pass
+
+
+    def _get_margin_atom_dihedrals(self, atom_nr):
+        pass
+
 
     def _patch_parameters(self, atompair):
         # TODO: handle this abstractly for different patch types and parameters 
@@ -606,6 +643,9 @@ def get_by_permutations(d: dict, key) -> Optional[Any]:
     # TODO: oh, we might not even need this in all cases
     # not just bonds, but also
     # angles and dihedrals have a well defined order
+    # What might be useful instead:
+    # an angle, (i,j,k) might also be keyd as (k,j,i)
+    # a dihedral, (i,j,k,l) might also be keyed as (l,k,j,i)
     for k in permutations(key):
         value = d.get(k, None)
         if value is not None:

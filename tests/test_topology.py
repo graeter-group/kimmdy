@@ -39,8 +39,16 @@ top.break_bond(('9', '10'))
 top.bind_bond(('9', '10'))
 
 #%%
-top._get_atom_angles('1')
+top._get_atom_proper_dihedrals('1')
 
+#%%
+keys = top.dihedrals.keys()
+order = []
+for key in keys:
+    res = int(key[1]) < int(key[2])
+    order.append(res)
+    
+order
 
 #%%
 for p in top.ffpatches.atompatches:
