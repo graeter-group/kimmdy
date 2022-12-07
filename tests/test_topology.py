@@ -36,10 +36,19 @@ oldtop = deepcopy(top)
 top.break_bond(('9', '10'))
 
 #%%
+top.bind_bond(('9', '10'))
+
+#%%
+top._get_atom_angles('1')
+
+
+#%%
 for p in top.ffpatches.atompatches:
     print(get_element_id(p))
 
+
 #%%
+
 filter(lambda x: x.funct == '9', top.dihedrals.values()).__next__()
 
 
@@ -50,5 +59,3 @@ for key in map(str, range(1,10)):
     atoms.append(top.atoms[key])
 
 #%%
-atoms
-
