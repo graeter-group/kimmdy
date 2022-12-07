@@ -88,9 +88,9 @@ class Bond:
     """Information about one bond
 
     A class containing bond information as in the bonds section of the topology.
-
     From gromacs topology:
     'ai', 'aj', 'funct', 'c0', 'c1', 'c2', 'c3
+    With ai < aj
     """
 
     ai: str
@@ -163,6 +163,7 @@ class Angle:
 
     From gromacs topology:
     ';', 'ai', 'aj', 'ak', 'funct', 'c0', 'c1', 'c2', 'c3'
+    With ai < ak
     """
 
     ai: str
@@ -475,11 +476,11 @@ class Topology:
         atompair[1].bound_to_nrs.append(atompair[0].nr)
 
         # add angles
-        self.angles = {
-                key:angle
-                for key, angle in self.angles.items()
-                if not all(x in [angle.ai, angle.aj, angle.ak] for x in atompair)
-        }
+        all_angles = (self._get_atom_angles(atompair_nrs[0]) +
+                      self._get_atom_angles(atompair_nrs[1]))
+        for key in all_angles:
+            if self.angles.get(key) is None:
+                self.angles[key] = Angle(key[0], key[1], key[2], '1')
 
         # add proper and improper dihedrals
         self.dihedrals = {
@@ -506,7 +507,39 @@ class Topology:
 
         self._update_dict()
 
-        raise NotImplemented("WIP")
+    def _get_atom_angles(self, atom_nr):
+        """
+        each atom has a list of atoms it is bound to
+        get a list of angles that one atom is involved in
+        based in these lists.
+        Angles between atoms ai, aj, ak satisfy ai < ak
+        """
+        return (self._get_center_atom_angles(atom_nr) +
+                self._get_margin_atom_angles(atom_nr))
+
+    def _get_center_atom_angles(self, atom_nr):
+        # atom_nr in the middle of an angle
+        angles = []
+        aj = atom_nr
+        partners = self.atoms[aj].bound_to_nrs
+        for ai in partners:
+            for ak in partners:
+                if int(ai) < int(ak):
+                    angles.append((ai, aj, ak))
+        return angles
+
+    def _get_margin_atom_angles(self, atom_nr):
+        # atom_nr in the middle of an angle
+        angles = []
+        ai = atom_nr
+        for aj in self.atoms[ai].bound_to_nrs:
+                for ak in self.atoms[aj].bound_to_nrs:
+                    if ai == ak: continue
+                    if int(ai) < int(ak):
+                        angles.append((ai, aj, ak))
+                    else:
+                        angles.append((ak, aj, ai))
+        return angles
 
     def _patch_parameters(self, atompair):
         # Adjust parameters based on patch
@@ -520,6 +553,7 @@ class Topology:
                     continue
 
                 atom.type = atom.type + "_R"
+                print(atom.type)
                 patch = match_attr(atompatches, "class1", atom.type)
                 if patch is not None:
                     if mass_factor := patch.get("mass_factor"):
@@ -620,6 +654,9 @@ def match_multi_attr(
 
 
 def get_by_permutations(d: dict, key) -> Optional[Any]:
+    # TODO: oh, we might not even need this in all cases
+    # not just bonds, but also
+    # angles and dihedrals have a well defined order
     for k in permutations(key):
         value = d.get(k, None)
         if value is not None:
