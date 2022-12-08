@@ -1,0 +1,35 @@
+---
+title: Hexala topology
+format: html
+mermaid-format: svg
+execute:
+  warning: false
+  echo: false
+---
+
+# Hexala
+
+ ```{python} 
+ from kimmdy.parsing import read_topol
+ from kimmdy.topology import Topology
+ from pathlib import Path
+ from kimmdy.misc_helper import top_to_graph
+ ```
+
+```{python}
+hexala_top = read_topol(Path('hexala.top'))
+ffdir = Path("../assets/amber99sb-star-ildnp.ff")
+ffpatch = Path('amber99sb_patches.xml')
+top = Topology(hexala_top, ffdir, ffpatch)
+
+ls = top_to_graph(top) 
+with open("hexala-top.dot", "w") as f:
+  f.writelines(ls)
+```
+
+```{dot}
+//| label: fig-hexala
+//| fig-cap: "A diagram of the hexala topology"
+//| file: hexala-top.dot
+//| column: page
+```

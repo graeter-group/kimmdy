@@ -1,7 +1,30 @@
 from pathlib import Path
 import subprocess
 from typing import Union
+from kimmdy.topology import Topology
 
+
+def topology_to_edgelist(top: Topology):
+    bonds = []
+    for atom in list(top.atoms.values()):
+        bonds.extend(top._get_atom_bonds(atom.nr))
+
+    return [f'"{b[0]} {top.atoms[b[0]].type}" -- "{b[1]} {top.atoms[b[1]].type}";' for b in bonds]
+
+def edgelist_to_dot_graph(ls: list[str]):
+    header = """
+        graph G {
+          layout=neato
+          node [shape="circle"]
+    """
+    tail = """
+        }
+    """
+    body = "\n".join(ls)
+    return header + body + tail
+
+def top_to_graph(top: Topology):
+    return edgelist_to_dot_graph(topology_to_edgelist(top))
 
 def concat_traj(run_dir: Union[Path, str], out: Union[Path, str], run_types=None):
     """Find and concatenate trajectories from KIMMDY runs.
