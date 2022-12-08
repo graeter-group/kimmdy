@@ -65,7 +65,7 @@ class TestTopology:
         top = Topology(self.hexala_top, self.ffdir, self.ffpatch)
         og_top = deepcopy(top)
         # bond = ('9', '10')
-        bond = ('1', '5')
+        bond = ('1', '2')
         top.break_bond(bond)
         top.bind_bond(bond)
         assert top.bonds == og_top.bonds
@@ -73,18 +73,17 @@ class TestTopology:
         assert top.angles == og_top.angles
         assert top.proper_dihedrals == og_top.proper_dihedrals
 
-    # @given(bondindex = st.integers(min_value=0, max_value=70))
-    # def test_break_bind_random_bond_hexala(self, bondindex):
-    #     top = Topology(self.hexala_top, self.ffdir, self.ffpatch)
-    #     og_top = deepcopy(top)
-    #     bond = list(top.bonds.keys())[bondindex]
-    #     bond = (bond[0], bond[1])
-    #     top.break_bond(bond)
-    #     top.bind_bond(bond)
-    #     assert top.bonds == og_top.bonds
-    #     assert top.pairs == og_top.pairs
-    #     assert top.angles == og_top.angles
-    #     assert top.proper_dihedrals == og_top.proper_dihedrals
+    @given(bondindex = st.integers(min_value=0, max_value=70))
+    def test_break_bind_random_bond_hexala(self, bondindex):
+        top = Topology(self.hexala_top, self.ffdir, self.ffpatch)
+        og_top = deepcopy(top)
+        bond = list(top.bonds.keys())[bondindex]
+        top.break_bond(bond)
+        top.bind_bond(bond)
+        assert top.bonds == og_top.bonds
+        assert top.pairs == og_top.pairs
+        assert top.angles == og_top.angles
+        assert top.proper_dihedrals == og_top.proper_dihedrals
 
 
     def test_generate_topology_from_bound_to(self):
