@@ -400,14 +400,10 @@ class Topology:
             ] = dihedral
 
     def get_proper_dihedrals(self):
-        return [
-            dihedral for dihedral in self.dihedrals.values() if dihedral.funct == "9"
-        ]
+        return { k:v for k,v in self.dihedrals.items() if v.funct == "9" }
 
     def get_improper_dihedrals(self):
-        return [
-            dihedral for dihedral in self.dihedrals.values() if dihedral.funct == "4"
-        ]
+        return { k:v for k,v in self.dihedrals.items() if v.funct == "4" }
 
     def _initialize_graph(self):
         for bond in self.bonds.values():
@@ -738,6 +734,12 @@ def generate_topology_from_bound_to(atoms: list[Atom]) -> Topology:
         keys = top._get_atom_pairs(atom.nr)
         for key in keys:
             top.pairs[key] = Pair(key[0], key[1], '1')
+
+    # dihedrals
+    for atom in top.atoms.values():
+        keys = top._get_atom_proper_dihedrals(atom.nr)
+        for key in keys:
+            top.dihedrals[key] = Dihedral(key[0], key[1], key[2], key[3], '9')
 
     top._update_dict()
     return top

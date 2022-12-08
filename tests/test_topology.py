@@ -64,7 +64,7 @@ def test_generate_topology_from_bound_to():
     assert newtop.bonds == og_top.bonds
     assert newtop.pairs == og_top.pairs
     assert newtop.angles == og_top.angles
-    assert newtop.dihedrals == og_top.dihedrals
+    assert newtop.get_proper_dihedrals() == og_top.get_proper_dihedrals()
 
 # @given(
 #     atoms = random_atomlist()
