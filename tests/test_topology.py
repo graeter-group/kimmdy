@@ -6,7 +6,9 @@ import os
 from xml.etree.ElementTree import Element
 from kimmdy.parsing import is_not_comment, read_topol, read_xml_ff
 from kimmdy.changemanager import LocalGraph
-from kimmdy.topology import FF, Topology, Atom, Bond, Dihedral, Pair, get_by_permutations, get_element_id
+from hypothesis import given, strategies as st
+from kimmdy.topology import FF, Angle, Topology, Atom, Bond, Dihedral, Pair, generate_topology_from_bound_to, get_by_permutations, get_element_id
+import string
 
 #%%
 def set_dir():
@@ -26,44 +28,50 @@ ffpatch = Path('amber99sb_patches.xml')
 top = Topology(hexala_top, ffdir, ffpatch)
 oldtop = deepcopy(top)
 
-# 9 = CA
-# 10 = HA
-# in residue 2 Ala
-# 9        CT       2        ALA      CA       9        0.0337   12.01   
-# 10       H1       2        ALA      HA       10       0.0823   1.008   
+allowed_text = st.text(
+    string.ascii_letters + "*+", min_size=1, max_size=5
+)
 
-#%%
-top.break_bond(('9', '10'))
+@st.composite
+def random_atomlist(draw):
+    n = draw(st.integers(min_value=10, max_value=50))
+    atom_nrs = [str(x + 1) for x in range(n)]
+    bound_to = st.lists(st.integers(min_value=1, max_value=n), min_size=1, max_size=n)
+    atoms = []
+    for i in atom_nrs:
+        type = draw(allowed_text)
+        resnr = draw(allowed_text)
+        residue = draw(allowed_text)
+        a = draw(allowed_text)
+        cgnr = draw(allowed_text)
+        charge = draw(allowed_text)
+        mass = draw(allowed_text)
+        atom = Atom(str(i), type, resnr, residue, a, cgnr, charge, mass)
+        atom.bound_to_nrs = [str(x) for x in draw(bound_to) if str(x) != i]
+        atoms.append(atom)
 
-#%%
-top.bind_bond(('9', '10'))
-
-#%%
-top._get_atom_proper_dihedrals('1')
-
-#%%
-keys = top.dihedrals.keys()
-order = []
-for key in keys:
-    res = int(key[1]) < int(key[2])
-    order.append(res)
-    
-order
-
-#%%
-for p in top.ffpatches.atompatches:
-    print(get_element_id(p))
+    return atoms
 
 
-#%%
+def test_generate_topology_from_bound_to():
+    hexala_top = read_topol(Path('hexala.top'))
+    ffdir = Path("../assets/amber99sb-star-ildnp.ff")
+    ffpatch = Path('amber99sb_patches.xml')
+    og_top = Topology(hexala_top, ffdir, ffpatch)
 
-filter(lambda x: x.funct == '9', top.dihedrals.values()).__next__()
+    atoms = list(og_top.atoms.values())
+    newtop = generate_topology_from_bound_to(atoms)
+    assert newtop.bonds == og_top.bonds
+    assert newtop.pairs == og_top.pairs
+    assert newtop.angles == og_top.angles
+    assert newtop.dihedrals == og_top.dihedrals
+
+# @given(
+#     atoms = random_atomlist()
+# )
+# def test_break_bind_bond_invertible(atoms):
+#     top = generate_topology_from_bound_to(atoms)
+#     print(top)
+#     assert False
 
 
-#%%
-
-atoms = []
-for key in map(str, range(1,10)):
-    atoms.append(top.atoms[key])
-
-#%%
