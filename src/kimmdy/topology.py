@@ -421,11 +421,6 @@ class Topology:
         atompair_nrs = tuple(sorted(atompair_nrs, key=str_to_int_or_0))
         atompair = [self.atoms[atompair_nrs[0]], self.atoms[atompair_nrs[1]]]
 
-        # bonds
-        # remove bonds
-        removed = self.bonds.pop(atompair_nrs, None)
-        logging.info(f"removed bond: {removed}")
-
         # update bound_to
         try:
             atompair[0].bound_to_nrs.remove(atompair[1].nr)
@@ -433,6 +428,11 @@ class Topology:
         except ValueError as _:
             m = f"tried to remove bond between already disconnected atoms: {atompair}."
             logging.warning(m)
+
+        # bonds
+        # remove bonds
+        removed = self.bonds.pop(atompair_nrs, None)
+        logging.info(f"removed bond: {removed}")
 
         # remove angles
         self.angles = {
@@ -492,15 +492,16 @@ class Topology:
         atompair_nrs = tuple(sorted(atompair_nrs, key=str_to_int_or_0))
         atompair = [self.atoms[atompair_nrs[0]], self.atoms[atompair_nrs[1]]]
 
+        # update bound_to
+        atompair[0].bound_to_nrs.append(atompair[1].nr)
+        atompair[1].bound_to_nrs.append(atompair[0].nr)
+
         # bonds
         # add bond
         bond = Bond(atompair_nrs[0], atompair_nrs[1], "1")
         self.bonds[atompair_nrs] = bond
         logging.info(f"added bond: {bond}")
 
-        # update bound_to
-        atompair[0].bound_to_nrs.append(atompair[1].nr)
-        atompair[1].bound_to_nrs.append(atompair[0].nr)
 
         # add angles
         all_angles = self._get_atom_angles(atompair_nrs[0]) + self._get_atom_angles(
@@ -511,22 +512,18 @@ class Topology:
                 self.angles[key] = Angle(key[0], key[1], key[2], "1")
 
         # add proper and improper dihedrals
+        # add prope dihedrals and pairs
         all_dihedrals = self._get_atom_proper_dihedrals(
             atompair_nrs[0]
         ) + self._get_atom_proper_dihedrals(atompair_nrs[1])
         for key in all_dihedrals:
             if self.proper_dihedrals.get(key) is None:
                 self.proper_dihedrals[key] = Dihedral(key[0], key[1], key[2], key[3], "9")
-        
-        # TODO: add improper dihedrals
+            pairkey = (key[0], key[3])
+            if self.pairs.get(pairkey) is None:
+                self.pairs[pairkey] = Pair(pairkey[0], pairkey[1], "1")
 
-        # add pairs
-        all_pairs = self._get_atom_pairs(atompair_nrs[0]) + self._get_atom_pairs(
-            atompair_nrs[1]
-        )
-        for key in all_pairs:
-            if self.pairs.get(key) is None:
-                self.pairs[key] = Pair(key[0], key[1], "1")
+        # TODO: add improper dihedrals
 
         # if there are no changed parameters for radicals, exit here
         if self.ffpatches is None:
@@ -548,6 +545,8 @@ class Topology:
         return bonds
 
     def _get_atom_pairs(self, atom_nr: str) -> list[tuple[str, str]]:
+        # TODO: this misses some
+        # use dihpairs instead for now 
         ai = atom_nr
         pairs = []
         for aj in self.atoms[ai].bound_to_nrs:
