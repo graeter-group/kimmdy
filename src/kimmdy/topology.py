@@ -1,14 +1,14 @@
-from dataclasses import dataclass, field, replace
+from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Hashable, Optional, Tuple
+from typing import Any, Optional
 from xml.etree.ElementTree import Element
-from kimmdy.parsing import TopologyDict, read_topol, read_xml_ff, is_not_comment
+from kimmdy.parsing import TopologyDict, read_topol, read_xml_ff
 from itertools import takewhile, permutations
 import re
 import textwrap
 import logging
 
-from kimmdy.utils import sort_bond, str_to_int_or_0
+from kimmdy.utils import str_to_int_or_0
 
 
 @dataclass(order=True)
@@ -331,11 +331,11 @@ class Topology:
         if ffpatch:
             self.ffpatches = FFPatches(ffpatch)
 
-        self._get_atoms()
-        self._get_bonds()
-        self._get_pairs()
-        self._get_angles()
-        self._get_dihedrals()
+        self._parse_atoms()
+        self._parse_bonds()
+        self._parse_pairs()
+        self._parse_angles()
+        self._parse_dihedrals()
 
         self._update_dict()
 
@@ -367,31 +367,31 @@ class Topology:
     def __str__(self) -> str:
         return str(self.atoms)
 
-    def _get_atoms(self):
+    def _parse_atoms(self):
         ls = self.top["atoms"]
         for l in ls:
             atom = Atom.from_top_line(l)
             self.atoms[atom.nr] = atom
 
-    def _get_bonds(self):
+    def _parse_bonds(self):
         ls = self.top["bonds"]
         for l in ls:
             bond = Bond.from_top_line(l)
             self.bonds[(bond.ai, bond.aj)] = bond
 
-    def _get_pairs(self):
+    def _parse_pairs(self):
         ls = self.top["pairs"]
         for l in ls:
             pair = Pair.from_top_line(l)
             self.pairs[(pair.ai, pair.aj)] = pair
 
-    def _get_angles(self):
+    def _parse_angles(self):
         ls = self.top["angles"]
         for l in ls:
             angle = Angle.from_top_line(l)
             self.angles[(angle.ai, angle.aj, angle.ak)] = angle
 
-    def _get_dihedrals(self):
+    def _parse_dihedrals(self):
         ls = self.top["dihedrals"]
         for l in ls:
             dihedral = Dihedral.from_top_line(l)
