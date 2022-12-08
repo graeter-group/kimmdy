@@ -28,6 +28,7 @@ with open("hexala-top.dot", "w") as f:
 ```
 
 ```{dot}
+//| echo: false
 //| label: fig-hexala
 //| fig-cap: "A diagram of the hexala topology"
 //| file: hexala-top.dot
