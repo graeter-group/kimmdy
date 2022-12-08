@@ -616,12 +616,8 @@ class Topology:
                 if ai == ak:
                     continue
                 for al in self.atoms[ak].bound_to_nrs:
-                    # no dihedrals with H
-                    types = [self.atoms[a].type for a in [ai, aj, ak, al]]
-                    has_h = any([t.startswith('H') for t in types])
-                    # only use dihedrals with ai < al
                     # to prevent double counting
-                    if al == ak or aj == al or has_h or int(ai) > int(al):
+                    if al == ak or aj == al or int(aj) > int(ak):
                         continue
                     dihedrals.append((ai, aj, ak, al))
         return dihedrals
@@ -636,12 +632,8 @@ class Topology:
                 if ai == ak:
                     continue
                 for al in self.atoms[ak].bound_to_nrs:
-                    # no dihedrals with H
-                    types = [self.atoms[a].type for a in [ai, aj, ak, al]]
-                    has_h = any([t.startswith('H') for t in types])
-                    # only use dihedrals with ai < al
                     # to prevent double counting
-                    if al == ak or aj == al or has_h or int(ai) > int(al):
+                    if al == ak or aj == al or int(aj) > int(ak):
                         continue
                     dihedrals.append((ai, aj, ak, al))
         return dihedrals
