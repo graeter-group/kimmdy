@@ -326,6 +326,7 @@ class Topology:
 
         if ffdir:
             self.ff = FF(ffdir)
+        self.ffpatches = None
         if ffpatch:
             self.ffpatches = FFPatches(ffpatch)
 
