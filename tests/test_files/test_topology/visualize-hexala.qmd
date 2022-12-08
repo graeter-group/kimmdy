@@ -4,17 +4,17 @@ format: html
 mermaid-format: svg
 execute:
   warning: false
-  echo: false
+  echo: true
 ---
 
 # Hexala
 
- ```{python} 
- from kimmdy.parsing import read_topol
- from kimmdy.topology import Topology
- from pathlib import Path
- from kimmdy.misc_helper import top_to_graph
- ```
+```{python}
+from kimmdy.parsing import read_topol
+from kimmdy.topology import Topology
+from pathlib import Path
+from kimmdy.misc_helper import top_to_graph
+```
 
 ```{python}
 hexala_top = read_topol(Path('hexala.top'))
