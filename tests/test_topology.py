@@ -52,6 +52,19 @@ def random_atomlist(draw):
 
     return atoms
 
+def test_break_bind_bond_hexala():
+    hexala_top = read_topol(Path('hexala.top'))
+    ffdir = Path("../assets/amber99sb-star-ildnp.ff")
+    ffpatch = Path('amber99sb_patches.xml')
+    top = Topology(hexala_top, ffdir, ffpatch)
+    og_top = deepcopy(top)
+    top.break_bond(('9', '10'))
+    top.bind_bond(('9', '10'))
+    assert top.bonds == og_top.bonds
+    assert top.pairs == og_top.pairs
+    assert top.angles == og_top.angles
+    assert top.proper_dihedrals == og_top.proper_dihedrals
+
 
 def test_generate_topology_from_bound_to():
     hexala_top = read_topol(Path('hexala.top'))
@@ -66,12 +79,12 @@ def test_generate_topology_from_bound_to():
     assert newtop.angles == og_top.angles
     assert newtop.proper_dihedrals == og_top.proper_dihedrals
 
-# @given(
-#     atoms = random_atomlist()
-# )
-# def test_break_bind_bond_invertible(atoms):
-#     top = generate_topology_from_bound_to(atoms)
-#     print(top)
-#     assert False
+@given(
+    atoms = random_atomlist()
+)
+def test_break_bind_bond_invertible(atoms):
+    # top = generate_topology_from_bound_to(atoms)
+    # TODO
+    assert True
 
 

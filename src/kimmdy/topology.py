@@ -518,13 +518,12 @@ class Topology:
                 self.proper_dihedrals[key] = Dihedral(key[0], key[1], key[2], key[3], "9")
 
         # add pairs
-        dihpairs = [
-            tuple(sorted((d.ai, d.al), key=str_to_int_or_0))
-            for d in self.proper_dihedrals.values()
-        ]
-        self.pairs = {
-            key: value for key, value in self.pairs.items() if key in dihpairs
-        }
+        all_pairs = self._get_atom_pairs(atompair_nrs[0]) + self._get_atom_pairs(
+            atompair_nrs[1]
+        )
+        for key in all_pairs:
+            if self.pairs.get(key) is None:
+                self.pairs[key] = Pair(key[0], key[1], "1")
 
         # if there are no changed parameters for radicals, exit here
         if self.ffpatches is None:
@@ -540,6 +539,7 @@ class Topology:
         ai = atom_nr
         bonds = []
         for aj in self.atoms[ai].bound_to_nrs:
+            # TODO: sorte here and filter later instead 
             if int(ai) < int(aj):
                 bonds.append((ai, aj))
         return bonds
@@ -552,9 +552,10 @@ class Topology:
                 if ai == ak:
                     continue
                 for al in self.atoms[ak].bound_to_nrs:
-                    if al == ak or aj == al or int(ai) > int(al):
+                    if al == ak or aj == al:
                         continue
-                    pairs.append((ai, al))
+                    key = sorted([ai, al], key=int)
+                    pairs.append((key[0], key[1]))
         return pairs
 
     def _get_atom_angles(self, atom_nr: str) -> list[tuple[str, str, str]]:
@@ -644,7 +645,7 @@ class Topology:
         # atoms
         if atompatches := self.ffpatches.atompatches:
             for atom in atompair:
-                logging.info(f"Adjust parameters for atom {atom}.")
+                # logging.info(f"Adjust parameters for atom {atom}.")
                 pass
 
         # get (unbroken) bonds that the now radicals in the atompair are still involved in
