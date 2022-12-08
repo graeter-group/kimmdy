@@ -10,7 +10,6 @@ import logging
 
 from kimmdy.utils import str_to_int_or_0
 
-
 @dataclass(order=True)
 class Atom:
     """Information about one atom
@@ -318,9 +317,8 @@ class Topology:
         self.bonds: dict[tuple[str, str], Bond] = {}
         self.pairs: dict[tuple[str, str], Pair] = {}
         self.angles: dict[tuple[str, str, str], Angle] = {}
-        self.dihedrals: dict[tuple[str, str, str, str], Dihedral] = {}
-        self.proper_dihedrals: list[Dihedral] = []
-        self.improper_dihedrals: list[Dihedral] = []
+        self.proper_dihedrals: dict[tuple[str, str, str, str], Dihedral] = {}
+        self.improper_dihedrals: dict[tuple[str, str, str, str], Dihedral] = {}
 
         # generate empty Topology if empty TopologyDict
         if self.top == {}:
@@ -346,7 +344,7 @@ class Topology:
         self.top["bonds"] = [attributes_to_list(x) for x in self.bonds.values()]
         self.top["pairs"] = [attributes_to_list(x) for x in self.pairs.values()]
         self.top["angles"] = [attributes_to_list(x) for x in self.angles.values()]
-        self.top["dihedrals"] = [attributes_to_list(x) for x in self.dihedrals.values()]
+        self.top["dihedrals"] = [attributes_to_list(x) for x in self.proper_dihedrals.values()]
 
     def to_dict(self) -> TopologyDict:
         self._update_dict()
@@ -360,7 +358,8 @@ class Topology:
         {len(self.bonds)} bonds,
         {len(self.angles)} angles,
         {len(self.pairs)} pairs,
-        {len(self.dihedrals)} dihedrals
+        {len(self.proper_dihedrals)} proper dihedrals
+        {len(self.improper_dihedrals)} improper dihedrals
         """
         )
 
@@ -395,15 +394,14 @@ class Topology:
         ls = self.top["dihedrals"]
         for l in ls:
             dihedral = Dihedral.from_top_line(l)
-            self.dihedrals[
-                (dihedral.ai, dihedral.aj, dihedral.ak, dihedral.al)
-            ] = dihedral
-
-    def get_proper_dihedrals(self):
-        return { k:v for k,v in self.dihedrals.items() if v.funct == "9" }
-
-    def get_improper_dihedrals(self):
-        return { k:v for k,v in self.dihedrals.items() if v.funct == "4" }
+            if dihedral.funct == "4":
+                self.improper_dihedrals[
+                    (dihedral.ai, dihedral.aj, dihedral.ak, dihedral.al)
+                ] = dihedral
+            else:
+                self.proper_dihedrals[
+                    (dihedral.ai, dihedral.aj, dihedral.ak, dihedral.al)
+                ] = dihedral
 
     def _initialize_graph(self):
         for bond in self.bonds.values():
@@ -443,9 +441,17 @@ class Topology:
         }
 
         # remove proper and improper dihedrals
-        self.dihedrals = {
+        self.proper_dihedrals = {
             key: dihedral
-            for key, dihedral in self.dihedrals.items()
+            for key, dihedral in self.proper_dihedrals.items()
+            if not all(
+                x in [dihedral.ai, dihedral.aj, dihedral.ak, dihedral.al]
+                for x in atompair_nrs
+            )
+        }
+        self.improper_dihedrals = {
+            key: dihedral
+            for key, dihedral in self.improper_dihedrals.items()
             if not all(
                 x in [dihedral.ai, dihedral.aj, dihedral.ak, dihedral.al]
                 for x in atompair_nrs
@@ -455,7 +461,7 @@ class Topology:
         # remove pairs
         dihpairs = [
             tuple(sorted((d.ai, d.al), key=str_to_int_or_0))
-            for d in self.dihedrals.values()
+            for d in self.proper_dihedrals.values()
         ]
         self.pairs = {
             key: value for key, value in self.pairs.items() if key in dihpairs
@@ -508,13 +514,13 @@ class Topology:
             atompair_nrs[0]
         ) + self._get_atom_proper_dihedrals(atompair_nrs[1])
         for key in all_dihedrals:
-            if self.dihedrals.get(key) is None:
-                self.dihedrals[key] = Dihedral(key[0], key[1], key[2], key[3], "9")
+            if self.proper_dihedrals.get(key) is None:
+                self.proper_dihedrals[key] = Dihedral(key[0], key[1], key[2], key[3], "9")
 
         # add pairs
         dihpairs = [
             tuple(sorted((d.ai, d.al), key=str_to_int_or_0))
-            for d in self.dihedrals.values()
+            for d in self.proper_dihedrals.values()
         ]
         self.pairs = {
             key: value for key, value in self.pairs.items() if key in dihpairs
@@ -610,7 +616,12 @@ class Topology:
                 if ai == ak:
                     continue
                 for al in self.atoms[ak].bound_to_nrs:
-                    if al == ak or aj == al:
+                    # no dihedrals with H
+                    types = [self.atoms[a].type for a in [ai, aj, ak, al]]
+                    has_h = any([t.startswith('H') for t in types])
+                    # only use dihedrals with ai < al
+                    # to prevent double counting
+                    if al == ak or aj == al or has_h or int(ai) > int(al):
                         continue
                     dihedrals.append((ai, aj, ak, al))
         return dihedrals
@@ -625,7 +636,12 @@ class Topology:
                 if ai == ak:
                     continue
                 for al in self.atoms[ak].bound_to_nrs:
-                    if al == ak or aj == al:
+                    # no dihedrals with H
+                    types = [self.atoms[a].type for a in [ai, aj, ak, al]]
+                    has_h = any([t.startswith('H') for t in types])
+                    # only use dihedrals with ai < al
+                    # to prevent double counting
+                    if al == ak or aj == al or has_h or int(ai) > int(al):
                         continue
                     dihedrals.append((ai, aj, ak, al))
         return dihedrals
@@ -692,7 +708,8 @@ def match_multi_attr(
 def get_by_permutations(d: dict, key) -> Optional[Any]:
     # TODO: oh, we might not even need this in all cases
     # not just bonds, but also
-    # angles and dihedrals have a well defined order
+    # angles and dihedrals have a well defined order.
+    # Or do they?
     # What might be useful instead:
     # an angle, (i,j,k) might also be keyd as (k,j,i)
     # a dihedral, (i,j,k,l) might also be keyed as (l,k,j,i)
@@ -739,7 +756,9 @@ def generate_topology_from_bound_to(atoms: list[Atom]) -> Topology:
     for atom in top.atoms.values():
         keys = top._get_atom_proper_dihedrals(atom.nr)
         for key in keys:
-            top.dihedrals[key] = Dihedral(key[0], key[1], key[2], key[3], '9')
+            top.proper_dihedrals[key] = Dihedral(key[0], key[1], key[2], key[3], '9')
+
+    # TODO: impropers
 
     top._update_dict()
     return top
