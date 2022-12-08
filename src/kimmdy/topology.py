@@ -516,6 +516,8 @@ class Topology:
         for key in all_dihedrals:
             if self.proper_dihedrals.get(key) is None:
                 self.proper_dihedrals[key] = Dihedral(key[0], key[1], key[2], key[3], "9")
+        
+        # TODO: add improper dihedrals
 
         # add pairs
         all_pairs = self._get_atom_pairs(atompair_nrs[0]) + self._get_atom_pairs(
@@ -617,10 +619,12 @@ class Topology:
                 if ai == ak:
                     continue
                 for al in self.atoms[ak].bound_to_nrs:
-                    # to prevent double counting
-                    if al == ak or aj == al or int(aj) > int(ak):
+                    if al == ak or aj == al:
                         continue
-                    dihedrals.append((ai, aj, ak, al))
+                    if int(aj) < int(ak):
+                        dihedrals.append((ai, aj, ak, al))
+                    else:
+                        dihedrals.append((al, ak, aj, ai))
         return dihedrals
 
     def _get_margin_atom_dihedrals(
@@ -633,10 +637,12 @@ class Topology:
                 if ai == ak:
                     continue
                 for al in self.atoms[ak].bound_to_nrs:
-                    # to prevent double counting
-                    if al == ak or aj == al or int(aj) > int(ak):
+                    if al == ak or aj == al:
                         continue
-                    dihedrals.append((ai, aj, ak, al))
+                    if int(aj) < int(ak):
+                        dihedrals.append((ai, aj, ak, al))
+                    else:
+                        dihedrals.append((al, ak, aj, ai))
         return dihedrals
 
     def _patch_parameters(self, atompair: list[Atom]):
