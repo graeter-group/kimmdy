@@ -320,7 +320,7 @@ class DihedralType:
             i=l[0],
             j=l[1],
             k=l[2],
-            l=l[2],
+            l=l[3],
             funct=l[4],
             c0=field_or_none(l, 5),
             c1=field_or_none(l, 6),
@@ -329,6 +329,23 @@ class DihedralType:
             c4=field_or_none(l, 9),
             c5=field_or_none(l, 10),
         )
+
+
+@dataclass(order=True)
+class ResidueType:
+    """Information about one residuetype
+    """
+
+    residue: str
+    atoms: list[list[str]]
+    bonds: list[list[str]]
+    impropers: list[list[str]]
+
+    @classmethod
+    def from_section(cls, ls: list[str]):
+        # TODO
+        pass
+
 
 
 
@@ -342,6 +359,7 @@ class FF:
         self.angletypes: dict[tuple[str, str, str], AngleType] = {}
         self.proper_dihedraltypes: dict[tuple[str, str, str, str], list[DihedralType]] = {}
         self.improper_dihedraltypes: dict[tuple[str, str, str, str], DihedralType] = {}
+        self.residuetypes: dict[str, list[ResidueType]]
 
         nonbonded_path = ffdir / "ffnonbonded.itp"
         nonbonded = read_topol(nonbonded_path)
@@ -381,6 +399,10 @@ class FF:
                         (dihedraltype.i, dihedraltype.j, dihedraltype.k, dihedraltype.l)
                     ].append(dihedraltype)
 
+            aminoacids = ffdir / "amionoacids.rtp"
+            # TODO
+
+
     def __repr__(self) -> str:
         return textwrap.dedent(
             f"""\
@@ -389,6 +411,7 @@ class FF:
         {len(self.bondtypes)} bondtypes,
         {len(self.angletypes)} angletypes,
         {len(self.proper_dihedraltypes)} dihedraltypes
+        {len(self.residuetypes)} residuetypes
         """
         )
 
@@ -668,7 +691,7 @@ class Topology:
         ai = atom_nr
         bonds = []
         for aj in self.atoms[ai].bound_to_nrs:
-            # TODO: sorte here and filter later instead
+            # TODO: maybe sort here and filter later instead
             if int(ai) < int(aj):
                 bonds.append((ai, aj))
         return bonds
@@ -762,6 +785,9 @@ class Topology:
         return dihedrals
 
     def _get_atom_improper_dihedrals(self, atom_nr: str):
+        # TODO: which improper dihedrals are used is defined for each residue
+        # in aminoacids.rtp
+
         # <https://manual.gromacs.org/current/reference-manual/functions/bonded-interactions.html#improper-dihedrals>
         # atom in a line, like a regular dihedral:
         dihedrals = []
@@ -789,12 +815,21 @@ class Topology:
         # check if there are improper dihedrals defined for these types
         for key in dihedral_candidate_keys:
             type_key = tuple([self.atoms[k].type for k in key])
-            # TODO: need to try allversions of the key with X in different place
-            # for wildcard matches!
             dihedral_type = self.ff.improper_dihedraltypes.get(type_key)
             if dihedral_type is not None:
                 dihedrals.append(key)
-
+            # to try all versions of the key with X in different places
+            # for wildcard matches!
+            pos = range(4)
+            for n in range(4):
+                n = n + 1
+                combs = combinations(pos, n)
+                for c in combs:
+                    k = list(type_key)
+                    for i in c: k[i] = "X"
+                    dihedral_type = self.ff.improper_dihedraltypes.get(tuple(k))
+                    if dihedral_type is not None:
+                        dihedrals.append(key)
 
         return dihedrals
 
