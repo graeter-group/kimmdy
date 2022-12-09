@@ -461,7 +461,7 @@ class Topology:
 
         # remove pairs
         dihpairs = [
-            tuple(sorted((d.ai, d.al), key=str_to_int_or_0))
+            tuple(sorted((d.ai, d.al), key=int))
             for d in self.proper_dihedrals.values()
         ]
         self.pairs = {
@@ -519,7 +519,7 @@ class Topology:
         for key in all_dihedrals:
             if self.proper_dihedrals.get(key) is None:
                 self.proper_dihedrals[key] = Dihedral(key[0], key[1], key[2], key[3], "9")
-            pairkey = (key[0], key[3])
+            pairkey = tuple(str(x) for x in sorted([key[0], key[3]], key=int))
             if self.pairs.get(pairkey) is None:
                 self.pairs[pairkey] = Pair(pairkey[0], pairkey[1], "1")
 

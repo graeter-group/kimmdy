@@ -57,9 +57,6 @@ class TestTopology:
     hexala_top = read_topol(Path('hexala.top'))
     ffdir = Path("../assets/amber99sb-star-ildnp.ff")
     ffpatch = Path('amber99sb_patches.xml')
-    top = Topology(hexala_top, ffdir, ffpatch)
-    oldtop = deepcopy(top)
-
 
     def test_break_bind_bond_hexala(self):
         top = Topology(self.hexala_top, self.ffdir, self.ffpatch)
@@ -75,15 +72,17 @@ class TestTopology:
 
     @given(bondindex = st.integers(min_value=0, max_value=70))
     def test_break_bind_random_bond_hexala(self, bondindex):
-        top = Topology(self.hexala_top, self.ffdir, self.ffpatch)
-        og_top = deepcopy(top)
-        bond = list(top.bonds.keys())[bondindex]
-        top.break_bond(bond)
-        top.bind_bond(bond)
-        assert top.bonds == og_top.bonds
-        assert top.pairs == og_top.pairs
-        assert top.angles == og_top.angles
-        assert top.proper_dihedrals == og_top.proper_dihedrals
+        # copy top 
+        # otherwise hypothesis retains some state
+        this_top = Topology(self.hexala_top, self.ffdir, self.ffpatch)
+        og_top = deepcopy(this_top)
+        bond = list(this_top.bonds.keys())[bondindex]
+        this_top.break_bond(bond)
+        this_top.bind_bond(bond)
+        assert this_top.bonds == og_top.bonds
+        assert this_top.pairs == og_top.pairs
+        assert this_top.angles == og_top.angles
+        assert this_top.proper_dihedrals == og_top.proper_dihedrals
 
 
     def test_generate_topology_from_bound_to(self):
