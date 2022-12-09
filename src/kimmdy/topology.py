@@ -230,7 +230,8 @@ class FF:
         self.atomtypes: dict[str, AtomType] = {}
         self.bondtypes: dict[tuple[str, str], Bond] = {}
         self.angletypes: dict[tuple[str, str, str], Angle] = {}
-        self.dihedraltypes: dict[tuple[str, str, str, str], Dihedral] = {}
+        self.proper_dihedraltypes: dict[tuple[str, str, str, str], [Dihedral]] = {}
+        self.improper_dihedraltypes: dict[tuple[str, str, str, str], Dihedral] = {}
 
         nonbonded_path = ffdir / "ffnonbonded.itp"
         nonbonded = read_topol(nonbonded_path)
@@ -249,9 +250,21 @@ class FF:
             self.angletypes[(angle.ai, angle.aj, angle.ak)] = angle
         for l in bonded["dihedraltypes"]:
             dihedral = Dihedral.from_top_line(l)
-            self.dihedraltypes[
-                (dihedral.ai, dihedral.aj, dihedral.ak, dihedral.al)
-            ] = dihedral
+            # proper dihedrals can be defined multiple times
+            # with a different phase
+            if dihedral.funct == "4":
+                self.improper_dihedraltypes[
+                    (dihedral.ai, dihedral.aj, dihedral.ak, dihedral.al)
+                ] = dihedral
+            elif dihedral.funct == "9":
+                if self.proper_dihedraltypes.get((dihedral.ai, dihedral.aj, dihedral.ak, dihedral.al)) is None: 
+                    self.proper_dihedraltypes[
+                        (dihedral.ai, dihedral.aj, dihedral.ak, dihedral.al)
+                    ] = [dihedral]
+                else:
+                    self.proper_dihedraltypes[
+                        (dihedral.ai, dihedral.aj, dihedral.ak, dihedral.al)
+                    ].append(dihedral)
 
     def __repr__(self) -> str:
         return textwrap.dedent(
@@ -260,7 +273,7 @@ class FF:
         {len(self.atomtypes)} atomtypes,
         {len(self.bondtypes)} bondtypes,
         {len(self.angletypes)} angletypes,
-        {len(self.dihedraltypes)} dihedraltypes
+        {len(self.proper_dihedraltypes)} dihedraltypes
         """
         )
 
