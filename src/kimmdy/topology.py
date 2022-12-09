@@ -10,6 +10,7 @@ import logging
 
 from kimmdy.utils import str_to_int_or_0
 
+
 @dataclass(order=True)
 class Atom:
     """Information about one atom
@@ -116,6 +117,137 @@ class Bond:
 
 
 @dataclass(order=True)
+class BondType:
+    """Information about one bondtype
+
+    A class containing bond information as in the bonds section of the topology.
+    From gromacs topology:
+    'i', 'j', 'funct', 'c0', 'c1', 'c2', 'c3
+    Where i and j are atomtypes
+    """
+
+    i: str
+    j: str
+    funct: str
+    c0: Optional[str] = None
+    c1: Optional[str] = None
+    c2: Optional[str] = None
+    c3: Optional[str] = None
+
+    @classmethod
+    def from_top_line(cls, l: list[str]):
+        return cls(
+            i=l[0],
+            j=l[1],
+            funct=l[2],
+            c0=field_or_none(l, 3),
+            c1=field_or_none(l, 4),
+            c2=field_or_none(l, 5),
+            c3=field_or_none(l, 6),
+        )
+
+
+@dataclass(order=True)
+class Pair:
+    """Information about one pair
+
+    A class containing pair information as in the pair section of the topology.
+
+    From gromacs topology:
+    ai', 'aj', 'funct', 'c0', 'c1', 'c2', 'c3'
+    """
+
+    ai: str
+    aj: str
+    funct: str
+    c0: Optional[str] = None
+    c1: Optional[str] = None
+    c2: Optional[str] = None
+    c3: Optional[str] = None
+
+    @classmethod
+    def from_top_line(cls, l: list[str]):
+        return cls(
+            ai=l[0],
+            aj=l[1],
+            funct=l[2],
+            c0=field_or_none(l, 3),
+            c1=field_or_none(l, 4),
+            c2=field_or_none(l, 5),
+            c3=field_or_none(l, 6),
+        )
+
+
+@dataclass(order=True)
+class Angle:
+    """Information about one angle
+
+    A class containing angle information as in the angles section of the topology.
+
+    From gromacs topology:
+    ';', 'ai', 'aj', 'ak', 'funct', 'c0', 'c1', 'c2', 'c3'
+    With aj < ai < ak
+    """
+
+    ai: str
+    aj: str
+    ak: str
+    funct: str
+    c0: Optional[str] = None
+    c1: Optional[str] = None
+    c2: Optional[str] = None
+    c3: Optional[str] = None
+
+    @classmethod
+    def from_top_line(cls, l: list[str]):
+        return cls(
+            ai=l[0],
+            aj=l[1],
+            ak=l[2],
+            funct=l[3],
+            c0=field_or_none(l, 4),
+            c1=field_or_none(l, 5),
+            c2=field_or_none(l, 6),
+            c3=field_or_none(l, 7),
+        )
+
+
+@dataclass(order=True)
+class AngleType:
+    """Information about one angle
+
+    A class containing angle information as in the angles section of the topology.
+
+    From gromacs topology:
+    ';', 'i', 'j', 'k', 'funct', 'c0', 'c1', 'c2', 'c3'
+    where i,j,k are atomtypes 
+    """
+
+    i: str
+    j: str
+    k: str
+    funct: str
+    c0: Optional[str] = None
+    c1: Optional[str] = None
+    c2: Optional[str] = None
+    c3: Optional[str] = None
+
+    @classmethod
+    def from_top_line(cls, l: list[str]):
+        return cls(
+            i=l[0],
+            j=l[1],
+            k=l[2],
+            funct=l[3],
+            c0=field_or_none(l, 4),
+            c1=field_or_none(l, 5),
+            c2=field_or_none(l, 6),
+            c3=field_or_none(l, 7),
+        )
+
+
+
+@dataclass(order=True)
 class Dihedral:
     """Information about one dihedral
 
@@ -157,70 +289,48 @@ class Dihedral:
             c5=field_or_none(l, 10),
         )
 
-
 @dataclass(order=True)
-class Angle:
-    """Information about one angle
+class DihedralType:
+    """Information about one dihedral
 
-    A class containing angle information as in the angles section of the topology.
+    A class containing bond information as in the dihedrals section of the topology.
+    Proper dihedrals have funct 9.
+    Improper dihedrals have funct 4.
 
     From gromacs topology:
-    ';', 'ai', 'aj', 'ak', 'funct', 'c0', 'c1', 'c2', 'c3'
-    With ai < ak
+    ';', 'i', 'j', 'k', 'l', 'funct', 'c0', 'c1', 'c2', 'c3', 'c4', 'c5'
+    Where i,j,k,l are atomtypes
     """
 
-    ai: str
-    aj: str
-    ak: str
+    i: str
+    j: str
+    k: str
+    l: str
     funct: str
     c0: Optional[str] = None
     c1: Optional[str] = None
     c2: Optional[str] = None
     c3: Optional[str] = None
+    c4: Optional[str] = None
+    c5: Optional[str] = None
 
     @classmethod
     def from_top_line(cls, l: list[str]):
         return cls(
-            ai=l[0],
-            aj=l[1],
-            ak=l[2],
-            funct=l[3],
-            c0=field_or_none(l, 4),
-            c1=field_or_none(l, 5),
-            c2=field_or_none(l, 6),
-            c3=field_or_none(l, 7),
+            i=l[0],
+            j=l[1],
+            k=l[2],
+            l=l[2],
+            funct=l[4],
+            c0=field_or_none(l, 5),
+            c1=field_or_none(l, 6),
+            c2=field_or_none(l, 7),
+            c3=field_or_none(l, 8),
+            c4=field_or_none(l, 9),
+            c5=field_or_none(l, 10),
         )
 
 
-@dataclass(order=True)
-class Pair:
-    """Information about one pair
-
-    A class containing pair information as in the pair section of the topology.
-
-    From gromacs topology:
-    ai', 'aj', 'funct', 'c0', 'c1', 'c2', 'c3'
-    """
-
-    ai: str
-    aj: str
-    funct: str
-    c0: Optional[str] = None
-    c1: Optional[str] = None
-    c2: Optional[str] = None
-    c3: Optional[str] = None
-
-    @classmethod
-    def from_top_line(cls, l: list[str]):
-        return cls(
-            ai=l[0],
-            aj=l[1],
-            funct=l[2],
-            c0=field_or_none(l, 3),
-            c1=field_or_none(l, 4),
-            c2=field_or_none(l, 5),
-            c3=field_or_none(l, 6),
-        )
 
 
 class FF:
@@ -228,10 +338,10 @@ class FF:
 
     def __init__(self, ffdir: Path):
         self.atomtypes: dict[str, AtomType] = {}
-        self.bondtypes: dict[tuple[str, str], Bond] = {}
-        self.angletypes: dict[tuple[str, str, str], Angle] = {}
-        self.proper_dihedraltypes: dict[tuple[str, str, str, str], [Dihedral]] = {}
-        self.improper_dihedraltypes: dict[tuple[str, str, str, str], Dihedral] = {}
+        self.bondtypes: dict[tuple[str, str], BondType] = {}
+        self.angletypes: dict[tuple[str, str, str], AngleType] = {}
+        self.proper_dihedraltypes: dict[tuple[str, str, str, str], list[DihedralType]] = {}
+        self.improper_dihedraltypes: dict[tuple[str, str, str, str], DihedralType] = {}
 
         nonbonded_path = ffdir / "ffnonbonded.itp"
         nonbonded = read_topol(nonbonded_path)
@@ -243,28 +353,33 @@ class FF:
         bonded_path = ffdir / "ffbonded.itp"
         bonded = read_topol(bonded_path)
         for l in bonded["bondtypes"]:
-            bond = Bond.from_top_line(l)
-            self.bondtypes[(bond.ai, bond.aj)] = bond
+            bondtype = BondType.from_top_line(l)
+            self.bondtypes[(bondtype.i, bondtype.j)] = bondtype
         for l in bonded["angletypes"]:
-            angle = Angle.from_top_line(l)
-            self.angletypes[(angle.ai, angle.aj, angle.ak)] = angle
+            angletype = AngleType.from_top_line(l)
+            self.angletypes[(angletype.i, angletype.j, angletype.k)] = angletype
         for l in bonded["dihedraltypes"]:
-            dihedral = Dihedral.from_top_line(l)
+            dihedraltype = DihedralType.from_top_line(l)
             # proper dihedrals can be defined multiple times
             # with a different phase
-            if dihedral.funct == "4":
+            if dihedraltype.funct == "4":
                 self.improper_dihedraltypes[
-                    (dihedral.ai, dihedral.aj, dihedral.ak, dihedral.al)
-                ] = dihedral
-            elif dihedral.funct == "9":
-                if self.proper_dihedraltypes.get((dihedral.ai, dihedral.aj, dihedral.ak, dihedral.al)) is None: 
+                    (dihedraltype.i, dihedraltype.j, dihedraltype.k, dihedraltype.l)
+                ] = dihedraltype
+            elif dihedraltype.funct == "9":
+                if (
+                    self.proper_dihedraltypes.get(
+                        (dihedraltype.i, dihedraltype.j, dihedraltype.k, dihedraltype.l)
+                    )
+                    is None
+                ):
                     self.proper_dihedraltypes[
-                        (dihedral.ai, dihedral.aj, dihedral.ak, dihedral.al)
-                    ] = [dihedral]
+                        (dihedraltype.i, dihedraltype.j, dihedraltype.k, dihedraltype.l)
+                    ] = [dihedraltype]
                 else:
                     self.proper_dihedraltypes[
-                        (dihedral.ai, dihedral.aj, dihedral.ak, dihedral.al)
-                    ].append(dihedral)
+                        (dihedraltype.i, dihedraltype.j, dihedraltype.k, dihedraltype.l)
+                    ].append(dihedraltype)
 
     def __repr__(self) -> str:
         return textwrap.dedent(
@@ -358,7 +473,9 @@ class Topology:
         self.top["bonds"] = [attributes_to_list(x) for x in self.bonds.values()]
         self.top["pairs"] = [attributes_to_list(x) for x in self.pairs.values()]
         self.top["angles"] = [attributes_to_list(x) for x in self.angles.values()]
-        self.top["dihedrals"] = [attributes_to_list(x) for x in self.proper_dihedrals.values()]
+        self.top["dihedrals"] = [
+            attributes_to_list(x) for x in self.proper_dihedrals.values()
+        ]
 
     def to_dict(self) -> TopologyDict:
         self._update_dict()
@@ -431,7 +548,7 @@ class Topology:
         Modifies the topology dictionary in place.
         It modifies the function types and parameters in the topology to account for radicals.
         """
-        atompair_nrs = tuple(sorted(atompair_nrs, key=str_to_int_or_0))
+        atompair_nrs = tuple(sorted(atompair_nrs, key=int))
         atompair = [self.atoms[atompair_nrs[0]], self.atoms[atompair_nrs[1]]]
 
         # update bound_to
@@ -474,8 +591,7 @@ class Topology:
 
         # remove pairs
         dihpairs = [
-            tuple(sorted((d.ai, d.al), key=int))
-            for d in self.proper_dihedrals.values()
+            tuple(sorted((d.ai, d.al), key=int)) for d in self.proper_dihedrals.values()
         ]
         self.pairs = {
             key: value for key, value in self.pairs.items() if key in dihpairs
@@ -502,7 +618,7 @@ class Topology:
             `to`, the atom to which the `from` atom will be bound
         """
 
-        atompair_nrs = tuple(sorted(atompair_nrs, key=str_to_int_or_0))
+        atompair_nrs = tuple(sorted(atompair_nrs, key=int))
         atompair = [self.atoms[atompair_nrs[0]], self.atoms[atompair_nrs[1]]]
 
         # update bound_to
@@ -515,7 +631,6 @@ class Topology:
         self.bonds[atompair_nrs] = bond
         logging.info(f"added bond: {bond}")
 
-
         # add angles
         all_angles = self._get_atom_angles(atompair_nrs[0]) + self._get_atom_angles(
             atompair_nrs[1]
@@ -525,18 +640,29 @@ class Topology:
                 self.angles[key] = Angle(key[0], key[1], key[2], "1")
 
         # add proper and improper dihedrals
-        # add prope dihedrals and pairs
+        # add proper dihedrals and pairs
         all_dihedrals = self._get_atom_proper_dihedrals(
             atompair_nrs[0]
         ) + self._get_atom_proper_dihedrals(atompair_nrs[1])
         for key in all_dihedrals:
             if self.proper_dihedrals.get(key) is None:
-                self.proper_dihedrals[key] = Dihedral(key[0], key[1], key[2], key[3], "9")
+                self.proper_dihedrals[key] = Dihedral(
+                    key[0], key[1], key[2], key[3], "9"
+                )
             pairkey = tuple(str(x) for x in sorted([key[0], key[3]], key=int))
             if self.pairs.get(pairkey) is None:
                 self.pairs[pairkey] = Pair(pairkey[0], pairkey[1], "1")
 
         # TODO: add improper dihedrals
+        all_dihedrals = self._get_atom_improper_dihedrals(
+            atompair_nrs[0]
+        ) + self._get_atom_improper_dihedrals(atompair_nrs[1])
+
+        for key in all_dihedrals:
+            if self.proper_dihedrals.get(key) is None:
+                self.proper_dihedrals[key] = Dihedral(
+                    key[0], key[1], key[2], key[3], "4"
+                )
 
         # if there are no changed parameters for radicals, exit here
         if self.ffpatches is None:
@@ -552,14 +678,14 @@ class Topology:
         ai = atom_nr
         bonds = []
         for aj in self.atoms[ai].bound_to_nrs:
-            # TODO: sorte here and filter later instead 
+            # TODO: sorte here and filter later instead
             if int(ai) < int(aj):
                 bonds.append((ai, aj))
         return bonds
 
     def _get_atom_pairs(self, atom_nr: str) -> list[tuple[str, str]]:
         # TODO: this misses some
-        # use dihpairs instead for now 
+        # use dihpairs instead for now
         ai = atom_nr
         pairs = []
         for aj in self.atoms[ai].bound_to_nrs:
@@ -658,6 +784,10 @@ class Topology:
                         dihedrals.append((al, ak, aj, ai))
         return dihedrals
 
+    def _get_atom_improper_dihedrals(self, atom_nr: str):
+        dihedrals = []
+        return dihedrals
+
     def _patch_parameters(self, atompair: list[Atom]):
         # TODO: handle this abstractly for different patch types and parameters
         # Adjust parameters based on patch
@@ -701,7 +831,7 @@ def match_attr(patches: list[Element], attr: str, m: str) -> Optional[Element]:
         if value := p.get(attr):
             if value == m:
                 return p
-            pattern = value.replace("*", r".*").replace("+", r"\+")
+            pattern = value.replace("*", r".*").replace("+", r".+")
             if re.match(pattern, m):
                 matches.append(p)
     if matches:
@@ -740,6 +870,7 @@ def get_element_id(e: Element) -> Optional[str]:
         id = ""
     return id
 
+
 def generate_topology_from_bound_to(atoms: list[Atom]) -> Topology:
     top = Topology({})
     for atom in atoms:
@@ -750,29 +881,27 @@ def generate_topology_from_bound_to(atoms: list[Atom]) -> Topology:
     for atom in top.atoms.values():
         keys = top._get_atom_bonds(atom.nr)
         for key in keys:
-            top.bonds[key] = Bond(key[0], key[1], '1')
+            top.bonds[key] = Bond(key[0], key[1], "1")
 
     # angles
     for atom in top.atoms.values():
         keys = top._get_atom_angles(atom.nr)
         for key in keys:
-            top.angles[key] = Angle(key[0], key[1], key[2], '1')
+            top.angles[key] = Angle(key[0], key[1], key[2], "1")
 
     # pairs
     for atom in top.atoms.values():
         keys = top._get_atom_pairs(atom.nr)
         for key in keys:
-            top.pairs[key] = Pair(key[0], key[1], '1')
+            top.pairs[key] = Pair(key[0], key[1], "1")
 
     # dihedrals
     for atom in top.atoms.values():
         keys = top._get_atom_proper_dihedrals(atom.nr)
         for key in keys:
-            top.proper_dihedrals[key] = Dihedral(key[0], key[1], key[2], key[3], '9')
+            top.proper_dihedrals[key] = Dihedral(key[0], key[1], key[2], key[3], "9")
 
     # TODO: impropers
 
     top._update_dict()
     return top
-
-
