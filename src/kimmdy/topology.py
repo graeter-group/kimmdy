@@ -258,7 +258,7 @@ class Dihedral:
     From gromacs topology:
     ';', 'ai', 'aj', 'ak', 'al', 'funct', 'c0', 'c1', 'c2', 'c3', 'c4', 'c5'
     For proper dihedrals (funct 9): aj < ak
-    For improper dihedrals (funct 4): aj > ak
+    For improper dihedrals (funct 4): no guaranteed order
     """
 
     ai: str
@@ -565,9 +565,6 @@ class Topology:
         logging.info(f"removed bond: {removed}")
 
         # remove angles
-        # the following can be sped up by
-        # first getting the candidate angles that the atoms are involved in
-        # with self._get_atom_angles etc.
         angle_keys = self._get_atom_angles(atompair_nrs[0]) + self._get_atom_angles(
             atompair_nrs[1]
         )
@@ -626,19 +623,19 @@ class Topology:
         logging.info(f"added bond: {bond}")
 
         # add angles
-        all_angles = self._get_atom_angles(atompair_nrs[0]) + self._get_atom_angles(
+        angle_keys = self._get_atom_angles(atompair_nrs[0]) + self._get_atom_angles(
             atompair_nrs[1]
         )
-        for key in all_angles:
+        for key in angle_keys:
             if self.angles.get(key) is None:
                 self.angles[key] = Angle(key[0], key[1], key[2], "1")
 
         # add proper and improper dihedrals
         # add proper dihedrals and pairs
-        all_dihedrals = self._get_atom_proper_dihedrals(
+        dihedral_keys = self._get_atom_proper_dihedrals(
             atompair_nrs[0]
         ) + self._get_atom_proper_dihedrals(atompair_nrs[1])
-        for key in all_dihedrals:
+        for key in dihedral_keys:
             if self.proper_dihedrals.get(key) is None:
                 self.proper_dihedrals[key] = Dihedral(
                     key[0], key[1], key[2], key[3], "9"
@@ -647,12 +644,11 @@ class Topology:
             if self.pairs.get(pairkey) is None:
                 self.pairs[pairkey] = Pair(pairkey[0], pairkey[1], "1")
 
-        # TODO: add improper dihedrals
-        all_dihedrals = self._get_atom_improper_dihedrals(
+        dihedral_keys = self._get_atom_improper_dihedrals(
             atompair_nrs[0]
         ) + self._get_atom_improper_dihedrals(atompair_nrs[1])
 
-        for key in all_dihedrals:
+        for key in dihedral_keys:
             if self.proper_dihedrals.get(key) is None:
                 self.proper_dihedrals[key] = Dihedral(
                     key[0], key[1], key[2], key[3], "4"
@@ -677,21 +673,8 @@ class Topology:
                 bonds.append((ai, aj))
         return bonds
 
-    def _get_atom_pairs(self, atom_nr: str) -> list[tuple[str, str]]:
-        # TODO: this misses some
-        # use dihpairs instead for now
-        ai = atom_nr
-        pairs = []
-        for aj in self.atoms[ai].bound_to_nrs:
-            for ak in self.atoms[aj].bound_to_nrs:
-                if ai == ak:
-                    continue
-                for al in self.atoms[ak].bound_to_nrs:
-                    if al == ak or aj == al:
-                        continue
-                    key = sorted([ai, al], key=int)
-                    pairs.append((key[0], key[1]))
-        return pairs
+    def _get_atom_pairs(self, _: str) -> list[tuple[str, str]]:
+        raise NotImplementedError("get_atom_pairs is not implementes. Get the pairs as the endpoints of dihedrals instead.")
 
     def _get_atom_angles(self, atom_nr: str) -> list[tuple[str, str, str]]:
         """
@@ -716,7 +699,7 @@ class Topology:
         return angles
 
     def _get_margin_atom_angles(self, atom_nr: str) -> list[tuple[str, str, str]]:
-        # atom_nr in the middle of an angle
+        # atom_nr at the outer corner of angle
         angles = []
         ai = atom_nr
         for aj in self.atoms[ai].bound_to_nrs:
@@ -781,28 +764,38 @@ class Topology:
     def _get_atom_improper_dihedrals(self, atom_nr: str):
         # <https://manual.gromacs.org/current/reference-manual/functions/bonded-interactions.html#improper-dihedrals>
         # atom in a line, like a regular dihedral:
-        # dihedrals = self._get_margin_atom_dihedrals(atom_nr) + self._get_center_atom_dihedrals(atom_nr)
-        #
-        # # atom in the center of a star/tetrahedron:
-        # ai = atom_nr
-        # partners = self.atoms[ai].bound_to_nrs
-        # if len(partners) >= 3:
-        #     combs = combinations(partners, 3)
-        #     for comb in combs:
-        #         aj,ak,al = sorted(comb, key=int)
-        #
-        # # check if there are improper dihedrals defined for these types
-        #
-        # ai = atom_nr
-        # partners = self.atoms[aj].bound_to_nrs
-        # for ai in partners:
-        #     for ak in partners:
-        #         if ai == ak:
-        #             continue
-        #         for al in self.atoms[ak].bound_to_nrs:
-        #             if al == ak or aj == al:
-        #                 continue
         dihedrals = []
+        dihedral_candidate_keys = self._get_margin_atom_dihedrals(atom_nr) + self._get_center_atom_dihedrals(atom_nr)
+
+        # atom in the center of a star/tetrahedron:
+        ai = atom_nr
+        partners = self.atoms[ai].bound_to_nrs
+        if len(partners) >= 3:
+            combs = combinations(partners, 3)
+            for comb in combs:
+                aj,ak,al = comb
+                dihedral_candidate_keys.append((ai,aj,ak,al))
+
+        # atom in corner of a star/tetrahedron:
+        aj = atom_nr
+        for ai in self.atoms[aj].bound_to_nrs:
+            partners = self.atoms[ai].bound_to_nrs
+            if len(partners) >= 3:
+                combs = combinations([p for p in partners if p != aj], 2)
+                for comb in combs:
+                    ak,al = comb
+                    dihedral_candidate_keys.append((ai,aj,ak,al))
+
+        # check if there are improper dihedrals defined for these types
+        for key in dihedral_candidate_keys:
+            type_key = tuple([self.atoms[k].type for k in key])
+            # TODO: need to try allversions of the key with X in different place
+            # for wildcard matches!
+            dihedral_type = self.ff.improper_dihedraltypes.get(type_key)
+            if dihedral_type is not None:
+                dihedrals.append(key)
+
+
         return dihedrals
 
     def _patch_parameters(self, atompair: list[Atom]):
