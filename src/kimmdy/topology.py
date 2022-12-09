@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Any, Optional
 from xml.etree.ElementTree import Element
 from kimmdy.parsing import TopologyDict, read_topol, read_xml_ff
-from itertools import takewhile, permutations
+from itertools import takewhile, permutations, combinations
 import re
 import textwrap
 import logging
@@ -565,37 +565,31 @@ class Topology:
         logging.info(f"removed bond: {removed}")
 
         # remove angles
-        self.angles = {
-            key: angle
-            for key, angle in self.angles.items()
-            if not all(x in [angle.ai, angle.aj, angle.ak] for x in atompair_nrs)
-        }
+        # the following can be sped up by
+        # first getting the candidate angles that the atoms are involved in
+        # with self._get_atom_angles etc.
+        angle_keys = self._get_atom_angles(atompair_nrs[0]) + self._get_atom_angles(
+            atompair_nrs[1]
+        )
+        for key in angle_keys:
+            self.angles.pop(key, None)
 
-        # remove proper and improper dihedrals
-        self.proper_dihedrals = {
-            key: dihedral
-            for key, dihedral in self.proper_dihedrals.items()
-            if not all(
-                x in [dihedral.ai, dihedral.aj, dihedral.ak, dihedral.al]
-                for x in atompair_nrs
-            )
-        }
-        self.improper_dihedrals = {
-            key: dihedral
-            for key, dihedral in self.improper_dihedrals.items()
-            if not all(
-                x in [dihedral.ai, dihedral.aj, dihedral.ak, dihedral.al]
-                for x in atompair_nrs
-            )
-        }
+        # remove proper dihedrals
+        # and pairs
+        dihedral_keys = self._get_atom_proper_dihedrals(
+            atompair_nrs[0]
+        ) + self._get_atom_proper_dihedrals(atompair_nrs[1])
+        for key in dihedral_keys:
+            self.proper_dihedrals.pop(key, None)
+            pairkey = tuple(sorted((key[0], key[3]), key=int))
+            self.pairs.pop(pairkey, None)
 
-        # remove pairs
-        dihpairs = [
-            tuple(sorted((d.ai, d.al), key=int)) for d in self.proper_dihedrals.values()
-        ]
-        self.pairs = {
-            key: value for key, value in self.pairs.items() if key in dihpairs
-        }
+        # and improper dihedrals
+        dihedral_keys = self._get_atom_improper_dihedrals(
+            atompair_nrs[0]
+        ) + self._get_atom_improper_dihedrals(atompair_nrs[1])
+        for key in dihedral_keys:
+            self.improper_dihedrals.pop(key, None)
 
         if self.ffpatches is not None:
             self._patch_parameters(atompair)
@@ -785,6 +779,29 @@ class Topology:
         return dihedrals
 
     def _get_atom_improper_dihedrals(self, atom_nr: str):
+        # <https://manual.gromacs.org/current/reference-manual/functions/bonded-interactions.html#improper-dihedrals>
+        # atom in a line, like a regular dihedral:
+        # dihedrals = self._get_margin_atom_dihedrals(atom_nr) + self._get_center_atom_dihedrals(atom_nr)
+        #
+        # # atom in the center of a star/tetrahedron:
+        # ai = atom_nr
+        # partners = self.atoms[ai].bound_to_nrs
+        # if len(partners) >= 3:
+        #     combs = combinations(partners, 3)
+        #     for comb in combs:
+        #         aj,ak,al = sorted(comb, key=int)
+        #
+        # # check if there are improper dihedrals defined for these types
+        #
+        # ai = atom_nr
+        # partners = self.atoms[aj].bound_to_nrs
+        # for ai in partners:
+        #     for ak in partners:
+        #         if ai == ak:
+        #             continue
+        #         for al in self.atoms[ak].bound_to_nrs:
+        #             if al == ak or aj == al:
+        #                 continue
         dihedrals = []
         return dihedrals
 
