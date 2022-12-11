@@ -687,10 +687,10 @@ class Topology:
             self.pairs.pop(pairkey, None)
 
         # and improper dihedrals
-        dihedral_keys = self._get_atom_improper_dihedrals(
+        dihedral_k_v = self._get_atom_improper_dihedrals(
             atompair_nrs[0]
         ) + self._get_atom_improper_dihedrals(atompair_nrs[1])
-        for key in dihedral_keys:
+        for key,_ in dihedral_k_v:
             self.improper_dihedrals.pop(key, None)
 
         if self.ffpatches is not None:
@@ -750,13 +750,16 @@ class Topology:
                 self.pairs[pairkey] = Pair(pairkey[0], pairkey[1], "1")
 
         # improper dihedral
-        dihedral_keys = self._get_atom_improper_dihedrals(
+        dihedral_k_v = self._get_atom_improper_dihedrals(
             atompair_nrs[0]
         ) + self._get_atom_improper_dihedrals(atompair_nrs[1])
-        for key in dihedral_keys:
+        for key,value in dihedral_k_v:
             if self.improper_dihedrals.get(key) is None:
+                # TODO: fix this after the demonstration
+                c2 = None
+                if value.q0 is not None: c2 = "1"
                 self.improper_dihedrals[key] = Dihedral(
-                    key[0], key[1], key[2], key[3], "4"
+                    key[0], key[1], key[2], key[3], "4", value.q0, value.cq, c2
                 )
 
         # if there are no changed parameters for radicals, exit here
@@ -866,7 +869,7 @@ class Topology:
                         dihedrals.append((al, ak, aj, ai))
         return dihedrals
 
-    def _get_atom_improper_dihedrals(self, atom_nr: str):
+    def _get_atom_improper_dihedrals(self, atom_nr: str) -> list[tuple]:
         # TODO: cleanup and make more efficient
         # which improper dihedrals are used is defined for each residue
         # in aminoacids.rtp
@@ -911,7 +914,7 @@ class Topology:
             candidate_key = tuple(candidate_key)
             dihedral = residue.improper_dihedrals.get(candidate_key)
             if dihedral:
-                dihedrals.append(candidate)
+                dihedrals.append((candidate, dihedral))
 
         return dihedrals
 

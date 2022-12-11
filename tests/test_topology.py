@@ -89,7 +89,7 @@ class TestTopology:
         assert top.pairs == og_top.pairs
         assert top.angles == og_top.angles
         assert top.proper_dihedrals == og_top.proper_dihedrals
-        # assert top.improper_dihedrals == og_top.improper_dihedrals
+        assert top.improper_dihedrals == og_top.improper_dihedrals
 
 
     def test_generate_topology_from_bound_to(self):
