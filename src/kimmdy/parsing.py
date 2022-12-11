@@ -12,8 +12,8 @@ def is_not_comment(c: str) -> bool:
     return c != ';'
 
 def get_sections(
-    seq: Iterable[str], section_marker: str
-) -> Generator[list[str], None, None]:
+        seq: Iterable[str], section_marker: str
+    ) -> Generator[list[str], None, None]:
     data = [""]
     for line in seq:
         line = ''.join(takewhile(is_not_comment, line))
@@ -45,12 +45,43 @@ def extract_section_name(ls: list[str]) -> tuple[str, list[str]]:
     else:
         return ("", ls)
 
+def create_subsections(ls: list[list[str]]):
+    d = {}
+    subsection_name = "other"
+    for i, l in enumerate(ls):
+        if l[0] == "[":
+            subsection_name = l[1]
+        else:
+            if subsection_name not in d:
+                d[subsection_name] = []
+            d[subsection_name].append(l)
+
+    return d
+
+def read_rtp(path: Path) -> dict:
+    # TODO: make this more elegant and performant
+    with open(path, "r") as f:
+        sections = get_sections(f, "[")
+        d = {}
+        for i, s in enumerate(sections):
+            # skip empty sections
+            if s == [""]:
+                continue
+            name, content = extract_section_name(s)
+            content = [c.split() for c in content if len(c.split()) > 0]
+            if not name:
+                name = f"BLOCK {i}"
+            d[name] = create_subsections(content)
+            # d[name] = content
+
+        return d
+
 
 def read_topol(path: Path) -> TopologyDict:
     # TODO look into following #includes
     # TODO look into [ intermolecule ] section
     with open(path, "r") as f:
-        sections = get_sections(f, "\n")
+        sections = get_sections(f, "[")
         d = {}
         for i, s in enumerate(sections):
             # skip empty sections
