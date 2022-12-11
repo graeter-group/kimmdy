@@ -142,10 +142,10 @@ class ResidueImroperSpec:
         return cls(
             atom1=l[0],
             atom2=l[1],
-            atom3=l[0],
-            atom4=l[1],
-            q0=field_or_none(l,2),
-            cq=field_or_none(l,3)
+            atom3=l[2],
+            atom4=l[3],
+            q0=field_or_none(l,4),
+            cq=field_or_none(l,5)
         )
 
 @dataclass(order=True)
@@ -406,7 +406,6 @@ class ResidueType:
 
     @classmethod
     def from_section(cls, residue, d: dict[str, list[list[str]]]):
-        # TODO
         atoms = {}
         bonds = {}
         impropers = {}
@@ -870,6 +869,9 @@ class Topology:
     def _get_atom_improper_dihedrals(self, atom_nr: str):
         # TODO: which improper dihedrals are used is defined for each residue
         # in aminoacids.rtp
+        # get improper diheldrals from FF based on residue
+        atom = self.atoms[atom_nr]
+        residue = self.ff.residuetypes[atom.residue]
 
         # <https://manual.gromacs.org/current/reference-manual/functions/bonded-interactions.html#improper-dihedrals>
         # atom in a line, like a regular dihedral:
@@ -890,31 +892,21 @@ class Topology:
         for ai in self.atoms[aj].bound_to_nrs:
             partners = self.atoms[ai].bound_to_nrs
             if len(partners) >= 3:
-                combs = combinations([p for p in partners if p != aj], 2)
+                combs = combinations([p for p in partners + [aj] if p != aj], 4)
                 for comb in combs:
-                    ak,al = comb
+                    ai, aj, ak,al = comb
                     dihedral_candidate_keys.append((ai,aj,ak,al))
 
-        # TODO: get improper diheldrals from FF based on residue
+        # residues on aminoacids.rtp specify a dihedral to the next or previous
+        # AA with -C and +N as the atomname
+        for candidate in dihedral_candidate_keys:
+            print(candidate)
+            candidate_key = tuple([self.atoms[atom_nr].atom for atom_nr in candidate])
+            print(candidate_key)
+            dihedral = residue.improper_dihedrals.get(candidate_key)
+            if dihedral: print(dihedral)
 
-        # check if there are improper dihedrals defined for these types
-        for key in dihedral_candidate_keys:
-            type_key = tuple([self.atoms[k].type for k in key])
-            dihedral_type = self.ff.improper_dihedraltypes.get(type_key)
-            if dihedral_type is not None:
-                dihedrals.append(key)
-            # to try all versions of the key with X in different places
-            # for wildcard matches!
-            pos = range(4)
-            for n in range(4):
-                n = n + 1
-                combs = combinations(pos, n)
-                for c in combs:
-                    k = list(type_key)
-                    for i in c: k[i] = "X"
-                    dihedral_type = self.ff.improper_dihedraltypes.get(tuple(k))
-                    if dihedral_type is not None:
-                        dihedrals.append(key)
+        print(residue.improper_dihedrals)
 
         return dihedrals
 
@@ -978,13 +970,6 @@ def match_multi_attr(
 
 
 def get_by_permutations(d: dict, key) -> Optional[Any]:
-    # TODO: oh, we might not even need this in all cases
-    # not just bonds, but also
-    # angles and dihedrals have a well defined order.
-    # Or do they?
-    # What might be useful instead:
-    # an angle, (i,j,k) might also be keyd as (k,j,i)
-    # a dihedral, (i,j,k,l) might also be keyed as (l,k,j,i)
     for k in permutations(key):
         value = d.get(k, None)
         if value is not None:
