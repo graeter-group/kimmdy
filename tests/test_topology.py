@@ -109,7 +109,6 @@ class TestTopology:
     def test_break_bind_bond_invertible(self, top_break):
         top, to_break = top_break
         og_top = deepcopy(top)
-        print(top.__repr__())
         top.break_bond(to_break)
         top.bind_bond(to_break)
         assert top.bonds == og_top.bonds

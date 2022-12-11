@@ -875,7 +875,8 @@ class Topology:
         # in aminoacids.rtp
         # get improper diheldrals from FF based on residue
         atom = self.atoms[atom_nr]
-        residue = self.ff.residuetypes[atom.residue]
+        residue = self.ff.residuetypes.get(atom.residue)
+        if residue is None: return []
 
         # <https://manual.gromacs.org/current/reference-manual/functions/bonded-interactions.html#improper-dihedrals>
         # atom in a line, like a regular dihedral:
