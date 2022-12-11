@@ -17,7 +17,7 @@ def get_sections(
     data = [""]
     for line in seq:
         line = ''.join(takewhile(is_not_comment, line))
-        if line.startswith(section_marker):
+        if line.strip(' ').startswith(section_marker):
             if data:
                 # first element will be empty
                 # because newlines mark sections
@@ -61,7 +61,7 @@ def create_subsections(ls: list[list[str]]):
 def read_rtp(path: Path) -> dict:
     # TODO: make this more elegant and performant
     with open(path, "r") as f:
-        sections = get_sections(f, "[")
+        sections = get_sections(f, "\n")
         d = {}
         for i, s in enumerate(sections):
             # skip empty sections
@@ -81,7 +81,7 @@ def read_topol(path: Path) -> TopologyDict:
     # TODO look into following #includes
     # TODO look into [ intermolecule ] section
     with open(path, "r") as f:
-        sections = get_sections(f, "[")
+        sections = get_sections(f, "\n")
         d = {}
         for i, s in enumerate(sections):
             # skip empty sections
