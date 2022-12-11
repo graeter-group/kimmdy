@@ -667,13 +667,13 @@ class Topology:
             if self.pairs.get(pairkey) is None:
                 self.pairs[pairkey] = Pair(pairkey[0], pairkey[1], "1")
 
+        # improper dihedral
         dihedral_keys = self._get_atom_improper_dihedrals(
             atompair_nrs[0]
         ) + self._get_atom_improper_dihedrals(atompair_nrs[1])
-
         for key in dihedral_keys:
-            if self.proper_dihedrals.get(key) is None:
-                self.proper_dihedrals[key] = Dihedral(
+            if self.improper_dihedrals.get(key) is None:
+                self.improper_dihedrals[key] = Dihedral(
                     key[0], key[1], key[2], key[3], "4"
                 )
 
@@ -934,17 +934,14 @@ def generate_topology_from_bound_to(atoms: list[Atom]) -> Topology:
         for key in keys:
             top.angles[key] = Angle(key[0], key[1], key[2], "1")
 
-    # pairs
-    for atom in top.atoms.values():
-        keys = top._get_atom_pairs(atom.nr)
-        for key in keys:
-            top.pairs[key] = Pair(key[0], key[1], "1")
-
-    # dihedrals
+    # dihedrals and pass
     for atom in top.atoms.values():
         keys = top._get_atom_proper_dihedrals(atom.nr)
         for key in keys:
             top.proper_dihedrals[key] = Dihedral(key[0], key[1], key[2], key[3], "9")
+            pairkey = tuple(str(x) for x in sorted([key[0], key[3]], key=int))
+            if top.pairs.get(pairkey) is None:
+                top.pairs[pairkey] = Pair(pairkey[0], pairkey[1], "1")
 
     # TODO: impropers
 
