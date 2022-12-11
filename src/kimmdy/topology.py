@@ -349,7 +349,6 @@ class ResidueType:
 
 
 
-
 class FF:
     """Conainer for parsed forcefield data."""
 
@@ -399,7 +398,7 @@ class FF:
                         (dihedraltype.i, dihedraltype.j, dihedraltype.k, dihedraltype.l)
                     ].append(dihedraltype)
 
-            aminoacids = ffdir / "amionoacids.rtp"
+            aminoacids_path = ffdir / "aminoacids.rtp"
             # TODO
 
 
@@ -811,6 +810,8 @@ class Topology:
                 for comb in combs:
                     ak,al = comb
                     dihedral_candidate_keys.append((ai,aj,ak,al))
+
+        # TODO: get improper diheldrals from FF based on residue
 
         # check if there are improper dihedrals defined for these types
         for key in dihedral_candidate_keys:
