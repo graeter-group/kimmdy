@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Optional
 from xml.etree.ElementTree import Element
-from kimmdy.parsing import TopologyDict, read_topol, read_xml_ff
+from kimmdy.parsing import TopologyDict, read_topol, read_xml_ff, read_rtp
 from itertools import takewhile, permutations, combinations
 import re
 import textwrap
@@ -84,6 +84,69 @@ class AtomType:
             epsilon=l[6],
         )
 
+@dataclass(order=True)
+class ResidueAtomSpec:
+    """Information about one atom in a residue
+    ; name  type  charge  chargegroup       
+    """
+
+    name: str
+    type: str
+    charge: str
+    cgrp: str
+
+    @classmethod
+    def from_top_line(cls, l: list[str]):
+        return cls(
+            name=l[0],
+            type=l[1],
+            charge=l[2],
+            cgrp=l[3]
+        )
+
+@dataclass(order=True)
+class ResidueBondSpec:
+    """Information about one bond in a residue
+    ; atom1 atom2      b0      kb      
+    """
+
+    atom1: str
+    atom2: str
+    b0: Optional[str]
+    kb: Optional[str]
+
+    @classmethod
+    def from_top_line(cls, l: list[str]):
+        return cls(
+            atom1=l[0],
+            atom2=l[1],
+            b0=field_or_none(l,2),
+            kb=field_or_none(l,3)
+        )
+
+@dataclass(order=True)
+class ResidueImroperSpec:
+    """Information about one imroper dihedral in a residue
+    ;atom1 atom2 atom3 atom4     q0     cq
+    """
+
+    atom1: str
+    atom2: str
+    atom3: str
+    atom4: str
+    q0: Optional[str]
+    cq: Optional[str]
+
+    @classmethod
+    def from_top_line(cls, l: list[str]):
+        return cls(
+            atom1=l[0],
+            atom2=l[1],
+            atom3=l[0],
+            atom4=l[1],
+            q0=field_or_none(l,2),
+            cq=field_or_none(l,3)
+        )
 
 @dataclass(order=True)
 class Bond:
@@ -337,15 +400,30 @@ class ResidueType:
     """
 
     residue: str
-    atoms: list[list[str]]
-    bonds: list[list[str]]
-    impropers: list[list[str]]
+    atoms: dict[str, ResidueAtomSpec]
+    bonds: dict[tuple[str, str], ResidueBondSpec]
+    improper_dihedrals: dict[tuple[str, str, str, str], ResidueImroperSpec]
 
     @classmethod
-    def from_section(cls, ls: list[str]):
+    def from_section(cls, residue, d: dict[str, list[list[str]]]):
         # TODO
-        pass
-
+        atoms = {}
+        bonds = {}
+        impropers = {}
+        if ls := d.get('atoms'):
+            for l in ls:
+                atom = ResidueAtomSpec.from_top_line(l)
+                atoms[atom.name] = atom
+        if ls := d.get('bonds'):
+            for l in ls:
+                bond = ResidueBondSpec.from_top_line(l)
+                bonds[(bond.atom1, bond.atom2)] = bond
+        if ls := d.get('impropers'):
+            for l in ls:
+                improper = ResidueImroperSpec.from_top_line(l)
+                impropers[(improper.atom1, improper.atom2, improper.atom3, improper.atom4)] = improper
+            
+        return cls(residue, atoms, bonds, impropers)
 
 
 
@@ -358,7 +436,7 @@ class FF:
         self.angletypes: dict[tuple[str, str, str], AngleType] = {}
         self.proper_dihedraltypes: dict[tuple[str, str, str, str], list[DihedralType]] = {}
         self.improper_dihedraltypes: dict[tuple[str, str, str, str], DihedralType] = {}
-        self.residuetypes: dict[str, list[ResidueType]]
+        self.residuetypes: dict[str, ResidueType]
 
         nonbonded_path = ffdir / "ffnonbonded.itp"
         nonbonded = read_topol(nonbonded_path)
@@ -398,8 +476,14 @@ class FF:
                         (dihedraltype.i, dihedraltype.j, dihedraltype.k, dihedraltype.l)
                     ].append(dihedraltype)
 
-            aminoacids_path = ffdir / "aminoacids.rtp"
             # TODO
+            self.residuetypes = {}
+            aminoacids_path = ffdir / "aminoacids.rtp"
+            aminoacids = read_rtp(aminoacids_path)
+            for k,v in aminoacids.items():
+                if k.startswith('BLOCK') or k == 'bondedtypes': continue
+                self.residuetypes[k] = ResidueType.from_section(k, v)
+
 
 
     def __repr__(self) -> str:
