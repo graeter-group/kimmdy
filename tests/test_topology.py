@@ -76,7 +76,7 @@ class TestTopology:
         assert top.pairs == og_top.pairs
         assert top.angles == og_top.angles
         assert top.proper_dihedrals == og_top.proper_dihedrals
-        # assert top.improper_dihedrals == og_top.improper_dihedrals
+        assert top.improper_dihedrals == og_top.improper_dihedrals
 
     @given(bondindex = st.integers(min_value=0, max_value=70))
     def test_break_bind_random_bond_hexala(self, bondindex):
