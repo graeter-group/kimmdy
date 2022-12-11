@@ -874,6 +874,8 @@ class Topology:
         # which improper dihedrals are used is defined for each residue
         # in aminoacids.rtp
         # get improper diheldrals from FF based on residue
+        # TODO: handle impropers defined for the residue that
+        # belongs to an adjacent atom, not just the the specied one
         atom = self.atoms[atom_nr]
         residue = self.ff.residuetypes.get(atom.residue)
         if residue is None: return []
