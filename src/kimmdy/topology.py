@@ -867,7 +867,8 @@ class Topology:
         return dihedrals
 
     def _get_atom_improper_dihedrals(self, atom_nr: str):
-        # TODO: which improper dihedrals are used is defined for each residue
+        # TODO: cleanup and make more efficient
+        # which improper dihedrals are used is defined for each residue
         # in aminoacids.rtp
         # get improper diheldrals from FF based on residue
         atom = self.atoms[atom_nr]
@@ -888,25 +889,29 @@ class Topology:
                 dihedral_candidate_keys.append((ai,aj,ak,al))
 
         # atom in corner of a star/tetrahedron:
-        aj = atom_nr
-        for ai in self.atoms[aj].bound_to_nrs:
-            partners = self.atoms[ai].bound_to_nrs
+        for a in self.atoms[atom_nr].bound_to_nrs:
+            partners = self.atoms[a].bound_to_nrs
             if len(partners) >= 3:
-                combs = combinations([p for p in partners + [aj] if p != aj], 4)
+                combs = permutations(partners + [a], 4)
                 for comb in combs:
-                    ai, aj, ak,al = comb
+                    ai,aj,ak,al = comb
                     dihedral_candidate_keys.append((ai,aj,ak,al))
 
         # residues on aminoacids.rtp specify a dihedral to the next or previous
         # AA with -C and +N as the atomname
         for candidate in dihedral_candidate_keys:
-            print(candidate)
-            candidate_key = tuple([self.atoms[atom_nr].atom for atom_nr in candidate])
-            print(candidate_key)
+            candidate_key =[self.atoms[atom_nr].atom for atom_nr in candidate]
+            for i,nr in enumerate(candidate):
+                if self.atoms[nr].resnr != atom.resnr:
+                    if candidate_key[i] == "C":
+                        candidate_key[i] = "-C"
+                    elif candidate_key[i] == "N":
+                        candidate_key[i] = "+N"
+                        
+            candidate_key = tuple(candidate_key)
             dihedral = residue.improper_dihedrals.get(candidate_key)
-            if dihedral: print(dihedral)
-
-        print(residue.improper_dihedrals)
+            if dihedral:
+                dihedrals.append(candidate)
 
         return dihedrals
 
