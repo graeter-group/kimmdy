@@ -1,17 +1,12 @@
 #%%
 from copy import deepcopy
-from itertools import takewhile, permutations
 from pathlib import Path
 import os
-from xml.etree.ElementTree import Element
 
 import hypothesis
-from kimmdy.parsing import is_not_comment, read_topol, read_xml_ff
-from kimmdy.changemanager import LocalGraph
-from hypothesis import given, strategies as st
-from kimmdy.topology import FF, Angle, Topology, Atom, Bond, Dihedral, Pair, generate_topology_from_bound_to, get_by_permutations, get_element_id
-import string
-import logging
+from kimmdy.parsing import read_topol
+from hypothesis import Phase, given, settings, strategies as st
+from kimmdy.topology import Topology, Atom, generate_topology_from_bound_to
 
 #%%
 def set_dir():
@@ -25,13 +20,18 @@ def set_dir():
 set_dir()
 
 #%%
+ffdir = Path("../assets/amber99sb-star-ildnp.ff")
+ffpatch = Path('amber99sb_patches.xml')
+
 allowed_text = st.text(
     "COHT1" + "*+", min_size=1, max_size=5
 )
 
 @st.composite
 def random_atomlist(draw):
-    n = draw(st.integers(min_value=5, max_value=10))
+    n = draw(st.integers(min_value=3, max_value=5))
+    elements = st.integers(min_value=1, max_value=n)
+    bound_to = st.lists(elements, min_size=2, max_size=4, unique=True)
     atom_nrs = [str(x + 1) for x in range(n)]
     atoms = []
     for i in atom_nrs:
@@ -51,9 +51,9 @@ def random_atomlist(draw):
 @st.composite
 def random_topology_and_break(draw):
     atoms = draw(random_atomlist())
-    top = generate_topology_from_bound_to(atoms)
-    break_this = draw(st.sampled_from(list(top.bonds.values())))
-    return (top, (break_this.ai, break_this.aj))
+    top = generate_topology_from_bound_to(atoms, ffdir, ffpatch)
+    break_this = draw(st.sampled_from(list(top.bonds.keys())))
+    return (top, break_this)
 
 class TestTopology:
     hexala_top = read_topol(Path('hexala.top'))
@@ -95,24 +95,26 @@ class TestTopology:
     def test_generate_topology_from_bound_to(self):
         og_top = deepcopy(self.top)
         atoms = list(og_top.atoms.values())
-        newtop = generate_topology_from_bound_to(atoms)
+        newtop = generate_topology_from_bound_to(atoms, ffdir, ffpatch)
         assert newtop.bonds == og_top.bonds
         assert newtop.pairs == og_top.pairs
         assert newtop.angles == og_top.angles
         assert newtop.proper_dihedrals == og_top.proper_dihedrals
 
 
-    # @given(
-    #     top_break = random_topology_and_break()
-    # )
-    # def test_break_bind_bond_invertible(self, top_break):
-    #     top, to_break = top_break
-    #     og_top = deepcopy(top)
-    #     top.break_bond(to_break)
-    #     top.bind_bond(to_break)
-    #     assert top.bonds == og_top.bonds
-    #     assert top.pairs == og_top.pairs
-    #     assert top.angles == og_top.angles
-    #     assert top.proper_dihedrals == og_top.proper_dihedrals
+    @settings(max_examples=1, phases=[Phase.generate])
+    @given(
+        top_break = random_topology_and_break()
+    )
+    def test_break_bind_bond_invertible(self, top_break):
+        top, to_break = top_break
+        og_top = deepcopy(top)
+        print(top.__repr__())
+        top.break_bond(to_break)
+        top.bind_bond(to_break)
+        assert top.bonds == og_top.bonds
+        assert top.pairs == og_top.pairs
+        assert top.angles == og_top.angles
+        assert top.proper_dihedrals == og_top.proper_dihedrals
 
 

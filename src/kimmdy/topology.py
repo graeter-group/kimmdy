@@ -553,15 +553,15 @@ class Topology:
         self.proper_dihedrals: dict[tuple[str, str, str, str], Dihedral] = {}
         self.improper_dihedrals: dict[tuple[str, str, str, str], Dihedral] = {}
 
-        # generate empty Topology if empty TopologyDict
-        if self.top == {}:
-            return
-
         if ffdir:
             self.ff = FF(ffdir)
         self.ffpatches = None
         if ffpatch:
             self.ffpatches = FFPatches(ffpatch)
+
+        # generate empty Topology if empty TopologyDict
+        if self.top == {}:
+            return
 
         self._parse_atoms()
         self._parse_bonds()
@@ -994,8 +994,8 @@ def get_element_id(e: Element) -> Optional[str]:
     return id
 
 
-def generate_topology_from_bound_to(atoms: list[Atom]) -> Topology:
-    top = Topology({})
+def generate_topology_from_bound_to(atoms: list[Atom], ffdir: Path, ffpatch: Path) -> Topology:
+    top = Topology({}, ffdir, ffpatch)
     for atom in atoms:
         top.atoms[atom.nr] = atom
 
