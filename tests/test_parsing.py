@@ -74,10 +74,25 @@ def test_parser_invertible(d):
     d2 = parsing.read_topol(p)
     assert d == d2
 
+
 #%%
 def test_parse_xml_ff():
     set_dir()
     ff_path = Path("amber99sb_trunc.xml")
     d = parsing.read_xml_ff(ff_path)
-    refdict = {'HEAD': {}, 'AtomTypes': {'N': {'element': 'N', 'mass': 14.00672}, 'H': {'element': 'H', 'mass': 1.007947}}, 'HarmonicBondForce': {'H_N': {'length': 0.101, 'k': 363171.2}, 'C_*_*_O': {'periodicity1': 2.0, 'phase1': 3.14159265359, 'k1': 43.932}}, 'NonbondedForce': {'N': {'charge': -0.4157, 'sigma': 0.324999852378, 'epsilon': 0.71128}, 'H': {'charge': 0.2719, 'sigma': 0.106907846177, 'epsilon': 0.0656888}}}
+    refdict = {
+        "HEAD": {},
+        "AtomTypes": {
+            "N": {"element": "N", "mass": 14.00672},
+            "H": {"element": "H", "mass": 1.007947},
+        },
+        "HarmonicBondForce": {
+            "H_N": {"length": 0.101, "k": 363171.2},
+            "C_*_*_O": {"periodicity1": 2.0, "phase1": 3.14159265359, "k1": 43.932},
+        },
+        "NonbondedForce": {
+            "N": {"charge": -0.4157, "sigma": 0.324999852378, "epsilon": 0.71128},
+            "H": {"charge": 0.2719, "sigma": 0.106907846177, "epsilon": 0.0656888},
+        },
+    }
     assert d == refdict

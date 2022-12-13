@@ -3,7 +3,6 @@ from copy import deepcopy
 from pathlib import Path
 import os
 
-import hypothesis
 from kimmdy.parsing import read_topol
 from hypothesis import Phase, given, settings, strategies as st
 from kimmdy.topology import Topology, Atom, generate_topology_from_bound_to
@@ -21,11 +20,10 @@ set_dir()
 
 #%%
 ffdir = Path("../assets/amber99sb-star-ildnp.ff")
-ffpatch = Path('amber99sb_patches.xml')
+ffpatch = Path("amber99sb_patches.xml")
 
-allowed_text = st.text(
-    "COHT1" + "*+", min_size=1, max_size=5
-)
+allowed_text = st.text("COHT1" + "*+", min_size=1, max_size=5)
+
 
 @st.composite
 def random_atomlist(draw):
@@ -45,8 +43,9 @@ def random_atomlist(draw):
         atom = Atom(str(i), type, resnr, residue, a, cgnr, charge, mass)
         atom.bound_to_nrs = [str(x) for x in draw(bound_to) if str(x) != i]
         atoms.append(atom)
-    
+
     return atoms
+
 
 @st.composite
 def random_topology_and_break(draw):
@@ -55,10 +54,11 @@ def random_topology_and_break(draw):
     break_this = draw(st.sampled_from(list(top.bonds.keys())))
     return (top, break_this)
 
+
 class TestTopology:
-    hexala_top = read_topol(Path('hexala.top'))
+    hexala_top = read_topol(Path("hexala.top"))
     ffdir = Path("../assets/amber99sb-star-ildnp.ff")
-    ffpatch = Path('amber99sb_patches.xml')
+    ffpatch = Path("amber99sb_patches.xml")
     top = Topology(hexala_top, ffdir, ffpatch)
 
     def test_break_bind_bond_hexala(self):
@@ -78,7 +78,7 @@ class TestTopology:
         assert top.proper_dihedrals == og_top.proper_dihedrals
         assert top.improper_dihedrals == og_top.improper_dihedrals
 
-    @given(bondindex = st.integers(min_value=0, max_value=70))
+    @given(bondindex=st.integers(min_value=0, max_value=70))
     def test_break_bind_random_bond_hexala(self, bondindex):
         top = deepcopy(self.top)
         og_top = deepcopy(top)
@@ -91,7 +91,6 @@ class TestTopology:
         assert top.proper_dihedrals == og_top.proper_dihedrals
         assert top.improper_dihedrals == og_top.improper_dihedrals
 
-
     def test_generate_topology_from_bound_to(self):
         og_top = deepcopy(self.top)
         atoms = list(og_top.atoms.values())
@@ -101,11 +100,8 @@ class TestTopology:
         assert newtop.angles == og_top.angles
         assert newtop.proper_dihedrals == og_top.proper_dihedrals
 
-
     @settings(max_examples=1, phases=[Phase.generate])
-    @given(
-        top_break = random_topology_and_break()
-    )
+    @given(top_break=random_topology_and_break())
     def test_break_bind_bond_invertible(self, top_break):
         top, to_break = top_break
         og_top = deepcopy(top)
@@ -115,5 +111,3 @@ class TestTopology:
         assert top.pairs == og_top.pairs
         assert top.angles == og_top.angles
         assert top.proper_dihedrals == og_top.proper_dihedrals
-
-

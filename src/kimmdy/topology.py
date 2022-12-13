@@ -8,8 +8,6 @@ import re
 import textwrap
 import logging
 
-from kimmdy.utils import str_to_int_or_0
-
 
 @dataclass(order=True)
 class Atom:
@@ -84,10 +82,11 @@ class AtomType:
             epsilon=l[6],
         )
 
+
 @dataclass(order=True)
 class ResidueAtomSpec:
     """Information about one atom in a residue
-    ; name  type  charge  chargegroup       
+    ; name  type  charge  chargegroup
     """
 
     name: str
@@ -97,17 +96,13 @@ class ResidueAtomSpec:
 
     @classmethod
     def from_top_line(cls, l: list[str]):
-        return cls(
-            name=l[0],
-            type=l[1],
-            charge=l[2],
-            cgrp=l[3]
-        )
+        return cls(name=l[0], type=l[1], charge=l[2], cgrp=l[3])
+
 
 @dataclass(order=True)
 class ResidueBondSpec:
     """Information about one bond in a residue
-    ; atom1 atom2      b0      kb      
+    ; atom1 atom2      b0      kb
     """
 
     atom1: str
@@ -118,11 +113,9 @@ class ResidueBondSpec:
     @classmethod
     def from_top_line(cls, l: list[str]):
         return cls(
-            atom1=l[0],
-            atom2=l[1],
-            b0=field_or_none(l,2),
-            kb=field_or_none(l,3)
+            atom1=l[0], atom2=l[1], b0=field_or_none(l, 2), kb=field_or_none(l, 3)
         )
+
 
 @dataclass(order=True)
 class ResidueImroperSpec:
@@ -144,9 +137,10 @@ class ResidueImroperSpec:
             atom2=l[1],
             atom3=l[2],
             atom4=l[3],
-            q0=field_or_none(l,4),
-            cq=field_or_none(l,5)
+            q0=field_or_none(l, 4),
+            cq=field_or_none(l, 5),
         )
+
 
 @dataclass(order=True)
 class Bond:
@@ -283,7 +277,7 @@ class AngleType:
 
     From gromacs topology:
     ';', 'i', 'j', 'k', 'funct', 'c0', 'c1', 'c2', 'c3'
-    where i,j,k are atomtypes 
+    where i,j,k are atomtypes
     """
 
     i: str
@@ -307,7 +301,6 @@ class AngleType:
             c2=field_or_none(l, 6),
             c3=field_or_none(l, 7),
         )
-
 
 
 @dataclass(order=True)
@@ -351,6 +344,7 @@ class Dihedral:
             c4=field_or_none(l, 9),
             c5=field_or_none(l, 10),
         )
+
 
 @dataclass(order=True)
 class DihedralType:
@@ -396,8 +390,7 @@ class DihedralType:
 
 @dataclass(order=True)
 class ResidueType:
-    """Information about one residuetype
-    """
+    """Information about one residuetype"""
 
     residue: str
     atoms: dict[str, ResidueAtomSpec]
@@ -409,21 +402,22 @@ class ResidueType:
         atoms = {}
         bonds = {}
         impropers = {}
-        if ls := d.get('atoms'):
+        if ls := d.get("atoms"):
             for l in ls:
                 atom = ResidueAtomSpec.from_top_line(l)
                 atoms[atom.name] = atom
-        if ls := d.get('bonds'):
+        if ls := d.get("bonds"):
             for l in ls:
                 bond = ResidueBondSpec.from_top_line(l)
                 bonds[(bond.atom1, bond.atom2)] = bond
-        if ls := d.get('impropers'):
+        if ls := d.get("impropers"):
             for l in ls:
                 improper = ResidueImroperSpec.from_top_line(l)
-                impropers[(improper.atom1, improper.atom2, improper.atom3, improper.atom4)] = improper
-            
-        return cls(residue, atoms, bonds, impropers)
+                impropers[
+                    (improper.atom1, improper.atom2, improper.atom3, improper.atom4)
+                ] = improper
 
+        return cls(residue, atoms, bonds, impropers)
 
 
 class FF:
@@ -433,7 +427,9 @@ class FF:
         self.atomtypes: dict[str, AtomType] = {}
         self.bondtypes: dict[tuple[str, str], BondType] = {}
         self.angletypes: dict[tuple[str, str, str], AngleType] = {}
-        self.proper_dihedraltypes: dict[tuple[str, str, str, str], list[DihedralType]] = {}
+        self.proper_dihedraltypes: dict[
+            tuple[str, str, str, str], list[DihedralType]
+        ] = {}
         self.improper_dihedraltypes: dict[tuple[str, str, str, str], DihedralType] = {}
         self.residuetypes: dict[str, ResidueType]
 
@@ -479,11 +475,10 @@ class FF:
             self.residuetypes = {}
             aminoacids_path = ffdir / "aminoacids.rtp"
             aminoacids = read_rtp(aminoacids_path)
-            for k,v in aminoacids.items():
-                if k.startswith('BLOCK') or k == 'bondedtypes': continue
+            for k, v in aminoacids.items():
+                if k.startswith("BLOCK") or k == "bondedtypes":
+                    continue
                 self.residuetypes[k] = ResidueType.from_section(k, v)
-
-
 
     def __repr__(self) -> str:
         return textwrap.dedent(
@@ -569,7 +564,7 @@ class Topology:
         self._parse_angles()
         self._parse_dihedrals()
 
-        self._update_dict()
+        # self._update_dict()
 
         self._initialize_graph()
 
@@ -690,7 +685,7 @@ class Topology:
         dihedral_k_v = self._get_atom_improper_dihedrals(
             atompair_nrs[0]
         ) + self._get_atom_improper_dihedrals(atompair_nrs[1])
-        for key,_ in dihedral_k_v:
+        for key, _ in dihedral_k_v:
             self.improper_dihedrals.pop(key, None)
 
         if self.ffpatches is not None:
@@ -753,11 +748,12 @@ class Topology:
         dihedral_k_v = self._get_atom_improper_dihedrals(
             atompair_nrs[0]
         ) + self._get_atom_improper_dihedrals(atompair_nrs[1])
-        for key,value in dihedral_k_v:
+        for key, value in dihedral_k_v:
             if self.improper_dihedrals.get(key) is None:
                 # TODO: fix this after the demonstration
                 c2 = None
-                if value.q0 is not None: c2 = "1"
+                if value.q0 is not None:
+                    c2 = "1"
                 self.improper_dihedrals[key] = Dihedral(
                     key[0], key[1], key[2], key[3], "4", value.q0, value.cq, c2
                 )
@@ -782,7 +778,9 @@ class Topology:
         return bonds
 
     def _get_atom_pairs(self, _: str) -> list[tuple[str, str]]:
-        raise NotImplementedError("get_atom_pairs is not implementes. Get the pairs as the endpoints of dihedrals instead.")
+        raise NotImplementedError(
+            "get_atom_pairs is not implementes. Get the pairs as the endpoints of dihedrals instead."
+        )
 
     def _get_atom_angles(self, atom_nr: str) -> list[tuple[str, str, str]]:
         """
@@ -878,12 +876,15 @@ class Topology:
         # belongs to an adjacent atom, not just the the specied one
         atom = self.atoms[atom_nr]
         residue = self.ff.residuetypes.get(atom.residue)
-        if residue is None: return []
+        if residue is None:
+            return []
 
         # <https://manual.gromacs.org/current/reference-manual/functions/bonded-interactions.html#improper-dihedrals>
         # atom in a line, like a regular dihedral:
         dihedrals = []
-        dihedral_candidate_keys = self._get_margin_atom_dihedrals(atom_nr) + self._get_center_atom_dihedrals(atom_nr)
+        dihedral_candidate_keys = self._get_margin_atom_dihedrals(
+            atom_nr
+        ) + self._get_center_atom_dihedrals(atom_nr)
 
         # atom in the center of a star/tetrahedron:
         ai = atom_nr
@@ -891,8 +892,8 @@ class Topology:
         if len(partners) >= 3:
             combs = combinations(partners, 3)
             for comb in combs:
-                aj,ak,al = comb
-                dihedral_candidate_keys.append((ai,aj,ak,al))
+                aj, ak, al = comb
+                dihedral_candidate_keys.append((ai, aj, ak, al))
 
         # atom in corner of a star/tetrahedron:
         for a in self.atoms[atom_nr].bound_to_nrs:
@@ -900,20 +901,20 @@ class Topology:
             if len(partners) >= 3:
                 combs = permutations(partners + [a], 4)
                 for comb in combs:
-                    ai,aj,ak,al = comb
-                    dihedral_candidate_keys.append((ai,aj,ak,al))
+                    ai, aj, ak, al = comb
+                    dihedral_candidate_keys.append((ai, aj, ak, al))
 
         # residues on aminoacids.rtp specify a dihedral to the next or previous
         # AA with -C and +N as the atomname
         for candidate in dihedral_candidate_keys:
-            candidate_key =[self.atoms[atom_nr].atom for atom_nr in candidate]
-            for i,nr in enumerate(candidate):
+            candidate_key = [self.atoms[atom_nr].atom for atom_nr in candidate]
+            for i, nr in enumerate(candidate):
                 if self.atoms[nr].resnr != atom.resnr:
                     if candidate_key[i] == "C":
                         candidate_key[i] = "-C"
                     elif candidate_key[i] == "N":
                         candidate_key[i] = "+N"
-                        
+
             candidate_key = tuple(candidate_key)
             dihedral = residue.improper_dihedrals.get(candidate_key)
             if dihedral:
@@ -997,7 +998,9 @@ def get_element_id(e: Element) -> Optional[str]:
     return id
 
 
-def generate_topology_from_bound_to(atoms: list[Atom], ffdir: Path, ffpatch: Path) -> Topology:
+def generate_topology_from_bound_to(
+    atoms: list[Atom], ffdir: Path, ffpatch: Path
+) -> Topology:
     top = Topology({}, ffdir, ffpatch)
     for atom in atoms:
         top.atoms[atom.nr] = atom
@@ -1026,5 +1029,4 @@ def generate_topology_from_bound_to(atoms: list[Atom], ffdir: Path, ffpatch: Pat
 
     # TODO: impropers
 
-    top._update_dict()
     return top
