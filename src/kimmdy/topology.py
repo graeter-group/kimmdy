@@ -651,14 +651,6 @@ class Topology:
         atompair_nrs = tuple(sorted(atompair_nrs, key=int))
         atompair = [self.atoms[atompair_nrs[0]], self.atoms[atompair_nrs[1]]]
 
-        # update bound_to
-        try:
-            atompair[0].bound_to_nrs.remove(atompair[1].nr)
-            atompair[1].bound_to_nrs.remove(atompair[0].nr)
-        except ValueError as _:
-            m = f"tried to remove bond between already disconnected atoms: {atompair}."
-            logging.warning(m)
-
         # bonds
         # remove bonds
         removed = self.bonds.pop(atompair_nrs, None)
@@ -669,7 +661,8 @@ class Topology:
             atompair_nrs[1]
         )
         for key in angle_keys:
-            self.angles.pop(key, None)
+            if all([x in key for x in atompair_nrs]):
+                self.angles.pop(key, None)
 
         # remove proper dihedrals
         # and pairs
@@ -677,16 +670,27 @@ class Topology:
             atompair_nrs[0]
         ) + self._get_atom_proper_dihedrals(atompair_nrs[1])
         for key in dihedral_keys:
-            self.proper_dihedrals.pop(key, None)
-            pairkey = tuple(sorted((key[0], key[3]), key=int))
-            self.pairs.pop(pairkey, None)
+            if all([x in key for x in atompair_nrs]):
+                self.proper_dihedrals.pop(key, None)
+                pairkey = tuple(sorted((key[0], key[3]), key=int))
+                self.pairs.pop(pairkey, None)
 
         # and improper dihedrals
         dihedral_k_v = self._get_atom_improper_dihedrals(
             atompair_nrs[0]
         ) + self._get_atom_improper_dihedrals(atompair_nrs[1])
         for key, _ in dihedral_k_v:
-            self.improper_dihedrals.pop(key, None)
+            if all([x in key for x in atompair_nrs]):
+                self.improper_dihedrals.pop(key, None)
+
+        # update bound_to
+        try:
+            atompair[0].bound_to_nrs.remove(atompair[1].nr)
+            atompair[1].bound_to_nrs.remove(atompair[0].nr)
+        except ValueError as _:
+            m = f"tried to remove bond between already disconnected atoms: {atompair}."
+            logging.warning(m)
+
 
         if self.ffpatches is not None:
             self._patch_parameters(atompair)
