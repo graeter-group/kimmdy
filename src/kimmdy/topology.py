@@ -696,7 +696,7 @@ class Topology:
         if self.ffpatches is not None:
             self._patch_parameters(atompair)
 
-        self._update_dict()
+        # self._update_dict()
 
     def bind_bond(self, atompair_nrs: tuple[str, str]):
         """Add a bond in topology.
@@ -770,7 +770,7 @@ class Topology:
         if self.ffpatches is not None:
             self._patch_parameters(atompair)
 
-        self._update_dict()
+        # self._update_dict()
 
     def _get_atom_bonds(self, atom_nr: str) -> list[tuple[str, str]]:
         ai = atom_nr
