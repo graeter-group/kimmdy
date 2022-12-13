@@ -8,16 +8,18 @@ from itertools import takewhile
 
 TopologyDict = dict[str, list[list[str]]]
 
+
 def is_not_comment(c: str) -> bool:
-    return c != ';'
+    return c != ";"
+
 
 def get_sections(
-        seq: Iterable[str], section_marker: str
-    ) -> Generator[list[str], None, None]:
+    seq: Iterable[str], section_marker: str
+) -> Generator[list[str], None, None]:
     data = [""]
     for line in seq:
-        line = ''.join(takewhile(is_not_comment, line))
-        if line.strip(' ').startswith(section_marker):
+        line = "".join(takewhile(is_not_comment, line))
+        if line.strip(" ").startswith(section_marker):
             if data:
                 # first element will be empty
                 # because newlines mark sections
@@ -45,6 +47,7 @@ def extract_section_name(ls: list[str]) -> tuple[str, list[str]]:
     else:
         return ("", ls)
 
+
 def create_subsections(ls: list[list[str]]):
     d = {}
     subsection_name = "other"
@@ -57,6 +60,7 @@ def create_subsections(ls: list[list[str]]):
             d[subsection_name].append(l)
 
     return d
+
 
 def read_rtp(path: Path) -> dict:
     # TODO: make this more elegant and performant
@@ -204,8 +208,8 @@ def read_plumed_distances(plumed_dat: Path, distances_dat: Path):
 
     return atoms
 
+
 def read_xml_ff(path: Path) -> ET.Element:
     tree = ET.parse(path)
     root = tree.getroot()
     return root
-

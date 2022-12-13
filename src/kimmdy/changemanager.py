@@ -30,7 +30,9 @@ from operator import itemgetter
 import re
 
 
-def modify_top(recipe: ConversionRecipe, oldtop: Path, newtop: Path, ffdir: Path, ffpatch: Path):
+def modify_top(
+    recipe: ConversionRecipe, oldtop: Path, newtop: Path, ffdir: Path, ffpatch: Path
+):
     logging.info(f"Reading: {oldtop} and writing modified topology to {newtop}.")
     topologyDict = read_topol(oldtop)
     topology = Topology(topologyDict, ffdir, ffpatch)
@@ -116,6 +118,7 @@ class Atom:
     # bound_to: list[str] = field(default_factory=list)
     bound_to: list[Atom] = field(default_factory=list)
 
+
 @dataclass
 class Bond:
     """Information about one bond
@@ -132,24 +135,29 @@ class Bond:
 def bond_section_to_bond_dict(ls: list[list[str]]) -> dict:
     d = {}
     for l in ls:
-        if l[0] == ';': continue
-        i,j,f = l
-        i,j = sorted([i,j])
-        d[(i,j)] = Bond(i,j,f)
+        if l[0] == ";":
+            continue
+        i, j, f = l
+        i, j = sorted([i, j])
+        d[(i, j)] = Bond(i, j, f)
     return d
+
 
 def atom_section_to_atom_dict(ls: list[list[str]]) -> dict:
     d = {}
     for l in ls:
-        if l[0] == ';': continue
+        if l[0] == ";":
+            continue
         d[l[0]] = Atom(l[0], l[1], l[4], l[3])
     return d
+
 
 def reciprocal_bonds(d: dict) -> dict:
     reciproce_dict = {}
     for k in d.keys():
         reciproce_dict[k[::-1]] = d[k]
     return reciproce_dict
+
 
 class LocalGraph:
     def __init__(
@@ -173,11 +181,10 @@ class LocalGraph:
         self.angles = []
         self.proper_dihedrals = []
         self.improper_dihedrals = []
-        self.topology_bonds = bond_section_to_bond_dict(topology['bonds'])
+        self.topology_bonds = bond_section_to_bond_dict(topology["bonds"])
         self.topology_bonds_reciprocal = reciprocal_bonds(self.topology_bonds)
-        self.topology_atoms = atom_section_to_atom_dict(topology['atoms'])
+        self.topology_atoms = atom_section_to_atom_dict(topology["atoms"])
 
-       
         # add initial two atoms to the graph
         one, two = [self.topology_atoms[idx] for idx in central_pair]
         one.bound_to.append(two)
@@ -194,7 +201,6 @@ class LocalGraph:
                 if atom.idx in key:
                     self.bonds.append(bond)
 
-
         # self.construct_graph(depth)
         # self.order_lists()
         # self.update_atoms_list()
@@ -203,16 +209,18 @@ class LocalGraph:
         # self.order_lists()
 
     def __repr__(self) -> str:
-        s = '\n'.join([
-            f'atoms: {self.atoms}',
-            f'bonds: {self.bonds}',
-            f'pairs: {self.pairs}',
-            f'angles: {self.angles}',
-            f'proper_dihedrals: {self.proper_dihedrals}',
-            f'improper_dihedrals: {self.improper_dihedrals}',
-            # f'atomdict: {self.topology_atoms}',
-            # f'bondsdict: {self.topology_bonds}',
-                       ])
+        s = "\n".join(
+            [
+                f"atoms: {self.atoms}",
+                f"bonds: {self.bonds}",
+                f"pairs: {self.pairs}",
+                f"angles: {self.angles}",
+                f"proper_dihedrals: {self.proper_dihedrals}",
+                f"improper_dihedrals: {self.improper_dihedrals}",
+                # f'atomdict: {self.topology_atoms}',
+                # f'bondsdict: {self.topology_bonds}',
+            ]
+        )
         return s
 
     def construct_graph(self, depth=3):
