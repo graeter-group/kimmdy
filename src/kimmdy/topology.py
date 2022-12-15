@@ -33,6 +33,7 @@ class Atom:
     massB: Optional[str] = None
     # TODO: use this with a local graph representation
     bound_to_nrs: list[str] = field(default_factory=list)
+    is_radical = False
 
     @classmethod
     def from_top_line(cls, l: list[str]):
@@ -651,6 +652,10 @@ class Topology:
         atompair_nrs = tuple(sorted(atompair_nrs, key=int))
         atompair = [self.atoms[atompair_nrs[0]], self.atoms[atompair_nrs[1]]]
 
+        # mark atoms as radicals
+        for atom in atompair:
+            atom.is_radical = True
+
         # bonds
         # remove bonds
         removed = self.bonds.pop(atompair_nrs, None)
@@ -715,6 +720,12 @@ class Topology:
 
         atompair_nrs = tuple(sorted(atompair_nrs, key=int))
         atompair = [self.atoms[atompair_nrs[0]], self.atoms[atompair_nrs[1]]]
+
+        # de-radialize if re-combining two radicals
+        if all(map(lambda x: x.is_radical, atompair)):
+            atompair[0].is_radical = False
+            atompair[1].is_radical = False
+
 
         # update bound_to
         atompair[0].bound_to_nrs.append(atompair[1].nr)
