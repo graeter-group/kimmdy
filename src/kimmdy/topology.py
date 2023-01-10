@@ -32,9 +32,8 @@ class Atom:
     typeB: Optional[str] = None
     chargeB: Optional[str] = None
     massB: Optional[str] = None
-    # TODO: use this with a local graph representation
     bound_to_nrs: list[str] = field(default_factory=list)
-    is_radical = False
+    is_radical: bool = False
 
     @classmethod
     def from_top_line(cls, l: list[str]):
@@ -560,6 +559,7 @@ class BondPatch:
         patches = props_to_patches(props)
         return cls(ai, aj, patches)
 
+
 @dataclass(order=True)
 class PairPatch:
     """Instructions to patch one pair"""
@@ -601,6 +601,7 @@ class AnglePatch:
         patches = props_to_patches(props)
         return cls(ai, aj, ak, patches)
 
+
 @dataclass(order=True)
 class DihedralPatch:
     """Instructions to patch one dihedral"""
@@ -621,10 +622,13 @@ class DihedralPatch:
         al = props.pop("al", None)
         periodicity = props.pop("periodicity", None)
         if ai is None or aj is None or ak is None or al is None or periodicity is None:
-            raise ValueError("Angle patch must have an ai, aj, ak, al and periodicity attribute")
+            raise ValueError(
+                "Angle patch must have an ai, aj, ak, al and periodicity attribute"
+            )
 
         patches = props_to_patches(props)
         return cls(ai, aj, ak, al, periodicity, patches)
+
 
 class FFPatches:
     """A container for forcefield patches"""
@@ -799,11 +803,10 @@ class Topology:
         for atom in atompair:
             atom.is_radical = True
 
-        # apply patches
-        if atompatches := self.ffpatches.atompatches:
-            for atom in atompair:
-                # logging.info(f"Adjust parameters for atom {atom}.")
-                pass
+            # patch parameters
+            if self.ffpatches is None or self.ffpatches.atompatches is None: continue
+            spec = self.ff.atomtypes.get(atom.type)
+            print(spec)
 
         # bonds
         # remove bonds
@@ -845,10 +848,6 @@ class Topology:
             m = f"tried to remove bond between already disconnected atoms: {atompair}."
             logging.warning(m)
 
-        if self.ffpatches is not None:
-            self._patch_parameters(atompair)
-
-        # self._update_dict()
 
     def bind_bond(self, atompair_nrs: tuple[str, str]):
         """Add a bond in topology.
@@ -924,11 +923,6 @@ class Topology:
         if self.ffpatches is None:
             self._update_dict()
             return
-
-        if self.ffpatches is not None:
-            self._patch_parameters(atompair)
-
-        # self._update_dict()
 
     def _get_atom_bonds(self, atom_nr: str) -> list[tuple[str, str]]:
         ai = atom_nr
@@ -1085,9 +1079,18 @@ class Topology:
         return dihedrals
 
     def _patch_parameters(self, atompair: list[Atom]):
-        # TODO: handle this abstractly for different patch types and parameters
+        if self.ffpatches is None:
+            return
         # Adjust parameters based on patch
+        # TODO: move to the section where the bonds are broken and made
+        # to reduce iterations
+        atom_nrs = [a.nr for a in atompair]
+
         # atoms
+        if atompatches := self.ffpatches.atompatches:
+            for atom in atompair:
+                spec = self.ff.atomtypes.get(atom.type)
+                print(spec)
 
         # get (unbroken) bonds that the now radicals in the atompair are still involved in
         if bondpatches := self.ffpatches.bondpatches:
@@ -1095,6 +1098,9 @@ class Topology:
 
         # get (unbroken) angles that the now radicals in the atompair are still involved in
         if anglepatches := self.ffpatches.anglepatches:
+            pass
+
+        if pairpatches := self.ffpatches.pairpatches:
             pass
 
         # get (unbroken) angles that the now radicals in the atompair are still involved in

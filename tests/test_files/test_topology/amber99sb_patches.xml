@@ -8,32 +8,32 @@
  <Bonds>
 
   <!-- This is just a test. -->
-  <Bond ai="*_R" aj="*" func_value="1" c0_factor="0.98" c1_value="100"/>
+  <Bond ai="X_R" aj="X" func_value="1" c0_factor="0.98" c1_value="100"/>
   <!-- This is just a test. -->
 
-  <Bond ai="*_R" aj="*"  c0_factor="0.98"/>
-  <Bond ai="*_R" aj="H+" c0_factor="1.00"/>
-  <Bond ai="O+_R" aj="*" c0_factor="0.95"/>
-  <Bond ai="O+" aj="*_R" c0_factor="0.95"/>
-  <Bond ai="S+_R" aj="*" c0_factor="0.95"/>
-  <Bond ai="S+" aj="*_R" c0_factor="0.95"/>
+  <Bond ai="X_R" aj="X"  c0_factor="0.98"/>
+  <Bond ai="X_R" aj="H+" c0_factor="1.00"/>
+  <Bond ai="O+_R" aj="X" c0_factor="0.95"/>
+  <Bond ai="O+" aj="X_R" c0_factor="0.95"/>
+  <Bond ai="S+_R" aj="X" c0_factor="0.95"/>
+  <Bond ai="S+" aj="X_R" c0_factor="0.95"/>
   <Bond ai="N" aj="CT_R" c0_factor="0.94"/>
   <Bond ai="C" aj="N_R" c0_factor="0.92"/>
  </Bonds>
  <Angles> 
 
   <!-- This is just a test. -->
-  <Angle ai="*" aj="*_R" ak="*" func_value="1" c0="117" c1_offset="1" c2_factor="1"/>
+  <Angle ai="X" aj="X_R" ak="X" func_value="1" c0="117" c1_offset="1" c2_factor="1"/>
   <!-- This is just a test. -->
 
-  <Angle ai="*" aj="*_R" ak="*" angle_value="117"/>
-  <Angle ai="*" aj="CR_R" ak="*" angle_factor="1.08"/>
-  <Angle ai="*" aj="NA_R" ak="*" angle_factor="1.08"/>
-  <Angle ai="*" aj="CW_R" ak="*" angle_factor="1.08"/>
-  <Angle ai="*" aj="CC_R" ak="*" angle_factor="1.08"/>
-  <Angle ai="*" aj="CA_R" ak="*" angle_factor="1.08"/>
-  <Angle ai="*" aj="CN_R" ak="*" angle_factor="1.08"/>
-  <Angle ai="*" aj="C*_R" ak="*" angle_factor="1.08"/>
+  <Angle ai="X" aj="X_R" ak="X" angle_value="117"/>
+  <Angle ai="X" aj="CR_R" ak="X" angle_factor="1.08"/>
+  <Angle ai="X" aj="NA_R" ak="X" angle_factor="1.08"/>
+  <Angle ai="X" aj="CW_R" ak="X" angle_factor="1.08"/>
+  <Angle ai="X" aj="CC_R" ak="X" angle_factor="1.08"/>
+  <Angle ai="X" aj="CA_R" ak="X" angle_factor="1.08"/>
+  <Angle ai="X" aj="CN_R" ak="X" angle_factor="1.08"/>
+  <Angle ai="X" aj="CX_R" ak="X" angle_factor="1.08"/>
  </Angles>
  <Dihedrals>
 
@@ -56,7 +56,7 @@
   <Dihedral ai="N" aj="CT_R" ak="C" al="N" periodicity="2" phase_value="180.0" k_value="20.284450"/>
   <Dihedral ai="N" aj="CT_R" ak="C" al="N" periodicity="3" phase_value="180.0" k_value="0.297901"/>
 
-  <Dihedral ai="*" aj="*" ak="*_R" al="*" periodicity="2" phase_value="180.0" k_value="43.932"/>
+  <Dihedral ai="X" aj="X" ak="X_R" al="X" periodicity="2" phase_value="180.0" k_value="43.932"/>
 
 
  </Dihedrals>
