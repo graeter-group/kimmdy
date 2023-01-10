@@ -632,6 +632,11 @@ class DihedralPatch:
 
 class FFPatches:
     """A container for forcefield patches"""
+    atompatches: list[AtomPatch]
+    bondpatches: list[BondPatch]
+    pairpatches: list[PairPatch]
+    anglepatches: list[AnglePatch]
+    dihedralpatches: list[DihedralPatch]
 
     def __init__(self, path: Path) -> None:
         xml = read_xml_ff(path)
@@ -799,6 +804,20 @@ class Topology:
         atompair_nrs = tuple(sorted(atompair_nrs, key=int))
         atompair = [self.atoms[atompair_nrs[0]], self.atoms[atompair_nrs[1]]]
 
+        def apply_param(old_value, new_params: ParamPatch):
+            pass
+
+        def patch_params(atom: Atom, patch: AtomPatch, spec: AtomType):
+            for key, patch in patch.patches.items():
+                # check if the key is already set in the topology
+
+                # otherwise get the initial value from the FF
+
+                # then patch it
+                # new = apply_param(key, patch)
+                pass
+            
+
         # mark atoms as radicals
         for atom in atompair:
             atom.is_radical = True
@@ -806,7 +825,9 @@ class Topology:
             # patch parameters
             if self.ffpatches is None or self.ffpatches.atompatches is None: continue
             spec = self.ff.atomtypes.get(atom.type)
-            print(spec)
+            for patch in self.ffpatches.atompatches:
+                if patch.ai == atom.type + "_R":
+                    patch_params(atom, patch, spec)
 
         # bonds
         # remove bonds
