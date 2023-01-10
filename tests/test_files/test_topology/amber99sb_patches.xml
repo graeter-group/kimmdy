@@ -1,7 +1,7 @@
 <ForceFieldPatches>
  <Atoms>
   <!-- This is just a test. -->
-  <Atom ai="CT_R" charge_factor="100" mass_factor="10" sigma="100" epsilon="100"/>
+  <Atom ai="CT_R" charge_factor="100" mass_factor="10" mass_offset="42" sigma_value="100" epsilon_value="100"/>
   <!-- This is just a test. -->
 
  </Atoms>

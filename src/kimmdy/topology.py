@@ -4,6 +4,7 @@ from typing import Any, Optional
 from xml.etree.ElementTree import Element
 from kimmdy.parsing import TopologyDict, read_topol, read_xml_ff, read_rtp
 from itertools import takewhile, permutations, combinations
+from xml.etree.ElementTree import Element
 import re
 import textwrap
 import logging
@@ -491,15 +492,53 @@ class FF:
         {len(self.proper_dihedraltypes)} dihedraltypes
         {len(self.residuetypes)} residuetypes
         """
+
         )
 
+@dataclass
+class ParamPatch():
+    offset: Optional[float] = None
+    factor: Optional[float] = None
+    value: Optional[float] = None
+
+    def update(self, new):
+        self.__dict__.update(new)
+
+@dataclass(order=True)
+class AtomPatch:
+    """Instructions to patch one atom or a match of atoms"""
+
+    ai: str
+    patches: dict[str, ParamPatch]
+
+    @classmethod
+    def from_element(cls, elem: Element):
+        props = elem.attrib
+        name = props.pop('ai')
+        if name is None:
+            raise ValueError('Atom patch must have an ai attribute')
+
+        patches = {}
+        for k, v in props.items():
+            if patches.get(k) == None: patches[k] = ParamPatch()
+            if k.endswith("_factor"):
+                patches[k.removesuffix("_factor")].update({'factor': float(v)})
+            elif k.endswith("_offset"):
+                patches[k.removesuffix("_offset")].update({'_offset': float(v)})
+
+        return cls(name, patches)
 
 class FFPatches:
     """A container for forcefield patches"""
 
     def __init__(self, path: Path) -> None:
         xml = read_xml_ff(path)
-        self.atompatches = xml.findall("Atoms/Atom")
+        self.atompatches = []
+        if elems := xml.findall("Atoms/Atom"):
+            for elem in elems:
+                self.atompatches.append(AtomPatch.from_element(elem))
+
+        self.rawatomspatches = xml.findall("Atoms/Atom")
         self.bondpatches = xml.findall("Bonds/Bond")
         self.pairpatches = xml.findall("Pairs/Pair")
         self.anglepatches = xml.findall("Angles/Angle")
@@ -655,6 +694,12 @@ class Topology:
         # mark atoms as radicals
         for atom in atompair:
             atom.is_radical = True
+
+        # apply patches
+        if atompatches := self.ffpatches.atompatches:
+            for atom in atompair:
+                # logging.info(f"Adjust parameters for atom {atom}.")
+                pass
 
         # bonds
         # remove bonds
@@ -941,10 +986,6 @@ class Topology:
         # TODO: handle this abstractly for different patch types and parameters
         # Adjust parameters based on patch
         # atoms
-        if atompatches := self.ffpatches.atompatches:
-            for atom in atompair:
-                # logging.info(f"Adjust parameters for atom {atom}.")
-                pass
 
         # get (unbroken) bonds that the now radicals in the atompair are still involved in
         if bondpatches := self.ffpatches.bondpatches:
