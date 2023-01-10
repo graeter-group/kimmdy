@@ -8,7 +8,7 @@
  <Bonds>
 
   <!-- This is just a test. -->
-  <Bond ai="*_R" aj="*" func="1" c0_factor="0.98" c1="100"/>
+  <Bond ai="*_R" aj="*" func_value="1" c0_factor="0.98" c1_value="100"/>
   <!-- This is just a test. -->
 
   <Bond ai="*_R" aj="*"  c0_factor="0.98"/>
@@ -21,11 +21,12 @@
   <Bond ai="C" aj="N_R" c0_factor="0.92"/>
  </Bonds>
  <Angles> 
+
   <!-- This is just a test. -->
-  <Angle ai="*" aj="*_R" ak="*" func="1" c0="117" c1_offset="1" c2_factor="1"/>
+  <Angle ai="*" aj="*_R" ak="*" func_value="1" c0="117" c1_offset="1" c2_factor="1"/>
   <!-- This is just a test. -->
 
-  <Angle ai="*" aj="*_R" ak="*" angle="117"/>
+  <Angle ai="*" aj="*_R" ak="*" angle_value="117"/>
   <Angle ai="*" aj="CR_R" ak="*" angle_factor="1.08"/>
   <Angle ai="*" aj="NA_R" ak="*" angle_factor="1.08"/>
   <Angle ai="*" aj="CW_R" ak="*" angle_factor="1.08"/>
@@ -35,16 +36,29 @@
   <Angle ai="*" aj="C*_R" ak="*" angle_factor="1.08"/>
  </Angles>
  <Dihedrals>
-  <!-- This is just a test. -->
-  <!-- how doe we handle this multiple dihedrals thing? -->
-  <!--  -->
-  <!-- https://manual.gromacs.org/documentation/current/reference-manual/topologies/topology-file-formats.html -->
-  <Dihedral ai="C" aj="N" ak="CT_R" al="C" periodicity1="1" phase1="180.0" k1="1.6279944" periodicity2="2" phase2="180.0" k2="21.068532" periodicity3="3" phase3="180.0" k3="1.447664"/>
 
   <!-- This is just a test. -->
-  <Dihedral ai="C" aj="N" ak="CT_R" al="C" periodicity1="1" phase1="180.0" k1="1.6279944" periodicity2="2" phase2="180.0" k2="21.068532" periodicity3="3" phase3="180.0" k3="1.447664"/>
-  <Dihedral ai="N" aj="CT_R" ak="C" al="N" periodicity1="1" phase1="180.0" k1="6.556746"  periodicity2="2" phase2="180.0" k2="20.284450" periodicity3="3" phase3="180.0" k3="0.297901"/>
-  <Dihedral ai="*" aj="*" ak="*_R" al="*" periodicity1="2" phase1="180.0" k1="43.932"/>
+  <!-- how doe we handle this multiple dihedrals thing? -->
+  <!-- https://manual.gromacs.org/documentation/current/reference-manual/topologies/topology-file-formats.html -->
+  <Dihedral ai="C" aj="N" ak="CT_R" al="C" periodicity="1" phase_value="180.0" k_value="1.6279944"/>
+  <Dihedral ai="C" aj="N" ak="CT_R" al="C" periodicity="2" phase_value="180.0" k_value="21.068532"/>
+  <Dihedral ai="C" aj="N" ak="CT_R" al="C" periodicity="3" phase_value="180.0" k_value="1.447664"/>
+  <!-- This is just a test. -->
+
+
+  <Dihedral ai="C" aj="N" ak="CT_R" al="C" periodicity="1" phase_value="180.0" k_value="1.6279944"/>
+  <Dihedral ai="C" aj="N" ak="CT_R" al="C" periodicity="2" phase_value="180.0" k_value="21.068532"/>
+  <Dihedral ai="C" aj="N" ak="CT_R" al="C" periodicity="3" phase_value="180.0" k_value="1.447664"/>
+
+
+
+  <Dihedral ai="N" aj="CT_R" ak="C" al="N" periodicity="1" phase_value="180.0" k_value="6.556746"/>
+  <Dihedral ai="N" aj="CT_R" ak="C" al="N" periodicity="2" phase_value="180.0" k_value="20.284450"/>
+  <Dihedral ai="N" aj="CT_R" ak="C" al="N" periodicity="3" phase_value="180.0" k_value="0.297901"/>
+
+  <Dihedral ai="*" aj="*" ak="*_R" al="*" periodicity="2" phase_value="180.0" k_value="43.932"/>
+
+
  </Dihedrals>
 </ForceFieldPatches>
 
