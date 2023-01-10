@@ -1,3 +1,19 @@
+<!-- 
+
+Note: * and + characters are already used in the ff as part of atomtypes
+
+Spec:
+X = any atomtype
+X_R = any radical
+CT_R = radical that would be CT if it wasn't a radical
+OX = starts with O followed by anything
+OX_R = starts with O followed by anything and is a radical
+
+_P and _M could be used in the future for positive and negative ions
+after heterolysis
+
+-->
+
 <ForceFieldPatches>
  <Atoms>
   <!-- This is just a test. -->
@@ -12,11 +28,11 @@
   <!-- This is just a test. -->
 
   <Bond ai="X_R" aj="X"  c0_factor="0.98"/>
-  <Bond ai="X_R" aj="H+" c0_factor="1.00"/>
-  <Bond ai="O+_R" aj="X" c0_factor="0.95"/>
-  <Bond ai="O+" aj="X_R" c0_factor="0.95"/>
-  <Bond ai="S+_R" aj="X" c0_factor="0.95"/>
-  <Bond ai="S+" aj="X_R" c0_factor="0.95"/>
+  <Bond ai="X_R" aj="HX" c0_factor="1.00"/>
+  <Bond ai="OX_R" aj="X" c0_factor="0.95"/>
+  <Bond ai="OX" aj="X_R" c0_factor="0.95"/>
+  <Bond ai="SX_R" aj="X" c0_factor="0.95"/>
+  <Bond ai="SX" aj="X_R" c0_factor="0.95"/>
   <Bond ai="N" aj="CT_R" c0_factor="0.94"/>
   <Bond ai="C" aj="N_R" c0_factor="0.92"/>
  </Bonds>
@@ -61,4 +77,3 @@
 
  </Dihedrals>
 </ForceFieldPatches>
-
