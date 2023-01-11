@@ -18,6 +18,9 @@ after heterolysis
  <Atoms>
   <!-- This is just a test. -->
   <Atom ai="CT_R" charge_factor="100" mass_factor="10" mass_offset="42" sigma_value="100" epsilon_value="100"/>
+  <Atom ai="X_R" charge_factor="100" mass_factor="10" mass_offset="42" sigma_value="100" epsilon_value="100"/>
+  <Atom ai="X*_R" charge_factor="100" mass_factor="10" mass_offset="42" sigma_value="100" epsilon_value="100"/>
+  <Atom ai="OX_R" charge_factor="100" mass_factor="10" mass_offset="42" sigma_value="100" epsilon_value="100"/>
   <!-- This is just a test. -->
 
  </Atoms>
@@ -56,23 +59,22 @@ after heterolysis
   <!-- This is just a test. -->
   <!-- how doe we handle this multiple dihedrals thing? -->
   <!-- https://manual.gromacs.org/documentation/current/reference-manual/topologies/topology-file-formats.html -->
-  <Dihedral ai="C" aj="N" ak="CT_R" al="C" periodicity="1" phase_value="180.0" k_value="1.6279944"/>
-  <Dihedral ai="C" aj="N" ak="CT_R" al="C" periodicity="2" phase_value="180.0" k_value="21.068532"/>
-  <Dihedral ai="C" aj="N" ak="CT_R" al="C" periodicity="3" phase_value="180.0" k_value="1.447664"/>
+  <Dihedral ai="C" aj="N" ak="CT_R" al="C" func="9" periodicity="1" phase_value="180.0" k_value="1.6279944"/>
+  <Dihedral ai="C" aj="N" ak="CT_R" al="C" func="9" periodicity="2" phase_value="180.0" k_value="21.068532"/>
+  <Dihedral ai="C" aj="N" ak="CT_R" al="C" func="9" periodicity="3" phase_value="180.0" k_value="1.447664"/>
   <!-- This is just a test. -->
 
 
-  <Dihedral ai="C" aj="N" ak="CT_R" al="C" periodicity="1" phase_value="180.0" k_value="1.6279944"/>
-  <Dihedral ai="C" aj="N" ak="CT_R" al="C" periodicity="2" phase_value="180.0" k_value="21.068532"/>
-  <Dihedral ai="C" aj="N" ak="CT_R" al="C" periodicity="3" phase_value="180.0" k_value="1.447664"/>
+  <Dihedral ai="C" aj="N" ak="CT_R" al="C" func="9" periodicity="1" phase_value="180.0" k_value="1.6279944"/>
+  <Dihedral ai="C" aj="N" ak="CT_R" al="C" func="9" periodicity="2" phase_value="180.0" k_value="21.068532"/>
+  <Dihedral ai="C" aj="N" ak="CT_R" al="C" func="9" periodicity="3" phase_value="180.0" k_value="1.447664"/>
 
 
+  <Dihedral ai="N" aj="CT_R" ak="C" al="N" func="9" periodicity="1" phase_value="180.0" k_value="6.556746"/>
+  <Dihedral ai="N" aj="CT_R" ak="C" al="N" func="9" periodicity="2" phase_value="180.0" k_value="20.284450"/>
+  <Dihedral ai="N" aj="CT_R" ak="C" al="N" func="9" periodicity="3" phase_value="180.0" k_value="0.297901"/>
 
-  <Dihedral ai="N" aj="CT_R" ak="C" al="N" periodicity="1" phase_value="180.0" k_value="6.556746"/>
-  <Dihedral ai="N" aj="CT_R" ak="C" al="N" periodicity="2" phase_value="180.0" k_value="20.284450"/>
-  <Dihedral ai="N" aj="CT_R" ak="C" al="N" periodicity="3" phase_value="180.0" k_value="0.297901"/>
-
-  <Dihedral ai="X" aj="X" ak="X_R" al="X" periodicity="2" phase_value="180.0" k_value="43.932"/>
+  <Dihedral ai="X" aj="X" ak="X_R" al="X" func="9" periodicity="2" phase_value="180.0" k_value="43.932"/>
 
 
  </Dihedrals>

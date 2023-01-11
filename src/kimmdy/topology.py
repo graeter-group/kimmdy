@@ -1,3 +1,4 @@
+from abc import ABC
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Optional
@@ -496,12 +497,22 @@ class FF:
 
 @dataclass
 class ParamPatch:
+    value: Optional[float] = None
     offset: Optional[float] = None
     factor: Optional[float] = None
-    value: Optional[float] = None
 
     def update(self, new):
         self.__dict__.update(new)
+
+    def apply(self, initial: float):
+        result = initial
+        if self.value is not None:
+            result = self.value
+        if self.offset is not None:
+            result += self.offset
+        if self.factor is not None:
+            result *= self.factor
+        return result
 
 
 def props_to_patches(props):
@@ -521,63 +532,72 @@ def props_to_patches(props):
     return patches
 
 
+class Patch:
+    id: str
+    params: dict[str, ParamPatch]
+
+
 @dataclass(order=True)
-class AtomPatch:
+class AtomPatch(Patch):
     """Instructions to patch one atom"""
 
     ai: str
-    patches: dict[str, ParamPatch]
+    id: str
+    params: dict[str, ParamPatch]
 
-    @classmethod
-    def from_element(cls, elem: Element):
+    def __init__(self, elem: Element):
         props = elem.attrib
-        name = props.pop("ai", None)
-        if name is None:
+        ai = props.pop("ai", None)
+        if ai is None:
             raise ValueError("Atom patch must have an ai attribute")
 
-        patches = props_to_patches(props)
-
-        return cls(name, patches)
+        self.ai = ai
+        self.params = props_to_patches(props)
+        self.id = self.ai
 
 
 @dataclass(order=True)
-class BondPatch:
+class BondPatch(Patch):
     """Instructions to patch one bond"""
 
     ai: str
     aj: str
-    patches: dict[str, ParamPatch]
+    id: str
+    params: dict[str, ParamPatch]
 
-    @classmethod
-    def from_element(cls, elem: Element):
+    def __init__(self, elem: Element):
         props = elem.attrib
         ai = props.pop("ai", None)
         aj = props.pop("aj", None)
         if ai is None or aj is None:
             raise ValueError("Bond patch must have an ai and aj attribute")
 
-        patches = props_to_patches(props)
-        return cls(ai, aj, patches)
+        self.params = props_to_patches(props)
+        self.ai = ai
+        self.aj = aj
+        self.id = ai + "---" + aj
 
 
 @dataclass(order=True)
-class PairPatch:
+class PairPatch(Patch):
     """Instructions to patch one pair"""
 
     ai: str
     aj: str
-    patches: dict[str, ParamPatch]
+    id: str
+    params: dict[str, ParamPatch]
 
-    @classmethod
-    def from_element(cls, elem: Element):
+    def __init__(self, elem: Element):
         props = elem.attrib
         ai = props.pop("ai", None)
         aj = props.pop("aj", None)
         if ai is None or aj is None:
             raise ValueError("Pair patch must have an ai and aj attribute")
 
-        patches = props_to_patches(props)
-        return cls(ai, aj, patches)
+        self.patches = props_to_patches(props)
+        self.ai = ai
+        self.aj = aj
+        self.id = ai + "---" + aj
 
 
 @dataclass(order=True)
@@ -587,10 +607,10 @@ class AnglePatch:
     ai: str
     aj: str
     ak: str
-    patches: dict[str, ParamPatch]
+    id: str
+    params: dict[str, ParamPatch]
 
-    @classmethod
-    def from_element(cls, elem: Element):
+    def __init__(self, elem: Element):
         props = elem.attrib
         ai = props.pop("ai", None)
         aj = props.pop("aj", None)
@@ -598,74 +618,110 @@ class AnglePatch:
         if ai is None or aj is None or ak is None:
             raise ValueError("Angle patch must have an ai, aj and ak attribute")
 
-        patches = props_to_patches(props)
-        return cls(ai, aj, ak, patches)
+        self.patches = props_to_patches(props)
+        self.ai = ai
+        self.aj = aj
+        self.ak = ak
+        self.id = ai + "---" + aj + "---" + ak
 
 
 @dataclass(order=True)
-class DihedralPatch:
+class DihedralPatch(Patch):
     """Instructions to patch one dihedral"""
 
     ai: str
     aj: str
     ak: str
     al: str
+    func: str
     periodicity: str
+    id: str
     patches: dict[str, ParamPatch]
 
-    @classmethod
-    def from_element(cls, elem: Element):
+    def __init__(self, elem: Element):
         props = elem.attrib
         ai = props.pop("ai", None)
         aj = props.pop("aj", None)
         ak = props.pop("ak", None)
         al = props.pop("al", None)
+        func = props.pop("func", None)
         periodicity = props.pop("periodicity", None)
-        if ai is None or aj is None or ak is None or al is None or periodicity is None:
+        if (
+            ai is None
+            or aj is None
+            or ak is None
+            or al is None
+            or func is None
+            or periodicity is None
+        ):
             raise ValueError(
                 "Angle patch must have an ai, aj, ak, al and periodicity attribute"
             )
 
-        patches = props_to_patches(props)
-        return cls(ai, aj, ak, al, periodicity, patches)
+        self.patches = props_to_patches(props)
+        self.ai = ai
+        self.aj = aj
+        self.ak = ak
+        self.ak = al
+        self.func = func
+        self.periodicity = periodicity
+        self.id = (
+            ai
+            + "---"
+            + aj
+            + "---"
+            + ak
+            + "---"
+            + al
+            + ":::"
+            + func
+            + "---"
+            + periodicity
+        )
 
 
 class FFPatches:
     """A container for forcefield patches"""
-    atompatches: list[AtomPatch]
-    bondpatches: list[BondPatch]
-    pairpatches: list[PairPatch]
-    anglepatches: list[AnglePatch]
-    dihedralpatches: list[DihedralPatch]
+
+    atompatches: dict[str, AtomPatch]
+    bondpatches: dict[str, BondPatch]
+    pairpatches: dict[str, PairPatch]
+    anglepatches: dict[str, AnglePatch]
+    dihedralpatches: dict[str, DihedralPatch]
 
     def __init__(self, path: Path) -> None:
         xml = read_xml_ff(path)
-        self.atompatches = []
+        self.atompatches = {}
         if elems := xml.findall("Atoms/Atom"):
             for elem in elems:
-                self.atompatches.append(AtomPatch.from_element(elem))
+                atompatch = AtomPatch(elem)
+                self.atompatches[atompatch.id] = atompatch
 
-        self.bondpatches = []
+        self.bondpatches = {}
         if elems := xml.findall("Bonds/Bond"):
             for elem in elems:
-                self.bondpatches.append(BondPatch.from_element(elem))
+                bondpatch = BondPatch(elem)
+                self.bondpatches[bondpatch.id] = bondpatch
 
-        self.pairpatches = []
+        self.pairpatches = {}
         if elems := xml.findall("Pairs/Pair"):
             for elem in elems:
-                self.pairpatches.append(PairPatch.from_element(elem))
+                pairpatch = PairPatch(elem)
+                self.pairpatches[pairpatch.id] = pairpatch
 
-        self.anglepatches = []
+        self.anglepatches = {}
         if elems := xml.findall("Angles/Angle"):
             for elem in elems:
-                self.anglepatches.append(AnglePatch.from_element(elem))
+                anglepatch = AnglePatch(elem)
+                self.anglepatches[anglepatch.id] = anglepatch
 
         # note... <https://manual.gromacs.org/current/reference-manual/functions/bonded-interactions.html#proper-dihedrals-periodic-type>
         # periodicity is also an identifier, not a parameter!
-        self.dihedralpatches = []
+        self.dihedralpatches = {}
         if elems := xml.findall("Dihedrals/Dihedral"):
             for elem in elems:
-                self.dihedralpatches.append(DihedralPatch.from_element(elem))
+                dihedralpatch = DihedralPatch(elem)
+                self.dihedralpatches[dihedralpatch.id] = dihedralpatch
 
     def __repr__(self) -> str:
         return textwrap.dedent(
@@ -794,6 +850,31 @@ class Topology:
             self.atoms[i].bound_to_nrs.append(j)
             self.atoms[j].bound_to_nrs.append(i)
 
+    def _apply_atom_param_patch(self, atom: Atom, patch: AtomPatch):
+        for param, correction in patch.params.items():
+            initial = atom.__dict__.get(param)
+            if initial is None:
+                # get initial value from the FF
+                atomtype = self.ff.atomtypes.get(atom.type)
+                # TODO:
+                # what about matching up differently named paramerts
+                # in atomtypes and the topology?
+                initial = atomtype.__dict__.get(param)
+
+            try:
+                initial = float(initial)
+            except ValueError as _:
+                logging.warning("Malformed patchfile. Some parameter pachtes couldn't be converted to a number:")
+                initial = None
+            except TypeError as _:
+                logging.warning("Can't patch parameter because no initial parameter was found in the topology or the FF: ")
+                initial = None
+
+            if initial is not None:
+                result = correction.apply(initial)
+                atom.__dict__[param] = result
+
+
     def break_bond(self, atompair_nrs: tuple[str, str]):
         """Break bonds in topology.
 
@@ -804,30 +885,20 @@ class Topology:
         atompair_nrs = tuple(sorted(atompair_nrs, key=int))
         atompair = [self.atoms[atompair_nrs[0]], self.atoms[atompair_nrs[1]]]
 
-        def apply_param(old_value, new_params: ParamPatch):
-            pass
-
-        def patch_params(atom: Atom, patch: AtomPatch, spec: AtomType):
-            for key, patch in patch.patches.items():
-                # check if the key is already set in the topology
-
-                # otherwise get the initial value from the FF
-
-                # then patch it
-                # new = apply_param(key, patch)
-                pass
-            
-
         # mark atoms as radicals
         for atom in atompair:
             atom.is_radical = True
 
             # patch parameters
-            if self.ffpatches is None or self.ffpatches.atompatches is None: continue
-            spec = self.ff.atomtypes.get(atom.type)
-            for patch in self.ffpatches.atompatches:
-                if patch.ai == atom.type + "_R":
-                    patch_params(atom, patch, spec)
+            if self.ffpatches is None or self.ffpatches.atompatches is None:
+                continue
+            atom_id = atom.type + "_R"
+            key = match_id_to_patch_id(atom_id, list(self.ffpatches.atompatches.keys()))
+            if key is None:
+                continue
+            patch = self.ffpatches.atompatches[key]
+            self._apply_atom_param_patch(atom, patch)
+            print(atom)
 
         # bonds
         # remove bonds
@@ -868,7 +939,6 @@ class Topology:
         except ValueError as _:
             m = f"tried to remove bond between already disconnected atoms: {atompair}."
             logging.warning(m)
-
 
     def bind_bond(self, atompair_nrs: tuple[str, str]):
         """Add a bond in topology.
@@ -1044,7 +1114,9 @@ class Topology:
                         dihedrals.append((al, ak, aj, ai))
         return dihedrals
 
-    def _get_atom_improper_dihedrals(self, atom_nr: str) -> list[tuple]:
+    def _get_atom_improper_dihedrals(
+        self, atom_nr: str
+    ) -> list[tuple[tuple[str, str, str, str], ResidueImroperSpec]]:
         # TODO: cleanup and make more efficient
         # which improper dihedrals are used is defined for each residue
         # in aminoacids.rtp
@@ -1111,7 +1183,6 @@ class Topology:
         if atompatches := self.ffpatches.atompatches:
             for atom in atompair:
                 spec = self.ff.atomtypes.get(atom.type)
-                print(spec)
 
         # get (unbroken) bonds that the now radicals in the atompair are still involved in
         if bondpatches := self.ffpatches.bondpatches:
@@ -1215,13 +1286,36 @@ def generate_topology_from_bound_to(
     for atom in top.atoms.values():
         impropers = top._get_atom_improper_dihedrals(atom.nr)
         for key, improper in impropers:
-            top.improper_dihedrals[key] = Dihedral(improper.atom1, improper.atom2, improper.atom3, improper.atom4, "4", improper.cq)
+            top.improper_dihedrals[key] = Dihedral(
+                improper.atom1,
+                improper.atom2,
+                improper.atom3,
+                improper.atom4,
+                "4",
+                improper.cq,
+            )
 
     return top
 
 
-def match_typestring_to_patch(s: str, ps: list[Patch]):
-    s = "CT_T"
-    patch_ids = [p.id for p in ps]
-    print(patch_ids)
-    return ps[0]
+def match_id_to_patch_id(s: str, keys: list[str]) -> Optional[str]:
+    result = None
+    longest_match = 0
+    for key in keys:
+        if key == s:
+            # early return exact match
+            return key
+        # escape special regex characters
+        # that can appear in a forcecield
+        # use X as the wildcard
+        s = s.replace("*", "STAR").replace("+", "PLUS")
+        key_re = key.replace("*", "STAR").replace("+", "PLUS").replace("X", ".*")
+        match = re.match(key_re, s)
+        if match is not None:
+            # favor longer (=more specific) and later matches
+            if len(key) >= longest_match:
+                result = key
+
+    return result
+
+
