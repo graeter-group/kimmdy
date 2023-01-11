@@ -1212,6 +1212,16 @@ def generate_topology_from_bound_to(
             if top.pairs.get(pairkey) is None:
                 top.pairs[pairkey] = Pair(pairkey[0], pairkey[1], "1")
 
-    # TODO: impropers
+    for atom in top.atoms.values():
+        impropers = top._get_atom_improper_dihedrals(atom.nr)
+        for key, improper in impropers:
+            top.improper_dihedrals[key] = Dihedral(improper.atom1, improper.atom2, improper.atom3, improper.atom4, "4", improper.cq)
 
     return top
+
+
+def match_typestring_to_patch(s: str, ps: list[Patch]):
+    s = "CT_T"
+    patch_ids = [p.id for p in ps]
+    print(patch_ids)
+    return ps[0]
