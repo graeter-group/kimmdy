@@ -1,7 +1,7 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any, Optional, Union
 from xml.etree.ElementTree import Element
 from kimmdy.parsing import TopologyDict, read_topol, read_xml_ff, read_rtp
 from itertools import takewhile, permutations, combinations
@@ -36,6 +36,12 @@ class Atom:
     bound_to_nrs: list[str] = field(default_factory=list)
     is_radical: bool = False
 
+    def radical_type(self):
+        if self.is_radical:
+            return self.type + "_R"
+        else:
+            return self.type
+
     @classmethod
     def from_top_line(cls, l: list[str]):
         return cls(
@@ -54,7 +60,7 @@ class Atom:
 
 
 @dataclass(order=True)
-class AtomType:
+class AtomType():
     """Information about one atom
 
     A class containing atom information as in the atoms section of the topology.
@@ -176,7 +182,7 @@ class Bond:
 
 
 @dataclass(order=True)
-class BondType:
+class BondType():
     """Information about one bondtype
 
     A class containing bond information as in the bonds section of the topology.
@@ -421,6 +427,9 @@ class ResidueType:
 
         return cls(residue, atoms, bonds, impropers)
 
+Atomic = Union[Atom, Bond, Pair, Angle, Dihedral]
+AtomTypes = dict[str, AtomType]
+AtomicTypes = Union[dict[str, AtomType], dict[str, AtomType]]
 
 class FF:
     """Conainer for parsed forcefield data."""
@@ -594,7 +603,7 @@ class PairPatch(Patch):
         if ai is None or aj is None:
             raise ValueError("Pair patch must have an ai and aj attribute")
 
-        self.patches = props_to_patches(props)
+        self.params = props_to_patches(props)
         self.ai = ai
         self.aj = aj
         self.id = ai + "---" + aj
@@ -618,7 +627,7 @@ class AnglePatch:
         if ai is None or aj is None or ak is None:
             raise ValueError("Angle patch must have an ai, aj and ak attribute")
 
-        self.patches = props_to_patches(props)
+        self.params = props_to_patches(props)
         self.ai = ai
         self.aj = aj
         self.ak = ak
@@ -636,7 +645,7 @@ class DihedralPatch(Patch):
     func: str
     periodicity: str
     id: str
-    patches: dict[str, ParamPatch]
+    params: dict[str, ParamPatch]
 
     def __init__(self, elem: Element):
         props = elem.attrib
@@ -658,7 +667,7 @@ class DihedralPatch(Patch):
                 "Angle patch must have an ai, aj, ak, al and periodicity attribute"
             )
 
-        self.patches = props_to_patches(props)
+        self.params = props_to_patches(props)
         self.ai = ai
         self.aj = aj
         self.ak = ak
@@ -851,14 +860,14 @@ class Topology:
             self.atoms[j].bound_to_nrs.append(i)
 
     def _apply_atom_param_patch(self, atom: Atom, patch: AtomPatch):
+        # TODO:
+        # what about matching up differently named paramerts
+        # in atomtypes and the topology?
         for param, correction in patch.params.items():
             initial = atom.__dict__.get(param)
             if initial is None:
                 # get initial value from the FF
                 atomtype = self.ff.atomtypes.get(atom.type)
-                # TODO:
-                # what about matching up differently named paramerts
-                # in atomtypes and the topology?
                 initial = atomtype.__dict__.get(param)
 
             try:
@@ -874,6 +883,63 @@ class Topology:
                 result = correction.apply(initial)
                 atom.__dict__[param] = result
 
+    def _apply_bond_param_patch(self, bond: Bond, patch: BondPatch):
+        # TODO:
+        # what about matching up differently named paramerts
+        # in atomtypes and the topology?
+        for param, correction in patch.params.items():
+            initial = bond.__dict__.get(param)
+            if initial is None:
+                # get initial value from the FF
+                ai = self.atoms[bond.ai]
+                aj = self.atoms[bond.aj]
+                key = (ai.type, aj.type)
+                bondtype = get_by_permutations(self.ff.bondtypes, key)
+                initial = bondtype.__dict__.get(param)
+
+            try:
+                initial = float(initial)
+            except ValueError as _:
+                logging.warning("Malformed patchfile. Some parameter pachtes couldn't be converted to a number:")
+                initial = None
+            except TypeError as _:
+                logging.warning("Can't patch parameter because no initial parameter was found in the topology or the FF: ")
+                initial = None
+
+            if initial is not None:
+                result = correction.apply(initial)
+                bond.__dict__[param] = result
+
+    def _apply_angle_param_patch(self, angle: Angle, patch: AnglePatch):
+        # TODO:
+        # what about matching up differently named paramerts
+        # in atomtypes and the topology?
+        for param, correction in patch.params.items():
+            initial = angle.__dict__.get(param)
+            if initial is None:
+                # get initial value from the FF
+                ai = self.atoms[angle.ai]
+                aj = self.atoms[angle.aj]
+                ak = self.atoms[angle.ak]
+                key = (ai.type, aj.type, ak.type)
+                # FIXME: this is not correct, we don't actually want
+                # all the permutations, just the symmetrical ones
+                # with the same center atom
+                angletype = get_by_permutations(self.ff.angletypes, key)
+                initial = angletype.__dict__.get(param)
+
+            try:
+                initial = float(initial)
+            except ValueError as _:
+                logging.warning("Malformed patchfile. Some parameter pachtes couldn't be converted to a number:")
+                initial = None
+            except TypeError as _:
+                logging.warning("Can't patch parameter because no initial parameter was found in the topology or the FF: ")
+                initial = None
+
+            if initial is not None:
+                result = correction.apply(initial)
+                angle.__dict__[param] = result
 
     def break_bond(self, atompair_nrs: tuple[str, str]):
         """Break bonds in topology.
@@ -892,18 +958,31 @@ class Topology:
             # patch parameters
             if self.ffpatches is None or self.ffpatches.atompatches is None:
                 continue
-            atom_id = atom.type + "_R"
-            key = match_id_to_patch_id(atom_id, list(self.ffpatches.atompatches.keys()))
+            bond_id = atom.type + "_R"
+            key = match_id_to_patch_id(bond_id, list(self.ffpatches.atompatches.keys()))
             if key is None:
                 continue
             patch = self.ffpatches.atompatches[key]
             self._apply_atom_param_patch(atom, patch)
-            print(atom)
 
         # bonds
-        # remove bonds
-        removed = self.bonds.pop(atompair_nrs, None)
-        logging.info(f"removed bond: {removed}")
+        # remove bond
+        removed_bond = self.bonds.pop(atompair_nrs, None)
+        logging.info(f"removed bond: {removed_bond}")
+
+        # get other possibly affected bonds
+        for atom in atompair:
+            for bond_key in self._get_atom_bonds(atom.nr):
+                bond = self.bonds.get(bond_key)
+                if bond is None or self.ffpatches is None or self.ffpatches.bondpatches is None:
+                    continue
+                ai = self.atoms[bond.ai]
+                aj = self.atoms[bond.aj]
+                bond_id = [ai.radical_type() , aj.radical_type()]
+                key = match_id_to_patch_id(bond_id, list(self.ffpatches.bondpatches.keys()))
+                if key is not None:
+                    patch = self.ffpatches.bondpatches[key]
+                    self._apply_bond_param_patch(bond, patch)
 
         # remove angles
         angle_keys = self._get_atom_angles(atompair_nrs[0]) + self._get_atom_angles(
@@ -911,7 +990,23 @@ class Topology:
         )
         for key in angle_keys:
             if all([x in key for x in atompair_nrs]):
+                # angle contained a now deleted bond because 
+                # it had both atoms of the broken bond
                 self.angles.pop(key, None)
+            else:
+                # angle only contains one of the affecte atoms
+                # angle is not removed but might need to be patched
+                # patch parameters
+                angle = self.angles[key]
+                if angle is None or self.ffpatches is None or self.ffpatches.anglepatches is None:
+                    continue
+                atoms = [self.atoms[i] for i in key]
+                angle_id = [a.radical_type() for a in atoms]
+                key = match_id_to_patch_id(angle_id, list(self.ffpatches.anglepatches.keys()))
+                if key is None:
+                    continue
+                patch = self.ffpatches.anglepatches[key]
+                self._apply_angle_param_patch(angle, patch)
 
         # remove proper dihedrals
         # and pairs
@@ -1298,23 +1393,26 @@ def generate_topology_from_bound_to(
     return top
 
 
-def match_id_to_patch_id(s: str, keys: list[str]) -> Optional[str]:
+def match_id_to_patch_id(id: list[str], keys: list[str]) -> Optional[str]:
     result = None
     longest_match = 0
     for key in keys:
-        if key == s:
+        if key == id:
             # early return exact match
             return key
         # escape special regex characters
         # that can appear in a forcecield
         # use X as the wildcard
-        s = s.replace("*", "STAR").replace("+", "PLUS")
+        id = [s.replace("*", "STAR").replace("+", "PLUS") for s in id]
         key_re = key.replace("*", "STAR").replace("+", "PLUS").replace("X", ".*")
-        match = re.match(key_re, s)
-        if match is not None:
-            # favor longer (=more specific) and later matches
-            if len(key) >= longest_match:
-                result = key
+        # construct id permutations
+        for perm in permutations(id):
+            id_perm = "---".join(perm)
+            match = re.match(key_re, id_perm)
+            if match is not None:
+                # favor longer (=more specific) and later matches
+                if len(key) >= longest_match:
+                    result = key
 
     return result
 

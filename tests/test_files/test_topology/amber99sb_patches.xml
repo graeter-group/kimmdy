@@ -17,10 +17,10 @@ after heterolysis
 <ForceFieldPatches>
  <Atoms>
   <!-- This is just a test. -->
-  <Atom ai="CT_R" charge_factor="100" mass_factor="10" mass_offset="42" sigma_value="100" epsilon_value="100"/>
-  <Atom ai="X_R" charge_factor="100" mass_factor="10" mass_offset="42" sigma_value="100" epsilon_value="100"/>
-  <Atom ai="X*_R" charge_factor="100" mass_factor="10" mass_offset="42" sigma_value="100" epsilon_value="100"/>
-  <Atom ai="OX_R" charge_factor="100" mass_factor="10" mass_offset="42" sigma_value="100" epsilon_value="100"/>
+  <Atom ai="CT_R" charge_factor="100" mass_factor="10" mass_offset="42"/>
+  <Atom ai="X_R" charge_factor="100" mass_factor="10" mass_offset="42"/>
+  <Atom ai="X*_R" charge_factor="100" mass_factor="10" mass_offset="42"/>
+  <Atom ai="OX_R" charge_factor="100" mass_factor="10" mass_offset="42"/>
   <!-- This is just a test. -->
 
  </Atoms>
