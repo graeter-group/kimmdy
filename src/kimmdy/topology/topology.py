@@ -4,326 +4,13 @@ from typing import Any, Optional, Union
 from xml.etree.ElementTree import Element
 from kimmdy.parsing import TopologyDict, read_topol, read_xml_ff, read_rtp
 from kimmdy.topology.atomic import *
-from kimmdy.topology.utils import match_id_to_patch_id, get_by_permutations
+from kimmdy.topology.utils import match_id_to_patch, get_by_permutations, attributes_to_list
+from kimmdy.topology.ff import FF, FFPatches, AtomPatch, BondPatch, PairPatch, AnglePatch, DihedralPatch
 from itertools import takewhile, permutations, combinations
 from xml.etree.ElementTree import Element
 import re
 import textwrap
 import logging
-
-class FF:
-    """Conainer for parsed forcefield data."""
-
-    def __init__(self, ffdir: Path):
-        self.atomtypes: dict[str, AtomType] = {}
-        self.bondtypes: dict[tuple[str, str], BondType] = {}
-        self.angletypes: dict[tuple[str, str, str], AngleType] = {}
-        self.proper_dihedraltypes: dict[
-            tuple[str, str, str, str], list[DihedralType]
-        ] = {}
-        self.improper_dihedraltypes: dict[tuple[str, str, str, str], DihedralType] = {}
-        self.residuetypes: dict[str, ResidueType]
-
-        nonbonded_path = ffdir / "ffnonbonded.itp"
-        nonbonded = read_topol(nonbonded_path)
-        for l in nonbonded["atomtypes"]:
-            if l[0][0] != ";":
-                atomtype = AtomType.from_top_line(l)
-                self.atomtypes[atomtype.type] = atomtype
-
-        bonded_path = ffdir / "ffbonded.itp"
-        bonded = read_topol(bonded_path)
-        for l in bonded["bondtypes"]:
-            bondtype = BondType.from_top_line(l)
-            self.bondtypes[(bondtype.i, bondtype.j)] = bondtype
-        for l in bonded["angletypes"]:
-            angletype = AngleType.from_top_line(l)
-            self.angletypes[(angletype.i, angletype.j, angletype.k)] = angletype
-        for l in bonded["dihedraltypes"]:
-            dihedraltype = DihedralType.from_top_line(l)
-            # proper dihedrals can be defined multiple times
-            # with a different phase
-            if dihedraltype.funct == "4":
-                self.improper_dihedraltypes[
-                    (dihedraltype.i, dihedraltype.j, dihedraltype.k, dihedraltype.l)
-                ] = dihedraltype
-            elif dihedraltype.funct == "9":
-                if (
-                    self.proper_dihedraltypes.get(
-                        (dihedraltype.i, dihedraltype.j, dihedraltype.k, dihedraltype.l)
-                    )
-                    is None
-                ):
-                    self.proper_dihedraltypes[
-                        (dihedraltype.i, dihedraltype.j, dihedraltype.k, dihedraltype.l)
-                    ] = [dihedraltype]
-                else:
-                    self.proper_dihedraltypes[
-                        (dihedraltype.i, dihedraltype.j, dihedraltype.k, dihedraltype.l)
-                    ].append(dihedraltype)
-
-            # TODO
-            self.residuetypes = {}
-            aminoacids_path = ffdir / "aminoacids.rtp"
-            aminoacids = read_rtp(aminoacids_path)
-            for k, v in aminoacids.items():
-                if k.startswith("BLOCK") or k == "bondedtypes":
-                    continue
-                self.residuetypes[k] = ResidueType.from_section(k, v)
-
-    def __repr__(self) -> str:
-        return textwrap.dedent(
-            f"""\
-        ForceField parameters with
-        {len(self.atomtypes)} atomtypes,
-        {len(self.bondtypes)} bondtypes,
-        {len(self.angletypes)} angletypes,
-        {len(self.proper_dihedraltypes)} dihedraltypes
-        {len(self.residuetypes)} residuetypes
-        """
-        )
-
-
-@dataclass
-class ParamPatch:
-    value: Optional[float] = None
-    offset: Optional[float] = None
-    factor: Optional[float] = None
-
-    def update(self, new):
-        self.__dict__.update(new)
-
-    def apply(self, initial: float):
-        result = initial
-        if self.value is not None:
-            result = self.value
-        if self.offset is not None:
-            result += self.offset
-        if self.factor is not None:
-            result *= self.factor
-        return result
-
-
-def props_to_patches(props):
-    patches = {}
-    for k, v in props.items():
-        if "_" not in k:
-            continue
-        key, suffix = k.split("_")
-        if patches.get(key) == None:
-            patches[key] = ParamPatch()
-        if suffix == "factor":
-            patches[key].update({"factor": float(v)})
-        elif suffix == "offset":
-            patches[key].update({"offset": float(v)})
-        elif suffix == "value":
-            patches[key].update({"value": float(v)})
-    return patches
-
-
-class Patch:
-    id: str
-    params: dict[str, ParamPatch]
-
-
-@dataclass(order=True)
-class AtomPatch(Patch):
-    """Instructions to patch one atom"""
-
-    ai: str
-    id: str
-    params: dict[str, ParamPatch]
-
-    def __init__(self, elem: Element):
-        props = elem.attrib
-        ai = props.pop("ai", None)
-        if ai is None:
-            raise ValueError("Atom patch must have an ai attribute")
-
-        self.ai = ai
-        self.params = props_to_patches(props)
-        self.id = self.ai
-
-
-@dataclass(order=True)
-class BondPatch(Patch):
-    """Instructions to patch one bond"""
-
-    ai: str
-    aj: str
-    id: str
-    params: dict[str, ParamPatch]
-
-    def __init__(self, elem: Element):
-        props = elem.attrib
-        ai = props.pop("ai", None)
-        aj = props.pop("aj", None)
-        if ai is None or aj is None:
-            raise ValueError("Bond patch must have an ai and aj attribute")
-
-        self.params = props_to_patches(props)
-        self.ai = ai
-        self.aj = aj
-        self.id = ai + "---" + aj
-
-
-@dataclass(order=True)
-class PairPatch(Patch):
-    """Instructions to patch one pair"""
-
-    ai: str
-    aj: str
-    id: str
-    params: dict[str, ParamPatch]
-
-    def __init__(self, elem: Element):
-        props = elem.attrib
-        ai = props.pop("ai", None)
-        aj = props.pop("aj", None)
-        if ai is None or aj is None:
-            raise ValueError("Pair patch must have an ai and aj attribute")
-
-        self.params = props_to_patches(props)
-        self.ai = ai
-        self.aj = aj
-        self.id = ai + "---" + aj
-
-
-@dataclass(order=True)
-class AnglePatch:
-    """Instructions to patch one angle"""
-
-    ai: str
-    aj: str
-    ak: str
-    id: str
-    params: dict[str, ParamPatch]
-
-    def __init__(self, elem: Element):
-        props = elem.attrib
-        ai = props.pop("ai", None)
-        aj = props.pop("aj", None)
-        ak = props.pop("ak", None)
-        if ai is None or aj is None or ak is None:
-            raise ValueError("Angle patch must have an ai, aj and ak attribute")
-
-        self.params = props_to_patches(props)
-        self.ai = ai
-        self.aj = aj
-        self.ak = ak
-        self.id = ai + "---" + aj + "---" + ak
-
-
-@dataclass(order=True)
-class DihedralPatch(Patch):
-    """Instructions to patch one dihedral"""
-
-    ai: str
-    aj: str
-    ak: str
-    al: str
-    func: str
-    periodicity: str
-    id: str
-    params: dict[str, ParamPatch]
-
-    def __init__(self, elem: Element):
-        props = elem.attrib
-        ai = props.pop("ai", None)
-        aj = props.pop("aj", None)
-        ak = props.pop("ak", None)
-        al = props.pop("al", None)
-        func = props.pop("func", None)
-        periodicity = props.pop("periodicity", None)
-        if (
-            ai is None
-            or aj is None
-            or ak is None
-            or al is None
-            or func is None
-            or periodicity is None
-        ):
-            raise ValueError(
-                "Angle patch must have an ai, aj, ak, al and periodicity attribute"
-            )
-
-        self.params = props_to_patches(props)
-        self.ai = ai
-        self.aj = aj
-        self.ak = ak
-        self.ak = al
-        self.func = func
-        self.periodicity = periodicity
-        self.id = (
-            ai
-            + "---"
-            + aj
-            + "---"
-            + ak
-            + "---"
-            + al
-            + ":::"
-            + func
-            + "---"
-            + periodicity
-        )
-
-
-class FFPatches:
-    """A container for forcefield patches"""
-
-    atompatches: dict[str, AtomPatch]
-    bondpatches: dict[str, BondPatch]
-    pairpatches: dict[str, PairPatch]
-    anglepatches: dict[str, AnglePatch]
-    dihedralpatches: dict[str, DihedralPatch]
-
-    def __init__(self, path: Path) -> None:
-        xml = read_xml_ff(path)
-        self.atompatches = {}
-        if elems := xml.findall("Atoms/Atom"):
-            for elem in elems:
-                atompatch = AtomPatch(elem)
-                self.atompatches[atompatch.id] = atompatch
-
-        self.bondpatches = {}
-        if elems := xml.findall("Bonds/Bond"):
-            for elem in elems:
-                bondpatch = BondPatch(elem)
-                self.bondpatches[bondpatch.id] = bondpatch
-
-        self.pairpatches = {}
-        if elems := xml.findall("Pairs/Pair"):
-            for elem in elems:
-                pairpatch = PairPatch(elem)
-                self.pairpatches[pairpatch.id] = pairpatch
-
-        self.anglepatches = {}
-        if elems := xml.findall("Angles/Angle"):
-            for elem in elems:
-                anglepatch = AnglePatch(elem)
-                self.anglepatches[anglepatch.id] = anglepatch
-
-        # note... <https://manual.gromacs.org/current/reference-manual/functions/bonded-interactions.html#proper-dihedrals-periodic-type>
-        # periodicity is also an identifier, not a parameter!
-        self.dihedralpatches = {}
-        if elems := xml.findall("Dihedrals/Dihedral"):
-            for elem in elems:
-                dihedralpatch = DihedralPatch(elem)
-                self.dihedralpatches[dihedralpatch.id] = dihedralpatch
-
-    def __repr__(self) -> str:
-        return textwrap.dedent(
-            f"""\
-        ForceField parameter patches with
-        {len(self.atompatches)} atompatches,
-        {len(self.bondpatches)} bondpatches,
-        {len(self.pairpatches)} pairpatches,
-        {len(self.anglepatches)} bondpatches,
-        {len(self.dihedralpatches)} dihedralpatches,
-        """
-        )
-
 
 class Topology:
     """Smart container for parsed topology data.
@@ -367,6 +54,7 @@ class Topology:
         self._initialize_graph()
 
     def _update_dict(self):
+
         self.top["atoms"] = [attributes_to_list(x) for x in self.atoms.values()]
         self.top["bonds"] = [attributes_to_list(x) for x in self.bonds.values()]
         self.top["pairs"] = [attributes_to_list(x) for x in self.pairs.values()]
@@ -540,10 +228,9 @@ class Topology:
                 continue
             bond_id = atom.type + "_R"
 
-            key = match_id_to_patch_id([bond_id], list(self.ffpatches.atompatches.keys()))
-            if key is None:
+            patch = match_id_to_patch([bond_id], self.ffpatches.atompatches)
+            if patch is None:
                 continue
-            patch = self.ffpatches.atompatches[key]
             self._apply_atom_param_patch(atom, patch)
 
         # bonds
@@ -560,10 +247,10 @@ class Topology:
                 ai = self.atoms[bond.ai]
                 aj = self.atoms[bond.aj]
                 bond_id = [ai.radical_type() , aj.radical_type()]
-                key = match_id_to_patch_id(bond_id, list(self.ffpatches.bondpatches.keys()))
-                if key is not None:
-                    patch = self.ffpatches.bondpatches[key]
-                    self._apply_bond_param_patch(bond, patch)
+                patch = match_id_to_patch(bond_id, self.ffpatches.bondpatches)
+                if patch is None:
+                    continue
+                self._apply_bond_param_patch(bond, patch)
 
         # remove angles
         angle_keys = self._get_atom_angles(atompair_nrs[0]) + self._get_atom_angles(
@@ -583,10 +270,9 @@ class Topology:
                     continue
                 atoms = [self.atoms[i] for i in key]
                 angle_id = [a.radical_type() for a in atoms]
-                key = match_id_to_patch_id(angle_id, list(self.ffpatches.anglepatches.keys()))
-                if key is None:
+                patch = match_id_to_patch(angle_id, self.ffpatches.anglepatches)
+                if patch is None:
                     continue
-                patch = self.ffpatches.anglepatches[key]
                 self._apply_angle_param_patch(angle, patch)
 
         # remove proper dihedrals

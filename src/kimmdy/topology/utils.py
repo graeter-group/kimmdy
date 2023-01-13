@@ -9,6 +9,7 @@ from kimmdy.topology.atomic import *
 
 if TYPE_CHECKING:
     from kimmdy.topology.topology import Topology
+    from kimmdy.topology.ff import Patch, Patches
 
 
 def field_or_none(l: list[str], i) -> Optional[str]:
@@ -65,70 +66,26 @@ def get_element_id(e: Element) -> Optional[str]:
     return id
 
 
-def generate_topology_from_bound_to(
-    atoms: list[Atom], ffdir: Path, ffpatch: Path
-) -> Topology:
-    top = Topology({}, ffdir, ffpatch)
-    for atom in atoms:
-        top.atoms[atom.nr] = atom
-
-    # bonds
-    keys = []
-    for atom in top.atoms.values():
-        keys = top._get_atom_bonds(atom.nr)
-        for key in keys:
-            top.bonds[key] = Bond(key[0], key[1], "1")
-
-    # angles
-    for atom in top.atoms.values():
-        keys = top._get_atom_angles(atom.nr)
-        for key in keys:
-            top.angles[key] = Angle(key[0], key[1], key[2], "1")
-
-    # dihedrals and pass
-    for atom in top.atoms.values():
-        keys = top._get_atom_proper_dihedrals(atom.nr)
-        for key in keys:
-            top.proper_dihedrals[key] = Dihedral(key[0], key[1], key[2], key[3], "9")
-            pairkey = tuple(str(x) for x in sorted([key[0], key[3]], key=int))
-            if top.pairs.get(pairkey) is None:
-                top.pairs[pairkey] = Pair(pairkey[0], pairkey[1], "1")
-
-    for atom in top.atoms.values():
-        impropers = top._get_atom_improper_dihedrals(atom.nr)
-        for key, improper in impropers:
-            top.improper_dihedrals[key] = Dihedral(
-                improper.atom1,
-                improper.atom2,
-                improper.atom3,
-                improper.atom4,
-                "4",
-                improper.cq,
-            )
-
-    return top
-
-
-def match_id_to_patch_id(id: list[str], keys: list[str]) -> Optional[str]:
+def match_id_to_patch(id: list[str], patches: Patches) -> Optional[Patch]:
+    id_str = "---".join([s.replace("*", "STAR").replace("+", "PLUS") for s in id])
     result = None
     longest_match = 0
-    for key in keys:
-        if key == id:
-            # early return exact match
-            return key
+    for _, patch in patches.items():
         # escape special regex characters
         # that can appear in a forcecield
         # use X as the wildcard
-        id = [s.replace("*", "STAR").replace("+", "PLUS") for s in id]
-        key_re = key.replace("*", "STAR").replace("+", "PLUS").replace("X", ".*")
-        # construct id permutations
-        for perm in permutations(id):
-            id_perm = "---".join(perm)
-            match = re.match(key_re, id_perm)
+        for key in [patch.id, patch.id_sym]:
+            key = key.replace("*", "STAR").replace("+", "PLUS")
+            # early return exact match
+            if key == id_str:
+                return patch
+            key_re = key.replace("X", ".*")
+            match = re.match(key_re, id_str)
             if match is not None:
                 # favor longer (=more specific) and later matches
                 if len(key) >= longest_match:
-                    result = key
+                    longest_match = len(key)
+                    result = patch
 
     return result
 
