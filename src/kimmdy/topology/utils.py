@@ -89,3 +89,26 @@ def match_id_to_patch(id: list[str], patches: Patches) -> Optional[Patch]:
 
     return result
 
+def match_atomic_item_to_atomic_type(id: list[str], types: AtomicTypes) -> Optional[AtomicType]:
+    id_str = "---".join([s.replace("*", "STAR").replace("+", "PLUS") for s in id])
+    result = None
+    longest_match = 0
+    for _, atomic_type in types.items():
+        # escape special regex characters
+        # that can appear in a forcecield
+        # use X as the wildcard
+        for key in [atomic_type.id, atomic_type.id_sym]:
+            key = key.replace("*", "STAR").replace("+", "PLUS")
+            # early return exact match
+            if key == id_str:
+                return atomic_type
+            key_re = key.replace("X", ".*")
+            match = re.match(key_re, id_str)
+            if match is not None:
+                # favor longer (=more specific) and later matches
+                if len(key) >= longest_match:
+                    longest_match = len(key)
+                    result = atomic_type
+
+    return result
+

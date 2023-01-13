@@ -62,82 +62,27 @@ class AtomType():
     """
 
     type: str
+    id_sym: str
     at_num: str
     charge: str
     mass: str
     ptype: str
     sigma: str
     epsilon: str
+    id: str
 
     @classmethod
     def from_top_line(cls, l: list[str]):
         return cls(
             type=l[0],
+            id_sym=l[0],
             at_num=l[1],
             charge=l[2],
             mass=l[3],
             ptype=l[4],
             sigma=l[5],
             epsilon=l[6],
-        )
-
-
-@dataclass(order=True)
-class ResidueAtomSpec:
-    """Information about one atom in a residue
-    ; name  type  charge  chargegroup
-    """
-
-    name: str
-    type: str
-    charge: str
-    cgrp: str
-
-    @classmethod
-    def from_top_line(cls, l: list[str]):
-        return cls(name=l[0], type=l[1], charge=l[2], cgrp=l[3])
-
-
-@dataclass(order=True)
-class ResidueBondSpec:
-    """Information about one bond in a residue
-    ; atom1 atom2      b0      kb
-    """
-
-    atom1: str
-    atom2: str
-    b0: Optional[str]
-    kb: Optional[str]
-
-    @classmethod
-    def from_top_line(cls, l: list[str]):
-        return cls(
-            atom1=l[0], atom2=l[1], b0=field_or_none(l, 2), kb=field_or_none(l, 3)
-        )
-
-
-@dataclass(order=True)
-class ResidueImroperSpec:
-    """Information about one imroper dihedral in a residue
-    ;atom1 atom2 atom3 atom4     q0     cq
-    """
-
-    atom1: str
-    atom2: str
-    atom3: str
-    atom4: str
-    q0: Optional[str]
-    cq: Optional[str]
-
-    @classmethod
-    def from_top_line(cls, l: list[str]):
-        return cls(
-            atom1=l[0],
-            atom2=l[1],
-            atom3=l[2],
-            atom4=l[3],
-            q0=field_or_none(l, 4),
-            cq=field_or_none(l, 5),
+            id=l[0]
         )
 
 
@@ -184,6 +129,8 @@ class BondType():
 
     i: str
     j: str
+    id: str
+    id_sym: str
     funct: str
     c0: Optional[str] = None
     c1: Optional[str] = None
@@ -195,6 +142,8 @@ class BondType():
         return cls(
             i=l[0],
             j=l[1],
+            id="---".join(l[:2]),
+            id_sym="---".join(reversed(l[:2])),
             funct=l[2],
             c0=field_or_none(l, 3),
             c1=field_or_none(l, 4),
@@ -282,6 +231,8 @@ class AngleType:
     i: str
     j: str
     k: str
+    id: str
+    id_sym: str
     funct: str
     c0: Optional[str] = None
     c1: Optional[str] = None
@@ -294,6 +245,8 @@ class AngleType:
             i=l[0],
             j=l[1],
             k=l[2],
+            id="---".join(l[:3]),
+            id_sym="---".join(reversed(l[:3])),
             funct=l[3],
             c0=field_or_none(l, 4),
             c1=field_or_none(l, 5),
@@ -341,7 +294,7 @@ class Dihedral:
             c2=field_or_none(l, 7),
             c3=field_or_none(l, 8),
             c4=field_or_none(l, 9),
-            c5=field_or_none(l, 10),
+            c5=field_or_none(l, 10)
         )
 
 
@@ -362,6 +315,8 @@ class DihedralType:
     j: str
     k: str
     l: str
+    id: str
+    id_sym: str
     funct: str
     c0: Optional[str] = None
     c1: Optional[str] = None
@@ -377,6 +332,8 @@ class DihedralType:
             j=l[1],
             k=l[2],
             l=l[3],
+            id="---".join(l[:4]),
+            id_sym="---".join(reversed(l[:4])),
             funct=l[4],
             c0=field_or_none(l, 5),
             c1=field_or_none(l, 6),
@@ -385,6 +342,65 @@ class DihedralType:
             c4=field_or_none(l, 9),
             c5=field_or_none(l, 10),
         )
+
+@dataclass(order=True)
+class ResidueAtomSpec:
+    """Information about one atom in a residue
+    ; name  type  charge  chargegroup
+    """
+
+    name: str
+    type: str
+    charge: str
+    cgrp: str
+
+    @classmethod
+    def from_top_line(cls, l: list[str]):
+        return cls(name=l[0], type=l[1], charge=l[2], cgrp=l[3])
+
+
+@dataclass(order=True)
+class ResidueBondSpec:
+    """Information about one bond in a residue
+    ; atom1 atom2      b0      kb
+    """
+
+    atom1: str
+    atom2: str
+    b0: Optional[str]
+    kb: Optional[str]
+
+    @classmethod
+    def from_top_line(cls, l: list[str]):
+        return cls(
+            atom1=l[0], atom2=l[1], b0=field_or_none(l, 2), kb=field_or_none(l, 3)
+        )
+
+
+@dataclass(order=True)
+class ResidueImroperSpec:
+    """Information about one imroper dihedral in a residue
+    ;atom1 atom2 atom3 atom4     q0     cq
+    """
+
+    atom1: str
+    atom2: str
+    atom3: str
+    atom4: str
+    q0: Optional[str]
+    cq: Optional[str]
+
+    @classmethod
+    def from_top_line(cls, l: list[str]):
+        return cls(
+            atom1=l[0],
+            atom2=l[1],
+            atom3=l[2],
+            atom4=l[3],
+            q0=field_or_none(l, 4),
+            cq=field_or_none(l, 5),
+        )
+
 
 
 @dataclass(order=True)
@@ -418,8 +434,16 @@ class ResidueType:
 
         return cls(residue, atoms, bonds, impropers)
 
+AtomId=str
+BondId=tuple[str,str]
+AngleId=tuple[str,str,str]
+DihedralId=tuple[str,str,str, str]
 Atomic = Union[Atom, Bond, Pair, Angle, Dihedral]
-AtomTypes = dict[str, AtomType]
-AtomicTypes = Union[dict[str, AtomType], dict[str, AtomType]]
-
+AtomicType = Union[AtomType, BondType, AngleType, DihedralType]
+AtomicTypes = Union[
+dict[AtomId, AtomType],
+dict[BondId, BondType],
+dict[AngleId, AngleType],
+dict[DihedralId, DihedralType],
+]
 
