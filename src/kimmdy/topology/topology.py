@@ -1,14 +1,10 @@
-from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Optional, Union
-from xml.etree.ElementTree import Element
-from kimmdy.parsing import TopologyDict, read_topol, read_xml_ff, read_rtp
+from typing import Optional
+from kimmdy.parsing import TopologyDict
 from kimmdy.topology.atomic import *
-from kimmdy.topology.utils import match_id_to_patch, get_by_permutations, attributes_to_list
-from kimmdy.topology.ff import FF, FFPatches, AtomPatch, BondPatch, PairPatch, AnglePatch, DihedralPatch
-from itertools import takewhile, permutations, combinations
-from xml.etree.ElementTree import Element
-import re
+from kimmdy.topology.utils import match_id_to_patch, get_by_permutations, attributes_to_list, match_atomic_item_to_atomic_type
+from kimmdy.topology.ff import FF, FFPatches, Patch
+from itertools import permutations, combinations
 import textwrap
 import logging
 
@@ -127,88 +123,30 @@ class Topology:
             self.atoms[i].bound_to_nrs.append(j)
             self.atoms[j].bound_to_nrs.append(i)
 
-    def _apply_atom_param_patch(self, atom: Atom, patch: AtomPatch):
-        # TODO:
-        # what about matching up differently named paramerts
-        # in atomtypes and the topology?
-        for param, correction in patch.params.items():
-            initial = atom.__dict__.get(param)
+    def _apply_param_patch(self, atomic_item: Atomic, atomic_id: list[str], patch: Patch, types: AtomicTypes):
+        # atomic_id_base = [item.removesuffix("_R") for item in atomic_id]
+        item_type = match_atomic_item_to_atomic_type(atomic_id, types)
+        for param, param_patch in patch.params.items():
+            initial = atomic_item.__dict__.get(param)
             if initial is None:
                 # get initial value from the FF
-                atomtype = self.ff.atomtypes.get(atom.type)
-                initial = atomtype.__dict__.get(param)
+                # TODO:
+                # what about matching up differently named parameters?
+                # in atomtypes and the topology?
+                initial = item_type.__dict__.get(param)
 
             try:
                 initial = float(initial)
             except ValueError as _:
                 logging.warning("Malformed patchfile. Some parameter pachtes couldn't be converted to a number:")
-                initial = None
+                continue
             except TypeError as _:
                 logging.warning("Can't patch parameter because no initial parameter was found in the topology or the FF: ")
-                initial = None
+                continue
 
-            if initial is not None:
-                result = correction.apply(initial)
-                atom.__dict__[param] = result
-
-    def _apply_bond_param_patch(self, bond: Bond, patch: BondPatch):
-        # TODO:
-        # what about matching up differently named paramerts
-        # in atomtypes and the topology?
-        for param, correction in patch.params.items():
-            initial = bond.__dict__.get(param)
-            if initial is None:
-                # get initial value from the FF
-                ai = self.atoms[bond.ai]
-                aj = self.atoms[bond.aj]
-                key = (ai.type, aj.type)
-                bondtype = get_by_permutations(self.ff.bondtypes, key)
-                initial = bondtype.__dict__.get(param)
-
-            try:
-                initial = float(initial)
-            except ValueError as _:
-                logging.warning("Malformed patchfile. Some parameter pachtes couldn't be converted to a number:")
-                initial = None
-            except TypeError as _:
-                logging.warning("Can't patch parameter because no initial parameter was found in the topology or the FF: ")
-                initial = None
-
-            if initial is not None:
-                result = correction.apply(initial)
-                bond.__dict__[param] = result
-
-    def _apply_angle_param_patch(self, angle: Angle, patch: AnglePatch):
-        # TODO:
-        # what about matching up differently named paramerts
-        # in atomtypes and the topology?
-        for param, correction in patch.params.items():
-            initial = angle.__dict__.get(param)
-            if initial is None:
-                # get initial value from the FF
-                ai = self.atoms[angle.ai]
-                aj = self.atoms[angle.aj]
-                ak = self.atoms[angle.ak]
-                key = (ai.type, aj.type, ak.type)
-                # FIXME: this is not correct, we don't actually want
-                # all the permutations, just the symmetrical ones
-                # with the same center atom
-                angletype = get_by_permutations(self.ff.angletypes, key)
-                initial = angletype.__dict__.get(param)
-
-            try:
-                initial = float(initial)
-            except ValueError as _:
-                logging.warning("Malformed patchfile. Some parameter pachtes couldn't be converted to a number:")
-                initial = None
-            except TypeError as _:
-                logging.warning("Can't patch parameter because no initial parameter was found in the topology or the FF: ")
-                initial = None
-
-            if initial is not None:
-                result = correction.apply(initial)
-                angle.__dict__[param] = result
-
+            result = param_patch.apply(initial)
+            atomic_item.__dict__[param] = result
+  
     def break_bond(self, atompair_nrs: tuple[str, str]):
         """Break bonds in topology.
 
@@ -226,12 +164,12 @@ class Topology:
             # patch parameters
             if self.ffpatches is None or self.ffpatches.atompatches is None:
                 continue
-            bond_id = atom.type + "_R"
+            atom_id = atom.type + "_R"
 
-            patch = match_id_to_patch([bond_id], self.ffpatches.atompatches)
+            patch = match_id_to_patch([atom_id], self.ffpatches.atompatches)
             if patch is None:
                 continue
-            self._apply_atom_param_patch(atom, patch)
+            self._apply_param_patch(atom, [atom.type], patch, self.ff.atomtypes)
 
         # bonds
         # remove bond
@@ -244,13 +182,12 @@ class Topology:
                 bond = self.bonds.get(bond_key)
                 if bond is None or self.ffpatches is None or self.ffpatches.bondpatches is None:
                     continue
-                ai = self.atoms[bond.ai]
-                aj = self.atoms[bond.aj]
-                bond_id = [ai.radical_type() , aj.radical_type()]
-                patch = match_id_to_patch(bond_id, self.ffpatches.bondpatches)
+                id = [self.atoms[i].radical_type() for i in [bond.ai, bond.aj]]
+                patch = match_id_to_patch(id, self.ffpatches.bondpatches)
                 if patch is None:
                     continue
-                self._apply_bond_param_patch(bond, patch)
+                id_base = [self.atoms[i].type for i in [bond.ai, bond.aj]]
+                self._apply_param_patch(bond, id_base, patch, self.ff.bondtypes)
 
         # remove angles
         angle_keys = self._get_atom_angles(atompair_nrs[0]) + self._get_atom_angles(
@@ -268,12 +205,12 @@ class Topology:
                 angle = self.angles[key]
                 if angle is None or self.ffpatches is None or self.ffpatches.anglepatches is None:
                     continue
-                atoms = [self.atoms[i] for i in key]
-                angle_id = [a.radical_type() for a in atoms]
-                patch = match_id_to_patch(angle_id, self.ffpatches.anglepatches)
+                id = [self.atoms[i].radical_type() for i in key]
+                patch = match_id_to_patch(id, self.ffpatches.anglepatches)
                 if patch is None:
                     continue
-                self._apply_angle_param_patch(angle, patch)
+                id_base = [self.atoms[i].radical_type() for i in key]
+                self._apply_param_patch(angle, id_base, patch, self.ff.angletypes)
 
         # remove proper dihedrals
         # and pairs
