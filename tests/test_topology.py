@@ -5,7 +5,8 @@ import os
 
 from kimmdy.parsing import read_topol
 from hypothesis import Phase, given, settings, strategies as st
-from kimmdy.topology import Topology, Atom, generate_topology_from_bound_to
+from kimmdy.topology.topology import Topology, generate_topology_from_bound_to
+from kimmdy.topology.atomic import *
 
 #%%
 def set_dir():

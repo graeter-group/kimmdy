@@ -44,15 +44,6 @@ def test_doubleparse_urea():
     assert top2 == top3
 
 
-def test_split_dihedrals():
-    set_dir()
-    top_path = Path("pytest_urea.top")
-    top = parsing.read_topol(top_path)
-    top_tmp = parsing.topol_split_dihedrals(deepcopy(top))
-    top_compare = parsing.topol_merge_propers_impropers(deepcopy(top_tmp))
-    assert top == top_compare
-
-
 #%%
 #### Parsing should be invertible ####
 allowed_text = st.text(

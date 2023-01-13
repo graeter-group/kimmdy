@@ -1,7 +1,7 @@
 from pathlib import Path
 import subprocess
 from typing import Union
-from kimmdy.topology import Topology
+from kimmdy.topology.topology import Topology
 
 
 def topology_to_edgelist(top: Topology):
