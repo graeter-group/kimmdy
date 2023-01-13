@@ -1,5 +1,6 @@
 # editors / tooling
 .vscode
+/os
 
 # our own program output
 kimmdy.log
