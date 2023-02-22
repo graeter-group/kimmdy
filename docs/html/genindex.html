@@ -15,6 +15,7 @@
         <script src="_static/underscore.js"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="#" />
     <link rel="search" title="Search" href="search.html" /> 
@@ -53,8 +54,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Index</li>
+      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">Index</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -77,7 +78,6 @@
  | <a href="#H"><strong>H</strong></a>
  | <a href="#I"><strong>I</strong></a>
  | <a href="#K"><strong>K</strong></a>
- | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#N"><strong>N</strong></a>
  | <a href="#O"><strong>O</strong></a>
@@ -85,33 +85,16 @@
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
  | <a href="#T"><strong>T</strong></a>
- | <a href="#U"><strong>U</strong></a>
  | <a href="#W"><strong>W</strong></a>
  
 </div>
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="kimmdy.html#kimmdy.changemanager.LocalGraph.add_atom">add_atom() (kimmdy.changemanager.LocalGraph method)</a>
-</li>
-      <li><a href="kimmdy.html#kimmdy.changemanager.add_bond">add_bond() (in module kimmdy.changemanager)</a>
-
-      <ul>
-        <li><a href="kimmdy.html#kimmdy.changemanager.LocalGraph.add_bond">(kimmdy.changemanager.LocalGraph method)</a>
-</li>
-      </ul></li>
-      <li><a href="kimmdy.html#kimmdy.changemanager.LocalGraph.add_function_to_terms">add_function_to_terms() (kimmdy.changemanager.LocalGraph method)</a>
-</li>
-      <li><a href="kimmdy.html#kimmdy.changemanager.Atom">Atom (class in kimmdy.changemanager)</a>
+      <li><a href="kimmdy.html#kimmdy.reaction.Conversion.atom_idx">atom_idx (kimmdy.reaction.Conversion attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="kimmdy.html#kimmdy.reaction.Conversion.atom_idx">atom_idx (kimmdy.reaction.Conversion attribute)</a>
-</li>
-      <li><a href="kimmdy.html#kimmdy.changemanager.Atom.atomname">atomname (kimmdy.changemanager.Atom attribute)</a>
-</li>
-      <li><a href="kimmdy.html#kimmdy.changemanager.Atom.atomtype">atomtype (kimmdy.changemanager.Atom attribute)</a>
-</li>
       <li><a href="kimmdy.html#kimmdy.config.Config.attr">attr() (kimmdy.config.Config method)</a>
 </li>
       <li><a href="kimmdy.html#kimmdy.tasks.AutoFillDict">AutoFillDict (class in kimmdy.tasks)</a>
@@ -124,17 +107,11 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="kimmdy.html#kimmdy.reaction.ConversionType.BIND">BIND (kimmdy.reaction.ConversionType attribute)</a>
 </li>
-      <li><a href="kimmdy.html#kimmdy.config.HomolysisConfig.bonds">bonds (kimmdy.config.HomolysisConfig attribute)</a>
-</li>
-      <li><a href="kimmdy.html#kimmdy.changemanager.Atom.bound_to">bound_to (kimmdy.changemanager.Atom attribute)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="kimmdy.html#kimmdy.config.HomolysisConfig.bonds">bonds (kimmdy.config.HomolysisConfig attribute)</a>
+</li>
       <li><a href="kimmdy.html#kimmdy.reaction.ConversionType.BREAK">BREAK (kimmdy.reaction.ConversionType attribute)</a>
-</li>
-      <li><a href="kimmdy.html#kimmdy.changemanager.break_bond_plumed">break_bond_plumed() (in module kimmdy.changemanager)</a>
-</li>
-      <li><a href="kimmdy.html#kimmdy.changemanager.LocalGraph.build_PADs">build_PADs() (kimmdy.changemanager.LocalGraph method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -156,8 +133,6 @@
 </li>
       <li><a href="kimmdy.html#kimmdy.utils.check_idx">check_idx() (in module kimmdy.utils)</a>
 </li>
-      <li><a href="kimmdy.html#kimmdy.changemanager.LocalGraph.compare_ff_impropers">compare_ff_impropers() (kimmdy.changemanager.LocalGraph method)</a>
-</li>
       <li><a href="kimmdy.html#kimmdy.misc_helper.concat_traj">concat_traj() (in module kimmdy.misc_helper)</a>
 </li>
   </ul></td>
@@ -165,8 +140,6 @@
       <li><a href="kimmdy.html#kimmdy.config.Config">Config (class in kimmdy.config)</a>
 </li>
       <li><a href="kimmdy.html#kimmdy.cmd.configure_logging">configure_logging() (in module kimmdy.cmd)</a>
-</li>
-      <li><a href="kimmdy.html#kimmdy.changemanager.LocalGraph.construct_graph">construct_graph() (kimmdy.changemanager.LocalGraph method)</a>
 </li>
       <li><a href="kimmdy.html#kimmdy.reaction.Conversion">Conversion (class in kimmdy.reaction)</a>
 </li>
@@ -178,7 +151,7 @@
 </li>
       <li><a href="kimmdy.html#kimmdy.config.CoordinatesConfig">CoordinatesConfig (class in kimmdy.config)</a>
 </li>
-      <li><a href="kimmdy.html#kimmdy.changemanager.LocalGraph.correct_atomprops">correct_atomprops() (kimmdy.changemanager.LocalGraph method)</a>
+      <li><a href="kimmdy.html#kimmdy.parsing.create_subsections">create_subsections() (in module kimmdy.parsing)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -202,16 +175,18 @@
 <h2 id="E">E</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="kimmdy.html#kimmdy.misc_helper.edgelist_to_dot_graph">edgelist_to_dot_graph() (in module kimmdy.misc_helper)</a>
+</li>
       <li><a href="kimmdy.html#kimmdy.config.HomolysisConfig.edis">edis (kimmdy.config.HomolysisConfig attribute)</a>
 </li>
       <li><a href="kimmdy.html#kimmdy.config.Config.equilibration">equilibration (kimmdy.config.Config attribute)</a>
 </li>
       <li><a href="kimmdy.html#kimmdy.mdmanager.equilibration">equilibration() (in module kimmdy.mdmanager)</a>
 </li>
-      <li><a href="kimmdy.html#kimmdy.config.EquilibrationConfig">EquilibrationConfig (class in kimmdy.config)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="kimmdy.html#kimmdy.config.EquilibrationConfig">EquilibrationConfig (class in kimmdy.config)</a>
+</li>
       <li><a href="kimmdy.html#kimmdy.config.Config.equilibrium">equilibrium (kimmdy.config.Config attribute)</a>
 </li>
       <li><a href="kimmdy.html#kimmdy.mdmanager.equilibrium">equilibrium() (in module kimmdy.mdmanager)</a>
@@ -228,8 +203,6 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="kimmdy.html#kimmdy.config.Config.ff">ff (kimmdy.config.Config attribute)</a>
 </li>
-      <li><a href="kimmdy.html#kimmdy.changemanager.LocalGraph.ff_AA_todict">ff_AA_todict() (kimmdy.changemanager.LocalGraph method)</a>
-</li>
       <li><a href="kimmdy.html#kimmdy.utils.find_bond_param">find_bond_param() (in module kimmdy.utils)</a>
 </li>
   </ul></td>
@@ -238,7 +211,7 @@
 </li>
       <li><a href="kimmdy.html#kimmdy.utils.find_Edis">find_Edis() (in module kimmdy.utils)</a>
 </li>
-      <li><a href="kimmdy.html#kimmdy.changemanager.find_heavy">find_heavy() (in module kimmdy.changemanager)</a>
+      <li><a href="kimmdy.html#kimmdy.utils.float_or_str">float_or_str() (in module kimmdy.utils)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -246,31 +219,21 @@
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="kimmdy.html#kimmdy.changemanager.LocalGraph.get_atomprop">get_atomprop() (kimmdy.changemanager.LocalGraph method)</a>
-</li>
-      <li><a href="kimmdy.html#kimmdy.changemanager.LocalGraph.get_atoms_property">get_atoms_property() (kimmdy.changemanager.LocalGraph method)</a>
-</li>
       <li><a href="kimmdy.html#kimmdy.config.Config.get_attributes">get_attributes() (kimmdy.config.Config method)</a>
 </li>
       <li><a href="kimmdy.html#kimmdy.cmd.get_cmdline_args">get_cmdline_args() (in module kimmdy.cmd)</a>
 </li>
       <li><a href="kimmdy.html#kimmdy.utils.get_data_from_file">get_data_from_file() (in module kimmdy.utils)</a>
 </li>
-      <li><a href="kimmdy.html#kimmdy.changemanager.LocalGraph.get_ff_sections">get_ff_sections() (kimmdy.changemanager.LocalGraph method)</a>
+      <li><a href="kimmdy.html#kimmdy.runmanager.RunManager.get_latest">get_latest() (kimmdy.runmanager.RunManager method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="kimmdy.html#kimmdy.changemanager.LocalGraph.get_H_ff_at_an">get_H_ff_at_an() (kimmdy.changemanager.LocalGraph method)</a>
-</li>
-      <li><a href="kimmdy.html#kimmdy.runmanager.RunManager.get_latest">get_latest() (kimmdy.runmanager.RunManager method)</a>
-</li>
       <li><a href="kimmdy.html#kimmdy.reaction.Reaction.get_reaction_result">get_reaction_result() (kimmdy.reaction.Reaction method)</a>
 </li>
       <li><a href="kimmdy.html#kimmdy.parsing.get_sections">get_sections() (in module kimmdy.parsing)</a>
 </li>
       <li><a href="kimmdy.html#kimmdy.utils.get_shell_stdout">get_shell_stdout() (in module kimmdy.utils)</a>
-</li>
-      <li><a href="kimmdy.html#kimmdy.changemanager.LocalGraph.get_terms_with_atom">get_terms_with_atom() (kimmdy.changemanager.LocalGraph method)</a>
 </li>
       <li><a href="kimmdy.html#kimmdy.config.Config.gro">gro (kimmdy.config.Config attribute)</a>
 </li>
@@ -296,17 +259,13 @@
 </li>
       <li><a href="kimmdy.html#kimmdy.runmanager.State.IDLE">IDLE (kimmdy.runmanager.State attribute)</a>
 </li>
-      <li><a href="kimmdy.html#kimmdy.changemanager.Atom.idx">idx (kimmdy.changemanager.Atom attribute)</a>
-
-      <ul>
-        <li><a href="kimmdy.html#kimmdy.config.Config.idx">(kimmdy.config.Config attribute)</a>
+      <li><a href="kimmdy.html#kimmdy.config.Config.idx">idx (kimmdy.config.Config attribute)</a>
 </li>
-      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="kimmdy.html#kimmdy.tasks.TaskFiles.input">input (kimmdy.tasks.TaskFiles attribute)</a>
 </li>
-      <li><a href="kimmdy.html#kimmdy.changemanager.LocalGraph.is_radical">is_radical() (kimmdy.changemanager.LocalGraph method)</a>
+      <li><a href="kimmdy.html#kimmdy.parsing.is_not_comment">is_not_comment() (in module kimmdy.parsing)</a>
 </li>
       <li><a href="kimmdy.html#kimmdy.config.Config.iterations">iterations (kimmdy.config.Config attribute)</a>
 </li>
@@ -409,14 +368,6 @@
   </ul></td>
 </tr></table>
 
-<h2 id="L">L</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="kimmdy.html#kimmdy.changemanager.LocalGraph">LocalGraph (class in kimmdy.changemanager)</a>
-</li>
-  </ul></td>
-</tr></table>
-
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -445,8 +396,6 @@
       <li><a href="kimmdy.html#kimmdy.config.MinimizationConfig">MinimizationConfig (class in kimmdy.config)</a>
 </li>
       <li><a href="kimmdy.html#kimmdy.mdmanager.minimzation">minimzation() (in module kimmdy.mdmanager)</a>
-</li>
-      <li><a href="kimmdy.html#kimmdy.changemanager.modify_plumed">modify_plumed() (in module kimmdy.changemanager)</a>
 </li>
       <li><a href="kimmdy.html#kimmdy.changemanager.modify_top">modify_top() (in module kimmdy.changemanager)</a>
 </li>
@@ -481,8 +430,6 @@
         <li><a href="kimmdy.html#module-kimmdy.utils">kimmdy.utils</a>
 </li>
       </ul></li>
-      <li><a href="kimmdy.html#kimmdy.changemanager.move_bond_plumed">move_bond_plumed() (in module kimmdy.changemanager)</a>
-</li>
   </ul></td>
 </tr></table>
 
@@ -507,8 +454,6 @@
 <h2 id="O">O</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="kimmdy.html#kimmdy.changemanager.LocalGraph.order_lists">order_lists() (kimmdy.changemanager.LocalGraph method)</a>
-</li>
       <li><a href="kimmdy.html#kimmdy.config.Config.out">out (kimmdy.config.Config attribute)</a>
 </li>
   </ul></td>
@@ -523,24 +468,12 @@
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="kimmdy.html#kimmdy.changemanager.LocalGraph.parameterize_around_atom">parameterize_around_atom() (kimmdy.changemanager.LocalGraph method)</a>
-</li>
-      <li><a href="kimmdy.html#kimmdy.changemanager.LocalGraph.parameterize_bonded_terms">parameterize_bonded_terms() (kimmdy.changemanager.LocalGraph method)</a>
-</li>
-      <li><a href="kimmdy.html#kimmdy.changemanager.LocalGraph.patch_angle">patch_angle() (kimmdy.changemanager.LocalGraph method)</a>
-</li>
-      <li><a href="kimmdy.html#kimmdy.changemanager.LocalGraph.patch_bond">patch_bond() (kimmdy.changemanager.LocalGraph method)</a>
-</li>
-      <li><a href="kimmdy.html#kimmdy.changemanager.LocalGraph.patch_dihedral_CA">patch_dihedral_CA() (kimmdy.changemanager.LocalGraph method)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="kimmdy.html#kimmdy.changemanager.LocalGraph.patch_improper">patch_improper() (kimmdy.changemanager.LocalGraph method)</a>
-</li>
       <li><a href="kimmdy.html#kimmdy.config.Config.plumed">plumed (kimmdy.config.Config attribute)</a>
 </li>
       <li><a href="kimmdy.html#kimmdy.config.Config.prod">prod (kimmdy.config.Config attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="kimmdy.html#kimmdy.config.ProdConfig">ProdConfig (class in kimmdy.config)</a>
 </li>
       <li><a href="kimmdy.html#kimmdy.mdmanager.production">production() (in module kimmdy.mdmanager)</a>
@@ -573,17 +506,15 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="kimmdy.html#kimmdy.parsing.read_rtp">read_rtp() (in module kimmdy.parsing)</a>
+</li>
       <li><a href="kimmdy.html#kimmdy.parsing.read_topol">read_topol() (in module kimmdy.parsing)</a>
+</li>
+      <li><a href="kimmdy.html#kimmdy.parsing.read_xml_ff">read_xml_ff() (in module kimmdy.parsing)</a>
 </li>
       <li><a href="kimmdy.html#kimmdy.reaction.ReactionOutcome.recipes">recipes (kimmdy.reaction.ReactionOutcome attribute)</a>
 </li>
       <li><a href="kimmdy.html#kimmdy.mdmanager.relaxation">relaxation() (in module kimmdy.mdmanager)</a>
-</li>
-      <li><a href="kimmdy.html#kimmdy.changemanager.remove_bond">remove_bond() (in module kimmdy.changemanager)</a>
-</li>
-      <li><a href="kimmdy.html#kimmdy.changemanager.LocalGraph.remove_terms">remove_terms() (kimmdy.changemanager.LocalGraph method)</a>
-</li>
-      <li><a href="kimmdy.html#kimmdy.changemanager.Atom.resname">resname (kimmdy.changemanager.Atom attribute)</a>
 </li>
       <li><a href="kimmdy.html#kimmdy.config.Config.run">run (kimmdy.config.Config attribute)</a>
 </li>
@@ -601,8 +532,6 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="kimmdy.html#kimmdy.changemanager.LocalGraph.search_terms">search_terms() (kimmdy.changemanager.LocalGraph method)</a>
-</li>
       <li><a href="kimmdy.html#kimmdy.config.Sequence">Sequence (class in kimmdy.config)</a>
 </li>
       <li><a href="kimmdy.html#kimmdy.config.Config.sequence">sequence (kimmdy.config.Config attribute)</a>
@@ -639,17 +568,13 @@
 </li>
       <li><a href="kimmdy.html#kimmdy.config.SequenceConfig.tasks">tasks (kimmdy.config.SequenceConfig attribute)</a>
 </li>
-      <li><a href="kimmdy.html#kimmdy.changemanager.terms_keep_only">terms_keep_only() (in module kimmdy.changemanager)</a>
-</li>
       <li><a href="kimmdy.html#kimmdy.config.Config.top">top (kimmdy.config.Config attribute)</a>
 </li>
-      <li><a href="kimmdy.html#kimmdy.changemanager.topol_add_terms">topol_add_terms() (in module kimmdy.changemanager)</a>
+      <li><a href="kimmdy.html#kimmdy.misc_helper.top_to_graph">top_to_graph() (in module kimmdy.misc_helper)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="kimmdy.html#kimmdy.changemanager.topol_change_at_an">topol_change_at_an() (in module kimmdy.changemanager)</a>
-</li>
-      <li><a href="kimmdy.html#kimmdy.changemanager.topol_remove_terms">topol_remove_terms() (in module kimmdy.changemanager)</a>
+      <li><a href="kimmdy.html#kimmdy.misc_helper.topology_to_edgelist">topology_to_edgelist() (in module kimmdy.misc_helper)</a>
 </li>
       <li><a href="kimmdy.html#kimmdy.config.MinimizationConfig.tpr">tpr (kimmdy.config.MinimizationConfig attribute)</a>
 
@@ -662,18 +587,6 @@
       <li><a href="kimmdy.html#kimmdy.reaction.Conversion.type">type (kimmdy.reaction.Conversion attribute)</a>
 </li>
       <li><a href="kimmdy.html#kimmdy.reaction.Reaction.type_scheme">type_scheme (kimmdy.reaction.Reaction attribute)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="U">U</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="kimmdy.html#kimmdy.changemanager.LocalGraph.update_atoms_list">update_atoms_list() (kimmdy.changemanager.LocalGraph method)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="kimmdy.html#kimmdy.changemanager.LocalGraph.update_bound_to">update_bound_to() (kimmdy.changemanager.LocalGraph method)</a>
 </li>
   </ul></td>
 </tr></table>
