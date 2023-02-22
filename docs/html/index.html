@@ -16,6 +16,7 @@
         <script src="_static/underscore.js"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -55,8 +56,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="#" class="icon icon-home"></a> &raquo;</li>
-      <li>Welcome to kimmdy’s documentation!</li>
+      <li><a href="#" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">Welcome to kimmdy’s documentation!</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -74,17 +75,112 @@
 <li class="toctree-l1"><a class="reference internal" href="modules.html">kimmdy</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="kimmdy.html">kimmdy package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="kimmdy.html#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="kimmdy.html#module-kimmdy.changemanager">kimmdy.changemanager module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="kimmdy.html#module-kimmdy.cmd">kimmdy.cmd module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="kimmdy.html#module-kimmdy.config">kimmdy.config module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="kimmdy.html#module-kimmdy.changemanager">kimmdy.changemanager module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.changemanager.modify_top"><code class="docutils literal notranslate"><span class="pre">modify_top()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="kimmdy.html#module-kimmdy.cmd">kimmdy.cmd module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.cmd.configure_logging"><code class="docutils literal notranslate"><span class="pre">configure_logging()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.cmd.get_cmdline_args"><code class="docutils literal notranslate"><span class="pre">get_cmdline_args()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.cmd.kimmdy"><code class="docutils literal notranslate"><span class="pre">kimmdy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.cmd.kimmdy_run"><code class="docutils literal notranslate"><span class="pre">kimmdy_run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="kimmdy.html#module-kimmdy.config">kimmdy.config module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.config.ChangerConfig"><code class="docutils literal notranslate"><span class="pre">ChangerConfig</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.config.Config"><code class="docutils literal notranslate"><span class="pre">Config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.config.CoordinatesConfig"><code class="docutils literal notranslate"><span class="pre">CoordinatesConfig</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.config.EquilibrationConfig"><code class="docutils literal notranslate"><span class="pre">EquilibrationConfig</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.config.HomolysisConfig"><code class="docutils literal notranslate"><span class="pre">HomolysisConfig</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.config.MdConfig"><code class="docutils literal notranslate"><span class="pre">MdConfig</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.config.MinimizationConfig"><code class="docutils literal notranslate"><span class="pre">MinimizationConfig</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.config.NptConfig"><code class="docutils literal notranslate"><span class="pre">NptConfig</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.config.NvtConfig"><code class="docutils literal notranslate"><span class="pre">NvtConfig</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.config.ProdConfig"><code class="docutils literal notranslate"><span class="pre">ProdConfig</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.config.ReactionsConfig"><code class="docutils literal notranslate"><span class="pre">ReactionsConfig</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.config.Sequence"><code class="docutils literal notranslate"><span class="pre">Sequence</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.config.SequenceConfig"><code class="docutils literal notranslate"><span class="pre">SequenceConfig</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.config.check_file_exists"><code class="docutils literal notranslate"><span class="pre">check_file_exists()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="kimmdy.html#module-kimmdy.constants">kimmdy.constants module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="kimmdy.html#module-kimmdy.mdmanager">kimmdy.mdmanager module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="kimmdy.html#module-kimmdy.misc_helper">kimmdy.misc_helper module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="kimmdy.html#module-kimmdy.parsing">kimmdy.parsing module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="kimmdy.html#module-kimmdy.reaction">kimmdy.reaction module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="kimmdy.html#module-kimmdy.runmanager">kimmdy.runmanager module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="kimmdy.html#module-kimmdy.tasks">kimmdy.tasks module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="kimmdy.html#module-kimmdy.utils">kimmdy.utils module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="kimmdy.html#module-kimmdy.mdmanager">kimmdy.mdmanager module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.mdmanager.dummy_step"><code class="docutils literal notranslate"><span class="pre">dummy_step()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.mdmanager.equilibration"><code class="docutils literal notranslate"><span class="pre">equilibration()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.mdmanager.equilibrium"><code class="docutils literal notranslate"><span class="pre">equilibrium()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.mdmanager.minimzation"><code class="docutils literal notranslate"><span class="pre">minimzation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.mdmanager.production"><code class="docutils literal notranslate"><span class="pre">production()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.mdmanager.relaxation"><code class="docutils literal notranslate"><span class="pre">relaxation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.mdmanager.write_mdp"><code class="docutils literal notranslate"><span class="pre">write_mdp()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="kimmdy.html#module-kimmdy.misc_helper">kimmdy.misc_helper module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.misc_helper.concat_traj"><code class="docutils literal notranslate"><span class="pre">concat_traj()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.misc_helper.edgelist_to_dot_graph"><code class="docutils literal notranslate"><span class="pre">edgelist_to_dot_graph()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.misc_helper.top_to_graph"><code class="docutils literal notranslate"><span class="pre">top_to_graph()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.misc_helper.topology_to_edgelist"><code class="docutils literal notranslate"><span class="pre">topology_to_edgelist()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="kimmdy.html#module-kimmdy.parsing">kimmdy.parsing module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.parsing.create_subsections"><code class="docutils literal notranslate"><span class="pre">create_subsections()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.parsing.extract_section_name"><code class="docutils literal notranslate"><span class="pre">extract_section_name()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.parsing.get_sections"><code class="docutils literal notranslate"><span class="pre">get_sections()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.parsing.is_not_comment"><code class="docutils literal notranslate"><span class="pre">is_not_comment()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.parsing.merge_propers_impropers"><code class="docutils literal notranslate"><span class="pre">merge_propers_impropers()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.parsing.read_distances_dat"><code class="docutils literal notranslate"><span class="pre">read_distances_dat()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.parsing.read_plumed"><code class="docutils literal notranslate"><span class="pre">read_plumed()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.parsing.read_plumed_distances"><code class="docutils literal notranslate"><span class="pre">read_plumed_distances()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.parsing.read_rtp"><code class="docutils literal notranslate"><span class="pre">read_rtp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.parsing.read_topol"><code class="docutils literal notranslate"><span class="pre">read_topol()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.parsing.read_xml_ff"><code class="docutils literal notranslate"><span class="pre">read_xml_ff()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.parsing.split_dihedrals"><code class="docutils literal notranslate"><span class="pre">split_dihedrals()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.parsing.write_plumed"><code class="docutils literal notranslate"><span class="pre">write_plumed()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.parsing.write_topol"><code class="docutils literal notranslate"><span class="pre">write_topol()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="kimmdy.html#module-kimmdy.reaction">kimmdy.reaction module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.reaction.Conversion"><code class="docutils literal notranslate"><span class="pre">Conversion</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.reaction.ConversionRecipe"><code class="docutils literal notranslate"><span class="pre">ConversionRecipe</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.reaction.ConversionType"><code class="docutils literal notranslate"><span class="pre">ConversionType</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.reaction.Reaction"><code class="docutils literal notranslate"><span class="pre">Reaction</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.reaction.ReactionOutcome"><code class="docutils literal notranslate"><span class="pre">ReactionOutcome</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.reaction.ReactionResult"><code class="docutils literal notranslate"><span class="pre">ReactionResult</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="kimmdy.html#module-kimmdy.runmanager">kimmdy.runmanager module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.runmanager.RunManager"><code class="docutils literal notranslate"><span class="pre">RunManager</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.runmanager.State"><code class="docutils literal notranslate"><span class="pre">State</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.runmanager.default_decision_strategy"><code class="docutils literal notranslate"><span class="pre">default_decision_strategy()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="kimmdy.html#module-kimmdy.tasks">kimmdy.tasks module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.tasks.AutoFillDict"><code class="docutils literal notranslate"><span class="pre">AutoFillDict</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.tasks.Task"><code class="docutils literal notranslate"><span class="pre">Task</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.tasks.TaskFiles"><code class="docutils literal notranslate"><span class="pre">TaskFiles</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="kimmdy.html#module-kimmdy.utils">kimmdy.utils module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.utils.calc_av_rate"><code class="docutils literal notranslate"><span class="pre">calc_av_rate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.utils.calc_transition_rate"><code class="docutils literal notranslate"><span class="pre">calc_transition_rate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.utils.check_gmx_version"><code class="docutils literal notranslate"><span class="pre">check_gmx_version()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.utils.check_idx"><code class="docutils literal notranslate"><span class="pre">check_idx()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.utils.find_Edis"><code class="docutils literal notranslate"><span class="pre">find_Edis()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.utils.find_bond_param"><code class="docutils literal notranslate"><span class="pre">find_bond_param()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.utils.find_distances"><code class="docutils literal notranslate"><span class="pre">find_distances()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.utils.float_or_str"><code class="docutils literal notranslate"><span class="pre">float_or_str()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.utils.get_data_from_file"><code class="docutils literal notranslate"><span class="pre">get_data_from_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.utils.get_shell_stdout"><code class="docutils literal notranslate"><span class="pre">get_shell_stdout()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.utils.identify_atomtypes"><code class="docutils literal notranslate"><span class="pre">identify_atomtypes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.utils.run_shell_cmd"><code class="docutils literal notranslate"><span class="pre">run_shell_cmd()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.utils.sort_angle"><code class="docutils literal notranslate"><span class="pre">sort_angle()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.utils.sort_bond"><code class="docutils literal notranslate"><span class="pre">sort_bond()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.utils.sort_dihedral"><code class="docutils literal notranslate"><span class="pre">sort_dihedral()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.utils.sort_improper"><code class="docutils literal notranslate"><span class="pre">sort_improper()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.utils.store_linelist_to_file"><code class="docutils literal notranslate"><span class="pre">store_linelist_to_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.utils.str_to_int_or_0"><code class="docutils literal notranslate"><span class="pre">str_to_int_or_0()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.utils.write_conditions_in_plumedfile"><code class="docutils literal notranslate"><span class="pre">write_conditions_in_plumedfile()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="kimmdy.html#module-kimmdy">Module contents</a></li>
 </ul>
 </li>

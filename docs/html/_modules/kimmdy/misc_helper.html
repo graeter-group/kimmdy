@@ -15,6 +15,7 @@
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -53,9 +54,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../index.html">Module code</a> &raquo;</li>
-      <li>kimmdy.misc_helper</li>
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">kimmdy.misc_helper</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -68,6 +69,35 @@
 <span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">import</span> <span class="nn">subprocess</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">kimmdy.topology.topology</span> <span class="kn">import</span> <span class="n">Topology</span>
+
+
+<div class="viewcode-block" id="topology_to_edgelist"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.misc_helper.topology_to_edgelist">[docs]</a><span class="k">def</span> <span class="nf">topology_to_edgelist</span><span class="p">(</span><span class="n">top</span><span class="p">:</span> <span class="n">Topology</span><span class="p">):</span>
+    <span class="n">bonds</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">top</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+        <span class="n">bonds</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">top</span><span class="o">.</span><span class="n">_get_atom_bonds</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">nr</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">top</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">type</span><span class="si">}</span><span class="s1">&quot; -- &quot;</span><span class="si">{</span><span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">top</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">type</span><span class="si">}</span><span class="s1">&quot;;&#39;</span>
+        <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bonds</span>
+    <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="edgelist_to_dot_graph"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.misc_helper.edgelist_to_dot_graph">[docs]</a><span class="k">def</span> <span class="nf">edgelist_to_dot_graph</span><span class="p">(</span><span class="n">ls</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+    <span class="n">header</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        graph G {</span>
+<span class="s2">          layout=neato</span>
+<span class="s2">          node [shape=&quot;circle&quot;]</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+    <span class="n">tail</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        }</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+    <span class="n">body</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ls</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">header</span> <span class="o">+</span> <span class="n">body</span> <span class="o">+</span> <span class="n">tail</span></div>
+
+
+<div class="viewcode-block" id="top_to_graph"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.misc_helper.top_to_graph">[docs]</a><span class="k">def</span> <span class="nf">top_to_graph</span><span class="p">(</span><span class="n">top</span><span class="p">:</span> <span class="n">Topology</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">edgelist_to_dot_graph</span><span class="p">(</span><span class="n">topology_to_edgelist</span><span class="p">(</span><span class="n">top</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="concat_traj"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.misc_helper.concat_traj">[docs]</a><span class="k">def</span> <span class="nf">concat_traj</span><span class="p">(</span><span class="n">run_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">out</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">run_types</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>

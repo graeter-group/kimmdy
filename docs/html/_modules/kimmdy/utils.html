@@ -15,6 +15,7 @@
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -53,9 +54,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../index.html">Module code</a> &raquo;</li>
-      <li>kimmdy.utils</li>
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">kimmdy.utils</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -284,6 +285,13 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="o">.</span><span class="n">dryrun</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">SystemError</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">version</span></div>
+
+
+<div class="viewcode-block" id="float_or_str"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.utils.float_or_str">[docs]</a><span class="k">def</span> <span class="nf">float_or_str</span><span class="p">(</span><span class="n">elem</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">elem</span></div>
 
 
 <span class="c1">## helpers for changemanager</span>
