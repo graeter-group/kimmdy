@@ -32,7 +32,7 @@ def get_cmdline_args():
     return parser.parse_args()
 
 
-def configure_logging(args, color=True):
+def configure_logging(args, color=False):
     """Configure logging.
 
     Configures the logging module with optional colorcodes
@@ -52,19 +52,30 @@ def configure_logging(args, color=True):
 
         Path(args.logfile).rename(log_curr)
 
+    format = "%(asctime): %(levelname)s: %(message)s"
     if color:
         logging.addLevelName(logging.INFO, "\033[35mINFO\033[00m")
         logging.addLevelName(logging.ERROR, "\033[31mERROR\033[00m")
         logging.addLevelName(logging.WARNING, "\033[33mWARN\033[00m")
-    logging.basicConfig(
-        level=getattr(logging, args.loglevel.upper()),
-        handlers=[
-            logging.FileHandler(args.logfile, encoding="utf-8", mode="w"),
-            logging.StreamHandler(sys.stdout),
-        ],
-        format="\033[34m %(asctime)s\033[00m: %(levelname)s: %(message)s",
-        datefmt="%d-%m-%Y %H:%M",
-    )
+        logging.basicConfig(
+            level=getattr(logging, args.loglevel.upper()),
+            handlers=[
+                logging.FileHandler(args.logfile, encoding="utf-8", mode="w"),
+                logging.StreamHandler(sys.stdout),
+            ],
+            format="\033[34m %(asctime)s\033[00m: %(levelname)s: %(message)s",
+            datefmt="%d-%m-%Y %H:%M",
+        )
+    else:
+        logging.basicConfig(
+            level=getattr(logging, args.loglevel.upper()),
+            handlers=[
+                logging.FileHandler(args.logfile, encoding="utf-8", mode="w"),
+                logging.StreamHandler(sys.stdout),
+            ],
+            format=" %(asctime)s: %(levelname)s: %(message)s",
+            datefmt="%d-%m-%Y %H:%M",
+        )
 
 
 def _run(args):

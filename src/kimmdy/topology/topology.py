@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Optional
 from kimmdy.parsing import TopologyDict
 from kimmdy.topology.atomic import *
-from kimmdy.topology.utils import match_id_to_patch, get_by_permutations, attributes_to_list, match_atomic_item_to_atomic_type
+from kimmdy.topology.utils import match_id_to_patch,attributes_to_list, match_atomic_item_to_atomic_type
 from kimmdy.topology.ff import FF, FFPatches, Patch
 from itertools import permutations, combinations
 import textwrap
@@ -202,7 +202,7 @@ class Topology:
                 # angle only contains one of the affecte atoms
                 # angle is not removed but might need to be patched
                 # patch parameters
-                angle = self.angles[key]
+                angle = self.angles.get(key)
                 if angle is None or self.ffpatches is None or self.ffpatches.anglepatches is None:
                     continue
                 id = [self.atoms[i].radical_type() for i in key]

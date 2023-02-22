@@ -5,6 +5,7 @@ from pathlib import Path
 import queue
 from enum import Enum, auto
 from typing import Callable
+from kimmdy import config
 from kimmdy.config import Config
 from kimmdy.reactions.homolysis import Homolysis
 from kimmdy.reaction import ReactionResult, ConversionRecipe, ConversionType
@@ -35,11 +36,10 @@ def default_decision_strategy(
     # flatten the list of rates form the reaction results
     rates = []
     recipes = []
-    for reaction in reaction_results:
-        for rate in reaction.rates:
-            rates.append(rate)
-        for recipe in reaction.recipes:
-            recipes.append(recipe)
+    for reaction_result in reaction_results:
+        for outcome in reaction_result:
+            rates.append(outcome.rate)
+            recipes.append(outcome.recipe)
 
     total_rate = sum(rates)
     random.seed()
@@ -312,7 +312,7 @@ class RunManager:
 
     def _run_recipe(self) -> TaskFiles:
         logging.info(f"Start Recipe in step {self.iteration}")
-        logging.info(f"Breakpair: {self.chosen_recipe.atom_idx}")
+        logging.info(f"Recipe: {self.chosen_recipe}")
 
         files = self._create_task_directory("recipe")
 
@@ -323,25 +323,28 @@ class RunManager:
             files.input["top"],
             files.output["top"],
             files.input["ff"],
+            self.config.ffpatch
         )
         logging.info(f'Wrote new topology to {files.output["top"].parts[-3:]}')
-        logging.debug(f"Chose recipe: {self.chosen_recipe.type}")
-        if self.chosen_recipe.type == [ConversionType.BREAK]:
-            # why not add both?
-            self.radical_idxs.extend(self.chosen_recipe.atom_idx[0])
-
-            # files.input["plumed.dat"] = self.get_latest("plumed.dat")
-            files.output["plumed.dat"] = files.outputdir / "plumed_mod.dat"
-            changer.modify_plumed(
-                self.chosen_recipe,
-                files.input["plumed.dat"],
-                files.output["plumed.dat"],
-                files.input["distances.dat"],
-            )
-            logging.info(
-                f'Wrote new plumedfile to {files.output["plumed.dat"].parts[-3:]}'
-            )
-        logging.info(f"Looking for md in {self.config.changer.coordinates.__dict__}")
+        logging.debug(f"Chose recipe: {self.chosen_recipe}")
+        # TODO: get radicals out of the new topology
+        # if self.chosen_recipe.type == [ConversionType.BREAK]:
+        #     # why not add both?
+        #     self.radical_idxs.extend(self.chosen_recipe.atom_idx[0])
+        #
+        #     # files.input["plumed.dat"] = self.get_latest("plumed.dat")
+        #     files.output["plumed.dat"] = files.outputdir / "plumed_mod.dat"
+        #     # TODO: this
+        #     # changer.modify_plumed(
+        #     #     self.chosen_recipe,
+        #     #     files.input["plumed.dat"],
+        #     #     files.output["plumed.dat"],
+        #     #     files.input["distances.dat"],
+        #     # )
+        #     # logging.info(
+        #     #     f'Wrote new plumedfile to {files.output["plumed.dat"].parts[-3:]}'
+        #     # )
+        # logging.info(f"Looking for md in {self.config.changer.coordinates.__dict__}")
         # TODO clean this up, maybe make function for this in config
         if hasattr(self.config, "changer"):
             if hasattr(self.config.changer, "coordinates"):

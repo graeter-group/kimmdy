@@ -1,4 +1,4 @@
-from kimmdy.reaction import Reaction, ReactionResult, ConversionRecipe, ConversionType
+from kimmdy.reaction import Conversion, Reaction, ReactionOutcome, ReactionResult, ConversionRecipe, ConversionType
 from .HAT_utils import cap_single_rad, find_radicals
 import logging
 import MDAnalysis as mda
@@ -25,32 +25,34 @@ class HAT_reaction(Reaction):
         logging.warning(f"{rads} for {tpr}")
         logging.warning([u.atoms[:20].elements, u.atoms[:20].types])
 
-        reaction_result = ReactionResult(recipes=[], rates=[])
+        outcomes = []
         for rad in rads:
             if len(rad.atoms) == 0:
                 logging.info("no radical found, returning zero rate recipe")
-                return ReactionResult(recipes=[], rates=[0])
+                return [ReactionOutcome([], 0)]
             bonded_rad = rad[0].bonded_atoms
-            logging.warning([rad, bonded_rad])
+            logging.info(f'radical: {rad}')
+            logging.info(f'bonded_rad: {bonded_rad}')
 
             subsystems = cap_single_rad(
                 u, u.trajectory[-2], rad, bonded_rad, h_cutoff=3.5
             )
+            logging.info('made subsystem')
 
             for subsystem in subsystems:
                 from_H = subsystem["meta"]["indices"][0]
                 from_H_nr = str(u.atoms[from_H].index + 1)
-                logging.warning(u.atoms[from_H].resname)
+                logging.info(u.atoms[from_H].resname)
                 if u.atoms[from_H].resname not in [
                     "NME",
                     "ACE",
                 ]:  # doesn't work with capping groups at the moment
                     rad_nr = str(rad.atoms[0].index + 1)
-                    conversion_recipe = ConversionRecipe(
-                        type=[ConversionType.BIND], atom_idx=[[from_H_nr, rad_nr]]
-                    )
-                    reaction_result.recipes.append(conversion_recipe)
-                    reaction_result.rates.append(get_reaction_rates())
+                    recipe = [Conversion(ConversionType.BREAK, (from_H_nr, rad_nr))]
+                    rate = get_reaction_rates()
+                    outcomes.append(ReactionOutcome(recipe, rate))
+                    logging.info(f'Made outcome with recipe: {recipe} and rate: {rate}')
 
-        logging.warning(f"Returning exactly these recipes to runmanager: {reaction_result}")
-        return reaction_result
+        logging.info(f"Returning exactly these recipes to runmanager: {outcomes}")
+        return outcomes
+

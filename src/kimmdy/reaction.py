@@ -47,8 +47,8 @@ class ReactionOutcome:
     encompasses a ConversionRecipe and its rate.
     """
 
-    recipes: ConversionRecipe
-    rates: float
+    recipe: ConversionRecipe
+    rate: float
 
 
 ReactionResult = list[ReactionOutcome]
