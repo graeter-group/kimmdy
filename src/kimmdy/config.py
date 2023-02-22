@@ -37,6 +37,7 @@ type_scheme = {
     "iterations": int,
     "out": Path,
     "ff": Path,
+    "ffpatch": Path,
     "top": Path,
     "gro": Path,
     "idx": Path,
@@ -130,6 +131,7 @@ class Config:
     iterations: int
     out: Path
     ff: Path
+    ffpatch: Path
     top: Path
     gro: Path
     idx: Path
