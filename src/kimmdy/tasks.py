@@ -1,8 +1,6 @@
 from dataclasses import dataclass, field, InitVar
 from pathlib import Path
-from typing import Callable
-
-from kimmdy.runmanager import RunManager
+from typing import Callable, TYPE_CHECKING
 
 
 class AutoFillDict(dict):
@@ -38,7 +36,7 @@ class TaskFiles:
 
     """
 
-    runmng: InitVar[RunManager]
+    runmng: InitVar
     input: dict[str, Path] = field(default_factory=dict)
     output: dict[str, Path] = field(default_factory=dict)
     # default outputdir is current working directory
