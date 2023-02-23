@@ -9,8 +9,6 @@ idx: 'index.ndx'
 plumed: false
 equilibrium:
   mdp: 'md.mdp'
-prod:
-  mdp: 'md.mdp'
 changer:
   coordinates:
     md:
@@ -25,8 +23,7 @@ reactions:
           #    bonds: 'ffbonded.itp'
 sequence:
   - equilibrium
-  - 
-    mult: 10
+  - mult: 10
     tasks:
       - equilibrium
       - reactions

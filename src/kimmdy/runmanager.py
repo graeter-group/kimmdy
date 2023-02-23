@@ -7,6 +7,7 @@ from enum import Enum, auto
 from typing import Callable
 from kimmdy import config
 from kimmdy.config import Config
+from kimmdy.parsing import read_topol
 from kimmdy.reactions.homolysis import Homolysis
 from kimmdy.reaction import ReactionResult, ConversionRecipe, ConversionType
 import kimmdy.mdmanager as md
@@ -15,6 +16,7 @@ from kimmdy.tasks import Task, TaskFiles, TaskMapping
 from pprint import pformat
 import random
 from kimmdy import plugins
+from kimmdy.topology.topology import Topology
 
 # file types of which there will be multiple files per type
 AMBIGUOUS_SUFFS = ["dat", "xvg", "log", "trr"]
@@ -90,6 +92,7 @@ class RunManager:
             "gro": self.config.gro,
             "idx": self.config.idx,
         }
+        self.top = Topology(read_topol(self.config.top), self.config.ff, self.config.ffpatch)
         # did we just miss to add this or is there a way around this explicit definition
         # with the new AutoFillDict??
         if self.config.plumed:
@@ -288,6 +291,7 @@ class RunManager:
         # empty list for every new round of queries
         self.reaction_results: list[ReactionResult] = []
 
+        files = self.latest_files
         for reaction in self.reactions:
             # TODO: refactor into Task
             files = self._create_task_directory(reaction.name)
@@ -323,7 +327,8 @@ class RunManager:
             files.input["top"],
             files.output["top"],
             files.input["ff"],
-            self.config.ffpatch
+            self.config.ffpatch,
+            self.top
         )
         logging.info(f'Wrote new topology to {files.output["top"].parts[-3:]}')
         logging.debug(f"Chose recipe: {self.chosen_recipe}")

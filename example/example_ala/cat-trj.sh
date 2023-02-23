@@ -24,8 +24,8 @@ gmx trjcat -cat -o cat.trr  -f \
   hat_tf_000/41_relaxation/relax.trr
 
 
-echo "1 0" | gmx trjconv -dump 0 -f cat.trr -s ./hat_tf_000/1_equilibration/equil.tpr -center -pbc mol -o cat-center.gro
-echo "1 0" | gmx trjconv -f cat.trr -s ./hat_tf_000/1_equilibration/equil.tpr -center -pbc mol -o cat-center.xtc
+echo "1 1" | gmx trjconv -dump 0 -f cat.trr -s ./hat_tf_000/1_equilibration/equil.tpr -center -pbc mol -o cat-center.gro
+echo "1 1" | gmx trjconv -f cat.trr -s ./hat_tf_000/1_equilibration/equil.tpr -center -pbc mol -o cat-center.xtc
 
 
 
