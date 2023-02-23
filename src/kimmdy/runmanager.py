@@ -7,7 +7,7 @@ from typing import Callable
 from kimmdy import config
 from kimmdy.config import Config
 from kimmdy.parsing import read_topol
-from kimmdy.reaction import Reaction, ReactionResult, ConversionRecipe
+from kimmdy.reaction import ConversionType, Reaction, ReactionResult, ConversionRecipe
 import kimmdy.mdmanager as md
 import kimmdy.changemanager as changer
 from kimmdy.tasks import Task, TaskFiles, TaskMapping
@@ -91,19 +91,15 @@ class RunManager:
             "idx": self.config.idx,
         }
         try:
-            ffpatch = self.config.ffpatch
+            _ = self.config.ffpatch
         except AttributeError:
-            ffpatch = None
-        self.top = Topology(read_topol(self.config.top), self.config.ff, ffpatch)
+            self.config.ffpatch = None
+        self.top = Topology(read_topol(self.config.top), self.config.ff, self.config.ffpatch)
         # did we just miss to add this or is there a way around this explicit definition
         # with the new AutoFillDict??
         if self.config.plumed:
             self.latest_files["plumed.dat"] = self.config.cwd / self.config.plumed.dat
             # self.latest_files["distances.dat"] = self.config.plumed.distances
-
-        # If we want to allow starting from radical containing systems this needs to be initialized:
-        # TODO: update with HAT
-        self.radical_idxs = []
 
         self.filehist: list[dict[str, TaskFiles]] = [
             {"setup": TaskFiles(runmng=self, input=self.latest_files)}
@@ -334,24 +330,21 @@ class RunManager:
         )
         logging.info(f'Wrote new topology to {files.output["top"].parts[-3:]}')
         logging.debug(f"Chose recipe: {self.chosen_recipe}")
-        # TODO: get radicals out of the new topology
-        # if self.chosen_recipe.type == [ConversionType.BREAK]:
-        #     # why not add both?
-        #     self.radical_idxs.extend(self.chosen_recipe.atom_idx[0])
-        #
-        #     # files.input["plumed.dat"] = self.get_latest("plumed.dat")
-        #     files.output["plumed.dat"] = files.outputdir / "plumed_mod.dat"
-        #     # TODO: this
-        #     # changer.modify_plumed(
-        #     #     self.chosen_recipe,
-        #     #     files.input["plumed.dat"],
-        #     #     files.output["plumed.dat"],
-        #     #     files.input["distances.dat"],
-        #     # )
-        #     # logging.info(
-        #     #     f'Wrote new plumedfile to {files.output["plumed.dat"].parts[-3:]}'
-        #     # )
-        # logging.info(f"Looking for md in {self.config.changer.coordinates.__dict__}")
+
+        if self.chosen_recipe.type == ConversionType.BREAK:
+            # files.input["plumed.dat"] = self.get_latest("plumed.dat")
+            files.output["plumed.dat"] = files.outputdir / "plumed_mod.dat"
+            # TODO: this
+            changer.modify_plumed(
+                self.chosen_recipe,
+                files.input["plumed.dat"],
+                files.output["plumed.dat"],
+                files.input["distances.dat"],
+            )
+            logging.info(
+                f'Wrote new plumedfile to {files.output["plumed.dat"].parts[-3:]}'
+            )
+        logging.info(f"Looking for md in {self.config.changer.coordinates.__dict__}")
         # TODO clean this up, maybe make function for this in config
         if hasattr(self.config, "changer"):
             if hasattr(self.config.changer, "coordinates"):
