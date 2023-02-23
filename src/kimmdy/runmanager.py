@@ -241,7 +241,7 @@ class RunManager:
         logging.info("Setup _run_md_minim")
         self.state = State.MD
         files = self._create_task_directory("minimization")
-        files.input["mdp"] = (self.config.minimization.mdp,)
+        files.input["mdp"] = self.config.minimization.mdp
 
         # perform step
         files = md.minimzation(files)
@@ -331,10 +331,8 @@ class RunManager:
         logging.info(f'Wrote new topology to {files.output["top"].parts[-3:]}')
         logging.debug(f"Chose recipe: {self.chosen_recipe}")
 
-        if self.chosen_recipe.type == ConversionType.BREAK:
-            # files.input["plumed.dat"] = self.get_latest("plumed.dat")
+        if self.config.plumed:
             files.output["plumed.dat"] = files.outputdir / "plumed_mod.dat"
-            # TODO: this
             changer.modify_plumed(
                 self.chosen_recipe,
                 files.input["plumed.dat"],
@@ -344,7 +342,9 @@ class RunManager:
             logging.info(
                 f'Wrote new plumedfile to {files.output["plumed.dat"].parts[-3:]}'
             )
+
         logging.info(f"Looking for md in {self.config.changer.coordinates.__dict__}")
+
         # TODO clean this up, maybe make function for this in config
         if hasattr(self.config, "changer"):
             if hasattr(self.config.changer, "coordinates"):

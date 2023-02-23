@@ -32,7 +32,7 @@ def modify_plumed(
     recipe: ConversionRecipe,
     oldplumeddat: Path,
     newplumeddat: Path,
-    plumeddist: str,
+    plumeddist: Path,
 ):
     logging.info(
         f"Reading: {oldplumeddat} and writing modified plumed input to {newplumeddat}."
