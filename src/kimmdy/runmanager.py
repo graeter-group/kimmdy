@@ -289,7 +289,6 @@ class RunManager:
         # empty list for every new round of queries
         self.reaction_results: list[ReactionResult] = []
 
-        files = TaskFiles(self)
         for reaction in self.reactions:
             # TODO: refactor into Task
             files = self._create_task_directory(reaction.name)
@@ -297,20 +296,19 @@ class RunManager:
             self.reaction_results.append(reaction.get_reaction_result(files))
 
         logging.info("Reaction done")
-        return files
 
     def _decide_reaction(
         self,
         decision_strategy: Callable[
             [list[ReactionResult]], ConversionRecipe
         ] = default_decision_strategy,
-    ) -> TaskFiles:
+    ):
         logging.info("Decide on a reaction")
         logging.debug(f"Available reaction results: {self.reaction_results}")
         self.chosen_recipe = decision_strategy(self.reaction_results)
         logging.info("Chosen recipe is:")
         logging.info(self.chosen_recipe)
-        return TaskFiles(self)
+        return
 
     def _run_recipe(self) -> TaskFiles:
         logging.info(f"Start Recipe in step {self.iteration}")
