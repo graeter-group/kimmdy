@@ -4,6 +4,7 @@ from pathlib import Path
 import queue
 from enum import Enum, auto
 from typing import Callable
+from kimmdy import config
 from kimmdy.config import Config
 from kimmdy.parsing import read_topol
 from kimmdy.reaction import Reaction, ReactionResult, ConversionRecipe

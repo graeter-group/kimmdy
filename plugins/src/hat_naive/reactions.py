@@ -40,10 +40,16 @@ class HAT_naive(Reaction):
                     if atom2.type.startswith('H'):
                         froms.append(atom.nr)
                         hs.append(atom2.nr)
+            logging.info(f'hs: {hs}')
+            logging.info(f'froms: {froms}')
             i = rng.randint(0, len(hs) - 1)
             r = rad.nr
             h = hs[i]
             f = froms[i]
+            logging.info(f'i: {i}')
+            logging.info(f'radical: {rad}')
+            logging.info(f'h: {top.atoms[h]}')
+            logging.info(f'from: {top.atoms[f]}')
             outcome = ReactionOutcome(
                 recipe = [
                     Conversion(ConversionType.BREAK, (f, h)),
