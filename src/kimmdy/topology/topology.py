@@ -28,6 +28,7 @@ class Topology:
         self.angles: dict[tuple[str, str, str], Angle] = {}
         self.proper_dihedrals: dict[tuple[str, str, str, str], Dihedral] = {}
         self.improper_dihedrals: dict[tuple[str, str, str, str], Dihedral] = {}
+        self.radicals: dict[str, Atom] = {}
 
         if ffdir:
             self.ff = FF(ffdir)
@@ -160,6 +161,7 @@ class Topology:
         # mark atoms as radicals
         for atom in atompair:
             atom.is_radical = True
+            self.radicals[atom.nr] = atom
 
             # patch parameters
             if self.ffpatches is None or self.ffpatches.atompatches is None:
@@ -262,6 +264,7 @@ class Topology:
         if all(map(lambda x: x.is_radical, atompair)):
             atompair[0].is_radical = False
             atompair[1].is_radical = False
+            for a in atompair: self.radicals.pop(a.nr)
 
         # update bound_to
         atompair[0].bound_to_nrs.append(atompair[1].nr)
