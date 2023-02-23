@@ -231,9 +231,6 @@ class Config:
             self._cast_types()
             self._validate()
 
-        # TODO: handle defaults and optionals more elegantly
-        if recursive_dict and recursive_dict.get('ffpatch') is None:
-            recursive_dict['ffpatch'] = None
 
     def get_attributes(self):
         """Get a list of all attributes"""
