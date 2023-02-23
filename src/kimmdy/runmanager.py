@@ -90,7 +90,11 @@ class RunManager:
             "gro": self.config.gro,
             "idx": self.config.idx,
         }
-        self.top = Topology(read_topol(self.config.top), self.config.ff, self.config.ffpatch)
+        try:
+            ffpatch = self.config.ffpatch
+        except AttributeError:
+            ffpatch = None
+        self.top = Topology(read_topol(self.config.top), self.config.ff, ffpatch)
         # did we just miss to add this or is there a way around this explicit definition
         # with the new AutoFillDict??
         if self.config.plumed:
