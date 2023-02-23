@@ -45,9 +45,6 @@ class Topology:
         self._parse_pairs()
         self._parse_angles()
         self._parse_dihedrals()
-
-        # self._update_dict()
-
         self._initialize_graph()
 
     def _update_dict(self):

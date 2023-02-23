@@ -20,10 +20,10 @@ class HAT_reaction(Reaction):
         trr = files.input["trr"]
         u = mda.Universe(str(tpr), str(trr), topology_format="tpr", format="trr")
 
-        logging.warning(u.atoms[:40].types)
+        logging.info(u.atoms[:40].types)
         rads = find_radicals(u)
-        logging.warning(f"{rads} for {tpr}")
-        logging.warning([u.atoms[:20].elements, u.atoms[:20].types])
+        logging.debug(f"{rads} for {tpr}")
+        logging.debug([u.atoms[:20].elements, u.atoms[:20].types])
 
         outcomes = []
         for rad in rads:
@@ -38,7 +38,6 @@ class HAT_reaction(Reaction):
                 u, u.trajectory[-2], rad, bonded_rad, h_cutoff=3.5
             )
             logging.info('made subsystem')
-
             for subsystem in subsystems:
                 from_H = subsystem["meta"]["indices"][0]
                 from_H_nr = str(u.atoms[from_H].index + 1)
@@ -48,7 +47,12 @@ class HAT_reaction(Reaction):
                     "ACE",
                 ]:  # doesn't work with capping groups at the moment
                     rad_nr = str(rad.atoms[0].index + 1)
-                    recipe = [Conversion(ConversionType.BREAK, (from_H_nr, rad_nr))]
+                    recipe = [
+                        # FIXME: which is the previous H binding partner?
+                        # to break it's bond so that the H can move.
+                        Conversion(ConversionType.BREAK, (from_H_nr, rad_nr)),
+                        Conversion(ConversionType.BIND, (from_H_nr, rad_nr)),
+                    ]
                     rate = get_reaction_rates()
                     outcomes.append(ReactionOutcome(recipe, rate))
                     logging.info(f'Made outcome with recipe: {recipe} and rate: {rate}')

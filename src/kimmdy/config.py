@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Optional
 import yaml
 import logging
 from pathlib import Path
@@ -37,7 +38,7 @@ type_scheme = {
     "iterations": int,
     "out": Path,
     "ff": Path,
-    "ffpatch": Path,
+    "ffpatch": None,
     "top": Path,
     "gro": Path,
     "idx": Path,
@@ -131,7 +132,7 @@ class Config:
     iterations: int
     out: Path
     ff: Path
-    ffpatch: Path
+    ffpatch: Optional[Path]
     top: Path
     gro: Path
     idx: Path

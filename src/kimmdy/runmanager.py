@@ -1,15 +1,12 @@
 from __future__ import annotations
-from dataclasses import field
 import logging
 from pathlib import Path
 import queue
 from enum import Enum, auto
 from typing import Callable
-from kimmdy import config
 from kimmdy.config import Config
 from kimmdy.parsing import read_topol
-from kimmdy.reactions.homolysis import Homolysis
-from kimmdy.reaction import ReactionResult, ConversionRecipe, ConversionType
+from kimmdy.reaction import Reaction, ReactionResult, ConversionRecipe
 import kimmdy.mdmanager as md
 import kimmdy.changemanager as changer
 from kimmdy.tasks import Task, TaskFiles, TaskMapping
@@ -291,7 +288,7 @@ class RunManager:
         # empty list for every new round of queries
         self.reaction_results: list[ReactionResult] = []
 
-        files = self.latest_files
+        files = TaskFiles(self)
         for reaction in self.reactions:
             # TODO: refactor into Task
             files = self._create_task_directory(reaction.name)
@@ -306,13 +303,13 @@ class RunManager:
         decision_strategy: Callable[
             [list[ReactionResult]], ConversionRecipe
         ] = default_decision_strategy,
-    ):
+    ) -> TaskFiles:
         logging.info("Decide on a reaction")
         logging.debug(f"Available reaction results: {self.reaction_results}")
         self.chosen_recipe = decision_strategy(self.reaction_results)
         logging.info("Chosen recipe is:")
         logging.info(self.chosen_recipe)
-        return None, None
+        return TaskFiles(self)
 
     def _run_recipe(self) -> TaskFiles:
         logging.info(f"Start Recipe in step {self.iteration}")
