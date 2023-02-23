@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-dir='002'
+dir='004'
 
 gmx trjcat -cat -o cat.trr  -f \
   hat_tf_${dir}/1_equilibration/equil.trr\
