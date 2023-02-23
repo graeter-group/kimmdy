@@ -2,6 +2,8 @@ from dataclasses import dataclass, field, InitVar
 from pathlib import Path
 from typing import Callable
 
+from kimmdy.runmanager import RunManager
+
 
 class AutoFillDict(dict):
     def __init__(self, get_missing: Callable):
@@ -36,7 +38,7 @@ class TaskFiles:
 
     """
 
-    runmng: InitVar
+    runmng: InitVar[RunManager]
     input: dict[str, Path] = field(default_factory=dict)
     output: dict[str, Path] = field(default_factory=dict)
     # default outputdir is current working directory
@@ -65,4 +67,4 @@ class Task:
         return str(self.f) + " args: " + str(self.kwargs)
 
 
-TaskMapping = dict[str, Callable[..., TaskFiles]]
+TaskMapping = dict[str, list[Callable[..., TaskFiles]]]
