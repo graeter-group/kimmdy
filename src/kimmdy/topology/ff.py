@@ -118,7 +118,7 @@ def props_to_patches(props):
 
 
 @dataclass(order=True)
-class AtomPatch():
+class AtomPatch:
     """Instructions to patch one atom"""
 
     ai: str
@@ -138,7 +138,7 @@ class AtomPatch():
 
 
 @dataclass(order=True)
-class BondPatch():
+class BondPatch:
     """Instructions to patch one bond"""
 
     ai: str
@@ -156,14 +156,12 @@ class BondPatch():
         self.params = props_to_patches(props)
         self.ai = ai
         self.aj = aj
-        self.id = "---".join([ai, aj]) 
-        self.id_sym = (
-            "---".join(reversed([ai, aj]))
-        )
+        self.id = "---".join([ai, aj])
+        self.id_sym = "---".join(reversed([ai, aj]))
 
 
 @dataclass(order=True)
-class PairPatch():
+class PairPatch:
     """Instructions to patch one pair"""
 
     ai: str
@@ -181,10 +179,8 @@ class PairPatch():
         self.params = props_to_patches(props)
         self.ai = ai
         self.aj = aj
-        self.id = "---".join([ai, aj]) 
-        self.id_sym = (
-            "---".join(reversed([ai, aj]))
-        )
+        self.id = "---".join([ai, aj])
+        self.id_sym = "---".join(reversed([ai, aj]))
 
 
 @dataclass(order=True)
@@ -209,14 +205,12 @@ class AnglePatch:
         self.ai = ai
         self.aj = aj
         self.ak = ak
-        self.id = "---".join([ai, aj, ak]) 
-        self.id_sym = (
-            "---".join(reversed([ai, aj, ak]))
-        )
+        self.id = "---".join([ai, aj, ak])
+        self.id_sym = "---".join(reversed([ai, aj, ak]))
 
 
 @dataclass(order=True)
-class DihedralPatch():
+class DihedralPatch:
     """Instructions to patch one dihedral"""
 
     ai: str
@@ -316,12 +310,12 @@ class FFPatches:
         """
         )
 
-Patch = Union[AtomPatch,BondPatch,PairPatch,AnglePatch,DihedralPatch]
-Patches = Union[
-dict[str, AtomPatch],
-dict[str, BondPatch],
-dict[str, PairPatch],
-dict[str, AnglePatch],
-dict[str, DihedralPatch],
-]
 
+Patch = Union[AtomPatch, BondPatch, PairPatch, AnglePatch, DihedralPatch]
+Patches = Union[
+    dict[str, AtomPatch],
+    dict[str, BondPatch],
+    dict[str, PairPatch],
+    dict[str, AnglePatch],
+    dict[str, DihedralPatch],
+]

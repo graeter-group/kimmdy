@@ -231,7 +231,6 @@ class Config:
             self._cast_types()
             self._validate()
 
-
     def get_attributes(self):
         """Get a list of all attributes"""
         repr = self.__dict__.copy()

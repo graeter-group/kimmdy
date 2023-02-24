@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 from typing import Optional, Union
 from kimmdy.topology.utils import field_or_none
 
+
 @dataclass(order=True)
 class Atom:
     """Information about one atom
@@ -51,7 +52,7 @@ class Atom:
 
 
 @dataclass(order=True)
-class AtomType():
+class AtomType:
     """Information about one atom
 
     A class containing atom information as in the atoms section of the topology.
@@ -82,7 +83,7 @@ class AtomType():
             ptype=l[4],
             sigma=l[5],
             epsilon=l[6],
-            id=l[0]
+            id=l[0],
         )
 
 
@@ -118,7 +119,7 @@ class Bond:
 
 
 @dataclass(order=True)
-class BondType():
+class BondType:
     """Information about one bondtype
 
     A class containing bond information as in the bonds section of the topology.
@@ -294,7 +295,7 @@ class Dihedral:
             c2=field_or_none(l, 7),
             c3=field_or_none(l, 8),
             c4=field_or_none(l, 9),
-            c5=field_or_none(l, 10)
+            c5=field_or_none(l, 10),
         )
 
 
@@ -342,6 +343,7 @@ class DihedralType:
             c4=field_or_none(l, 9),
             c5=field_or_none(l, 10),
         )
+
 
 @dataclass(order=True)
 class ResidueAtomSpec:
@@ -402,7 +404,6 @@ class ResidueImroperSpec:
         )
 
 
-
 @dataclass(order=True)
 class ResidueType:
     """Information about one residuetype"""
@@ -434,16 +435,16 @@ class ResidueType:
 
         return cls(residue, atoms, bonds, impropers)
 
-AtomId=str
-BondId=tuple[str,str]
-AngleId=tuple[str,str,str]
-DihedralId=tuple[str,str,str, str]
+
+AtomId = str
+BondId = tuple[str, str]
+AngleId = tuple[str, str, str]
+DihedralId = tuple[str, str, str, str]
 Atomic = Union[Atom, Bond, Pair, Angle, Dihedral]
 AtomicType = Union[AtomType, BondType, AngleType, DihedralType]
 AtomicTypes = Union[
-dict[AtomId, AtomType],
-dict[BondId, BondType],
-dict[AngleId, AngleType],
-dict[DihedralId, DihedralType],
+    dict[AtomId, AtomType],
+    dict[BondId, BondType],
+    dict[AngleId, AngleType],
+    dict[DihedralId, DihedralType],
 ]
-

@@ -1,5 +1,12 @@
 import logging
-from kimmdy.reaction import Conversion, Reaction, ConversionRecipe, ConversionType, ReactionOutcome, ReactionResult
+from kimmdy.reaction import (
+    Conversion,
+    Reaction,
+    ConversionRecipe,
+    ConversionType,
+    ReactionOutcome,
+    ReactionResult,
+)
 from kimmdy.tasks import TaskFiles
 from kimmdy.utils import (
     identify_atomtypes,
@@ -60,8 +67,7 @@ class Homolysis(Reaction):
             k = calc_av_rate(distances, float(r_0), float(E_dis), float(k_f))
 
             outcome = ReactionOutcome(
-                recipe=[Conversion(ConversionType.BREAK, breakpair)],
-                rate=k
+                recipe=[Conversion(ConversionType.BREAK, breakpair)], rate=k
             )
             result.append(outcome)
 

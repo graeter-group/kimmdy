@@ -94,7 +94,9 @@ class RunManager:
             _ = self.config.ffpatch
         except AttributeError:
             self.config.ffpatch = None
-        self.top = Topology(read_topol(self.config.top), self.config.ff, self.config.ffpatch)
+        self.top = Topology(
+            read_topol(self.config.top), self.config.ff, self.config.ffpatch
+        )
         # did we just miss to add this or is there a way around this explicit definition
         # with the new AutoFillDict??
         if self.config.plumed:
@@ -324,7 +326,7 @@ class RunManager:
             files.output["top"],
             files.input["ff"],
             self.config.ffpatch,
-            self.top
+            self.top,
         )
         logging.info(f'Wrote new topology to {files.output["top"].parts[-3:]}')
         logging.debug(f"Chose recipe: {self.chosen_recipe}")

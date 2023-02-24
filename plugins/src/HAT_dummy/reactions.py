@@ -1,4 +1,11 @@
-from kimmdy.reaction import Conversion, Reaction, ReactionOutcome, ReactionResult, ConversionRecipe, ConversionType
+from kimmdy.reaction import (
+    Conversion,
+    Reaction,
+    ReactionOutcome,
+    ReactionResult,
+    ConversionRecipe,
+    ConversionType,
+)
 from .HAT_utils import cap_single_rad, find_radicals
 import logging
 import MDAnalysis as mda
@@ -31,13 +38,13 @@ class HAT_reaction(Reaction):
                 logging.info("no radical found, returning zero rate recipe")
                 return [ReactionOutcome([], 0)]
             bonded_rad = rad[0].bonded_atoms
-            logging.info(f'radical: {rad}')
-            logging.info(f'bonded_rad: {bonded_rad}')
+            logging.info(f"radical: {rad}")
+            logging.info(f"bonded_rad: {bonded_rad}")
 
             subsystems = cap_single_rad(
                 u, u.trajectory[-2], rad, bonded_rad, h_cutoff=3.5
             )
-            logging.info('made subsystem')
+            logging.info("made subsystem")
             for subsystem in subsystems:
                 from_H = subsystem["meta"]["indices"][0]
                 from_H_nr = str(u.atoms[from_H].index + 1)
@@ -55,8 +62,7 @@ class HAT_reaction(Reaction):
                     ]
                     rate = get_reaction_rates()
                     outcomes.append(ReactionOutcome(recipe, rate))
-                    logging.info(f'Made outcome with recipe: {recipe} and rate: {rate}')
+                    logging.info(f"Made outcome with recipe: {recipe} and rate: {rate}")
 
         logging.info(f"Returning exactly these recipes to runmanager: {outcomes}")
         return outcomes
-

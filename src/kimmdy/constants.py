@@ -104,5 +104,5 @@ ATOMTYPE_BONDORDER_FLAT = {
     "CT": 4,
     "N3": 4,
     "P": 4,
-    "SO": 4
+    "SO": 4,
 }
