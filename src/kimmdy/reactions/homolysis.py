@@ -1,5 +1,12 @@
 import logging
-from kimmdy.reaction import Reaction, ConversionRecipe, ConversionType, ReactionResult
+from kimmdy.reaction import (
+    Conversion,
+    Reaction,
+    ConversionRecipe,
+    ConversionType,
+    ReactionOutcome,
+    ReactionResult,
+)
 from kimmdy.tasks import TaskFiles
 from kimmdy.utils import (
     identify_atomtypes,
@@ -59,9 +66,9 @@ class Homolysis(Reaction):
             # calculate rupture probabilties
             k = calc_av_rate(distances, float(r_0), float(E_dis), float(k_f))
 
-            result.rates.append(k)
-            result.recipes.append(
-                ConversionRecipe(type=[ConversionType.BREAK], atom_idx=[breakpair])
+            outcome = ReactionOutcome(
+                recipe=[Conversion(ConversionType.BREAK, breakpair)], rate=k
             )
+            result.append(outcome)
 
         return result

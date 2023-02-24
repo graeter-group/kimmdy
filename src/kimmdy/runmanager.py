@@ -1,19 +1,20 @@
 from __future__ import annotations
-from dataclasses import field
 import logging
 from pathlib import Path
 import queue
 from enum import Enum, auto
 from typing import Callable
+from kimmdy import config
 from kimmdy.config import Config
-from kimmdy.reactions.homolysis import Homolysis
-from kimmdy.reaction import ReactionResult, ConversionRecipe, ConversionType
+from kimmdy.parsing import read_topol
+from kimmdy.reaction import ConversionType, Reaction, ReactionResult, ConversionRecipe
 import kimmdy.mdmanager as md
 import kimmdy.changemanager as changer
 from kimmdy.tasks import Task, TaskFiles, TaskMapping
 from pprint import pformat
 import random
 from kimmdy import plugins
+from kimmdy.topology.topology import Topology
 
 # file types of which there will be multiple files per type
 AMBIGUOUS_SUFFS = ["dat", "xvg", "log", "trr"]
@@ -35,11 +36,10 @@ def default_decision_strategy(
     # flatten the list of rates form the reaction results
     rates = []
     recipes = []
-    for reaction in reaction_results:
-        for rate in reaction.rates:
-            rates.append(rate)
-        for recipe in reaction.recipes:
-            recipes.append(recipe)
+    for reaction_result in reaction_results:
+        for outcome in reaction_result:
+            rates.append(outcome.rate)
+            recipes.append(outcome.recipe)
 
     total_rate = sum(rates)
     random.seed()
@@ -90,15 +90,18 @@ class RunManager:
             "gro": self.config.gro,
             "idx": self.config.idx,
         }
+        try:
+            _ = self.config.ffpatch
+        except AttributeError:
+            self.config.ffpatch = None
+        self.top = Topology(
+            read_topol(self.config.top), self.config.ff, self.config.ffpatch
+        )
         # did we just miss to add this or is there a way around this explicit definition
         # with the new AutoFillDict??
         if self.config.plumed:
             self.latest_files["plumed.dat"] = self.config.cwd / self.config.plumed.dat
             # self.latest_files["distances.dat"] = self.config.plumed.distances
-
-        # If we want to allow starting from radical containing systems this needs to be initialized:
-        # TODO: update with HAT
-        self.radical_idxs = []
 
         self.filehist: list[dict[str, TaskFiles]] = [
             {"setup": TaskFiles(runmng=self, input=self.latest_files)}
@@ -119,7 +122,7 @@ class RunManager:
         # Instantiate reactions
         self.reactions = []
         react_names = self.config.reactions.get_attributes()
-        logging.info("Instantiating Reactions:", *react_names)
+        # logging.info("Instantiating Reactions:", *react_names)
         for react_name in react_names:
             r = plugins[react_name]
             reaction = r(react_name, self)
@@ -240,7 +243,7 @@ class RunManager:
         logging.info("Setup _run_md_minim")
         self.state = State.MD
         files = self._create_task_directory("minimization")
-        files.input["mdp"] = (self.config.minimization.mdp,)
+        files.input["mdp"] = self.config.minimization.mdp
 
         # perform step
         files = md.minimzation(files)
@@ -295,7 +298,6 @@ class RunManager:
             self.reaction_results.append(reaction.get_reaction_result(files))
 
         logging.info("Reaction done")
-        return files
 
     def _decide_reaction(
         self,
@@ -308,11 +310,11 @@ class RunManager:
         self.chosen_recipe = decision_strategy(self.reaction_results)
         logging.info("Chosen recipe is:")
         logging.info(self.chosen_recipe)
-        return None, None
+        return
 
     def _run_recipe(self) -> TaskFiles:
         logging.info(f"Start Recipe in step {self.iteration}")
-        logging.info(f"Breakpair: {self.chosen_recipe.atom_idx}")
+        logging.info(f"Recipe: {self.chosen_recipe}")
 
         files = self._create_task_directory("recipe")
 
@@ -323,14 +325,13 @@ class RunManager:
             files.input["top"],
             files.output["top"],
             files.input["ff"],
+            self.config.ffpatch,
+            self.top,
         )
         logging.info(f'Wrote new topology to {files.output["top"].parts[-3:]}')
-        logging.debug(f"Chose recipe: {self.chosen_recipe.type}")
-        if self.chosen_recipe.type == [ConversionType.BREAK]:
-            # why not add both?
-            self.radical_idxs.extend(self.chosen_recipe.atom_idx[0])
+        logging.debug(f"Chose recipe: {self.chosen_recipe}")
 
-            # files.input["plumed.dat"] = self.get_latest("plumed.dat")
+        if self.config.plumed:
             files.output["plumed.dat"] = files.outputdir / "plumed_mod.dat"
             changer.modify_plumed(
                 self.chosen_recipe,
@@ -341,7 +342,9 @@ class RunManager:
             logging.info(
                 f'Wrote new plumedfile to {files.output["plumed.dat"].parts[-3:]}'
             )
+
         logging.info(f"Looking for md in {self.config.changer.coordinates.__dict__}")
+
         # TODO clean this up, maybe make function for this in config
         if hasattr(self.config, "changer"):
             if hasattr(self.config.changer, "coordinates"):

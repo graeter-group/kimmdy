@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import Optional
 import yaml
 import logging
 from pathlib import Path
@@ -14,6 +16,8 @@ def check_file_exists(p: Path):
 
 
 class Sequence(list):
+    """A sequence of tasks."""
+
     def __init__(self, tasks: list):
         list.__init__(self)
         for task in tasks:
@@ -34,6 +38,7 @@ type_scheme = {
     "iterations": int,
     "out": Path,
     "ff": Path,
+    "ffpatch": None,
     "top": Path,
     "gro": Path,
     "idx": Path,
@@ -127,6 +132,7 @@ class Config:
     iterations: int
     out: Path
     ff: Path
+    ffpatch: Optional[Path]
     top: Path
     gro: Path
     idx: Path
@@ -140,7 +146,10 @@ class Config:
     sequence: SequenceConfig
 
     def __init__(
-        self, input_file: Path = None, recursive_dict=None, type_scheme=type_scheme
+        self,
+        input_file: Path | None = None,
+        recursive_dict: dict | None = None,
+        type_scheme=type_scheme,
     ):
         if input_file is None and recursive_dict is None:
             m = "Error: No input file was provided!"
@@ -176,7 +185,7 @@ class Config:
                         logging.warn(
                             f"Plugin {plg_name} could not be loaded!\n{plugin}\n"
                         )
-                    if issubclass(plugin, Reaction):
+                    if issubclass(type(plugin), Reaction):
                         self.type_scheme["reactions"].update(plugin.type_scheme)
                         logging.debug(self.type_scheme["reactions"])
 

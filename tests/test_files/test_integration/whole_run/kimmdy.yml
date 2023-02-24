@@ -20,7 +20,7 @@ reactions:
   homolysis:
     edis: 'edissoc.dat'
     bonds: 'ffbonded.itp'
-  HAT:
+  HAT_dummy:
 sequence:
   - equilibrium
   - prod

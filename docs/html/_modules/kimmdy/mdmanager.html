@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>kimmdy.mdmanager &mdash; kimmdy 2023 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> kimmdy
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">kimmdy</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">kimmdy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">kimmdy.mdmanager</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for kimmdy.mdmanager</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">kimmdy.tasks</span> <span class="kn">import</span> <span class="n">TaskFiles</span>
+<span class="kn">from</span> <span class="nn">kimmdy.utils</span> <span class="kn">import</span> <span class="n">run_shell_cmd</span>
+
+
+<div class="viewcode-block" id="dummy_step"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.mdmanager.dummy_step">[docs]</a><span class="k">def</span> <span class="nf">dummy_step</span><span class="p">(</span><span class="n">files</span><span class="p">):</span>
+    <span class="n">run_shell_cmd</span><span class="p">(</span><span class="s2">&quot;pwd&gt;./pwd.pwd&quot;</span><span class="p">,</span> <span class="n">files</span><span class="o">.</span><span class="n">outputdir</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">files</span></div>
+
+
+<div class="viewcode-block" id="write_mdp"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.mdmanager.write_mdp">[docs]</a><span class="k">def</span> <span class="nf">write_mdp</span><span class="p">():</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="minimzation"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.mdmanager.minimzation">[docs]</a><span class="k">def</span> <span class="nf">minimzation</span><span class="p">(</span><span class="n">files</span><span class="p">:</span> <span class="n">TaskFiles</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TaskFiles</span><span class="p">:</span>
+    <span class="n">outputdir</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">outputdir</span>
+    <span class="n">top</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">]</span>
+    <span class="n">gro</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;gro&quot;</span><span class="p">]</span>
+    <span class="n">mdp</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;mdp&quot;</span><span class="p">]</span>
+    <span class="n">outgro</span> <span class="o">=</span> <span class="n">outputdir</span> <span class="o">/</span> <span class="s2">&quot;minimized.gro&quot;</span>
+    <span class="n">outgro</span> <span class="o">=</span> <span class="n">outputdir</span> <span class="o">/</span> <span class="s2">&quot;minimized.gro&quot;</span>
+    <span class="n">tpr</span> <span class="o">=</span> <span class="n">outputdir</span> <span class="o">/</span> <span class="s2">&quot;minimization.tpr&quot;</span>
+
+    <span class="n">files</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;tpr&quot;</span><span class="p">:</span> <span class="n">tpr</span><span class="p">,</span> <span class="s2">&quot;outgro&quot;</span><span class="p">:</span> <span class="n">outgro</span><span class="p">}</span>
+
+    <span class="n">run_shell_cmd</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;gmx grompp -p </span><span class="si">{</span><span class="n">top</span><span class="si">}</span><span class="s2"> -c </span><span class="si">{</span><span class="n">gro</span><span class="si">}</span><span class="s2"> -r </span><span class="si">{</span><span class="n">gro</span><span class="si">}</span><span class="s2"> -f </span><span class="si">{</span><span class="n">mdp</span><span class="si">}</span><span class="s2"> -o </span><span class="si">{</span><span class="n">tpr</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">outputdir</span><span class="p">)</span>
+    <span class="n">run_shell_cmd</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;gmx mdrun -s </span><span class="si">{</span><span class="n">tpr</span><span class="si">}</span><span class="s2"> -c </span><span class="si">{</span><span class="n">outgro</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">outputdir</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">files</span></div>
+
+
+<div class="viewcode-block" id="equilibration"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.mdmanager.equilibration">[docs]</a><span class="k">def</span> <span class="nf">equilibration</span><span class="p">(</span><span class="n">files</span><span class="p">:</span> <span class="n">TaskFiles</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TaskFiles</span><span class="p">:</span>
+    <span class="n">outputdir</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">outputdir</span>
+    <span class="n">gro</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;gro&quot;</span><span class="p">]</span>
+    <span class="n">top</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">]</span>
+    <span class="n">mdp</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;mdp&quot;</span><span class="p">]</span>
+    <span class="n">tpr</span> <span class="o">=</span> <span class="n">outputdir</span> <span class="o">/</span> <span class="s2">&quot;equil.tpr&quot;</span>
+    <span class="n">outgro</span> <span class="o">=</span> <span class="n">outputdir</span> <span class="o">/</span> <span class="s2">&quot;equil.gro&quot;</span>
+
+    <span class="n">files</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;tpr&quot;</span><span class="p">:</span> <span class="n">tpr</span><span class="p">,</span> <span class="s2">&quot;gro&quot;</span><span class="p">:</span> <span class="n">outgro</span><span class="p">}</span>
+
+    <span class="n">run_shell_cmd</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;gmx grompp -p </span><span class="si">{</span><span class="n">top</span><span class="si">}</span><span class="s2"> -c </span><span class="si">{</span><span class="n">gro</span><span class="si">}</span><span class="s2"> -r </span><span class="si">{</span><span class="n">gro</span><span class="si">}</span><span class="s2"> -f </span><span class="si">{</span><span class="n">mdp</span><span class="si">}</span><span class="s2"> -o </span><span class="si">{</span><span class="n">tpr</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">outputdir</span><span class="p">)</span>
+    <span class="n">run_shell_cmd</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;gmx mdrun -v -s </span><span class="si">{</span><span class="n">tpr</span><span class="si">}</span><span class="s2"> -c </span><span class="si">{</span><span class="n">outgro</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">outputdir</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">files</span></div>
+
+
+<div class="viewcode-block" id="equilibrium"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.mdmanager.equilibrium">[docs]</a><span class="k">def</span> <span class="nf">equilibrium</span><span class="p">(</span><span class="n">files</span><span class="p">:</span> <span class="n">TaskFiles</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Equilibrium MD simulation.</span>
+
+<span class="sd">    Equilibrium simulation before the production simulation,</span>
+<span class="sd">    which potentially includes pulling.</span>
+<span class="sd">    Will call `gmx grompp` and `mdrun` based on mdp-file specified</span>
+<span class="sd">    in files: TaskFiles.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">outputdir</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">outputdir</span>
+
+    <span class="n">top</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">]</span>
+    <span class="n">gro</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;gro&quot;</span><span class="p">]</span>
+    <span class="n">mdp</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;mdp&quot;</span><span class="p">]</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;idx&quot;</span><span class="p">]</span>
+    <span class="n">tpr</span> <span class="o">=</span> <span class="n">outputdir</span> <span class="o">/</span> <span class="s2">&quot;equil.tpr&quot;</span>
+    <span class="n">outgro</span> <span class="o">=</span> <span class="n">outputdir</span> <span class="o">/</span> <span class="s2">&quot;equil.gro&quot;</span>
+    <span class="n">outtrr</span> <span class="o">=</span> <span class="n">outputdir</span> <span class="o">/</span> <span class="s2">&quot;equil.trr&quot;</span>
+
+    <span class="n">files</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;tpr&quot;</span><span class="p">:</span> <span class="n">tpr</span><span class="p">,</span> <span class="s2">&quot;gro&quot;</span><span class="p">:</span> <span class="n">outgro</span><span class="p">,</span> <span class="s2">&quot;trr&quot;</span><span class="p">:</span> <span class="n">outtrr</span><span class="p">}</span>
+
+    <span class="n">run_shell_cmd</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;gmx grompp -p </span><span class="si">{</span><span class="n">top</span><span class="si">}</span><span class="s2"> -c </span><span class="si">{</span><span class="n">gro</span><span class="si">}</span><span class="s2"> -f </span><span class="si">{</span><span class="n">mdp</span><span class="si">}</span><span class="s2"> -n </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2"> -o </span><span class="si">{</span><span class="n">tpr</span><span class="si">}</span><span class="s2"> -maxwarn 5&quot;</span><span class="p">,</span>
+        <span class="n">outputdir</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">run_shell_cmd</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;gmx mdrun -v -s </span><span class="si">{</span><span class="n">tpr</span><span class="si">}</span><span class="s2"> -c </span><span class="si">{</span><span class="n">outgro</span><span class="si">}</span><span class="s2"> -o </span><span class="si">{</span><span class="n">outtrr</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">outputdir</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">files</span></div>
+
+
+<div class="viewcode-block" id="production"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.mdmanager.production">[docs]</a><span class="k">def</span> <span class="nf">production</span><span class="p">(</span><span class="n">files</span><span class="p">:</span> <span class="n">TaskFiles</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TaskFiles</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Production MD simulation.</span>
+
+<span class="sd">    Potentially with pulling.</span>
+<span class="sd">    Will call `gmx grompp` and `mdrun` based on mdp-file specified</span>
+<span class="sd">    in files: TaskFiles.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">outputdir</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">outputdir</span>
+
+    <span class="n">top</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">]</span>
+    <span class="n">gro</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;gro&quot;</span><span class="p">]</span>
+    <span class="n">mdp</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;mdp&quot;</span><span class="p">]</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;idx&quot;</span><span class="p">]</span>
+    <span class="n">cpt</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;cpt&quot;</span><span class="p">]</span>
+    <span class="n">plumed_dat</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;plumed.dat&quot;</span><span class="p">]</span>
+    <span class="n">tpr</span> <span class="o">=</span> <span class="n">outputdir</span> <span class="o">/</span> <span class="s2">&quot;prod.tpr&quot;</span>
+    <span class="n">outgro</span> <span class="o">=</span> <span class="n">outputdir</span> <span class="o">/</span> <span class="s2">&quot;prod.gro&quot;</span>
+    <span class="n">outtrr</span> <span class="o">=</span> <span class="n">outputdir</span> <span class="o">/</span> <span class="s2">&quot;prod.trr&quot;</span>
+
+    <span class="n">files</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;tpr&quot;</span><span class="p">:</span> <span class="n">tpr</span><span class="p">,</span> <span class="s2">&quot;gro&quot;</span><span class="p">:</span> <span class="n">outgro</span><span class="p">,</span> <span class="s2">&quot;trr&quot;</span><span class="p">:</span> <span class="n">outtrr</span><span class="p">}</span>
+
+    <span class="n">run_shell_cmd</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot; gmx grompp -p </span><span class="si">{</span><span class="n">top</span><span class="si">}</span><span class="s2"> -c </span><span class="si">{</span><span class="n">gro</span><span class="si">}</span><span class="s2"> -f </span><span class="si">{</span><span class="n">mdp</span><span class="si">}</span><span class="s2"> -n </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2"> -o </span><span class="si">{</span><span class="n">tpr</span><span class="si">}</span><span class="s2"> -maxwarn 5&quot;</span><span class="p">,</span>
+        <span class="n">outputdir</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">run_shell_cmd</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;gmx mdrun -v -s </span><span class="si">{</span><span class="n">tpr</span><span class="si">}</span><span class="s2"> -c </span><span class="si">{</span><span class="n">outgro</span><span class="si">}</span><span class="s2"> -plumed </span><span class="si">{</span><span class="n">plumed_dat</span><span class="si">}</span><span class="s2"> -o </span><span class="si">{</span><span class="n">outtrr</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">outputdir</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">files</span></div>
+
+
+<div class="viewcode-block" id="relaxation"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.mdmanager.relaxation">[docs]</a><span class="k">def</span> <span class="nf">relaxation</span><span class="p">(</span><span class="n">files</span><span class="p">:</span> <span class="n">TaskFiles</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TaskFiles</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Relaxation MD simulation.</span>
+
+<span class="sd">    To relax / equilibrate after a reaction.</span>
+<span class="sd">    Will call `gmx grompp` and `mdrun` based on mdp-file specified</span>
+<span class="sd">    in files: TaskFiles.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">outputdir</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">outputdir</span>
+    <span class="n">top</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">]</span>
+    <span class="n">gro</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;gro&quot;</span><span class="p">]</span>
+    <span class="n">mdp</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;mdp&quot;</span><span class="p">]</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;idx&quot;</span><span class="p">]</span>
+    <span class="n">cpt</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;cpt&quot;</span><span class="p">]</span>
+    <span class="n">tpr</span> <span class="o">=</span> <span class="n">outputdir</span> <span class="o">/</span> <span class="s2">&quot;relax.tpr&quot;</span>
+    <span class="n">outgro</span> <span class="o">=</span> <span class="n">outputdir</span> <span class="o">/</span> <span class="s2">&quot;relax.gro&quot;</span>
+    <span class="n">outtrr</span> <span class="o">=</span> <span class="n">outputdir</span> <span class="o">/</span> <span class="s2">&quot;relax.trr&quot;</span>
+
+    <span class="n">files</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;tpr&quot;</span><span class="p">:</span> <span class="n">tpr</span><span class="p">,</span> <span class="s2">&quot;gro&quot;</span><span class="p">:</span> <span class="n">outgro</span><span class="p">,</span> <span class="s2">&quot;trr&quot;</span><span class="p">:</span> <span class="n">outtrr</span><span class="p">}</span>
+
+    <span class="n">run_shell_cmd</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;gmx grompp -p </span><span class="si">{</span><span class="n">top</span><span class="si">}</span><span class="s2"> -c </span><span class="si">{</span><span class="n">gro</span><span class="si">}</span><span class="s2"> -f </span><span class="si">{</span><span class="n">mdp</span><span class="si">}</span><span class="s2"> -n </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2"> -t </span><span class="si">{</span><span class="n">cpt</span><span class="si">}</span><span class="s2"> -o </span><span class="si">{</span><span class="n">tpr</span><span class="si">}</span><span class="s2"> -maxwarn 5&quot;</span><span class="p">,</span>
+        <span class="n">outputdir</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">run_shell_cmd</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;gmx mdrun -v -s </span><span class="si">{</span><span class="n">tpr</span><span class="si">}</span><span class="s2"> -c </span><span class="si">{</span><span class="n">outgro</span><span class="si">}</span><span class="s2"> -o </span><span class="si">{</span><span class="n">outtrr</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">outputdir</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">files</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Jannik Buhr, Eric Hartmann, Benedikt Rennekamp, Kai Riedmiller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
