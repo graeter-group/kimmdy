@@ -1,7 +1,7 @@
 dryrun: false
-iterations: 3
+iterations: 6
 out: 'test_out_001'
-# ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
+ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
 top: 'topol.top'
 gro: 'npt.gro'
 idx: 'index_backbone.ndx'
@@ -23,7 +23,7 @@ reactions:
 sequence:
   - equilibrium
   - 
-    mult: 1
+    mult: 2
     tasks:
       - prod
       - reactions

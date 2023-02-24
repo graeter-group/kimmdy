@@ -1,0 +1,15 @@
+dryrun: false
+iterations: 0
+name: 'emptyrun_001'
+# ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
+top: 'emptyrun.txt'
+gro: 'emptyrun.txt'
+idx: 'emptyrun.txt'
+plumed: false
+reactions:
+  HAT_dummy:
+prod:
+  mdp: 'emptyrun.txt'
+sequence:
+  - reactions
+

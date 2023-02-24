@@ -2,10 +2,15 @@ from pathlib import Path
 from collections.abc import Iterable
 from typing import Generator
 import pandas as pd
+from copy import deepcopy
+import xml.etree.ElementTree as ET
+from itertools import takewhile
 
-# time to experiment
-# what a topplogy is
-Topology = dict[str, list[list[str]]]
+TopologyDict = dict[str, list[list[str]]]
+
+
+def is_not_comment(c: str) -> bool:
+    return c != ";"
 
 
 def get_sections(
@@ -13,15 +18,16 @@ def get_sections(
 ) -> Generator[list[str], None, None]:
     data = [""]
     for line in seq:
-        if line.startswith(section_marker):
+        line = "".join(takewhile(is_not_comment, line))
+        if line.strip(" ").startswith(section_marker):
             if data:
                 # first element will be empty
                 # because newlines mark sections
                 data.pop(0)
                 # only yield section if non-empty
-                if data:
+                if len(data) > 0:
                     yield data
-                data = []
+                data = [""]
         data.append(line.strip("\n"))
     if data:
         yield data
@@ -31,7 +37,7 @@ def extract_section_name(ls: list[str]) -> tuple[str, list[str]]:
     """takes a list of lines and return a tuple
     with the name and the lines minus the
     line that contained the name.
-    Returns the empty string of no name was found.
+    Returns the empty string if no name was found.
     """
     for i, l in enumerate(ls):
         if l and l[0] != ";" and "[" in l:
@@ -42,7 +48,40 @@ def extract_section_name(ls: list[str]) -> tuple[str, list[str]]:
         return ("", ls)
 
 
-def read_topol(path: Path) -> Topology:
+def create_subsections(ls: list[list[str]]):
+    d = {}
+    subsection_name = "other"
+    for i, l in enumerate(ls):
+        if l[0] == "[":
+            subsection_name = l[1]
+        else:
+            if subsection_name not in d:
+                d[subsection_name] = []
+            d[subsection_name].append(l)
+
+    return d
+
+
+def read_rtp(path: Path) -> dict:
+    # TODO: make this more elegant and performant
+    with open(path, "r") as f:
+        sections = get_sections(f, "\n")
+        d = {}
+        for i, s in enumerate(sections):
+            # skip empty sections
+            if s == [""]:
+                continue
+            name, content = extract_section_name(s)
+            content = [c.split() for c in content if len(c.split()) > 0]
+            if not name:
+                name = f"BLOCK {i}"
+            d[name] = create_subsections(content)
+            # d[name] = content
+
+        return d
+
+
+def read_topol(path: Path) -> TopologyDict:
     # TODO look into following #includes
     # TODO look into [ intermolecule ] section
     with open(path, "r") as f:
@@ -53,7 +92,7 @@ def read_topol(path: Path) -> Topology:
             if s == [""]:
                 continue
             name, content = extract_section_name(s)
-            content = [c.split() for c in content if c]
+            content = [c.split() for c in content if len(c.split()) > 0]
             if not name:
                 name = f"BLOCK {i}"
             # sections can be duplicated.
@@ -65,9 +104,9 @@ def read_topol(path: Path) -> Topology:
         return d
 
 
-def write_topol(d: Topology, outfile: Path) -> None:
+def write_topol(top: TopologyDict, outfile: Path):
     with open(outfile, "w") as f:
-        for title, content in d.items():
+        for title, content in top.items():
             if title.startswith("BLOCK "):
                 f.write(f"\n")
             else:
@@ -82,6 +121,24 @@ def write_topol(d: Topology, outfile: Path) -> None:
                 + "\n\n"
             )
             f.write(s)
+
+
+def split_dihedrals(top: TopologyDict):
+    if "dihedrals" in top.keys():
+        top["propers"] = deepcopy(top["dihedrals"])
+        top["impropers"] = []
+        for dih in top["propers"][::-1]:
+            if dih[4] == "9":
+                break
+            else:
+                top["impropers"].insert(0, (top["propers"].pop(-1)))
+
+
+def merge_propers_impropers(top: TopologyDict):
+    if set(["propers", "impropers"]).issubset(top.keys()):
+        top["dihedrals"].clear()
+        top["dihedrals"].extend(top.pop("propers"))
+        top["dihedrals"].extend(top.pop("impropers"))
 
 
 def read_plumed(path: Path) -> dict:
@@ -122,7 +179,8 @@ def write_plumed(d, path: Path) -> None:
     """Write a plumed.dat configuration file."""
     with open(path, "w") as f:
         for l in d["distances"]:
-            f.write(f"{l['id']}: {l['keyword']} ATOMS={','.join(l['atoms'])}\n")
+            f.write(f"{l['id']}: {l['keyword']} ATOMS={','.join(l['atoms'])} \n")
+        f.write("\n")
         for l in d["prints"]:
             f.write(
                 f"{l['PRINT']} ARG={','.join(l['ARG'])} STRIDE={str(l['STRIDE'])} FILE={str(l['FILE'])}\n"
@@ -139,7 +197,7 @@ def read_distances_dat(distances_dat: Path):
 
 def read_plumed_distances(plumed_dat: Path, distances_dat: Path):
     plumed = read_plumed(plumed_dat)
-    # plumed['distances']: [{'id': 'd0', 'keyword': 'DISTANCE', 'atoms': ['5', '7']}
+    # plumed['distances']: [{'id': 'd0', 'keyword': 'DISTANCE', 'atoms': ['5', '7']}]
 
     distances = read_distances_dat(distances_dat)
     # distances is a pd DataFrame with time and id's -> distance
@@ -149,3 +207,9 @@ def read_plumed_distances(plumed_dat: Path, distances_dat: Path):
     }
 
     return atoms
+
+
+def read_xml_ff(path: Path) -> ET.Element:
+    tree = ET.parse(path)
+    root = tree.getroot()
+    return root

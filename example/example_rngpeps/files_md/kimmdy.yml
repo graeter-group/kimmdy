@@ -1,0 +1,32 @@
+dryrun: false
+iterations: 100
+out: 'test_out_001'
+# ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
+top: 'pep_out.top'
+gro: 'npt.gro'
+idx: 'index.ndx'
+plumed:
+  dat: 'plumed.dat'
+  distances: 'distances.dat'
+equilibrium:
+  mdp: 'md_slow.mdp'
+prod:
+  mdp: 'md.mdp'
+changer:
+  coordinates:
+    md:
+      mdp: 'minim.mdp'
+reactions:
+  homolysis:
+    edis: 'edissoc.dat'
+    bonds: 'ffbonded.itp'
+  HAT_dummy:
+sequence:
+  - equilibrium
+  - prod
+  -
+    mult: 10
+    tasks:
+      - reactions
+      - equilibrium
+      - prod

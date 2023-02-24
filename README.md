@@ -1,11 +1,24 @@
 # KIMMDY
+
 Reactive MD pipeline for GROMACS using Kinetic Monte Carlo / Molecular Dynamics (KIMMDY)
 
 This is a short readme / manual to KIMMDY 
 
-## Installation
-* `git clone`
-* `pip install -e .` or, for development: `pip install -r requirements.txt`
+## Quick start
+
+* clone repository, e.g. `git clone https://github.com/hits-mbm-dev/kimmdy.git`
+* `cd kimmdy`
+* `conda env create -f environment.yml -n kimmdy`
+* `conda activate kimmdy`
+* make sure you use a GROMACS version patched by PLUMED
+* check whether kimmdy works properly: `cd tests; pytest`
+
+## First simulation
+
+* change directory to `example_triala`
+* `ln -s ../../tests/test_files/assets/amber99sb-star-ildnp.ff ./amber99sb-star-ildnp.ff`
+* run kimmdy: `kimmdy -l INFO`
+* check output: `kimmdy.log`, `test_out_00X/`
 
 ## Development
 
@@ -18,8 +31,10 @@ If you want to contribute here are some informations:
 * requirements.txt containes packages necessary for development, like for testing and linting
 * pytest is used for tests, these are located in tests/
 * tox is used to test automated against multiple python versions
+* Shinx with the autodoc and napoleon extensions is used to generated documentation. Run `make html` to update.
 
 
+# KIMMDY (legacy)
 ## Python Pipeline for hybrid reactive Kinetic Monte Carlo / Molecular Dynamics Simulations (KIMMDY)
 ### by Benedikt Rennekamp. Heidelberg Institute of Theoretical Studies (HITS)
 ### Current version: 1.0, lastly updated on 31/03/2019

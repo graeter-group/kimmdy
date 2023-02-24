@@ -1,5 +1,6 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
+from typing import Optional
 from omegaconf.errors import ValidationError, MissingMandatoryValue
 from omegaconf import OmegaConf
 from pathlib import Path
@@ -15,21 +16,62 @@ def check_file_exists(p: Path):
 
 
 @dataclass
-class TaskConfig:
-    tasks: (str | list[TaskConfig])
+class SingleTaskConfig:
+    tasks: str
     mult: int = 1
-
 
 @dataclass
 class SequenceConfig:
-    tasks: list[TaskConfig] = field(default_factory=list)
+    tasks: list[SingleTaskConfig] = field(default_factory=list)
 
+@dataclass
+class TaskConfig:
+    tasks: SingleTaskConfig|SequenceConfig
 
 @dataclass
 class PlumedConfig:
     dat: str
     distances: str
 
+class Sequence(list):
+    """A sequence of tasks."""
+
+    def __init__(self, tasks: list):
+        list.__init__(self)
+        for task in tasks:
+            if isinstance(task, dict):
+                for _ in range(task["mult"]):
+                    assert isinstance(
+                        task["tasks"], list
+                    ), "Grouped tasks must be a list!"
+                    self.extend(task["tasks"])
+            else:
+                self.append(task)
+
+
+type_scheme = {
+    "experiment": str,
+    "run": int,
+    "dryrun": bool,
+    "iterations": int,
+    "out": Path,
+    "ff": Path,
+    "ffpatch": None,
+    "top": Path,
+    "gro": Path,
+    "idx": Path,
+    "plumed": None,
+    "minimization": {"mdp": Path, "tpr": Path},
+    "equilibration": {
+        "nvt": {"mdp": Path, "tpr": Path},
+        "npt": {"mdp": Path, "tpr": Path},
+    },
+    "equilibrium": {"mdp": Path},
+    "prod": {"mdp": Path},
+    "changer": {"coordinates": {"md": {"mdp": Path}}},
+    "reactions": {},
+    "sequence": Sequence,
+}
 
 @dataclass
 class MinimizationConfig:
@@ -86,14 +128,6 @@ class ProdConfig:
     mdp: str
 
 
-@dataclass
-class Config:
-    """Internal representation of the configuration generated
-    from the input file, which enables validation before running
-    and computationally expensive operations.
-    All settings read from the input file are accessible through nested attributes.
-    """
-
 
 @dataclass
 class LoggingConf:
@@ -109,12 +143,13 @@ class BaseConfig:
     name: str
     dryrun: bool
     iterations: int
-    out: str
-    ff: str
-    top: str
-    gro: str
-    idx: str
-    plumed: PlumedConfig
+    out: Path
+    ff: Path
+    ffpatch: Optional[Path]
+    top: Path
+    gro: Path
+    idx: Path
+    plumed: Optional[PlumedConfig]
     minimization: MinimizationConfig
     equilibration: EquilibrationConfig
     equilibrium: MdConfig
@@ -122,6 +157,14 @@ class BaseConfig:
     reactions: ReactionsConfig
     prod: ProdConfig
     logging: LoggingConf = LoggingConf()
+
+@dataclass
+class Config(BaseConfig):
+    """Internal representation of the configuration generated
+    from the input file, which enables validation before running
+    and computationally expensive operations.
+    All settings read from the input file are accessible through nested attributes.
+    """
 
 
 def get_config() -> BaseConfig:
@@ -185,3 +228,20 @@ def validate_config(conf: BaseConfig):
         conf.prod.mdp,
     ]:
         check_file_exists(Path(f))
+
+
+        # TODO:
+        # # Validate sequence
+        # if isinstance(attr, Sequence):
+        #     for task in attr:
+        #         assert hasattr(
+        #             self, task
+        #         ), f"Task {task} listed in sequence, but not defined!"
+        #
+        # # Validate reaction plugins
+        # if attr_name == "reactions":
+        #     for r in attr.get_attributes():
+        #         assert r in (ks := list(plugins.keys())), (
+        #             f"Error: Reaction plugin {r} not found!\n"
+        #             + f"Available plugins: {ks}"
+        #         )

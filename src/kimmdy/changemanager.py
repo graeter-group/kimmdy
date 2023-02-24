@@ -1,60 +1,59 @@
+from __future__ import annotations
 import logging
+from typing import Optional
 from kimmdy.reaction import ConversionRecipe, ConversionType
-from kimmdy.parsing import read_plumed, write_plumed, read_topol, write_topol, Topology
+from kimmdy.parsing import read_topol, write_topol, write_plumed, read_plumed
+from kimmdy.topology.topology import Topology
 from pathlib import Path
 
 
-def modify_top(recipe: ConversionRecipe, oldtop: Path, newtop: Path):
+def modify_top(
+    recipe: ConversionRecipe,
+    oldtop: Path,
+    newtop: Path,
+    ffdir: Path,
+    ffpatch: Optional[Path],
+    topology: Optional[Topology],
+):
     logging.info(f"Reading: {oldtop} and writing modified topology to {newtop}.")
-    topology = read_topol(oldtop)
+    if topology is None:
+        topologyDict = read_topol(oldtop)
+        topology = Topology(topologyDict, ffdir, ffpatch)
 
-    for type, pair in zip(recipe.type, recipe.atom_idx):
-        if type == ConversionType.BREAK:
-            topology = break_bond_top(topology, pair)
-        elif type == ConversionType.MOVE:
-            topology = move_bond_top(topology, pair)
-
-    write_topol(topology, newtop)
-
-
-def break_bond_top(topology: Topology, breakpair: tuple[int, int]) -> Topology:
-    """Break bonds in topology.
-    removes bond, angles and dihedrals where breakpair was involved
-    """
-    topology["bonds"] = [
-        bond
-        for bond in topology["bonds"]
-        if not bond[0] in breakpair and not bond[1] in breakpair
-    ]
-    topology["pairs"] = [
-        pair
-        for pair in topology["pairs"]
-        if not pair[0] in breakpair and not pair[1] in breakpair
-    ]
-    topology["angles"] = [
-        angle
-        for angle in topology["angles"]
-        if not angle[0] in breakpair and not angle[1] in breakpair
-    ]
-    topology["dihedrals"] = [
-        dihedral
-        for dihedral in topology["dihedrals"]
-        if not dihedral[1] in breakpair and not dihedral[2] in breakpair
-    ]
-    return topology
+    for conversion in recipe:
+        if conversion.type == ConversionType.BREAK:
+            topology.break_bond(conversion.atom_idx)
+        elif conversion.type == ConversionType.BIND:
+            topology.bind_bond(conversion.atom_idx)
+    topology._update_dict()
+    write_topol(topology.top, newtop)
 
 
-def move_bond_top(topology: Topology, movepair: tuple[int, int]) -> Topology:
-    raise NotImplementedError(
-        "Topology Changer for moving Atoms is not implemented yet."
+def modify_plumed(
+    recipe: ConversionRecipe,
+    oldplumeddat: Path,
+    newplumeddat: Path,
+    plumeddist: Path,
+):
+    logging.info(
+        f"Reading: {oldplumeddat} and writing modified plumed input to {newplumeddat}."
     )
+    plumeddat = read_plumed(oldplumeddat)
+
+    for conversion in recipe:
+        if conversion.type == ConversionType.BREAK:
+            plumeddat = break_bond_plumed(plumeddat, conversion.atom_idx, plumeddist)
+
+    # TODO: handle BIND / MOVE
+    write_plumed(plumeddat, newplumeddat)
 
 
-def break_bond_plumed(plumeddat, breakpair, newplumeddist):
+def break_bond_plumed(plumeddat, breakpair, plumeddist):
     new_distances = []
     broken_distances = []
+    breakpair = [str(x) for x in breakpair]
     for line in plumeddat["distances"]:
-        if breakpair[0] in line["atoms"] or breakpair[1] in line["atoms"]:
+        if all(x in line["atoms"] for x in breakpair):
             broken_distances.append(line["id"])
         else:
             new_distances.append(line)
@@ -63,33 +62,6 @@ def break_bond_plumed(plumeddat, breakpair, newplumeddist):
 
     for line in plumeddat["prints"]:
         line["ARG"] = [id for id in line["ARG"] if not id in broken_distances]
-        line["FIlE"] = newplumeddist
+        line["FILE"] = plumeddist
 
     return plumeddat
-
-
-def move_bond_plumed(plumeddat, movepair, newplumeddist):
-    raise NotImplementedError(
-        "Plumeddat Changer for moving Atoms is not implemented yet."
-    )
-
-
-def modify_plumed(
-    recipe: ConversionRecipe,
-    oldplumeddat: Path,
-    newplumeddat: Path,
-    newplumeddist: Path,
-):
-
-    logging.info(
-        f"Reading: {oldplumeddat} and writing modified plumed input to {newplumeddat}. Also writing {newplumeddist}."
-    )
-    plumeddat = read_plumed(oldplumeddat)
-
-    for type, pair in zip(recipe.type, recipe.atom_idx):
-        if type == ConversionType.BREAK:
-            plumeddat = break_bond_plumed(plumeddat, pair, newplumeddist)
-        elif type == ConversionType.MOVE:
-            plumeddat = move_bond_plumed(plumeddat, pair, newplumeddist)
-
-    write_plumed(plumeddat, newplumeddat)
