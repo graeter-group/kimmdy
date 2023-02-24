@@ -1,48 +1,21 @@
 import logging
-from pathlib import Path
+from typing import Optional, Union
 from kimmdy.config import Config
 import sys
-
-from omegaconf.omegaconf import OmegaConf
 from kimmdy.runmanager import RunManager
 from kimmdy.utils import check_gmx_version
 from kimmdy.config import BaseConfig, get_config
 
 
-def get_cmdline_args():
-    """Parse command line arguments.
-
-    Returns
-    -------
-    Namespace
-        parsed command line arguments
-    """
-    parser = argparse.ArgumentParser(description="Welcome to KIMMDY")
-    parser.add_argument(
-        "--input", "-i", type=str, help="kimmdy input file", default="kimmdy.yml"
-    )
-    parser.add_argument(
-        "--loglevel",
-        "-l",
-        type=str,
-        help="logging level (CRITICAL, ERROR, WARNING, INFO, DEBUG)",
-        default="DEBUG",
-    )
-    parser.add_argument(
-        "--logfile", "-f", type=str, help="logfile", default="kimmdy.log"
-    )
-    return parser.parse_args()
-
-
-def configure_logging(args, color=False):
+def configure_logging(config: BaseConfig):
     """Configure logging.
 
     Configures the logging module with optional colorcodes
     for the terminal.
     """
 
-    if Path(args.logfile).exists():
-        log_curr = Path(args.logfile)
+    if config.logging.logfile.exists():
+        log_curr = config.logging.logfile
         while log_curr.exists():
             out_end = log_curr.name.strip("#")[-3:]
             if out_end.isdigit():
@@ -52,42 +25,32 @@ def configure_logging(args, color=False):
             else:
                 log_curr = log_curr.with_name(f"#{log_curr.name}_001#")
 
-        Path(args.logfile).rename(log_curr)
+        config.logging.logfile.rename(log_curr)
 
-    format = "%(asctime): %(levelname)s: %(message)s"
-    if color:
+    if config.logging.color:
         logging.addLevelName(logging.INFO, "\033[35mINFO\033[00m")
         logging.addLevelName(logging.ERROR, "\033[31mERROR\033[00m")
         logging.addLevelName(logging.WARNING, "\033[33mWARN\033[00m")
-        logging.basicConfig(
-            level=getattr(logging, args.loglevel.upper()),
-            handlers=[
-                logging.FileHandler(args.logfile, encoding="utf-8", mode="w"),
-                logging.StreamHandler(sys.stdout),
-            ],
-            format="\033[34m %(asctime)s\033[00m: %(levelname)s: %(message)s",
-            datefmt="%d-%m-%Y %H:%M",
-        )
+        format = "\033[34m %(asctime)s\033[00m: %(levelname)s: %(message)s"
     else:
-        logging.basicConfig(
-            level=getattr(logging, args.loglevel.upper()),
-            handlers=[
-                logging.FileHandler(args.logfile, encoding="utf-8", mode="w"),
-                logging.StreamHandler(sys.stdout),
-            ],
-            format=" %(asctime)s: %(levelname)s: %(message)s",
-            datefmt="%d-%m-%Y %H:%M",
-        )
+        format = " %(asctime)s: %(levelname)s: %(message)s"
+    logging.basicConfig(
+        level=getattr(logging, config.logging.loglevel.upper()),
+        handlers=[
+            logging.FileHandler(config.logging.logfile, encoding="utf-8", mode="w"),
+            logging.StreamHandler(sys.stdout),
+        ],
+        format=format,
+        datefmt="%d-%m-%Y %H:%M",
+    )
 
 
-def _run(args):
-    configure_logging(args)
+def _run(opts: Union[Config, dict] = {}):
+    config = get_config(opts)
+    configure_logging(config)
 
     logging.info("Welcome to KIMMDY")
-    logging.info("KIMMDY is running with these command line options:")
-    logging.info(args)
-
-    config = Config(args.input)
+    logging.info("KIMMDY is running with these options:")
     logging.debug(config)
 
     logging.debug("Using system GROMACS:")
@@ -97,14 +60,9 @@ def _run(args):
     runmgr.run()
 
 
-def kimmdy_run(
-    input: Path = Path("kimmdy.yml"),
-    loglevel: str = "DEBUG",
-    logfile: Path = Path("kimmdy.log"),
-):
+def kimmdy_run(opts: Union[Config, dict] = {}):
     """Run KIMMDY from python."""
-    args = argparse.Namespace(input=input, loglevel=loglevel, logfile=logfile)
-    _run(args)
+    _run(opts)
     logging.shutdown()
 
 
@@ -114,11 +72,9 @@ def kimmdy():
     The configuration is gathered from the input file,
     which is `kimmdy.yml` by default.
     """
-    args = get_cmdline_args()
-    _run(args)
+    _run()
     logging.shutdown()
 
 
-#%%
 if __name__ == "__main__":
     kimmdy_run()

@@ -1,11 +1,13 @@
 from dataclasses import dataclass, field
-from enum import Enum
-from typing import Optional
+from typing import Optional, Union
 from omegaconf.errors import ValidationError, MissingMandatoryValue
 from omegaconf import OmegaConf
+import omegaconf as omg
 from pathlib import Path
+from kimmdy import plugins
 import logging
 import sys
+from kimmdy.reaction import Reaction
 
 
 def check_file_exists(p: Path):
@@ -20,18 +22,22 @@ class SingleTaskConfig:
     tasks: str
     mult: int = 1
 
+
 @dataclass
 class SequenceConfig:
     tasks: list[SingleTaskConfig] = field(default_factory=list)
 
+
 @dataclass
 class TaskConfig:
-    tasks: SingleTaskConfig|SequenceConfig
+    tasks: Union[SingleTaskConfig,SequenceConfig]
+
 
 @dataclass
 class PlumedConfig:
     dat: str
     distances: str
+
 
 class Sequence(list):
     """A sequence of tasks."""
@@ -48,30 +54,6 @@ class Sequence(list):
             else:
                 self.append(task)
 
-
-type_scheme = {
-    "experiment": str,
-    "run": int,
-    "dryrun": bool,
-    "iterations": int,
-    "out": Path,
-    "ff": Path,
-    "ffpatch": None,
-    "top": Path,
-    "gro": Path,
-    "idx": Path,
-    "plumed": None,
-    "minimization": {"mdp": Path, "tpr": Path},
-    "equilibration": {
-        "nvt": {"mdp": Path, "tpr": Path},
-        "npt": {"mdp": Path, "tpr": Path},
-    },
-    "equilibrium": {"mdp": Path},
-    "prod": {"mdp": Path},
-    "changer": {"coordinates": {"md": {"mdp": Path}}},
-    "reactions": {},
-    "sequence": Sequence,
-}
 
 @dataclass
 class MinimizationConfig:
@@ -128,16 +110,15 @@ class ProdConfig:
     mdp: str
 
 
-
 @dataclass
 class LoggingConf:
-    logfile: str = "kimmdy.log"
+    logfile: Path = Path("kimmdy.log")
     loglevel: str = "DEBUG"
-    color: bool = True
+    color: bool = False
 
 
 @dataclass
-class BaseConfig:
+class BaseConfig():
     run: int
     experiment: str
     name: str
@@ -149,14 +130,16 @@ class BaseConfig:
     top: Path
     gro: Path
     idx: Path
-    plumed: Optional[PlumedConfig]
     minimization: MinimizationConfig
     equilibration: EquilibrationConfig
     equilibrium: MdConfig
     changer: ChangerConfig
     reactions: ReactionsConfig
     prod: ProdConfig
+    plumed: Optional[PlumedConfig]
+    sequence: list
     logging: LoggingConf = LoggingConf()
+
 
 @dataclass
 class Config(BaseConfig):
@@ -167,7 +150,7 @@ class Config(BaseConfig):
     """
 
 
-def get_config() -> BaseConfig:
+def get_config(opts: Union[Config, dict] = {}) -> Config:
     """Get the configuration object.
     The BaseConfig is merged with command line arguments and the configuration read from the yaml file.
     All settings read from the input file are accessible through nested attributes.
@@ -185,21 +168,37 @@ def get_config() -> BaseConfig:
         -  `kimmdy <path>` to use a different configuration file
         -  `kimmdy <...>` with configuration keyword=value pairs
             to overwrite the configuration from the command line.
-            Nested arguments in kimmdy.yaml can be accessed with `.`.
+            Nested arguments in kimmdy.yml can be accessed with `.`.
             e.g. `kimmdy logging.loglevel=DEBUG`.
         """
         )
         exit()
 
+    plugin_configs = []
+    if len(plugins) > 0:
+        logging.info("Loading Plugins")
+        for plg_name, plugin in plugins.items():
+            logging.debug(f"Loading {plg_name}")
+            if isinstance(plugin, Exception):
+                logging.warn(
+                    f"Plugin {plg_name} could not be loaded!\n{plugin}\n"
+                )
+            # this next type error can be ignored
+            print(plugin)
+            if issubclass(plugin, Reaction):
+                c = OmegaConf.create(plugin.type_scheme)
+                if c:
+                    plugin_configs.append(c)
+
     try:
         base_conf = OmegaConf.structured(BaseConfig)
-        input = "kimmdy.yaml"
-        if arglist and (".yml" in arglist[0] or ".yaml" in arglist[0]):
+        input = "kimmdy.yml"
+        if arglist and (".yml" in arglist[0] or ".yml" in arglist[0]):
             input = arglist[0]
             arglist = arglist[1:]
         yaml_conf = OmegaConf.load(input)
         cli_conf = OmegaConf.from_cli(arglist)
-        conf = OmegaConf.merge(base_conf, yaml_conf, cli_conf)
+        conf = OmegaConf.merge(base_conf, *plugin_configs, yaml_conf, cli_conf, opts)
     except MissingMandatoryValue as e:
         logging.error("Missing configuration:")
         logging.error(e)
@@ -228,7 +227,6 @@ def validate_config(conf: BaseConfig):
         conf.prod.mdp,
     ]:
         check_file_exists(Path(f))
-
 
         # TODO:
         # # Validate sequence

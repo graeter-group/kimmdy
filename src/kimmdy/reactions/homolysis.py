@@ -1,8 +1,9 @@
+from dataclasses import dataclass
 import logging
+from typing import Optional
 from kimmdy.reaction import (
     Conversion,
     Reaction,
-    ConversionRecipe,
     ConversionType,
     ReactionOutcome,
     ReactionResult,
@@ -18,12 +19,26 @@ from kimmdy.utils import (
 from pathlib import Path
 
 
+@dataclass
+class HomolysisConfig:
+    edis: Path = Path('edissoc.dat')
+    bonds: Path = Path('ffbonded.dat')
+
+@dataclass
+class ReactionsConfig:
+    homolysis: HomolysisConfig = HomolysisConfig()
+
+@dataclass
+class Config:
+    reactions: ReactionsConfig = ReactionsConfig()
+
+@dataclass
 class Homolysis(Reaction):
     """Homolytic bond breaking leading to 2 radicals.
     Implemented according to kimmdy 1.0
     """
 
-    type_scheme = {"homolysis": {"edis": Path, "bonds": Path}}
+    config: Config = Config()
 
     def get_reaction_result(self, files: TaskFiles):
         logging.debug("Getting recipe for reaction: homolysis")
@@ -31,8 +46,8 @@ class Homolysis(Reaction):
         plumed_dat = files.input["plumed.dat"]
         distances_dat = files.input["distances.dat"]
         top = files.input["top"]
-        files.input["ffbonded.itp"] = self.config.bonds
-        files.input["edissoc.dat"] = self.config.edis
+        files.input["ffbonded.itp"] = self.config.reactions.homolysis.bonds
+        files.input["edissoc.dat"] = self.config.reactions.homolysis.edis
         ffbonded_itp = files.input["ffbonded.itp"]
         edissoc_dat = files.input["edissoc.dat"]
 

@@ -6,7 +6,6 @@ ff: 'amber99sb-star-ildnp.ff'
 top: 'Ala_out.top'
 gro: 'npt.gro'
 idx: 'index.ndx'
-plumed: false
 equilibrium:
   mdp: 'md.mdp'
 changer:
