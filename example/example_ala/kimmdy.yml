@@ -2,7 +2,7 @@ dryrun: false
 iterations: 100
 name: 'hat_tf_000'
 ff: 'amber99sb-star-ildnp.ff'
-ffpatch: 'ffpatch.xml'
+# ffpatch: 'ffpatch.xml'
 top: 'Ala_out.top'
 gro: 'npt.gro'
 idx: 'index.ndx'

@@ -89,7 +89,10 @@ def match_id_to_patch(id: list[str], patches: Patches) -> Optional[Patch]:
 
     return result
 
-def match_atomic_item_to_atomic_type(id: list[str], types: AtomicTypes) -> Optional[AtomicType]:
+
+def match_atomic_item_to_atomic_type(
+    id: list[str], types: AtomicTypes
+) -> Optional[AtomicType]:
     id_str = "---".join([s.replace("*", "STAR").replace("+", "PLUS") for s in id])
     result = None
     longest_match = 0
@@ -111,4 +114,3 @@ def match_atomic_item_to_atomic_type(id: list[str], types: AtomicTypes) -> Optio
                     result = atomic_type
 
     return result
-

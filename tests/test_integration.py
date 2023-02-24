@@ -63,7 +63,6 @@ def test_integration_move_top():
     assert top.improper_dihedrals == top_moved.improper_dihedrals
 
 
-
 def test_integration_emptyrun(tmp_path):
     tmpdir = tmp_path / "emptyrun"
     shutil.copytree(

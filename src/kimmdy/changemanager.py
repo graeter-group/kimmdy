@@ -2,17 +2,18 @@ from __future__ import annotations
 import logging
 from typing import Optional
 from kimmdy.reaction import ConversionRecipe, ConversionType
-from kimmdy.parsing import (
-    read_topol,
-    write_topol,
-    write_plumed,
-    read_plumed
-)
+from kimmdy.parsing import read_topol, write_topol, write_plumed, read_plumed
 from kimmdy.topology.topology import Topology
 from pathlib import Path
 
+
 def modify_top(
-        recipe: ConversionRecipe, oldtop: Path, newtop: Path, ffdir: Path, ffpatch: Optional[Path], topology: Optional[Topology]
+    recipe: ConversionRecipe,
+    oldtop: Path,
+    newtop: Path,
+    ffdir: Path,
+    ffpatch: Optional[Path],
+    topology: Optional[Topology],
 ):
     logging.info(f"Reading: {oldtop} and writing modified topology to {newtop}.")
     if topology is None:
@@ -64,4 +65,3 @@ def break_bond_plumed(plumeddat, breakpair, plumeddist):
         line["FILE"] = plumeddist
 
     return plumeddat
-

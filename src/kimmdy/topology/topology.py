@@ -2,11 +2,16 @@ from pathlib import Path
 from typing import Optional
 from kimmdy.parsing import TopologyDict
 from kimmdy.topology.atomic import *
-from kimmdy.topology.utils import match_id_to_patch,attributes_to_list, match_atomic_item_to_atomic_type
+from kimmdy.topology.utils import (
+    match_id_to_patch,
+    attributes_to_list,
+    match_atomic_item_to_atomic_type,
+)
 from kimmdy.topology.ff import FF, FFPatches, Patch
 from itertools import permutations, combinations
 import textwrap
 import logging
+
 
 class Topology:
     """Smart container for parsed topology data.
@@ -121,7 +126,13 @@ class Topology:
             self.atoms[i].bound_to_nrs.append(j)
             self.atoms[j].bound_to_nrs.append(i)
 
-    def _apply_param_patch(self, atomic_item: Atomic, atomic_id: list[str], patch: Patch, types: AtomicTypes):
+    def _apply_param_patch(
+        self,
+        atomic_item: Atomic,
+        atomic_id: list[str],
+        patch: Patch,
+        types: AtomicTypes,
+    ):
         # atomic_id_base = [item.removesuffix("_R") for item in atomic_id]
         item_type = match_atomic_item_to_atomic_type(atomic_id, types)
         for param, param_patch in patch.params.items():
@@ -136,15 +147,19 @@ class Topology:
             try:
                 initial = float(initial)
             except ValueError as _:
-                logging.warning("Malformed patchfile. Some parameter pachtes couldn't be converted to a number:")
+                logging.warning(
+                    "Malformed patchfile. Some parameter pachtes couldn't be converted to a number:"
+                )
                 continue
             except TypeError as _:
-                logging.warning("Can't patch parameter because no initial parameter was found in the topology or the FF: ")
+                logging.warning(
+                    "Can't patch parameter because no initial parameter was found in the topology or the FF: "
+                )
                 continue
 
             result = param_patch.apply(initial)
             atomic_item.__dict__[param] = result
-  
+
     def break_bond(self, atompair_nrs: tuple[str, str]):
         """Break bonds in topology.
 
@@ -179,7 +194,11 @@ class Topology:
         for atom in atompair:
             for bond_key in self._get_atom_bonds(atom.nr):
                 bond = self.bonds.get(bond_key)
-                if bond is None or self.ffpatches is None or self.ffpatches.bondpatches is None:
+                if (
+                    bond is None
+                    or self.ffpatches is None
+                    or self.ffpatches.bondpatches is None
+                ):
                     continue
                 id = [self.atoms[i].radical_type() for i in [bond.ai, bond.aj]]
                 patch = match_id_to_patch(id, self.ffpatches.bondpatches)
@@ -194,7 +213,7 @@ class Topology:
         )
         for key in angle_keys:
             if all([x in key for x in atompair_nrs]):
-                # angle contained a now deleted bond because 
+                # angle contained a now deleted bond because
                 # it had both atoms of the broken bond
                 self.angles.pop(key, None)
             else:
@@ -202,7 +221,11 @@ class Topology:
                 # angle is not removed but might need to be patched
                 # patch parameters
                 angle = self.angles.get(key)
-                if angle is None or self.ffpatches is None or self.ffpatches.anglepatches is None:
+                if (
+                    angle is None
+                    or self.ffpatches is None
+                    or self.ffpatches.anglepatches is None
+                ):
                     continue
                 id = [self.atoms[i].radical_type() for i in key]
                 patch = match_id_to_patch(id, self.ffpatches.anglepatches)
@@ -261,7 +284,8 @@ class Topology:
         if all(map(lambda x: x.is_radical, atompair)):
             atompair[0].is_radical = False
             atompair[1].is_radical = False
-            for a in atompair: self.radicals.pop(a.nr)
+            for a in atompair:
+                self.radicals.pop(a.nr)
 
         # update bound_to
         atompair[0].bound_to_nrs.append(atompair[1].nr)
@@ -513,4 +537,3 @@ def generate_topology_from_bound_to(
             )
 
     return top
-
