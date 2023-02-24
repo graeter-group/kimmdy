@@ -14,6 +14,8 @@ pytest_topol.top
 *.trr
 *.dat
 .nvimlog
+render/
+cat-center.gro
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
