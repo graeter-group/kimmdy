@@ -5,7 +5,7 @@ if TYPE_CHECKING:
     from kimmdy.runmanager import RunManager
     from kimmdy.config import Config
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum, auto
 from kimmdy.tasks import TaskFiles
 import logging
@@ -13,38 +13,50 @@ import logging
 
 class ConversionType(Enum):
     BREAK = auto()
-    MOVE = auto()
+    BIND = auto()
 
 
 @dataclass
-class ConversionRecipe:
-    """A ConversionReipe.
-    encompasses a single transformation, e.g. moving one
-    atom or braking one bond.
+class Conversion:
+    """A Conversion.
+    encompasses a single transformation, breaking of adding one bond.
 
     Parameters
     ----------
-    type : list[ConversionType.BREAK or .MOVE]
-    atom_idx : list[(from, to)]
+    type : ConversionType.BREAK or .BIND
+    atom_idx : tuple(from, to)
     """
 
-    type: list[ConversionType] = field(default_factory=list)
-    atom_idx: list[tuple[int, int]] = field(default_factory=list)
+    type: ConversionType
+    atom_idx: tuple[str, str]
+
+
+ConversionRecipe = list[Conversion]
+"""A ConversionReipe.
+
+is a list of Conversions to encompass one reaction outcome.
+In the case of breaking a bond it is simply a list of length one,
+but for e.g. moving an atom from one binding partner to another
+it is a list with one BREAK and one BIND operation.
+"""
 
 
 @dataclass
-class ReactionResult:
-    """A ReactionResult
-    encompasses a list of transformations and their rates.
-
-    Parameters
-    ----------
-    recipes : list of ConversionRecipes
-    rates : list of rates
+class ReactionOutcome:
+    """A ReactionOutcome
+    encompasses a ConversionRecipe and its rate.
     """
 
-    recipes: list[ConversionRecipe] = field(default_factory=list)
-    rates: list[float] = field(default_factory=list)
+    recipe: ConversionRecipe
+    rate: float
+
+
+ReactionResult = list[ReactionOutcome]
+"""A ReactionResult
+encompasses a list of ReactionOutcomes.
+Each outcome has a ConversionRecipe for changing the topology and a rate
+at which it is predicted to happen.
+"""
 
 
 class Reaction(ABC):
@@ -65,6 +77,7 @@ class Reaction(ABC):
         self.name = name
         self.runmng = runmng
         # sub config, settings of this specific reaction:
+        # TODO: does it even need it's own config explicitlye if if can always access the full config anyways?
         self.config: Config = self.runmng.config.reactions.attr(self.name)
 
         logging.debug(f"Reaction {self.name} instatiated.")

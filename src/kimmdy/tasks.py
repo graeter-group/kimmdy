@@ -1,10 +1,10 @@
 from dataclasses import dataclass, field, InitVar
 from pathlib import Path
-from typing import Callable
+from typing import Callable, Optional
 
 
 class AutoFillDict(dict):
-    def __init__(self, get_missing : Callable):
+    def __init__(self, get_missing: Callable):
         self.get_missing = get_missing
 
     def __missing__(self, key):
@@ -65,4 +65,4 @@ class Task:
         return str(self.f) + " args: " + str(self.kwargs)
 
 
-TaskMapping = dict[str, Callable[..., TaskFiles]]
+TaskMapping = dict[str, list[Callable[..., Optional[TaskFiles]]]]

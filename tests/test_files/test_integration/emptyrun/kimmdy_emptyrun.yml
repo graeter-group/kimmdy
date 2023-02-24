@@ -7,7 +7,7 @@ gro: 'emptyrun.txt'
 idx: 'emptyrun.txt'
 plumed: false
 reactions:
-  HAT:
+  HAT_dummy:
 prod:
   mdp: 'emptyrun.txt'
 sequence:
