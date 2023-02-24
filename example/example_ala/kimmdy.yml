@@ -14,19 +14,17 @@ changer:
     md:
       mdp: 'md_slow.mdp'
 reactions:
-  hat_naive:
+  HAT_dummy:
     frequency_factor: 100000000
     h_cutoff: 3
-  # HAT_dummy:
-  #   frequency_factor: 100000000
-  #   h_cutoff: 3
-    #tprpath: 'md.tpr'
-    #trrpath: 'md.trr'
-          #    edis: 'edissoc.dat'
-          #    bonds: 'ffbonded.itp'
+    tprpath: 'md.tpr'
+    trrpath: 'md.trr'
+# hat_naive:
+#   frequency_factor: 100000000
+#   h_cutoff: 3
 sequence:
+- equilibrium
+- mult: 2
+  tasks:
   - equilibrium
-  - mult: 10
-    tasks:
-      - equilibrium
-      - reactions
+  - reactions
