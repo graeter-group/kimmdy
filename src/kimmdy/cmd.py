@@ -30,9 +30,7 @@ def get_cmdline_args():
     parser.add_argument(
         "--logfile", "-f", type=str, help="logfile", default="kimmdy.log"
     )
-    parser.add_argument(
-        "--checkpoint", "-c", type=str, help="checkpoint file"
-    )
+    parser.add_argument("--checkpoint", "-c", type=str, help="checkpoint file")
     return parser.parse_args()
 
 
@@ -72,7 +70,7 @@ def _run(args):
 
     if args.checkpoint:
         logging.info("KIMMDY is starting from a checkpoint.")
-        with open(args.checkpoint, 'rb') as f:
+        with open(args.checkpoint, "rb") as f:
             runmgr = dill.load(f)
             runmgr.from_checkpoint = True
     else:
