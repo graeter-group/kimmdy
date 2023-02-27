@@ -26,10 +26,12 @@ If you want to contribute here are some informations:
 
 * Docstrings should be in [numpy style](https://numpydoc.readthedocs.io/en/latest/format.html#documenting-classes)
 * Code should be formatted with [black](https://github.com/psf/black)
-* The main code is in src/kimmdy
+* The main code is in `src/kimmdy/`
+* Reaction plugins are in `plugins/`
+* Releases with semantic versioning are created based on [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/#summary)
 * Python scripts with command line interfaces are in src/kimmdy/cmd and must be registered in setup.cfg
 * requirements.txt containes packages necessary for development, like for testing and linting
-* pytest is used for tests, these are located in tests/
+* pytest is used for tests, these are located in `tests/`
 * tox is used to test automated against multiple python versions
 * Shinx with the autodoc and napoleon extensions is used to generated documentation. Run `make html` to update.
 
