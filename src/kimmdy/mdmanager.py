@@ -6,6 +6,7 @@ from kimmdy.tasks import TaskFiles
 from kimmdy.utils import run_shell_cmd
 import subprocess as sp
 
+
 def run_gmx(s: str, cwd=None) -> Optional[sp.CalledProcessError]:
     result = run_shell_cmd(f"gmx -quiet {s}", cwd)
     if result.returncode != 0:

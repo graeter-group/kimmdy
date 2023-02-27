@@ -5,18 +5,24 @@ from pathlib import Path
 
 from kimmdy.config import Config
 
+
 def increment_logfile(f: Path) -> Path:
     backup_file_prefix = "#"
     backup_file_suffix = "#"
     logfile = f
     if logfile.exists():
         backup_count = 1
-        backup_file = f"{backup_file_prefix}{logfile}_{backup_count}{backup_file_suffix}"
+        backup_file = (
+            f"{backup_file_prefix}{logfile}_{backup_count}{backup_file_suffix}"
+        )
         while Path(backup_file).exists():
             backup_count += 1
-            backup_file = f"{backup_file_prefix}{logfile}_{backup_count}{backup_file_suffix}"
+            backup_file = (
+                f"{backup_file_prefix}{logfile}_{backup_count}{backup_file_suffix}"
+            )
         logfile.rename(backup_file)
     return logfile
+
 
 def find_bond_param(atomtypes, filepath):
     # reads bond parameters vom gromacs forcefield file #based on ff.bonded.itp from amber99sb-ildn.ff

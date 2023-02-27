@@ -165,6 +165,7 @@ class RunManager:
         logging.info(
             f"Stop running tasks, state: {self.state}, iteration:{self.iteration}, max:{self.iterations}"
         )
+
     def __iter__(self):
         return self
 
@@ -211,9 +212,8 @@ class RunManager:
             Task: {taskname}, output:\n{pformat(files.output)}
             """
             logging.info(m)
-            with open(self.histfile, 'a') as f:
+            with open(self.histfile, "a") as f:
                 f.write(m)
-
 
     def _create_task_directory(self, postfix: str) -> TaskFiles:
         """Creates TaskFiles object, output directory and symlinks ff."""
