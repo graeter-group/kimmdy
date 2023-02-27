@@ -31,7 +31,7 @@ class HAT_reaction(Reaction):
         logging.debug(f"{rads} for {tpr}")
         logging.debug([u.atoms[:20].elements, u.atoms[:20].types])
 
-        outcomes = []
+        outcomes: list[ReactionOutcome] = []
         for rad in rads:
             if len(rad.atoms) == 0:
                 logging.info("no radical found, returning zero rate recipe")
@@ -56,8 +56,6 @@ class HAT_reaction(Reaction):
                 ]:  # doesn't work with capping groups at the moment
                     rad_nr = str(rad.atoms[0].index + 1)
                     recipe = [
-                        # FIXME: which is the previous H binding partner?
-                        # to break it's bond so that the H can move.
                         Conversion(ConversionType.BREAK, (from_H_nr, h_partner_nr)),
                         Conversion(ConversionType.BIND, (from_H_nr, rad_nr)),
                     ]

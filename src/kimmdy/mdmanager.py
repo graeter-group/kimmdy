@@ -1,7 +1,17 @@
 from __future__ import annotations
+
 import logging
+from typing import Optional
 from kimmdy.tasks import TaskFiles
 from kimmdy.utils import run_shell_cmd
+import subprocess as sp
+
+
+def run_gmx(s: str, cwd=None) -> Optional[sp.CalledProcessError]:
+    result = run_shell_cmd(f"gmx -quiet {s}", cwd)
+    if result.returncode != 0:
+        logging.error(f"Gromacs process failed with exit code {result.returncode}.")
+        result.check_returncode()
 
 
 def dummy_step(files):
@@ -24,8 +34,8 @@ def minimzation(files: TaskFiles) -> TaskFiles:
 
     files.output = {"tpr": tpr, "outgro": outgro}
 
-    run_shell_cmd(f"gmx grompp -p {top} -c {gro} -r {gro} -f {mdp} -o {tpr}", outputdir)
-    run_shell_cmd(f"gmx mdrun -s {tpr} -c {outgro}", outputdir)
+    run_gmx(f"grompp -p {top} -c {gro} -r {gro} -f {mdp} -o {tpr}", outputdir)
+    run_gmx(f"mdrun -s {tpr} -c {outgro}", outputdir)
 
     return files
 
@@ -40,8 +50,8 @@ def equilibration(files: TaskFiles) -> TaskFiles:
 
     files.output = {"tpr": tpr, "gro": outgro}
 
-    run_shell_cmd(f"gmx grompp -p {top} -c {gro} -r {gro} -f {mdp} -o {tpr}", outputdir)
-    run_shell_cmd(f"gmx mdrun -v -s {tpr} -c {outgro}", outputdir)
+    run_gmx(f"grompp -p {top} -c {gro} -r {gro} -f {mdp} -o {tpr}", outputdir)
+    run_gmx(f"mdrun -v -s {tpr} -c {outgro}", outputdir)
 
     return files
 
@@ -66,11 +76,11 @@ def equilibrium(files: TaskFiles):
 
     files.output = {"tpr": tpr, "gro": outgro, "trr": outtrr}
 
-    run_shell_cmd(
-        f"gmx grompp -p {top} -c {gro} -f {mdp} -n {idx} -o {tpr} -maxwarn 5",
+    run_gmx(
+        f"grompp -p {top} -c {gro} -f {mdp} -n {idx} -o {tpr} -maxwarn 5",
         outputdir,
     )
-    run_shell_cmd(f"gmx mdrun -v -s {tpr} -c {outgro} -o {outtrr}", outputdir)
+    run_gmx(f"mdrun -v -s {tpr} -c {outgro} -o {outtrr}", outputdir)
 
     return files
 
@@ -90,21 +100,27 @@ def production(files: TaskFiles) -> TaskFiles:
     mdp = files.input["mdp"]
     idx = files.input["idx"]
     cpt = files.input["cpt"]
-    plumed_dat = files.input["plumed.dat"]
+    plumed_dat = files.input.get("plumed.dat")
     tpr = outputdir / "prod.tpr"
     outgro = outputdir / "prod.gro"
     outtrr = outputdir / "prod.trr"
 
     files.output = {"tpr": tpr, "gro": outgro, "trr": outtrr}
 
-    run_shell_cmd(
-        f" gmx grompp -p {top} -c {gro} -f {mdp} -n {idx} -o {tpr} -maxwarn 5",
+    run_gmx(
+        f"grompp -p {top} -c {gro} -f {mdp} -n {idx} -o {tpr} -maxwarn 5",
         outputdir,
     )
-    run_shell_cmd(
-        f"gmx mdrun -v -s {tpr} -c {outgro} -plumed {plumed_dat} -o {outtrr}",
-        outputdir,
-    )
+    if plumed_dat:
+        run_gmx(
+            f"mdrun -v -s {tpr} -c {outgro} -plumed {plumed_dat} -o {outtrr}",
+            outputdir,
+        )
+    else:
+        run_gmx(
+            f"mdrun -v -s {tpr} -c {outgro} -o {outtrr}",
+            outputdir,
+        )
 
     return files
 
@@ -128,10 +144,10 @@ def relaxation(files: TaskFiles) -> TaskFiles:
 
     files.output = {"tpr": tpr, "gro": outgro, "trr": outtrr}
 
-    run_shell_cmd(
-        f"gmx grompp -p {top} -c {gro} -f {mdp} -n {idx} -t {cpt} -o {tpr} -maxwarn 5",
+    run_gmx(
+        f"grompp -p {top} -c {gro} -f {mdp} -n {idx} -t {cpt} -o {tpr} -maxwarn 5",
         outputdir,
     )
-    run_shell_cmd(f"gmx mdrun -v -s {tpr} -c {outgro} -o {outtrr}", outputdir)
+    run_gmx(f"mdrun -v -s {tpr} -c {outgro} -o {outtrr}", outputdir)
 
     return files

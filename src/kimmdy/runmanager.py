@@ -6,6 +6,7 @@ from enum import Enum, auto
 from typing import Callable
 from kimmdy import config
 from kimmdy.config import Config
+from kimmdy.utils import increment_logfile
 from kimmdy.parsing import read_topol
 from kimmdy.reaction import ConversionType, Reaction, ReactionResult, ConversionRecipe
 import kimmdy.mdmanager as md
@@ -90,6 +91,7 @@ class RunManager:
             "gro": self.config.gro,
             "idx": self.config.idx,
         }
+        self.histfile = increment_logfile(Path(f"{self.config.out}_history.log"))
         try:
             _ = self.config.ffpatch
         except AttributeError:
@@ -163,16 +165,6 @@ class RunManager:
         logging.info(
             f"Stop running tasks, state: {self.state}, iteration:{self.iteration}, max:{self.iterations}"
         )
-        logging.info("History:")
-        for x in self.filehist:
-            for taskname, taskfiles in x.items():
-                logging.info(
-                    f"""
-                Task: {taskname} with output directory: {taskfiles.outputdir}
-                Task: {taskname}, input:\n{pformat(taskfiles.input)}
-                Task: {taskname}, output:\n{pformat(taskfiles.output)}
-                """
-                )
 
     def __iter__(self):
         return self
@@ -212,6 +204,16 @@ class RunManager:
             self.latest_files.update(files.output)
             logging.debug("Append to file history")
             self.filehist.append({taskname: files})
+
+            logging.info(f"Current task files:")
+            m = f"""
+            Task: {taskname} with output directory: {files.outputdir}
+            Task: {taskname}, input:\n{pformat(files.input)}
+            Task: {taskname}, output:\n{pformat(files.output)}
+            """
+            logging.info(m)
+            with open(self.histfile, "a") as f:
+                f.write(m)
 
     def _create_task_directory(self, postfix: str) -> TaskFiles:
         """Creates TaskFiles object, output directory and symlinks ff."""
@@ -267,9 +269,6 @@ class RunManager:
         files.input["mdp"] = self.config.prod.mdp
         files.input["idx"] = self.config.idx
 
-        # TODO: do we need this part with the new automatic get_latest
-        # for missing entries?
-        files.input["plumed.dat"] = self.get_latest("plumed.dat")
         files = md.production(files)
         logging.info("Done with production MD")
         return files
