@@ -99,7 +99,7 @@ def production(files: TaskFiles) -> TaskFiles:
     mdp = files.input["mdp"]
     idx = files.input["idx"]
     cpt = files.input["cpt"]
-    plumed_dat = files.input["plumed.dat"]
+    plumed_dat = files.input.get("plumed.dat")
     tpr = outputdir / "prod.tpr"
     outgro = outputdir / "prod.gro"
     outtrr = outputdir / "prod.trr"
@@ -110,10 +110,16 @@ def production(files: TaskFiles) -> TaskFiles:
         f"grompp -p {top} -c {gro} -f {mdp} -n {idx} -o {tpr} -maxwarn 5",
         outputdir,
     )
-    run_gmx(
-        f"mdrun -v -s {tpr} -c {outgro} -plumed {plumed_dat} -o {outtrr}",
-        outputdir,
-    )
+    if plumed_dat:
+        run_gmx(
+            f"mdrun -v -s {tpr} -c {outgro} -plumed {plumed_dat} -o {outtrr}",
+            outputdir,
+        )
+    else:
+        run_gmx(
+            f"mdrun -v -s {tpr} -c {outgro} -o {outtrr}",
+            outputdir,
+        )
 
     return files
 
