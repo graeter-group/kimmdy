@@ -1,10 +1,16 @@
 from __future__ import annotations
+
 import logging
+from typing import Optional
 from kimmdy.tasks import TaskFiles
 from kimmdy.utils import run_shell_cmd
+import subprocess as sp
 
-def run_gmx(s: str, cwd=None):
-    run_shell_cmd(f"gmx -quiet {s}", cwd, check=True)
+def run_gmx(s: str, cwd=None) -> Optional[sp.CalledProcessError]:
+    result = run_shell_cmd(f"gmx -quiet {s}", cwd)
+    if result.returncode != 0:
+        logging.error(f"Gromacs process failed with exit code {result.returncode}.")
+        result.check_returncode()
 
 
 def dummy_step(files):
