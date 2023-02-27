@@ -91,7 +91,7 @@ class RunManager:
             "gro": self.config.gro,
             "idx": self.config.idx,
         }
-        self.histfile = increment_logfile(Path(f"{self.config.name}_history.log"))
+        self.histfile = increment_logfile(Path(f"{self.config.out}_history.log"))
         try:
             _ = self.config.ffpatch
         except AttributeError:
@@ -269,9 +269,6 @@ class RunManager:
         files.input["mdp"] = self.config.prod.mdp
         files.input["idx"] = self.config.idx
 
-        # TODO: do we need this part with the new automatic get_latest
-        # for missing entries?
-        files.input["plumed.dat"] = self.get_latest("plumed.dat")
         files = md.production(files)
         logging.info("Done with production MD")
         return files
