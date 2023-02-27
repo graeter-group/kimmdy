@@ -287,6 +287,20 @@ class Topology:
             for a in atompair:
                 self.radicals.pop(a.nr)
 
+        # FIXME: need a more general solution
+        # quickfix for hydrogens
+        # to make them adopt the correct residuetype and atomtype
+        # when bound to a new heavy atom
+        for i,atom in enumerate(atompair):
+            if atom.type.startswith('H'):
+                i_other = abs(i - 1)
+                atom_other = atompair[i_other]
+                atom.residue = atom_other.residue
+                
+                if atom_other.type == 'CT':
+                    atom.type = 'H1'
+
+
         # update bound_to
         atompair[0].bound_to_nrs.append(atompair[1].nr)
         atompair[1].bound_to_nrs.append(atompair[0].nr)
