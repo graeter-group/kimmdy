@@ -53,7 +53,6 @@ class Topology:
         self._initialize_graph()
 
     def _update_dict(self):
-
         self.top["atoms"] = [attributes_to_list(x) for x in self.atoms.values()]
         self.top["bonds"] = [attributes_to_list(x) for x in self.bonds.values()]
         self.top["pairs"] = [attributes_to_list(x) for x in self.pairs.values()]

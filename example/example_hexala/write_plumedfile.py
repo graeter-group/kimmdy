@@ -63,7 +63,6 @@ def write_conditions_in_plumedfile(topfile, indexfile, indexgroup, outplumed):
             break
 
     for j in range(bonds_pos + 2, len(data_all)):  # go through all bonds
-
         if "[ pairs ]" in data_all[j]:  # stop when done with all bonds
             break
 
