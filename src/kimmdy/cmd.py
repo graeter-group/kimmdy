@@ -3,7 +3,7 @@ import logging
 from pathlib import Path
 from kimmdy.config import Config
 from kimmdy.runmanager import RunManager
-from kimmdy.utils import check_gmx_version
+from kimmdy.utils import check_gmx_version, increment_logfile
 import sys
 
 
@@ -39,17 +39,7 @@ def configure_logging(args, color=False):
     for the terminal.
     """
 
-    backup_file_prefix = "#"
-    backup_file_suffix = "#"
-    logfile = Path(args.logfile)
-    if logfile.exists():
-        backup_count = 1
-        backup_file = f"{backup_file_prefix}{logfile}_{backup_count}{backup_file_suffix}"
-        while Path(backup_file).exists():
-            backup_count += 1
-            backup_file = f"{backup_file_prefix}{logfile}_{backup_count}{backup_file_suffix}"
-        logfile.rename(backup_file)
-
+    increment_logfile(Path(args.logfile))
     if color:
         logging.addLevelName(logging.INFO, "\033[35mINFO\033[00m")
         logging.addLevelName(logging.ERROR, "\033[31mERROR\033[00m")
@@ -57,6 +47,7 @@ def configure_logging(args, color=False):
         format="\033[34m %(asctime)s\033[00m: %(levelname)s: %(message)s"
     else:
         format = "%(asctime)s: %(levelname)s: %(message)s"
+
     logging.basicConfig(
         level=getattr(logging, args.loglevel.upper()),
         handlers=[
