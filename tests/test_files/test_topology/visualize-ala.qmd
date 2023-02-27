@@ -47,7 +47,13 @@ ERROR 1 [file topol_mod.top, line 126]:
 
 See:
 7        9        12       1       
+
+
+7        N        2        ALA      N        7        -0.4157  14.01   
+9        CT       2        ALA      CA       9        0.1160   12.01   
+12       HC       2        ALA      HB2      12       0.0603   1.008   
 ```
+
 
 
 :::: {#fig-label layout="[[1,1]]"}
