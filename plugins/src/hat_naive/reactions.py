@@ -27,7 +27,6 @@ class HAT_naive(Reaction):
     """HAT reaction"""
 
     def get_reaction_result(self, files) -> ReactionResult:
-
         logging.info("Starting naive HAT reaction")
         top = self.runmng.top
 
