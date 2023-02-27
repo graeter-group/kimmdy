@@ -1,5 +1,5 @@
-#%%
-#%autoreload
+# %%
+# %autoreload
 import os
 import string
 from hypothesis import given, strategies as st
@@ -18,7 +18,8 @@ def set_dir():
 
 set_dir()
 
-#%%
+
+# %%
 #### Example file urea.gro ####
 # from <https://manual.gromacs.org/documentation/current/reference-manual/topologies/topology-file-formats.html>
 # should parse
@@ -29,7 +30,7 @@ def test_parser_doesnt_crash_on_example():
     assert isinstance(top, dict)
 
 
-#%%
+# %%
 #### Parsing it's own output should return the same top on urea.gro ####
 def test_doubleparse_urea():
     set_dir()
@@ -44,7 +45,7 @@ def test_doubleparse_urea():
     assert top2 == top3
 
 
-#%%
+# %%
 #### Parsing should be invertible ####
 allowed_text = st.text(
     string.ascii_letters + string.digits + "!\"$%&'()*+,-./:<=>?@\\^_`{|}~", min_size=1
@@ -66,7 +67,7 @@ def test_parser_invertible(d):
     assert d == d2
 
 
-#%%
+# %%
 def test_parse_xml_ff():
     set_dir()
     ff_path = Path("amber99sb_trunc.xml")

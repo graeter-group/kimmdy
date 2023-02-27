@@ -1,6 +1,7 @@
 from __future__ import annotations
 import logging
 from pathlib import Path
+import dill
 import queue
 from enum import Enum, auto
 from typing import Callable
@@ -80,6 +81,7 @@ class RunManager:
 
     def __init__(self, config: Config):
         self.config = config
+        self.from_checkpoint = False
         self.tasks: queue.Queue[Task] = queue.Queue()  # tasks from config
         self.crr_tasks: queue.Queue[Task] = queue.Queue()  # current tasks
         self.iteration = 0
@@ -92,6 +94,7 @@ class RunManager:
             "idx": self.config.idx,
         }
         self.histfile = increment_logfile(Path(f"{self.config.out}_history.log"))
+        self.cptfile = increment_logfile(Path(f"{self.config.out}_kimmdy.cpt"))
         try:
             _ = self.config.ffpatch
         except AttributeError:
@@ -153,13 +156,17 @@ class RunManager:
         logging.info("Start run")
         logging.info("Build task list")
 
-        # allows for mapping one config entry to multiple tasks
-        for entry in self.config.sequence:
-            for task in self.task_mapping[entry]:
-                logging.info(f"Put Task: {task}")
-                self.tasks.put(Task(task))
+        if not self.from_checkpoint:
+            # allows for mapping one config entry to multiple tasks
+            for entry in self.config.sequence:
+                for task in self.task_mapping[entry]:
+                    logging.info(f"Put Task: {task}")
+                    self.tasks.put(Task(task))
 
         while not (self.state is State.DONE or self.iteration >= self.iterations):
+            logging.info("Write checkpoint before next task")
+            with open(self.cptfile, "wb") as f:
+                dill.dump(self, f)
             next(self)
 
         logging.info(
@@ -219,8 +226,9 @@ class RunManager:
         """Creates TaskFiles object, output directory and symlinks ff."""
         files = TaskFiles(self)
         files.outputdir = self.config.out / f"{self.iteration}_{postfix}"
-        files.outputdir.mkdir()
-        (files.outputdir / self.config.ff.name).symlink_to(self.config.ff)
+        files.outputdir.mkdir(exist_ok=self.from_checkpoint)
+        if not (files.outputdir / self.config.ff.name).exists():
+            (files.outputdir / self.config.ff.name).symlink_to(self.config.ff)
         return files
 
     def _dummy(self):

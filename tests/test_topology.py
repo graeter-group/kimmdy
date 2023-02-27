@@ -1,4 +1,4 @@
-#%%
+# %%
 from copy import deepcopy
 from pathlib import Path
 import os
@@ -8,7 +8,8 @@ from hypothesis import Phase, given, settings, strategies as st
 from kimmdy.topology.topology import Topology, generate_topology_from_bound_to
 from kimmdy.topology.atomic import *
 
-#%%
+
+# %%
 def set_dir():
     try:
         test_dir = Path(__file__).parent / "test_files/test_topology"
@@ -19,7 +20,7 @@ def set_dir():
 
 set_dir()
 
-#%%
+# %%
 ffdir = Path("../assets/amber99sb-star-ildnp.ff")
 ffpatch = Path("amber99sb_patches.xml")
 
