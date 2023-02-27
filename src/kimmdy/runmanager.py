@@ -164,8 +164,8 @@ class RunManager:
                     self.tasks.put(Task(task))
 
         while not (self.state is State.DONE or self.iteration >= self.iterations):
-            logging.info('Write checkpoint before next task')
-            with open(self.cptfile, 'wb') as f:
+            logging.info("Write checkpoint before next task")
+            with open(self.cptfile, "wb") as f:
                 dill.dump(self, f)
             next(self)
 
