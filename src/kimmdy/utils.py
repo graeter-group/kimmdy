@@ -185,8 +185,8 @@ def calc_av_rate(distances, r_0, E_dis, k_f):
 
 
 # utils
-def run_shell_cmd(s, cwd=None):
-    sp.run(s, shell=True, cwd=cwd)
+def run_shell_cmd(s, cwd=None, check=False):
+    sp.run(s, shell=True, cwd=cwd, check=check)
 
 
 def get_shell_stdout(s):
