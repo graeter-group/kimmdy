@@ -12,7 +12,6 @@ from itertools import permutations, combinations
 import textwrap
 import logging
 
-
 class Topology:
     """Smart container for parsed topology data.
 
@@ -287,18 +286,32 @@ class Topology:
             for a in atompair:
                 self.radicals.pop(a.nr)
 
-        # FIXME: need a more general solution
-        # quickfix for hydrogens
+        # quickfix for jumping hydrogens
         # to make them adopt the correct residuetype and atomtype
         # when bound to a new heavy atom
         for i,atom in enumerate(atompair):
             if atom.type.startswith('H'):
-                i_other = abs(i - 1)
-                atom_other = atompair[i_other]
-                atom.residue = atom_other.residue
-                
-                if atom_other.type == 'CT':
-                    atom.type = 'H1'
+                other_i = abs(i - 1)
+                other_atom = atompair[other_i]
+                other_res = other_atom.residue
+                atom.residue = other_res
+                aa = self.ff.residuetypes.get(other_res)
+                if not aa:
+                    logging.warning(f"No AA found for {other_res}, to which a H would jump")
+                    continue
+
+                for key, bond in aa.bonds.items():
+                    if other_atom.atom in key and any(k.startswith('H') for k in key):
+                        if key[0] == other_atom.atom:
+                            h_name = bond.atom2
+                        else:
+                            h_name = bond.atom1
+
+                        atom.type = aa.atoms[h_name].type
+                        logging.info(f"HAT hydrogen will be bound to {other_atom}.")
+                        break
+                else:
+                    logging.warn(f"Found no new atomtype for HAT hydrogen!")
 
 
         # update bound_to
