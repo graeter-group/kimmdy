@@ -226,8 +226,9 @@ class RunManager:
         """Creates TaskFiles object, output directory and symlinks ff."""
         files = TaskFiles(self)
         files.outputdir = self.config.out / f"{self.iteration}_{postfix}"
-        files.outputdir.mkdir()
-        (files.outputdir / self.config.ff.name).symlink_to(self.config.ff)
+        files.outputdir.mkdir(exist_ok=self.from_checkpoint)
+        if not (files.outputdir / self.config.ff.name).exists():
+            (files.outputdir / self.config.ff.name).symlink_to(self.config.ff)
         return files
 
     def _dummy(self):
