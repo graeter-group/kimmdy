@@ -17,6 +17,7 @@ pytest_topol.top
 render/
 cat-center.gro
 *-tmp.py
+*.cpt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
