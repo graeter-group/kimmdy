@@ -1,6 +1,7 @@
 import argparse
 import logging
 from pathlib import Path
+import dill
 from kimmdy.config import Config
 from kimmdy.runmanager import RunManager
 from kimmdy.utils import check_gmx_version, increment_logfile
@@ -28,6 +29,9 @@ def get_cmdline_args():
     )
     parser.add_argument(
         "--logfile", "-f", type=str, help="logfile", default="kimmdy.log"
+    )
+    parser.add_argument(
+        "--checkpoint", "-c", type=str, help="checkpoint file"
     )
     return parser.parse_args()
 
@@ -66,13 +70,18 @@ def _run(args):
     logging.info("KIMMDY is running with these command line options:")
     logging.info(args)
 
-    config = Config(args.input)
-    logging.debug(config)
+    if args.checkpoint:
+        logging.info("KIMMDY is starting from a checkpoint.")
+        with open(args.checkpoint, 'rb') as f:
+            runmgr = dill.load(f)
+            runmgr.from_checkpoint = True
+    else:
+        config = Config(args.input)
+        logging.debug(config)
+        runmgr = RunManager(config)
+        logging.debug("Using system GROMACS:")
+        logging.debug(check_gmx_version(config))
 
-    logging.debug("Using system GROMACS:")
-    logging.debug(check_gmx_version(config))
-
-    runmgr = RunManager(config)
     runmgr.run()
 
 
