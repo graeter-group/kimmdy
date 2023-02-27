@@ -1,8 +1,27 @@
 import subprocess as sp
 import numpy as np
 import logging
+from pathlib import Path
 
 from kimmdy.config import Config
+
+
+def increment_logfile(f: Path) -> Path:
+    backup_file_prefix = "#"
+    backup_file_suffix = "#"
+    logfile = f
+    if logfile.exists():
+        backup_count = 1
+        backup_file = (
+            f"{backup_file_prefix}{logfile}_{backup_count}{backup_file_suffix}"
+        )
+        while Path(backup_file).exists():
+            backup_count += 1
+            backup_file = (
+                f"{backup_file_prefix}{logfile}_{backup_count}{backup_file_suffix}"
+            )
+        logfile.rename(backup_file)
+    return logfile
 
 
 def find_bond_param(atomtypes, filepath):
@@ -185,8 +204,8 @@ def calc_av_rate(distances, r_0, E_dis, k_f):
 
 
 # utils
-def run_shell_cmd(s, cwd=None):
-    sp.run(s, shell=True, cwd=cwd)
+def run_shell_cmd(s, cwd=None) -> sp.CompletedProcess:
+    return sp.run(s, shell=True, cwd=cwd)
 
 
 def get_shell_stdout(s):

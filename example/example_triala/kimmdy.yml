@@ -1,7 +1,7 @@
 dryrun: false
 iterations: 100
 out: 'test_out_001'
-# ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
+ff: 'amber99sb-star-ildnp.ff'
 top: 'triala_out.top'
 gro: 'npt.gro'
 idx: 'index.ndx'
