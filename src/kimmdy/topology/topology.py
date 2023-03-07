@@ -147,12 +147,12 @@ class Topology:
                 initial = float(initial)
             except ValueError as _:
                 logging.warning(
-                    "Malformed patchfile. Some parameter pachtes couldn't be converted to a number:"
+                    f"Malformed patchfile. Some parameter pachtes couldn't be converted to a number: {initial}"
                 )
                 continue
             except TypeError as _:
                 logging.warning(
-                    "Can't patch parameter because no initial parameter was found in the topology or the FF: "
+                    f"Can't patch parameter because no initial parameter was found in the topology or the FF for: {atomic_id}"
                 )
                 continue
 
@@ -240,9 +240,27 @@ class Topology:
         ) + self._get_atom_proper_dihedrals(atompair_nrs[1])
         for key in dihedral_keys:
             if all([x in key for x in atompair_nrs]):
+                # dihedral contained a now deleted bond because
+                # it had both atoms of the broken bond
                 self.proper_dihedrals.pop(key, None)
                 pairkey = tuple(sorted((key[0], key[3]), key=int))
                 self.pairs.pop(pairkey, None)
+            else:
+                # dihedral only contains one of the affecte atoms
+                # dihedral is not removed but might need to be patched
+                dihedral = self.proper_dihedrals.get(key)
+                if (
+                    dihedral is None
+                    or self.ffpatches is None
+                    or self.ffpatches.anglepatches is None
+                ):
+                    continue
+                id = [self.atoms[i].radical_type() for i in key]
+                patch = match_id_to_patch(id, self.ffpatches.dihedralpatches)
+                if patch is None:
+                    continue
+                id_base = [self.atoms[i].radical_type() for i in key]
+                self._apply_param_patch(dihedral, id_base, patch, self.ff.proper_dihedraltypes)
 
         # and improper dihedrals
         dihedral_k_v = self._get_atom_improper_dihedrals(

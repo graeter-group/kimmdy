@@ -446,5 +446,5 @@ AtomicTypes = Union[
     dict[AtomId, AtomType],
     dict[BondId, BondType],
     dict[AngleId, AngleType],
-    dict[DihedralId, DihedralType],
+    dict[DihedralId, list[DihedralType]],
 ]
