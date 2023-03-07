@@ -141,15 +141,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>top_break_29_25 <span class="op">=</span> Topology(hexala_break_29_35, ffdir, ffpatch)</span>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>top_move_34_39 <span class="op">=</span> Topology(hexala_move_34_39, ffdir, ffpatch)</span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>ls <span class="op">=</span> top_to_graph(top) </span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>ls <span class="op">=</span> top_to_graph(top, overlap<span class="op">=</span><span class="st">'true'</span>) </span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">"hexala-top.dot"</span>, <span class="st">"w"</span>) <span class="im">as</span> f:</span>
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  f.writelines(ls)</span>
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>ls <span class="op">=</span> top_to_graph(top_break_29_25) </span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>ls <span class="op">=</span> top_to_graph(top_break_29_25,overlap<span class="op">=</span><span class="st">'false'</span>) </span>
 <span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">"hexala-break.dot"</span>, <span class="st">"w"</span>) <span class="im">as</span> f:</span>
 <span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  f.writelines(ls)</span>
 <span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>ls <span class="op">=</span> top_to_graph(top_move_34_39)</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>ls <span class="op">=</span> top_to_graph(top_move_34_39,overlap<span class="op">=</span><span class="st">'false'</span>)</span>
 <span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">"hexala-move.dot"</span>, <span class="st">"w"</span>) <span class="im">as</span> f:</span>
 <span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  f.writelines(ls)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -757,580 +757,580 @@ G
 <div id="fig-hexala-break" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <div>
-<svg width="672" height="480" viewbox="0.00 0.00 1096.95 1345.79" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="; max-width: none; max-height: none">
-<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 1341.79)">
+<svg width="672" height="480" viewbox="0.00 0.00 1268.17 1536.64" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="; max-width: none; max-height: none">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 1532.64)">
 <title>
 G
 </title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-1341.79 1092.95,-1341.79 1092.95,4 -4,4"></polygon> <!-- 1 CT --> <g id="node1" class="node">
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-1532.64 1264.17,-1532.64 1264.17,4 -4,4"></polygon> <!-- 1 CT --> <g id="node1" class="node">
 <title>
 1 CT
 </title>
-<ellipse fill="none" stroke="black" cx="725.74" cy="-443.14" rx="30.74" ry="30.74"></ellipse> <text text-anchor="middle" x="725.74" y="-438.94" font-family="Times,serif" font-size="14.00">1 CT</text> </g> <!-- 2 HC --> <g id="node2" class="node">
+<ellipse fill="none" stroke="black" cx="889.86" cy="-592.53" rx="30.74" ry="30.74"></ellipse> <text text-anchor="middle" x="889.86" y="-588.33" font-family="Times,serif" font-size="14.00">1 CT</text> </g> <!-- 2 HC --> <g id="node2" class="node">
 <title>
 2 HC
 </title>
-<ellipse fill="none" stroke="black" cx="771.56" cy="-371.69" rx="31.89" ry="31.89"></ellipse> <text text-anchor="middle" x="771.56" y="-367.49" font-family="Times,serif" font-size="14.00">2 HC</text> </g> <!-- 1 CT&#45;&#45;2 HC --> <g id="edge1" class="edge">
+<ellipse fill="none" stroke="black" cx="1015.03" cy="-496.47" rx="31.89" ry="31.89"></ellipse> <text text-anchor="middle" x="1015.03" y="-492.27" font-family="Times,serif" font-size="14.00">2 HC</text> </g> <!-- 1 CT&#45;&#45;2 HC --> <g id="edge1" class="edge">
 <title>
 1 CT–2 HC
 </title>
-<path fill="none" stroke="black" d="M742.28,-417.35C746.18,-411.27 750.34,-404.78 754.27,-398.66"></path> </g> <!-- 3 HC --> <g id="node3" class="node">
+<path fill="none" stroke="black" d="M914.29,-573.78C936.06,-557.07 967.79,-532.72 989.8,-515.83"></path> </g> <!-- 3 HC --> <g id="node3" class="node">
 <title>
 3 HC
 </title>
-<ellipse fill="none" stroke="black" cx="693.64" cy="-372.27" rx="31.89" ry="31.89"></ellipse> <text text-anchor="middle" x="693.64" y="-368.07" font-family="Times,serif" font-size="14.00">3 HC</text> </g> <!-- 1 CT&#45;&#45;3 HC --> <g id="edge2" class="edge">
+<ellipse fill="none" stroke="black" cx="820.09" cy="-486.69" rx="31.89" ry="31.89"></ellipse> <text text-anchor="middle" x="820.09" y="-482.49" font-family="Times,serif" font-size="14.00">3 HC</text> </g> <!-- 1 CT&#45;&#45;3 HC --> <g id="edge2" class="edge">
 <title>
 1 CT–3 HC
 </title>
-<path fill="none" stroke="black" d="M713.05,-415.13C711.02,-410.65 708.91,-405.99 706.86,-401.48"></path> </g> <!-- 4 HC --> <g id="node4" class="node">
+<path fill="none" stroke="black" d="M872.97,-566.91C862.25,-550.64 848.39,-529.62 837.55,-513.18"></path> </g> <!-- 4 HC --> <g id="node4" class="node">
 <title>
 4 HC
 </title>
-<ellipse fill="none" stroke="black" cx="640.64" cy="-430.5" rx="31.89" ry="31.89"></ellipse> <text text-anchor="middle" x="640.64" y="-426.3" font-family="Times,serif" font-size="14.00">4 HC</text> </g> <!-- 1 CT&#45;&#45;4 HC --> <g id="edge3" class="edge">
+<ellipse fill="none" stroke="black" cx="766.57" cy="-593.2" rx="31.89" ry="31.89"></ellipse> <text text-anchor="middle" x="766.57" y="-589" font-family="Times,serif" font-size="14.00">4 HC</text> </g> <!-- 1 CT&#45;&#45;4 HC --> <g id="edge3" class="edge">
 <title>
 1 CT–4 HC
 </title>
-<path fill="none" stroke="black" d="M695.01,-438.58C687.59,-437.47 679.64,-436.29 672.17,-435.18"></path> </g> <!-- 5 C --> <g id="node5" class="node">
+<path fill="none" stroke="black" d="M859.07,-592.7C840.67,-592.8 817.32,-592.92 798.69,-593.02"></path> </g> <!-- 5 C --> <g id="node5" class="node">
 <title>
 5 C
 </title>
-<ellipse fill="none" stroke="black" cx="751.12" cy="-526.2" rx="24.94" ry="24.94"></ellipse> <text text-anchor="middle" x="751.12" y="-522" font-family="Times,serif" font-size="14.00">5 C</text> </g> <!-- 1 CT&#45;&#45;5 C --> <g id="edge4" class="edge">
+<ellipse fill="none" stroke="black" cx="906.88" cy="-684.27" rx="24.94" ry="24.94"></ellipse> <text text-anchor="middle" x="906.88" y="-680.07" font-family="Times,serif" font-size="14.00">5 C</text> </g> <!-- 1 CT&#45;&#45;5 C --> <g id="edge4" class="edge">
 <title>
 1 CT–5 C
 </title>
-<path fill="none" stroke="black" d="M734.76,-472.66C737.75,-482.45 741.04,-493.22 743.88,-502.52"></path> </g> <!-- 6 O --> <g id="node6" class="node">
+<path fill="none" stroke="black" d="M895.48,-622.82C897.71,-634.83 900.23,-648.45 902.34,-659.81"></path> </g> <!-- 6 O --> <g id="node6" class="node">
 <title>
 6 O
 </title>
-<ellipse fill="none" stroke="black" cx="673.07" cy="-544.85" rx="25.01" ry="25.01"></ellipse> <text text-anchor="middle" x="673.07" y="-540.65" font-family="Times,serif" font-size="14.00">6 O</text> </g> <!-- 5 C&#45;&#45;6 O --> <g id="edge5" class="edge">
+<ellipse fill="none" stroke="black" cx="784.64" cy="-761.49" rx="25.01" ry="25.01"></ellipse> <text text-anchor="middle" x="784.64" y="-757.29" font-family="Times,serif" font-size="14.00">6 O</text> </g> <!-- 5 C&#45;&#45;6 O --> <g id="edge5" class="edge">
 <title>
 5 C–6 O
 </title>
-<path fill="none" stroke="black" d="M726.85,-532C717.63,-534.21 707.13,-536.72 697.86,-538.93"></path> </g> <!-- 7 N --> <g id="node7" class="node">
+<path fill="none" stroke="black" d="M885.86,-697.55C863.61,-711.6 828.66,-733.68 806.2,-747.87"></path> </g> <!-- 7 N --> <g id="node7" class="node">
 <title>
 7 N
 </title>
-<ellipse fill="none" stroke="black" cx="816.11" cy="-584.91" rx="25.01" ry="25.01"></ellipse> <text text-anchor="middle" x="816.11" y="-580.71" font-family="Times,serif" font-size="14.00">7 N</text> </g> <!-- 5 C&#45;&#45;7 N --> <g id="edge6" class="edge">
+<ellipse fill="none" stroke="black" cx="933.83" cy="-774.87" rx="25.01" ry="25.01"></ellipse> <text text-anchor="middle" x="933.83" y="-770.67" font-family="Times,serif" font-size="14.00">7 N</text> </g> <!-- 5 C&#45;&#45;7 N --> <g id="edge6" class="edge">
 <title>
 5 C–7 N
 </title>
-<path fill="none" stroke="black" d="M769.57,-542.87C778.13,-550.6 788.29,-559.78 796.93,-567.59"></path> </g> <!-- 8 H --> <g id="node8" class="node">
+<path fill="none" stroke="black" d="M913.96,-708.08C917.86,-721.18 922.69,-737.41 926.61,-750.59"></path> </g> <!-- 8 H --> <g id="node8" class="node">
 <title>
 8 H
 </title>
-<ellipse fill="none" stroke="black" cx="857.91" cy="-517.01" rx="25.01" ry="25.01"></ellipse> <text text-anchor="middle" x="857.91" y="-512.81" font-family="Times,serif" font-size="14.00">8 H</text> </g> <!-- 7 N&#45;&#45;8 H --> <g id="edge7" class="edge">
+<ellipse fill="none" stroke="black" cx="1043.21" cy="-623.81" rx="25.01" ry="25.01"></ellipse> <text text-anchor="middle" x="1043.21" y="-619.61" font-family="Times,serif" font-size="14.00">8 H</text> </g> <!-- 7 N&#45;&#45;8 H --> <g id="edge7" class="edge">
 <title>
 7 N–8 H
 </title>
-<path fill="none" stroke="black" d="M829.56,-563.05C834.34,-555.29 839.71,-546.57 844.48,-538.82"></path> </g> <!-- 9 CT --> <g id="node9" class="node">
+<path fill="none" stroke="black" d="M948.81,-754.18C969.64,-725.41 1007.14,-673.62 1028.06,-644.73"></path> </g> <!-- 9 CT --> <g id="node9" class="node">
 <title>
 9 CT
 </title>
-<ellipse fill="none" stroke="black" cx="878.23" cy="-656.53" rx="30.74" ry="30.74"></ellipse> <text text-anchor="middle" x="878.23" y="-652.33" font-family="Times,serif" font-size="14.00">9 CT</text> </g> <!-- 7 N&#45;&#45;9 CT --> <g id="edge8" class="edge">
+<ellipse fill="none" stroke="black" cx="1026.43" cy="-824.31" rx="30.74" ry="30.74"></ellipse> <text text-anchor="middle" x="1026.43" y="-820.11" font-family="Times,serif" font-size="14.00">9 CT</text> </g> <!-- 7 N&#45;&#45;9 CT --> <g id="edge8" class="edge">
 <title>
 7 N–9 CT
 </title>
-<path fill="none" stroke="black" d="M832.75,-604.1C840.52,-613.05 849.82,-623.78 857.99,-633.2"></path> </g> <!-- 10 H1 --> <g id="node10" class="node">
+<path fill="none" stroke="black" d="M956.25,-786.83C969.2,-793.75 985.59,-802.5 999.27,-809.8"></path> </g> <!-- 10 H1 --> <g id="node10" class="node">
 <title>
 10 H1
 </title>
-<ellipse fill="none" stroke="black" cx="903.85" cy="-610.54" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="903.85" y="-606.34" font-family="Times,serif" font-size="14.00">10 H1</text> </g> <!-- 9 CT&#45;&#45;10 H1 --> <g id="edge9" class="edge">
+<ellipse fill="none" stroke="black" cx="1064.64" cy="-730.1" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="1064.64" y="-725.9" font-family="Times,serif" font-size="14.00">10 H1</text> </g> <!-- 9 CT&#45;&#45;10 H1 --> <g id="edge9" class="edge">
 <title>
 9 CT–10 H1
 </title>
-<path fill="none" stroke="black" d="M893.13,-629.78C893.22,-629.62 893.31,-629.46 893.4,-629.3"></path> </g> <!-- 11 CT --> <g id="node11" class="node">
+<path fill="none" stroke="black" d="M1038,-795.78C1042.26,-785.28 1047.12,-773.3 1051.51,-762.48"></path> </g> <!-- 11 CT --> <g id="node11" class="node">
 <title>
 11 CT
 </title>
-<ellipse fill="none" stroke="black" cx="975.21" cy="-628.47" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="975.21" y="-624.27" font-family="Times,serif" font-size="14.00">11 CT</text> </g> <!-- 9 CT&#45;&#45;11 CT --> <g id="edge10" class="edge">
+<ellipse fill="none" stroke="black" cx="1131.51" cy="-800.61" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="1131.51" y="-796.41" font-family="Times,serif" font-size="14.00">11 CT</text> </g> <!-- 9 CT&#45;&#45;11 CT --> <g id="edge10" class="edge">
 <title>
 9 CT–11 CT
 </title>
-<path fill="none" stroke="black" d="M907.86,-647.96C918.33,-644.93 930.19,-641.5 941.01,-638.37"></path> </g> <!-- 15 C --> <g id="node12" class="node">
+<path fill="none" stroke="black" d="M1056.54,-817.52C1069.04,-814.7 1083.61,-811.41 1096.57,-808.49"></path> </g> <!-- 15 C --> <g id="node12" class="node">
 <title>
 15 C
 </title>
-<ellipse fill="none" stroke="black" cx="862.38" cy="-742.13" rx="29.6" ry="29.6"></ellipse> <text text-anchor="middle" x="862.38" y="-737.93" font-family="Times,serif" font-size="14.00">15 C</text> </g> <!-- 9 CT&#45;&#45;15 C --> <g id="edge11" class="edge">
+<ellipse fill="none" stroke="black" cx="994.15" cy="-892.95" rx="29.6" ry="29.6"></ellipse> <text text-anchor="middle" x="994.15" y="-888.75" font-family="Times,serif" font-size="14.00">15 C</text> </g> <!-- 9 CT&#45;&#45;15 C --> <g id="edge11" class="edge">
 <title>
 9 CT–15 C
 </title>
-<path fill="none" stroke="black" d="M872.6,-686.95C871.03,-695.41 869.34,-704.57 867.78,-712.96"></path> </g> <!-- 12 HC --> <g id="node13" class="node">
+<path fill="none" stroke="black" d="M1013.3,-852.22C1011.14,-856.83 1008.9,-861.59 1006.74,-866.16"></path> </g> <!-- 12 HC --> <g id="node13" class="node">
 <title>
 12 HC
 </title>
-<ellipse fill="none" stroke="black" cx="1007.1" cy="-550.48" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="1007.1" y="-546.28" font-family="Times,serif" font-size="14.00">12 HC</text> </g> <!-- 11 CT&#45;&#45;12 HC --> <g id="edge12" class="edge">
+<ellipse fill="none" stroke="black" cx="1190.2" cy="-553.39" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="1190.2" y="-549.19" font-family="Times,serif" font-size="14.00">12 HC</text> </g> <!-- 11 CT&#45;&#45;12 HC --> <g id="edge12" class="edge">
 <title>
 11 CT–12 HC
 </title>
-<path fill="none" stroke="black" d="M988.73,-595.4C990.23,-591.74 991.75,-588.02 993.25,-584.36"></path> </g> <!-- 13 HC --> <g id="node14" class="node">
+<path fill="none" stroke="black" d="M1139.74,-765.97C1150.84,-719.2 1170.53,-636.26 1181.75,-588.99"></path> </g> <!-- 13 HC --> <g id="node14" class="node">
 <title>
 13 HC
 </title>
-<ellipse fill="none" stroke="black" cx="1052.43" cy="-596.48" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="1052.43" y="-592.28" font-family="Times,serif" font-size="14.00">13 HC</text> </g> <!-- 11 CT&#45;&#45;13 HC --> <g id="edge13" class="edge">
+<ellipse fill="none" stroke="black" cx="1217.85" cy="-723.14" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="1217.85" y="-718.94" font-family="Times,serif" font-size="14.00">13 HC</text> </g> <!-- 11 CT&#45;&#45;13 HC --> <g id="edge13" class="edge">
 <title>
 11 CT–13 HC
 </title>
-<path fill="none" stroke="black" d="M1008.41,-614.72C1011.68,-613.37 1015,-611.99 1018.28,-610.63"></path> </g> <!-- 14 HC --> <g id="node15" class="node">
+<path fill="none" stroke="black" d="M1158.36,-776.52C1168.55,-767.37 1180.18,-756.94 1190.42,-747.75"></path> </g> <!-- 14 HC --> <g id="node15" class="node">
 <title>
 14 HC
 </title>
-<ellipse fill="none" stroke="black" cx="1050.98" cy="-659.68" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="1050.98" y="-655.48" font-family="Times,serif" font-size="14.00">14 HC</text> </g> <!-- 11 CT&#45;&#45;14 HC --> <g id="edge14" class="edge">
+<ellipse fill="none" stroke="black" cx="1223.65" cy="-879.57" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="1223.65" y="-875.37" font-family="Times,serif" font-size="14.00">14 HC</text> </g> <!-- 11 CT&#45;&#45;14 HC --> <g id="edge14" class="edge">
 <title>
 11 CT–14 HC
 </title>
-<path fill="none" stroke="black" d="M1008.22,-642.07C1011.1,-643.25 1014,-644.45 1016.88,-645.64"></path> </g> <!-- 16 O --> <g id="node16" class="node">
+<path fill="none" stroke="black" d="M1158.66,-823.87C1170.34,-833.88 1183.98,-845.57 1195.74,-855.65"></path> </g> <!-- 16 O --> <g id="node16" class="node">
 <title>
 16 O
 </title>
-<ellipse fill="none" stroke="black" cx="936.13" cy="-764.94" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="936.13" y="-760.74" font-family="Times,serif" font-size="14.00">16 O</text> </g> <!-- 15 C&#45;&#45;16 O --> <g id="edge15" class="edge">
+<ellipse fill="none" stroke="black" cx="1144.5" cy="-954.37" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="1144.5" y="-950.17" font-family="Times,serif" font-size="14.00">16 O</text> </g> <!-- 15 C&#45;&#45;16 O --> <g id="edge15" class="edge">
 <title>
 15 C–16 O
 </title>
-<path fill="none" stroke="black" d="M890.68,-750.88C896.04,-752.54 901.66,-754.28 907.05,-755.95"></path> </g> <!-- 17 N --> <g id="node17" class="node">
+<path fill="none" stroke="black" d="M1021.72,-904.21C1048.68,-915.23 1089.51,-931.91 1116.59,-942.97"></path> </g> <!-- 17 N --> <g id="node17" class="node">
 <title>
 17 N
 </title>
-<ellipse fill="none" stroke="black" cx="826.22" cy="-822.46" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="826.22" y="-818.26" font-family="Times,serif" font-size="14.00">17 N</text> </g> <!-- 15 C&#45;&#45;17 N --> <g id="edge16" class="edge">
+<ellipse fill="none" stroke="black" cx="1004.07" cy="-985.19" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="1004.07" y="-980.99" font-family="Times,serif" font-size="14.00">17 N</text> </g> <!-- 15 C&#45;&#45;17 N --> <g id="edge16" class="edge">
 <title>
 15 C–17 N
 </title>
-<path fill="none" stroke="black" d="M850.14,-769.33C846.41,-777.61 842.31,-786.72 838.57,-795.02"></path> </g> <!-- 18 H --> <g id="node18" class="node">
+<path fill="none" stroke="black" d="M997.31,-922.39C998.44,-932.83 999.7,-944.59 1000.83,-955.08"></path> </g> <!-- 18 H --> <g id="node18" class="node">
 <title>
 18 H
 </title>
-<ellipse fill="none" stroke="black" cx="753.67" cy="-795.05" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="753.67" y="-790.85" font-family="Times,serif" font-size="14.00">18 H</text> </g> <!-- 17 N&#45;&#45;18 H --> <g id="edge17" class="edge">
+<ellipse fill="none" stroke="black" cx="847.44" cy="-900.53" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="847.44" y="-896.33" font-family="Times,serif" font-size="14.00">18 H</text> </g> <!-- 17 N&#45;&#45;18 H --> <g id="edge17" class="edge">
 <title>
 17 N–18 H
 </title>
-<path fill="none" stroke="black" d="M797.97,-811.79C792.71,-809.8 787.23,-807.73 781.97,-805.74"></path> </g> <!-- 19 CT --> <g id="node19" class="node">
+<path fill="none" stroke="black" d="M977.5,-970.83C948.7,-955.26 902.99,-930.56 874.14,-914.96"></path> </g> <!-- 19 CT --> <g id="node19" class="node">
 <title>
 19 CT
 </title>
-<ellipse fill="none" stroke="black" cx="808.51" cy="-913.86" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="808.51" y="-909.66" font-family="Times,serif" font-size="14.00">19 CT</text> </g> <!-- 17 N&#45;&#45;19 CT --> <g id="edge18" class="edge">
+<ellipse fill="none" stroke="black" cx="990.01" cy="-1071.14" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="990.01" y="-1066.94" font-family="Times,serif" font-size="14.00">19 CT</text> </g> <!-- 17 N&#45;&#45;19 CT --> <g id="edge18" class="edge">
 <title>
 17 N–19 CT
 </title>
-<path fill="none" stroke="black" d="M820.47,-852.13C818.82,-860.68 816.99,-870.09 815.28,-878.92"></path> </g> <!-- 20 H1 --> <g id="node20" class="node">
+<path fill="none" stroke="black" d="M999.15,-1015.25C998.06,-1021.93 996.89,-1029.07 995.77,-1035.94"></path> </g> <!-- 20 H1 --> <g id="node20" class="node">
 <title>
 20 H1
 </title>
-<ellipse fill="none" stroke="black" cx="757.96" cy="-905.16" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="757.96" y="-900.96" font-family="Times,serif" font-size="14.00">20 H1</text> </g> <!-- 19 CT&#45;&#45;20 H1 --> <g id="edge19" class="edge">
+<ellipse fill="none" stroke="black" cx="894.77" cy="-1028.77" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="894.77" y="-1024.57" font-family="Times,serif" font-size="14.00">20 H1</text> </g> <!-- 19 CT&#45;&#45;20 H1 --> <g id="edge19" class="edge">
 <title>
 19 CT–20 H1
 </title>
-<path fill="none" stroke="black" d="M773.41,-907.82C773.27,-907.79 773.14,-907.77 773,-907.75"></path> </g> <!-- 21 CT --> <g id="node21" class="node">
+<path fill="none" stroke="black" d="M957.5,-1056.68C947.58,-1052.27 936.69,-1047.42 926.81,-1043.02"></path> </g> <!-- 21 CT --> <g id="node21" class="node">
 <title>
 21 CT
 </title>
-<ellipse fill="none" stroke="black" cx="711.25" cy="-942.32" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="711.25" y="-938.12" font-family="Times,serif" font-size="14.00">21 CT</text> </g> <!-- 19 CT&#45;&#45;21 CT --> <g id="edge20" class="edge">
+<ellipse fill="none" stroke="black" cx="868.4" cy="-1122.65" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="868.4" y="-1118.45" font-family="Times,serif" font-size="14.00">21 CT</text> </g> <!-- 19 CT&#45;&#45;21 CT --> <g id="edge20" class="edge">
 <title>
 19 CT–21 CT
 </title>
-<path fill="none" stroke="black" d="M774.22,-923.89C764.92,-926.61 754.86,-929.56 745.56,-932.28"></path> </g> <!-- 25 C --> <g id="node22" class="node">
+<path fill="none" stroke="black" d="M957.1,-1085.08C939.8,-1092.41 918.64,-1101.37 901.34,-1108.7"></path> </g> <!-- 25 C --> <g id="node22" class="node">
 <title>
 25 C
 </title>
-<ellipse fill="none" stroke="black" cx="863.4" cy="-981.7" rx="29.6" ry="29.6"></ellipse> <text text-anchor="middle" x="863.4" y="-977.5" font-family="Times,serif" font-size="14.00">25 C</text> </g> <!-- 19 CT&#45;&#45;25 C --> <g id="edge21" class="edge">
+<ellipse fill="none" stroke="black" cx="995.07" cy="-1150.78" rx="29.6" ry="29.6"></ellipse> <text text-anchor="middle" x="995.07" y="-1146.58" font-family="Times,serif" font-size="14.00">25 C</text> </g> <!-- 19 CT&#45;&#45;25 C --> <g id="edge21" class="edge">
 <title>
 19 CT–25 C
 </title>
-<path fill="none" stroke="black" d="M830.84,-941.45C835.47,-947.18 840.3,-953.15 844.78,-958.69"></path> </g> <!-- 22 HC --> <g id="node23" class="node">
+<path fill="none" stroke="black" d="M992.27,-1106.76C992.58,-1111.57 992.89,-1116.46 993.19,-1121.14"></path> </g> <!-- 22 HC --> <g id="node23" class="node">
 <title>
 22 HC
 </title>
-<ellipse fill="none" stroke="black" cx="631.52" cy="-967.67" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="631.52" y="-963.47" font-family="Times,serif" font-size="14.00">22 HC</text> </g> <!-- 21 CT&#45;&#45;22 HC --> <g id="edge22" class="edge">
+<ellipse fill="none" stroke="black" cx="764.52" cy="-1144.1" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="764.52" y="-1139.9" font-family="Times,serif" font-size="14.00">22 HC</text> </g> <!-- 21 CT&#45;&#45;22 HC --> <g id="edge22" class="edge">
 <title>
 21 CT–22 HC
 </title>
-<path fill="none" stroke="black" d="M677.44,-953.07C673.79,-954.23 670.07,-955.41 666.41,-956.58"></path> </g> <!-- 23 HC --> <g id="node24" class="node">
+<path fill="none" stroke="black" d="M833.52,-1129.85C822.91,-1132.04 811.24,-1134.45 800.55,-1136.66"></path> </g> <!-- 23 HC --> <g id="node24" class="node">
 <title>
 23 HC
 </title>
-<ellipse fill="none" stroke="black" cx="679.3" cy="-1013.66" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="679.3" y="-1009.46" font-family="Times,serif" font-size="14.00">23 HC</text> </g> <!-- 21 CT&#45;&#45;23 HC --> <g id="edge23" class="edge">
+<ellipse fill="none" stroke="black" cx="819.1" cy="-1270.9" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="819.1" y="-1266.7" font-family="Times,serif" font-size="14.00">23 HC</text> </g> <!-- 21 CT&#45;&#45;23 HC --> <g id="edge23" class="edge">
 <title>
 21 CT–23 HC
 </title>
-<path fill="none" stroke="black" d="M696.58,-975.07C695.86,-976.68 695.14,-978.3 694.41,-979.91"></path> </g> <!-- 24 HC --> <g id="node25" class="node">
+<path fill="none" stroke="black" d="M857.21,-1156.29C849.29,-1180.12 838.68,-1212.02 830.67,-1236.11"></path> </g> <!-- 24 HC --> <g id="node25" class="node">
 <title>
 24 HC
 </title>
-<ellipse fill="none" stroke="black" cx="634.41" cy="-905.67" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="634.41" y="-901.47" font-family="Times,serif" font-size="14.00">24 HC</text> </g> <!-- 21 CT&#45;&#45;24 HC --> <g id="edge24" class="edge">
+<ellipse fill="none" stroke="black" cx="769.77" cy="-993.11" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="769.77" y="-988.91" font-family="Times,serif" font-size="14.00">24 HC</text> </g> <!-- 21 CT&#45;&#45;24 HC --> <g id="edge24" class="edge">
 <title>
 21 CT–24 HC
 </title>
-<path fill="none" stroke="black" d="M679.11,-926.99C675.32,-925.18 671.46,-923.34 667.66,-921.53"></path> </g> <!-- 26 O --> <g id="node26" class="node">
+<path fill="none" stroke="black" d="M846.76,-1094.22C830.54,-1072.92 808.42,-1043.87 792.05,-1022.37"></path> </g> <!-- 26 O --> <g id="node26" class="node">
 <title>
 26 O
 </title>
-<ellipse fill="none" stroke="black" cx="938.53" cy="-964.07" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="938.53" y="-959.87" font-family="Times,serif" font-size="14.00">26 O</text> </g> <!-- 25 C&#45;&#45;26 O --> <g id="edge25" class="edge">
+<ellipse fill="none" stroke="black" cx="1161.83" cy="-1073.77" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="1161.83" y="-1069.57" font-family="Times,serif" font-size="14.00">26 O</text> </g> <!-- 25 C&#45;&#45;26 O --> <g id="edge25" class="edge">
 <title>
 25 C–26 O
 </title>
-<path fill="none" stroke="black" d="M892.23,-974.93C897.7,-973.65 903.42,-972.31 908.91,-971.02"></path> </g> <!-- 27 N --> <g id="node27" class="node">
+<path fill="none" stroke="black" d="M1022.23,-1138.23C1053.15,-1123.96 1103.37,-1100.76 1134.4,-1086.43"></path> </g> <!-- 27 N --> <g id="node27" class="node">
 <title>
 27 N
 </title>
-<ellipse fill="none" stroke="black" cx="900.51" cy="-1059.78" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="900.51" y="-1055.58" font-family="Times,serif" font-size="14.00">27 N</text> </g> <!-- 25 C&#45;&#45;27 N --> <g id="edge26" class="edge">
+<ellipse fill="none" stroke="black" cx="1019.16" cy="-1221.82" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="1019.16" y="-1217.62" font-family="Times,serif" font-size="14.00">27 N</text> </g> <!-- 25 C&#45;&#45;27 N --> <g id="edge26" class="edge">
 <title>
 25 C–27 N
 </title>
-<path fill="none" stroke="black" d="M876.17,-1008.57C879.86,-1016.34 883.89,-1024.82 887.59,-1032.6"></path> </g> <!-- 28 H --> <g id="node28" class="node">
+<path fill="none" stroke="black" d="M1004.59,-1178.86C1006.17,-1183.51 1007.81,-1188.34 1009.39,-1193.01"></path> </g> <!-- 28 H --> <g id="node28" class="node">
 <title>
 28 H
 </title>
-<ellipse fill="none" stroke="black" cx="986.6" cy="-1055.78" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="986.6" y="-1051.58" font-family="Times,serif" font-size="14.00">28 H</text> </g> <!-- 27 N&#45;&#45;28 H --> <g id="edge27" class="edge">
+<ellipse fill="none" stroke="black" cx="1196.39" cy="-1191.28" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="1196.39" y="-1187.08" font-family="Times,serif" font-size="14.00">28 H</text> </g> <!-- 27 N&#45;&#45;28 H --> <g id="edge27" class="edge">
 <title>
 27 N–28 H
 </title>
-<path fill="none" stroke="black" d="M930.62,-1058.38C938.96,-1058 948.01,-1057.57 956.36,-1057.19"></path> </g> <!-- 29 CT --> <g id="node29" class="node">
+<path fill="none" stroke="black" d="M1048.83,-1216.71C1081.54,-1211.07 1133.88,-1202.05 1166.63,-1196.41"></path> </g> <!-- 29 CT --> <g id="node29" class="node">
 <title>
 29 CT
 </title>
-<ellipse fill="none" stroke="black" cx="911.38" cy="-1143.08" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="911.38" y="-1138.88" font-family="Times,serif" font-size="14.00">29 CT</text> </g> <!-- 27 N&#45;&#45;29 CT --> <g id="edge28" class="edge">
+<ellipse fill="none" stroke="red" cx="1028.15" cy="-1294.99" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="1028.15" y="-1290.79" font-family="Times,serif" font-size="14.00">29 CT</text> </g> <!-- 27 N&#45;&#45;29 CT --> <g id="edge28" class="edge">
 <title>
 27 N–29 CT
 </title>
-<path fill="none" stroke="black" d="M904.44,-1089.86C905.19,-1095.64 905.99,-1101.74 906.76,-1107.67"></path> </g> <!-- 30 H1 --> <g id="node30" class="node">
+<path fill="none" stroke="black" d="M1022.87,-1252C1023.18,-1254.52 1023.49,-1257.08 1023.81,-1259.63"></path> </g> <!-- 30 H1 --> <g id="node30" class="node">
 <title>
 30 H1
 </title>
-<ellipse fill="none" stroke="black" cx="995.6" cy="-1163.22" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="995.6" y="-1159.02" font-family="Times,serif" font-size="14.00">30 H1</text> </g> <!-- 29 CT&#45;&#45;30 H1 --> <g id="edge29" class="edge">
+<ellipse fill="none" stroke="black" cx="1197.25" cy="-1329.91" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="1197.25" y="-1325.71" font-family="Times,serif" font-size="14.00">30 H1</text> </g> <!-- 29 CT&#45;&#45;30 H1 --> <g id="edge29" class="edge">
 <title>
 29 CT–30 H1
 </title>
-<path fill="none" stroke="black" d="M946.12,-1151.39C951.2,-1152.6 956.42,-1153.85 961.48,-1155.06"></path> </g> <!-- 31 CT --> <g id="node31" class="node">
+<path fill="none" stroke="black" d="M1063.18,-1302.22C1092.4,-1308.26 1133.79,-1316.81 1162.83,-1322.81"></path> </g> <!-- 31 CT --> <g id="node31" class="node">
 <title>
 31 CT
 </title>
-<ellipse fill="none" stroke="black" cx="889.46" cy="-1224.11" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="889.46" y="-1219.91" font-family="Times,serif" font-size="14.00">31 CT</text> </g> <!-- 29 CT&#45;&#45;31 CT --> <g id="edge30" class="edge">
+<ellipse fill="none" stroke="black" cx="1029.48" cy="-1378.87" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="1029.48" y="-1374.67" font-family="Times,serif" font-size="14.00">31 CT</text> </g> <!-- 29 CT&#45;&#45;31 CT --> <g id="edge30" class="edge">
 <title>
 29 CT–31 CT
 </title>
-<path fill="none" stroke="black" d="M902.09,-1177.45C900.99,-1181.5 899.87,-1185.64 898.77,-1189.7"></path> </g> <!-- 32 HC --> <g id="node32" class="node">
+<path fill="none" stroke="black" d="M1028.71,-1330.56C1028.78,-1334.76 1028.84,-1339.04 1028.91,-1343.24"></path> </g> <!-- 32 HC --> <g id="node32" class="node">
 <title>
 32 HC
 </title>
-<ellipse fill="none" stroke="black" cx="957.75" cy="-1276.12" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="957.75" y="-1271.92" font-family="Times,serif" font-size="14.00">32 HC</text> </g> <!-- 31 CT&#45;&#45;32 HC --> <g id="edge31" class="edge">
+<ellipse fill="none" stroke="black" cx="1184.25" cy="-1472.29" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="1184.25" y="-1468.09" font-family="Times,serif" font-size="14.00">32 HC</text> </g> <!-- 31 CT&#45;&#45;32 HC --> <g id="edge31" class="edge">
 <title>
 31 CT–32 HC
 </title>
-<path fill="none" stroke="black" d="M918.03,-1245.87C921.54,-1248.54 925.13,-1251.27 928.64,-1253.95"></path> </g> <!-- 33 HC --> <g id="node33" class="node">
+<path fill="none" stroke="black" d="M1060.05,-1397.33C1086.92,-1413.55 1125.85,-1437.04 1152.94,-1453.39"></path> </g> <!-- 33 HC --> <g id="node33" class="node">
 <title>
 33 HC
 </title>
-<ellipse fill="none" stroke="black" cx="815" cy="-1262" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="815" y="-1257.8" font-family="Times,serif" font-size="14.00">33 HC</text> </g> <!-- 31 CT&#45;&#45;33 HC --> <g id="edge32" class="edge">
+<ellipse fill="none" stroke="black" cx="832.22" cy="-1443.5" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="832.22" y="-1439.3" font-family="Times,serif" font-size="14.00">33 HC</text> </g> <!-- 31 CT&#45;&#45;33 HC --> <g id="edge32" class="edge">
 <title>
 31 CT–33 HC
 </title>
-<path fill="none" stroke="black" d="M857.45,-1240.4C854.3,-1242.01 851.1,-1243.64 847.93,-1245.24"></path> </g> <!-- 34 HC --> <g id="node34" class="node">
+<path fill="none" stroke="black" d="M995.57,-1389.98C959.66,-1401.75 903.25,-1420.23 867.01,-1432.1"></path> </g> <!-- 34 HC --> <g id="node34" class="node">
 <title>
 34 HC
 </title>
-<ellipse fill="none" stroke="black" cx="879.85" cy="-1301.27" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="879.85" y="-1297.07" font-family="Times,serif" font-size="14.00">34 HC</text> </g> <!-- 31 CT&#45;&#45;34 HC --> <g id="edge33" class="edge">
+<ellipse fill="none" stroke="black" cx="1016.1" cy="-1492.12" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="1016.1" y="-1487.92" font-family="Times,serif" font-size="14.00">34 HC</text> </g> <!-- 31 CT&#45;&#45;34 HC --> <g id="edge33" class="edge">
 <title>
 31 CT–34 HC
 </title>
-<path fill="none" stroke="black" d="M885.05,-1259.53C884.83,-1261.27 884.61,-1263.02 884.4,-1264.77"></path> </g> <!-- 35 C --> <g id="node35" class="node">
+<path fill="none" stroke="black" d="M1025.32,-1414.08C1023.75,-1427.33 1021.97,-1442.41 1020.39,-1455.76"></path> </g> <!-- 35 C --> <g id="node35" class="node">
 <title>
 35 C
 </title>
-<ellipse fill="none" stroke="black" cx="98.91" cy="-89.13" rx="29.6" ry="29.6"></ellipse> <text text-anchor="middle" x="98.91" y="-84.93" font-family="Times,serif" font-size="14.00">35 C</text> </g> <!-- 36 O --> <g id="node36" class="node">
+<ellipse fill="none" stroke="red" cx="144.79" cy="-83.16" rx="29.6" ry="29.6"></ellipse> <text text-anchor="middle" x="144.79" y="-78.96" font-family="Times,serif" font-size="14.00">35 C</text> </g> <!-- 36 O --> <g id="node36" class="node">
 <title>
 36 O
 </title>
-<ellipse fill="none" stroke="black" cx="49.61" cy="-30.08" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="49.61" y="-25.88" font-family="Times,serif" font-size="14.00">36 O</text> </g> <!-- 35 C&#45;&#45;36 O --> <g id="edge34" class="edge">
+<ellipse fill="none" stroke="black" cx="58.5" cy="-30.08" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="58.5" y="-25.88" font-family="Times,serif" font-size="14.00">36 O</text> </g> <!-- 35 C&#45;&#45;36 O --> <g id="edge34" class="edge">
 <title>
 35 C–36 O
 </title>
-<path fill="none" stroke="black" d="M79.71,-66.13C76.24,-61.99 72.63,-57.66 69.16,-53.5"></path> </g> <!-- 37 N --> <g id="node37" class="node">
+<path fill="none" stroke="black" d="M119.37,-67.52C108.33,-60.73 95.42,-52.79 84.34,-45.97"></path> </g> <!-- 37 N --> <g id="node37" class="node">
 <title>
 37 N
 </title>
-<ellipse fill="none" stroke="black" cx="131.62" cy="-162.2" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="131.62" y="-158" font-family="Times,serif" font-size="14.00">37 N</text> </g> <!-- 35 C&#45;&#45;37 N --> <g id="edge35" class="edge">
+<ellipse fill="none" stroke="black" cx="166.37" cy="-168.2" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="166.37" y="-164" font-family="Times,serif" font-size="14.00">37 N</text> </g> <!-- 35 C&#45;&#45;37 N --> <g id="edge35" class="edge">
 <title>
 35 C–37 N
 </title>
-<path fill="none" stroke="black" d="M111.09,-116.34C113.78,-122.35 116.63,-128.71 119.32,-134.73"></path> </g> <!-- 38 H --> <g id="node38" class="node">
+<path fill="none" stroke="black" d="M152.09,-111.95C154.3,-120.62 156.71,-130.15 158.92,-138.86"></path> </g> <!-- 38 H --> <g id="node38" class="node">
 <title>
 38 H
 </title>
-<ellipse fill="none" stroke="black" cx="46.3" cy="-167.41" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="46.3" y="-163.21" font-family="Times,serif" font-size="14.00">38 H</text> </g> <!-- 37 N&#45;&#45;38 H --> <g id="edge36" class="edge">
+<ellipse fill="none" stroke="black" cx="36.13" cy="-211.14" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="36.13" y="-206.94" font-family="Times,serif" font-size="14.00">38 H</text> </g> <!-- 37 N&#45;&#45;38 H --> <g id="edge36" class="edge">
 <title>
 37 N–38 H
 </title>
-<path fill="none" stroke="black" d="M101.3,-164.06C93.25,-164.55 84.56,-165.08 76.52,-165.57"></path> </g> <!-- 39 CT --> <g id="node39" class="node">
+<path fill="none" stroke="black" d="M137.79,-177.62C116.22,-184.74 86.75,-194.45 65.09,-201.59"></path> </g> <!-- 39 CT --> <g id="node39" class="node">
 <title>
 39 CT
 </title>
-<ellipse fill="none" stroke="black" cx="214.85" cy="-217.41" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="214.85" y="-213.21" font-family="Times,serif" font-size="14.00">39 CT</text> </g> <!-- 37 N&#45;&#45;39 CT --> <g id="edge37" class="edge">
+<ellipse fill="none" stroke="black" cx="259.87" cy="-250.66" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="259.87" y="-246.46" font-family="Times,serif" font-size="14.00">39 CT</text> </g> <!-- 37 N&#45;&#45;39 CT --> <g id="edge37" class="edge">
 <title>
 37 N–39 CT
 </title>
-<path fill="none" stroke="black" d="M157.04,-179.07C165.93,-184.97 175.99,-191.64 185.2,-197.75"></path> </g> <!-- 40 H1 --> <g id="node40" class="node">
+<path fill="none" stroke="black" d="M189,-188.16C202.3,-199.89 219.18,-214.77 233.13,-227.08"></path> </g> <!-- 40 H1 --> <g id="node40" class="node">
 <title>
 40 H1
 </title>
-<ellipse fill="none" stroke="black" cx="160.17" cy="-208.94" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="160.17" y="-204.74" font-family="Times,serif" font-size="14.00">40 H1</text> </g> <!-- 39 CT&#45;&#45;40 H1 --> <g id="edge38" class="edge">
+<ellipse fill="none" stroke="black" cx="158.06" cy="-254.1" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="158.06" y="-249.9" font-family="Times,serif" font-size="14.00">40 H1</text> </g> <!-- 39 CT&#45;&#45;40 H1 --> <g id="edge38" class="edge">
 <title>
 39 CT–40 H1
 </title>
-<path fill="none" stroke="black" d="M179.6,-211.95C179.44,-211.93 179.27,-211.9 179.11,-211.88"></path> </g> <!-- 41 CT --> <g id="node41" class="node">
+<path fill="none" stroke="black" d="M224.26,-251.87C214.17,-252.21 203.19,-252.58 193.13,-252.92"></path> </g> <!-- 41 CT --> <g id="node41" class="node">
 <title>
 41 CT
 </title>
-<ellipse fill="none" stroke="black" cx="281.21" cy="-160.57" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="281.21" y="-156.37" font-family="Times,serif" font-size="14.00">41 CT</text> </g> <!-- 39 CT&#45;&#45;41 CT --> <g id="edge39" class="edge">
+<ellipse fill="none" stroke="black" cx="335.91" cy="-192.32" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="335.91" y="-188.12" font-family="Times,serif" font-size="14.00">41 CT</text> </g> <!-- 39 CT&#45;&#45;41 CT --> <g id="edge39" class="edge">
 <title>
 39 CT–41 CT
 </title>
-<path fill="none" stroke="black" d="M241.84,-194.29C245.86,-190.85 250,-187.3 254.02,-183.85"></path> </g> <!-- 45 C --> <g id="node42" class="node">
+<path fill="none" stroke="black" d="M288.19,-228.94C294.52,-224.08 301.24,-218.93 307.57,-214.07"></path> </g> <!-- 45 C --> <g id="node42" class="node">
 <title>
 45 C
 </title>
-<ellipse fill="none" stroke="black" cx="206.98" cy="-308.09" rx="29.6" ry="29.6"></ellipse> <text text-anchor="middle" x="206.98" y="-303.89" font-family="Times,serif" font-size="14.00">45 C</text> </g> <!-- 39 CT&#45;&#45;45 C --> <g id="edge40" class="edge">
+<ellipse fill="none" stroke="black" cx="253.19" cy="-332.86" rx="29.6" ry="29.6"></ellipse> <text text-anchor="middle" x="253.19" y="-328.66" font-family="Times,serif" font-size="14.00">45 C</text> </g> <!-- 39 CT&#45;&#45;45 C --> <g id="edge40" class="edge">
 <title>
 39 CT–45 C
 </title>
-<path fill="none" stroke="black" d="M211.78,-252.73C211.04,-261.28 210.25,-270.34 209.54,-278.59"></path> </g> <!-- 42 HC --> <g id="node43" class="node">
+<path fill="none" stroke="black" d="M257,-286C256.53,-291.74 256.05,-297.64 255.6,-303.23"></path> </g> <!-- 42 HC --> <g id="node43" class="node">
 <title>
 42 HC
 </title>
-<ellipse fill="none" stroke="black" cx="269.18" cy="-79.57" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="269.18" y="-75.37" font-family="Times,serif" font-size="14.00">42 HC</text> </g> <!-- 41 CT&#45;&#45;42 HC --> <g id="edge41" class="edge">
+<ellipse fill="none" stroke="black" cx="279.3" cy="-41.15" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="279.3" y="-36.95" font-family="Times,serif" font-size="14.00">42 HC</text> </g> <!-- 41 CT&#45;&#45;42 HC --> <g id="edge41" class="edge">
 <title>
 41 CT–42 HC
 </title>
-<path fill="none" stroke="black" d="M275.97,-125.28C275.5,-122.12 275.02,-118.92 274.55,-115.76"></path> </g> <!-- 43 HC --> <g id="node44" class="node">
+<path fill="none" stroke="black" d="M323.35,-158.77C314.07,-133.98 301.47,-100.35 292.12,-75.39"></path> </g> <!-- 43 HC --> <g id="node44" class="node">
 <title>
 43 HC
 </title>
-<ellipse fill="none" stroke="black" cx="363.08" cy="-155.84" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="363.08" y="-151.64" font-family="Times,serif" font-size="14.00">43 HC</text> </g> <!-- 41 CT&#45;&#45;43 HC --> <g id="edge42" class="edge">
+<ellipse fill="none" stroke="black" cx="558.14" cy="-213.71" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="558.14" y="-209.51" font-family="Times,serif" font-size="14.00">43 HC</text> </g> <!-- 41 CT&#45;&#45;43 HC --> <g id="edge42" class="edge">
 <title>
 41 CT–43 HC
 </title>
-<path fill="none" stroke="black" d="M316.88,-158.51C320.07,-158.32 323.3,-158.14 326.49,-157.95"></path> </g> <!-- 44 HC --> <g id="node45" class="node">
+<path fill="none" stroke="black" d="M371.62,-195.76C412.84,-199.73 480.29,-206.22 521.79,-210.21"></path> </g> <!-- 44 HC --> <g id="node45" class="node">
 <title>
 44 HC
 </title>
-<ellipse fill="none" stroke="black" cx="334.14" cy="-98.75" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="334.14" y="-94.55" font-family="Times,serif" font-size="14.00">44 HC</text> </g> <!-- 41 CT&#45;&#45;44 HC --> <g id="edge43" class="edge">
+<ellipse fill="none" stroke="black" cx="497.38" cy="-39.42" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="497.38" y="-35.22" font-family="Times,serif" font-size="14.00">44 HC</text> </g> <!-- 41 CT&#45;&#45;44 HC --> <g id="edge43" class="edge">
 <title>
 41 CT–44 HC
 </title>
-<path fill="none" stroke="black" d="M304.27,-133.63C306.28,-131.29 308.31,-128.92 310.32,-126.57"></path> </g> <!-- 46 O --> <g id="node46" class="node">
+<path fill="none" stroke="black" d="M361.86,-167.76C391.72,-139.48 440.52,-93.26 470.69,-64.69"></path> </g> <!-- 46 O --> <g id="node46" class="node">
 <title>
 46 O
 </title>
-<ellipse fill="none" stroke="black" cx="126.83" cy="-313.31" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="126.83" y="-309.11" font-family="Times,serif" font-size="14.00">46 O</text> </g> <!-- 45 C&#45;&#45;46 O --> <g id="edge44" class="edge">
+<ellipse fill="none" stroke="black" cx="87.81" cy="-345.82" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="87.81" y="-341.62" font-family="Times,serif" font-size="14.00">46 O</text> </g> <!-- 45 C&#45;&#45;46 O --> <g id="edge44" class="edge">
 <title>
 45 C–46 O
 </title>
-<path fill="none" stroke="black" d="M177.13,-310.03C170.55,-310.46 163.56,-310.92 156.97,-311.35"></path> </g> <!-- 47 N --> <g id="node47" class="node">
+<path fill="none" stroke="black" d="M223.63,-335.18C193.8,-337.51 147.99,-341.11 117.96,-343.46"></path> </g> <!-- 47 N --> <g id="node47" class="node">
 <title>
 47 N
 </title>
-<ellipse fill="none" stroke="black" cx="223.73" cy="-393.3" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="223.73" y="-389.1" font-family="Times,serif" font-size="14.00">47 N</text> </g> <!-- 45 C&#45;&#45;47 N --> <g id="edge45" class="edge">
+<ellipse fill="none" stroke="black" cx="222.42" cy="-416.59" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="222.42" y="-412.39" font-family="Times,serif" font-size="14.00">47 N</text> </g> <!-- 45 C&#45;&#45;47 N --> <g id="edge45" class="edge">
 <title>
 45 C–47 N
 </title>
-<path fill="none" stroke="black" d="M212.74,-337.41C214.41,-345.89 216.23,-355.14 217.9,-363.63"></path> </g> <!-- 48 H --> <g id="node48" class="node">
+<path fill="none" stroke="black" d="M242.95,-360.74C239.69,-369.59 236.1,-379.38 232.83,-388.26"></path> </g> <!-- 48 H --> <g id="node48" class="node">
 <title>
 48 H
 </title>
-<ellipse fill="none" stroke="black" cx="301.87" cy="-370.75" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="301.87" y="-366.55" font-family="Times,serif" font-size="14.00">48 H</text> </g> <!-- 47 N&#45;&#45;48 H --> <g id="edge46" class="edge">
+<ellipse fill="none" stroke="black" cx="433.96" cy="-365.67" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="433.96" y="-361.47" font-family="Times,serif" font-size="14.00">48 H</text> </g> <!-- 47 N&#45;&#45;48 H --> <g id="edge46" class="edge">
 <title>
 47 N–48 H
 </title>
-<path fill="none" stroke="black" d="M252.83,-384.9C259.33,-383.02 266.24,-381.03 272.75,-379.15"></path> </g> <!-- 49 CT --> <g id="node49" class="node">
+<path fill="none" stroke="black" d="M251.83,-409.51C292.14,-399.81 364.11,-382.48 404.46,-372.77"></path> </g> <!-- 49 CT --> <g id="node49" class="node">
 <title>
 49 CT
 </title>
-<ellipse fill="none" stroke="black" cx="204.99" cy="-486.35" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="204.99" y="-482.15" font-family="Times,serif" font-size="14.00">49 CT</text> </g> <!-- 47 N&#45;&#45;49 CT --> <g id="edge47" class="edge">
+<ellipse fill="none" stroke="black" cx="216.14" cy="-515.72" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="216.14" y="-511.52" font-family="Times,serif" font-size="14.00">49 CT</text> </g> <!-- 47 N&#45;&#45;49 CT --> <g id="edge47" class="edge">
 <title>
 47 N–49 CT
 </title>
-<path fill="none" stroke="black" d="M217.75,-422.99C215.93,-432.04 213.91,-442.06 212.02,-451.41"></path> </g> <!-- 50 H1 --> <g id="node50" class="node">
+<path fill="none" stroke="black" d="M220.5,-446.87C219.84,-457.35 219.09,-469.19 218.4,-480.06"></path> </g> <!-- 50 H1 --> <g id="node50" class="node">
 <title>
 50 H1
 </title>
-<ellipse fill="none" stroke="black" cx="262.31" cy="-468.57" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="262.31" y="-464.37" font-family="Times,serif" font-size="14.00">50 H1</text> </g> <!-- 49 CT&#45;&#45;50 H1 --> <g id="edge48" class="edge">
+<ellipse fill="none" stroke="black" cx="324.83" cy="-482.13" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="324.83" y="-477.93" font-family="Times,serif" font-size="14.00">50 H1</text> </g> <!-- 49 CT&#45;&#45;50 H1 --> <g id="edge48" class="edge">
 <title>
 49 CT–50 H1
 </title>
-<path fill="none" stroke="black" d="M238.99,-475.8C239.09,-475.77 239.19,-475.74 239.28,-475.71"></path> </g> <!-- 51 CT --> <g id="node51" class="node">
+<path fill="none" stroke="black" d="M250.23,-505.19C263.3,-501.14 278.2,-496.54 291.23,-492.51"></path> </g> <!-- 51 CT --> <g id="node51" class="node">
 <title>
 51 CT
 </title>
-<ellipse fill="none" stroke="black" cx="119.22" cy="-510.92" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="119.22" y="-506.72" font-family="Times,serif" font-size="14.00">51 CT</text> </g> <!-- 49 CT&#45;&#45;51 CT --> <g id="edge49" class="edge">
+<ellipse fill="none" stroke="black" cx="139.01" cy="-540.41" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="139.01" y="-536.21" font-family="Times,serif" font-size="14.00">51 CT</text> </g> <!-- 49 CT&#45;&#45;51 CT --> <g id="edge49" class="edge">
 <title>
 49 CT–51 CT
 </title>
-<path fill="none" stroke="black" d="M170.6,-496.2C164.91,-497.83 159.02,-499.52 153.34,-501.15"></path> </g> <!-- 55 C --> <g id="node52" class="node">
+<path fill="none" stroke="black" d="M182.08,-526.62C179.02,-527.6 175.91,-528.6 172.85,-529.58"></path> </g> <!-- 55 C --> <g id="node52" class="node">
 <title>
 55 C
 </title>
-<ellipse fill="none" stroke="black" cx="264.37" cy="-560.08" rx="29.6" ry="29.6"></ellipse> <text text-anchor="middle" x="264.37" y="-555.88" font-family="Times,serif" font-size="14.00">55 C</text> </g> <!-- 49 CT&#45;&#45;55 C --> <g id="edge50" class="edge">
+<ellipse fill="none" stroke="black" cx="289.35" cy="-583.08" rx="29.6" ry="29.6"></ellipse> <text text-anchor="middle" x="289.35" y="-578.88" font-family="Times,serif" font-size="14.00">55 C</text> </g> <!-- 49 CT&#45;&#45;55 C --> <g id="edge50" class="edge">
 <title>
 49 CT–55 C
 </title>
-<path fill="none" stroke="black" d="M227.44,-514.22C233.48,-521.73 239.95,-529.76 245.76,-536.97"></path> </g> <!-- 52 HC --> <g id="node53" class="node">
+<path fill="none" stroke="black" d="M242.57,-540.04C250.76,-547.58 259.69,-555.79 267.53,-563.01"></path> </g> <!-- 52 HC --> <g id="node53" class="node">
 <title>
 52 HC
 </title>
-<ellipse fill="none" stroke="black" cx="36.52" cy="-533.14" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="36.52" y="-528.94" font-family="Times,serif" font-size="14.00">52 HC</text> </g> <!-- 51 CT&#45;&#45;52 HC --> <g id="edge51" class="edge">
+<ellipse fill="none" stroke="black" cx="36.52" cy="-577.43" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="36.52" y="-573.23" font-family="Times,serif" font-size="14.00">52 HC</text> </g> <!-- 51 CT&#45;&#45;52 HC --> <g id="edge51" class="edge">
 <title>
 51 CT–52 HC
 </title>
-<path fill="none" stroke="black" d="M84.63,-520.22C80.47,-521.34 76.21,-522.48 72.04,-523.6"></path> </g> <!-- 53 HC --> <g id="node54" class="node">
+<path fill="none" stroke="black" d="M105.45,-552.53C94.48,-556.49 82.27,-560.9 71.21,-564.9"></path> </g> <!-- 53 HC --> <g id="node54" class="node">
 <title>
 53 HC
 </title>
-<ellipse fill="none" stroke="black" cx="72.71" cy="-578.11" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="72.71" y="-573.91" font-family="Times,serif" font-size="14.00">53 HC</text> </g> <!-- 51 CT&#45;&#45;53 HC --> <g id="edge52" class="edge">
+<ellipse fill="none" stroke="black" cx="58.81" cy="-727.5" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="58.81" y="-723.3" font-family="Times,serif" font-size="14.00">53 HC</text> </g> <!-- 51 CT&#45;&#45;53 HC --> <g id="edge52" class="edge">
 <title>
 51 CT–53 HC
 </title>
-<path fill="none" stroke="black" d="M98.96,-540.2C97.19,-542.74 95.41,-545.32 93.64,-547.87"></path> </g> <!-- 54 HC --> <g id="node55" class="node">
+<path fill="none" stroke="black" d="M125.04,-573C110.54,-606.81 87.98,-659.45 73.3,-693.71"></path> </g> <!-- 54 HC --> <g id="node55" class="node">
 <title>
 54 HC
 </title>
-<ellipse fill="none" stroke="black" cx="48.1" cy="-475.76" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="48.1" y="-471.56" font-family="Times,serif" font-size="14.00">54 HC</text> </g> <!-- 51 CT&#45;&#45;54 HC --> <g id="edge53" class="edge">
+<ellipse fill="none" stroke="black" cx="45.63" cy="-445.99" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="45.63" y="-441.79" font-family="Times,serif" font-size="14.00">54 HC</text> </g> <!-- 51 CT&#45;&#45;54 HC --> <g id="edge53" class="edge">
 <title>
 51 CT–54 HC
 </title>
-<path fill="none" stroke="black" d="M87.4,-495.19C85.33,-494.17 83.24,-493.14 81.17,-492.11"></path> </g> <!-- 56 O --> <g id="node56" class="node">
+<path fill="none" stroke="black" d="M113.98,-515.1C100.8,-501.78 84.66,-485.45 71.37,-472.02"></path> </g> <!-- 56 O --> <g id="node56" class="node">
 <title>
 56 O
 </title>
-<ellipse fill="none" stroke="black" cx="210.18" cy="-612.93" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="210.18" y="-608.73" font-family="Times,serif" font-size="14.00">56 O</text> </g> <!-- 55 C&#45;&#45;56 O --> <g id="edge54" class="edge">
+<ellipse fill="none" stroke="black" cx="204.24" cy="-701.05" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="204.24" y="-696.85" font-family="Times,serif" font-size="14.00">56 O</text> </g> <!-- 55 C&#45;&#45;56 O --> <g id="edge54" class="edge">
 <title>
 55 C–56 O
 </title>
-<path fill="none" stroke="black" d="M242.95,-580.97C239.29,-584.55 235.47,-588.27 231.8,-591.85"></path> </g> <!-- 57 N --> <g id="node57" class="node">
+<path fill="none" stroke="black" d="M271.92,-607.24C257.33,-627.46 236.6,-656.19 221.93,-676.52"></path> </g> <!-- 57 N --> <g id="node57" class="node">
 <title>
 57 N
 </title>
-<ellipse fill="none" stroke="black" cx="333.52" cy="-616.16" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="333.52" y="-611.96" font-family="Times,serif" font-size="14.00">57 N</text> </g> <!-- 55 C&#45;&#45;57 N --> <g id="edge55" class="edge">
+<ellipse fill="none" stroke="black" cx="339.77" cy="-652.6" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="339.77" y="-648.4" font-family="Times,serif" font-size="14.00">57 N</text> </g> <!-- 55 C&#45;&#45;57 N --> <g id="edge55" class="edge">
 <title>
 55 C–57 N
 </title>
-<path fill="none" stroke="black" d="M287.4,-578.76C294.62,-584.62 302.61,-591.1 309.88,-596.99"></path> </g> <!-- 58 H --> <g id="node58" class="node">
+<path fill="none" stroke="black" d="M306.7,-607C311.6,-613.76 316.94,-621.12 321.87,-627.92"></path> </g> <!-- 58 H --> <g id="node58" class="node">
 <title>
 58 H
 </title>
-<ellipse fill="none" stroke="black" cx="393.19" cy="-564.9" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="393.19" y="-560.7" font-family="Times,serif" font-size="14.00">58 H</text> </g> <!-- 57 N&#45;&#45;58 H --> <g id="edge56" class="edge">
+<ellipse fill="none" stroke="black" cx="457.28" cy="-522.96" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="457.28" y="-518.76" font-family="Times,serif" font-size="14.00">58 H</text> </g> <!-- 57 N&#45;&#45;58 H --> <g id="edge56" class="edge">
 <title>
 57 N–58 H
 </title>
-<path fill="none" stroke="black" d="M356.42,-596.49C360.89,-592.65 365.58,-588.62 370.06,-584.77"></path> </g> <!-- 59 CT --> <g id="node59" class="node">
+<path fill="none" stroke="black" d="M360.24,-630.02C381.81,-606.22 415.56,-568.98 437.04,-545.28"></path> </g> <!-- 59 CT --> <g id="node59" class="node">
 <title>
 59 CT
 </title>
-<ellipse fill="none" stroke="black" cx="385.86" cy="-691.7" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="385.86" y="-687.5" font-family="Times,serif" font-size="14.00">59 CT</text> </g> <!-- 57 N&#45;&#45;59 CT --> <g id="edge57" class="edge">
+<ellipse fill="none" stroke="black" cx="398.99" cy="-731.78" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="398.99" y="-727.58" font-family="Times,serif" font-size="14.00">59 CT</text> </g> <!-- 57 N&#45;&#45;59 CT --> <g id="edge57" class="edge">
 <title>
 57 N–59 CT
 </title>
-<path fill="none" stroke="black" d="M350.65,-640.89C355.42,-647.78 360.65,-655.32 365.58,-662.44"></path> </g> <!-- 60 H1 --> <g id="node60" class="node">
+<path fill="none" stroke="black" d="M357.86,-676.78C364.12,-685.15 371.19,-694.61 377.69,-703.29"></path> </g> <!-- 60 H1 --> <g id="node60" class="node">
 <title>
 60 H1
 </title>
-<ellipse fill="none" stroke="black" cx="431.25" cy="-663.51" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="431.25" y="-659.31" font-family="Times,serif" font-size="14.00">60 H1</text> </g> <!-- 59 CT&#45;&#45;60 H1 --> <g id="edge58" class="edge">
+<ellipse fill="none" stroke="black" cx="460.29" cy="-648.32" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="460.29" y="-644.12" font-family="Times,serif" font-size="14.00">60 H1</text> </g> <!-- 59 CT&#45;&#45;60 H1 --> <g id="edge58" class="edge">
 <title>
 59 CT–60 H1
 </title>
-<path fill="none" stroke="black" d="M416.13,-672.9C416.26,-672.82 416.39,-672.74 416.52,-672.66"></path> </g> <!-- 61 CT --> <g id="node61" class="node">
+<path fill="none" stroke="black" d="M420.09,-703.06C426.39,-694.48 433.29,-685.08 439.57,-676.53"></path> </g> <!-- 61 CT --> <g id="node61" class="node">
 <title>
 61 CT
 </title>
-<ellipse fill="none" stroke="black" cx="488.43" cy="-683.98" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="488.43" y="-679.78" font-family="Times,serif" font-size="14.00">61 CT</text> </g> <!-- 59 CT&#45;&#45;61 CT --> <g id="edge59" class="edge">
+<ellipse fill="none" stroke="black" cx="513.68" cy="-722.35" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="513.68" y="-718.15" font-family="Times,serif" font-size="14.00">61 CT</text> </g> <!-- 59 CT&#45;&#45;61 CT --> <g id="edge59" class="edge">
 <title>
 59 CT–61 CT
 </title>
-<path fill="none" stroke="black" d="M421.45,-689.02C431.63,-688.25 442.73,-687.42 452.91,-686.65"></path> </g> <!-- 65 C --> <g id="node62" class="node">
+<path fill="none" stroke="black" d="M434.34,-728.87C448.29,-727.73 464.29,-726.41 478.25,-725.26"></path> </g> <!-- 65 C --> <g id="node62" class="node">
 <title>
 65 C
 </title>
-<ellipse fill="none" stroke="black" cx="361.12" cy="-775.87" rx="29.6" ry="29.6"></ellipse> <text text-anchor="middle" x="361.12" y="-771.67" font-family="Times,serif" font-size="14.00">65 C</text> </g> <!-- 59 CT&#45;&#45;65 C --> <g id="edge60" class="edge">
+<ellipse fill="none" stroke="black" cx="324.49" cy="-787.44" rx="29.6" ry="29.6"></ellipse> <text text-anchor="middle" x="324.49" y="-783.24" font-family="Times,serif" font-size="14.00">65 C</text> </g> <!-- 59 CT&#45;&#45;65 C --> <g id="edge60" class="edge">
 <title>
 59 CT–65 C
 </title>
-<path fill="none" stroke="black" d="M375.8,-725.94C373.71,-733.04 371.53,-740.45 369.51,-747.32"></path> </g> <!-- 62 HC --> <g id="node63" class="node">
+<path fill="none" stroke="black" d="M370.4,-753.14C363.18,-758.53 355.5,-764.27 348.53,-769.48"></path> </g> <!-- 62 HC --> <g id="node63" class="node">
 <title>
 62 HC
 </title>
-<ellipse fill="none" stroke="black" cx="549.83" cy="-624.89" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="549.83" y="-620.69" font-family="Times,serif" font-size="14.00">62 HC</text> </g> <!-- 61 CT&#45;&#45;62 HC --> <g id="edge61" class="edge">
+<ellipse fill="none" stroke="black" cx="597.16" cy="-495.76" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="597.16" y="-491.56" font-family="Times,serif" font-size="14.00">62 HC</text> </g> <!-- 61 CT&#45;&#45;62 HC --> <g id="edge61" class="edge">
 <title>
 61 CT–62 HC
 </title>
-<path fill="none" stroke="black" d="M514.11,-659.26C517.14,-656.35 520.23,-653.38 523.26,-650.46"></path> </g> <!-- 63 HC --> <g id="node64" class="node">
+<path fill="none" stroke="black" d="M525.99,-688.92C541.69,-646.32 568.67,-573.09 584.51,-530.08"></path> </g> <!-- 63 HC --> <g id="node64" class="node">
 <title>
 63 HC
 </title>
-<ellipse fill="none" stroke="black" cx="571.63" cy="-683.07" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="571.63" y="-678.87" font-family="Times,serif" font-size="14.00">63 HC</text> </g> <!-- 61 CT&#45;&#45;63 HC --> <g id="edge62" class="edge">
+<ellipse fill="none" stroke="black" cx="612.87" cy="-696.96" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="612.87" y="-692.76" font-family="Times,serif" font-size="14.00">63 HC</text> </g> <!-- 61 CT&#45;&#45;63 HC --> <g id="edge62" class="edge">
 <title>
 61 CT–63 HC
 </title>
-<path fill="none" stroke="black" d="M524.2,-683.59C527.81,-683.55 531.48,-683.51 535.1,-683.47"></path> </g> <!-- 64 HC --> <g id="node65" class="node">
+<path fill="none" stroke="black" d="M548.09,-713.54C557.49,-711.14 567.7,-708.52 577.17,-706.1"></path> </g> <!-- 64 HC --> <g id="node65" class="node">
 <title>
 64 HC
 </title>
-<ellipse fill="none" stroke="black" cx="543.27" cy="-742.76" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="543.27" y="-738.56" font-family="Times,serif" font-size="14.00">64 HC</text> </g> <!-- 61 CT&#45;&#45;64 HC --> <g id="edge63" class="edge">
+<ellipse fill="none" stroke="black" cx="601.37" cy="-857.89" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="601.37" y="-853.69" font-family="Times,serif" font-size="14.00">64 HC</text> </g> <!-- 61 CT&#45;&#45;64 HC --> <g id="edge63" class="edge">
 <title>
 61 CT–64 HC
 </title>
-<path fill="none" stroke="black" d="M512.64,-709.93C514.48,-711.9 516.34,-713.89 518.18,-715.86"></path> </g> <!-- 66 O --> <g id="node66" class="node">
+<path fill="none" stroke="black" d="M533.14,-752.43C547.47,-774.58 566.89,-804.6 581.35,-826.95"></path> </g> <!-- 66 O --> <g id="node66" class="node">
 <title>
 66 O
 </title>
-<ellipse fill="none" stroke="black" cx="425.55" cy="-817.36" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="425.55" y="-813.16" font-family="Times,serif" font-size="14.00">66 O</text> </g> <!-- 65 C&#45;&#45;66 O --> <g id="edge64" class="edge">
+<ellipse fill="none" stroke="black" cx="478.58" cy="-870.54" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="478.58" y="-866.34" font-family="Times,serif" font-size="14.00">66 O</text> </g> <!-- 65 C&#45;&#45;66 O --> <g id="edge64" class="edge">
 <title>
 65 C–66 O
 </title>
-<path fill="none" stroke="black" d="M386.22,-792.03C390.74,-794.95 395.46,-797.99 400,-800.91"></path> </g> <!-- 67 N --> <g id="node67" class="node">
+<path fill="none" stroke="black" d="M350.63,-801.53C378.88,-816.77 423.65,-840.92 452.05,-856.23"></path> </g> <!-- 67 N --> <g id="node67" class="node">
 <title>
 67 N
 </title>
-<ellipse fill="none" stroke="black" cx="327.1" cy="-856.29" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="327.1" y="-852.09" font-family="Times,serif" font-size="14.00">67 N</text> </g> <!-- 65 C&#45;&#45;67 N --> <g id="edge65" class="edge">
+<ellipse fill="none" stroke="black" cx="324.03" cy="-876.73" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="324.03" y="-872.53" font-family="Times,serif" font-size="14.00">67 N</text> </g> <!-- 65 C&#45;&#45;67 N --> <g id="edge65" class="edge">
 <title>
 65 C–67 N
 </title>
-<path fill="none" stroke="black" d="M349.6,-803.1C346.13,-811.3 342.32,-820.31 338.84,-828.55"></path> </g> <!-- 68 H --> <g id="node68" class="node">
+<path fill="none" stroke="black" d="M324.34,-817.17C324.29,-826.61 324.24,-837.05 324.19,-846.52"></path> </g> <!-- 68 H --> <g id="node68" class="node">
 <title>
 68 H
 </title>
-<ellipse fill="none" stroke="black" cx="249.14" cy="-875.71" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="249.14" y="-871.51" font-family="Times,serif" font-size="14.00">68 H</text> </g> <!-- 67 N&#45;&#45;68 H --> <g id="edge66" class="edge">
+<ellipse fill="none" stroke="black" cx="118.46" cy="-892.27" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="118.46" y="-888.07" font-family="Times,serif" font-size="14.00">68 H</text> </g> <!-- 67 N&#45;&#45;68 H --> <g id="edge66" class="edge">
 <title>
 67 N–68 H
 </title>
-<path fill="none" stroke="black" d="M297.63,-863.64C291.33,-865.2 284.68,-866.86 278.4,-868.43"></path> </g> <!-- 69 CT --> <g id="node69" class="node">
+<path fill="none" stroke="black" d="M293.7,-879.03C254.72,-881.97 187.46,-887.05 148.58,-889.99"></path> </g> <!-- 69 CT --> <g id="node69" class="node">
 <title>
 69 CT
 </title>
-<ellipse fill="none" stroke="black" cx="341.33" cy="-941.79" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="341.33" y="-937.59" font-family="Times,serif" font-size="14.00">69 CT</text> </g> <!-- 67 N&#45;&#45;69 CT --> <g id="edge67" class="edge">
+<ellipse fill="none" stroke="black" cx="356.11" cy="-968.93" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="356.11" y="-964.73" font-family="Times,serif" font-size="14.00">69 CT</text> </g> <!-- 67 N&#45;&#45;69 CT --> <g id="edge67" class="edge">
 <title>
 67 N–69 CT
 </title>
-<path fill="none" stroke="black" d="M332.08,-886.2C333.18,-892.84 334.37,-899.94 335.5,-906.77"></path> </g> <!-- 70 H1 --> <g id="node70" class="node">
+<path fill="none" stroke="black" d="M333.92,-905.15C337.23,-914.67 340.96,-925.38 344.4,-935.27"></path> </g> <!-- 70 H1 --> <g id="node70" class="node">
 <title>
 70 H1
 </title>
-<ellipse fill="none" stroke="black" cx="414.29" cy="-985.33" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="414.29" y="-981.13" font-family="Times,serif" font-size="14.00">70 H1</text> </g> <!-- 69 CT&#45;&#45;70 H1 --> <g id="edge68" class="edge">
+<ellipse fill="none" stroke="black" cx="558.55" cy="-1040.31" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="558.55" y="-1036.11" font-family="Times,serif" font-size="14.00">70 H1</text> </g> <!-- 69 CT&#45;&#45;70 H1 --> <g id="edge68" class="edge">
 <title>
 69 CT–70 H1
 </title>
-<path fill="none" stroke="black" d="M371.85,-960C375.91,-962.42 380.07,-964.91 384.13,-967.33"></path> </g> <!-- 71 H1 --> <g id="node71" class="node">
+<path fill="none" stroke="black" d="M389.99,-980.88C427.7,-994.17 488.22,-1015.51 525.56,-1028.68"></path> </g> <!-- 71 H1 --> <g id="node71" class="node">
 <title>
 71 H1
 </title>
-<ellipse fill="none" stroke="black" cx="271.48" cy="-992.06" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="271.48" y="-987.86" font-family="Times,serif" font-size="14.00">71 H1</text> </g> <!-- 69 CT&#45;&#45;71 H1 --> <g id="edge69" class="edge">
+<ellipse fill="none" stroke="black" cx="126.54" cy="-1056.11" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="126.54" y="-1051.91" font-family="Times,serif" font-size="14.00">71 H1</text> </g> <!-- 69 CT&#45;&#45;71 H1 --> <g id="edge69" class="edge">
 <title>
 69 CT–71 H1
 </title>
-<path fill="none" stroke="black" d="M312.52,-962.53C308.46,-965.45 304.29,-968.45 300.23,-971.37"></path> </g> <!-- 72 H1 --> <g id="node72" class="node">
+<path fill="none" stroke="black" d="M322.73,-981.61C278.96,-998.23 202.64,-1027.21 159.22,-1043.7"></path> </g> <!-- 72 H1 --> <g id="node72" class="node">
 <title>
 72 H1
 </title>
-<ellipse fill="none" stroke="black" cx="345.49" cy="-1019.31" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="345.49" y="-1015.11" font-family="Times,serif" font-size="14.00">72 H1</text> </g> <!-- 69 CT&#45;&#45;72 H1 --> <g id="edge70" class="edge">
+<ellipse fill="none" stroke="black" cx="360.57" cy="-1079.54" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="360.57" y="-1075.34" font-family="Times,serif" font-size="14.00">72 H1</text> </g> <!-- 69 CT&#45;&#45;72 H1 --> <g id="edge70" class="edge">
 <title>
 69 CT–72 H1
 </title>
-<path fill="none" stroke="black" d="M343.24,-977.37C343.36,-979.6 343.48,-981.84 343.6,-984.07"></path> </g> </g>
+<path fill="none" stroke="black" d="M357.55,-1004.54C358.06,-1017.29 358.64,-1031.66 359.15,-1044.38"></path> </g> </g>
 </svg>
 </div>
 <p></p><figcaption class="figure-caption">Figure&nbsp;2: A diagram of the hexala topology</figcaption><p></p>
@@ -1343,580 +1343,580 @@ G
 <div id="fig-hexala-move" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <div>
-<svg width="672" height="480" viewbox="0.00 0.00 1099.19 1325.45" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="; max-width: none; max-height: none">
-<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 1321.45)">
+<svg width="672" height="480" viewbox="0.00 0.00 1259.76 1960.38" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="; max-width: none; max-height: none">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 1956.38)">
 <title>
 G
 </title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-1321.45 1095.19,-1321.45 1095.19,4 -4,4"></polygon> <!-- 1 CT --> <g id="node1" class="node">
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-1956.38 1255.76,-1956.38 1255.76,4 -4,4"></polygon> <!-- 1 CT --> <g id="node1" class="node">
 <title>
 1 CT
 </title>
-<ellipse fill="none" stroke="black" cx="729.47" cy="-442.88" rx="30.74" ry="30.74"></ellipse> <text text-anchor="middle" x="729.47" y="-438.68" font-family="Times,serif" font-size="14.00">1 CT</text> </g> <!-- 2 HC --> <g id="node2" class="node">
+<ellipse fill="none" stroke="black" cx="882.34" cy="-1037.46" rx="30.74" ry="30.74"></ellipse> <text text-anchor="middle" x="882.34" y="-1033.26" font-family="Times,serif" font-size="14.00">1 CT</text> </g> <!-- 2 HC --> <g id="node2" class="node">
 <title>
 2 HC
 </title>
-<ellipse fill="none" stroke="black" cx="775.77" cy="-371.69" rx="31.89" ry="31.89"></ellipse> <text text-anchor="middle" x="775.77" y="-367.49" font-family="Times,serif" font-size="14.00">2 HC</text> </g> <!-- 1 CT&#45;&#45;2 HC --> <g id="edge1" class="edge">
+<ellipse fill="none" stroke="black" cx="1008.82" cy="-942.23" rx="31.89" ry="31.89"></ellipse> <text text-anchor="middle" x="1008.82" y="-938.03" font-family="Times,serif" font-size="14.00">2 HC</text> </g> <!-- 1 CT&#45;&#45;2 HC --> <g id="edge1" class="edge">
 <title>
 1 CT–2 HC
 </title>
-<path fill="none" stroke="black" d="M746.19,-417.18C750.12,-411.13 754.33,-404.66 758.3,-398.56"></path> </g> <!-- 3 HC --> <g id="node3" class="node">
+<path fill="none" stroke="black" d="M907.03,-1018.87C929.02,-1002.31 961.09,-978.17 983.33,-961.43"></path> </g> <!-- 3 HC --> <g id="node3" class="node">
 <title>
 3 HC
 </title>
-<ellipse fill="none" stroke="black" cx="697.95" cy="-371.76" rx="31.89" ry="31.89"></ellipse> <text text-anchor="middle" x="697.95" y="-367.56" font-family="Times,serif" font-size="14.00">3 HC</text> </g> <!-- 1 CT&#45;&#45;3 HC --> <g id="edge2" class="edge">
+<ellipse fill="none" stroke="black" cx="813.37" cy="-931.69" rx="31.89" ry="31.89"></ellipse> <text text-anchor="middle" x="813.37" y="-927.49" font-family="Times,serif" font-size="14.00">3 HC</text> </g> <!-- 1 CT&#45;&#45;3 HC --> <g id="edge2" class="edge">
 <title>
 1 CT–3 HC
 </title>
-<path fill="none" stroke="black" d="M717.01,-414.77C715.01,-410.27 712.94,-405.6 710.94,-401.07"></path> </g> <!-- 4 HC --> <g id="node4" class="node">
+<path fill="none" stroke="black" d="M865.47,-1011.58C854.94,-995.44 841.42,-974.7 830.79,-958.4"></path> </g> <!-- 4 HC --> <g id="node4" class="node">
 <title>
 4 HC
 </title>
-<ellipse fill="none" stroke="black" cx="644.48" cy="-429.63" rx="31.89" ry="31.89"></ellipse> <text text-anchor="middle" x="644.48" y="-425.43" font-family="Times,serif" font-size="14.00">4 HC</text> </g> <!-- 1 CT&#45;&#45;4 HC --> <g id="edge3" class="edge">
+<ellipse fill="none" stroke="black" cx="756.54" cy="-1035.5" rx="31.89" ry="31.89"></ellipse> <text text-anchor="middle" x="756.54" y="-1031.3" font-family="Times,serif" font-size="14.00">4 HC</text> </g> <!-- 1 CT&#45;&#45;4 HC --> <g id="edge3" class="edge">
 <title>
 1 CT–4 HC
 </title>
-<path fill="none" stroke="black" d="M698.78,-438.1C691.37,-436.94 683.43,-435.7 675.97,-434.54"></path> </g> <!-- 5 C --> <g id="node5" class="node">
+<path fill="none" stroke="black" d="M851.56,-1036.98C832.36,-1036.68 807.7,-1036.29 788.31,-1035.99"></path> </g> <!-- 5 C --> <g id="node5" class="node">
 <title>
 5 C
 </title>
-<ellipse fill="none" stroke="black" cx="754.14" cy="-526.17" rx="24.94" ry="24.94"></ellipse> <text text-anchor="middle" x="754.14" y="-521.97" font-family="Times,serif" font-size="14.00">5 C</text> </g> <!-- 1 CT&#45;&#45;5 C --> <g id="edge4" class="edge">
+<ellipse fill="none" stroke="black" cx="898.68" cy="-1129.32" rx="24.94" ry="24.94"></ellipse> <text text-anchor="middle" x="898.68" y="-1125.12" font-family="Times,serif" font-size="14.00">5 C</text> </g> <!-- 1 CT&#45;&#45;5 C --> <g id="edge4" class="edge">
 <title>
 1 CT–5 C
 </title>
-<path fill="none" stroke="black" d="M738.24,-472.48C741.15,-482.3 744.34,-493.09 747.11,-502.41"></path> </g> <!-- 6 O --> <g id="node6" class="node">
+<path fill="none" stroke="black" d="M887.73,-1067.79C889.87,-1079.81 892.3,-1093.45 894.32,-1104.82"></path> </g> <!-- 6 O --> <g id="node6" class="node">
 <title>
 6 O
 </title>
-<ellipse fill="none" stroke="black" cx="675.94" cy="-544.32" rx="25.01" ry="25.01"></ellipse> <text text-anchor="middle" x="675.94" y="-540.12" font-family="Times,serif" font-size="14.00">6 O</text> </g> <!-- 5 C&#45;&#45;6 O --> <g id="edge5" class="edge">
+<ellipse fill="none" stroke="black" cx="774.78" cy="-1205.79" rx="25.01" ry="25.01"></ellipse> <text text-anchor="middle" x="774.78" y="-1201.59" font-family="Times,serif" font-size="14.00">6 O</text> </g> <!-- 5 C&#45;&#45;6 O --> <g id="edge5" class="edge">
 <title>
 5 C–6 O
 </title>
-<path fill="none" stroke="black" d="M729.83,-531.81C720.59,-533.96 710.06,-536.4 700.78,-538.55"></path> </g> <!-- 7 N --> <g id="node7" class="node">
+<path fill="none" stroke="black" d="M877.38,-1142.46C854.83,-1156.39 819.4,-1178.25 796.64,-1192.31"></path> </g> <!-- 7 N --> <g id="node7" class="node">
 <title>
 7 N
 </title>
-<ellipse fill="none" stroke="black" cx="818.74" cy="-585.28" rx="25.01" ry="25.01"></ellipse> <text text-anchor="middle" x="818.74" y="-581.08" font-family="Times,serif" font-size="14.00">7 N</text> </g> <!-- 5 C&#45;&#45;7 N --> <g id="edge6" class="edge">
+<ellipse fill="none" stroke="black" cx="925.4" cy="-1219.98" rx="25.01" ry="25.01"></ellipse> <text text-anchor="middle" x="925.4" y="-1215.78" font-family="Times,serif" font-size="14.00">7 N</text> </g> <!-- 5 C&#45;&#45;7 N --> <g id="edge6" class="edge">
 <title>
 5 C–7 N
 </title>
-<path fill="none" stroke="black" d="M772.48,-542.95C780.98,-550.73 791.09,-559.97 799.68,-567.84"></path> </g> <!-- 8 H --> <g id="node8" class="node">
+<path fill="none" stroke="black" d="M905.7,-1153.14C909.57,-1166.26 914.36,-1182.5 918.25,-1195.69"></path> </g> <!-- 8 H --> <g id="node8" class="node">
 <title>
 8 H
 </title>
-<ellipse fill="none" stroke="black" cx="860.85" cy="-517.59" rx="25.01" ry="25.01"></ellipse> <text text-anchor="middle" x="860.85" y="-513.39" font-family="Times,serif" font-size="14.00">8 H</text> </g> <!-- 7 N&#45;&#45;8 H --> <g id="edge7" class="edge">
+<ellipse fill="none" stroke="black" cx="1035.35" cy="-1070.01" rx="25.01" ry="25.01"></ellipse> <text text-anchor="middle" x="1035.35" y="-1065.81" font-family="Times,serif" font-size="14.00">8 H</text> </g> <!-- 7 N&#45;&#45;8 H --> <g id="edge7" class="edge">
 <title>
 7 N–8 H
 </title>
-<path fill="none" stroke="black" d="M832.3,-563.49C837.1,-555.76 842.51,-547.07 847.32,-539.34"></path> </g> <!-- 9 CT --> <g id="node9" class="node">
+<path fill="none" stroke="black" d="M940.46,-1199.45C961.4,-1170.89 999.09,-1119.47 1020.12,-1090.78"></path> </g> <!-- 9 CT --> <g id="node9" class="node">
 <title>
 9 CT
 </title>
-<ellipse fill="none" stroke="black" cx="880.5" cy="-657.2" rx="30.74" ry="30.74"></ellipse> <text text-anchor="middle" x="880.5" y="-653" font-family="Times,serif" font-size="14.00">9 CT</text> </g> <!-- 7 N&#45;&#45;9 CT --> <g id="edge8" class="edge">
+<ellipse fill="none" stroke="black" cx="1017.98" cy="-1269.86" rx="30.74" ry="30.74"></ellipse> <text text-anchor="middle" x="1017.98" y="-1265.66" font-family="Times,serif" font-size="14.00">9 CT</text> </g> <!-- 7 N&#45;&#45;9 CT --> <g id="edge8" class="edge">
 <title>
 7 N–9 CT
 </title>
-<path fill="none" stroke="black" d="M835.29,-604.55C843.01,-613.54 852.26,-624.31 860.38,-633.77"></path> </g> <!-- 10 H1 --> <g id="node10" class="node">
+<path fill="none" stroke="black" d="M947.82,-1232.06C960.77,-1239.03 977.15,-1247.86 990.83,-1255.23"></path> </g> <!-- 10 H1 --> <g id="node10" class="node">
 <title>
 10 H1
 </title>
-<ellipse fill="none" stroke="black" cx="906.25" cy="-611.46" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="906.25" y="-607.26" font-family="Times,serif" font-size="14.00">10 H1</text> </g> <!-- 9 CT&#45;&#45;10 H1 --> <g id="edge9" class="edge">
+<ellipse fill="none" stroke="black" cx="1056.39" cy="-1175.99" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="1056.39" y="-1171.79" font-family="Times,serif" font-size="14.00">10 H1</text> </g> <!-- 9 CT&#45;&#45;10 H1 --> <g id="edge9" class="edge">
 <title>
 9 CT–10 H1
 </title>
-<path fill="none" stroke="black" d="M895.63,-630.33C895.72,-630.17 895.8,-630.02 895.89,-629.86"></path> </g> <!-- 11 CT --> <g id="node11" class="node">
+<path fill="none" stroke="black" d="M1029.61,-1241.44C1033.85,-1231.08 1038.67,-1219.29 1043.05,-1208.59"></path> </g> <!-- 11 CT --> <g id="node11" class="node">
 <title>
 11 CT
 </title>
-<ellipse fill="none" stroke="black" cx="977.46" cy="-629.02" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="977.46" y="-624.82" font-family="Times,serif" font-size="14.00">11 CT</text> </g> <!-- 9 CT&#45;&#45;11 CT --> <g id="edge10" class="edge">
+<ellipse fill="none" stroke="black" cx="1123.22" cy="-1246.17" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="1123.22" y="-1241.97" font-family="Times,serif" font-size="14.00">11 CT</text> </g> <!-- 9 CT&#45;&#45;11 CT --> <g id="edge10" class="edge">
 <title>
 9 CT–11 CT
 </title>
-<path fill="none" stroke="black" d="M910.12,-648.59C920.59,-645.55 932.45,-642.1 943.27,-638.96"></path> </g> <!-- 15 C --> <g id="node12" class="node">
+<path fill="none" stroke="black" d="M1047.86,-1263.13C1060.5,-1260.29 1075.3,-1256.95 1088.43,-1254"></path> </g> <!-- 15 C --> <g id="node12" class="node">
 <title>
 15 C
 </title>
-<ellipse fill="none" stroke="black" cx="864.47" cy="-742.82" rx="29.6" ry="29.6"></ellipse> <text text-anchor="middle" x="864.47" y="-738.62" font-family="Times,serif" font-size="14.00">15 C</text> </g> <!-- 9 CT&#45;&#45;15 C --> <g id="edge11" class="edge">
+<ellipse fill="none" stroke="black" cx="985.9" cy="-1338.57" rx="29.6" ry="29.6"></ellipse> <text text-anchor="middle" x="985.9" y="-1334.37" font-family="Times,serif" font-size="14.00">15 C</text> </g> <!-- 9 CT&#45;&#45;15 C --> <g id="edge11" class="edge">
 <title>
 9 CT–15 C
 </title>
-<path fill="none" stroke="black" d="M874.81,-687.63C873.22,-696.09 871.51,-705.25 869.94,-713.64"></path> </g> <!-- 12 HC --> <g id="node13" class="node">
+<path fill="none" stroke="black" d="M1004.93,-1297.8C1002.78,-1302.41 1000.56,-1307.18 998.42,-1311.76"></path> </g> <!-- 12 HC --> <g id="node13" class="node">
 <title>
 12 HC
 </title>
-<ellipse fill="none" stroke="black" cx="1009.42" cy="-551.02" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="1009.42" y="-546.82" font-family="Times,serif" font-size="14.00">12 HC</text> </g> <!-- 11 CT&#45;&#45;12 HC --> <g id="edge12" class="edge">
+<ellipse fill="none" stroke="black" cx="1182.3" cy="-999.36" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="1182.3" y="-995.16" font-family="Times,serif" font-size="14.00">12 HC</text> </g> <!-- 11 CT&#45;&#45;12 HC --> <g id="edge12" class="edge">
 <title>
 11 CT–12 HC
 </title>
-<path fill="none" stroke="black" d="M991.01,-595.94C992.51,-592.29 994.04,-588.57 995.54,-584.9"></path> </g> <!-- 13 HC --> <g id="node14" class="node">
+<path fill="none" stroke="black" d="M1131.5,-1211.59C1142.68,-1164.89 1162.5,-1082.09 1173.8,-1034.91"></path> </g> <!-- 13 HC --> <g id="node14" class="node">
 <title>
 13 HC
 </title>
-<ellipse fill="none" stroke="black" cx="1054.67" cy="-596.92" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="1054.67" y="-592.72" font-family="Times,serif" font-size="14.00">13 HC</text> </g> <!-- 11 CT&#45;&#45;13 HC --> <g id="edge13" class="edge">
+<ellipse fill="none" stroke="black" cx="1209.61" cy="-1168.62" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="1209.61" y="-1164.42" font-family="Times,serif" font-size="14.00">13 HC</text> </g> <!-- 11 CT&#45;&#45;13 HC --> <g id="edge13" class="edge">
 <title>
 11 CT–13 HC
 </title>
-<path fill="none" stroke="black" d="M1010.2,-615.41C1013.66,-613.98 1017.17,-612.51 1020.64,-611.07"></path> </g> <!-- 14 HC --> <g id="node15" class="node">
+<path fill="none" stroke="black" d="M1149.61,-1222.48C1159.93,-1213.22 1171.77,-1202.59 1182.19,-1193.24"></path> </g> <!-- 14 HC --> <g id="node15" class="node">
 <title>
 14 HC
 </title>
-<ellipse fill="none" stroke="black" cx="1053.12" cy="-660.08" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="1053.12" y="-655.88" font-family="Times,serif" font-size="14.00">14 HC</text> </g> <!-- 11 CT&#45;&#45;14 HC --> <g id="edge14" class="edge">
+<ellipse fill="none" stroke="black" cx="1215.24" cy="-1324.83" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="1215.24" y="-1320.63" font-family="Times,serif" font-size="14.00">14 HC</text> </g> <!-- 11 CT&#45;&#45;14 HC --> <g id="edge14" class="edge">
 <title>
 11 CT–14 HC
 </title>
-<path fill="none" stroke="black" d="M1010.43,-642.56C1013.29,-643.73 1016.2,-644.93 1019.08,-646.11"></path> </g> <!-- 16 O --> <g id="node16" class="node">
+<path fill="none" stroke="black" d="M1150.33,-1269.34C1161.99,-1279.31 1175.62,-1290.96 1187.37,-1301"></path> </g> <!-- 16 O --> <g id="node16" class="node">
 <title>
 16 O
 </title>
-<ellipse fill="none" stroke="black" cx="938.02" cy="-765.67" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="938.02" y="-761.47" font-family="Times,serif" font-size="14.00">16 O</text> </g> <!-- 15 C&#45;&#45;16 O --> <g id="edge15" class="edge">
+<ellipse fill="none" stroke="black" cx="1137.43" cy="-1403.67" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="1137.43" y="-1399.47" font-family="Times,serif" font-size="14.00">16 O</text> </g> <!-- 15 C&#45;&#45;16 O --> <g id="edge15" class="edge">
 <title>
 15 C–16 O
 </title>
-<path fill="none" stroke="black" d="M892.7,-751.59C898.04,-753.25 903.65,-754.99 909.02,-756.66"></path> </g> <!-- 17 N --> <g id="node17" class="node">
+<path fill="none" stroke="black" d="M1013.34,-1350.36C1040.63,-1362.08 1082.28,-1379.97 1109.68,-1391.75"></path> </g> <!-- 17 N --> <g id="node17" class="node">
 <title>
 17 N
 </title>
-<ellipse fill="none" stroke="black" cx="828.35" cy="-823.22" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="828.35" y="-819.02" font-family="Times,serif" font-size="14.00">17 N</text> </g> <!-- 15 C&#45;&#45;17 N --> <g id="edge16" class="edge">
+<ellipse fill="none" stroke="black" cx="997.33" cy="-1432.1" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="997.33" y="-1427.9" font-family="Times,serif" font-size="14.00">17 N</text> </g> <!-- 15 C&#45;&#45;17 N --> <g id="edge16" class="edge">
 <title>
 15 C–17 N
 </title>
-<path fill="none" stroke="black" d="M852.24,-770.04C848.52,-778.33 844.42,-787.45 840.69,-795.76"></path> </g> <!-- 18 H --> <g id="node18" class="node">
+<path fill="none" stroke="black" d="M989.49,-1367.91C990.82,-1378.84 992.34,-1391.25 993.68,-1402.23"></path> </g> <!-- 18 H --> <g id="node18" class="node">
 <title>
 18 H
 </title>
-<ellipse fill="none" stroke="black" cx="756.11" cy="-795.24" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="756.11" y="-791.04" font-family="Times,serif" font-size="14.00">18 H</text> </g> <!-- 17 N&#45;&#45;18 H --> <g id="edge17" class="edge">
+<ellipse fill="none" stroke="black" cx="839.53" cy="-1345.03" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="839.53" y="-1340.83" font-family="Times,serif" font-size="14.00">18 H</text> </g> <!-- 17 N&#45;&#45;18 H --> <g id="edge17" class="edge">
 <title>
 17 N–18 H
 </title>
-<path fill="none" stroke="black" d="M800.21,-812.33C794.98,-810.3 789.52,-808.18 784.29,-806.16"></path> </g> <!-- 19 CT --> <g id="node19" class="node">
+<path fill="none" stroke="black" d="M970.92,-1417.53C941.79,-1401.46 895.19,-1375.74 866.03,-1359.65"></path> </g> <!-- 19 CT --> <g id="node19" class="node">
 <title>
 19 CT
 </title>
-<ellipse fill="none" stroke="black" cx="809.42" cy="-914.4" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="809.42" y="-910.2" font-family="Times,serif" font-size="14.00">19 CT</text> </g> <!-- 17 N&#45;&#45;19 CT --> <g id="edge18" class="edge">
+<ellipse fill="none" stroke="black" cx="978.18" cy="-1515.85" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="978.18" y="-1511.65" font-family="Times,serif" font-size="14.00">19 CT</text> </g> <!-- 17 N&#45;&#45;19 CT --> <g id="edge18" class="edge">
 <title>
 17 N–19 CT
 </title>
-<path fill="none" stroke="black" d="M822.21,-852.82C820.43,-861.35 818.49,-870.73 816.66,-879.55"></path> </g> <!-- 20 H1 --> <g id="node20" class="node">
+<path fill="none" stroke="black" d="M990.53,-1461.87C989.11,-1468.07 987.6,-1474.66 986.14,-1481.03"></path> </g> <!-- 20 H1 --> <g id="node20" class="node">
 <title>
 20 H1
 </title>
-<ellipse fill="none" stroke="black" cx="758.71" cy="-903.78" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="758.71" y="-899.58" font-family="Times,serif" font-size="14.00">20 H1</text> </g> <!-- 19 CT&#45;&#45;20 H1 --> <g id="edge19" class="edge">
+<ellipse fill="none" stroke="black" cx="884.45" cy="-1472.66" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="884.45" y="-1468.46" font-family="Times,serif" font-size="14.00">20 H1</text> </g> <!-- 19 CT&#45;&#45;20 H1 --> <g id="edge19" class="edge">
 <title>
 19 CT–20 H1
 </title>
-<path fill="none" stroke="black" d="M774.48,-907.08C774.34,-907.05 774.2,-907.02 774.07,-906.99"></path> </g> <!-- 21 CT --> <g id="node21" class="node">
+<path fill="none" stroke="black" d="M945.92,-1500.98C936.39,-1496.59 925.96,-1491.79 916.45,-1487.4"></path> </g> <!-- 21 CT --> <g id="node21" class="node">
 <title>
 21 CT
 </title>
-<ellipse fill="none" stroke="black" cx="711.6" cy="-942.63" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="711.6" y="-938.43" font-family="Times,serif" font-size="14.00">21 CT</text> </g> <!-- 19 CT&#45;&#45;21 CT --> <g id="edge20" class="edge">
+<ellipse fill="none" stroke="black" cx="860.36" cy="-1574.74" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="860.36" y="-1570.54" font-family="Times,serif" font-size="14.00">21 CT</text> </g> <!-- 19 CT&#45;&#45;21 CT --> <g id="edge20" class="edge">
 <title>
 19 CT–21 CT
 </title>
-<path fill="none" stroke="black" d="M775.2,-924.27C765.73,-927.01 755.44,-929.98 745.96,-932.71"></path> </g> <!-- 25 C --> <g id="node22" class="node">
+<path fill="none" stroke="black" d="M946.3,-1531.79C929.53,-1540.17 909.04,-1550.41 892.27,-1558.79"></path> </g> <!-- 25 C --> <g id="node22" class="node">
 <title>
 25 C
 </title>
-<ellipse fill="none" stroke="black" cx="864.83" cy="-982.1" rx="29.6" ry="29.6"></ellipse> <text text-anchor="middle" x="864.83" y="-977.9" font-family="Times,serif" font-size="14.00">25 C</text> </g> <!-- 19 CT&#45;&#45;25 C --> <g id="edge21" class="edge">
+<ellipse fill="none" stroke="black" cx="986.76" cy="-1594.41" rx="29.6" ry="29.6"></ellipse> <text text-anchor="middle" x="986.76" y="-1590.21" font-family="Times,serif" font-size="14.00">25 C</text> </g> <!-- 19 CT&#45;&#45;25 C --> <g id="edge21" class="edge">
 <title>
 19 CT–25 C
 </title>
-<path fill="none" stroke="black" d="M831.96,-941.93C836.63,-947.64 841.51,-953.6 846.03,-959.13"></path> </g> <!-- 22 HC --> <g id="node23" class="node">
+<path fill="none" stroke="black" d="M982.07,-1551.45C982.55,-1555.84 983.03,-1560.28 983.5,-1564.57"></path> </g> <!-- 22 HC --> <g id="node23" class="node">
 <title>
 22 HC
 </title>
-<ellipse fill="none" stroke="black" cx="631.52" cy="-967.63" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="631.52" y="-963.43" font-family="Times,serif" font-size="14.00">22 HC</text> </g> <!-- 21 CT&#45;&#45;22 HC --> <g id="edge22" class="edge">
+<ellipse fill="none" stroke="black" cx="756.52" cy="-1587.91" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="756.52" y="-1583.71" font-family="Times,serif" font-size="14.00">22 HC</text> </g> <!-- 21 CT&#45;&#45;22 HC --> <g id="edge22" class="edge">
 <title>
 21 CT–22 HC
 </title>
-<path fill="none" stroke="black" d="M677.64,-953.24C673.97,-954.38 670.24,-955.55 666.56,-956.69"></path> </g> <!-- 23 HC --> <g id="node24" class="node">
+<path fill="none" stroke="black" d="M824.92,-1579.24C814.58,-1580.55 803.26,-1581.98 792.87,-1583.3"></path> </g> <!-- 23 HC --> <g id="node24" class="node">
 <title>
 23 HC
 </title>
-<ellipse fill="none" stroke="black" cx="677.1" cy="-1013.89" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="677.1" y="-1009.69" font-family="Times,serif" font-size="14.00">23 HC</text> </g> <!-- 21 CT&#45;&#45;23 HC --> <g id="edge23" class="edge">
+<ellipse fill="none" stroke="black" cx="777.2" cy="-1745.31" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="777.2" y="-1741.11" font-family="Times,serif" font-size="14.00">23 HC</text> </g> <!-- 21 CT&#45;&#45;23 HC --> <g id="edge23" class="edge">
 <title>
 21 CT–23 HC
 </title>
-<path fill="none" stroke="black" d="M695.96,-974.93C695.04,-976.84 694.1,-978.77 693.17,-980.69"></path> </g> <!-- 24 HC --> <g id="node25" class="node">
+<path fill="none" stroke="black" d="M844.72,-1606.83C830.04,-1636.93 808.18,-1681.77 793.34,-1712.21"></path> </g> <!-- 24 HC --> <g id="node25" class="node">
 <title>
 24 HC
 </title>
-<ellipse fill="none" stroke="black" cx="635.2" cy="-905.67" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="635.2" y="-901.47" font-family="Times,serif" font-size="14.00">24 HC</text> </g> <!-- 21 CT&#45;&#45;24 HC --> <g id="edge24" class="edge">
+<ellipse fill="none" stroke="black" cx="759.26" cy="-1435.73" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="759.26" y="-1431.53" font-family="Times,serif" font-size="14.00">24 HC</text> </g> <!-- 21 CT&#45;&#45;24 HC --> <g id="edge24" class="edge">
 <title>
 21 CT–24 HC
 </title>
-<path fill="none" stroke="black" d="M679.64,-927.17C675.88,-925.35 672.03,-923.49 668.25,-921.66"></path> </g> <!-- 26 O --> <g id="node26" class="node">
+<path fill="none" stroke="black" d="M839.42,-1545.94C822.29,-1522.4 798.18,-1489.24 780.88,-1465.45"></path> </g> <!-- 26 O --> <g id="node26" class="node">
 <title>
 26 O
 </title>
-<ellipse fill="none" stroke="black" cx="940.68" cy="-967.84" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="940.68" y="-963.64" font-family="Times,serif" font-size="14.00">26 O</text> </g> <!-- 25 C&#45;&#45;26 O --> <g id="edge25" class="edge">
+<ellipse fill="none" stroke="black" cx="1160.57" cy="-1531.49" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="1160.57" y="-1527.29" font-family="Times,serif" font-size="14.00">26 O</text> </g> <!-- 25 C&#45;&#45;26 O --> <g id="edge25" class="edge">
 <title>
 25 C–26 O
 </title>
-<path fill="none" stroke="black" d="M893.94,-976.63C899.54,-975.57 905.41,-974.47 911.02,-973.41"></path> </g> <!-- 27 N --> <g id="node27" class="node">
+<path fill="none" stroke="black" d="M1014.69,-1584.31C1046.93,-1572.63 1099.68,-1553.54 1132.14,-1541.79"></path> </g> <!-- 27 N --> <g id="node27" class="node">
 <title>
 27 N
 </title>
-<ellipse fill="none" stroke="black" cx="890.29" cy="-1065.3" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="890.29" y="-1061.1" font-family="Times,serif" font-size="14.00">27 N</text> </g> <!-- 25 C&#45;&#45;27 N --> <g id="edge26" class="edge">
+<ellipse fill="none" stroke="black" cx="1036.76" cy="-1659.42" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="1036.76" y="-1655.22" font-family="Times,serif" font-size="14.00">27 N</text> </g> <!-- 25 C&#45;&#45;27 N --> <g id="edge26" class="edge">
 <title>
 25 C–27 N
 </title>
-<path fill="none" stroke="black" d="M873.59,-1010.73C876.12,-1019 878.89,-1028.04 881.42,-1036.33"></path> </g> <!-- 28 H --> <g id="node28" class="node">
+<path fill="none" stroke="black" d="M1004.81,-1617.88C1009.18,-1623.56 1013.85,-1629.63 1018.23,-1635.33"></path> </g> <!-- 28 H --> <g id="node28" class="node">
 <title>
 28 H
 </title>
-<ellipse fill="none" stroke="black" cx="827.74" cy="-1115.91" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="827.74" y="-1111.71" font-family="Times,serif" font-size="14.00">28 H</text> </g> <!-- 27 N&#45;&#45;28 H --> <g id="edge27" class="edge">
+<ellipse fill="none" stroke="black" cx="912.8" cy="-1750.26" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="912.8" y="-1746.06" font-family="Times,serif" font-size="14.00">28 H</text> </g> <!-- 27 N&#45;&#45;28 H --> <g id="edge27" class="edge">
 <title>
 27 N–28 H
 </title>
-<path fill="none" stroke="black" d="M866.64,-1084.43C861.66,-1088.46 856.4,-1092.71 851.42,-1096.75"></path> </g> <!-- 29 CT --> <g id="node29" class="node">
+<path fill="none" stroke="black" d="M1012.27,-1677.37C990.54,-1693.29 958.96,-1716.44 937.24,-1732.35"></path> </g> <!-- 29 CT --> <g id="node29" class="node">
 <title>
 29 CT
 </title>
-<ellipse fill="none" stroke="black" cx="948.62" cy="-1130.06" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="948.62" y="-1125.86" font-family="Times,serif" font-size="14.00">29 CT</text> </g> <!-- 27 N&#45;&#45;29 CT --> <g id="edge28" class="edge">
+<ellipse fill="none" stroke="black" cx="1092.89" cy="-1722.6" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="1092.89" y="-1718.4" font-family="Times,serif" font-size="14.00">29 CT</text> </g> <!-- 27 N&#45;&#45;29 CT --> <g id="edge28" class="edge">
 <title>
 27 N–29 CT
 </title>
-<path fill="none" stroke="black" d="M910.69,-1087.95C915.16,-1092.91 919.93,-1098.21 924.52,-1103.31"></path> </g> <!-- 30 H1 --> <g id="node30" class="node">
+<path fill="none" stroke="black" d="M1057.02,-1682.23C1060.92,-1686.61 1065.03,-1691.24 1069.02,-1695.74"></path> </g> <!-- 30 H1 --> <g id="node30" class="node">
 <title>
 30 H1
 </title>
-<ellipse fill="none" stroke="black" cx="1032.56" cy="-1110.8" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="1032.56" y="-1106.6" font-family="Times,serif" font-size="14.00">30 H1</text> </g> <!-- 29 CT&#45;&#45;30 H1 --> <g id="edge29" class="edge">
+<ellipse fill="none" stroke="black" cx="1204.36" cy="-1658.33" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="1204.36" y="-1654.13" font-family="Times,serif" font-size="14.00">30 H1</text> </g> <!-- 29 CT&#45;&#45;30 H1 --> <g id="edge29" class="edge">
 <title>
 29 CT–30 H1
 </title>
-<path fill="none" stroke="black" d="M983.25,-1122.12C988.21,-1120.98 993.32,-1119.8 998.29,-1118.67"></path> </g> <!-- 31 CT --> <g id="node31" class="node">
+<path fill="none" stroke="black" d="M1123.64,-1704.87C1139.37,-1695.8 1158.44,-1684.81 1174.09,-1675.78"></path> </g> <!-- 31 CT --> <g id="node31" class="node">
 <title>
 31 CT
 </title>
-<ellipse fill="none" stroke="black" cx="928.15" cy="-1215.75" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="928.15" y="-1211.55" font-family="Times,serif" font-size="14.00">31 CT</text> </g> <!-- 29 CT&#45;&#45;31 CT --> <g id="edge30" class="edge">
+<ellipse fill="none" stroke="red" cx="1046.96" cy="-1830.65" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="1046.96" y="-1826.45" font-family="Times,serif" font-size="14.00">31 CT</text> </g> <!-- 29 CT&#45;&#45;31 CT --> <g id="edge30" class="edge">
 <title>
 29 CT–31 CT
 </title>
-<path fill="none" stroke="black" d="M940.29,-1164.91C939.01,-1170.29 937.68,-1175.84 936.4,-1181.21"></path> </g> <!-- 34 H1 --> <g id="node32" class="node">
+<path fill="none" stroke="black" d="M1078.98,-1755.31C1073.28,-1768.73 1066.69,-1784.23 1060.98,-1797.67"></path> </g> <!-- 34 H1 --> <g id="node32" class="node">
 <title>
 34 H1
 </title>
-<ellipse fill="none" stroke="black" cx="1017.13" cy="-1165.87" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="1017.13" y="-1161.67" font-family="Times,serif" font-size="14.00">34 H1</text> </g> <!-- 29 CT&#45;&#45;34 H1 --> <g id="edge31" class="edge">
+<ellipse fill="none" stroke="black" cx="1200.33" cy="-1795.12" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="1200.33" y="-1790.92" font-family="Times,serif" font-size="14.00">34 H1</text> </g> <!-- 29 CT&#45;&#45;34 H1 --> <g id="edge31" class="edge">
 <title>
 29 CT–34 H1
 </title>
-<path fill="none" stroke="black" d="M980.07,-1146.5C982.04,-1147.53 984.02,-1148.56 985.99,-1149.59"></path> </g> <!-- 32 HC --> <g id="node33" class="node">
+<path fill="none" stroke="black" d="M1122.53,-1742.61C1137.69,-1752.84 1156.07,-1765.25 1171.15,-1775.43"></path> </g> <!-- 32 HC --> <g id="node33" class="node">
 <title>
 32 HC
 </title>
-<ellipse fill="none" stroke="black" cx="878.39" cy="-1280.48" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="878.39" y="-1276.28" font-family="Times,serif" font-size="14.00">32 HC</text> </g> <!-- 31 CT&#45;&#45;32 HC --> <g id="edge32" class="edge">
+<ellipse fill="none" stroke="black" cx="867.95" cy="-1906.23" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="867.95" y="-1902.03" font-family="Times,serif" font-size="14.00">32 HC</text> </g> <!-- 31 CT&#45;&#45;32 HC --> <g id="edge32" class="edge">
 <title>
 31 CT–32 HC
 </title>
-<path fill="none" stroke="black" d="M906.47,-1243.95C904.58,-1246.41 902.67,-1248.89 900.78,-1251.35"></path> </g> <!-- 33 HC --> <g id="node34" class="node">
+<path fill="none" stroke="black" d="M1014.13,-1844.51C982.23,-1857.97 934.02,-1878.33 901.79,-1891.94"></path> </g> <!-- 33 HC --> <g id="node34" class="node">
 <title>
 33 HC
 </title>
-<ellipse fill="none" stroke="black" cx="977.24" cy="-1280.93" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="977.24" y="-1276.73" font-family="Times,serif" font-size="14.00">33 HC</text> </g> <!-- 31 CT&#45;&#45;33 HC --> <g id="edge33" class="edge">
+<ellipse fill="none" stroke="black" cx="1159.21" cy="-1915.86" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="1159.21" y="-1911.66" font-family="Times,serif" font-size="14.00">33 HC</text> </g> <!-- 31 CT&#45;&#45;33 HC --> <g id="edge33" class="edge">
 <title>
 31 CT–33 HC
 </title>
-<path fill="none" stroke="black" d="M949.54,-1244.15C951.4,-1246.62 953.28,-1249.12 955.15,-1251.6"></path> </g> <!-- 35 C --> <g id="node35" class="node">
+<path fill="none" stroke="black" d="M1075.29,-1852.15C1092.04,-1864.87 1113.22,-1880.95 1130.11,-1893.77"></path> </g> <!-- 35 C --> <g id="node35" class="node">
 <title>
 35 C
 </title>
-<ellipse fill="none" stroke="black" cx="98.91" cy="-89.13" rx="29.6" ry="29.6"></ellipse> <text text-anchor="middle" x="98.91" y="-84.93" font-family="Times,serif" font-size="14.00">35 C</text> </g> <!-- 36 O --> <g id="node36" class="node">
+<ellipse fill="none" stroke="red" cx="144.79" cy="-83.16" rx="29.6" ry="29.6"></ellipse> <text text-anchor="middle" x="144.79" y="-78.96" font-family="Times,serif" font-size="14.00">35 C</text> </g> <!-- 36 O --> <g id="node36" class="node">
 <title>
 36 O
 </title>
-<ellipse fill="none" stroke="black" cx="49.61" cy="-30.08" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="49.61" y="-25.88" font-family="Times,serif" font-size="14.00">36 O</text> </g> <!-- 35 C&#45;&#45;36 O --> <g id="edge34" class="edge">
+<ellipse fill="none" stroke="black" cx="58.5" cy="-30.08" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="58.5" y="-25.88" font-family="Times,serif" font-size="14.00">36 O</text> </g> <!-- 35 C&#45;&#45;36 O --> <g id="edge34" class="edge">
 <title>
 35 C–36 O
 </title>
-<path fill="none" stroke="black" d="M79.71,-66.13C76.24,-61.99 72.63,-57.66 69.16,-53.5"></path> </g> <!-- 37 N --> <g id="node37" class="node">
+<path fill="none" stroke="black" d="M119.37,-67.52C108.33,-60.73 95.42,-52.79 84.34,-45.97"></path> </g> <!-- 37 N --> <g id="node37" class="node">
 <title>
 37 N
 </title>
-<ellipse fill="none" stroke="black" cx="131.62" cy="-162.2" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="131.62" y="-158" font-family="Times,serif" font-size="14.00">37 N</text> </g> <!-- 35 C&#45;&#45;37 N --> <g id="edge35" class="edge">
+<ellipse fill="none" stroke="black" cx="166.37" cy="-168.2" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="166.37" y="-164" font-family="Times,serif" font-size="14.00">37 N</text> </g> <!-- 35 C&#45;&#45;37 N --> <g id="edge35" class="edge">
 <title>
 35 C–37 N
 </title>
-<path fill="none" stroke="black" d="M111.09,-116.34C113.78,-122.35 116.63,-128.71 119.32,-134.73"></path> </g> <!-- 38 H --> <g id="node38" class="node">
+<path fill="none" stroke="black" d="M152.09,-111.95C154.3,-120.62 156.71,-130.15 158.92,-138.86"></path> </g> <!-- 38 H --> <g id="node38" class="node">
 <title>
 38 H
 </title>
-<ellipse fill="none" stroke="black" cx="46.3" cy="-167.41" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="46.3" y="-163.21" font-family="Times,serif" font-size="14.00">38 H</text> </g> <!-- 37 N&#45;&#45;38 H --> <g id="edge36" class="edge">
+<ellipse fill="none" stroke="black" cx="36.13" cy="-211.14" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="36.13" y="-206.94" font-family="Times,serif" font-size="14.00">38 H</text> </g> <!-- 37 N&#45;&#45;38 H --> <g id="edge36" class="edge">
 <title>
 37 N–38 H
 </title>
-<path fill="none" stroke="black" d="M101.3,-164.06C93.25,-164.55 84.56,-165.08 76.52,-165.57"></path> </g> <!-- 39 CT --> <g id="node39" class="node">
+<path fill="none" stroke="black" d="M137.79,-177.62C116.22,-184.74 86.75,-194.45 65.09,-201.59"></path> </g> <!-- 39 CT --> <g id="node39" class="node">
 <title>
 39 CT
 </title>
-<ellipse fill="none" stroke="black" cx="214.85" cy="-217.41" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="214.85" y="-213.21" font-family="Times,serif" font-size="14.00">39 CT</text> </g> <!-- 37 N&#45;&#45;39 CT --> <g id="edge37" class="edge">
+<ellipse fill="none" stroke="black" cx="259.87" cy="-250.66" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="259.87" y="-246.46" font-family="Times,serif" font-size="14.00">39 CT</text> </g> <!-- 37 N&#45;&#45;39 CT --> <g id="edge37" class="edge">
 <title>
 37 N–39 CT
 </title>
-<path fill="none" stroke="black" d="M157.04,-179.07C165.93,-184.97 175.99,-191.64 185.2,-197.75"></path> </g> <!-- 40 H1 --> <g id="node40" class="node">
+<path fill="none" stroke="black" d="M189,-188.16C202.3,-199.89 219.18,-214.77 233.13,-227.08"></path> </g> <!-- 40 H1 --> <g id="node40" class="node">
 <title>
 40 H1
 </title>
-<ellipse fill="none" stroke="black" cx="160.17" cy="-208.94" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="160.17" y="-204.74" font-family="Times,serif" font-size="14.00">40 H1</text> </g> <!-- 39 CT&#45;&#45;40 H1 --> <g id="edge38" class="edge">
+<ellipse fill="none" stroke="black" cx="158.06" cy="-254.1" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="158.06" y="-249.9" font-family="Times,serif" font-size="14.00">40 H1</text> </g> <!-- 39 CT&#45;&#45;40 H1 --> <g id="edge38" class="edge">
 <title>
 39 CT–40 H1
 </title>
-<path fill="none" stroke="black" d="M179.6,-211.95C179.44,-211.93 179.27,-211.9 179.11,-211.88"></path> </g> <!-- 41 CT --> <g id="node41" class="node">
+<path fill="none" stroke="black" d="M224.26,-251.87C214.17,-252.21 203.19,-252.58 193.13,-252.92"></path> </g> <!-- 41 CT --> <g id="node41" class="node">
 <title>
 41 CT
 </title>
-<ellipse fill="none" stroke="black" cx="281.21" cy="-160.57" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="281.21" y="-156.37" font-family="Times,serif" font-size="14.00">41 CT</text> </g> <!-- 39 CT&#45;&#45;41 CT --> <g id="edge39" class="edge">
+<ellipse fill="none" stroke="black" cx="335.91" cy="-192.32" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="335.91" y="-188.12" font-family="Times,serif" font-size="14.00">41 CT</text> </g> <!-- 39 CT&#45;&#45;41 CT --> <g id="edge39" class="edge">
 <title>
 39 CT–41 CT
 </title>
-<path fill="none" stroke="black" d="M241.84,-194.29C245.86,-190.85 250,-187.3 254.02,-183.85"></path> </g> <!-- 45 C --> <g id="node42" class="node">
+<path fill="none" stroke="black" d="M288.19,-228.94C294.52,-224.08 301.24,-218.93 307.57,-214.07"></path> </g> <!-- 45 C --> <g id="node42" class="node">
 <title>
 45 C
 </title>
-<ellipse fill="none" stroke="black" cx="206.98" cy="-308.09" rx="29.6" ry="29.6"></ellipse> <text text-anchor="middle" x="206.98" y="-303.89" font-family="Times,serif" font-size="14.00">45 C</text> </g> <!-- 39 CT&#45;&#45;45 C --> <g id="edge40" class="edge">
+<ellipse fill="none" stroke="black" cx="253.19" cy="-332.86" rx="29.6" ry="29.6"></ellipse> <text text-anchor="middle" x="253.19" y="-328.66" font-family="Times,serif" font-size="14.00">45 C</text> </g> <!-- 39 CT&#45;&#45;45 C --> <g id="edge40" class="edge">
 <title>
 39 CT–45 C
 </title>
-<path fill="none" stroke="black" d="M211.78,-252.73C211.04,-261.28 210.25,-270.34 209.54,-278.59"></path> </g> <!-- 42 HC --> <g id="node43" class="node">
+<path fill="none" stroke="black" d="M257,-286C256.53,-291.74 256.05,-297.64 255.6,-303.23"></path> </g> <!-- 42 HC --> <g id="node43" class="node">
 <title>
 42 HC
 </title>
-<ellipse fill="none" stroke="black" cx="269.18" cy="-79.57" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="269.18" y="-75.37" font-family="Times,serif" font-size="14.00">42 HC</text> </g> <!-- 41 CT&#45;&#45;42 HC --> <g id="edge41" class="edge">
+<ellipse fill="none" stroke="black" cx="279.3" cy="-41.15" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="279.3" y="-36.95" font-family="Times,serif" font-size="14.00">42 HC</text> </g> <!-- 41 CT&#45;&#45;42 HC --> <g id="edge41" class="edge">
 <title>
 41 CT–42 HC
 </title>
-<path fill="none" stroke="black" d="M275.97,-125.28C275.5,-122.12 275.02,-118.92 274.55,-115.76"></path> </g> <!-- 43 HC --> <g id="node44" class="node">
+<path fill="none" stroke="black" d="M323.35,-158.77C314.07,-133.98 301.47,-100.35 292.12,-75.39"></path> </g> <!-- 43 HC --> <g id="node44" class="node">
 <title>
 43 HC
 </title>
-<ellipse fill="none" stroke="black" cx="363.08" cy="-155.84" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="363.08" y="-151.64" font-family="Times,serif" font-size="14.00">43 HC</text> </g> <!-- 41 CT&#45;&#45;43 HC --> <g id="edge42" class="edge">
+<ellipse fill="none" stroke="black" cx="558.14" cy="-213.71" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="558.14" y="-209.51" font-family="Times,serif" font-size="14.00">43 HC</text> </g> <!-- 41 CT&#45;&#45;43 HC --> <g id="edge42" class="edge">
 <title>
 41 CT–43 HC
 </title>
-<path fill="none" stroke="black" d="M316.88,-158.51C320.07,-158.32 323.3,-158.14 326.49,-157.95"></path> </g> <!-- 44 HC --> <g id="node45" class="node">
+<path fill="none" stroke="black" d="M371.62,-195.76C412.84,-199.73 480.29,-206.22 521.79,-210.21"></path> </g> <!-- 44 HC --> <g id="node45" class="node">
 <title>
 44 HC
 </title>
-<ellipse fill="none" stroke="black" cx="334.14" cy="-98.75" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="334.14" y="-94.55" font-family="Times,serif" font-size="14.00">44 HC</text> </g> <!-- 41 CT&#45;&#45;44 HC --> <g id="edge43" class="edge">
+<ellipse fill="none" stroke="black" cx="497.38" cy="-39.42" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="497.38" y="-35.22" font-family="Times,serif" font-size="14.00">44 HC</text> </g> <!-- 41 CT&#45;&#45;44 HC --> <g id="edge43" class="edge">
 <title>
 41 CT–44 HC
 </title>
-<path fill="none" stroke="black" d="M304.27,-133.63C306.28,-131.29 308.31,-128.92 310.32,-126.57"></path> </g> <!-- 46 O --> <g id="node46" class="node">
+<path fill="none" stroke="black" d="M361.86,-167.76C391.72,-139.48 440.52,-93.26 470.69,-64.69"></path> </g> <!-- 46 O --> <g id="node46" class="node">
 <title>
 46 O
 </title>
-<ellipse fill="none" stroke="black" cx="126.83" cy="-313.31" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="126.83" y="-309.11" font-family="Times,serif" font-size="14.00">46 O</text> </g> <!-- 45 C&#45;&#45;46 O --> <g id="edge44" class="edge">
+<ellipse fill="none" stroke="black" cx="87.81" cy="-345.82" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="87.81" y="-341.62" font-family="Times,serif" font-size="14.00">46 O</text> </g> <!-- 45 C&#45;&#45;46 O --> <g id="edge44" class="edge">
 <title>
 45 C–46 O
 </title>
-<path fill="none" stroke="black" d="M177.13,-310.03C170.55,-310.46 163.56,-310.92 156.97,-311.35"></path> </g> <!-- 47 N --> <g id="node47" class="node">
+<path fill="none" stroke="black" d="M223.63,-335.18C193.8,-337.51 147.99,-341.11 117.96,-343.46"></path> </g> <!-- 47 N --> <g id="node47" class="node">
 <title>
 47 N
 </title>
-<ellipse fill="none" stroke="black" cx="223.73" cy="-393.3" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="223.73" y="-389.1" font-family="Times,serif" font-size="14.00">47 N</text> </g> <!-- 45 C&#45;&#45;47 N --> <g id="edge45" class="edge">
+<ellipse fill="none" stroke="black" cx="222.42" cy="-416.59" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="222.42" y="-412.39" font-family="Times,serif" font-size="14.00">47 N</text> </g> <!-- 45 C&#45;&#45;47 N --> <g id="edge45" class="edge">
 <title>
 45 C–47 N
 </title>
-<path fill="none" stroke="black" d="M212.74,-337.41C214.41,-345.89 216.23,-355.14 217.9,-363.63"></path> </g> <!-- 48 H --> <g id="node48" class="node">
+<path fill="none" stroke="black" d="M242.95,-360.74C239.69,-369.59 236.1,-379.38 232.83,-388.26"></path> </g> <!-- 48 H --> <g id="node48" class="node">
 <title>
 48 H
 </title>
-<ellipse fill="none" stroke="black" cx="301.87" cy="-370.75" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="301.87" y="-366.55" font-family="Times,serif" font-size="14.00">48 H</text> </g> <!-- 47 N&#45;&#45;48 H --> <g id="edge46" class="edge">
+<ellipse fill="none" stroke="black" cx="433.96" cy="-365.67" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="433.96" y="-361.47" font-family="Times,serif" font-size="14.00">48 H</text> </g> <!-- 47 N&#45;&#45;48 H --> <g id="edge46" class="edge">
 <title>
 47 N–48 H
 </title>
-<path fill="none" stroke="black" d="M252.83,-384.9C259.33,-383.02 266.24,-381.03 272.75,-379.15"></path> </g> <!-- 49 CT --> <g id="node49" class="node">
+<path fill="none" stroke="black" d="M251.83,-409.51C292.14,-399.81 364.11,-382.48 404.46,-372.77"></path> </g> <!-- 49 CT --> <g id="node49" class="node">
 <title>
 49 CT
 </title>
-<ellipse fill="none" stroke="black" cx="204.99" cy="-486.35" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="204.99" y="-482.15" font-family="Times,serif" font-size="14.00">49 CT</text> </g> <!-- 47 N&#45;&#45;49 CT --> <g id="edge47" class="edge">
+<ellipse fill="none" stroke="black" cx="216.14" cy="-515.72" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="216.14" y="-511.52" font-family="Times,serif" font-size="14.00">49 CT</text> </g> <!-- 47 N&#45;&#45;49 CT --> <g id="edge47" class="edge">
 <title>
 47 N–49 CT
 </title>
-<path fill="none" stroke="black" d="M217.75,-422.99C215.93,-432.04 213.91,-442.06 212.02,-451.41"></path> </g> <!-- 50 H1 --> <g id="node50" class="node">
+<path fill="none" stroke="black" d="M220.5,-446.87C219.84,-457.35 219.09,-469.19 218.4,-480.06"></path> </g> <!-- 50 H1 --> <g id="node50" class="node">
 <title>
 50 H1
 </title>
-<ellipse fill="none" stroke="black" cx="262.31" cy="-468.57" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="262.31" y="-464.37" font-family="Times,serif" font-size="14.00">50 H1</text> </g> <!-- 49 CT&#45;&#45;50 H1 --> <g id="edge48" class="edge">
+<ellipse fill="none" stroke="black" cx="324.83" cy="-482.13" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="324.83" y="-477.93" font-family="Times,serif" font-size="14.00">50 H1</text> </g> <!-- 49 CT&#45;&#45;50 H1 --> <g id="edge48" class="edge">
 <title>
 49 CT–50 H1
 </title>
-<path fill="none" stroke="black" d="M238.99,-475.8C239.09,-475.77 239.19,-475.74 239.28,-475.71"></path> </g> <!-- 51 CT --> <g id="node51" class="node">
+<path fill="none" stroke="black" d="M250.23,-505.19C263.3,-501.14 278.2,-496.54 291.23,-492.51"></path> </g> <!-- 51 CT --> <g id="node51" class="node">
 <title>
 51 CT
 </title>
-<ellipse fill="none" stroke="black" cx="119.22" cy="-510.92" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="119.22" y="-506.72" font-family="Times,serif" font-size="14.00">51 CT</text> </g> <!-- 49 CT&#45;&#45;51 CT --> <g id="edge49" class="edge">
+<ellipse fill="none" stroke="black" cx="139.01" cy="-540.41" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="139.01" y="-536.21" font-family="Times,serif" font-size="14.00">51 CT</text> </g> <!-- 49 CT&#45;&#45;51 CT --> <g id="edge49" class="edge">
 <title>
 49 CT–51 CT
 </title>
-<path fill="none" stroke="black" d="M170.6,-496.2C164.91,-497.83 159.02,-499.52 153.34,-501.15"></path> </g> <!-- 55 C --> <g id="node52" class="node">
+<path fill="none" stroke="black" d="M182.08,-526.62C179.02,-527.6 175.91,-528.6 172.85,-529.58"></path> </g> <!-- 55 C --> <g id="node52" class="node">
 <title>
 55 C
 </title>
-<ellipse fill="none" stroke="black" cx="264.37" cy="-560.08" rx="29.6" ry="29.6"></ellipse> <text text-anchor="middle" x="264.37" y="-555.88" font-family="Times,serif" font-size="14.00">55 C</text> </g> <!-- 49 CT&#45;&#45;55 C --> <g id="edge50" class="edge">
+<ellipse fill="none" stroke="black" cx="289.35" cy="-583.08" rx="29.6" ry="29.6"></ellipse> <text text-anchor="middle" x="289.35" y="-578.88" font-family="Times,serif" font-size="14.00">55 C</text> </g> <!-- 49 CT&#45;&#45;55 C --> <g id="edge50" class="edge">
 <title>
 49 CT–55 C
 </title>
-<path fill="none" stroke="black" d="M227.44,-514.22C233.48,-521.73 239.95,-529.76 245.76,-536.97"></path> </g> <!-- 52 HC --> <g id="node53" class="node">
+<path fill="none" stroke="black" d="M242.57,-540.04C250.76,-547.58 259.69,-555.79 267.53,-563.01"></path> </g> <!-- 52 HC --> <g id="node53" class="node">
 <title>
 52 HC
 </title>
-<ellipse fill="none" stroke="black" cx="36.52" cy="-533.14" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="36.52" y="-528.94" font-family="Times,serif" font-size="14.00">52 HC</text> </g> <!-- 51 CT&#45;&#45;52 HC --> <g id="edge51" class="edge">
+<ellipse fill="none" stroke="black" cx="36.52" cy="-577.43" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="36.52" y="-573.23" font-family="Times,serif" font-size="14.00">52 HC</text> </g> <!-- 51 CT&#45;&#45;52 HC --> <g id="edge51" class="edge">
 <title>
 51 CT–52 HC
 </title>
-<path fill="none" stroke="black" d="M84.63,-520.22C80.47,-521.34 76.21,-522.48 72.04,-523.6"></path> </g> <!-- 53 HC --> <g id="node54" class="node">
+<path fill="none" stroke="black" d="M105.45,-552.53C94.48,-556.49 82.27,-560.9 71.21,-564.9"></path> </g> <!-- 53 HC --> <g id="node54" class="node">
 <title>
 53 HC
 </title>
-<ellipse fill="none" stroke="black" cx="72.71" cy="-578.11" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="72.71" y="-573.91" font-family="Times,serif" font-size="14.00">53 HC</text> </g> <!-- 51 CT&#45;&#45;53 HC --> <g id="edge52" class="edge">
+<ellipse fill="none" stroke="black" cx="58.81" cy="-727.5" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="58.81" y="-723.3" font-family="Times,serif" font-size="14.00">53 HC</text> </g> <!-- 51 CT&#45;&#45;53 HC --> <g id="edge52" class="edge">
 <title>
 51 CT–53 HC
 </title>
-<path fill="none" stroke="black" d="M98.96,-540.2C97.19,-542.74 95.41,-545.32 93.64,-547.87"></path> </g> <!-- 54 HC --> <g id="node55" class="node">
+<path fill="none" stroke="black" d="M125.04,-573C110.54,-606.81 87.98,-659.45 73.3,-693.71"></path> </g> <!-- 54 HC --> <g id="node55" class="node">
 <title>
 54 HC
 </title>
-<ellipse fill="none" stroke="black" cx="48.1" cy="-475.76" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="48.1" y="-471.56" font-family="Times,serif" font-size="14.00">54 HC</text> </g> <!-- 51 CT&#45;&#45;54 HC --> <g id="edge53" class="edge">
+<ellipse fill="none" stroke="black" cx="45.63" cy="-445.99" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="45.63" y="-441.79" font-family="Times,serif" font-size="14.00">54 HC</text> </g> <!-- 51 CT&#45;&#45;54 HC --> <g id="edge53" class="edge">
 <title>
 51 CT–54 HC
 </title>
-<path fill="none" stroke="black" d="M87.4,-495.19C85.33,-494.17 83.24,-493.14 81.17,-492.11"></path> </g> <!-- 56 O --> <g id="node56" class="node">
+<path fill="none" stroke="black" d="M113.98,-515.1C100.8,-501.78 84.66,-485.45 71.37,-472.02"></path> </g> <!-- 56 O --> <g id="node56" class="node">
 <title>
 56 O
 </title>
-<ellipse fill="none" stroke="black" cx="210.18" cy="-612.93" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="210.18" y="-608.73" font-family="Times,serif" font-size="14.00">56 O</text> </g> <!-- 55 C&#45;&#45;56 O --> <g id="edge54" class="edge">
+<ellipse fill="none" stroke="black" cx="204.24" cy="-701.05" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="204.24" y="-696.85" font-family="Times,serif" font-size="14.00">56 O</text> </g> <!-- 55 C&#45;&#45;56 O --> <g id="edge54" class="edge">
 <title>
 55 C–56 O
 </title>
-<path fill="none" stroke="black" d="M242.95,-580.97C239.29,-584.55 235.47,-588.27 231.8,-591.85"></path> </g> <!-- 57 N --> <g id="node57" class="node">
+<path fill="none" stroke="black" d="M271.92,-607.24C257.33,-627.46 236.6,-656.19 221.93,-676.52"></path> </g> <!-- 57 N --> <g id="node57" class="node">
 <title>
 57 N
 </title>
-<ellipse fill="none" stroke="black" cx="333.52" cy="-616.16" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="333.52" y="-611.96" font-family="Times,serif" font-size="14.00">57 N</text> </g> <!-- 55 C&#45;&#45;57 N --> <g id="edge55" class="edge">
+<ellipse fill="none" stroke="black" cx="339.77" cy="-652.6" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="339.77" y="-648.4" font-family="Times,serif" font-size="14.00">57 N</text> </g> <!-- 55 C&#45;&#45;57 N --> <g id="edge55" class="edge">
 <title>
 55 C–57 N
 </title>
-<path fill="none" stroke="black" d="M287.4,-578.76C294.62,-584.62 302.61,-591.1 309.88,-596.99"></path> </g> <!-- 58 H --> <g id="node58" class="node">
+<path fill="none" stroke="black" d="M306.7,-607C311.6,-613.76 316.94,-621.12 321.87,-627.92"></path> </g> <!-- 58 H --> <g id="node58" class="node">
 <title>
 58 H
 </title>
-<ellipse fill="none" stroke="black" cx="393.19" cy="-564.9" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="393.19" y="-560.7" font-family="Times,serif" font-size="14.00">58 H</text> </g> <!-- 57 N&#45;&#45;58 H --> <g id="edge56" class="edge">
+<ellipse fill="none" stroke="black" cx="457.28" cy="-522.96" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="457.28" y="-518.76" font-family="Times,serif" font-size="14.00">58 H</text> </g> <!-- 57 N&#45;&#45;58 H --> <g id="edge56" class="edge">
 <title>
 57 N–58 H
 </title>
-<path fill="none" stroke="black" d="M356.42,-596.49C360.89,-592.65 365.58,-588.62 370.06,-584.77"></path> </g> <!-- 59 CT --> <g id="node59" class="node">
+<path fill="none" stroke="black" d="M360.24,-630.02C381.81,-606.22 415.56,-568.98 437.04,-545.28"></path> </g> <!-- 59 CT --> <g id="node59" class="node">
 <title>
 59 CT
 </title>
-<ellipse fill="none" stroke="black" cx="385.86" cy="-691.7" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="385.86" y="-687.5" font-family="Times,serif" font-size="14.00">59 CT</text> </g> <!-- 57 N&#45;&#45;59 CT --> <g id="edge57" class="edge">
+<ellipse fill="none" stroke="black" cx="398.99" cy="-731.78" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="398.99" y="-727.58" font-family="Times,serif" font-size="14.00">59 CT</text> </g> <!-- 57 N&#45;&#45;59 CT --> <g id="edge57" class="edge">
 <title>
 57 N–59 CT
 </title>
-<path fill="none" stroke="black" d="M350.65,-640.89C355.42,-647.78 360.65,-655.32 365.58,-662.44"></path> </g> <!-- 60 H1 --> <g id="node60" class="node">
+<path fill="none" stroke="black" d="M357.86,-676.78C364.12,-685.15 371.19,-694.61 377.69,-703.29"></path> </g> <!-- 60 H1 --> <g id="node60" class="node">
 <title>
 60 H1
 </title>
-<ellipse fill="none" stroke="black" cx="431.25" cy="-663.51" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="431.25" y="-659.31" font-family="Times,serif" font-size="14.00">60 H1</text> </g> <!-- 59 CT&#45;&#45;60 H1 --> <g id="edge58" class="edge">
+<ellipse fill="none" stroke="black" cx="460.29" cy="-648.32" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="460.29" y="-644.12" font-family="Times,serif" font-size="14.00">60 H1</text> </g> <!-- 59 CT&#45;&#45;60 H1 --> <g id="edge58" class="edge">
 <title>
 59 CT–60 H1
 </title>
-<path fill="none" stroke="black" d="M416.13,-672.9C416.26,-672.82 416.39,-672.74 416.52,-672.66"></path> </g> <!-- 61 CT --> <g id="node61" class="node">
+<path fill="none" stroke="black" d="M420.09,-703.06C426.39,-694.48 433.29,-685.08 439.57,-676.53"></path> </g> <!-- 61 CT --> <g id="node61" class="node">
 <title>
 61 CT
 </title>
-<ellipse fill="none" stroke="black" cx="488.43" cy="-683.98" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="488.43" y="-679.78" font-family="Times,serif" font-size="14.00">61 CT</text> </g> <!-- 59 CT&#45;&#45;61 CT --> <g id="edge59" class="edge">
+<ellipse fill="none" stroke="black" cx="513.68" cy="-722.35" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="513.68" y="-718.15" font-family="Times,serif" font-size="14.00">61 CT</text> </g> <!-- 59 CT&#45;&#45;61 CT --> <g id="edge59" class="edge">
 <title>
 59 CT–61 CT
 </title>
-<path fill="none" stroke="black" d="M421.45,-689.02C431.63,-688.25 442.73,-687.42 452.91,-686.65"></path> </g> <!-- 65 C --> <g id="node62" class="node">
+<path fill="none" stroke="black" d="M434.34,-728.87C448.29,-727.73 464.29,-726.41 478.25,-725.26"></path> </g> <!-- 65 C --> <g id="node62" class="node">
 <title>
 65 C
 </title>
-<ellipse fill="none" stroke="black" cx="361.12" cy="-775.87" rx="29.6" ry="29.6"></ellipse> <text text-anchor="middle" x="361.12" y="-771.67" font-family="Times,serif" font-size="14.00">65 C</text> </g> <!-- 59 CT&#45;&#45;65 C --> <g id="edge60" class="edge">
+<ellipse fill="none" stroke="black" cx="324.49" cy="-787.44" rx="29.6" ry="29.6"></ellipse> <text text-anchor="middle" x="324.49" y="-783.24" font-family="Times,serif" font-size="14.00">65 C</text> </g> <!-- 59 CT&#45;&#45;65 C --> <g id="edge60" class="edge">
 <title>
 59 CT–65 C
 </title>
-<path fill="none" stroke="black" d="M375.8,-725.94C373.71,-733.04 371.53,-740.45 369.51,-747.32"></path> </g> <!-- 62 HC --> <g id="node63" class="node">
+<path fill="none" stroke="black" d="M370.4,-753.14C363.18,-758.53 355.5,-764.27 348.53,-769.48"></path> </g> <!-- 62 HC --> <g id="node63" class="node">
 <title>
 62 HC
 </title>
-<ellipse fill="none" stroke="black" cx="549.83" cy="-624.89" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="549.83" y="-620.69" font-family="Times,serif" font-size="14.00">62 HC</text> </g> <!-- 61 CT&#45;&#45;62 HC --> <g id="edge61" class="edge">
+<ellipse fill="none" stroke="black" cx="597.16" cy="-495.76" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="597.16" y="-491.56" font-family="Times,serif" font-size="14.00">62 HC</text> </g> <!-- 61 CT&#45;&#45;62 HC --> <g id="edge61" class="edge">
 <title>
 61 CT–62 HC
 </title>
-<path fill="none" stroke="black" d="M514.11,-659.26C517.14,-656.35 520.23,-653.38 523.26,-650.46"></path> </g> <!-- 63 HC --> <g id="node64" class="node">
+<path fill="none" stroke="black" d="M525.99,-688.92C541.69,-646.32 568.67,-573.09 584.51,-530.08"></path> </g> <!-- 63 HC --> <g id="node64" class="node">
 <title>
 63 HC
 </title>
-<ellipse fill="none" stroke="black" cx="571.63" cy="-683.07" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="571.63" y="-678.87" font-family="Times,serif" font-size="14.00">63 HC</text> </g> <!-- 61 CT&#45;&#45;63 HC --> <g id="edge62" class="edge">
+<ellipse fill="none" stroke="black" cx="612.87" cy="-696.96" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="612.87" y="-692.76" font-family="Times,serif" font-size="14.00">63 HC</text> </g> <!-- 61 CT&#45;&#45;63 HC --> <g id="edge62" class="edge">
 <title>
 61 CT–63 HC
 </title>
-<path fill="none" stroke="black" d="M524.2,-683.59C527.81,-683.55 531.48,-683.51 535.1,-683.47"></path> </g> <!-- 64 HC --> <g id="node65" class="node">
+<path fill="none" stroke="black" d="M548.09,-713.54C557.49,-711.14 567.7,-708.52 577.17,-706.1"></path> </g> <!-- 64 HC --> <g id="node65" class="node">
 <title>
 64 HC
 </title>
-<ellipse fill="none" stroke="black" cx="543.27" cy="-742.76" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="543.27" y="-738.56" font-family="Times,serif" font-size="14.00">64 HC</text> </g> <!-- 61 CT&#45;&#45;64 HC --> <g id="edge63" class="edge">
+<ellipse fill="none" stroke="black" cx="601.37" cy="-857.89" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="601.37" y="-853.69" font-family="Times,serif" font-size="14.00">64 HC</text> </g> <!-- 61 CT&#45;&#45;64 HC --> <g id="edge63" class="edge">
 <title>
 61 CT–64 HC
 </title>
-<path fill="none" stroke="black" d="M512.64,-709.93C514.48,-711.9 516.34,-713.89 518.18,-715.86"></path> </g> <!-- 66 O --> <g id="node66" class="node">
+<path fill="none" stroke="black" d="M533.14,-752.43C547.47,-774.58 566.89,-804.6 581.35,-826.95"></path> </g> <!-- 66 O --> <g id="node66" class="node">
 <title>
 66 O
 </title>
-<ellipse fill="none" stroke="black" cx="425.55" cy="-817.36" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="425.55" y="-813.16" font-family="Times,serif" font-size="14.00">66 O</text> </g> <!-- 65 C&#45;&#45;66 O --> <g id="edge64" class="edge">
+<ellipse fill="none" stroke="black" cx="478.58" cy="-870.54" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="478.58" y="-866.34" font-family="Times,serif" font-size="14.00">66 O</text> </g> <!-- 65 C&#45;&#45;66 O --> <g id="edge64" class="edge">
 <title>
 65 C–66 O
 </title>
-<path fill="none" stroke="black" d="M386.22,-792.03C390.74,-794.95 395.46,-797.99 400,-800.91"></path> </g> <!-- 67 N --> <g id="node67" class="node">
+<path fill="none" stroke="black" d="M350.63,-801.53C378.88,-816.77 423.65,-840.92 452.05,-856.23"></path> </g> <!-- 67 N --> <g id="node67" class="node">
 <title>
 67 N
 </title>
-<ellipse fill="none" stroke="black" cx="327.1" cy="-856.29" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="327.1" y="-852.09" font-family="Times,serif" font-size="14.00">67 N</text> </g> <!-- 65 C&#45;&#45;67 N --> <g id="edge65" class="edge">
+<ellipse fill="none" stroke="black" cx="324.03" cy="-876.73" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="324.03" y="-872.53" font-family="Times,serif" font-size="14.00">67 N</text> </g> <!-- 65 C&#45;&#45;67 N --> <g id="edge65" class="edge">
 <title>
 65 C–67 N
 </title>
-<path fill="none" stroke="black" d="M349.6,-803.1C346.13,-811.3 342.32,-820.31 338.84,-828.55"></path> </g> <!-- 68 H --> <g id="node68" class="node">
+<path fill="none" stroke="black" d="M324.34,-817.17C324.29,-826.61 324.24,-837.05 324.19,-846.52"></path> </g> <!-- 68 H --> <g id="node68" class="node">
 <title>
 68 H
 </title>
-<ellipse fill="none" stroke="black" cx="249.14" cy="-875.71" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="249.14" y="-871.51" font-family="Times,serif" font-size="14.00">68 H</text> </g> <!-- 67 N&#45;&#45;68 H --> <g id="edge66" class="edge">
+<ellipse fill="none" stroke="black" cx="118.46" cy="-892.27" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="118.46" y="-888.07" font-family="Times,serif" font-size="14.00">68 H</text> </g> <!-- 67 N&#45;&#45;68 H --> <g id="edge66" class="edge">
 <title>
 67 N–68 H
 </title>
-<path fill="none" stroke="black" d="M297.63,-863.64C291.33,-865.2 284.68,-866.86 278.4,-868.43"></path> </g> <!-- 69 CT --> <g id="node69" class="node">
+<path fill="none" stroke="black" d="M293.7,-879.03C254.72,-881.97 187.46,-887.05 148.58,-889.99"></path> </g> <!-- 69 CT --> <g id="node69" class="node">
 <title>
 69 CT
 </title>
-<ellipse fill="none" stroke="black" cx="341.33" cy="-941.79" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="341.33" y="-937.59" font-family="Times,serif" font-size="14.00">69 CT</text> </g> <!-- 67 N&#45;&#45;69 CT --> <g id="edge67" class="edge">
+<ellipse fill="none" stroke="black" cx="356.11" cy="-968.93" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="356.11" y="-964.73" font-family="Times,serif" font-size="14.00">69 CT</text> </g> <!-- 67 N&#45;&#45;69 CT --> <g id="edge67" class="edge">
 <title>
 67 N–69 CT
 </title>
-<path fill="none" stroke="black" d="M332.08,-886.2C333.18,-892.84 334.37,-899.94 335.5,-906.77"></path> </g> <!-- 70 H1 --> <g id="node70" class="node">
+<path fill="none" stroke="black" d="M333.92,-905.15C337.23,-914.67 340.96,-925.38 344.4,-935.27"></path> </g> <!-- 70 H1 --> <g id="node70" class="node">
 <title>
 70 H1
 </title>
-<ellipse fill="none" stroke="black" cx="414.29" cy="-985.33" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="414.29" y="-981.13" font-family="Times,serif" font-size="14.00">70 H1</text> </g> <!-- 69 CT&#45;&#45;70 H1 --> <g id="edge68" class="edge">
+<ellipse fill="none" stroke="black" cx="558.55" cy="-1040.31" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="558.55" y="-1036.11" font-family="Times,serif" font-size="14.00">70 H1</text> </g> <!-- 69 CT&#45;&#45;70 H1 --> <g id="edge68" class="edge">
 <title>
 69 CT–70 H1
 </title>
-<path fill="none" stroke="black" d="M371.85,-960C375.91,-962.42 380.07,-964.91 384.13,-967.33"></path> </g> <!-- 71 H1 --> <g id="node71" class="node">
+<path fill="none" stroke="black" d="M389.99,-980.88C427.7,-994.17 488.22,-1015.51 525.56,-1028.68"></path> </g> <!-- 71 H1 --> <g id="node71" class="node">
 <title>
 71 H1
 </title>
-<ellipse fill="none" stroke="black" cx="271.48" cy="-992.06" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="271.48" y="-987.86" font-family="Times,serif" font-size="14.00">71 H1</text> </g> <!-- 69 CT&#45;&#45;71 H1 --> <g id="edge69" class="edge">
+<ellipse fill="none" stroke="black" cx="126.54" cy="-1056.11" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="126.54" y="-1051.91" font-family="Times,serif" font-size="14.00">71 H1</text> </g> <!-- 69 CT&#45;&#45;71 H1 --> <g id="edge69" class="edge">
 <title>
 69 CT–71 H1
 </title>
-<path fill="none" stroke="black" d="M312.52,-962.53C308.46,-965.45 304.29,-968.45 300.23,-971.37"></path> </g> <!-- 72 H1 --> <g id="node72" class="node">
+<path fill="none" stroke="black" d="M322.73,-981.61C278.96,-998.23 202.64,-1027.21 159.22,-1043.7"></path> </g> <!-- 72 H1 --> <g id="node72" class="node">
 <title>
 72 H1
 </title>
-<ellipse fill="none" stroke="black" cx="345.49" cy="-1019.31" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="345.49" y="-1015.11" font-family="Times,serif" font-size="14.00">72 H1</text> </g> <!-- 69 CT&#45;&#45;72 H1 --> <g id="edge70" class="edge">
+<ellipse fill="none" stroke="black" cx="360.57" cy="-1079.54" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="360.57" y="-1075.34" font-family="Times,serif" font-size="14.00">72 H1</text> </g> <!-- 69 CT&#45;&#45;72 H1 --> <g id="edge70" class="edge">
 <title>
 69 CT–72 H1
 </title>
-<path fill="none" stroke="black" d="M343.24,-977.37C343.36,-979.6 343.48,-981.84 343.6,-984.07"></path> </g> </g>
+<path fill="none" stroke="black" d="M357.55,-1004.54C358.06,-1017.29 358.64,-1031.66 359.15,-1044.38"></path> </g> </g>
 </svg>
 </div>
 <p></p><figcaption class="figure-caption">Figure&nbsp;3: A diagram of the hexala topology</figcaption><p></p>
