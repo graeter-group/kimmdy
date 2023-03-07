@@ -8,6 +8,12 @@ from kimmdy.utils import check_gmx_version, increment_logfile
 import sys
 
 
+if sys.version_info > (3, 10):
+    from importlib_metadata import version
+else:
+    from importlib.metadata import version
+
+
 def get_cmdline_args():
     """Parse command line arguments and configure logger.
 
@@ -17,6 +23,7 @@ def get_cmdline_args():
         parsed command line arguments
     """
     parser = argparse.ArgumentParser(description="Welcome to KIMMDY")
+    parser.add_argument('--version', action='version', version=f'KIMMDY {version("kimmdy")}')
     parser.add_argument(
         "--input", "-i", type=str, help="kimmdy input file", default="kimmdy.yml"
     )
