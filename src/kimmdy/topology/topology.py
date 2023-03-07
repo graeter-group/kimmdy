@@ -1,5 +1,6 @@
 from pathlib import Path
 from typing import Optional
+from kimmdy.constants import ATOMTYPE_BONDORDER_FLAT
 from kimmdy.parsing import TopologyDict
 from kimmdy.topology.atomic import *
 from kimmdy.topology.utils import (
@@ -51,6 +52,7 @@ class Topology:
         self._parse_angles()
         self._parse_dihedrals()
         self._initialize_graph()
+        self._test_for_radicals()
 
     def _update_dict(self):
         self.top["atoms"] = [attributes_to_list(x) for x in self.atoms.values()]
@@ -124,6 +126,17 @@ class Topology:
             j = bond.aj
             self.atoms[i].bound_to_nrs.append(j)
             self.atoms[j].bound_to_nrs.append(i)
+
+    def _test_for_radicals(self):
+        for atom in self.atoms.values():
+            bo = ATOMTYPE_BONDORDER_FLAT.get(atom.type)
+            if bo and bo > len(atom.bound_to_nrs):
+                atom.is_radical = True
+            else:
+                atom.is_radical = False
+
+        return None
+
 
     def _apply_param_patch(
         self,
