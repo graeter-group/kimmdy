@@ -2,6 +2,7 @@ pytest
 tox
 black
 hypothesis
+jupyter
 sphinx
 sphinx-rtd-theme
 -e .

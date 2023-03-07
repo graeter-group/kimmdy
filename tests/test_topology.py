@@ -113,3 +113,49 @@ class TestTopology:
         assert top.pairs == og_top.pairs
         assert top.angles == og_top.angles
         assert top.proper_dihedrals == og_top.proper_dihedrals
+
+
+
+class TestHexalaTopology:
+    hexala_top = read_topol(Path("hexala.top"))
+    hexala_break_29_35 = read_topol(Path("hexala_break29-35.top"))
+    hexala_move_34_39 = read_topol(Path("hexala_move34-29.top"))
+    ffdir = Path("../assets/amber99sb-star-ildnp.ff")
+    ffpatch = Path("amber99sb_patches.xml")
+    top = Topology(hexala_top, ffdir, ffpatch)
+    top_break_29_35 = Topology(hexala_break_29_35, ffdir, ffpatch)
+    top_move_34_29 = Topology(hexala_move_34_39, ffdir, ffpatch)
+
+    def all_terms_accounted_for(self):
+        top = self.top
+        hexala_top = self.hexala_top
+        assert len(top.atoms) == len(hexala_top["atoms"])
+        assert len(top.bonds) == len(hexala_top["bonds"])
+        assert len(top.pairs) == len(hexala_top["pairs"])
+        assert len(top.angles) == len(hexala_top["angles"])
+        assert len(top.proper_dihedrals) == len(hexala_top["propers"])
+        assert len(top.improper_dihedrals) == len(hexala_top["impropers"]) 
+
+    def break_bond_29_35(self):
+        top = deepcopy(self.top)
+        top_broken = deepcopy(self.top_break_29_35)
+        top.break_bond(('29', '35'))
+        assert top.bonds == top_broken.bonds
+        assert top.pairs == top_broken.pairs
+        assert top.angles == top_broken.angles
+        assert top.proper_dihedrals == top_broken.proper_dihedrals
+        assert top.improper_dihedrals == top_broken.improper_dihedrals
+
+
+    def break_move_34_29_after_break(self):
+        top = deepcopy(self.top)
+        top_moved = deepcopy(self.top_move_34_29)
+        top.break_bond(('29', '25'))
+        top.break_bond(('31', '34'))
+        top.bind_bond(('34', '29'))
+        assert top.bonds == top_moved.bonds
+        assert top.pairs == top_moved.pairs
+        assert top.angles == top_moved.angles
+        assert top.proper_dihedrals == top_moved.proper_dihedrals
+        assert top.improper_dihedrals == top_moved.improper_dihedrals
+
