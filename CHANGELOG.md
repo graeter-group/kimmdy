@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.2.0](https://github.com/hits-mbm-dev/kimmdy/compare/v2.1.0...v2.2.0) (2023-03-07)
+
+
+### Features
+
+* add --version command ([bf3e183](https://github.com/hits-mbm-dev/kimmdy/commit/bf3e183ee57c7b78b3913070bde861a198adc441))
+
+
+### Bug Fixes
+
+* update importlib syntax and and importlib dependency ([abc89e0](https://github.com/hits-mbm-dev/kimmdy/commit/abc89e00cbdc8e4bc5a235bd4a5f8e387deb866e)), closes [#93](https://github.com/hits-mbm-dev/kimmdy/issues/93)
+
 ## [2.1.0](https://github.com/hits-mbm-dev/kimmdy/compare/v2.0.0...v2.1.0) (2023-02-27)
 
 
