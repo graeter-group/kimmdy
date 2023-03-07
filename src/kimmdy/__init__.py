@@ -8,7 +8,7 @@ if sys.version_info > (3, 10):
 else:
     from importlib.metadata import entry_points
 
-discovered_plugins = entry_points()["kimmdy.plugins"]
+discovered_plugins = entry_points(group="kimmdy.plugins")
 plugins: dict[str, Reaction | Exception] = {}
 for _ep in discovered_plugins:
     try:
