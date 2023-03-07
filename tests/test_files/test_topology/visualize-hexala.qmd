@@ -27,15 +27,15 @@ top = Topology(hexala_top, ffdir, ffpatch)
 top_break_29_25 = Topology(hexala_break_29_35, ffdir, ffpatch)
 top_move_34_39 = Topology(hexala_move_34_39, ffdir, ffpatch)
 
-ls = top_to_graph(top) 
+ls = top_to_graph(top, overlap='true') 
 with open("hexala-top.dot", "w") as f:
   f.writelines(ls)
 
-ls = top_to_graph(top_break_29_25) 
+ls = top_to_graph(top_break_29_25,overlap='false') 
 with open("hexala-break.dot", "w") as f:
   f.writelines(ls)
 
-ls = top_to_graph(top_move_34_39)
+ls = top_to_graph(top_move_34_39,overlap='false')
 with open("hexala-move.dot", "w") as f:
   f.writelines(ls)
 ```
