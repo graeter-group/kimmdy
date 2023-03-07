@@ -23,7 +23,9 @@ def get_cmdline_args():
         parsed command line arguments
     """
     parser = argparse.ArgumentParser(description="Welcome to KIMMDY")
-    parser.add_argument('--version', action='version', version=f'KIMMDY {version("kimmdy")}')
+    parser.add_argument(
+        "--version", action="version", version=f'KIMMDY {version("kimmdy")}'
+    )
     parser.add_argument(
         "--input", "-i", type=str, help="kimmdy input file", default="kimmdy.yml"
     )
