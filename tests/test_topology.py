@@ -7,6 +7,7 @@ from kimmdy.parsing import read_topol
 from hypothesis import Phase, given, settings, strategies as st
 from kimmdy.topology.topology import Topology, generate_topology_from_bound_to
 from kimmdy.topology.atomic import *
+from kimmdy.topology.utils import match_atomic_item_to_atomic_type
 
 
 # %%
@@ -56,6 +57,26 @@ def random_topology_and_break(draw):
     break_this = draw(st.sampled_from(list(top.bonds.keys())))
     return (top, break_this)
 
+class TestFFPatches:
+    hexala_top = read_topol(Path("hexala.top"))
+    top = Topology(hexala_top, ffdir, ffpatch)
+
+    def test_match_atomic_item_to_atomic_type(self):
+        types = self.top.ff.angletypes
+
+        atomic_id = ['CT', 'C_R', 'N']
+        want = ('CT', 'C', 'N')
+        types_wanted = {want: types[want]}
+        item_type = match_atomic_item_to_atomic_type(atomic_id, types_wanted)
+        expected = AngleType(i='CT', j='C', k='N', id='CT---C---N', id_sym='N---C---CT', funct='1', c0='116.600', c1='585.760', c2=None, c3=None)
+        assert item_type == expected
+
+        atomic_id = ['C_R', 'CA', 'HA']
+        want = ('C', 'CA', 'HA')
+        types_wanted = {want: types[want]}
+        item_type = match_atomic_item_to_atomic_type(atomic_id, types_wanted)
+        expected = AngleType(i='C', j='CA', k='HA', id='C---CA---HA', id_sym='HA---CA---C', funct='1', c0='120.000', c1='418.400', c2=None, c3=None)
+        assert item_type == expected
 
 class TestTopology:
     hexala_top = read_topol(Path("hexala.top"))
