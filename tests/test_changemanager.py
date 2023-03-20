@@ -1,61 +1,48 @@
-from kimmdy.parsing import read_topol, read_plumed, topol_split_dihedrals
+from kimmdy.parsing import read_topol, read_plumed
 from kimmdy import changemanager
 import pytest
+import os
 
 from pathlib import Path
 from copy import deepcopy
 
+from kimmdy.reaction import Conversion, ConversionRecipe, ConversionType, ReactionOutcome, ReactionResult
 
-def test_break_bond_top():
-    input_f = Path(__file__).parent / "test_files/test_changemanager/hexala_out.top"
-    topology = read_topol(input_f)
-    breakpair = (9, 15)
-    breakpair_str = (str(x) for x in breakpair)
+# %%
+def set_dir():
+    try:
+        test_dir = Path(__file__).parent / "test_files/test_topology"
+    except NameError:
+        test_dir = Path("./tests/test_files/test_topology")
+    os.chdir(test_dir)
 
-    topology_new = changemanager.break_bond_top(deepcopy(topology), breakpair)
 
-    diffdict = {}
-    for key in topology.keys():
-        oldset = set(tuple(x) for x in topology[key])
-        newset = set(tuple(x) for x in topology_new[key])
-        diffdict[key] = list(oldset - newset)
+set_dir()
 
-    assert len(diffdict["bonds"]) == 1 and all(
-        [x in diffdict["bonds"][0] for x in breakpair_str]
-    )
-    assert len(diffdict["pairs"]) == 13
-    assert len(diffdict["angles"]) == 5 and all(
-        [x in angle for angle in diffdict["angles"] for x in breakpair_str]
-    )
-    assert len(diffdict["dihedrals"]) == 15 and all(
-        [x in dih for dih in diffdict["dihedrals"] for x in breakpair_str]
-    )
-    # includes impropers which might change
+# %%
+ffdir = Path("../assets/amber99sb-star-ildnp.ff")
+ffpatch = Path("amber99sb_patches.xml")
 
 
 def test_break_bond_plumed():
-    input_f = Path(__file__).parent / "test_files/test_changemanager/plumed.dat"
-    plumeddat = read_plumed(input_f)
-    breakpair = (9, 15)
-    breakpair = (str(breakpair[0]), str(breakpair[1]))
+    plumeddat = read_plumed(Path('plumed.dat'))
+    breakpair = ('9', '15')
 
-    newplumeddat = changemanager.break_bond_plumed(
-        deepcopy(plumeddat), breakpair, "distances.dat"
+    recipe = [Conversion(ConversionType.BREAK, breakpair)]
+
+    changemanager.modify_plumed(
+        recipe,
+        Path("plumed.dat"),
+        Path("plumed-mod.dat"),
+        Path("distances.dat"),
     )
+
+    newplumeddat = read_plumed(Path('plumed-mod.dat'))
 
     oldset = set(tuple(x["atoms"]) for x in plumeddat["distances"])
     newset = set(tuple(x["atoms"]) for x in newplumeddat["distances"])
     diffs = list(oldset - newset)
     assert len(diffs) == 1 and diffs[0] == breakpair
-
-
-def test_find_heavy():
-    movepair = ["9", "10"]
-    topology = {"bonds": []}
-    for i in range(0, 20, 2):
-        topology["bonds"].append([str(i), str(i + 1)])
-    heavy_idx = changemanager.find_heavy(topology["bonds"], movepair[0])
-    assert heavy_idx == "8"
 
 
 class TestTopologyMethods:
@@ -83,14 +70,6 @@ class TestTopologyMethods:
             for entry in val:
                 assert entry in self.topology[key]
 
-    def test_topol_change_at_an(self):
-        atom = ["10", "HX", "H9", "ALA"]
-        changemanager.topol_change_at_an(self.topology, atom)
-        assert self.topology["atoms"][12][1] == "HX"
-        assert self.topology["atoms"][12][4] == "H9"
-        atom = ["20", "HC", "HB1", "ALA"]
-        changemanager.topol_change_at_an(self.topology, atom)
-        assert self.topology["atoms"][23][4] == "HB4"
 
 
 class TestLocalGraphConstructMethods:
@@ -237,46 +216,6 @@ class TestLocalGraphFFMethods:
                 ["C", "N"],
             ]
         )
-
-    def test_get_H_FF_at_an(self):
-        at_an1 = self.full_graph.get_H_ff_at_an("9")
-        assert at_an1[0] == "H1"
-        assert at_an1[1] == "HA"
-        at_an2 = self.full_graph.get_H_ff_at_an("11")
-        assert at_an2 == ("HC", "HB1")
-
-    def test_compare_ff_impropers(self):
-        self.full_graph.improper_dihedrals.append(
-            ["5", "9", "7", "10", "4", "180.00", "4.60240", "2"]
-        )
-        adddict, rmvdict = self.full_graph.compare_ff_impropers("9", "7")
-        assert adddict["impropers"] == [["5", "9", "7", "8", "4"]]
-        assert rmvdict["impropers"] == [
-            ["5", "9", "7", "10", "4", "180.00", "4.60240", "2"]
-        ]
-
-    def test_get_ff_sections(self):
-        self.test_graph.get_ff_sections()
-        assert self.test_graph.ff["bondtypes"][1] == [
-            "C",
-            "C",
-            "1",
-            "0.1525",
-            "259408.0",
-            ";",
-            "new99",
-        ]
-        assert self.test_graph.ff["angletypes"][-1] == [
-            "CT",
-            "CC",
-            "CC",
-            "1",
-            "115.970",
-            "541.070",
-            ";",
-            "AOK_parm.PYL",
-        ]
-
 
 class TestLocalGraphParameterize:
     input_f = Path(__file__).parent / "test_files/test_changemanager/AlaCaR_out.top"
