@@ -369,8 +369,8 @@ class ResidueBondSpec:
 
     atom1: str
     atom2: str
-    b0: Optional[str]
-    kb: Optional[str]
+    b0: Optional[str] = None
+    kb: Optional[str] = None
 
     @classmethod
     def from_top_line(cls, l: list[str]):

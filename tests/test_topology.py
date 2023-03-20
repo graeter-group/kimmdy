@@ -146,16 +146,111 @@ class TestHexalaTopology:
         assert top.proper_dihedrals == top_broken.proper_dihedrals
         assert top.improper_dihedrals == top_broken.improper_dihedrals
 
+    def test_break_bond_9_15(self):
+        top = deepcopy(self.top)
+        og_top = deepcopy(self.top)
+        breakpair = ('9', '15')
 
-    def break_move_34_29_after_break(self):
+        top.break_bond(breakpair)
+        top._update_dict()
+
+        topology = og_top.top
+        topology_new = top.top
+
+        diffdict = {}
+        for key in topology.keys():
+            oldset = set(tuple(x) for x in topology[key])
+            newset = set(tuple(x) for x in topology_new[key])
+            diffdict[key] = list(oldset - newset)
+
+        assert len(diffdict["bonds"]) == 1 and all(
+            [x in diffdict["bonds"][0] for x in breakpair]
+        )
+        assert len(diffdict["pairs"]) == 13
+        assert len(diffdict["angles"]) == 5 and all(
+            [x in angle for angle in diffdict["angles"] for x in breakpair]
+        )
+        assert len(diffdict["dihedrals"]) == 15 and all(
+            [x in dih for dih in diffdict["dihedrals"] for x in breakpair]
+        )
+        # includes impropers which might change
+
+    def test_top_properties(self):
+        top = deepcopy(self.top)
+        og_top = deepcopy(self.top)
+
+        # initial correct number of atoms and bonds
+        assert len(top.atoms) == 16
+        assert len(top.bonds) == 15
+
+        # order is correct
+        val = 0
+        for atom_idx in top.atoms.keys():
+            assert int(atom_idx) > val
+            val = int(atom_idx)
+
+        val = 0
+        for bond in top.bonds.keys():
+            assert int(bond[0]) >= val
+            val = int(bond[0])
+
+        # specific atoms
+        for atom in top.atoms.values():
+            assert atom.type == "CH3"
+            assert atom.residue == "ACE"
+            break
+
+        # everything is bound to something
+        for atom in top.atoms.values():
+            assert len(atom.bound_to_nrs) > 0
+
+
+
+    def test_move_34_29_after_break(self):
+        """Move H at 34 to C at 39
+        """
         top = deepcopy(self.top)
         top_moved = deepcopy(self.top_move_34_29)
         top.break_bond(('29', '25'))
         top.break_bond(('31', '34'))
         top.bind_bond(('34', '29'))
+
+        # compare topologies
         assert top.bonds == top_moved.bonds
         assert top.pairs == top_moved.pairs
         assert top.angles == top_moved.angles
         assert top.proper_dihedrals == top_moved.proper_dihedrals
         assert top.improper_dihedrals == top_moved.improper_dihedrals
+
+        # inspect HAT hydrogen
+        h = top.atoms['34']
+        assert h.is_radical == False
+        assert h.atom == "H9"
+        assert h.type == "HX"
+        assert h.residue == "ALA"
+        assert h.bound_to_nrs == ['29']
+
+    def test_ff(self):
+        top = deepcopy(self.top)
+
+        residues = list(top.ff.residuetypes.keys())
+        assert len(residues) == 125
+
+        res = ResidueType('HOH',
+                          atoms={
+                              'OW': ResidueAtomSpec('OW', 'OW', '-0.834', '0'),
+                              'HW1': ResidueAtomSpec('HW1', 'HW', '0.417', '0'),
+                              'HW2': ResidueAtomSpec('HW2', 'HW', '0.417', '0')
+                          },
+                          bonds={
+                              ('OW', 'HW1'): ResidueBondSpec('OW', 'HW1'),
+                              ('OW', 'HW2'): ResidueBondSpec('OW', 'HW2')
+                          },
+                          improper_dihedrals={}
+                          )
+
+        assert residues[0] == res
+
+
+
 

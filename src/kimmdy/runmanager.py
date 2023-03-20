@@ -327,6 +327,7 @@ class RunManager:
 
         files.output = {"top": files.outputdir / "topol_mod.top"}
 
+        logging.debug(f"Chose recipe: {self.chosen_recipe}")
         changer.modify_top(
             self.chosen_recipe,
             files.input["top"],
@@ -336,7 +337,6 @@ class RunManager:
             self.top,
         )
         logging.info(f'Wrote new topology to {files.output["top"].parts[-3:]}')
-        logging.debug(f"Chose recipe: {self.chosen_recipe}")
 
         if self.config.plumed:
             files.output["plumed.dat"] = files.outputdir / "plumed_mod.dat"
