@@ -84,30 +84,40 @@ class Topology:
         return str(self.atoms)
 
     def _parse_atoms(self):
+        """Parse atoms from topology dictionary.
+        """
         ls = self.top["atoms"]
         for l in ls:
             atom = Atom.from_top_line(l)
             self.atoms[atom.nr] = atom
 
     def _parse_bonds(self):
+        """Parse bond from topology dictionary.
+        """
         ls = self.top["bonds"]
         for l in ls:
             bond = Bond.from_top_line(l)
             self.bonds[(bond.ai, bond.aj)] = bond
 
     def _parse_pairs(self):
+        """Parse pairs from topology dictionary.
+        """
         ls = self.top["pairs"]
         for l in ls:
             pair = Pair.from_top_line(l)
             self.pairs[(pair.ai, pair.aj)] = pair
 
     def _parse_angles(self):
+        """Parse angles from topology dictionary.
+        """
         ls = self.top["angles"]
         for l in ls:
             angle = Angle.from_top_line(l)
             self.angles[(angle.ai, angle.aj, angle.ak)] = angle
 
     def _parse_dihedrals(self):
+        """Parse improper and proper dihedrals from topology dictionary.
+        """
         ls = self.top["dihedrals"]
         for l in ls:
             dihedral = Dihedral.from_top_line(l)
@@ -121,6 +131,7 @@ class Topology:
                 ] = dihedral
 
     def _initialize_graph(self):
+        """Add a list of atom nrs bound to an atom to each atom."""
         for bond in self.bonds.values():
             i = bond.ai
             j = bond.aj
@@ -128,6 +139,7 @@ class Topology:
             self.atoms[j].bound_to_nrs.append(i)
 
     def _test_for_radicals(self):
+        """Iterate over all atoms and designate them as radicals if they have fewer bounds than their natural bond order"""
         for atom in self.atoms.values():
             bo = ATOMTYPE_BONDORDER_FLAT.get(atom.type)
             if bo and bo > len(atom.bound_to_nrs):
@@ -145,32 +157,60 @@ class Topology:
         patch: Patch,
         types: AtomicTypes,
     ):
-        # atomic_id_base = [item.removesuffix("_R") for item in atomic_id]
+        """Apply a patch to an atomic item (Atom, Bond, Angle etc.).
+
+        Initial values are taken from the topology or the force field (supplied via `types`).
+        """
         item_type = match_atomic_item_to_atomic_type(atomic_id, types)
         for param, param_patch in patch.params.items():
             initial = atomic_item.__dict__.get(param)
             if initial is None:
                 # get initial value from the FF
-                # TODO:
-                # what about matching up differently named parameters?
-                # in atomtypes and the topology?
                 initial = item_type.__dict__.get(param)
+            if initial is None:
+                logging.warning(
+                    f"Can't patch parameter because no initial parameter was found in the topology or the FF for: {atomic_id}, {atomic_item}."
+                )
+                continue
 
             try:
                 initial = float(initial)
             except ValueError as _:
                 logging.warning(
-                    f"Malformed patchfile. Some parameter pachtes couldn't be converted to a number: {initial}"
+                    f"Malformed patchfile. Some parameter patches couldn't be converted to a number: {param} with value {initial} of {atomic_item}."
                 )
                 continue
             except TypeError as _:
-                logging.warning(
-                    f"Can't patch parameter because no initial parameter was found in the topology or the FF for: {atomic_id}"
-                )
                 continue
 
             result = param_patch.apply(initial)
             atomic_item.__dict__[param] = result
+
+    def _revert_param_patch(
+        self,
+        atomic_item: Atomic,
+        atomic_id: list[str],
+        types: AtomicTypes,
+    ):
+        """Revert a patch to an atomic item (Atom, Bond, Angle etc.).
+
+        Values are taken from the force field (supplied via `types`) or reset to `None` if not found.
+        """
+        item_type = match_atomic_item_to_atomic_type(atomic_id, types)
+        no_itemtype = False
+        if item_type is None:
+            logging.warning(
+                f"Can't revert patch because no initial parameter was found in the FF for: {atomic_id}, {atomic_item}. Resetting to None"
+            )
+            no_itemtype = True
+
+        print(atomic_item)
+        for param in atomic_item.__dict__.keys():
+            if param.startswith('c'):
+                if no_itemtype:
+                    atomic_item.__dict__[param] = None
+                atomic_item.__dict__[param] = atomic_item.__dict__.get(param)
+
 
     def break_bond(self, atompair_nrs: tuple[str, str]):
         """Break bonds in topology.
@@ -282,6 +322,7 @@ class Topology:
         for key, _ in dihedral_k_v:
             if all([x in key for x in atompair_nrs]):
                 self.improper_dihedrals.pop(key, None)
+                # TODO: patch improper dihedrals!
 
         # update bound_to
         try:
@@ -311,7 +352,9 @@ class Topology:
         atompair = [self.atoms[atompair_nrs[0]], self.atoms[atompair_nrs[1]]]
 
         # de-radialize if re-combining two radicals
+        combined_radicals = False
         if all(map(lambda x: x.is_radical, atompair)):
+            combined_radicals = True
             atompair[0].is_radical = False
             atompair[1].is_radical = False
             for a in atompair:
@@ -384,7 +427,7 @@ class Topology:
         ) + self._get_atom_improper_dihedrals(atompair_nrs[1])
         for key, value in dihedral_k_v:
             if self.improper_dihedrals.get(key) is None:
-                # TODO: fix this after the demonstration
+                # TODO: fix this
                 c2 = None
                 if value.q0 is not None:
                     c2 = "1"
@@ -392,18 +435,63 @@ class Topology:
                     key[0], key[1], key[2], key[3], "4", value.q0, value.cq, c2
                 )
 
-        # if there are no changed parameters for radicals, exit here
-        if self.ffpatches is None:
-            self._update_dict()
-            return
+
+        # revert patches on the no-longer radicals
+        if combined_radicals:
+            for atom in atompair:
+                # revert patches on atoms
+                self._revert_param_patch(atom, [atom.nr], self.ff.atomtypes)
+
+                # revert patches on bonds
+                for bond_key in self._get_atom_bonds(atom.nr):
+                    bond = self.bonds.get(bond_key)
+                    if (
+                        bond is None
+                        or self.ffpatches is None
+                        or self.ffpatches.bondpatches is None
+                    ):
+                        continue
+                    id_base = [self.atoms[i].type for i in [bond.ai, bond.aj]]
+                    self._revert_param_patch(bond, id_base, self.ff.bondtypes)
+
+                # revert patches on angles
+                angle_keys = self._get_atom_angles(atom.nr)
+                for key in angle_keys:
+                    angle = self.angles.get(key)
+                    if (
+                        angle is None
+                        or self.ffpatches is None
+                        or self.ffpatches.anglepatches is None
+                    ):
+                        continue
+                    id_base = [self.atoms[i].type for i in key]
+                    self._revert_param_patch(angle, id_base, self.ff.angletypes)
+
+                # revert patches on dihedrals
+                dihedral_keys = self._get_atom_proper_dihedrals(atom.nr)
+                for key in dihedral_keys:
+                    dihedral = self.proper_dihedrals.get(key)
+                    if (
+                        dihedral is None
+                        or self.ffpatches is None
+                        or self.ffpatches.anglepatches is None
+                    ):
+                        continue
+                    id_base = [self.atoms[i].type for i in key]
+                    self._revert_param_patch(dihedral, id_base, self.ff.proper_dihedraltypes)
+
+
+
 
     def _get_atom_bonds(self, atom_nr: str) -> list[tuple[str, str]]:
+        """Get all bonds a particular atom is involved in."""
         ai = atom_nr
         bonds = []
         for aj in self.atoms[ai].bound_to_nrs:
-            # TODO: maybe sort here and filter later instead
             if int(ai) < int(aj):
                 bonds.append((ai, aj))
+            else:
+                bonds.append((aj, ai))
         return bonds
 
     def _get_atom_pairs(self, _: str) -> list[tuple[str, str]]:

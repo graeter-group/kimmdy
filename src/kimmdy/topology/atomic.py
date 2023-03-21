@@ -306,9 +306,13 @@ class DihedralType:
     A class containing bond information as in the dihedrals section of the topology.
     Proper dihedrals have funct 9.
     Improper dihedrals have funct 4.
+    
+    Note that proper dihedrals of type 9 can be defined multiple times, for different
+    periodicities. This is why would-be parameter c2 is called periodicity and part of
+    the `id`.
 
     From gromacs topology:
-    ';', 'i', 'j', 'k', 'l', 'funct', 'c0', 'c1', 'c2', 'c3', 'c4', 'c5'
+    ';', 'i', 'j', 'k', 'l', 'funct', 'c0', 'c1', 'periodicity', 'c3', 'c4', 'c5'
     Where i,j,k,l are atomtypes
     """
 
@@ -319,6 +323,7 @@ class DihedralType:
     id: str
     id_sym: str
     funct: str
+    periodicity: str
     c0: Optional[str] = None
     c1: Optional[str] = None
     c2: Optional[str] = None
@@ -328,17 +333,20 @@ class DihedralType:
 
     @classmethod
     def from_top_line(cls, l: list[str]):
+        periodicity = field_or_none(l, 7)
+        if periodicity is None:
+            periodicity = '2'
         return cls(
             i=l[0],
             j=l[1],
             k=l[2],
             l=l[3],
-            id="---".join(l[:4]),
-            id_sym="---".join(reversed(l[:4])),
+            id="---".join(l[:4]) + ':::' + periodicity,
+            id_sym="---".join(reversed(l[:4])) + ':::' + periodicity,
             funct=l[4],
+            periodicity=periodicity,
             c0=field_or_none(l, 5),
             c1=field_or_none(l, 6),
-            c2=field_or_none(l, 7),
             c3=field_or_none(l, 8),
             c4=field_or_none(l, 9),
             c5=field_or_none(l, 10),
@@ -439,12 +447,12 @@ class ResidueType:
 AtomId = str
 BondId = tuple[str, str]
 AngleId = tuple[str, str, str]
-DihedralId = tuple[str, str, str, str]
+DihedralId = tuple[str, str, str, str, str]
 Atomic = Union[Atom, Bond, Pair, Angle, Dihedral]
 AtomicType = Union[AtomType, BondType, AngleType, DihedralType]
 AtomicTypes = Union[
     dict[AtomId, AtomType],
     dict[BondId, BondType],
     dict[AngleId, AngleType],
-    dict[DihedralId, list[DihedralType]],
+    dict[DihedralId, DihedralType],
 ]

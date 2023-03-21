@@ -8,6 +8,7 @@ from hypothesis import Phase, given, settings, strategies as st
 from kimmdy.topology.topology import Topology, generate_topology_from_bound_to
 from kimmdy.topology.atomic import *
 from kimmdy.topology.utils import match_atomic_item_to_atomic_type
+import logging
 
 
 # %%
@@ -90,9 +91,9 @@ class TestTopology:
 
         bondindex = 24
         bond_key = list(top.bonds.keys())[bondindex]
-        # bond_key = ('9', '10')
-        # bond = ('1', '2')
-        # bond = ('5', '6')
+        logging.info(f"bond_key: {bond_key}")
+        # 25, 27
+        # C, N
         top.break_bond(bond_key)
         top.bind_bond(bond_key)
         assert top.bonds == og_top.bonds
