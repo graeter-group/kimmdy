@@ -148,7 +148,7 @@ class TestHexalaTopology:
     top_break_29_35 = Topology(hexala_break_29_35, ffdir, ffpatch)
     top_move_34_29 = Topology(hexala_move_34_39, ffdir, ffpatch)
 
-    def all_terms_accounted_for(self):
+    def test_all_terms_accounted_for(self):
         top = self.top
         hexala_top = self.hexala_top
         assert len(top.atoms) == len(hexala_top["atoms"])
@@ -158,7 +158,17 @@ class TestHexalaTopology:
         assert len(top.proper_dihedrals) == len(hexala_top["propers"])
         assert len(top.improper_dihedrals) == len(hexala_top["impropers"]) 
 
-    def break_bond_29_35(self):
+    def test_find_bondtypes(self):
+        top = deepcopy(self.top)
+
+        id = ['C', 'CT']
+        result = match_atomic_item_to_atomic_type(id, top.ff.bondtypes)
+        id = ['CT', 'C']
+        result = match_atomic_item_to_atomic_type(id, top.ff.bondtypes)
+        assert result is not None
+
+
+    def test_break_bond_29_35(self):
         top = deepcopy(self.top)
         top_broken = deepcopy(self.top_break_29_35)
         top.break_bond(('29', '35'))
