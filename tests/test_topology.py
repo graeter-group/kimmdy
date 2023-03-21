@@ -255,6 +255,30 @@ class TestHexalaTopology:
         assert len(improper_dihedrals) == 3
 
 
+        atomnr = "9"
+        bonds = top._get_atom_bonds(atomnr)
+        angles = top._get_atom_angles(atomnr)
+        proper_dihedrals_center = top._get_center_atom_dihedrals(atomnr)
+
+        assert bonds == [("7", "9"), ("9", "10"), ("9", "14")]
+        assert proper_dihedrals_center == [
+            ("5", "7", "9", "10"),
+            ("5", "7", "9", "14"),
+            ("8", "7", "9", "10"),
+            ("8", "7", "9", "14"),
+            ("7", "9", "10", "11"),
+            ("7", "9", "10", "12"),
+            ("7", "9", "10", "13"),
+            ("14", "9", "10", "11"),
+            ("14", "9", "10", "12"),
+            ("14", "9", "10", "13"),
+            ("7", "9", "14", "15"),
+            ("7", "9", "14", "16"),
+            ("10", "9", "14", "15"),
+            ("10", "9", "14", "16")
+        ]
+
+
 
 
     def test_move_34_29_after_break(self):
