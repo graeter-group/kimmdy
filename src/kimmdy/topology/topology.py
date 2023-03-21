@@ -12,6 +12,7 @@ from kimmdy.topology.ff import FF, FFPatches, Patch
 from itertools import permutations, combinations
 import textwrap
 import logging
+import re
 
 
 class Topology:
@@ -194,22 +195,19 @@ class Topology:
     ):
         """Revert a patch to an atomic item (Atom, Bond, Angle etc.).
 
-        Values are taken from the force field (supplied via `types`) or reset to `None` if not found.
+        Values reset to `None` if found in the forcefield (supplied via `types`).
         """
         item_type = match_atomic_item_to_atomic_type(atomic_id, types)
-        no_itemtype = False
         if item_type is None:
             logging.warning(
-                f"Can't revert patch because no initial parameter was found in the FF for: {atomic_id}, {atomic_item}. Resetting to None"
+                f"Won't revert patch because no initial parameter was found in the FF for: {atomic_id}, {atomic_item}."
             )
-            no_itemtype = True
+            return
 
-        print(atomic_item)
+        print(f'item_type: {item_type}')
         for param in atomic_item.__dict__.keys():
-            if param.startswith('c'):
-                if no_itemtype:
-                    atomic_item.__dict__[param] = None
-                atomic_item.__dict__[param] = atomic_item.__dict__.get(param)
+            if re.match(r'^c\d', param):
+                atomic_item.__dict__[param] = None
 
 
     def break_bond(self, atompair_nrs: tuple[str, str]):
@@ -440,7 +438,7 @@ class Topology:
         if combined_radicals:
             for atom in atompair:
                 # revert patches on atoms
-                self._revert_param_patch(atom, [atom.nr], self.ff.atomtypes)
+                self._revert_param_patch(atom, [atom.type], self.ff.atomtypes)
 
                 # revert patches on bonds
                 for bond_key in self._get_atom_bonds(atom.nr):
