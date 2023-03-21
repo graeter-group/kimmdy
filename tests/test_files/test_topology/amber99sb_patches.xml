@@ -27,27 +27,27 @@ after heterolysis
  </Bonds>
  <Angles> 
 
-  <Angle ai="X" aj="X_R" ak="X" angle_value="117"/>
-  <Angle ai="X" aj="CR_R" ak="X" angle_factor="1.08"/>
-  <Angle ai="X" aj="NA_R" ak="X" angle_factor="1.08"/>
-  <Angle ai="X" aj="CW_R" ak="X" angle_factor="1.08"/>
-  <Angle ai="X" aj="CC_R" ak="X" angle_factor="1.08"/>
-  <Angle ai="X" aj="CA_R" ak="X" angle_factor="1.08"/>
-  <Angle ai="X" aj="CN_R" ak="X" angle_factor="1.08"/>
-  <Angle ai="X" aj="CX_R" ak="X" angle_factor="1.08"/>
+  <Angle ai="X" aj="X_R" ak="X" c0_value="117"/>
+  <Angle ai="X" aj="CR_R" ak="X" c0_factor="1.08"/>
+  <Angle ai="X" aj="NA_R" ak="X" c0_factor="1.08"/>
+  <Angle ai="X" aj="CW_R" ak="X" c0_factor="1.08"/>
+  <Angle ai="X" aj="CC_R" ak="X" c0_factor="1.08"/>
+  <Angle ai="X" aj="CA_R" ak="X" c0_factor="1.08"/>
+  <Angle ai="X" aj="CN_R" ak="X" c0_factor="1.08"/>
+  <Angle ai="X" aj="CX_R" ak="X" c0_factor="1.08"/>
  </Angles>
  <Dihedrals>
 
-  <Dihedral ai="C" aj="N" ak="CT_R" al="C" func="9" periodicity="1" phase_value="180.0" k_value="1.6279944"/>
-  <Dihedral ai="C" aj="N" ak="CT_R" al="C" func="9" periodicity="2" phase_value="180.0" k_value="21.068532"/>
-  <Dihedral ai="C" aj="N" ak="CT_R" al="C" func="9" periodicity="3" phase_value="180.0" k_value="1.447664"/>
+  <Dihedral ai="C" aj="N" ak="CT_R" al="C" func="9" periodicity="1" c0_value="180.0" c1_value="1.6279944"/>
+  <Dihedral ai="C" aj="N" ak="CT_R" al="C" func="9" periodicity="2" c0_value="180.0" c1_value="21.068532"/>
+  <Dihedral ai="C" aj="N" ak="CT_R" al="C" func="9" periodicity="3" c0_value="180.0" c1_value="1.447664"/>
 
 
-  <Dihedral ai="N" aj="CT_R" ak="C" al="N" func="9" periodicity="1" phase_value="180.0" k_value="6.556746"/>
-  <Dihedral ai="N" aj="CT_R" ak="C" al="N" func="9" periodicity="2" phase_value="180.0" k_value="20.284450"/>
-  <Dihedral ai="N" aj="CT_R" ak="C" al="N" func="9" periodicity="3" phase_value="180.0" k_value="0.297901"/>
+  <Dihedral ai="N" aj="CT_R" ak="C" al="N" func="9" periodicity="1" c0_value="180.0" c1_value="6.556746"/>
+  <Dihedral ai="N" aj="CT_R" ak="C" al="N" func="9" periodicity="2" c0_value="180.0" c1_value="20.284450"/>
+  <Dihedral ai="N" aj="CT_R" ak="C" al="N" func="9" periodicity="3" c0_value="180.0" c1_value="0.297901"/>
 
-  <Dihedral ai="X" aj="X" ak="X_R" al="X" func="9" periodicity="2" phase_value="180.0" k_value="43.932"/>
+  <Dihedral ai="X" aj="X" ak="X_R" al="X" func="9" periodicity="2" c0_value="180.0" c1_value="43.932"/>
 
 
  </Dihedrals>
