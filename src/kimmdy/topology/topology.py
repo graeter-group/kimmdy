@@ -60,9 +60,7 @@ class Topology:
         self.top["bonds"] = [attributes_to_list(x) for x in self.bonds.values()]
         self.top["pairs"] = [attributes_to_list(x) for x in self.pairs.values()]
         self.top["angles"] = [attributes_to_list(x) for x in self.angles.values()]
-        self.top["dihedrals"] = [
-            attributes_to_list(x) for x in self.proper_dihedrals.values()
-        ]
+        self.top["dihedrals"] = [attributes_to_list(x) for x in self.proper_dihedrals.values()] + [attributes_to_list(x) for x in self.improper_dihedrals.values()]
 
     def to_dict(self) -> TopologyDict:
         self._update_dict()
