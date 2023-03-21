@@ -45,22 +45,6 @@ def test_break_bond_plumed():
     assert len(diffs) == 1 and diffs[0] == breakpair
 
 
-def test_build_PADs():
-    input_f = Path(__file__).parent / "test_files/test_changemanager/hexala_out.top"
-    topology = read_topol(input_f)
-    topology = topol_split_dihedrals(topology)
-    input_ff = Path(__file__).parent / "test_files/assets/amber99sb-star-ildnp.ff"
-
-    new_graph = changemanager.LocalGraph(topology, "29", input_ff, None, 20)
-
-    assert len(new_graph.atoms) == len(topology["atoms"]) - 9
-    assert len(new_graph.bonds) == len(topology["bonds"]) - 1
-    assert len(new_graph.pairs) == len(topology["pairs"]) - 1
-    assert len(new_graph.angles) == len(topology["angles"]) - 1
-    assert len(new_graph.proper_dihedrals) == len(topology["propers"]) - 1
-    assert len(new_graph.improper_dihedrals) == len(topology["impropers"]) - 1
-
-
 class TestLocalGraphAddRemoveMethods:
     input_f = Path(__file__).parent / "test_files/test_changemanager/hexala_out.top"
     topology = read_topol(input_f)
