@@ -37,7 +37,7 @@ def extract_section_name(ls: list[str]) -> tuple[str, list[str]]:
     """takes a list of lines and return a tuple
     with the name and the lines minus the
     line that contained the name.
-    Returns the empty string if no name was found.
+    Returns the empty string as the name if no name was found.
     """
     for i, l in enumerate(ls):
         if l and l[0] != ";" and "[" in l:
@@ -87,12 +87,11 @@ def read_topol(path: Path) -> TopologyDict:
     with open(path, "r") as f:
         sections = get_sections(f, "\n")
         d = {}
-        for i, s in enumerate(sections):
-            # skip empty sections
-            if s == [""]:
-                continue
+        for i, s in enumerate([s for s in sections if s is not [""] and s is not []]):
             name, content = extract_section_name(s)
             content = [c.split() for c in content if len(c.split()) > 0]
+            if content == []:
+                continue
             if not name:
                 name = f"BLOCK {i}"
             # sections can be duplicated.
@@ -107,6 +106,8 @@ def read_topol(path: Path) -> TopologyDict:
 def write_topol(top: TopologyDict, outfile: Path):
     with open(outfile, "w") as f:
         for title, content in top.items():
+            if content == []:
+                continue
             if title.startswith("BLOCK "):
                 f.write(f"\n")
             else:
