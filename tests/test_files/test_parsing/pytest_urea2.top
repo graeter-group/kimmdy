@@ -44,6 +44,8 @@ Urea     3
 [ dihedral_restraints ]
 3        6        1        2        1        180      0        10      
 1        4        3        5        1        180      0        10      
+
+
 #include "amber99.ff/tip3p.itp"
 
 [ system ]
@@ -52,4 +54,7 @@ Urea     in       Water
 [ molecules ]
 Urea     1       
 SOL      1000    
+
+
+
 
