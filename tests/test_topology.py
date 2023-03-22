@@ -328,4 +328,10 @@ class TestHexalaTopology:
 
 
 
-
+class TestRadicalAla():
+    ala_top = read_topol(Path("AlaCa_R.top"))
+    top = Topology(ala_top, ffdir, ffpatch)
+    def test_is_radical(self):
+        top = self.top
+        assert top.atoms['9'].is_radical == True
+        assert top.atoms['10'].is_radical == False

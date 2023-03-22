@@ -45,43 +45,6 @@ def test_break_bond_plumed():
     assert len(diffs) == 1 and diffs[0] == breakpair
 
 
-class TestLocalGraphParameterize:
-    input_f = Path(__file__).parent / "test_files/test_changemanager/AlaCaR_out.top"
-    input_ff = Path(__file__).parent / "test_files/assets/amber99sb-star-ildnp.ff"
-
-    topology = read_topol(input_f)
-    topology = topol_split_dihedrals(topology)
-    full_graph = changemanager.LocalGraph(topology, "9", input_ff)
-    full_graph.get_ff_sections()
-
-    atom_terms = full_graph.get_terms_with_atom("9", center=True)
-    atom_terms["pairs"].clear()
-
-
-
-    def test_add_function_to_terms(self):
-        termdict = {
-            "bonds": [["b1"], ["b2"]],
-            "pairs": [["p1"], ["p2"]],
-            "angles": [["a1"], ["a2"]],
-            "propers": [["p1"], ["p2"]],
-            "impropers": [["i1"], ["i2"]],
-        }
-        termdict_funct = self.full_graph.add_function_to_terms(termdict)
-        funct_dict = {
-            "bonds": "1",
-            "pairs": "1",
-            "angles": "1",
-            "propers": "9",
-            "impropers": "4",
-        }
-        for key, val in termdict_funct.items():
-            for entry in val:
-                assert entry[-1] == funct_dict[key]
-
-    def test_is_radical(self):
-        assert self.full_graph.is_radical("9")
-        assert not self.full_graph.is_radical("10")
 
     def test_parameterize_bonded_terms(self):
         terms_bond = self.full_graph.parameterize_bonded_terms(

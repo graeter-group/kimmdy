@@ -85,7 +85,7 @@ def read_topol(path: Path) -> TopologyDict:
     # TODO look into following #includes
     # TODO look into [ intermolecule ] section
     with open(path, "r") as f:
-        sections = get_sections(f, "[")
+        sections = get_sections(f, "\n")
         d = {}
         for i, s in enumerate(sections):
             # skip empty sections
