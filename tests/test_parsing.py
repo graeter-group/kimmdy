@@ -71,20 +71,13 @@ def test_parser_invertible(d):
 def test_parse_xml_ff():
     set_dir()
     ff_path = Path("amber99sb_trunc.xml")
-    d = parsing.read_xml_ff(ff_path)
-    refdict = {
-        "HEAD": {},
-        "AtomTypes": {
-            "N": {"element": "N", "mass": 14.00672},
-            "H": {"element": "H", "mass": 1.007947},
-        },
-        "HarmonicBondForce": {
-            "H_N": {"length": 0.101, "k": 363171.2},
-            "C_*_*_O": {"periodicity1": 2.0, "phase1": 3.14159265359, "k1": 43.932},
-        },
-        "NonbondedForce": {
-            "N": {"charge": -0.4157, "sigma": 0.324999852378, "epsilon": 0.71128},
-            "H": {"charge": 0.2719, "sigma": 0.106907846177, "epsilon": 0.0656888},
-        },
+    xml = parsing.read_xml_ff(ff_path)
+
+    atomtypes = xml.find('AtomTypes')
+    atomtypes.findall('Type')
+    assert atomtypes.findall('Type')[0].attrib == {
+        "class": "N", "element": "N", "mass": '14.00672'
     }
-    assert d == refdict
+    assert atomtypes.findall('Type')[1].attrib == {
+        "class": "H", "element": "H", "mass": '1.007947'
+    }

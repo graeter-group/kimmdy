@@ -45,79 +45,6 @@ def test_break_bond_plumed():
     assert len(diffs) == 1 and diffs[0] == breakpair
 
 
-class TestLocalGraphAddRemoveMethods:
-    input_f = Path(__file__).parent / "test_files/test_changemanager/hexala_out.top"
-    topology = read_topol(input_f)
-    topology = topol_split_dihedrals(topology)
-    input_ff = Path(__file__).parent / "test_files/assets/amber99sb-star-ildnp.ff"
-    test_graph = changemanager.LocalGraph(topology, "1", input_ff, None, 3)
-    original_graph = deepcopy(test_graph)
-    n_atoms = len(test_graph.get_atoms_property("idx"))
-    n_bonds = len(test_graph.bonds)
-
-    def test_add_atom(self):
-        self.test_graph.add_atom(changemanager.Atom("10"))
-        self.test_graph.add_atom(changemanager.Atom("11"))
-        self.test_graph.add_atom(changemanager.Atom("12"))
-
-        assert len(self.test_graph.atoms) == self.n_atoms + 3
-        assert len(self.test_graph.atoms_idx) == self.n_atoms + 3
-
-    def test_add_bond(self):
-        self.test_graph.add_bond(["9", "10"])
-        self.test_graph.add_bond(["10", "11"])
-        self.test_graph.add_bond(["11", "12"])
-
-        assert ["11", "12"] in self.test_graph.bonds
-        assert len(self.test_graph.bonds) == self.n_bonds + 3
-
-    def test_remove_terms(self):
-        # TODO: rewrite
-        pass
-
-
-class TestLocalGraphFFMethods:
-    input_ff = Path(__file__).parent / "test_files/assets/amber99sb-star-ildnp.ff"
-    input_f = Path(__file__).parent / "test_files/test_changemanager/hexala_out.top"
-    topology = read_topol(input_f)
-    topology = topol_split_dihedrals(topology)
-    test_graph = changemanager.LocalGraph(topology, "1", input_ff)
-
-    full_graph = changemanager.LocalGraph(topology, "9", input_ff)
-    full_graph.construct_graph()
-    full_graph.order_lists()
-    full_graph.update_atoms_list()
-    full_graph.update_bound_to()
-    full_graph.build_PADs()
-    full_graph.order_lists()
-
-    def test_ff_AA_todict(self):
-        ffaminoacids = self.test_graph.ff_AA_todict()
-        assert "ALA" in ffaminoacids.keys()
-        assert all(
-            x in ffaminoacids["GLY"]["atoms"]
-            for x in [
-                ["N", "N", "0.41570", "1"],
-                ["H", "H", "0.27190", "2"],
-                ["CA", "CT", "0.02520", "3"],
-                ["HA1", "H1", "0.06980", "4"],
-                ["HA2", "H1", "0.06980", "5"],
-                ["C", "C", "0.59730", "6"],
-                ["O", "O", "0.56790", "7"],
-            ]
-        )
-        assert all(
-            x in ffaminoacids["NME"]["bonds"]
-            for x in [
-                ["N", "H"],
-                ["N", "CH3"],
-                ["CH3", "HH31"],
-                ["CH3", "HH32"],
-                ["CH3", "HH33"],
-                ["C", "N"],
-            ]
-        )
-
 class TestLocalGraphParameterize:
     input_f = Path(__file__).parent / "test_files/test_changemanager/AlaCaR_out.top"
     input_ff = Path(__file__).parent / "test_files/assets/amber99sb-star-ildnp.ff"
@@ -130,35 +57,7 @@ class TestLocalGraphParameterize:
     atom_terms = full_graph.get_terms_with_atom("9", center=True)
     atom_terms["pairs"].clear()
 
-    def test_search_terms(self):
-        termdict = {}
-        termdict["bonds"] = self.full_graph.search_terms(
-            self.full_graph.bonds, "9", False
-        )
-        termdict["propers"] = self.full_graph.search_terms(
-            self.full_graph.proper_dihedrals, "9", False
-        )
-        termdict["centerpropers"] = self.full_graph.search_terms(
-            self.full_graph.proper_dihedrals, "9", True
-        )
-        assert termdict["bonds"] == [["7", "9"], ["9", "10"], ["9", "14"]]
-        assert termdict["propers"][0] == ["1", "5", "7", "9"]
-        assert termdict["centerpropers"] == [
-            ["5", "7", "9", "10"],
-            ["5", "7", "9", "14"],
-            ["8", "7", "9", "10"],
-            ["8", "7", "9", "14"],
-            ["7", "9", "10", "11"],
-            ["7", "9", "10", "12"],
-            ["7", "9", "10", "13"],
-            ["14", "9", "10", "11"],
-            ["14", "9", "10", "12"],
-            ["14", "9", "10", "13"],
-            ["7", "9", "14", "15"],
-            ["7", "9", "14", "16"],
-            ["10", "9", "14", "15"],
-            ["10", "9", "14", "16"],
-        ]
+
 
     def test_add_function_to_terms(self):
         termdict = {

@@ -51,7 +51,7 @@ def extract_section_name(ls: list[str]) -> tuple[str, list[str]]:
 def create_subsections(ls: list[list[str]]):
     d = {}
     subsection_name = "other"
-    for i, l in enumerate(ls):
+    for _, l in enumerate(ls):
         if l[0] == "[":
             subsection_name = l[1]
         else:
@@ -65,7 +65,7 @@ def create_subsections(ls: list[list[str]]):
 def read_rtp(path: Path) -> dict:
     # TODO: make this more elegant and performant
     with open(path, "r") as f:
-        sections = get_sections(f, "\n")
+        sections = get_sections(f, "[")
         d = {}
         for i, s in enumerate(sections):
             # skip empty sections
@@ -85,7 +85,7 @@ def read_topol(path: Path) -> TopologyDict:
     # TODO look into following #includes
     # TODO look into [ intermolecule ] section
     with open(path, "r") as f:
-        sections = get_sections(f, "\n")
+        sections = get_sections(f, "[")
         d = {}
         for i, s in enumerate(sections):
             # skip empty sections
