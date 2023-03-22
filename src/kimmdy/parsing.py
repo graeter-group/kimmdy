@@ -65,7 +65,7 @@ def create_subsections(ls: list[list[str]]):
 def read_rtp(path: Path) -> dict:
     # TODO: make this more elegant and performant
     with open(path, "r") as f:
-        sections = get_sections(f, "[")
+        sections = get_sections(f, "\n")
         d = {}
         for i, s in enumerate(sections):
             # skip empty sections
@@ -87,7 +87,7 @@ def read_topol(path: Path) -> TopologyDict:
     with open(path, "r") as f:
         sections = get_sections(f, "\n")
         d = {}
-        for i, s in enumerate([s for s in sections if s is not [""] and s is not []]):
+        for i, s in enumerate([s for s in sections if s is not [""]]):
             name, content = extract_section_name(s)
             content = [c.split() for c in content if len(c.split()) > 0]
             if content == []:

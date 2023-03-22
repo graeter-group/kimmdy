@@ -309,7 +309,7 @@ class TestHexalaTopology:
         top = deepcopy(self.top)
 
         residues = list(top.ff.residuetypes.keys())
-        assert len(residues) == 125
+        assert len(residues) == 121
 
         res = ResidueType('HOH',
                           atoms={
@@ -324,7 +324,7 @@ class TestHexalaTopology:
                           improper_dihedrals={}
                           )
 
-        assert residues[0] == res
+        assert top.ff.residuetypes['HOH'] == res
 
 
 
