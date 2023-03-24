@@ -50,6 +50,73 @@ class Atom:
             massB=field_or_none(l, 9),
         )
 
+@dataclass(order=True)
+class PositionRestraint:
+    """Information about one position restraint.
+
+    A class containing information as in the position_restraints section of the topology.
+
+    From gromacs topology:
+    ; ai   funct    fc(x,y,z)
+    """
+
+    ai: str
+    funct: str
+    fc: tuple[str, str, str]
+    condition: Optional[str] = None
+
+    @classmethod
+    def from_top_line(cls, l: list[str], condition=None):
+        return cls(
+            ai=l[0],
+            funct=l[1],
+            fc=tuple(l[2:]),
+            condition=condition,
+        )
+
+# [ position_restraints ]
+# ; you wouldn't normally use this for a molecule like Urea,
+# ; but we include it here for didactic purposes
+# ; ai   funct    fc
+#    1     1     1000    1000    1000 ; Restrain to a point
+#    2     1     1000       0    1000 ; Restrain to a line (Y-axis)
+#    3     1     1000       0       0 ; Restrain to a plane (Y-Z-plane)
+# [ dihedral_restraints ]
+# ; ai   aj    ak    al  type  phi  dphi  fc
+#     3    6     1    2     1  180     0  10
+#     1    4     3    5     1  180     0  10
+
+@dataclass(order=True)
+class DihedralRestraint:
+    """Information about one dihedral restraint.
+
+    A class containing information as in the dihedral_restraints section of the topology.
+
+    From gromacs topology:
+    ; ai   aj    ak    al  type  phi  dphi  fc
+    """
+
+    ai: str
+    aj: str
+    ak: str
+    al: str
+    type: str
+    phi: str
+    dphi: str
+    fc: str
+
+    @classmethod
+    def from_top_line(cls, l: list[str]):
+        return cls(
+            ai=l[0],
+            aj=l[1],
+            ak=l[2],
+            al=l[3],
+            type=l[4],
+            phi=l[5],
+            dphi=l[6],
+            fc=l[7],
+        )
 
 @dataclass(order=True)
 class AtomType:
@@ -434,7 +501,7 @@ class ResidueProperSpec:
 
 @dataclass(order=True)
 class ResidueType:
-    """Information about one residuetype"""
+    """Information about one residuetype from aminoacids.rtp"""
 
     residue: str
     atoms: dict[str, ResidueAtomSpec]
@@ -446,6 +513,7 @@ class ResidueType:
     def from_section(cls, residue, d: dict[str, list[list[str]]]):
         atoms = {}
         bonds = {}
+        propers = {}
         impropers = {}
         if ls := d.get("atoms"):
             for l in ls:
@@ -455,6 +523,12 @@ class ResidueType:
             for l in ls:
                 bond = ResidueBondSpec.from_top_line(l)
                 bonds[(bond.atom1, bond.atom2)] = bond
+        if ls := d.get("dihedrals"):
+            for l in ls:
+                proper = ResidueProperSpec.from_top_line(l)
+                propers[
+                    (proper.atom1, proper.atom2, proper.atom3, proper.atom4)
+                ] = proper
         if ls := d.get("impropers"):
             for l in ls:
                 improper = ResidueImproperSpec.from_top_line(l)
@@ -462,7 +536,7 @@ class ResidueType:
                     (improper.atom1, improper.atom2, improper.atom3, improper.atom4)
                 ] = improper
 
-        return cls(residue, atoms, bonds, impropers)
+        return cls(residue, atoms, bonds, propers, impropers)
 
 
 AtomId = str

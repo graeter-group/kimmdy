@@ -321,7 +321,8 @@ class TestHexalaTopology:
                               ('OW', 'HW1'): ResidueBondSpec('OW', 'HW1'),
                               ('OW', 'HW2'): ResidueBondSpec('OW', 'HW2')
                           },
-                          improper_dihedrals={}
+                          proper_dihedrals={},
+                          improper_dihedrals={},
                           )
 
         assert top.ff.residuetypes['HOH'] == res
