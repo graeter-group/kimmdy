@@ -27,6 +27,8 @@ def modify_top(
             topology.break_bond(conversion.atom_idx)
         elif conversion.type == ConversionType.BIND:
             topology.bind_bond(conversion.atom_idx)
+        elif conversion.type == ConversionType.MOVE:
+            topology.move_hydrogen(conversion.atom_idx)
     topology._update_dict()
     write_topol(topology.top, newtop)
 
