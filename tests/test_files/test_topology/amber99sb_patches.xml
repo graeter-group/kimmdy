@@ -15,6 +15,18 @@ after heterolysis
 -->
 
 <ForceFieldPatches>
+
+ <Atoms>
+  <Atom ai="X_R" aj="X"  c0_factor="0.98"/>
+  <Atom ai="X_R" aj="HX" c0_factor="1.00"/>
+  <Atom ai="OX_R" aj="X" c0_factor="0.95"/>
+  <Atom ai="OX" aj="X_R" c0_factor="0.95"/>
+  <Atom ai="SX_R" aj="X" c0_factor="0.95"/>
+  <Atom ai="SX" aj="X_R" c0_factor="0.95"/>
+  <Atom ai="N" aj="CT_R" c0_factor="0.94"/>
+  <Atom ai="C" aj="N_R" c0_factor="0.92"/>
+ </Atoms>
+
  <Bonds>
   <Bond ai="X_R" aj="X"  c0_factor="0.98"/>
   <Bond ai="X_R" aj="HX" c0_factor="1.00"/>

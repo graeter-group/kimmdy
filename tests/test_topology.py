@@ -282,11 +282,11 @@ class TestHexalaTopology:
 
 
     def test_move_34_29_after_break(self):
-        """Move H at 34 to C at 39
+        """Move H at 34 to C at 29
         """
         top = deepcopy(self.top)
         top_moved = deepcopy(self.top_move_34_29)
-        top.break_bond(('29', '25'))
+        top.break_bond(('29', '35'))
         top.break_bond(('31', '34'))
         top.bind_bond(('34', '29'))
 
@@ -329,9 +329,33 @@ class TestHexalaTopology:
 
 
 class TestRadicalAla():
-    ala_top = read_topol(Path("AlaCa_R.top"))
-    top = Topology(ala_top, ffdir, ffpatch)
+    ala_r_top = read_topol(Path("AlaCa_R.top"))
+    ala_nat_top = read_topol(Path("AlaCa_nat.top"))
+    top_r = Topology(ala_r_top, ffdir, ffpatch)
+    top_nat = Topology(ala_nat_top, ffdir, ffpatch)
     def test_is_radical(self):
-        top = self.top
+        top = self.top_r
         assert top.atoms['9'].is_radical == True
         assert top.atoms['10'].is_radical == False
+
+    def test_parameters_applied(self):
+        top_r = deepcopy(self.top_r)
+        top_nat = deepcopy(self.top_nat)
+
+        assert top_r.atoms == top_nat.atoms
+        assert top_r.bonds == top_nat.bonds
+        assert top_r.pairs == top_nat.pairs
+        assert top_r.angles == top_nat.angles
+        assert top_r.proper_dihedrals == top_nat.proper_dihedrals
+        assert top_r.improper_dihedrals == top_nat.improper_dihedrals
+
+
+# {('9', '10'): Bond(ai='9', aj='10', funct='1', c0='0.14955', c1='259408.000000', c2=None, c3=None)} != {('9', '10'): Bond(ai='9', aj='10', funct='1', c0=None, c1=None, c2=None, c3=None)}
+# {('10', '13'): Bond(ai='10', aj='13', funct='1', c0='0.10900', c1='284512.0', c2=None, c3=None)} != {('10', '13'): Bond(ai='10', aj='13', funct='1', c0=None, c1=None, c2=None, c3=None)}
+# {('7', '9'): Bond(ai='7', aj='9', funct='1', c0='0.13600', c1='282001.600000', c2=None, c3=None)} != {('7', '9'): Bond(ai='7', aj='9', funct='1', c0=None, c1=None, c2=None, c3=None)}
+# {('9', '14'): Bond(ai='9', aj='14', funct='1', c0='0.14916', c1='265265.600000', c2=None, c3=None)} != {('9', '14'): Bond(ai='9', aj='14', funct='1', c0=None, c1=None, c2=None, c3=None)}
+# {('10', '11'): Bond(ai='10', aj='11', funct='1', c0='0.10900', c1='284512.0', c2=None, c3=None)} != {('10', '11'): Bond(ai='10', aj='11', funct='1', c0=None, c1=None, c2=None, c3=None)}
+# {('10', '12'): Bond(ai='10', aj='12', funct='1', c0='0.10900', c1='284512.0', c2=None, c3=None)} != {('10', '12'): Bond(ai='10', aj='12', funct='1', c0=None, c1=None, c2=None, c3=None)}
+
+
+

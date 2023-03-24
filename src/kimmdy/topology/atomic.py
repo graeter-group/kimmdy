@@ -326,7 +326,6 @@ class DihedralType:
     periodicity: str
     c0: Optional[str] = None
     c1: Optional[str] = None
-    c2: Optional[str] = None
     c3: Optional[str] = None
     c4: Optional[str] = None
     c5: Optional[str] = None
@@ -388,7 +387,7 @@ class ResidueBondSpec:
 
 
 @dataclass(order=True)
-class ResidueImroperSpec:
+class ResidueImproperSpec:
     """Information about one imroper dihedral in a residue
     ;atom1 atom2 atom3 atom4     q0     cq
     """
@@ -411,6 +410,27 @@ class ResidueImroperSpec:
             cq=field_or_none(l, 5),
         )
 
+@dataclass(order=True)
+class ResidueProperSpec:
+    """Information about one imroper dihedral in a residue
+    ;atom1 atom2 atom3 atom4     q0     cq
+    """
+
+    atom1: str
+    atom2: str
+    atom3: str
+    atom4: str
+    q0: Optional[str]
+
+    @classmethod
+    def from_top_line(cls, l: list[str]):
+        return cls(
+            atom1=l[0],
+            atom2=l[1],
+            atom3=l[2],
+            atom4=l[3],
+            q0=field_or_none(l, 4),
+        )
 
 @dataclass(order=True)
 class ResidueType:
@@ -419,7 +439,8 @@ class ResidueType:
     residue: str
     atoms: dict[str, ResidueAtomSpec]
     bonds: dict[tuple[str, str], ResidueBondSpec]
-    improper_dihedrals: dict[tuple[str, str, str, str], ResidueImroperSpec]
+    proper_dihedrals: dict[tuple[str, str, str, str], ResidueProperSpec]
+    improper_dihedrals: dict[tuple[str, str, str, str], ResidueImproperSpec]
 
     @classmethod
     def from_section(cls, residue, d: dict[str, list[list[str]]]):
@@ -436,7 +457,7 @@ class ResidueType:
                 bonds[(bond.atom1, bond.atom2)] = bond
         if ls := d.get("impropers"):
             for l in ls:
-                improper = ResidueImroperSpec.from_top_line(l)
+                improper = ResidueImproperSpec.from_top_line(l)
                 impropers[
                     (improper.atom1, improper.atom2, improper.atom3, improper.atom4)
                 ] = improper
