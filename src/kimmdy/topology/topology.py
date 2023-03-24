@@ -35,6 +35,8 @@ class Topology:
         self.angles: dict[tuple[str, str, str], Angle] = {}
         self.proper_dihedrals: dict[tuple[str, str, str, str], Dihedral] = {}
         self.improper_dihedrals: dict[tuple[str, str, str, str], Dihedral] = {}
+        self.position_restraints: dict[str, PositionRestraint] = {}
+        self.dihedral_restraints: dict[tuple[str, str, str, str], DihedralRestraint] = {}
         self.radicals: dict[str, Atom] = {}
 
         if ffdir:
@@ -52,6 +54,7 @@ class Topology:
         self._parse_pairs()
         self._parse_angles()
         self._parse_dihedrals()
+        self._parse_restraints()
         self._initialize_graph()
         self._test_for_radicals()
 
@@ -125,6 +128,28 @@ class Topology:
                 self.proper_dihedrals[
                     (dihedral.ai, dihedral.aj, dihedral.ak, dihedral.al)
                 ] = dihedral
+
+    def _parse_restraints(self):
+        """Parse restraints from topology dictionary."""
+        ls = self.top.get("position_restraints")
+        if ls is None:
+            return
+        condition = None
+        for l in ls:
+            if l[0] == "#ifdef":
+                condition = l[1]
+                continue
+            elif l[0] == "#endif":
+                condition = None
+                continue
+            restraint = PositionRestraint.from_top_line(l, condition=condition)
+            self.position_restraints[restraint.ai] = restraint
+        ls = self.top.get("dihedral_restraints")
+        if ls is None:
+            return
+        for l in ls:
+            restraint = DihedralRestraint.from_top_line(l)
+            self.dihedral_restraints[(restraint.ai, restraint.aj, restraint.ak, restraint.al)] = restraint
 
     def _initialize_graph(self):
         """Add a list of atom nrs bound to an atom to each atom."""
@@ -352,9 +377,7 @@ class Topology:
         atompair = [self.atoms[atompair_nrs[0]], self.atoms[atompair_nrs[1]]]
 
         # de-radialize if re-combining two radicals
-        combined_radicals = False
         if all(map(lambda x: x.is_radical, atompair)):
-            combined_radicals = True
             atompair[0].is_radical = False
             atompair[1].is_radical = False
             for a in atompair:
