@@ -17,6 +17,7 @@ import logging
 class ConversionType(Enum):
     BREAK = auto()
     BIND = auto()
+    MOVE = auto()
 
 
 @dataclass
