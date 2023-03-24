@@ -14,19 +14,25 @@ def modify_top(
     ffdir: Path,
     ffpatch: Optional[Path],
     topology: Optional[Topology],
-):
+) -> Topology:
     logging.info(f"Reading: {oldtop} and writing modified topology to {newtop}.")
     if topology is None:
         topologyDict = read_topol(oldtop)
         topology = Topology(topologyDict, ffdir, ffpatch)
 
+    focus = set()
     for conversion in recipe:
+        focus.add(conversion.atom_idx)
         if conversion.type == ConversionType.BREAK:
             topology.break_bond(conversion.atom_idx)
         elif conversion.type == ConversionType.BIND:
             topology.bind_bond(conversion.atom_idx)
     topology._update_dict()
     write_topol(topology.top, newtop)
+
+    topology.patch_parameters(list(focus))
+
+    return topology
 
 
 def modify_plumed(
