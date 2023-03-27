@@ -84,6 +84,53 @@ class Topology:
         """
         )
 
+    def reindex_atomnrs (self):
+        """Reindex atom numbers in topology.
+
+        Starts at index 1.
+        This also updates the numbers for bonds, angles, dihedrals and pairs.
+        """
+        update_map = {atom_nr: str(i+1) for i, atom_nr in enumerate(self.atoms.keys())}
+        print(update_map)
+
+        new_atoms = {}
+        for atom in self.atoms.values():
+            atom.nr = update_map[atom.nr]
+            new_atoms[atom.nr] = atom
+        self.atoms = new_atoms
+
+        new_bonds = {}
+        for bond in self.bonds.values():
+            bond.ai = update_map[bond.ai]
+            bond.aj = update_map[bond.aj]
+            new_bonds[(update_map[bond.ai], update_map[bond.aj])] = bond
+        self.bonds = new_bonds
+
+        new_angles = {}
+        for angle in self.angles.values():
+            angle.ai = update_map[angle.ai]
+            angle.aj = update_map[angle.aj]
+            angle.ak = update_map[angle.ak]
+            new_angles[(update_map[angle.ai], update_map[angle.aj], update_map[angle.ak])] = angle
+        self.angles = new_angles
+
+        new_dihedrals = {}
+        for dihedral in self.proper_dihedrals.values():
+            dihedral.ai = update_map[dihedral.ai]
+            dihedral.aj = update_map[dihedral.aj]
+            dihedral.ak = update_map[dihedral.ak]
+            dihedral.al = update_map[dihedral.al]
+            new_dihedrals[(update_map[dihedral.ai], update_map[dihedral.aj], update_map[dihedral.ak], update_map[dihedral.al])] = dihedral
+        self.dihedrals = new_dihedrals
+
+        new_pairs = {}
+        for pair in self.pairs.values():
+            pair.ai = update_map[pair.ai]
+            pair.aj = update_map[pair.aj]
+            new_pairs[(update_map[pair.ai], update_map[pair.aj])] = pair
+        self.pairs = new_pairs
+
+
     def __str__(self) -> str:
         return str(self.atoms)
 
