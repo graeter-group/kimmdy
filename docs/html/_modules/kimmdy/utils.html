@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>kimmdy.utils &mdash; kimmdy 2023 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> kimmdy
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">kimmdy</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">kimmdy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">kimmdy.utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for kimmdy.utils</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">subprocess</span> <span class="k">as</span> <span class="nn">sp</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">from</span> <span class="nn">kimmdy.config</span> <span class="kn">import</span> <span class="n">Config</span>
+
+
+<div class="viewcode-block" id="find_bond_param"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.utils.find_bond_param">[docs]</a><span class="k">def</span> <span class="nf">find_bond_param</span><span class="p">(</span><span class="n">atomtypes</span><span class="p">,</span> <span class="n">filepath</span><span class="p">):</span>
+    <span class="c1"># reads bond parameters vom gromacs forcefield file #based on ff.bonded.itp from amber99sb-ildn.ff</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">data_array</span> <span class="o">=</span> <span class="n">get_data_from_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+    <span class="n">comb1</span> <span class="o">=</span> <span class="p">[</span><span class="n">atomtypes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">atomtypes</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+    <span class="n">comb2</span> <span class="o">=</span> <span class="p">[</span><span class="n">atomtypes</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">atomtypes</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+
+    <span class="n">found_first_entry</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="kc">False</span>  <span class="c1"># only use first entry correspondnig to [ bondtypes ] section</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data_array</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="nb">list</span><span class="p">(</span><span class="n">data_array</span><span class="p">[</span><span class="n">i</span><span class="p">][:</span><span class="mi">2</span><span class="p">])</span> <span class="o">==</span> <span class="n">comb1</span> <span class="ow">or</span> <span class="nb">list</span><span class="p">(</span><span class="n">data_array</span><span class="p">[</span><span class="n">i</span><span class="p">][:</span><span class="mi">2</span><span class="p">])</span> <span class="o">==</span> <span class="n">comb2</span>
+        <span class="p">):</span>  <span class="c1"># or data_array[i][:2] == (atomtype2, atomtype1)) :</span>
+            <span class="n">r_0</span> <span class="o">=</span> <span class="n">data_array</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span>
+            <span class="n">k_f</span> <span class="o">=</span> <span class="n">data_array</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">4</span><span class="p">]</span>
+            <span class="n">found_first_entry</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">break</span>  <span class="c1"># stop when first entry found</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">found_first_entry</span><span class="p">:</span>
+        <span class="c1"># print(&quot;Warning: No bond parameters found&quot;)</span>
+        <span class="c1"># logging.warning(&#39;No bond parameters found&#39;)</span>
+        <span class="c1"># r_0 = 0.145   #default value in same order of magnitude</span>
+        <span class="c1"># k_f = 280000   #default value in same order of magnitude</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Found no entry for &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">atomtypes</span><span class="p">))</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Found no entry for &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">atomtypes</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">r_0</span><span class="p">,</span> <span class="n">k_f</span></div>
+
+
+<div class="viewcode-block" id="find_Edis"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.utils.find_Edis">[docs]</a><span class="k">def</span> <span class="nf">find_Edis</span><span class="p">(</span><span class="n">atomtypes</span><span class="p">,</span> <span class="n">filepath</span><span class="p">):</span>
+    <span class="c1"># reads dissociation energy from edissoc.dat (gromacs)</span>
+
+    <span class="n">_</span><span class="p">,</span> <span class="n">data_array</span> <span class="o">=</span> <span class="n">get_data_from_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+    <span class="n">comb1</span> <span class="o">=</span> <span class="p">[</span><span class="n">atomtypes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">atomtypes</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+    <span class="n">comb2</span> <span class="o">=</span> <span class="p">[</span><span class="n">atomtypes</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">atomtypes</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+    <span class="n">Edis</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data_array</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="nb">list</span><span class="p">(</span><span class="n">data_array</span><span class="p">[</span><span class="n">i</span><span class="p">][:</span><span class="mi">2</span><span class="p">])</span> <span class="o">==</span> <span class="n">comb1</span> <span class="ow">or</span> <span class="nb">list</span><span class="p">(</span><span class="n">data_array</span><span class="p">[</span><span class="n">i</span><span class="p">][:</span><span class="mi">2</span><span class="p">])</span> <span class="o">==</span> <span class="n">comb2</span>
+        <span class="p">):</span>  <span class="c1"># or data_array[i][:2] == (atomtype2, atomtype1)) :</span>
+            <span class="n">Edis</span> <span class="o">=</span> <span class="n">data_array</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">Edis</span><span class="p">:</span>
+        <span class="c1"># print(&quot;Info: Used simplified atom types to determine dissociaton energy for morse potential&quot;)</span>
+        <span class="c1"># logging.debug(&quot;Used simplified atom types to determine dissociaton energy for morse potential&quot;)</span>
+        <span class="n">comb1</span> <span class="o">=</span> <span class="p">[</span><span class="n">atomtypes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">atomtypes</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="n">comb2</span> <span class="o">=</span> <span class="p">[</span><span class="n">atomtypes</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">atomtypes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data_array</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="nb">list</span><span class="p">(</span><span class="n">data_array</span><span class="p">[</span><span class="n">i</span><span class="p">][:</span><span class="mi">2</span><span class="p">])</span> <span class="o">==</span> <span class="n">comb1</span> <span class="ow">or</span> <span class="nb">list</span><span class="p">(</span><span class="n">data_array</span><span class="p">[</span><span class="n">i</span><span class="p">][:</span><span class="mi">2</span><span class="p">])</span> <span class="o">==</span> <span class="n">comb2</span>
+            <span class="p">):</span>  <span class="c1"># or data_array[i][:2] == (atomtype2, atomtype1)) :</span>
+                <span class="n">Edis</span> <span class="o">=</span> <span class="n">data_array</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+    <span class="c1"># print (&#39;E_dis = &#39; + str(Edis))</span>
+    <span class="c1"># logging.debug(&#39;E_dis = &#39; + str(Edis))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">Edis</span><span class="p">:</span>
+        <span class="c1"># print(&quot;Warning: No morse dissociation energy found. Used 350 as default value&quot;)</span>
+        <span class="c1"># logging.warning(&quot;No morse dissociation energy found. Used 350 as default value&quot;)</span>
+        <span class="n">Edis</span> <span class="o">=</span> <span class="mi">350</span>  <span class="c1"># default value in same order of magnitude</span>
+    <span class="k">return</span> <span class="n">Edis</span></div>
+
+
+<div class="viewcode-block" id="find_distances"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.utils.find_distances">[docs]</a><span class="k">def</span> <span class="nf">find_distances</span><span class="p">(</span><span class="n">plumedfile</span><span class="p">,</span> <span class="n">datafile</span><span class="p">):</span>
+    <span class="n">data_all</span><span class="p">,</span> <span class="n">data_array</span> <span class="o">=</span> <span class="n">get_data_from_file</span><span class="p">(</span><span class="n">plumedfile</span><span class="p">)</span>
+
+    <span class="c1"># get all pairs from plumedfile</span>
+    <span class="n">list_of_pairs_and_distances</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">nbr_of_pairs</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data_all</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="s2">&quot;DISTANCE&quot;</span> <span class="ow">in</span> <span class="n">data_all</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="s2">&quot;broken&quot;</span> <span class="ow">in</span> <span class="n">data_all</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>  <span class="c1"># leave out already broken distances</span>
+                <span class="k">continue</span>
+            <span class="n">split1</span> <span class="o">=</span> <span class="n">data_all</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+            <span class="n">atom2</span> <span class="o">=</span> <span class="n">split1</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">split2</span> <span class="o">=</span> <span class="n">split1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)</span>
+            <span class="n">atom1</span> <span class="o">=</span> <span class="n">split2</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">nbr_of_pairs</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">list_of_pairs_and_distances</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">atom1</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">atom2</span><span class="p">)])</span>
+
+    <span class="c1"># get all distances from datafile</span>
+    <span class="c1"># Note: Open file line by line i.o.t. to avoid memory error</span>
+    <span class="n">list_of_distances</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">header</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># used to skip header</span>
+    <span class="n">ctr</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">datafile</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">line_split</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">ctr</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">header</span><span class="p">:</span>
+                <span class="n">header</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">continue</span>
+            <span class="n">line_split</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span>
+                <span class="mi">1</span><span class="p">,</span> <span class="n">nbr_of_pairs</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="p">):</span>  <span class="c1"># shift by +1 i.o.t. leave out time (first entry)</span>
+                <span class="n">distance</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line_split</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+                <span class="n">list_of_pairs_and_distances</span><span class="p">[</span><span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">distance</span><span class="p">)</span>
+    <span class="n">nbr_of_data_points</span> <span class="o">=</span> <span class="n">ctr</span> <span class="o">-</span> <span class="mi">1</span>
+
+    <span class="c1"># print (&#39;Collected distances from &#39; + str(datafile) + &#39; for &#39; + str(nbr_of_pairs) + &#39; pairs with &#39; + str(nbr_of_data_points) + &#39; distances per pair.&#39;)</span>
+    <span class="c1"># logging.info(&#39;Collected distances from &#39; + str(datafile) + &#39; for &#39; + str(nbr_of_pairs) + &#39; pairs with &#39; + str(nbr_of_data_points) + &#39; distances per pair.&#39;)</span>
+
+    <span class="k">return</span> <span class="n">list_of_pairs_and_distances</span></div>
+
+
+<div class="viewcode-block" id="calc_transition_rate"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.utils.calc_transition_rate">[docs]</a><span class="k">def</span> <span class="nf">calc_transition_rate</span><span class="p">(</span><span class="n">r_curr</span><span class="p">,</span> <span class="n">r_0</span><span class="p">,</span> <span class="n">E_dis</span><span class="p">,</span> <span class="n">k_f</span><span class="p">):</span>
+    <span class="c1"># parameters</span>
+    <span class="n">kT</span> <span class="o">=</span> <span class="mf">2.479</span>  <span class="c1"># k_B T at 310K #in Gromacs units kj *mol^-1</span>
+    <span class="c1"># tau =  0.16    #unfitted / theoretical pre-exponential factor #h/kT = 0.16 ps from transition state theory</span>
+    <span class="n">k_0</span> <span class="o">=</span> <span class="mf">0.288</span>  <span class="c1"># pre-exponential factor #from fitting averaged C_a - N data to gromacs data, see paper  #or: 1/2pi sqrt(k/m)</span>
+
+    <span class="c1"># calculates energy barrier crossing rate [in ps]; barrier based on the model V = V_morse - F*X</span>
+
+    <span class="n">beta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">k_f</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">E_dis</span><span class="p">))</span>  <span class="c1"># [beta] =1/nm since beta = sqrt(k/2D)</span>
+
+    <span class="c1"># calculate inflection point corresponding to point with maximal force</span>
+    <span class="n">r_infl</span> <span class="o">=</span> <span class="p">(</span><span class="n">beta</span> <span class="o">*</span> <span class="n">r_0</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span> <span class="o">/</span> <span class="n">beta</span>
+
+    <span class="c1"># calculate current force in bond F = -del V / del x</span>
+    <span class="k">if</span> <span class="n">r_curr</span> <span class="o">&gt;</span> <span class="n">r_infl</span><span class="p">:</span>
+        <span class="c1"># logging.debug(&#39;Used maximum force for bond Evans model since position behind inflection point found&#39;)</span>
+        <span class="n">F</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="mi">2</span>
+            <span class="o">*</span> <span class="n">beta</span>
+            <span class="o">*</span> <span class="n">E_dis</span>
+            <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">beta</span> <span class="o">*</span> <span class="p">(</span><span class="n">r_infl</span> <span class="o">-</span> <span class="n">r_0</span><span class="p">))</span>
+            <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">beta</span> <span class="o">*</span> <span class="p">(</span><span class="n">r_infl</span> <span class="o">-</span> <span class="n">r_0</span><span class="p">)))</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">F</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="mi">2</span>
+            <span class="o">*</span> <span class="n">beta</span>
+            <span class="o">*</span> <span class="n">E_dis</span>
+            <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">beta</span> <span class="o">*</span> <span class="p">(</span><span class="n">r_curr</span> <span class="o">-</span> <span class="n">r_0</span><span class="p">))</span>
+            <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">beta</span> <span class="o">*</span> <span class="p">(</span><span class="n">r_curr</span> <span class="o">-</span> <span class="n">r_0</span><span class="p">)))</span>
+        <span class="p">)</span>
+    <span class="c1"># logging.debug(&#39;Calculated force in bond F = &#39; + str(F))</span>
+
+    <span class="c1"># calculate extrema of shifted potential i.o.t. get barrier hight</span>
+    <span class="n">rmin</span> <span class="o">=</span> <span class="n">r_0</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
+        <span class="p">(</span><span class="n">beta</span> <span class="o">*</span> <span class="n">E_dis</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">beta</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">E_dis</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">E_dis</span> <span class="o">*</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">F</span><span class="p">))</span>
+        <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">E_dis</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">rmax</span> <span class="o">=</span> <span class="n">r_0</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
+        <span class="p">(</span><span class="n">beta</span> <span class="o">*</span> <span class="n">E_dis</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">beta</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">E_dis</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">E_dis</span> <span class="o">*</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">F</span><span class="p">))</span>
+        <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">E_dis</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="n">Vmax</span> <span class="o">=</span> <span class="n">E_dis</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">beta</span> <span class="o">*</span> <span class="p">(</span><span class="n">rmax</span> <span class="o">-</span> <span class="n">r_0</span><span class="p">)))</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">F</span> <span class="o">*</span> <span class="p">(</span>
+        <span class="n">rmax</span> <span class="o">-</span> <span class="n">r_0</span>
+    <span class="p">)</span>  <span class="c1"># Note: F*r should lead to same result as F*(r-r_0) since the shifts in Vmax-Vmin adds up to zero</span>
+    <span class="n">Vmin</span> <span class="o">=</span> <span class="n">E_dis</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">beta</span> <span class="o">*</span> <span class="p">(</span><span class="n">rmin</span> <span class="o">-</span> <span class="n">r_0</span><span class="p">)))</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">F</span> <span class="o">*</span> <span class="p">(</span><span class="n">rmin</span> <span class="o">-</span> <span class="n">r_0</span><span class="p">)</span>
+
+    <span class="n">delta_V</span> <span class="o">=</span> <span class="n">Vmax</span> <span class="o">-</span> <span class="n">Vmin</span>
+
+    <span class="n">k</span> <span class="o">=</span> <span class="n">k_0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">delta_V</span> <span class="o">/</span> <span class="n">kT</span><span class="p">)</span>  <span class="c1"># [1/ps]</span>
+
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="nb">float</span><span class="p">(</span><span class="n">r_curr</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">rmax</span>
+    <span class="p">):</span>  <span class="c1"># already jumped over the barrier? Even if not &quot;open&quot; in gromacs morse potential?</span>
+        <span class="k">pass</span>
+    <span class="k">if</span> <span class="n">F</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">:</span>  <span class="c1"># negative force: Vmax -&gt; infinity impliying k -&gt; 0</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="c1"># logging.info(&#39;Found negative force, most likely due to compression. Rate replaced with zero.&#39;)</span>
+
+    <span class="k">return</span> <span class="n">k</span><span class="p">,</span> <span class="n">F</span>  <span class="c1"># [0,1]</span></div>
+
+
+<div class="viewcode-block" id="calc_av_rate"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.utils.calc_av_rate">[docs]</a><span class="k">def</span> <span class="nf">calc_av_rate</span><span class="p">(</span><span class="n">distances</span><span class="p">,</span> <span class="n">r_0</span><span class="p">,</span> <span class="n">E_dis</span><span class="p">,</span> <span class="n">k_f</span><span class="p">):</span>
+    <span class="c1"># average distances first, if necessary</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">distances</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">r_av</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">distances</span><span class="p">[</span><span class="mi">2</span><span class="p">:])</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">distances</span><span class="p">[</span><span class="mi">2</span><span class="p">:])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">r_av</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">distances</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">r_av</span><span class="p">)</span>
+    <span class="n">k</span><span class="p">,</span> <span class="n">F</span> <span class="o">=</span> <span class="n">calc_transition_rate</span><span class="p">(</span><span class="n">r_av</span><span class="p">,</span> <span class="n">r_0</span><span class="p">,</span> <span class="n">E_dis</span><span class="p">,</span> <span class="n">k_f</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">r_av</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">F</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">k</span></div>
+
+
+<span class="c1"># utils</span>
+<div class="viewcode-block" id="run_shell_cmd"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.utils.run_shell_cmd">[docs]</a><span class="k">def</span> <span class="nf">run_shell_cmd</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">cwd</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">sp</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cwd</span><span class="o">=</span><span class="n">cwd</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_shell_stdout"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.utils.get_shell_stdout">[docs]</a><span class="k">def</span> <span class="nf">get_shell_stdout</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="n">process</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">capture_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">process</span><span class="o">.</span><span class="n">stdout</span></div>
+
+
+<div class="viewcode-block" id="check_gmx_version"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.utils.check_gmx_version">[docs]</a><span class="k">def</span> <span class="nf">check_gmx_version</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">Config</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Check for an existing gromacs installation.</span>
+
+<span class="sd">    If PLUMED is meant to be used it additionally checks for the keyword</span>
+<span class="sd">    &#39;MODIFIED&#39; in the version name.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">version</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">l</span>
+            <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">get_shell_stdout</span><span class="p">(</span><span class="s2">&quot;gmx --quiet --version&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s2">&quot;GROMACS version:&quot;</span> <span class="ow">in</span> <span class="n">l</span>
+        <span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="s2">&quot;No system gromacs detected. With error: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">SystemError</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">plumed</span> <span class="ow">and</span> <span class="ow">not</span> <span class="s2">&quot;MODIFIED&quot;</span> <span class="ow">in</span> <span class="n">version</span><span class="p">:</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="s2">&quot;GROMACS version does not contain MODIFIED, aborting due to lack of PLUMED patch.&quot;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Version was: &quot;</span> <span class="o">+</span> <span class="n">version</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="o">.</span><span class="n">dryrun</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">SystemError</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">version</span></div>
+
+
+<div class="viewcode-block" id="float_or_str"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.utils.float_or_str">[docs]</a><span class="k">def</span> <span class="nf">float_or_str</span><span class="p">(</span><span class="n">elem</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">elem</span></div>
+
+
+<span class="c1">## helpers for changemanager</span>
+<div class="viewcode-block" id="str_to_int_or_0"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.utils.str_to_int_or_0">[docs]</a><span class="k">def</span> <span class="nf">str_to_int_or_0</span><span class="p">(</span><span class="n">elem</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span> <span class="k">if</span> <span class="n">elem</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()</span> <span class="k">else</span> <span class="mi">0</span></div>
+
+
+<div class="viewcode-block" id="sort_bond"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.utils.sort_bond">[docs]</a><span class="k">def</span> <span class="nf">sort_bond</span><span class="p">(</span><span class="n">entry</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">sorted</span><span class="p">((</span><span class="n">str_to_int_or_0</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">str_to_int_or_0</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="mi">1</span><span class="p">])))</span></div>
+
+
+<div class="viewcode-block" id="sort_angle"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.utils.sort_angle">[docs]</a><span class="k">def</span> <span class="nf">sort_angle</span><span class="p">(</span><span class="n">entry</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">str_to_int_or_0</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+        <span class="n">str_to_int_or_0</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+        <span class="n">str_to_int_or_0</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="sort_dihedral"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.utils.sort_dihedral">[docs]</a><span class="k">def</span> <span class="nf">sort_dihedral</span><span class="p">(</span><span class="n">entry</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">str_to_int_or_0</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+        <span class="n">str_to_int_or_0</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span>
+        <span class="n">str_to_int_or_0</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+        <span class="n">str_to_int_or_0</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="mi">3</span><span class="p">]),</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="sort_improper"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.utils.sort_improper">[docs]</a><span class="k">def</span> <span class="nf">sort_improper</span><span class="p">(</span><span class="n">entry</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">str_to_int_or_0</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span>
+        <span class="n">str_to_int_or_0</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+        <span class="n">str_to_int_or_0</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+        <span class="n">str_to_int_or_0</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="mi">3</span><span class="p">]),</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="check_idx"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.utils.check_idx">[docs]</a><span class="k">def</span> <span class="nf">check_idx</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">str_to_int_or_0</span><span class="p">(</span><span class="nb">object</span><span class="o">.</span><span class="n">idx</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Non Atom object in AtomList&quot;</span><span class="p">)</span></div>
+
+
+<span class="c1">## from kimmdy</span>
+<div class="viewcode-block" id="store_linelist_to_file"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.utils.store_linelist_to_file">[docs]</a><span class="k">def</span> <span class="nf">store_linelist_to_file</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">filepath</span><span class="p">):</span>
+    <span class="n">file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+        <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+    <span class="n">file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="identify_atomtypes"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.utils.identify_atomtypes">[docs]</a><span class="k">def</span> <span class="nf">identify_atomtypes</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
+    <span class="n">dic_of_atoms_to_groups</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span>
+    <span class="n">atoms</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">file</span><span class="p">:</span>
+        <span class="c1"># start collecting data when [ atoms ] reached</span>
+        <span class="k">if</span> <span class="s2">&quot;atoms&quot;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">atoms</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">atoms</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="c1"># reached [ bonds ], stop</span>
+        <span class="k">if</span> <span class="s2">&quot;bonds&quot;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="k">break</span>
+
+        <span class="c1"># leave out comments, includes, and empty lines</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">elif</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;;&quot;</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">elif</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;#&quot;</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="c1"># hopefully, these are all and exclusively the lines now with atomnbrs, types etc.</span>
+        <span class="n">line_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+        <span class="n">nbr</span> <span class="o">=</span> <span class="n">line_array</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">atomtype</span> <span class="o">=</span> <span class="n">line_array</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">dic_of_atoms_to_groups</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">nbr</span><span class="p">:</span> <span class="n">atomtype</span><span class="p">})</span>
+    <span class="n">file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">dic_of_atoms_to_groups</span></div>
+
+
+<span class="c1"># TODO: replace with our new parsers</span>
+<div class="viewcode-block" id="get_data_from_file"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.utils.get_data_from_file">[docs]</a><span class="k">def</span> <span class="nf">get_data_from_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
+    <span class="n">file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span>
+    <span class="n">data_all</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># array with each entry corresponding to one (string) line</span>
+    <span class="n">data_array</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># array of all lines with each subarray containing one value</span>
+    <span class="n">settings</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">data_all</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="n">line_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+        <span class="n">data_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line_array</span><span class="p">)</span>
+    <span class="n">file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">data_all</span><span class="p">,</span> <span class="n">data_array</span></div>
+
+
+<span class="c1"># TODO: replace with our new parsers</span>
+<div class="viewcode-block" id="write_conditions_in_plumedfile"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.utils.write_conditions_in_plumedfile">[docs]</a><span class="k">def</span> <span class="nf">write_conditions_in_plumedfile</span><span class="p">(</span><span class="n">topfile</span><span class="p">,</span> <span class="n">indexfile</span><span class="p">,</span> <span class="n">indexgroup</span><span class="p">,</span> <span class="n">outplumed</span><span class="p">):</span>
+    <span class="c1"># use once to create index and plumed file with all necessary entries / conditons.</span>
+    <span class="c1"># to be adjusted system specific.</span>
+    <span class="c1"># uses atoms from given indexgroup (and, hardcoded, crosslinks, if not commented out). Skips bonds that include hydrogens or oxygens since they are not break-relevant.</span>
+
+    <span class="n">data_all</span><span class="p">,</span> <span class="n">data_array</span> <span class="o">=</span> <span class="n">get_data_from_file</span><span class="p">(</span><span class="n">topfile</span><span class="p">)</span>
+
+    <span class="c1"># create dic_of_atoms with atomtype and number to sort out hydrogens afterwards</span>
+    <span class="n">dic_of_atoms</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data_all</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="s2">&quot;[ bonds ]&quot;</span> <span class="ow">in</span> <span class="n">data_all</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="p">):</span>  <span class="c1"># only go until atoms ended and continue here later</span>
+            <span class="n">bonds_pos</span> <span class="o">=</span> <span class="n">i</span>
+            <span class="k">break</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_array</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># skip empty lines</span>
+            <span class="k">pass</span>
+        <span class="k">elif</span> <span class="n">data_all</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span>
+            <span class="s2">&quot;;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;#&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;[&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;P&quot;</span><span class="p">,</span>
+        <span class="p">):</span>  <span class="c1"># skip comments, types, includes and Protein_Chains</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">atom_nbr</span> <span class="o">=</span> <span class="n">data_array</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">atom_type</span> <span class="o">=</span> <span class="n">data_array</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">dic_of_atoms</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">atom_nbr</span><span class="p">:</span> <span class="n">atom_type</span><span class="p">})</span>
+    <span class="n">dic_of_indx</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">list_of_non_h_bonds</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">index_nbr</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># start at 1 since cond-stop has default group 0 alreay</span>
+
+    <span class="c1"># collect backbone atoms from indexfile</span>
+    <span class="n">index_all</span><span class="p">,</span> <span class="n">index_array</span> <span class="o">=</span> <span class="n">get_data_from_file</span><span class="p">(</span><span class="n">indexfile</span><span class="p">)</span>
+    <span class="n">relevant_atoms</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">found_group</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">index_array</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">indexgroup</span> <span class="ow">in</span> <span class="n">index_all</span><span class="p">[</span><span class="n">k</span><span class="p">]:</span>
+            <span class="n">found_group</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">found_group</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">index_array</span><span class="p">[</span><span class="n">k</span><span class="p">]:</span>
+                <span class="n">relevant_atoms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">found_group</span> <span class="ow">and</span> <span class="s2">&quot;[ &quot;</span> <span class="ow">in</span> <span class="n">index_all</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]:</span>  <span class="c1"># stop at next group</span>
+            <span class="k">break</span>
+
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">bonds_pos</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_all</span><span class="p">)):</span>  <span class="c1"># go through all bonds</span>
+
+        <span class="k">if</span> <span class="s2">&quot;[ pairs ]&quot;</span> <span class="ow">in</span> <span class="n">data_all</span><span class="p">[</span><span class="n">j</span><span class="p">]:</span>  <span class="c1"># stop when done with all bonds</span>
+            <span class="k">break</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_array</span><span class="p">[</span><span class="n">j</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">nbr1</span> <span class="o">=</span> <span class="n">data_array</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">nbr2</span> <span class="o">=</span> <span class="n">data_array</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+            <span class="c1"># skip irrelevant bonds (e.g. side chains which are not under force)</span>
+            <span class="k">if</span> <span class="n">nbr1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">relevant_atoms</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">nbr2</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">relevant_atoms</span><span class="p">:</span>
+                <span class="k">continue</span>
+        <span class="c1"># leave out stronger C-N bond (chemically not prone to rupture due to electron resonance)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">dic_of_atoms</span><span class="p">[</span><span class="n">nbr1</span><span class="p">],</span> <span class="n">dic_of_atoms</span><span class="p">[</span><span class="n">nbr2</span><span class="p">]),</span>
+            <span class="p">(</span><span class="n">dic_of_atoms</span><span class="p">[</span><span class="n">nbr2</span><span class="p">],</span> <span class="n">dic_of_atoms</span><span class="p">[</span><span class="n">nbr1</span><span class="p">]),</span>
+        <span class="p">]:</span>
+            <span class="k">pass</span>
+        <span class="k">elif</span> <span class="p">(</span>
+            <span class="s2">&quot;H&quot;</span> <span class="ow">in</span> <span class="n">dic_of_atoms</span><span class="p">[</span><span class="n">nbr1</span><span class="p">]</span> <span class="ow">or</span> <span class="s2">&quot;H&quot;</span> <span class="ow">in</span> <span class="n">dic_of_atoms</span><span class="p">[</span><span class="n">nbr2</span><span class="p">]</span>
+        <span class="p">):</span>  <span class="c1"># leave out hydrogen bonds</span>
+            <span class="k">pass</span>
+        <span class="k">elif</span> <span class="p">(</span>
+            <span class="s2">&quot;O&quot;</span> <span class="ow">in</span> <span class="n">dic_of_atoms</span><span class="p">[</span><span class="n">nbr1</span><span class="p">]</span> <span class="ow">or</span> <span class="s2">&quot;O&quot;</span> <span class="ow">in</span> <span class="n">dic_of_atoms</span><span class="p">[</span><span class="n">nbr2</span><span class="p">]</span>
+        <span class="p">):</span>  <span class="c1"># leave out oxygen bonds</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">bond</span> <span class="o">=</span> <span class="p">(</span><span class="n">nbr1</span><span class="p">,</span> <span class="n">nbr2</span><span class="p">)</span>
+            <span class="n">list_of_non_h_bonds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bond</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">nbr1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dic_of_indx</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">index_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">index_nbr</span><span class="p">)</span>  <span class="c1"># + &#39;_&#39; + dic_of_atoms[nbr1]</span>
+                <span class="n">dic_of_indx</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">nbr1</span><span class="p">:</span> <span class="n">index_name</span><span class="p">})</span>
+                <span class="n">index_nbr</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">nbr2</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dic_of_indx</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">index_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">index_nbr</span><span class="p">)</span>  <span class="c1"># + &#39;_&#39; + dic_of_atoms[nbr2]</span>
+                <span class="n">dic_of_indx</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">nbr2</span><span class="p">:</span> <span class="n">index_name</span><span class="p">})</span>
+                <span class="n">index_nbr</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="n">cond_ngroups</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dic_of_indx</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="n">cond_nconds</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">list_of_non_h_bonds</span><span class="p">)</span>
+
+    <span class="c1"># write plumed-file</span>
+    <span class="n">print_arg</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">outplumed</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">)</span>  <span class="c1"># open in  append mode</span>
+    <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;#Define distances </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">pair_nbr</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">cond_nconds</span><span class="p">):</span>
+        <span class="n">nbr1</span> <span class="o">=</span> <span class="n">list_of_non_h_bonds</span><span class="p">[</span><span class="n">pair_nbr</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">nbr2</span> <span class="o">=</span> <span class="n">list_of_non_h_bonds</span><span class="p">[</span><span class="n">pair_nbr</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+            <span class="s2">&quot;d&quot;</span>
+            <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">pair_nbr</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s2">&quot;: DISTANCE ATOMS=&quot;</span>
+            <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">nbr1</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s2">&quot;,&quot;</span>
+            <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">nbr2</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s2">&quot; </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="n">print_arg</span> <span class="o">+=</span> <span class="s2">&quot;d&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">pair_nbr</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;,&quot;</span>
+    <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot; </span><span class="se">\n</span><span class="s2">#Print distances ARG to FILE every STRIDE steps </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;PRINT ARG=&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">print_arg</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; STRIDE=100 FILE=distances.dat&quot;</span><span class="p">)</span>
+    <span class="n">file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;finished writing plumed-file&quot;</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Jannik Buhr, Eric Hartmann, Benedikt Rennekamp, Kai Riedmiller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

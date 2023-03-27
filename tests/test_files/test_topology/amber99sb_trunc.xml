@@ -1,0 +1,16 @@
+<ForceField>
+ <AtomTypes>
+  <Type class="N" element="N" mass="14.00672"/>
+  <Type class="H" element="H" mass="1.007947"/>
+ </AtomTypes>
+ <HarmonicBondForce>
+  <Bond class1="H" class2="N" length="0.101" k="363171.2"/>
+ </HarmonicBondForce>
+ <PeriodicTorsionForce>
+  <Improper class1="C" class2="*" class3="*" class4="O" periodicity1="2" phase1="3.14159265359" k1="43.932"/>
+ </PeriodicTorsionForce>
+ <NonbondedForce>
+  <Atom class="N" charge="-0.4157" sigma="0.324999852378" epsilon="0.71128"/>
+  <Atom class="H" charge="0.2719" sigma="0.106907846177" epsilon="0.0656888"/>
+ </NonbondedForce>
+</ForceField>

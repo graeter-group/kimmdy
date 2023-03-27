@@ -15,7 +15,7 @@ changer:
   coordinates:
     md: 'relax'
 reactions:
-  HAT:
+  HAT_dummy:
 sequence:
   - equilibrium1
   -

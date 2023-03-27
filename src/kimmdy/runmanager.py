@@ -1,19 +1,23 @@
 from __future__ import annotations
-from dataclasses import field
 import logging
 from pathlib import Path
+import dill
 import queue
 from enum import Enum, auto
 from typing import Callable
+from kimmdy import config
 from kimmdy.config import Config
-from kimmdy.reactions.homolysis import Homolysis
-from kimmdy.reaction import ReactionResult, ConversionRecipe, ConversionType
+from kimmdy.utils import increment_logfile
+from kimmdy.parsing import read_topol
+from kimmdy.reaction import ConversionType, Reaction, ReactionResult, ConversionRecipe
+import kimmdy.mdmanager as md
 import kimmdy.changemanager as changer
 from kimmdy.tasks import Task, TaskFiles, TaskMapping
 from kimmdy.utils import run_shell_cmd
 from pprint import pformat
 import random
 from kimmdy import plugins
+from kimmdy.topology.topology import Topology
 
 # file types of which there will be multiple files per type
 AMBIGUOUS_SUFFS = ["dat", "xvg", "log"]
@@ -36,11 +40,10 @@ def default_decision_strategy(
     # flatten the list of rates form the reaction results
     rates = []
     recipes = []
-    for reaction in reaction_results:
-        for rate in reaction.rates:
-            rates.append(rate)
-        for recipe in reaction.recipes:
-            recipes.append(recipe)
+    for reaction_result in reaction_results:
+        for outcome in reaction_result:
+            rates.append(outcome.rate)
+            recipes.append(outcome.recipe)
 
     total_rate = sum(rates)
     random.seed()
@@ -80,6 +83,7 @@ class RunManager:
 
     def __init__(self, config: Config):
         self.config = config
+        self.from_checkpoint = False
         self.tasks: queue.Queue[Task] = queue.Queue()  # tasks from config
         self.crr_tasks: queue.Queue[Task] = queue.Queue()  # current tasks
         self.iteration = 0
@@ -93,10 +97,20 @@ class RunManager:
             "trr": '',
             "edr": '',
         }
-
-        # If we want to allow starting from radical containing systems this needs to be initialized:
-        # TODO: update with HAT
-        self.radical_idxs = []
+        self.histfile = increment_logfile(Path(f"{self.config.out}_history.log"))
+        self.cptfile = increment_logfile(Path(f"{self.config.out}_kimmdy.cpt"))
+        try:
+            _ = self.config.ffpatch
+        except AttributeError:
+            self.config.ffpatch = None
+        self.top = Topology(
+            read_topol(self.config.top), self.config.ff, self.config.ffpatch
+        )
+        # # did we just miss to add this or is there a way around this explicit definition
+        # # with the new AutoFillDict??
+        # if self.config.plumed:
+        #     self.latest_files["plumed.dat"] = self.config.cwd / self.config.plumed.dat
+        #     # self.latest_files["distances.dat"] = self.config.plumed.distances
 
         self.filehist: list[dict[str, TaskFiles]] = [
             {"setup": TaskFiles(runmng=self, input=self.latest_files)}
@@ -115,7 +129,7 @@ class RunManager:
         # Instantiate reactions
         self.reactions = []
         react_names = self.config.reactions.get_attributes()
-        logging.info("Instantiating Reactions:", *react_names)
+        # logging.info("Instantiating Reactions:", *react_names)
         for react_name in react_names:
             r = plugins[react_name]
             reaction = r(react_name, self)
@@ -144,33 +158,27 @@ class RunManager:
         logging.info("Start run")
         logging.info("Build task list")
 
-        # allows for mapping one config entry to multiple tasks
-        for entry in self.config.sequence:
-            if entry in self.config.mds.get_attributes():
-                task = self.task_mapping["md"]
-                logging.info(f"Put Task: {task}")
-                self.tasks.put(Task(task, kwargs={"instance": entry}))
-            else:
-                for task in self.task_mapping[entry]:
+        if not self.from_checkpoint:
+            # allows for mapping one config entry to multiple tasks
+            for entry in self.config.sequence:
+                if entry in self.config.mds.get_attributes():
+                    task = self.task_mapping["md"]
                     logging.info(f"Put Task: {task}")
-                    self.tasks.put(Task(task))
+                    self.tasks.put(Task(task, kwargs={"instance": entry}))
+                else:
+                    for task in self.task_mapping[entry]:
+                            logging.info(f"Put Task: {task}")
+                            self.tasks.put(Task(task))
 
         while not (self.state is State.DONE or self.iteration >= self.iterations):
+            logging.info("Write checkpoint before next task")
+            with open(self.cptfile, "wb") as f:
+                dill.dump(self, f)
             next(self)
 
         logging.info(
             f"Stop running tasks, state: {self.state}, iteration:{self.iteration}, max:{self.iterations}"
         )
-        logging.info("History:")
-        for x in self.filehist:
-            for taskname, taskfiles in x.items():
-                logging.info(
-                    f"""
-                Task: {taskname} with output directory: {taskfiles.outputdir}
-                Task: {taskname}, input:\n{pformat(taskfiles.input)}
-                Task: {taskname}, output:\n{pformat(taskfiles.output)}
-                """
-                )
 
     def __iter__(self):
         return self
@@ -211,12 +219,23 @@ class RunManager:
             logging.debug("Append to file history")
             self.filehist.append({taskname: files})
 
+            logging.info(f"Current task files:")
+            m = f"""
+            Task: {taskname} with output directory: {files.outputdir}
+            Task: {taskname}, input:\n{pformat(files.input)}
+            Task: {taskname}, output:\n{pformat(files.output)}
+            """
+            logging.info(m)
+            with open(self.histfile, "a") as f:
+                f.write(m)
+
     def _create_task_directory(self, postfix: str) -> TaskFiles:
         """Creates TaskFiles object, output directory and symlinks ff."""
         files = TaskFiles(self)
         files.outputdir = self.config.out / f"{self.iteration}_{postfix}"
-        files.outputdir.mkdir()
-        (files.outputdir / self.config.ff.name).symlink_to(self.config.ff)
+        files.outputdir.mkdir(exist_ok=self.from_checkpoint)
+        if not (files.outputdir / self.config.ff.name).exists():
+            (files.outputdir / self.config.ff.name).symlink_to(self.config.ff)
         return files
 
     def _dummy(self):
@@ -280,7 +299,8 @@ class RunManager:
 
             self.reaction_results.append(reaction.get_reaction_result(files))
 
-        return files
+        logging.info("Reaction done")
+        return files        # necessary?
 
     def _decide_reaction(
         self,
@@ -293,11 +313,11 @@ class RunManager:
         self.chosen_recipe = decision_strategy(self.reaction_results)
         logging.info("Chosen recipe is:")
         logging.info(self.chosen_recipe)
-        return None, None
+        return
 
     def _run_recipe(self) -> TaskFiles:
         logging.info(f"Start Recipe in step {self.iteration}")
-        logging.info(f"Breakpair: {self.chosen_recipe.atom_idx}")
+        logging.info(f"Recipe: {self.chosen_recipe}")
 
         files = self._create_task_directory("recipe")
 
@@ -308,14 +328,13 @@ class RunManager:
             files.input["top"],
             files.output["top"],
             files.input["ff"],
+            self.config.ffpatch,
+            self.top,
         )
         logging.info(f'Wrote new topology to {files.output["top"].parts[-3:]}')
-        logging.debug(f"Chose recipe: {self.chosen_recipe.type}")
-        if self.chosen_recipe.type == [ConversionType.BREAK]:
-            self.radical_idxs.extend(self.chosen_recipe.atom_idx[0])
-            # TODO: also change self.radical_idxs for MOVE
+        logging.debug(f"Chose recipe: {self.chosen_recipe}")
 
-            # files.input["plumed.dat"] = self.get_latest("plumed.dat")
+        if self.config.plumed:
             files.output["plumed.dat"] = files.outputdir / "plumed_mod.dat"
             changer.modify_plumed(
                 self.chosen_recipe,

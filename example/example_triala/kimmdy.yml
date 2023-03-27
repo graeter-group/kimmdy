@@ -2,7 +2,7 @@ dryrun: false
 iterations: 100
 out: 'test_out_001'
 gromacs_alias: 'gmx'
-# ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default
+ff: 'amber99sb-star-ildnp.ff'
 top: 'triala_out.top'
 gro: 'npt.gro'
 idx: 'index.ndx'
@@ -15,7 +15,7 @@ changer:
   coordinates:
     md: 'relax'
 reactions:
-  HAT:
+  HAT_dummy:
     #tprpath: 'md.tpr'
     #trrpath: 'md.trr'
           #    edis: 'edissoc.dat'

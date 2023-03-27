@@ -1,10 +1,29 @@
 import subprocess as sp
 import numpy as np
 import logging
+from pathlib import Path
 import MDAnalysis as MDA
 from scipy.spatial.transform import Rotation
 
 from kimmdy.config import Config
+
+
+def increment_logfile(f: Path) -> Path:
+    backup_file_prefix = "#"
+    backup_file_suffix = "#"
+    logfile = f
+    if logfile.exists():
+        backup_count = 1
+        backup_file = (
+            f"{backup_file_prefix}{logfile}_{backup_count}{backup_file_suffix}"
+        )
+        while Path(backup_file).exists():
+            backup_count += 1
+            backup_file = (
+                f"{backup_file_prefix}{logfile}_{backup_count}{backup_file_suffix}"
+            )
+        logfile.rename(backup_file)
+    return logfile
 
 
 def find_bond_param(atomtypes, filepath):
@@ -175,7 +194,6 @@ def calc_transition_rate(r_curr, r_0, E_dis, k_f):
 
 def calc_av_rate(distances, r_0, E_dis, k_f):
     # average distances first, if necessary
-    dist = []
     if len(distances) > 1:
         r_av = sum(distances[2:]) / len(distances[2:])
     else:
@@ -188,8 +206,8 @@ def calc_av_rate(distances, r_0, E_dis, k_f):
 
 
 # utils
-def run_shell_cmd(s, cwd=None):
-    sp.run(s, shell=True, cwd=cwd)
+def run_shell_cmd(s, cwd=None) -> sp.CompletedProcess:
+    return sp.run(s, shell=True, cwd=cwd)
 
 
 def get_shell_stdout(s):
@@ -234,61 +252,56 @@ def check_gmx_version(config: Config):
     return version
 
 
-## helpers for changemanager
-def str_to_int(elem):
+def float_or_str(elem):
     try:
-        return int(elem)
-    except ValueError:
-        # logging.debug("Not all List elements are integers! Returning 0")
-        return 0
+        return float(elem)
+    except:
+        return elem
+
+
+## helpers for changemanager
+def str_to_int_or_0(elem):
+    return int(elem) if elem.isdigit() else 0
 
 
 def sort_bond(entry):
-    return sorted((str_to_int(entry[0]), str_to_int(entry[1])))
+    return sorted((str_to_int_or_0(entry[0]), str_to_int_or_0(entry[1])))
 
 
 def sort_angle(entry):
-    return (str_to_int(entry[1]), str_to_int(entry[0]), str_to_int(entry[2]))
+    return (
+        str_to_int_or_0(entry[1]),
+        str_to_int_or_0(entry[0]),
+        str_to_int_or_0(entry[2]),
+    )
 
 
 def sort_dihedral(entry):
     return (
-        str_to_int(entry[1]),
-        str_to_int(entry[2]),
-        str_to_int(entry[0]),
-        str_to_int(entry[3]),
+        str_to_int_or_0(entry[1]),
+        str_to_int_or_0(entry[2]),
+        str_to_int_or_0(entry[0]),
+        str_to_int_or_0(entry[3]),
     )
 
 
 def sort_improper(entry):
     return (
-        str_to_int(entry[2]),
-        str_to_int(entry[0]),
-        str_to_int(entry[1]),
-        str_to_int(entry[3]),
+        str_to_int_or_0(entry[2]),
+        str_to_int_or_0(entry[0]),
+        str_to_int_or_0(entry[1]),
+        str_to_int_or_0(entry[3]),
     )
 
 
 def check_idx(object):
     try:
-        return str_to_int(object.idx)
+        return str_to_int_or_0(object.idx)
     except:
         raise ValueError("Non Atom object in AtomList")
 
 
 ## from kimmdy
-def get_data_from_file(filepath):
-    with open(filepath, "r") as f:
-        data_all = []  # array with each entry corresponding to one (string) line
-        data_array = []  # array of all lines with each subarray containing one value
-        for line in f:
-            data_all.append(line)
-            line_array = np.asarray(line.split())
-            data_array.append(line_array)
-
-    return data_all, data_array
-
-
 def store_linelist_to_file(data, filepath):
     file = open(filepath, "w")
     for line in data:
@@ -395,7 +408,6 @@ def write_conditions_in_plumedfile(topfile, indexfile, indexgroup, outplumed):
             break
 
     for j in range(bonds_pos + 2, len(data_all)):  # go through all bonds
-
         if "[ pairs ]" in data_all[j]:  # stop when done with all bonds
             break
 
