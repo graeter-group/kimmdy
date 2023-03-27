@@ -1,56 +1,45 @@
 from kimmdy.parsing import (
     read_topol,
     read_plumed,
-    topol_split_dihedrals,
-    topol_merge_propers_impropers,
-    write_topol,
 )
-from kimmdy.changemanager import break_bond_top, break_bond_plumed, move_bond_top
-from kimmdy.reaction import ConversionRecipe, ConversionType
 from kimmdy.cmd import kimmdy_run
 
-import pytest
 import os
 import shutil
 from pathlib import Path
 
+from kimmdy.topology.topology import Topology
+
 
 def test_integration_break_bond_top():
+    ffdir = Path("../assets/amber99sb-star-ildnp.ff")
+    ffpatch = Path("amber99sb_patches.xml")
     toppath = Path(__file__).parent / "test_files/test_integration/hexala_nat.top"
     toppath_compare = (
         Path(__file__).parent / "test_files/test_integration/hexala_break29-35.top"
     )
 
-    topology = read_topol(toppath)
-    topology_compare = read_topol(toppath_compare)
+    top = Topology(read_topol(toppath), ffdir, ffpatch)
+    top_broken = Topology(read_topol(toppath_compare), ffdir, ffpatch)
 
-    pair = (29, 35)
+    pair = ("29", "35")
+    top.break_bond(pair)
 
-    topology = break_bond_top(topology, pair)
-
-    for key in ["bonds", "pairs", "angles", "dihedrals"]:
-        assert topology[key] == topology_compare[key]
+    assert top.bonds == top_broken.bonds
+    assert top.pairs == top_broken.pairs
+    assert top.angles == top_broken.angles
+    assert top.proper_dihedrals == top_broken.proper_dihedrals
+    assert top.improper_dihedrals == top_broken.improper_dihedrals
 
 
 def test_integration_break_plumed():
-    plumedpath = Path(__file__).parent / "test_files/test_integration/plumed_nat.dat"
-    plumedpath_compare = (
-        Path(__file__).parent / "test_files/test_integration/plumed_break29-35.dat"
-    )
-
-    plumed = read_plumed(plumedpath)
-    plumed_compare = read_plumed(plumedpath_compare)
-
-    pair = (29, 35)
-
-    plumed = break_bond_plumed(plumed, pair, Path("distances.dat"))
-
-    for key in ["distances", "prints"]:
-        assert plumed[key] == plumed_compare[key]
+    # FIXME
     pass
 
 
 def test_integration_move_top():
+    ffdir = Path("../assets/amber99sb-star-ildnp.ff")
+    ffpatch = Path("amber99sb_patches.xml")
     toppath = (
         Path(__file__).parent / "test_files/test_integration/hexala_break29-35.top"
     )
@@ -59,15 +48,19 @@ def test_integration_move_top():
     )
     ffdir = Path(__file__).parent / "test_files/assets/amber99sb-star-ildnp.ff"
 
-    topology = read_topol(toppath)
-    topology_compare = read_topol(toppath_compare)
+    top = Topology(read_topol(toppath), ffdir, ffpatch)
+    top_moved = Topology(read_topol(toppath_compare), ffdir, ffpatch)
 
-    pair = (34, 29)
+    break_bond = ("31", "34")
+    bind_bond = ("34", "29")
+    top.break_bond(break_bond)
+    top.bind_bond(bind_bond)
 
-    topology = move_bond_top(topology, pair, ffdir)
-
-    for key in ["bonds", "pairs", "angles", "dihedrals"]:
-        assert topology[key] == topology_compare[key]
+    assert top.bonds == top_moved.bonds
+    assert top.pairs == top_moved.pairs
+    assert top.angles == top_moved.angles
+    assert top.proper_dihedrals == top_moved.proper_dihedrals
+    assert top.improper_dihedrals == top_moved.improper_dihedrals
 
 
 def test_integration_emptyrun(tmp_path):

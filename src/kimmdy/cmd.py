@@ -1,10 +1,17 @@
 import argparse
 import logging
 from pathlib import Path
+import dill
 from kimmdy.config import Config
 from kimmdy.runmanager import RunManager
-from kimmdy.utils import check_gmx_version
+from kimmdy.utils import check_gmx_version, increment_logfile
 import sys
+
+
+if sys.version_info > (3, 10):
+    from importlib_metadata import version
+else:
+    from importlib.metadata import version
 
 
 def get_cmdline_args():
@@ -16,6 +23,9 @@ def get_cmdline_args():
         parsed command line arguments
     """
     parser = argparse.ArgumentParser(description="Welcome to KIMMDY")
+    parser.add_argument(
+        "--version", action="version", version=f'KIMMDY {version("kimmdy")}'
+    )
     parser.add_argument(
         "--input", "-i", type=str, help="kimmdy input file", default="kimmdy.yml"
     )
@@ -29,26 +39,33 @@ def get_cmdline_args():
     parser.add_argument(
         "--logfile", "-f", type=str, help="logfile", default="kimmdy.log"
     )
+    parser.add_argument("--checkpoint", "-c", type=str, help="checkpoint file")
     return parser.parse_args()
 
 
-def configure_logging(args, color=True):
+def configure_logging(args, color=False):
     """Configure logging.
 
     Configures the logging module with optional colorcodes
     for the terminal.
     """
+
+    increment_logfile(Path(args.logfile))
     if color:
         logging.addLevelName(logging.INFO, "\033[35mINFO\033[00m")
         logging.addLevelName(logging.ERROR, "\033[31mERROR\033[00m")
         logging.addLevelName(logging.WARNING, "\033[33mWARN\033[00m")
+        format = "\033[34m %(asctime)s\033[00m: %(levelname)s: %(message)s"
+    else:
+        format = "%(asctime)s: %(levelname)s: %(message)s"
+
     logging.basicConfig(
         level=getattr(logging, args.loglevel.upper()),
         handlers=[
             logging.FileHandler(args.logfile, encoding="utf-8", mode="w"),
             logging.StreamHandler(sys.stdout),
         ],
-        format="\033[34m %(asctime)s\033[00m: %(levelname)s: %(message)s",
+        format=format,
         datefmt="%d-%m-%Y %H:%M",
     )
 
@@ -60,13 +77,18 @@ def _run(args):
     logging.info("KIMMDY is running with these command line options:")
     logging.info(args)
 
-    config = Config(args.input)
-    logging.debug(config)
+    if args.checkpoint:
+        logging.info("KIMMDY is starting from a checkpoint.")
+        with open(args.checkpoint, "rb") as f:
+            runmgr = dill.load(f)
+            runmgr.from_checkpoint = True
+    else:
+        config = Config(args.input)
+        logging.debug(config)
+        runmgr = RunManager(config)
+        logging.debug("Using system GROMACS:")
+        logging.debug(check_gmx_version(config))
 
-    logging.debug("Using system GROMACS:")
-    logging.debug(check_gmx_version(config))
-
-    runmgr = RunManager(config)
     runmgr.run()
 
 
@@ -92,6 +114,6 @@ def kimmdy():
     logging.shutdown()
 
 
-#%%
+# %%
 if __name__ == "__main__":
     kimmdy_run()

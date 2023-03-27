@@ -1,4 +1,4 @@
-from kimmdy.reaction import Reaction, ReactionResult, ConversionRecipe
+from kimmdy.reaction import Reaction, ReactionOutcome, ReactionResult, ConversionRecipe
 import logging
 
 
@@ -7,4 +7,4 @@ class dummy_reaction(Reaction):
 
     def get_reaction_result(self, files) -> ReactionResult:
         logging.info("Starting dummy reaction, will do nothing")
-        return ReactionResult()
+        return [ReactionOutcome([], 0)]
