@@ -1,15 +1,16 @@
 dryrun: false
 iterations: 0
-name: 'emptyrun_001'
+out: 'emptyrun_001'
+gromacs_alias: 'gmx'
 # ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
 top: 'emptyrun.txt'
 gro: 'emptyrun.txt'
 idx: 'emptyrun.txt'
-plumed: false
+mds:
+  prod:
+    mdp: 'emptyrun.txt'
 reactions:
   HAT_dummy:
-prod:
-  mdp: 'emptyrun.txt'
 sequence:
   - reactions
 

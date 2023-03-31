@@ -1,5 +1,6 @@
 from pathlib import Path
 from typing import Optional
+from kimmdy.constants import ATOMTYPE_BONDORDER_FLAT
 from kimmdy.parsing import TopologyDict
 from kimmdy.topology.atomic import *
 from kimmdy.topology.utils import (
@@ -11,6 +12,7 @@ from kimmdy.topology.ff import FF, FFPatches, Patch
 from itertools import permutations, combinations
 import textwrap
 import logging
+import re
 
 
 class Topology:
@@ -33,6 +35,10 @@ class Topology:
         self.angles: dict[tuple[str, str, str], Angle] = {}
         self.proper_dihedrals: dict[tuple[str, str, str, str], Dihedral] = {}
         self.improper_dihedrals: dict[tuple[str, str, str, str], Dihedral] = {}
+        self.position_restraints: dict[str, PositionRestraint] = {}
+        self.dihedral_restraints: dict[
+            tuple[str, str, str, str], DihedralRestraint
+        ] = {}
         self.radicals: dict[str, Atom] = {}
 
         if ffdir:
@@ -50,17 +56,18 @@ class Topology:
         self._parse_pairs()
         self._parse_angles()
         self._parse_dihedrals()
+        self._parse_restraints()
         self._initialize_graph()
+        self._test_for_radicals()
 
     def _update_dict(self):
-
         self.top["atoms"] = [attributes_to_list(x) for x in self.atoms.values()]
         self.top["bonds"] = [attributes_to_list(x) for x in self.bonds.values()]
         self.top["pairs"] = [attributes_to_list(x) for x in self.pairs.values()]
         self.top["angles"] = [attributes_to_list(x) for x in self.angles.values()]
         self.top["dihedrals"] = [
             attributes_to_list(x) for x in self.proper_dihedrals.values()
-        ]
+        ] + [attributes_to_list(x) for x in self.improper_dihedrals.values()]
 
     def to_dict(self) -> TopologyDict:
         self._update_dict()
@@ -79,34 +86,96 @@ class Topology:
         """
         )
 
+    def reindex_atomnrs(self):
+        """Reindex atom numbers in topology.
+
+        Starts at index 1.
+        This also updates the numbers for bonds, angles, dihedrals and pairs.
+        """
+        update_map = {
+            atom_nr: str(i + 1) for i, atom_nr in enumerate(self.atoms.keys())
+        }
+        print(update_map)
+
+        new_atoms = {}
+        for atom in self.atoms.values():
+            atom.nr = update_map[atom.nr]
+            new_atoms[atom.nr] = atom
+        self.atoms = new_atoms
+
+        new_bonds = {}
+        for bond in self.bonds.values():
+            bond.ai = update_map[bond.ai]
+            bond.aj = update_map[bond.aj]
+            new_bonds[(update_map[bond.ai], update_map[bond.aj])] = bond
+        self.bonds = new_bonds
+
+        new_angles = {}
+        for angle in self.angles.values():
+            angle.ai = update_map[angle.ai]
+            angle.aj = update_map[angle.aj]
+            angle.ak = update_map[angle.ak]
+            new_angles[
+                (update_map[angle.ai], update_map[angle.aj], update_map[angle.ak])
+            ] = angle
+        self.angles = new_angles
+
+        new_dihedrals = {}
+        for dihedral in self.proper_dihedrals.values():
+            dihedral.ai = update_map[dihedral.ai]
+            dihedral.aj = update_map[dihedral.aj]
+            dihedral.ak = update_map[dihedral.ak]
+            dihedral.al = update_map[dihedral.al]
+            new_dihedrals[
+                (
+                    update_map[dihedral.ai],
+                    update_map[dihedral.aj],
+                    update_map[dihedral.ak],
+                    update_map[dihedral.al],
+                )
+            ] = dihedral
+        self.dihedrals = new_dihedrals
+
+        new_pairs = {}
+        for pair in self.pairs.values():
+            pair.ai = update_map[pair.ai]
+            pair.aj = update_map[pair.aj]
+            new_pairs[(update_map[pair.ai], update_map[pair.aj])] = pair
+        self.pairs = new_pairs
+
     def __str__(self) -> str:
         return str(self.atoms)
 
     def _parse_atoms(self):
+        """Parse atoms from topology dictionary."""
         ls = self.top["atoms"]
         for l in ls:
             atom = Atom.from_top_line(l)
             self.atoms[atom.nr] = atom
 
     def _parse_bonds(self):
+        """Parse bond from topology dictionary."""
         ls = self.top["bonds"]
         for l in ls:
             bond = Bond.from_top_line(l)
             self.bonds[(bond.ai, bond.aj)] = bond
 
     def _parse_pairs(self):
+        """Parse pairs from topology dictionary."""
         ls = self.top["pairs"]
         for l in ls:
             pair = Pair.from_top_line(l)
             self.pairs[(pair.ai, pair.aj)] = pair
 
     def _parse_angles(self):
+        """Parse angles from topology dictionary."""
         ls = self.top["angles"]
         for l in ls:
             angle = Angle.from_top_line(l)
             self.angles[(angle.ai, angle.aj, angle.ak)] = angle
 
     def _parse_dihedrals(self):
+        """Parse improper and proper dihedrals from topology dictionary."""
         ls = self.top["dihedrals"]
         for l in ls:
             dihedral = Dihedral.from_top_line(l)
@@ -119,12 +188,48 @@ class Topology:
                     (dihedral.ai, dihedral.aj, dihedral.ak, dihedral.al)
                 ] = dihedral
 
+    def _parse_restraints(self):
+        """Parse restraints from topology dictionary."""
+        ls = self.top.get("position_restraints")
+        if ls is None:
+            return
+        condition = None
+        for l in ls:
+            if l[0] == "#ifdef":
+                condition = l[1]
+                continue
+            elif l[0] == "#endif":
+                condition = None
+                continue
+            restraint = PositionRestraint.from_top_line(l, condition=condition)
+            self.position_restraints[restraint.ai] = restraint
+        ls = self.top.get("dihedral_restraints")
+        if ls is None:
+            return
+        for l in ls:
+            restraint = DihedralRestraint.from_top_line(l)
+            self.dihedral_restraints[
+                (restraint.ai, restraint.aj, restraint.ak, restraint.al)
+            ] = restraint
+
     def _initialize_graph(self):
+        """Add a list of atom nrs bound to an atom to each atom."""
         for bond in self.bonds.values():
             i = bond.ai
             j = bond.aj
             self.atoms[i].bound_to_nrs.append(j)
             self.atoms[j].bound_to_nrs.append(i)
+
+    def _test_for_radicals(self):
+        """Iterate over all atoms and designate them as radicals if they have fewer bounds than their natural bond order"""
+        for atom in self.atoms.values():
+            bo = ATOMTYPE_BONDORDER_FLAT.get(atom.type)
+            if bo and bo > len(atom.bound_to_nrs):
+                atom.is_radical = True
+            else:
+                atom.is_radical = False
+
+        return None
 
     def _apply_param_patch(
         self,
@@ -133,65 +238,72 @@ class Topology:
         patch: Patch,
         types: AtomicTypes,
     ):
-        # atomic_id_base = [item.removesuffix("_R") for item in atomic_id]
+        """Apply a patch to an atomic item (Atom, Bond, Angle etc.).
+
+        Initial values are taken from the topology or the force field (supplied via `types`).
+        """
         item_type = match_atomic_item_to_atomic_type(atomic_id, types)
         for param, param_patch in patch.params.items():
             initial = atomic_item.__dict__.get(param)
             if initial is None:
                 # get initial value from the FF
-                # TODO:
-                # what about matching up differently named parameters?
-                # in atomtypes and the topology?
                 initial = item_type.__dict__.get(param)
+            if initial is None:
+                logging.warning(
+                    f"Can't patch parameter because no initial parameter was found in the topology or the FF for: {atomic_id}, {atomic_item}."
+                )
+                continue
 
             try:
                 initial = float(initial)
             except ValueError as _:
                 logging.warning(
-                    "Malformed patchfile. Some parameter pachtes couldn't be converted to a number:"
+                    f"Malformed patchfile. Some parameter patches couldn't be converted to a number: {param} with value {initial} of {atomic_item}."
                 )
                 continue
             except TypeError as _:
-                logging.warning(
-                    "Can't patch parameter because no initial parameter was found in the topology or the FF: "
-                )
                 continue
 
             result = param_patch.apply(initial)
             atomic_item.__dict__[param] = result
 
-    def break_bond(self, atompair_nrs: tuple[str, str]):
-        """Break bonds in topology.
+    def _revert_param_patch(
+        self,
+        atomic_item: Atomic,
+        atomic_id: list[str],
+        types: AtomicTypes,
+    ):
+        """Revert a patch to an atomic item (Atom, Bond, Angle etc.).
 
-        removes bond, angles and dihedrals where atompair was involved.
-        Modifies the topology dictionary in place.
-        It modifies the function types and parameters in the topology to account for radicals.
+        Values reset to `None` if found in the forcefield (supplied via `types`).
         """
-        atompair_nrs = tuple(sorted(atompair_nrs, key=int))
-        atompair = [self.atoms[atompair_nrs[0]], self.atoms[atompair_nrs[1]]]
+        item_type = match_atomic_item_to_atomic_type(atomic_id, types)
+        if item_type is None:
+            logging.warning(
+                f"Won't revert patch because no initial parameter was found in the FF for: {atomic_id}, {atomic_item}."
+            )
+            return
 
-        # mark atoms as radicals
-        for atom in atompair:
-            atom.is_radical = True
-            self.radicals[atom.nr] = atom
+        print(f"item_type: {item_type}")
+        for param in atomic_item.__dict__.keys():
+            if re.match(r"^c\d", param):
+                atomic_item.__dict__[param] = None
 
-            # patch parameters
-            if self.ffpatches is None or self.ffpatches.atompatches is None:
-                continue
-            atom_id = atom.type + "_R"
+    def patch_parameters(self, focus_nr: list[str]):
+        if self.ffpatches is None:
+            return
+        focus = [self.atoms[nr] for nr in focus_nr]
+        logging.info(f"Applying parameter patches around these atoms: {focus}.")
 
-            patch = match_id_to_patch([atom_id], self.ffpatches.atompatches)
+        # atoms
+        for atom in focus:
+            patch = match_id_to_patch([atom.radical_type()], self.ffpatches.atompatches)
             if patch is None:
                 continue
             self._apply_param_patch(atom, [atom.type], patch, self.ff.atomtypes)
 
         # bonds
-        # remove bond
-        removed_bond = self.bonds.pop(atompair_nrs, None)
-        logging.info(f"removed bond: {removed_bond}")
-
-        # get other possibly affected bonds
-        for atom in atompair:
+        for atom in focus:
             for bond_key in self._get_atom_bonds(atom.nr):
                 bond = self.bonds.get(bond_key)
                 if (
@@ -207,6 +319,66 @@ class Topology:
                 id_base = [self.atoms[i].type for i in [bond.ai, bond.aj]]
                 self._apply_param_patch(bond, id_base, patch, self.ff.bondtypes)
 
+        angle_keys = self._get_atom_angles(focus_nr[0]) + self._get_atom_angles(
+            focus_nr[1]
+        )
+        for key in angle_keys:
+            angle = self.angles.get(key)
+            if (
+                angle is None
+                or self.ffpatches is None
+                or self.ffpatches.anglepatches is None
+            ):
+                continue
+            id = [self.atoms[i].radical_type() for i in key]
+            patch = match_id_to_patch(id, self.ffpatches.anglepatches)
+            if patch is None:
+                continue
+            id_base = [self.atoms[i].radical_type() for i in key]
+            self._apply_param_patch(angle, id_base, patch, self.ff.angletypes)
+
+        # proper dihedrals and pairs
+        dihedral_keys = self._get_atom_proper_dihedrals(
+            focus_nr[0]
+        ) + self._get_atom_proper_dihedrals(focus_nr[1])
+        for key in dihedral_keys:
+            dihedral = self.proper_dihedrals.get(key)
+            if (
+                dihedral is None
+                or self.ffpatches is None
+                or self.ffpatches.anglepatches is None
+            ):
+                continue
+            id = [self.atoms[i].radical_type() for i in key]
+            patch = match_id_to_patch(id, self.ffpatches.dihedralpatches)
+            if patch is None:
+                continue
+            id_base = [self.atoms[i].radical_type() for i in key]
+            self._apply_param_patch(
+                dihedral, id_base, patch, self.ff.proper_dihedraltypes
+            )
+
+        # TODO: improper dihedrals
+
+    def break_bond(self, atompair_nrs: tuple[str, str]):
+        """Break bonds in topology.
+
+        removes bond, angles and dihedrals where atompair was involved.
+        Modifies the topology dictionary in place.
+        """
+        atompair_nrs = tuple(sorted(atompair_nrs, key=int))
+        atompair = [self.atoms[atompair_nrs[0]], self.atoms[atompair_nrs[1]]]
+
+        # mark atoms as radicals
+        for atom in atompair:
+            atom.is_radical = True
+            self.radicals[atom.nr] = atom
+
+        # bonds
+        # remove bond
+        removed_bond = self.bonds.pop(atompair_nrs, None)
+        logging.info(f"removed bond: {removed_bond}")
+
         # remove angles
         angle_keys = self._get_atom_angles(atompair_nrs[0]) + self._get_atom_angles(
             atompair_nrs[1]
@@ -216,23 +388,6 @@ class Topology:
                 # angle contained a now deleted bond because
                 # it had both atoms of the broken bond
                 self.angles.pop(key, None)
-            else:
-                # angle only contains one of the affecte atoms
-                # angle is not removed but might need to be patched
-                # patch parameters
-                angle = self.angles.get(key)
-                if (
-                    angle is None
-                    or self.ffpatches is None
-                    or self.ffpatches.anglepatches is None
-                ):
-                    continue
-                id = [self.atoms[i].radical_type() for i in key]
-                patch = match_id_to_patch(id, self.ffpatches.anglepatches)
-                if patch is None:
-                    continue
-                id_base = [self.atoms[i].radical_type() for i in key]
-                self._apply_param_patch(angle, id_base, patch, self.ff.angletypes)
 
         # remove proper dihedrals
         # and pairs
@@ -241,6 +396,8 @@ class Topology:
         ) + self._get_atom_proper_dihedrals(atompair_nrs[1])
         for key in dihedral_keys:
             if all([x in key for x in atompair_nrs]):
+                # dihedral contained a now deleted bond because
+                # it had both atoms of the broken bond
                 self.proper_dihedrals.pop(key, None)
                 pairkey = tuple(sorted((key[0], key[3]), key=int))
                 self.pairs.pop(pairkey, None)
@@ -264,7 +421,6 @@ class Topology:
     def bind_bond(self, atompair_nrs: tuple[str, str]):
         """Add a bond in topology.
 
-        Move an atom (typically H for Hydrogen Atom Transfer) to a new location.
         Modifies the topology dictionary in place.
         It keeps track of affected terms in the topology via a graph representation of the topology
         and applies the necessary changes to bonds, angles and dihedrals (proper and improper).
@@ -286,6 +442,35 @@ class Topology:
             atompair[1].is_radical = False
             for a in atompair:
                 self.radicals.pop(a.nr)
+
+        # quickfix for jumping hydrogens
+        # to make them adopt the correct residuetype and atomtype
+        # when bound to a new heavy atom
+        for i, atom in enumerate(atompair):
+            if atom.type.startswith("H"):
+                other_i = abs(i - 1)
+                other_atom = atompair[other_i]
+                other_res = other_atom.residue
+                atom.residue = other_res
+                aa = self.ff.residuetypes.get(other_res)
+                if not aa:
+                    logging.warning(
+                        f"No AA found for {other_res}, to which a H would jump"
+                    )
+                    continue
+
+                for key, bond in aa.bonds.items():
+                    if other_atom.atom in key and any(k.startswith("H") for k in key):
+                        if key[0] == other_atom.atom:
+                            h_name = bond.atom2
+                        else:
+                            h_name = bond.atom1
+
+                        atom.type = aa.atoms[h_name].type
+                        logging.info(f"HAT hydrogen will be bound to {other_atom}.")
+                        break
+                else:
+                    logging.warn(f"Found no new atomtype for HAT hydrogen!")
 
         # update bound_to
         atompair[0].bound_to_nrs.append(atompair[1].nr)
@@ -325,7 +510,7 @@ class Topology:
         ) + self._get_atom_improper_dihedrals(atompair_nrs[1])
         for key, value in dihedral_k_v:
             if self.improper_dihedrals.get(key) is None:
-                # TODO: fix this after the demonstration
+                # TODO: fix this
                 c2 = None
                 if value.q0 is not None:
                     c2 = "1"
@@ -333,18 +518,28 @@ class Topology:
                     key[0], key[1], key[2], key[3], "4", value.q0, value.cq, c2
                 )
 
-        # if there are no changed parameters for radicals, exit here
-        if self.ffpatches is None:
-            self._update_dict()
+    def move_hydrogen(self, from_to: tuple[str, str]):
+        """Move a singly bound atom to a new location.
+
+        This is typically H for Hydrogen Atom Transfer (HAT).
+        """
+        f, t = from_to
+        heavy = self.atoms[f].bound_to_nrs.pop()
+        if heavy is None:
+            logging.error(f"Atom {f} is not bound to anything.")
             return
+        self.break_bond((f, heavy))
+        self.bind_bond((f, t))
 
     def _get_atom_bonds(self, atom_nr: str) -> list[tuple[str, str]]:
+        """Get all bonds a particular atom is involved in."""
         ai = atom_nr
         bonds = []
         for aj in self.atoms[ai].bound_to_nrs:
-            # TODO: maybe sort here and filter later instead
             if int(ai) < int(aj):
                 bonds.append((ai, aj))
+            else:
+                bonds.append((aj, ai))
         return bonds
 
     def _get_atom_pairs(self, _: str) -> list[tuple[str, str]]:
@@ -439,7 +634,7 @@ class Topology:
 
     def _get_atom_improper_dihedrals(
         self, atom_nr: str
-    ) -> list[tuple[tuple[str, str, str, str], ResidueImroperSpec]]:
+    ) -> list[tuple[tuple[str, str, str, str], ResidueImproperSpec]]:
         # TODO: cleanup and make more efficient
         # which improper dihedrals are used is defined for each residue
         # in aminoacids.rtp

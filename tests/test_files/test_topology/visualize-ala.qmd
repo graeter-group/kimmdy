@@ -1,0 +1,144 @@
+---
+title: Ala topology
+format: html
+mermaid-format: svg
+execute:
+  warning: false
+  echo: true
+---
+
+# Ala
+
+```{python}
+from kimmdy.parsing import read_topol
+from kimmdy.topology.topology import Topology
+from pathlib import Path
+from kimmdy.misc_helper import top_to_graph
+```
+
+```{python}
+#| eval: false
+ala_top = read_topol(Path('../../../example/example_ala/Ala_out.top'))
+ala_top_mod = read_topol(Path('../../../example/example_ala/hat_tf_015/5_recipe/topol_mod.top'))
+ffdir = Path("../assets/amber99sb-star-ildnp.ff")
+ffpatch = Path('amber99sb_patches.xml')
+top = Topology(ala_top, ffdir, ffpatch)
+top_mod = Topology(ala_top_mod, ffdir, ffpatch)
+
+ls = top_to_graph(top) 
+with open("ala-top.dot", "w") as f:
+  f.writelines(ls)
+
+ls = top_to_graph(top_mod) 
+with open("ala-top-mod.dot", "w") as f:
+  f.writelines(ls)
+```
+
+Top, Ala and
+
+Top, Ala after
+
+`Recipe: [Conversion(type=<ConversionType.BREAK: 1>, atom_idx=('12', '10')), Conversion(type=<ConversionType.BIND: 2>, atom_idx=('12', '9'))]`
+
+Problem: 
+
+```
+ERROR 1 [file topol_mod.top, line 126]:
+  No default Angle types
+
+See:
+7        9        12       1       
+
+
+7        N        2        ALA      N        7        -0.4157  14.01   
+9        CT       2        ALA      CA       9        0.1160   12.01   
+12       HC       2        ALA      HB2      12       0.0603   1.008   
+
+N CT HC
+```
+
+
+
+:::: {#fig-label layout="[[1,1]]"}
+
+```{dot}
+//| echo: false
+//| label: fig-ala
+//| fig-cap: "A diagram of the ala topology"
+//| file: ala-top.dot
+```
+
+```{dot}
+//| echo: false
+//| label: fig-ala-mod
+//| fig-cap: "A diagram of the ala-mod topology"
+//| file: ala-top-mod.dot
+```
+
+caption
+::::
+
+# TriAla
+
+```{python}
+from kimmdy.parsing import read_topol
+from kimmdy.topology.topology import Topology
+from pathlib import Path
+from kimmdy.misc_helper import top_to_graph
+```
+
+```{python}
+ala_top = read_topol(Path('../../../example/example_triala/test_out_008/4_recipe/topol_mod.top'))
+ala_top_mod = read_topol(Path('../../../example/example_triala/test_out_008/9_recipe/topol_mod.top'))
+ffdir = Path("../assets/amber99sb-star-ildnp.ff")
+ffpatch = Path('amber99sb_patches.xml')
+top = Topology(ala_top, ffdir, ffpatch)
+top_mod = Topology(ala_top_mod, ffdir, ffpatch)
+
+ls = top_to_graph(top) 
+with open("triala-top.dot", "w") as f:
+  f.writelines(ls)
+
+ls = top_to_graph(top_mod) 
+with open("triala-top-mod.dot", "w") as f:
+  f.writelines(ls)
+```
+
+```
+ERROR 1 [file topol_mod.top, line 249]:
+  No default Angle types
+
+ERROR 2 [file topol_mod.top, line 250]:
+  No default Angle types
+
+
+21       20       22       1       
+21       20       23       1       
+
+
+20       CT       3        ALA      CB       20       -0.1825  12.01   
+21       H1       3        ALA      HB1      21       0.0603   1.008   
+22       HC       3        ALA      HB2      22       0.0603   1.008   
+23       HC       3        ALA      HB3      23       0.0603   1.008   
+```
+
+:::: {#fig-label layout="[[1,1]]"}
+
+```{dot}
+//| echo: false
+//| label: fig-triala
+//| fig-cap: "A diagram of the ala topology"
+//| file: triala-top.dot
+```
+
+```{dot}
+//| echo: false
+//| label: fig-triala-mod
+//| fig-cap: "A diagram of the ala-mod topology"
+//| file: triala-top-mod.dot
+```
+
+caption
+::::
+
+

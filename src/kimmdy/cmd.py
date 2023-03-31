@@ -1,10 +1,51 @@
 import logging
 from typing import Optional, Union
+from pathlib import Path
+import dill
 from kimmdy.config import Config
 import sys
 from kimmdy.runmanager import RunManager
 from kimmdy.utils import check_gmx_version
 from kimmdy.config import BaseConfig, get_config
+
+
+from kimmdy.utils import check_gmx_version, increment_logfile
+import sys
+
+
+if sys.version_info > (3, 10):
+    from importlib_metadata import version
+else:
+    from importlib.metadata import version
+
+
+def get_cmdline_args():
+    """Parse command line arguments and configure logger.
+
+    Returns
+    -------
+    Namespace
+        parsed command line arguments
+    """
+    parser = argparse.ArgumentParser(description="Welcome to KIMMDY")
+    parser.add_argument(
+        "--version", action="version", version=f'KIMMDY {version("kimmdy")}'
+    )
+    parser.add_argument(
+        "--input", "-i", type=str, help="kimmdy input file", default="kimmdy.yml"
+    )
+    parser.add_argument(
+        "--loglevel",
+        "-l",
+        type=str,
+        help="logging level (CRITICAL, ERROR, WARNING, INFO, DEBUG)",
+        default="DEBUG",
+    )
+    parser.add_argument(
+        "--logfile", "-f", type=str, help="logfile", default="kimmdy.log"
+    )
+    parser.add_argument("--checkpoint", "-c", type=str, help="checkpoint file")
+    return parser.parse_args()
 
 
 def configure_logging(config: BaseConfig):
@@ -14,26 +55,16 @@ def configure_logging(config: BaseConfig):
     for the terminal.
     """
 
-    if config.logging.logfile.exists():
-        log_curr = config.logging.logfile
-        while log_curr.exists():
-            out_end = log_curr.name.strip("#")[-3:]
-            if out_end.isdigit():
-                log_curr = log_curr.with_name(
-                    f"#{log_curr.name[:-3]}{int(out_end)+1:03}#"
-                )
-            else:
-                log_curr = log_curr.with_name(f"#{log_curr.name}_001#")
+    config.logging.logfile = increment_logfile(Path(config.logging.logfile))
 
-        config.logging.logfile.rename(log_curr)
-
-    if config.logging.color:
+    if color:
         logging.addLevelName(logging.INFO, "\033[35mINFO\033[00m")
         logging.addLevelName(logging.ERROR, "\033[31mERROR\033[00m")
         logging.addLevelName(logging.WARNING, "\033[33mWARN\033[00m")
         format = "\033[34m %(asctime)s\033[00m: %(levelname)s: %(message)s"
     else:
         format = " %(asctime)s: %(levelname)s: %(message)s"
+
     logging.basicConfig(
         level=getattr(logging, config.logging.loglevel.upper()),
         handlers=[
@@ -53,10 +84,18 @@ def _run(opts: Union[Config, dict] = {}):
     logging.info("KIMMDY is running with these options:")
     logging.debug(config)
 
-    logging.debug("Using system GROMACS:")
-    logging.debug(check_gmx_version(config))
+    if args.checkpoint:
+        logging.info("KIMMDY is starting from a checkpoint.")
+        with open(args.checkpoint, "rb") as f:
+            runmgr = dill.load(f)
+            runmgr.from_checkpoint = True
+    else:
+        config = Config(args.input)
+        logging.debug(config)
+        runmgr = RunManager(config)
+        logging.debug("Using system GROMACS:")
+        logging.debug(check_gmx_version(config))
 
-    runmgr = RunManager(config)
     runmgr.run()
 
 

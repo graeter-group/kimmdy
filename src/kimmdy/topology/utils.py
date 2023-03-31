@@ -67,7 +67,11 @@ def get_element_id(e: Element) -> Optional[str]:
 
 
 def match_id_to_patch(id: list[str], patches: Patches) -> Optional[Patch]:
-    id_str = "---".join([s.replace("*", "STAR").replace("+", "PLUS") for s in id])
+    id = [s.replace("*", "STAR").replace("+", "PLUS") for s in id]
+    id_str = "---".join(id)
+    id_sym = reversed(id)
+    id_str = "---".join(id)
+    id_sym_str = "---".join(id_sym)
     result = None
     longest_match = 0
     for _, patch in patches.items():
@@ -77,7 +81,7 @@ def match_id_to_patch(id: list[str], patches: Patches) -> Optional[Patch]:
         for key in [patch.id, patch.id_sym]:
             key = key.replace("*", "STAR").replace("+", "PLUS")
             # early return exact match
-            if key == id_str:
+            if key == id_str or key == id_sym_str:
                 return patch
             key_re = key.replace("X", ".*")
             match = re.match(key_re, id_str)
@@ -93,7 +97,10 @@ def match_id_to_patch(id: list[str], patches: Patches) -> Optional[Patch]:
 def match_atomic_item_to_atomic_type(
     id: list[str], types: AtomicTypes
 ) -> Optional[AtomicType]:
-    id_str = "---".join([s.replace("*", "STAR").replace("+", "PLUS") for s in id])
+    id = [s.replace("*", "STAR").replace("+", "PLUS") for s in id]
+    id_sym = reversed(id)
+    id_str = "---".join(id)
+    id_sym_str = "---".join(id_sym)
     result = None
     longest_match = 0
     for _, atomic_type in types.items():
@@ -102,12 +109,13 @@ def match_atomic_item_to_atomic_type(
         # use X as the wildcard
         for key in [atomic_type.id, atomic_type.id_sym]:
             key = key.replace("*", "STAR").replace("+", "PLUS")
+            keys = key.split("---")
             # early return exact match
-            if key == id_str:
+            if key == id_str or key == id_sym_str:
                 return atomic_type
             key_re = key.replace("X", ".*")
-            match = re.match(key_re, id_str)
-            if match is not None:
+            matches = [re.match(k, i) for k, i in zip(keys, id)]
+            if all(matches):
                 # favor longer (=more specific) and later matches
                 if len(key) >= longest_match:
                     longest_match = len(key)

@@ -90,6 +90,19 @@ def test_integration_hat_reaction(tmp_path):
     kimmdy_run(tmpdir / "kimmdy.yml")
 
 
+def test_integration_homolysis_reaction(tmp_path):
+    tmpdir = tmp_path / "homolysis"
+    shutil.copytree(
+        Path(__file__).parent / "test_files/test_integration/homolysis", tmpdir
+    )
+    os.chdir(tmpdir)
+    Path(tmpdir / "amber99sb-star-ildnp.ff").symlink_to(
+        Path(__file__).parent / "test_files/assets/amber99sb-star-ildnp.ff",
+        target_is_directory=True,
+    )
+    kimmdy_run(tmpdir / "kimmdy.yml")
+
+
 def test_integration_whole_run(tmp_path):
     tmpdir = tmp_path / "whole_run"
     shutil.copytree(

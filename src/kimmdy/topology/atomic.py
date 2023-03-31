@@ -52,6 +52,77 @@ class Atom:
 
 
 @dataclass(order=True)
+class PositionRestraint:
+    """Information about one position restraint.
+
+    A class containing information as in the position_restraints section of the topology.
+
+    From gromacs topology:
+    ; ai   funct    fc(x,y,z)
+    """
+
+    ai: str
+    funct: str
+    fc: tuple[str, str, str]
+    condition: Optional[str] = None
+
+    @classmethod
+    def from_top_line(cls, l: list[str], condition=None):
+        return cls(
+            ai=l[0],
+            funct=l[1],
+            fc=tuple(l[2:]),
+            condition=condition,
+        )
+
+
+# [ position_restraints ]
+# ; you wouldn't normally use this for a molecule like Urea,
+# ; but we include it here for didactic purposes
+# ; ai   funct    fc
+#    1     1     1000    1000    1000 ; Restrain to a point
+#    2     1     1000       0    1000 ; Restrain to a line (Y-axis)
+#    3     1     1000       0       0 ; Restrain to a plane (Y-Z-plane)
+# [ dihedral_restraints ]
+# ; ai   aj    ak    al  type  phi  dphi  fc
+#     3    6     1    2     1  180     0  10
+#     1    4     3    5     1  180     0  10
+
+
+@dataclass(order=True)
+class DihedralRestraint:
+    """Information about one dihedral restraint.
+
+    A class containing information as in the dihedral_restraints section of the topology.
+
+    From gromacs topology:
+    ; ai   aj    ak    al  type  phi  dphi  fc
+    """
+
+    ai: str
+    aj: str
+    ak: str
+    al: str
+    type: str
+    phi: str
+    dphi: str
+    fc: str
+
+    @classmethod
+    def from_top_line(cls, l: list[str]):
+        return cls(
+            ai=l[0],
+            aj=l[1],
+            ak=l[2],
+            al=l[3],
+            type=l[4],
+            phi=l[5],
+            dphi=l[6],
+            fc=l[7],
+        )
+
+
+@dataclass(order=True)
 class AtomType:
     """Information about one atom
 
@@ -307,8 +378,12 @@ class DihedralType:
     Proper dihedrals have funct 9.
     Improper dihedrals have funct 4.
 
+    Note that proper dihedrals of type 9 can be defined multiple times, for different
+    periodicities. This is why would-be parameter c2 is called periodicity and part of
+    the `id`.
+
     From gromacs topology:
-    ';', 'i', 'j', 'k', 'l', 'funct', 'c0', 'c1', 'c2', 'c3', 'c4', 'c5'
+    ';', 'i', 'j', 'k', 'l', 'funct', 'c0', 'c1', 'periodicity', 'c3', 'c4', 'c5'
     Where i,j,k,l are atomtypes
     """
 
@@ -319,26 +394,29 @@ class DihedralType:
     id: str
     id_sym: str
     funct: str
+    periodicity: str
     c0: Optional[str] = None
     c1: Optional[str] = None
-    c2: Optional[str] = None
     c3: Optional[str] = None
     c4: Optional[str] = None
     c5: Optional[str] = None
 
     @classmethod
     def from_top_line(cls, l: list[str]):
+        periodicity = field_or_none(l, 7)
+        if periodicity is None:
+            periodicity = "2"
         return cls(
             i=l[0],
             j=l[1],
             k=l[2],
             l=l[3],
-            id="---".join(l[:4]),
-            id_sym="---".join(reversed(l[:4])),
+            id="---".join(l[:4]) + ":::" + periodicity,
+            id_sym="---".join(reversed(l[:4])) + ":::" + periodicity,
             funct=l[4],
+            periodicity=periodicity,
             c0=field_or_none(l, 5),
             c1=field_or_none(l, 6),
-            c2=field_or_none(l, 7),
             c3=field_or_none(l, 8),
             c4=field_or_none(l, 9),
             c5=field_or_none(l, 10),
@@ -369,8 +447,8 @@ class ResidueBondSpec:
 
     atom1: str
     atom2: str
-    b0: Optional[str]
-    kb: Optional[str]
+    b0: Optional[str] = None
+    kb: Optional[str] = None
 
     @classmethod
     def from_top_line(cls, l: list[str]):
@@ -380,7 +458,7 @@ class ResidueBondSpec:
 
 
 @dataclass(order=True)
-class ResidueImroperSpec:
+class ResidueImproperSpec:
     """Information about one imroper dihedral in a residue
     ;atom1 atom2 atom3 atom4     q0     cq
     """
@@ -405,18 +483,43 @@ class ResidueImroperSpec:
 
 
 @dataclass(order=True)
+class ResidueProperSpec:
+    """Information about one imroper dihedral in a residue
+    ;atom1 atom2 atom3 atom4     q0     cq
+    """
+
+    atom1: str
+    atom2: str
+    atom3: str
+    atom4: str
+    q0: Optional[str]
+
+    @classmethod
+    def from_top_line(cls, l: list[str]):
+        return cls(
+            atom1=l[0],
+            atom2=l[1],
+            atom3=l[2],
+            atom4=l[3],
+            q0=field_or_none(l, 4),
+        )
+
+
+@dataclass(order=True)
 class ResidueType:
-    """Information about one residuetype"""
+    """Information about one residuetype from aminoacids.rtp"""
 
     residue: str
     atoms: dict[str, ResidueAtomSpec]
     bonds: dict[tuple[str, str], ResidueBondSpec]
-    improper_dihedrals: dict[tuple[str, str, str, str], ResidueImroperSpec]
+    proper_dihedrals: dict[tuple[str, str, str, str], ResidueProperSpec]
+    improper_dihedrals: dict[tuple[str, str, str, str], ResidueImproperSpec]
 
     @classmethod
     def from_section(cls, residue, d: dict[str, list[list[str]]]):
         atoms = {}
         bonds = {}
+        propers = {}
         impropers = {}
         if ls := d.get("atoms"):
             for l in ls:
@@ -426,20 +529,26 @@ class ResidueType:
             for l in ls:
                 bond = ResidueBondSpec.from_top_line(l)
                 bonds[(bond.atom1, bond.atom2)] = bond
+        if ls := d.get("dihedrals"):
+            for l in ls:
+                proper = ResidueProperSpec.from_top_line(l)
+                propers[
+                    (proper.atom1, proper.atom2, proper.atom3, proper.atom4)
+                ] = proper
         if ls := d.get("impropers"):
             for l in ls:
-                improper = ResidueImroperSpec.from_top_line(l)
+                improper = ResidueImproperSpec.from_top_line(l)
                 impropers[
                     (improper.atom1, improper.atom2, improper.atom3, improper.atom4)
                 ] = improper
 
-        return cls(residue, atoms, bonds, impropers)
+        return cls(residue, atoms, bonds, propers, impropers)
 
 
 AtomId = str
 BondId = tuple[str, str]
 AngleId = tuple[str, str, str]
-DihedralId = tuple[str, str, str, str]
+DihedralId = tuple[str, str, str, str, str]
 Atomic = Union[Atom, Bond, Pair, Angle, Dihedral]
 AtomicType = Union[AtomType, BondType, AngleType, DihedralType]
 AtomicTypes = Union[

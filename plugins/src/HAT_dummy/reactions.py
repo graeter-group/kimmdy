@@ -3,7 +3,6 @@ from kimmdy.reaction import (
     Reaction,
     ReactionOutcome,
     ReactionResult,
-    ConversionRecipe,
     ConversionType,
 )
 from .HAT_utils import cap_single_rad, find_radicals
@@ -32,7 +31,7 @@ class HAT_reaction(Reaction):
         logging.debug(f"{rads} for {tpr}")
         logging.debug([u.atoms[:20].elements, u.atoms[:20].types])
 
-        outcomes = []
+        outcomes: list[ReactionOutcome] = []
         for rad in rads:
             if len(rad.atoms) == 0:
                 logging.info("no radical found, returning zero rate recipe")
@@ -47,7 +46,9 @@ class HAT_reaction(Reaction):
             logging.info("made subsystem")
             for subsystem in subsystems:
                 from_H = subsystem["meta"]["indices"][0]
+                h_partner = u.atoms[from_H].bonded_atoms[0]
                 from_H_nr = str(u.atoms[from_H].index + 1)
+                h_partner_nr = str(h_partner.index + 1)
                 logging.info(u.atoms[from_H].resname)
                 if u.atoms[from_H].resname not in [
                     "NME",
@@ -55,9 +56,7 @@ class HAT_reaction(Reaction):
                 ]:  # doesn't work with capping groups at the moment
                     rad_nr = str(rad.atoms[0].index + 1)
                     recipe = [
-                        # FIXME: which is the previous H binding partner?
-                        # to break it's bond so that the H can move.
-                        Conversion(ConversionType.BREAK, (from_H_nr, rad_nr)),
+                        Conversion(ConversionType.BREAK, (from_H_nr, h_partner_nr)),
                         Conversion(ConversionType.BIND, (from_H_nr, rad_nr)),
                     ]
                     rate = get_reaction_rates()

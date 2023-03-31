@@ -91,7 +91,7 @@ class CoordinatesConfig:
 
 @dataclass
 class ChangerConfig:
-    coordinates: CoordinatesConfig
+    coordinates: MDrefConfig
 
 
 @dataclass
@@ -121,10 +121,11 @@ class LoggingConf:
 class BaseConfig():
     run: int
     experiment: str
-    name: str
+    name: str  # obsolete??
     dryrun: bool
     iterations: int
     out: Path
+    gromacs_alias: str
     ff: Path
     ffpatch: Optional[Path]
     top: Path
