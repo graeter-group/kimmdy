@@ -32,8 +32,7 @@ def test_parser_doesnt_crash_on_example():
 
 # %%
 def test_doubleparse_urea():
-    """ Parsing it's own output should return the same top on urea.gro
-    """
+    """Parsing it's own output should return the same top on urea.gro"""
     set_dir()
     urea_path = Path("urea.gro")
     top = parsing.read_topol(urea_path)
@@ -45,11 +44,12 @@ def test_doubleparse_urea():
     top3 = parsing.read_topol(p2)
     assert top2 == top3
 
+
 def test_parsing_includes_as_blocks():
     set_dir()
     urea_path = Path("urea.gro")
     top = parsing.read_topol(urea_path)
-    assert top['includes'] is not None
+    assert top["includes"] is not None
 
 
 #### Parsing should be invertible ####
@@ -79,11 +79,15 @@ def test_parse_xml_ff():
     ff_path = Path("amber99sb_trunc.xml")
     xml = parsing.read_xml_ff(ff_path)
 
-    atomtypes = xml.find('AtomTypes')
-    atomtypes.findall('Type')
-    assert atomtypes.findall('Type')[0].attrib == {
-        "class": "N", "element": "N", "mass": '14.00672'
+    atomtypes = xml.find("AtomTypes")
+    atomtypes.findall("Type")
+    assert atomtypes.findall("Type")[0].attrib == {
+        "class": "N",
+        "element": "N",
+        "mass": "14.00672",
     }
-    assert atomtypes.findall('Type')[1].attrib == {
-        "class": "H", "element": "H", "mass": '1.007947'
+    assert atomtypes.findall("Type")[1].attrib == {
+        "class": "H",
+        "element": "H",
+        "mass": "1.007947",
     }

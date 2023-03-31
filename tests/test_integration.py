@@ -1,4 +1,3 @@
-
 from kimmdy.parsing import (
     read_topol,
     read_plumed,
