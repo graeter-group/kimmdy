@@ -144,8 +144,7 @@ def merge_propers_impropers(top: TopologyDict):
 
 # WIP topol parsers
 def read_topol_with_idx(path: Path, idxs: list[str]) -> TopologyDict:
-    '''reads a reduced topology made of the lines that contain the strings in idxs
-    '''
+    """reads a reduced topology made of the lines that contain the strings in idxs"""
     # TODO look into following #includes
     # TODO look into [ intermolecule ] section
     with open(path, "r") as f:
@@ -159,8 +158,8 @@ def read_topol_with_idx(path: Path, idxs: list[str]) -> TopologyDict:
             clist = []
             for c in content:
                 csplit = c.split()
-                if any([idx in csplit for idx in idxs]) or name == 'atoms':
-                    clist.append(csplit) 
+                if any([idx in csplit for idx in idxs]) or name == "atoms":
+                    clist.append(csplit)
             content = clist
             if not name:
                 name = f"BLOCK {i}"
@@ -172,10 +171,14 @@ def read_topol_with_idx(path: Path, idxs: list[str]) -> TopologyDict:
                 d[name] += content
         return d
 
-def read_topol_mod_slowgrowth(path: Path, CR: ConversionRecipe, state_A_reduced: TopologyDict,ffpath: Path) -> TopologyDict:
+
+def read_topol_mod_slowgrowth(
+    path: Path, CR: ConversionRecipe, state_A_reduced: TopologyDict, ffpath: Path
+) -> TopologyDict:
     # TODO look into following #includes
     # TODO look into [ intermolecule ] section
     from kimmdy.coordinatemanager import merge_section_slowgrowth
+
     with open(path, "r") as f:
         sections = get_sections(f, "\n")
         d = {}
@@ -185,8 +188,10 @@ def read_topol_mod_slowgrowth(path: Path, CR: ConversionRecipe, state_A_reduced:
                 continue
             name, content = extract_section_name(s)
             clist = []
-            if name in ['bonds','pairs','angles']:
-                content = merge_section_slowgrowth(name,content,CR,state_A_reduced,ffpath)
+            if name in ["bonds", "pairs", "angles"]:
+                content = merge_section_slowgrowth(
+                    name, content, CR, state_A_reduced, ffpath
+                )
             else:
                 content = [c.split() for c in content if c]
             if not name:
@@ -202,8 +207,7 @@ def read_topol_mod_slowgrowth(path: Path, CR: ConversionRecipe, state_A_reduced:
 
 # WIP topol parsers
 def read_topol_with_idx(path: Path, idxs: list[str]) -> TopologyDict:
-    '''reads a reduced topology made of the lines that contain the strings in idxs
-    '''
+    """reads a reduced topology made of the lines that contain the strings in idxs"""
     # TODO look into following #includes
     # TODO look into [ intermolecule ] section
     with open(path, "r") as f:
@@ -217,8 +221,8 @@ def read_topol_with_idx(path: Path, idxs: list[str]) -> TopologyDict:
             clist = []
             for c in content:
                 csplit = c.split()
-                if any([idx in csplit for idx in idxs]) or name == 'atoms':
-                    clist.append(csplit) 
+                if any([idx in csplit for idx in idxs]) or name == "atoms":
+                    clist.append(csplit)
             content = clist
             if not name:
                 name = f"BLOCK {i}"
@@ -230,10 +234,14 @@ def read_topol_with_idx(path: Path, idxs: list[str]) -> TopologyDict:
                 d[name] += content
         return d
 
-def read_topol_mod_slowgrowth(path: Path, CR: ConversionRecipe, state_A_reduced: TopologyDict,ffpath: Path) -> TopologyDict:
+
+def read_topol_mod_slowgrowth(
+    path: Path, CR: ConversionRecipe, state_A_reduced: TopologyDict, ffpath: Path
+) -> TopologyDict:
     # TODO look into following #includes
     # TODO look into [ intermolecule ] section
     from kimmdy.coordinatemanager import merge_section_slowgrowth
+
     with open(path, "r") as f:
         sections = get_sections(f, "\n")
         d = {}
@@ -243,8 +251,10 @@ def read_topol_mod_slowgrowth(path: Path, CR: ConversionRecipe, state_A_reduced:
                 continue
             name, content = extract_section_name(s)
             clist = []
-            if name in ['bonds','pairs','angles']:
-                content = merge_section_slowgrowth(name,content,CR,state_A_reduced,ffpath)
+            if name in ["bonds", "pairs", "angles"]:
+                content = merge_section_slowgrowth(
+                    name, content, CR, state_A_reduced, ffpath
+                )
             else:
                 content = [c.split() for c in content if c]
             if not name:
