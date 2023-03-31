@@ -15,7 +15,7 @@ class FF:
         self.bondtypes: dict[tuple[str, str], BondType] = {}
         self.angletypes: dict[tuple[str, str, str], AngleType] = {}
         self.proper_dihedraltypes: dict[
-            tuple[str, str, str, str], list[DihedralType]
+            tuple[str, str, str, str, str], DihedralType
         ] = {}
         self.improper_dihedraltypes: dict[tuple[str, str, str, str], DihedralType] = {}
         self.residuetypes: dict[str, ResidueType]
@@ -46,17 +46,25 @@ class FF:
             elif dihedraltype.funct == "9":
                 if (
                     self.proper_dihedraltypes.get(
-                        (dihedraltype.i, dihedraltype.j, dihedraltype.k, dihedraltype.l)
+                        (
+                            dihedraltype.i,
+                            dihedraltype.j,
+                            dihedraltype.k,
+                            dihedraltype.l,
+                            dihedraltype.periodicity,
+                        )
                     )
                     is None
                 ):
                     self.proper_dihedraltypes[
-                        (dihedraltype.i, dihedraltype.j, dihedraltype.k, dihedraltype.l)
-                    ] = [dihedraltype]
-                else:
-                    self.proper_dihedraltypes[
-                        (dihedraltype.i, dihedraltype.j, dihedraltype.k, dihedraltype.l)
-                    ].append(dihedraltype)
+                        (
+                            dihedraltype.i,
+                            dihedraltype.j,
+                            dihedraltype.k,
+                            dihedraltype.l,
+                            dihedraltype.periodicity,
+                        )
+                    ] = dihedraltype
 
             # TODO
             self.residuetypes = {}

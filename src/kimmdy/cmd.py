@@ -98,7 +98,9 @@ def kimmdy_run(
     logfile: Path = Path("kimmdy.log"),
 ):
     """Run KIMMDY from python."""
-    args = argparse.Namespace(input=input, loglevel=loglevel, logfile=logfile)
+    args = argparse.Namespace(
+        input=input, loglevel=loglevel, logfile=logfile, checkpoint=""
+    )
     _run(args)
     logging.shutdown()
 

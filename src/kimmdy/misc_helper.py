@@ -5,20 +5,27 @@ from kimmdy.topology.topology import Topology
 
 
 def topology_to_edgelist(top: Topology):
-    bonds = []
-    for atom in list(top.atoms.values()):
-        bonds.extend(top._get_atom_bonds(atom.nr))
+    ls = []
+    for b in top.bonds:
+        ai = b[0]
+        aj = b[1]
+        x = top.atoms[ai]
+        y = top.atoms[aj]
+        left = f'"{ai} {x.type}" '
+        right = f'"{aj} {y.type}" '
+        ls.append(f"{left} -- {right};")
+        if x.is_radical:
+            ls.append(f'{left} [color="red"]')
+        if y.is_radical:
+            ls.append(f'{right} [color="red"]')
+    return ls
 
-    return [
-        f'"{b[0]} {top.atoms[b[0]].type}" -- "{b[1]} {top.atoms[b[1]].type}";'
-        for b in bonds
-    ]
 
-
-def edgelist_to_dot_graph(ls: list[str]):
-    header = """
-        graph G {
+def edgelist_to_dot_graph(ls: list[str], overlap: str = "true"):
+    header = f"""
+        graph G {{
           layout=neato
+          overlap={overlap}
           node [shape="circle"]
     """
     tail = """
@@ -28,8 +35,8 @@ def edgelist_to_dot_graph(ls: list[str]):
     return header + body + tail
 
 
-def top_to_graph(top: Topology):
-    return edgelist_to_dot_graph(topology_to_edgelist(top))
+def top_to_graph(top: Topology, overlap: str = "true"):
+    return edgelist_to_dot_graph(topology_to_edgelist(top), overlap)
 
 
 def concat_traj(run_dir: Union[Path, str], out: Union[Path, str], run_types=None):
