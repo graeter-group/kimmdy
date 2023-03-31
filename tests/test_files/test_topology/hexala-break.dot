@@ -1,7 +1,7 @@
 
         graph G {
           layout=neato
-          overlap=true
+          overlap=false
           node [shape="circle"]
     "1 CT"  -- "2 HC" ;
 "1 CT"  -- "3 HC" ;
@@ -31,14 +31,18 @@
 "25 C"  -- "27 N" ;
 "27 N"  -- "28 H" ;
 "27 N"  -- "29 CT" ;
+"29 CT"  [color="red"]
 "29 CT"  -- "30 H1" ;
+"29 CT"  [color="red"]
 "29 CT"  -- "31 CT" ;
-"29 CT"  -- "35 C" ;
+"29 CT"  [color="red"]
 "31 CT"  -- "32 HC" ;
 "31 CT"  -- "33 HC" ;
 "31 CT"  -- "34 HC" ;
 "35 C"  -- "36 O" ;
+"35 C"  [color="red"]
 "35 C"  -- "37 N" ;
+"35 C"  [color="red"]
 "37 N"  -- "38 H" ;
 "37 N"  -- "39 CT" ;
 "39 CT"  -- "40 H1" ;

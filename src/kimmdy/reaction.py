@@ -1,5 +1,10 @@
-from __future__ import annotations  # for 3.7 <= Python version < 3.10
-from typing import TYPE_CHECKING  # fixes circular import issues for type hints
+from __future__ import annotations
+from collections.abc import Callable  # for 3.7 <= Python version < 3.10
+from typing import TYPE_CHECKING
+
+from kimmdy.topology.topology import (
+    Topology,
+)  # fixes circular import issues for type hints
 
 if TYPE_CHECKING:
     from kimmdy.runmanager import RunManager
@@ -14,6 +19,7 @@ import logging
 class ConversionType(Enum):
     BREAK = auto()
     BIND = auto()
+    MOVE = auto()
 
 
 @dataclass
