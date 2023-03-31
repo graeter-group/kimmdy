@@ -1,24 +1,26 @@
 dryrun: false
 iterations: 100
-name: 'hat_tf_000'
+out: 'hat_tf_000'
+gromacs_alias: 'gmx'
 # ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
 top: 'Ala_out.top'
 gro: 'npt.gro'
 idx: 'index.ndx'
-plumed: false
-equilibrium:
-  mdp: 'md.mdp'
+mds:
+  equilibrium1:
+    mdp: 'md.mdp'
+  relax:
+    mdp: 'minim.mdp'
 changer:
   coordinates:
-    md:
-      mdp: 'minim.mdp'
+    md: 'relax'
 reactions:
   HAT_dummy:
 sequence:
-  - equilibrium
+  - equilibrium1
   -
     mult: 3
     tasks:
       - reactions
-      - equilibrium
+      - equilibrium1
       

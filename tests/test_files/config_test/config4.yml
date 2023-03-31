@@ -1,8 +1,8 @@
 dryrun: true
 iterations: 3
-out: 'test_config_3'
+out: 'test_config_4'
 gromacs_alias: 'gmx'
-ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
+#ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
 top: 'topol.top'
 gro: 'npt.gro'
 idx: 'index_backbone.ndx'
@@ -10,7 +10,7 @@ mds:
   equilibrium:
     mdp: 'pullf1500_equil.mdp'
   pull:
-    mdp: 'not_existing.mdp' # not existing
+    mdp: 'pullf1500.mdp' 
     plumed:
       dat: 'plumed.dat' 
       distances: 'distances.dat'
@@ -28,6 +28,6 @@ sequence:
   - 
     mult: 1
     tasks:
-      - pull
+      - pull_nonexistent
       - reactions
 

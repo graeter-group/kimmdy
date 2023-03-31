@@ -31,26 +31,32 @@ class Sequence(list):
                 self.append(task)
 
 
+class Mds:
+    def __init__(self):
+        pass
+
+
 type_scheme = {
     "experiment": str,
     "run": int,
     "dryrun": bool,
     "iterations": int,
     "out": Path,
+    "gromacs_alias": str,
     "ff": Path,
     "ffpatch": None,
     "top": Path,
     "gro": Path,
     "idx": Path,
-    "plumed": None,
-    "minimization": {"mdp": Path, "tpr": Path},
-    "equilibration": {
-        "nvt": {"mdp": Path, "tpr": Path},
-        "npt": {"mdp": Path, "tpr": Path},
+    "mds": {
+        "*": {
+            "mdp": Path,
+            "plumed": {"dat": Path, "distances": Path},
+            "prefix": str,
+            "overwrite": str,
+        }
     },
-    "equilibrium": {"mdp": Path},
-    "prod": {"mdp": Path},
-    "changer": {"coordinates": {"md": {"mdp": Path}}},
+    "changer": {"coordinates": {"md": str}},
     "reactions": {},
     "sequence": Sequence,
 }
@@ -58,36 +64,12 @@ type_scheme = {
 # classes for static code analysis
 
 
-class MinimizationConfig:
-    mdp: Path
-    tpr: Path
-
-
-class NvtConfig:
-    mdp: Path
-    tpr: Path
-
-
-class NptConfig:
-    mdp: Path
-    tpr: Path
-
-
-class EquilibrationConfig:
-    nvt: NvtConfig
-    npt: NptConfig
-
-
-class MdConfig:
-    mdp: Path
-
-
-class CoordinatesConfig:
-    md: MdConfig
+class MDrefConfig:
+    md: str
 
 
 class ChangerConfig:
-    coordinates: CoordinatesConfig
+    coordinates: MDrefConfig
 
 
 class HomolysisConfig:
@@ -99,7 +81,7 @@ class ReactionsConfig:
     homolysis: HomolysisConfig
 
 
-class ProdConfig:
+class PullConfig:
     mdp: Path
 
 
@@ -127,22 +109,20 @@ class Config:
 
     run: int
     experiment: str
-    name: str
+    name: str  # obsolete??
     dryrun: bool
     iterations: int
     out: Path
+    gromacs_alias: str
     ff: Path
     ffpatch: Optional[Path]
     top: Path
     gro: Path
     idx: Path
-    plumed: None
-    minimization: MinimizationConfig
-    equilibration: EquilibrationConfig
-    equilibrium: MdConfig
+    mds: dict
     changer: ChangerConfig
     reactions: ReactionsConfig
-    prod: ProdConfig
+    pull: PullConfig
     sequence: SequenceConfig
 
     def __init__(
@@ -193,9 +173,10 @@ class Config:
         if recursive_dict is not None:
             for name, val in recursive_dict.items():
                 if isinstance(val, dict):
-                    val = Config(
-                        recursive_dict=val, type_scheme=self.type_scheme.get(name)
-                    )
+                    recursiv_type_s = self.type_scheme.get(name)
+                    if recursiv_type_s is None:
+                        recursiv_type_s = self.type_scheme.get("*")
+                    val = Config(recursive_dict=val, type_scheme=recursiv_type_s)
                 logging.debug(f"Set attribute: {name}, {val}")
                 self.__setattr__(name, val)
 
@@ -228,6 +209,10 @@ class Config:
                 assert ffs[0].is_dir(), "Forcefield should be a directory!"
                 self.ff = ffs[0].resolve()
 
+            # assert hasattr(self,'mds'), "MD section not defined in config file!"
+            # for attribute in self.mds.get_attributes():
+            #     self.mds.attr(attribute).mdp = Path(self.mds.attr(attribute).mdp)
+
             self._cast_types()
             self._validate()
 
@@ -248,13 +233,19 @@ class Config:
         """
         return self.__getattribute__(attribute)
 
-    def _cast_types(self):
+    def _cast_types(self, to_type_wildcard=None):
         """Casts types defined in `type_scheme` to raw attributes."""
         attr_names = filter(lambda s: s[0] != "_", self.__dir__())
         for attr_name in attr_names:
             to_type = self.type_scheme.get(attr_name)
             attr = self.__getattribute__(attr_name)
 
+            if attr_name == "type_scheme" or callable(attr):
+                continue
+
+            # handle wildcard attr
+            if to_type_wildcard is not None:
+                to_type = to_type_wildcard
             if to_type is not None:
                 if attr is None:
                     raise ValueError(
@@ -263,7 +254,10 @@ class Config:
 
                 # nested:
                 if isinstance(to_type, dict):
-                    attr._cast_types()
+                    if list(to_type.keys()) == ["*"]:
+                        attr._cast_types(to_type["*"])
+                    else:
+                        attr._cast_types()
                     continue
                 # wrap single element if it should be a list
                 elif to_type is list:
@@ -296,18 +290,31 @@ class Config:
                 # Check files from scheme
                 if isinstance(attr, Path):
                     self.__setattr__(attr_name, attr.resolve())
-                    if not str(attr) in [
-                        "distances.dat"
-                    ]:  # distances.dat wouldn't exist prior to the run
+                    # distances.dat wouldn't exist prior to the run
+                    if not str(attr) in ["distances.dat"]:
                         logging.debug(attr)
                         check_file_exists(attr)
 
                 # Validate sequence
                 if isinstance(attr, Sequence):
                     for task in attr:
-                        assert hasattr(
-                            self, task
-                        ), f"Task {task} listed in sequence, but not defined!"
+                        if not hasattr(self, task):
+                            if hasattr(self, "mds"):
+                                if hasattr(self.mds, task):
+                                    continue
+                            raise AssertionError(
+                                f"Task {task} listed in sequence, but not defined!"
+                            )
+
+                # Validate changer reference
+                if attr_name == "raw":
+                    if hasattr(self, "changer"):
+                        if hasattr(self.changer, "coordinates"):
+                            if "md" in self.changer.coordinates.get_attributes():
+                                assert (
+                                    self.changer.coordinates.md
+                                    in self.mds.get_attributes()
+                                ), f"Relax MD {self.changer.coordinates.md} not in MD section!"
 
                 # Validate reaction plugins
                 if attr_name == "reactions":
@@ -319,4 +326,4 @@ class Config:
 
         except AssertionError as e:
             logging.error(f"Validating input failed!\n{e}")
-            raise ValueError(e)
+            raise AssertionError(e)

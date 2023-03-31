@@ -23,12 +23,9 @@ reactions:
   homolysis:
     edis: 'edissoc.dat'
     bonds: 'ffbonded.itp'
-  HAT_dummy:
 sequence:
   - equilibrium
-  - prod
-  - mult: 3
-    tasks:
-      - reactions
-      - equilibrium
-      - pull
+  - pull  
+  - reactions
+  - equilibrium
+  - pull
