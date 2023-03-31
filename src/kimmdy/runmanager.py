@@ -94,8 +94,8 @@ class RunManager:
             "top": self.config.top,
             "gro": self.config.gro,
             "idx": self.config.idx,
-            "trr": '',
-            "edr": '',
+            "trr": "",
+            "edr": "",
         }
         self.histfile = increment_logfile(Path(f"{self.config.out}_history.log"))
         self.cptfile = increment_logfile(Path(f"{self.config.out}_kimmdy.cpt"))
@@ -167,8 +167,8 @@ class RunManager:
                     self.tasks.put(Task(task, kwargs={"instance": entry}))
                 else:
                     for task in self.task_mapping[entry]:
-                            logging.info(f"Put Task: {task}")
-                            self.tasks.put(Task(task))
+                        logging.info(f"Put Task: {task}")
+                        self.tasks.put(Task(task))
 
         while not (self.state is State.DONE or self.iteration >= self.iterations):
             logging.info("Write checkpoint before next task")
@@ -269,9 +269,9 @@ class RunManager:
         ntomp = 2
 
         grompp_cmd = f"{gmx_alias} grompp -p {top} -c {gro} -f {mdp} -n {idx} -o {instance}.tpr -maxwarn 5"
-        # only appends these lines if there are trr and edr files 
+        # only appends these lines if there are trr and edr files
         if trr and edr:
-            grompp_cmd +=  f" -t {trr} -e {edr}"
+            grompp_cmd += f" -t {trr} -e {edr}"
         mdrun_cmd = f"{gmx_alias} mdrun -s {instance}.tpr -cpi {instance}.cpt -x {instance}.xtc -o {instance}.trr -cpo {instance}.cpt -c {instance}.gro -g {instance}.log -e {instance}.edr -px {instance}_pullx.xvg -pf {instance}_pullf.xvg -ro {instance}-rotation.xvg -ra {instance}-rotangles.log -rs {instance}-rotslabs.log -rt {instance}-rottorque.log -maxh {maxh} -dlb yes -ntomp {ntomp}"
         # like this, the previous checkpoint file would not be used, -t and -e options from grompp
         # replace the checkpoint file if gen_vel = no in the mdp file
@@ -300,7 +300,7 @@ class RunManager:
             self.reaction_results.append(reaction.get_reaction_result(files))
 
         logging.info("Reaction done")
-        return files        # necessary?
+        return files  # necessary?
 
     def _decide_reaction(
         self,
