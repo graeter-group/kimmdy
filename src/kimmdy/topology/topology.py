@@ -143,6 +143,29 @@ class Topology:
             new_pairs[(update_map[pair.ai], update_map[pair.aj])] = pair
         self.pairs = new_pairs
 
+    def reset_all_parameters(self):
+        """Resets all parameters to None."""
+        for bond in self.bonds.values():
+            for key in bond.__dict__.keys():
+                if key not in ["ai", "aj", "funct"]:
+                    setattr(bond, key, None)
+
+        for angle in self.angles.values():
+            for key in angle.__dict__.keys():
+                if key not in ["ai", "aj", "ak", "funct"]:
+                    setattr(angle, key, None)
+
+        for dihedral in self.proper_dihedrals.values():
+            for key in dihedral.__dict__.keys():
+                if key not in ["ai", "aj", "ak", "al", "funct"]:
+                    setattr(dihedral, key, None)
+
+        for dihedral in self.improper_dihedrals.values():
+            for key in dihedral.__dict__.keys():
+                if key not in ["ai", "aj", "ak", "al", "funct"]:
+                    setattr(dihedral, key, None)
+
+
     def __str__(self) -> str:
         return str(self.atoms)
 

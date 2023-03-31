@@ -6,7 +6,7 @@ from kimmdy.topology.topology import Topology
 
 def topology_to_edgelist(top: Topology):
     ls = []
-    for b in top.bonds:
+    for b in sorted(top.bonds):
         ai = b[0]
         aj = b[1]
         x = top.atoms[ai]
