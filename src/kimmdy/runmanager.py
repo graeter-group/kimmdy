@@ -13,13 +13,15 @@ from kimmdy.reaction import ConversionType, Reaction, ReactionResult, Conversion
 import kimmdy.mdmanager as md
 import kimmdy.changemanager as changer
 from kimmdy.tasks import Task, TaskFiles, TaskMapping
+from kimmdy.utils import run_shell_cmd
 from pprint import pformat
 import random
 from kimmdy import plugins
 from kimmdy.topology.topology import Topology
 
 # file types of which there will be multiple files per type
-AMBIGUOUS_SUFFS = ["dat", "xvg", "log", "trr"]
+AMBIGUOUS_SUFFS = ["dat", "xvg", "log"]
+# are there cases where we have multiple trr files?
 
 
 def default_decision_strategy(
@@ -92,6 +94,8 @@ class RunManager:
             "top": self.config.top,
             "gro": self.config.gro,
             "idx": self.config.idx,
+            "trr": "",
+            "edr": "",
         }
         self.histfile = increment_logfile(Path(f"{self.config.out}_history.log"))
         self.cptfile = increment_logfile(Path(f"{self.config.out}_kimmdy.cpt"))
@@ -102,25 +106,23 @@ class RunManager:
         self.top = Topology(
             read_topol(self.config.top), self.config.ff, self.config.ffpatch
         )
-        # did we just miss to add this or is there a way around this explicit definition
-        # with the new AutoFillDict??
-        if self.config.plumed:
-            self.latest_files["plumed.dat"] = self.config.cwd / self.config.plumed.dat
-            # self.latest_files["distances.dat"] = self.config.plumed.distances
+        # # did we just miss to add this or is there a way around this explicit definition
+        # # with the new AutoFillDict??
+        # if self.config.plumed:
+        #     self.latest_files["plumed.dat"] = self.config.cwd / self.config.plumed.dat
+        #     # self.latest_files["distances.dat"] = self.config.plumed.distances
 
         self.filehist: list[dict[str, TaskFiles]] = [
             {"setup": TaskFiles(runmng=self, input=self.latest_files)}
         ]
 
         self.task_mapping: TaskMapping = {
-            "equilibrium": [self._run_md_equil],
-            "prod": [self._run_md_prod],
-            "minimization": [self._run_md_minim],
-            "relax": [self._run_md_relax],
+            "md": self._run_md,
             "reactions": [
                 self._query_reactions,
                 self._decide_reaction,
                 self._run_recipe,
+                self._relaxation,
             ],
         }
 
@@ -159,9 +161,14 @@ class RunManager:
         if not self.from_checkpoint:
             # allows for mapping one config entry to multiple tasks
             for entry in self.config.sequence:
-                for task in self.task_mapping[entry]:
+                if entry in self.config.mds.get_attributes():
+                    task = self.task_mapping["md"]
                     logging.info(f"Put Task: {task}")
-                    self.tasks.put(Task(task))
+                    self.tasks.put(Task(task, kwargs={"instance": entry}))
+                else:
+                    for task in self.task_mapping[entry]:
+                        logging.info(f"Put Task: {task}")
+                        self.tasks.put(Task(task))
 
         while not (self.state is State.DONE or self.iteration >= self.iterations):
             logging.info("Write checkpoint before next task")
@@ -236,60 +243,48 @@ class RunManager:
         files = TaskFiles(self)
         files.outputdir = self.config.out / f"{self.iteration}_dummy"
         files.outputdir.mkdir()
-        md.dummy_step(files)
+        run_shell_cmd("pwd>./pwd.pwd", files.outputdir)
         return files
 
-    def _run_md_equil(self) -> TaskFiles:
-        logging.info("Start equilibration MD")
+    def _run_md(self, instance) -> TaskFiles:
+        """General MD simulation"""
+        logging.info(f"Start MD {instance}")
         self.state = State.MD
-        files = self._create_task_directory("equilibration")
-        files.input["mdp"] = self.config.equilibrium.mdp
-        files.input["idx"] = self.config.idx
-        md.equilibrium(files)
-        logging.info("Done equilibrating")
-        return files
 
-    def _run_md_minim(self) -> TaskFiles:
-        logging.info("Setup _run_md_minim")
-        self.state = State.MD
-        files = self._create_task_directory("minimization")
-        files.input["mdp"] = self.config.minimization.mdp
+        files = self._create_task_directory(f"{instance}")
+        md_config = self.config.mds.attr(instance)
+        gmx_alias = self.config.gromacs_alias
 
-        # perform step
-        files = md.minimzation(files)
-        logging.info("Done minimizing")
-        return files
+        logging.warning(self.latest_files)
+        top = files.input["top"]
+        gro = files.input["gro"]
+        trr = files.input["trr"]
+        edr = files.input["edr"]
+        mdp = md_config.mdp
+        idx = files.input["idx"]
 
-    def _run_md_eq(self) -> TaskFiles:
-        logging.info("Setup _run_md_eq MD")
-        self.state = State.MD
-        files = self._create_task_directory("equilibrium")
-        files.input["mdp"] = self.config.equilibrium.mdp
+        outputdir = files.outputdir
+        # make maxh and ntomp accessible?
+        maxh = 24
+        ntomp = 2
 
-        files = md.equilibration(files)
-        logging.info("Done")
-        return files
+        grompp_cmd = f"{gmx_alias} grompp -p {top} -c {gro} -f {mdp} -n {idx} -o {instance}.tpr -maxwarn 5"
+        # only appends these lines if there are trr and edr files
+        if trr and edr:
+            grompp_cmd += f" -t {trr} -e {edr}"
+        mdrun_cmd = f"{gmx_alias} mdrun -s {instance}.tpr -cpi {instance}.cpt -x {instance}.xtc -o {instance}.trr -cpo {instance}.cpt -c {instance}.gro -g {instance}.log -e {instance}.edr -px {instance}_pullx.xvg -pf {instance}_pullf.xvg -ro {instance}-rotation.xvg -ra {instance}-rotangles.log -rs {instance}-rotslabs.log -rt {instance}-rottorque.log -maxh {maxh} -dlb yes -ntomp {ntomp}"
+        # like this, the previous checkpoint file would not be used, -t and -e options from grompp
+        # replace the checkpoint file if gen_vel = no in the mdp file
 
-    def _run_md_prod(self) -> TaskFiles:
-        logging.info("Setup _run_md_prod")
-        self.state = State.MD
-        files = self._create_task_directory("production")
-        files.input["mdp"] = self.config.prod.mdp
-        files.input["idx"] = self.config.idx
+        if "plumed" in md_config.get_attributes():
+            mdrun_cmd += f" -plumed {md_config.plumed.dat}"
+            files.output = {"plumed.dat": md_config.plumed.dat}
+            # add plumed.dat to output to indicate it as current plumed.dat file
 
-        files = md.production(files)
-        logging.info("Done with production MD")
-        return files
+        run_shell_cmd(grompp_cmd, outputdir)
+        run_shell_cmd(mdrun_cmd, outputdir)
 
-    def _run_md_relax(self) -> TaskFiles:
-        logging.info("Start _run_md_relax")
-        self.state = State.MD
-        files = self._create_task_directory("relaxation")
-        files.input["mdp"] = self.config.changer.coordinates.md.mdp
-        files.input["idx"] = self.config.idx
-
-        files = md.relaxation(files)
-        logging.info("Done with relaxation MD")
+        logging.info("Done with MD {instance}")
         return files
 
     def _query_reactions(self):
@@ -305,6 +300,7 @@ class RunManager:
             self.reaction_results.append(reaction.get_reaction_result(files))
 
         logging.info("Reaction done")
+        return files  # necessary?
 
     def _decide_reaction(
         self,
@@ -349,12 +345,20 @@ class RunManager:
             logging.info(
                 f'Wrote new plumedfile to {files.output["plumed.dat"].parts[-3:]}'
             )
-
-        logging.info(f"Looking for md in {self.config.changer.coordinates.__dict__}")
-
-        # TODO clean this up, maybe make function for this in config
-        if hasattr(self.config, "changer"):
-            if hasattr(self.config.changer, "coordinates"):
-                if hasattr(self.config.changer.coordinates, "md"):
-                    self.crr_tasks.put(Task(self._run_md_relax))
+        logging.info("Reaction done")
         return files
+
+    def _relaxation(self) -> TaskFiles:
+        # this task generates no files but is only there to generate subtasks
+        logging.info(f"Start Relaxation in step {self.iteration}")
+        logging.info(f"Type of relaxation: {self.config.changer.coordinates}")
+
+        if hasattr(self.config.changer.coordinates, "md"):
+            self.crr_tasks.put(
+                Task(
+                    self._run_md,
+                    kwargs={"instance": self.config.changer.coordinates.md},
+                )
+            )
+        # TODO add atom placement method from Kai as relaxation option
+        logging.info(f"Relaxation done!")

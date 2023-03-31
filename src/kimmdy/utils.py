@@ -2,6 +2,8 @@ import subprocess as sp
 import numpy as np
 import logging
 from pathlib import Path
+import MDAnalysis as MDA
+from scipy.spatial.transform import Rotation
 
 from kimmdy.config import Config
 
@@ -222,14 +224,26 @@ def check_gmx_version(config: Config):
     try:
         version = [
             l
-            for l in get_shell_stdout("gmx --quiet --version").split("\n")
+            for l in get_shell_stdout(
+                f"{config.gromacs_alias} --quiet --version"
+            ).split("\n")
             if "GROMACS version:" in l
         ][0]
     except Exception as e:
         m = "No system gromacs detected. With error: " + str(e)
         logging.error(m)
         raise SystemError(m)
-    if config.plumed and not "MODIFIED" in version:
+
+    # i hate this
+    if (
+        any(
+            "plumed" in y
+            for y in [
+                config.mds.attr(x).get_attributes() for x in config.mds.get_attributes()
+            ]
+        )
+        and not "MODIFIED" in version
+    ):
         m = "GROMACS version does not contain MODIFIED, aborting due to lack of PLUMED patch."
         logging.error(m)
         logging.error("Version was: " + version)
@@ -456,3 +470,124 @@ def write_conditions_in_plumedfile(topfile, indexfile, indexgroup, outplumed):
     file.close()
 
     print("finished writing plumed-file")
+
+
+## coordinate changer utils
+
+
+def find_radical_pos(
+    center: MDA.core.groups.Atom, bonded: MDA.core.groups.AtomGroup, tetrahedral=False
+):
+    """Calculates possible radical positions of a given radical atom
+
+    Parameters
+    ----------
+    center : MDA.core.groups.Atom
+        Radical atom
+    bonded : MDA.core.groups.AtomGroup
+        Atom group of bonded atoms. From its length the geometry is predicted.
+    tetrahedral : bool
+        Whether to assume a tetrahedral conformation around C and N
+
+    Returns
+    -------
+    list
+        List of radical positions, three dimensional arrays
+    """
+    scale_C = 1.10
+    scale_N = 1.04
+    scale_O = 0.97
+    scale_S = 1.41
+
+    if center.element == "C" and len(bonded) == 2:
+        c_alphas = center.bonded_atoms
+        c_o = c_alphas[np.nonzero(c_alphas.elements == "O")]
+        assert len(c_o) in [0, 1], "Carboxyl radical?"
+        if len(c_o) > 0 and len(c_o[0].bonded_atoms) > 1:
+            tetrahedral = True
+
+    if tetrahedral:
+        # MAKE SP3 from C with 2 bonds
+        # invert bonded positions
+        inv_1 = (center.position - bonded[0].position) + center.position
+        inv_2 = (center.position - bonded[1].position) + center.position
+        # construct rotation axis
+        midpoint = (inv_2 - inv_1) * 0.5 + inv_1
+        rot_ax = midpoint - center.position
+        # 90 degree rotation
+        r = Rotation.from_rotvec((np.pi / 2) * (rot_ax / np.linalg.norm(rot_ax)))
+        # rotated bonds relative to center
+        rad_1 = r.apply(inv_1 - center.position)
+        rad_2 = r.apply(inv_2 - center.position)
+
+        # scale to correct bond length, make absolute
+        if center.element == "N":
+            scale = scale_N
+        elif center.element == "C":
+            scale = scale_C
+        else:
+            raise NotImplementedError("H Bondlength to central atom missing")
+
+        rad_1 = (rad_1 / np.linalg.norm(rad_1)) * scale + center.position
+        rad_2 = (rad_2 / np.linalg.norm(rad_2)) * scale + center.position
+        return [rad_1, rad_2]
+
+    if len(bonded) in [2, 3]:
+        assert center.element in [
+            "C",
+            "N",
+        ], "Element element does not match bond number"
+
+        # prediction: inverse midpoint between bonded
+        # scale to correct bond length, make absolute
+        if center.element == "N":
+            scale = scale_N
+        elif center.element == "C":
+            scale = scale_C
+
+        b_normed = []
+        for b in bonded:
+            b_vec = b.position - center.position
+            b_vec_norm = b_vec / np.linalg.norm(b_vec)
+            b_normed.append(b_vec_norm)
+
+        midpoint = sum(b_normed)
+
+        v = midpoint / np.linalg.norm(midpoint)
+        rad = center.position + (-1 * v * scale)
+        return [rad]
+
+    # Radicals w/ only one bond:
+    elif len(bonded) == 1:
+        assert center.element in [
+            "O",
+            "S",
+        ], "Element element does not match bond number"
+        if center.element == "O":
+            scale = scale_O
+        elif center.element == "S":
+            scale = scale_S
+
+        b = bonded[0]
+        b_vec = b.position - center.position
+        b_vec = b_vec / np.linalg.norm(b_vec)
+        rnd_vec = [1, 1, 1]  # to find a vector perpendicular to b_vec
+
+        rnd_rot_ax = np.cross(b_vec, rnd_vec)
+        rnd_rot_ax = rnd_rot_ax / np.linalg.norm(rnd_rot_ax)
+
+        r1 = Rotation.from_rotvec(1.911 * rnd_rot_ax)  # 109.5 degree
+        r2 = Rotation.from_rotvec(0.785 * b_vec)  # 45 degree
+
+        ends = [r1.apply(b_vec)]  # up to 109.5
+
+        for i in range(8):
+            ends.append(r2.apply(ends[-1]))  # turn in 45d steps
+
+        # norm and vec --> position
+        ends = [(e / np.linalg.norm(e)) * scale + center.position for e in ends]
+
+        return ends
+
+    else:
+        raise ValueError(f"Weired count of bonds: {list(bonded)}\nCorrect radicals?")

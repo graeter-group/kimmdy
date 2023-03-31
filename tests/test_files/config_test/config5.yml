@@ -1,0 +1,20 @@
+dryrun: true
+iterations: 3
+out: 'test_config_5'
+gromacs_alias: 'gmx'
+#ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
+top: 'topol.top'
+gro: 'npt.gro'
+idx: 'index_backbone.ndx'
+reactions:
+  homolysis:
+    edis: 'edissoc.dat'
+    bonds: 'ffbonded.itp'
+sequence:
+  - equilibrium
+  - 
+    mult: 1
+    tasks:
+      - pull
+      - reactions
+

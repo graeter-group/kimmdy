@@ -1,21 +1,24 @@
 dryrun: true
 iterations: 3
 out: 'test_config_2'
+gromacs_alias: 'gmx'
 ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
 top: 'topol.top'
 gro: 'npt.gro'
 idx: 'index_backbone.ndx'
-plumed:
-#  dat: 'plumed.dat' # dat entry missing!
-  distances: 'distances.dat'
-equilibrium:
-  mdp: 'pullf1500_equil.mdp'
-prod:
-  mdp: 'pullf1500.mdp'
+mds:
+  equilibrium:
+    mdp: 'pullf1500_equil.mdp'
+  pull:
+    mdp: 'pullf1500.mdp'
+    plumed:
+    #  dat: 'plumed.dat' # dat entry missing!
+      distances: 'distances.dat'
+  relax:
+    mdp: 'broken_equil_f1000.mdp'
 changer:
   coordinates:
-    md:
-      mdp: 'broken_equil_f1000.mdp'
+    md: 'relax'
 reactions:
   homolysis:
     edis: 'edissoc.dat'
@@ -25,6 +28,6 @@ sequence:
   - 
     mult: 1
     tasks:
-      - prod
+      - pull
       - reactions
 

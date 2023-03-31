@@ -1,19 +1,19 @@
 dryrun: false
 iterations: 100
 out: 'test_out_001'
+gromacs_alias: 'gmx'
 ff: 'amber99sb-star-ildnp.ff'
 top: 'triala_out.top'
 gro: 'npt.gro'
 idx: 'index.ndx'
-plumed: false
-equilibrium:
-  mdp: 'md.mdp'
-prod:
-  mdp: 'md_slow.mdp'
+mds:
+  equilibrium1:
+    mdp: 'md.mdp'
+  relax:
+    mdp: 'md_slow.mdp'
 changer:
   coordinates:
-    md:
-      mdp: 'minim.mdp'
+    md: 'relax'
 reactions:
   HAT_dummy:
     #tprpath: 'md.tpr'
@@ -21,10 +21,9 @@ reactions:
           #    edis: 'edissoc.dat'
           #    bonds: 'ffbonded.itp'
 sequence:
-  - equilibrium
-  - 
-    mult: 10
+  - equilibrium1
+  -
+    mult: 3
     tasks:
       - reactions
-      - prod
-      - equilibrium
+      - equilibrium1
