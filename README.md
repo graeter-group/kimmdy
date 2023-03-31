@@ -2,8 +2,6 @@
 
 Reactive MD pipeline for GROMACS using Kinetic Monte Carlo / Molecular Dynamics (KIMMDY)
 
-This is a short readme / manual to KIMMDY 
-
 ## Quick start
 
 * clone repository, e.g. `git clone https://github.com/hits-mbm-dev/kimmdy.git`
