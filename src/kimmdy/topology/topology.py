@@ -36,7 +36,9 @@ class Topology:
         self.proper_dihedrals: dict[tuple[str, str, str, str], Dihedral] = {}
         self.improper_dihedrals: dict[tuple[str, str, str, str], Dihedral] = {}
         self.position_restraints: dict[str, PositionRestraint] = {}
-        self.dihedral_restraints: dict[tuple[str, str, str, str], DihedralRestraint] = {}
+        self.dihedral_restraints: dict[
+            tuple[str, str, str, str], DihedralRestraint
+        ] = {}
         self.radicals: dict[str, Atom] = {}
 
         if ffdir:
@@ -84,13 +86,15 @@ class Topology:
         """
         )
 
-    def reindex_atomnrs (self):
+    def reindex_atomnrs(self):
         """Reindex atom numbers in topology.
 
         Starts at index 1.
         This also updates the numbers for bonds, angles, dihedrals and pairs.
         """
-        update_map = {atom_nr: str(i+1) for i, atom_nr in enumerate(self.atoms.keys())}
+        update_map = {
+            atom_nr: str(i + 1) for i, atom_nr in enumerate(self.atoms.keys())
+        }
         print(update_map)
 
         new_atoms = {}
@@ -111,7 +115,9 @@ class Topology:
             angle.ai = update_map[angle.ai]
             angle.aj = update_map[angle.aj]
             angle.ak = update_map[angle.ak]
-            new_angles[(update_map[angle.ai], update_map[angle.aj], update_map[angle.ak])] = angle
+            new_angles[
+                (update_map[angle.ai], update_map[angle.aj], update_map[angle.ak])
+            ] = angle
         self.angles = new_angles
 
         new_dihedrals = {}
@@ -120,7 +126,14 @@ class Topology:
             dihedral.aj = update_map[dihedral.aj]
             dihedral.ak = update_map[dihedral.ak]
             dihedral.al = update_map[dihedral.al]
-            new_dihedrals[(update_map[dihedral.ai], update_map[dihedral.aj], update_map[dihedral.ak], update_map[dihedral.al])] = dihedral
+            new_dihedrals[
+                (
+                    update_map[dihedral.ai],
+                    update_map[dihedral.aj],
+                    update_map[dihedral.ak],
+                    update_map[dihedral.al],
+                )
+            ] = dihedral
         self.dihedrals = new_dihedrals
 
         new_pairs = {}
@@ -129,7 +142,6 @@ class Topology:
             pair.aj = update_map[pair.aj]
             new_pairs[(update_map[pair.ai], update_map[pair.aj])] = pair
         self.pairs = new_pairs
-
 
     def __str__(self) -> str:
         return str(self.atoms)
@@ -196,7 +208,9 @@ class Topology:
             return
         for l in ls:
             restraint = DihedralRestraint.from_top_line(l)
-            self.dihedral_restraints[(restraint.ai, restraint.aj, restraint.ak, restraint.al)] = restraint
+            self.dihedral_restraints[
+                (restraint.ai, restraint.aj, restraint.ak, restraint.al)
+            ] = restraint
 
     def _initialize_graph(self):
         """Add a list of atom nrs bound to an atom to each atom."""
@@ -309,19 +323,19 @@ class Topology:
             focus_nr[1]
         )
         for key in angle_keys:
-                angle = self.angles.get(key)
-                if (
-                    angle is None
-                    or self.ffpatches is None
-                    or self.ffpatches.anglepatches is None
-                ):
-                    continue
-                id = [self.atoms[i].radical_type() for i in key]
-                patch = match_id_to_patch(id, self.ffpatches.anglepatches)
-                if patch is None:
-                    continue
-                id_base = [self.atoms[i].radical_type() for i in key]
-                self._apply_param_patch(angle, id_base, patch, self.ff.angletypes)
+            angle = self.angles.get(key)
+            if (
+                angle is None
+                or self.ffpatches is None
+                or self.ffpatches.anglepatches is None
+            ):
+                continue
+            id = [self.atoms[i].radical_type() for i in key]
+            patch = match_id_to_patch(id, self.ffpatches.anglepatches)
+            if patch is None:
+                continue
+            id_base = [self.atoms[i].radical_type() for i in key]
+            self._apply_param_patch(angle, id_base, patch, self.ff.angletypes)
 
         # proper dihedrals and pairs
         dihedral_keys = self._get_atom_proper_dihedrals(
@@ -345,7 +359,6 @@ class Topology:
             )
 
         # TODO: improper dihedrals
-
 
     def break_bond(self, atompair_nrs: tuple[str, str]):
         """Break bonds in topology.
@@ -506,8 +519,8 @@ class Topology:
                 )
 
     def move_hydrogen(self, from_to: tuple[str, str]):
-        """ Move a singly bound atom to a new location.
-        
+        """Move a singly bound atom to a new location.
+
         This is typically H for Hydrogen Atom Transfer (HAT).
         """
         f, t = from_to

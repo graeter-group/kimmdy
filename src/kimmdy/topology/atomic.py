@@ -50,6 +50,7 @@ class Atom:
             massB=field_or_none(l, 9),
         )
 
+
 @dataclass(order=True)
 class PositionRestraint:
     """Information about one position restraint.
@@ -74,6 +75,7 @@ class PositionRestraint:
             condition=condition,
         )
 
+
 # [ position_restraints ]
 # ; you wouldn't normally use this for a molecule like Urea,
 # ; but we include it here for didactic purposes
@@ -85,6 +87,7 @@ class PositionRestraint:
 # ; ai   aj    ak    al  type  phi  dphi  fc
 #     3    6     1    2     1  180     0  10
 #     1    4     3    5     1  180     0  10
+
 
 @dataclass(order=True)
 class DihedralRestraint:
@@ -117,6 +120,7 @@ class DihedralRestraint:
             dphi=l[6],
             fc=l[7],
         )
+
 
 @dataclass(order=True)
 class AtomType:
@@ -373,7 +377,7 @@ class DihedralType:
     A class containing bond information as in the dihedrals section of the topology.
     Proper dihedrals have funct 9.
     Improper dihedrals have funct 4.
-    
+
     Note that proper dihedrals of type 9 can be defined multiple times, for different
     periodicities. This is why would-be parameter c2 is called periodicity and part of
     the `id`.
@@ -401,14 +405,14 @@ class DihedralType:
     def from_top_line(cls, l: list[str]):
         periodicity = field_or_none(l, 7)
         if periodicity is None:
-            periodicity = '2'
+            periodicity = "2"
         return cls(
             i=l[0],
             j=l[1],
             k=l[2],
             l=l[3],
-            id="---".join(l[:4]) + ':::' + periodicity,
-            id_sym="---".join(reversed(l[:4])) + ':::' + periodicity,
+            id="---".join(l[:4]) + ":::" + periodicity,
+            id_sym="---".join(reversed(l[:4])) + ":::" + periodicity,
             funct=l[4],
             periodicity=periodicity,
             c0=field_or_none(l, 5),
@@ -477,6 +481,7 @@ class ResidueImproperSpec:
             cq=field_or_none(l, 5),
         )
 
+
 @dataclass(order=True)
 class ResidueProperSpec:
     """Information about one imroper dihedral in a residue
@@ -498,6 +503,7 @@ class ResidueProperSpec:
             atom4=l[3],
             q0=field_or_none(l, 4),
         )
+
 
 @dataclass(order=True)
 class ResidueType:

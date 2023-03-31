@@ -12,10 +12,8 @@ def topology_to_edgelist(top: Topology):
         x = top.atoms[ai]
         y = top.atoms[aj]
         left = f'"{ai} {x.type}" '
-        right =f'"{aj} {y.type}" '
-        ls.append(
-            f'{left} -- {right};'
-        )
+        right = f'"{aj} {y.type}" '
+        ls.append(f"{left} -- {right};")
         if x.is_radical:
             ls.append(f'{left} [color="red"]')
         if y.is_radical:
@@ -23,7 +21,7 @@ def topology_to_edgelist(top: Topology):
     return ls
 
 
-def edgelist_to_dot_graph(ls: list[str], overlap: str = 'true'):
+def edgelist_to_dot_graph(ls: list[str], overlap: str = "true"):
     header = f"""
         graph G {{
           layout=neato
@@ -37,7 +35,7 @@ def edgelist_to_dot_graph(ls: list[str], overlap: str = 'true'):
     return header + body + tail
 
 
-def top_to_graph(top: Topology, overlap: str = 'true'):
+def top_to_graph(top: Topology, overlap: str = "true"):
     return edgelist_to_dot_graph(topology_to_edgelist(top), overlap)
 
 

@@ -6,7 +6,14 @@ import os
 from pathlib import Path
 from copy import deepcopy
 
-from kimmdy.reaction import Conversion, ConversionRecipe, ConversionType, ReactionOutcome, ReactionResult
+from kimmdy.reaction import (
+    Conversion,
+    ConversionRecipe,
+    ConversionType,
+    ReactionOutcome,
+    ReactionResult,
+)
+
 
 # %%
 def set_dir():
@@ -25,8 +32,8 @@ ffpatch = Path("amber99sb_patches.xml")
 
 
 def test_break_bond_plumed():
-    plumeddat = read_plumed(Path('plumed.dat'))
-    breakpair = ('9', '15')
+    plumeddat = read_plumed(Path("plumed.dat"))
+    breakpair = ("9", "15")
 
     recipe = [Conversion(ConversionType.BREAK, breakpair)]
 
@@ -37,14 +44,12 @@ def test_break_bond_plumed():
         Path("distances.dat"),
     )
 
-    newplumeddat = read_plumed(Path('plumed-mod.dat'))
+    newplumeddat = read_plumed(Path("plumed-mod.dat"))
 
     oldset = set(tuple(x["atoms"]) for x in plumeddat["distances"])
     newset = set(tuple(x["atoms"]) for x in newplumeddat["distances"])
     diffs = list(oldset - newset)
     assert len(diffs) == 1 and diffs[0] == breakpair
-
-
 
     def test_parameterize_bonded_terms(self):
         terms_bond = self.full_graph.parameterize_bonded_terms(

@@ -46,12 +46,24 @@ class FF:
             elif dihedraltype.funct == "9":
                 if (
                     self.proper_dihedraltypes.get(
-                        (dihedraltype.i, dihedraltype.j, dihedraltype.k, dihedraltype.l, dihedraltype.periodicity)
+                        (
+                            dihedraltype.i,
+                            dihedraltype.j,
+                            dihedraltype.k,
+                            dihedraltype.l,
+                            dihedraltype.periodicity,
+                        )
                     )
                     is None
                 ):
                     self.proper_dihedraltypes[
-                        (dihedraltype.i, dihedraltype.j, dihedraltype.k, dihedraltype.l, dihedraltype.periodicity)
+                        (
+                            dihedraltype.i,
+                            dihedraltype.j,
+                            dihedraltype.k,
+                            dihedraltype.l,
+                            dihedraltype.periodicity,
+                        )
                     ] = dihedraltype
 
             # TODO

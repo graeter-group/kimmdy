@@ -109,12 +109,12 @@ def match_atomic_item_to_atomic_type(
         # use X as the wildcard
         for key in [atomic_type.id, atomic_type.id_sym]:
             key = key.replace("*", "STAR").replace("+", "PLUS")
-            keys = key.split('---')
+            keys = key.split("---")
             # early return exact match
             if key == id_str or key == id_sym_str:
                 return atomic_type
             key_re = key.replace("X", ".*")
-            matches = [re.match(k, i) for k,i in zip(keys, id)]
+            matches = [re.match(k, i) for k, i in zip(keys, id)]
             if all(matches):
                 # favor longer (=more specific) and later matches
                 if len(key) >= longest_match:
