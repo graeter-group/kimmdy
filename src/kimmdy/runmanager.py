@@ -334,7 +334,7 @@ class RunManager:
         )
         logging.info(f'Wrote new topology to {files.output["top"].parts[-3:]}')
 
-        if self.config.plumed:
+        if 'plumed.dat' in self.latest_files:
             files.output["plumed.dat"] = files.outputdir / "plumed_mod.dat"
             changer.modify_plumed(
                 self.chosen_recipe,
