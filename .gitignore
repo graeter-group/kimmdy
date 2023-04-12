@@ -12,7 +12,6 @@ pytest_topol.top
 \#*\#
 *.xtc
 *.trr
-*.dat
 .nvimlog
 render/
 cat-center.gro
