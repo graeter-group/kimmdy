@@ -106,11 +106,6 @@ class RunManager:
         self.top = Topology(
             read_topol(self.config.top), self.config.ff, self.config.ffpatch
         )
-        # # did we just miss to add this or is there a way around this explicit definition
-        # # with the new AutoFillDict??
-        # if self.config.plumed:
-        #     self.latest_files["plumed.dat"] = self.config.cwd / self.config.plumed.dat
-        #     # self.latest_files["distances.dat"] = self.config.plumed.distances
 
         self.filehist: list[dict[str, TaskFiles]] = [
             {"setup": TaskFiles(runmng=self, input=self.latest_files)}
@@ -334,7 +329,7 @@ class RunManager:
         )
         logging.info(f'Wrote new topology to {files.output["top"].parts[-3:]}')
 
-        if 'plumed.dat' in self.latest_files:
+        if "plumed.dat" in self.latest_files:
             files.output["plumed.dat"] = files.outputdir / "plumed_mod.dat"
             changer.modify_plumed(
                 self.chosen_recipe,
