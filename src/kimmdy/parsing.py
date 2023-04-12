@@ -1,7 +1,6 @@
 from pathlib import Path
 from collections.abc import Iterable
 from typing import Generator
-import pandas as pd
 from copy import deepcopy
 import xml.etree.ElementTree as ET
 from itertools import takewhile
@@ -192,16 +191,18 @@ def read_distances_dat(distances_dat: Path):
     """Read a distances.dat plumed output file."""
     with open(distances_dat, "r") as f:
         colnames = f.readline()[10:].split()
+        d = {c: [] for c in colnames}
+        for l in f:
+            values = l.split()
+            for k,v in zip(colnames, values):
+                d[k].append(v)
 
-    return pd.read_csv(distances_dat, delim_whitespace=True, skiprows=1, names=colnames)
+    return d
 
 
 def read_plumed_distances(plumed_dat: Path, distances_dat: Path):
     plumed = read_plumed(plumed_dat)
-    # plumed['distances']: [{'id': 'd0', 'keyword': 'DISTANCE', 'atoms': ['5', '7']}]
-
     distances = read_distances_dat(distances_dat)
-    # distances is a pd DataFrame with time and id's -> distance
 
     atoms = {
         x["id"]: x["atoms"] for x in plumed["distances"] if x["keyword"] == "DISTANCE"
