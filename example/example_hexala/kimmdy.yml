@@ -26,9 +26,8 @@ reactions:
   HAT_dummy:
 sequence:
   - equilibrium
-  - prod
   - mult: 3
     tasks:
+      - pull
       - reactions
       - equilibrium
-      - pull
