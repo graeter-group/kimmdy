@@ -279,7 +279,7 @@ class RunManager:
         run_shell_cmd(grompp_cmd, outputdir)
         run_shell_cmd(mdrun_cmd, outputdir)
 
-        logging.info("Done with MD {instance}")
+        logging.info(f"Done with MD {instance}")
         return files
 
     def _query_reactions(self):
