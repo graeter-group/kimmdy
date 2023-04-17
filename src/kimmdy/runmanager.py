@@ -368,4 +368,4 @@ class RunManager:
                 )
             )
         # TODO add atom placement method from Kai as relaxation option
-        logging.info(f"Relaxation done!")
+        logging.info(f"Relaxation task added!")
