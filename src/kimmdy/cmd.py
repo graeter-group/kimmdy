@@ -3,6 +3,7 @@ import logging
 from pathlib import Path
 import dill
 from kimmdy.config import Config
+from kimmdy.misc_helper import concat_traj
 from kimmdy.runmanager import RunManager
 from kimmdy.utils import check_gmx_version, increment_logfile
 import sys
@@ -40,6 +41,17 @@ def get_cmdline_args():
         "--logfile", "-f", type=str, help="logfile", default="kimmdy.log"
     )
     parser.add_argument("--checkpoint", "-c", type=str, help="checkpoint file")
+    parser.add_argument(
+        "--concat",
+        type=Path,
+        nargs="?",
+        const=True,
+        help=(
+            "Concatenate trrs of this run"
+            "Optionally, the run directory can be give"
+            "Will save as concat.trr in current directory"
+        ),
+    )
     return parser.parse_args()
 
 
@@ -76,6 +88,15 @@ def _run(args):
     logging.info("Welcome to KIMMDY")
     logging.info("KIMMDY is running with these command line options:")
     logging.info(args)
+
+    if args.concat:
+        logging.info("KIMMDY will concatenate trrs and exit.")
+
+        run_dir = Path().cwd()
+        if type(args.concat) != bool:
+            run_dir = args.concat
+        concat_traj(run_dir)
+        exit()
 
     if args.checkpoint:
         logging.info("KIMMDY is starting from a checkpoint.")

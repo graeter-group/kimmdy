@@ -39,24 +39,27 @@ def top_to_graph(top: Topology, overlap: str = "true"):
     return edgelist_to_dot_graph(topology_to_edgelist(top), overlap)
 
 
-def concat_traj(run_dir: Union[Path, str], out: Union[Path, str], run_types=None):
+def concat_traj(
+    run_dir: Union[Path, str], out: Union[Path, str] = None, run_types=None
+):
     """Find and concatenate trajectories from KIMMDY runs.
 
     Parameters
     ----------
-    run_dir : Path
+    run_dir : Path|str
         Directory containing directories of multiple tasks.
     out : Path
         File Path into the output trr will be written.
-        Can be relative to run_dir
+        Default `concat.trr` in given run_dir
     run_types : list, optional
         List of tasks to get trrs from. If a task is not in this list
         it will be skipped. By default None
     """
     run_dir = Path(run_dir).expanduser().resolve()
+    if out is None:
+        out = run_dir / "concat.trr"
     out = Path(out).expanduser()
     assert out.suffix == ".trr", "Output file should be a trr file."
-
     dirs = sorted(
         list(filter(lambda d: d.is_dir(), run_dir.iterdir())),
         key=lambda p: int(p.name.split("_")[0]),
@@ -68,7 +71,12 @@ def concat_traj(run_dir: Union[Path, str], out: Union[Path, str], run_types=None
     trrs = []
     for d in dirs:
         trrs.extend(d.glob("*.trr"))
+    trrs = list(filter(lambda p: "rotref" not in p.stem, trrs))
     trrs = [str(t) for t in trrs]
+    newline = "\n\t"
+    assert (
+        len(trrs) > 0
+    ), f"No trrs found to concatenate in \n{newline.join([str(t) for t in dirs])}"
 
     command = f"gmx trjcat -f {' '.join(trrs)} -o {str(out)} -cat".split(" ")
 

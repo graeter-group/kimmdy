@@ -15,7 +15,8 @@ mds:
       dat: 'plumed.dat'
       distances: 'distances.dat'
   relax:
-    mdp: 'minim.mdp'
+    # mdp: 'minim.mdp'  # this mdp does not work currently
+    mdp: 'md_slow.mdp'
 changer:
   coordinates:
     md: 'relax'
@@ -23,12 +24,11 @@ reactions:
   homolysis:
     edis: 'edissoc.dat'
     bonds: 'ffbonded.itp'
-  HAT_dummy:
+  # HAT_dummy:
 sequence:
   - equilibrium
-  - prod
   - mult: 3
     tasks:
+      - pull
       - reactions
       - equilibrium
-      - pull
