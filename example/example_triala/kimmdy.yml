@@ -15,7 +15,8 @@ changer:
   coordinates:
     md: 'relax'
 reactions:
-  HAT_dummy:
+  hat_naive:
+  # HAT_dummy:
     #tprpath: 'md.tpr'
     #trrpath: 'md.trr'
           #    edis: 'edissoc.dat'

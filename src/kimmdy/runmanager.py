@@ -172,7 +172,8 @@ class RunManager:
             next(self)
 
         logging.info(
-            f"Stop running tasks, state: {self.state}, iteration:{self.iteration}, max:{self.iterations}"
+            f"Stop running tasks, state: {self.state}, "
+            f"iteration:{self.iteration}, max:{self.iterations}"
         )
 
     def __iter__(self):
@@ -263,12 +264,24 @@ class RunManager:
         maxh = 24
         ntomp = 2
 
-        grompp_cmd = f"{gmx_alias} grompp -p {top} -c {gro} -f {mdp} -n {idx} -o {instance}.tpr -maxwarn 5"
+        grompp_cmd = (
+            f"{gmx_alias} grompp -p {top} -c {gro} "
+            f"-f {mdp} -n {idx} -o {instance}.tpr -maxwarn 5"
+        )
         # only appends these lines if there are trr and edr files
         if trr and edr:
             grompp_cmd += f" -t {trr} -e {edr}"
-        mdrun_cmd = f"{gmx_alias} mdrun -s {instance}.tpr -cpi {instance}.cpt -x {instance}.xtc -o {instance}.trr -cpo {instance}.cpt -c {instance}.gro -g {instance}.log -e {instance}.edr -px {instance}_pullx.xvg -pf {instance}_pullf.xvg -ro {instance}-rotation.xvg -ra {instance}-rotangles.log -rs {instance}-rotslabs.log -rt {instance}-rottorque.log -maxh {maxh} -dlb yes -ntomp {ntomp}"
-        # like this, the previous checkpoint file would not be used, -t and -e options from grompp
+        mdrun_cmd = (
+            f"{gmx_alias} mdrun -s {instance}.tpr -cpi {instance}.cpt "
+            f"-x {instance}.xtc -o {instance}.trr -cpo {instance}.cpt "
+            f"-c {instance}.gro -g {instance}.log -e {instance}.edr "
+            f"-px {instance}_pullx.xvg -pf {instance}_pullf.xvg "
+            f"-ro {instance}-rotation.xvg -ra {instance}-rotangles.log "
+            f"-rs {instance}-rotslabs.log -rt {instance}-rottorque.log "
+            f"-maxh {maxh} -dlb yes -ntomp {ntomp}"
+        )
+        # like this, the previous checkpoint file would not be used,
+        # -t and -e options from grompp
         # replace the checkpoint file if gen_vel = no in the mdp file
 
         if "plumed" in md_config.get_attributes():
@@ -356,4 +369,4 @@ class RunManager:
                 )
             )
         # TODO add atom placement method from Kai as relaxation option
-        logging.info(f"Relaxation done!")
+        logging.info(f"Relaxation task added!")
