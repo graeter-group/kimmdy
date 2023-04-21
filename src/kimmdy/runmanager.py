@@ -15,52 +15,13 @@ import kimmdy.changemanager as changer
 from kimmdy.tasks import Task, TaskFiles, TaskMapping
 from kimmdy.utils import run_shell_cmd
 from pprint import pformat
-import random
 from kimmdy import plugins
 from kimmdy.topology.topology import Topology
+from kimmdy.KMC import rfKMC
 
 # file types of which there will be multiple files per type
 AMBIGUOUS_SUFFS = ["dat", "xvg", "log"]
 # are there cases where we have multiple trr files?
-
-
-def default_decision_strategy(
-    reaction_results: list[ReactionResult],
-) -> ConversionRecipe:
-    """Rejection-Free Monte Carlo.
-    takes a list of ReactionResults and choses a recipe.
-
-    Parameters
-    ---------
-    reaction_reults: list[ReactionResults]
-        from which one will be choosen
-    """
-    # compare e.g. <https://en.wikipedia.org/wiki/Kinetic_Monte_Carlo#Rejection-free_KMC>
-
-    # flatten the list of rates form the reaction results
-    rates = []
-    recipes = []
-    for reaction_result in reaction_results:
-        for outcome in reaction_result:
-            rates.append(outcome.rate)
-            recipes.append(outcome.recipe)
-
-    total_rate = sum(rates)
-    random.seed()
-    t = random.random()  # t in [0.0,1.0)
-    logging.debug(f"Random value t: {t}, rates {rates}, total rate {total_rate}")
-    rate_running_sum = 0
-
-    # if nothing is choosen, return an empty ConversionRecipe
-    result = ConversionRecipe()
-    for i, rate in enumerate(rates):
-        rate_running_sum += rate
-        if (t * total_rate) <= rate_running_sum:
-            result = recipes[i]
-            break
-    logging.debug(f"Result: {result}")
-
-    return result
 
 
 class State(Enum):
@@ -314,7 +275,7 @@ class RunManager:
         self,
         decision_strategy: Callable[
             [list[ReactionResult]], ConversionRecipe
-        ] = default_decision_strategy,
+        ] = rfKMC,
     ):
         logging.info("Decide on a reaction")
         logging.debug(f"Available reaction results: {self.reaction_results}")

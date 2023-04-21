@@ -38,7 +38,7 @@ class Conversion:
 
 
 ConversionRecipe = list[Conversion]
-"""A ConversionReipe.
+"""A ConversionRecipe.
 
 is a list of Conversions to encompass one reaction outcome.
 In the case of breaking a bond it is simply a list of length one,
