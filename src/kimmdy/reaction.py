@@ -50,11 +50,14 @@ it is a list with one BREAK and one BIND operation.
 @dataclass
 class ReactionOutcome:
     """A ReactionOutcome
-    encompasses a ConversionRecipe and its rate.
+    encompasses a ConversionRecipe, its (constant) rate, as well as
+    time-dependent rates r_ts with an associated timestep ts. 
     """
 
     recipe: ConversionRecipe
-    rate: float
+    rate: float 
+    r_ts: list[float]
+    ts: list[int]
 
 
 ReactionResult = list[ReactionOutcome]
