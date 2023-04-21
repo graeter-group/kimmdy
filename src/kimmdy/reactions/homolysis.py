@@ -20,7 +20,7 @@ from pathlib import Path
 
 class Homolysis(Reaction):
     """Homolytic bond breaking leading to 2 radicals.
-    Implemented according to kimmdy 1.0
+    New implementation for time-varying rates
     """
 
     type_scheme = {"homolysis": {"edis": Path, "bonds": Path}}
