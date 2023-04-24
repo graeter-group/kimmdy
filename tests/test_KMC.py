@@ -40,9 +40,9 @@ def test_parsers():
     os.chdir(cwd)
     plumed = read_plumed(Path('plumed.dat'))
     distances = read_distances_dat(Path('distances.dat'))
-    distances_v2 = read_plumed_distances(Path('plumed.dat'),Path('distances.dat'))
-    edissoc = read_edissoc(Path('edissoc.dat'))
-    ffbonded = read_rtp(Path('ffbonded.itp'))
+    edissoc_lookup = read_edissoc(Path('edissoc.dat'))
+    ffbonded_dict = read_rtp(Path('ffbonded.itp'))
+    ffbonded_lookup = {tuple(l[:2]):{'b0':float(l[3]),'kb':float(l[4])} for l in ffbonded_dict['bondtypes']['other']}
     return
 
 

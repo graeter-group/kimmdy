@@ -33,6 +33,7 @@ class Homolysis(Reaction):
         top = files.input["top"]
         files.input["ffbonded.itp"] = self.config.bonds
         files.input["edissoc.dat"] = self.config.edis
+        # shouldn't config files automatically be in the TaskFiles?
         ffbonded_itp = files.input["ffbonded.itp"]
         edissoc_dat = files.input["edissoc.dat"]
 
