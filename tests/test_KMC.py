@@ -25,13 +25,11 @@ def test_KMC():
 
 ## this should be somewhere else
 def test_homolysis():
-    # %%
     from numpy.random import default_rng
     rng = default_rng(1)
 
     cwd = Path("tests/test_files/test_KMC")
     os.chdir(cwd)
-    # %%
     rmgr = RunManager(Config(Path("kimmdy.yml")))
     files = TaskFiles(rmgr)
     files.input['top'] = Path('topol.top')
@@ -39,11 +37,16 @@ def test_homolysis():
         files.input[f_path] = Path(f_path)
                       
     r = Homolysis(name='homolysis',runmng=rmgr)
-    # %%
-    RR = [r.get_reaction_result(files)]
+    RR = r.get_reaction_result(files)
     print(RR)
+    for RO in RR:
+        r_ts = RO.r_ts
+        ts = RO.ts
+        plt.plot(ts,r_ts)
+        plt.scatter(ts,r_ts)
+        plt.yscale('log')
+        plt.show()
 
-    # %%
     return
 
 def test_parsers():
