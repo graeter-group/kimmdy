@@ -14,6 +14,7 @@ from kimmdy.utils import (
     find_Edis,
     find_bond_param,
     calc_av_rate,
+    morse_transition_rate
 )
 from kimmdy.parsing import read_topol, read_rtp, read_plumed, read_distances_dat, read_edissoc
 from pathlib import Path
@@ -69,7 +70,14 @@ class Homolysis(Reaction):
             
             print(plumedid,atomids,atomtypes,b0,kb,E_dis)
 
-            
+            k_reaction = morse_transition_rate(dists,b0,E_dis,kb)
+
+            outcome = ReactionOutcome(
+                recipe=[Conversion(ConversionType.BREAK, atomids_list)], rate=None, r_ts=k_reaction, ts=ts
+            )
+            result.append(outcome)       
+
+        return result
 
 
 
@@ -115,4 +123,4 @@ class Homolysis(Reaction):
         #     )
         #     result.append(outcome)
 
-        return result
+        #return result
