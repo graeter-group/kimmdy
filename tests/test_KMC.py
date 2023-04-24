@@ -1,3 +1,4 @@
+# %%
 import MDAnalysis as mda
 from pathlib import Path
 import os
@@ -6,9 +7,9 @@ from kimmdy.tasks import TaskFiles
 from kimmdy.reactions.homolysis import Homolysis
 from kimmdy.config import Config
 from kimmdy.runmanager import RunManager
-from kimmdy.parsing import read_plumed, read_distances_dat, read_plumed_distances, read_rtp, read_edissoc
+from kimmdy.parsing import read_plumed, read_distances_dat, read_plumed_distances, read_topol, read_rtp, read_edissoc
 from kimmdy.utils import calc_transition_rate
-
+# %%
 
 def test_KMC():
     tpr = Path("../example/example_triala/test_out_003/1_equilibration/equil.tpr")
@@ -24,20 +25,31 @@ def test_KMC():
 
 ## this should be somewhere else
 def test_homolysis():
+    # %%
+    from numpy.random import default_rng
+    rng = default_rng(1)
+
     cwd = Path("tests/test_files/test_KMC")
     os.chdir(cwd)
-    yml = "kimmdy.yml"
-    print(yml)
+    # %%
+    rmgr = RunManager(Config(Path("kimmdy.yml")))
+    files = TaskFiles(rmgr)
+    files.input['top'] = Path('topol.top')
+    for f_path in ['plumed.dat','distances.dat','edissoc.dat','ffbonded.itp']:
+        files.input[f_path] = Path(f_path)
+                      
+    r = Homolysis(name='homolysis',runmng=rmgr)
+    # %%
+    RR = [r.get_reaction_result(files)]
+    print(RR)
 
-
-    r = Homolysis(name='homolysis',runmng=RunManager(Config(yml)))
-    print(r)
-
+    # %%
     return
 
 def test_parsers():
     cwd = Path("tests/test_files/test_KMC")
     os.chdir(cwd)
+    top = read_topol(Path('topol.top'))
     plumed = read_plumed(Path('plumed.dat'))
     distances = read_distances_dat(Path('distances.dat'))
     edissoc_lookup = read_edissoc(Path('edissoc.dat'))
@@ -59,11 +71,10 @@ def plot_time_evolution():
             plt.show()
             plt.figure()
         
-
-
+# %%
+test_homolysis()
 #test_KMC()
-test_parsers()
+#test_parsers()
 #plot_time_evolution()
 
-
-
+# %%
