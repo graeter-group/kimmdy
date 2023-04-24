@@ -195,7 +195,7 @@ def read_distances_dat(distances_dat: Path):
         for l in f:
             values = l.split()
             for k, v in zip(colnames, values):
-                d[k].append(v)
+                d[k].append(float(v))
 
     return d
 

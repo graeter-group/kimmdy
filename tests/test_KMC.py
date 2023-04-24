@@ -1,10 +1,12 @@
 import MDAnalysis as mda
 from pathlib import Path
 import os
+import matplotlib.pyplot as plt
 from kimmdy.tasks import TaskFiles
 from kimmdy.reactions.homolysis import Homolysis
 from kimmdy.config import Config
 from kimmdy.runmanager import RunManager
+from kimmdy.parsing import read_plumed, read_distances_dat, read_plumed_distances, read_rtp
 
 
 def test_KMC():
@@ -28,12 +30,34 @@ def test_homolysis():
 
 
     r = Homolysis(name='homolysis',runmng=RunManager(Config(yml)))
+    print(r)
 
     return
 
+def test_parsers():
+    cwd = Path("tests/test_files/test_KMC")
+    os.chdir(cwd)
+    plumed = read_plumed(Path('plumed.dat'))
+    distances = read_distances_dat(Path('distances.dat'))
+    distances_v2 = read_plumed_distances(Path('plumed.dat'),Path('distances.dat'))
+    edissoc = None
+    ffbonded = read_rtp(Path('ffbonded.itp'))
+    return
+
+
+def plot_time_evolution():
+    cwd = Path("tests/test_files/test_KMC")
+    os.chdir(cwd)
+    distances = read_distances_dat(Path('distances.dat'))
+    for key in distances.keys():
+        if key == 'time':
+            continue
+        plt.plot(distances['time'],distances[key])
+        plt.show()
 
 #test_KMC()
-test_homolysis()
+test_parsers()
+#plot_time_evolution()
 
 
 
