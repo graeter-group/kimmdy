@@ -6,7 +6,8 @@ from kimmdy.tasks import TaskFiles
 from kimmdy.reactions.homolysis import Homolysis
 from kimmdy.config import Config
 from kimmdy.runmanager import RunManager
-from kimmdy.parsing import read_plumed, read_distances_dat, read_plumed_distances, read_rtp
+from kimmdy.parsing import read_plumed, read_distances_dat, read_plumed_distances, read_rtp, read_edissoc
+from kimmdy.utils import calc_transition_rate
 
 
 def test_KMC():
@@ -40,7 +41,7 @@ def test_parsers():
     plumed = read_plumed(Path('plumed.dat'))
     distances = read_distances_dat(Path('distances.dat'))
     distances_v2 = read_plumed_distances(Path('plumed.dat'),Path('distances.dat'))
-    edissoc = None
+    edissoc = read_edissoc(Path('edissoc.dat'))
     ffbonded = read_rtp(Path('ffbonded.itp'))
     return
 
@@ -49,11 +50,16 @@ def plot_time_evolution():
     cwd = Path("tests/test_files/test_KMC")
     os.chdir(cwd)
     distances = read_distances_dat(Path('distances.dat'))
-    for key in distances.keys():
+    for i,key in enumerate(distances.keys()):
+        #k, F = calc_transition_rate(r_av, r_0, E_dis, k_f)
         if key == 'time':
             continue
-        plt.plot(distances['time'],distances[key])
-        plt.show()
+        plt.plot(distances['time'],distances[key],alpha=0.7)
+        if i%20 == 19:
+            plt.show()
+            plt.figure()
+        
+
 
 #test_KMC()
 test_parsers()
