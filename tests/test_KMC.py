@@ -2,13 +2,21 @@
 import MDAnalysis as mda
 from pathlib import Path
 import os
+import numpy as np
 import matplotlib.pyplot as plt
 from kimmdy.tasks import TaskFiles
+from kimmdy.reaction import ReactionResult
 from kimmdy.reactions.homolysis import Homolysis
 from kimmdy.config import Config
 from kimmdy.runmanager import RunManager
 from kimmdy.parsing import read_plumed, read_distances_dat, read_plumed_distances, read_topol, read_rtp, read_edissoc
 from kimmdy.utils import calc_transition_rate
+
+#%%
+print(os.getcwd())
+cwd = Path("tests/test_files/test_KMC")
+os.chdir(cwd)
+print(os.getcwd())
 # %%
 
 def test_KMC():
@@ -28,8 +36,8 @@ def test_homolysis():
     from numpy.random import default_rng
     rng = default_rng(1)
 
-    cwd = Path("tests/test_files/test_KMC")
-    os.chdir(cwd)
+    # cwd = Path("tests/test_files/test_KMC")
+    # os.chdir(cwd)
     rmgr = RunManager(Config(Path("kimmdy.yml")))
     files = TaskFiles(rmgr)
     files.input['top'] = Path('topol.top')
@@ -40,12 +48,25 @@ def test_homolysis():
     RR = r.get_reaction_result(files)
     print(RR)
     for RO in RR:
-        r_ts = RO.r_ts
-        ts = RO.ts
-        plt.plot(ts,r_ts)
-        plt.scatter(ts,r_ts)
-        plt.yscale('log')
-        plt.show()
+        print(RO)
+
+    RR.write_ReactionResult(Path("RR_test.csv"))
+    # RR_parsed = read_ReactionResult(Path("RR_test.csv"))
+    # print(RR_parsed)
+    # if RR == RR_parsed:
+    #     print("IDENTITY!")
+    # else:
+    #     print("FAILURE")
+
+    # for RO in RR:
+    #     r_ts = RO.r_ts
+    #     ts = RO.ts
+    #     plt.plot(ts,r_ts)
+    #     plt.plot([min(ts),max(ts)],np.full(2,RO.rate),color='k',linewidth=2,label='dist avg')
+    #     plt.scatter(ts,r_ts)
+    #     plt.yscale('log')
+    #     plt.legend()
+    #     plt.show()
 
     return
 
@@ -73,11 +94,40 @@ def plot_time_evolution():
         if i%20 == 19:
             plt.show()
             plt.figure()
-        
+
+def test_RR_parsing():
+    RR_blank = ReactionResult()
+    # RR_ref = read_ReactionResult(RR_blank, Path("RR_ref.csv"))
+
+    # write_ReactionResult(RR_ref, Path("RR_test.csv"))
+    # RR_blank = ReactionResult()
+    # RR_test = read_ReactionResult(RR_blank, Path("RR_test.csv"))
+    
+    # print(RR_test)
+    # if RR_ref == RR_test:
+    #     print("IDENTITY!")
+    # else:
+    #     print("FAILURE")
+
+def test_pandas_lists():
+    import pandas as pd
+    # df = pd.DataFrame(
+    #     {'trial_num': [1, 2, 3, 1, 2, 3],
+    #     'subject': [1, 1, 1, 2, 2, 2],
+    #     'samples': [list(np.random.randn(3).round(2)) for i in range(6)]
+    #     }
+    # )   
+    # df.to_csv(Path('pandas_test.csv'))
+    df_new = pd.read_csv(Path('RR_test.csv'))
+    print(df_new)
+    return
+
 # %%
-test_homolysis()
+#test_homolysis()
 #test_KMC()
 #test_parsers()
 #plot_time_evolution()
+#test_RR_parsing()
+test_pandas_lists()
 
 # %%

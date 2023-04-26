@@ -71,9 +71,10 @@ class Homolysis(Reaction):
             print(plumedid,atomids,atomtypes,b0,kb,E_dis)
 
             k_reaction = morse_transition_rate(dists,b0,E_dis,kb)
+            k_avg = calc_av_rate(dists, b0, E_dis, kb)
 
             outcome = ReactionOutcome(
-                recipe=[Conversion(ConversionType.BREAK, atomids_list)], rate=None, r_ts=k_reaction, ts=ts
+                recipe=[Conversion(ConversionType.BREAK, atomids_list)], rate=k_avg, r_ts=k_reaction, ts=ts
             )
             result.append(outcome)       
 
