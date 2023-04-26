@@ -3,12 +3,12 @@ import MDAnalysis as mda
 from pathlib import Path
 from ast import literal_eval
 import os
-import dill
-import dill.detect
+import dill as pickle
+#import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 from kimmdy.tasks import TaskFiles
-from kimmdy.reaction import ReactionResult
+from kimmdy.reaction import ReactionResult, ReactionOutcome, Conversion, ConversionRecipe, ConversionType
 from kimmdy.reactions.homolysis import Homolysis
 from kimmdy.config import Config
 from kimmdy.runmanager import RunManager
@@ -49,12 +49,13 @@ def test_homolysis():
                       
     r = Homolysis(name='homolysis',runmng=rmgr)
     RR = r.get_reaction_result(files)
-    print(RR)
-    for RO in RR:
-        print(RO)
+    print(type(RR))
+    print(len(RR))
+    # for RO in RR:
+    #     print(RO)
 
     #RR.to_csv(Path("RR_test.csv"))
-    RR.to_dill(Path("RR_test.dill"))
+    RR.to_dill(Path("RR_test.pickle"))
     # RR_parsed = read_ReactionResult(Path("RR_test.csv"))
     # print(RR_parsed)
     # if RR == RR_parsed:
@@ -130,14 +131,32 @@ def test_RR_dill():
     #resource.setrlimit(resource.RLIMIT_STACK, [0x100*500, resource.RLIM_INFINITY])
     print('testing...')
 
-    with open(Path('RR_test.dill'),"rb") as f:
-        RR = dill.load(f)
-    print(RR)
-    RR.to_csv(Path('RR_test2.csv'))
+    # RR = ReactionResult([ReactionOutcome(recipe=[], rate=0.5, r_ts=0.5, ts=1
+    #         )])
+    # RR.to_dill(Path('RR_test.pickle'))
+    RO = ReactionResult([ReactionOutcome(recipe=[Conversion(ConversionType.BREAK, ('0','1'))], rate=0.5, r_ts=0.5, ts=1)])
+    with open(Path('RR_test.pickle'),"wb") as f:
+        pickle.dump(RO, f)
+
+    print(RO)
+    print(dir(RO))
+    for method in dir(RO):
+        print(method,getattr(RO,method))
+    with open(Path('RR_test.pickle'),"rb") as f:
+        RO = pickle.load(f)
+    print(type(RO))
+    print(RO)
+    # RR.to_csv(Path('RR_test2.csv'))
     return
 
+def test_cpt_dill():
+    with open(Path('/hits/fast/mbm/hartmaec/kimmdys/kimmdy/example/example_ala/hat_tf_000/1_equilibrium/equilibrium.cpt'),"rb") as f:
+        cpt = pickle.load(f)
+    print('loaded:')
+    print(cpt)
+
 # %%
-test_homolysis()
+#test_homolysis()
 #test_KMC()
 #test_parsers()
 #plot_time_evolution()
