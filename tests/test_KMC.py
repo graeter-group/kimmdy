@@ -1,7 +1,10 @@
 # %%
 import MDAnalysis as mda
 from pathlib import Path
+from ast import literal_eval
 import os
+import dill
+import dill.detect
 import numpy as np
 import matplotlib.pyplot as plt
 from kimmdy.tasks import TaskFiles
@@ -50,7 +53,8 @@ def test_homolysis():
     for RO in RR:
         print(RO)
 
-    RR.write_ReactionResult(Path("RR_test.csv"))
+    #RR.to_csv(Path("RR_test.csv"))
+    RR.to_dill(Path("RR_test.dill"))
     # RR_parsed = read_ReactionResult(Path("RR_test.csv"))
     # print(RR_parsed)
     # if RR == RR_parsed:
@@ -122,12 +126,23 @@ def test_pandas_lists():
     print(df_new)
     return
 
+def test_RR_dill():
+    #resource.setrlimit(resource.RLIMIT_STACK, [0x100*500, resource.RLIM_INFINITY])
+    print('testing...')
+
+    with open(Path('RR_test.dill'),"rb") as f:
+        RR = dill.load(f)
+    print(RR)
+    RR.to_csv(Path('RR_test2.csv'))
+    return
+
 # %%
-#test_homolysis()
+test_homolysis()
 #test_KMC()
 #test_parsers()
 #plot_time_evolution()
 #test_RR_parsing()
-test_pandas_lists()
-
+#test_pandas_lists()
+test_RR_dill()
+print('x')
 # %%

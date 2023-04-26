@@ -15,6 +15,7 @@ from enum import Enum, auto
 from kimmdy.tasks import TaskFiles
 import logging
 from pathlib import Path
+import dill
 
 
 class ConversionType(Enum):
@@ -76,13 +77,19 @@ class ReactionResult:
     def __init__(self, outcomes: list[ReactionOutcome] = []):
         self.outcomes = outcomes
 
-    def write_ReactionResult(self, path: Path):
+    def to_csv(self, path: Path):
         """Write a ReactionResult as defined in the reaction module to a csv file"""
         with open(path,"w") as f:    
             f.write(',rate,recipe,r_ts,ts\n')        
             f.write('\n'.join([f"{i},{RO.rate},\"{RO.recipe}\",\"[{','.join(map(str,RO.r_ts))}]\",\"[{','.join(map(str,RO.ts))}]\"" for i,RO in enumerate(self)]))
-        return 
-     
+    
+    def to_dill(self, path: Path):
+        for outcome in self.outcomes:
+            outcome.r_ts = repr(outcome.r_ts)
+            outcome.ts = repr(outcome.ts)
+        with open(path,"wb") as f:
+            dill.dump(self, f)
+    
     def __iter__(self):
         yield from self.outcomes
 
