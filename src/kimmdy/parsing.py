@@ -4,6 +4,7 @@ from typing import Generator
 from copy import deepcopy
 import xml.etree.ElementTree as ET
 from itertools import takewhile
+from typing import TYPE_CHECKING
 
 TopologyDict = dict[str, list[list[str]]]
 
