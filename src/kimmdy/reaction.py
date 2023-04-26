@@ -15,7 +15,8 @@ from enum import Enum, auto
 from kimmdy.tasks import TaskFiles
 import logging
 from pathlib import Path
-import dill
+#import dill
+import pickle
 
 
 class ConversionType(Enum):
@@ -88,14 +89,14 @@ class ReactionResult:
             outcome.r_ts = repr(outcome.r_ts)
             outcome.ts = repr(outcome.ts)
         with open(path,"wb") as f:
-            dill.dump(self, f)
+            pickle.dump(self, f)
     
     def __iter__(self):
         yield from self.outcomes
 
     def __getattr__(self, method):
         return getattr(self.outcomes,method)
-
+    
     def __len__(self):
         return len(self.outcomes)
     

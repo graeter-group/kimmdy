@@ -76,7 +76,9 @@ class Homolysis(Reaction):
             outcome = ReactionOutcome(
                 recipe=[Conversion(ConversionType.BREAK, atomids_list)], rate=k_avg, r_ts=k_reaction, ts=ts
             )
-            result.append(outcome)       
+            result.append(outcome)   
+            if len(result) == 1:
+                return result    
 
         return result
 
