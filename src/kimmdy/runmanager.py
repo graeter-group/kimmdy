@@ -50,7 +50,7 @@ class RunManager:
         self.iteration = 0
         self.iterations = self.config.iterations
         self.state = State.IDLE
-        self.reaction_results: list[ReactionResult] = []
+        self.reaction_result: ReactionResult = ReactionResult([])
         self.latest_files: dict[str, Path] = {
             "top": self.config.top,
             "gro": self.config.gro,
@@ -260,13 +260,13 @@ class RunManager:
         logging.info("Query reactions")
         self.state = State.REACTION
         # empty list for every new round of queries
-        self.reaction_results: list[ReactionResult] = []
+        self.reaction_result: ReactionResult = ReactionResult([])
 
         for reaction in self.reactions:
             # TODO: refactor into Task
             files = self._create_task_directory(reaction.name)
 
-            self.reaction_results.append(reaction.get_reaction_result(files))
+            self.reaction_result.outcomes.extend(reaction.get_reaction_result(files))
 
         logging.info("Reaction done")
         return files  # necessary?
@@ -278,8 +278,8 @@ class RunManager:
         ] = rfKMC,
     ):
         logging.info("Decide on a reaction")
-        logging.debug(f"Available reaction results: {self.reaction_results}")
-        self.chosen_recipe = decision_strategy(self.reaction_results)
+        logging.debug(f"Available reaction results: {self.reaction_result}")
+        self.chosen_recipe = decision_strategy(self.reaction_result)
         logging.info("Chosen recipe is:")
         logging.info(self.chosen_recipe)
         return

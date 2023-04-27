@@ -1,17 +1,18 @@
 import logging
+import numpy as np
 from numpy.random import default_rng
-rng = default_rng()
 from kimmdy.reaction import ReactionResult,ConversionRecipe
+from kimmdy.utils import a
 
 def rfKMC(
-    reaction_results: list[ReactionResult],
+    reaction_result: ReactionResult, rng: np.random.BitGenerator = default_rng()
 ) -> ConversionRecipe:
     """Rejection-Free Monte Carlo.
-    takes a list of ReactionResults and choses a recipe.
+    takes ReactionResults and choses a recipe.
 
     Parameters
     ---------
-    reaction_results: list[ReactionResults]
+    reaction_result: ReactionResult
         from which one will be choosen
     """
     # compare e.g. <https://en.wikipedia.org/wiki/Kinetic_Monte_Carlo#Rejection-free_KMC>
@@ -19,10 +20,9 @@ def rfKMC(
     # flatten the list of rates form the reaction results
     rates = []
     recipes = []
-    for reaction_result in reaction_results:
-        for outcome in reaction_result:
-            rates.append(outcome.rate)
-            recipes.append(outcome.recipe)
+    for outcome in reaction_result.outcomes:
+        rates.append(outcome.rate)
+        recipes.append(outcome.recipe)
 
     total_rate = sum(rates)
     t = rng.random()  # t in [0.0,1.0)
