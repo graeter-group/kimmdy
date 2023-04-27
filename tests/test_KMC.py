@@ -12,6 +12,7 @@ from kimmdy.config import Config
 from kimmdy.runmanager import RunManager
 from kimmdy.parsing import read_plumed, read_distances_dat, read_plumed_distances, read_topol, read_rtp, read_edissoc
 from kimmdy.utils import calc_transition_rate
+from kimmdy.KMC import rfKMC
 
 #%%
 print(os.getcwd())
@@ -135,8 +136,25 @@ def test_RR_dill():
     return
 
 def test_decision_strategy():
-    RR = ReactionResult.from_dill(Path('RR_ref.dill'))
-    print(RR)
+    result = ReactionResult.from_dill(Path('RR_ref.dill'))
+    k_dist_avg = [outcome.rate for outcome in result.outcomes]
+
+    _, k_integrate = rfKMC(result)
+    # k_dist_avg = np.asarray(k_dist_avg)/np.sum(k_dist_avg)
+    # k_integrate = np.asarray(k_integrate)/np.sum(k_integrate)
+    print(np.sum(k_integrate),np.sum(k_dist_avg))
+    print(np.max(k_dist_avg),np.max(k_integrate))
+
+    print(len(result.outcomes),len(k_dist_avg),len(k_integrate))
+    plt.scatter(range(len(k_dist_avg)),k_dist_avg,label='dist_avg',alpha=0.5)
+    plt.scatter(range(len(k_integrate)),k_integrate,label='k_integrate',alpha=0.5)
+    plt.yscale('log')
+    plt.legend()
+    plt.show()
+
+
+    
+    #print(RR)
 
 # %%
 #test_homolysis()
