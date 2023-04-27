@@ -15,8 +15,7 @@ from enum import Enum, auto
 from kimmdy.tasks import TaskFiles
 import logging
 from pathlib import Path
-#import dill
-import pickle
+import dill
 
 
 class ConversionType(Enum):
@@ -69,39 +68,29 @@ class ReactionOutcome:
     r_ts: list[float]
     ts: list[int]
 
-
+@dataclass
 class ReactionResult:
     """A ReactionResult
     encompasses a list of ReactionOutcomes.
     """
 
-    def __init__(self, outcomes: list[ReactionOutcome] = []):
-        self.outcomes = outcomes
+    outcomes: list[ReactionOutcome]
 
     def to_csv(self, path: Path):
         """Write a ReactionResult as defined in the reaction module to a csv file"""
         with open(path,"w") as f:    
             f.write(',rate,recipe,r_ts,ts\n')        
-            f.write('\n'.join([f"{i},{RO.rate},\"{RO.recipe}\",\"[{','.join(map(str,RO.r_ts))}]\",\"[{','.join(map(str,RO.ts))}]\"" for i,RO in enumerate(self)]))
+            f.write('\n'.join([f"{i},{RO.rate},\"{RO.recipe}\",\"[{','.join(map(str,RO.r_ts))}]\",\"[{','.join(map(str,RO.ts))}]\"" for i,RO in enumerate(self.outcomes)]))
     
     def to_dill(self, path: Path):
-        for outcome in self.outcomes:
-            outcome.r_ts = repr(outcome.r_ts)
-            outcome.ts = repr(outcome.ts)
         with open(path,"wb") as f:
-            pickle.dump(self, f)
-    
-    def __iter__(self):
-        yield from self.outcomes
+            dill.dump(self, f)
 
-    def __getattr__(self, method):
-        return getattr(self.outcomes,method)
-    
-    def __len__(self):
-        return len(self.outcomes)
-    
-    def __repr__(self):
-        return f"{self.outcomes}"
+    @classmethod
+    def from_dill(_, path: Path):
+        with open(path,"rb") as f:
+            return dill.load(f)
+
 
 class Reaction(ABC):
     """Reaction base class
