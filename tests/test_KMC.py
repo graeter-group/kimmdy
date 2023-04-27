@@ -134,13 +134,18 @@ def test_RR_dill():
     RR_new.to_csv(Path('RR_test2.csv'))
     return
 
+def test_decision_strategy():
+    RR = ReactionResult.from_dill(Path('RR_ref.dill'))
+    print(RR)
+
 # %%
-test_homolysis()
+#test_homolysis()
 #test_KMC()
 #test_parsers()
 #plot_time_evolution()
 #test_RR_parsing()
 #test_pandas_lists()
 #test_RR_dill()
-print('x')
+test_decision_strategy()
+
 # %%

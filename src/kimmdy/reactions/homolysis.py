@@ -53,7 +53,7 @@ class Homolysis(Reaction):
 
 
         ts = distances['time']
-        RR = ReactionResult([])
+        result = ReactionResult([])
         for plumedid, dists in distances.items():
             if plumedid == 'time':
                 continue
@@ -76,9 +76,9 @@ class Homolysis(Reaction):
             outcome = ReactionOutcome(
                 recipe=[Conversion(ConversionType.BREAK, atomids_list)], rate=k_avg, r_ts=k_reaction, ts=ts
             )
-            RR.outcomes.append(outcome)   
+            result.outcomes.append(outcome)   
 
-        return RR
+        return result
 
 
 
