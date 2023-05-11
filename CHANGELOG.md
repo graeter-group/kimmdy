@@ -1,5 +1,26 @@
 # Changelog
 
+## [2.3.0](https://github.com/hits-mbm-dev/kimmdy/compare/v2.2.0...v2.3.0) (2023-05-11)
+
+
+### Features
+
+* add MOVE conversion for HAT ([0dbe4b1](https://github.com/hits-mbm-dev/kimmdy/commit/0dbe4b1b53272bd9c813550cae875134bc679f55))
+* make periodicity part of the id for dihedrals ([0710086](https://github.com/hits-mbm-dev/kimmdy/commit/0710086473a81878d86ed8ca4daa2b31b921e868))
+* parse dihedral and position restraints ([1209714](https://github.com/hits-mbm-dev/kimmdy/commit/12097148ff8fe64b4f40eb0d19ad30def6070c7f))
+* test for radicals based on bondorder in top initialization ([a446a70](https://github.com/hits-mbm-dev/kimmdy/commit/a446a70348bc575b5e5212a23301c51cd9c41233))
+
+
+### Bug Fixes
+
+* more robust fix for [#93](https://github.com/hits-mbm-dev/kimmdy/issues/93) ([3cea313](https://github.com/hits-mbm-dev/kimmdy/commit/3cea31394cb7c4abb02439796f724642e4b42e2b))
+* rtp parsing for aminoacids.rtp ([025e6c1](https://github.com/hits-mbm-dev/kimmdy/commit/025e6c14fc50982db7809079b8418644e3d474df))
+
+
+### Documentation
+
+* Updates reaction api documentation ([87007b4](https://github.com/hits-mbm-dev/kimmdy/commit/87007b485c23262451fe86cb1fb8a9ac0a90fce6)), closes [#114](https://github.com/hits-mbm-dev/kimmdy/issues/114)
+
 ## [2.2.0](https://github.com/hits-mbm-dev/kimmdy/compare/v2.1.0...v2.2.0) (2023-03-07)
 
 
