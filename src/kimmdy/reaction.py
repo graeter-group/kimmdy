@@ -17,6 +17,16 @@ import logging
 
 
 class ConversionType(Enum):
+    """Types of topology modifications possible.
+
+    Attributes
+    ----------
+    BREAK
+    BIND
+    MOVE
+        Breaks one bond, creates another
+    """
+
     BREAK = auto()
     BIND = auto()
     MOVE = auto()
@@ -29,8 +39,10 @@ class Conversion:
 
     Parameters
     ----------
-    type : ConversionType.BREAK or .BIND
-    atom_idx : tuple(from, to)
+    type : ConversionType
+    atom_idx : tuple(str, str)
+        For BREAK and BIND the involved atom indices.
+        For MOVE, first the atom index to move, then the target atom to bind.
     """
 
     type: ConversionType
@@ -41,9 +53,9 @@ ConversionRecipe = list[Conversion]
 """A ConversionReipe.
 
 is a list of Conversions to encompass one reaction outcome.
-In the case of breaking a bond it is simply a list of length one,
-but for e.g. moving an atom from one binding partner to another
-it is a list with one BREAK and one BIND operation.
+It is simply a list of length one for Homolysis and HAT.
+More complex reactions can chain conversions here
+(as long as they belong to one rate).
 """
 
 
