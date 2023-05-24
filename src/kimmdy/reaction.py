@@ -73,33 +73,35 @@ class Bind(Conversion):
 
 @dataclass
 class ReactionPath:
-    """One reaction path
-    Defines everything necessart to build the 
+    """A reaction path defined by one series of conversions.
+    Defines everything necessart to build the
     product state from the educt state.
 
     Attributes
     ----------
     conversions : list[Conversion]
-        Sequence of conversions to build product
+        Single sequence of conversions to build product
     rates : list[float]
         Reaction rates corresponding 1:1 to frames.
     frames : list[int]
-        List of frame indices. Must have same number of frames as rates.
+        List of frame indices, in which this reaction path applies.
+        Must have same number of frames as rates.
     avg_rates : Union[list[float], None]
         Optional, average rate corresponding to a frame range, default None
     avg_frames : Union[list[list[int,int]], None]
-        Optional, per averaged rate the first and last frame index of 
+        Optional, per averaged rate the first and last frame index of
         the averaged interval, default None
-        
-    """    
+
+    """
+
     conversions: list[Conversion]
     rates: list[float]
     frames: list[int]
     avg_rates: Union[list[float], None] = None
-    avg_frames: Union[list[list[int,int]], None] = None
+    avg_frames: Union[list[list[int, int]], None] = None
 
     def __post_init__(self):
-        assert len(self.rates) == len(self.frames)
+        self.check_consistency()
 
     def calc_averages(self, window_size: int):
         """Calulate average rates over some window size
@@ -107,36 +109,93 @@ class ReactionPath:
         Parameters
         ----------
         window_size : int
-            Size of the window to average over
-        """        
+            Size of the window to average over,
+            -1 to average over whole available range.
+        """
         raise NotImplementedError
+
+    def combine_with(self, other: ReactionPath):
+        """Combines this ReactionPath with another with the same conversions.
+
+        Parameters
+        ----------
+        other : ReactionPath
+        """
+        if other != self:
+            raise ValueError(
+                "Error: Trying to combine unequal reaction paths\n"
+                f"self: {self.conversions}\n"
+                f"other: {other.conversions}"
+            )
+
+        other.check_consistency()
+
+        self.rates += other.rates
+        self.frames += other.rates
+
+        if other.avg_rates is not None:
+            if self.avg_rates is None:
+                self.avg_rates = other.avg_rates
+                self.avg_frames = other.avg_frames
+            else:
+                self.avg_rates += other.avg_rates
+                self.avg_frames += other.avg_frames
+
+    def check_consistency(self):
+        """Run consistency checks for correct size of variables"""
+        if len(self.rates) != len(self.frames):
+            raise ValueError(
+                "Frames and rates are not of equal length"
+                f"\trates: {len(self.rates)}\n"
+                f"\tframes: {len(self.frames)}"
+            )
+
+        if self.avg_rates is not None or self.avg_frames is not None:
+            if self.avg_rates is None or self.avg_frames is None:
+                raise ValueError(
+                    "Average frames and average rates must be of same type, but one is None\n"
+                    f"\tavg_rates: {type(self.avg_rates)}\n"
+                    f"\tavg_frames: {type(self.avg_frames)}"
+                )
+            if len(self.avg_rates) != len(self.avg_frames):
+                raise ValueError(
+                    "Average frames and average rates are not of equal length"
+                    f"\tavg_rates: {len(self.avg_rates)}\n"
+                    f"\tavg_frames: {len(self.avg_frames)}"
+                )
 
     def __eq__(self, other):
         if type(other) is ReactionPath:
-            if self.conversions == ReactionPath:
+            if self.conversions == other.conversions:
                 return True
         return False
 
 
 @dataclass
-class ReactionQueryResult:
-    """A ReactionQueryResult encompasses all possible reaction paths.
-    
+class ReactionResults:
+    """A ReactionResults encompasses a number of reaction paths.
+    They can originate from multiple reaction plugins, but do not need to.
     """
 
     reaction_paths: list[ReactionPath]
-    
-    
 
+    def aggregate_reactions(self):
+        """Combines reactions having the same sequence of conversions."""
 
-@dataclass
-class ReactionResult:
-    """A ReactionResult
-    encompasses a list of ReactionOutcomes.
-    """
+        all_comb_list = []
+        for i, r1 in enumerate(self.reaction_paths):
+            to_comb_with = []
+            for j, r2 in enumerate(self.reaction_paths[i + 1 :]):
+                if r1 == r2:
+                    to_comb_with.append(i + 1 + j)
+            all_comb_list.append(to_comb_with)
 
-    outcomes: list[ReactionQueryResult]
-    # outcomes :dict[ConversionRecipe : dict[f: list[frames], r: list[rates], r_a: avg_rate, end_coords]]
+        for i, to_comb_list in enumerate(all_comb_list):
+            for j in to_comb_list:
+                print("indices:", i, j)
+                self.reaction_paths[i].combine_with(self.reaction_paths[j])
+                # matches with j are added to i already, remove them:
+                all_comb_list[j] = []
 
     def to_csv(self, path: Path):
         """Write a ReactionResult as defined in the reaction module to a csv file"""
@@ -161,7 +220,17 @@ class ReactionResult:
             return dill.load(f)
 
 
-class Reaction(ABC):
+# @dataclass
+# class ReactionPluginResult:
+#     """A ReactionResult
+#     encompasses a list of ReactionOutcomes.
+#     """
+
+#     outcomes: list[ReactionQueryResult]
+#     # outcomes :dict[ConversionRecipe : dict[f: list[frames], r: list[rates], r_a: avg_rate, end_coords]]
+
+
+class ReactionPlugin(ABC):
     """Reaction base class
     hast a type_scheme, which is a dict of types of possible entries in config.
     Used to read and check the input config.
