@@ -20,8 +20,8 @@ TypeReactionPath = TypeVar("TypeReactionPath", bound="ReactionPath")
 
 @dataclass
 class Conversion(ABC):
-    """ABC for all conversions.
-    """    
+    """ABC for all conversions."""
+
     pass
 
 
@@ -57,7 +57,8 @@ class Break(Conversion):
         atom indices between which a bond should be removed
     """
 
-    atom_idxs: list[int, int]
+    atom_idx_1: int
+    atom_idx_2: int
 
 
 @dataclass
@@ -70,7 +71,8 @@ class Bind(Conversion):
         atom indices between which a bond should be formed
     """
 
-    atom_idxs: list[int, int]
+    atom_idx_1: int
+    atom_idx_2: int
 
 
 @dataclass
