@@ -1,25 +1,27 @@
 from __future__ import annotations
-from collections.abc import Callable  # for 3.7 <= Python version < 3.10
 from typing import TYPE_CHECKING, Union
-
-from kimmdy.topology.topology import (
-    Topology,
-)  # fixes circular import issues for type hints
 
 if TYPE_CHECKING:
     from kimmdy.runmanager import RunManager
     from kimmdy.config import Config
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
-from enum import Enum, auto
+from dataclasses import dataclass
 from kimmdy.tasks import TaskFiles
 import logging
 from pathlib import Path
 import dill
+import csv
+
+# Necessary before 3.11: https://peps.python.org/pep-0673/
+from typing import TypeVar
+
+TypeReactionPath = TypeVar("TypeReactionPath", bound="ReactionPath")
 
 
 @dataclass
 class Conversion(ABC):
+    """ABC for all conversions.
+    """    
     pass
 
 
@@ -114,24 +116,27 @@ class ReactionPath:
         """
         raise NotImplementedError
 
-    def combine_with(self, other: ReactionPath):
+    def combine_with(self, other: TypeReactionPath):
         """Combines this ReactionPath with another with the same conversions.
 
         Parameters
         ----------
         other : ReactionPath
         """
-        if other != self:
+
+        if self.conversions != other.conversions:
             raise ValueError(
-                "Error: Trying to combine unequal reaction paths\n"
+                "Error: Trying to combine reaction paths with "
+                "different conversions!\n"
                 f"self: {self.conversions}\n"
                 f"other: {other.conversions}"
             )
 
+        self.check_consistency()
         other.check_consistency()
 
         self.rates += other.rates
-        self.frames += other.rates
+        self.frames += other.frames
 
         if other.avg_rates is not None:
             if self.avg_rates is None:
@@ -143,32 +148,46 @@ class ReactionPath:
 
     def check_consistency(self):
         """Run consistency checks for correct size of variables"""
-        if len(self.rates) != len(self.frames):
+        try:
+            if len(self.rates) != len(self.frames):
+                raise ValueError(
+                    "Frames and rates are not of equal length\n"
+                    f"\trates: {len(self.rates)}\n"
+                    f"\tframes: {len(self.frames)}"
+                )
+
+            if self.avg_rates is not None or self.avg_frames is not None:
+                if self.avg_rates is None or self.avg_frames is None:
+                    raise ValueError(
+                        "Average frames and average rates must be "
+                        "of same type, but one is None\n"
+                        f"\tavg_rates: {type(self.avg_rates)}\n"
+                        f"\tavg_frames: {type(self.avg_frames)}"
+                    )
+                if len(self.avg_rates) != len(self.avg_frames):
+                    raise ValueError(
+                        "Average frames and average rates are not of equal length\n"
+                        f"\tavg_rates: {len(self.avg_rates)}\n"
+                        f"\tavg_frames: {len(self.avg_frames)}"
+                    )
+
+            double_counter = 0
+            double_frames = set()
+            for i, frame in enumerate(self.frames):
+                for frame2 in self.frames[i + 1 :]:
+                    if frame == frame2:
+                        double_counter += 1
+                        double_frames.add(frame)
+            if double_counter != 0:
+                raise ValueError(
+                    "Frames are not unique! "
+                    f"{double_counter} frames found multiple times\n"
+                    f"Frames: {double_frames}"
+                )
+        except ValueError as e:
             raise ValueError(
-                "Frames and rates are not of equal length"
-                f"\trates: {len(self.rates)}\n"
-                f"\tframes: {len(self.frames)}"
+                f"Consistency error in ReactionPath {self.conversions}" "" + e.args[0]
             )
-
-        if self.avg_rates is not None or self.avg_frames is not None:
-            if self.avg_rates is None or self.avg_frames is None:
-                raise ValueError(
-                    "Average frames and average rates must be of same type, but one is None\n"
-                    f"\tavg_rates: {type(self.avg_rates)}\n"
-                    f"\tavg_frames: {type(self.avg_frames)}"
-                )
-            if len(self.avg_rates) != len(self.avg_frames):
-                raise ValueError(
-                    "Average frames and average rates are not of equal length"
-                    f"\tavg_rates: {len(self.avg_rates)}\n"
-                    f"\tavg_frames: {len(self.avg_frames)}"
-                )
-
-    def __eq__(self, other):
-        if type(other) is ReactionPath:
-            if self.conversions == other.conversions:
-                return True
-        return False
 
 
 @dataclass
@@ -182,33 +201,44 @@ class ReactionResults:
     def aggregate_reactions(self):
         """Combines reactions having the same sequence of conversions."""
 
-        all_comb_list = []
-        for i, r1 in enumerate(self.reaction_paths):
-            to_comb_with = []
-            for j, r2 in enumerate(self.reaction_paths[i + 1 :]):
-                if r1 == r2:
-                    to_comb_with.append(i + 1 + j)
-            all_comb_list.append(to_comb_with)
+        unique_conversions = []
+        unique_conversions_idxs = []
 
-        for i, to_comb_list in enumerate(all_comb_list):
-            for j in to_comb_list:
-                print("indices:", i, j)
-                self.reaction_paths[i].combine_with(self.reaction_paths[j])
-                # matches with j are added to i already, remove them:
-                all_comb_list[j] = []
+        for i, rp in enumerate(self.reaction_paths):
+            if rp.conversions not in unique_conversions:
+                unique_conversions.append(rp.conversions)
+                unique_conversions_idxs.append([i])
+            else:
+                for j, uc in enumerate(unique_conversions):
+                    if rp.conversions == uc:
+                        unique_conversions_idxs[j].append(i)
+
+        # merge every dublicate into first reaction path
+        for uci in unique_conversions_idxs:
+            if len(uci) > 1:
+                for uci_double in uci[1:]:
+                    self.reaction_paths[uci[0]].combine_with(
+                        self.reaction_paths[uci_double]
+                    )
+        # only keep first of each reaction path
+        urps = []
+        for uci in unique_conversions_idxs:
+            urps.append(self.reaction_paths[uci[0]])
+        self.reaction_paths = urps
 
     def to_csv(self, path: Path):
         """Write a ReactionResult as defined in the reaction module to a csv file"""
-        with open(path, "w") as f:
-            f.write(",rate,recipe,r_ts,ts\n")
-            f.write(
-                "\n".join(
-                    [
-                        f"{i},{RO.rate},\"{RO.recipe}\",\"[{','.join(map(str,RO.r_ts))}]\",\"[{','.join(map(str,RO.ts))}]\""
-                        for i, RO in enumerate(self.outcomes)
-                    ]
-                )
-            )
+
+        header = ["conversions", "frames", "rates", "avg_frames", "avg_rates"]
+        rows = []
+        for i, rp in enumerate(self.reaction_paths):
+            rows.append([i] + [rp.__getattribute__(h) for h in header])
+        header = ["index"] + header
+
+        with open(path, "w", newline="") as f:
+            writer = csv.writer(f)
+            writer.writerow(header)
+            writer.writerows(rows)
 
     def to_dill(self, path: Path):
         with open(path, "wb") as f:
@@ -218,16 +248,6 @@ class ReactionResults:
     def from_dill(_, path: Path):
         with open(path, "rb") as f:
             return dill.load(f)
-
-
-# @dataclass
-# class ReactionPluginResult:
-#     """A ReactionResult
-#     encompasses a list of ReactionOutcomes.
-#     """
-
-#     outcomes: list[ReactionQueryResult]
-#     # outcomes :dict[ConversionRecipe : dict[f: list[frames], r: list[rates], r_a: avg_rate, end_coords]]
 
 
 class ReactionPlugin(ABC):
@@ -253,5 +273,5 @@ class ReactionPlugin(ABC):
         logging.debug(f"Reaction {self.name} instatiated.")
 
     @abstractmethod
-    def get_reaction_result(self, files: TaskFiles) -> ReactionResult:
+    def get_reaction_results(self, files: TaskFiles) -> ReactionResults:
         pass
