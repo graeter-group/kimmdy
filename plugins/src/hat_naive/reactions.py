@@ -1,13 +1,13 @@
 from kimmdy.topology.atomic import Atom
 from kimmdy.constants import ATOMTYPE_BONDORDER_FLAT
 from kimmdy.reaction import (
-    Conversion,
-    ConversionRecipe,
-    Reaction,
-    ReactionOutcome,
-    ReactionResult,
-    ConversionType,
+    Break,
+    Bind,
+    ReactionPath,
+    ReactionResults,
+    ReactionPlugin,
 )
+import MDAnalysis as mda
 import random as rng
 import logging
 
@@ -23,12 +23,16 @@ def find_radical(atoms: list[Atom]):
     return None
 
 
-class HAT_naive(Reaction):
-    """HAT reaction"""
+class HAT_naive(ReactionPlugin):
+    """Naive HAT reaction, selects hydrogens at random"""
 
-    def get_reaction_result(self, files) -> ReactionResult:
+    def get_reaction_result(self, files) -> ReactionResults:
         logging.info("Starting naive HAT reaction")
         top = self.runmng.top
+
+        tpr = files.input["tpr"]
+        trr = files.input["trr"]
+        u = mda.Universe(str(tpr), str(trr), topology_format="tpr", format="trr")
 
         if not top.radicals:
             radical = find_radical(list(top.atoms.values()))
@@ -56,13 +60,12 @@ class HAT_naive(Reaction):
             logging.info(f"radical: {rad}")
             logging.info(f"h: {top.atoms[h]}")
             logging.info(f"from: {top.atoms[f]}")
-            outcome = ReactionOutcome(
-                recipe=[
-                    Conversion(ConversionType.BREAK, (f, h)),
-                    Conversion(ConversionType.BIND, (h, r)),
-                ],
-                rate=1,
-            )
-            return [outcome]
 
-        return [ReactionOutcome([], 0)]
+            rp = ReactionPath(
+                conversions=[Break(f, h), Bind(h, r)], 
+                rates=[1], 
+                frames=[u.trajectory[-1].frame]
+            )
+            return ReactionResults([rp])
+
+        return ReactionResults([])

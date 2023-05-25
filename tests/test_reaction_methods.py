@@ -33,7 +33,7 @@ def reaction_result():
         ReactionPath([Conversion(), Conversion()], rates=[1], frames=[5]),
     ]
     return ReactionResults(rps)
-    
+
 
 def test_aggregate_reaction_result(reaction_result):
     reaction_result.aggregate_reactions()
@@ -64,6 +64,3 @@ def test_reaction_result_to_dill(tmp_path, reaction_result):
     reaction_result.to_dill(csv_path)
     loaded_rr = ReactionResults.from_dill(csv_path)
     assert loaded_rr == reaction_result
-
-
-
