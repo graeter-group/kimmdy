@@ -136,8 +136,8 @@ class AtomType:
     type: str
     id_sym: str
     at_num: str
-    charge: str
     mass: str
+    charge: str
     ptype: str
     sigma: str
     epsilon: str
@@ -149,8 +149,8 @@ class AtomType:
             type=l[0],
             id_sym=l[0],
             at_num=l[1],
-            charge=l[2],
-            mass=l[3],
+            mass=l[2],
+            charge=l[3],           
             ptype=l[4],
             sigma=l[5],
             epsilon=l[6],
