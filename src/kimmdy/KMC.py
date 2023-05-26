@@ -5,7 +5,9 @@ from numpy.random import default_rng
 from kimmdy.reaction import ReactionResults, Conversion
 
 def integrate(y,x):
-    return scipy.integrate.trapezoid(y)
+    return scipy.integrate.trapezoid(y,x)
+
+
 
 def rfKMC(
     reaction_results: ReactionResults, rng: np.random.BitGenerator = default_rng()
@@ -21,17 +23,21 @@ def rfKMC(
     # compare e.g. <https://en.wikipedia.org/wiki/Kinetic_Monte_Carlo#Rejection-free_KMC>
 
     # check for empty ReactionResult
-    if len(reaction_results.outcomes) == 0:
+    if len(reaction_results.reaction_paths) == 0:
         logging.warning("Empty ReactionResult; no reaction chosen")
         return  Conversion()
 
     rates = []
     recipes = []
-    for i,outcome in enumerate(reaction_results.outcomes):
-        curr_rate = integrate(outcome.r_ts+1e-30,outcome.ts)
-        # nan case could be problematic
-        rates.append(curr_rate if str(curr_rate) != 'nan' else 0 )
-        recipes.append(outcome.recipe)
+    for i, path in enumerate(reaction_results.reaction_paths):
+        if path.avg_rates != None:
+            avg_weigth = [x[1]-x[0] for x in path.avg_frames]
+            rates.append(sum(map(lambda x,y:x*y, avg_weigth, path.avg_rates)))
+        else:
+            curr_rate = integrate(path.r_ts+1e-30,path.ts)
+            # nan case could be problematic
+            rates.append(curr_rate if str(curr_rate) != 'nan' else 0 )
+        recipes.append(path.recipe)
 
     rates_cumulative = np.cumsum(rates)
     total_rate = rates_cumulative[-1]
