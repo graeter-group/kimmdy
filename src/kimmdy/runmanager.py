@@ -9,7 +9,7 @@ from kimmdy import config
 from kimmdy.config import Config
 from kimmdy.utils import increment_logfile
 from kimmdy.parsing import read_topol
-from kimmdy.reaction import ReactionPlugin, ReactionResults, Conversion
+from kimmdy.reaction import ReactionPlugin, RecipeCollection, RecipeStep
 import kimmdy.mdmanager as md
 import kimmdy.changemanager as changer
 from kimmdy.tasks import Task, TaskFiles, TaskMapping
@@ -50,7 +50,7 @@ class RunManager:
         self.iteration = 0
         self.iterations = self.config.iterations
         self.state = State.IDLE
-        self.reaction_results: ReactionResults = ReactionResults([])
+        self.recipe_collection: RecipeCollection = RecipeCollection([])
         self.latest_files: dict[str, Path] = {
             "top": self.config.top,
             "gro": self.config.gro,
@@ -260,26 +260,26 @@ class RunManager:
         logging.info("Query reactions")
         self.state = State.REACTION
         # empty list for every new round of queries
-        self.reaction_results: ReactionResults = ReactionResults([])
+        self.recipe_collection: RecipeCollection = RecipeCollection([])
 
         for reaction_plugin in self.reaction_plugins:
             # TODO: refactor into Task
             files = self._create_task_directory(reaction_plugin.name)
 
-            self.reaction_results.reaction_paths.extend(reaction_plugin.get_reaction_results(files))
+            self.recipe_collection.recipes.extend(
+                reaction_plugin.get_recipe_collection(files)
+            )
 
         logging.info("Reaction done")
         return files  # necessary?
 
     def _decide_reaction(
         self,
-        decision_strategy: Callable[
-            [ReactionResults], Conversion
-        ] = rfKMC,
+        decision_strategy: Callable[[RecipeCollection], RecipeStep] = rfKMC,
     ):
         logging.info("Decide on a reaction")
-        logging.debug(f"Available reaction results: {self.reaction_results}")
-        self.chosen_recipe = decision_strategy(self.reaction_results)
+        logging.debug(f"Available reaction results: {self.recipe_collection}")
+        self.chosen_recipe = decision_strategy(self.recipe_collection)
         logging.info("Chosen recipe is:")
         logging.info(self.chosen_recipe)
         return

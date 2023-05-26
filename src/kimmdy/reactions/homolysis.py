@@ -1,8 +1,8 @@
 import logging
 from kimmdy.reaction import (
     Break,
-    ReactionPath,
-    ReactionResults,
+    Recipe,
+    RecipeCollection,
     ReactionPlugin,
 )
 from kimmdy.tasks import TaskFiles
@@ -28,7 +28,7 @@ class Homolysis(ReactionPlugin):
 
     type_scheme = {"homolysis": {"edis": Path, "bonds": Path}}
 
-    def get_reaction_results(self, files: TaskFiles):
+    def get_recipe_collection(self, files: TaskFiles):
         logging.debug("Getting recipe for reaction: homolysis")
 
         tpr = files.input["tpr"]
@@ -61,7 +61,7 @@ class Homolysis(ReactionPlugin):
         lookup_edissoc_atomtype = read_edissoc(edissoc_dat)
 
         ts = distances["time"]
-        reaction_paths = []
+        recipes = []
         for plumedid, dists in distances.items():
             if plumedid == "time":
                 continue
@@ -89,9 +89,9 @@ class Homolysis(ReactionPlugin):
             k_reaction = morse_transition_rate(dists, b0, E_dis, kb)
             k_avg = calc_av_rate(dists, b0, E_dis, kb)
 
-            reaction_paths.append(
-                ReactionPath(
-                    conversions=[Break(atomids_list)],
+            recipes.append(
+                Recipe(
+                    conversions=[Break(*atomids_list)],
                     rates=[k_avg],
                     frames=[u.trajectory[-1].frame],
                     avg_rates=[k_avg],
@@ -99,7 +99,7 @@ class Homolysis(ReactionPlugin):
                 )
             )
 
-        return ReactionResults(reaction_paths)
+        return RecipeCollection(recipes)
 
         # # read out bond distances and atomtypes
         # list_of_breakpairs_and_distances = find_distances(plumed_dat, distances_dat)

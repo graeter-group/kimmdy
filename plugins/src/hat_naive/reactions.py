@@ -3,8 +3,8 @@ from kimmdy.constants import ATOMTYPE_BONDORDER_FLAT
 from kimmdy.reaction import (
     Break,
     Bind,
-    ReactionPath,
-    ReactionResults,
+    Recipe,
+    RecipeCollection,
     ReactionPlugin,
 )
 import MDAnalysis as mda
@@ -26,7 +26,7 @@ def find_radical(atoms: list[Atom]):
 class HAT_naive(ReactionPlugin):
     """Naive HAT reaction, selects hydrogens at random"""
 
-    def get_reaction_result(self, files) -> ReactionResults:
+    def get_recipe_collectionon(self, files) -> RecipeCollection:
         logging.info("Starting naive HAT reaction")
         top = self.runmng.top
 
@@ -61,11 +61,11 @@ class HAT_naive(ReactionPlugin):
             logging.info(f"h: {top.atoms[h]}")
             logging.info(f"from: {top.atoms[f]}")
 
-            rp = ReactionPath(
+            recipe = Recipe(
                 conversions=[Break(f, h), Bind(h, r)], 
                 rates=[1], 
                 frames=[u.trajectory[-1].frame]
             )
-            return ReactionResults([rp])
+            return RecipeCollection([recipe])
 
-        return ReactionResults([])
+        return RecipeCollection([])

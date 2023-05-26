@@ -15,18 +15,18 @@ import csv
 # Necessary before 3.11: https://peps.python.org/pep-0673/
 from typing import TypeVar
 
-TypeReactionPath = TypeVar("TypeReactionPath", bound="ReactionPath")
+TypeRecipe = TypeVar("TypeRecipe", bound="Recipe")
 
 
 @dataclass
-class Conversion(ABC):
-    """ABC for all conversions."""
+class RecipeStep(ABC):
+    """ABC for all RecipeSteps."""
 
     pass
 
 
 @dataclass
-class Move(Conversion):
+class Move(RecipeStep):
     """Change topology and/or coordinates to move an atom.
 
     Attributes
@@ -48,7 +48,7 @@ class Move(Conversion):
 
 
 @dataclass
-class Break(Conversion):
+class Break(RecipeStep):
     """Change topology to break a bond
 
     Attributes
@@ -62,7 +62,7 @@ class Break(Conversion):
 
 
 @dataclass
-class Bind(Conversion):
+class Bind(RecipeStep):
     """Change topology to form a bond
 
     Attributes
@@ -76,15 +76,15 @@ class Bind(Conversion):
 
 
 @dataclass
-class ReactionPath:
-    """A reaction path defined by one series of conversions.
+class Recipe:
+    """A reaction path defined by one series of RecipeSteps.
     Defines everything necessart to build the
     product state from the educt state.
 
     Attributes
     ----------
-    conversions : list[Conversion]
-        Single sequence of conversions to build product
+    recipe_steps : list[RecipeStep]
+        Single sequence of RecipeSteps to build product
     rates : list[float]
         Reaction rates corresponding 1:1 to frames.
     frames : list[int]
@@ -98,7 +98,7 @@ class ReactionPath:
 
     """
 
-    conversions: list[Conversion]
+    recipe_steps: list[RecipeStep]
     rates: list[float]
     frames: list[int]
     avg_rates: Union[list[float], None] = None
@@ -118,20 +118,20 @@ class ReactionPath:
         """
         raise NotImplementedError
 
-    def combine_with(self, other: TypeReactionPath):
-        """Combines this ReactionPath with another with the same conversions.
+    def combine_with(self, other: TypeRecipe):
+        """Combines this Recipe with another with the same RecipeSteps.
 
         Parameters
         ----------
-        other : ReactionPath
+        other : Recipe
         """
 
-        if self.conversions != other.conversions:
+        if self.recipe_steps != other.recipe_steps:
             raise ValueError(
                 "Error: Trying to combine reaction paths with "
-                "different conversions!\n"
-                f"self: {self.conversions}\n"
-                f"other: {other.conversions}"
+                "different recipe_steps!\n"
+                f"self: {self.recipe_steps}\n"
+                f"other: {other.recipe_steps}"
             )
 
         self.check_consistency()
@@ -188,52 +188,52 @@ class ReactionPath:
                 )
         except ValueError as e:
             raise ValueError(
-                f"Consistency error in ReactionPath {self.conversions}" "" + e.args[0]
+                f"Consistency error in Recipe {self.recipe_steps}" "" + e.args[0]
             )
 
 
 @dataclass
-class ReactionResults:
-    """A ReactionResults encompasses a number of reaction paths.
+class RecipeCollection:
+    """A RecipeCollection encompasses a number of reaction paths.
     They can originate from multiple reaction plugins, but do not need to.
     """
 
-    reaction_paths: list[ReactionPath]
+    recipes: list[Recipe]
 
     def aggregate_reactions(self):
-        """Combines reactions having the same sequence of conversions."""
+        """Combines reactions having the same sequence of RecipeSteps."""
 
-        unique_conversions = []
-        unique_conversions_idxs = []
+        unique_recipes = []
+        unique_recipes_idxs = []
 
-        for i, rp in enumerate(self.reaction_paths):
-            if rp.conversions not in unique_conversions:
-                unique_conversions.append(rp.conversions)
-                unique_conversions_idxs.append([i])
+        for i, recipe in enumerate(self.recipes):
+            if recipe.recipe_steps not in unique_recipes:
+                unique_recipes.append(recipe.recipe_steps)
+                unique_recipes_idxs.append([i])
             else:
-                for j, uc in enumerate(unique_conversions):
-                    if rp.conversions == uc:
-                        unique_conversions_idxs[j].append(i)
+                for j, uc in enumerate(unique_recipes):
+                    if recipe.recipe_steps == uc:
+                        unique_recipes_idxs[j].append(i)
 
         # merge every dublicate into first reaction path
-        for uci in unique_conversions_idxs:
+        for uci in unique_recipes_idxs:
             if len(uci) > 1:
                 for uci_double in uci[1:]:
-                    self.reaction_paths[uci[0]].combine_with(
-                        self.reaction_paths[uci_double]
+                    self.recipes[uci[0]].combine_with(
+                        self.recipes[uci_double]
                     )
         # only keep first of each reaction path
         urps = []
-        for uci in unique_conversions_idxs:
-            urps.append(self.reaction_paths[uci[0]])
-        self.reaction_paths = urps
+        for uci in unique_recipes_idxs:
+            urps.append(self.recipes[uci[0]])
+        self.recipes = urps
 
     def to_csv(self, path: Path):
         """Write a ReactionResult as defined in the reaction module to a csv file"""
 
-        header = ["conversions", "frames", "rates", "avg_frames", "avg_rates"]
+        header = ["recipe_steps", "frames", "rates", "avg_frames", "avg_rates"]
         rows = []
-        for i, rp in enumerate(self.reaction_paths):
+        for i, rp in enumerate(self.recipes):
             rows.append([i] + [rp.__getattribute__(h) for h in header])
         header = ["index"] + header
 
@@ -275,5 +275,5 @@ class ReactionPlugin(ABC):
         logging.debug(f"Reaction {self.name} instatiated.")
 
     @abstractmethod
-    def get_reaction_results(self, files: TaskFiles) -> ReactionResults:
+    def get_recipe_collection(self, files: TaskFiles) -> RecipeCollection:
         pass
