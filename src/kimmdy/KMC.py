@@ -2,14 +2,14 @@ import logging
 import numpy as np
 import scipy.integrate 
 from numpy.random import default_rng
-from kimmdy.reaction import ReactionResult,ConversionRecipe
+from kimmdy.reaction import ReactionResults, Conversion
 
 def integrate(y,x):
     return scipy.integrate.trapezoid(y)
 
 def rfKMC(
-    reaction_result: ReactionResult, rng: np.random.BitGenerator = default_rng()
-) -> ConversionRecipe:
+    reaction_results: ReactionResults, rng: np.random.BitGenerator = default_rng()
+) -> Conversion:
     """Rejection-Free Monte Carlo.
     takes ReactionResults and choses a recipe.
 
@@ -21,13 +21,13 @@ def rfKMC(
     # compare e.g. <https://en.wikipedia.org/wiki/Kinetic_Monte_Carlo#Rejection-free_KMC>
 
     # check for empty ReactionResult
-    if len(reaction_result.outcomes) == 0:
+    if len(reaction_results.outcomes) == 0:
         logging.warning("Empty ReactionResult; no reaction chosen")
-        return  ConversionRecipe()
+        return  Conversion()
 
     rates = []
     recipes = []
-    for i,outcome in enumerate(reaction_result.outcomes):
+    for i,outcome in enumerate(reaction_results.outcomes):
         curr_rate = integrate(outcome.r_ts+1e-30,outcome.ts)
         # nan case could be problematic
         rates.append(curr_rate if str(curr_rate) != 'nan' else 0 )
