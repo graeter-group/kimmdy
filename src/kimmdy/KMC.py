@@ -1,12 +1,12 @@
 import logging
 import numpy as np
-import scipy.integrate 
+import scipy.integrate
 from numpy.random import default_rng
 from kimmdy.reaction import RecipeCollection, Recipe
 
-def integrate(y,x):
-    return scipy.integrate.trapezoid(y,x)
 
+def integrate(y, x):
+    return scipy.integrate.trapezoid(y, x)
 
 
 def rfKMC(
@@ -31,21 +31,23 @@ def rfKMC(
     recipes = []
     for i, path in enumerate(recipe_collection.recipes):
         if path.avg_rates != None:
-            avg_weigth = [x[1]-x[0] for x in path.avg_frames]
-            rates.append(sum(map(lambda x,y:x*y, avg_weigth, path.avg_rates)))
+            avg_weigth = [x[1] - x[0] for x in path.avg_frames]
+            rates.append(sum(map(lambda x, y: x * y, avg_weigth, path.avg_rates)))
         else:
-            curr_rate = integrate(path.r_ts+1e-30,path.ts)
+            curr_rate = integrate(path.r_ts + 1e-30, path.ts)
             # nan case could be problematic
-            rates.append(curr_rate if str(curr_rate) != 'nan' else 0 )
+            rates.append(curr_rate if str(curr_rate) != "nan" else 0)
         recipes.append(path.recipe)
 
     rates_cumulative = np.cumsum(rates)
     total_rate = rates_cumulative[-1]
     u = rng.random()  # u in [0.0,1.0)
-    logging.debug(f"Random value u: {u}, cumulative rates {rates_cumulative}, total rate {total_rate}")
+    logging.debug(
+        f"Random value u: {u}, cumulative rates {rates_cumulative}, total rate {total_rate}"
+    )
 
     # Find the even to carry out, mu, using binary search (np.searchsorted)
-    pos = np.searchsorted(rates_cumulative,u*total_rate)
+    pos = np.searchsorted(rates_cumulative, u * total_rate)
     chosen_recipe = recipes[pos]
     logging.debug(f"Chosen Recipe: {chosen_recipe}")
 

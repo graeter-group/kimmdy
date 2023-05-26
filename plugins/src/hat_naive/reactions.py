@@ -62,9 +62,9 @@ class HAT_naive(ReactionPlugin):
             logging.info(f"from: {top.atoms[f]}")
 
             recipe = Recipe(
-                conversions=[Break(f, h), Bind(h, r)], 
-                rates=[1], 
-                frames=[u.trajectory[-1].frame]
+                conversions=[Break(f, h), Bind(h, r)],
+                rates=[1],
+                frames=[u.trajectory[-1].frame],
             )
             return RecipeCollection([recipe])
 

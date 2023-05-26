@@ -219,9 +219,7 @@ class RecipeCollection:
         for uci in unique_recipes_idxs:
             if len(uci) > 1:
                 for uci_double in uci[1:]:
-                    self.recipes[uci[0]].combine_with(
-                        self.recipes[uci_double]
-                    )
+                    self.recipes[uci[0]].combine_with(self.recipes[uci_double])
         # only keep first of each reaction path
         urps = []
         for uci in unique_recipes_idxs:
