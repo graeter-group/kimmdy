@@ -1,0 +1,12 @@
+website:
+  sidebar:
+    contents:
+    - reference/index.qmd
+    - contents:
+      - reference/cmd.qmd
+      section: API
+    - contents:
+      - reference/runmanager.qmd
+      - reference/runmanager.RunManager.qmd
+      section: Internals
+    id: reference

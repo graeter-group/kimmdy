@@ -1,0 +1,75 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Fira+Mono&family=Miriam+Libre&family=Roboto&display=swap');
+
+/*-- scss:defaults --*/
+$hits-blue: #1E4287;
+$hits-green: "#019050";
+$hits-magenta: "#c3006b";
+$hits-yellow: "#ffcc00";
+
+
+// $background-color: white;
+$main-color: #2E3440;
+$light-color: #999da3;
+$block-margin: 10px;
+$heading-margin: 0 0 20px 0;
+$headings-font-family: Miriam Libre, sans-serif;
+$heading-color: #333;
+$heading-line-height: 1.2;
+$heading-letter-spacing: inherit; /*-0.08em;*/
+$heading-text-transform: none;
+$heading-text-shadow: none;
+$heading-font-weight: normal;
+$heading1-text-shadow: none;
+$heading1-size: 2.77em;
+$heading2-size: 1.50em;
+$heading3-size: 1em;
+$heading4-size: 1em;
+
+$font-family-sans-serif: Roboto, sans-serif;
+$font-family-monospace: Fira Mono;
+$body-bg: #fff;
+$body-color: #222;
+$text-muted: lighten($body-color, 50%);
+$link-color: $hits-blue;
+$link-color-hover: lighten($link-color, 15%);
+$selection-color: #fff;
+$selection-bg: $hits-blue;
+$selection-color: $body-bg;
+$border-color: lighten($body-color, 30%);
+$border-width: 1px;
+$border-radius: 3px;
+
+$presentation-font-size-root: 30px;
+$presentation-heading-font: Miriam Libre, sans-serif;
+$presentation-heading-line-height: 1.2;
+$presentation-heading-letter-spacing: normal;
+$presentation-heading-text-transform: none;
+$presentation-heading-text-shadow: none;
+$presentation-h1-text-shadow: none;
+$presentation-heading-font-weight: 400;
+$presentation-h1-font-size: 2.7em;
+$presentation-h2-font-size: 1.5em;
+$presentation-h3-font-size: 1em;
+$presentation-h4-font-size: 1em;
+$presentation-font-smaller: 0.7;
+$presentation-line-height: 1.2;
+$presentation-block-margin: 12px;
+$presentation-slide-text-align: left;
+$presentation-title-slide-text-align: center;
+
+/*-- scss:rules --*/
+
+.reveal .footer a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.reveal .slide-logo {
+  max-height: 6rem !important;
+}
+
+a {
+  text-decoration: none;
+}
+

@@ -1,0 +1,18 @@
+# Function reference
+
+## API
+
+Start KIMMDY from a python script
+
+| | |
+| --- | --- |
+| [cmd](cmd.qmd#kimmdy.cmd) |  |
+
+## Internals
+
+TODO
+
+| | |
+| --- | --- |
+| [runmanager](runmanager.qmd#kimmdy.runmanager) |  |
+| [runmanager.RunManager](runmanager.RunManager.qmd#kimmdy.runmanager.RunManager) | The RunManager, a central piece. |

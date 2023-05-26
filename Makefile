@@ -21,3 +21,8 @@ help:
 	@$(SPHINXAPIDOC) -f -o "$(SOURCEDIR)" src/kimmdy
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
+quartodoc:
+	quarto add --no-prompt machow/quartodoc
+	python -m quartodoc build --verbose
+	python -m quartodoc interlinks
+	quarto render

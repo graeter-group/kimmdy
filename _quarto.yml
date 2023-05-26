@@ -1,0 +1,75 @@
+project:
+  type: website
+  output-dir: docs
+  render:
+    - index.qmd
+    - reference
+    - guide/*.qmd
+
+website:
+  page-navigation: true
+  site-url: http://hits-mbm-dev.github.io/kimmdy
+  repo-url: https://github.com/hits-mbm-dev/kimmdy
+  repo-actions: [edit, issue]
+  navbar:
+    left:
+      - file: index.qmd
+        text: KIMMDY
+      - file: reference/index.qmd
+        text: Reference
+
+# tell quarto to read the generated sidebar
+metadata-files:
+  - _sidebar.yml
+
+format:
+  html:
+    toc: true
+    mainfont: Roboto
+    number-depth: 0
+    theme:
+      light:
+      - default
+      - theme.scss
+      dark:
+      - default
+      - theme.scss
+      # - theme-dark.scss
+    code-copy: true
+
+filters:
+  - interlinks
+
+interlinks:
+  sources:
+    numpy:
+      url: https://numpy.org/doc/stable/
+    python:
+      url: https://docs.python.org/3/
+
+
+quartodoc:
+  package: kimmdy
+  sidebar: _sidebar.yml
+  style: pkgdown
+  dir: reference
+  version: 2.0.1 # TODO
+
+  sections:
+    - title: API
+      desc: Start KIMMDY from a python script
+      contents:
+        - name: cmd
+          children: flat
+    - title: Internals
+      desc: TODO
+      contents:
+        # set the children option, so that methods get documented
+        # on separate pages. MdRenderer's docs will include a summary
+        # table that links to each page.
+        - name: runmanager
+          children: separate # embedded, flat, separate
+        - name: runmanager.RunManager
+          children: embedded # embedded, flat, separate
+        - name: topology.topology.Topology
+          children: separate # embedded, flat, separate

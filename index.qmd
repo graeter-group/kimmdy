@@ -1,0 +1,10 @@
+# KIMMDY
+
+Welcome to KIMMDY
+
+```{python}
+#| eval: false
+from kimmdy.cmd import kimmdy_run
+
+kimmdy_run
+```

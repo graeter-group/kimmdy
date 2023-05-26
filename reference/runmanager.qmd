@@ -1,0 +1,15 @@
+# runmanager { #kimmdy.runmanager }
+
+`runmanager`
+
+## Attributes
+
+| Name | Description |
+| --- | --- |
+| [AMBIGUOUS_SUFFS](kimmdy.runmanager.AMBIGUOUS_SUFFS.qmd#kimmdy.runmanager.AMBIGUOUS_SUFFS) |  |
+
+## Functions
+
+| Name | Description |
+| --- | --- |
+| [default_decision_strategy](kimmdy.runmanager.default_decision_strategy.qmd#kimmdy.runmanager.default_decision_strategy) | Rejection-Free Monte Carlo. |

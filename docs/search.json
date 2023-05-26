@@ -1,0 +1,310 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "KIMMDY",
+    "section": "",
+    "text": "Welcome to KIMMDY\n\nfrom kimmdy.cmd import kimmdy_run\n\nkimmdy_run"
+  },
+  {
+    "objectID": "reference/get_object.html",
+    "href": "reference/get_object.html",
+    "title": "get_object",
+    "section": "",
+    "text": "get_object(path, object_name=None, parser='numpy', load_aliases=True, dynamic=False, loader=None)\nFetch a griffe object.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\npath\nstr\nAn import path to the object. This should have the form path.to.module:object. For example, quartodoc:get_object or quartodoc:MdRenderer.render.\nrequired\n\n\nobject_name\nstr | None\n(Deprecated). A function name.\nNone\n\n\nparser\nstr\nA docstring parser to use.\n'numpy'\n\n\nload_aliases\n\nFor aliases that were imported from other modules, should we load that module?\nTrue\n\n\ndynamic\n\nWhether to dynamically import object. Useful if docstring is not hard-coded, but was set on object by running python code.\nFalse\n\n\n\n\n\n\npreview: print a user-friendly preview of a griffe object.\n\n\n\n&gt;&gt;&gt; get_function(\"quartodoc\", \"get_function\")\n&lt;Function('get_function', ..."
+  },
+  {
+    "objectID": "reference/get_object.html#parameters",
+    "href": "reference/get_object.html#parameters",
+    "title": "get_object",
+    "section": "",
+    "text": "Name\nType\nDescription\nDefault\n\n\n\n\npath\nstr\nAn import path to the object. This should have the form path.to.module:object. For example, quartodoc:get_object or quartodoc:MdRenderer.render.\nrequired\n\n\nobject_name\nstr | None\n(Deprecated). A function name.\nNone\n\n\nparser\nstr\nA docstring parser to use.\n'numpy'\n\n\nload_aliases\n\nFor aliases that were imported from other modules, should we load that module?\nTrue\n\n\ndynamic\n\nWhether to dynamically import object. Useful if docstring is not hard-coded, but was set on object by running python code.\nFalse"
+  },
+  {
+    "objectID": "reference/get_object.html#see-also",
+    "href": "reference/get_object.html#see-also",
+    "title": "get_object",
+    "section": "",
+    "text": "preview: print a user-friendly preview of a griffe object."
+  },
+  {
+    "objectID": "reference/get_object.html#examples",
+    "href": "reference/get_object.html#examples",
+    "title": "get_object",
+    "section": "",
+    "text": "&gt;&gt;&gt; get_function(\"quartodoc\", \"get_function\")\n&lt;Function('get_function', ..."
+  },
+  {
+    "objectID": "reference/cmd.kimmdy_run.html",
+    "href": "reference/cmd.kimmdy_run.html",
+    "title": "cmd.kimmdy_run",
+    "section": "",
+    "text": "cmd.kimmdy_run\ncmd.kimmdy_run(input=Path('kimmdy.yml'), loglevel='DEBUG', logfile=Path('kimmdy.log'))\nRun KIMMDY from python."
+  },
+  {
+    "objectID": "reference/runmanager.html",
+    "href": "reference/runmanager.html",
+    "title": "runmanager",
+    "section": "",
+    "text": "runmanager\n\n\n\n\n\nName\nDescription\n\n\n\n\nAMBIGUOUS_SUFFS\n\n\n\n\n\n\n\n\n\n\nName\nDescription\n\n\n\n\ndefault_decision_strategy\nRejection-Free Monte Carlo."
+  },
+  {
+    "objectID": "reference/runmanager.html#attributes",
+    "href": "reference/runmanager.html#attributes",
+    "title": "runmanager",
+    "section": "",
+    "text": "Name\nDescription\n\n\n\n\nAMBIGUOUS_SUFFS"
+  },
+  {
+    "objectID": "reference/runmanager.html#functions",
+    "href": "reference/runmanager.html#functions",
+    "title": "runmanager",
+    "section": "",
+    "text": "Name\nDescription\n\n\n\n\ndefault_decision_strategy\nRejection-Free Monte Carlo."
+  },
+  {
+    "objectID": "reference/index.html",
+    "href": "reference/index.html",
+    "title": "Function reference",
+    "section": "",
+    "text": "Start KIMMDY from a python script\n\n\n\ncmd\n\n\n\n\n\n\n\nTODO\n\n\n\nrunmanager\n\n\n\nrunmanager.RunManager\nThe RunManager, a central piece."
+  },
+  {
+    "objectID": "reference/index.html#api",
+    "href": "reference/index.html#api",
+    "title": "Function reference",
+    "section": "",
+    "text": "Start KIMMDY from a python script\n\n\n\ncmd"
+  },
+  {
+    "objectID": "reference/index.html#internals",
+    "href": "reference/index.html#internals",
+    "title": "Function reference",
+    "section": "",
+    "text": "TODO\n\n\n\nrunmanager\n\n\n\nrunmanager.RunManager\nThe RunManager, a central piece."
+  },
+  {
+    "objectID": "guide/getting-started.html",
+    "href": "guide/getting-started.html",
+    "title": "Getting Started",
+    "section": "",
+    "text": "Getting Started\nLet’s jump right in!"
+  },
+  {
+    "objectID": "reference/runmanager.RunManager.html",
+    "href": "reference/runmanager.RunManager.html",
+    "title": "runmanager.RunManager",
+    "section": "",
+    "text": "runmanager.RunManager(self, config)\nThe RunManager, a central piece.\nManages the queue of tasks, communicates with the rest of the program and keeps track of global state.\n\n\n\n\n\nName\nDescription\n\n\n\n\nget_latest\nReturns path to latest file of given type.\n\n\nrun\n\n\n\n\n\n\nrunmanager.RunManager.get_latest(self, suffix)\nReturns path to latest file of given type.\nFor .dat files (in general ambiguous extensions) use full file name. Errors if file is not found.\n\n\n\nrunmanager.RunManager.run(self)"
+  },
+  {
+    "objectID": "reference/runmanager.RunManager.html#methods",
+    "href": "reference/runmanager.RunManager.html#methods",
+    "title": "runmanager.RunManager",
+    "section": "",
+    "text": "Name\nDescription\n\n\n\n\nget_latest\nReturns path to latest file of given type.\n\n\nrun\n\n\n\n\n\n\nrunmanager.RunManager.get_latest(self, suffix)\nReturns path to latest file of given type.\nFor .dat files (in general ambiguous extensions) use full file name. Errors if file is not found.\n\n\n\nrunmanager.RunManager.run(self)"
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.RunManager.config.html",
+    "href": "reference/kimmdy.runmanager.RunManager.config.html",
+    "title": "config",
+    "section": "",
+    "text": "config\nrunmanager.RunManager.config"
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.RunManager.cptfile.html",
+    "href": "reference/kimmdy.runmanager.RunManager.cptfile.html",
+    "title": "cptfile",
+    "section": "",
+    "text": "cptfile\nrunmanager.RunManager.cptfile"
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.RunManager.crr_tasks.html",
+    "href": "reference/kimmdy.runmanager.RunManager.crr_tasks.html",
+    "title": "crr_tasks",
+    "section": "",
+    "text": "crr_tasks\nrunmanager.RunManager.crr_tasks"
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.RunManager.filehist.html",
+    "href": "reference/kimmdy.runmanager.RunManager.filehist.html",
+    "title": "filehist",
+    "section": "",
+    "text": "filehist\nrunmanager.RunManager.filehist"
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.RunManager.from_checkpoint.html",
+    "href": "reference/kimmdy.runmanager.RunManager.from_checkpoint.html",
+    "title": "from_checkpoint",
+    "section": "",
+    "text": "from_checkpoint\nrunmanager.RunManager.from_checkpoint"
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.RunManager.get_latest.html",
+    "href": "reference/kimmdy.runmanager.RunManager.get_latest.html",
+    "title": "get_latest",
+    "section": "",
+    "text": "get_latest\nrunmanager.RunManager.get_latest(self, suffix)\nReturns path to latest file of given type.\nFor .dat files (in general ambiguous extensions) use full file name. Errors if file is not found."
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.RunManager.run.html",
+    "href": "reference/kimmdy.runmanager.RunManager.run.html",
+    "title": "run",
+    "section": "",
+    "text": "run\nrunmanager.RunManager.run(self)"
+  },
+  {
+    "objectID": "reference/runmanager.html#kimmdy.runmanager.default_decision_strategy",
+    "href": "reference/runmanager.html#kimmdy.runmanager.default_decision_strategy",
+    "title": "runmanager",
+    "section": "",
+    "text": "runmanager.default_decision_strategy(reaction_results)\nRejection-Free Monte Carlo. takes a list of ReactionResults and choses a recipe.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nreaction_reults\n\nfrom which one will be choosen\nrequired"
+  },
+  {
+    "objectID": "reference/cmd.html",
+    "href": "reference/cmd.html",
+    "title": "cmd",
+    "section": "",
+    "text": "cmd\n\n\n\n\n\nName\nDescription\n\n\n\n\nconfigure_logging\nConfigure logging.\n\n\nget_cmdline_args\nParse command line arguments and configure logger.\n\n\nkimmdy\nRun KIMMDY from the command line.\n\n\nkimmdy_run\nRun KIMMDY from python.\n\n\n\n\n\n\ncmd.configure_logging(args, color=False)\nConfigure logging.\nConfigures the logging module with optional colorcodes for the terminal.\n\n\n\ncmd.get_cmdline_args()\nParse command line arguments and configure logger.\n\n\n\n\n\nType\nDescription\n\n\n\n\nNamespace\nparsed command line arguments\n\n\n\n\n\n\n\ncmd.kimmdy()\nRun KIMMDY from the command line.\nThe configuration is gathered from the input file, which is kimmdy.yml by default.\n\n\n\ncmd.kimmdy_run(input=Path('kimmdy.yml'), loglevel='DEBUG', logfile=Path('kimmdy.log'))\nRun KIMMDY from python."
+  },
+  {
+    "objectID": "reference/cmd.html#functions",
+    "href": "reference/cmd.html#functions",
+    "title": "cmd",
+    "section": "",
+    "text": "Name\nDescription\n\n\n\n\nconfigure_logging\nConfigure logging.\n\n\nget_cmdline_args\nParse command line arguments and configure logger.\n\n\nkimmdy\nRun KIMMDY from the command line.\n\n\nkimmdy_run\nRun KIMMDY from python."
+  },
+  {
+    "objectID": "reference/cmd.html#kimmdy.cmd.configure_logging",
+    "href": "reference/cmd.html#kimmdy.cmd.configure_logging",
+    "title": "cmd",
+    "section": "",
+    "text": "cmd.configure_logging(args, color=False)\nConfigure logging.\nConfigures the logging module with optional colorcodes for the terminal."
+  },
+  {
+    "objectID": "reference/cmd.html#kimmdy.cmd.get_cmdline_args",
+    "href": "reference/cmd.html#kimmdy.cmd.get_cmdline_args",
+    "title": "cmd",
+    "section": "",
+    "text": "cmd.get_cmdline_args()\nParse command line arguments and configure logger.\n\n\n\n\n\nType\nDescription\n\n\n\n\nNamespace\nparsed command line arguments"
+  },
+  {
+    "objectID": "reference/cmd.html#kimmdy.cmd.kimmdy",
+    "href": "reference/cmd.html#kimmdy.cmd.kimmdy",
+    "title": "cmd",
+    "section": "",
+    "text": "cmd.kimmdy()\nRun KIMMDY from the command line.\nThe configuration is gathered from the input file, which is kimmdy.yml by default."
+  },
+  {
+    "objectID": "reference/cmd.html#kimmdy.cmd.kimmdy_run",
+    "href": "reference/cmd.html#kimmdy.cmd.kimmdy_run",
+    "title": "cmd",
+    "section": "",
+    "text": "cmd.kimmdy_run(input=Path('kimmdy.yml'), loglevel='DEBUG', logfile=Path('kimmdy.log'))\nRun KIMMDY from python."
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.default_decision_strategy.html",
+    "href": "reference/kimmdy.runmanager.default_decision_strategy.html",
+    "title": "default_decision_strategy",
+    "section": "",
+    "text": "runmanager.default_decision_strategy(reaction_results)\nRejection-Free Monte Carlo. takes a list of ReactionResults and choses a recipe.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nreaction_reults\n\nfrom which one will be choosen\nrequired"
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.default_decision_strategy.html#parameters",
+    "href": "reference/kimmdy.runmanager.default_decision_strategy.html#parameters",
+    "title": "default_decision_strategy",
+    "section": "",
+    "text": "Name\nType\nDescription\nDefault\n\n\n\n\nreaction_reults\n\nfrom which one will be choosen\nrequired"
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.AMBIGUOUS_SUFFS.html",
+    "href": "reference/kimmdy.runmanager.AMBIGUOUS_SUFFS.html",
+    "title": "AMBIGUOUS_SUFFS",
+    "section": "",
+    "text": "AMBIGUOUS_SUFFS\nrunmanager.AMBIGUOUS_SUFFS"
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.RunManager.iterations.html",
+    "href": "reference/kimmdy.runmanager.RunManager.iterations.html",
+    "title": "iterations",
+    "section": "",
+    "text": "iterations\nrunmanager.RunManager.iterations"
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.RunManager.state.html",
+    "href": "reference/kimmdy.runmanager.RunManager.state.html",
+    "title": "state",
+    "section": "",
+    "text": "state\nrunmanager.RunManager.state"
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.RunManager.tasks.html",
+    "href": "reference/kimmdy.runmanager.RunManager.tasks.html",
+    "title": "tasks",
+    "section": "",
+    "text": "tasks\nrunmanager.RunManager.tasks"
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.RunManager.top.html",
+    "href": "reference/kimmdy.runmanager.RunManager.top.html",
+    "title": "top",
+    "section": "",
+    "text": "top\nrunmanager.RunManager.top"
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.State.html",
+    "href": "reference/kimmdy.runmanager.State.html",
+    "title": "State",
+    "section": "",
+    "text": "State\nrunmanager.State()\nState of the system. one of IDLE, MD, REACTION, DONE."
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.RunManager.task_mapping.html",
+    "href": "reference/kimmdy.runmanager.RunManager.task_mapping.html",
+    "title": "task_mapping",
+    "section": "",
+    "text": "task_mapping\nrunmanager.RunManager.task_mapping"
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.RunManager.histfile.html",
+    "href": "reference/kimmdy.runmanager.RunManager.histfile.html",
+    "title": "histfile",
+    "section": "",
+    "text": "histfile\nrunmanager.RunManager.histfile"
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.RunManager.reactions.html",
+    "href": "reference/kimmdy.runmanager.RunManager.reactions.html",
+    "title": "reactions",
+    "section": "",
+    "text": "reactions\nrunmanager.RunManager.reactions"
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.RunManager.latest_files.html",
+    "href": "reference/kimmdy.runmanager.RunManager.latest_files.html",
+    "title": "latest_files",
+    "section": "",
+    "text": "latest_files\nrunmanager.RunManager.latest_files"
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.RunManager.html",
+    "href": "reference/kimmdy.runmanager.RunManager.html",
+    "title": "RunManager",
+    "section": "",
+    "text": "RunManager\nrunmanager.RunManager(self, config)\nThe RunManager, a central piece.\nManages the queue of tasks, communicates with the rest of the program and keeps track of global state."
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.RunManager.iteration.html",
+    "href": "reference/kimmdy.runmanager.RunManager.iteration.html",
+    "title": "iteration",
+    "section": "",
+    "text": "iteration\nrunmanager.RunManager.iteration"
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.RunManager.reaction_results.html",
+    "href": "reference/kimmdy.runmanager.RunManager.reaction_results.html",
+    "title": "reaction_results",
+    "section": "",
+    "text": "reaction_results\nrunmanager.RunManager.reaction_results"
+  }
+]

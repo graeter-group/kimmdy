@@ -1,0 +1,5 @@
+# cmd.kimmdy_run { #kimmdy.cmd.kimmdy_run }
+
+`cmd.kimmdy_run(input=Path('kimmdy.yml'), loglevel='DEBUG', logfile=Path('kimmdy.log'))`
+
+Run KIMMDY from python.

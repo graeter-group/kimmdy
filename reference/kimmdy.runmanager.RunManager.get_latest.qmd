@@ -1,0 +1,8 @@
+# get_latest { #kimmdy.runmanager.RunManager.get_latest }
+
+`runmanager.RunManager.get_latest(self, suffix)`
+
+Returns path to latest file of given type.
+
+For .dat files (in general ambiguous extensions) use full file name.
+Errors if file is not found.
