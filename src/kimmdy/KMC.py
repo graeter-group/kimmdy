@@ -38,8 +38,11 @@ def rfKMC(
         if recipe.avg_rates is not None:
             # 1.1 Calculate the propensity function for each reaction
             avg_weigth = [x[1] - x[0] for x in recipe.avg_timespans]
-            overall_timespan = recipe.avg_timespans[-1][1]-recipe.avg_timespans[0][0]           
-            rates.append(sum(map(lambda x, y: x * y, avg_weigth, recipe.avg_rates))/ overall_timespan)
+            overall_timespan = recipe.avg_timespans[-1][1] - recipe.avg_timespans[0][0]
+            rates.append(
+                sum(map(lambda x, y: x * y, avg_weigth, recipe.avg_rates))
+                / overall_timespan
+            )
         else:
             # 1.2 Calculate the propensity function for each reaction
             curr_rate = integrate(recipe.rates, recipe.times)
@@ -49,7 +52,7 @@ def rfKMC(
     rates_cumulative = np.cumsum(rates)
     total_rate = rates_cumulative[-1]
     # 3. Generate two independent uniform (0,1) random numbers u1,u2
-    u = rng.random(2) 
+    u = rng.random(2)
     logging.debug(
         f"Random values u: {u}, cumulative rates {rates_cumulative}, total rate {total_rate}"
     )
@@ -59,12 +62,15 @@ def rfKMC(
     chosen_recipe = recipes[pos]
     logging.debug(f"Chosen Recipe: {chosen_recipe}")
     # 5. Calculate the time step associated with mu
-    dt = 1/total_rate *np.log(1/u[1])
+    dt = 1 / total_rate * np.log(1 / u[1])
 
     return chosen_recipe, dt, rates
 
+
 def FRM(
-    recipe_collection: RecipeCollection, rng: np.random.BitGenerator = default_rng(), MD_time: Union[float,None] = None
+    recipe_collection: RecipeCollection,
+    rng: np.random.BitGenerator = default_rng(),
+    MD_time: Union[float, None] = None,
 ) -> Recipe:
     """First Reaction Method variant of Kinetic Monte Carlo.
     takes RecipeCollection and choses a recipe based on which reaction would occur.
