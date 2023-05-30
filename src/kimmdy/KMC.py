@@ -7,6 +7,12 @@ import scipy
 from numpy.random import default_rng
 from kimmdy.reaction import RecipeCollection, Recipe
 
+# In our system, the reaction rate r = (deterministic) reaction constant k
+# = stochastic reaction constant c (from gillespie 1977)
+# = propensity a (from Anderson 2007)
+# because of the fundamental premise of chemical kinetics
+# and because we have one reactant molecule
+
 
 def rfKMC(
     recipe_collection: RecipeCollection, rng: np.random.BitGenerator = default_rng()
@@ -32,11 +38,11 @@ def rfKMC(
     constant_rates = []
     recipes_steps = []
     for recipe in recipe_collection.recipes:
-        # 1.1 Calculate the propensity function for each reaction
+        # 1.1 Calculate the constant rate for each reaction
         dt = [x[1] - x[0] for x in recipe.timespans]
         constant_rates.append(sum(map(lambda x, y: x * y, dt, recipe.rates)))
         recipes_steps.append(recipe.recipe_steps)
-    # 2. Set the total propensity to the sum of individual propensities
+    # 2. Set the total rate to the sum of individual rates
     rates_cumulative = np.cumsum(constant_rates)
     total_rate = rates_cumulative[-1]
     # 3. Generate two independent uniform (0,1) random numbers u1,u2
@@ -50,9 +56,9 @@ def rfKMC(
     chosen_recipe = recipes_steps[pos]
     logging.debug(f"Chosen Recipe: {chosen_recipe}")
     # 5. Calculate the time step associated with mu
-    dt = 1 / total_rate * np.log(1 / u[1])
+    time_step = 1 / total_rate * np.log(1 / u[1])
 
-    return chosen_recipe, dt, constant_rates
+    return chosen_recipe, time_step, constant_rates
 
 
 def FRM(
@@ -80,20 +86,25 @@ def FRM(
         return Recipe(), 0, []
 
     # 0. Initialization
-    start_time = recipe_collection.recipes[0].times[0]
-    end_time = recipe_collection.recipes[0].times[-1]
-    resolution = 50  # [1/ps]
-    samples = np.linspace(
-        start_time, end_time, num=resolution * (end_time - start_time)
-    )
-    rates = np.empty((len(recipe_collection.recipes), len(samples)))
+    recipes_steps = []
+    tau = [MD_time] if MD_time else []
+    # conformational change is an event that occurs during MD time
+    # 1. Generate M independent uniform (0,1) random numbers
+    u = rng.random(len(recipe_collection.recipes))
+    # 2. Calculate the cumulative probabilities for each event
     for i, recipe in enumerate(recipe_collection.recipes):
-        # 1.1 Calculate the propensity function for each reaction
-        f = interp1d(recipe.times, recipe.rates, kind="linear", bounds_error=True)
-        # does not deal with implicit 0-rates inbetween explicit rates
-        # use of interpolation is to get uniform time steps?!
-        rates[i] = trapezoid(samples, f(samples))
-        recipes.append(recipe)
-        # add option to convert avg_rates to rates??
+        dt = [x[1] - x[0] for x in recipe.timespans]
+        cumulative_probabilities = np.cumsum(map(lambda x, y: x * y, dt, recipe.rates))
+        # 3. For each event k, find the time until the this reaction takes place tau_k,
+        #    if it is during the time when the propensities are defined (simulation time)
+        if p := np.log(1 / u[i]) <= cumulative_probabilities[-1]:
+            # this means a reaction will take place during the defined time
+            pos_time = np.searchsorted(cumulative_probabilities, p)
+            tau.append(recipe.avg_timespans[pos_time][1])
+            recipes_steps.append(recipe.recipe_steps)
+    # 4. Find the event whose putative time is least
+    pos_event = np.argmin(tau)
+    chosen_recipe = recipes_steps[pos_event]
+    time_step = tau[pos_event]
 
-    return chosen_recipe, dt, rates
+    return chosen_recipe, time_step
