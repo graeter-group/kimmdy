@@ -9,7 +9,7 @@ from kimmdy import config
 from kimmdy.config import Config
 from kimmdy.utils import increment_logfile
 from kimmdy.parsing import read_topol
-from kimmdy.reaction import ConversionType, Reaction, ReactionResult, ConversionRecipe
+from kimmdy.reaction import ReactionPlugin, RecipeCollection, Recipe
 import kimmdy.mdmanager as md
 import kimmdy.changemanager as changer
 from kimmdy.tasks import Task, TaskFiles, TaskMapping
@@ -50,7 +50,7 @@ class RunManager:
         self.iteration = 0
         self.iterations = self.config.iterations
         self.state = State.IDLE
-        self.reaction_result: ReactionResult = ReactionResult([])
+        self.recipe_collection: RecipeCollection = RecipeCollection([])
         self.latest_files: dict[str, Path] = {
             "top": self.config.top,
             "gro": self.config.gro,
@@ -83,13 +83,13 @@ class RunManager:
         }
 
         # Instantiate reactions
-        self.reactions = []
+        self.reaction_plugins: list[ReactionPlugin] = []
         react_names = self.config.reactions.get_attributes()
         # logging.info("Instantiating Reactions:", *react_names)
-        for react_name in react_names:
-            r = plugins[react_name]
-            reaction = r(react_name, self)
-            self.reactions.append(reaction)
+        for rp_name in react_names:
+            r = plugins[rp_name]
+            reaction_plugin: ReactionPlugin = r(rp_name, self)
+            self.reaction_plugins.append(reaction_plugin)
 
         logging.debug("Configuration from input file:")
         logging.debug(pformat(self.config.__dict__))
@@ -260,32 +260,33 @@ class RunManager:
         logging.info("Query reactions")
         self.state = State.REACTION
         # empty list for every new round of queries
-        self.reaction_result: ReactionResult = ReactionResult([])
+        self.recipe_collection: RecipeCollection = RecipeCollection([])
 
-        for reaction in self.reactions:
+        for reaction_plugin in self.reaction_plugins:
             # TODO: refactor into Task
-            files = self._create_task_directory(reaction.name)
+            files = self._create_task_directory(reaction_plugin.name)
 
-            self.reaction_result.outcomes.extend(reaction.get_reaction_result(files))
+            self.recipe_collection.recipes.extend(
+                reaction_plugin.get_recipe_collection(files).recipes
+            )
 
         logging.info("Reaction done")
-        return files  # necessary?
+        return files
 
     def _decide_reaction(
         self,
-        decision_strategy: Callable[
-            [list[ReactionResult]], ConversionRecipe
-        ] = rfKMC,
+        decision_strategy: Callable[[RecipeCollection], Recipe] = rfKMC,
     ):
-        logging.info("Decide on a reaction")
-        logging.debug(f"Available reaction results: {self.reaction_result}")
-        self.chosen_recipe = decision_strategy(self.reaction_result)
+        logging.info("Decide on a recipe")
+        logging.debug(f"Available reaction results: {self.recipe_collection}")
+        # self.chosen_recipe, rates
+        self.chosen_recipe, _ = decision_strategy(self.recipe_collection)
         logging.info("Chosen recipe is:")
         logging.info(self.chosen_recipe)
         return
 
     def _run_recipe(self) -> TaskFiles:
-        logging.info(f"Start Recipe in step {self.iteration}")
+        logging.info(f"Start Recipe in KIMMDY iteration {self.iteration}")
         logging.info(f"Recipe: {self.chosen_recipe}")
 
         files = self._create_task_directory("recipe")

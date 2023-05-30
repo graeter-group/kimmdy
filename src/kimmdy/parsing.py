@@ -103,19 +103,17 @@ def read_topol(path: Path) -> TopologyDict:
         return d
 
 
-def read_edissoc(path:Path) -> dict:
-    '''reads a edissoc file and turns it into a dict.
-    the tuple of bond atoms make up the key, 
+def read_edissoc(path: Path) -> dict:
+    """reads a edissoc file and turns it into a dict.
+    the tuple of bond atoms make up the key,
     the dissociation energy E_dissoc [kJ mol-1] is the value
-    '''
+    """
     with open(path, "r") as f:
         edissocs = {}
         for l in f:
-            at1, at2, edissoc, *_  = l.split()
-            edissocs[frozenset((at1,at2))] = float(edissoc)
+            at1, at2, edissoc, *_ = l.split()
+            edissocs[frozenset((at1, at2))] = float(edissoc)
     return edissocs
-
-
 
 
 def write_topol(top: TopologyDict, outfile: Path):
