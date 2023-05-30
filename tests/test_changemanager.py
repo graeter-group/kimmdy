@@ -13,6 +13,7 @@ from kimmdy.reaction import (
     ReactionOutcome,
     ReactionResult,
 )
+from kimmdy.reaction import Break, Recipe
 
 
 # %%
@@ -33,9 +34,9 @@ ffpatch = Path("amber99sb_patches.xml")
 
 def test_break_bond_plumed():
     plumeddat = read_plumed(Path("plumed.dat"))
-    breakpair = ("9", "15")
+    breakpair = (9, 15)
 
-    recipe = [Conversion(ConversionType.BREAK, breakpair)]
+    recipe = Recipe([Break(*breakpair)], [], [])
 
     changemanager.modify_plumed(
         recipe,

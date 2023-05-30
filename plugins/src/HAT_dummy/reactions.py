@@ -1,9 +1,9 @@
 from kimmdy.reaction import (
-    Conversion,
-    Reaction,
-    ReactionOutcome,
-    ReactionResult,
-    ConversionType,
+    Break,
+    Bind,
+    Recipe,
+    RecipeCollection,
+    ReactionPlugin,
 )
 from .HAT_utils import cap_single_rad, find_radicals
 import logging
@@ -13,11 +13,11 @@ from numpy.random import default_rng
 rng = default_rng()
 
 
-class HAT_reaction(Reaction):
+class HAT_reaction(ReactionPlugin):
     """HAT reaction"""
 
-    def get_reaction_result(self, files) -> ReactionResult:
-        def get_reaction_rates():
+    def get_reaction_result(self, files) -> RecipeCollection:
+        def get_reaction_rate():
             return rng.random()
 
         logging.info("Starting HAT reaction, will do cool things")
@@ -31,11 +31,12 @@ class HAT_reaction(Reaction):
         logging.debug(f"{rads} for {tpr}")
         logging.debug([u.atoms[:20].elements, u.atoms[:20].types])
 
-        outcomes: list[ReactionOutcome] = []
+        recipes = []
         for rad in rads:
             if len(rad.atoms) == 0:
-                logging.info("no radical found, returning zero rate recipe")
-                return [ReactionOutcome([], 0)]
+                logging.debug("no radical found, returning empty RecipeCollection")
+                return RecipeCollection([])
+
             bonded_rad = rad[0].bonded_atoms
             logging.info(f"radical: {rad}")
             logging.info(f"bonded_rad: {bonded_rad}")
@@ -55,13 +56,19 @@ class HAT_reaction(Reaction):
                     "ACE",
                 ]:  # doesn't work with capping groups at the moment
                     rad_nr = str(rad.atoms[0].index + 1)
-                    recipe = [
-                        Conversion(ConversionType.BREAK, (from_H_nr, h_partner_nr)),
-                        Conversion(ConversionType.BIND, (from_H_nr, rad_nr)),
-                    ]
-                    rate = get_reaction_rates()
-                    outcomes.append(ReactionOutcome(recipe, rate))
-                    logging.info(f"Made outcome with recipe: {recipe} and rate: {rate}")
 
-        logging.info(f"Returning exactly these recipes to runmanager: {outcomes}")
-        return outcomes
+                    rate = get_reaction_rate()
+                    recipes.append(
+                        Recipe(
+                            [
+                                Break(from_H_nr, h_partner_nr),
+                                Bind(from_H_nr, rad_nr),
+                            ],
+                            rates=[rate],
+                            times=[u.trajectory[-2].time],
+                        )
+                    )
+                    logging.info(f"Recipe: {recipes[-1]}, rate: {rate}")
+
+        logging.info(f"Returning these recipes to runmanager: {recipes}")
+        return RecipeCollection(recipes)

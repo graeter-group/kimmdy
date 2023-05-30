@@ -524,6 +524,7 @@ class Topology:
         This is typically H for Hydrogen Atom Transfer (HAT).
         """
         f, t = from_to
+        assert self.atoms[f].type == "H", "move_hydrogen called for non-hydrogen!"
         heavy = self.atoms[f].bound_to_nrs.pop()
         if heavy is None:
             logging.error(f"Atom {f} is not bound to anything.")

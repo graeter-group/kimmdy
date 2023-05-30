@@ -1,14 +1,14 @@
 from __future__ import annotations
 import logging
 from typing import Optional
-from kimmdy.reaction import ConversionRecipe, ConversionType
+from kimmdy.reaction import Recipe, Bind, Break, Move
 from kimmdy.parsing import read_topol, write_topol, write_plumed, read_plumed
 from kimmdy.topology.topology import Topology
 from pathlib import Path
 
 
 def modify_top(
-    recipe: ConversionRecipe,
+    recipe: Recipe,
     oldtop: Path,
     newtop: Path,
     ffdir: Path,
@@ -21,14 +21,36 @@ def modify_top(
         topology = Topology(topologyDict, ffdir, ffpatch)
 
     focus = set()
-    for conversion in recipe:
-        focus.add(conversion.atom_idx)
-        if conversion.type == ConversionType.BREAK:
-            topology.break_bond(conversion.atom_idx)
-        elif conversion.type == ConversionType.BIND:
-            topology.bind_bond(conversion.atom_idx)
-        elif conversion.type == ConversionType.MOVE:
-            topology.move_hydrogen(conversion.atom_idx)
+    for step in recipe.recipe_steps:
+        if isinstance(step, Break):
+            topology.break_bond([str(step.atom_idx_1), str(step.atom_idx_2)])
+            focus.add(str(step.atom_idx_1))
+            focus.add(str(step.atom_idx_2))
+        elif isinstance(step, Bind):
+            topology.bind_bond([step.atom_idx_1, step.atom_idx_2])
+            focus.add(str(step.atom_idx_1))
+            focus.add(str(step.atom_idx_2))
+        elif isinstance(step, Move):
+            top_done = False
+            if step.idx_to_bind is not None and step.idx_to_break is None:
+                # implicit H-bond breaking
+                topology.move_hydrogen([step.idx_to_move, step.idx_to_bind])
+                focus.add(str(step.idx_to_move))
+                focus.add(str(step.idx_to_bind))
+                top_done = True
+            if step.idx_to_bind is not None and not top_done:
+                topology.bind_bond([step.idx_to_move, step.idx_to_bind])
+                focus.add(str(step.idx_to_move))
+                focus.add(str(step.idx_to_bind))
+            if step.idx_to_break is not None and not top_done:
+                topology.break_bond([step.idx_to_move, step.idx_to_break])
+                focus.add(str(step.idx_to_move))
+                focus.add(str(step.idx_to_break))
+            if step.new_coords is not None:
+                raise NotImplementedError("Changing coordinates not implemented!")
+
+        else:
+            raise NotImplementedError(f"RecipeStep {step} not implemented!")
     topology._update_dict()
     write_topol(topology.top, newtop)
 
@@ -38,7 +60,7 @@ def modify_top(
 
 
 def modify_plumed(
-    recipe: ConversionRecipe,
+    recipe: Recipe,
     oldplumeddat: Path,
     newplumeddat: Path,
     plumeddist: Path,
@@ -48,11 +70,15 @@ def modify_plumed(
     )
     plumeddat = read_plumed(oldplumeddat)
 
-    for conversion in recipe:
-        if conversion.type == ConversionType.BREAK:
-            plumeddat = break_bond_plumed(plumeddat, conversion.atom_idx, plumeddist)
+    for step in recipe.recipe_steps:
+        if isinstance(step, Break):
+            plumeddat = break_bond_plumed(
+                plumeddat, (step.atom_idx_1, step.atom_idx_2), plumeddist
+            )
+        else:
+            # TODO: handle BIND / MOVE
+            logging.WARNING(f"Plumed changes for {step} not implemented!")
 
-    # TODO: handle BIND / MOVE
     write_plumed(plumeddat, newplumeddat)
 
 

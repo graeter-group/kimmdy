@@ -1,10 +1,10 @@
-from kimmdy.reaction import Reaction, ReactionOutcome, ReactionResult, ConversionRecipe
+from kimmdy.reaction import RecipeCollection, ReactionPlugin
 import logging
 
 
-class dummy_reaction(Reaction):
-    """Dummy reaction, does not change the topology"""
+class dummy_reaction(ReactionPlugin):
+    """Dummy reaction, returns empty RecipeCollection"""
 
-    def get_reaction_result(self, files) -> ReactionResult:
+    def get_recipe_collection(self, files) -> RecipeCollection:
         logging.info("Starting dummy reaction, will do nothing")
-        return [ReactionOutcome([], 0)]
+        return RecipeCollection([])

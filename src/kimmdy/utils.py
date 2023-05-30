@@ -129,25 +129,49 @@ def find_distances(plumedfile, datafile):
     return list_of_pairs_and_distances
 
 
-def morse_transition_rate(r_curr: list[float], r_0: float, E_dis: float, k_f: float, k_0: float = 0.288, kT: float = 2.479):
-    ''' calculates energy barrier crossing rate [in ps]; barrier based on the model V = V_morse - F*X
-    '''
+def morse_transition_rate(
+    r_curr: list[float],
+    r_0: float,
+    E_dis: float,
+    k_f: float,
+    k_0: float = 0.288,
+    kT: float = 2.479,
+):
+    """calculates energy barrier crossing rate [in ps]; barrier based on the model V = V_morse - F*X"""
     r_curr = np.asarray(r_curr)
     beta = np.sqrt(k_f / (2 * E_dis))
 
-    Fs = (2*beta*E_dis*np.exp(-beta * (r_curr - r_0))* (1 - np.exp(-beta * (r_curr - r_0))))
+    Fs = (
+        2
+        * beta
+        * E_dis
+        * np.exp(-beta * (r_curr - r_0))
+        * (1 - np.exp(-beta * (r_curr - r_0)))
+    )
 
     # inflection calculation
     r_infl = (beta * r_0 + np.log(2)) / beta
-    F_infl = (2* beta* E_dis* np.exp(-beta * (r_infl - r_0))* (1 - np.exp(-beta * (r_infl - r_0))))
+    F_infl = (
+        2
+        * beta
+        * E_dis
+        * np.exp(-beta * (r_infl - r_0))
+        * (1 - np.exp(-beta * (r_infl - r_0)))
+    )
     Fs_mask = r_curr > r_infl
     Fs[Fs_mask] = F_infl
 
     # calculate extrema of shifted potential i.o.t. get barrier hight
-    rmin = r_0 - 1 / beta * np.log((beta * E_dis + np.sqrt(beta**2 * E_dis**2 - 2 * E_dis * beta * Fs))/ (2 * beta * E_dis))
-    rmax = r_0 - 1 / beta * np.log((beta * E_dis - np.sqrt(beta**2 * E_dis**2 - 2 * E_dis * beta * Fs))/ (2 * beta * E_dis))
+    rmin = r_0 - 1 / beta * np.log(
+        (beta * E_dis + np.sqrt(beta**2 * E_dis**2 - 2 * E_dis * beta * Fs))
+        / (2 * beta * E_dis)
+    )
+    rmax = r_0 - 1 / beta * np.log(
+        (beta * E_dis - np.sqrt(beta**2 * E_dis**2 - 2 * E_dis * beta * Fs))
+        / (2 * beta * E_dis)
+    )
 
-    Vmax = E_dis * (1 - np.exp(-beta * (rmax - r_0))) ** 2 - Fs * (rmax - r_0)  
+    Vmax = E_dis * (1 - np.exp(-beta * (rmax - r_0))) ** 2 - Fs * (rmax - r_0)
     Vmin = E_dis * (1 - np.exp(-beta * (rmin - r_0))) ** 2 - Fs * (rmin - r_0)
     # Note: F*r should lead to same result as F*(r-r_0) since the shifts in Vmax-Vmin adds up to zero
 
@@ -158,13 +182,14 @@ def morse_transition_rate(r_curr: list[float], r_0: float, E_dis: float, k_f: fl
 
     return k
 
+
 def calc_transition_rate(r_curr, r_0, E_dis, k_f):
     # parameters
     kT = 2.479  # k_B T at 310K #in Gromacs units kj *mol^-1
     # tau =  0.16    #unfitted / theoretical pre-exponential factor #h/kT = 0.16 ps from transition state theory
     k_0 = 0.288  # pre-exponential factor #from fitting averaged C_a - N data to gromacs data, see paper  #or: 1/2pi sqrt(k/m)
 
-    # 
+    #
 
     beta = np.sqrt(k_f / (2 * E_dis))  # [beta] =1/nm since beta = sqrt(k/2D)
 
