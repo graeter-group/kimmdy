@@ -2,14 +2,10 @@ from typing import Union
 
 import logging
 import numpy as np
-import scipy.integrate
+from scipy.interpolate import interp1d
+import scipy
 from numpy.random import default_rng
 from kimmdy.reaction import RecipeCollection, Recipe
-
-
-def integrate(y, x):
-    return scipy.integrate.trapezoid(y, x)
-
 
 def rfKMC(
     recipe_collection: RecipeCollection, rng: np.random.BitGenerator = default_rng()
@@ -29,27 +25,18 @@ def rfKMC(
     # check for empty ReactionResult
     if len(recipe_collection.recipes) == 0:
         logging.warning("Empty ReactionResult; no reaction chosen")
-        return Recipe()
+        return Recipe(), 0 , []
 
     # 0. Initialization
-    rates = []
-    recipes = []
+    constant_rates = []
+    recipes_steps = []
     for recipe in recipe_collection.recipes:
-        if recipe.avg_rates is not None:
-            # 1.1 Calculate the propensity function for each reaction
-            avg_weigth = [x[1] - x[0] for x in recipe.avg_timespans]
-            overall_timespan = recipe.avg_timespans[-1][1] - recipe.avg_timespans[0][0]
-            rates.append(
-                sum(map(lambda x, y: x * y, avg_weigth, recipe.avg_rates))
-                / overall_timespan
-            )
-        else:
-            # 1.2 Calculate the propensity function for each reaction
-            curr_rate = integrate(recipe.rates, recipe.times)
-            rates.append(curr_rate if not np.isnan(curr_rate) else 0)
-        recipes.append(recipe)
+        # 1.1 Calculate the propensity function for each reaction
+        dt = [x[1] - x[0] for x in recipe.timespans]
+        constant_rates.append(sum(map(lambda x, y: x * y, dt, recipe.rates)))
+        recipes_steps.append(recipe.recipe_steps)
     # 2. Set the total propensity to the sum of individual propensities
-    rates_cumulative = np.cumsum(rates)
+    rates_cumulative = np.cumsum(constant_rates)
     total_rate = rates_cumulative[-1]
     # 3. Generate two independent uniform (0,1) random numbers u1,u2
     u = rng.random(2)
@@ -59,12 +46,12 @@ def rfKMC(
 
     # 4. Find the even to carry out, mu, using binary search (np.searchsorted)
     pos = np.searchsorted(rates_cumulative, u[0] * total_rate)
-    chosen_recipe = recipes[pos]
+    chosen_recipe = recipes_steps[pos]
     logging.debug(f"Chosen Recipe: {chosen_recipe}")
     # 5. Calculate the time step associated with mu
     dt = 1 / total_rate * np.log(1 / u[1])
 
-    return chosen_recipe, dt, rates
+    return chosen_recipe, dt, constant_rates
 
 
 def FRM(
@@ -89,4 +76,23 @@ def FRM(
     # check for empty ReactionResult
     if len(recipe_collection.recipes) == 0:
         logging.warning("Empty ReactionResult; no reaction chosen")
-        return Recipe()
+        return Recipe(), 0 , []
+    
+    # 0. Initialization
+    start_time = recipe_collection.recipes[0].times[0]
+    end_time = recipe_collection.recipes[0].times[-1]
+    resolution = 50 # [1/ps]
+    samples = np.linspace(start_time,end_time,num=resolution*(end_time-start_time))
+    rates = np.empty((len(recipe_collection.recipes),len(samples)))
+    for i,recipe in enumerate(recipe_collection.recipes):
+        # 1.1 Calculate the propensity function for each reaction
+        f = interp1d(recipe.times,recipe.rates,kind='linear',bounds_error=True)
+        # does not deal with implicit 0-rates inbetween explicit rates
+        # use of interpolation is to get uniform time steps?!
+        rates[i] = trapezoid(samples,f(samples))
+        recipes.append(recipe)
+        # add option to convert avg_rates to rates??
+
+
+
+    return chosen_recipe, dt, rates
