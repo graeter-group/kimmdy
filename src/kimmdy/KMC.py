@@ -7,6 +7,7 @@ import scipy
 from numpy.random import default_rng
 from kimmdy.reaction import RecipeCollection, Recipe
 
+
 def rfKMC(
     recipe_collection: RecipeCollection, rng: np.random.BitGenerator = default_rng()
 ) -> Recipe:
@@ -25,7 +26,7 @@ def rfKMC(
     # check for empty ReactionResult
     if len(recipe_collection.recipes) == 0:
         logging.warning("Empty ReactionResult; no reaction chosen")
-        return Recipe(), 0 , []
+        return Recipe(), 0, []
 
     # 0. Initialization
     constant_rates = []
@@ -76,23 +77,23 @@ def FRM(
     # check for empty ReactionResult
     if len(recipe_collection.recipes) == 0:
         logging.warning("Empty ReactionResult; no reaction chosen")
-        return Recipe(), 0 , []
-    
+        return Recipe(), 0, []
+
     # 0. Initialization
     start_time = recipe_collection.recipes[0].times[0]
     end_time = recipe_collection.recipes[0].times[-1]
-    resolution = 50 # [1/ps]
-    samples = np.linspace(start_time,end_time,num=resolution*(end_time-start_time))
-    rates = np.empty((len(recipe_collection.recipes),len(samples)))
-    for i,recipe in enumerate(recipe_collection.recipes):
+    resolution = 50  # [1/ps]
+    samples = np.linspace(
+        start_time, end_time, num=resolution * (end_time - start_time)
+    )
+    rates = np.empty((len(recipe_collection.recipes), len(samples)))
+    for i, recipe in enumerate(recipe_collection.recipes):
         # 1.1 Calculate the propensity function for each reaction
-        f = interp1d(recipe.times,recipe.rates,kind='linear',bounds_error=True)
+        f = interp1d(recipe.times, recipe.rates, kind="linear", bounds_error=True)
         # does not deal with implicit 0-rates inbetween explicit rates
         # use of interpolation is to get uniform time steps?!
-        rates[i] = trapezoid(samples,f(samples))
+        rates[i] = trapezoid(samples, f(samples))
         recipes.append(recipe)
         # add option to convert avg_rates to rates??
-
-
 
     return chosen_recipe, dt, rates
