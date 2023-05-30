@@ -29,15 +29,14 @@ def rfKMC(
 
     rates = []
     recipes = []
-    for i, path in enumerate(recipe_collection.recipes):
-        if path.avg_rates != None:
-            avg_weigth = [x[1] - x[0] for x in path.avg_frames]
-            rates.append(sum(map(lambda x, y: x * y, avg_weigth, path.avg_rates)))
+    for recipe in recipe_collection.recipes:
+        if recipe.avg_rates is not None:
+            avg_weigth = [x[1] - x[0] for x in recipe.avg_timespans]
+            rates.append(sum(map(lambda x, y: x * y, avg_weigth, recipe.avg_rates)))
         else:
-            curr_rate = integrate(path.r_ts + 1e-30, path.ts)
-            # nan case could be problematic
-            rates.append(curr_rate if str(curr_rate) != "nan" else 0)
-        recipes.append(path.recipe)
+            curr_rate = integrate(recipe.rates, recipe.times)
+            rates.append(curr_rate if not np.isnan(curr_rate) else 0)
+        recipes.append(recipe)
 
     rates_cumulative = np.cumsum(rates)
     total_rate = rates_cumulative[-1]

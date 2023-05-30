@@ -31,10 +31,6 @@ class Homolysis(ReactionPlugin):
     def get_recipe_collection(self, files: TaskFiles):
         logging.debug("Getting recipe for reaction: homolysis")
 
-        tpr = files.input["tpr"]
-        trr = files.input["trr"]
-        u = mda.Universe(str(tpr), str(trr), topology_format="tpr", format="trr")
-
         plumed_dat = files.input["plumed.dat"]
         distances_dat = files.input["distances.dat"]
         topol_top = files.input["top"]
@@ -60,7 +56,6 @@ class Homolysis(ReactionPlugin):
         }
         lookup_edissoc_atomtype = read_edissoc(edissoc_dat)
 
-        ts = distances["time"]
         recipes = []
         for plumedid, dists in distances.items():
             if plumedid == "time":
@@ -86,16 +81,16 @@ class Homolysis(ReactionPlugin):
 
             print(plumedid, atomids, atomtypes, b0, kb, E_dis)
 
-            k_reaction = morse_transition_rate(dists, b0, E_dis, kb)
+            # k_reaction = morse_transition_rate(dists, b0, E_dis, kb)
             k_avg = calc_av_rate(dists, b0, E_dis, kb)
 
             recipes.append(
                 Recipe(
                     conversions=[Break(*atomids_list)],
                     rates=[k_avg],
-                    frames=[u.trajectory[-1].frame],
+                    frames=distances["time"][-1],
                     avg_rates=[k_avg],
-                    avg_frames=[[u.trajectory[0].frame, u.trajectory[-1].frame]],
+                    avg_frames=[[distances["time"][0], distances["time"][-1]]],
                 )
             )
 

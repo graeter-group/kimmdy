@@ -9,7 +9,7 @@ from kimmdy import config
 from kimmdy.config import Config
 from kimmdy.utils import increment_logfile
 from kimmdy.parsing import read_topol
-from kimmdy.reaction import ReactionPlugin, RecipeCollection, RecipeStep
+from kimmdy.reaction import ReactionPlugin, RecipeCollection, Recipe
 import kimmdy.mdmanager as md
 import kimmdy.changemanager as changer
 from kimmdy.tasks import Task, TaskFiles, TaskMapping
@@ -267,25 +267,26 @@ class RunManager:
             files = self._create_task_directory(reaction_plugin.name)
 
             self.recipe_collection.recipes.extend(
-                reaction_plugin.get_recipe_collection(files)
+                reaction_plugin.get_recipe_collection(files).recipes
             )
 
         logging.info("Reaction done")
-        return files  # necessary?
+        return files
 
     def _decide_reaction(
         self,
-        decision_strategy: Callable[[RecipeCollection], RecipeStep] = rfKMC,
+        decision_strategy: Callable[[RecipeCollection], Recipe] = rfKMC,
     ):
-        logging.info("Decide on a reaction")
+        logging.info("Decide on a recipe")
         logging.debug(f"Available reaction results: {self.recipe_collection}")
-        self.chosen_recipe = decision_strategy(self.recipe_collection)
+        # self.chosen_recipe, rates
+        self.chosen_recipe, _ = decision_strategy(self.recipe_collection)
         logging.info("Chosen recipe is:")
         logging.info(self.chosen_recipe)
         return
 
     def _run_recipe(self) -> TaskFiles:
-        logging.info(f"Start Recipe in step {self.iteration}")
+        logging.info(f"Start Recipe in KIMMDY iteration {self.iteration}")
         logging.info(f"Recipe: {self.chosen_recipe}")
 
         files = self._create_task_directory("recipe")

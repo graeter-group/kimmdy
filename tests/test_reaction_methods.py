@@ -4,18 +4,18 @@ import pytest
 from dataclasses import asdict
 
 
-def test_no_double_frames():
+def test_no_double_times():
     with pytest.raises(ValueError):
-        Recipe([RecipeStep()], rates=[1.0, 2.0, 3.0], frames=[1, 1, 2])
+        Recipe([RecipeStep()], rates=[1.0, 2.0, 3.0], times=[1.0, 1.0, 2.0])
 
 
 def test_combine_recipes():
-    rp1a = Recipe([RecipeStep()], rates=[1], frames=[1])
-    rp1b = Recipe([RecipeStep()], rates=[1], frames=[2])
-    rp2 = Recipe([RecipeStep(), RecipeStep()], rates=[1], frames=[3])
+    rp1a = Recipe([RecipeStep()], rates=[1], times=[1.0])
+    rp1b = Recipe([RecipeStep()], rates=[1], times=[2.0])
+    rp2 = Recipe([RecipeStep(), RecipeStep()], rates=[1], times=[3.0])
 
     rp1a.combine_with(rp1b)
-    assert rp1a.frames == [1, 2]
+    assert rp1a.times == [1, 2]
     assert rp1a.rates == [1, 1]
 
     with pytest.raises(ValueError):
@@ -25,12 +25,12 @@ def test_combine_recipes():
 @pytest.fixture
 def recipe_collection():
     rps = [
-        Recipe([RecipeStep(), RecipeStep(), RecipeStep()], rates=[1], frames=[0]),
-        Recipe([RecipeStep()], rates=[1], frames=[1]),
-        Recipe([RecipeStep()], rates=[1], frames=[2]),
-        Recipe([RecipeStep(), RecipeStep()], rates=[1], frames=[3]),
-        Recipe([RecipeStep()], rates=[1], frames=[4]),
-        Recipe([RecipeStep(), RecipeStep()], rates=[1], frames=[5]),
+        Recipe([RecipeStep(), RecipeStep(), RecipeStep()], rates=[1], times=[0.0]),
+        Recipe([RecipeStep()], rates=[1], times=[1.0]),
+        Recipe([RecipeStep()], rates=[1], times=[2.0]),
+        Recipe([RecipeStep(), RecipeStep()], rates=[1], times=[3.0]),
+        Recipe([RecipeStep()], rates=[1], times=[4.0]),
+        Recipe([RecipeStep(), RecipeStep()], rates=[1], times=[5.0]),
     ]
     return RecipeCollection(rps)
 
@@ -39,8 +39,8 @@ def test_aggregate_recipe_collection(recipe_collection):
     recipe_collection.aggregate_reactions()
 
     assert len(recipe_collection.recipes) == 3
-    assert recipe_collection.recipes[1].frames == [1, 2, 4]
-    assert recipe_collection.recipes[2].frames == [3, 5]
+    assert recipe_collection.recipes[1].times == [1.0, 2.0, 4.0]
+    assert recipe_collection.recipes[2].times == [3.0, 5.0]
 
 
 def test_recipe_collection_to_csv(tmp_path, recipe_collection):
@@ -51,7 +51,7 @@ def test_recipe_collection_to_csv(tmp_path, recipe_collection):
         rows = [r for r in reader]
     for read_rp, org_rp in zip(rows, recipe_collection.recipes):
         org_rp_d = asdict(org_rp)
-        keys_to_check = ["rates", "frames", "avg_rates", "avg_frames"]
+        keys_to_check = ["rates", "times", "avg_rates", "avg_timespans"]
         for key in keys_to_check:
             org_val = str(org_rp_d[key])
             if org_val == "None":

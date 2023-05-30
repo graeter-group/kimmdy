@@ -26,7 +26,7 @@ def find_radical(atoms: list[Atom]):
 class HAT_naive(ReactionPlugin):
     """Naive HAT reaction, selects hydrogens at random"""
 
-    def get_recipe_collectionon(self, files) -> RecipeCollection:
+    def get_recipe_collection(self, files) -> RecipeCollection:
         logging.info("Starting naive HAT reaction")
         top = self.runmng.top
 
@@ -62,9 +62,9 @@ class HAT_naive(ReactionPlugin):
             logging.info(f"from: {top.atoms[f]}")
 
             recipe = Recipe(
-                conversions=[Break(f, h), Bind(h, r)],
+                recipe_steps=[Break(f, h), Bind(h, r)],
                 rates=[1],
-                frames=[u.trajectory[-1].frame],
+                times=[u.trajectory[-1].time],
             )
             return RecipeCollection([recipe])
 
