@@ -1,0 +1,87 @@
+import pytest
+from numpy.random import default_rng
+from kimmdy.reaction import Recipe, RecipeCollection, Break, Bind, Move
+from kimmdy.KMC import rfKMC, FRM
+
+
+@pytest.fixture
+def recipe_collection():
+    rps: list[Recipe] = [
+        Recipe([Break(1, 2)], rates=[0.0], timespans=[[0.0, 1.0]]),
+        Recipe([Bind(2, 3)], rates=[0.12, 0.0], timespans=[[0.0, 6.0], [6.0, 10.0]]),
+        Recipe([Move(3, 4, 5)], rates=[0.15, 0.06], timespans=[[2.0, 4.0], [4.0, 8.0]]),
+        Recipe([Move(4, 5, 6)], rates=[1.0], timespans=[[0.0, 0.0]]),
+    ]
+    return RecipeCollection(rps)
+
+
+@pytest.fixture
+def reference_KMC():
+    KMC_dict = {
+        "chosen_recipe": RecipeCollection(
+            recipes=[
+                Recipe(
+                    recipe_steps=[Bind(atom_idx_1=2, atom_idx_2=3)],
+                    rates=[0.12, 0.0],
+                    timespans=[[0.0, 6.0], [6.0, 10.0]],
+                )
+            ]
+        ),
+        "time_step": 0.04032167624965666,
+        "reaction_probability": [0.0, 0.72, 0.54, 0.0],
+    }
+    return KMC_dict
+
+
+def compare_to_ref(result: dict, reference: dict):
+    assert result["chosen_recipe"].recipes == reference["chosen_recipe"].recipes
+    for i in range(len(reference["reaction_probability"])):
+        assert (
+            abs(
+                result["reaction_probability"][i] - reference["reaction_probability"][i]
+            )
+            < 1e-9
+        )
+
+
+def test_rfKMC_empty():
+    KMC_dict = rfKMC(RecipeCollection([]))
+    assert KMC_dict["chosen_recipe"] == RecipeCollection([])
+
+
+def test_FRM_empty():
+    KMC_dict = FRM(RecipeCollection([]))
+    assert KMC_dict["chosen_recipe"] == RecipeCollection([])
+
+
+def test_rfKMC_unlike_ref(reference_KMC):
+    rng = default_rng(1)
+    # first random numbers are array([0.51182162, 0.9504637])
+    KMC_dict = rfKMC(RecipeCollection([]), rng)
+    with pytest.raises(AssertionError):
+        compare_to_ref(KMC_dict, reference_KMC)
+
+
+def test_rfKMC_calculation(recipe_collection, reference_KMC):
+    rng = default_rng(1)
+    # first random numbers are array([0.51182162, 0.9504637])
+    KMC_dict = rfKMC(recipe_collection, rng)
+    compare_to_ref(KMC_dict, reference_KMC)
+    assert abs(KMC_dict["time_step"] - reference_KMC["time_step"]) < 1e-9
+
+
+def test_FRM_calculation(recipe_collection, reference_KMC):
+    rng = default_rng(1)
+    # first random numbers are array([0.51182162, 0.9504637 , 0.14415961, 0.94864945])
+    # with the seed 0, the second reaction is picked, so that the time step for rfKMC and FRM are equal
+    # because the same random value is used to determine the time step
+    KMC_dict = FRM(recipe_collection, rng, MD_time=10)
+    compare_to_ref(KMC_dict, reference_KMC)
+
+
+def test_FRM_no_event(recipe_collection):
+    rng = default_rng(1)
+    # first random numbers are array([0.51182162, 0.9504637 , 0.14415961, 0.94864945])
+    new_recipes = recipe_collection.recipes[2:4]
+    KMC_dict = FRM(RecipeCollection(new_recipes), rng, MD_time=None)
+    assert KMC_dict["chosen_recipe"] == RecipeCollection([])
