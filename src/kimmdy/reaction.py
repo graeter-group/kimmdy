@@ -143,6 +143,8 @@ class Recipe:
                     f"\trates: {len(self.rates)}\n"
                     f"\timespans: {len(self.timespans)}"
                 )
+            if len(self.rates) < 1:
+                raise ValueError("Recipe empty! Use empty RecipeCollection instead!")
 
         except ValueError as e:
             raise ValueError(
