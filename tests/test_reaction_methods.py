@@ -7,7 +7,7 @@ from dataclasses import asdict
 def test_combine_recipes():
     rp1a = Recipe([RecipeStep()], rates=[1], timespans=[[0.0, 1.0]])
     rp1b = Recipe([RecipeStep()], rates=[1], timespans=[[1.0, 2.0]])
-    rp2 = Recipe([RecipeStep(), RecipeStep()], rates=[1], timespans=[[1.0,3.0]])
+    rp2 = Recipe([RecipeStep(), RecipeStep()], rates=[1], timespans=[[1.0, 3.0]])
 
     rp1a.combine_with(rp1b)
     assert rp1a.timespans == [[0.0, 1.0], [1.0, 2.0]]
@@ -20,7 +20,11 @@ def test_combine_recipes():
 @pytest.fixture
 def recipe_collection():
     rps = [
-        Recipe([RecipeStep(), RecipeStep(), RecipeStep()], rates=[1], timespans=[[0.0, 1.0]]),
+        Recipe(
+            [RecipeStep(), RecipeStep(), RecipeStep()],
+            rates=[1],
+            timespans=[[0.0, 1.0]],
+        ),
         Recipe([RecipeStep()], rates=[1], timespans=[[0.0, 1.0]]),
         Recipe([RecipeStep()], rates=[1], timespans=[[1.0, 2.0]]),
         Recipe([RecipeStep(), RecipeStep()], rates=[1], timespans=[[2.0, 3.0]]),
@@ -34,7 +38,11 @@ def test_aggregate_recipe_collection(recipe_collection):
     recipe_collection.aggregate_reactions()
 
     assert len(recipe_collection.recipes) == 3
-    assert recipe_collection.recipes[1].timespans == [[0.0, 1.0], [1.0, 2.0], [3.0, 4.0]]
+    assert recipe_collection.recipes[1].timespans == [
+        [0.0, 1.0],
+        [1.0, 2.0],
+        [3.0, 4.0],
+    ]
     assert recipe_collection.recipes[2].timespans == [[2.0, 3.0], [4.0, 5.0]]
 
 
