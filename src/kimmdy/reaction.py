@@ -36,15 +36,15 @@ class Move(RecipeStep):
         Bonding partner to form bond with, default None.
     idx_to_break : Union[int, None]
         Bonding partner to break bond with, default None.
-    new_coords : Union[list[float, float, float], None]
-        Optional new xyz coordinates for atom to move to,
-        default None.
+    new_coords : Union[list[list[float, float, float], float] , None]
+        Optional new xyz coordinates for atom to move to, and the associated
+        time in ps default None.
     """
 
     idx_to_move: int
     idx_to_bind: Union[int, None] = None
     idx_to_break: Union[int, None] = None
-    new_coords: Union[list[float, float, float], None] = None
+    new_coords: Union[list[list[float, float, float], float], None] = None
 
 
 @dataclass
@@ -88,8 +88,9 @@ class Recipe:
     rates : list[float]
         Reaction rates corresponding 1:1 to timespans.
     timespans : list[list[float, float]]
-        List of half-open timespans [t1, t2) in ps, at which this reaction
+        List of half-open timespans (t1, t2] in ps, at which this reaction
         path applies. Must have same number of timespans as rates.
+        t1 can equal t2 for the first frame.
 
     """
 
