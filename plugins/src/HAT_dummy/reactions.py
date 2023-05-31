@@ -42,7 +42,7 @@ class HAT_reaction(ReactionPlugin):
             logging.info(f"bonded_rad: {bonded_rad}")
 
             subsystems = cap_single_rad(
-                u, u.trajectory[-2], rad, bonded_rad, h_cutoff=3.5
+                u, u.trajectory[-1], rad, bonded_rad, h_cutoff=3.5
             )
             logging.info("made subsystem")
             for subsystem in subsystems:
@@ -65,7 +65,7 @@ class HAT_reaction(ReactionPlugin):
                                 Bind(from_H_nr, rad_nr),
                             ],
                             rates=[rate],
-                            times=[u.trajectory[-2].time],
+                            timespans=[u.trajectory[0].time, u.trajectory[-1].time],
                         )
                     )
                     logging.info(f"Recipe: {recipes[-1]}, rate: {rate}")
