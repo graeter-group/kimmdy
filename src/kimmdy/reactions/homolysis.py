@@ -88,9 +88,7 @@ class Homolysis(ReactionPlugin):
                 Recipe(
                     conversions=[Break(*atomids_list)],
                     rates=[k_avg],
-                    frames=distances["time"][-1],
-                    avg_rates=[k_avg],
-                    avg_frames=[[distances["time"][0], distances["time"][-1]]],
+                    timespans=[[distances["time"][0], distances["time"][-1]]],
                 )
             )
 

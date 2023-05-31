@@ -86,23 +86,16 @@ class Recipe:
     recipe_steps : list[RecipeStep]
         Single sequence of RecipeSteps to build product
     rates : list[float]
-        Reaction rates corresponding 1:1 to times.
-    times : list[float]
-        List of times in ps, at which this reaction path applies.
-        Must have same number of times as rates.
-    avg_rates : Union[list[float], None]
-        Optional, average rate corresponding to a time range, default None
-    avg_timespans : Union[list[list[float,float]], None]
-        Optional, per averaged rate the first and last time in ps of
-        the averaged interval, default None
+        Reaction rates corresponding 1:1 to timespans.
+    timespans : list[list[float, float]]
+        List of half-open timespans [t1, t2) in ps, at which this reaction
+        path applies. Must have same number of timespans as rates.
 
     """
 
     recipe_steps: list[RecipeStep]
     rates: list[float]
-    times: list[float]
-    avg_rates: Union[list[float], None] = None
-    avg_timespans: Union[list[list[float, float]], None] = None
+    timespans: list[list[float, float]]
 
     def __post_init__(self):
         self.check_consistency()
@@ -138,54 +131,18 @@ class Recipe:
         other.check_consistency()
 
         self.rates += other.rates
-        self.times += other.times
-
-        if other.avg_rates is not None:
-            if self.avg_rates is None:
-                self.avg_rates = other.avg_rates
-                self.avg_timespans = other.avg_timespans
-            else:
-                self.avg_rates += other.avg_rates
-                self.avg_timespans += other.avg_timespans
+        self.timespans += other.timespans
 
     def check_consistency(self):
         """Run consistency checks for correct size of variables"""
         try:
-            if len(self.rates) != len(self.times):
+            if len(self.rates) != len(self.timespans):
                 raise ValueError(
-                    "Times and rates are not of equal length\n"
+                    "Timespans and rates are not of equal length\n"
                     f"\trates: {len(self.rates)}\n"
-                    f"\times: {len(self.times)}"
+                    f"\timespans: {len(self.timespans)}"
                 )
 
-            if self.avg_rates is not None or self.avg_timespans is not None:
-                if self.avg_rates is None or self.avg_timespans is None:
-                    raise ValueError(
-                        "Average times and average rates must be "
-                        "of same type, but one is None\n"
-                        f"\tavg_rates: {type(self.avg_rates)}\n"
-                        f"\tavg_timespans: {type(self.avg_timespans)}"
-                    )
-                if len(self.avg_rates) != len(self.avg_timespans):
-                    raise ValueError(
-                        "Average times and average rates are not of equal length\n"
-                        f"\tavg_rates: {len(self.avg_rates)}\n"
-                        f"\tavg_timespans: {len(self.avg_timespans)}"
-                    )
-
-            double_counter = 0
-            double_times = set()
-            for i, time in enumerate(self.times):
-                for time2 in self.times[i + 1 :]:
-                    if abs(time - time2) < 1e-6:
-                        double_counter += 1
-                        double_times.add(time)
-            if double_counter != 0:
-                raise ValueError(
-                    "Times are not unique! "
-                    f"{double_counter} times found multiple times\n"
-                    f"Times: {double_times}"
-                )
         except ValueError as e:
             raise ValueError(
                 f"Consistency error in Recipe {self.recipe_steps}" "" + e.args[0]
@@ -229,7 +186,7 @@ class RecipeCollection:
     def to_csv(self, path: Path):
         """Write a ReactionResult as defined in the reaction module to a csv file"""
 
-        header = ["recipe_steps", "times", "rates", "avg_timespans", "avg_rates"]
+        header = ["recipe_steps", "timespans", "rates"]
         rows = []
         for i, rp in enumerate(self.recipes):
             rows.append([i] + [rp.__getattribute__(h) for h in header])
@@ -268,7 +225,7 @@ class ReactionPlugin(ABC):
         self.name = name
         self.runmng = runmng
         # sub config, settings of this specific reaction:
-        self.config: Config = self.runmng.config.reactions.attr(self.name)
+        self.config: Config = self.runmng.config.reactions.__getattribute__(self.name)
 
         logging.debug(f"Reaction {self.name} instatiated.")
 
