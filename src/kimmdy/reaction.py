@@ -26,20 +26,41 @@ class RecipeStep(ABC):
     one-based copies must not be passed around.
     """
 
-    def one_based(self):
-        """Returns new RecipeStep using one-based indices"""
-        one_based_self = deepcopy(self)
-        to_convert = [
+    def __post_init__(self):
+        self.is_one_based = False
+        self.to_convert = [
             "idx_to_move",
             "idx_to_bind",
             "idx_to_break",
             "atom_idx_1",
             "atom_idx_2",
         ]
-        for att_name in to_convert:
+
+    def one_based(self):
+        """Returns new RecipeStep using one-based indices"""
+        if self.is_one_based:
+            logging.warn("Requesting conversion to one-base, but is already one-based")
+            return self
+        one_based_self = deepcopy(self)
+        one_based_self.is_one_based = True
+        for att_name in self.to_convert:
             if hasattr(self, att_name):
                 setattr(one_based_self, att_name, getattr(self, att_name) + 1)
         return one_based_self
+
+    def zero_based(self):
+        """Returns new RecipeStep using one-based indices"""
+        if not self.is_one_based:
+            logging.warn(
+                "Requesting conversion to zero-base, but is already zero-based"
+            )
+            return self
+        zero_based_self = deepcopy(self)
+        zero_based_self.is_one_based = False
+        for att_name in self.to_convert:
+            if hasattr(self, att_name):
+                setattr(zero_based_self, att_name, getattr(self, att_name) - 1)
+        return zero_based_self
 
 
 @dataclass
