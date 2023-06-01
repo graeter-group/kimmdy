@@ -14,7 +14,7 @@ from kimmdy.reaction import RecipeCollection, Recipe
 
 def rfKMC(
     recipe_collection: RecipeCollection, rng: np.random.BitGenerator = default_rng()
-) -> RecipeCollection:
+) -> dict:
     """Rejection-Free Monte Carlo.
     takes RecipeCollection and choses a recipe based on the relative propensity of the events.
 
@@ -51,13 +51,13 @@ def rfKMC(
 
     # 4. Find the even to carry out, mu, using binary search (np.searchsorted)
     pos = np.searchsorted(probability_cumulative, u[0] * probability_sum)
-    chosen_recipe = recipes[pos]
-    logging.debug(f"Chosen Recipe: {chosen_recipe}")
+    recipe = recipe_collection.recipes[pos]
+    logging.info(f"Chosen Recipe: {recipe}")
     # 5. Calculate the time step associated with mu
     time_step = 1 / probability_sum * np.log(1 / u[1])
 
     return {
-        "chosen_recipe": RecipeCollection([chosen_recipe]),
+        "recipe_steps": recipe.recipe_steps,
         "time_step": time_step,
         "reaction_probability": reaction_probability,
     }
@@ -67,7 +67,7 @@ def FRM(
     recipe_collection: RecipeCollection,
     rng: np.random.BitGenerator = default_rng(),
     MD_time: Union[float, None] = None,
-) -> RecipeCollection:
+) -> dict:
     """First Reaction Method variant of Kinetic Monte Carlo.
     takes RecipeCollection and choses a recipe based on which reaction would occur.
 
@@ -85,7 +85,11 @@ def FRM(
     # check for empty ReactionResult
     if len(recipe_collection.recipes) == 0:
         logging.warning("Empty ReactionResult; no reaction chosen")
-        return {"chosen_recipe": RecipeCollection([])}
+        return {
+            "recipe_steps": None,
+            "time_step": None,
+            "reaction_probability": None,
+        }
 
     # 0. Initialization
     reaction_probability = []
@@ -120,7 +124,7 @@ def FRM(
         return {"chosen_recipe": RecipeCollection([])}
 
     return {
-        "chosen_recipe": RecipeCollection([chosen_recipe]),
+        "recipe_steps": chosen_recipe.recipe_steps,
         "time_step": time_step,
         "reaction_probability": reaction_probability,
     }
