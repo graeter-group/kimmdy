@@ -22,6 +22,7 @@ def modify_top(
 
     focus = set()
     for step in recipe_steps:
+        step = step.one_based()
         if isinstance(step, Break):
             topology.break_bond([str(step.atom_idx_1), str(step.atom_idx_2)])
             focus.add(str(step.atom_idx_1))
