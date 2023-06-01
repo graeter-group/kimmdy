@@ -226,6 +226,7 @@ class Topology:
             bo = ATOMTYPE_BONDORDER_FLAT.get(atom.type)
             if bo and bo > len(atom.bound_to_nrs):
                 atom.is_radical = True
+                self.radicals[atom.nr] = atom
             else:
                 atom.is_radical = False
 
