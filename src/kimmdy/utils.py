@@ -129,6 +129,62 @@ def find_distances(plumedfile, datafile):
     return list_of_pairs_and_distances
 
 
+def get_atominfo_from_plumedid(
+    plumedid: str, plumed: dict, top: dict
+) -> tuple[frozenset, frozenset]:
+    """returns atomtypes for a plumedid with information from the plumed and topology file"""
+    lookup_atomid_plumedid = {
+        entry["id"]: frozenset(entry["atoms"]) for entry in plumed["distances"]
+    }
+    lookup_atomtype_atomid = {atom[0]: atom[1] for atom in top["atoms"]}
+    atomids = lookup_atomid_plumedid[plumedid]
+    atomids_list = list(atomids)
+    atomtypes_list = [
+        lookup_atomtype_atomid[atomids_list[0]],
+        lookup_atomtype_atomid[atomids_list[1]],
+    ]
+    atomtypes = frozenset(atomtypes_list)
+    logging.debug(f"Found atomtypes {atomtypes} for plumedid {plumedid}.")
+    return atomtypes, atomids
+
+
+def get_bondprm_from_atomtypes(
+    atomtypes: frozenset, ffbonded: dict, lookup_edissoc_atomtype: dict
+):
+    """returns bond parameters (b0, kb, E_dis) for a set of atomtypes"""
+    atomtypes_list = list(atomtypes)
+    lookup_ffbonded_atomtype = {
+        frozenset(l[:2]): [float(l[3]), float(l[4])]
+        for l in ffbonded["bondtypes"]["other"]
+    }
+    atomelements_list = [x[0] for x in atomtypes_list]
+
+    # dissociation energy can be for bonds between atomtypes or elements or mixtures of both
+    for comb in [
+        atomtypes_list,
+        [atomtypes_list[0], atomelements_list[1]],
+        [atomelements_list[0], atomtypes_list[1]],
+        atomelements_list,
+    ]:
+        if (comb_set := frozenset(comb)) in lookup_edissoc_atomtype.keys():
+            E_dis = lookup_edissoc_atomtype[comb_set]
+            break
+    else:
+        raise KeyError(
+            f"Did not find dissociation energy for atomtypes {atomtypes} in edissoc file"
+        )
+
+    try:
+        b0, kb = lookup_ffbonded_atomtype[atomtypes]
+    except KeyError as e:
+        raise KeyError(
+            f"Did not find bond parameters for atomtypes {atomtypes} in ffbonded file"
+        ) from e
+
+    logging.debug(f"Found bondprm {[b0,kb,E_dis]} for atomtypes {atomtypes}.")
+    return float(b0), float(kb), float(E_dis)
+
+
 def morse_transition_rate(
     r_curr: list[float],
     r_0: float,
@@ -141,13 +197,7 @@ def morse_transition_rate(
     r_curr = np.asarray(r_curr)
     beta = np.sqrt(k_f / (2 * E_dis))
 
-    Fs = (
-        2
-        * beta
-        * E_dis
-        * np.exp(-beta * (r_curr - r_0))
-        * (1 - np.exp(-beta * (r_curr - r_0)))
-    )
+    Fs = 2* beta* E_dis* np.exp(-beta * (r_curr - r_0))* (1 - np.exp(-beta * (r_curr - r_0)))
 
     # inflection calculation
     r_infl = (beta * r_0 + np.log(2)) / beta
@@ -170,17 +220,16 @@ def morse_transition_rate(
         (beta * E_dis - np.sqrt(beta**2 * E_dis**2 - 2 * E_dis * beta * Fs))
         / (2 * beta * E_dis)
     )
-
+    # set rmax to r0 * 10 where no rmax can be found
+    rmax = np.where(~np.isfinite(rmax),10 *r_0,rmax)
     Vmax = E_dis * (1 - np.exp(-beta * (rmax - r_0))) ** 2 - Fs * (rmax - r_0)
     Vmin = E_dis * (1 - np.exp(-beta * (rmin - r_0))) ** 2 - Fs * (rmin - r_0)
     # Note: F*r should lead to same result as F*(r-r_0) since the shifts in Vmax-Vmin adds up to zero
 
     delta_V = Vmax - Vmin
     k = k_0 * np.exp(-delta_V / kT)  # [1/ps]
-    k_mask = Fs < 0
-    k[k_mask] = 0
 
-    return k
+    return k, Fs
 
 
 def calc_transition_rate(r_curr, r_0, E_dis, k_f):
@@ -239,7 +288,7 @@ def calc_transition_rate(r_curr, r_0, E_dis, k_f):
         float(r_curr) > rmax
     ):  # already jumped over the barrier? Even if not "open" in gromacs morse potential?
         pass
-    if F <= 0.0:  # negative force: Vmax -> infinity impliying k -> 0
+    if F <= 0.0:  # negative force: Vmax -> infinity impliying k -> ~0
         k = 0.0
         # logging.info('Found negative force, most likely due to compression. Rate replaced with zero.')
 

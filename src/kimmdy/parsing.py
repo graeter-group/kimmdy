@@ -214,15 +214,15 @@ def read_distances_dat(distances_dat: Path):
     return d
 
 
-def read_plumed_distances(plumed_dat: Path, distances_dat: Path):
-    plumed = read_plumed(plumed_dat)
-    distances = read_distances_dat(distances_dat)
+# def read_plumed_distances(plumed_dat: Path, distances_dat: Path):
+#     plumed = read_plumed(plumed_dat)
+#     distances = read_distances_dat(distances_dat)
 
-    atoms = {
-        x["id"]: x["atoms"] for x in plumed["distances"] if x["keyword"] == "DISTANCE"
-    }
+#     atoms = {
+#         x["id"]: x["atoms"] for x in plumed["distances"] if x["keyword"] == "DISTANCE"
+#     }
 
-    return atoms
+#     return atoms
 
 
 def read_xml_ff(path: Path) -> ET.Element:
