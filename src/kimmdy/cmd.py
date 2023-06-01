@@ -1,3 +1,4 @@
+# %%
 import argparse
 import logging
 from pathlib import Path
@@ -117,10 +118,16 @@ def kimmdy_run(
     input: Path = Path("kimmdy.yml"),
     loglevel: str = "DEBUG",
     logfile: Path = Path("kimmdy.log"),
+    checkpoint: str = "",
+    concat: bool = False,
 ):
     """Run KIMMDY from python."""
     args = argparse.Namespace(
-        input=input, loglevel=loglevel, logfile=logfile, checkpoint=""
+        input=input,
+        loglevel=loglevel,
+        logfile=logfile,
+        checkpoint=checkpoint,
+        concat=concat,
     )
     _run(args)
     logging.shutdown()
