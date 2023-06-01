@@ -10,7 +10,6 @@ from kimmdy.config import Config
 from kimmdy.utils import increment_logfile
 from kimmdy.parsing import read_topol
 from kimmdy.reaction import ReactionPlugin, RecipeCollection, Recipe
-import kimmdy.mdmanager as md
 import kimmdy.changemanager as changer
 from kimmdy.tasks import Task, TaskFiles, TaskMapping
 from kimmdy.utils import run_shell_cmd
@@ -275,27 +274,27 @@ class RunManager:
 
     def _decide_reaction(
         self,
-        decision_strategy: Callable[[RecipeCollection], Recipe] = rfKMC,
+        decision_strategy: Callable[[RecipeCollection], dict] = rfKMC,
     ):
         logging.info("Decide on a recipe")
         logging.debug(f"Available reaction results: {self.recipe_collection}")
-        # self.chosen_recipe, rates
-        self.chosen_recipe, *_ = decision_strategy(self.recipe_collection)
+        decision_d = decision_strategy(self.recipe_collection)
+        self.recipe_steps = decision_d["recipe_steps"]
         logging.info("Chosen recipe is:")
-        logging.info(self.chosen_recipe)
+        logging.info(self.recipe_steps)
         return
 
     def _run_recipe(self) -> TaskFiles:
         logging.info(f"Start Recipe in KIMMDY iteration {self.iteration}")
-        logging.info(f"Recipe: {self.chosen_recipe}")
+        logging.info(f"Recipe: {self.recipe_steps}")
 
         files = self._create_task_directory("recipe")
 
         files.output = {"top": files.outputdir / "topol_mod.top"}
 
-        logging.debug(f"Chose recipe: {self.chosen_recipe}")
+        logging.debug(f"Chose recipe: {self.recipe_steps}")
         changer.modify_top(
-            self.chosen_recipe,
+            self.recipe_steps,
             files.input["top"],
             files.output["top"],
             files.input["ff"],
@@ -307,7 +306,7 @@ class RunManager:
         if "plumed.dat" in self.latest_files:
             files.output["plumed.dat"] = files.outputdir / "plumed_mod.dat"
             changer.modify_plumed(
-                self.chosen_recipe,
+                self.recipe_steps,
                 files.input["plumed.dat"],
                 files.output["plumed.dat"],
                 files.input["distances.dat"],
