@@ -226,6 +226,7 @@ class Topology:
             bo = ATOMTYPE_BONDORDER_FLAT.get(atom.type)
             if bo and bo > len(atom.bound_to_nrs):
                 atom.is_radical = True
+                self.radicals[atom.nr] = atom
             else:
                 atom.is_radical = False
 
@@ -523,8 +524,10 @@ class Topology:
 
         This is typically H for Hydrogen Atom Transfer (HAT).
         """
-        f, t = from_to
-        assert self.atoms[f].type == "H", "move_hydrogen called for non-hydrogen!"
+        f, t = list(map(str, from_to))
+        assert (
+            self.atoms[f].type[0] == "H"
+        ), f"move_hydrogen called for non-hydrogen! type: {self.atoms[f].type}"
         heavy = self.atoms[f].bound_to_nrs.pop()
         if heavy is None:
             logging.error(f"Atom {f} is not bound to anything.")
