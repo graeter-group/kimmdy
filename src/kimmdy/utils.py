@@ -197,7 +197,13 @@ def morse_transition_rate(
     r_curr = np.asarray(r_curr)
     beta = np.sqrt(k_f / (2 * E_dis))
 
-    Fs = 2* beta* E_dis* np.exp(-beta * (r_curr - r_0))* (1 - np.exp(-beta * (r_curr - r_0)))
+    Fs = (
+        2
+        * beta
+        * E_dis
+        * np.exp(-beta * (r_curr - r_0))
+        * (1 - np.exp(-beta * (r_curr - r_0)))
+    )
 
     # inflection calculation
     r_infl = (beta * r_0 + np.log(2)) / beta
@@ -221,7 +227,7 @@ def morse_transition_rate(
         / (2 * beta * E_dis)
     )
     # set rmax to r0 * 10 where no rmax can be found
-    rmax = np.where(~np.isfinite(rmax),10 *r_0,rmax)
+    rmax = np.where(~np.isfinite(rmax), 10 * r_0, rmax)
     Vmax = E_dis * (1 - np.exp(-beta * (rmax - r_0))) ** 2 - Fs * (rmax - r_0)
     Vmin = E_dis * (1 - np.exp(-beta * (rmin - r_0))) ** 2 - Fs * (rmin - r_0)
     # Note: F*r should lead to same result as F*(r-r_0) since the shifts in Vmax-Vmin adds up to zero

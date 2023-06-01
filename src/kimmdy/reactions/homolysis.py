@@ -10,7 +10,7 @@ from kimmdy.utils import (
     calc_av_rate,
     morse_transition_rate,
     get_atominfo_from_plumedid,
-    get_bondprm_from_atomtypes
+    get_bondprm_from_atomtypes,
 )
 from kimmdy.parsing import (
     read_topol,
@@ -33,7 +33,7 @@ class Homolysis(ReactionPlugin):
     def get_recipe_collection(self, files: TaskFiles):
         logging.debug("Getting recipe for reaction: homolysis")
 
-        # Initialization of filepaths 
+        # Initialization of filepaths
         plumed_dat = files.input["plumed.dat"]
         distances_dat = files.input["distances.dat"]
         topol_top = files.input["top"]
@@ -43,11 +43,11 @@ class Homolysis(ReactionPlugin):
         # Initialization of objects from files
         distances = read_distances_dat(distances_dat)
         plumed = read_plumed(plumed_dat)
-        top = read_topol(topol_top)        
+        top = read_topol(topol_top)
         ffbonded = read_rtp(ffbonded_itp)
         edissoc = read_edissoc(edissoc_dat)
 
-        # 
+        #
         recipes = []
         for plumedid, dists in distances.items():
             if plumedid == "time":
@@ -56,9 +56,11 @@ class Homolysis(ReactionPlugin):
             atomtypes, atomids = get_atominfo_from_plumedid(plumedid, plumed, top)
             b0, kb, E_dis = get_bondprm_from_atomtypes(atomtypes, ffbonded, edissoc)
 
-            logging.debug(f"plumedid: {plumedid}, atomids: {atomids}, atomtypes: {atomtypes}, b0: {b0}, kb: {kb}, E_dis: {E_dis}")
+            logging.debug(
+                f"plumedid: {plumedid}, atomids: {atomids}, atomtypes: {atomtypes}, b0: {b0}, kb: {kb}, E_dis: {E_dis}"
+            )
 
-            k_avg, _ = morse_transition_rate([sum(dists)/len(dists)], b0, E_dis, kb)
+            k_avg, _ = morse_transition_rate([sum(dists) / len(dists)], b0, E_dis, kb)
             # averaging distances works here because we typically have
             # one conformational state per calculation
 

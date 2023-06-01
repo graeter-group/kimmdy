@@ -20,7 +20,7 @@ from kimmdy.topology.topology import Topology
 from kimmdy.KMC import rfKMC
 
 # file types of which there will be multiple files per type
-AMBIGUOUS_SUFFS = ["dat", "xvg", "log","itp"]
+AMBIGUOUS_SUFFS = ["dat", "xvg", "log", "itp"]
 # are there cases where we have multiple trr files?
 
 
