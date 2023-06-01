@@ -7,7 +7,6 @@ from kimmdy.reaction import (
 )
 from kimmdy.tasks import TaskFiles
 from kimmdy.utils import (
-    calc_av_rate,
     morse_transition_rate,
     get_atominfo_from_plumedid,
     get_bondprm_from_atomtypes,
@@ -67,7 +66,7 @@ class Homolysis(ReactionPlugin):
             recipes.append(
                 Recipe(
                     recipe_steps=[Break(*list(atomids))],
-                    rates=[k_avg],
+                    rates=[*k_avg],
                     timespans=[[distances["time"][0], distances["time"][-1]]],
                 )
             )

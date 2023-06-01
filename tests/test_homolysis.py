@@ -17,9 +17,7 @@ from kimmdy.parsing import (
 from kimmdy.utils import (
     get_atominfo_from_plumedid,
     get_bondprm_from_atomtypes,
-    calc_av_rate,
     morse_transition_rate,
-    calc_transition_rate,
 )
 from kimmdy.tasks import TaskFiles
 
@@ -130,3 +128,9 @@ def test_get_recipe_collection(tmp_path):
     for recipe in rc.recipes:
         assert len(recipe.recipe_steps) == 1
         assert type(recipe.recipe_steps[0]) == type(Break(1, 2))
+        assert len(recipe.rates) == 1
+        assert type(recipe.rates[0]) in [float, np.float32, np.float64]
+        assert len(recipe.timespans) == 1
+        assert len(recipe.timespans[0]) == 2
+        for time in recipe.timespans[0]:
+            assert type(time) in [float, np.float32, np.float64]
