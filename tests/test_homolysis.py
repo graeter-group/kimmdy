@@ -129,4 +129,4 @@ def test_get_recipe_collection(tmp_path):
     assert len(rc.recipes) == len(plumed["distances"])
     for recipe in rc.recipes:
         assert len(recipe.recipe_steps) == 1
-        assert type(recipe.recipe_steps[0]) == Break(1, 2)
+        assert type(recipe.recipe_steps[0]) == type(Break(1, 2))
