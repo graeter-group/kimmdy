@@ -150,7 +150,7 @@ class AtomType:
             id_sym=l[0],
             at_num=l[1],
             mass=l[2],
-            charge=l[3],           
+            charge=l[3],
             ptype=l[4],
             sigma=l[5],
             epsilon=l[6],
