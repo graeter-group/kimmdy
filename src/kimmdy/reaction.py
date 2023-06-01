@@ -11,6 +11,7 @@ import logging
 from pathlib import Path
 import dill
 import csv
+from copy import deepcopy
 
 # Necessary before 3.11: https://peps.python.org/pep-0673/
 from typing import TypeVar
@@ -20,9 +21,25 @@ TypeRecipe = TypeVar("TypeRecipe", bound="Recipe")
 
 @dataclass
 class RecipeStep(ABC):
-    """ABC for all RecipeSteps."""
+    """ABC for all RecipeSteps.
+    Indices should be zero-based by default,
+    one-based copies must not be passed around.
+    """
 
-    pass
+    def one_based(self):
+        """Returns new RecipeStep using one-based indices"""
+        one_based_self = deepcopy(self)
+        to_convert = [
+            "idx_to_move",
+            "idx_to_bind",
+            "idx_to_break",
+            "atom_idx_1",
+            "atom_idx_2",
+        ]
+        for att_name in to_convert:
+            if hasattr(self, att_name):
+                setattr(one_based_self, att_name, getattr(self, att_name) + 1)
+        return one_based_self
 
 
 @dataclass

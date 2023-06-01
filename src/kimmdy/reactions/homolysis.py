@@ -84,6 +84,9 @@ class Homolysis(ReactionPlugin):
             # k_reaction = morse_transition_rate(dists, b0, E_dis, kb)
             k_avg = calc_av_rate(dists, b0, E_dis, kb)
 
+            # converto to zero-base
+            atomids_list = [i - 1 for i in atomids_list]
+
             recipes.append(
                 Recipe(
                     conversions=[Break(*atomids_list)],

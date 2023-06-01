@@ -48,14 +48,14 @@ class HAT_reaction(ReactionPlugin):
             for subsystem in subsystems:
                 from_H = subsystem["meta"]["indices"][0]
                 h_partner = u.atoms[from_H].bonded_atoms[0]
-                from_H_nr = str(u.atoms[from_H].index + 1)
-                h_partner_nr = str(h_partner.index + 1)
+                from_H_nr = str(u.atoms[from_H].index)
+                h_partner_nr = str(h_partner.index)
                 logging.info(u.atoms[from_H].resname)
                 if u.atoms[from_H].resname not in [
                     "NME",
                     "ACE",
                 ]:  # doesn't work with capping groups at the moment
-                    rad_nr = str(rad.atoms[0].index + 1)
+                    rad_nr = str(rad.atoms[0].index)
 
                     rate = get_reaction_rate()
                     recipes.append(
