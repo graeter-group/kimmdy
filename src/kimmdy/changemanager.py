@@ -1,14 +1,14 @@
 from __future__ import annotations
 import logging
 from typing import Optional
-from kimmdy.reaction import Recipe, Bind, Break, Move
+from kimmdy.reaction import Recipe, Bind, Break, Move, RecipeStep
 from kimmdy.parsing import read_topol, write_topol, write_plumed, read_plumed
 from kimmdy.topology.topology import Topology
 from pathlib import Path
 
 
 def modify_top(
-    recipe: Recipe,
+    recipe_steps: list[RecipeStep],
     oldtop: Path,
     newtop: Path,
     ffdir: Path,
@@ -21,7 +21,7 @@ def modify_top(
         topology = Topology(topologyDict, ffdir, ffpatch)
 
     focus = set()
-    for step in recipe.recipe_steps:
+    for step in recipe_steps:
         if isinstance(step, Break):
             topology.break_bond([str(step.atom_idx_1), str(step.atom_idx_2)])
             focus.add(str(step.atom_idx_1))
@@ -60,7 +60,7 @@ def modify_top(
 
 
 def modify_plumed(
-    recipe: Recipe,
+    recipe_steps: list[RecipeStep],
     oldplumeddat: Path,
     newplumeddat: Path,
     plumeddist: Path,
@@ -70,7 +70,7 @@ def modify_plumed(
     )
     plumeddat = read_plumed(oldplumeddat)
 
-    for step in recipe.recipe_steps:
+    for step in recipe_steps:
         if isinstance(step, Break):
             plumeddat = break_bond_plumed(
                 plumeddat, (step.atom_idx_1, step.atom_idx_2), plumeddist
