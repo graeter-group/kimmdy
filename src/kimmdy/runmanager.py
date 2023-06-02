@@ -16,7 +16,7 @@ from kimmdy.utils import run_shell_cmd
 from pprint import pformat
 from kimmdy import plugins
 from kimmdy.topology.topology import Topology
-from kimmdy.kmc import rfKMC
+from kimmdy.kmc import rf_kmc
 
 # file types of which there will be multiple files per type
 AMBIGUOUS_SUFFS = ["dat", "xvg", "log", "itp"]
@@ -274,7 +274,7 @@ class RunManager:
 
     def _decide_reaction(
         self,
-        decision_strategy: Callable[[RecipeCollection], dict] = rfKMC,
+        decision_strategy: Callable[[RecipeCollection], dict] = rf_kmc,
     ):
         logging.info("Decide on a recipe")
         logging.debug(f"Available reaction results: {self.recipe_collection}")
