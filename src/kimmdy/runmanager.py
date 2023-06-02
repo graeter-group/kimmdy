@@ -16,7 +16,7 @@ from kimmdy.utils import run_shell_cmd
 from pprint import pformat
 from kimmdy import plugins
 from kimmdy.topology.topology import Topology
-from kimmdy.KMC import rfKMC
+from kimmdy.kmc import rfKMC
 
 # file types of which there will be multiple files per type
 AMBIGUOUS_SUFFS = ["dat", "xvg", "log", "itp"]

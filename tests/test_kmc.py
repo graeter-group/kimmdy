@@ -1,7 +1,7 @@
 import pytest
 from numpy.random import default_rng
 from kimmdy.reaction import Recipe, RecipeCollection, Break, Bind, Move
-from kimmdy.KMC import rfKMC, FRM
+from kimmdy.kmc import rfKMC, FRM
 
 
 @pytest.fixture
