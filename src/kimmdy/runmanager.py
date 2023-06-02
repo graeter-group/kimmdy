@@ -19,7 +19,7 @@ from kimmdy.topology.topology import Topology
 from kimmdy.KMC import rfKMC
 
 # file types of which there will be multiple files per type
-AMBIGUOUS_SUFFS = ["dat", "xvg", "log"]
+AMBIGUOUS_SUFFS = ["dat", "xvg", "log", "mdp"]
 # are there cases where we have multiple trr files?
 
 
@@ -32,6 +32,26 @@ class State(Enum):
     MD = auto()
     REACTION = auto()
     DONE = auto()
+
+
+def get_existing_files(config: Config):
+    """Initialize latest_files with every existing file defined in config
+    """    
+    file_d = {}
+    attr_names = filter(lambda s: s[0] != "_", config.__dir__())
+    for attr_name in attr_names:
+        attr = getattr(config, attr_name)
+        if isinstance(attr, Path):
+            if not attr.exists():
+                continue
+            key = attr.suffix[1:] # rm the get_existing_files
+            # AMBIGUOUS_SUFFS -> key whole name
+            if attr.suffix[1:] in AMBIGUOUS_SUFFS:
+                key = attr.name
+            file_d[key] = attr
+        elif isinstance(attr, Config):
+            file_d.update(get_existing_files(attr))
+    return file_d
 
 
 class RunManager:
@@ -50,13 +70,9 @@ class RunManager:
         self.iterations = self.config.iterations
         self.state = State.IDLE
         self.recipe_collection: RecipeCollection = RecipeCollection([])
-        self.latest_files: dict[str, Path] = {
-            "top": self.config.top,
-            "gro": self.config.gro,
-            "idx": self.config.idx,
-            "trr": "",
-            "edr": "",
-        }
+        self.latest_files: dict[str, Path] = get_existing_files(config)
+        logging.debug("Initialized latest files:")
+        logging.debug(pformat(self.latest_files))
         self.histfile = increment_logfile(Path(f"{self.config.out}_history.log"))
         self.cptfile = increment_logfile(Path(f"{self.config.out}_kimmdy.cpt"))
         try:
