@@ -36,10 +36,18 @@ kimmdy.constants module
    :undoc-members:
    :show-inheritance:
 
-kimmdy.mdmanager module
------------------------
+kimmdy.coordinatemanager module
+-------------------------------
 
-.. automodule:: kimmdy.mdmanager
+.. automodule:: kimmdy.coordinatemanager
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+kimmdy.kmc module
+-----------------
+
+.. automodule:: kimmdy.kmc
    :members:
    :undoc-members:
    :show-inheritance:

@@ -10,10 +10,9 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/underscore.js"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script src="../../_static/sphinx_highlight.js"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -26,11 +25,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../index.html" class="icon icon-home"> kimmdy
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            kimmdy
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -54,7 +57,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a></li>
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
       <li class="breadcrumb-item active">kimmdy.config</li>
       <li class="wy-breadcrumbs-aside">
@@ -67,12 +70,13 @@
              
   <h1>Source code for kimmdy.config</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
 <span class="kn">import</span> <span class="nn">yaml</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
 <span class="kn">from</span> <span class="nn">kimmdy</span> <span class="kn">import</span> <span class="n">plugins</span>
-<span class="kn">from</span> <span class="nn">kimmdy.reaction</span> <span class="kn">import</span> <span class="n">Reaction</span>
+<span class="kn">from</span> <span class="nn">kimmdy.reaction</span> <span class="kn">import</span> <span class="n">ReactionPlugin</span>
 
 
 <div class="viewcode-block" id="check_file_exists"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.config.check_file_exists">[docs]</a><span class="k">def</span> <span class="nf">check_file_exists</span><span class="p">(</span><span class="n">p</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
@@ -83,7 +87,7 @@
 
 
 <div class="viewcode-block" id="Sequence"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.config.Sequence">[docs]</a><span class="k">class</span> <span class="nc">Sequence</span><span class="p">(</span><span class="nb">list</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;A sequence of tasks.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A sequence of tasks.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tasks</span><span class="p">:</span> <span class="nb">list</span><span class="p">):</span>
         <span class="nb">list</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -98,25 +102,32 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">task</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="Mds"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.config.Mds">[docs]</a><span class="k">class</span> <span class="nc">Mds</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+
 <span class="n">type_scheme</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;experiment&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="s2">&quot;run&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="s2">&quot;dryrun&quot;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
     <span class="s2">&quot;iterations&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="s2">&quot;out&quot;</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+    <span class="s2">&quot;gromacs_alias&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="s2">&quot;ff&quot;</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+    <span class="s2">&quot;ffpatch&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
     <span class="s2">&quot;top&quot;</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
     <span class="s2">&quot;gro&quot;</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
     <span class="s2">&quot;idx&quot;</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
-    <span class="s2">&quot;plumed&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="s2">&quot;minimization&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;mdp&quot;</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="s2">&quot;tpr&quot;</span><span class="p">:</span> <span class="n">Path</span><span class="p">},</span>
-    <span class="s2">&quot;equilibration&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;nvt&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;mdp&quot;</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="s2">&quot;tpr&quot;</span><span class="p">:</span> <span class="n">Path</span><span class="p">},</span>
-        <span class="s2">&quot;npt&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;mdp&quot;</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="s2">&quot;tpr&quot;</span><span class="p">:</span> <span class="n">Path</span><span class="p">},</span>
+    <span class="s2">&quot;mds&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;*&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;mdp&quot;</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+            <span class="s2">&quot;plumed&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;dat&quot;</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="s2">&quot;distances&quot;</span><span class="p">:</span> <span class="n">Path</span><span class="p">},</span>
+            <span class="s2">&quot;prefix&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="s2">&quot;overwrite&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="p">}</span>
     <span class="p">},</span>
-    <span class="s2">&quot;equilibrium&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;mdp&quot;</span><span class="p">:</span> <span class="n">Path</span><span class="p">},</span>
-    <span class="s2">&quot;prod&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;mdp&quot;</span><span class="p">:</span> <span class="n">Path</span><span class="p">},</span>
-    <span class="s2">&quot;changer&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;coordinates&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;md&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;mdp&quot;</span><span class="p">:</span> <span class="n">Path</span><span class="p">}}},</span>
+    <span class="s2">&quot;changer&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;coordinates&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;md&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">}},</span>
     <span class="s2">&quot;reactions&quot;</span><span class="p">:</span> <span class="p">{},</span>
     <span class="s2">&quot;sequence&quot;</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">,</span>
 <span class="p">}</span>
@@ -124,36 +135,12 @@
 <span class="c1"># classes for static code analysis</span>
 
 
-<div class="viewcode-block" id="MinimizationConfig"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.config.MinimizationConfig">[docs]</a><span class="k">class</span> <span class="nc">MinimizationConfig</span><span class="p">:</span>
-    <span class="n">mdp</span><span class="p">:</span> <span class="n">Path</span>
-    <span class="n">tpr</span><span class="p">:</span> <span class="n">Path</span></div>
-
-
-<div class="viewcode-block" id="NvtConfig"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.config.NvtConfig">[docs]</a><span class="k">class</span> <span class="nc">NvtConfig</span><span class="p">:</span>
-    <span class="n">mdp</span><span class="p">:</span> <span class="n">Path</span>
-    <span class="n">tpr</span><span class="p">:</span> <span class="n">Path</span></div>
-
-
-<div class="viewcode-block" id="NptConfig"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.config.NptConfig">[docs]</a><span class="k">class</span> <span class="nc">NptConfig</span><span class="p">:</span>
-    <span class="n">mdp</span><span class="p">:</span> <span class="n">Path</span>
-    <span class="n">tpr</span><span class="p">:</span> <span class="n">Path</span></div>
-
-
-<div class="viewcode-block" id="EquilibrationConfig"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.config.EquilibrationConfig">[docs]</a><span class="k">class</span> <span class="nc">EquilibrationConfig</span><span class="p">:</span>
-    <span class="n">nvt</span><span class="p">:</span> <span class="n">NvtConfig</span>
-    <span class="n">npt</span><span class="p">:</span> <span class="n">NptConfig</span></div>
-
-
-<div class="viewcode-block" id="MdConfig"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.config.MdConfig">[docs]</a><span class="k">class</span> <span class="nc">MdConfig</span><span class="p">:</span>
-    <span class="n">mdp</span><span class="p">:</span> <span class="n">Path</span></div>
-
-
-<div class="viewcode-block" id="CoordinatesConfig"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.config.CoordinatesConfig">[docs]</a><span class="k">class</span> <span class="nc">CoordinatesConfig</span><span class="p">:</span>
-    <span class="n">md</span><span class="p">:</span> <span class="n">MdConfig</span></div>
+<div class="viewcode-block" id="MDrefConfig"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.config.MDrefConfig">[docs]</a><span class="k">class</span> <span class="nc">MDrefConfig</span><span class="p">:</span>
+    <span class="n">md</span><span class="p">:</span> <span class="nb">str</span></div>
 
 
 <div class="viewcode-block" id="ChangerConfig"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.config.ChangerConfig">[docs]</a><span class="k">class</span> <span class="nc">ChangerConfig</span><span class="p">:</span>
-    <span class="n">coordinates</span><span class="p">:</span> <span class="n">CoordinatesConfig</span></div>
+    <span class="n">coordinates</span><span class="p">:</span> <span class="n">MDrefConfig</span></div>
 
 
 <div class="viewcode-block" id="HomolysisConfig"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.config.HomolysisConfig">[docs]</a><span class="k">class</span> <span class="nc">HomolysisConfig</span><span class="p">:</span>
@@ -165,7 +152,7 @@
     <span class="n">homolysis</span><span class="p">:</span> <span class="n">HomolysisConfig</span></div>
 
 
-<div class="viewcode-block" id="ProdConfig"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.config.ProdConfig">[docs]</a><span class="k">class</span> <span class="nc">ProdConfig</span><span class="p">:</span>
+<div class="viewcode-block" id="PullConfig"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.config.PullConfig">[docs]</a><span class="k">class</span> <span class="nc">PullConfig</span><span class="p">:</span>
     <span class="n">mdp</span><span class="p">:</span> <span class="n">Path</span></div>
 
 
@@ -175,7 +162,7 @@
 
 <div class="viewcode-block" id="Config"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.config.Config">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Internal representation of the configuration generated</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Internal representation of the configuration generated</span>
 <span class="sd">    from the input file, which enables validation before running</span>
 <span class="sd">    and computationally expensive operations.</span>
 <span class="sd">    All settings read from the input file are accessible through nested attributes.</span>
@@ -193,21 +180,20 @@
 
     <span class="n">run</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">experiment</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>  <span class="c1"># obsolete??</span>
     <span class="n">dryrun</span><span class="p">:</span> <span class="nb">bool</span>
     <span class="n">iterations</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">out</span><span class="p">:</span> <span class="n">Path</span>
+    <span class="n">gromacs_alias</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">ff</span><span class="p">:</span> <span class="n">Path</span>
+    <span class="n">ffpatch</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span>
     <span class="n">top</span><span class="p">:</span> <span class="n">Path</span>
     <span class="n">gro</span><span class="p">:</span> <span class="n">Path</span>
     <span class="n">idx</span><span class="p">:</span> <span class="n">Path</span>
-    <span class="n">plumed</span><span class="p">:</span> <span class="kc">None</span>
-    <span class="n">minimization</span><span class="p">:</span> <span class="n">MinimizationConfig</span>
-    <span class="n">equilibration</span><span class="p">:</span> <span class="n">EquilibrationConfig</span>
-    <span class="n">equilibrium</span><span class="p">:</span> <span class="n">MdConfig</span>
+    <span class="n">mds</span><span class="p">:</span> <span class="nb">dict</span>
     <span class="n">changer</span><span class="p">:</span> <span class="n">ChangerConfig</span>
     <span class="n">reactions</span><span class="p">:</span> <span class="n">ReactionsConfig</span>
-    <span class="n">prod</span><span class="p">:</span> <span class="n">ProdConfig</span>
+    <span class="n">pull</span><span class="p">:</span> <span class="n">PullConfig</span>
     <span class="n">sequence</span><span class="p">:</span> <span class="n">SequenceConfig</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -250,7 +236,7 @@
                         <span class="n">logging</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
                             <span class="sa">f</span><span class="s2">&quot;Plugin </span><span class="si">{</span><span class="n">plg_name</span><span class="si">}</span><span class="s2"> could not be loaded!</span><span class="se">\n</span><span class="si">{</span><span class="n">plugin</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
                         <span class="p">)</span>
-                    <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">plugin</span><span class="p">),</span> <span class="n">Reaction</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">plugin</span><span class="p">),</span> <span class="n">ReactionPlugin</span><span class="p">):</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">type_scheme</span><span class="p">[</span><span class="s2">&quot;reactions&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">plugin</span><span class="o">.</span><span class="n">type_scheme</span><span class="p">)</span>
                         <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type_scheme</span><span class="p">[</span><span class="s2">&quot;reactions&quot;</span><span class="p">])</span>
 
@@ -258,9 +244,10 @@
         <span class="k">if</span> <span class="n">recursive_dict</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">recursive_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-                    <span class="n">val</span> <span class="o">=</span> <span class="n">Config</span><span class="p">(</span>
-                        <span class="n">recursive_dict</span><span class="o">=</span><span class="n">val</span><span class="p">,</span> <span class="n">type_scheme</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">type_scheme</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-                    <span class="p">)</span>
+                    <span class="n">recursiv_type_s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">type_scheme</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">recursiv_type_s</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">recursiv_type_s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">type_scheme</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">)</span>
+                    <span class="n">val</span> <span class="o">=</span> <span class="n">Config</span><span class="p">(</span><span class="n">recursive_dict</span><span class="o">=</span><span class="n">val</span><span class="p">,</span> <span class="n">type_scheme</span><span class="o">=</span><span class="n">recursiv_type_s</span><span class="p">)</span>
                 <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Set attribute: </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
 
@@ -293,11 +280,15 @@
                 <span class="k">assert</span> <span class="n">ffs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">is_dir</span><span class="p">(),</span> <span class="s2">&quot;Forcefield should be a directory!&quot;</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">ff</span> <span class="o">=</span> <span class="n">ffs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
 
+            <span class="c1"># assert hasattr(self,&#39;mds&#39;), &quot;MD section not defined in config file!&quot;</span>
+            <span class="c1"># for attribute in self.mds.get_attributes():</span>
+            <span class="c1">#     self.mds.attr(attribute).mdp = Path(self.mds.attr(attribute).mdp)</span>
+
             <span class="bp">self</span><span class="o">.</span><span class="n">_cast_types</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_validate</span><span class="p">()</span>
 
 <div class="viewcode-block" id="Config.get_attributes"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.config.Config.get_attributes">[docs]</a>    <span class="k">def</span> <span class="nf">get_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Get a list of all attributes&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a list of all attributes&quot;&quot;&quot;</span>
         <span class="nb">repr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="nb">repr</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;type_scheme&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">repr</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
@@ -308,18 +299,24 @@
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="nb">repr</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Config.attr"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.config.Config.attr">[docs]</a>    <span class="k">def</span> <span class="nf">attr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attribute</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Get the value of a specific attribute.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the value of a specific attribute.</span>
 <span class="sd">        Alias for self.__getattribute__</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">attribute</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">_cast_types</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Casts types defined in `type_scheme` to raw attributes.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">_cast_types</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">to_type_wildcard</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Casts types defined in `type_scheme` to raw attributes.&quot;&quot;&quot;</span>
         <span class="n">attr_names</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__dir__</span><span class="p">())</span>
         <span class="k">for</span> <span class="n">attr_name</span> <span class="ow">in</span> <span class="n">attr_names</span><span class="p">:</span>
             <span class="n">to_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">type_scheme</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attr_name</span><span class="p">)</span>
             <span class="n">attr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">attr_name</span><span class="p">)</span>
 
+            <span class="k">if</span> <span class="n">attr_name</span> <span class="o">==</span> <span class="s2">&quot;type_scheme&quot;</span> <span class="ow">or</span> <span class="nb">callable</span><span class="p">(</span><span class="n">attr</span><span class="p">):</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># handle wildcard attr</span>
+            <span class="k">if</span> <span class="n">to_type_wildcard</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">to_type</span> <span class="o">=</span> <span class="n">to_type_wildcard</span>
             <span class="k">if</span> <span class="n">to_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">attr</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -328,7 +325,10 @@
 
                 <span class="c1"># nested:</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">to_type</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-                    <span class="n">attr</span><span class="o">.</span><span class="n">_cast_types</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="nb">list</span><span class="p">(</span><span class="n">to_type</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">==</span> <span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">]:</span>
+                        <span class="n">attr</span><span class="o">.</span><span class="n">_cast_types</span><span class="p">(</span><span class="n">to_type</span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">])</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">attr</span><span class="o">.</span><span class="n">_cast_types</span><span class="p">()</span>
                     <span class="k">continue</span>
                 <span class="c1"># wrap single element if it should be a list</span>
                 <span class="k">elif</span> <span class="n">to_type</span> <span class="ow">is</span> <span class="nb">list</span><span class="p">:</span>
@@ -349,7 +349,7 @@
                 <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_validate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Validates attributes read from config file.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validates attributes read from config file.&quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">attr_names</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__dir__</span><span class="p">())</span>
             <span class="k">for</span> <span class="n">attr_name</span> <span class="ow">in</span> <span class="n">attr_names</span><span class="p">:</span>
@@ -361,18 +361,31 @@
                 <span class="c1"># Check files from scheme</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span> <span class="n">Path</span><span class="p">):</span>
                     <span class="bp">self</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="n">attr_name</span><span class="p">,</span> <span class="n">attr</span><span class="o">.</span><span class="n">resolve</span><span class="p">())</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">str</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span>
-                        <span class="s2">&quot;distances.dat&quot;</span>
-                    <span class="p">]:</span>  <span class="c1"># distances.dat wouldn&#39;t exist prior to the run</span>
+                    <span class="c1"># distances.dat wouldn&#39;t exist prior to the run</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">str</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;distances.dat&quot;</span><span class="p">]:</span>
                         <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span>
                         <span class="n">check_file_exists</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span>
 
                 <span class="c1"># Validate sequence</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">):</span>
                     <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">attr</span><span class="p">:</span>
-                        <span class="k">assert</span> <span class="nb">hasattr</span><span class="p">(</span>
-                            <span class="bp">self</span><span class="p">,</span> <span class="n">task</span>
-                        <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;Task </span><span class="si">{</span><span class="n">task</span><span class="si">}</span><span class="s2"> listed in sequence, but not defined!&quot;</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task</span><span class="p">):</span>
+                            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;mds&quot;</span><span class="p">):</span>
+                                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mds</span><span class="p">,</span> <span class="n">task</span><span class="p">):</span>
+                                    <span class="k">continue</span>
+                            <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span>
+                                <span class="sa">f</span><span class="s2">&quot;Task </span><span class="si">{</span><span class="n">task</span><span class="si">}</span><span class="s2"> listed in sequence, but not defined!&quot;</span>
+                            <span class="p">)</span>
+
+                <span class="c1"># Validate changer reference</span>
+                <span class="k">if</span> <span class="n">attr_name</span> <span class="o">==</span> <span class="s2">&quot;raw&quot;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;changer&quot;</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">changer</span><span class="p">,</span> <span class="s2">&quot;coordinates&quot;</span><span class="p">):</span>
+                            <span class="k">if</span> <span class="s2">&quot;md&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">changer</span><span class="o">.</span><span class="n">coordinates</span><span class="o">.</span><span class="n">get_attributes</span><span class="p">():</span>
+                                <span class="k">assert</span> <span class="p">(</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">changer</span><span class="o">.</span><span class="n">coordinates</span><span class="o">.</span><span class="n">md</span>
+                                    <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mds</span><span class="o">.</span><span class="n">get_attributes</span><span class="p">()</span>
+                                <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;Relax MD </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">changer</span><span class="o">.</span><span class="n">coordinates</span><span class="o">.</span><span class="n">md</span><span class="si">}</span><span class="s2"> not in MD section!&quot;</span>
 
                 <span class="c1"># Validate reaction plugins</span>
                 <span class="k">if</span> <span class="n">attr_name</span> <span class="o">==</span> <span class="s2">&quot;reactions&quot;</span><span class="p">:</span>
@@ -384,7 +397,7 @@
 
         <span class="k">except</span> <span class="ne">AssertionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Validating input failed!</span><span class="se">\n</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">e</span><span class="p">)</span></div>
+            <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="n">e</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

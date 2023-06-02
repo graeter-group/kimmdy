@@ -10,10 +10,9 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/underscore.js"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script src="../../_static/sphinx_highlight.js"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -26,11 +25,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../index.html" class="icon icon-home"> kimmdy
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            kimmdy
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -54,7 +57,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a></li>
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
       <li class="breadcrumb-item active">kimmdy.parsing</li>
       <li class="wy-breadcrumbs-aside">
@@ -69,10 +72,10 @@
 <span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Iterable</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Generator</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
 <span class="kn">import</span> <span class="nn">xml.etree.ElementTree</span> <span class="k">as</span> <span class="nn">ET</span>
 <span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">takewhile</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
 
 <span class="n">TopologyDict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span>
 
@@ -102,10 +105,10 @@
 
 
 <div class="viewcode-block" id="extract_section_name"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.parsing.extract_section_name">[docs]</a><span class="k">def</span> <span class="nf">extract_section_name</span><span class="p">(</span><span class="n">ls</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
-    <span class="sd">&quot;&quot;&quot;takes a list of lines and return a tuple</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;takes a list of lines and return a tuple</span>
 <span class="sd">    with the name and the lines minus the</span>
 <span class="sd">    line that contained the name.</span>
-<span class="sd">    Returns the empty string if no name was found.</span>
+<span class="sd">    Returns the empty string as the name if no name was found.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ls</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">l</span> <span class="ow">and</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;;&quot;</span> <span class="ow">and</span> <span class="s2">&quot;[&quot;</span> <span class="ow">in</span> <span class="n">l</span><span class="p">:</span>
@@ -119,7 +122,7 @@
 <div class="viewcode-block" id="create_subsections"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.parsing.create_subsections">[docs]</a><span class="k">def</span> <span class="nf">create_subsections</span><span class="p">(</span><span class="n">ls</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]):</span>
     <span class="n">d</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">subsection_name</span> <span class="o">=</span> <span class="s2">&quot;other&quot;</span>
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ls</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ls</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;[&quot;</span><span class="p">:</span>
             <span class="n">subsection_name</span> <span class="o">=</span> <span class="n">l</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
@@ -155,12 +158,11 @@
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">sections</span> <span class="o">=</span> <span class="n">get_sections</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">d</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sections</span><span class="p">):</span>
-            <span class="c1"># skip empty sections</span>
-            <span class="k">if</span> <span class="n">s</span> <span class="o">==</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]:</span>
-                <span class="k">continue</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sections</span> <span class="k">if</span> <span class="n">s</span> <span class="ow">is</span> <span class="ow">not</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]]):</span>
             <span class="n">name</span><span class="p">,</span> <span class="n">content</span> <span class="o">=</span> <span class="n">extract_section_name</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
             <span class="n">content</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">split</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">content</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">split</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">content</span> <span class="o">==</span> <span class="p">[]:</span>
+                <span class="k">continue</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="p">:</span>
                 <span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;BLOCK </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="c1"># sections can be duplicated.</span>
@@ -172,9 +174,24 @@
         <span class="k">return</span> <span class="n">d</span></div>
 
 
+<div class="viewcode-block" id="read_edissoc"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.parsing.read_edissoc">[docs]</a><span class="k">def</span> <span class="nf">read_edissoc</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;reads a edissoc file and turns it into a dict.</span>
+<span class="sd">    the tuple of bond atoms make up the key,</span>
+<span class="sd">    the dissociation energy E_dissoc [kJ mol-1] is the value</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">edissocs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">at1</span><span class="p">,</span> <span class="n">at2</span><span class="p">,</span> <span class="n">edissoc</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">l</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="n">edissocs</span><span class="p">[</span><span class="nb">frozenset</span><span class="p">((</span><span class="n">at1</span><span class="p">,</span> <span class="n">at2</span><span class="p">))]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">edissoc</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">edissocs</span></div>
+
+
 <div class="viewcode-block" id="write_topol"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.parsing.write_topol">[docs]</a><span class="k">def</span> <span class="nf">write_topol</span><span class="p">(</span><span class="n">top</span><span class="p">:</span> <span class="n">TopologyDict</span><span class="p">,</span> <span class="n">outfile</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">outfile</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">title</span><span class="p">,</span> <span class="n">content</span> <span class="ow">in</span> <span class="n">top</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">content</span> <span class="o">==</span> <span class="p">[]:</span>
+                <span class="k">continue</span>
             <span class="k">if</span> <span class="n">title</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;BLOCK &quot;</span><span class="p">):</span>
                 <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
@@ -210,7 +227,7 @@
 
 
 <div class="viewcode-block" id="read_plumed"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.parsing.read_plumed">[docs]</a><span class="k">def</span> <span class="nf">read_plumed</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Read a plumed.dat configuration file.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read a plumed.dat configuration file.&quot;&quot;&quot;</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">distances</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">prints</span> <span class="o">=</span> <span class="p">[]</span>
@@ -244,7 +261,7 @@
 
 
 <div class="viewcode-block" id="write_plumed"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.parsing.write_plumed">[docs]</a><span class="k">def</span> <span class="nf">write_plumed</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Write a plumed.dat configuration file.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Write a plumed.dat configuration file.&quot;&quot;&quot;</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;distances&quot;</span><span class="p">]:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">l</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">l</span><span class="p">[</span><span class="s1">&#39;keyword&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> ATOMS=</span><span class="si">{</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="s1">&#39;atoms&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -256,25 +273,27 @@
 
 
 <div class="viewcode-block" id="read_distances_dat"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.parsing.read_distances_dat">[docs]</a><span class="k">def</span> <span class="nf">read_distances_dat</span><span class="p">(</span><span class="n">distances_dat</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Read a distances.dat plumed output file.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read a distances.dat plumed output file.&quot;&quot;&quot;</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">distances_dat</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">colnames</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()[</span><span class="mi">10</span><span class="p">:]</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="n">c</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">colnames</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">l</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">colnames</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+                <span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
 
-    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">distances_dat</span><span class="p">,</span> <span class="n">delim_whitespace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">skiprows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">colnames</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">d</span></div>
 
 
-<div class="viewcode-block" id="read_plumed_distances"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.parsing.read_plumed_distances">[docs]</a><span class="k">def</span> <span class="nf">read_plumed_distances</span><span class="p">(</span><span class="n">plumed_dat</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">distances_dat</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
-    <span class="n">plumed</span> <span class="o">=</span> <span class="n">read_plumed</span><span class="p">(</span><span class="n">plumed_dat</span><span class="p">)</span>
-    <span class="c1"># plumed[&#39;distances&#39;]: [{&#39;id&#39;: &#39;d0&#39;, &#39;keyword&#39;: &#39;DISTANCE&#39;, &#39;atoms&#39;: [&#39;5&#39;, &#39;7&#39;]}]</span>
+<span class="c1"># def read_plumed_distances(plumed_dat: Path, distances_dat: Path):</span>
+<span class="c1">#     plumed = read_plumed(plumed_dat)</span>
+<span class="c1">#     distances = read_distances_dat(distances_dat)</span>
 
-    <span class="n">distances</span> <span class="o">=</span> <span class="n">read_distances_dat</span><span class="p">(</span><span class="n">distances_dat</span><span class="p">)</span>
-    <span class="c1"># distances is a pd DataFrame with time and id&#39;s -&gt; distance</span>
+<span class="c1">#     atoms = {</span>
+<span class="c1">#         x[&quot;id&quot;]: x[&quot;atoms&quot;] for x in plumed[&quot;distances&quot;] if x[&quot;keyword&quot;] == &quot;DISTANCE&quot;</span>
+<span class="c1">#     }</span>
 
-    <span class="n">atoms</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="n">x</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]:</span> <span class="n">x</span><span class="p">[</span><span class="s2">&quot;atoms&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">plumed</span><span class="p">[</span><span class="s2">&quot;distances&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="s2">&quot;keyword&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;DISTANCE&quot;</span>
-    <span class="p">}</span>
-
-    <span class="k">return</span> <span class="n">atoms</span></div>
+<span class="c1">#     return atoms</span>
 
 
 <div class="viewcode-block" id="read_xml_ff"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.parsing.read_xml_ff">[docs]</a><span class="k">def</span> <span class="nf">read_xml_ff</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ET</span><span class="o">.</span><span class="n">Element</span><span class="p">:</span>
