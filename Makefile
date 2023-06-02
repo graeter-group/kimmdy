@@ -21,3 +21,6 @@ help:
 	@$(SPHINXAPIDOC) -f -o "$(SOURCEDIR)" src/kimmdy
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
+preview:
+	python -m http.server --directory docs
+
