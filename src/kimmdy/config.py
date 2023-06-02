@@ -47,7 +47,7 @@ type_scheme = {
     "ffpatch": None,
     "top": Path,
     "gro": Path,
-    "idx": Path,
+    "ndx": Path,
     "mds": {
         "*": {
             "mdp": Path,
@@ -118,7 +118,7 @@ class Config:
     ffpatch: Optional[Path]
     top: Path
     gro: Path
-    idx: Path
+    ndx: Path
     mds: dict
     changer: ChangerConfig
     reactions: ReactionsConfig
