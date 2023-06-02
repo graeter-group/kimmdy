@@ -5,7 +5,7 @@ gromacs_alias: 'gmx'
 ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
 top: 'Ala_out.top'
 gro: 'npt.gro'
-idx: 'index.ndx'
+ndx: 'index.ndx'
 mds:
   equilibrium:
     mdp: 'md.mdp'
