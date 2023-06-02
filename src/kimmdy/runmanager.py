@@ -183,6 +183,15 @@ class RunManager:
                 suffix = path.suffix[1:]
                 if suffix in AMBIGUOUS_SUFFS:
                     suffix = path.name
+                if files.output.get(suffix) is not None:
+                    if files.output[suffix] == files.outputdir / path:
+                        logging.error(
+                            "_discover_output_files wants to overwrite files.output!"
+                        )
+                        logging.error(f"Suffix {suffix}")
+                        logging.error(f"From {files.output[suffix]}")
+                        logging.error(f"To {files.outputdir / path}")
+                    continue
                 files.output[suffix] = files.outputdir / path
 
             logging.debug("Update latest files with: ")
@@ -265,8 +274,8 @@ class RunManager:
             files.output = {"plumed.dat": md_config.plumed.dat}
             # add plumed.dat to output to indicate it as current plumed.dat file
 
-        run_shell_cmd(grompp_cmd, outputdir)
-        run_shell_cmd(mdrun_cmd, outputdir)
+        # specify trr to prevent rotref trr getting set as standard trr
+        files.output["trr"] = files.outputdir / f"{instance}.trr"
 
         logging.info(f"Done with MD {instance}")
         return files
