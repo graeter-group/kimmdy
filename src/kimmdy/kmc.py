@@ -12,7 +12,7 @@ from kimmdy.reaction import RecipeCollection, Recipe
 # and because we have one reactant molecule
 
 
-def rfKMC(
+def rf_kmc(
     recipe_collection: RecipeCollection, rng: np.random.BitGenerator = default_rng()
 ) -> dict:
     """Rejection-Free Monte Carlo.
@@ -63,7 +63,7 @@ def rfKMC(
     }
 
 
-def FRM(
+def frm(
     recipe_collection: RecipeCollection,
     rng: np.random.BitGenerator = default_rng(),
     MD_time: Union[float, None] = None,
