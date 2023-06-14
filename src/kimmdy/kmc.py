@@ -11,6 +11,7 @@ from kimmdy.reaction import RecipeCollection, Recipe
 # because of the fundamental premise of chemical kinetics
 # and because we have one reactant molecule
 
+
 def get_empty_results():
     # is None or [] better to handle for the runmanager?
     # is there a better way to define an empty result?
@@ -19,6 +20,7 @@ def get_empty_results():
         "time_step": None,
         "reaction_probability": None,
     }
+
 
 def rf_kmc(
     recipe_collection: RecipeCollection, rng: np.random.BitGenerator = default_rng()
@@ -39,8 +41,6 @@ def rf_kmc(
     if len(recipe_collection.recipes) == 0:
         logging.warning("Empty ReactionResult; no reaction chosen")
         return get_empty_results()
-
-    
 
     # 0. Initialization
     reaction_probability = []
