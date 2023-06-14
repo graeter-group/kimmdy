@@ -11,6 +11,14 @@ from kimmdy.reaction import RecipeCollection, Recipe
 # because of the fundamental premise of chemical kinetics
 # and because we have one reactant molecule
 
+def get_empty_results():
+    # is None or [] better to handle for the runmanager?
+    # is there a better way to define an empty result?
+    return {
+        "recipe_steps": None,
+        "time_step": None,
+        "reaction_probability": None,
+    }
 
 def rf_kmc(
     recipe_collection: RecipeCollection, rng: np.random.BitGenerator = default_rng()
@@ -30,7 +38,9 @@ def rf_kmc(
     # check for empty ReactionResult
     if len(recipe_collection.recipes) == 0:
         logging.warning("Empty ReactionResult; no reaction chosen")
-        return {"chosen_recipe": RecipeCollection([])}
+        return get_empty_results()
+
+    
 
     # 0. Initialization
     reaction_probability = []
@@ -85,15 +95,11 @@ def frm(
     # check for empty ReactionResult
     if len(recipe_collection.recipes) == 0:
         logging.warning("Empty ReactionResult; no reaction chosen")
-        return {
-            "recipe_steps": None,
-            "time_step": None,
-            "reaction_probability": None,
-        }
+        return get_empty_results()
 
     # 0. Initialization
     reaction_probability = []
-    recipes = ["MD"] if MD_time else []
+    recipes_steps = [["MD"]] if MD_time else []
     tau = [MD_time] if MD_time else []
     # conformational change is an event that occurs during MD time
     # 1. Generate M independent uniform (0,1) random numbers
@@ -111,20 +117,20 @@ def frm(
             # this means a reaction will take place during the defined time
             pos_time = np.searchsorted(cumulative_probability, p)
             tau.append(recipe.timespans[pos_time][1])
-            recipes.append(recipe)
+            recipes_steps.append(recipe.recipe_steps)
     # 4. Find the event whose putative time is least
     try:
         pos_event = np.argmin(tau)
-        chosen_recipe = recipes[pos_event]
+        chosen_steps = recipes_steps[pos_event]
         time_step = tau[pos_event]
     except ValueError:
         logging.warning(
             f"FRM recipe selection did not work, probably tau: {tau} is empty."
         )
-        return {"chosen_recipe": RecipeCollection([])}
+        return get_empty_results()
 
     return {
-        "recipe_steps": chosen_recipe.recipe_steps,
+        "recipe_steps": chosen_steps,
         "time_step": time_step,
         "reaction_probability": reaction_probability,
     }
