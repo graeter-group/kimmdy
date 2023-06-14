@@ -4,8 +4,18 @@ import logging
 from pathlib import Path
 import MDAnalysis as MDA
 from scipy.spatial.transform import Rotation
-
+from contextlib import contextmanager
 from kimmdy.config import Config
+import os
+
+@contextmanager
+def pushd(path):
+    prev = os.getcwd()
+    os.chdir(path)
+    try:
+        yield
+    finally:
+        os.chdir(prev)
 
 
 def increment_logfile(f: Path) -> Path:

@@ -1,9 +1,11 @@
+import os
 from pathlib import Path
 from collections.abc import Iterable
 from typing import Generator
 from copy import deepcopy
 import xml.etree.ElementTree as ET
 from itertools import takewhile
+from kimmdy.utils import pushd
 
 TopologyDict = dict[str, list[list[str]]]
 
@@ -79,18 +81,42 @@ def read_rtp(path: Path) -> dict:
 
         return d
 
+def resolve_includes(path: Path) -> list[str]:
+    """Resolve #include statements in a (top/itp) file."""
+    dir = path.parent
+    fname = path.name
+    cwd = Path.cwd()
+    os.chdir(dir)
+    ls_prime = []
+    with open(fname, "r") as f:
+        for l in f:
+            l = "".join(takewhile(is_not_comment, l)).strip()
+            if not l: continue
+            if l.startswith("#include"):
+                path = Path(l.split('"')[1])
+                try:
+                    ls_prime.extend(resolve_includes(path))
+                except Exception as e:
+                    ls_prime.append(l)
+            else:
+                ls_prime.append(l)
+
+    os.chdir(cwd)
+    return ls_prime
+
 
 def read_topol(path: Path) -> TopologyDict:
     # TODO look into following #includes
     # TODO look into [ intermolecule ] section
-    with open(path, "r") as f:
-        sections = get_sections(f, "\n")
-        d = {}
-        for i, s in enumerate([s for s in sections if s is not [""]]):
-            name, content = extract_section_name(s)
-            content = [c.split() for c in content if len(c.split()) > 0]
-            if content == []:
-                continue
+    ls = resolve_includes(path)
+    return ls
+    sections = get_sections(f, "\n")
+    d = {}
+    for i, s in enumerate([s for s in sections if s is not [""]]):
+        name, content = extract_section_name(s)
+        content = [c.split() for c in content if len(c.split()) > 0]
+        if content == []:
+            continue
             if not name:
                 name = f"BLOCK {i}"
             # sections can be duplicated.
