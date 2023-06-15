@@ -2,8 +2,9 @@ from typing import Union
 
 import logging
 import numpy as np
+from dataclasses import dataclass
 from numpy.random import default_rng
-from kimmdy.reaction import RecipeCollection, Recipe
+from kimmdy.reaction import RecipeCollection, RecipeStep
 
 # In our system, the reaction rate r = (deterministic) reaction constant k
 # = stochastic reaction constant c (from gillespie 1977)
@@ -12,14 +13,23 @@ from kimmdy.reaction import RecipeCollection, Recipe
 # and because we have one reactant molecule
 
 
-def get_empty_results():
-    # is None or [] better to handle for the runmanager?
-    # is there a better way to define an empty result?
-    return {
-        "recipe_steps": None,
-        "time_step": None,
-        "reaction_probability": None,
-    }
+@dataclass
+class KMCResult:
+    """The result of a KMC step. Similar to a Recipe but for the concrete realization of a reaction.
+
+    Attributes
+    ----------
+    recipe_steps : list[RecipeStep]
+        Single sequence of RecipeSteps to build product
+    reaction_probability : float
+        Integral of reaction propensity with respect to time
+    time_step : float
+        Time step during which the reaction occurs
+    """
+
+    recipe_steps: Union[list[RecipeStep], None] = None
+    reaction_probability: Union[float, None] = None
+    time_step: Union[float, None] = None
 
 
 def rf_kmc(
@@ -40,7 +50,7 @@ def rf_kmc(
     # check for empty ReactionResult
     if len(recipe_collection.recipes) == 0:
         logging.warning("Empty ReactionResult; no reaction chosen")
-        return get_empty_results()
+        return KMCResult()
 
     # 0. Initialization
     reaction_probability = []
@@ -66,11 +76,11 @@ def rf_kmc(
     # 5. Calculate the time step associated with mu
     time_step = 1 / probability_sum * np.log(1 / u[1])
 
-    return {
-        "recipe_steps": recipe.recipe_steps,
-        "time_step": time_step,
-        "reaction_probability": reaction_probability,
-    }
+    return KMCResult(
+        recipe_steps=recipe.recipe_steps,
+        reaction_probability=reaction_probability,
+        time_step=time_step,
+    )
 
 
 def frm(
@@ -95,7 +105,7 @@ def frm(
     # check for empty ReactionResult
     if len(recipe_collection.recipes) == 0:
         logging.warning("Empty ReactionResult; no reaction chosen")
-        return get_empty_results()
+        return KMCResult()
 
     # 0. Initialization
     reaction_probability = []
@@ -127,10 +137,10 @@ def frm(
         logging.warning(
             f"FRM recipe selection did not work, probably tau: {tau} is empty."
         )
-        return get_empty_results()
+        return KMCResult()
 
-    return {
-        "recipe_steps": chosen_steps,
-        "time_step": time_step,
-        "reaction_probability": reaction_probability,
-    }
+    return KMCResult(
+        recipe_steps=chosen_steps,
+        reaction_probability=reaction_probability,
+        time_step=time_step,
+    )

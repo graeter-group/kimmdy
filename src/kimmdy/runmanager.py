@@ -279,7 +279,7 @@ class RunManager:
         logging.info("Decide on a recipe")
         logging.debug(f"Available reaction results: {self.recipe_collection}")
         decision_d = decision_strategy(self.recipe_collection)
-        self.recipe_steps = decision_d["recipe_steps"]
+        self.recipe_steps = decision_d.recipe_steps
         logging.info("Chosen recipe is:")
         logging.info(self.recipe_steps)
         return
