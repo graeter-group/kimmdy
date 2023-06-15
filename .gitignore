@@ -7,6 +7,7 @@ kimmdy.log
 tmp/
 *.gif
 *.log
+*.csv
 example/**/*[0-9][0-9][0-9]/
 pytest_topol.top
 \#*\#
@@ -17,6 +18,8 @@ render/
 cat-center.gro
 *-tmp.py
 *.cpt
+*.dill
+*.pickle
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
