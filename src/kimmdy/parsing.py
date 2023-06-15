@@ -4,6 +4,7 @@ from typing import Generator
 from copy import deepcopy
 import xml.etree.ElementTree as ET
 from itertools import takewhile
+from typing import TYPE_CHECKING
 
 TopologyDict = dict[str, list[list[str]]]
 
@@ -102,6 +103,19 @@ def read_topol(path: Path) -> TopologyDict:
         return d
 
 
+def read_edissoc(path: Path) -> dict:
+    """reads a edissoc file and turns it into a dict.
+    the tuple of bond atoms make up the key,
+    the dissociation energy E_dissoc [kJ mol-1] is the value
+    """
+    with open(path, "r") as f:
+        edissocs = {}
+        for l in f:
+            at1, at2, edissoc, *_ = l.split()
+            edissocs[frozenset((at1, at2))] = float(edissoc)
+    return edissocs
+
+
 def write_topol(top: TopologyDict, outfile: Path):
     with open(outfile, "w") as f:
         for title, content in top.items():
@@ -195,20 +209,20 @@ def read_distances_dat(distances_dat: Path):
         for l in f:
             values = l.split()
             for k, v in zip(colnames, values):
-                d[k].append(v)
+                d[k].append(float(v))
 
     return d
 
 
-def read_plumed_distances(plumed_dat: Path, distances_dat: Path):
-    plumed = read_plumed(plumed_dat)
-    distances = read_distances_dat(distances_dat)
+# def read_plumed_distances(plumed_dat: Path, distances_dat: Path):
+#     plumed = read_plumed(plumed_dat)
+#     distances = read_distances_dat(distances_dat)
 
-    atoms = {
-        x["id"]: x["atoms"] for x in plumed["distances"] if x["keyword"] == "DISTANCE"
-    }
+#     atoms = {
+#         x["id"]: x["atoms"] for x in plumed["distances"] if x["keyword"] == "DISTANCE"
+#     }
 
-    return atoms
+#     return atoms
 
 
 def read_xml_ff(path: Path) -> ET.Element:
