@@ -12,12 +12,12 @@ from kimmdy.kmc import KMCResult
 
 
 @pytest.fixture
-def testdir(tmp_path):
+def testdir(tmp_path) -> Path:
     dirname = "test_changemanager"
     try:
-        filedir = Path(__file__).parent / "test_files/" / dirname
+        filedir = Path(__file__).parent / "test_files" / dirname
     except NameError:
-        filedir = Path("./tests/test_files/" / dirname)
+        filedir = Path("./tests/test_files" / dirname)
     testdir = tmp_path / dirname
     shutil.copytree(filedir, testdir)
     return testdir

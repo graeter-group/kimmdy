@@ -7,17 +7,38 @@ from kimmdy.cmd import kimmdy_run
 import os
 import shutil
 from pathlib import Path
+import pytest
 
 from kimmdy.topology.topology import Topology
 
 
-def test_integration_break_bond_top():
-    ffdir = Path("../assets/amber99sb-star-ildnp.ff")
-    ffpatch = Path("amber99sb_patches.xml")
-    toppath = Path(__file__).parent / "test_files/test_integration/hexala_nat.top"
-    toppath_compare = (
-        Path(__file__).parent / "test_files/test_integration/hexala_break29-35.top"
-    )
+@pytest.fixture
+def testdir(tmp_path) -> Path:
+    dirname = "test_integration"
+    try:
+        filedir = Path(__file__).parent / "test_files" / dirname
+    except NameError:
+        filedir = Path("./tests/test_files" / dirname)
+    testdir = tmp_path / dirname
+    shutil.copytree(filedir, testdir)
+    return testdir
+
+
+@pytest.fixture
+def assetsdir() -> Path:
+    return Path(__file__).parent / "test_files" / "assets"
+
+
+@pytest.fixture
+def filedir() -> Path:
+    return Path(__file__).parent / "test_files" / "test_integration"
+
+
+def test_integration_break_bond_top(filedir, assetsdir):
+    ffdir = assetsdir / "amber99sb-star-ildnp.ff"
+    ffpatch = assetsdir / "amber99sb_patches.xml"
+    toppath = filedir / "hexala_nat.top"
+    toppath_compare = filedir / "hexala_break29-35.top"
 
     top = Topology(read_topol(toppath), ffdir, ffpatch)
     top_broken = Topology(read_topol(toppath_compare), ffdir, ffpatch)
