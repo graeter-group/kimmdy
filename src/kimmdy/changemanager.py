@@ -82,10 +82,9 @@ def modify_plumed(
     write_plumed(plumeddat, newplumeddat)
 
 
-def break_bond_plumed(plumeddat, breakpair, plumeddist):
+def break_bond_plumed(plumeddat, breakpair: list[int, int], plumeddist):
     new_distances = []
     broken_distances = []
-    breakpair = [str(x) for x in breakpair]
     for line in plumeddat["distances"]:
         if all(x in line["atoms"] for x in breakpair):
             broken_distances.append(line["id"])

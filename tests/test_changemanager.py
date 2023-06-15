@@ -2,43 +2,41 @@ from kimmdy.parsing import read_topol, read_plumed
 from kimmdy import changemanager
 import pytest
 import os
+import shutil
 
 from pathlib import Path
 from copy import deepcopy
 
 from kimmdy.reaction import Break, Recipe
+from kimmdy.kmc import KMCResult
 
 
-# %%
-def set_dir():
+@pytest.fixture
+def testdir(tmp_path):
+    dirname = "test_changemanager"
     try:
-        test_dir = Path(__file__).parent / "test_files/test_topology"
+        filedir = Path(__file__).parent / "test_files/" / dirname
     except NameError:
-        test_dir = Path("./tests/test_files/test_topology")
-    os.chdir(test_dir)
+        filedir = Path("./tests/test_files/" / dirname)
+    testdir = tmp_path / dirname
+    shutil.copytree(filedir, testdir)
+    return testdir
 
 
-set_dir()
-
-# %%
-ffdir = Path("../assets/amber99sb-star-ildnp.ff")
-ffpatch = Path("amber99sb_patches.xml")
-
-
-def test_break_bond_plumed():
-    plumeddat = read_plumed(Path("plumed.dat"))
+def test_break_bond_plumed(testdir):
+    plumeddat = read_plumed(testdir / "plumed.dat")
     breakpair = (9, 15)
 
-    recipe = Recipe([Break(*breakpair)], [], [])
+    recipe_steps = [Break(*breakpair)]
 
     changemanager.modify_plumed(
-        recipe,
-        Path("plumed.dat"),
-        Path("plumed-mod.dat"),
-        Path("distances.dat"),
+        recipe_steps,
+        testdir / "plumed.dat",
+        testdir / "plumed-mod.dat",
+        testdir / "distances.dat",
     )
 
-    newplumeddat = read_plumed(Path("plumed-mod.dat"))
+    newplumeddat = read_plumed(testdir / "plumed-mod.dat")
 
     oldset = set(tuple(x["atoms"]) for x in plumeddat["distances"])
     newset = set(tuple(x["atoms"]) for x in newplumeddat["distances"])
