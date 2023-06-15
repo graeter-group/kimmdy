@@ -167,7 +167,7 @@ def read_plumed(path: Path) -> dict:
                     {
                         "id": d[0].strip(":"),
                         "keyword": d[1],
-                        "atoms": d[2].strip("ATOMS=").split(","),
+                        "atoms": [int(x) for x in d[2].strip("ATOMS=").split(",")],
                     }
                 )
             elif "PRINT" in l[:5]:
@@ -193,7 +193,9 @@ def write_plumed(d, path: Path) -> None:
     """Write a plumed.dat configuration file."""
     with open(path, "w") as f:
         for l in d["distances"]:
-            f.write(f"{l['id']}: {l['keyword']} ATOMS={','.join(l['atoms'])} \n")
+            f.write(
+                f"{l['id']}: {l['keyword']} ATOMS={l['atoms'][0]},{l['atoms'][1]} \n"
+            )
         f.write("\n")
         for l in d["prints"]:
             f.write(

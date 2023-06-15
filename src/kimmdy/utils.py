@@ -33,7 +33,7 @@ def get_atominfo_from_plumedid(
     lookup_atomid_plumedid = {
         entry["id"]: frozenset(entry["atoms"]) for entry in plumed["distances"]
     }
-    lookup_atomtype_atomid = {atom[0]: atom[1] for atom in top["atoms"]}
+    lookup_atomtype_atomid = {int(atom[0]): atom[1] for atom in top["atoms"]}
     atomids = lookup_atomid_plumedid[plumedid]
     atomids_list = list(atomids)
     atomtypes_list = [
