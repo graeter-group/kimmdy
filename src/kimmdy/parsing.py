@@ -127,6 +127,7 @@ def parse_topol(ls: list[str]) -> TopologyDict:
     d = {}
     d['define'] = {}
     current_section = None
+    subsection = None
     section = None
     for l in ls:
         if l.startswith('*'):
@@ -142,8 +143,11 @@ def parse_topol(ls: list[str]) -> TopologyDict:
             l = l.split()
             condition_type = l[0].removeprefix('#')
             condition = l[1]
+        elif l.startswith("#endif"):
+            # TODO
+            continue
         elif l.startswith("["):
-            # we start a new section
+            # start a new section
             section = l.strip("[] \n").lower()
             if section in SECTIONS_WITH_SUBSECTIONS:
                 current_section = section
@@ -151,28 +155,45 @@ def parse_topol(ls: list[str]) -> TopologyDict:
                 if d.get(current_section) is None:
                     d[current_section] = {
                         'content': [],
+                        'extra': [],
                         'subsections': {}
                     }
             else:
                 if current_section is not None:
-                    print('We are in a current_section that has subsections')
-                    # we are in a current_section that can have subsections
+                    # in a current_section that can have subsections
                     if section in NESTABLE_SECTIONS:
                         if d[current_section]['subsections'].get(section) is None:
-                            d[current_section]['subsections'][section] = []
+                            d[current_section]['subsections'][section] = {
+                                'content': [],
+                                'extra': []
+                            }
                     else:
                         # exit current_section by setting current_section to None
-                        print('exiting', current_section)
                         current_section = None
                         if d.get(section) is None:
                             d[section] = []
-                            print('made', section)
+                else:
+                    if d.get(section) is None:
+                        # regular section that is not a subsection
+                        subsection = None
+                        d[section] = {
+                            'content': [],
+                            'extra': []
+                        }
         else:
             if current_section is not None:
+                # line is in a section that can have subsections
                 if section is None:
-                    d[current_section]['content'].append(l.split())
+                    # but no yet in a subsection
+                    l = l.split()
+                    d[current_section]['content'].append(l)
+                    # the following subsections will be grouped
+                    # under the name of the first line
+                    # of the content of the current_section
+                    subsection = l[0]
                 else:
-                    d[current_section]['subsections'][section].append(l.split())
+                    # line is in in a subsection
+                    d[current_section]['subsections'][subsection][section].append(l.split())
             else:
                 d[section].append(l.split())
     return d
