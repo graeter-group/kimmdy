@@ -5,7 +5,6 @@ from pathlib import Path
 import MDAnalysis as MDA
 from scipy.spatial.transform import Rotation
 from contextlib import contextmanager
-from kimmdy.config import Config
 import os
 
 @contextmanager
@@ -225,7 +224,7 @@ def get_shell_stdout(s):
     return process.stdout
 
 
-def check_gmx_version(config: Config):
+def check_gmx_version(config):
     """Check for an existing gromacs installation.
 
     If PLUMED is meant to be used it additionally checks for the keyword
