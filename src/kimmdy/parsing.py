@@ -7,7 +7,7 @@ import xml.etree.ElementTree as ET
 from itertools import takewhile
 from kimmdy.utils import pushd
 
-TopologyDict = dict[str, Union[list[list[str]],dict[str, list[str]]]]
+TopologyDict = dict[str, dict[str, list[str]]]
 
 
 def is_not_comment(c: str) -> bool:
@@ -217,23 +217,37 @@ def read_topol(path: Path) -> TopologyDict:
 
 def write_topol(top: TopologyDict, outfile: Path):
     with open(outfile, "w") as f:
-        for title, content in top.items():
-            if content == []:
-                continue
-            if title.startswith("BLOCK "):
-                f.write(f"\n")
+        # extract sections that have to be written first
+        define = top.pop('define')
+        # extract sections that have to be written last
+        system = top.pop('system')
+        molecules = top.pop('molecules')
+        if system is None or molecules is None:
+            raise ValueError("Invalid topology, no [ system ] or no [ molecules ] section found")
+        for name, section in top.items():
+            subsections = section.get('subsections')
+            if subsections is None:
+                if section['condition'] is None:
+                    f.write('\n')
+                    f.write(f"[ {name} ]\n")
+                    for l in section['content']:
+                        f.writelines(' '.join(l))
+                        f.write('\n')
             else:
-                f.write(f"[ {title} ]\n")
-            s = (
-                "\n".join(
-                    [
-                        " ".join([x.ljust(8) if l[0] != ";" else x for x in l])
-                        for l in content
-                    ]
-                )
-                + "\n\n"
-            )
-            f.write(s)
+                # this is a parent section
+                for subsection_name, subsection in subsections.items():
+                    subsections = section.get('subsections')
+                    for name, section in subsections.items():
+                        # TODO: WIP
+                        subsections = section.get('subsections')
+                        for name, section in subsections.items():
+                            if section['condition'] is None:
+                                f.write('\n')
+                                f.write(f"[ {name} ]\n")
+                                for l in section['content']:
+                                    f.writelines(' '.join(l))
+                                    f.write('\n')
+
 
 
 def split_dihedrals(top: TopologyDict):
