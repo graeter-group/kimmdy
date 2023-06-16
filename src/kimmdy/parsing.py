@@ -126,10 +126,11 @@ def parse_topol(ls: list[str]) -> TopologyDict:
     """
     d = {}
     d['define'] = {}
-    current_section = None
-    subsection = None
+    parent_section = None
+    subsection_name = None
     section = None
     for l in ls:
+        print(l)
         if l.startswith('*'):
             # comments at the start of forcefield.itp
             continue
@@ -150,52 +151,60 @@ def parse_topol(ls: list[str]) -> TopologyDict:
             # start a new section
             section = l.strip("[] \n").lower()
             if section in SECTIONS_WITH_SUBSECTIONS:
-                current_section = section
+                parent_section = section
                 section = None
-                if d.get(current_section) is None:
-                    d[current_section] = {
+                if d.get(parent_section) is None:
+                    d[parent_section] = {
                         'content': [],
                         'extra': [],
                         'subsections': {}
                     }
             else:
-                if current_section is not None:
-                    # in a current_section that can have subsections
+                if parent_section is not None:
+                    # in a parent_section that can have subsections
                     if section in NESTABLE_SECTIONS:
-                        if d[current_section]['subsections'].get(section) is None:
-                            d[current_section]['subsections'][section] = {
+                        assert subsection_name is not None
+                        if d[parent_section]['subsections'].get(subsection_name) is None:
+                            d[parent_section]['subsections'][subsection_name] = {}
+                        if d[parent_section]['subsections'][subsection_name].get(section) is None:
+                            d[parent_section]['subsections'][subsection_name][section] = {
                                 'content': [],
                                 'extra': []
                             }
                     else:
-                        # exit current_section by setting current_section to None
-                        current_section = None
+                        # exit parent_section by setting it to None
+                        parent_section = None
                         if d.get(section) is None:
-                            d[section] = []
+                            d[section] = {
+                                'content': [],
+                                'extra': []
+                            }
                 else:
                     if d.get(section) is None:
                         # regular section that is not a subsection
-                        subsection = None
                         d[section] = {
                             'content': [],
                             'extra': []
                         }
         else:
-            if current_section is not None:
+            if parent_section is not None:
                 # line is in a section that can have subsections
                 if section is None:
                     # but no yet in a subsection
                     l = l.split()
-                    d[current_section]['content'].append(l)
+                    d[parent_section]['content'].append(l)
                     # the following subsections will be grouped
                     # under the name of the first line
                     # of the content of the current_section
-                    subsection = l[0]
+                    subsection_name = l[0].lower()
                 else:
+                    print(parent_section)
+                    print(subsection_name)
+                    print(section)
                     # line is in in a subsection
-                    d[current_section]['subsections'][subsection][section].append(l.split())
+                    d[parent_section]['subsections'][subsection_name][section]['content'].append(l.split())
             else:
-                d[section].append(l.split())
+                d[section]['content'].append(l.split())
     return d
 
 
