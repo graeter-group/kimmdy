@@ -1,13 +1,13 @@
 import os
 from pathlib import Path
 from collections.abc import Iterable
-from typing import Generator
+from typing import Generator, Optional, Union
 from copy import deepcopy
 import xml.etree.ElementTree as ET
 from itertools import takewhile
 from kimmdy.utils import pushd
 
-TopologyDict = dict[str, list[list[str]]]
+TopologyDict = dict[str, Union[list[list[str]],dict[str, list[str]]]]
 
 
 def is_not_comment(c: str) -> bool:
@@ -96,7 +96,10 @@ def resolve_includes(path: Path) -> list[str]:
                 path = Path(l.split('"')[1])
                 try:
                     ls_prime.extend(resolve_includes(path))
-                except Exception as e:
+                except Exception as _:
+                    # keep the line if file path can't be resolved
+                    # might be a path that only exists for a later step
+                    # such as posres.itp created only later
                     ls_prime.append(l)
             else:
                 ls_prime.append(l)
@@ -104,28 +107,82 @@ def resolve_includes(path: Path) -> list[str]:
     os.chdir(cwd)
     return ls_prime
 
+SECTIONS_WITH_SUBSECTIONS = ("moleculetype",)
+NESTABLE_SECTIONS = ("atoms", "bonds", "pairs", "angles", "dihedrals", "impropers", "exclusions", "virtual_sites", "settles", "position_restraints")
+
+
+def parse_topol(ls: list[str]) -> TopologyDict:
+    """Parse a list of lines from a topology file.
+
+    Assumptions:
+    - `#include` statements have been resolved
+    - comments have been removed
+    - empty lines have been removed
+    - all lines are stripped of leading and trailing whitespace
+    - `#ifdef .. #endif` statements only surround a full section or subsection,
+      not individual lines within a section
+    - a section within `ifdef` may be a subsection of a section that was started
+      outside of the `ifdef`
+    """
+    d = {}
+    d['define'] = {}
+    current_section = None
+    section = None
+    for l in ls:
+        if l.startswith('*'):
+            # comments at the start of forcefield.itp
+            continue
+        elif l.startswith("#define"):
+            l = l.split()
+            name = l[1]
+            values = l[2:]
+            d['define'][name] = values
+        elif l.startswith("#if"):
+            # TODO
+            l = l.split()
+            condition_type = l[0].removeprefix('#')
+            condition = l[1]
+        elif l.startswith("["):
+            # we start a new section
+            section = l.strip("[] \n").lower()
+            if section in SECTIONS_WITH_SUBSECTIONS:
+                current_section = section
+                section = None
+                if d.get(current_section) is None:
+                    d[current_section] = {
+                        'content': [],
+                        'subsections': {}
+                    }
+            else:
+                if current_section is not None:
+                    print('We are in a current_section that has subsections')
+                    # we are in a current_section that can have subsections
+                    if section in NESTABLE_SECTIONS:
+                        if d[current_section]['subsections'].get(section) is None:
+                            d[current_section]['subsections'][section] = []
+                    else:
+                        # exit current_section by setting current_section to None
+                        print('exiting', current_section)
+                        current_section = None
+                        if d.get(section) is None:
+                            d[section] = []
+                            print('made', section)
+        else:
+            if current_section is not None:
+                if section is None:
+                    d[current_section]['content'].append(l.split())
+                else:
+                    d[current_section]['subsections'][section].append(l.split())
+            else:
+                d[section].append(l.split())
+    return d
+
 
 def read_topol(path: Path) -> TopologyDict:
     # TODO look into following #includes
     # TODO look into [ intermolecule ] section
     ls = resolve_includes(path)
-    return ls
-    sections = get_sections(f, "\n")
-    d = {}
-    for i, s in enumerate([s for s in sections if s is not [""]]):
-        name, content = extract_section_name(s)
-        content = [c.split() for c in content if len(c.split()) > 0]
-        if content == []:
-            continue
-            if not name:
-                name = f"BLOCK {i}"
-            # sections can be duplicated.
-            # append values in such cases
-            if name not in d:
-                d[name] = content
-            else:
-                d[name] += content
-        return d
+    return parse_topol(ls)
 
 
 def write_topol(top: TopologyDict, outfile: Path):
