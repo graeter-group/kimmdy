@@ -18,9 +18,9 @@ def testdir(tmp_path) -> Path:
         filedir = Path(__file__).parent / "test_files" / dirname
     except NameError:
         filedir = Path("./tests/test_files" / dirname)
-    testdir = tmp_path / dirname
-    shutil.copytree(filedir, testdir)
-    return testdir
+    test_dir = tmp_path / dirname
+    shutil.copytree(filedir, test_dir)
+    return test_dir
 
 
 def test_break_bond_plumed(testdir):
