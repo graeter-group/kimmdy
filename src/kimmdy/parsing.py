@@ -97,10 +97,8 @@ def resolve_includes(path: Path) -> list[str]:
                 try:
                     ls_prime.extend(resolve_includes(path))
                 except Exception as _:
-                    # keep the line if file path can't be resolved
-                    # might be a path that only exists for a later step
-                    # such as posres.itp created only later
-                    ls_prime.append(l)
+                    # drop line if path can't be resolved
+                    continue
             else:
                 ls_prime.append(l)
 
@@ -111,30 +109,23 @@ SECTIONS_WITH_SUBSECTIONS = ("moleculetype",)
 NESTABLE_SECTIONS = ("atoms", "bonds", "pairs", "angles", "dihedrals", "impropers", "exclusions", "virtual_sites", "settles", "position_restraints")
 
 
-def parse_topol(ls: list[str]) -> TopologyDict:
-    """Parse a list of lines from a topology file.
-
-    Assumptions:
-    - `#include` statements have been resolved
-    - comments have been removed
-    - empty lines have been removed
-    - all lines are stripped of leading and trailing whitespace
-    - `#ifdef .. #endif` statements only surround a full section or subsection,
-      not individual lines within a section
-    - a section within `ifdef` may be a subsection of a section that was started
-      outside of the `ifdef`
-    """
+def parse_topol(ls: Iterable[str]) -> TopologyDict:
     d = {}
     d['define'] = {}
     parent_section = None
     subsection_name = None
     section = None
-    for l in ls:
-        print(l)
-        if l.startswith('*'):
-            # comments at the start of forcefield.itp
-            continue
-        elif l.startswith("#define"):
+    condition = None
+
+    def empty_section(condition):
+        return {
+            'content': [],
+            'extra': [],
+            'condition': condition
+        }
+
+    for i,l in enumerate(ls):
+        if l.startswith("#define"):
             l = l.split()
             name = l[1]
             values = l[2:]
@@ -143,9 +134,14 @@ def parse_topol(ls: list[str]) -> TopologyDict:
             # TODO
             l = l.split()
             condition_type = l[0].removeprefix('#')
-            condition = l[1]
+            condition_value = l[1]
+            condition = {
+                'type': condition_type,
+                'value': condition_value
+            }
         elif l.startswith("#endif"):
             # TODO
+            condition = None
             continue
         elif l.startswith("["):
             # start a new section
@@ -157,7 +153,8 @@ def parse_topol(ls: list[str]) -> TopologyDict:
                     d[parent_section] = {
                         'content': [],
                         'extra': [],
-                        'subsections': {}
+                        'subsections': {},
+                        'condition': condition
                     }
             else:
                 if parent_section is not None:
@@ -167,25 +164,16 @@ def parse_topol(ls: list[str]) -> TopologyDict:
                         if d[parent_section]['subsections'].get(subsection_name) is None:
                             d[parent_section]['subsections'][subsection_name] = {}
                         if d[parent_section]['subsections'][subsection_name].get(section) is None:
-                            d[parent_section]['subsections'][subsection_name][section] = {
-                                'content': [],
-                                'extra': []
-                            }
+                            d[parent_section]['subsections'][subsection_name][section] = empty_section(condition)
                     else:
                         # exit parent_section by setting it to None
                         parent_section = None
                         if d.get(section) is None:
-                            d[section] = {
-                                'content': [],
-                                'extra': []
-                            }
+                            d[section] = empty_section(condition)
                 else:
                     if d.get(section) is None:
                         # regular section that is not a subsection
-                        d[section] = {
-                            'content': [],
-                            'extra': []
-                        }
+                        d[section] = empty_section(condition)
         else:
             if parent_section is not None:
                 # line is in a section that can have subsections
@@ -198,9 +186,6 @@ def parse_topol(ls: list[str]) -> TopologyDict:
                     # of the content of the current_section
                     subsection_name = l[0].lower()
                 else:
-                    print(parent_section)
-                    print(subsection_name)
-                    print(section)
                     # line is in in a subsection
                     d[parent_section]['subsections'][subsection_name][section]['content'].append(l.split())
             else:
@@ -209,10 +194,25 @@ def parse_topol(ls: list[str]) -> TopologyDict:
 
 
 def read_topol(path: Path) -> TopologyDict:
-    # TODO look into following #includes
-    # TODO look into [ intermolecule ] section
+    """Parse a list of lines from a topology file.
+
+    Assumptions and limitation:
+    - `#include` statements have been resolved
+    - comments have been removed
+    - empty lines have been removed
+    - all lines are stripped of leading and trailing whitespace
+    - `#if .. #endif` statements only surround a full section or subsection,
+      not individual lines within a section
+    - `#undef` is not supported
+    - a section within `ifdef` may be a subsection of a section that was started
+      outside of the `ifdef`
+    - a section may either be contained within if ... else or it may not be,
+      but it can not be duplicated with one part inside and one outside.
+    - `if .. else` can't be nested
+    - `#include`s that don't resolve to a valid file path are silently dropped 
+    """
     ls = resolve_includes(path)
-    return parse_topol(ls)
+    return parse_topol(filter(lambda l: not l.startswith('*'), ls))
 
 
 def write_topol(top: TopologyDict, outfile: Path):
