@@ -5,7 +5,7 @@ import logging
 from pathlib import Path
 from dataclasses import dataclass
 from kimmdy import plugins
-from kimmdy.reaction import Reaction
+from kimmdy.reaction import ReactionPlugin
 
 
 def check_file_exists(p: Path):
@@ -165,7 +165,7 @@ class Config:
                         logging.warn(
                             f"Plugin {plg_name} could not be loaded!\n{plugin}\n"
                         )
-                    if issubclass(type(plugin), Reaction):
+                    if issubclass(type(plugin), ReactionPlugin):
                         self.type_scheme["reactions"].update(plugin.type_scheme)
                         logging.debug(self.type_scheme["reactions"])
 

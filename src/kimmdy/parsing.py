@@ -6,6 +6,7 @@ from copy import deepcopy
 import xml.etree.ElementTree as ET
 from itertools import takewhile
 from kimmdy.utils import pushd
+from typing import TYPE_CHECKING
 
 TopologyDict = dict[str, dict[str, list[str]]]
 
@@ -215,6 +216,19 @@ def read_topol(path: Path) -> TopologyDict:
     return parse_topol(filter(lambda l: not l.startswith('*'), ls))
 
 
+def read_edissoc(path: Path) -> dict:
+    """reads a edissoc file and turns it into a dict.
+    the tuple of bond atoms make up the key,
+    the dissociation energy E_dissoc [kJ mol-1] is the value
+    """
+    with open(path, "r") as f:
+        edissocs = {}
+        for l in f:
+            at1, at2, edissoc, *_ = l.split()
+            edissocs[frozenset((at1, at2))] = float(edissoc)
+    return edissocs
+
+
 def write_topol(top: TopologyDict, outfile: Path):
     with open(outfile, "w") as f:
         # extract sections that have to be written first
@@ -280,7 +294,7 @@ def read_plumed(path: Path) -> dict:
                     {
                         "id": d[0].strip(":"),
                         "keyword": d[1],
-                        "atoms": d[2].strip("ATOMS=").split(","),
+                        "atoms": [int(x) for x in d[2].strip("ATOMS=").split(",")],
                     }
                 )
             elif "PRINT" in l[:5]:
@@ -306,7 +320,9 @@ def write_plumed(d, path: Path) -> None:
     """Write a plumed.dat configuration file."""
     with open(path, "w") as f:
         for l in d["distances"]:
-            f.write(f"{l['id']}: {l['keyword']} ATOMS={','.join(l['atoms'])} \n")
+            f.write(
+                f"{l['id']}: {l['keyword']} ATOMS={l['atoms'][0]},{l['atoms'][1]} \n"
+            )
         f.write("\n")
         for l in d["prints"]:
             f.write(
@@ -322,20 +338,20 @@ def read_distances_dat(distances_dat: Path):
         for l in f:
             values = l.split()
             for k, v in zip(colnames, values):
-                d[k].append(v)
+                d[k].append(float(v))
 
     return d
 
 
-def read_plumed_distances(plumed_dat: Path, distances_dat: Path):
-    plumed = read_plumed(plumed_dat)
-    distances = read_distances_dat(distances_dat)
+# def read_plumed_distances(plumed_dat: Path, distances_dat: Path):
+#     plumed = read_plumed(plumed_dat)
+#     distances = read_distances_dat(distances_dat)
 
-    atoms = {
-        x["id"]: x["atoms"] for x in plumed["distances"] if x["keyword"] == "DISTANCE"
-    }
+#     atoms = {
+#         x["id"]: x["atoms"] for x in plumed["distances"] if x["keyword"] == "DISTANCE"
+#     }
 
-    return atoms
+#     return atoms
 
 
 def read_xml_ff(path: Path) -> ET.Element:
