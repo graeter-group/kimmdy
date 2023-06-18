@@ -7,6 +7,7 @@ import xml.etree.ElementTree as ET
 from itertools import takewhile
 from kimmdy.utils import pushd
 from typing import TYPE_CHECKING
+import logging
 
 TopologyDict = dict[str, dict[str, list[str]]]
 
@@ -99,6 +100,7 @@ def resolve_includes(path: Path) -> list[str]:
                     ls_prime.extend(resolve_includes(path))
                 except Exception as _:
                     # drop line if path can't be resolved
+                    logging.warn('top include could not be resolved.')
                     continue
             else:
                 ls_prime.append(l)
@@ -132,7 +134,6 @@ def parse_topol(ls: Iterable[str]) -> TopologyDict:
             values = l[2:]
             d['define'][name] = values
         elif l.startswith("#if"):
-            # TODO
             l = l.split()
             condition_type = l[0].removeprefix('#')
             condition_value = l[1]
@@ -141,7 +142,6 @@ def parse_topol(ls: Iterable[str]) -> TopologyDict:
                 'value': condition_value
             }
         elif l.startswith("#endif"):
-            # TODO
             condition = None
             continue
         elif l.startswith("["):
@@ -238,6 +238,13 @@ def write_topol(top: TopologyDict, outfile: Path):
         molecules = top.pop('molecules')
         if system is None or molecules is None:
             raise ValueError("Invalid topology, no [ system ] or no [ molecules ] section found")
+
+        f.write('\n')
+        for name, value in define.items():
+            f.writelines('#define ' + name + ' '.join(value))
+            f.write('\n')
+
+
         for name, section in top.items():
             subsections = section.get('subsections')
             if subsections is None:
@@ -249,18 +256,29 @@ def write_topol(top: TopologyDict, outfile: Path):
                         f.write('\n')
             else:
                 # this is a parent section
+                if section['condition'] is None:
+                    f.write('\n')
+                    f.write(f"[ {name} ]\n")
+                    for l in section['content']:
+                        f.writelines(' '.join(l))
+                        f.write('\n')
+
+                subsections = section.get('subsections')
                 for subsection_name, subsection in subsections.items():
-                    subsections = section.get('subsections')
-                    for name, section in subsections.items():
-                        # TODO: WIP
-                        subsections = section.get('subsections')
-                        for name, section in subsections.items():
-                            if section['condition'] is None:
+                    for name, section in subsection.items():
+                        if section.get('condition') is None:
+                            f.write('\n')
+                            f.write(f"[ {name} ]\n")
+                            for l in section['content']:
+                                f.writelines(' '.join(l))
                                 f.write('\n')
-                                f.write(f"[ {name} ]\n")
-                                for l in section['content']:
-                                    f.writelines(' '.join(l))
-                                    f.write('\n')
+
+        for name, section in [('system', system), ('molecules', molecules)]:
+            f.write('\n')
+            f.write(f"[ {name} ]\n")
+            for l in section['content']:
+                f.writelines(' '.join(l))
+                f.write('\n')
 
 
 
