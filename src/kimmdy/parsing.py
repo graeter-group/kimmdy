@@ -121,15 +121,22 @@ def parse_topol(ls: Iterable[str]) -> TopologyDict:
     subsection_name = None
     section = None
     condition = None
+    condition_else = False
 
     def empty_section(condition):
         return {
             'content': [],
+            'else_content': [],
             'extra': [],
             'condition': condition
         }
 
     for i,l in enumerate(ls):
+        # line is in in a subsection
+        if condition_else:
+            content_key = 'else_content'
+        else:
+            content_key = 'content'
         if l.startswith("#define"):
             l = l.split()
             name = l[1]
@@ -143,8 +150,13 @@ def parse_topol(ls: Iterable[str]) -> TopologyDict:
                 'type': condition_type,
                 'value': condition_value
             }
+        elif l.startswith("#else"):
+            # TODO
+            condition_else = True
+            pass
         elif l.startswith("#endif"):
             condition = None
+            condition_else = False
             continue
         elif l.startswith("["):
             # start a new section
@@ -157,6 +169,7 @@ def parse_topol(ls: Iterable[str]) -> TopologyDict:
                     parent_section_index += 1
                     d[parent_section] = {
                         'content': [],
+                        'else_content': [],
                         'extra': [],
                         'subsections': {},
                         'condition': condition
@@ -185,16 +198,15 @@ def parse_topol(ls: Iterable[str]) -> TopologyDict:
                 if section is None:
                     # but no yet in a subsection
                     l = l.split()
-                    d[parent_section]['content'].append(l)
+                    d[parent_section][content_key].append(l)
                     # the following subsections will be grouped
                     # under the name of the first line
                     # of the content of the current_section
                     subsection_name = l[0].lower()
                 else:
-                    # line is in in a subsection
-                    d[parent_section]['subsections'][subsection_name][section]['content'].append(l.split())
+                    d[parent_section]['subsections'][subsection_name][section][content_key].append(l.split())
             else:
-                d[section]['content'].append(l.split())
+                d[section][content_key].append(l.split())
     return d
 
 
