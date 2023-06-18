@@ -289,6 +289,12 @@ def write_topol(top: TopologyDict, outfile: Path):
                         for l in section['content']:
                             f.writelines(' '.join(l))
                             f.write('\n')
+                        else_content = section.get('else_content')
+                        if else_content:
+                            f.write('#else\n')
+                            for l in else_content:
+                                f.writelines(' '.join(l))
+                                f.write('\n')
                         if condition is not None:
                             f.write(f"#endif\n")
 
