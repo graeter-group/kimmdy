@@ -115,6 +115,7 @@ NESTABLE_SECTIONS = ("atoms", "bonds", "pairs", "angles", "dihedrals", "improper
 def parse_topol(ls: Iterable[str]) -> TopologyDict:
     d = {}
     d['define'] = {}
+    parent_section_index = 0
     parent_section = None
     subsection_name = None
     section = None
@@ -151,6 +152,8 @@ def parse_topol(ls: Iterable[str]) -> TopologyDict:
                 parent_section = section
                 section = None
                 if d.get(parent_section) is None:
+                    parent_section = f"{parent_section}_{parent_section_index}"
+                    parent_section_index += 1
                     d[parent_section] = {
                         'content': [],
                         'extra': [],
@@ -211,6 +214,8 @@ def read_topol(path: Path) -> TopologyDict:
       but it can not be duplicated with one part inside and one outside.
     - `if .. else` can't be nested
     - `#include`s that don't resolve to a valid file path are silently dropped 
+    - sections that can have subsections can also exist multiple, separate times
+      e.g. moleculetype will appear multiple times and they should not be merged
     """
     ls = resolve_includes(path)
     return parse_topol(filter(lambda l: not l.startswith('*'), ls))
@@ -247,31 +252,32 @@ def write_topol(top: TopologyDict, outfile: Path):
 
         for name, section in top.items():
             subsections = section.get('subsections')
-            if subsections is None:
-                if section['condition'] is None:
+            if section['condition'] is None:
+                f.write('\n')
+                f.write(f"[ {name} ]\n")
+                for l in section['content']:
+                    f.writelines(' '.join(l))
                     f.write('\n')
-                    f.write(f"[ {name} ]\n")
-                    for l in section['content']:
-                        f.writelines(' '.join(l))
-                        f.write('\n')
-            else:
-                # this is a parent section
-                if section['condition'] is None:
-                    f.write('\n')
-                    f.write(f"[ {name} ]\n")
-                    for l in section['content']:
-                        f.writelines(' '.join(l))
-                        f.write('\n')
-
+            if subsections is not None:
                 subsections = section.get('subsections')
                 for subsection_name, subsection in subsections.items():
+                    f.write('\n')
                     for name, section in subsection.items():
-                        if section.get('condition') is None:
+                        condition = section.get('condition')
+                        f.write('\n')
+                        if condition is not None:
+                            condition_type = condition['type']
+                            condition_value = condition['value']
+                            f.write(f"#{condition_type} {condition_value}")
+                            f.write("\n")
+                        f.write(f"[ {name} ]\n")
+                        for l in section['content']:
+                            f.writelines(' '.join(l))
                             f.write('\n')
-                            f.write(f"[ {name} ]\n")
-                            for l in section['content']:
-                                f.writelines(' '.join(l))
-                                f.write('\n')
+                        if condition is not None:
+                            f.write(f"#endif\n")
+
+
 
         for name, section in [('system', system), ('molecules', molecules)]:
             f.write('\n')
