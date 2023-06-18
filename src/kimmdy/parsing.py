@@ -1,4 +1,5 @@
 import os
+import re
 from pathlib import Path
 from collections.abc import Iterable
 from typing import Generator, Optional, Union
@@ -254,14 +255,16 @@ def write_topol(top: TopologyDict, outfile: Path):
             subsections = section.get('subsections')
             if section['condition'] is None:
                 f.write('\n')
-                f.write(f"[ {name} ]\n")
+                printname = re.sub(r'_\d+', '', name)
+                print(name)
+                print(printname)
+                f.write(f"[ {printname} ]\n")
                 for l in section['content']:
                     f.writelines(' '.join(l))
                     f.write('\n')
             if subsections is not None:
                 subsections = section.get('subsections')
                 for subsection_name, subsection in subsections.items():
-                    f.write('\n')
                     for name, section in subsection.items():
                         condition = section.get('condition')
                         f.write('\n')
