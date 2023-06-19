@@ -101,7 +101,7 @@ def resolve_includes(path: Path) -> list[str]:
                     ls_prime.extend(resolve_includes(path))
                 except Exception as _:
                     # drop line if path can't be resolved
-                    logging.warn('top include could not be resolved.')
+                    logging.warn(f'top include {path} could not be resolved. Line was dropped.')
                     continue
             else:
                 ls_prime.append(l)
@@ -118,7 +118,6 @@ def parse_topol(ls: Iterable[str]) -> TopologyDict:
     d['define'] = {}
     parent_section_index = 0
     parent_section = None
-    subsection_name = None
     section = None
     condition = None
     condition_else = False
@@ -178,11 +177,8 @@ def parse_topol(ls: Iterable[str]) -> TopologyDict:
                 if parent_section is not None:
                     # in a parent_section that can have subsections
                     if section in NESTABLE_SECTIONS:
-                        assert subsection_name is not None
-                        if d[parent_section]['subsections'].get(subsection_name) is None:
-                            d[parent_section]['subsections'][subsection_name] = {}
-                        if d[parent_section]['subsections'][subsection_name].get(section) is None:
-                            d[parent_section]['subsections'][subsection_name][section] = empty_section(condition)
+                        if d[parent_section]['subsections'].get(section) is None:
+                            d[parent_section]['subsections'][section] = empty_section(condition)
                     else:
                         # exit parent_section by setting it to None
                         parent_section = None
@@ -199,18 +195,14 @@ def parse_topol(ls: Iterable[str]) -> TopologyDict:
                     # but no yet in a subsection
                     l = l.split()
                     d[parent_section][content_key].append(l)
-                    # the following subsections will be grouped
-                    # under the name of the first line
-                    # of the content of the current_section
-                    subsection_name = l[0].lower()
                 else:
-                    d[parent_section]['subsections'][subsection_name][section][content_key].append(l.split())
+                    d[parent_section]['subsections'][section][content_key].append(l.split())
             else:
                 d[section][content_key].append(l.split())
     return d
 
 
-def read_topol(path: Path) -> TopologyDict:
+def read_top(path: Path) -> TopologyDict:
     """Parse a list of lines from a topology file.
 
     Assumptions and limitation:
@@ -231,7 +223,8 @@ def read_topol(path: Path) -> TopologyDict:
       e.g. moleculetype will appear multiple times and they should not be merged
     """
     ls = resolve_includes(path)
-    return parse_topol(filter(lambda l: not l.startswith('*'), ls))
+    top = parse_topol(filter(lambda l: not l.startswith('*'), ls))
+    return top
 
 
 def read_edissoc(path: Path) -> dict:
@@ -247,7 +240,7 @@ def read_edissoc(path: Path) -> dict:
     return edissocs
 
 
-def write_topol(top: TopologyDict, outfile: Path):
+def write_top(top: TopologyDict, outfile: Path):
     with open(outfile, "w") as f:
         # extract sections that have to be written first
         define = top.pop('define')
@@ -262,41 +255,36 @@ def write_topol(top: TopologyDict, outfile: Path):
             f.writelines('#define ' + name + ' '.join(value))
             f.write('\n')
 
-
         for name, section in top.items():
             subsections = section.get('subsections')
             if section['condition'] is None:
                 f.write('\n')
                 printname = re.sub(r'_\d+', '', name)
-                print(name)
-                print(printname)
                 f.write(f"[ {printname} ]\n")
                 for l in section['content']:
                     f.writelines(' '.join(l))
                     f.write('\n')
             if subsections is not None:
-                subsections = section.get('subsections')
-                for subsection_name, subsection in subsections.items():
-                    for name, section in subsection.items():
-                        condition = section.get('condition')
+                for name, section in subsections.items():
+                    condition = section.get('condition')
+                    f.write('\n')
+                    if condition is not None:
+                        condition_type = condition['type']
+                        condition_value = condition['value']
+                        f.write(f"#{condition_type} {condition_value}")
+                        f.write("\n")
+                    f.write(f"[ {name} ]\n")
+                    for l in section['content']:
+                        f.writelines(' '.join(l))
                         f.write('\n')
-                        if condition is not None:
-                            condition_type = condition['type']
-                            condition_value = condition['value']
-                            f.write(f"#{condition_type} {condition_value}")
-                            f.write("\n")
-                        f.write(f"[ {name} ]\n")
-                        for l in section['content']:
+                    else_content = section.get('else_content')
+                    if else_content:
+                        f.write('#else\n')
+                        for l in else_content:
                             f.writelines(' '.join(l))
                             f.write('\n')
-                        else_content = section.get('else_content')
-                        if else_content:
-                            f.write('#else\n')
-                            for l in else_content:
-                                f.writelines(' '.join(l))
-                                f.write('\n')
-                        if condition is not None:
-                            f.write(f"#endif\n")
+                    if condition is not None:
+                        f.write(f"#endif\n")
 
 
 
