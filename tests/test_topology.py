@@ -227,11 +227,11 @@ class TestHexalaTopology:
         top = deepcopy(top_fix)
         top_broken = deepcopy(top_break_29_35_fix)
         top.break_bond(("29", "35"))
-        assert len(top.bonds) == len(top_broken.bonds)
-        assert len(top.pairs) == len(top_broken.pairs)
-        assert len(top.angles) == len(top_broken.angles)
-        assert len(top.proper_dihedrals) == len(top_broken.proper_dihedrals)
-        assert len(top.improper_dihedrals) == len(top_broken.improper_dihedrals)
+        assert top.bonds == top_broken.bonds
+        assert top.pairs == top_broken.pairs
+        assert top.angles == top_broken.angles
+        assert top.proper_dihedrals == top_broken.proper_dihedrals
+        assert top.improper_dihedrals == top_broken.improper_dihedrals
 
     def test_break_bond_9_15(self, top_fix):
         top = deepcopy(top_fix)
