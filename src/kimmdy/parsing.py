@@ -10,7 +10,7 @@ from kimmdy.utils import pushd
 from typing import TYPE_CHECKING
 import logging
 
-TopologyDict = dict[str, dict[str, list[str]]]
+TopologyDict = dict
 
 
 def is_not_comment(c: str) -> bool:
@@ -101,7 +101,7 @@ def resolve_includes(path: Path) -> list[str]:
                     ls_prime.extend(resolve_includes(path))
                 except Exception as _:
                     # drop line if path can't be resolved
-                    logging.warn(f'top include {path} could not be resolved. Line was dropped.')
+                    logging.warning(f'top include {path} could not be resolved. Line was dropped.')
                     continue
             else:
                 ls_prime.append(l)
@@ -228,6 +228,7 @@ def read_top(path: Path) -> TopologyDict:
     if len(d) <= 1:
         raise ValueError(f"topology file {path} does not contain any sections")
     return d
+
 
 
 def write_top(top: TopologyDict, outfile: Path):
