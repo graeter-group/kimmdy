@@ -109,11 +109,33 @@ def resolve_includes(path: Path) -> list[str]:
     os.chdir(cwd)
     return ls_prime
 
-SECTIONS_WITH_SUBSECTIONS = ("moleculetype",)
-NESTABLE_SECTIONS = ("atoms", "bonds", "pairs", "angles", "dihedrals", "impropers", "exclusions", "virtual_sites", "settles", "position_restraints")
 
 
-def parse_topol(ls: Iterable[str]) -> TopologyDict:
+def read_top(path: Path) -> TopologyDict:
+    """Parse a list of lines from a topology file.
+
+    Assumptions and limitation:
+    - `#include` statements have been resolved
+    - comments have been removed
+    - empty lines have been removed
+    - all lines are stripped of leading and trailing whitespace
+    - `#if .. #endif` statements only surround a full section or subsection,
+      not individual lines within a section
+    - `#undef` is not supported
+    - a section within `ifdef` may be a subsection of a section that was started
+      outside of the `ifdef`
+    - a section may either be contained within if ... else or it may not be,
+      but it can not be duplicated with one part inside and one outside.
+    - `if .. else` can't be nested
+    - `#include`s that don't resolve to a valid file path are silently dropped 
+    - sections that can have subsections can also exist multiple, separate times
+      e.g. moleculetype will appear multiple times and they should not be merged
+    """
+    SECTIONS_WITH_SUBSECTIONS = ("moleculetype",)
+    NESTABLE_SECTIONS = ("atoms", "bonds", "pairs", "angles", "dihedrals", "impropers", "exclusions", "virtual_sites", "settles", "position_restraints")
+
+    ls = resolve_includes(path)
+    ls = filter(lambda l: not l.startswith('*'), ls)
     d = {}
     d['define'] = {}
     parent_section_index = 0
@@ -130,17 +152,19 @@ def parse_topol(ls: Iterable[str]) -> TopologyDict:
             'condition': condition
         }
 
-    for i,l in enumerate(ls):
-        # line is in in a subsection
+    for l in ls:
+        # where to put lines dependign on current context
         if condition_else:
             content_key = 'else_content'
         else:
             content_key = 'content'
+
         if l.startswith("#define"):
             l = l.split()
             name = l[1]
             values = l[2:]
             d['define'][name] = values
+            continue
         elif l.startswith("#if"):
             l = l.split()
             condition_type = l[0].removeprefix('#')
@@ -149,14 +173,15 @@ def parse_topol(ls: Iterable[str]) -> TopologyDict:
                 'type': condition_type,
                 'value': condition_value
             }
+            continue
         elif l.startswith("#else"):
-            # TODO
             condition_else = True
-            pass
+            continue
         elif l.startswith("#endif"):
             condition = None
             condition_else = False
             continue
+
         elif l.startswith("["):
             # start a new section
             section = l.strip("[] \n").lower()
@@ -166,13 +191,8 @@ def parse_topol(ls: Iterable[str]) -> TopologyDict:
                 if d.get(parent_section) is None:
                     parent_section = f"{parent_section}_{parent_section_index}"
                     parent_section_index += 1
-                    d[parent_section] = {
-                        'content': [],
-                        'else_content': [],
-                        'extra': [],
-                        'subsections': {},
-                        'condition': condition
-                    }
+                    d[parent_section] = empty_section(condition)
+                    d[parent_section]['subsections'] = {}
             else:
                 if parent_section is not None:
                     # in a parent_section that can have subsections
@@ -196,48 +216,11 @@ def parse_topol(ls: Iterable[str]) -> TopologyDict:
                     l = l.split()
                     d[parent_section][content_key].append(l)
                 else:
+                    # part of a subsection
                     d[parent_section]['subsections'][section][content_key].append(l.split())
             else:
                 d[section][content_key].append(l.split())
     return d
-
-
-def read_top(path: Path) -> TopologyDict:
-    """Parse a list of lines from a topology file.
-
-    Assumptions and limitation:
-    - `#include` statements have been resolved
-    - comments have been removed
-    - empty lines have been removed
-    - all lines are stripped of leading and trailing whitespace
-    - `#if .. #endif` statements only surround a full section or subsection,
-      not individual lines within a section
-    - `#undef` is not supported
-    - a section within `ifdef` may be a subsection of a section that was started
-      outside of the `ifdef`
-    - a section may either be contained within if ... else or it may not be,
-      but it can not be duplicated with one part inside and one outside.
-    - `if .. else` can't be nested
-    - `#include`s that don't resolve to a valid file path are silently dropped 
-    - sections that can have subsections can also exist multiple, separate times
-      e.g. moleculetype will appear multiple times and they should not be merged
-    """
-    ls = resolve_includes(path)
-    top = parse_topol(filter(lambda l: not l.startswith('*'), ls))
-    return top
-
-
-def read_edissoc(path: Path) -> dict:
-    """reads a edissoc file and turns it into a dict.
-    the tuple of bond atoms make up the key,
-    the dissociation energy E_dissoc [kJ mol-1] is the value
-    """
-    with open(path, "r") as f:
-        edissocs = {}
-        for l in f:
-            at1, at2, edissoc, *_ = l.split()
-            edissocs[frozenset((at1, at2))] = float(edissoc)
-    return edissocs
 
 
 def write_top(top: TopologyDict, outfile: Path):
@@ -256,36 +239,68 @@ def write_top(top: TopologyDict, outfile: Path):
             f.write('\n')
 
         for name, section in top.items():
+            f.write('\n')
+            printname = re.sub(r'_\d+', '', name)
             subsections = section.get('subsections')
             if section['condition'] is None:
-                f.write('\n')
-                printname = re.sub(r'_\d+', '', name)
                 f.write(f"[ {printname} ]\n")
                 for l in section['content']:
                     f.writelines(' '.join(l))
                     f.write('\n')
-            if subsections is not None:
+            if subsections is None:
+                condition = section.get('condition')
+                f.write('\n')
+                if condition is None:
+                    f.write(f"[ {printname} ]\n")
+                    for l in section['content']:
+                        f.writelines(' '.join(l))
+                        f.write('\n')
+                else:
+                    condition_type = condition['type']
+                    condition_value = condition['value']
+                    f.write(f"#{condition_type} {condition_value}")
+                    f.write("\n")
+                    f.write(f"[ {printname} ]\n")
+                for l in section['content']:
+                    f.writelines(' '.join(l))
+                    f.write('\n')
+                else_content = section.get('else_content')
+                if else_content:
+                    f.write('#else\n')
+                    f.write(f"[ {printname} ]\n")
+                    for l in else_content:
+                        f.writelines(' '.join(l))
+                        f.write('\n')
+                if condition is not None:
+                    f.write(f"#endif\n")
+            else:
                 for name, section in subsections.items():
+                    printname = re.sub(r'_\d+', '', name)
                     condition = section.get('condition')
                     f.write('\n')
-                    if condition is not None:
+                    if condition is None:
+                        f.write(f"[ {printname} ]\n")
+                        for l in section['content']:
+                            f.writelines(' '.join(l))
+                            f.write('\n')
+                    else:
                         condition_type = condition['type']
                         condition_value = condition['value']
                         f.write(f"#{condition_type} {condition_value}")
                         f.write("\n")
-                    f.write(f"[ {name} ]\n")
+                        f.write(f"[ {printname} ]\n")
                     for l in section['content']:
                         f.writelines(' '.join(l))
                         f.write('\n')
                     else_content = section.get('else_content')
                     if else_content:
                         f.write('#else\n')
+                        f.write(f"[ {printname} ]\n")
                         for l in else_content:
                             f.writelines(' '.join(l))
                             f.write('\n')
                     if condition is not None:
                         f.write(f"#endif\n")
-
 
 
         for name, section in [('system', system), ('molecules', molecules)]:
@@ -295,24 +310,17 @@ def write_top(top: TopologyDict, outfile: Path):
                 f.writelines(' '.join(l))
                 f.write('\n')
 
-
-
-def split_dihedrals(top: TopologyDict):
-    if "dihedrals" in top.keys():
-        top["propers"] = deepcopy(top["dihedrals"])
-        top["impropers"] = []
-        for dih in top["propers"][::-1]:
-            if dih[4] == "9":
-                break
-            else:
-                top["impropers"].insert(0, (top["propers"].pop(-1)))
-
-
-def merge_propers_impropers(top: TopologyDict):
-    if set(["propers", "impropers"]).issubset(top.keys()):
-        top["dihedrals"].clear()
-        top["dihedrals"].extend(top.pop("propers"))
-        top["dihedrals"].extend(top.pop("impropers"))
+def read_edissoc(path: Path) -> dict:
+    """reads a edissoc file and turns it into a dict.
+    the tuple of bond atoms make up the key,
+    the dissociation energy E_dissoc [kJ mol-1] is the value
+    """
+    with open(path, "r") as f:
+        edissocs = {}
+        for l in f:
+            at1, at2, edissoc, *_ = l.split()
+            edissocs[frozenset((at1, at2))] = float(edissoc)
+    return edissocs
 
 
 def read_plumed(path: Path) -> dict:
@@ -375,16 +383,6 @@ def read_distances_dat(distances_dat: Path):
 
     return d
 
-
-# def read_plumed_distances(plumed_dat: Path, distances_dat: Path):
-#     plumed = read_plumed(plumed_dat)
-#     distances = read_distances_dat(distances_dat)
-
-#     atoms = {
-#         x["id"]: x["atoms"] for x in plumed["distances"] if x["keyword"] == "DISTANCE"
-#     }
-
-#     return atoms
 
 
 def read_xml_ff(path: Path) -> ET.Element:
