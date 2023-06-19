@@ -3,7 +3,7 @@ import textwrap
 from pathlib import Path
 from xml.etree.ElementTree import Element
 from kimmdy.topology.atomic import *
-from kimmdy.parsing import read_topol, read_xml_ff, read_rtp
+from kimmdy.parsing import read_top, read_xml_ff, read_rtp
 from typing import Union
 
 
@@ -21,14 +21,14 @@ class FF:
         self.residuetypes: dict[str, ResidueType]
 
         nonbonded_path = ffdir / "ffnonbonded.itp"
-        nonbonded = read_topol(nonbonded_path)
+        nonbonded = read_top(nonbonded_path)
         for l in nonbonded["atomtypes"]:
             if l[0][0] != ";":
                 atomtype = AtomType.from_top_line(l)
                 self.atomtypes[atomtype.type] = atomtype
 
         bonded_path = ffdir / "ffbonded.itp"
-        bonded = read_topol(bonded_path)
+        bonded = read_top(bonded_path)
         for l in bonded["bondtypes"]:
             bondtype = BondType.from_top_line(l)
             self.bondtypes[(bondtype.i, bondtype.j)] = bondtype

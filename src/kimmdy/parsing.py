@@ -132,7 +132,7 @@ def read_top(path: Path) -> TopologyDict:
       e.g. moleculetype will appear multiple times and they should not be merged
     """
     SECTIONS_WITH_SUBSECTIONS = ("moleculetype",)
-    NESTABLE_SECTIONS = ("atoms", "bonds", "pairs", "angles", "dihedrals", "impropers", "exclusions", "virtual_sites", "settles", "position_restraints")
+    NESTABLE_SECTIONS = ("atoms", "bonds", "pairs", "angles", "dihedrals", "impropers", "exclusions", "virtual_sites", "settles", "position_restraints", "dihedral_restraints")
 
     ls = resolve_includes(path)
     ls = filter(lambda l: not l.startswith('*'), ls)

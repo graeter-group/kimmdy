@@ -15,10 +15,14 @@ import logging
 import re
 
 
+PROTEIN_SECTION = 'moleculetype_0'
+
 class Topology:
     """Smart container for parsed topology data.
 
     A topology keeps track of connections and applies patches to parameters when bonds are broken or formed.
+    Assumptions:
+    - the topology of interest (the protein) is in section 'moleculetype_0'.
     """
 
     def __init__(
@@ -28,6 +32,7 @@ class Topology:
         ffpatch: Optional[Path] = None,
     ) -> None:
         self.top = top
+        self.protein = top[PROTEIN_SECTION]['subsections']
         self.forcefield_directory = ffdir
         self.atoms: dict[str, Atom] = {}
         self.bonds: dict[tuple[str, str], Bond] = {}
@@ -61,13 +66,14 @@ class Topology:
         self._test_for_radicals()
 
     def _update_dict(self):
-        self.top["atoms"] = [attributes_to_list(x) for x in self.atoms.values()]
-        self.top["bonds"] = [attributes_to_list(x) for x in self.bonds.values()]
-        self.top["pairs"] = [attributes_to_list(x) for x in self.pairs.values()]
-        self.top["angles"] = [attributes_to_list(x) for x in self.angles.values()]
-        self.top["dihedrals"] = [
+        self.protein["atoms"]["content"] = [attributes_to_list(x) for x in self.atoms.values()]
+        self.protein["bonds"]["content"] = [attributes_to_list(x) for x in self.bonds.values()]
+        self.protein["pairs"]["content"] = [attributes_to_list(x) for x in self.pairs.values()]
+        self.protein["angles"]["content"] = [attributes_to_list(x) for x in self.angles.values()]
+        self.protein["dihedrals"]["content"] = [
             attributes_to_list(x) for x in self.proper_dihedrals.values()
         ] + [attributes_to_list(x) for x in self.improper_dihedrals.values()]
+        self.top[PROTEIN_SECTION]["subsections"] = self.protein
 
     def to_dict(self) -> TopologyDict:
         self._update_dict()
@@ -148,35 +154,35 @@ class Topology:
 
     def _parse_atoms(self):
         """Parse atoms from topology dictionary."""
-        ls = self.top["atoms"]
+        ls = self.protein["atoms"]["content"]
         for l in ls:
             atom = Atom.from_top_line(l)
             self.atoms[atom.nr] = atom
 
     def _parse_bonds(self):
         """Parse bond from topology dictionary."""
-        ls = self.top["bonds"]
+        ls = self.protein["bonds"]["content"]
         for l in ls:
             bond = Bond.from_top_line(l)
             self.bonds[(bond.ai, bond.aj)] = bond
 
     def _parse_pairs(self):
         """Parse pairs from topology dictionary."""
-        ls = self.top["pairs"]
+        ls = self.protein["pairs"]["content"]
         for l in ls:
             pair = Pair.from_top_line(l)
             self.pairs[(pair.ai, pair.aj)] = pair
 
     def _parse_angles(self):
         """Parse angles from topology dictionary."""
-        ls = self.top["angles"]
+        ls = self.protein["angles"]["content"]
         for l in ls:
             angle = Angle.from_top_line(l)
             self.angles[(angle.ai, angle.aj, angle.ak)] = angle
 
     def _parse_dihedrals(self):
         """Parse improper and proper dihedrals from topology dictionary."""
-        ls = self.top["dihedrals"]
+        ls = self.protein["dihedrals"]["content"]
         for l in ls:
             dihedral = Dihedral.from_top_line(l)
             if dihedral.funct == "4":
@@ -190,11 +196,11 @@ class Topology:
 
     def _parse_restraints(self):
         """Parse restraints from topology dictionary."""
-        ls = self.top.get("position_restraints")
+        ls = self.protein.get("position_restraints")
         if ls is None:
             return
         condition = None
-        for l in ls:
+        for l in ls.get("content"):
             if l[0] == "#ifdef":
                 condition = l[1]
                 continue
@@ -203,10 +209,10 @@ class Topology:
                 continue
             restraint = PositionRestraint.from_top_line(l, condition=condition)
             self.position_restraints[restraint.ai] = restraint
-        ls = self.top.get("dihedral_restraints")
+        ls = self.protein.get("dihedral_restraints")
         if ls is None:
             return
-        for l in ls:
+        for l in ls.get("content"):
             restraint = DihedralRestraint.from_top_line(l)
             self.dihedral_restraints[
                 (restraint.ai, restraint.aj, restraint.ak, restraint.al)
