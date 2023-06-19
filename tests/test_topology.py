@@ -4,7 +4,7 @@ from pathlib import Path
 import os
 import pytest
 
-from kimmdy.parsing import read_topol, write_topol,TopologyDict
+from kimmdy.parsing import read_topol, write_topol, TopologyDict
 from hypothesis import Phase, given, settings, strategies as st
 from kimmdy.topology.topology import Topology, generate_topology_from_bound_to
 from kimmdy.topology.atomic import *
@@ -13,7 +13,8 @@ import logging
 
 # %%
 
-@pytest.fixture
+
+@pytest.fixture(scope="module")
 def filedir() -> Path:
     dirname = "test_topology"
     try:
@@ -23,7 +24,7 @@ def filedir() -> Path:
     return file_dir
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def assetsdir() -> Path:
     return Path(__file__).parent / "test_files" / "assets"
 
@@ -117,7 +118,7 @@ class TestFFPatches:
 
 
 class TestTopology:
-    @pytest.fixture
+    @pytest.fixture(scope="class")
     def top_fix(self, assetsdir, filedir) -> Topology:
         ffdir = assetsdir / "amber99sb-star-ildnp.ff"
         ffpatch = assetsdir / "amber99sb_patches.xml"
