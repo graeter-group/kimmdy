@@ -143,6 +143,7 @@ def read_top(path: Path) -> TopologyDict:
     section = None
     condition = None
     condition_else = False
+    is_first_line_after_section_header = False
 
     def empty_section(condition):
         return {
@@ -166,6 +167,8 @@ def read_top(path: Path) -> TopologyDict:
             d['define'][name] = values
             continue
         elif l.startswith("#if"):
+            if is_first_line_after_section_header:
+                raise NotImplementedError('#if ... #endif can only be used to surround a section, not within')
             l = l.split()
             condition_type = l[0].removeprefix('#')
             condition_value = l[1]
@@ -208,6 +211,7 @@ def read_top(path: Path) -> TopologyDict:
                     if d.get(section) is None:
                         # regular section that is not a subsection
                         d[section] = empty_section(condition)
+            is_first_line_after_section_header = True
         else:
             if parent_section is not None:
                 # line is in a section that can have subsections
@@ -220,10 +224,38 @@ def read_top(path: Path) -> TopologyDict:
                     d[parent_section]['subsections'][section][content_key].append(l.split())
             else:
                 d[section][content_key].append(l.split())
+            is_first_line_after_section_header = False
     return d
 
 
 def write_top(top: TopologyDict, outfile: Path):
+    def write_section(f, name, section):
+        printname = re.sub(r'_\d+', '', name)
+        condition = section.get('condition')
+        f.write('\n')
+        if condition is None:
+            f.write(f"[ {printname} ]\n")
+            for l in section['content']:
+                f.writelines(' '.join(l))
+                f.write('\n')
+        else:
+            condition_type = condition['type']
+            condition_value = condition['value']
+            f.write(f"#{condition_type} {condition_value}")
+            f.write("\n")
+            f.write(f"[ {printname} ]\n")
+            for l in section['content']:
+                f.writelines(' '.join(l))
+                f.write('\n')
+            else_content = section.get('else_content')
+            if else_content:
+                f.write('#else\n')
+                f.write(f"[ {printname} ]\n")
+                for l in else_content:
+                    f.writelines(' '.join(l))
+                    f.write('\n')
+            f.write(f"#endif\n")
+
     with open(outfile, "w") as f:
         # extract sections that have to be written first
         define = top.pop('define')
@@ -240,67 +272,11 @@ def write_top(top: TopologyDict, outfile: Path):
 
         for name, section in top.items():
             f.write('\n')
-            printname = re.sub(r'_\d+', '', name)
             subsections = section.get('subsections')
-            if section['condition'] is None:
-                f.write(f"[ {printname} ]\n")
-                for l in section['content']:
-                    f.writelines(' '.join(l))
-                    f.write('\n')
-            if subsections is None:
-                condition = section.get('condition')
-                f.write('\n')
-                if condition is None:
-                    f.write(f"[ {printname} ]\n")
-                    for l in section['content']:
-                        f.writelines(' '.join(l))
-                        f.write('\n')
-                else:
-                    condition_type = condition['type']
-                    condition_value = condition['value']
-                    f.write(f"#{condition_type} {condition_value}")
-                    f.write("\n")
-                    f.write(f"[ {printname} ]\n")
-                for l in section['content']:
-                    f.writelines(' '.join(l))
-                    f.write('\n')
-                else_content = section.get('else_content')
-                if else_content:
-                    f.write('#else\n')
-                    f.write(f"[ {printname} ]\n")
-                    for l in else_content:
-                        f.writelines(' '.join(l))
-                        f.write('\n')
-                if condition is not None:
-                    f.write(f"#endif\n")
-            else:
+            write_section(f, name, section)
+            if subsections is not None:
                 for name, section in subsections.items():
-                    printname = re.sub(r'_\d+', '', name)
-                    condition = section.get('condition')
-                    f.write('\n')
-                    if condition is None:
-                        f.write(f"[ {printname} ]\n")
-                        for l in section['content']:
-                            f.writelines(' '.join(l))
-                            f.write('\n')
-                    else:
-                        condition_type = condition['type']
-                        condition_value = condition['value']
-                        f.write(f"#{condition_type} {condition_value}")
-                        f.write("\n")
-                        f.write(f"[ {printname} ]\n")
-                    for l in section['content']:
-                        f.writelines(' '.join(l))
-                        f.write('\n')
-                    else_content = section.get('else_content')
-                    if else_content:
-                        f.write('#else\n')
-                        f.write(f"[ {printname} ]\n")
-                        for l in else_content:
-                            f.writelines(' '.join(l))
-                            f.write('\n')
-                    if condition is not None:
-                        f.write(f"#endif\n")
+                    write_section(f, name, section)
 
 
         for name, section in [('system', system), ('molecules', molecules)]:
