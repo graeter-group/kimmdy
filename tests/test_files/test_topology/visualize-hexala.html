@@ -97,21 +97,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="hexala" class="level1 page-columns page-full">
 <h1>Hexala</h1>
 <div class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> kimmdy.parsing <span class="im">import</span> read_topol</span>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> kimmdy.parsing <span class="im">import</span> read_top</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> kimmdy.topology.topology <span class="im">import</span> Topology</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> kimmdy.misc_helper <span class="im">import</span> top_to_graph</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>hexala_top <span class="op">=</span> read_topol(Path(<span class="st">'hexala.top'</span>))</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>hexala_break_29_35 <span class="op">=</span> read_topol(Path(<span class="st">"hexala_break29-35.top"</span>))</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>hexala_move_34_39 <span class="op">=</span> read_topol(Path(<span class="st">"hexala_move34-29.top"</span>))</span>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>hexala_top <span class="op">=</span> read_top(Path(<span class="st">'hexala.top'</span>))</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>hexala_break_29_35 <span class="op">=</span> read_top(Path(<span class="st">"hexala_break29-35.top"</span>))</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>hexala_move_34_39 <span class="op">=</span> read_top(Path(<span class="st">"hexala_move34-29.top"</span>))</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>ffdir <span class="op">=</span> Path(<span class="st">"../assets/amber99sb-star-ildnp.ff"</span>)</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>ffpatch <span class="op">=</span> Path(<span class="st">'amber99sb_patches.xml'</span>)</span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>top <span class="op">=</span> Topology(hexala_top, ffdir, ffpatch)</span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>top_break_29_25 <span class="op">=</span> Topology(hexala_break_29_35, ffdir, ffpatch)</span>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>top_move_34_39 <span class="op">=</span> Topology(hexala_move_34_39, ffdir, ffpatch)</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>ala_r <span class="op">=</span> read_topol(Path(<span class="st">"AlaCa_R.top"</span>))</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>ala_r <span class="op">=</span> read_top(Path(<span class="st">"AlaCa_R.top"</span>))</span>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>top_ala_r <span class="op">=</span> Topology(ala_r, ffdir, ffpatch)</span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>ls <span class="op">=</span> top_to_graph(top, overlap<span class="op">=</span><span class="st">'true'</span>) </span>

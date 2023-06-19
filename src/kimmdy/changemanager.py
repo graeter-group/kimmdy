@@ -2,7 +2,7 @@ from __future__ import annotations
 import logging
 from typing import Optional
 from kimmdy.reaction import Recipe, Bind, Break, Move, RecipeStep
-from kimmdy.parsing import read_topol, write_topol, write_plumed, read_plumed
+from kimmdy.parsing import read_top, write_topol, write_plumed, read_plumed
 from kimmdy.topology.topology import Topology
 from pathlib import Path
 
@@ -17,7 +17,7 @@ def modify_top(
 ) -> Topology:
     logging.info(f"Reading: {oldtop} and writing modified topology to {newtop}.")
     if topology is None:
-        topologyDict = read_topol(oldtop)
+        topologyDict = read_top(oldtop)
         topology = Topology(topologyDict, ffdir, ffpatch)
 
     focus = set()

@@ -12,7 +12,7 @@ from kimmdy.utils import (
     get_bondprm_from_atomtypes,
 )
 from kimmdy.parsing import (
-    read_topol,
+    read_top,
     read_rtp,
     read_plumed,
     read_distances_dat,
@@ -42,7 +42,7 @@ class Homolysis(ReactionPlugin):
         # Initialization of objects from files
         distances = read_distances_dat(distances_dat)
         plumed = read_plumed(plumed_dat)
-        top = read_topol(topol_top)
+        top = read_top(topol_top)
         ffbonded = read_rtp(ffbonded_itp)
         edissoc = read_edissoc(edissoc_dat)
 

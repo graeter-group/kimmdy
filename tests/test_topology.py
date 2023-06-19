@@ -4,7 +4,7 @@ from pathlib import Path
 import os
 import pytest
 
-from kimmdy.parsing import read_topol, TopologyDict
+from kimmdy.parsing import read_top, TopologyDict
 from hypothesis import Phase, given, settings, strategies as st
 from kimmdy.topology.topology import Topology, generate_topology_from_bound_to
 from kimmdy.topology.atomic import *
@@ -21,7 +21,7 @@ def filedir() -> Path:
     try:
         file_dir = Path(__file__).parent / "test_files" / dirname
     except NameError:
-        file_dir = Path("./tests/test_files" / dirname)
+        file_dir = Path("./tests/test_files") / dirname
     return file_dir
 
 
@@ -75,7 +75,7 @@ class TestFFPatches:
     def top_fix(self, assetsdir, filedir) -> Topology:
         ffdir = assetsdir / "amber99sb-star-ildnp.ff"
         ffpatch = assetsdir / "amber99sb_patches.xml"
-        hexala_top = read_topol(filedir / "hexala.top")
+        hexala_top = read_top(filedir / "hexala.top")
         return Topology(hexala_top, ffdir, ffpatch)
 
     def test_match_atomic_item_to_atomic_type(self, top_fix):
@@ -123,7 +123,7 @@ class TestTopology:
     def top_fix(self, assetsdir, filedir) -> Topology:
         ffdir = assetsdir / "amber99sb-star-ildnp.ff"
         ffpatch = assetsdir / "amber99sb_patches.xml"
-        hexala_top = read_topol(filedir / "hexala.top")
+        hexala_top = read_top(filedir / "hexala.top")
         return Topology(hexala_top, ffdir, ffpatch)
 
     def test_break_bind_bond_hexala(self, top_fix):
@@ -183,27 +183,27 @@ class TestTopology:
 class TestHexalaTopology:
     @pytest.fixture
     def hexala_top(self, filedir) -> TopologyDict:
-        return read_topol(filedir / "hexala.top")
+        return read_top(filedir / "hexala.top")
 
     @pytest.fixture
     def top_fix(self, assetsdir, filedir) -> Topology:
         ffdir = assetsdir / "amber99sb-star-ildnp.ff"
         ffpatch = assetsdir / "amber99sb_patches.xml"
-        hexala_top = read_topol(filedir / "hexala.top")
+        hexala_top = read_top(filedir / "hexala.top")
         return Topology(hexala_top, ffdir, ffpatch)
 
     @pytest.fixture
     def top_break_29_35_fix(self, assetsdir, filedir) -> Topology:
         ffdir = assetsdir / "amber99sb-star-ildnp.ff"
         ffpatch = assetsdir / "amber99sb_patches.xml"
-        hexala_top = read_topol(filedir / "hexala_break29-35.top")
+        hexala_top = read_top(filedir / "hexala_break29-35.top")
         return Topology(hexala_top, ffdir, ffpatch)
 
     @pytest.fixture
     def top_move_34_29_fix(self, assetsdir, filedir) -> Topology:
         ffdir = assetsdir / "amber99sb-star-ildnp.ff"
         ffpatch = assetsdir / "amber99sb_patches.xml"
-        hexala_top = read_topol(filedir / "hexala_move34-29.top")
+        hexala_top = read_top(filedir / "hexala_move34-29.top")
         return Topology(hexala_top, ffdir, ffpatch)
 
     def test_all_terms_accounted_for(self, top_fix, hexala_top):
@@ -444,14 +444,14 @@ class TestRadicalAla:
     def top_fix(self, assetsdir, filedir) -> Topology:
         ffdir = assetsdir / "amber99sb-star-ildnp.ff"
         ffpatch = assetsdir / "amber99sb_patches.xml"
-        hexala_top = read_topol(filedir / "AlaCa_nat.top")
+        hexala_top = read_top(filedir / "AlaCa_nat.top")
         return Topology(hexala_top, ffdir, ffpatch)
 
     @pytest.fixture
     def top_rad_fix(self, assetsdir, filedir) -> Topology:
         ffdir = assetsdir / "amber99sb-star-ildnp.ff"
         ffpatch = assetsdir / "amber99sb_patches.xml"
-        hexala_top = read_topol(filedir / "AlaCa_R.top")
+        hexala_top = read_top(filedir / "AlaCa_R.top")
         return Topology(hexala_top, ffdir, ffpatch)
 
     def test_is_radical(self, top_rad_fix):

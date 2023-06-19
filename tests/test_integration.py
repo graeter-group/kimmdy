@@ -1,5 +1,5 @@
 from kimmdy.parsing import (
-    read_topol,
+    read_top,
     read_plumed,
 )
 from kimmdy.cmd import kimmdy_run
@@ -40,8 +40,8 @@ def test_integration_break_bond_top(filedir, assetsdir):
     toppath = filedir / "hexala_nat.top"
     toppath_compare = filedir / "hexala_break29-35.top"
 
-    top = Topology(read_topol(toppath), ffdir, ffpatch)
-    top_broken = Topology(read_topol(toppath_compare), ffdir, ffpatch)
+    top = Topology(read_top(toppath), ffdir, ffpatch)
+    top_broken = Topology(read_top(toppath_compare), ffdir, ffpatch)
 
     pair = ("29", "35")
     top.break_bond(pair)
@@ -69,8 +69,8 @@ def test_integration_move_top():
     )
     ffdir = Path(__file__).parent / "test_files/assets/amber99sb-star-ildnp.ff"
 
-    top = Topology(read_topol(toppath), ffdir, ffpatch)
-    top_moved = Topology(read_topol(toppath_compare), ffdir, ffpatch)
+    top = Topology(read_top(toppath), ffdir, ffpatch)
+    top_moved = Topology(read_top(toppath_compare), ffdir, ffpatch)
 
     break_bond = ("31", "34")
     bind_bond = ("34", "29")

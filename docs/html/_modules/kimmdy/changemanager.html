@@ -73,7 +73,7 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
 <span class="kn">from</span> <span class="nn">kimmdy.reaction</span> <span class="kn">import</span> <span class="n">Recipe</span><span class="p">,</span> <span class="n">Bind</span><span class="p">,</span> <span class="n">Break</span><span class="p">,</span> <span class="n">Move</span><span class="p">,</span> <span class="n">RecipeStep</span>
-<span class="kn">from</span> <span class="nn">kimmdy.parsing</span> <span class="kn">import</span> <span class="n">read_topol</span><span class="p">,</span> <span class="n">write_topol</span><span class="p">,</span> <span class="n">write_plumed</span><span class="p">,</span> <span class="n">read_plumed</span>
+<span class="kn">from</span> <span class="nn">kimmdy.parsing</span> <span class="kn">import</span> <span class="n">read_top</span><span class="p">,</span> <span class="n">write_topol</span><span class="p">,</span> <span class="n">write_plumed</span><span class="p">,</span> <span class="n">read_plumed</span>
 <span class="kn">from</span> <span class="nn">kimmdy.topology.topology</span> <span class="kn">import</span> <span class="n">Topology</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 
@@ -88,7 +88,7 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Topology</span><span class="p">:</span>
     <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reading: </span><span class="si">{</span><span class="n">oldtop</span><span class="si">}</span><span class="s2"> and writing modified topology to </span><span class="si">{</span><span class="n">newtop</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">topology</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">topologyDict</span> <span class="o">=</span> <span class="n">read_topol</span><span class="p">(</span><span class="n">oldtop</span><span class="p">)</span>
+        <span class="n">topologyDict</span> <span class="o">=</span> <span class="n">read_top</span><span class="p">(</span><span class="n">oldtop</span><span class="p">)</span>
         <span class="n">topology</span> <span class="o">=</span> <span class="n">Topology</span><span class="p">(</span><span class="n">topologyDict</span><span class="p">,</span> <span class="n">ffdir</span><span class="p">,</span> <span class="n">ffpatch</span><span class="p">)</span>
 
     <span class="n">focus</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>

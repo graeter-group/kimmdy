@@ -4,7 +4,7 @@ import numpy as np
 import logging
 
 from kimmdy.utils import find_radical_pos
-from kimmdy.parsing import read_topol, Topology
+from kimmdy.parsing import read_top, Topology
 from kimmdy.reaction import ReactionResult, ConversionRecipe, ConversionType
 
 
@@ -33,7 +33,7 @@ def place_hydrogen(tpr: Path, trr: Path, recipe: ConversionRecipe):
 
 ## copied from changemanager. should be put into utils
 def get_ff_sections(ffdir):
-    return read_topol(ffdir / "ffbonded.itp")
+    return read_top(ffdir / "ffbonded.itp")
 
 
 def parameterize_bonded_terms(ffprm, terms_atomtype, prop, terms):

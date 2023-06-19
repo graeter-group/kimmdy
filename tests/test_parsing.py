@@ -26,7 +26,7 @@ set_dir()
 def test_parser_doesnt_crash_on_example():
     set_dir()
     urea_path = Path("urea.gro")
-    top = parsing.read_topol(urea_path)
+    top = parsing.read_top(urea_path)
     assert isinstance(top, dict)
 
 
@@ -35,20 +35,20 @@ def test_doubleparse_urea():
     """Parsing it's own output should return the same top on urea.gro"""
     set_dir()
     urea_path = Path("urea.gro")
-    top = parsing.read_topol(urea_path)
+    top = parsing.read_top(urea_path)
     p = Path("pytest_urea.top")
     parsing.write_topol(top, p)
-    top2 = parsing.read_topol(p)
+    top2 = parsing.read_top(p)
     p2 = Path("pytest_urea2.top")
     parsing.write_topol(top2, p2)
-    top3 = parsing.read_topol(p2)
+    top3 = parsing.read_top(p2)
     assert top2 == top3
 
 
 def test_parsing_includes_as_blocks():
     set_dir()
     urea_path = Path("urea.gro")
-    top = parsing.read_topol(urea_path)
+    top = parsing.read_top(urea_path)
     assert top["includes"] is not None
 
 
@@ -69,7 +69,7 @@ def test_parser_invertible(d):
     p = Path("tmp/pytest_topol.top")
     p.parent.mkdir(exist_ok=True)
     parsing.write_topol(d, p)
-    d2 = parsing.read_topol(p)
+    d2 = parsing.read_top(p)
     assert d == d2
 
 

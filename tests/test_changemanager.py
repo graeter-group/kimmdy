@@ -1,4 +1,4 @@
-from kimmdy.parsing import read_topol, read_plumed
+from kimmdy.parsing import read_top, read_plumed
 from kimmdy import changemanager
 import pytest
 import os

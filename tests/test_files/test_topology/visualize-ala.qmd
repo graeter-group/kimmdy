@@ -10,7 +10,7 @@ execute:
 # Ala
 
 ```{python}
-from kimmdy.parsing import read_topol
+from kimmdy.parsing import read_top
 from kimmdy.topology.topology import Topology
 from pathlib import Path
 from kimmdy.misc_helper import top_to_graph
@@ -18,8 +18,8 @@ from kimmdy.misc_helper import top_to_graph
 
 ```{python}
 #| eval: false
-ala_top = read_topol(Path('../../../example/example_ala/Ala_out.top'))
-ala_top_mod = read_topol(Path('../../../example/example_ala/hat_tf_015/5_recipe/topol_mod.top'))
+ala_top = read_top(Path('../../../example/example_ala/Ala_out.top'))
+ala_top_mod = read_top(Path('../../../example/example_ala/hat_tf_015/5_recipe/topol_mod.top'))
 ffdir = Path("../assets/amber99sb-star-ildnp.ff")
 ffpatch = Path('amber99sb_patches.xml')
 top = Topology(ala_top, ffdir, ffpatch)
@@ -81,15 +81,15 @@ caption
 # TriAla
 
 ```{python}
-from kimmdy.parsing import read_topol
+from kimmdy.parsing import read_top
 from kimmdy.topology.topology import Topology
 from pathlib import Path
 from kimmdy.misc_helper import top_to_graph
 ```
 
 ```{python}
-ala_top = read_topol(Path('../../../example/example_triala/test_out_008/4_recipe/topol_mod.top'))
-ala_top_mod = read_topol(Path('../../../example/example_triala/test_out_008/9_recipe/topol_mod.top'))
+ala_top = read_top(Path('../../../example/example_triala/test_out_008/4_recipe/topol_mod.top'))
+ala_top_mod = read_top(Path('../../../example/example_triala/test_out_008/9_recipe/topol_mod.top'))
 ffdir = Path("../assets/amber99sb-star-ildnp.ff")
 ffpatch = Path('amber99sb_patches.xml')
 top = Topology(ala_top, ffdir, ffpatch)
