@@ -132,7 +132,7 @@ class RunManager:
             next(self)
 
         logging.info(
-            f"Stop running tasks, state: {self.state}, "
+            f"Finished running tasks, state: {self.state}, "
             f"iteration:{self.iteration}, max:{self.iterations}"
         )
 
