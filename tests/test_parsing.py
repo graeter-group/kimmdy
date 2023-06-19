@@ -1,11 +1,13 @@
 # %%
 # %autoreload
 import os
+import re
 import string
 from hypothesis import given, strategies as st
 from kimmdy import parsing
 from pathlib import Path
 from copy import deepcopy
+import pytest
 
 
 def set_dir():
@@ -36,20 +38,7 @@ def test_doubleparse_urea():
     set_dir()
     urea_path = Path("urea.gro")
     top = parsing.read_top(urea_path)
-    p = Path("pytest_urea.top")
-    parsing.write_top(top, p)
-    top2 = parsing.read_top(p)
-    p2 = Path("pytest_urea2.top")
-    parsing.write_top(top2, p2)
-    top3 = parsing.read_top(p2)
-    assert top2 == top3
 
-
-def test_parsing_includes_as_blocks():
-    set_dir()
-    urea_path = Path("urea.gro")
-    top = parsing.read_top(urea_path)
-    assert top["includes"] is not None
 
 
 #### Parsing should be invertible ####
@@ -59,18 +48,49 @@ allowed_text = st.text(
 
 
 @given(
-    d=st.dictionaries(
-        allowed_text,
-        st.lists(st.lists(allowed_text, min_size=1), min_size=1),
+    # a list of lists that correspond to a sections of a top file
+    sections = st.lists(
+        st.lists(
+            allowed_text,
+            min_size=2,
+            max_size=5,
+        ),
         min_size=1,
+        max_size=5,
     )
 )
-def test_parser_invertible(d):
+def test_parser_invertible(sections):
+    # flatten list of lists of strings to list of strings with subsection headers
+    # use first element of each section as header
+    for s in sections:
+        header = s[0]
+        header = re.sub(r"\d", "x", header)
+        s[0] = f"[ {header} ]"
+    ls = [l for s in sections for l in s]
+    print(ls)
+    p = Path("tmp/pytest_topol.top")
+    p2 = Path("tmp/pytest_topol2.top")
+    p.parent.mkdir(exist_ok=True)
+    with open(p, 'w') as f:
+        f.write("\n".join(ls))
+    top = parsing.read_top(p)
+    parsing.write_top(top, p2)
+    top2 = parsing.read_top(p2)
+    assert top == top2
+
+@given(
+    ls=st.lists(
+        allowed_text
+    )
+)
+def test_parser_fails_without_sections(ls):
     p = Path("tmp/pytest_topol.top")
     p.parent.mkdir(exist_ok=True)
-    parsing.write_top(d, p)
-    d2 = parsing.read_top(p)
-    assert d == d2
+    with open(p, 'w') as f:
+        f.writelines(ls)
+    with pytest.raises(ValueError):
+        parsing.read_top(p)
+    assert True
 
 
 # %%

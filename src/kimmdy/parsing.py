@@ -115,16 +115,15 @@ def read_top(path: Path) -> TopologyDict:
     """Parse a list of lines from a topology file.
 
     Assumptions and limitation:
-    - `#include` statements have been resolved
-    - comments have been removed
-    - empty lines have been removed
+    - `#include` statements will be resolved
+    - comments will be removed
     - all lines are stripped of leading and trailing whitespace
-    - `#if .. #endif` statements only surround a full section or subsection,
-      not individual lines within a section
     - `#undef` is not supported
     - a section within `ifdef` may be a subsection of a section that was started
       outside of the `ifdef`
-    - a section may either be contained within if ... else or it may not be,
+    - `#if .. #endif` statements only surround a full section or subsection,
+      not individual lines within a section and
+      a section may either be contained within if ... else or it may not be,
       but it can not be duplicated with one part inside and one outside.
     - `if .. else` can't be nested
     - `#include`s that don't resolve to a valid file path are silently dropped 
@@ -144,6 +143,7 @@ def read_top(path: Path) -> TopologyDict:
     condition = None
     condition_else = False
     is_first_line_after_section_header = False
+    content_key = 'content'
 
     def empty_section(condition):
         return {
@@ -155,11 +155,6 @@ def read_top(path: Path) -> TopologyDict:
 
     for l in ls:
         # where to put lines dependign on current context
-        if condition_else:
-            content_key = 'else_content'
-        else:
-            content_key = 'content'
-
         if l.startswith("#define"):
             l = l.split()
             name = l[1]
@@ -179,10 +174,12 @@ def read_top(path: Path) -> TopologyDict:
             continue
         elif l.startswith("#else"):
             condition_else = True
+            content_key = 'else_content'
             continue
         elif l.startswith("#endif"):
             condition = None
             condition_else = False
+            content_key = 'content'
             continue
 
         elif l.startswith("["):
@@ -223,8 +220,13 @@ def read_top(path: Path) -> TopologyDict:
                     # part of a subsection
                     d[parent_section]['subsections'][section][content_key].append(l.split())
             else:
+                if section is None:
+                    raise ValueError(f"topology file {path} contains lines outside of a section")
                 d[section][content_key].append(l.split())
             is_first_line_after_section_header = False
+
+    if len(d) <= 1:
+        raise ValueError(f"topology file {path} does not contain any sections")
     return d
 
 
@@ -257,34 +259,19 @@ def write_top(top: TopologyDict, outfile: Path):
             f.write(f"#endif\n")
 
     with open(outfile, "w") as f:
-        # extract sections that have to be written first
-        define = top.pop('define')
-        # extract sections that have to be written last
-        system = top.pop('system')
-        molecules = top.pop('molecules')
-        if system is None or molecules is None:
-            raise ValueError("Invalid topology, no [ system ] or no [ molecules ] section found")
-
-        f.write('\n')
+        define = top.get('define')
         for name, value in define.items():
             f.writelines('#define ' + name + ' '.join(value))
             f.write('\n')
 
-        for name, section in top.items():
+        for name, section in top.items() :
+            if name == 'define': continue
             f.write('\n')
             subsections = section.get('subsections')
             write_section(f, name, section)
             if subsections is not None:
                 for name, section in subsections.items():
                     write_section(f, name, section)
-
-
-        for name, section in [('system', system), ('molecules', molecules)]:
-            f.write('\n')
-            f.write(f"[ {name} ]\n")
-            for l in section['content']:
-                f.writelines(' '.join(l))
-                f.write('\n')
 
 def read_edissoc(path: Path) -> dict:
     """reads a edissoc file and turns it into a dict.
