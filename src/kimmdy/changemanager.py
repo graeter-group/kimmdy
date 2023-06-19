@@ -2,7 +2,7 @@ from __future__ import annotations
 import logging
 from typing import Optional
 from kimmdy.reaction import Recipe, Bind, Break, Move, RecipeStep
-from kimmdy.parsing import read_top, write_topol, write_plumed, read_plumed
+from kimmdy.parsing import read_top, write_top, write_plumed, read_plumed
 from kimmdy.topology.topology import Topology
 from pathlib import Path
 
@@ -52,7 +52,7 @@ def modify_top(
         else:
             raise NotImplementedError(f"RecipeStep {step} not implemented!")
     topology._update_dict()
-    write_topol(topology.top, newtop)
+    write_top(topology.top, newtop)
 
     topology.patch_parameters(list(focus))
 
