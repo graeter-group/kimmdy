@@ -68,6 +68,9 @@ def create_subsections(ls: list[list[str]]):
 
 def read_rtp(path: Path) -> dict:
     # TODO: make this more elegant and performant
+    # TODO combine with top parser?
+    # would need a way to tell the parser
+    # that here, all sections have subsections
     with open(path, "r") as f:
         sections = get_sections(f, "\n")
         d = {}

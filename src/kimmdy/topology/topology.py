@@ -32,7 +32,6 @@ class Topology:
         ffpatch: Optional[Path] = None,
     ) -> None:
         self.top = top
-        self.protein = top[PROTEIN_SECTION]['subsections']
         self.forcefield_directory = ffdir
         self.atoms: dict[str, Atom] = {}
         self.bonds: dict[tuple[str, str], Bond] = {}
@@ -47,15 +46,17 @@ class Topology:
         self.radicals: dict[str, Atom] = {}
 
         if ffdir:
-            self.ff = FF(ffdir)
+            self.ff = FF(top, ffdir)
         self.ffpatches = None
         if ffpatch:
             self.ffpatches = FFPatches(ffpatch)
+
 
         # generate empty Topology if empty TopologyDict
         if self.top == {}:
             return
 
+        self.protein = top[PROTEIN_SECTION]['subsections']
         self._parse_atoms()
         self._parse_bonds()
         self._parse_pairs()

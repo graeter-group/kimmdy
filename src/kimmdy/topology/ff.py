@@ -6,11 +6,13 @@ from kimmdy.topology.atomic import *
 from kimmdy.parsing import read_top, read_xml_ff, read_rtp
 from typing import Union
 
+from kimmdy.topology.utils import get_top_section
+
 
 class FF:
     """Conainer for parsed forcefield data."""
 
-    def __init__(self, ffdir: Path):
+    def __init__(self, top, ffdir: Path):
         self.atomtypes: dict[str, AtomType] = {}
         self.bondtypes: dict[tuple[str, str], BondType] = {}
         self.angletypes: dict[tuple[str, str, str], AngleType] = {}
@@ -20,22 +22,34 @@ class FF:
         self.improper_dihedraltypes: dict[tuple[str, str, str, str], DihedralType] = {}
         self.residuetypes: dict[str, ResidueType]
 
-        nonbonded_path = ffdir / "ffnonbonded.itp"
-        nonbonded = read_top(nonbonded_path)
-        for l in nonbonded["atomtypes"]:
-            if l[0][0] != ";":
-                atomtype = AtomType.from_top_line(l)
-                self.atomtypes[atomtype.type] = atomtype
+        atomtypes = get_top_section(top, 'atomtypes')
+        if atomtypes is None:
+            raise ValueError("atomtypes not found in top file")
+        for l in atomtypes:
+            atomtype = AtomType.from_top_line(l)
+            self.atomtypes[atomtype.type] = atomtype
 
-        bonded_path = ffdir / "ffbonded.itp"
-        bonded = read_top(bonded_path)
-        for l in bonded["bondtypes"]:
+
+        bondtypes = get_top_section(top, 'bondtypes')
+        if bondtypes is None:
+            raise ValueError("bondtypes not found in top file")
+        for l in bondtypes:
             bondtype = BondType.from_top_line(l)
             self.bondtypes[(bondtype.i, bondtype.j)] = bondtype
-        for l in bonded["angletypes"]:
+
+
+        angletypes = get_top_section(top, 'angletypes')
+        if angletypes is None:
+            raise ValueError("angletypes not found in top file")
+        for l in angletypes:
             angletype = AngleType.from_top_line(l)
             self.angletypes[(angletype.i, angletype.j, angletype.k)] = angletype
-        for l in bonded["dihedraltypes"]:
+
+
+        dihedraltypes = get_top_section(top, 'dihedraltypes')
+        if dihedraltypes is None:
+            raise ValueError("dihedraltypes not found in top file")
+        for l in dihedraltypes:
             dihedraltype = DihedralType.from_top_line(l)
             # proper dihedrals can be defined multiple times
             # with a different phase
@@ -66,7 +80,6 @@ class FF:
                         )
                     ] = dihedraltype
 
-            # TODO
             self.residuetypes = {}
             aminoacids_path = ffdir / "aminoacids.rtp"
             aminoacids = read_rtp(aminoacids_path)

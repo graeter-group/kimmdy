@@ -5,7 +5,7 @@ import os
 import pytest
 
 from kimmdy.parsing import read_top, TopologyDict
-from hypothesis import Phase, given, settings, strategies as st
+from hypothesis import Phase, given, settings, HealthCheck, strategies as st
 from kimmdy.topology.topology import Topology, generate_topology_from_bound_to
 from kimmdy.topology.atomic import *
 from kimmdy.topology.utils import match_atomic_item_to_atomic_type
@@ -29,8 +29,6 @@ def filedir() -> Path:
 def assetsdir() -> Path:
     return Path(__file__).parent / "test_files" / "assets"
 
-
-# %%
 
 
 @st.composite
@@ -61,7 +59,7 @@ def random_topology_and_break(draw):
     try:
         assets_dir = Path(__file__).parent / "test_files" / "assets"
     except NameError:
-        assets_dir = Path("./tests/test_files" / "assets")
+        assets_dir = Path("./tests/test_files") / "assets"
     ffdir = assets_dir / "amber99sb-star-ildnp.ff"
     ffpatch = assets_dir / "amber99sb_patches.xml"
     atoms = draw(random_atomlist())
@@ -144,6 +142,7 @@ class TestTopology:
         assert top.improper_dihedrals == og_top.improper_dihedrals
 
     @given(bondindex=st.integers(min_value=0, max_value=70))
+    @settings(suppress_health_check=[HealthCheck.function_scoped_fixture])
     def test_break_bind_random_bond_hexala(self, top_fix, bondindex):
         top = deepcopy(top_fix)
         og_top = deepcopy(top)
