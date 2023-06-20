@@ -16,7 +16,8 @@ def get_top_section(
     top: dict, name: str, moleculetype: Optional[int] = None
 ) -> Optional[list[list]]:
     """Get content of a section from a topology dict.
-    By resolving any `#ifdef` statements by check in the top['define'] dict.
+    By resolving any `#ifdef` statements by check in the top['define'] dict
+    and choosing the 'content' or 'else_content' depending on the result.
     """
     if moleculetype is not None:
         parent_name = f"moleculetype_{moleculetype}"
@@ -49,6 +50,43 @@ def get_top_section(
             )
     return section.get("content")
 
+def set_top_section(
+    top: dict, name: str, value: list, moleculetype: Optional[int] = None
+) -> Optional[list[list]]:
+    """Set content of a section from a topology dict.
+    By resolving any `#ifdef` statements by check in the top['define'] dict
+    and choosing the 'content' or 'else_content' depending on the result.
+    """
+    if moleculetype is not None:
+        parent_name = f"moleculetype_{moleculetype}"
+        parent_section = top.get(parent_name)
+        if parent_section is None:
+            raise ValueError(f"topology does not contain moleculetype {moleculetype}")
+        section = parent_section["subsections"].get(name)
+    else:
+        section = top.get(name)
+
+    if section is None:
+        raise ValueError(f"topology does not contain section {name}")
+    condition = section.get("condition")
+    if condition is not None:
+        condition_type = condition.get("type")
+        condition_value = condition.get("value")
+        if condition_type == "ifdef":
+            if condition_value in top["define"].keys():
+                section["content"] = value
+            else:
+                section["else_content"] = value
+        elif condition_type == "ifndef":
+            if condition_value not in top["define"].keys():
+                section["content"] = value
+            else:
+                section["else_content"] = value
+        else:
+            raise NotImplementedError(
+                f"condition type {condition_type} is not supported"
+            )
+    section["content"] = value
 
 def field_or_none(l: list[str], i) -> Optional[str]:
     try:

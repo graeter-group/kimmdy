@@ -82,7 +82,6 @@ class Topology:
         self.protein["dihedrals"]["content"] = [
             attributes_to_list(x) for x in self.proper_dihedrals.values()
         ] + [attributes_to_list(x) for x in self.improper_dihedrals.values()]
-        self.top[PROTEIN_SECTION]["subsections"] = self.protein
 
     def to_dict(self) -> TopologyDict:
         self._update_dict()
