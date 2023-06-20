@@ -75,7 +75,7 @@ def is_parameterized(term):
 def merge_section_slowgrowth(
     name: str,
     content: list[str],
-    CR: Any, # TODO: ConversionRecipe,
+    CR: Any,  # TODO: ConversionRecipe,
     state_A_reduced: Topology,
     ffpath: Path,
 ):
