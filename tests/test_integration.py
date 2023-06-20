@@ -7,20 +7,9 @@ from kimmdy.utils import run_shell_cmd
 
 import os
 import shutil
+import logging
 from pathlib import Path
 import pytest
-
-from kimmdy.topology.topology import Topology
-from kimmdy.changemanager import break_bond_plumed
-
-
-def check_succesful_run(logfile):
-    with open(logfile, "r") as f:
-        log = f.readlines()
-    if len(log) > 1:
-        if set(["Finished", "running", "tasks,"]).issubset(set(log[-1].split(sep=" "))):
-            return
-    raise ValueError("Log file indicates an unplanned exit of KIMMDY.")
 
 
 def setup_testdir(tmp_path, dirname) -> Path:
@@ -41,43 +30,53 @@ def setup_testdir(tmp_path, dirname) -> Path:
     return testdir
 
 
-def test_integration_emptyrun(tmp_path):
+def test_integration_emptyrun(tmp_path, caplog):
     testdir = setup_testdir(tmp_path, "emptyrun")
-
+    caplog.set_level(logging.INFO)
     (testdir / "emptyrun.txt").touch()
-    run_shell_cmd("kimmdy")
-    check_succesful_run(testdir / "kimmdy.log")
+
+    kimmdy_run()
+    for record in caplog.records:
+        # assert record.levelname != "WARNING"
+        assert record.levelname != "CRITICAL"
+    assert set(["Finished", "running", "tasks,"]).issubset(
+        set(caplog.records[-1].message.split(sep=" "))
+    )
 
 
-def test_integration_hat_reaction(tmp_path):
+def test_integration_hat_reaction(tmp_path, caplog):
     testdir = setup_testdir(tmp_path, "HAT_reaction")
 
-    (testdir / "emptyrun.txt").touch()
-    run_shell_cmd("kimmdy")
-    check_succesful_run(testdir / "kimmdy.log")
+    kimmdy_run()
+    for record in caplog.records:
+        # assert record.levelname != "WARNING"
+        assert record.levelname != "CRITICAL"
+    assert set(["Finished", "running", "tasks,"]).issubset(
+        set(caplog.records[-1].message.split(sep=" "))
+    )
 
 
-def test_integration_homolysis_reaction(tmp_path):
-    tmpdir = tmp_path / "homolysis"
-    shutil.copytree(
-        Path(__file__).parent / "test_files/test_integration/homolysis", tmpdir
+def test_integration_homolysis_reaction(tmp_path, caplog):
+    testdir = setup_testdir(tmp_path, "homolysis")
+
+    kimmdy_run()
+
+    for record in caplog.records:
+        # assert record.levelname != "WARNING"
+        assert record.levelname != "CRITICAL"
+    assert set(["Finished", "running", "tasks,"]).issubset(
+        set(caplog.records[-1].message.split(sep=" "))
     )
-    os.chdir(tmpdir)
-    Path(tmpdir / "amber99sb-star-ildnp.ff").symlink_to(
-        Path(__file__).parent / "test_files/assets/amber99sb-star-ildnp.ff",
-        target_is_directory=True,
-    )
-    kimmdy_run(tmpdir / "kimmdy.yml")
 
 
-def test_integration_whole_run(tmp_path):
-    tmpdir = tmp_path / "whole_run"
-    shutil.copytree(
-        Path(__file__).parent / "test_files/test_integration/whole_run", tmpdir
+def test_integration_whole_run(tmp_path, caplog):
+    testdir = setup_testdir(tmp_path, "whole_run")
+
+    kimmdy_run()
+
+    for record in caplog.records:
+        # assert record.levelname != "WARNING"
+        assert record.levelname != "CRITICAL"
+    assert set(["Finished", "running", "tasks,"]).issubset(
+        set(caplog.records[-1].message.split(sep=" "))
     )
-    os.chdir(tmpdir)
-    Path(tmpdir / "amber99sb-star-ildnp.ff").symlink_to(
-        Path(__file__).parent / "test_files/assets/amber99sb-star-ildnp.ff",
-        target_is_directory=True,
-    )
-    kimmdy_run(tmpdir / "kimmdy.yml")
