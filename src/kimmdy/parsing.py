@@ -118,19 +118,20 @@ def resolve_includes(path: Path) -> list[str]:
 def read_top(path: Path) -> TopologyDict:
     """Parse a list of lines from a topology file.
 
-    Assumptions and limitation:
-    - `#include` statements will be resolved
+    Assumptions and limitation
+    -----
+    - ``#include`` statements will be resolved
     - comments will be removed
     - all lines are stripped of leading and trailing whitespace
-    - `#undef` is not supported
-    - a section within `ifdef` may be a subsection of a section that was started
-      outside of the `ifdef`
-    - `#if .. #endif` statements only surround a full section or subsection,
+    - ``#undef`` is not supported
+    - a section within ``ifdef`` may be a subsection of a section that was started
+      outside of the ``ifdef``
+    - ``#if..#endif`` statements only surround a full section or subsection,
       not individual lines within a section and
       a section may either be contained within if ... else or it may not be,
       but it can not be duplicated with one part inside and one outside.
     - `if .. else` can't be nested
-    - `#include`s that don't resolve to a valid file path are silently dropped
+    - ``#include`` s that don't resolve to a valid file path are silently dropped
     - sections that can have subsections can also exist multiple, separate times
       e.g. moleculetype will appear multiple times and they should not be merged
     """

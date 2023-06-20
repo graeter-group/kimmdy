@@ -77,7 +77,14 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-kimmdy.constants">kimmdy.constants module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#kimmdy-coordinatemanager-module">kimmdy.coordinatemanager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-kimmdy.coordinatemanager">kimmdy.coordinatemanager module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#kimmdy.coordinatemanager.get_ff_sections"><code class="docutils literal notranslate"><span class="pre">get_ff_sections()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#kimmdy.coordinatemanager.is_parameterized"><code class="docutils literal notranslate"><span class="pre">is_parameterized()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#kimmdy.coordinatemanager.merge_section_slowgrowth"><code class="docutils literal notranslate"><span class="pre">merge_section_slowgrowth()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#kimmdy.coordinatemanager.parameterize_bonded_terms"><code class="docutils literal notranslate"><span class="pre">parameterize_bonded_terms()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#kimmdy.coordinatemanager.place_hydrogen"><code class="docutils literal notranslate"><span class="pre">place_hydrogen()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#module-kimmdy.kmc">kimmdy.kmc module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#kimmdy.kmc.KMCResult"><code class="docutils literal notranslate"><span class="pre">KMCResult</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#kimmdy.kmc.frm"><code class="docutils literal notranslate"><span class="pre">frm()</span></code></a></li>
@@ -455,8 +462,38 @@ Alias for self.__getattribute__</p>
 <section id="module-kimmdy.constants">
 <span id="kimmdy-constants-module"></span><h2>kimmdy.constants module<a class="headerlink" href="#module-kimmdy.constants" title="Permalink to this heading"></a></h2>
 </section>
-<section id="kimmdy-coordinatemanager-module">
-<h2>kimmdy.coordinatemanager module<a class="headerlink" href="#kimmdy-coordinatemanager-module" title="Permalink to this heading"></a></h2>
+<section id="module-kimmdy.coordinatemanager">
+<span id="kimmdy-coordinatemanager-module"></span><h2>kimmdy.coordinatemanager module<a class="headerlink" href="#module-kimmdy.coordinatemanager" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="kimmdy.coordinatemanager.get_ff_sections">
+<span class="sig-prename descclassname"><span class="pre">kimmdy.coordinatemanager.</span></span><span class="sig-name descname"><span class="pre">get_ff_sections</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ffdir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kimmdy/coordinatemanager.html#get_ff_sections"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#kimmdy.coordinatemanager.get_ff_sections" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="kimmdy.coordinatemanager.is_parameterized">
+<span class="sig-prename descclassname"><span class="pre">kimmdy.coordinatemanager.</span></span><span class="sig-name descname"><span class="pre">is_parameterized</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">term</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kimmdy/coordinatemanager.html#is_parameterized"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#kimmdy.coordinatemanager.is_parameterized" title="Permalink to this definition"></a></dt>
+<dd><p>does not work for dihedrals
+basically checks whether there are floats in the term</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="kimmdy.coordinatemanager.merge_section_slowgrowth">
+<span class="sig-prename descclassname"><span class="pre">kimmdy.coordinatemanager.</span></span><span class="sig-name descname"><span class="pre">merge_section_slowgrowth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">CR</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state_A_reduced</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Topology</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ffpath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kimmdy/coordinatemanager.html#merge_section_slowgrowth"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#kimmdy.coordinatemanager.merge_section_slowgrowth" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="kimmdy.coordinatemanager.parameterize_bonded_terms">
+<span class="sig-prename descclassname"><span class="pre">kimmdy.coordinatemanager.</span></span><span class="sig-name descname"><span class="pre">parameterize_bonded_terms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ffprm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">terms_atomtype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">terms</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kimmdy/coordinatemanager.html#parameterize_bonded_terms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#kimmdy.coordinatemanager.parameterize_bonded_terms" title="Permalink to this definition"></a></dt>
+<dd><p>takes a term (bond or angle) and adds the parameters from
+the force field ffbonded.itp file that match the atomtypes</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="kimmdy.coordinatemanager.place_hydrogen">
+<span class="sig-prename descclassname"><span class="pre">kimmdy.coordinatemanager.</span></span><span class="sig-name descname"><span class="pre">place_hydrogen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tpr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recipe</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kimmdy/coordinatemanager.html#place_hydrogen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#kimmdy.coordinatemanager.place_hydrogen" title="Permalink to this definition"></a></dt>
+<dd><p>use find_radical_pos to change the coordinates of the HAT hydrogen according to the reaction recipe</p>
+</dd></dl>
+
 </section>
 <section id="module-kimmdy.kmc">
 <span id="kimmdy-kmc-module"></span><h2>kimmdy.kmc module<a class="headerlink" href="#module-kimmdy.kmc" title="Permalink to this heading"></a></h2>
@@ -517,7 +554,7 @@ Alias for self.__getattribute__</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="kimmdy.kmc.frm">
-<span class="sig-prename descclassname"><span class="pre">kimmdy.kmc.</span></span><span class="sig-name descname"><span class="pre">frm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">recipe_collection:</span> <span class="pre">~kimmdy.reaction.RecipeCollection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng:</span> <span class="pre">~numpy.random.bit_generator.BitGenerator</span> <span class="pre">=</span> <span class="pre">Generator(PCG64)</span> <span class="pre">at</span> <span class="pre">0x7F7BE783E500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MD_time:</span> <span class="pre">float</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/kimmdy/kmc.html#frm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#kimmdy.kmc.frm" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">kimmdy.kmc.</span></span><span class="sig-name descname"><span class="pre">frm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">recipe_collection:</span> <span class="pre">~kimmdy.reaction.RecipeCollection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng:</span> <span class="pre">~numpy.random.bit_generator.BitGenerator</span> <span class="pre">=</span> <span class="pre">Generator(PCG64)</span> <span class="pre">at</span> <span class="pre">0x7FA5A89AB220</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MD_time:</span> <span class="pre">float</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/kimmdy/kmc.html#frm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#kimmdy.kmc.frm" title="Permalink to this definition"></a></dt>
 <dd><p>First Reaction Method variant of Kinetic Monte Carlo.
 takes RecipeCollection and choses a recipe based on which reaction would occur.</p>
 <dl class="field-list simple">
@@ -533,7 +570,7 @@ takes RecipeCollection and choses a recipe based on which reaction would occur.<
 
 <dl class="py function">
 <dt class="sig sig-object py" id="kimmdy.kmc.rf_kmc">
-<span class="sig-prename descclassname"><span class="pre">kimmdy.kmc.</span></span><span class="sig-name descname"><span class="pre">rf_kmc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">recipe_collection:</span> <span class="pre">~kimmdy.reaction.RecipeCollection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng:</span> <span class="pre">~numpy.random.bit_generator.BitGenerator</span> <span class="pre">=</span> <span class="pre">Generator(PCG64)</span> <span class="pre">at</span> <span class="pre">0x7F7BE783F220</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/kimmdy/kmc.html#rf_kmc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#kimmdy.kmc.rf_kmc" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">kimmdy.kmc.</span></span><span class="sig-name descname"><span class="pre">rf_kmc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">recipe_collection:</span> <span class="pre">~kimmdy.reaction.RecipeCollection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng:</span> <span class="pre">~numpy.random.bit_generator.BitGenerator</span> <span class="pre">=</span> <span class="pre">Generator(PCG64)</span> <span class="pre">at</span> <span class="pre">0x7FA5A89AA180</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/kimmdy/kmc.html#rf_kmc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#kimmdy.kmc.rf_kmc" title="Permalink to this definition"></a></dt>
 <dd><p>Rejection-Free Monte Carlo.
 takes RecipeCollection and choses a recipe based on the relative propensity of the events.</p>
 <dl class="field-list simple">
@@ -623,25 +660,25 @@ the dissociation energy E_dissoc [kJ mol-1] is the value</p>
 <dt class="sig sig-object py" id="kimmdy.parsing.read_top">
 <span class="sig-prename descclassname"><span class="pre">kimmdy.parsing.</span></span><span class="sig-name descname"><span class="pre">read_top</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/kimmdy/parsing.html#read_top"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#kimmdy.parsing.read_top" title="Permalink to this definition"></a></dt>
 <dd><p>Parse a list of lines from a topology file.</p>
-<p>Assumptions and limitation:
-- <cite>#include</cite> statements will be resolved
-- comments will be removed
-- all lines are stripped of leading and trailing whitespace
-- <cite>#undef</cite> is not supported
-- a section within <cite>ifdef</cite> may be a subsection of a section that was started</p>
-<blockquote>
-<div><p>outside of the <cite>ifdef</cite></p>
-</div></blockquote>
+<section id="assumptions-and-limitation">
+<h3>Assumptions and limitation<a class="headerlink" href="#assumptions-and-limitation" title="Permalink to this heading"></a></h3>
 <ul class="simple">
-<li><p><cite>#if .. #endif</cite> statements only surround a full section or subsection,
+<li><p><code class="docutils literal notranslate"><span class="pre">#include</span></code> statements will be resolved</p></li>
+<li><p>comments will be removed</p></li>
+<li><p>all lines are stripped of leading and trailing whitespace</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">#undef</span></code> is not supported</p></li>
+<li><p>a section within <code class="docutils literal notranslate"><span class="pre">ifdef</span></code> may be a subsection of a section that was started
+outside of the <code class="docutils literal notranslate"><span class="pre">ifdef</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">#if..#endif</span></code> statements only surround a full section or subsection,
 not individual lines within a section and
 a section may either be contained within if … else or it may not be,
 but it can not be duplicated with one part inside and one outside.</p></li>
 <li><p><cite>if .. else</cite> can’t be nested</p></li>
-<li><p><a href="#id3"><span class="problematic" id="id4">`</span></a>#include`s that don’t resolve to a valid file path are silently dropped</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">#include</span></code> s that don’t resolve to a valid file path are silently dropped</p></li>
 <li><p>sections that can have subsections can also exist multiple, separate times
 e.g. moleculetype will appear multiple times and they should not be merged</p></li>
 </ul>
+</section>
 </dd></dl>
 
 <dl class="py function">
@@ -775,23 +812,23 @@ time in ps default None.</p>
 </dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="id3">
+<span class="sig-name descname"><span class="pre">idx_to_bind</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#id3" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id4">
+<span class="sig-name descname"><span class="pre">idx_to_break</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#id4" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="id5">
-<span class="sig-name descname"><span class="pre">idx_to_bind</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#id5" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">idx_to_move</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#id5" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id6">
-<span class="sig-name descname"><span class="pre">idx_to_break</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#id6" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="id7">
-<span class="sig-name descname"><span class="pre">idx_to_move</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#id7" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="id8">
-<span class="sig-name descname"><span class="pre">new_coords</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#id8" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">new_coords</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#id6" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -892,18 +929,18 @@ t1 can equal t2 for the first frame.</p>
 </dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="id7">
+<span class="sig-name descname"><span class="pre">rates</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id7" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id8">
+<span class="sig-name descname"><span class="pre">recipe_steps</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#kimmdy.reaction.RecipeStep" title="kimmdy.reaction.RecipeStep"><span class="pre">kimmdy.reaction.RecipeStep</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id8" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="id9">
-<span class="sig-name descname"><span class="pre">rates</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id9" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="id10">
-<span class="sig-name descname"><span class="pre">recipe_steps</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#kimmdy.reaction.RecipeStep" title="kimmdy.reaction.RecipeStep"><span class="pre">kimmdy.reaction.RecipeStep</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id10" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="id11">
-<span class="sig-name descname"><span class="pre">timespans</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id11" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">timespans</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id9" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>

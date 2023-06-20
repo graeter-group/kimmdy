@@ -39,7 +39,11 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../welcome.html">Welcome to KIMMDY: Getting Started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../modules.html">kimmdy</a></li>
 </ul>
@@ -189,19 +193,20 @@
 <div class="viewcode-block" id="read_top"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.parsing.read_top">[docs]</a><span class="k">def</span> <span class="nf">read_top</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TopologyDict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Parse a list of lines from a topology file.</span>
 
-<span class="sd">    Assumptions and limitation:</span>
-<span class="sd">    - `#include` statements will be resolved</span>
+<span class="sd">    Assumptions and limitation</span>
+<span class="sd">    -----</span>
+<span class="sd">    - ``#include`` statements will be resolved</span>
 <span class="sd">    - comments will be removed</span>
 <span class="sd">    - all lines are stripped of leading and trailing whitespace</span>
-<span class="sd">    - `#undef` is not supported</span>
-<span class="sd">    - a section within `ifdef` may be a subsection of a section that was started</span>
-<span class="sd">      outside of the `ifdef`</span>
-<span class="sd">    - `#if .. #endif` statements only surround a full section or subsection,</span>
+<span class="sd">    - ``#undef`` is not supported</span>
+<span class="sd">    - a section within ``ifdef`` may be a subsection of a section that was started</span>
+<span class="sd">      outside of the ``ifdef``</span>
+<span class="sd">    - ``#if..#endif`` statements only surround a full section or subsection,</span>
 <span class="sd">      not individual lines within a section and</span>
 <span class="sd">      a section may either be contained within if ... else or it may not be,</span>
 <span class="sd">      but it can not be duplicated with one part inside and one outside.</span>
 <span class="sd">    - `if .. else` can&#39;t be nested</span>
-<span class="sd">    - `#include`s that don&#39;t resolve to a valid file path are silently dropped</span>
+<span class="sd">    - ``#include`` s that don&#39;t resolve to a valid file path are silently dropped</span>
 <span class="sd">    - sections that can have subsections can also exist multiple, separate times</span>
 <span class="sd">      e.g. moleculetype will appear multiple times and they should not be merged</span>
 <span class="sd">    &quot;&quot;&quot;</span>
