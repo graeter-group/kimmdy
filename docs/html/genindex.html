@@ -10,6 +10,8 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/sphinx_highlight.js"></script>
@@ -37,7 +39,11 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="welcome.html">Welcome to KIMMDY: Getting Started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">kimmdy</a></li>
 </ul>
@@ -188,13 +194,11 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="kimmdy.html#kimmdy.misc_helper.edgelist_to_dot_graph">edgelist_to_dot_graph() (in module kimmdy.misc_helper)</a>
 </li>
-      <li><a href="kimmdy.html#kimmdy.config.HomolysisConfig.edis">edis (kimmdy.config.HomolysisConfig attribute)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="kimmdy.html#kimmdy.config.Config.experiment">experiment (kimmdy.config.Config attribute)</a>
+      <li><a href="kimmdy.html#kimmdy.config.HomolysisConfig.edis">edis (kimmdy.config.HomolysisConfig attribute)</a>
 </li>
-      <li><a href="kimmdy.html#kimmdy.parsing.extract_section_name">extract_section_name() (in module kimmdy.parsing)</a>
+      <li><a href="kimmdy.html#kimmdy.config.Config.experiment">experiment (kimmdy.config.Config attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -238,8 +242,6 @@
 </li>
       <li><a href="kimmdy.html#kimmdy.reaction.ReactionPlugin.get_recipe_collection">get_recipe_collection() (kimmdy.reaction.ReactionPlugin method)</a>
 </li>
-      <li><a href="kimmdy.html#kimmdy.parsing.get_sections">get_sections() (in module kimmdy.parsing)</a>
-</li>
       <li><a href="kimmdy.html#kimmdy.utils.get_shell_stdout">get_shell_stdout() (in module kimmdy.utils)</a>
 </li>
       <li><a href="kimmdy.html#kimmdy.config.Config.gro">gro (kimmdy.config.Config attribute)</a>
@@ -270,13 +272,13 @@
 </li>
       <li><a href="kimmdy.html#kimmdy.config.Config.idx">idx (kimmdy.config.Config attribute)</a>
 </li>
-      <li><a href="kimmdy.html#id0">idx_to_bind (kimmdy.reaction.Move attribute)</a>, <a href="kimmdy.html#kimmdy.reaction.Move.idx_to_bind">[1]</a>
+      <li><a href="kimmdy.html#id5">idx_to_bind (kimmdy.reaction.Move attribute)</a>, <a href="kimmdy.html#kimmdy.reaction.Move.idx_to_bind">[1]</a>
 </li>
-      <li><a href="kimmdy.html#id1">idx_to_break (kimmdy.reaction.Move attribute)</a>, <a href="kimmdy.html#kimmdy.reaction.Move.idx_to_break">[1]</a>
+      <li><a href="kimmdy.html#id6">idx_to_break (kimmdy.reaction.Move attribute)</a>, <a href="kimmdy.html#kimmdy.reaction.Move.idx_to_break">[1]</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="kimmdy.html#id2">idx_to_move (kimmdy.reaction.Move attribute)</a>, <a href="kimmdy.html#kimmdy.reaction.Move.idx_to_move">[1]</a>
+      <li><a href="kimmdy.html#id7">idx_to_move (kimmdy.reaction.Move attribute)</a>, <a href="kimmdy.html#kimmdy.reaction.Move.idx_to_move">[1]</a>
 </li>
       <li><a href="kimmdy.html#kimmdy.utils.increment_logfile">increment_logfile() (in module kimmdy.utils)</a>
 </li>
@@ -382,6 +384,8 @@
       </ul></li>
       <li><a href="kimmdy.html#kimmdy.cmd.kimmdy_run">kimmdy_run() (in module kimmdy.cmd)</a>
 </li>
+      <li><a href="kimmdy.html#kimmdy.kmc.KMCResult">KMCResult (class in kimmdy.kmc)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -399,8 +403,6 @@
       <li><a href="kimmdy.html#kimmdy.config.Mds">Mds (class in kimmdy.config)</a>
 </li>
       <li><a href="kimmdy.html#kimmdy.config.Config.mds">mds (kimmdy.config.Config attribute)</a>
-</li>
-      <li><a href="kimmdy.html#kimmdy.parsing.merge_propers_impropers">merge_propers_impropers() (in module kimmdy.parsing)</a>
 </li>
       <li><a href="kimmdy.html#kimmdy.changemanager.modify_plumed">modify_plumed() (in module kimmdy.changemanager)</a>
 </li>
@@ -451,7 +453,7 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="kimmdy.html#id3">new_coords (kimmdy.reaction.Move attribute)</a>, <a href="kimmdy.html#kimmdy.reaction.Move.new_coords">[1]</a>
+      <li><a href="kimmdy.html#id8">new_coords (kimmdy.reaction.Move attribute)</a>, <a href="kimmdy.html#kimmdy.reaction.Move.new_coords">[1]</a>
 </li>
   </ul></td>
 </tr></table>
@@ -479,15 +481,19 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="kimmdy.html#kimmdy.config.PullConfig">PullConfig (class in kimmdy.config)</a>
 </li>
+      <li><a href="kimmdy.html#kimmdy.utils.pushd">pushd() (in module kimmdy.utils)</a>
+</li>
   </ul></td>
 </tr></table>
 
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="kimmdy.html#id4">rates (kimmdy.reaction.Recipe attribute)</a>, <a href="kimmdy.html#kimmdy.reaction.Recipe.rates">[1]</a>
+      <li><a href="kimmdy.html#id9">rates (kimmdy.reaction.Recipe attribute)</a>, <a href="kimmdy.html#kimmdy.reaction.Recipe.rates">[1]</a>
 </li>
       <li><a href="kimmdy.html#kimmdy.runmanager.State.REACTION">REACTION (kimmdy.runmanager.State attribute)</a>
+</li>
+      <li><a href="kimmdy.html#id0">reaction_probability (kimmdy.kmc.KMCResult attribute)</a>, <a href="kimmdy.html#kimmdy.kmc.KMCResult.reaction_probability">[1]</a>
 </li>
       <li><a href="kimmdy.html#kimmdy.reaction.ReactionPlugin">ReactionPlugin (class in kimmdy.reaction)</a>
 </li>
@@ -511,13 +517,19 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="kimmdy.html#kimmdy.reaction.Recipe">Recipe (class in kimmdy.reaction)</a>
 </li>
-      <li><a href="kimmdy.html#id5">recipe_steps (kimmdy.reaction.Recipe attribute)</a>, <a href="kimmdy.html#kimmdy.reaction.Recipe.recipe_steps">[1]</a>
+      <li><a href="kimmdy.html#id1">recipe_steps (kimmdy.kmc.KMCResult attribute)</a>, <a href="kimmdy.html#kimmdy.kmc.KMCResult.recipe_steps">[1]</a>
+
+      <ul>
+        <li><a href="kimmdy.html#id10">(kimmdy.reaction.Recipe attribute)</a>, <a href="kimmdy.html#kimmdy.reaction.Recipe.recipe_steps">[1]</a>
 </li>
+      </ul></li>
       <li><a href="kimmdy.html#kimmdy.reaction.RecipeCollection">RecipeCollection (class in kimmdy.reaction)</a>
 </li>
       <li><a href="kimmdy.html#kimmdy.reaction.RecipeCollection.recipes">recipes (kimmdy.reaction.RecipeCollection attribute)</a>
 </li>
       <li><a href="kimmdy.html#kimmdy.reaction.RecipeStep">RecipeStep (class in kimmdy.reaction)</a>
+</li>
+      <li><a href="kimmdy.html#kimmdy.parsing.resolve_includes">resolve_includes() (in module kimmdy.parsing)</a>
 </li>
       <li><a href="kimmdy.html#kimmdy.kmc.rf_kmc">rf_kmc() (in module kimmdy.kmc)</a>
 </li>
@@ -553,8 +565,6 @@
 </li>
       <li><a href="kimmdy.html#kimmdy.utils.sort_improper">sort_improper() (in module kimmdy.utils)</a>
 </li>
-      <li><a href="kimmdy.html#kimmdy.parsing.split_dihedrals">split_dihedrals() (in module kimmdy.parsing)</a>
-</li>
       <li><a href="kimmdy.html#kimmdy.runmanager.State">State (class in kimmdy.runmanager)</a>
 </li>
       <li><a href="kimmdy.html#kimmdy.utils.store_linelist_to_file">store_linelist_to_file() (in module kimmdy.utils)</a>
@@ -573,12 +583,14 @@
 </li>
       <li><a href="kimmdy.html#kimmdy.config.SequenceConfig.tasks">tasks (kimmdy.config.SequenceConfig attribute)</a>
 </li>
-      <li><a href="kimmdy.html#id6">timespans (kimmdy.reaction.Recipe attribute)</a>, <a href="kimmdy.html#kimmdy.reaction.Recipe.timespans">[1]</a>
+      <li><a href="kimmdy.html#id2">time_step (kimmdy.kmc.KMCResult attribute)</a>, <a href="kimmdy.html#kimmdy.kmc.KMCResult.time_step">[1]</a>
 </li>
-      <li><a href="kimmdy.html#kimmdy.reaction.RecipeCollection.to_csv">to_csv() (kimmdy.reaction.RecipeCollection method)</a>
+      <li><a href="kimmdy.html#id11">timespans (kimmdy.reaction.Recipe attribute)</a>, <a href="kimmdy.html#kimmdy.reaction.Recipe.timespans">[1]</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="kimmdy.html#kimmdy.reaction.RecipeCollection.to_csv">to_csv() (kimmdy.reaction.RecipeCollection method)</a>
+</li>
       <li><a href="kimmdy.html#kimmdy.reaction.RecipeCollection.to_dill">to_dill() (kimmdy.reaction.RecipeCollection method)</a>
 </li>
       <li><a href="kimmdy.html#kimmdy.config.Config.top">top (kimmdy.config.Config attribute)</a>
@@ -601,7 +613,7 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="kimmdy.html#kimmdy.parsing.write_plumed">write_plumed() (in module kimmdy.parsing)</a>
 </li>
-      <li><a href="kimmdy.html#kimmdy.parsing.write_topol">write_topol() (in module kimmdy.parsing)</a>
+      <li><a href="kimmdy.html#kimmdy.parsing.write_top">write_top() (in module kimmdy.parsing)</a>
 </li>
   </ul></td>
 </tr></table>

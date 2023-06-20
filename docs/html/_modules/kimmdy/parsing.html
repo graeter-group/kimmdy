@@ -69,54 +69,23 @@
            <div itemprop="articleBody">
              
   <h1>Source code for kimmdy.parsing</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Iterable</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Generator</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Generator</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
 <span class="kn">import</span> <span class="nn">xml.etree.ElementTree</span> <span class="k">as</span> <span class="nn">ET</span>
 <span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">takewhile</span>
+<span class="kn">from</span> <span class="nn">kimmdy.utils</span> <span class="kn">import</span> <span class="n">pushd</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 
-<span class="n">TopologyDict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span>
+<span class="n">TopologyDict</span> <span class="o">=</span> <span class="nb">dict</span>
 
 
 <div class="viewcode-block" id="is_not_comment"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.parsing.is_not_comment">[docs]</a><span class="k">def</span> <span class="nf">is_not_comment</span><span class="p">(</span><span class="n">c</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">c</span> <span class="o">!=</span> <span class="s2">&quot;;&quot;</span></div>
-
-
-<div class="viewcode-block" id="get_sections"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.parsing.get_sections">[docs]</a><span class="k">def</span> <span class="nf">get_sections</span><span class="p">(</span>
-    <span class="n">seq</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">section_marker</span><span class="p">:</span> <span class="nb">str</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span>
-    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">seq</span><span class="p">:</span>
-        <span class="n">line</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">takewhile</span><span class="p">(</span><span class="n">is_not_comment</span><span class="p">,</span> <span class="n">line</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">section_marker</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">data</span><span class="p">:</span>
-                <span class="c1"># first element will be empty</span>
-                <span class="c1"># because newlines mark sections</span>
-                <span class="n">data</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-                <span class="c1"># only yield section if non-empty</span>
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="k">yield</span> <span class="n">data</span>
-                <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span>
-        <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">))</span>
-    <span class="k">if</span> <span class="n">data</span><span class="p">:</span>
-        <span class="k">yield</span> <span class="n">data</span></div>
-
-
-<div class="viewcode-block" id="extract_section_name"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.parsing.extract_section_name">[docs]</a><span class="k">def</span> <span class="nf">extract_section_name</span><span class="p">(</span><span class="n">ls</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;takes a list of lines and return a tuple</span>
-<span class="sd">    with the name and the lines minus the</span>
-<span class="sd">    line that contained the name.</span>
-<span class="sd">    Returns the empty string as the name if no name was found.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ls</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">l</span> <span class="ow">and</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;;&quot;</span> <span class="ow">and</span> <span class="s2">&quot;[&quot;</span> <span class="ow">in</span> <span class="n">l</span><span class="p">:</span>
-            <span class="n">name</span> <span class="o">=</span> <span class="n">l</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;[] </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="n">ls</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-            <span class="k">return</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">ls</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">ls</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="create_subsections"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.parsing.create_subsections">[docs]</a><span class="k">def</span> <span class="nf">create_subsections</span><span class="p">(</span><span class="n">ls</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]):</span>
@@ -135,6 +104,42 @@
 
 <div class="viewcode-block" id="read_rtp"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.parsing.read_rtp">[docs]</a><span class="k">def</span> <span class="nf">read_rtp</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
     <span class="c1"># TODO: make this more elegant and performant</span>
+    <span class="c1"># TODO combine with top parser?</span>
+    <span class="c1"># would need a way to tell the parser</span>
+    <span class="c1"># that here, all sections have subsections</span>
+    <span class="k">def</span> <span class="nf">get_sections</span><span class="p">(</span>
+        <span class="n">seq</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">section_marker</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">seq</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">takewhile</span><span class="p">(</span><span class="n">is_not_comment</span><span class="p">,</span> <span class="n">line</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">section_marker</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">data</span><span class="p">:</span>
+                    <span class="c1"># first element will be empty</span>
+                    <span class="c1"># because newlines mark sections</span>
+                    <span class="n">data</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                    <span class="c1"># only yield section if non-empty</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">yield</span> <span class="n">data</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span>
+            <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">data</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">data</span>
+
+    <span class="k">def</span> <span class="nf">extract_section_name</span><span class="p">(</span><span class="n">ls</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;takes a list of lines and return a tuple</span>
+<span class="sd">        with the name and the lines minus the</span>
+<span class="sd">        line that contained the name.</span>
+<span class="sd">        Returns the empty string as the name if no name was found.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ls</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">l</span> <span class="ow">and</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;;&quot;</span> <span class="ow">and</span> <span class="s2">&quot;[&quot;</span> <span class="ow">in</span> <span class="n">l</span><span class="p">:</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="n">l</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;[] </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">ls</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                <span class="k">return</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">ls</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">ls</span><span class="p">)</span>
+
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">sections</span> <span class="o">=</span> <span class="n">get_sections</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">d</span> <span class="o">=</span> <span class="p">{}</span>
@@ -152,26 +157,209 @@
         <span class="k">return</span> <span class="n">d</span></div>
 
 
-<div class="viewcode-block" id="read_top"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.parsing.read_top">[docs]</a><span class="k">def</span> <span class="nf">read_top</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TopologyDict</span><span class="p">:</span>
-    <span class="c1"># TODO look into following #includes</span>
-    <span class="c1"># TODO look into [ intermolecule ] section</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="n">sections</span> <span class="o">=</span> <span class="n">get_sections</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">d</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sections</span> <span class="k">if</span> <span class="n">s</span> <span class="ow">is</span> <span class="ow">not</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]]):</span>
-            <span class="n">name</span><span class="p">,</span> <span class="n">content</span> <span class="o">=</span> <span class="n">extract_section_name</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
-            <span class="n">content</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">split</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">content</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">split</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">content</span> <span class="o">==</span> <span class="p">[]:</span>
+<div class="viewcode-block" id="resolve_includes"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.parsing.resolve_includes">[docs]</a><span class="k">def</span> <span class="nf">resolve_includes</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve #include statements in a (top/itp) file.&quot;&quot;&quot;</span>
+    <span class="nb">dir</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">parent</span>
+    <span class="n">fname</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">name</span>
+    <span class="n">cwd</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="nb">dir</span><span class="p">)</span>
+    <span class="n">ls_prime</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">l</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">takewhile</span><span class="p">(</span><span class="n">is_not_comment</span><span class="p">,</span> <span class="n">l</span><span class="p">))</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">l</span><span class="p">:</span>
                 <span class="k">continue</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="p">:</span>
-                <span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;BLOCK </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="c1"># sections can be duplicated.</span>
-            <span class="c1"># append values in such cases</span>
-            <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">d</span><span class="p">:</span>
-                <span class="n">d</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">content</span>
+            <span class="k">if</span> <span class="n">l</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#include&quot;</span><span class="p">):</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">l</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">ls_prime</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">resolve_includes</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">_</span><span class="p">:</span>
+                    <span class="c1"># drop line if path can&#39;t be resolved</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;top include </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2"> could not be resolved. Line was dropped.&quot;</span>
+                    <span class="p">)</span>
+                    <span class="k">continue</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">d</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">+=</span> <span class="n">content</span>
-        <span class="k">return</span> <span class="n">d</span></div>
+                <span class="n">ls_prime</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">cwd</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ls_prime</span></div>
+
+
+<div class="viewcode-block" id="read_top"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.parsing.read_top">[docs]</a><span class="k">def</span> <span class="nf">read_top</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TopologyDict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parse a list of lines from a topology file.</span>
+
+<span class="sd">    Assumptions and limitation:</span>
+<span class="sd">    - `#include` statements will be resolved</span>
+<span class="sd">    - comments will be removed</span>
+<span class="sd">    - all lines are stripped of leading and trailing whitespace</span>
+<span class="sd">    - `#undef` is not supported</span>
+<span class="sd">    - a section within `ifdef` may be a subsection of a section that was started</span>
+<span class="sd">      outside of the `ifdef`</span>
+<span class="sd">    - `#if .. #endif` statements only surround a full section or subsection,</span>
+<span class="sd">      not individual lines within a section and</span>
+<span class="sd">      a section may either be contained within if ... else or it may not be,</span>
+<span class="sd">      but it can not be duplicated with one part inside and one outside.</span>
+<span class="sd">    - `if .. else` can&#39;t be nested</span>
+<span class="sd">    - `#include`s that don&#39;t resolve to a valid file path are silently dropped</span>
+<span class="sd">    - sections that can have subsections can also exist multiple, separate times</span>
+<span class="sd">      e.g. moleculetype will appear multiple times and they should not be merged</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">SECTIONS_WITH_SUBSECTIONS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;moleculetype&quot;</span><span class="p">,)</span>
+    <span class="n">NESTABLE_SECTIONS</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;atoms&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;bonds&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;pairs&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;angles&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;dihedrals&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;impropers&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;exclusions&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;virtual_sites&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;settles&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;position_restraints&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;dihedral_restraints&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">ls</span> <span class="o">=</span> <span class="n">resolve_includes</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="n">ls</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">l</span><span class="p">:</span> <span class="ow">not</span> <span class="n">l</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">),</span> <span class="n">ls</span><span class="p">)</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">d</span><span class="p">[</span><span class="s2">&quot;define&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">parent_section_index</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">parent_section</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">section</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">condition</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">condition_else</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">is_first_line_after_section_header</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">content_key</span> <span class="o">=</span> <span class="s2">&quot;content&quot;</span>
+
+    <span class="k">def</span> <span class="nf">empty_section</span><span class="p">(</span><span class="n">condition</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;else_content&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;extra&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;condition&quot;</span><span class="p">:</span> <span class="n">condition</span><span class="p">}</span>
+
+    <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">ls</span><span class="p">:</span>
+        <span class="c1"># where to put lines dependign on current context</span>
+        <span class="k">if</span> <span class="n">l</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#define&quot;</span><span class="p">):</span>
+            <span class="n">l</span> <span class="o">=</span> <span class="n">l</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">l</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">l</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span>
+            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;define&quot;</span><span class="p">][</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">values</span>
+            <span class="k">continue</span>
+        <span class="k">elif</span> <span class="n">l</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#if&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">is_first_line_after_section_header</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                    <span class="s2">&quot;#if ... #endif can only be used to surround a section, not within&quot;</span>
+                <span class="p">)</span>
+            <span class="n">l</span> <span class="o">=</span> <span class="n">l</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="n">condition_type</span> <span class="o">=</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">removeprefix</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">)</span>
+            <span class="n">condition_value</span> <span class="o">=</span> <span class="n">l</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">condition</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">condition_type</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">condition_value</span><span class="p">}</span>
+            <span class="k">continue</span>
+        <span class="k">elif</span> <span class="n">l</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#else&quot;</span><span class="p">):</span>
+            <span class="n">condition_else</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">content_key</span> <span class="o">=</span> <span class="s2">&quot;else_content&quot;</span>
+            <span class="k">continue</span>
+        <span class="k">elif</span> <span class="n">l</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#endif&quot;</span><span class="p">):</span>
+            <span class="n">condition</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">condition_else</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">content_key</span> <span class="o">=</span> <span class="s2">&quot;content&quot;</span>
+            <span class="k">continue</span>
+
+        <span class="k">elif</span> <span class="n">l</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;[&quot;</span><span class="p">):</span>
+            <span class="c1"># start a new section</span>
+            <span class="n">section</span> <span class="o">=</span> <span class="n">l</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;[] </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">SECTIONS_WITH_SUBSECTIONS</span><span class="p">:</span>
+                <span class="n">parent_section</span> <span class="o">=</span> <span class="n">section</span>
+                <span class="n">section</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">parent_section</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">parent_section</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">parent_section</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">parent_section_index</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="n">parent_section_index</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="n">d</span><span class="p">[</span><span class="n">parent_section</span><span class="p">]</span> <span class="o">=</span> <span class="n">empty_section</span><span class="p">(</span><span class="n">condition</span><span class="p">)</span>
+                    <span class="n">d</span><span class="p">[</span><span class="n">parent_section</span><span class="p">][</span><span class="s2">&quot;subsections&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">parent_section</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="c1"># in a parent_section that can have subsections</span>
+                    <span class="k">if</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">NESTABLE_SECTIONS</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">d</span><span class="p">[</span><span class="n">parent_section</span><span class="p">][</span><span class="s2">&quot;subsections&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">section</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="n">d</span><span class="p">[</span><span class="n">parent_section</span><span class="p">][</span><span class="s2">&quot;subsections&quot;</span><span class="p">][</span><span class="n">section</span><span class="p">]</span> <span class="o">=</span> <span class="n">empty_section</span><span class="p">(</span>
+                                <span class="n">condition</span>
+                            <span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c1"># exit parent_section by setting it to None</span>
+                        <span class="n">parent_section</span> <span class="o">=</span> <span class="kc">None</span>
+                        <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">section</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="n">d</span><span class="p">[</span><span class="n">section</span><span class="p">]</span> <span class="o">=</span> <span class="n">empty_section</span><span class="p">(</span><span class="n">condition</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">section</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="c1"># regular section that is not a subsection</span>
+                        <span class="n">d</span><span class="p">[</span><span class="n">section</span><span class="p">]</span> <span class="o">=</span> <span class="n">empty_section</span><span class="p">(</span><span class="n">condition</span><span class="p">)</span>
+            <span class="n">is_first_line_after_section_header</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">parent_section</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># line is in a section that can have subsections</span>
+                <span class="k">if</span> <span class="n">section</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="c1"># but no yet in a subsection</span>
+                    <span class="n">l</span> <span class="o">=</span> <span class="n">l</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+                    <span class="n">d</span><span class="p">[</span><span class="n">parent_section</span><span class="p">][</span><span class="n">content_key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># part of a subsection</span>
+                    <span class="n">d</span><span class="p">[</span><span class="n">parent_section</span><span class="p">][</span><span class="s2">&quot;subsections&quot;</span><span class="p">][</span><span class="n">section</span><span class="p">][</span><span class="n">content_key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="n">l</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+                    <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">section</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;topology file </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2"> contains lines outside of a section&quot;</span>
+                    <span class="p">)</span>
+                <span class="n">d</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="n">content_key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">l</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+            <span class="n">is_first_line_after_section_header</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;topology file </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2"> does not contain any sections&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">d</span></div>
+
+
+<div class="viewcode-block" id="write_top"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.parsing.write_top">[docs]</a><span class="k">def</span> <span class="nf">write_top</span><span class="p">(</span><span class="n">top</span><span class="p">:</span> <span class="n">TopologyDict</span><span class="p">,</span> <span class="n">outfile</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">write_section</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">section</span><span class="p">):</span>
+        <span class="n">printname</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;_\d+&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="n">condition</span> <span class="o">=</span> <span class="n">section</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;condition&quot;</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">condition</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[ </span><span class="si">{</span><span class="n">printname</span><span class="si">}</span><span class="s2"> ]</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">section</span><span class="p">[</span><span class="s2">&quot;content&quot;</span><span class="p">]:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">l</span><span class="p">))</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">condition_type</span> <span class="o">=</span> <span class="n">condition</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span>
+            <span class="n">condition_value</span> <span class="o">=</span> <span class="n">condition</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;#</span><span class="si">{</span><span class="n">condition_type</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">condition_value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[ </span><span class="si">{</span><span class="n">printname</span><span class="si">}</span><span class="s2"> ]</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">section</span><span class="p">[</span><span class="s2">&quot;content&quot;</span><span class="p">]:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">l</span><span class="p">))</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">else_content</span> <span class="o">=</span> <span class="n">section</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;else_content&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">else_content</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;#else</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[ </span><span class="si">{</span><span class="n">printname</span><span class="si">}</span><span class="s2"> ]</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">else_content</span><span class="p">:</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">l</span><span class="p">))</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;#endif</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">outfile</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">define</span> <span class="o">=</span> <span class="n">top</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;define&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">define</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span><span class="s2">&quot;#define &quot;</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">top</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;define&quot;</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">subsections</span> <span class="o">=</span> <span class="n">section</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;subsections&quot;</span><span class="p">)</span>
+            <span class="n">write_section</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">section</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">subsections</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">subsections</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">write_section</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">section</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="read_edissoc"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.parsing.read_edissoc">[docs]</a><span class="k">def</span> <span class="nf">read_edissoc</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
@@ -187,45 +375,6 @@
     <span class="k">return</span> <span class="n">edissocs</span></div>
 
 
-<div class="viewcode-block" id="write_topol"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.parsing.write_topol">[docs]</a><span class="k">def</span> <span class="nf">write_topol</span><span class="p">(</span><span class="n">top</span><span class="p">:</span> <span class="n">TopologyDict</span><span class="p">,</span> <span class="n">outfile</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">outfile</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">title</span><span class="p">,</span> <span class="n">content</span> <span class="ow">in</span> <span class="n">top</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">content</span> <span class="o">==</span> <span class="p">[]:</span>
-                <span class="k">continue</span>
-            <span class="k">if</span> <span class="n">title</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;BLOCK &quot;</span><span class="p">):</span>
-                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[ </span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2"> ]</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="n">s</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="p">[</span>
-                        <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">x</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span> <span class="k">if</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;;&quot;</span> <span class="k">else</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">l</span><span class="p">])</span>
-                        <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">content</span>
-                    <span class="p">]</span>
-                <span class="p">)</span>
-                <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span>
-            <span class="p">)</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">s</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="split_dihedrals"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.parsing.split_dihedrals">[docs]</a><span class="k">def</span> <span class="nf">split_dihedrals</span><span class="p">(</span><span class="n">top</span><span class="p">:</span> <span class="n">TopologyDict</span><span class="p">):</span>
-    <span class="k">if</span> <span class="s2">&quot;dihedrals&quot;</span> <span class="ow">in</span> <span class="n">top</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-        <span class="n">top</span><span class="p">[</span><span class="s2">&quot;propers&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">top</span><span class="p">[</span><span class="s2">&quot;dihedrals&quot;</span><span class="p">])</span>
-        <span class="n">top</span><span class="p">[</span><span class="s2">&quot;impropers&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">dih</span> <span class="ow">in</span> <span class="n">top</span><span class="p">[</span><span class="s2">&quot;propers&quot;</span><span class="p">][::</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
-            <span class="k">if</span> <span class="n">dih</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;9&quot;</span><span class="p">:</span>
-                <span class="k">break</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">top</span><span class="p">[</span><span class="s2">&quot;impropers&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="n">top</span><span class="p">[</span><span class="s2">&quot;propers&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)))</span></div>
-
-
-<div class="viewcode-block" id="merge_propers_impropers"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.parsing.merge_propers_impropers">[docs]</a><span class="k">def</span> <span class="nf">merge_propers_impropers</span><span class="p">(</span><span class="n">top</span><span class="p">:</span> <span class="n">TopologyDict</span><span class="p">):</span>
-    <span class="k">if</span> <span class="nb">set</span><span class="p">([</span><span class="s2">&quot;propers&quot;</span><span class="p">,</span> <span class="s2">&quot;impropers&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">top</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
-        <span class="n">top</span><span class="p">[</span><span class="s2">&quot;dihedrals&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-        <span class="n">top</span><span class="p">[</span><span class="s2">&quot;dihedrals&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">top</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;propers&quot;</span><span class="p">))</span>
-        <span class="n">top</span><span class="p">[</span><span class="s2">&quot;dihedrals&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">top</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;impropers&quot;</span><span class="p">))</span></div>
-
-
 <div class="viewcode-block" id="read_plumed"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.parsing.read_plumed">[docs]</a><span class="k">def</span> <span class="nf">read_plumed</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Read a plumed.dat configuration file.&quot;&quot;&quot;</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
@@ -238,7 +387,7 @@
                     <span class="p">{</span>
                         <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">d</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">),</span>
                         <span class="s2">&quot;keyword&quot;</span><span class="p">:</span> <span class="n">d</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-                        <span class="s2">&quot;atoms&quot;</span><span class="p">:</span> <span class="n">d</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;ATOMS=&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">),</span>
+                        <span class="s2">&quot;atoms&quot;</span><span class="p">:</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">d</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;ATOMS=&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)],</span>
                     <span class="p">}</span>
                 <span class="p">)</span>
             <span class="k">elif</span> <span class="s2">&quot;PRINT&quot;</span> <span class="ow">in</span> <span class="n">l</span><span class="p">[:</span><span class="mi">5</span><span class="p">]:</span>
@@ -264,7 +413,9 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Write a plumed.dat configuration file.&quot;&quot;&quot;</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;distances&quot;</span><span class="p">]:</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">l</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">l</span><span class="p">[</span><span class="s1">&#39;keyword&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> ATOMS=</span><span class="si">{</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="s1">&#39;atoms&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">l</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">l</span><span class="p">[</span><span class="s1">&#39;keyword&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> ATOMS=</span><span class="si">{</span><span class="n">l</span><span class="p">[</span><span class="s1">&#39;atoms&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">l</span><span class="p">[</span><span class="s1">&#39;atoms&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;prints&quot;</span><span class="p">]:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
@@ -283,17 +434,6 @@
                 <span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">d</span></div>
-
-
-<span class="c1"># def read_plumed_distances(plumed_dat: Path, distances_dat: Path):</span>
-<span class="c1">#     plumed = read_plumed(plumed_dat)</span>
-<span class="c1">#     distances = read_distances_dat(distances_dat)</span>
-
-<span class="c1">#     atoms = {</span>
-<span class="c1">#         x[&quot;id&quot;]: x[&quot;atoms&quot;] for x in plumed[&quot;distances&quot;] if x[&quot;keyword&quot;] == &quot;DISTANCE&quot;</span>
-<span class="c1">#     }</span>
-
-<span class="c1">#     return atoms</span>
 
 
 <div class="viewcode-block" id="read_xml_ff"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.parsing.read_xml_ff">[docs]</a><span class="k">def</span> <span class="nf">read_xml_ff</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ET</span><span class="o">.</span><span class="n">Element</span><span class="p">:</span>

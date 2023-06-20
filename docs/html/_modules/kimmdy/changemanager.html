@@ -10,8 +10,6 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script src="../../_static/sphinx_highlight.js"></script>
@@ -73,7 +71,7 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
 <span class="kn">from</span> <span class="nn">kimmdy.reaction</span> <span class="kn">import</span> <span class="n">Recipe</span><span class="p">,</span> <span class="n">Bind</span><span class="p">,</span> <span class="n">Break</span><span class="p">,</span> <span class="n">Move</span><span class="p">,</span> <span class="n">RecipeStep</span>
-<span class="kn">from</span> <span class="nn">kimmdy.parsing</span> <span class="kn">import</span> <span class="n">read_top</span><span class="p">,</span> <span class="n">write_topol</span><span class="p">,</span> <span class="n">write_plumed</span><span class="p">,</span> <span class="n">read_plumed</span>
+<span class="kn">from</span> <span class="nn">kimmdy.parsing</span> <span class="kn">import</span> <span class="n">read_top</span><span class="p">,</span> <span class="n">write_top</span><span class="p">,</span> <span class="n">write_plumed</span><span class="p">,</span> <span class="n">read_plumed</span>
 <span class="kn">from</span> <span class="nn">kimmdy.topology.topology</span> <span class="kn">import</span> <span class="n">Topology</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 
@@ -123,7 +121,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;RecipeStep </span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2"> not implemented!&quot;</span><span class="p">)</span>
     <span class="n">topology</span><span class="o">.</span><span class="n">_update_dict</span><span class="p">()</span>
-    <span class="n">write_topol</span><span class="p">(</span><span class="n">topology</span><span class="o">.</span><span class="n">top</span><span class="p">,</span> <span class="n">newtop</span><span class="p">)</span>
+    <span class="n">write_top</span><span class="p">(</span><span class="n">topology</span><span class="o">.</span><span class="n">top</span><span class="p">,</span> <span class="n">newtop</span><span class="p">)</span>
 
     <span class="n">topology</span><span class="o">.</span><span class="n">patch_parameters</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">focus</span><span class="p">))</span>
 
@@ -153,10 +151,9 @@
     <span class="n">write_plumed</span><span class="p">(</span><span class="n">plumeddat</span><span class="p">,</span> <span class="n">newplumeddat</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="break_bond_plumed"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.changemanager.break_bond_plumed">[docs]</a><span class="k">def</span> <span class="nf">break_bond_plumed</span><span class="p">(</span><span class="n">plumeddat</span><span class="p">,</span> <span class="n">breakpair</span><span class="p">,</span> <span class="n">plumeddist</span><span class="p">):</span>
+<div class="viewcode-block" id="break_bond_plumed"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.changemanager.break_bond_plumed">[docs]</a><span class="k">def</span> <span class="nf">break_bond_plumed</span><span class="p">(</span><span class="n">plumeddat</span><span class="p">,</span> <span class="n">breakpair</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">plumeddist</span><span class="p">):</span>
     <span class="n">new_distances</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">broken_distances</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">breakpair</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">breakpair</span><span class="p">]</span>
     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">plumeddat</span><span class="p">[</span><span class="s2">&quot;distances&quot;</span><span class="p">]:</span>
         <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">x</span> <span class="ow">in</span> <span class="n">line</span><span class="p">[</span><span class="s2">&quot;atoms&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">breakpair</span><span class="p">):</span>
             <span class="n">broken_distances</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">])</span>
