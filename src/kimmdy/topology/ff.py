@@ -22,31 +22,28 @@ class FF:
         self.improper_dihedraltypes: dict[tuple[str, str, str, str], DihedralType] = {}
         self.residuetypes: dict[str, ResidueType]
 
-        atomtypes = get_top_section(top, 'atomtypes')
+        atomtypes = get_top_section(top, "atomtypes")
         if atomtypes is None:
             raise ValueError("atomtypes not found in top file")
         for l in atomtypes:
             atomtype = AtomType.from_top_line(l)
             self.atomtypes[atomtype.type] = atomtype
 
-
-        bondtypes = get_top_section(top, 'bondtypes')
+        bondtypes = get_top_section(top, "bondtypes")
         if bondtypes is None:
             raise ValueError("bondtypes not found in top file")
         for l in bondtypes:
             bondtype = BondType.from_top_line(l)
             self.bondtypes[(bondtype.i, bondtype.j)] = bondtype
 
-
-        angletypes = get_top_section(top, 'angletypes')
+        angletypes = get_top_section(top, "angletypes")
         if angletypes is None:
             raise ValueError("angletypes not found in top file")
         for l in angletypes:
             angletype = AngleType.from_top_line(l)
             self.angletypes[(angletype.i, angletype.j, angletype.k)] = angletype
 
-
-        dihedraltypes = get_top_section(top, 'dihedraltypes')
+        dihedraltypes = get_top_section(top, "dihedraltypes")
         if dihedraltypes is None:
             raise ValueError("dihedraltypes not found in top file")
         for l in dihedraltypes:

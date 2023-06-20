@@ -87,6 +87,7 @@ def read_rtp(path: Path) -> dict:
 
         return d
 
+
 def resolve_includes(path: Path) -> list[str]:
     """Resolve #include statements in a (top/itp) file."""
     dir = path.parent
@@ -97,21 +98,23 @@ def resolve_includes(path: Path) -> list[str]:
     with open(fname, "r") as f:
         for l in f:
             l = "".join(takewhile(is_not_comment, l)).strip()
-            if not l: continue
+            if not l:
+                continue
             if l.startswith("#include"):
                 path = Path(l.split('"')[1])
                 try:
                     ls_prime.extend(resolve_includes(path))
                 except Exception as _:
                     # drop line if path can't be resolved
-                    logging.warning(f'top include {path} could not be resolved. Line was dropped.')
+                    logging.warning(
+                        f"top include {path} could not be resolved. Line was dropped."
+                    )
                     continue
             else:
                 ls_prime.append(l)
 
     os.chdir(cwd)
     return ls_prime
-
 
 
 def read_top(path: Path) -> TopologyDict:
@@ -129,32 +132,39 @@ def read_top(path: Path) -> TopologyDict:
       a section may either be contained within if ... else or it may not be,
       but it can not be duplicated with one part inside and one outside.
     - `if .. else` can't be nested
-    - `#include`s that don't resolve to a valid file path are silently dropped 
+    - `#include`s that don't resolve to a valid file path are silently dropped
     - sections that can have subsections can also exist multiple, separate times
       e.g. moleculetype will appear multiple times and they should not be merged
     """
     SECTIONS_WITH_SUBSECTIONS = ("moleculetype",)
-    NESTABLE_SECTIONS = ("atoms", "bonds", "pairs", "angles", "dihedrals", "impropers", "exclusions", "virtual_sites", "settles", "position_restraints", "dihedral_restraints")
+    NESTABLE_SECTIONS = (
+        "atoms",
+        "bonds",
+        "pairs",
+        "angles",
+        "dihedrals",
+        "impropers",
+        "exclusions",
+        "virtual_sites",
+        "settles",
+        "position_restraints",
+        "dihedral_restraints",
+    )
 
     ls = resolve_includes(path)
-    ls = filter(lambda l: not l.startswith('*'), ls)
+    ls = filter(lambda l: not l.startswith("*"), ls)
     d = {}
-    d['define'] = {}
+    d["define"] = {}
     parent_section_index = 0
     parent_section = None
     section = None
     condition = None
     condition_else = False
     is_first_line_after_section_header = False
-    content_key = 'content'
+    content_key = "content"
 
     def empty_section(condition):
-        return {
-            'content': [],
-            'else_content': [],
-            'extra': [],
-            'condition': condition
-        }
+        return {"content": [], "else_content": [], "extra": [], "condition": condition}
 
     for l in ls:
         # where to put lines dependign on current context
@@ -162,27 +172,26 @@ def read_top(path: Path) -> TopologyDict:
             l = l.split()
             name = l[1]
             values = l[2:]
-            d['define'][name] = values
+            d["define"][name] = values
             continue
         elif l.startswith("#if"):
             if is_first_line_after_section_header:
-                raise NotImplementedError('#if ... #endif can only be used to surround a section, not within')
+                raise NotImplementedError(
+                    "#if ... #endif can only be used to surround a section, not within"
+                )
             l = l.split()
-            condition_type = l[0].removeprefix('#')
+            condition_type = l[0].removeprefix("#")
             condition_value = l[1]
-            condition = {
-                'type': condition_type,
-                'value': condition_value
-            }
+            condition = {"type": condition_type, "value": condition_value}
             continue
         elif l.startswith("#else"):
             condition_else = True
-            content_key = 'else_content'
+            content_key = "else_content"
             continue
         elif l.startswith("#endif"):
             condition = None
             condition_else = False
-            content_key = 'content'
+            content_key = "content"
             continue
 
         elif l.startswith("["):
@@ -195,13 +204,15 @@ def read_top(path: Path) -> TopologyDict:
                     parent_section = f"{parent_section}_{parent_section_index}"
                     parent_section_index += 1
                     d[parent_section] = empty_section(condition)
-                    d[parent_section]['subsections'] = {}
+                    d[parent_section]["subsections"] = {}
             else:
                 if parent_section is not None:
                     # in a parent_section that can have subsections
                     if section in NESTABLE_SECTIONS:
-                        if d[parent_section]['subsections'].get(section) is None:
-                            d[parent_section]['subsections'][section] = empty_section(condition)
+                        if d[parent_section]["subsections"].get(section) is None:
+                            d[parent_section]["subsections"][section] = empty_section(
+                                condition
+                            )
                     else:
                         # exit parent_section by setting it to None
                         parent_section = None
@@ -221,10 +232,14 @@ def read_top(path: Path) -> TopologyDict:
                     d[parent_section][content_key].append(l)
                 else:
                     # part of a subsection
-                    d[parent_section]['subsections'][section][content_key].append(l.split())
+                    d[parent_section]["subsections"][section][content_key].append(
+                        l.split()
+                    )
             else:
                 if section is None:
-                    raise ValueError(f"topology file {path} contains lines outside of a section")
+                    raise ValueError(
+                        f"topology file {path} contains lines outside of a section"
+                    )
                 d[section][content_key].append(l.split())
             is_first_line_after_section_header = False
 
@@ -233,49 +248,50 @@ def read_top(path: Path) -> TopologyDict:
     return d
 
 
-
 def write_top(top: TopologyDict, outfile: Path):
     def write_section(f, name, section):
-        printname = re.sub(r'_\d+', '', name)
-        condition = section.get('condition')
-        f.write('\n')
+        printname = re.sub(r"_\d+", "", name)
+        condition = section.get("condition")
+        f.write("\n")
         if condition is None:
             f.write(f"[ {printname} ]\n")
-            for l in section['content']:
-                f.writelines(' '.join(l))
-                f.write('\n')
+            for l in section["content"]:
+                f.writelines(" ".join(l))
+                f.write("\n")
         else:
-            condition_type = condition['type']
-            condition_value = condition['value']
+            condition_type = condition["type"]
+            condition_value = condition["value"]
             f.write(f"#{condition_type} {condition_value}")
             f.write("\n")
             f.write(f"[ {printname} ]\n")
-            for l in section['content']:
-                f.writelines(' '.join(l))
-                f.write('\n')
-            else_content = section.get('else_content')
+            for l in section["content"]:
+                f.writelines(" ".join(l))
+                f.write("\n")
+            else_content = section.get("else_content")
             if else_content:
-                f.write('#else\n')
+                f.write("#else\n")
                 f.write(f"[ {printname} ]\n")
                 for l in else_content:
-                    f.writelines(' '.join(l))
-                    f.write('\n')
+                    f.writelines(" ".join(l))
+                    f.write("\n")
             f.write(f"#endif\n")
 
     with open(outfile, "w") as f:
-        define = top.get('define')
+        define = top.get("define")
         for name, value in define.items():
-            f.writelines('#define ' + name + ' '.join(value))
-            f.write('\n')
+            f.writelines("#define " + name + " ".join(value))
+            f.write("\n")
 
-        for name, section in top.items() :
-            if name == 'define': continue
-            f.write('\n')
-            subsections = section.get('subsections')
+        for name, section in top.items():
+            if name == "define":
+                continue
+            f.write("\n")
+            subsections = section.get("subsections")
             write_section(f, name, section)
             if subsections is not None:
                 for name, section in subsections.items():
                     write_section(f, name, section)
+
 
 def read_edissoc(path: Path) -> dict:
     """reads a edissoc file and turns it into a dict.
@@ -349,7 +365,6 @@ def read_distances_dat(distances_dat: Path):
                 d[k].append(float(v))
 
     return d
-
 
 
 def read_xml_ff(path: Path) -> ET.Element:

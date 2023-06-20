@@ -15,7 +15,8 @@ import logging
 import re
 
 
-PROTEIN_SECTION = 'moleculetype_0'
+PROTEIN_SECTION = "moleculetype_0"
+
 
 class Topology:
     """Smart container for parsed topology data.
@@ -51,12 +52,11 @@ class Topology:
         if ffpatch:
             self.ffpatches = FFPatches(ffpatch)
 
-
         # generate empty Topology if empty TopologyDict
         if self.top == {}:
             return
 
-        self.protein = top[PROTEIN_SECTION]['subsections']
+        self.protein = top[PROTEIN_SECTION]["subsections"]
         self._parse_atoms()
         self._parse_bonds()
         self._parse_pairs()
@@ -67,10 +67,18 @@ class Topology:
         self._test_for_radicals()
 
     def _update_dict(self):
-        self.protein["atoms"]["content"] = [attributes_to_list(x) for x in self.atoms.values()]
-        self.protein["bonds"]["content"] = [attributes_to_list(x) for x in self.bonds.values()]
-        self.protein["pairs"]["content"] = [attributes_to_list(x) for x in self.pairs.values()]
-        self.protein["angles"]["content"] = [attributes_to_list(x) for x in self.angles.values()]
+        self.protein["atoms"]["content"] = [
+            attributes_to_list(x) for x in self.atoms.values()
+        ]
+        self.protein["bonds"]["content"] = [
+            attributes_to_list(x) for x in self.bonds.values()
+        ]
+        self.protein["pairs"]["content"] = [
+            attributes_to_list(x) for x in self.pairs.values()
+        ]
+        self.protein["angles"]["content"] = [
+            attributes_to_list(x) for x in self.angles.values()
+        ]
         self.protein["dihedrals"]["content"] = [
             attributes_to_list(x) for x in self.proper_dihedrals.values()
         ] + [attributes_to_list(x) for x in self.improper_dihedrals.values()]

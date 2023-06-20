@@ -30,7 +30,6 @@ def assetsdir() -> Path:
     return Path(__file__).parent / "test_files" / "assets"
 
 
-
 @st.composite
 def random_atomlist(draw):
     n = draw(st.integers(min_value=3, max_value=5))

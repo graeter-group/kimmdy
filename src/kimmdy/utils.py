@@ -7,6 +7,7 @@ from scipy.spatial.transform import Rotation
 from contextlib import contextmanager
 import os
 
+
 @contextmanager
 def pushd(path):
     prev = os.getcwd()

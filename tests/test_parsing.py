@@ -40,7 +40,6 @@ def test_doubleparse_urea():
     top = parsing.read_top(urea_path)
 
 
-
 #### Parsing should be invertible ####
 allowed_text = st.text(
     string.ascii_letters + string.digits + "!\"$%&'()*+,-./:<=>?@\\^_`{|}~", min_size=1
@@ -49,7 +48,7 @@ allowed_text = st.text(
 
 @given(
     # a list of lists that correspond to a sections of a top file
-    sections = st.lists(
+    sections=st.lists(
         st.lists(
             allowed_text,
             min_size=2,
@@ -71,22 +70,19 @@ def test_parser_invertible(sections):
     p = Path("tmp/pytest_topol.top")
     p2 = Path("tmp/pytest_topol2.top")
     p.parent.mkdir(exist_ok=True)
-    with open(p, 'w') as f:
+    with open(p, "w") as f:
         f.write("\n".join(ls))
     top = parsing.read_top(p)
     parsing.write_top(top, p2)
     top2 = parsing.read_top(p2)
     assert top == top2
 
-@given(
-    ls=st.lists(
-        allowed_text
-    )
-)
+
+@given(ls=st.lists(allowed_text))
 def test_parser_fails_without_sections(ls):
     p = Path("tmp/pytest_topol.top")
     p.parent.mkdir(exist_ok=True)
-    with open(p, 'w') as f:
+    with open(p, "w") as f:
         f.writelines(ls)
     with pytest.raises(ValueError):
         parsing.read_top(p)
