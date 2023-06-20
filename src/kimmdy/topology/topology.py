@@ -33,7 +33,9 @@ class Topology:
         ffpatch: Optional[Path] = None,
     ) -> None:
         if top == {}:
-            raise NotImplementedError('Generating an empty Topology from an empty TopologyDict is not implemented.')
+            raise NotImplementedError(
+                "Generating an empty Topology from an empty TopologyDict is not implemented."
+            )
 
         if not top.get(PROTEIN_SECTION) or not top[PROTEIN_SECTION].get("subsections"):
             raise ValueError(
@@ -737,7 +739,9 @@ class Topology:
         for atom in self.atoms.values():
             keys = self._get_atom_proper_dihedrals(atom.nr)
             for key in keys:
-                self.proper_dihedrals[key] = Dihedral(key[0], key[1], key[2], key[3], "9")
+                self.proper_dihedrals[key] = Dihedral(
+                    key[0], key[1], key[2], key[3], "9"
+                )
                 pairkey = tuple(str(x) for x in sorted([key[0], key[3]], key=int))
                 if self.pairs.get(pairkey) is None:
                     self.pairs[pairkey] = Pair(pairkey[0], pairkey[1], "1")
@@ -753,4 +757,3 @@ class Topology:
                     "4",
                     improper.cq,
                 )
-

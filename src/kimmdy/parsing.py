@@ -17,7 +17,6 @@ def is_not_comment(c: str) -> bool:
     return c != ";"
 
 
-
 def create_subsections(ls: list[list[str]]):
     d = {}
     subsection_name = "other"
@@ -55,7 +54,6 @@ def read_rtp(path: Path) -> dict:
             data.append(line.strip("\n"))
         if data:
             yield data
-
 
     def extract_section_name(ls: list[str]) -> tuple[str, list[str]]:
         """takes a list of lines and return a tuple

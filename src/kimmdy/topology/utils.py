@@ -50,6 +50,7 @@ def get_top_section(
             )
     return section.get("content")
 
+
 def set_top_section(
     top: dict, name: str, value: list, moleculetype: Optional[int] = None
 ) -> Optional[list[list]]:
@@ -87,6 +88,7 @@ def set_top_section(
                 f"condition type {condition_type} is not supported"
             )
     section["content"] = value
+
 
 def field_or_none(l: list[str], i) -> Optional[str]:
     try:

@@ -206,16 +206,16 @@ class TestHexalaTopology:
         return Topology(hexala_top, ffdir, ffpatch)
 
     def test_all_terms_accounted_for(self, top_fix, hexala_top):
-        atoms = get_top_section(hexala_top, 'atoms', 0)
-        bonds = get_top_section(hexala_top, 'bonds', 0)
-        pairs = get_top_section(hexala_top, 'pairs', 0)
-        angles = get_top_section(hexala_top, 'angles', 0)
-        dihedrals = get_top_section(hexala_top, 'dihedrals', 0)
+        atoms = get_top_section(hexala_top, "atoms", 0)
+        bonds = get_top_section(hexala_top, "bonds", 0)
+        pairs = get_top_section(hexala_top, "pairs", 0)
+        angles = get_top_section(hexala_top, "angles", 0)
+        dihedrals = get_top_section(hexala_top, "dihedrals", 0)
         assert atoms
         assert bonds
         assert pairs
         assert angles
-        assert dihedrals 
+        assert dihedrals
         assert len(top_fix.atoms) == len(atoms)
         assert len(top_fix.bonds) == len(bonds)
         assert len(top_fix.pairs) == len(pairs)
