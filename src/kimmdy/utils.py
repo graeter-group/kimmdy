@@ -1,6 +1,7 @@
 import subprocess as sp
 import numpy as np
 import logging
+from typing import Optional
 from pathlib import Path
 import MDAnalysis as MDA
 from scipy.spatial.transform import Rotation
@@ -138,6 +139,13 @@ def morse_transition_rate(
 # utils
 def run_shell_cmd(s, cwd=None) -> sp.CompletedProcess:
     return sp.run(s, shell=True, cwd=cwd)
+
+
+def run_gmx(s: str, cwd=None) -> Optional[sp.CalledProcessError]:
+    result = run_shell_cmd(f"gmx -quiet {s}", cwd)
+    if result.returncode != 0:
+        logging.error(f"Gromacs process failed with exit code {result.returncode}.")
+        result.check_returncode()
 
 
 def get_shell_stdout(s):
