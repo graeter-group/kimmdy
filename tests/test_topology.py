@@ -6,7 +6,7 @@ import pytest
 
 from kimmdy.parsing import read_top, TopologyDict
 from hypothesis import Phase, given, settings, HealthCheck, strategies as st
-from kimmdy.topology.topology import Topology, generate_topology_from_bound_to
+from kimmdy.topology.topology import Topology
 from kimmdy.topology.atomic import *
 from kimmdy.topology.utils import match_atomic_item_to_atomic_type
 import logging
@@ -56,13 +56,16 @@ def random_atomlist(draw):
 @st.composite
 def random_topology_and_break(draw):
     try:
-        assets_dir = Path(__file__).parent / "test_files" / "assets"
+        dir = Path(__file__).parent / "test_files" / "test_topology"
     except NameError:
-        assets_dir = Path("./tests/test_files") / "assets"
-    ffdir = assets_dir / "amber99sb-star-ildnp.ff"
-    ffpatch = assets_dir / "amber99sb_patches.xml"
-    atoms = draw(random_atomlist())
-    top = generate_topology_from_bound_to(atoms, ffdir, ffpatch)
+        dir = Path("./tests/test_files") / "test_topology"
+    ffdir = dir / "amber99sb-star-ildnp.ff"
+    ffpatch = dir / "amber99sb_patches.xml"
+    hexala_top = read_top(dir / "hexala.top")
+    top = Topology(hexala_top, ffdir, ffpatch)
+    atomlist = draw(random_atomlist())
+    top.atoms = {atom.nr: atom for atom in atomlist}
+    top._regenerate_topology_from_bound_to()
     break_this = draw(st.sampled_from(list(top.bonds.keys())))
     return (top, break_this)
 
@@ -155,11 +158,9 @@ class TestTopology:
         assert top.improper_dihedrals == og_top.improper_dihedrals
 
     def test_generate_topology_from_bound_to(self, top_fix, assetsdir):
-        ffdir = assetsdir / "amber99sb-star-ildnp.ff"
-        ffpatch = assetsdir / "amber99sb_patches.xml"
         og_top = deepcopy(top_fix)
-        atoms = list(og_top.atoms.values())
-        newtop = generate_topology_from_bound_to(atoms, ffdir, ffpatch)
+        newtop = deepcopy(top_fix)
+        newtop._regenerate_topology_from_bound_to()
         assert newtop.bonds == og_top.bonds
         assert newtop.pairs == og_top.pairs
         assert newtop.angles == og_top.angles
