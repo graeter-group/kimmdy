@@ -8,7 +8,7 @@ from kimmdy.parsing import read_top, TopologyDict
 from hypothesis import Phase, given, settings, HealthCheck, strategies as st
 from kimmdy.topology.topology import Topology
 from kimmdy.topology.atomic import *
-from kimmdy.topology.utils import match_atomic_item_to_atomic_type
+from kimmdy.topology.utils import get_top_section, match_atomic_item_to_atomic_type
 import logging
 
 
@@ -206,12 +206,12 @@ class TestHexalaTopology:
         return Topology(hexala_top, ffdir, ffpatch)
 
     def test_all_terms_accounted_for(self, top_fix, hexala_top):
-        assert len(top_fix.atoms) == len(hexala_top["atoms"])
-        assert len(top_fix.bonds) == len(hexala_top["bonds"])
-        assert len(top_fix.pairs) == len(hexala_top["pairs"])
-        assert len(top_fix.angles) == len(hexala_top["angles"])
+        assert len(top_fix.atoms) == len(get_top_section(hexala_top, 'atoms', 0))
+        assert len(top_fix.bonds) == len(get_top_section(hexala_top, 'bonds', 0))
+        assert len(top_fix.pairs) == len(get_top_section(hexala_top, 'pairs', 0))
+        assert len(top_fix.angles) == len(get_top_section(hexala_top, 'angles', 0))
         assert len(top_fix.proper_dihedrals) + len(top_fix.improper_dihedrals) == len(
-            hexala_top["dihedrals"]
+            get_top_section(hexala_top, 'dihedrals', 0)
         )
 
     def test_find_bondtypes(self, top_fix):
