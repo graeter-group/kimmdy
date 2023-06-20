@@ -17,40 +17,6 @@ def is_not_comment(c: str) -> bool:
     return c != ";"
 
 
-def get_sections(
-    seq: Iterable[str], section_marker: str
-) -> Generator[list[str], None, None]:
-    data = [""]
-    for line in seq:
-        line = "".join(takewhile(is_not_comment, line))
-        if line.strip(" ").startswith(section_marker):
-            if data:
-                # first element will be empty
-                # because newlines mark sections
-                data.pop(0)
-                # only yield section if non-empty
-                if len(data) > 0:
-                    yield data
-                data = [""]
-        data.append(line.strip("\n"))
-    if data:
-        yield data
-
-
-def extract_section_name(ls: list[str]) -> tuple[str, list[str]]:
-    """takes a list of lines and return a tuple
-    with the name and the lines minus the
-    line that contained the name.
-    Returns the empty string as the name if no name was found.
-    """
-    for i, l in enumerate(ls):
-        if l and l[0] != ";" and "[" in l:
-            name = l.strip("[] \n")
-            ls.pop(i)
-            return (name, ls)
-    else:
-        return ("", ls)
-
 
 def create_subsections(ls: list[list[str]]):
     d = {}
@@ -71,6 +37,40 @@ def read_rtp(path: Path) -> dict:
     # TODO combine with top parser?
     # would need a way to tell the parser
     # that here, all sections have subsections
+    def get_sections(
+        seq: Iterable[str], section_marker: str
+    ) -> Generator[list[str], None, None]:
+        data = [""]
+        for line in seq:
+            line = "".join(takewhile(is_not_comment, line))
+            if line.strip(" ").startswith(section_marker):
+                if data:
+                    # first element will be empty
+                    # because newlines mark sections
+                    data.pop(0)
+                    # only yield section if non-empty
+                    if len(data) > 0:
+                        yield data
+                    data = [""]
+            data.append(line.strip("\n"))
+        if data:
+            yield data
+
+
+    def extract_section_name(ls: list[str]) -> tuple[str, list[str]]:
+        """takes a list of lines and return a tuple
+        with the name and the lines minus the
+        line that contained the name.
+        Returns the empty string as the name if no name was found.
+        """
+        for i, l in enumerate(ls):
+            if l and l[0] != ";" and "[" in l:
+                name = l.strip("[] \n")
+                ls.pop(i)
+                return (name, ls)
+        else:
+            return ("", ls)
+
     with open(path, "r") as f:
         sections = get_sections(f, "\n")
         d = {}
