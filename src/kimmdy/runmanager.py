@@ -35,8 +35,7 @@ class State(Enum):
 
 
 def get_existing_files(config: Config):
-    """Initialize latest_files with every existing file defined in config
-    """    
+    """Initialize latest_files with every existing file defined in config"""
     file_d = {}
     attr_names = filter(lambda s: s[0] != "_", config.__dir__())
     for attr_name in attr_names:
@@ -44,7 +43,7 @@ def get_existing_files(config: Config):
         if isinstance(attr, Path):
             if not attr.exists():
                 continue
-            key = attr.suffix[1:] # rm the get_existing_files
+            key = attr.suffix[1:]  # rm the get_existing_files
             # AMBIGUOUS_SUFFS -> key whole name
             if attr.suffix[1:] in AMBIGUOUS_SUFFS:
                 key = attr.name
