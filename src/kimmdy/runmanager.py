@@ -265,8 +265,9 @@ class RunManager:
             f"-px {instance}_pullx.xvg -pf {instance}_pullf.xvg "
             f"-ro {instance}-rotation.xvg -ra {instance}-rotangles.log "
             f"-rs {instance}-rotslabs.log -rt {instance}-rottorque.log "
-            f"-maxh {maxh} -dlb yes -ntomp {ntomp}"
+            f"-maxh {maxh} -dlb yes "
         )
+        # -ntomp {ntomp} removed for now
         # like this, the previous checkpoint file would not be used,
         # -t and -e options from grompp
         # replace the checkpoint file if gen_vel = no in the mdp file

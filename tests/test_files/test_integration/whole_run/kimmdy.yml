@@ -15,7 +15,7 @@ mds:
       dat: 'plumed.dat'
       distances: 'distances.dat'
   relax:
-    mdp: 'minim.mdp'
+    mdp: 'md_slow.mdp'
 changer:
   coordinates:
     md: 'relax'    

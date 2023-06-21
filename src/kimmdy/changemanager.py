@@ -83,6 +83,7 @@ def modify_top(
     oldtop = (files.input["top"],)
     newtop = (files.output["top"],)
     ffdir = (files.input["ff"],)
+    # why is this a tuple??
 
     logging.info(f"Reading: {oldtop} and writing modified topology to {newtop}.")
     if topology is None:
@@ -120,7 +121,7 @@ def modify_top(
         else:
             raise NotImplementedError(f"RecipeStep {step} not implemented!")
     topology._update_dict()
-    write_topol(topology.top, newtop)
+    write_topol(topology.top, newtop[0])
 
     topology.patch_parameters(list(focus))
 

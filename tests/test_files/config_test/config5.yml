@@ -8,7 +8,7 @@ gro: 'npt.gro'
 ndx: 'index_backbone.ndx'
 reactions:
   homolysis:
-    dat 'edissoc.dat'
+    dat: 'edissoc.dat'
     itp: 'ffbonded.itp'
 sequence:
   - equilibrium
