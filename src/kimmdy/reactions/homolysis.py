@@ -66,6 +66,9 @@ class Homolysis(ReactionPlugin):
             # converto to zero-base
             atomids_list = [i - 1 for i in atomids_list]
 
+            # converto to zero-base
+            atomids_list = [i - 1 for i in atomids_list]
+
             recipes.append(
                 Recipe(
                     recipe_steps=[Break(*list(atomids))],
