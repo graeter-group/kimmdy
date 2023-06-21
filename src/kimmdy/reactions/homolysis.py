@@ -27,7 +27,7 @@ class Homolysis(ReactionPlugin):
     Implementation for time-varying rates
     """
 
-    type_scheme = {"homolysis": {"edis": Path, "bonds": Path}}
+    type_scheme = {"homolysis": {"dat": Path, "itp": Path}}
 
     def get_recipe_collection(self, files: TaskFiles):
         logging.debug("Getting recipe for reaction: homolysis")
@@ -64,10 +64,7 @@ class Homolysis(ReactionPlugin):
             # one conformational state per calculation
 
             # converto to zero-base
-            atomids_list = [i - 1 for i in atomids_list]
-
-            # converto to zero-base
-            atomids_list = [i - 1 for i in atomids_list]
+            atomids = [i - 1 for i in list(atomids)]
 
             recipes.append(
                 Recipe(

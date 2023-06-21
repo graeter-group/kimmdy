@@ -1,4 +1,5 @@
 from kimmdy.config import Config
+from kimmdy.runmanager import get_existing_files
 from pathlib import Path
 import pytest
 import os
@@ -97,6 +98,36 @@ def test_parse_config6_changer_bad_reference():
             Config(input_f)
     finally:
         for d in input_f.parent.glob("test_config_6*"):
+            [f.unlink() for f in d.iterdir()]
+            d.rmdir()
+
+
+def test_get_existing_files():
+    try:
+        input_f = Path(__file__).parent / "test_files/config_test/config1.yml"
+        os.chdir(input_f.parent)
+        assert input_f.exists(), "Input file not found"
+
+        config = Config(input_f)
+        file_d = get_existing_files(config)
+        assert set(file_d.keys()) == set(
+            [
+                "",
+                "top",
+                "gro",
+                "ndx",
+                "ff",
+                "plumed.dat",
+                "pullf1500_equil.mdp",
+                "pullf1500.mdp",
+                "broken_equil_f1000.mdp",
+                "edissoc.dat",
+                "ffbonded.itp",
+            ]
+        )
+
+    finally:
+        for d in input_f.parent.glob("test_config_1*"):
             [f.unlink() for f in d.iterdir()]
             d.rmdir()
 

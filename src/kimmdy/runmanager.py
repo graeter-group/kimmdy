@@ -238,10 +238,8 @@ class RunManager:
         logging.warning(self.latest_files)
         top = files.input["top"]
         gro = files.input["gro"]
-        trr = files.input["trr"]
-        edr = files.input["edr"]
         mdp = md_config.mdp
-        idx = files.input["idx"]
+        ndx = files.input["ndx"]
 
         outputdir = files.outputdir
         # make maxh and ntomp accessible?
@@ -250,11 +248,16 @@ class RunManager:
 
         grompp_cmd = (
             f"{gmx_alias} grompp -p {top} -c {gro} "
-            f"-f {mdp} -n {idx} -o {instance}.tpr -maxwarn 5"
+            f"-f {mdp} -n {ndx} -o {instance}.tpr -maxwarn 5"
         )
         # only appends these lines if there are trr and edr files
-        if trr and edr:
+        try:
+            trr = files.input["trr"]
+            edr = files.input["edr"]
             grompp_cmd += f" -t {trr} -e {edr}"
+        except FileNotFoundError:
+            pass
+
         mdrun_cmd = (
             f"{gmx_alias} mdrun -s {instance}.tpr -cpi {instance}.cpt "
             f"-x {instance}.xtc -o {instance}.trr -cpo {instance}.cpt "
@@ -321,9 +324,7 @@ class RunManager:
         logging.debug(f"Chose recipe: {self.recipe_steps}")
         changer.modify_top(
             self.recipe_steps,
-            files.input["top"],
-            files.output["top"],
-            files.input["ff"],
+            files,
             self.config.ffpatch,
             self.top,
         )

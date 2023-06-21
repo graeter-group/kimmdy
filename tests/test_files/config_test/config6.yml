@@ -21,8 +21,8 @@ changer:
     md: 'relax_noexistent'
 reactions:
   homolysis:
-    edis: 'edissoc.dat'
-    bonds: 'ffbonded.itp'
+    dat 'edissoc.dat'
+    itp: 'ffbonded.itp'
 sequence:
   - equilibrium
   - 

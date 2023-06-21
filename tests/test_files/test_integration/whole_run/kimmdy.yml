@@ -21,8 +21,8 @@ changer:
     md: 'relax'    
 reactions:
   homolysis:
-    edis: 'edissoc.dat'
-    bonds: 'ffbonded.itp'
+    dat: 'edissoc.dat'
+    itp: 'ffbonded.itp'
   hat_reaction:
     frequency_factor: 100000000
     h_cutoff: 3

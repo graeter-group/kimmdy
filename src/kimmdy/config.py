@@ -73,8 +73,8 @@ class ChangerConfig:
 
 
 class HomolysisConfig:
-    edis: Path
-    bonds: Path
+    dat: Path
+    itp: Path
 
 
 class ReactionsConfig:
@@ -161,13 +161,22 @@ class Config:
                 logging.info("Loading Plugins")
                 for plg_name, plugin in plugins.items():
                     logging.debug(f"Loading {plg_name}")
-                    if isinstance(plugin, Exception):
+                    if type(plugin) is ModuleNotFoundError:
                         logging.warn(
                             f"Plugin {plg_name} could not be loaded!\n{plugin}\n"
                         )
-                    if issubclass(type(plugin), ReactionPlugin):
-                        self.type_scheme["reactions"].update(plugin.type_scheme)
-                        logging.debug(self.type_scheme["reactions"])
+                    else:
+                        try:
+                            if (
+                                plugin.__bases__[0] is ReactionPlugin
+                            ):  # isinstance didnt work for some reason
+                                self.type_scheme["reactions"].update(plugin.type_scheme)
+                                logging.debug(self.type_scheme["reactions"])
+                        except:
+                            logging.warn(
+                                f"Plugin {plg_name} could not be loaded!\n{plugin}\n"
+                            )
+                            pass
 
         # building config recursively
         if recursive_dict is not None:
