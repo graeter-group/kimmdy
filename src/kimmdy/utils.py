@@ -1,6 +1,7 @@
 import subprocess as sp
 import numpy as np
 import logging
+from typing import Optional
 from pathlib import Path
 import MDAnalysis as MDA
 from scipy.spatial.transform import Rotation
@@ -33,7 +34,7 @@ def get_atominfo_from_plumedid(
     lookup_atomid_plumedid = {
         entry["id"]: frozenset(entry["atoms"]) for entry in plumed["distances"]
     }
-    lookup_atomtype_atomid = {atom[0]: atom[1] for atom in top["atoms"]}
+    lookup_atomtype_atomid = {int(atom[0]): atom[1] for atom in top["atoms"]}
     atomids = lookup_atomid_plumedid[plumedid]
     atomids_list = list(atomids)
     atomtypes_list = [
@@ -138,6 +139,13 @@ def morse_transition_rate(
 # utils
 def run_shell_cmd(s, cwd=None) -> sp.CompletedProcess:
     return sp.run(s, shell=True, cwd=cwd)
+
+
+def run_gmx(s: str, cwd=None) -> Optional[sp.CalledProcessError]:
+    result = run_shell_cmd(f"gmx -quiet {s}", cwd)
+    if result.returncode != 0:
+        logging.error(f"Gromacs process failed with exit code {result.returncode}.")
+        result.check_returncode()
 
 
 def get_shell_stdout(s):

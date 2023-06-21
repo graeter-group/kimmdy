@@ -12,7 +12,7 @@ from kimmdy.parsing import read_topol
 from kimmdy.reaction import ReactionPlugin, RecipeCollection, Recipe
 import kimmdy.changemanager as changer
 from kimmdy.tasks import Task, TaskFiles, TaskMapping
-from kimmdy.utils import run_shell_cmd
+from kimmdy.utils import run_shell_cmd, run_gmx
 from pprint import pformat
 from kimmdy import plugins
 from kimmdy.topology.topology import Topology
@@ -132,7 +132,7 @@ class RunManager:
             next(self)
 
         logging.info(
-            f"Stop running tasks, state: {self.state}, "
+            f"Finished running tasks, state: {self.state}, "
             f"iteration:{self.iteration}, max:{self.iterations}"
         )
 
@@ -249,8 +249,8 @@ class RunManager:
             files.output = {"plumed.dat": md_config.plumed.dat}
             # add plumed.dat to output to indicate it as current plumed.dat file
 
-        run_shell_cmd(grompp_cmd, outputdir)
-        run_shell_cmd(mdrun_cmd, outputdir)
+        run_gmx(grompp_cmd, outputdir)
+        run_gmx(mdrun_cmd, outputdir)
 
         logging.info(f"Done with MD {instance}")
         return files

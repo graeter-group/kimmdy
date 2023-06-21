@@ -46,7 +46,7 @@ def test_lookup_atominfo(homolysis_files):
         "d1", homolysis_files["plumed"], homolysis_files["top"]
     )
     assert atomtypes == frozenset(["N", "CT"])
-    assert atomid == frozenset(["7", "9"])
+    assert atomid == frozenset([7, 9])
 
 
 def test_lookup_bondprm(homolysis_files):
