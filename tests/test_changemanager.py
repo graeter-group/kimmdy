@@ -6,7 +6,7 @@ import shutil
 from pathlib import Path
 
 @pytest.fixture
-def testdir(tmp_path) -> Path:
+def tmpdir(tmp_path) -> Path:
     dirname = "test_changemanager"
     try:
         filedir = Path(__file__).parent / "test_files" / dirname
