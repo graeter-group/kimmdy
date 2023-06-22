@@ -184,12 +184,12 @@ class RunManager:
                     suffix = path.name
                 if files.output.get(suffix) is not None:
                     if files.output[suffix] == files.outputdir / path:
-                        logging.error(
+                        logging.debug(
                             "_discover_output_files wants to overwrite files.output!"
                         )
-                        logging.error(f"Suffix {suffix}")
-                        logging.error(f"From {files.output[suffix]}")
-                        logging.error(f"To {files.outputdir / path}")
+                        logging.debug(f"Suffix {suffix}")
+                        logging.debug(f"From {files.output[suffix]}")
+                        logging.debug(f"To {files.outputdir / path}")
                     continue
                 files.output[suffix] = files.outputdir / path
 
