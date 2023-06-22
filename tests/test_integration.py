@@ -5,6 +5,8 @@ import shutil
 import logging
 from pathlib import Path
 
+import pytest
+
 
 def setup_testdir(tmp_path, dirname) -> Path:
     try:
@@ -29,13 +31,10 @@ def test_integration_emptyrun(tmp_path, caplog):
     caplog.set_level(logging.INFO)
     (testdir / "emptyrun.txt").touch()
 
-    kimmdy_run()
-    for record in caplog.records:
-        # assert record.levelname != "WARNING"
-        assert record.levelname != "CRITICAL"
-    assert set(["Finished", "running", "tasks,"]).issubset(
-        set(caplog.records[-1].message.split(sep=" "))
-    )
+    # not expecting this to run
+    # because the topology is empty
+    with pytest.raises(ValueError) as e:
+        kimmdy_run()
 
 
 def test_integration_hat_reaction(tmp_path, caplog):
