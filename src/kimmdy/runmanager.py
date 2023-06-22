@@ -19,7 +19,7 @@ from kimmdy.topology.topology import Topology
 from kimmdy.kmc import rf_kmc
 
 # file types of which there will be multiple files per type
-AMBIGUOUS_SUFFS = ["dat", "xvg", "log", "itp"]
+AMBIGUOUS_SUFFS = ["dat", "xvg", "log", "itp", "mdp"]
 # are there cases where we have multiple trr files?
 
 
@@ -32,6 +32,25 @@ class State(Enum):
     MD = auto()
     REACTION = auto()
     DONE = auto()
+
+
+def get_existing_files(config: Config):
+    """Initialize latest_files with every existing file defined in config"""
+    file_d = {}
+    attr_names = filter(lambda s: s[0] != "_", config.__dir__())
+    for attr_name in attr_names:
+        attr = getattr(config, attr_name)
+        if isinstance(attr, Path):
+            if not attr.exists():
+                continue
+            key = attr.suffix[1:]  # rm the get_existing_files
+            # AMBIGUOUS_SUFFS -> key whole name
+            if attr.suffix[1:] in AMBIGUOUS_SUFFS:
+                key = attr.name
+            file_d[key] = attr
+        elif isinstance(attr, Config):
+            file_d.update(get_existing_files(attr))
+    return file_d
 
 
 class RunManager:
@@ -50,13 +69,9 @@ class RunManager:
         self.iterations = self.config.iterations
         self.state = State.IDLE
         self.recipe_collection: RecipeCollection = RecipeCollection([])
-        self.latest_files: dict[str, Path] = {
-            "top": self.config.top,
-            "gro": self.config.gro,
-            "idx": self.config.idx,
-            "trr": "",
-            "edr": "",
-        }
+        self.latest_files: dict[str, Path] = get_existing_files(config)
+        logging.debug("Initialized latest files:")
+        logging.debug(pformat(self.latest_files))
         self.histfile = increment_logfile(Path(f"{self.config.out}_history.log"))
         self.cptfile = increment_logfile(Path(f"{self.config.out}_kimmdy.cpt"))
         try:
@@ -167,6 +182,15 @@ class RunManager:
                 suffix = path.suffix[1:]
                 if suffix in AMBIGUOUS_SUFFS:
                     suffix = path.name
+                if files.output.get(suffix) is not None:
+                    if files.output[suffix] == files.outputdir / path:
+                        logging.debug(
+                            "_discover_output_files wants to overwrite files.output!"
+                        )
+                        logging.debug(f"Suffix {suffix}")
+                        logging.debug(f"From {files.output[suffix]}")
+                        logging.debug(f"To {files.outputdir / path}")
+                    continue
                 files.output[suffix] = files.outputdir / path
 
             logging.debug("Update latest files with: ")
@@ -214,10 +238,8 @@ class RunManager:
         logging.warning(self.latest_files)
         top = files.input["top"]
         gro = files.input["gro"]
-        trr = files.input["trr"]
-        edr = files.input["edr"]
         mdp = md_config.mdp
-        idx = files.input["idx"]
+        ndx = files.input["ndx"]
 
         outputdir = files.outputdir
         # make maxh and ntomp accessible?
@@ -226,11 +248,16 @@ class RunManager:
 
         grompp_cmd = (
             f"{gmx_alias} grompp -p {top} -c {gro} "
-            f"-f {mdp} -n {idx} -o {instance}.tpr -maxwarn 5"
+            f"-f {mdp} -n {ndx} -o {instance}.tpr -maxwarn 5"
         )
         # only appends these lines if there are trr and edr files
-        if trr and edr:
+        try:
+            trr = files.input["trr"]
+            edr = files.input["edr"]
             grompp_cmd += f" -t {trr} -e {edr}"
+        except FileNotFoundError:
+            pass
+
         mdrun_cmd = (
             f"{gmx_alias} mdrun -s {instance}.tpr -cpi {instance}.cpt "
             f"-x {instance}.xtc -o {instance}.trr -cpo {instance}.cpt "
@@ -238,8 +265,9 @@ class RunManager:
             f"-px {instance}_pullx.xvg -pf {instance}_pullf.xvg "
             f"-ro {instance}-rotation.xvg -ra {instance}-rotangles.log "
             f"-rs {instance}-rotslabs.log -rt {instance}-rottorque.log "
-            f"-maxh {maxh} -dlb yes -ntomp {ntomp}"
+            f"-maxh {maxh} -dlb yes "
         )
+        # -ntomp {ntomp} removed for now
         # like this, the previous checkpoint file would not be used,
         # -t and -e options from grompp
         # replace the checkpoint file if gen_vel = no in the mdp file
@@ -249,6 +277,8 @@ class RunManager:
             files.output = {"plumed.dat": md_config.plumed.dat}
             # add plumed.dat to output to indicate it as current plumed.dat file
 
+        # specify trr to prevent rotref trr getting set as standard trr
+        files.output["trr"] = files.outputdir / f"{instance}.trr"
         run_gmx(grompp_cmd, outputdir)
         run_gmx(mdrun_cmd, outputdir)
 
@@ -295,9 +325,7 @@ class RunManager:
         logging.debug(f"Chose recipe: {self.recipe_steps}")
         changer.modify_top(
             self.recipe_steps,
-            files.input["top"],
-            files.output["top"],
-            files.input["ff"],
+            files,
             self.config.ffpatch,
             self.top,
         )

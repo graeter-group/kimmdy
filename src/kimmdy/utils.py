@@ -142,7 +142,7 @@ def run_shell_cmd(s, cwd=None) -> sp.CompletedProcess:
 
 
 def run_gmx(s: str, cwd=None) -> Optional[sp.CalledProcessError]:
-    result = run_shell_cmd(f"gmx -quiet {s}", cwd)
+    result = run_shell_cmd(f"{s} -quiet", cwd)
     if result.returncode != 0:
         logging.error(f"Gromacs process failed with exit code {result.returncode}.")
         result.check_returncode()
