@@ -1,5 +1,33 @@
 # Changelog
 
+## [2.4.0](https://github.com/hits-mbm-dev/kimmdy/compare/v2.3.0...v2.4.0) (2023-06-22)
+
+
+### Features
+
+* homolysis module and homolysis tests ([3267642](https://github.com/hits-mbm-dev/kimmdy/commit/32676421c3d087ed4e38777117b6ffe334883cf3))
+* KMC module testing ([ebb771f](https://github.com/hits-mbm-dev/kimmdy/commit/ebb771fbbcd730d70a0c5fc7a879a8e0705d48b8))
+* Move coordinates include time ([10bb3a7](https://github.com/hits-mbm-dev/kimmdy/commit/10bb3a78ac6a53e7f48ef3cf37113518987cedf3))
+* Use proper HAT plugin ([6a4b0eb](https://github.com/hits-mbm-dev/kimmdy/commit/6a4b0eb4e13a800545b2ff234a30fe6d773439c1))
+
+
+### Bug Fixes
+
+* allow restarting from checkpoint from python ([2163173](https://github.com/hits-mbm-dev/kimmdy/commit/2163173495ea5e325b2cd3c278df1bb6c100c026))
+* correct assignment of charge and mass in ff ([c5f92a6](https://github.com/hits-mbm-dev/kimmdy/commit/c5f92a672ba6932d64a1ee206fd27c13762d8fe4))
+* homolysis test ([178590d](https://github.com/hits-mbm-dev/kimmdy/commit/178590d503ff0d58ad6098cc62e6ef150e197dec))
+* initialize radical list ([3196747](https://github.com/hits-mbm-dev/kimmdy/commit/3196747bfd5d724e805e5c892c6c74d1964ec86a))
+* initialize Topology.radicals ([5e0f335](https://github.com/hits-mbm-dev/kimmdy/commit/5e0f335c0f7472c30bf1e154913d6afdfc514b6e))
+* remove deprecated imports in tests ([d078109](https://github.com/hits-mbm-dev/kimmdy/commit/d078109062a4960984591d283be9de647212a284))
+* rename variables in test_kmc ([4df479d](https://github.com/hits-mbm-dev/kimmdy/commit/4df479d4a8c1f0c656368322d02606b5f74a5044))
+* test_integration_move_top ([e0f71b6](https://github.com/hits-mbm-dev/kimmdy/commit/e0f71b6506ecab1c14742568f8c47c7a30a15418))
+
+
+### Documentation
+
+* **general:** add make preview command ([9806e63](https://github.com/hits-mbm-dev/kimmdy/commit/9806e63171cec8d4fc3532bbbab13499d7084089))
+* render docs ([f306a6c](https://github.com/hits-mbm-dev/kimmdy/commit/f306a6c5a09176703c6fe12d3df8a51646fe5a81))
+
 ## [2.3.0](https://github.com/hits-mbm-dev/kimmdy/compare/v2.2.0...v2.3.0) (2023-05-11)
 
 
