@@ -45,7 +45,7 @@ def get_atominfo_from_plumedid(
     lookup_atomid_plumedid = {
         entry["id"]: frozenset(entry["atoms"]) for entry in plumed["distances"]
     }
-    atoms = get_protein_section(top, 'atoms')
+    atoms = get_protein_section(top, "atoms")
     if not atoms:
         raise ValueError("Could not find atoms in topology file")
     lookup_atomtype_atomid = {int(atom[0]): atom[1] for atom in atoms}

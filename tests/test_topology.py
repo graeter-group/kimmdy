@@ -7,7 +7,11 @@ from kimmdy.parsing import read_top, TopologyDict
 from hypothesis import Phase, given, settings, HealthCheck, strategies as st
 from kimmdy.topology.topology import Topology
 from kimmdy.topology.atomic import *
-from kimmdy.topology.utils import get_top_section, match_atomic_item_to_atomic_type, get_protein_section
+from kimmdy.topology.utils import (
+    get_top_section,
+    match_atomic_item_to_atomic_type,
+    get_protein_section,
+)
 import logging
 
 # %%
@@ -204,7 +208,6 @@ class TestHexalaTopology:
         return Topology(hexala_top, ffdir, ffpatch)
 
     def test_all_terms_accounted_for(self, top_fix, hexala_top):
-
         atoms = get_protein_section(hexala_top, "atoms")
         bonds = get_protein_section(hexala_top, "bonds")
         pairs = get_protein_section(hexala_top, "pairs")
