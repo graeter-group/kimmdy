@@ -114,6 +114,7 @@ def test_get_recipe_collection(tmp_path):
         Path(__file__).parent / "test_files/assets/amber99sb-star-ildnp.ff",
         target_is_directory=True,
     )
+
     rmgr = RunManager(Config(tmpdir / "kimmdy.yml"))
     files = TaskFiles(rmgr)
     files.input["top"] = Path("topol.top")

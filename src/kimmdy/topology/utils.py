@@ -1,15 +1,13 @@
 from __future__ import annotations  # for 3.7 <= Python version < 3.10
 from itertools import takewhile, permutations
 from typing import Optional, Any
-from pathlib import Path
 from xml.etree.ElementTree import Element
 import re
 from typing import TYPE_CHECKING
-from kimmdy.topology.atomic import *
 
 if TYPE_CHECKING:
-    from kimmdy.topology.topology import Topology
     from kimmdy.topology.ff import Patch, Patches
+    from kimmdy.topology.atomic import AtomicType, AtomicTypes
 
 
 def get_top_section(

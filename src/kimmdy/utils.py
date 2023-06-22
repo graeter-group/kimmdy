@@ -1,4 +1,5 @@
 import subprocess as sp
+from kimmdy.topology.utils import get_protein_section
 import numpy as np
 import logging
 from typing import Optional
@@ -44,7 +45,10 @@ def get_atominfo_from_plumedid(
     lookup_atomid_plumedid = {
         entry["id"]: frozenset(entry["atoms"]) for entry in plumed["distances"]
     }
-    lookup_atomtype_atomid = {int(atom[0]): atom[1] for atom in top["atoms"]}
+    atoms = get_protein_section(top, 'atoms')
+    if not atoms:
+        raise ValueError("Could not find atoms in topology file")
+    lookup_atomtype_atomid = {int(atom[0]): atom[1] for atom in atoms}
     atomids = lookup_atomid_plumedid[plumedid]
     atomids_list = list(atomids)
     atomtypes_list = [
