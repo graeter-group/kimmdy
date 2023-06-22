@@ -1,5 +1,4 @@
 # %%
-# %autoreload
 import os
 import re
 import string
@@ -38,6 +37,13 @@ def test_doubleparse_urea():
     set_dir()
     urea_path = Path("urea.gro")
     top = parsing.read_top(urea_path)
+    p = Path("pytest_urea.top")
+    parsing.write_top(top, p)
+    top2 = parsing.read_top(p)
+    p2 = Path("pytest_urea2.top")
+    parsing.write_top(top2, p2)
+    top3 = parsing.read_top(p2)
+    assert top2 == top3
 
 
 #### Parsing should be invertible ####

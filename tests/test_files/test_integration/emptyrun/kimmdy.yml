@@ -5,12 +5,11 @@ gromacs_alias: 'gmx'
 # ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
 top: 'emptyrun.txt'
 gro: 'emptyrun.txt'
-idx: 'emptyrun.txt'
+ndx: 'emptyrun.txt'
 mds:
   prod:
     mdp: 'emptyrun.txt'
 reactions:
-  HAT_dummy:
+  hat_naive:
 sequence:
   - reactions
-
