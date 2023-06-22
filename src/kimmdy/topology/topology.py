@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Optional
 from kimmdy.constants import ATOMTYPE_BONDORDER_FLAT
 from kimmdy.parsing import TopologyDict
-from kimmdy.topology.atomic import *
+from kimmdy.topology.atomic import Atom, Bond, Pair, Angle, Dihedral
 from kimmdy.topology.utils import (
     match_id_to_patch,
     attributes_to_list,

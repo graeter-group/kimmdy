@@ -2,12 +2,9 @@ import os
 import re
 from pathlib import Path
 from collections.abc import Iterable
-from typing import Generator, Optional, Union
-from copy import deepcopy
+from typing import Generator
 import xml.etree.ElementTree as ET
 from itertools import takewhile
-from kimmdy.utils import pushd
-from typing import TYPE_CHECKING
 import logging
 
 TopologyDict = dict
@@ -158,7 +155,6 @@ def read_top(path: Path) -> TopologyDict:
     parent_section = None
     section = None
     condition = None
-    condition_else = False
     is_first_line_after_section_header = False
     content_key = "content"
 
@@ -184,12 +180,10 @@ def read_top(path: Path) -> TopologyDict:
             condition = {"type": condition_type, "value": condition_value}
             continue
         elif l.startswith("#else"):
-            condition_else = True
             content_key = "else_content"
             continue
         elif l.startswith("#endif"):
             condition = None
-            condition_else = False
             content_key = "content"
             continue
 
@@ -273,7 +267,7 @@ def write_top(top: TopologyDict, outfile: Path):
                 for l in else_content:
                     f.writelines(" ".join(l))
                     f.write("\n")
-            f.write(f"#endif\n")
+            f.write("#endif\n")
 
     with open(outfile, "w") as f:
         define = top.get("define")
