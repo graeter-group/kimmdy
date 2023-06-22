@@ -51,6 +51,13 @@ def get_top_section(
     return section.get("content")
 
 
+def get_protein_section(top: dict, name: str) -> Optional[list[list]]:
+    """
+    Get content of a section in the first moleculetype (protein) from a topology dict.
+    """
+    return get_top_section(top, name, moleculetype=0)
+
+
 def set_top_section(
     top: dict, name: str, value: list, moleculetype: Optional[int] = None
 ) -> Optional[list[list]]:
@@ -88,6 +95,13 @@ def set_top_section(
                 f"condition type {condition_type} is not supported"
             )
     section["content"] = value
+
+
+def set_protein_section(top: dict, name: str, value: list) -> Optional[list[list]]:
+    """
+    Set content of a section in the first moleculetype (protein) from a topology dict.
+    """
+    set_top_section(top, name, value, moleculetype=0)
 
 
 def field_or_none(l: list[str], i) -> Optional[str]:

@@ -238,6 +238,7 @@ def read_top(path: Path) -> TopologyDict:
 
     if len(d) <= 1:
         raise ValueError(f"topology file {path} does not contain any sections")
+
     return d
 
 
