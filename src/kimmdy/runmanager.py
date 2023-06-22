@@ -321,8 +321,9 @@ class RunManager:
         files = self._create_task_directory("recipe")
 
         files.output = {"top": files.outputdir / "topol_mod.top"}
-
         logging.debug(f"Chose recipe: {self.recipe_steps}")
+
+        # changes to topology
         changer.modify_top(
             self.recipe_steps,
             files,
@@ -331,6 +332,7 @@ class RunManager:
         )
         logging.info(f'Wrote new topology to {files.output["top"].parts[-3:]}')
 
+        # changes to plumed.dat
         if "plumed.dat" in self.latest_files:
             files.output["plumed.dat"] = files.outputdir / "plumed_mod.dat"
             changer.modify_plumed(
@@ -342,6 +344,37 @@ class RunManager:
             logging.info(
                 f'Wrote new plumedfile to {files.output["plumed.dat"].parts[-3:]}'
             )
+
+        # changes to coordinates
+        run_prmgrowth = changer.modify_coords(self.recipe_steps, files)
+        if run_prmgrowth:
+            if hasattr(self.config.changer.coordinates, "md_prmgrowth"):
+                self.crr_tasks.put(
+                    Task(
+                        self._run_md,
+                        kwargs={
+                            "instance": self.config.changer.coordinates.md_prmgrowth
+                        },
+                    )
+                )
+            else:
+                logging.warning(
+                    f"No parameter growth MD relaxation possible, trying classical MD relaxation."
+                )
+                run_prmgrowth = False
+
+        if not run_prmgrowth:
+            if hasattr(self.config.changer.coordinates, "md"):
+                self.crr_tasks.put(
+                    Task(
+                        self._run_md,
+                        kwargs={"instance": self.config.changer.coordinates.md},
+                    )
+                )
+            else:
+                logging.info(f"No MD relaxation after reaction.")
+        logging.info(f'Wrote new coordinates to {files.output["trr"].parts[-3:]}')
+
         logging.info("Reaction done")
         return files
 
@@ -350,12 +383,5 @@ class RunManager:
         logging.info(f"Start Relaxation in step {self.iteration}")
         logging.info(f"Type of relaxation: {self.config.changer.coordinates}")
 
-        if hasattr(self.config.changer.coordinates, "md"):
-            self.crr_tasks.put(
-                Task(
-                    self._run_md,
-                    kwargs={"instance": self.config.changer.coordinates.md},
-                )
-            )
         # TODO add atom placement method from Kai as relaxation option
         logging.info(f"Relaxation task added!")

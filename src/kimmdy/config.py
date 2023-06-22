@@ -56,7 +56,7 @@ type_scheme = {
             "overwrite": str,
         }
     },
-    "changer": {"coordinates": {"md": str}},
+    "changer": {"coordinates": {"md": str, "md_prmgrowth": str}},
     "reactions": {},
     "sequence": Sequence,
 }

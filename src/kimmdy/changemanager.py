@@ -7,6 +7,7 @@ from kimmdy.reaction import Bind, Break, Move, RecipeStep
 from kimmdy.parsing import read_topol, write_topol, write_plumed, read_plumed
 from kimmdy.tasks import TaskFiles
 from kimmdy.topology.topology import Topology
+from kimmdy.coordinates import merge_section_slowgrowth
 from pathlib import Path
 
 
@@ -30,6 +31,7 @@ def modify_coords(
 
     ttime = None
     to_move = []
+    run_prmgrowth = False
     for step in recipe_steps:
         if isinstance(step, Move) and step.new_coords is not None:
             assert not step.is_one_based, "RecipeSteps should be zero based!"
@@ -44,6 +46,8 @@ def modify_coords(
                 logging.error(m)
                 raise ValueError(m)
             to_move.append(step.idx_to_move)
+        elif isinstance(step, Break) or isinstance(step, Bind):
+            run_prmgrowth = True
 
     np.unique(to_move, return_counts=True)
 
@@ -62,6 +66,9 @@ def modify_coords(
             f"with length {u.trajectory[-1].time}"
         )
 
+    if run_prmgrowth:
+        merge_section_slowgrowth()
+
     u.atoms.write(trr_out)
     u.atoms.write(gro_out)
 
@@ -71,6 +78,8 @@ def modify_coords(
     logging.debug(
         f"Exit modify_coords, final coordinates written to {trr_out.parts[-2:]}"
     )
+
+    return run_prmgrowth
 
 
 def modify_top(

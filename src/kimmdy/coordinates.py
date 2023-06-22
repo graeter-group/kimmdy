@@ -3,32 +3,9 @@ from pathlib import Path
 import numpy as np
 import logging
 
-from kimmdy.utils import find_radical_pos
+from kimmdy.utils import f
 from kimmdy.parsing import read_topol, Topology
 from kimmdy.reaction import ReactionResult, ConversionRecipe, ConversionType
-
-
-def place_hydrogen(tpr: Path, trr: Path, recipe: ConversionRecipe):
-    """use find_radical_pos to change the coordinates of the HAT hydrogen according to the reaction recipe"""
-    # current recipe format: ConversionRecipe(type=[ConversionType.MOVE], atom_idx=[[from_H_nr, rad_nr]])                   )
-    u = MDA.Universe(str(tpr), str(trr), topology_format="tpr", format="trr")
-    # set timestep to last one in trajectory
-    u.trajectory[-1]
-    rad = u.select_atoms(f"bynum {recipe['atom_idx'][1]}")[0]
-    bonded_rad = rad.bonded_atoms
-    H_options = find_radical_pos(rad, bonded_rad)
-
-    H_initial = u.select_atoms(f"bynum {recipe['atom_idx'][0]}")[0]
-
-    # dealing with cases where several positions are returned as H_options
-    # continues with the positions thats closest to the initial H_initial position
-    distances = [np.sum(np.absolute(x - H_initial.position)) for x in H_options]
-    H_final = H_options[np.argmin(distances)]
-
-    system = u.select_atoms("all")
-    H_initial.position = H_final
-    system.write(trr.with_name(f"{trr.stem}_mod.trr"))
-    return
 
 
 ## copied from changemanager. should be put into utils
