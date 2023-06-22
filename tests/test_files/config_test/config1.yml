@@ -5,7 +5,7 @@ gromacs_alias: 'gmx'
 # ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default
 top: 'topol.top'
 gro: 'npt.gro'
-idx: 'index_backbone.ndx'
+ndx: 'index_backbone.ndx'
 mds:
   equilibrium1:
     mdp: 'pullf1500_equil.mdp'
@@ -22,8 +22,8 @@ changer:
     # points to which md should be performed for relaxation
 reactions:
   homolysis:
-    edis: 'edissoc.dat'
-    bonds: 'ffbonded.itp'
+    dat: 'edissoc.dat'
+    itp: 'ffbonded.itp'
 sequence:
   - equilibrium1
   -

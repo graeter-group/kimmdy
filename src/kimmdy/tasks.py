@@ -31,7 +31,7 @@ class TaskFiles:
     >>> runmng = run()
     >>> files = TaskFiles(runmng)
     >>> files.input
-    >>> files.input["tpr"]
+    >>> files.input["top"]
     {'top': 'latest top'}
 
     """

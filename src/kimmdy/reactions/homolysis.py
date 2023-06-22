@@ -27,7 +27,7 @@ class Homolysis(ReactionPlugin):
     Implementation for time-varying rates
     """
 
-    type_scheme = {"homolysis": {"edis": Path, "bonds": Path}}
+    type_scheme = {"homolysis": {"dat": Path, "itp": Path}}
 
     def get_recipe_collection(self, files: TaskFiles):
         logging.debug("Getting recipe for reaction: homolysis")
@@ -62,6 +62,9 @@ class Homolysis(ReactionPlugin):
             k_avg, _ = morse_transition_rate([sum(dists) / len(dists)], b0, E_dis, kb)
             # averaging distances works here because we typically have
             # one conformational state per calculation
+
+            # converto to zero-base
+            atomids = [i - 1 for i in list(atomids)]
 
             recipes.append(
                 Recipe(
