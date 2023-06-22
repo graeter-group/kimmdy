@@ -7,7 +7,7 @@ from kimmdy.parsing import read_top, TopologyDict
 from hypothesis import Phase, given, settings, HealthCheck, strategies as st
 from kimmdy.topology.topology import Topology
 from kimmdy.topology.atomic import *
-from kimmdy.topology.utils import get_top_section, match_atomic_item_to_atomic_type
+from kimmdy.topology.utils import get_top_section, match_atomic_item_to_atomic_type, get_protein_section
 import logging
 
 # %%
@@ -204,11 +204,13 @@ class TestHexalaTopology:
         return Topology(hexala_top, ffdir, ffpatch)
 
     def test_all_terms_accounted_for(self, top_fix, hexala_top):
-        atoms = get_top_section(hexala_top, "atoms", 0)
-        bonds = get_top_section(hexala_top, "bonds", 0)
-        pairs = get_top_section(hexala_top, "pairs", 0)
-        angles = get_top_section(hexala_top, "angles", 0)
-        dihedrals = get_top_section(hexala_top, "dihedrals", 0)
+
+        atoms = get_protein_section(hexala_top, "atoms")
+        bonds = get_protein_section(hexala_top, "bonds")
+        pairs = get_protein_section(hexala_top, "pairs")
+        angles = get_protein_section(hexala_top, "angles")
+        dihedrals = get_protein_section(hexala_top, "dihedrals")
+
         assert atoms
         assert bonds
         assert pairs
@@ -235,6 +237,7 @@ class TestHexalaTopology:
         top = deepcopy(top_fix)
         top_broken = deepcopy(top_break_29_35_fix)
         top.break_bond(("29", "35"))
+
         assert top.bonds == top_broken.bonds
         assert top.pairs == top_broken.pairs
         assert top.angles == top_broken.angles
@@ -252,17 +255,39 @@ class TestHexalaTopology:
         topology = og_top.top
         topology_new = top.top
 
-        bonddiff = set([(x[0], x[1]) for x in topology["bonds"]]) - set(
-            [(x[0], x[1]) for x in topology_new["bonds"]]
+        atoms = get_protein_section(topology, "atoms")
+        bonds = get_protein_section(topology, "bonds")
+        pairs = get_protein_section(topology, "pairs")
+        angles = get_protein_section(topology, "angles")
+        dihedrals = get_protein_section(topology, "dihedrals")
+
+        atoms_new = get_protein_section(topology_new, "atoms")
+        bonds_new = get_protein_section(topology_new, "bonds")
+        pairs_new = get_protein_section(topology_new, "pairs")
+        angles_new = get_protein_section(topology_new, "angles")
+        dihedrals_new = get_protein_section(topology_new, "dihedrals")
+        assert atoms is not None
+        assert bonds is not None
+        assert pairs is not None
+        assert angles is not None
+        assert dihedrals is not None
+        assert atoms_new is not None
+        assert bonds_new is not None
+        assert pairs_new is not None
+        assert angles_new is not None
+        assert dihedrals_new is not None
+
+        bonddiff = set([(x[0], x[1]) for x in bonds]) - set(
+            [(x[0], x[1]) for x in bonds_new]
         )
-        pairdiff = set([tuple(x[:2]) for x in topology["pairs"]]) - set(
-            [tuple(x[:2]) for x in topology_new["pairs"]]
+        pairdiff = set([tuple(x[:2]) for x in pairs]) - set(
+            [tuple(x[:2]) for x in pairs_new]
         )
-        anglediff = set([tuple(x[:3]) for x in topology["angles"]]) - set(
-            [tuple(x[:3]) for x in topology_new["angles"]]
+        anglediff = set([tuple(x[:3]) for x in angles]) - set(
+            [tuple(x[:3]) for x in angles_new]
         )
-        dihedraldiff = set([tuple(x[:4]) for x in topology["dihedrals"]]) - set(
-            [tuple(x[:4]) for x in topology_new["dihedrals"]]
+        dihedraldiff = set([tuple(x[:4]) for x in dihedrals]) - set(
+            [tuple(x[:4]) for x in dihedrals_new]
         )
 
         assert bonddiff == set([breakpair])
