@@ -7,6 +7,8 @@ import xml.etree.ElementTree as ET
 from itertools import takewhile
 import logging
 
+from kimmdy.utils import get_gmx_dir
+
 TopologyDict = dict
 
 
@@ -85,6 +87,7 @@ def read_rtp(path: Path) -> dict:
 
 def resolve_includes(path: Path) -> list[str]:
     """Resolve #include statements in a (top/itp) file."""
+    gmx_builtin_ffs = get_gmx_dir() / 'top'
     dir = path.parent
     fname = path.name
     cwd = Path.cwd()
@@ -100,11 +103,14 @@ def resolve_includes(path: Path) -> list[str]:
                 try:
                     ls_prime.extend(resolve_includes(path))
                 except Exception as _:
-                    # drop line if path can't be resolved
-                    logging.warning(
-                        f"top include {path} could not be resolved. Line was dropped."
-                    )
-                    continue
+                    try:
+                        ls_prime.extend(resolve_includes(gmx_builtin_ffs / path))
+                    except Exception as _:
+                        # drop line if path can't be resolved
+                        logging.warning(
+                            f"top include {path} could not be resolved. Line was dropped."
+                        )
+                        continue
             else:
                 ls_prime.append(l)
 

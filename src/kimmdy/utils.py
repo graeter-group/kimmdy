@@ -19,6 +19,15 @@ def pushd(path):
     finally:
         os.chdir(prev)
 
+def get_gmx_dir() -> Path:
+    """returns the path to the gromacs installation"""
+    gmx_binary = Path(sp.run(["which", "gmx"], capture_output=True).stdout.decode().strip())
+    if not gmx_binary.exists():
+        raise ValueError("Could not find gromacs installation")
+    # resolve symlink if gmxbinary is a symlink
+    gmx_binary = gmx_binary.resolve()
+    gmx_dir = gmx_binary.parent.parent / 'share' / 'gromacs'
+    return gmx_dir
 
 def increment_logfile(f: Path) -> Path:
     backup_file_prefix = "#"
