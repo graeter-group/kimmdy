@@ -14,8 +14,6 @@ from kimmdy.topology.utils import (
 )
 import logging
 
-# %%
-
 
 @pytest.fixture(scope="module")
 def filedir() -> Path:

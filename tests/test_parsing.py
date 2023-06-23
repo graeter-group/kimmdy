@@ -26,13 +26,6 @@ def setup_testdir(tmp_path) -> Path:
     os.chdir(tmp_path.resolve())
     return tmp_path
 
-def set_dir():
-    try:
-        test_dir = Path(__file__).parent / "test_files/test_parsing"
-    except NameError:
-        test_dir = Path("./tests/test_files/test_parsing")
-    os.chdir(test_dir)
-
 
 def test_parser_doesnt_crash_on_example(tmp_path, caplog):
     """Example file urea.gro
