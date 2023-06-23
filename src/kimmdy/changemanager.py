@@ -7,7 +7,7 @@ from kimmdy.reaction import Bind, Break, Move, RecipeStep
 from kimmdy.parsing import read_topol, write_topol, write_plumed, read_plumed
 from kimmdy.tasks import TaskFiles
 from kimmdy.topology.topology import Topology
-from kimmdy.coordinates import merge_section_slowgrowth
+from kimmdy.coordinates import merge_top_prmgrowth
 from pathlib import Path
 
 
@@ -67,7 +67,7 @@ def modify_coords(
         )
 
     if run_prmgrowth:
-        merge_section_slowgrowth()
+        merge_top_prmgrowth()
 
     u.atoms.write(trr_out)
     u.atoms.write(gro_out)
