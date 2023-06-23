@@ -36,6 +36,18 @@ def test_integration_emptyrun(tmp_path, caplog):
     with pytest.raises(ValueError) as e:
         kimmdy_run()
 
+def test_integration_valid_input_files(tmp_path, caplog):
+    testdir = setup_testdir(tmp_path, "minimal_input_files")
+    caplog.set_level(logging.INFO)
+    (testdir / "emptyrun.txt").touch()
+
+    kimmdy_run()
+    for record in caplog.records:
+        # assert record.levelname != "WARNING"
+        assert record.levelname != "CRITICAL"
+    assert set(["Finished", "running", "tasks,"]).issubset(
+        set(caplog.records[-1].message.split(sep=" "))
+    )
 
 def test_integration_hat_reaction(tmp_path, caplog):
     testdir = setup_testdir(tmp_path, "HAT_reaction")
