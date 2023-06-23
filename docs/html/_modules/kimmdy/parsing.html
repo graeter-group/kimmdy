@@ -77,12 +77,9 @@
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Iterable</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Generator</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
-<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Generator</span>
 <span class="kn">import</span> <span class="nn">xml.etree.ElementTree</span> <span class="k">as</span> <span class="nn">ET</span>
 <span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">takewhile</span>
-<span class="kn">from</span> <span class="nn">kimmdy.utils</span> <span class="kn">import</span> <span class="n">pushd</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 
 <span class="n">TopologyDict</span> <span class="o">=</span> <span class="nb">dict</span>
@@ -233,7 +230,6 @@
     <span class="n">parent_section</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">section</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">condition</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">condition_else</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">is_first_line_after_section_header</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">content_key</span> <span class="o">=</span> <span class="s2">&quot;content&quot;</span>
 
@@ -251,7 +247,7 @@
         <span class="k">elif</span> <span class="n">l</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#if&quot;</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">is_first_line_after_section_header</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-                    <span class="s2">&quot;#if ... #endif can only be used to surround a section, not within&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;&quot;&quot;Errro parsing </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">: #if ... #endif can only be used to surround a section, not within.&quot;&quot;&quot;</span>
                 <span class="p">)</span>
             <span class="n">l</span> <span class="o">=</span> <span class="n">l</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
             <span class="n">condition_type</span> <span class="o">=</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">removeprefix</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">)</span>
@@ -259,12 +255,10 @@
             <span class="n">condition</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">condition_type</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">condition_value</span><span class="p">}</span>
             <span class="k">continue</span>
         <span class="k">elif</span> <span class="n">l</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#else&quot;</span><span class="p">):</span>
-            <span class="n">condition_else</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="n">content_key</span> <span class="o">=</span> <span class="s2">&quot;else_content&quot;</span>
             <span class="k">continue</span>
         <span class="k">elif</span> <span class="n">l</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#endif&quot;</span><span class="p">):</span>
             <span class="n">condition</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="n">condition_else</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="n">content_key</span> <span class="o">=</span> <span class="s2">&quot;content&quot;</span>
             <span class="k">continue</span>
 
@@ -319,6 +313,7 @@
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;topology file </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2"> does not contain any sections&quot;</span><span class="p">)</span>
+
     <span class="k">return</span> <span class="n">d</span></div>
 
 
@@ -348,7 +343,7 @@
                 <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">else_content</span><span class="p">:</span>
                     <span class="n">f</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">l</span><span class="p">))</span>
                     <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;#endif</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;#endif</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">outfile</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">define</span> <span class="o">=</span> <span class="n">top</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;define&quot;</span><span class="p">)</span>

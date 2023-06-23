@@ -10,6 +10,8 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script src="../../_static/sphinx_highlight.js"></script>
@@ -37,7 +39,11 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../welcome.html">Welcome to KIMMDY: Getting Started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../modules.html">kimmdy</a></li>
 </ul>
@@ -80,6 +86,7 @@
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">import</span> <span class="nn">dill</span>
 <span class="kn">import</span> <span class="nn">csv</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
 
 <span class="c1"># Necessary before 3.11: https://peps.python.org/pep-0673/</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TypeVar</span>
@@ -89,9 +96,46 @@
 
 <div class="viewcode-block" id="RecipeStep"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.reaction.RecipeStep">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">RecipeStep</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;ABC for all RecipeSteps.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;ABC for all RecipeSteps.</span>
+<span class="sd">    Indices should be zero-based by default,</span>
+<span class="sd">    one-based copies must not be passed around.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">pass</span></div>
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_one_based</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">to_convert</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;idx_to_move&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;idx_to_bind&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;idx_to_break&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;atom_idx_1&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;atom_idx_2&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+
+<div class="viewcode-block" id="RecipeStep.one_based"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.reaction.RecipeStep.one_based">[docs]</a>    <span class="k">def</span> <span class="nf">one_based</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns new RecipeStep using one-based indices&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_one_based</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Requesting conversion to one-base, but is already one-based&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span>
+        <span class="n">one_based_self</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">one_based_self</span><span class="o">.</span><span class="n">is_one_based</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">for</span> <span class="n">att_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_convert</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">att_name</span><span class="p">):</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="n">one_based_self</span><span class="p">,</span> <span class="n">att_name</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">att_name</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">one_based_self</span></div>
+
+<div class="viewcode-block" id="RecipeStep.zero_based"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.reaction.RecipeStep.zero_based">[docs]</a>    <span class="k">def</span> <span class="nf">zero_based</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns new RecipeStep using one-based indices&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_one_based</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;Requesting conversion to zero-base, but is already zero-based&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span>
+        <span class="n">zero_based_self</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">zero_based_self</span><span class="o">.</span><span class="n">is_one_based</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">att_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_convert</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">att_name</span><span class="p">):</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="n">zero_based_self</span><span class="p">,</span> <span class="n">att_name</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">att_name</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">zero_based_self</span></div></div>
 
 
 <div class="viewcode-block" id="Move"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.reaction.Move">[docs]</a><span class="nd">@dataclass</span>

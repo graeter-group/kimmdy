@@ -10,6 +10,8 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script src="../../_static/sphinx_highlight.js"></script>
@@ -37,7 +39,11 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../welcome.html">Welcome to KIMMDY: Getting Started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../modules.html">kimmdy</a></li>
 </ul>
@@ -81,14 +87,14 @@
 <span class="kn">from</span> <span class="nn">kimmdy.reaction</span> <span class="kn">import</span> <span class="n">ReactionPlugin</span><span class="p">,</span> <span class="n">RecipeCollection</span><span class="p">,</span> <span class="n">Recipe</span>
 <span class="kn">import</span> <span class="nn">kimmdy.changemanager</span> <span class="k">as</span> <span class="nn">changer</span>
 <span class="kn">from</span> <span class="nn">kimmdy.tasks</span> <span class="kn">import</span> <span class="n">Task</span><span class="p">,</span> <span class="n">TaskFiles</span><span class="p">,</span> <span class="n">TaskMapping</span>
-<span class="kn">from</span> <span class="nn">kimmdy.utils</span> <span class="kn">import</span> <span class="n">run_shell_cmd</span>
+<span class="kn">from</span> <span class="nn">kimmdy.utils</span> <span class="kn">import</span> <span class="n">run_shell_cmd</span><span class="p">,</span> <span class="n">run_gmx</span>
 <span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pformat</span>
 <span class="kn">from</span> <span class="nn">kimmdy</span> <span class="kn">import</span> <span class="n">plugins</span>
 <span class="kn">from</span> <span class="nn">kimmdy.topology.topology</span> <span class="kn">import</span> <span class="n">Topology</span>
 <span class="kn">from</span> <span class="nn">kimmdy.kmc</span> <span class="kn">import</span> <span class="n">rf_kmc</span>
 
 <span class="c1"># file types of which there will be multiple files per type</span>
-<span class="n">AMBIGUOUS_SUFFS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;dat&quot;</span><span class="p">,</span> <span class="s2">&quot;xvg&quot;</span><span class="p">,</span> <span class="s2">&quot;log&quot;</span><span class="p">,</span> <span class="s2">&quot;itp&quot;</span><span class="p">]</span>
+<span class="n">AMBIGUOUS_SUFFS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;dat&quot;</span><span class="p">,</span> <span class="s2">&quot;xvg&quot;</span><span class="p">,</span> <span class="s2">&quot;log&quot;</span><span class="p">,</span> <span class="s2">&quot;itp&quot;</span><span class="p">,</span> <span class="s2">&quot;mdp&quot;</span><span class="p">]</span>
 <span class="c1"># are there cases where we have multiple trr files?</span>
 
 
@@ -101,6 +107,25 @@
     <span class="n">MD</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
     <span class="n">REACTION</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
     <span class="n">DONE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="get_existing_files"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.runmanager.get_existing_files">[docs]</a><span class="k">def</span> <span class="nf">get_existing_files</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">Config</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize latest_files with every existing file defined in config&quot;&quot;&quot;</span>
+    <span class="n">file_d</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">attr_names</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="fm">__dir__</span><span class="p">())</span>
+    <span class="k">for</span> <span class="n">attr_name</span> <span class="ow">in</span> <span class="n">attr_names</span><span class="p">:</span>
+        <span class="n">attr</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">attr_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span> <span class="n">Path</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">attr</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="k">continue</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">attr</span><span class="o">.</span><span class="n">suffix</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>  <span class="c1"># rm the get_existing_files</span>
+            <span class="c1"># AMBIGUOUS_SUFFS -&gt; key whole name</span>
+            <span class="k">if</span> <span class="n">attr</span><span class="o">.</span><span class="n">suffix</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="ow">in</span> <span class="n">AMBIGUOUS_SUFFS</span><span class="p">:</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="n">attr</span><span class="o">.</span><span class="n">name</span>
+            <span class="n">file_d</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">attr</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span> <span class="n">Config</span><span class="p">):</span>
+            <span class="n">file_d</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">get_existing_files</span><span class="p">(</span><span class="n">attr</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">file_d</span></div>
 
 
 <div class="viewcode-block" id="RunManager"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.runmanager.RunManager">[docs]</a><span class="k">class</span> <span class="nc">RunManager</span><span class="p">:</span>
@@ -119,13 +144,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">iterations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">iterations</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">State</span><span class="o">.</span><span class="n">IDLE</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">recipe_collection</span><span class="p">:</span> <span class="n">RecipeCollection</span> <span class="o">=</span> <span class="n">RecipeCollection</span><span class="p">([])</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">latest_files</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;top&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">top</span><span class="p">,</span>
-            <span class="s2">&quot;gro&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">gro</span><span class="p">,</span>
-            <span class="s2">&quot;idx&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">idx</span><span class="p">,</span>
-            <span class="s2">&quot;trr&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;edr&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">latest_files</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_existing_files</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Initialized latest files:&quot;</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">pformat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latest_files</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">histfile</span> <span class="o">=</span> <span class="n">increment_logfile</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">out</span><span class="si">}</span><span class="s2">_history.log&quot;</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cptfile</span> <span class="o">=</span> <span class="n">increment_logfile</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">out</span><span class="si">}</span><span class="s2">_kimmdy.cpt&quot;</span><span class="p">))</span>
         <span class="k">try</span><span class="p">:</span>
@@ -201,7 +222,7 @@
             <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Stop running tasks, state: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="si">}</span><span class="s2">, &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Finished running tasks, state: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="si">}</span><span class="s2">, &quot;</span>
             <span class="sa">f</span><span class="s2">&quot;iteration:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">iteration</span><span class="si">}</span><span class="s2">, max:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">iterations</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span></div>
 
@@ -236,6 +257,15 @@
                 <span class="n">suffix</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">suffix</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
                 <span class="k">if</span> <span class="n">suffix</span> <span class="ow">in</span> <span class="n">AMBIGUOUS_SUFFS</span><span class="p">:</span>
                     <span class="n">suffix</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">name</span>
+                <span class="k">if</span> <span class="n">files</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">suffix</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">files</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="n">suffix</span><span class="p">]</span> <span class="o">==</span> <span class="n">files</span><span class="o">.</span><span class="n">outputdir</span> <span class="o">/</span> <span class="n">path</span><span class="p">:</span>
+                        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                            <span class="s2">&quot;_discover_output_files wants to overwrite files.output!&quot;</span>
+                        <span class="p">)</span>
+                        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Suffix </span><span class="si">{</span><span class="n">suffix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;From </span><span class="si">{</span><span class="n">files</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="n">suffix</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;To </span><span class="si">{</span><span class="n">files</span><span class="o">.</span><span class="n">outputdir</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">continue</span>
                 <span class="n">files</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="n">suffix</span><span class="p">]</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">outputdir</span> <span class="o">/</span> <span class="n">path</span>
 
             <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Update latest files with: &quot;</span><span class="p">)</span>
@@ -283,10 +313,8 @@
         <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latest_files</span><span class="p">)</span>
         <span class="n">top</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">]</span>
         <span class="n">gro</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;gro&quot;</span><span class="p">]</span>
-        <span class="n">trr</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;trr&quot;</span><span class="p">]</span>
-        <span class="n">edr</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;edr&quot;</span><span class="p">]</span>
         <span class="n">mdp</span> <span class="o">=</span> <span class="n">md_config</span><span class="o">.</span><span class="n">mdp</span>
-        <span class="n">idx</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;idx&quot;</span><span class="p">]</span>
+        <span class="n">ndx</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;ndx&quot;</span><span class="p">]</span>
 
         <span class="n">outputdir</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">outputdir</span>
         <span class="c1"># make maxh and ntomp accessible?</span>
@@ -295,11 +323,16 @@
 
         <span class="n">grompp_cmd</span> <span class="o">=</span> <span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">gmx_alias</span><span class="si">}</span><span class="s2"> grompp -p </span><span class="si">{</span><span class="n">top</span><span class="si">}</span><span class="s2"> -c </span><span class="si">{</span><span class="n">gro</span><span class="si">}</span><span class="s2"> &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;-f </span><span class="si">{</span><span class="n">mdp</span><span class="si">}</span><span class="s2"> -n </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2"> -o </span><span class="si">{</span><span class="n">instance</span><span class="si">}</span><span class="s2">.tpr -maxwarn 5&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;-f </span><span class="si">{</span><span class="n">mdp</span><span class="si">}</span><span class="s2"> -n </span><span class="si">{</span><span class="n">ndx</span><span class="si">}</span><span class="s2"> -o </span><span class="si">{</span><span class="n">instance</span><span class="si">}</span><span class="s2">.tpr -maxwarn 5&quot;</span>
         <span class="p">)</span>
         <span class="c1"># only appends these lines if there are trr and edr files</span>
-        <span class="k">if</span> <span class="n">trr</span> <span class="ow">and</span> <span class="n">edr</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">trr</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;trr&quot;</span><span class="p">]</span>
+            <span class="n">edr</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;edr&quot;</span><span class="p">]</span>
             <span class="n">grompp_cmd</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; -t </span><span class="si">{</span><span class="n">trr</span><span class="si">}</span><span class="s2"> -e </span><span class="si">{</span><span class="n">edr</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+            <span class="k">pass</span>
+
         <span class="n">mdrun_cmd</span> <span class="o">=</span> <span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">gmx_alias</span><span class="si">}</span><span class="s2"> mdrun -s </span><span class="si">{</span><span class="n">instance</span><span class="si">}</span><span class="s2">.tpr -cpi </span><span class="si">{</span><span class="n">instance</span><span class="si">}</span><span class="s2">.cpt &quot;</span>
             <span class="sa">f</span><span class="s2">&quot;-x </span><span class="si">{</span><span class="n">instance</span><span class="si">}</span><span class="s2">.xtc -o </span><span class="si">{</span><span class="n">instance</span><span class="si">}</span><span class="s2">.trr -cpo </span><span class="si">{</span><span class="n">instance</span><span class="si">}</span><span class="s2">.cpt &quot;</span>
@@ -307,8 +340,9 @@
             <span class="sa">f</span><span class="s2">&quot;-px </span><span class="si">{</span><span class="n">instance</span><span class="si">}</span><span class="s2">_pullx.xvg -pf </span><span class="si">{</span><span class="n">instance</span><span class="si">}</span><span class="s2">_pullf.xvg &quot;</span>
             <span class="sa">f</span><span class="s2">&quot;-ro </span><span class="si">{</span><span class="n">instance</span><span class="si">}</span><span class="s2">-rotation.xvg -ra </span><span class="si">{</span><span class="n">instance</span><span class="si">}</span><span class="s2">-rotangles.log &quot;</span>
             <span class="sa">f</span><span class="s2">&quot;-rs </span><span class="si">{</span><span class="n">instance</span><span class="si">}</span><span class="s2">-rotslabs.log -rt </span><span class="si">{</span><span class="n">instance</span><span class="si">}</span><span class="s2">-rottorque.log &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;-maxh </span><span class="si">{</span><span class="n">maxh</span><span class="si">}</span><span class="s2"> -dlb yes -ntomp </span><span class="si">{</span><span class="n">ntomp</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;-maxh </span><span class="si">{</span><span class="n">maxh</span><span class="si">}</span><span class="s2"> -dlb yes &quot;</span>
         <span class="p">)</span>
+        <span class="c1"># -ntomp {ntomp} removed for now</span>
         <span class="c1"># like this, the previous checkpoint file would not be used,</span>
         <span class="c1"># -t and -e options from grompp</span>
         <span class="c1"># replace the checkpoint file if gen_vel = no in the mdp file</span>
@@ -318,8 +352,10 @@
             <span class="n">files</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;plumed.dat&quot;</span><span class="p">:</span> <span class="n">md_config</span><span class="o">.</span><span class="n">plumed</span><span class="o">.</span><span class="n">dat</span><span class="p">}</span>
             <span class="c1"># add plumed.dat to output to indicate it as current plumed.dat file</span>
 
-        <span class="n">run_shell_cmd</span><span class="p">(</span><span class="n">grompp_cmd</span><span class="p">,</span> <span class="n">outputdir</span><span class="p">)</span>
-        <span class="n">run_shell_cmd</span><span class="p">(</span><span class="n">mdrun_cmd</span><span class="p">,</span> <span class="n">outputdir</span><span class="p">)</span>
+        <span class="c1"># specify trr to prevent rotref trr getting set as standard trr</span>
+        <span class="n">files</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;trr&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">outputdir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">instance</span><span class="si">}</span><span class="s2">.trr&quot;</span>
+        <span class="n">run_gmx</span><span class="p">(</span><span class="n">grompp_cmd</span><span class="p">,</span> <span class="n">outputdir</span><span class="p">)</span>
+        <span class="n">run_gmx</span><span class="p">(</span><span class="n">mdrun_cmd</span><span class="p">,</span> <span class="n">outputdir</span><span class="p">)</span>
 
         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Done with MD </span><span class="si">{</span><span class="n">instance</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">files</span>
@@ -364,9 +400,7 @@
         <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Chose recipe: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">recipe_steps</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">changer</span><span class="o">.</span><span class="n">modify_top</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">recipe_steps</span><span class="p">,</span>
-            <span class="n">files</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">],</span>
-            <span class="n">files</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">],</span>
-            <span class="n">files</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;ff&quot;</span><span class="p">],</span>
+            <span class="n">files</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">ffpatch</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">top</span><span class="p">,</span>
         <span class="p">)</span>
