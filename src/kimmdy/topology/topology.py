@@ -7,6 +7,8 @@ from kimmdy.topology.utils import (
     match_id_to_patch,
     attributes_to_list,
     match_atomic_item_to_atomic_type,
+    set_protein_section,
+    set_top_section,
 )
 from kimmdy.topology.ff import FF, FFPatches, Patch
 from itertools import permutations, combinations
@@ -74,21 +76,35 @@ class Topology:
         self._test_for_radicals()
 
     def _update_dict(self):
-        self.protein["atoms"]["content"] = [
+        set_protein_section(self.top, "atoms", [
             attributes_to_list(x) for x in self.atoms.values()
-        ]
-        self.protein["bonds"]["content"] = [
+        ])
+
+        set_protein_section(self.top, "bonds", [
             attributes_to_list(x) for x in self.bonds.values()
-        ]
-        self.protein["pairs"]["content"] = [
+        ])
+
+        set_protein_section(self.top, "pairs", [
             attributes_to_list(x) for x in self.pairs.values()
-        ]
-        self.protein["angles"]["content"] = [
+        ])
+
+        set_protein_section(self.top, "angles", [
             attributes_to_list(x) for x in self.angles.values()
-        ]
-        self.protein["dihedrals"]["content"] = [
-            attributes_to_list(x) for x in self.proper_dihedrals.values()
-        ] + [attributes_to_list(x) for x in self.improper_dihedrals.values()]
+        ])
+
+        set_protein_section(self.top, "dihedrals",
+                            [attributes_to_list(x) for x in self.proper_dihedrals.values() ] +
+                            [attributes_to_list(x) for x in self.improper_dihedrals.values()]
+        )
+
+        set_top_section(self.top, 'atomtypes', [
+            attributes_to_list(x) for x in self.ff.atomtypes.values()
+        ])
+
+        set_top_section(self.top, 'bondtypes', [
+            attributes_to_list(x) for x in self.ff.bondtypes.values()
+        ])
+
 
     def to_dict(self) -> TopologyDict:
         self._update_dict()

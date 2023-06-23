@@ -28,20 +28,20 @@ def setup_testdir(tmp_path) -> Path:
 
 
 def test_parser_doesnt_crash_on_example(tmp_path, caplog):
-    """Example file urea.gro
+    """Example file urea.top
     from <https://manual.gromacs.org/documentation/current/reference-manual/topologies/topology-file-formats.html>
     """
     testdir = setup_testdir(tmp_path)
-    urea_path = Path("urea.gro")
+    urea_path = Path("urea.top")
     top = parsing.read_top(urea_path)
     assert isinstance(top, dict)
 
 
 # %%
 def test_doubleparse_urea(tmp_path):
-    """Parsing it's own output should return the same top on urea.gro"""
+    """Parsing it's own output should return the same top on urea.top"""
     testdir = setup_testdir(tmp_path)
-    urea_path = Path("urea.gro")
+    urea_path = Path("urea.top")
     top = parsing.read_top(urea_path)
     p = Path("pytest_urea.top")
     parsing.write_top(top, p)
