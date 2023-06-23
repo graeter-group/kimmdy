@@ -60,8 +60,8 @@ class Topology:
         ] = {}
         self.radicals: dict[str, Atom] = {}
 
-        if ffdir:
-            self.ff = FF(top, ffdir)
+        self.ff = FF(top, ffdir)
+
         self.ffpatches = None
         if ffpatch:
             self.ffpatches = FFPatches(ffpatch)

@@ -12,7 +12,7 @@ from kimmdy.topology.utils import get_top_section
 class FF:
     """Conainer for parsed forcefield data."""
 
-    def __init__(self, top, ffdir: Path):
+    def __init__(self, top, ffdir: Optional[Path]):
         self.atomtypes: dict[str, AtomType] = {}
         self.bondtypes: dict[tuple[str, str], BondType] = {}
         self.angletypes: dict[tuple[str, str, str], AngleType] = {}
@@ -78,6 +78,8 @@ class FF:
                     ] = dihedraltype
 
             self.residuetypes = {}
+            if ffdir is None:
+                return
             aminoacids_path = ffdir / "aminoacids.rtp"
             aminoacids = read_rtp(aminoacids_path)
             for k, v in aminoacids.items():
