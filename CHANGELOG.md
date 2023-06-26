@@ -1,5 +1,37 @@
 # Changelog
 
+## [3.0.0](https://github.com/hits-mbm-dev/kimmdy/compare/v2.4.0...v3.0.0) (2023-06-26)
+
+
+### ⚠ BREAKING CHANGES
+
+* put restrictions on the way top files are accepted
+* deprecate generate_top_from_atom_list
+
+### Features
+
+* handle else macros ([bcb6121](https://github.com/hits-mbm-dev/kimmdy/commit/bcb6121e73a1e54a832cad45f2dd406ac25a26da))
+* handle multiple moleculetype sections ([bcb6121](https://github.com/hits-mbm-dev/kimmdy/commit/bcb6121e73a1e54a832cad45f2dd406ac25a26da))
+* parse top files with includes ([#124](https://github.com/hits-mbm-dev/kimmdy/issues/124)) ([bcb6121](https://github.com/hits-mbm-dev/kimmdy/commit/bcb6121e73a1e54a832cad45f2dd406ac25a26da))
+* resolve includes in gromacs data dir (located relative to gmx executable) if not in cwd ([bcb6121](https://github.com/hits-mbm-dev/kimmdy/commit/bcb6121e73a1e54a832cad45f2dd406ac25a26da))
+* stop if no ff found, warn if multiple found ([bcb6121](https://github.com/hits-mbm-dev/kimmdy/commit/bcb6121e73a1e54a832cad45f2dd406ac25a26da))
+* topology dictionary helpers to get and set sections ([bcb6121](https://github.com/hits-mbm-dev/kimmdy/commit/bcb6121e73a1e54a832cad45f2dd406ac25a26da))
+* udpate top dict with parsed ff parameters ([bcb6121](https://github.com/hits-mbm-dev/kimmdy/commit/bcb6121e73a1e54a832cad45f2dd406ac25a26da))
+
+
+### Bug Fixes
+
+* deprecate generate_top_from_atom_list ([bcb6121](https://github.com/hits-mbm-dev/kimmdy/commit/bcb6121e73a1e54a832cad45f2dd406ac25a26da))
+* put restrictions on the way top files are accepted ([bcb6121](https://github.com/hits-mbm-dev/kimmdy/commit/bcb6121e73a1e54a832cad45f2dd406ac25a26da))
+* use hat_naive instead of hat_reaction ([bcb6121](https://github.com/hits-mbm-dev/kimmdy/commit/bcb6121e73a1e54a832cad45f2dd406ac25a26da))
+* use logging.warning instead of depcrecated warn ([bcb6121](https://github.com/hits-mbm-dev/kimmdy/commit/bcb6121e73a1e54a832cad45f2dd406ac25a26da))
+
+
+### Documentation
+
+* add tutorial section (with markdown support) ([bcb6121](https://github.com/hits-mbm-dev/kimmdy/commit/bcb6121e73a1e54a832cad45f2dd406ac25a26da))
+* move qmd to preview topology to docs ([bcb6121](https://github.com/hits-mbm-dev/kimmdy/commit/bcb6121e73a1e54a832cad45f2dd406ac25a26da))
+
 ## [2.4.0](https://github.com/hits-mbm-dev/kimmdy/compare/v2.3.0...v2.4.0) (2023-06-22)
 
 
