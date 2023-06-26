@@ -107,7 +107,7 @@ def merge_top_prmgrowth(
                 bond_objA = get_bondobj(bond_key, bondA, topA)
                 bond_objB = get_bondobj(bond_key, bondB, topB)
                 bondB.c2 = bond_objB.c0
-                bondB.c3 = bond_objB.c3
+                bondB.c3 = bond_objB.c1
                 bondB.c0 = bond_objA.c0
                 bondB.c1 = bond_objA.c1
 

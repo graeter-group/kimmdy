@@ -105,9 +105,14 @@ def test_morse_transition_rate(homolysis_files):
     assert all(np.isclose(F_array, F_ref))
 
 
-def test_get_recipe_collection(tmp_path):
+def test_get_recipe_collection(generic_rmgr):
+    # curr_path = Path().cwd()
 
-    r = Homolysis(name="homolysis", runmng=rmgr)
+    files = TaskFiles(generic_rmgr)
+    files.input["top"] = Path("topol.top")
+    for f_path in ["plumed.dat", "distances.dat", "edissoc.dat", "ffbonded.itp"]:
+        files.input[f_path] = Path(f_path)
+    r = Homolysis(name="homolysis", runmng=generic_rmgr)
     rc = r.get_recipe_collection(files)
 
     plumed = read_plumed(files.input["plumed.dat"])

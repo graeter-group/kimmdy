@@ -43,13 +43,11 @@ def test_get_bondobj(coordinates_files):
     assert bond2obj.c0 == "0.13600" and bond2obj.c1 == "282001.6"
 
 
-def test_merge_prm_top(coordinates_files):
+def test_merge_prm_top(generic_rmgr, coordinates_files):
     # needs a proper runmgr
-    files = TaskFiles(
-        None,
-        input={"top": coordinates_files["topA_path"]},
-        output={"top": coordinates_files["topB_path"]},
-    )
+    files = TaskFiles(generic_rmgr)
+    files.input["top"] = coordinates_files["topA_path"]
+    files.output["top"] = coordinates_files["topB_path"]
     topmerge = merge_top_prmgrowth(files)
     write_top(
         topmerge.to_dict(), coordinates_files["topB_path"].parent / "top_merge.top"
