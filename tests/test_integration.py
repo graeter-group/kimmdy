@@ -52,7 +52,7 @@ def test_integration_valid_input_files(tmp_path, caplog):
 
 
 def test_integration_hat_reaction(tmp_path, caplog):
-    testdir = setup_testdir(tmp_path, "HAT_reaction")
+    testdir = setup_testdir(tmp_path, "hat_naive")
 
     kimmdy_run()
     for record in caplog.records:
