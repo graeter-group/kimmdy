@@ -116,7 +116,7 @@ def test_get_recipe_collection(tmp_path):
     )
 
     rmgr = RunManager(Config(tmpdir / "kimmdy.yml"))
-    files = TaskFiles(rmgr)
+    files = TaskFiles(rmgr.get_latest)
     files.input["top"] = Path("topol.top")
     for f_path in ["plumed.dat", "distances.dat", "edissoc.dat", "ffbonded.itp"]:
         files.input[f_path] = tmpdir / f_path
