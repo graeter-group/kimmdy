@@ -106,19 +106,6 @@ def test_morse_transition_rate(homolysis_files):
 
 
 def test_get_recipe_collection(tmp_path):
-    # setting up runmanager for testing homolysis is tedious. shortcut possible?
-    tmpdir = tmp_path / "homolysis"
-    shutil.copytree(Path(__file__).parent / "test_files/test_homolysis", tmpdir)
-    os.chdir(tmpdir)
-    Path(tmpdir / "amber99sb-star-ildnp.ff").symlink_to(
-        Path(__file__).parent / "test_files/assets/amber99sb-star-ildnp.ff",
-        target_is_directory=True,
-    )
-    rmgr = RunManager(Config(tmpdir / "kimmdy.yml"))
-    files = TaskFiles(rmgr)
-    files.input["top"] = Path("topol.top")
-    for f_path in ["plumed.dat", "distances.dat", "edissoc.dat", "ffbonded.itp"]:
-        files.input[f_path] = tmpdir / f_path
 
     r = Homolysis(name="homolysis", runmng=rmgr)
     rc = r.get_recipe_collection(files)
