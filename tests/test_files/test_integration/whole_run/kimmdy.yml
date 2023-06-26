@@ -23,7 +23,7 @@ reactions:
   homolysis:
     dat: 'edissoc.dat'
     itp: 'ffbonded.itp'
-  hat_reaction:
+  hat_naive:
     frequency_factor: 100000000
     h_cutoff: 3
     polling_rate: 1

@@ -1,31 +1,26 @@
-from kimmdy.parsing import read_topol, read_plumed
+from kimmdy.parsing import read_plumed
 from kimmdy.changemanager import break_bond_plumed
 import pytest
-import os
 import shutil
 
 from pathlib import Path
-from copy import deepcopy
-
-from kimmdy.reaction import Break, Recipe
-from kimmdy.kmc import KMCResult
 
 
 @pytest.fixture
-def testdir(tmp_path) -> Path:
+def tmpdir(tmp_path) -> Path:
     dirname = "test_changemanager"
     try:
         filedir = Path(__file__).parent / "test_files" / dirname
     except NameError:
-        filedir = Path("./tests/test_files" / dirname)
+        filedir = Path("./tests/test_files") / dirname
     test_dir = tmp_path / dirname
     shutil.copytree(filedir, test_dir)
     return test_dir
 
 
-def test_plumed_break(testdir):
-    plumed = read_plumed(testdir / "plumed_nat.dat")
-    plumed_break_ref = read_plumed(testdir / "plumed_break29-35.dat")
+def test_plumed_break(tmpdir):
+    plumed = read_plumed(tmpdir / "plumed_nat.dat")
+    plumed_break_ref = read_plumed(tmpdir / "plumed_break29-35.dat")
 
     breakpair = [29, 35]
     plumed_break = break_bond_plumed(plumed, breakpair, Path("distances.dat"))

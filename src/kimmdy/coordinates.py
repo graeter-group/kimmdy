@@ -4,7 +4,7 @@ import numpy as np
 import logging
 from typing import Union
 
-from kimmdy.parsing import read_topol
+from kimmdy.parsing import read_top
 from kimmdy.tasks import TaskFiles
 from kimmdy.topology.topology import Topology
 from kimmdy.topology.atomic import Bond, Angle, Dihedral, Pair, Atomic
@@ -13,7 +13,7 @@ from kimmdy.topology.utils import match_atomic_item_to_atomic_type
 
 ## copied from changemanager. should be put into utils
 def get_ff_sections(ffdir):
-    return read_topol(ffdir / "ffbonded.itp")
+    return read_top(ffdir / "ffbonded.itp")
 
 
 def parameterize_bonded_terms(ffprm, terms_atomtype, prop, terms):
@@ -70,8 +70,8 @@ def merge_top_prmgrowth(
         "morse_well_depth": "400",
         "morse_steepness": "10",
     }  # well_depth D [kJ/mol], steepness [nm-1]
-    topADict = read_topol(files.input["top"])
-    topBDict = read_topol(files.output["top"])
+    topADict = read_top(files.input["top"])
+    topBDict = read_top(files.output["top"])
     topA = Topology(topADict)
     topB = Topology(topBDict)
 

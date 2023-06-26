@@ -1,17 +1,18 @@
 # %%
 from copy import deepcopy
 from pathlib import Path
-import os
 import pytest
 
-from kimmdy.parsing import read_topol, write_topol, TopologyDict
-from hypothesis import Phase, given, settings, strategies as st
-from kimmdy.topology.topology import Topology, generate_topology_from_bound_to
+from kimmdy.parsing import read_top, TopologyDict
+from hypothesis import Phase, given, settings, HealthCheck, strategies as st
+from kimmdy.topology.topology import Topology
 from kimmdy.topology.atomic import *
-from kimmdy.topology.utils import match_atomic_item_to_atomic_type
+from kimmdy.topology.utils import (
+    get_top_section,
+    match_atomic_item_to_atomic_type,
+    get_protein_section,
+)
 import logging
-
-# %%
 
 
 @pytest.fixture(scope="module")
@@ -20,16 +21,13 @@ def filedir() -> Path:
     try:
         file_dir = Path(__file__).parent / "test_files" / dirname
     except NameError:
-        file_dir = Path("./tests/test_files" / dirname)
+        file_dir = Path("./tests/test_files") / dirname
     return file_dir
 
 
 @pytest.fixture(scope="module")
 def assetsdir() -> Path:
     return Path(__file__).parent / "test_files" / "assets"
-
-
-# %%
 
 
 @st.composite
@@ -58,13 +56,16 @@ def random_atomlist(draw):
 @st.composite
 def random_topology_and_break(draw):
     try:
-        assets_dir = Path(__file__).parent / "test_files" / "assets"
+        dir = Path(__file__).parent / "test_files" / "test_topology"
     except NameError:
-        assets_dir = Path("./tests/test_files" / "assets")
-    ffdir = assets_dir / "amber99sb-star-ildnp.ff"
-    ffpatch = assets_dir / "amber99sb_patches.xml"
-    atoms = draw(random_atomlist())
-    top = generate_topology_from_bound_to(atoms, ffdir, ffpatch)
+        dir = Path("./tests/test_files") / "test_topology"
+    ffdir = dir / "amber99sb-star-ildnp.ff"
+    ffpatch = dir / "amber99sb_patches.xml"
+    hexala_top = read_top(dir / "hexala.top")
+    top = Topology(hexala_top, ffdir, ffpatch)
+    atomlist = draw(random_atomlist())
+    top.atoms = {atom.nr: atom for atom in atomlist}
+    top._regenerate_topology_from_bound_to()
     break_this = draw(st.sampled_from(list(top.bonds.keys())))
     return (top, break_this)
 
@@ -74,7 +75,7 @@ class TestFFPatches:
     def top_fix(self, assetsdir, filedir) -> Topology:
         ffdir = assetsdir / "amber99sb-star-ildnp.ff"
         ffpatch = assetsdir / "amber99sb_patches.xml"
-        hexala_top = read_topol(filedir / "hexala.top")
+        hexala_top = read_top(filedir / "hexala.top")
         return Topology(hexala_top, ffdir, ffpatch)
 
     def test_match_atomic_item_to_atomic_type(self, top_fix):
@@ -122,7 +123,7 @@ class TestTopology:
     def top_fix(self, assetsdir, filedir) -> Topology:
         ffdir = assetsdir / "amber99sb-star-ildnp.ff"
         ffpatch = assetsdir / "amber99sb_patches.xml"
-        hexala_top = read_topol(filedir / "hexala.top")
+        hexala_top = read_top(filedir / "hexala.top")
         return Topology(hexala_top, ffdir, ffpatch)
 
     def test_break_bind_bond_hexala(self, top_fix):
@@ -143,6 +144,7 @@ class TestTopology:
         assert top.improper_dihedrals == og_top.improper_dihedrals
 
     @given(bondindex=st.integers(min_value=0, max_value=70))
+    @settings(suppress_health_check=[HealthCheck.function_scoped_fixture])
     def test_break_bind_random_bond_hexala(self, top_fix, bondindex):
         top = deepcopy(top_fix)
         og_top = deepcopy(top)
@@ -156,11 +158,9 @@ class TestTopology:
         assert top.improper_dihedrals == og_top.improper_dihedrals
 
     def test_generate_topology_from_bound_to(self, top_fix, assetsdir):
-        ffdir = assetsdir / "amber99sb-star-ildnp.ff"
-        ffpatch = assetsdir / "amber99sb_patches.xml"
         og_top = deepcopy(top_fix)
-        atoms = list(og_top.atoms.values())
-        newtop = generate_topology_from_bound_to(atoms, ffdir, ffpatch)
+        newtop = deepcopy(top_fix)
+        newtop._regenerate_topology_from_bound_to()
         assert newtop.bonds == og_top.bonds
         assert newtop.pairs == og_top.pairs
         assert newtop.angles == og_top.angles
@@ -182,36 +182,47 @@ class TestTopology:
 class TestHexalaTopology:
     @pytest.fixture
     def hexala_top(self, filedir) -> TopologyDict:
-        return read_topol(filedir / "hexala.top")
+        return read_top(filedir / "hexala.top")
 
     @pytest.fixture
     def top_fix(self, assetsdir, filedir) -> Topology:
         ffdir = assetsdir / "amber99sb-star-ildnp.ff"
         ffpatch = assetsdir / "amber99sb_patches.xml"
-        hexala_top = read_topol(filedir / "hexala.top")
+        hexala_top = read_top(filedir / "hexala.top")
         return Topology(hexala_top, ffdir, ffpatch)
 
     @pytest.fixture
     def top_break_29_35_fix(self, assetsdir, filedir) -> Topology:
         ffdir = assetsdir / "amber99sb-star-ildnp.ff"
         ffpatch = assetsdir / "amber99sb_patches.xml"
-        hexala_top = read_topol(filedir / "hexala_break29-35.top")
+        hexala_top = read_top(filedir / "hexala_break29-35.top")
         return Topology(hexala_top, ffdir, ffpatch)
 
     @pytest.fixture
     def top_move_34_29_fix(self, assetsdir, filedir) -> Topology:
         ffdir = assetsdir / "amber99sb-star-ildnp.ff"
         ffpatch = assetsdir / "amber99sb_patches.xml"
-        hexala_top = read_topol(filedir / "hexala_move34-29.top")
+        hexala_top = read_top(filedir / "hexala_move34-29.top")
         return Topology(hexala_top, ffdir, ffpatch)
 
     def test_all_terms_accounted_for(self, top_fix, hexala_top):
-        assert len(top_fix.atoms) == len(hexala_top["atoms"])
-        assert len(top_fix.bonds) == len(hexala_top["bonds"])
-        assert len(top_fix.pairs) == len(hexala_top["pairs"])
-        assert len(top_fix.angles) == len(hexala_top["angles"])
+        atoms = get_protein_section(hexala_top, "atoms")
+        bonds = get_protein_section(hexala_top, "bonds")
+        pairs = get_protein_section(hexala_top, "pairs")
+        angles = get_protein_section(hexala_top, "angles")
+        dihedrals = get_protein_section(hexala_top, "dihedrals")
+
+        assert atoms
+        assert bonds
+        assert pairs
+        assert angles
+        assert dihedrals
+        assert len(top_fix.atoms) == len(atoms)
+        assert len(top_fix.bonds) == len(bonds)
+        assert len(top_fix.pairs) == len(pairs)
+        assert len(top_fix.angles) == len(angles)
         assert len(top_fix.proper_dihedrals) + len(top_fix.improper_dihedrals) == len(
-            hexala_top["dihedrals"]
+            dihedrals
         )
 
     def test_find_bondtypes(self, top_fix):
@@ -227,6 +238,7 @@ class TestHexalaTopology:
         top = deepcopy(top_fix)
         top_broken = deepcopy(top_break_29_35_fix)
         top.break_bond(("29", "35"))
+
         assert top.bonds == top_broken.bonds
         assert top.pairs == top_broken.pairs
         assert top.angles == top_broken.angles
@@ -244,17 +256,39 @@ class TestHexalaTopology:
         topology = og_top.top
         topology_new = top.top
 
-        bonddiff = set([(x[0], x[1]) for x in topology["bonds"]]) - set(
-            [(x[0], x[1]) for x in topology_new["bonds"]]
+        atoms = get_protein_section(topology, "atoms")
+        bonds = get_protein_section(topology, "bonds")
+        pairs = get_protein_section(topology, "pairs")
+        angles = get_protein_section(topology, "angles")
+        dihedrals = get_protein_section(topology, "dihedrals")
+
+        atoms_new = get_protein_section(topology_new, "atoms")
+        bonds_new = get_protein_section(topology_new, "bonds")
+        pairs_new = get_protein_section(topology_new, "pairs")
+        angles_new = get_protein_section(topology_new, "angles")
+        dihedrals_new = get_protein_section(topology_new, "dihedrals")
+        assert atoms is not None
+        assert bonds is not None
+        assert pairs is not None
+        assert angles is not None
+        assert dihedrals is not None
+        assert atoms_new is not None
+        assert bonds_new is not None
+        assert pairs_new is not None
+        assert angles_new is not None
+        assert dihedrals_new is not None
+
+        bonddiff = set([(x[0], x[1]) for x in bonds]) - set(
+            [(x[0], x[1]) for x in bonds_new]
         )
-        pairdiff = set([tuple(x[:2]) for x in topology["pairs"]]) - set(
-            [tuple(x[:2]) for x in topology_new["pairs"]]
+        pairdiff = set([tuple(x[:2]) for x in pairs]) - set(
+            [tuple(x[:2]) for x in pairs_new]
         )
-        anglediff = set([tuple(x[:3]) for x in topology["angles"]]) - set(
-            [tuple(x[:3]) for x in topology_new["angles"]]
+        anglediff = set([tuple(x[:3]) for x in angles]) - set(
+            [tuple(x[:3]) for x in angles_new]
         )
-        dihedraldiff = set([tuple(x[:4]) for x in topology["dihedrals"]]) - set(
-            [tuple(x[:4]) for x in topology_new["dihedrals"]]
+        dihedraldiff = set([tuple(x[:4]) for x in dihedrals]) - set(
+            [tuple(x[:4]) for x in dihedrals_new]
         )
 
         assert bonddiff == set([breakpair])
@@ -443,14 +477,14 @@ class TestRadicalAla:
     def top_noprm_fix(self, assetsdir, filedir) -> Topology:
         ffdir = assetsdir / "amber99sb-star-ildnp.ff"
         ffpatch = assetsdir / "amber99sb_patches.xml"
-        hexala_top = read_topol(filedir / "Ala_R_noprm.top")
+        hexala_top = read_top(filedir / "Ala_R_noprm.top")
         return Topology(hexala_top, ffdir, ffpatch)
 
     @pytest.fixture
     def top_prm_fix(self, assetsdir, filedir) -> Topology:
         ffdir = assetsdir / "amber99sb-star-ildnp.ff"
         ffpatch = assetsdir / "amber99sb_patches.xml"
-        hexala_top = read_topol(filedir / "Ala_R_prm.top")
+        hexala_top = read_top(filedir / "Ala_R_prm.top")
         return Topology(hexala_top, ffdir, ffpatch)
 
     def test_is_radical(self, top_noprm_fix):

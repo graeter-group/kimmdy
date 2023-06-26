@@ -1,4 +1,4 @@
-from kimmdy.parsing import read_topol, write_topol
+from kimmdy.parsing import read_top, write_top
 from kimmdy.tasks import TaskFiles
 from kimmdy.topology.topology import Topology, TopologyDict
 from kimmdy.topology.atomic import Bond
@@ -14,9 +14,9 @@ def coordinates_files():
     ffdir = Path(__file__).parent / "test_files" / "assets" / "amber99sb-star-ildnp.ff"
     topA_path = filedir / "topol_stateA.top"
     topB_path = filedir / "topol_stateB.top"
-    stateA = read_topol(topA_path)
-    stateB = read_topol(topB_path)
-    fep = read_topol(filedir / "topol_FEP.top")
+    stateA = read_top(topA_path)
+    stateB = read_top(topB_path)
+    fep = read_top(filedir / "topol_FEP.top")
     topA = Topology(stateA, ffdir)
     topB = Topology(stateB, ffdir)
     topFEP = Topology(fep, ffdir)
@@ -51,7 +51,7 @@ def test_merge_prm_top(coordinates_files):
         output={"top": coordinates_files["topB_path"]},
     )
     topmerge = merge_top_prmgrowth(files)
-    write_topol(
+    write_top(
         topmerge.to_dict(), coordinates_files["topB_path"].parent / "top_merge.top"
     )
     assert topmerge == coordinates_files["topFEP"]
