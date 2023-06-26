@@ -214,7 +214,14 @@ class Config:
 
             if not hasattr(self, "ff"):
                 ffs = list(self.cwd.glob("*.ff"))
-                assert len(ffs) == 1, "Wrong count of forcefields"
+                if len(ffs) < 1:
+                    raise FileNotFoundError(
+                        "No forcefield found in cwd, please provide one!"
+                    )
+                if len(ffs) > 1:
+                    logging.warn(
+                        f"Found {len(ffs)} forcefields in cwd, using first one: {ffs[0]}"
+                    )
                 assert ffs[0].is_dir(), "Forcefield should be a directory!"
                 self.ff = ffs[0].resolve()
 

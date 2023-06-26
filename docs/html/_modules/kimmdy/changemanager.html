@@ -39,7 +39,11 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../welcome.html">Welcome to KIMMDY: Getting Started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../modules.html">kimmdy</a></li>
 </ul>
@@ -71,28 +75,99 @@
   <h1>Source code for kimmdy.changemanager</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">MDAnalysis</span> <span class="k">as</span> <span class="nn">mda</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
 <span class="kn">from</span> <span class="nn">kimmdy.reaction</span> <span class="kn">import</span> <span class="n">Recipe</span><span class="p">,</span> <span class="n">Bind</span><span class="p">,</span> <span class="n">Break</span><span class="p">,</span> <span class="n">Move</span><span class="p">,</span> <span class="n">RecipeStep</span>
-<span class="kn">from</span> <span class="nn">kimmdy.parsing</span> <span class="kn">import</span> <span class="n">read_topol</span><span class="p">,</span> <span class="n">write_topol</span><span class="p">,</span> <span class="n">write_plumed</span><span class="p">,</span> <span class="n">read_plumed</span>
+<span class="kn">from</span> <span class="nn">kimmdy.parsing</span> <span class="kn">import</span> <span class="n">read_top</span><span class="p">,</span> <span class="n">write_top</span><span class="p">,</span> <span class="n">write_plumed</span><span class="p">,</span> <span class="n">read_plumed</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">kimmdy.tasks</span> <span class="kn">import</span> <span class="n">TaskFiles</span>
 <span class="kn">from</span> <span class="nn">kimmdy.topology.topology</span> <span class="kn">import</span> <span class="n">Topology</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 
 
+<div class="viewcode-block" id="modify_coords"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.changemanager.modify_coords">[docs]</a><span class="k">def</span> <span class="nf">modify_coords</span><span class="p">(</span>
+    <span class="n">recipe_steps</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RecipeStep</span><span class="p">],</span>
+    <span class="n">files</span><span class="p">:</span> <span class="n">TaskFiles</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Entering modify_coords with recipe_steps </span><span class="si">{</span><span class="n">recipe_steps</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">trr</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;trr&quot;</span><span class="p">]</span>
+    <span class="n">tpr</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;tpr&quot;</span><span class="p">]</span>
+    <span class="n">trr_out</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">outputdir</span> <span class="o">/</span> <span class="s2">&quot;coord_mod.trr&quot;</span>
+    <span class="n">gro_out</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">outputdir</span> <span class="o">/</span> <span class="s2">&quot;coord_mod.gro&quot;</span>
+    <span class="n">files</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;trr&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">trr_out</span>
+    <span class="n">files</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;gro&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gro_out</span>
+
+    <span class="k">assert</span> <span class="ow">not</span> <span class="n">trr_out</span><span class="o">.</span><span class="n">exists</span><span class="p">(),</span> <span class="sa">f</span><span class="s2">&quot;Error: Output trr exists! </span><span class="si">{</span><span class="n">trr_out</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">assert</span> <span class="ow">not</span> <span class="n">gro_out</span><span class="o">.</span><span class="n">exists</span><span class="p">(),</span> <span class="sa">f</span><span class="s2">&quot;Error: Output gro exists! </span><span class="si">{</span><span class="n">gro_out</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="n">u</span> <span class="o">=</span> <span class="n">mda</span><span class="o">.</span><span class="n">Universe</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">tpr</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">trr</span><span class="p">),</span> <span class="n">topology_format</span><span class="o">=</span><span class="s2">&quot;tpr&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;trr&quot;</span><span class="p">)</span>
+
+    <span class="n">ttime</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">to_move</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">recipe_steps</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">Move</span><span class="p">)</span> <span class="ow">and</span> <span class="n">step</span><span class="o">.</span><span class="n">new_coords</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="ow">not</span> <span class="n">step</span><span class="o">.</span><span class="n">is_one_based</span><span class="p">,</span> <span class="s2">&quot;RecipeSteps should be zero based!&quot;</span>
+            <span class="k">if</span> <span class="n">ttime</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">ttime</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">new_coords</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="k">elif</span> <span class="nb">abs</span><span class="p">(</span><span class="n">ttime</span> <span class="o">-</span> <span class="n">step</span><span class="o">.</span><span class="n">new_coords</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mf">1e-5</span><span class="p">:</span>  <span class="c1"># 0.01 fs</span>
+                <span class="n">m</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Multiple coordinate changes requested at different times!&quot;</span>
+                    <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">RecipeSteps:</span><span class="si">{recipe_steps}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+            <span class="n">to_move</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">idx_to_move</span><span class="p">)</span>
+
+    <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">to_move</span><span class="p">,</span> <span class="n">return_counts</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">ts</span> <span class="ow">in</span> <span class="n">u</span><span class="o">.</span><span class="n">trajectory</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">ts</span><span class="o">.</span><span class="n">time</span> <span class="o">-</span> <span class="n">ttime</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1e-5</span><span class="p">:</span>  <span class="c1"># 0.01 fs</span>
+            <span class="k">continue</span>
+        <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">recipe_steps</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">Move</span><span class="p">)</span> <span class="ow">and</span> <span class="n">step</span><span class="o">.</span><span class="n">new_coords</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">atm_move</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">select_atoms</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;index </span><span class="si">{</span><span class="n">step</span><span class="o">.</span><span class="n">idx_to_move</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">atm_move</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">new_coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">break</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Did not find time </span><span class="si">{</span><span class="n">ttime</span><span class="si">}</span><span class="s2"> in trajectory &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;with length </span><span class="si">{</span><span class="n">u</span><span class="o">.</span><span class="n">trajectory</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">time</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">u</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">trr_out</span><span class="p">)</span>
+    <span class="n">u</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">gro_out</span><span class="p">)</span>
+
+    <span class="n">files</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;trr&quot;</span><span class="p">:</span> <span class="n">trr_out</span><span class="p">}</span>
+    <span class="n">files</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;gro&quot;</span><span class="p">:</span> <span class="n">gro_out</span><span class="p">}</span>
+
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Exit modify_coords, final coordinates written to </span><span class="si">{</span><span class="n">trr_out</span><span class="o">.</span><span class="n">parts</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="modify_top"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.changemanager.modify_top">[docs]</a><span class="k">def</span> <span class="nf">modify_top</span><span class="p">(</span>
     <span class="n">recipe_steps</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RecipeStep</span><span class="p">],</span>
-    <span class="n">oldtop</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
-    <span class="n">newtop</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
-    <span class="n">ffdir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+    <span class="n">files</span><span class="p">:</span> <span class="n">TaskFiles</span><span class="p">,</span>
     <span class="n">ffpatch</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">],</span>
     <span class="n">topology</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Topology</span><span class="p">],</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Topology</span><span class="p">:</span>
+<span class="p">):</span>
+    <span class="n">files</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;top&quot;</span><span class="p">:</span> <span class="n">files</span><span class="o">.</span><span class="n">outputdir</span> <span class="o">/</span> <span class="s2">&quot;topol_mod.top&quot;</span><span class="p">}</span>
+    <span class="n">oldtop</span> <span class="o">=</span> <span class="p">(</span><span class="n">files</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">],)</span>
+    <span class="n">newtop</span> <span class="o">=</span> <span class="p">(</span><span class="n">files</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">],)</span>
+    <span class="n">ffdir</span> <span class="o">=</span> <span class="p">(</span><span class="n">files</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;ff&quot;</span><span class="p">],)</span>
+    <span class="c1"># why is this a tuple??</span>
+
     <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reading: </span><span class="si">{</span><span class="n">oldtop</span><span class="si">}</span><span class="s2"> and writing modified topology to </span><span class="si">{</span><span class="n">newtop</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">topology</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">topologyDict</span> <span class="o">=</span> <span class="n">read_topol</span><span class="p">(</span><span class="n">oldtop</span><span class="p">)</span>
+        <span class="n">topologyDict</span> <span class="o">=</span> <span class="n">read_top</span><span class="p">(</span><span class="n">oldtop</span><span class="p">)</span>
         <span class="n">topology</span> <span class="o">=</span> <span class="n">Topology</span><span class="p">(</span><span class="n">topologyDict</span><span class="p">,</span> <span class="n">ffdir</span><span class="p">,</span> <span class="n">ffpatch</span><span class="p">)</span>
 
     <span class="n">focus</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">recipe_steps</span><span class="p">:</span>
+        <span class="n">step</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">one_based</span><span class="p">()</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">Break</span><span class="p">):</span>
             <span class="n">topology</span><span class="o">.</span><span class="n">break_bond</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">atom_idx_1</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">atom_idx_2</span><span class="p">)])</span>
             <span class="n">focus</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">atom_idx_1</span><span class="p">))</span>
@@ -117,17 +192,15 @@
                 <span class="n">topology</span><span class="o">.</span><span class="n">break_bond</span><span class="p">([</span><span class="n">step</span><span class="o">.</span><span class="n">idx_to_move</span><span class="p">,</span> <span class="n">step</span><span class="o">.</span><span class="n">idx_to_break</span><span class="p">])</span>
                 <span class="n">focus</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">idx_to_move</span><span class="p">))</span>
                 <span class="n">focus</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">idx_to_break</span><span class="p">))</span>
-            <span class="k">if</span> <span class="n">step</span><span class="o">.</span><span class="n">new_coords</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Changing coordinates not implemented!&quot;</span><span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;RecipeStep </span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2"> not implemented!&quot;</span><span class="p">)</span>
     <span class="n">topology</span><span class="o">.</span><span class="n">_update_dict</span><span class="p">()</span>
-    <span class="n">write_topol</span><span class="p">(</span><span class="n">topology</span><span class="o">.</span><span class="n">top</span><span class="p">,</span> <span class="n">newtop</span><span class="p">)</span>
+    <span class="n">write_top</span><span class="p">(</span><span class="n">topology</span><span class="o">.</span><span class="n">top</span><span class="p">,</span> <span class="n">newtop</span><span class="p">)</span>
 
     <span class="n">topology</span><span class="o">.</span><span class="n">patch_parameters</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">focus</span><span class="p">))</span>
 
-    <span class="k">return</span> <span class="n">topology</span></div>
+    <span class="k">return</span></div>
 
 
 <div class="viewcode-block" id="modify_plumed"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.changemanager.modify_plumed">[docs]</a><span class="k">def</span> <span class="nf">modify_plumed</span><span class="p">(</span>
@@ -153,10 +226,9 @@
     <span class="n">write_plumed</span><span class="p">(</span><span class="n">plumeddat</span><span class="p">,</span> <span class="n">newplumeddat</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="break_bond_plumed"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.changemanager.break_bond_plumed">[docs]</a><span class="k">def</span> <span class="nf">break_bond_plumed</span><span class="p">(</span><span class="n">plumeddat</span><span class="p">,</span> <span class="n">breakpair</span><span class="p">,</span> <span class="n">plumeddist</span><span class="p">):</span>
+<div class="viewcode-block" id="break_bond_plumed"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.changemanager.break_bond_plumed">[docs]</a><span class="k">def</span> <span class="nf">break_bond_plumed</span><span class="p">(</span><span class="n">plumeddat</span><span class="p">,</span> <span class="n">breakpair</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">plumeddist</span><span class="p">):</span>
     <span class="n">new_distances</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">broken_distances</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">breakpair</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">breakpair</span><span class="p">]</span>
     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">plumeddat</span><span class="p">[</span><span class="s2">&quot;distances&quot;</span><span class="p">]:</span>
         <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">x</span> <span class="ow">in</span> <span class="n">line</span><span class="p">[</span><span class="s2">&quot;atoms&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">breakpair</span><span class="p">):</span>
             <span class="n">broken_distances</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">])</span>

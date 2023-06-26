@@ -1,12 +1,36 @@
 import subprocess as sp
+from kimmdy.topology.utils import get_protein_section
 import numpy as np
 import logging
 from typing import Optional
 from pathlib import Path
 import MDAnalysis as MDA
 from scipy.spatial.transform import Rotation
+from contextlib import contextmanager
+import os
 
-from kimmdy.config import Config
+
+@contextmanager
+def pushd(path):
+    prev = os.getcwd()
+    os.chdir(path)
+    try:
+        yield
+    finally:
+        os.chdir(prev)
+
+
+def get_gmx_dir() -> Path:
+    """returns the path to the gromacs installation"""
+    gmx_binary = Path(
+        sp.run(["which", "gmx"], capture_output=True).stdout.decode().strip()
+    )
+    if not gmx_binary.exists():
+        raise ValueError("Could not find gromacs installation")
+    # resolve symlink if gmxbinary is a symlink
+    gmx_binary = gmx_binary.resolve()
+    gmx_dir = gmx_binary.parent.parent / "share" / "gromacs"
+    return gmx_dir
 
 
 def increment_logfile(f: Path) -> Path:
@@ -34,7 +58,10 @@ def get_atominfo_from_plumedid(
     lookup_atomid_plumedid = {
         entry["id"]: frozenset(entry["atoms"]) for entry in plumed["distances"]
     }
-    lookup_atomtype_atomid = {int(atom[0]): atom[1] for atom in top["atoms"]}
+    atoms = get_protein_section(top, "atoms")
+    if not atoms:
+        raise ValueError("Could not find atoms in topology file")
+    lookup_atomtype_atomid = {int(atom[0]): atom[1] for atom in atoms}
     atomids = lookup_atomid_plumedid[plumedid]
     atomids_list = list(atomids)
     atomtypes_list = [
@@ -153,7 +180,7 @@ def get_shell_stdout(s):
     return process.stdout
 
 
-def check_gmx_version(config: Config):
+def check_gmx_version(config):
     """Check for an existing gromacs installation.
 
     If PLUMED is meant to be used it additionally checks for the keyword
