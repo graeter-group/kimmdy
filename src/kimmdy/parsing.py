@@ -10,6 +10,7 @@ import logging
 from kimmdy.utils import get_gmx_dir
 
 TopologyDict = dict
+GMX_BUILTIN_FF_DIR = get_gmx_dir() / "top"
 
 
 def is_not_comment(c: str) -> bool:
@@ -87,35 +88,34 @@ def read_rtp(path: Path) -> dict:
 
 def resolve_includes(path: Path) -> list[str]:
     """Resolve #include statements in a (top/itp) file."""
-    gmx_builtin_ffs = get_gmx_dir() / "top"
+    path = path.resolve()
     dir = path.parent
     fname = path.name
     cwd = Path.cwd()
+    if not dir.exists() or not path.exists():
+        return []
     os.chdir(dir)
-    ls_prime = []
+    ls = []
     with open(fname, "r") as f:
         for l in f:
             l = "".join(takewhile(is_not_comment, l)).strip()
             if not l:
                 continue
             if l.startswith("#include"):
-                path = Path(l.split('"')[1])
-                try:
-                    ls_prime.extend(resolve_includes(path))
-                except Exception as _:
-                    try:
-                        ls_prime.extend(resolve_includes(gmx_builtin_ffs / path))
-                    except Exception as _:
-                        # drop line if path can't be resolved
-                        logging.warning(
-                            f"top include {path} could not be resolved. Line was dropped."
-                        )
-                        continue
+                include_path = Path(l.split('"')[1])
+                ls_prime = resolve_includes(include_path)
+                if not ls_prime:
+                    ls_prime = resolve_includes(GMX_BUILTIN_FF_DIR / include_path)
+                if not ls_prime:
+                    logging.warning(
+                        f"top include {include_path} could not be resolved. Line was dropped."
+                    )
+                ls.extend(ls_prime)
             else:
-                ls_prime.append(l)
+                ls.append(l)
 
     os.chdir(cwd)
-    return ls_prime
+    return ls
 
 
 def read_top(path: Path) -> TopologyDict:
