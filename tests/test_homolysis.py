@@ -9,7 +9,7 @@ from kimmdy.reactions.homolysis import Homolysis
 from kimmdy.reaction import Break
 from kimmdy.parsing import (
     read_plumed,
-    read_topol,
+    read_top,
     read_distances_dat,
     read_edissoc,
     read_rtp,
@@ -25,7 +25,7 @@ from kimmdy.tasks import TaskFiles
 @pytest.fixture
 def homolysis_files():
     filedir = Path(__file__).parent / "test_files/test_homolysis"
-    top = read_topol(filedir / "topol.top")
+    top = read_top(filedir / "topol.top")
     plumed = read_plumed(filedir / "plumed.dat")
     distances = read_distances_dat(filedir / "distances.dat")
     ffbonded = read_rtp(filedir / "ffbonded.itp")
@@ -114,6 +114,7 @@ def test_get_recipe_collection(tmp_path):
         Path(__file__).parent / "test_files/assets/amber99sb-star-ildnp.ff",
         target_is_directory=True,
     )
+
     rmgr = RunManager(Config(tmpdir / "kimmdy.yml"))
     files = TaskFiles(rmgr)
     files.input["top"] = Path("topol.top")

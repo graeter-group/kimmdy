@@ -8,7 +8,7 @@ from typing import Callable
 from kimmdy import config
 from kimmdy.config import Config
 from kimmdy.utils import increment_logfile
-from kimmdy.parsing import read_topol
+from kimmdy.parsing import read_top
 from kimmdy.reaction import ReactionPlugin, RecipeCollection, Recipe
 import kimmdy.changemanager as changer
 from kimmdy.tasks import Task, TaskFiles, TaskMapping
@@ -79,7 +79,7 @@ class RunManager:
         except AttributeError:
             self.config.ffpatch = None
         self.top = Topology(
-            read_topol(self.config.top), self.config.ff, self.config.ffpatch
+            read_top(self.config.top), self.config.ff, self.config.ffpatch
         )
 
         self.filehist: list[dict[str, TaskFiles]] = [

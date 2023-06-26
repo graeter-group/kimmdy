@@ -2,9 +2,9 @@ from __future__ import annotations
 import logging
 import MDAnalysis as mda
 from typing import Optional
+from kimmdy.reaction import Recipe, Bind, Break, Move, RecipeStep
+from kimmdy.parsing import read_top, write_top, write_plumed, read_plumed
 import numpy as np
-from kimmdy.reaction import Bind, Break, Move, RecipeStep
-from kimmdy.parsing import read_topol, write_topol, write_plumed, read_plumed
 from kimmdy.tasks import TaskFiles
 from kimmdy.topology.topology import Topology
 from pathlib import Path
@@ -87,7 +87,7 @@ def modify_top(
 
     logging.info(f"Reading: {oldtop} and writing modified topology to {newtop}.")
     if topology is None:
-        topologyDict = read_topol(oldtop)
+        topologyDict = read_top(oldtop)
         topology = Topology(topologyDict, ffdir, ffpatch)
 
     focus = set()
@@ -121,7 +121,7 @@ def modify_top(
         else:
             raise NotImplementedError(f"RecipeStep {step} not implemented!")
     topology._update_dict()
-    write_topol(topology.top, newtop[0])
+    write_top(topology.top, newtop)
 
     topology.patch_parameters(list(focus))
 

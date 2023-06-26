@@ -1,14 +1,15 @@
+from typing import Any
 import MDAnalysis as MDA
 from pathlib import Path
 import numpy as np
 import logging
 
 from kimmdy.utils import find_radical_pos
-from kimmdy.parsing import read_topol, Topology
-from kimmdy.reaction import ReactionResult, ConversionRecipe, ConversionType
+from kimmdy.parsing import read_top
+from kimmdy.topology.topology import Topology
 
 
-def place_hydrogen(tpr: Path, trr: Path, recipe: ConversionRecipe):
+def place_hydrogen(tpr: Path, trr: Path, recipe: Any):  # TODO: Type
     """use find_radical_pos to change the coordinates of the HAT hydrogen according to the reaction recipe"""
     # current recipe format: ConversionRecipe(type=[ConversionType.MOVE], atom_idx=[[from_H_nr, rad_nr]])                   )
     u = MDA.Universe(str(tpr), str(trr), topology_format="tpr", format="trr")
@@ -33,7 +34,7 @@ def place_hydrogen(tpr: Path, trr: Path, recipe: ConversionRecipe):
 
 ## copied from changemanager. should be put into utils
 def get_ff_sections(ffdir):
-    return read_topol(ffdir / "ffbonded.itp")
+    return read_top(ffdir / "ffbonded.itp")
 
 
 def parameterize_bonded_terms(ffprm, terms_atomtype, prop, terms):
@@ -74,7 +75,7 @@ def is_parameterized(term):
 def merge_section_slowgrowth(
     name: str,
     content: list[str],
-    CR: ConversionRecipe,
+    CR: Any,  # TODO: ConversionRecipe,
     state_A_reduced: Topology,
     ffpath: Path,
 ):

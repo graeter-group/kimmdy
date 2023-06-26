@@ -10,10 +10,9 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/underscore.js"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script src="../../_static/sphinx_highlight.js"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -26,17 +25,25 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../index.html" class="icon icon-home"> kimmdy
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            kimmdy
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../welcome.html">Welcome to KIMMDY: Getting Started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../modules.html">kimmdy</a></li>
 </ul>
@@ -54,7 +61,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a></li>
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
       <li class="breadcrumb-item active">kimmdy.tasks</li>
       <li class="wy-breadcrumbs-aside">
@@ -68,7 +75,7 @@
   <h1>Source code for kimmdy.tasks</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">InitVar</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span>
 
 
 <div class="viewcode-block" id="AutoFillDict"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.tasks.AutoFillDict">[docs]</a><span class="k">class</span> <span class="nc">AutoFillDict</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
@@ -82,7 +89,7 @@
 
 <div class="viewcode-block" id="TaskFiles"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.tasks.TaskFiles">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">TaskFiles</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Input and Output files and directories.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Input and Output files and directories.</span>
 
 <span class="sd">    Hosts the input and output files belonging to a task.</span>
 <span class="sd">    A function or method that wants to be callable as a Task</span>
@@ -99,7 +106,7 @@
 <span class="sd">    &gt;&gt;&gt; runmng = run()</span>
 <span class="sd">    &gt;&gt;&gt; files = TaskFiles(runmng)</span>
 <span class="sd">    &gt;&gt;&gt; files.input</span>
-<span class="sd">    &gt;&gt;&gt; files.input[&quot;tpr&quot;]</span>
+<span class="sd">    &gt;&gt;&gt; files.input[&quot;top&quot;]</span>
 <span class="sd">    {&#39;top&#39;: &#39;latest top&#39;}</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -115,7 +122,7 @@
 
 
 <div class="viewcode-block" id="Task"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.tasks.Task">[docs]</a><span class="k">class</span> <span class="nc">Task</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;A task to be performed as as a step in the RunManager.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A task to be performed as as a step in the RunManager.</span>
 
 <span class="sd">    A task consists of a function and its keyword arguments and is</span>
 <span class="sd">    itself callable. The function must return a TaskFiles object.</span>
@@ -133,7 +140,7 @@
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; args: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
-<span class="n">TaskMapping</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">TaskFiles</span><span class="p">]]</span>
+<span class="n">TaskMapping</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TaskFiles</span><span class="p">]]]]</span>
 </pre></div>
 
            </div>

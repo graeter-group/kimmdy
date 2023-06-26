@@ -39,7 +39,11 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../welcome.html">Welcome to KIMMDY: Getting Started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../modules.html">kimmdy</a></li>
 </ul>
@@ -118,7 +122,7 @@
     <span class="s2">&quot;ffpatch&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
     <span class="s2">&quot;top&quot;</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
     <span class="s2">&quot;gro&quot;</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
-    <span class="s2">&quot;idx&quot;</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+    <span class="s2">&quot;ndx&quot;</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
     <span class="s2">&quot;mds&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;*&quot;</span><span class="p">:</span> <span class="p">{</span>
             <span class="s2">&quot;mdp&quot;</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
@@ -144,8 +148,8 @@
 
 
 <div class="viewcode-block" id="HomolysisConfig"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.config.HomolysisConfig">[docs]</a><span class="k">class</span> <span class="nc">HomolysisConfig</span><span class="p">:</span>
-    <span class="n">edis</span><span class="p">:</span> <span class="n">Path</span>
-    <span class="n">bonds</span><span class="p">:</span> <span class="n">Path</span></div>
+    <span class="n">dat</span><span class="p">:</span> <span class="n">Path</span>
+    <span class="n">itp</span><span class="p">:</span> <span class="n">Path</span></div>
 
 
 <div class="viewcode-block" id="ReactionsConfig"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.config.ReactionsConfig">[docs]</a><span class="k">class</span> <span class="nc">ReactionsConfig</span><span class="p">:</span>
@@ -189,7 +193,7 @@
     <span class="n">ffpatch</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span>
     <span class="n">top</span><span class="p">:</span> <span class="n">Path</span>
     <span class="n">gro</span><span class="p">:</span> <span class="n">Path</span>
-    <span class="n">idx</span><span class="p">:</span> <span class="n">Path</span>
+    <span class="n">ndx</span><span class="p">:</span> <span class="n">Path</span>
     <span class="n">mds</span><span class="p">:</span> <span class="nb">dict</span>
     <span class="n">changer</span><span class="p">:</span> <span class="n">ChangerConfig</span>
     <span class="n">reactions</span><span class="p">:</span> <span class="n">ReactionsConfig</span>
@@ -232,13 +236,22 @@
                 <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Loading Plugins&quot;</span><span class="p">)</span>
                 <span class="k">for</span> <span class="n">plg_name</span><span class="p">,</span> <span class="n">plugin</span> <span class="ow">in</span> <span class="n">plugins</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                     <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loading </span><span class="si">{</span><span class="n">plg_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">plugin</span><span class="p">,</span> <span class="ne">Exception</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">plugin</span><span class="p">)</span> <span class="ow">is</span> <span class="ne">ModuleNotFoundError</span><span class="p">:</span>
                         <span class="n">logging</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
                             <span class="sa">f</span><span class="s2">&quot;Plugin </span><span class="si">{</span><span class="n">plg_name</span><span class="si">}</span><span class="s2"> could not be loaded!</span><span class="se">\n</span><span class="si">{</span><span class="n">plugin</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
                         <span class="p">)</span>
-                    <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">plugin</span><span class="p">),</span> <span class="n">ReactionPlugin</span><span class="p">):</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">type_scheme</span><span class="p">[</span><span class="s2">&quot;reactions&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">plugin</span><span class="o">.</span><span class="n">type_scheme</span><span class="p">)</span>
-                        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type_scheme</span><span class="p">[</span><span class="s2">&quot;reactions&quot;</span><span class="p">])</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="p">(</span>
+                                <span class="n">plugin</span><span class="o">.</span><span class="vm">__bases__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="n">ReactionPlugin</span>
+                            <span class="p">):</span>  <span class="c1"># isinstance didnt work for some reason</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">type_scheme</span><span class="p">[</span><span class="s2">&quot;reactions&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">plugin</span><span class="o">.</span><span class="n">type_scheme</span><span class="p">)</span>
+                                <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type_scheme</span><span class="p">[</span><span class="s2">&quot;reactions&quot;</span><span class="p">])</span>
+                        <span class="k">except</span><span class="p">:</span>
+                            <span class="n">logging</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                                <span class="sa">f</span><span class="s2">&quot;Plugin </span><span class="si">{</span><span class="n">plg_name</span><span class="si">}</span><span class="s2"> could not be loaded!</span><span class="se">\n</span><span class="si">{</span><span class="n">plugin</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                            <span class="p">)</span>
+                            <span class="k">pass</span>
 
         <span class="c1"># building config recursively</span>
         <span class="k">if</span> <span class="n">recursive_dict</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -276,7 +289,14 @@
 
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;ff&quot;</span><span class="p">):</span>
                 <span class="n">ffs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cwd</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*.ff&quot;</span><span class="p">))</span>
-                <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">ffs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Wrong count of forcefields&quot;</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ffs</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
+                        <span class="s2">&quot;No forcefield found in cwd, please provide one!&quot;</span>
+                    <span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ffs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">ffs</span><span class="p">)</span><span class="si">}</span><span class="s2"> forcefields in cwd, using first one: </span><span class="si">{</span><span class="n">ffs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
                 <span class="k">assert</span> <span class="n">ffs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">is_dir</span><span class="p">(),</span> <span class="s2">&quot;Forcefield should be a directory!&quot;</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">ff</span> <span class="o">=</span> <span class="n">ffs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
 

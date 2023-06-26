@@ -11,6 +11,8 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/sphinx_highlight.js"></script>
@@ -18,7 +20,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="kimmdy package" href="kimmdy.html" />
-    <link rel="prev" title="Welcome to kimmdy’s documentation!" href="index.html" /> 
+    <link rel="prev" title="Welcome to KIMMDY: Getting Started" href="welcome.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -40,7 +42,11 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="welcome.html">Welcome to KIMMDY: Getting Started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">kimmdy</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="kimmdy.html">kimmdy package</a></li>
@@ -80,6 +86,7 @@
 <li class="toctree-l2"><a class="reference internal" href="kimmdy.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="kimmdy.html#module-kimmdy.changemanager">kimmdy.changemanager module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="kimmdy.html#kimmdy.changemanager.break_bond_plumed"><code class="docutils literal notranslate"><span class="pre">break_bond_plumed()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kimmdy.html#kimmdy.changemanager.modify_coords"><code class="docutils literal notranslate"><span class="pre">modify_coords()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="kimmdy.html#kimmdy.changemanager.modify_plumed"><code class="docutils literal notranslate"><span class="pre">modify_plumed()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="kimmdy.html#kimmdy.changemanager.modify_top"><code class="docutils literal notranslate"><span class="pre">modify_top()</span></code></a></li>
 </ul>
@@ -106,10 +113,10 @@
 <li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.config.Config.get_attributes"><code class="docutils literal notranslate"><span class="pre">Config.get_attributes()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.config.Config.gro"><code class="docutils literal notranslate"><span class="pre">Config.gro</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.config.Config.gromacs_alias"><code class="docutils literal notranslate"><span class="pre">Config.gromacs_alias</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.config.Config.idx"><code class="docutils literal notranslate"><span class="pre">Config.idx</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.config.Config.iterations"><code class="docutils literal notranslate"><span class="pre">Config.iterations</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.config.Config.mds"><code class="docutils literal notranslate"><span class="pre">Config.mds</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.config.Config.name"><code class="docutils literal notranslate"><span class="pre">Config.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.config.Config.ndx"><code class="docutils literal notranslate"><span class="pre">Config.ndx</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.config.Config.out"><code class="docutils literal notranslate"><span class="pre">Config.out</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.config.Config.pull"><code class="docutils literal notranslate"><span class="pre">Config.pull</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.config.Config.reactions"><code class="docutils literal notranslate"><span class="pre">Config.reactions</span></code></a></li>
@@ -119,8 +126,8 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="kimmdy.html#kimmdy.config.HomolysisConfig"><code class="docutils literal notranslate"><span class="pre">HomolysisConfig</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.config.HomolysisConfig.bonds"><code class="docutils literal notranslate"><span class="pre">HomolysisConfig.bonds</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.config.HomolysisConfig.edis"><code class="docutils literal notranslate"><span class="pre">HomolysisConfig.edis</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.config.HomolysisConfig.dat"><code class="docutils literal notranslate"><span class="pre">HomolysisConfig.dat</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.config.HomolysisConfig.itp"><code class="docutils literal notranslate"><span class="pre">HomolysisConfig.itp</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="kimmdy.html#kimmdy.config.MDrefConfig"><code class="docutils literal notranslate"><span class="pre">MDrefConfig</span></code></a><ul>
@@ -145,8 +152,24 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="kimmdy.html#module-kimmdy.constants">kimmdy.constants module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="kimmdy.html#kimmdy-coordinatemanager-module">kimmdy.coordinatemanager module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kimmdy.html#module-kimmdy.coordinatemanager">kimmdy.coordinatemanager module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="kimmdy.html#kimmdy.coordinatemanager.get_ff_sections"><code class="docutils literal notranslate"><span class="pre">get_ff_sections()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kimmdy.html#kimmdy.coordinatemanager.is_parameterized"><code class="docutils literal notranslate"><span class="pre">is_parameterized()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kimmdy.html#kimmdy.coordinatemanager.merge_section_slowgrowth"><code class="docutils literal notranslate"><span class="pre">merge_section_slowgrowth()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kimmdy.html#kimmdy.coordinatemanager.parameterize_bonded_terms"><code class="docutils literal notranslate"><span class="pre">parameterize_bonded_terms()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kimmdy.html#kimmdy.coordinatemanager.place_hydrogen"><code class="docutils literal notranslate"><span class="pre">place_hydrogen()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="kimmdy.html#module-kimmdy.kmc">kimmdy.kmc module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="kimmdy.html#kimmdy.kmc.KMCResult"><code class="docutils literal notranslate"><span class="pre">KMCResult</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.kmc.KMCResult.recipe_steps"><code class="docutils literal notranslate"><span class="pre">KMCResult.recipe_steps</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.kmc.KMCResult.reaction_probability"><code class="docutils literal notranslate"><span class="pre">KMCResult.reaction_probability</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.kmc.KMCResult.time_step"><code class="docutils literal notranslate"><span class="pre">KMCResult.time_step</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#id0"><code class="docutils literal notranslate"><span class="pre">KMCResult.reaction_probability</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#id1"><code class="docutils literal notranslate"><span class="pre">KMCResult.recipe_steps</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#id2"><code class="docutils literal notranslate"><span class="pre">KMCResult.time_step</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="kimmdy.html#kimmdy.kmc.frm"><code class="docutils literal notranslate"><span class="pre">frm()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="kimmdy.html#kimmdy.kmc.rf_kmc"><code class="docutils literal notranslate"><span class="pre">rf_kmc()</span></code></a></li>
 </ul>
@@ -160,19 +183,16 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="kimmdy.html#module-kimmdy.parsing">kimmdy.parsing module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="kimmdy.html#kimmdy.parsing.create_subsections"><code class="docutils literal notranslate"><span class="pre">create_subsections()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="kimmdy.html#kimmdy.parsing.extract_section_name"><code class="docutils literal notranslate"><span class="pre">extract_section_name()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="kimmdy.html#kimmdy.parsing.get_sections"><code class="docutils literal notranslate"><span class="pre">get_sections()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="kimmdy.html#kimmdy.parsing.is_not_comment"><code class="docutils literal notranslate"><span class="pre">is_not_comment()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="kimmdy.html#kimmdy.parsing.merge_propers_impropers"><code class="docutils literal notranslate"><span class="pre">merge_propers_impropers()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="kimmdy.html#kimmdy.parsing.read_distances_dat"><code class="docutils literal notranslate"><span class="pre">read_distances_dat()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="kimmdy.html#kimmdy.parsing.read_edissoc"><code class="docutils literal notranslate"><span class="pre">read_edissoc()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="kimmdy.html#kimmdy.parsing.read_plumed"><code class="docutils literal notranslate"><span class="pre">read_plumed()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="kimmdy.html#kimmdy.parsing.read_rtp"><code class="docutils literal notranslate"><span class="pre">read_rtp()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="kimmdy.html#kimmdy.parsing.read_topol"><code class="docutils literal notranslate"><span class="pre">read_topol()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kimmdy.html#kimmdy.parsing.read_top"><code class="docutils literal notranslate"><span class="pre">read_top()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="kimmdy.html#kimmdy.parsing.read_xml_ff"><code class="docutils literal notranslate"><span class="pre">read_xml_ff()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="kimmdy.html#kimmdy.parsing.split_dihedrals"><code class="docutils literal notranslate"><span class="pre">split_dihedrals()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kimmdy.html#kimmdy.parsing.resolve_includes"><code class="docutils literal notranslate"><span class="pre">resolve_includes()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="kimmdy.html#kimmdy.parsing.write_plumed"><code class="docutils literal notranslate"><span class="pre">write_plumed()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="kimmdy.html#kimmdy.parsing.write_topol"><code class="docutils literal notranslate"><span class="pre">write_topol()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kimmdy.html#kimmdy.parsing.write_top"><code class="docutils literal notranslate"><span class="pre">write_top()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="kimmdy.html#module-kimmdy.reaction">kimmdy.reaction module</a><ul>
@@ -193,10 +213,10 @@
 <li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.reaction.Move.idx_to_bind"><code class="docutils literal notranslate"><span class="pre">Move.idx_to_bind</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.reaction.Move.idx_to_break"><code class="docutils literal notranslate"><span class="pre">Move.idx_to_break</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.reaction.Move.new_coords"><code class="docutils literal notranslate"><span class="pre">Move.new_coords</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#id0"><code class="docutils literal notranslate"><span class="pre">Move.idx_to_bind</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#id1"><code class="docutils literal notranslate"><span class="pre">Move.idx_to_break</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#id2"><code class="docutils literal notranslate"><span class="pre">Move.idx_to_move</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#id3"><code class="docutils literal notranslate"><span class="pre">Move.new_coords</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#id3"><code class="docutils literal notranslate"><span class="pre">Move.idx_to_bind</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#id4"><code class="docutils literal notranslate"><span class="pre">Move.idx_to_break</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#id5"><code class="docutils literal notranslate"><span class="pre">Move.idx_to_move</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#id6"><code class="docutils literal notranslate"><span class="pre">Move.new_coords</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="kimmdy.html#kimmdy.reaction.ReactionPlugin"><code class="docutils literal notranslate"><span class="pre">ReactionPlugin</span></code></a><ul>
@@ -211,9 +231,9 @@
 <li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.reaction.Recipe.calc_averages"><code class="docutils literal notranslate"><span class="pre">Recipe.calc_averages()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.reaction.Recipe.check_consistency"><code class="docutils literal notranslate"><span class="pre">Recipe.check_consistency()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.reaction.Recipe.combine_with"><code class="docutils literal notranslate"><span class="pre">Recipe.combine_with()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#id4"><code class="docutils literal notranslate"><span class="pre">Recipe.rates</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#id5"><code class="docutils literal notranslate"><span class="pre">Recipe.recipe_steps</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#id6"><code class="docutils literal notranslate"><span class="pre">Recipe.timespans</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#id7"><code class="docutils literal notranslate"><span class="pre">Recipe.rates</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#id8"><code class="docutils literal notranslate"><span class="pre">Recipe.recipe_steps</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#id9"><code class="docutils literal notranslate"><span class="pre">Recipe.timespans</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="kimmdy.html#kimmdy.reaction.RecipeCollection"><code class="docutils literal notranslate"><span class="pre">RecipeCollection</span></code></a><ul>
@@ -224,7 +244,11 @@
 <li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.reaction.RecipeCollection.to_dill"><code class="docutils literal notranslate"><span class="pre">RecipeCollection.to_dill()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="kimmdy.html#kimmdy.reaction.RecipeStep"><code class="docutils literal notranslate"><span class="pre">RecipeStep</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kimmdy.html#kimmdy.reaction.RecipeStep"><code class="docutils literal notranslate"><span class="pre">RecipeStep</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.reaction.RecipeStep.one_based"><code class="docutils literal notranslate"><span class="pre">RecipeStep.one_based()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.reaction.RecipeStep.zero_based"><code class="docutils literal notranslate"><span class="pre">RecipeStep.zero_based()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="kimmdy.html#module-kimmdy.runmanager">kimmdy.runmanager module</a><ul>
@@ -240,6 +264,7 @@
 <li class="toctree-l4"><a class="reference internal" href="kimmdy.html#kimmdy.runmanager.State.REACTION"><code class="docutils literal notranslate"><span class="pre">State.REACTION</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="kimmdy.html#kimmdy.runmanager.get_existing_files"><code class="docutils literal notranslate"><span class="pre">get_existing_files()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="kimmdy.html#module-kimmdy.tasks">kimmdy.tasks module</a><ul>
@@ -266,6 +291,8 @@
 <li class="toctree-l3"><a class="reference internal" href="kimmdy.html#kimmdy.utils.identify_atomtypes"><code class="docutils literal notranslate"><span class="pre">identify_atomtypes()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="kimmdy.html#kimmdy.utils.increment_logfile"><code class="docutils literal notranslate"><span class="pre">increment_logfile()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="kimmdy.html#kimmdy.utils.morse_transition_rate"><code class="docutils literal notranslate"><span class="pre">morse_transition_rate()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kimmdy.html#kimmdy.utils.pushd"><code class="docutils literal notranslate"><span class="pre">pushd()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="kimmdy.html#kimmdy.utils.run_gmx"><code class="docutils literal notranslate"><span class="pre">run_gmx()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="kimmdy.html#kimmdy.utils.run_shell_cmd"><code class="docutils literal notranslate"><span class="pre">run_shell_cmd()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="kimmdy.html#kimmdy.utils.sort_angle"><code class="docutils literal notranslate"><span class="pre">sort_angle()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="kimmdy.html#kimmdy.utils.sort_bond"><code class="docutils literal notranslate"><span class="pre">sort_bond()</span></code></a></li>
@@ -287,7 +314,7 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to kimmdy’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="welcome.html" class="btn btn-neutral float-left" title="Welcome to KIMMDY: Getting Started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="kimmdy.html" class="btn btn-neutral float-right" title="kimmdy package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

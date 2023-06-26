@@ -652,8 +652,8 @@ Protein  3
 ; Include water topology
 #include "./amber99sb-star-ildnp.ff/tip3p.itp"
 
-[ position_restraints ]
 #ifdef   POSRES_WATER
+[ position_restraints ]
 ; Position restraint for each water oxygen
 ; i funct fcx fcy fcz
 1        1        1000     1000     1000    

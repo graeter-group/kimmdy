@@ -1,0 +1,14 @@
+dryrun: false
+iterations: 0
+out: 'minimal'
+gromacs_alias: 'gmx'
+top: 'minimal.top'
+gro: 'minimal.gro'
+ndx: 'minimal.ndx'
+mds:
+  prod:
+    mdp: 'minimal.mdp'
+reactions:
+  hat_naive:
+sequence:
+  - reactions

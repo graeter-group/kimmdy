@@ -39,7 +39,11 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../welcome.html">Welcome to KIMMDY: Getting Started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../modules.html">kimmdy</a></li>
 </ul>
@@ -70,13 +74,25 @@
              
   <h1>Source code for kimmdy.utils</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">subprocess</span> <span class="k">as</span> <span class="nn">sp</span>
+<span class="kn">from</span> <span class="nn">kimmdy.topology.utils</span> <span class="kn">import</span> <span class="n">get_protein_section</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">import</span> <span class="nn">MDAnalysis</span> <span class="k">as</span> <span class="nn">MDA</span>
 <span class="kn">from</span> <span class="nn">scipy.spatial.transform</span> <span class="kn">import</span> <span class="n">Rotation</span>
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span>
+<span class="kn">import</span> <span class="nn">os</span>
 
-<span class="kn">from</span> <span class="nn">kimmdy.config</span> <span class="kn">import</span> <span class="n">Config</span>
+
+<div class="viewcode-block" id="pushd"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.utils.pushd">[docs]</a><span class="nd">@contextmanager</span>
+<span class="k">def</span> <span class="nf">pushd</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="n">prev</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">yield</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">prev</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="increment_logfile"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.utils.increment_logfile">[docs]</a><span class="k">def</span> <span class="nf">increment_logfile</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
@@ -104,7 +120,10 @@
     <span class="n">lookup_atomid_plumedid</span> <span class="o">=</span> <span class="p">{</span>
         <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]:</span> <span class="nb">frozenset</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="s2">&quot;atoms&quot;</span><span class="p">])</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">plumed</span><span class="p">[</span><span class="s2">&quot;distances&quot;</span><span class="p">]</span>
     <span class="p">}</span>
-    <span class="n">lookup_atomtype_atomid</span> <span class="o">=</span> <span class="p">{</span><span class="n">atom</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">atom</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">top</span><span class="p">[</span><span class="s2">&quot;atoms&quot;</span><span class="p">]}</span>
+    <span class="n">atoms</span> <span class="o">=</span> <span class="n">get_protein_section</span><span class="p">(</span><span class="n">top</span><span class="p">,</span> <span class="s2">&quot;atoms&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">atoms</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Could not find atoms in topology file&quot;</span><span class="p">)</span>
+    <span class="n">lookup_atomtype_atomid</span> <span class="o">=</span> <span class="p">{</span><span class="nb">int</span><span class="p">(</span><span class="n">atom</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span> <span class="n">atom</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">}</span>
     <span class="n">atomids</span> <span class="o">=</span> <span class="n">lookup_atomid_plumedid</span><span class="p">[</span><span class="n">plumedid</span><span class="p">]</span>
     <span class="n">atomids_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">atomids</span><span class="p">)</span>
     <span class="n">atomtypes_list</span> <span class="o">=</span> <span class="p">[</span>
@@ -211,12 +230,19 @@
     <span class="k">return</span> <span class="n">sp</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cwd</span><span class="o">=</span><span class="n">cwd</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="run_gmx"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.utils.run_gmx">[docs]</a><span class="k">def</span> <span class="nf">run_gmx</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">cwd</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">sp</span><span class="o">.</span><span class="n">CalledProcessError</span><span class="p">]:</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">run_shell_cmd</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s2"> -quiet&quot;</span><span class="p">,</span> <span class="n">cwd</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Gromacs process failed with exit code </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">returncode</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">check_returncode</span><span class="p">()</span></div>
+
+
 <div class="viewcode-block" id="get_shell_stdout"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.utils.get_shell_stdout">[docs]</a><span class="k">def</span> <span class="nf">get_shell_stdout</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
     <span class="n">process</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">capture_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">process</span><span class="o">.</span><span class="n">stdout</span></div>
 
 
-<div class="viewcode-block" id="check_gmx_version"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.utils.check_gmx_version">[docs]</a><span class="k">def</span> <span class="nf">check_gmx_version</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">Config</span><span class="p">):</span>
+<div class="viewcode-block" id="check_gmx_version"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.utils.check_gmx_version">[docs]</a><span class="k">def</span> <span class="nf">check_gmx_version</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Check for an existing gromacs installation.</span>
 
 <span class="sd">    If PLUMED is meant to be used it additionally checks for the keyword</span>
