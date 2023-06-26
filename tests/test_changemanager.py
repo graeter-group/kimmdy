@@ -18,9 +18,9 @@ def tmpdir(tmp_path) -> Path:
     return test_dir
 
 
-def test_plumed_break(testdir):
-    plumed = read_plumed(testdir / "plumed_nat.dat")
-    plumed_break_ref = read_plumed(testdir / "plumed_break29-35.dat")
+def test_plumed_break(tmpdir):
+    plumed = read_plumed(tmpdir / "plumed_nat.dat")
+    plumed_break_ref = read_plumed(tmpdir / "plumed_break29-35.dat")
 
     breakpair = [29, 35]
     plumed_break = break_bond_plumed(plumed, breakpair, Path("distances.dat"))
