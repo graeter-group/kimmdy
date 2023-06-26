@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 import shutil
 
+
 def setup_testdir(tmp_path) -> Path:
     if tmp_path.exists():
         shutil.rmtree(tmp_path)

@@ -87,7 +87,7 @@ def read_rtp(path: Path) -> dict:
 
 def resolve_includes(path: Path) -> list[str]:
     """Resolve #include statements in a (top/itp) file."""
-    gmx_builtin_ffs = get_gmx_dir() / 'top'
+    gmx_builtin_ffs = get_gmx_dir() / "top"
     dir = path.parent
     fname = path.name
     cwd = Path.cwd()

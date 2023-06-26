@@ -76,35 +76,40 @@ class Topology:
         self._test_for_radicals()
 
     def _update_dict(self):
-        set_protein_section(self.top, "atoms", [
-            attributes_to_list(x) for x in self.atoms.values()
-        ])
-
-        set_protein_section(self.top, "bonds", [
-            attributes_to_list(x) for x in self.bonds.values()
-        ])
-
-        set_protein_section(self.top, "pairs", [
-            attributes_to_list(x) for x in self.pairs.values()
-        ])
-
-        set_protein_section(self.top, "angles", [
-            attributes_to_list(x) for x in self.angles.values()
-        ])
-
-        set_protein_section(self.top, "dihedrals",
-                            [attributes_to_list(x) for x in self.proper_dihedrals.values() ] +
-                            [attributes_to_list(x) for x in self.improper_dihedrals.values()]
+        set_protein_section(
+            self.top, "atoms", [attributes_to_list(x) for x in self.atoms.values()]
         )
 
-        set_top_section(self.top, 'atomtypes', [
-            attributes_to_list(x) for x in self.ff.atomtypes.values()
-        ])
+        set_protein_section(
+            self.top, "bonds", [attributes_to_list(x) for x in self.bonds.values()]
+        )
 
-        set_top_section(self.top, 'bondtypes', [
-            attributes_to_list(x) for x in self.ff.bondtypes.values()
-        ])
+        set_protein_section(
+            self.top, "pairs", [attributes_to_list(x) for x in self.pairs.values()]
+        )
 
+        set_protein_section(
+            self.top, "angles", [attributes_to_list(x) for x in self.angles.values()]
+        )
+
+        set_protein_section(
+            self.top,
+            "dihedrals",
+            [attributes_to_list(x) for x in self.proper_dihedrals.values()]
+            + [attributes_to_list(x) for x in self.improper_dihedrals.values()],
+        )
+
+        set_top_section(
+            self.top,
+            "atomtypes",
+            [attributes_to_list(x) for x in self.ff.atomtypes.values()],
+        )
+
+        set_top_section(
+            self.top,
+            "bondtypes",
+            [attributes_to_list(x) for x in self.ff.bondtypes.values()],
+        )
 
     def to_dict(self) -> TopologyDict:
         self._update_dict()
