@@ -53,6 +53,86 @@ def test_doubleparse_urea(tmp_path):
     assert top2 == top3
 
 
+# %%
+def test_ff_includes_with_gmxdir(tmp_path):
+    testdir = setup_testdir(tmp_path)
+    urea_path = Path("urea.top")
+    raw = parsing.read_top(urea_path)
+
+    print(raw["moleculetype_1"])
+    assert raw["atomtypes"]
+    assert raw["bondtypes"]
+    assert raw["moleculetype_1"] == {
+        "content": [["SOL", "2"]],
+        "else_content": [],
+        "extra": [],
+        "condition": None,
+        "subsections": {
+            "atoms": {
+                "content": [
+                    ["1", "OW", "1", "SOL", "OW", "1", "-0.834", "16.00000"],
+                    ["2", "HW", "1", "SOL", "HW1", "1", "0.417", "1.00800"],
+                    ["3", "HW", "1", "SOL", "HW2", "1", "0.417", "1.00800"],
+                ],
+                "else_content": [],
+                "extra": [],
+                "condition": None,
+            },
+            "settles": {
+                "content": [["1", "1", "0.09572", "0.15139"]],
+                "else_content": [],
+                "extra": [],
+                "condition": {"type": "ifndef", "value": "FLEXIBLE"},
+            },
+            "exclusions": {
+                "content": [["1", "2", "3"], ["2", "1", "3"], ["3", "1", "2"]],
+                "else_content": [],
+                "extra": [],
+                "condition": {"type": "ifndef", "value": "FLEXIBLE"},
+            },
+            "bonds": {
+                "content": [],
+                "else_content": [
+                    ["1", "2", "1", "0.09572", "502416.0", "0.09572", "502416.0"],
+                    ["1", "3", "1", "0.09572", "502416.0", "0.09572", "502416.0"],
+                ],
+                "extra": [],
+                "condition": {"type": "ifndef", "value": "FLEXIBLE"},
+            },
+            "angles": {
+                "content": [],
+                "else_content": [
+                    ["2", "1", "3", "1", "104.52", "628.02", "104.52", "628.02"]
+                ],
+                "extra": [],
+                "condition": {"type": "ifndef", "value": "FLEXIBLE"},
+            },
+        },
+    }
+
+
+def test_ff_includes_with_ff_in_cwd(tmp_path):
+    testdir = setup_testdir(tmp_path)
+    urea_path = Path("hexala.top")
+    raw = parsing.read_top(urea_path)
+    assert raw["atomtypes"]
+    assert raw["bondtypes"]
+    assert raw["moleculetype_11"] == {
+        "content": [["ZN", "1"]],
+        "else_content": [],
+        "extra": [],
+        "condition": None,
+        "subsections": {
+            "atoms": {
+                "content": [["1", "Zn", "1", "ZN", "ZN", "1", "2.00000"]],
+                "else_content": [],
+                "extra": [],
+                "condition": None,
+            }
+        },
+    }
+
+
 #### Parsing should be invertible ####
 allowed_text = st.text(
     string.ascii_letters + string.digits + "!\"$%&'()*+,-./:<=>?@\\^_`{|}~", min_size=1
