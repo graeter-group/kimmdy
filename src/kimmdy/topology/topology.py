@@ -43,7 +43,8 @@ class Topology:
             raise ValueError(
                 "The topology does not contain a protein section."
                 "Please make sure the topology contains a section"
-                f"called [ moleculetype ]. The first of which is assumed to be the protein of interest."
+                "called [ moleculetype ]."
+                "The first of which is assumed to be the protein of interest."
             )
         self.protein = top[PROTEIN_SECTION]["subsections"]
         self.top = top

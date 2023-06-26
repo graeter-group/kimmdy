@@ -94,7 +94,8 @@ class FF:
         {len(self.atomtypes)} atomtypes,
         {len(self.bondtypes)} bondtypes,
         {len(self.angletypes)} angletypes,
-        {len(self.proper_dihedraltypes)} dihedraltypes
+        {len(self.proper_dihedraltypes)} proper dihedraltypes
+        {len(self.improper_dihedraltypes)} improper dihedraltypes
         {len(self.residuetypes)} residuetypes
         """
         )
