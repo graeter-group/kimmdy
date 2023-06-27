@@ -167,6 +167,8 @@ def read_top(path: Path) -> TopologyDict:
 
     ls, ffdir = resolve_includes(path)
     ls = filter(lambda l: not l.startswith("*"), ls)
+    if ffdir is None:
+        raise ValueError(f"No forcefield directory (`*.ff/`) found in the includes of your .top file at: {path}")
     d = {}
     d['ffdir'] = ffdir
     d["define"] = {}

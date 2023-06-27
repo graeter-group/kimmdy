@@ -110,6 +110,19 @@ class Topology:
             [attributes_to_list(x) for x in self.ff.bondtypes.values()],
         )
 
+        set_top_section(
+            self.top,
+            "angletypes",
+            [attributes_to_list(x) for x in self.ff.angletypes.values()],
+        )
+
+        set_top_section(
+            self.top,
+            "dihedraltypes",
+            [attributes_to_list(x) for x in self.ff.improper_dihedraltypes.values()]
+            + [attributes_to_list(x) for x in self.ff.proper_dihedraltypes.values()],
+        )
+
     def to_dict(self) -> TopologyDict:
         self._update_dict()
         return self.top
