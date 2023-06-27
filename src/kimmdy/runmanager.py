@@ -77,9 +77,7 @@ class RunManager:
             _ = self.config.ffpatch
         except AttributeError:
             self.config.ffpatch = None
-        self.top = Topology(
-            read_top(self.config.top), self.config.ffpatch
-        )
+        self.top = Topology(read_top(self.config.top), self.config.ffpatch)
 
         self.filehist: list[dict[str, TaskFiles]] = [
             {"setup": TaskFiles(self.get_latest)}

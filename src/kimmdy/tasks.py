@@ -34,6 +34,7 @@ class TaskFiles:
     >>> files.input["top"]
     {'top': 'latest top'}
     """
+
     get_latest: Callable
     input: dict[str, Path] = field(default_factory=dict)
     output: dict[str, Path] = field(default_factory=dict)

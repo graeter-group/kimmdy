@@ -111,8 +111,8 @@ def field_or_none(l: list[str], i) -> Optional[str]:
 
 def attributes_to_list(obj) -> list[str]:
     attrs = []
-    for k,v in obj.__dict__.items():
-        if k in ['bound_to_nrs', 'is_radical', 'id', 'id_sym']:
+    for k, v in obj.__dict__.items():
+        if k in ["bound_to_nrs", "is_radical", "id", "id_sym"]:
             continue
         if v is None:
             continue

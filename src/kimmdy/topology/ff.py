@@ -22,7 +22,7 @@ class FF:
         self.improper_dihedraltypes: dict[tuple[str, str, str, str], DihedralType] = {}
         self.residuetypes: dict[str, ResidueType]
 
-        ffdir = top['ffdir']
+        ffdir = top["ffdir"]
 
         atomtypes = get_top_section(top, "atomtypes")
         if atomtypes is None:
