@@ -108,7 +108,7 @@ def resolve_includes(path: Path) -> tuple[list[str], Optional[Path]]:
                 include_path = Path(l.split('"')[1])
                 # if the include path contains `ff` it is a file in a force field directory
                 # get the path to the force field directory
-                if '.ff' in l:
+                if ".ff" in l:
                     # e.g. #include "amber99.ff/forcefield.itp"
                     ffdir = include_path.parent
                     # test if the path is in the cwd, otherwise search in gmx ff dir
@@ -171,7 +171,7 @@ def read_top(path: Path) -> TopologyDict:
 
     ls = filter(lambda l: not l.startswith("*"), ls)
     d = {}
-    d['ffdir'] = ffdir
+    d["ffdir"] = ffdir
     d["define"] = {}
     parent_section_index = 0
     parent_section = None

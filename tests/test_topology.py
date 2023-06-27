@@ -29,16 +29,19 @@ def filedir() -> Path:
 def assetsdir() -> Path:
     return Path(__file__).parent / "test_files" / "assets"
 
+
 @pytest.fixture()
 def raw_hexala_top_fix(filedir) -> TopologyDict:
     hexala_top = read_top(filedir / "hexala.top")
     return hexala_top
+
 
 @pytest.fixture()
 def hexala_top_fix(assetsdir, filedir) -> Topology:
     ffpatch = assetsdir / "amber99sb_patches.xml"
     hexala_top = read_top(filedir / "hexala.top")
     return Topology(hexala_top, ffpatch)
+
 
 @st.composite
 def random_atomlist(draw):
@@ -210,9 +213,9 @@ class TestHexalaTopology:
         assert len(hexala_top_fix.bonds) == len(bonds)
         assert len(hexala_top_fix.pairs) == len(pairs)
         assert len(hexala_top_fix.angles) == len(angles)
-        assert len(hexala_top_fix.proper_dihedrals) + len(hexala_top_fix.improper_dihedrals) == len(
-            dihedrals
-        )
+        assert len(hexala_top_fix.proper_dihedrals) + len(
+            hexala_top_fix.improper_dihedrals
+        ) == len(dihedrals)
 
     def test_find_bondtypes(self, hexala_top_fix):
         top_cp = deepcopy(hexala_top_fix)
@@ -336,7 +339,7 @@ class TestHexalaTopology:
         raw_copy = deepcopy(raw)
         top = Topology(raw_copy)
         top._update_dict()
-        assert top.top['dihedraltypes']['content'] == raw['dihedraltypes']['content']
+        assert top.top["dihedraltypes"]["content"] == raw["dihedraltypes"]["content"]
         assert top.top == raw
 
     def test_top_properties(self, hexala_top_fix):
