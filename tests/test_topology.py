@@ -159,7 +159,7 @@ class TestTopology:
         assert top.proper_dihedrals == og_top.proper_dihedrals
         assert top.improper_dihedrals == og_top.improper_dihedrals
 
-    def test_generate_topology_from_bound_to(self, hexala_top_fix, assetsdir):
+    def test_generate_topology_from_bound_to(self, hexala_top_fix):
         og_top = deepcopy(hexala_top_fix)
         newtop = deepcopy(hexala_top_fix)
         newtop._regenerate_topology_from_bound_to()
@@ -194,12 +194,12 @@ class TestHexalaTopology:
         hexala_top = read_top(filedir / "hexala_move34-29.top")
         return Topology(hexala_top, ffpatch)
 
-    def test_all_terms_accounted_for(self, hexala_top_fix, hexala_top):
-        atoms = get_protein_section(hexala_top, "atoms")
-        bonds = get_protein_section(hexala_top, "bonds")
-        pairs = get_protein_section(hexala_top, "pairs")
-        angles = get_protein_section(hexala_top, "angles")
-        dihedrals = get_protein_section(hexala_top, "dihedrals")
+    def test_all_terms_accounted_for(self, raw_hexala_top_fix, hexala_top_fix):
+        atoms = get_protein_section(raw_hexala_top_fix, "atoms")
+        bonds = get_protein_section(raw_hexala_top_fix, "bonds")
+        pairs = get_protein_section(raw_hexala_top_fix, "pairs")
+        angles = get_protein_section(raw_hexala_top_fix, "angles")
+        dihedrals = get_protein_section(raw_hexala_top_fix, "dihedrals")
 
         assert atoms
         assert bonds
@@ -336,6 +336,7 @@ class TestHexalaTopology:
         raw_copy = deepcopy(raw)
         top = Topology(raw_copy)
         top._update_dict()
+        assert top.top['dihedraltypes']['content'] == raw['dihedraltypes']['content']
         assert top.top == raw
 
     def test_top_properties(self, hexala_top_fix):
@@ -471,14 +472,12 @@ class TestHexalaTopology:
 class TestRadicalAla:
     @pytest.fixture
     def top_noprm_fix(self, assetsdir, filedir) -> Topology:
-        ffdir = assetsdir / "amber99sb-star-ildnp.ff"
         ffpatch = assetsdir / "amber99sb_patches.xml"
         hexala_top = read_top(filedir / "Ala_R_noprm.top")
         return Topology(hexala_top, ffpatch)
 
     @pytest.fixture
     def top_prm_fix(self, assetsdir, filedir) -> Topology:
-        ffdir = assetsdir / "amber99sb-star-ildnp.ff"
         ffpatch = assetsdir / "amber99sb_patches.xml"
         hexala_top = read_top(filedir / "Ala_R_prm.top")
         return Topology(hexala_top, ffpatch)
