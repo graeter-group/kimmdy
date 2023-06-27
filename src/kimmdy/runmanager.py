@@ -78,7 +78,7 @@ class RunManager:
         except AttributeError:
             self.config.ffpatch = None
         self.top = Topology(
-            read_top(self.config.top), self.config.ff, self.config.ffpatch
+            read_top(self.config.top), self.config.ffpatch
         )
 
         self.filehist: list[dict[str, TaskFiles]] = [

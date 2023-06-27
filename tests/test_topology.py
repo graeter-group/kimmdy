@@ -62,7 +62,7 @@ def random_topology_and_break(draw):
     ffdir = dir / "amber99sb-star-ildnp.ff"
     ffpatch = dir / "amber99sb_patches.xml"
     hexala_top = read_top(dir / "hexala.top")
-    top = Topology(hexala_top, ffdir, ffpatch)
+    top = Topology(hexala_top, ffpatch)
     atomlist = draw(random_atomlist())
     top.atoms = {atom.nr: atom for atom in atomlist}
     top._regenerate_topology_from_bound_to()
@@ -76,7 +76,7 @@ class TestFFPatches:
         ffdir = assetsdir / "amber99sb-star-ildnp.ff"
         ffpatch = assetsdir / "amber99sb_patches.xml"
         hexala_top = read_top(filedir / "hexala.top")
-        return Topology(hexala_top, ffdir, ffpatch)
+        return Topology(hexala_top, ffpatch)
 
     def test_match_atomic_item_to_atomic_type(self, top_fix):
         types = top_fix.ff.angletypes
@@ -124,7 +124,7 @@ class TestTopology:
         ffdir = assetsdir / "amber99sb-star-ildnp.ff"
         ffpatch = assetsdir / "amber99sb_patches.xml"
         hexala_top = read_top(filedir / "hexala.top")
-        return Topology(hexala_top, ffdir, ffpatch)
+        return Topology(hexala_top, ffpatch)
 
     def test_break_bind_bond_hexala(self, top_fix):
         top = deepcopy(top_fix)
@@ -189,21 +189,21 @@ class TestHexalaTopology:
         ffdir = assetsdir / "amber99sb-star-ildnp.ff"
         ffpatch = assetsdir / "amber99sb_patches.xml"
         hexala_top = read_top(filedir / "hexala.top")
-        return Topology(hexala_top, ffdir, ffpatch)
+        return Topology(hexala_top, ffpatch)
 
     @pytest.fixture
     def top_break_29_35_fix(self, assetsdir, filedir) -> Topology:
         ffdir = assetsdir / "amber99sb-star-ildnp.ff"
         ffpatch = assetsdir / "amber99sb_patches.xml"
         hexala_top = read_top(filedir / "hexala_break29-35.top")
-        return Topology(hexala_top, ffdir, ffpatch)
+        return Topology(hexala_top, ffpatch)
 
     @pytest.fixture
     def top_move_34_29_fix(self, assetsdir, filedir) -> Topology:
         ffdir = assetsdir / "amber99sb-star-ildnp.ff"
         ffpatch = assetsdir / "amber99sb_patches.xml"
         hexala_top = read_top(filedir / "hexala_move34-29.top")
-        return Topology(hexala_top, ffdir, ffpatch)
+        return Topology(hexala_top, ffpatch)
 
     def test_all_terms_accounted_for(self, top_fix, hexala_top):
         atoms = get_protein_section(hexala_top, "atoms")
@@ -478,14 +478,14 @@ class TestRadicalAla:
         ffdir = assetsdir / "amber99sb-star-ildnp.ff"
         ffpatch = assetsdir / "amber99sb_patches.xml"
         hexala_top = read_top(filedir / "Ala_R_noprm.top")
-        return Topology(hexala_top, ffdir, ffpatch)
+        return Topology(hexala_top, ffpatch)
 
     @pytest.fixture
     def top_prm_fix(self, assetsdir, filedir) -> Topology:
         ffdir = assetsdir / "amber99sb-star-ildnp.ff"
         ffpatch = assetsdir / "amber99sb_patches.xml"
         hexala_top = read_top(filedir / "Ala_R_prm.top")
-        return Topology(hexala_top, ffdir, ffpatch)
+        return Topology(hexala_top, ffpatch)
 
     def test_is_radical(self, top_noprm_fix):
         assert top_noprm_fix.atoms["9"].is_radical == True
