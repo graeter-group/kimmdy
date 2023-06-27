@@ -59,7 +59,7 @@ Protein  3
 ; residue 4 ALA rtp ALA q 0.0
 26       N        4        ALA      N        26       -0.600  14.01   
 27       H1       4        ALA      HA       27       0.2719   1.008   
-28       CT       4        ALA      CA       28       0.0337   12.01   
+28       CT       4        ALA      CA       28       0.2180   12.01   
 29       H1       4        ALA      HA       29       0.0823   1.008   
 30       CT       4        ALA      CB       30       -0.1825  12.01   
 31       HC       4        ALA      HB1      31       0.0603   1.008   

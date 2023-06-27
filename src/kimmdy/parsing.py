@@ -168,7 +168,7 @@ def read_top(path: Path) -> TopologyDict:
         return {"content": [], "else_content": [], "extra": [], "condition": condition}
 
     for l in ls:
-    # where to put lines dependign on current context
+        # where to put lines dependign on current context
         if l.startswith("#define"):
             l = l.split()
             name = l[1]

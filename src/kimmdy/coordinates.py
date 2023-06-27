@@ -8,71 +8,79 @@ from copy import deepcopy
 from kimmdy.parsing import read_top
 from kimmdy.tasks import TaskFiles
 from kimmdy.topology.topology import Topology
-from kimmdy.topology.atomic import Bond, Angle, Dihedral, Pair, Atomic
-from kimmdy.topology.utils import match_atomic_item_to_atomic_type, get_protein_section, set_protein_section
+from kimmdy.topology.atomic import Bond, Angle, Dihedral, Pair, Atomic, AtomicType
+from kimmdy.topology.utils import (
+    match_atomic_item_to_atomic_type,
+    get_protein_section,
+    set_protein_section,
+)
 
 
-## copied from changemanager. should be put into utils
-def get_ff_sections(ffdir):
-    return read_top(ffdir / "ffbonded.itp")
-
-
-def parameterize_bonded_terms(ffprm, terms_atomtype, prop, terms):
-    """
-    takes a term (bond or angle) and adds the parameters from
-    the force field ffbonded.itp file that match the atomtypes
-    """
-    print(f"Looking for atom parameters in atoms section of topology for {terms}")
-    # prop must be 'bondtypes' or 'angletypes'
-    terms_prm = []
-    for i, term in enumerate(terms_atomtype):
-        for entry in ffprm[prop]:
-            if term == entry[: len(term)] or term[::-1] == entry[: len(term)]:
-                stop = entry.index(";")
-                terms_prm.append([*terms[i], *entry[len(term) : stop]])
-                break
-        else:
-            print(f"No parameters found for {term}/{terms[i]}!")
-    print(f"Parameterized these terms: {terms_prm}")
-    return terms_prm
-
-
-# def is_parameterized(term):
-#     """does not work for dihedrals
-#     basically checks whether there are floats in the term
-#     """
-#     for idx in term:
-#         if not idx.isdigit():
-#             if idx.replace(".", "", 1).isdigit():
-#                 return True
-#     return False
 def is_parameterized(entry: Atomic):
     """Parameterized topology entries have c0 and c1 attributes != None"""
     return entry.c0 != None and entry.c1 != None
 
 
-def get_bondobj(bond_key: list[str], bond: Bond, top: Topology):
-    if is_parameterized(bond):
-        return bond
+def get_atomicobj(key: list[str], type: AtomicType, top: Topology):
+    # ugly
+    type_key = [top.atoms[x].type for x in key]
+    if type == Bond:
+        instance = top.bonds.get(key)
+        match_obj = match_atomic_item_to_atomic_type(type_key, top.ff.bondtypes)
+    elif type == Angle:
+        instance = top.angles.get(key)
+        match_obj = match_atomic_item_to_atomic_type(type_key, top.ff.angletypes)
+    elif type == Dihedral:
+        instance = top.dihedrals.get(key)
+        if instance.funct == "4":
+            match_obj = match_atomic_item_to_atomic_type(
+                type_key, top.ff.improper_dihedraltypes
+            )
+        elif instance.funct == "9":
+            match_obj = match_atomic_item_to_atomic_type(
+                type_key, top.ff.proper_dihedraltypes
+            )
     else:
-        bondtype_key = [top.atoms[bond_key[0]].type, top.atoms[bond_key[1]].type]
-        return match_atomic_item_to_atomic_type(bondtype_key, top.ff.bondtypes)
-
-def get_angleobj(angle_key: list[str], angle: Angle, top: Topology):
-    if is_parameterized(angle):
-        return angle
+        raise ValueError(f"Could not match type {type} of atomic object.")
+    if is_parameterized(instance):
+        return instance
     else:
-        angletype_key = [top.atoms[x].type for x in angle_key]
-        return match_atomic_item_to_atomic_type(angletype_key, top.ff.angletypes)
+        if match_obj:
+            return match_obj
+        else:
+            raise ValueError(
+                f"Match object is {match_obj} for {[type_key,instance]} of type {type}."
+            )
 
-def get_dihedralobj(dihedral_key: list[str], dihedral: Dihedral, top: Topology):
-    if is_parameterized(dihedral):
-        return dihedral
-    else:
-        dihedraltype_key = [top.atoms[x].type for x in dihedral_key]
-        return match_atomic_item_to_atomic_type(dihedraltype_key, top.ff.proper_dihedraltypes)
 
-##
+def get_keys(atomicA: dict, atomicB: dict) -> tuple[list, list, list]:
+    keysA = set(atomicA.keys())
+    keysB = set(atomicB.keys())
+
+    same = set.intersection(keysA, keysB)
+    breaking = keysA - keysB
+    binding = keysB - keysA
+
+    return list(same), list(breaking), list(binding)
+
+
+def merge_same(same: list, topA: Topology, topB: Topology, type: Atomic):
+    # also ugly
+    for key in same:
+        if type is Bond:
+            instanceA = topA.bonds.get(key)
+            instanceB = topB.bonds.get(key)
+        elif type is Angle:
+            instanceA = topA.angles.get(key)
+            instanceB = topB.angles.get(key)
+        if instanceA != instanceB:
+            # assuming no instance has explicit standard ff parameters
+            instance_objA = get_atomicobj(key, type, topA)
+            instance_objB = get_atomicobj(key, type, topB)
+            instanceB.c2 = deepcopy(instance_objB.c0)
+            instanceB.c3 = deepcopy(instance_objB.c1)
+            instanceB.c0 = deepcopy(instance_objA.c0)
+            instanceB.c1 = deepcopy(instance_objA.c1)
 
 
 def merge_top_prmgrowth(
@@ -83,7 +91,7 @@ def merge_top_prmgrowth(
     hyperprms = {
         "morse_well_depth": "400.0",
         "morse_steepness": "10.0",
-        'morse_dist_factor': 3
+        "morse_dist_factor": 3,
     }  # well_depth D [kJ/mol], steepness [nm-1]
     topADict = read_top(files.input["top"])
     topBDict = read_top(files.output["top"])
@@ -110,45 +118,46 @@ def merge_top_prmgrowth(
     #                 f"Atom {nr} changed during changemanager step but not the charges!"
     #             )
 
-    #ToDo: Generalize
+    # ToDo: Generalize
 
     # # bonds
-    bondA_keys = set(topA.bonds.keys())
-    bondB_keys = set(topB.bonds.keys())
 
-    same = set.intersection(bondA_keys, bondB_keys)
-    breaking = bondA_keys - bondB_keys
-    binding = bondB_keys - bondA_keys
+    same, breaking, binding = get_keys(topA.bonds, topB.bonds)
 
-    for bond_key in same:
-        bondA = topA.bonds.get(bond_key)
-        bondB = topB.bonds.get(bond_key)
-        if bondA != bondB:
-            # assuming no bond has explicit standard ff parameters
-            bond_objA = get_bondobj(bond_key, bondA, topA)
-            bond_objB = get_bondobj(bond_key, bondB, topB)
-            bondB.c2 = deepcopy(bond_objB.c0)
-            bondB.c3 = deepcopy(bond_objB.c1)
-            bondB.c0 = deepcopy(bond_objA.c0)
-            bondB.c1 = deepcopy(bond_objA.c1)
+    merge_same(same, topA, topB, Bond)
 
     for bond_key in breaking:
         topB.bonds[bond_key] = Bond(*bond_key, "1")
-        # topB.bind_bond(bond_key)      # this doesn't work for this use case
-        bondB = topB.bonds.get(bond_key)
-        bond_objA = get_bondobj(bond_key, bondA, topA)
+        bond_objA = get_atomicobj(bond_key, Bond, topA)
 
-        bondB.funct = "3"  # Morse potential
-        bondB.c0 = deepcopy(bond_objA.c0)
-        bondB.c1 = deepcopy(hyperprms["morse_well_depth"])
-        bondB.c2 = deepcopy(hyperprms["morse_steepness"])
-        bondB.c3 = f"{float(deepcopy(bond_objA.c0))*hyperprms['morse_dist_factor']:7.5f}"
-        bondB.c4 = "0.00"
-        bondB.c5 = deepcopy(hyperprms["morse_steepness"])
+        topB.bonds[(bond_key)] = Bond(
+            *bond_key,
+            funct="3",
+            c0=deepcopy(bond_objA.c0),
+            c1=deepcopy(hyperprms["morse_well_depth"]),
+            c2=deepcopy(hyperprms["morse_steepness"]),
+            c3=(f"{float(deepcopy(bond_objA.c0))*hyperprms['morse_dist_factor']:7.5f}"),
+            c4="0.00",
+            c5=deepcopy(hyperprms["morse_steepness"]),
+        )
 
-    # deal with pairs and exclusions
+    for bond_key in binding:
+        bond_objB = get_atomicobj(bond_key, Bond, topB)
+
+        topB.bonds[(bond_key)] = Bond(
+            *bond_key,
+            funct="3",
+            c0=deepcopy(bond_objB.c0),
+            c1="0.00",
+            c2=deepcopy(hyperprms["morse_steepness"]),
+            c3=deepcopy(bond_objB.c0),
+            c4=deepcopy(hyperprms["morse_well_depth"]),
+            c5=deepcopy(hyperprms["morse_steepness"]),
+        )
+
+    # # pairs and exclusions
     try:
-        exclusions_content = get_protein_section(topB.top,"exclusions")
+        exclusions_content = get_protein_section(topB.top, "exclusions")
 
     except ValueError:
         # maybe hook this up to empty_sections if it gets accessible
@@ -157,63 +166,41 @@ def merge_top_prmgrowth(
         exclusions_content = exclusions["content"]
 
     for bond_key in breaking:
-        topB.pairs.pop(bond_key,None)
+        topB.pairs.pop(bond_key, None)
         exclusions_content.append(list(bond_key))
 
-    set_protein_section(topB.top,"exclusions",exclusions_content)
-
-
-    for bond_key in binding:
-        bondB = topB.bonds.get(bond_key)
-        bond_objB = get_bondobj(bond_key, bondB, topB)
-
-        bondB.funct = "3"  # Morse potential
-        bondB.c0 = deepcopy(bond_objB.c0)
-        bondB.c1 = "0.00"
-        bondB.c2 = deepcopy(hyperprms['morse_steepness'])
-        bondB.c3 = deepcopy(bond_objB.c0)
-        bondB.c4 = deepcopy(hyperprms['morse_well_depth'])
-        bondB.c5 = deepcopy(hyperprms['morse_steepness'])
+    set_protein_section(topB.top, "exclusions", exclusions_content)
 
     # # angles
-    angleA_keys = set(topA.angles.keys())
-    angleB_keys = set(topB.angles.keys())
+    same, breaking, binding = get_keys(topA.angles, topB.angles)
 
-    same = set.intersection(angleA_keys, angleB_keys)
-    breaking = angleA_keys - angleB_keys
-    binding = angleB_keys - angleA_keys
-
-    for angle_key in same:
-        angleA = topA.angles.get(angle_key)
-        angleB = topB.angles.get(angle_key)
-        if angleA != angleB:
-            # assuming no angle has explicit standard ff parameters
-            angle_objA = get_angleobj(angle_key, angleA, topA)
-            angle_objB = get_angleobj(angle_key, angleB, topB)
-            angleB.c2 = deepcopy(angle_objB.c0)
-            angleB.c3 = deepcopy(angle_objB.c1)
-            angleB.c0 = deepcopy(angle_objA.c0)
-            angleB.c1 = deepcopy(angle_objA.c1)
+    merge_same(same, topA, topB, Angle)
 
     for angle_key in breaking:
         topB.angles[angle_key] = Angle(*angle_key, "1")
         # topB.bind_angle(angle_key)      # this doesn't work for this use case
-        angleB = topB.angles.get(angle_key)
-        angle_objA = get_angleobj(angle_key, angleA, topA)
+        angle_objA = get_atomicobj(angle_key, Angle, topA)
 
-        angleB.c0 = deepcopy(angle_objA.c0)
-        angleB.c1 = deepcopy(angle_objA.c1)
-        angleB.c2 = deepcopy(angle_objA.c0)
-        angleB.c3 = "0.00"
+        topB.angles[(angle_key)] = Angle(
+            *angle_key,
+            funct="1",
+            c0=deepcopy(angle_objA.c0),
+            c1=deepcopy(angle_objA.c1),
+            c2=deepcopy(angle_objA.c0),
+            c3="0.00",
+        )
 
     for angle_key in binding:
-        angleB = topB.angles.get(angle_key)
-        angle_objB = get_angleobj(angle_key, angleB, topB)
+        angle_objB = get_atomicobj(angle_key, Angle, topB)
 
-        angleB.c0 = deepcopy(angle_objB.c0)
-        angleB.c1 = "0.00"
-        angleB.c2 = deepcopy(angle_objB.c0)
-        angleB.c3 = deepcopy(angle_objB.c1)
+        topB.angles[(angle_key)] = Angle(
+            *angle_key,
+            funct="1",
+            c0=deepcopy(angle_objB.c0),
+            c1="0.00",
+            c2=deepcopy(angle_objB.c0),
+            c3=deepcopy(angle_objB.c1),
+        )
 
     # # dihedrals
     # dihedraltypes does not work at the moment
@@ -241,16 +228,4 @@ def merge_top_prmgrowth(
     #     dihedralB.c4 = deepcopy(dihedral_objB.c4)
     #     dihedralB.c5 = deepcopy(dihedral_objB.c5)
 
-
     return topB
-
-
-
-# # pairs
-#             if name == "pairs":
-#                 if not csplit[:2] == list(CR[0].atom_idx):
-#                     clist.append(csplit)
-#         else:
-#             clist.append(csplit)
-#     content = clist
-#     return content
