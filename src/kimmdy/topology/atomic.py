@@ -164,7 +164,7 @@ class Bond:
 
     A class containing bond information as in the bonds section of the topology.
     From gromacs topology:
-    'ai', 'aj', 'funct', 'c0', 'c1', 'c2', 'c3
+    'ai', 'aj', 'funct', 'c0', 'c1', 'c2', 'c3', 'c4', 'c5'
     With ai < aj
     """
 
@@ -175,6 +175,8 @@ class Bond:
     c1: Optional[str] = None
     c2: Optional[str] = None
     c3: Optional[str] = None
+    c4: Optional[str] = None
+    c5: Optional[str] = None
 
     @classmethod
     def from_top_line(cls, l: list[str]):
@@ -186,6 +188,8 @@ class Bond:
             c1=field_or_none(l, 4),
             c2=field_or_none(l, 5),
             c3=field_or_none(l, 6),
+            c4=field_or_none(l, 6),
+            c5=field_or_none(l, 6),
         )
 
 

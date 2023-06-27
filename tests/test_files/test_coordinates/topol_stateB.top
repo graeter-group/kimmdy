@@ -57,7 +57,7 @@ Protein  3
 24       C        3        ALA      C        24       0.5973   12.01   
 25       O        3        ALA      O        25       -0.5679  16       ;        qtot     0       
 ; residue 4 ALA rtp ALA q 0.0
-26       N        4        ALA      N        26       -0.600  14.01   #patched
+26       N        4        ALA      N        26       -0.600  14.01   
 27       H1       4        ALA      HA       27       0.2719   1.008   
 28       CT       4        ALA      CA       28       0.0337   12.01   
 29       H1       4        ALA      HA       29       0.0823   1.008   
@@ -379,8 +379,6 @@ Protein  3
 28       36       34       35       4       
 34       38       36       37       4       
 
-[ exclusions ] 
-26       27
 
 
 ; Include Position restraint file

@@ -3,12 +3,13 @@ from pathlib import Path
 import numpy as np
 import logging
 from typing import Union
+from copy import deepcopy
 
 from kimmdy.parsing import read_top
 from kimmdy.tasks import TaskFiles
 from kimmdy.topology.topology import Topology
 from kimmdy.topology.atomic import Bond, Angle, Dihedral, Pair, Atomic
-from kimmdy.topology.utils import match_atomic_item_to_atomic_type
+from kimmdy.topology.utils import match_atomic_item_to_atomic_type, get_protein_section, set_protein_section
 
 
 ## copied from changemanager. should be put into utils
@@ -57,6 +58,19 @@ def get_bondobj(bond_key: list[str], bond: Bond, top: Topology):
         bondtype_key = [top.atoms[bond_key[0]].type, top.atoms[bond_key[1]].type]
         return match_atomic_item_to_atomic_type(bondtype_key, top.ff.bondtypes)
 
+def get_angleobj(angle_key: list[str], angle: Angle, top: Topology):
+    if is_parameterized(angle):
+        return angle
+    else:
+        angletype_key = [top.atoms[x].type for x in angle_key]
+        return match_atomic_item_to_atomic_type(angletype_key, top.ff.angletypes)
+
+def get_dihedralobj(dihedral_key: list[str], dihedral: Dihedral, top: Topology):
+    if is_parameterized(dihedral):
+        return dihedral
+    else:
+        dihedraltype_key = [top.atoms[x].type for x in dihedral_key]
+        return match_atomic_item_to_atomic_type(dihedraltype_key, top.ff.proper_dihedraltypes)
 
 ##
 
@@ -67,8 +81,9 @@ def merge_top_prmgrowth(
     # ffdir = (files.input["ff"],)
     # not the most robust way to get topA and topB
     hyperprms = {
-        "morse_well_depth": "400",
-        "morse_steepness": "10",
+        "morse_well_depth": "400.0",
+        "morse_steepness": "10.0",
+        'morse_dist_factor': 3
     }  # well_depth D [kJ/mol], steepness [nm-1]
     topADict = read_top(files.input["top"])
     topBDict = read_top(files.output["top"])
@@ -77,296 +92,160 @@ def merge_top_prmgrowth(
 
     # ToDo: what about implicit parameters?? especially dihedrals
     # think about how to bring focus_nr into this
-    for nr in topB.atoms.keys():
+    # for nr in topB.atoms.keys():
 
-        # atoms
-        atomA = topA.atoms[nr]
-        atomB = topB.atoms[nr]
-        if atomA != atomB:
-            if atomA.charge != atomB.charge:
-                atomB.chargeB = atomB.charge
-                atomB.charge = atomA.charge
-            else:
-                logging.debug(
-                    f"Atom {nr} changed during changemanager step but not the charges!"
-                )
+    #     # atoms
+    #     atomA = topA.atoms[nr]
+    #     atomB = topB.atoms[nr]
+    #     if atomA != atomB:
+    #         if atomA.charge != atomB.charge:
+    #             atomB.typeB = deepcopy(atomB.type)
+    #             atomB.type = deepcopy(atomA.type)
+    #             atomB.chargeB = deepcopy(atomB.charge)
+    #             atomB.charge = deepcopy(atomA.charge)
+    #             atomB.massB = deepcopy(atomB.mass)
+    #             atomB.mass = deepcopy(atomA.mass)
+    #         else:
+    #             logging.debug(
+    #                 f"Atom {nr} changed during changemanager step but not the charges!"
+    #             )
 
-        # # bonds
-        bondA_keys = set(topA.bonds.keys())
-        bondB_keys = set(topB.bonds.keys())
+    #ToDo: Generalize
 
-        same = set.intersection(bondA_keys, bondB_keys)
-        broken = bondA_keys - bondB_keys
-        bound = bondB_keys - bondA_keys
+    # # bonds
+    bondA_keys = set(topA.bonds.keys())
+    bondB_keys = set(topB.bonds.keys())
 
-        for bond_key in same:
-            bondA = topA.bonds.get(bond_key)
-            bondB = topB.bonds.get(bond_key)
-            if bondA != bondB:
-                # assuming no bond has explicit standard ff parameters
-                bond_objA = get_bondobj(bond_key, bondA, topA)
-                bond_objB = get_bondobj(bond_key, bondB, topB)
-                bondB.c2 = bond_objB.c0
-                bondB.c3 = bond_objB.c1
-                bondB.c0 = bond_objA.c0
-                bondB.c1 = bond_objA.c1
+    same = set.intersection(bondA_keys, bondB_keys)
+    breaking = bondA_keys - bondB_keys
+    binding = bondB_keys - bondA_keys
 
-        for bond_key in broken:
-            topB.bind_bond(bond_key)
-            bondB = topB.bonds.get(bond_key)
+    for bond_key in same:
+        bondA = topA.bonds.get(bond_key)
+        bondB = topB.bonds.get(bond_key)
+        if bondA != bondB:
+            # assuming no bond has explicit standard ff parameters
             bond_objA = get_bondobj(bond_key, bondA, topA)
-
-            bondB.funct = "3"  # Morse potential
-            bondB.c0 = bond_objA.c0
-            bondB.c1 = hyperprms["morse_well_depth"]
-            bondB.c2 = hyperprms["morse_steepness"]
-            bondB.c3 = "0.00"
-            # bondB.c4 = '0.00'
-            # bondB.c5 = '0.00'
-
-        for bond_key in bound:
-            bondB = topB.bonds.get(bond_key)
             bond_objB = get_bondobj(bond_key, bondB, topB)
+            bondB.c2 = deepcopy(bond_objB.c0)
+            bondB.c3 = deepcopy(bond_objB.c1)
+            bondB.c0 = deepcopy(bond_objA.c0)
+            bondB.c1 = deepcopy(bond_objA.c1)
 
-            bondB.funct = "3"  # Morse potential
-            bondB.c0 = "0.00"
-            bondB.c1 = "0.00"
-            bondB.c2 = "0.00"
-            bondB.c3 = bond_objA.c0
-            # bondB.c4 = hyperprms['morse_well_depth']
-            # bondB.c5 = hyperprms['morse_steepness']
-    return topB
+    for bond_key in breaking:
+        topB.bonds[bond_key] = Bond(*bond_key, "1")
+        # topB.bind_bond(bond_key)      # this doesn't work for this use case
+        bondB = topB.bonds.get(bond_key)
+        bond_objA = get_bondobj(bond_key, bondA, topA)
+
+        bondB.funct = "3"  # Morse potential
+        bondB.c0 = deepcopy(bond_objA.c0)
+        bondB.c1 = deepcopy(hyperprms["morse_well_depth"])
+        bondB.c2 = deepcopy(hyperprms["morse_steepness"])
+        bondB.c3 = f"{float(deepcopy(bond_objA.c0))*hyperprms['morse_dist_factor']:7.5f}"
+        bondB.c4 = "0.00"
+        bondB.c5 = deepcopy(hyperprms["morse_steepness"])
+
+    # deal with pairs and exclusions
+    try:
+        exclusions_content = get_protein_section(topB.top,"exclusions")
+
+    except ValueError:
+        # maybe hook this up to empty_sections if it gets accessible
+        exclusions = {"content": [], "else_content": [], "extra": [], "condition": None}
+        topB.top["moleculetype_0"]["subsections"]["exclusions"] = exclusions
+        exclusions_content = exclusions["content"]
+
+    for bond_key in breaking:
+        topB.pairs.pop(bond_key,None)
+        exclusions_content.append(list(bond_key))
+
+    set_protein_section(topB.top,"exclusions",exclusions_content)
+
+
+    for bond_key in binding:
+        bondB = topB.bonds.get(bond_key)
+        bond_objB = get_bondobj(bond_key, bondB, topB)
+
+        bondB.funct = "3"  # Morse potential
+        bondB.c0 = deepcopy(bond_objB.c0)
+        bondB.c1 = "0.00"
+        bondB.c2 = deepcopy(hyperprms['morse_steepness'])
+        bondB.c3 = deepcopy(bond_objB.c0)
+        bondB.c4 = deepcopy(hyperprms['morse_well_depth'])
+        bondB.c5 = deepcopy(hyperprms['morse_steepness'])
+
     # # angles
+    angleA_keys = set(topA.angles.keys())
+    angleB_keys = set(topB.angles.keys())
 
-    # angle_keys = topB._get_atom_angles(focus_nr[0]) + topB._get_atom_angles(
-    #     focus_nr[1]
-    # )
-    # for key in angle_keys:
-    #     angle = topB.angles.get(key)
-    #     if (
-    #         angle is None
-    #         or topB.ffpatches is None
-    #         or topB.ffpatches.anglepatches is None
-    #     ):
-    #         continue
-    #     id = [topB.atoms[i].radical_type() for i in key]
-    #     patch = match_id_to_patch(id, topB.ffpatches.anglepatches)
-    #     if patch is None:
-    #         continue
-    #     id_base = [topB.atoms[i].radical_type() for i in key]
-    #     topB._apply_param_patch(angle, id_base, patch, topB.ff.angletypes)
+    same = set.intersection(angleA_keys, angleB_keys)
+    breaking = angleA_keys - angleB_keys
+    binding = angleB_keys - angleA_keys
 
-    # # proper dihedrals and pairs
-    # dihedral_keys = self._get_atom_proper_dihedrals(
-    #     focus_nr[0]
-    # ) + self._get_atom_proper_dihedrals(focus_nr[1])
-    # for key in dihedral_keys:
-    #     dihedral = self.proper_dihedrals.get(key)
-    #     if (
-    #         dihedral is None
-    #         or self.ffpatches is None
-    #         or self.ffpatches.anglepatches is None
-    #     ):
-    #         continue
-    #     id = [self.atoms[i].radical_type() for i in key]
-    #     patch = match_id_to_patch(id, self.ffpatches.dihedralpatches)
-    #     if patch is None:
-    #         continue
-    #     id_base = [self.atoms[i].radical_type() for i in key]
-    #     self._apply_param_patch(
-    #         dihedral, id_base, patch, self.ff.proper_dihedraltypes
+    for angle_key in same:
+        angleA = topA.angles.get(angle_key)
+        angleB = topB.angles.get(angle_key)
+        if angleA != angleB:
+            # assuming no angle has explicit standard ff parameters
+            angle_objA = get_angleobj(angle_key, angleA, topA)
+            angle_objB = get_angleobj(angle_key, angleB, topB)
+            angleB.c2 = deepcopy(angle_objB.c0)
+            angleB.c3 = deepcopy(angle_objB.c1)
+            angleB.c0 = deepcopy(angle_objA.c0)
+            angleB.c1 = deepcopy(angle_objA.c1)
+
+    for angle_key in breaking:
+        topB.angles[angle_key] = Angle(*angle_key, "1")
+        # topB.bind_angle(angle_key)      # this doesn't work for this use case
+        angleB = topB.angles.get(angle_key)
+        angle_objA = get_angleobj(angle_key, angleA, topA)
+
+        angleB.c0 = deepcopy(angle_objA.c0)
+        angleB.c1 = deepcopy(angle_objA.c1)
+        angleB.c2 = deepcopy(angle_objA.c0)
+        angleB.c3 = "0.00"
+
+    for angle_key in binding:
+        angleB = topB.angles.get(angle_key)
+        angle_objB = get_angleobj(angle_key, angleB, topB)
+
+        angleB.c0 = deepcopy(angle_objB.c0)
+        angleB.c1 = "0.00"
+        angleB.c2 = deepcopy(angle_objB.c0)
+        angleB.c3 = deepcopy(angle_objB.c1)
+
+    # # dihedrals
+    # dihedraltypes does not work at the moment
+    # proper_dihedraltypes also has the periodicity as key
+    # maybe match_atomic_item_to_atomic_type could give us dihedraltypes with all periodicities
+    # compare entry-wise
+
+    # dihedralA_keys = set(topA.proper_dihedrals.keys())
+    # dihedralB_keys = set(topB.proper_dihedrals.keys())
+
+    # same = set.intersection(dihedralA_keys, dihedralB_keys)
+    # breaking = dihedralA_keys - dihedralB_keys
+    # binding = dihedralB_keys - dihedralA_keys
+    # for dihedral_key in same:
+    #     dihedralA = topA.proper_dihedrals.get(dihedral_key)
+    #     dihedralB = topB.proper_dihedrals.get(dihedral_key)
+    #     # if dihedralA != dihedralB:
+    #     #     # assuming no dihedral has explicit standard ff parameters
+    #     #     dihedral_objA = get_dihedralobj(dihedral_key, dihedralA, topA)
+    #     dihedral_objB = get_dihedralobj(dihedral_key, dihedralB, topB)
+    #     dihedralB.c0 = deepcopy(dihedral_objB.c0)
+    #     dihedralB.c1 = deepcopy(dihedral_objB.c1)
+    #     dihedralB.c2 = deepcopy(dihedral_objB.c2)
+    #     dihedralB.c3 = deepcopy(dihedral_objB.c3)
+    #     dihedralB.c4 = deepcopy(dihedral_objB.c4)
+    #     dihedralB.c5 = deepcopy(dihedral_objB.c5)
 
 
-# get toppath_A from runmanager iterating through self.filehist['n'] to find self.filehist['x']['_run_recipe']['output']['top']
-# def merge_section_slowgrowth(
-#     name: str,
-#     content: list[str],
-#     CR: ConversionRecipe,
-#     state_A_reduced: Topology,
-#     ffpath: Path,
-# ):
-#     # name is 'bonds' or 'angles'
-#     logging.debug("CR", CR)
-#     clist = []
-#     recipeatoms = [x for y in CR for x in y.atom_idx]
-#     recipeatoms = list(set(recipeatoms))
+    return topB
 
-#     # holds true for stateB as well except for the HAT atom
-#     atom_idx_at = {
-#         key: value
-#         for (key, value) in map(lambda a: [a[0], a[1]], state_A_reduced["atoms"])
-#     }
 
-#     inserted_angles = False
 
-#     ffprm = get_ff_sections(ffpath)
-#     for c in content:
-#         # TODO: make merge work
-#         csplit = c.split()
-#         if any([idx in csplit for idx in recipeatoms]):
-#             # move check up
-# # bonds
-#             if name == "bonds":
-#                 atoms = csplit[0:2]
-#                 logging.debug(atoms)
-#                 # atom_idx of bind (exists only in stateB)
-#                 if atoms == list(CR[1].atom_idx):
-#                     CR_bonds = {
-#                         "break": [
-#                             x
-#                             for x in state_A_reduced["bonds"]
-#                             if CR[0].atom_idx == tuple(x[:2])
-#                         ][0],
-#                         "bind": csplit,
-#                     }
-#                     for key, bond in CR_bonds.items():
-#                         if not is_parameterized(bond):
-#                             bond_at = [atom_idx_at[x] for x in bond[:2]]
-#                             CR_bonds[key] = parameterize_bonded_terms(
-#                                 ffprm, [bond_at], "bondtypes", [bond[:2]]
-#                             )
-#                             # unpack
-#                             CR_bonds[key] = CR_bonds[key][0]
-#                     CR_bonds["break"] = [
-#                         *CR_bonds["break"][:2],
-#                         "3",
-#                         CR_bonds["break"][3],
-#                         "400.0",
-#                         "10.0",
-#                         "0.00",
-#                         "0.00",
-#                         "0.00",
-#                     ]
-#                     CR_bonds["bind"] = [
-#                         *CR_bonds["bind"][:2],
-#                         "3",
-#                         "0.00",
-#                         "0.00",
-#                         "0.00",
-#                         CR_bonds["bind"][3],
-#                         "400.0",
-#                         "10.0",
-#                     ]
-#                     clist.append(CR_bonds["bind"])
-#                     clist.append(CR_bonds["break"])
-#                 # bonded terms that are both in stateA and stateB
-#                 else:
-#                     [bond_A] = [x for x in state_A_reduced["bonds"] if atoms == x[:2]]
-#                     bond_B = csplit
-#                     bonds = [bond_A, bond_B]
-#                     logging.debug(bonds)
-
-#                     for i, bond in enumerate(bonds):
-#                         if not is_parameterized(bond):
-#                             bond_at = [atom_idx_at[x] for x in bond[:2]]
-#                             [bonds[i]] = parameterize_bonded_terms(
-#                                 ffprm, [bond_at], "bondtypes", [bond[:2]]
-#                             )
-#                             logging.debug("!!", bond)
-#                     logging.debug(bonds)
-#                     if not bonds[0] == bonds[1]:
-#                         bond_slowgrowth = [*bonds[0][:5], *bonds[1][3:5]]
-#                     else:
-#                         bond_slowgrowth = bonds[1]
-#                     logging.debug(bond_slowgrowth)
-#                     clist.append(bond_slowgrowth)
-#                 # atom_A = [x if idxs[2:4] in x else None for x in state_A_reduced["bonds"]]
-#             # logging.debug(atoms,atom_A)
-
-# #angles
-#             if name == "angles":
-#                 atoms = csplit[:3]
-#                 if atoms[1] == CR[0].atom_idx[0]:
-#                     # potentially broken angle -> not in state B
-#                     if not inserted_angles:
-#                         # definitively broken
-#                         addterms = [
-#                             x
-#                             for x in state_A_reduced["angles"]
-#                             if all([y in x[:4] for y in CR[0].atom_idx])
-#                         ]
-#                         logging.debug(CR[0].atom_idx, addterms)
-#                         for i, term in enumerate(addterms):
-#                             if not is_parameterized(term):
-#                                 term_at = [atom_idx_at[x] for x in term[:3]]
-#                                 [term] = parameterize_bonded_terms(
-#                                     ffprm, [term_at], "angletypes", [term[:3]]
-#                                 )
-#                                 logging.debug(term)
-#                                 addterms[i] = [*term[:6], term[4], "0.00"]
-#                             else:
-#                                 addterms[i] = [*term[:6], term[4], "0.00"]
-#                         logging.debug(addterms)
-#                         clist.extend(addterms)
-#                         inserted_angles = True
-
-#                     # angle should exist in A
-#                     [angle_A] = [x for x in state_A_reduced["angles"] if atoms == x[:3]]
-#                     angle_B = csplit
-#                     if angle_A == angle_B:
-#                         clist.append(csplit)
-#                     elif is_parameterized(angle_A) != is_parameterized(angle_B):
-#                         if is_parameterized(angle_A):
-#                             angle_B_at = [atom_idx_at[x] for x in angle_B[:3]]
-#                             [angle_B] = parameterize_bonded_terms(
-#                                 ffprm, [angle_B_at], "angletypes", [angle_B[:3]]
-#                             )
-#                         elif is_parameterized(angle_B):
-#                             angle_A_at = [atom_idx_at[x] for x in angle_A[:3]]
-#                             [angle_A] = parameterize_bonded_terms(
-#                                 ffprm, [angle_A_at], "angletypes", [angle_A[:3]]
-#                             )
-#                         if angle_A == angle_B:
-#                             clist.append(csplit)
-#                         else:
-#                             angle_slowgrowth = [*angle_A[:6], *angle_B[4:6]]
-#                             clist.append(angle_slowgrowth)
-#                     else:
-#                         angle_slowgrowth = [*angle_A[:6], *angle_B[4:6]]
-#                         clist.append(angle_slowgrowth)
-
-#                 elif atoms[1] == CR[1].atom_idx[0]:
-#                     # this line, among others assumes a difference between atom_idx[0] and atom_idx[1] which is the case for HAT but not other reactions
-#                     angle_B = csplit
-#                     if CR[1].atom_idx[1] in atoms:
-#                         # doesn't exist in state_A
-#                         if not is_parameterized(angle_B):
-#                             angle_B_at = [atom_idx_at[x] for x in angle_B[:3]]
-#                             [angle_B] = parameterize_bonded_terms(
-#                                 ffprm, [angle_B_at], "angletypes", [angle_B[:3]]
-#                             )
-#                         angle_slowgrowth = [*angle_B[:5], "0.00", *angle_B[4:6]]
-#                         clist.append(angle_slowgrowth)
-#                     else:
-#                         # copied
-#                         # angle should exist in A
-#                         [angle_A] = [
-#                             x for x in state_A_reduced["angles"] if atoms == x[:3]
-#                         ]
-#                         angle_B = csplit
-#                         if angle_A == angle_B:
-#                             clist.append(csplit)
-#                         elif is_parameterized(angle_A) != is_parameterized(angle_B):
-#                             if is_parameterized(angle_A):
-#                                 angle_B_at = [atom_idx_at[x] for x in angle_B[:3]]
-#                                 [angle_B] = parameterize_bonded_terms(
-#                                     ffprm, [angle_B_at], "angletypes", [angle_B[:3]]
-#                                 )
-#                             elif is_parameterized(angle_B):
-#                                 angle_A_at = [atom_idx_at[x] for x in angle_A[:3]]
-#                                 [angle_A] = parameterize_bonded_terms(
-#                                     ffprm, [angle_A_at], "angletypes", [angle_A[:3]]
-#                                 )
-#                             if angle_A == angle_B:
-#                                 clist.append(csplit)
-#                             else:
-#                                 angle_slowgrowth = [*angle_A[:6], *angle_B[4:6]]
-#                                 clist.append(angle_slowgrowth)
-#                         else:
-#                             angle_slowgrowth = [*angle_A[:6], *angle_B[4:6]]
-#                             clist.append(angle_slowgrowth)
-#                 else:
-#                     clist.append(csplit)
 # # pairs
 #             if name == "pairs":
 #                 if not csplit[:2] == list(CR[0].atom_idx):

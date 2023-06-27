@@ -49,7 +49,9 @@ def test_merge_prm_top(generic_rmgr, coordinates_files):
     files.input["top"] = coordinates_files["topA_path"]
     files.output["top"] = coordinates_files["topB_path"]
     topmerge = merge_top_prmgrowth(files)
+    topdict = topmerge.to_dict()
     write_top(
-        topmerge.to_dict(), coordinates_files["topB_path"].parent / "top_merge.top"
+        topdict, coordinates_files["topB_path"].parent / "top_merge.top"
     )
+    # topFEP does not work as a reference, the file must be changed for this test to work
     assert topmerge == coordinates_files["topFEP"]
