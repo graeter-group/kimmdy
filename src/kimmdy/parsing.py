@@ -166,9 +166,10 @@ def read_top(path: Path) -> TopologyDict:
     )
 
     ls, ffdir = resolve_includes(path)
-    ls = filter(lambda l: not l.startswith("*"), ls)
     if ffdir is None:
-        raise ValueError(f"No forcefield directory (`*.ff/`) found in the includes of your .top file at: {path}")
+        logging.warning(f"No #include for a forcefield directory found in {path}.")
+
+    ls = filter(lambda l: not l.startswith("*"), ls)
     d = {}
     d['ffdir'] = ffdir
     d["define"] = {}
@@ -257,7 +258,7 @@ def read_top(path: Path) -> TopologyDict:
                 d[section][content_key].append(l.split())
             is_first_line_after_section_header = False
 
-    if len(d) <= 1:
+    if len(d) <= 2:
         raise ValueError(f"topology file {path} does not contain any sections")
 
     return d
@@ -293,12 +294,13 @@ def write_top(top: TopologyDict, outfile: Path):
 
     with open(outfile, "w") as f:
         define = top.get("define")
-        for name, value in define.items():
-            f.writelines("#define " + name + " ".join(value))
-            f.write("\n")
+        if define is not None:
+            for name, value in define.items():
+                f.writelines("#define " + name + " ".join(value))
+                f.write("\n")
 
         for name, section in top.items():
-            if name == "define":
+            if name in ["define", "ffdir"]:
                 continue
             f.write("\n")
             subsections = section.get("subsections")

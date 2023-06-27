@@ -186,7 +186,6 @@ def test_parser_fails_without_sections(ls, tmp_path):
     assert True
 
 
-# %%
 def test_parse_xml_ff(tmp_path):
     testdir = setup_testdir(tmp_path)
     ff_path = Path("amber99sb_trunc.xml")
