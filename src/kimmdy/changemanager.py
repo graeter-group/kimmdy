@@ -80,15 +80,13 @@ def modify_top(
     topology: Optional[Topology],
 ):
     files.output = {"top": files.outputdir / "topol_mod.top"}
-    oldtop = (files.input["top"],)
-    newtop = (files.output["top"],)
-    ffdir = (files.input["ff"],)
-    # why is this a tuple??
+    oldtop = files.input["top"]
+    newtop = files.output["top"]
 
     logging.info(f"Reading: {oldtop} and writing modified topology to {newtop}.")
     if topology is None:
         topologyDict = read_top(oldtop)
-        topology = Topology(topologyDict, ffdir, ffpatch)
+        topology = Topology(topologyDict, ffpatch)
 
     focus = set()
     for step in recipe_steps:

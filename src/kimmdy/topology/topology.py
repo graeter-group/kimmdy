@@ -31,7 +31,6 @@ class Topology:
     def __init__(
         self,
         top: TopologyDict,
-        ffdir: Optional[Path] = None,
         ffpatch: Optional[Path] = None,
     ) -> None:
         if top == {}:
@@ -48,7 +47,6 @@ class Topology:
             )
         self.protein = top[PROTEIN_SECTION]["subsections"]
         self.top = top
-        self.forcefield_directory = ffdir
         self.atoms: dict[str, Atom] = {}
         self.bonds: dict[tuple[str, str], Bond] = {}
         self.pairs: dict[tuple[str, str], Pair] = {}
@@ -61,7 +59,7 @@ class Topology:
         ] = {}
         self.radicals: dict[str, Atom] = {}
 
-        self.ff = FF(top, ffdir)
+        self.ff = FF(top)
 
         self.ffpatches = None
         if ffpatch:

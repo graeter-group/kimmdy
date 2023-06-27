@@ -12,7 +12,7 @@ from kimmdy.topology.utils import get_top_section
 class FF:
     """Conainer for parsed forcefield data."""
 
-    def __init__(self, top, ffdir: Optional[Path]):
+    def __init__(self, top):
         self.atomtypes: dict[str, AtomType] = {}
         self.bondtypes: dict[tuple[str, str], BondType] = {}
         self.angletypes: dict[tuple[str, str, str], AngleType] = {}
@@ -21,6 +21,8 @@ class FF:
         ] = {}
         self.improper_dihedraltypes: dict[tuple[str, str, str, str], DihedralType] = {}
         self.residuetypes: dict[str, ResidueType]
+
+        ffdir = top['ffdir']
 
         atomtypes = get_top_section(top, "atomtypes")
         if atomtypes is None:

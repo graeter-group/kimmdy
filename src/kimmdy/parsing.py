@@ -2,7 +2,7 @@ import os
 import re
 from pathlib import Path
 from collections.abc import Iterable
-from typing import Generator
+from typing import Generator, Optional
 import xml.etree.ElementTree as ET
 from itertools import takewhile
 import logging
@@ -86,16 +86,19 @@ def read_rtp(path: Path) -> dict:
         return d
 
 
-def resolve_includes(path: Path) -> list[str]:
-    """Resolve #include statements in a (top/itp) file."""
+def resolve_includes(path: Path) -> tuple[list[str], Optional[Path]]:
+    """Resolve #include statements in a (top/itp) file.
+    Returns a tuple with the list of lines and the Path to the ff directory.
+    """
     path = path.resolve()
     dir = path.parent
     fname = path.name
     cwd = Path.cwd()
     if not dir.exists() or not path.exists():
-        return []
+        return ([], None)
     os.chdir(dir)
     ls = []
+    ffdir = None
     with open(fname, "r") as f:
         for l in f:
             l = "".join(takewhile(is_not_comment, l)).strip()
@@ -103,9 +106,18 @@ def resolve_includes(path: Path) -> list[str]:
                 continue
             if l.startswith("#include"):
                 include_path = Path(l.split('"')[1])
-                ls_prime = resolve_includes(include_path)
+                # if the include path contains `ff` it is a file in a force field directory
+                # get the path to the force field directory
+                if '.ff' in l:
+                    # e.g. #include "amber99.ff/forcefield.itp"
+                    ffdir = include_path.parent
+                    # test if the path is in the cwd, otherwise search in gmx ff dir
+                    if not ffdir.exists():
+                        ffdir = GMX_BUILTIN_FF_DIR / ffdir
+                    ffdir = ffdir.resolve()
+                ls_prime, _ = resolve_includes(include_path)
                 if not ls_prime:
-                    ls_prime = resolve_includes(GMX_BUILTIN_FF_DIR / include_path)
+                    ls_prime, _ = resolve_includes(GMX_BUILTIN_FF_DIR / include_path)
                 if not ls_prime:
                     logging.warning(
                         f"top include {include_path} could not be resolved. Line was dropped."
@@ -115,7 +127,7 @@ def resolve_includes(path: Path) -> list[str]:
                 ls.append(l)
 
     os.chdir(cwd)
-    return ls
+    return (ls, ffdir)
 
 
 def read_top(path: Path) -> TopologyDict:
@@ -153,9 +165,10 @@ def read_top(path: Path) -> TopologyDict:
         "dihedral_restraints",
     )
 
-    ls = resolve_includes(path)
+    ls, ffdir = resolve_includes(path)
     ls = filter(lambda l: not l.startswith("*"), ls)
     d = {}
+    d['ffdir'] = ffdir
     d["define"] = {}
     parent_section_index = 0
     parent_section = None
