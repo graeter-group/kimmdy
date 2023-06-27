@@ -56,7 +56,8 @@ class FF:
                 self.improper_dihedraltypes[
                     (dihedraltype.i, dihedraltype.j, dihedraltype.k, dihedraltype.l)
                 ] = dihedraltype
-            elif dihedraltype.funct == "9":
+            else:
+                # e.g. proper dihedrals with dihedraltype.funct == "9":
                 if (
                     self.proper_dihedraltypes.get(
                         (
