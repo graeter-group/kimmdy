@@ -21,6 +21,10 @@ def coordinates_files():
     topA = Topology(stateA, ffdir)
     topB = Topology(stateB, ffdir)
     topFEP = Topology(fep, ffdir)
+    Path(filedir / "amber99sb-star-ildnp.ff").symlink_to(
+        ffdir,
+        target_is_directory=True,
+    )
 
     files = {
         "topA": topA,
@@ -36,13 +40,14 @@ def coordinates_files():
 def test_get_bondobj(coordinates_files):
     bond1_keys = ["17", "18"]
     bond1 = Bond.from_top_line("17       18       1   ".split())
-    bond1obj = get_atomicobj(bond1_keys, bond1, coordinates_files["topA"])
+    bond1obj = get_atomicobj(bond1_keys, Bond, coordinates_files["topA"])
 
     bond2_keys = ["17", "19"]
     bond2 = Bond.from_top_line("17       19       1        0.13600  282001.6".split())
-    bond2obj = get_atomicobj(bond2_keys, bond2, coordinates_files["topA"])
+    bond2obj = get_atomicobj(bond2_keys, Bond, coordinates_files["topA"])
     assert bond1obj.c0 == "0.10100" and bond1obj.c1 == "363171.2"
     assert bond2obj.c0 == "0.13600" and bond2obj.c1 == "282001.6"
+    (coordinates_files["topA_path"].parent / "amber99sb-star-ildnp.ff").rmdir()
 
 
 def test_merge_prm_top(generic_rmgr, coordinates_files):
