@@ -2,12 +2,20 @@ import pytest
 import shutil
 import os
 from pathlib import Path
+from dataclasses import dataclass, field
 
 from kimmdy.runmanager import RunManager
 from kimmdy.config import Config
 from kimmdy.tasks import TaskFiles
 
-# name is fixed for pytest to recognize the fixture without importing
+# name of this file is fixed for pytest to recognize the fixture without importing
+
+
+@dataclass
+class SlimFiles:
+    input: dict[str, Path] = field(default_factory=dict)
+    output: dict[str, Path] = field(default_factory=dict)
+    outputdir: Path = Path()
 
 
 @pytest.fixture

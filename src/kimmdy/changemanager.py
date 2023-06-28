@@ -48,10 +48,12 @@ def modify_coords(
             to_move.append(step.idx_to_move)
         elif isinstance(step, Break) or isinstance(step, Bind):
             run_prmgrowth = True
+            ts = u.trajectory[-1]
+            ttime = ts.time
 
     np.unique(to_move, return_counts=True)
 
-    for ts in u.trajectory:
+    for ts in u.trajectory[::-1]:
         if abs(ts.time - ttime) > 1e-5:  # 0.01 fs
             continue
         for step in recipe_steps:
@@ -67,7 +69,10 @@ def modify_coords(
         )
 
     if run_prmgrowth:
-        merge_top_prmgrowth()
+        top_merge = merge_top_prmgrowth(files)
+        top_merge_path = files.outputdir / "top_merge.top"
+        write_top(top_merge.to_dict(), top_merge_path)
+        files.input["top"] = top_merge_path
 
     u.atoms.write(trr_out)
     u.atoms.write(gro_out)

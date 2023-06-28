@@ -3,7 +3,8 @@ from kimmdy.tasks import TaskFiles
 from kimmdy.topology.topology import Topology, TopologyDict
 from kimmdy.topology.atomic import Bond
 from kimmdy.coordinates import merge_top_prmgrowth, get_atomicobj
-from dataclasses import dataclass, field
+from conftest import SlimFiles
+
 
 import pytest
 from pathlib import Path
@@ -14,13 +15,6 @@ def diff_within(val1: str, val2: str, diff: float = 1e-09):
         return abs(float(val1) - float(val2)) < diff
     except ValueError:
         return False
-
-
-@dataclass
-class Slim_Files:
-    input: dict[str, Path] = field(default_factory=dict)
-    output: dict[str, Path] = field(default_factory=dict)
-    outputdir: Path = Path()
 
 
 @pytest.fixture(scope="module")
@@ -70,7 +64,7 @@ def test_get_bondobj(coordinates_files):
 def test_merge_prm_top(coordinates_files):
     # needs a proper runmgr
     # files = TaskFiles(generic_rmgr)
-    files = Slim_Files()
+    files = SlimFiles()
     files.input["top"] = coordinates_files["topA_path"]
     files.output["top"] = coordinates_files["topB_path"]
     topmerge = merge_top_prmgrowth(files)
