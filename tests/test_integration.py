@@ -1,11 +1,15 @@
 from kimmdy.cmd import kimmdy_run
 
+import subprocess as sp
 import os
 import shutil
 import logging
 from pathlib import Path
+from kimmdy.topology.topology import Topology
 
 import pytest
+
+from kimmdy.parsing import read_top, write_top
 
 
 def setup_testdir(tmp_path, dirname) -> Path:
@@ -49,6 +53,14 @@ def test_integration_valid_input_files(tmp_path, caplog):
     assert set(["Finished", "running", "tasks,"]).issubset(
         set(caplog.records[-1].message.split(sep=" "))
     )
+
+def test_grompp_with_kimmdy_topology(tmp_path):
+    testdir = setup_testdir(tmp_path, "minimal_input_files")
+    raw_top = read_top(Path('minimal.top'))
+    top = Topology(raw_top)
+    top._update_dict()
+    write_top(top.top, Path('output.top'))
+    assert sp.run(['gmx', 'grompp', '-f', 'minimal.mdp', '-c', 'minimal.gro', '-p', 'output.top', '-o', 'minial.tpr'], check=True)
 
 
 def test_integration_hat_reaction(tmp_path, caplog):
