@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.1](https://github.com/hits-mbm-dev/kimmdy/compare/v3.0.0...v3.0.1) (2023-06-28)
+
+
+### Bug Fixes
+
+* dihedraltypes sections in ff/topology ([affa546](https://github.com/hits-mbm-dev/kimmdy/commit/affa5468ab537bcb37d7ae99ceded4fcf48cbc60))
+
 ## [3.0.0](https://github.com/hits-mbm-dev/kimmdy/compare/v2.4.0...v3.0.0) (2023-06-26)
 
 
