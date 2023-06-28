@@ -34,6 +34,7 @@ def assetsdir() -> Path:
 def raw_hexala_top_fix(filedir) -> TopologyDict:
     return read_top(filedir / "hexala.top")
 
+
 @pytest.fixture()
 def raw_urea_top_fix(filedir) -> TopologyDict:
     return read_top(filedir / "urea.top")
@@ -131,6 +132,7 @@ class TestFFPatches:
             c3=None,
         )
         assert item_type == expected
+
 
 class TestUrea:
     def test_urea(self, raw_urea_top_fix):

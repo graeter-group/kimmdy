@@ -224,7 +224,7 @@ class Topology:
         """Parse pairs from topology dictionary."""
         ls = get_protein_section(self.top, "pairs")
         if ls is None:
-            logging.warning('No pairs found in topology. Setting pairs to {}.')
+            logging.warning("No pairs found in topology. Setting pairs to {}.")
             return
         for l in ls:
             pair = Pair.from_top_line(l)
@@ -234,7 +234,7 @@ class Topology:
         """Parse angles from topology dictionary."""
         ls = get_protein_section(self.top, "angles")
         if ls is None:
-            logging.warning('No angles found in topology. Setting angles to {}.')
+            logging.warning("No angles found in topology. Setting angles to {}.")
             return
         for l in ls:
             angle = Angle.from_top_line(l)
@@ -244,7 +244,7 @@ class Topology:
         """Parse improper and proper dihedrals from topology dictionary."""
         ls = get_protein_section(self.top, "dihedrals")
         if ls is None:
-            logging.warning('No dihedrals found in topology. Setting dihedrals to {}.')
+            logging.warning("No dihedrals found in topology. Setting dihedrals to {}.")
             return
         for l in ls:
             dihedral = Dihedral.from_top_line(l)
