@@ -1,3 +1,9 @@
+"""
+Atomic datatypes for the topology such as Atom, Bond, Angle, Dihedral, etc.
+The order of the fields comes from the gromacs topology file format.
+See <https://manual.gromacs.org/current/reference-manual/topologies/topology-file-formats.html#topology-file>
+"""
+
 from dataclasses import dataclass, field
 from typing import Optional, Union
 from kimmdy.topology.utils import field_or_none
@@ -345,8 +351,12 @@ class Dihedral:
     Proper dihedrals have funct 9.
     Improper dihedrals have funct 4.
 
+    Note that proper dihedrals of type 9 can be defined multiple times, for different
+    periodicities. This is why would-be parameter c2 is called periodicity and part of
+    the `id`.
+
     From gromacs topology:
-    ';', 'ai', 'aj', 'ak', 'al', 'funct', 'c0', 'c1', 'c2', 'c3', 'c4', 'c5'
+    ';', 'ai', 'aj', 'ak', 'al', 'funct', 'c0', 'c1', 'periodicity', 'c3', 'c4', 'c5'
     For proper dihedrals (funct 9): aj < ak
     For improper dihedrals (funct 4): no guaranteed order
     """
@@ -358,13 +368,19 @@ class Dihedral:
     funct: str
     c0: Optional[str] = None
     c1: Optional[str] = None
-    c2: Optional[str] = None
+    periodicity: str = '2'
     c3: Optional[str] = None
     c4: Optional[str] = None
     c5: Optional[str] = None
 
     @classmethod
     def from_top_line(cls, l: list[str]):
+        funct = field_or_none(l, 4)
+        periodicity = field_or_none(l, 7)
+        if periodicity is None and funct == "9":
+            periodicity = "2"
+        if periodicity is None:
+            periodicity = "2"
         return cls(
             ai=l[0],
             aj=l[1],
@@ -373,7 +389,7 @@ class Dihedral:
             funct=l[4],
             c0=field_or_none(l, 5),
             c1=field_or_none(l, 6),
-            c2=field_or_none(l, 7),
+            periodicity=periodicity,
             c3=field_or_none(l, 8),
             c4=field_or_none(l, 9),
             c5=field_or_none(l, 10),

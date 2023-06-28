@@ -34,6 +34,13 @@ def assetsdir() -> Path:
 def raw_hexala_top_fix(filedir) -> TopologyDict:
     return read_top(filedir / "hexala.top")
 
+@pytest.fixture()
+def raw_top_a_fix(filedir) -> TopologyDict:
+    return read_top(filedir / "topol_stateA.top")
+
+@pytest.fixture()
+def raw_top_b_fix(filedir) -> TopologyDict:
+    return read_top(filedir / "topol_stateB.top")
 
 @pytest.fixture()
 def raw_urea_top_fix(filedir) -> TopologyDict:
@@ -145,6 +152,14 @@ class TestUrea:
         assert len(top.proper_dihedrals) == 8
         assert len(top.improper_dihedrals) == 3
 
+class TestTopAB:
+    def test_top_ab(self, raw_top_a_fix, raw_top_b_fix):
+        topA = Topology(raw_top_a_fix)
+        topB = Topology(raw_top_b_fix)
+        assert topA
+        assert topB
+        assert len(topA.atoms) == 41
+        assert len(topA.proper_dihedrals) == 88
 
 class TestTopology:
     def test_break_bind_bond_hexala(self, hexala_top_fix):
@@ -154,8 +169,6 @@ class TestTopology:
         bondindex = 24
         bond_key = list(top.bonds.keys())[bondindex]
         logging.info(f"bond_key: {bond_key}")
-        # 25, 27
-        # C, N
         top.break_bond(bond_key)
         top.bind_bond(bond_key)
         assert top.bonds == og_top.bonds

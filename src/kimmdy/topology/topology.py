@@ -52,7 +52,7 @@ class Topology:
         self.bonds: dict[tuple[str, str], Bond] = {}
         self.pairs: dict[tuple[str, str], Pair] = {}
         self.angles: dict[tuple[str, str, str], Angle] = {}
-        self.proper_dihedrals: dict[tuple[str, str, str, str], Dihedral] = {}
+        self.proper_dihedrals: dict[tuple[str, str, str, str, str], Dihedral] = {}
         self.improper_dihedrals: dict[tuple[str, str, str, str], Dihedral] = {}
         self.position_restraints: dict[str, PositionRestraint] = {}
         self.dihedral_restraints: dict[
@@ -151,7 +151,6 @@ class Topology:
         update_map = {
             atom_nr: str(i + 1) for i, atom_nr in enumerate(self.atoms.keys())
         }
-        print(update_map)
 
         new_atoms = {}
         for atom in self.atoms.values():
@@ -188,6 +187,7 @@ class Topology:
                     update_map[dihedral.aj],
                     update_map[dihedral.ak],
                     update_map[dihedral.al],
+                    dihedral.periodicity,
                 )
             ] = dihedral
         self.dihedrals = new_dihedrals
@@ -254,7 +254,7 @@ class Topology:
                 ] = dihedral
             else:
                 self.proper_dihedrals[
-                    (dihedral.ai, dihedral.aj, dihedral.ak, dihedral.al)
+                    (dihedral.ai, dihedral.aj, dihedral.ak, dihedral.al, dihedral.periodicity)
                 ] = dihedral
 
     def _parse_restraints(self):
@@ -465,7 +465,9 @@ class Topology:
             atompair_nrs[0]
         ) + self._get_atom_proper_dihedrals(atompair_nrs[1])
         for key in dihedral_keys:
-            if all([x in key for x in atompair_nrs]):
+            # don't use periodicity in key for checking atompair_nrs
+            atom_ids_in_key = (key[0], key[1], key[2], key[3])
+            if all([x in atom_ids_in_key for x in atompair_nrs]):
                 # dihedral contained a now deleted bond because
                 # it had both atoms of the broken bond
                 self.proper_dihedrals.pop(key, None)
@@ -658,7 +660,7 @@ class Topology:
 
     def _get_atom_proper_dihedrals(
         self, atom_nr: str
-    ) -> list[tuple[str, str, str, str]]:
+    ) -> list[tuple[str, str, str, str, str]]:
         """
         each atom has a list of atoms it is bound to.
         get a list of dihedrals that one atom is involved in
@@ -670,7 +672,7 @@ class Topology:
 
     def _get_center_atom_dihedrals(
         self, atom_nr: str
-    ) -> list[tuple[str, str, str, str]]:
+    ) -> list[tuple[str, str, str, str, str]]:
         dihedrals = []
         aj = atom_nr
         partners = self.atoms[aj].bound_to_nrs
