@@ -23,6 +23,7 @@ def is_parameterized(entry: Atomic):
 
 def get_atomicobj(key: list[str], type: AtomicType, top: Topology):
     # ugly
+    key = tuple(key)
     type_key = [top.atoms[x].type for x in key]
     if type == Bond:
         instance = top.bonds.get(key)
@@ -102,23 +103,22 @@ def merge_top_prmgrowth(
     # think about how to bring focus_nr into this
     # for nr in topB.atoms.keys():
 
-    #     # atoms
-    #     atomA = topA.atoms[nr]
-    #     atomB = topB.atoms[nr]
-    #     if atomA != atomB:
-    #         if atomA.charge != atomB.charge:
-    #             atomB.typeB = deepcopy(atomB.type)
-    #             atomB.type = deepcopy(atomA.type)
-    #             atomB.chargeB = deepcopy(atomB.charge)
-    #             atomB.charge = deepcopy(atomA.charge)
-    #             atomB.massB = deepcopy(atomB.mass)
-    #             atomB.mass = deepcopy(atomA.mass)
-    #         else:
-    #             logging.debug(
-    #                 f"Atom {nr} changed during changemanager step but not the charges!"
-    #             )
-
-    # ToDo: Generalize
+    # atoms
+    for nr in topA.atoms.keys():
+        atomA = topA.atoms[nr]
+        atomB = topB.atoms[nr]
+        if atomA != atomB:
+            if atomA.charge != atomB.charge:
+                atomB.typeB = deepcopy(atomB.type)
+                atomB.type = deepcopy(atomA.type)
+                atomB.chargeB = deepcopy(atomB.charge)
+                atomB.charge = deepcopy(atomA.charge)
+                atomB.massB = deepcopy(atomB.mass)
+                atomB.mass = deepcopy(atomA.mass)
+            else:
+                logging.debug(
+                    f"Atom {nr} changed during changemanager step but not the charges!"
+                )
 
     # # bonds
 
@@ -208,19 +208,15 @@ def merge_top_prmgrowth(
     # maybe match_atomic_item_to_atomic_type could give us dihedraltypes with all periodicities
     # compare entry-wise
 
-    # dihedralA_keys = set(topA.proper_dihedrals.keys())
-    # dihedralB_keys = set(topB.proper_dihedrals.keys())
+    # same, breaking, binding = get_keys(topA.dihedrals, topB.dihedrals)
 
-    # same = set.intersection(dihedralA_keys, dihedralB_keys)
-    # breaking = dihedralA_keys - dihedralB_keys
-    # binding = dihedralB_keys - dihedralA_keys
     # for dihedral_key in same:
     #     dihedralA = topA.proper_dihedrals.get(dihedral_key)
     #     dihedralB = topB.proper_dihedrals.get(dihedral_key)
-    #     # if dihedralA != dihedralB:
-    #     #     # assuming no dihedral has explicit standard ff parameters
-    #     #     dihedral_objA = get_dihedralobj(dihedral_key, dihedralA, topA)
-    #     dihedral_objB = get_dihedralobj(dihedral_key, dihedralB, topB)
+    #     if dihedralA != dihedralB:
+    #         # assuming no dihedral has explicit standard ff parameters
+    #         dihedral_objA = get_atomicobj(dihedral_key, dihedralA, topA)
+    #     dihedral_objB = get_atomicobj(dihedral_key, Dihedral, topB)
     #     dihedralB.c0 = deepcopy(dihedral_objB.c0)
     #     dihedralB.c1 = deepcopy(dihedral_objB.c1)
     #     dihedralB.c2 = deepcopy(dihedral_objB.c2)
