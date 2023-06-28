@@ -4,6 +4,7 @@ from kimmdy.constants import ATOMTYPE_BONDORDER_FLAT
 from kimmdy.parsing import TopologyDict
 from kimmdy.topology.atomic import *
 from kimmdy.topology.utils import (
+    get_protein_section,
     match_id_to_patch,
     attributes_to_list,
     match_atomic_item_to_atomic_type,
@@ -203,35 +204,48 @@ class Topology:
 
     def _parse_atoms(self):
         """Parse atoms from topology dictionary."""
-        ls = self.protein["atoms"]["content"]
+        ls = get_protein_section(self.top, "atoms")
+        if ls is None:
+            raise ValueError("No atoms found in topology.")
         for l in ls:
             atom = Atom.from_top_line(l)
             self.atoms[atom.nr] = atom
 
     def _parse_bonds(self):
         """Parse bond from topology dictionary."""
-        ls = self.protein["bonds"]["content"]
+        ls = get_protein_section(self.top, "bonds")
+        if ls is None:
+            raise ValueError("No bonds found in topology.")
         for l in ls:
             bond = Bond.from_top_line(l)
             self.bonds[(bond.ai, bond.aj)] = bond
 
     def _parse_pairs(self):
         """Parse pairs from topology dictionary."""
-        ls = self.protein["pairs"]["content"]
+        ls = get_protein_section(self.top, "pairs")
+        if ls is None:
+            logging.warning('No pairs found in topology. Setting pairs to {}.')
+            return
         for l in ls:
             pair = Pair.from_top_line(l)
             self.pairs[(pair.ai, pair.aj)] = pair
 
     def _parse_angles(self):
         """Parse angles from topology dictionary."""
-        ls = self.protein["angles"]["content"]
+        ls = get_protein_section(self.top, "angles")
+        if ls is None:
+            logging.warning('No angles found in topology. Setting angles to {}.')
+            return
         for l in ls:
             angle = Angle.from_top_line(l)
             self.angles[(angle.ai, angle.aj, angle.ak)] = angle
 
     def _parse_dihedrals(self):
         """Parse improper and proper dihedrals from topology dictionary."""
-        ls = self.protein["dihedrals"]["content"]
+        ls = get_protein_section(self.top, "dihedrals")
+        if ls is None:
+            logging.warning('No dihedrals found in topology. Setting dihedrals to {}.')
+            return
         for l in ls:
             dihedral = Dihedral.from_top_line(l)
             if dihedral.funct == "4":

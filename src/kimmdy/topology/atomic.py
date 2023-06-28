@@ -180,10 +180,13 @@ class Bond:
 
     @classmethod
     def from_top_line(cls, l: list[str]):
+        funct = field_or_none(l, 2)
+        if funct is None:
+            funct = "1"
         return cls(
             ai=l[0],
             aj=l[1],
-            funct=l[2],
+            funct=funct,
             c0=field_or_none(l, 3),
             c1=field_or_none(l, 4),
             c2=field_or_none(l, 5),
@@ -215,12 +218,15 @@ class BondType:
 
     @classmethod
     def from_top_line(cls, l: list[str]):
+        funct = field_or_none(l, 2)
+        if funct is None:
+            funct = "1"
         return cls(
             i=l[0],
             j=l[1],
             id="---".join(l[:2]),
             id_sym="---".join(reversed(l[:2])),
-            funct=l[2],
+            funct=funct,
             c0=field_or_none(l, 3),
             c1=field_or_none(l, 4),
             c2=field_or_none(l, 5),

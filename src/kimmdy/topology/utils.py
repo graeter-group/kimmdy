@@ -5,6 +5,8 @@ from xml.etree.ElementTree import Element
 import re
 from typing import TYPE_CHECKING
 
+from dill.logger import logging
+
 if TYPE_CHECKING:
     from kimmdy.topology.ff import Patch, Patches
     from kimmdy.topology.atomic import AtomicType, AtomicTypes
@@ -21,13 +23,15 @@ def get_top_section(
         parent_name = f"moleculetype_{moleculetype}"
         parent_section = top.get(parent_name)
         if parent_section is None:
-            raise ValueError(f"topology does not contain moleculetype {moleculetype}")
+            logging.warning(f"topology does not contain moleculetype {moleculetype}")
+            return None
         section = parent_section["subsections"].get(name)
     else:
         section = top.get(name)
 
     if section is None:
-        raise ValueError(f"topology does not contain section {name}")
+        logging.warning(f"topology does not contain section {name}")
+        return None
     condition = section.get("condition")
     if condition is not None:
         condition_type = condition.get("type")

@@ -32,8 +32,11 @@ def assetsdir() -> Path:
 
 @pytest.fixture()
 def raw_hexala_top_fix(filedir) -> TopologyDict:
-    hexala_top = read_top(filedir / "hexala.top")
-    return hexala_top
+    return read_top(filedir / "hexala.top")
+
+@pytest.fixture()
+def raw_urea_top_fix(filedir) -> TopologyDict:
+    return read_top(filedir / "urea.top")
 
 
 @pytest.fixture()
@@ -128,6 +131,17 @@ class TestFFPatches:
             c3=None,
         )
         assert item_type == expected
+
+class TestUrea:
+    def test_urea(self, raw_urea_top_fix):
+        raw = deepcopy(raw_urea_top_fix)
+        top = Topology(raw)
+        assert len(top.atoms) == 8
+        assert len(top.bonds) == 7
+        assert len(top.pairs) == 0
+        assert len(top.angles) == 0
+        assert len(top.proper_dihedrals) == 8
+        assert len(top.improper_dihedrals) == 3
 
 
 class TestTopology:
