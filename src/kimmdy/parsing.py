@@ -2,7 +2,7 @@ import os
 import re
 from pathlib import Path
 from collections.abc import Iterable
-from typing import Generator
+from typing import Generator, Optional
 import xml.etree.ElementTree as ET
 from itertools import takewhile
 import logging
@@ -10,6 +10,7 @@ import logging
 from kimmdy.utils import get_gmx_dir
 
 TopologyDict = dict
+GMX_BUILTIN_FF_DIR = get_gmx_dir() / "top"
 
 
 def is_not_comment(c: str) -> bool:
@@ -85,37 +86,48 @@ def read_rtp(path: Path) -> dict:
         return d
 
 
-def resolve_includes(path: Path) -> list[str]:
-    """Resolve #include statements in a (top/itp) file."""
-    gmx_builtin_ffs = get_gmx_dir() / "top"
+def resolve_includes(path: Path) -> tuple[list[str], Optional[Path]]:
+    """Resolve #include statements in a (top/itp) file.
+    Returns a tuple with the list of lines and the Path to the ff directory.
+    """
+    path = path.resolve()
     dir = path.parent
     fname = path.name
     cwd = Path.cwd()
+    if not dir.exists() or not path.exists():
+        return ([], None)
     os.chdir(dir)
-    ls_prime = []
+    ls = []
+    ffdir = None
     with open(fname, "r") as f:
         for l in f:
             l = "".join(takewhile(is_not_comment, l)).strip()
             if not l:
                 continue
             if l.startswith("#include"):
-                path = Path(l.split('"')[1])
-                try:
-                    ls_prime.extend(resolve_includes(path))
-                except Exception as _:
-                    try:
-                        ls_prime.extend(resolve_includes(gmx_builtin_ffs / path))
-                    except Exception as _:
-                        # drop line if path can't be resolved
-                        logging.warning(
-                            f"top include {path} could not be resolved. Line was dropped."
-                        )
-                        continue
+                include_path = Path(l.split('"')[1])
+                # if the include path contains `ff` it is a file in a force field directory
+                # get the path to the force field directory
+                if ".ff" in l:
+                    # e.g. #include "amber99.ff/forcefield.itp"
+                    ffdir = include_path.parent
+                    # test if the path is in the cwd, otherwise search in gmx ff dir
+                    if not ffdir.exists():
+                        ffdir = GMX_BUILTIN_FF_DIR / ffdir
+                    ffdir = ffdir.resolve()
+                ls_prime, _ = resolve_includes(include_path)
+                if not ls_prime:
+                    ls_prime, _ = resolve_includes(GMX_BUILTIN_FF_DIR / include_path)
+                if not ls_prime:
+                    logging.warning(
+                        f"top include {include_path} could not be resolved. Line was dropped."
+                    )
+                ls.extend(ls_prime)
             else:
-                ls_prime.append(l)
+                ls.append(l)
 
     os.chdir(cwd)
-    return ls_prime
+    return (ls, ffdir)
 
 
 def read_top(path: Path) -> TopologyDict:
@@ -153,9 +165,13 @@ def read_top(path: Path) -> TopologyDict:
         "dihedral_restraints",
     )
 
-    ls = resolve_includes(path)
+    ls, ffdir = resolve_includes(path)
+    if ffdir is None:
+        logging.warning(f"No #include for a forcefield directory found in {path}.")
+
     ls = filter(lambda l: not l.startswith("*"), ls)
     d = {}
+    d["ffdir"] = ffdir
     d["define"] = {}
     parent_section_index = 0
     parent_section = None
@@ -242,7 +258,7 @@ def read_top(path: Path) -> TopologyDict:
                 d[section][content_key].append(l.split())
             is_first_line_after_section_header = False
 
-    if len(d) <= 1:
+    if len(d) <= 2:
         raise ValueError(f"topology file {path} does not contain any sections")
 
     return d
@@ -278,12 +294,13 @@ def write_top(top: TopologyDict, outfile: Path):
 
     with open(outfile, "w") as f:
         define = top.get("define")
-        for name, value in define.items():
-            f.writelines("#define " + name + " ".join(value))
-            f.write("\n")
+        if define is not None:
+            for name, value in define.items():
+                f.writelines("#define " + name + " ".join(value))
+                f.write("\n")
 
         for name, section in top.items():
-            if name == "define":
+            if name in ["define", "ffdir"]:
                 continue
             f.write("\n")
             subsections = section.get("subsections")

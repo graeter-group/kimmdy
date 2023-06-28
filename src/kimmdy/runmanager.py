@@ -5,11 +5,10 @@ import dill
 import queue
 from enum import Enum, auto
 from typing import Callable
-from kimmdy import config
 from kimmdy.config import Config
 from kimmdy.utils import increment_logfile
 from kimmdy.parsing import read_top
-from kimmdy.reaction import ReactionPlugin, RecipeCollection, Recipe
+from kimmdy.reaction import ReactionPlugin, RecipeCollection
 import kimmdy.changemanager as changer
 from kimmdy.tasks import Task, TaskFiles, TaskMapping
 from kimmdy.utils import run_shell_cmd, run_gmx
@@ -78,12 +77,10 @@ class RunManager:
             _ = self.config.ffpatch
         except AttributeError:
             self.config.ffpatch = None
-        self.top = Topology(
-            read_top(self.config.top), self.config.ff, self.config.ffpatch
-        )
+        self.top = Topology(read_top(self.config.top), self.config.ffpatch)
 
         self.filehist: list[dict[str, TaskFiles]] = [
-            {"setup": TaskFiles(runmng=self, input=self.latest_files)}
+            {"setup": TaskFiles(self.get_latest)}
         ]
 
         self.task_mapping: TaskMapping = {
@@ -211,7 +208,7 @@ class RunManager:
 
     def _create_task_directory(self, postfix: str) -> TaskFiles:
         """Creates TaskFiles object, output directory and symlinks ff."""
-        files = TaskFiles(self)
+        files = TaskFiles(self.get_latest)
         files.outputdir = self.config.out / f"{self.iteration}_{postfix}"
         files.outputdir.mkdir(exist_ok=self.from_checkpoint)
         if not (files.outputdir / self.config.ff.name).exists():
@@ -220,7 +217,7 @@ class RunManager:
 
     def _dummy(self):
         logging.info("Start dummy task")
-        files = TaskFiles(self)
+        files = TaskFiles(self.get_latest)
         files.outputdir = self.config.out / f"{self.iteration}_dummy"
         files.outputdir.mkdir()
         run_shell_cmd("pwd>./pwd.pwd", files.outputdir)

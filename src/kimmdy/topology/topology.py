@@ -31,7 +31,6 @@ class Topology:
     def __init__(
         self,
         top: TopologyDict,
-        ffdir: Optional[Path] = None,
         ffpatch: Optional[Path] = None,
     ) -> None:
         if top == {}:
@@ -43,11 +42,11 @@ class Topology:
             raise ValueError(
                 "The topology does not contain a protein section."
                 "Please make sure the topology contains a section"
-                f"called [ moleculetype ]. The first of which is assumed to be the protein of interest."
+                "called [ moleculetype ]."
+                "The first of which is assumed to be the protein of interest."
             )
         self.protein = top[PROTEIN_SECTION]["subsections"]
         self.top = top
-        self.forcefield_directory = ffdir
         self.atoms: dict[str, Atom] = {}
         self.bonds: dict[tuple[str, str], Bond] = {}
         self.pairs: dict[tuple[str, str], Pair] = {}
@@ -60,7 +59,7 @@ class Topology:
         ] = {}
         self.radicals: dict[str, Atom] = {}
 
-        self.ff = FF(top, ffdir)
+        self.ff = FF(top)
 
         self.ffpatches = None
         if ffpatch:
@@ -109,6 +108,19 @@ class Topology:
             self.top,
             "bondtypes",
             [attributes_to_list(x) for x in self.ff.bondtypes.values()],
+        )
+
+        set_top_section(
+            self.top,
+            "angletypes",
+            [attributes_to_list(x) for x in self.ff.angletypes.values()],
+        )
+
+        set_top_section(
+            self.top,
+            "dihedraltypes",
+            [attributes_to_list(x) for x in self.ff.improper_dihedraltypes.values()]
+            + [attributes_to_list(x) for x in self.ff.proper_dihedraltypes.values()],
         )
 
     def to_dict(self) -> TopologyDict:
