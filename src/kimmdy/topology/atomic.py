@@ -345,22 +345,19 @@ class AngleType:
 
 @dataclass(order=True)
 class Dihedral:
-    """Information about one dihedral
+    """Information about one proper or improper dihedral
 
     A class containing bond information as in the dihedrals section of the topology.
-    Proper dihedrals have funct 9.
     Improper dihedrals have funct 4.
+    Proper dihedrals have funct != 4. Mostly funct 9.
 
     Note that proper dihedrals of type 9 can be defined multiple times, for different
-    periodicities. This is why would-be parameter c2 is called periodicity and part of
-    the `id`.
+    periodicities. This is why would-be parameter c2 is called periodicity.
 
     From gromacs topology:
     ';', 'ai', 'aj', 'ak', 'al', 'funct', 'c0', 'c1', 'periodicity', 'c3', 'c4', 'c5'
     For proper dihedrals (funct 9): aj < ak
-    For improper dihedrals (funct 4): no guaranteed order
     """
-
     ai: str
     aj: str
     ak: str
@@ -368,7 +365,7 @@ class Dihedral:
     funct: str
     c0: Optional[str] = None
     c1: Optional[str] = None
-    periodicity: str = '2'
+    periodicity: str = ""
     c3: Optional[str] = None
     c4: Optional[str] = None
     c5: Optional[str] = None
@@ -378,9 +375,7 @@ class Dihedral:
         funct = field_or_none(l, 4)
         periodicity = field_or_none(l, 7)
         if periodicity is None and funct == "9":
-            periodicity = "2"
-        if periodicity is None:
-            periodicity = "2"
+            periodicity = ''
         return cls(
             ai=l[0],
             aj=l[1],
@@ -394,6 +389,21 @@ class Dihedral:
             c4=field_or_none(l, 9),
             c5=field_or_none(l, 10),
         )
+
+@dataclass
+class MultipleDihedrals:
+    """
+    Multiple ``Dihedral``s with the same ai, aj, ak, al
+    but different periodicities.
+    funct should always be "9" when the length of dihedrals is > 1.
+    The key of the dict is the periodicity (c2).
+    """
+    ai: str
+    aj: str
+    ak: str
+    al: str
+    funct: str
+    dihedrals: dict[str, Dihedral]
 
 
 @dataclass(order=True)
@@ -448,6 +458,20 @@ class DihedralType:
             c5=field_or_none(l, 10),
         )
 
+@dataclass(order=True)
+class MultipleDihedralTypes:
+    """
+    Multiple ``DihedralTypes``s with the same ai, aj, ak, al
+    but different periodicities.
+    funct should always be "9" when the length of dihedrals is > 1.
+    The key of the dict is the periodicity (c2).
+    """
+    ai: str
+    aj: str
+    ak: str
+    al: str
+    funct: str
+    dihedral_types: dict[str, DihedralType]
 
 @dataclass(order=True)
 class ResidueAtomSpec:

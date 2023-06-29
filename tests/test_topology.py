@@ -159,7 +159,11 @@ class TestTopAB:
         assert topA
         assert topB
         assert len(topA.atoms) == 41
-        assert len(topA.proper_dihedrals) == 88
+        assert len(topA.proper_dihedrals) == 84
+        proper_dihedrals_counts = 0
+        for dihedral in topA.proper_dihedrals.values():
+            proper_dihedrals_counts += len(dihedral.dihedrals) 
+        assert proper_dihedrals_counts == 88
 
 class TestTopology:
     def test_break_bind_bond_hexala(self, hexala_top_fix):
@@ -369,6 +373,7 @@ class TestHexalaTopology:
         top = Topology(raw_copy)
         top._update_dict()
         assert top.top["dihedraltypes"]["content"] == raw["dihedraltypes"]["content"]
+        assert top.top["moleculetype_0"]["subsections"]["dihedrals"]["content"] == raw[ "moleculetype_0" ]["subsections"]["dihedrals"]["content"]
         assert top.top == raw
 
     def test_top_properties(self, hexala_top_fix):
