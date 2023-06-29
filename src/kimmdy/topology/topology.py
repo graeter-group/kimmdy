@@ -75,6 +75,11 @@ class Topology:
         self._initialize_graph()
         self._test_for_radicals()
 
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Topology):
+            return NotImplemented
+        return self.to_dict() == other.to_dict()
+
     def _update_dict(self):
         set_protein_section(
             self.top, "atoms", [attributes_to_list(x) for x in self.atoms.values()]
@@ -84,24 +89,29 @@ class Topology:
             self.top, "bonds", [attributes_to_list(x) for x in self.bonds.values()]
         )
 
-        set_protein_section(
-            self.top, "pairs", [attributes_to_list(x) for x in self.pairs.values()]
-        )
+        if len(self.pairs) > 0:
+            set_protein_section(
+                self.top, "pairs", [attributes_to_list(x) for x in self.pairs.values()]
+            )
 
-        set_protein_section(
-            self.top, "angles", [attributes_to_list(x) for x in self.angles.values()]
-        )
+        if len(self.angles) > 0:
+            set_protein_section(
+                self.top,
+                "angles",
+                [attributes_to_list(x) for x in self.angles.values()],
+            )
 
-        set_protein_section(
-            self.top,
-            "dihedrals",
-            [
-                attributes_to_list(x)
-                for dihedrals in self.proper_dihedrals.values()
-                for x in dihedrals.dihedrals.values()
-            ]
-            + [attributes_to_list(x) for x in self.improper_dihedrals.values()],
-        )
+        if len(self.proper_dihedrals) > 0:
+            set_protein_section(
+                self.top,
+                "dihedrals",
+                [
+                    attributes_to_list(x)
+                    for dihedrals in self.proper_dihedrals.values()
+                    for x in dihedrals.dihedrals.values()
+                ]
+                + [attributes_to_list(x) for x in self.improper_dihedrals.values()],
+            )
 
         set_top_section(
             self.top,
@@ -152,6 +162,7 @@ class Topology:
         Starts at index 1.
         This also updates the numbers for bonds, angles, dihedrals and pairs.
         """
+        # TODO: check angles, dihedrals, pairs
         update_map = {
             atom_nr: str(i + 1) for i, atom_nr in enumerate(self.atoms.keys())
         }
@@ -159,35 +170,66 @@ class Topology:
         new_atoms = {}
         for atom in self.atoms.values():
             atom.nr = update_map[atom.nr]
+            bound_to = []
+            for nr in atom.bound_to_nrs:
+                new_nr = update_map.get(nr)
+                if new_nr is not None:
+                    bound_to.append(new_nr)
+            atom.bound_to_nrs = bound_to
             new_atoms[atom.nr] = atom
         self.atoms = new_atoms
 
         new_bonds = {}
         for bond in self.bonds.values():
-            bond.ai = update_map[bond.ai]
-            bond.aj = update_map[bond.aj]
-            new_bonds[(update_map[bond.ai], update_map[bond.aj])] = bond
+            ai = update_map.get(bond.ai)
+            aj = update_map.get(bond.aj)
+            # drop bonds to a deleted atom
+            if ai is None or aj is None:
+                continue
+            bond.ai = ai
+            bond.aj = aj
+            new_bonds[(ai, aj)] = bond
         self.bonds = new_bonds
 
         new_angles = {}
         for angle in self.angles.values():
-            angle.ai = update_map[angle.ai]
-            angle.aj = update_map[angle.aj]
-            angle.ak = update_map[angle.ak]
+            ai = update_map.get(angle.ai)
+            aj = update_map.get(angle.aj)
+            ak = update_map.get(angle.ak)
+            # drop angles to a deleted atom
+            if ai is None or aj is None or ak is None:
+                continue
+            angle.ai = ai
+            angle.aj = aj
+            angle.ak = ak
             new_angles[
                 (update_map[angle.ai], update_map[angle.aj], update_map[angle.ak])
             ] = angle
         self.angles = new_angles
 
+        new_pairs = {}
         new_multiple_dihedrals = {}
         for dihedrals in self.proper_dihedrals.values():
-            dihedrals.ai = update_map[dihedrals.ai]
-            dihedrals.aj = update_map[dihedrals.aj]
-            dihedrals.ak = update_map[dihedrals.ak]
-            dihedrals.al = update_map[dihedrals.al]
+            ai = update_map.get(dihedrals.ai)
+            aj = update_map.get(dihedrals.aj)
+            ak = update_map.get(dihedrals.ak)
+            al = update_map.get(dihedrals.al)
+            # drop dihedrals to a deleted atom
+            if ai is None or aj is None or ak is None or al is None:
+                continue
+            dihedrals.ai = ai
+            dihedrals.aj = aj
+            dihedrals.ak = ak
+            dihedrals.al = al
+
             new_dihedrals = {}
-            for k, v in dihedrals.dihedrals.items():
-                dihedrals.dihedrals[k] = update_map[v]
+            for dihedral in dihedrals.dihedrals.values():
+                dihedral.ai = ai
+                dihedral.aj = aj
+                dihedral.ak = ak
+                dihedral.al = al
+                new_dihedrals[dihedral.periodicity] = dihedral
+
 
             new_multiple_dihedrals[
                 (
@@ -197,25 +239,33 @@ class Topology:
                     update_map[dihedrals.al],
                 )
             ] = dihedrals
-        self.proper_dihedralss = new_multiple_dihedrals
+
+            pair = self.pairs.get((dihedrals.ai, dihedrals.al))
+            if pair is None:
+                continue
+            pair.ai = update_map[pair.ai]
+            pair.aj = update_map[pair.aj]
+            new_pairs[(ai, al)] = pair
+
+        self.proper_dihedrals = new_multiple_dihedrals
 
         new_dihedrals = {}
         for dihedral in self.improper_dihedrals.values():
-            dihedral.ai = update_map[dihedral.ai]
-            dihedral.aj = update_map[dihedral.aj]
-            dihedral.ak = update_map[dihedral.ak]
-            dihedral.al = update_map[dihedral.al]
-            new_dihedrals[
-                (
-                    update_map[dihedral.ai],
-                    update_map[dihedral.aj],
-                    update_map[dihedral.ak],
-                    update_map[dihedral.al],
-                )
-            ] = dihedral
+            ai = update_map.get(dihedral.ai)
+            aj = update_map.get(dihedral.aj)
+            ak = update_map.get(dihedral.ak)
+            al = update_map.get(dihedral.al)
+            # drop dihedrals to a deleted atom
+            if ai is None or aj is None or ak is None or al is None:
+                continue
+            dihedral.ai = ai
+            dihedral.aj = aj
+            dihedral.ak = ak
+            dihedral.al = al
+            new_dihedrals[(ai, aj, ak, al)] = new_dihedrals
         self.dihedrals = new_dihedrals
+        self.pairs = new_pairs
 
-        new_pairs = {}
         for pair in self.pairs.values():
             pair.ai = update_map[pair.ai]
             pair.aj = update_map[pair.aj]
