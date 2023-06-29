@@ -186,7 +186,7 @@ class Topology:
             dihedrals.ak = update_map[dihedrals.ak]
             dihedrals.al = update_map[dihedrals.al]
             new_dihedrals = {}
-            for k,v in dihedrals.dihedrals.items():
+            for k, v in dihedrals.dihedrals.items():
                 dihedrals.dihedrals[k] = update_map[v]
 
             new_multiple_dihedrals[
@@ -279,9 +279,7 @@ class Topology:
                     self.proper_dihedrals[key] = MultipleDihedrals(
                         *key, dihedral.funct, dihedrals={}
                     )
-                self.proper_dihedrals[key].dihedrals[
-                    dihedral.periodicity
-                ] = dihedral
+                self.proper_dihedrals[key].dihedrals[dihedral.periodicity] = dihedral
 
     def _parse_restraints(self):
         """Parse restraints from topology dictionary."""
@@ -373,7 +371,7 @@ class Topology:
 
         Values reset to `None` if found in the forcefield (supplied via `types`).
         """
-        raise NotImplementedError('Reverting patches is not finished yet.')
+        raise NotImplementedError("Reverting patches is not finished yet.")
         item_type = match_atomic_item_to_atomic_type(atomic_id, types)
         if item_type is None:
             logging.warning(
@@ -387,7 +385,7 @@ class Topology:
                 atomic_item.__dict__[param] = None
 
     def patch_parameters(self, focus_nr: list[str]):
-        raise NotImplementedError('Patching is not finished yet.')
+        raise NotImplementedError("Patching is not finished yet.")
         if self.ffpatches is None:
             return
         focus = [self.atoms[nr] for nr in focus_nr]
@@ -600,7 +598,9 @@ class Topology:
         ) + self._get_atom_proper_dihedrals(atompair_nrs[1])
         for key in dihedral_keys:
             if self.proper_dihedrals.get(key) is None:
-                self.proper_dihedrals[key] = MultipleDihedrals(*key, '9', dihedrals={'': Dihedral(*key, '9')})
+                self.proper_dihedrals[key] = MultipleDihedrals(
+                    *key, "9", dihedrals={"": Dihedral(*key, "9")}
+                )
             pairkey = tuple(str(x) for x in sorted([key[0], key[3]], key=int))
             if self.pairs.get(pairkey) is None:
                 self.pairs[pairkey] = Pair(pairkey[0], pairkey[1], "1")
@@ -818,7 +818,9 @@ class Topology:
         for atom in self.atoms.values():
             keys = self._get_atom_proper_dihedrals(atom.nr)
             for key in keys:
-                self.proper_dihedrals[key] = MultipleDihedrals(*key, '9', dihedrals={'': Dihedral(*key, '9')})
+                self.proper_dihedrals[key] = MultipleDihedrals(
+                    *key, "9", dihedrals={"": Dihedral(*key, "9")}
+                )
                 pairkey = tuple(str(x) for x in sorted([key[0], key[3]], key=int))
                 if self.pairs.get(pairkey) is None:
                     self.pairs[pairkey] = Pair(pairkey[0], pairkey[1], "1")

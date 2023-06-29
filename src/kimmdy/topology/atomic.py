@@ -358,6 +358,7 @@ class Dihedral:
     ';', 'ai', 'aj', 'ak', 'al', 'funct', 'c0', 'c1', 'periodicity', 'c3', 'c4', 'c5'
     For proper dihedrals (funct 9): aj < ak
     """
+
     ai: str
     aj: str
     ak: str
@@ -375,7 +376,7 @@ class Dihedral:
         funct = field_or_none(l, 4)
         periodicity = field_or_none(l, 7)
         if periodicity is None and funct == "9":
-            periodicity = ''
+            periodicity = ""
         return cls(
             ai=l[0],
             aj=l[1],
@@ -390,6 +391,7 @@ class Dihedral:
             c5=field_or_none(l, 10),
         )
 
+
 @dataclass
 class MultipleDihedrals:
     """
@@ -398,6 +400,7 @@ class MultipleDihedrals:
     funct should always be "9" when the length of dihedrals is > 1.
     The key of the dict is the periodicity (c2).
     """
+
     ai: str
     aj: str
     ak: str
@@ -458,6 +461,7 @@ class DihedralType:
             c5=field_or_none(l, 10),
         )
 
+
 @dataclass(order=True)
 class MultipleDihedralTypes:
     """
@@ -466,12 +470,14 @@ class MultipleDihedralTypes:
     funct should always be "9" when the length of dihedrals is > 1.
     The key of the dict is the periodicity (c2).
     """
+
     ai: str
     aj: str
     ak: str
     al: str
     funct: str
     dihedral_types: dict[str, DihedralType]
+
 
 @dataclass(order=True)
 class ResidueAtomSpec:

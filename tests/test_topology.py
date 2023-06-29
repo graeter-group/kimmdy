@@ -34,13 +34,16 @@ def assetsdir() -> Path:
 def raw_hexala_top_fix(filedir) -> TopologyDict:
     return read_top(filedir / "hexala.top")
 
+
 @pytest.fixture()
 def raw_top_a_fix(filedir) -> TopologyDict:
     return read_top(filedir / "topol_stateA.top")
 
+
 @pytest.fixture()
 def raw_top_b_fix(filedir) -> TopologyDict:
     return read_top(filedir / "topol_stateB.top")
+
 
 @pytest.fixture()
 def raw_urea_top_fix(filedir) -> TopologyDict:
@@ -152,6 +155,7 @@ class TestUrea:
         assert len(top.proper_dihedrals) == 8
         assert len(top.improper_dihedrals) == 3
 
+
 class TestTopAB:
     def test_top_ab(self, raw_top_a_fix, raw_top_b_fix):
         topA = Topology(raw_top_a_fix)
@@ -162,8 +166,9 @@ class TestTopAB:
         assert len(topA.proper_dihedrals) == 84
         proper_dihedrals_counts = 0
         for dihedral in topA.proper_dihedrals.values():
-            proper_dihedrals_counts += len(dihedral.dihedrals) 
+            proper_dihedrals_counts += len(dihedral.dihedrals)
         assert proper_dihedrals_counts == 88
+
 
 class TestTopology:
     def test_break_bind_bond_hexala(self, hexala_top_fix):
@@ -373,7 +378,10 @@ class TestHexalaTopology:
         top = Topology(raw_copy)
         top._update_dict()
         assert top.top["dihedraltypes"]["content"] == raw["dihedraltypes"]["content"]
-        assert top.top["moleculetype_0"]["subsections"]["dihedrals"]["content"] == raw[ "moleculetype_0" ]["subsections"]["dihedrals"]["content"]
+        assert (
+            top.top["moleculetype_0"]["subsections"]["dihedrals"]["content"]
+            == raw["moleculetype_0"]["subsections"]["dihedrals"]["content"]
+        )
         assert top.top == raw
 
     def test_top_properties(self, hexala_top_fix):

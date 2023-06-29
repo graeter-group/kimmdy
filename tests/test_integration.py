@@ -54,13 +54,28 @@ def test_integration_valid_input_files(tmp_path, caplog):
         set(caplog.records[-1].message.split(sep=" "))
     )
 
+
 def test_grompp_with_kimmdy_topology(tmp_path):
     testdir = setup_testdir(tmp_path, "minimal_input_files")
-    raw_top = read_top(Path('minimal.top'))
+    raw_top = read_top(Path("minimal.top"))
     top = Topology(raw_top)
     top._update_dict()
-    write_top(top.top, Path('output.top'))
-    assert sp.run(['gmx', 'grompp', '-f', 'minimal.mdp', '-c', 'minimal.gro', '-p', 'output.top', '-o', 'minial.tpr'], check=True)
+    write_top(top.top, Path("output.top"))
+    assert sp.run(
+        [
+            "gmx",
+            "grompp",
+            "-f",
+            "minimal.mdp",
+            "-c",
+            "minimal.gro",
+            "-p",
+            "output.top",
+            "-o",
+            "minial.tpr",
+        ],
+        check=True,
+    )
 
 
 def test_integration_hat_reaction(tmp_path, caplog):
