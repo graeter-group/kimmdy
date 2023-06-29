@@ -42,6 +42,19 @@ def test_modify_coords_break(tmpdir):
     assert run_prmgrowth
     assert files.input["top"] == files.outputdir / "top_merge.top"
 
+
+def test_modify_coords_move(tmpdir):
+    steps = [Move(idx_to_move=0, new_coords=[[0.0, 0.0, 0.0], 100.0])]
+    files = SlimFiles(outputdir=tmpdir)
+    files.input["trr"] = tmpdir / "pull.trr"
+    files.input["tpr"] = tmpdir / "pull.tpr"
+    run_prmgrowth = modify_coords(steps, files)
+    assert not run_prmgrowth
+    assert files.output["trr"].exists()
+    assert files.output["gro"].exists()
+    # could check whether the coordinates were actually changed, probably using mda
+    # could even randomize idx and coords
+
     # def test_parameterize_bonded_terms(self):
     #     terms_bond = self.full_graph.parameterize_bonded_terms(
     #         "bondtypes", self.full_graph.bonds

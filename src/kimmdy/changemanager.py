@@ -9,6 +9,7 @@ from kimmdy.tasks import TaskFiles
 from kimmdy.topology.topology import Topology
 from kimmdy.coordinates import merge_top_prmgrowth
 from pathlib import Path
+import numpy as np
 
 
 def modify_coords(
@@ -59,7 +60,7 @@ def modify_coords(
         for step in recipe_steps:
             if isinstance(step, Move) and step.new_coords is not None:
                 atm_move = u.select_atoms(f"index {step.idx_to_move}")
-                atm_move.position = step.new_coords[0]
+                atm_move[0].position = step.new_coords[0]
 
         break
     else:
@@ -77,8 +78,8 @@ def modify_coords(
     u.atoms.write(trr_out)
     u.atoms.write(gro_out)
 
-    files.output = {"trr": trr_out}
-    files.output = {"gro": gro_out}
+    files.output["trr"] = trr_out
+    files.output["gro"] = gro_out
 
     logging.debug(
         f"Exit modify_coords, final coordinates written to {trr_out.parts[-2:]}"
