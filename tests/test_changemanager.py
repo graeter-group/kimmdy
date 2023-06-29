@@ -41,6 +41,7 @@ def test_modify_coords_break(tmpdir):
     run_prmgrowth = modify_coords(steps, files)
     assert run_prmgrowth
     assert files.input["top"] == files.outputdir / "top_merge.top"
+    assert (files.outputdir / "top_merge.top").exists()
 
 
 def test_modify_coords_move(tmpdir):

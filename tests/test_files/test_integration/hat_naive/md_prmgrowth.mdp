@@ -1,23 +1,25 @@
+title                   = OPLS Lysozyme NPT equilibration 
 ; Run parameters
 integrator              = md        ; leap-frog integrator
-nsteps                  = 5000      ; 0.2 * 5000 = 1 ps
-dt                      = 0.0002    ; 0.2 fs
+nsteps                  = 50000     ; 2 * 100000 = 1000 ps (0.2 ns)
+dt                      = 0.002     ; 2 fs
 ; Output control
-nstenergy               = 500       ; save energies every 10.0 ps
-nstlog                  = 500       ; update log file every 10.0 ps
-nstxout			        = 20
-nstvout			        = 20
-nstfout			        = 20
-nstxout-compressed      = 20        ; save compressed coordinates every 10.0 ps
+nstenergy               = 5000      ; save energies every 10.0 ps
+nstlog                  = 5000      ; update log file every 10.0 ps
+nstxout			= 5000
+nstvout			= 5000
+nstfout			= 5000
+nstxout-compressed      = 500      ; save compressed coordinates every 10.0 ps
 compressed-x-grps       = System    ; save the whole system
 ; Bond parameters
 continuation            = yes       ; Restarting after NPT 
 constraint_algorithm    = lincs     ; holonomic constraints 
-constraints             = none      ; bonds involving H are constrained
-lincs_iter              = 4         ; accuracy of LINCS
-lincs_order             = 8         ; also related to accuracy
+constraints             = none   ; bonds involving H are constrained
+lincs_iter              = 1         ; accuracy of LINCS
+lincs_order             = 4         ; also related to accuracy
 ; Neighborsearching
 cutoff-scheme           = Verlet    ; Buffered neighbor searching
+ns_type                 = grid      ; search neighboring grid cells
 nstlist                 = 10        ; 20 fs, largely irrelevant with Verlet scheme
 rcoulomb                = 1.0       ; short-range electrostatic cutoff (in nm)
 rvdw                    = 1.0       ; short-range van der Waals cutoff (in nm)
@@ -42,3 +44,9 @@ pbc                     = xyz       ; 3-D PBC
 DispCorr                = EnerPres  ; account for cut-off vdW scheme
 ; Velocity generation
 gen_vel                 = no        ; Velocity generation is off 
+; free-energy parameters
+free-energy             = yes
+init-lambda             = 0.0
+delta-lambda            = 0.00002		; should be 1/nsteps
+separate-dhdl-file      = yes
+nstdhdl                 = 100 

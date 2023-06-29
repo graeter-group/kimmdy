@@ -34,19 +34,26 @@ def modify_coords(
     to_move = []
     run_prmgrowth = False
     for step in recipe_steps:
-        if isinstance(step, Move) and step.new_coords is not None:
-            assert not step.is_one_based, "RecipeSteps should be zero based!"
-            if ttime is None:
-                ttime = step.new_coords[1]
+        if isinstance(step, Move):
+            if step.new_coords is not None:
+                # just convert it
+                assert not step.is_one_based, "RecipeSteps should be zero based!"
+                if ttime is None:
+                    ttime = step.new_coords[1]
 
-            elif abs(ttime - step.new_coords[1]) > 1e-5:  # 0.01 fs
-                m = (
-                    f"Multiple coordinate changes requested at different times!"
-                    "\nRecipeSteps:{recipe_steps}"
-                )
-                logging.error(m)
-                raise ValueError(m)
-            to_move.append(step.idx_to_move)
+                elif abs(ttime - step.new_coords[1]) > 1e-5:  # 0.01 fs
+                    m = (
+                        f"Multiple coordinate changes requested at different times!"
+                        "\nRecipeSteps:{recipe_steps}"
+                    )
+                    logging.error(m)
+                    raise ValueError(m)
+                to_move.append(step.idx_to_move)
+            else:
+                run_prmgrowth = True
+                ts = u.trajectory[-1]
+                ttime = ts.time
+
         elif isinstance(step, Break) or isinstance(step, Bind):
             run_prmgrowth = True
             ts = u.trajectory[-1]
@@ -111,25 +118,25 @@ def modify_top(
             focus.add(str(step.atom_idx_1))
             focus.add(str(step.atom_idx_2))
         elif isinstance(step, Bind):
-            topology.bind_bond([step.atom_idx_1, step.atom_idx_2])
+            topology.bind_bond([str(step.atom_idx_1), str(step.atom_idx_2)])
             focus.add(str(step.atom_idx_1))
             focus.add(str(step.atom_idx_2))
         elif isinstance(step, Move):
             top_done = False
             if step.idx_to_bind is not None and step.idx_to_break is None:
                 # implicit H-bond breaking
-                topology.move_hydrogen([step.idx_to_move, step.idx_to_bind])
+                topology.move_hydrogen([str(step.idx_to_move), str(step.idx_to_bind)])
                 focus.add(str(step.idx_to_move))
                 focus.add(str(step.idx_to_bind))
                 top_done = True
-            if step.idx_to_bind is not None and not top_done:
-                topology.bind_bond([step.idx_to_move, step.idx_to_bind])
-                focus.add(str(step.idx_to_move))
-                focus.add(str(step.idx_to_bind))
             if step.idx_to_break is not None and not top_done:
-                topology.break_bond([step.idx_to_move, step.idx_to_break])
+                topology.break_bond([str(step.idx_to_move), str(step.idx_to_break)])
                 focus.add(str(step.idx_to_move))
                 focus.add(str(step.idx_to_break))
+            if step.idx_to_bind is not None and not top_done:
+                topology.bind_bond([str(step.idx_to_move), str(step.idx_to_bind)])
+                focus.add(str(step.idx_to_move))
+                focus.add(str(step.idx_to_bind))
 
         else:
             raise NotImplementedError(f"RecipeStep {step} not implemented!")

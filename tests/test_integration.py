@@ -47,24 +47,26 @@ def test_integration_valid_input_files(tmp_path, caplog):
         # assert record.levelname != "WARNING"
         assert record.levelname != "CRITICAL"
     assert set(["Finished", "running", "tasks,"]).issubset(
-        set(caplog.records[-1].message.split(sep=" "))
+        set(caplog.get_records("call")[-1].message.split(sep=" "))
     )
 
 
 def test_integration_hat_reaction(tmp_path, caplog):
     testdir = setup_testdir(tmp_path, "hat_naive")
+    caplog.set_level(logging.INFO)
 
     kimmdy_run()
     for record in caplog.records:
         # assert record.levelname != "WARNING"
         assert record.levelname != "CRITICAL"
     assert set(["Finished", "running", "tasks,"]).issubset(
-        set(caplog.records[-1].message.split(sep=" "))
+        set(caplog.get_records("call")[-1].message.split(sep=" "))
     )
 
 
 def test_integration_homolysis_reaction(tmp_path, caplog):
     testdir = setup_testdir(tmp_path, "homolysis")
+    caplog.set_level(logging.INFO)
 
     kimmdy_run()
 
@@ -78,6 +80,7 @@ def test_integration_homolysis_reaction(tmp_path, caplog):
 
 def test_integration_whole_run(tmp_path, caplog):
     testdir = setup_testdir(tmp_path, "whole_run")
+    caplog.set_level(logging.INFO)
 
     kimmdy_run()
 

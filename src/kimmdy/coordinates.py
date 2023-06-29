@@ -94,6 +94,7 @@ def merge_top_prmgrowth(
         "morse_steepness": "10.0",
         "morse_dist_factor": 3,
     }  # well_depth D [kJ/mol], steepness [nm-1]
+    logging.info(f"Merging topologies {files.input['top']} and {files.output['top']}")
     topADict = read_top(files.input["top"])
     topBDict = read_top(files.output["top"])
     topA = Topology(topADict)
@@ -147,7 +148,7 @@ def merge_top_prmgrowth(
         topB.bonds[(bond_key)] = Bond(
             *bond_key,
             funct="3",
-            c0=deepcopy(bond_objB.c0),
+            c0=(f"{float(deepcopy(bond_objB.c0))*hyperprms['morse_dist_factor']:7.5f}"),
             c1="0.00",
             c2=deepcopy(hyperprms["morse_steepness"]),
             c3=deepcopy(bond_objB.c0),
