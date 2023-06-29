@@ -349,20 +349,23 @@ class RunManager:
             if hasattr(self.config.changer.coordinates, "md_prmgrowth"):
                 # pass merged topology to run_md task
                 self.latest_files["top"] = files.input["top"]
-                self._run_md(self.config.changer.coordinates.md_prmgrowth)
-                # self.crr_tasks.put(
-                #     Task(
-                #         self._run_md,
-                #         kwargs={
-                #             "instance": self.config.changer.coordinates.md_prmgrowth
-                #         },
-                #     )
-                # )
+                # self._run_md(self.config.changer.coordinates.md_prmgrowth)
+                self.crr_tasks.put(
+                    Task(
+                        self._run_md,
+                        kwargs={
+                            "instance": self.config.changer.coordinates.md_prmgrowth
+                        },
+                    )
+                )
+                next(self)
             else:
                 logging.warning(
                     f"No parameter growth MD relaxation possible, trying classical MD relaxation."
                 )
                 run_prmgrowth = False
+        else:
+            logging.info(f'Wrote new coordinates to {files.output["trr"].parts[-3:]}')
 
         if not run_prmgrowth:
             if hasattr(self.config.changer.coordinates, "md"):
@@ -376,7 +379,6 @@ class RunManager:
                 # )
             else:
                 logging.info(f"No MD relaxation after reaction.")
-        logging.info(f'Wrote new coordinates to {files.output["trr"].parts[-3:]}')
 
         logging.info("Reaction done")
         return files

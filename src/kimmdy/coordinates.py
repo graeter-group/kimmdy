@@ -92,7 +92,7 @@ def merge_top_prmgrowth(
     hyperprms = {
         "morse_well_depth": "400.0",
         "morse_steepness": "10.0",
-        "morse_dist_factor": 3,
+        "morse_dist_factor": 5,
     }  # well_depth D [kJ/mol], steepness [nm-1]
     logging.info(f"Merging topologies {files.input['top']} and {files.output['top']}")
     topADict = read_top(files.input["top"])

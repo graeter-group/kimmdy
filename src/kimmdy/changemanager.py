@@ -20,13 +20,6 @@ def modify_coords(
 
     trr = files.input["trr"]
     tpr = files.input["tpr"]
-    trr_out = files.outputdir / "coord_mod.trr"
-    gro_out = files.outputdir / "coord_mod.gro"
-    files.output["trr"] = trr_out
-    files.output["gro"] = gro_out
-
-    assert not trr_out.exists(), f"Error: Output trr exists! {trr_out}"
-    assert not gro_out.exists(), f"Error: Output gro exists! {gro_out}"
 
     u = mda.Universe(str(tpr), str(trr), topology_format="tpr", format="trr")
 
@@ -82,15 +75,23 @@ def modify_coords(
         write_top(top_merge.to_dict(), top_merge_path)
         files.input["top"] = top_merge_path
 
-    u.atoms.write(trr_out)
-    u.atoms.write(gro_out)
+    else:
+        trr_out = files.outputdir / "coord_mod.trr"
+        gro_out = files.outputdir / "coord_mod.gro"
+        files.output["trr"] = trr_out
+        files.output["gro"] = gro_out
 
-    files.output["trr"] = trr_out
-    files.output["gro"] = gro_out
+        assert not trr_out.exists(), f"Error: Output trr exists! {trr_out}"
+        assert not gro_out.exists(), f"Error: Output gro exists! {gro_out}"
+        u.atoms.write(trr_out)
+        u.atoms.write(gro_out)
 
-    logging.debug(
-        f"Exit modify_coords, final coordinates written to {trr_out.parts[-2:]}"
-    )
+        files.output["trr"] = trr_out
+        files.output["gro"] = gro_out
+
+        logging.debug(
+            f"Exit modify_coords, final coordinates written to {trr_out.parts[-2:]}"
+        )
 
     return run_prmgrowth
 
