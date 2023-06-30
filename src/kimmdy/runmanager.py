@@ -344,23 +344,23 @@ class RunManager:
             )
 
         # changes to coordinates
-        run_prmgrowth = changer.modify_coords(self.recipe_steps, files)
+        run_parameter_growth = changer.modify_coords(self.recipe_steps, files)
         instance = None
-        if run_prmgrowth:
-            if hasattr(self.config.changer.coordinates, "md_prmgrowth"):
+        if run_parameter_growth:
+            if hasattr(self.config.changer.coordinates, "md_parameter_growth"):
                 # pass merged topology to run_md task
                 self.latest_files["top"] = files.input["top"]
-                instance = self.config.changer.coordinates.md_prmgrowth
+                instance = self.config.changer.coordinates.md_parameter_growth
 
             else:
                 logging.warning(
                     f"No parameter growth MD possible, trying classical MD relaxation."
                 )
-                run_prmgrowth = False
+                run_parameter_growth = False
         else:
             logging.info(f'Wrote new coordinates to {files.output["trr"].parts[-3:]}')
 
-        if not run_prmgrowth:
+        if not run_parameter_growth:
             if hasattr(self.config.changer.coordinates, "md"):
                 instance = self.config.changer.coordinates.md
             else:

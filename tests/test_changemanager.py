@@ -38,8 +38,8 @@ def test_modify_coords_break(tmpdir):
     files.input["tpr"] = tmpdir / "pull.tpr"
     files.input["top"] = tmpdir / "hexala_out.top"
     files.output["top"] = tmpdir / "topol_mod.top"
-    run_prmgrowth = modify_coords(steps, files)
-    assert run_prmgrowth
+    run_parameter_growth = modify_coords(steps, files)
+    assert run_parameter_growth
     assert files.input["top"] == files.outputdir / "top_merge.top"
     assert (files.outputdir / "top_merge.top").exists()
 
@@ -49,8 +49,8 @@ def test_modify_coords_move(tmpdir):
     files = SlimFiles(outputdir=tmpdir)
     files.input["trr"] = tmpdir / "pull.trr"
     files.input["tpr"] = tmpdir / "pull.tpr"
-    run_prmgrowth = modify_coords(steps, files)
-    assert not run_prmgrowth
+    run_parameter_growth = modify_coords(steps, files)
+    assert not run_parameter_growth
     assert files.output["trr"].exists()
     assert files.output["gro"].exists()
     # could check whether the coordinates were actually changed, probably using mda

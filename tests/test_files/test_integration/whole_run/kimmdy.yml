@@ -15,10 +15,10 @@ mds:
       dat: 'plumed.dat'
       distances: 'distances.dat'
   relax:
-    mdp: 'md_prmgrowth.mdp'
+    mdp: 'md_parameter_growth.mdp'
 changer:
   coordinates:
-    md_prmgrowth: 'relax'    
+    md_parameter_growth: 'relax'    
 reactions:
   homolysis:
     dat: 'edissoc.dat'

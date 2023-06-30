@@ -4,12 +4,12 @@ integrator              = md        ; leap-frog integrator
 nsteps                  = 10000    ; 0.002 * 50000 = 100 ps (0.1 ns)
 dt                      = 0.002     ; 2 fs
 ; Output control
-nstenergy               = 5000      ; save energies every 10.0 ps
-nstlog                  = 5000      ; update log file every 10.0 ps
-nstxout			= 5000
-nstvout			= 5000
-nstfout			= 5000
-nstxout-compressed      = 5000      ; save compressed coordinates every 10.0 ps
+nstenergy               = 1000      ; save energies every 10.0 ps
+nstlog                  = 1000      ; update log file every 10.0 ps
+nstxout			= 1000
+nstvout			= 1000
+nstfout			= 1000
+nstxout-compressed      = 500      ; save compressed coordinates every 10.0 ps
 compressed-x-grps       = System    ; save the whole system
 ; Bond parameters
 continuation            = yes       ; Restarting after NPT 

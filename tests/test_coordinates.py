@@ -1,19 +1,12 @@
 from kimmdy.parsing import read_top, write_top
 from kimmdy.topology.topology import Topology
 from kimmdy.topology.atomic import Bond
-from kimmdy.coordinates import merge_top_prmgrowth, get_atomicobj
+from kimmdy.coordinates import merge_top_parameter_growth, get_atomicobj
 from conftest import SlimFiles
 
 
 import pytest
 from pathlib import Path
-
-
-def diff_within(val1: str, val2: str, diff: float = 1e-09):
-    try:
-        return abs(float(val1) - float(val2)) < diff
-    except ValueError:
-        return False
 
 
 @pytest.fixture(scope="module")
@@ -54,15 +47,20 @@ def test_get_bondobj(coordinates_files):
 
     bond2_keys = ["17", "19"]
     bond2obj = get_atomicobj(bond2_keys, Bond, coordinates_files["topA"])
-    assert diff_within(bond1obj.c0, "0.10100") and diff_within(bond1obj.c1, "363171.2")
-    assert diff_within(bond2obj.c0, "0.13600") and diff_within(bond2obj.c1, "282001.6")
+    assert (
+        float(bond1obj.c0) == pytest.approx(0.10100) and float(bond1obj.c1),
+        pytest.approx(363171.2),
+    )
+    assert float(bond2obj.c0) == pytest.approx(0.13600) and float(
+        bond2obj.c1
+    ) == pytest.approx(282001.6)
 
 
 def test_merge_prm_top(coordinates_files):
     files = SlimFiles()
     files.input["top"] = coordinates_files["topA_path"]
     files.output["top"] = coordinates_files["topB_path"]
-    topmerge = merge_top_prmgrowth(files)
+    topmerge = merge_top_parameter_growth(files)
     topmerge_path = coordinates_files["topB_path"].parent / "top_merge.top"
     topdict = topmerge.to_dict()
     write_top(topdict, topmerge_path)

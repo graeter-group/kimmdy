@@ -82,11 +82,11 @@ def merge_same(same: list, topA: Topology, topB: Topology, type: Atomic):
             instanceB.c1 = deepcopy(instance_objA.c1)
 
 
-def merge_top_prmgrowth(
+def merge_top_parameter_growth(
     files: TaskFiles, focus_nr: Union[list[str], None] = None
 ) -> Topology:
     # not the most robust way to get topA and topB
-    hyperprms = {
+    hyperparameters = {
         "morse_well_depth": "400.0",
         "morse_steepness": "10.0",
         "morse_dist_factor": 5,
@@ -129,11 +129,13 @@ def merge_top_prmgrowth(
             *bond_key,
             funct="3",
             c0=deepcopy(bond_objA.c0),
-            c1=deepcopy(hyperprms["morse_well_depth"]),
-            c2=deepcopy(hyperprms["morse_steepness"]),
-            c3=(f"{float(deepcopy(bond_objA.c0))*hyperprms['morse_dist_factor']:7.5f}"),
+            c1=deepcopy(hyperparameters["morse_well_depth"]),
+            c2=deepcopy(hyperparameters["morse_steepness"]),
+            c3=(
+                f"{float(deepcopy(bond_objA.c0))*hyperparameters['morse_dist_factor']:7.5f}"
+            ),
             c4="0.00",
-            c5=deepcopy(hyperprms["morse_steepness"]),
+            c5=deepcopy(hyperparameters["morse_steepness"]),
         )
 
     for bond_key in binding:
@@ -142,12 +144,14 @@ def merge_top_prmgrowth(
         topB.bonds[(bond_key)] = Bond(
             *bond_key,
             funct="3",
-            c0=(f"{float(deepcopy(bond_objB.c0))*hyperprms['morse_dist_factor']:7.5f}"),
+            c0=(
+                f"{float(deepcopy(bond_objB.c0))*hyperparameters['morse_dist_factor']:7.5f}"
+            ),
             c1="0.00",
-            c2=deepcopy(hyperprms["morse_steepness"]),
+            c2=deepcopy(hyperparameters["morse_steepness"]),
             c3=deepcopy(bond_objB.c0),
-            c4=deepcopy(hyperprms["morse_well_depth"]),
-            c5=deepcopy(hyperprms["morse_steepness"]),
+            c4=deepcopy(hyperparameters["morse_well_depth"]),
+            c5=deepcopy(hyperparameters["morse_steepness"]),
         )
 
     ## pairs and exclusions

@@ -1,20 +1,20 @@
 title                   = OPLS Lysozyme NPT equilibration 
 ; Run parameters
 integrator              = md        ; leap-frog integrator
-nsteps                  = 2000    ; 2 * 100000 = 1000 ps (0.2 ns)
-dt                      = 0.0002     ; 0.5 fs
+nsteps                  = 50000     ; 2 * 100000 = 1000 ps (0.2 ns)
+dt                      = 0.002     ; 2 fs
 ; Output control
-nstenergy               = 2000      ; save energies every 10.0 ps
-nstlog                  = 2000      ; update log file every 10.0 ps
-nstxout			= 200
-nstvout			= 200
-nstfout			= 200
-nstxout-compressed      = 200     ; save compressed coordinates every 10.0 ps
+nstenergy               = 1000      ; save energies every 10.0 ps
+nstlog                  = 1000      ; update log file every 10.0 ps
+nstxout			= 1000
+nstvout			= 1000
+nstfout			= 1000
+nstxout-compressed      = 500      ; save compressed coordinates every 10.0 ps
 compressed-x-grps       = System    ; save the whole system
 ; Bond parameters
 continuation            = yes       ; Restarting after NPT 
 constraint_algorithm    = lincs     ; holonomic constraints 
-constraints             = h-bonds   ; bonds involving H are constrained
+constraints             = none   ; bonds involving H are constrained
 lincs_iter              = 1         ; accuracy of LINCS
 lincs_order             = 4         ; also related to accuracy
 ; Neighborsearching
@@ -44,3 +44,9 @@ pbc                     = xyz       ; 3-D PBC
 DispCorr                = EnerPres  ; account for cut-off vdW scheme
 ; Velocity generation
 gen_vel                 = no        ; Velocity generation is off 
+; free-energy parameters
+free-energy             = yes
+init-lambda             = 0.0
+delta-lambda            = 0.00002		; should be 1/nsteps
+separate-dhdl-file      = yes
+nstdhdl                 = 100 

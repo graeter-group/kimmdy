@@ -188,8 +188,8 @@ class Bond:
             c1=field_or_none(l, 4),
             c2=field_or_none(l, 5),
             c3=field_or_none(l, 6),
-            c4=field_or_none(l, 6),
-            c5=field_or_none(l, 6),
+            c4=field_or_none(l, 7),
+            c5=field_or_none(l, 8),
         )
 
 

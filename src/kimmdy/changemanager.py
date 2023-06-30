@@ -7,7 +7,7 @@ from kimmdy.parsing import read_top, write_top, write_plumed, read_plumed
 import numpy as np
 from kimmdy.tasks import TaskFiles
 from kimmdy.topology.topology import Topology
-from kimmdy.coordinates import merge_top_prmgrowth
+from kimmdy.coordinates import merge_top_parameter_growth
 from pathlib import Path
 import numpy as np
 
@@ -25,7 +25,7 @@ def modify_coords(
 
     ttime = None
     to_move = []
-    run_prmgrowth = False
+    run_parameter_growth = False
     for step in recipe_steps:
         if isinstance(step, Move):
             if step.new_coords:
@@ -43,11 +43,11 @@ def modify_coords(
                     raise ValueError(m)
                 to_move.append(step.idx_to_move)
             else:
-                run_prmgrowth = True
+                run_parameter_growth = True
                 ttime = u.trajectory[-1].time
 
         elif isinstance(step, Break) or isinstance(step, Bind):
-            run_prmgrowth = True
+            run_parameter_growth = True
             ttime = u.trajectory[-1].time
 
     np.unique(to_move, return_counts=True)
@@ -67,8 +67,8 @@ def modify_coords(
             f"with length {u.trajectory[-1].time}"
         )
 
-    if run_prmgrowth:
-        top_merge = merge_top_prmgrowth(files)
+    if run_parameter_growth:
+        top_merge = merge_top_parameter_growth(files)
         top_merge_path = files.outputdir / "top_merge.top"
         write_top(top_merge.to_dict(), top_merge_path)
         files.input["top"] = top_merge_path
@@ -87,7 +87,7 @@ def modify_coords(
             f"Exit modify_coords, final coordinates written to {trr_out.parts[-2:]}"
         )
 
-    return run_prmgrowth
+    return run_parameter_growth
 
 
 def modify_top(
