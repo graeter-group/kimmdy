@@ -109,7 +109,7 @@ class TestFFPatches:
 
         atomic_id = ["CT", "C_R", "N"]
         want = ("CT", "C", "N")
-        types_wanted = {want: types[want]}
+        types_wanted: dict[AngleId, AngleType] = {want: types[want]}
         item_type = match_atomic_item_to_atomic_type(atomic_id, types_wanted)
         expected = AngleType(
             i="CT",
