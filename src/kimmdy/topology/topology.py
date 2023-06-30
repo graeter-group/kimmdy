@@ -163,6 +163,7 @@ class Topology:
         This also updates the numbers for bonds, angles, dihedrals and pairs.
         """
         # TODO: check angles, dihedrals, pairs
+        raise NotImplementedError("reindex_atomrns is not finished yet.")
         update_map = {
             atom_nr: str(i + 1) for i, atom_nr in enumerate(self.atoms.keys())
         }

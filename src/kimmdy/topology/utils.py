@@ -198,24 +198,28 @@ def match_id_to_patch(id: list[str], patches: Patches) -> Optional[Patch]:
 def match_atomic_item_to_atomic_type(
     id: list[str], types: AtomicTypes
 ) -> Optional[AtomicType]:
-    id = [s.replace("*", "STAR").replace("+", "PLUS") for s in id]
+    def escape_re_atomtypes(s: str) -> str:
+        """
+        escape special regex characters
+        that can appear in a forcecield
+        use X as the wildcard
+        """
+        return s.replace("*", "STAR").replace("+", "PLUS")
+
+    id = [escape_re_atomtypes(s) for s in id]
     id_sym = reversed(id)
     id_str = "---".join(id)
     id_sym_str = "---".join(id_sym)
     result = None
     longest_match = 0
     for _, atomic_type in types.items():
-        # escape special regex characters
-        # that can appear in a forcecield
-        # use X as the wildcard
         for key in [atomic_type.id, atomic_type.id_sym]:
-            key = key.replace("*", "STAR").replace("+", "PLUS")
+            key = escape_re_atomtypes(key).replace("X", ".*")
             keys = key.split("---")
             # early return exact match
             if key == id_str or key == id_sym_str:
                 return atomic_type
-            key_re = key.replace("X", ".*")
-            matches = [re.match(k, i) for k, i in zip(keys, id)]
+            matches = [re.match(pattern, s) for pattern, s in zip(keys, id)]
             if all(matches):
                 # favor longer (=more specific) and later matches
                 if len(key) >= longest_match:
