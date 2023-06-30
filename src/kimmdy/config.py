@@ -56,7 +56,7 @@ type_scheme = {
             "overwrite": str,
         }
     },
-    "changer": {"coordinates": {"md": str}},
+    "changer": {"coordinates": {"md": str, "md_parameter_growth": str}},
     "reactions": {},
     "sequence": Sequence,
 }
@@ -66,6 +66,7 @@ type_scheme = {
 
 class MDrefConfig:
     md: str
+    md_parameter_growth: str
 
 
 class ChangerConfig:

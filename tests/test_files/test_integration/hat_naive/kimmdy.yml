@@ -10,10 +10,10 @@ mds:
   equilibrium:
     mdp: 'md.mdp'
   relax:
-    mdp: 'md_slow.mdp'
+    mdp: 'md_parameter_growth.mdp'
 changer:
   coordinates:
-    md: 'relax'      
+    md_parameter_growth: 'relax'      
 reactions:
   hat_naive:
     frequency_factor: 100000000
