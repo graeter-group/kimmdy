@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.0](https://github.com/hits-mbm-dev/kimmdy/compare/v3.0.1...v3.1.0) (2023-06-30)
+
+
+### Features
+
+* changemanager [#129](https://github.com/hits-mbm-dev/kimmdy/issues/129) ([087d652](https://github.com/hits-mbm-dev/kimmdy/commit/087d652dba53857c561c8e028133d5f035e099d3))
+
 ## [3.0.1](https://github.com/hits-mbm-dev/kimmdy/compare/v3.0.0...v3.0.1) (2023-06-28)
 
 
