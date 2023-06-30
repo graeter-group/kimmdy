@@ -167,7 +167,8 @@ def modify_plumed(
             )
         else:
             # TODO: handle BIND / MOVE
-            logging.WARNING(f"Plumed changes for {step} not implemented!")
+            # for now, we wouldn't bind or move bonds that are relevant for plumed
+            logging.debug(f"Plumed changes for {step} not implemented!")
 
     write_plumed(plumeddat, newplumeddat)
 
