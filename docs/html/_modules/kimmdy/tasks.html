@@ -73,9 +73,9 @@
            <div itemprop="articleBody">
              
   <h1>Source code for kimmdy.tasks</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">InitVar</span>
+<span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">TYPE_CHECKING</span>
 
 
 <div class="viewcode-block" id="AutoFillDict"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.tasks.AutoFillDict">[docs]</a><span class="k">class</span> <span class="nc">AutoFillDict</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
@@ -108,17 +108,15 @@
 <span class="sd">    &gt;&gt;&gt; files.input</span>
 <span class="sd">    &gt;&gt;&gt; files.input[&quot;top&quot;]</span>
 <span class="sd">    {&#39;top&#39;: &#39;latest top&#39;}</span>
-
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">runmng</span><span class="p">:</span> <span class="n">InitVar</span>
+    <span class="n">get_latest</span><span class="p">:</span> <span class="n">Callable</span>
     <span class="nb">input</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
     <span class="n">output</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
-    <span class="c1"># default outputdir is current working directory</span>
     <span class="n">outputdir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">runmng</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">input</span> <span class="o">=</span> <span class="n">AutoFillDict</span><span class="p">(</span><span class="n">runmng</span><span class="o">.</span><span class="n">get_latest</span><span class="p">)</span></div>
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input</span> <span class="o">=</span> <span class="n">AutoFillDict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_latest</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Task"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.tasks.Task">[docs]</a><span class="k">class</span> <span class="nc">Task</span><span class="p">:</span>

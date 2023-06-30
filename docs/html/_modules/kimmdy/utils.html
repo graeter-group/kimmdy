@@ -95,6 +95,19 @@
         <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">prev</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="get_gmx_dir"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.utils.get_gmx_dir">[docs]</a><span class="k">def</span> <span class="nf">get_gmx_dir</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;returns the path to the gromacs installation&quot;&quot;&quot;</span>
+    <span class="n">gmx_binary</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span>
+        <span class="n">sp</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s2">&quot;which&quot;</span><span class="p">,</span> <span class="s2">&quot;gmx&quot;</span><span class="p">],</span> <span class="n">capture_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">gmx_binary</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Could not find gromacs installation&quot;</span><span class="p">)</span>
+    <span class="c1"># resolve symlink if gmxbinary is a symlink</span>
+    <span class="n">gmx_binary</span> <span class="o">=</span> <span class="n">gmx_binary</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+    <span class="n">gmx_dir</span> <span class="o">=</span> <span class="n">gmx_binary</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;share&quot;</span> <span class="o">/</span> <span class="s2">&quot;gromacs&quot;</span>
+    <span class="k">return</span> <span class="n">gmx_dir</span></div>
+
+
 <div class="viewcode-block" id="increment_logfile"><a class="viewcode-back" href="../../kimmdy.html#kimmdy.utils.increment_logfile">[docs]</a><span class="k">def</span> <span class="nf">increment_logfile</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
     <span class="n">backup_file_prefix</span> <span class="o">=</span> <span class="s2">&quot;#&quot;</span>
     <span class="n">backup_file_suffix</span> <span class="o">=</span> <span class="s2">&quot;#&quot;</span>

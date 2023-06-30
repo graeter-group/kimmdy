@@ -1,7 +1,6 @@
 ---
 title: Ala topology
 format: markdown
-mermaid-format: svg
 execute:
   warning: false
   echo: true
@@ -34,4 +33,5 @@ with open("ala-top.dot", "w") as f:
 //| fig-cap: "A diagram of the ala topology"
 //| file: ala-top.dot
 ```
+
 

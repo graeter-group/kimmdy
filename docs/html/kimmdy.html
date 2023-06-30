@@ -143,6 +143,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#kimmdy.utils.get_atominfo_from_plumedid"><code class="docutils literal notranslate"><span class="pre">get_atominfo_from_plumedid()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#kimmdy.utils.get_bondprm_from_atomtypes"><code class="docutils literal notranslate"><span class="pre">get_bondprm_from_atomtypes()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#kimmdy.utils.get_data_from_file"><code class="docutils literal notranslate"><span class="pre">get_data_from_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#kimmdy.utils.get_gmx_dir"><code class="docutils literal notranslate"><span class="pre">get_gmx_dir()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#kimmdy.utils.get_shell_stdout"><code class="docutils literal notranslate"><span class="pre">get_shell_stdout()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#kimmdy.utils.identify_atomtypes"><code class="docutils literal notranslate"><span class="pre">identify_atomtypes()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#kimmdy.utils.increment_logfile"><code class="docutils literal notranslate"><span class="pre">increment_logfile()</span></code></a></li>
@@ -562,7 +563,7 @@ the force field ffbonded.itp file that match the atomtypes</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="kimmdy.kmc.frm">
-<span class="sig-prename descclassname"><span class="pre">kimmdy.kmc.</span></span><span class="sig-name descname"><span class="pre">frm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">recipe_collection:</span> <span class="pre">~kimmdy.reaction.RecipeCollection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng:</span> <span class="pre">~numpy.random.bit_generator.BitGenerator</span> <span class="pre">=</span> <span class="pre">Generator(PCG64)</span> <span class="pre">at</span> <span class="pre">0x7F1D34C0ECE0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MD_time:</span> <span class="pre">float</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/kimmdy/kmc.html#frm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#kimmdy.kmc.frm" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">kimmdy.kmc.</span></span><span class="sig-name descname"><span class="pre">frm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">recipe_collection:</span> <span class="pre">~kimmdy.reaction.RecipeCollection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng:</span> <span class="pre">~numpy.random.bit_generator.BitGenerator</span> <span class="pre">=</span> <span class="pre">Generator(PCG64)</span> <span class="pre">at</span> <span class="pre">0x7F3679312A40</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MD_time:</span> <span class="pre">float</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/kimmdy/kmc.html#frm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#kimmdy.kmc.frm" title="Permalink to this definition"></a></dt>
 <dd><p>First Reaction Method variant of Kinetic Monte Carlo.
 takes RecipeCollection and choses a recipe based on which reaction would occur.</p>
 <dl class="field-list simple">
@@ -578,7 +579,7 @@ takes RecipeCollection and choses a recipe based on which reaction would occur.<
 
 <dl class="py function">
 <dt class="sig sig-object py" id="kimmdy.kmc.rf_kmc">
-<span class="sig-prename descclassname"><span class="pre">kimmdy.kmc.</span></span><span class="sig-name descname"><span class="pre">rf_kmc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">recipe_collection:</span> <span class="pre">~kimmdy.reaction.RecipeCollection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng:</span> <span class="pre">~numpy.random.bit_generator.BitGenerator</span> <span class="pre">=</span> <span class="pre">Generator(PCG64)</span> <span class="pre">at</span> <span class="pre">0x7F1D34C0DA80</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/kimmdy/kmc.html#rf_kmc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#kimmdy.kmc.rf_kmc" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">kimmdy.kmc.</span></span><span class="sig-name descname"><span class="pre">rf_kmc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">recipe_collection:</span> <span class="pre">~kimmdy.reaction.RecipeCollection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng:</span> <span class="pre">~numpy.random.bit_generator.BitGenerator</span> <span class="pre">=</span> <span class="pre">Generator(PCG64)</span> <span class="pre">at</span> <span class="pre">0x7F36793126C0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/kimmdy/kmc.html#rf_kmc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#kimmdy.kmc.rf_kmc" title="Permalink to this definition"></a></dt>
 <dd><p>Rejection-Free Monte Carlo.
 takes RecipeCollection and choses a recipe based on the relative propensity of the events.</p>
 <dl class="field-list simple">
@@ -696,8 +697,9 @@ e.g. moleculetype will appear multiple times and they should not be merged</p></
 
 <dl class="py function">
 <dt class="sig sig-object py" id="kimmdy.parsing.resolve_includes">
-<span class="sig-prename descclassname"><span class="pre">kimmdy.parsing.</span></span><span class="sig-name descname"><span class="pre">resolve_includes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/kimmdy/parsing.html#resolve_includes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#kimmdy.parsing.resolve_includes" title="Permalink to this definition"></a></dt>
-<dd><p>Resolve #include statements in a (top/itp) file.</p>
+<span class="sig-prename descclassname"><span class="pre">kimmdy.parsing.</span></span><span class="sig-name descname"><span class="pre">resolve_includes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">pathlib.Path</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/kimmdy/parsing.html#resolve_includes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#kimmdy.parsing.resolve_includes" title="Permalink to this definition"></a></dt>
+<dd><p>Resolve #include statements in a (top/itp) file.
+Returns a tuple with the list of lines and the Path to the ff directory.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -1088,7 +1090,7 @@ itself callable. The function must return a TaskFiles object.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="kimmdy.tasks.TaskFiles">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kimmdy.tasks.</span></span><span class="sig-name descname"><span class="pre">TaskFiles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">runmng:</span> <span class="pre">~dataclasses.InitVar</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input:</span> <span class="pre">dict[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pathlib.Path]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output:</span> <span class="pre">dict[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pathlib.Path]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outputdir:</span> <span class="pre">~pathlib.Path</span> <span class="pre">=</span> <span class="pre">PosixPath('.')</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kimmdy/tasks.html#TaskFiles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#kimmdy.tasks.TaskFiles" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kimmdy.tasks.</span></span><span class="sig-name descname"><span class="pre">TaskFiles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">get_latest:</span> <span class="pre">~typing.Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input:</span> <span class="pre">dict[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pathlib.Path]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output:</span> <span class="pre">dict[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pathlib.Path]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outputdir:</span> <span class="pre">~pathlib.Path</span> <span class="pre">=</span> <span class="pre">PosixPath('.')</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kimmdy/tasks.html#TaskFiles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#kimmdy.tasks.TaskFiles" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Input and Output files and directories.</p>
 <p>Hosts the input and output files belonging to a task.
@@ -1109,6 +1111,11 @@ Files which can not be found by get_latest must be added manually.</p>
 </pre></div>
 </div>
 <dl class="py attribute">
+<dt class="sig sig-object py" id="kimmdy.tasks.TaskFiles.get_latest">
+<span class="sig-name descname"><span class="pre">get_latest</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Callable</span></em><a class="headerlink" href="#kimmdy.tasks.TaskFiles.get_latest" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="kimmdy.tasks.TaskFiles.input">
 <span class="sig-name descname"><span class="pre">input</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pathlib.Path</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#kimmdy.tasks.TaskFiles.input" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
@@ -1121,11 +1128,6 @@ Files which can not be found by get_latest must be added manually.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="kimmdy.tasks.TaskFiles.outputdir">
 <span class="sig-name descname"><span class="pre">outputdir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">PosixPath('.')</span></em><a class="headerlink" href="#kimmdy.tasks.TaskFiles.outputdir" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="kimmdy.tasks.TaskFiles.runmng">
-<span class="sig-name descname"><span class="pre">runmng</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">InitVar</span></em><a class="headerlink" href="#kimmdy.tasks.TaskFiles.runmng" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -1188,6 +1190,12 @@ Files which can not be found by get_latest must be added manually.</p>
 <dt class="sig sig-object py" id="kimmdy.utils.get_data_from_file">
 <span class="sig-prename descclassname"><span class="pre">kimmdy.utils.</span></span><span class="sig-name descname"><span class="pre">get_data_from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kimmdy/utils.html#get_data_from_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#kimmdy.utils.get_data_from_file" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="kimmdy.utils.get_gmx_dir">
+<span class="sig-prename descclassname"><span class="pre">kimmdy.utils.</span></span><span class="sig-name descname"><span class="pre">get_gmx_dir</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Path</span></span></span><a class="reference internal" href="_modules/kimmdy/utils.html#get_gmx_dir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#kimmdy.utils.get_gmx_dir" title="Permalink to this definition"></a></dt>
+<dd><p>returns the path to the gromacs installation</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="kimmdy.utils.get_shell_stdout">

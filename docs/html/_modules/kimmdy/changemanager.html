@@ -155,15 +155,13 @@
     <span class="n">topology</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Topology</span><span class="p">],</span>
 <span class="p">):</span>
     <span class="n">files</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;top&quot;</span><span class="p">:</span> <span class="n">files</span><span class="o">.</span><span class="n">outputdir</span> <span class="o">/</span> <span class="s2">&quot;topol_mod.top&quot;</span><span class="p">}</span>
-    <span class="n">oldtop</span> <span class="o">=</span> <span class="p">(</span><span class="n">files</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">],)</span>
-    <span class="n">newtop</span> <span class="o">=</span> <span class="p">(</span><span class="n">files</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">],)</span>
-    <span class="n">ffdir</span> <span class="o">=</span> <span class="p">(</span><span class="n">files</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;ff&quot;</span><span class="p">],)</span>
-    <span class="c1"># why is this a tuple??</span>
+    <span class="n">oldtop</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">]</span>
+    <span class="n">newtop</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">]</span>
 
     <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reading: </span><span class="si">{</span><span class="n">oldtop</span><span class="si">}</span><span class="s2"> and writing modified topology to </span><span class="si">{</span><span class="n">newtop</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">topology</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">topologyDict</span> <span class="o">=</span> <span class="n">read_top</span><span class="p">(</span><span class="n">oldtop</span><span class="p">)</span>
-        <span class="n">topology</span> <span class="o">=</span> <span class="n">Topology</span><span class="p">(</span><span class="n">topologyDict</span><span class="p">,</span> <span class="n">ffdir</span><span class="p">,</span> <span class="n">ffpatch</span><span class="p">)</span>
+        <span class="n">topology</span> <span class="o">=</span> <span class="n">Topology</span><span class="p">(</span><span class="n">topologyDict</span><span class="p">,</span> <span class="n">ffpatch</span><span class="p">)</span>
 
     <span class="n">focus</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">recipe_steps</span><span class="p">:</span>

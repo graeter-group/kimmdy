@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ala &mdash; kimmdy 2023 documentation</title>
+  <title>Ala topology &mdash; kimmdy 2023 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -63,7 +63,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Ala</li>
+      <li class="breadcrumb-item active">Ala topology</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/topology.md.txt" rel="nofollow"> View page source</a>
       </li>
@@ -73,38 +73,41 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="ala">
+  <section id="ala-topology">
+<h1>Ala topology<a class="headerlink" href="#ala-topology" title="Permalink to this heading"></a></h1>
+</section>
+<section id="ala">
 <h1>Ala<a class="headerlink" href="#ala" title="Permalink to this heading"></a></h1>
-<p>::: {.cell execution_count=”1”}</p>
-<div class="highlight-{.python notranslate"><div class="highlight"><pre><span></span>from kimmdy.parsing import read_top
-from kimmdy.topology.topology import Topology
-from pathlib import Path
-from kimmdy.misc_helper import top_to_graph
+<div class="cell" execution_count="1">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">kimmdy.parsing</span> <span class="kn">import</span> <span class="n">read_top</span>
+<span class="kn">from</span> <span class="nn">kimmdy.topology.topology</span> <span class="kn">import</span> <span class="n">Topology</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">kimmdy.misc_helper</span> <span class="kn">import</span> <span class="n">top_to_graph</span>
 </pre></div>
 </div>
-<p>:::</p>
-<p>::: {.cell execution_count=”2”}</p>
-<div class="highlight-{.python notranslate"><div class="highlight"><pre><span></span>ala_top = read_top(Path(&#39;../example/example_ala/Ala_out.top&#39;))
-ffdir = Path(&quot;../tests/test_files/assets/amber99sb-star-ildnp.ff&quot;)
-top = Topology(ala_top, ffdir)
+</div>
+<div class="cell" execution_count="2">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ala_top</span> <span class="o">=</span> <span class="n">read_top</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="s1">&#39;../example/example_ala/Ala_out.top&#39;</span><span class="p">))</span>
+<span class="n">ffdir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;../tests/test_files/assets/amber99sb-star-ildnp.ff&quot;</span><span class="p">)</span>
+<span class="n">top</span> <span class="o">=</span> <span class="n">Topology</span><span class="p">(</span><span class="n">ala_top</span><span class="p">,</span> <span class="n">ffdir</span><span class="p">)</span>
 
-ls = top_to_graph(top) 
-with open(&quot;ala-top.dot&quot;, &quot;w&quot;) as f:
-  f.writelines(ls)
+<span class="n">ls</span> <span class="o">=</span> <span class="n">top_to_graph</span><span class="p">(</span><span class="n">top</span><span class="p">)</span> 
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;ala-top.dot&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+  <span class="n">f</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span><span class="n">ls</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>:::</p>
-<p>::: {.cell file=”ala-top.dot”}
-::: cell-output-display
-::: {#fig-ala}</p>
-<div>
-<p><img alt="" src="_images/dot-figure-1.png" />{width=”7in”
-height=”5in”}</p>
 </div>
-<p>Figure 1: A diagram of the ala topology
-:::
-:::
-:::</p>
+<div class="cell" file="ala-top.dot">
+<div class="cell-output-display">
+<div id="fig-ala">
+<div>
+<p><img src="topology_files/figure-commonmark/dot-figure-1.png"
+style="width:7in;height:5in" /></p>
+</div>
+<p>Figure 1: A diagram of the ala topology</p>
+</div>
+</div>
+</div>
 </section>
 
 

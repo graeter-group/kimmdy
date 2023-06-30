@@ -1,24 +1,21 @@
----
-execute:
-  echo: true
-  warning: false
-title: Ala topology
-toc-title: Table of contents
----
+# Ala topology
 
 # Ala
 
-::: {.cell execution_count="1"}
-``` {.python .cell-code}
+<div class="cell" execution_count="1">
+
+``` python
 from kimmdy.parsing import read_top
 from kimmdy.topology.topology import Topology
 from pathlib import Path
 from kimmdy.misc_helper import top_to_graph
 ```
-:::
 
-::: {.cell execution_count="2"}
-``` {.python .cell-code}
+</div>
+
+<div class="cell" execution_count="2">
+
+``` python
 ala_top = read_top(Path('../example/example_ala/Ala_out.top'))
 ffdir = Path("../tests/test_files/assets/amber99sb-star-ildnp.ff")
 top = Topology(ala_top, ffdir)
@@ -27,19 +24,26 @@ ls = top_to_graph(top)
 with open("ala-top.dot", "w") as f:
   f.writelines(ls)
 ```
-:::
 
-::: {.cell file="ala-top.dot"}
-::: cell-output-display
-::: {#fig-ala}
+</div>
+
+<div class="cell" file="ala-top.dot">
+
+<div class="cell-output-display">
+
+<div id="fig-ala">
+
 <div>
 
-![](topology_files/figure-markdown/dot-figure-1.png){width="7in"
-height="5in"}
+<img src="topology_files/figure-commonmark/dot-figure-1.png"
+style="width:7in;height:5in" />
 
 </div>
 
 Figure 1: A diagram of the ala topology
-:::
-:::
-:::
+
+</div>
+
+</div>
+
+</div>
