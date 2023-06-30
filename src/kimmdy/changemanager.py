@@ -2,12 +2,14 @@ from __future__ import annotations
 import logging
 import MDAnalysis as mda
 from typing import Optional
-from kimmdy.reaction import Recipe, Bind, Break, Move, RecipeStep
+from kimmdy.reaction import Bind, Break, Move, RecipeStep
 from kimmdy.parsing import read_top, write_top, write_plumed, read_plumed
 import numpy as np
 from kimmdy.tasks import TaskFiles
 from kimmdy.topology.topology import Topology
+from kimmdy.coordinates import merge_top_parameter_growth
 from pathlib import Path
+import numpy as np
 
 
 def modify_coords(
@@ -18,42 +20,45 @@ def modify_coords(
 
     trr = files.input["trr"]
     tpr = files.input["tpr"]
-    trr_out = files.outputdir / "coord_mod.trr"
-    gro_out = files.outputdir / "coord_mod.gro"
-    files.output["trr"] = trr_out
-    files.output["gro"] = gro_out
-
-    assert not trr_out.exists(), f"Error: Output trr exists! {trr_out}"
-    assert not gro_out.exists(), f"Error: Output gro exists! {gro_out}"
 
     u = mda.Universe(str(tpr), str(trr), topology_format="tpr", format="trr")
 
     ttime = None
     to_move = []
+    run_parameter_growth = False
     for step in recipe_steps:
-        if isinstance(step, Move) and step.new_coords is not None:
-            assert not step.is_one_based, "RecipeSteps should be zero based!"
-            if ttime is None:
-                ttime = step.new_coords[1]
+        if isinstance(step, Move):
+            if step.new_coords:
+                # just convert it
+                assert not step.is_one_based, "RecipeSteps should be zero based!"
+                if ttime is None:
+                    ttime = step.new_coords[1]
 
-            elif abs(ttime - step.new_coords[1]) > 1e-5:  # 0.01 fs
-                m = (
-                    f"Multiple coordinate changes requested at different times!"
-                    "\nRecipeSteps:{recipe_steps}"
-                )
-                logging.error(m)
-                raise ValueError(m)
-            to_move.append(step.idx_to_move)
+                elif abs(ttime - step.new_coords[1]) > 1e-5:  # 0.01 fs
+                    m = (
+                        f"Multiple coordinate changes requested at different times!"
+                        "\nRecipeSteps:{recipe_steps}"
+                    )
+                    logging.error(m)
+                    raise ValueError(m)
+                to_move.append(step.idx_to_move)
+            else:
+                run_parameter_growth = True
+                ttime = u.trajectory[-1].time
+
+        elif isinstance(step, Break) or isinstance(step, Bind):
+            run_parameter_growth = True
+            ttime = u.trajectory[-1].time
 
     np.unique(to_move, return_counts=True)
 
-    for ts in u.trajectory:
+    for ts in u.trajectory[::-1]:
         if abs(ts.time - ttime) > 1e-5:  # 0.01 fs
             continue
         for step in recipe_steps:
             if isinstance(step, Move) and step.new_coords is not None:
                 atm_move = u.select_atoms(f"index {step.idx_to_move}")
-                atm_move.position = step.new_coords[0]
+                atm_move[0].position = step.new_coords[0]
 
         break
     else:
@@ -62,15 +67,27 @@ def modify_coords(
             f"with length {u.trajectory[-1].time}"
         )
 
-    u.atoms.write(trr_out)
-    u.atoms.write(gro_out)
+    if run_parameter_growth:
+        top_merge = merge_top_parameter_growth(files)
+        top_merge_path = files.outputdir / "top_merge.top"
+        write_top(top_merge.to_dict(), top_merge_path)
+        files.input["top"] = top_merge_path
 
-    files.output = {"trr": trr_out}
-    files.output = {"gro": gro_out}
+    else:
+        trr_out = files.outputdir / "coord_mod.trr"
+        gro_out = files.outputdir / "coord_mod.gro"
 
-    logging.debug(
-        f"Exit modify_coords, final coordinates written to {trr_out.parts[-2:]}"
-    )
+        u.atoms.write(trr_out)
+        u.atoms.write(gro_out)
+
+        files.output["trr"] = trr_out
+        files.output["gro"] = gro_out
+
+        logging.debug(
+            f"Exit modify_coords, final coordinates written to {trr_out.parts[-2:]}"
+        )
+
+    return run_parameter_growth
 
 
 def modify_top(
@@ -96,25 +113,25 @@ def modify_top(
             focus.add(str(step.atom_idx_1))
             focus.add(str(step.atom_idx_2))
         elif isinstance(step, Bind):
-            topology.bind_bond([step.atom_idx_1, step.atom_idx_2])
+            topology.bind_bond([str(step.atom_idx_1), str(step.atom_idx_2)])
             focus.add(str(step.atom_idx_1))
             focus.add(str(step.atom_idx_2))
         elif isinstance(step, Move):
             top_done = False
             if step.idx_to_bind is not None and step.idx_to_break is None:
                 # implicit H-bond breaking
-                topology.move_hydrogen([step.idx_to_move, step.idx_to_bind])
+                topology.move_hydrogen([str(step.idx_to_move), str(step.idx_to_bind)])
                 focus.add(str(step.idx_to_move))
                 focus.add(str(step.idx_to_bind))
                 top_done = True
-            if step.idx_to_bind is not None and not top_done:
-                topology.bind_bond([step.idx_to_move, step.idx_to_bind])
-                focus.add(str(step.idx_to_move))
-                focus.add(str(step.idx_to_bind))
             if step.idx_to_break is not None and not top_done:
-                topology.break_bond([step.idx_to_move, step.idx_to_break])
+                topology.break_bond([str(step.idx_to_move), str(step.idx_to_break)])
                 focus.add(str(step.idx_to_move))
                 focus.add(str(step.idx_to_break))
+            if step.idx_to_bind is not None and not top_done:
+                topology.bind_bond([str(step.idx_to_move), str(step.idx_to_bind)])
+                focus.add(str(step.idx_to_move))
+                focus.add(str(step.idx_to_bind))
 
         else:
             raise NotImplementedError(f"RecipeStep {step} not implemented!")
@@ -144,7 +161,8 @@ def modify_plumed(
             )
         else:
             # TODO: handle BIND / MOVE
-            logging.WARNING(f"Plumed changes for {step} not implemented!")
+            # for now, we wouldn't bind or move bonds that are relevant for plumed
+            logging.debug(f"Plumed changes for {step} not implemented!")
 
     write_plumed(plumeddat, newplumeddat)
 

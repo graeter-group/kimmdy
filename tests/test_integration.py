@@ -53,6 +53,7 @@ def test_integration_valid_input_files(tmp_path, caplog):
 
 def test_integration_hat_reaction(tmp_path, caplog):
     testdir = setup_testdir(tmp_path, "hat_naive")
+    caplog.set_level(logging.INFO)
 
     kimmdy_run()
     for record in caplog.records:
@@ -65,6 +66,7 @@ def test_integration_hat_reaction(tmp_path, caplog):
 
 def test_integration_homolysis_reaction(tmp_path, caplog):
     testdir = setup_testdir(tmp_path, "homolysis")
+    caplog.set_level(logging.INFO)
 
     kimmdy_run()
 
@@ -78,6 +80,7 @@ def test_integration_homolysis_reaction(tmp_path, caplog):
 
 def test_integration_whole_run(tmp_path, caplog):
     testdir = setup_testdir(tmp_path, "whole_run")
+    caplog.set_level(logging.INFO)
 
     kimmdy_run()
 

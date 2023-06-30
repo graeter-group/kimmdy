@@ -1,9 +1,11 @@
-from kimmdy.parsing import read_plumed
-from kimmdy.changemanager import break_bond_plumed
 import pytest
 import shutil
-
 from pathlib import Path
+
+from kimmdy.reaction import Break, Bind, Move
+from kimmdy.parsing import read_plumed
+from kimmdy.changemanager import break_bond_plumed, modify_coords
+from conftest import SlimFiles
 
 
 @pytest.fixture
@@ -27,6 +29,32 @@ def test_plumed_break(tmpdir):
 
     assert plumed_break["distances"] == plumed_break_ref["distances"]
     assert plumed_break["prints"] == plumed_break_ref["prints"]
+
+
+def test_modify_coords_break(tmpdir):
+    steps = [Break(29, 35)]
+    files = SlimFiles(outputdir=tmpdir)
+    files.input["trr"] = tmpdir / "pull.trr"
+    files.input["tpr"] = tmpdir / "pull.tpr"
+    files.input["top"] = tmpdir / "hexala_out.top"
+    files.output["top"] = tmpdir / "topol_mod.top"
+    run_parameter_growth = modify_coords(steps, files)
+    assert run_parameter_growth
+    assert files.input["top"] == files.outputdir / "top_merge.top"
+    assert (files.outputdir / "top_merge.top").exists()
+
+
+def test_modify_coords_move(tmpdir):
+    steps = [Move(idx_to_move=0, new_coords=[[0.0, 0.0, 0.0], 100.0])]
+    files = SlimFiles(outputdir=tmpdir)
+    files.input["trr"] = tmpdir / "pull.trr"
+    files.input["tpr"] = tmpdir / "pull.tpr"
+    run_parameter_growth = modify_coords(steps, files)
+    assert not run_parameter_growth
+    assert files.output["trr"].exists()
+    assert files.output["gro"].exists()
+    # could check whether the coordinates were actually changed, probably using mda
+    # could even randomize idx and coords
 
     # def test_parameterize_bonded_terms(self):
     #     terms_bond = self.full_graph.parameterize_bonded_terms(
