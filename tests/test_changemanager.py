@@ -2,7 +2,7 @@ import pytest
 import shutil
 from pathlib import Path
 
-from kimmdy.reaction import RecipeStep, Break, Bind, Move
+from kimmdy.reaction import Break, Bind, Move
 from kimmdy.parsing import read_plumed
 from kimmdy.changemanager import break_bond_plumed, modify_coords
 from conftest import SlimFiles

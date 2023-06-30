@@ -1,6 +1,3 @@
-import MDAnalysis as MDA
-from pathlib import Path
-import numpy as np
 import logging
 from typing import Union
 from copy import deepcopy
@@ -67,6 +64,7 @@ def get_keys(atomicA: dict, atomicB: dict) -> tuple[list, list, list]:
 
 def merge_same(same: list, topA: Topology, topB: Topology, type: Atomic):
     # also ugly
+    # should also be able to deal with dihedral
     for key in same:
         if type is Bond:
             instanceA = topA.bonds.get(key)
@@ -87,24 +85,21 @@ def merge_same(same: list, topA: Topology, topB: Topology, type: Atomic):
 def merge_top_prmgrowth(
     files: TaskFiles, focus_nr: Union[list[str], None] = None
 ) -> Topology:
-    # ffdir = (files.input["ff"],)
     # not the most robust way to get topA and topB
     hyperprms = {
         "morse_well_depth": "400.0",
         "morse_steepness": "10.0",
         "morse_dist_factor": 5,
-    }  # well_depth D [kJ/mol], steepness [nm-1]
+    }  # well_depth D [kJ/mol], steepness [nm-1], dist_factor for bond length
     logging.info(f"Merging topologies {files.input['top']} and {files.output['top']}")
     topADict = read_top(files.input["top"])
     topBDict = read_top(files.output["top"])
     topA = Topology(topADict)
     topB = Topology(topBDict)
 
-    # ToDo: what about implicit parameters?? especially dihedrals
     # think about how to bring focus_nr into this
-    # for nr in topB.atoms.keys():
 
-    # atoms
+    ## atoms
     for nr in topA.atoms.keys():
         atomA = topA.atoms[nr]
         atomB = topB.atoms[nr]
@@ -121,8 +116,7 @@ def merge_top_prmgrowth(
                     f"Atom {nr} changed during changemanager step but not the charges!"
                 )
 
-    # # bonds
-
+    ## bonds
     same, breaking, binding = get_keys(topA.bonds, topB.bonds)
 
     merge_same(same, topA, topB, Bond)
@@ -156,7 +150,7 @@ def merge_top_prmgrowth(
             c5=deepcopy(hyperprms["morse_steepness"]),
         )
 
-    # # pairs and exclusions
+    ## pairs and exclusions
     try:
         exclusions_content = get_protein_section(topB.top, "exclusions")
 
@@ -172,14 +166,13 @@ def merge_top_prmgrowth(
 
     set_protein_section(topB.top, "exclusions", exclusions_content)
 
-    # # angles
+    ## angles
     same, breaking, binding = get_keys(topA.angles, topB.angles)
 
     merge_same(same, topA, topB, Angle)
 
     for angle_key in breaking:
         topB.angles[angle_key] = Angle(*angle_key, "1")
-        # topB.bind_angle(angle_key)      # this doesn't work for this use case
         angle_objA = get_atomicobj(angle_key, Angle, topA)
 
         topB.angles[(angle_key)] = Angle(
@@ -203,7 +196,7 @@ def merge_top_prmgrowth(
             c3=deepcopy(angle_objB.c1),
         )
 
-    # # dihedrals
+    ## dihedrals
     # dihedraltypes does not work at the moment
     # proper_dihedraltypes also has the periodicity as key
     # maybe match_atomic_item_to_atomic_type could give us dihedraltypes with all periodicities

@@ -2,7 +2,7 @@ from __future__ import annotations
 import logging
 import MDAnalysis as mda
 from typing import Optional
-from kimmdy.reaction import Recipe, Bind, Break, Move, RecipeStep
+from kimmdy.reaction import Bind, Break, Move, RecipeStep
 from kimmdy.parsing import read_top, write_top, write_plumed, read_plumed
 import numpy as np
 from kimmdy.tasks import TaskFiles
@@ -28,7 +28,7 @@ def modify_coords(
     run_prmgrowth = False
     for step in recipe_steps:
         if isinstance(step, Move):
-            if step.new_coords is not None:
+            if step.new_coords:
                 # just convert it
                 assert not step.is_one_based, "RecipeSteps should be zero based!"
                 if ttime is None:
@@ -44,13 +44,11 @@ def modify_coords(
                 to_move.append(step.idx_to_move)
             else:
                 run_prmgrowth = True
-                ts = u.trajectory[-1]
-                ttime = ts.time
+                ttime = u.trajectory[-1].time
 
         elif isinstance(step, Break) or isinstance(step, Bind):
             run_prmgrowth = True
-            ts = u.trajectory[-1]
-            ttime = ts.time
+            ttime = u.trajectory[-1].time
 
     np.unique(to_move, return_counts=True)
 
@@ -78,11 +76,7 @@ def modify_coords(
     else:
         trr_out = files.outputdir / "coord_mod.trr"
         gro_out = files.outputdir / "coord_mod.gro"
-        files.output["trr"] = trr_out
-        files.output["gro"] = gro_out
 
-        assert not trr_out.exists(), f"Error: Output trr exists! {trr_out}"
-        assert not gro_out.exists(), f"Error: Output gro exists! {gro_out}"
         u.atoms.write(trr_out)
         u.atoms.write(gro_out)
 

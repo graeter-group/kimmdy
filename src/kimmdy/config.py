@@ -66,6 +66,7 @@ type_scheme = {
 
 class MDrefConfig:
     md: str
+    md_prmgrowth: str
 
 
 class ChangerConfig:

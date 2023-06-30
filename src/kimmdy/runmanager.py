@@ -345,23 +345,16 @@ class RunManager:
 
         # changes to coordinates
         run_prmgrowth = changer.modify_coords(self.recipe_steps, files)
+        instance = None
         if run_prmgrowth:
             if hasattr(self.config.changer.coordinates, "md_prmgrowth"):
                 # pass merged topology to run_md task
                 self.latest_files["top"] = files.input["top"]
-                # self._run_md(self.config.changer.coordinates.md_prmgrowth)
-                self.crr_tasks.put(
-                    Task(
-                        self._run_md,
-                        kwargs={
-                            "instance": self.config.changer.coordinates.md_prmgrowth
-                        },
-                    )
-                )
-                next(self)
+                instance = self.config.changer.coordinates.md_prmgrowth
+
             else:
                 logging.warning(
-                    f"No parameter growth MD relaxation possible, trying classical MD relaxation."
+                    f"No parameter growth MD possible, trying classical MD relaxation."
                 )
                 run_prmgrowth = False
         else:
@@ -369,24 +362,19 @@ class RunManager:
 
         if not run_prmgrowth:
             if hasattr(self.config.changer.coordinates, "md"):
-                self._run_md(self.config.changer.coordinates.md)
-                # crr_tasks doesn't work because _run_recipe finishes before and then has no control over the file handling anymore
-                # self.crr_tasks.put(
-                #     Task(
-                #         self._run_md,
-                #         kwargs={"instance": self.config.changer.coordinates.md},
-                #     )
-                # )
+                instance = self.config.changer.coordinates.md
             else:
                 logging.info(f"No MD relaxation after reaction.")
 
+        if instance:
+            # crr_task nested in this task instead of running afterwards
+            self.crr_tasks.put(
+                Task(
+                    self._run_md,
+                    kwargs={"instance": instance},
+                )
+            )
+            next(self)
+
         logging.info("Reaction done")
         return files
-
-    # def _relaxation(self) -> TaskFiles:
-    #     # this task generates no files but is only there to generate subtasks
-    #     logging.info(f"Start Relaxation in step {self.iteration}")
-    #     logging.info(f"Type of relaxation: {self.config.changer.coordinates}")
-
-    #     # TODO add atom placement method from Kai as relaxation option
-    #     logging.info(f"Relaxation task added!")

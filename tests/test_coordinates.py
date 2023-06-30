@@ -1,6 +1,5 @@
 from kimmdy.parsing import read_top, write_top
-from kimmdy.tasks import TaskFiles
-from kimmdy.topology.topology import Topology, TopologyDict
+from kimmdy.topology.topology import Topology
 from kimmdy.topology.atomic import Bond
 from kimmdy.coordinates import merge_top_prmgrowth, get_atomicobj
 from conftest import SlimFiles
@@ -51,19 +50,15 @@ def coordinates_files():
 
 def test_get_bondobj(coordinates_files):
     bond1_keys = ["17", "18"]
-    bond1 = Bond.from_top_line("17       18       1   ".split())
     bond1obj = get_atomicobj(bond1_keys, Bond, coordinates_files["topA"])
 
     bond2_keys = ["17", "19"]
-    bond2 = Bond.from_top_line("17       19       1        0.13600  282001.6".split())
     bond2obj = get_atomicobj(bond2_keys, Bond, coordinates_files["topA"])
     assert diff_within(bond1obj.c0, "0.10100") and diff_within(bond1obj.c1, "363171.2")
     assert diff_within(bond2obj.c0, "0.13600") and diff_within(bond2obj.c1, "282001.6")
 
 
 def test_merge_prm_top(coordinates_files):
-    # needs a proper runmgr
-    # files = TaskFiles(generic_rmgr)
     files = SlimFiles()
     files.input["top"] = coordinates_files["topA_path"]
     files.output["top"] = coordinates_files["topB_path"]

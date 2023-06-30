@@ -47,7 +47,7 @@ def test_integration_valid_input_files(tmp_path, caplog):
         # assert record.levelname != "WARNING"
         assert record.levelname != "CRITICAL"
     assert set(["Finished", "running", "tasks,"]).issubset(
-        set(caplog.get_records("call")[-1].message.split(sep=" "))
+        set(caplog.records[-1].message.split(sep=" "))
     )
 
 
@@ -60,7 +60,7 @@ def test_integration_hat_reaction(tmp_path, caplog):
         # assert record.levelname != "WARNING"
         assert record.levelname != "CRITICAL"
     assert set(["Finished", "running", "tasks,"]).issubset(
-        set(caplog.get_records("call")[-1].message.split(sep=" "))
+        set(caplog.records[-1].message.split(sep=" "))
     )
 
 
