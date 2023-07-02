@@ -61,6 +61,14 @@ Read a plumed.dat configuration file.
 
 `parsing.read_top(path)`
 
+Parse a list of lines from a topology file.
+
+#### Parameters
+
+| Name   | Type   | Description                | Default    |
+|--------|--------|----------------------------|------------|
+| `path` | Path   | Path to the topology file. | _required_ |
+
 #### Assumptions And Limitation
 
 - ``#include`` statements will be resolved
