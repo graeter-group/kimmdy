@@ -6,5 +6,5 @@ Welcome to KIMMDY
 #| eval: false
 from kimmdy.cmd import kimmdy_run
 
-kimmdy_run
+kimmdy_run()
 ```

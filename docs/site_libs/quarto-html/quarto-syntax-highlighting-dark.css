@@ -34,7 +34,7 @@
 
 /* other quarto variables */
 :root {
-  --quarto-font-monospace: Fira Mono;
+  --quarto-font-monospace: "Fira Mono", Menlo, Consolas, monospace;
 }
 
 code span.al {

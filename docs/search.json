@@ -1,73 +1,31 @@
 [
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "KIMMDY",
+    "objectID": "guide/getting-started.html",
+    "href": "guide/getting-started.html",
+    "title": "Getting Started",
     "section": "",
-    "text": "Welcome to KIMMDY\n\nfrom kimmdy.cmd import kimmdy_run\n\nkimmdy_run"
+    "text": "Getting Started\nLet’s jump right in!"
   },
   {
-    "objectID": "reference/get_object.html",
-    "href": "reference/get_object.html",
-    "title": "get_object",
+    "objectID": "reference/kimmdy.runmanager.default_decision_strategy.html",
+    "href": "reference/kimmdy.runmanager.default_decision_strategy.html",
+    "title": "default_decision_strategy",
     "section": "",
-    "text": "get_object(path, object_name=None, parser='numpy', load_aliases=True, dynamic=False, loader=None)\nFetch a griffe object.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\npath\nstr\nAn import path to the object. This should have the form path.to.module:object. For example, quartodoc:get_object or quartodoc:MdRenderer.render.\nrequired\n\n\nobject_name\nstr | None\n(Deprecated). A function name.\nNone\n\n\nparser\nstr\nA docstring parser to use.\n'numpy'\n\n\nload_aliases\n\nFor aliases that were imported from other modules, should we load that module?\nTrue\n\n\ndynamic\n\nWhether to dynamically import object. Useful if docstring is not hard-coded, but was set on object by running python code.\nFalse\n\n\n\n\n\n\npreview: print a user-friendly preview of a griffe object.\n\n\n\n&gt;&gt;&gt; get_function(\"quartodoc\", \"get_function\")\n&lt;Function('get_function', ..."
+    "text": "runmanager.default_decision_strategy(reaction_results)\nRejection-Free Monte Carlo. takes a list of ReactionResults and choses a recipe.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nreaction_reults\n\nfrom which one will be choosen\nrequired"
   },
   {
-    "objectID": "reference/get_object.html#parameters",
-    "href": "reference/get_object.html#parameters",
-    "title": "get_object",
+    "objectID": "reference/kimmdy.runmanager.default_decision_strategy.html#parameters",
+    "href": "reference/kimmdy.runmanager.default_decision_strategy.html#parameters",
+    "title": "default_decision_strategy",
     "section": "",
-    "text": "Name\nType\nDescription\nDefault\n\n\n\n\npath\nstr\nAn import path to the object. This should have the form path.to.module:object. For example, quartodoc:get_object or quartodoc:MdRenderer.render.\nrequired\n\n\nobject_name\nstr | None\n(Deprecated). A function name.\nNone\n\n\nparser\nstr\nA docstring parser to use.\n'numpy'\n\n\nload_aliases\n\nFor aliases that were imported from other modules, should we load that module?\nTrue\n\n\ndynamic\n\nWhether to dynamically import object. Useful if docstring is not hard-coded, but was set on object by running python code.\nFalse"
-  },
-  {
-    "objectID": "reference/get_object.html#see-also",
-    "href": "reference/get_object.html#see-also",
-    "title": "get_object",
-    "section": "",
-    "text": "preview: print a user-friendly preview of a griffe object."
-  },
-  {
-    "objectID": "reference/get_object.html#examples",
-    "href": "reference/get_object.html#examples",
-    "title": "get_object",
-    "section": "",
-    "text": "&gt;&gt;&gt; get_function(\"quartodoc\", \"get_function\")\n&lt;Function('get_function', ..."
-  },
-  {
-    "objectID": "reference/cmd.kimmdy_run.html",
-    "href": "reference/cmd.kimmdy_run.html",
-    "title": "cmd.kimmdy_run",
-    "section": "",
-    "text": "cmd.kimmdy_run\ncmd.kimmdy_run(input=Path('kimmdy.yml'), loglevel='DEBUG', logfile=Path('kimmdy.log'))\nRun KIMMDY from python."
-  },
-  {
-    "objectID": "reference/runmanager.html",
-    "href": "reference/runmanager.html",
-    "title": "runmanager",
-    "section": "",
-    "text": "runmanager\n\n\n\n\n\nName\nDescription\n\n\n\n\nAMBIGUOUS_SUFFS\n\n\n\n\n\n\n\n\n\n\nName\nDescription\n\n\n\n\ndefault_decision_strategy\nRejection-Free Monte Carlo."
-  },
-  {
-    "objectID": "reference/runmanager.html#attributes",
-    "href": "reference/runmanager.html#attributes",
-    "title": "runmanager",
-    "section": "",
-    "text": "Name\nDescription\n\n\n\n\nAMBIGUOUS_SUFFS"
-  },
-  {
-    "objectID": "reference/runmanager.html#functions",
-    "href": "reference/runmanager.html#functions",
-    "title": "runmanager",
-    "section": "",
-    "text": "Name\nDescription\n\n\n\n\ndefault_decision_strategy\nRejection-Free Monte Carlo."
+    "text": "Name\nType\nDescription\nDefault\n\n\n\n\nreaction_reults\n\nfrom which one will be choosen\nrequired"
   },
   {
     "objectID": "reference/index.html",
     "href": "reference/index.html",
     "title": "Function reference",
     "section": "",
-    "text": "Start KIMMDY from a python script\n\n\n\ncmd\n\n\n\n\n\n\n\nTODO\n\n\n\nrunmanager\n\n\n\nrunmanager.RunManager\nThe RunManager, a central piece."
+    "text": "Start KIMMDY from a python script\n\n\n\ncmd\n\n\n\n\n\n\n\nTODO\n\n\n\nrunmanager\n\n\n\nrunmanager.RunManager\nThe RunManager, a central piece.\n\n\nreaction\n\n\n\ntasks\n\n\n\ntopology.topology.Topology\nSmart container for parsed topology data.\n\n\nparsing"
   },
   {
     "objectID": "reference/index.html#api",
@@ -81,63 +39,14 @@
     "href": "reference/index.html#internals",
     "title": "Function reference",
     "section": "",
-    "text": "TODO\n\n\n\nrunmanager\n\n\n\nrunmanager.RunManager\nThe RunManager, a central piece."
+    "text": "TODO\n\n\n\nrunmanager\n\n\n\nrunmanager.RunManager\nThe RunManager, a central piece.\n\n\nreaction\n\n\n\ntasks\n\n\n\ntopology.topology.Topology\nSmart container for parsed topology data.\n\n\nparsing"
   },
   {
-    "objectID": "guide/getting-started.html",
-    "href": "guide/getting-started.html",
-    "title": "Getting Started",
+    "objectID": "reference/kimmdy.runmanager.RunManager.iteration.html",
+    "href": "reference/kimmdy.runmanager.RunManager.iteration.html",
+    "title": "iteration",
     "section": "",
-    "text": "Getting Started\nLet’s jump right in!"
-  },
-  {
-    "objectID": "reference/runmanager.RunManager.html",
-    "href": "reference/runmanager.RunManager.html",
-    "title": "runmanager.RunManager",
-    "section": "",
-    "text": "runmanager.RunManager(self, config)\nThe RunManager, a central piece.\nManages the queue of tasks, communicates with the rest of the program and keeps track of global state.\n\n\n\n\n\nName\nDescription\n\n\n\n\nget_latest\nReturns path to latest file of given type.\n\n\nrun\n\n\n\n\n\n\nrunmanager.RunManager.get_latest(self, suffix)\nReturns path to latest file of given type.\nFor .dat files (in general ambiguous extensions) use full file name. Errors if file is not found.\n\n\n\nrunmanager.RunManager.run(self)"
-  },
-  {
-    "objectID": "reference/runmanager.RunManager.html#methods",
-    "href": "reference/runmanager.RunManager.html#methods",
-    "title": "runmanager.RunManager",
-    "section": "",
-    "text": "Name\nDescription\n\n\n\n\nget_latest\nReturns path to latest file of given type.\n\n\nrun\n\n\n\n\n\n\nrunmanager.RunManager.get_latest(self, suffix)\nReturns path to latest file of given type.\nFor .dat files (in general ambiguous extensions) use full file name. Errors if file is not found.\n\n\n\nrunmanager.RunManager.run(self)"
-  },
-  {
-    "objectID": "reference/kimmdy.runmanager.RunManager.config.html",
-    "href": "reference/kimmdy.runmanager.RunManager.config.html",
-    "title": "config",
-    "section": "",
-    "text": "config\nrunmanager.RunManager.config"
-  },
-  {
-    "objectID": "reference/kimmdy.runmanager.RunManager.cptfile.html",
-    "href": "reference/kimmdy.runmanager.RunManager.cptfile.html",
-    "title": "cptfile",
-    "section": "",
-    "text": "cptfile\nrunmanager.RunManager.cptfile"
-  },
-  {
-    "objectID": "reference/kimmdy.runmanager.RunManager.crr_tasks.html",
-    "href": "reference/kimmdy.runmanager.RunManager.crr_tasks.html",
-    "title": "crr_tasks",
-    "section": "",
-    "text": "crr_tasks\nrunmanager.RunManager.crr_tasks"
-  },
-  {
-    "objectID": "reference/kimmdy.runmanager.RunManager.filehist.html",
-    "href": "reference/kimmdy.runmanager.RunManager.filehist.html",
-    "title": "filehist",
-    "section": "",
-    "text": "filehist\nrunmanager.RunManager.filehist"
-  },
-  {
-    "objectID": "reference/kimmdy.runmanager.RunManager.from_checkpoint.html",
-    "href": "reference/kimmdy.runmanager.RunManager.from_checkpoint.html",
-    "title": "from_checkpoint",
-    "section": "",
-    "text": "from_checkpoint\nrunmanager.RunManager.from_checkpoint"
+    "text": "iteration\nrunmanager.RunManager.iteration"
   },
   {
     "objectID": "reference/kimmdy.runmanager.RunManager.get_latest.html",
@@ -147,25 +56,11 @@
     "text": "get_latest\nrunmanager.RunManager.get_latest(self, suffix)\nReturns path to latest file of given type.\nFor .dat files (in general ambiguous extensions) use full file name. Errors if file is not found."
   },
   {
-    "objectID": "reference/kimmdy.runmanager.RunManager.run.html",
-    "href": "reference/kimmdy.runmanager.RunManager.run.html",
-    "title": "run",
-    "section": "",
-    "text": "run\nrunmanager.RunManager.run(self)"
-  },
-  {
-    "objectID": "reference/runmanager.html#kimmdy.runmanager.default_decision_strategy",
-    "href": "reference/runmanager.html#kimmdy.runmanager.default_decision_strategy",
-    "title": "runmanager",
-    "section": "",
-    "text": "runmanager.default_decision_strategy(reaction_results)\nRejection-Free Monte Carlo. takes a list of ReactionResults and choses a recipe.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nreaction_reults\n\nfrom which one will be choosen\nrequired"
-  },
-  {
     "objectID": "reference/cmd.html",
     "href": "reference/cmd.html",
     "title": "cmd",
     "section": "",
-    "text": "cmd\n\n\n\n\n\nName\nDescription\n\n\n\n\nconfigure_logging\nConfigure logging.\n\n\nget_cmdline_args\nParse command line arguments and configure logger.\n\n\nkimmdy\nRun KIMMDY from the command line.\n\n\nkimmdy_run\nRun KIMMDY from python.\n\n\n\n\n\n\ncmd.configure_logging(args, color=False)\nConfigure logging.\nConfigures the logging module with optional colorcodes for the terminal.\n\n\n\ncmd.get_cmdline_args()\nParse command line arguments and configure logger.\n\n\n\n\n\nType\nDescription\n\n\n\n\nNamespace\nparsed command line arguments\n\n\n\n\n\n\n\ncmd.kimmdy()\nRun KIMMDY from the command line.\nThe configuration is gathered from the input file, which is kimmdy.yml by default.\n\n\n\ncmd.kimmdy_run(input=Path('kimmdy.yml'), loglevel='DEBUG', logfile=Path('kimmdy.log'))\nRun KIMMDY from python."
+    "text": "cmd\n\n\n\n\n\nName\nDescription\n\n\n\n\nconfigure_logging\nConfigure logging.\n\n\nget_cmdline_args\nParse command line arguments and configure logger.\n\n\nkimmdy\nRun KIMMDY from the command line.\n\n\nkimmdy_run\nRun KIMMDY from python.\n\n\n\n\n\n\ncmd.configure_logging(args, color=False)\nConfigure logging.\nConfigures the logging module with optional colorcodes for the terminal.\n\n\n\ncmd.get_cmdline_args()\nParse command line arguments and configure logger.\n\n\n\n\n\nType\nDescription\n\n\n\n\nNamespace\nparsed command line arguments\n\n\n\n\n\n\n\ncmd.kimmdy()\nRun KIMMDY from the command line.\nThe configuration is gathered from the input file, which is kimmdy.yml by default.\n\n\n\ncmd.kimmdy_run(input=Path('kimmdy.yml'), loglevel='DEBUG', logfile=Path('kimmdy.log'), checkpoint='', concat=False)\nRun KIMMDY from python."
   },
   {
     "objectID": "reference/cmd.html#functions",
@@ -200,63 +95,42 @@
     "href": "reference/cmd.html#kimmdy.cmd.kimmdy_run",
     "title": "cmd",
     "section": "",
-    "text": "cmd.kimmdy_run(input=Path('kimmdy.yml'), loglevel='DEBUG', logfile=Path('kimmdy.log'))\nRun KIMMDY from python."
+    "text": "cmd.kimmdy_run(input=Path('kimmdy.yml'), loglevel='DEBUG', logfile=Path('kimmdy.log'), checkpoint='', concat=False)\nRun KIMMDY from python."
   },
   {
-    "objectID": "reference/kimmdy.runmanager.default_decision_strategy.html",
-    "href": "reference/kimmdy.runmanager.default_decision_strategy.html",
-    "title": "default_decision_strategy",
+    "objectID": "reference/kimmdy.runmanager.RunManager.filehist.html",
+    "href": "reference/kimmdy.runmanager.RunManager.filehist.html",
+    "title": "filehist",
     "section": "",
-    "text": "runmanager.default_decision_strategy(reaction_results)\nRejection-Free Monte Carlo. takes a list of ReactionResults and choses a recipe.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nreaction_reults\n\nfrom which one will be choosen\nrequired"
+    "text": "filehist\nrunmanager.RunManager.filehist"
   },
   {
-    "objectID": "reference/kimmdy.runmanager.default_decision_strategy.html#parameters",
-    "href": "reference/kimmdy.runmanager.default_decision_strategy.html#parameters",
-    "title": "default_decision_strategy",
+    "objectID": "reference/coordinates.Example.html",
+    "href": "reference/coordinates.Example.html",
+    "title": "coordinates.Example",
     "section": "",
-    "text": "Name\nType\nDescription\nDefault\n\n\n\n\nreaction_reults\n\nfrom which one will be choosen\nrequired"
+    "text": "coordinates.Example\ncoordinates.Example()\nExample class for testing purposes."
   },
   {
-    "objectID": "reference/kimmdy.runmanager.AMBIGUOUS_SUFFS.html",
-    "href": "reference/kimmdy.runmanager.AMBIGUOUS_SUFFS.html",
-    "title": "AMBIGUOUS_SUFFS",
+    "objectID": "reference/kimmdy.runmanager.RunManager.run.html",
+    "href": "reference/kimmdy.runmanager.RunManager.run.html",
+    "title": "run",
     "section": "",
-    "text": "AMBIGUOUS_SUFFS\nrunmanager.AMBIGUOUS_SUFFS"
+    "text": "run\nrunmanager.RunManager.run(self)"
   },
   {
-    "objectID": "reference/kimmdy.runmanager.RunManager.iterations.html",
-    "href": "reference/kimmdy.runmanager.RunManager.iterations.html",
-    "title": "iterations",
+    "objectID": "reference/runmanager.RunManager.html",
+    "href": "reference/runmanager.RunManager.html",
+    "title": "runmanager.RunManager",
     "section": "",
-    "text": "iterations\nrunmanager.RunManager.iterations"
+    "text": "runmanager.RunManager(self, config)\nThe RunManager, a central piece.\nManages the queue of tasks, communicates with the rest of the program and keeps track of global state.\n\n\n\n\n\nName\nDescription\n\n\n\n\nget_latest\nReturns path to latest file of given type.\n\n\nrun\n\n\n\n\n\n\nrunmanager.RunManager.get_latest(self, suffix)\nReturns path to latest file of given type.\nFor .dat files (in general ambiguous extensions) use full file name. Errors if file is not found.\n\n\n\nrunmanager.RunManager.run(self)"
   },
   {
-    "objectID": "reference/kimmdy.runmanager.RunManager.state.html",
-    "href": "reference/kimmdy.runmanager.RunManager.state.html",
-    "title": "state",
+    "objectID": "reference/runmanager.RunManager.html#methods",
+    "href": "reference/runmanager.RunManager.html#methods",
+    "title": "runmanager.RunManager",
     "section": "",
-    "text": "state\nrunmanager.RunManager.state"
-  },
-  {
-    "objectID": "reference/kimmdy.runmanager.RunManager.tasks.html",
-    "href": "reference/kimmdy.runmanager.RunManager.tasks.html",
-    "title": "tasks",
-    "section": "",
-    "text": "tasks\nrunmanager.RunManager.tasks"
-  },
-  {
-    "objectID": "reference/kimmdy.runmanager.RunManager.top.html",
-    "href": "reference/kimmdy.runmanager.RunManager.top.html",
-    "title": "top",
-    "section": "",
-    "text": "top\nrunmanager.RunManager.top"
-  },
-  {
-    "objectID": "reference/kimmdy.runmanager.State.html",
-    "href": "reference/kimmdy.runmanager.State.html",
-    "title": "State",
-    "section": "",
-    "text": "State\nrunmanager.State()\nState of the system. one of IDLE, MD, REACTION, DONE."
+    "text": "Name\nDescription\n\n\n\n\nget_latest\nReturns path to latest file of given type.\n\n\nrun\n\n\n\n\n\n\nrunmanager.RunManager.get_latest(self, suffix)\nReturns path to latest file of given type.\nFor .dat files (in general ambiguous extensions) use full file name. Errors if file is not found.\n\n\n\nrunmanager.RunManager.run(self)"
   },
   {
     "objectID": "reference/kimmdy.runmanager.RunManager.task_mapping.html",
@@ -266,6 +140,139 @@
     "text": "task_mapping\nrunmanager.RunManager.task_mapping"
   },
   {
+    "objectID": "reference/kimmdy.runmanager.RunManager.top.html",
+    "href": "reference/kimmdy.runmanager.RunManager.top.html",
+    "title": "top",
+    "section": "",
+    "text": "top\nrunmanager.RunManager.top"
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.RunManager.state.html",
+    "href": "reference/kimmdy.runmanager.RunManager.state.html",
+    "title": "state",
+    "section": "",
+    "text": "state\nrunmanager.RunManager.state"
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.RunManager.cptfile.html",
+    "href": "reference/kimmdy.runmanager.RunManager.cptfile.html",
+    "title": "cptfile",
+    "section": "",
+    "text": "cptfile\nrunmanager.RunManager.cptfile"
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.get_existing_files.html",
+    "href": "reference/kimmdy.runmanager.get_existing_files.html",
+    "title": "get_existing_files",
+    "section": "",
+    "text": "get_existing_files\nrunmanager.get_existing_files(config)\nInitialize latest_files with every existing file defined in config"
+  },
+  {
+    "objectID": "reference/cmd.kimmdy_run.html",
+    "href": "reference/cmd.kimmdy_run.html",
+    "title": "cmd.kimmdy_run",
+    "section": "",
+    "text": "cmd.kimmdy_run\ncmd.kimmdy_run(input=Path('kimmdy.yml'), loglevel='DEBUG', logfile=Path('kimmdy.log'))\nRun KIMMDY from python."
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.AMBIGUOUS_SUFFS.html",
+    "href": "reference/kimmdy.runmanager.AMBIGUOUS_SUFFS.html",
+    "title": "AMBIGUOUS_SUFFS",
+    "section": "",
+    "text": "AMBIGUOUS_SUFFS\nrunmanager.AMBIGUOUS_SUFFS"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "KIMMDY",
+    "section": "",
+    "text": "Welcome to KIMMDY\n\nfrom kimmdy.cmd import kimmdy_run\n\nkimmdy_run()"
+  },
+  {
+    "objectID": "reference/get_object.html",
+    "href": "reference/get_object.html",
+    "title": "get_object",
+    "section": "",
+    "text": "get_object(path, object_name=None, parser='numpy', load_aliases=True, dynamic=False, loader=None)\nFetch a griffe object.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\npath\nstr\nAn import path to the object. This should have the form path.to.module:object. For example, quartodoc:get_object or quartodoc:MdRenderer.render.\nrequired\n\n\nobject_name\nstr | None\n(Deprecated). A function name.\nNone\n\n\nparser\nstr\nA docstring parser to use.\n'numpy'\n\n\nload_aliases\n\nFor aliases that were imported from other modules, should we load that module?\nTrue\n\n\ndynamic\n\nWhether to dynamically import object. Useful if docstring is not hard-coded, but was set on object by running python code.\nFalse\n\n\n\n\n\n\npreview: print a user-friendly preview of a griffe object.\n\n\n\n&gt;&gt;&gt; get_function(\"quartodoc\", \"get_function\")\n&lt;Function('get_function', ..."
+  },
+  {
+    "objectID": "reference/get_object.html#parameters",
+    "href": "reference/get_object.html#parameters",
+    "title": "get_object",
+    "section": "",
+    "text": "Name\nType\nDescription\nDefault\n\n\n\n\npath\nstr\nAn import path to the object. This should have the form path.to.module:object. For example, quartodoc:get_object or quartodoc:MdRenderer.render.\nrequired\n\n\nobject_name\nstr | None\n(Deprecated). A function name.\nNone\n\n\nparser\nstr\nA docstring parser to use.\n'numpy'\n\n\nload_aliases\n\nFor aliases that were imported from other modules, should we load that module?\nTrue\n\n\ndynamic\n\nWhether to dynamically import object. Useful if docstring is not hard-coded, but was set on object by running python code.\nFalse"
+  },
+  {
+    "objectID": "reference/get_object.html#see-also",
+    "href": "reference/get_object.html#see-also",
+    "title": "get_object",
+    "section": "",
+    "text": "preview: print a user-friendly preview of a griffe object."
+  },
+  {
+    "objectID": "reference/get_object.html#examples",
+    "href": "reference/get_object.html#examples",
+    "title": "get_object",
+    "section": "",
+    "text": "&gt;&gt;&gt; get_function(\"quartodoc\", \"get_function\")\n&lt;Function('get_function', ..."
+  },
+  {
+    "objectID": "reference/reaction.html",
+    "href": "reference/reaction.html",
+    "title": "reaction",
+    "section": "",
+    "text": "reaction\n\n\n\n\n\nName\nDescription\n\n\n\n\nTypeRecipe"
+  },
+  {
+    "objectID": "reference/reaction.html#attributes",
+    "href": "reference/reaction.html#attributes",
+    "title": "reaction",
+    "section": "",
+    "text": "Name\nDescription\n\n\n\n\nTypeRecipe"
+  },
+  {
+    "objectID": "reference/topology.topology.Topology.html",
+    "href": "reference/topology.topology.Topology.html",
+    "title": "topology.topology.Topology",
+    "section": "",
+    "text": "topology.topology.Topology(self, top, ffpatch=None)\nSmart container for parsed topology data.\nA topology keeps track of connections and applies patches to parameters when bonds are broken or formed. Assumptions: - the topology of interest (the protein) is in section ‘moleculetype_0’.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\ntop\nTopologyDict\nA dictionary containing the parsed topology data.\nrequired\n\n\nffpatch\ntyping.Optional[pathlib.Path]\nPath to a force field patch file. If None, no patching is applied.\nNone\n\n\n\n\n\n\n\n\n\nName\nDescription\n\n\n\n\nbind_bond\nAdd a bond in topology.\n\n\nbreak_bond\nBreak bonds in topology.\n\n\nmove_hydrogen\nMove a singly bound atom to a new location.\n\n\npatch_parameters\n\n\n\nreindex_atomnrs\nReindex atom numbers in topology.\n\n\nto_dict\n\n\n\n\n\n\ntopology.topology.Topology.bind_bond(self, atompair_nrs)\nAdd a bond in topology.\nModifies the topology dictionary in place. It keeps track of affected terms in the topology via a graph representation of the topology and applies the necessary changes to bonds, angles and dihedrals (proper and improper). Furthermore, it modifies to function types in the topology to account for radicals.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\natompair\n\nA tuple of integers with the atoms indices (id, starting at 1) with from, the atom being moved and to, the atom to which the from atom will be bound\nrequired\n\n\n\n\n\n\n\ntopology.topology.Topology.break_bond(self, atompair_nrs)\nBreak bonds in topology.\nremoves bond, angles and dihedrals where atompair was involved. Modifies the topology dictionary in place.\n\n\n\ntopology.topology.Topology.move_hydrogen(self, from_to)\nMove a singly bound atom to a new location.\nThis is typically H for Hydrogen Atom Transfer (HAT).\n\n\n\ntopology.topology.Topology.patch_parameters(self, focus_nr)\n\n\n\ntopology.topology.Topology.reindex_atomnrs(self)\nReindex atom numbers in topology.\nStarts at index 1. This also updates the numbers for bonds, angles, dihedrals and pairs.\n\n\n\ntopology.topology.Topology.to_dict(self)"
+  },
+  {
+    "objectID": "reference/topology.topology.Topology.html#methods",
+    "href": "reference/topology.topology.Topology.html#methods",
+    "title": "topology.topology.Topology",
+    "section": "",
+    "text": "Name\nDescription\n\n\n\n\nbind_bond\nAdd a bond in topology.\n\n\nbreak_bond\nBreak bonds in topology.\n\n\nmove_hydrogen\nMove a singly bound atom to a new location.\n\n\npatch_parameters\n\n\n\nreindex_atomnrs\nReindex atom numbers in topology.\n\n\nto_dict\n\n\n\n\n\n\ntopology.topology.Topology.bind_bond(self, atompair_nrs)\nAdd a bond in topology.\nModifies the topology dictionary in place. It keeps track of affected terms in the topology via a graph representation of the topology and applies the necessary changes to bonds, angles and dihedrals (proper and improper). Furthermore, it modifies to function types in the topology to account for radicals.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\natompair\n\nA tuple of integers with the atoms indices (id, starting at 1) with from, the atom being moved and to, the atom to which the from atom will be bound\nrequired\n\n\n\n\n\n\n\ntopology.topology.Topology.break_bond(self, atompair_nrs)\nBreak bonds in topology.\nremoves bond, angles and dihedrals where atompair was involved. Modifies the topology dictionary in place.\n\n\n\ntopology.topology.Topology.move_hydrogen(self, from_to)\nMove a singly bound atom to a new location.\nThis is typically H for Hydrogen Atom Transfer (HAT).\n\n\n\ntopology.topology.Topology.patch_parameters(self, focus_nr)\n\n\n\ntopology.topology.Topology.reindex_atomnrs(self)\nReindex atom numbers in topology.\nStarts at index 1. This also updates the numbers for bonds, angles, dihedrals and pairs.\n\n\n\ntopology.topology.Topology.to_dict(self)"
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.RunManager.iterations.html",
+    "href": "reference/kimmdy.runmanager.RunManager.iterations.html",
+    "title": "iterations",
+    "section": "",
+    "text": "iterations\nrunmanager.RunManager.iterations"
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.RunManager.tasks.html",
+    "href": "reference/kimmdy.runmanager.RunManager.tasks.html",
+    "title": "tasks",
+    "section": "",
+    "text": "tasks\nrunmanager.RunManager.tasks"
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.State.html",
+    "href": "reference/kimmdy.runmanager.State.html",
+    "title": "State",
+    "section": "",
+    "text": "State\nrunmanager.State()\nState of the system. one of IDLE, MD, REACTION, DONE."
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.RunManager.from_checkpoint.html",
+    "href": "reference/kimmdy.runmanager.RunManager.from_checkpoint.html",
+    "title": "from_checkpoint",
+    "section": "",
+    "text": "from_checkpoint\nrunmanager.RunManager.from_checkpoint"
+  },
+  {
     "objectID": "reference/kimmdy.runmanager.RunManager.histfile.html",
     "href": "reference/kimmdy.runmanager.RunManager.histfile.html",
     "title": "histfile",
@@ -273,11 +280,39 @@
     "text": "histfile\nrunmanager.RunManager.histfile"
   },
   {
+    "objectID": "reference/runmanager.html",
+    "href": "reference/runmanager.html",
+    "title": "runmanager",
+    "section": "",
+    "text": "runmanager\n\n\n\n\n\nName\nDescription\n\n\n\n\nAMBIGUOUS_SUFFS\n\n\n\n\n\n\n\n\n\n\nName\nDescription\n\n\n\n\nget_existing_files\nInitialize latest_files with every existing file defined in config"
+  },
+  {
+    "objectID": "reference/runmanager.html#attributes",
+    "href": "reference/runmanager.html#attributes",
+    "title": "runmanager",
+    "section": "",
+    "text": "Name\nDescription\n\n\n\n\nAMBIGUOUS_SUFFS"
+  },
+  {
+    "objectID": "reference/runmanager.html#functions",
+    "href": "reference/runmanager.html#functions",
+    "title": "runmanager",
+    "section": "",
+    "text": "Name\nDescription\n\n\n\n\nget_existing_files\nInitialize latest_files with every existing file defined in config"
+  },
+  {
     "objectID": "reference/kimmdy.runmanager.RunManager.reactions.html",
     "href": "reference/kimmdy.runmanager.RunManager.reactions.html",
     "title": "reactions",
     "section": "",
     "text": "reactions\nrunmanager.RunManager.reactions"
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.RunManager.crr_tasks.html",
+    "href": "reference/kimmdy.runmanager.RunManager.crr_tasks.html",
+    "title": "crr_tasks",
+    "section": "",
+    "text": "crr_tasks\nrunmanager.RunManager.crr_tasks"
   },
   {
     "objectID": "reference/kimmdy.runmanager.RunManager.latest_files.html",
@@ -294,17 +329,66 @@
     "text": "RunManager\nrunmanager.RunManager(self, config)\nThe RunManager, a central piece.\nManages the queue of tasks, communicates with the rest of the program and keeps track of global state."
   },
   {
-    "objectID": "reference/kimmdy.runmanager.RunManager.iteration.html",
-    "href": "reference/kimmdy.runmanager.RunManager.iteration.html",
-    "title": "iteration",
-    "section": "",
-    "text": "iteration\nrunmanager.RunManager.iteration"
-  },
-  {
     "objectID": "reference/kimmdy.runmanager.RunManager.reaction_results.html",
     "href": "reference/kimmdy.runmanager.RunManager.reaction_results.html",
     "title": "reaction_results",
     "section": "",
     "text": "reaction_results\nrunmanager.RunManager.reaction_results"
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.RunManager.config.html",
+    "href": "reference/kimmdy.runmanager.RunManager.config.html",
+    "title": "config",
+    "section": "",
+    "text": "config\nrunmanager.RunManager.config"
+  },
+  {
+    "objectID": "reference/tasks.html",
+    "href": "reference/tasks.html",
+    "title": "tasks",
+    "section": "",
+    "text": "tasks\n\n\n\n\n\nName\nDescription\n\n\n\n\nTaskMapping"
+  },
+  {
+    "objectID": "reference/tasks.html#attributes",
+    "href": "reference/tasks.html#attributes",
+    "title": "tasks",
+    "section": "",
+    "text": "Name\nDescription\n\n\n\n\nTaskMapping"
+  },
+  {
+    "objectID": "reference/topology.topology.Topology.html#parameters",
+    "href": "reference/topology.topology.Topology.html#parameters",
+    "title": "topology.topology.Topology",
+    "section": "",
+    "text": "Name\nType\nDescription\nDefault\n\n\n\n\ntop\nTopologyDict\nA dictionary containing the parsed topology data.\nrequired\n\n\nffpatch\ntyping.Optional[pathlib.Path]\nPath to a force field patch file. If None, no patching is applied.\nNone"
+  },
+  {
+    "objectID": "reference/parsing.html",
+    "href": "reference/parsing.html",
+    "title": "parsing",
+    "section": "",
+    "text": "parsing\n\n\n\n\n\nName\nDescription\n\n\n\n\nGMX_BUILTIN_FF_DIR\n\n\n\nTopologyDict\n\n\n\n\n\n\n\n\n\n\nName\nDescription\n\n\n\n\ncreate_subsections\n\n\n\nis_not_comment\n\n\n\nread_distances_dat\nRead a distances.dat plumed output file.\n\n\nread_edissoc\nreads a edissoc file and turns it into a dict.\n\n\nread_plumed\nRead a plumed.dat configuration file.\n\n\nread_rtp\n\n\n\nread_top\nParse a list of lines from a topology file.\n\n\nread_xml_ff\n\n\n\nresolve_includes\nResolve #include statements in a (top/itp) file.\n\n\nwrite_plumed\nWrite a plumed.dat configuration file.\n\n\nwrite_top\n\n\n\n\n\n\nparsing.create_subsections(ls)\n\n\n\nparsing.is_not_comment(c)\n\n\n\nparsing.read_distances_dat(distances_dat)\nRead a distances.dat plumed output file.\n\n\n\nparsing.read_edissoc(path)\nreads a edissoc file and turns it into a dict. the tuple of bond atoms make up the key, the dissociation energy E_dissoc [kJ mol-1] is the value\n\n\n\nparsing.read_plumed(path)\nRead a plumed.dat configuration file.\n\n\n\nparsing.read_rtp(path)\n\n\n\nparsing.read_top(path)\n\n\n\n#include statements will be resolved\ncomments will be removed\nall lines are stripped of leading and trailing whitespace\n#undef is not supported\na section within ifdef may be a subsection of a section that was started outside of the ifdef\n#if..#endif statements only surround a full section or subsection, not individual lines within a section and a section may either be contained within if … else or it may not be, but it can not be duplicated with one part inside and one outside.\nif .. else can’t be nested\n#include s that don’t resolve to a valid file path are silently dropped\nsections that can have subsections can also exist multiple, separate times e.g. moleculetype will appear multiple times and they should not be merged\n\n\n\n\n\nparsing.read_xml_ff(path)\n\n\n\nparsing.resolve_includes(path)\nResolve #include statements in a (top/itp) file. Returns a tuple with the list of lines and the Path to the ff directory.\n\n\n\nparsing.write_plumed(d, path)\nWrite a plumed.dat configuration file.\n\n\n\nparsing.write_top(top, outfile)"
+  },
+  {
+    "objectID": "reference/parsing.html#attributes",
+    "href": "reference/parsing.html#attributes",
+    "title": "parsing",
+    "section": "",
+    "text": "Name\nDescription\n\n\n\n\nGMX_BUILTIN_FF_DIR\n\n\n\nTopologyDict"
+  },
+  {
+    "objectID": "reference/parsing.html#functions",
+    "href": "reference/parsing.html#functions",
+    "title": "parsing",
+    "section": "",
+    "text": "Name\nDescription\n\n\n\n\ncreate_subsections\n\n\n\nis_not_comment\n\n\n\nread_distances_dat\nRead a distances.dat plumed output file.\n\n\nread_edissoc\nreads a edissoc file and turns it into a dict.\n\n\nread_plumed\nRead a plumed.dat configuration file.\n\n\nread_rtp\n\n\n\nread_top\nParse a list of lines from a topology file.\n\n\nread_xml_ff\n\n\n\nresolve_includes\nResolve #include statements in a (top/itp) file.\n\n\nwrite_plumed\nWrite a plumed.dat configuration file.\n\n\nwrite_top\n\n\n\n\n\n\nparsing.create_subsections(ls)\n\n\n\nparsing.is_not_comment(c)\n\n\n\nparsing.read_distances_dat(distances_dat)\nRead a distances.dat plumed output file.\n\n\n\nparsing.read_edissoc(path)\nreads a edissoc file and turns it into a dict. the tuple of bond atoms make up the key, the dissociation energy E_dissoc [kJ mol-1] is the value\n\n\n\nparsing.read_plumed(path)\nRead a plumed.dat configuration file.\n\n\n\nparsing.read_rtp(path)\n\n\n\nparsing.read_top(path)\n\n\n\n#include statements will be resolved\ncomments will be removed\nall lines are stripped of leading and trailing whitespace\n#undef is not supported\na section within ifdef may be a subsection of a section that was started outside of the ifdef\n#if..#endif statements only surround a full section or subsection, not individual lines within a section and a section may either be contained within if … else or it may not be, but it can not be duplicated with one part inside and one outside.\nif .. else can’t be nested\n#include s that don’t resolve to a valid file path are silently dropped\nsections that can have subsections can also exist multiple, separate times e.g. moleculetype will appear multiple times and they should not be merged\n\n\n\n\n\nparsing.read_xml_ff(path)\n\n\n\nparsing.resolve_includes(path)\nResolve #include statements in a (top/itp) file. Returns a tuple with the list of lines and the Path to the ff directory.\n\n\n\nparsing.write_plumed(d, path)\nWrite a plumed.dat configuration file.\n\n\n\nparsing.write_top(top, outfile)"
+  },
+  {
+    "objectID": "guide/topology.html",
+    "href": "guide/topology.html",
+    "title": "Hexala topology",
+    "section": "",
+    "text": "Hexala\n\nfrom kimmdy.parsing import read_top\nfrom kimmdy.topology.topology import Topology\nfrom pathlib import Path\nfrom kimmdy.misc_helper import top_to_graph\n\n\nala_top = read_top(Path('../tests/test_files/test_topology/hexala.top'))\ntop = Topology(ala_top)\n\nls = top_to_graph(top) \nwith open(\"ala-top.dot\", \"w\") as f:\n  f.writelines(ls)\n\n\n\n\n\n\n\n\n\nG\n\n  \n\n1 CT\n\n 1 CT   \n\n2 HC\n\n 2 HC   \n\n1 CT–2 HC\n\n   \n\n3 HC\n\n 3 HC   \n\n1 CT–3 HC\n\n   \n\n4 HC\n\n 4 HC   \n\n1 CT–4 HC\n\n   \n\n5 C\n\n 5 C   \n\n1 CT–5 C\n\n   \n\n6 O\n\n 6 O   \n\n5 C–6 O\n\n   \n\n7 N\n\n 7 N   \n\n5 C–7 N\n\n   \n\n8 H\n\n 8 H   \n\n7 N–8 H\n\n   \n\n9 CT\n\n 9 CT   \n\n7 N–9 CT\n\n   \n\n10 H1\n\n 10 H1   \n\n9 CT–10 H1\n\n   \n\n11 CT\n\n 11 CT   \n\n9 CT–11 CT\n\n   \n\n15 C\n\n 15 C   \n\n9 CT–15 C\n\n   \n\n12 HC\n\n 12 HC   \n\n11 CT–12 HC\n\n   \n\n13 HC\n\n 13 HC   \n\n11 CT–13 HC\n\n   \n\n14 HC\n\n 14 HC   \n\n11 CT–14 HC\n\n   \n\n16 O\n\n 16 O   \n\n15 C–16 O\n\n   \n\n17 N\n\n 17 N   \n\n15 C–17 N\n\n   \n\n18 H\n\n 18 H   \n\n17 N–18 H\n\n   \n\n19 CT\n\n 19 CT   \n\n17 N–19 CT\n\n   \n\n20 H1\n\n 20 H1   \n\n19 CT–20 H1\n\n   \n\n21 CT\n\n 21 CT   \n\n19 CT–21 CT\n\n   \n\n25 C\n\n 25 C   \n\n19 CT–25 C\n\n   \n\n22 HC\n\n 22 HC   \n\n21 CT–22 HC\n\n   \n\n23 HC\n\n 23 HC   \n\n21 CT–23 HC\n\n   \n\n24 HC\n\n 24 HC   \n\n21 CT–24 HC\n\n   \n\n26 O\n\n 26 O   \n\n25 C–26 O\n\n   \n\n27 N\n\n 27 N   \n\n25 C–27 N\n\n   \n\n28 H\n\n 28 H   \n\n27 N–28 H\n\n   \n\n29 CT\n\n 29 CT   \n\n27 N–29 CT\n\n   \n\n30 H1\n\n 30 H1   \n\n29 CT–30 H1\n\n   \n\n31 CT\n\n 31 CT   \n\n29 CT–31 CT\n\n   \n\n35 C\n\n 35 C   \n\n29 CT–35 C\n\n   \n\n32 HC\n\n 32 HC   \n\n31 CT–32 HC\n\n   \n\n33 HC\n\n 33 HC   \n\n31 CT–33 HC\n\n   \n\n34 HC\n\n 34 HC   \n\n31 CT–34 HC\n\n   \n\n36 O\n\n 36 O   \n\n35 C–36 O\n\n   \n\n37 N\n\n 37 N   \n\n35 C–37 N\n\n   \n\n38 H\n\n 38 H   \n\n37 N–38 H\n\n   \n\n39 CT\n\n 39 CT   \n\n37 N–39 CT\n\n   \n\n40 H1\n\n 40 H1   \n\n39 CT–40 H1\n\n   \n\n41 CT\n\n 41 CT   \n\n39 CT–41 CT\n\n   \n\n45 C\n\n 45 C   \n\n39 CT–45 C\n\n   \n\n42 HC\n\n 42 HC   \n\n41 CT–42 HC\n\n   \n\n43 HC\n\n 43 HC   \n\n41 CT–43 HC\n\n   \n\n44 HC\n\n 44 HC   \n\n41 CT–44 HC\n\n   \n\n46 O\n\n 46 O   \n\n45 C–46 O\n\n   \n\n47 N\n\n 47 N   \n\n45 C–47 N\n\n   \n\n48 H\n\n 48 H   \n\n47 N–48 H\n\n   \n\n49 CT\n\n 49 CT   \n\n47 N–49 CT\n\n   \n\n50 H1\n\n 50 H1   \n\n49 CT–50 H1\n\n   \n\n51 CT\n\n 51 CT   \n\n49 CT–51 CT\n\n   \n\n55 C\n\n 55 C   \n\n49 CT–55 C\n\n   \n\n52 HC\n\n 52 HC   \n\n51 CT–52 HC\n\n   \n\n53 HC\n\n 53 HC   \n\n51 CT–53 HC\n\n   \n\n54 HC\n\n 54 HC   \n\n51 CT–54 HC\n\n   \n\n56 O\n\n 56 O   \n\n55 C–56 O\n\n   \n\n57 N\n\n 57 N   \n\n55 C–57 N\n\n   \n\n58 H\n\n 58 H   \n\n57 N–58 H\n\n   \n\n59 CT\n\n 59 CT   \n\n57 N–59 CT\n\n   \n\n60 H1\n\n 60 H1   \n\n59 CT–60 H1\n\n   \n\n61 CT\n\n 61 CT   \n\n59 CT–61 CT\n\n   \n\n65 C\n\n 65 C   \n\n59 CT–65 C\n\n   \n\n62 HC\n\n 62 HC   \n\n61 CT–62 HC\n\n   \n\n63 HC\n\n 63 HC   \n\n61 CT–63 HC\n\n   \n\n64 HC\n\n 64 HC   \n\n61 CT–64 HC\n\n   \n\n66 O\n\n 66 O   \n\n65 C–66 O\n\n   \n\n67 N\n\n 67 N   \n\n65 C–67 N\n\n   \n\n68 H\n\n 68 H   \n\n67 N–68 H\n\n   \n\n69 CT\n\n 69 CT   \n\n67 N–69 CT\n\n   \n\n70 H1\n\n 70 H1   \n\n69 CT–70 H1\n\n   \n\n71 H1\n\n 71 H1   \n\n69 CT–71 H1\n\n   \n\n72 H1\n\n 72 H1   \n\n69 CT–72 H1\n\n  \n\n\nFigure 1: A diagram of the ala topology"
   }
 ]

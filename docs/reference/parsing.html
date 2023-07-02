@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>kimmdy.runmanager.runmanager.state</title>
+<title>parsing</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -30,6 +30,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
+<link href="../reference/topology.topology.Topology.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -70,7 +71,7 @@ ul.task-list li input[type="checkbox"] {
 
 </head>
 
-<body class="nav-fixed">
+<body class="nav-sidebar floating nav-fixed">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -87,7 +88,7 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">KIMMDY</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../reference/index.html" rel="" target="">
+    <a class="nav-link active" href="../reference/index.html" rel="" target="" aria-current="page">
  <span class="menu-text">Reference</span></a>
   </li>  
 </ul>
@@ -97,30 +98,275 @@ ul.task-list li input[type="checkbox"] {
 </div>
       </div> <!-- /container-fluid -->
     </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../reference/runmanager.html">Internals</a></li><li class="breadcrumb-item"><a href="../reference/parsing.html">parsing</a></li></ol></nav>
+        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
 </header>
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Function reference</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+ <span class="menu-text">API</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/cmd.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">cmd</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
+ <span class="menu-text">Internals</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/runmanager.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">runmanager</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/runmanager.RunManager.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">runmanager.RunManager</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/reaction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">reaction</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/tasks.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">tasks</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/topology.topology.Topology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">topology.topology.Topology</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/parsing.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">parsing</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#kimmdy.runmanager.RunManager.state" id="toc-kimmdy.runmanager.RunManager.state" class="nav-link active" data-scroll-target="#kimmdy.runmanager.RunManager.state">state</a></li>
+  <li><a href="#kimmdy.parsing" id="toc-kimmdy.parsing" class="nav-link active" data-scroll-target="#kimmdy.parsing">parsing</a>
+  <ul class="collapse">
+  <li><a href="#attributes" id="toc-attributes" class="nav-link" data-scroll-target="#attributes">Attributes</a></li>
+  <li><a href="#functions" id="toc-functions" class="nav-link" data-scroll-target="#functions">Functions</a>
+  <ul class="collapse">
+  <li><a href="#kimmdy.parsing.create_subsections" id="toc-kimmdy.parsing.create_subsections" class="nav-link" data-scroll-target="#kimmdy.parsing.create_subsections">create_subsections</a></li>
+  <li><a href="#kimmdy.parsing.is_not_comment" id="toc-kimmdy.parsing.is_not_comment" class="nav-link" data-scroll-target="#kimmdy.parsing.is_not_comment">is_not_comment</a></li>
+  <li><a href="#kimmdy.parsing.read_distances_dat" id="toc-kimmdy.parsing.read_distances_dat" class="nav-link" data-scroll-target="#kimmdy.parsing.read_distances_dat">read_distances_dat</a></li>
+  <li><a href="#kimmdy.parsing.read_edissoc" id="toc-kimmdy.parsing.read_edissoc" class="nav-link" data-scroll-target="#kimmdy.parsing.read_edissoc">read_edissoc</a></li>
+  <li><a href="#kimmdy.parsing.read_plumed" id="toc-kimmdy.parsing.read_plumed" class="nav-link" data-scroll-target="#kimmdy.parsing.read_plumed">read_plumed</a></li>
+  <li><a href="#kimmdy.parsing.read_rtp" id="toc-kimmdy.parsing.read_rtp" class="nav-link" data-scroll-target="#kimmdy.parsing.read_rtp">read_rtp</a></li>
+  <li><a href="#kimmdy.parsing.read_top" id="toc-kimmdy.parsing.read_top" class="nav-link" data-scroll-target="#kimmdy.parsing.read_top">read_top</a></li>
+  <li><a href="#kimmdy.parsing.read_xml_ff" id="toc-kimmdy.parsing.read_xml_ff" class="nav-link" data-scroll-target="#kimmdy.parsing.read_xml_ff">read_xml_ff</a></li>
+  <li><a href="#kimmdy.parsing.resolve_includes" id="toc-kimmdy.parsing.resolve_includes" class="nav-link" data-scroll-target="#kimmdy.parsing.resolve_includes">resolve_includes</a></li>
+  <li><a href="#kimmdy.parsing.write_plumed" id="toc-kimmdy.parsing.write_plumed" class="nav-link" data-scroll-target="#kimmdy.parsing.write_plumed">write_plumed</a></li>
+  <li><a href="#kimmdy.parsing.write_top" id="toc-kimmdy.parsing.write_top" class="nav-link" data-scroll-target="#kimmdy.parsing.write_top">write_top</a></li>
+  </ul></li>
+  </ul></li>
   </ul>
-<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hits-mbm-dev/kimmdy/edit/main/reference/kimmdy.runmanager.RunManager.state.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/hits-mbm-dev/kimmdy/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hits-mbm-dev/kimmdy/edit/main/reference/parsing.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/hits-mbm-dev/kimmdy/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 
 
-<section id="kimmdy.runmanager.RunManager.state" class="level1">
-<h1>state</h1>
-<p><code>runmanager.RunManager.state</code></p>
+<section id="kimmdy.parsing" class="level1">
+<h1>parsing</h1>
+<p><code>parsing</code></p>
+<section id="attributes" class="level2">
+<h2 class="anchored" data-anchor-id="attributes">Attributes</h2>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="#kimmdy.parsing.GMX_BUILTIN_FF_DIR">GMX_BUILTIN_FF_DIR</a></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><a href="#kimmdy.parsing.TopologyDict">TopologyDict</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="functions" class="level2">
+<h2 class="anchored" data-anchor-id="functions">Functions</h2>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="#kimmdy.parsing.create_subsections">create_subsections</a></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><a href="#kimmdy.parsing.is_not_comment">is_not_comment</a></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><a href="#kimmdy.parsing.read_distances_dat">read_distances_dat</a></td>
+<td>Read a distances.dat plumed output file.</td>
+</tr>
+<tr class="even">
+<td><a href="#kimmdy.parsing.read_edissoc">read_edissoc</a></td>
+<td>reads a edissoc file and turns it into a dict.</td>
+</tr>
+<tr class="odd">
+<td><a href="#kimmdy.parsing.read_plumed">read_plumed</a></td>
+<td>Read a plumed.dat configuration file.</td>
+</tr>
+<tr class="even">
+<td><a href="#kimmdy.parsing.read_rtp">read_rtp</a></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><a href="#kimmdy.parsing.read_top">read_top</a></td>
+<td>Parse a list of lines from a topology file.</td>
+</tr>
+<tr class="even">
+<td><a href="#kimmdy.parsing.read_xml_ff">read_xml_ff</a></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><a href="#kimmdy.parsing.resolve_includes">resolve_includes</a></td>
+<td>Resolve #include statements in a (top/itp) file.</td>
+</tr>
+<tr class="even">
+<td><a href="#kimmdy.parsing.write_plumed">write_plumed</a></td>
+<td>Write a plumed.dat configuration file.</td>
+</tr>
+<tr class="odd">
+<td><a href="#kimmdy.parsing.write_top">write_top</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<section id="kimmdy.parsing.create_subsections" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.parsing.create_subsections">create_subsections</h3>
+<p><code>parsing.create_subsections(ls)</code></p>
+</section>
+<section id="kimmdy.parsing.is_not_comment" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.parsing.is_not_comment">is_not_comment</h3>
+<p><code>parsing.is_not_comment(c)</code></p>
+</section>
+<section id="kimmdy.parsing.read_distances_dat" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.parsing.read_distances_dat">read_distances_dat</h3>
+<p><code>parsing.read_distances_dat(distances_dat)</code></p>
+<p>Read a distances.dat plumed output file.</p>
+</section>
+<section id="kimmdy.parsing.read_edissoc" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.parsing.read_edissoc">read_edissoc</h3>
+<p><code>parsing.read_edissoc(path)</code></p>
+<p>reads a edissoc file and turns it into a dict. the tuple of bond atoms make up the key, the dissociation energy E_dissoc [kJ mol-1] is the value</p>
+</section>
+<section id="kimmdy.parsing.read_plumed" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.parsing.read_plumed">read_plumed</h3>
+<p><code>parsing.read_plumed(path)</code></p>
+<p>Read a plumed.dat configuration file.</p>
+</section>
+<section id="kimmdy.parsing.read_rtp" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.parsing.read_rtp">read_rtp</h3>
+<p><code>parsing.read_rtp(path)</code></p>
+</section>
+<section id="kimmdy.parsing.read_top" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.parsing.read_top">read_top</h3>
+<p><code>parsing.read_top(path)</code></p>
+<section id="assumptions-and-limitation" class="level4">
+<h4 class="anchored" data-anchor-id="assumptions-and-limitation">Assumptions And Limitation</h4>
+<ul>
+<li><code>#include</code> statements will be resolved</li>
+<li>comments will be removed</li>
+<li>all lines are stripped of leading and trailing whitespace</li>
+<li><code>#undef</code> is not supported</li>
+<li>a section within <code>ifdef</code> may be a subsection of a section that was started outside of the <code>ifdef</code></li>
+<li><code>#if..#endif</code> statements only surround a full section or subsection, not individual lines within a section and a section may either be contained within if … else or it may not be, but it can not be duplicated with one part inside and one outside.</li>
+<li><code>if .. else</code> can’t be nested</li>
+<li><code>#include</code> s that don’t resolve to a valid file path are silently dropped</li>
+<li>sections that can have subsections can also exist multiple, separate times e.g.&nbsp;moleculetype will appear multiple times and they should not be merged</li>
+</ul>
+</section>
+</section>
+<section id="kimmdy.parsing.read_xml_ff" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.parsing.read_xml_ff">read_xml_ff</h3>
+<p><code>parsing.read_xml_ff(path)</code></p>
+</section>
+<section id="kimmdy.parsing.resolve_includes" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.parsing.resolve_includes">resolve_includes</h3>
+<p><code>parsing.resolve_includes(path)</code></p>
+<p>Resolve #include statements in a (top/itp) file. Returns a tuple with the list of lines and the Path to the ff directory.</p>
+</section>
+<section id="kimmdy.parsing.write_plumed" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.parsing.write_plumed">write_plumed</h3>
+<p><code>parsing.write_plumed(d, path)</code></p>
+<p>Write a plumed.dat configuration file.</p>
+</section>
+<section id="kimmdy.parsing.write_top" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.parsing.write_top">write_top</h3>
+<p><code>parsing.write_top(top, outfile)</code></p>
 
 
+</section>
+</section>
 </section>
 
 </main> <!-- /main -->
@@ -564,6 +810,15 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../reference/topology.topology.Topology.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">topology.topology.Topology</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+  </div>
+</nav>
 </div> <!-- /content -->
 
 

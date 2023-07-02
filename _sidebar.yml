@@ -1,6 +1,6 @@
 website:
   sidebar:
-    contents:
+  - contents:
     - reference/index.qmd
     - contents:
       - reference/cmd.qmd
@@ -8,5 +8,10 @@ website:
     - contents:
       - reference/runmanager.qmd
       - reference/runmanager.RunManager.qmd
+      - reference/reaction.qmd
+      - reference/tasks.qmd
+      - reference/topology.topology.Topology.qmd
+      - reference/parsing.qmd
       section: Internals
     id: reference
+  - id: dummy-sidebar

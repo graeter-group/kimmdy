@@ -28,6 +28,5 @@ quartodoc:
 	quarto render
 
 preview:
-	quarto add --no-prompt machow/quartodoc
 	python -m quartodoc build 
 	quarto preview

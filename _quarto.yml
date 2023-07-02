@@ -6,6 +6,7 @@ project:
     - reference
     - guide/*.qmd
 
+
 website:
   page-navigation: true
   site-url: http://hits-mbm-dev.github.io/kimmdy
@@ -15,12 +16,20 @@ website:
     left:
       - file: index.qmd
         text: KIMMDY
+      - file: ./guide/getting-started.qmd
+        text: Getting Started 
+      - file: ./guide/topology.qmd
+        text: Development
       - file: reference/index.qmd
         text: Reference
 
 # tell quarto to read the generated sidebar
 metadata-files:
   - _sidebar.yml
+
+execute:
+  warning: false
+  echo: true
 
 format:
   html:
@@ -34,7 +43,7 @@ format:
       dark:
       - default
       - theme.scss
-      # - theme-dark.scss
+      - theme-dark.scss
     code-copy: true
 
 filters:
@@ -70,7 +79,9 @@ quartodoc:
         - name: runmanager
           children: separate # embedded, flat, separate
         - name: runmanager.RunManager
-          children: embedded # embedded, flat, separate
+        - name: reaction
+        - name: tasks
         - name: topology.topology.Topology
-          children: separate # embedded, flat, separate
+        - name: parsing
+
 

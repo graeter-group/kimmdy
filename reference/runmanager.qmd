@@ -12,4 +12,4 @@
 
 | Name | Description |
 | --- | --- |
-| [default_decision_strategy](kimmdy.runmanager.default_decision_strategy.qmd#kimmdy.runmanager.default_decision_strategy) | Rejection-Free Monte Carlo. |
+| [get_existing_files](kimmdy.runmanager.get_existing_files.qmd#kimmdy.runmanager.get_existing_files) | Initialize latest_files with every existing file defined in config |

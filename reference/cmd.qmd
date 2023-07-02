@@ -43,6 +43,6 @@ which is `kimmdy.yml` by default.
 
 ## kimmdy_run { #kimmdy.cmd.kimmdy_run }
 
-`cmd.kimmdy_run(input=Path('kimmdy.yml'), loglevel='DEBUG', logfile=Path('kimmdy.log'))`
+`cmd.kimmdy_run(input=Path('kimmdy.yml'), loglevel='DEBUG', logfile=Path('kimmdy.log'), checkpoint='', concat=False)`
 
 Run KIMMDY from python.
