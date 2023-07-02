@@ -1,5 +1,5 @@
 from __future__ import annotations  # for 3.7 <= Python version < 3.10
-from itertools import takewhile, permutations
+from itertools import permutations
 from typing import Optional, Any
 from xml.etree.ElementTree import Element
 import re

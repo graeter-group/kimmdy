@@ -8,7 +8,6 @@ from hypothesis import Phase, given, settings, HealthCheck, strategies as st
 from kimmdy.topology.topology import Topology
 from kimmdy.topology.atomic import *
 from kimmdy.topology.utils import (
-    get_top_section,
     match_atomic_item_to_atomic_type,
     get_protein_section,
 )
@@ -86,7 +85,6 @@ def random_topology_and_break(draw):
         dir = Path(__file__).parent / "test_files" / "test_topology"
     except NameError:
         dir = Path("./tests/test_files") / "test_topology"
-    ffdir = dir / "amber99sb-star-ildnp.ff"
     ffpatch = dir / "amber99sb_patches.xml"
     hexala_top = read_top(dir / "hexala.top")
     top = Topology(hexala_top, ffpatch)

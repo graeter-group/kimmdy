@@ -373,9 +373,8 @@ class Dihedral:
 
     @classmethod
     def from_top_line(cls, l: list[str]):
-        funct = field_or_none(l, 4)
         periodicity = field_or_none(l, 7)
-        if periodicity is None and funct == "9":
+        if periodicity is None:
             periodicity = ""
         return cls(
             ai=l[0],
