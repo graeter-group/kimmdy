@@ -393,6 +393,8 @@ Protein  3
 27       29       30       1        109.500  418.400 
 27       29       31       1        109.700  669.440 
 30       29       31       1        109.500  418.400 
+27       29       34       1        109.500  418.400
+30       29       34       1        109.500  418.400
 31       29       34       1        109.500  418.400 
 29       31       32       1        117.0000000 418.400000  ; patched parameter
 29       31       33       1        117.0000000 418.400000  ; patched parameter
@@ -650,8 +652,8 @@ Protein  3
 ; Include water topology
 #include "./amber99sb-star-ildnp.ff/tip3p.itp"
 
-[ position_restraints ]
 #ifdef   POSRES_WATER
+[ position_restraints ]
 ; Position restraint for each water oxygen
 ; i funct fcx fcy fcz
 1        1        1000     1000     1000    

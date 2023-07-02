@@ -5,62 +5,21 @@ import dill
 import queue
 from enum import Enum, auto
 from typing import Callable
-from kimmdy import config
 from kimmdy.config import Config
 from kimmdy.utils import increment_logfile
-from kimmdy.parsing import read_topol
-from kimmdy.reaction import ConversionType, Reaction, ReactionResult, ConversionRecipe
-import kimmdy.mdmanager as md
+from kimmdy.parsing import read_top
+from kimmdy.reaction import ReactionPlugin, RecipeCollection
 import kimmdy.changemanager as changer
 from kimmdy.tasks import Task, TaskFiles, TaskMapping
-from kimmdy.utils import run_shell_cmd
+from kimmdy.utils import run_shell_cmd, run_gmx
 from pprint import pformat
-import random
 from kimmdy import plugins
 from kimmdy.topology.topology import Topology
+from kimmdy.kmc import rf_kmc
 
 # file types of which there will be multiple files per type
-AMBIGUOUS_SUFFS = ["dat", "xvg", "log"]
+AMBIGUOUS_SUFFS = ["dat", "xvg", "log", "itp", "mdp"]
 # are there cases where we have multiple trr files?
-
-
-def default_decision_strategy(
-    reaction_results: list[ReactionResult],
-) -> ConversionRecipe:
-    """Rejection-Free Monte Carlo.
-    takes a list of ReactionResults and choses a recipe.
-
-    Parameters
-    ---------
-    reaction_reults: list[ReactionResults]
-        from which one will be choosen
-    """
-    # compare e.g. <https://en.wikipedia.org/wiki/Kinetic_Monte_Carlo#Rejection-free_KMC>
-
-    # flatten the list of rates form the reaction results
-    rates = []
-    recipes = []
-    for reaction_result in reaction_results:
-        for outcome in reaction_result:
-            rates.append(outcome.rate)
-            recipes.append(outcome.recipe)
-
-    total_rate = sum(rates)
-    random.seed()
-    t = random.random()  # t in [0.0,1.0)
-    logging.debug(f"Random value t: {t}, rates {rates}, total rate {total_rate}")
-    rate_running_sum = 0
-
-    # if nothing is choosen, return an empty ConversionRecipe
-    result = ConversionRecipe()
-    for i, rate in enumerate(rates):
-        rate_running_sum += rate
-        if (t * total_rate) <= rate_running_sum:
-            result = recipes[i]
-            break
-    logging.debug(f"Result: {result}")
-
-    return result
 
 
 class State(Enum):
@@ -72,6 +31,25 @@ class State(Enum):
     MD = auto()
     REACTION = auto()
     DONE = auto()
+
+
+def get_existing_files(config: Config):
+    """Initialize latest_files with every existing file defined in config"""
+    file_d = {}
+    attr_names = filter(lambda s: s[0] != "_", config.__dir__())
+    for attr_name in attr_names:
+        attr = getattr(config, attr_name)
+        if isinstance(attr, Path):
+            if not attr.exists():
+                continue
+            key = attr.suffix[1:]  # rm the get_existing_files
+            # AMBIGUOUS_SUFFS -> key whole name
+            if attr.suffix[1:] in AMBIGUOUS_SUFFS:
+                key = attr.name
+            file_d[key] = attr
+        elif isinstance(attr, Config):
+            file_d.update(get_existing_files(attr))
+    return file_d
 
 
 class RunManager:
@@ -89,26 +67,20 @@ class RunManager:
         self.iteration = 0
         self.iterations = self.config.iterations
         self.state = State.IDLE
-        self.reaction_results: list[ReactionResult] = []
-        self.latest_files: dict[str, Path] = {
-            "top": self.config.top,
-            "gro": self.config.gro,
-            "idx": self.config.idx,
-            "trr": "",
-            "edr": "",
-        }
+        self.recipe_collection: RecipeCollection = RecipeCollection([])
+        self.latest_files: dict[str, Path] = get_existing_files(config)
+        logging.debug("Initialized latest files:")
+        logging.debug(pformat(self.latest_files))
         self.histfile = increment_logfile(Path(f"{self.config.out}_history.log"))
         self.cptfile = increment_logfile(Path(f"{self.config.out}_kimmdy.cpt"))
         try:
             _ = self.config.ffpatch
         except AttributeError:
             self.config.ffpatch = None
-        self.top = Topology(
-            read_topol(self.config.top), self.config.ff, self.config.ffpatch
-        )
+        self.top = Topology(read_top(self.config.top), self.config.ffpatch)
 
         self.filehist: list[dict[str, TaskFiles]] = [
-            {"setup": TaskFiles(runmng=self, input=self.latest_files)}
+            {"setup": TaskFiles(self.get_latest)}
         ]
 
         self.task_mapping: TaskMapping = {
@@ -117,18 +89,17 @@ class RunManager:
                 self._query_reactions,
                 self._decide_reaction,
                 self._run_recipe,
-                self._relaxation,
             ],
         }
 
         # Instantiate reactions
-        self.reactions = []
+        self.reaction_plugins: list[ReactionPlugin] = []
         react_names = self.config.reactions.get_attributes()
         # logging.info("Instantiating Reactions:", *react_names)
-        for react_name in react_names:
-            r = plugins[react_name]
-            reaction = r(react_name, self)
-            self.reactions.append(reaction)
+        for rp_name in react_names:
+            r = plugins[rp_name]
+            reaction_plugin: ReactionPlugin = r(rp_name, self)
+            self.reaction_plugins.append(reaction_plugin)
 
         logging.debug("Configuration from input file:")
         logging.debug(pformat(self.config.__dict__))
@@ -172,7 +143,7 @@ class RunManager:
             next(self)
 
         logging.info(
-            f"Stop running tasks, state: {self.state}, "
+            f"Finished running tasks, state: {self.state}, "
             f"iteration:{self.iteration}, max:{self.iterations}"
         )
 
@@ -207,6 +178,15 @@ class RunManager:
                 suffix = path.suffix[1:]
                 if suffix in AMBIGUOUS_SUFFS:
                     suffix = path.name
+                if files.output.get(suffix) is not None:
+                    if files.output[suffix] == files.outputdir / path:
+                        logging.debug(
+                            "_discover_output_files wants to overwrite files.output!"
+                        )
+                        logging.debug(f"Suffix {suffix}")
+                        logging.debug(f"From {files.output[suffix]}")
+                        logging.debug(f"To {files.outputdir / path}")
+                    continue
                 files.output[suffix] = files.outputdir / path
 
             logging.debug("Update latest files with: ")
@@ -227,7 +207,7 @@ class RunManager:
 
     def _create_task_directory(self, postfix: str) -> TaskFiles:
         """Creates TaskFiles object, output directory and symlinks ff."""
-        files = TaskFiles(self)
+        files = TaskFiles(self.get_latest)
         files.outputdir = self.config.out / f"{self.iteration}_{postfix}"
         files.outputdir.mkdir(exist_ok=self.from_checkpoint)
         if not (files.outputdir / self.config.ff.name).exists():
@@ -236,7 +216,7 @@ class RunManager:
 
     def _dummy(self):
         logging.info("Start dummy task")
-        files = TaskFiles(self)
+        files = TaskFiles(self.get_latest)
         files.outputdir = self.config.out / f"{self.iteration}_dummy"
         files.outputdir.mkdir()
         run_shell_cmd("pwd>./pwd.pwd", files.outputdir)
@@ -254,10 +234,8 @@ class RunManager:
         logging.warning(self.latest_files)
         top = files.input["top"]
         gro = files.input["gro"]
-        trr = files.input["trr"]
-        edr = files.input["edr"]
         mdp = md_config.mdp
-        idx = files.input["idx"]
+        ndx = files.input["ndx"]
 
         outputdir = files.outputdir
         # make maxh and ntomp accessible?
@@ -266,11 +244,16 @@ class RunManager:
 
         grompp_cmd = (
             f"{gmx_alias} grompp -p {top} -c {gro} "
-            f"-f {mdp} -n {idx} -o {instance}.tpr -maxwarn 5"
+            f"-f {mdp} -n {ndx} -o {instance}.tpr -maxwarn 5"
         )
         # only appends these lines if there are trr and edr files
-        if trr and edr:
+        try:
+            trr = files.input["trr"]
+            edr = files.input["edr"]
             grompp_cmd += f" -t {trr} -e {edr}"
+        except FileNotFoundError:
+            pass
+
         mdrun_cmd = (
             f"{gmx_alias} mdrun -s {instance}.tpr -cpi {instance}.cpt "
             f"-x {instance}.xtc -o {instance}.trr -cpo {instance}.cpt "
@@ -278,8 +261,9 @@ class RunManager:
             f"-px {instance}_pullx.xvg -pf {instance}_pullf.xvg "
             f"-ro {instance}-rotation.xvg -ra {instance}-rotangles.log "
             f"-rs {instance}-rotslabs.log -rt {instance}-rottorque.log "
-            f"-maxh {maxh} -dlb yes -ntomp {ntomp}"
+            f"-maxh {maxh} -dlb yes "
         )
+        # -ntomp {ntomp} removed for now
         # like this, the previous checkpoint file would not be used,
         # -t and -e options from grompp
         # replace the checkpoint file if gen_vel = no in the mdp file
@@ -289,8 +273,12 @@ class RunManager:
             files.output = {"plumed.dat": md_config.plumed.dat}
             # add plumed.dat to output to indicate it as current plumed.dat file
 
-        run_shell_cmd(grompp_cmd, outputdir)
-        run_shell_cmd(mdrun_cmd, outputdir)
+        # specify trr to prevent rotref trr getting set as standard trr
+        files.output["trr"] = files.outputdir / f"{instance}.trr"
+        logging.debug(f"grompp cmd: {grompp_cmd}")
+        logging.debug(f"mdrun cmd: {mdrun_cmd}")
+        run_gmx(grompp_cmd, outputdir)
+        run_gmx(mdrun_cmd, outputdir)
 
         logging.info(f"Done with MD {instance}")
         return files
@@ -299,53 +287,54 @@ class RunManager:
         logging.info("Query reactions")
         self.state = State.REACTION
         # empty list for every new round of queries
-        self.reaction_results: list[ReactionResult] = []
+        self.recipe_collection: RecipeCollection = RecipeCollection([])
 
-        for reaction in self.reactions:
+        for reaction_plugin in self.reaction_plugins:
             # TODO: refactor into Task
-            files = self._create_task_directory(reaction.name)
+            files = self._create_task_directory(reaction_plugin.name)
 
-            self.reaction_results.append(reaction.get_reaction_result(files))
+            self.recipe_collection.recipes.extend(
+                reaction_plugin.get_recipe_collection(files).recipes
+            )
 
         logging.info("Reaction done")
-        return files  # necessary?
+        return files
 
     def _decide_reaction(
         self,
-        decision_strategy: Callable[
-            [list[ReactionResult]], ConversionRecipe
-        ] = default_decision_strategy,
+        decision_strategy: Callable[[RecipeCollection], dict] = rf_kmc,
     ):
-        logging.info("Decide on a reaction")
-        logging.debug(f"Available reaction results: {self.reaction_results}")
-        self.chosen_recipe = decision_strategy(self.reaction_results)
+        logging.info("Decide on a recipe")
+        logging.debug(f"Available reaction results: {self.recipe_collection}")
+        decision_d = decision_strategy(self.recipe_collection)
+        self.recipe_steps = decision_d.recipe_steps
         logging.info("Chosen recipe is:")
-        logging.info(self.chosen_recipe)
+        logging.info(self.recipe_steps)
         return
 
     def _run_recipe(self) -> TaskFiles:
-        logging.info(f"Start Recipe in step {self.iteration}")
-        logging.info(f"Recipe: {self.chosen_recipe}")
+        logging.info(f"Start Recipe in KIMMDY iteration {self.iteration}")
+        logging.info(f"Recipe: {self.recipe_steps}")
 
         files = self._create_task_directory("recipe")
 
         files.output = {"top": files.outputdir / "topol_mod.top"}
+        logging.debug(f"Chose recipe: {self.recipe_steps}")
 
-        logging.debug(f"Chose recipe: {self.chosen_recipe}")
+        # changes to topology
         changer.modify_top(
-            self.chosen_recipe,
-            files.input["top"],
-            files.output["top"],
-            files.input["ff"],
+            self.recipe_steps,
+            files,
             self.config.ffpatch,
             self.top,
         )
         logging.info(f'Wrote new topology to {files.output["top"].parts[-3:]}')
 
+        # changes to plumed.dat
         if "plumed.dat" in self.latest_files:
             files.output["plumed.dat"] = files.outputdir / "plumed_mod.dat"
             changer.modify_plumed(
-                self.chosen_recipe,
+                self.recipe_steps,
                 files.input["plumed.dat"],
                 files.output["plumed.dat"],
                 files.input["distances.dat"],
@@ -353,20 +342,39 @@ class RunManager:
             logging.info(
                 f'Wrote new plumedfile to {files.output["plumed.dat"].parts[-3:]}'
             )
-        logging.info("Reaction done")
-        return files
 
-    def _relaxation(self) -> TaskFiles:
-        # this task generates no files but is only there to generate subtasks
-        logging.info(f"Start Relaxation in step {self.iteration}")
-        logging.info(f"Type of relaxation: {self.config.changer.coordinates}")
+        # changes to coordinates
+        run_parameter_growth = changer.modify_coords(self.recipe_steps, files)
+        instance = None
+        if run_parameter_growth:
+            if hasattr(self.config.changer.coordinates, "md_parameter_growth"):
+                # pass merged topology to run_md task
+                self.latest_files["top"] = files.input["top"]
+                instance = self.config.changer.coordinates.md_parameter_growth
 
-        if hasattr(self.config.changer.coordinates, "md"):
+            else:
+                logging.warning(
+                    f"No parameter growth MD possible, trying classical MD relaxation."
+                )
+                run_parameter_growth = False
+        else:
+            logging.info(f'Wrote new coordinates to {files.output["trr"].parts[-3:]}')
+
+        if not run_parameter_growth:
+            if hasattr(self.config.changer.coordinates, "md"):
+                instance = self.config.changer.coordinates.md
+            else:
+                logging.info(f"No MD relaxation after reaction.")
+
+        if instance:
+            # crr_task nested in this task instead of running afterwards
             self.crr_tasks.put(
                 Task(
                     self._run_md,
-                    kwargs={"instance": self.config.changer.coordinates.md},
+                    kwargs={"instance": instance},
                 )
             )
-        # TODO add atom placement method from Kai as relaxation option
-        logging.info(f"Relaxation task added!")
+            next(self)
+
+        logging.info("Reaction done")
+        return files

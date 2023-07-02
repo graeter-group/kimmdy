@@ -150,7 +150,7 @@ class AtomType:
             id_sym=l[0],
             at_num=l[1],
             mass=l[2],
-            charge=l[3],           
+            charge=l[3],
             ptype=l[4],
             sigma=l[5],
             epsilon=l[6],
@@ -164,7 +164,7 @@ class Bond:
 
     A class containing bond information as in the bonds section of the topology.
     From gromacs topology:
-    'ai', 'aj', 'funct', 'c0', 'c1', 'c2', 'c3
+    'ai', 'aj', 'funct', 'c0', 'c1', 'c2', 'c3', 'c4', 'c5'
     With ai < aj
     """
 
@@ -175,6 +175,8 @@ class Bond:
     c1: Optional[str] = None
     c2: Optional[str] = None
     c3: Optional[str] = None
+    c4: Optional[str] = None
+    c5: Optional[str] = None
 
     @classmethod
     def from_top_line(cls, l: list[str]):
@@ -186,6 +188,8 @@ class Bond:
             c1=field_or_none(l, 4),
             c2=field_or_none(l, 5),
             c3=field_or_none(l, 6),
+            c4=field_or_none(l, 7),
+            c5=field_or_none(l, 8),
         )
 
 
@@ -394,9 +398,9 @@ class DihedralType:
     id: str
     id_sym: str
     funct: str
+    c0: str
+    c1: str
     periodicity: str
-    c0: Optional[str] = None
-    c1: Optional[str] = None
     c3: Optional[str] = None
     c4: Optional[str] = None
     c5: Optional[str] = None
@@ -414,9 +418,9 @@ class DihedralType:
             id="---".join(l[:4]) + ":::" + periodicity,
             id_sym="---".join(reversed(l[:4])) + ":::" + periodicity,
             funct=l[4],
+            c0=l[5],
+            c1=l[6],
             periodicity=periodicity,
-            c0=field_or_none(l, 5),
-            c1=field_or_none(l, 6),
             c3=field_or_none(l, 8),
             c4=field_or_none(l, 9),
             c5=field_or_none(l, 10),

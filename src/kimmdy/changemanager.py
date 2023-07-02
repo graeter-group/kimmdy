@@ -1,44 +1,150 @@
 from __future__ import annotations
 import logging
+import MDAnalysis as mda
 from typing import Optional
-from kimmdy.reaction import ConversionRecipe, ConversionType
-from kimmdy.parsing import read_topol, write_topol, write_plumed, read_plumed
+from kimmdy.reaction import Bind, Break, Move, RecipeStep
+from kimmdy.parsing import read_top, write_top, write_plumed, read_plumed
+import numpy as np
+from kimmdy.tasks import TaskFiles
 from kimmdy.topology.topology import Topology
+from kimmdy.coordinates import merge_top_parameter_growth
 from pathlib import Path
+import numpy as np
+
+
+def modify_coords(
+    recipe_steps: list[RecipeStep],
+    files: TaskFiles,
+):
+    logging.debug(f"Entering modify_coords with recipe_steps {recipe_steps}")
+
+    trr = files.input["trr"]
+    tpr = files.input["tpr"]
+
+    u = mda.Universe(str(tpr), str(trr), topology_format="tpr", format="trr")
+
+    ttime = None
+    to_move = []
+    run_parameter_growth = False
+    for step in recipe_steps:
+        if isinstance(step, Move):
+            if step.new_coords:
+                # just convert it
+                assert not step.is_one_based, "RecipeSteps should be zero based!"
+                if ttime is None:
+                    ttime = step.new_coords[1]
+
+                elif abs(ttime - step.new_coords[1]) > 1e-5:  # 0.01 fs
+                    m = (
+                        f"Multiple coordinate changes requested at different times!"
+                        "\nRecipeSteps:{recipe_steps}"
+                    )
+                    logging.error(m)
+                    raise ValueError(m)
+                to_move.append(step.idx_to_move)
+            else:
+                run_parameter_growth = True
+                ttime = u.trajectory[-1].time
+
+        elif isinstance(step, Break) or isinstance(step, Bind):
+            run_parameter_growth = True
+            ttime = u.trajectory[-1].time
+
+    np.unique(to_move, return_counts=True)
+
+    for ts in u.trajectory[::-1]:
+        if abs(ts.time - ttime) > 1e-5:  # 0.01 fs
+            continue
+        for step in recipe_steps:
+            if isinstance(step, Move) and step.new_coords is not None:
+                atm_move = u.select_atoms(f"index {step.idx_to_move}")
+                atm_move[0].position = step.new_coords[0]
+
+        break
+    else:
+        raise LookupError(
+            f"Did not find time {ttime} in trajectory "
+            f"with length {u.trajectory[-1].time}"
+        )
+
+    if run_parameter_growth:
+        top_merge = merge_top_parameter_growth(files)
+        top_merge_path = files.outputdir / "top_merge.top"
+        write_top(top_merge.to_dict(), top_merge_path)
+        files.input["top"] = top_merge_path
+
+    else:
+        trr_out = files.outputdir / "coord_mod.trr"
+        gro_out = files.outputdir / "coord_mod.gro"
+
+        u.atoms.write(trr_out)
+        u.atoms.write(gro_out)
+
+        files.output["trr"] = trr_out
+        files.output["gro"] = gro_out
+
+        logging.debug(
+            f"Exit modify_coords, final coordinates written to {trr_out.parts[-2:]}"
+        )
+
+    return run_parameter_growth
 
 
 def modify_top(
-    recipe: ConversionRecipe,
-    oldtop: Path,
-    newtop: Path,
-    ffdir: Path,
+    recipe_steps: list[RecipeStep],
+    files: TaskFiles,
     ffpatch: Optional[Path],
     topology: Optional[Topology],
-) -> Topology:
+):
+    files.output = {"top": files.outputdir / "topol_mod.top"}
+    oldtop = files.input["top"]
+    newtop = files.output["top"]
+
     logging.info(f"Reading: {oldtop} and writing modified topology to {newtop}.")
     if topology is None:
-        topologyDict = read_topol(oldtop)
-        topology = Topology(topologyDict, ffdir, ffpatch)
+        topologyDict = read_top(oldtop)
+        topology = Topology(topologyDict, ffpatch)
 
     focus = set()
-    for conversion in recipe:
-        focus.add(conversion.atom_idx)
-        if conversion.type == ConversionType.BREAK:
-            topology.break_bond(conversion.atom_idx)
-        elif conversion.type == ConversionType.BIND:
-            topology.bind_bond(conversion.atom_idx)
-        elif conversion.type == ConversionType.MOVE:
-            topology.move_hydrogen(conversion.atom_idx)
+    for step in recipe_steps:
+        step = step.one_based()
+        if isinstance(step, Break):
+            topology.break_bond([str(step.atom_idx_1), str(step.atom_idx_2)])
+            focus.add(str(step.atom_idx_1))
+            focus.add(str(step.atom_idx_2))
+        elif isinstance(step, Bind):
+            topology.bind_bond([str(step.atom_idx_1), str(step.atom_idx_2)])
+            focus.add(str(step.atom_idx_1))
+            focus.add(str(step.atom_idx_2))
+        elif isinstance(step, Move):
+            top_done = False
+            if step.idx_to_bind is not None and step.idx_to_break is None:
+                # implicit H-bond breaking
+                topology.move_hydrogen([str(step.idx_to_move), str(step.idx_to_bind)])
+                focus.add(str(step.idx_to_move))
+                focus.add(str(step.idx_to_bind))
+                top_done = True
+            if step.idx_to_break is not None and not top_done:
+                topology.break_bond([str(step.idx_to_move), str(step.idx_to_break)])
+                focus.add(str(step.idx_to_move))
+                focus.add(str(step.idx_to_break))
+            if step.idx_to_bind is not None and not top_done:
+                topology.bind_bond([str(step.idx_to_move), str(step.idx_to_bind)])
+                focus.add(str(step.idx_to_move))
+                focus.add(str(step.idx_to_bind))
+
+        else:
+            raise NotImplementedError(f"RecipeStep {step} not implemented!")
     topology._update_dict()
-    write_topol(topology.top, newtop)
+    write_top(topology.top, newtop)
 
     topology.patch_parameters(list(focus))
 
-    return topology
+    return
 
 
 def modify_plumed(
-    recipe: ConversionRecipe,
+    recipe_steps: list[RecipeStep],
     oldplumeddat: Path,
     newplumeddat: Path,
     plumeddist: Path,
@@ -48,18 +154,22 @@ def modify_plumed(
     )
     plumeddat = read_plumed(oldplumeddat)
 
-    for conversion in recipe:
-        if conversion.type == ConversionType.BREAK:
-            plumeddat = break_bond_plumed(plumeddat, conversion.atom_idx, plumeddist)
+    for step in recipe_steps:
+        if isinstance(step, Break):
+            plumeddat = break_bond_plumed(
+                plumeddat, (step.atom_idx_1, step.atom_idx_2), plumeddist
+            )
+        else:
+            # TODO: handle BIND / MOVE
+            # for now, we wouldn't bind or move bonds that are relevant for plumed
+            logging.debug(f"Plumed changes for {step} not implemented!")
 
-    # TODO: handle BIND / MOVE
     write_plumed(plumeddat, newplumeddat)
 
 
-def break_bond_plumed(plumeddat, breakpair, plumeddist):
+def break_bond_plumed(plumeddat, breakpair: list[int, int], plumeddist):
     new_distances = []
     broken_distances = []
-    breakpair = [str(x) for x in breakpair]
     for line in plumeddat["distances"]:
         if all(x in line["atoms"] for x in breakpair):
             broken_distances.append(line["id"])

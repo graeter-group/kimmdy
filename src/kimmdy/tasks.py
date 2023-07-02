@@ -1,6 +1,6 @@
-from dataclasses import dataclass, field, InitVar
+from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Callable, Optional
+from typing import Callable, Optional, TYPE_CHECKING
 
 
 class AutoFillDict(dict):
@@ -31,19 +31,17 @@ class TaskFiles:
     >>> runmng = run()
     >>> files = TaskFiles(runmng)
     >>> files.input
-    >>> files.input["tpr"]
+    >>> files.input["top"]
     {'top': 'latest top'}
-
     """
 
-    runmng: InitVar
+    get_latest: Callable
     input: dict[str, Path] = field(default_factory=dict)
     output: dict[str, Path] = field(default_factory=dict)
-    # default outputdir is current working directory
     outputdir: Path = Path()
 
-    def __post_init__(self, runmng):
-        self.input = AutoFillDict(runmng.get_latest)
+    def __post_init__(self):
+        self.input = AutoFillDict(self.get_latest)
 
 
 class Task:

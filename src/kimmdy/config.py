@@ -5,7 +5,7 @@ import logging
 from pathlib import Path
 from dataclasses import dataclass
 from kimmdy import plugins
-from kimmdy.reaction import Reaction
+from kimmdy.reaction import ReactionPlugin
 
 
 def check_file_exists(p: Path):
@@ -47,7 +47,7 @@ type_scheme = {
     "ffpatch": None,
     "top": Path,
     "gro": Path,
-    "idx": Path,
+    "ndx": Path,
     "mds": {
         "*": {
             "mdp": Path,
@@ -56,7 +56,7 @@ type_scheme = {
             "overwrite": str,
         }
     },
-    "changer": {"coordinates": {"md": str}},
+    "changer": {"coordinates": {"md": str, "md_parameter_growth": str}},
     "reactions": {},
     "sequence": Sequence,
 }
@@ -66,6 +66,7 @@ type_scheme = {
 
 class MDrefConfig:
     md: str
+    md_parameter_growth: str
 
 
 class ChangerConfig:
@@ -73,8 +74,8 @@ class ChangerConfig:
 
 
 class HomolysisConfig:
-    edis: Path
-    bonds: Path
+    dat: Path
+    itp: Path
 
 
 class ReactionsConfig:
@@ -118,7 +119,7 @@ class Config:
     ffpatch: Optional[Path]
     top: Path
     gro: Path
-    idx: Path
+    ndx: Path
     mds: dict
     changer: ChangerConfig
     reactions: ReactionsConfig
@@ -161,13 +162,22 @@ class Config:
                 logging.info("Loading Plugins")
                 for plg_name, plugin in plugins.items():
                     logging.debug(f"Loading {plg_name}")
-                    if isinstance(plugin, Exception):
+                    if type(plugin) is ModuleNotFoundError:
                         logging.warn(
                             f"Plugin {plg_name} could not be loaded!\n{plugin}\n"
                         )
-                    if issubclass(type(plugin), Reaction):
-                        self.type_scheme["reactions"].update(plugin.type_scheme)
-                        logging.debug(self.type_scheme["reactions"])
+                    else:
+                        try:
+                            if (
+                                plugin.__bases__[0] is ReactionPlugin
+                            ):  # isinstance didnt work for some reason
+                                self.type_scheme["reactions"].update(plugin.type_scheme)
+                                logging.debug(self.type_scheme["reactions"])
+                        except:
+                            logging.warn(
+                                f"Plugin {plg_name} could not be loaded!\n{plugin}\n"
+                            )
+                            pass
 
         # building config recursively
         if recursive_dict is not None:
@@ -207,7 +217,14 @@ class Config:
 
             if not hasattr(self, "ff"):
                 ffs = list(self.cwd.glob("*.ff"))
-                assert len(ffs) == 1, "Wrong count of forcefields"
+                if len(ffs) < 1:
+                    raise FileNotFoundError(
+                        "No forcefield found in cwd, please provide one!"
+                    )
+                if len(ffs) > 1:
+                    logging.warn(
+                        f"Found {len(ffs)} forcefields in cwd, using first one: {ffs[0]}"
+                    )
                 assert ffs[0].is_dir(), "Forcefield should be a directory!"
                 self.ff = ffs[0].resolve()
 

@@ -1,15 +1,105 @@
 from __future__ import annotations  # for 3.7 <= Python version < 3.10
 from itertools import takewhile, permutations
 from typing import Optional, Any
-from pathlib import Path
 from xml.etree.ElementTree import Element
 import re
 from typing import TYPE_CHECKING
-from kimmdy.topology.atomic import *
 
 if TYPE_CHECKING:
-    from kimmdy.topology.topology import Topology
     from kimmdy.topology.ff import Patch, Patches
+    from kimmdy.topology.atomic import AtomicType, AtomicTypes
+
+
+def get_top_section(
+    top: dict, name: str, moleculetype: Optional[int] = None
+) -> Optional[list[list]]:
+    """Get content of a section from a topology dict.
+    By resolving any `#ifdef` statements by check in the top['define'] dict
+    and choosing the 'content' or 'else_content' depending on the result.
+    """
+    if moleculetype is not None:
+        parent_name = f"moleculetype_{moleculetype}"
+        parent_section = top.get(parent_name)
+        if parent_section is None:
+            raise ValueError(f"topology does not contain moleculetype {moleculetype}")
+        section = parent_section["subsections"].get(name)
+    else:
+        section = top.get(name)
+
+    if section is None:
+        raise ValueError(f"topology does not contain section {name}")
+    condition = section.get("condition")
+    if condition is not None:
+        condition_type = condition.get("type")
+        condition_value = condition.get("value")
+        if condition_type == "ifdef":
+            if condition_value in top["define"].keys():
+                return section.get("content")
+            else:
+                return section.get("else_content")
+        elif condition_type == "ifndef":
+            if condition_value not in top["define"].keys():
+                return section.get("content")
+            else:
+                return section.get("else_content")
+        else:
+            raise NotImplementedError(
+                f"condition type {condition_type} is not supported"
+            )
+    return section.get("content")
+
+
+def get_protein_section(top: dict, name: str) -> Optional[list[list]]:
+    """
+    Get content of a section in the first moleculetype (protein) from a topology dict.
+    """
+    return get_top_section(top, name, moleculetype=0)
+
+
+def set_top_section(
+    top: dict, name: str, value: list, moleculetype: Optional[int] = None
+) -> Optional[list[list]]:
+    """Set content of a section from a topology dict.
+    By resolving any `#ifdef` statements by check in the top['define'] dict
+    and choosing the 'content' or 'else_content' depending on the result.
+    """
+    if moleculetype is not None:
+        parent_name = f"moleculetype_{moleculetype}"
+        parent_section = top.get(parent_name)
+        if parent_section is None:
+            raise ValueError(f"topology does not contain moleculetype {moleculetype}")
+        section = parent_section["subsections"].get(name)
+    else:
+        section = top.get(name)
+
+    if section is None:
+        raise ValueError(f"topology does not contain section {name}")
+    condition = section.get("condition")
+    if condition is not None:
+        condition_type = condition.get("type")
+        condition_value = condition.get("value")
+        if condition_type == "ifdef":
+            if condition_value in top["define"].keys():
+                section["content"] = value
+            else:
+                section["else_content"] = value
+        elif condition_type == "ifndef":
+            if condition_value not in top["define"].keys():
+                section["content"] = value
+            else:
+                section["else_content"] = value
+        else:
+            raise NotImplementedError(
+                f"condition type {condition_type} is not supported"
+            )
+    section["content"] = value
+
+
+def set_protein_section(top: dict, name: str, value: list) -> Optional[list[list]]:
+    """
+    Set content of a section in the first moleculetype (protein) from a topology dict.
+    """
+    set_top_section(top, name, value, moleculetype=0)
 
 
 def field_or_none(l: list[str], i) -> Optional[str]:
@@ -20,7 +110,14 @@ def field_or_none(l: list[str], i) -> Optional[str]:
 
 
 def attributes_to_list(obj) -> list[str]:
-    return list(takewhile(lambda x: x is not None, obj.__dict__.values()))
+    attrs = []
+    for k, v in obj.__dict__.items():
+        if k in ["bound_to_nrs", "is_radical", "id", "id_sym"]:
+            continue
+        if v is None:
+            continue
+        attrs.append(v)
+    return attrs
 
 
 def is_not_none(x) -> bool:
