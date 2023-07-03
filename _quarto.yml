@@ -12,7 +12,19 @@ website:
   site-url: http://hits-mbm-dev.github.io/kimmdy
   repo-url: https://github.com/hits-mbm-dev/kimmdy
   repo-actions: [edit, issue]
+  reader-mode: true
+  back-to-top-navigation: true
   navbar:
+    background: light
+    tools:
+      - icon: house-fill
+        href: https://www.h-its.org/research/mbm/
+      - icon: github
+        menu:
+          - text: Source Code
+            url:  https://github.com/hits-mbm-dev/kimmdy
+          - text: Report a Bug
+            url:  https://github.com/hits-mbm-dev/kimmdy/issues/new
     left:
       - file: index.qmd
         text: KIMMDY
@@ -66,7 +78,7 @@ quartodoc:
 
   sections:
     - title: API
-      desc: Start KIMMDY from a python script
+      desc: Start KIMMDY from a python script or the command line
       contents:
         - name: cmd
           children: flat
@@ -76,12 +88,48 @@ quartodoc:
         # set the children option, so that methods get documented
         # on separate pages. MdRenderer's docs will include a summary
         # table that links to each page.
-        - name: runmanager
-          children: separate # embedded, flat, separate
-        - name: runmanager.RunManager
-        - name: reaction
-        - name: tasks
-        - name: topology.topology.Topology
+        # - name: ....
+        #   children: separate # embedded, flat, separate
+        - name: changemanager
+        - name: config
+        - name: constants
+        - name: coordinates
+        - name: kmc
+        - name: misc_helper
         - name: parsing
+          children: embedded
+        - name: reaction
+        - name: runmanager
+        - name: tasks
+        - name: utils
+        - name: topology.topology.Topology
+          children: embedded
+        - name: topology.ff
+          children: embedded
+        - name: topology.utils
+          children: embedded
+    - title: Atomic types
+      desc: Internal representations of topology and forcfield entities
+      contents:
+        - name: topology.atomic
+        - name: topology.atomic.Atom
+        - name: topology.atomic.AtomType
+        - name: topology.atomic.Bond
+        - name: topology.atomic.BondType
+        - name: topology.atomic.PositionRestraint
+        - name: topology.atomic.DihedralRestraint
+        - name: topology.atomic.Pair
+        - name: topology.atomic.Angle
+        - name: topology.atomic.AngleType
+        - name: topology.atomic.DihedralType
+        - name: topology.atomic.ResidueAtomSpec
+        - name: topology.atomic.ResidueBondSpec
+        - name: topology.atomic.ResidueImproperSpec
+        - name: topology.atomic.ResidueProperSpec
+        - name: topology.atomic.ResidueType
+    - title: Reactions
+      desc: Reaction plugins bundled with KIMMDY
+      contents:
+        - name: reactions.homolysis
 
 

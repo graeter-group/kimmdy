@@ -1,0 +1,21 @@
+# topology.atomic.Angle { #kimmdy.topology.atomic.Angle }
+
+`topology.atomic.Angle(ai, aj, ak, funct, c0=None, c1=None, c2=None, c3=None)`
+
+Information about one angle
+
+A class containing angle information as in the angles section of the topology.
+
+From gromacs topology:
+';', 'ai', 'aj', 'ak', 'funct', 'c0', 'c1', 'c2', 'c3'
+With aj < ai < ak
+
+## Methods
+
+| Name | Description |
+| --- | --- |
+| [from_top_line](#kimmdy.topology.atomic.Angle.from_top_line) |  |
+
+### from_top_line { #kimmdy.topology.atomic.Angle.from_top_line }
+
+`topology.atomic.Angle.from_top_line(cls, l)`

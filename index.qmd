@@ -2,9 +2,5 @@
 
 Welcome to KIMMDY
 
-```{python}
-#| eval: false
-from kimmdy.cmd import kimmdy_run
+[Getting Started](/guide/getting-started.qmd)
 
-kimmdy_run()
-```

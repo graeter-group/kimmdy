@@ -6,10 +6,16 @@
 
 | Name | Description |
 | --- | --- |
-| [AMBIGUOUS_SUFFS](kimmdy.runmanager.AMBIGUOUS_SUFFS.qmd#kimmdy.runmanager.AMBIGUOUS_SUFFS) |  |
+| [AMBIGUOUS_SUFFS](#kimmdy.runmanager.AMBIGUOUS_SUFFS) |  |
 
 ## Functions
 
 | Name | Description |
 | --- | --- |
-| [get_existing_files](kimmdy.runmanager.get_existing_files.qmd#kimmdy.runmanager.get_existing_files) | Initialize latest_files with every existing file defined in config |
+| [get_existing_files](#kimmdy.runmanager.get_existing_files) | Initialize latest_files with every existing file defined in config |
+
+### get_existing_files { #kimmdy.runmanager.get_existing_files }
+
+`runmanager.get_existing_files(config)`
+
+Initialize latest_files with every existing file defined in config

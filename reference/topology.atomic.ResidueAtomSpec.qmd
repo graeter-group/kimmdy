@@ -1,0 +1,16 @@
+# topology.atomic.ResidueAtomSpec { #kimmdy.topology.atomic.ResidueAtomSpec }
+
+`topology.atomic.ResidueAtomSpec(name, type, charge, cgrp)`
+
+Information about one atom in a residue
+; name  type  charge  chargegroup
+
+## Methods
+
+| Name | Description |
+| --- | --- |
+| [from_top_line](#kimmdy.topology.atomic.ResidueAtomSpec.from_top_line) |  |
+
+### from_top_line { #kimmdy.topology.atomic.ResidueAtomSpec.from_top_line }
+
+`topology.atomic.ResidueAtomSpec.from_top_line(cls, l)`

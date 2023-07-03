@@ -1,0 +1,10 @@
+# constants { #kimmdy.constants }
+
+`constants`
+
+## Attributes
+
+| Name | Description |
+| --- | --- |
+| [ATOMTYPE_BONDORDER](#kimmdy.constants.ATOMTYPE_BONDORDER) |  |
+| [ATOMTYPE_BONDORDER_FLAT](#kimmdy.constants.ATOMTYPE_BONDORDER_FLAT) |  |
