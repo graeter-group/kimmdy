@@ -1,5 +1,6 @@
 # editors / tooling
 .vscode
+.quarto
 /os
 
 # our own program output
