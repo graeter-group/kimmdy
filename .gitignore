@@ -21,6 +21,9 @@ cat-center.gro
 *.dill
 *.pickle
 
+# excludes
+!tests/test_files/test_changemanager/pull.trr
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
