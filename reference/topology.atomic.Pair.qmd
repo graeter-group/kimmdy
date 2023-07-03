@@ -1,0 +1,20 @@
+# topology.atomic.Pair { #kimmdy.topology.atomic.Pair }
+
+`topology.atomic.Pair(ai, aj, funct, c0=None, c1=None, c2=None, c3=None)`
+
+Information about one pair
+
+A class containing pair information as in the pair section of the topology.
+
+From gromacs topology:
+ai', 'aj', 'funct', 'c0', 'c1', 'c2', 'c3'
+
+## Methods
+
+| Name | Description |
+| --- | --- |
+| [from_top_line](#kimmdy.topology.atomic.Pair.from_top_line) |  |
+
+### from_top_line { #kimmdy.topology.atomic.Pair.from_top_line }
+
+`topology.atomic.Pair.from_top_line(cls, l)`

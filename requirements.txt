@@ -3,8 +3,7 @@ tox
 black
 hypothesis
 jupyter
-sphinx
-sphinx-rtd-theme
-myst-parser
+git+https://github.com/machow/quartodoc.git
+pydantic<2
 -e .
 -e ./plugins

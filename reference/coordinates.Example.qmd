@@ -1,0 +1,5 @@
+# coordinates.Example { #kimmdy.coordinates.Example }
+
+`coordinates.Example()`
+
+Example class for testing purposes.

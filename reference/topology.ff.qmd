@@ -1,0 +1,20 @@
+# topology.ff { #kimmdy.topology.ff }
+
+`topology.ff`
+
+## Attributes
+
+| Name | Description |
+| --- | --- |
+| [Patch](#kimmdy.topology.ff.Patch) |  |
+| [Patches](#kimmdy.topology.ff.Patches) |  |
+
+## Functions
+
+| Name | Description |
+| --- | --- |
+| [props_to_patches](#kimmdy.topology.ff.props_to_patches) |  |
+
+### props_to_patches { #kimmdy.topology.ff.props_to_patches }
+
+`topology.ff.props_to_patches(props)`

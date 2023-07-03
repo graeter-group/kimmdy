@@ -1,0 +1,16 @@
+# topology.atomic.ResidueImproperSpec { #kimmdy.topology.atomic.ResidueImproperSpec }
+
+`topology.atomic.ResidueImproperSpec(atom1, atom2, atom3, atom4, q0, cq)`
+
+Information about one imroper dihedral in a residue
+;atom1 atom2 atom3 atom4     q0     cq
+
+## Methods
+
+| Name | Description |
+| --- | --- |
+| [from_top_line](#kimmdy.topology.atomic.ResidueImproperSpec.from_top_line) |  |
+
+### from_top_line { #kimmdy.topology.atomic.ResidueImproperSpec.from_top_line }
+
+`topology.atomic.ResidueImproperSpec.from_top_line(cls, l)`

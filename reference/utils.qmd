@@ -1,0 +1,147 @@
+# utils { #kimmdy.utils }
+
+`utils`
+
+## Functions
+
+| Name | Description |
+| --- | --- |
+| [check_gmx_version](#kimmdy.utils.check_gmx_version) | Check for an existing gromacs installation. |
+| [check_idx](#kimmdy.utils.check_idx) |  |
+| [find_radical_pos](#kimmdy.utils.find_radical_pos) | Calculates possible radical positions of a given radical atom |
+| [float_or_str](#kimmdy.utils.float_or_str) |  |
+| [get_atominfo_from_plumedid](#kimmdy.utils.get_atominfo_from_plumedid) | returns atomtypes for a plumedid with information from the plumed and topology file |
+| [get_bondprm_from_atomtypes](#kimmdy.utils.get_bondprm_from_atomtypes) | returns bond parameters (b0, kb, E_dis) for a set of atomtypes |
+| [get_data_from_file](#kimmdy.utils.get_data_from_file) |  |
+| [get_gmx_dir](#kimmdy.utils.get_gmx_dir) | returns the path to the gromacs installation |
+| [get_shell_stdout](#kimmdy.utils.get_shell_stdout) |  |
+| [identify_atomtypes](#kimmdy.utils.identify_atomtypes) |  |
+| [increment_logfile](#kimmdy.utils.increment_logfile) |  |
+| [morse_transition_rate](#kimmdy.utils.morse_transition_rate) | calculates energy barrier crossing rate [in ps]; barrier based on the model V = V_morse - F*X |
+| [pushd](#kimmdy.utils.pushd) |  |
+| [run_gmx](#kimmdy.utils.run_gmx) |  |
+| [run_shell_cmd](#kimmdy.utils.run_shell_cmd) |  |
+| [sort_angle](#kimmdy.utils.sort_angle) |  |
+| [sort_bond](#kimmdy.utils.sort_bond) |  |
+| [sort_dihedral](#kimmdy.utils.sort_dihedral) |  |
+| [sort_improper](#kimmdy.utils.sort_improper) |  |
+| [store_linelist_to_file](#kimmdy.utils.store_linelist_to_file) |  |
+| [str_to_int_or_0](#kimmdy.utils.str_to_int_or_0) |  |
+| [write_conditions_in_plumedfile](#kimmdy.utils.write_conditions_in_plumedfile) |  |
+
+### check_gmx_version { #kimmdy.utils.check_gmx_version }
+
+`utils.check_gmx_version(config)`
+
+Check for an existing gromacs installation.
+
+If PLUMED is meant to be used it additionally checks for the keyword
+'MODIFIED' in the version name.
+
+### check_idx { #kimmdy.utils.check_idx }
+
+`utils.check_idx(object)`
+
+### find_radical_pos { #kimmdy.utils.find_radical_pos }
+
+`utils.find_radical_pos(center, bonded, tetrahedral=False)`
+
+Calculates possible radical positions of a given radical atom
+
+#### Parameters
+
+| Name          | Type                             | Description                                                            | Default    |
+|---------------|----------------------------------|------------------------------------------------------------------------|------------|
+| `center`      | MDAnalysis.core.groups.Atom      | Radical atom                                                           | _required_ |
+| `bonded`      | MDAnalysis.core.groups.AtomGroup | Atom group of bonded atoms. From its length the geometry is predicted. | _required_ |
+| `tetrahedral` | bool                             | Whether to assume a tetrahedral conformation around C and N            | `False`    |
+
+#### Returns
+
+| Type   | Description                                         |
+|--------|-----------------------------------------------------|
+| list   | List of radical positions, three dimensional arrays |
+
+### float_or_str { #kimmdy.utils.float_or_str }
+
+`utils.float_or_str(elem)`
+
+### get_atominfo_from_plumedid { #kimmdy.utils.get_atominfo_from_plumedid }
+
+`utils.get_atominfo_from_plumedid(plumedid, plumed, top)`
+
+returns atomtypes for a plumedid with information from the plumed and topology file
+
+### get_bondprm_from_atomtypes { #kimmdy.utils.get_bondprm_from_atomtypes }
+
+`utils.get_bondprm_from_atomtypes(atomtypes, ffbonded, lookup_edissoc_atomtype)`
+
+returns bond parameters (b0, kb, E_dis) for a set of atomtypes
+
+### get_data_from_file { #kimmdy.utils.get_data_from_file }
+
+`utils.get_data_from_file(filepath)`
+
+### get_gmx_dir { #kimmdy.utils.get_gmx_dir }
+
+`utils.get_gmx_dir()`
+
+returns the path to the gromacs installation
+
+### get_shell_stdout { #kimmdy.utils.get_shell_stdout }
+
+`utils.get_shell_stdout(s)`
+
+### identify_atomtypes { #kimmdy.utils.identify_atomtypes }
+
+`utils.identify_atomtypes(filepath)`
+
+### increment_logfile { #kimmdy.utils.increment_logfile }
+
+`utils.increment_logfile(f)`
+
+### morse_transition_rate { #kimmdy.utils.morse_transition_rate }
+
+`utils.morse_transition_rate(r_curr, r_0, E_dis, k_f, k_0=0.288, kT=2.479)`
+
+calculates energy barrier crossing rate [in ps]; barrier based on the model V = V_morse - F*X
+
+### pushd { #kimmdy.utils.pushd }
+
+`utils.pushd(path)`
+
+### run_gmx { #kimmdy.utils.run_gmx }
+
+`utils.run_gmx(s, cwd=None)`
+
+### run_shell_cmd { #kimmdy.utils.run_shell_cmd }
+
+`utils.run_shell_cmd(s, cwd=None)`
+
+### sort_angle { #kimmdy.utils.sort_angle }
+
+`utils.sort_angle(entry)`
+
+### sort_bond { #kimmdy.utils.sort_bond }
+
+`utils.sort_bond(entry)`
+
+### sort_dihedral { #kimmdy.utils.sort_dihedral }
+
+`utils.sort_dihedral(entry)`
+
+### sort_improper { #kimmdy.utils.sort_improper }
+
+`utils.sort_improper(entry)`
+
+### store_linelist_to_file { #kimmdy.utils.store_linelist_to_file }
+
+`utils.store_linelist_to_file(data, filepath)`
+
+### str_to_int_or_0 { #kimmdy.utils.str_to_int_or_0 }
+
+`utils.str_to_int_or_0(elem)`
+
+### write_conditions_in_plumedfile { #kimmdy.utils.write_conditions_in_plumedfile }
+
+`utils.write_conditions_in_plumedfile(topfile, indexfile, indexgroup, outplumed)`

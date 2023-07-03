@@ -26,6 +26,13 @@ class Topology:
     A topology keeps track of connections and applies patches to parameters when bonds are broken or formed.
     Assumptions:
     - the topology of interest (the protein) is in section 'moleculetype_0'.
+
+    Parameters
+    ----------
+    top :
+        A dictionary containing the parsed topology data.
+    ffpatch : Optional[Path]
+        Path to a force field patch file. If None, no patching is applied.
     """
 
     def __init__(
@@ -484,8 +491,9 @@ class Topology:
 
         Parameters
         ----------
-        atompair: a tuple of integers with the atoms indices
-            `from`, the atom being moved and
+        atompair:
+            A tuple of integers with the atoms indices (id, starting at 1)
+            with `from`, the atom being moved and
             `to`, the atom to which the `from` atom will be bound
         """
 
