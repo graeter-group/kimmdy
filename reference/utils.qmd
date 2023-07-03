@@ -50,11 +50,11 @@ Calculates possible radical positions of a given radical atom
 
 #### Parameters
 
-| Name          | Type                      | Description                                                            | Default    |
-|---------------|---------------------------|------------------------------------------------------------------------|------------|
-| `center`      | MDA.core.groups.Atom      | Radical atom                                                           | _required_ |
-| `bonded`      | MDA.core.groups.AtomGroup | Atom group of bonded atoms. From its length the geometry is predicted. | _required_ |
-| `tetrahedral` | bool                      | Whether to assume a tetrahedral conformation around C and N            | `False`    |
+| Name          | Type                             | Description                                                            | Default    |
+|---------------|----------------------------------|------------------------------------------------------------------------|------------|
+| `center`      | MDAnalysis.core.groups.Atom      | Radical atom                                                           | _required_ |
+| `bonded`      | MDAnalysis.core.groups.AtomGroup | Atom group of bonded atoms. From its length the geometry is predicted. | _required_ |
+| `tetrahedral` | bool                             | Whether to assume a tetrahedral conformation around C and N            | `False`    |
 
 #### Returns
 

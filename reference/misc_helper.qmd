@@ -19,11 +19,11 @@ Find and concatenate trajectories from KIMMDY runs.
 
 #### Parameters
 
-| Name        | Type           | Description                                                                                       | Default    |
-|-------------|----------------|---------------------------------------------------------------------------------------------------|------------|
-| `run_dir`   | Path \| str    | Directory containing directories of multiple tasks.                                               | _required_ |
-| `out`       | Path           | File Path into the output trr will be written. Default `concat.trr` in given run_dir              | `None`     |
-| `run_types` | list, optional | List of tasks to get trrs from. If a task is not in this list it will be skipped. By default None | `None`     |
+| Name        | Type                | Description                                                                                       | Default    |
+|-------------|---------------------|---------------------------------------------------------------------------------------------------|------------|
+| `run_dir`   | pathlib.Path \| str | Directory containing directories of multiple tasks.                                               | _required_ |
+| `out`       | Path                | File Path into the output trr will be written. Default `concat.trr` in given run_dir              | `None`     |
+| `run_types` | list                | List of tasks to get trrs from. If a task is not in this list it will be skipped. By default None | `None`     |
 
 ### edgelist_to_dot_graph { #kimmdy.misc_helper.edgelist_to_dot_graph }
 

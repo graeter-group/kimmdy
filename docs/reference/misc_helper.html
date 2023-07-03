@@ -454,9 +454,9 @@ ul.task-list li input[type="checkbox"] {
 <h4 class="anchored" data-anchor-id="parameters">Parameters</h4>
 <table class="table">
 <colgroup>
-<col style="width: 9%">
-<col style="width: 11%">
-<col style="width: 70%">
+<col style="width: 8%">
+<col style="width: 14%">
+<col style="width: 68%">
 <col style="width: 8%">
 </colgroup>
 <thead>
@@ -470,7 +470,7 @@ ul.task-list li input[type="checkbox"] {
 <tbody>
 <tr class="odd">
 <td><code>run_dir</code></td>
-<td>Path | str</td>
+<td>pathlib.Path | str</td>
 <td>Directory containing directories of multiple tasks.</td>
 <td><em>required</em></td>
 </tr>
@@ -482,7 +482,7 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 <tr class="odd">
 <td><code>run_types</code></td>
-<td>list, optional</td>
+<td>list</td>
 <td>List of tasks to get trrs from. If a task is not in this list it will be skipped. By default None</td>
 <td><code>None</code></td>
 </tr>

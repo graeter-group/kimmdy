@@ -18,11 +18,11 @@ takes RecipeCollection and choses a recipe based on which reaction would occur.
 
 #### Parameters
 
-| Name              | Type                   | Description                                                              | Default         |
-|-------------------|------------------------|--------------------------------------------------------------------------|-----------------|
-| `reaction_result` |                        | from which one will be choosen                                           | _required_      |
-| `rng`             | np.random.BitGenerator | to generate random numbers in the KMC step                               | `default_rng()` |
-| `MD_time`         | Union\[float, None\]   | to compare conformational events with reaction events in the time domain | `None`          |
+| Name              | Type                        | Description                                                              | Default         |
+|-------------------|-----------------------------|--------------------------------------------------------------------------|-----------------|
+| `reaction_result` |                             | from which one will be choosen                                           | _required_      |
+| `rng`             | numpy.random.BitGenerator   | to generate random numbers in the KMC step                               | `default_rng()` |
+| `MD_time`         | typing.Union\[float, None\] | to compare conformational events with reaction events in the time domain | `None`          |
 
 ### rf_kmc { #kimmdy.kmc.rf_kmc }
 
@@ -33,7 +33,7 @@ takes RecipeCollection and choses a recipe based on the relative propensity of t
 
 #### Parameters
 
-| Name              | Type                   | Description                                | Default         |
-|-------------------|------------------------|--------------------------------------------|-----------------|
-| `reaction_result` |                        | from which one will be choosen             | _required_      |
-| `rng`             | np.random.BitGenerator | to generate random numbers in the KMC step | `default_rng()` |
+| Name              | Type                      | Description                                | Default         |
+|-------------------|---------------------------|--------------------------------------------|-----------------|
+| `reaction_result` |                           | from which one will be choosen             | _required_      |
+| `rng`             | numpy.random.BitGenerator | to generate random numbers in the KMC step | `default_rng()` |
