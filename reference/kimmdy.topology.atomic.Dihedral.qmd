@@ -1,0 +1,14 @@
+# Dihedral { #kimmdy.topology.atomic.Dihedral }
+
+`topology.atomic.Dihedral(ai, aj, ak, al, funct, c0=None, c1=None, c2=None, c3=None, c4=None, c5=None)`
+
+Information about one dihedral
+
+A class containing bond information as in the dihedrals section of the topology.
+Proper dihedrals have funct 9.
+Improper dihedrals have funct 4.
+
+From gromacs topology:
+';', 'ai', 'aj', 'ak', 'al', 'funct', 'c0', 'c1', 'c2', 'c3', 'c4', 'c5'
+For proper dihedrals (funct 9): aj < ak
+For improper dihedrals (funct 4): no guaranteed order

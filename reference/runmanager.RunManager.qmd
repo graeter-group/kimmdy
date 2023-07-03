@@ -1,0 +1,28 @@
+# runmanager.RunManager { #kimmdy.runmanager.RunManager }
+
+`runmanager.RunManager(self, config)`
+
+The RunManager, a central piece.
+
+Manages the queue of tasks, communicates with the
+rest of the program and keeps track of global state.
+
+## Methods
+
+| Name | Description |
+| --- | --- |
+| [get_latest](#kimmdy.runmanager.RunManager.get_latest) | Returns path to latest file of given type. |
+| [run](#kimmdy.runmanager.RunManager.run) |  |
+
+### get_latest { #kimmdy.runmanager.RunManager.get_latest }
+
+`runmanager.RunManager.get_latest(self, suffix)`
+
+Returns path to latest file of given type.
+
+For .dat files (in general ambiguous extensions) use full file name.
+Errors if file is not found.
+
+### run { #kimmdy.runmanager.RunManager.run }
+
+`runmanager.RunManager.run(self)`

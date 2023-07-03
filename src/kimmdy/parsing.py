@@ -10,6 +10,7 @@ import logging
 from kimmdy.utils import get_gmx_dir
 
 TopologyDict = dict
+
 GMX_BUILTIN_FF_DIR = get_gmx_dir() / "top"
 
 
@@ -132,6 +133,11 @@ def resolve_includes(path: Path) -> tuple[list[str], Optional[Path]]:
 
 def read_top(path: Path) -> TopologyDict:
     """Parse a list of lines from a topology file.
+
+    Parameters
+    ----------
+    path :
+        Path to the topology file.
 
     Assumptions and limitation
     -----

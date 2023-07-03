@@ -1,0 +1,20 @@
+# topology.atomic.Bond { #kimmdy.topology.atomic.Bond }
+
+`topology.atomic.Bond(ai, aj, funct, c0=None, c1=None, c2=None, c3=None, c4=None, c5=None)`
+
+Information about one bond
+
+A class containing bond information as in the bonds section of the topology.
+From gromacs topology:
+'ai', 'aj', 'funct', 'c0', 'c1', 'c2', 'c3', 'c4', 'c5'
+With ai < aj
+
+## Methods
+
+| Name | Description |
+| --- | --- |
+| [from_top_line](#kimmdy.topology.atomic.Bond.from_top_line) |  |
+
+### from_top_line { #kimmdy.topology.atomic.Bond.from_top_line }
+
+`topology.atomic.Bond.from_top_line(cls, l)`

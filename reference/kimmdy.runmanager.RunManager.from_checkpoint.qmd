@@ -1,0 +1,3 @@
+# from_checkpoint { #kimmdy.runmanager.RunManager.from_checkpoint }
+
+`runmanager.RunManager.from_checkpoint`

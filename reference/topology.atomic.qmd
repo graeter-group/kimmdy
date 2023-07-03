@@ -1,0 +1,15 @@
+# topology.atomic { #kimmdy.topology.atomic }
+
+`topology.atomic`
+
+## Attributes
+
+| Name | Description |
+| --- | --- |
+| [AngleId](#kimmdy.topology.atomic.AngleId) |  |
+| [AtomId](#kimmdy.topology.atomic.AtomId) |  |
+| [Atomic](#kimmdy.topology.atomic.Atomic) |  |
+| [AtomicType](#kimmdy.topology.atomic.AtomicType) |  |
+| [AtomicTypes](#kimmdy.topology.atomic.AtomicTypes) |  |
+| [BondId](#kimmdy.topology.atomic.BondId) |  |
+| [DihedralId](#kimmdy.topology.atomic.DihedralId) |  |

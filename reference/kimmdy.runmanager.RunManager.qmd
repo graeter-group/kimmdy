@@ -1,0 +1,8 @@
+# RunManager { #kimmdy.runmanager.RunManager }
+
+`runmanager.RunManager(self, config)`
+
+The RunManager, a central piece.
+
+Manages the queue of tasks, communicates with the
+rest of the program and keeps track of global state.

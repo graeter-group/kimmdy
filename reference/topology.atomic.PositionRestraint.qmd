@@ -1,0 +1,20 @@
+# topology.atomic.PositionRestraint { #kimmdy.topology.atomic.PositionRestraint }
+
+`topology.atomic.PositionRestraint(ai, funct, fc, condition=None)`
+
+Information about one position restraint.
+
+A class containing information as in the position_restraints section of the topology.
+
+From gromacs topology:
+; ai   funct    fc(x,y,z)
+
+## Methods
+
+| Name | Description |
+| --- | --- |
+| [from_top_line](#kimmdy.topology.atomic.PositionRestraint.from_top_line) |  |
+
+### from_top_line { #kimmdy.topology.atomic.PositionRestraint.from_top_line }
+
+`topology.atomic.PositionRestraint.from_top_line(cls, l, condition=None)`

@@ -1,0 +1,5 @@
+# get_existing_files { #kimmdy.runmanager.get_existing_files }
+
+`runmanager.get_existing_files(config)`
+
+Initialize latest_files with every existing file defined in config

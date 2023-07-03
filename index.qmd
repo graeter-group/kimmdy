@@ -1,0 +1,6 @@
+# KIMMDY
+
+Welcome to KIMMDY
+
+[Getting Started](/guide/getting-started.qmd)
+

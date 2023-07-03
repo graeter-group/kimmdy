@@ -1,0 +1,10 @@
+# BondType { #kimmdy.topology.atomic.BondType }
+
+`topology.atomic.BondType(i, j, id, id_sym, funct, c0=None, c1=None, c2=None, c3=None)`
+
+Information about one bondtype
+
+A class containing bond information as in the bonds section of the topology.
+From gromacs topology:
+'i', 'j', 'funct', 'c0', 'c1', 'c2', 'c3
+Where i and j are atomtypes

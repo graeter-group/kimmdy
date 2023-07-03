@@ -1,0 +1,17 @@
+# DihedralType { #kimmdy.topology.atomic.DihedralType }
+
+`topology.atomic.DihedralType(i, j, k, l, id, id_sym, funct, c0, c1, periodicity, c3=None, c4=None, c5=None)`
+
+Information about one dihedral
+
+A class containing bond information as in the dihedrals section of the topology.
+Proper dihedrals have funct 9.
+Improper dihedrals have funct 4.
+
+Note that proper dihedrals of type 9 can be defined multiple times, for different
+periodicities. This is why would-be parameter c2 is called periodicity and part of
+the `id`.
+
+From gromacs topology:
+';', 'i', 'j', 'k', 'l', 'funct', 'c0', 'c1', 'periodicity', 'c3', 'c4', 'c5'
+Where i,j,k,l are atomtypes
