@@ -192,12 +192,12 @@ class Config:
 
         # top level after initialization here
         if input_file is not None:
-            if (cwd := self.raw.get("cwd")):
+            if cwd := self.raw.get("cwd"):
                 cwd = Path(cwd)
             else:
                 cwd = input_file.parent.resolve()
             self.cwd = cwd
-            if (out := self.raw.get("out")):
+            if out := self.raw.get("out"):
                 out = Path(out)
             else:
                 out = self.cwd / self.name
