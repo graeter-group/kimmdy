@@ -5,12 +5,13 @@ from dataclasses import asdict
 
 
 def test_combine_recipes():
-    rp1a = Recipe([RecipeStep()], rates=[1], timespans=[[0.0, 1.0]])
-    rp1b = Recipe([RecipeStep()], rates=[1], timespans=[[1.0, 2.0]])
-    rp2 = Recipe([RecipeStep(), RecipeStep()], rates=[1], timespans=[[1.0, 3.0]])
+    empty_step = RecipeStep()
+    rp1a = Recipe([empty_step], rates=[1], timespans=[(0.0, 1.0)])
+    rp1b = Recipe([empty_step], rates=[1], timespans=[(1.0, 2.0)])
+    rp2 = Recipe([empty_step, empty_step], rates=[1], timespans=[(1.0, 3.0)])
 
     rp1a.combine_with(rp1b)
-    assert rp1a.timespans == [[0.0, 1.0], [1.0, 2.0]]
+    assert rp1a.timespans == [(0.0, 1.0), (1.0, 2.0)]
     assert rp1a.rates == [1, 1]
 
     with pytest.raises(ValueError):
@@ -23,13 +24,13 @@ def recipe_collection():
         Recipe(
             [RecipeStep(), RecipeStep(), RecipeStep()],
             rates=[1],
-            timespans=[[0.0, 1.0]],
+            timespans=[(0.0, 1.0)],
         ),
-        Recipe([RecipeStep()], rates=[1], timespans=[[0.0, 1.0]]),
-        Recipe([RecipeStep()], rates=[1], timespans=[[1.0, 2.0]]),
-        Recipe([RecipeStep(), RecipeStep()], rates=[1], timespans=[[2.0, 3.0]]),
-        Recipe([RecipeStep()], rates=[1], timespans=[[3.0, 4.0]]),
-        Recipe([RecipeStep(), RecipeStep()], rates=[1], timespans=[[4.0, 5.0]]),
+        Recipe([RecipeStep()], rates=[1], timespans=[(0.0, 1.0)]),
+        Recipe([RecipeStep()], rates=[1], timespans=[(1.0, 2.0)]),
+        Recipe([RecipeStep(), RecipeStep()], rates=[1], timespans=[(2.0, 3.0)]),
+        Recipe([RecipeStep()], rates=[1], timespans=[(3.0, 4.0)]),
+        Recipe([RecipeStep(), RecipeStep()], rates=[1], timespans=[(4.0, 5.0)]),
     ]
     return RecipeCollection(rps)
 
@@ -39,11 +40,11 @@ def test_aggregate_recipe_collection(recipe_collection):
 
     assert len(recipe_collection.recipes) == 3
     assert recipe_collection.recipes[1].timespans == [
-        [0.0, 1.0],
-        [1.0, 2.0],
-        [3.0, 4.0],
+        (0.0, 1.0),
+        (1.0, 2.0),
+        (3.0, 4.0),
     ]
-    assert recipe_collection.recipes[2].timespans == [[2.0, 3.0], [4.0, 5.0]]
+    assert recipe_collection.recipes[2].timespans == [(2.0, 3.0), (4.0, 5.0)]
 
 
 def test_recipe_collection_to_csv(tmp_path, recipe_collection):

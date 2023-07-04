@@ -67,13 +67,13 @@ class HAT_naive(ReactionPlugin):
             recipe = Recipe(
                 recipe_steps=[
                     Move(
-                        idx_to_move=int(h) - 1,
-                        idx_to_break=int(f) - 1,
-                        idx_to_bind=int(r) - 1,
+                        ix_to_move=int(h) - 1,
+                        ix_to_break=int(f) - 1,
+                        ix_to_bind=int(r) - 1,
                     )
                 ],
                 rates=[1],
-                timespans=[[u.trajectory[0].time, u.trajectory[-1].time]],
+                timespans=[(u.trajectory[0].time, u.trajectory[-1].time)],
             )
             return RecipeCollection([recipe])
 

@@ -13,11 +13,12 @@ import dill
 import csv
 
 
+@dataclass
 class RecipeStep():
-    """ABC for all RecipeSteps.
+    """Base class for all RecipeSteps.
     Indices can be accessed as 0-based or 1-based.
-    id: 1-based, str
     ix: 0-based, int
+    id: 1-based, str
     """
 
 
@@ -26,15 +27,21 @@ class Move(RecipeStep):
 
     Attributes
     ----------
-    idx_to_move :
+    ix_to_move : int
         Index of atom to move. 0-based.
-    idx_to_bind :
+    ix_to_bind : int
         Bonding partner to form bond with.
-    idx_to_break :
+    ix_to_break : int
         Bonding partner to break bond with, default None.
     new_coords :
         Optional new xyz coordinates for atom to move to, and the associated
         time in ps default None.
+    id_to_move : str
+        Index of atom to move. 1-based
+    id_to_bind : str
+        Bonding partner to form bond with.
+    id_to_break : str
+        Bonding partner to break bond with, default None.
     """
 
     _ix_to_move: int
@@ -159,25 +166,26 @@ class SingleOperation(RecipeStep):
 
 
 
-class Break(SingleOperation):
+class Break(SingleOperation, RecipeStep):
     """Change topology to break a bond
 
     Attributes
     ----------
-    atom_id1/2 : str
-        atom indices between which a bond should be removed
     atom_ix1/2 : int
         0-based atom indices as ints
+    atom_id1/2 : str
+        atom indices between which a bond should be removed
     """
 
 class Bind(SingleOperation):
     """Change topology to form a bond
+
     Attributes
     ----------
-    atom_id1/2 : str
-        atom indices between which a bond should be removed
     atom_ix1/2 : int
         0-based atom indices as ints
+    atom_id1/2 : str
+        atom indices between which a bond should be removed
     """
 
 
