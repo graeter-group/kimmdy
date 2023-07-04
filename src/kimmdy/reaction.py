@@ -14,7 +14,7 @@ import csv
 
 
 @dataclass
-class RecipeStep():
+class RecipeStep:
     """Base class for all RecipeSteps.
     Indices can be accessed as 0-based or 1-based.
     ix: 0-based, int
@@ -49,7 +49,13 @@ class Move(RecipeStep):
     _ix_to_break: Optional[int] = None
     new_coords: Union[tuple[tuple[float, float, float], float], None] = None
 
-    def __init__(self, ix_to_move: int, ix_to_bind: Optional[int] = None, ix_to_break: Optional[int] = None, new_coords: Optional[tuple[tuple[float, float, float], float]] = None) -> None:
+    def __init__(
+        self,
+        ix_to_move: int,
+        ix_to_bind: Optional[int] = None,
+        ix_to_break: Optional[int] = None,
+        new_coords: Optional[tuple[tuple[float, float, float], float]] = None,
+    ) -> None:
         self._ix_to_move = ix_to_move
         self._ix_to_bind = ix_to_bind
         self._ix_to_break = ix_to_break
@@ -130,11 +136,10 @@ class SingleOperation(RecipeStep):
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}, ixs: ({self.atom_ix_1}, {self.atom_ix_2}) ids: ({self.atom_id_1}, {self.atom_id_2})"
 
-
     @property
     def atom_id_1(self) -> str:
         return str(self._atom_ix_1 + 1)
-    
+
     @atom_id_1.setter
     def atom_id_1(self, value: str):
         self._atom_ix_1 = int(value) - 1
@@ -142,16 +147,15 @@ class SingleOperation(RecipeStep):
     @property
     def atom_ix_1(self) -> int:
         return self._atom_ix_1
-    
+
     @atom_ix_1.setter
     def atom_ix_1(self, value: int):
         self._atom_ix_1 = value
 
-
     @property
     def atom_id_2(self) -> str:
         return str(self._atom_ix_2 + 1)
-    
+
     @atom_id_2.setter
     def atom_id_2(self, value: str):
         self._atom_ix_2 = int(value) - 1
@@ -159,11 +163,10 @@ class SingleOperation(RecipeStep):
     @property
     def atom_ix_2(self) -> int:
         return self._atom_ix_2
-    
+
     @atom_ix_2.setter
     def atom_ix_2(self, value: int):
         self._atom_ix_2 = value
-
 
 
 class Break(SingleOperation, RecipeStep):
@@ -176,6 +179,7 @@ class Break(SingleOperation, RecipeStep):
     atom_id1/2 : str
         atom indices between which a bond should be removed
     """
+
 
 class Bind(SingleOperation):
     """Change topology to form a bond

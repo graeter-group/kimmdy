@@ -164,7 +164,7 @@ class TestUrea:
         raw = deepcopy(raw_urea_top_fix)
         top = Topology(raw)
         og_top = deepcopy(top)
-        top.atoms.pop('3')
+        top.atoms.pop("3")
         top.reindex_atomnrs()
 
         og_atoms = list(og_top.atoms.keys())
@@ -179,16 +179,35 @@ class TestUrea:
         og_impropers = list(og_top.improper_dihedrals.keys())
         impropers = list(top.improper_dihedrals.keys())
 
-        assert og_atoms == [str(x) for x in range(1,9)]
-        assert atoms == [str(x) for x in range(1,8)]
+        assert og_atoms == [str(x) for x in range(1, 9)]
+        assert atoms == [str(x) for x in range(1, 8)]
 
-        assert top.atoms['3'] == Atom('3', 'H', '1', 'URE', 'H11', '4', '0.395055', '1.00800')
+        assert top.atoms["3"] == Atom(
+            "3", "H", "1", "URE", "H11", "4", "0.395055", "1.00800"
+        )
 
-        assert og_bonds == [('1', '2'), ('1', '3'), ('1', '6'), ('3', '4'), ('3', '5'), ('6', '7'), ('6', '8')]
-        assert bonds == [('1', '2'), ('1', '5'), ('5', '6'), ('5', '7')]
+        assert og_bonds == [
+            ("1", "2"),
+            ("1", "3"),
+            ("1", "6"),
+            ("3", "4"),
+            ("3", "5"),
+            ("6", "7"),
+            ("6", "8"),
+        ]
+        assert bonds == [("1", "2"), ("1", "5"), ("5", "6"), ("5", "7")]
 
-        assert og_dihedrals == [('2', '1', '3', '4'), ('2', '1', '3', '5'), ('2', '1', '6', '7'), ('2', '1', '6', '8'), ('3', '1', '6', '7'), ('3', '1', '6', '8'), ('6', '1', '3', '4'), ('6', '1', '3', '5')]
-        assert dihedrals == [('2', '1', '5', '6'), ('2', '1', '5', '7')]
+        assert og_dihedrals == [
+            ("2", "1", "3", "4"),
+            ("2", "1", "3", "5"),
+            ("2", "1", "6", "7"),
+            ("2", "1", "6", "8"),
+            ("3", "1", "6", "7"),
+            ("3", "1", "6", "8"),
+            ("6", "1", "3", "4"),
+            ("6", "1", "3", "5"),
+        ]
+        assert dihedrals == [("2", "1", "5", "6"), ("2", "1", "5", "7")]
 
         assert og_impropers == []
         assert impropers == []

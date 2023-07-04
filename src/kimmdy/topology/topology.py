@@ -238,7 +238,6 @@ class Topology:
                 dihedral.al = al
                 new_dihedrals[dihedral.periodicity] = dihedral
 
-
             new_multiple_dihedrals[
                 (
                     update_map[dihedrals.ai],
@@ -671,7 +670,7 @@ class Topology:
         for key, value in dihedral_k_v:
             if self.improper_dihedrals.get(key) is None:
                 # TODO: fix this
-                c2 = ''
+                c2 = ""
                 if value.q0 is not None:
                     c2 = "1"
                 self.improper_dihedrals[key] = Dihedral(

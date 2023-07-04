@@ -63,4 +63,7 @@ class Task:
         return str(self.f) + " args: " + str(self.kwargs)
 
 
-TaskMapping = dict[str,  Union[ list[Callable[..., Optional[TaskFiles]]], Callable[..., Optional[TaskFiles]]  ] ]
+TaskMapping = dict[
+    str,
+    Union[list[Callable[..., Optional[TaskFiles]]], Callable[..., Optional[TaskFiles]]],
+]

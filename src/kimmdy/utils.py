@@ -6,7 +6,6 @@ from typing import Optional
 from pathlib import Path
 
 
-
 def get_gmx_dir() -> Path:
     """returns the path to the gromacs installation"""
     gmx_binary = Path(
@@ -201,5 +200,3 @@ def check_gmx_version(config):
         if not config.dryrun:
             raise SystemError(m)
     return version
-
-
