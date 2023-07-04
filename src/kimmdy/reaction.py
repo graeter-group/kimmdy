@@ -278,25 +278,25 @@ class RecipeCollection:
         """Combines reactions having the same sequence of RecipeSteps."""
 
         unique_recipes = []
-        unique_recipes_idxs = []
+        unique_recipes_ixs = []
 
         for i, recipe in enumerate(self.recipes):
             if recipe.recipe_steps not in unique_recipes:
                 unique_recipes.append(recipe.recipe_steps)
-                unique_recipes_idxs.append([i])
+                unique_recipes_ixs.append([i])
             else:
                 for j, ur in enumerate(unique_recipes):
                     if recipe.recipe_steps == ur:
-                        unique_recipes_idxs[j].append(i)
+                        unique_recipes_ixs[j].append(i)
 
         # merge every dublicate into first reaction path
-        for uri in unique_recipes_idxs:
+        for uri in unique_recipes_ixs:
             if len(uri) > 1:
                 for uri_double in uri[1:]:
                     self.recipes[uri[0]].combine_with(self.recipes[uri_double])
         # only keep first of each reaction path
         urps = []
-        for uri in unique_recipes_idxs:
+        for uri in unique_recipes_ixs:
             urps.append(self.recipes[uri[0]])
         self.recipes = urps
 

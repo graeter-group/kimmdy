@@ -431,9 +431,9 @@ class TestHexalaTopology:
 
         # order is correct
         val = 0
-        for atom_idx in top.atoms.keys():
-            assert int(atom_idx) > val
-            val = int(atom_idx)
+        for atom_id in top.atoms.keys():
+            assert int(atom_id) > val
+            val = int(atom_id)
 
         val = 0
         for bond in top.bonds.keys():

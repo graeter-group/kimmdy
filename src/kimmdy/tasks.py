@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Callable, Optional, TYPE_CHECKING
+from typing import Callable, Optional, TYPE_CHECKING, Union
 
 
 class AutoFillDict(dict):
@@ -63,4 +63,4 @@ class Task:
         return str(self.f) + " args: " + str(self.kwargs)
 
 
-TaskMapping = dict[str, list[Callable[..., Optional[TaskFiles]]]]
+TaskMapping = dict[str,  Union[ list[Callable[..., Optional[TaskFiles]]], Callable[..., Optional[TaskFiles]]  ] ]

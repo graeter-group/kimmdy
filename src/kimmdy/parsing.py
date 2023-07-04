@@ -209,7 +209,7 @@ def read_top(path: Path) -> TopologyDict:
         elif l.startswith("#if"):
             if is_first_line_after_section_header:
                 raise NotImplementedError(
-                    f"""Errro parsing {path}: #if ... #endif can only be used to surround a section, not within."""
+                    f"""Error parsing {path}: #if ... #endif can only be used to surround a section, not within."""
                 )
             l = l.split()
             condition_type = l[0].removeprefix("#")
