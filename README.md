@@ -33,7 +33,8 @@ If you want to contribute here are some informations:
 * requirements.txt containes packages necessary for development, like for testing and linting
 * pytest is used for tests, these are located in `tests/`
 * tox is used to test automated against multiple python versions
-* Shinx with the autodoc and napoleon extensions is used to generated documentation. Run `make html` to update or `make html preview` to update and start an http preview server
+* [quartodoc](https://github.com/machow/quartodoc) is used to generate the documentation website.
+  Run `make quartodoc` (once) and/or `make preview` to build and preview.
 
 
 # KIMMDY (legacy)

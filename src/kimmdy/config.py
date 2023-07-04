@@ -192,14 +192,16 @@ class Config:
 
         # top level after initialization here
         if input_file is not None:
-            self.cwd = (
-                Path(cwd)
-                if (cwd := self.raw.get("cwd"))
-                else input_file.parent.resolve()
-            )
-            self.out = (
-                Path(out) if (out := self.raw.get("out")) else self.cwd / self.name
-            )
+            if cwd := self.raw.get("cwd"):
+                cwd = Path(cwd)
+            else:
+                cwd = input_file.parent.resolve()
+            self.cwd = cwd
+            if out := self.raw.get("out"):
+                out = Path(out)
+            else:
+                out = self.cwd / self.name
+            self.out = out
             # make sure self.out is empty
             while self.out.exists():
                 logging.debug(f"Output dir {self.out} exists, incrementing name")

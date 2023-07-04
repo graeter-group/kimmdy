@@ -1,0 +1,5 @@
+# ResidueType { #kimmdy.topology.atomic.ResidueType }
+
+`topology.atomic.ResidueType(residue, atoms, bonds, proper_dihedrals, improper_dihedrals)`
+
+Information about one residuetype from aminoacids.rtp

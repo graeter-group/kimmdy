@@ -1,0 +1,19 @@
+# topology.atomic { #kimmdy.topology.atomic }
+
+`topology.atomic`
+
+Atomic datatypes for the topology such as Atom, Bond, Angle, Dihedral, etc.
+The order of the fields comes from the gromacs topology file format.
+See <https://manual.gromacs.org/current/reference-manual/topologies/topology-file-formats.html#topology-file>
+
+## Attributes
+
+| Name | Description |
+| --- | --- |
+| [AngleId](#kimmdy.topology.atomic.AngleId) |  |
+| [AtomId](#kimmdy.topology.atomic.AtomId) |  |
+| [Atomic](#kimmdy.topology.atomic.Atomic) |  |
+| [AtomicType](#kimmdy.topology.atomic.AtomicType) |  |
+| [AtomicTypes](#kimmdy.topology.atomic.AtomicTypes) |  |
+| [BondId](#kimmdy.topology.atomic.BondId) |  |
+| [DihedralId](#kimmdy.topology.atomic.DihedralId) |  |

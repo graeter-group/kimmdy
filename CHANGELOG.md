@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.2.0](https://github.com/hits-mbm-dev/kimmdy/compare/v3.1.0...v3.2.0) (2023-07-03)
+
+
+### Features
+
+* quartodoc ([f10e531](https://github.com/hits-mbm-dev/kimmdy/commit/f10e53152d7a9ddc2655bb3744972d06d64eb2b2))
+* quartodoc ([#142](https://github.com/hits-mbm-dev/kimmdy/issues/142)) ([f10e531](https://github.com/hits-mbm-dev/kimmdy/commit/f10e53152d7a9ddc2655bb3744972d06d64eb2b2))
+
 ## [3.1.0](https://github.com/hits-mbm-dev/kimmdy/compare/v3.0.1...v3.1.0) (2023-06-30)
 
 

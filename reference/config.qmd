@@ -1,0 +1,19 @@
+# config { #kimmdy.config }
+
+`config`
+
+## Attributes
+
+| Name | Description |
+| --- | --- |
+| [type_scheme](#kimmdy.config.type_scheme) |  |
+
+## Functions
+
+| Name | Description |
+| --- | --- |
+| [check_file_exists](#kimmdy.config.check_file_exists) |  |
+
+### check_file_exists { #kimmdy.config.check_file_exists }
+
+`config.check_file_exists(p)`

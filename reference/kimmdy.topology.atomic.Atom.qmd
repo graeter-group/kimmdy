@@ -1,0 +1,11 @@
+# Atom { #kimmdy.topology.atomic.Atom }
+
+`topology.atomic.Atom(nr, type, resnr, residue, atom, cgnr, charge, mass, typeB=None, chargeB=None, massB=None, bound_to_nrs=field(default_factory=list), is_radical=False)`
+
+Information about one atom
+
+A class containing atom information as in the atoms section of the topology.
+An atom keeps a list of which atoms it is bound to.
+
+From gromacs topology:
+; nr type resnr residue atom cgnr charge mass typeB chargeB massB

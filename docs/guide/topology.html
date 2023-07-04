@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.353">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Hexala topology</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html" rel="" target="">
+ <span class="menu-text">KIMMDY</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../guide/getting-started.html" rel="" target="">
+ <span class="menu-text">Getting Started</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../guide/topology.html" rel="" target="" aria-current="page">
+ <span class="menu-text">Development</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../reference/index.html" rel="" target="">
+ <span class="menu-text">Reference</span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools ms-auto tools-wide">
+    <a href="https://www.h-its.org/research/mbm/" title="" class="quarto-navigation-tool px-1" aria-label=""><i class="bi bi-house-fill"></i></a>
+    <div class="dropdown">
+      <a href="" title="" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" aria-label=""><i class="bi bi-github"></i></a>
+      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="quarto-navigation-tool-dropdown-0">
+          <li>
+            <a class="dropdown-item quarto-navbar-tools ms-auto-item" href="https://github.com/hits-mbm-dev/kimmdy">
+            Source Code
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item quarto-navbar-tools ms-auto-item" href="https://github.com/hits-mbm-dev/kimmdy/issues/new">
+            Report a Bug
+            </a>
+          </li>
+      </ul>
+    </div>
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#hexala" id="toc-hexala" class="nav-link active" data-scroll-target="#hexala">Hexala</a></li>
+  </ul>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hits-mbm-dev/kimmdy/edit/main/guide/topology.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/hits-mbm-dev/kimmdy/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Hexala topology</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="hexala" class="level1">
+<h1>Hexala</h1>
+<div class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> kimmdy.parsing <span class="im">import</span> read_top</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> kimmdy.topology.topology <span class="im">import</span> Topology</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> kimmdy.misc_helper <span class="im">import</span> top_to_graph</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>ala_top <span class="op">=</span> read_top(Path(<span class="st">'../tests/test_files/test_topology/hexala.top'</span>))</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>top <span class="op">=</span> Topology(ala_top)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>ls <span class="op">=</span> top_to_graph(top) </span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">"ala-top.dot"</span>, <span class="st">"w"</span>) <span class="im">as</span> f:</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  f.writelines(ls)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-file="ala-top.dot">
+<div class="cell-output-display">
+<div id="fig-ala" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<div>
+<svg width="672" height="480" viewbox="0.00 0.00 804.69 1825.96" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="; max-width: none; max-height: none">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 1821.96)">
+<title>
+G
+</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-1821.96 800.69,-1821.96 800.69,4 -4,4"></polygon> <!-- 1 CT --> <g id="node1" class="node">
+<title>
+1 CT
+</title>
+<ellipse fill="none" stroke="black" cx="164.65" cy="-102.86" rx="30.74" ry="30.74"></ellipse> <text text-anchor="middle" x="164.65" y="-98.66" font-family="Times,serif" font-size="14.00">1 CT</text> </g> <!-- 2 HC --> <g id="node2" class="node">
+<title>
+2 HC
+</title>
+<ellipse fill="none" stroke="black" cx="212.51" cy="-32.19" rx="31.89" ry="31.89"></ellipse> <text text-anchor="middle" x="212.51" y="-27.99" font-family="Times,serif" font-size="14.00">2 HC</text> </g> <!-- 1 CT&#45;&#45;2 HC --> <g id="edge1" class="edge">
+<title>
+1 CT–2 HC
+</title>
+<path fill="none" stroke="black" d="M181.93,-77.35C186,-71.34 190.34,-64.92 194.45,-58.86"></path> </g> <!-- 3 HC --> <g id="node3" class="node">
+<title>
+3 HC
+</title>
+<ellipse fill="none" stroke="black" cx="135.89" cy="-31.69" rx="31.89" ry="31.89"></ellipse> <text text-anchor="middle" x="135.89" y="-27.49" font-family="Times,serif" font-size="14.00">3 HC</text> </g> <!-- 1 CT&#45;&#45;3 HC --> <g id="edge2" class="edge">
+<title>
+1 CT–3 HC
+</title>
+<path fill="none" stroke="black" d="M153.12,-74.32C151.37,-69.99 149.56,-65.52 147.8,-61.17"></path> </g> <!-- 4 HC --> <g id="node4" class="node">
+<title>
+4 HC
+</title>
+<ellipse fill="none" stroke="black" cx="79.74" cy="-84.17" rx="31.89" ry="31.89"></ellipse> <text text-anchor="middle" x="79.74" y="-79.97" font-family="Times,serif" font-size="14.00">4 HC</text> </g> <!-- 1 CT&#45;&#45;4 HC --> <g id="edge3" class="edge">
+<title>
+1 CT–4 HC
+</title>
+<path fill="none" stroke="black" d="M134.48,-96.22C126.85,-94.54 118.64,-92.73 110.97,-91.04"></path> </g> <!-- 5 C --> <g id="node5" class="node">
+<title>
+5 C
+</title>
+<ellipse fill="none" stroke="black" cx="186.04" cy="-186.6" rx="24.94" ry="24.94"></ellipse> <text text-anchor="middle" x="186.04" y="-182.4" font-family="Times,serif" font-size="14.00">5 C</text> </g> <!-- 1 CT&#45;&#45;5 C --> <g id="edge4" class="edge">
+<title>
+1 CT–5 C
+</title>
+<path fill="none" stroke="black" d="M172.25,-132.62C174.75,-142.4 177.49,-153.14 179.87,-162.45"></path> </g> <!-- 6 O --> <g id="node6" class="node">
+<title>
+6 O
+</title>
+<ellipse fill="none" stroke="black" cx="106.22" cy="-195.2" rx="25.01" ry="25.01"></ellipse> <text text-anchor="middle" x="106.22" y="-191" font-family="Times,serif" font-size="14.00">6 O</text> </g> <!-- 5 C&#45;&#45;6 O --> <g id="edge5" class="edge">
+<title>
+5 C–6 O
+</title>
+<path fill="none" stroke="black" d="M161.22,-189.27C151.79,-190.29 141.05,-191.45 131.57,-192.47"></path> </g> <!-- 7 N --> <g id="node7" class="node">
+<title>
+7 N
+</title>
+<ellipse fill="none" stroke="black" cx="249.44" cy="-247.21" rx="25.01" ry="25.01"></ellipse> <text text-anchor="middle" x="249.44" y="-243.01" font-family="Times,serif" font-size="14.00">7 N</text> </g> <!-- 5 C&#45;&#45;7 N --> <g id="edge6" class="edge">
+<title>
+5 C–7 N
+</title>
+<path fill="none" stroke="black" d="M204.04,-203.81C212.53,-211.93 222.65,-221.6 231.18,-229.75"></path> </g> <!-- 8 H --> <g id="node8" class="node">
+<title>
+8 H
+</title>
+<ellipse fill="none" stroke="black" cx="289.36" cy="-180.18" rx="25.01" ry="25.01"></ellipse> <text text-anchor="middle" x="289.36" y="-175.98" font-family="Times,serif" font-size="14.00">8 H</text> </g> <!-- 7 N&#45;&#45;8 H --> <g id="edge7" class="edge">
+<title>
+7 N–8 H
+</title>
+<path fill="none" stroke="black" d="M262.51,-225.26C266.97,-217.78 271.95,-209.42 276.4,-201.95"></path> </g> <!-- 9 CT --> <g id="node9" class="node">
+<title>
+9 CT
+</title>
+<ellipse fill="none" stroke="black" cx="313.43" cy="-316.48" rx="30.74" ry="30.74"></ellipse> <text text-anchor="middle" x="313.43" y="-312.28" font-family="Times,serif" font-size="14.00">9 CT</text> </g> <!-- 7 N&#45;&#45;9 CT --> <g id="edge8" class="edge">
+<title>
+7 N–9 CT
+</title>
+<path fill="none" stroke="black" d="M266.59,-265.77C274.59,-274.43 284.17,-284.81 292.58,-293.91"></path> </g> <!-- 10 H1 --> <g id="node10" class="node">
+<title>
+10 H1
+</title>
+<ellipse fill="none" stroke="black" cx="339.37" cy="-273.25" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="339.37" y="-269.05" font-family="Times,serif" font-size="14.00">10 H1</text> </g> <!-- 9 CT&#45;&#45;10 H1 --> <g id="edge9" class="edge">
+<title>
+9 CT–10 H1
+</title>
+<path fill="none" stroke="black" d="M329.42,-289.84C329.5,-289.7 329.58,-289.56 329.66,-289.42"></path> </g> <!-- 11 CT --> <g id="node11" class="node">
+<title>
+11 CT
+</title>
+<ellipse fill="none" stroke="black" cx="408.22" cy="-278.48" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="408.22" y="-274.28" font-family="Times,serif" font-size="14.00">11 CT</text> </g> <!-- 9 CT&#45;&#45;11 CT --> <g id="edge10" class="edge">
+<title>
+9 CT–11 CT
+</title>
+<path fill="none" stroke="black" d="M341.87,-305.08C352.34,-300.88 364.29,-296.09 375.14,-291.74"></path> </g> <!-- 15 C --> <g id="node12" class="node">
+<title>
+15 C
+</title>
+<ellipse fill="none" stroke="black" cx="301.83" cy="-402.9" rx="29.6" ry="29.6"></ellipse> <text text-anchor="middle" x="301.83" y="-398.7" font-family="Times,serif" font-size="14.00">15 C</text> </g> <!-- 9 CT&#45;&#45;15 C --> <g id="edge11" class="edge">
+<title>
+9 CT–15 C
+</title>
+<path fill="none" stroke="black" d="M309.31,-347.19C308.16,-355.73 306.92,-364.98 305.78,-373.45"></path> </g> <!-- 12 HC --> <g id="node13" class="node">
+<title>
+12 HC
+</title>
+<ellipse fill="none" stroke="black" cx="429.45" cy="-197.85" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="429.45" y="-193.65" font-family="Times,serif" font-size="14.00">12 HC</text> </g> <!-- 11 CT&#45;&#45;12 HC --> <g id="edge12" class="edge">
+<title>
+11 CT–12 HC
+</title>
+<path fill="none" stroke="black" d="M417.35,-243.82C418.27,-240.32 419.21,-236.76 420.13,-233.25"></path> </g> <!-- 13 HC --> <g id="node14" class="node">
+<title>
+13 HC
+</title>
+<ellipse fill="none" stroke="black" cx="479.07" cy="-232.52" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="479.07" y="-228.32" font-family="Times,serif" font-size="14.00">13 HC</text> </g> <!-- 11 CT&#45;&#45;13 HC --> <g id="edge13" class="edge">
+<title>
+11 CT–13 HC
+</title>
+<path fill="none" stroke="black" d="M438.27,-258.99C441.59,-256.84 444.97,-254.64 448.3,-252.49"></path> </g> <!-- 14 HC --> <g id="node15" class="node">
+<title>
+14 HC
+</title>
+<ellipse fill="none" stroke="black" cx="488.94" cy="-289.58" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="488.94" y="-285.38" font-family="Times,serif" font-size="14.00">14 HC</text> </g> <!-- 11 CT&#45;&#45;14 HC --> <g id="edge14" class="edge">
+<title>
+11 CT–14 HC
+</title>
+<path fill="none" stroke="black" d="M443.39,-283.32C446.45,-283.74 449.55,-284.16 452.62,-284.59"></path> </g> <!-- 16 O --> <g id="node16" class="node">
+<title>
+16 O
+</title>
+<ellipse fill="none" stroke="black" cx="376.82" cy="-413.78" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="376.82" y="-409.58" font-family="Times,serif" font-size="14.00">16 O</text> </g> <!-- 15 C&#45;&#45;16 O --> <g id="edge15" class="edge">
+<title>
+15 C–16 O
+</title>
+<path fill="none" stroke="black" d="M331.47,-407.2C336.54,-407.94 341.82,-408.7 346.9,-409.44"></path> </g> <!-- 17 N --> <g id="node17" class="node">
+<title>
+17 N
+</title>
+<ellipse fill="none" stroke="black" cx="265.25" cy="-483.59" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="265.25" y="-479.39" font-family="Times,serif" font-size="14.00">17 N</text> </g> <!-- 15 C&#45;&#45;17 N --> <g id="edge16" class="edge">
+<title>
+15 C–17 N
+</title>
+<path fill="none" stroke="black" d="M289.44,-430.22C285.67,-438.54 281.52,-447.69 277.74,-456.02"></path> </g> <!-- 18 H --> <g id="node18" class="node">
+<title>
+18 H
+</title>
+<ellipse fill="none" stroke="black" cx="201.58" cy="-448.81" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="201.58" y="-444.61" font-family="Times,serif" font-size="14.00">18 H</text> </g> <!-- 17 N&#45;&#45;18 H --> <g id="edge17" class="edge">
+<title>
+17 N–18 H
+</title>
+<path fill="none" stroke="black" d="M238.61,-469.04C235.21,-467.18 231.72,-465.27 228.31,-463.41"></path> </g> <!-- 19 CT --> <g id="node19" class="node">
+<title>
+19 CT
+</title>
+<ellipse fill="none" stroke="black" cx="228.64" cy="-568.27" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="228.64" y="-564.07" font-family="Times,serif" font-size="14.00">19 CT</text> </g> <!-- 17 N&#45;&#45;19 CT --> <g id="edge18" class="edge">
+<title>
+17 N–19 CT
+</title>
+<path fill="none" stroke="black" d="M253.26,-511.32C249.92,-519.03 246.27,-527.49 242.82,-535.47"></path> </g> <!-- 20 H1 --> <g id="node20" class="node">
+<title>
+20 H1
+</title>
+<ellipse fill="none" stroke="black" cx="181.39" cy="-559.75" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="181.39" y="-555.55" font-family="Times,serif" font-size="14.00">20 H1</text> </g> <!-- 19 CT&#45;&#45;20 H1 --> <g id="edge19" class="edge">
+<title>
+19 CT–20 H1
+</title>
+<path fill="none" stroke="black" d="M193.31,-561.9C193.21,-561.88 193.1,-561.86 192.99,-561.84"></path> </g> <!-- 21 CT --> <g id="node21" class="node">
+<title>
+21 CT
+</title>
+<ellipse fill="none" stroke="black" cx="123.44" cy="-570.78" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="123.44" y="-566.58" font-family="Times,serif" font-size="14.00">21 CT</text> </g> <!-- 19 CT&#45;&#45;21 CT --> <g id="edge20" class="edge">
+<title>
+19 CT–21 CT
+</title>
+<path fill="none" stroke="black" d="M193.02,-569.12C182.06,-569.38 169.98,-569.67 159.02,-569.93"></path> </g> <!-- 25 C --> <g id="node22" class="node">
+<title>
+25 C
+</title>
+<ellipse fill="none" stroke="black" cx="270.97" cy="-645.65" rx="29.6" ry="29.6"></ellipse> <text text-anchor="middle" x="270.97" y="-641.45" font-family="Times,serif" font-size="14.00">25 C</text> </g> <!-- 19 CT&#45;&#45;25 C --> <g id="edge21" class="edge">
+<title>
+19 CT–25 C
+</title>
+<path fill="none" stroke="black" d="M245.86,-599.75C249.43,-606.27 253.16,-613.09 256.61,-619.4"></path> </g> <!-- 22 HC --> <g id="node23" class="node">
+<title>
+22 HC
+</title>
+<ellipse fill="none" stroke="black" cx="64.91" cy="-516.46" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="64.91" y="-512.26" font-family="Times,serif" font-size="14.00">22 HC</text> </g> <!-- 21 CT&#45;&#45;22 HC --> <g id="edge22" class="edge">
+<title>
+21 CT–22 HC
+</title>
+<path fill="none" stroke="black" d="M97.26,-546.48C95.43,-544.78 93.59,-543.07 91.76,-541.37"></path> </g> <!-- 23 HC --> <g id="node24" class="node">
+<title>
+23 HC
+</title>
+<ellipse fill="none" stroke="black" cx="54.17" cy="-614.32" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="54.17" y="-610.12" font-family="Times,serif" font-size="14.00">23 HC</text> </g> <!-- 21 CT&#45;&#45;23 HC --> <g id="edge23" class="edge">
+<title>
+21 CT–23 HC
+</title>
+<path fill="none" stroke="black" d="M93.26,-589.75C90.63,-591.4 87.97,-593.07 85.34,-594.72"></path> </g> <!-- 24 HC --> <g id="node25" class="node">
+<title>
+24 HC
+</title>
+<ellipse fill="none" stroke="black" cx="36.52" cy="-564.76" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="36.52" y="-560.56" font-family="Times,serif" font-size="14.00">24 HC</text> </g> <!-- 21 CT&#45;&#45;24 HC --> <g id="edge24" class="edge">
+<title>
+21 CT–24 HC
+</title>
+<path fill="none" stroke="black" d="M87.84,-568.31C82.96,-567.98 77.95,-567.63 73.06,-567.29"></path> </g> <!-- 26 O --> <g id="node26" class="node">
+<title>
+26 O
+</title>
+<ellipse fill="none" stroke="black" cx="344.3" cy="-623.91" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="344.3" y="-619.71" font-family="Times,serif" font-size="14.00">26 O</text> </g> <!-- 25 C&#45;&#45;26 O --> <g id="edge25" class="edge">
+<title>
+25 C–26 O
+</title>
+<path fill="none" stroke="black" d="M299.53,-637.18C304.68,-635.66 310.05,-634.06 315.22,-632.53"></path> </g> <!-- 27 N --> <g id="node27" class="node">
+<title>
+27 N
+</title>
+<ellipse fill="none" stroke="black" cx="276.92" cy="-733.61" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="276.92" y="-729.41" font-family="Times,serif" font-size="14.00">27 N</text> </g> <!-- 25 C&#45;&#45;27 N --> <g id="edge26" class="edge">
+<title>
+25 C–27 N
+</title>
+<path fill="none" stroke="black" d="M272.99,-675.43C273.6,-684.5 274.28,-694.48 274.89,-703.56"></path> </g> <!-- 28 H --> <g id="node28" class="node">
+<title>
+28 H
+</title>
+<ellipse fill="none" stroke="black" cx="204.38" cy="-744.71" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="204.38" y="-740.51" font-family="Times,serif" font-size="14.00">28 H</text> </g> <!-- 27 N&#45;&#45;28 H --> <g id="edge27" class="edge">
+<title>
+27 N–28 H
+</title>
+<path fill="none" stroke="black" d="M247,-738.19C242.78,-738.84 238.45,-739.5 234.23,-740.14"></path> </g> <!-- 29 CT --> <g id="node29" class="node">
+<title>
+29 CT
+</title>
+<ellipse fill="none" stroke="black" cx="289.05" cy="-828.15" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="289.05" y="-823.95" font-family="Times,serif" font-size="14.00">29 CT</text> </g> <!-- 27 N&#45;&#45;29 CT --> <g id="edge28" class="edge">
+<title>
+27 N–29 CT
+</title>
+<path fill="none" stroke="black" d="M280.76,-763.53C281.96,-772.83 283.28,-783.18 284.52,-792.81"></path> </g> <!-- 30 H1 --> <g id="node30" class="node">
+<title>
+30 H1
+</title>
+<ellipse fill="none" stroke="black" cx="335.27" cy="-794" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="335.27" y="-789.8" font-family="Times,serif" font-size="14.00">30 H1</text> </g> <!-- 29 CT&#45;&#45;30 H1 --> <g id="edge29" class="edge">
+<title>
+29 CT–30 H1
+</title>
+<path fill="none" stroke="black" d="M317.8,-806.91C317.94,-806.8 318.09,-806.69 318.24,-806.59"></path> </g> <!-- 31 CT --> <g id="node31" class="node">
+<title>
+31 CT
+</title>
+<ellipse fill="none" stroke="black" cx="210.62" cy="-868.43" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="210.62" y="-864.23" font-family="Times,serif" font-size="14.00">31 CT</text> </g> <!-- 29 CT&#45;&#45;31 CT --> <g id="edge30" class="edge">
+<title>
+29 CT–31 CT
+</title>
+<path fill="none" stroke="black" d="M257.15,-844.53C252.23,-847.06 247.15,-849.67 242.24,-852.19"></path> </g> <!-- 35 C --> <g id="node32" class="node">
+<title>
+35 C
+</title>
+<ellipse fill="none" stroke="black" cx="367.52" cy="-878.86" rx="29.6" ry="29.6"></ellipse> <text text-anchor="middle" x="367.52" y="-874.66" font-family="Times,serif" font-size="14.00">35 C</text> </g> <!-- 29 CT&#45;&#45;35 C --> <g id="edge31" class="edge">
+<title>
+29 CT–35 C
+</title>
+<path fill="none" stroke="black" d="M319.17,-847.61C326.77,-852.53 334.87,-857.76 342.21,-862.5"></path> </g> <!-- 32 HC --> <g id="node33" class="node">
+<title>
+32 HC
+</title>
+<ellipse fill="none" stroke="black" cx="130.19" cy="-853.9" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="130.19" y="-849.7" font-family="Times,serif" font-size="14.00">32 HC</text> </g> <!-- 31 CT&#45;&#45;32 HC --> <g id="edge32" class="edge">
+<title>
+31 CT–32 HC
+</title>
+<path fill="none" stroke="black" d="M175.58,-862.1C172.53,-861.55 169.44,-860.99 166.39,-860.44"></path> </g> <!-- 33 HC --> <g id="node34" class="node">
+<title>
+33 HC
+</title>
+<ellipse fill="none" stroke="black" cx="130.02" cy="-904.1" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="130.02" y="-899.9" font-family="Times,serif" font-size="14.00">33 HC</text> </g> <!-- 31 CT&#45;&#45;33 HC --> <g id="edge33" class="edge">
+<title>
+31 CT–33 HC
+</title>
+<path fill="none" stroke="black" d="M177.84,-882.94C173.13,-885.02 168.28,-887.17 163.56,-889.26"></path> </g> <!-- 34 HC --> <g id="node35" class="node">
+<title>
+34 HC
+</title>
+<ellipse fill="none" stroke="black" cx="174.17" cy="-934.37" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="174.17" y="-930.17" font-family="Times,serif" font-size="14.00">34 HC</text> </g> <!-- 31 CT&#45;&#45;34 HC --> <g id="edge34" class="edge">
+<title>
+31 CT–34 HC
+</title>
+<path fill="none" stroke="black" d="M193.46,-899.47C192.95,-900.41 192.43,-901.34 191.91,-902.28"></path> </g> <!-- 36 O --> <g id="node36" class="node">
+<title>
+36 O
+</title>
+<ellipse fill="none" stroke="black" cx="423.95" cy="-826.25" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="423.95" y="-822.05" font-family="Times,serif" font-size="14.00">36 O</text> </g> <!-- 35 C&#45;&#45;36 O --> <g id="edge35" class="edge">
+<title>
+35 C–36 O
+</title>
+<path fill="none" stroke="black" d="M389.18,-858.67C393.28,-854.85 397.58,-850.84 401.7,-847"></path> </g> <!-- 37 N --> <g id="node37" class="node">
+<title>
+37 N
+</title>
+<ellipse fill="none" stroke="black" cx="437.72" cy="-933.05" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="437.72" y="-928.85" font-family="Times,serif" font-size="14.00">37 N</text> </g> <!-- 35 C&#45;&#45;37 N --> <g id="edge36" class="edge">
+<title>
+35 C–37 N
+</title>
+<path fill="none" stroke="black" d="M391.29,-897.2C398.45,-902.73 406.31,-908.8 413.5,-914.35"></path> </g> <!-- 38 H --> <g id="node38" class="node">
+<title>
+38 H
+</title>
+<ellipse fill="none" stroke="black" cx="495.86" cy="-883.8" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="495.86" y="-879.6" font-family="Times,serif" font-size="14.00">38 H</text> </g> <!-- 37 N&#45;&#45;38 H --> <g id="edge37" class="edge">
+<title>
+37 N–38 H
+</title>
+<path fill="none" stroke="black" d="M460.7,-913.58C464.63,-910.25 468.73,-906.78 472.67,-903.45"></path> </g> <!-- 39 CT --> <g id="node39" class="node">
+<title>
+39 CT
+</title>
+<ellipse fill="none" stroke="black" cx="506.85" cy="-995.81" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="506.85" y="-991.61" font-family="Times,serif" font-size="14.00">39 CT</text> </g> <!-- 37 N&#45;&#45;39 CT --> <g id="edge38" class="edge">
+<title>
+37 N–39 CT
+</title>
+<path fill="none" stroke="black" d="M460.36,-953.6C466.81,-959.46 473.91,-965.9 480.56,-971.94"></path> </g> <!-- 40 H1 --> <g id="node40" class="node">
+<title>
+40 H1
+</title>
+<ellipse fill="none" stroke="black" cx="448.4" cy="-1020.24" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="448.4" y="-1016.04" font-family="Times,serif" font-size="14.00">40 H1</text> </g> <!-- 39 CT&#45;&#45;40 H1 --> <g id="edge39" class="edge">
+<title>
+39 CT–40 H1
+</title>
+<path fill="none" stroke="black" d="M473.86,-1009.6C473.76,-1009.64 473.66,-1009.69 473.55,-1009.73"></path> </g> <!-- 41 CT --> <g id="node41" class="node">
+<title>
+41 CT
+</title>
+<ellipse fill="none" stroke="black" cx="591.32" cy="-960.25" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="591.32" y="-956.05" font-family="Times,serif" font-size="14.00">41 CT</text> </g> <!-- 39 CT&#45;&#45;41 CT --> <g id="edge40" class="edge">
+<title>
+39 CT–41 CT
+</title>
+<path fill="none" stroke="black" d="M539.75,-981.96C545.96,-979.35 552.45,-976.62 558.65,-974.01"></path> </g> <!-- 45 C --> <g id="node42" class="node">
+<title>
+45 C
+</title>
+<ellipse fill="none" stroke="black" cx="500.2" cy="-1088.63" rx="29.6" ry="29.6"></ellipse> <text text-anchor="middle" x="500.2" y="-1084.43" font-family="Times,serif" font-size="14.00">45 C</text> </g> <!-- 39 CT&#45;&#45;45 C --> <g id="edge41" class="edge">
+<title>
+39 CT–45 C
+</title>
+<path fill="none" stroke="black" d="M504.3,-1031.43C503.65,-1040.53 502.95,-1050.22 502.32,-1058.98"></path> </g> <!-- 42 HC --> <g id="node43" class="node">
+<title>
+42 HC
+</title>
+<ellipse fill="none" stroke="black" cx="667.21" cy="-978.36" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="667.21" y="-974.16" font-family="Times,serif" font-size="14.00">42 HC</text> </g> <!-- 41 CT&#45;&#45;42 HC --> <g id="edge42" class="edge">
+<title>
+41 CT–42 HC
+</title>
+<path fill="none" stroke="black" d="M626.16,-968.57C627.87,-968.97 629.59,-969.39 631.31,-969.8"></path> </g> <!-- 43 HC --> <g id="node44" class="node">
+<title>
+43 HC
+</title>
+<ellipse fill="none" stroke="black" cx="675.36" cy="-928.08" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="675.36" y="-923.88" font-family="Times,serif" font-size="14.00">43 HC</text> </g> <!-- 41 CT&#45;&#45;43 HC --> <g id="edge43" class="edge">
+<title>
+41 CT–43 HC
+</title>
+<path fill="none" stroke="black" d="M624.54,-947.54C629.95,-945.46 635.57,-943.31 641.01,-941.23"></path> </g> <!-- 44 HC --> <g id="node45" class="node">
+<title>
+44 HC
+</title>
+<ellipse fill="none" stroke="black" cx="637.11" cy="-894.17" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="637.11" y="-889.97" font-family="Times,serif" font-size="14.00">44 HC</text> </g> <!-- 41 CT&#45;&#45;44 HC --> <g id="edge44" class="edge">
+<title>
+41 CT–44 HC
+</title>
+<path fill="none" stroke="black" d="M611.54,-931.08C613.07,-928.86 614.62,-926.63 616.16,-924.41"></path> </g> <!-- 46 O --> <g id="node46" class="node">
+<title>
+46 O
+</title>
+<ellipse fill="none" stroke="black" cx="425.86" cy="-1118.96" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="425.86" y="-1114.76" font-family="Times,serif" font-size="14.00">46 O</text> </g> <!-- 45 C&#45;&#45;46 O --> <g id="edge45" class="edge">
+<title>
+45 C–46 O
+</title>
+<path fill="none" stroke="black" d="M472.52,-1099.92C466.41,-1102.42 459.94,-1105.06 453.82,-1107.56"></path> </g> <!-- 47 N --> <g id="node47" class="node">
+<title>
+47 N
+</title>
+<ellipse fill="none" stroke="black" cx="532.47" cy="-1168.83" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="532.47" y="-1164.63" font-family="Times,serif" font-size="14.00">47 N</text> </g> <!-- 45 C&#45;&#45;47 N --> <g id="edge46" class="edge">
+<title>
+45 C–47 N
+</title>
+<path fill="none" stroke="black" d="M511.31,-1116.23C514.52,-1124.2 518.02,-1132.91 521.24,-1140.9"></path> </g> <!-- 48 H --> <g id="node48" class="node">
+<title>
+48 H
+</title>
+<ellipse fill="none" stroke="black" cx="600.88" cy="-1143.6" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="600.88" y="-1139.4" font-family="Times,serif" font-size="14.00">48 H</text> </g> <!-- 47 N&#45;&#45;48 H --> <g id="edge47" class="edge">
+<title>
+47 N–48 H
+</title>
+<path fill="none" stroke="black" d="M561.09,-1158.27C564.89,-1156.87 568.8,-1155.43 572.6,-1154.03"></path> </g> <!-- 49 CT --> <g id="node49" class="node">
+<title>
+49 CT
+</title>
+<ellipse fill="none" stroke="black" cx="566.14" cy="-1249.08" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="566.14" y="-1244.88" font-family="Times,serif" font-size="14.00">49 CT</text> </g> <!-- 47 N&#45;&#45;49 CT --> <g id="edge48" class="edge">
+<title>
+47 N–49 CT
+</title>
+<path fill="none" stroke="black" d="M544.25,-1196.9C546.86,-1203.13 549.66,-1209.8 552.35,-1216.21"></path> </g> <!-- 50 H1 --> <g id="node50" class="node">
+<title>
+50 H1
+</title>
+<ellipse fill="none" stroke="black" cx="611.66" cy="-1266.52" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="611.66" y="-1262.32" font-family="Times,serif" font-size="14.00">50 H1</text> </g> <!-- 49 CT&#45;&#45;50 H1 --> <g id="edge49" class="edge">
+<title>
+49 CT–50 H1
+</title>
+<path fill="none" stroke="black" d="M599.7,-1261.93C599.81,-1261.98 599.92,-1262.02 600.02,-1262.06"></path> </g> <!-- 51 CT --> <g id="node51" class="node">
+<title>
+51 CT
+</title>
+<ellipse fill="none" stroke="black" cx="673.57" cy="-1251.86" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="673.57" y="-1247.66" font-family="Times,serif" font-size="14.00">51 CT</text> </g> <!-- 49 CT&#45;&#45;51 CT --> <g id="edge50" class="edge">
+<title>
+49 CT–51 CT
+</title>
+<path fill="none" stroke="black" d="M601.62,-1250C613.35,-1250.3 626.4,-1250.64 638.14,-1250.95"></path> </g> <!-- 55 C --> <g id="node52" class="node">
+<title>
+55 C
+</title>
+<ellipse fill="none" stroke="black" cx="523.7" cy="-1330.36" rx="29.6" ry="29.6"></ellipse> <text text-anchor="middle" x="523.7" y="-1326.16" font-family="Times,serif" font-size="14.00">55 C</text> </g> <!-- 49 CT&#45;&#45;55 C --> <g id="edge51" class="edge">
+<title>
+49 CT–55 C
+</title>
+<path fill="none" stroke="black" d="M549.61,-1280.74C545.61,-1288.41 541.37,-1296.52 537.5,-1303.92"></path> </g> <!-- 52 HC --> <g id="node53" class="node">
+<title>
+52 HC
+</title>
+<ellipse fill="none" stroke="black" cx="760.17" cy="-1261.61" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="760.17" y="-1257.41" font-family="Times,serif" font-size="14.00">52 HC</text> </g> <!-- 51 CT&#45;&#45;52 HC --> <g id="edge52" class="edge">
+<title>
+51 CT–52 HC
+</title>
+<path fill="none" stroke="black" d="M709.04,-1255.86C713.9,-1256.4 718.9,-1256.96 723.77,-1257.51"></path> </g> <!-- 53 HC --> <g id="node54" class="node">
+<title>
+53 HC
+</title>
+<ellipse fill="none" stroke="black" cx="730.44" cy="-1308.88" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="730.44" y="-1304.68" font-family="Times,serif" font-size="14.00">53 HC</text> </g> <!-- 51 CT&#45;&#45;53 HC --> <g id="edge53" class="edge">
+<title>
+51 CT–53 HC
+</title>
+<path fill="none" stroke="black" d="M698.68,-1277.04C700.59,-1278.95 702.51,-1280.88 704.42,-1282.79"></path> </g> <!-- 54 HC --> <g id="node55" class="node">
+<title>
+54 HC
+</title>
+<ellipse fill="none" stroke="black" cx="745.43" cy="-1210.75" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="745.43" y="-1206.55" font-family="Times,serif" font-size="14.00">54 HC</text> </g> <!-- 51 CT&#45;&#45;54 HC --> <g id="edge54" class="edge">
+<title>
+51 CT–54 HC
+</title>
+<path fill="none" stroke="black" d="M704.46,-1234.19C707.51,-1232.45 710.6,-1230.68 713.65,-1228.93"></path> </g> <!-- 56 O --> <g id="node56" class="node">
+<title>
+56 O
+</title>
+<ellipse fill="none" stroke="black" cx="585.31" cy="-1367.2" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="585.31" y="-1363" font-family="Times,serif" font-size="14.00">56 O</text> </g> <!-- 55 C&#45;&#45;56 O --> <g id="edge55" class="edge">
+<title>
+55 C–56 O
+</title>
+<path fill="none" stroke="black" d="M549.11,-1345.56C552.43,-1347.54 555.83,-1349.57 559.15,-1351.56"></path> </g> <!-- 57 N --> <g id="node57" class="node">
+<title>
+57 N
+</title>
+<ellipse fill="none" stroke="black" cx="490.08" cy="-1412.19" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="490.08" y="-1407.99" font-family="Times,serif" font-size="14.00">57 N</text> </g> <!-- 55 C&#45;&#45;57 N --> <g id="edge56" class="edge">
+<title>
+55 C–57 N
+</title>
+<path fill="none" stroke="black" d="M512.32,-1358.07C508.85,-1366.5 505.04,-1375.78 501.56,-1384.24"></path> </g> <!-- 58 H --> <g id="node58" class="node">
+<title>
+58 H
+</title>
+<ellipse fill="none" stroke="black" cx="412.22" cy="-1398.67" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="412.22" y="-1394.47" font-family="Times,serif" font-size="14.00">58 H</text> </g> <!-- 57 N&#45;&#45;58 H --> <g id="edge57" class="edge">
+<title>
+57 N–58 H
+</title>
+<path fill="none" stroke="black" d="M460.2,-1407C454.2,-1405.96 447.89,-1404.87 441.89,-1403.82"></path> </g> <!-- 59 CT --> <g id="node59" class="node">
+<title>
+59 CT
+</title>
+<ellipse fill="none" stroke="black" cx="493.19" cy="-1505.14" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="493.19" y="-1500.94" font-family="Times,serif" font-size="14.00">59 CT</text> </g> <!-- 57 N&#45;&#45;59 CT --> <g id="edge58" class="edge">
+<title>
+57 N–59 CT
+</title>
+<path fill="none" stroke="black" d="M491.09,-1442.37C491.38,-1451.07 491.7,-1460.63 492,-1469.62"></path> </g> <!-- 60 H1 --> <g id="node60" class="node">
+<title>
+60 H1
+</title>
+<ellipse fill="none" stroke="black" cx="431.23" cy="-1498.17" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="431.23" y="-1493.97" font-family="Times,serif" font-size="14.00">60 H1</text> </g> <!-- 59 CT&#45;&#45;60 H1 --> <g id="edge59" class="edge">
+<title>
+59 CT–60 H1
+</title>
+<path fill="none" stroke="black" d="M457.87,-1501.17C457.76,-1501.15 457.65,-1501.14 457.54,-1501.13"></path> </g> <!-- 61 CT --> <g id="node61" class="node">
+<title>
+61 CT
+</title>
+<ellipse fill="none" stroke="black" cx="567.82" cy="-1553.29" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="567.82" y="-1549.09" font-family="Times,serif" font-size="14.00">61 CT</text> </g> <!-- 59 CT&#45;&#45;61 CT --> <g id="edge60" class="edge">
+<title>
+59 CT–61 CT
+</title>
+<path fill="none" stroke="black" d="M523.12,-1524.45C527.98,-1527.59 533.02,-1530.84 537.89,-1533.98"></path> </g> <!-- 65 C --> <g id="node62" class="node">
+<title>
+65 C
+</title>
+<ellipse fill="none" stroke="black" cx="419.66" cy="-1566.34" rx="29.6" ry="29.6"></ellipse> <text text-anchor="middle" x="419.66" y="-1562.14" font-family="Times,serif" font-size="14.00">65 C</text> </g> <!-- 59 CT&#45;&#45;65 C --> <g id="edge61" class="edge">
+<title>
+59 CT–65 C
+</title>
+<path fill="none" stroke="black" d="M465.81,-1527.93C458.13,-1534.32 449.87,-1541.19 442.49,-1547.34"></path> </g> <!-- 62 HC --> <g id="node63" class="node">
+<title>
+62 HC
+</title>
+<ellipse fill="none" stroke="black" cx="576.58" cy="-1630.82" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="576.58" y="-1626.62" font-family="Times,serif" font-size="14.00">62 HC</text> </g> <!-- 61 CT&#45;&#45;62 HC --> <g id="edge62" class="edge">
+<title>
+61 CT–62 HC
+</title>
+<path fill="none" stroke="black" d="M571.84,-1588.88C572.04,-1590.63 572.24,-1592.39 572.44,-1594.14"></path> </g> <!-- 63 HC --> <g id="node64" class="node">
+<title>
+63 HC
+</title>
+<ellipse fill="none" stroke="black" cx="632.44" cy="-1608.71" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="632.44" y="-1604.51" font-family="Times,serif" font-size="14.00">63 HC</text> </g> <!-- 61 CT&#45;&#45;63 HC --> <g id="edge63" class="edge">
+<title>
+61 CT–63 HC
+</title>
+<path fill="none" stroke="black" d="M594.85,-1576.47C598.03,-1579.2 601.28,-1581.99 604.48,-1584.73"></path> </g> <!-- 64 HC --> <g id="node65" class="node">
+<title>
+64 HC
+</title>
+<ellipse fill="none" stroke="black" cx="651.16" cy="-1557.84" rx="36.55" ry="36.55"></ellipse> <text text-anchor="middle" x="651.16" y="-1553.64" font-family="Times,serif" font-size="14.00">64 HC</text> </g> <!-- 61 CT&#45;&#45;64 HC --> <g id="edge64" class="edge">
+<title>
+61 CT–64 HC
+</title>
+<path fill="none" stroke="black" d="M603.65,-1555.25C607.27,-1555.45 610.94,-1555.65 614.57,-1555.84"></path> </g> <!-- 66 O --> <g id="node66" class="node">
+<title>
+66 O
+</title>
+<ellipse fill="none" stroke="black" cx="337.87" cy="-1552.34" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="337.87" y="-1548.14" font-family="Times,serif" font-size="14.00">66 O</text> </g> <!-- 65 C&#45;&#45;66 O --> <g id="edge65" class="edge">
+<title>
+65 C–66 O
+</title>
+<path fill="none" stroke="black" d="M390.13,-1561.28C382.81,-1560.03 374.96,-1558.69 367.63,-1557.43"></path> </g> <!-- 67 N --> <g id="node67" class="node">
+<title>
+67 N
+</title>
+<ellipse fill="none" stroke="black" cx="386.76" cy="-1644.82" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="386.76" y="-1640.62" font-family="Times,serif" font-size="14.00">67 N</text> </g> <!-- 65 C&#45;&#45;67 N --> <g id="edge66" class="edge">
+<title>
+65 C–67 N
+</title>
+<path fill="none" stroke="black" d="M408.15,-1593.79C405,-1601.3 401.58,-1609.45 398.43,-1616.99"></path> </g> <!-- 68 H --> <g id="node68" class="node">
+<title>
+68 H
+</title>
+<ellipse fill="none" stroke="black" cx="438.39" cy="-1708.77" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="438.39" y="-1704.57" font-family="Times,serif" font-size="14.00">68 H</text> </g> <!-- 67 N&#45;&#45;68 H --> <g id="edge67" class="edge">
+<title>
+67 N–68 H
+</title>
+<path fill="none" stroke="black" d="M405.69,-1668.27C410.18,-1673.83 414.97,-1679.76 419.46,-1685.32"></path> </g> <!-- 69 CT --> <g id="node69" class="node">
+<title>
+69 CT
+</title>
+<ellipse fill="none" stroke="black" cx="323.04" cy="-1701.84" rx="35.4" ry="35.4"></ellipse> <text text-anchor="middle" x="323.04" y="-1697.64" font-family="Times,serif" font-size="14.00">69 CT</text> </g> <!-- 67 N&#45;&#45;69 CT --> <g id="edge68" class="edge">
+<title>
+67 N–69 CT
+</title>
+<path fill="none" stroke="black" d="M364.12,-1665.09C359.4,-1669.31 354.38,-1673.8 349.53,-1678.14"></path> </g> <!-- 70 H1 --> <g id="node70" class="node">
+<title>
+70 H1
+</title>
+<ellipse fill="none" stroke="black" cx="238.89" cy="-1701.52" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="238.89" y="-1697.32" font-family="Times,serif" font-size="14.00">70 H1</text> </g> <!-- 69 CT&#45;&#45;70 H1 --> <g id="edge69" class="edge">
+<title>
+69 CT–70 H1
+</title>
+<path fill="none" stroke="black" d="M287.35,-1701.71C282.87,-1701.69 278.29,-1701.67 273.83,-1701.66"></path> </g> <!-- 71 H1 --> <g id="node71" class="node">
+<title>
+71 H1
+</title>
+<ellipse fill="none" stroke="black" cx="353.33" cy="-1783.05" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="353.33" y="-1778.85" font-family="Times,serif" font-size="14.00">71 H1</text> </g> <!-- 69 CT&#45;&#45;71 H1 --> <g id="edge70" class="edge">
+<title>
+69 CT–71 H1
+</title>
+<path fill="none" stroke="black" d="M335.54,-1735.34C337.36,-1740.23 339.24,-1745.27 341.06,-1750.15"></path> </g> <!-- 72 H1 --> <g id="node72" class="node">
+<title>
+72 H1
+</title>
+<ellipse fill="none" stroke="black" cx="278.33" cy="-1764.75" rx="34.82" ry="34.82"></ellipse> <text text-anchor="middle" x="278.33" y="-1760.55" font-family="Times,serif" font-size="14.00">72 H1</text> </g> <!-- 69 CT&#45;&#45;72 H1 --> <g id="edge71" class="edge">
+<title>
+69 CT–72 H1
+</title>
+<path fill="none" stroke="black" d="M302.26,-1731.08C301.07,-1732.75 299.88,-1734.43 298.7,-1736.1"></path> </g> </g>
+</svg>
+</div>
+<figcaption class="figure-caption">Figure&nbsp;1: A diagram of the ala topology</figcaption>
+</figure>
+</div>
+</div>
+</div>
+
+
+</section>
+
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  let localAlternateSentinel = 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
