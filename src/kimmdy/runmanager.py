@@ -13,7 +13,7 @@ import kimmdy.changemanager as changer
 from kimmdy.tasks import Task, TaskFiles, TaskMapping
 from kimmdy.utils import run_shell_cmd, run_gmx
 from pprint import pformat
-from kimmdy import plugins
+from kimmdy import reaction_plugins
 from kimmdy.topology.topology import Topology
 from kimmdy.kmc import rf_kmc
 
@@ -97,7 +97,7 @@ class RunManager:
         react_names = self.config.reactions.get_attributes()
         # logging.info("Instantiating Reactions:", *react_names)
         for rp_name in react_names:
-            r = plugins[rp_name]
+            r = reaction_plugins[rp_name]
             reaction_plugin: ReactionPlugin = r(rp_name, self)
             self.reaction_plugins.append(reaction_plugin)
 

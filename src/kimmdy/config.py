@@ -1,10 +1,10 @@
 from __future__ import annotations
-from typing import Optional
+from typing import Optional, Callable
 import yaml
 import logging
 from pathlib import Path
 from dataclasses import dataclass
-from kimmdy import plugins
+from kimmdy import reaction_plugins, parameterization_plugins
 from kimmdy.reaction import ReactionPlugin
 
 
@@ -56,7 +56,10 @@ type_scheme = {
             "overwrite": str,
         }
     },
-    "changer": {"coordinates": {"md": str, "md_parameter_growth": str}},
+    "changer": {
+        "coordinates": {"md": str, "md_parameter_growth": str},
+        "topology": {"parameterization": str},
+    },
     "reactions": {},
     "sequence": Sequence,
 }
@@ -69,8 +72,13 @@ class MDrefConfig:
     md_parameter_growth: str
 
 
+class TopologyConfig:
+    parameterization: str
+
+
 class ChangerConfig:
     coordinates: MDrefConfig
+    topology: TopologyConfig
 
 
 class HomolysisConfig:
@@ -158,26 +166,30 @@ class Config:
                 raise ValueError(m)
             recursive_dict = raw
 
-            if len(plugins) > 0:
-                logging.info("Loading Plugins")
-                for plg_name, plugin in plugins.items():
-                    logging.debug(f"Loading {plg_name}")
-                    if type(plugin) is ModuleNotFoundError:
-                        logging.warn(
-                            f"Plugin {plg_name} could not be loaded!\n{plugin}\n"
-                        )
-                    else:
-                        try:
-                            if (
-                                plugin.__bases__[0] is ReactionPlugin
-                            ):  # isinstance didnt work for some reason
-                                self.type_scheme["reactions"].update(plugin.type_scheme)
-                                logging.debug(self.type_scheme["reactions"])
-                        except:
+            # hope it works to do the same for both types of plugins
+            for plugins in [reaction_plugins, parameterization_plugins]:
+                if len(plugins) > 0:
+                    logging.info(f"Loading Plugins {plugins.keys()}")
+                    for plg_name, plugin in plugins.items():
+                        logging.debug(f"Loading {plg_name}")
+                        if type(plugin) is ModuleNotFoundError:
                             logging.warn(
                                 f"Plugin {plg_name} could not be loaded!\n{plugin}\n"
                             )
-                            pass
+                        else:
+                            try:
+                                if (
+                                    plugin.__bases__[0] is ReactionPlugin
+                                ):  # isinstance didnt work for some reason
+                                    self.type_scheme["reactions"].update(
+                                        plugin.type_scheme
+                                    )
+                                    logging.debug(self.type_scheme["reactions"])
+                            except:
+                                logging.warn(
+                                    f"Plugin {plg_name} could not be loaded!\n{plugin}\n"
+                                )
+                                pass
 
         # building config recursively
         if recursive_dict is not None:
@@ -338,7 +350,7 @@ class Config:
                 # Validate reaction plugins
                 if attr_name == "reactions":
                     for r in attr.get_attributes():
-                        assert r in (ks := list(plugins.keys())), (
+                        assert r in (ks := list(reaction_plugins.keys())), (
                             f"Error: Reaction plugin {r} not found!\n"
                             + f"Available plugins: {ks}"
                         )
