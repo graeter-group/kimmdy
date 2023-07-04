@@ -18,7 +18,7 @@ def recipe_collection():
 @pytest.fixture
 def reference_KMC():
     return KMCResult(
-        recipe_steps=[Bind(atom_idx_1=2, atom_idx_2=3)],
+        recipe_steps=[Bind(2, 3)],
         time_step=0.04032167624965666,
         reaction_probability=[0.0, 0.72, 0.54, 0.0],
     )
