@@ -28,13 +28,13 @@ class KMCResult:
     """
 
     recipe_steps: Union[list[RecipeStep], None] = None
-    reaction_probability: Union[float, None] = None
+    reaction_probability: Union[list[float], None] = None
     time_step: Union[float, None] = None
 
 
 def rf_kmc(
     recipe_collection: RecipeCollection, rng: np.random.BitGenerator = default_rng()
-) -> dict:
+) -> KMCResult:
     """Rejection-Free Monte Carlo.
     takes RecipeCollection and choses a recipe based on the relative propensity of the events.
 

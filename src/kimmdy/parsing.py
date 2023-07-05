@@ -164,11 +164,20 @@ def read_top(path: Path) -> TopologyDict:
         "angles",
         "dihedrals",
         "impropers",
+        "pairs_nb",
         "exclusions",
-        "virtual_sites",
+        "constraints" "virtual_sites",
+        "virtual_sites1",
+        "virtual_sites2",
+        "virtual_sites3",
+        "virtual_sites4",
+        "virtual_sitesn",
         "settles",
         "position_restraints",
         "dihedral_restraints",
+        "angle_restraints",
+        "angle_restraints_z",
+        "orientation_restraints",
     )
 
     ls, ffdir = resolve_includes(path)
@@ -200,7 +209,7 @@ def read_top(path: Path) -> TopologyDict:
         elif l.startswith("#if"):
             if is_first_line_after_section_header:
                 raise NotImplementedError(
-                    f"""Errro parsing {path}: #if ... #endif can only be used to surround a section, not within."""
+                    f"""Error parsing {path}: #if ... #endif can only be used to surround a section, not within."""
                 )
             l = l.split()
             condition_type = l[0].removeprefix("#")
