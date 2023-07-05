@@ -1,122 +1,31 @@
 [
   {
-    "objectID": "guide/uml.html",
-    "href": "guide/uml.html",
-    "title": "UML",
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "KIMMDY",
     "section": "",
-    "text": "(Re)render the diagrams with\nplantuml -tsvg uml.qmd\nor preview online with plantuml.\n\n\n\n\n@startuml\nclass           RunManager{\nconfig : Config\ntasks : Queue\nstate\nfile history\nchosen_recipe\nrun()\nrun_MD()\nquery_reactions()\ndecide_reaction()\nexecute_recipe(ConversionRecipe)\nnext()\n}\nclass          Config{\nfile paths\ntask sequence\n...\n__init__(configuration_file)\n}\nclass           ConversionRecipe{\ntype\natom_idx\n}\n\nabstract class           Reaction{\nget_reaction_result()\n}\nclass           HAT{\n}\nclass           HomolyticBreak{\n}\nclass           ChangeManager{\nmodify_connectivity()\n}\n\npackage GROMACS{\ninterface GROMACS_CLI{\n}\n}\n\nReaction --|&gt; HAT\nReaction --|&gt; HomolyticBreak\nRunManager -right- Config\nRunManager -right- GROMACS_CLI \nRunManager -- Reaction \nConversionRecipe - Reaction\nChangeManager - RunManager\nConfig -[hidden]-&gt; GROMACS_CLI\n@enduml\n\n\n\n\n\n@startuml classuml\nclass           RunManager{\nconfig : Config\nconfig_reactions\nstate : Enum\nMDparams\nrates \nrun_md_min()\nrun_md_eq()\nrun_md()\nquery_reactions()\nmake_decision()\nrun_recipe(ConversionRecipe)\nnext()\n}\nclass          Config{\npath\n...\nread_yaml()\n}\nclass           MDManager{\nwrite_mdp()\ndo_md()\n}\nclass           ConversionRecipe{\ntype\natom_idx\n}\nclass           DecisionStrategy{\n}\nclass           Reaction{\nrecipe: ConversionRecipe\nget_rates()\n}\nclass           HAT{\n\n}\nclass           CoordinateChanger{\n}\nclass           TopologyChanger{\n}\npackage GROMACS{\ninterface GROMACSCli{\n}\n}\n\nReaction --|&gt; HAT\nConfig -- RunManager : reads &lt;\nRunManager - MDManager : &gt; starts\nMDManager - GROMACSCli : &gt; interacts\nRunManager -- Reaction : &gt; starts\nRunManager -- DecisionStrategy : &gt; starts\nConversionRecipe - Reaction: &lt; generates\nCoordinateChanger - RunManager: &lt; starts\nTopologyChanger - RunManager: &lt; starts\nTopologyChanger -[hidden]-&gt; CoordinateChanger\nMDManager -[hidden]-&gt; DecisionStrategy\n@enduml\n\n@startuml flow\nstart\n:Read .yaml;\n:Run MD_eq;\nrepeat\n :Run MD_prod;\n :Query reactions;\n :Make reaction decision;\n :Change system coordinates;\n :Change system topology;\nrepeatwhile (itermax reached) is (no)\n-&gt; yes;\nstop\n@enduml\n\nlink\nlink"
+    "text": "KIMMDY\nWelcome to KIMMDY\nGetting Started\n\n\n\n\n Back to top"
   },
   {
-    "objectID": "guide/uml.html#classes",
-    "href": "guide/uml.html#classes",
-    "title": "UML",
+    "objectID": "reference/topology.atomic.ResidueProperSpec.html",
+    "href": "reference/topology.atomic.ResidueProperSpec.html",
+    "title": "topology.atomic.ResidueProperSpec",
     "section": "",
-    "text": "@startuml\nclass           RunManager{\nconfig : Config\ntasks : Queue\nstate\nfile history\nchosen_recipe\nrun()\nrun_MD()\nquery_reactions()\ndecide_reaction()\nexecute_recipe(ConversionRecipe)\nnext()\n}\nclass          Config{\nfile paths\ntask sequence\n...\n__init__(configuration_file)\n}\nclass           ConversionRecipe{\ntype\natom_idx\n}\n\nabstract class           Reaction{\nget_reaction_result()\n}\nclass           HAT{\n}\nclass           HomolyticBreak{\n}\nclass           ChangeManager{\nmodify_connectivity()\n}\n\npackage GROMACS{\ninterface GROMACS_CLI{\n}\n}\n\nReaction --|&gt; HAT\nReaction --|&gt; HomolyticBreak\nRunManager -right- Config\nRunManager -right- GROMACS_CLI \nRunManager -- Reaction \nConversionRecipe - Reaction\nChangeManager - RunManager\nConfig -[hidden]-&gt; GROMACS_CLI\n@enduml\n\n\n\n\n\n@startuml classuml\nclass           RunManager{\nconfig : Config\nconfig_reactions\nstate : Enum\nMDparams\nrates \nrun_md_min()\nrun_md_eq()\nrun_md()\nquery_reactions()\nmake_decision()\nrun_recipe(ConversionRecipe)\nnext()\n}\nclass          Config{\npath\n...\nread_yaml()\n}\nclass           MDManager{\nwrite_mdp()\ndo_md()\n}\nclass           ConversionRecipe{\ntype\natom_idx\n}\nclass           DecisionStrategy{\n}\nclass           Reaction{\nrecipe: ConversionRecipe\nget_rates()\n}\nclass           HAT{\n\n}\nclass           CoordinateChanger{\n}\nclass           TopologyChanger{\n}\npackage GROMACS{\ninterface GROMACSCli{\n}\n}\n\nReaction --|&gt; HAT\nConfig -- RunManager : reads &lt;\nRunManager - MDManager : &gt; starts\nMDManager - GROMACSCli : &gt; interacts\nRunManager -- Reaction : &gt; starts\nRunManager -- DecisionStrategy : &gt; starts\nConversionRecipe - Reaction: &lt; generates\nCoordinateChanger - RunManager: &lt; starts\nTopologyChanger - RunManager: &lt; starts\nTopologyChanger -[hidden]-&gt; CoordinateChanger\nMDManager -[hidden]-&gt; DecisionStrategy\n@enduml\n\n@startuml flow\nstart\n:Read .yaml;\n:Run MD_eq;\nrepeat\n :Run MD_prod;\n :Query reactions;\n :Make reaction decision;\n :Change system coordinates;\n :Change system topology;\nrepeatwhile (itermax reached) is (no)\n-&gt; yes;\nstop\n@enduml\n\nlink\nlink"
+    "text": "topology.atomic.ResidueProperSpec(atom1, atom2, atom3, atom4, q0)\nInformation about one imroper dihedral in a residue ;atom1 atom2 atom3 atom4 q0 cq\n\n\n\n\n\nName\nDescription\n\n\n\n\nfrom_top_line\n\n\n\n\n\n\ntopology.atomic.ResidueProperSpec.from_top_line(cls, l)"
   },
   {
-    "objectID": "guide/getting-started.html",
-    "href": "guide/getting-started.html",
-    "title": "Getting Started",
+    "objectID": "reference/topology.atomic.ResidueProperSpec.html#methods",
+    "href": "reference/topology.atomic.ResidueProperSpec.html#methods",
+    "title": "topology.atomic.ResidueProperSpec",
     "section": "",
-    "text": "Let’s jump right in!\n\n\n\n\n\npython3.9 or higher\ngromacs (tested with version &gt;= 2020.4)\n\nOptional:\n\nplumed-patched version of gromacs\n\n\n\n\n\nCreate a file:\n\n\nkimmdy.yml\n\ndryrun: false\niterations: 100\nname: 'hat_tf_000'\ngromacs_alias: 'gmx'\ntop: 'Ala_out.top'\ngro: 'npt.gro'\nndx: 'index.ndx'\nmds:\n  equilibrium:\n    mdp: 'md.mdp'\n  relax:\n    mdp: 'md_slow.mdp'\nchanger:\n  coordinates:\n    md: 'relax'      \nreactions:\n  hat_reaction:\n    frequency_factor: 100000000\n    h_cutoff: 3\n    polling_rate: 1\n\nsequence:\n- equilibrium\n- mult: 2\n  tasks:\n  - equilibrium"
+    "text": "Name\nDescription\n\n\n\n\nfrom_top_line\n\n\n\n\n\n\ntopology.atomic.ResidueProperSpec.from_top_line(cls, l)"
   },
   {
-    "objectID": "guide/getting-started.html#installation",
-    "href": "guide/getting-started.html#installation",
-    "title": "Getting Started",
+    "objectID": "reference/kimmdy.topology.atomic.BondType.html",
+    "href": "reference/kimmdy.topology.atomic.BondType.html",
+    "title": "BondType",
     "section": "",
-    "text": "python3.9 or higher\ngromacs (tested with version &gt;= 2020.4)\n\nOptional:\n\nplumed-patched version of gromacs"
-  },
-  {
-    "objectID": "guide/getting-started.html#setup",
-    "href": "guide/getting-started.html#setup",
-    "title": "Getting Started",
-    "section": "",
-    "text": "Create a file:\n\n\nkimmdy.yml\n\ndryrun: false\niterations: 100\nname: 'hat_tf_000'\ngromacs_alias: 'gmx'\ntop: 'Ala_out.top'\ngro: 'npt.gro'\nndx: 'index.ndx'\nmds:\n  equilibrium:\n    mdp: 'md.mdp'\n  relax:\n    mdp: 'md_slow.mdp'\nchanger:\n  coordinates:\n    md: 'relax'      \nreactions:\n  hat_reaction:\n    frequency_factor: 100000000\n    h_cutoff: 3\n    polling_rate: 1\n\nsequence:\n- equilibrium\n- mult: 2\n  tasks:\n  - equilibrium"
-  },
-  {
-    "objectID": "reference/tasks.html",
-    "href": "reference/tasks.html",
-    "title": "tasks",
-    "section": "",
-    "text": "tasks\n\n\n\n\n\nName\nDescription\n\n\n\n\nTaskMapping"
-  },
-  {
-    "objectID": "reference/tasks.html#attributes",
-    "href": "reference/tasks.html#attributes",
-    "title": "tasks",
-    "section": "",
-    "text": "Name\nDescription\n\n\n\n\nTaskMapping"
-  },
-  {
-    "objectID": "reference/kimmdy.runmanager.RunManager.config.html",
-    "href": "reference/kimmdy.runmanager.RunManager.config.html",
-    "title": "config",
-    "section": "",
-    "text": "config\nrunmanager.RunManager.config\n\n\n\n\n Back to top"
-  },
-  {
-    "objectID": "reference/kimmdy.topology.atomic.DihedralType.html",
-    "href": "reference/kimmdy.topology.atomic.DihedralType.html",
-    "title": "DihedralType",
-    "section": "",
-    "text": "DihedralType\ntopology.atomic.DihedralType(i, j, k, l, id, id_sym, funct, c0, c1, periodicity, c3=None, c4=None, c5=None)\nInformation about one dihedral\nA class containing bond information as in the dihedrals section of the topology. Proper dihedrals have funct 9. Improper dihedrals have funct 4.\nNote that proper dihedrals of type 9 can be defined multiple times, for different periodicities. This is why would-be parameter c2 is called periodicity and part of the id.\nFrom gromacs topology: ‘;’, ‘i’, ‘j’, ‘k’, ‘l’, ‘funct’, ‘c0’, ‘c1’, ‘periodicity’, ‘c3’, ‘c4’, ‘c5’ Where i,j,k,l are atomtypes\n\n\n\n\n Back to top"
-  },
-  {
-    "objectID": "reference/kimmdy.topology.atomic.PositionRestraint.html",
-    "href": "reference/kimmdy.topology.atomic.PositionRestraint.html",
-    "title": "PositionRestraint",
-    "section": "",
-    "text": "PositionRestraint\ntopology.atomic.PositionRestraint(ai, funct, fc, condition=None)\nInformation about one position restraint.\nA class containing information as in the position_restraints section of the topology.\nFrom gromacs topology: ; ai funct fc(x,y,z)\n\n\n\n\n Back to top"
-  },
-  {
-    "objectID": "reference/kimmdy.topology.atomic.Atomic.html",
-    "href": "reference/kimmdy.topology.atomic.Atomic.html",
-    "title": "Atomic",
-    "section": "",
-    "text": "Atomic\ntopology.atomic.Atomic\n\n\n\n\n Back to top"
-  },
-  {
-    "objectID": "reference/kimmdy.runmanager.RunManager.html",
-    "href": "reference/kimmdy.runmanager.RunManager.html",
-    "title": "RunManager",
-    "section": "",
-    "text": "RunManager\nrunmanager.RunManager(self, config)\nThe RunManager, a central piece.\nManages the queue of tasks, communicates with the rest of the program and keeps track of global state.\n\n\n\n\n Back to top"
-  },
-  {
-    "objectID": "reference/kimmdy.runmanager.RunManager.get_latest.html",
-    "href": "reference/kimmdy.runmanager.RunManager.get_latest.html",
-    "title": "get_latest",
-    "section": "",
-    "text": "get_latest\nrunmanager.RunManager.get_latest(self, suffix)\nReturns path to latest file of given type.\nFor .dat files (in general ambiguous extensions) use full file name. Errors if file is not found.\n\n\n\n\n Back to top"
-  },
-  {
-    "objectID": "reference/kimmdy.topology.atomic.ResidueImproperSpec.html",
-    "href": "reference/kimmdy.topology.atomic.ResidueImproperSpec.html",
-    "title": "ResidueImproperSpec",
-    "section": "",
-    "text": "ResidueImproperSpec\ntopology.atomic.ResidueImproperSpec(atom1, atom2, atom3, atom4, q0, cq)\nInformation about one imroper dihedral in a residue ;atom1 atom2 atom3 atom4 q0 cq\n\n\n\n\n Back to top"
-  },
-  {
-    "objectID": "reference/topology.ff.html",
-    "href": "reference/topology.ff.html",
-    "title": "topology.ff",
-    "section": "",
-    "text": "topology.ff\n\n\n\n\n\nName\nDescription\n\n\n\n\nPatch\n\n\n\nPatches\n\n\n\n\n\n\n\n\n\n\nName\nDescription\n\n\n\n\nprops_to_patches\n\n\n\n\n\n\ntopology.ff.props_to_patches(props)"
-  },
-  {
-    "objectID": "reference/topology.ff.html#attributes",
-    "href": "reference/topology.ff.html#attributes",
-    "title": "topology.ff",
-    "section": "",
-    "text": "Name\nDescription\n\n\n\n\nPatch\n\n\n\nPatches"
-  },
-  {
-    "objectID": "reference/topology.ff.html#functions",
-    "href": "reference/topology.ff.html#functions",
-    "title": "topology.ff",
-    "section": "",
-    "text": "Name\nDescription\n\n\n\n\nprops_to_patches\n\n\n\n\n\n\ntopology.ff.props_to_patches(props)"
+    "text": "BondType\ntopology.atomic.BondType(i, j, id, id_sym, funct, c0=None, c1=None, c2=None, c3=None)\nInformation about one bondtype\nA class containing bond information as in the bonds section of the topology. From gromacs topology: ‘i’, ‘j’, ‘funct’, ‘c0’, ‘c1’, ‘c2’, ’c3 Where i and j are atomtypes\n\n\n\n\n Back to top"
   },
   {
     "objectID": "reference/kimmdy.topology.atomic.BondId.html",
@@ -126,11 +35,32 @@
     "text": "BondId\ntopology.atomic.BondId\n\n\n\n\n Back to top"
   },
   {
-    "objectID": "reference/kimmdy.topology.atomic.AtomType.html",
-    "href": "reference/kimmdy.topology.atomic.AtomType.html",
-    "title": "AtomType",
+    "objectID": "reference/kimmdy.runmanager.RunManager.reaction_results.html",
+    "href": "reference/kimmdy.runmanager.RunManager.reaction_results.html",
+    "title": "reaction_results",
     "section": "",
-    "text": "AtomType\ntopology.atomic.AtomType(type, id_sym, at_num, mass, charge, ptype, sigma, epsilon, id)\nInformation about one atom\nA class containing atom information as in the atoms section of the topology. An atom keeps a list of which atoms it is bound to.\nFrom gromacs version of the amber* ff: ; name at.num mass charge ptype sigma epsilon\n\n\n\n\n Back to top"
+    "text": "reaction_results\nrunmanager.RunManager.reaction_results\n\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "reference/kimmdy.topology.atomic.AngleType.html",
+    "href": "reference/kimmdy.topology.atomic.AngleType.html",
+    "title": "AngleType",
+    "section": "",
+    "text": "AngleType\ntopology.atomic.AngleType(i, j, k, id, id_sym, funct, c0=None, c1=None, c2=None, c3=None)\nInformation about one angle\nA class containing angle information as in the angles section of the topology.\nFrom gromacs topology: ‘;’, ‘i’, ‘j’, ‘k’, ‘funct’, ‘c0’, ‘c1’, ‘c2’, ‘c3’ where i,j,k are atomtypes\n\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "reference/topology.atomic.ResidueType.html",
+    "href": "reference/topology.atomic.ResidueType.html",
+    "title": "topology.atomic.ResidueType",
+    "section": "",
+    "text": "topology.atomic.ResidueType(residue, atoms, bonds, proper_dihedrals, improper_dihedrals)\nInformation about one residuetype from aminoacids.rtp\n\n\n\n\n\nName\nDescription\n\n\n\n\nfrom_section\n\n\n\n\n\n\ntopology.atomic.ResidueType.from_section(cls, residue, d)"
+  },
+  {
+    "objectID": "reference/topology.atomic.ResidueType.html#methods",
+    "href": "reference/topology.atomic.ResidueType.html#methods",
+    "title": "topology.atomic.ResidueType",
+    "section": "",
+    "text": "Name\nDescription\n\n\n\n\nfrom_section\n\n\n\n\n\n\ntopology.atomic.ResidueType.from_section(cls, residue, d)"
   },
   {
     "objectID": "reference/cmd.html",
@@ -175,144 +105,25 @@
     "text": "cmd.kimmdy_run(input=Path('kimmdy.yml'), loglevel='DEBUG', logfile=Path('kimmdy.log'), checkpoint='', concat=False)\nRun KIMMDY from python."
   },
   {
-    "objectID": "reference/topology.atomic.Pair.html",
-    "href": "reference/topology.atomic.Pair.html",
-    "title": "topology.atomic.Pair",
+    "objectID": "reference/kimmdy.runmanager.RunManager.top.html",
+    "href": "reference/kimmdy.runmanager.RunManager.top.html",
+    "title": "top",
     "section": "",
-    "text": "topology.atomic.Pair(ai, aj, funct, c0=None, c1=None, c2=None, c3=None)\nInformation about one pair\nA class containing pair information as in the pair section of the topology.\nFrom gromacs topology: ai’, ‘aj’, ‘funct’, ‘c0’, ‘c1’, ‘c2’, ‘c3’\n\n\n\n\n\nName\nDescription\n\n\n\n\nfrom_top_line\n\n\n\n\n\n\ntopology.atomic.Pair.from_top_line(cls, l)"
+    "text": "top\nrunmanager.RunManager.top\n\n\n\n\n Back to top"
   },
   {
-    "objectID": "reference/topology.atomic.Pair.html#methods",
-    "href": "reference/topology.atomic.Pair.html#methods",
-    "title": "topology.atomic.Pair",
+    "objectID": "reference/kimmdy.topology.atomic.AngleId.html",
+    "href": "reference/kimmdy.topology.atomic.AngleId.html",
+    "title": "AngleId",
     "section": "",
-    "text": "Name\nDescription\n\n\n\n\nfrom_top_line\n\n\n\n\n\n\ntopology.atomic.Pair.from_top_line(cls, l)"
+    "text": "AngleId\ntopology.atomic.AngleId\n\n\n\n\n Back to top"
   },
   {
-    "objectID": "reference/kimmdy.runmanager.RunManager.crr_tasks.html",
-    "href": "reference/kimmdy.runmanager.RunManager.crr_tasks.html",
-    "title": "crr_tasks",
+    "objectID": "reference/coordinates.Example.html",
+    "href": "reference/coordinates.Example.html",
+    "title": "coordinates.Example",
     "section": "",
-    "text": "crr_tasks\nrunmanager.RunManager.crr_tasks\n\n\n\n\n Back to top"
-  },
-  {
-    "objectID": "reference/kimmdy.runmanager.RunManager.filehist.html",
-    "href": "reference/kimmdy.runmanager.RunManager.filehist.html",
-    "title": "filehist",
-    "section": "",
-    "text": "filehist\nrunmanager.RunManager.filehist\n\n\n\n\n Back to top"
-  },
-  {
-    "objectID": "reference/kimmdy.topology.atomic.DihedralRestraint.html",
-    "href": "reference/kimmdy.topology.atomic.DihedralRestraint.html",
-    "title": "DihedralRestraint",
-    "section": "",
-    "text": "DihedralRestraint\ntopology.atomic.DihedralRestraint(ai, aj, ak, al, type, phi, dphi, fc)\nInformation about one dihedral restraint.\nA class containing information as in the dihedral_restraints section of the topology.\nFrom gromacs topology: ; ai aj ak al type phi dphi fc\n\n\n\n\n Back to top"
-  },
-  {
-    "objectID": "reference/changemanager.html",
-    "href": "reference/changemanager.html",
-    "title": "changemanager",
-    "section": "",
-    "text": "changemanager\n\n\n\n\n\nName\nDescription\n\n\n\n\nbreak_bond_plumed\n\n\n\nmodify_coords\n\n\n\nmodify_plumed\n\n\n\nmodify_top\n\n\n\n\n\n\nchangemanager.break_bond_plumed(plumeddat, breakpair, plumeddist)\n\n\n\nchangemanager.modify_coords(recipe_steps, files)\n\n\n\nchangemanager.modify_plumed(recipe_steps, oldplumeddat, newplumeddat, plumeddist)\n\n\n\nchangemanager.modify_top(recipe_steps, files, ffpatch, topology)"
-  },
-  {
-    "objectID": "reference/changemanager.html#functions",
-    "href": "reference/changemanager.html#functions",
-    "title": "changemanager",
-    "section": "",
-    "text": "Name\nDescription\n\n\n\n\nbreak_bond_plumed\n\n\n\nmodify_coords\n\n\n\nmodify_plumed\n\n\n\nmodify_top\n\n\n\n\n\n\nchangemanager.break_bond_plumed(plumeddat, breakpair, plumeddist)\n\n\n\nchangemanager.modify_coords(recipe_steps, files)\n\n\n\nchangemanager.modify_plumed(recipe_steps, oldplumeddat, newplumeddat, plumeddist)\n\n\n\nchangemanager.modify_top(recipe_steps, files, ffpatch, topology)"
-  },
-  {
-    "objectID": "reference/topology.atomic.ResidueProperSpec.html",
-    "href": "reference/topology.atomic.ResidueProperSpec.html",
-    "title": "topology.atomic.ResidueProperSpec",
-    "section": "",
-    "text": "topology.atomic.ResidueProperSpec(atom1, atom2, atom3, atom4, q0)\nInformation about one imroper dihedral in a residue ;atom1 atom2 atom3 atom4 q0 cq\n\n\n\n\n\nName\nDescription\n\n\n\n\nfrom_top_line\n\n\n\n\n\n\ntopology.atomic.ResidueProperSpec.from_top_line(cls, l)"
-  },
-  {
-    "objectID": "reference/topology.atomic.ResidueProperSpec.html#methods",
-    "href": "reference/topology.atomic.ResidueProperSpec.html#methods",
-    "title": "topology.atomic.ResidueProperSpec",
-    "section": "",
-    "text": "Name\nDescription\n\n\n\n\nfrom_top_line\n\n\n\n\n\n\ntopology.atomic.ResidueProperSpec.from_top_line(cls, l)"
-  },
-  {
-    "objectID": "reference/coordinates.html",
-    "href": "reference/coordinates.html",
-    "title": "coordinates",
-    "section": "",
-    "text": "coordinates\n\n\n\n\n\nName\nDescription\n\n\n\n\nget_atomicobj\n\n\n\nget_keys\n\n\n\nis_parameterized\nParameterized topology entries have c0 and c1 attributes != None\n\n\nmerge_same\n\n\n\nmerge_top_parameter_growth\n\n\n\n\n\n\ncoordinates.get_atomicobj(key, type, top)\n\n\n\ncoordinates.get_keys(atomicA, atomicB)\n\n\n\ncoordinates.is_parameterized(entry)\nParameterized topology entries have c0 and c1 attributes != None\n\n\n\ncoordinates.merge_same(same, topA, topB, type)\n\n\n\ncoordinates.merge_top_parameter_growth(files, focus_nr=None)"
-  },
-  {
-    "objectID": "reference/coordinates.html#functions",
-    "href": "reference/coordinates.html#functions",
-    "title": "coordinates",
-    "section": "",
-    "text": "Name\nDescription\n\n\n\n\nget_atomicobj\n\n\n\nget_keys\n\n\n\nis_parameterized\nParameterized topology entries have c0 and c1 attributes != None\n\n\nmerge_same\n\n\n\nmerge_top_parameter_growth\n\n\n\n\n\n\ncoordinates.get_atomicobj(key, type, top)\n\n\n\ncoordinates.get_keys(atomicA, atomicB)\n\n\n\ncoordinates.is_parameterized(entry)\nParameterized topology entries have c0 and c1 attributes != None\n\n\n\ncoordinates.merge_same(same, topA, topB, type)\n\n\n\ncoordinates.merge_top_parameter_growth(files, focus_nr=None)"
-  },
-  {
-    "objectID": "reference/runmanager.html",
-    "href": "reference/runmanager.html",
-    "title": "runmanager",
-    "section": "",
-    "text": "runmanager\n\n\n\n\n\nName\nDescription\n\n\n\n\nAMBIGUOUS_SUFFS\n\n\n\n\n\n\n\n\n\n\nName\nDescription\n\n\n\n\nget_existing_files\nInitialize latest_files with every existing file defined in config\n\n\n\n\n\nrunmanager.get_existing_files(config)\nInitialize latest_files with every existing file defined in config"
-  },
-  {
-    "objectID": "reference/runmanager.html#attributes",
-    "href": "reference/runmanager.html#attributes",
-    "title": "runmanager",
-    "section": "",
-    "text": "Name\nDescription\n\n\n\n\nAMBIGUOUS_SUFFS"
-  },
-  {
-    "objectID": "reference/runmanager.html#functions",
-    "href": "reference/runmanager.html#functions",
-    "title": "runmanager",
-    "section": "",
-    "text": "Name\nDescription\n\n\n\n\nget_existing_files\nInitialize latest_files with every existing file defined in config\n\n\n\n\n\nrunmanager.get_existing_files(config)\nInitialize latest_files with every existing file defined in config"
-  },
-  {
-    "objectID": "reference/kimmdy.runmanager.RunManager.run.html",
-    "href": "reference/kimmdy.runmanager.RunManager.run.html",
-    "title": "run",
-    "section": "",
-    "text": "run\nrunmanager.RunManager.run(self)\n\n\n\n\n Back to top"
-  },
-  {
-    "objectID": "reference/topology.atomic.AtomType.html",
-    "href": "reference/topology.atomic.AtomType.html",
-    "title": "topology.atomic.AtomType",
-    "section": "",
-    "text": "topology.atomic.AtomType(type, id_sym, at_num, mass, charge, ptype, sigma, epsilon, id)\nInformation about one atom\nA class containing atom information as in the atoms section of the topology. An atom keeps a list of which atoms it is bound to.\nFrom gromacs version of the amber* ff: ; name at.num mass charge ptype sigma epsilon\n\n\n\n\n\nName\nDescription\n\n\n\n\nfrom_top_line\n\n\n\n\n\n\ntopology.atomic.AtomType.from_top_line(cls, l)"
-  },
-  {
-    "objectID": "reference/topology.atomic.AtomType.html#methods",
-    "href": "reference/topology.atomic.AtomType.html#methods",
-    "title": "topology.atomic.AtomType",
-    "section": "",
-    "text": "Name\nDescription\n\n\n\n\nfrom_top_line\n\n\n\n\n\n\ntopology.atomic.AtomType.from_top_line(cls, l)"
-  },
-  {
-    "objectID": "reference/runmanager.RunManager.html",
-    "href": "reference/runmanager.RunManager.html",
-    "title": "runmanager.RunManager",
-    "section": "",
-    "text": "runmanager.RunManager(self, config)\nThe RunManager, a central piece.\nManages the queue of tasks, communicates with the rest of the program and keeps track of global state.\n\n\n\n\n\nName\nDescription\n\n\n\n\nget_latest\nReturns path to latest file of given type.\n\n\nrun\n\n\n\n\n\n\nrunmanager.RunManager.get_latest(self, suffix)\nReturns path to latest file of given type.\nFor .dat files (in general ambiguous extensions) use full file name. Errors if file is not found.\n\n\n\nrunmanager.RunManager.run(self)"
-  },
-  {
-    "objectID": "reference/runmanager.RunManager.html#methods",
-    "href": "reference/runmanager.RunManager.html#methods",
-    "title": "runmanager.RunManager",
-    "section": "",
-    "text": "Name\nDescription\n\n\n\n\nget_latest\nReturns path to latest file of given type.\n\n\nrun\n\n\n\n\n\n\nrunmanager.RunManager.get_latest(self, suffix)\nReturns path to latest file of given type.\nFor .dat files (in general ambiguous extensions) use full file name. Errors if file is not found.\n\n\n\nrunmanager.RunManager.run(self)"
-  },
-  {
-    "objectID": "reference/kimmdy.runmanager.RunManager.task_mapping.html",
-    "href": "reference/kimmdy.runmanager.RunManager.task_mapping.html",
-    "title": "task_mapping",
-    "section": "",
-    "text": "task_mapping\nrunmanager.RunManager.task_mapping\n\n\n\n\n Back to top"
+    "text": "coordinates.Example\ncoordinates.Example()\nExample class for testing purposes.\n\n\n\n\n Back to top"
   },
   {
     "objectID": "reference/topology.atomic.ResidueBondSpec.html",
@@ -329,186 +140,39 @@
     "text": "Name\nDescription\n\n\n\n\nfrom_top_line\n\n\n\n\n\n\ntopology.atomic.ResidueBondSpec.from_top_line(cls, l)"
   },
   {
-    "objectID": "reference/topology.atomic.ResidueType.html",
-    "href": "reference/topology.atomic.ResidueType.html",
-    "title": "topology.atomic.ResidueType",
+    "objectID": "reference/index.html",
+    "href": "reference/index.html",
+    "title": "Function reference",
     "section": "",
-    "text": "topology.atomic.ResidueType(residue, atoms, bonds, proper_dihedrals, improper_dihedrals)\nInformation about one residuetype from aminoacids.rtp\n\n\n\n\n\nName\nDescription\n\n\n\n\nfrom_section\n\n\n\n\n\n\ntopology.atomic.ResidueType.from_section(cls, residue, d)"
+    "text": "Start KIMMDY from a python script or the command line\n\n\n\ncmd\n\n\n\n\n\n\n\nTODO\n\n\n\nchangemanager\n\n\n\nconfig\n\n\n\nconstants\n\n\n\ncoordinates\n\n\n\nkmc\n\n\n\nmisc_helper\n\n\n\nparsing\n\n\n\nreaction\n\n\n\nrunmanager\n\n\n\ntasks\n\n\n\nutils\n\n\n\ntopology.topology.Topology\nSmart container for parsed topology data.\n\n\ntopology.ff\n\n\n\ntopology.utils\n\n\n\n\n\n\n\nInternal representations of topology and forcfield entities\n\n\n\ntopology.atomic\nAtomic datatypes for the topology such as Atom, Bond, Angle, Dihedral, etc.\n\n\ntopology.atomic.Atom\nInformation about one atom\n\n\ntopology.atomic.AtomType\nInformation about one atom\n\n\ntopology.atomic.Bond\nInformation about one bond\n\n\ntopology.atomic.BondType\nInformation about one bondtype\n\n\ntopology.atomic.PositionRestraint\nInformation about one position restraint.\n\n\ntopology.atomic.DihedralRestraint\nInformation about one dihedral restraint.\n\n\ntopology.atomic.Pair\nInformation about one pair\n\n\ntopology.atomic.Angle\nInformation about one angle\n\n\ntopology.atomic.AngleType\nInformation about one angle\n\n\ntopology.atomic.DihedralType\nInformation about one dihedral\n\n\ntopology.atomic.ResidueAtomSpec\nInformation about one atom in a residue\n\n\ntopology.atomic.ResidueBondSpec\nInformation about one bond in a residue\n\n\ntopology.atomic.ResidueImproperSpec\nInformation about one imroper dihedral in a residue\n\n\ntopology.atomic.ResidueProperSpec\nInformation about one imroper dihedral in a residue\n\n\ntopology.atomic.ResidueType\nInformation about one residuetype from aminoacids.rtp\n\n\n\n\n\n\nReaction plugins bundled with KIMMDY\n\n\n\nreactions.homolysis"
   },
   {
-    "objectID": "reference/topology.atomic.ResidueType.html#methods",
-    "href": "reference/topology.atomic.ResidueType.html#methods",
-    "title": "topology.atomic.ResidueType",
+    "objectID": "reference/index.html#api",
+    "href": "reference/index.html#api",
+    "title": "Function reference",
     "section": "",
-    "text": "Name\nDescription\n\n\n\n\nfrom_section\n\n\n\n\n\n\ntopology.atomic.ResidueType.from_section(cls, residue, d)"
+    "text": "Start KIMMDY from a python script or the command line\n\n\n\ncmd"
   },
   {
-    "objectID": "reference/topology.atomic.Bond.html",
-    "href": "reference/topology.atomic.Bond.html",
-    "title": "topology.atomic.Bond",
+    "objectID": "reference/index.html#internals",
+    "href": "reference/index.html#internals",
+    "title": "Function reference",
     "section": "",
-    "text": "topology.atomic.Bond(ai, aj, funct, c0=None, c1=None, c2=None, c3=None, c4=None, c5=None)\nInformation about one bond\nA class containing bond information as in the bonds section of the topology. From gromacs topology: ‘ai’, ‘aj’, ‘funct’, ‘c0’, ‘c1’, ‘c2’, ‘c3’, ‘c4’, ‘c5’ With ai &lt; aj\n\n\n\n\n\nName\nDescription\n\n\n\n\nfrom_top_line\n\n\n\n\n\n\ntopology.atomic.Bond.from_top_line(cls, l)"
+    "text": "TODO\n\n\n\nchangemanager\n\n\n\nconfig\n\n\n\nconstants\n\n\n\ncoordinates\n\n\n\nkmc\n\n\n\nmisc_helper\n\n\n\nparsing\n\n\n\nreaction\n\n\n\nrunmanager\n\n\n\ntasks\n\n\n\nutils\n\n\n\ntopology.topology.Topology\nSmart container for parsed topology data.\n\n\ntopology.ff\n\n\n\ntopology.utils"
   },
   {
-    "objectID": "reference/topology.atomic.Bond.html#methods",
-    "href": "reference/topology.atomic.Bond.html#methods",
-    "title": "topology.atomic.Bond",
+    "objectID": "reference/index.html#atomic-types",
+    "href": "reference/index.html#atomic-types",
+    "title": "Function reference",
     "section": "",
-    "text": "Name\nDescription\n\n\n\n\nfrom_top_line\n\n\n\n\n\n\ntopology.atomic.Bond.from_top_line(cls, l)"
+    "text": "Internal representations of topology and forcfield entities\n\n\n\ntopology.atomic\nAtomic datatypes for the topology such as Atom, Bond, Angle, Dihedral, etc.\n\n\ntopology.atomic.Atom\nInformation about one atom\n\n\ntopology.atomic.AtomType\nInformation about one atom\n\n\ntopology.atomic.Bond\nInformation about one bond\n\n\ntopology.atomic.BondType\nInformation about one bondtype\n\n\ntopology.atomic.PositionRestraint\nInformation about one position restraint.\n\n\ntopology.atomic.DihedralRestraint\nInformation about one dihedral restraint.\n\n\ntopology.atomic.Pair\nInformation about one pair\n\n\ntopology.atomic.Angle\nInformation about one angle\n\n\ntopology.atomic.AngleType\nInformation about one angle\n\n\ntopology.atomic.DihedralType\nInformation about one dihedral\n\n\ntopology.atomic.ResidueAtomSpec\nInformation about one atom in a residue\n\n\ntopology.atomic.ResidueBondSpec\nInformation about one bond in a residue\n\n\ntopology.atomic.ResidueImproperSpec\nInformation about one imroper dihedral in a residue\n\n\ntopology.atomic.ResidueProperSpec\nInformation about one imroper dihedral in a residue\n\n\ntopology.atomic.ResidueType\nInformation about one residuetype from aminoacids.rtp"
   },
   {
-    "objectID": "reference/kimmdy.runmanager.RunManager.top.html",
-    "href": "reference/kimmdy.runmanager.RunManager.top.html",
-    "title": "top",
+    "objectID": "reference/index.html#reactions",
+    "href": "reference/index.html#reactions",
+    "title": "Function reference",
     "section": "",
-    "text": "top\nrunmanager.RunManager.top\n\n\n\n\n Back to top"
-  },
-  {
-    "objectID": "reference/kimmdy.runmanager.RunManager.tasks.html",
-    "href": "reference/kimmdy.runmanager.RunManager.tasks.html",
-    "title": "tasks",
-    "section": "",
-    "text": "tasks\nrunmanager.RunManager.tasks\n\n\n\n\n Back to top"
-  },
-  {
-    "objectID": "reference/kimmdy.topology.atomic.DihedralId.html",
-    "href": "reference/kimmdy.topology.atomic.DihedralId.html",
-    "title": "DihedralId",
-    "section": "",
-    "text": "DihedralId\ntopology.atomic.DihedralId\n\n\n\n\n Back to top"
-  },
-  {
-    "objectID": "reference/kimmdy.topology.atomic.Angle.html",
-    "href": "reference/kimmdy.topology.atomic.Angle.html",
-    "title": "Angle",
-    "section": "",
-    "text": "Angle\ntopology.atomic.Angle(ai, aj, ak, funct, c0=None, c1=None, c2=None, c3=None)\nInformation about one angle\nA class containing angle information as in the angles section of the topology.\nFrom gromacs topology: ‘;’, ‘ai’, ‘aj’, ‘ak’, ‘funct’, ‘c0’, ‘c1’, ‘c2’, ‘c3’ With aj &lt; ai &lt; ak\n\n\n\n\n Back to top"
-  },
-  {
-    "objectID": "reference/kimmdy.runmanager.RunManager.iterations.html",
-    "href": "reference/kimmdy.runmanager.RunManager.iterations.html",
-    "title": "iterations",
-    "section": "",
-    "text": "iterations\nrunmanager.RunManager.iterations\n\n\n\n\n Back to top"
-  },
-  {
-    "objectID": "reference/constants.html",
-    "href": "reference/constants.html",
-    "title": "constants",
-    "section": "",
-    "text": "constants\n\n\n\n\n\nName\nDescription\n\n\n\n\nATOMTYPE_BONDORDER\n\n\n\nATOMTYPE_BONDORDER_FLAT"
-  },
-  {
-    "objectID": "reference/constants.html#attributes",
-    "href": "reference/constants.html#attributes",
-    "title": "constants",
-    "section": "",
-    "text": "Name\nDescription\n\n\n\n\nATOMTYPE_BONDORDER\n\n\n\nATOMTYPE_BONDORDER_FLAT"
-  },
-  {
-    "objectID": "reference/kimmdy.runmanager.RunManager.cptfile.html",
-    "href": "reference/kimmdy.runmanager.RunManager.cptfile.html",
-    "title": "cptfile",
-    "section": "",
-    "text": "cptfile\nrunmanager.RunManager.cptfile\n\n\n\n\n Back to top"
-  },
-  {
-    "objectID": "reference/topology.atomic.BondType.html",
-    "href": "reference/topology.atomic.BondType.html",
-    "title": "topology.atomic.BondType",
-    "section": "",
-    "text": "topology.atomic.BondType(i, j, id, id_sym, funct, c0=None, c1=None, c2=None, c3=None)\nInformation about one bondtype\nA class containing bond information as in the bonds section of the topology. From gromacs topology: ‘i’, ‘j’, ‘funct’, ‘c0’, ‘c1’, ‘c2’, ’c3 Where i and j are atomtypes\n\n\n\n\n\nName\nDescription\n\n\n\n\nfrom_top_line\n\n\n\n\n\n\ntopology.atomic.BondType.from_top_line(cls, l)"
-  },
-  {
-    "objectID": "reference/topology.atomic.BondType.html#methods",
-    "href": "reference/topology.atomic.BondType.html#methods",
-    "title": "topology.atomic.BondType",
-    "section": "",
-    "text": "Name\nDescription\n\n\n\n\nfrom_top_line\n\n\n\n\n\n\ntopology.atomic.BondType.from_top_line(cls, l)"
-  },
-  {
-    "objectID": "reference/topology.atomic.ResidueImproperSpec.html",
-    "href": "reference/topology.atomic.ResidueImproperSpec.html",
-    "title": "topology.atomic.ResidueImproperSpec",
-    "section": "",
-    "text": "topology.atomic.ResidueImproperSpec(atom1, atom2, atom3, atom4, q0, cq)\nInformation about one imroper dihedral in a residue ;atom1 atom2 atom3 atom4 q0 cq\n\n\n\n\n\nName\nDescription\n\n\n\n\nfrom_top_line\n\n\n\n\n\n\ntopology.atomic.ResidueImproperSpec.from_top_line(cls, l)"
-  },
-  {
-    "objectID": "reference/topology.atomic.ResidueImproperSpec.html#methods",
-    "href": "reference/topology.atomic.ResidueImproperSpec.html#methods",
-    "title": "topology.atomic.ResidueImproperSpec",
-    "section": "",
-    "text": "Name\nDescription\n\n\n\n\nfrom_top_line\n\n\n\n\n\n\ntopology.atomic.ResidueImproperSpec.from_top_line(cls, l)"
-  },
-  {
-    "objectID": "reference/topology.atomic.DihedralType.html",
-    "href": "reference/topology.atomic.DihedralType.html",
-    "title": "topology.atomic.DihedralType",
-    "section": "",
-    "text": "topology.atomic.DihedralType(i, j, k, l, id, id_sym, funct, c0, c1, periodicity, c3=None, c4=None, c5=None)\nInformation about one dihedral\nA class containing bond information as in the dihedrals section of the topology. Proper dihedrals have funct 9. Improper dihedrals have funct 4.\nNote that proper dihedrals of type 9 can be defined multiple times, for different periodicities. This is why would-be parameter c2 is called periodicity and part of the id.\nFrom gromacs topology: ‘;’, ‘i’, ‘j’, ‘k’, ‘l’, ‘funct’, ‘c0’, ‘c1’, ‘periodicity’, ‘c3’, ‘c4’, ‘c5’ Where i,j,k,l are atomtypes\n\n\n\n\n\nName\nDescription\n\n\n\n\nfrom_top_line\n\n\n\n\n\n\ntopology.atomic.DihedralType.from_top_line(cls, l)"
-  },
-  {
-    "objectID": "reference/topology.atomic.DihedralType.html#methods",
-    "href": "reference/topology.atomic.DihedralType.html#methods",
-    "title": "topology.atomic.DihedralType",
-    "section": "",
-    "text": "Name\nDescription\n\n\n\n\nfrom_top_line\n\n\n\n\n\n\ntopology.atomic.DihedralType.from_top_line(cls, l)"
-  },
-  {
-    "objectID": "reference/reaction.html",
-    "href": "reference/reaction.html",
-    "title": "reaction",
-    "section": "",
-    "text": "reaction\n\n\n\n\n\nName\nDescription\n\n\n\n\nTypeRecipe"
-  },
-  {
-    "objectID": "reference/reaction.html#attributes",
-    "href": "reference/reaction.html#attributes",
-    "title": "reaction",
-    "section": "",
-    "text": "Name\nDescription\n\n\n\n\nTypeRecipe"
-  },
-  {
-    "objectID": "reference/kimmdy.topology.atomic.Pair.html",
-    "href": "reference/kimmdy.topology.atomic.Pair.html",
-    "title": "Pair",
-    "section": "",
-    "text": "Pair\ntopology.atomic.Pair(ai, aj, funct, c0=None, c1=None, c2=None, c3=None)\nInformation about one pair\nA class containing pair information as in the pair section of the topology.\nFrom gromacs topology: ai’, ‘aj’, ‘funct’, ‘c0’, ‘c1’, ‘c2’, ‘c3’\n\n\n\n\n Back to top"
-  },
-  {
-    "objectID": "reference/parsing.html",
-    "href": "reference/parsing.html",
-    "title": "parsing",
-    "section": "",
-    "text": "parsing\n\n\n\n\n\nName\nDescription\n\n\n\n\nGMX_BUILTIN_FF_DIR\n\n\n\nTopologyDict\n\n\n\n\n\n\n\n\n\n\nName\nDescription\n\n\n\n\ncreate_subsections\n\n\n\nis_not_comment\n\n\n\nread_distances_dat\nRead a distances.dat plumed output file.\n\n\nread_edissoc\nreads a edissoc file and turns it into a dict.\n\n\nread_plumed\nRead a plumed.dat configuration file.\n\n\nread_rtp\n\n\n\nread_top\nParse a list of lines from a topology file.\n\n\nread_xml_ff\n\n\n\nresolve_includes\nResolve #include statements in a (top/itp) file.\n\n\nwrite_plumed\nWrite a plumed.dat configuration file.\n\n\nwrite_top\n\n\n\n\n\n\nparsing.create_subsections(ls)\n\n\n\nparsing.is_not_comment(c)\n\n\n\nparsing.read_distances_dat(distances_dat)\nRead a distances.dat plumed output file.\n\n\n\nparsing.read_edissoc(path)\nreads a edissoc file and turns it into a dict. the tuple of bond atoms make up the key, the dissociation energy E_dissoc [kJ mol-1] is the value\n\n\n\nparsing.read_plumed(path)\nRead a plumed.dat configuration file.\n\n\n\nparsing.read_rtp(path)\n\n\n\nparsing.read_top(path)\nParse a list of lines from a topology file.\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\npath\nPath\nPath to the topology file.\nrequired\n\n\n\n\n\n\n\n#include statements will be resolved\ncomments will be removed\nall lines are stripped of leading and trailing whitespace\n#undef is not supported\na section within ifdef may be a subsection of a section that was started outside of the ifdef\n#if..#endif statements only surround a full section or subsection, not individual lines within a section and a section may either be contained within if … else or it may not be, but it can not be duplicated with one part inside and one outside.\nif .. else can’t be nested\n#include s that don’t resolve to a valid file path are silently dropped\nsections that can have subsections can also exist multiple, separate times e.g. moleculetype will appear multiple times and they should not be merged\n\n\n\n\n\nparsing.read_xml_ff(path)\n\n\n\nparsing.resolve_includes(path)\nResolve #include statements in a (top/itp) file. Returns a tuple with the list of lines and the Path to the ff directory.\n\n\n\nparsing.write_plumed(d, path)\nWrite a plumed.dat configuration file.\n\n\n\nparsing.write_top(top, outfile)"
-  },
-  {
-    "objectID": "reference/parsing.html#attributes",
-    "href": "reference/parsing.html#attributes",
-    "title": "parsing",
-    "section": "",
-    "text": "Name\nDescription\n\n\n\n\nGMX_BUILTIN_FF_DIR\n\n\n\nTopologyDict"
-  },
-  {
-    "objectID": "reference/parsing.html#functions",
-    "href": "reference/parsing.html#functions",
-    "title": "parsing",
-    "section": "",
-    "text": "Name\nDescription\n\n\n\n\ncreate_subsections\n\n\n\nis_not_comment\n\n\n\nread_distances_dat\nRead a distances.dat plumed output file.\n\n\nread_edissoc\nreads a edissoc file and turns it into a dict.\n\n\nread_plumed\nRead a plumed.dat configuration file.\n\n\nread_rtp\n\n\n\nread_top\nParse a list of lines from a topology file.\n\n\nread_xml_ff\n\n\n\nresolve_includes\nResolve #include statements in a (top/itp) file.\n\n\nwrite_plumed\nWrite a plumed.dat configuration file.\n\n\nwrite_top\n\n\n\n\n\n\nparsing.create_subsections(ls)\n\n\n\nparsing.is_not_comment(c)\n\n\n\nparsing.read_distances_dat(distances_dat)\nRead a distances.dat plumed output file.\n\n\n\nparsing.read_edissoc(path)\nreads a edissoc file and turns it into a dict. the tuple of bond atoms make up the key, the dissociation energy E_dissoc [kJ mol-1] is the value\n\n\n\nparsing.read_plumed(path)\nRead a plumed.dat configuration file.\n\n\n\nparsing.read_rtp(path)\n\n\n\nparsing.read_top(path)\nParse a list of lines from a topology file.\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\npath\nPath\nPath to the topology file.\nrequired\n\n\n\n\n\n\n\n#include statements will be resolved\ncomments will be removed\nall lines are stripped of leading and trailing whitespace\n#undef is not supported\na section within ifdef may be a subsection of a section that was started outside of the ifdef\n#if..#endif statements only surround a full section or subsection, not individual lines within a section and a section may either be contained within if … else or it may not be, but it can not be duplicated with one part inside and one outside.\nif .. else can’t be nested\n#include s that don’t resolve to a valid file path are silently dropped\nsections that can have subsections can also exist multiple, separate times e.g. moleculetype will appear multiple times and they should not be merged\n\n\n\n\n\nparsing.read_xml_ff(path)\n\n\n\nparsing.resolve_includes(path)\nResolve #include statements in a (top/itp) file. Returns a tuple with the list of lines and the Path to the ff directory.\n\n\n\nparsing.write_plumed(d, path)\nWrite a plumed.dat configuration file.\n\n\n\nparsing.write_top(top, outfile)"
-  },
-  {
-    "objectID": "reference/kimmdy.runmanager.AMBIGUOUS_SUFFS.html",
-    "href": "reference/kimmdy.runmanager.AMBIGUOUS_SUFFS.html",
-    "title": "AMBIGUOUS_SUFFS",
-    "section": "",
-    "text": "AMBIGUOUS_SUFFS\nrunmanager.AMBIGUOUS_SUFFS\n\n\n\n\n Back to top"
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "KIMMDY",
-    "section": "",
-    "text": "KIMMDY\nWelcome to KIMMDY\nGetting Started\n\n\n\n\n Back to top"
+    "text": "Reaction plugins bundled with KIMMDY\n\n\n\nreactions.homolysis"
   },
   {
     "objectID": "reference/get_object.html",
@@ -539,151 +203,32 @@
     "text": "&gt;&gt;&gt; get_function(\"quartodoc\", \"get_function\")\n&lt;Function('get_function', ..."
   },
   {
-    "objectID": "reference/kimmdy.topology.atomic.ResidueBondSpec.html",
-    "href": "reference/kimmdy.topology.atomic.ResidueBondSpec.html",
-    "title": "ResidueBondSpec",
+    "objectID": "reference/kimmdy.runmanager.AMBIGUOUS_SUFFS.html",
+    "href": "reference/kimmdy.runmanager.AMBIGUOUS_SUFFS.html",
+    "title": "AMBIGUOUS_SUFFS",
     "section": "",
-    "text": "ResidueBondSpec\ntopology.atomic.ResidueBondSpec(atom1, atom2, b0=None, kb=None)\nInformation about one bond in a residue ; atom1 atom2 b0 kb\n\n\n\n\n Back to top"
+    "text": "AMBIGUOUS_SUFFS\nrunmanager.AMBIGUOUS_SUFFS\n\n\n\n\n Back to top"
   },
   {
-    "objectID": "reference/cmd.kimmdy_run.html",
-    "href": "reference/cmd.kimmdy_run.html",
-    "title": "cmd.kimmdy_run",
+    "objectID": "reference/kimmdy.topology.atomic.ResidueImproperSpec.html",
+    "href": "reference/kimmdy.topology.atomic.ResidueImproperSpec.html",
+    "title": "ResidueImproperSpec",
     "section": "",
-    "text": "cmd.kimmdy_run\ncmd.kimmdy_run(input=Path('kimmdy.yml'), loglevel='DEBUG', logfile=Path('kimmdy.log'))\nRun KIMMDY from python.\n\n\n\n\n Back to top"
+    "text": "ResidueImproperSpec\ntopology.atomic.ResidueImproperSpec(atom1, atom2, atom3, atom4, q0, cq)\nInformation about one imroper dihedral in a residue ;atom1 atom2 atom3 atom4 q0 cq\n\n\n\n\n Back to top"
   },
   {
-    "objectID": "reference/kimmdy.runmanager.get_existing_files.html",
-    "href": "reference/kimmdy.runmanager.get_existing_files.html",
-    "title": "get_existing_files",
+    "objectID": "reference/kimmdy.topology.atomic.Pair.html",
+    "href": "reference/kimmdy.topology.atomic.Pair.html",
+    "title": "Pair",
     "section": "",
-    "text": "get_existing_files\nrunmanager.get_existing_files(config)\nInitialize latest_files with every existing file defined in config\n\n\n\n\n Back to top"
+    "text": "Pair\ntopology.atomic.Pair(ai, aj, funct, c0=None, c1=None, c2=None, c3=None)\nInformation about one pair\nA class containing pair information as in the pair section of the topology.\nFrom gromacs topology: ai’, ‘aj’, ‘funct’, ‘c0’, ‘c1’, ‘c2’, ‘c3’\n\n\n\n\n Back to top"
   },
   {
-    "objectID": "reference/kmc.html",
-    "href": "reference/kmc.html",
-    "title": "kmc",
+    "objectID": "reference/kimmdy.topology.atomic.ResidueAtomSpec.html",
+    "href": "reference/kimmdy.topology.atomic.ResidueAtomSpec.html",
+    "title": "ResidueAtomSpec",
     "section": "",
-    "text": "kmc\n\n\n\n\n\nName\nDescription\n\n\n\n\nfrm\nFirst Reaction Method variant of Kinetic Monte Carlo.\n\n\nrf_kmc\nRejection-Free Monte Carlo.\n\n\n\n\n\nkmc.frm(recipe_collection, rng=default_rng(), MD_time=None)\nFirst Reaction Method variant of Kinetic Monte Carlo. takes RecipeCollection and choses a recipe based on which reaction would occur.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nreaction_result\n\nfrom which one will be choosen\nrequired\n\n\nrng\nnumpy.random.BitGenerator\nto generate random numbers in the KMC step\ndefault_rng()\n\n\nMD_time\ntyping.Union[float, None]\nto compare conformational events with reaction events in the time domain\nNone\n\n\n\n\n\n\n\nkmc.rf_kmc(recipe_collection, rng=default_rng())\nRejection-Free Monte Carlo. takes RecipeCollection and choses a recipe based on the relative propensity of the events.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nreaction_result\n\nfrom which one will be choosen\nrequired\n\n\nrng\nnumpy.random.BitGenerator\nto generate random numbers in the KMC step\ndefault_rng()"
-  },
-  {
-    "objectID": "reference/kmc.html#functions",
-    "href": "reference/kmc.html#functions",
-    "title": "kmc",
-    "section": "",
-    "text": "Name\nDescription\n\n\n\n\nfrm\nFirst Reaction Method variant of Kinetic Monte Carlo.\n\n\nrf_kmc\nRejection-Free Monte Carlo.\n\n\n\n\n\nkmc.frm(recipe_collection, rng=default_rng(), MD_time=None)\nFirst Reaction Method variant of Kinetic Monte Carlo. takes RecipeCollection and choses a recipe based on which reaction would occur.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nreaction_result\n\nfrom which one will be choosen\nrequired\n\n\nrng\nnumpy.random.BitGenerator\nto generate random numbers in the KMC step\ndefault_rng()\n\n\nMD_time\ntyping.Union[float, None]\nto compare conformational events with reaction events in the time domain\nNone\n\n\n\n\n\n\n\nkmc.rf_kmc(recipe_collection, rng=default_rng())\nRejection-Free Monte Carlo. takes RecipeCollection and choses a recipe based on the relative propensity of the events.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nreaction_result\n\nfrom which one will be choosen\nrequired\n\n\nrng\nnumpy.random.BitGenerator\nto generate random numbers in the KMC step\ndefault_rng()"
-  },
-  {
-    "objectID": "reference/topology.topology.Topology.html",
-    "href": "reference/topology.topology.Topology.html",
-    "title": "topology.topology.Topology",
-    "section": "",
-    "text": "topology.topology.Topology(self, top, ffpatch=None)\nSmart container for parsed topology data.\nA topology keeps track of connections and applies patches to parameters when bonds are broken or formed. Assumptions: - the topology of interest (the protein) is in section ‘moleculetype_0’.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\ntop\nTopologyDict\nA dictionary containing the parsed topology data.\nrequired\n\n\nffpatch\ntyping.Optional[pathlib.Path]\nPath to a force field patch file. If None, no patching is applied.\nNone\n\n\n\n\n\n\n\n\n\nName\nDescription\n\n\n\n\nbind_bond\nAdd a bond in topology.\n\n\nbreak_bond\nBreak bonds in topology.\n\n\nmove_hydrogen\nMove a singly bound atom to a new location.\n\n\npatch_parameters\n\n\n\nreindex_atomnrs\nReindex atom numbers in topology.\n\n\nto_dict\n\n\n\n\n\n\ntopology.topology.Topology.bind_bond(self, atompair_nrs)\nAdd a bond in topology.\nModifies the topology dictionary in place. It keeps track of affected terms in the topology via a graph representation of the topology and applies the necessary changes to bonds, angles and dihedrals (proper and improper). Furthermore, it modifies to function types in the topology to account for radicals.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\natompair\n\nA tuple of integers with the atoms indices (id, starting at 1) with from, the atom being moved and to, the atom to which the from atom will be bound\nrequired\n\n\n\n\n\n\n\ntopology.topology.Topology.break_bond(self, atompair_nrs)\nBreak bonds in topology.\nremoves bond, angles and dihedrals where atompair was involved. Modifies the topology dictionary in place.\n\n\n\ntopology.topology.Topology.move_hydrogen(self, from_to)\nMove a singly bound atom to a new location.\nThis is typically H for Hydrogen Atom Transfer (HAT).\n\n\n\ntopology.topology.Topology.patch_parameters(self, focus_nr)\n\n\n\ntopology.topology.Topology.reindex_atomnrs(self)\nReindex atom numbers in topology.\nStarts at index 1. This also updates the numbers for bonds, angles, dihedrals and pairs.\n\n\n\ntopology.topology.Topology.to_dict(self)"
-  },
-  {
-    "objectID": "reference/topology.topology.Topology.html#parameters",
-    "href": "reference/topology.topology.Topology.html#parameters",
-    "title": "topology.topology.Topology",
-    "section": "",
-    "text": "Name\nType\nDescription\nDefault\n\n\n\n\ntop\nTopologyDict\nA dictionary containing the parsed topology data.\nrequired\n\n\nffpatch\ntyping.Optional[pathlib.Path]\nPath to a force field patch file. If None, no patching is applied.\nNone"
-  },
-  {
-    "objectID": "reference/topology.topology.Topology.html#methods",
-    "href": "reference/topology.topology.Topology.html#methods",
-    "title": "topology.topology.Topology",
-    "section": "",
-    "text": "Name\nDescription\n\n\n\n\nbind_bond\nAdd a bond in topology.\n\n\nbreak_bond\nBreak bonds in topology.\n\n\nmove_hydrogen\nMove a singly bound atom to a new location.\n\n\npatch_parameters\n\n\n\nreindex_atomnrs\nReindex atom numbers in topology.\n\n\nto_dict\n\n\n\n\n\n\ntopology.topology.Topology.bind_bond(self, atompair_nrs)\nAdd a bond in topology.\nModifies the topology dictionary in place. It keeps track of affected terms in the topology via a graph representation of the topology and applies the necessary changes to bonds, angles and dihedrals (proper and improper). Furthermore, it modifies to function types in the topology to account for radicals.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\natompair\n\nA tuple of integers with the atoms indices (id, starting at 1) with from, the atom being moved and to, the atom to which the from atom will be bound\nrequired\n\n\n\n\n\n\n\ntopology.topology.Topology.break_bond(self, atompair_nrs)\nBreak bonds in topology.\nremoves bond, angles and dihedrals where atompair was involved. Modifies the topology dictionary in place.\n\n\n\ntopology.topology.Topology.move_hydrogen(self, from_to)\nMove a singly bound atom to a new location.\nThis is typically H for Hydrogen Atom Transfer (HAT).\n\n\n\ntopology.topology.Topology.patch_parameters(self, focus_nr)\n\n\n\ntopology.topology.Topology.reindex_atomnrs(self)\nReindex atom numbers in topology.\nStarts at index 1. This also updates the numbers for bonds, angles, dihedrals and pairs.\n\n\n\ntopology.topology.Topology.to_dict(self)"
-  },
-  {
-    "objectID": "reference/kimmdy.topology.atomic.BondType.html",
-    "href": "reference/kimmdy.topology.atomic.BondType.html",
-    "title": "BondType",
-    "section": "",
-    "text": "BondType\ntopology.atomic.BondType(i, j, id, id_sym, funct, c0=None, c1=None, c2=None, c3=None)\nInformation about one bondtype\nA class containing bond information as in the bonds section of the topology. From gromacs topology: ‘i’, ‘j’, ‘funct’, ‘c0’, ‘c1’, ‘c2’, ’c3 Where i and j are atomtypes\n\n\n\n\n Back to top"
-  },
-  {
-    "objectID": "reference/kimmdy.topology.atomic.ResidueType.html",
-    "href": "reference/kimmdy.topology.atomic.ResidueType.html",
-    "title": "ResidueType",
-    "section": "",
-    "text": "ResidueType\ntopology.atomic.ResidueType(residue, atoms, bonds, proper_dihedrals, improper_dihedrals)\nInformation about one residuetype from aminoacids.rtp\n\n\n\n\n Back to top"
-  },
-  {
-    "objectID": "reference/kimmdy.topology.atomic.AtomicType.html",
-    "href": "reference/kimmdy.topology.atomic.AtomicType.html",
-    "title": "AtomicType",
-    "section": "",
-    "text": "AtomicType\ntopology.atomic.AtomicType\n\n\n\n\n Back to top"
-  },
-  {
-    "objectID": "reference/kimmdy.topology.atomic.AtomicTypes.html",
-    "href": "reference/kimmdy.topology.atomic.AtomicTypes.html",
-    "title": "AtomicTypes",
-    "section": "",
-    "text": "AtomicTypes\ntopology.atomic.AtomicTypes\n\n\n\n\n Back to top"
-  },
-  {
-    "objectID": "reference/kimmdy.runmanager.RunManager.state.html",
-    "href": "reference/kimmdy.runmanager.RunManager.state.html",
-    "title": "state",
-    "section": "",
-    "text": "state\nrunmanager.RunManager.state\n\n\n\n\n Back to top"
-  },
-  {
-    "objectID": "reference/kimmdy.topology.atomic.AngleType.html",
-    "href": "reference/kimmdy.topology.atomic.AngleType.html",
-    "title": "AngleType",
-    "section": "",
-    "text": "AngleType\ntopology.atomic.AngleType(i, j, k, id, id_sym, funct, c0=None, c1=None, c2=None, c3=None)\nInformation about one angle\nA class containing angle information as in the angles section of the topology.\nFrom gromacs topology: ‘;’, ‘i’, ‘j’, ‘k’, ‘funct’, ‘c0’, ‘c1’, ‘c2’, ‘c3’ where i,j,k are atomtypes\n\n\n\n\n Back to top"
-  },
-  {
-    "objectID": "reference/kimmdy.topology.atomic.Bond.html",
-    "href": "reference/kimmdy.topology.atomic.Bond.html",
-    "title": "Bond",
-    "section": "",
-    "text": "Bond\ntopology.atomic.Bond(ai, aj, funct, c0=None, c1=None, c2=None, c3=None, c4=None, c5=None)\nInformation about one bond\nA class containing bond information as in the bonds section of the topology. From gromacs topology: ‘ai’, ‘aj’, ‘funct’, ‘c0’, ‘c1’, ‘c2’, ‘c3’, ‘c4’, ‘c5’ With ai &lt; aj\n\n\n\n\n Back to top"
-  },
-  {
-    "objectID": "reference/utils.html",
-    "href": "reference/utils.html",
-    "title": "utils",
-    "section": "",
-    "text": "utils\n\n\n\n\n\nName\nDescription\n\n\n\n\ncheck_gmx_version\nCheck for an existing gromacs installation.\n\n\ncheck_idx\n\n\n\nfind_radical_pos\nCalculates possible radical positions of a given radical atom\n\n\nfloat_or_str\n\n\n\nget_atominfo_from_plumedid\nreturns atomtypes for a plumedid with information from the plumed and topology file\n\n\nget_bondprm_from_atomtypes\nreturns bond parameters (b0, kb, E_dis) for a set of atomtypes\n\n\nget_data_from_file\n\n\n\nget_gmx_dir\nreturns the path to the gromacs installation\n\n\nget_shell_stdout\n\n\n\nidentify_atomtypes\n\n\n\nincrement_logfile\n\n\n\nmorse_transition_rate\ncalculates energy barrier crossing rate [in ps]; barrier based on the model V = V_morse - F*X\n\n\npushd\n\n\n\nrun_gmx\n\n\n\nrun_shell_cmd\n\n\n\nsort_angle\n\n\n\nsort_bond\n\n\n\nsort_dihedral\n\n\n\nsort_improper\n\n\n\nstore_linelist_to_file\n\n\n\nstr_to_int_or_0\n\n\n\nwrite_conditions_in_plumedfile\n\n\n\n\n\n\nutils.check_gmx_version(config)\nCheck for an existing gromacs installation.\nIf PLUMED is meant to be used it additionally checks for the keyword ‘MODIFIED’ in the version name.\n\n\n\nutils.check_idx(object)\n\n\n\nutils.find_radical_pos(center, bonded, tetrahedral=False)\nCalculates possible radical positions of a given radical atom\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\ncenter\nMDAnalysis.core.groups.Atom\nRadical atom\nrequired\n\n\nbonded\nMDAnalysis.core.groups.AtomGroup\nAtom group of bonded atoms. From its length the geometry is predicted.\nrequired\n\n\ntetrahedral\nbool\nWhether to assume a tetrahedral conformation around C and N\nFalse\n\n\n\n\n\n\n\n\n\nType\nDescription\n\n\n\n\nlist\nList of radical positions, three dimensional arrays\n\n\n\n\n\n\n\nutils.float_or_str(elem)\n\n\n\nutils.get_atominfo_from_plumedid(plumedid, plumed, top)\nreturns atomtypes for a plumedid with information from the plumed and topology file\n\n\n\nutils.get_bondprm_from_atomtypes(atomtypes, ffbonded, lookup_edissoc_atomtype)\nreturns bond parameters (b0, kb, E_dis) for a set of atomtypes\n\n\n\nutils.get_data_from_file(filepath)\n\n\n\nutils.get_gmx_dir()\nreturns the path to the gromacs installation\n\n\n\nutils.get_shell_stdout(s)\n\n\n\nutils.identify_atomtypes(filepath)\n\n\n\nutils.increment_logfile(f)\n\n\n\nutils.morse_transition_rate(r_curr, r_0, E_dis, k_f, k_0=0.288, kT=2.479)\ncalculates energy barrier crossing rate [in ps]; barrier based on the model V = V_morse - F*X\n\n\n\nutils.pushd(path)\n\n\n\nutils.run_gmx(s, cwd=None)\n\n\n\nutils.run_shell_cmd(s, cwd=None)\n\n\n\nutils.sort_angle(entry)\n\n\n\nutils.sort_bond(entry)\n\n\n\nutils.sort_dihedral(entry)\n\n\n\nutils.sort_improper(entry)\n\n\n\nutils.store_linelist_to_file(data, filepath)\n\n\n\nutils.str_to_int_or_0(elem)\n\n\n\nutils.write_conditions_in_plumedfile(topfile, indexfile, indexgroup, outplumed)"
-  },
-  {
-    "objectID": "reference/utils.html#functions",
-    "href": "reference/utils.html#functions",
-    "title": "utils",
-    "section": "",
-    "text": "Name\nDescription\n\n\n\n\ncheck_gmx_version\nCheck for an existing gromacs installation.\n\n\ncheck_idx\n\n\n\nfind_radical_pos\nCalculates possible radical positions of a given radical atom\n\n\nfloat_or_str\n\n\n\nget_atominfo_from_plumedid\nreturns atomtypes for a plumedid with information from the plumed and topology file\n\n\nget_bondprm_from_atomtypes\nreturns bond parameters (b0, kb, E_dis) for a set of atomtypes\n\n\nget_data_from_file\n\n\n\nget_gmx_dir\nreturns the path to the gromacs installation\n\n\nget_shell_stdout\n\n\n\nidentify_atomtypes\n\n\n\nincrement_logfile\n\n\n\nmorse_transition_rate\ncalculates energy barrier crossing rate [in ps]; barrier based on the model V = V_morse - F*X\n\n\npushd\n\n\n\nrun_gmx\n\n\n\nrun_shell_cmd\n\n\n\nsort_angle\n\n\n\nsort_bond\n\n\n\nsort_dihedral\n\n\n\nsort_improper\n\n\n\nstore_linelist_to_file\n\n\n\nstr_to_int_or_0\n\n\n\nwrite_conditions_in_plumedfile\n\n\n\n\n\n\nutils.check_gmx_version(config)\nCheck for an existing gromacs installation.\nIf PLUMED is meant to be used it additionally checks for the keyword ‘MODIFIED’ in the version name.\n\n\n\nutils.check_idx(object)\n\n\n\nutils.find_radical_pos(center, bonded, tetrahedral=False)\nCalculates possible radical positions of a given radical atom\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\ncenter\nMDAnalysis.core.groups.Atom\nRadical atom\nrequired\n\n\nbonded\nMDAnalysis.core.groups.AtomGroup\nAtom group of bonded atoms. From its length the geometry is predicted.\nrequired\n\n\ntetrahedral\nbool\nWhether to assume a tetrahedral conformation around C and N\nFalse\n\n\n\n\n\n\n\n\n\nType\nDescription\n\n\n\n\nlist\nList of radical positions, three dimensional arrays\n\n\n\n\n\n\n\nutils.float_or_str(elem)\n\n\n\nutils.get_atominfo_from_plumedid(plumedid, plumed, top)\nreturns atomtypes for a plumedid with information from the plumed and topology file\n\n\n\nutils.get_bondprm_from_atomtypes(atomtypes, ffbonded, lookup_edissoc_atomtype)\nreturns bond parameters (b0, kb, E_dis) for a set of atomtypes\n\n\n\nutils.get_data_from_file(filepath)\n\n\n\nutils.get_gmx_dir()\nreturns the path to the gromacs installation\n\n\n\nutils.get_shell_stdout(s)\n\n\n\nutils.identify_atomtypes(filepath)\n\n\n\nutils.increment_logfile(f)\n\n\n\nutils.morse_transition_rate(r_curr, r_0, E_dis, k_f, k_0=0.288, kT=2.479)\ncalculates energy barrier crossing rate [in ps]; barrier based on the model V = V_morse - F*X\n\n\n\nutils.pushd(path)\n\n\n\nutils.run_gmx(s, cwd=None)\n\n\n\nutils.run_shell_cmd(s, cwd=None)\n\n\n\nutils.sort_angle(entry)\n\n\n\nutils.sort_bond(entry)\n\n\n\nutils.sort_dihedral(entry)\n\n\n\nutils.sort_improper(entry)\n\n\n\nutils.store_linelist_to_file(data, filepath)\n\n\n\nutils.str_to_int_or_0(elem)\n\n\n\nutils.write_conditions_in_plumedfile(topfile, indexfile, indexgroup, outplumed)"
-  },
-  {
-    "objectID": "reference/kimmdy.topology.atomic.Atom.html",
-    "href": "reference/kimmdy.topology.atomic.Atom.html",
-    "title": "Atom",
-    "section": "",
-    "text": "Atom\ntopology.atomic.Atom(nr, type, resnr, residue, atom, cgnr, charge, mass, typeB=None, chargeB=None, massB=None, bound_to_nrs=field(default_factory=list), is_radical=False)\nInformation about one atom\nA class containing atom information as in the atoms section of the topology. An atom keeps a list of which atoms it is bound to.\nFrom gromacs topology: ; nr type resnr residue atom cgnr charge mass typeB chargeB massB\n\n\n\n\n Back to top"
-  },
-  {
-    "objectID": "reference/kimmdy.runmanager.State.html",
-    "href": "reference/kimmdy.runmanager.State.html",
-    "title": "State",
-    "section": "",
-    "text": "State\nrunmanager.State()\nState of the system. one of IDLE, MD, REACTION, DONE.\n\n\n\n\n Back to top"
-  },
-  {
-    "objectID": "reference/topology.atomic.html",
-    "href": "reference/topology.atomic.html",
-    "title": "topology.atomic",
-    "section": "",
-    "text": "topology.atomic\n\n\n\n\n\nName\nDescription\n\n\n\n\nAngleId\n\n\n\nAtomId\n\n\n\nAtomic\n\n\n\nAtomicType\n\n\n\nAtomicTypes\n\n\n\nBondId\n\n\n\nDihedralId"
-  },
-  {
-    "objectID": "reference/topology.atomic.html#attributes",
-    "href": "reference/topology.atomic.html#attributes",
-    "title": "topology.atomic",
-    "section": "",
-    "text": "Name\nDescription\n\n\n\n\nAngleId\n\n\n\nAtomId\n\n\n\nAtomic\n\n\n\nAtomicType\n\n\n\nAtomicTypes\n\n\n\nBondId\n\n\n\nDihedralId"
+    "text": "ResidueAtomSpec\ntopology.atomic.ResidueAtomSpec(name, type, charge, cgrp)\nInformation about one atom in a residue ; name type charge chargegroup\n\n\n\n\n Back to top"
   },
   {
     "objectID": "reference/kimmdy.runmanager.RunManager.from_checkpoint.html",
@@ -693,46 +238,67 @@
     "text": "from_checkpoint\nrunmanager.RunManager.from_checkpoint\n\n\n\n\n Back to top"
   },
   {
-    "objectID": "reference/misc_helper.html",
-    "href": "reference/misc_helper.html",
-    "title": "misc_helper",
+    "objectID": "reference/utils.html",
+    "href": "reference/utils.html",
+    "title": "utils",
     "section": "",
-    "text": "misc_helper\n\n\n\n\n\nName\nDescription\n\n\n\n\nconcat_traj\nFind and concatenate trajectories from KIMMDY runs.\n\n\nedgelist_to_dot_graph\n\n\n\ntop_to_graph\n\n\n\ntopology_to_edgelist\n\n\n\n\n\n\nmisc_helper.concat_traj(run_dir, out=None, run_types=None)\nFind and concatenate trajectories from KIMMDY runs.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nrun_dir\npathlib.Path | str\nDirectory containing directories of multiple tasks.\nrequired\n\n\nout\nPath\nFile Path into the output trr will be written. Default concat.trr in given run_dir\nNone\n\n\nrun_types\nlist\nList of tasks to get trrs from. If a task is not in this list it will be skipped. By default None\nNone\n\n\n\n\n\n\n\nmisc_helper.edgelist_to_dot_graph(ls, overlap='true')\n\n\n\nmisc_helper.top_to_graph(top, overlap='true')\n\n\n\nmisc_helper.topology_to_edgelist(top)"
+    "text": "utils\n\n\n\n\n\nName\nDescription\n\n\n\n\ncheck_gmx_version\nCheck for an existing gromacs installation.\n\n\nget_atominfo_from_plumedid\nreturns atomtypes for a plumedid with information from the plumed and topology file\n\n\nget_bondprm_from_atomtypes\nreturns bond parameters (b0, kb, E_dis) for a set of atomtypes\n\n\nget_gmx_dir\nreturns the path to the gromacs installation\n\n\nget_shell_stdout\n\n\n\nincrement_logfile\n\n\n\nmorse_transition_rate\ncalculates energy barrier crossing rate [in ps]; barrier based on the model V = V_morse - F*X\n\n\nrun_gmx\n\n\n\nrun_shell_cmd\n\n\n\n\n\n\nutils.check_gmx_version(config)\nCheck for an existing gromacs installation.\nIf PLUMED is meant to be used it additionally checks for the keyword ‘MODIFIED’ in the version name.\n\n\n\nutils.get_atominfo_from_plumedid(plumedid, plumed, top)\nreturns atomtypes for a plumedid with information from the plumed and topology file\n\n\n\nutils.get_bondprm_from_atomtypes(atomtypes, ffbonded, lookup_edissoc_atomtype)\nreturns bond parameters (b0, kb, E_dis) for a set of atomtypes\n\n\n\nutils.get_gmx_dir()\nreturns the path to the gromacs installation\n\n\n\nutils.get_shell_stdout(s)\n\n\n\nutils.increment_logfile(f)\n\n\n\nutils.morse_transition_rate(r_curr, r_0, E_dis, k_f, k_0=0.288, kT=2.479)\ncalculates energy barrier crossing rate [in ps]; barrier based on the model V = V_morse - F*X\n\n\n\nutils.run_gmx(s, cwd=None)\n\n\n\nutils.run_shell_cmd(s, cwd=None)"
   },
   {
-    "objectID": "reference/misc_helper.html#functions",
-    "href": "reference/misc_helper.html#functions",
-    "title": "misc_helper",
+    "objectID": "reference/utils.html#functions",
+    "href": "reference/utils.html#functions",
+    "title": "utils",
     "section": "",
-    "text": "Name\nDescription\n\n\n\n\nconcat_traj\nFind and concatenate trajectories from KIMMDY runs.\n\n\nedgelist_to_dot_graph\n\n\n\ntop_to_graph\n\n\n\ntopology_to_edgelist\n\n\n\n\n\n\nmisc_helper.concat_traj(run_dir, out=None, run_types=None)\nFind and concatenate trajectories from KIMMDY runs.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nrun_dir\npathlib.Path | str\nDirectory containing directories of multiple tasks.\nrequired\n\n\nout\nPath\nFile Path into the output trr will be written. Default concat.trr in given run_dir\nNone\n\n\nrun_types\nlist\nList of tasks to get trrs from. If a task is not in this list it will be skipped. By default None\nNone\n\n\n\n\n\n\n\nmisc_helper.edgelist_to_dot_graph(ls, overlap='true')\n\n\n\nmisc_helper.top_to_graph(top, overlap='true')\n\n\n\nmisc_helper.topology_to_edgelist(top)"
+    "text": "Name\nDescription\n\n\n\n\ncheck_gmx_version\nCheck for an existing gromacs installation.\n\n\nget_atominfo_from_plumedid\nreturns atomtypes for a plumedid with information from the plumed and topology file\n\n\nget_bondprm_from_atomtypes\nreturns bond parameters (b0, kb, E_dis) for a set of atomtypes\n\n\nget_gmx_dir\nreturns the path to the gromacs installation\n\n\nget_shell_stdout\n\n\n\nincrement_logfile\n\n\n\nmorse_transition_rate\ncalculates energy barrier crossing rate [in ps]; barrier based on the model V = V_morse - F*X\n\n\nrun_gmx\n\n\n\nrun_shell_cmd\n\n\n\n\n\n\nutils.check_gmx_version(config)\nCheck for an existing gromacs installation.\nIf PLUMED is meant to be used it additionally checks for the keyword ‘MODIFIED’ in the version name.\n\n\n\nutils.get_atominfo_from_plumedid(plumedid, plumed, top)\nreturns atomtypes for a plumedid with information from the plumed and topology file\n\n\n\nutils.get_bondprm_from_atomtypes(atomtypes, ffbonded, lookup_edissoc_atomtype)\nreturns bond parameters (b0, kb, E_dis) for a set of atomtypes\n\n\n\nutils.get_gmx_dir()\nreturns the path to the gromacs installation\n\n\n\nutils.get_shell_stdout(s)\n\n\n\nutils.increment_logfile(f)\n\n\n\nutils.morse_transition_rate(r_curr, r_0, E_dis, k_f, k_0=0.288, kT=2.479)\ncalculates energy barrier crossing rate [in ps]; barrier based on the model V = V_morse - F*X\n\n\n\nutils.run_gmx(s, cwd=None)\n\n\n\nutils.run_shell_cmd(s, cwd=None)"
   },
   {
-    "objectID": "reference/kimmdy.runmanager.RunManager.histfile.html",
-    "href": "reference/kimmdy.runmanager.RunManager.histfile.html",
-    "title": "histfile",
+    "objectID": "reference/kimmdy.runmanager.default_decision_strategy.html",
+    "href": "reference/kimmdy.runmanager.default_decision_strategy.html",
+    "title": "default_decision_strategy",
     "section": "",
-    "text": "histfile\nrunmanager.RunManager.histfile\n\n\n\n\n Back to top"
+    "text": "runmanager.default_decision_strategy(reaction_results)\nRejection-Free Monte Carlo. takes a list of ReactionResults and choses a recipe.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nreaction_reults\n\nfrom which one will be choosen\nrequired"
   },
   {
-    "objectID": "reference/topology.utils.html",
-    "href": "reference/topology.utils.html",
-    "title": "topology.utils",
+    "objectID": "reference/kimmdy.runmanager.default_decision_strategy.html#parameters",
+    "href": "reference/kimmdy.runmanager.default_decision_strategy.html#parameters",
+    "title": "default_decision_strategy",
     "section": "",
-    "text": "topology.utils\n\n\n\n\n\nName\nDescription\n\n\n\n\nattributes_to_list\n\n\n\nfield_or_none\n\n\n\nget_by_permutations\n\n\n\nget_element_id\n\n\n\nget_protein_section\nGet content of a section in the first moleculetype (protein) from a topology dict.\n\n\nget_top_section\nGet content of a section from a topology dict.\n\n\nis_not_none\n\n\n\nmatch_atomic_item_to_atomic_type\n\n\n\nmatch_attr\n\n\n\nmatch_id_to_patch\n\n\n\nmatch_multi_attr\n\n\n\nset_protein_section\nSet content of a section in the first moleculetype (protein) from a topology dict.\n\n\nset_top_section\nSet content of a section from a topology dict.\n\n\n\n\n\ntopology.utils.attributes_to_list(obj)\n\n\n\ntopology.utils.field_or_none(l, i)\n\n\n\ntopology.utils.get_by_permutations(d, key)\n\n\n\ntopology.utils.get_element_id(e)\n\n\n\ntopology.utils.get_protein_section(top, name)\nGet content of a section in the first moleculetype (protein) from a topology dict.\n\n\n\ntopology.utils.get_top_section(top, name, moleculetype=None)\nGet content of a section from a topology dict. By resolving any #ifdef statements by check in the top[‘define’] dict and choosing the ‘content’ or ‘else_content’ depending on the result.\n\n\n\ntopology.utils.is_not_none(x)\n\n\n\ntopology.utils.match_atomic_item_to_atomic_type(id, types)\n\n\n\ntopology.utils.match_attr(patches, attr, m)\n\n\n\ntopology.utils.match_id_to_patch(id, patches)\n\n\n\ntopology.utils.match_multi_attr(patches, attrs, m)\n\n\n\ntopology.utils.set_protein_section(top, name, value)\nSet content of a section in the first moleculetype (protein) from a topology dict.\n\n\n\ntopology.utils.set_top_section(top, name, value, moleculetype=None)\nSet content of a section from a topology dict. By resolving any #ifdef statements by check in the top[‘define’] dict and choosing the ‘content’ or ‘else_content’ depending on the result."
+    "text": "Name\nType\nDescription\nDefault\n\n\n\n\nreaction_reults\n\nfrom which one will be choosen\nrequired"
   },
   {
-    "objectID": "reference/topology.utils.html#functions",
-    "href": "reference/topology.utils.html#functions",
-    "title": "topology.utils",
+    "objectID": "reference/parsing.html",
+    "href": "reference/parsing.html",
+    "title": "parsing",
     "section": "",
-    "text": "Name\nDescription\n\n\n\n\nattributes_to_list\n\n\n\nfield_or_none\n\n\n\nget_by_permutations\n\n\n\nget_element_id\n\n\n\nget_protein_section\nGet content of a section in the first moleculetype (protein) from a topology dict.\n\n\nget_top_section\nGet content of a section from a topology dict.\n\n\nis_not_none\n\n\n\nmatch_atomic_item_to_atomic_type\n\n\n\nmatch_attr\n\n\n\nmatch_id_to_patch\n\n\n\nmatch_multi_attr\n\n\n\nset_protein_section\nSet content of a section in the first moleculetype (protein) from a topology dict.\n\n\nset_top_section\nSet content of a section from a topology dict.\n\n\n\n\n\ntopology.utils.attributes_to_list(obj)\n\n\n\ntopology.utils.field_or_none(l, i)\n\n\n\ntopology.utils.get_by_permutations(d, key)\n\n\n\ntopology.utils.get_element_id(e)\n\n\n\ntopology.utils.get_protein_section(top, name)\nGet content of a section in the first moleculetype (protein) from a topology dict.\n\n\n\ntopology.utils.get_top_section(top, name, moleculetype=None)\nGet content of a section from a topology dict. By resolving any #ifdef statements by check in the top[‘define’] dict and choosing the ‘content’ or ‘else_content’ depending on the result.\n\n\n\ntopology.utils.is_not_none(x)\n\n\n\ntopology.utils.match_atomic_item_to_atomic_type(id, types)\n\n\n\ntopology.utils.match_attr(patches, attr, m)\n\n\n\ntopology.utils.match_id_to_patch(id, patches)\n\n\n\ntopology.utils.match_multi_attr(patches, attrs, m)\n\n\n\ntopology.utils.set_protein_section(top, name, value)\nSet content of a section in the first moleculetype (protein) from a topology dict.\n\n\n\ntopology.utils.set_top_section(top, name, value, moleculetype=None)\nSet content of a section from a topology dict. By resolving any #ifdef statements by check in the top[‘define’] dict and choosing the ‘content’ or ‘else_content’ depending on the result."
+    "text": "parsing\n\n\n\n\n\nName\nDescription\n\n\n\n\nGMX_BUILTIN_FF_DIR\n\n\n\nTopologyDict\n\n\n\n\n\n\n\n\n\n\nName\nDescription\n\n\n\n\ncreate_subsections\n\n\n\nis_not_comment\n\n\n\nread_distances_dat\nRead a distances.dat plumed output file.\n\n\nread_edissoc\nreads a edissoc file and turns it into a dict.\n\n\nread_plumed\nRead a plumed.dat configuration file.\n\n\nread_rtp\n\n\n\nread_top\nParse a list of lines from a topology file.\n\n\nread_xml_ff\n\n\n\nresolve_includes\nResolve #include statements in a (top/itp) file.\n\n\nwrite_plumed\nWrite a plumed.dat configuration file.\n\n\nwrite_top\n\n\n\n\n\n\nparsing.create_subsections(ls)\n\n\n\nparsing.is_not_comment(c)\n\n\n\nparsing.read_distances_dat(distances_dat)\nRead a distances.dat plumed output file.\n\n\n\nparsing.read_edissoc(path)\nreads a edissoc file and turns it into a dict. the tuple of bond atoms make up the key, the dissociation energy E_dissoc [kJ mol-1] is the value\n\n\n\nparsing.read_plumed(path)\nRead a plumed.dat configuration file.\n\n\n\nparsing.read_rtp(path)\n\n\n\nparsing.read_top(path)\nParse a list of lines from a topology file.\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\npath\nPath\nPath to the topology file.\nrequired\n\n\n\n\n\n\n\n#include statements will be resolved\ncomments will be removed\nall lines are stripped of leading and trailing whitespace\n#undef is not supported\na section within ifdef may be a subsection of a section that was started outside of the ifdef\n#if..#endif statements only surround a full section or subsection, not individual lines within a section and a section may either be contained within if … else or it may not be, but it can not be duplicated with one part inside and one outside.\nif .. else can’t be nested\n#include s that don’t resolve to a valid file path are silently dropped\nsections that can have subsections can also exist multiple, separate times e.g. moleculetype will appear multiple times and they should not be merged\n\n\n\n\n\nparsing.read_xml_ff(path)\n\n\n\nparsing.resolve_includes(path)\nResolve #include statements in a (top/itp) file. Returns a tuple with the list of lines and the Path to the ff directory.\n\n\n\nparsing.write_plumed(d, path)\nWrite a plumed.dat configuration file.\n\n\n\nparsing.write_top(top, outfile)"
   },
   {
-    "objectID": "reference/reactions.homolysis.html",
-    "href": "reference/reactions.homolysis.html",
-    "title": "reactions.homolysis",
+    "objectID": "reference/parsing.html#attributes",
+    "href": "reference/parsing.html#attributes",
+    "title": "parsing",
     "section": "",
-    "text": "reactions.homolysis\nreactions.homolysis\n\n\n\n\n Back to top"
+    "text": "Name\nDescription\n\n\n\n\nGMX_BUILTIN_FF_DIR\n\n\n\nTopologyDict"
+  },
+  {
+    "objectID": "reference/parsing.html#functions",
+    "href": "reference/parsing.html#functions",
+    "title": "parsing",
+    "section": "",
+    "text": "Name\nDescription\n\n\n\n\ncreate_subsections\n\n\n\nis_not_comment\n\n\n\nread_distances_dat\nRead a distances.dat plumed output file.\n\n\nread_edissoc\nreads a edissoc file and turns it into a dict.\n\n\nread_plumed\nRead a plumed.dat configuration file.\n\n\nread_rtp\n\n\n\nread_top\nParse a list of lines from a topology file.\n\n\nread_xml_ff\n\n\n\nresolve_includes\nResolve #include statements in a (top/itp) file.\n\n\nwrite_plumed\nWrite a plumed.dat configuration file.\n\n\nwrite_top\n\n\n\n\n\n\nparsing.create_subsections(ls)\n\n\n\nparsing.is_not_comment(c)\n\n\n\nparsing.read_distances_dat(distances_dat)\nRead a distances.dat plumed output file.\n\n\n\nparsing.read_edissoc(path)\nreads a edissoc file and turns it into a dict. the tuple of bond atoms make up the key, the dissociation energy E_dissoc [kJ mol-1] is the value\n\n\n\nparsing.read_plumed(path)\nRead a plumed.dat configuration file.\n\n\n\nparsing.read_rtp(path)\n\n\n\nparsing.read_top(path)\nParse a list of lines from a topology file.\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\npath\nPath\nPath to the topology file.\nrequired\n\n\n\n\n\n\n\n#include statements will be resolved\ncomments will be removed\nall lines are stripped of leading and trailing whitespace\n#undef is not supported\na section within ifdef may be a subsection of a section that was started outside of the ifdef\n#if..#endif statements only surround a full section or subsection, not individual lines within a section and a section may either be contained within if … else or it may not be, but it can not be duplicated with one part inside and one outside.\nif .. else can’t be nested\n#include s that don’t resolve to a valid file path are silently dropped\nsections that can have subsections can also exist multiple, separate times e.g. moleculetype will appear multiple times and they should not be merged\n\n\n\n\n\nparsing.read_xml_ff(path)\n\n\n\nparsing.resolve_includes(path)\nResolve #include statements in a (top/itp) file. Returns a tuple with the list of lines and the Path to the ff directory.\n\n\n\nparsing.write_plumed(d, path)\nWrite a plumed.dat configuration file.\n\n\n\nparsing.write_top(top, outfile)"
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.RunManager.filehist.html",
+    "href": "reference/kimmdy.runmanager.RunManager.filehist.html",
+    "title": "filehist",
+    "section": "",
+    "text": "filehist\nrunmanager.RunManager.filehist\n\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "reference/kimmdy.topology.atomic.Atomic.html",
+    "href": "reference/kimmdy.topology.atomic.Atomic.html",
+    "title": "Atomic",
+    "section": "",
+    "text": "Atomic\ntopology.atomic.Atomic\n\n\n\n\n Back to top"
   },
   {
     "objectID": "reference/kimmdy.topology.atomic.AtomId.html",
@@ -742,53 +308,11 @@
     "text": "AtomId\ntopology.atomic.AtomId\n\n\n\n\n Back to top"
   },
   {
-    "objectID": "reference/coordinates.Example.html",
-    "href": "reference/coordinates.Example.html",
-    "title": "coordinates.Example",
+    "objectID": "reference/reaction.html",
+    "href": "reference/reaction.html",
+    "title": "reaction",
     "section": "",
-    "text": "coordinates.Example\ncoordinates.Example()\nExample class for testing purposes.\n\n\n\n\n Back to top"
-  },
-  {
-    "objectID": "reference/kimmdy.runmanager.RunManager.reactions.html",
-    "href": "reference/kimmdy.runmanager.RunManager.reactions.html",
-    "title": "reactions",
-    "section": "",
-    "text": "reactions\nrunmanager.RunManager.reactions\n\n\n\n\n Back to top"
-  },
-  {
-    "objectID": "reference/topology.atomic.ResidueAtomSpec.html",
-    "href": "reference/topology.atomic.ResidueAtomSpec.html",
-    "title": "topology.atomic.ResidueAtomSpec",
-    "section": "",
-    "text": "topology.atomic.ResidueAtomSpec(name, type, charge, cgrp)\nInformation about one atom in a residue ; name type charge chargegroup\n\n\n\n\n\nName\nDescription\n\n\n\n\nfrom_top_line\n\n\n\n\n\n\ntopology.atomic.ResidueAtomSpec.from_top_line(cls, l)"
-  },
-  {
-    "objectID": "reference/topology.atomic.ResidueAtomSpec.html#methods",
-    "href": "reference/topology.atomic.ResidueAtomSpec.html#methods",
-    "title": "topology.atomic.ResidueAtomSpec",
-    "section": "",
-    "text": "Name\nDescription\n\n\n\n\nfrom_top_line\n\n\n\n\n\n\ntopology.atomic.ResidueAtomSpec.from_top_line(cls, l)"
-  },
-  {
-    "objectID": "reference/kimmdy.topology.atomic.AngleId.html",
-    "href": "reference/kimmdy.topology.atomic.AngleId.html",
-    "title": "AngleId",
-    "section": "",
-    "text": "AngleId\ntopology.atomic.AngleId\n\n\n\n\n Back to top"
-  },
-  {
-    "objectID": "reference/topology.atomic.Atom.html",
-    "href": "reference/topology.atomic.Atom.html",
-    "title": "topology.atomic.Atom",
-    "section": "",
-    "text": "topology.atomic.Atom(nr, type, resnr, residue, atom, cgnr, charge, mass, typeB=None, chargeB=None, massB=None, bound_to_nrs=field(default_factory=list), is_radical=False)\nInformation about one atom\nA class containing atom information as in the atoms section of the topology. An atom keeps a list of which atoms it is bound to.\nFrom gromacs topology: ; nr type resnr residue atom cgnr charge mass typeB chargeB massB\n\n\n\n\n\nName\nDescription\n\n\n\n\nfrom_top_line\n\n\n\nradical_type\n\n\n\n\n\n\ntopology.atomic.Atom.from_top_line(cls, l)\n\n\n\ntopology.atomic.Atom.radical_type(self)"
-  },
-  {
-    "objectID": "reference/topology.atomic.Atom.html#methods",
-    "href": "reference/topology.atomic.Atom.html#methods",
-    "title": "topology.atomic.Atom",
-    "section": "",
-    "text": "Name\nDescription\n\n\n\n\nfrom_top_line\n\n\n\nradical_type\n\n\n\n\n\n\ntopology.atomic.Atom.from_top_line(cls, l)\n\n\n\ntopology.atomic.Atom.radical_type(self)"
+    "text": "reaction\nreaction\n\n\n\n\n Back to top"
   },
   {
     "objectID": "reference/kimmdy.topology.atomic.Dihedral.html",
@@ -798,11 +322,25 @@
     "text": "Dihedral\ntopology.atomic.Dihedral(ai, aj, ak, al, funct, c0=None, c1=None, c2=None, c3=None, c4=None, c5=None)\nInformation about one dihedral\nA class containing bond information as in the dihedrals section of the topology. Proper dihedrals have funct 9. Improper dihedrals have funct 4.\nFrom gromacs topology: ‘;’, ‘ai’, ‘aj’, ‘ak’, ‘al’, ‘funct’, ‘c0’, ‘c1’, ‘c2’, ‘c3’, ‘c4’, ‘c5’ For proper dihedrals (funct 9): aj &lt; ak For improper dihedrals (funct 4): no guaranteed order\n\n\n\n\n Back to top"
   },
   {
-    "objectID": "reference/kimmdy.topology.atomic.ResidueProperSpec.html",
-    "href": "reference/kimmdy.topology.atomic.ResidueProperSpec.html",
-    "title": "ResidueProperSpec",
+    "objectID": "reference/topology.atomic.DihedralType.html",
+    "href": "reference/topology.atomic.DihedralType.html",
+    "title": "topology.atomic.DihedralType",
     "section": "",
-    "text": "ResidueProperSpec\ntopology.atomic.ResidueProperSpec(atom1, atom2, atom3, atom4, q0)\nInformation about one imroper dihedral in a residue ;atom1 atom2 atom3 atom4 q0 cq\n\n\n\n\n Back to top"
+    "text": "topology.atomic.DihedralType(i, j, k, l, id, id_sym, funct, c0, c1, periodicity, c3=None, c4=None, c5=None)\nInformation about one dihedral\nA class containing bond information as in the dihedrals section of the topology. Proper dihedrals have funct 9. Improper dihedrals have funct 4.\nNote that proper dihedrals of type 9 can be defined multiple times, for different periodicities. This is why would-be parameter c2 is called periodicity and part of the id.\nFrom gromacs topology: ‘;’, ‘i’, ‘j’, ‘k’, ‘l’, ‘funct’, ‘c0’, ‘c1’, ‘periodicity’, ‘c3’, ‘c4’, ‘c5’ Where i,j,k,l are atomtypes\n\n\n\n\n\nName\nDescription\n\n\n\n\nfrom_top_line\n\n\n\n\n\n\ntopology.atomic.DihedralType.from_top_line(cls, l)"
+  },
+  {
+    "objectID": "reference/topology.atomic.DihedralType.html#methods",
+    "href": "reference/topology.atomic.DihedralType.html#methods",
+    "title": "topology.atomic.DihedralType",
+    "section": "",
+    "text": "Name\nDescription\n\n\n\n\nfrom_top_line\n\n\n\n\n\n\ntopology.atomic.DihedralType.from_top_line(cls, l)"
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.RunManager.iterations.html",
+    "href": "reference/kimmdy.runmanager.RunManager.iterations.html",
+    "title": "iterations",
+    "section": "",
+    "text": "iterations\nrunmanager.RunManager.iterations\n\n\n\n\n Back to top"
   },
   {
     "objectID": "reference/topology.atomic.PositionRestraint.html",
@@ -819,60 +357,88 @@
     "text": "Name\nDescription\n\n\n\n\nfrom_top_line\n\n\n\n\n\n\ntopology.atomic.PositionRestraint.from_top_line(cls, l, condition=None)"
   },
   {
-    "objectID": "reference/kimmdy.runmanager.RunManager.latest_files.html",
-    "href": "reference/kimmdy.runmanager.RunManager.latest_files.html",
-    "title": "latest_files",
+    "objectID": "reference/topology.atomic.Pair.html",
+    "href": "reference/topology.atomic.Pair.html",
+    "title": "topology.atomic.Pair",
     "section": "",
-    "text": "latest_files\nrunmanager.RunManager.latest_files\n\n\n\n\n Back to top"
+    "text": "topology.atomic.Pair(ai, aj, funct, c0=None, c1=None, c2=None, c3=None)\nInformation about one pair\nA class containing pair information as in the pair section of the topology.\nFrom gromacs topology: ai’, ‘aj’, ‘funct’, ‘c0’, ‘c1’, ‘c2’, ‘c3’\n\n\n\n\n\nName\nDescription\n\n\n\n\nfrom_top_line\n\n\n\n\n\n\ntopology.atomic.Pair.from_top_line(cls, l)"
   },
   {
-    "objectID": "reference/kimmdy.topology.atomic.ResidueAtomSpec.html",
-    "href": "reference/kimmdy.topology.atomic.ResidueAtomSpec.html",
-    "title": "ResidueAtomSpec",
+    "objectID": "reference/topology.atomic.Pair.html#methods",
+    "href": "reference/topology.atomic.Pair.html#methods",
+    "title": "topology.atomic.Pair",
     "section": "",
-    "text": "ResidueAtomSpec\ntopology.atomic.ResidueAtomSpec(name, type, charge, cgrp)\nInformation about one atom in a residue ; name type charge chargegroup\n\n\n\n\n Back to top"
+    "text": "Name\nDescription\n\n\n\n\nfrom_top_line\n\n\n\n\n\n\ntopology.atomic.Pair.from_top_line(cls, l)"
   },
   {
-    "objectID": "reference/topology.atomic.DihedralRestraint.html",
-    "href": "reference/topology.atomic.DihedralRestraint.html",
-    "title": "topology.atomic.DihedralRestraint",
+    "objectID": "reference/runmanager.html",
+    "href": "reference/runmanager.html",
+    "title": "runmanager",
     "section": "",
-    "text": "topology.atomic.DihedralRestraint(ai, aj, ak, al, type, phi, dphi, fc)\nInformation about one dihedral restraint.\nA class containing information as in the dihedral_restraints section of the topology.\nFrom gromacs topology: ; ai aj ak al type phi dphi fc\n\n\n\n\n\nName\nDescription\n\n\n\n\nfrom_top_line\n\n\n\n\n\n\ntopology.atomic.DihedralRestraint.from_top_line(cls, l)"
+    "text": "runmanager\n\n\n\n\n\nName\nDescription\n\n\n\n\nAMBIGUOUS_SUFFS\n\n\n\n\n\n\n\n\n\n\nName\nDescription\n\n\n\n\nget_existing_files\nInitialize latest_files with every existing file defined in config\n\n\n\n\n\nrunmanager.get_existing_files(config)\nInitialize latest_files with every existing file defined in config"
   },
   {
-    "objectID": "reference/topology.atomic.DihedralRestraint.html#methods",
-    "href": "reference/topology.atomic.DihedralRestraint.html#methods",
-    "title": "topology.atomic.DihedralRestraint",
+    "objectID": "reference/runmanager.html#attributes",
+    "href": "reference/runmanager.html#attributes",
+    "title": "runmanager",
     "section": "",
-    "text": "Name\nDescription\n\n\n\n\nfrom_top_line\n\n\n\n\n\n\ntopology.atomic.DihedralRestraint.from_top_line(cls, l)"
+    "text": "Name\nDescription\n\n\n\n\nAMBIGUOUS_SUFFS"
   },
   {
-    "objectID": "reference/topology.atomic.Angle.html",
-    "href": "reference/topology.atomic.Angle.html",
-    "title": "topology.atomic.Angle",
+    "objectID": "reference/runmanager.html#functions",
+    "href": "reference/runmanager.html#functions",
+    "title": "runmanager",
     "section": "",
-    "text": "topology.atomic.Angle(ai, aj, ak, funct, c0=None, c1=None, c2=None, c3=None)\nInformation about one angle\nA class containing angle information as in the angles section of the topology.\nFrom gromacs topology: ‘;’, ‘ai’, ‘aj’, ‘ak’, ‘funct’, ‘c0’, ‘c1’, ‘c2’, ‘c3’ With aj &lt; ai &lt; ak\n\n\n\n\n\nName\nDescription\n\n\n\n\nfrom_top_line\n\n\n\n\n\n\ntopology.atomic.Angle.from_top_line(cls, l)"
+    "text": "Name\nDescription\n\n\n\n\nget_existing_files\nInitialize latest_files with every existing file defined in config\n\n\n\n\n\nrunmanager.get_existing_files(config)\nInitialize latest_files with every existing file defined in config"
   },
   {
-    "objectID": "reference/topology.atomic.Angle.html#methods",
-    "href": "reference/topology.atomic.Angle.html#methods",
-    "title": "topology.atomic.Angle",
+    "objectID": "reference/kimmdy.runmanager.get_existing_files.html",
+    "href": "reference/kimmdy.runmanager.get_existing_files.html",
+    "title": "get_existing_files",
     "section": "",
-    "text": "Name\nDescription\n\n\n\n\nfrom_top_line\n\n\n\n\n\n\ntopology.atomic.Angle.from_top_line(cls, l)"
+    "text": "get_existing_files\nrunmanager.get_existing_files(config)\nInitialize latest_files with every existing file defined in config\n\n\n\n\n Back to top"
   },
   {
-    "objectID": "reference/kimmdy.runmanager.RunManager.iteration.html",
-    "href": "reference/kimmdy.runmanager.RunManager.iteration.html",
-    "title": "iteration",
+    "objectID": "reference/kimmdy.topology.atomic.ResidueType.html",
+    "href": "reference/kimmdy.topology.atomic.ResidueType.html",
+    "title": "ResidueType",
     "section": "",
-    "text": "iteration\nrunmanager.RunManager.iteration\n\n\n\n\n Back to top"
+    "text": "ResidueType\ntopology.atomic.ResidueType(residue, atoms, bonds, proper_dihedrals, improper_dihedrals)\nInformation about one residuetype from aminoacids.rtp\n\n\n\n\n Back to top"
   },
   {
-    "objectID": "reference/kimmdy.runmanager.RunManager.reaction_results.html",
-    "href": "reference/kimmdy.runmanager.RunManager.reaction_results.html",
-    "title": "reaction_results",
+    "objectID": "reference/kimmdy.topology.atomic.AtomicTypes.html",
+    "href": "reference/kimmdy.topology.atomic.AtomicTypes.html",
+    "title": "AtomicTypes",
     "section": "",
-    "text": "reaction_results\nrunmanager.RunManager.reaction_results\n\n\n\n\n Back to top"
+    "text": "AtomicTypes\ntopology.atomic.AtomicTypes\n\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "reference/kimmdy.topology.atomic.PositionRestraint.html",
+    "href": "reference/kimmdy.topology.atomic.PositionRestraint.html",
+    "title": "PositionRestraint",
+    "section": "",
+    "text": "PositionRestraint\ntopology.atomic.PositionRestraint(ai, funct, fc, condition=None)\nInformation about one position restraint.\nA class containing information as in the position_restraints section of the topology.\nFrom gromacs topology: ; ai funct fc(x,y,z)\n\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "reference/misc_helper.html",
+    "href": "reference/misc_helper.html",
+    "title": "misc_helper",
+    "section": "",
+    "text": "misc_helper\n\n\n\n\n\nName\nDescription\n\n\n\n\nconcat_traj\nFind and concatenate trajectories from KIMMDY runs.\n\n\nedgelist_to_dot_graph\n\n\n\ntop_to_graph\n\n\n\ntopology_to_edgelist\n\n\n\n\n\n\nmisc_helper.concat_traj(run_dir, out=None, run_types=None)\nFind and concatenate trajectories from KIMMDY runs.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nrun_dir\npathlib.Path | str\nDirectory containing directories of multiple tasks.\nrequired\n\n\nout\nPath\nFile Path into the output trr will be written. Default concat.trr in given run_dir\nNone\n\n\nrun_types\nlist\nList of tasks to get trrs from. If a task is not in this list it will be skipped. By default None\nNone\n\n\n\n\n\n\n\nmisc_helper.edgelist_to_dot_graph(ls, overlap='true')\n\n\n\nmisc_helper.top_to_graph(top, overlap='true')\n\n\n\nmisc_helper.topology_to_edgelist(top)"
+  },
+  {
+    "objectID": "reference/misc_helper.html#functions",
+    "href": "reference/misc_helper.html#functions",
+    "title": "misc_helper",
+    "section": "",
+    "text": "Name\nDescription\n\n\n\n\nconcat_traj\nFind and concatenate trajectories from KIMMDY runs.\n\n\nedgelist_to_dot_graph\n\n\n\ntop_to_graph\n\n\n\ntopology_to_edgelist\n\n\n\n\n\n\nmisc_helper.concat_traj(run_dir, out=None, run_types=None)\nFind and concatenate trajectories from KIMMDY runs.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nrun_dir\npathlib.Path | str\nDirectory containing directories of multiple tasks.\nrequired\n\n\nout\nPath\nFile Path into the output trr will be written. Default concat.trr in given run_dir\nNone\n\n\nrun_types\nlist\nList of tasks to get trrs from. If a task is not in this list it will be skipped. By default None\nNone\n\n\n\n\n\n\n\nmisc_helper.edgelist_to_dot_graph(ls, overlap='true')\n\n\n\nmisc_helper.top_to_graph(top, overlap='true')\n\n\n\nmisc_helper.topology_to_edgelist(top)"
+  },
+  {
+    "objectID": "reference/reactions.homolysis.html",
+    "href": "reference/reactions.homolysis.html",
+    "title": "reactions.homolysis",
+    "section": "",
+    "text": "reactions.homolysis\nreactions.homolysis\n\n\n\n\n Back to top"
   },
   {
     "objectID": "reference/config.html",
@@ -896,53 +462,298 @@
     "text": "Name\nDescription\n\n\n\n\ncheck_file_exists\n\n\n\n\n\n\nconfig.check_file_exists(p)"
   },
   {
-    "objectID": "reference/index.html",
-    "href": "reference/index.html",
-    "title": "Function reference",
+    "objectID": "reference/kimmdy.topology.atomic.AtomicType.html",
+    "href": "reference/kimmdy.topology.atomic.AtomicType.html",
+    "title": "AtomicType",
     "section": "",
-    "text": "Start KIMMDY from a python script or the command line\n\n\n\ncmd\n\n\n\n\n\n\n\nTODO\n\n\n\nchangemanager\n\n\n\nconfig\n\n\n\nconstants\n\n\n\ncoordinates\n\n\n\nkmc\n\n\n\nmisc_helper\n\n\n\nparsing\n\n\n\nreaction\n\n\n\nrunmanager\n\n\n\ntasks\n\n\n\nutils\n\n\n\ntopology.topology.Topology\nSmart container for parsed topology data.\n\n\ntopology.ff\n\n\n\ntopology.utils\n\n\n\n\n\n\n\nInternal representations of topology and forcfield entities\n\n\n\ntopology.atomic\n\n\n\ntopology.atomic.Atom\nInformation about one atom\n\n\ntopology.atomic.AtomType\nInformation about one atom\n\n\ntopology.atomic.Bond\nInformation about one bond\n\n\ntopology.atomic.BondType\nInformation about one bondtype\n\n\ntopology.atomic.PositionRestraint\nInformation about one position restraint.\n\n\ntopology.atomic.DihedralRestraint\nInformation about one dihedral restraint.\n\n\ntopology.atomic.Pair\nInformation about one pair\n\n\ntopology.atomic.Angle\nInformation about one angle\n\n\ntopology.atomic.AngleType\nInformation about one angle\n\n\ntopology.atomic.DihedralType\nInformation about one dihedral\n\n\ntopology.atomic.ResidueAtomSpec\nInformation about one atom in a residue\n\n\ntopology.atomic.ResidueBondSpec\nInformation about one bond in a residue\n\n\ntopology.atomic.ResidueImproperSpec\nInformation about one imroper dihedral in a residue\n\n\ntopology.atomic.ResidueProperSpec\nInformation about one imroper dihedral in a residue\n\n\ntopology.atomic.ResidueType\nInformation about one residuetype from aminoacids.rtp\n\n\n\n\n\n\nReaction plugins bundled with KIMMDY\n\n\n\nreactions.homolysis"
+    "text": "AtomicType\ntopology.atomic.AtomicType\n\n\n\n\n Back to top"
   },
   {
-    "objectID": "reference/index.html#api",
-    "href": "reference/index.html#api",
-    "title": "Function reference",
+    "objectID": "reference/kimmdy.topology.atomic.Atom.html",
+    "href": "reference/kimmdy.topology.atomic.Atom.html",
+    "title": "Atom",
     "section": "",
-    "text": "Start KIMMDY from a python script or the command line\n\n\n\ncmd"
+    "text": "Atom\ntopology.atomic.Atom(nr, type, resnr, residue, atom, cgnr, charge, mass, typeB=None, chargeB=None, massB=None, bound_to_nrs=field(default_factory=list), is_radical=False)\nInformation about one atom\nA class containing atom information as in the atoms section of the topology. An atom keeps a list of which atoms it is bound to.\nFrom gromacs topology: ; nr type resnr residue atom cgnr charge mass typeB chargeB massB\n\n\n\n\n Back to top"
   },
   {
-    "objectID": "reference/index.html#internals",
-    "href": "reference/index.html#internals",
-    "title": "Function reference",
+    "objectID": "reference/kimmdy.topology.atomic.DihedralType.html",
+    "href": "reference/kimmdy.topology.atomic.DihedralType.html",
+    "title": "DihedralType",
     "section": "",
-    "text": "TODO\n\n\n\nchangemanager\n\n\n\nconfig\n\n\n\nconstants\n\n\n\ncoordinates\n\n\n\nkmc\n\n\n\nmisc_helper\n\n\n\nparsing\n\n\n\nreaction\n\n\n\nrunmanager\n\n\n\ntasks\n\n\n\nutils\n\n\n\ntopology.topology.Topology\nSmart container for parsed topology data.\n\n\ntopology.ff\n\n\n\ntopology.utils"
+    "text": "DihedralType\ntopology.atomic.DihedralType(i, j, k, l, id, id_sym, funct, c0, c1, periodicity, c3=None, c4=None, c5=None)\nInformation about one dihedral\nA class containing bond information as in the dihedrals section of the topology. Proper dihedrals have funct 9. Improper dihedrals have funct 4.\nNote that proper dihedrals of type 9 can be defined multiple times, for different periodicities. This is why would-be parameter c2 is called periodicity and part of the id.\nFrom gromacs topology: ‘;’, ‘i’, ‘j’, ‘k’, ‘l’, ‘funct’, ‘c0’, ‘c1’, ‘periodicity’, ‘c3’, ‘c4’, ‘c5’ Where i,j,k,l are atomtypes\n\n\n\n\n Back to top"
   },
   {
-    "objectID": "reference/index.html#atomic-types",
-    "href": "reference/index.html#atomic-types",
-    "title": "Function reference",
+    "objectID": "reference/runmanager.RunManager.html",
+    "href": "reference/runmanager.RunManager.html",
+    "title": "runmanager.RunManager",
     "section": "",
-    "text": "Internal representations of topology and forcfield entities\n\n\n\ntopology.atomic\n\n\n\ntopology.atomic.Atom\nInformation about one atom\n\n\ntopology.atomic.AtomType\nInformation about one atom\n\n\ntopology.atomic.Bond\nInformation about one bond\n\n\ntopology.atomic.BondType\nInformation about one bondtype\n\n\ntopology.atomic.PositionRestraint\nInformation about one position restraint.\n\n\ntopology.atomic.DihedralRestraint\nInformation about one dihedral restraint.\n\n\ntopology.atomic.Pair\nInformation about one pair\n\n\ntopology.atomic.Angle\nInformation about one angle\n\n\ntopology.atomic.AngleType\nInformation about one angle\n\n\ntopology.atomic.DihedralType\nInformation about one dihedral\n\n\ntopology.atomic.ResidueAtomSpec\nInformation about one atom in a residue\n\n\ntopology.atomic.ResidueBondSpec\nInformation about one bond in a residue\n\n\ntopology.atomic.ResidueImproperSpec\nInformation about one imroper dihedral in a residue\n\n\ntopology.atomic.ResidueProperSpec\nInformation about one imroper dihedral in a residue\n\n\ntopology.atomic.ResidueType\nInformation about one residuetype from aminoacids.rtp"
+    "text": "runmanager.RunManager(self, config)\nThe RunManager, a central piece.\nManages the queue of tasks, communicates with the rest of the program and keeps track of global state.\n\n\n\n\n\nName\nDescription\n\n\n\n\nget_latest\nReturns path to latest file of given type.\n\n\nrun\n\n\n\n\n\n\nrunmanager.RunManager.get_latest(self, suffix)\nReturns path to latest file of given type.\nFor .dat files (in general ambiguous extensions) use full file name. Errors if file is not found.\n\n\n\nrunmanager.RunManager.run(self)"
   },
   {
-    "objectID": "reference/index.html#reactions",
-    "href": "reference/index.html#reactions",
-    "title": "Function reference",
+    "objectID": "reference/runmanager.RunManager.html#methods",
+    "href": "reference/runmanager.RunManager.html#methods",
+    "title": "runmanager.RunManager",
     "section": "",
-    "text": "Reaction plugins bundled with KIMMDY\n\n\n\nreactions.homolysis"
+    "text": "Name\nDescription\n\n\n\n\nget_latest\nReturns path to latest file of given type.\n\n\nrun\n\n\n\n\n\n\nrunmanager.RunManager.get_latest(self, suffix)\nReturns path to latest file of given type.\nFor .dat files (in general ambiguous extensions) use full file name. Errors if file is not found.\n\n\n\nrunmanager.RunManager.run(self)"
   },
   {
-    "objectID": "reference/kimmdy.runmanager.default_decision_strategy.html",
-    "href": "reference/kimmdy.runmanager.default_decision_strategy.html",
-    "title": "default_decision_strategy",
+    "objectID": "reference/topology.ff.html",
+    "href": "reference/topology.ff.html",
+    "title": "topology.ff",
     "section": "",
-    "text": "runmanager.default_decision_strategy(reaction_results)\nRejection-Free Monte Carlo. takes a list of ReactionResults and choses a recipe.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nreaction_reults\n\nfrom which one will be choosen\nrequired"
+    "text": "topology.ff\n\n\n\n\n\nName\nDescription\n\n\n\n\nPatch\n\n\n\nPatches\n\n\n\n\n\n\n\n\n\n\nName\nDescription\n\n\n\n\nprops_to_patches\n\n\n\n\n\n\ntopology.ff.props_to_patches(props)"
   },
   {
-    "objectID": "reference/kimmdy.runmanager.default_decision_strategy.html#parameters",
-    "href": "reference/kimmdy.runmanager.default_decision_strategy.html#parameters",
-    "title": "default_decision_strategy",
+    "objectID": "reference/topology.ff.html#attributes",
+    "href": "reference/topology.ff.html#attributes",
+    "title": "topology.ff",
     "section": "",
-    "text": "Name\nType\nDescription\nDefault\n\n\n\n\nreaction_reults\n\nfrom which one will be choosen\nrequired"
+    "text": "Name\nDescription\n\n\n\n\nPatch\n\n\n\nPatches"
+  },
+  {
+    "objectID": "reference/topology.ff.html#functions",
+    "href": "reference/topology.ff.html#functions",
+    "title": "topology.ff",
+    "section": "",
+    "text": "Name\nDescription\n\n\n\n\nprops_to_patches\n\n\n\n\n\n\ntopology.ff.props_to_patches(props)"
+  },
+  {
+    "objectID": "reference/coordinates.html",
+    "href": "reference/coordinates.html",
+    "title": "coordinates",
+    "section": "",
+    "text": "coordinates\n\n\n\n\n\nName\nDescription\n\n\n\n\nget_atomicobj\n\n\n\nget_keys\n\n\n\nis_parameterized\nParameterized topology entries have c0 and c1 attributes != None\n\n\nmerge_same\n\n\n\nmerge_top_parameter_growth\n\n\n\n\n\n\ncoordinates.get_atomicobj(key, type, top)\n\n\n\ncoordinates.get_keys(atomicA, atomicB)\n\n\n\ncoordinates.is_parameterized(entry)\nParameterized topology entries have c0 and c1 attributes != None\n\n\n\ncoordinates.merge_same(same, topA, topB, type)\n\n\n\ncoordinates.merge_top_parameter_growth(files, focus_nr=None)"
+  },
+  {
+    "objectID": "reference/coordinates.html#functions",
+    "href": "reference/coordinates.html#functions",
+    "title": "coordinates",
+    "section": "",
+    "text": "Name\nDescription\n\n\n\n\nget_atomicobj\n\n\n\nget_keys\n\n\n\nis_parameterized\nParameterized topology entries have c0 and c1 attributes != None\n\n\nmerge_same\n\n\n\nmerge_top_parameter_growth\n\n\n\n\n\n\ncoordinates.get_atomicobj(key, type, top)\n\n\n\ncoordinates.get_keys(atomicA, atomicB)\n\n\n\ncoordinates.is_parameterized(entry)\nParameterized topology entries have c0 and c1 attributes != None\n\n\n\ncoordinates.merge_same(same, topA, topB, type)\n\n\n\ncoordinates.merge_top_parameter_growth(files, focus_nr=None)"
+  },
+  {
+    "objectID": "reference/topology.utils.html",
+    "href": "reference/topology.utils.html",
+    "title": "topology.utils",
+    "section": "",
+    "text": "topology.utils\n\n\n\n\n\nName\nDescription\n\n\n\n\nattributes_to_list\n\n\n\nfield_or_none\n\n\n\nget_by_permutations\n\n\n\nget_element_id\n\n\n\nget_protein_section\nGet content of a section in the first moleculetype (protein) from a topology dict.\n\n\nget_top_section\nGet content of a section from a topology dict.\n\n\nis_not_none\n\n\n\nmatch_atomic_item_to_atomic_type\n\n\n\nmatch_attr\n\n\n\nmatch_id_to_patch\n\n\n\nmatch_multi_attr\n\n\n\nset_protein_section\nSet content of a section in the first moleculetype (protein) from a topology dict.\n\n\nset_top_section\nSet content of a section from a topology dict.\n\n\n\n\n\ntopology.utils.attributes_to_list(obj)\n\n\n\ntopology.utils.field_or_none(l, i)\n\n\n\ntopology.utils.get_by_permutations(d, key)\n\n\n\ntopology.utils.get_element_id(e)\n\n\n\ntopology.utils.get_protein_section(top, name)\nGet content of a section in the first moleculetype (protein) from a topology dict.\n\n\n\ntopology.utils.get_top_section(top, name, moleculetype=None)\nGet content of a section from a topology dict. By resolving any #ifdef statements by check in the top[‘define’] dict and choosing the ‘content’ or ‘else_content’ depending on the result.\n\n\n\ntopology.utils.is_not_none(x)\n\n\n\ntopology.utils.match_atomic_item_to_atomic_type(id, types)\n\n\n\ntopology.utils.match_attr(patches, attr, m)\n\n\n\ntopology.utils.match_id_to_patch(id, patches)\n\n\n\ntopology.utils.match_multi_attr(patches, attrs, m)\n\n\n\ntopology.utils.set_protein_section(top, name, value)\nSet content of a section in the first moleculetype (protein) from a topology dict.\n\n\n\ntopology.utils.set_top_section(top, name, value, moleculetype=None)\nSet content of a section from a topology dict. By resolving any #ifdef statements by check in the top[‘define’] dict and choosing the ‘content’ or ‘else_content’ depending on the result."
+  },
+  {
+    "objectID": "reference/topology.utils.html#functions",
+    "href": "reference/topology.utils.html#functions",
+    "title": "topology.utils",
+    "section": "",
+    "text": "Name\nDescription\n\n\n\n\nattributes_to_list\n\n\n\nfield_or_none\n\n\n\nget_by_permutations\n\n\n\nget_element_id\n\n\n\nget_protein_section\nGet content of a section in the first moleculetype (protein) from a topology dict.\n\n\nget_top_section\nGet content of a section from a topology dict.\n\n\nis_not_none\n\n\n\nmatch_atomic_item_to_atomic_type\n\n\n\nmatch_attr\n\n\n\nmatch_id_to_patch\n\n\n\nmatch_multi_attr\n\n\n\nset_protein_section\nSet content of a section in the first moleculetype (protein) from a topology dict.\n\n\nset_top_section\nSet content of a section from a topology dict.\n\n\n\n\n\ntopology.utils.attributes_to_list(obj)\n\n\n\ntopology.utils.field_or_none(l, i)\n\n\n\ntopology.utils.get_by_permutations(d, key)\n\n\n\ntopology.utils.get_element_id(e)\n\n\n\ntopology.utils.get_protein_section(top, name)\nGet content of a section in the first moleculetype (protein) from a topology dict.\n\n\n\ntopology.utils.get_top_section(top, name, moleculetype=None)\nGet content of a section from a topology dict. By resolving any #ifdef statements by check in the top[‘define’] dict and choosing the ‘content’ or ‘else_content’ depending on the result.\n\n\n\ntopology.utils.is_not_none(x)\n\n\n\ntopology.utils.match_atomic_item_to_atomic_type(id, types)\n\n\n\ntopology.utils.match_attr(patches, attr, m)\n\n\n\ntopology.utils.match_id_to_patch(id, patches)\n\n\n\ntopology.utils.match_multi_attr(patches, attrs, m)\n\n\n\ntopology.utils.set_protein_section(top, name, value)\nSet content of a section in the first moleculetype (protein) from a topology dict.\n\n\n\ntopology.utils.set_top_section(top, name, value, moleculetype=None)\nSet content of a section from a topology dict. By resolving any #ifdef statements by check in the top[‘define’] dict and choosing the ‘content’ or ‘else_content’ depending on the result."
+  },
+  {
+    "objectID": "reference/topology.atomic.DihedralRestraint.html",
+    "href": "reference/topology.atomic.DihedralRestraint.html",
+    "title": "topology.atomic.DihedralRestraint",
+    "section": "",
+    "text": "topology.atomic.DihedralRestraint(ai, aj, ak, al, type, phi, dphi, fc)\nInformation about one dihedral restraint.\nA class containing information as in the dihedral_restraints section of the topology.\nFrom gromacs topology: ; ai aj ak al type phi dphi fc\n\n\n\n\n\nName\nDescription\n\n\n\n\nfrom_top_line\n\n\n\n\n\n\ntopology.atomic.DihedralRestraint.from_top_line(cls, l)"
+  },
+  {
+    "objectID": "reference/topology.atomic.DihedralRestraint.html#methods",
+    "href": "reference/topology.atomic.DihedralRestraint.html#methods",
+    "title": "topology.atomic.DihedralRestraint",
+    "section": "",
+    "text": "Name\nDescription\n\n\n\n\nfrom_top_line\n\n\n\n\n\n\ntopology.atomic.DihedralRestraint.from_top_line(cls, l)"
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.State.html",
+    "href": "reference/kimmdy.runmanager.State.html",
+    "title": "State",
+    "section": "",
+    "text": "State\nrunmanager.State()\nState of the system. one of IDLE, MD, REACTION, DONE.\n\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.RunManager.histfile.html",
+    "href": "reference/kimmdy.runmanager.RunManager.histfile.html",
+    "title": "histfile",
+    "section": "",
+    "text": "histfile\nrunmanager.RunManager.histfile\n\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "reference/topology.atomic.BondType.html",
+    "href": "reference/topology.atomic.BondType.html",
+    "title": "topology.atomic.BondType",
+    "section": "",
+    "text": "topology.atomic.BondType(i, j, id, id_sym, funct, c0=None, c1=None, c2=None, c3=None)\nInformation about one bondtype\nA class containing bond information as in the bonds section of the topology. From gromacs topology: ‘i’, ‘j’, ‘funct’, ‘c0’, ‘c1’, ‘c2’, ’c3 Where i and j are atomtypes\n\n\n\n\n\nName\nDescription\n\n\n\n\nfrom_top_line\n\n\n\n\n\n\ntopology.atomic.BondType.from_top_line(cls, l)"
+  },
+  {
+    "objectID": "reference/topology.atomic.BondType.html#methods",
+    "href": "reference/topology.atomic.BondType.html#methods",
+    "title": "topology.atomic.BondType",
+    "section": "",
+    "text": "Name\nDescription\n\n\n\n\nfrom_top_line\n\n\n\n\n\n\ntopology.atomic.BondType.from_top_line(cls, l)"
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.RunManager.latest_files.html",
+    "href": "reference/kimmdy.runmanager.RunManager.latest_files.html",
+    "title": "latest_files",
+    "section": "",
+    "text": "latest_files\nrunmanager.RunManager.latest_files\n\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.RunManager.state.html",
+    "href": "reference/kimmdy.runmanager.RunManager.state.html",
+    "title": "state",
+    "section": "",
+    "text": "state\nrunmanager.RunManager.state\n\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "reference/kimmdy.topology.atomic.Angle.html",
+    "href": "reference/kimmdy.topology.atomic.Angle.html",
+    "title": "Angle",
+    "section": "",
+    "text": "Angle\ntopology.atomic.Angle(ai, aj, ak, funct, c0=None, c1=None, c2=None, c3=None)\nInformation about one angle\nA class containing angle information as in the angles section of the topology.\nFrom gromacs topology: ‘;’, ‘ai’, ‘aj’, ‘ak’, ‘funct’, ‘c0’, ‘c1’, ‘c2’, ‘c3’ With aj &lt; ai &lt; ak\n\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "reference/topology.atomic.ResidueAtomSpec.html",
+    "href": "reference/topology.atomic.ResidueAtomSpec.html",
+    "title": "topology.atomic.ResidueAtomSpec",
+    "section": "",
+    "text": "topology.atomic.ResidueAtomSpec(name, type, charge, cgrp)\nInformation about one atom in a residue ; name type charge chargegroup\n\n\n\n\n\nName\nDescription\n\n\n\n\nfrom_top_line\n\n\n\n\n\n\ntopology.atomic.ResidueAtomSpec.from_top_line(cls, l)"
+  },
+  {
+    "objectID": "reference/topology.atomic.ResidueAtomSpec.html#methods",
+    "href": "reference/topology.atomic.ResidueAtomSpec.html#methods",
+    "title": "topology.atomic.ResidueAtomSpec",
+    "section": "",
+    "text": "Name\nDescription\n\n\n\n\nfrom_top_line\n\n\n\n\n\n\ntopology.atomic.ResidueAtomSpec.from_top_line(cls, l)"
+  },
+  {
+    "objectID": "reference/kmc.html",
+    "href": "reference/kmc.html",
+    "title": "kmc",
+    "section": "",
+    "text": "kmc\n\n\n\n\n\nName\nDescription\n\n\n\n\nfrm\nFirst Reaction Method variant of Kinetic Monte Carlo.\n\n\nrf_kmc\nRejection-Free Monte Carlo.\n\n\n\n\n\nkmc.frm(recipe_collection, rng=default_rng(), MD_time=None)\nFirst Reaction Method variant of Kinetic Monte Carlo. takes RecipeCollection and choses a recipe based on which reaction would occur.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nreaction_result\n\nfrom which one will be choosen\nrequired\n\n\nrng\nnumpy.random.BitGenerator\nto generate random numbers in the KMC step\ndefault_rng()\n\n\nMD_time\ntyping.Union[float, None]\nto compare conformational events with reaction events in the time domain\nNone\n\n\n\n\n\n\n\nkmc.rf_kmc(recipe_collection, rng=default_rng())\nRejection-Free Monte Carlo. takes RecipeCollection and choses a recipe based on the relative propensity of the events.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nreaction_result\n\nfrom which one will be choosen\nrequired\n\n\nrng\nnumpy.random.BitGenerator\nto generate random numbers in the KMC step\ndefault_rng()"
+  },
+  {
+    "objectID": "reference/kmc.html#functions",
+    "href": "reference/kmc.html#functions",
+    "title": "kmc",
+    "section": "",
+    "text": "Name\nDescription\n\n\n\n\nfrm\nFirst Reaction Method variant of Kinetic Monte Carlo.\n\n\nrf_kmc\nRejection-Free Monte Carlo.\n\n\n\n\n\nkmc.frm(recipe_collection, rng=default_rng(), MD_time=None)\nFirst Reaction Method variant of Kinetic Monte Carlo. takes RecipeCollection and choses a recipe based on which reaction would occur.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nreaction_result\n\nfrom which one will be choosen\nrequired\n\n\nrng\nnumpy.random.BitGenerator\nto generate random numbers in the KMC step\ndefault_rng()\n\n\nMD_time\ntyping.Union[float, None]\nto compare conformational events with reaction events in the time domain\nNone\n\n\n\n\n\n\n\nkmc.rf_kmc(recipe_collection, rng=default_rng())\nRejection-Free Monte Carlo. takes RecipeCollection and choses a recipe based on the relative propensity of the events.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nreaction_result\n\nfrom which one will be choosen\nrequired\n\n\nrng\nnumpy.random.BitGenerator\nto generate random numbers in the KMC step\ndefault_rng()"
+  },
+  {
+    "objectID": "reference/topology.atomic.AtomType.html",
+    "href": "reference/topology.atomic.AtomType.html",
+    "title": "topology.atomic.AtomType",
+    "section": "",
+    "text": "topology.atomic.AtomType(type, id_sym, at_num, mass, charge, ptype, sigma, epsilon, id)\nInformation about one atom\nA class containing atom information as in the atoms section of the topology. An atom keeps a list of which atoms it is bound to.\nFrom gromacs version of the amber* ff: ; name at.num mass charge ptype sigma epsilon\n\n\n\n\n\nName\nDescription\n\n\n\n\nfrom_top_line\n\n\n\n\n\n\ntopology.atomic.AtomType.from_top_line(cls, l)"
+  },
+  {
+    "objectID": "reference/topology.atomic.AtomType.html#methods",
+    "href": "reference/topology.atomic.AtomType.html#methods",
+    "title": "topology.atomic.AtomType",
+    "section": "",
+    "text": "Name\nDescription\n\n\n\n\nfrom_top_line\n\n\n\n\n\n\ntopology.atomic.AtomType.from_top_line(cls, l)"
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.RunManager.crr_tasks.html",
+    "href": "reference/kimmdy.runmanager.RunManager.crr_tasks.html",
+    "title": "crr_tasks",
+    "section": "",
+    "text": "crr_tasks\nrunmanager.RunManager.crr_tasks\n\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "reference/changemanager.html",
+    "href": "reference/changemanager.html",
+    "title": "changemanager",
+    "section": "",
+    "text": "changemanager\n\n\n\n\n\nName\nDescription\n\n\n\n\nbreak_bond_plumed\n\n\n\nmodify_coords\n\n\n\nmodify_plumed\n\n\n\nmodify_top\n\n\n\n\n\n\nchangemanager.break_bond_plumed(plumeddat, breakpair, plumeddist)\n\n\n\nchangemanager.modify_coords(recipe_steps, files)\n\n\n\nchangemanager.modify_plumed(recipe_steps, oldplumeddat, newplumeddat, plumeddist)\n\n\n\nchangemanager.modify_top(recipe_steps, files, ffpatch, topology)"
+  },
+  {
+    "objectID": "reference/changemanager.html#functions",
+    "href": "reference/changemanager.html#functions",
+    "title": "changemanager",
+    "section": "",
+    "text": "Name\nDescription\n\n\n\n\nbreak_bond_plumed\n\n\n\nmodify_coords\n\n\n\nmodify_plumed\n\n\n\nmodify_top\n\n\n\n\n\n\nchangemanager.break_bond_plumed(plumeddat, breakpair, plumeddist)\n\n\n\nchangemanager.modify_coords(recipe_steps, files)\n\n\n\nchangemanager.modify_plumed(recipe_steps, oldplumeddat, newplumeddat, plumeddist)\n\n\n\nchangemanager.modify_top(recipe_steps, files, ffpatch, topology)"
+  },
+  {
+    "objectID": "reference/topology.atomic.ResidueImproperSpec.html",
+    "href": "reference/topology.atomic.ResidueImproperSpec.html",
+    "title": "topology.atomic.ResidueImproperSpec",
+    "section": "",
+    "text": "topology.atomic.ResidueImproperSpec(atom1, atom2, atom3, atom4, q0, cq)\nInformation about one imroper dihedral in a residue ;atom1 atom2 atom3 atom4 q0 cq\n\n\n\n\n\nName\nDescription\n\n\n\n\nfrom_top_line\n\n\n\n\n\n\ntopology.atomic.ResidueImproperSpec.from_top_line(cls, l)"
+  },
+  {
+    "objectID": "reference/topology.atomic.ResidueImproperSpec.html#methods",
+    "href": "reference/topology.atomic.ResidueImproperSpec.html#methods",
+    "title": "topology.atomic.ResidueImproperSpec",
+    "section": "",
+    "text": "Name\nDescription\n\n\n\n\nfrom_top_line\n\n\n\n\n\n\ntopology.atomic.ResidueImproperSpec.from_top_line(cls, l)"
+  },
+  {
+    "objectID": "reference/topology.atomic.Atom.html",
+    "href": "reference/topology.atomic.Atom.html",
+    "title": "topology.atomic.Atom",
+    "section": "",
+    "text": "topology.atomic.Atom(nr, type, resnr, residue, atom, cgnr, charge, mass, typeB=None, chargeB=None, massB=None, bound_to_nrs=field(default_factory=list), is_radical=False)\nInformation about one atom\nA class containing atom information as in the atoms section of the topology. An atom keeps a list of which atoms it is bound to.\nFrom gromacs topology: ; nr type resnr residue atom cgnr charge mass typeB chargeB massB\n\n\n\n\n\nName\nDescription\n\n\n\n\nfrom_top_line\n\n\n\nradical_type\n\n\n\n\n\n\ntopology.atomic.Atom.from_top_line(cls, l)\n\n\n\ntopology.atomic.Atom.radical_type(self)"
+  },
+  {
+    "objectID": "reference/topology.atomic.Atom.html#methods",
+    "href": "reference/topology.atomic.Atom.html#methods",
+    "title": "topology.atomic.Atom",
+    "section": "",
+    "text": "Name\nDescription\n\n\n\n\nfrom_top_line\n\n\n\nradical_type\n\n\n\n\n\n\ntopology.atomic.Atom.from_top_line(cls, l)\n\n\n\ntopology.atomic.Atom.radical_type(self)"
+  },
+  {
+    "objectID": "reference/kimmdy.topology.atomic.ResidueProperSpec.html",
+    "href": "reference/kimmdy.topology.atomic.ResidueProperSpec.html",
+    "title": "ResidueProperSpec",
+    "section": "",
+    "text": "ResidueProperSpec\ntopology.atomic.ResidueProperSpec(atom1, atom2, atom3, atom4, q0)\nInformation about one imroper dihedral in a residue ;atom1 atom2 atom3 atom4 q0 cq\n\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.RunManager.tasks.html",
+    "href": "reference/kimmdy.runmanager.RunManager.tasks.html",
+    "title": "tasks",
+    "section": "",
+    "text": "tasks\nrunmanager.RunManager.tasks\n\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "reference/topology.atomic.Bond.html",
+    "href": "reference/topology.atomic.Bond.html",
+    "title": "topology.atomic.Bond",
+    "section": "",
+    "text": "topology.atomic.Bond(ai, aj, funct, c0=None, c1=None, c2=None, c3=None, c4=None, c5=None)\nInformation about one bond\nA class containing bond information as in the bonds section of the topology. From gromacs topology: ‘ai’, ‘aj’, ‘funct’, ‘c0’, ‘c1’, ‘c2’, ‘c3’, ‘c4’, ‘c5’ With ai &lt; aj\n\n\n\n\n\nName\nDescription\n\n\n\n\nfrom_top_line\n\n\n\n\n\n\ntopology.atomic.Bond.from_top_line(cls, l)"
+  },
+  {
+    "objectID": "reference/topology.atomic.Bond.html#methods",
+    "href": "reference/topology.atomic.Bond.html#methods",
+    "title": "topology.atomic.Bond",
+    "section": "",
+    "text": "Name\nDescription\n\n\n\n\nfrom_top_line\n\n\n\n\n\n\ntopology.atomic.Bond.from_top_line(cls, l)"
+  },
+  {
+    "objectID": "reference/topology.atomic.Angle.html",
+    "href": "reference/topology.atomic.Angle.html",
+    "title": "topology.atomic.Angle",
+    "section": "",
+    "text": "topology.atomic.Angle(ai, aj, ak, funct, c0=None, c1=None, c2=None, c3=None)\nInformation about one angle\nA class containing angle information as in the angles section of the topology.\nFrom gromacs topology: ‘;’, ‘ai’, ‘aj’, ‘ak’, ‘funct’, ‘c0’, ‘c1’, ‘c2’, ‘c3’ With aj &lt; ai &lt; ak\n\n\n\n\n\nName\nDescription\n\n\n\n\nfrom_top_line\n\n\n\n\n\n\ntopology.atomic.Angle.from_top_line(cls, l)"
+  },
+  {
+    "objectID": "reference/topology.atomic.Angle.html#methods",
+    "href": "reference/topology.atomic.Angle.html#methods",
+    "title": "topology.atomic.Angle",
+    "section": "",
+    "text": "Name\nDescription\n\n\n\n\nfrom_top_line\n\n\n\n\n\n\ntopology.atomic.Angle.from_top_line(cls, l)"
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.RunManager.run.html",
+    "href": "reference/kimmdy.runmanager.RunManager.run.html",
+    "title": "run",
+    "section": "",
+    "text": "run\nrunmanager.RunManager.run(self)\n\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "reference/kimmdy.topology.atomic.DihedralRestraint.html",
+    "href": "reference/kimmdy.topology.atomic.DihedralRestraint.html",
+    "title": "DihedralRestraint",
+    "section": "",
+    "text": "DihedralRestraint\ntopology.atomic.DihedralRestraint(ai, aj, ak, al, type, phi, dphi, fc)\nInformation about one dihedral restraint.\nA class containing information as in the dihedral_restraints section of the topology.\nFrom gromacs topology: ; ai aj ak al type phi dphi fc\n\n\n\n\n Back to top"
   },
   {
     "objectID": "reference/topology.atomic.AngleType.html",
@@ -959,10 +770,192 @@
     "text": "Name\nDescription\n\n\n\n\nfrom_top_line\n\n\n\n\n\n\ntopology.atomic.AngleType.from_top_line(cls, l)"
   },
   {
+    "objectID": "reference/kimmdy.topology.atomic.Bond.html",
+    "href": "reference/kimmdy.topology.atomic.Bond.html",
+    "title": "Bond",
+    "section": "",
+    "text": "Bond\ntopology.atomic.Bond(ai, aj, funct, c0=None, c1=None, c2=None, c3=None, c4=None, c5=None)\nInformation about one bond\nA class containing bond information as in the bonds section of the topology. From gromacs topology: ‘ai’, ‘aj’, ‘funct’, ‘c0’, ‘c1’, ‘c2’, ‘c3’, ‘c4’, ‘c5’ With ai &lt; aj\n\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.RunManager.cptfile.html",
+    "href": "reference/kimmdy.runmanager.RunManager.cptfile.html",
+    "title": "cptfile",
+    "section": "",
+    "text": "cptfile\nrunmanager.RunManager.cptfile\n\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "reference/cmd.kimmdy_run.html",
+    "href": "reference/cmd.kimmdy_run.html",
+    "title": "cmd.kimmdy_run",
+    "section": "",
+    "text": "cmd.kimmdy_run\ncmd.kimmdy_run(input=Path('kimmdy.yml'), loglevel='DEBUG', logfile=Path('kimmdy.log'))\nRun KIMMDY from python.\n\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "reference/kimmdy.topology.atomic.AtomType.html",
+    "href": "reference/kimmdy.topology.atomic.AtomType.html",
+    "title": "AtomType",
+    "section": "",
+    "text": "AtomType\ntopology.atomic.AtomType(type, id_sym, at_num, mass, charge, ptype, sigma, epsilon, id)\nInformation about one atom\nA class containing atom information as in the atoms section of the topology. An atom keeps a list of which atoms it is bound to.\nFrom gromacs version of the amber* ff: ; name at.num mass charge ptype sigma epsilon\n\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.RunManager.get_latest.html",
+    "href": "reference/kimmdy.runmanager.RunManager.get_latest.html",
+    "title": "get_latest",
+    "section": "",
+    "text": "get_latest\nrunmanager.RunManager.get_latest(self, suffix)\nReturns path to latest file of given type.\nFor .dat files (in general ambiguous extensions) use full file name. Errors if file is not found.\n\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.RunManager.iteration.html",
+    "href": "reference/kimmdy.runmanager.RunManager.iteration.html",
+    "title": "iteration",
+    "section": "",
+    "text": "iteration\nrunmanager.RunManager.iteration\n\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "reference/constants.html",
+    "href": "reference/constants.html",
+    "title": "constants",
+    "section": "",
+    "text": "constants\n\n\n\n\n\nName\nDescription\n\n\n\n\nATOMTYPE_BONDORDER\n\n\n\nATOMTYPE_BONDORDER_FLAT"
+  },
+  {
+    "objectID": "reference/constants.html#attributes",
+    "href": "reference/constants.html#attributes",
+    "title": "constants",
+    "section": "",
+    "text": "Name\nDescription\n\n\n\n\nATOMTYPE_BONDORDER\n\n\n\nATOMTYPE_BONDORDER_FLAT"
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.RunManager.config.html",
+    "href": "reference/kimmdy.runmanager.RunManager.config.html",
+    "title": "config",
+    "section": "",
+    "text": "config\nrunmanager.RunManager.config\n\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "reference/kimmdy.topology.atomic.DihedralId.html",
+    "href": "reference/kimmdy.topology.atomic.DihedralId.html",
+    "title": "DihedralId",
+    "section": "",
+    "text": "DihedralId\ntopology.atomic.DihedralId\n\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.RunManager.task_mapping.html",
+    "href": "reference/kimmdy.runmanager.RunManager.task_mapping.html",
+    "title": "task_mapping",
+    "section": "",
+    "text": "task_mapping\nrunmanager.RunManager.task_mapping\n\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.RunManager.reactions.html",
+    "href": "reference/kimmdy.runmanager.RunManager.reactions.html",
+    "title": "reactions",
+    "section": "",
+    "text": "reactions\nrunmanager.RunManager.reactions\n\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "reference/topology.atomic.html",
+    "href": "reference/topology.atomic.html",
+    "title": "topology.atomic",
+    "section": "",
+    "text": "topology.atomic\nAtomic datatypes for the topology such as Atom, Bond, Angle, Dihedral, etc. The order of the fields comes from the gromacs topology file format. See https://manual.gromacs.org/current/reference-manual/topologies/topology-file-formats.html#topology-file\n\n\n\n\n\nName\nDescription\n\n\n\n\nAngleId\n\n\n\nAtomId\n\n\n\nAtomic\n\n\n\nAtomicType\n\n\n\nAtomicTypes\n\n\n\nBondId\n\n\n\nDihedralId"
+  },
+  {
+    "objectID": "reference/topology.atomic.html#attributes",
+    "href": "reference/topology.atomic.html#attributes",
+    "title": "topology.atomic",
+    "section": "",
+    "text": "Name\nDescription\n\n\n\n\nAngleId\n\n\n\nAtomId\n\n\n\nAtomic\n\n\n\nAtomicType\n\n\n\nAtomicTypes\n\n\n\nBondId\n\n\n\nDihedralId"
+  },
+  {
+    "objectID": "reference/topology.topology.Topology.html",
+    "href": "reference/topology.topology.Topology.html",
+    "title": "topology.topology.Topology",
+    "section": "",
+    "text": "topology.topology.Topology(self, top, ffpatch=None)\nSmart container for parsed topology data.\nA topology keeps track of connections and applies patches to parameters when bonds are broken or formed. Assumptions: - the topology of interest (the protein) is in section ‘moleculetype_0’.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\ntop\nTopologyDict\nA dictionary containing the parsed topology data.\nrequired\n\n\nffpatch\ntyping.Optional[pathlib.Path]\nPath to a force field patch file. If None, no patching is applied.\nNone\n\n\n\n\n\n\n\n\n\nName\nDescription\n\n\n\n\nbind_bond\nAdd a bond in topology.\n\n\nbreak_bond\nBreak bonds in topology.\n\n\nmove_hydrogen\nMove a singly bound atom to a new location.\n\n\npatch_parameters\n\n\n\nreindex_atomnrs\nReindex atom numbers in topology.\n\n\nto_dict\n\n\n\n\n\n\ntopology.topology.Topology.bind_bond(self, atompair_nrs)\nAdd a bond in topology.\nModifies the topology dictionary in place. It keeps track of affected terms in the topology via a graph representation of the topology and applies the necessary changes to bonds, angles and dihedrals (proper and improper). Furthermore, it modifies to function types in the topology to account for radicals.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\natompair\n\nA tuple of integers with the atoms indices (id, starting at 1) with from, the atom being moved and to, the atom to which the from atom will be bound\nrequired\n\n\n\n\n\n\n\ntopology.topology.Topology.break_bond(self, atompair_nrs)\nBreak bonds in topology.\nremoves bond, angles and dihedrals where atompair was involved. Modifies the topology dictionary in place.\n\n\n\ntopology.topology.Topology.move_hydrogen(self, from_to)\nMove a singly bound atom to a new location.\nThis is typically H for Hydrogen Atom Transfer (HAT).\n\n\n\ntopology.topology.Topology.patch_parameters(self, focus_nr)\n\n\n\ntopology.topology.Topology.reindex_atomnrs(self)\nReindex atom numbers in topology.\nStarts at index 1. This also updates the numbers for bonds, angles, dihedrals and pairs.\n\n\n\ntopology.topology.Topology.to_dict(self)"
+  },
+  {
+    "objectID": "reference/topology.topology.Topology.html#parameters",
+    "href": "reference/topology.topology.Topology.html#parameters",
+    "title": "topology.topology.Topology",
+    "section": "",
+    "text": "Name\nType\nDescription\nDefault\n\n\n\n\ntop\nTopologyDict\nA dictionary containing the parsed topology data.\nrequired\n\n\nffpatch\ntyping.Optional[pathlib.Path]\nPath to a force field patch file. If None, no patching is applied.\nNone"
+  },
+  {
+    "objectID": "reference/topology.topology.Topology.html#methods",
+    "href": "reference/topology.topology.Topology.html#methods",
+    "title": "topology.topology.Topology",
+    "section": "",
+    "text": "Name\nDescription\n\n\n\n\nbind_bond\nAdd a bond in topology.\n\n\nbreak_bond\nBreak bonds in topology.\n\n\nmove_hydrogen\nMove a singly bound atom to a new location.\n\n\npatch_parameters\n\n\n\nreindex_atomnrs\nReindex atom numbers in topology.\n\n\nto_dict\n\n\n\n\n\n\ntopology.topology.Topology.bind_bond(self, atompair_nrs)\nAdd a bond in topology.\nModifies the topology dictionary in place. It keeps track of affected terms in the topology via a graph representation of the topology and applies the necessary changes to bonds, angles and dihedrals (proper and improper). Furthermore, it modifies to function types in the topology to account for radicals.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\natompair\n\nA tuple of integers with the atoms indices (id, starting at 1) with from, the atom being moved and to, the atom to which the from atom will be bound\nrequired\n\n\n\n\n\n\n\ntopology.topology.Topology.break_bond(self, atompair_nrs)\nBreak bonds in topology.\nremoves bond, angles and dihedrals where atompair was involved. Modifies the topology dictionary in place.\n\n\n\ntopology.topology.Topology.move_hydrogen(self, from_to)\nMove a singly bound atom to a new location.\nThis is typically H for Hydrogen Atom Transfer (HAT).\n\n\n\ntopology.topology.Topology.patch_parameters(self, focus_nr)\n\n\n\ntopology.topology.Topology.reindex_atomnrs(self)\nReindex atom numbers in topology.\nStarts at index 1. This also updates the numbers for bonds, angles, dihedrals and pairs.\n\n\n\ntopology.topology.Topology.to_dict(self)"
+  },
+  {
+    "objectID": "reference/tasks.html",
+    "href": "reference/tasks.html",
+    "title": "tasks",
+    "section": "",
+    "text": "tasks\n\n\n\n\n\nName\nDescription\n\n\n\n\nTaskMapping"
+  },
+  {
+    "objectID": "reference/tasks.html#attributes",
+    "href": "reference/tasks.html#attributes",
+    "title": "tasks",
+    "section": "",
+    "text": "Name\nDescription\n\n\n\n\nTaskMapping"
+  },
+  {
+    "objectID": "reference/kimmdy.topology.atomic.ResidueBondSpec.html",
+    "href": "reference/kimmdy.topology.atomic.ResidueBondSpec.html",
+    "title": "ResidueBondSpec",
+    "section": "",
+    "text": "ResidueBondSpec\ntopology.atomic.ResidueBondSpec(atom1, atom2, b0=None, kb=None)\nInformation about one bond in a residue ; atom1 atom2 b0 kb\n\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "reference/kimmdy.runmanager.RunManager.html",
+    "href": "reference/kimmdy.runmanager.RunManager.html",
+    "title": "RunManager",
+    "section": "",
+    "text": "RunManager\nrunmanager.RunManager(self, config)\nThe RunManager, a central piece.\nManages the queue of tasks, communicates with the rest of the program and keeps track of global state.\n\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "guide/getting-started.html",
+    "href": "guide/getting-started.html",
+    "title": "Getting Started",
+    "section": "",
+    "text": "Let’s jump right in!\n\n\n\n\n\npython3.9 or higher\ngromacs (tested with version &gt;= 2020.4)\n\nOptional:\n\nplumed-patched version of gromacs\n\n\n\n\n\nCreate a file:\n\n\nkimmdy.yml\n\ndryrun: false\niterations: 100\nname: 'hat_tf_000'\ngromacs_alias: 'gmx'\ntop: 'Ala_out.top'\ngro: 'npt.gro'\nndx: 'index.ndx'\nmds:\n  equilibrium:\n    mdp: 'md.mdp'\n  relax:\n    mdp: 'md_slow.mdp'\nchanger:\n  coordinates:\n    md: 'relax'      \nreactions:\n  hat_reaction:\n    frequency_factor: 100000000\n    h_cutoff: 3\n    polling_rate: 1\n\nsequence:\n- equilibrium\n- mult: 2\n  tasks:\n  - equilibrium"
+  },
+  {
+    "objectID": "guide/getting-started.html#installation",
+    "href": "guide/getting-started.html#installation",
+    "title": "Getting Started",
+    "section": "",
+    "text": "python3.9 or higher\ngromacs (tested with version &gt;= 2020.4)\n\nOptional:\n\nplumed-patched version of gromacs"
+  },
+  {
+    "objectID": "guide/getting-started.html#setup",
+    "href": "guide/getting-started.html#setup",
+    "title": "Getting Started",
+    "section": "",
+    "text": "Create a file:\n\n\nkimmdy.yml\n\ndryrun: false\niterations: 100\nname: 'hat_tf_000'\ngromacs_alias: 'gmx'\ntop: 'Ala_out.top'\ngro: 'npt.gro'\nndx: 'index.ndx'\nmds:\n  equilibrium:\n    mdp: 'md.mdp'\n  relax:\n    mdp: 'md_slow.mdp'\nchanger:\n  coordinates:\n    md: 'relax'      \nreactions:\n  hat_reaction:\n    frequency_factor: 100000000\n    h_cutoff: 3\n    polling_rate: 1\n\nsequence:\n- equilibrium\n- mult: 2\n  tasks:\n  - equilibrium"
+  },
+  {
     "objectID": "guide/topology.html",
     "href": "guide/topology.html",
     "title": "Hexala topology",
     "section": "",
     "text": "Hexala\n\nfrom kimmdy.parsing import read_top\nfrom kimmdy.topology.topology import Topology\nfrom pathlib import Path\nfrom kimmdy.misc_helper import top_to_graph\n\n\nala_top = read_top(Path('../tests/test_files/test_topology/hexala.top'))\ntop = Topology(ala_top)\n\nls = top_to_graph(top) \nwith open(\"ala-top.dot\", \"w\") as f:\n  f.writelines(ls)\n\n\n\n\n\n\n\n\n\nG\n\n  \n\n1 CT\n\n 1 CT   \n\n2 HC\n\n 2 HC   \n\n1 CT–2 HC\n\n   \n\n3 HC\n\n 3 HC   \n\n1 CT–3 HC\n\n   \n\n4 HC\n\n 4 HC   \n\n1 CT–4 HC\n\n   \n\n5 C\n\n 5 C   \n\n1 CT–5 C\n\n   \n\n6 O\n\n 6 O   \n\n5 C–6 O\n\n   \n\n7 N\n\n 7 N   \n\n5 C–7 N\n\n   \n\n8 H\n\n 8 H   \n\n7 N–8 H\n\n   \n\n9 CT\n\n 9 CT   \n\n7 N–9 CT\n\n   \n\n10 H1\n\n 10 H1   \n\n9 CT–10 H1\n\n   \n\n11 CT\n\n 11 CT   \n\n9 CT–11 CT\n\n   \n\n15 C\n\n 15 C   \n\n9 CT–15 C\n\n   \n\n12 HC\n\n 12 HC   \n\n11 CT–12 HC\n\n   \n\n13 HC\n\n 13 HC   \n\n11 CT–13 HC\n\n   \n\n14 HC\n\n 14 HC   \n\n11 CT–14 HC\n\n   \n\n16 O\n\n 16 O   \n\n15 C–16 O\n\n   \n\n17 N\n\n 17 N   \n\n15 C–17 N\n\n   \n\n18 H\n\n 18 H   \n\n17 N–18 H\n\n   \n\n19 CT\n\n 19 CT   \n\n17 N–19 CT\n\n   \n\n20 H1\n\n 20 H1   \n\n19 CT–20 H1\n\n   \n\n21 CT\n\n 21 CT   \n\n19 CT–21 CT\n\n   \n\n25 C\n\n 25 C   \n\n19 CT–25 C\n\n   \n\n22 HC\n\n 22 HC   \n\n21 CT–22 HC\n\n   \n\n23 HC\n\n 23 HC   \n\n21 CT–23 HC\n\n   \n\n24 HC\n\n 24 HC   \n\n21 CT–24 HC\n\n   \n\n26 O\n\n 26 O   \n\n25 C–26 O\n\n   \n\n27 N\n\n 27 N   \n\n25 C–27 N\n\n   \n\n28 H\n\n 28 H   \n\n27 N–28 H\n\n   \n\n29 CT\n\n 29 CT   \n\n27 N–29 CT\n\n   \n\n30 H1\n\n 30 H1   \n\n29 CT–30 H1\n\n   \n\n31 CT\n\n 31 CT   \n\n29 CT–31 CT\n\n   \n\n35 C\n\n 35 C   \n\n29 CT–35 C\n\n   \n\n32 HC\n\n 32 HC   \n\n31 CT–32 HC\n\n   \n\n33 HC\n\n 33 HC   \n\n31 CT–33 HC\n\n   \n\n34 HC\n\n 34 HC   \n\n31 CT–34 HC\n\n   \n\n36 O\n\n 36 O   \n\n35 C–36 O\n\n   \n\n37 N\n\n 37 N   \n\n35 C–37 N\n\n   \n\n38 H\n\n 38 H   \n\n37 N–38 H\n\n   \n\n39 CT\n\n 39 CT   \n\n37 N–39 CT\n\n   \n\n40 H1\n\n 40 H1   \n\n39 CT–40 H1\n\n   \n\n41 CT\n\n 41 CT   \n\n39 CT–41 CT\n\n   \n\n45 C\n\n 45 C   \n\n39 CT–45 C\n\n   \n\n42 HC\n\n 42 HC   \n\n41 CT–42 HC\n\n   \n\n43 HC\n\n 43 HC   \n\n41 CT–43 HC\n\n   \n\n44 HC\n\n 44 HC   \n\n41 CT–44 HC\n\n   \n\n46 O\n\n 46 O   \n\n45 C–46 O\n\n   \n\n47 N\n\n 47 N   \n\n45 C–47 N\n\n   \n\n48 H\n\n 48 H   \n\n47 N–48 H\n\n   \n\n49 CT\n\n 49 CT   \n\n47 N–49 CT\n\n   \n\n50 H1\n\n 50 H1   \n\n49 CT–50 H1\n\n   \n\n51 CT\n\n 51 CT   \n\n49 CT–51 CT\n\n   \n\n55 C\n\n 55 C   \n\n49 CT–55 C\n\n   \n\n52 HC\n\n 52 HC   \n\n51 CT–52 HC\n\n   \n\n53 HC\n\n 53 HC   \n\n51 CT–53 HC\n\n   \n\n54 HC\n\n 54 HC   \n\n51 CT–54 HC\n\n   \n\n56 O\n\n 56 O   \n\n55 C–56 O\n\n   \n\n57 N\n\n 57 N   \n\n55 C–57 N\n\n   \n\n58 H\n\n 58 H   \n\n57 N–58 H\n\n   \n\n59 CT\n\n 59 CT   \n\n57 N–59 CT\n\n   \n\n60 H1\n\n 60 H1   \n\n59 CT–60 H1\n\n   \n\n61 CT\n\n 61 CT   \n\n59 CT–61 CT\n\n   \n\n65 C\n\n 65 C   \n\n59 CT–65 C\n\n   \n\n62 HC\n\n 62 HC   \n\n61 CT–62 HC\n\n   \n\n63 HC\n\n 63 HC   \n\n61 CT–63 HC\n\n   \n\n64 HC\n\n 64 HC   \n\n61 CT–64 HC\n\n   \n\n66 O\n\n 66 O   \n\n65 C–66 O\n\n   \n\n67 N\n\n 67 N   \n\n65 C–67 N\n\n   \n\n68 H\n\n 68 H   \n\n67 N–68 H\n\n   \n\n69 CT\n\n 69 CT   \n\n67 N–69 CT\n\n   \n\n70 H1\n\n 70 H1   \n\n69 CT–70 H1\n\n   \n\n71 H1\n\n 71 H1   \n\n69 CT–71 H1\n\n   \n\n72 H1\n\n 72 H1   \n\n69 CT–72 H1\n\n  \n\n\nFigure 1: A diagram of the ala topology\n\n\n\n\n\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "guide/uml.html",
+    "href": "guide/uml.html",
+    "title": "UML",
+    "section": "",
+    "text": "(Re)render the diagrams with\nplantuml -tsvg uml.qmd\nor preview online with plantuml.\n\n\n\n\n@startuml\nclass           RunManager{\nconfig : Config\ntasks : Queue\nstate\nfile history\nchosen_recipe\nrun()\nrun_MD()\nquery_reactions()\ndecide_reaction()\nexecute_recipe(ConversionRecipe)\nnext()\n}\nclass          Config{\nfile paths\ntask sequence\n...\n__init__(configuration_file)\n}\nclass           ConversionRecipe{\ntype\natom_idx\n}\n\nabstract class           Reaction{\nget_reaction_result()\n}\nclass           HAT{\n}\nclass           HomolyticBreak{\n}\nclass           ChangeManager{\nmodify_connectivity()\n}\n\npackage GROMACS{\ninterface GROMACS_CLI{\n}\n}\n\nReaction --|&gt; HAT\nReaction --|&gt; HomolyticBreak\nRunManager -right- Config\nRunManager -right- GROMACS_CLI \nRunManager -- Reaction \nConversionRecipe - Reaction\nChangeManager - RunManager\nConfig -[hidden]-&gt; GROMACS_CLI\n@enduml\n\n\n\n\n\n@startuml classuml\nclass           RunManager{\nconfig : Config\nconfig_reactions\nstate : Enum\nMDparams\nrates \nrun_md_min()\nrun_md_eq()\nrun_md()\nquery_reactions()\nmake_decision()\nrun_recipe(ConversionRecipe)\nnext()\n}\nclass          Config{\npath\n...\nread_yaml()\n}\nclass           MDManager{\nwrite_mdp()\ndo_md()\n}\nclass           ConversionRecipe{\ntype\natom_idx\n}\nclass           DecisionStrategy{\n}\nclass           Reaction{\nrecipe: ConversionRecipe\nget_rates()\n}\nclass           HAT{\n\n}\nclass           CoordinateChanger{\n}\nclass           TopologyChanger{\n}\npackage GROMACS{\ninterface GROMACSCli{\n}\n}\n\nReaction --|&gt; HAT\nConfig -- RunManager : reads &lt;\nRunManager - MDManager : &gt; starts\nMDManager - GROMACSCli : &gt; interacts\nRunManager -- Reaction : &gt; starts\nRunManager -- DecisionStrategy : &gt; starts\nConversionRecipe - Reaction: &lt; generates\nCoordinateChanger - RunManager: &lt; starts\nTopologyChanger - RunManager: &lt; starts\nTopologyChanger -[hidden]-&gt; CoordinateChanger\nMDManager -[hidden]-&gt; DecisionStrategy\n@enduml\n\n@startuml flow\nstart\n:Read .yaml;\n:Run MD_eq;\nrepeat\n :Run MD_prod;\n :Query reactions;\n :Make reaction decision;\n :Change system coordinates;\n :Change system topology;\nrepeatwhile (itermax reached) is (no)\n-&gt; yes;\nstop\n@enduml\n\nlink\nlink"
+  },
+  {
+    "objectID": "guide/uml.html#classes",
+    "href": "guide/uml.html#classes",
+    "title": "UML",
+    "section": "",
+    "text": "@startuml\nclass           RunManager{\nconfig : Config\ntasks : Queue\nstate\nfile history\nchosen_recipe\nrun()\nrun_MD()\nquery_reactions()\ndecide_reaction()\nexecute_recipe(ConversionRecipe)\nnext()\n}\nclass          Config{\nfile paths\ntask sequence\n...\n__init__(configuration_file)\n}\nclass           ConversionRecipe{\ntype\natom_idx\n}\n\nabstract class           Reaction{\nget_reaction_result()\n}\nclass           HAT{\n}\nclass           HomolyticBreak{\n}\nclass           ChangeManager{\nmodify_connectivity()\n}\n\npackage GROMACS{\ninterface GROMACS_CLI{\n}\n}\n\nReaction --|&gt; HAT\nReaction --|&gt; HomolyticBreak\nRunManager -right- Config\nRunManager -right- GROMACS_CLI \nRunManager -- Reaction \nConversionRecipe - Reaction\nChangeManager - RunManager\nConfig -[hidden]-&gt; GROMACS_CLI\n@enduml\n\n\n\n\n\n@startuml classuml\nclass           RunManager{\nconfig : Config\nconfig_reactions\nstate : Enum\nMDparams\nrates \nrun_md_min()\nrun_md_eq()\nrun_md()\nquery_reactions()\nmake_decision()\nrun_recipe(ConversionRecipe)\nnext()\n}\nclass          Config{\npath\n...\nread_yaml()\n}\nclass           MDManager{\nwrite_mdp()\ndo_md()\n}\nclass           ConversionRecipe{\ntype\natom_idx\n}\nclass           DecisionStrategy{\n}\nclass           Reaction{\nrecipe: ConversionRecipe\nget_rates()\n}\nclass           HAT{\n\n}\nclass           CoordinateChanger{\n}\nclass           TopologyChanger{\n}\npackage GROMACS{\ninterface GROMACSCli{\n}\n}\n\nReaction --|&gt; HAT\nConfig -- RunManager : reads &lt;\nRunManager - MDManager : &gt; starts\nMDManager - GROMACSCli : &gt; interacts\nRunManager -- Reaction : &gt; starts\nRunManager -- DecisionStrategy : &gt; starts\nConversionRecipe - Reaction: &lt; generates\nCoordinateChanger - RunManager: &lt; starts\nTopologyChanger - RunManager: &lt; starts\nTopologyChanger -[hidden]-&gt; CoordinateChanger\nMDManager -[hidden]-&gt; DecisionStrategy\n@enduml\n\n@startuml flow\nstart\n:Read .yaml;\n:Run MD_eq;\nrepeat\n :Run MD_prod;\n :Query reactions;\n :Make reaction decision;\n :Change system coordinates;\n :Change system topology;\nrepeatwhile (itermax reached) is (no)\n-&gt; yes;\nstop\n@enduml\n\nlink\nlink"
   }
 ]

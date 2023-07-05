@@ -35,7 +35,7 @@ Internal representations of topology and forcfield entities
 
 | | |
 | --- | --- |
-| [topology.atomic](topology.atomic.qmd#kimmdy.topology.atomic) |  |
+| [topology.atomic](topology.atomic.qmd#kimmdy.topology.atomic) | Atomic datatypes for the topology such as Atom, Bond, Angle, Dihedral, etc. |
 | [topology.atomic.Atom](topology.atomic.Atom.qmd#kimmdy.topology.atomic.Atom) | Information about one atom |
 | [topology.atomic.AtomType](topology.atomic.AtomType.qmd#kimmdy.topology.atomic.AtomType) | Information about one atom |
 | [topology.atomic.Bond](topology.atomic.Bond.qmd#kimmdy.topology.atomic.Bond) | Information about one bond |

@@ -7,15 +7,17 @@ from dataclasses import dataclass, field
 from kimmdy.runmanager import RunManager
 from kimmdy.config import Config
 from kimmdy.tasks import TaskFiles
+from typing import Callable
 
 # name of this file is fixed for pytest to recognize the fixture without importing
 
 
 @dataclass
-class SlimFiles:
+class SlimFiles(TaskFiles):
     input: dict[str, Path] = field(default_factory=dict)
     output: dict[str, Path] = field(default_factory=dict)
     outputdir: Path = Path()
+    get_latest: Callable = lambda x: x
 
 
 @pytest.fixture

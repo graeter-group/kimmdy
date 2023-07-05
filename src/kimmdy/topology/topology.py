@@ -4,6 +4,7 @@ from kimmdy.constants import ATOMTYPE_BONDORDER_FLAT
 from kimmdy.parsing import TopologyDict
 from kimmdy.topology.atomic import *
 from kimmdy.topology.utils import (
+    get_protein_section,
     match_id_to_patch,
     attributes_to_list,
     match_atomic_item_to_atomic_type,
@@ -58,7 +59,7 @@ class Topology:
         self.bonds: dict[tuple[str, str], Bond] = {}
         self.pairs: dict[tuple[str, str], Pair] = {}
         self.angles: dict[tuple[str, str, str], Angle] = {}
-        self.proper_dihedrals: dict[tuple[str, str, str, str], Dihedral] = {}
+        self.proper_dihedrals: dict[tuple[str, str, str, str], MultipleDihedrals] = {}
         self.improper_dihedrals: dict[tuple[str, str, str, str], Dihedral] = {}
         self.position_restraints: dict[str, PositionRestraint] = {}
         self.dihedral_restraints: dict[
@@ -81,6 +82,11 @@ class Topology:
         self._initialize_graph()
         self._test_for_radicals()
 
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Topology):
+            return NotImplemented
+        return self.to_dict() == other.to_dict()
+
     def _update_dict(self):
         set_protein_section(
             self.top, "atoms", [attributes_to_list(x) for x in self.atoms.values()]
@@ -90,20 +96,29 @@ class Topology:
             self.top, "bonds", [attributes_to_list(x) for x in self.bonds.values()]
         )
 
-        set_protein_section(
-            self.top, "pairs", [attributes_to_list(x) for x in self.pairs.values()]
-        )
+        if len(self.pairs) > 0:
+            set_protein_section(
+                self.top, "pairs", [attributes_to_list(x) for x in self.pairs.values()]
+            )
 
-        set_protein_section(
-            self.top, "angles", [attributes_to_list(x) for x in self.angles.values()]
-        )
+        if len(self.angles) > 0:
+            set_protein_section(
+                self.top,
+                "angles",
+                [attributes_to_list(x) for x in self.angles.values()],
+            )
 
-        set_protein_section(
-            self.top,
-            "dihedrals",
-            [attributes_to_list(x) for x in self.proper_dihedrals.values()]
-            + [attributes_to_list(x) for x in self.improper_dihedrals.values()],
-        )
+        if len(self.proper_dihedrals) > 0:
+            set_protein_section(
+                self.top,
+                "dihedrals",
+                [
+                    attributes_to_list(x)
+                    for dihedrals in self.proper_dihedrals.values()
+                    for x in dihedrals.dihedrals.values()
+                ]
+                + [attributes_to_list(x) for x in self.improper_dihedrals.values()],
+            )
 
         set_top_section(
             self.top,
@@ -154,51 +169,110 @@ class Topology:
         Starts at index 1.
         This also updates the numbers for bonds, angles, dihedrals and pairs.
         """
+        # TODO: check angles, dihedrals, pairs
+        raise NotImplementedError("reindex_atomrns is not finished yet.")
         update_map = {
             atom_nr: str(i + 1) for i, atom_nr in enumerate(self.atoms.keys())
         }
-        print(update_map)
 
         new_atoms = {}
         for atom in self.atoms.values():
             atom.nr = update_map[atom.nr]
+            bound_to = []
+            for nr in atom.bound_to_nrs:
+                new_nr = update_map.get(nr)
+                if new_nr is not None:
+                    bound_to.append(new_nr)
+            atom.bound_to_nrs = bound_to
             new_atoms[atom.nr] = atom
         self.atoms = new_atoms
 
         new_bonds = {}
         for bond in self.bonds.values():
-            bond.ai = update_map[bond.ai]
-            bond.aj = update_map[bond.aj]
-            new_bonds[(update_map[bond.ai], update_map[bond.aj])] = bond
+            ai = update_map.get(bond.ai)
+            aj = update_map.get(bond.aj)
+            # drop bonds to a deleted atom
+            if ai is None or aj is None:
+                continue
+            bond.ai = ai
+            bond.aj = aj
+            new_bonds[(ai, aj)] = bond
         self.bonds = new_bonds
 
         new_angles = {}
         for angle in self.angles.values():
-            angle.ai = update_map[angle.ai]
-            angle.aj = update_map[angle.aj]
-            angle.ak = update_map[angle.ak]
+            ai = update_map.get(angle.ai)
+            aj = update_map.get(angle.aj)
+            ak = update_map.get(angle.ak)
+            # drop angles to a deleted atom
+            if ai is None or aj is None or ak is None:
+                continue
+            angle.ai = ai
+            angle.aj = aj
+            angle.ak = ak
             new_angles[
                 (update_map[angle.ai], update_map[angle.aj], update_map[angle.ak])
             ] = angle
         self.angles = new_angles
 
-        new_dihedrals = {}
-        for dihedral in self.proper_dihedrals.values():
-            dihedral.ai = update_map[dihedral.ai]
-            dihedral.aj = update_map[dihedral.aj]
-            dihedral.ak = update_map[dihedral.ak]
-            dihedral.al = update_map[dihedral.al]
-            new_dihedrals[
-                (
-                    update_map[dihedral.ai],
-                    update_map[dihedral.aj],
-                    update_map[dihedral.ak],
-                    update_map[dihedral.al],
-                )
-            ] = dihedral
-        self.dihedrals = new_dihedrals
-
         new_pairs = {}
+        new_multiple_dihedrals = {}
+        for dihedrals in self.proper_dihedrals.values():
+            ai = update_map.get(dihedrals.ai)
+            aj = update_map.get(dihedrals.aj)
+            ak = update_map.get(dihedrals.ak)
+            al = update_map.get(dihedrals.al)
+            # drop dihedrals to a deleted atom
+            if ai is None or aj is None or ak is None or al is None:
+                continue
+            dihedrals.ai = ai
+            dihedrals.aj = aj
+            dihedrals.ak = ak
+            dihedrals.al = al
+
+            new_dihedrals = {}
+            for dihedral in dihedrals.dihedrals.values():
+                dihedral.ai = ai
+                dihedral.aj = aj
+                dihedral.ak = ak
+                dihedral.al = al
+                new_dihedrals[dihedral.periodicity] = dihedral
+
+            new_multiple_dihedrals[
+                (
+                    update_map[dihedrals.ai],
+                    update_map[dihedrals.aj],
+                    update_map[dihedrals.ak],
+                    update_map[dihedrals.al],
+                )
+            ] = dihedrals
+
+            pair = self.pairs.get((dihedrals.ai, dihedrals.al))
+            if pair is None:
+                continue
+            pair.ai = update_map[pair.ai]
+            pair.aj = update_map[pair.aj]
+            new_pairs[(ai, al)] = pair
+
+        self.proper_dihedrals = new_multiple_dihedrals
+
+        new_dihedrals = {}
+        for dihedral in self.improper_dihedrals.values():
+            ai = update_map.get(dihedral.ai)
+            aj = update_map.get(dihedral.aj)
+            ak = update_map.get(dihedral.ak)
+            al = update_map.get(dihedral.al)
+            # drop dihedrals to a deleted atom
+            if ai is None or aj is None or ak is None or al is None:
+                continue
+            dihedral.ai = ai
+            dihedral.aj = aj
+            dihedral.ak = ak
+            dihedral.al = al
+            new_dihedrals[(ai, aj, ak, al)] = new_dihedrals
+        self.dihedrals = new_dihedrals
+        self.pairs = new_pairs
+
         for pair in self.pairs.values():
             pair.ai = update_map[pair.ai]
             pair.aj = update_map[pair.aj]
@@ -210,45 +284,59 @@ class Topology:
 
     def _parse_atoms(self):
         """Parse atoms from topology dictionary."""
-        ls = self.protein["atoms"]["content"]
+        ls = get_protein_section(self.top, "atoms")
+        if ls is None:
+            raise ValueError("No atoms found in topology.")
         for l in ls:
             atom = Atom.from_top_line(l)
             self.atoms[atom.nr] = atom
 
     def _parse_bonds(self):
         """Parse bond from topology dictionary."""
-        ls = self.protein["bonds"]["content"]
+        ls = get_protein_section(self.top, "bonds")
+        if ls is None:
+            raise ValueError("No bonds found in topology.")
         for l in ls:
             bond = Bond.from_top_line(l)
             self.bonds[(bond.ai, bond.aj)] = bond
 
     def _parse_pairs(self):
         """Parse pairs from topology dictionary."""
-        ls = self.protein["pairs"]["content"]
+        ls = get_protein_section(self.top, "pairs")
+        if ls is None:
+            logging.warning("No pairs found in topology. Setting pairs to {}.")
+            return
         for l in ls:
             pair = Pair.from_top_line(l)
             self.pairs[(pair.ai, pair.aj)] = pair
 
     def _parse_angles(self):
         """Parse angles from topology dictionary."""
-        ls = self.protein["angles"]["content"]
+        ls = get_protein_section(self.top, "angles")
+        if ls is None:
+            logging.warning("No angles found in topology. Setting angles to {}.")
+            return
         for l in ls:
             angle = Angle.from_top_line(l)
             self.angles[(angle.ai, angle.aj, angle.ak)] = angle
 
     def _parse_dihedrals(self):
         """Parse improper and proper dihedrals from topology dictionary."""
-        ls = self.protein["dihedrals"]["content"]
+        ls = get_protein_section(self.top, "dihedrals")
+        if ls is None:
+            logging.warning("No dihedrals found in topology. Setting dihedrals to {}.")
+            return
         for l in ls:
             dihedral = Dihedral.from_top_line(l)
+            key = (dihedral.ai, dihedral.aj, dihedral.ak, dihedral.al)
             if dihedral.funct == "4":
-                self.improper_dihedrals[
-                    (dihedral.ai, dihedral.aj, dihedral.ak, dihedral.al)
-                ] = dihedral
+                self.improper_dihedrals[key] = dihedral
             else:
-                self.proper_dihedrals[
-                    (dihedral.ai, dihedral.aj, dihedral.ak, dihedral.al)
-                ] = dihedral
+                if self.proper_dihedrals.get(key) is None:
+                    self.proper_dihedrals[key] = MultipleDihedrals(
+                        *key, dihedral.funct, dihedrals={}
+                    )
+                self.proper_dihedrals[key].dihedrals[dihedral.periodicity] = dihedral
 
     def _parse_restraints(self):
         """Parse restraints from topology dictionary."""
@@ -340,6 +428,7 @@ class Topology:
 
         Values reset to `None` if found in the forcefield (supplied via `types`).
         """
+        raise NotImplementedError("Reverting patches is not finished yet.")
         item_type = match_atomic_item_to_atomic_type(atomic_id, types)
         if item_type is None:
             logging.warning(
@@ -353,6 +442,7 @@ class Topology:
                 atomic_item.__dict__[param] = None
 
     def patch_parameters(self, focus_nr: list[str]):
+        raise NotImplementedError("Patching is not finished yet.")
         if self.ffpatches is None:
             return
         focus = [self.atoms[nr] for nr in focus_nr]
@@ -458,6 +548,7 @@ class Topology:
             atompair_nrs[0]
         ) + self._get_atom_proper_dihedrals(atompair_nrs[1])
         for key in dihedral_keys:
+            # don't use periodicity in key for checking atompair_nrs
             if all([x in key for x in atompair_nrs]):
                 # dihedral contained a now deleted bond because
                 # it had both atoms of the broken bond
@@ -556,13 +647,17 @@ class Topology:
 
         # add proper and improper dihedrals
         # add proper dihedrals and pairs
+        # TODO; for now this assumes function type 9 for all dihedrals
+        # and adds all possible dihedrals (and pairs)
+        # later we should check the ff if there are multiple
+        # dihedrals for the same atoms with different periodicities.
         dihedral_keys = self._get_atom_proper_dihedrals(
             atompair_nrs[0]
         ) + self._get_atom_proper_dihedrals(atompair_nrs[1])
         for key in dihedral_keys:
             if self.proper_dihedrals.get(key) is None:
-                self.proper_dihedrals[key] = Dihedral(
-                    key[0], key[1], key[2], key[3], "9"
+                self.proper_dihedrals[key] = MultipleDihedrals(
+                    *key, "9", dihedrals={"": Dihedral(*key, "9")}
                 )
             pairkey = tuple(str(x) for x in sorted([key[0], key[3]], key=int))
             if self.pairs.get(pairkey) is None:
@@ -575,7 +670,7 @@ class Topology:
         for key, value in dihedral_k_v:
             if self.improper_dihedrals.get(key) is None:
                 # TODO: fix this
-                c2 = None
+                c2 = ""
                 if value.q0 is not None:
                     c2 = "1"
                 self.improper_dihedrals[key] = Dihedral(
@@ -781,8 +876,8 @@ class Topology:
         for atom in self.atoms.values():
             keys = self._get_atom_proper_dihedrals(atom.nr)
             for key in keys:
-                self.proper_dihedrals[key] = Dihedral(
-                    key[0], key[1], key[2], key[3], "9"
+                self.proper_dihedrals[key] = MultipleDihedrals(
+                    *key, "9", dihedrals={"": Dihedral(*key, "9")}
                 )
                 pairkey = tuple(str(x) for x in sorted([key[0], key[3]], key=int))
                 if self.pairs.get(pairkey) is None:

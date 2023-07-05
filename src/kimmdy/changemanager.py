@@ -29,8 +29,6 @@ def modify_coords(
     for step in recipe_steps:
         if isinstance(step, Move):
             if step.new_coords:
-                # just convert it
-                assert not step.is_one_based, "RecipeSteps should be zero based!"
                 if ttime is None:
                     ttime = step.new_coords[1]
 
@@ -41,7 +39,7 @@ def modify_coords(
                     )
                     logging.error(m)
                     raise ValueError(m)
-                to_move.append(step.idx_to_move)
+                to_move.append(step.ix_to_move)
             else:
                 run_parameter_growth = True
                 ttime = u.trajectory[-1].time
@@ -57,7 +55,7 @@ def modify_coords(
             continue
         for step in recipe_steps:
             if isinstance(step, Move) and step.new_coords is not None:
-                atm_move = u.select_atoms(f"index {step.idx_to_move}")
+                atm_move = u.select_atoms(f"index {step.ix_to_move}")
                 atm_move[0].position = step.new_coords[0]
 
         break
@@ -107,38 +105,35 @@ def modify_top(
 
     focus = set()
     for step in recipe_steps:
-        step = step.one_based()
         if isinstance(step, Break):
-            topology.break_bond([str(step.atom_idx_1), str(step.atom_idx_2)])
-            focus.add(str(step.atom_idx_1))
-            focus.add(str(step.atom_idx_2))
+            topology.break_bond((step.atom_id_1, step.atom_id_2))
+            focus.add(step.atom_ix_1)
+            focus.add(step.atom_ix_2)
         elif isinstance(step, Bind):
-            topology.bind_bond([str(step.atom_idx_1), str(step.atom_idx_2)])
-            focus.add(str(step.atom_idx_1))
-            focus.add(str(step.atom_idx_2))
+            topology.bind_bond((step.atom_id_1, step.atom_id_2))
+            focus.add(step.atom_id_1)
+            focus.add(step.atom_id_2)
         elif isinstance(step, Move):
             top_done = False
-            if step.idx_to_bind is not None and step.idx_to_break is None:
+            if step.id_to_bind is not None and step.id_to_break is None:
                 # implicit H-bond breaking
-                topology.move_hydrogen([str(step.idx_to_move), str(step.idx_to_bind)])
-                focus.add(str(step.idx_to_move))
-                focus.add(str(step.idx_to_bind))
+                topology.move_hydrogen((step.id_to_move, step.id_to_bind))
+                focus.add(step.id_to_move)
+                focus.add(step.id_to_bind)
                 top_done = True
-            if step.idx_to_break is not None and not top_done:
-                topology.break_bond([str(step.idx_to_move), str(step.idx_to_break)])
-                focus.add(str(step.idx_to_move))
-                focus.add(str(step.idx_to_break))
-            if step.idx_to_bind is not None and not top_done:
-                topology.bind_bond([str(step.idx_to_move), str(step.idx_to_bind)])
-                focus.add(str(step.idx_to_move))
-                focus.add(str(step.idx_to_bind))
+            if step.id_to_break is not None and not top_done:
+                topology.break_bond((step.id_to_move, step.id_to_break))
+                focus.add(step.id_to_move)
+                focus.add(step.id_to_break)
+            if step.id_to_bind is not None and not top_done:
+                topology.bind_bond((step.id_to_move, step.id_to_bind))
+                focus.add(step.id_to_move)
+                focus.add(step.id_to_bind)
 
         else:
             raise NotImplementedError(f"RecipeStep {step} not implemented!")
     topology._update_dict()
     write_top(topology.top, newtop)
-
-    topology.patch_parameters(list(focus))
 
     return
 
@@ -157,7 +152,7 @@ def modify_plumed(
     for step in recipe_steps:
         if isinstance(step, Break):
             plumeddat = break_bond_plumed(
-                plumeddat, (step.atom_idx_1, step.atom_idx_2), plumeddist
+                plumeddat, (step.atom_id_1, step.atom_id_2), plumeddist
             )
         else:
             # TODO: handle BIND / MOVE
@@ -167,7 +162,7 @@ def modify_plumed(
     write_plumed(plumeddat, newplumeddat)
 
 
-def break_bond_plumed(plumeddat, breakpair: list[int, int], plumeddist):
+def break_bond_plumed(plumeddat, breakpair: tuple[str, str], plumeddist):
     new_distances = []
     broken_distances = []
     for line in plumeddat["distances"]:

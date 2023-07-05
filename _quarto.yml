@@ -51,11 +51,11 @@ format:
     theme:
       light:
       - default
-      - theme.scss
+      - www/theme.scss
       dark:
       - default
-      - theme.scss
-      - theme-dark.scss
+      - www/theme.scss
+      - www/theme-dark.scss
     code-copy: true
 
 filters:

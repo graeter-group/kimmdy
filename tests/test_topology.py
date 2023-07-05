@@ -8,7 +8,6 @@ from hypothesis import Phase, given, settings, HealthCheck, strategies as st
 from kimmdy.topology.topology import Topology
 from kimmdy.topology.atomic import *
 from kimmdy.topology.utils import (
-    get_top_section,
     match_atomic_item_to_atomic_type,
     get_protein_section,
 )
@@ -32,8 +31,22 @@ def assetsdir() -> Path:
 
 @pytest.fixture()
 def raw_hexala_top_fix(filedir) -> TopologyDict:
-    hexala_top = read_top(filedir / "hexala.top")
-    return hexala_top
+    return read_top(filedir / "hexala.top")
+
+
+@pytest.fixture()
+def raw_top_a_fix(filedir) -> TopologyDict:
+    return read_top(filedir / "topol_stateA.top")
+
+
+@pytest.fixture()
+def raw_top_b_fix(filedir) -> TopologyDict:
+    return read_top(filedir / "topol_stateB.top")
+
+
+@pytest.fixture()
+def raw_urea_top_fix(filedir) -> TopologyDict:
+    return read_top(filedir / "urea.top")
 
 
 @pytest.fixture()
@@ -72,7 +85,6 @@ def random_topology_and_break(draw):
         dir = Path(__file__).parent / "test_files" / "test_topology"
     except NameError:
         dir = Path("./tests/test_files") / "test_topology"
-    ffdir = dir / "amber99sb-star-ildnp.ff"
     ffpatch = dir / "amber99sb_patches.xml"
     hexala_top = read_top(dir / "hexala.top")
     top = Topology(hexala_top, ffpatch)
@@ -95,7 +107,7 @@ class TestFFPatches:
 
         atomic_id = ["CT", "C_R", "N"]
         want = ("CT", "C", "N")
-        types_wanted = {want: types[want]}
+        types_wanted: dict[AngleId, AngleType] = {want: types[want]}
         item_type = match_atomic_item_to_atomic_type(atomic_id, types_wanted)
         expected = AngleType(
             i="CT",
@@ -130,6 +142,91 @@ class TestFFPatches:
         assert item_type == expected
 
 
+class TestUrea:
+    def test_urea(self, raw_urea_top_fix):
+        raw = deepcopy(raw_urea_top_fix)
+        top = Topology(raw)
+        assert len(top.atoms) == 8
+        assert len(top.bonds) == 7
+        assert len(top.pairs) == 0
+        assert len(top.angles) == 0
+        assert len(top.proper_dihedrals) == 8
+        assert len(top.improper_dihedrals) == 3
+
+    def test_reindex_atomnumbers_for_already_ordered(self, raw_urea_top_fix):
+        raw = deepcopy(raw_urea_top_fix)
+        top = Topology(raw)
+        og_top = deepcopy(top)
+        top.reindex_atomnrs()
+        assert top == og_top
+
+    def test_reindex_atomnumbers_after_deletion(self, raw_urea_top_fix):
+        raw = deepcopy(raw_urea_top_fix)
+        top = Topology(raw)
+        og_top = deepcopy(top)
+        top.atoms.pop("3")
+        top.reindex_atomnrs()
+
+        og_atoms = list(og_top.atoms.keys())
+        atoms = list(top.atoms.keys())
+
+        og_bonds = list(og_top.bonds.keys())
+        bonds = list(top.bonds.keys())
+
+        og_dihedrals = list(og_top.proper_dihedrals.keys())
+        dihedrals = list(top.proper_dihedrals.keys())
+
+        og_impropers = list(og_top.improper_dihedrals.keys())
+        impropers = list(top.improper_dihedrals.keys())
+
+        assert og_atoms == [str(x) for x in range(1, 9)]
+        assert atoms == [str(x) for x in range(1, 8)]
+
+        assert top.atoms["3"] == Atom(
+            "3", "H", "1", "URE", "H11", "4", "0.395055", "1.00800"
+        )
+
+        assert og_bonds == [
+            ("1", "2"),
+            ("1", "3"),
+            ("1", "6"),
+            ("3", "4"),
+            ("3", "5"),
+            ("6", "7"),
+            ("6", "8"),
+        ]
+        assert bonds == [("1", "2"), ("1", "5"), ("5", "6"), ("5", "7")]
+
+        assert og_dihedrals == [
+            ("2", "1", "3", "4"),
+            ("2", "1", "3", "5"),
+            ("2", "1", "6", "7"),
+            ("2", "1", "6", "8"),
+            ("3", "1", "6", "7"),
+            ("3", "1", "6", "8"),
+            ("6", "1", "3", "4"),
+            ("6", "1", "3", "5"),
+        ]
+        assert dihedrals == [("2", "1", "5", "6"), ("2", "1", "5", "7")]
+
+        assert og_impropers == []
+        assert impropers == []
+
+
+class TestTopAB:
+    def test_top_ab(self, raw_top_a_fix, raw_top_b_fix):
+        topA = Topology(raw_top_a_fix)
+        topB = Topology(raw_top_b_fix)
+        assert topA
+        assert topB
+        assert len(topA.atoms) == 41
+        assert len(topA.proper_dihedrals) == 84
+        proper_dihedrals_counts = 0
+        for dihedral in topA.proper_dihedrals.values():
+            proper_dihedrals_counts += len(dihedral.dihedrals)
+        assert proper_dihedrals_counts == 88
+
+
 class TestTopology:
     def test_break_bind_bond_hexala(self, hexala_top_fix):
         top = deepcopy(hexala_top_fix)
@@ -138,8 +235,6 @@ class TestTopology:
         bondindex = 24
         bond_key = list(top.bonds.keys())[bondindex]
         logging.info(f"bond_key: {bond_key}")
-        # 25, 27
-        # C, N
         top.break_bond(bond_key)
         top.bind_bond(bond_key)
         assert top.bonds == og_top.bonds
@@ -340,6 +435,10 @@ class TestHexalaTopology:
         top = Topology(raw_copy)
         top._update_dict()
         assert top.top["dihedraltypes"]["content"] == raw["dihedraltypes"]["content"]
+        assert (
+            top.top["moleculetype_0"]["subsections"]["dihedrals"]["content"]
+            == raw["moleculetype_0"]["subsections"]["dihedrals"]["content"]
+        )
         assert top.top == raw
 
     def test_top_properties(self, hexala_top_fix):
@@ -351,9 +450,9 @@ class TestHexalaTopology:
 
         # order is correct
         val = 0
-        for atom_idx in top.atoms.keys():
-            assert int(atom_idx) > val
-            val = int(atom_idx)
+        for atom_id in top.atoms.keys():
+            assert int(atom_id) > val
+            val = int(atom_id)
 
         val = 0
         for bond in top.bonds.keys():
