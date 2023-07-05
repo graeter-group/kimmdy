@@ -1,5 +1,20 @@
 # Changelog
 
+## [3.3.0](https://github.com/hits-mbm-dev/kimmdy/compare/v3.2.0...v3.3.0) (2023-07-05)
+
+
+### Features
+
+* linked ixs and ids for RecipSteps ([#137](https://github.com/hits-mbm-dev/kimmdy/issues/137)) ([8238df9](https://github.com/hits-mbm-dev/kimmdy/commit/8238df91ffed28568443cdd20e0ff46fdba328c6))
+* **topology:** enable multiple dihedrals (unique by their periodicity) for proper dihedrals ([8238df9](https://github.com/hits-mbm-dev/kimmdy/commit/8238df91ffed28568443cdd20e0ff46fdba328c6))
+
+
+### Bug Fixes
+
+* add default funct for Bonds and BondTypes ([8238df9](https://github.com/hits-mbm-dev/kimmdy/commit/8238df91ffed28568443cdd20e0ff46fdba328c6))
+* add more nestable sections in topology parsing ([8238df9](https://github.com/hits-mbm-dev/kimmdy/commit/8238df91ffed28568443cdd20e0ff46fdba328c6))
+* match X as wildcards for atomic types ([8238df9](https://github.com/hits-mbm-dev/kimmdy/commit/8238df91ffed28568443cdd20e0ff46fdba328c6))
+
 ## [3.2.0](https://github.com/hits-mbm-dev/kimmdy/compare/v3.1.0...v3.2.0) (2023-07-03)
 
 
