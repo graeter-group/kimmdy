@@ -2,10 +2,11 @@ import pytest
 import shutil
 from pathlib import Path
 
-from kimmdy.reaction import Break, Bind, Move
+from kimmdy.reaction import Break, Bind, Move, RecipeStep
 from kimmdy.parsing import read_plumed
 from kimmdy.changemanager import break_bond_plumed, modify_coords
 from conftest import SlimFiles
+import os
 
 
 @pytest.fixture
@@ -13,10 +14,16 @@ def tmpdir(tmp_path) -> Path:
     dirname = "test_changemanager"
     try:
         filedir = Path(__file__).parent / "test_files" / dirname
+        assetsdir = Path(__file__).parent / "test_files" / "assets"
     except NameError:
         filedir = Path("./tests/test_files") / dirname
+        assetsdir = Path("./tests/test_files") / "assets"
     test_dir = tmp_path / dirname
     shutil.copytree(filedir, test_dir)
+    Path(test_dir / "amber99sb-star-ildnp.ff").symlink_to(
+        assetsdir / "amber99sb-star-ildnp.ff",
+        target_is_directory=True,
+    )
     return test_dir
 
 
@@ -24,7 +31,7 @@ def test_plumed_break(tmpdir):
     plumed = read_plumed(tmpdir / "plumed_nat.dat")
     plumed_break_ref = read_plumed(tmpdir / "plumed_break29-35.dat")
 
-    breakpair = [29, 35]
+    breakpair = (29, 35)
     plumed_break = break_bond_plumed(plumed, breakpair, Path("distances.dat"))
 
     assert plumed_break["distances"] == plumed_break_ref["distances"]
@@ -32,7 +39,7 @@ def test_plumed_break(tmpdir):
 
 
 def test_modify_coords_break(tmpdir):
-    steps = [Break(29, 35)]
+    steps: list[RecipeStep] = [Break(28, 34)]
     files = SlimFiles(outputdir=tmpdir)
     files.input["trr"] = tmpdir / "pull.trr"
     files.input["tpr"] = tmpdir / "pull.tpr"
@@ -45,7 +52,7 @@ def test_modify_coords_break(tmpdir):
 
 
 def test_modify_coords_move(tmpdir):
-    steps = [Move(idx_to_move=0, new_coords=[[0.0, 0.0, 0.0], 100.0])]
+    steps = [Move(ix_to_move=0, new_coords=[[0.0, 0.0, 0.0], 100.0])]
     files = SlimFiles(outputdir=tmpdir)
     files.input["trr"] = tmpdir / "pull.trr"
     files.input["tpr"] = tmpdir / "pull.tpr"

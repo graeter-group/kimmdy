@@ -155,10 +155,8 @@ def merge_top_parameter_growth(
         )
 
     ## pairs and exclusions
-    try:
-        exclusions_content = get_protein_section(topB.top, "exclusions")
-
-    except ValueError:
+    exclusions_content = get_protein_section(topB.top, "exclusions")
+    if exclusions_content is None:
         # maybe hook this up to empty_sections if it gets accessible
         exclusions = {"content": [], "else_content": [], "extra": [], "condition": None}
         topB.top["moleculetype_0"]["subsections"]["exclusions"] = exclusions

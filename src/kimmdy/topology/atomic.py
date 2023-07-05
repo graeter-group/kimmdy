@@ -1,3 +1,9 @@
+"""
+Atomic datatypes for the topology such as Atom, Bond, Angle, Dihedral, etc.
+The order of the fields comes from the gromacs topology file format.
+See <https://manual.gromacs.org/current/reference-manual/topologies/topology-file-formats.html#topology-file>
+"""
+
 from dataclasses import dataclass, field
 from typing import Optional, Union
 from kimmdy.topology.utils import field_or_none
@@ -180,10 +186,13 @@ class Bond:
 
     @classmethod
     def from_top_line(cls, l: list[str]):
+        funct = field_or_none(l, 2)
+        if funct is None:
+            funct = "1"
         return cls(
             ai=l[0],
             aj=l[1],
-            funct=l[2],
+            funct=funct,
             c0=field_or_none(l, 3),
             c1=field_or_none(l, 4),
             c2=field_or_none(l, 5),
@@ -215,12 +224,15 @@ class BondType:
 
     @classmethod
     def from_top_line(cls, l: list[str]):
+        funct = field_or_none(l, 2)
+        if funct is None:
+            funct = "1"
         return cls(
             i=l[0],
             j=l[1],
             id="---".join(l[:2]),
             id_sym="---".join(reversed(l[:2])),
-            funct=l[2],
+            funct=funct,
             c0=field_or_none(l, 3),
             c1=field_or_none(l, 4),
             c2=field_or_none(l, 5),
@@ -333,16 +345,18 @@ class AngleType:
 
 @dataclass(order=True)
 class Dihedral:
-    """Information about one dihedral
+    """Information about one proper or improper dihedral
 
     A class containing bond information as in the dihedrals section of the topology.
-    Proper dihedrals have funct 9.
     Improper dihedrals have funct 4.
+    Proper dihedrals have funct != 4. Mostly funct 9.
+
+    Note that proper dihedrals of type 9 can be defined multiple times, for different
+    periodicities. This is why would-be parameter c2 is called periodicity.
 
     From gromacs topology:
-    ';', 'ai', 'aj', 'ak', 'al', 'funct', 'c0', 'c1', 'c2', 'c3', 'c4', 'c5'
+    ';', 'ai', 'aj', 'ak', 'al', 'funct', 'c0', 'c1', 'periodicity', 'c3', 'c4', 'c5'
     For proper dihedrals (funct 9): aj < ak
-    For improper dihedrals (funct 4): no guaranteed order
     """
 
     ai: str
@@ -352,13 +366,16 @@ class Dihedral:
     funct: str
     c0: Optional[str] = None
     c1: Optional[str] = None
-    c2: Optional[str] = None
+    periodicity: str = ""
     c3: Optional[str] = None
     c4: Optional[str] = None
     c5: Optional[str] = None
 
     @classmethod
     def from_top_line(cls, l: list[str]):
+        periodicity = field_or_none(l, 7)
+        if periodicity is None:
+            periodicity = ""
         return cls(
             ai=l[0],
             aj=l[1],
@@ -367,11 +384,28 @@ class Dihedral:
             funct=l[4],
             c0=field_or_none(l, 5),
             c1=field_or_none(l, 6),
-            c2=field_or_none(l, 7),
+            periodicity=periodicity,
             c3=field_or_none(l, 8),
             c4=field_or_none(l, 9),
             c5=field_or_none(l, 10),
         )
+
+
+@dataclass
+class MultipleDihedrals:
+    """
+    Multiple ``Dihedral``s with the same ai, aj, ak, al
+    but different periodicities.
+    funct should always be "9" when the length of dihedrals is > 1.
+    The key of the dict is the periodicity (c2).
+    """
+
+    ai: str
+    aj: str
+    ak: str
+    al: str
+    funct: str
+    dihedrals: dict[str, Dihedral]
 
 
 @dataclass(order=True)
@@ -425,6 +459,23 @@ class DihedralType:
             c4=field_or_none(l, 9),
             c5=field_or_none(l, 10),
         )
+
+
+@dataclass(order=True)
+class MultipleDihedralTypes:
+    """
+    Multiple ``DihedralTypes``s with the same ai, aj, ak, al
+    but different periodicities.
+    funct should always be "9" when the length of dihedrals is > 1.
+    The key of the dict is the periodicity (c2).
+    """
+
+    ai: str
+    aj: str
+    ak: str
+    al: str
+    funct: str
+    dihedral_types: dict[str, DihedralType]
 
 
 @dataclass(order=True)

@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, Optional, Union
 
 if TYPE_CHECKING:
     from kimmdy.runmanager import RunManager
@@ -11,106 +11,186 @@ import logging
 from pathlib import Path
 import dill
 import csv
-from copy import deepcopy
-
-# Necessary before 3.11: https://peps.python.org/pep-0673/
-from typing import TypeVar
-
-TypeRecipe = TypeVar("TypeRecipe", bound="Recipe")
 
 
 @dataclass
-class RecipeStep(ABC):
-    """ABC for all RecipeSteps.
-    Indices should be zero-based by default,
-    one-based copies must not be passed around.
+class RecipeStep:
+    """Base class for all RecipeSteps.
+    Indices can be accessed as 0-based or 1-based.
+    ix: 0-based, int
+    id: 1-based, str
     """
 
-    def __post_init__(self):
-        self.is_one_based = False
-        self.to_convert = [
-            "idx_to_move",
-            "idx_to_bind",
-            "idx_to_break",
-            "atom_idx_1",
-            "atom_idx_2",
-        ]
 
-    def one_based(self):
-        """Returns new RecipeStep using one-based indices"""
-        if self.is_one_based:
-            logging.warn("Requesting conversion to one-base, but is already one-based")
-            return self
-        one_based_self = deepcopy(self)
-        one_based_self.is_one_based = True
-        for att_name in self.to_convert:
-            if hasattr(self, att_name):
-                setattr(one_based_self, att_name, getattr(self, att_name) + 1)
-        return one_based_self
-
-    def zero_based(self):
-        """Returns new RecipeStep using one-based indices"""
-        if not self.is_one_based:
-            logging.warn(
-                "Requesting conversion to zero-base, but is already zero-based"
-            )
-            return self
-        zero_based_self = deepcopy(self)
-        zero_based_self.is_one_based = False
-        for att_name in self.to_convert:
-            if hasattr(self, att_name):
-                setattr(zero_based_self, att_name, getattr(self, att_name) - 1)
-        return zero_based_self
-
-
-@dataclass
 class Move(RecipeStep):
     """Change topology and/or coordinates to move an atom.
 
     Attributes
     ----------
-    idx_to_move : int
-    idx_to_bind : Union[int, None]
-        Bonding partner to form bond with, default None.
-    idx_to_break : Union[int, None]
+    ix_to_move : int
+        Index of atom to move. 0-based.
+    ix_to_bind : int
+        Bonding partner to form bond with.
+    ix_to_break : int
         Bonding partner to break bond with, default None.
-    new_coords : Union[list[list[float, float, float], float] , None]
+    new_coords :
         Optional new xyz coordinates for atom to move to, and the associated
         time in ps default None.
+    id_to_move : str
+        Index of atom to move. 1-based
+    id_to_bind : str
+        Bonding partner to form bond with.
+    id_to_break : str
+        Bonding partner to break bond with, default None.
     """
 
-    idx_to_move: int
-    idx_to_bind: Union[int, None] = None
-    idx_to_break: Union[int, None] = None
-    new_coords: Union[list[list[float, float, float], float], None] = None
+    _ix_to_move: int
+    _ix_to_bind: Optional[int] = None
+    _ix_to_break: Optional[int] = None
+    new_coords: Union[tuple[tuple[float, float, float], float], None] = None
+
+    def __init__(
+        self,
+        ix_to_move: int,
+        ix_to_bind: Optional[int] = None,
+        ix_to_break: Optional[int] = None,
+        new_coords: Optional[tuple[tuple[float, float, float], float]] = None,
+    ) -> None:
+        self._ix_to_move = ix_to_move
+        self._ix_to_bind = ix_to_bind
+        self._ix_to_break = ix_to_break
+        self.new_coords = new_coords
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}, ix_to_move: {self.ix_to_move}, ix_to_bind: {self.ix_to_bind}, ix_to_break: {self.ix_to_break}, new_coords: {self.new_coords}"
+
+    @property
+    def ix_to_move(self) -> int:
+        return self._ix_to_move
+
+    @ix_to_move.setter
+    def ix_to_move(self, value: int):
+        self._ix_to_move = value
+
+    @property
+    def id_to_move(self) -> str:
+        return str(self._ix_to_move + 1)
+
+    @id_to_move.setter
+    def id_to_move(self, value: str):
+        self._ix_to_move = int(value) - 1
+
+    @property
+    def ix_to_bind(self) -> Optional[int]:
+        return self._ix_to_bind
+
+    @ix_to_bind.setter
+    def ix_to_bind(self, value: Optional[int]):
+        self._ix_to_bind = value
+
+    @property
+    def id_to_bind(self) -> Optional[str]:
+        if self._ix_to_bind is None:
+            return None
+        else:
+            return str(self._ix_to_bind + 1)
+
+    @id_to_bind.setter
+    def id_to_bind(self, value: Optional[str]):
+        if value is None:
+            self._ix_to_bind = None
+        else:
+            self._ix_to_bind = int(value) - 1
+
+    @property
+    def ix_to_break(self) -> Optional[int]:
+        return self._ix_to_break
+
+    @ix_to_break.setter
+    def ix_to_break(self, value: Optional[int]):
+        self._ix_to_break = value
+
+    @property
+    def id_to_break(self) -> Optional[str]:
+        if self._ix_to_break is None:
+            return None
+        else:
+            return str(self._ix_to_break + 1)
+
+    @id_to_break.setter
+    def id_to_break(self, value: Optional[str]):
+        if value is None:
+            self._ix_to_break = None
+        else:
+            self._ix_to_break = int(value) - 1
 
 
-@dataclass
-class Break(RecipeStep):
+class SingleOperation(RecipeStep):
+    _atom_ix_1: int
+    _atom_ix_2: int
+
+    def __init__(self, ix1, ix2) -> None:
+        self._atom_ix_1 = ix1
+        self._atom_ix_2 = ix2
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}, ixs: ({self.atom_ix_1}, {self.atom_ix_2}) ids: ({self.atom_id_1}, {self.atom_id_2})"
+
+    @property
+    def atom_id_1(self) -> str:
+        return str(self._atom_ix_1 + 1)
+
+    @atom_id_1.setter
+    def atom_id_1(self, value: str):
+        self._atom_ix_1 = int(value) - 1
+
+    @property
+    def atom_ix_1(self) -> int:
+        return self._atom_ix_1
+
+    @atom_ix_1.setter
+    def atom_ix_1(self, value: int):
+        self._atom_ix_1 = value
+
+    @property
+    def atom_id_2(self) -> str:
+        return str(self._atom_ix_2 + 1)
+
+    @atom_id_2.setter
+    def atom_id_2(self, value: str):
+        self._atom_ix_2 = int(value) - 1
+
+    @property
+    def atom_ix_2(self) -> int:
+        return self._atom_ix_2
+
+    @atom_ix_2.setter
+    def atom_ix_2(self, value: int):
+        self._atom_ix_2 = value
+
+
+class Break(SingleOperation, RecipeStep):
     """Change topology to break a bond
 
     Attributes
     ----------
-    atom_idxs : list[int, int]
+    atom_ix1/2 : int
+        0-based atom indices as ints
+    atom_id1/2 : str
         atom indices between which a bond should be removed
     """
 
-    atom_idx_1: int
-    atom_idx_2: int
 
-
-@dataclass
-class Bind(RecipeStep):
+class Bind(SingleOperation):
     """Change topology to form a bond
 
     Attributes
     ----------
-    atom_idxs : list[int, int]
-        atom indices between which a bond should be formed
+    atom_ix1/2 : int
+        0-based atom indices as ints
+    atom_id1/2 : str
+        atom indices between which a bond should be removed
     """
-
-    atom_idx_1: int
-    atom_idx_2: int
 
 
 @dataclass
@@ -134,7 +214,7 @@ class Recipe:
 
     recipe_steps: list[RecipeStep]
     rates: list[float]
-    timespans: list[list[float, float]]
+    timespans: list[tuple[float, float]]
 
     def __post_init__(self):
         self.check_consistency()
@@ -148,9 +228,9 @@ class Recipe:
             Size of the window to average over,
             -1 to average over whole available range.
         """
-        raise NotImplementedError
+        raise NotImplementedError("calc_averages not implemented yet")
 
-    def combine_with(self, other: TypeRecipe):
+    def combine_with(self, other: Recipe):
         """Combines this Recipe with another with the same RecipeSteps.
 
         Parameters
@@ -202,25 +282,25 @@ class RecipeCollection:
         """Combines reactions having the same sequence of RecipeSteps."""
 
         unique_recipes = []
-        unique_recipes_idxs = []
+        unique_recipes_ixs = []
 
         for i, recipe in enumerate(self.recipes):
             if recipe.recipe_steps not in unique_recipes:
                 unique_recipes.append(recipe.recipe_steps)
-                unique_recipes_idxs.append([i])
+                unique_recipes_ixs.append([i])
             else:
                 for j, ur in enumerate(unique_recipes):
                     if recipe.recipe_steps == ur:
-                        unique_recipes_idxs[j].append(i)
+                        unique_recipes_ixs[j].append(i)
 
         # merge every dublicate into first reaction path
-        for uri in unique_recipes_idxs:
+        for uri in unique_recipes_ixs:
             if len(uri) > 1:
                 for uri_double in uri[1:]:
                     self.recipes[uri[0]].combine_with(self.recipes[uri_double])
         # only keep first of each reaction path
         urps = []
-        for uri in unique_recipes_idxs:
+        for uri in unique_recipes_ixs:
             urps.append(self.recipes[uri[0]])
         self.recipes = urps
 
@@ -243,7 +323,7 @@ class RecipeCollection:
             dill.dump(self, f)
 
     @classmethod
-    def from_dill(_, path: Path):
+    def from_dill(cls, path: Path):
         with open(path, "rb") as f:
             return dill.load(f)
 
