@@ -14,4 +14,4 @@ class DefaultParameterizer(Parameterizer):
     """default for parameter patch: reconstruct base force field state"""
 
     def parameterize_topology(self, current_topology):
-        return current_topology
+        raise NotImplementedError
