@@ -36,7 +36,8 @@ def generic_rmgr(tmp_path):
     )
     return RunManager(Config(tmp_path / "kimmdy.yml"))
 
-@pytest.fixture(scope='function')
+
+@pytest.fixture(scope="function")
 def generic_topology():
     filedir = Path(__file__).parent / "test_files/test_topology"
     top_path = filedir / "hexala_break29-35.top"
