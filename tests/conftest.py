@@ -5,8 +5,10 @@ from pathlib import Path
 from dataclasses import dataclass, field
 
 from kimmdy.runmanager import RunManager
+from kimmdy.topology.topology import Topology
 from kimmdy.config import Config
 from kimmdy.tasks import TaskFiles
+from kimmdy.parsing import read_top
 from typing import Callable
 
 # name of this file is fixed for pytest to recognize the fixture without importing
@@ -33,3 +35,11 @@ def generic_rmgr(tmp_path):
         target_is_directory=True,
     )
     return RunManager(Config(tmp_path / "kimmdy.yml"))
+
+@pytest.fixture(scope='function')
+def generic_topology():
+    filedir = Path(__file__).parent / "test_files/test_topology"
+    top_path = filedir / "hexala_break29-35.top"
+    top_dict = read_top(top_path)
+    top = Topology(top_dict)
+    return top
