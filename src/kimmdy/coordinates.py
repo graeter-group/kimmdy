@@ -83,20 +83,16 @@ def merge_same(same: list, topA: Topology, topB: Topology, type: Atomic):
 
 
 def merge_top_parameter_growth(
-    files: TaskFiles, focus_nr: Union[list[str], None] = None
+    topA: Topology, topB: Topology, focus_nr: Union[list[str], None] = None
 ) -> Topology:
-    # not the most robust way to get topA and topB
     hyperparameters = {
         "morse_well_depth": "400.0",
         "morse_steepness": "10.0",
         "morse_dist_factor": 5,
     }  # well_depth D [kJ/mol], steepness [nm-1], dist_factor for bond length
-    logging.info(f"Merging topologies {files.input['top']} and {files.output['top']}")
-    topADict = read_top(files.input["top"])
-    topBDict = read_top(files.output["top"])
-    topA = Topology(topADict)
-    topB = Topology(topBDict)
+    logging.info(f"Merging topologies {topA} and {topB}")
 
+    # TODO:
     # think about how to bring focus_nr into this
 
     ## atoms

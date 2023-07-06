@@ -1,6 +1,7 @@
 from __future__ import annotations
 import logging
 from pathlib import Path
+from copy import deepcopy
 import dill
 import queue
 from enum import Enum, auto
@@ -322,6 +323,7 @@ class RunManager:
         logging.debug(f"Chose recipe: {self.recipe_steps}")
 
         # changes to topology
+        top_prev = deepcopy(self.top)
         changer.modify_top(
             self.recipe_steps,
             files,
@@ -344,12 +346,16 @@ class RunManager:
             )
 
         # changes to coordinates
-        run_parameter_growth = changer.modify_coords(self.recipe_steps, files)
+        run_parameter_growth, top_merge_path = changer.modify_coords(
+            self.recipe_steps, files, top_prev, deepcopy(self.top)
+        )
         instance = None
+
         if run_parameter_growth:
             if hasattr(self.config.changer.coordinates, "md_parameter_growth"):
-                # pass merged topology to run_md task
-                self.latest_files["top"] = files.input["top"]
+                # just to make pyright happy
+                if top_merge_path:
+                    self.latest_files["top"] = top_merge_path
                 instance = self.config.changer.coordinates.md_parameter_growth
 
             else:
