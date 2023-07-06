@@ -44,6 +44,7 @@ type_scheme = {
     "out": Path,
     "gromacs_alias": str,
     "ff": Path,
+    "gmx_mdrun_flags": str,
     "ffpatch": None,
     "top": Path,
     "gro": Path,
@@ -116,6 +117,7 @@ class Config:
     out: Path
     gromacs_alias: str
     ff: Path
+    gmx_mdrun_flags: str
     ffpatch: Optional[Path]
     top: Path
     gro: Path
