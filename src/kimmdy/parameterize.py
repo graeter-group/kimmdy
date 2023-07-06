@@ -16,7 +16,7 @@ class DefaultParameterizer(Parameterizer):
     def parameterize_topology(self, current_topology):
         raise NotImplementedError
         # ToDo:
-        # read aminoacids.rtp
+        # use aminoacids.rtp from top.ff
         # check atomtypes & connectivity (bonds)
         # build angle, proper, improper terms
         # update dicts
