@@ -60,14 +60,8 @@ def test_merge_prm_top(coordinates_files):
     topmerge = merge_top_parameter_growth(
         coordinates_files["topA"], coordinates_files["topB"]
     )
-    # topmerge_path = coordinates_files["topB_path"].parent / "top_merge.top"
-    # topdict = topmerge.to_dict()
-    # write_top(topdict, topmerge_path)
-    # topFEP does not work as a reference, the file must be changed for this test to work
-    # try:
+
     assert topmerge.atoms == coordinates_files["topFEP"].atoms
     assert topmerge.bonds == coordinates_files["topFEP"].bonds
     assert topmerge.angles == coordinates_files["topFEP"].angles
     assert topmerge.pairs == coordinates_files["topFEP"].pairs
-    # finally:
-    #     topmerge_path.unlink()
