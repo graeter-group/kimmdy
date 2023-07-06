@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Union
 import logging
 import MDAnalysis as mda
 from typing import Optional
@@ -13,9 +14,8 @@ import numpy as np
 
 
 def modify_coords(
-    recipe_steps: list[RecipeStep],
-    files: TaskFiles,
-):
+    recipe_steps: list[RecipeStep], files: TaskFiles, topA: Topology, topB: Topology
+) -> tuple[bool, Union[Path, None]]:
     logging.debug(f"Entering modify_coords with recipe_steps {recipe_steps}")
 
     trr = files.input["trr"]
@@ -26,6 +26,8 @@ def modify_coords(
     ttime = None
     to_move = []
     run_parameter_growth = False
+
+    top_merge_path = None
     for step in recipe_steps:
         if isinstance(step, Move):
             if step.new_coords:
@@ -66,10 +68,9 @@ def modify_coords(
         )
 
     if run_parameter_growth:
-        top_merge = merge_top_parameter_growth(files)
+        top_merge = merge_top_parameter_growth(topA, topB)
         top_merge_path = files.outputdir / "top_merge.top"
         write_top(top_merge.to_dict(), top_merge_path)
-        files.input["top"] = top_merge_path
 
     else:
         trr_out = files.outputdir / "coord_mod.trr"
@@ -85,7 +86,7 @@ def modify_coords(
             f"Exit modify_coords, final coordinates written to {trr_out.parts[-2:]}"
         )
 
-    return run_parameter_growth
+    return run_parameter_growth, top_merge_path
 
 
 def modify_top(

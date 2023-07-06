@@ -3,8 +3,9 @@ import shutil
 from pathlib import Path
 
 from kimmdy.reaction import Break, Bind, Move, RecipeStep
-from kimmdy.parsing import read_plumed
+from kimmdy.parsing import read_plumed, read_top
 from kimmdy.changemanager import break_bond_plumed, modify_coords
+from kimmdy.topology.topology import Topology
 from conftest import SlimFiles
 import os
 
@@ -45,9 +46,13 @@ def test_modify_coords_break(tmpdir):
     files.input["tpr"] = tmpdir / "pull.tpr"
     files.input["top"] = tmpdir / "hexala_out.top"
     files.output["top"] = tmpdir / "topol_mod.top"
-    run_parameter_growth = modify_coords(steps, files)
+    topA_dict = read_top(files.input["top"])
+    topB_dict = read_top(files.output["top"])
+    topA = Topology(topA_dict)
+    topB = Topology(topB_dict)
+    run_parameter_growth, top_merge_path = modify_coords(steps, files, topA, topB)
     assert run_parameter_growth
-    assert files.input["top"] == files.outputdir / "top_merge.top"
+    assert top_merge_path
     assert (files.outputdir / "top_merge.top").exists()
 
 
@@ -56,7 +61,7 @@ def test_modify_coords_move(tmpdir):
     files = SlimFiles(outputdir=tmpdir)
     files.input["trr"] = tmpdir / "pull.trr"
     files.input["tpr"] = tmpdir / "pull.tpr"
-    run_parameter_growth = modify_coords(steps, files)
+    run_parameter_growth, top_merge_path = modify_coords(steps, files, None, None)
     assert not run_parameter_growth
     assert files.output["trr"].exists()
     assert files.output["gro"].exists()
