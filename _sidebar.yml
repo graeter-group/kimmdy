@@ -49,7 +49,6 @@ website:
       section: Atomic types
     - contents:
       - reference/reaction.ReactionPlugin.qmd
-      - reference/reaction.qmd
       - reference/reaction.RecipeStep.qmd
       - reference/reaction.Break.qmd
       - reference/reaction.Bind.qmd

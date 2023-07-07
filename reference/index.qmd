@@ -77,7 +77,6 @@ Protocol to add a new reaction plugin to KIMMDY
 | | |
 | --- | --- |
 | [reaction.ReactionPlugin](reaction.ReactionPlugin.qmd#kimmdy.reaction.ReactionPlugin) | Reaction base class |
-| [reaction](reaction.qmd#kimmdy.reaction) | ReactionPlugin protocoll and reaction recipes. |
 | [reaction.RecipeStep](reaction.RecipeStep.qmd#kimmdy.reaction.RecipeStep) | Base class for all RecipeSteps. |
 | [reaction.Break](reaction.Break.qmd#kimmdy.reaction.Break) | Change topology to break a bond |
 | [reaction.Bind](reaction.Bind.qmd#kimmdy.reaction.Bind) | Change topology to form a bond |

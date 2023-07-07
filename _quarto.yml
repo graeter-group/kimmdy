@@ -96,7 +96,7 @@ quartodoc:
         - name: kmc
         - name: misc_helper
         - name: parsing
-        - name: reaction
+        # - name: reaction
         - name: runmanager
         - name: tasks
         - name: utils
@@ -139,7 +139,6 @@ quartodoc:
       desc: Protocol to add a new reaction plugin to KIMMDY
       contents:
         - name: reaction.ReactionPlugin
-        - name: reaction
         - name: reaction.RecipeStep
         - name: reaction.Break
         - name: reaction.Bind
