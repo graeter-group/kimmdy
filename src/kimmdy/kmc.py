@@ -15,7 +15,6 @@ from numpy.random import default_rng
 from kimmdy.reaction import RecipeCollection, RecipeStep
 
 
-
 @dataclass
 class KMCResult:
     """The result of a KMC step. Similar to a Recipe but for the concrete realization of a reaction.
@@ -29,6 +28,7 @@ class KMCResult:
     time_step :
         Time step during which the reaction occurs
     """
+
     recipe_steps: Union[list[RecipeStep], None] = None
     reaction_probability: Union[list[float], None] = None
     time_step: Union[float, None] = None

@@ -270,7 +270,7 @@ class Config:
         return list(repr.keys())
 
     def __repr__(self):
-        repr = self.__dict__.get('type_scheme')
+        repr = self.__dict__.get("type_scheme")
         return str(repr)
 
     def attr(self, attribute):

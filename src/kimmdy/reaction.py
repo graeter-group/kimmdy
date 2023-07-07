@@ -353,9 +353,9 @@ class ReactionPlugin(ABC):
         dict of types of possible entries in config
     """
 
-    type_scheme : dict = dict()
+    type_scheme: dict = dict()
 
-    def __init__(self, name : str, runmng: RunManager):
+    def __init__(self, name: str, runmng: RunManager):
         self.name = name
         self.runmng = runmng
         # sub config, settings of this specific reaction:

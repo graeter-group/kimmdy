@@ -98,20 +98,21 @@ class RunManager:
     task_mapping :
         Mapping of task names to runmanager methods.
     """
+
     def __init__(self, config: Config):
-        self.config : Config = config
-        self.from_checkpoint : bool = False
+        self.config: Config = config
+        self.from_checkpoint: bool = False
         self.tasks: queue.Queue[Task] = queue.Queue()  # tasks from config
         self.crr_tasks: queue.Queue[Task] = queue.Queue()  # current tasks
-        self.iteration : int = 0
-        self.iterations : int = self.config.iterations
-        self.state : State = State.IDLE
+        self.iteration: int = 0
+        self.iterations: int = self.config.iterations
+        self.state: State = State.IDLE
         self.recipe_collection: RecipeCollection = RecipeCollection([])
         self.latest_files: dict[str, Path] = get_existing_files(config)
         logging.debug("Initialized latest files:")
         logging.debug(pformat(self.latest_files))
-        self.histfile : Path = increment_logfile(Path(f"{self.config.out}_history.log"))
-        self.cptfile : Path = increment_logfile(Path(f"{self.config.out}_kimmdy.cpt"))
+        self.histfile: Path = increment_logfile(Path(f"{self.config.out}_history.log"))
+        self.cptfile: Path = increment_logfile(Path(f"{self.config.out}_kimmdy.cpt"))
         try:
             _ = self.config.ffpatch
         except AttributeError:

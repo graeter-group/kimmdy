@@ -153,7 +153,7 @@ def modify_top(
             - top
         files.output:
             - top
-    ffpatch : 
+    ffpatch :
         TODO: deprecate
     topology:
         TODO: make this required instead of optional
