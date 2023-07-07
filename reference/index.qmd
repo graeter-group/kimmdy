@@ -72,6 +72,22 @@ Internal representations of topology and forcfield entities
 
 ## Reactions
 
+Protocol to add a new reaction plugin to KIMMDY
+
+| | |
+| --- | --- |
+| [reaction.ReactionPlugin](reaction.ReactionPlugin.qmd#kimmdy.reaction.ReactionPlugin) | Reaction base class |
+| [reaction](reaction.qmd#kimmdy.reaction) | ReactionPlugin protocoll and reaction recipes. |
+| [reaction.RecipeStep](reaction.RecipeStep.qmd#kimmdy.reaction.RecipeStep) | Base class for all RecipeSteps. |
+| [reaction.Break](reaction.Break.qmd#kimmdy.reaction.Break) | Change topology to break a bond |
+| [reaction.Bind](reaction.Bind.qmd#kimmdy.reaction.Bind) | Change topology to form a bond |
+| [reaction.Move](reaction.Move.qmd#kimmdy.reaction.Move) | Change topology and/or coordinates to move an atom. |
+| [reaction.SingleOperation](reaction.SingleOperation.qmd#kimmdy.reaction.SingleOperation) |  |
+| [reaction.Recipe](reaction.Recipe.qmd#kimmdy.reaction.Recipe) | A reaction path defined by one series of RecipeSteps. |
+| [reaction.RecipeCollection](reaction.RecipeCollection.qmd#kimmdy.reaction.RecipeCollection) | A RecipeCollection encompasses a number of reaction paths. |
+
+## Reaction Plugins
+
 Reaction plugins bundled with KIMMDY
 
 | | |

@@ -420,6 +420,71 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../reference/reaction.ReactionPlugin.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">reaction.ReactionPlugin</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/reaction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">reaction</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/reaction.RecipeStep.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">reaction.RecipeStep</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/reaction.Break.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">reaction.Break</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/reaction.Bind.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">reaction.Bind</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/reaction.Move.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">reaction.Move</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/reaction.SingleOperation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">reaction.SingleOperation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/reaction.Recipe.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">reaction.Recipe</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/reaction.RecipeCollection.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">reaction.RecipeCollection</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="true">
+ <span class="menu-text">Reaction Plugins</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../reference/reactions.homolysis.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">reactions.homolysis</span></a>
   </div>
@@ -444,6 +509,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#topology" id="toc-topology" class="nav-link" data-scroll-target="#topology">Topology</a></li>
   <li><a href="#atomic-types" id="toc-atomic-types" class="nav-link" data-scroll-target="#atomic-types">Atomic types</a></li>
   <li><a href="#reactions" id="toc-reactions" class="nav-link" data-scroll-target="#reactions">Reactions</a></li>
+  <li><a href="#reaction-plugins" id="toc-reaction-plugins" class="nav-link" data-scroll-target="#reaction-plugins">Reaction Plugins</a></li>
   </ul></li>
   </ul>
 <div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hits-mbm-dev/kimmdy/edit/main/reference/index.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/hits-mbm-dev/kimmdy/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
@@ -637,6 +703,50 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="reactions" class="level2">
 <h2 class="anchored" data-anchor-id="reactions">Reactions</h2>
+<p>Protocol to add a new reaction plugin to KIMMDY</p>
+<table class="table">
+<tbody>
+<tr class="odd">
+<td><a href="../reference/reaction.ReactionPlugin.html#kimmdy.reaction.ReactionPlugin">reaction.ReactionPlugin</a></td>
+<td>Reaction base class</td>
+</tr>
+<tr class="even">
+<td><a href="../reference/reaction.html#kimmdy.reaction">reaction</a></td>
+<td>ReactionPlugin protocoll and reaction recipes.</td>
+</tr>
+<tr class="odd">
+<td><a href="../reference/reaction.RecipeStep.html#kimmdy.reaction.RecipeStep">reaction.RecipeStep</a></td>
+<td>Base class for all RecipeSteps.</td>
+</tr>
+<tr class="even">
+<td><a href="../reference/reaction.Break.html#kimmdy.reaction.Break">reaction.Break</a></td>
+<td>Change topology to break a bond</td>
+</tr>
+<tr class="odd">
+<td><a href="../reference/reaction.Bind.html#kimmdy.reaction.Bind">reaction.Bind</a></td>
+<td>Change topology to form a bond</td>
+</tr>
+<tr class="even">
+<td><a href="../reference/reaction.Move.html#kimmdy.reaction.Move">reaction.Move</a></td>
+<td>Change topology and/or coordinates to move an atom.</td>
+</tr>
+<tr class="odd">
+<td><a href="../reference/reaction.SingleOperation.html#kimmdy.reaction.SingleOperation">reaction.SingleOperation</a></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><a href="../reference/reaction.Recipe.html#kimmdy.reaction.Recipe">reaction.Recipe</a></td>
+<td>A reaction path defined by one series of RecipeSteps.</td>
+</tr>
+<tr class="odd">
+<td><a href="../reference/reaction.RecipeCollection.html#kimmdy.reaction.RecipeCollection">reaction.RecipeCollection</a></td>
+<td>A RecipeCollection encompasses a number of reaction paths.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="reaction-plugins" class="level2">
+<h2 class="anchored" data-anchor-id="reaction-plugins">Reaction Plugins</h2>
 <p>Reaction plugins bundled with KIMMDY</p>
 <table class="table">
 <tbody>

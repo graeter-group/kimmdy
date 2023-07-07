@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>reactions.homolysis</title>
+<title>reaction.move</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -30,7 +30,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../reference/topology.atomic.ResidueType.html" rel="prev">
+<link href="../reference/reaction.SingleOperation.html" rel="next">
+<link href="../reference/reaction.Bind.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -126,7 +127,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../reference/reactions.homolysis.html">Reactions</a></li><li class="breadcrumb-item"><a href="../reference/reactions.homolysis.html">reactions.homolysis</a></li></ol></nav>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../reference/reaction.ReactionPlugin.html">Reactions</a></li><li class="breadcrumb-item"><a href="../reference/reaction.Move.html">reaction.Move</a></li></ol></nav>
       <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
       </a>
     </div>
@@ -420,7 +421,72 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/reactions.homolysis.html" class="sidebar-item-text sidebar-link active">
+  <a href="../reference/reaction.ReactionPlugin.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">reaction.ReactionPlugin</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/reaction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">reaction</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/reaction.RecipeStep.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">reaction.RecipeStep</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/reaction.Break.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">reaction.Break</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/reaction.Bind.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">reaction.Bind</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/reaction.Move.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">reaction.Move</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/reaction.SingleOperation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">reaction.SingleOperation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/reaction.Recipe.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">reaction.Recipe</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/reaction.RecipeCollection.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">reaction.RecipeCollection</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="true">
+ <span class="menu-text">Reaction Plugins</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/reactions.homolysis.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">reactions.homolysis</span></a>
   </div>
 </li>
@@ -436,20 +502,78 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#kimmdy.reactions.homolysis" id="toc-kimmdy.reactions.homolysis" class="nav-link active" data-scroll-target="#kimmdy.reactions.homolysis">reactions.homolysis</a></li>
+  <li><a href="#kimmdy.reaction.Move" id="toc-kimmdy.reaction.Move" class="nav-link active" data-scroll-target="#kimmdy.reaction.Move">reaction.Move</a>
+  <ul class="collapse">
+  <li><a href="#attributes" id="toc-attributes" class="nav-link" data-scroll-target="#attributes">Attributes</a></li>
+  </ul></li>
   </ul>
-<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hits-mbm-dev/kimmdy/edit/main/reference/reactions.homolysis.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/hits-mbm-dev/kimmdy/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hits-mbm-dev/kimmdy/edit/main/reference/reaction.Move.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/hits-mbm-dev/kimmdy/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 
 
-<section id="kimmdy.reactions.homolysis" class="level1">
-<h1>reactions.homolysis</h1>
-<p><code>reactions.homolysis</code></p>
+<section id="kimmdy.reaction.Move" class="level1">
+<h1>reaction.Move</h1>
+<p><code>reaction.Move(self, ix_to_move, ix_to_bind=None, ix_to_break=None, new_coords=None)</code></p>
+<p>Change topology and/or coordinates to move an atom.</p>
+<section id="attributes" class="level2">
+<h2 class="anchored" data-anchor-id="attributes">Attributes</h2>
+<table class="table">
+<colgroup>
+<col style="width: 7%">
+<col style="width: 38%">
+<col style="width: 53%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>ix_to_move</td>
+<td>int</td>
+<td>Index of atom to move. 0-based.</td>
+</tr>
+<tr class="even">
+<td>ix_to_bind</td>
+<td>int</td>
+<td>Bonding partner to form bond with.</td>
+</tr>
+<tr class="odd">
+<td>ix_to_break</td>
+<td>int</td>
+<td>Bonding partner to break bond with, default None.</td>
+</tr>
+<tr class="even">
+<td>new_coords</td>
+<td>typing.Union[tuple[tuple[float, float, float], float], None]</td>
+<td>Optional new xyz coordinates for atom to move to, and the associated time in ps default None.</td>
+</tr>
+<tr class="odd">
+<td>id_to_move</td>
+<td>str</td>
+<td>Index of atom to move. 1-based</td>
+</tr>
+<tr class="even">
+<td>id_to_bind</td>
+<td>str</td>
+<td>Bonding partner to form bond with.</td>
+</tr>
+<tr class="odd">
+<td>id_to_break</td>
+<td>str</td>
+<td>Bonding partner to break bond with, default None.</td>
+</tr>
+</tbody>
+</table>
 
 
+</section>
 </section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
@@ -803,11 +927,14 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../reference/topology.atomic.ResidueType.html" class="pagination-link">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">topology.atomic.ResidueType</span>
+      <a href="../reference/reaction.Bind.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">reaction.Bind</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
+      <a href="../reference/reaction.SingleOperation.html" class="pagination-link">
+        <span class="nav-page-text">reaction.SingleOperation</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
   </div>
 </nav>
 </div> <!-- /content -->

@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>reactions.homolysis</title>
+<title>reaction.recipe</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -30,7 +30,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../reference/topology.atomic.ResidueType.html" rel="prev">
+<link href="../reference/reaction.RecipeCollection.html" rel="next">
+<link href="../reference/reaction.SingleOperation.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -126,7 +127,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../reference/reactions.homolysis.html">Reactions</a></li><li class="breadcrumb-item"><a href="../reference/reactions.homolysis.html">reactions.homolysis</a></li></ol></nav>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../reference/reaction.ReactionPlugin.html">Reactions</a></li><li class="breadcrumb-item"><a href="../reference/reaction.Recipe.html">reaction.Recipe</a></li></ol></nav>
       <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
       </a>
     </div>
@@ -420,7 +421,72 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/reactions.homolysis.html" class="sidebar-item-text sidebar-link active">
+  <a href="../reference/reaction.ReactionPlugin.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">reaction.ReactionPlugin</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/reaction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">reaction</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/reaction.RecipeStep.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">reaction.RecipeStep</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/reaction.Break.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">reaction.Break</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/reaction.Bind.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">reaction.Bind</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/reaction.Move.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">reaction.Move</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/reaction.SingleOperation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">reaction.SingleOperation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/reaction.Recipe.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">reaction.Recipe</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/reaction.RecipeCollection.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">reaction.RecipeCollection</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="true">
+ <span class="menu-text">Reaction Plugins</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/reactions.homolysis.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">reactions.homolysis</span></a>
   </div>
 </li>
@@ -436,20 +502,152 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#kimmdy.reactions.homolysis" id="toc-kimmdy.reactions.homolysis" class="nav-link active" data-scroll-target="#kimmdy.reactions.homolysis">reactions.homolysis</a></li>
+  <li><a href="#kimmdy.reaction.Recipe" id="toc-kimmdy.reaction.Recipe" class="nav-link active" data-scroll-target="#kimmdy.reaction.Recipe">reaction.Recipe</a>
+  <ul class="collapse">
+  <li><a href="#attributes" id="toc-attributes" class="nav-link" data-scroll-target="#attributes">Attributes</a></li>
+  <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
+  <ul class="collapse">
+  <li><a href="#kimmdy.reaction.Recipe.calc_averages" id="toc-kimmdy.reaction.Recipe.calc_averages" class="nav-link" data-scroll-target="#kimmdy.reaction.Recipe.calc_averages">calc_averages</a></li>
+  <li><a href="#kimmdy.reaction.Recipe.check_consistency" id="toc-kimmdy.reaction.Recipe.check_consistency" class="nav-link" data-scroll-target="#kimmdy.reaction.Recipe.check_consistency">check_consistency</a></li>
+  <li><a href="#kimmdy.reaction.Recipe.combine_with" id="toc-kimmdy.reaction.Recipe.combine_with" class="nav-link" data-scroll-target="#kimmdy.reaction.Recipe.combine_with">combine_with</a></li>
+  </ul></li>
+  </ul></li>
   </ul>
-<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hits-mbm-dev/kimmdy/edit/main/reference/reactions.homolysis.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/hits-mbm-dev/kimmdy/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hits-mbm-dev/kimmdy/edit/main/reference/reaction.Recipe.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/hits-mbm-dev/kimmdy/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 
 
-<section id="kimmdy.reactions.homolysis" class="level1">
-<h1>reactions.homolysis</h1>
-<p><code>reactions.homolysis</code></p>
+<section id="kimmdy.reaction.Recipe" class="level1">
+<h1>reaction.Recipe</h1>
+<p><code>reaction.Recipe(recipe_steps, rates, timespans)</code></p>
+<p>A reaction path defined by one series of RecipeSteps. Defines everything necessart to build the product state from the educt state.</p>
+<section id="attributes" class="level2">
+<h2 class="anchored" data-anchor-id="attributes">Attributes</h2>
+<table class="table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 16%">
+<col style="width: 76%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>recipe_steps</td>
+<td>list[kimmdy.reaction.RecipeStep]</td>
+<td>Single sequence of RecipeSteps to build product</td>
+</tr>
+<tr class="even">
+<td>rates</td>
+<td>list[float]</td>
+<td>Reaction rates corresponding 1:1 to timespans.</td>
+</tr>
+<tr class="odd">
+<td>timespans</td>
+<td>list[list[float, float]]</td>
+<td>List of half-open timespans (t1, t2] in ps, at which this reaction path applies. Must have same number of timespans as rates. t1 can equal t2 for the first frame.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="methods" class="level2">
+<h2 class="anchored" data-anchor-id="methods">Methods</h2>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="#kimmdy.reaction.Recipe.calc_averages">calc_averages</a></td>
+<td>Calulate average rates over some window size</td>
+</tr>
+<tr class="even">
+<td><a href="#kimmdy.reaction.Recipe.check_consistency">check_consistency</a></td>
+<td>Run consistency checks for correct size of variables</td>
+</tr>
+<tr class="odd">
+<td><a href="#kimmdy.reaction.Recipe.combine_with">combine_with</a></td>
+<td>Combines this Recipe with another with the same RecipeSteps.</td>
+</tr>
+</tbody>
+</table>
+<section id="kimmdy.reaction.Recipe.calc_averages" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.reaction.Recipe.calc_averages">calc_averages</h3>
+<p><code>reaction.Recipe.calc_averages(self, window_size)</code></p>
+<p>Calulate average rates over some window size</p>
+<section id="parameters" class="level4">
+<h4 class="anchored" data-anchor-id="parameters">Parameters</h4>
+<table class="table">
+<colgroup>
+<col style="width: 13%">
+<col style="width: 7%">
+<col style="width: 69%">
+<col style="width: 10%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>window_size</code></td>
+<td>int</td>
+<td>Size of the window to average over, -1 to average over whole available range.</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="kimmdy.reaction.Recipe.check_consistency" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.reaction.Recipe.check_consistency">check_consistency</h3>
+<p><code>reaction.Recipe.check_consistency(self)</code></p>
+<p>Run consistency checks for correct size of variables</p>
+</section>
+<section id="kimmdy.reaction.Recipe.combine_with" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.reaction.Recipe.combine_with">combine_with</h3>
+<p><code>reaction.Recipe.combine_with(self, other)</code></p>
+<p>Combines this Recipe with another with the same RecipeSteps.</p>
+<section id="parameters-1" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-1">Parameters</h4>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>other</code></td>
+<td>Recipe</td>
+<td></td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
 
 
+</section>
+</section>
+</section>
 </section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
@@ -803,11 +1001,14 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../reference/topology.atomic.ResidueType.html" class="pagination-link">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">topology.atomic.ResidueType</span>
+      <a href="../reference/reaction.SingleOperation.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">reaction.SingleOperation</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
+      <a href="../reference/reaction.RecipeCollection.html" class="pagination-link">
+        <span class="nav-page-text">reaction.RecipeCollection</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
   </div>
 </nav>
 </div> <!-- /content -->

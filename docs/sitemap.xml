@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>http://hits-mbm-dev.github.io/kimmdy/index.html</loc>
-    <lastmod>2023-07-07T07:49:14.504Z</lastmod>
+    <lastmod>2023-07-07T13:12:17.884Z</lastmod>
   </url>
   <url>
     <loc>http://hits-mbm-dev.github.io/kimmdy/reference/get_object.html</loc>
@@ -18,7 +18,7 @@
   </url>
   <url>
     <loc>http://hits-mbm-dev.github.io/kimmdy/reference/reactions.homolysis.html</loc>
-    <lastmod>2023-07-07T07:49:18.172Z</lastmod>
+    <lastmod>2023-07-07T12:56:16.049Z</lastmod>
   </url>
   <url>
     <loc>http://hits-mbm-dev.github.io/kimmdy/reference/kimmdy.runmanager.RunManager.filehist.html</loc>
@@ -98,7 +98,7 @@
   </url>
   <url>
     <loc>http://hits-mbm-dev.github.io/kimmdy/reference/parsing.html</loc>
-    <lastmod>2023-07-07T12:49:36.757Z</lastmod>
+    <lastmod>2023-07-07T13:05:31.855Z</lastmod>
   </url>
   <url>
     <loc>http://hits-mbm-dev.github.io/kimmdy/reference/kimmdy.runmanager.RunManager.iterations.html</loc>
@@ -118,7 +118,7 @@
   </url>
   <url>
     <loc>http://hits-mbm-dev.github.io/kimmdy/reference/changemanager.html</loc>
-    <lastmod>2023-07-07T12:24:54.367Z</lastmod>
+    <lastmod>2023-07-07T13:37:15.148Z</lastmod>
   </url>
   <url>
     <loc>http://hits-mbm-dev.github.io/kimmdy/reference/cmd.kimmdy_run.html</loc>
@@ -206,7 +206,7 @@
   </url>
   <url>
     <loc>http://hits-mbm-dev.github.io/kimmdy/reference/tasks.html</loc>
-    <lastmod>2023-07-07T07:50:01.409Z</lastmod>
+    <lastmod>2023-07-07T13:27:42.898Z</lastmod>
   </url>
   <url>
     <loc>http://hits-mbm-dev.github.io/kimmdy/reference/topology.atomic.Pair.html</loc>
@@ -290,7 +290,7 @@
   </url>
   <url>
     <loc>http://hits-mbm-dev.github.io/kimmdy/reference/index.html</loc>
-    <lastmod>2023-07-07T12:49:52.177Z</lastmod>
+    <lastmod>2023-07-07T13:37:30.840Z</lastmod>
   </url>
   <url>
     <loc>http://hits-mbm-dev.github.io/kimmdy/reference/misc_helper.html</loc>
@@ -334,7 +334,7 @@
   </url>
   <url>
     <loc>http://hits-mbm-dev.github.io/kimmdy/guide/getting-started.html</loc>
-    <lastmod>2023-07-07T07:50:32.789Z</lastmod>
+    <lastmod>2023-07-07T13:05:33.975Z</lastmod>
   </url>
   <url>
     <loc>http://hits-mbm-dev.github.io/kimmdy/guide/topology.html</loc>
@@ -343,5 +343,37 @@
   <url>
     <loc>http://hits-mbm-dev.github.io/kimmdy/guide/uml.html</loc>
     <lastmod>2023-07-07T07:50:44.617Z</lastmod>
+  </url>
+  <url>
+    <loc>http://hits-mbm-dev.github.io/kimmdy/reference/reaction.Move.html</loc>
+    <lastmod>2023-07-07T12:56:22.809Z</lastmod>
+  </url>
+  <url>
+    <loc>http://hits-mbm-dev.github.io/kimmdy/reference/reaction.Bind.html</loc>
+    <lastmod>2023-07-07T12:56:23.774Z</lastmod>
+  </url>
+  <url>
+    <loc>http://hits-mbm-dev.github.io/kimmdy/reference/reaction.ReactionPlugin.html</loc>
+    <lastmod>2023-07-07T13:03:18.422Z</lastmod>
+  </url>
+  <url>
+    <loc>http://hits-mbm-dev.github.io/kimmdy/reference/reaction.SingleOperation.html</loc>
+    <lastmod>2023-07-07T12:56:25.666Z</lastmod>
+  </url>
+  <url>
+    <loc>http://hits-mbm-dev.github.io/kimmdy/reference/reaction.Recipe.html</loc>
+    <lastmod>2023-07-07T12:56:26.658Z</lastmod>
+  </url>
+  <url>
+    <loc>http://hits-mbm-dev.github.io/kimmdy/reference/reaction.RecipeCollection.html</loc>
+    <lastmod>2023-07-07T12:56:27.650Z</lastmod>
+  </url>
+  <url>
+    <loc>http://hits-mbm-dev.github.io/kimmdy/reference/reaction.RecipeStep.html</loc>
+    <lastmod>2023-07-07T12:56:29.750Z</lastmod>
+  </url>
+  <url>
+    <loc>http://hits-mbm-dev.github.io/kimmdy/reference/reaction.Break.html</loc>
+    <lastmod>2023-07-07T12:56:30.722Z</lastmod>
   </url>
 </urlset>

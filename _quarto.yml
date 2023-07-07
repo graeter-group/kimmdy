@@ -66,15 +66,19 @@ interlinks:
     numpy:
       url: https://numpy.org/doc/stable/
     python:
-      url: https://docs.python.org/3/
+      url: https://docs.python.org/3.10/
 
+# TODO: interlinks fails for some cases
+# things where there is a page for the module
+# and one page for the class can't resolve the
+# interlinks.
+# WHy aren't classes added to the same page as the module?
 
 quartodoc:
   package: kimmdy
   sidebar: _sidebar.yml
   style: pkgdown
   dir: reference
-  version: 2.0.1 # TODO
 
   sections:
     - title: API
@@ -132,6 +136,18 @@ quartodoc:
         - name: topology.atomic.ResidueProperSpec
         - name: topology.atomic.ResidueType
     - title: Reactions
+      desc: Protocol to add a new reaction plugin to KIMMDY
+      contents:
+        - name: reaction.ReactionPlugin
+        - name: reaction
+        - name: reaction.RecipeStep
+        - name: reaction.Break
+        - name: reaction.Bind
+        - name: reaction.Move
+        - name: reaction.SingleOperation
+        - name: reaction.Recipe
+        - name: reaction.RecipeCollection
+    - title: Reaction Plugins
       desc: Reaction plugins bundled with KIMMDY
       contents:
         - name: reactions.homolysis

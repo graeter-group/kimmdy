@@ -1,0 +1,45 @@
+# reaction.ReactionPlugin { #kimmdy.reaction.ReactionPlugin }
+
+`reaction.ReactionPlugin(self, name, runmng)`
+
+Reaction base class
+
+hast a type_scheme, which is a dict of types of possible entries in config.
+Used to read and check the input config.
+To not use this feature return empty dict.
+
+Example:
+```python
+{"homolysis": {"edis": Path, "bonds": Path}}
+```
+
+## Parameters
+
+| Name          | Type       | Description                                 | Default    |
+|---------------|------------|---------------------------------------------|------------|
+| `name`        | str        | Name of the reaction                        | _required_ |
+| `runmng`      | RunManager | RunManager instance                         | _required_ |
+| `type_scheme` | dict       | dict of types of possible entries in config | _required_ |
+
+## Methods
+
+| Name | Description |
+| --- | --- |
+| [get_recipe_collection](#kimmdy.reaction.ReactionPlugin.get_recipe_collection) | Get a RecipeCollection as a result of the reaction. |
+
+### get_recipe_collection { #kimmdy.reaction.ReactionPlugin.get_recipe_collection }
+
+`reaction.ReactionPlugin.get_recipe_collection(self, files)`
+
+Get a RecipeCollection as a result of the reaction.
+
+This is run as a [Task](`kimmdy.task.Task`) in the RunManager.
+How the RecipeCollection is built is up to the reaction.
+It has access to the current state of the system via the
+runmanager `self.runmng` and the files.
+
+#### Parameters
+
+| Name    | Type      | Description        | Default    |
+|---------|-----------|--------------------|------------|
+| `files` | TaskFiles | TaskFiles instance | _required_ |

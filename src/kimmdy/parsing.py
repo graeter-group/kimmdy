@@ -155,13 +155,13 @@ def read_top(path: Path) -> TopologyDict:
 
     Assumptions and limitation
     -----
-    - ``#include`` statements will be resolved
+    - `#include` statements will be resolved
     - comments will be removed
     - all lines are stripped of leading and trailing whitespace
-    - ``#undef`` is not supported
-    - a section within ``ifdef`` may be a subsection of a section that was started
-      outside of the ``ifdef``
-    - ``#if..#endif`` statements only surround a full section or subsection,
+    - `#undef` is not supported
+    - a section within `ifdef` may be a subsection of a section that was started
+      outside of the `ifdef`
+    - `#if..#endif` statements only surround a full section or subsection,
       not individual lines within a section and
       a section may either be contained within if ... else or it may not be,
       but it can not be duplicated with one part inside and one outside.

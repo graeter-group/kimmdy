@@ -41,10 +41,10 @@ def modify_coords(
     Parameters
     ----------
     recipe_steps :
-        A list of [RecipeStep](``kimmdy.reaction.RecipeStep``)s where each steps contains a ``new_coords``
+        A list of [](`~kimmdy.tasks.Task`) [](`~kimmdy.reaction.RecipeStep`) where each steps contains a `new_coords`
         parameter.
     files :
-        Input and output files for this [Task](``kimmdy.tasks.Task``).
+        Input and output files for this [](`~kimmdy.tasks.Task`).
         files.input:
             - trr
             - tpr
