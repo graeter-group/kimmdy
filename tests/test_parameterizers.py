@@ -34,19 +34,20 @@ def test_generate_input(generic_topology):
 
     input_dict = generate_input(generic_topology)
 
-    with open("GrAPPa_input.json", "w") as f:
+    with open("GrAPPa_input_tripelhelix.json", "w") as f:
         json.dump(input_dict, f)
 
-    assert len(atoms) == 72
-    assert len(bonds) == 70
-    assert radicals == [29, 35]
-    assert atoms[0] == ["ACE", "CT", ["3.39967e-01", "4.57730e-01"], "6"]
+    assert len(input_dict["atoms"]) == 72
+    assert len(input_dict["bonds"]) == 70
+    assert input_dict["radicals"] == [29, 35]
+    assert input_dict["atoms"][0] == [1, "CH3", "ACE", 1, [0.339967, 0.45773], 6]
 
-    assert all([len(x) == 4 for x in atoms])
-    assert all([isinstance(x[y], str) for x in atoms for y in [0, 1, 3]])
-    assert all([isinstance(x[2], list) for x in atoms])
-    assert all([len(x[2]) == 2 for x in atoms])
-    assert all([x[0] in AA3 for x in atoms])
+    assert all([len(x) == 6 for x in input_dict["atoms"]])
+    assert all([isinstance(x[s], str) for x in input_dict["atoms"] for s in [1, 2]])
+    assert all([isinstance(x[i], int) for x in input_dict["atoms"] for i in [0, 3, 5]])
+    assert all([isinstance(x[4], list) for x in input_dict["atoms"]])
+    assert all([len(x[4]) == 2 for x in input_dict["atoms"]])
+    assert all([x[2] in AA3 for x in input_dict["atoms"]])
 
 
 def test_apply_parameters_assertE(generic_topology, caplog):

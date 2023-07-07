@@ -7,6 +7,7 @@ from kimmdy.parsing import read_top, write_top, write_plumed, read_plumed
 import numpy as np
 from kimmdy.tasks import TaskFiles
 from kimmdy.topology.topology import Topology
+from kimmdy.parameterize import Parameterizer
 from kimmdy.coordinates import merge_top_parameter_growth
 from pathlib import Path
 import numpy as np
@@ -93,6 +94,7 @@ def modify_top(
     files: TaskFiles,
     ffpatch: Optional[Path],
     topology: Optional[Topology],
+    parameterizer: Parameterizer,
 ):
     files.output = {"top": files.outputdir / "topol_mod.top"}
     oldtop = files.input["top"]
@@ -132,7 +134,7 @@ def modify_top(
 
         else:
             raise NotImplementedError(f"RecipeStep {step} not implemented!")
-    topology._update_dict()
+    parameterizer.parameterize_topology(topology)
     write_top(topology.top, newtop)
 
     return

@@ -13,7 +13,7 @@ import kimmdy.changemanager as changer
 from kimmdy.tasks import Task, TaskFiles, TaskMapping
 from kimmdy.utils import run_shell_cmd, run_gmx
 from pprint import pformat
-from kimmdy import reaction_plugins
+from kimmdy import reaction_plugins, parameterization_plugins
 from kimmdy.topology.topology import Topology
 from kimmdy.kmc import rf_kmc
 
@@ -78,6 +78,14 @@ class RunManager:
         except AttributeError:
             self.config.ffpatch = None
         self.top = Topology(read_top(self.config.top), self.config.ffpatch)
+        try:
+            self.parameterizer = parameterization_plugins[
+                self.config.changer.topology.parameterization
+            ]()
+        except KeyError as e:
+            raise KeyError(
+                f"The parameterization tool chosen in the configuration file: '{self.config.changer.topology.parameterization}' can not be found in the parameterization plugins: {list(parameterization_plugins.keys())}"
+            ) from e
 
         self.filehist: list[dict[str, TaskFiles]] = [
             {"setup": TaskFiles(self.get_latest)}
@@ -323,10 +331,7 @@ class RunManager:
 
         # changes to topology
         changer.modify_top(
-            self.recipe_steps,
-            files,
-            self.config.ffpatch,
-            self.top,
+            self.recipe_steps, files, self.config.ffpatch, self.top, self.parameterizer
         )
         logging.info(f'Wrote new topology to {files.output["top"].parts[-3:]}')
 

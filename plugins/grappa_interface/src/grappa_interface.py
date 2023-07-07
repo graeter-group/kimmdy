@@ -5,13 +5,14 @@ from kimmdy.topology.atomic import Bond, Angle, Dihedral, MultipleDihedrals
 from kimmdy.parameterize import Parameterizer
 
 
-def generate_input(top: Topology) -> tuple[list, list, list]:
+def generate_input(top: Topology) -> dict:
     at_map = top.ff.atomtypes
     atoms = [
         [
             int(atom.nr),
+            atom.atom,
             atom.residue,
-            atom.type,
+            int(atom.resnr),
             [float(at_map[atom.type].sigma), float(at_map[atom.type].epsilon)],
             int(at_map[atom.type].at_num),
         ]

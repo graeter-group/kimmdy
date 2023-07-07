@@ -10,5 +10,8 @@ mds:
     mdp: 'minimal.mdp'
 reactions:
   hat_naive:
+changer:
+  topology:
+    parameterization: 'grappa' 
 sequence:
   - reactions
