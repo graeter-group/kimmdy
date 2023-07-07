@@ -1,4 +1,7 @@
-# %%
+"""
+Functions for starting KIMMDY either from python or the command line.
+Also initialized logging and configuration.
+"""
 import argparse
 import logging
 from pathlib import Path
@@ -56,11 +59,18 @@ def get_cmdline_args():
     return parser.parse_args()
 
 
-def configure_logging(args, color=False):
+def configure_logging(args: argparse.Namespace, color=False):
     """Configure logging.
 
     Configures the logging module with optional colorcodes
     for the terminal.
+
+    Parameters
+    ----------
+    args :
+        Command line arguments.
+    color :
+        Should logging output use colorcodes for terminal output?
     """
 
     increment_logfile(Path(args.logfile))
@@ -83,7 +93,14 @@ def configure_logging(args, color=False):
     )
 
 
-def _run(args):
+def _run(args: argparse.Namespace):
+    """Run kimmdy.
+
+    Parameters
+    ----------
+    args :
+        Command line arguments.
+    """
     configure_logging(args)
 
     logging.info("Welcome to KIMMDY")
@@ -121,7 +138,28 @@ def kimmdy_run(
     checkpoint: str = "",
     concat: bool = False,
 ):
-    """Run KIMMDY from python."""
+    """Run KIMMDY from python.
+
+    TODO: The concat option looks like we probably
+    want an additional kimmdy analysis module,
+    maybe with its own subcommand(s)?
+    Like gromacs ``gmx <command>``?
+
+
+    Parameters
+    ----------
+    input :
+        kimmdy input yml file.
+    loglevel :
+        Loglevel. One of ["INFO", "WARNING", "MESSAGE", "DEBUG"]
+    logfile :
+        File path of the logfile.
+    checkpoint :
+        File path if a kimmdy.cpt file to restart KIMMDY from a checkpoint.
+    concat :
+        Don't perform a full KIMMDY run but instead concatenate trajectories
+        from a previous run.
+    """
     args = argparse.Namespace(
         input=input,
         loglevel=loglevel,
