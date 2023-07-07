@@ -16,6 +16,9 @@ import numpy as np
 def modify_coords(
     recipe_steps: list[RecipeStep], files: TaskFiles, topA: Topology, topB: Topology
 ) -> tuple[bool, Union[Path, None]]:
+    """Modify the coordinates of the system according to the recipe steps.
+    """
+
     logging.debug(f"Entering modify_coords with recipe_steps {recipe_steps}")
 
     trr = files.input["trr"]
