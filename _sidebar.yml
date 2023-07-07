@@ -13,7 +13,6 @@ website:
       - reference/kmc.qmd
       - reference/misc_helper.qmd
       - reference/parsing.qmd
-      - reference/reaction.qmd
       - reference/runmanager.qmd
       - reference/tasks.qmd
       - reference/utils.qmd
