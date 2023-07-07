@@ -182,6 +182,5 @@ def kimmdy():
     logging.shutdown()
 
 
-# %%
 if __name__ == "__main__":
     kimmdy_run()
