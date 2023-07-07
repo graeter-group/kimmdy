@@ -7,7 +7,7 @@
 | Name | Description |
 | --- | --- |
 | [break_bond_plumed](#kimmdy.changemanager.break_bond_plumed) |  |
-| [modify_coords](#kimmdy.changemanager.modify_coords) |  |
+| [modify_coords](#kimmdy.changemanager.modify_coords) | Modify the coordinates of the system according to the recipe steps. |
 | [modify_plumed](#kimmdy.changemanager.modify_plumed) |  |
 | [modify_top](#kimmdy.changemanager.modify_top) |  |
 
@@ -17,7 +17,9 @@
 
 ### modify_coords { #kimmdy.changemanager.modify_coords }
 
-`changemanager.modify_coords(recipe_steps, files)`
+`changemanager.modify_coords(recipe_steps, files, topA, topB)`
+
+Modify the coordinates of the system according to the recipe steps.
 
 ### modify_plumed { #kimmdy.changemanager.modify_plumed }
 
