@@ -191,12 +191,6 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/coordinates.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">coordinates</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="../reference/kmc.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">kmc</span></a>
   </div>
@@ -420,6 +414,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="kimmdy.parsing" class="level1">
 <h1>parsing</h1>
 <p><code>parsing</code></p>
+<p>All read_&lt;…&gt; and write_&lt;…&gt; functions.</p>
 <section id="attributes" class="level2">
 <h2 class="anchored" data-anchor-id="attributes">Attributes</h2>
 <table class="table">
@@ -432,7 +427,7 @@ ul.task-list li input[type="checkbox"] {
 <tbody>
 <tr class="odd">
 <td><a href="#kimmdy.parsing.GMX_BUILTIN_FF_DIR">GMX_BUILTIN_FF_DIR</a></td>
-<td></td>
+<td>Path to gromacs data directory with the built-in forcefields.</td>
 </tr>
 <tr class="even">
 <td><a href="#kimmdy.parsing.TopologyDict">TopologyDict</a></td>
@@ -477,7 +472,7 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 <tr class="odd">
 <td><a href="#kimmdy.parsing.read_top">read_top</a></td>
-<td>Parse a list of lines from a topology file.</td>
+<td>Read a topology file into a raw TopologyDict represenation.</td>
 </tr>
 <tr class="even">
 <td><a href="#kimmdy.parsing.read_xml_ff">read_xml_ff</a></td>
@@ -493,7 +488,7 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 <tr class="odd">
 <td><a href="#kimmdy.parsing.write_top">write_top</a></td>
-<td></td>
+<td>Write a TopologyDict to a topology file.</td>
 </tr>
 </tbody>
 </table>
@@ -514,11 +509,59 @@ ul.task-list li input[type="checkbox"] {
 <h3 class="anchored" data-anchor-id="kimmdy.parsing.read_edissoc">read_edissoc</h3>
 <p><code>parsing.read_edissoc(path)</code></p>
 <p>reads a edissoc file and turns it into a dict. the tuple of bond atoms make up the key, the dissociation energy E_dissoc [kJ mol-1] is the value</p>
+<section id="parameters" class="level4">
+<h4 class="anchored" data-anchor-id="parameters">Parameters</h4>
+<table class="table">
+<colgroup>
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 61%">
+<col style="width: 16%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>path</code></td>
+<td>Path</td>
+<td>Path to the file. E.g. Path(“edissoc.dat”)</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+</section>
 </section>
 <section id="kimmdy.parsing.read_plumed" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.parsing.read_plumed">read_plumed</h3>
 <p><code>parsing.read_plumed(path)</code></p>
 <p>Read a plumed.dat configuration file.</p>
+<section id="parameters-1" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-1">Parameters</h4>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>path</code></td>
+<td>Path</td>
+<td>Path to the file. E.g. “plumed.dat”</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+</section>
 </section>
 <section id="kimmdy.parsing.read_rtp" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.parsing.read_rtp">read_rtp</h3>
@@ -527,9 +570,9 @@ ul.task-list li input[type="checkbox"] {
 <section id="kimmdy.parsing.read_top" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.parsing.read_top">read_top</h3>
 <p><code>parsing.read_top(path)</code></p>
-<p>Parse a list of lines from a topology file.</p>
-<section id="parameters" class="level4">
-<h4 class="anchored" data-anchor-id="parameters">Parameters</h4>
+<p>Read a topology file into a raw TopologyDict represenation.</p>
+<section id="parameters-2" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-2">Parameters</h4>
 <table class="table">
 <thead>
 <tr class="header">
@@ -571,18 +614,101 @@ ul.task-list li input[type="checkbox"] {
 <section id="kimmdy.parsing.resolve_includes" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.parsing.resolve_includes">resolve_includes</h3>
 <p><code>parsing.resolve_includes(path)</code></p>
-<p>Resolve #include statements in a (top/itp) file. Returns a tuple with the list of lines and the Path to the ff directory.</p>
+<section id="arguments" class="level4">
+<h4 class="anchored" data-anchor-id="arguments">Arguments</h4>
+<p>path : Filepath to read.</p>
+</section>
+<section id="returns" class="level4">
+<h4 class="anchored" data-anchor-id="returns">Returns</h4>
+<table class="table">
+<colgroup>
+<col style="width: 32%">
+<col style="width: 67%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>list[str]</td>
+<td>List of lines.</td>
+</tr>
+<tr class="even">
+<td>typing.Optional[pathlib.Path]</td>
+<td>Path to the ff directory if one of the includes used a file from it.</td>
+</tr>
+</tbody>
+</table>
+</section>
 </section>
 <section id="kimmdy.parsing.write_plumed" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.parsing.write_plumed">write_plumed</h3>
 <p><code>parsing.write_plumed(d, path)</code></p>
 <p>Write a plumed.dat configuration file.</p>
+<section id="parameters-3" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-3">Parameters</h4>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>path</code></td>
+<td>Path</td>
+<td>Path to the file. E.g. “plumed.dat”</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+</section>
 </section>
 <section id="kimmdy.parsing.write_top" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.parsing.write_top">write_top</h3>
 <p><code>parsing.write_top(top, outfile)</code></p>
+<p>Write a TopologyDict to a topology file.</p>
+<section id="parameters-4" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-4">Parameters</h4>
+<table class="table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 17%">
+<col style="width: 58%">
+<col style="width: 14%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>top</code></td>
+<td>TopologyDict</td>
+<td>Raw dictionary represenation of the topology.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td><code>path</code></td>
+<td></td>
+<td>Path to the topology file.</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
 
 
+</section>
 </section>
 </section>
 </section>

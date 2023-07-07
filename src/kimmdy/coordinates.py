@@ -86,8 +86,7 @@ def merge_same(same: list, topA: Topology, topB: Topology, type: Atomic):
             instanceB.c2 = deepcopy(instance_objB.c0)
             instanceB.c3 = deepcopy(instance_objB.c1)
             instanceB.c0 = deepcopy(instance_objA.c0)
-            in                                                                                                
-   42 │   │                                                                                                    stanceB.c1 = deepcopy(instance_objA.c1)
+            instanceB.c1 = deepcopy(instance_objA.c1)
 
 
 def merge_top_parameter_growth(

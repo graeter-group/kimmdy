@@ -2,11 +2,13 @@
 
 `parsing`
 
+All read_<...> and write_<...> functions.
+
 ## Attributes
 
 | Name | Description |
 | --- | --- |
-| [GMX_BUILTIN_FF_DIR](#kimmdy.parsing.GMX_BUILTIN_FF_DIR) |  |
+| [GMX_BUILTIN_FF_DIR](#kimmdy.parsing.GMX_BUILTIN_FF_DIR) | Path to gromacs data directory with the built-in forcefields. |
 | [TopologyDict](#kimmdy.parsing.TopologyDict) |  |
 
 ## Functions
@@ -19,11 +21,11 @@
 | [read_edissoc](#kimmdy.parsing.read_edissoc) | reads a edissoc file and turns it into a dict. |
 | [read_plumed](#kimmdy.parsing.read_plumed) | Read a plumed.dat configuration file. |
 | [read_rtp](#kimmdy.parsing.read_rtp) |  |
-| [read_top](#kimmdy.parsing.read_top) | Parse a list of lines from a topology file. |
+| [read_top](#kimmdy.parsing.read_top) | Read a topology file into a raw TopologyDict represenation. |
 | [read_xml_ff](#kimmdy.parsing.read_xml_ff) |  |
 | [resolve_includes](#kimmdy.parsing.resolve_includes) | Resolve #include statements in a (top/itp) file. |
 | [write_plumed](#kimmdy.parsing.write_plumed) | Write a plumed.dat configuration file. |
-| [write_top](#kimmdy.parsing.write_top) |  |
+| [write_top](#kimmdy.parsing.write_top) | Write a TopologyDict to a topology file. |
 
 ### create_subsections { #kimmdy.parsing.create_subsections }
 
@@ -47,11 +49,23 @@ reads a edissoc file and turns it into a dict.
 the tuple of bond atoms make up the key,
 the dissociation energy E_dissoc [kJ mol-1] is the value
 
+#### Parameters
+
+| Name   | Type   | Description                                | Default    |
+|--------|--------|--------------------------------------------|------------|
+| `path` | Path   | Path to the file. E.g. Path("edissoc.dat") | _required_ |
+
 ### read_plumed { #kimmdy.parsing.read_plumed }
 
 `parsing.read_plumed(path)`
 
 Read a plumed.dat configuration file.
+
+#### Parameters
+
+| Name   | Type   | Description                         | Default    |
+|--------|--------|-------------------------------------|------------|
+| `path` | Path   | Path to the file. E.g. "plumed.dat" | _required_ |
 
 ### read_rtp { #kimmdy.parsing.read_rtp }
 
@@ -61,7 +75,7 @@ Read a plumed.dat configuration file.
 
 `parsing.read_top(path)`
 
-Parse a list of lines from a topology file.
+Read a topology file into a raw TopologyDict represenation.
 
 #### Parameters
 
@@ -94,8 +108,17 @@ Parse a list of lines from a topology file.
 
 `parsing.resolve_includes(path)`
 
-Resolve #include statements in a (top/itp) file.
-Returns a tuple with the list of lines and the Path to the ff directory.
+#### Arguments
+
+path :
+    Filepath to read.
+
+#### Returns
+
+| Type                            | Description                                                          |
+|---------------------------------|----------------------------------------------------------------------|
+| list\[str\]                     | List of lines.                                                       |
+| typing.Optional\[pathlib.Path\] | Path to the ff directory if one of the includes used a file from it. |
 
 ### write_plumed { #kimmdy.parsing.write_plumed }
 
@@ -103,6 +126,21 @@ Returns a tuple with the list of lines and the Path to the ff directory.
 
 Write a plumed.dat configuration file.
 
+#### Parameters
+
+| Name   | Type   | Description                         | Default    |
+|--------|--------|-------------------------------------|------------|
+| `path` | Path   | Path to the file. E.g. "plumed.dat" | _required_ |
+
 ### write_top { #kimmdy.parsing.write_top }
 
 `parsing.write_top(top, outfile)`
+
+Write a TopologyDict to a topology file.
+
+#### Parameters
+
+| Name   | Type         | Description                                   | Default    |
+|--------|--------------|-----------------------------------------------|------------|
+| `top`  | TopologyDict | Raw dictionary represenation of the topology. | _required_ |
+| `path` |              | Path to the topology file.                    | _required_ |

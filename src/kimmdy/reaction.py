@@ -1,3 +1,6 @@
+"""
+ReactionPlugin protocoll and reaction recipes.
+"""
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Union
 

@@ -31,7 +31,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
 <link href="../reference/misc_helper.html" rel="next">
-<link href="../reference/coordinates.html" rel="prev">
+<link href="../reference/constants.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -187,12 +187,6 @@ ul.task-list li input[type="checkbox"] {
   <div class="sidebar-item-container"> 
   <a href="../reference/constants.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">constants</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../reference/coordinates.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">coordinates</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -410,6 +404,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="kimmdy.kmc" class="level1">
 <h1>kmc</h1>
 <p><code>kmc</code></p>
+<p>Kinetic Monte Carlo (KMC) classes and functions.</p>
+<p>In our system, the reaction rate r = (deterministic) reaction constant k = stochastic reaction constant c (from gillespie 1977) = propensity a (from Anderson 2007) because of the fundamental premise of chemical kinetics and because we have one reactant molecule</p>
 <section id="functions" class="level2">
 <h2 class="anchored" data-anchor-id="functions">Functions</h2>
 <table class="table">
@@ -434,6 +430,7 @@ ul.task-list li input[type="checkbox"] {
 <h3 class="anchored" data-anchor-id="kimmdy.kmc.frm">frm</h3>
 <p><code>kmc.frm(recipe_collection, rng=default_rng(), MD_time=None)</code></p>
 <p>First Reaction Method variant of Kinetic Monte Carlo. takes RecipeCollection and choses a recipe based on which reaction would occur.</p>
+<p>Compare e.g.&nbsp;<a href="https://en.wikipedia.org/wiki/Kinetic_Monte_Carlo#Time-dependent_Algorithms" class="uri">https://en.wikipedia.org/wiki/Kinetic_Monte_Carlo#Time-dependent_Algorithms</a></p>
 <section id="parameters" class="level4">
 <h4 class="anchored" data-anchor-id="parameters">Parameters</h4>
 <table class="table">
@@ -478,6 +475,7 @@ ul.task-list li input[type="checkbox"] {
 <h3 class="anchored" data-anchor-id="kimmdy.kmc.rf_kmc">rf_kmc</h3>
 <p><code>kmc.rf_kmc(recipe_collection, rng=default_rng())</code></p>
 <p>Rejection-Free Monte Carlo. takes RecipeCollection and choses a recipe based on the relative propensity of the events.</p>
+<p>Compare e.g.&nbsp;<a href="https://en.wikipedia.org/wiki/Kinetic_Monte_Carlo#Rejection-free_KMC" class="uri">https://en.wikipedia.org/wiki/Kinetic_Monte_Carlo#Rejection-free_KMC</a></p>
 <section id="parameters-1" class="level4">
 <h4 class="anchored" data-anchor-id="parameters-1">Parameters</h4>
 <table class="table">
@@ -868,8 +866,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../reference/coordinates.html" class="pagination-link">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">coordinates</span>
+      <a href="../reference/constants.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">constants</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">

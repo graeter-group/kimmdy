@@ -2,6 +2,14 @@
 
 `kmc`
 
+Kinetic Monte Carlo (KMC) classes and functions.
+
+In our system, the reaction rate r = (deterministic) reaction constant k
+= stochastic reaction constant c (from gillespie 1977)
+= propensity a (from Anderson 2007)
+because of the fundamental premise of chemical kinetics
+and because we have one reactant molecule
+
 ## Functions
 
 | Name | Description |
@@ -15,6 +23,8 @@
 
 First Reaction Method variant of Kinetic Monte Carlo.
 takes RecipeCollection and choses a recipe based on which reaction would occur.
+
+Compare e.g. <https://en.wikipedia.org/wiki/Kinetic_Monte_Carlo#Time-dependent_Algorithms>
 
 #### Parameters
 
@@ -30,6 +40,9 @@ takes RecipeCollection and choses a recipe based on which reaction would occur.
 
 Rejection-Free Monte Carlo.
 takes RecipeCollection and choses a recipe based on the relative propensity of the events.
+
+
+Compare e.g. <https://en.wikipedia.org/wiki/Kinetic_Monte_Carlo#Rejection-free_KMC>
 
 #### Parameters
 
