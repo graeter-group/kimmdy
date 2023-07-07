@@ -300,8 +300,8 @@ def write_top(top: TopologyDict, outfile: Path):
     ----------
     top:
         Raw dictionary represenation of the topology.
-    path :
-        Path to the topology file.
+    outfile :
+        Path to the topology file to write to.
     """
 
     def write_section(f, name, section):

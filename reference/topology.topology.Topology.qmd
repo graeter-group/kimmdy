@@ -39,9 +39,9 @@ Furthermore, it modifies to function types in the topology to account for radica
 
 #### Parameters
 
-| Name       | Type   | Description                                                                                                                                                | Default    |
-|------------|--------|------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
-| `atompair` |        | A tuple of integers with the atoms indices (id, starting at 1) with `from`, the atom being moved and `to`, the atom to which the `from` atom will be bound | _required_ |
+| Name           | Type              | Description                                                                                                                                            | Default    |
+|----------------|-------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| `atompair_nrs` | tuple\[str, str\] | A tuple of integers with the atoms ids (id, starting at 1) with `from`, the atom being moved and `to`, the atom to which the `from` atom will be bound | _required_ |
 
 ### break_bond { #kimmdy.topology.topology.Topology.break_bond }
 

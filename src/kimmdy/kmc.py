@@ -45,10 +45,10 @@ def rf_kmc(
 
     Parameters
     ---------
-    reaction_result :
+    recipe_collection :
         from which one will be choosen
     rng :
-        to generate random numbers in the KMC step
+        function to generate random numbers in the KMC step
     """
 
     # check for empty ReactionResult
@@ -99,12 +99,12 @@ def frm(
 
     Parameters
     ---------
-    reaction_result: ReactionResult
+    recipe_collection :
         from which one will be choosen
-    rng: np.random.BitGenerator
+    rng :
         to generate random numbers in the KMC step
-    MD_time: Union[float, None] [ps]
-        to compare conformational events with reaction events in the time domain
+    MD_time :
+        time [ps] to compare conformational events with reaction events in the time domain
     """
 
     # check for empty ReactionResult

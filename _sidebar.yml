@@ -20,7 +20,15 @@ website:
       - reference/topology.topology.Topology.qmd
       - reference/topology.ff.qmd
       - reference/topology.utils.qmd
-      section: Internals
+      section: Modules
+    - contents:
+      - reference/runmanager.RunManager.qmd
+      section: Other classes
+    - contents:
+      - reference/topology.topology.Topology.qmd
+      - reference/topology.ff.qmd
+      - reference/topology.utils.qmd
+      section: Topology
     - contents:
       - reference/topology.atomic.qmd
       - reference/topology.atomic.Atom.qmd

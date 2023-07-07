@@ -140,7 +140,7 @@ Write a TopologyDict to a topology file.
 
 #### Parameters
 
-| Name   | Type         | Description                                   | Default    |
-|--------|--------------|-----------------------------------------------|------------|
-| `top`  | TopologyDict | Raw dictionary represenation of the topology. | _required_ |
-| `path` |              | Path to the topology file.                    | _required_ |
+| Name      | Type         | Description                                   | Default    |
+|-----------|--------------|-----------------------------------------------|------------|
+| `top`     | TopologyDict | Raw dictionary represenation of the topology. | _required_ |
+| `outfile` | Path         | Path to the topology file to write to.        | _required_ |

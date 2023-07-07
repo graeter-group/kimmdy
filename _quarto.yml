@@ -82,14 +82,9 @@ quartodoc:
       contents:
         - name: cmd
           children: flat
-    - title: Internals
-      desc: TODO
+    - title: Modules
+      desc: Modules
       contents:
-        # set the children option, so that methods get documented
-        # on separate pages. MdRenderer's docs will include a summary
-        # table that links to each page.
-        # - name: ....
-        #   children: separate # embedded, flat, separate
         - name: changemanager
         - name: config
         - name: constants
@@ -97,7 +92,6 @@ quartodoc:
         - name: kmc
         - name: misc_helper
         - name: parsing
-          children: embedded
         - name: reaction
         - name: runmanager
         - name: tasks
@@ -108,6 +102,16 @@ quartodoc:
           children: embedded
         - name: topology.utils
           children: embedded
+    - title: Other classes
+      desc: TODO
+      contents:
+        - name: runmanager.RunManager
+    - title: Topology
+      desc: Topology classes
+      contents:
+        - name: topology.topology.Topology
+        - name: topology.ff
+        - name: topology.utils
     - title: Atomic types
       desc: Internal representations of topology and forcfield entities
       contents:

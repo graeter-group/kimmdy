@@ -28,11 +28,11 @@ Compare e.g. <https://en.wikipedia.org/wiki/Kinetic_Monte_Carlo#Time-dependent_A
 
 #### Parameters
 
-| Name              | Type                        | Description                                                              | Default         |
-|-------------------|-----------------------------|--------------------------------------------------------------------------|-----------------|
-| `reaction_result` |                             | from which one will be choosen                                           | _required_      |
-| `rng`             | numpy.random.BitGenerator   | to generate random numbers in the KMC step                               | `default_rng()` |
-| `MD_time`         | typing.Union\[float, None\] | to compare conformational events with reaction events in the time domain | `None`          |
+| Name                | Type                        | Description                                                                        | Default         |
+|---------------------|-----------------------------|------------------------------------------------------------------------------------|-----------------|
+| `recipe_collection` | RecipeCollection            | from which one will be choosen                                                     | _required_      |
+| `rng`               | numpy.random.BitGenerator   | to generate random numbers in the KMC step                                         | `default_rng()` |
+| `MD_time`           | typing.Union\[float, None\] | time [ps] to compare conformational events with reaction events in the time domain | `None`          |
 
 ### rf_kmc { #kimmdy.kmc.rf_kmc }
 
@@ -46,7 +46,7 @@ Compare e.g. <https://en.wikipedia.org/wiki/Kinetic_Monte_Carlo#Rejection-free_K
 
 #### Parameters
 
-| Name              | Type                      | Description                                | Default         |
-|-------------------|---------------------------|--------------------------------------------|-----------------|
-| `reaction_result` |                           | from which one will be choosen             | _required_      |
-| `rng`             | numpy.random.BitGenerator | to generate random numbers in the KMC step | `default_rng()` |
+| Name                | Type                      | Description                                         | Default         |
+|---------------------|---------------------------|-----------------------------------------------------|-----------------|
+| `recipe_collection` | RecipeCollection          | from which one will be choosen                      | _required_      |
+| `rng`               | numpy.random.BitGenerator | function to generate random numbers in the KMC step | `default_rng()` |
