@@ -7,43 +7,23 @@ Let's jump right in!
 ### Prerequisites
 
 - `python3.9` or higher
-- `gromacs` (tested with version >= 2020.4)
+- `gromacs` (tested with version 2021.4, `gmx` should be available in the `PATH`)
+
+Let's first create a virtual environment for `kimmdy`:
+
+```bash
+python3.9 -m venv .venv
+source .venv/bin/activate
+```
+
+Because we'll be using optional reactio plugins directly from the git repository, we'll need to install `kimmdy` from GitHub with the `plugins` extra:
+
+
+```bash
+pip install git+https://github.com/hits-mbm-dev/kimmdy.git#egg=kimmdy[plugins]
+```
 
 Optional:
 
 - `plumed`-patched version of `gromacs`
-
-## Setup
-
-Create a file:
-
-```{.yaml filename="kimmdy.yml"}
-dryrun: false
-iterations: 100
-name: 'hat_tf_000'
-gromacs_alias: 'gmx'
-top: 'Ala_out.top'
-gro: 'npt.gro'
-ndx: 'index.ndx'
-mds:
-  equilibrium:
-    mdp: 'md.mdp'
-  relax:
-    mdp: 'md_slow.mdp'
-changer:
-  coordinates:
-    md: 'relax'      
-reactions:
-  hat_reaction:
-    frequency_factor: 100000000
-    h_cutoff: 3
-    polling_rate: 1
-
-sequence:
-- equilibrium
-- mult: 2
-  tasks:
-  - equilibrium
- 
-```
 
