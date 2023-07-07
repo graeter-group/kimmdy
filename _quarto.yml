@@ -90,22 +90,14 @@ quartodoc:
       desc: Modules
       contents:
         - name: changemanager
-        - name: config
         - name: constants
         - name: coordinates
         - name: kmc
         - name: misc_helper
         - name: parsing
-        # - name: reaction
         - name: runmanager
         - name: tasks
         - name: utils
-        - name: topology.topology.Topology
-          children: embedded
-        - name: topology.ff
-          children: embedded
-        - name: topology.utils
-          children: embedded
     - title: Other classes
       desc: TODO
       contents:
@@ -138,14 +130,24 @@ quartodoc:
     - title: Reactions
       desc: Protocol to add a new reaction plugin to KIMMDY
       contents:
-        - name: reaction.ReactionPlugin
-        - name: reaction.RecipeStep
-        - name: reaction.Break
-        - name: reaction.Bind
-        - name: reaction.Move
-        - name: reaction.SingleOperation
-        - name: reaction.Recipe
-        - name: reaction.RecipeCollection
+        - kind: auto
+          name: reaction
+          members:
+            - ReactionPlugin
+            - RecipeStep
+            - Break
+            - Bind
+            - Move
+            - SingleOperation
+            - Recipe
+            - RecipeCollection
+    - title: Config
+      desc: config
+      contents:
+        - kind: auto
+          name: config
+          members:
+            - Sequence
     - title: Reaction Plugins
       desc: Reaction plugins bundled with KIMMDY
       contents:

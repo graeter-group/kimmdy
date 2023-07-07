@@ -15,7 +15,6 @@ Modules
 | | |
 | --- | --- |
 | [changemanager](changemanager.qmd#kimmdy.changemanager) | The changemanager module holds functions that modify the system |
-| [config](config.qmd#kimmdy.config) | Read and validate kimmdy.yml configuration files |
 | [constants](constants.qmd#kimmdy.constants) | Comstants used throughout KIMMDY |
 | [coordinates](coordinates.qmd#kimmdy.coordinates) | TODO: WIP |
 | [kmc](kmc.qmd#kimmdy.kmc) | Kinetic Monte Carlo (KMC) classes and functions. |
@@ -24,9 +23,6 @@ Modules
 | [runmanager](runmanager.qmd#kimmdy.runmanager) | The Runmanager is the main entry point of the program. |
 | [tasks](tasks.qmd#kimmdy.tasks) |  |
 | [utils](utils.qmd#kimmdy.utils) |  |
-| [topology.topology.Topology](topology.topology.Topology.qmd#kimmdy.topology.topology.Topology) | Smart container for parsed topology data. |
-| [topology.ff](topology.ff.qmd#kimmdy.topology.ff) |  |
-| [topology.utils](topology.utils.qmd#kimmdy.topology.utils) |  |
 
 ## Other classes
 
@@ -75,14 +71,15 @@ Protocol to add a new reaction plugin to KIMMDY
 
 | | |
 | --- | --- |
-| [reaction.ReactionPlugin](reaction.ReactionPlugin.qmd#kimmdy.reaction.ReactionPlugin) | Reaction base class |
-| [reaction.RecipeStep](reaction.RecipeStep.qmd#kimmdy.reaction.RecipeStep) | Base class for all RecipeSteps. |
-| [reaction.Break](reaction.Break.qmd#kimmdy.reaction.Break) | Change topology to break a bond |
-| [reaction.Bind](reaction.Bind.qmd#kimmdy.reaction.Bind) | Change topology to form a bond |
-| [reaction.Move](reaction.Move.qmd#kimmdy.reaction.Move) | Change topology and/or coordinates to move an atom. |
-| [reaction.SingleOperation](reaction.SingleOperation.qmd#kimmdy.reaction.SingleOperation) |  |
-| [reaction.Recipe](reaction.Recipe.qmd#kimmdy.reaction.Recipe) | A reaction path defined by one series of RecipeSteps. |
-| [reaction.RecipeCollection](reaction.RecipeCollection.qmd#kimmdy.reaction.RecipeCollection) | A RecipeCollection encompasses a number of reaction paths. |
+| [reaction](reaction.qmd#kimmdy.reaction) | ReactionPlugin protocoll and reaction recipes. |
+
+## Config
+
+config
+
+| | |
+| --- | --- |
+| [config](config.qmd#kimmdy.config) | Read and validate kimmdy.yml configuration files |
 
 ## Reaction Plugins
 
