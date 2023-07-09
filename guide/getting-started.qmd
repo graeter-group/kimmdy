@@ -9,21 +9,119 @@ Let's jump right in!
 - `python3.9` or higher
 - `gromacs` (tested with version 2021.4, `gmx` should be available in the `PATH`)
 
+Optional:
+
+- `plumed`-patched version of `gromacs`
+
+## Installation
+
 Let's first create a virtual environment for `kimmdy`:
 
 ```bash
+mkdir kimmdy-tutorial
+cd kimmdy-tutorial
 python3.9 -m venv .venv
 source .venv/bin/activate
 ```
 
-Because we'll be using optional reactio plugins directly from the git repository, we'll need to install `kimmdy` from GitHub with the `plugins` extra:
-
+Because we'll be using optional reaction plugins directly from the git repository, we'll need to install `kimmdy` from GitHub with the `plugins` extra:
 
 ```bash
-pip install git+https://github.com/hits-mbm-dev/kimmdy.git#egg=kimmdy[plugins]
+# pip install git+https://github.com/hits-mbm-dev/kimmdy.git#egg=kimmdy[plugins]
+# TODO: update when repo is public
+git clone ssh://git@github.com/hits-mbm-dev/kimmdy.git
+pushd kimmdy
+python -m pip install -r requirements.txt
+popd
 ```
 
-Optional:
+## Setup the Simulation
 
-- `plumed`-patched version of `gromacs`
+Download the [example kimmdy.yml file](/example/example_ala/kimmdy.yml) to this directory.
+It should look like this:
+
+```{.yaml, filename='kimmdy.yml'}
+dryrun: false
+iterations: 100
+name: 'hat_tf_000'
+gromacs_alias: 'gmx'
+top: 'Ala_out.top'
+gro: 'npt.gro'
+ndx: 'index.ndx'
+mds:
+  equilibrium:
+    mdp: 'md.mdp'
+  relax:
+    mdp: 'md_slow.mdp'
+changer:
+  coordinates:
+    md: 'relax'      
+reactions:
+  hat_reaction:
+    frequency_factor: 100000000
+    h_cutoff: 3
+    polling_rate: 1
+
+sequence:
+- equilibrium
+- mult: 2
+  tasks:
+  - equilibrium
+  - reactions
+```
+
+
+Let's also fetch the other input files:
+
+- [Ala_out.top](/example/example_ala/Ala_out.top)
+- [npt.gro](/example/example_ala/npt.gro)
+- [cat-center.gro](/example/example_ala/cat-center.gro)
+- [index.ndx](/example/example_ala/index.ndx)
+- [md.mdp](/example/example_ala/md.mdp)
+- [md_slow.mdp](/example/example_ala/md_slow.mdp)
+- [minim.mdp](/example/example_ala/minim.mdp)
+
+Our starting structure is a simple ACE/NME-capped Alanine molecule:
+
+<!-- TODO: install molstar extension -->
+
+{{< mol ../example/example_ala/npt.gro >}}
+
+Start a KIMMDY run with `kimmdy` command:
+
+## Run the Simulation
+
+```bash
+kimmdy
+```
+
+You can also run kimmdy directly from python with
+
+```python
+from kimmdy.cmd import kimmdy_run
+kimmdy_run()
+```
+
+## Analyse the Simulation
+
+Concatenate the trajectories from the individual steps into one for viewing:
+
+```bash
+kimmdy --concat
+```
+
+or from python:
+
+```python
+kimmdy_run(concat = True)
+```
+
+
+
+
+
+
+
+
+
 
