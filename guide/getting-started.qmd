@@ -37,10 +37,10 @@ popd
 
 ## Setup the Simulation
 
-Download the [example kimmdy.yml file](/example/example_ala/kimmdy.yml) to this directory.
+Download the [example kimmdy.yml file](../example/example_ala/kimmdy.yml) to this directory.
 It should look like this:
 
-```{.yaml, filename='kimmdy.yml'}
+```{.yaml filename='kimmdy.yml'}
 dryrun: false
 iterations: 100
 name: 'hat_tf_000'
