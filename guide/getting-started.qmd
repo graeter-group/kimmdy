@@ -1,3 +1,9 @@
+---
+resources:
+  - 'vis-ala.molj'
+  - '/example/example_ala/Ala_out.top'
+---
+
 # Getting Started
 
 Let's jump right in!
@@ -20,7 +26,7 @@ Let's first create a virtual environment for `kimmdy`:
 ```bash
 mkdir kimmdy-tutorial
 cd kimmdy-tutorial
-python3.9 -m venv .venv
+python -m venv .venv
 source .venv/bin/activate
 ```
 
@@ -81,11 +87,24 @@ Let's also fetch the other input files:
 - [md_slow.mdp](/example/example_ala/md_slow.mdp)
 - [minim.mdp](/example/example_ala/minim.mdp)
 
-Our starting structure is a simple ACE/NME-capped Alanine molecule:
+Or from the command line:
 
-<!-- TODO: install molstar extension -->
+```bash
+# TODO: update when repo is public
+wget https://raw.githubusercontent.com/hits-mbm-dev/kimmdy/main/example/example_ala/Ala_out.top
+wget https://raw.githubusercontent.com/hits-mbm-dev/kimmdy/main/example/example_ala/npt.gro
+wget https://raw.githubusercontent.com/hits-mbm-dev/kimmdy/main/example/example_ala/cat-center.gro
+wget https://raw.githubusercontent.com/hits-mbm-dev/kimmdy/main/example/example_ala/index.ndx
+wget https://raw.githubusercontent.com/hits-mbm-dev/kimmdy/main/example/example_ala/md.mdp
+wget https://raw.githubusercontent.com/hits-mbm-dev/kimmdy/main/example/example_ala/md_slow.mdp
+wget https://raw.githubusercontent.com/hits-mbm-dev/kimmdy/main/example/example_ala/minim.mdp
+wget https://raw.githubusercontent.com/hits-mbm-dev/kimmdy/main/example/example_ala/kimmdy.yml
+```
 
-{{< mol ../example/example_ala/npt.gro >}}
+
+Our starting structure is a simple ACE/NME-capped Alanine molecule in a box of water.
+
+{{< mol-snapshot vis-ala.molj >}}
 
 Start a KIMMDY run with `kimmdy` command:
 
@@ -115,13 +134,6 @@ or from python:
 ```python
 kimmdy_run(concat = True)
 ```
-
-
-
-
-
-
-
 
 
 
