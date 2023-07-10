@@ -187,6 +187,8 @@ class Config:
                 for plg_name, plugin in plugins.items():
                     logging.debug(f"Loading {plg_name}")
                     if type(plugin) is ModuleNotFoundError:
+                        # TODO; should this be more than a warning?
+                        # Should we crash here?
                         logging.warn(
                             f"Plugin {plg_name} could not be loaded!\n{plugin}\n"
                         )

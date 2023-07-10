@@ -32,13 +32,12 @@ source .venv/bin/activate
 
 Because we'll be using optional reaction plugins directly from the git repository, we'll need to install `kimmdy` from GitHub with the `plugins` extra:
 
+
 ```bash
-# pip install git+https://github.com/hits-mbm-dev/kimmdy.git#egg=kimmdy[plugins]
-# TODO: update when repo is public
-git clone ssh://git@github.com/hits-mbm-dev/kimmdy.git
-pushd kimmdy
-python -m pip install -r requirements.txt
-popd
+# TODO: update with https instead of ssh when repo is public
+pip install 'git+ssh://git@github.com/hits-mbm-dev/kimmdy.git#egg=kimmdy'
+pip install 'git+ssh://git@github.com/hits-mbm-dev/kimmdy.git#egg&subdirectory=plugins'
+pip install '../../plugins'
 ```
 
 ## Setup the Simulation
@@ -99,6 +98,18 @@ wget https://raw.githubusercontent.com/hits-mbm-dev/kimmdy/main/example/example_
 wget https://raw.githubusercontent.com/hits-mbm-dev/kimmdy/main/example/example_ala/md_slow.mdp
 wget https://raw.githubusercontent.com/hits-mbm-dev/kimmdy/main/example/example_ala/minim.mdp
 wget https://raw.githubusercontent.com/hits-mbm-dev/kimmdy/main/example/example_ala/kimmdy.yml
+wget https://raw.githubusercontent.com/hits-mbm-dev/kimmdy/main/example/example_ala/amber99sb-star-ildnp.ff
+
+# TODO: while dev, copy from example dir
+cp ../../example/example_ala/Ala_out.top .
+cp ../../example/example_ala/npt.gro .
+cp ../../example/example_ala/cat-center.gro .
+cp ../../example/example_ala/index.ndx .
+cp ../../example/example_ala/md.mdp .
+cp ../../example/example_ala/md_slow.mdp .
+cp ../../example/example_ala/minim.mdp .
+cp ../../example/example_ala/kimmdy.yml .
+cp -r ../../example/example_ala/amber99sb-star-ildnp.ff .
 ```
 
 
