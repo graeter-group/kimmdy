@@ -39,8 +39,8 @@ def generic_rmgr(tmp_path):
 
 @pytest.fixture(scope="function")
 def generic_topology():
-    filedir = Path(__file__).parent / "test_files/test_topology"
-    top_path = filedir / "hexala_break29-35.top"
+    filedir = Path(__file__).parent / "test_files/test_integration/hat_naive"
+    top_path = filedir / "Ala_out.top"
     top_dict = read_top(top_path)
     top = Topology(top_dict)
     return top

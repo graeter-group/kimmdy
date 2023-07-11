@@ -99,4 +99,6 @@ def test_apply_parameters(generic_topology):
 
 
 def test_parameterize_topology(generic_topology):
-    raise NotImplementedError
+    parameterizer = GrappaInterface()
+    new_topology = parameterizer.parameterize_topology(generic_topology)
+    assert new_topology == []

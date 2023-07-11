@@ -6,4 +6,5 @@ jupyter
 git+https://github.com/machow/quartodoc.git
 pydantic<2
 -e .
--e ./plugins
+-e ./plugins/dummyreactions
+-e ./plugins/grappa_interface
