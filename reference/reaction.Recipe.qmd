@@ -1,0 +1,53 @@
+# reaction.Recipe { #kimmdy.reaction.Recipe }
+
+`reaction.Recipe(recipe_steps, rates, timespans)`
+
+A reaction path defined by one series of RecipeSteps.
+Defines everything necessart to build the
+product state from the educt state.
+
+## Attributes
+
+| Name         | Type                               | Description                                                                                                                                                        |
+|--------------|------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| recipe_steps | list\[kimmdy.reaction.RecipeStep\] | Single sequence of RecipeSteps to build product                                                                                                                    |
+| rates        | list\[float\]                      | Reaction rates corresponding 1:1 to timespans.                                                                                                                     |
+| timespans    | list\[list\[float, float\]\]       | List of half-open timespans (t1, t2] in ps, at which this reaction path applies. Must have same number of timespans as rates. t1 can equal t2 for the first frame. |
+
+## Methods
+
+| Name | Description |
+| --- | --- |
+| [calc_averages](#kimmdy.reaction.Recipe.calc_averages) | Calulate average rates over some window size |
+| [check_consistency](#kimmdy.reaction.Recipe.check_consistency) | Run consistency checks for correct size of variables |
+| [combine_with](#kimmdy.reaction.Recipe.combine_with) | Combines this Recipe with another with the same RecipeSteps. |
+
+### calc_averages { #kimmdy.reaction.Recipe.calc_averages }
+
+`reaction.Recipe.calc_averages(self, window_size)`
+
+Calulate average rates over some window size
+
+#### Parameters
+
+| Name          | Type   | Description                                                                   | Default    |
+|---------------|--------|-------------------------------------------------------------------------------|------------|
+| `window_size` | int    | Size of the window to average over, -1 to average over whole available range. | _required_ |
+
+### check_consistency { #kimmdy.reaction.Recipe.check_consistency }
+
+`reaction.Recipe.check_consistency(self)`
+
+Run consistency checks for correct size of variables
+
+### combine_with { #kimmdy.reaction.Recipe.combine_with }
+
+`reaction.Recipe.combine_with(self, other)`
+
+Combines this Recipe with another with the same RecipeSteps.
+
+#### Parameters
+
+| Name    | Type   | Description   | Default    |
+|---------|--------|---------------|------------|
+| `other` | Recipe |               | _required_ |

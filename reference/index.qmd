@@ -6,25 +6,38 @@ Start KIMMDY from a python script or the command line
 
 | | |
 | --- | --- |
-| [cmd](cmd.qmd#kimmdy.cmd) |  |
+| [cmd](cmd.qmd#kimmdy.cmd) | Functions for starting KIMMDY either from python or the command line. |
 
-## Internals
+## Modules
+
+Modules
+
+| | |
+| --- | --- |
+| [changemanager](changemanager.qmd#kimmdy.changemanager) | The changemanager module holds functions that modify the system |
+| [constants](constants.qmd#kimmdy.constants) | Comstants used throughout KIMMDY |
+| [coordinates](coordinates.qmd#kimmdy.coordinates) | TODO: WIP |
+| [kmc](kmc.qmd#kimmdy.kmc) | Kinetic Monte Carlo (KMC) classes and functions. |
+| [misc_helper](misc_helper.qmd#kimmdy.misc_helper) | Miscelaneous utilitiies that didn't fit anywhere else for now. |
+| [parsing](parsing.qmd#kimmdy.parsing) | All read_<...> and write_<...> functions. |
+| [runmanager](runmanager.qmd#kimmdy.runmanager) | The Runmanager is the main entry point of the program. |
+| [tasks](tasks.qmd#kimmdy.tasks) |  |
+| [utils](utils.qmd#kimmdy.utils) |  |
+
+## Other classes
 
 TODO
 
 | | |
 | --- | --- |
-| [changemanager](changemanager.qmd#kimmdy.changemanager) |  |
-| [config](config.qmd#kimmdy.config) |  |
-| [constants](constants.qmd#kimmdy.constants) |  |
-| [coordinates](coordinates.qmd#kimmdy.coordinates) |  |
-| [kmc](kmc.qmd#kimmdy.kmc) |  |
-| [misc_helper](misc_helper.qmd#kimmdy.misc_helper) |  |
-| [parsing](parsing.qmd#kimmdy.parsing) |  |
-| [reaction](reaction.qmd#kimmdy.reaction) |  |
-| [runmanager](runmanager.qmd#kimmdy.runmanager) |  |
-| [tasks](tasks.qmd#kimmdy.tasks) |  |
-| [utils](utils.qmd#kimmdy.utils) |  |
+| [runmanager.RunManager](runmanager.RunManager.qmd#kimmdy.runmanager.RunManager) | The Runmanager is the main entry point of the program. |
+
+## Topology
+
+Topology classes
+
+| | |
+| --- | --- |
 | [topology.topology.Topology](topology.topology.Topology.qmd#kimmdy.topology.topology.Topology) | Smart container for parsed topology data. |
 | [topology.ff](topology.ff.qmd#kimmdy.topology.ff) |  |
 | [topology.utils](topology.utils.qmd#kimmdy.topology.utils) |  |
@@ -53,6 +66,22 @@ Internal representations of topology and forcfield entities
 | [topology.atomic.ResidueType](topology.atomic.ResidueType.qmd#kimmdy.topology.atomic.ResidueType) | Information about one residuetype from aminoacids.rtp |
 
 ## Reactions
+
+Protocol to add a new reaction plugin to KIMMDY
+
+| | |
+| --- | --- |
+| [reaction](reaction.qmd#kimmdy.reaction) | ReactionPlugin protocoll and reaction recipes. |
+
+## Config
+
+config
+
+| | |
+| --- | --- |
+| [config](config.qmd#kimmdy.config) | Read and validate kimmdy.yml configuration files |
+
+## Reaction Plugins
 
 Reaction plugins bundled with KIMMDY
 

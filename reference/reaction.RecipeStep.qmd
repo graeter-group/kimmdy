@@ -1,0 +1,8 @@
+# reaction.RecipeStep { #kimmdy.reaction.RecipeStep }
+
+`reaction.RecipeStep()`
+
+Base class for all RecipeSteps.
+Indices can be accessed as 0-based or 1-based.
+ix: 0-based, int
+id: 1-based, str

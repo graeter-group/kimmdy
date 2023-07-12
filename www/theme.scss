@@ -27,6 +27,10 @@ $gray-dark:              lighten($gray-base, 20%) !default;   // #333
   border: 0;
 }
 
+.code-copy-button {
+    z-index: 1;
+}
+
 /*
 * {
   scrollbar-width: thin;

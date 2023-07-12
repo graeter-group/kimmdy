@@ -582,8 +582,8 @@ class Topology:
 
         Parameters
         ----------
-        atompair:
-            A tuple of integers with the atoms indices (id, starting at 1)
+        atompair_nrs :
+            A tuple of integers with the atoms ids (id, starting at 1)
             with `from`, the atom being moved and
             `to`, the atom to which the `from` atom will be bound
         """

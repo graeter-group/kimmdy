@@ -2,6 +2,9 @@
 
 `cmd`
 
+Functions for starting KIMMDY either from python or the command line.
+Also initialized logging and configuration.
+
 ## Functions
 
 | Name | Description |
@@ -19,6 +22,13 @@ Configure logging.
 
 Configures the logging module with optional colorcodes
 for the terminal.
+
+### Parameters
+
+| Name    | Type               | Description                                               | Default    |
+|---------|--------------------|-----------------------------------------------------------|------------|
+| `args`  | argparse.Namespace | Command line arguments.                                   | _required_ |
+| `color` |                    | Should logging output use colorcodes for terminal output? | `False`    |
 
 ## get_cmdline_args { #kimmdy.cmd.get_cmdline_args }
 
@@ -46,3 +56,18 @@ which is `kimmdy.yml` by default.
 `cmd.kimmdy_run(input=Path('kimmdy.yml'), loglevel='DEBUG', logfile=Path('kimmdy.log'), checkpoint='', concat=False)`
 
 Run KIMMDY from python.
+
+TODO: The concat option looks like we probably
+want an additional kimmdy analysis module,
+maybe with its own subcommand(s)?
+Like gromacs ``gmx <command>``?
+
+### Parameters
+
+| Name         | Type   | Description                                                                               | Default              |
+|--------------|--------|-------------------------------------------------------------------------------------------|----------------------|
+| `input`      | Path   | kimmdy input yml file.                                                                    | `Path('kimmdy.yml')` |
+| `loglevel`   | str    | Loglevel. One of ["INFO", "WARNING", "MESSAGE", "DEBUG"]                                  | `'DEBUG'`            |
+| `logfile`    | Path   | File path of the logfile.                                                                 | `Path('kimmdy.log')` |
+| `checkpoint` | str    | File path if a kimmdy.cpt file to restart KIMMDY from a checkpoint.                       | `''`                 |
+| `concat`     | bool   | Don't perform a full KIMMDY run but instead concatenate trajectories from a previous run. | `False`              |

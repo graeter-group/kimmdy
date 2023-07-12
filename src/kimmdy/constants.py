@@ -1,4 +1,14 @@
+"""
+Comstants used throughout KIMMDY
+"""
+
+
 # compare to atom type perception paper (2006) doi:10.1016/j.jmgm.2005.12.005
+ATOMTYPE_BONDORDER: dict[tuple, int]
+"""
+To determin if an atom is a radical.
+Compare to atom type perception paper (2006) doi:10.1016/j.jmgm.2005.12.005
+"""
 ATOMTYPE_BONDORDER = {
     ("MG", "NA", "CO"): 0,
     (
@@ -49,7 +59,12 @@ ATOMTYPE_BONDORDER = {
     ("CT", "N3", "P", "SO"): 4,
 }
 
-# compare to atom type perception paper (2006) doi:10.1016/j.jmgm.2005.12.005
+
+ATOMTYPE_BONDORDER_FLAT: dict[str, int]
+"""
+To determin if an atom is a radical.
+Compare to atom type perception paper (2006) doi:10.1016/j.jmgm.2005.12.005
+"""
 ATOMTYPE_BONDORDER_FLAT = {
     "MG": 0,
     "NA": 0,

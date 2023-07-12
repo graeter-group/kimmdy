@@ -1,3 +1,6 @@
+"""
+Miscelaneous utilitiies that didn't fit anywhere else for now.
+"""
 from pathlib import Path
 import subprocess
 from typing import Union
