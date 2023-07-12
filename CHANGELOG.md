@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.3.1](https://github.com/hits-mbm-dev/kimmdy/compare/v3.3.0...v3.3.1) (2023-07-12)
+
+
+### Documentation
+
+* add a lot more docstrings to functions, classes, modules ([#149](https://github.com/hits-mbm-dev/kimmdy/issues/149)) ([a0d2a43](https://github.com/hits-mbm-dev/kimmdy/commit/a0d2a43ca257934222227897e586ba81d7507497))
+
 ## [3.3.0](https://github.com/hits-mbm-dev/kimmdy/compare/v3.2.0...v3.3.0) (2023-07-05)
 
 
