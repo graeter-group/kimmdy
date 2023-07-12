@@ -1,4 +1,5 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/hits-mbm-dev/kimmdy/main/www/kimmdy-yaml-config.json
+# yaml-language-server: $schema=../../www/kimmdy-yaml-config.json
+
 dryrun: false
 iterations: 100
 name: 'hat_tf_000'
