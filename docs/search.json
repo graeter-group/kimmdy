@@ -1111,5 +1111,12 @@
     "title": "Getting Started",
     "section": "",
     "text": "kimmdy\nYou can also run kimmdy directly from python with\nfrom kimmdy.cmd import kimmdy_run\nkimmdy_run()"
+  },
+  {
+    "objectID": "guide/plugins.html",
+    "href": "guide/plugins.html",
+    "title": "Writing Reaction Plugins",
+    "section": "",
+    "text": "Writing Reaction Plugins\nTODO\n\n\n\n\n Back to top"
   }
 ]

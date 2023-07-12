@@ -30,6 +30,8 @@ website:
         text: KIMMDY
       - file: ./guide/getting-started.qmd
         text: Getting Started 
+      - file: ./guide/plugins.qmd
+        text: Reaction Plugins
       - file: ./guide/topology.qmd
         text: Development
       - file: reference/index.qmd
