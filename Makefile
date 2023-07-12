@@ -1,9 +1,9 @@
 
-.PHONY: Makefile quartodoc preview docs
+.PHONY: Makefile setup-docs preview docs
 	
 
 preview:
-	python -m quartodoc build 
+	python -m quartodoc build --watch &
 	python -m quartodoc interlinks
 	quarto preview
 
@@ -13,7 +13,7 @@ docs:
 	quarto render
 
 
-quartodoc:
+setup-docs:
 	quarto add --no-prompt machow/quartodoc
 	python -m quartodoc build --verbose
 	python -m quartodoc interlinks
