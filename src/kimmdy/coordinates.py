@@ -1,3 +1,6 @@
+"""
+TODO: WIP
+"""
 import logging
 from typing import Union
 from copy import deepcopy
@@ -15,11 +18,14 @@ from kimmdy.topology.utils import (
 
 def is_parameterized(entry: Atomic):
     """Parameterized topology entries have c0 and c1 attributes != None"""
+    # TODO: this will fail for Atom (no c0 and c1)
+    # should we rename mass and charge of Atom to c0 and c1
+    # instead of patching our way aroiund this here?
     return entry.c0 != None and entry.c1 != None
 
 
 def get_atomicobj(key: list[str], type: AtomicType, top: Topology):
-    # ugly
+    # TODO: ugly
     key = tuple(key)
     type_key = [top.atoms[x].type for x in key]
     if type == Bond:
@@ -63,6 +69,7 @@ def get_keys(atomicA: dict, atomicB: dict) -> tuple[list, list, list]:
 
 
 def merge_same(same: list, topA: Topology, topB: Topology, type: Atomic):
+    # TODO:
     # also ugly
     # should also be able to deal with dihedral
     for key in same:
@@ -194,6 +201,7 @@ def merge_top_parameter_growth(
             c3=deepcopy(angle_objB.c1),
         )
 
+    # TODO: dihedrals
     ## dihedrals
     # dihedraltypes does not work at the moment
     # proper_dihedraltypes also has the periodicity as key

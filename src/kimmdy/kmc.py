@@ -1,16 +1,18 @@
-from typing import Union
+"""
+Kinetic Monte Carlo (KMC) classes and functions.
 
+In our system, the reaction rate r = (deterministic) reaction constant k
+= stochastic reaction constant c (from gillespie 1977)
+= propensity a (from Anderson 2007)
+because of the fundamental premise of chemical kinetics
+and because we have one reactant molecule
+"""
+from typing import Union
 import logging
 import numpy as np
 from dataclasses import dataclass
 from numpy.random import default_rng
 from kimmdy.reaction import RecipeCollection, RecipeStep
-
-# In our system, the reaction rate r = (deterministic) reaction constant k
-# = stochastic reaction constant c (from gillespie 1977)
-# = propensity a (from Anderson 2007)
-# because of the fundamental premise of chemical kinetics
-# and because we have one reactant molecule
 
 
 @dataclass
@@ -19,11 +21,11 @@ class KMCResult:
 
     Attributes
     ----------
-    recipe_steps : list[RecipeStep]
+    recipe_steps :
         Single sequence of RecipeSteps to build product
-    reaction_probability : float
+    reaction_probability :
         Integral of reaction propensity with respect to time
-    time_step : float
+    time_step :
         Time step during which the reaction occurs
     """
 
@@ -38,14 +40,16 @@ def rf_kmc(
     """Rejection-Free Monte Carlo.
     takes RecipeCollection and choses a recipe based on the relative propensity of the events.
 
+
+    Compare e.g. <https://en.wikipedia.org/wiki/Kinetic_Monte_Carlo#Rejection-free_KMC>
+
     Parameters
     ---------
-    reaction_result: ReactionResult
+    recipe_collection :
         from which one will be choosen
-    rng: np.random.BitGenerator
-        to generate random numbers in the KMC step
+    rng :
+        function to generate random numbers in the KMC step
     """
-    # compare e.g. <https://en.wikipedia.org/wiki/Kinetic_Monte_Carlo#Rejection-free_KMC>
 
     # check for empty ReactionResult
     if len(recipe_collection.recipes) == 0:
@@ -91,16 +95,17 @@ def frm(
     """First Reaction Method variant of Kinetic Monte Carlo.
     takes RecipeCollection and choses a recipe based on which reaction would occur.
 
+    Compare e.g. <https://en.wikipedia.org/wiki/Kinetic_Monte_Carlo#Time-dependent_Algorithms>
+
     Parameters
     ---------
-    reaction_result: ReactionResult
+    recipe_collection :
         from which one will be choosen
-    rng: np.random.BitGenerator
+    rng :
         to generate random numbers in the KMC step
-    MD_time: Union[float, None] [ps]
-        to compare conformational events with reaction events in the time domain
+    MD_time :
+        time [ps] to compare conformational events with reaction events in the time domain
     """
-    # compare e.g. <https://en.wikipedia.org/wiki/Kinetic_Monte_Carlo#Time-dependent_Algorithms>
 
     # check for empty ReactionResult
     if len(recipe_collection.recipes) == 0:

@@ -2,6 +2,8 @@
 
 `coordinates`
 
+TODO: WIP
+
 ## Functions
 
 | Name | Description |
@@ -32,4 +34,4 @@ Parameterized topology entries have c0 and c1 attributes != None
 
 ### merge_top_parameter_growth { #kimmdy.coordinates.merge_top_parameter_growth }
 
-`coordinates.merge_top_parameter_growth(files, focus_nr=None)`
+`coordinates.merge_top_parameter_growth(topA, topB, focus_nr=None)`

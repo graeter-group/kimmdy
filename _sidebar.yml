@@ -7,20 +7,23 @@ website:
       section: API
     - contents:
       - reference/changemanager.qmd
-      - reference/config.qmd
       - reference/constants.qmd
       - reference/coordinates.qmd
       - reference/kmc.qmd
       - reference/misc_helper.qmd
       - reference/parsing.qmd
-      - reference/reaction.qmd
       - reference/runmanager.qmd
       - reference/tasks.qmd
       - reference/utils.qmd
+      section: Modules
+    - contents:
+      - reference/runmanager.RunManager.qmd
+      section: Other classes
+    - contents:
       - reference/topology.topology.Topology.qmd
       - reference/topology.ff.qmd
       - reference/topology.utils.qmd
-      section: Internals
+      section: Topology
     - contents:
       - reference/topology.atomic.qmd
       - reference/topology.atomic.Atom.qmd
@@ -40,7 +43,13 @@ website:
       - reference/topology.atomic.ResidueType.qmd
       section: Atomic types
     - contents:
-      - reference/reactions.homolysis.qmd
+      - reference/reaction.qmd
       section: Reactions
+    - contents:
+      - reference/config.qmd
+      section: Config
+    - contents:
+      - reference/reactions.homolysis.qmd
+      section: Reaction Plugins
     id: reference
   - id: dummy-sidebar

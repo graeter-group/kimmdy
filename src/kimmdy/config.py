@@ -1,3 +1,7 @@
+"""
+Read and validate kimmdy.yml configuration files
+and package into a parsed format for internal use.
+"""
 from __future__ import annotations
 from typing import Optional
 import yaml
@@ -90,12 +94,32 @@ class SequenceConfig(list):
     tasks: list
 
 
-@dataclass
 class Config:
     """Internal representation of the configuration generated
     from the input file, which enables validation before running
     and computationally expensive operations.
     All settings read from the input file are accessible through nested attributes.
+
+    TODO: think about how much the type annotations on here can lie.
+
+    Attributes
+    run: int
+    experiment: str
+    name: str  # TODO: obsolete??
+    dryrun: bool
+    iterations: int
+    out: Path
+    gromacs_alias: str
+    ff: Path
+    ffpatch: Optional[Path]
+    top: Path
+    gro: Path
+    ndx: Path
+    mds: dict
+    changer: ChangerConfig
+    reactions: ReactionsConfig
+    pull: PullConfig
+    sequence: SequenceConfig
 
     Parameters
     ----------
@@ -110,7 +134,7 @@ class Config:
 
     run: int
     experiment: str
-    name: str  # obsolete??
+    name: str  # TODO: obsolete??
     dryrun: bool
     iterations: int
     out: Path
@@ -163,6 +187,8 @@ class Config:
                 for plg_name, plugin in plugins.items():
                     logging.debug(f"Loading {plg_name}")
                     if type(plugin) is ModuleNotFoundError:
+                        # TODO; should this be more than a warning?
+                        # Should we crash here?
                         logging.warn(
                             f"Plugin {plg_name} could not be loaded!\n{plugin}\n"
                         )
@@ -218,6 +244,9 @@ class Config:
             if not hasattr(self, "ff"):
                 ffs = list(self.cwd.glob("*.ff"))
                 if len(ffs) < 1:
+                    # TODO: it can work with a ff in the gromacs data dir
+                    # need to re-add the `ff` option but change a bit
+                    # to unify with read_top
                     raise FileNotFoundError(
                         "No forcefield found in cwd, please provide one!"
                     )
@@ -228,6 +257,7 @@ class Config:
                 assert ffs[0].is_dir(), "Forcefield should be a directory!"
                 self.ff = ffs[0].resolve()
 
+            # TODO: why is this commented out?
             # assert hasattr(self,'mds'), "MD section not defined in config file!"
             # for attribute in self.mds.get_attributes():
             #     self.mds.attr(attribute).mdp = Path(self.mds.attr(attribute).mdp)
@@ -242,8 +272,7 @@ class Config:
         return list(repr.keys())
 
     def __repr__(self):
-        repr = self.__dict__.copy()
-        repr.pop("type_scheme")
+        repr = self.__dict__.get("type_scheme")
         return str(repr)
 
     def attr(self, attribute):
@@ -253,7 +282,7 @@ class Config:
         return self.__getattribute__(attribute)
 
     def _cast_types(self, to_type_wildcard=None):
-        """Casts types defined in `type_scheme` to raw attributes."""
+        """Cast raw attributes to types defined in `type_scheme`"""
         attr_names = filter(lambda s: s[0] != "_", self.__dir__())
         for attr_name in attr_names:
             to_type = self.type_scheme.get(attr_name)

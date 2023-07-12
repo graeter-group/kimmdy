@@ -86,6 +86,10 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">Getting Started</span></a>
   </li>  
   <li class="nav-item">
+    <a class="nav-link" href="../guide/plugins.html" rel="" target="">
+ <span class="menu-text">Reaction Plugins</span></a>
+  </li>  
+  <li class="nav-item">
     <a class="nav-link" href="../guide/topology.html" rel="" target="">
  <span class="menu-text">Development</span></a>
   </li>  
@@ -164,7 +168,7 @@ ul.task-list li input[type="checkbox"] {
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
- <span class="menu-text">Internals</span></a>
+ <span class="menu-text">Modules</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -174,12 +178,6 @@ ul.task-list li input[type="checkbox"] {
   <div class="sidebar-item-container"> 
   <a href="../reference/changemanager.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">changemanager</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../reference/config.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">config</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -214,12 +212,6 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/reaction.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">reaction</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="../reference/runmanager.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">runmanager</span></a>
   </div>
@@ -236,6 +228,34 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">utils</span></a>
   </div>
 </li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
+ <span class="menu-text">Other classes</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/runmanager.RunManager.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">runmanager.RunManager</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">
+ <span class="menu-text">Topology</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/topology.topology.Topology.html" class="sidebar-item-text sidebar-link">
@@ -258,13 +278,13 @@ ul.task-list li input[type="checkbox"] {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="true">
  <span class="menu-text">Atomic types</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/topology.atomic.html" class="sidebar-item-text sidebar-link">
@@ -365,13 +385,47 @@ ul.task-list li input[type="checkbox"] {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="true">
  <span class="menu-text">Reactions</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/reaction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">reaction</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="true">
+ <span class="menu-text">Config</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/config.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">config</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" aria-expanded="true">
+ <span class="menu-text">Reaction Plugins</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/reactions.homolysis.html" class="sidebar-item-text sidebar-link">
@@ -393,9 +447,13 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#function-reference" id="toc-function-reference" class="nav-link active" data-scroll-target="#function-reference">Function reference</a>
   <ul class="collapse">
   <li><a href="#api" id="toc-api" class="nav-link" data-scroll-target="#api">API</a></li>
-  <li><a href="#internals" id="toc-internals" class="nav-link" data-scroll-target="#internals">Internals</a></li>
+  <li><a href="#modules" id="toc-modules" class="nav-link" data-scroll-target="#modules">Modules</a></li>
+  <li><a href="#other-classes" id="toc-other-classes" class="nav-link" data-scroll-target="#other-classes">Other classes</a></li>
+  <li><a href="#topology" id="toc-topology" class="nav-link" data-scroll-target="#topology">Topology</a></li>
   <li><a href="#atomic-types" id="toc-atomic-types" class="nav-link" data-scroll-target="#atomic-types">Atomic types</a></li>
   <li><a href="#reactions" id="toc-reactions" class="nav-link" data-scroll-target="#reactions">Reactions</a></li>
+  <li><a href="#config" id="toc-config" class="nav-link" data-scroll-target="#config">Config</a></li>
+  <li><a href="#reaction-plugins" id="toc-reaction-plugins" class="nav-link" data-scroll-target="#reaction-plugins">Reaction Plugins</a></li>
   </ul></li>
   </ul>
 <div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hits-mbm-dev/kimmdy/edit/main/reference/index.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/hits-mbm-dev/kimmdy/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
@@ -414,51 +472,43 @@ ul.task-list li input[type="checkbox"] {
 <tbody>
 <tr class="odd">
 <td><a href="../reference/cmd.html#kimmdy.cmd">cmd</a></td>
-<td></td>
+<td>Functions for starting KIMMDY either from python or the command line.</td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="internals" class="level2">
-<h2 class="anchored" data-anchor-id="internals">Internals</h2>
-<p>TODO</p>
+<section id="modules" class="level2">
+<h2 class="anchored" data-anchor-id="modules">Modules</h2>
+<p>Modules</p>
 <table class="table">
 <tbody>
 <tr class="odd">
 <td><a href="../reference/changemanager.html#kimmdy.changemanager">changemanager</a></td>
-<td></td>
+<td>The changemanager module holds functions that modify the system</td>
 </tr>
 <tr class="even">
-<td><a href="../reference/config.html#kimmdy.config">config</a></td>
-<td></td>
-</tr>
-<tr class="odd">
 <td><a href="../reference/constants.html#kimmdy.constants">constants</a></td>
-<td></td>
+<td>Comstants used throughout KIMMDY</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="../reference/coordinates.html#kimmdy.coordinates">coordinates</a></td>
-<td></td>
+<td>TODO: WIP</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="../reference/kmc.html#kimmdy.kmc">kmc</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="../reference/misc_helper.html#kimmdy.misc_helper">misc_helper</a></td>
-<td></td>
+<td>Kinetic Monte Carlo (KMC) classes and functions.</td>
 </tr>
 <tr class="odd">
-<td><a href="../reference/parsing.html#kimmdy.parsing">parsing</a></td>
-<td></td>
+<td><a href="../reference/misc_helper.html#kimmdy.misc_helper">misc_helper</a></td>
+<td>Miscelaneous utilitiies that didn’t fit anywhere else for now.</td>
 </tr>
 <tr class="even">
-<td><a href="../reference/reaction.html#kimmdy.reaction">reaction</a></td>
-<td></td>
+<td><a href="../reference/parsing.html#kimmdy.parsing">parsing</a></td>
+<td>All read_&lt;…&gt; and write_&lt;…&gt; functions.</td>
 </tr>
 <tr class="odd">
 <td><a href="../reference/runmanager.html#kimmdy.runmanager">runmanager</a></td>
-<td></td>
+<td>The Runmanager is the main entry point of the program.</td>
 </tr>
 <tr class="even">
 <td><a href="../reference/tasks.html#kimmdy.tasks">tasks</a></td>
@@ -468,15 +518,35 @@ ul.task-list li input[type="checkbox"] {
 <td><a href="../reference/utils.html#kimmdy.utils">utils</a></td>
 <td></td>
 </tr>
-<tr class="even">
+</tbody>
+</table>
+</section>
+<section id="other-classes" class="level2">
+<h2 class="anchored" data-anchor-id="other-classes">Other classes</h2>
+<p>TODO</p>
+<table class="table">
+<tbody>
+<tr class="odd">
+<td><a href="../reference/runmanager.RunManager.html#kimmdy.runmanager.RunManager">runmanager.RunManager</a></td>
+<td>The Runmanager is the main entry point of the program.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="topology" class="level2">
+<h2 class="anchored" data-anchor-id="topology">Topology</h2>
+<p>Topology classes</p>
+<table class="table">
+<tbody>
+<tr class="odd">
 <td><a href="../reference/topology.topology.Topology.html#kimmdy.topology.topology.Topology">topology.topology.Topology</a></td>
 <td>Smart container for parsed topology data.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="../reference/topology.ff.html#kimmdy.topology.ff">topology.ff</a></td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="../reference/topology.utils.html#kimmdy.topology.utils">topology.utils</a></td>
 <td></td>
 </tr>
@@ -557,6 +627,30 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="reactions" class="level2">
 <h2 class="anchored" data-anchor-id="reactions">Reactions</h2>
+<p>Protocol to add a new reaction plugin to KIMMDY</p>
+<table class="table">
+<tbody>
+<tr class="odd">
+<td><a href="../reference/reaction.html#kimmdy.reaction">reaction</a></td>
+<td>ReactionPlugin protocoll and reaction recipes.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="config" class="level2">
+<h2 class="anchored" data-anchor-id="config">Config</h2>
+<p>config</p>
+<table class="table">
+<tbody>
+<tr class="odd">
+<td><a href="../reference/config.html#kimmdy.config">config</a></td>
+<td>Read and validate kimmdy.yml configuration files</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="reaction-plugins" class="level2">
+<h2 class="anchored" data-anchor-id="reaction-plugins">Reaction Plugins</h2>
 <p>Reaction plugins bundled with KIMMDY</p>
 <table class="table">
 <tbody>

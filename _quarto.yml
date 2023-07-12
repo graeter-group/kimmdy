@@ -30,6 +30,8 @@ website:
         text: KIMMDY
       - file: ./guide/getting-started.qmd
         text: Getting Started 
+      - file: ./guide/plugins.qmd
+        text: Reaction Plugins
       - file: ./guide/topology.qmd
         text: Development
       - file: reference/index.qmd
@@ -66,15 +68,19 @@ interlinks:
     numpy:
       url: https://numpy.org/doc/stable/
     python:
-      url: https://docs.python.org/3/
+      url: https://docs.python.org/3.10/
 
+# TODO: interlinks fails for some cases
+# things where there is a page for the module
+# and one page for the class can't resolve the
+# interlinks.
+# WHy aren't classes added to the same page as the module?
 
 quartodoc:
   package: kimmdy
   sidebar: _sidebar.yml
   style: pkgdown
   dir: reference
-  version: 2.0.1 # TODO
 
   sections:
     - title: API
@@ -82,32 +88,28 @@ quartodoc:
       contents:
         - name: cmd
           children: flat
-    - title: Internals
-      desc: TODO
+    - title: Modules
+      desc: Modules
       contents:
-        # set the children option, so that methods get documented
-        # on separate pages. MdRenderer's docs will include a summary
-        # table that links to each page.
-        # - name: ....
-        #   children: separate # embedded, flat, separate
         - name: changemanager
-        - name: config
         - name: constants
         - name: coordinates
         - name: kmc
         - name: misc_helper
         - name: parsing
-          children: embedded
-        - name: reaction
         - name: runmanager
         - name: tasks
         - name: utils
+    - title: Other classes
+      desc: TODO
+      contents:
+        - name: runmanager.RunManager
+    - title: Topology
+      desc: Topology classes
+      contents:
         - name: topology.topology.Topology
-          children: embedded
         - name: topology.ff
-          children: embedded
         - name: topology.utils
-          children: embedded
     - title: Atomic types
       desc: Internal representations of topology and forcfield entities
       contents:
@@ -128,6 +130,27 @@ quartodoc:
         - name: topology.atomic.ResidueProperSpec
         - name: topology.atomic.ResidueType
     - title: Reactions
+      desc: Protocol to add a new reaction plugin to KIMMDY
+      contents:
+        - kind: auto
+          name: reaction
+          members:
+            - ReactionPlugin
+            - RecipeStep
+            - Break
+            - Bind
+            - Move
+            - SingleOperation
+            - Recipe
+            - RecipeCollection
+    - title: Config
+      desc: config
+      contents:
+        - kind: auto
+          name: config
+          members:
+            - Sequence
+    - title: Reaction Plugins
       desc: Reaction plugins bundled with KIMMDY
       contents:
         - name: reactions.homolysis

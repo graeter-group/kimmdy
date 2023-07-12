@@ -2,10 +2,30 @@
 
 `runmanager.RunManager(self, config)`
 
-The RunManager, a central piece.
+The Runmanager is the main entry point of the program.
 
 Manages the queue of tasks, communicates with the
 rest of the program and keeps track of global state.
+
+## Attributes
+
+| Name              | Type                                        | Description                                               |
+|-------------------|---------------------------------------------|-----------------------------------------------------------|
+| config            | Config                                      | The configuration object.                                 |
+| from_checkpoint   | bool                                        | Whether the runmanager was initialized from a checkpoint. |
+| tasks             | queue.Queue\[kimmdy.tasks.Task\]            | Tasks from config.                                        |
+| crr_tasks         | queue.Queue\[kimmdy.tasks.Task\]            | Current tasks.                                            |
+| iteration         | int                                         | Current iteration.                                        |
+| iterations        | int                                         | Total number of iterations.                               |
+| state             | State                                       | Current state of the system.                              |
+| recipe_collection | RecipeCollection                            | Collection of recipes.                                    |
+| latest_files      | dict\[str, pathlib.Path\]                   | Dictionary of latest files.                               |
+| histfile          | Path                                        | Path to history file.                                     |
+| cptfile           | Path                                        | Path to checkpoint file.                                  |
+| ffpatch           |                                             | Path to force field patch file.                           |
+| top               |                                             | Topology object.                                          |
+| filehist          | list\[dict\[str, kimmdy.tasks.TaskFiles\]\] | List of dictionaries of TaskFiles.                        |
+| task_mapping      | TaskMapping                                 | Mapping of task names to runmanager methods.              |
 
 ## Methods
 
