@@ -11,6 +11,9 @@ from dataclasses import dataclass
 from kimmdy import plugins
 from kimmdy.reaction import ReactionPlugin
 import json
+import importlib.resources as pkg_resources
+import kimmdy
+import pathlib
 
 
 def check_file_exists(p: Path):
@@ -40,32 +43,61 @@ class Mds:
     def __init__(self):
         pass
 
-# with open("./kimmdy-yaml-schema.json", "r") as f:
-#     schema = json.load(f)
 
-type_scheme = {
-    "experiment": str,
-    "run": int,
-    "dryrun": bool,
-    "iterations": int,
-    "out": Path,
-    "gromacs_alias": str,
-    "ff": Path,
-    "top": Path,
-    "gro": Path,
-    "ndx": Path,
-    "mds": {
-        "*": {
-            "mdp": Path,
-            "plumed": {"dat": Path, "distances": Path},
-            "prefix": str,
-            "overwrite": str,
-        }
-    },
-    "changer": {"coordinates": {"md": str, "md_parameter_growth": str}},
-    "reactions": {},
-    "sequence": Sequence,
-}
+def convert_schema_to_type_dict(dictionary):
+    result = {}
+    additionalProperties = dictionary.get("additionalProperties")
+    if additionalProperties is not None:
+        return convert_schema_to_type_dict(additionalProperties)
+
+    properties = dictionary.get("properties")
+    if properties is None:
+        return result
+    for key, value in properties.items():
+        if not isinstance(value, dict):
+            continue
+        elif "pytype" in value:
+            result[key] = eval(value["pytype"])
+        else:
+            print(value)
+            result[key] = convert_schema_to_type_dict(value)
+
+    return result
+
+def config_schema():
+    """Return the schema for the config file"""
+    path = (pkg_resources.files(kimmdy) / 'kimmdy-yaml-schema.json')
+    with path.open("rt") as f:
+        schema = json.load(f)
+    return schema
+
+
+type_scheme = convert_schema_to_type_dict(config_schema())
+
+# type_scheme = {
+#     "experiment": str,
+#     "run": int,
+#     "dryrun": bool,
+#     "iterations": int,
+#     "out": Path,
+#     "gromacs_alias": str,
+#     "ff": Path,
+#     "top": Path,
+#     "gro": Path,
+#     "ndx": Path,
+#     "mds": {
+#         "*": {
+#             "mdp": Path,
+#             "plumed": {"dat": Path, "distances": Path},
+#             "prefix": str,
+#             "overwrite": str,
+#         }
+#     },
+#     "changer": {"coordinates": {"md": str, "md_parameter_growth": str}},
+#     "reactions": {},
+#     "sequence": Sequence,
+# }
+
 
 # classes for static code analysis
 

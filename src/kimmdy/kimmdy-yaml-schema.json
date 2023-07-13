@@ -5,11 +5,13 @@
     "dryrun": {
       "description": "(false) Don't run the actual simulations, just print the tasks",
       "type": "boolean",
+      "pytype": "bool",
       "default": false
     },
     "iterations": {
       "description": "(1) Number of iterations to run",
       "type": "integer",
+      "pytype": "int",
       "default": 1,
       "exclusiveMinimum": 0
     },
@@ -22,14 +24,15 @@
     "experiment": {
       "description": "(kimmdy) Name of the experiment",
       "type": "string",
+      "pytype": "str",
       "default": "kimmdy",
       "pytype": "str"
     },
     "run": {
       "description": "(1) Replica number",
       "type": "integer",
-      "default": "1",
-      "pytype": "int"
+      "pytype": "int",
+      "default": "1"
     },
     "out": {
       "description": "(kimmdy) Output folder",
@@ -58,8 +61,8 @@
     "gromacs_alias": {
       "description": "(gmx) Gromacs alias",
       "type": "string",
-      "default": "gmx",
-      "pytype": "str"
+      "pytype": "str",
+      "default": "gmx"
     },
     "ff": {
       "description": "(amber99sb-star-ildnp.ff) Force field directory",
@@ -120,7 +123,8 @@
       }
     },
     "reactions": {
-      "type": "object"
+      "type": "object",
+      "pytype": "dict"
     },
     "sequence": {
       "type": "array",

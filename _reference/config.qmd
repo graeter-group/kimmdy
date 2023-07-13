@@ -9,6 +9,8 @@ and package into a parsed format for internal use.
 
 | Name | Description |
 | --- | --- |
+| [inp_file](#kimmdy.config.inp_file) |  |
+| [schema](#kimmdy.config.schema) |  |
 | [type_scheme](#kimmdy.config.type_scheme) |  |
 
 ## Classes
