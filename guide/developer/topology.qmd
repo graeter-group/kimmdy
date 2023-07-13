@@ -15,7 +15,7 @@ from kimmdy.misc_helper import top_to_graph
 
 ```{python}
 #| eval: true
-ala_top = read_top(Path('../tests/test_files/test_topology/hexala.top'))
+ala_top = read_top(Path('../../tests/test_files/test_topology/hexala.top'))
 top = Topology(ala_top)
 
 ls = top_to_graph(top) 

@@ -1,10 +1,11 @@
 project:
+  title: KIMMDY
   type: website
   output-dir: docs
   render:
     - index.qmd
     - _reference
-    - guide/*.qmd
+    - guide
 
 
 website:
@@ -15,11 +16,8 @@ website:
   reader-mode: true
   back-to-top-navigation: true
   navbar:
-    logo: ./www/hits-logo.png
     background: light
     tools:
-      - icon: house-fill
-        href: https://www.h-its.org/research/mbm/
       - icon: github
         menu:
           - text: Source Code
@@ -27,19 +25,21 @@ website:
           - text: Report a Bug
             url:  https://github.com/hits-mbm-dev/kimmdy/issues/new
     left:
-      - file: index.qmd
-        text: KIMMDY
       - file: ./guide/getting-started.qmd
         text: Getting Started 
-      - file: ./guide/plugins.qmd
-        text: Reaction Plugins
-      - file: ./guide/topology.qmd
-        text: Development
+      - file: ./guide/index.qmd
+        text: Guide
       - file: _reference/index.qmd
         text: Reference
   sidebar:
+    subtitle: "Reactive MD pipeline for GROMACS using Kinetic Monte Carlo / Molecular Dynamic"
     style: "docked"
-    search: true
+    contents:
+      - section: Guide
+        contents: guide/**
+      - section: Reference
+        contents: _reference/**
+          
 
 execute:
   warning: false
