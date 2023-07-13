@@ -1,0 +1,234 @@
+# reaction { #kimmdy.reaction }
+
+`reaction`
+
+ReactionPlugin protocoll and reaction recipes.
+
+## Classes
+
+| Name | Description |
+| --- | --- |
+| [Bind](#kimmdy.reaction.Bind) | Change topology to form a bond |
+| [Break](#kimmdy.reaction.Break) | Change topology to break a bond |
+| [Move](#kimmdy.reaction.Move) | Change topology and/or coordinates to move an atom. |
+| [ReactionPlugin](#kimmdy.reaction.ReactionPlugin) | Reaction base class |
+| [Recipe](#kimmdy.reaction.Recipe) | A reaction path defined by one series of RecipeSteps. |
+| [RecipeCollection](#kimmdy.reaction.RecipeCollection) | A RecipeCollection encompasses a number of reaction paths. |
+| [RecipeStep](#kimmdy.reaction.RecipeStep) | Base class for all RecipeSteps. |
+| [SingleOperation](#kimmdy.reaction.SingleOperation) |  |
+
+### Bind { #kimmdy.reaction.Bind }
+
+`reaction.Bind()`
+
+Change topology to form a bond
+
+#### Attributes
+
+| Name       | Type   | Description                                         |
+|------------|--------|-----------------------------------------------------|
+| atom_ix1/2 | int    | 0-based atom indices as ints                        |
+| atom_id1/2 | str    | atom indices between which a bond should be removed |
+
+### Break { #kimmdy.reaction.Break }
+
+`reaction.Break()`
+
+Change topology to break a bond
+
+#### Attributes
+
+| Name       | Type   | Description                                         |
+|------------|--------|-----------------------------------------------------|
+| atom_ix1/2 | int    | 0-based atom indices as ints                        |
+| atom_id1/2 | str    | atom indices between which a bond should be removed |
+
+### Move { #kimmdy.reaction.Move }
+
+`reaction.Move(self, ix_to_move, ix_to_bind=None, ix_to_break=None, new_coords=None)`
+
+Change topology and/or coordinates to move an atom.
+
+#### Attributes
+
+| Name        | Type                                                               | Description                                                                                   |
+|-------------|--------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
+| ix_to_move  | int                                                                | Index of atom to move. 0-based.                                                               |
+| ix_to_bind  | int                                                                | Bonding partner to form bond with.                                                            |
+| ix_to_break | int                                                                | Bonding partner to break bond with, default None.                                             |
+| new_coords  | typing.Union\[tuple\[tuple\[float, float, float\], float\], None\] | Optional new xyz coordinates for atom to move to, and the associated time in ps default None. |
+| id_to_move  | str                                                                | Index of atom to move. 1-based                                                                |
+| id_to_bind  | str                                                                | Bonding partner to form bond with.                                                            |
+| id_to_break | str                                                                | Bonding partner to break bond with, default None.                                             |
+
+### ReactionPlugin { #kimmdy.reaction.ReactionPlugin }
+
+`reaction.ReactionPlugin(self, name, runmng)`
+
+Reaction base class
+
+hast a type_scheme, which is a dict of types of possible entries in config.
+Used to read and check the input config.
+To not use this feature return empty dict.
+
+Example:
+```python
+{"homolysis": {"edis": Path, "bonds": Path}}
+```
+
+#### Parameters
+
+| Name     | Type       | Description          | Default    |
+|----------|------------|----------------------|------------|
+| `name`   | str        | Name of the reaction | _required_ |
+| `runmng` | RunManager | RunManager instance  | _required_ |
+
+#### Attributes
+
+| Name | Description |
+| --- | --- |
+| [config](#kimmdy.reaction.ReactionPlugin.config) |  |
+| [name](#kimmdy.reaction.ReactionPlugin.name) |  |
+| [runmng](#kimmdy.reaction.ReactionPlugin.runmng) |  |
+| [type_scheme](#kimmdy.reaction.ReactionPlugin.type_scheme) |  |
+
+#### Methods
+
+| Name | Description |
+| --- | --- |
+| [get_recipe_collection](#kimmdy.reaction.ReactionPlugin.get_recipe_collection) | Get a RecipeCollection as a result of the reaction. |
+
+##### get_recipe_collection { #kimmdy.reaction.ReactionPlugin.get_recipe_collection }
+
+`reaction.ReactionPlugin.get_recipe_collection(self, files)`
+
+Get a RecipeCollection as a result of the reaction.
+
+This is run as a [](`~kimmdy.tasks.Task`) in the RunManager.
+How the RecipeCollection is built is up to the reaction.
+It has access to the current state of the system via the
+runmanager `self.runmng` and the files.
+
+###### Parameters
+
+| Name    | Type      | Description        | Default    |
+|---------|-----------|--------------------|------------|
+| `files` | TaskFiles | TaskFiles instance | _required_ |
+
+### Recipe { #kimmdy.reaction.Recipe }
+
+`reaction.Recipe(recipe_steps, rates, timespans)`
+
+A reaction path defined by one series of RecipeSteps.
+Defines everything necessart to build the
+product state from the educt state.
+
+#### Attributes
+
+| Name         | Type                               | Description                                                                                                                                                        |
+|--------------|------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| recipe_steps | list\[kimmdy.reaction.RecipeStep\] | Single sequence of RecipeSteps to build product                                                                                                                    |
+| rates        | list\[float\]                      | Reaction rates corresponding 1:1 to timespans.                                                                                                                     |
+| timespans    | list\[list\[float, float\]\]       | List of half-open timespans (t1, t2] in ps, at which this reaction path applies. Must have same number of timespans as rates. t1 can equal t2 for the first frame. |
+
+#### Methods
+
+| Name | Description |
+| --- | --- |
+| [calc_averages](#kimmdy.reaction.Recipe.calc_averages) | Calulate average rates over some window size |
+| [check_consistency](#kimmdy.reaction.Recipe.check_consistency) | Run consistency checks for correct size of variables |
+| [combine_with](#kimmdy.reaction.Recipe.combine_with) | Combines this Recipe with another with the same RecipeSteps. |
+
+##### calc_averages { #kimmdy.reaction.Recipe.calc_averages }
+
+`reaction.Recipe.calc_averages(self, window_size)`
+
+Calulate average rates over some window size
+
+###### Parameters
+
+| Name          | Type   | Description                                                                   | Default    |
+|---------------|--------|-------------------------------------------------------------------------------|------------|
+| `window_size` | int    | Size of the window to average over, -1 to average over whole available range. | _required_ |
+
+##### check_consistency { #kimmdy.reaction.Recipe.check_consistency }
+
+`reaction.Recipe.check_consistency(self)`
+
+Run consistency checks for correct size of variables
+
+##### combine_with { #kimmdy.reaction.Recipe.combine_with }
+
+`reaction.Recipe.combine_with(self, other)`
+
+Combines this Recipe with another with the same RecipeSteps.
+
+###### Parameters
+
+| Name    | Type   | Description   | Default    |
+|---------|--------|---------------|------------|
+| `other` | Recipe |               | _required_ |
+
+### RecipeCollection { #kimmdy.reaction.RecipeCollection }
+
+`reaction.RecipeCollection(recipes)`
+
+A RecipeCollection encompasses a number of reaction paths.
+They can originate from multiple reaction plugins, but do not need to.
+
+#### Attributes
+
+| Name | Description |
+| --- | --- |
+| [recipes](#kimmdy.reaction.RecipeCollection.recipes) |  |
+
+#### Methods
+
+| Name | Description |
+| --- | --- |
+| [aggregate_reactions](#kimmdy.reaction.RecipeCollection.aggregate_reactions) | Combines reactions having the same sequence of RecipeSteps. |
+| [from_dill](#kimmdy.reaction.RecipeCollection.from_dill) |  |
+| [to_csv](#kimmdy.reaction.RecipeCollection.to_csv) | Write a ReactionResult as defined in the reaction module to a csv file |
+| [to_dill](#kimmdy.reaction.RecipeCollection.to_dill) |  |
+
+##### aggregate_reactions { #kimmdy.reaction.RecipeCollection.aggregate_reactions }
+
+`reaction.RecipeCollection.aggregate_reactions(self)`
+
+Combines reactions having the same sequence of RecipeSteps.
+
+##### from_dill { #kimmdy.reaction.RecipeCollection.from_dill }
+
+`reaction.RecipeCollection.from_dill(cls, path)`
+
+##### to_csv { #kimmdy.reaction.RecipeCollection.to_csv }
+
+`reaction.RecipeCollection.to_csv(self, path)`
+
+Write a ReactionResult as defined in the reaction module to a csv file
+
+##### to_dill { #kimmdy.reaction.RecipeCollection.to_dill }
+
+`reaction.RecipeCollection.to_dill(self, path)`
+
+### RecipeStep { #kimmdy.reaction.RecipeStep }
+
+`reaction.RecipeStep()`
+
+Base class for all RecipeSteps.
+Indices can be accessed as 0-based or 1-based.
+ix: 0-based, int
+id: 1-based, str
+
+### SingleOperation { #kimmdy.reaction.SingleOperation }
+
+`reaction.SingleOperation(self, ix1, ix2)`
+
+#### Attributes
+
+| Name | Description |
+| --- | --- |
+| [atom_id_1](#kimmdy.reaction.SingleOperation.atom_id_1) |  |
+| [atom_id_2](#kimmdy.reaction.SingleOperation.atom_id_2) |  |
+| [atom_ix_1](#kimmdy.reaction.SingleOperation.atom_ix_1) |  |
+| [atom_ix_2](#kimmdy.reaction.SingleOperation.atom_ix_2) |  |

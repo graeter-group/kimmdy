@@ -10,6 +10,7 @@ from pathlib import Path
 from dataclasses import dataclass
 from kimmdy import plugins
 from kimmdy.reaction import ReactionPlugin
+import json
 
 
 def check_file_exists(p: Path):
@@ -39,6 +40,8 @@ class Mds:
     def __init__(self):
         pass
 
+# with open("./kimmdy-yaml-schema.json", "r") as f:
+#     schema = json.load(f)
 
 type_scheme = {
     "experiment": str,
@@ -48,7 +51,6 @@ type_scheme = {
     "out": Path,
     "gromacs_alias": str,
     "ff": Path,
-    "ffpatch": None,
     "top": Path,
     "gro": Path,
     "ndx": Path,

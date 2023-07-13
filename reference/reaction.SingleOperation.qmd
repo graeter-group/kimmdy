@@ -1,3 +1,0 @@
-# reaction.SingleOperation { #kimmdy.reaction.SingleOperation }
-
-`reaction.SingleOperation(self, ix1, ix2)`

@@ -1,0 +1,32 @@
+# reactions.homolysis { #kimmdy.reactions.homolysis }
+
+`reactions.homolysis`
+
+## Classes
+
+| Name | Description |
+| --- | --- |
+| [Homolysis](#kimmdy.reactions.homolysis.Homolysis) | Homolytic bond breaking leading to 2 radicals. |
+
+### Homolysis { #kimmdy.reactions.homolysis.Homolysis }
+
+`reactions.homolysis.Homolysis()`
+
+Homolytic bond breaking leading to 2 radicals.
+Implementation for time-varying rates
+
+#### Attributes
+
+| Name | Description |
+| --- | --- |
+| [type_scheme](#kimmdy.reactions.homolysis.Homolysis.type_scheme) |  |
+
+#### Methods
+
+| Name | Description |
+| --- | --- |
+| [get_recipe_collection](#kimmdy.reactions.homolysis.Homolysis.get_recipe_collection) |  |
+
+##### get_recipe_collection { #kimmdy.reactions.homolysis.Homolysis.get_recipe_collection }
+
+`reactions.homolysis.Homolysis.get_recipe_collection(self, files)`

@@ -3,7 +3,7 @@ project:
   output-dir: docs
   render:
     - index.qmd
-    - reference
+    - _reference
     - guide/*.qmd
 
 
@@ -15,6 +15,7 @@ website:
   reader-mode: true
   back-to-top-navigation: true
   navbar:
+    logo: ./www/hits-logo.png
     background: light
     tools:
       - icon: house-fill
@@ -34,12 +35,11 @@ website:
         text: Reaction Plugins
       - file: ./guide/topology.qmd
         text: Development
-      - file: reference/index.qmd
+      - file: _reference/index.qmd
         text: Reference
-
-# tell quarto to read the generated sidebar
-metadata-files:
-  - _sidebar.yml
+  sidebar:
+    style: "docked"
+    search: true
 
 execute:
   warning: false
@@ -70,89 +70,40 @@ interlinks:
     python:
       url: https://docs.python.org/3.10/
 
-# TODO: interlinks fails for some cases
-# things where there is a page for the module
-# and one page for the class can't resolve the
-# interlinks.
-# WHy aren't classes added to the same page as the module?
 
 quartodoc:
   package: kimmdy
-  sidebar: _sidebar.yml
   style: pkgdown
-  dir: reference
-
+  dir: _reference
   sections:
     - title: API
       desc: Start KIMMDY from a python script or the command line
       contents:
         - name: cmd
-          children: flat
+    - title: Topology
+      desc: Topology modules
+      contents:
+        - name: topology.topology
+        - name: topology.ff
+        - name: topology.utils
+        - name: topology.atomic
+    - title: Reaction Plugins
+      desc: Reaction plugins bundled with KIMMDY and the protocol to add a new reaction plugin to KIMMDY
+      contents:
+        - name: reaction
+        - name: reactions.homolysis
     - title: Modules
       desc: Modules
       contents:
         - name: changemanager
         - name: constants
         - name: coordinates
+        - name: config
         - name: kmc
         - name: misc_helper
         - name: parsing
         - name: runmanager
         - name: tasks
         - name: utils
-    - title: Other classes
-      desc: TODO
-      contents:
-        - name: runmanager.RunManager
-    - title: Topology
-      desc: Topology classes
-      contents:
-        - name: topology.topology.Topology
-        - name: topology.ff
-        - name: topology.utils
-    - title: Atomic types
-      desc: Internal representations of topology and forcfield entities
-      contents:
-        - name: topology.atomic
-        - name: topology.atomic.Atom
-        - name: topology.atomic.AtomType
-        - name: topology.atomic.Bond
-        - name: topology.atomic.BondType
-        - name: topology.atomic.PositionRestraint
-        - name: topology.atomic.DihedralRestraint
-        - name: topology.atomic.Pair
-        - name: topology.atomic.Angle
-        - name: topology.atomic.AngleType
-        - name: topology.atomic.DihedralType
-        - name: topology.atomic.ResidueAtomSpec
-        - name: topology.atomic.ResidueBondSpec
-        - name: topology.atomic.ResidueImproperSpec
-        - name: topology.atomic.ResidueProperSpec
-        - name: topology.atomic.ResidueType
-    - title: Reactions
-      desc: Protocol to add a new reaction plugin to KIMMDY
-      contents:
-        - kind: auto
-          name: reaction
-          members:
-            - ReactionPlugin
-            - RecipeStep
-            - Break
-            - Bind
-            - Move
-            - SingleOperation
-            - Recipe
-            - RecipeCollection
-    - title: Config
-      desc: config
-      contents:
-        - kind: auto
-          name: config
-          members:
-            - Sequence
-    - title: Reaction Plugins
-      desc: Reaction plugins bundled with KIMMDY
-      contents:
-        - name: reactions.homolysis
 
 

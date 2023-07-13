@@ -349,8 +349,6 @@ class ReactionPlugin(ABC):
         Name of the reaction
     runmng :
         RunManager instance
-    type_scheme : dict
-        dict of types of possible entries in config
     """
 
     type_scheme: dict = dict()
@@ -367,7 +365,7 @@ class ReactionPlugin(ABC):
     def get_recipe_collection(self, files: TaskFiles) -> RecipeCollection:
         """Get a RecipeCollection as a result of the reaction.
 
-        This is run as a [Task](`kimmdy.task.Task`) in the RunManager.
+        This is run as a [](`~kimmdy.tasks.Task`) in the RunManager.
         How the RecipeCollection is built is up to the reaction.
         It has access to the current state of the system via the
         runmanager `self.runmng` and the files.

@@ -1,0 +1,191 @@
+# config { #kimmdy.config }
+
+`config`
+
+Read and validate kimmdy.yml configuration files
+and package into a parsed format for internal use.
+
+## Attributes
+
+| Name | Description |
+| --- | --- |
+| [type_scheme](#kimmdy.config.type_scheme) |  |
+
+## Classes
+
+| Name | Description |
+| --- | --- |
+| [ChangerConfig](#kimmdy.config.ChangerConfig) |  |
+| [Config](#kimmdy.config.Config) | Internal representation of the configuration generated |
+| [HomolysisConfig](#kimmdy.config.HomolysisConfig) |  |
+| [MDrefConfig](#kimmdy.config.MDrefConfig) |  |
+| [Mds](#kimmdy.config.Mds) |  |
+| [PullConfig](#kimmdy.config.PullConfig) |  |
+| [ReactionsConfig](#kimmdy.config.ReactionsConfig) |  |
+| [Sequence](#kimmdy.config.Sequence) | A sequence of tasks. |
+| [SequenceConfig](#kimmdy.config.SequenceConfig) |  |
+
+### ChangerConfig { #kimmdy.config.ChangerConfig }
+
+`config.ChangerConfig()`
+
+#### Attributes
+
+| Name | Description |
+| --- | --- |
+| [coordinates](#kimmdy.config.ChangerConfig.coordinates) |  |
+
+### Config { #kimmdy.config.Config }
+
+`config.Config(self, input_file=None, recursive_dict=None, type_scheme=type_scheme)`
+
+Internal representation of the configuration generated
+from the input file, which enables validation before running
+and computationally expensive operations.
+All settings read from the input file are accessible through nested attributes.
+
+TODO: think about how much the type annotations on here can lie.
+
+Attributes
+run: int
+experiment: str
+name: str  # TODO: obsolete??
+dryrun: bool
+iterations: int
+out: Path
+gromacs_alias: str
+ff: Path
+ffpatch: Optional[Path]
+top: Path
+gro: Path
+ndx: Path
+mds: dict
+changer: ChangerConfig
+reactions: ReactionsConfig
+pull: PullConfig
+sequence: SequenceConfig
+
+#### Parameters
+
+| Name             | Type   | Description                                                     | Default       |
+|------------------|--------|-----------------------------------------------------------------|---------------|
+| `input_file`     | Path   | Path to the config yaml file.                                   | `None`        |
+| `recursive_dict` | dict   | For internal use only, used in reading settings in recursively. | `None`        |
+| `type_scheme`    | dict   | dict containing types for casting and validating settings.      | `type_scheme` |
+
+#### Attributes
+
+| Name | Description |
+| --- | --- |
+| [changer](#kimmdy.config.Config.changer) |  |
+| [cwd](#kimmdy.config.Config.cwd) |  |
+| [dryrun](#kimmdy.config.Config.dryrun) |  |
+| [experiment](#kimmdy.config.Config.experiment) |  |
+| [ff](#kimmdy.config.Config.ff) |  |
+| [ffpatch](#kimmdy.config.Config.ffpatch) |  |
+| [gro](#kimmdy.config.Config.gro) |  |
+| [gromacs_alias](#kimmdy.config.Config.gromacs_alias) |  |
+| [iterations](#kimmdy.config.Config.iterations) |  |
+| [mds](#kimmdy.config.Config.mds) |  |
+| [name](#kimmdy.config.Config.name) |  |
+| [ndx](#kimmdy.config.Config.ndx) |  |
+| [out](#kimmdy.config.Config.out) |  |
+| [pull](#kimmdy.config.Config.pull) |  |
+| [raw](#kimmdy.config.Config.raw) |  |
+| [reactions](#kimmdy.config.Config.reactions) |  |
+| [run](#kimmdy.config.Config.run) |  |
+| [sequence](#kimmdy.config.Config.sequence) |  |
+| [top](#kimmdy.config.Config.top) |  |
+| [type_scheme](#kimmdy.config.Config.type_scheme) |  |
+
+#### Methods
+
+| Name | Description |
+| --- | --- |
+| [attr](#kimmdy.config.Config.attr) | Get the value of a specific attribute. |
+| [get_attributes](#kimmdy.config.Config.get_attributes) | Get a list of all attributes |
+
+##### attr { #kimmdy.config.Config.attr }
+
+`config.Config.attr(self, attribute)`
+
+Get the value of a specific attribute.
+Alias for self.__getattribute__
+
+##### get_attributes { #kimmdy.config.Config.get_attributes }
+
+`config.Config.get_attributes(self)`
+
+Get a list of all attributes
+
+### HomolysisConfig { #kimmdy.config.HomolysisConfig }
+
+`config.HomolysisConfig()`
+
+#### Attributes
+
+| Name | Description |
+| --- | --- |
+| [dat](#kimmdy.config.HomolysisConfig.dat) |  |
+| [itp](#kimmdy.config.HomolysisConfig.itp) |  |
+
+### MDrefConfig { #kimmdy.config.MDrefConfig }
+
+`config.MDrefConfig()`
+
+#### Attributes
+
+| Name | Description |
+| --- | --- |
+| [md](#kimmdy.config.MDrefConfig.md) |  |
+| [md_parameter_growth](#kimmdy.config.MDrefConfig.md_parameter_growth) |  |
+
+### Mds { #kimmdy.config.Mds }
+
+`config.Mds(self)`
+
+### PullConfig { #kimmdy.config.PullConfig }
+
+`config.PullConfig()`
+
+#### Attributes
+
+| Name | Description |
+| --- | --- |
+| [mdp](#kimmdy.config.PullConfig.mdp) |  |
+
+### ReactionsConfig { #kimmdy.config.ReactionsConfig }
+
+`config.ReactionsConfig()`
+
+#### Attributes
+
+| Name | Description |
+| --- | --- |
+| [homolysis](#kimmdy.config.ReactionsConfig.homolysis) |  |
+
+### Sequence { #kimmdy.config.Sequence }
+
+`config.Sequence(self, tasks)`
+
+A sequence of tasks.
+
+### SequenceConfig { #kimmdy.config.SequenceConfig }
+
+`config.SequenceConfig()`
+
+#### Attributes
+
+| Name | Description |
+| --- | --- |
+| [tasks](#kimmdy.config.SequenceConfig.tasks) |  |
+
+## Functions
+
+| Name | Description |
+| --- | --- |
+| [check_file_exists](#kimmdy.config.check_file_exists) |  |
+
+### check_file_exists { #kimmdy.config.check_file_exists }
+
+`config.check_file_exists(p)`

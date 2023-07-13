@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "dryrun": {
+      "description": "(false) Don't run the actual simulations, just print the tasks",
+      "type": "boolean",
+      "default": false
+    },
+    "iterations": {
+      "description": "(1) Number of iterations to run",
+      "type": "integer",
+      "default": 1,
+      "exclusiveMinimum": 0
+    },
+    "name": {
+      "description": "(kimmdy) Name for output folders",
+      "type": "string",
+      "pytype": "Path",
+      "default": "kimmdy"
+    },
+    "experiment": {
+      "description": "(kimmdy) Name of the experiment",
+      "type": "string",
+      "default": "kimmdy",
+      "pytype": "str"
+    },
+    "run": {
+      "description": "(1) Replica number",
+      "type": "integer",
+      "default": "1",
+      "pytype": "int"
+    },
+    "out": {
+      "description": "(kimmdy) Output folder",
+      "type": "string",
+      "pytype": "Path",
+      "default": "kimmdy"
+    },
+    "top": {
+      "description": "(topol.top) Topology file",
+      "type": "string",
+      "pytype": "Path",
+      "default": "topol.top"
+    },
+    "gro": {
+      "description": "(conf.gro) Coordinate file",
+      "type": "string",
+      "pytype": "Path",
+      "default": "conf.gro"
+    },
+    "ndx": {
+      "description": "(index.ndx) Index file",
+      "type": "string",
+      "pytype": "Path",
+      "default": "index.ndx"
+    },
+    "gromacs_alias": {
+      "description": "(gmx) Gromacs alias",
+      "type": "string",
+      "default": "gmx",
+      "pytype": "str"
+    },
+    "ff": {
+      "description": "(amber99sb-star-ildnp.ff) Force field directory",
+      "type": "string",
+      "pytype": "Path",
+      "default": "amber99sb-star-ildnp.ff"
+    },
+    "mds": {
+      "type": "object",
+      "description": "Settings for MD steps, e.g. mdp files",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "mdp": {
+            "type": "string",
+            "pytype": "Path"
+          },
+          "plumed": {
+            "type": "object",
+            "properties": {
+              "dat": {
+                "type": "string",
+                "pytype": "Path"
+              },
+              "distances": {
+                "type": "string",
+                "pytype": "Path"
+              }
+            }
+          },
+          "prefix": {
+            "type": "string",
+            "pytype": "str"
+          },
+          "overwrite": {
+            "type": "string",
+            "pytype": "str"
+          }
+        }
+      }
+    },
+    "changer": {
+      "type": "object",
+      "properties": {
+        "coordinates": {
+          "type": "object",
+          "properties": {
+            "md": {
+              "type": "string",
+              "pytype": "str"
+            },
+            "md_parameter_growth": {
+              "type": "string",
+              "pytype": "str"
+            }
+          }
+        }
+      }
+    },
+    "reactions": {
+      "type": "object"
+    },
+    "sequence": {
+      "type": "array",
+      "pytype": "Sequence"
+    }
+  },
+  "required": ["name", "ff", "sequence" ]
+}
+

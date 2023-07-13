@@ -1,0 +1,624 @@
+# topology.atomic { #kimmdy.topology.atomic }
+
+`topology.atomic`
+
+Atomic datatypes for the topology such as Atom, Bond, Angle, Dihedral, etc.
+The order of the fields comes from the gromacs topology file format.
+See <https://manual.gromacs.org/current/reference-manual/topologies/topology-file-formats.html#topology-file>
+
+## Attributes
+
+| Name | Description |
+| --- | --- |
+| [AngleId](#kimmdy.topology.atomic.AngleId) |  |
+| [AtomId](#kimmdy.topology.atomic.AtomId) |  |
+| [Atomic](#kimmdy.topology.atomic.Atomic) |  |
+| [AtomicType](#kimmdy.topology.atomic.AtomicType) |  |
+| [AtomicTypes](#kimmdy.topology.atomic.AtomicTypes) |  |
+| [BondId](#kimmdy.topology.atomic.BondId) |  |
+| [DihedralId](#kimmdy.topology.atomic.DihedralId) |  |
+
+## Classes
+
+| Name | Description |
+| --- | --- |
+| [Angle](#kimmdy.topology.atomic.Angle) | Information about one angle |
+| [AngleType](#kimmdy.topology.atomic.AngleType) | Information about one angle |
+| [Atom](#kimmdy.topology.atomic.Atom) | Information about one atom |
+| [AtomType](#kimmdy.topology.atomic.AtomType) | Information about one atom |
+| [Bond](#kimmdy.topology.atomic.Bond) | Information about one bond |
+| [BondType](#kimmdy.topology.atomic.BondType) | Information about one bondtype |
+| [Dihedral](#kimmdy.topology.atomic.Dihedral) | Information about one proper or improper dihedral |
+| [DihedralRestraint](#kimmdy.topology.atomic.DihedralRestraint) | Information about one dihedral restraint. |
+| [DihedralType](#kimmdy.topology.atomic.DihedralType) | Information about one dihedral |
+| [MultipleDihedralTypes](#kimmdy.topology.atomic.MultipleDihedralTypes) | Multiple ``DihedralTypes``s with the same ai, aj, ak, al |
+| [MultipleDihedrals](#kimmdy.topology.atomic.MultipleDihedrals) | Multiple ``Dihedral``s with the same ai, aj, ak, al |
+| [Pair](#kimmdy.topology.atomic.Pair) | Information about one pair |
+| [PositionRestraint](#kimmdy.topology.atomic.PositionRestraint) | Information about one position restraint. |
+| [ResidueAtomSpec](#kimmdy.topology.atomic.ResidueAtomSpec) | Information about one atom in a residue |
+| [ResidueBondSpec](#kimmdy.topology.atomic.ResidueBondSpec) | Information about one bond in a residue |
+| [ResidueImproperSpec](#kimmdy.topology.atomic.ResidueImproperSpec) | Information about one imroper dihedral in a residue |
+| [ResidueProperSpec](#kimmdy.topology.atomic.ResidueProperSpec) | Information about one imroper dihedral in a residue |
+| [ResidueType](#kimmdy.topology.atomic.ResidueType) | Information about one residuetype from aminoacids.rtp |
+
+### Angle { #kimmdy.topology.atomic.Angle }
+
+`topology.atomic.Angle(ai, aj, ak, funct, c0=None, c1=None, c2=None, c3=None)`
+
+Information about one angle
+
+A class containing angle information as in the angles section of the topology.
+
+From gromacs topology:
+';', 'ai', 'aj', 'ak', 'funct', 'c0', 'c1', 'c2', 'c3'
+With aj < ai < ak
+
+#### Attributes
+
+| Name | Description |
+| --- | --- |
+| [ai](#kimmdy.topology.atomic.Angle.ai) |  |
+| [aj](#kimmdy.topology.atomic.Angle.aj) |  |
+| [ak](#kimmdy.topology.atomic.Angle.ak) |  |
+| [c0](#kimmdy.topology.atomic.Angle.c0) |  |
+| [c1](#kimmdy.topology.atomic.Angle.c1) |  |
+| [c2](#kimmdy.topology.atomic.Angle.c2) |  |
+| [c3](#kimmdy.topology.atomic.Angle.c3) |  |
+| [funct](#kimmdy.topology.atomic.Angle.funct) |  |
+
+#### Methods
+
+| Name | Description |
+| --- | --- |
+| [from_top_line](#kimmdy.topology.atomic.Angle.from_top_line) |  |
+
+##### from_top_line { #kimmdy.topology.atomic.Angle.from_top_line }
+
+`topology.atomic.Angle.from_top_line(cls, l)`
+
+### AngleType { #kimmdy.topology.atomic.AngleType }
+
+`topology.atomic.AngleType(i, j, k, id, id_sym, funct, c0=None, c1=None, c2=None, c3=None)`
+
+Information about one angle
+
+A class containing angle information as in the angles section of the topology.
+
+From gromacs topology:
+';', 'i', 'j', 'k', 'funct', 'c0', 'c1', 'c2', 'c3'
+where i,j,k are atomtypes
+
+#### Attributes
+
+| Name | Description |
+| --- | --- |
+| [c0](#kimmdy.topology.atomic.AngleType.c0) |  |
+| [c1](#kimmdy.topology.atomic.AngleType.c1) |  |
+| [c2](#kimmdy.topology.atomic.AngleType.c2) |  |
+| [c3](#kimmdy.topology.atomic.AngleType.c3) |  |
+| [funct](#kimmdy.topology.atomic.AngleType.funct) |  |
+| [i](#kimmdy.topology.atomic.AngleType.i) |  |
+| [id](#kimmdy.topology.atomic.AngleType.id) |  |
+| [id_sym](#kimmdy.topology.atomic.AngleType.id_sym) |  |
+| [j](#kimmdy.topology.atomic.AngleType.j) |  |
+| [k](#kimmdy.topology.atomic.AngleType.k) |  |
+
+#### Methods
+
+| Name | Description |
+| --- | --- |
+| [from_top_line](#kimmdy.topology.atomic.AngleType.from_top_line) |  |
+
+##### from_top_line { #kimmdy.topology.atomic.AngleType.from_top_line }
+
+`topology.atomic.AngleType.from_top_line(cls, l)`
+
+### Atom { #kimmdy.topology.atomic.Atom }
+
+`topology.atomic.Atom(nr, type, resnr, residue, atom, cgnr, charge, mass, typeB=None, chargeB=None, massB=None, bound_to_nrs=field(default_factory=list), is_radical=False)`
+
+Information about one atom
+
+A class containing atom information as in the atoms section of the topology.
+An atom keeps a list of which atoms it is bound to.
+
+From gromacs topology:
+; nr type resnr residue atom cgnr charge mass typeB chargeB massB
+
+#### Attributes
+
+| Name | Description |
+| --- | --- |
+| [atom](#kimmdy.topology.atomic.Atom.atom) |  |
+| [bound_to_nrs](#kimmdy.topology.atomic.Atom.bound_to_nrs) |  |
+| [cgnr](#kimmdy.topology.atomic.Atom.cgnr) |  |
+| [charge](#kimmdy.topology.atomic.Atom.charge) |  |
+| [chargeB](#kimmdy.topology.atomic.Atom.chargeB) |  |
+| [is_radical](#kimmdy.topology.atomic.Atom.is_radical) |  |
+| [mass](#kimmdy.topology.atomic.Atom.mass) |  |
+| [massB](#kimmdy.topology.atomic.Atom.massB) |  |
+| [nr](#kimmdy.topology.atomic.Atom.nr) |  |
+| [residue](#kimmdy.topology.atomic.Atom.residue) |  |
+| [resnr](#kimmdy.topology.atomic.Atom.resnr) |  |
+| [type](#kimmdy.topology.atomic.Atom.type) |  |
+| [typeB](#kimmdy.topology.atomic.Atom.typeB) |  |
+
+#### Methods
+
+| Name | Description |
+| --- | --- |
+| [from_top_line](#kimmdy.topology.atomic.Atom.from_top_line) |  |
+| [radical_type](#kimmdy.topology.atomic.Atom.radical_type) |  |
+
+##### from_top_line { #kimmdy.topology.atomic.Atom.from_top_line }
+
+`topology.atomic.Atom.from_top_line(cls, l)`
+
+##### radical_type { #kimmdy.topology.atomic.Atom.radical_type }
+
+`topology.atomic.Atom.radical_type(self)`
+
+### AtomType { #kimmdy.topology.atomic.AtomType }
+
+`topology.atomic.AtomType(type, id_sym, at_num, mass, charge, ptype, sigma, epsilon, id)`
+
+Information about one atom
+
+A class containing atom information as in the atoms section of the topology.
+An atom keeps a list of which atoms it is bound to.
+
+From gromacs version of the amber* ff:
+; name      at.num  mass     charge ptype  sigma      epsilon
+
+#### Attributes
+
+| Name | Description |
+| --- | --- |
+| [at_num](#kimmdy.topology.atomic.AtomType.at_num) |  |
+| [charge](#kimmdy.topology.atomic.AtomType.charge) |  |
+| [epsilon](#kimmdy.topology.atomic.AtomType.epsilon) |  |
+| [id](#kimmdy.topology.atomic.AtomType.id) |  |
+| [id_sym](#kimmdy.topology.atomic.AtomType.id_sym) |  |
+| [mass](#kimmdy.topology.atomic.AtomType.mass) |  |
+| [ptype](#kimmdy.topology.atomic.AtomType.ptype) |  |
+| [sigma](#kimmdy.topology.atomic.AtomType.sigma) |  |
+| [type](#kimmdy.topology.atomic.AtomType.type) |  |
+
+#### Methods
+
+| Name | Description |
+| --- | --- |
+| [from_top_line](#kimmdy.topology.atomic.AtomType.from_top_line) |  |
+
+##### from_top_line { #kimmdy.topology.atomic.AtomType.from_top_line }
+
+`topology.atomic.AtomType.from_top_line(cls, l)`
+
+### Bond { #kimmdy.topology.atomic.Bond }
+
+`topology.atomic.Bond(ai, aj, funct, c0=None, c1=None, c2=None, c3=None, c4=None, c5=None)`
+
+Information about one bond
+
+A class containing bond information as in the bonds section of the topology.
+From gromacs topology:
+'ai', 'aj', 'funct', 'c0', 'c1', 'c2', 'c3', 'c4', 'c5'
+With ai < aj
+
+#### Attributes
+
+| Name | Description |
+| --- | --- |
+| [ai](#kimmdy.topology.atomic.Bond.ai) |  |
+| [aj](#kimmdy.topology.atomic.Bond.aj) |  |
+| [c0](#kimmdy.topology.atomic.Bond.c0) |  |
+| [c1](#kimmdy.topology.atomic.Bond.c1) |  |
+| [c2](#kimmdy.topology.atomic.Bond.c2) |  |
+| [c3](#kimmdy.topology.atomic.Bond.c3) |  |
+| [c4](#kimmdy.topology.atomic.Bond.c4) |  |
+| [c5](#kimmdy.topology.atomic.Bond.c5) |  |
+| [funct](#kimmdy.topology.atomic.Bond.funct) |  |
+
+#### Methods
+
+| Name | Description |
+| --- | --- |
+| [from_top_line](#kimmdy.topology.atomic.Bond.from_top_line) |  |
+
+##### from_top_line { #kimmdy.topology.atomic.Bond.from_top_line }
+
+`topology.atomic.Bond.from_top_line(cls, l)`
+
+### BondType { #kimmdy.topology.atomic.BondType }
+
+`topology.atomic.BondType(i, j, id, id_sym, funct, c0=None, c1=None, c2=None, c3=None)`
+
+Information about one bondtype
+
+A class containing bond information as in the bonds section of the topology.
+From gromacs topology:
+'i', 'j', 'funct', 'c0', 'c1', 'c2', 'c3
+Where i and j are atomtypes
+
+#### Attributes
+
+| Name | Description |
+| --- | --- |
+| [c0](#kimmdy.topology.atomic.BondType.c0) |  |
+| [c1](#kimmdy.topology.atomic.BondType.c1) |  |
+| [c2](#kimmdy.topology.atomic.BondType.c2) |  |
+| [c3](#kimmdy.topology.atomic.BondType.c3) |  |
+| [funct](#kimmdy.topology.atomic.BondType.funct) |  |
+| [i](#kimmdy.topology.atomic.BondType.i) |  |
+| [id](#kimmdy.topology.atomic.BondType.id) |  |
+| [id_sym](#kimmdy.topology.atomic.BondType.id_sym) |  |
+| [j](#kimmdy.topology.atomic.BondType.j) |  |
+
+#### Methods
+
+| Name | Description |
+| --- | --- |
+| [from_top_line](#kimmdy.topology.atomic.BondType.from_top_line) |  |
+
+##### from_top_line { #kimmdy.topology.atomic.BondType.from_top_line }
+
+`topology.atomic.BondType.from_top_line(cls, l)`
+
+### Dihedral { #kimmdy.topology.atomic.Dihedral }
+
+`topology.atomic.Dihedral(ai, aj, ak, al, funct, c0=None, c1=None, periodicity='', c3=None, c4=None, c5=None)`
+
+Information about one proper or improper dihedral
+
+A class containing bond information as in the dihedrals section of the topology.
+Improper dihedrals have funct 4.
+Proper dihedrals have funct != 4. Mostly funct 9.
+
+Note that proper dihedrals of type 9 can be defined multiple times, for different
+periodicities. This is why would-be parameter c2 is called periodicity.
+
+From gromacs topology:
+';', 'ai', 'aj', 'ak', 'al', 'funct', 'c0', 'c1', 'periodicity', 'c3', 'c4', 'c5'
+For proper dihedrals (funct 9): aj < ak
+
+#### Attributes
+
+| Name | Description |
+| --- | --- |
+| [ai](#kimmdy.topology.atomic.Dihedral.ai) |  |
+| [aj](#kimmdy.topology.atomic.Dihedral.aj) |  |
+| [ak](#kimmdy.topology.atomic.Dihedral.ak) |  |
+| [al](#kimmdy.topology.atomic.Dihedral.al) |  |
+| [c0](#kimmdy.topology.atomic.Dihedral.c0) |  |
+| [c1](#kimmdy.topology.atomic.Dihedral.c1) |  |
+| [c3](#kimmdy.topology.atomic.Dihedral.c3) |  |
+| [c4](#kimmdy.topology.atomic.Dihedral.c4) |  |
+| [c5](#kimmdy.topology.atomic.Dihedral.c5) |  |
+| [funct](#kimmdy.topology.atomic.Dihedral.funct) |  |
+| [periodicity](#kimmdy.topology.atomic.Dihedral.periodicity) |  |
+
+#### Methods
+
+| Name | Description |
+| --- | --- |
+| [from_top_line](#kimmdy.topology.atomic.Dihedral.from_top_line) |  |
+
+##### from_top_line { #kimmdy.topology.atomic.Dihedral.from_top_line }
+
+`topology.atomic.Dihedral.from_top_line(cls, l)`
+
+### DihedralRestraint { #kimmdy.topology.atomic.DihedralRestraint }
+
+`topology.atomic.DihedralRestraint(ai, aj, ak, al, type, phi, dphi, fc)`
+
+Information about one dihedral restraint.
+
+A class containing information as in the dihedral_restraints section of the topology.
+
+From gromacs topology:
+; ai   aj    ak    al  type  phi  dphi  fc
+
+#### Attributes
+
+| Name | Description |
+| --- | --- |
+| [ai](#kimmdy.topology.atomic.DihedralRestraint.ai) |  |
+| [aj](#kimmdy.topology.atomic.DihedralRestraint.aj) |  |
+| [ak](#kimmdy.topology.atomic.DihedralRestraint.ak) |  |
+| [al](#kimmdy.topology.atomic.DihedralRestraint.al) |  |
+| [dphi](#kimmdy.topology.atomic.DihedralRestraint.dphi) |  |
+| [fc](#kimmdy.topology.atomic.DihedralRestraint.fc) |  |
+| [phi](#kimmdy.topology.atomic.DihedralRestraint.phi) |  |
+| [type](#kimmdy.topology.atomic.DihedralRestraint.type) |  |
+
+#### Methods
+
+| Name | Description |
+| --- | --- |
+| [from_top_line](#kimmdy.topology.atomic.DihedralRestraint.from_top_line) |  |
+
+##### from_top_line { #kimmdy.topology.atomic.DihedralRestraint.from_top_line }
+
+`topology.atomic.DihedralRestraint.from_top_line(cls, l)`
+
+### DihedralType { #kimmdy.topology.atomic.DihedralType }
+
+`topology.atomic.DihedralType(i, j, k, l, id, id_sym, funct, c0, c1, periodicity, c3=None, c4=None, c5=None)`
+
+Information about one dihedral
+
+A class containing bond information as in the dihedrals section of the topology.
+Proper dihedrals have funct 9.
+Improper dihedrals have funct 4.
+
+Note that proper dihedrals of type 9 can be defined multiple times, for different
+periodicities. This is why would-be parameter c2 is called periodicity and part of
+the `id`.
+
+From gromacs topology:
+';', 'i', 'j', 'k', 'l', 'funct', 'c0', 'c1', 'periodicity', 'c3', 'c4', 'c5'
+Where i,j,k,l are atomtypes
+
+#### Attributes
+
+| Name | Description |
+| --- | --- |
+| [c0](#kimmdy.topology.atomic.DihedralType.c0) |  |
+| [c1](#kimmdy.topology.atomic.DihedralType.c1) |  |
+| [c3](#kimmdy.topology.atomic.DihedralType.c3) |  |
+| [c4](#kimmdy.topology.atomic.DihedralType.c4) |  |
+| [c5](#kimmdy.topology.atomic.DihedralType.c5) |  |
+| [funct](#kimmdy.topology.atomic.DihedralType.funct) |  |
+| [i](#kimmdy.topology.atomic.DihedralType.i) |  |
+| [id](#kimmdy.topology.atomic.DihedralType.id) |  |
+| [id_sym](#kimmdy.topology.atomic.DihedralType.id_sym) |  |
+| [j](#kimmdy.topology.atomic.DihedralType.j) |  |
+| [k](#kimmdy.topology.atomic.DihedralType.k) |  |
+| [l](#kimmdy.topology.atomic.DihedralType.l) |  |
+| [periodicity](#kimmdy.topology.atomic.DihedralType.periodicity) |  |
+
+#### Methods
+
+| Name | Description |
+| --- | --- |
+| [from_top_line](#kimmdy.topology.atomic.DihedralType.from_top_line) |  |
+
+##### from_top_line { #kimmdy.topology.atomic.DihedralType.from_top_line }
+
+`topology.atomic.DihedralType.from_top_line(cls, l)`
+
+### MultipleDihedralTypes { #kimmdy.topology.atomic.MultipleDihedralTypes }
+
+`topology.atomic.MultipleDihedralTypes(ai, aj, ak, al, funct, dihedral_types)`
+
+Multiple ``DihedralTypes``s with the same ai, aj, ak, al
+but different periodicities.
+funct should always be "9" when the length of dihedrals is > 1.
+The key of the dict is the periodicity (c2).
+
+#### Attributes
+
+| Name | Description |
+| --- | --- |
+| [ai](#kimmdy.topology.atomic.MultipleDihedralTypes.ai) |  |
+| [aj](#kimmdy.topology.atomic.MultipleDihedralTypes.aj) |  |
+| [ak](#kimmdy.topology.atomic.MultipleDihedralTypes.ak) |  |
+| [al](#kimmdy.topology.atomic.MultipleDihedralTypes.al) |  |
+| [dihedral_types](#kimmdy.topology.atomic.MultipleDihedralTypes.dihedral_types) |  |
+| [funct](#kimmdy.topology.atomic.MultipleDihedralTypes.funct) |  |
+
+### MultipleDihedrals { #kimmdy.topology.atomic.MultipleDihedrals }
+
+`topology.atomic.MultipleDihedrals(ai, aj, ak, al, funct, dihedrals)`
+
+Multiple ``Dihedral``s with the same ai, aj, ak, al
+but different periodicities.
+funct should always be "9" when the length of dihedrals is > 1.
+The key of the dict is the periodicity (c2).
+
+#### Attributes
+
+| Name | Description |
+| --- | --- |
+| [ai](#kimmdy.topology.atomic.MultipleDihedrals.ai) |  |
+| [aj](#kimmdy.topology.atomic.MultipleDihedrals.aj) |  |
+| [ak](#kimmdy.topology.atomic.MultipleDihedrals.ak) |  |
+| [al](#kimmdy.topology.atomic.MultipleDihedrals.al) |  |
+| [dihedrals](#kimmdy.topology.atomic.MultipleDihedrals.dihedrals) |  |
+| [funct](#kimmdy.topology.atomic.MultipleDihedrals.funct) |  |
+
+### Pair { #kimmdy.topology.atomic.Pair }
+
+`topology.atomic.Pair(ai, aj, funct, c0=None, c1=None, c2=None, c3=None)`
+
+Information about one pair
+
+A class containing pair information as in the pair section of the topology.
+
+From gromacs topology:
+ai', 'aj', 'funct', 'c0', 'c1', 'c2', 'c3'
+
+#### Attributes
+
+| Name | Description |
+| --- | --- |
+| [ai](#kimmdy.topology.atomic.Pair.ai) |  |
+| [aj](#kimmdy.topology.atomic.Pair.aj) |  |
+| [c0](#kimmdy.topology.atomic.Pair.c0) |  |
+| [c1](#kimmdy.topology.atomic.Pair.c1) |  |
+| [c2](#kimmdy.topology.atomic.Pair.c2) |  |
+| [c3](#kimmdy.topology.atomic.Pair.c3) |  |
+| [funct](#kimmdy.topology.atomic.Pair.funct) |  |
+
+#### Methods
+
+| Name | Description |
+| --- | --- |
+| [from_top_line](#kimmdy.topology.atomic.Pair.from_top_line) |  |
+
+##### from_top_line { #kimmdy.topology.atomic.Pair.from_top_line }
+
+`topology.atomic.Pair.from_top_line(cls, l)`
+
+### PositionRestraint { #kimmdy.topology.atomic.PositionRestraint }
+
+`topology.atomic.PositionRestraint(ai, funct, fc, condition=None)`
+
+Information about one position restraint.
+
+A class containing information as in the position_restraints section of the topology.
+
+From gromacs topology:
+; ai   funct    fc(x,y,z)
+
+#### Attributes
+
+| Name | Description |
+| --- | --- |
+| [ai](#kimmdy.topology.atomic.PositionRestraint.ai) |  |
+| [condition](#kimmdy.topology.atomic.PositionRestraint.condition) |  |
+| [fc](#kimmdy.topology.atomic.PositionRestraint.fc) |  |
+| [funct](#kimmdy.topology.atomic.PositionRestraint.funct) |  |
+
+#### Methods
+
+| Name | Description |
+| --- | --- |
+| [from_top_line](#kimmdy.topology.atomic.PositionRestraint.from_top_line) |  |
+
+##### from_top_line { #kimmdy.topology.atomic.PositionRestraint.from_top_line }
+
+`topology.atomic.PositionRestraint.from_top_line(cls, l, condition=None)`
+
+### ResidueAtomSpec { #kimmdy.topology.atomic.ResidueAtomSpec }
+
+`topology.atomic.ResidueAtomSpec(name, type, charge, cgrp)`
+
+Information about one atom in a residue
+; name  type  charge  chargegroup
+
+#### Attributes
+
+| Name | Description |
+| --- | --- |
+| [cgrp](#kimmdy.topology.atomic.ResidueAtomSpec.cgrp) |  |
+| [charge](#kimmdy.topology.atomic.ResidueAtomSpec.charge) |  |
+| [name](#kimmdy.topology.atomic.ResidueAtomSpec.name) |  |
+| [type](#kimmdy.topology.atomic.ResidueAtomSpec.type) |  |
+
+#### Methods
+
+| Name | Description |
+| --- | --- |
+| [from_top_line](#kimmdy.topology.atomic.ResidueAtomSpec.from_top_line) |  |
+
+##### from_top_line { #kimmdy.topology.atomic.ResidueAtomSpec.from_top_line }
+
+`topology.atomic.ResidueAtomSpec.from_top_line(cls, l)`
+
+### ResidueBondSpec { #kimmdy.topology.atomic.ResidueBondSpec }
+
+`topology.atomic.ResidueBondSpec(atom1, atom2, b0=None, kb=None)`
+
+Information about one bond in a residue
+; atom1 atom2      b0      kb
+
+#### Attributes
+
+| Name | Description |
+| --- | --- |
+| [atom1](#kimmdy.topology.atomic.ResidueBondSpec.atom1) |  |
+| [atom2](#kimmdy.topology.atomic.ResidueBondSpec.atom2) |  |
+| [b0](#kimmdy.topology.atomic.ResidueBondSpec.b0) |  |
+| [kb](#kimmdy.topology.atomic.ResidueBondSpec.kb) |  |
+
+#### Methods
+
+| Name | Description |
+| --- | --- |
+| [from_top_line](#kimmdy.topology.atomic.ResidueBondSpec.from_top_line) |  |
+
+##### from_top_line { #kimmdy.topology.atomic.ResidueBondSpec.from_top_line }
+
+`topology.atomic.ResidueBondSpec.from_top_line(cls, l)`
+
+### ResidueImproperSpec { #kimmdy.topology.atomic.ResidueImproperSpec }
+
+`topology.atomic.ResidueImproperSpec(atom1, atom2, atom3, atom4, q0, cq)`
+
+Information about one imroper dihedral in a residue
+;atom1 atom2 atom3 atom4     q0     cq
+
+#### Attributes
+
+| Name | Description |
+| --- | --- |
+| [atom1](#kimmdy.topology.atomic.ResidueImproperSpec.atom1) |  |
+| [atom2](#kimmdy.topology.atomic.ResidueImproperSpec.atom2) |  |
+| [atom3](#kimmdy.topology.atomic.ResidueImproperSpec.atom3) |  |
+| [atom4](#kimmdy.topology.atomic.ResidueImproperSpec.atom4) |  |
+| [cq](#kimmdy.topology.atomic.ResidueImproperSpec.cq) |  |
+| [q0](#kimmdy.topology.atomic.ResidueImproperSpec.q0) |  |
+
+#### Methods
+
+| Name | Description |
+| --- | --- |
+| [from_top_line](#kimmdy.topology.atomic.ResidueImproperSpec.from_top_line) |  |
+
+##### from_top_line { #kimmdy.topology.atomic.ResidueImproperSpec.from_top_line }
+
+`topology.atomic.ResidueImproperSpec.from_top_line(cls, l)`
+
+### ResidueProperSpec { #kimmdy.topology.atomic.ResidueProperSpec }
+
+`topology.atomic.ResidueProperSpec(atom1, atom2, atom3, atom4, q0)`
+
+Information about one imroper dihedral in a residue
+;atom1 atom2 atom3 atom4     q0     cq
+
+#### Attributes
+
+| Name | Description |
+| --- | --- |
+| [atom1](#kimmdy.topology.atomic.ResidueProperSpec.atom1) |  |
+| [atom2](#kimmdy.topology.atomic.ResidueProperSpec.atom2) |  |
+| [atom3](#kimmdy.topology.atomic.ResidueProperSpec.atom3) |  |
+| [atom4](#kimmdy.topology.atomic.ResidueProperSpec.atom4) |  |
+| [q0](#kimmdy.topology.atomic.ResidueProperSpec.q0) |  |
+
+#### Methods
+
+| Name | Description |
+| --- | --- |
+| [from_top_line](#kimmdy.topology.atomic.ResidueProperSpec.from_top_line) |  |
+
+##### from_top_line { #kimmdy.topology.atomic.ResidueProperSpec.from_top_line }
+
+`topology.atomic.ResidueProperSpec.from_top_line(cls, l)`
+
+### ResidueType { #kimmdy.topology.atomic.ResidueType }
+
+`topology.atomic.ResidueType(residue, atoms, bonds, proper_dihedrals, improper_dihedrals)`
+
+Information about one residuetype from aminoacids.rtp
+
+#### Attributes
+
+| Name | Description |
+| --- | --- |
+| [atoms](#kimmdy.topology.atomic.ResidueType.atoms) |  |
+| [bonds](#kimmdy.topology.atomic.ResidueType.bonds) |  |
+| [improper_dihedrals](#kimmdy.topology.atomic.ResidueType.improper_dihedrals) |  |
+| [proper_dihedrals](#kimmdy.topology.atomic.ResidueType.proper_dihedrals) |  |
+| [residue](#kimmdy.topology.atomic.ResidueType.residue) |  |
+
+#### Methods
+
+| Name | Description |
+| --- | --- |
+| [from_section](#kimmdy.topology.atomic.ResidueType.from_section) |  |
+
+##### from_section { #kimmdy.topology.atomic.ResidueType.from_section }
+
+`topology.atomic.ResidueType.from_section(cls, residue, d)`
