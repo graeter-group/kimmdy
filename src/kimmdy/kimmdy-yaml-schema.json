@@ -16,6 +16,12 @@
       "exclusiveMinimum": 0
     },
     "name": {
+      "description": "(kimmdy) Name. Used for output folder of out is not specified",
+      "type": "string",
+      "pytype": "str",
+      "default": "kimmdy"
+    },
+    "out": {
       "description": "(kimmdy) Name for output folders",
       "type": "string",
       "pytype": "Path",

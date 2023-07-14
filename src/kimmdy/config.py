@@ -41,16 +41,11 @@ class Sequence(list):
                 self.append(task)
 
 
-class Mds:
-    def __init__(self):
-        pass
-
-
-def convert_schema_to_type_dict(dictionary):
+def convert_schema_to_type_dict(dictionary: dict, field: str ='pytype', eval_field: bool = True) -> dict:
     result = {}
     additionalProperties = dictionary.get("additionalProperties")
     if additionalProperties is not None:
-        return convert_schema_to_type_dict(additionalProperties)
+        return convert_schema_to_type_dict(additionalProperties, field, eval_field)
 
     properties = dictionary.get("properties")
     if properties is None:
@@ -58,15 +53,17 @@ def convert_schema_to_type_dict(dictionary):
     for key, value in properties.items():
         if not isinstance(value, dict):
             continue
-        elif "pytype" in value:
-            result[key] = eval(value["pytype"])
+        elif field in value:
+            if eval_field:
+                result[key] = eval(value[field])
+            else:
+                result[key] = value[field]
         else:
-            print(value)
-            result[key] = convert_schema_to_type_dict(value)
+            result[key] = convert_schema_to_type_dict(value, field, eval_field)
 
     return result
 
-def config_schema():
+def config_schema() -> dict:
     """Return the schema for the config file"""
     path = (pkg_resources.files(kimmdy) / 'kimmdy-yaml-schema.json')
     with path.open("rt") as f:
@@ -74,16 +71,18 @@ def config_schema():
     return schema
 
 
-def create_type_scheme():
+def create_schemes() -> tuple[dict, dict]:
     """Create a type scheme from the schema"""
     schema = config_schema()
     type_scheme = convert_schema_to_type_dict(schema)
-    mds = type_scheme['mds']
-    type_scheme['mds'] = {'*': mds}
+    type_scheme['mds'] = {'*': type_scheme['mds']}
     type_scheme['reactions'] = {}
-    return type_scheme
+    default_scheme = convert_schema_to_type_dict(schema, field='default', eval_field=False)
+    default_scheme = {k: v for k, v in default_scheme.items() if v is not None and not isinstance(v, dict)}
 
-type_scheme = create_type_scheme()
+    return type_scheme, default_scheme
+
+type_scheme, default_scheme = create_schemes()
 
 
 class Config:
@@ -101,7 +100,8 @@ class Config:
         dict containing types for casting and validating settings.
 
     """
-    # override get and set attributes to satisy type checker
+    # override get and set attributes to satisy type checker and
+    # Acknowledge that we don't actually check the attributes.
     def __getattribute__(self, name) -> Any:
         return object.__getattribute__(self, name)
 
@@ -176,6 +176,7 @@ class Config:
 
         # top level after initialization here
         if input_file is not None:
+            self._set_defaults()
             if cwd := self.raw.get("cwd"):
                 cwd = Path(cwd)
             else:
@@ -230,7 +231,7 @@ class Config:
         return list(repr.keys())
 
     def __repr__(self):
-        repr = self.__dict__.get("type_scheme")
+        repr = self.__dict__
         return str(repr)
 
     def attr(self, attribute):
@@ -282,6 +283,12 @@ class Config:
                 logging.debug(
                     f"{to_type} conversion found for attribute {attr_name} and not executed."
                 )
+
+    def _set_defaults(self):
+        """Set default values for attributes"""
+        for attr_name, default in default_scheme.items():
+            if not hasattr(self, attr_name):
+                self.__setattr__(attr_name, default)
 
     def _validate(self):
         """Validates attributes read from config file."""

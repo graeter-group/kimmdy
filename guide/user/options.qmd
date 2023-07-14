@@ -31,6 +31,18 @@ print(table)
 ```
 
 
+```{python}
+#| eval: false
+#| echo: false
+
+# for debugging
+from kimmdy.config import default_scheme, Config
+from pathlib import Path
+
+config = Config(Path('kimmdy.yml'))
+```
+
+
 ## Example `kimmdy.yml` Files
 
 ```{.yaml filename='kimmdy.yml'}
