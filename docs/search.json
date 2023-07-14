@@ -481,5 +481,40 @@
     "title": "Guide",
     "section": "",
     "text": "Welcome to the KIMMDY documentation. Here you will find all the information you need to get started with KIMMDY.\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "guide/user/options.html",
+    "href": "guide/user/options.html",
+    "title": "KIMMDY Options",
+    "section": "",
+    "text": "The following is a list of the options that can be set in the kimmdy.yml file.\n\n\n\n\n\n\n\n\n\nOption\nType\n(default) Description\n\n\n\n\n\ndryrun\nbool\n(false) Don’t run the actual simulations, just print the tasks\n\n\n\niterations\nint\n(1) Number of iterations to run\n\n\n\nname\nPath\n(kimmdy) Name for output folders\n\n\n\nexperiment\nstr\n(kimmdy) Name of the experiment\n\n\n\nrun\nint\n(1) Replica number\n\n\n\nout\nPath\n(kimmdy) Output folder\n\n\n\ntop\nPath\n(topol.top) Topology file\n\n\n\ngro\nPath\n(conf.gro) Coordinate file\n\n\n\nndx\nPath\n(index.ndx) Index file\n\n\n\ngromacs_alias\nstr\n(gmx) Gromacs alias\n\n\n\nff\nPath\n(amber99sb-star-ildnp.ff) Force field directory\n\n\n\nmds\n\nSettings for MD steps, e.g. mdp files\n\n\n\nchanger\n\n\n\n\n\nreactions\ndict\n\n\n\n\nsequence\nSequence"
+  },
+  {
+    "objectID": "guide/user/options.html#example-kimmdy.yml-file",
+    "href": "guide/user/options.html#example-kimmdy.yml-file",
+    "title": "KIMMDY Options",
+    "section": "Example kimmdy.yml File",
+    "text": "Example kimmdy.yml File\n\n\nkimmdy.yml\n\ndryrun: false\niterations: 100\nname: 'hat_tf_000'\ngromacs_alias: 'gmx'\ntop: 'Ala_out.top'\ngro: 'npt.gro'\nndx: 'index.ndx'\nmds:\n  equilibrium:\n    mdp: 'md.mdp'\n  relax:\n    mdp: 'md_slow.mdp'\nchanger:\n  coordinates:\n    md: 'relax'      \nreactions:\n  hat_reaction:\n    frequency_factor: 100000000\n    h_cutoff: 3\n    polling_rate: 1\n\nsequence:\n- equilibrium\n- mult: 2\n  tasks:\n  - equilibrium\n  - reactions"
+  },
+  {
+    "objectID": "guide/user/options.html#kimmdy-options",
+    "href": "guide/user/options.html#kimmdy-options",
+    "title": "KIMMDY Options",
+    "section": "",
+    "text": "The following is a list of the options that can be set in the kimmdy.yml file.\n\n\n\n\n\n\n\n\n\nOption\nType\n(default) Description\n\n\n\n\n\ndryrun\nbool\n(false) Don’t run the actual simulations, just print the tasks\n\n\n\niterations\nint\n(1) Number of iterations to run\n\n\n\nname\nPath\n(kimmdy) Name for output folders\n\n\n\nexperiment\nstr\n(kimmdy) Name of the experiment\n\n\n\nrun\nint\n(1) Replica number\n\n\n\nout\nPath\n(kimmdy) Output folder\n\n\n\ntop\nPath\n(topol.top) Topology file\n\n\n\ngro\nPath\n(conf.gro) Coordinate file\n\n\n\nndx\nPath\n(index.ndx) Index file\n\n\n\ngromacs_alias\nstr\n(gmx) Gromacs alias\n\n\n\nff\nPath\n(amber99sb-star-ildnp.ff) Force field directory\n\n\n\nmds\n\nSettings for MD steps, e.g. mdp files\n\n\n\nchanger\n\n\n\n\n\nreactions\ndict\n\n\n\n\nsequence\nSequence"
+  },
+  {
+    "objectID": "guide/user/options.html#example-kimmdy.yml-files",
+    "href": "guide/user/options.html#example-kimmdy.yml-files",
+    "title": "KIMMDY Options",
+    "section": "Example kimmdy.yml Files",
+    "text": "Example kimmdy.yml Files\n\n\nkimmdy.yml\n\ndryrun: false\niterations: 100\nname: 'hat_tf_000'\ngromacs_alias: 'gmx'\ntop: 'Ala_out.top'\ngro: 'npt.gro'\nndx: 'index.ndx'\nmds:\n  equilibrium:\n    mdp: 'md.mdp'\n  relax:\n    mdp: 'md_slow.mdp'\nchanger:\n  coordinates:\n    md: 'relax'      \nreactions:\n  hat_reaction:\n    frequency_factor: 100000000\n    h_cutoff: 3\n    polling_rate: 1\n\nsequence:\n- equilibrium\n- mult: 2\n  tasks:\n  - equilibrium\n  - reactions"
+  },
+  {
+    "objectID": "guide/user/options.html#all-options",
+    "href": "guide/user/options.html#all-options",
+    "title": "KIMMDY Options",
+    "section": "",
+    "text": "The following is a list of the options that can be set in the kimmdy.yml file.\n\n\n\n\n\n\n\n\n\nOption\nType\n(default) Description\n\n\n\n\n\ndryrun\nbool\n(false) Don’t run the actual simulations, just print the tasks\n\n\n\niterations\nint\n(1) Number of iterations to run\n\n\n\nname\nPath\n(kimmdy) Name for output folders\n\n\n\nexperiment\nstr\n(kimmdy) Name of the experiment\n\n\n\nrun\nint\n(1) Replica number\n\n\n\nout\nPath\n(kimmdy) Output folder\n\n\n\ntop\nPath\n(topol.top) Topology file\n\n\n\ngro\nPath\n(conf.gro) Coordinate file\n\n\n\nndx\nPath\n(index.ndx) Index file\n\n\n\ngromacs_alias\nstr\n(gmx) Gromacs alias\n\n\n\nff\nPath\n(amber99sb-star-ildnp.ff) Force field directory\n\n\n\nmds\n\nSettings for MD steps, e.g. mdp files\n\n\n\nchanger\n\n\n\n\n\nreactions\ndict\n\n\n\n\nsequence\nSequence"
   }
 ]

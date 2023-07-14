@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>KIMMDY - Developers</title>
+<title>KIMMDY - KIMMDY Options</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,6 +20,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -30,8 +64,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
-<link href="../../guide/developers/plugins.html" rel="next">
-<link href="../../guide/getting-started.html" rel="prev">
+<link href="../../guide/developer/index.html" rel="next">
+<link href="../../guide/user/index.html" rel="prev">
 <script src="../../site_libs/quarto-html/quarto.js"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -94,8 +128,8 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">Getting Started</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../.././guide/plugins.qmd" rel="" target="">
- <span class="menu-text">Reaction Plugins</span></a>
+    <a class="nav-link" href="../../guide/index.html" rel="" target="">
+ <span class="menu-text">Guide</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../../_reference/index.html" rel="" target="">
@@ -133,7 +167,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../guide/getting-started.html">Guide</a></li><li class="breadcrumb-item"><a href="../../guide/developers/index.html">Developers</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../guide/index.html">Guide</a></li><li class="breadcrumb-item"><a href="../../guide/user/index.html">User</a></li><li class="breadcrumb-item"><a href="../../guide/user/options.html">KIMMDY Options</a></li></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -147,7 +181,7 @@ ul.task-list li input[type="checkbox"] {
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <a href="../../guide/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Guide</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
@@ -162,8 +196,8 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../../guide/developers/index.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Developers</span></a>
+            <a href="../../guide/user/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">User</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -171,13 +205,30 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../guide/developers/plugins.html" class="sidebar-item-text sidebar-link">
+  <a href="../../guide/user/options.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">KIMMDY Options</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../guide/developer/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Developer</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guide/developer/plugins.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Writing Reaction Plugins</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../guide/developers/topology.html" class="sidebar-item-text sidebar-link">
+  <a href="../../guide/developer/topology.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Hexala topology</span></a>
   </div>
 </li>
@@ -188,12 +239,12 @@ ul.task-list li input[type="checkbox"] {
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="../../_reference/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Function reference</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="Toggle section">
+ <span class="menu-text">Reference</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../_reference/changemanager.html" class="sidebar-item-text sidebar-link">
@@ -304,14 +355,21 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#all-options" id="toc-all-options" class="nav-link active" data-scroll-target="#all-options">All Options</a></li>
+  <li><a href="#example-kimmdy.yml-files" id="toc-example-kimmdy.yml-files" class="nav-link" data-scroll-target="#example-kimmdy.yml-files">Example <code>kimmdy.yml</code> Files</a></li>
+  </ul>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hits-mbm-dev/kimmdy/edit/main/guide/user/options.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/hits-mbm-dev/kimmdy/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../guide/getting-started.html">Guide</a></li><li class="breadcrumb-item"><a href="../../guide/developers/index.html">Developers</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../guide/index.html">Guide</a></li><li class="breadcrumb-item"><a href="../../guide/user/index.html">User</a></li><li class="breadcrumb-item"><a href="../../guide/user/options.html">KIMMDY Options</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Developers</h1>
+<h1 class="title">KIMMDY Options</h1>
 </div>
 
 
@@ -326,9 +384,155 @@ ul.task-list li input[type="checkbox"] {
 
 </header>
 
-<p>Resources for developers.</p>
+<section id="all-options" class="level2">
+<h2 class="anchored" data-anchor-id="all-options">All Options</h2>
+<p>The following is a list of the options that can be set in the <code>kimmdy.yml</code> file.</p>
+<table class="table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Option</th>
+<th>Type</th>
+<th>(<em>default</em>) Description</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>dryrun</td>
+<td>bool</td>
+<td>(false) Don’t run the actual simulations, just print the tasks</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>iterations</td>
+<td>int</td>
+<td>(1) Number of iterations to run</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>name</td>
+<td>Path</td>
+<td>(kimmdy) Name for output folders</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>experiment</td>
+<td>str</td>
+<td>(kimmdy) Name of the experiment</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>run</td>
+<td>int</td>
+<td>(1) Replica number</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>out</td>
+<td>Path</td>
+<td>(kimmdy) Output folder</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>top</td>
+<td>Path</td>
+<td>(topol.top) Topology file</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>gro</td>
+<td>Path</td>
+<td>(conf.gro) Coordinate file</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>ndx</td>
+<td>Path</td>
+<td>(index.ndx) Index file</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>gromacs_alias</td>
+<td>str</td>
+<td>(gmx) Gromacs alias</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>ff</td>
+<td>Path</td>
+<td>(amber99sb-star-ildnp.ff) Force field directory</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>mds</td>
+<td></td>
+<td>Settings for MD steps, e.g.&nbsp;mdp files</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>changer</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>reactions</td>
+<td>dict</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>sequence</td>
+<td>Sequence</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="example-kimmdy.yml-files" class="level2">
+<h2 class="anchored" data-anchor-id="example-kimmdy.yml-files">Example <code>kimmdy.yml</code> Files</h2>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>kimmdy.yml</strong></pre>
+</div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dryrun</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">iterations</span><span class="kw">:</span><span class="at"> </span><span class="dv">100</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">name</span><span class="kw">:</span><span class="at"> </span><span class="st">'hat_tf_000'</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">gromacs_alias</span><span class="kw">:</span><span class="at"> </span><span class="st">'gmx'</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">top</span><span class="kw">:</span><span class="at"> </span><span class="st">'Ala_out.top'</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">gro</span><span class="kw">:</span><span class="at"> </span><span class="st">'npt.gro'</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ndx</span><span class="kw">:</span><span class="at"> </span><span class="st">'index.ndx'</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">mds</span><span class="kw">:</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">equilibrium</span><span class="kw">:</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">mdp</span><span class="kw">:</span><span class="at"> </span><span class="st">'md.mdp'</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">relax</span><span class="kw">:</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">mdp</span><span class="kw">:</span><span class="at"> </span><span class="st">'md_slow.mdp'</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">changer</span><span class="kw">:</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">coordinates</span><span class="kw">:</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">md</span><span class="kw">:</span><span class="at"> </span><span class="st">'relax'</span><span class="at">      </span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="fu">reactions</span><span class="kw">:</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">hat_reaction</span><span class="kw">:</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">frequency_factor</span><span class="kw">:</span><span class="at"> </span><span class="dv">100000000</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">h_cutoff</span><span class="kw">:</span><span class="at"> </span><span class="dv">3</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">polling_rate</span><span class="kw">:</span><span class="at"> </span><span class="dv">1</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="fu">sequence</span><span class="kw">:</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> equilibrium</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">mult</span><span class="kw">:</span><span class="at"> </span><span class="dv">2</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">tasks</span><span class="kw">:</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> equilibrium</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> reactions</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 
 
+</section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -773,13 +977,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../../guide/getting-started.html" class="pagination-link">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Getting Started</span>
+      <a href="../../guide/user/index.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">User</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../../guide/developers/plugins.html" class="pagination-link">
-        <span class="nav-page-text">Writing Reaction Plugins</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../../guide/developer/index.html" class="pagination-link">
+        <span class="nav-page-text">Developer</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
@@ -788,4 +992,4 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 
 
 
-<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hits-mbm-dev/kimmdy/edit/main/guide/developers/index.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/hits-mbm-dev/kimmdy/issues/new" class="toc-action">Report an issue</a></p></div></div></div></div></footer></body></html>
+</body></html>
