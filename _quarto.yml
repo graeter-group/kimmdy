@@ -48,6 +48,7 @@ execute:
 format:
   html:
     toc: true
+    toc-depth: 5
     mainfont: Roboto
     number-depth: 0
     theme:
