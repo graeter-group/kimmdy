@@ -41,7 +41,9 @@ class Sequence(list):
                 self.append(task)
 
 
-def convert_schema_to_type_dict(dictionary: dict, field: str ='pytype', eval_field: bool = True) -> dict:
+def convert_schema_to_type_dict(
+    dictionary: dict, field: str = "pytype", eval_field: bool = True
+) -> dict:
     result = {}
     additionalProperties = dictionary.get("additionalProperties")
     if additionalProperties is not None:
@@ -63,9 +65,10 @@ def convert_schema_to_type_dict(dictionary: dict, field: str ='pytype', eval_fie
 
     return result
 
+
 def config_schema() -> dict:
     """Return the schema for the config file"""
-    path = (pkg_resources.files(kimmdy) / 'kimmdy-yaml-schema.json')
+    path = pkg_resources.files(kimmdy) / "kimmdy-yaml-schema.json"
     with path.open("rt") as f:
         schema = json.load(f)
     return schema
@@ -75,12 +78,19 @@ def create_schemes() -> tuple[dict, dict]:
     """Create a type scheme from the schema"""
     schema = config_schema()
     type_scheme = convert_schema_to_type_dict(schema)
-    type_scheme['mds'] = {'*': type_scheme['mds']}
-    type_scheme['reactions'] = {}
-    default_scheme = convert_schema_to_type_dict(schema, field='default', eval_field=False)
-    default_scheme = {k: v for k, v in default_scheme.items() if v is not None and not isinstance(v, dict)}
+    type_scheme["mds"] = {"*": type_scheme["mds"]}
+    type_scheme["reactions"] = {}
+    default_scheme = convert_schema_to_type_dict(
+        schema, field="default", eval_field=False
+    )
+    default_scheme = {
+        k: v
+        for k, v in default_scheme.items()
+        if v is not None and not isinstance(v, dict)
+    }
 
     return type_scheme, default_scheme
+
 
 type_scheme, default_scheme = create_schemes()
 
@@ -100,6 +110,7 @@ class Config:
         dict containing types for casting and validating settings.
 
     """
+
     # override get and set attributes to satisy type checker and
     # Acknowledge that we don't actually check the attributes.
     def __getattribute__(self, name) -> Any:
