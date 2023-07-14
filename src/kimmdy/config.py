@@ -83,59 +83,6 @@ def create_type_scheme():
 
 type_scheme = create_type_scheme()
 
-# type_scheme = {
-#     "experiment": str,
-#     "run": int,
-#     "dryrun": bool,
-#     "iterations": int,
-#     "out": Path,
-#     "gromacs_alias": str,
-#     "ff": Path,
-#     "top": Path,
-#     "gro": Path,
-#     "ndx": Path,
-#     "mds": {
-#         "*": {
-#             "mdp": Path,
-#             "plumed": {"dat": Path, "distances": Path},
-#             "prefix": str,
-#             "overwrite": str,
-#         }
-#     },
-#     "changer": {"coordinates": {"md": str, "md_parameter_growth": str}},
-#     "reactions": {},
-#     "sequence": Sequence,
-# }
-
-
-# classes for static code analysis
-
-
-class MDrefConfig:
-    md: str
-    md_parameter_growth: str
-
-
-class ChangerConfig:
-    coordinates: MDrefConfig
-
-
-class HomolysisConfig:
-    dat: Path
-    itp: Path
-
-
-class ReactionsConfig:
-    homolysis: HomolysisConfig
-
-
-class PullConfig:
-    mdp: Path
-
-
-class SequenceConfig(list):
-    tasks: list
-
 
 class Config:
     """Internal representation of the configuration generated
@@ -174,25 +121,6 @@ class Config:
         dict containing types for casting and validating settings.
 
     """
-
-    run: int
-    experiment: str
-    name: str  # TODO: obsolete??
-    dryrun: bool
-    iterations: int
-    out: Path
-    gromacs_alias: str
-    ff: Path
-    ffpatch: Optional[Path]
-    top: Path
-    gro: Path
-    ndx: Path
-    mds: dict
-    changer: ChangerConfig
-    reactions: ReactionsConfig
-    pull: PullConfig
-    sequence: SequenceConfig
-
     def __init__(
         self,
         input_file: Path | None = None,
