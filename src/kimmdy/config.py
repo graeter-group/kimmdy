@@ -3,7 +3,7 @@ Read and validate kimmdy.yml configuration files
 and package into a parsed format for internal use.
 """
 from __future__ import annotations
-from typing import Optional
+from typing import Any, Optional
 import yaml
 import logging
 from pathlib import Path
@@ -12,6 +12,8 @@ from kimmdy import plugins
 from kimmdy.reaction import ReactionPlugin
 import json
 import importlib.resources as pkg_resources
+
+# needed for eval of type_scheme from schema
 import kimmdy
 import pathlib
 
@@ -88,28 +90,6 @@ class Config:
     """Internal representation of the configuration generated
     from the input file, which enables validation before running
     and computationally expensive operations.
-    All settings read from the input file are accessible through nested attributes.
-
-    TODO: think about how much the type annotations on here can lie.
-
-    Attributes
-    run: int
-    experiment: str
-    name: str  # TODO: obsolete??
-    dryrun: bool
-    iterations: int
-    out: Path
-    gromacs_alias: str
-    ff: Path
-    ffpatch: Optional[Path]
-    top: Path
-    gro: Path
-    ndx: Path
-    mds: dict
-    changer: ChangerConfig
-    reactions: ReactionsConfig
-    pull: PullConfig
-    sequence: SequenceConfig
 
     Parameters
     ----------
@@ -121,6 +101,13 @@ class Config:
         dict containing types for casting and validating settings.
 
     """
+    # override get and set attributes to satisy type checker
+    def __getattribute__(self, name) -> Any:
+        return object.__getattribute__(self, name)
+
+    def __setattr__(self, name, value: Any):
+        object.__setattr__(self, name, value)
+
     def __init__(
         self,
         input_file: Path | None = None,
