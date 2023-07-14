@@ -72,7 +72,16 @@ def config_schema():
     return schema
 
 
-type_scheme = convert_schema_to_type_dict(config_schema())
+def create_type_scheme():
+    """Create a type scheme from the schema"""
+    schema = config_schema()
+    type_scheme = convert_schema_to_type_dict(schema)
+    mds = type_scheme['mds']
+    type_scheme['mds'] = {'*': mds}
+    type_scheme['reactions'] = {}
+    return type_scheme
+
+type_scheme = create_type_scheme()
 
 # type_scheme = {
 #     "experiment": str,
