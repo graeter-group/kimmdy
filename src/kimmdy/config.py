@@ -45,11 +45,9 @@ def convert_schema_to_type_dict(
     dictionary: dict, field: str = "pytype", eval_field: bool = True
 ) -> dict:
     result = {}
-    additionalProperties = dictionary.get("additionalProperties")
-    if additionalProperties is not None:
-        return convert_schema_to_type_dict(additionalProperties, field, eval_field)
-
     properties = dictionary.get("properties")
+    if properties is None:
+        properties = dictionary.get("patternProperties")
     if properties is None:
         return result
     for key, value in properties.items():
@@ -78,8 +76,6 @@ def create_schemes() -> tuple[dict, dict]:
     """Create a type scheme from the schema"""
     schema = config_schema()
     type_scheme = convert_schema_to_type_dict(schema)
-    type_scheme["mds"] = {"*": type_scheme["mds"]}
-    type_scheme["reactions"] = {}
     default_scheme = convert_schema_to_type_dict(
         schema, field="default", eval_field=False
     )
@@ -180,7 +176,7 @@ class Config:
                 if isinstance(val, dict):
                     recursiv_type_s = self.type_scheme.get(name)
                     if recursiv_type_s is None:
-                        recursiv_type_s = self.type_scheme.get("*")
+                        recursiv_type_s = self.type_scheme.get(".*")
                     val = Config(recursive_dict=val, type_scheme=recursiv_type_s)
                 logging.debug(f"Set attribute: {name}, {val}")
                 self.__setattr__(name, val)
@@ -272,8 +268,8 @@ class Config:
 
                 # nested:
                 if isinstance(to_type, dict):
-                    if list(to_type.keys()) == ["*"]:
-                        attr._cast_types(to_type["*"])
+                    if list(to_type.keys()) == [".*"]:
+                        attr._cast_types(to_type[".*"])
                     else:
                         attr._cast_types()
                     continue

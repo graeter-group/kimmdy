@@ -1,6 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
+  "additionalProperties": false,
   "properties": {
     "dryrun": {
       "description": "(false) Don't run the actual simulations, just print the tasks",
@@ -78,40 +79,50 @@
     },
     "mds": {
       "type": "object",
-      "description": "Settings for MD steps, e.g. mdp files",
-      "additionalProperties": {
-        "type": "object",
-        "properties": {
-          "mdp": {
-            "type": "string",
-            "pytype": "Path"
-          },
-          "plumed": {
-            "type": "object",
-            "properties": {
-              "dat": {
-                "type": "string",
-                "pytype": "Path"
+      "description": "Settings for MD steps, e.g. mdp files, plumed files, etc.",
+      "patternProperties": {
+        ".*": {
+          "type": "object",
+          "properties": {
+            "mdp": {
+              "type": "string",
+              "pytype": "Path",
+              "description": "MDP file for the MD step"
+            },
+            "prefix": {
+              "type": "string",
+              "pytype": "str",
+              "description": "TODO: What is this?"
+            },
+            "overwrite": {
+              "type": "string",
+              "pytype": "str",
+              "description": "TODO: What is this?"
+            },
+            "plumed": {
+              "type": "object",
+              "properties": {
+                "dat": {
+                  "type": "string",
+                  "pytype": "Path"
+                },
+                "distances": {
+                  "type": "string",
+                  "pytype": "str"
+                }
               },
-              "distances": {
-                "type": "string",
-                "pytype": "Path"
-              }
+              "required": ["dat", "distances"],
+              "additionalProperties": false
             }
           },
-          "prefix": {
-            "type": "string",
-            "pytype": "str"
-          },
-          "overwrite": {
-            "type": "string",
-            "pytype": "str"
-          }
+          "required": ["mdp"],
+          "additionalProperties": false
         }
       }
     },
     "changer": {
       "type": "object",
+      "description": "Settings for the coordinate changer",
       "properties": {
         "coordinates": {
           "type": "object",
@@ -130,7 +141,22 @@
     },
     "reactions": {
       "type": "object",
-      "pytype": "dict"
+      "description": "Settings for reactions",
+      "patternProperties": {
+        ".*": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "frequency_factor": {
+              "description": "(1.0) Frequency factor",
+              "default": 1.0,
+              "type": "number",
+              "pytype": "float"
+            }
+          },
+          "required": []
+        }
+      }
     },
     "sequence": {
       "type": "array",
