@@ -172,7 +172,7 @@ class SingleOperation(RecipeStep):
         self._atom_ix_2 = value
 
 
-class Break(SingleOperation, RecipeStep):
+class Break(SingleOperation):
     """Change topology to break a bond
 
     Attributes
