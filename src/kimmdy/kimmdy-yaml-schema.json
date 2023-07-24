@@ -22,18 +22,11 @@
       "pytype": "str",
       "default": "kimmdy"
     },
-    "out": {
-      "description": "(kimmdy) Name for output folders",
-      "type": "string",
-      "pytype": "Path",
-      "default": "kimmdy"
-    },
     "experiment": {
       "description": "(kimmdy) Name of the experiment",
       "type": "string",
       "pytype": "str",
-      "default": "kimmdy",
-      "pytype": "str"
+      "default": "kimmdy"
     },
     "run": {
       "description": "(1) Replica number",
