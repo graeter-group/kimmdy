@@ -1,35 +1,107 @@
 ---
 title: "KIMMDY Options"
+execute:
+  echo: false
 ---
 
 ## All Options
 
 The following is a list of the options that can be set in the `kimmdy.yml` file.
+It includes reactions currently available in KIMMDY as plugins.
+Nested options are separated by a `.`.
+`*` denotes an arbitrary name for a section.
+The key for a section is **bold**.
 
 ```{python}
-#| echo: false
 #| output: asis
 from kimmdy.config import config_schema
+import json
+import importlib.resources as pkg_resources
+import sys
+from typing import Optional
+from pathlib import Path
+
 schema = config_schema()
 
-def generate_markdown_table(schema):
-    table = []
-    table.append('| Option | Type | (_default_) Description |')
-    table.append('| --- | --- | --- | --- |')
+def get_properties(schema, section=""):
+    """recursively get propteries and their desicripions from the schema"""
+    properties = []
+    property_section = schema.get('properties')
 
-    for key, value in schema['properties'].items():
-        pytype = value.get('pytype', '')
+    if property_section is None:
+      patterns = schema.get('patternProperties')
+      if patterns is not None:
+        patterns = patterns.get('.*')
+        section = f"{section}.\\*"
+        property_section = patterns.get('properties')
+
+    if not property_section:
+        return properties
+    for key, value in property_section.items():
+        if section:
+            key = f"{section}.{key}"
         description = value.get('description', '')
+        pytype = value.get('pytype', '')
+        properties.append((key, pytype, description))
+        if value.get('type', '') == 'object':
+            properties.extend(get_properties(value, key))
+    return properties
 
-        row = f"| {key} | {pytype} | {description} |"
-        table.append(row)
+def get_plugin_schema(plugin) -> Optional[dict]:
+  """Return the schema for the config file for a kimmdy reaction plugin."""
+  path = pkg_resources.files(plugin) / "kimmdy-yaml-schema.json"
+  if not path.is_file():
+    return None
+  with path.open("rt") as f:
+    schema = json.load(f)
+    return schema
+
+def get_all_plugin_schemas():
+  """loop over all discovered plugins and print their schema"""
+  if sys.version_info > (3, 10):
+      from importlib_metadata import entry_points
+      discovered_plugins = entry_points(group="kimmdy.plugins")
+  else:
+      from importlib.metadata import entry_points
+      discovered_plugins = entry_points()["kimmdy.plugins"]
+
+  schemas = []
+  for entry_point in discovered_plugins:
+    # get entry point of plugin
+    plugin = entry_point.load()
+    # get main module from that plugin
+    plugin = plugin.__module__.split(".")[0]
+    if plugin == "kimmdy":
+      continue
+    schema = get_plugin_schema(plugin)
+    if schema is None:
+      continue
+    schemas.append(schema)
+  return schemas
+
+
+def generate_markdown_table(schema, section="", append = False):
+    properties = get_properties(schema, section)
+    table = []
+    if not append:
+      table.append('| Option | Type | (_default_) Description |')
+      table.append('| --- | --- | --- | --- |')
+
+    for key, pytype, description in properties:
+      if pytype == "":
+        key = f"**{key}**"
+      row = f"| {key} | {pytype} | {description} |"
+      table.append(row)
 
     return '\n'.join(table)
 
 table = generate_markdown_table(schema)
 print(table)
-```
 
+for schema in get_all_plugin_schemas():
+  table = generate_markdown_table(schema, "reactions", append=True)
+  print(table)
+```
 
 ```{python}
 #| eval: false
@@ -41,7 +113,6 @@ from pathlib import Path
 
 config = Config(Path('kimmdy.yml'))
 ```
-
 
 ## Example `kimmdy.yml` Files
 

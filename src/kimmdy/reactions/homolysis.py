@@ -27,8 +27,6 @@ class Homolysis(ReactionPlugin):
     Implementation for time-varying rates
     """
 
-    type_scheme = {"homolysis": {"dat": Path, "itp": Path}}
-
     def get_recipe_collection(self, files: TaskFiles):
         logging.debug("Getting recipe for reaction: homolysis")
 

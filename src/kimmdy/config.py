@@ -46,10 +46,13 @@ def convert_schema_to_type_dict(
 ) -> dict:
     result = {}
     properties = dictionary.get("properties")
-    if properties is None:
-        properties = dictionary.get("patternProperties")
+    patternProperties = dictionary.get("patternProperties")
+    if properties is None and patternProperties is not None:
+        properties = patternProperties
     if properties is None:
         return result
+    if patternProperties is not None:
+        properties.update(patternProperties)
     for key, value in properties.items():
         if not isinstance(value, dict):
             continue

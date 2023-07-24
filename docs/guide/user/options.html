@@ -386,7 +386,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="all-options" class="level2">
 <h2 class="anchored" data-anchor-id="all-options">All Options</h2>
-<p>The following is a list of the options that can be set in the <code>kimmdy.yml</code> file.</p>
+<p>The following is a list of the options that can be set in the <code>kimmdy.yml</code> file. It includes reactions currently available in KIMMDY as plugins. Nested options are separated by a <code>.</code>. <code>*</code> denotes an arbitrary name for a section. The key for a section is <strong>bold</strong>.</p>
 <table class="table">
 <colgroup>
 <col style="width: 25%">
@@ -417,26 +417,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 <tr class="odd">
 <td>name</td>
-<td>Path</td>
-<td>(kimmdy) Name for output folders</td>
-<td></td>
-</tr>
-<tr class="even">
-<td>experiment</td>
 <td>str</td>
-<td>(kimmdy) Name of the experiment</td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>run</td>
-<td>int</td>
-<td>(1) Replica number</td>
+<td>(kimmdy) Name. Used for output folder of out is not specified</td>
 <td></td>
 </tr>
 <tr class="even">
 <td>out</td>
 <td>Path</td>
 <td>(kimmdy) Output folder</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>experiment</td>
+<td>str</td>
+<td>(kimmdy) Name of the experiment</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>run</td>
+<td>int</td>
+<td>(1) Replica number</td>
 <td></td>
 </tr>
 <tr class="odd">
@@ -470,26 +470,116 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td></td>
 </tr>
 <tr class="even">
-<td>mds</td>
+<td><strong>mds</strong></td>
 <td></td>
-<td>Settings for MD steps, e.g.&nbsp;mdp files</td>
+<td>Settings for MD steps, e.g.&nbsp;mdp files, plumed files, etc.</td>
 <td></td>
 </tr>
 <tr class="odd">
-<td>changer</td>
+<td>mds.*.mdp</td>
+<td>Path</td>
+<td>MDP file for the MD step</td>
 <td></td>
+</tr>
+<tr class="even">
+<td>mds.*.prefix</td>
+<td>str</td>
+<td>TODO: What is this?</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>mds.*.overwrite</td>
+<td>str</td>
+<td>TODO: What is this?</td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>mds.*.plumed</strong></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>mds.*.plumed.dat</td>
+<td>Path</td>
 <td></td>
 <td></td>
 </tr>
 <tr class="even">
-<td>reactions</td>
-<td>dict</td>
+<td>mds.*.plumed.distances</td>
+<td>str</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>changer</strong></td>
+<td></td>
+<td>Settings for the coordinate changer</td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>changer.coordinates</strong></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>changer.coordinates.md</td>
+<td>str</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>changer.coordinates.md_parameter_growth</td>
+<td>str</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>reactions</strong></td>
+<td></td>
+<td>Settings for reactions</td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>reactions.homolysis</strong></td>
+<td></td>
+<td>Settings for homolysis reactions</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>reactions.homolysis.dat</td>
+<td>Path</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>reactions.homolysis.itp</td>
+<td>Path</td>
 <td></td>
 <td></td>
 </tr>
 <tr class="odd">
 <td>sequence</td>
 <td>Sequence</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>reactions.hat_naive</strong></td>
+<td></td>
+<td>Settings for naive HAT reaction</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>reactions.hat_naive.dat</td>
+<td>Path</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>reactions.hat_naive.itp</td>
+<td>Path</td>
 <td></td>
 <td></td>
 </tr>

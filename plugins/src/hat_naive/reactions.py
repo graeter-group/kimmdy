@@ -5,6 +5,7 @@ from kimmdy.reaction import (
     Recipe,
     RecipeCollection,
     ReactionPlugin,
+    RecipeStep,
 )
 import MDAnalysis as mda
 import random as rng
@@ -38,6 +39,12 @@ class HAT_naive(ReactionPlugin):
             if radical:
                 top.radicals[radical.nr] = radical
 
+        # empty recipe that does nothing as a fallback
+        recipe = Recipe(
+            recipe_steps=[RecipeStep()],
+            rates=[1],
+            timespans=[(u.trajectory[0].time, u.trajectory[-1].time)],
+        )
         if top.radicals:
             for rad in rng.sample(list(top.radicals.values()), len(top.radicals)):
                 hs = []
@@ -61,20 +68,20 @@ class HAT_naive(ReactionPlugin):
                 logging.info(f"radical: {rad}")
                 logging.info(f"h: {top.atoms[h]}")
                 logging.info(f"from: {top.atoms[f]}")
+                # int(x) - 1 to be zero based because h,f,r are from topology
+                recipe = Recipe(
+                    recipe_steps=[
+                        Move(
+                            ix_to_move=int(h) - 1,
+                            ix_to_break=int(f) - 1,
+                            ix_to_bind=int(r) - 1,
+                        )
+                    ],
+                    rates=[1],
+                    timespans=[(u.trajectory[0].time, u.trajectory[-1].time)],
+                )
                 break
 
-            # int(x) - 1 to be zero based because h,f,r are from topology
-            recipe = Recipe(
-                recipe_steps=[
-                    Move(
-                        ix_to_move=int(h) - 1,
-                        ix_to_break=int(f) - 1,
-                        ix_to_bind=int(r) - 1,
-                    )
-                ],
-                rates=[1],
-                timespans=[(u.trajectory[0].time, u.trajectory[-1].time)],
-            )
             return RecipeCollection([recipe])
 
         return RecipeCollection([])

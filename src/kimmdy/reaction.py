@@ -334,15 +334,6 @@ class RecipeCollection:
 class ReactionPlugin(ABC):
     """Reaction base class
 
-    hast a type_scheme, which is a dict of types of possible entries in config.
-    Used to read and check the input config.
-    To not use this feature return empty dict.
-
-    Example:
-    ```python
-    {"homolysis": {"edis": Path, "bonds": Path}}
-    ```
-
     Parameters
     ----------
     name :
@@ -350,8 +341,6 @@ class ReactionPlugin(ABC):
     runmng :
         RunManager instance
     """
-
-    type_scheme: dict = dict()
 
     def __init__(self, name: str, runmng: RunManager):
         self.name = name
