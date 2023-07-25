@@ -54,7 +54,16 @@ def get_cmdline_args():
             "Concatenate trrs of this run"
             "Optionally, the run directory can be give"
             "Will save as concat.trr in current directory"
-        ),
+        )
+    )
+
+    # flag to show available plugins
+    parser.add_argument(
+        "--plugins",
+        action="store_true",
+        help=(
+            "List available plugins"
+        )
     )
     return parser.parse_args()
 
@@ -106,6 +115,14 @@ def _run(args: argparse.Namespace):
     logging.info("Welcome to KIMMDY")
     logging.info("KIMMDY is running with these command line options:")
     logging.info(args)
+
+    if args.plugins:
+        from kimmdy import discovered_plugins
+        print("Available plugins:")
+        for plugin in discovered_plugins:
+            print(plugin)
+
+        exit()
 
     if args.concat:
         logging.info("KIMMDY will concatenate trrs and exit.")

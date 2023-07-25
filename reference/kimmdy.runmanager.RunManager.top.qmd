@@ -1,3 +1,0 @@
-# top { #kimmdy.runmanager.RunManager.top }
-
-`runmanager.RunManager.top`

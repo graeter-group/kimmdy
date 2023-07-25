@@ -1,17 +1,25 @@
-# yaml-language-server: $schema=../../www/kimmdy-yaml-config.json
+# yaml-language-server: $schema=../../src/kimmdy/kimmdy-yaml-schema.json
 
 dryrun: false
+name: kimmdy
 iterations: 100
-name: 'hat_tf_000'
+ff: amber99sb-star-ildnp.ff
 gromacs_alias: 'gmx'
 top: 'Ala_out.top'
 gro: 'npt.gro'
-ndx: 'index.ndx'
+ndx: index.ndx
 mds:
   equilibrium:
-    mdp: 'md.mdp'
+    mdp: 'test.mdp'
   relax:
     mdp: 'md_slow.mdp'
+  other-part:
+    mdp: 'options.mdp'
+    plumed:
+      dat: 'plumed.dat'
+      distances: 'dist.dat'
+  another-part:
+    mdp: 'other-options.mdp'
 changer:
   coordinates:
     md: 'relax'      

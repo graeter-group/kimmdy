@@ -1,9 +1,0 @@
-# tasks { #kimmdy.tasks }
-
-`tasks`
-
-## Attributes
-
-| Name | Description |
-| --- | --- |
-| [TaskMapping](#kimmdy.tasks.TaskMapping) |  |

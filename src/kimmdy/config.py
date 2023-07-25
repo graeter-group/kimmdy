@@ -3,13 +3,19 @@ Read and validate kimmdy.yml configuration files
 and package into a parsed format for internal use.
 """
 from __future__ import annotations
-from typing import Optional
+from typing import Any, Optional
 import yaml
 import logging
 from pathlib import Path
 from dataclasses import dataclass
 from kimmdy import plugins
 from kimmdy.reaction import ReactionPlugin
+import json
+import importlib.resources as pkg_resources
+
+# needed for eval of type_scheme from schema
+import kimmdy
+import pathlib
 
 
 def check_file_exists(p: Path):
@@ -35,91 +41,63 @@ class Sequence(list):
                 self.append(task)
 
 
-class Mds:
-    def __init__(self):
-        pass
+def convert_schema_to_type_dict(
+    dictionary: dict, field: str = "pytype", eval_field: bool = True
+) -> dict:
+    result = {}
+    properties = dictionary.get("properties")
+    patternProperties = dictionary.get("patternProperties")
+    if properties is None and patternProperties is not None:
+        properties = patternProperties
+    if properties is None:
+        return result
+    if patternProperties is not None:
+        properties.update(patternProperties)
+    for key, value in properties.items():
+        if not isinstance(value, dict):
+            continue
+        elif field in value:
+            if eval_field:
+                result[key] = eval(value[field])
+            else:
+                result[key] = value[field]
+        else:
+            result[key] = convert_schema_to_type_dict(value, field, eval_field)
+
+    return result
 
 
-type_scheme = {
-    "experiment": str,
-    "run": int,
-    "dryrun": bool,
-    "iterations": int,
-    "out": Path,
-    "gromacs_alias": str,
-    "ff": Path,
-    "ffpatch": None,
-    "top": Path,
-    "gro": Path,
-    "ndx": Path,
-    "mds": {
-        "*": {
-            "mdp": Path,
-            "plumed": {"dat": Path, "distances": Path},
-            "prefix": str,
-            "overwrite": str,
-        }
-    },
-    "changer": {"coordinates": {"md": str, "md_parameter_growth": str}},
-    "reactions": {},
-    "sequence": Sequence,
-}
-
-# classes for static code analysis
+def config_schema() -> dict:
+    """Return the schema for the config file"""
+    path = pkg_resources.files(kimmdy) / "kimmdy-yaml-schema.json"
+    with path.open("rt") as f:
+        schema = json.load(f)
+    return schema
 
 
-class MDrefConfig:
-    md: str
-    md_parameter_growth: str
+def create_schemes() -> tuple[dict, dict]:
+    """Create a type scheme from the schema"""
+    schema = config_schema()
+    type_scheme = convert_schema_to_type_dict(schema)
+    default_scheme = convert_schema_to_type_dict(
+        schema, field="default", eval_field=False
+    )
+    default_scheme = {
+        k: v
+        for k, v in default_scheme.items()
+        if v is not None and not isinstance(v, dict)
+    }
+
+    return type_scheme, default_scheme
 
 
-class ChangerConfig:
-    coordinates: MDrefConfig
-
-
-class HomolysisConfig:
-    dat: Path
-    itp: Path
-
-
-class ReactionsConfig:
-    homolysis: HomolysisConfig
-
-
-class PullConfig:
-    mdp: Path
-
-
-class SequenceConfig(list):
-    tasks: list
+type_scheme, default_scheme = create_schemes()
 
 
 class Config:
     """Internal representation of the configuration generated
     from the input file, which enables validation before running
     and computationally expensive operations.
-    All settings read from the input file are accessible through nested attributes.
-
-    TODO: think about how much the type annotations on here can lie.
-
-    Attributes
-    run: int
-    experiment: str
-    name: str  # TODO: obsolete??
-    dryrun: bool
-    iterations: int
-    out: Path
-    gromacs_alias: str
-    ff: Path
-    ffpatch: Optional[Path]
-    top: Path
-    gro: Path
-    ndx: Path
-    mds: dict
-    changer: ChangerConfig
-    reactions: ReactionsConfig
-    pull: PullConfig
-    sequence: SequenceConfig
 
     Parameters
     ----------
@@ -132,23 +110,13 @@ class Config:
 
     """
 
-    run: int
-    experiment: str
-    name: str  # TODO: obsolete??
-    dryrun: bool
-    iterations: int
-    out: Path
-    gromacs_alias: str
-    ff: Path
-    ffpatch: Optional[Path]
-    top: Path
-    gro: Path
-    ndx: Path
-    mds: dict
-    changer: ChangerConfig
-    reactions: ReactionsConfig
-    pull: PullConfig
-    sequence: SequenceConfig
+    # override get and set attributes to satisy type checker and
+    # Acknowledge that we don't actually check the attributes.
+    def __getattribute__(self, name) -> Any:
+        return object.__getattribute__(self, name)
+
+    def __setattr__(self, name, value: Any):
+        object.__setattr__(self, name, value)
 
     def __init__(
         self,
@@ -211,13 +179,14 @@ class Config:
                 if isinstance(val, dict):
                     recursiv_type_s = self.type_scheme.get(name)
                     if recursiv_type_s is None:
-                        recursiv_type_s = self.type_scheme.get("*")
+                        recursiv_type_s = self.type_scheme.get(".*")
                     val = Config(recursive_dict=val, type_scheme=recursiv_type_s)
                 logging.debug(f"Set attribute: {name}, {val}")
                 self.__setattr__(name, val)
 
         # top level after initialization here
         if input_file is not None:
+            self._set_defaults()
             if cwd := self.raw.get("cwd"):
                 cwd = Path(cwd)
             else:
@@ -272,7 +241,7 @@ class Config:
         return list(repr.keys())
 
     def __repr__(self):
-        repr = self.__dict__.get("type_scheme")
+        repr = self.__dict__
         return str(repr)
 
     def attr(self, attribute):
@@ -302,8 +271,8 @@ class Config:
 
                 # nested:
                 if isinstance(to_type, dict):
-                    if list(to_type.keys()) == ["*"]:
-                        attr._cast_types(to_type["*"])
+                    if list(to_type.keys()) == [".*"]:
+                        attr._cast_types(to_type[".*"])
                     else:
                         attr._cast_types()
                     continue
@@ -324,6 +293,12 @@ class Config:
                 logging.debug(
                     f"{to_type} conversion found for attribute {attr_name} and not executed."
                 )
+
+    def _set_defaults(self):
+        """Set default values for attributes"""
+        for attr_name, default in default_scheme.items():
+            if not hasattr(self, attr_name):
+                self.__setattr__(attr_name, default)
 
     def _validate(self):
         """Validates attributes read from config file."""

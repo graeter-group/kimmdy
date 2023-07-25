@@ -1,3 +1,0 @@
-# AtomicType { #kimmdy.topology.atomic.AtomicType }
-
-`topology.atomic.AtomicType`

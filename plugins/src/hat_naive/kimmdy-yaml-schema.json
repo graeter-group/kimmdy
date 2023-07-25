@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "hat_naive": {
+      "type": "object",
+      "description": "Settings for naive HAT reaction",
+      "properties": {
+        "dat": {
+          "type": "string",
+          "pytype": "Path"
+        },
+        "itp": {
+          "type": "string",
+          "pytype": "Path"
+        }
+      },
+      "required": [ "dat", "itp" ]
+    }
+  }
+}
+

@@ -1,3 +1,0 @@
-# Atomic { #kimmdy.topology.atomic.Atomic }
-
-`topology.atomic.Atomic`

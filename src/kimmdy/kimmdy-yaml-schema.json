@@ -1,0 +1,177 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "dryrun": {
+      "description": "(false) Don't run the actual simulations, just print the tasks",
+      "type": "boolean",
+      "pytype": "bool",
+      "default": false
+    },
+    "iterations": {
+      "description": "(1) Number of iterations to run",
+      "type": "integer",
+      "pytype": "int",
+      "default": 1,
+      "exclusiveMinimum": 0
+    },
+    "name": {
+      "description": "(kimmdy) Name. Used for output folder of out is not specified",
+      "type": "string",
+      "pytype": "str",
+      "default": "kimmdy"
+    },
+    "experiment": {
+      "description": "(kimmdy) Name of the experiment",
+      "type": "string",
+      "pytype": "str",
+      "default": "kimmdy"
+    },
+    "run": {
+      "description": "(1) Replica number",
+      "type": "integer",
+      "pytype": "int",
+      "default": "1"
+    },
+    "out": {
+      "description": "(kimmdy) Output folder",
+      "type": "string",
+      "pytype": "Path",
+      "default": "kimmdy"
+    },
+    "top": {
+      "description": "(topol.top) Topology file",
+      "type": "string",
+      "pytype": "Path",
+      "default": "topol.top"
+    },
+    "gro": {
+      "description": "(conf.gro) Coordinate file",
+      "type": "string",
+      "pytype": "Path",
+      "default": "conf.gro"
+    },
+    "ndx": {
+      "description": "(index.ndx) Index file",
+      "type": "string",
+      "pytype": "Path",
+      "default": "index.ndx"
+    },
+    "gromacs_alias": {
+      "description": "(gmx) Gromacs alias",
+      "type": "string",
+      "pytype": "str",
+      "default": "gmx"
+    },
+    "ff": {
+      "description": "(amber99sb-star-ildnp.ff) Force field directory",
+      "type": "string",
+      "pytype": "Path",
+      "default": "amber99sb-star-ildnp.ff"
+    },
+    "mds": {
+      "type": "object",
+      "description": "Settings for MD steps, e.g. mdp files, plumed files, etc.",
+      "patternProperties": {
+        ".*": {
+          "type": "object",
+          "properties": {
+            "mdp": {
+              "type": "string",
+              "pytype": "Path",
+              "description": "MDP file for the MD step"
+            },
+            "prefix": {
+              "type": "string",
+              "pytype": "str",
+              "description": "TODO: What is this?"
+            },
+            "overwrite": {
+              "type": "string",
+              "pytype": "str",
+              "description": "TODO: What is this?"
+            },
+            "plumed": {
+              "type": "object",
+              "properties": {
+                "dat": {
+                  "type": "string",
+                  "pytype": "Path"
+                },
+                "distances": {
+                  "type": "string",
+                  "pytype": "str"
+                }
+              },
+              "required": ["dat", "distances"],
+              "additionalProperties": false
+            }
+          },
+          "required": ["mdp"],
+          "additionalProperties": false
+        }
+      }
+    },
+    "changer": {
+      "type": "object",
+      "description": "Settings for the coordinate changer",
+      "properties": {
+        "coordinates": {
+          "type": "object",
+          "properties": {
+            "md": {
+              "type": "string",
+              "pytype": "str"
+            },
+            "md_parameter_growth": {
+              "type": "string",
+              "pytype": "str"
+            }
+          }
+        }
+      }
+    },
+    "reactions": {
+      "type": "object",
+      "description": "Settings for reactions",
+      "properties": {
+        "homolysis": {
+          "type": "object",
+          "description": "Settings for homolysis reactions",
+          "properties": {
+            "dat": {
+              "type": "string",
+              "pytype": "Path"
+            },
+            "itp": {
+              "type": "string",
+              "pytype": "Path"
+            }
+          }
+        }
+      },
+      "patternProperties": {
+        ".*": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "frequency_factor": {
+              "description": "(1.0) Frequency factor",
+              "default": 1.0,
+              "type": "number",
+              "pytype": "float"
+            }
+          },
+          "required": []
+        }
+      }
+    },
+    "sequence": {
+      "type": "array",
+      "pytype": "Sequence"
+    }
+  },
+  "required": ["name", "ff", "sequence" ]
+}
+

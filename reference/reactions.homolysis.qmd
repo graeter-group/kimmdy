@@ -1,3 +1,0 @@
-# reactions.homolysis { #kimmdy.reactions.homolysis }
-
-`reactions.homolysis`

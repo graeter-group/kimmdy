@@ -215,7 +215,7 @@ def modify_plumed(
     Parameters
     ----------
     recipe_steps :
-        A list of [RecipeStep](``kimmdy.reaction.RecipeStep``)s.
+        A list of [RecipeStep](`~kimmdy.reaction.RecipeStep`)s.
         parameter.
     """
     logging.info(
