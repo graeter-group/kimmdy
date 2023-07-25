@@ -23,7 +23,7 @@ def find_radical(atoms: list[Atom]):
     return None
 
 
-class HAT_naive(ReactionPlugin):
+class NaiveHAT(ReactionPlugin):
     """Naive HAT reaction, selects hydrogens at random"""
 
     def get_recipe_collection(self, files) -> RecipeCollection:

@@ -5,7 +5,7 @@ import os
 import numpy as np
 from kimmdy.runmanager import RunManager
 from kimmdy.config import Config
-from kimmdy.reactions.homolysis import Homolysis
+from homolysis.reaction import Homolysis
 from kimmdy.reaction import Break
 from kimmdy.parsing import (
     read_plumed,

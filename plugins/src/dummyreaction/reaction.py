@@ -2,7 +2,7 @@ from kimmdy.reaction import RecipeCollection, ReactionPlugin
 import logging
 
 
-class dummy_reaction(ReactionPlugin):
+class DummyReaction(ReactionPlugin):
     """Dummy reaction, returns empty RecipeCollection"""
 
     def get_recipe_collection(self, files) -> RecipeCollection:
