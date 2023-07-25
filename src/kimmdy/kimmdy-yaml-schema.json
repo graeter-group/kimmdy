@@ -9,24 +9,29 @@
       "pytype": "bool",
       "default": false
     },
+    "cwd": {
+      "description": "(.) Working directory",
+      "type": "string",
+      "pytype": "Path",
+      "default": "."
+    },
+    "out": {
+      "description": "Output directory",
+      "type": "string",
+      "pytype": "Path"
+    },
+    "name": {
+      "description": "(kimmdy) Name. Used for output folder if out is not specified",
+      "type": "string",
+      "pytype": "str",
+      "default": "kimmdy"
+    },
     "iterations": {
       "description": "(1) Number of iterations to run",
       "type": "integer",
       "pytype": "int",
       "default": 1,
       "exclusiveMinimum": 0
-    },
-    "name": {
-      "description": "(kimmdy) Name. Used for output folder of out is not specified",
-      "type": "string",
-      "pytype": "str",
-      "default": "kimmdy"
-    },
-    "experiment": {
-      "description": "(kimmdy) Name of the experiment",
-      "type": "string",
-      "pytype": "str",
-      "default": "kimmdy"
     },
     "run": {
       "description": "(1) Replica number",
@@ -65,10 +70,9 @@
       "default": "gmx"
     },
     "ff": {
-      "description": "(amber99sb-star-ildnp.ff) Force field directory",
+      "description": "(looks for .ff in cwd) Force field directory",
       "type": "string",
-      "pytype": "Path",
-      "default": "amber99sb-star-ildnp.ff"
+      "pytype": "Path"
     },
     "mds": {
       "type": "object",
@@ -158,5 +162,5 @@
       }
     }
   },
-  "required": ["name", "ff", "sequence" ]
+  "required": ["name", "sequence" ]
 }

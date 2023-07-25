@@ -1,12 +1,30 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
-  "additionalProperties": false,
   "properties": {
-    "dummyreaction": {
+    "reactions": {
       "type": "object",
-      "description": "The dummy reaction does _nothing_",
       "properties": {
+        "dummyreaction": {
+          "type": "object",
+          "description": "This reaction does _nothing_ and is only here to demonstrate the syntax.",
+          "additionalProperties": false,
+          "properties": {
+            "example": {
+              "type": "number",
+              "description": "This is an example of an option for a reaction.",
+              "pytype": "float",
+              "default": 0.0
+            },
+            "example2": {
+              "type": "string",
+              "pytype": "str",
+              "description": "This is another example of an option for a reaction.",
+              "default": "hello"
+            }
+          },
+          "required": []
+        }
       }
     }
   }

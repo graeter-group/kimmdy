@@ -18,8 +18,6 @@ from kimmdy.parsing import (
     read_distances_dat,
     read_edissoc,
 )
-import MDAnalysis as mda
-from pathlib import Path
 
 
 class Homolysis(ReactionPlugin):
@@ -34,8 +32,8 @@ class Homolysis(ReactionPlugin):
         plumed_dat = files.input["plumed.dat"]
         distances_dat = files.input["distances.dat"]
         topol_top = files.input["top"]
-        ffbonded_itp = files.input["ffbonded.itp"]
-        edissoc_dat = files.input["edissoc.dat"]
+        ffbonded_itp = self.config.itp
+        edissoc_dat = self.config.dat
 
         # Initialization of objects from files
         distances = read_distances_dat(distances_dat)

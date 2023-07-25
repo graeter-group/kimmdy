@@ -1,22 +1,38 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
-  "additionalProperties": false,
   "properties": {
-    "hat_naive": {
+    "reactions": {
       "type": "object",
-      "description": "Settings for naive HAT reaction",
       "properties": {
-        "dat": {
-          "type": "string",
-          "pytype": "Path"
-        },
-        "itp": {
-          "type": "string",
-          "pytype": "Path"
+        "hat_naiv": {
+          "type": "object",
+          "description": "Settings for naive HAT reaction",
+          "additionalProperties": false,
+          "properties": {
+            "frequency_factor": {
+              "type": "number",
+              "description": "Frequency factor",
+              "pytype": "float",
+              "default": 1,
+              "minimum": 1
+            },
+            "h_cutoff": {
+              "type": "number",
+              "description": "Cutoff for H atom",
+              "pytype": "float",
+              "default": 4
+            },
+            "polling_rate": {
+              "type": "number",
+              "description": "Polling rate",
+              "pytype": "float",
+              "default": 1
+            }
+          },
+          "required": []
         }
-      },
-      "required": [ "dat", "itp" ]
+      }
     }
   }
 }

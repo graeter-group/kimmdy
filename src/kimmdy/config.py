@@ -7,15 +7,9 @@ from typing import Any, Optional
 import yaml
 import logging
 from pathlib import Path
-from dataclasses import dataclass
 from kimmdy import plugins
 from kimmdy.reaction import ReactionPlugin
-import json
-import importlib.resources as pkg_resources
-
-# needed for eval of type_scheme from schema
-import kimmdy
-import pathlib
+from kimmdy.schema import type_scheme, default_scheme, Sequence
 
 
 def check_file_exists(p: Path):
@@ -25,73 +19,32 @@ def check_file_exists(p: Path):
         raise LookupError(m)
 
 
-class Sequence(list):
-    """A sequence of tasks."""
+def get_config_dict(input_file: Path) -> dict:
+    with open(input_file, "r") as f:
+        raw = yaml.safe_load(f)
+    if raw is None:
+        m = "Error: Could not read input file"
+        logging.error(m)
+        raise ValueError(m)
+    config_dict = default_scheme
+    config_dict.update(raw)
+    return config_dict
 
-    def __init__(self, tasks: list):
-        list.__init__(self)
-        for task in tasks:
-            if isinstance(task, dict):
-                for _ in range(task["mult"]):
-                    assert isinstance(
-                        task["tasks"], list
-                    ), "Grouped tasks must be a list!"
-                    self.extend(task["tasks"])
-            else:
-                self.append(task)
-
-
-def convert_schema_to_type_dict(
-    dictionary: dict, field: str = "pytype", eval_field: bool = True
-) -> dict:
-    result = {}
-    properties = dictionary.get("properties")
-    patternProperties = dictionary.get("patternProperties")
-    if properties is None and patternProperties is not None:
-        properties = patternProperties
-    if properties is None:
-        return result
-    if patternProperties is not None:
-        properties.update(patternProperties)
-    for key, value in properties.items():
-        if not isinstance(value, dict):
-            continue
-        elif field in value:
-            if eval_field:
-                result[key] = eval(value[field])
-            else:
-                result[key] = value[field]
+def cast_config_dict_types(config_dict: dict, types: Optional[dict] = None) -> dict:
+    """Cast the types of the config dict to the types specified in the schema"""
+    if types is None:
+        types = type_scheme
+        print(type_scheme)
+    for key, val in config_dict.items():
+        if isinstance(val, dict):
+            subtypes = types.get(key)
+            if subtypes is None:
+                continue
+                # subtypes = types.get(".*")
+            config_dict[key] = cast_config_dict_types(val, subtypes)
         else:
-            result[key] = convert_schema_to_type_dict(value, field, eval_field)
-
-    return result
-
-
-def config_schema() -> dict:
-    """Return the schema for the config file"""
-    path = pkg_resources.files(kimmdy) / "kimmdy-yaml-schema.json"
-    with path.open("rt") as f:
-        schema = json.load(f)
-    return schema
-
-
-def create_schemes() -> tuple[dict, dict]:
-    """Create a type scheme from the schema"""
-    schema = config_schema()
-    type_scheme = convert_schema_to_type_dict(schema)
-    default_scheme = convert_schema_to_type_dict(
-        schema, field="default", eval_field=False
-    )
-    default_scheme = {
-        k: v
-        for k, v in default_scheme.items()
-        if v is not None and not isinstance(v, dict)
-    }
-
-    return type_scheme, default_scheme
-
-
-type_scheme, default_scheme = create_schemes()
+            config_dict[key] = types[key](val)
+    return config_dict
 
 
 class Config:
@@ -101,17 +54,16 @@ class Config:
 
     Parameters
     ----------
-    input_file : Path
+    input_file :
         Path to the config yaml file.
-    recursive_dict : dict
+    recursive_dict :
         For internal use only, used in reading settings in recursively.
-    type_scheme : dict
+    type_scheme :
         dict containing types for casting and validating settings.
-
     """
 
     # override get and set attributes to satisy type checker and
-    # Acknowledge that we don't actually check the attributes.
+    # acknowledge that we don't actually statically type-check the attributes
     def __getattribute__(self, name) -> Any:
         return object.__getattribute__(self, name)
 
@@ -122,56 +74,38 @@ class Config:
         self,
         input_file: Path | None = None,
         recursive_dict: dict | None = None,
-        type_scheme=type_scheme,
     ):
+        # failure case: no input file and no values from dictionary
         if input_file is None and recursive_dict is None:
-            m = "Error: No input file was provided!"
+            m = "No input file was provided for Config"
             logging.error(m)
             raise ValueError(m)
 
-        if input_file is not None and not isinstance(input_file, Path):
-            logging.debug(
-                "Config input file was not type pathlib.Path, attempting conversion.."
-            )
-            input_file = Path(input_file)
-
-        self.type_scheme = type_scheme
-        if self.type_scheme is None:
-            self.type_scheme = {}
-
-        # top level before initialization here
         if input_file is not None:
             with open(input_file, "r") as f:
                 raw = yaml.safe_load(f)
-            self.raw = raw
-            if self.raw is None:
+            if raw is None:
                 m = "Error: Could not read input file"
                 logging.error(m)
                 raise ValueError(m)
             recursive_dict = raw
 
-            if len(plugins) > 0:
-                logging.info("Loading Plugins")
-                for plg_name, plugin in plugins.items():
-                    logging.debug(f"Loading {plg_name}")
-                    if type(plugin) is ModuleNotFoundError:
-                        # TODO; should this be more than a warning?
-                        # Should we crash here?
-                        logging.warn(
-                            f"Plugin {plg_name} could not be loaded!\n{plugin}\n"
-                        )
-                    else:
-                        try:
-                            if (
-                                plugin.__bases__[0] is ReactionPlugin
-                            ):  # isinstance didnt work for some reason
-                                self.type_scheme["reactions"].update(plugin.type_scheme)
-                                logging.debug(self.type_scheme["reactions"])
-                        except:
-                            logging.warn(
-                                f"Plugin {plg_name} could not be loaded!\n{plugin}\n"
-                            )
-                            pass
+        if input_file is None:
+            assert recursive_dict
+            for k, v in recursive_dict.values():
+                if isinstance(v, dict):
+                    subconfig  = Config(recursive_dict=v)
+                    self.__setattr__(k, subconfig)
+                else:
+                    # base case for recursion
+                    self.__setattr__(k, v)
+
+
+    def _set_defaults(self):
+        """Set default values for missing settings"""
+        for name, val in default_scheme.items():
+            if not hasattr(self, name):
+                self.__setattr__(name, val)
 
         # building config recursively
         if recursive_dict is not None:
@@ -210,21 +144,22 @@ class Config:
             self.out.mkdir()
             logging.info(f"Created output dir {self.out}")
 
-            if not hasattr(self, "ff"):
-                ffs = list(self.cwd.glob("*.ff"))
-                if len(ffs) < 1:
-                    # TODO: it can work with a ff in the gromacs data dir
-                    # need to re-add the `ff` option but change a bit
-                    # to unify with read_top
-                    raise FileNotFoundError(
-                        "No forcefield found in cwd, please provide one!"
-                    )
-                if len(ffs) > 1:
-                    logging.warn(
-                        f"Found {len(ffs)} forcefields in cwd, using first one: {ffs[0]}"
-                    )
-                assert ffs[0].is_dir(), "Forcefield should be a directory!"
-                self.ff = ffs[0].resolve()
+            # TODO: move to defaults and then valdiation
+            # if not hasattr(self, "ff"):
+            #     ffs = list(self.cwd.glob("*.ff"))
+            #     if len(ffs) < 1:
+            #         # TODO: it can work with a ff in the gromacs data dir
+            #         # need to re-add the `ff` option but change a bit
+            #         # to unify with read_top
+            #         raise FileNotFoundError(
+            #             "No forcefield found in cwd, please provide one!"
+            #         )
+            #     if len(ffs) > 1:
+            #         logging.warn(
+            #             f"Found {len(ffs)} forcefields in cwd, using first one: {ffs[0]}"
+            #         )
+            #     assert ffs[0].is_dir(), "Forcefield should be a directory!"
+            #     self.ff = ffs[0].resolve()
 
             # TODO: why is this commented out?
             # assert hasattr(self,'mds'), "MD section not defined in config file!"
@@ -293,12 +228,6 @@ class Config:
                 logging.debug(
                     f"{to_type} conversion found for attribute {attr_name} and not executed."
                 )
-
-    def _set_defaults(self):
-        """Set default values for attributes"""
-        for attr_name, default in default_scheme.items():
-            if not hasattr(self, attr_name):
-                self.__setattr__(attr_name, default)
 
     def _validate(self):
         """Validates attributes read from config file."""

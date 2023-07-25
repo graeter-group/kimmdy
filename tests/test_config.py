@@ -110,6 +110,7 @@ def test_get_existing_files():
 
         config = Config(input_f)
         file_d = get_existing_files(config)
+        print(config)
         assert set(file_d.keys()) == set(
             [
                 "",
