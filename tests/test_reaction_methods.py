@@ -5,7 +5,7 @@ from dataclasses import asdict
 
 
 def test_combine_recipes():
-    empty_step = RecipeStep()
+    empty_step = SingleOperation(1,5)
     rp1a = Recipe([empty_step], rates=[1], timespans=[(0.0, 1.0)])
     rp1b = Recipe([empty_step], rates=[1], timespans=[(1.0, 2.0)])
     rp2 = Recipe([empty_step, empty_step], rates=[1], timespans=[(1.0, 3.0)])
@@ -17,32 +17,44 @@ def test_combine_recipes():
     with pytest.raises(ValueError):
         rp1a.combine_with(rp2)
 
+def test_compare_single_operations():
+    
+    sp1 = SingleOperation(1,5)
+    sp2 = SingleOperation(2,5)
+    sp21 = SingleOperation(atom_id_1=3, atom_id_2="6")
+    sp22 = SingleOperation(atom_ix_1=2, atom_id_2="6")
+
+    assert sp1 == sp1
+    assert sp1 != sp2
+    assert sp2 == sp21
+    assert sp2 == sp22
 
 @pytest.fixture
 def recipe_collection():
     rps = [
         Recipe(
-            [RecipeStep(), RecipeStep(), RecipeStep()],
+            [SingleOperation(1,5), SingleOperation(2,6), SingleOperation(3,7)],
             rates=[1],
             timespans=[(0.0, 1.0)],
         ),
-        Recipe([RecipeStep()], rates=[1], timespans=[(0.0, 1.0)]),
-        Recipe([RecipeStep()], rates=[1], timespans=[(1.0, 2.0)]),
-        Recipe([RecipeStep(), RecipeStep()], rates=[1], timespans=[(2.0, 3.0)]),
-        Recipe([RecipeStep()], rates=[1], timespans=[(3.0, 4.0)]),
-        Recipe([RecipeStep(), RecipeStep()], rates=[1], timespans=[(4.0, 5.0)]),
+        Recipe([SingleOperation(1,5)], rates=[1], timespans=[(0.0, 1.0)]),
+        Recipe([SingleOperation(1,5)], rates=[1], timespans=[(1.0, 2.0)]),
+        Recipe([SingleOperation(1,5), SingleOperation(1,5)], rates=[1], timespans=[(2.0, 3.0)]),
+        Recipe([SingleOperation(2,6)], rates=[1], timespans=[(3.0, 4.0)]),
+        Recipe([SingleOperation(1,5), SingleOperation(1,5)], rates=[1], timespans=[(4.0, 5.0)]),
+        Recipe([SingleOperation(2,6), SingleOperation(3,7)], rates=[1], timespans=[(4.0, 5.0)]),
     ]
     return RecipeCollection(rps)
 
 
 def test_aggregate_recipe_collection(recipe_collection):
+    assert len(recipe_collection.recipes) == 7
     recipe_collection.aggregate_reactions()
 
-    assert len(recipe_collection.recipes) == 3
+    assert len(recipe_collection.recipes) == 5
     assert recipe_collection.recipes[1].timespans == [
         (0.0, 1.0),
         (1.0, 2.0),
-        (3.0, 4.0),
     ]
     assert recipe_collection.recipes[2].timespans == [(2.0, 3.0), (4.0, 5.0)]
 
