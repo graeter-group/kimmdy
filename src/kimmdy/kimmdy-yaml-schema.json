@@ -132,30 +132,31 @@
         }
       }
     },
-    "reactions": {
-      "type": "object",
-      "description": "Settings for reactions",
-      "patternProperties": {
-        ".*": {
-          "type": "object",
-          "additionalProperties": true,
-          "properties": {
-            "frequency_factor": {
-              "description": "(1.0) Frequency factor",
-              "default": 1.0,
-              "type": "number",
-              "pytype": "float"
-            }
-          },
-          "required": []
-        }
-      }
-    },
     "sequence": {
       "type": "array",
       "pytype": "Sequence"
+    },
+    "reactions": {
+      "type": "object",
+      "description": "Settings for reactions",
+      "commented-out-as-currently-no-settings-for-all-reactions": {
+        "patternProperties": {
+          ".*": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+              "frequency_factor": {
+                "description": "(1.0) Frequency factor",
+                "default": 1.0,
+                "type": "number",
+                "pytype": "float"
+              }
+            },
+            "required": []
+          }
+        }
+      }
     }
   },
   "required": ["name", "ff", "sequence" ]
 }
-
