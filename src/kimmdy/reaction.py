@@ -59,6 +59,10 @@ class Move(RecipeStep):
     _ix_to_bind: Optional[int] = field(init=False, repr=False, default=None)
     _ix_to_break: Optional[int] = field(init=False, repr=False, default=None)
 
+    def __post_init__(self):
+        if self._ix_to_move is None:
+            raise ValueError("id_ or ix_ to_move must be provided!")
+
     # During init without given parameters, setters recive **not** the default
     # value, but a property instance -> Error in type conversion
 
