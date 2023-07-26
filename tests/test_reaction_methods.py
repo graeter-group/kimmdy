@@ -129,9 +129,9 @@ def test_move_class_initialization_integers(ix_to_move, ix_to_bind, ix_to_break)
 
     # Initialize with corresponding strings
     m2 = Move(
-        id_to_move=str(ix_to_move + 1),
-        id_to_bind=str(ix_to_bind + 1),
-        id_to_break=str(ix_to_break + 1),
+        id_to_move=ix_to_move + 1,
+        id_to_bind=ix_to_bind + 1,
+        id_to_break=ix_to_break + 1,
     )
 
     # Compare instances
