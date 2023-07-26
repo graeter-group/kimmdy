@@ -8,7 +8,6 @@ import yaml
 import logging
 from pathlib import Path
 from kimmdy import plugins
-from kimmdy.reaction import ReactionPlugin
 from kimmdy.schema import type_scheme, default_scheme, Sequence
 
 

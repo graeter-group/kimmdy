@@ -60,6 +60,28 @@ def config_schema() -> dict:
         schema = json.load(f)
     return schema
 
+def resolve_references(schema: dict) -> dict:
+    """Resolve $refs according to json schema standard"""
+    if "$ref" in schema:
+        ref = schema["$ref"]
+        if ref.startswith("#/definitions/"):
+            ref = ref.split("/")[-1]
+            schema = schema["definitions"][ref]
+        if ref.startswith("."):
+            # relative file path
+            path = Path(ref)
+            print(path)
+            if path.is_file():
+                with path.open("rt") as f:
+                    schema = json.load(f)
+                    print(schema)
+        else:
+            raise NotImplementedError("External references not implemented yet")
+    if "properties" in schema:
+        for key, value in schema["properties"].items():
+            schema["properties"][key] = resolve_references(value)
+    return schema
+
 def prune(d: dict) -> dict:
     """Remove empty dicts from a nested dict"""
     if not isinstance(d, dict):
@@ -130,9 +152,14 @@ def get_plugin_schema(plugin) -> Optional[dict]:
     path = pkg_resources.files(plugin) / "kimmdy-yaml-schema.json"
     if not path.is_file():
         return None
+    schema = {}
+    name = plugin.split(".")[-1]
+    schema['properties'] = {}
+    schema['properties']['reactions'] = {}
+    schema['properties']['reactions']['properties'] = {}
     with path.open("rt") as f:
-        schema = json.load(f)
-        return schema
+        schema['properties']['reactions']['properties'][name] = json.load(f)
+    return schema
 
 
 def get_all_plugin_schemas():
@@ -160,6 +187,15 @@ def get_all_plugin_schemas():
         schemas.append(schema)
     return schemas
 
+
+def get_overall_schema():
+    """get the schema for the overall config file"""
+    schema = config_schema()
+    schemas = get_all_plugin_schemas()
+    for schema in schemas:
+        # schema.update(schema)
+        pass
+    return schema
 
 def generate_markdown_table(schema, section="", append=False):
     properties = get_properties(schema, section)
