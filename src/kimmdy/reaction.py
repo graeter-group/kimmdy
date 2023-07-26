@@ -14,6 +14,7 @@ import logging
 from pathlib import Path
 import dill
 import csv
+import numpy as np
 
 
 class RecipeStep(ABC):
@@ -24,7 +25,7 @@ class RecipeStep(ABC):
     """
 
 
-@dataclass
+@dataclass(unsafe_hash=True)
 class Move(RecipeStep):
     """Change topology and/or coordinates to move an atom.
 
@@ -133,7 +134,7 @@ class Move(RecipeStep):
         self._ix_to_break = int(value) - 1
 
 
-@dataclass
+@dataclass(unsafe_hash=True)
 class SingleOperation(RecipeStep):
     """Handle a single operation on the recipe step.
 
@@ -281,6 +282,12 @@ class Recipe:
     def __post_init__(self):
         self.check_consistency()
 
+    def __hash__(self):
+        h_recip = hash(tuple(map(hash, self.recipe_steps)))
+        h_rate = hash(tuple(map(hash, self.rates)))
+        h_time = hash(tuple(map(hash, tuple(*self.timespans))))
+        return h_recip ^ h_rate ^ h_time
+
     def calc_averages(self, window_size: int):
         """Calulate average rates over some window size
 
@@ -330,6 +337,39 @@ class Recipe:
             raise ValueError(
                 f"Consistency error in Recipe {self.recipe_steps}" "" + e.args[0]
             )
+
+    def get_recipe_name(self):
+        name = ""
+        for rs in self.recipe_steps:
+            name += " "
+            if isinstance(rs, Move):
+                if (ix := getattr(rs, "ix_to_break", None)) is not None:
+                    name += str(ix)
+                    name += "\u26A1"  # ⚡
+                if (ix := getattr(rs, "ix_to_move", None)) is not None:
+                    name += str(ix)
+                if (ix := getattr(rs, "ix_to_bind", None)) is not None:
+                    name += "\u27A1"  # ➡
+                    name += str(ix)
+
+            elif isinstance(rs, Bind):
+                if (ix := getattr(rs, "atom_ix_1", None)) is not None:
+                    name += str(ix)
+                    name += "\u27A1"  # ➡
+                if (ix := getattr(rs, "atom_ix_2", None)) is not None:
+                    name += str(ix)
+
+            elif isinstance(rs, Break):
+                if (ix := getattr(rs, "atom_ix_1", None)) is not None:
+                    name += str(ix)
+                    name += "\u26A1"  # ➡
+                if (ix := getattr(rs, "atom_ix_2", None)) is not None:
+                    name += str(ix)
+
+            else:
+                logging.warning(f"get_recipe_name got unknown step type: {type(rs)}")
+                name += "?".join(list(map(str, rs.__dict__.values())))
+        return name
 
 
 @dataclass
@@ -388,6 +428,71 @@ class RecipeCollection:
     def from_dill(cls, path: Path):
         with open(path, "rb") as f:
             return dill.load(f)
+
+    def calc_cumprob(self):
+        """Calculate cumulative probability of all contained recipe steps.
+        Sums up to 1 over all recipes. Assumes constant rate for given timespan
+        and rate zero otherwise.
+        """
+        self.aggregate_reactions()
+
+        cumprob = []
+
+        for re in self.recipes:
+            integral = []
+            for t, r in zip(re.timespans, re.rates):
+                dt = t[1] - t[0]
+                integral += r * dt
+            cumprob.append(integral)
+
+        return np.array(cumprob) / sum(cumprob)
+
+    def plot(self):
+        """Plot reaction rates over time"""
+        import matplotlib.pyplot as plt
+        import seaborn as sns
+
+        # t_min = None
+        # t_max = None
+        # for re in self.recipes:
+        #     for t0, t1 in re.timespans:
+        #         if t_min is None or t_min > t0:
+        #             t_min = t0
+        #         if t_max is None or t_max < t1:
+        #             t_max = t1
+
+        # ax = plt.subplot()
+        # ax.set_xlim(t_min, t_max)
+
+        cmap = sns.color_palette("husl", len(self.recipes))
+        cumprob = self.calc_cumprob()
+        recipes = np.array(self.recipes)
+        idxs = slice(None)
+        if len(recipes) > 8:
+            logging.info(
+                "More than 8 reactions found, displaying only 8 most likely ones."
+            )
+            idxs = np.argsort(cumprob)[-8:]
+
+        for r_i, re in enumerate(recipes[idxs]):
+            name = re.get_recipe_name()
+
+            for t_i, (dt, r) in enumerate(zip(re.timespans, re.rates)):
+                sns.lineplot(
+                    x=np.array(dt),
+                    y=(r, r),
+                    color=cmap[r_i],
+                    label=name,
+                    legend="full",
+                )
+        plt.xlabel("time [frames]")
+        plt.ylabel("reaction rate")
+        plt.yscale("log")
+
+        # removing duplicates in legend
+        handles, labels = plt.gca().get_legend_handles_labels()
+        by_label = dict(zip(labels, handles))
+        plt.legend(by_label.values(), by_label.keys())
 
 
 class ReactionPlugin(ABC):

@@ -167,7 +167,7 @@ def recipe_collection():
             timespans=[(0.0, 1.0)],
         ),
         Recipe([SingleOperation(1, 5)], rates=[1], timespans=[(0.0, 1.0)]),
-        Recipe([SingleOperation(1, 5)], rates=[1], timespans=[(1.0, 2.0)]),
+        Recipe([SingleOperation(1, 5)], rates=[2], timespans=[(1.0, 2.0)]),
         Recipe(
             [SingleOperation(1, 5), SingleOperation(1, 5)],
             rates=[1],
@@ -176,7 +176,7 @@ def recipe_collection():
         Recipe([SingleOperation(2, 6)], rates=[1], timespans=[(3.0, 4.0)]),
         Recipe(
             [SingleOperation(1, 5), SingleOperation(1, 5)],
-            rates=[1],
+            rates=[3],
             timespans=[(4.0, 5.0)],
         ),
         Recipe(
