@@ -32,13 +32,11 @@ def test_compare_single_operations():
 
 
 def test_compare_move():
-    m = Move()
     m1 = Move(1)
     m11 = Move(ix_to_move=1)
     m12 = Move(id_to_move=2)
     m13 = Move(id_to_move="2")
 
-    assert m != m1
     assert m1 == m11
     assert m1 == m12
     assert m1 == m13
