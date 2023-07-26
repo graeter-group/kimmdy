@@ -1,33 +1,22 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
+  "description": "Settings for homolysis reactions",
+  "additionalProperties": false,
   "properties": {
-    "reactions": {
-      "type": "object",
-      "properties": {
-        "homolysis": {
-          "type": "object",
-          "description": "Settings for homolysis reactions",
-          "additionalProperties": false,
-          "properties": {
-            "dat": {
-              "type": "string",
-              "pytype": "Path",
-              "description": "Dissociation energies ata file",
-              "default": "edissoc.dat"
-              
-            },
-            "itp": {
-              "type": "string",
-              "pytype": "Path",
-              "description": "Additional itp file with bonded parameters",
-              "default": "ffbonded.itp"
-            }
-          },
-          "required": [ "dat", "itp" ]
-        }
-      }
+    "dat": {
+      "type": "string",
+      "pytype": "Path",
+      "description": "Dissociation energies ata file",
+      "default": "edissoc.dat"
+    },
+    "itp": {
+      "type": "string",
+      "pytype": "Path",
+      "description": "Additional itp file with bonded parameters",
+      "default": "ffbonded.itp"
     }
-  }
+  },
+  "required": [ "dat", "itp" ]
 }
 

@@ -143,21 +143,29 @@
     "reactions": {
       "type": "object",
       "description": "Settings for reactions",
-      "commented-out-as-currently-no-settings-for-all-reactions": {
-        "patternProperties": {
-          ".*": {
-            "type": "object",
-            "additionalProperties": true,
-            "properties": {
-              "frequency_factor": {
-                "description": "(1.0) Frequency factor",
-                "default": 1.0,
-                "type": "number",
-                "pytype": "float"
-              }
-            },
-            "required": []
-          }
+      "properties": {
+        "homolysis": {
+          "$ref": "../../plugins/src/homolysis/kimmdy-yaml-schema.json"
+        },
+        "hat_naive": {
+          "$ref": "../../plugins/src/hat_naive/kimmdy-yaml-schema.json"
+        },
+        "dummyreaction": {
+          "$ref": "../../plugins/src/dummyreaction/kimmdy-yaml-schema.json"
+        }
+      },
+      "patternProperties": {
+        ".*": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "example_property_for_all_reactions": {
+              "description": "This property can be set for any reaction",
+              "type": "number",
+              "pytype": "float"
+            }
+          },
+          "required": []
         }
       }
     }

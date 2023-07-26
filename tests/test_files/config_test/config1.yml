@@ -1,8 +1,8 @@
-dryrun: True
+dryrun: true
 iterations: 10
 out: 'test_config_1'
 gromacs_alias: 'gmx'
-# ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default
+# ff: 'amber99sb-star-ildnp.ff' # optional, dir ending with .ff by default
 top: 'topol.top'
 gro: 'npt.gro'
 ndx: 'index_backbone.ndx'
