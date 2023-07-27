@@ -408,17 +408,24 @@ class ReactionPlugin(ABC):
         Name of the reaction
     runmng :
         RunManager instance
+    config: Config
+        Optional config for use without a runmng. Takes precendece over runmng
     type_scheme : dict
         dict of types of possible entries in config
     """
 
     type_scheme: dict = dict()
 
-    def __init__(self, name: str, runmng: RunManager):
+    def __init__(self, name: str, runmng: RunManager = None, config: Config = None):
         self.name = name
         self.runmng = runmng
         # sub config, settings of this specific reaction:
-        self.config: Config = self.runmng.config.reactions.__getattribute__(self.name)
+        if config is None:
+            if runmng is not None:
+                config: Config = getattr(self.runmng.config.reactions, self.name)
+            else:
+                raise ValueError("runmng or config must be given!")
+        self.config = config
 
         logging.debug(f"Reaction {self.name} instatiated.")
 
