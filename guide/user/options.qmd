@@ -4,6 +4,24 @@ execute:
   echo: false
 ---
 
+## Autocompletion
+
+KIMMDY comes with autocompletion for the `kimmdy.yml` file.
+Run `kimmdy --show-schema-path` to get the path to the schema file.
+Then, add the following to either the top of your `kimmmdy.yml` file or
+add the schema to the global configuration of the `yaml-language-server` in your editor
+e.g. VS Code or Neovim.
+
+```{.yaml filename='kimmdy.yml'}
+# yaml-language-server: $schema=/your/path/to/kimmdy-yaml-schema.json
+```
+
+Once KIMMDY is public, you can replace the path with the following url:
+
+```{.yaml filename='kimmdy.yml'}
+# yaml-language-server: $schema=https://raw.githubusercontent.com/hits-mbm-dev/kimmdy/main/src/kimmdy/kimmdy-yaml-schema.json
+```
+
 ## All Options
 
 The following is a list of the options that can be set in the `kimmdy.yml` file.
@@ -13,17 +31,12 @@ Nested options are separated by a `.`.
 The key for a section is **bold**.
 
 ```{python}
-from kimmdy.schema import config_schema, create_schemes, generate_markdown_table, get_all_plugin_schemas, get_overall_schema, resolve_references
-from kimmdy.config import cast_config_dict_types, get_config_dict
-from pathlib import Path
-
-types, defaults = create_schemes()
-p = Path('./example/example_ala/kimmdy.yml')
-d = get_config_dict(p)
-cast_config_dict_types(d)
-
-get_all_plugin_schemas()
+from kimmdy.schema import config_schema, convert_schema_to_dict
+schema = config_schema()
+schema_dict = convert_schema_to_dict(schema)
+schema_dict
 ```
+
 
 
 ```{python}
@@ -31,7 +44,6 @@ get_all_plugin_schemas()
 schema = get_overall_schema()
 table = generate_markdown_table(schema)
 schema = config_schema()
-resolved = resolve_references(schema)
 
 # for schema in get_all_plugin_schemas():
 #   table = generate_markdown_table(schema, "reactions", append=True)

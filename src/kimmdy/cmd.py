@@ -10,8 +10,8 @@ from kimmdy.config import Config
 from kimmdy.misc_helper import concat_traj
 from kimmdy.runmanager import RunManager
 from kimmdy.utils import check_gmx_version, increment_logfile
+import importlib.resources as pkg_resources
 import sys
-
 
 if sys.version_info > (3, 10):
     from importlib_metadata import version
@@ -59,10 +59,20 @@ def get_cmdline_args():
 
     # flag to show available plugins
     parser.add_argument(
-        "--plugins",
+        "--show-plugins",
         action="store_true",
         help=(
             "List available plugins"
+        )
+    )
+
+    # flag to print path to yaml schema
+    parser.add_argument(
+        "--show-schema-path",
+        action="store_true",
+        help=(
+            "Print path to yaml schema for use with yaml-language-server e.g. in VSCode and Neovim"
+            "# yaml-language-server: $schema=/path/to/kimmdy-yaml-schema.json"
         )
     )
     return parser.parse_args()
@@ -112,15 +122,17 @@ def _run(args: argparse.Namespace):
     """
     configure_logging(args)
 
-    logging.info("Welcome to KIMMDY")
-    logging.info("KIMMDY is running with these command line options:")
-    logging.info(args)
-
-    if args.plugins:
+    if args.show_plugins:
         from kimmdy import discovered_plugins
         print("Available plugins:")
         for plugin in discovered_plugins:
             print(plugin)
+
+        exit()
+
+    if args.show_schema_path:
+        path = pkg_resources.files('kimmdy') / "kimmdy-yaml-schema.json"
+        print(f"{path}")
 
         exit()
 
@@ -132,6 +144,10 @@ def _run(args: argparse.Namespace):
             run_dir = args.concat
         concat_traj(run_dir)
         exit()
+
+    logging.info("Welcome to KIMMDY")
+    logging.info("KIMMDY is running with these command line options:")
+    logging.info(args)
 
     if args.checkpoint:
         logging.info("KIMMDY is starting from a checkpoint.")

@@ -37,6 +37,7 @@ Because we'll be using optional reaction plugins directly from the git repositor
 # TODO: update with https instead of ssh when repo is public
 pip install 'git+ssh://git@github.com/hits-mbm-dev/kimmdy.git#egg=kimmdy[plugins]'
 # pip install 'git+ssh://git@github.com/hits-mbm-dev/kimmdy.git#egg&subdirectory=plugins'
+# pip install 'git+ssh://git@github.com/hits-mbm-dev/kimmdy.git@docs/config-completion#egg=kimmdy[plugins]'
 ```
 
 ## Setup the Simulation

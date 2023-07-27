@@ -27,9 +27,11 @@ class Sequence(list):
 
 
 
-def convert_schema_to_type_dict(
-    dictionary: dict, field: str = "pytype", eval_field: bool = True
-) -> dict:
+def convert_schema_to_dict(
+    dictionary: dict) -> dict:
+    """Convert a dictionary from a raw json schema to a nested dictionary
+    where each leaf entry is a dictionary with the "pytype" and "default".
+    """
     result = {}
     properties = dictionary.get("properties")
     patternProperties = dictionary.get("patternProperties")
@@ -42,13 +44,18 @@ def convert_schema_to_type_dict(
     for key, value in properties.items():
         if not isinstance(value, dict):
             continue
-        elif field in value:
-            if eval_field:
-                result[key] = eval(value[field])
-            else:
-                result[key] = value[field]
-        else:
-            result[key] = convert_schema_to_type_dict(value, field, eval_field)
+        result[key] = {}
+        json_type = value.get('type')
+        if json_type == 'object':
+            result[key] = convert_schema_to_dict(value)
+            continue
+
+        pytype = value.get("pytype")
+        default = value.get("default")
+        if pytype is not None:
+            result[key]["pytype"] = eval(pytype)
+        if default is not None:
+            result[key]["default"] = default
 
     return result
 
@@ -60,27 +67,6 @@ def config_schema() -> dict:
         schema = json.load(f)
     return schema
 
-def resolve_references(schema: dict) -> dict:
-    """Resolve $refs according to json schema standard"""
-    if "$ref" in schema:
-        ref = schema["$ref"]
-        if ref.startswith("#/definitions/"):
-            ref = ref.split("/")[-1]
-            schema = schema["definitions"][ref]
-        if ref.startswith("."):
-            # relative file path
-            path = Path(ref)
-            print(path)
-            if path.is_file():
-                with path.open("rt") as f:
-                    schema = json.load(f)
-                    print(schema)
-        else:
-            raise NotImplementedError("External references not implemented yet")
-    if "properties" in schema:
-        for key, value in schema["properties"].items():
-            schema["properties"][key] = resolve_references(value)
-    return schema
 
 def prune(d: dict) -> dict:
     """Remove empty dicts from a nested dict"""
@@ -166,11 +152,9 @@ def get_all_plugin_schemas():
     """loop over all discovered plugins and print their schema"""
     if sys.version_info > (3, 10):
         from importlib_metadata import entry_points
-
         discovered_plugins = entry_points(group="kimmdy.plugins")
     else:
         from importlib.metadata import entry_points
-
         discovered_plugins = entry_points()["kimmdy.plugins"]
 
     schemas = []
@@ -213,5 +197,5 @@ def generate_markdown_table(schema, section="", append=False):
     return "\n".join(table)
 
 
-type_scheme, default_scheme = create_schemes()
+# type_scheme, default_scheme = create_schemes()
 
