@@ -1,6 +1,5 @@
 # yaml-language-server: $schema=../../src/kimmdy/kimmdy-yaml-schema.json
 
-dryrun: false
 name: kimmdy
 iterations: 100
 ff: amber99sb-star-ildnp.ff

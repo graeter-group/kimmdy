@@ -32,7 +32,7 @@ The key for a section is **bold**.
 
 ```{python}
 #| output: asis
-from kimmdy.schema import load_kimmdy_schema, convert_schema_to_dict, load_plugin_schemas, get_combined_scheme, flatten_scheme, generate_markdown_table
+from kimmdy.schema import get_combined_scheme, flatten_scheme, generate_markdown_table
 
 scheme = get_combined_scheme()
 flat_scheme = flatten_scheme(scheme)
@@ -50,10 +50,12 @@ print(
 #| echo: false
 
 # for debugging
-from kimmdy.config import Config, get_config_dict
+from kimmdy.config import Config
 from pathlib import Path
 
-config = Config(Path('kimmdy.yml'))
+config = Config(Path('example/example_ala/kimmdy.yml'))
+# config
+config.validate()
 ```
 
 ## Example `kimmdy.yml` Files

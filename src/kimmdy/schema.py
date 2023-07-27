@@ -35,6 +35,8 @@ class Sequence(list):
                     self.extend(task["tasks"])
             else:
                 self.append(task)
+    def __repr__(self):
+        return f"Sequence({list.__repr__(self)})"
 
 def load_kimmdy_schema() -> dict:
     """Return the schema for the config file"""

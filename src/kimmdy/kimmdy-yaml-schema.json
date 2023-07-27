@@ -189,6 +189,7 @@
     "reactions": {
       "type": "object",
       "description": "Settings for reactions",
+      "additionalProperties": true,
       "properties": {
         "homolysis": {
           "$ref": "../../plugins/src/homolysis/kimmdy-yaml-schema.json"
@@ -198,20 +199,6 @@
         },
         "dummyreaction": {
           "$ref": "../../plugins/src/dummyreaction/kimmdy-yaml-schema.json"
-        }
-      },
-      "patternProperties": {
-        ".*": {
-          "type": "object",
-          "additionalProperties": true,
-          "properties": {
-            "example_property_for_all_reactions": {
-              "description": "This property can be set for any reaction",
-              "type": "number",
-              "pytype": "float"
-            }
-          },
-          "required": []
         }
       }
     }
