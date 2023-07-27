@@ -4,13 +4,13 @@
   "additionalProperties": false,
   "properties": {
     "dryrun": {
-      "description": "(false) Don't run the actual simulations, just print the tasks",
+      "description": "Don't run the actual simulations, just print the tasks",
       "type": "boolean",
       "pytype": "bool",
       "default": false
     },
     "cwd": {
-      "description": "(.) Working directory",
+      "description": "Working directory",
       "type": "string",
       "pytype": "Path",
       "default": "."
@@ -21,56 +21,56 @@
       "pytype": "Path"
     },
     "name": {
-      "description": "(kimmdy) Name. Used for output folder if out is not specified",
+      "description": "Used for output folder if out is not specified",
       "type": "string",
       "pytype": "str",
       "default": "kimmdy"
     },
     "iterations": {
-      "description": "(1) Number of iterations to run",
+      "description": "Number of iterations to run",
       "type": "integer",
       "pytype": "int",
       "default": 1,
       "exclusiveMinimum": 0
     },
     "run": {
-      "description": "(1) Replica number",
+      "description": "Replica number",
       "type": "integer",
       "pytype": "int",
       "default": "1"
     },
     "out": {
-      "description": "(kimmdy) Output folder",
+      "description": "Output folder",
       "type": "string",
       "pytype": "Path",
       "default": "kimmdy"
     },
     "top": {
-      "description": "(topol.top) Topology file",
+      "description": "Topology file",
       "type": "string",
       "pytype": "Path",
       "default": "topol.top"
     },
     "gro": {
-      "description": "(conf.gro) Coordinate file",
+      "description": "Coordinate file",
       "type": "string",
       "pytype": "Path",
       "default": "conf.gro"
     },
     "ndx": {
-      "description": "(index.ndx) Index file",
+      "description": "Index file",
       "type": "string",
       "pytype": "Path",
       "default": "index.ndx"
     },
     "gromacs_alias": {
-      "description": "(gmx) Gromacs alias",
+      "description": "Gromacs alias",
       "type": "string",
       "pytype": "str",
       "default": "gmx"
     },
     "ff": {
-      "description": "(looks for .ff in cwd) Force field directory",
+      "description": "Force field directory (looks for .ff in cwd if not set)",
       "type": "string",
       "pytype": "Path"
     },

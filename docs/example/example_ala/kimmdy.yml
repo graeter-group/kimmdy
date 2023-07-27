@@ -25,13 +25,26 @@ changer:
     md: 'relax'      
 reactions:
   hat_naive:
-    frequency_factor: 100000000
-    h_cutoff: 3
+    frequency_factor: 1
+    h_cutoff: 4
     polling_rate: 1
+  homolysis:
+    dat: edissoc.dat
+    itp: ffbonded.itp
+  dummyreaction:
+    example: 0
+    example2: hello
+
 
 sequence:
-- equilibrium
-- mult: 2
-  tasks:
-  - equilibrium
+  - mult: 2
+    tasks:
+      - equilibrum
   - reactions
+  - mult: 3
+    tasks:
+      - mult: 3
+        tasks:
+          - reactions
+          - relax
+

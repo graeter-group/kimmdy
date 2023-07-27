@@ -10,7 +10,7 @@ KIMMDY comes with autocompletion for the `kimmdy.yml` file.
 Run `kimmdy --show-schema-path` to get the path to the schema file.
 Then, add the following to either the top of your `kimmmdy.yml` file or
 add the schema to the global configuration of the `yaml-language-server` in your editor
-e.g. VS Code or Neovim.
+(e.g. VS Code or Neovim).
 
 ```{.yaml filename='kimmdy.yml'}
 # yaml-language-server: $schema=/your/path/to/kimmdy-yaml-schema.json
@@ -31,24 +31,19 @@ Nested options are separated by a `.`.
 The key for a section is **bold**.
 
 ```{python}
-from kimmdy.schema import config_schema, convert_schema_to_dict
-schema = config_schema()
-schema_dict = convert_schema_to_dict(schema)
-schema_dict
-```
-
-
-
-```{python}
 #| output: asis
-schema = get_overall_schema()
-table = generate_markdown_table(schema)
-schema = config_schema()
+from kimmdy.schema import load_kimmdy_schema, convert_schema_to_dict, load_plugin_schemas, get_combined_scheme, flatten_scheme, generate_markdown_table
 
-# for schema in get_all_plugin_schemas():
-#   table = generate_markdown_table(schema, "reactions", append=True)
-#   print(table)
+scheme = get_combined_scheme()
+flat_scheme = flatten_scheme(scheme)
+table = generate_markdown_table(flat_scheme)
+
+print(table)
+print(
+  ': KIMMDY options  {#tbl-options .striped .hover tbl-colwidths="[25,50,15,15]"}'
+)
 ```
+
 
 ```{python}
 #| eval: false

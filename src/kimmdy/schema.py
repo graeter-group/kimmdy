@@ -1,3 +1,14 @@
+"""
+Handle the schema for the config file.
+To  be used by the config module to validate the config file and set defaults
+for the Config object.
+
+Reserved keywords:
+    - pytype
+    - default
+    - description
+    - type
+"""
 import json
 import importlib.resources as pkg_resources
 import sys
@@ -25,7 +36,35 @@ class Sequence(list):
             else:
                 self.append(task)
 
+def load_kimmdy_schema() -> dict:
+    """Return the schema for the config file"""
+    path = pkg_resources.files(kimmdy) / "kimmdy-yaml-schema.json"
+    with path.open("rt") as f:
+        schema = json.load(f)
+    return schema
 
+def load_plugin_schemas() -> dict:
+    """Return the schemas for the plugins"""
+    if sys.version_info > (3, 10):
+        from importlib_metadata import entry_points
+        discovered_plugins = entry_points(group="kimmdy.plugins")
+    else:
+        from importlib.metadata import entry_points
+        discovered_plugins = entry_points()["kimmdy.plugins"]
+
+    schemas = {}
+    for entry_point in discovered_plugins:
+        # get entry point of plugin
+        plugin = entry_point.load()
+        # get main module from that plugin
+        plugin = plugin.__module__.split(".")[0]
+        if plugin == "kimmdy":
+            continue
+        path = pkg_resources.files(plugin) / "kimmdy-yaml-schema.json"
+        name = plugin.split(".")[-1]
+        with path.open("rt") as f:
+            schemas[name] = json.load(f)
+    return schemas
 
 def convert_schema_to_dict(
     dictionary: dict) -> dict:
@@ -48,25 +87,29 @@ def convert_schema_to_dict(
         json_type = value.get('type')
         if json_type == 'object':
             result[key] = convert_schema_to_dict(value)
-            continue
 
         pytype = value.get("pytype")
         default = value.get("default")
+        description = value.get("description")
         if pytype is not None:
             result[key]["pytype"] = eval(pytype)
         if default is not None:
             result[key]["default"] = default
+        if description is not None:
+            result[key]["description"] = description
 
     return result
 
-
-def config_schema() -> dict:
+def get_combined_scheme() -> dict:
     """Return the schema for the config file"""
-    path = pkg_resources.files(kimmdy) / "kimmdy-yaml-schema.json"
-    with path.open("rt") as f:
-        schema = json.load(f)
-    return schema
+    schema = load_kimmdy_schema()
+    schemas = load_plugin_schemas()
+    kimmdy_dict = convert_schema_to_dict(schema)
+    plugin_dicts = {k: convert_schema_to_dict(schema) for k, schema in schemas.items()}
+    for k, v in plugin_dicts.items():
+        kimmdy_dict["reactions"].update({k: v})
 
+    return kimmdy_dict
 
 def prune(d: dict) -> dict:
     """Remove empty dicts from a nested dict"""
@@ -78,124 +121,47 @@ def prune(d: dict) -> dict:
         if v is not None and v != {}
     }
 
-def create_schemes() -> tuple[dict, dict]:
-    """Create a type scheme from the schema"""
-
-    type_scheme = {}
-    default_scheme = {}
-    schemas = get_all_plugin_schemas()
-    for schema in schemas:
-        plugin_type_scheme = convert_schema_to_type_dict(schema)
-        plugin_type_scheme = prune(plugin_type_scheme)
-        plugin_default_scheme = convert_schema_to_type_dict(
-            schema, field="default", eval_field=False
-        )
-        type_scheme.update(plugin_type_scheme)
-        default_scheme.update(plugin_default_scheme)
-
-    schema = config_schema()
-    main_type_scheme = convert_schema_to_type_dict(schema)
-    main_type_scheme = prune(main_type_scheme)
-    type_scheme.update(main_type_scheme)
-
-    main_default_scheme = convert_schema_to_type_dict(
-            schema, field="default", eval_field=False
-        )
-    main_default_scheme = prune(main_default_scheme)
-
-    default_scheme.update(main_default_scheme)
-
-    return type_scheme, default_scheme
-
-
-def get_properties(schema, section=""):
-    """recursively get propteries and their desicripions from the schema"""
-    properties = []
-    property_section = schema.get("properties")
-
-    if property_section is None:
-        patterns = schema.get("patternProperties")
-        if patterns is not None:
-            patterns = patterns.get(".*")
-            section = f"{section}.\\*"
-            property_section = patterns.get("properties")
-
-    if not property_section:
-        return properties
-    for key, value in property_section.items():
+def flatten_scheme(scheme, section="") -> list:
+    """recursively get properties and their desicripions from the scheme"""
+    ls = []
+    for key, value in scheme.items():
+        if not isinstance(value, dict):
+            continue
         if section:
             key = f"{section}.{key}"
+
         description = value.get("description", "")
-        pytype = value.get("pytype", "")
-        properties.append((key, pytype, description))
-        if value.get("type", "") == "object":
-            properties.extend(get_properties(value, key))
-    return properties
+        pytype = value.get("pytype")
+        if pytype is not None:
+            pytype = pytype.__name__
+        else:
+            pytype = ""
+        default = value.get("default", "")
 
+        ls.append((key, description, pytype, default))
 
-def get_plugin_schema(plugin) -> Optional[dict]:
-    """Return the schema for the config file for a kimmdy reaction plugin."""
-    path = pkg_resources.files(plugin) / "kimmdy-yaml-schema.json"
-    if not path.is_file():
-        return None
-    schema = {}
-    name = plugin.split(".")[-1]
-    schema['properties'] = {}
-    schema['properties']['reactions'] = {}
-    schema['properties']['reactions']['properties'] = {}
-    with path.open("rt") as f:
-        schema['properties']['reactions']['properties'][name] = json.load(f)
-    return schema
+        for k in value.keys():
+            if k not in ["pytype", "default", "description", "type"]:
+                k_esc = k
+                if k == '.*':
+                    k_esc = '\\*'
+                s = f"{key}.{k_esc}"
+                ls.extend(flatten_scheme(value[k], section=s))
 
+    return ls
 
-def get_all_plugin_schemas():
-    """loop over all discovered plugins and print their schema"""
-    if sys.version_info > (3, 10):
-        from importlib_metadata import entry_points
-        discovered_plugins = entry_points(group="kimmdy.plugins")
-    else:
-        from importlib.metadata import entry_points
-        discovered_plugins = entry_points()["kimmdy.plugins"]
-
-    schemas = []
-    for entry_point in discovered_plugins:
-        # get entry point of plugin
-        plugin = entry_point.load()
-        # get main module from that plugin
-        plugin = plugin.__module__.split(".")[0]
-        if plugin == "kimmdy":
-            continue
-        schema = get_plugin_schema(plugin)
-        if schema is None:
-            continue
-        schemas.append(schema)
-    return schemas
-
-
-def get_overall_schema():
-    """get the schema for the overall config file"""
-    schema = config_schema()
-    schemas = get_all_plugin_schemas()
-    for schema in schemas:
-        # schema.update(schema)
-        pass
-    return schema
-
-def generate_markdown_table(schema, section="", append=False):
-    properties = get_properties(schema, section)
+def generate_markdown_table(scheme, append=False):
     table = []
     if not append:
-        table.append("| Option | Type | (_default_) Description |")
-        table.append("| --- | --- | --- | --- |")
+        table.append("| Option | Description | Type | Default |")
+        table.append("| --- | --- | --- | --- | --- |")
 
-    for key, pytype, description in properties:
+    for key, pytype, description, default in scheme:
         if pytype == "":
             key = f"**{key}**"
-        row = f"| {key} | {pytype} | {description} |"
+        row = f"| {key} | {pytype} | {description} | {default} |"
         table.append(row)
 
     return "\n".join(table)
 
-
-# type_scheme, default_scheme = create_schemes()
 

@@ -8,7 +8,7 @@ import yaml
 import logging
 from pathlib import Path
 from kimmdy import plugins
-from kimmdy.schema import type_scheme, default_scheme, Sequence
+from kimmdy.schema import Sequence, get_combined_scheme
 
 
 def check_file_exists(p: Path):
@@ -16,34 +16,6 @@ def check_file_exists(p: Path):
         m = "File not found: " + str(p.resolve())
         logging.error(m)
         raise LookupError(m)
-
-
-def get_config_dict(input_file: Path) -> dict:
-    with open(input_file, "r") as f:
-        raw = yaml.safe_load(f)
-    if raw is None:
-        m = "Error: Could not read input file"
-        logging.error(m)
-        raise ValueError(m)
-    config_dict = default_scheme
-    config_dict.update(raw)
-    return config_dict
-
-def cast_config_dict_types(config_dict: dict, types: Optional[dict] = None) -> dict:
-    """Cast the types of the config dict to the types specified in the schema"""
-    if types is None:
-        types = type_scheme
-        print(type_scheme)
-    for key, val in config_dict.items():
-        if isinstance(val, dict):
-            subtypes = types.get(key)
-            if subtypes is None:
-                continue
-                # subtypes = types.get(".*")
-            config_dict[key] = cast_config_dict_types(val, subtypes)
-        else:
-            config_dict[key] = types[key](val)
-    return config_dict
 
 
 class Config:
@@ -73,12 +45,16 @@ class Config:
         self,
         input_file: Path | None = None,
         recursive_dict: dict | None = None,
+        scheme: dict | None = None
     ):
         # failure case: no input file and no values from dictionary
         if input_file is None and recursive_dict is None:
             m = "No input file was provided for Config"
             logging.error(m)
             raise ValueError(m)
+
+        if scheme is None:
+            scheme = get_combined_scheme()
 
         if input_file is not None:
             with open(input_file, "r") as f:
