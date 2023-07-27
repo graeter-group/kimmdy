@@ -137,8 +137,54 @@
       }
     },
     "sequence": {
+      "description": "List of tasks. Each task can be a string (the name of the task) or an object with the task name and a multiplicity `mult: <int>`",
+      "pytype": "Sequence",
       "type": "array",
-      "pytype": "Sequence"
+      "items": {
+        "oneOf": [
+          { "type": "string" },
+          {
+            "type": "object",
+            "properties": {
+              "mult": {
+                "type": "integer",
+                "description": "Multiplicity of the task",
+                "default": 2,
+                "minimum": 1 },
+              "tasks": {
+                "type": "array",
+                "description": "List of tasks",
+                "items": {
+                  "oneOf": [
+                    { "type": "string" },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "mult": {
+                          "type": "integer",
+                          "description": "Multiplicity of the task",
+                          "default": 2,
+                          "minimum": 1 },
+                        "tasks": {
+                          "type": "array",
+                          "description": "List of tasks",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "required": ["mult", "tasks"],
+                      "additionalProperties": false
+                    }
+                  ]
+                }
+              }
+            },
+            "required": ["mult", "tasks"],
+            "additionalProperties": false
+          }
+        ]
+      }
     },
     "reactions": {
       "type": "object",

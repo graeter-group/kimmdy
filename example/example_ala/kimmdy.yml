@@ -31,11 +31,20 @@ reactions:
   homolysis:
     dat: edissoc.dat
     itp: ffbonded.itp
+  dummyreaction:
+    example: 0
+    example2: hello
 
 
 sequence:
-- equilibrium
-- mult: 2
-  tasks:
-  - equilibrium
+  - mult: 2
+    tasks:
+      - equilibrum
   - reactions
+  - mult: 3
+    tasks:
+      - mult: 3
+        tasks:
+          - reactions
+          - relax
+
