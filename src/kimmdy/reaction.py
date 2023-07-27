@@ -2,13 +2,13 @@
 ReactionPlugin protocoll and reaction recipes.
 """
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:
     from kimmdy.runmanager import RunManager
     from kimmdy.config import Config
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
+from dataclasses import dataclass, field, InitVar
 from kimmdy.tasks import TaskFiles
 import logging
 from pathlib import Path
@@ -16,8 +16,7 @@ import dill
 import csv
 
 
-@dataclass
-class RecipeStep:
+class RecipeStep(ABC):
     """Base class for all RecipeSteps.
     Indices can be accessed as 0-based or 1-based.
     ix: 0-based, int
@@ -25,62 +24,68 @@ class RecipeStep:
     """
 
 
+@dataclass
 class Move(RecipeStep):
     """Change topology and/or coordinates to move an atom.
 
-    Attributes
+    Parameters
     ----------
     ix_to_move : int
         Index of atom to move. 0-based.
     ix_to_bind : int
-        Bonding partner to form bond with.
+        Bonding partner to form bond with. 0-based.
     ix_to_break : int
-        Bonding partner to break bond with, default None.
+        Bonding partner to break bond with, default None. 0-based.
     new_coords :
         Optional new xyz coordinates for atom to move to, and the associated
         time in ps default None.
     id_to_move : str
         Index of atom to move. 1-based
     id_to_bind : str
-        Bonding partner to form bond with.
+        Bonding partner to form bond with. 1-based
     id_to_break : str
-        Bonding partner to break bond with, default None.
+        Bonding partner to break bond with, default None. 1-based
     """
 
-    _ix_to_move: int
-    _ix_to_bind: Optional[int] = None
-    _ix_to_break: Optional[int] = None
-    new_coords: Union[tuple[tuple[float, float, float], float], None] = None
+    ix_to_move: Optional[int] = None
+    ix_to_bind: Optional[int] = None
+    ix_to_break: Optional[int] = None
+    new_coords: Optional[tuple[tuple[float, float, float], float]] = None
+    id_to_move: Optional[str] = None
+    id_to_bind: Optional[str] = None
+    id_to_break: Optional[str] = None
 
-    def __init__(
-        self,
-        ix_to_move: int,
-        ix_to_bind: Optional[int] = None,
-        ix_to_break: Optional[int] = None,
-        new_coords: Optional[tuple[tuple[float, float, float], float]] = None,
-    ) -> None:
-        self._ix_to_move = ix_to_move
-        self._ix_to_bind = ix_to_bind
-        self._ix_to_break = ix_to_break
-        self.new_coords = new_coords
+    _ix_to_move: Optional[int] = field(init=False, repr=False, default=None)
+    _ix_to_bind: Optional[int] = field(init=False, repr=False, default=None)
+    _ix_to_break: Optional[int] = field(init=False, repr=False, default=None)
 
-    def __repr__(self) -> str:
-        return f"{self.__class__.__name__}, ix_to_move: {self.ix_to_move}, ix_to_bind: {self.ix_to_bind}, ix_to_break: {self.ix_to_break}, new_coords: {self.new_coords}"
+    def __post_init__(self):
+        if self._ix_to_move is None:
+            raise ValueError("id_ or ix_ to_move must be provided!")
+
+    # During init without given parameters, setters recive **not** the default
+    # value, but a property instance -> Error in type conversion
 
     @property
-    def ix_to_move(self) -> int:
+    def ix_to_move(self) -> Optional[int]:
         return self._ix_to_move
 
     @ix_to_move.setter
-    def ix_to_move(self, value: int):
+    def ix_to_move(self, value: Optional[int]):
+        if isinstance(value, property):
+            return
         self._ix_to_move = value
 
     @property
-    def id_to_move(self) -> str:
+    def id_to_move(self) -> Optional[str]:
+        if self._ix_to_move is None:
+            return None
         return str(self._ix_to_move + 1)
 
     @id_to_move.setter
-    def id_to_move(self, value: str):
+    def id_to_move(self, value: Optional[str]):
+        if isinstance(value, property):
+            return
         self._ix_to_move = int(value) - 1
 
     @property
@@ -89,21 +94,21 @@ class Move(RecipeStep):
 
     @ix_to_bind.setter
     def ix_to_bind(self, value: Optional[int]):
+        if isinstance(value, property):
+            return
         self._ix_to_bind = value
 
     @property
     def id_to_bind(self) -> Optional[str]:
         if self._ix_to_bind is None:
             return None
-        else:
-            return str(self._ix_to_bind + 1)
+        return str(self._ix_to_bind + 1)
 
     @id_to_bind.setter
     def id_to_bind(self, value: Optional[str]):
-        if value is None:
-            self._ix_to_bind = None
-        else:
-            self._ix_to_bind = int(value) - 1
+        if isinstance(value, property):
+            return
+        self._ix_to_bind = int(value) - 1
 
     @property
     def ix_to_break(self) -> Optional[int]:
@@ -111,40 +116,78 @@ class Move(RecipeStep):
 
     @ix_to_break.setter
     def ix_to_break(self, value: Optional[int]):
+        if isinstance(value, property):
+            return
         self._ix_to_break = value
 
     @property
     def id_to_break(self) -> Optional[str]:
         if self._ix_to_break is None:
             return None
-        else:
-            return str(self._ix_to_break + 1)
+        return str(self._ix_to_break + 1)
 
     @id_to_break.setter
     def id_to_break(self, value: Optional[str]):
-        if value is None:
-            self._ix_to_break = None
-        else:
-            self._ix_to_break = int(value) - 1
+        if isinstance(value, property):
+            return
+        self._ix_to_break = int(value) - 1
 
 
+@dataclass
 class SingleOperation(RecipeStep):
-    _atom_ix_1: int
-    _atom_ix_2: int
+    """Handle a single operation on the recipe step.
 
-    def __init__(self, ix1, ix2) -> None:
-        self._atom_ix_1 = ix1
-        self._atom_ix_2 = ix2
+    This class takes in either zero-based indices or one-base IDs for two atoms
 
-    def __repr__(self) -> str:
-        return f"{self.__class__.__name__}, ixs: ({self.atom_ix_1}, {self.atom_ix_2}) ids: ({self.atom_id_1}, {self.atom_id_2})"
+    Parameters
+    ----------
+    atom_ix_1 : int, optional
+        The index of the first atom. zero-based, by default None
+    atom_ix_2 : int, optional
+        The index of the second atom. zero-based, by default None
+    atom_id_1 : str, optional
+        The ID of the first atom. one-based, by default None
+    atom_id_2 : str, optional
+        The ID of the second atom. one-based, by default None
+
+    Raises
+    ------
+    ValueError
+        If neither an index nor an ID is provided for any of the atoms.
+
+    Notes
+    -----
+    Internally, this class stores the atom indices and converts IDs to indices as needed.
+
+    """
+
+    atom_ix_1: Optional[int] = None
+    atom_ix_2: Optional[int] = None
+    atom_id_1: Optional[str] = None
+    atom_id_2: Optional[str] = None
+
+    _atom_ix_1: int = field(init=False, repr=False, default=None)
+    _atom_ix_2: int = field(init=False, repr=False, default=None)
+
+    def __post_init__(self):
+        e = ""
+        if not (isinstance(self.atom_ix_1, int) or isinstance(self.atom_id_1, str)):
+            e += "Exactly on of atom_ix_1 and atom_id_1 must be given!\n"
+        if not (isinstance(self.atom_ix_2, int) or isinstance(self.atom_id_2, str)):
+            e += "Exactly on of atom_ix_2 and atom_id_2 must be given!\n"
+        if len(e) > 0:
+            raise ValueError(e)
 
     @property
     def atom_id_1(self) -> str:
+        if self._atom_ix_1 is None:
+            return None
         return str(self._atom_ix_1 + 1)
 
     @atom_id_1.setter
     def atom_id_1(self, value: str):
+        if isinstance(value, property):
+            return
         self._atom_ix_1 = int(value) - 1
 
     @property
@@ -153,14 +196,20 @@ class SingleOperation(RecipeStep):
 
     @atom_ix_1.setter
     def atom_ix_1(self, value: int):
+        if isinstance(value, property):
+            return
         self._atom_ix_1 = value
 
     @property
     def atom_id_2(self) -> str:
+        if self._atom_ix_2 is None:
+            return None
         return str(self._atom_ix_2 + 1)
 
     @atom_id_2.setter
     def atom_id_2(self, value: str):
+        if isinstance(value, property):
+            return
         self._atom_ix_2 = int(value) - 1
 
     @property
@@ -169,30 +218,40 @@ class SingleOperation(RecipeStep):
 
     @atom_ix_2.setter
     def atom_ix_2(self, value: int):
+        if isinstance(value, property):
+            return
         self._atom_ix_2 = value
 
 
-class Break(SingleOperation, RecipeStep):
+class Break(SingleOperation):
     """Change topology to break a bond
 
-    Attributes
+    Parameters
     ----------
-    atom_ix1/2 : int
-        0-based atom indices as ints
-    atom_id1/2 : str
-        atom indices between which a bond should be removed
+    atom_ix_1 : int, optional
+        The index of the first atom. zero-based, by default None
+    atom_ix_2 : int, optional
+        The index of the second atom. zero-based, by default None
+    atom_id_1 : str, optional
+        The ID of the first atom. one-based, by default None
+    atom_id_2 : str, optional
+        The ID of the second atom. one-based, by default None
     """
 
 
 class Bind(SingleOperation):
     """Change topology to form a bond
 
-    Attributes
+    Parameters
     ----------
-    atom_ix1/2 : int
-        0-based atom indices as ints
-    atom_id1/2 : str
-        atom indices between which a bond should be removed
+    atom_ix_1 : int, optional
+        The index of the first atom. zero-based, by default None
+    atom_ix_2 : int, optional
+        The index of the second atom. zero-based, by default None
+    atom_id_1 : str, optional
+        The ID of the first atom. one-based, by default None
+    atom_id_2 : str, optional
+        The ID of the second atom. one-based, by default None
     """
 
 
@@ -202,7 +261,7 @@ class Recipe:
     Defines everything necessart to build the
     product state from the educt state.
 
-    Attributes
+    Parameters
     ----------
     recipe_steps : list[RecipeStep]
         Single sequence of RecipeSteps to build product
