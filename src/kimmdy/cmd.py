@@ -156,6 +156,7 @@ def _run(args: argparse.Namespace):
             runmgr.from_checkpoint = True
     else:
         config = Config(args.input)
+        config.validate()
         logging.debug(config)
         runmgr = RunManager(config)
         logging.debug("Using system GROMACS:")
@@ -170,6 +171,8 @@ def kimmdy_run(
     logfile: Path = Path("kimmdy.log"),
     checkpoint: str = "",
     concat: bool = False,
+    show_plugins: bool = False,
+    show_schema_path: bool = False,
 ):
     """Run KIMMDY from python.
 
@@ -192,13 +195,19 @@ def kimmdy_run(
     concat :
         Don't perform a full KIMMDY run but instead concatenate trajectories
         from a previous run.
+    show_plugins :
+        Show available plugins and exit.
+    show_schema_path :
+        Print path to yaml schema for use with yaml-language-server e.g. in VSCode and Neovim
     """
     args = argparse.Namespace(
-        input=input,
+        input =input,
         loglevel=loglevel,
         logfile=logfile,
         checkpoint=checkpoint,
         concat=concat,
+        show_plugins=show_plugins,
+        show_schema_path=show_schema_path,
     )
     _run(args)
     logging.shutdown()

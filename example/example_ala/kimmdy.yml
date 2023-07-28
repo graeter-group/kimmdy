@@ -2,7 +2,7 @@
 
 name: 'hat_tf_000'
 iterations: 100
-ff: amber99sb-star-ildnp.ff
+# ff: amber99sb-star-ildnp.ff
 gromacs_alias: 'gmx'
 top: 'Ala_out.top'
 gro: 'npt.gro'

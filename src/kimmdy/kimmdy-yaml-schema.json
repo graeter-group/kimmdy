@@ -15,16 +15,16 @@
       "pytype": "Path",
       "default": "."
     },
-    "out": {
-      "description": "Output directory",
-      "type": "string",
-      "pytype": "Path"
-    },
     "name": {
       "description": "Used for output folder if out is not specified",
       "type": "string",
       "pytype": "str",
       "default": "kimmdy"
+    },
+    "out": {
+      "description": "Output folder",
+      "type": "string",
+      "pytype": "Path"
     },
     "iterations": {
       "description": "Number of iterations to run",
@@ -38,12 +38,6 @@
       "type": "integer",
       "pytype": "int",
       "default": "1"
-    },
-    "out": {
-      "description": "Output folder",
-      "type": "string",
-      "pytype": "Path",
-      "default": "kimmdy"
     },
     "top": {
       "description": "Topology file",
@@ -72,7 +66,8 @@
     "ff": {
       "description": "Force field directory (looks for .ff in cwd if not set)",
       "type": "string",
-      "pytype": "Path"
+      "pytype": "Path",
+      "default": "*.ff"
     },
     "mds": {
       "type": "object",

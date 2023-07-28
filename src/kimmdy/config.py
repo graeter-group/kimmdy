@@ -6,7 +6,7 @@ from __future__ import annotations
 from typing import Any, Optional
 import yaml
 import logging
-from pathlib import Path
+from pathlib import Path, PosixPath
 from kimmdy import plugins
 from kimmdy.schema import Sequence, get_combined_scheme
 from kimmdy.utils import get_gmx_dir
@@ -133,84 +133,63 @@ class Config:
                 self.__setattr__(k, default)
 
 
-    def validate(self):
-        """Validates attributes read from config file."""
+    def validate(self, section: str = "config"):
+        """Validates config."""
         logging.info(f"Validating Config")
+        logging.info(f"Validating Config, section {section}")
 
-
-
-        for name, attr in self.__dict__.items():
-            if type(attr) is Config:
-                attr.validate()
-                continue
-
-            # more bespoke defaults
-            if name == "ff":
-                ffdir = attr.resolve()
-                if not ffdir.exists():
-                    ffdir = GMX_BUILTIN_FF_DIR / ffdir
-                    if not ffdir.exists():
-                        m = f"Could not find forcefield {attr} in cwd or gromacs data directory"
-                        logging.error(m)
-                        raise AssertionError(m)
-
+        # globals / interconnected
+        if section == "config":
+            # forcfield
+            ffdir = self.ff
+            if ffdir == Path("*.ff"):
                 ffs = list(self.cwd.glob("*.ff"))
                 if len(ffs) > 1:
                     logging.warn(
                         f"Found {len(ffs)} forcefields in cwd, using first one: {ffs[0]}"
                     )
                 assert ffs[0].is_dir(), "Forcefield should be a directory!"
-                self.ff = ffs[0].resolve()
-
-            # Check files from scheme
-            if isinstance(attr, Path):
-                path = attr.resolve()
-                # TODO: do we resolve the path here for self as well?
-                # distances.dat wouldn't exist prior to the run
-                if not str(attr) in ["distances.dat"]:
-                    check_file_exists(path)
-
-            # Validate sequence
-            if isinstance(attr, Sequence):
-                for task in attr:
-                    if not hasattr(self, task):
-                        if hasattr(self, "mds"):
-                            if hasattr(self.mds, task):
-                                continue
-                        raise AssertionError(
-                            f"Task {task} listed in sequence, but not defined!"
-                        )
+                ffdir = ffs[0].resolve()
+            elif not ffdir.exists():
+                print(ffdir)
+                ffdir = GMX_BUILTIN_FF_DIR / ffdir
+                if not ffdir.exists():
+                    m = f"Could not find forcefield {ffdir} in cwd or gromacs data directory"
+                    logging.error(m)
+                    raise AssertionError(m)
+            self.ff = ffdir
 
             # Validate changer reference
-            if attr == "raw":
-                if hasattr(self, "changer"):
-                    if hasattr(self.changer, "coordinates"):
-                        if "md" in self.changer.coordinates.get_attributes():
-                            assert (
-                                self.changer.coordinates.md
-                                in self.mds.get_attributes()
-                            ), f"Relax MD {self.changer.coordinates.md} not in MD section!"
+            if hasattr(self, "changer"):
+                if hasattr(self.changer, "coordinates"):
+                    if "md" in self.changer.coordinates.__dict__.keys():
+                        assert (
+                            self.changer.coordinates.md
+                            in self.mds.__dict__.keys()
+                        ), f"Relax MD {self.changer.coordinates.md} not in MD section!"
 
             # Validate reaction plugins
-            if attr == "reactions":
-                for reaction_name, reaction_config in attr.__dict__.items():
+            if hasattr(self, "reactions"):
+                for reaction_name, reaction_config in self.reactions.__dict__.items():
                     assert reaction_name in (ks := list(plugins.keys())), (
                         f"Error: Reaction plugin {reaction_name} not found!\n"
                         + f"Available plugins: {ks}"
                     )
 
-        if input_file is not None:
-            self._set_defaults()
-            if cwd := self.raw.get("cwd"):
-                cwd = Path(cwd)
-            else:
-                cwd = input_file.parent.resolve()
-            self.cwd = cwd
-            if out := self.raw.get("out"):
-                out = Path(out)
-            else:
-                out = self.cwd / self.name
-            self.out = out
+            # Validate sequence
+            assert hasattr(self, "sequence"), "No sequence defined!"
+            for task in self.sequence:
+                if not hasattr(self, task):
+                    if hasattr(self, "mds"):
+                        if hasattr(self.mds, task):
+                            continue
+                    raise AssertionError(
+                        f"Task {task} listed in sequence, but not defined!"
+                    )
+
+            if not hasattr(self, "out"):
+                self.out = self.cwd / self.name
+
             # make sure self.out is empty
             while self.out.exists():
                 logging.debug(f"Output dir {self.out} exists, incrementing name")
@@ -224,12 +203,18 @@ class Config:
             self.out.mkdir()
             logging.info(f"Created output dir {self.out}")
 
-            # TODO: move to defaults and then valdiation
+        # individual attributes, recursively
+        for name, attr in self.__dict__.items():
+            if type(attr) is Config:
+                attr.validate(section=f"{section}.{name}")
+                continue
 
-            # TODO: why is this commented out?
-            # assert hasattr(self,'mds'), "MD section not defined in config file!"
-            # for attribute in self.mds.get_attributes():
-            #     self.mds.attr(attribute).mdp = Path(self.mds.attr(attribute).mdp)
+            # Check files from scheme
+            elif isinstance(attr, Path):
+                path = attr
+                # distances.dat wouldn't exist prior to the run
+                if not str(attr) in ["distances.dat"] and not path.is_dir():
+                    check_file_exists(path)
 
 
     def __repr__(self):

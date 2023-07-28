@@ -12,8 +12,7 @@ reactions:
     itp: 'ffbonded.itp'
 sequence:
   - equilibrium
-  - 
-    mult: 1
+  - mult: 1
     tasks:
       - pull
       - reactions
