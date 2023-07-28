@@ -54,16 +54,12 @@ def get_cmdline_args():
             "Concatenate trrs of this run"
             "Optionally, the run directory can be give"
             "Will save as concat.trr in current directory"
-        )
+        ),
     )
 
     # flag to show available plugins
     parser.add_argument(
-        "--show-plugins",
-        action="store_true",
-        help=(
-            "List available plugins"
-        )
+        "--show-plugins", action="store_true", help=("List available plugins")
     )
 
     # flag to print path to yaml schema
@@ -73,7 +69,7 @@ def get_cmdline_args():
         help=(
             "Print path to yaml schema for use with yaml-language-server e.g. in VSCode and Neovim"
             "# yaml-language-server: $schema=/path/to/kimmdy-yaml-schema.json"
-        )
+        ),
     )
     return parser.parse_args()
 
@@ -124,6 +120,7 @@ def _run(args: argparse.Namespace):
 
     if args.show_plugins:
         from kimmdy import discovered_plugins
+
         print("Available plugins:")
         for plugin in discovered_plugins:
             print(plugin)
@@ -131,7 +128,7 @@ def _run(args: argparse.Namespace):
         exit()
 
     if args.show_schema_path:
-        path = pkg_resources.files('kimmdy') / "kimmdy-yaml-schema.json"
+        path = pkg_resources.files("kimmdy") / "kimmdy-yaml-schema.json"
         print(f"{path}")
 
         exit()
@@ -201,7 +198,7 @@ def kimmdy_run(
         Print path to yaml schema for use with yaml-language-server e.g. in VSCode and Neovim
     """
     args = argparse.Namespace(
-        input =input,
+        input=input,
         loglevel=loglevel,
         logfile=logfile,
         checkpoint=checkpoint,

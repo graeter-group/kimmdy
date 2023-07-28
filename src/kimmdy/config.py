@@ -16,7 +16,6 @@ GMX_BUILTIN_FF_DIR = get_gmx_dir() / "top"
 """Path to gromacs data directory with the built-in forcefields."""
 
 
-
 def check_file_exists(p: Path):
     if not p.exists():
         m = "File not found: " + str(p.resolve())
@@ -51,7 +50,7 @@ class Config:
         self,
         input_file: Path | None = None,
         recursive_dict: dict | None = None,
-        scheme: dict | None = None
+        scheme: dict | None = None,
     ):
         # failure case: no input file and no values from dictionary
         if input_file is None and recursive_dict is None:
@@ -132,7 +131,6 @@ class Config:
 
                 self.__setattr__(k, default)
 
-
     def validate(self, section: str = "config"):
         """Validates config."""
         logging.info(f"Validating Config")
@@ -164,8 +162,7 @@ class Config:
                 if hasattr(self.changer, "coordinates"):
                     if "md" in self.changer.coordinates.__dict__.keys():
                         assert (
-                            self.changer.coordinates.md
-                            in self.mds.__dict__.keys()
+                            self.changer.coordinates.md in self.mds.__dict__.keys()
                         ), f"Relax MD {self.changer.coordinates.md} not in MD section!"
 
             # Validate reaction plugins
@@ -216,8 +213,6 @@ class Config:
                 if not str(attr) in ["distances.dat"] and not path.is_dir():
                     check_file_exists(path)
 
-
     def __repr__(self):
         repr = self.__dict__
         return str(repr)
-

@@ -35,8 +35,10 @@ class Sequence(list):
                     self.extend(task["tasks"])
             else:
                 self.append(task)
+
     def __repr__(self):
         return f"Sequence({list.__repr__(self)})"
+
 
 def load_kimmdy_schema() -> dict:
     """Return the schema for the config file"""
@@ -45,13 +47,16 @@ def load_kimmdy_schema() -> dict:
         schema = json.load(f)
     return schema
 
+
 def load_plugin_schemas() -> dict:
     """Return the schemas for the plugins"""
     if sys.version_info > (3, 10):
         from importlib_metadata import entry_points
+
         discovered_plugins = entry_points(group="kimmdy.plugins")
     else:
         from importlib.metadata import entry_points
+
         discovered_plugins = entry_points()["kimmdy.plugins"]
 
     schemas = {}
@@ -68,8 +73,8 @@ def load_plugin_schemas() -> dict:
             schemas[name] = json.load(f)
     return schemas
 
-def convert_schema_to_dict(
-    dictionary: dict) -> dict:
+
+def convert_schema_to_dict(dictionary: dict) -> dict:
     """Convert a dictionary from a raw json schema to a nested dictionary
     where each leaf entry is a dictionary with the "pytype" and "default".
     """
@@ -86,8 +91,8 @@ def convert_schema_to_dict(
         if not isinstance(value, dict):
             continue
         result[key] = {}
-        json_type = value.get('type')
-        if json_type == 'object':
+        json_type = value.get("type")
+        if json_type == "object":
             result[key] = convert_schema_to_dict(value)
 
         pytype = value.get("pytype")
@@ -102,6 +107,7 @@ def convert_schema_to_dict(
 
     return result
 
+
 def get_combined_scheme() -> dict:
     """Return the schema for the config file"""
     schema = load_kimmdy_schema()
@@ -113,6 +119,7 @@ def get_combined_scheme() -> dict:
 
     return kimmdy_dict
 
+
 def prune(d: dict) -> dict:
     """Remove empty dicts from a nested dict"""
     if not isinstance(d, dict):
@@ -122,6 +129,7 @@ def prune(d: dict) -> dict:
         for k, v in ((k, prune(v)) for k, v in d.items())
         if v is not None and v != {}
     }
+
 
 def flatten_scheme(scheme, section="") -> list:
     """recursively get properties and their desicripions from the scheme"""
@@ -145,12 +153,13 @@ def flatten_scheme(scheme, section="") -> list:
         for k in value.keys():
             if k not in ["pytype", "default", "description", "type"]:
                 k_esc = k
-                if k == '.*':
-                    k_esc = '\\*'
+                if k == ".*":
+                    k_esc = "\\*"
                 s = f"{key}.{k_esc}"
                 ls.extend(flatten_scheme(value[k], section=s))
 
     return ls
+
 
 def generate_markdown_table(scheme, append=False):
     table = []
@@ -165,5 +174,3 @@ def generate_markdown_table(scheme, append=False):
         table.append(row)
 
     return "\n".join(table)
-
-
