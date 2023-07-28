@@ -52,10 +52,12 @@ print(
 # for debugging
 from kimmdy.config import Config
 from pathlib import Path
+import os
 
-config = Config(Path('example/example_ala/kimmdy.yml'))
-# config
+
+config = Config(Path('kimmdy.yml'))
 config.validate()
+config
 ```
 
 ## Example `kimmdy.yml` Files

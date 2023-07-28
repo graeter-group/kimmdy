@@ -9,6 +9,12 @@ import logging
 from pathlib import Path
 from kimmdy import plugins
 from kimmdy.schema import Sequence, get_combined_scheme
+from kimmdy.utils import get_gmx_dir
+
+
+GMX_BUILTIN_FF_DIR = get_gmx_dir() / "top"
+"""Path to gromacs data directory with the built-in forcefields."""
+
 
 
 def check_file_exists(p: Path):
@@ -82,7 +88,8 @@ class Config:
                 self.__setattr__(k, subconfig)
             else:
                 # base case for recursion
-                # caste type and validate attribute
+
+                # merge ".*" and specific schemes
                 global_opts = scheme.get(".*")
                 opts = scheme.get(k)
                 if opts is None and global_opts is None:
@@ -99,21 +106,30 @@ class Config:
                     logging.error(m)
                     raise ValueError(m)
 
-                # cast type
+                # cast to type
                 v = pytype(v)
                 self.__setattr__(k, v)
 
         # set defaults for attributes
         for k, v in scheme.items():
             if "pytype" not in v:
-                # recursive case, skip
+                # recursive case, skip.
+                # handled at base case
                 continue
             if not hasattr(self, k):
+                # get default if not set in yaml
                 default = v.get("default")
+                pytype = v.get("pytype")
                 if default is None:
                     m = f"No default found for {k}"
-                    logging.warning(m)
+                    logging.debug(m)
                     continue
+                if pytype is None:
+                    m = f"No type found for default value {k}: {default}"
+                    logging.error(m)
+                    raise ValueError(m)
+                default = pytype(default)
+
                 self.__setattr__(k, default)
 
 
@@ -121,11 +137,30 @@ class Config:
         """Validates attributes read from config file."""
         logging.info(f"Validating Config")
 
-        for attr in self.__dict__.items():
-            print(attr)
-            print(type(attr))
-            if isinstance(attr, Config):
+
+
+        for name, attr in self.__dict__.items():
+            if type(attr) is Config:
                 attr.validate()
+                continue
+
+            # more bespoke defaults
+            if name == "ff":
+                ffdir = attr.resolve()
+                if not ffdir.exists():
+                    ffdir = GMX_BUILTIN_FF_DIR / ffdir
+                    if not ffdir.exists():
+                        m = f"Could not find forcefield {attr} in cwd or gromacs data directory"
+                        logging.error(m)
+                        raise AssertionError(m)
+
+                ffs = list(self.cwd.glob("*.ff"))
+                if len(ffs) > 1:
+                    logging.warn(
+                        f"Found {len(ffs)} forcefields in cwd, using first one: {ffs[0]}"
+                    )
+                assert ffs[0].is_dir(), "Forcefield should be a directory!"
+                self.ff = ffs[0].resolve()
 
             # Check files from scheme
             if isinstance(attr, Path):
@@ -164,47 +199,32 @@ class Config:
                         + f"Available plugins: {ks}"
                     )
 
-        # if input_file is not None:
-        #     self._set_defaults()
-        #     if cwd := self.raw.get("cwd"):
-        #         cwd = Path(cwd)
-        #     else:
-        #         cwd = input_file.parent.resolve()
-        #     self.cwd = cwd
-        #     if out := self.raw.get("out"):
-        #         out = Path(out)
-        #     else:
-        #         out = self.cwd / self.name
-        #     self.out = out
-        #     # make sure self.out is empty
-        #     while self.out.exists():
-        #         logging.debug(f"Output dir {self.out} exists, incrementing name")
-        #         out_end = self.out.name[-3:]
-        #         if out_end.isdigit():
-        #             self.out = self.out.with_name(
-        #                 f"{self.out.name[:-3]}{int(out_end)+1:03}"
-        #             )
-        #         else:
-        #             self.out = self.out.with_name(self.out.name + "_001")
-        #     self.out.mkdir()
-        #     logging.info(f"Created output dir {self.out}")
+        if input_file is not None:
+            self._set_defaults()
+            if cwd := self.raw.get("cwd"):
+                cwd = Path(cwd)
+            else:
+                cwd = input_file.parent.resolve()
+            self.cwd = cwd
+            if out := self.raw.get("out"):
+                out = Path(out)
+            else:
+                out = self.cwd / self.name
+            self.out = out
+            # make sure self.out is empty
+            while self.out.exists():
+                logging.debug(f"Output dir {self.out} exists, incrementing name")
+                out_end = self.out.name[-3:]
+                if out_end.isdigit():
+                    self.out = self.out.with_name(
+                        f"{self.out.name[:-3]}{int(out_end)+1:03}"
+                    )
+                else:
+                    self.out = self.out.with_name(self.out.name + "_001")
+            self.out.mkdir()
+            logging.info(f"Created output dir {self.out}")
 
             # TODO: move to defaults and then valdiation
-            # if not hasattr(self, "ff"):
-            #     ffs = list(self.cwd.glob("*.ff"))
-            #     if len(ffs) < 1:
-            #         # TODO: it can work with a ff in the gromacs data dir
-            #         # need to re-add the `ff` option but change a bit
-            #         # to unify with read_top
-            #         raise FileNotFoundError(
-            #             "No forcefield found in cwd, please provide one!"
-            #         )
-            #     if len(ffs) > 1:
-            #         logging.warn(
-            #             f"Found {len(ffs)} forcefields in cwd, using first one: {ffs[0]}"
-            #         )
-            #     assert ffs[0].is_dir(), "Forcefield should be a directory!"
-            #     self.ff = ffs[0].resolve()
 
             # TODO: why is this commented out?
             # assert hasattr(self,'mds'), "MD section not defined in config file!"
