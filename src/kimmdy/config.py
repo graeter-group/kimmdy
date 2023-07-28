@@ -40,6 +40,7 @@ class Config:
         current section e.g. to determine the level of recursion in nested configs
         e.g. "config", "config.mds" or "config.reactions.homolysis"
     """
+
     # override get and set attributes to satisy type checker and
     # acknowledge that we don't actually statically type-check the attributes
     def __getattribute__(self, name) -> Any:
@@ -89,7 +90,9 @@ class Config:
                     subscheme = general_subscheme
                 assert subscheme is not None
                 subsection = f"{section}.{k}"
-                subconfig = Config(recursive_dict=v, scheme=subscheme, section=subsection)
+                subconfig = Config(
+                    recursive_dict=v, scheme=subscheme, section=subsection
+                )
                 self.__setattr__(k, subconfig)
             else:
                 # base case for recursion
