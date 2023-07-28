@@ -53,8 +53,7 @@ def test_parse_config3_missing_mdp_file():
         assert input_f.exists(), "Input file not found"
 
         with pytest.raises(LookupError):
-            config = Config(input_f)
-            config.validate()
+            Config(input_f)
     finally:
         for d in input_f.parent.glob("test_config_3*"):
             [f.unlink() for f in d.iterdir()]
@@ -68,8 +67,7 @@ def test_parse_config4_sequence_missing_entry():
         assert input_f.exists(), "Input file not found"
 
         with pytest.raises(AssertionError):
-            config = Config(input_f)
-            config.validate()
+            Config(input_f)
     finally:
         for d in input_f.parent.glob("test_config_4*"):
             [f.unlink() for f in d.iterdir()]
@@ -83,8 +81,7 @@ def test_parse_config5_sequence_missing_entry_no_mds():
         assert input_f.exists(), "Input file not found"
 
         with pytest.raises(AssertionError):
-            config = Config(input_f)
-            config.validate()
+            Config(input_f)
     finally:
         for d in input_f.parent.glob("test_config_5*"):
             [f.unlink() for f in d.iterdir()]
@@ -98,8 +95,7 @@ def test_parse_config6_changer_bad_reference():
         assert input_f.exists(), "Input file not found"
 
         with pytest.raises(AssertionError):
-            config = Config(input_f)
-            config.validate()
+            Config(input_f)
     finally:
         for d in input_f.parent.glob("test_config_6*"):
             [f.unlink() for f in d.iterdir()]
@@ -113,7 +109,6 @@ def test_get_existing_files():
         assert input_f.exists(), "Input file not found"
 
         config = Config(input_f)
-        config.validate()
         file_d = get_existing_files(config)
         assert set(file_d.keys()) == set(
             [

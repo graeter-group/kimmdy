@@ -6,7 +6,7 @@ from __future__ import annotations
 from typing import Any, Optional
 import yaml
 import logging
-from pathlib import Path, PosixPath
+from pathlib import Path
 from kimmdy import plugins
 from kimmdy.schema import Sequence, get_combined_scheme
 from kimmdy.utils import get_gmx_dir
@@ -36,8 +36,10 @@ class Config:
         For internal use only, used in reading settings in recursively.
     scheme :
         dict containing types and defaults for casting and validating settings.
+    section :
+        current section e.g. to determine the level of recursion in nested configs
+        e.g. "config", "config.mds" or "config.reactions.homolysis"
     """
-
     # override get and set attributes to satisy type checker and
     # acknowledge that we don't actually statically type-check the attributes
     def __getattribute__(self, name) -> Any:
@@ -51,6 +53,7 @@ class Config:
         input_file: Path | None = None,
         recursive_dict: dict | None = None,
         scheme: dict | None = None,
+        section: str = "config",
     ):
         # failure case: no input file and no values from dictionary
         if input_file is None and recursive_dict is None:
@@ -58,9 +61,11 @@ class Config:
             logging.error(m)
             raise ValueError(m)
 
+        # initial scheme
         if scheme is None:
             scheme = get_combined_scheme()
 
+        # read initial input file
         if input_file is not None:
             with open(input_file, "r") as f:
                 raw = yaml.safe_load(f)
@@ -83,7 +88,8 @@ class Config:
                     general_subscheme.update(subscheme)
                     subscheme = general_subscheme
                 assert subscheme is not None
-                subconfig = Config(recursive_dict=v, scheme=subscheme)
+                subsection = f"{section}.{k}"
+                subconfig = Config(recursive_dict=v, scheme=subscheme, section=subsection)
                 self.__setattr__(k, subconfig)
             else:
                 # base case for recursion
@@ -131,7 +137,11 @@ class Config:
 
                 self.__setattr__(k, default)
 
-    def validate(self, section: str = "config"):
+        # validate on initial construction
+        if section == "config":
+            self._validate()
+
+    def _validate(self, section: str = "config"):
         """Validates config."""
         logging.info(f"Validating Config")
         logging.info(f"Validating Config, section {section}")
@@ -203,15 +213,27 @@ class Config:
         # individual attributes, recursively
         for name, attr in self.__dict__.items():
             if type(attr) is Config:
-                attr.validate(section=f"{section}.{name}")
+                attr._validate(section=f"{section}.{name}")
                 continue
 
             # Check files from scheme
             elif isinstance(attr, Path):
                 path = attr
+                path = path.resolve()
+                self.__setattr__(name, path)
                 # distances.dat wouldn't exist prior to the run
                 if not str(attr) in ["distances.dat"] and not path.is_dir():
                     check_file_exists(path)
+
+    def attr(self, attribute):
+        """Get the value of a specific attribute.
+        Alias for self.__getattribute__
+        """
+        return self.__getattribute__(attribute)
+
+    def get_attributes(self):
+        """Get a list of all attributes"""
+        return list(self.__dict__.keys())
 
     def __repr__(self):
         repr = self.__dict__

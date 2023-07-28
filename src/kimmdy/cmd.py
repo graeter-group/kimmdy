@@ -153,7 +153,6 @@ def _run(args: argparse.Namespace):
             runmgr.from_checkpoint = True
     else:
         config = Config(args.input)
-        config.validate()
         logging.debug(config)
         runmgr = RunManager(config)
         logging.debug("Using system GROMACS:")

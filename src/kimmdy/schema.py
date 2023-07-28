@@ -109,7 +109,11 @@ def convert_schema_to_dict(dictionary: dict) -> dict:
 
 
 def get_combined_scheme() -> dict:
-    """Return the schema for the config file"""
+    """Return the schema for the config file.
+
+    Nested scheme where each leaf entry is a dictionary with the "pytype",
+    "default" and "description".
+    """
     schema = load_kimmdy_schema()
     schemas = load_plugin_schemas()
     kimmdy_dict = convert_schema_to_dict(schema)
