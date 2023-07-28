@@ -1,4 +1,4 @@
-# Function reference
+# Reference
 
 ## API
 
@@ -19,15 +19,6 @@ Topology modules
 | [topology.utils](topology.utils.qmd#kimmdy.topology.utils) |  |
 | [topology.atomic](topology.atomic.qmd#kimmdy.topology.atomic) | Atomic datatypes for the topology such as Atom, Bond, Angle, Dihedral, etc. |
 
-## Reaction Plugins
-
-Reaction plugins bundled with KIMMDY and the protocol to add a new reaction plugin to KIMMDY
-
-| | |
-| --- | --- |
-| [reaction](reaction.qmd#kimmdy.reaction) | ReactionPlugin protocoll and reaction recipes. |
-| [reactions.homolysis](reactions.homolysis.qmd#kimmdy.reactions.homolysis) |  |
-
 ## Modules
 
 Modules
@@ -44,3 +35,13 @@ Modules
 | [runmanager](runmanager.qmd#kimmdy.runmanager) | The Runmanager is the main entry point of the program. |
 | [tasks](tasks.qmd#kimmdy.tasks) |  |
 | [utils](utils.qmd#kimmdy.utils) |  |
+
+## Reaction Plugins
+
+Reaction plugins bundled with KIMMDY and the protocol to add a new reaction plugin to KIMMDY
+
+| | |
+| --- | --- |
+| [homolysis.reaction.Homolysis](homolysis.reaction.Homolysis.qmd#homolysis.reaction.Homolysis) | Homolytic bond breaking leading to 2 radicals. |
+| [hat_naive.reaction.NaiveHAT](hat_naive.reaction.NaiveHAT.qmd#hat_naive.reaction.NaiveHAT) | Naive HAT reaction, selects hydrogens at random |
+| [dummyreaction.reaction.DummyReaction](dummyreaction.reaction.DummyReaction.qmd#dummyreaction.reaction.DummyReaction) | Dummy reaction, returns empty RecipeCollection |

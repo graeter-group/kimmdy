@@ -12,10 +12,6 @@ website:
       - _reference/topology.atomic.qmd
       section: Topology
     - contents:
-      - _reference/reaction.qmd
-      - _reference/reactions.homolysis.qmd
-      section: Reaction Plugins
-    - contents:
       - _reference/changemanager.qmd
       - _reference/constants.qmd
       - _reference/coordinates.qmd
@@ -27,5 +23,10 @@ website:
       - _reference/tasks.qmd
       - _reference/utils.qmd
       section: Modules
+    - contents:
+      - _reference/homolysis.reaction.Homolysis.qmd
+      - _reference/hat_naive.reaction.NaiveHAT.qmd
+      - _reference/dummyreaction.reaction.DummyReaction.qmd
+      section: Reaction Plugins
     id: _reference
   - id: dummy-sidebar

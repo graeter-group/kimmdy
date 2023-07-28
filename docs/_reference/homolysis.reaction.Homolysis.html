@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>uml</title>
+<title>KIMMDY – homolysis.reaction.homolysis</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,40 +20,6 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
 </style>
 
 
@@ -64,8 +30,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../_reference/index.html" rel="next">
-<link href="../guide/topology.html" rel="prev">
+<link href="../_reference/hat_naive.reaction.NaiveHAT.html" rel="next">
+<link href="../_reference/utils.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -113,8 +79,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <nav class="navbar navbar-expand-lg navbar-dark ">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="../index.html" class="navbar-brand navbar-brand-logo">
-    <img src=".././www/hits-logo.png" alt="" class="navbar-logo">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">KIMMDY</span>
     </a>
   </div>
             <div id="quarto-search" class="" title="Search"></div>
@@ -124,20 +90,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../index.html" rel="" target="">
- <span class="menu-text">KIMMDY</span></a>
-  </li>  
-  <li class="nav-item">
     <a class="nav-link active" href="../guide/getting-started.html" rel="" target="" aria-current="page">
  <span class="menu-text">Getting Started</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../guide/plugins.html" rel="" target="">
- <span class="menu-text">Reaction Plugins</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../guide/topology.html" rel="" target="">
- <span class="menu-text">Development</span></a>
+    <a class="nav-link" href="../guide/index.html" rel="" target="">
+ <span class="menu-text">Guide</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../_reference/index.html" rel="" target="">
@@ -146,7 +104,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul>
           </div> <!-- /navcollapse -->
           <div class="quarto-navbar-tools tools-wide">
-    <a href="https://www.h-its.org/research/mbm/" rel="" title="" class="quarto-navigation-tool px-1" aria-label=""><i class="bi bi-house-fill"></i></a>
     <div class="dropdown">
       <a href="" title="" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" aria-label=""><i class="bi bi-github"></i></a>
       <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="quarto-navigation-tool-dropdown-0">
@@ -176,12 +133,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../guide/getting-started.html">Guide</a></li><li class="breadcrumb-item"><a href="../guide/uml.html">UML</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../_reference/index.html">Reference</a></li><li class="breadcrumb-item"><a href="../_reference/homolysis.reaction.Homolysis.html">Reaction Plugins</a></li><li class="breadcrumb-item"><a href="../_reference/homolysis.reaction.Homolysis.html">homolysis.reaction.Homolysis</a></li></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
-      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
-        <i class="bi bi-search"></i>
-      </button>
     </div>
   </nav>
 </header>
@@ -189,16 +143,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation docked overflow-auto">
-        <div class="mt-2 flex-shrink-0 align-items-center">
-        <div class="sidebar-search">
-        <div id="quarto-search" class="" title="Search"></div>
-        </div>
-        </div>
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <a href="../guide/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Guide</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
@@ -211,51 +160,128 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">Getting Started</span></a>
   </div>
 </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../guide/user/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">User</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../guide/plugins.html" class="sidebar-item-text sidebar-link">
+  <a href="../guide/user/options.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">KIMMDY Options</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../guide/developer/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Developer</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guide/developer/plugins.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Writing Reaction Plugins</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../guide/topology.html" class="sidebar-item-text sidebar-link">
+  <a href="../guide/developer/topology.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Hexala topology</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../guide/uml.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">UML</span></a>
   </div>
 </li>
       </ul>
   </li>
+      </ul>
+  </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../_reference/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Function reference</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">
+ <span class="menu-text">Reference</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/changemanager.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">changemanager</span></a>
+  <a href="../_reference/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Reference</span></a>
   </div>
 </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="false">
+ <span class="menu-text">API</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../_reference/cmd.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">cmd</span></a>
   </div>
 </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="false">
+ <span class="menu-text">Topology</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/config.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">config</span></a>
+  <a href="../_reference/topology.topology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">topology.topology</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/topology.ff.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">topology.ff</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/topology.utils.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">topology.utils</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/topology.atomic.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">topology.atomic</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="false">
+ <span class="menu-text">Modules</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/changemanager.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">changemanager</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -268,6 +294,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../_reference/coordinates.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">coordinates</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/config.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">config</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -290,18 +322,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/reaction.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">reaction</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../_reference/reactions.homolysis.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">reactions.homolysis</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="../_reference/runmanager.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">runmanager</span></a>
   </div>
@@ -314,34 +334,41 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/topology.atomic.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">topology.atomic</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../_reference/topology.ff.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">topology.ff</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../_reference/topology.topology.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">topology.topology</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../_reference/topology.utils.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">topology.utils</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="../_reference/utils.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">utils</span></a>
   </div>
 </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" aria-expanded="true">
+ <span class="menu-text">Reaction Plugins</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth2 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/homolysis.reaction.Homolysis.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">homolysis.reaction.Homolysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/hat_naive.reaction.NaiveHAT.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">hat_naive.reaction.NaiveHAT</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/dummyreaction.reaction.DummyReaction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">dummyreaction.reaction.DummyReaction</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
       </ul>
   </li>
     </ul>
@@ -354,166 +381,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#uml" id="toc-uml" class="nav-link active" data-scroll-target="#uml">UML</a>
-  <ul class="collapse">
-  <li><a href="#classes" id="toc-classes" class="nav-link" data-scroll-target="#classes">Classes</a>
-  <ul class="collapse">
-  <li><a href="#new-diagram" id="toc-new-diagram" class="nav-link" data-scroll-target="#new-diagram">New Diagram</a></li>
-  <li><a href="#old-diagram" id="toc-old-diagram" class="nav-link" data-scroll-target="#old-diagram">Old Diagram</a></li>
-  </ul></li>
-  </ul></li>
+  <li><a href="#homolysis.reaction.Homolysis" id="toc-homolysis.reaction.Homolysis" class="nav-link active" data-scroll-target="#homolysis.reaction.Homolysis">homolysis.reaction.Homolysis</a></li>
   </ul>
-<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hits-mbm-dev/kimmdy/edit/main/guide/uml.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/hits-mbm-dev/kimmdy/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hits-mbm-dev/kimmdy/edit/main/_reference/homolysis.reaction.Homolysis.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/hits-mbm-dev/kimmdy/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 
 
-<section id="uml" class="level1">
-<h1>UML</h1>
-<p>(Re)render the diagrams with</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">plantuml</span> <span class="at">-tsvg</span> uml.qmd</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>or preview online with <a href="https://plantuml.com">plantuml</a>.</p>
-<section id="classes" class="level2">
-<h2 class="anchored" data-anchor-id="classes">Classes</h2>
-<section id="new-diagram" class="level3">
-<h3 class="anchored" data-anchor-id="new-diagram">New Diagram</h3>
-<pre><code>@startuml
-class           RunManager{
-config : Config
-tasks : Queue
-state
-file history
-chosen_recipe
-run()
-run_MD()
-query_reactions()
-decide_reaction()
-execute_recipe(ConversionRecipe)
-next()
-}
-class          Config{
-file paths
-task sequence
-...
-__init__(configuration_file)
-}
-class           ConversionRecipe{
-type
-atom_idx
-}
-
-abstract class           Reaction{
-get_reaction_result()
-}
-class           HAT{
-}
-class           HomolyticBreak{
-}
-class           ChangeManager{
-modify_connectivity()
-}
-
-package GROMACS{
-interface GROMACS_CLI{
-}
-}
-
-Reaction --|&gt; HAT
-Reaction --|&gt; HomolyticBreak
-RunManager -right- Config
-RunManager -right- GROMACS_CLI 
-RunManager -- Reaction 
-ConversionRecipe - Reaction
-ChangeManager - RunManager
-Config -[hidden]-&gt; GROMACS_CLI
-@enduml
-</code></pre>
-<p><img src="uml.svg" class="img-fluid"></p>
-</section>
-<section id="old-diagram" class="level3">
-<h3 class="anchored" data-anchor-id="old-diagram">Old Diagram</h3>
-<pre><code>@startuml classuml
-class           RunManager{
-config : Config
-config_reactions
-state : Enum
-MDparams
-rates 
-run_md_min()
-run_md_eq()
-run_md()
-query_reactions()
-make_decision()
-run_recipe(ConversionRecipe)
-next()
-}
-class          Config{
-path
-...
-read_yaml()
-}
-class           MDManager{
-write_mdp()
-do_md()
-}
-class           ConversionRecipe{
-type
-atom_idx
-}
-class           DecisionStrategy{
-}
-class           Reaction{
-recipe: ConversionRecipe
-get_rates()
-}
-class           HAT{
-
-}
-class           CoordinateChanger{
-}
-class           TopologyChanger{
-}
-package GROMACS{
-interface GROMACSCli{
-}
-}
-
-Reaction --|&gt; HAT
-Config -- RunManager : reads &lt;
-RunManager - MDManager : &gt; starts
-MDManager - GROMACSCli : &gt; interacts
-RunManager -- Reaction : &gt; starts
-RunManager -- DecisionStrategy : &gt; starts
-ConversionRecipe - Reaction: &lt; generates
-CoordinateChanger - RunManager: &lt; starts
-TopologyChanger - RunManager: &lt; starts
-TopologyChanger -[hidden]-&gt; CoordinateChanger
-MDManager -[hidden]-&gt; DecisionStrategy
-@enduml</code></pre>
-<p><img src="classuml.svg" class="img-fluid"></p>
-<pre><code>@startuml flow
-start
-:Read .yaml;
-:Run MD_eq;
-repeat
- :Run MD_prod;
- :Query reactions;
- :Make reaction decision;
- :Change system coordinates;
- :Change system topology;
-repeatwhile (itermax reached) is (no)
--&gt; yes;
-stop
-@enduml</code></pre>
-<p><img src="flow.svg" class="img-fluid"></p>
-<p><a href="www.plantuml.com/plantuml/png/bLB1Zfim4BtFL_YuUo0VW5RHhaZLNb0bTczLXImyIwnWczYc3QBzzmuaO0kuDBdC36zctdlZL-UvzPrge6guSopyYaxdNFCQxG2LqP-oPYdBfk2HbnPvvQNH3cYAH_h-HNSAybFBBLSEB1KT0zlfKebIIVtqF2TuNM8AhXtQFeoZYk8NB0LMqaapjrbAMtmY3h_GZlLYAZo3nfidpD-rXZlR0Lhkpt0u780sYBBdgjb3i_oq2FvjfKVYrX9G60fs6zPC1l1zYy2zKQKKjvsEqqFHkn-zgVjX1rCyR1ZWBZZTx84QVJcPkqlhszl70BjqZHLIKrzsvffqxct_CArfJDr7a9PN5xA5VIs-vs_P-m1IUxIVl5fAMIC9I7-OoRCa-NCScS3z29H7BugbR3o5OoyG5PDm0G8SsVGq7OHY4ksR41CHNX4e7fCi5eOnQyJw435oRJSB0rFsmchKE9aF6qDPB9AmyyHWwl_1Vfob4AX_9iVjyM9V0cuZ35vHYqur_m00">link</a></p>
-<p><a href="www.plantuml.com/plantuml/png/POz12i8m44NtESKisuKUm88KTDk5Na26PcY3IIPcfcXkRrge6tV_lmzlc5uKiox1cosOqvtGmh5Wy5qjIuJX-g1NPp8bGZMmivJPThNU5ie5Ck6eZgEiQC0d_GXO6ftKi2wN6UD484MK0epCsRg8Il8_AYVsF9Nzydjsdg1nIZdWPzFFP5jm0atarXpEK5QFA2VJKxJrfoy0">link</a></p>
+<section id="homolysis.reaction.Homolysis" class="level1">
+<h1>homolysis.reaction.Homolysis</h1>
+<p><code>reaction.Homolysis()</code></p>
+<p>Homolytic bond breaking leading to 2 radicals. Implementation for time-varying rates</p>
 
 
-</section>
-</section>
 </section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
@@ -959,13 +841,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../guide/topology.html" class="pagination-link">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Hexala topology</span>
+      <a href="../_reference/utils.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">utils</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../_reference/index.html" class="pagination-link">
-        <span class="nav-page-text">Function reference</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../_reference/hat_naive.reaction.NaiveHAT.html" class="pagination-link">
+        <span class="nav-page-text">hat_naive.reaction.NaiveHAT</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

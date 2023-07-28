@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>topology.atomic</title>
+<title>KIMMDY – topology.atomic</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -30,8 +30,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../_reference/topology.ff.html" rel="next">
-<link href="../_reference/tasks.html" rel="prev">
+<link href="../_reference/changemanager.html" rel="next">
+<link href="../_reference/topology.utils.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -79,8 +79,8 @@ ul.task-list li input[type="checkbox"] {
     <nav class="navbar navbar-expand-lg navbar-dark ">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="../index.html" class="navbar-brand navbar-brand-logo">
-    <img src=".././www/hits-logo.png" alt="" class="navbar-logo">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">KIMMDY</span>
     </a>
   </div>
             <div id="quarto-search" class="" title="Search"></div>
@@ -90,20 +90,12 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../index.html" rel="" target="">
- <span class="menu-text">KIMMDY</span></a>
-  </li>  
-  <li class="nav-item">
     <a class="nav-link active" href="../guide/getting-started.html" rel="" target="" aria-current="page">
  <span class="menu-text">Getting Started</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../guide/plugins.html" rel="" target="">
- <span class="menu-text">Reaction Plugins</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../guide/topology.html" rel="" target="">
- <span class="menu-text">Development</span></a>
+    <a class="nav-link" href="../guide/index.html" rel="" target="">
+ <span class="menu-text">Guide</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../_reference/index.html" rel="" target="">
@@ -112,7 +104,6 @@ ul.task-list li input[type="checkbox"] {
 </ul>
           </div> <!-- /navcollapse -->
           <div class="quarto-navbar-tools tools-wide">
-    <a href="https://www.h-its.org/research/mbm/" rel="" title="" class="quarto-navigation-tool px-1" aria-label=""><i class="bi bi-house-fill"></i></a>
     <div class="dropdown">
       <a href="" title="" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" aria-label=""><i class="bi bi-github"></i></a>
       <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="quarto-navigation-tool-dropdown-0">
@@ -142,12 +133,9 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../_reference/index.html">Function reference</a></li><li class="breadcrumb-item"><a href="../_reference/topology.atomic.html">topology.atomic</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../_reference/index.html">Reference</a></li><li class="breadcrumb-item"><a href="../_reference/topology.topology.html">Topology</a></li><li class="breadcrumb-item"><a href="../_reference/topology.atomic.html">topology.atomic</a></li></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
-      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
-        <i class="bi bi-search"></i>
-      </button>
     </div>
   </nav>
 </header>
@@ -155,16 +143,11 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation docked overflow-auto">
-        <div class="mt-2 flex-shrink-0 align-items-center">
-        <div class="sidebar-search">
-        <div id="quarto-search" class="" title="Search"></div>
-        </div>
-        </div>
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <a href="../guide/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Guide</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
@@ -177,51 +160,128 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">Getting Started</span></a>
   </div>
 </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../guide/user/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">User</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../guide/plugins.html" class="sidebar-item-text sidebar-link">
+  <a href="../guide/user/options.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">KIMMDY Options</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../guide/developer/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Developer</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guide/developer/plugins.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Writing Reaction Plugins</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../guide/topology.html" class="sidebar-item-text sidebar-link">
+  <a href="../guide/developer/topology.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Hexala topology</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../guide/uml.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">UML</span></a>
   </div>
 </li>
       </ul>
   </li>
+      </ul>
+  </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../_reference/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Function reference</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">
+ <span class="menu-text">Reference</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/changemanager.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">changemanager</span></a>
+  <a href="../_reference/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Reference</span></a>
   </div>
 </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="false">
+ <span class="menu-text">API</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../_reference/cmd.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">cmd</span></a>
   </div>
 </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="true">
+ <span class="menu-text">Topology</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/config.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">config</span></a>
+  <a href="../_reference/topology.topology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">topology.topology</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/topology.ff.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">topology.ff</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/topology.utils.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">topology.utils</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/topology.atomic.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">topology.atomic</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="false">
+ <span class="menu-text">Modules</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/changemanager.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">changemanager</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -234,6 +294,12 @@ ul.task-list li input[type="checkbox"] {
   <div class="sidebar-item-container"> 
   <a href="../_reference/coordinates.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">coordinates</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/config.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">config</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -256,18 +322,6 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/reaction.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">reaction</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../_reference/reactions.homolysis.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">reactions.homolysis</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="../_reference/runmanager.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">runmanager</span></a>
   </div>
@@ -280,34 +334,41 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/topology.atomic.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">topology.atomic</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../_reference/topology.ff.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">topology.ff</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../_reference/topology.topology.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">topology.topology</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../_reference/topology.utils.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">topology.utils</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="../_reference/utils.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">utils</span></a>
   </div>
 </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" aria-expanded="false">
+ <span class="menu-text">Reaction Plugins</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/homolysis.reaction.Homolysis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">homolysis.reaction.Homolysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/hat_naive.reaction.NaiveHAT.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">hat_naive.reaction.NaiveHAT</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/dummyreaction.reaction.DummyReaction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">dummyreaction.reaction.DummyReaction</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
       </ul>
   </li>
     </ul>
@@ -321,10 +382,9 @@ ul.task-list li input[type="checkbox"] {
    
   <ul>
   <li><a href="#kimmdy.topology.atomic" id="toc-kimmdy.topology.atomic" class="nav-link active" data-scroll-target="#kimmdy.topology.atomic">topology.atomic</a>
-  <ul class="collapse">
-  <li><a href="#attributes" id="toc-attributes" class="nav-link" data-scroll-target="#attributes">Attributes</a></li>
+  <ul>
   <li><a href="#classes" id="toc-classes" class="nav-link" data-scroll-target="#classes">Classes</a>
-  <ul class="collapse">
+  <ul>
   <li><a href="#kimmdy.topology.atomic.Angle" id="toc-kimmdy.topology.atomic.Angle" class="nav-link" data-scroll-target="#kimmdy.topology.atomic.Angle">Angle</a></li>
   <li><a href="#kimmdy.topology.atomic.AngleType" id="toc-kimmdy.topology.atomic.AngleType" class="nav-link" data-scroll-target="#kimmdy.topology.atomic.AngleType">AngleType</a></li>
   <li><a href="#kimmdy.topology.atomic.Atom" id="toc-kimmdy.topology.atomic.Atom" class="nav-link" data-scroll-target="#kimmdy.topology.atomic.Atom">Atom</a></li>
@@ -357,47 +417,6 @@ ul.task-list li input[type="checkbox"] {
 <h1>topology.atomic</h1>
 <p><code>topology.atomic</code></p>
 <p>Atomic datatypes for the topology such as Atom, Bond, Angle, Dihedral, etc. The order of the fields comes from the gromacs topology file format. See <a href="https://manual.gromacs.org/current/reference-manual/topologies/topology-file-formats.html#topology-file" class="uri">https://manual.gromacs.org/current/reference-manual/topologies/topology-file-formats.html#topology-file</a></p>
-<section id="attributes" class="level2">
-<h2 class="anchored" data-anchor-id="attributes">Attributes</h2>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.AngleId">AngleId</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.AtomId">AtomId</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.Atomic">Atomic</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.AtomicType">AtomicType</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.AtomicTypes">AtomicTypes</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.BondId">BondId</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.DihedralId">DihedralId</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-</section>
 <section id="classes" class="level2">
 <h2 class="anchored" data-anchor-id="classes">Classes</h2>
 <table class="table">
@@ -488,72 +507,6 @@ ul.task-list li input[type="checkbox"] {
 <p>Information about one angle</p>
 <p>A class containing angle information as in the angles section of the topology.</p>
 <p>From gromacs topology: ‘;’, ‘ai’, ‘aj’, ‘ak’, ‘funct’, ‘c0’, ‘c1’, ‘c2’, ‘c3’ With aj &lt; ai &lt; ak</p>
-<section id="attributes-1" class="level4">
-<h4 class="anchored" data-anchor-id="attributes-1">Attributes</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.Angle.ai">ai</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.Angle.aj">aj</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.Angle.ak">ak</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.Angle.c0">c0</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.Angle.c1">c1</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.Angle.c2">c2</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.Angle.c3">c3</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.Angle.funct">funct</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="methods" class="level4">
-<h4 class="anchored" data-anchor-id="methods">Methods</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.Angle.from_top_line">from_top_line</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-<section id="kimmdy.topology.atomic.Angle.from_top_line" class="level5">
-<h5 class="anchored" data-anchor-id="kimmdy.topology.atomic.Angle.from_top_line">from_top_line</h5>
-<p><code>topology.atomic.Angle.from_top_line(cls, l)</code></p>
-</section>
-</section>
 </section>
 <section id="kimmdy.topology.atomic.AngleType" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.AngleType">AngleType</h3>
@@ -561,80 +514,6 @@ ul.task-list li input[type="checkbox"] {
 <p>Information about one angle</p>
 <p>A class containing angle information as in the angles section of the topology.</p>
 <p>From gromacs topology: ‘;’, ‘i’, ‘j’, ‘k’, ‘funct’, ‘c0’, ‘c1’, ‘c2’, ‘c3’ where i,j,k are atomtypes</p>
-<section id="attributes-2" class="level4">
-<h4 class="anchored" data-anchor-id="attributes-2">Attributes</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.AngleType.c0">c0</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.AngleType.c1">c1</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.AngleType.c2">c2</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.AngleType.c3">c3</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.AngleType.funct">funct</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.AngleType.i">i</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.AngleType.id">id</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.AngleType.id_sym">id_sym</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.AngleType.j">j</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.AngleType.k">k</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="methods-1" class="level4">
-<h4 class="anchored" data-anchor-id="methods-1">Methods</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.AngleType.from_top_line">from_top_line</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-<section id="kimmdy.topology.atomic.AngleType.from_top_line" class="level5">
-<h5 class="anchored" data-anchor-id="kimmdy.topology.atomic.AngleType.from_top_line">from_top_line</h5>
-<p><code>topology.atomic.AngleType.from_top_line(cls, l)</code></p>
-</section>
-</section>
 </section>
 <section id="kimmdy.topology.atomic.Atom" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.Atom">Atom</h3>
@@ -642,100 +521,6 @@ ul.task-list li input[type="checkbox"] {
 <p>Information about one atom</p>
 <p>A class containing atom information as in the atoms section of the topology. An atom keeps a list of which atoms it is bound to.</p>
 <p>From gromacs topology: ; nr type resnr residue atom cgnr charge mass typeB chargeB massB</p>
-<section id="attributes-3" class="level4">
-<h4 class="anchored" data-anchor-id="attributes-3">Attributes</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.Atom.atom">atom</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.Atom.bound_to_nrs">bound_to_nrs</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.Atom.cgnr">cgnr</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.Atom.charge">charge</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.Atom.chargeB">chargeB</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.Atom.is_radical">is_radical</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.Atom.mass">mass</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.Atom.massB">massB</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.Atom.nr">nr</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.Atom.residue">residue</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.Atom.resnr">resnr</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.Atom.type">type</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.Atom.typeB">typeB</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="methods-2" class="level4">
-<h4 class="anchored" data-anchor-id="methods-2">Methods</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.Atom.from_top_line">from_top_line</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.Atom.radical_type">radical_type</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-<section id="kimmdy.topology.atomic.Atom.from_top_line" class="level5">
-<h5 class="anchored" data-anchor-id="kimmdy.topology.atomic.Atom.from_top_line">from_top_line</h5>
-<p><code>topology.atomic.Atom.from_top_line(cls, l)</code></p>
-</section>
-<section id="kimmdy.topology.atomic.Atom.radical_type" class="level5">
-<h5 class="anchored" data-anchor-id="kimmdy.topology.atomic.Atom.radical_type">radical_type</h5>
-<p><code>topology.atomic.Atom.radical_type(self)</code></p>
-</section>
-</section>
 </section>
 <section id="kimmdy.topology.atomic.AtomType" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.AtomType">AtomType</h3>
@@ -743,228 +528,18 @@ ul.task-list li input[type="checkbox"] {
 <p>Information about one atom</p>
 <p>A class containing atom information as in the atoms section of the topology. An atom keeps a list of which atoms it is bound to.</p>
 <p>From gromacs version of the amber* ff: ; name at.num mass charge ptype sigma epsilon</p>
-<section id="attributes-4" class="level4">
-<h4 class="anchored" data-anchor-id="attributes-4">Attributes</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.AtomType.at_num">at_num</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.AtomType.charge">charge</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.AtomType.epsilon">epsilon</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.AtomType.id">id</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.AtomType.id_sym">id_sym</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.AtomType.mass">mass</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.AtomType.ptype">ptype</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.AtomType.sigma">sigma</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.AtomType.type">type</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="methods-3" class="level4">
-<h4 class="anchored" data-anchor-id="methods-3">Methods</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.AtomType.from_top_line">from_top_line</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-<section id="kimmdy.topology.atomic.AtomType.from_top_line" class="level5">
-<h5 class="anchored" data-anchor-id="kimmdy.topology.atomic.AtomType.from_top_line">from_top_line</h5>
-<p><code>topology.atomic.AtomType.from_top_line(cls, l)</code></p>
-</section>
-</section>
 </section>
 <section id="kimmdy.topology.atomic.Bond" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.Bond">Bond</h3>
 <p><code>topology.atomic.Bond(ai, aj, funct, c0=None, c1=None, c2=None, c3=None, c4=None, c5=None)</code></p>
 <p>Information about one bond</p>
 <p>A class containing bond information as in the bonds section of the topology. From gromacs topology: ‘ai’, ‘aj’, ‘funct’, ‘c0’, ‘c1’, ‘c2’, ‘c3’, ‘c4’, ‘c5’ With ai &lt; aj</p>
-<section id="attributes-5" class="level4">
-<h4 class="anchored" data-anchor-id="attributes-5">Attributes</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.Bond.ai">ai</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.Bond.aj">aj</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.Bond.c0">c0</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.Bond.c1">c1</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.Bond.c2">c2</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.Bond.c3">c3</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.Bond.c4">c4</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.Bond.c5">c5</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.Bond.funct">funct</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="methods-4" class="level4">
-<h4 class="anchored" data-anchor-id="methods-4">Methods</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.Bond.from_top_line">from_top_line</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-<section id="kimmdy.topology.atomic.Bond.from_top_line" class="level5">
-<h5 class="anchored" data-anchor-id="kimmdy.topology.atomic.Bond.from_top_line">from_top_line</h5>
-<p><code>topology.atomic.Bond.from_top_line(cls, l)</code></p>
-</section>
-</section>
 </section>
 <section id="kimmdy.topology.atomic.BondType" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.BondType">BondType</h3>
 <p><code>topology.atomic.BondType(i, j, id, id_sym, funct, c0=None, c1=None, c2=None, c3=None)</code></p>
 <p>Information about one bondtype</p>
 <p>A class containing bond information as in the bonds section of the topology. From gromacs topology: ‘i’, ‘j’, ‘funct’, ‘c0’, ‘c1’, ‘c2’, ’c3 Where i and j are atomtypes</p>
-<section id="attributes-6" class="level4">
-<h4 class="anchored" data-anchor-id="attributes-6">Attributes</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.BondType.c0">c0</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.BondType.c1">c1</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.BondType.c2">c2</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.BondType.c3">c3</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.BondType.funct">funct</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.BondType.i">i</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.BondType.id">id</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.BondType.id_sym">id_sym</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.BondType.j">j</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="methods-5" class="level4">
-<h4 class="anchored" data-anchor-id="methods-5">Methods</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.BondType.from_top_line">from_top_line</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-<section id="kimmdy.topology.atomic.BondType.from_top_line" class="level5">
-<h5 class="anchored" data-anchor-id="kimmdy.topology.atomic.BondType.from_top_line">from_top_line</h5>
-<p><code>topology.atomic.BondType.from_top_line(cls, l)</code></p>
-</section>
-</section>
 </section>
 <section id="kimmdy.topology.atomic.Dihedral" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.Dihedral">Dihedral</h3>
@@ -973,84 +548,6 @@ ul.task-list li input[type="checkbox"] {
 <p>A class containing bond information as in the dihedrals section of the topology. Improper dihedrals have funct 4. Proper dihedrals have funct != 4. Mostly funct 9.</p>
 <p>Note that proper dihedrals of type 9 can be defined multiple times, for different periodicities. This is why would-be parameter c2 is called periodicity.</p>
 <p>From gromacs topology: ‘;’, ‘ai’, ‘aj’, ‘ak’, ‘al’, ‘funct’, ‘c0’, ‘c1’, ‘periodicity’, ‘c3’, ‘c4’, ‘c5’ For proper dihedrals (funct 9): aj &lt; ak</p>
-<section id="attributes-7" class="level4">
-<h4 class="anchored" data-anchor-id="attributes-7">Attributes</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.Dihedral.ai">ai</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.Dihedral.aj">aj</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.Dihedral.ak">ak</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.Dihedral.al">al</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.Dihedral.c0">c0</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.Dihedral.c1">c1</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.Dihedral.c3">c3</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.Dihedral.c4">c4</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.Dihedral.c5">c5</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.Dihedral.funct">funct</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.Dihedral.periodicity">periodicity</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="methods-6" class="level4">
-<h4 class="anchored" data-anchor-id="methods-6">Methods</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.Dihedral.from_top_line">from_top_line</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-<section id="kimmdy.topology.atomic.Dihedral.from_top_line" class="level5">
-<h5 class="anchored" data-anchor-id="kimmdy.topology.atomic.Dihedral.from_top_line">from_top_line</h5>
-<p><code>topology.atomic.Dihedral.from_top_line(cls, l)</code></p>
-</section>
-</section>
 </section>
 <section id="kimmdy.topology.atomic.DihedralRestraint" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.DihedralRestraint">DihedralRestraint</h3>
@@ -1058,72 +555,6 @@ ul.task-list li input[type="checkbox"] {
 <p>Information about one dihedral restraint.</p>
 <p>A class containing information as in the dihedral_restraints section of the topology.</p>
 <p>From gromacs topology: ; ai aj ak al type phi dphi fc</p>
-<section id="attributes-8" class="level4">
-<h4 class="anchored" data-anchor-id="attributes-8">Attributes</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.DihedralRestraint.ai">ai</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.DihedralRestraint.aj">aj</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.DihedralRestraint.ak">ak</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.DihedralRestraint.al">al</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.DihedralRestraint.dphi">dphi</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.DihedralRestraint.fc">fc</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.DihedralRestraint.phi">phi</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.DihedralRestraint.type">type</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="methods-7" class="level4">
-<h4 class="anchored" data-anchor-id="methods-7">Methods</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.DihedralRestraint.from_top_line">from_top_line</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-<section id="kimmdy.topology.atomic.DihedralRestraint.from_top_line" class="level5">
-<h5 class="anchored" data-anchor-id="kimmdy.topology.atomic.DihedralRestraint.from_top_line">from_top_line</h5>
-<p><code>topology.atomic.DihedralRestraint.from_top_line(cls, l)</code></p>
-</section>
-</section>
 </section>
 <section id="kimmdy.topology.atomic.DihedralType" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.DihedralType">DihedralType</h3>
@@ -1132,176 +563,16 @@ ul.task-list li input[type="checkbox"] {
 <p>A class containing bond information as in the dihedrals section of the topology. Proper dihedrals have funct 9. Improper dihedrals have funct 4.</p>
 <p>Note that proper dihedrals of type 9 can be defined multiple times, for different periodicities. This is why would-be parameter c2 is called periodicity and part of the <code>id</code>.</p>
 <p>From gromacs topology: ‘;’, ‘i’, ‘j’, ‘k’, ‘l’, ‘funct’, ‘c0’, ‘c1’, ‘periodicity’, ‘c3’, ‘c4’, ‘c5’ Where i,j,k,l are atomtypes</p>
-<section id="attributes-9" class="level4">
-<h4 class="anchored" data-anchor-id="attributes-9">Attributes</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.DihedralType.c0">c0</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.DihedralType.c1">c1</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.DihedralType.c3">c3</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.DihedralType.c4">c4</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.DihedralType.c5">c5</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.DihedralType.funct">funct</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.DihedralType.i">i</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.DihedralType.id">id</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.DihedralType.id_sym">id_sym</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.DihedralType.j">j</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.DihedralType.k">k</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.DihedralType.l">l</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.DihedralType.periodicity">periodicity</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="methods-8" class="level4">
-<h4 class="anchored" data-anchor-id="methods-8">Methods</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.DihedralType.from_top_line">from_top_line</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-<section id="kimmdy.topology.atomic.DihedralType.from_top_line" class="level5">
-<h5 class="anchored" data-anchor-id="kimmdy.topology.atomic.DihedralType.from_top_line">from_top_line</h5>
-<p><code>topology.atomic.DihedralType.from_top_line(cls, l)</code></p>
-</section>
-</section>
 </section>
 <section id="kimmdy.topology.atomic.MultipleDihedralTypes" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.MultipleDihedralTypes">MultipleDihedralTypes</h3>
 <p><code>topology.atomic.MultipleDihedralTypes(ai, aj, ak, al, funct, dihedral_types)</code></p>
 <p>Multiple <code>DihedralTypes</code>s with the same ai, aj, ak, al but different periodicities. funct should always be “9” when the length of dihedrals is &gt; 1. The key of the dict is the periodicity (c2).</p>
-<section id="attributes-10" class="level4">
-<h4 class="anchored" data-anchor-id="attributes-10">Attributes</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.MultipleDihedralTypes.ai">ai</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.MultipleDihedralTypes.aj">aj</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.MultipleDihedralTypes.ak">ak</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.MultipleDihedralTypes.al">al</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.MultipleDihedralTypes.dihedral_types">dihedral_types</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.MultipleDihedralTypes.funct">funct</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-</section>
 </section>
 <section id="kimmdy.topology.atomic.MultipleDihedrals" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.MultipleDihedrals">MultipleDihedrals</h3>
 <p><code>topology.atomic.MultipleDihedrals(ai, aj, ak, al, funct, dihedrals)</code></p>
 <p>Multiple <code>Dihedral</code>s with the same ai, aj, ak, al but different periodicities. funct should always be “9” when the length of dihedrals is &gt; 1. The key of the dict is the periodicity (c2).</p>
-<section id="attributes-11" class="level4">
-<h4 class="anchored" data-anchor-id="attributes-11">Attributes</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.MultipleDihedrals.ai">ai</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.MultipleDihedrals.aj">aj</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.MultipleDihedrals.ak">ak</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.MultipleDihedrals.al">al</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.MultipleDihedrals.dihedrals">dihedrals</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.MultipleDihedrals.funct">funct</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-</section>
 </section>
 <section id="kimmdy.topology.atomic.Pair" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.Pair">Pair</h3>
@@ -1309,68 +580,6 @@ ul.task-list li input[type="checkbox"] {
 <p>Information about one pair</p>
 <p>A class containing pair information as in the pair section of the topology.</p>
 <p>From gromacs topology: ai’, ‘aj’, ‘funct’, ‘c0’, ‘c1’, ‘c2’, ‘c3’</p>
-<section id="attributes-12" class="level4">
-<h4 class="anchored" data-anchor-id="attributes-12">Attributes</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.Pair.ai">ai</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.Pair.aj">aj</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.Pair.c0">c0</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.Pair.c1">c1</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.Pair.c2">c2</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.Pair.c3">c3</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.Pair.funct">funct</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="methods-9" class="level4">
-<h4 class="anchored" data-anchor-id="methods-9">Methods</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.Pair.from_top_line">from_top_line</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-<section id="kimmdy.topology.atomic.Pair.from_top_line" class="level5">
-<h5 class="anchored" data-anchor-id="kimmdy.topology.atomic.Pair.from_top_line">from_top_line</h5>
-<p><code>topology.atomic.Pair.from_top_line(cls, l)</code></p>
-</section>
-</section>
 </section>
 <section id="kimmdy.topology.atomic.PositionRestraint" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.PositionRestraint">PositionRestraint</h3>
@@ -1378,349 +587,33 @@ ul.task-list li input[type="checkbox"] {
 <p>Information about one position restraint.</p>
 <p>A class containing information as in the position_restraints section of the topology.</p>
 <p>From gromacs topology: ; ai funct fc(x,y,z)</p>
-<section id="attributes-13" class="level4">
-<h4 class="anchored" data-anchor-id="attributes-13">Attributes</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.PositionRestraint.ai">ai</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.PositionRestraint.condition">condition</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.PositionRestraint.fc">fc</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.PositionRestraint.funct">funct</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="methods-10" class="level4">
-<h4 class="anchored" data-anchor-id="methods-10">Methods</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.PositionRestraint.from_top_line">from_top_line</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-<section id="kimmdy.topology.atomic.PositionRestraint.from_top_line" class="level5">
-<h5 class="anchored" data-anchor-id="kimmdy.topology.atomic.PositionRestraint.from_top_line">from_top_line</h5>
-<p><code>topology.atomic.PositionRestraint.from_top_line(cls, l, condition=None)</code></p>
-</section>
-</section>
 </section>
 <section id="kimmdy.topology.atomic.ResidueAtomSpec" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.ResidueAtomSpec">ResidueAtomSpec</h3>
 <p><code>topology.atomic.ResidueAtomSpec(name, type, charge, cgrp)</code></p>
 <p>Information about one atom in a residue ; name type charge chargegroup</p>
-<section id="attributes-14" class="level4">
-<h4 class="anchored" data-anchor-id="attributes-14">Attributes</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.ResidueAtomSpec.cgrp">cgrp</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.ResidueAtomSpec.charge">charge</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.ResidueAtomSpec.name">name</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.ResidueAtomSpec.type">type</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="methods-11" class="level4">
-<h4 class="anchored" data-anchor-id="methods-11">Methods</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.ResidueAtomSpec.from_top_line">from_top_line</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-<section id="kimmdy.topology.atomic.ResidueAtomSpec.from_top_line" class="level5">
-<h5 class="anchored" data-anchor-id="kimmdy.topology.atomic.ResidueAtomSpec.from_top_line">from_top_line</h5>
-<p><code>topology.atomic.ResidueAtomSpec.from_top_line(cls, l)</code></p>
-</section>
-</section>
 </section>
 <section id="kimmdy.topology.atomic.ResidueBondSpec" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.ResidueBondSpec">ResidueBondSpec</h3>
 <p><code>topology.atomic.ResidueBondSpec(atom1, atom2, b0=None, kb=None)</code></p>
 <p>Information about one bond in a residue ; atom1 atom2 b0 kb</p>
-<section id="attributes-15" class="level4">
-<h4 class="anchored" data-anchor-id="attributes-15">Attributes</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.ResidueBondSpec.atom1">atom1</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.ResidueBondSpec.atom2">atom2</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.ResidueBondSpec.b0">b0</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.ResidueBondSpec.kb">kb</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="methods-12" class="level4">
-<h4 class="anchored" data-anchor-id="methods-12">Methods</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.ResidueBondSpec.from_top_line">from_top_line</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-<section id="kimmdy.topology.atomic.ResidueBondSpec.from_top_line" class="level5">
-<h5 class="anchored" data-anchor-id="kimmdy.topology.atomic.ResidueBondSpec.from_top_line">from_top_line</h5>
-<p><code>topology.atomic.ResidueBondSpec.from_top_line(cls, l)</code></p>
-</section>
-</section>
 </section>
 <section id="kimmdy.topology.atomic.ResidueImproperSpec" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.ResidueImproperSpec">ResidueImproperSpec</h3>
 <p><code>topology.atomic.ResidueImproperSpec(atom1, atom2, atom3, atom4, q0, cq)</code></p>
 <p>Information about one imroper dihedral in a residue ;atom1 atom2 atom3 atom4 q0 cq</p>
-<section id="attributes-16" class="level4">
-<h4 class="anchored" data-anchor-id="attributes-16">Attributes</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.ResidueImproperSpec.atom1">atom1</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.ResidueImproperSpec.atom2">atom2</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.ResidueImproperSpec.atom3">atom3</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.ResidueImproperSpec.atom4">atom4</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.ResidueImproperSpec.cq">cq</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.ResidueImproperSpec.q0">q0</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="methods-13" class="level4">
-<h4 class="anchored" data-anchor-id="methods-13">Methods</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.ResidueImproperSpec.from_top_line">from_top_line</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-<section id="kimmdy.topology.atomic.ResidueImproperSpec.from_top_line" class="level5">
-<h5 class="anchored" data-anchor-id="kimmdy.topology.atomic.ResidueImproperSpec.from_top_line">from_top_line</h5>
-<p><code>topology.atomic.ResidueImproperSpec.from_top_line(cls, l)</code></p>
-</section>
-</section>
 </section>
 <section id="kimmdy.topology.atomic.ResidueProperSpec" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.ResidueProperSpec">ResidueProperSpec</h3>
 <p><code>topology.atomic.ResidueProperSpec(atom1, atom2, atom3, atom4, q0)</code></p>
 <p>Information about one imroper dihedral in a residue ;atom1 atom2 atom3 atom4 q0 cq</p>
-<section id="attributes-17" class="level4">
-<h4 class="anchored" data-anchor-id="attributes-17">Attributes</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.ResidueProperSpec.atom1">atom1</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.ResidueProperSpec.atom2">atom2</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.ResidueProperSpec.atom3">atom3</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.ResidueProperSpec.atom4">atom4</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.ResidueProperSpec.q0">q0</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="methods-14" class="level4">
-<h4 class="anchored" data-anchor-id="methods-14">Methods</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.ResidueProperSpec.from_top_line">from_top_line</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-<section id="kimmdy.topology.atomic.ResidueProperSpec.from_top_line" class="level5">
-<h5 class="anchored" data-anchor-id="kimmdy.topology.atomic.ResidueProperSpec.from_top_line">from_top_line</h5>
-<p><code>topology.atomic.ResidueProperSpec.from_top_line(cls, l)</code></p>
-</section>
-</section>
 </section>
 <section id="kimmdy.topology.atomic.ResidueType" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.ResidueType">ResidueType</h3>
 <p><code>topology.atomic.ResidueType(residue, atoms, bonds, proper_dihedrals, improper_dihedrals)</code></p>
 <p>Information about one residuetype from aminoacids.rtp</p>
-<section id="attributes-18" class="level4">
-<h4 class="anchored" data-anchor-id="attributes-18">Attributes</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.ResidueType.atoms">atoms</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.ResidueType.bonds">bonds</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.ResidueType.improper_dihedrals">improper_dihedrals</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.atomic.ResidueType.proper_dihedrals">proper_dihedrals</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.ResidueType.residue">residue</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="methods-15" class="level4">
-<h4 class="anchored" data-anchor-id="methods-15">Methods</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.topology.atomic.ResidueType.from_section">from_section</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-<section id="kimmdy.topology.atomic.ResidueType.from_section" class="level5">
-<h5 class="anchored" data-anchor-id="kimmdy.topology.atomic.ResidueType.from_section">from_section</h5>
-<p><code>topology.atomic.ResidueType.from_section(cls, residue, d)</code></p>
 
 
-</section>
-</section>
 </section>
 </section>
 </section>
@@ -2168,13 +1061,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../_reference/tasks.html" class="pagination-link">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">tasks</span>
+      <a href="../_reference/topology.utils.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">topology.utils</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../_reference/topology.ff.html" class="pagination-link">
-        <span class="nav-page-text">topology.ff</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../_reference/changemanager.html" class="pagination-link">
+        <span class="nav-page-text">changemanager</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

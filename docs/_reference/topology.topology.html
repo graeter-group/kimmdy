@@ -30,8 +30,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../_reference/topology.utils.html" rel="next">
-<link href="../_reference/topology.ff.html" rel="prev">
+<link href="../_reference/topology.ff.html" rel="next">
+<link href="../_reference/cmd.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -133,7 +133,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../_reference/index.html">Reference</a></li><li class="breadcrumb-item"><a href="../_reference/topology.topology.html">topology.topology</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../_reference/index.html">Reference</a></li><li class="breadcrumb-item"><a href="../_reference/topology.topology.html">Topology</a></li><li class="breadcrumb-item"><a href="../_reference/topology.topology.html">topology.topology</a></li></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -160,21 +160,32 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">Getting Started</span></a>
   </div>
 </li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../guide/user/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">User</span></a>
-  </div>
-</li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../guide/developer/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Developer</span></a>
+            <a href="../guide/user/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">User</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guide/user/options.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">KIMMDY Options</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../guide/developer/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Developer</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../guide/developer/plugins.html" class="sidebar-item-text sidebar-link">
@@ -193,29 +204,84 @@ ul.task-list li input[type="checkbox"] {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../_reference/index.html" class="sidebar-item-text sidebar-link">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">
  <span class="menu-text">Reference</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/changemanager.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">changemanager</span></a>
+  <a href="../_reference/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Reference</span></a>
   </div>
 </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="false">
+ <span class="menu-text">API</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../_reference/cmd.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">cmd</span></a>
   </div>
 </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="true">
+ <span class="menu-text">Topology</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/config.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">config</span></a>
+  <a href="../_reference/topology.topology.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">topology.topology</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/topology.ff.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">topology.ff</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/topology.utils.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">topology.utils</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/topology.atomic.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">topology.atomic</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="false">
+ <span class="menu-text">Modules</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/changemanager.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">changemanager</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -228,6 +294,12 @@ ul.task-list li input[type="checkbox"] {
   <div class="sidebar-item-container"> 
   <a href="../_reference/coordinates.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">coordinates</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/config.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">config</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -250,18 +322,6 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/reaction.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">reaction</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../_reference/reactions.homolysis.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">reactions.homolysis</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="../_reference/runmanager.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">runmanager</span></a>
   </div>
@@ -274,34 +334,41 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/topology.atomic.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">topology.atomic</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../_reference/topology.ff.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">topology.ff</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../_reference/topology.topology.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">topology.topology</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../_reference/topology.utils.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">topology.utils</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="../_reference/utils.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">utils</span></a>
   </div>
 </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" aria-expanded="false">
+ <span class="menu-text">Reaction Plugins</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/homolysis.reaction.Homolysis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">homolysis.reaction.Homolysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/hat_naive.reaction.NaiveHAT.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">hat_naive.reaction.NaiveHAT</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/dummyreaction.reaction.DummyReaction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">dummyreaction.reaction.DummyReaction</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
       </ul>
   </li>
     </ul>
@@ -316,21 +383,17 @@ ul.task-list li input[type="checkbox"] {
   <ul>
   <li><a href="#kimmdy.topology.topology" id="toc-kimmdy.topology.topology" class="nav-link active" data-scroll-target="#kimmdy.topology.topology">topology.topology</a>
   <ul>
-  <li><a href="#attributes" id="toc-attributes" class="nav-link" data-scroll-target="#attributes">Attributes</a></li>
   <li><a href="#classes" id="toc-classes" class="nav-link" data-scroll-target="#classes">Classes</a>
   <ul>
   <li><a href="#kimmdy.topology.topology.Topology" id="toc-kimmdy.topology.topology.Topology" class="nav-link" data-scroll-target="#kimmdy.topology.topology.Topology">Topology</a>
   <ul class="collapse">
   <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
-  <li><a href="#attributes-1" id="toc-attributes-1" class="nav-link" data-scroll-target="#attributes-1">Attributes</a></li>
   <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
   <ul class="collapse">
   <li><a href="#kimmdy.topology.topology.Topology.bind_bond" id="toc-kimmdy.topology.topology.Topology.bind_bond" class="nav-link" data-scroll-target="#kimmdy.topology.topology.Topology.bind_bond">bind_bond</a></li>
   <li><a href="#kimmdy.topology.topology.Topology.break_bond" id="toc-kimmdy.topology.topology.Topology.break_bond" class="nav-link" data-scroll-target="#kimmdy.topology.topology.Topology.break_bond">break_bond</a></li>
   <li><a href="#kimmdy.topology.topology.Topology.move_hydrogen" id="toc-kimmdy.topology.topology.Topology.move_hydrogen" class="nav-link" data-scroll-target="#kimmdy.topology.topology.Topology.move_hydrogen">move_hydrogen</a></li>
-  <li><a href="#kimmdy.topology.topology.Topology.patch_parameters" id="toc-kimmdy.topology.topology.Topology.patch_parameters" class="nav-link" data-scroll-target="#kimmdy.topology.topology.Topology.patch_parameters">patch_parameters</a></li>
   <li><a href="#kimmdy.topology.topology.Topology.reindex_atomnrs" id="toc-kimmdy.topology.topology.Topology.reindex_atomnrs" class="nav-link" data-scroll-target="#kimmdy.topology.topology.Topology.reindex_atomnrs">reindex_atomnrs</a></li>
-  <li><a href="#kimmdy.topology.topology.Topology.to_dict" id="toc-kimmdy.topology.topology.Topology.to_dict" class="nav-link" data-scroll-target="#kimmdy.topology.topology.Topology.to_dict">to_dict</a></li>
   </ul></li>
   </ul></li>
   </ul></li>
@@ -346,23 +409,6 @@ ul.task-list li input[type="checkbox"] {
 <section id="kimmdy.topology.topology" class="level1">
 <h1>topology.topology</h1>
 <p><code>topology.topology</code></p>
-<section id="attributes" class="level2">
-<h2 class="anchored" data-anchor-id="attributes">Attributes</h2>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.topology.topology.PROTEIN_SECTION">PROTEIN_SECTION</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-</section>
 <section id="classes" class="level2">
 <h2 class="anchored" data-anchor-id="classes">Classes</h2>
 <table class="table">
@@ -421,71 +467,6 @@ ul.task-list li input[type="checkbox"] {
 </tbody>
 </table>
 </section>
-<section id="attributes-1" class="level4">
-<h4 class="anchored" data-anchor-id="attributes-1">Attributes</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.topology.topology.Topology.angles">angles</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.topology.Topology.atoms">atoms</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.topology.Topology.bonds">bonds</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.topology.Topology.dihedral_restraints">dihedral_restraints</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.topology.Topology.ff">ff</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.topology.Topology.ffpatches">ffpatches</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.topology.Topology.improper_dihedrals">improper_dihedrals</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.topology.Topology.pairs">pairs</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.topology.Topology.position_restraints">position_restraints</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.topology.Topology.proper_dihedrals">proper_dihedrals</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.topology.Topology.protein">protein</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.topology.Topology.radicals">radicals</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.topology.Topology.top">top</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-</section>
 <section id="methods" class="level4">
 <h4 class="anchored" data-anchor-id="methods">Methods</h4>
 <table class="table">
@@ -509,16 +490,8 @@ ul.task-list li input[type="checkbox"] {
 <td>Move a singly bound atom to a new location.</td>
 </tr>
 <tr class="even">
-<td><a href="#kimmdy.topology.topology.Topology.patch_parameters">patch_parameters</a></td>
-<td></td>
-</tr>
-<tr class="odd">
 <td><a href="#kimmdy.topology.topology.Topology.reindex_atomnrs">reindex_atomnrs</a></td>
 <td>Reindex atom numbers in topology.</td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.topology.Topology.to_dict">to_dict</a></td>
-<td></td>
 </tr>
 </tbody>
 </table>
@@ -567,19 +540,11 @@ ul.task-list li input[type="checkbox"] {
 <p>Move a singly bound atom to a new location.</p>
 <p>This is typically H for Hydrogen Atom Transfer (HAT).</p>
 </section>
-<section id="kimmdy.topology.topology.Topology.patch_parameters" class="level5">
-<h5 class="anchored" data-anchor-id="kimmdy.topology.topology.Topology.patch_parameters">patch_parameters</h5>
-<p><code>topology.topology.Topology.patch_parameters(self, focus_nr)</code></p>
-</section>
 <section id="kimmdy.topology.topology.Topology.reindex_atomnrs" class="level5">
 <h5 class="anchored" data-anchor-id="kimmdy.topology.topology.Topology.reindex_atomnrs">reindex_atomnrs</h5>
 <p><code>topology.topology.Topology.reindex_atomnrs(self)</code></p>
 <p>Reindex atom numbers in topology.</p>
 <p>Starts at index 1. This also updates the numbers for bonds, angles, dihedrals and pairs.</p>
-</section>
-<section id="kimmdy.topology.topology.Topology.to_dict" class="level5">
-<h5 class="anchored" data-anchor-id="kimmdy.topology.topology.Topology.to_dict">to_dict</h5>
-<p><code>topology.topology.Topology.to_dict(self)</code></p>
 
 
 </section>
@@ -1031,13 +996,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../_reference/topology.ff.html" class="pagination-link">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">topology.ff</span>
+      <a href="../_reference/cmd.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">cmd</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../_reference/topology.utils.html" class="pagination-link">
-        <span class="nav-page-text">topology.utils</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../_reference/topology.ff.html" class="pagination-link">
+        <span class="nav-page-text">topology.ff</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

@@ -2,12 +2,6 @@
 
 `topology.topology`
 
-## Attributes
-
-| Name | Description |
-| --- | --- |
-| [PROTEIN_SECTION](#kimmdy.topology.topology.PROTEIN_SECTION) |  |
-
 ## Classes
 
 | Name | Description |
@@ -33,24 +27,6 @@ Assumptions:
 | `top`     | TopologyDict                    | A dictionary containing the parsed topology data.                  | _required_ |
 | `ffpatch` | typing.Optional\[pathlib.Path\] | Path to a force field patch file. If None, no patching is applied. | `None`     |
 
-#### Attributes
-
-| Name | Description |
-| --- | --- |
-| [angles](#kimmdy.topology.topology.Topology.angles) |  |
-| [atoms](#kimmdy.topology.topology.Topology.atoms) |  |
-| [bonds](#kimmdy.topology.topology.Topology.bonds) |  |
-| [dihedral_restraints](#kimmdy.topology.topology.Topology.dihedral_restraints) |  |
-| [ff](#kimmdy.topology.topology.Topology.ff) |  |
-| [ffpatches](#kimmdy.topology.topology.Topology.ffpatches) |  |
-| [improper_dihedrals](#kimmdy.topology.topology.Topology.improper_dihedrals) |  |
-| [pairs](#kimmdy.topology.topology.Topology.pairs) |  |
-| [position_restraints](#kimmdy.topology.topology.Topology.position_restraints) |  |
-| [proper_dihedrals](#kimmdy.topology.topology.Topology.proper_dihedrals) |  |
-| [protein](#kimmdy.topology.topology.Topology.protein) |  |
-| [radicals](#kimmdy.topology.topology.Topology.radicals) |  |
-| [top](#kimmdy.topology.topology.Topology.top) |  |
-
 #### Methods
 
 | Name | Description |
@@ -58,9 +34,7 @@ Assumptions:
 | [bind_bond](#kimmdy.topology.topology.Topology.bind_bond) | Add a bond in topology. |
 | [break_bond](#kimmdy.topology.topology.Topology.break_bond) | Break bonds in topology. |
 | [move_hydrogen](#kimmdy.topology.topology.Topology.move_hydrogen) | Move a singly bound atom to a new location. |
-| [patch_parameters](#kimmdy.topology.topology.Topology.patch_parameters) |  |
 | [reindex_atomnrs](#kimmdy.topology.topology.Topology.reindex_atomnrs) | Reindex atom numbers in topology. |
-| [to_dict](#kimmdy.topology.topology.Topology.to_dict) |  |
 
 ##### bind_bond { #kimmdy.topology.topology.Topology.bind_bond }
 
@@ -96,10 +70,6 @@ Move a singly bound atom to a new location.
 
 This is typically H for Hydrogen Atom Transfer (HAT).
 
-##### patch_parameters { #kimmdy.topology.topology.Topology.patch_parameters }
-
-`topology.topology.Topology.patch_parameters(self, focus_nr)`
-
 ##### reindex_atomnrs { #kimmdy.topology.topology.Topology.reindex_atomnrs }
 
 `topology.topology.Topology.reindex_atomnrs(self)`
@@ -108,7 +78,3 @@ Reindex atom numbers in topology.
 
 Starts at index 1.
 This also updates the numbers for bonds, angles, dihedrals and pairs.
-
-##### to_dict { #kimmdy.topology.topology.Topology.to_dict }
-
-`topology.topology.Topology.to_dict(self)`

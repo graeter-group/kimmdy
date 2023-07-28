@@ -38,8 +38,37 @@ website:
       - section: Guide
         contents: guide/**
       - section: Reference
-        contents: _reference/**
-          
+        contents:
+        - _reference/index.qmd
+        - contents:
+          - _reference/cmd.qmd
+          section: API
+        - contents:
+          - _reference/topology.topology.qmd
+          - _reference/topology.ff.qmd
+          - _reference/topology.utils.qmd
+          - _reference/topology.atomic.qmd
+          section: Topology
+        - contents:
+          - _reference/changemanager.qmd
+          - _reference/constants.qmd
+          - _reference/coordinates.qmd
+          - _reference/config.qmd
+          - _reference/kmc.qmd
+          - _reference/misc_helper.qmd
+          - _reference/parsing.qmd
+          - _reference/runmanager.qmd
+          - _reference/tasks.qmd
+          - _reference/utils.qmd
+          section: Modules
+        - contents:
+          - _reference/homolysis.reaction.Homolysis.qmd
+          - _reference/hat_naive.reaction.NaiveHAT.qmd
+          - _reference/dummyreaction.reaction.DummyReaction.qmd
+          section: Reaction Plugins
+
+# metadata-files:
+#   - _sidebar.yml
 
 execute:
   warning: false
@@ -71,8 +100,9 @@ interlinks:
     python:
       url: https://docs.python.org/3.10/
 
-
 quartodoc:
+  sidebar: "_sidebar.yml"
+  title: "Reference"
   package: kimmdy
   style: pkgdown
   dir: _reference
@@ -88,11 +118,6 @@ quartodoc:
         - name: topology.ff
         - name: topology.utils
         - name: topology.atomic
-    - title: Reaction Plugins
-      desc: Reaction plugins bundled with KIMMDY and the protocol to add a new reaction plugin to KIMMDY
-      contents:
-        - name: reaction
-        - name: reactions.homolysis
     - title: Modules
       desc: Modules
       contents:
@@ -106,5 +131,12 @@ quartodoc:
         - name: runmanager
         - name: tasks
         - name: utils
+    - title: Reaction Plugins
+      desc: Reaction plugins bundled with KIMMDY and the protocol to add a new reaction plugin to KIMMDY
+      package: null
+      contents:
+        - homolysis.reaction.Homolysis
+        - hat_naive.reaction.NaiveHAT
+        - dummyreaction.reaction.DummyReaction
 
 

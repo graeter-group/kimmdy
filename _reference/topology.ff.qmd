@@ -2,13 +2,6 @@
 
 `topology.ff`
 
-## Attributes
-
-| Name | Description |
-| --- | --- |
-| [Patch](#kimmdy.topology.ff.Patch) |  |
-| [Patches](#kimmdy.topology.ff.Patches) |  |
-
 ## Classes
 
 | Name | Description |
@@ -20,7 +13,6 @@
 | [FF](#kimmdy.topology.ff.FF) | Conainer for parsed forcefield data. |
 | [FFPatches](#kimmdy.topology.ff.FFPatches) | A container for forcefield patches |
 | [PairPatch](#kimmdy.topology.ff.PairPatch) | Instructions to patch one pair |
-| [ParamPatch](#kimmdy.topology.ff.ParamPatch) |  |
 
 ### AnglePatch { #kimmdy.topology.ff.AnglePatch }
 
@@ -28,31 +20,11 @@
 
 Instructions to patch one angle
 
-#### Attributes
-
-| Name | Description |
-| --- | --- |
-| [ai](#kimmdy.topology.ff.AnglePatch.ai) |  |
-| [aj](#kimmdy.topology.ff.AnglePatch.aj) |  |
-| [ak](#kimmdy.topology.ff.AnglePatch.ak) |  |
-| [id](#kimmdy.topology.ff.AnglePatch.id) |  |
-| [id_sym](#kimmdy.topology.ff.AnglePatch.id_sym) |  |
-| [params](#kimmdy.topology.ff.AnglePatch.params) |  |
-
 ### AtomPatch { #kimmdy.topology.ff.AtomPatch }
 
 `topology.ff.AtomPatch(self, elem)`
 
 Instructions to patch one atom
-
-#### Attributes
-
-| Name | Description |
-| --- | --- |
-| [ai](#kimmdy.topology.ff.AtomPatch.ai) |  |
-| [id](#kimmdy.topology.ff.AtomPatch.id) |  |
-| [id_sym](#kimmdy.topology.ff.AtomPatch.id_sym) |  |
-| [params](#kimmdy.topology.ff.AtomPatch.params) |  |
 
 ### BondPatch { #kimmdy.topology.ff.BondPatch }
 
@@ -60,35 +32,11 @@ Instructions to patch one atom
 
 Instructions to patch one bond
 
-#### Attributes
-
-| Name | Description |
-| --- | --- |
-| [ai](#kimmdy.topology.ff.BondPatch.ai) |  |
-| [aj](#kimmdy.topology.ff.BondPatch.aj) |  |
-| [id](#kimmdy.topology.ff.BondPatch.id) |  |
-| [id_sym](#kimmdy.topology.ff.BondPatch.id_sym) |  |
-| [params](#kimmdy.topology.ff.BondPatch.params) |  |
-
 ### DihedralPatch { #kimmdy.topology.ff.DihedralPatch }
 
 `topology.ff.DihedralPatch(self, elem)`
 
 Instructions to patch one dihedral
-
-#### Attributes
-
-| Name | Description |
-| --- | --- |
-| [ai](#kimmdy.topology.ff.DihedralPatch.ai) |  |
-| [aj](#kimmdy.topology.ff.DihedralPatch.aj) |  |
-| [ak](#kimmdy.topology.ff.DihedralPatch.ak) |  |
-| [al](#kimmdy.topology.ff.DihedralPatch.al) |  |
-| [func](#kimmdy.topology.ff.DihedralPatch.func) |  |
-| [id](#kimmdy.topology.ff.DihedralPatch.id) |  |
-| [id_sym](#kimmdy.topology.ff.DihedralPatch.id_sym) |  |
-| [params](#kimmdy.topology.ff.DihedralPatch.params) |  |
-| [periodicity](#kimmdy.topology.ff.DihedralPatch.periodicity) |  |
 
 ### FF { #kimmdy.topology.ff.FF }
 
@@ -96,82 +44,14 @@ Instructions to patch one dihedral
 
 Conainer for parsed forcefield data.
 
-#### Attributes
-
-| Name | Description |
-| --- | --- |
-| [angletypes](#kimmdy.topology.ff.FF.angletypes) |  |
-| [atomtypes](#kimmdy.topology.ff.FF.atomtypes) |  |
-| [bondtypes](#kimmdy.topology.ff.FF.bondtypes) |  |
-| [improper_dihedraltypes](#kimmdy.topology.ff.FF.improper_dihedraltypes) |  |
-| [proper_dihedraltypes](#kimmdy.topology.ff.FF.proper_dihedraltypes) |  |
-| [residuetypes](#kimmdy.topology.ff.FF.residuetypes) |  |
-
 ### FFPatches { #kimmdy.topology.ff.FFPatches }
 
 `topology.ff.FFPatches(self, path)`
 
 A container for forcefield patches
 
-#### Attributes
-
-| Name | Description |
-| --- | --- |
-| [anglepatches](#kimmdy.topology.ff.FFPatches.anglepatches) |  |
-| [atompatches](#kimmdy.topology.ff.FFPatches.atompatches) |  |
-| [bondpatches](#kimmdy.topology.ff.FFPatches.bondpatches) |  |
-| [dihedralpatches](#kimmdy.topology.ff.FFPatches.dihedralpatches) |  |
-| [pairpatches](#kimmdy.topology.ff.FFPatches.pairpatches) |  |
-
 ### PairPatch { #kimmdy.topology.ff.PairPatch }
 
 `topology.ff.PairPatch(self, elem)`
 
 Instructions to patch one pair
-
-#### Attributes
-
-| Name | Description |
-| --- | --- |
-| [ai](#kimmdy.topology.ff.PairPatch.ai) |  |
-| [aj](#kimmdy.topology.ff.PairPatch.aj) |  |
-| [id](#kimmdy.topology.ff.PairPatch.id) |  |
-| [id_sym](#kimmdy.topology.ff.PairPatch.id_sym) |  |
-| [params](#kimmdy.topology.ff.PairPatch.params) |  |
-
-### ParamPatch { #kimmdy.topology.ff.ParamPatch }
-
-`topology.ff.ParamPatch()`
-
-#### Attributes
-
-| Name | Description |
-| --- | --- |
-| [factor](#kimmdy.topology.ff.ParamPatch.factor) |  |
-| [offset](#kimmdy.topology.ff.ParamPatch.offset) |  |
-| [value](#kimmdy.topology.ff.ParamPatch.value) |  |
-
-#### Methods
-
-| Name | Description |
-| --- | --- |
-| [apply](#kimmdy.topology.ff.ParamPatch.apply) |  |
-| [update](#kimmdy.topology.ff.ParamPatch.update) |  |
-
-##### apply { #kimmdy.topology.ff.ParamPatch.apply }
-
-`topology.ff.ParamPatch.apply(self, initial)`
-
-##### update { #kimmdy.topology.ff.ParamPatch.update }
-
-`topology.ff.ParamPatch.update(self, new)`
-
-## Functions
-
-| Name | Description |
-| --- | --- |
-| [props_to_patches](#kimmdy.topology.ff.props_to_patches) |  |
-
-### props_to_patches { #kimmdy.topology.ff.props_to_patches }
-
-`topology.ff.props_to_patches(props)`

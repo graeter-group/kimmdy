@@ -53,7 +53,7 @@ which is `kimmdy.yml` by default.
 
 ### kimmdy_run { #kimmdy.cmd.kimmdy_run }
 
-`cmd.kimmdy_run(input=Path('kimmdy.yml'), loglevel='DEBUG', logfile=Path('kimmdy.log'), checkpoint='', concat=False)`
+`cmd.kimmdy_run(input=Path('kimmdy.yml'), loglevel='DEBUG', logfile=Path('kimmdy.log'), checkpoint='', concat=False, show_plugins=False, show_schema_path=False)`
 
 Run KIMMDY from python.
 
@@ -64,10 +64,12 @@ Like gromacs ``gmx <command>``?
 
 #### Parameters
 
-| Name         | Type   | Description                                                                               | Default              |
-|--------------|--------|-------------------------------------------------------------------------------------------|----------------------|
-| `input`      | Path   | kimmdy input yml file.                                                                    | `Path('kimmdy.yml')` |
-| `loglevel`   | str    | Loglevel. One of ["INFO", "WARNING", "MESSAGE", "DEBUG"]                                  | `'DEBUG'`            |
-| `logfile`    | Path   | File path of the logfile.                                                                 | `Path('kimmdy.log')` |
-| `checkpoint` | str    | File path if a kimmdy.cpt file to restart KIMMDY from a checkpoint.                       | `''`                 |
-| `concat`     | bool   | Don't perform a full KIMMDY run but instead concatenate trajectories from a previous run. | `False`              |
+| Name               | Type   | Description                                                                               | Default              |
+|--------------------|--------|-------------------------------------------------------------------------------------------|----------------------|
+| `input`            | Path   | kimmdy input yml file.                                                                    | `Path('kimmdy.yml')` |
+| `loglevel`         | str    | Loglevel. One of ["INFO", "WARNING", "MESSAGE", "DEBUG"]                                  | `'DEBUG'`            |
+| `logfile`          | Path   | File path of the logfile.                                                                 | `Path('kimmdy.log')` |
+| `checkpoint`       | str    | File path if a kimmdy.cpt file to restart KIMMDY from a checkpoint.                       | `''`                 |
+| `concat`           | bool   | Don't perform a full KIMMDY run but instead concatenate trajectories from a previous run. | `False`              |
+| `show_plugins`     | bool   | Show available plugins and exit.                                                          | `False`              |
+| `show_schema_path` | bool   | Print path to yaml schema for use with yaml-language-server e.g. in VSCode and Neovim     | `False`              |

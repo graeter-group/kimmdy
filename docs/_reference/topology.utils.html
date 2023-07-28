@@ -30,8 +30,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../_reference/utils.html" rel="next">
-<link href="../_reference/topology.topology.html" rel="prev">
+<link href="../_reference/topology.atomic.html" rel="next">
+<link href="../_reference/topology.ff.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -133,7 +133,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../_reference/index.html">Reference</a></li><li class="breadcrumb-item"><a href="../_reference/topology.utils.html">topology.utils</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../_reference/index.html">Reference</a></li><li class="breadcrumb-item"><a href="../_reference/topology.topology.html">Topology</a></li><li class="breadcrumb-item"><a href="../_reference/topology.utils.html">topology.utils</a></li></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -160,21 +160,32 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">Getting Started</span></a>
   </div>
 </li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../guide/user/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">User</span></a>
-  </div>
-</li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../guide/developer/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Developer</span></a>
+            <a href="../guide/user/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">User</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guide/user/options.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">KIMMDY Options</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../guide/developer/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Developer</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../guide/developer/plugins.html" class="sidebar-item-text sidebar-link">
@@ -193,29 +204,84 @@ ul.task-list li input[type="checkbox"] {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../_reference/index.html" class="sidebar-item-text sidebar-link">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">
  <span class="menu-text">Reference</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/changemanager.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">changemanager</span></a>
+  <a href="../_reference/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Reference</span></a>
   </div>
 </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="false">
+ <span class="menu-text">API</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../_reference/cmd.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">cmd</span></a>
   </div>
 </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="true">
+ <span class="menu-text">Topology</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/config.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">config</span></a>
+  <a href="../_reference/topology.topology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">topology.topology</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/topology.ff.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">topology.ff</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/topology.utils.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">topology.utils</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/topology.atomic.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">topology.atomic</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="false">
+ <span class="menu-text">Modules</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/changemanager.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">changemanager</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -228,6 +294,12 @@ ul.task-list li input[type="checkbox"] {
   <div class="sidebar-item-container"> 
   <a href="../_reference/coordinates.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">coordinates</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/config.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">config</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -250,18 +322,6 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/reaction.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">reaction</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../_reference/reactions.homolysis.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">reactions.homolysis</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="../_reference/runmanager.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">runmanager</span></a>
   </div>
@@ -274,34 +334,41 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/topology.atomic.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">topology.atomic</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../_reference/topology.ff.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">topology.ff</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../_reference/topology.topology.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">topology.topology</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../_reference/topology.utils.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">topology.utils</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="../_reference/utils.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">utils</span></a>
   </div>
 </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" aria-expanded="false">
+ <span class="menu-text">Reaction Plugins</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/homolysis.reaction.Homolysis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">homolysis.reaction.Homolysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/hat_naive.reaction.NaiveHAT.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">hat_naive.reaction.NaiveHAT</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/dummyreaction.reaction.DummyReaction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">dummyreaction.reaction.DummyReaction</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
       </ul>
   </li>
     </ul>
@@ -315,20 +382,11 @@ ul.task-list li input[type="checkbox"] {
    
   <ul>
   <li><a href="#kimmdy.topology.utils" id="toc-kimmdy.topology.utils" class="nav-link active" data-scroll-target="#kimmdy.topology.utils">topology.utils</a>
-  <ul class="collapse">
+  <ul>
   <li><a href="#functions" id="toc-functions" class="nav-link" data-scroll-target="#functions">Functions</a>
-  <ul class="collapse">
-  <li><a href="#kimmdy.topology.utils.attributes_to_list" id="toc-kimmdy.topology.utils.attributes_to_list" class="nav-link" data-scroll-target="#kimmdy.topology.utils.attributes_to_list">attributes_to_list</a></li>
-  <li><a href="#kimmdy.topology.utils.field_or_none" id="toc-kimmdy.topology.utils.field_or_none" class="nav-link" data-scroll-target="#kimmdy.topology.utils.field_or_none">field_or_none</a></li>
-  <li><a href="#kimmdy.topology.utils.get_by_permutations" id="toc-kimmdy.topology.utils.get_by_permutations" class="nav-link" data-scroll-target="#kimmdy.topology.utils.get_by_permutations">get_by_permutations</a></li>
-  <li><a href="#kimmdy.topology.utils.get_element_id" id="toc-kimmdy.topology.utils.get_element_id" class="nav-link" data-scroll-target="#kimmdy.topology.utils.get_element_id">get_element_id</a></li>
+  <ul>
   <li><a href="#kimmdy.topology.utils.get_protein_section" id="toc-kimmdy.topology.utils.get_protein_section" class="nav-link" data-scroll-target="#kimmdy.topology.utils.get_protein_section">get_protein_section</a></li>
   <li><a href="#kimmdy.topology.utils.get_top_section" id="toc-kimmdy.topology.utils.get_top_section" class="nav-link" data-scroll-target="#kimmdy.topology.utils.get_top_section">get_top_section</a></li>
-  <li><a href="#kimmdy.topology.utils.is_not_none" id="toc-kimmdy.topology.utils.is_not_none" class="nav-link" data-scroll-target="#kimmdy.topology.utils.is_not_none">is_not_none</a></li>
-  <li><a href="#kimmdy.topology.utils.match_atomic_item_to_atomic_type" id="toc-kimmdy.topology.utils.match_atomic_item_to_atomic_type" class="nav-link" data-scroll-target="#kimmdy.topology.utils.match_atomic_item_to_atomic_type">match_atomic_item_to_atomic_type</a></li>
-  <li><a href="#kimmdy.topology.utils.match_attr" id="toc-kimmdy.topology.utils.match_attr" class="nav-link" data-scroll-target="#kimmdy.topology.utils.match_attr">match_attr</a></li>
-  <li><a href="#kimmdy.topology.utils.match_id_to_patch" id="toc-kimmdy.topology.utils.match_id_to_patch" class="nav-link" data-scroll-target="#kimmdy.topology.utils.match_id_to_patch">match_id_to_patch</a></li>
-  <li><a href="#kimmdy.topology.utils.match_multi_attr" id="toc-kimmdy.topology.utils.match_multi_attr" class="nav-link" data-scroll-target="#kimmdy.topology.utils.match_multi_attr">match_multi_attr</a></li>
   <li><a href="#kimmdy.topology.utils.set_protein_section" id="toc-kimmdy.topology.utils.set_protein_section" class="nav-link" data-scroll-target="#kimmdy.topology.utils.set_protein_section">set_protein_section</a></li>
   <li><a href="#kimmdy.topology.utils.set_top_section" id="toc-kimmdy.topology.utils.set_top_section" class="nav-link" data-scroll-target="#kimmdy.topology.utils.set_top_section">set_top_section</a></li>
   </ul></li>
@@ -355,22 +413,6 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
-<td><a href="#kimmdy.topology.utils.attributes_to_list">attributes_to_list</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.utils.field_or_none">field_or_none</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.utils.get_by_permutations">get_by_permutations</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.utils.get_element_id">get_element_id</a></td>
-<td></td>
-</tr>
-<tr class="odd">
 <td><a href="#kimmdy.topology.utils.get_protein_section">get_protein_section</a></td>
 <td>Get content of a section in the first moleculetype (protein) from a topology dict.</td>
 </tr>
@@ -379,51 +421,15 @@ ul.task-list li input[type="checkbox"] {
 <td>Get content of a section from a topology dict.</td>
 </tr>
 <tr class="odd">
-<td><a href="#kimmdy.topology.utils.is_not_none">is_not_none</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.utils.match_atomic_item_to_atomic_type">match_atomic_item_to_atomic_type</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.utils.match_attr">match_attr</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.utils.match_id_to_patch">match_id_to_patch</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.topology.utils.match_multi_attr">match_multi_attr</a></td>
-<td></td>
-</tr>
-<tr class="even">
 <td><a href="#kimmdy.topology.utils.set_protein_section">set_protein_section</a></td>
 <td>Set content of a section in the first moleculetype (protein) from a topology dict.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#kimmdy.topology.utils.set_top_section">set_top_section</a></td>
 <td>Set content of a section from a topology dict.</td>
 </tr>
 </tbody>
 </table>
-<section id="kimmdy.topology.utils.attributes_to_list" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.topology.utils.attributes_to_list">attributes_to_list</h3>
-<p><code>topology.utils.attributes_to_list(obj)</code></p>
-</section>
-<section id="kimmdy.topology.utils.field_or_none" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.topology.utils.field_or_none">field_or_none</h3>
-<p><code>topology.utils.field_or_none(l, i)</code></p>
-</section>
-<section id="kimmdy.topology.utils.get_by_permutations" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.topology.utils.get_by_permutations">get_by_permutations</h3>
-<p><code>topology.utils.get_by_permutations(d, key)</code></p>
-</section>
-<section id="kimmdy.topology.utils.get_element_id" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.topology.utils.get_element_id">get_element_id</h3>
-<p><code>topology.utils.get_element_id(e)</code></p>
-</section>
 <section id="kimmdy.topology.utils.get_protein_section" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.utils.get_protein_section">get_protein_section</h3>
 <p><code>topology.utils.get_protein_section(top, name)</code></p>
@@ -433,26 +439,6 @@ ul.task-list li input[type="checkbox"] {
 <h3 class="anchored" data-anchor-id="kimmdy.topology.utils.get_top_section">get_top_section</h3>
 <p><code>topology.utils.get_top_section(top, name, moleculetype=None)</code></p>
 <p>Get content of a section from a topology dict. By resolving any <code>#ifdef</code> statements by check in the top[‘define’] dict and choosing the ‘content’ or ‘else_content’ depending on the result.</p>
-</section>
-<section id="kimmdy.topology.utils.is_not_none" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.topology.utils.is_not_none">is_not_none</h3>
-<p><code>topology.utils.is_not_none(x)</code></p>
-</section>
-<section id="kimmdy.topology.utils.match_atomic_item_to_atomic_type" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.topology.utils.match_atomic_item_to_atomic_type">match_atomic_item_to_atomic_type</h3>
-<p><code>topology.utils.match_atomic_item_to_atomic_type(id, types)</code></p>
-</section>
-<section id="kimmdy.topology.utils.match_attr" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.topology.utils.match_attr">match_attr</h3>
-<p><code>topology.utils.match_attr(patches, attr, m)</code></p>
-</section>
-<section id="kimmdy.topology.utils.match_id_to_patch" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.topology.utils.match_id_to_patch">match_id_to_patch</h3>
-<p><code>topology.utils.match_id_to_patch(id, patches)</code></p>
-</section>
-<section id="kimmdy.topology.utils.match_multi_attr" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.topology.utils.match_multi_attr">match_multi_attr</h3>
-<p><code>topology.utils.match_multi_attr(patches, attrs, m)</code></p>
 </section>
 <section id="kimmdy.topology.utils.set_protein_section" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.utils.set_protein_section">set_protein_section</h3>
@@ -912,13 +898,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../_reference/topology.topology.html" class="pagination-link">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">topology.topology</span>
+      <a href="../_reference/topology.ff.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">topology.ff</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../_reference/utils.html" class="pagination-link">
-        <span class="nav-page-text">utils</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../_reference/topology.atomic.html" class="pagination-link">
+        <span class="nav-page-text">topology.atomic</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

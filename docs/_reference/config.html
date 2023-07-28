@@ -30,8 +30,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../_reference/constants.html" rel="next">
-<link href="../_reference/cmd.html" rel="prev">
+<link href="../_reference/kmc.html" rel="next">
+<link href="../_reference/coordinates.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -133,7 +133,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../_reference/index.html">Reference</a></li><li class="breadcrumb-item"><a href="../_reference/config.html">config</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../_reference/index.html">Reference</a></li><li class="breadcrumb-item"><a href="../_reference/changemanager.html">Modules</a></li><li class="breadcrumb-item"><a href="../_reference/config.html">config</a></li></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -160,21 +160,32 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">Getting Started</span></a>
   </div>
 </li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../guide/user/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">User</span></a>
-  </div>
-</li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../guide/developer/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Developer</span></a>
+            <a href="../guide/user/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">User</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guide/user/options.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">KIMMDY Options</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../guide/developer/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Developer</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../guide/developer/plugins.html" class="sidebar-item-text sidebar-link">
@@ -193,29 +204,84 @@ ul.task-list li input[type="checkbox"] {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../_reference/index.html" class="sidebar-item-text sidebar-link">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">
  <span class="menu-text">Reference</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/changemanager.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">changemanager</span></a>
+  <a href="../_reference/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Reference</span></a>
   </div>
 </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="false">
+ <span class="menu-text">API</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../_reference/cmd.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">cmd</span></a>
   </div>
 </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="false">
+ <span class="menu-text">Topology</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/config.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">config</span></a>
+  <a href="../_reference/topology.topology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">topology.topology</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/topology.ff.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">topology.ff</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/topology.utils.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">topology.utils</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/topology.atomic.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">topology.atomic</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="true">
+ <span class="menu-text">Modules</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth2 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/changemanager.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">changemanager</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -228,6 +294,12 @@ ul.task-list li input[type="checkbox"] {
   <div class="sidebar-item-container"> 
   <a href="../_reference/coordinates.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">coordinates</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/config.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">config</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -250,18 +322,6 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/reaction.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">reaction</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../_reference/reactions.homolysis.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">reactions.homolysis</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="../_reference/runmanager.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">runmanager</span></a>
   </div>
@@ -274,34 +334,41 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/topology.atomic.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">topology.atomic</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../_reference/topology.ff.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">topology.ff</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../_reference/topology.topology.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">topology.topology</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../_reference/topology.utils.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">topology.utils</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="../_reference/utils.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">utils</span></a>
   </div>
 </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" aria-expanded="false">
+ <span class="menu-text">Reaction Plugins</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/homolysis.reaction.Homolysis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">homolysis.reaction.Homolysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/hat_naive.reaction.NaiveHAT.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">hat_naive.reaction.NaiveHAT</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/dummyreaction.reaction.DummyReaction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">dummyreaction.reaction.DummyReaction</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
       </ul>
   </li>
     </ul>
@@ -315,23 +382,19 @@ ul.task-list li input[type="checkbox"] {
    
   <ul>
   <li><a href="#kimmdy.config" id="toc-kimmdy.config" class="nav-link active" data-scroll-target="#kimmdy.config">config</a>
-  <ul class="collapse">
+  <ul>
   <li><a href="#attributes" id="toc-attributes" class="nav-link" data-scroll-target="#attributes">Attributes</a></li>
   <li><a href="#classes" id="toc-classes" class="nav-link" data-scroll-target="#classes">Classes</a>
+  <ul>
+  <li><a href="#kimmdy.config.Config" id="toc-kimmdy.config.Config" class="nav-link" data-scroll-target="#kimmdy.config.Config">Config</a>
   <ul class="collapse">
-  <li><a href="#kimmdy.config.ChangerConfig" id="toc-kimmdy.config.ChangerConfig" class="nav-link" data-scroll-target="#kimmdy.config.ChangerConfig">ChangerConfig</a></li>
-  <li><a href="#kimmdy.config.Config" id="toc-kimmdy.config.Config" class="nav-link" data-scroll-target="#kimmdy.config.Config">Config</a></li>
-  <li><a href="#kimmdy.config.HomolysisConfig" id="toc-kimmdy.config.HomolysisConfig" class="nav-link" data-scroll-target="#kimmdy.config.HomolysisConfig">HomolysisConfig</a></li>
-  <li><a href="#kimmdy.config.MDrefConfig" id="toc-kimmdy.config.MDrefConfig" class="nav-link" data-scroll-target="#kimmdy.config.MDrefConfig">MDrefConfig</a></li>
-  <li><a href="#kimmdy.config.Mds" id="toc-kimmdy.config.Mds" class="nav-link" data-scroll-target="#kimmdy.config.Mds">Mds</a></li>
-  <li><a href="#kimmdy.config.PullConfig" id="toc-kimmdy.config.PullConfig" class="nav-link" data-scroll-target="#kimmdy.config.PullConfig">PullConfig</a></li>
-  <li><a href="#kimmdy.config.ReactionsConfig" id="toc-kimmdy.config.ReactionsConfig" class="nav-link" data-scroll-target="#kimmdy.config.ReactionsConfig">ReactionsConfig</a></li>
-  <li><a href="#kimmdy.config.Sequence" id="toc-kimmdy.config.Sequence" class="nav-link" data-scroll-target="#kimmdy.config.Sequence">Sequence</a></li>
-  <li><a href="#kimmdy.config.SequenceConfig" id="toc-kimmdy.config.SequenceConfig" class="nav-link" data-scroll-target="#kimmdy.config.SequenceConfig">SequenceConfig</a></li>
+  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
+  <ul class="collapse">
+  <li><a href="#kimmdy.config.Config.attr" id="toc-kimmdy.config.Config.attr" class="nav-link" data-scroll-target="#kimmdy.config.Config.attr">attr</a></li>
+  <li><a href="#kimmdy.config.Config.get_attributes" id="toc-kimmdy.config.Config.get_attributes" class="nav-link" data-scroll-target="#kimmdy.config.Config.get_attributes">get_attributes</a></li>
   </ul></li>
-  <li><a href="#functions" id="toc-functions" class="nav-link" data-scroll-target="#functions">Functions</a>
-  <ul class="collapse">
-  <li><a href="#kimmdy.config.check_file_exists" id="toc-kimmdy.config.check_file_exists" class="nav-link" data-scroll-target="#kimmdy.config.check_file_exists">check_file_exists</a></li>
+  </ul></li>
   </ul></li>
   </ul></li>
   </ul>
@@ -357,16 +420,8 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
-<td><a href="#kimmdy.config.inp_file">inp_file</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.config.schema">schema</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.config.type_scheme">type_scheme</a></td>
-<td></td>
+<td><a href="#kimmdy.config.GMX_BUILTIN_FF_DIR">GMX_BUILTIN_FF_DIR</a></td>
+<td>Path to gromacs data directory with the built-in forcefields.</td>
 </tr>
 </tbody>
 </table>
@@ -382,78 +437,23 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
-<td><a href="#kimmdy.config.ChangerConfig">ChangerConfig</a></td>
-<td></td>
-</tr>
-<tr class="even">
 <td><a href="#kimmdy.config.Config">Config</a></td>
 <td>Internal representation of the configuration generated</td>
 </tr>
-<tr class="odd">
-<td><a href="#kimmdy.config.HomolysisConfig">HomolysisConfig</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.config.MDrefConfig">MDrefConfig</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.config.Mds">Mds</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.config.PullConfig">PullConfig</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.config.ReactionsConfig">ReactionsConfig</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.config.Sequence">Sequence</a></td>
-<td>A sequence of tasks.</td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.config.SequenceConfig">SequenceConfig</a></td>
-<td></td>
-</tr>
 </tbody>
 </table>
-<section id="kimmdy.config.ChangerConfig" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.config.ChangerConfig">ChangerConfig</h3>
-<p><code>config.ChangerConfig()</code></p>
-<section id="attributes-1" class="level4">
-<h4 class="anchored" data-anchor-id="attributes-1">Attributes</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.config.ChangerConfig.coordinates">coordinates</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-</section>
-</section>
 <section id="kimmdy.config.Config" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.config.Config">Config</h3>
-<p><code>config.Config(self, input_file=None, recursive_dict=None, type_scheme=type_scheme)</code></p>
-<p>Internal representation of the configuration generated from the input file, which enables validation before running and computationally expensive operations. All settings read from the input file are accessible through nested attributes.</p>
-<p>TODO: think about how much the type annotations on here can lie.</p>
-<p>Attributes run: int experiment: str name: str # TODO: obsolete?? dryrun: bool iterations: int out: Path gromacs_alias: str ff: Path ffpatch: Optional[Path] top: Path gro: Path ndx: Path mds: dict changer: ChangerConfig reactions: ReactionsConfig pull: PullConfig sequence: SequenceConfig</p>
+<p><code>config.Config(self, input_file=None, recursive_dict=None, scheme=None, section='config')</code></p>
+<p>Internal representation of the configuration generated from the input file, which enables validation before running and computationally expensive operations.</p>
 <section id="parameters" class="level4">
 <h4 class="anchored" data-anchor-id="parameters">Parameters</h4>
 <table class="table">
 <colgroup>
-<col style="width: 16%">
-<col style="width: 7%">
-<col style="width: 61%">
-<col style="width: 14%">
+<col style="width: 9%">
+<col style="width: 11%">
+<col style="width: 72%">
+<col style="width: 6%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -466,114 +466,27 @@ ul.task-list li input[type="checkbox"] {
 <tbody>
 <tr class="odd">
 <td><code>input_file</code></td>
-<td>Path</td>
+<td>pathlib.Path | None</td>
 <td>Path to the config yaml file.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="even">
 <td><code>recursive_dict</code></td>
-<td>dict</td>
+<td>dict | None</td>
 <td>For internal use only, used in reading settings in recursively.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="odd">
-<td><code>type_scheme</code></td>
-<td>dict</td>
-<td>dict containing types for casting and validating settings.</td>
-<td><code>type_scheme</code></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="attributes-2" class="level4">
-<h4 class="anchored" data-anchor-id="attributes-2">Attributes</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.config.Config.changer">changer</a></td>
-<td></td>
+<td><code>scheme</code></td>
+<td>dict | None</td>
+<td>dict containing types and defaults for casting and validating settings.</td>
+<td><code>None</code></td>
 </tr>
 <tr class="even">
-<td><a href="#kimmdy.config.Config.cwd">cwd</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.config.Config.dryrun">dryrun</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.config.Config.experiment">experiment</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.config.Config.ff">ff</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.config.Config.ffpatch">ffpatch</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.config.Config.gro">gro</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.config.Config.gromacs_alias">gromacs_alias</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.config.Config.iterations">iterations</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.config.Config.mds">mds</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.config.Config.name">name</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.config.Config.ndx">ndx</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.config.Config.out">out</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.config.Config.pull">pull</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.config.Config.raw">raw</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.config.Config.reactions">reactions</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.config.Config.run">run</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.config.Config.sequence">sequence</a></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.config.Config.top">top</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.config.Config.type_scheme">type_scheme</a></td>
-<td></td>
+<td><code>section</code></td>
+<td>str</td>
+<td>current section e.g.&nbsp;to determine the level of recursion in nested configs e.g.&nbsp;“config”, “config.mds” or “config.reactions.homolysis”</td>
+<td><code>'config'</code></td>
 </tr>
 </tbody>
 </table>
@@ -607,153 +520,10 @@ ul.task-list li input[type="checkbox"] {
 <h5 class="anchored" data-anchor-id="kimmdy.config.Config.get_attributes">get_attributes</h5>
 <p><code>config.Config.get_attributes(self)</code></p>
 <p>Get a list of all attributes</p>
-</section>
-</section>
-</section>
-<section id="kimmdy.config.HomolysisConfig" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.config.HomolysisConfig">HomolysisConfig</h3>
-<p><code>config.HomolysisConfig()</code></p>
-<section id="attributes-3" class="level4">
-<h4 class="anchored" data-anchor-id="attributes-3">Attributes</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.config.HomolysisConfig.dat">dat</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.config.HomolysisConfig.itp">itp</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-</section>
-</section>
-<section id="kimmdy.config.MDrefConfig" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.config.MDrefConfig">MDrefConfig</h3>
-<p><code>config.MDrefConfig()</code></p>
-<section id="attributes-4" class="level4">
-<h4 class="anchored" data-anchor-id="attributes-4">Attributes</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.config.MDrefConfig.md">md</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.config.MDrefConfig.md_parameter_growth">md_parameter_growth</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-</section>
-</section>
-<section id="kimmdy.config.Mds" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.config.Mds">Mds</h3>
-<p><code>config.Mds(self)</code></p>
-</section>
-<section id="kimmdy.config.PullConfig" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.config.PullConfig">PullConfig</h3>
-<p><code>config.PullConfig()</code></p>
-<section id="attributes-5" class="level4">
-<h4 class="anchored" data-anchor-id="attributes-5">Attributes</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.config.PullConfig.mdp">mdp</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-</section>
-</section>
-<section id="kimmdy.config.ReactionsConfig" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.config.ReactionsConfig">ReactionsConfig</h3>
-<p><code>config.ReactionsConfig()</code></p>
-<section id="attributes-6" class="level4">
-<h4 class="anchored" data-anchor-id="attributes-6">Attributes</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.config.ReactionsConfig.homolysis">homolysis</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-</section>
-</section>
-<section id="kimmdy.config.Sequence" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.config.Sequence">Sequence</h3>
-<p><code>config.Sequence(self, tasks)</code></p>
-<p>A sequence of tasks.</p>
-</section>
-<section id="kimmdy.config.SequenceConfig" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.config.SequenceConfig">SequenceConfig</h3>
-<p><code>config.SequenceConfig()</code></p>
-<section id="attributes-7" class="level4">
-<h4 class="anchored" data-anchor-id="attributes-7">Attributes</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.config.SequenceConfig.tasks">tasks</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-</section>
-</section>
-</section>
-<section id="functions" class="level2">
-<h2 class="anchored" data-anchor-id="functions">Functions</h2>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.config.check_file_exists">check_file_exists</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-<section id="kimmdy.config.check_file_exists" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.config.check_file_exists">check_file_exists</h3>
-<p><code>config.check_file_exists(p)</code></p>
 
 
+</section>
+</section>
 </section>
 </section>
 </section>
@@ -1201,13 +971,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../_reference/cmd.html" class="pagination-link">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">cmd</span>
+      <a href="../_reference/coordinates.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">coordinates</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../_reference/constants.html" class="pagination-link">
-        <span class="nav-page-text">constants</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../_reference/kmc.html" class="pagination-link">
+        <span class="nav-page-text">kmc</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
