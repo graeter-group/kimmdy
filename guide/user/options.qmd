@@ -54,8 +54,13 @@ from kimmdy.config import Config
 from pathlib import Path
 import os
 
+try:
+  os.chdir("example/example_ala/")
+except:
+  pass
+
 config = Config(Path('kimmdy.yml'))
-config
+config.reactions
 ```
 
 ## Example `kimmdy.yml` Files

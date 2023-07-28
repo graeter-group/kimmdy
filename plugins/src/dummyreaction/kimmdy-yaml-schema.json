@@ -1,5 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dummyreaction-config",
   "type": "object",
   "description": "This reaction does _nothing_ and is only here to demonstrate the syntax.",
   "additionalProperties": false,

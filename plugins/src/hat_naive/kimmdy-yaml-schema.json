@@ -1,6 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
+  "$id": "hat_naive-config",
   "description": "Settings for naive HAT reaction",
   "additionalProperties": false,
   "properties": {

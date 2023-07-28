@@ -15,7 +15,7 @@ changer:
   coordinates:
     md: 'relax'
 reactions:
-  hat_naive:
+  hat_naive: {}
   # HAT_dummy:
     #tprpath: 'md.tpr'
     #trrpath: 'md.trr'
