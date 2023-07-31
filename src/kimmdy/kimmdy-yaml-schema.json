@@ -63,6 +63,12 @@
       "pytype": "str",
       "default": "gmx"
     },
+    "gmx_mdrun_flags": {
+      "description": "Flags passed to gmx mdrun. e.g. `-nt 8 -maxh 24`",
+      "type": "string",
+      "pytype": "str",
+      "default": "-maxh 24 -dlb yes"
+    },
     "ff": {
       "description": "Force field directory (looks for .ff in cwd if not set)",
       "type": "string",
