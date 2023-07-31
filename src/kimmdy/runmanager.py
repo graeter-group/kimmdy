@@ -270,6 +270,7 @@ class RunManager:
         files = self._create_task_directory(f"{instance}")
         md_config = self.config.mds.attr(instance)
         gmx_alias = self.config.gromacs_alias
+        gmx_mdrun_flags = self.config.gmx_mdrun_flags
 
         logging.warning(self.latest_files)
         top = files.input["top"]
@@ -278,9 +279,6 @@ class RunManager:
         ndx = files.input["ndx"]
 
         outputdir = files.outputdir
-        # make maxh and ntomp accessible?
-        maxh = 24
-        ntomp = 2
 
         grompp_cmd = (
             f"{gmx_alias} grompp -p {top} -c {gro} "
@@ -301,7 +299,7 @@ class RunManager:
             f"-px {instance}_pullx.xvg -pf {instance}_pullf.xvg "
             f"-ro {instance}-rotation.xvg -ra {instance}-rotangles.log "
             f"-rs {instance}-rotslabs.log -rt {instance}-rottorque.log "
-            f"-maxh {maxh} -dlb yes "
+            f"{gmx_mdrun_flags}  "
         )
         # -ntomp {ntomp} removed for now
         # like this, the previous checkpoint file would not be used,
