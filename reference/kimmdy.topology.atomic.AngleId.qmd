@@ -1,3 +1,0 @@
-# AngleId { #kimmdy.topology.atomic.AngleId }
-
-`topology.atomic.AngleId`

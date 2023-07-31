@@ -1,10 +1,11 @@
 project:
+  title: KIMMDY
   type: website
   output-dir: docs
   render:
     - index.qmd
-    - reference
-    - guide/*.qmd
+    - _reference
+    - guide
 
 
 website:
@@ -17,8 +18,6 @@ website:
   navbar:
     background: light
     tools:
-      - icon: house-fill
-        href: https://www.h-its.org/research/mbm/
       - icon: github
         menu:
           - text: Source Code
@@ -26,20 +25,50 @@ website:
           - text: Report a Bug
             url:  https://github.com/hits-mbm-dev/kimmdy/issues/new
     left:
-      - file: index.qmd
-        text: KIMMDY
       - file: ./guide/getting-started.qmd
         text: Getting Started 
-      - file: ./guide/plugins.qmd
-        text: Reaction Plugins
-      - file: ./guide/topology.qmd
-        text: Development
-      - file: reference/index.qmd
+      - file: ./guide/index.qmd
+        text: Guide
+      - file: _reference/index.qmd
         text: Reference
+  sidebar:
+    subtitle: "Reactive MD pipeline for GROMACS using Kinetic Monte Carlo / Molecular Dynamic"
+    style: "docked"
+    contents:
+      - section: Guide
+        contents: guide/**
+      - section: Reference
+        contents:
+        - _reference/index.qmd
+        - contents:
+          - _reference/cmd.qmd
+          section: API
+        - contents:
+          - _reference/topology.topology.qmd
+          - _reference/topology.ff.qmd
+          - _reference/topology.utils.qmd
+          - _reference/topology.atomic.qmd
+          section: Topology
+        - contents:
+          - _reference/changemanager.qmd
+          - _reference/constants.qmd
+          - _reference/coordinates.qmd
+          - _reference/config.qmd
+          - _reference/kmc.qmd
+          - _reference/misc_helper.qmd
+          - _reference/parsing.qmd
+          - _reference/runmanager.qmd
+          - _reference/tasks.qmd
+          - _reference/utils.qmd
+          section: Modules
+        - contents:
+          - _reference/homolysis.reaction.Homolysis.qmd
+          - _reference/hat_naive.reaction.NaiveHAT.qmd
+          - _reference/dummyreaction.reaction.DummyReaction.qmd
+          section: Reaction Plugins
 
-# tell quarto to read the generated sidebar
-metadata-files:
-  - _sidebar.yml
+# metadata-files:
+#   - _sidebar.yml
 
 execute:
   warning: false
@@ -48,6 +77,7 @@ execute:
 format:
   html:
     toc: true
+    toc-depth: 5
     mainfont: Roboto
     number-depth: 0
     theme:
@@ -70,89 +100,43 @@ interlinks:
     python:
       url: https://docs.python.org/3.10/
 
-# TODO: interlinks fails for some cases
-# things where there is a page for the module
-# and one page for the class can't resolve the
-# interlinks.
-# WHy aren't classes added to the same page as the module?
-
 quartodoc:
+  sidebar: "_sidebar.yml"
+  title: "Reference"
   package: kimmdy
-  sidebar: _sidebar.yml
   style: pkgdown
-  dir: reference
-
+  dir: _reference
   sections:
     - title: API
       desc: Start KIMMDY from a python script or the command line
       contents:
         - name: cmd
-          children: flat
+    - title: Topology
+      desc: Topology modules
+      contents:
+        - name: topology.topology
+        - name: topology.ff
+        - name: topology.utils
+        - name: topology.atomic
     - title: Modules
       desc: Modules
       contents:
         - name: changemanager
         - name: constants
         - name: coordinates
+        - name: config
         - name: kmc
         - name: misc_helper
         - name: parsing
         - name: runmanager
         - name: tasks
         - name: utils
-    - title: Other classes
-      desc: TODO
-      contents:
-        - name: runmanager.RunManager
-    - title: Topology
-      desc: Topology classes
-      contents:
-        - name: topology.topology.Topology
-        - name: topology.ff
-        - name: topology.utils
-    - title: Atomic types
-      desc: Internal representations of topology and forcfield entities
-      contents:
-        - name: topology.atomic
-        - name: topology.atomic.Atom
-        - name: topology.atomic.AtomType
-        - name: topology.atomic.Bond
-        - name: topology.atomic.BondType
-        - name: topology.atomic.PositionRestraint
-        - name: topology.atomic.DihedralRestraint
-        - name: topology.atomic.Pair
-        - name: topology.atomic.Angle
-        - name: topology.atomic.AngleType
-        - name: topology.atomic.DihedralType
-        - name: topology.atomic.ResidueAtomSpec
-        - name: topology.atomic.ResidueBondSpec
-        - name: topology.atomic.ResidueImproperSpec
-        - name: topology.atomic.ResidueProperSpec
-        - name: topology.atomic.ResidueType
-    - title: Reactions
-      desc: Protocol to add a new reaction plugin to KIMMDY
-      contents:
-        - kind: auto
-          name: reaction
-          members:
-            - ReactionPlugin
-            - RecipeStep
-            - Break
-            - Bind
-            - Move
-            - SingleOperation
-            - Recipe
-            - RecipeCollection
-    - title: Config
-      desc: config
-      contents:
-        - kind: auto
-          name: config
-          members:
-            - Sequence
     - title: Reaction Plugins
-      desc: Reaction plugins bundled with KIMMDY
+      desc: Reaction plugins bundled with KIMMDY and the protocol to add a new reaction plugin to KIMMDY
+      package: null
       contents:
-        - name: reactions.homolysis
+        - homolysis.reaction.Homolysis
+        - hat_naive.reaction.NaiveHAT
+        - dummyreaction.reaction.DummyReaction
 
 

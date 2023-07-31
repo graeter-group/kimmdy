@@ -1,6 +1,0 @@
-# ResidueAtomSpec { #kimmdy.topology.atomic.ResidueAtomSpec }
-
-`topology.atomic.ResidueAtomSpec(name, type, charge, cgrp)`
-
-Information about one atom in a residue
-; name  type  charge  chargegroup

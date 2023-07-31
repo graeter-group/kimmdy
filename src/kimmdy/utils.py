@@ -184,6 +184,7 @@ def check_gmx_version(config):
         logging.error(m)
         raise SystemError(m)
 
+    # this should probably be a TODO: then
     # i hate this
     if (
         any(

@@ -1,0 +1,5 @@
+# hat_naive.reaction.NaiveHAT { #hat_naive.reaction.NaiveHAT }
+
+`reaction.NaiveHAT()`
+
+Naive HAT reaction, selects hydrogens at random

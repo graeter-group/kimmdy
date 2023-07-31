@@ -25,7 +25,9 @@ class Topology:
     """Smart container for parsed topology data.
 
     A topology keeps track of connections and applies patches to parameters when bonds are broken or formed.
+
     Assumptions:
+
     - the topology of interest (the protein) is in section 'moleculetype_0'.
 
     Parameters

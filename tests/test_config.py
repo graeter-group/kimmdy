@@ -6,8 +6,8 @@ import os
 
 
 def test_parse_config1_casting():
+    input_f = Path(__file__).parent / "test_files/test_config/config1.yml"
     try:
-        input_f = Path(__file__).parent / "test_files/config_test/config1.yml"
         os.chdir(input_f.parent)
         assert input_f.exists(), "Input file not found"
 
@@ -31,8 +31,8 @@ def test_parse_config1_casting():
 
 
 def test_parse_config2_missing_dat_in_plumed():
+    input_f = Path(__file__).parent / "test_files/test_config/config2.yml"
     try:
-        input_f = Path(__file__).parent / "test_files/config_test/config2.yml"
         os.chdir(input_f.parent)
         assert input_f.exists(), "Input file not found"
 
@@ -47,8 +47,8 @@ def test_parse_config2_missing_dat_in_plumed():
 
 
 def test_parse_config3_missing_mdp_file():
+    input_f = Path(__file__).parent / "test_files/test_config/config3.yml"
     try:
-        input_f = Path(__file__).parent / "test_files/config_test/config3.yml"
         os.chdir(input_f.parent)
         assert input_f.exists(), "Input file not found"
 
@@ -61,8 +61,8 @@ def test_parse_config3_missing_mdp_file():
 
 
 def test_parse_config4_sequence_missing_entry():
+    input_f = Path(__file__).parent / "test_files/test_config/config4.yml"
     try:
-        input_f = Path(__file__).parent / "test_files/config_test/config4.yml"
         os.chdir(input_f.parent)
         assert input_f.exists(), "Input file not found"
 
@@ -75,8 +75,8 @@ def test_parse_config4_sequence_missing_entry():
 
 
 def test_parse_config5_sequence_missing_entry_no_mds():
+    input_f = Path(__file__).parent / "test_files/test_config/config5.yml"
     try:
-        input_f = Path(__file__).parent / "test_files/config_test/config5.yml"
         os.chdir(input_f.parent)
         assert input_f.exists(), "Input file not found"
 
@@ -89,8 +89,8 @@ def test_parse_config5_sequence_missing_entry_no_mds():
 
 
 def test_parse_config6_changer_bad_reference():
+    input_f = Path(__file__).parent / "test_files/test_config/config6.yml"
     try:
-        input_f = Path(__file__).parent / "test_files/config_test/config6.yml"
         os.chdir(input_f.parent)
         assert input_f.exists(), "Input file not found"
 
@@ -103,8 +103,8 @@ def test_parse_config6_changer_bad_reference():
 
 
 def test_get_existing_files():
+    input_f = Path(__file__).parent / "test_files/test_config/config1.yml"
     try:
-        input_f = Path(__file__).parent / "test_files/config_test/config1.yml"
         os.chdir(input_f.parent)
         assert input_f.exists(), "Input file not found"
 

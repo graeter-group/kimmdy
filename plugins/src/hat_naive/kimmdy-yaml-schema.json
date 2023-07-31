@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "$id": "hat_naive-config",
+  "description": "Settings for naive HAT reaction",
+  "additionalProperties": false,
+  "properties": {
+    "frequency_factor": {
+      "type": "number",
+      "description": "Frequency factor",
+      "pytype": "float",
+      "default": 1,
+      "minimum": 1
+    },
+    "h_cutoff": {
+      "type": "number",
+      "description": "Cutoff for H atom",
+      "pytype": "float",
+      "default": 4
+    },
+    "polling_rate": {
+      "type": "number",
+      "description": "Polling rate",
+      "pytype": "float",
+      "default": 1
+    }
+  },
+  "required": [  ]
+}
+

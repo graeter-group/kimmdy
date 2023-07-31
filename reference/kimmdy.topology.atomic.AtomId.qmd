@@ -1,3 +1,0 @@
-# AtomId { #kimmdy.topology.atomic.AtomId }
-
-`topology.atomic.AtomId`

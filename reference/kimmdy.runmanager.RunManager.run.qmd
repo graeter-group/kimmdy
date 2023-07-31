@@ -1,3 +1,0 @@
-# run { #kimmdy.runmanager.RunManager.run }
-
-`runmanager.RunManager.run(self)`

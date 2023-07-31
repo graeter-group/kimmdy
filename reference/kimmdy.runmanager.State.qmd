@@ -1,6 +1,0 @@
-# State { #kimmdy.runmanager.State }
-
-`runmanager.State()`
-
-State of the system.
-one of IDLE, MD, REACTION, DONE.

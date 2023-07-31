@@ -1,6 +1,0 @@
-# ResidueBondSpec { #kimmdy.topology.atomic.ResidueBondSpec }
-
-`topology.atomic.ResidueBondSpec(atom1, atom2, b0=None, kb=None)`
-
-Information about one bond in a residue
-; atom1 atom2      b0      kb

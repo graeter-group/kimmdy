@@ -1,0 +1,220 @@
+# topology.atomic { #kimmdy.topology.atomic }
+
+`topology.atomic`
+
+Atomic datatypes for the topology such as Atom, Bond, Angle, Dihedral, etc.
+The order of the fields comes from the gromacs topology file format.
+See <https://manual.gromacs.org/current/reference-manual/topologies/topology-file-formats.html#topology-file>
+
+## Classes
+
+| Name | Description |
+| --- | --- |
+| [Angle](#kimmdy.topology.atomic.Angle) | Information about one angle |
+| [AngleType](#kimmdy.topology.atomic.AngleType) | Information about one angle |
+| [Atom](#kimmdy.topology.atomic.Atom) | Information about one atom |
+| [AtomType](#kimmdy.topology.atomic.AtomType) | Information about one atom |
+| [Bond](#kimmdy.topology.atomic.Bond) | Information about one bond |
+| [BondType](#kimmdy.topology.atomic.BondType) | Information about one bondtype |
+| [Dihedral](#kimmdy.topology.atomic.Dihedral) | Information about one proper or improper dihedral |
+| [DihedralRestraint](#kimmdy.topology.atomic.DihedralRestraint) | Information about one dihedral restraint. |
+| [DihedralType](#kimmdy.topology.atomic.DihedralType) | Information about one dihedral |
+| [MultipleDihedralTypes](#kimmdy.topology.atomic.MultipleDihedralTypes) | Multiple ``DihedralTypes``s with the same ai, aj, ak, al |
+| [MultipleDihedrals](#kimmdy.topology.atomic.MultipleDihedrals) | Multiple ``Dihedral``s with the same ai, aj, ak, al |
+| [Pair](#kimmdy.topology.atomic.Pair) | Information about one pair |
+| [PositionRestraint](#kimmdy.topology.atomic.PositionRestraint) | Information about one position restraint. |
+| [ResidueAtomSpec](#kimmdy.topology.atomic.ResidueAtomSpec) | Information about one atom in a residue |
+| [ResidueBondSpec](#kimmdy.topology.atomic.ResidueBondSpec) | Information about one bond in a residue |
+| [ResidueImproperSpec](#kimmdy.topology.atomic.ResidueImproperSpec) | Information about one imroper dihedral in a residue |
+| [ResidueProperSpec](#kimmdy.topology.atomic.ResidueProperSpec) | Information about one imroper dihedral in a residue |
+| [ResidueType](#kimmdy.topology.atomic.ResidueType) | Information about one residuetype from aminoacids.rtp |
+
+### Angle { #kimmdy.topology.atomic.Angle }
+
+`topology.atomic.Angle(ai, aj, ak, funct, c0=None, c1=None, c2=None, c3=None)`
+
+Information about one angle
+
+A class containing angle information as in the angles section of the topology.
+
+From gromacs topology:
+';', 'ai', 'aj', 'ak', 'funct', 'c0', 'c1', 'c2', 'c3'
+With aj < ai < ak
+
+### AngleType { #kimmdy.topology.atomic.AngleType }
+
+`topology.atomic.AngleType(i, j, k, id, id_sym, funct, c0=None, c1=None, c2=None, c3=None)`
+
+Information about one angle
+
+A class containing angle information as in the angles section of the topology.
+
+From gromacs topology:
+';', 'i', 'j', 'k', 'funct', 'c0', 'c1', 'c2', 'c3'
+where i,j,k are atomtypes
+
+### Atom { #kimmdy.topology.atomic.Atom }
+
+`topology.atomic.Atom(nr, type, resnr, residue, atom, cgnr, charge, mass, typeB=None, chargeB=None, massB=None, bound_to_nrs=field(default_factory=list), is_radical=False)`
+
+Information about one atom
+
+A class containing atom information as in the atoms section of the topology.
+An atom keeps a list of which atoms it is bound to.
+
+From gromacs topology:
+; nr type resnr residue atom cgnr charge mass typeB chargeB massB
+
+### AtomType { #kimmdy.topology.atomic.AtomType }
+
+`topology.atomic.AtomType(type, id_sym, at_num, mass, charge, ptype, sigma, epsilon, id)`
+
+Information about one atom
+
+A class containing atom information as in the atoms section of the topology.
+An atom keeps a list of which atoms it is bound to.
+
+From gromacs version of the amber* ff:
+; name      at.num  mass     charge ptype  sigma      epsilon
+
+### Bond { #kimmdy.topology.atomic.Bond }
+
+`topology.atomic.Bond(ai, aj, funct, c0=None, c1=None, c2=None, c3=None, c4=None, c5=None)`
+
+Information about one bond
+
+A class containing bond information as in the bonds section of the topology.
+From gromacs topology:
+'ai', 'aj', 'funct', 'c0', 'c1', 'c2', 'c3', 'c4', 'c5'
+With ai < aj
+
+### BondType { #kimmdy.topology.atomic.BondType }
+
+`topology.atomic.BondType(i, j, id, id_sym, funct, c0=None, c1=None, c2=None, c3=None)`
+
+Information about one bondtype
+
+A class containing bond information as in the bonds section of the topology.
+From gromacs topology:
+'i', 'j', 'funct', 'c0', 'c1', 'c2', 'c3
+Where i and j are atomtypes
+
+### Dihedral { #kimmdy.topology.atomic.Dihedral }
+
+`topology.atomic.Dihedral(ai, aj, ak, al, funct, c0=None, c1=None, periodicity='', c3=None, c4=None, c5=None)`
+
+Information about one proper or improper dihedral
+
+A class containing bond information as in the dihedrals section of the topology.
+Improper dihedrals have funct 4.
+Proper dihedrals have funct != 4. Mostly funct 9.
+
+Note that proper dihedrals of type 9 can be defined multiple times, for different
+periodicities. This is why would-be parameter c2 is called periodicity.
+
+From gromacs topology:
+';', 'ai', 'aj', 'ak', 'al', 'funct', 'c0', 'c1', 'periodicity', 'c3', 'c4', 'c5'
+For proper dihedrals (funct 9): aj < ak
+
+### DihedralRestraint { #kimmdy.topology.atomic.DihedralRestraint }
+
+`topology.atomic.DihedralRestraint(ai, aj, ak, al, type, phi, dphi, fc)`
+
+Information about one dihedral restraint.
+
+A class containing information as in the dihedral_restraints section of the topology.
+
+From gromacs topology:
+; ai   aj    ak    al  type  phi  dphi  fc
+
+### DihedralType { #kimmdy.topology.atomic.DihedralType }
+
+`topology.atomic.DihedralType(i, j, k, l, id, id_sym, funct, c0, c1, periodicity, c3=None, c4=None, c5=None)`
+
+Information about one dihedral
+
+A class containing bond information as in the dihedrals section of the topology.
+Proper dihedrals have funct 9.
+Improper dihedrals have funct 4.
+
+Note that proper dihedrals of type 9 can be defined multiple times, for different
+periodicities. This is why would-be parameter c2 is called periodicity and part of
+the `id`.
+
+From gromacs topology:
+';', 'i', 'j', 'k', 'l', 'funct', 'c0', 'c1', 'periodicity', 'c3', 'c4', 'c5'
+Where i,j,k,l are atomtypes
+
+### MultipleDihedralTypes { #kimmdy.topology.atomic.MultipleDihedralTypes }
+
+`topology.atomic.MultipleDihedralTypes(ai, aj, ak, al, funct, dihedral_types)`
+
+Multiple ``DihedralTypes``s with the same ai, aj, ak, al
+but different periodicities.
+funct should always be "9" when the length of dihedrals is > 1.
+The key of the dict is the periodicity (c2).
+
+### MultipleDihedrals { #kimmdy.topology.atomic.MultipleDihedrals }
+
+`topology.atomic.MultipleDihedrals(ai, aj, ak, al, funct, dihedrals)`
+
+Multiple ``Dihedral``s with the same ai, aj, ak, al
+but different periodicities.
+funct should always be "9" when the length of dihedrals is > 1.
+The key of the dict is the periodicity (c2).
+
+### Pair { #kimmdy.topology.atomic.Pair }
+
+`topology.atomic.Pair(ai, aj, funct, c0=None, c1=None, c2=None, c3=None)`
+
+Information about one pair
+
+A class containing pair information as in the pair section of the topology.
+
+From gromacs topology:
+ai', 'aj', 'funct', 'c0', 'c1', 'c2', 'c3'
+
+### PositionRestraint { #kimmdy.topology.atomic.PositionRestraint }
+
+`topology.atomic.PositionRestraint(ai, funct, fc, condition=None)`
+
+Information about one position restraint.
+
+A class containing information as in the position_restraints section of the topology.
+
+From gromacs topology:
+; ai   funct    fc(x,y,z)
+
+### ResidueAtomSpec { #kimmdy.topology.atomic.ResidueAtomSpec }
+
+`topology.atomic.ResidueAtomSpec(name, type, charge, cgrp)`
+
+Information about one atom in a residue
+; name  type  charge  chargegroup
+
+### ResidueBondSpec { #kimmdy.topology.atomic.ResidueBondSpec }
+
+`topology.atomic.ResidueBondSpec(atom1, atom2, b0=None, kb=None)`
+
+Information about one bond in a residue
+; atom1 atom2      b0      kb
+
+### ResidueImproperSpec { #kimmdy.topology.atomic.ResidueImproperSpec }
+
+`topology.atomic.ResidueImproperSpec(atom1, atom2, atom3, atom4, q0, cq)`
+
+Information about one imroper dihedral in a residue
+;atom1 atom2 atom3 atom4     q0     cq
+
+### ResidueProperSpec { #kimmdy.topology.atomic.ResidueProperSpec }
+
+`topology.atomic.ResidueProperSpec(atom1, atom2, atom3, atom4, q0)`
+
+Information about one imroper dihedral in a residue
+;atom1 atom2 atom3 atom4     q0     cq
+
+### ResidueType { #kimmdy.topology.atomic.ResidueType }
+
+`topology.atomic.ResidueType(residue, atoms, bonds, proper_dihedrals, improper_dihedrals)`
+
+Information about one residuetype from aminoacids.rtp

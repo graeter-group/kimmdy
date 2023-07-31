@@ -1,3 +1,0 @@
-# AMBIGUOUS_SUFFS { #kimmdy.runmanager.AMBIGUOUS_SUFFS }
-
-`runmanager.AMBIGUOUS_SUFFS`

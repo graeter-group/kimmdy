@@ -1,3 +1,0 @@
-# tasks { #kimmdy.runmanager.RunManager.tasks }
-
-`runmanager.RunManager.tasks`
