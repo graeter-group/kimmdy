@@ -23,6 +23,7 @@ from pprint import pformat
 from kimmdy import plugins
 from kimmdy.topology.topology import Topology
 from kimmdy.kmc import rf_kmc
+import time
 
 # file types of which there will be multiple files per type
 AMBIGUOUS_SUFFS = ["dat", "xvg", "log", "itp", "mdp"]
@@ -100,6 +101,7 @@ class RunManager:
     """
 
     def __init__(self, config: Config):
+        self.start_time = time.time()
         self.config: Config = config
         self.from_checkpoint: bool = False
         self.tasks: queue.Queue[Task] = queue.Queue()  # tasks from config

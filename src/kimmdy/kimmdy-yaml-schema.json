@@ -69,6 +69,13 @@
       "pytype": "str",
       "default": "-maxh 24 -dlb yes"
     },
+    "maxh": {
+      "description": "Maximum number of hours to run KIMMDY until it stops to aviod running out of time on the cluster. This enables graceful shutdown of KIMMDY and allows it to resume from the last checkpoint e.g. via a jobscript.",
+      "type": "integer",
+      "pytype": "int",
+      "default": 24,
+      "minimum": 1
+    },
     "ff": {
       "description": "Force field directory (looks for .ff in cwd if not set)",
       "type": "string",
