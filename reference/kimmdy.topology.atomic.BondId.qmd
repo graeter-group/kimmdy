@@ -1,3 +1,0 @@
-# BondId { #kimmdy.topology.atomic.BondId }
-
-`topology.atomic.BondId`

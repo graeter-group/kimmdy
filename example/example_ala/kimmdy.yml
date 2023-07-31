@@ -1,10 +1,12 @@
-dryrun: false
-iterations: 100
+# yaml-language-server: $schema=../../src/kimmdy/kimmdy-yaml-schema.json
+
 name: 'hat_tf_000'
+iterations: 100
+# ff: amber99sb-star-ildnp.ff
 gromacs_alias: 'gmx'
 top: 'Ala_out.top'
 gro: 'npt.gro'
-ndx: 'index.ndx'
+ndx: index.ndx
 mds:
   equilibrium:
     mdp: 'md.mdp'
@@ -19,9 +21,10 @@ reactions:
     h_cutoff: 3
     polling_rate: 1
 
+
 sequence:
-- equilibrium
-- mult: 2
-  tasks:
   - equilibrium
+  - mult: 2
+    tasks:
+    - equilibrium
   - reactions

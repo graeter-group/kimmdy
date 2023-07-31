@@ -1,11 +1,13 @@
+"""
+Tests for homolysis reaction plugin.
+
+Assumes KIMMDY was installed with the plugin.
+E.g. via pip install -r requirements.txt.
+"""
 import pytest
 from pathlib import Path
-import shutil
-import os
 import numpy as np
-from kimmdy.runmanager import RunManager
-from kimmdy.config import Config
-from kimmdy.reactions.homolysis import Homolysis
+from homolysis.reaction import Homolysis
 from kimmdy.reaction import Break
 from kimmdy.parsing import (
     read_plumed,

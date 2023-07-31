@@ -1,0 +1,202 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "dryrun": {
+      "description": "Don't run the actual simulations, just print the tasks",
+      "type": "boolean",
+      "pytype": "bool",
+      "default": false
+    },
+    "cwd": {
+      "description": "Working directory",
+      "type": "string",
+      "pytype": "Path",
+      "default": "."
+    },
+    "name": {
+      "description": "Used for output folder if out is not specified",
+      "type": "string",
+      "pytype": "str",
+      "default": "kimmdy"
+    },
+    "out": {
+      "description": "Output folder",
+      "type": "string",
+      "pytype": "Path"
+    },
+    "iterations": {
+      "description": "Number of iterations to run",
+      "type": "integer",
+      "pytype": "int",
+      "default": 1,
+      "exclusiveMinimum": 0
+    },
+    "run": {
+      "description": "Replica number",
+      "type": "integer",
+      "pytype": "int",
+      "default": "1"
+    },
+    "top": {
+      "description": "Topology file",
+      "type": "string",
+      "pytype": "Path",
+      "default": "topol.top"
+    },
+    "gro": {
+      "description": "Coordinate file",
+      "type": "string",
+      "pytype": "Path",
+      "default": "conf.gro"
+    },
+    "ndx": {
+      "description": "Index file",
+      "type": "string",
+      "pytype": "Path",
+      "default": "index.ndx"
+    },
+    "gromacs_alias": {
+      "description": "Gromacs alias",
+      "type": "string",
+      "pytype": "str",
+      "default": "gmx"
+    },
+    "ff": {
+      "description": "Force field directory (looks for .ff in cwd if not set)",
+      "type": "string",
+      "pytype": "Path",
+      "default": "*.ff"
+    },
+    "mds": {
+      "type": "object",
+      "description": "Settings for MD steps, e.g. mdp files, plumed files, etc.",
+      "patternProperties": {
+        ".*": {
+          "type": "object",
+          "properties": {
+            "mdp": {
+              "type": "string",
+              "pytype": "Path",
+              "description": "MDP file for the MD step"
+            },
+            "prefix": {
+              "type": "string",
+              "pytype": "str",
+              "description": "TODO: What is this?"
+            },
+            "overwrite": {
+              "type": "string",
+              "pytype": "str",
+              "description": "TODO: What is this?"
+            },
+            "plumed": {
+              "type": "object",
+              "properties": {
+                "dat": {
+                  "type": "string",
+                  "pytype": "Path"
+                },
+                "distances": {
+                  "type": "string",
+                  "pytype": "str"
+                }
+              },
+              "required": ["dat", "distances"],
+              "additionalProperties": false
+            }
+          },
+          "required": ["mdp"],
+          "additionalProperties": false
+        }
+      }
+    },
+    "changer": {
+      "type": "object",
+      "description": "Settings for the coordinate changer",
+      "properties": {
+        "coordinates": {
+          "type": "object",
+          "properties": {
+            "md": {
+              "type": "string",
+              "pytype": "str"
+            },
+            "md_parameter_growth": {
+              "type": "string",
+              "pytype": "str"
+            }
+          }
+        }
+      }
+    },
+    "sequence": {
+      "description": "List of tasks. Each task can be a string (the name of the task) or an object with the task name and a multiplicity `mult: <int>`",
+      "pytype": "Sequence",
+      "type": "array",
+      "items": {
+        "oneOf": [
+          { "type": "string" },
+          {
+            "type": "object",
+            "properties": {
+              "mult": {
+                "type": "integer",
+                "description": "Multiplicity of the task",
+                "default": 2,
+                "minimum": 1 },
+              "tasks": {
+                "type": "array",
+                "description": "List of tasks",
+                "items": {
+                  "oneOf": [
+                    { "type": "string" },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "mult": {
+                          "type": "integer",
+                          "description": "Multiplicity of the task",
+                          "default": 2,
+                          "minimum": 1 },
+                        "tasks": {
+                          "type": "array",
+                          "description": "List of tasks",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "required": ["mult", "tasks"],
+                      "additionalProperties": false
+                    }
+                  ]
+                }
+              }
+            },
+            "required": ["mult", "tasks"],
+            "additionalProperties": false
+          }
+        ]
+      }
+    },
+    "reactions": {
+      "type": "object",
+      "description": "Settings for reactions",
+      "additionalProperties": true,
+      "properties": {
+        "homolysis": {
+          "$ref": "../../plugins/src/homolysis/kimmdy-yaml-schema.json"
+        },
+        "hat_naive": {
+          "$ref": "../../plugins/src/hat_naive/kimmdy-yaml-schema.json"
+        },
+        "dummyreaction": {
+          "$ref": "../../plugins/src/dummyreaction/kimmdy-yaml-schema.json"
+        }
+      }
+    }
+  },
+  "required": ["name", "sequence" ]
+}

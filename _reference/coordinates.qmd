@@ -1,0 +1,17 @@
+# coordinates { #kimmdy.coordinates }
+
+`coordinates`
+
+TODO: WIP
+
+## Functions
+
+| Name | Description |
+| --- | --- |
+| [is_parameterized](#kimmdy.coordinates.is_parameterized) | Parameterized topology entries have c0 and c1 attributes != None |
+
+### is_parameterized { #kimmdy.coordinates.is_parameterized }
+
+`coordinates.is_parameterized(entry)`
+
+Parameterized topology entries have c0 and c1 attributes != None

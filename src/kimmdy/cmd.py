@@ -10,8 +10,8 @@ from kimmdy.config import Config
 from kimmdy.misc_helper import concat_traj
 from kimmdy.runmanager import RunManager
 from kimmdy.utils import check_gmx_version, increment_logfile
+import importlib.resources as pkg_resources
 import sys
-
 
 if sys.version_info > (3, 10):
     from importlib_metadata import version
@@ -54,6 +54,21 @@ def get_cmdline_args():
             "Concatenate trrs of this run"
             "Optionally, the run directory can be give"
             "Will save as concat.trr in current directory"
+        ),
+    )
+
+    # flag to show available plugins
+    parser.add_argument(
+        "--show-plugins", action="store_true", help=("List available plugins")
+    )
+
+    # flag to print path to yaml schema
+    parser.add_argument(
+        "--show-schema-path",
+        action="store_true",
+        help=(
+            "Print path to yaml schema for use with yaml-language-server e.g. in VSCode and Neovim"
+            "# yaml-language-server: $schema=/path/to/kimmdy-yaml-schema.json"
         ),
     )
     return parser.parse_args()
@@ -103,9 +118,20 @@ def _run(args: argparse.Namespace):
     """
     configure_logging(args)
 
-    logging.info("Welcome to KIMMDY")
-    logging.info("KIMMDY is running with these command line options:")
-    logging.info(args)
+    if args.show_plugins:
+        from kimmdy import discovered_plugins
+
+        print("Available plugins:")
+        for plugin in discovered_plugins:
+            print(plugin)
+
+        exit()
+
+    if args.show_schema_path:
+        path = pkg_resources.files("kimmdy") / "kimmdy-yaml-schema.json"
+        print(f"{path}")
+
+        exit()
 
     if args.concat:
         logging.info("KIMMDY will concatenate trrs and exit.")
@@ -115,6 +141,10 @@ def _run(args: argparse.Namespace):
             run_dir = args.concat
         concat_traj(run_dir)
         exit()
+
+    logging.info("Welcome to KIMMDY")
+    logging.info("KIMMDY is running with these command line options:")
+    logging.info(args)
 
     if args.checkpoint:
         logging.info("KIMMDY is starting from a checkpoint.")
@@ -137,6 +167,8 @@ def kimmdy_run(
     logfile: Path = Path("kimmdy.log"),
     checkpoint: str = "",
     concat: bool = False,
+    show_plugins: bool = False,
+    show_schema_path: bool = False,
 ):
     """Run KIMMDY from python.
 
@@ -159,6 +191,10 @@ def kimmdy_run(
     concat :
         Don't perform a full KIMMDY run but instead concatenate trajectories
         from a previous run.
+    show_plugins :
+        Show available plugins and exit.
+    show_schema_path :
+        Print path to yaml schema for use with yaml-language-server e.g. in VSCode and Neovim
     """
     args = argparse.Namespace(
         input=input,
@@ -166,6 +202,8 @@ def kimmdy_run(
         logfile=logfile,
         checkpoint=checkpoint,
         concat=concat,
+        show_plugins=show_plugins,
+        show_schema_path=show_schema_path,
     )
     _run(args)
     logging.shutdown()

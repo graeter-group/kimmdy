@@ -1,3 +1,0 @@
-# histfile { #kimmdy.runmanager.RunManager.histfile }
-
-`runmanager.RunManager.histfile`

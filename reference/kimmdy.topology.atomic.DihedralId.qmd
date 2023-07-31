@@ -1,3 +1,0 @@
-# DihedralId { #kimmdy.topology.atomic.DihedralId }
-
-`topology.atomic.DihedralId`

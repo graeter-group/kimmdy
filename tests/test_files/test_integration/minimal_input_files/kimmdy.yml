@@ -9,6 +9,7 @@ mds:
   prod:
     mdp: 'minimal.mdp'
 reactions:
-  hat_naive:
+  hat_naive: {}
+
 sequence:
   - reactions
