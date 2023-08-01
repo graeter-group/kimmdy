@@ -1,46 +1,32 @@
 website:
   sidebar:
   - contents:
-    - reference/index.qmd
+    - _reference/index.qmd
     - contents:
-      - reference/cmd.qmd
+      - _reference/cmd.qmd
       section: API
     - contents:
-      - reference/changemanager.qmd
-      - reference/config.qmd
-      - reference/constants.qmd
-      - reference/coordinates.qmd
-      - reference/kmc.qmd
-      - reference/misc_helper.qmd
-      - reference/parsing.qmd
-      - reference/reaction.qmd
-      - reference/runmanager.qmd
-      - reference/tasks.qmd
-      - reference/utils.qmd
-      - reference/topology.topology.Topology.qmd
-      - reference/topology.ff.qmd
-      - reference/topology.utils.qmd
-      section: Internals
+      - _reference/topology.topology.qmd
+      - _reference/topology.ff.qmd
+      - _reference/topology.utils.qmd
+      - _reference/topology.atomic.qmd
+      section: Topology
     - contents:
-      - reference/topology.atomic.qmd
-      - reference/topology.atomic.Atom.qmd
-      - reference/topology.atomic.AtomType.qmd
-      - reference/topology.atomic.Bond.qmd
-      - reference/topology.atomic.BondType.qmd
-      - reference/topology.atomic.PositionRestraint.qmd
-      - reference/topology.atomic.DihedralRestraint.qmd
-      - reference/topology.atomic.Pair.qmd
-      - reference/topology.atomic.Angle.qmd
-      - reference/topology.atomic.AngleType.qmd
-      - reference/topology.atomic.DihedralType.qmd
-      - reference/topology.atomic.ResidueAtomSpec.qmd
-      - reference/topology.atomic.ResidueBondSpec.qmd
-      - reference/topology.atomic.ResidueImproperSpec.qmd
-      - reference/topology.atomic.ResidueProperSpec.qmd
-      - reference/topology.atomic.ResidueType.qmd
-      section: Atomic types
+      - _reference/changemanager.qmd
+      - _reference/constants.qmd
+      - _reference/coordinates.qmd
+      - _reference/config.qmd
+      - _reference/kmc.qmd
+      - _reference/misc_helper.qmd
+      - _reference/parsing.qmd
+      - _reference/runmanager.qmd
+      - _reference/tasks.qmd
+      - _reference/utils.qmd
+      section: Modules
     - contents:
-      - reference/reactions.homolysis.qmd
-      section: Reactions
-    id: reference
+      - _reference/homolysis.reaction.Homolysis.qmd
+      - _reference/hat_naive.reaction.NaiveHAT.qmd
+      - _reference/dummyreaction.reaction.DummyReaction.qmd
+      section: Reaction Plugins
+    id: _reference
   - id: dummy-sidebar

@@ -1,3 +1,6 @@
+"""
+All read_<...> and write_<...> functions.
+"""
 import os
 import re
 from pathlib import Path
@@ -12,6 +15,7 @@ from kimmdy.utils import get_gmx_dir
 TopologyDict = dict
 
 GMX_BUILTIN_FF_DIR = get_gmx_dir() / "top"
+"""Path to gromacs data directory with the built-in forcefields."""
 
 
 def is_not_comment(c: str) -> bool:
@@ -82,14 +86,24 @@ def read_rtp(path: Path) -> dict:
             if not name:
                 name = f"BLOCK {i}"
             d[name] = create_subsections(content)
-            # d[name] = content
 
         return d
 
 
 def resolve_includes(path: Path) -> tuple[list[str], Optional[Path]]:
     """Resolve #include statements in a (top/itp) file.
-    Returns a tuple with the list of lines and the Path to the ff directory.
+
+    Arguments
+    ---------
+    path :
+        Filepath to read.
+
+    Returns
+    -------
+    lines:
+        List of lines.
+    ffdir:
+        Path to the ff directory if one of the includes used a file from it.
     """
     path = path.resolve()
     dir = path.parent
@@ -132,7 +146,7 @@ def resolve_includes(path: Path) -> tuple[list[str], Optional[Path]]:
 
 
 def read_top(path: Path) -> TopologyDict:
-    """Parse a list of lines from a topology file.
+    """Read a topology file into a raw TopologyDict represenation.
 
     Parameters
     ----------
@@ -141,13 +155,13 @@ def read_top(path: Path) -> TopologyDict:
 
     Assumptions and limitation
     -----
-    - ``#include`` statements will be resolved
+    - `#include` statements will be resolved
     - comments will be removed
     - all lines are stripped of leading and trailing whitespace
-    - ``#undef`` is not supported
-    - a section within ``ifdef`` may be a subsection of a section that was started
-      outside of the ``ifdef``
-    - ``#if..#endif`` statements only surround a full section or subsection,
+    - `#undef` is not supported
+    - a section within `ifdef` may be a subsection of a section that was started
+      outside of the `ifdef`
+    - `#if..#endif` statements only surround a full section or subsection,
       not individual lines within a section and
       a section may either be contained within if ... else or it may not be,
       but it can not be duplicated with one part inside and one outside.
@@ -280,6 +294,16 @@ def read_top(path: Path) -> TopologyDict:
 
 
 def write_top(top: TopologyDict, outfile: Path):
+    """Write a TopologyDict to a topology file.
+
+    Parameters
+    ----------
+    top:
+        Raw dictionary represenation of the topology.
+    outfile :
+        Path to the topology file to write to.
+    """
+
     def write_section(f, name, section):
         printname = re.sub(r"_\d+", "", name)
         condition = section.get("condition")
@@ -329,6 +353,11 @@ def read_edissoc(path: Path) -> dict:
     """reads a edissoc file and turns it into a dict.
     the tuple of bond atoms make up the key,
     the dissociation energy E_dissoc [kJ mol-1] is the value
+
+    Parameters
+    ----------
+    path :
+        Path to the file. E.g. Path("edissoc.dat")
     """
     with open(path, "r") as f:
         edissocs = {}
@@ -339,7 +368,13 @@ def read_edissoc(path: Path) -> dict:
 
 
 def read_plumed(path: Path) -> dict:
-    """Read a plumed.dat configuration file."""
+    """Read a plumed.dat configuration file.
+
+    Parameters
+    ----------
+    path :
+        Path to the file. E.g. "plumed.dat"
+    """
     with open(path, "r") as f:
         distances = []
         prints = []
@@ -373,7 +408,13 @@ def read_plumed(path: Path) -> dict:
 
 
 def write_plumed(d, path: Path) -> None:
-    """Write a plumed.dat configuration file."""
+    """Write a plumed.dat configuration file.
+
+    Parameters
+    ----------
+    path :
+        Path to the file. E.g. "plumed.dat"
+    """
     with open(path, "w") as f:
         for l in d["distances"]:
             f.write(

@@ -36,6 +36,7 @@ def coordinates_files():
         "topA_path": topA_path,
         "topB_path": topB_path,
         "topFEP_path": topFEP,
+        "fep": fep,
     }
     yield files
     (filedir / "amber99sb-star-ildnp.ff").unlink()
@@ -47,28 +48,33 @@ def test_get_bondobj(coordinates_files):
 
     bond2_keys = ["17", "19"]
     bond2obj = get_atomicobj(bond2_keys, Bond, coordinates_files["topA"])
-    assert (
-        float(bond1obj.c0) == pytest.approx(0.10100) and float(bond1obj.c1),
-        pytest.approx(363171.2),
-    )
+    assert float(bond1obj.c0) == pytest.approx(0.10100) and float(
+        bond1obj.c1
+    ) == pytest.approx(363171.2)
+
     assert float(bond2obj.c0) == pytest.approx(0.13600) and float(
         bond2obj.c1
     ) == pytest.approx(282001.6)
 
 
 def test_merge_prm_top(coordinates_files):
-    files = SlimFiles()
-    files.input["top"] = coordinates_files["topA_path"]
-    files.output["top"] = coordinates_files["topB_path"]
-    topmerge = merge_top_parameter_growth(files)
-    topmerge_path = coordinates_files["topB_path"].parent / "top_merge.top"
-    topdict = topmerge.to_dict()
-    write_top(topdict, topmerge_path)
-    # topFEP does not work as a reference, the file must be changed for this test to work
-    try:
-        assert topmerge.atoms == coordinates_files["topFEP"].atoms
-        assert topmerge.bonds == coordinates_files["topFEP"].bonds
-        assert topmerge.angles == coordinates_files["topFEP"].angles
-        assert topmerge.pairs == coordinates_files["topFEP"].pairs
-    finally:
-        topmerge_path.unlink()
+    """this tests a topology merge for a HAT reaction from a Ca (nr 19) radical to a N (nr 26) radical"""
+    topmerge = merge_top_parameter_growth(
+        coordinates_files["topA"], coordinates_files["topB"]
+    )
+
+    assert topmerge.atoms == coordinates_files["topFEP"].atoms
+    assert topmerge.bonds.keys() == coordinates_files["topFEP"].bonds.keys()
+    assert topmerge.angles.keys() == coordinates_files["topFEP"].angles.keys()
+    assert topmerge.pairs.keys() == coordinates_files["topFEP"].pairs.keys()
+    assert (
+        topmerge.proper_dihedrals.keys()
+        == coordinates_files["topFEP"].proper_dihedrals.keys()
+    )
+    assert (
+        topmerge.improper_dihedrals.keys()
+        == coordinates_files["topFEP"].improper_dihedrals.keys()
+    )
+
+    assert topmerge.bonds[("19", "27")].funct == "3"
+    assert topmerge.bonds[("26", "27")].funct == "3"

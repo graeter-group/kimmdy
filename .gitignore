@@ -17,10 +17,13 @@ pytest_topol.top
 .nvimlog
 render/
 cat-center.gro
-*-tmp.py
 *.cpt
 *.dill
 *.pickle
+
+# tutorials and example output files
+guide/kimmdy-tutorial
+
 
 # excludes
 !tests/test_files/test_changemanager/pull.trr

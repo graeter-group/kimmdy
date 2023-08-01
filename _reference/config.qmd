@@ -1,0 +1,55 @@
+# config { #kimmdy.config }
+
+`config`
+
+Read and validate kimmdy.yml configuration files
+and package into a parsed format for internal use.
+
+## Attributes
+
+| Name | Description |
+| --- | --- |
+| [GMX_BUILTIN_FF_DIR](#kimmdy.config.GMX_BUILTIN_FF_DIR) | Path to gromacs data directory with the built-in forcefields. |
+
+## Classes
+
+| Name | Description |
+| --- | --- |
+| [Config](#kimmdy.config.Config) | Internal representation of the configuration generated |
+
+### Config { #kimmdy.config.Config }
+
+`config.Config(self, input_file=None, recursive_dict=None, scheme=None, section='config')`
+
+Internal representation of the configuration generated
+from the input file, which enables validation before running
+and computationally expensive operations.
+
+#### Parameters
+
+| Name             | Type                 | Description                                                                                                                            | Default    |
+|------------------|----------------------|----------------------------------------------------------------------------------------------------------------------------------------|------------|
+| `input_file`     | pathlib.Path \| None | Path to the config yaml file.                                                                                                          | `None`     |
+| `recursive_dict` | dict \| None         | For internal use only, used in reading settings in recursively.                                                                        | `None`     |
+| `scheme`         | dict \| None         | dict containing types and defaults for casting and validating settings.                                                                | `None`     |
+| `section`        | str                  | current section e.g. to determine the level of recursion in nested configs e.g. "config", "config.mds" or "config.reactions.homolysis" | `'config'` |
+
+#### Methods
+
+| Name | Description |
+| --- | --- |
+| [attr](#kimmdy.config.Config.attr) | Get the value of a specific attribute. |
+| [get_attributes](#kimmdy.config.Config.get_attributes) | Get a list of all attributes |
+
+##### attr { #kimmdy.config.Config.attr }
+
+`config.Config.attr(self, attribute)`
+
+Get the value of a specific attribute.
+Alias for self.__getattribute__
+
+##### get_attributes { #kimmdy.config.Config.get_attributes }
+
+`config.Config.get_attributes(self)`
+
+Get a list of all attributes

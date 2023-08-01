@@ -1,3 +1,0 @@
-# iterations { #kimmdy.runmanager.RunManager.iterations }
-
-`runmanager.RunManager.iterations`

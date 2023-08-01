@@ -23,7 +23,7 @@ changer:
     parameterization: 'grappa' 
 reactions:
   homolysis:
-    dat: 'edissoc.dat'
+    edis: 'edissoc.dat'
     itp: 'ffbonded.itp'
   hat_naive:
     frequency_factor: 100000000

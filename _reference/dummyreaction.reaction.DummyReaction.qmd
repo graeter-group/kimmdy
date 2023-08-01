@@ -1,0 +1,5 @@
+# dummyreaction.reaction.DummyReaction { #dummyreaction.reaction.DummyReaction }
+
+`reaction.DummyReaction()`
+
+Dummy reaction, returns empty RecipeCollection

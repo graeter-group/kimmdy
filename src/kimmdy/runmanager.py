@@ -1,6 +1,13 @@
+"""
+The Runmanager is the main entry point of the program.
+
+It manages the queue of tasks, communicates with the
+rest of the program and keeps track of global state.
+"""
 from __future__ import annotations
 import logging
 from pathlib import Path
+from copy import deepcopy
 import dill
 import queue
 from enum import Enum, auto
@@ -53,26 +60,59 @@ def get_existing_files(config: Config):
 
 
 class RunManager:
-    """The RunManager, a central piece.
+    """The Runmanager is the main entry point of the program.
 
     Manages the queue of tasks, communicates with the
     rest of the program and keeps track of global state.
+
+    Attributes
+    ----------
+    config :
+        The configuration object.
+    from_checkpoint :
+        Whether the runmanager was initialized from a checkpoint.
+    tasks :
+        Tasks from config.
+    crr_tasks :
+        Current tasks.
+    iteration :
+        Current iteration.
+    iterations :
+        Total number of iterations.
+    state :
+        Current state of the system.
+    recipe_collection :
+        Collection of recipes.
+    latest_files :
+        Dictionary of latest files.
+    histfile :
+        Path to history file.
+    cptfile :
+        Path to checkpoint file.
+    ffpatch :
+        Path to force field patch file.
+    top :
+        Topology object.
+    filehist :
+        List of dictionaries of TaskFiles.
+    task_mapping :
+        Mapping of task names to runmanager methods.
     """
 
     def __init__(self, config: Config):
-        self.config = config
-        self.from_checkpoint = False
+        self.config: Config = config
+        self.from_checkpoint: bool = False
         self.tasks: queue.Queue[Task] = queue.Queue()  # tasks from config
         self.crr_tasks: queue.Queue[Task] = queue.Queue()  # current tasks
-        self.iteration = 0
-        self.iterations = self.config.iterations
-        self.state = State.IDLE
+        self.iteration: int = 0
+        self.iterations: int = self.config.iterations
+        self.state: State = State.IDLE
         self.recipe_collection: RecipeCollection = RecipeCollection([])
         self.latest_files: dict[str, Path] = get_existing_files(config)
         logging.debug("Initialized latest files:")
         logging.debug(pformat(self.latest_files))
-        self.histfile = increment_logfile(Path(f"{self.config.out}_history.log"))
-        self.cptfile = increment_logfile(Path(f"{self.config.out}_kimmdy.cpt"))
+        self.histfile: Path = increment_logfile(Path(f"{self.config.out}_history.log"))
+        self.cptfile: Path = increment_logfile(Path(f"{self.config.out}_kimmdy.cpt"))
         try:
             _ = self.config.ffpatch
         except AttributeError:
@@ -112,22 +152,6 @@ class RunManager:
         logging.debug("Configuration from input file:")
         logging.debug(pformat(self.config.__dict__))
 
-    def get_latest(self, suffix: str):
-        """Returns path to latest file of given type.
-
-        For .dat files (in general ambiguous extensions) use full file name.
-        Errors if file is not found.
-        """
-        logging.debug("Getting latest suffix: " + suffix)
-        try:
-            path = self.latest_files[suffix]
-            logging.debug("Found: " + str(path))
-            return path
-        except Exception:
-            m = f"File {suffix} requested but not found!"
-            logging.error(m)
-            raise FileNotFoundError(m)
-
     def run(self):
         logging.info("Start run")
         logging.info("Build task list")
@@ -154,6 +178,22 @@ class RunManager:
             f"Finished running tasks, state: {self.state}, "
             f"iteration:{self.iteration}, max:{self.iterations}"
         )
+
+    def get_latest(self, suffix: str):
+        """Returns path to latest file of given type.
+
+        For .dat files (in general ambiguous extensions) use full file name.
+        Errors if file is not found.
+        """
+        logging.debug("Getting latest suffix: " + suffix)
+        try:
+            path = self.latest_files[suffix]
+            logging.debug("Found: " + str(path))
+            return path
+        except Exception:
+            m = f"File {suffix} requested but not found!"
+            logging.error(m)
+            raise FileNotFoundError(m)
 
     def __iter__(self):
         return self
@@ -238,6 +278,7 @@ class RunManager:
         files = self._create_task_directory(f"{instance}")
         md_config = self.config.mds.attr(instance)
         gmx_alias = self.config.gromacs_alias
+        gmx_mdrun_flags = self.config.gmx_mdrun_flags
 
         logging.warning(self.latest_files)
         top = files.input["top"]
@@ -246,9 +287,6 @@ class RunManager:
         ndx = files.input["ndx"]
 
         outputdir = files.outputdir
-        # make maxh and ntomp accessible?
-        maxh = 24
-        ntomp = 2
 
         grompp_cmd = (
             f"{gmx_alias} grompp -p {top} -c {gro} "
@@ -269,7 +307,7 @@ class RunManager:
             f"-px {instance}_pullx.xvg -pf {instance}_pullf.xvg "
             f"-ro {instance}-rotation.xvg -ra {instance}-rotangles.log "
             f"-rs {instance}-rotslabs.log -rt {instance}-rottorque.log "
-            f"-maxh {maxh} -dlb yes "
+            f"{gmx_mdrun_flags}  "
         )
         # -ntomp {ntomp} removed for now
         # like this, the previous checkpoint file would not be used,
@@ -330,6 +368,7 @@ class RunManager:
         logging.debug(f"Chose recipe: {self.recipe_steps}")
 
         # changes to topology
+        top_prev = deepcopy(self.top)
         changer.modify_top(
             self.recipe_steps, files, self.config.ffpatch, self.top, self.parameterizer
         )
@@ -349,12 +388,16 @@ class RunManager:
             )
 
         # changes to coordinates
-        run_parameter_growth = changer.modify_coords(self.recipe_steps, files)
+        run_parameter_growth, top_merge_path = changer.modify_coords(
+            self.recipe_steps, files, top_prev, deepcopy(self.top)
+        )
         instance = None
+
         if run_parameter_growth:
             if hasattr(self.config.changer.coordinates, "md_parameter_growth"):
-                # pass merged topology to run_md task
-                self.latest_files["top"] = files.input["top"]
+                # just to make pyright happy
+                if top_merge_path:
+                    self.latest_files["top"] = top_merge_path
                 instance = self.config.changer.coordinates.md_parameter_growth
 
             else:

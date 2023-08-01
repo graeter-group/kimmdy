@@ -1,3 +1,6 @@
+"""
+TODO: WIP
+"""
 import logging
 from typing import Union
 from copy import deepcopy
@@ -15,11 +18,14 @@ from kimmdy.topology.utils import (
 
 def is_parameterized(entry: Atomic):
     """Parameterized topology entries have c0 and c1 attributes != None"""
+    # TODO: this will fail for Atom (no c0 and c1)
+    # should we rename mass and charge of Atom to c0 and c1
+    # instead of patching our way aroiund this here?
     return entry.c0 != None and entry.c1 != None
 
 
 def get_atomicobj(key: list[str], type: AtomicType, top: Topology):
-    # ugly
+    # TODO: ugly
     key = tuple(key)
     type_key = [top.atoms[x].type for x in key]
     if type == Bond:
@@ -63,6 +69,7 @@ def get_keys(atomicA: dict, atomicB: dict) -> tuple[list, list, list]:
 
 
 def merge_same(same: list, topA: Topology, topB: Topology, type: Atomic):
+    # TODO:
     # also ugly
     # should also be able to deal with dihedral
     for key in same:
@@ -83,20 +90,16 @@ def merge_same(same: list, topA: Topology, topB: Topology, type: Atomic):
 
 
 def merge_top_parameter_growth(
-    files: TaskFiles, focus_nr: Union[list[str], None] = None
+    topA: Topology, topB: Topology, focus_nr: Union[list[str], None] = None
 ) -> Topology:
-    # not the most robust way to get topA and topB
     hyperparameters = {
         "morse_well_depth": "400.0",
         "morse_steepness": "10.0",
         "morse_dist_factor": 5,
     }  # well_depth D [kJ/mol], steepness [nm-1], dist_factor for bond length
-    logging.info(f"Merging topologies {files.input['top']} and {files.output['top']}")
-    topADict = read_top(files.input["top"])
-    topBDict = read_top(files.output["top"])
-    topA = Topology(topADict)
-    topB = Topology(topBDict)
+    logging.info(f"Merging topologies {topA} and {topB}")
 
+    # TODO:
     # think about how to bring focus_nr into this
 
     ## atoms
@@ -137,6 +140,11 @@ def merge_top_parameter_growth(
             c4="0.00",
             c5=deepcopy(hyperparameters["morse_steepness"]),
         )
+
+        # update bound_to
+        atompair = [topB.atoms[bond_key[0]], topB.atoms[bond_key[1]]]
+        atompair[0].bound_to_nrs.append(atompair[1].nr)
+        atompair[1].bound_to_nrs.append(atompair[0].nr)
 
     for bond_key in binding:
         bond_objB = get_atomicobj(bond_key, Bond, topB)
@@ -198,6 +206,7 @@ def merge_top_parameter_growth(
             c3=deepcopy(angle_objB.c1),
         )
 
+    # TODO: dihedrals
     ## dihedrals
     # dihedraltypes does not work at the moment
     # proper_dihedraltypes also has the periodicity as key
@@ -219,5 +228,8 @@ def merge_top_parameter_growth(
     #     dihedralB.c3 = deepcopy(dihedral_objB.c3)
     #     dihedralB.c4 = deepcopy(dihedral_objB.c4)
     #     dihedralB.c5 = deepcopy(dihedral_objB.c5)
+
+    ## update is_radical attribute of Atom objects in topology
+    topB._test_for_radicals()
 
     return topB

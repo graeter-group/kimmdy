@@ -15,7 +15,7 @@ changer:
   coordinates:
     md: 'relax'      
 reactions:
-  hat_naive:
+  hat_naive: {}
 sequence:
 - equilibrium
 - mult: 2

@@ -1,11 +1,19 @@
+"""
+Read and validate kimmdy.yml configuration files
+and package into a parsed format for internal use.
+"""
 from __future__ import annotations
-from typing import Optional, Callable
+from typing import Any, Optional
 import yaml
 import logging
 from pathlib import Path
-from dataclasses import dataclass
-from kimmdy import reaction_plugins, parameterization_plugins
-from kimmdy.reaction import ReactionPlugin
+from kimmdy import plugins
+from kimmdy.schema import Sequence, get_combined_scheme
+from kimmdy.utils import get_gmx_dir
+
+
+GMX_BUILTIN_FF_DIR = get_gmx_dir() / "top"
+"""Path to gromacs data directory with the built-in forcefields."""
 
 
 def check_file_exists(p: Path):
@@ -15,205 +23,183 @@ def check_file_exists(p: Path):
         raise LookupError(m)
 
 
-class Sequence(list):
-    """A sequence of tasks."""
-
-    def __init__(self, tasks: list):
-        list.__init__(self)
-        for task in tasks:
-            if isinstance(task, dict):
-                for _ in range(task["mult"]):
-                    assert isinstance(
-                        task["tasks"], list
-                    ), "Grouped tasks must be a list!"
-                    self.extend(task["tasks"])
-            else:
-                self.append(task)
-
-
-class Mds:
-    def __init__(self):
-        pass
-
-
-type_scheme = {
-    "experiment": str,
-    "run": int,
-    "dryrun": bool,
-    "iterations": int,
-    "out": Path,
-    "gromacs_alias": str,
-    "ff": Path,
-    "ffpatch": None,
-    "top": Path,
-    "gro": Path,
-    "ndx": Path,
-    "mds": {
-        "*": {
-            "mdp": Path,
-            "plumed": {"dat": Path, "distances": Path},
-            "prefix": str,
-            "overwrite": str,
-        }
-    },
-    "changer": {
-        "coordinates": {"md": str, "md_parameter_growth": str},
-        "topology": {"parameterization": str},
-    },
-    "reactions": {},
-    "sequence": Sequence,
-}
-
-# classes for static code analysis
-
-
-class MDrefConfig:
-    md: str
-    md_parameter_growth: str
-
-
-class TopologyConfig:
-    parameterization: str
-
-
-class ChangerConfig:
-    coordinates: MDrefConfig
-    topology: TopologyConfig
-
-
-class HomolysisConfig:
-    dat: Path
-    itp: Path
-
-
-class ReactionsConfig:
-    homolysis: HomolysisConfig
-
-
-class PullConfig:
-    mdp: Path
-
-
-class SequenceConfig(list):
-    tasks: list
-
-
-@dataclass
 class Config:
     """Internal representation of the configuration generated
     from the input file, which enables validation before running
     and computationally expensive operations.
-    All settings read from the input file are accessible through nested attributes.
 
     Parameters
     ----------
-    input_file : Path
+    input_file :
         Path to the config yaml file.
-    recursive_dict : dict
+    recursive_dict :
         For internal use only, used in reading settings in recursively.
-    type_scheme : dict
-        dict containing types for casting and validating settings.
-
+    scheme :
+        dict containing types and defaults for casting and validating settings.
+    section :
+        current section e.g. to determine the level of recursion in nested configs
+        e.g. "config", "config.mds" or "config.reactions.homolysis"
     """
 
-    run: int
-    experiment: str
-    name: str  # obsolete??
-    dryrun: bool
-    iterations: int
-    out: Path
-    gromacs_alias: str
-    ff: Path
-    ffpatch: Optional[Path]
-    top: Path
-    gro: Path
-    ndx: Path
-    mds: dict
-    changer: ChangerConfig
-    reactions: ReactionsConfig
-    pull: PullConfig
-    sequence: SequenceConfig
+    # override get and set attributes to satisy type checker and
+    # acknowledge that we don't actually statically type-check the attributes
+    def __getattribute__(self, name) -> Any:
+        return object.__getattribute__(self, name)
+
+    def __setattr__(self, name, value: Any):
+        object.__setattr__(self, name, value)
 
     def __init__(
         self,
         input_file: Path | None = None,
         recursive_dict: dict | None = None,
-        type_scheme=type_scheme,
+        scheme: dict | None = None,
+        section: str = "config",
     ):
+        # failure case: no input file and no values from dictionary
         if input_file is None and recursive_dict is None:
-            m = "Error: No input file was provided!"
+            m = "No input file was provided for Config"
             logging.error(m)
             raise ValueError(m)
 
-        if input_file is not None and not isinstance(input_file, Path):
-            logging.debug(
-                "Config input file was not type pathlib.Path, attempting conversion.."
-            )
-            input_file = Path(input_file)
+        # initial scheme
+        if scheme is None:
+            scheme = get_combined_scheme()
 
-        self.type_scheme = type_scheme
-        if self.type_scheme is None:
-            self.type_scheme = {}
-
-        # top level before initialization here
+        # read initial input file
         if input_file is not None:
             with open(input_file, "r") as f:
                 raw = yaml.safe_load(f)
-            self.raw = raw
-            if self.raw is None:
-                m = "Error: Could not read input file"
+            if raw is None or not isinstance(raw, dict):
+                m = "Could not read input file"
                 logging.error(m)
                 raise ValueError(m)
             recursive_dict = raw
 
-            # hope it works to do the same for both types of plugins
-            for plugins in [reaction_plugins, parameterization_plugins]:
-                if len(plugins) > 0:
-                    logging.info(f"Loading Plugins {plugins.keys()}")
-                    for plg_name, plugin in plugins.items():
-                        logging.debug(f"Loading {plg_name}")
-                        if type(plugin) is ModuleNotFoundError:
-                            logging.warn(
-                                f"Plugin {plg_name} could not be loaded!\n{plugin}\n"
-                            )
-                        else:
-                            try:
-                                if (
-                                    plugin.__bases__[0] is ReactionPlugin
-                                ):  # isinstance didnt work for some reason
-                                    self.type_scheme["reactions"].update(
-                                        plugin.type_scheme
-                                    )
-                                    logging.debug(self.type_scheme["reactions"])
-                            except:
-                                logging.warn(
-                                    f"Plugin {plg_name} could not be loaded!\n{plugin}\n"
-                                )
-                                pass
-
-        # building config recursively
-        if recursive_dict is not None:
-            for name, val in recursive_dict.items():
-                if isinstance(val, dict):
-                    recursiv_type_s = self.type_scheme.get(name)
-                    if recursiv_type_s is None:
-                        recursiv_type_s = self.type_scheme.get("*")
-                    val = Config(recursive_dict=val, type_scheme=recursiv_type_s)
-                logging.debug(f"Set attribute: {name}, {val}")
-                self.__setattr__(name, val)
-
-        # top level after initialization here
-        if input_file is not None:
-            if cwd := self.raw.get("cwd"):
-                cwd = Path(cwd)
+        assert recursive_dict is not None
+        assert scheme is not None
+        for k, v in recursive_dict.items():
+            if isinstance(v, dict):
+                # recursive case
+                general_subscheme = scheme.get(".*")
+                subscheme = scheme.get(k)
+                if subscheme is None:
+                    subscheme = general_subscheme
+                if general_subscheme is not None:
+                    general_subscheme.update(subscheme)
+                    subscheme = general_subscheme
+                assert subscheme is not None, (k, v, scheme)
+                subsection = f"{section}.{k}"
+                subconfig = Config(
+                    recursive_dict=v, scheme=subscheme, section=subsection
+                )
+                self.__setattr__(k, subconfig)
             else:
-                cwd = input_file.parent.resolve()
-            self.cwd = cwd
-            if out := self.raw.get("out"):
-                out = Path(out)
-            else:
-                out = self.cwd / self.name
-            self.out = out
+                # base case for recursion
+
+                # merge ".*" and specific schemes
+                global_opts = scheme.get(".*")
+                opts = scheme.get(k)
+                if opts is None and global_opts is None:
+                    m = f"No scheme found for {k}"
+                    logging.error(m)
+                    raise ValueError(m)
+                if opts is None:
+                    opts = {}
+                if global_opts is not None:
+                    opts.update(global_opts)
+                pytype = opts.get("pytype")
+                if pytype is None:
+                    m = f"No type found for {k}"
+                    logging.error(m)
+                    raise ValueError(m)
+
+                # cast to type
+                v = pytype(v)
+                self.__setattr__(k, v)
+
+        # set defaults for attributes
+        for k, v in scheme.items():
+            if "pytype" not in v:
+                # recursive case, skip.
+                # handled at base case
+                continue
+            if not hasattr(self, k):
+                # get default if not set in yaml
+                default = v.get("default")
+                pytype = v.get("pytype")
+                if default is None:
+                    m = f"No default found for {k}"
+                    logging.debug(m)
+                    continue
+                if pytype is None:
+                    m = f"No type found for default value {k}: {default}"
+                    logging.error(m)
+                    raise ValueError(m)
+                default = pytype(default)
+
+                self.__setattr__(k, default)
+
+        # validate on initial construction
+        if section == "config":
+            self._validate()
+
+    def _validate(self, section: str = "config"):
+        """Validates config."""
+        logging.info(f"Validating Config")
+        logging.info(f"Validating Config, section {section}")
+
+        # globals / interconnected
+        if section == "config":
+            # forcfield
+            ffdir = self.ff
+            if ffdir == Path("*.ff"):
+                ffs = list(self.cwd.glob("*.ff"))
+                if len(ffs) > 1:
+                    logging.warn(
+                        f"Found {len(ffs)} forcefields in cwd, using first one: {ffs[0]}"
+                    )
+                assert ffs[0].is_dir(), "Forcefield should be a directory!"
+                ffdir = ffs[0].resolve()
+            elif not ffdir.exists():
+                print(ffdir)
+                ffdir = GMX_BUILTIN_FF_DIR / ffdir
+                if not ffdir.exists():
+                    m = f"Could not find forcefield {ffdir} in cwd or gromacs data directory"
+                    logging.error(m)
+                    raise AssertionError(m)
+            self.ff = ffdir
+
+            # Validate changer reference
+            if hasattr(self, "changer"):
+                if hasattr(self.changer, "coordinates"):
+                    if "md" in self.changer.coordinates.__dict__.keys():
+                        assert (
+                            self.changer.coordinates.md in self.mds.__dict__.keys()
+                        ), f"Relax MD {self.changer.coordinates.md} not in MD section!"
+
+            # Validate reaction plugins
+            if hasattr(self, "reactions"):
+                for reaction_name, reaction_config in self.reactions.__dict__.items():
+                    assert reaction_name in (ks := list(plugins.keys())), (
+                        f"Error: Reaction plugin {reaction_name} not found!\n"
+                        + f"Available plugins: {ks}"
+                    )
+
+            # Validate sequence
+            assert hasattr(self, "sequence"), "No sequence defined!"
+            for task in self.sequence:
+                if not hasattr(self, task):
+                    if hasattr(self, "mds"):
+                        if hasattr(self.mds, task):
+                            continue
+                    raise AssertionError(
+                        f"Task {task} listed in sequence, but not defined!"
+                    )
+
+            if not hasattr(self, "out"):
+                self.out = self.cwd / self.name
+
             # make sure self.out is empty
             while self.out.exists():
                 logging.debug(f"Output dir {self.out} exists, incrementing name")
@@ -227,36 +213,20 @@ class Config:
             self.out.mkdir()
             logging.info(f"Created output dir {self.out}")
 
-            if not hasattr(self, "ff"):
-                ffs = list(self.cwd.glob("*.ff"))
-                if len(ffs) < 1:
-                    raise FileNotFoundError(
-                        "No forcefield found in cwd, please provide one!"
-                    )
-                if len(ffs) > 1:
-                    logging.warn(
-                        f"Found {len(ffs)} forcefields in cwd, using first one: {ffs[0]}"
-                    )
-                assert ffs[0].is_dir(), "Forcefield should be a directory!"
-                self.ff = ffs[0].resolve()
+        # individual attributes, recursively
+        for name, attr in self.__dict__.items():
+            if type(attr) is Config:
+                attr._validate(section=f"{section}.{name}")
+                continue
 
-            # assert hasattr(self,'mds'), "MD section not defined in config file!"
-            # for attribute in self.mds.get_attributes():
-            #     self.mds.attr(attribute).mdp = Path(self.mds.attr(attribute).mdp)
-
-            self._cast_types()
-            self._validate()
-
-    def get_attributes(self):
-        """Get a list of all attributes"""
-        repr = self.__dict__.copy()
-        repr.pop("type_scheme")
-        return list(repr.keys())
-
-    def __repr__(self):
-        repr = self.__dict__.copy()
-        repr.pop("type_scheme")
-        return str(repr)
+            # Check files from scheme
+            elif isinstance(attr, Path):
+                path = attr
+                path = path.resolve()
+                self.__setattr__(name, path)
+                # distances.dat wouldn't exist prior to the run
+                if not str(attr) in ["distances.dat"] and not path.is_dir():
+                    check_file_exists(path)
 
     def attr(self, attribute):
         """Get the value of a specific attribute.
@@ -264,97 +234,10 @@ class Config:
         """
         return self.__getattribute__(attribute)
 
-    def _cast_types(self, to_type_wildcard=None):
-        """Casts types defined in `type_scheme` to raw attributes."""
-        attr_names = filter(lambda s: s[0] != "_", self.__dir__())
-        for attr_name in attr_names:
-            to_type = self.type_scheme.get(attr_name)
-            attr = self.__getattribute__(attr_name)
+    def get_attributes(self):
+        """Get a list of all attributes"""
+        return list(self.__dict__.keys())
 
-            if attr_name == "type_scheme" or callable(attr):
-                continue
-
-            # handle wildcard attr
-            if to_type_wildcard is not None:
-                to_type = to_type_wildcard
-            if to_type is not None:
-                if attr is None:
-                    raise ValueError(
-                        f"ERROR in inputfile: Missing settings for {attr_name}"
-                    )
-
-                # nested:
-                if isinstance(to_type, dict):
-                    if list(to_type.keys()) == ["*"]:
-                        attr._cast_types(to_type["*"])
-                    else:
-                        attr._cast_types()
-                    continue
-                # wrap single element if it should be a list
-                elif to_type is list:
-                    self.__setattr__(attr_name, [attr])
-                try:
-                    self.__setattr__(attr_name, to_type(attr))
-                except ValueError as e:
-                    m = (
-                        f"Error: Attribute {attr_name} with value {attr} "
-                        + f"and type {type(attr)} cound not be converted to {to_type}!"
-                    )
-                    logging.error(m)
-                    raise ValueError(e)
-
-            else:
-                logging.debug(
-                    f"{to_type} conversion found for attribute {attr_name} and not executed."
-                )
-
-    def _validate(self):
-        """Validates attributes read from config file."""
-        try:
-            attr_names = filter(lambda s: s[0] != "_", self.__dir__())
-            for attr_name in attr_names:
-                logging.debug(f"validating: {attr_name}")
-                attr = self.attr(attr_name)
-                if isinstance(attr, Config):
-                    attr._validate()
-
-                # Check files from scheme
-                if isinstance(attr, Path):
-                    self.__setattr__(attr_name, attr.resolve())
-                    # distances.dat wouldn't exist prior to the run
-                    if not str(attr) in ["distances.dat"]:
-                        logging.debug(attr)
-                        check_file_exists(attr)
-
-                # Validate sequence
-                if isinstance(attr, Sequence):
-                    for task in attr:
-                        if not hasattr(self, task):
-                            if hasattr(self, "mds"):
-                                if hasattr(self.mds, task):
-                                    continue
-                            raise AssertionError(
-                                f"Task {task} listed in sequence, but not defined!"
-                            )
-
-                # Validate changer reference
-                if attr_name == "raw":
-                    if hasattr(self, "changer"):
-                        if hasattr(self.changer, "coordinates"):
-                            if "md" in self.changer.coordinates.get_attributes():
-                                assert (
-                                    self.changer.coordinates.md
-                                    in self.mds.get_attributes()
-                                ), f"Relax MD {self.changer.coordinates.md} not in MD section!"
-
-                # Validate reaction plugins
-                if attr_name == "reactions":
-                    for r in attr.get_attributes():
-                        assert r in (ks := list(reaction_plugins.keys())), (
-                            f"Error: Reaction plugin {r} not found!\n"
-                            + f"Available plugins: {ks}"
-                        )
-
-        except AssertionError as e:
-            logging.error(f"Validating input failed!\n{e}")
-            raise AssertionError(e)
+    def __repr__(self):
+        repr = self.__dict__
+        return str(repr)

@@ -1,6 +1,0 @@
-# ResidueProperSpec { #kimmdy.topology.atomic.ResidueProperSpec }
-
-`topology.atomic.ResidueProperSpec(atom1, atom2, atom3, atom4, q0)`
-
-Information about one imroper dihedral in a residue
-;atom1 atom2 atom3 atom4     q0     cq
