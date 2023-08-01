@@ -22,7 +22,7 @@ changer:
 reactions:
   homolysis:
     edis: 'edissoc.dat'
-    bonds: 'ffbonded.itp'
+    itp: 'ffbonded.itp'
   dummyreaction: {}
 sequence:
   - equilibrium
