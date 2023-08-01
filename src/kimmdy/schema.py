@@ -11,14 +11,12 @@ Reserved keywords:
 """
 import json
 import importlib.resources as pkg_resources
-import sys
-from typing import Optional
 
 # needed for eval of type_scheme from schema
 # don't remove even if lsp says it's unused
 import kimmdy
-import pathlib
-from pathlib import Path
+from kimmdy import plugins
+import logging
 
 
 class Sequence(list):
@@ -50,26 +48,22 @@ def load_kimmdy_schema() -> dict:
 
 def load_plugin_schemas() -> dict:
     """Return the schemas for the plugins"""
-    if sys.version_info > (3, 10):
-        from importlib_metadata import entry_points
-
-        discovered_plugins = entry_points(group="kimmdy.plugins")
-    else:
-        from importlib.metadata import entry_points
-
-        discovered_plugins = entry_points()["kimmdy.plugins"]
 
     schemas = {}
-    for entry_point in discovered_plugins:
-        # get entry point of plugin
-        plugin = entry_point.load()
-        # get main module from that plugin
-        plugin = plugin.__module__.split(".")[0]
-        if plugin == "kimmdy":
+    for plg_name, plugin in plugins.items():
+        logging.debug(f"Loading {plg_name}")
+        # Catch loading exception
+        if type(plugin) is ModuleNotFoundError:
+            logging.warn(f"Plugin {plg_name} could not be loaded!\n{plugin}\n")
             continue
-        path = pkg_resources.files(plugin) / "kimmdy-yaml-schema.json"
-        with path.open("rt") as f:
-            schemas[entry_point.name] = json.load(f)
+        # get main module from that plugin
+        plg_module_name = plugin.__module__.split(".")[0]
+        if plg_module_name == "kimmdy":
+            continue
+        scheme_path = pkg_resources.files(plg_module_name) / "kimmdy-yaml-schema.json"
+        with open(scheme_path, "rt") as f:
+            schemas[plg_name] = json.load(f)
+
     return schemas
 
 
