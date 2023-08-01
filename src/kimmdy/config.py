@@ -7,7 +7,7 @@ from typing import Any, Optional
 import yaml
 import logging
 from pathlib import Path
-from kimmdy import plugins
+from kimmdy import reaction_plugins
 from kimmdy.schema import Sequence, get_combined_scheme
 from kimmdy.utils import get_gmx_dir
 
@@ -181,7 +181,7 @@ class Config:
             # Validate reaction plugins
             if hasattr(self, "reactions"):
                 for reaction_name, reaction_config in self.reactions.__dict__.items():
-                    assert reaction_name in (ks := list(plugins.keys())), (
+                    assert reaction_name in (ks := list(reaction_plugins.keys())), (
                         f"Error: Reaction plugin {reaction_name} not found!\n"
                         + f"Available plugins: {ks}"
                     )

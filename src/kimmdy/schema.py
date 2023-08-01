@@ -17,7 +17,7 @@ from typing import Optional
 # needed for eval of type_scheme from schema
 # don't remove even if lsp says it's unused
 import kimmdy
-from kimmdy import plugins
+from kimmdy import reaction_plugins
 import logging
 import pathlib
 from pathlib import Path
@@ -54,7 +54,7 @@ def load_plugin_schemas() -> dict:
     """Return the schemas for the plugins"""
 
     schemas = {}
-    for plg_name, plugin in plugins.items():
+    for plg_name, plugin in reaction_plugins.items():
         logging.debug(f"Loading {plg_name}")
         # Catch loading exception
         if type(plugin) is ModuleNotFoundError:
