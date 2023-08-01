@@ -68,9 +68,8 @@ def load_plugin_schemas() -> dict:
         if plugin == "kimmdy":
             continue
         path = pkg_resources.files(plugin) / "kimmdy-yaml-schema.json"
-        name = plugin.split(".")[-1]
         with path.open("rt") as f:
-            schemas[name] = json.load(f)
+            schemas[entry_point.name] = json.load(f)
     return schemas
 
 
