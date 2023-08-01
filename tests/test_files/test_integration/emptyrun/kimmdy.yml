@@ -10,6 +10,6 @@ mds:
   prod:
     mdp: 'emptyrun.txt'
 reactions:
-  hat_naive:
+  hat_naive: {}
 sequence:
   - reactions

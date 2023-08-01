@@ -21,7 +21,7 @@ changer:
     md_parameter_growth: 'relax'    
 reactions:
   homolysis:
-    dat: 'edissoc.dat'
+    edis: 'edissoc.dat'
     itp: 'ffbonded.itp'
   hat_naive:
     frequency_factor: 100000000
