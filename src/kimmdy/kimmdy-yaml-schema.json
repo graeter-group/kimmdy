@@ -134,6 +134,18 @@
               "pytype": "str"
             }
           }
+        },
+        "topology": {
+          "type": "object",
+          "properties": {
+            "parameterization": {
+              "type": "string",
+              "pytype": "str",
+              "default": "grappa"
+            }
+          },
+          "required": ["parameterization"],
+          "additionalProperties": false
         }
       }
     },
