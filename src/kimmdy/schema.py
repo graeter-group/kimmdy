@@ -11,12 +11,16 @@ Reserved keywords:
 """
 import json
 import importlib.resources as pkg_resources
+import sys
+from typing import Optional
 
 # needed for eval of type_scheme from schema
 # don't remove even if lsp says it's unused
 import kimmdy
 from kimmdy import plugins
 import logging
+import pathlib
+from pathlib import Path
 
 
 class Sequence(list):
@@ -61,6 +65,12 @@ def load_plugin_schemas() -> dict:
         if plg_module_name == "kimmdy":
             continue
         scheme_path = pkg_resources.files(plg_module_name) / "kimmdy-yaml-schema.json"
+        if not scheme_path.exists():
+            logging.warn(
+                f"{plg_name} did not provide a `kimmdy-yaml-schema.json`!\n"
+                "Scheme will not be loaded!"
+            )
+            continue
         with open(scheme_path, "rt") as f:
             schemas[plg_name] = json.load(f)
 
