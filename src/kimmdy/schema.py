@@ -13,6 +13,7 @@ import json
 import importlib.resources as pkg_resources
 import sys
 from typing import Optional
+import logging
 
 # needed for eval of type_scheme from schema
 # don't remove even if lsp says it's unused
@@ -80,6 +81,12 @@ def load_plugin_schemas() -> dict:
             continue
         path = pkg_resources.files(plugin) / "kimmdy-yaml-schema.json"
         name = plugin.split(".")[-1]
+        with pkg_resources.as_file(path) as p:
+            if not p.exists():
+                logging.warning(
+                    f"Plugin {name} does not have a kimmdy-yaml-schema.json file! Skipping schema"
+                )
+                continue
         with path.open("rt") as f:
             schemas[name] = json.load(f)
     return schemas
