@@ -36,6 +36,7 @@ def coordinates_files():
         "topA_path": topA_path,
         "topB_path": topB_path,
         "topFEP_path": topFEP,
+        "fep": fep,
     }
     yield files
     (filedir / "amber99sb-star-ildnp.ff").unlink()
@@ -57,11 +58,23 @@ def test_get_bondobj(coordinates_files):
 
 
 def test_merge_prm_top(coordinates_files):
+    """this tests a topology merge for a HAT reaction from a Ca (nr 19) radical to a N (nr 26) radical"""
     topmerge = merge_top_parameter_growth(
         coordinates_files["topA"], coordinates_files["topB"]
     )
 
     assert topmerge.atoms == coordinates_files["topFEP"].atoms
-    assert topmerge.bonds == coordinates_files["topFEP"].bonds
-    assert topmerge.angles == coordinates_files["topFEP"].angles
-    assert topmerge.pairs == coordinates_files["topFEP"].pairs
+    assert topmerge.bonds.keys() == coordinates_files["topFEP"].bonds.keys()
+    assert topmerge.angles.keys() == coordinates_files["topFEP"].angles.keys()
+    assert topmerge.pairs.keys() == coordinates_files["topFEP"].pairs.keys()
+    assert (
+        topmerge.proper_dihedrals.keys()
+        == coordinates_files["topFEP"].proper_dihedrals.keys()
+    )
+    assert (
+        topmerge.improper_dihedrals.keys()
+        == coordinates_files["topFEP"].improper_dihedrals.keys()
+    )
+
+    assert topmerge.bonds[("19", "27")].funct == "3"
+    assert topmerge.bonds[("26", "27")].funct == "3"

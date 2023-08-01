@@ -141,6 +141,11 @@ def merge_top_parameter_growth(
             c5=deepcopy(hyperparameters["morse_steepness"]),
         )
 
+        # update bound_to
+        atompair = [topB.atoms[bond_key[0]], topB.atoms[bond_key[1]]]
+        atompair[0].bound_to_nrs.append(atompair[1].nr)
+        atompair[1].bound_to_nrs.append(atompair[0].nr)
+
     for bond_key in binding:
         bond_objB = get_atomicobj(bond_key, Bond, topB)
 
@@ -223,5 +228,8 @@ def merge_top_parameter_growth(
     #     dihedralB.c3 = deepcopy(dihedral_objB.c3)
     #     dihedralB.c4 = deepcopy(dihedral_objB.c4)
     #     dihedralB.c5 = deepcopy(dihedral_objB.c5)
+
+    ## update is_radical attribute of Atom objects in topology
+    topB._test_for_radicals()
 
     return topB

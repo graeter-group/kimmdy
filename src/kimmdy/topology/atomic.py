@@ -53,7 +53,7 @@ class Atom:
             mass=l[7],
             typeB=field_or_none(l, 8),
             chargeB=field_or_none(l, 9),
-            massB=field_or_none(l, 9),
+            massB=field_or_none(l, 10),
         )
 
 
