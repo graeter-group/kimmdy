@@ -22,7 +22,18 @@ from pathlib import Path
 
 
 class Sequence(list):
-    """A sequence of tasks."""
+    """A sequence of tasks.
+
+    Tasks can be grouped together by using a dictionary with the following
+    keys:
+        - mult: number of times to repeat the tasks
+        - tasks: list of tasks to repeat
+
+    Attributes
+    ----------
+    tasks:
+        list of tasks
+    """
 
     def __init__(self, tasks: list):
         list.__init__(self)
@@ -49,7 +60,7 @@ def load_kimmdy_schema() -> dict:
 
 
 def load_plugin_schemas() -> dict:
-    """Return the schemas for the plugins"""
+    """Return the schemas for the reaction plugins known to kimmdy"""
     if sys.version_info > (3, 10):
         from importlib_metadata import entry_points
 
@@ -76,7 +87,17 @@ def load_plugin_schemas() -> dict:
 
 def convert_schema_to_dict(dictionary: dict) -> dict:
     """Convert a dictionary from a raw json schema to a nested dictionary
-    where each leaf entry is a dictionary with the "pytype" and "default".
+
+    Parameters
+    ----------
+    dictionary:
+        dictionary from a raw json schema
+
+    Returns
+    -------
+    dict:
+        nested dictionary where each leaf entry is a dictionary with the
+        "pytype", "default" and "description" keys
     """
     result = {}
     properties = dictionary.get("properties")
@@ -113,6 +134,8 @@ def get_combined_scheme() -> dict:
 
     Nested scheme where each leaf entry is a dictionary with the "pytype",
     "default" and "description".
+    Contains the schema for the main kimmdy config file and all the plugins
+    known at runtime.
     """
     schema = load_kimmdy_schema()
     schemas = load_plugin_schemas()
@@ -136,7 +159,7 @@ def prune(d: dict) -> dict:
 
 
 def flatten_scheme(scheme, section="") -> list:
-    """recursively get properties and their desicripions from the scheme"""
+    """Recursively get properties and their desicripions from the scheme"""
     ls = []
     for key, value in scheme.items():
         if not isinstance(value, dict):

@@ -125,6 +125,7 @@ quartodoc:
         - name: constants
         - name: coordinates
         - name: config
+        - name: schema
         - name: kmc
         - name: misc_helper
         - name: parsing
