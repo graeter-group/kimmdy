@@ -196,7 +196,7 @@ def match_id_to_patch(id: list[str], patches: Patches) -> Optional[Patch]:
 
 
 def match_atomic_item_to_atomic_type(
-    id: list[str], types: AtomicTypes
+    id: list[str], types: AtomicTypes, periodicity: str = ""
 ) -> Optional[AtomicType]:
     def escape_re_atomtypes(s: str) -> str:
         """
@@ -210,6 +210,10 @@ def match_atomic_item_to_atomic_type(
     id_sym = reversed(id)
     id_str = "---".join(id)
     id_sym_str = "---".join(id_sym)
+    if periodicity:
+        id[-1] += ":::" + periodicity
+        id_str += ":::" + periodicity
+        id_sym_str += ":::" + periodicity
     result = None
     longest_match = 0
     for _, atomic_type in types.items():

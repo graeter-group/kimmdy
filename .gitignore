@@ -109,3 +109,5 @@ package-lock.json
 
 
 /.quarto/
+
+/.luarc.json

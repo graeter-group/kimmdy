@@ -63,6 +63,8 @@ def test_merge_prm_top(coordinates_files):
         coordinates_files["topA"], coordinates_files["topB"]
     )
 
+    #  write_top(topmerge.to_dict(),Path("/hits/fast/mbm/hartmaec/kimmdys/kimmdy_main/tests/test_files/test_coordinates/topol_curr.top"))
+
     assert topmerge.atoms == coordinates_files["topFEP"].atoms
     assert topmerge.bonds.keys() == coordinates_files["topFEP"].bonds.keys()
     assert topmerge.angles.keys() == coordinates_files["topFEP"].angles.keys()
@@ -78,3 +80,5 @@ def test_merge_prm_top(coordinates_files):
 
     assert topmerge.bonds[("19", "27")].funct == "3"
     assert topmerge.bonds[("26", "27")].funct == "3"
+    # assert one angle merge
+    # asster one dihedral merge improper/proper
