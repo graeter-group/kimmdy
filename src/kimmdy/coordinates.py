@@ -67,7 +67,7 @@ def get_atomicobj(key: list[str], type: Atomic, top: Topology, periodicity: str 
         else:
             instance = top.improper_dihedrals.get(key)
             match_obj = match_atomic_item_to_atomic_type(
-                type_key, top.ff.improper_dihedraltypes
+                type_key, top.ff.improper_dihedraltypes, "2"
             )
     else:
         raise ValueError(f"Could not match type {type} of atomic object.")
@@ -233,6 +233,7 @@ def merge_top_parameter_growth(
         )
 
     ## dihedrals
+    ## porper dihedrals
     # if indices change atomtypes and parameters change because of that, it will ignore these parameter change
 
     same, breaking, binding = get_keys(topA.proper_dihedrals, topB.proper_dihedrals)
@@ -350,4 +351,49 @@ def merge_top_parameter_growth(
     ## update is_radical attribute of Atom objects in topology
     topB._test_for_radicals()
 
+    ## improper dihedrals
+    same, breaking, binding = get_keys(topA.improper_dihedrals, topB.improper_dihedrals)
+
+    for dihedral_key in same:
+        dihedralA = topA.improper_dihedrals.get(dihedral_key)
+        dihedralB = topB.improper_dihedrals.get(dihedral_key)
+        if dihedralA != dihedralB:
+            # convert implicit standard ff parameters to explicit, if necessary
+            dihedral_objA = get_atomicobj(dihedral_key, Dihedral, topA)
+            dihedral_objB = get_atomicobj(dihedral_key, Dihedral, topB)
+
+            dihedralB.c3 = deepcopy(dihedral_objB.c0)
+            dihedralB.c4 = deepcopy(dihedral_objB.c1)
+            dihedralB.c5 = deepcopy(dihedral_objB.periodicity)
+            dihedralB.c0 = deepcopy(dihedral_objA.c0)
+            dihedralB.c1 = deepcopy(dihedral_objA.c1)
+            dihedralB.periodicity = deepcopy(dihedral_objB.periodicity)
+
+    for dihedral_key in breaking:
+        dihedral_objA = get_atomicobj(dihedral_key, Dihedral, topA)
+
+        topB.improper_dihedrals[(dihedral_key)] = Dihedral(
+            *dihedral_key,
+            funct="4",
+            c0=deepcopy(dihedral_objA.c0),
+            c1=deepcopy(dihedral_objA.c1),
+            periodicity=deepcopy(dihedral_objA.periodicity),
+            c3=deepcopy(dihedral_objA.c0),
+            c4="0.00",
+            c5=deepcopy(dihedral_objA.periodicity),
+        )
+
+    for dihedral_key in binding:
+        dihedral_objB = get_atomicobj(dihedral_key, Dihedral, topB)
+
+        topB.improper_dihedrals[(dihedral_key)] = Dihedral(
+            *dihedral_key,
+            funct="4",
+            c0=deepcopy(dihedral_objB.c0),
+            c1="0.00",
+            periodicity=deepcopy(dihedral_objB.periodicity),
+            c3=deepcopy(dihedral_objB.c0),
+            c4=deepcopy(dihedral_objB.c1),
+            c5=deepcopy(dihedral_objB.periodicity),
+        )
     return topB
