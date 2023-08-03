@@ -612,3 +612,16 @@ AtomicTypes = Union[
     dict[AngleId, AngleType],
     dict[DihedralId, DihedralType],
 ]
+InteractionIds = Union[BondId, AngleId, DihedralId]
+Interaction = Union[Bond, Pair, Angle, Dihedral]
+Interactions = Union[
+    dict[BondId, Bond],
+    dict[AngleId, Angle],
+    dict[DihedralId, Dihedral],
+]
+InteractionType = Union[BondType, AngleType, DihedralType]
+InteractionTypes = Union[
+    dict[BondId, BondType],
+    dict[AngleId, AngleType],
+    dict[DihedralId, DihedralType],
+]
