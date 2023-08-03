@@ -99,48 +99,77 @@ def get_explicit_or_type(
         )
 
 
-def merge_parameterized_dihedrals(
+def merge_dihedrals(
     dihedral_key: tuple[str, str, str, str],
-    dihedralA: Union[Dihedral, DihedralType, None],
-    dihedralB: Union[Dihedral, DihedralType, None],
+    interactionA: Union[Dihedral, None],
+    interactionB: Union[Dihedral, None],
+    interaction_typesA: InteractionTypes,
+    interaction_typesB: InteractionTypes,
+    topA: Topology,
+    topB: Topology,
     funct: str,
+    periodicity: str,
 ) -> Dihedral:
     """Merge one to two Dihedrals or -Types into a Dihedral in free-energy syntax"""
-    if dihedralA and dihedralB:
+    # convert implicit standard ff parameters to explicit, if necessary
+    if interactionA:
+        parameterizedA = get_explicit_or_type(
+            dihedral_key,
+            interactionA,
+            interaction_typesA,
+            topA,
+            periodicity,
+        )
+    else:
+        parameterizedA = None
+
+    if interactionB:
+        parameterizedB = get_explicit_or_type(
+            dihedral_key,
+            interactionB,
+            interaction_typesB,
+            topB,
+            periodicity,
+        )
+    else:
+        parameterizedB = None
+
+    # construct parameterized Dihedral
+    if parameterizedA and parameterizedB:
         # same
         dihedralmerge = Dihedral(
             *dihedral_key,
             funct=funct,
-            c0=dihedralA.c0,
-            c1=dihedralA.c1,
-            periodicity=dihedralA.periodicity,
-            c3=dihedralB.c0,
-            c4=dihedralB.c1,
-            c5=dihedralB.periodicity,
+            c0=parameterizedA.c0,
+            c1=parameterizedA.c1,
+            periodicity=parameterizedA.periodicity,
+            c3=parameterizedB.c0,
+            c4=parameterizedB.c1,
+            c5=parameterizedB.periodicity,
         )
-    elif dihedralA:
+    elif parameterizedA:
         # breaking
         dihedralmerge = Dihedral(
             *dihedral_key,
             funct=funct,
-            c0=dihedralA.c0,
-            c1=dihedralA.c1,
-            periodicity=dihedralA.periodicity,
-            c3=dihedralA.c0,
+            c0=parameterizedA.c0,
+            c1=parameterizedA.c1,
+            periodicity=parameterizedA.periodicity,
+            c3=parameterizedA.c0,
             c4="0.00",
-            c5=dihedralA.periodicity,
+            c5=parameterizedA.periodicity,
         )
-    elif dihedralB:
+    elif parameterizedB:
         # binding
         dihedralmerge = Dihedral(
             *dihedral_key,
             funct="9",
-            c0=dihedralB.c0,
+            c0=parameterizedB.c0,
             c1="0.00",
-            periodicity=dihedralB.periodicity,
-            c3=dihedralB.c0,
-            c4=dihedralB.c1,
-            c5=dihedralB.periodicity,
+            periodicity=parameterizedB.periodicity,
+            c3=parameterizedB.c0,
+            c4=parameterizedB.c1,
+            c5=parameterizedB.periodicity,
         )
     else:
         raise ValueError(
@@ -339,55 +368,46 @@ def merge_top_parameter_growth(
             for periodicity in periodicity_same:
                 interactionA = multiple_dihedralsA.dihedrals[periodicity]
                 interactionB = multiple_dihedralsB.dihedrals[periodicity]
+
                 if interactionA != interactionB:
-                    parameterizedA = get_explicit_or_type(
+                    multiple_dihedralsB.dihedrals[periodicity] = merge_dihedrals(
                         dihedral_key,
                         interactionA,
-                        topA.ff.proper_dihedraltypes,
-                        topA,
-                        periodicity,
-                    )
-                    parameterizedB = get_explicit_or_type(
-                        dihedral_key,
                         interactionB,
+                        topA.ff.proper_dihedraltypes,
                         topB.ff.proper_dihedraltypes,
+                        topA,
                         topB,
+                        "9",
                         periodicity,
-                    )
-                    multiple_dihedralsB.dihedrals[
-                        periodicity
-                    ] = merge_parameterized_dihedrals(
-                        dihedral_key, parameterizedA, parameterizedB, "9"
                     )
 
             for periodicity in periodicity_breaking:
                 interactionA = multiple_dihedralsA.dihedrals[periodicity]
-                parameterizedA = get_explicit_or_type(
+                multiple_dihedralsB.dihedrals[periodicity] = merge_dihedrals(
                     dihedral_key,
                     interactionA,
+                    None,
                     topA.ff.proper_dihedraltypes,
+                    topB.ff.proper_dihedraltypes,
                     topA,
+                    topB,
+                    "9",
                     periodicity,
-                )
-                multiple_dihedralsB.dihedrals[
-                    periodicity
-                ] = merge_parameterized_dihedrals(
-                    dihedral_key, parameterizedA, None, "9"
                 )
 
             for periodicity in periodicity_binding:
                 interactionB = multiple_dihedralsB.dihedrals[periodicity]
-                parameterizedB = get_explicit_or_type(
+                multiple_dihedralsB.dihedrals[periodicity] = merge_dihedrals(
                     dihedral_key,
+                    None,
                     interactionB,
+                    topA.ff.proper_dihedraltypes,
                     topB.ff.proper_dihedraltypes,
+                    topA,
                     topB,
+                    "9",
                     periodicity,
-                )
-                multiple_dihedralsB.dihedrals[
-                    periodicity
-                ] = merge_parameterized_dihedrals(
-                    dihedral_key, None, parameterizedB, "9"
                 )
         topB.proper_dihedrals[dihedral_key] = multiple_dihedralsB
 
@@ -400,8 +420,16 @@ def merge_top_parameter_growth(
         )
         multiple_dihedralsB = MultipleDihedrals(*dihedral_key, "9", {})
         for periodicity, parameterizedA in multiple_dihedralsA.dihedrals.items():
-            multiple_dihedralsB.dihedrals[periodicity] = merge_parameterized_dihedrals(
-                dihedral_key, parameterizedA, None, "9"
+            multiple_dihedralsB.dihedrals[periodicity] = merge_dihedrals(
+                dihedral_key,
+                parameterizedA,
+                None,
+                topA.ff.proper_dihedraltypes,
+                topB.ff.proper_dihedraltypes,
+                topA,
+                topB,
+                "9",
+                periodicity,
             )
         topB.proper_dihedrals[dihedral_key] = multiple_dihedralsB
 
@@ -413,8 +441,16 @@ def merge_top_parameter_growth(
             else multiple_dihedralsB
         )
         for periodicity, parameterizedB in multiple_dihedralsB.dihedrals.items():
-            multiple_dihedralsB.dihedrals[periodicity] = merge_parameterized_dihedrals(
-                dihedral_key, None, parameterizedB, "9"
+            multiple_dihedralsB.dihedrals[periodicity] = merge_dihedrals(
+                dihedral_key,
+                None,
+                parameterizedB,
+                topA.ff.proper_dihedraltypes,
+                topB.ff.proper_dihedraltypes,
+                topA,
+                topB,
+                "9",
+                periodicity,
             )
         topB.proper_dihedrals[dihedral_key] = multiple_dihedralsB
 
@@ -428,33 +464,44 @@ def merge_top_parameter_growth(
         interactionA = topA.improper_dihedrals[dihedral_key]
         interactionB = topB.improper_dihedrals[dihedral_key]
         if interactionA != interactionB:
-            # convert implicit standard ff parameters to explicit, if necessary
-            parameterizedA = get_explicit_or_type(
-                dihedral_key, interactionA, topA.ff.improper_dihedraltypes, topA, "2"
-            )
-            parameterizedB = get_explicit_or_type(
-                dihedral_key, interactionB, topB.ff.improper_dihedraltypes, topB, "2"
-            )
-            topB.improper_dihedrals[dihedral_key] = merge_parameterized_dihedrals(
-                dihedral_key, parameterizedA, parameterizedB, "4"
+            topB.improper_dihedrals[dihedral_key] = merge_dihedrals(
+                dihedral_key,
+                interactionA,
+                interactionB,
+                topA.ff.improper_dihedraltypes,
+                topB.ff.improper_dihedraltypes,
+                topA,
+                topB,
+                "4",
+                "2",
             )
 
     for dihedral_key in breaking:
         interactionA = topA.improper_dihedrals[dihedral_key]
-        parameterizedA = get_explicit_or_type(
-            dihedral_key, interactionA, topA.ff.improper_dihedraltypes, topA, "2"
-        )
-        topB.improper_dihedrals[dihedral_key] = merge_parameterized_dihedrals(
-            dihedral_key, parameterizedA, None, "4"
+        topB.improper_dihedrals[dihedral_key] = merge_dihedrals(
+            dihedral_key,
+            interactionA,
+            None,
+            topA.ff.improper_dihedraltypes,
+            topB.ff.improper_dihedraltypes,
+            topA,
+            topB,
+            "4",
+            "2",
         )
 
     for dihedral_key in binding:
         interactionB = topB.improper_dihedrals[dihedral_key]
-        parameterizedB = get_explicit_or_type(
-            dihedral_key, interactionB, topB.ff.improper_dihedraltypes, topB, "2"
-        )
-        topB.improper_dihedrals[dihedral_key] = merge_parameterized_dihedrals(
-            dihedral_key, None, parameterizedB, "4"
+        topB.improper_dihedrals[dihedral_key] = merge_dihedrals(
+            dihedral_key,
+            None,
+            interactionB,
+            topA.ff.improper_dihedraltypes,
+            topB.ff.improper_dihedraltypes,
+            topA,
+            topB,
+            "4",
+            "2",
         )
 
     ## update is_radical attribute of Atom objects in topology
