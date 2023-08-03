@@ -169,7 +169,7 @@ def check_gmx_version(config):
     """Check for an existing gromacs installation.
 
     If PLUMED is meant to be used it additionally checks for the keyword
-    'MODIFIED' in the version name.
+    'MODIFIED' or 'plumed' in the version name.
     """
     try:
         version = [
@@ -184,18 +184,13 @@ def check_gmx_version(config):
         logging.error(m)
         raise SystemError(m)
 
-    # this should probably be a TODO: then
-    # i hate this
-    if (
-        any(
-            "plumed" in y
-            for y in [
-                config.mds.attr(x).get_attributes() for x in config.mds.get_attributes()
-            ]
-        )
-        and not "MODIFIED" in version
-    ):
-        m = "GROMACS version does not contain MODIFIED, aborting due to lack of PLUMED patch."
+    if any(
+        "plumed" in y
+        for y in [
+            config.mds.attr(x).get_attributes() for x in config.mds.get_attributes()
+        ]
+    ) and (not ("MODIFIED" in version or "plumed" in version)):
+        m = "GROMACS version does not contain MODIFIED or plumed, aborting due to lack of PLUMED patch."
         logging.error(m)
         logging.error("Version was: " + version)
         if not config.dryrun:

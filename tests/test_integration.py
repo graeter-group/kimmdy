@@ -91,6 +91,7 @@ def test_integration_hat_reaction(tmp_path, caplog):
     )
 
 
+@pytest.mark.slow
 def test_integration_homolysis_reaction(tmp_path, caplog):
     testdir = setup_testdir(tmp_path, "homolysis")
     caplog.set_level(logging.INFO)
@@ -105,6 +106,7 @@ def test_integration_homolysis_reaction(tmp_path, caplog):
     )
 
 
+@pytest.mark.slow
 def test_integration_whole_run(tmp_path, caplog):
     testdir = setup_testdir(tmp_path, "whole_run")
     caplog.set_level(logging.INFO)
