@@ -43,11 +43,21 @@ def coordinates_files():
 
 
 def test_get_bondobj(coordinates_files):
-    bond1_keys = ["17", "18"]
-    bond1obj = get_explicit_or_type(bond1_keys, Bond, coordinates_files["topA"])
+    bond1_keys = ("17", "18")
+    bond1obj = get_explicit_or_type(
+        bond1_keys,
+        coordinates_files["topA"].bonds[bond1_keys],
+        coordinates_files["topA"].ff.bondtypes,
+        coordinates_files["topA"],
+    )
 
-    bond2_keys = ["17", "19"]
-    bond2obj = get_explicit_or_type(bond2_keys, Bond, coordinates_files["topA"])
+    bond2_keys = ("17", "19")
+    bond2obj = get_explicit_or_type(
+        bond2_keys,
+        coordinates_files["topA"].bonds[bond2_keys],
+        coordinates_files["topA"].ff.bondtypes,
+        coordinates_files["topA"],
+    )
     assert float(bond1obj.c0) == pytest.approx(0.10100) and float(
         bond1obj.c1
     ) == pytest.approx(363171.2)
@@ -63,12 +73,12 @@ def test_merge_prm_top(coordinates_files):
         coordinates_files["topA"], coordinates_files["topB"]
     )
 
-    write_top(
-        topmerge.to_dict(),
-        Path(
-            "/hits/fast/mbm/hartmaec/kimmdys/kimmdy_main/tests/test_files/test_coordinates/topol_curr.top"
-        ),
-    )
+    # write_top(
+    #     topmerge.to_dict(),
+    #     Path(
+    #         "/hits/fast/mbm/hartmaec/kimmdys/kimmdy_main/tests/test_files/test_coordinates/topol_curr.top"
+    #     ),
+    # )
 
     assert topmerge.atoms == coordinates_files["topFEP"].atoms
     assert topmerge.bonds.keys() == coordinates_files["topFEP"].bonds.keys()

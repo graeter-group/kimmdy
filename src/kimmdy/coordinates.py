@@ -1,12 +1,6 @@
-"""
-TODO: WIP
-"""
 import logging
 from typing import Union
 from copy import deepcopy
-
-from kimmdy.parsing import read_top
-from kimmdy.tasks import TaskFiles
 from kimmdy.topology.topology import Topology
 from kimmdy.topology.atomic import (
     Bond,
@@ -14,13 +8,9 @@ from kimmdy.topology.atomic import (
     Dihedral,
     DihedralType,
     MultipleDihedrals,
-    Pair,
     Interaction,
-    Interactions,
     InteractionType,
     InteractionTypes,
-    InteractionIds,
-    BondId,
 )
 from kimmdy.topology.utils import (
     match_atomic_item_to_atomic_type,
@@ -34,29 +24,22 @@ def is_parameterized(entry: Interaction):
     return entry.c0 != None and entry.c1 != None
 
 
-def get_keys(
-    interactionA: Interactions, interactionB: Interactions
-) -> tuple[list[InteractionIds], list[InteractionIds], list[InteractionIds]]:
-    """For a pair of Interactions, returns same keys, keys only in
-    interactionA == breaking and keys only in interactionB == binding
-    """
-    # also works for MultipleDihedrals.dihedrals
-    keysA = set(interactionA.keys())
-    keysB = set(interactionB.keys())
-
-    same: set[InteractionIds] = set.intersection(keysA, keysB)
-    breaking = keysA - keysB
-    binding = keysB - keysA
-
-    return list(same), list(breaking), list(binding)
-
-
 def get_explicit_MultipleDihedrals(
-    dihedral_key: tuple[str, str, str, str], top: Topology, periodicity_max: int = 6
-):
+    dihedral_key: tuple[str, str, str, str],
+    top: Topology,
+    dihedrals_in: Union[MultipleDihedrals, None],
+    periodicity_max: int = 6,
+) -> Union[MultipleDihedrals, None]:
     """Takes a valid dihedral key and returns explicit
     dihedral parameters for a given topology
     """
+    if not dihedrals_in:
+        return None
+
+    if not "" in dihedrals_in.dihedrals.keys():
+        # empty string means implicit parameters
+        return dihedrals_in
+
     type_key = [top.atoms[x].type for x in dihedral_key]
 
     multiple_dihedrals = MultipleDihedrals(*dihedral_key, "9", {})
@@ -69,19 +52,25 @@ def get_explicit_MultipleDihedrals(
             l = [*dihedral_key, "9", match_obj.c0, match_obj.c1, match_obj.periodicity]
             multiple_dihedrals.dihedrals[str(periodicity)] = Dihedral.from_top_line(l)
 
+    if not multiple_dihedrals.dihedrals:
+        return None
+
     return multiple_dihedrals
 
 
 def get_explicit_or_type(
     key: tuple[str, ...],
-    interaction: Interaction,
+    interaction: Union[Interaction, None],
     interaction_types: InteractionTypes,
     top: Topology,
     periodicity: str = "",
-) -> Union[Interaction, InteractionType]:
+) -> Union[Interaction, InteractionType, None]:
     """Takes an Interaction and associated key, InteractionTypes, Topology
     and Periodicity (for dihedrals) and returns an object with the parameters of this Interaction
     """
+    if not interaction:
+        return None
+
     if is_parameterized(interaction):
         return interaction
 
@@ -103,8 +92,8 @@ def merge_dihedrals(
     dihedral_key: tuple[str, str, str, str],
     interactionA: Union[Dihedral, None],
     interactionB: Union[Dihedral, None],
-    interaction_typesA: InteractionTypes,
-    interaction_typesB: InteractionTypes,
+    interaction_typesA: dict[tuple[str, ...], DihedralType],
+    interaction_typesB: dict[tuple[str, ...], DihedralType],
     topA: Topology,
     topB: Topology,
     funct: str,
@@ -210,67 +199,58 @@ def merge_top_parameter_growth(
                 )
 
     ## bonds
-    same, breaking, binding = get_keys(topA.bonds, topB.bonds)
+    keysA = set(topA.bonds.keys())
+    keysB = set(topB.bonds.keys())
+    keys = keysA | keysB
 
-    for bond_key in same:
-        interactionA = topA.bonds[bond_key]
-        interactionB = topB.bonds[bond_key]
+    for key in keys:
+        interactionA = topA.bonds.get(key)
+        interactionB = topB.bonds.get(key)
 
         if interactionA != interactionB:
             parameterizedA = get_explicit_or_type(
-                bond_key, interactionA, topA.ff.bondtypes, topA
+                key, interactionA, topA.ff.bondtypes, topA
             )
             parameterizedB = get_explicit_or_type(
-                bond_key, interactionB, topB.ff.bondtypes, topB
+                key, interactionB, topB.ff.bondtypes, topB
             )
+            if parameterizedA and parameterizedB:
+                topB.bonds[key] = Bond(
+                    *key,
+                    funct=parameterizedB.funct,
+                    c0=parameterizedA.c0,
+                    c1=parameterizedA.c1,
+                    c2=parameterizedB.c0,
+                    c3=parameterizedB.c1,
+                )
+            elif parameterizedA:
+                topB.bonds[key] = Bond(
+                    *key,
+                    funct="3",
+                    c0=parameterizedA.c0,
+                    c1=hyperparameters["morse_well_depth"],
+                    c2=hyperparameters["morse_steepness"],
+                    c3=f"{float(parameterizedA.c0)*hyperparameters['morse_dist_factor']:7.5f}",
+                    c4="0.00",
+                    c5=hyperparameters["morse_steepness"],
+                )
 
-            topB.bonds[bond_key] = Bond(
-                *bond_key,
-                funct=parameterizedB.funct,
-                c0=parameterizedA.c0,
-                c1=parameterizedA.c1,
-                c2=parameterizedB.c0,
-                c3=parameterizedB.c1,
-            )
+                # update bound_to
+                atompair = [topB.atoms[key[0]], topB.atoms[key[1]]]
+                atompair[0].bound_to_nrs.append(atompair[1].nr)
+                atompair[1].bound_to_nrs.append(atompair[0].nr)
 
-    for bond_key in breaking:
-        interactionA = topA.bonds[bond_key]
-        parameterizedA = get_explicit_or_type(
-            bond_key, interactionA, topA.ff.bondtypes, topA
-        )
-
-        topB.bonds[bond_key] = Bond(
-            *bond_key,
-            funct="3",
-            c0=parameterizedA.c0,
-            c1=hyperparameters["morse_well_depth"],
-            c2=hyperparameters["morse_steepness"],
-            c3=f"{float(parameterizedA.c0)*hyperparameters['morse_dist_factor']:7.5f}",
-            c4="0.00",
-            c5=hyperparameters["morse_steepness"],
-        )
-
-        # update bound_to
-        atompair = [topB.atoms[bond_key[0]], topB.atoms[bond_key[1]]]
-        atompair[0].bound_to_nrs.append(atompair[1].nr)
-        atompair[1].bound_to_nrs.append(atompair[0].nr)
-
-    for bond_key in binding:
-        interactionB = topB.bonds[bond_key]
-        parameterizedB = get_explicit_or_type(
-            bond_key, interactionB, topB.ff.bondtypes, topB
-        )
-
-        topB.bonds[bond_key] = Bond(
-            *bond_key,
-            funct="3",
-            c0=f"{float(parameterizedB.c0)*hyperparameters['morse_dist_factor']:7.5f}",
-            c1="0.00",
-            c2=hyperparameters["morse_steepness"],
-            c3=parameterizedB.c0,
-            c4=hyperparameters["morse_well_depth"],
-            c5=hyperparameters["morse_steepness"],
-        )
+            elif parameterizedB:
+                topB.bonds[key] = Bond(
+                    *key,
+                    funct="3",
+                    c0=f"{float(parameterizedB.c0)*hyperparameters['morse_dist_factor']:7.5f}",
+                    c1="0.00",
+                    c2=hyperparameters["morse_steepness"],
+                    c3=parameterizedB.c0,
+                    c4=hyperparameters["morse_well_depth"],
+                    c5=hyperparameters["morse_steepness"],
+                )
 
     ## pairs and exclusions
     exclusions_content = get_protein_section(topB.top, "exclusions")
@@ -279,128 +259,101 @@ def merge_top_parameter_growth(
         exclusions = {"content": [], "else_content": [], "extra": [], "condition": None}
         topB.top["moleculetype_0"]["subsections"]["exclusions"] = exclusions
         exclusions_content = exclusions["content"]
-
-    for bond_key in breaking:
-        topB.pairs.pop(bond_key, None)
-        exclusions_content.append(list(bond_key))
+    for key in keysA - keysB:
+        topB.pairs.pop(key, None)
+        exclusions_content.append(list(key))
 
     set_protein_section(topB.top, "exclusions", exclusions_content)
 
     ## angles
-    same, breaking, binding = get_keys(topA.angles, topB.angles)
-
-    for angle_key in same:
-        interactionA = topA.angles[angle_key]
-        interactionB = topB.angles[angle_key]
+    keys = set(topA.angles.keys()) | set(topB.angles.keys())
+    for key in keys:
+        interactionA = topA.angles.get(key)
+        interactionB = topB.angles.get(key)
 
         if interactionA != interactionB:
             parameterizedA = get_explicit_or_type(
-                angle_key, interactionA, topA.ff.angletypes, topA
+                key, interactionA, topA.ff.angletypes, topA
             )
             parameterizedB = get_explicit_or_type(
-                angle_key, interactionB, topB.ff.angletypes, topB
+                key, interactionB, topB.ff.angletypes, topB
             )
-            topB.angles[angle_key] = Angle(
-                *angle_key,
-                funct=parameterizedB.funct,
-                c0=parameterizedA.c0,
-                c1=parameterizedA.c1,
-                c2=parameterizedB.c0,
-                c3=parameterizedB.c1,
-            )
-
-    for angle_key in breaking:
-        interactionA = topA.angles[angle_key]
-        parameterizedA = get_explicit_or_type(
-            angle_key, interactionA, topA.ff.angletypes, topA
-        )
-        topB.angles[angle_key] = Angle(
-            *angle_key,
-            funct="1",
-            c0=parameterizedA.c0,
-            c1=parameterizedA.c1,
-            c2=parameterizedA.c0,
-            c3="0.00",
-        )
-
-    for angle_key in binding:
-        interactionB = topB.angles[angle_key]
-        parameterizedB = get_explicit_or_type(
-            angle_key, interactionB, topB.ff.angletypes, topB
-        )
-        topB.angles[angle_key] = Angle(
-            *angle_key,
-            funct="1",
-            c0=parameterizedB.c0,
-            c1="0.00",
-            c2=parameterizedB.c0,
-            c3=parameterizedB.c1,
-        )
+            if parameterizedA and parameterizedB:
+                topB.angles[key] = Angle(
+                    *key,
+                    funct=parameterizedB.funct,
+                    c0=parameterizedA.c0,
+                    c1=parameterizedA.c1,
+                    c2=parameterizedB.c0,
+                    c3=parameterizedB.c1,
+                )
+            elif parameterizedA:
+                topB.angles[key] = Angle(
+                    *key,
+                    funct="1",
+                    c0=parameterizedA.c0,
+                    c1=parameterizedA.c1,
+                    c2=parameterizedA.c0,
+                    c3="0.00",
+                )
+            elif parameterizedB:
+                topB.angles[key] = Angle(
+                    *key,
+                    funct="1",
+                    c0=parameterizedB.c0,
+                    c1="0.00",
+                    c2=parameterizedB.c0,
+                    c3=parameterizedB.c1,
+                )
+            else:
+                logging.warning(f"Could not parameterize angle {key}.")
 
     ## dihedrals
     ## proper dihedrals
+    # proper dihedrals have a nested structure and need a different treatment from bonds, angles and improper dihedrals
     # if indices change atomtypes and parameters change because of that, it will ignore these parameter change
 
-    same, breaking, binding = get_keys(topA.proper_dihedrals, topB.proper_dihedrals)
+    keys = set(topA.proper_dihedrals.keys()) | set(topB.proper_dihedrals.keys())
+    for key in keys:
+        multiple_dihedralsA = topA.proper_dihedrals.get(key)
+        multiple_dihedralsB = topB.proper_dihedrals.get(key)
 
-    for dihedral_key in same:
-        # dihedrals have a nested structure and need a different treatment from bonds and angles
-        multiple_dihedralsA = topA.proper_dihedrals[dihedral_key]
-        multiple_dihedralsB = topB.proper_dihedrals[dihedral_key]
         if multiple_dihedralsA != multiple_dihedralsB:
-            # convert implicit standard ff parameters to explicit
-            multiple_dihedralsA = (
-                get_explicit_MultipleDihedrals(dihedral_key, topA)
-                if "" in multiple_dihedralsA.dihedrals.keys()
-                else multiple_dihedralsA
+            multiple_dihedralsA = get_explicit_MultipleDihedrals(
+                key, topA, multiple_dihedralsA
             )
-            multiple_dihedralsB = (
-                get_explicit_MultipleDihedrals(dihedral_key, topB)
-                if "" in multiple_dihedralsB.dihedrals.keys()
-                else multiple_dihedralsB
+            multiple_dihedralsB = get_explicit_MultipleDihedrals(
+                key, topB, multiple_dihedralsB
+            )
+            keysA = (
+                set(multiple_dihedralsA.dihedrals.keys())
+                if multiple_dihedralsA
+                else set()
+            )
+            keysB = (
+                set(multiple_dihedralsB.dihedrals.keys())
+                if multiple_dihedralsB
+                else set()
             )
 
-            # periodicity-wise construction of merged parameters
-            periodicity_same, periodicity_breaking, periodicity_binding = get_keys(
-                multiple_dihedralsA.dihedrals, multiple_dihedralsB.dihedrals
-            )
-
-            for periodicity in periodicity_same:
-                interactionA = multiple_dihedralsA.dihedrals[periodicity]
-                interactionB = multiple_dihedralsB.dihedrals[periodicity]
-
-                if interactionA != interactionB:
-                    multiple_dihedralsB.dihedrals[periodicity] = merge_dihedrals(
-                        dihedral_key,
-                        interactionA,
-                        interactionB,
-                        topA.ff.proper_dihedraltypes,
-                        topB.ff.proper_dihedraltypes,
-                        topA,
-                        topB,
-                        "9",
-                        periodicity,
-                    )
-
-            for periodicity in periodicity_breaking:
-                interactionA = multiple_dihedralsA.dihedrals[periodicity]
-                multiple_dihedralsB.dihedrals[periodicity] = merge_dihedrals(
-                    dihedral_key,
-                    interactionA,
-                    None,
-                    topA.ff.proper_dihedraltypes,
-                    topB.ff.proper_dihedraltypes,
-                    topA,
-                    topB,
-                    "9",
-                    periodicity,
+            topB.proper_dihedrals[key] = MultipleDihedrals(*key, "9", {})
+            periodicities = keysA | keysB
+            for periodicity in periodicities:
+                assert isinstance(periodicity, str)
+                interactionA = (
+                    multiple_dihedralsA.dihedrals.get(periodicity)
+                    if multiple_dihedralsA
+                    else None
+                )
+                interactionB = (
+                    multiple_dihedralsB.dihedrals.get(periodicity)
+                    if multiple_dihedralsB
+                    else None
                 )
 
-            for periodicity in periodicity_binding:
-                interactionB = multiple_dihedralsB.dihedrals[periodicity]
-                multiple_dihedralsB.dihedrals[periodicity] = merge_dihedrals(
-                    dihedral_key,
-                    None,
+                topB.proper_dihedrals[key].dihedrals[periodicity] = merge_dihedrals(
+                    key,
+                    interactionA,
                     interactionB,
                     topA.ff.proper_dihedraltypes,
                     topB.ff.proper_dihedraltypes,
@@ -409,63 +362,20 @@ def merge_top_parameter_growth(
                     "9",
                     periodicity,
                 )
-        topB.proper_dihedrals[dihedral_key] = multiple_dihedralsB
-
-    for dihedral_key in breaking:
-        multiple_dihedralsA = topA.proper_dihedrals.get(dihedral_key)
-        multiple_dihedralsA = (
-            get_explicit_MultipleDihedrals(dihedral_key, topA)
-            if "" in multiple_dihedralsA.dihedrals.keys()
-            else multiple_dihedralsA
-        )
-        multiple_dihedralsB = MultipleDihedrals(*dihedral_key, "9", {})
-        for periodicity, parameterizedA in multiple_dihedralsA.dihedrals.items():
-            multiple_dihedralsB.dihedrals[periodicity] = merge_dihedrals(
-                dihedral_key,
-                parameterizedA,
-                None,
-                topA.ff.proper_dihedraltypes,
-                topB.ff.proper_dihedraltypes,
-                topA,
-                topB,
-                "9",
-                periodicity,
-            )
-        topB.proper_dihedrals[dihedral_key] = multiple_dihedralsB
-
-    for dihedral_key in binding:
-        multiple_dihedralsB = topB.proper_dihedrals.get(dihedral_key)
-        multiple_dihedralsB = (
-            get_explicit_MultipleDihedrals(dihedral_key, topB)
-            if "" in multiple_dihedralsB.dihedrals.keys()
-            else multiple_dihedralsB
-        )
-        for periodicity, parameterizedB in multiple_dihedralsB.dihedrals.items():
-            multiple_dihedralsB.dihedrals[periodicity] = merge_dihedrals(
-                dihedral_key,
-                None,
-                parameterizedB,
-                topA.ff.proper_dihedraltypes,
-                topB.ff.proper_dihedraltypes,
-                topA,
-                topB,
-                "9",
-                periodicity,
-            )
-        topB.proper_dihedrals[dihedral_key] = multiple_dihedralsB
 
     ## improper dihedrals
     # all impropers in amber99SB ffbonded.itp have a periodicity of 2
     # but not the ones defined in aminoacids.rtp. For now, I am assuming
     # a periodicity of 2 in this section
-    same, breaking, binding = get_keys(topA.improper_dihedrals, topB.improper_dihedrals)
 
-    for dihedral_key in same:
-        interactionA = topA.improper_dihedrals[dihedral_key]
-        interactionB = topB.improper_dihedrals[dihedral_key]
+    keys = set(topA.improper_dihedrals.keys()) | set(topB.improper_dihedrals.keys())
+    for key in keys:
+        interactionA = topA.improper_dihedrals.get(key)
+        interactionB = topB.improper_dihedrals.get(key)
+
         if interactionA != interactionB:
-            topB.improper_dihedrals[dihedral_key] = merge_dihedrals(
-                dihedral_key,
+            topB.improper_dihedrals[key] = merge_dihedrals(
+                key,
                 interactionA,
                 interactionB,
                 topA.ff.improper_dihedraltypes,
@@ -475,34 +385,6 @@ def merge_top_parameter_growth(
                 "4",
                 "2",
             )
-
-    for dihedral_key in breaking:
-        interactionA = topA.improper_dihedrals[dihedral_key]
-        topB.improper_dihedrals[dihedral_key] = merge_dihedrals(
-            dihedral_key,
-            interactionA,
-            None,
-            topA.ff.improper_dihedraltypes,
-            topB.ff.improper_dihedraltypes,
-            topA,
-            topB,
-            "4",
-            "2",
-        )
-
-    for dihedral_key in binding:
-        interactionB = topB.improper_dihedrals[dihedral_key]
-        topB.improper_dihedrals[dihedral_key] = merge_dihedrals(
-            dihedral_key,
-            None,
-            interactionB,
-            topA.ff.improper_dihedraltypes,
-            topB.ff.improper_dihedraltypes,
-            topA,
-            topB,
-            "4",
-            "2",
-        )
 
     ## update is_radical attribute of Atom objects in topology
     topB._test_for_radicals()
