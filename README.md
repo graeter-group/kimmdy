@@ -1,5 +1,7 @@
 # KIMMDY
 
+[![CI](https://github.com/hits-mbm-dev/kimmdy/actions/workflows/ci.yml/badge.svg)](https://github.com/hits-mbm-dev/kimmdy/actions/workflows/ci.yml)
+
 Reactive MD pipeline for GROMACS using Kinetic Monte Carlo / Molecular Dynamics (KIMMDY)
 
 ## Quick start
