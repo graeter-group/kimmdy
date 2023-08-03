@@ -207,11 +207,12 @@ def match_atomic_item_to_atomic_type(
         return s.replace("*", "STAR").replace("+", "PLUS")
 
     id = [escape_re_atomtypes(s) for s in id]
-    id_sym = reversed(id)
+    id_sym = id[::-1]
     id_str = "---".join(id)
     id_sym_str = "---".join(id_sym)
     if periodicity:
         id[-1] += ":::" + periodicity
+        id_sym[-1] += ":::" + periodicity
         id_str += ":::" + periodicity
         id_sym_str += ":::" + periodicity
     result = None
