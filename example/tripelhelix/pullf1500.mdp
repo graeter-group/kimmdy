@@ -5,7 +5,7 @@ title                    = Pulling simulation
 integrator  = md
 dt          = 0.002
 tinit       = 0
-nsteps      = 500    ; 
+nsteps      = 1000    ; 
 nstcomm     = 10
 ; Output parameters
 nstxout     = 100      ; every x ps

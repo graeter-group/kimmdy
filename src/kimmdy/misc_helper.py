@@ -95,7 +95,8 @@ def _build_examples(args: argparse.Namespace):
         "hat_naive": "alanine",
         "homolysis": "hexalanine",
         "whole_run": "charged_peptide",
-    }  # ,'pull':'tripelhelix'}
+        "pull": "tripelhelix",
+    }
     basedir = Path(__file__).parents[2]
     testpath = basedir / "tests" / "test_files" / "test_integration"
     assetpath = basedir / "tests" / "test_files" / "assets"

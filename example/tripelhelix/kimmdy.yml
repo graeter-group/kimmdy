@@ -1,6 +1,8 @@
+# yaml-language-server: $schema=../../../../src/kimmdy/kimmdy-yaml-schema.json
+
+name: 'kimmdy_001'
 dryrun: false
 iterations: 10
-out: 'test_out_001'
 gromacs_alias: 'gmx'
 ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
 top: 'topol.top'
@@ -15,7 +17,7 @@ mds:
       dat: 'plumed.dat'
       distances: 'distances.dat'
   relax:
-    mdp: 'broken_equil_f1000.mdp'
+    mdp: 'pullf1500.mdp'
 changer:
   coordinates:
     md: 'relax'     
@@ -26,7 +28,7 @@ reactions:
   dummyreaction: {}
 sequence:
   - equilibrium
-  - mult: 2
+  - mult: 1
     tasks:
       - prod
       - reactions
