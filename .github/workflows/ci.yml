@@ -38,9 +38,14 @@ jobs:
     runs-on: ubuntu-latest
     container: riedmiki/gromacs-plumed-python:2021
     steps:
+      - name: Check pr lable
+        uses: jesusvasquez333/verify-pr-label-action@v1.4.0
+        with:
+          github-token: '${{ secrets.GITHUB_TOKEN }}'
+          valid-labels: 'CI:run_test'
+          invalid-labels: 'autorelease:tagged'
       - uses  : actions/checkout@v3
       - name: run tox
-        if : contains( github.event.pull_request.labeled.label.name, 'CI:run_test')
         run: tox || true
       - name: zip coverage report
         run: zip -r htmlcov.zip htmlcov || true
@@ -48,4 +53,5 @@ jobs:
         with:
           name: coverage artifact
           path: htmlcov.zip
-            
+
+          
