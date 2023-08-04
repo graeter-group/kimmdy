@@ -9,7 +9,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: psf/black@stable
   release:
     name: release
@@ -23,7 +23,7 @@ jobs:
         with:
           release-type: python
           package-name: kimmdy
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: tag stable versions
         if: ${{ steps.release.outputs.release_created }}
         run: |
@@ -34,3 +34,35 @@ jobs:
           git push origin :stable || true
           git tag -a stable -m "Last Stable Release"
           git push origin stable
+  prlabel:
+    runs-on: ubuntu-latest
+    outputs:
+      status: ${{ steps.prcheck.conclusion }}
+    steps:
+      - name: Check pr lable
+        id: prcheck
+        uses: jesusvasquez333/verify-pr-label-action@v1.4.0
+        with:
+          github-token: '${{ secrets.GITHUB_TOKEN }}'
+          valid-labels: 'CI:run_test'
+          invalid-labels: ''
+          disable-reviews: true
+  test:
+    runs-on: ubuntu-latest
+    container: riedmiki/gromacs-plumed-python:2021
+    needs: prlabel
+    if: needs.prlabel.outputs.status == 'success'
+    steps:
+      - uses  : actions/checkout@v3
+      - name: run tox
+        run: tox
+      - name: zip coverage report
+        if: ${{ !cancelled() }}
+        run: zip -r htmlcov.zip htmlcov || true
+      - uses: actions/upload-artifact@v3
+        if: ${{ !cancelled() }}
+        with:
+          name: coverage artifact
+          path: htmlcov.zip
+
+          
