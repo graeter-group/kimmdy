@@ -34,18 +34,25 @@ jobs:
           git push origin :stable || true
           git tag -a stable -m "Last Stable Release"
           git push origin stable
-  test:
+  prlabel:
     runs-on: ubuntu-latest
-    container: riedmiki/gromacs-plumed-python:2021
+    outputs:
+      status: ${{ steps.prcheck.conclusion }}
     steps:
       - name: Check pr lable
-        id: prlabel
+        id: prcheck
         uses: jesusvasquez333/verify-pr-label-action@v1.4.0
         with:
           github-token: '${{ secrets.GITHUB_TOKEN }}'
           valid-labels: 'CI:run_test'
-          invalid-labels: 'autorelease:tagged'
+          invalid-labels: ''
           disable-reviews: true
+  test:
+    runs-on: ubuntu-latest
+    container: riedmiki/gromacs-plumed-python:2021
+    needs: prlabel
+    if: needs.prlabel.outputs.status == 'success'
+    steps:
       - uses  : actions/checkout@v3
       - name: run tox
         run: tox
@@ -57,8 +64,5 @@ jobs:
         with:
           name: coverage artifact
           path: htmlcov.zip
-      - name: Get exit status for badge
-        if: ${{ failure() && steps.prlabel.conclusion == 'failure'}}
-        run: true
 
           
