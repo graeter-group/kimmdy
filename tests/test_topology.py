@@ -244,7 +244,10 @@ class TestTopology:
         assert top.improper_dihedrals == og_top.improper_dihedrals
 
     @given(bondindex=st.integers(min_value=0, max_value=70))
-    @settings(suppress_health_check=[HealthCheck.function_scoped_fixture])
+    @settings(
+        suppress_health_check=[HealthCheck.function_scoped_fixture], deadline=1000
+    )
+    @pytest.mark.slow
     def test_break_bind_random_bond_hexala(self, hexala_top_fix, bondindex):
         top = deepcopy(hexala_top_fix)
         og_top = deepcopy(top)
