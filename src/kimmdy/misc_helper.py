@@ -87,27 +87,31 @@ def concat_traj(
 
     subprocess.run(command, cwd=run_dir)
 
+
 def _build_examples(args: argparse.Namespace):
     overwrite = True if args.restore else False
 
-    rename = {'hat_naive':'alanine','homolysis':'hexalanine','whole_run':'charged_peptide'}#,'pull':'tripelhelix'}
+    rename = {
+        "hat_naive": "alanine",
+        "homolysis": "hexalanine",
+        "whole_run": "charged_peptide",
+    }  # ,'pull':'tripelhelix'}
     basedir = Path(__file__).parents[2]
-    testpath =  basedir / "tests" / "test_files" / "test_integration"
+    testpath = basedir / "tests" / "test_files" / "test_integration"
     assetpath = basedir / "tests" / "test_files" / "assets"
     examplepath = basedir / "example"
-    
 
-    for k,v in rename.items():
+    for k, v in rename.items():
         try:
             srcpath = testpath / k
             dstpath = examplepath / v
-            if args.restore == 'hard':
-                shutil.rmtree(dstpath,ignore_errors=True)
-            shutil.copytree(srcpath,  dstpath , dirs_exist_ok= overwrite)
-            (dstpath/ "amber99sb-star-ildnp.ff").unlink(missing_ok=True)
-            (dstpath/ "amber99sb-star-ildnp.ff").symlink_to(
+            if args.restore == "hard":
+                shutil.rmtree(dstpath, ignore_errors=True)
+            shutil.copytree(srcpath, dstpath, dirs_exist_ok=overwrite)
+            (dstpath / "amber99sb-star-ildnp.ff").unlink(missing_ok=True)
+            (dstpath / "amber99sb-star-ildnp.ff").symlink_to(
                 (assetpath / "amber99sb-star-ildnp.ff"),
-                target_is_directory=True, 
+                target_is_directory=True,
             )
         except FileExistsError as e:
             raise FileExistsError(

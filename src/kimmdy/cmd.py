@@ -219,13 +219,17 @@ def get_build_example_args():
     """
     parser = argparse.ArgumentParser(description="Build examples for KIMMDY.")
     parser.add_argument(
-        "-r", "--restore", const=True, nargs='?',help="Overwrite input files in existing example directories, use keyword 'hard' to also delete output files."
+        "-r",
+        "--restore",
+        const=True,
+        nargs="?",
+        help="Overwrite input files in existing example directories, use keyword 'hard' to also delete output files.",
     )
     return parser.parse_args()
 
+
 def build_examples():
-    """Build examples from the command line.
-    """
+    """Build examples from the command line."""
     args = get_build_example_args()
     _build_examples(args)
     pass
