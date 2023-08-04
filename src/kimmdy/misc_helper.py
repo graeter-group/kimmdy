@@ -99,8 +99,8 @@ def _build_examples(args: argparse.Namespace):
     }
     basedir = Path(__file__).parents[2]
     testpath = basedir / "tests" / "test_files" / "test_integration"
-    assetpath = basedir / "tests" / "test_files" / "assets"
     examplepath = basedir / "example"
+    relassetpath = Path(".") / ".." / ".." / "tests" / "test_files" / "assets"
 
     for k, v in rename.items():
         try:
@@ -111,7 +111,7 @@ def _build_examples(args: argparse.Namespace):
             shutil.copytree(srcpath, dstpath, dirs_exist_ok=overwrite)
             (dstpath / "amber99sb-star-ildnp.ff").unlink(missing_ok=True)
             (dstpath / "amber99sb-star-ildnp.ff").symlink_to(
-                (assetpath / "amber99sb-star-ildnp.ff"),
+                relassetpath / "amber99sb-star-ildnp.ff",
                 target_is_directory=True,
             )
         except FileExistsError as e:
