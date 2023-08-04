@@ -104,6 +104,7 @@ def test_integration_homolysis_reaction(tmp_path, caplog):
         set(caplog.records[-1].message.split(sep=" "))
     )
 
+
 def test_integration_pull(tmp_path, caplog):
     testdir = setup_testdir(tmp_path, "pull")
     caplog.set_level(logging.INFO)
@@ -116,6 +117,7 @@ def test_integration_pull(tmp_path, caplog):
     assert set(["Finished", "running", "tasks,"]).issubset(
         set(caplog.records[-1].message.split(sep=" "))
     )
+
 
 def test_integration_whole_run(tmp_path, caplog):
     testdir = setup_testdir(tmp_path, "whole_run")
