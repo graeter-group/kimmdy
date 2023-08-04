@@ -108,6 +108,21 @@ def test_integration_homolysis_reaction(tmp_path, caplog):
 
 
 @pytest.mark.slow
+def test_integration_pull(tmp_path, caplog):
+    testdir = setup_testdir(tmp_path, "pull")
+    caplog.set_level(logging.INFO)
+
+    kimmdy_run()
+
+    for record in caplog.records:
+        # assert record.levelname != "WARNING"
+        assert record.levelname != "CRITICAL"
+    assert set(["Finished", "running", "tasks,"]).issubset(
+        set(caplog.records[-1].message.split(sep=" "))
+    )
+
+
+@pytest.mark.slow
 def test_integration_whole_run(tmp_path, caplog):
     testdir = setup_testdir(tmp_path, "whole_run")
     caplog.set_level(logging.INFO)
