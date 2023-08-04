@@ -39,6 +39,7 @@ jobs:
     container: riedmiki/gromacs-plumed-python:2021
     steps:
       - name: Check pr lable
+        id: prlabel
         uses: jesusvasquez333/verify-pr-label-action@v1.4.0
         with:
           github-token: '${{ secrets.GITHUB_TOKEN }}'
@@ -57,7 +58,7 @@ jobs:
           name: coverage artifact
           path: htmlcov.zip
       - name: Get exit status for badge
-        if: ${{ failure() }}
-        run: false
+        if: ${{ failure() && steps.prlabel.conclusion == 'failure'}}
+        run: true
 
           
