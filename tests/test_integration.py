@@ -78,6 +78,7 @@ def test_grompp_with_kimmdy_topology(tmp_path):
     )
 
 
+@pytest.mark.slow
 def test_integration_hat_reaction(tmp_path, caplog):
     testdir = setup_testdir(tmp_path, "hat_naive")
     caplog.set_level(logging.INFO)

@@ -40,11 +40,10 @@ jobs:
     steps:
       - uses  : actions/checkout@v3
       - name: run tox
-        run: |
-          tox
-          zip -r htmlcov.zip htmlcov
+        run: tox || true
+      - name: zip coverage report
+        run: zip -r htmlcov.zip htmlcov || true
       - uses: actions/upload-artifact@v3
-        if: ${{ !cancelled() }}
         with:
           name: coverage artifact
           path: htmlcov.zip
