@@ -7,7 +7,7 @@ import logging
 from pathlib import Path
 import dill
 from kimmdy.config import Config
-from kimmdy.misc_helper import concat_traj
+from kimmdy.misc_helper import concat_traj, _build_examples
 from kimmdy.runmanager import RunManager
 from kimmdy.utils import check_gmx_version, increment_logfile
 import importlib.resources as pkg_resources
@@ -207,6 +207,28 @@ def kimmdy_run(
     )
     _run(args)
     logging.shutdown()
+
+
+def get_build_example_args():
+    """Parse command line arguments.
+
+    Returns
+    -------
+    Namespace
+        parsed command line arguments
+    """
+    parser = argparse.ArgumentParser(description="Build examples for KIMMDY.")
+    parser.add_argument(
+        "-r", "--restore", const=True, nargs='?',help="Overwrite input files in existing example directories, use keyword 'hard' to also delete output files."
+    )
+    return parser.parse_args()
+
+def build_examples():
+    """Build examples from the command line.
+    """
+    args = get_build_example_args()
+    _build_examples(args)
+    pass
 
 
 def kimmdy():
