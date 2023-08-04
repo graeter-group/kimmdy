@@ -44,6 +44,7 @@ jobs:
           tox
           zip -r htmlcov.zip htmlcov
       - uses: actions/upload-artifact@v3
+        if: ${{ !cancelled() }}
         with:
           name: coverage artifact
           path: htmlcov.zip
