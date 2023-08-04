@@ -1,6 +1,8 @@
+# yaml-language-server: $schema=../../../../src/kimmdy/kimmdy-yaml-schema.json
+
+name: 'minimal'
 dryrun: false
 iterations: 0
-out: 'minimal'
 gromacs_alias: 'gmx'
 top: 'minimal.top'
 gro: 'minimal.gro'
