@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=../../../../src/kimmdy/kimmdy-yaml-schema.json
+# yaml-language-server: $schema=../../src/kimmdy/kimmdy-yaml-schema.json
 
 dryrun: false
 name: 'alanine_hat_000'
