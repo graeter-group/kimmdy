@@ -1,6 +1,8 @@
+# yaml-language-server: $schema=../../../../src/kimmdy/kimmdy-yaml-schema.json
+
+name: 'kimmdy_001'
 dryrun: false
 iterations: 100
-out: 'whole_run_001'
 gromacs_alias: 'gmx'
 # ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
 top: 'IMREE.top'
@@ -21,7 +23,7 @@ changer:
     md_parameter_growth: 'relax'    
 reactions:
   homolysis:
-    dat: 'edissoc.dat'
+    edis: 'edissoc.dat'
     itp: 'ffbonded.itp'
   hat_naive:
     frequency_factor: 100000000
@@ -31,7 +33,7 @@ sequence:
   - equilibrium
   - pull
   -
-    mult: 4
+    mult: 2
     tasks:
       - reactions
       - equilibrium

@@ -1,6 +1,8 @@
+# yaml-language-server: $schema=../../../../src/kimmdy/kimmdy-yaml-schema.json
+
 dryrun: false
+name: 'hexalanine_homolysis_000'
 iterations: 100
-out: 'test_out_001'
 gromacs_alias: 'gmx'
 ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
 top: 'hexala_out.top'
@@ -21,7 +23,7 @@ changer:
     md_parameter_growth: 'relax'
 reactions:
   homolysis:
-    dat: 'edissoc.dat'
+    edis: 'edissoc.dat'
     itp: 'ffbonded.itp'
 sequence:
   - equilibrium

@@ -21,9 +21,9 @@ changer:
     md: 'relax'     
 reactions:
   homolysis:
-    dat: 'edissoc.dat'
+    edis: 'edissoc.dat'
     itp: 'ffbonded.itp'
-  dummyreaction:
+  dummyreaction: {}
 sequence:
   - equilibrium
   - mult: 2

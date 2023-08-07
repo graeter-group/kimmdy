@@ -53,7 +53,7 @@ class Atom:
             mass=l[7],
             typeB=field_or_none(l, 8),
             chargeB=field_or_none(l, 9),
-            massB=field_or_none(l, 9),
+            massB=field_or_none(l, 10),
         )
 
 
@@ -608,6 +608,19 @@ Atomic = Union[Atom, Bond, Pair, Angle, Dihedral]
 AtomicType = Union[AtomType, BondType, AngleType, DihedralType]
 AtomicTypes = Union[
     dict[AtomId, AtomType],
+    dict[BondId, BondType],
+    dict[AngleId, AngleType],
+    dict[DihedralId, DihedralType],
+]
+InteractionIds = Union[BondId, AngleId, DihedralId]
+Interaction = Union[Bond, Pair, Angle, Dihedral]
+Interactions = Union[
+    dict[BondId, Bond],
+    dict[AngleId, Angle],
+    dict[DihedralId, Dihedral],
+]
+InteractionType = Union[BondType, AngleType, DihedralType]
+InteractionTypes = Union[
     dict[BondId, BondType],
     dict[AngleId, AngleType],
     dict[DihedralId, DihedralType],

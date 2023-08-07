@@ -88,7 +88,7 @@ class Config:
                 if general_subscheme is not None:
                     general_subscheme.update(subscheme)
                     subscheme = general_subscheme
-                assert subscheme is not None
+                assert subscheme is not None, (k, v, scheme)
                 subsection = f"{section}.{k}"
                 subconfig = Config(
                     recursive_dict=v, scheme=subscheme, section=subsection

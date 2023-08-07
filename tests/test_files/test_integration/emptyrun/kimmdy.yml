@@ -1,6 +1,8 @@
+# yaml-language-server: $schema=../../../../src/kimmdy/kimmdy-yaml-schema.json
+
+name: 'emptyrun_001'
 dryrun: false
 iterations: 0
-out: 'emptyrun_001'
 gromacs_alias: 'gmx'
 # ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
 top: 'emptyrun.txt'
@@ -10,6 +12,6 @@ mds:
   prod:
     mdp: 'emptyrun.txt'
 reactions:
-  hat_naive:
+  hat_naive: {}
 sequence:
   - reactions
