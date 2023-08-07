@@ -116,9 +116,11 @@ def _build_examples(args: argparse.Namespace):
                 target_is_directory=True,
             )
             # fix scheme path
-            yml = dstpath / 'kimmdy.yml'
+            yml = dstpath / "kimmdy.yml"
             if yml.exists():
-                scheme_p = Path("..") / ".." / "src" / "kimmdy" / "kimmdy-yaml-schema.json"
+                scheme_p = (
+                    Path("..") / ".." / "src" / "kimmdy" / "kimmdy-yaml-schema.json"
+                )
                 first_line = f"# yaml-language-server: $schema={scheme_p}\n"
                 with open(yml, "r+") as f:
                     lines = f.readlines()
@@ -129,7 +131,7 @@ def _build_examples(args: argparse.Namespace):
                     f.seek(0)
                     f.writelines(lines)
                     f.truncate()
-            
+
             print("done")
         except FileExistsError as e:
             raise FileExistsError(
