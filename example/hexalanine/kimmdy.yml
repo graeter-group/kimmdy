@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=../../../../src/kimmdy/kimmdy-yaml-schema.json
+# yaml-language-server: $schema=../../src/kimmdy/kimmdy-yaml-schema.json
 
 dryrun: false
 name: 'hexalanine_homolysis_000'
