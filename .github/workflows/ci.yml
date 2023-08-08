@@ -6,7 +6,7 @@ on:
 
 jobs:
   lint:
-    if: github.event.label.name == 'testthis'
+    if:  github.event.label.name == 'testthis' && !startsWith(github.head_ref, 'release-please-')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
