@@ -27,12 +27,12 @@ and computationally expensive operations.
 
 #### Parameters
 
-| Name             | Type                 | Description                                                                                                                            | Default    |
-|------------------|----------------------|----------------------------------------------------------------------------------------------------------------------------------------|------------|
-| `input_file`     | pathlib.Path \| None | Path to the config yaml file.                                                                                                          | `None`     |
-| `recursive_dict` | dict \| None         | For internal use only, used in reading settings in recursively.                                                                        | `None`     |
-| `scheme`         | dict \| None         | dict containing types and defaults for casting and validating settings.                                                                | `None`     |
-| `section`        | str                  | current section e.g. to determine the level of recursion in nested configs e.g. "config", "config.mds" or "config.reactions.homolysis" | `'config'` |
+| Name             | Type                           | Description                                                                                                                            | Default    |
+|------------------|--------------------------------|----------------------------------------------------------------------------------------------------------------------------------------|------------|
+| `input_file`     | [Path](`pathlib.Path`) \| None | Path to the config yaml file.                                                                                                          | `None`     |
+| `recursive_dict` | [dict](`dict`) \| None         | For internal use only, used in reading settings in recursively.                                                                        | `None`     |
+| `scheme`         | [dict](`dict`) \| None         | dict containing types and defaults for casting and validating settings.                                                                | `None`     |
+| `section`        | [str](`str`)                   | current section e.g. to determine the level of recursion in nested configs e.g. "config", "config.mds" or "config.reactions.homolysis" | `'config'` |
 
 #### Methods
 

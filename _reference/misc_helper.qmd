@@ -2,7 +2,7 @@
 
 `misc_helper`
 
-Miscelaneous utilitiies that didn't fit anywhere else for now.
+Miscelaneous utilitiies that didn&#x27;t fit anywhere else for now.
 
 ## Functions
 
@@ -18,8 +18,8 @@ Find and concatenate trajectories from KIMMDY runs.
 
 #### Parameters
 
-| Name        | Type                | Description                                                                                       | Default    |
-|-------------|---------------------|---------------------------------------------------------------------------------------------------|------------|
-| `run_dir`   | pathlib.Path \| str | Directory containing directories of multiple tasks.                                               | _required_ |
-| `out`       | Path                | File Path into the output trr will be written. Default `concat.trr` in given run_dir              | `None`     |
-| `run_types` | list                | List of tasks to get trrs from. If a task is not in this list it will be skipped. By default None | `None`     |
+| Name        | Type                                   | Description                                                                                       | Default    |
+|-------------|----------------------------------------|---------------------------------------------------------------------------------------------------|------------|
+| `run_dir`   | [Path](`pathlib.Path`) \| [str](`str`) | Directory containing directories of multiple tasks.                                               | _required_ |
+| `out`       | [Path](`pathlib.Path`)                 | File Path into the output trr will be written. Default `concat.trr` in given run_dir              | `None`     |
+| `run_types` | [list](`list`)                         | List of tasks to get trrs from. If a task is not in this list it will be skipped. By default None | `None`     |

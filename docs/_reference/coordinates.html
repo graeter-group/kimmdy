@@ -338,6 +338,12 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">utils</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/reaction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">reaction</span></a>
+  </div>
+</li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
@@ -385,7 +391,11 @@ ul.task-list li input[type="checkbox"] {
   <ul>
   <li><a href="#functions" id="toc-functions" class="nav-link" data-scroll-target="#functions">Functions</a>
   <ul>
+  <li><a href="#kimmdy.coordinates.get_explicit_MultipleDihedrals" id="toc-kimmdy.coordinates.get_explicit_MultipleDihedrals" class="nav-link" data-scroll-target="#kimmdy.coordinates.get_explicit_MultipleDihedrals">get_explicit_MultipleDihedrals</a></li>
+  <li><a href="#kimmdy.coordinates.get_explicit_or_type" id="toc-kimmdy.coordinates.get_explicit_or_type" class="nav-link" data-scroll-target="#kimmdy.coordinates.get_explicit_or_type">get_explicit_or_type</a></li>
   <li><a href="#kimmdy.coordinates.is_parameterized" id="toc-kimmdy.coordinates.is_parameterized" class="nav-link" data-scroll-target="#kimmdy.coordinates.is_parameterized">is_parameterized</a></li>
+  <li><a href="#kimmdy.coordinates.merge_dihedrals" id="toc-kimmdy.coordinates.merge_dihedrals" class="nav-link" data-scroll-target="#kimmdy.coordinates.merge_dihedrals">merge_dihedrals</a></li>
+  <li><a href="#kimmdy.coordinates.merge_top_parameter_growth" id="toc-kimmdy.coordinates.merge_top_parameter_growth" class="nav-link" data-scroll-target="#kimmdy.coordinates.merge_top_parameter_growth">merge_top_parameter_growth</a></li>
   </ul></li>
   </ul></li>
   </ul>
@@ -399,7 +409,6 @@ ul.task-list li input[type="checkbox"] {
 <section id="kimmdy.coordinates" class="level1">
 <h1>coordinates</h1>
 <p><code>coordinates</code></p>
-<p>TODO: WIP</p>
 <section id="functions" class="level2">
 <h2 class="anchored" data-anchor-id="functions">Functions</h2>
 <table class="table">
@@ -411,15 +420,51 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
+<td><a href="#kimmdy.coordinates.get_explicit_MultipleDihedrals">get_explicit_MultipleDihedrals</a></td>
+<td>Takes a valid dihedral key and returns explicit</td>
+</tr>
+<tr class="even">
+<td><a href="#kimmdy.coordinates.get_explicit_or_type">get_explicit_or_type</a></td>
+<td>Takes an Interaction and associated key, InteractionTypes, Topology</td>
+</tr>
+<tr class="odd">
 <td><a href="#kimmdy.coordinates.is_parameterized">is_parameterized</a></td>
 <td>Parameterized topology entries have c0 and c1 attributes != None</td>
 </tr>
+<tr class="even">
+<td><a href="#kimmdy.coordinates.merge_dihedrals">merge_dihedrals</a></td>
+<td>Merge one to two Dihedrals or -Types into a Dihedral in free-energy syntax</td>
+</tr>
+<tr class="odd">
+<td><a href="#kimmdy.coordinates.merge_top_parameter_growth">merge_top_parameter_growth</a></td>
+<td>Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation</td>
+</tr>
 </tbody>
 </table>
+<section id="kimmdy.coordinates.get_explicit_MultipleDihedrals" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.coordinates.get_explicit_MultipleDihedrals">get_explicit_MultipleDihedrals</h3>
+<p><code>coordinates.get_explicit_MultipleDihedrals(dihedral_key, top, dihedrals_in, periodicity_max=6)</code></p>
+<p>Takes a valid dihedral key and returns explicit dihedral parameters for a given topology</p>
+</section>
+<section id="kimmdy.coordinates.get_explicit_or_type" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.coordinates.get_explicit_or_type">get_explicit_or_type</h3>
+<p><code>coordinates.get_explicit_or_type(key, interaction, interaction_types, top, periodicity='')</code></p>
+<p>Takes an Interaction and associated key, InteractionTypes, Topology and Periodicity (for dihedrals) and returns an object with the parameters of this Interaction</p>
+</section>
 <section id="kimmdy.coordinates.is_parameterized" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.coordinates.is_parameterized">is_parameterized</h3>
 <p><code>coordinates.is_parameterized(entry)</code></p>
 <p>Parameterized topology entries have c0 and c1 attributes != None</p>
+</section>
+<section id="kimmdy.coordinates.merge_dihedrals" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.coordinates.merge_dihedrals">merge_dihedrals</h3>
+<p><code>coordinates.merge_dihedrals(dihedral_key, interactionA, interactionB, interaction_typesA, interaction_typesB, topA, topB, funct, periodicity)</code></p>
+<p>Merge one to two Dihedrals or -Types into a Dihedral in free-energy syntax</p>
+</section>
+<section id="kimmdy.coordinates.merge_top_parameter_growth" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.coordinates.merge_top_parameter_growth">merge_top_parameter_growth</h3>
+<p><code>coordinates.merge_top_parameter_growth(topA, topB, focus_nr=None)</code></p>
+<p>Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation</p>
 
 
 </section>

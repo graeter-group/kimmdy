@@ -67,7 +67,7 @@ config.reactions
 
 ```{.yaml filename='kimmdy.yml'}
 dryrun: false
-iterations: 100
+max_tasks: 100
 name: 'hat_tf_000'
 gromacs_alias: 'gmx'
 top: 'Ala_out.top'

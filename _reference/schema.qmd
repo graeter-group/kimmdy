@@ -1,0 +1,100 @@
+# schema { #kimmdy.schema }
+
+`schema`
+
+Handle the schema for the config file.
+To  be used by the config module to validate the config file and set defaults
+for the Config object.
+
+Reserved keywords:
+    - pytype
+    - default
+    - description
+    - type
+
+## Classes
+
+| Name | Description |
+| --- | --- |
+| [Sequence](#kimmdy.schema.Sequence) | A sequence of tasks. |
+
+### Sequence { #kimmdy.schema.Sequence }
+
+`schema.Sequence(self, tasks)`
+
+A sequence of tasks.
+
+Tasks can be grouped together by using a dictionary with the following
+keys:
+    - mult: number of times to repeat the tasks
+    - tasks: list of tasks to repeat
+
+#### Attributes
+
+| Name   | Type   | Description   |
+|--------|--------|---------------|
+| tasks  |        | list of tasks |
+
+## Functions
+
+| Name | Description |
+| --- | --- |
+| [convert_schema_to_dict](#kimmdy.schema.convert_schema_to_dict) | Convert a dictionary from a raw json schema to a nested dictionary |
+| [flatten_scheme](#kimmdy.schema.flatten_scheme) | Recursively get properties and their desicripions from the scheme |
+| [get_combined_scheme](#kimmdy.schema.get_combined_scheme) | Return the schema for the config file. |
+| [load_kimmdy_schema](#kimmdy.schema.load_kimmdy_schema) | Return the schema for the config file |
+| [load_plugin_schemas](#kimmdy.schema.load_plugin_schemas) | Return the schemas for the reaction plugins known to kimmdy |
+| [prune](#kimmdy.schema.prune) | Remove empty dicts from a nested dict |
+
+### convert_schema_to_dict { #kimmdy.schema.convert_schema_to_dict }
+
+`schema.convert_schema_to_dict(dictionary)`
+
+Convert a dictionary from a raw json schema to a nested dictionary
+
+#### Parameters
+
+| Name         | Type           | Description                       | Default    |
+|--------------|----------------|-----------------------------------|------------|
+| `dictionary` | [dict](`dict`) | dictionary from a raw json schema | _required_ |
+
+#### Returns
+
+| Type           | Description                                                                                                 |
+|----------------|-------------------------------------------------------------------------------------------------------------|
+| [dict](`dict`) | nested dictionary where each leaf entry is a dictionary with the "pytype", "default" and "description" keys |
+
+### flatten_scheme { #kimmdy.schema.flatten_scheme }
+
+`schema.flatten_scheme(scheme, section='')`
+
+Recursively get properties and their desicripions from the scheme
+
+### get_combined_scheme { #kimmdy.schema.get_combined_scheme }
+
+`schema.get_combined_scheme()`
+
+Return the schema for the config file.
+
+Nested scheme where each leaf entry is a dictionary with the &quot;pytype&quot;,
+&quot;default&quot; and &quot;description&quot;.
+Contains the schema for the main kimmdy config file and all the plugins
+known at runtime.
+
+### load_kimmdy_schema { #kimmdy.schema.load_kimmdy_schema }
+
+`schema.load_kimmdy_schema()`
+
+Return the schema for the config file
+
+### load_plugin_schemas { #kimmdy.schema.load_plugin_schemas }
+
+`schema.load_plugin_schemas()`
+
+Return the schemas for the reaction plugins known to kimmdy
+
+### prune { #kimmdy.schema.prune }
+
+`schema.prune(d)`
+
+Remove empty dicts from a nested dict

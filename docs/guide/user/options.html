@@ -372,6 +372,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">utils</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../_reference/reaction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">reaction</span></a>
+  </div>
+</li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
@@ -510,10 +516,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td></td>
 </tr>
 <tr class="odd">
-<td>iterations</td>
-<td>Number of iterations to run</td>
+<td>max_tasks</td>
+<td>Maximum number of tasks to run. This is useful when a task in the sequence can dymanically add more tasks. 0 means no limit.</td>
 <td>int</td>
-<td>1</td>
+<td>0</td>
 <td></td>
 </tr>
 <tr class="even">
@@ -552,125 +558,132 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td></td>
 </tr>
 <tr class="odd">
+<td>gmx_mdrun_flags</td>
+<td>Flags passed to gmx mdrun. e.g.&nbsp;<code>-nt 8 -maxh 24</code></td>
+<td>str</td>
+<td>-maxh 24 -dlb yes</td>
+<td></td>
+</tr>
+<tr class="even">
 <td>ff</td>
 <td>Force field directory (looks for .ff in cwd if not set)</td>
 <td>Path</td>
 <td>*.ff</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>mds</td>
 <td>Settings for MD steps, e.g.&nbsp;mdp files, plumed files, etc.</td>
 <td></td>
 <td></td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>mds.*.mdp</td>
 <td>MDP file for the MD step</td>
 <td>Path</td>
 <td></td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>mds.*.prefix</td>
 <td>TODO: What is this?</td>
 <td>str</td>
 <td></td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>mds.*.overwrite</td>
 <td>TODO: What is this?</td>
 <td>str</td>
 <td></td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><strong>mds.*.plumed</strong></td>
 <td></td>
 <td></td>
 <td></td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>changer</td>
 <td>Settings for the coordinate changer</td>
 <td></td>
 <td></td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><strong>changer.coordinates.md</strong></td>
 <td></td>
 <td>str</td>
 <td></td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><strong>changer.coordinates.md_parameter_growth</strong></td>
 <td></td>
 <td>str</td>
 <td></td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>sequence</td>
 <td>List of tasks. Each task can be a string (the name of the task) or an object with the task name and a multiplicity <code>mult: &lt;int&gt;</code></td>
 <td>Sequence</td>
 <td></td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>reactions</td>
 <td>Settings for reactions</td>
 <td></td>
 <td></td>
 <td></td>
 </tr>
-<tr class="even">
-<td>reactions.homolysis.dat</td>
-<td>Dissociation energies ata file</td>
+<tr class="odd">
+<td>reactions.homolysis.edis</td>
+<td>Dissociation energies data file</td>
 <td>Path</td>
 <td>edissoc.dat</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>reactions.homolysis.itp</td>
 <td>Additional itp file with bonded parameters</td>
 <td>Path</td>
 <td>ffbonded.itp</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>reactions.hat_naive.frequency_factor</td>
 <td>Frequency factor</td>
 <td>float</td>
 <td>1</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>reactions.hat_naive.h_cutoff</td>
 <td>Cutoff for H atom</td>
 <td>float</td>
 <td>4</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>reactions.hat_naive.polling_rate</td>
 <td>Polling rate</td>
 <td>float</td>
 <td>1</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>reactions.dummyreaction.example</td>
 <td>This is an example of an option for a reaction.</td>
 <td>float</td>
 <td>0.0</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>reactions.dummyreaction.example2</td>
 <td>This is another example of an option for a reaction.</td>
 <td>str</td>
@@ -688,7 +701,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><strong>kimmdy.yml</strong></pre>
 </div>
 <div class="sourceCode" id="cb3"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dryrun</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">iterations</span><span class="kw">:</span><span class="at"> </span><span class="dv">100</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">max_tasks</span><span class="kw">:</span><span class="at"> </span><span class="dv">100</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">name</span><span class="kw">:</span><span class="at"> </span><span class="st">'hat_tf_000'</span></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">gromacs_alias</span><span class="kw">:</span><span class="at"> </span><span class="st">'gmx'</span></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">top</span><span class="kw">:</span><span class="at"> </span><span class="st">'Ala_out.top'</span></span>

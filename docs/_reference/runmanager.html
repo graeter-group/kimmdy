@@ -338,6 +338,12 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">utils</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/reaction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">reaction</span></a>
+  </div>
+</li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
@@ -441,11 +447,6 @@ ul.task-list li input[type="checkbox"] {
 <section id="attributes" class="level4">
 <h4 class="anchored" data-anchor-id="attributes">Attributes</h4>
 <table class="table">
-<colgroup>
-<col style="width: 15%">
-<col style="width: 36%">
-<col style="width: 47%">
-</colgroup>
 <thead>
 <tr class="header">
 <th>Name</th>
@@ -456,77 +457,72 @@ ul.task-list li input[type="checkbox"] {
 <tbody>
 <tr class="odd">
 <td>config</td>
-<td>Config</td>
+<td><a href="../_reference/config.html#kimmdy.config.Config">Config</a></td>
 <td>The configuration object.</td>
 </tr>
 <tr class="even">
 <td>from_checkpoint</td>
-<td>bool</td>
+<td><a href="https://docs.python.org/3.10/library/functions.html#bool">bool</a></td>
 <td>Whether the runmanager was initialized from a checkpoint.</td>
 </tr>
 <tr class="odd">
 <td>tasks</td>
-<td>queue.Queue[kimmdy.tasks.Task]</td>
+<td><a href="https://docs.python.org/3.10/library/queue.html#module-queue">queue</a>.<a href="https://docs.python.org/3.10/library/queue.html#queue.Queue">Queue</a>[<a href="../_reference/tasks.html#kimmdy.tasks.Task">Task</a>]</td>
 <td>Tasks from config.</td>
 </tr>
 <tr class="even">
 <td>crr_tasks</td>
-<td>queue.Queue[kimmdy.tasks.Task]</td>
+<td><a href="https://docs.python.org/3.10/library/queue.html#module-queue">queue</a>.<a href="https://docs.python.org/3.10/library/queue.html#queue.Queue">Queue</a>[<a href="../_reference/tasks.html#kimmdy.tasks.Task">Task</a>]</td>
 <td>Current tasks.</td>
 </tr>
 <tr class="odd">
 <td>iteration</td>
-<td>int</td>
+<td><a href="https://docs.python.org/3.10/library/functions.html#int">int</a></td>
 <td>Current iteration.</td>
 </tr>
 <tr class="even">
-<td>iterations</td>
-<td>int</td>
-<td>Total number of iterations.</td>
-</tr>
-<tr class="odd">
 <td>state</td>
-<td>State</td>
+<td><a href="../_reference/runmanager.html#kimmdy.runmanager.State">State</a></td>
 <td>Current state of the system.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>recipe_collection</td>
-<td>RecipeCollection</td>
+<td><a href="../_reference/reaction.html#kimmdy.reaction.RecipeCollection">RecipeCollection</a></td>
 <td>Collection of recipes.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>latest_files</td>
-<td>dict[str, pathlib.Path]</td>
+<td><code>dict</code>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>, <a href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path">Path</a>]</td>
 <td>Dictionary of latest files.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>histfile</td>
-<td>Path</td>
+<td><a href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path">Path</a></td>
 <td>Path to history file.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>cptfile</td>
-<td>Path</td>
+<td><a href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path">Path</a></td>
 <td>Path to checkpoint file.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>ffpatch</td>
 <td></td>
 <td>Path to force field patch file.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>top</td>
 <td></td>
 <td>Topology object.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>filehist</td>
-<td>list[dict[str, kimmdy.tasks.TaskFiles]]</td>
+<td><code>list</code>[<code>dict</code>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>, <a href="../_reference/tasks.html#kimmdy.tasks.TaskFiles">TaskFiles</a>]]</td>
 <td>List of dictionaries of TaskFiles.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>task_mapping</td>
-<td>TaskMapping</td>
+<td><code>TaskMapping</code></td>
 <td>Mapping of task names to runmanager methods.</td>
 </tr>
 </tbody>

@@ -18,14 +18,14 @@ A topology keeps track of connections and applies patches to parameters when bon
 
 Assumptions:
 
-- the topology of interest (the protein) is in section 'moleculetype_0'.
+- the topology of interest (the protein) is in section &#x27;moleculetype_0&#x27;.
 
 #### Parameters
 
-| Name      | Type                            | Description                                                        | Default    |
-|-----------|---------------------------------|--------------------------------------------------------------------|------------|
-| `top`     | TopologyDict                    | A dictionary containing the parsed topology data.                  | _required_ |
-| `ffpatch` | typing.Optional\[pathlib.Path\] | Path to a force field patch file. If None, no patching is applied. | `None`     |
+| Name      | Type                                                    | Description                                                        | Default    |
+|-----------|---------------------------------------------------------|--------------------------------------------------------------------|------------|
+| `top`     | [TopologyDict](`kimmdy.parsing.TopologyDict`)           | A dictionary containing the parsed topology data.                  | _required_ |
+| `ffpatch` | [Optional](`typing.Optional`)\[[Path](`pathlib.Path`)\] | Path to a force field patch file. If None, no patching is applied. | `None`     |
 
 #### Methods
 
@@ -49,9 +49,9 @@ Furthermore, it modifies to function types in the topology to account for radica
 
 ###### Parameters
 
-| Name           | Type              | Description                                                                                                                                            | Default    |
-|----------------|-------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
-| `atompair_nrs` | tuple\[str, str\] | A tuple of integers with the atoms ids (id, starting at 1) with `from`, the atom being moved and `to`, the atom to which the `from` atom will be bound | _required_ |
+| Name           | Type                                           | Description                                                                                                                                            | Default    |
+|----------------|------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| `atompair_nrs` | [tuple](`tuple`)\[[str](`str`), [str](`str`)\] | A tuple of integers with the atoms ids (id, starting at 1) with `from`, the atom being moved and `to`, the atom to which the `from` atom will be bound | _required_ |
 
 ##### break_bond { #kimmdy.topology.topology.Topology.break_bond }
 

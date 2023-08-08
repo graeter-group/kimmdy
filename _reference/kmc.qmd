@@ -24,11 +24,11 @@ The result of a KMC step. Similar to a Recipe but for the concrete realization o
 
 #### Attributes
 
-| Name                 | Type                                                     | Description                                          |
-|----------------------|----------------------------------------------------------|------------------------------------------------------|
-| recipe_steps         | typing.Union\[list\[kimmdy.reaction.RecipeStep\], None\] | Single sequence of RecipeSteps to build product      |
-| reaction_probability | typing.Union\[list\[float\], None\]                      | Integral of reaction propensity with respect to time |
-| time_step            | typing.Union\[float, None\]                              | Time step during which the reaction occurs           |
+| Name                 | Type                                                                                          | Description                                          |
+|----------------------|-----------------------------------------------------------------------------------------------|------------------------------------------------------|
+| recipe_steps         | [Union](`typing.Union`)\[[list](`list`)\[[RecipeStep](`kimmdy.reaction.RecipeStep`)\], None\] | Single sequence of RecipeSteps to build product      |
+| reaction_probability | [Union](`typing.Union`)\[[list](`list`)\[[float](`float`)\], None\]                           | Integral of reaction propensity with respect to time |
+| time_step            | [Union](`typing.Union`)\[[float](`float`), None\]                                             | Time step during which the reaction occurs           |
 
 ## Functions
 
@@ -44,15 +44,15 @@ The result of a KMC step. Similar to a Recipe but for the concrete realization o
 First Reaction Method variant of Kinetic Monte Carlo.
 takes RecipeCollection and choses a recipe based on which reaction would occur.
 
-Compare e.g. <https://en.wikipedia.org/wiki/Kinetic_Monte_Carlo#Time-dependent_Algorithms>
+Compare e.g. &lt;https://en.wikipedia.org/wiki/Kinetic_Monte_Carlo#Time-dependent_Algorithms&gt;
 
 #### Parameters
 
-| Name                | Type                        | Description                                                                        | Default         |
-|---------------------|-----------------------------|------------------------------------------------------------------------------------|-----------------|
-| `recipe_collection` | RecipeCollection            | from which one will be choosen                                                     | _required_      |
-| `rng`               | numpy.random.BitGenerator   | to generate random numbers in the KMC step                                         | `default_rng()` |
-| `MD_time`           | typing.Union\[float, None\] | time [ps] to compare conformational events with reaction events in the time domain | `None`          |
+| Name                | Type                                                                               | Description                                                                        | Default         |
+|---------------------|------------------------------------------------------------------------------------|------------------------------------------------------------------------------------|-----------------|
+| `recipe_collection` | [RecipeCollection](`kimmdy.reaction.RecipeCollection`)                             | from which one will be choosen                                                     | _required_      |
+| `rng`               | [np](`numpy`).[random](`numpy.random`).[BitGenerator](`numpy.random.BitGenerator`) | to generate random numbers in the KMC step                                         | `default_rng()` |
+| `MD_time`           | [Union](`typing.Union`)\[[float](`float`), None\]                                  | time [ps] to compare conformational events with reaction events in the time domain | `None`          |
 
 ### rf_kmc { #kimmdy.kmc.rf_kmc }
 
@@ -62,11 +62,11 @@ Rejection-Free Monte Carlo.
 takes RecipeCollection and choses a recipe based on the relative propensity of the events.
 
 
-Compare e.g. <https://en.wikipedia.org/wiki/Kinetic_Monte_Carlo#Rejection-free_KMC>
+Compare e.g. &lt;https://en.wikipedia.org/wiki/Kinetic_Monte_Carlo#Rejection-free_KMC&gt;
 
 #### Parameters
 
-| Name                | Type                      | Description                                         | Default         |
-|---------------------|---------------------------|-----------------------------------------------------|-----------------|
-| `recipe_collection` | RecipeCollection          | from which one will be choosen                      | _required_      |
-| `rng`               | numpy.random.BitGenerator | function to generate random numbers in the KMC step | `default_rng()` |
+| Name                | Type                                                                               | Description                                         | Default         |
+|---------------------|------------------------------------------------------------------------------------|-----------------------------------------------------|-----------------|
+| `recipe_collection` | [RecipeCollection](`kimmdy.reaction.RecipeCollection`)                             | from which one will be choosen                      | _required_      |
+| `rng`               | [np](`numpy`).[random](`numpy.random`).[BitGenerator](`numpy.random.BitGenerator`) | function to generate random numbers in the KMC step | `default_rng()` |
