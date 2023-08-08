@@ -7,7 +7,8 @@ import logging
 from pathlib import Path
 import dill
 from kimmdy.config import Config
-from kimmdy.misc_helper import concat_traj, _build_examples
+from kimmdy.analysis import concat_traj
+from kimmdy.misc_helper import _build_examples
 from kimmdy.runmanager import RunManager
 from kimmdy.utils import check_gmx_version, increment_logfile
 import importlib.resources as pkg_resources
@@ -45,17 +46,6 @@ def get_cmdline_args():
         "--logfile", "-f", type=str, help="logfile", default="kimmdy.log"
     )
     parser.add_argument("--checkpoint", "-c", type=str, help="checkpoint file")
-    parser.add_argument(
-        "--concat",
-        type=Path,
-        nargs="?",
-        const=True,
-        help=(
-            "Concatenate trrs of this run"
-            "Optionally, the run directory can be give"
-            "Will save as concat.trr in current directory"
-        ),
-    )
 
     # flag to show available plugins
     parser.add_argument(
@@ -69,6 +59,28 @@ def get_cmdline_args():
         help=(
             "Print path to yaml schema for use with yaml-language-server e.g. in VSCode and Neovim"
             "# yaml-language-server: $schema=/path/to/kimmdy-yaml-schema.json"
+        ),
+    )
+    return parser.parse_args()
+
+
+def get_analysis_cmdline_args():
+    """
+    concat :
+    Don't perform a full KIMMDY run but instead concatenate trajectories
+    from a previous run.
+    """
+    parser = argparse.ArgumentParser(
+        description="Welcome to the KIMMDY analysis module"
+    )
+    parser.add_argument("dir", type=str, help="KIMMDY run directory to be analysed.")
+    parser.add_argument(
+        "--steps",
+        "-s",
+        nargs="*",
+        default="all",
+        help=(
+            "Concatenate trrs from directories with these names. Uses all directories by default"
         ),
     )
     return parser.parse_args()
@@ -133,15 +145,6 @@ def _run(args: argparse.Namespace):
 
         exit()
 
-    if args.concat:
-        logging.info("KIMMDY will concatenate trrs and exit.")
-
-        run_dir = Path().cwd()
-        if type(args.concat) != bool:
-            run_dir = args.concat
-        concat_traj(run_dir)
-        exit()
-
     logging.info("Welcome to KIMMDY")
     logging.info("KIMMDY is running with these command line options:")
     logging.info(args)
@@ -166,7 +169,6 @@ def kimmdy_run(
     loglevel: str = "DEBUG",
     logfile: Path = Path("kimmdy.log"),
     checkpoint: str = "",
-    concat: bool = False,
     show_plugins: bool = False,
     show_schema_path: bool = False,
 ):
@@ -188,9 +190,6 @@ def kimmdy_run(
         File path of the logfile.
     checkpoint :
         File path if a kimmdy.cpt file to restart KIMMDY from a checkpoint.
-    concat :
-        Don't perform a full KIMMDY run but instead concatenate trajectories
-        from a previous run.
     show_plugins :
         Show available plugins and exit.
     show_schema_path :
@@ -201,7 +200,6 @@ def kimmdy_run(
         loglevel=loglevel,
         logfile=logfile,
         checkpoint=checkpoint,
-        concat=concat,
         show_plugins=show_plugins,
         show_schema_path=show_schema_path,
     )
@@ -233,6 +231,13 @@ def build_examples():
     args = get_build_example_args()
     _build_examples(args)
     pass
+
+
+def analysis():
+    """Analyse existing KIMMDY runs."""
+
+    args = get_analysis_cmdline_args()
+    concat_traj(args)
 
 
 def kimmdy():
