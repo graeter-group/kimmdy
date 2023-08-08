@@ -2,33 +2,50 @@ name: test release
 on:
   pull_request:
     branches: [ main ]
+    types: [labeled, opened]
 
 jobs:
+  print_context:
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          EVENT_CONTEXT: ${{ toJSON(github.event) }}
+        run: |
+          echo $EVENT_CONTEXT
   hello:
     runs-on: ubuntu-latest
     steps:
       - run: echo "Hello"
+  hello2:
+    if: ${{ github.event.pull_request.labled.label.name == 'testthis' }}
+    runs-on: ubuntu-latest
+    needs: hello
+    steps:
+      - run: echo "Hello"
   lint:
+    needs: hello2
     if:  startsWith(github.head_ref, 'release-please-')
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: psf/black@stable
+      - run: echo "Hello from lint"
+      # - uses: actions/checkout@v3
+      # - uses: psf/black@stable
   test:
     runs-on: ubuntu-latest
     container: riedmiki/gromacs-plumed-python:2021
     needs: lint
     steps:
-      - uses  : actions/checkout@v3
-      - name: run tox
-        run: tox
-      - name: zip coverage report
-        if: ${{ !cancelled() }}
-        run: zip -r htmlcov.zip htmlcov || true
-      - uses: actions/upload-artifact@v3
-        if: ${{ !cancelled() }}
-        with:
-          name: coverage artifact
-          path: htmlcov.zip
+      - run: echo "Hello from test"
+      # - uses  : actions/checkout@v3
+      # - name: run tox
+      #   run: tox
+      # - name: zip coverage report
+      #   if: ${{ !cancelled() }}
+      #   run: zip -r htmlcov.zip htmlcov || true
+      # - uses: actions/upload-artifact@v3
+      #   if: ${{ !cancelled() }}
+      #   with:
+      #     name: coverage artifact
+      #     path: htmlcov.zip
 
           
