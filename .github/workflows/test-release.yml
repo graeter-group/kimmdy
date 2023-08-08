@@ -4,6 +4,11 @@ on:
     branches: [ main ]
 
 jobs:
+  # mock job to show that it runs
+  hello:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Hello"
   lint:
     if:  startsWith(github.head_ref, 'release-please-')
     runs-on: ubuntu-latest
