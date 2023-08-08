@@ -1,12 +1,12 @@
-name: test PR
+name: test PR or release
 on:
-  pull_request_review:
-    types: [submitted]
+  pull_request:
     branches: [ main ]
+    types: [labeled]
 
 jobs:
   lint:
-    if: github.event.review.state == 'approved'
+    if: ${{ github.event.label.name == 'testthis' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -16,7 +16,7 @@ jobs:
     container: riedmiki/gromacs-plumed-python:2021
     needs: lint
     steps:
-      - uses  : actions/checkout@v3
+      - uses: actions/checkout@v3
       - name: run tox
         run: tox
       - name: zip coverage report
