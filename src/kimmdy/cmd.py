@@ -7,7 +7,7 @@ import logging
 from pathlib import Path
 import dill
 from kimmdy.config import Config
-from kimmdy.analysis import concat_traj
+from kimmdy.analysis import concat_traj, plot_energy
 from kimmdy.misc_helper import _build_examples
 from kimmdy.runmanager import RunManager
 from kimmdy.utils import check_gmx_version, increment_logfile
@@ -73,14 +73,48 @@ def get_analysis_cmdline_args():
     parser = argparse.ArgumentParser(
         description="Welcome to the KIMMDY analysis module"
     )
-    parser.add_argument("dir", type=str, help="KIMMDY run directory to be analysed.")
-    parser.add_argument(
+    subparsers = parser.add_subparsers(required=True, metavar="module", dest="module")
+
+    # trjcat
+    parser_trjcat = subparsers.add_parser(
+        name="trjcat", help="Concatenate trajectories of a KIMMDY run"
+    )
+    parser_trjcat.add_argument(
+        "dir", type=str, help="KIMMDY run directory to be analysed."
+    )
+    parser_trjcat.add_argument(
         "--steps",
         "-s",
         nargs="*",
         default="all",
         help=(
-            "Concatenate trrs from directories with these names. Uses all directories by default"
+            "Apply analysis method to subdirectories with these names. Uses all subdirectories by default"
+        ),
+    )
+
+    # plot_energy
+    parser_plot_energy = subparsers.add_parser(
+        name="plot_energy", help="Plot GROMACS energy for a KIMMDY run"
+    )
+    parser_plot_energy.add_argument(
+        "dir", type=str, help="KIMMDY run directory to be analysed."
+    )
+    parser_plot_energy.add_argument(
+        "--steps",
+        "-s",
+        nargs="*",
+        default="all",
+        help=(
+            "Apply analysis method to subdirectories with these names. Uses all subdirectories by default"
+        ),
+    )
+    parser_plot_energy.add_argument(
+        "--terms",
+        "-t",
+        nargs="*",
+        default=["Potential"],
+        help=(
+            "Terms from gmx energy that will be plotted. Uses 'Potential' by default"
         ),
     )
     return parser.parse_args()
@@ -237,7 +271,11 @@ def analysis():
     """Analyse existing KIMMDY runs."""
 
     args = get_analysis_cmdline_args()
-    concat_traj(args)
+    print(args)
+    if args.module == "trjcat":
+        concat_traj(args)
+    elif args.module == "plot_energy":
+        plot_energy(args)
 
 
 def kimmdy():
