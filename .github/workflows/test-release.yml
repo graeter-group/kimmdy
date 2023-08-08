@@ -1,4 +1,4 @@
-name: CI
+name: test release
 on:
   pull_request:
     branches: [ main ]
