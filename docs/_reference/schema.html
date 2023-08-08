@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>KIMMDY – constants</title>
+<title>KIMMDY – schema</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -30,8 +30,6 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../_reference/coordinates.html" rel="next">
-<link href="../_reference/changemanager.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -133,7 +131,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../_reference/index.html">Reference</a></li><li class="breadcrumb-item"><a href="../_reference/changemanager.html">Modules</a></li><li class="breadcrumb-item"><a href="../_reference/constants.html">constants</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -271,13 +269,13 @@ ul.task-list li input[type="checkbox"] {
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="false">
  <span class="menu-text">Modules</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth2 show">  
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../_reference/changemanager.html" class="sidebar-item-text sidebar-link">
@@ -286,7 +284,7 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/constants.html" class="sidebar-item-text sidebar-link active">
+  <a href="../_reference/constants.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">constants</span></a>
   </div>
 </li>
@@ -387,24 +385,44 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#kimmdy.constants" id="toc-kimmdy.constants" class="nav-link active" data-scroll-target="#kimmdy.constants">constants</a>
+  <li><a href="#kimmdy.schema" id="toc-kimmdy.schema" class="nav-link active" data-scroll-target="#kimmdy.schema">schema</a>
   <ul>
+  <li><a href="#classes" id="toc-classes" class="nav-link" data-scroll-target="#classes">Classes</a>
+  <ul>
+  <li><a href="#kimmdy.schema.Sequence" id="toc-kimmdy.schema.Sequence" class="nav-link" data-scroll-target="#kimmdy.schema.Sequence">Sequence</a>
+  <ul class="collapse">
   <li><a href="#attributes" id="toc-attributes" class="nav-link" data-scroll-target="#attributes">Attributes</a></li>
   </ul></li>
+  </ul></li>
+  <li><a href="#functions" id="toc-functions" class="nav-link" data-scroll-target="#functions">Functions</a>
+  <ul>
+  <li><a href="#kimmdy.schema.convert_schema_to_dict" id="toc-kimmdy.schema.convert_schema_to_dict" class="nav-link" data-scroll-target="#kimmdy.schema.convert_schema_to_dict">convert_schema_to_dict</a>
+  <ul class="collapse">
+  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
+  </ul></li>
+  <li><a href="#kimmdy.schema.flatten_scheme" id="toc-kimmdy.schema.flatten_scheme" class="nav-link" data-scroll-target="#kimmdy.schema.flatten_scheme">flatten_scheme</a></li>
+  <li><a href="#kimmdy.schema.get_combined_scheme" id="toc-kimmdy.schema.get_combined_scheme" class="nav-link" data-scroll-target="#kimmdy.schema.get_combined_scheme">get_combined_scheme</a></li>
+  <li><a href="#kimmdy.schema.load_kimmdy_schema" id="toc-kimmdy.schema.load_kimmdy_schema" class="nav-link" data-scroll-target="#kimmdy.schema.load_kimmdy_schema">load_kimmdy_schema</a></li>
+  <li><a href="#kimmdy.schema.load_plugin_schemas" id="toc-kimmdy.schema.load_plugin_schemas" class="nav-link" data-scroll-target="#kimmdy.schema.load_plugin_schemas">load_plugin_schemas</a></li>
+  <li><a href="#kimmdy.schema.prune" id="toc-kimmdy.schema.prune" class="nav-link" data-scroll-target="#kimmdy.schema.prune">prune</a></li>
+  </ul></li>
+  </ul></li>
   </ul>
-<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hits-mbm-dev/kimmdy/edit/main/_reference/constants.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/hits-mbm-dev/kimmdy/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hits-mbm-dev/kimmdy/edit/main/_reference/schema.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/hits-mbm-dev/kimmdy/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 
 
-<section id="kimmdy.constants" class="level1">
-<h1>constants</h1>
-<p><code>constants</code></p>
-<p>Comstants used throughout KIMMDY</p>
-<section id="attributes" class="level2">
-<h2 class="anchored" data-anchor-id="attributes">Attributes</h2>
+<section id="kimmdy.schema" class="level1">
+<h1>schema</h1>
+<p><code>schema</code></p>
+<p>Handle the schema for the config file. To be used by the config module to validate the config file and set defaults for the Config object.</p>
+<p>Reserved keywords: - pytype - default - description - type</p>
+<section id="classes" class="level2">
+<h2 class="anchored" data-anchor-id="classes">Classes</h2>
 <table class="table">
 <thead>
 <tr class="header">
@@ -414,17 +432,154 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
-<td><a href="#kimmdy.constants.ATOMTYPE_BONDORDER">ATOMTYPE_BONDORDER</a></td>
-<td>To determin if an atom is a radical.</td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.constants.ATOMTYPE_BONDORDER_FLAT">ATOMTYPE_BONDORDER_FLAT</a></td>
-<td>To determin if an atom is a radical.</td>
+<td><a href="#kimmdy.schema.Sequence">Sequence</a></td>
+<td>A sequence of tasks.</td>
 </tr>
 </tbody>
 </table>
+<section id="kimmdy.schema.Sequence" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.schema.Sequence">Sequence</h3>
+<p><code>schema.Sequence(self, tasks)</code></p>
+<p>A sequence of tasks.</p>
+<p>Tasks can be grouped together by using a dictionary with the following keys: - mult: number of times to repeat the tasks - tasks: list of tasks to repeat</p>
+<section id="attributes" class="level4">
+<h4 class="anchored" data-anchor-id="attributes">Attributes</h4>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>tasks</td>
+<td></td>
+<td>list of tasks</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+</section>
+<section id="functions" class="level2">
+<h2 class="anchored" data-anchor-id="functions">Functions</h2>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="#kimmdy.schema.convert_schema_to_dict">convert_schema_to_dict</a></td>
+<td>Convert a dictionary from a raw json schema to a nested dictionary</td>
+</tr>
+<tr class="even">
+<td><a href="#kimmdy.schema.flatten_scheme">flatten_scheme</a></td>
+<td>Recursively get properties and their desicripions from the scheme</td>
+</tr>
+<tr class="odd">
+<td><a href="#kimmdy.schema.get_combined_scheme">get_combined_scheme</a></td>
+<td>Return the schema for the config file.</td>
+</tr>
+<tr class="even">
+<td><a href="#kimmdy.schema.load_kimmdy_schema">load_kimmdy_schema</a></td>
+<td>Return the schema for the config file</td>
+</tr>
+<tr class="odd">
+<td><a href="#kimmdy.schema.load_plugin_schemas">load_plugin_schemas</a></td>
+<td>Return the schemas for the reaction plugins known to kimmdy</td>
+</tr>
+<tr class="even">
+<td><a href="#kimmdy.schema.prune">prune</a></td>
+<td>Remove empty dicts from a nested dict</td>
+</tr>
+</tbody>
+</table>
+<section id="kimmdy.schema.convert_schema_to_dict" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.schema.convert_schema_to_dict">convert_schema_to_dict</h3>
+<p><code>schema.convert_schema_to_dict(dictionary)</code></p>
+<p>Convert a dictionary from a raw json schema to a nested dictionary</p>
+<section id="parameters" class="level4">
+<h4 class="anchored" data-anchor-id="parameters">Parameters</h4>
+<table class="table">
+<colgroup>
+<col style="width: 18%">
+<col style="width: 20%">
+<col style="width: 45%">
+<col style="width: 15%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>dictionary</code></td>
+<td><code>dict</code></td>
+<td>dictionary from a raw json schema</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns" class="level4">
+<h4 class="anchored" data-anchor-id="returns">Returns</h4>
+<table class="table">
+<colgroup>
+<col style="width: 12%">
+<col style="width: 87%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>dict</code></td>
+<td>nested dictionary where each leaf entry is a dictionary with the “pytype”, “default” and “description” keys</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="kimmdy.schema.flatten_scheme" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.schema.flatten_scheme">flatten_scheme</h3>
+<p><code>schema.flatten_scheme(scheme, section='')</code></p>
+<p>Recursively get properties and their desicripions from the scheme</p>
+</section>
+<section id="kimmdy.schema.get_combined_scheme" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.schema.get_combined_scheme">get_combined_scheme</h3>
+<p><code>schema.get_combined_scheme()</code></p>
+<p>Return the schema for the config file.</p>
+<p>Nested scheme where each leaf entry is a dictionary with the "pytype", "default" and "description". Contains the schema for the main kimmdy config file and all the plugins known at runtime.</p>
+</section>
+<section id="kimmdy.schema.load_kimmdy_schema" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.schema.load_kimmdy_schema">load_kimmdy_schema</h3>
+<p><code>schema.load_kimmdy_schema()</code></p>
+<p>Return the schema for the config file</p>
+</section>
+<section id="kimmdy.schema.load_plugin_schemas" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.schema.load_plugin_schemas">load_plugin_schemas</h3>
+<p><code>schema.load_plugin_schemas()</code></p>
+<p>Return the schemas for the reaction plugins known to kimmdy</p>
+</section>
+<section id="kimmdy.schema.prune" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.schema.prune">prune</h3>
+<p><code>schema.prune(d)</code></p>
+<p>Remove empty dicts from a nested dict</p>
 
 
+</section>
 </section>
 </section>
 
@@ -869,18 +1024,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script>
-<nav class="page-navigation">
-  <div class="nav-page nav-page-previous">
-      <a href="../_reference/changemanager.html" class="pagination-link">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">changemanager</span>
-      </a>          
-  </div>
-  <div class="nav-page nav-page-next">
-      <a href="../_reference/coordinates.html" class="pagination-link">
-        <span class="nav-page-text">coordinates</span> <i class="bi bi-arrow-right-short"></i>
-      </a>
-  </div>
-</nav>
 </div> <!-- /content -->
 
 

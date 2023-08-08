@@ -19,7 +19,7 @@
 Check for an existing gromacs installation.
 
 If PLUMED is meant to be used it additionally checks for the keyword
-'MODIFIED' in the version name.
+&#x27;MODIFIED&#x27; or &#x27;plumed&#x27; in the version name.
 
 ### get_atominfo_from_plumedid { #kimmdy.utils.get_atominfo_from_plumedid }
 

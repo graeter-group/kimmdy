@@ -338,6 +338,12 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">utils</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/reaction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">reaction</span></a>
+  </div>
+</li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
@@ -402,7 +408,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="kimmdy.misc_helper" class="level1">
 <h1>misc_helper</h1>
 <p><code>misc_helper</code></p>
-<p>Miscelaneous utilitiies that didn’t fit anywhere else for now.</p>
+<p>Miscelaneous utilitiies that didn't fit anywhere else for now.</p>
 <section id="functions" class="level2">
 <h2 class="anchored" data-anchor-id="functions">Functions</h2>
 <table class="table">
@@ -426,12 +432,6 @@ ul.task-list li input[type="checkbox"] {
 <section id="parameters" class="level4">
 <h4 class="anchored" data-anchor-id="parameters">Parameters</h4>
 <table class="table">
-<colgroup>
-<col style="width: 8%">
-<col style="width: 14%">
-<col style="width: 68%">
-<col style="width: 8%">
-</colgroup>
 <thead>
 <tr class="header">
 <th>Name</th>
@@ -443,19 +443,19 @@ ul.task-list li input[type="checkbox"] {
 <tbody>
 <tr class="odd">
 <td><code>run_dir</code></td>
-<td>pathlib.Path | str</td>
+<td><a href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path">Path</a> | <a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
 <td>Directory containing directories of multiple tasks.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
 <td><code>out</code></td>
-<td>Path</td>
+<td><a href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path">Path</a></td>
 <td>File Path into the output trr will be written. Default <code>concat.trr</code> in given run_dir</td>
 <td><code>None</code></td>
 </tr>
 <tr class="odd">
 <td><code>run_types</code></td>
-<td>list</td>
+<td><code>list</code></td>
 <td>List of tasks to get trrs from. If a task is not in this list it will be skipped. By default None</td>
 <td><code>None</code></td>
 </tr>
