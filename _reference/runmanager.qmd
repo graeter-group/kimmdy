@@ -25,23 +25,22 @@ rest of the program and keeps track of global state.
 
 #### Attributes
 
-| Name              | Type                                        | Description                                               |
-|-------------------|---------------------------------------------|-----------------------------------------------------------|
-| config            | Config                                      | The configuration object.                                 |
-| from_checkpoint   | bool                                        | Whether the runmanager was initialized from a checkpoint. |
-| tasks             | queue.Queue\[kimmdy.tasks.Task\]            | Tasks from config.                                        |
-| crr_tasks         | queue.Queue\[kimmdy.tasks.Task\]            | Current tasks.                                            |
-| iteration         | int                                         | Current iteration.                                        |
-| iterations        | int                                         | Total number of iterations.                               |
-| state             | State                                       | Current state of the system.                              |
-| recipe_collection | RecipeCollection                            | Collection of recipes.                                    |
-| latest_files      | dict\[str, pathlib.Path\]                   | Dictionary of latest files.                               |
-| histfile          | Path                                        | Path to history file.                                     |
-| cptfile           | Path                                        | Path to checkpoint file.                                  |
-| ffpatch           |                                             | Path to force field patch file.                           |
-| top               |                                             | Topology object.                                          |
-| filehist          | list\[dict\[str, kimmdy.tasks.TaskFiles\]\] | List of dictionaries of TaskFiles.                        |
-| task_mapping      | TaskMapping                                 | Mapping of task names to runmanager methods.              |
+| Name              | Type                                                                                    | Description                                               |
+|-------------------|-----------------------------------------------------------------------------------------|-----------------------------------------------------------|
+| config            | [Config](`kimmdy.config.Config`)                                                        | The configuration object.                                 |
+| from_checkpoint   | [bool](`bool`)                                                                          | Whether the runmanager was initialized from a checkpoint. |
+| tasks             | [queue](`queue`).[Queue](`queue.Queue`)\[[Task](`kimmdy.tasks.Task`)\]                  | Tasks from config.                                        |
+| crr_tasks         | [queue](`queue`).[Queue](`queue.Queue`)\[[Task](`kimmdy.tasks.Task`)\]                  | Current tasks.                                            |
+| iteration         | [int](`int`)                                                                            | Current iteration.                                        |
+| state             | [State](`kimmdy.runmanager.State`)                                                      | Current state of the system.                              |
+| recipe_collection | [RecipeCollection](`kimmdy.reaction.RecipeCollection`)                                  | Collection of recipes.                                    |
+| latest_files      | [dict](`dict`)\[[str](`str`), [Path](`pathlib.Path`)\]                                  | Dictionary of latest files.                               |
+| histfile          | [Path](`pathlib.Path`)                                                                  | Path to history file.                                     |
+| cptfile           | [Path](`pathlib.Path`)                                                                  | Path to checkpoint file.                                  |
+| ffpatch           |                                                                                         | Path to force field patch file.                           |
+| top               |                                                                                         | Topology object.                                          |
+| filehist          | [list](`list`)\[[dict](`dict`)\[[str](`str`), [TaskFiles](`kimmdy.tasks.TaskFiles`)\]\] | List of dictionaries of TaskFiles.                        |
+| task_mapping      | [TaskMapping](`kimmdy.tasks.TaskMapping`)                                               | Mapping of task names to runmanager methods.              |
 
 #### Methods
 

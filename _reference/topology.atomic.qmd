@@ -4,7 +4,7 @@
 
 Atomic datatypes for the topology such as Atom, Bond, Angle, Dihedral, etc.
 The order of the fields comes from the gromacs topology file format.
-See <https://manual.gromacs.org/current/reference-manual/topologies/topology-file-formats.html#topology-file>
+See &lt;https://manual.gromacs.org/current/reference-manual/topologies/topology-file-formats.html#topology-file&gt;
 
 ## Classes
 
@@ -38,8 +38,8 @@ Information about one angle
 A class containing angle information as in the angles section of the topology.
 
 From gromacs topology:
-';', 'ai', 'aj', 'ak', 'funct', 'c0', 'c1', 'c2', 'c3'
-With aj < ai < ak
+&#x27;;&#x27;, &#x27;ai&#x27;, &#x27;aj&#x27;, &#x27;ak&#x27;, &#x27;funct&#x27;, &#x27;c0&#x27;, &#x27;c1&#x27;, &#x27;c2&#x27;, &#x27;c3&#x27;
+With aj &lt; ai &lt; ak
 
 ### AngleType { #kimmdy.topology.atomic.AngleType }
 
@@ -50,7 +50,7 @@ Information about one angle
 A class containing angle information as in the angles section of the topology.
 
 From gromacs topology:
-';', 'i', 'j', 'k', 'funct', 'c0', 'c1', 'c2', 'c3'
+&#x27;;&#x27;, &#x27;i&#x27;, &#x27;j&#x27;, &#x27;k&#x27;, &#x27;funct&#x27;, &#x27;c0&#x27;, &#x27;c1&#x27;, &#x27;c2&#x27;, &#x27;c3&#x27;
 where i,j,k are atomtypes
 
 ### Atom { #kimmdy.topology.atomic.Atom }
@@ -85,8 +85,8 @@ Information about one bond
 
 A class containing bond information as in the bonds section of the topology.
 From gromacs topology:
-'ai', 'aj', 'funct', 'c0', 'c1', 'c2', 'c3', 'c4', 'c5'
-With ai < aj
+&#x27;ai&#x27;, &#x27;aj&#x27;, &#x27;funct&#x27;, &#x27;c0&#x27;, &#x27;c1&#x27;, &#x27;c2&#x27;, &#x27;c3&#x27;, &#x27;c4&#x27;, &#x27;c5&#x27;
+With ai &lt; aj
 
 ### BondType { #kimmdy.topology.atomic.BondType }
 
@@ -96,7 +96,7 @@ Information about one bondtype
 
 A class containing bond information as in the bonds section of the topology.
 From gromacs topology:
-'i', 'j', 'funct', 'c0', 'c1', 'c2', 'c3
+&#x27;i&#x27;, &#x27;j&#x27;, &#x27;funct&#x27;, &#x27;c0&#x27;, &#x27;c1&#x27;, &#x27;c2&#x27;, &#x27;c3
 Where i and j are atomtypes
 
 ### Dihedral { #kimmdy.topology.atomic.Dihedral }
@@ -113,8 +113,8 @@ Note that proper dihedrals of type 9 can be defined multiple times, for differen
 periodicities. This is why would-be parameter c2 is called periodicity.
 
 From gromacs topology:
-';', 'ai', 'aj', 'ak', 'al', 'funct', 'c0', 'c1', 'periodicity', 'c3', 'c4', 'c5'
-For proper dihedrals (funct 9): aj < ak
+&#x27;;&#x27;, &#x27;ai&#x27;, &#x27;aj&#x27;, &#x27;ak&#x27;, &#x27;al&#x27;, &#x27;funct&#x27;, &#x27;c0&#x27;, &#x27;c1&#x27;, &#x27;periodicity&#x27;, &#x27;c3&#x27;, &#x27;c4&#x27;, &#x27;c5&#x27;
+For proper dihedrals (funct 9): aj &lt; ak
 
 ### DihedralRestraint { #kimmdy.topology.atomic.DihedralRestraint }
 
@@ -142,7 +142,7 @@ periodicities. This is why would-be parameter c2 is called periodicity and part 
 the `id`.
 
 From gromacs topology:
-';', 'i', 'j', 'k', 'l', 'funct', 'c0', 'c1', 'periodicity', 'c3', 'c4', 'c5'
+&#x27;;&#x27;, &#x27;i&#x27;, &#x27;j&#x27;, &#x27;k&#x27;, &#x27;l&#x27;, &#x27;funct&#x27;, &#x27;c0&#x27;, &#x27;c1&#x27;, &#x27;periodicity&#x27;, &#x27;c3&#x27;, &#x27;c4&#x27;, &#x27;c5&#x27;
 Where i,j,k,l are atomtypes
 
 ### MultipleDihedralTypes { #kimmdy.topology.atomic.MultipleDihedralTypes }
@@ -151,7 +151,7 @@ Where i,j,k,l are atomtypes
 
 Multiple ``DihedralTypes``s with the same ai, aj, ak, al
 but different periodicities.
-funct should always be "9" when the length of dihedrals is > 1.
+funct should always be &quot;9&quot; when the length of dihedrals is &gt; 1.
 The key of the dict is the periodicity (c2).
 
 ### MultipleDihedrals { #kimmdy.topology.atomic.MultipleDihedrals }
@@ -160,7 +160,7 @@ The key of the dict is the periodicity (c2).
 
 Multiple ``Dihedral``s with the same ai, aj, ak, al
 but different periodicities.
-funct should always be "9" when the length of dihedrals is > 1.
+funct should always be &quot;9&quot; when the length of dihedrals is &gt; 1.
 The key of the dict is the periodicity (c2).
 
 ### Pair { #kimmdy.topology.atomic.Pair }
@@ -172,7 +172,7 @@ Information about one pair
 A class containing pair information as in the pair section of the topology.
 
 From gromacs topology:
-ai', 'aj', 'funct', 'c0', 'c1', 'c2', 'c3'
+ai&#x27;, &#x27;aj&#x27;, &#x27;funct&#x27;, &#x27;c0&#x27;, &#x27;c1&#x27;, &#x27;c2&#x27;, &#x27;c3&#x27;
 
 ### PositionRestraint { #kimmdy.topology.atomic.PositionRestraint }
 

@@ -16,12 +16,14 @@ website:
       - _reference/constants.qmd
       - _reference/coordinates.qmd
       - _reference/config.qmd
+      - _reference/schema.qmd
       - _reference/kmc.qmd
       - _reference/misc_helper.qmd
       - _reference/parsing.qmd
       - _reference/runmanager.qmd
       - _reference/tasks.qmd
       - _reference/utils.qmd
+      - _reference/reaction.qmd
       section: Modules
     - contents:
       - _reference/homolysis.reaction.Homolysis.qmd

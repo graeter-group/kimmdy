@@ -60,6 +60,7 @@ website:
           - _reference/runmanager.qmd
           - _reference/tasks.qmd
           - _reference/utils.qmd
+          - _reference/reaction.qmd
           section: Modules
         - contents:
           - _reference/homolysis.reaction.Homolysis.qmd
@@ -102,6 +103,8 @@ interlinks:
 
 quartodoc:
   sidebar: "_sidebar.yml"
+  renderer:
+    style: _renderer.py
   title: "Reference"
   package: kimmdy
   style: pkgdown
@@ -132,6 +135,7 @@ quartodoc:
         - name: runmanager
         - name: tasks
         - name: utils
+        - name: reaction
     - title: Reaction Plugins
       desc: Reaction plugins bundled with KIMMDY and the protocol to add a new reaction plugin to KIMMDY
       package: null
