@@ -1,5 +1,18 @@
 # Changelog
 
+## [3.5.0](https://github.com/hits-mbm-dev/kimmdy/compare/v3.4.0...v3.5.0) (2023-08-08)
+
+
+### Features
+
+* **ci:** first try! ([f2c686f](https://github.com/hits-mbm-dev/kimmdy/commit/f2c686f5336f5e3e5e0c819990c0fb89bec9f647))
+
+
+### Bug Fixes
+
+* ci ([3bcc81a](https://github.com/hits-mbm-dev/kimmdy/commit/3bcc81a3231ddc2e4a6b7b3d8f112228e2c10226))
+* **ci:** almost did it first try... ([2850379](https://github.com/hits-mbm-dev/kimmdy/commit/2850379ca5c0d3d0e1e755a1e2170caa4bef38b8))
+
 ## [3.4.0](https://github.com/hits-mbm-dev/kimmdy/compare/v3.3.1...v3.4.0) (2023-08-08)
 
 
