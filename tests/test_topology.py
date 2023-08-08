@@ -153,6 +153,7 @@ class TestUrea:
         assert len(top.proper_dihedrals) == 8
         assert len(top.improper_dihedrals) == 3
 
+
 class TestTopAB:
     def test_top_ab(self, raw_top_a_fix, raw_top_b_fix):
         topA = Topology(raw_top_a_fix)
