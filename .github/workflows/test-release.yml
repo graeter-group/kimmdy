@@ -1,4 +1,4 @@
-name: test PR
+name: test latest release
 on:
   pull_request:
     branches: [ main ]
@@ -6,7 +6,7 @@ on:
 
 jobs:
   lint:
-    if: github.event.label.name == 'testthis'
+    if:  startsWith(github.head_ref, 'release-please-') && github.event.label.name == 'testthis'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
