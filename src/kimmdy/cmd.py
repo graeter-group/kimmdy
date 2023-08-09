@@ -7,7 +7,7 @@ import logging
 from pathlib import Path
 import dill
 from kimmdy.config import Config
-from kimmdy.analysis import concat_traj, plot_energy
+from kimmdy.analysis import concat_traj, plot_energy, radical_population
 from kimmdy.misc_helper import _build_examples
 from kimmdy.runmanager import RunManager
 from kimmdy.utils import check_gmx_version, increment_logfile
@@ -75,7 +75,7 @@ def get_analysis_cmdline_args():
     )
     subparsers = parser.add_subparsers(required=True, metavar="module", dest="module")
 
-    # trjcat
+    ## trjcat
     parser_trjcat = subparsers.add_parser(
         name="trjcat", help="Concatenate trajectories of a KIMMDY run"
     )
@@ -92,7 +92,7 @@ def get_analysis_cmdline_args():
         ),
     )
 
-    # plot_energy
+    ## plot_energy
     parser_plot_energy = subparsers.add_parser(
         name="plot_energy", help="Plot GROMACS energy for a KIMMDY run"
     )
@@ -116,6 +116,15 @@ def get_analysis_cmdline_args():
         help=(
             "Terms from gmx energy that will be plotted. Uses 'Potential' by default"
         ),
+    )
+
+    ## radical population
+    parser_radical_population = subparsers.add_parser(
+        name="radical_population",
+        help="Plot population of radicals for one or multiple KIMMDY run(s)",
+    )
+    parser_radical_population.add_argument(
+        "dir", nargs="+", help="KIMMDY run directory to be analysed. Can be multiple."
     )
     return parser.parse_args()
 
@@ -276,6 +285,8 @@ def analysis():
         concat_traj(args)
     elif args.module == "plot_energy":
         plot_energy(args)
+    elif args.module == "radical_population":
+        radical_population(args)
 
 
 def kimmdy():

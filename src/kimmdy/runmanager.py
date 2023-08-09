@@ -14,7 +14,7 @@ from enum import Enum, auto
 from typing import Callable, Union
 from kimmdy.config import Config
 from kimmdy.utils import increment_logfile
-from kimmdy.parsing import read_top
+from kimmdy.parsing import read_top, write_json
 from kimmdy.reaction import ReactionPlugin, RecipeCollection, RecipeStep
 import kimmdy.changemanager as changer
 from kimmdy.tasks import Task, TaskFiles, TaskMapping
@@ -420,5 +420,9 @@ class RunManager:
             )
             next(self)
 
+        write_json(
+            {"time": self.time, "radicals": list(self.top.radicals.keys())},
+            files.outputdir / "radicals.json",
+        )
         logging.info("Reaction done")
         return files

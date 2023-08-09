@@ -4,8 +4,10 @@ import subprocess
 import argparse
 from math import isclose
 import matplotlib.pyplot as plt
+import MDAnalysis as mda
 
 from kimmdy.utils import run_shell_cmd
+from kimmdy.parsing import read_json
 
 
 def get_subdirs(run_dir: Path, steps: Union[list, str]):
@@ -133,3 +135,75 @@ def plot_energy(args: argparse.Namespace):
     plt.savefig(str(run_dir / "analysis" / "energy.png"), dpi=300)
 
     print(limy)
+
+
+def radical_population(args):
+    for curr_dir in args.dir:
+        run_dir = Path(curr_dir).expanduser().resolve()
+
+        ## create output dir
+        (run_dir / "analysis").mkdir(exist_ok=True)
+        out = run_dir / "analysis" / "radical_population.pdb"
+        out = Path(out).expanduser()
+
+        ## find .gro file
+        subdirs_sorted = sorted(
+            list(filter(lambda d: d.is_dir(), run_dir.glob("*_*/"))),
+            key=lambda p: int(p.name.split("_")[0]),
+        )
+        for subdir in subdirs_sorted:
+            gro = list(subdir.glob("*.gro"))
+            if gro:
+                break
+        assert gro
+
+        ## get info from gro file
+        u = mda.Universe(str(gro[0]), format="gro")
+        print(u)
+        atoms = u.select_atoms("protein")
+        atoms_id = [atom.id for atom in atoms]
+        print(atoms_id)
+
+        ## gather radical info
+        radical_jsons = run_dir.glob("**/radicals.json")
+        # print(list(radical_jsons))
+
+        ## parse radical info
+        radical_info = {"time": [], "radicals": []}
+        for radical_json in radical_jsons:
+            print(radical_json, "X")
+            data = read_json(radical_json)
+            print(data)
+            for k in radical_info.keys():
+                radical_info[k].append(data[k])
+
+        ## plot fingerprint
+        counts = {i: 0.0 for i in atoms_id}
+        n_states = len(radical_info["time"])
+        for state in range(n_states):
+            for idx in radical_info["radicals"][state]:
+                counts[int(idx)] += 1 / n_states
+        print(counts)
+
+        plt.bar(x=counts.keys(), height=counts.values())
+        plt.xlabel("Atom idx")
+        plt.ylabel("Fractional Radical Occupancy")
+        plt.ylim(0, 1)
+        plt.xticks(atoms_id)
+        plt.savefig(
+            str(run_dir / "analysis" / "radical_population_fingerprint"), dpi=300
+        )
+
+        ## write pdb with beta
+        # for k,v in counts.items():
+        #     atom = u.select_atoms(f"index {k}")
+        #     print(atom)
+        #     print(atom[0])
+
+        #     atom[0].beta = v
+        u.add_TopologyAttr("tempfactors")
+        protein = u.select_atoms("protein")
+        print(list(counts.values()))
+        print(protein.tempfactors)
+        protein.tempfactors = list(counts.values())
+        protein.write(str(out))
