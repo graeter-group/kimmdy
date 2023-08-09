@@ -281,6 +281,7 @@ class RunManager:
         top = files.input["top"]
         gro = files.input["gro"]
         mdp = md_config.mdp
+        files.input["mdp"] = mdp
         ndx = files.input["ndx"]
 
         outputdir = files.outputdir
@@ -415,14 +416,12 @@ class RunManager:
                 logging.info(f"No MD relaxation after reaction.")
 
         if instance:
-            # crr_task nested in this task instead of running afterwards
-            self.crr_tasks.put(
-                Task(
-                    self._run_md,
-                    kwargs={"instance": instance},
-                )
+            task = Task(
+                self._run_md,
+                kwargs={"instance": instance},
             )
-            next(self)
+            md_files = task()
+            self._discover_output_files(task.name, md_files)
 
         logging.info("Reaction done")
         return files
