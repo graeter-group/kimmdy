@@ -1,5 +1,7 @@
 # KIMMDY
 
+[![tests on latest release](https://github.com/hits-mbm-dev/kimmdy/actions/workflows/test-release.yml/badge.svg)](https://github.com/hits-mbm-dev/kimmdy/actions/workflows/test-release.yml)
+
 Reactive MD pipeline for GROMACS using Kinetic Monte Carlo / Molecular Dynamics (KIMMDY)
 
 ## Quick start
@@ -8,8 +10,16 @@ Reactive MD pipeline for GROMACS using Kinetic Monte Carlo / Molecular Dynamics 
 * `cd kimmdy`
 * `python -m venv .venv`
 * `source ./venv/bin/activate`
+* `python -m pip install -e ./`
+* Some rections need a GROMACS version patched with PLUMED, gromacs name should then contain `MODIFIED` or `plumed`
+
+## Development setup
+
 * `python -m pip install -r requirments.txt`
-* Some rections need a GROMACS version patched with PLUMED
+* code style: black
+* docstrings: numpy
+* [Conventional commit](https://www.conventionalcommits.org/en/v1.0.0/) messages when possible for pretty release notes.
+
 
 ## First simulation
 
@@ -19,3 +29,14 @@ Reactive MD pipeline for GROMACS using Kinetic Monte Carlo / Molecular Dynamics 
 * check output: `kimmdy.log`, `test_out_00X/`
 
 
+## Local testing
+
+For developoment, we provide a docker image containing gromacs and multiple python versions to test against.  
+To run the test locally, you must:
+- install docker
+- install [act](https://github.com/nektos/act), easiest option is with github cli
+    - install github cli (`gh`)
+    - `gh extension install https://github.com/nektos/gh-act`
+- run tests with `gh extension exec act -j test --artifact-server-path ./artifacts`
+    - customize which python versions to test in `tox.ini` 
+    - html coverage report is exported into `artifacts`

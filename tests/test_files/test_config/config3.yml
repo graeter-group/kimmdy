@@ -1,5 +1,5 @@
 dryrun: true
-iterations: 3
+max_tasks: 3
 out: 'test_config_3'
 gromacs_alias: 'gmx'
 ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
@@ -21,7 +21,7 @@ changer:
     md: 'relax'
 reactions:
   homolysis:
-    dat: 'edissoc.dat'
+    edis: 'edissoc.dat'
     itp: 'ffbonded.itp'
 sequence:
   - equilibrium

@@ -78,8 +78,6 @@ class RunManager:
         Current tasks.
     iteration :
         Current iteration.
-    iterations :
-        Total number of iterations.
     state :
         Current state of the system.
     recipe_collection :
@@ -107,7 +105,6 @@ class RunManager:
         self.tasks: queue.Queue[Task] = queue.Queue()  # tasks from config
         self.crr_tasks: queue.Queue[Task] = queue.Queue()  # current tasks
         self.iteration: int = 0
-        self.iterations: int = self.config.iterations
         self.state: State = State.IDLE
         self.recipe_collection: RecipeCollection = RecipeCollection([])
         self.latest_files: dict[str, Path] = get_existing_files(config)
@@ -162,7 +159,7 @@ class RunManager:
                         logging.info(f"Put Task: {task}")
                         self.tasks.put(Task(task))
 
-        while not (self.state is State.DONE or self.iteration >= self.iterations):
+        while not (self.state is State.DONE or self.iteration >= self.config.max_tasks):
             logging.info("Write checkpoint before next task")
             with open(self.cptfile, "wb") as f:
                 dill.dump(self, f)
@@ -170,7 +167,7 @@ class RunManager:
 
         logging.info(
             f"Finished running tasks, state: {self.state}, "
-            f"iteration:{self.iteration}, max:{self.iterations}"
+            f"iteration:{self.iteration}, max:{self.config.max_tasks}"
         )
 
     def get_latest(self, suffix: str):

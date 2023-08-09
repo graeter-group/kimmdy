@@ -1,0 +1,30 @@
+name: test latest release
+on:
+  pull_request:
+    branches: [ main ]
+    types: [labeled]
+
+jobs:
+  lint:
+    if:  startsWith(github.head_ref, 'release-please-') && github.event.label.name == 'testthis'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: psf/black@stable
+  test:
+    runs-on: ubuntu-latest
+    container: riedmiki/gromacs-plumed-python:2021
+    steps:
+      - uses: actions/checkout@v3
+      - name: run tox
+        run: tox
+      - name: zip coverage report
+        if: ${{ !cancelled() }}
+        run: zip -r htmlcov.zip htmlcov || true
+      - uses: actions/upload-artifact@v3
+        if: ${{ !cancelled() }}
+        with:
+          name: coverage artifact
+          path: htmlcov.zip
+
+          

@@ -11,8 +11,8 @@ Reserved keywords:
 """
 import json
 import importlib.resources as pkg_resources
-import sys
-from typing import Optional
+import logging
+from kimmdy import plugins
 
 # needed for eval of type_scheme from schema
 # don't remove even if lsp says it's unused
@@ -22,7 +22,18 @@ from pathlib import Path
 
 
 class Sequence(list):
-    """A sequence of tasks."""
+    """A sequence of tasks.
+
+    Tasks can be grouped together by using a dictionary with the following
+    keys:
+        - mult: number of times to repeat the tasks
+        - tasks: list of tasks to repeat
+
+    Attributes
+    ----------
+    tasks:
+        list of tasks
+    """
 
     def __init__(self, tasks: list):
         list.__init__(self)
@@ -49,34 +60,46 @@ def load_kimmdy_schema() -> dict:
 
 
 def load_plugin_schemas() -> dict:
-    """Return the schemas for the plugins"""
-    if sys.version_info > (3, 10):
-        from importlib_metadata import entry_points
-
-        discovered_plugins = entry_points(group="kimmdy.plugins")
-    else:
-        from importlib.metadata import entry_points
-
-        discovered_plugins = entry_points()["kimmdy.plugins"]
+    """Return the schemas for the reaction plugins known to kimmdy"""
 
     schemas = {}
-    for entry_point in discovered_plugins:
-        # get entry point of plugin
-        plugin = entry_point.load()
-        # get main module from that plugin
-        plugin = plugin.__module__.split(".")[0]
-        if plugin == "kimmdy":
+    for plg_name, plugin in plugins.items():
+        logging.debug(f"Loading {plg_name}")
+        # Catch loading exception
+        if type(plugin) is ModuleNotFoundError:
+            logging.warn(f"Plugin {plg_name} could not be loaded!\n{plugin}\n")
             continue
-        path = pkg_resources.files(plugin) / "kimmdy-yaml-schema.json"
-        name = plugin.split(".")[-1]
-        with path.open("rt") as f:
-            schemas[name] = json.load(f)
+        # get main module from that plugin
+        plg_module_name = plugin.__module__.split(".")[0]
+        if plg_module_name == "kimmdy":
+            continue
+        schema_path = pkg_resources.files(plg_module_name) / "kimmdy-yaml-schema.json"
+        with pkg_resources.as_file(schema_path) as p:
+            if not p.exists():
+                logging.warn(
+                    f"{plg_name} did not provide a `kimmdy-yaml-schema.json`!\n"
+                    "Schema will not be loaded!"
+                )
+                continue
+            with open(p, "rt") as f:
+                schemas[plg_name] = json.load(f)
+
     return schemas
 
 
 def convert_schema_to_dict(dictionary: dict) -> dict:
     """Convert a dictionary from a raw json schema to a nested dictionary
-    where each leaf entry is a dictionary with the "pytype" and "default".
+
+    Parameters
+    ----------
+    dictionary:
+        dictionary from a raw json schema
+
+    Returns
+    -------
+    dict:
+        nested dictionary where each leaf entry is a dictionary with the
+        "pytype", "default" and "description" keys
     """
     result = {}
     properties = dictionary.get("properties")
@@ -113,6 +136,8 @@ def get_combined_scheme() -> dict:
 
     Nested scheme where each leaf entry is a dictionary with the "pytype",
     "default" and "description".
+    Contains the schema for the main kimmdy config file and all the plugins
+    known at runtime.
     """
     schema = load_kimmdy_schema()
     schemas = load_plugin_schemas()
@@ -136,7 +161,7 @@ def prune(d: dict) -> dict:
 
 
 def flatten_scheme(scheme, section="") -> list:
-    """recursively get properties and their desicripions from the scheme"""
+    """Recursively get properties and their desicripions from the scheme"""
     ls = []
     for key, value in scheme.items():
         if not isinstance(value, dict):

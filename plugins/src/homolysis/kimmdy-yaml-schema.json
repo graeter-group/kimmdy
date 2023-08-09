@@ -5,10 +5,10 @@
   "description": "Settings for homolysis reactions",
   "additionalProperties": false,
   "properties": {
-    "dat": {
+    "edis": {
       "type": "string",
       "pytype": "Path",
-      "description": "Dissociation energies ata file",
+      "description": "Dissociation energies data file",
       "default": "edissoc.dat"
     },
     "itp": {
@@ -18,6 +18,6 @@
       "default": "ffbonded.itp"
     }
   },
-  "required": [ "dat", "itp" ]
+  "required": [ "edis", "itp" ]
 }
 

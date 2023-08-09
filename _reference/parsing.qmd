@@ -2,7 +2,7 @@
 
 `parsing`
 
-All read_<...> and write_<...> functions.
+All read_&lt;...&gt; and write_&lt;...&gt; functions.
 
 ## Attributes
 
@@ -38,9 +38,9 @@ the dissociation energy E_dissoc [kJ mol-1] is the value
 
 #### Parameters
 
-| Name   | Type   | Description                                | Default    |
-|--------|--------|--------------------------------------------|------------|
-| `path` | Path   | Path to the file. E.g. Path("edissoc.dat") | _required_ |
+| Name   | Type                   | Description                                | Default    |
+|--------|------------------------|--------------------------------------------|------------|
+| `path` | [Path](`pathlib.Path`) | Path to the file. E.g. Path("edissoc.dat") | _required_ |
 
 ### read_plumed { #kimmdy.parsing.read_plumed }
 
@@ -50,9 +50,9 @@ Read a plumed.dat configuration file.
 
 #### Parameters
 
-| Name   | Type   | Description                         | Default    |
-|--------|--------|-------------------------------------|------------|
-| `path` | Path   | Path to the file. E.g. "plumed.dat" | _required_ |
+| Name   | Type                   | Description                         | Default    |
+|--------|------------------------|-------------------------------------|------------|
+| `path` | [Path](`pathlib.Path`) | Path to the file. E.g. "plumed.dat" | _required_ |
 
 ### read_top { #kimmdy.parsing.read_top }
 
@@ -62,9 +62,9 @@ Read a topology file into a raw TopologyDict represenation.
 
 #### Parameters
 
-| Name   | Type   | Description                | Default    |
-|--------|--------|----------------------------|------------|
-| `path` | Path   | Path to the topology file. | _required_ |
+| Name   | Type                   | Description                | Default    |
+|--------|------------------------|----------------------------|------------|
+| `path` | [Path](`pathlib.Path`) | Path to the topology file. | _required_ |
 
 #### Assumptions And Limitation
 
@@ -78,8 +78,8 @@ Read a topology file into a raw TopologyDict represenation.
   not individual lines within a section and
   a section may either be contained within if ... else or it may not be,
   but it can not be duplicated with one part inside and one outside.
-- `if .. else` can't be nested
-- ``#include`` s that don't resolve to a valid file path are silently dropped
+- `if .. else` can&#x27;t be nested
+- ``#include`` s that don&#x27;t resolve to a valid file path are silently dropped
 - sections that can have subsections can also exist multiple, separate times
   e.g. moleculetype will appear multiple times and they should not be merged
 
@@ -94,10 +94,10 @@ path :
 
 #### Returns
 
-| Type                            | Description                                                          |
-|---------------------------------|----------------------------------------------------------------------|
-| list\[str\]                     | List of lines.                                                       |
-| typing.Optional\[pathlib.Path\] | Path to the ff directory if one of the includes used a file from it. |
+| Type                                                    | Description                                                          |
+|---------------------------------------------------------|----------------------------------------------------------------------|
+| [list](`list`)\[[str](`str`)\]                          | List of lines.                                                       |
+| [Optional](`typing.Optional`)\[[Path](`pathlib.Path`)\] | Path to the ff directory if one of the includes used a file from it. |
 
 ### write_plumed { #kimmdy.parsing.write_plumed }
 
@@ -107,9 +107,9 @@ Write a plumed.dat configuration file.
 
 #### Parameters
 
-| Name   | Type   | Description                         | Default    |
-|--------|--------|-------------------------------------|------------|
-| `path` | Path   | Path to the file. E.g. "plumed.dat" | _required_ |
+| Name   | Type                   | Description                         | Default    |
+|--------|------------------------|-------------------------------------|------------|
+| `path` | [Path](`pathlib.Path`) | Path to the file. E.g. "plumed.dat" | _required_ |
 
 ### write_top { #kimmdy.parsing.write_top }
 
@@ -119,7 +119,7 @@ Write a TopologyDict to a topology file.
 
 #### Parameters
 
-| Name      | Type         | Description                                   | Default    |
-|-----------|--------------|-----------------------------------------------|------------|
-| `top`     | TopologyDict | Raw dictionary represenation of the topology. | _required_ |
-| `outfile` | Path         | Path to the topology file to write to.        | _required_ |
+| Name      | Type                                          | Description                                   | Default    |
+|-----------|-----------------------------------------------|-----------------------------------------------|------------|
+| `top`     | [TopologyDict](`kimmdy.parsing.TopologyDict`) | Raw dictionary represenation of the topology. | _required_ |
+| `outfile` | [Path](`pathlib.Path`)                        | Path to the topology file to write to.        | _required_ |

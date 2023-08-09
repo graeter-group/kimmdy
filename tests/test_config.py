@@ -15,7 +15,7 @@ def test_parse_config1_casting():
 
         assert config.dryrun is True
         assert isinstance(config.dryrun, bool)
-        assert config.iterations == 10
+        assert config.max_tasks == 10
 
         assert isinstance(config.cwd, Path)
         assert isinstance(config.out, Path)

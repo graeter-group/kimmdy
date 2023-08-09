@@ -26,12 +26,11 @@
       "type": "string",
       "pytype": "Path"
     },
-    "iterations": {
-      "description": "Number of iterations to run",
+    "max_tasks": {
+      "description": "Maximum number of tasks to run. This is useful when a task in the sequence can dymanically add more tasks. 0 means no limit.",
       "type": "integer",
       "pytype": "int",
-      "default": 1,
-      "exclusiveMinimum": 0
+      "default": 0
     },
     "run": {
       "description": "Replica number",
