@@ -385,7 +385,7 @@ def read_plumed(path: Path) -> dict:
                     {
                         "id": d[0].strip(":"),
                         "keyword": d[1],
-                        "atoms": [int(x) for x in d[2].strip("ATOMS=").split(",")],
+                        "atoms": [str(x) for x in d[2].strip("ATOMS=").split(",")],
                     }
                 )
             elif "PRINT" in l[:5]:
