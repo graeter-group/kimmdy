@@ -71,6 +71,16 @@ def get_cmdline_args():
             "# yaml-language-server: $schema=/path/to/kimmdy-yaml-schema.json"
         ),
     )
+
+    # flag to print an example jobscript for slurm hpc clusters
+    parser.add_argument(
+        "--generate-jobscript", action="store_true", help=("""
+        Instead of running KIMMDY directly, generate at jobscript.sh for slurm HPC clusters.
+        Save the jobscript to a file with e.g. `kimmdy --generate-jobscript > jobscript.sh`.
+        You can then run this jobscript with sbatch jobscript.sh
+        """)
+    )
+
     return parser.parse_args()
 
 
@@ -133,6 +143,57 @@ def _run(args: argparse.Namespace):
 
         exit()
 
+    if args.generate_jobscript:
+        print(
+            f"""
+#!/bin/env bash
+#SBATCH --job-name=kimmdy
+#SBATCH --output=kimmdy-job.log
+#SBATCH --error=kimmdy-job.log
+#SBATCH -p <your-partition>.p
+#SBATCH --time=24:00:00
+#SBATCH -N 1
+#SBATCH --ntasks-per-node=40
+#SBATCH --mincpus=40
+#SBATCH --exclusive
+#SBATCH --cpus-per-task=1
+#SBATCH --gpus 1
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=<your-email>
+
+echo "Job Name:"
+echo "$SLURM_JOB_NAME"
+
+# Setup up your environment here
+# modules.sh might load lmod modules, set environment variables, etc.
+source ./_modules.sh
+
+JOB={args.input}
+CYCLE=21
+SUBMIT="jobscript.sh $JOB"
+
+START=$(date +"%s")
+
+END=$(date +"%s")
+LEN=$((END-START))
+HOURS=$((LEN/3600))
+echo "$LEN seconds ran"
+echo "$HOURS full hours ran"
+let "CYCLE--"
+if [ $HOURS -lt $CYCLE ]; then
+  echo "last cycle was just $HOURS h long and therefore finito"
+  rm $targetRunning
+  exit 3
+else
+  echo "cycle resubmitting"
+  sbatch -J $SLURM_JOB_NAME $SUBMIT
+  exit 2
+fi
+            """
+        )
+
+        exit()
+
     if args.concat:
         logging.info("KIMMDY will concatenate trrs and exit.")
 
@@ -169,14 +230,9 @@ def kimmdy_run(
     concat: bool = False,
     show_plugins: bool = False,
     show_schema_path: bool = False,
+    generate_jobscript: bool = False,
 ):
     """Run KIMMDY from python.
-
-    TODO: The concat option looks like we probably
-    want an additional kimmdy analysis module,
-    maybe with its own subcommand(s)?
-    Like gromacs ``gmx <command>``?
-
 
     Parameters
     ----------
@@ -195,6 +251,8 @@ def kimmdy_run(
         Show available plugins and exit.
     show_schema_path :
         Print path to yaml schema for use with yaml-language-server e.g. in VSCode and Neovim
+    generate_jobscript :
+        Instead of running KIMMDY directly, generate at jobscript.sh for slurm HPC clusters
     """
     args = argparse.Namespace(
         input=input,
@@ -204,6 +262,7 @@ def kimmdy_run(
         concat=concat,
         show_plugins=show_plugins,
         show_schema_path=show_schema_path,
+        generate_jobscript=generate_jobscript
     )
     _run(args)
     logging.shutdown()
