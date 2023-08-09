@@ -47,8 +47,9 @@ class TaskFiles:
 class Task:
     """A task to be performed as as a step in the RunManager.
 
-    A task consists of a function and its keyword arguments and is
-    itself callable. The function must return a TaskFiles object.
+    A task consists of a function and its keyword arguments.
+    Calling a taks calls the stored function.
+    The function must return a TaskFiles object.
     """
 
     def __init__(self, f: Callable[..., TaskFiles], kwargs={}):
@@ -60,7 +61,7 @@ class Task:
         return self.f(**self.kwargs)
 
     def __repr__(self) -> str:
-        return str(self.f) + " args: " + str(self.kwargs)
+        return str(self.name) + " args: " + str(self.kwargs)
 
 
 TaskMapping = dict[

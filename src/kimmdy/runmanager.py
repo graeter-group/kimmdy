@@ -153,9 +153,10 @@ class RunManager:
                     logging.info(f"Put Task: {task}")
                     self.tasks.put(Task(task, kwargs={"instance": entry}))
                 else:
-                    for task in self.task_mapping[entry]:
+                    for task_f in self.task_mapping[entry]:
+                        task = Task(task_f)
                         logging.info(f"Put Task: {task}")
-                        self.tasks.put(Task(task))
+                        self.tasks.put(task)
 
         while not (self.state is State.DONE or (self.iteration >= self.config.max_tasks) or self.config.max_tasks == 0):
             logging.info("Write checkpoint before next task")
