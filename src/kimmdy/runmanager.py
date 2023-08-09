@@ -196,7 +196,6 @@ class RunManager:
             task = self.crr_tasks.get()
         else:
             task = self.tasks.get()
-            self.iteration += 1
         if self.config.dryrun:
             logging.info(f"Pretend to run: {task.name} with args: {task.kwargs}")
             return
@@ -253,6 +252,7 @@ class RunManager:
     def _create_task_directory(self, postfix: str) -> TaskFiles:
         """Creates TaskFiles object, output directory and symlinks ff."""
         files = TaskFiles(self.get_latest)
+        self.iteration += 1
         files.outputdir = self.config.out / f"{self.iteration}_{postfix}"
         files.outputdir.mkdir(exist_ok=self.from_checkpoint)
         if not (files.outputdir / self.config.ff.name).exists():
