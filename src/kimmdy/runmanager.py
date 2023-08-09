@@ -212,18 +212,25 @@ class RunManager:
         """
         # discover other files written by the task
         if hasattr(files, "outputdir"):
+            # check whether double suffs are properly defined in files by the task
+            suffs = [p.suffix[1:] for p in files.outputdir.iterdir()]
+            counts = [suffs.count(s) for s in suffs]
+            for suff, c in zip(suffs, counts):
+                if c != 1 and suff not in AMBIGUOUS_SUFFS:
+                    if files.output.get(suff) is None:
+                        e = (
+                            "ERROR: Task produced multiple files with same suffix but "
+                            "did not define with which to continue!\n"
+                            f"Task {taskname}, Suffix {suff} found {c} times"
+                        )
+                        logging.error(e)
+                        raise RuntimeError(e)
+
             for path in files.outputdir.iterdir():
                 suffix = path.suffix[1:]
                 if suffix in AMBIGUOUS_SUFFS:
                     suffix = path.name
                 if files.output.get(suffix) is not None:
-                    if files.output[suffix] == files.outputdir / path:
-                        logging.debug(
-                            "_discover_output_files wants to overwrite files.output!"
-                        )
-                        logging.debug(f"Suffix {suffix}")
-                        logging.debug(f"From {files.output[suffix]}")
-                        logging.debug(f"To {files.outputdir / path}")
                     continue
                 files.output[suffix] = files.outputdir / path
 
