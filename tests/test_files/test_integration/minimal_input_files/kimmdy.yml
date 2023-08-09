@@ -2,7 +2,7 @@
 
 name: 'minimal'
 dryrun: false
-iterations: 0
+max_tasks: 0
 gromacs_alias: 'gmx'
 top: 'minimal.top'
 gro: 'minimal.gro'

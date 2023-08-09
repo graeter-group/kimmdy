@@ -60,6 +60,7 @@ def _build_examples(args: argparse.Namespace):
 
     for k, v in rename.items():
         try:
+            print("Building example", v, "...", end="")
             srcpath = testpath / k
             dstpath = examplepath / v
             if args.restore == "hard":
@@ -70,6 +71,24 @@ def _build_examples(args: argparse.Namespace):
                 relassetpath / "amber99sb-star-ildnp.ff",
                 target_is_directory=True,
             )
+            # fix scheme path
+            yml = dstpath / "kimmdy.yml"
+            if yml.exists():
+                scheme_p = (
+                    Path("..") / ".." / "src" / "kimmdy" / "kimmdy-yaml-schema.json"
+                )
+                first_line = f"# yaml-language-server: $schema={scheme_p}\n"
+                with open(yml, "r+") as f:
+                    lines = f.readlines()
+                    if lines[0][:22] == "# yaml-language-server":
+                        lines[0] = first_line
+                    else:
+                        lines = [first_line] + lines
+                    f.seek(0)
+                    f.writelines(lines)
+                    f.truncate()
+
+            print("done")
         except FileExistsError as e:
             raise FileExistsError(
                 f"Could not build example directory {v} because it already exists. Try the --restore option to still build it."
