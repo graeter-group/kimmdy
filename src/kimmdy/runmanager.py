@@ -11,18 +11,18 @@ from copy import deepcopy
 import dill
 import queue
 from enum import Enum, auto
-from typing import Callable
+from typing import Callable, Union
 from kimmdy.config import Config
 from kimmdy.utils import increment_logfile
 from kimmdy.parsing import read_top
-from kimmdy.reaction import ReactionPlugin, RecipeCollection
+from kimmdy.reaction import ReactionPlugin, RecipeCollection, RecipeStep
 import kimmdy.changemanager as changer
 from kimmdy.tasks import Task, TaskFiles, TaskMapping
 from kimmdy.utils import run_shell_cmd, run_gmx
 from pprint import pformat
 from kimmdy import plugins
 from kimmdy.topology.topology import Topology
-from kimmdy.kmc import rf_kmc
+from kimmdy.kmc import rf_kmc, KMCResult
 
 # file types of which there will be multiple files per type
 AMBIGUOUS_SUFFS = ["dat", "xvg", "log", "itp", "mdp"]
@@ -105,6 +105,8 @@ class RunManager:
         self.iteration: int = 0
         self.state: State = State.IDLE
         self.recipe_collection: RecipeCollection = RecipeCollection([])
+        self.recipe_steps: Union[list[RecipeStep], None] = []
+        self.time: float = 0.0  # [ps]
         self.latest_files: dict[str, Path] = get_existing_files(config)
         logging.debug("Initialized latest files:")
         logging.debug(pformat(self.latest_files))
@@ -337,14 +339,16 @@ class RunManager:
 
     def _decide_reaction(
         self,
-        decision_strategy: Callable[[RecipeCollection], dict] = rf_kmc,
+        decision_strategy: Callable[[RecipeCollection], KMCResult] = rf_kmc,
     ):
         logging.info("Decide on a recipe")
         logging.debug(f"Available reaction results: {self.recipe_collection}")
+        files = self._create_task_directory("reaction_decision")
         decision_d = decision_strategy(self.recipe_collection)
         self.recipe_steps = decision_d.recipe_steps
-        logging.info("Chosen recipe is:")
-        logging.info(self.recipe_steps)
+        if decision_d.time_step:
+            self.time += decision_d.time_step
+        logging.info(f"Chosen recipe is: {self.recipe_steps} at time {self.time}")
         return
 
     def _run_recipe(self) -> TaskFiles:

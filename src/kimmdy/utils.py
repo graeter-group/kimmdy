@@ -48,7 +48,7 @@ def get_atominfo_from_plumedid(
     if not atoms:
         raise ValueError("Could not find atoms in topology file")
     lookup_atomtype_atomid = {str(atom[0]): atom[1] for atom in atoms}
-    atomids = sorted(lookup_atomid_plumedid[plumedid],key=int)
+    atomids = sorted(lookup_atomid_plumedid[plumedid], key=int)
     atomtypes_list = [
         lookup_atomtype_atomid[atomids[0]],
         lookup_atomtype_atomid[atomids[1]],
