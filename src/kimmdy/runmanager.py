@@ -4,7 +4,7 @@ The Runmanager is the main entry point of the program.
 It manages the queue of tasks, communicates with the
 rest of the program and keeps track of global state.
 """
-from __future__ import annotations
+from __future__ import annotations.
 import logging
 from pathlib import Path
 from copy import deepcopy
@@ -125,9 +125,9 @@ class RunManager:
         self.task_mapping: TaskMapping = {
             "md": self._run_md,
             "reactions": [
-                self._query_reactions,
-                self._decide_reaction,
-                self._run_recipe,
+                {"f": self._place_reaction_tasks},
+                {"f": self._decide_recipe, "kwargs": {"decision_strategy": rf_kmc}},
+                {"f": self._run_recipe, "out": "run_recipe"},
             ],
         }
 
@@ -151,15 +151,22 @@ class RunManager:
             # allows for mapping one config entry to multiple tasks
             for entry in self.config.sequence:
                 if entry in self.config.mds.get_attributes():
-                    task = self.task_mapping["md"]
-                    logging.info(f"Put Task: {task}")
-                    self.tasks.put(Task(task, kwargs={"instance": entry}))
+                    task = Task(
+                        self,
+                        f=self.task_mapping["md"],
+                        kwargs={"instance": entry},
+                        out=entry,
+                    )
+                    self.tasks.put(task)
                 else:
-                    for task in self.task_mapping[entry]:
-                        logging.info(f"Put Task: {task}")
-                        self.tasks.put(Task(task))
+                    for task_kargs in self.task_mapping[entry]:
+                        self.tasks.put(Task(self, **task_kargs))
 
-        while not (self.state is State.DONE or self.iteration >= self.config.max_tasks):
+        while not (
+            self.state is State.DONE
+            or (self.iteration >= self.config.max_tasks)
+            or self.config.max_tasks == 0
+        ):
             logging.info("Write checkpoint before next task")
             with open(self.cptfile, "wb") as f:
                 dill.dump(self, f)
@@ -197,7 +204,6 @@ class RunManager:
             task = self.crr_tasks.get()
         else:
             task = self.tasks.get()
-            self.iteration += 1
         if self.config.dryrun:
             logging.info(f"Pretend to run: {task.name} with args: {task.kwargs}")
             return
@@ -213,18 +219,25 @@ class RunManager:
         """
         # discover other files written by the task
         if hasattr(files, "outputdir"):
+            # check whether double suffs are properly defined in files by the task
+            suffs = [p.suffix[1:] for p in files.outputdir.iterdir()]
+            counts = [suffs.count(s) for s in suffs]
+            for suff, c in zip(suffs, counts):
+                if c != 1 and suff not in AMBIGUOUS_SUFFS:
+                    if files.output.get(suff) is None:
+                        e = (
+                            "ERROR: Task produced multiple files with same suffix but "
+                            "did not define with which to continue!\n"
+                            f"Task {taskname}, Suffix {suff} found {c} times"
+                        )
+                        logging.error(e)
+                        raise RuntimeError(e)
+
             for path in files.outputdir.iterdir():
                 suffix = path.suffix[1:]
                 if suffix in AMBIGUOUS_SUFFS:
                     suffix = path.name
                 if files.output.get(suffix) is not None:
-                    if files.output[suffix] == files.outputdir / path:
-                        logging.debug(
-                            "_discover_output_files wants to overwrite files.output!"
-                        )
-                        logging.debug(f"Suffix {suffix}")
-                        logging.debug(f"From {files.output[suffix]}")
-                        logging.debug(f"To {files.outputdir / path}")
                     continue
                 files.output[suffix] = files.outputdir / path
 
@@ -244,15 +257,6 @@ class RunManager:
             with open(self.histfile, "a") as f:
                 f.write(m)
 
-    def _create_task_directory(self, postfix: str) -> TaskFiles:
-        """Creates TaskFiles object, output directory and symlinks ff."""
-        files = TaskFiles(self.get_latest)
-        files.outputdir = self.config.out / f"{self.iteration}_{postfix}"
-        files.outputdir.mkdir(exist_ok=self.from_checkpoint)
-        if not (files.outputdir / self.config.ff.name).exists():
-            (files.outputdir / self.config.ff.name).symlink_to(self.config.ff)
-        return files
-
     def _dummy(self):
         logging.info("Start dummy task")
         files = TaskFiles(self.get_latest)
@@ -261,12 +265,11 @@ class RunManager:
         run_shell_cmd("pwd>./pwd.pwd", files.outputdir)
         return files
 
-    def _run_md(self, instance) -> TaskFiles:
+    def _run_md(self, instance, files) -> TaskFiles:
         """General MD simulation"""
         logging.info(f"Start MD {instance}")
         self.state = State.MD
 
-        files = self._create_task_directory(f"{instance}")
         md_config = self.config.mds.attr(instance)
         gmx_alias = self.config.gromacs_alias
         gmx_mdrun_flags = self.config.gmx_mdrun_flags
@@ -275,6 +278,7 @@ class RunManager:
         top = files.input["top"]
         gro = files.input["gro"]
         mdp = md_config.mdp
+        files.input["mdp"] = mdp
         ndx = files.input["ndx"]
 
         outputdir = files.outputdir
@@ -315,31 +319,45 @@ class RunManager:
         logging.debug(f"grompp cmd: {grompp_cmd}")
         logging.debug(f"mdrun cmd: {mdrun_cmd}")
         run_gmx(grompp_cmd, outputdir)
-        run_gmx(mdrun_cmd, outputdir)
+        run_gmx(mdrun_cmd, outputdir).
 
         logging.info(f"Done with MD {instance}")
         return files
 
-    def _query_reactions(self):
+    def _place_reaction_tasks(self):
         logging.info("Query reactions")
         self.state = State.REACTION
         # empty list for every new round of queries
         self.recipe_collection: RecipeCollection = RecipeCollection([])
 
         for reaction_plugin in self.reaction_plugins:
-            # TODO: refactor into Task
-            files = self._create_task_directory(reaction_plugin.name)
+            # placing tasks in priority queue
 
-            self.recipe_collection.recipes.extend(
-                reaction_plugin.get_recipe_collection(files).recipes
+            self.crr_tasks.put(
+                Task(
+                    self,
+                    f=self._query_reaction,
+                    kwargs={"reaction_plugin": reaction_plugin},
+                    out=reaction_plugin.name,
+                )
             )
 
-        logging.info("Reaction done")
+        logging.info(f"Queued {len(self.reaction_plugins)} reaction plugin(s)")
+        return
+
+    def _query_reaction(self, reaction_plugin, files):
+        logging.info(f"Start query {reaction_plugin.name}")
+
+        self.recipe_collection.recipes.extend(
+            reaction_plugin.get_recipe_collection(files).recipes
+        )
+        self.recipe_collection.aggregate_reactions()
+
         return files
 
-    def _decide_reaction(
+    def _decide_recipe(
         self,
-        decision_strategy: Callable[[RecipeCollection], KMCResult] = rf_kmc,
+        decision_strategy: Callable[[RecipeCollection], KMCResult],
     ):
         logging.info("Decide on a recipe")
         logging.debug(f"Available reaction results: {self.recipe_collection}")
@@ -351,11 +369,9 @@ class RunManager:
         logging.info(f"Chosen recipe is: {self.recipe_steps} at time {self.time}")
         return
 
-    def _run_recipe(self) -> TaskFiles:
+    def _run_recipe(self, files) -> TaskFiles:
         logging.info(f"Start Recipe in KIMMDY iteration {self.iteration}")
         logging.info(f"Recipe: {self.recipe_steps}")
-
-        files = self._create_task_directory("recipe")
 
         files.output = {"top": files.outputdir / "topol_mod.top"}
         logging.debug(f"Chose recipe: {self.recipe_steps}")
@@ -391,7 +407,7 @@ class RunManager:
 
         if run_parameter_growth:
             if hasattr(self.config.changer.coordinates, "md_parameter_growth"):
-                # just to make pyright happy
+                # Only for sub-task run_md, afterwards, top will be set back properly
                 if top_merge_path:
                     self.latest_files["top"] = top_merge_path
                 instance = self.config.changer.coordinates.md_parameter_growth
@@ -411,14 +427,13 @@ class RunManager:
                 logging.info(f"No MD relaxation after reaction.")
 
         if instance:
-            # crr_task nested in this task instead of running afterwards
-            self.crr_tasks.put(
-                Task(
-                    self._run_md,
-                    kwargs={"instance": instance},
-                )
+            logging.info("Starting relaxation md as part of reaction..")
+
+            task = Task(
+                self, f=self._run_md, kwargs={"instance": instance}, out=instance
             )
-            next(self)
+            md_files = task()
+            self._discover_output_files(task.name, md_files)
 
         write_json(
             {"time": self.time, "radicals": list(self.top.radicals.keys())},
