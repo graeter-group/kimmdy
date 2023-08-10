@@ -160,7 +160,11 @@ class RunManager:
                     for task_kargs in self.task_mapping[entry]:
                         self.tasks.put(Task(self, **task_kargs))
 
-        while not (self.state is State.DONE or (self.iteration >= self.config.max_tasks) or self.config.max_tasks == 0):
+        while not (
+            self.state is State.DONE
+            or (self.iteration >= self.config.max_tasks)
+            or self.config.max_tasks == 0
+        ):
             logging.info("Write checkpoint before next task")
             with open(self.cptfile, "wb") as f:
                 dill.dump(self, f)
