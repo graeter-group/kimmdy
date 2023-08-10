@@ -123,7 +123,7 @@ class RunManager:
         self.task_mapping: TaskMapping = {
             "md": self._run_md,
             "reactions": [
-                self._query_reactions,
+                self._place_reaction_tasks,
                 self._decide_reaction,
                 self._run_recipe,
             ],
@@ -327,21 +327,31 @@ class RunManager:
         logging.info(f"Done with MD {instance}")
         return files
 
-    def _query_reactions(self):
+    def _place_reaction_tasks(self):
         logging.info("Query reactions")
         self.state = State.REACTION
         # empty list for every new round of queries
         self.recipe_collection: RecipeCollection = RecipeCollection([])
 
         for reaction_plugin in self.reaction_plugins:
-            # TODO: refactor into Task
-            files = self._create_task_directory(reaction_plugin.name)
-
-            self.recipe_collection.recipes.extend(
-                reaction_plugin.get_recipe_collection(files).recipes
+            # placing tasks in priority queue
+            self.crr_tasks.put(
+                Task(self._query_reaction, {"reaction_plugin": reaction_plugin})
             )
 
-        logging.info("Reaction done")
+        logging.info(f"Queued {len(self.reaction_plugins)} reaction plugin(s)")
+        return
+
+    def _query_reaction(self, reaction_plugin):
+        logging.info(f"Start query {reaction_plugin.name}")
+
+        files = self._create_task_directory(reaction_plugin.name)
+
+        self.recipe_collection.recipes.extend(
+            reaction_plugin.get_recipe_collection(files).recipes
+        )
+        self.recipe_collection.aggregate_reactions()
+
         return files
 
     def _decide_reaction(
@@ -416,6 +426,8 @@ class RunManager:
                 logging.info(f"No MD relaxation after reaction.")
 
         if instance:
+            logging.info("Starting relaxation md as part of reaction..")
+
             task = Task(
                 self._run_md,
                 kwargs={"instance": instance},
