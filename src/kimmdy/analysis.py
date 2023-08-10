@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import MDAnalysis as mda
 
 from kimmdy.utils import run_shell_cmd
-from kimmdy.parsing import read_json
+from kimmdy.parsing import read_json, write_json
 
 
 def get_subdirs(run_dir: Path, steps: Union[list, str]):
@@ -138,13 +138,14 @@ def plot_energy(args: argparse.Namespace):
 
 
 def radical_population(args):
-    for curr_dir in args.dir:
-        run_dir = Path(curr_dir).expanduser().resolve()
+    # TODO: weigh radical population by time
 
-        ## create output dir
-        (run_dir / "analysis").mkdir(exist_ok=True)
-        out = run_dir / "analysis" / "radical_population.pdb"
-        out = Path(out).expanduser()
+    select_atoms = args.select_atoms
+    ## set up directory to store radical information
+    radical_info = {"time": [], "radicals": []}
+
+    for curr_dir in args.dir[::-1]:
+        run_dir = Path(curr_dir).expanduser().resolve()
 
         ## find .gro file
         subdirs_sorted = sorted(
@@ -157,53 +158,62 @@ def radical_population(args):
                 break
         assert gro
 
-        ## get info from gro file
-        u = mda.Universe(str(gro[0]), format="gro")
-        print(u)
-        atoms = u.select_atoms("protein")
-        atoms_id = [atom.id for atom in atoms]
-        print(atoms_id)
-
         ## gather radical info
         radical_jsons = run_dir.glob("**/radicals.json")
         # print(list(radical_jsons))
 
         ## parse radical info
-        radical_info = {"time": [], "radicals": []}
         for radical_json in radical_jsons:
-            print(radical_json, "X")
             data = read_json(radical_json)
-            print(data)
             for k in radical_info.keys():
                 radical_info[k].append(data[k])
 
-        ## plot fingerprint
-        counts = {i: 0.0 for i in atoms_id}
-        n_states = len(radical_info["time"])
-        for state in range(n_states):
-            for idx in radical_info["radicals"][state]:
-                counts[int(idx)] += 1 / n_states
-        print(counts)
+    ## create output dir (only goes to first mentioned run_dir)
+    (run_dir / "analysis").mkdir(exist_ok=True)
+    out = run_dir / "analysis"
+    out = Path(out).expanduser()
 
-        plt.bar(x=counts.keys(), height=counts.values())
-        plt.xlabel("Atom idx")
-        plt.ylabel("Fractional Radical Occupancy")
-        plt.ylim(0, 1)
-        plt.xticks(atoms_id)
-        plt.savefig(
-            str(run_dir / "analysis" / "radical_population_fingerprint"), dpi=300
+    ## write gathered radical info
+    write_json(radical_info, out / "radical_population.json")
+
+    ## get info from gro file
+    u = mda.Universe(str(gro[0]), format="gro")
+    print(u)
+    atoms = u.select_atoms(select_atoms)
+    atoms_identifier = [
+        "-".join(x)
+        for x in list(
+            zip(
+                [str(resid) for resid in atoms.resids],
+                [str(name) for name in atoms.names],
+            )
         )
+    ]
+    atoms_id = atoms.ids
+    print(atoms_identifier)
+    print(atoms_id)
 
-        ## write pdb with beta
-        # for k,v in counts.items():
-        #     atom = u.select_atoms(f"index {k}")
-        #     print(atom)
-        #     print(atom[0])
+    ## plot fingerprint
+    counts = {i: 0.0 for i in atoms_id}
+    n_states = len(radical_info["time"])
+    for state in range(n_states):
+        for idx in radical_info["radicals"][state]:
+            if int(idx) in counts.keys():
+                counts[int(idx)] += 1 / n_states
+    print(counts)
 
-        #     atom[0].beta = v
-        u.add_TopologyAttr("tempfactors")
-        protein = u.select_atoms("protein")
-        print(list(counts.values()))
-        print(protein.tempfactors)
-        protein.tempfactors = list(counts.values())
-        protein.write(str(out))
+    plt.bar(x=atoms_identifier, height=counts.values())
+    plt.xlabel("Atom identifier")
+    plt.ylabel("Fractional Radical Occupancy")
+    plt.ylim(0, 1)
+    plt.xticks(atoms_identifier, rotation=90, ha="right")
+    plt.tight_layout()
+    plt.savefig(str(run_dir / "analysis" / "radical_population_fingerprint"), dpi=300)
+
+    u.add_TopologyAttr("tempfactors")
+    atoms = u.select_atoms(select_atoms)
+    print(list(counts.values()))
+    print(atoms.tempfactors)
+    atoms.tempfactors = list(counts.values())
+    protein = u.select_atoms("protein")
+    protein.write(str(out))

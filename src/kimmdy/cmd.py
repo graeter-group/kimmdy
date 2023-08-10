@@ -126,6 +126,13 @@ def get_analysis_cmdline_args():
     parser_radical_population.add_argument(
         "dir", nargs="+", help="KIMMDY run directory to be analysed. Can be multiple."
     )
+    parser_radical_population.add_argument(
+        "--select_atoms",
+        "-a",
+        type=str,
+        help="Atoms chosen for radical population analysis, default is protein (uses MDAnalysis selection syntax)",
+        default="protein",
+    )
     return parser.parse_args()
 
 
