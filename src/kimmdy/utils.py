@@ -8,14 +8,21 @@ from pathlib import Path
 
 def get_gmx_dir() -> Path:
     """returns the path to the gromacs installation"""
-    gmx_binary = Path(
-        sp.run(["which", "gmx"], capture_output=True).stdout.decode().strip()
-    )
-    if not gmx_binary.exists():
+
+    # get the stder from calling `gmx` to search for the `Data prefix:`
+    # line which contains the path to the gromacs installation
+    r = sp.run(["gmx"], check=True, capture_output=True, text=True)
+
+    gmx_prefix = None
+    for l in r.stderr.splitlines():
+        if l.startswith('Data prefix:'):
+            gmx_prefix = l.split()[2]
+            break
+
+    if gmx_prefix is None:
         raise ValueError("Could not find gromacs installation")
-    # resolve symlink if gmxbinary is a symlink
-    gmx_binary = gmx_binary.resolve()
-    gmx_dir = gmx_binary.parent.parent / "share" / "gromacs"
+
+    gmx_dir = Path(gmx_prefix) / "share" / "gromacs"
     return gmx_dir
 
 
