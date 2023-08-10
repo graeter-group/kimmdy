@@ -9,6 +9,7 @@ from typing import Generator, Optional
 import xml.etree.ElementTree as ET
 from itertools import takewhile
 import logging
+import json
 
 from kimmdy.utils import get_gmx_dir
 
@@ -444,3 +445,15 @@ def read_xml_ff(path: Path) -> ET.Element:
     tree = ET.parse(path)
     root = tree.getroot()
     return root
+
+
+def write_json(d: dict, path: Path) -> None:
+    logging.debug(f"writing dictionary to json: {d}")
+    with open(path, "w") as f:
+        json.dump(d, f)
+
+
+def read_json(path: Path) -> dict:
+    with open(path, "r") as f:
+        data = json.load(f)
+    return data
