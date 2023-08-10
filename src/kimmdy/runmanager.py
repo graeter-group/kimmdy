@@ -4,7 +4,7 @@ The Runmanager is the main entry point of the program.
 It manages the queue of tasks, communicates with the
 rest of the program and keeps track of global state.
 """
-from __future__ import annotations.
+from __future__ import annotations
 import logging
 from pathlib import Path
 from copy import deepcopy
@@ -319,7 +319,7 @@ class RunManager:
         logging.debug(f"grompp cmd: {grompp_cmd}")
         logging.debug(f"mdrun cmd: {mdrun_cmd}")
         run_gmx(grompp_cmd, outputdir)
-        run_gmx(mdrun_cmd, outputdir).
+        run_gmx(mdrun_cmd, outputdir)
 
         logging.info(f"Done with MD {instance}")
         return files
@@ -361,7 +361,6 @@ class RunManager:
     ):
         logging.info("Decide on a recipe")
         logging.debug(f"Available reaction results: {self.recipe_collection}")
-        files = self._create_task_directory("reaction_decision")
         decision_d = decision_strategy(self.recipe_collection)
         self.recipe_steps = decision_d.recipe_steps
         if decision_d.time_step:
