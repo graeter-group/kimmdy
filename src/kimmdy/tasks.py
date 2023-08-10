@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable, Optional, TYPE_CHECKING, Union
+import logging
 
 
 class AutoFillDict(dict):
@@ -44,20 +45,55 @@ class TaskFiles:
         self.input = AutoFillDict(self.get_latest)
 
 
+def create_task_directory(runmng, postfix: str) -> TaskFiles:
+    """Creates TaskFiles object, output directory and symlinks ff."""
+    files = TaskFiles(runmng.get_latest)
+    runmng.iteration += 1
+    files.outputdir = runmng.config.out / f"{runmng.iteration}_{postfix}"
+    logging.debug(f"Creating Output directory: {files.outputdir}")
+    files.outputdir.mkdir(exist_ok=runmng.from_checkpoint)
+    if not (files.outputdir / runmng.config.ff.name).exists():
+        (files.outputdir / runmng.config.ff.name).symlink_to(runmng.config.ff)
+    return files
+
+
 class Task:
     """A task to be performed as as a step in the RunManager.
 
     A task consists of a function and its keyword arguments.
     Calling a taks calls the stored function.
     The function must return a TaskFiles object.
+
+    Parameters:
+    -----------
+    runmng : kimmdy.runmanager.Runmanager
+        Runmanager instance
+    f : Callable
+        Will be called when the task is called
+    kwargs : dict
+        kwargs will be passed to f
+    out : str, optional
+        If not None, an output dir will be created with this name
     """
 
-    def __init__(self, f: Callable[..., TaskFiles], kwargs={}):
+    def __init__(self, runmng, f: Callable[..., TaskFiles], kwargs=None, out=None):
+        self.runmng = runmng
         self.f = f
+        if kwargs is None:
+            kwargs = {}
         self.kwargs = kwargs
         self.name = self.f.__name__
+        self.out = out
+
+        logging.info(
+            f"Init task {self.name}\n\tkwargs: {self.kwargs}\n\tOut: {self.out}"
+        )
 
     def __call__(self) -> TaskFiles:
+        if self.out is not None:
+            self.kwargs.update({"files": create_task_directory(self.runmng, self.out)})
+
+        logging.debug(f"Calling task {self.name} with kwargs: {self.kwargs}")
         return self.f(**self.kwargs)
 
     def __repr__(self) -> str:
