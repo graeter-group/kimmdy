@@ -399,7 +399,7 @@ class RunManager:
 
         if run_parameter_growth:
             if hasattr(self.config.changer.coordinates, "md_parameter_growth"):
-                # TODO: don't use latest files but supply _run_md with a top in TaskFiles
+                # Only for sub-task run_md, afterwards, top will be set back properly
                 if top_merge_path:
                     self.latest_files["top"] = top_merge_path
                 instance = self.config.changer.coordinates.md_parameter_growth
