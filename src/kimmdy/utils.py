@@ -105,54 +105,54 @@ def get_bondprm_from_atomtypes(
 def morse_transition_rate(
     r_curr: list[float],
     r_0: float,
-    E_dis: float,
+    dissociation_energies: float,
     k_f: float,
     k_0: float = 0.288,
     kT: float = 2.479,
 ) -> tuple[list[float], list[float]]:
     """calculates energy barrier crossing rate [in ps]; barrier based on the model V = V_morse - F*X"""
-    r_curr = np.asarray(r_curr)
-    beta = np.sqrt(k_f / (2 * E_dis))
+    rs = np.asarray(r_curr)
+    beta = np.sqrt(k_f / (2 * dissociation_energies))
 
-    Fs = (
+    fs = (
         2
         * beta
-        * E_dis
-        * np.exp(-beta * (r_curr - r_0))
-        * (1 - np.exp(-beta * (r_curr - r_0)))
+        * dissociation_energies
+        * np.exp(-beta * (rs - r_0))
+        * (1 - np.exp(-beta * (rs - r_0)))
     )
 
     # inflection calculation
-    r_infl = (beta * r_0 + np.log(2)) / beta
-    F_infl = (
+    r_inflection = (beta * r_0 + np.log(2)) / beta
+    f_inflection = (
         2
         * beta
-        * E_dis
-        * np.exp(-beta * (r_infl - r_0))
-        * (1 - np.exp(-beta * (r_infl - r_0)))
+        * dissociation_energies
+        * np.exp(-beta * (r_inflection - r_0))
+        * (1 - np.exp(-beta * (r_inflection - r_0)))
     )
-    Fs_mask = r_curr > r_infl
-    Fs[Fs_mask] = F_infl
+    fs_mask = rs > r_inflection
+    fs[fs_mask] = f_inflection
 
     # calculate extrema of shifted potential i.o.t. get barrier hight
     rmin = r_0 - 1 / beta * np.log(
-        (beta * E_dis + np.sqrt(beta**2 * E_dis**2 - 2 * E_dis * beta * Fs))
-        / (2 * beta * E_dis)
+        (beta * dissociation_energies + np.sqrt(beta**2 * dissociation_energies**2 - 2 * dissociation_energies * beta * fs))
+        / (2 * beta * dissociation_energies)
     )
-    rmax = r_0 - 1 / beta * np.log(
-        (beta * E_dis - np.sqrt(beta**2 * E_dis**2 - 2 * E_dis * beta * Fs))
-        / (2 * beta * E_dis)
+    r_max = r_0 - 1 / beta * np.log(
+        (beta * dissociation_energies - np.sqrt(beta**2 * dissociation_energies**2 - 2 * dissociation_energies * beta * fs))
+        / (2 * beta * dissociation_energies)
     )
     # set rmax to r0 * 10 where no rmax can be found
-    rmax = np.where(~np.isfinite(rmax), 10 * r_0, rmax)
-    Vmax = E_dis * (1 - np.exp(-beta * (rmax - r_0))) ** 2 - Fs * (rmax - r_0)
-    Vmin = E_dis * (1 - np.exp(-beta * (rmin - r_0))) ** 2 - Fs * (rmin - r_0)
+    r_max = np.where(~np.isfinite(r_max), 10 * r_0, r_max)
+    v_max = dissociation_energies * (1 - np.exp(-beta * (r_max - r_0))) ** 2 - fs * (r_max - r_0)
+    v_min = dissociation_energies * (1 - np.exp(-beta * (rmin - r_0))) ** 2 - fs * (rmin - r_0)
     # Note: F*r should lead to same result as F*(r-r_0) since the shifts in Vmax-Vmin adds up to zero
 
-    delta_V = Vmax - Vmin
-    k = k_0 * np.exp(-delta_V / kT)  # [1/ps]
+    delta_v = v_max - v_min
+    k = k_0 * np.exp(-delta_v / kT)  # [1/ps]
 
-    return k, Fs
+    return k, fs
 
 
 def run_shell_cmd(s, cwd=None) -> sp.CompletedProcess:
