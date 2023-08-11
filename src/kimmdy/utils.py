@@ -110,7 +110,7 @@ def morse_transition_rate(
     k_0: float = 0.288,
     kT: float = 2.479,
 ) -> tuple[list[float], list[float]]:
-    """calculates energy barrier crossing rate [in ps]; barrier based on the model V = V_morse - F*X"""
+    """calculates energy barrier crossing rate [in 1/ps]; barrier based on the model V = V_morse - F*X"""
     rs = np.asarray(r_curr)
     beta = np.sqrt(k_f / (2 * dissociation_energies))
 
@@ -135,18 +135,24 @@ def morse_transition_rate(
     fs[fs_mask] = f_inflection
 
     # calculate extrema of shifted potential i.o.t. get barrier hight
-    rmin = r_0 - 1 / beta * np.log(
+    r_min = r_0 - 1 / beta * np.log(
         (beta * dissociation_energies + np.sqrt(beta**2 * dissociation_energies**2 - 2 * dissociation_energies * beta * fs))
         / (2 * beta * dissociation_energies)
     )
+    x = (beta * dissociation_energies - np.sqrt(beta**2 * dissociation_energies**2 - 2 * dissociation_energies * beta * fs)) / (2 * beta * dissociation_energies)
+    logging.error(x)
+    # TODO: why can x be negative here?
+    # this breaks the log below
     r_max = r_0 - 1 / beta * np.log(
         (beta * dissociation_energies - np.sqrt(beta**2 * dissociation_energies**2 - 2 * dissociation_energies * beta * fs))
         / (2 * beta * dissociation_energies)
     )
+    logging.error(r_max)
     # set rmax to r0 * 10 where no rmax can be found
     r_max = np.where(~np.isfinite(r_max), 10 * r_0, r_max)
+    logging.error(r_max)
     v_max = dissociation_energies * (1 - np.exp(-beta * (r_max - r_0))) ** 2 - fs * (r_max - r_0)
-    v_min = dissociation_energies * (1 - np.exp(-beta * (rmin - r_0))) ** 2 - fs * (rmin - r_0)
+    v_min = dissociation_energies * (1 - np.exp(-beta * (r_min - r_0))) ** 2 - fs * (r_min - r_0)
     # Note: F*r should lead to same result as F*(r-r_0) since the shifts in Vmax-Vmin adds up to zero
 
     delta_v = v_max - v_min

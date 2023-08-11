@@ -4,6 +4,7 @@ Tests for homolysis reaction plugin.
 Assumes KIMMDY was installed with the plugin.
 E.g. via pip install -r requirements.txt.
 """
+import logging
 import pytest
 from pathlib import Path
 import numpy as np
@@ -70,13 +71,15 @@ def test_fail_lookup_bondprm(homolysis_files):
 
 
 def test_morse_transition_rate(homolysis_files):
-    b0, kb, E_dis = get_bondprm_from_atomtypes(
+    b0, kb, dissociation_energyies = get_bondprm_from_atomtypes(
         frozenset(["CT", "C"]), homolysis_files["ffbonded"], homolysis_files["edissoc"]
     )
 
-    refval = np.linspace(0.9, 1.3, 8) * b0
+    refval = list(np.linspace(0.9, 1.3, 8) * b0)
     # tested morse_transition_rate vs Benedikt's implementation before removing it
-    k_array, F_array = morse_transition_rate(refval, b0, E_dis, kb)
+    ks, fs = morse_transition_rate(refval, b0, dissociation_energyies, kb)
+    logging.error(ks)
+    logging.error(fs)
 
     k_ref = np.asarray(
         [
@@ -103,8 +106,8 @@ def test_morse_transition_rate(homolysis_files):
         ]
     )
 
-    assert all(np.isclose(k_array, k_ref))
-    assert all(np.isclose(F_array, F_ref))
+    assert all(np.isclose(ks, k_ref))
+    assert all(np.isclose(fs, F_ref))
 
 
 def test_get_recipe_collection(generic_rmgr):
