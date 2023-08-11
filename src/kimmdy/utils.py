@@ -7,20 +7,23 @@ from pathlib import Path
 
 
 def get_gmx_dir() -> Path:
-    """returns the path to the gromacs installation"""
+    """returns the path to the gromacs installation
+
+    This does not check if the installation is valid.
+    It just returns the path to the gromacs data directory.
+    If `gmx` is not executable it still returns the default
+    gromacs data directory in `/usr/share/gromacs`.
+    """
 
     # get the stder from calling `gmx` to search for the `Data prefix:`
     # line which contains the path to the gromacs installation
-    r = sp.run(["gmx"], check=True, capture_output=True, text=True)
+    r = sp.run(["gmx"], check=False, capture_output=True, text=True)
 
-    gmx_prefix = None
+    gmx_prefix = "/usr"
     for l in r.stderr.splitlines():
         if l.startswith("Data prefix:"):
             gmx_prefix = l.split()[2]
             break
-
-    if gmx_prefix is None:
-        raise ValueError("Could not find gromacs installation")
 
     gmx_dir = Path(gmx_prefix) / "share" / "gromacs"
     return gmx_dir
@@ -155,10 +158,8 @@ def morse_transition_rate(
         )
         / (2 * beta * dissociation_energies)
     )
-    logging.error(r_max)
     # set rmax to r0 * 10 where no rmax can be found
     r_max = np.where(~np.isfinite(r_max), 10 * r_0, r_max)
-    logging.error(r_max)
     v_max = dissociation_energies * (1 - np.exp(-beta * (r_max - r_0))) ** 2 - fs * (
         r_max - r_0
     )
