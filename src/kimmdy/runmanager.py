@@ -257,14 +257,6 @@ class RunManager:
             with open(self.histfile, "a") as f:
                 f.write(m)
 
-    def _dummy(self):
-        logging.info("Start dummy task")
-        files = TaskFiles(self.get_latest)
-        files.outputdir = self.config.out / f"{self.iteration}_dummy"
-        files.outputdir.mkdir()
-        run_shell_cmd("pwd>./pwd.pwd", files.outputdir)
-        return files
-
     def _run_md(self, instance, files) -> TaskFiles:
         """General MD simulation"""
         logging.info(f"Start MD {instance}")
