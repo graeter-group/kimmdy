@@ -1,4 +1,3 @@
-# %%
 from copy import deepcopy
 from pathlib import Path
 import pytest
@@ -210,6 +209,7 @@ class TestTopology:
         assert newtop.angles == og_top.angles
         assert newtop.proper_dihedrals == og_top.proper_dihedrals
 
+    @pytest.mark.slow
     @settings(max_examples=1, phases=[Phase.generate])
     @given(top_break=random_topology_and_break())
     def test_break_bind_bond_invertible(self, top_break):
