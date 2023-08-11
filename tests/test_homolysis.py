@@ -63,7 +63,7 @@ def test_lookup_bondprm(homolysis_files):
 
 def test_fail_lookup_bondprm(homolysis_files):
     with pytest.raises(KeyError):
-        b0, kb, E_dis = get_bondprm_from_atomtypes(
+        b0, kb, e_dis = get_bondprm_from_atomtypes(
             frozenset(["X", "Z"]),
             homolysis_files["ffbonded"],
             homolysis_files["edissoc"],
@@ -71,17 +71,14 @@ def test_fail_lookup_bondprm(homolysis_files):
 
 
 def test_morse_transition_rate(homolysis_files):
-    b0, kb, dissociation_energyies = get_bondprm_from_atomtypes(
+    b0, kb, es_dis = get_bondprm_from_atomtypes(
         frozenset(["CT", "C"]), homolysis_files["ffbonded"], homolysis_files["edissoc"]
     )
 
-    refval = list(np.linspace(0.9, 1.3, 8) * b0)
-    # tested morse_transition_rate vs Benedikt's implementation before removing it
-    ks, fs = morse_transition_rate(refval, b0, dissociation_energyies, kb)
-    logging.error(ks)
-    logging.error(fs)
+    rs_ref = list(np.linspace(0.9, 1.3, 8) * b0)
+    ks, fs = morse_transition_rate(rs_ref, b0, es_dis, kb)
 
-    k_ref = np.asarray(
+    ks_ref = np.asarray(
         [
             0.00000000e00,
             0.00000000e00,
@@ -93,7 +90,7 @@ def test_morse_transition_rate(homolysis_files):
             2.88000000e-01,
         ]
     )
-    F_ref = np.asarray(
+    fs_ref = np.asarray(
         [
             -6327.85756373,
             -2095.88999762,
@@ -106,8 +103,8 @@ def test_morse_transition_rate(homolysis_files):
         ]
     )
 
-    assert all(np.isclose(ks, k_ref))
-    assert all(np.isclose(fs, F_ref))
+    assert all(np.isclose(ks, ks_ref))
+    assert all(np.isclose(fs, fs_ref))
 
 
 def test_get_recipe_collection(generic_rmgr):
