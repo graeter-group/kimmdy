@@ -5,12 +5,6 @@ on:
     types: [labeled]
 
 jobs:
-  lint:
-    if:  startsWith(github.head_ref, 'release-please-') && github.event.label.name == 'testthis'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: psf/black@stable
   test:
     if:  startsWith(github.head_ref, 'release-please-') && github.event.label.name == 'testthis'
     runs-on: ubuntu-latest
