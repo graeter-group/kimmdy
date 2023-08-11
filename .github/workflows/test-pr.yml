@@ -5,16 +5,10 @@ on:
     types: [labeled]
 
 jobs:
-  lint:
+  test:
     if:  github.event.label.name == 'testthis' && !startsWith(github.head_ref, 'release-please-')
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: psf/black@stable
-  test:
-    runs-on: ubuntu-latest
     container: riedmiki/gromacs-plumed-python:2021
-    needs: lint
     steps:
       - uses: actions/checkout@v3
       - name: run tox
