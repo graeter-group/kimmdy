@@ -39,7 +39,7 @@ def increment_logfile(f: Path) -> Path:
 
 def get_atominfo_from_plumedid(
     plumedid: str, plumed: dict, top: dict
-) -> tuple[frozenset, frozenset]:
+) -> tuple[frozenset[str], list[str]]:
     """returns atomtypes for a plumedid with information from the plumed and topology file"""
     lookup_atomid_plumedid = {
         entry["id"]: frozenset(entry["atoms"]) for entry in plumed["distances"]
@@ -47,12 +47,11 @@ def get_atominfo_from_plumedid(
     atoms = get_protein_section(top, "atoms")
     if not atoms:
         raise ValueError("Could not find atoms in topology file")
-    lookup_atomtype_atomid = {int(atom[0]): atom[1] for atom in atoms}
-    atomids = lookup_atomid_plumedid[plumedid]
-    atomids_list = list(atomids)
+    lookup_atomtype_atomid = {str(atom[0]): atom[1] for atom in atoms}
+    atomids = sorted(lookup_atomid_plumedid[plumedid], key=int)
     atomtypes_list = [
-        lookup_atomtype_atomid[atomids_list[0]],
-        lookup_atomtype_atomid[atomids_list[1]],
+        lookup_atomtype_atomid[atomids[0]],
+        lookup_atomtype_atomid[atomids[1]],
     ]
     atomtypes = frozenset(atomtypes_list)
     logging.debug(f"Found atomtypes {atomtypes} for plumedid {plumedid}.")
@@ -169,7 +168,7 @@ def check_gmx_version(config):
     """Check for an existing gromacs installation.
 
     If PLUMED is meant to be used it additionally checks for the keyword
-    'MODIFIED' in the version name.
+    'MODIFIED' or 'plumed' in the version name.
     """
     try:
         version = [
@@ -184,17 +183,13 @@ def check_gmx_version(config):
         logging.error(m)
         raise SystemError(m)
 
-    # i hate this
-    if (
-        any(
-            "plumed" in y
-            for y in [
-                config.mds.attr(x).get_attributes() for x in config.mds.get_attributes()
-            ]
-        )
-        and not "MODIFIED" in version
-    ):
-        m = "GROMACS version does not contain MODIFIED, aborting due to lack of PLUMED patch."
+    if any(
+        "plumed" in y
+        for y in [
+            config.mds.attr(x).get_attributes() for x in config.mds.get_attributes()
+        ]
+    ) and (not ("MODIFIED" in version or "plumed" in version)):
+        m = "GROMACS version does not contain MODIFIED or plumed, aborting due to lack of PLUMED patch."
         logging.error(m)
         logging.error("Version was: " + version)
         if not config.dryrun:

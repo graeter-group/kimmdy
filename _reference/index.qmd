@@ -1,0 +1,49 @@
+# Reference
+
+## API
+
+Start KIMMDY from a python script or the command line
+
+| | |
+| --- | --- |
+| [cmd](cmd.qmd#kimmdy.cmd) | Functions for starting KIMMDY either from python or the command line. |
+
+## Topology
+
+Topology modules
+
+| | |
+| --- | --- |
+| [topology.topology](topology.topology.qmd#kimmdy.topology.topology) |  |
+| [topology.ff](topology.ff.qmd#kimmdy.topology.ff) |  |
+| [topology.utils](topology.utils.qmd#kimmdy.topology.utils) |  |
+| [topology.atomic](topology.atomic.qmd#kimmdy.topology.atomic) | Atomic datatypes for the topology such as Atom, Bond, Angle, Dihedral, etc. |
+
+## Modules
+
+Modules
+
+| | |
+| --- | --- |
+| [changemanager](changemanager.qmd#kimmdy.changemanager) | The changemanager module holds functions that modify the system |
+| [constants](constants.qmd#kimmdy.constants) | Comstants used throughout KIMMDY |
+| [coordinates](coordinates.qmd#kimmdy.coordinates) |  |
+| [config](config.qmd#kimmdy.config) | Read and validate kimmdy.yml configuration files |
+| [schema](schema.qmd#kimmdy.schema) | Handle the schema for the config file. |
+| [kmc](kmc.qmd#kimmdy.kmc) | Kinetic Monte Carlo (KMC) classes and functions. |
+| [misc_helper](misc_helper.qmd#kimmdy.misc_helper) | Miscelaneous utilitiies that didn&#x27;t fit anywhere else for now. |
+| [parsing](parsing.qmd#kimmdy.parsing) | All read_&lt;...&gt; and write_&lt;...&gt; functions. |
+| [runmanager](runmanager.qmd#kimmdy.runmanager) | The Runmanager is the main entry point of the program. |
+| [tasks](tasks.qmd#kimmdy.tasks) |  |
+| [utils](utils.qmd#kimmdy.utils) |  |
+| [reaction](reaction.qmd#kimmdy.reaction) | ReactionPlugin protocoll and reaction recipes. |
+
+## Reaction Plugins
+
+Reaction plugins bundled with KIMMDY and the protocol to add a new reaction plugin to KIMMDY
+
+| | |
+| --- | --- |
+| [homolysis.reaction.Homolysis](homolysis.reaction.Homolysis.qmd#homolysis.reaction.Homolysis) | Homolytic bond breaking leading to 2 radicals. |
+| [hat_naive.reaction.NaiveHAT](hat_naive.reaction.NaiveHAT.qmd#hat_naive.reaction.NaiveHAT) | Naive HAT reaction, selects hydrogens at random |
+| [dummyreaction.reaction.DummyReaction](dummyreaction.reaction.DummyReaction.qmd#dummyreaction.reaction.DummyReaction) | Dummy reaction, returns empty RecipeCollection |

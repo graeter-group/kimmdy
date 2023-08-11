@@ -1,3 +1,0 @@
-# reaction_results { #kimmdy.runmanager.RunManager.reaction_results }
-
-`runmanager.RunManager.reaction_results`

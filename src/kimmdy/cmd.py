@@ -7,11 +7,12 @@ import logging
 from pathlib import Path
 import dill
 from kimmdy.config import Config
-from kimmdy.misc_helper import concat_traj
+from kimmdy.analysis import concat_traj, plot_energy, radical_population
+from kimmdy.misc_helper import _build_examples
 from kimmdy.runmanager import RunManager
 from kimmdy.utils import check_gmx_version, increment_logfile
+import importlib.resources as pkg_resources
 import sys
-
 
 if sys.version_info > (3, 10):
     from importlib_metadata import version
@@ -45,16 +46,92 @@ def get_cmdline_args():
         "--logfile", "-f", type=str, help="logfile", default="kimmdy.log"
     )
     parser.add_argument("--checkpoint", "-c", type=str, help="checkpoint file")
+
+    # flag to show available plugins
     parser.add_argument(
-        "--concat",
-        type=Path,
-        nargs="?",
-        const=True,
+        "--show-plugins", action="store_true", help=("List available plugins")
+    )
+
+    # flag to print path to yaml schema
+    parser.add_argument(
+        "--show-schema-path",
+        action="store_true",
         help=(
-            "Concatenate trrs of this run"
-            "Optionally, the run directory can be give"
-            "Will save as concat.trr in current directory"
+            "Print path to yaml schema for use with yaml-language-server e.g. in VSCode and Neovim"
+            "# yaml-language-server: $schema=/path/to/kimmdy-yaml-schema.json"
         ),
+    )
+    return parser.parse_args()
+
+
+def get_analysis_cmdline_args():
+    """
+    concat :
+    Don't perform a full KIMMDY run but instead concatenate trajectories
+    from a previous run.
+    """
+    parser = argparse.ArgumentParser(
+        description="Welcome to the KIMMDY analysis module"
+    )
+    subparsers = parser.add_subparsers(required=True, metavar="module", dest="module")
+
+    ## trjcat
+    parser_trjcat = subparsers.add_parser(
+        name="trjcat", help="Concatenate trajectories of a KIMMDY run"
+    )
+    parser_trjcat.add_argument(
+        "dir", type=str, help="KIMMDY run directory to be analysed."
+    )
+    parser_trjcat.add_argument(
+        "--steps",
+        "-s",
+        nargs="*",
+        default="all",
+        help=(
+            "Apply analysis method to subdirectories with these names. Uses all subdirectories by default"
+        ),
+    )
+
+    ## plot_energy
+    parser_plot_energy = subparsers.add_parser(
+        name="plot_energy", help="Plot GROMACS energy for a KIMMDY run"
+    )
+    parser_plot_energy.add_argument(
+        "dir", type=str, help="KIMMDY run directory to be analysed."
+    )
+    parser_plot_energy.add_argument(
+        "--steps",
+        "-s",
+        nargs="*",
+        default="all",
+        help=(
+            "Apply analysis method to subdirectories with these names. Uses all subdirectories by default"
+        ),
+    )
+    parser_plot_energy.add_argument(
+        "--terms",
+        "-t",
+        nargs="*",
+        default=["Potential"],
+        help=(
+            "Terms from gmx energy that will be plotted. Uses 'Potential' by default"
+        ),
+    )
+
+    ## radical population
+    parser_radical_population = subparsers.add_parser(
+        name="radical_population",
+        help="Plot population of radicals for one or multiple KIMMDY run(s)",
+    )
+    parser_radical_population.add_argument(
+        "dir", nargs="+", help="KIMMDY run directory to be analysed. Can be multiple."
+    )
+    parser_radical_population.add_argument(
+        "--select_atoms",
+        "-a",
+        type=str,
+        help="Atoms chosen for radical population analysis, default is protein (uses MDAnalysis selection syntax)",
+        default="protein",
     )
     return parser.parse_args()
 
@@ -103,18 +180,24 @@ def _run(args: argparse.Namespace):
     """
     configure_logging(args)
 
+    if args.show_plugins:
+        from kimmdy import discovered_plugins
+
+        print("Available plugins:")
+        for plugin in discovered_plugins:
+            print(plugin)
+
+        exit()
+
+    if args.show_schema_path:
+        path = pkg_resources.files("kimmdy") / "kimmdy-yaml-schema.json"
+        print(f"{path}")
+
+        exit()
+
     logging.info("Welcome to KIMMDY")
     logging.info("KIMMDY is running with these command line options:")
     logging.info(args)
-
-    if args.concat:
-        logging.info("KIMMDY will concatenate trrs and exit.")
-
-        run_dir = Path().cwd()
-        if type(args.concat) != bool:
-            run_dir = args.concat
-        concat_traj(run_dir)
-        exit()
 
     if args.checkpoint:
         logging.info("KIMMDY is starting from a checkpoint.")
@@ -136,7 +219,8 @@ def kimmdy_run(
     loglevel: str = "DEBUG",
     logfile: Path = Path("kimmdy.log"),
     checkpoint: str = "",
-    concat: bool = False,
+    show_plugins: bool = False,
+    show_schema_path: bool = False,
 ):
     """Run KIMMDY from python.
 
@@ -156,19 +240,60 @@ def kimmdy_run(
         File path of the logfile.
     checkpoint :
         File path if a kimmdy.cpt file to restart KIMMDY from a checkpoint.
-    concat :
-        Don't perform a full KIMMDY run but instead concatenate trajectories
-        from a previous run.
+    show_plugins :
+        Show available plugins and exit.
+    show_schema_path :
+        Print path to yaml schema for use with yaml-language-server e.g. in VSCode and Neovim
     """
     args = argparse.Namespace(
         input=input,
         loglevel=loglevel,
         logfile=logfile,
         checkpoint=checkpoint,
-        concat=concat,
+        show_plugins=show_plugins,
+        show_schema_path=show_schema_path,
     )
     _run(args)
     logging.shutdown()
+
+
+def get_build_example_args():
+    """Parse command line arguments.
+
+    Returns
+    -------
+    Namespace
+        parsed command line arguments
+    """
+    parser = argparse.ArgumentParser(description="Build examples for KIMMDY.")
+    parser.add_argument(
+        "-r",
+        "--restore",
+        const=True,
+        nargs="?",
+        help="Overwrite input files in existing example directories, use keyword 'hard' to also delete output files.",
+    )
+    return parser.parse_args()
+
+
+def build_examples():
+    """Build examples from the command line."""
+    args = get_build_example_args()
+    _build_examples(args)
+    pass
+
+
+def analysis():
+    """Analyse existing KIMMDY runs."""
+
+    args = get_analysis_cmdline_args()
+    print(args)
+    if args.module == "trjcat":
+        concat_traj(args)
+    elif args.module == "plot_energy":
+        plot_energy(args)
+    elif args.module == "radical_population":
+        radical_population(args)
 
 
 def kimmdy():

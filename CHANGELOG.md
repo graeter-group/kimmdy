@@ -1,5 +1,54 @@
 # Changelog
 
+## [3.5.1](https://github.com/hits-mbm-dev/kimmdy/compare/v3.5.0...v3.5.1) (2023-08-08)
+
+
+### Bug Fixes
+
+* **ci:** testing ([e9b4b19](https://github.com/hits-mbm-dev/kimmdy/commit/e9b4b19b5801f342f0e75e5ccd819e5ae55a9473))
+* **ci:** trigger another release PR ([9c824a8](https://github.com/hits-mbm-dev/kimmdy/commit/9c824a890628c7995fa40cca77c974d8fa35644d))
+
+## [3.5.0](https://github.com/hits-mbm-dev/kimmdy/compare/v3.4.0...v3.5.0) (2023-08-08)
+
+
+### Features
+
+* **ci:** first try! ([f2c686f](https://github.com/hits-mbm-dev/kimmdy/commit/f2c686f5336f5e3e5e0c819990c0fb89bec9f647))
+
+
+### Bug Fixes
+
+* ci ([3bcc81a](https://github.com/hits-mbm-dev/kimmdy/commit/3bcc81a3231ddc2e4a6b7b3d8f112228e2c10226))
+* **ci:** almost did it first try... ([2850379](https://github.com/hits-mbm-dev/kimmdy/commit/2850379ca5c0d3d0e1e755a1e2170caa4bef38b8))
+
+## [3.4.0](https://github.com/hits-mbm-dev/kimmdy/compare/v3.3.1...v3.4.0) (2023-08-08)
+
+
+### Features
+
+* add gmx_mdrun_flags option. fixes [#145](https://github.com/hits-mbm-dev/kimmdy/issues/145) ([#161](https://github.com/hits-mbm-dev/kimmdy/issues/161)) ([e780402](https://github.com/hits-mbm-dev/kimmdy/commit/e780402e33e796d2672fc286a81031154ecd1569))
+* **config:** validation, completion and defaults for kimmdy.yml ([#153](https://github.com/hits-mbm-dev/kimmdy/issues/153)) ([de7c78f](https://github.com/hits-mbm-dev/kimmdy/commit/de7c78f30de9fb5d5075bff239e82888abc0e35d))
+* example from tests ([#175](https://github.com/hits-mbm-dev/kimmdy/issues/175)) ([a096a45](https://github.com/hits-mbm-dev/kimmdy/commit/a096a45af9a3cd0f7974301a307265404b105424))
+
+
+### Bug Fixes
+
+* consistent use of `edis` in homolysis config ([#170](https://github.com/hits-mbm-dev/kimmdy/issues/170)) ([e847707](https://github.com/hits-mbm-dev/kimmdy/commit/e8477074810a523f2cde79f49bc3cc103fa869a5))
+* don't allow `Move` w/o ix/id_to_move ([10c9231](https://github.com/hits-mbm-dev/kimmdy/commit/10c9231f6dd98e2d51613ad94a2c690058bb84b2))
+* inconsistent inheritance ([#154](https://github.com/hits-mbm-dev/kimmdy/issues/154)) ([2bec671](https://github.com/hits-mbm-dev/kimmdy/commit/2bec67167207bf3c38e2985e5bef7ed1f3a60870))
+* load plugins only once in __init__ ([#171](https://github.com/hits-mbm-dev/kimmdy/issues/171)) ([88b55ee](https://github.com/hits-mbm-dev/kimmdy/commit/88b55ee281f0e9c39b5f527aa21eed88c57e5c8a))
+* merge dihedrals ([#174](https://github.com/hits-mbm-dev/kimmdy/issues/174)) ([37f6be3](https://github.com/hits-mbm-dev/kimmdy/commit/37f6be3b322cdba4175817d40fcf489be992a1f8))
+* scheme keys not plugin names but entrypoints ([b878b69](https://github.com/hits-mbm-dev/kimmdy/commit/b878b6966ead7dee83a21d274d3de0a8e6aa5291))
+* test input files now compatible ([eda027a](https://github.com/hits-mbm-dev/kimmdy/commit/eda027a297d0d33bef404907ac7090f5b0b29204))
+* test_merge_prm_top ([9d333bc](https://github.com/hits-mbm-dev/kimmdy/commit/9d333bc37423ae007019bc742b5eba36a70192e3))
+* update scheme paths after building examples ([5076ca4](https://github.com/hits-mbm-dev/kimmdy/commit/5076ca4c5196a0d1f12e8f8245f6110ed24417cb))
+
+
+### Documentation
+
+* improve config option descriptions, names and error reporting ([#163](https://github.com/hits-mbm-dev/kimmdy/issues/163)) ([3318bdc](https://github.com/hits-mbm-dev/kimmdy/commit/3318bdc0f16fff99efb7493e03d6f9a086814325))
+* **types:** add custom renderer ([3318bdc](https://github.com/hits-mbm-dev/kimmdy/commit/3318bdc0f16fff99efb7493e03d6f9a086814325))
+
 ## [3.3.1](https://github.com/hits-mbm-dev/kimmdy/compare/v3.3.0...v3.3.1) (2023-07-12)
 
 

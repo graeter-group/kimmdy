@@ -1,3 +1,0 @@
-# cptfile { #kimmdy.runmanager.RunManager.cptfile }
-
-`runmanager.RunManager.cptfile`

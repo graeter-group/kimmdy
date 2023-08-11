@@ -498,26 +498,13 @@ class RecipeCollection:
 class ReactionPlugin(ABC):
     """Reaction base class
 
-    hast a type_scheme, which is a dict of types of possible entries in config.
-    Used to read and check the input config.
-    To not use this feature return empty dict.
-
-    Example:
-    ```python
-    {"homolysis": {"edis": Path, "bonds": Path}}
-    ```
-
     Parameters
     ----------
     name :
         Name of the reaction
     runmng :
         RunManager instance
-    type_scheme : dict
-        dict of types of possible entries in config
     """
-
-    type_scheme: dict = dict()
 
     def __init__(self, name: str, runmng: RunManager):
         self.name = name
@@ -531,7 +518,7 @@ class ReactionPlugin(ABC):
     def get_recipe_collection(self, files: TaskFiles) -> RecipeCollection:
         """Get a RecipeCollection as a result of the reaction.
 
-        This is run as a [Task](`kimmdy.task.Task`) in the RunManager.
+        This is run as a [](`~kimmdy.tasks.Task`) in the RunManager.
         How the RecipeCollection is built is up to the reaction.
         It has access to the current state of the system via the
         runmanager `self.runmng` and the files.

@@ -26,7 +26,7 @@ class KMCResult:
     reaction_probability :
         Integral of reaction propensity with respect to time
     time_step :
-        Time step during which the reaction occurs
+        Time step during which the reaction occurs [ps]
     """
 
     recipe_steps: Union[list[RecipeStep], None] = None

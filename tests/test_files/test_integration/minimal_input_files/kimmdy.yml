@@ -1,6 +1,8 @@
+# yaml-language-server: $schema=../../../../src/kimmdy/kimmdy-yaml-schema.json
+
+name: 'minimal'
 dryrun: false
-iterations: 0
-out: 'minimal'
+max_tasks: 0
 gromacs_alias: 'gmx'
 top: 'minimal.top'
 gro: 'minimal.gro'
@@ -9,6 +11,7 @@ mds:
   prod:
     mdp: 'minimal.mdp'
 reactions:
-  hat_naive:
+  hat_naive: {}
+
 sequence:
   - reactions

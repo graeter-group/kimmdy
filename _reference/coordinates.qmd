@@ -1,0 +1,45 @@
+# coordinates { #kimmdy.coordinates }
+
+`coordinates`
+
+## Functions
+
+| Name | Description |
+| --- | --- |
+| [get_explicit_MultipleDihedrals](#kimmdy.coordinates.get_explicit_MultipleDihedrals) | Takes a valid dihedral key and returns explicit |
+| [get_explicit_or_type](#kimmdy.coordinates.get_explicit_or_type) | Takes an Interaction and associated key, InteractionTypes, Topology |
+| [is_parameterized](#kimmdy.coordinates.is_parameterized) | Parameterized topology entries have c0 and c1 attributes != None |
+| [merge_dihedrals](#kimmdy.coordinates.merge_dihedrals) | Merge one to two Dihedrals or -Types into a Dihedral in free-energy syntax |
+| [merge_top_parameter_growth](#kimmdy.coordinates.merge_top_parameter_growth) | Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation |
+
+### get_explicit_MultipleDihedrals { #kimmdy.coordinates.get_explicit_MultipleDihedrals }
+
+`coordinates.get_explicit_MultipleDihedrals(dihedral_key, top, dihedrals_in, periodicity_max=6)`
+
+Takes a valid dihedral key and returns explicit
+dihedral parameters for a given topology
+
+### get_explicit_or_type { #kimmdy.coordinates.get_explicit_or_type }
+
+`coordinates.get_explicit_or_type(key, interaction, interaction_types, top, periodicity='')`
+
+Takes an Interaction and associated key, InteractionTypes, Topology
+and Periodicity (for dihedrals) and returns an object with the parameters of this Interaction
+
+### is_parameterized { #kimmdy.coordinates.is_parameterized }
+
+`coordinates.is_parameterized(entry)`
+
+Parameterized topology entries have c0 and c1 attributes != None
+
+### merge_dihedrals { #kimmdy.coordinates.merge_dihedrals }
+
+`coordinates.merge_dihedrals(dihedral_key, interactionA, interactionB, interaction_typesA, interaction_typesB, topA, topB, funct, periodicity)`
+
+Merge one to two Dihedrals or -Types into a Dihedral in free-energy syntax
+
+### merge_top_parameter_growth { #kimmdy.coordinates.merge_top_parameter_growth }
+
+`coordinates.merge_top_parameter_growth(topA, topB, focus_nr=None)`
+
+Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation

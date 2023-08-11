@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "$id": "homolysis-config",
+  "description": "Settings for homolysis reactions",
+  "additionalProperties": false,
+  "properties": {
+    "edis": {
+      "type": "string",
+      "pytype": "Path",
+      "description": "Dissociation energies data file",
+      "default": "edissoc.dat"
+    },
+    "itp": {
+      "type": "string",
+      "pytype": "Path",
+      "description": "Additional itp file with bonded parameters",
+      "default": "ffbonded.itp"
+    }
+  },
+  "required": [ "edis", "itp" ]
+}
+

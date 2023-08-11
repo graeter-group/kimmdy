@@ -35,9 +35,9 @@ Because we'll be using optional reaction plugins directly from the git repositor
 
 ```bash
 # TODO: update with https instead of ssh when repo is public
-pip install 'git+ssh://git@github.com/hits-mbm-dev/kimmdy.git#egg=kimmdy'
-pip install 'git+ssh://git@github.com/hits-mbm-dev/kimmdy.git#egg&subdirectory=plugins'
-pip install '../../plugins'
+pip install 'git+ssh://git@github.com/hits-mbm-dev/kimmdy.git#egg=kimmdy[plugins]'
+# pip install 'git+ssh://git@github.com/hits-mbm-dev/kimmdy.git#egg&subdirectory=plugins'
+# pip install 'git+ssh://git@github.com/hits-mbm-dev/kimmdy.git@docs/config-completion#egg=kimmdy[plugins]'
 ```
 
 ## Setup the Simulation
@@ -47,7 +47,7 @@ It should look like this:
 
 ```{.yaml filename='kimmdy.yml'}
 dryrun: false
-iterations: 100
+max_tasks: 100
 name: 'hat_tf_000'
 gromacs_alias: 'gmx'
 top: 'Ala_out.top'

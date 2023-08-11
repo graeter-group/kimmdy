@@ -1,6 +1,0 @@
-# config { #kimmdy.config }
-
-`config`
-
-Read and validate kimmdy.yml configuration files
-and package into a parsed format for internal use.

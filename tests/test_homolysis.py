@@ -1,11 +1,13 @@
+"""
+Tests for homolysis reaction plugin.
+
+Assumes KIMMDY was installed with the plugin.
+E.g. via pip install -r requirements.txt.
+"""
 import pytest
 from pathlib import Path
-import shutil
-import os
 import numpy as np
-from kimmdy.runmanager import RunManager
-from kimmdy.config import Config
-from kimmdy.reactions.homolysis import Homolysis
+from homolysis.reaction import Homolysis
 from kimmdy.reaction import Break
 from kimmdy.parsing import (
     read_plumed,
@@ -46,7 +48,7 @@ def test_lookup_atominfo(homolysis_files):
         "d1", homolysis_files["plumed"], homolysis_files["top"]
     )
     assert atomtypes == frozenset(["N", "CT"])
-    assert atomid == frozenset([7, 9])
+    assert atomid == ["7", "9"]
 
 
 def test_lookup_bondprm(homolysis_files):
