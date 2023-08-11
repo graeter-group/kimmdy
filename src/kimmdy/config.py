@@ -101,7 +101,7 @@ class Config:
                 global_opts = scheme.get(".*")
                 opts = scheme.get(k)
                 if opts is None and global_opts is None:
-                    m = f"No scheme found for {k}"
+                    m = f"Unknown option {section}.{k} found in config file."
                     logging.error(m)
                     raise ValueError(m)
                 if opts is None:
@@ -129,11 +129,11 @@ class Config:
                 default = v.get("default")
                 pytype = v.get("pytype")
                 if default is None:
-                    m = f"No default found for {k}"
+                    m = f"Option required but no default found for {section}.{k}"
                     logging.debug(m)
                     continue
                 if pytype is None:
-                    m = f"No type found for default value {k}: {default}"
+                    m = f"No type found for default value of {section}.{k}: {default}"
                     logging.error(m)
                     raise ValueError(m)
                 default = pytype(default)

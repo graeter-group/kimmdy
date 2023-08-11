@@ -59,12 +59,9 @@ class Homolysis(ReactionPlugin):
             # averaging distances works here because we typically have
             # one conformational state per calculation
 
-            # converto to zero-base
-            atomids = [i - 1 for i in list(atomids)]
-
             recipes.append(
                 Recipe(
-                    recipe_steps=[Break(*list(atomids))],
+                    recipe_steps=[Break(atom_id_1=atomids[0], atom_id_2=atomids[1])],
                     rates=[*k_avg],
                     timespans=[(distances["time"][0], distances["time"][-1])],
                 )

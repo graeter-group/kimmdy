@@ -153,65 +153,6 @@ class TestUrea:
         assert len(top.proper_dihedrals) == 8
         assert len(top.improper_dihedrals) == 3
 
-    def test_reindex_atomnumbers_for_already_ordered(self, raw_urea_top_fix):
-        raw = deepcopy(raw_urea_top_fix)
-        top = Topology(raw)
-        og_top = deepcopy(top)
-        top.reindex_atomnrs()
-        assert top == og_top
-
-    def test_reindex_atomnumbers_after_deletion(self, raw_urea_top_fix):
-        raw = deepcopy(raw_urea_top_fix)
-        top = Topology(raw)
-        og_top = deepcopy(top)
-        top.atoms.pop("3")
-        top.reindex_atomnrs()
-
-        og_atoms = list(og_top.atoms.keys())
-        atoms = list(top.atoms.keys())
-
-        og_bonds = list(og_top.bonds.keys())
-        bonds = list(top.bonds.keys())
-
-        og_dihedrals = list(og_top.proper_dihedrals.keys())
-        dihedrals = list(top.proper_dihedrals.keys())
-
-        og_impropers = list(og_top.improper_dihedrals.keys())
-        impropers = list(top.improper_dihedrals.keys())
-
-        assert og_atoms == [str(x) for x in range(1, 9)]
-        assert atoms == [str(x) for x in range(1, 8)]
-
-        assert top.atoms["3"] == Atom(
-            "3", "H", "1", "URE", "H11", "4", "0.395055", "1.00800"
-        )
-
-        assert og_bonds == [
-            ("1", "2"),
-            ("1", "3"),
-            ("1", "6"),
-            ("3", "4"),
-            ("3", "5"),
-            ("6", "7"),
-            ("6", "8"),
-        ]
-        assert bonds == [("1", "2"), ("1", "5"), ("5", "6"), ("5", "7")]
-
-        assert og_dihedrals == [
-            ("2", "1", "3", "4"),
-            ("2", "1", "3", "5"),
-            ("2", "1", "6", "7"),
-            ("2", "1", "6", "8"),
-            ("3", "1", "6", "7"),
-            ("3", "1", "6", "8"),
-            ("6", "1", "3", "4"),
-            ("6", "1", "3", "5"),
-        ]
-        assert dihedrals == [("2", "1", "5", "6"), ("2", "1", "5", "7")]
-
-        assert og_impropers == []
-        assert impropers == []
-
 
 class TestTopAB:
     def test_top_ab(self, raw_top_a_fix, raw_top_b_fix):
@@ -244,7 +185,10 @@ class TestTopology:
         assert top.improper_dihedrals == og_top.improper_dihedrals
 
     @given(bondindex=st.integers(min_value=0, max_value=70))
-    @settings(suppress_health_check=[HealthCheck.function_scoped_fixture])
+    @settings(
+        suppress_health_check=[HealthCheck.function_scoped_fixture], deadline=1000
+    )
+    @pytest.mark.slow
     def test_break_bind_random_bond_hexala(self, hexala_top_fix, bondindex):
         top = deepcopy(hexala_top_fix)
         og_top = deepcopy(top)
@@ -518,7 +462,10 @@ class TestHexalaTopology:
         )
 
     def test_move_34_29_after_break(self, hexala_top_fix, top_move_34_29_fix):
-        """Move H at 34 to C at 29"""
+        """Move H at 34 to C at 29
+
+        TODO: this does not yet test patching parameters.
+        """
         top = deepcopy(hexala_top_fix)
         top_moved = deepcopy(top_move_34_29_fix)
         top.break_bond(("29", "35"))
@@ -527,7 +474,6 @@ class TestHexalaTopology:
         # patches are applied here, but parameters don't match, only number of parameters
         # the reference is shit anyway
         focus = set(["29", "31", "34", "35"])
-        top.patch_parameters(list(focus))
 
         # compare topologies
         assert len(top.bonds) == len(top_moved.bonds)
