@@ -257,7 +257,6 @@ class RunManager:
             with open(self.histfile, "a") as f:
                 f.write(m)
 
-
     def _run_md(self, instance, files) -> TaskFiles:
         """General MD simulation"""
         logging.info(f"Start MD {instance}")
