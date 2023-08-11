@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.0.1](https://github.com/hits-mbm-dev/kimmdy/compare/v4.0.0...v4.0.1) (2023-08-11)
+
+
+### Documentation
+
+* **ci:** add docs build workflow ([#190](https://github.com/hits-mbm-dev/kimmdy/issues/190)) ([#198](https://github.com/hits-mbm-dev/kimmdy/issues/198)) ([5fdec0b](https://github.com/hits-mbm-dev/kimmdy/commit/5fdec0b4903a578abd2fe75cfadfc9b842168be1))
+* **dev:** add information for developers about conventional commits ([5fdec0b](https://github.com/hits-mbm-dev/kimmdy/commit/5fdec0b4903a578abd2fe75cfadfc9b842168be1))
+
 ## [4.0.0](https://github.com/hits-mbm-dev/kimmdy/compare/v3.6.0...v4.0.0) (2023-08-11)
 
 
