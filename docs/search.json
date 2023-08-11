@@ -4,7 +4,7 @@
     "href": "guide/developer/index.html",
     "title": "Developer",
     "section": "",
-    "text": "Resources for developers.\n\n\n\n Back to top"
+    "text": "Resources for developers."
   },
   {
     "objectID": "guide/developer/topology.html",
@@ -439,5 +439,19 @@
     "title": "Writing Reaction Plugins",
     "section": "",
     "text": "Writing Reaction Plugins\nTODO\n\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "guide/developer/index.html#contributing",
+    "href": "guide/developer/index.html#contributing",
+    "title": "Developer",
+    "section": "Contributing",
+    "text": "Contributing\nKIMMDY uses conventional commits and semantic versioning, automated via release please.\nIf a PR adds multiple commits, we use the squash and merge option to keep the commit history clean. If a PR unavoidably contains changes the message can be edited before merging to ensure release please picks up all changes.\nThe following example message (first line is the title in the GitHub UI, the rest is the body in the window below):\nfeat: this is a release-please test\n\nIt should add 3 features and a 2 fixes\nMaybe this first body is the important\npart of the commit message\n\nfix(ci): release please adds all the things\n  BREAKING-CHANGE: does this work?\n\nfeat(ci): update encode to support unicode\n  do I add a body here?\n\nfeat(ci): what if this doesn't have a body?\n\nfix(ci): or this?\nGenerates the following changelog:\n:robot: I have created a release *beep* *boop*\n---\n\n\n## [4.0.0](https://github.com/hits-mbm-dev/kimmdy/compare/v3.6.0...v4.0.0) (2023-08-11)\n\n\n### ⚠ BREAKING CHANGES\n\n* **ci:** does this work?\n\n### Features\n\n* **ci:** update encode to support unicode ([d9f16ad](https://github.com/hits-mbm-dev/kimmdy/commit/d9f16adb7470479a9e700ffd86597784caa2afe7))\n* **ci:** what if this doesn't have a body? ([d9f16ad](https://github.com/hits-mbm-dev/kimmdy/commit/d9f16adb7470479a9e700ffd86597784caa2afe7))\n* this is a release-please test ([d9f16ad](https://github.com/hits-mbm-dev/kimmdy/commit/d9f16adb7470479a9e700ffd86597784caa2afe7))\n\n\n### Bug Fixes\n\n* **ci:** or this? ([d9f16ad](https://github.com/hits-mbm-dev/kimmdy/commit/d9f16adb7470479a9e700ffd86597784caa2afe7))\n* **ci:** release please adds all the things ([d9f16ad](https://github.com/hits-mbm-dev/kimmdy/commit/d9f16adb7470479a9e700ffd86597784caa2afe7))\n\n---\nThis PR was generated with [Release Please](https://github.com/googleapis/release-please). See [documentation](https://github.com/googleapis/release-please#release-please)."
+  },
+  {
+    "objectID": "guide/developer/index.html#local-testing",
+    "href": "guide/developer/index.html#local-testing",
+    "title": "Developer",
+    "section": "Local testing",
+    "text": "Local testing\nFor developoment, we provide a docker image containing gromacs and multiple python versions to test against.\nTo run the test locally, you must:\n\ninstall docker\ninstall act, easiest option is with github cli\n\ninstall github cli (gh)\ngh extension install https://github.com/nektos/gh-act\n\nrun tests with gh extension exec act -j test --artifact-server-path ./artifacts\n\ncustomize which python versions to test in tox.ini\nhtml coverage report is exported into artifacts"
   }
 ]
