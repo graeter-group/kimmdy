@@ -137,6 +137,7 @@ def modify_top(
     files: TaskFiles,
     ffpatch: Optional[Path],
     topology: Optional[Topology],
+    parameterizer: Parameterizer,
 ) -> None:
     """Modify the topology of the system according to the recipe steps.
 
