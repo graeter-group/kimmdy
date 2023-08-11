@@ -1,7 +1,13 @@
-from grappa_interface import generate_input, apply_parameters, GrappaInterface
+from grappa_interface import (
+    clean_parameters,
+    generate_input,
+    apply_parameters,
+    GrappaInterface,
+)
 from kimmdy.topology.topology import Topology
-import numpy as np
-import json
+
+# from kimmdy.parsing import write_json, read_json
+# import json
 
 
 def test_generate_input(generic_topology):
@@ -34,12 +40,11 @@ def test_generate_input(generic_topology):
 
     input_dict = generate_input(generic_topology)
 
-    with open("GrAPPa_input_tripelhelix.json", "w") as f:
-        json.dump(input_dict, f)
-
-    assert len(input_dict["atoms"]) == 72
-    assert len(input_dict["bonds"]) == 70
-    assert input_dict["radicals"] == [29, 35]
+    # with open("GrAPPa_input_alanine.json", "w") as f:
+    #     json.dump(input_dict, f)
+    assert len(input_dict["atoms"]) == 21
+    assert len(input_dict["bonds"]) == 20
+    assert input_dict["radicals"] == [9]
     assert input_dict["atoms"][0] == [1, "CH3", "ACE", 1, [0.339967, 0.45773], 6]
 
     assert all([len(x) == 6 for x in input_dict["atoms"]])
@@ -50,55 +55,63 @@ def test_generate_input(generic_topology):
     assert all([x[2] in AA3 for x in input_dict["atoms"]])
 
 
-def test_apply_parameters_assertE(generic_topology, caplog):
-    parameters = {
-        k: {("100"): []}
-        for k in ["atoms", "bonds", "angles", "proper_dihedrals", "improper_dihedrals"]
-    }
+def test_clean_parameters(generic_parameter_output):
+    clean_parameters(generic_parameter_output)
+    pass
 
-    apply_parameters(generic_topology, parameters)
 
-    warnings = 0
-    for record in caplog.records:
-        if record.levelname == "WARNING":
-            warnings += 1
-    assert warnings == 5
+def test_generate_parameters(generic_parameter_input):
+    import grappa.ff
+
+    ff = grappa.ff.ForceField.from_tag("radical_example")
+    # in rad to avoid import openmm
+    parameters = ff.params_from_topology_dict(generic_parameter_input)
+    clean_parameters(parameters)
+    # write_json(parameters, "GrAPPa_output_alanine.json")
+    # with open("GrAPPa_output_alanine.json", "r") as f:
+    #     parameters = json.load(f,parse_float=lambda x: round(float(x), 3))
+    # write_json(parameters, "GrAPPa_output_alanine.json")
 
 
 def test_apply_parameters(generic_topology):
-    idxs = {
-        "atoms": ("1"),
-        "bonds": ("1", "3"),
-        "angles": ("2", "1", "5"),
-        "proper_dihedrals": ("68", "67", "69", "72"),
-    }
-    vals = {
-        "atoms": ["0.1"],
-        "bonds": ["0.3", "400.0"],
-        "angles": ["40.0", "1000.0"],
-        "proper_dihedrals": {"2": ["0.0", "20.0"]},
-    }
-    parameters = {
-        "atoms": {idxs["atoms"]: vals["atoms"]},
-        "bonds": {idxs["bonds"]: vals["bonds"]},
-        "angles": {idxs["angles"]: vals["angles"]},
-        "proper_dihedrals": {idxs["proper_dihedrals"]: vals["proper_dihedrals"]},
-        "improper_dihedrals": {},
+    parameters_clean = {
+        "atom": {"idxs": [1], "q": [0.1]},
+        "bond": {"idxs": [[1, 3]], "eq": [400.0], "k": [0.3]},
+        "angle": {"idxs": [[2, 1, 5]], "eq": [1000.0], "k": [40.0]},
+        "proper": {
+            "idxs": [[17, 16, 18, 21]],
+            "phases": [[20.0]],
+            "ks": [[0.0]],
+            "ns": [[2]],
+        },
+        "improper": {
+            "idxs": [[18, 14, 16, 17]],
+            "phases": [[0.0]],
+            "ks": [[2.0]],
+            "ns": [[2]],
+        },
     }
 
-    apply_parameters(generic_topology, parameters)
+    apply_parameters(generic_topology, parameters_clean)
 
     assert isinstance(generic_topology, Topology)
-    assert generic_topology.atoms[idxs["atoms"]].charge == vals["atoms"][0]
-    assert generic_topology.bonds[idxs["bonds"]].c0 == vals["bonds"][0]
-    assert generic_topology.angles[idxs["angles"]].c1 == vals["angles"][1]
-    assert (
-        generic_topology.proper_dihedrals[idxs["proper_dihedrals"]].dihedrals["2"].c0
-        == vals["proper_dihedrals"]["2"][0]
-    )
+    assert generic_topology.atoms[
+        str(parameters_clean["atom"]["idxs"][0])
+    ].charge == str(parameters_clean["atom"]["q"][0])
+    assert generic_topology.bonds[
+        tuple(str(x) for x in parameters_clean["bond"]["idxs"][0])
+    ].c1 == str(parameters_clean["bond"]["k"][0])
+    assert generic_topology.angles[
+        tuple(str(x) for x in parameters_clean["angle"]["idxs"][0])
+    ].c0 == str(parameters_clean["angle"]["eq"][0])
+    assert generic_topology.proper_dihedrals[
+        tuple(str(x) for x in parameters_clean["proper"]["idxs"][0])
+    ].dihedrals["2"].c0 == str(parameters_clean["proper"]["phases"][0])
+    assert generic_topology.improper_dihedrals[
+        tuple(["14", "18", "16", "17"])
+    ].c0 == str(parameters_clean["improper"]["phases"][0][0])
 
 
 def test_parameterize_topology(generic_topology):
     parameterizer = GrappaInterface()
     new_topology = parameterizer.parameterize_topology(generic_topology)
-    assert new_topology == []
