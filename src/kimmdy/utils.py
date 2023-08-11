@@ -139,10 +139,6 @@ def morse_transition_rate(
         (beta * dissociation_energies + np.sqrt(beta**2 * dissociation_energies**2 - 2 * dissociation_energies * beta * fs))
         / (2 * beta * dissociation_energies)
     )
-    x = (beta * dissociation_energies - np.sqrt(beta**2 * dissociation_energies**2 - 2 * dissociation_energies * beta * fs)) / (2 * beta * dissociation_energies)
-    logging.error(x)
-    # TODO: why can x be negative here?
-    # this breaks the log below
     r_max = r_0 - 1 / beta * np.log(
         (beta * dissociation_energies - np.sqrt(beta**2 * dissociation_energies**2 - 2 * dissociation_energies * beta * fs))
         / (2 * beta * dissociation_energies)
