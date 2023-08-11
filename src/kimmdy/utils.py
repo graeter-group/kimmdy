@@ -136,19 +136,35 @@ def morse_transition_rate(
 
     # calculate extrema of shifted potential i.o.t. get barrier hight
     r_min = r_0 - 1 / beta * np.log(
-        (beta * dissociation_energies + np.sqrt(beta**2 * dissociation_energies**2 - 2 * dissociation_energies * beta * fs))
+        (
+            beta * dissociation_energies
+            + np.sqrt(
+                beta**2 * dissociation_energies**2
+                - 2 * dissociation_energies * beta * fs
+            )
+        )
         / (2 * beta * dissociation_energies)
     )
     r_max = r_0 - 1 / beta * np.log(
-        (beta * dissociation_energies - np.sqrt(beta**2 * dissociation_energies**2 - 2 * dissociation_energies * beta * fs))
+        (
+            beta * dissociation_energies
+            - np.sqrt(
+                beta**2 * dissociation_energies**2
+                - 2 * dissociation_energies * beta * fs
+            )
+        )
         / (2 * beta * dissociation_energies)
     )
     logging.error(r_max)
     # set rmax to r0 * 10 where no rmax can be found
     r_max = np.where(~np.isfinite(r_max), 10 * r_0, r_max)
     logging.error(r_max)
-    v_max = dissociation_energies * (1 - np.exp(-beta * (r_max - r_0))) ** 2 - fs * (r_max - r_0)
-    v_min = dissociation_energies * (1 - np.exp(-beta * (r_min - r_0))) ** 2 - fs * (r_min - r_0)
+    v_max = dissociation_energies * (1 - np.exp(-beta * (r_max - r_0))) ** 2 - fs * (
+        r_max - r_0
+    )
+    v_min = dissociation_energies * (1 - np.exp(-beta * (r_min - r_0))) ** 2 - fs * (
+        r_min - r_0
+    )
     # Note: F*r should lead to same result as F*(r-r_0) since the shifts in Vmax-Vmin adds up to zero
 
     delta_v = v_max - v_min
