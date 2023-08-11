@@ -1,5 +1,24 @@
 # Changelog
 
+## [4.0.0](https://github.com/hits-mbm-dev/kimmdy/compare/v3.6.0...v4.0.0) (2023-08-11)
+
+
+### ⚠ BREAKING CHANGES
+
+* **ci:** does this work?
+
+### Features
+
+* **ci:** update encode to support unicode ([d9f16ad](https://github.com/hits-mbm-dev/kimmdy/commit/d9f16adb7470479a9e700ffd86597784caa2afe7))
+* **ci:** what if this doesn't have a body? ([d9f16ad](https://github.com/hits-mbm-dev/kimmdy/commit/d9f16adb7470479a9e700ffd86597784caa2afe7))
+* this is a release-please test ([d9f16ad](https://github.com/hits-mbm-dev/kimmdy/commit/d9f16adb7470479a9e700ffd86597784caa2afe7))
+
+
+### Bug Fixes
+
+* **ci:** or this? ([d9f16ad](https://github.com/hits-mbm-dev/kimmdy/commit/d9f16adb7470479a9e700ffd86597784caa2afe7))
+* **ci:** release please adds all the things ([d9f16ad](https://github.com/hits-mbm-dev/kimmdy/commit/d9f16adb7470479a9e700ffd86597784caa2afe7))
+
 ## [3.6.0](https://github.com/hits-mbm-dev/kimmdy/compare/v3.5.1...v3.6.0) (2023-08-11)
 
 
