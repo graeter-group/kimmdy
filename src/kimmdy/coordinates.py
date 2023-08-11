@@ -176,7 +176,6 @@ def merge_top_parameter_growth(
         "morse_steepness": "10.0",
         "morse_dist_factor": 5,
     }  # well_depth D [kJ/mol], steepness [nm-1], dist_factor for bond length
-    logging.info(f"Merging topologies {topA} and {topB}")
 
     # TODO:
     # think about how to bring focus_nr into this
