@@ -171,6 +171,15 @@ def morse_transition_rate(
     delta_v = v_max - v_min
     k = k_0 * np.exp(-delta_v / kT)  # [1/ps]
 
+    if any(np.isnan(k)):
+        logging.error(f"k: {k}")
+        logging.error(f"delta_v: {delta_v}")
+        logging.error(f"r_max: {r_max}")
+        logging.error(f"r_min: {r_min}")
+        logging.error(f"r_0: {r_0}")
+        logging.error(f"beta: {beta}")
+        logging.error(f"r_curr: {r_curr}")
+
     return k, fs
 
 
