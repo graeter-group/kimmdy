@@ -323,12 +323,20 @@ class Recipe:
                     f"\trates: {len(self.rates)}\n"
                     f"\timespans: {len(self.timespans)}"
                 )
-            if len(self.rates) < 1:
-                raise ValueError("Recipe empty! Use empty RecipeCollection instead!")
+            if not isinstance(self.recipe_steps, list):
+                raise ValueError(
+                    f"Recipe Steps must be a list, not {type(self.recipe_steps)}"
+                )
+            if not isinstance(self.timespans, list):
+                raise ValueError(
+                    f"timespans must be a list, not {type(self.timespans)}"
+                )
+            if not isinstance(self.rates, list):
+                raise ValueError(f"rates must be a list, not {type(self.rates)}")
 
         except ValueError as e:
             raise ValueError(
-                f"Consistency error in Recipe {self.recipe_steps}" "" + e.args[0]
+                f"Consistency error in Recipe {self.recipe_steps}" " " + e.args[0]
             )
 
     def get_recipe_name(self):
