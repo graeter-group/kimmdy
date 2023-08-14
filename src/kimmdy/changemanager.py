@@ -199,7 +199,7 @@ def modify_top(
         else:
             raise NotImplementedError(f"RecipeStep {step} not implemented!")
     parameterizer.parameterize_topology(topology)
-    write_top(topology.top, newtop)
+    write_top(topology.to_dict(), newtop)
 
     return
 

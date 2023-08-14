@@ -5,6 +5,7 @@ from grappa_interface import (
     GrappaInterface,
 )
 from kimmdy.topology.topology import Topology
+from copy import deepcopy
 
 # from kimmdy.parsing import write_json, read_json
 # import json
@@ -106,7 +107,7 @@ def test_apply_parameters(generic_topology):
     ].c0 == str(parameters_clean["angle"]["eq"][0])
     assert generic_topology.proper_dihedrals[
         tuple(str(x) for x in parameters_clean["proper"]["idxs"][0])
-    ].dihedrals["2"].c0 == str(parameters_clean["proper"]["phases"][0])
+    ].dihedrals["2"].c0 == str(parameters_clean["proper"]["phases"][0][0])
     assert generic_topology.improper_dihedrals[
         tuple(["14", "18", "16", "17"])
     ].c0 == str(parameters_clean["improper"]["phases"][0][0])
@@ -114,4 +115,6 @@ def test_apply_parameters(generic_topology):
 
 def test_parameterize_topology(generic_topology):
     parameterizer = GrappaInterface()
-    new_topology = parameterizer.parameterize_topology(generic_topology)
+    curr_top = deepcopy(generic_topology)
+    parameterizer.parameterize_topology(curr_top)
+    assert generic_topology != curr_top

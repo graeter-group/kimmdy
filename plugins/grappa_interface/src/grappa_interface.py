@@ -12,15 +12,6 @@ import grappa.ff
 import openmm.unit
 
 
-def order_proper(idxs: np.ndarray):
-    # center atoms of dihedral must have ascending value
-    # idx_list is array(array(list(i)),array(list(j)),array(list(k)),array(list(l)))
-    if idxs[1] < idxs[2]:
-        return idxs
-    else:
-        return np.flip(idxs)
-
-
 def check_equal_length(d: dict, name: str):
     lengths = [len(y) for y in d.values()]
     assert (
@@ -40,8 +31,15 @@ def order_proper(idxs: np.ndarray):
     else:
         return np.flip(idxs)
 
+def elements_to_string(l:list):
+    for i,e in enumerate(l):
+        if isinstance(e,list):
+            elements_to_string(e)
+        else:
+            l[i] = str(e)
 
-def clean_parameters(parameters: dict) -> None:
+
+def clean_parameters(parameters: dict) -> dict:
     harmonic_keys = {"idxs", "eq", "k"}
     dihedral_keys = {"idxs", "phases", "ks", "ns"}
     parameters_clean = {
@@ -59,6 +57,7 @@ def clean_parameters(parameters: dict) -> None:
                 parameters_clean[atomic][parameter] = convert_to_python_types(
                     parameters[key]
                 )
+                elements_to_string(parameters_clean[atomic][parameter])
     except KeyError:
         raise KeyError(
             f"GrAPPa returned parameters {list(parameters.keys())}, which do not contain the required sections to fill {parameters_clean}"
@@ -68,18 +67,12 @@ def clean_parameters(parameters: dict) -> None:
         check_equal_length(atomic, name)
 
     ## sample type check
-    assert isinstance(
-        parameters_clean["atom"]["idxs"][0], int
-    ), f"atom idxs element has wrong type {type(parameters_clean['atom']['idxs'][0])}, should be int."
-    assert isinstance(
-        parameters_clean["bond"]["k"][0], float
-    ), f"b k element has wrong type {type(parameters_clean['bond']['k'][0])}, should be float."
+    assert parameters_clean["atom"]["idxs"][0].isdigit(), f"atom idxs element does not look like int {parameters_clean['atom']['idxs'][0]}."
+    assert parameters_clean["bond"]["k"][0].strip().lstrip('-').replace('.', '', 1).isdigit(), f"b k element does not look like float {parameters_clean['bond']['k'][0]}."
     assert isinstance(
         parameters_clean["proper"]["ns"][0], list
     ), f"proper ns element has wrong type {type(parameters_clean['proper']['ns'][0])}, should be list."
-    assert isinstance(
-        parameters_clean["improper"]["phases"][0][0], float
-    ), f"improper phases element has wrong type {type(parameters_clean['improper']['phases'][0][0])}, should be float."
+    assert parameters_clean["improper"]["phases"][0][0].strip().lstrip('-').replace('.', '', 1).isdigit(), f"improper phases element does not look like float {type(parameters_clean['improper']['phases'][0][0])}"
     return parameters_clean
 
 
@@ -102,7 +95,7 @@ def generate_input(top: Topology) -> dict:
     return {"atoms": atoms, "bonds": bonds, "radicals": radicals}
 
 
-def apply_parameters(top: Topology, parameters: dict) -> Topology:
+def apply_parameters(top: Topology, parameters: dict):
     # parameter structure is defined in clean_parameters()
     # assume units are according to https://manual.gromacs.org/current/reference-manual/definitions.html
     # namely: length [nm], mass [kg], time [ps], energy [kJ/mol], force [kJ mol-1 nm-1], angle [deg]
@@ -171,11 +164,12 @@ def apply_parameters(top: Topology, parameters: dict) -> Topology:
 
     ## proper dihedrals
     for idx in range(len(parameters["proper"]["idxs"])):
-        if not top.proper_dihedrals.get(
-            tuple(str(x) for x in parameters["proper"]["idxs"][idx])
+        tup = tuple(str(x) for x in parameters["proper"]["idxs"][idx])
+        if not top.proper_dihedrals.get(tup
+            
         ):
             raise KeyError(
-                f"bad index {tuple(str(x) for x in parameters['proper']['idxs'][idx])} in {list(top.proper_dihedrals.keys())}"
+                f"bad index {tup} in {list(top.proper_dihedrals.keys())}"
             )
             logging.warning(
                 f"Ignored parameters with invalid ids: {parameters['proper']['idxs'][idx]} for proper dihedrals"
@@ -183,23 +177,17 @@ def apply_parameters(top: Topology, parameters: dict) -> Topology:
             continue
         dihedral_dict = {}
         for i, n in enumerate(parameters["proper"]["ns"][idx]):
-            dihedral_dict[str(n)] = Dihedral.from_top_line(
-                [
-                    str(x)
-                    for x in [
-                        *parameters["proper"]["idxs"][idx],
-                        "9",
-                        parameters["proper"]["phases"][i],
-                        parameters["proper"]["ks"][i],
-                        n,
-                    ]
-                ]
+            dihedral_dict[str(n)] = Dihedral(
+                *tup,
+                funct="9",
+                c0=parameters["proper"]["phases"][idx][i],
+                c1=parameters["proper"]["ks"][idx][i],
+                periodicity=n,
             )
-
         top.proper_dihedrals[
-            tuple(str(x) for x in parameters["proper"]["idxs"][idx])
+            tup
         ] = MultipleDihedrals(
-            *[str(x) for x in parameters["proper"]["idxs"][idx]], "9", dihedral_dict
+            *tup, funct="9", dihedrals=dihedral_dict
         )
 
     ## improper dihedrals
@@ -230,7 +218,7 @@ def apply_parameters(top: Topology, parameters: dict) -> Topology:
                 term.c0 = str(parameters["improper"]["phases"][idx][i])
                 term.c1 = str(parameters["improper"]["ks"][idx][i])
 
-    return top
+    return 
 
 
 class GrappaInterface(Parameterizer):
