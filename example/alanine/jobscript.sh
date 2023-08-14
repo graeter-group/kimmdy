@@ -1,9 +1,9 @@
 
 #!/bin/env bash
-#SBATCH --job-name=kimmdy
+#SBATCH --job-name=alanine_hat
 #SBATCH --output=kimmdy-job.log
 #SBATCH --error=kimmdy-job.log
-#SBATCH -p <your-partition>.p
+# #SBATCH -p <your-partition>.p
 #SBATCH --time=24:00:00
 #SBATCH -N 1
 #SBATCH --ntasks-per-node=40
@@ -12,16 +12,16 @@
 #SBATCH --cpus-per-task=1
 #SBATCH --gpus 1
 #SBATCH --mail-type=ALL
-#SBATCH --mail-user=<your-email>
-
+# #SBATCH --mail-user=<your-email
 echo "Job Name:"
 echo "$SLURM_JOB_NAME"
+JOB_NAME = "$SLURM_JOB_NAME"
 
 # Setup up your environment here
 # modules.sh might load lmod modules, set environment variables, etc.
 source ./_modules.sh
 
-JOB=kimmdy.yml
+JOB=alanine_hat
 CYCLE=20
 SUBMIT="jobscript.sh $JOB"
 
@@ -42,4 +42,3 @@ else
   sbatch -J $SLURM_JOB_NAME $SUBMIT
   exit 2
 fi
-            

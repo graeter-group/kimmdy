@@ -5,6 +5,7 @@ Also initialized logging and configuration.
 import argparse
 import logging
 from pathlib import Path
+import textwrap
 import dill
 from kimmdy.config import Config
 from kimmdy.misc_helper import concat_traj, _build_examples
@@ -45,7 +46,7 @@ def get_cmdline_args():
         "--logfile", "-f", type=str, help="logfile", default="kimmdy.log"
     )
     parser.add_argument("--checkpoint", "-p", type=str, help="start KIMMDY from a checkpoint file")
-    parser.add_argument("--from-latest-checkpoint", "-c", action="store_true", help="start KIMMDY from the latest checkpoint file")
+    parser.add_argument("--from-latest-checkpoint", "-c", action="store_true", help="continue. Start KIMMDY from the latest checkpoint file")
     parser.add_argument(
         "--concat",
         type=Path,
@@ -164,53 +165,52 @@ def _run(args: argparse.Namespace):
         runmgr.write_one_checkoint()
 
         content = f"""
-#!/bin/env bash
-#SBATCH --job-name={args.name}
-#SBATCH --output=kimmdy-job.log
-#SBATCH --error=kimmdy-job.log
-# #SBATCH -p <your-partition>.p
-#SBATCH --time=24:00:00
-#SBATCH -N 1
-#SBATCH --ntasks-per-node=40
-#SBATCH --mincpus=40
-#SBATCH --exclusive
-#SBATCH --cpus-per-task=1
-#SBATCH --gpus 1
-#SBATCH --mail-type=ALL
-# #SBATCH --mail-user=<your-email>
+        #!/bin/env bash
+        #SBATCH --job-name={config.name}
+        #SBATCH --output=kimmdy-job.log
+        #SBATCH --error=kimmdy-job.log
+        #SBATCH --time=24:00:00
+        #SBATCH -N 1
+        #SBATCH --ntasks-per-node=40
+        #SBATCH --mincpus=40
+        #SBATCH --exclusive
+        #SBATCH --cpus-per-task=1
+        #SBATCH --gpus 1
+        #SBATCH --mail-type=ALL
+        # #SBATCH -p <your-partition>.p
+        # #SBATCH --mail-user=<your-email
 
-echo "Job Name:"
-echo "$SLURM_JOB_NAME"
-JOB_NAME = "$SLURM_JOB_NAME"
 
-# Setup up your environment here
-# modules.sh might load lmod modules, set environment variables, etc.
-source ./_modules.sh
+        # Setup up your environment here
+        # modules.sh might load lmod modules, set environment variables, etc.
+        source ./_modules.sh
 
-JOB={args.name}
-CYCLE=20
-SUBMIT="jobscript.sh $JOB"
+        CYCLE=20
 
-START=$(date +"%s")
+        START=$(date +"%s")
 
-END=$(date +"%s")
-LEN=$((END-START))
-HOURS=$((LEN/3600))
-echo "$LEN seconds ran"
-echo "$HOURS full hours ran"
-let "CYCLE--"
-if [ $HOURS -lt $CYCLE ]; then
-  echo "last cycle was just $HOURS h long and therefore finito"
-  rm $targetRunning
-  exit 3
-else
-  echo "cycle resubmitting"
-  sbatch -J $SLURM_JOB_NAME $SUBMIT
-  exit 2
-fi
-            """
+        kimmdy --input {args.input} -c
+
+        END=$(date +"%s")
+
+        LEN=$((END-START))
+        HOURS=$((LEN/3600))
+
+        echo "$LEN seconds ran"
+        echo "$HOURS full hours ran"
+
+        let "CYCLE--"
+        if [ $HOURS -lt $CYCLE ]; then
+          echo "last cycle was just $HOURS h long, KIMMDY is done."
+          exit 3
+        else
+          echo "cycle resubmitting"
+          sbatch -J {config.name} ./jobscript.sh
+          exit 2
+        fi
+        """
         with open("jobscript.sh", "w") as f:
-            f.write(content)
+            f.write(textwrap.dedent(content))
 
         exit()
 
