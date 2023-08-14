@@ -24,7 +24,7 @@ class RecipeStep(ABC):
     """
 
 
-@dataclass
+@dataclass()
 class Move(RecipeStep):
     """Change topology and/or coordinates to move an atom.
 
@@ -321,15 +321,56 @@ class Recipe:
                 raise ValueError(
                     "Timespans and rates are not of equal length\n"
                     f"\trates: {len(self.rates)}\n"
-                    f"\timespans: {len(self.timespans)}"
+                    f"\ttimespans: {len(self.timespans)}"
                 )
-            if len(self.rates) < 1:
-                raise ValueError("Recipe empty! Use empty RecipeCollection instead!")
+            if not isinstance(self.recipe_steps, list):
+                raise ValueError(
+                    f"Recipe Steps must be a list, not {type(self.recipe_steps)}"
+                )
+            if not isinstance(self.timespans, list):
+                raise ValueError(
+                    f"timespans must be a list, not {type(self.timespans)}"
+                )
+            if not isinstance(self.rates, list):
+                raise ValueError(f"rates must be a list, not {type(self.rates)}")
 
         except ValueError as e:
             raise ValueError(
-                f"Consistency error in Recipe {self.recipe_steps}" "" + e.args[0]
+                f"Consistency error in Recipe {self.recipe_steps}" " " + e.args[0]
             )
+
+    def get_recipe_name(self):
+        name = ""
+        for rs in self.recipe_steps:
+            name += " "
+            if isinstance(rs, Move):
+                if (ix := getattr(rs, "ix_to_break", None)) is not None:
+                    name += str(ix)
+                    name += "\u26A1"  # ⚡
+                if (ix := getattr(rs, "ix_to_move", None)) is not None:
+                    name += str(ix)
+                if (ix := getattr(rs, "ix_to_bind", None)) is not None:
+                    name += "\u27A1"  # ➡
+                    name += str(ix)
+
+            elif isinstance(rs, Bind):
+                if (ix := getattr(rs, "atom_ix_1", None)) is not None:
+                    name += str(ix)
+                    name += "\u27A1"  # ➡
+                if (ix := getattr(rs, "atom_ix_2", None)) is not None:
+                    name += str(ix)
+
+            elif isinstance(rs, Break):
+                if (ix := getattr(rs, "atom_ix_1", None)) is not None:
+                    name += str(ix)
+                    name += "\u26A1"  # ➡
+                if (ix := getattr(rs, "atom_ix_2", None)) is not None:
+                    name += str(ix)
+
+            else:
+                logging.warning(f"get_recipe_name got unknown step type: {type(rs)}")
+                name += "?".join(list(map(str, rs.__dict__.values())))
+        return name
 
 
 @dataclass
@@ -366,19 +407,48 @@ class RecipeCollection:
             urps.append(self.recipes[uri[0]])
         self.recipes = urps
 
-    def to_csv(self, path: Path):
+    def to_csv(self, path: Path, picked_recipe=None):
         """Write a ReactionResult as defined in the reaction module to a csv file"""
 
         header = ["recipe_steps", "timespans", "rates"]
         rows = []
         for i, rp in enumerate(self.recipes):
-            rows.append([i] + [rp.__getattribute__(h) for h in header])
-        header = ["index"] + header
+            picked = rp == picked_recipe
+            rows.append([i] + [picked] + [rp.__getattribute__(h) for h in header])
+        header = ["index", "picked"] + header
 
         with open(path, "w", newline="") as f:
             writer = csv.writer(f)
             writer.writerow(header)
             writer.writerows(rows)
+
+    @classmethod
+    def from_csv(cls, path: Path):
+        """Create a RecipeCollection object from a CSV file
+        Returns the recipe collection and a single recipe that was picked, otherwise None
+        """
+        recipes = []
+
+        with open(path, "r") as f:
+            reader = csv.reader(f)
+            header = next(reader)  # Skip the header row
+            picked_rp = None
+            for row in reader:
+                index_s, picked_s, recipe_steps_s, timespans_s, rates_s = row
+
+                picked = eval(picked_s)
+                recipe_steps = eval(recipe_steps_s)
+                timespans = eval(timespans_s)
+                rates = eval(rates_s)
+
+                recipe = Recipe(
+                    recipe_steps=recipe_steps, timespans=timespans, rates=rates
+                )
+                recipes.append(recipe)
+                if picked:
+                    picked_rp = recipe
+
+        return cls(recipes=recipes), picked_rp
 
     def to_dill(self, path: Path):
         with open(path, "wb") as f:
@@ -388,6 +458,93 @@ class RecipeCollection:
     def from_dill(cls, path: Path):
         with open(path, "rb") as f:
             return dill.load(f)
+
+    def calc_cumprob(self):
+        """Calculate cumulative probability of all contained recipe steps.
+        Sums up to 1 over all recipes. Assumes constant rate for given timespan
+        and rate zero otherwise.
+        """
+        import numpy as np
+
+        self.aggregate_reactions()
+
+        cumprob = []
+
+        for re in self.recipes:
+            integral = 0
+            for t, r in zip(re.timespans, re.rates):
+                dt = t[1] - t[0]
+                integral += r * dt
+            cumprob.append(integral)
+
+        return np.array(cumprob) / sum(cumprob)
+
+    def plot(self, outfile, highlight_r=None, highlight_t=None):
+        """Plot reaction rates over time
+
+        Parameters
+        ----------
+        outfile : Path
+            Where to save the plot, must have compatible suffix.
+        highlight_r : Recipe, optional
+            Recipe to highlight, by default None
+        highlight_t : float, optional
+            Time at which the reactions starts
+        """
+        import matplotlib as mpl
+        import matplotlib.pyplot as plt
+        import seaborn as sns
+        import numpy as np
+
+        cumprob = self.calc_cumprob()
+        recipes = np.array(self.recipes)
+        idxs = slice(None)
+        if len(recipes) > 8:
+            logging.info(
+                "More than 8 reactions found, displaying only 8 most likely ones."
+            )
+            idxs = np.argsort(cumprob)[-8:]
+            i_to_highlight = np.nonzero(recipes == highlight_r)[0]
+            idxs = list(set(np.concatenate([idxs, i_to_highlight])))
+
+        cmap = sns.color_palette("husl", len(idxs))
+
+        plt.figure()
+        for r_i, re in enumerate(recipes[idxs]):
+            name = re.get_recipe_name()
+
+            linestyle = "-"
+            linewidth = 0.8
+            if re == highlight_r:
+                linestyle = "-."
+                linewidth += 1.3
+
+                if highlight_t is not None:
+                    plt.axvline(highlight_t, color="red")
+
+            for dt, r in zip(re.timespans, re.rates):
+                marker = ""
+                if dt[1] == 0:
+                    marker = "."
+                plt.plot(
+                    np.array(dt),
+                    (r, r),
+                    color=cmap[r_i],
+                    label=name,
+                    linestyle=linestyle,
+                    linewidth=linewidth,
+                    marker=marker,
+                )
+        plt.xlabel("time [frames]")
+        plt.ylabel("reaction rate")
+        plt.yscale("log")
+
+        # removing duplicates in legend
+        handles, labels = plt.gca().get_legend_handles_labels()
+        by_label = dict(zip(labels, handles))
+        plt.legend(by_label.values(), by_label.keys())
+
+        plt.savefig(outfile)
 
 
 class ReactionPlugin(ABC):

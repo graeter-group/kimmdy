@@ -129,9 +129,9 @@ def test_move_class_initialization_integers(ix_to_move, ix_to_bind, ix_to_break)
 
     # Initialize with corresponding strings
     m2 = Move(
-        id_to_move=str(ix_to_move + 1),
-        id_to_bind=str(ix_to_bind + 1),
-        id_to_break=str(ix_to_break + 1),
+        id_to_move=ix_to_move + 1,
+        id_to_bind=ix_to_bind + 1,
+        id_to_break=ix_to_break + 1,
     )
 
     # Compare instances
@@ -167,7 +167,7 @@ def recipe_collection():
             timespans=[(0.0, 1.0)],
         ),
         Recipe([SingleOperation(1, 5)], rates=[1], timespans=[(0.0, 1.0)]),
-        Recipe([SingleOperation(1, 5)], rates=[1], timespans=[(1.0, 2.0)]),
+        Recipe([SingleOperation(1, 5)], rates=[2], timespans=[(1.0, 2.0)]),
         Recipe(
             [SingleOperation(1, 5), SingleOperation(1, 5)],
             rates=[1],
@@ -176,7 +176,7 @@ def recipe_collection():
         Recipe([SingleOperation(2, 6)], rates=[1], timespans=[(3.0, 4.0)]),
         Recipe(
             [SingleOperation(1, 5), SingleOperation(1, 5)],
-            rates=[1],
+            rates=[3],
             timespans=[(4.0, 5.0)],
         ),
         Recipe(
@@ -200,9 +200,42 @@ def test_aggregate_recipe_collection(recipe_collection):
     assert recipe_collection.recipes[2].timespans == [(2.0, 3.0), (4.0, 5.0)]
 
 
+def test_recipe_collection_from_csv(tmp_path, recipe_collection):
+    csv_path = tmp_path / "test_out.csv"
+    recipe_collection.to_csv(csv_path)
+    loaded = RecipeCollection.from_csv(csv_path)[0]
+    assert loaded == recipe_collection
+
+
+def test_recipe_collection_from_csv_picked(tmp_path, recipe_collection):
+    csv_path = tmp_path / "test_out.csv"
+    picked = recipe_collection.recipes[2]
+    recipe_collection.to_csv(csv_path, picked_recipe=picked)
+    loaded, loaded_pick = RecipeCollection.from_csv(csv_path)
+    assert loaded == recipe_collection
+    assert picked == loaded_pick
+
+
 def test_recipe_collection_to_csv(tmp_path, recipe_collection):
     csv_path = tmp_path / "test_out.csv"
     recipe_collection.to_csv(csv_path)
+    with open(csv_path, newline="") as f:
+        reader = csv.DictReader(f)
+        rows = [r for r in reader]
+    for read_rp, org_rp in zip(rows, recipe_collection.recipes):
+        org_rp_d = asdict(org_rp)
+        keys_to_check = ["rates", "timespans"]
+        for key in keys_to_check:
+            org_val = str(org_rp_d[key])
+            if org_val == "None":
+                org_val = ""
+            assert org_val == read_rp[key], f"{org_rp_d[key]} != {read_rp[key]}"
+
+
+def test_recipe_collection_to_csv_picked(tmp_path, recipe_collection):
+    csv_path = tmp_path / "test_out.csv"
+    picked = recipe_collection.recipes[2]
+    recipe_collection.to_csv(csv_path, picked_recipe=picked)
     with open(csv_path, newline="") as f:
         reader = csv.DictReader(f)
         rows = [r for r in reader]

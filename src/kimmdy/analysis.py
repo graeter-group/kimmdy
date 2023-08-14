@@ -8,6 +8,7 @@ import MDAnalysis as mda
 
 from kimmdy.utils import run_shell_cmd
 from kimmdy.parsing import read_json, write_json
+from kimmdy.reaction import RecipeCollection
 
 
 def get_subdirs(run_dir: Path, steps: Union[list, str]):
@@ -217,3 +218,17 @@ def radical_population(args):
     atoms.tempfactors = list(counts.values())
     protein = u.select_atoms("protein")
     protein.write(str(out))
+
+
+def plot_rates(args: argparse.Namespace):
+    for curr_dir in args.dir:
+        run_dir = Path(curr_dir).expanduser().resolve()
+
+        ## create output dir (only goes to first mentioned run_dir)
+        (run_dir / "analysis").mkdir(exist_ok=True)
+        out = run_dir / "analysis"
+
+        for recipes in run_dir.glob("*decide_recipe/recipes.csv"):
+            rc, picked_rp = RecipeCollection.from_csv(recipes)
+            i = recipes.parent.name.split("_")[0]
+            rc.plot(out / f"{i}_reaction_rates.svg", highlight_r=picked_rp)

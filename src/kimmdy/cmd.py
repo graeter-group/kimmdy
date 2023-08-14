@@ -7,7 +7,6 @@ import logging
 from pathlib import Path
 import dill
 from kimmdy.config import Config
-from kimmdy.analysis import concat_traj, plot_energy, radical_population
 from kimmdy.misc_helper import _build_examples
 from kimmdy.runmanager import RunManager
 from kimmdy.utils import check_gmx_version, increment_logfile
@@ -133,6 +132,16 @@ def get_analysis_cmdline_args():
         help="Atoms chosen for radical population analysis, default is protein (uses MDAnalysis selection syntax)",
         default="protein",
     )
+
+    # plot rates at each decision step
+    parser_plot_rates = subparsers.add_parser(
+        name="plot_rates",
+        help="Plot rates of all possible reactions after a MD run. Rates must have been saved!",
+    )
+    parser_plot_rates.add_argument(
+        "dir", nargs="+", help="KIMMDY run directory to be analysed. Can be multiple."
+    )
+
     return parser.parse_args()
 
 
@@ -288,12 +297,16 @@ def analysis():
 
     args = get_analysis_cmdline_args()
     print(args)
+    from kimmdy.analysis import concat_traj, plot_energy, radical_population, plot_rates
+
     if args.module == "trjcat":
         concat_traj(args)
     elif args.module == "plot_energy":
         plot_energy(args)
     elif args.module == "radical_population":
         radical_population(args)
+    elif args.module == "plot_rates":
+        plot_rates(args)
 
 
 def kimmdy():
