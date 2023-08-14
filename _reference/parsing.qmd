@@ -9,18 +9,31 @@ All read_&lt;...&gt; and write_&lt;...&gt; functions.
 | Name | Description |
 | --- | --- |
 | [GMX_BUILTIN_FF_DIR](#kimmdy.parsing.GMX_BUILTIN_FF_DIR) | Path to gromacs data directory with the built-in forcefields. |
+| [TopologyDict](#kimmdy.parsing.TopologyDict) |  |
 
 ## Functions
 
 | Name | Description |
 | --- | --- |
+| [create_subsections](#kimmdy.parsing.create_subsections) |  |
+| [is_not_comment](#kimmdy.parsing.is_not_comment) |  |
 | [read_distances_dat](#kimmdy.parsing.read_distances_dat) | Read a distances.dat plumed output file. |
 | [read_edissoc](#kimmdy.parsing.read_edissoc) | reads a edissoc file and turns it into a dict. |
 | [read_plumed](#kimmdy.parsing.read_plumed) | Read a plumed.dat configuration file. |
+| [read_rtp](#kimmdy.parsing.read_rtp) |  |
 | [read_top](#kimmdy.parsing.read_top) | Read a topology file into a raw TopologyDict represenation. |
+| [read_xml_ff](#kimmdy.parsing.read_xml_ff) |  |
 | [resolve_includes](#kimmdy.parsing.resolve_includes) | Resolve #include statements in a (top/itp) file. |
 | [write_plumed](#kimmdy.parsing.write_plumed) | Write a plumed.dat configuration file. |
 | [write_top](#kimmdy.parsing.write_top) | Write a TopologyDict to a topology file. |
+
+### create_subsections { #kimmdy.parsing.create_subsections }
+
+`parsing.create_subsections(ls)`
+
+### is_not_comment { #kimmdy.parsing.is_not_comment }
+
+`parsing.is_not_comment(c)`
 
 ### read_distances_dat { #kimmdy.parsing.read_distances_dat }
 
@@ -54,6 +67,10 @@ Read a plumed.dat configuration file.
 |--------|------------------------|-------------------------------------|------------|
 | `path` | [Path](`pathlib.Path`) | Path to the file. E.g. "plumed.dat" | _required_ |
 
+### read_rtp { #kimmdy.parsing.read_rtp }
+
+`parsing.read_rtp(path)`
+
 ### read_top { #kimmdy.parsing.read_top }
 
 `parsing.read_top(path)`
@@ -82,6 +99,10 @@ Read a topology file into a raw TopologyDict represenation.
 - ``#include`` s that don&#x27;t resolve to a valid file path are silently dropped
 - sections that can have subsections can also exist multiple, separate times
   e.g. moleculetype will appear multiple times and they should not be merged
+
+### read_xml_ff { #kimmdy.parsing.read_xml_ff }
+
+`parsing.read_xml_ff(path)`
 
 ### resolve_includes { #kimmdy.parsing.resolve_includes }
 

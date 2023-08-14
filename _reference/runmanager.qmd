@@ -7,62 +7,11 @@ The Runmanager is the main entry point of the program.
 It manages the queue of tasks, communicates with the
 rest of the program and keeps track of global state.
 
-## Classes
+## Attributes
 
 | Name | Description |
 | --- | --- |
-| [RunManager](#kimmdy.runmanager.RunManager) | The Runmanager is the main entry point of the program. |
-| [State](#kimmdy.runmanager.State) | State of the system. |
-
-### RunManager { #kimmdy.runmanager.RunManager }
-
-`runmanager.RunManager(self, config)`
-
-The Runmanager is the main entry point of the program.
-
-Manages the queue of tasks, communicates with the
-rest of the program and keeps track of global state.
-
-#### Attributes
-
-| Name              | Type                                                                                    | Description                                               |
-|-------------------|-----------------------------------------------------------------------------------------|-----------------------------------------------------------|
-| config            | [Config](`kimmdy.config.Config`)                                                        | The configuration object.                                 |
-| from_checkpoint   | [bool](`bool`)                                                                          | Whether the runmanager was initialized from a checkpoint. |
-| tasks             | [queue](`queue`).[Queue](`queue.Queue`)\[[Task](`kimmdy.tasks.Task`)\]                  | Tasks from config.                                        |
-| crr_tasks         | [queue](`queue`).[Queue](`queue.Queue`)\[[Task](`kimmdy.tasks.Task`)\]                  | Current tasks.                                            |
-| iteration         | [int](`int`)                                                                            | Current iteration.                                        |
-| state             | [State](`kimmdy.runmanager.State`)                                                      | Current state of the system.                              |
-| recipe_collection | [RecipeCollection](`kimmdy.reaction.RecipeCollection`)                                  | Collection of recipes.                                    |
-| latest_files      | [dict](`dict`)\[[str](`str`), [Path](`pathlib.Path`)\]                                  | Dictionary of latest files.                               |
-| histfile          | [Path](`pathlib.Path`)                                                                  | Path to history file.                                     |
-| cptfile           | [Path](`pathlib.Path`)                                                                  | Path to checkpoint file.                                  |
-| ffpatch           |                                                                                         | Path to force field patch file.                           |
-| top               |                                                                                         | Topology object.                                          |
-| filehist          | [list](`list`)\[[dict](`dict`)\[[str](`str`), [TaskFiles](`kimmdy.tasks.TaskFiles`)\]\] | List of dictionaries of TaskFiles.                        |
-| task_mapping      | [TaskMapping](`kimmdy.tasks.TaskMapping`)                                               | Mapping of task names to runmanager methods.              |
-
-#### Methods
-
-| Name | Description |
-| --- | --- |
-| [get_latest](#kimmdy.runmanager.RunManager.get_latest) | Returns path to latest file of given type. |
-
-##### get_latest { #kimmdy.runmanager.RunManager.get_latest }
-
-`runmanager.RunManager.get_latest(self, suffix)`
-
-Returns path to latest file of given type.
-
-For .dat files (in general ambiguous extensions) use full file name.
-Errors if file is not found.
-
-### State { #kimmdy.runmanager.State }
-
-`runmanager.State()`
-
-State of the system.
-one of IDLE, MD, REACTION, DONE.
+| [AMBIGUOUS_SUFFS](#kimmdy.runmanager.AMBIGUOUS_SUFFS) |  |
 
 ## Functions
 

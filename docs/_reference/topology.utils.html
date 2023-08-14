@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.176">
+<meta name="generator" content="quarto-1.3.299">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -50,11 +50,6 @@ ul.task-list li input[type="checkbox"] {
   "panel-placement": "end",
   "type": "overlay",
   "limit": 20,
-  "keyboard-shortcut": [
-    "f",
-    "/",
-    "s"
-  ],
   "language": {
     "search-no-results-text": "No results",
     "search-matching-documents-text": "matching documents",
@@ -64,8 +59,7 @@ ul.task-list li input[type="checkbox"] {
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
     "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit",
-    "search-label": "Search"
+    "search-submit-button-title": "Submit"
   }
 }</script>
 
@@ -78,7 +72,7 @@ ul.task-list li input[type="checkbox"] {
   <header id="quarto-header" class="headroom fixed-top">
     <nav class="navbar navbar-expand-lg navbar-dark ">
       <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container mx-auto">
+      <div class="navbar-brand-container">
     <a class="navbar-brand" href="../index.html">
     <span class="navbar-title">KIMMDY</span>
     </a>
@@ -102,18 +96,17 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">Reference</span></a>
   </li>  
 </ul>
-          </div> <!-- /navcollapse -->
-          <div class="quarto-navbar-tools tools-wide">
+            <div class="quarto-navbar-tools ms-auto tools-wide">
     <div class="dropdown">
       <a href="" title="" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" aria-label=""><i class="bi bi-github"></i></a>
       <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="quarto-navigation-tool-dropdown-0">
           <li>
-            <a class="dropdown-item quarto-navbar-tools-item" href="https://github.com/hits-mbm-dev/kimmdy">
+            <a class="dropdown-item quarto-navbar-tools ms-auto-item" href="https://github.com/hits-mbm-dev/kimmdy">
             Source Code
             </a>
           </li>
           <li>
-            <a class="dropdown-item quarto-navbar-tools-item" href="https://github.com/hits-mbm-dev/kimmdy/issues/new">
+            <a class="dropdown-item quarto-navbar-tools ms-auto-item" href="https://github.com/hits-mbm-dev/kimmdy/issues/new">
             Report a Bug
             </a>
           </li>
@@ -126,6 +119,7 @@ ul.task-list li input[type="checkbox"] {
   </div>
 </a>
 </div>
+          </div> <!-- /navcollapse -->
       </div> <!-- /container-fluid -->
     </nav>
   <nav class="quarto-secondary-nav">
@@ -133,9 +127,9 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../_reference/index.html">Reference</a></li><li class="breadcrumb-item"><a href="../_reference/topology.topology.html">Topology</a></li><li class="breadcrumb-item"><a href="../_reference/topology.utils.html">topology.utils</a></li></ol></nav>
-        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
-        </a>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../_reference/index.html">Reference</a></li><li class="breadcrumb-item"><a href="../_reference/topology.topology.html">topology.topology</a></li><li class="breadcrumb-item"><a href="../_reference/topology.utils.html">topology.utils</a></li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
     </div>
   </nav>
 </header>
@@ -391,8 +385,17 @@ ul.task-list li input[type="checkbox"] {
   <ul>
   <li><a href="#functions" id="toc-functions" class="nav-link" data-scroll-target="#functions">Functions</a>
   <ul>
+  <li><a href="#kimmdy.topology.utils.attributes_to_list" id="toc-kimmdy.topology.utils.attributes_to_list" class="nav-link" data-scroll-target="#kimmdy.topology.utils.attributes_to_list">attributes_to_list</a></li>
+  <li><a href="#kimmdy.topology.utils.field_or_none" id="toc-kimmdy.topology.utils.field_or_none" class="nav-link" data-scroll-target="#kimmdy.topology.utils.field_or_none">field_or_none</a></li>
+  <li><a href="#kimmdy.topology.utils.get_by_permutations" id="toc-kimmdy.topology.utils.get_by_permutations" class="nav-link" data-scroll-target="#kimmdy.topology.utils.get_by_permutations">get_by_permutations</a></li>
+  <li><a href="#kimmdy.topology.utils.get_element_id" id="toc-kimmdy.topology.utils.get_element_id" class="nav-link" data-scroll-target="#kimmdy.topology.utils.get_element_id">get_element_id</a></li>
   <li><a href="#kimmdy.topology.utils.get_protein_section" id="toc-kimmdy.topology.utils.get_protein_section" class="nav-link" data-scroll-target="#kimmdy.topology.utils.get_protein_section">get_protein_section</a></li>
   <li><a href="#kimmdy.topology.utils.get_top_section" id="toc-kimmdy.topology.utils.get_top_section" class="nav-link" data-scroll-target="#kimmdy.topology.utils.get_top_section">get_top_section</a></li>
+  <li><a href="#kimmdy.topology.utils.is_not_none" id="toc-kimmdy.topology.utils.is_not_none" class="nav-link" data-scroll-target="#kimmdy.topology.utils.is_not_none">is_not_none</a></li>
+  <li><a href="#kimmdy.topology.utils.match_atomic_item_to_atomic_type" id="toc-kimmdy.topology.utils.match_atomic_item_to_atomic_type" class="nav-link" data-scroll-target="#kimmdy.topology.utils.match_atomic_item_to_atomic_type">match_atomic_item_to_atomic_type</a></li>
+  <li><a href="#kimmdy.topology.utils.match_attr" id="toc-kimmdy.topology.utils.match_attr" class="nav-link" data-scroll-target="#kimmdy.topology.utils.match_attr">match_attr</a></li>
+  <li><a href="#kimmdy.topology.utils.match_id_to_patch" id="toc-kimmdy.topology.utils.match_id_to_patch" class="nav-link" data-scroll-target="#kimmdy.topology.utils.match_id_to_patch">match_id_to_patch</a></li>
+  <li><a href="#kimmdy.topology.utils.match_multi_attr" id="toc-kimmdy.topology.utils.match_multi_attr" class="nav-link" data-scroll-target="#kimmdy.topology.utils.match_multi_attr">match_multi_attr</a></li>
   <li><a href="#kimmdy.topology.utils.set_protein_section" id="toc-kimmdy.topology.utils.set_protein_section" class="nav-link" data-scroll-target="#kimmdy.topology.utils.set_protein_section">set_protein_section</a></li>
   <li><a href="#kimmdy.topology.utils.set_top_section" id="toc-kimmdy.topology.utils.set_top_section" class="nav-link" data-scroll-target="#kimmdy.topology.utils.set_top_section">set_top_section</a></li>
   </ul></li>
@@ -419,6 +422,22 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
+<td><a href="#kimmdy.topology.utils.attributes_to_list">attributes_to_list</a></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><a href="#kimmdy.topology.utils.field_or_none">field_or_none</a></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><a href="#kimmdy.topology.utils.get_by_permutations">get_by_permutations</a></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><a href="#kimmdy.topology.utils.get_element_id">get_element_id</a></td>
+<td></td>
+</tr>
+<tr class="odd">
 <td><a href="#kimmdy.topology.utils.get_protein_section">get_protein_section</a></td>
 <td>Get content of a section in the first moleculetype (protein) from a topology dict.</td>
 </tr>
@@ -427,15 +446,51 @@ ul.task-list li input[type="checkbox"] {
 <td>Get content of a section from a topology dict.</td>
 </tr>
 <tr class="odd">
+<td><a href="#kimmdy.topology.utils.is_not_none">is_not_none</a></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><a href="#kimmdy.topology.utils.match_atomic_item_to_atomic_type">match_atomic_item_to_atomic_type</a></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><a href="#kimmdy.topology.utils.match_attr">match_attr</a></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><a href="#kimmdy.topology.utils.match_id_to_patch">match_id_to_patch</a></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><a href="#kimmdy.topology.utils.match_multi_attr">match_multi_attr</a></td>
+<td></td>
+</tr>
+<tr class="even">
 <td><a href="#kimmdy.topology.utils.set_protein_section">set_protein_section</a></td>
 <td>Set content of a section in the first moleculetype (protein) from a topology dict.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#kimmdy.topology.utils.set_top_section">set_top_section</a></td>
 <td>Set content of a section from a topology dict.</td>
 </tr>
 </tbody>
 </table>
+<section id="kimmdy.topology.utils.attributes_to_list" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.topology.utils.attributes_to_list">attributes_to_list</h3>
+<p><code>topology.utils.attributes_to_list(obj)</code></p>
+</section>
+<section id="kimmdy.topology.utils.field_or_none" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.topology.utils.field_or_none">field_or_none</h3>
+<p><code>topology.utils.field_or_none(l, i)</code></p>
+</section>
+<section id="kimmdy.topology.utils.get_by_permutations" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.topology.utils.get_by_permutations">get_by_permutations</h3>
+<p><code>topology.utils.get_by_permutations(d, key)</code></p>
+</section>
+<section id="kimmdy.topology.utils.get_element_id" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.topology.utils.get_element_id">get_element_id</h3>
+<p><code>topology.utils.get_element_id(e)</code></p>
+</section>
 <section id="kimmdy.topology.utils.get_protein_section" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.utils.get_protein_section">get_protein_section</h3>
 <p><code>topology.utils.get_protein_section(top, name)</code></p>
@@ -445,6 +500,26 @@ ul.task-list li input[type="checkbox"] {
 <h3 class="anchored" data-anchor-id="kimmdy.topology.utils.get_top_section">get_top_section</h3>
 <p><code>topology.utils.get_top_section(top, name, moleculetype=None)</code></p>
 <p>Get content of a section from a topology dict. By resolving any <code>#ifdef</code> statements by check in the top['define'] dict and choosing the 'content' or 'else_content' depending on the result.</p>
+</section>
+<section id="kimmdy.topology.utils.is_not_none" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.topology.utils.is_not_none">is_not_none</h3>
+<p><code>topology.utils.is_not_none(x)</code></p>
+</section>
+<section id="kimmdy.topology.utils.match_atomic_item_to_atomic_type" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.topology.utils.match_atomic_item_to_atomic_type">match_atomic_item_to_atomic_type</h3>
+<p><code>topology.utils.match_atomic_item_to_atomic_type(id, types, periodicity='')</code></p>
+</section>
+<section id="kimmdy.topology.utils.match_attr" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.topology.utils.match_attr">match_attr</h3>
+<p><code>topology.utils.match_attr(patches, attr, m)</code></p>
+</section>
+<section id="kimmdy.topology.utils.match_id_to_patch" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.topology.utils.match_id_to_patch">match_id_to_patch</h3>
+<p><code>topology.utils.match_id_to_patch(id, patches)</code></p>
+</section>
+<section id="kimmdy.topology.utils.match_multi_attr" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.topology.utils.match_multi_attr">match_multi_attr</h3>
+<p><code>topology.utils.match_multi_attr(patches, attrs, m)</code></p>
 </section>
 <section id="kimmdy.topology.utils.set_protein_section" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.utils.set_protein_section">set_protein_section</h3>
@@ -503,33 +578,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       } else {
         el.classList.add('notransition');
       }
-    }
-  }
-  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
-    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
-    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
-    let newTheme = '';
-    if(darkModeDefault) {
-      newTheme = isAlternate ? baseTheme : alternateTheme;
-    } else {
-      newTheme = isAlternate ? alternateTheme : baseTheme;
-    }
-    const changeGiscusTheme = () => {
-      // From: https://github.com/giscus/giscus/issues/336
-      const sendMessage = (message) => {
-        const iframe = document.querySelector('iframe.giscus-frame');
-        if (!iframe) return;
-        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
-      }
-      sendMessage({
-        setConfig: {
-          theme: newTheme
-        }
-      });
-    }
-    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
-    if (isGiscussLoaded) {
-      changeGiscusTheme();
     }
   }
   const toggleColorMode = (alternate) => {
@@ -598,15 +646,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       return localAlternateSentinel;
     }
   }
-  const darkModeDefault = false;
-  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+  let localAlternateSentinel = 'default';
   // Dark / light mode switch
   window.quartoToggleColorScheme = () => {
     // Read the current dark / light value 
     let toAlternate = !hasAlternateSentinel();
     toggleColorMode(toAlternate);
     setStyleSentinel(toAlternate);
-    toggleGiscusIfUsed(toAlternate, darkModeDefault);
   };
   // Ensure there is a toggle, if there isn't float one in the top right
   if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
@@ -685,9 +731,10 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     // clear code selection
     e.clearSelection();
   });
-  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+  function tippyHover(el, contentFn) {
     const config = {
       allowHTML: true,
+      content: contentFn,
       maxWidth: 500,
       delay: 100,
       arrow: false,
@@ -697,17 +744,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       interactive: true,
       interactiveBorder: 10,
       theme: 'quarto',
-      placement: 'bottom-start',
+      placement: 'bottom-start'
     };
-    if (contentFn) {
-      config.content = contentFn;
-    }
-    if (onTriggerFn) {
-      config.onTrigger = onTriggerFn;
-    }
-    if (onUntriggerFn) {
-      config.onUntrigger = onUntriggerFn;
-    }
     window.tippy(el, config); 
   }
   const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
@@ -720,60 +758,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
       return note.innerHTML;
-    });
-  }
-  const xrefs = window.document.querySelectorAll('a.quarto-xref');
-  const processXRef = (id, note) => {
-    if (id.startsWith('sec-')) {
-      // Special case sections, only their first couple elements
-      const container = document.createElement("div");
-      if (note.children && note.children.length > 2) {
-        for (let i = 0; i < 2; i++) {
-          container.appendChild(note.children[i].cloneNode(true));
-        }
-        return container.innerHTML
-      } else {
-        return note.innerHTML;
-      }
-    } else {
-      return note.innerHTML;
-    }
-  }
-  for (var i=0; i<xrefs.length; i++) {
-    const xref = xrefs[i];
-    tippyHover(xref, undefined, function(instance) {
-      instance.disable();
-      let url = xref.getAttribute('href');
-      let hash = undefined; 
-      try { hash = new URL(url).hash; } catch {}
-      const id = hash.replace(/^#\/?/, "");
-      const note = window.document.getElementById(id);
-      if (note !== null) {
-        try {
-          const html = processXRef(id, note);
-          instance.setContent(html);
-        } finally {
-          instance.enable();
-          instance.show();
-        }
-      } else {
-        // See if we can fetch this
-        fetch(url.split('#')[0])
-        .then(res => res.text())
-        .then(html => {
-          const parser = new DOMParser();
-          const htmlDoc = parser.parseFromString(html, "text/html");
-          const note = htmlDoc.getElementById(id);
-          if (note !== null) {
-            const html = processXRef(id, note);
-            instance.setContent(html);
-          } 
-        }).finally(() => {
-          instance.enable();
-          instance.show();
-        });
-      }
-    }, function(instance) {
     });
   }
       let selectedAnnoteEl;
@@ -817,7 +801,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             }
             div.style.top = top - 2 + "px";
             div.style.height = height + 4 + "px";
-            div.style.left = 0;
             let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
             if (gutterDiv === null) {
               gutterDiv = window.document.createElement("div");
@@ -915,7 +898,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   </div>
 </nav>
 </div> <!-- /content -->
-
 
 
 

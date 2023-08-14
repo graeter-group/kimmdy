@@ -10,26 +10,6 @@ In our system, the reaction rate r = (deterministic) reaction constant k
 because of the fundamental premise of chemical kinetics
 and because we have one reactant molecule
 
-## Classes
-
-| Name | Description |
-| --- | --- |
-| [KMCResult](#kimmdy.kmc.KMCResult) | The result of a KMC step. Similar to a Recipe but for the concrete realization of a reaction. |
-
-### KMCResult { #kimmdy.kmc.KMCResult }
-
-`kmc.KMCResult(recipe_steps=None, reaction_probability=None, time_step=None)`
-
-The result of a KMC step. Similar to a Recipe but for the concrete realization of a reaction.
-
-#### Attributes
-
-| Name                 | Type                                                                                          | Description                                          |
-|----------------------|-----------------------------------------------------------------------------------------------|------------------------------------------------------|
-| recipe_steps         | [Union](`typing.Union`)\[[list](`list`)\[[RecipeStep](`kimmdy.reaction.RecipeStep`)\], None\] | Single sequence of RecipeSteps to build product      |
-| reaction_probability | [Union](`typing.Union`)\[[list](`list`)\[[float](`float`)\], None\]                           | Integral of reaction propensity with respect to time |
-| time_step            | [Union](`typing.Union`)\[[float](`float`), None\]                                             | Time step during which the reaction occurs           |
-
 ## Functions
 
 | Name | Description |

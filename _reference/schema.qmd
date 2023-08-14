@@ -12,35 +12,13 @@ Reserved keywords:
     - description
     - type
 
-## Classes
-
-| Name | Description |
-| --- | --- |
-| [Sequence](#kimmdy.schema.Sequence) | A sequence of tasks. |
-
-### Sequence { #kimmdy.schema.Sequence }
-
-`schema.Sequence(self, tasks)`
-
-A sequence of tasks.
-
-Tasks can be grouped together by using a dictionary with the following
-keys:
-    - mult: number of times to repeat the tasks
-    - tasks: list of tasks to repeat
-
-#### Attributes
-
-| Name   | Type   | Description   |
-|--------|--------|---------------|
-| tasks  |        | list of tasks |
-
 ## Functions
 
 | Name | Description |
 | --- | --- |
 | [convert_schema_to_dict](#kimmdy.schema.convert_schema_to_dict) | Convert a dictionary from a raw json schema to a nested dictionary |
 | [flatten_scheme](#kimmdy.schema.flatten_scheme) | Recursively get properties and their desicripions from the scheme |
+| [generate_markdown_table](#kimmdy.schema.generate_markdown_table) |  |
 | [get_combined_scheme](#kimmdy.schema.get_combined_scheme) | Return the schema for the config file. |
 | [load_kimmdy_schema](#kimmdy.schema.load_kimmdy_schema) | Return the schema for the config file |
 | [load_plugin_schemas](#kimmdy.schema.load_plugin_schemas) | Return the schemas for the reaction plugins known to kimmdy |
@@ -69,6 +47,10 @@ Convert a dictionary from a raw json schema to a nested dictionary
 `schema.flatten_scheme(scheme, section='')`
 
 Recursively get properties and their desicripions from the scheme
+
+### generate_markdown_table { #kimmdy.schema.generate_markdown_table }
+
+`schema.generate_markdown_table(scheme, append=False)`
 
 ### get_combined_scheme { #kimmdy.schema.get_combined_scheme }
 

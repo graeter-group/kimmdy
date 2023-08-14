@@ -2,56 +2,19 @@
 
 `topology.ff`
 
-## Classes
+## Attributes
 
 | Name | Description |
 | --- | --- |
-| [AnglePatch](#kimmdy.topology.ff.AnglePatch) | Instructions to patch one angle |
-| [AtomPatch](#kimmdy.topology.ff.AtomPatch) | Instructions to patch one atom |
-| [BondPatch](#kimmdy.topology.ff.BondPatch) | Instructions to patch one bond |
-| [DihedralPatch](#kimmdy.topology.ff.DihedralPatch) | Instructions to patch one dihedral |
-| [FF](#kimmdy.topology.ff.FF) | Conainer for parsed forcefield data. |
-| [FFPatches](#kimmdy.topology.ff.FFPatches) | A container for forcefield patches |
-| [PairPatch](#kimmdy.topology.ff.PairPatch) | Instructions to patch one pair |
+| [Patch](#kimmdy.topology.ff.Patch) |  |
+| [Patches](#kimmdy.topology.ff.Patches) |  |
 
-### AnglePatch { #kimmdy.topology.ff.AnglePatch }
+## Functions
 
-`topology.ff.AnglePatch(self, elem)`
+| Name | Description |
+| --- | --- |
+| [props_to_patches](#kimmdy.topology.ff.props_to_patches) |  |
 
-Instructions to patch one angle
+### props_to_patches { #kimmdy.topology.ff.props_to_patches }
 
-### AtomPatch { #kimmdy.topology.ff.AtomPatch }
-
-`topology.ff.AtomPatch(self, elem)`
-
-Instructions to patch one atom
-
-### BondPatch { #kimmdy.topology.ff.BondPatch }
-
-`topology.ff.BondPatch(self, elem)`
-
-Instructions to patch one bond
-
-### DihedralPatch { #kimmdy.topology.ff.DihedralPatch }
-
-`topology.ff.DihedralPatch(self, elem)`
-
-Instructions to patch one dihedral
-
-### FF { #kimmdy.topology.ff.FF }
-
-`topology.ff.FF(self, top)`
-
-Conainer for parsed forcefield data.
-
-### FFPatches { #kimmdy.topology.ff.FFPatches }
-
-`topology.ff.FFPatches(self, path)`
-
-A container for forcefield patches
-
-### PairPatch { #kimmdy.topology.ff.PairPatch }
-
-`topology.ff.PairPatch(self, elem)`
-
-Instructions to patch one pair
+`topology.ff.props_to_patches(props)`

@@ -2,44 +2,8 @@
 
 `tasks`
 
-## Classes
+## Attributes
 
 | Name | Description |
 | --- | --- |
-| [Task](#kimmdy.tasks.Task) | A task to be performed as as a step in the RunManager. |
-| [TaskFiles](#kimmdy.tasks.TaskFiles) | Input and Output files and directories. |
-
-### Task { #kimmdy.tasks.Task }
-
-`tasks.Task(self, f, kwargs={})`
-
-A task to be performed as as a step in the RunManager.
-
-A task consists of a function and its keyword arguments and is
-itself callable. The function must return a TaskFiles object.
-
-### TaskFiles { #kimmdy.tasks.TaskFiles }
-
-`tasks.TaskFiles(get_latest, input=field(default_factory=dict), output=field(default_factory=dict), outputdir=Path())`
-
-Input and Output files and directories.
-
-Hosts the input and output files belonging to a task.
-A function or method that wants to be callable as a Task
-has to return a TaskFiles object.
-The input defaultdict is populated on the fly using
-get_latest of the runmanager to find newest files.
-Files which can not be found by get_latest must be added manually.
-
-#### Examples
-
-```python
->>> class run():
->>>     def get_latest(self, s):
->>>         return f"latest {s}"
->>> runmng = run()
->>> files = TaskFiles(runmng)
->>> files.input
->>> files.input["top"]
-{'top': 'latest top'}
-```
+| [TaskMapping](#kimmdy.tasks.TaskMapping) |  |

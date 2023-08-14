@@ -3,3 +3,13 @@
 `reaction.NaiveHAT()`
 
 Naive HAT reaction, selects hydrogens at random
+
+## Methods
+
+| Name | Description |
+| --- | --- |
+| [get_recipe_collection](#hat_naive.reaction.NaiveHAT.get_recipe_collection) |  |
+
+### get_recipe_collection { #hat_naive.reaction.NaiveHAT.get_recipe_collection }
+
+`reaction.NaiveHAT.get_recipe_collection(self, files)`

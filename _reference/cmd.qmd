@@ -73,23 +73,19 @@ which is `kimmdy.yml` by default.
 
 ### kimmdy_run { #kimmdy.cmd.kimmdy_run }
 
-`cmd.kimmdy_run(input=Path('kimmdy.yml'), loglevel='DEBUG', logfile=Path('kimmdy.log'), checkpoint='', concat=False, show_plugins=False, show_schema_path=False)`
+`cmd.kimmdy_run(input=Path('kimmdy.yml'), loglevel='DEBUG', logfile=Path('kimmdy.log'), checkpoint='', concat=False, show_plugins=False, show_schema_path=False, generate_jobscript=False)`
 
 Run KIMMDY from python.
 
-TODO: The concat option looks like we probably
-want an additional kimmdy analysis module,
-maybe with its own subcommand(s)?
-Like gromacs ``gmx &lt;command&gt;``?
-
 #### Parameters
 
-| Name               | Type                   | Description                                                                               | Default              |
-|--------------------|------------------------|-------------------------------------------------------------------------------------------|----------------------|
-| `input`            | [Path](`pathlib.Path`) | kimmdy input yml file.                                                                    | `Path('kimmdy.yml')` |
-| `loglevel`         | [str](`str`)           | Loglevel. One of ["INFO", "WARNING", "MESSAGE", "DEBUG"]                                  | `'DEBUG'`            |
-| `logfile`          | [Path](`pathlib.Path`) | File path of the logfile.                                                                 | `Path('kimmdy.log')` |
-| `checkpoint`       | [str](`str`)           | File path if a kimmdy.cpt file to restart KIMMDY from a checkpoint.                       | `''`                 |
-| `concat`           | [bool](`bool`)         | Don't perform a full KIMMDY run but instead concatenate trajectories from a previous run. | `False`              |
-| `show_plugins`     | [bool](`bool`)         | Show available plugins and exit.                                                          | `False`              |
-| `show_schema_path` | [bool](`bool`)         | Print path to yaml schema for use with yaml-language-server e.g. in VSCode and Neovim     | `False`              |
+| Name                 | Type                   | Description                                                                               | Default              |
+|----------------------|------------------------|-------------------------------------------------------------------------------------------|----------------------|
+| `input`              | [Path](`pathlib.Path`) | kimmdy input yml file.                                                                    | `Path('kimmdy.yml')` |
+| `loglevel`           | [str](`str`)           | Loglevel. One of ["INFO", "WARNING", "MESSAGE", "DEBUG"]                                  | `'DEBUG'`            |
+| `logfile`            | [Path](`pathlib.Path`) | File path of the logfile.                                                                 | `Path('kimmdy.log')` |
+| `checkpoint`         | [str](`str`)           | File path if a kimmdy.cpt file to restart KIMMDY from a checkpoint.                       | `''`                 |
+| `concat`             | [bool](`bool`)         | Don't perform a full KIMMDY run but instead concatenate trajectories from a previous run. | `False`              |
+| `show_plugins`       | [bool](`bool`)         | Show available plugins and exit.                                                          | `False`              |
+| `show_schema_path`   | [bool](`bool`)         | Print path to yaml schema for use with yaml-language-server e.g. in VSCode and Neovim     | `False`              |
+| `generate_jobscript` | [bool](`bool`)         | Instead of running KIMMDY directly, generate at jobscript.sh for slurm HPC clusters       | `False`              |
