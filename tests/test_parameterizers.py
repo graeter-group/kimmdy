@@ -76,20 +76,20 @@ def test_generate_parameters(generic_parameter_input):
 
 def test_apply_parameters(generic_topology):
     parameters_clean = {
-        "atom": {"idxs": [1], "q": [0.1]},
-        "bond": {"idxs": [[1, 3]], "eq": [400.0], "k": [0.3]},
-        "angle": {"idxs": [[2, 1, 5]], "eq": [1000.0], "k": [40.0]},
+        "atom": {"idxs": ["1"], "q": ["0.1"]},
+        "bond": {"idxs": [["1", "3"]], "eq": ["400.0"], "k": ["0.3"]},
+        "angle": {"idxs": [["2", "1", "5"]], "eq": ["1000.0"], "k": ["40.0"]},
         "proper": {
-            "idxs": [[17, 16, 18, 21]],
-            "phases": [[20.0]],
-            "ks": [[0.0]],
-            "ns": [[2]],
+            "idxs": [["17", "16", "18", "21"]],
+            "phases": [["20.0"]],
+            "ks": [["0.0"]],
+            "ns": [["2"]],
         },
         "improper": {
-            "idxs": [[18, 14, 16, 17]],
-            "phases": [[0.0]],
-            "ks": [[2.0]],
-            "ns": [[2]],
+            "idxs": [["18", "14", "16", "17"]],
+            "phases": [["0.0"]],
+            "ks": [["2.0"]],
+            "ns": [["2"]],
         },
     }
 
