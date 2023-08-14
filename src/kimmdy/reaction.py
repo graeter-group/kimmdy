@@ -321,7 +321,7 @@ class Recipe:
                 raise ValueError(
                     "Timespans and rates are not of equal length\n"
                     f"\trates: {len(self.rates)}\n"
-                    f"\timespans: {len(self.timespans)}"
+                    f"\ttimespans: {len(self.timespans)}"
                 )
             if not isinstance(self.recipe_steps, list):
                 raise ValueError(
@@ -407,19 +407,48 @@ class RecipeCollection:
             urps.append(self.recipes[uri[0]])
         self.recipes = urps
 
-    def to_csv(self, path: Path):
+    def to_csv(self, path: Path, picked_recipe=None):
         """Write a ReactionResult as defined in the reaction module to a csv file"""
 
         header = ["recipe_steps", "timespans", "rates"]
         rows = []
         for i, rp in enumerate(self.recipes):
-            rows.append([i] + [rp.__getattribute__(h) for h in header])
-        header = ["index"] + header
+            picked = rp == picked_recipe
+            rows.append([i] + [picked] + [rp.__getattribute__(h) for h in header])
+        header = ["index", "picked"] + header
 
         with open(path, "w", newline="") as f:
             writer = csv.writer(f)
             writer.writerow(header)
             writer.writerows(rows)
+
+    @classmethod
+    def from_csv(cls, path: Path):
+        """Create a RecipeCollection object from a CSV file
+        Returns the recipe collection and a single recipe that was picked, otherwise None
+        """
+        recipes = []
+
+        with open(path, "r") as f:
+            reader = csv.reader(f)
+            header = next(reader)  # Skip the header row
+            picked_rp = None
+            for row in reader:
+                index_s, picked_s, recipe_steps_s, timespans_s, rates_s = row
+
+                picked = eval(picked_s)
+                recipe_steps = eval(recipe_steps_s)
+                timespans = eval(timespans_s)
+                rates = eval(rates_s)
+
+                recipe = Recipe(
+                    recipe_steps=recipe_steps, timespans=timespans, rates=rates
+                )
+                recipes.append(recipe)
+                if picked:
+                    picked_rp = recipe
+
+        return cls(recipes=recipes), picked_rp
 
     def to_dill(self, path: Path):
         with open(path, "wb") as f:
@@ -450,11 +479,13 @@ class RecipeCollection:
 
         return np.array(cumprob) / sum(cumprob)
 
-    def plot(self, files, highlight_r=None, highlight_t=None):
+    def plot(self, outfile, highlight_r=None, highlight_t=None):
         """Plot reaction rates over time
 
         Parameters
         ----------
+        outfile : Path
+            Where to save the plot, must have compatible suffix.
         highlight_r : Recipe, optional
             Recipe to highlight, by default None
         highlight_t : float, optional
@@ -464,8 +495,6 @@ class RecipeCollection:
         import matplotlib.pyplot as plt
         import seaborn as sns
         import numpy as np
-
-        mpl.use("svg")
 
         cumprob = self.calc_cumprob()
         recipes = np.array(self.recipes)
@@ -515,7 +544,7 @@ class RecipeCollection:
         by_label = dict(zip(labels, handles))
         plt.legend(by_label.values(), by_label.keys())
 
-        plt.savefig(files.outputdir / "reaction_rates.svg")
+        plt.savefig(outfile)
 
 
 class ReactionPlugin(ABC):

@@ -358,11 +358,14 @@ class RunManager:
         self.recipe = decision_d.recipe
 
         if self.config.save_recipes:
-            self.recipe_collection.to_csv(files.outputdir / "recipes.csv")
+            self.recipe_collection.to_csv(files.outputdir / "recipes.csv", self.recipe)
 
         try:
             if self.config.plot_rates:
-                kwargs = {"files": files, "highlight_r": self.recipe}
+                kwargs = {
+                    "outfile": files.outputdir / "reaction_rates.svg",
+                    "highlight_r": self.recipe,
+                }
                 if (decision_d.time_start is not None) and (decision_d.time_start != 0):
                     kwargs["highlight_t"] = decision_d.time_start
                 self.recipe_collection.plot(**kwargs)
