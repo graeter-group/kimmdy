@@ -44,7 +44,8 @@ def get_cmdline_args():
     parser.add_argument(
         "--logfile", "-f", type=str, help="logfile", default="kimmdy.log"
     )
-    parser.add_argument("--checkpoint", "-c", type=str, help="checkpoint file")
+    parser.add_argument("--checkpoint", "-p", type=str, help="start KIMMDY from a checkpoint file")
+    parser.add_argument("--from-latest-checkpoint", "-c", action="store_true", help="start KIMMDY from the latest checkpoint file")
     parser.add_argument(
         "--concat",
         type=Path,
@@ -76,7 +77,6 @@ def get_cmdline_args():
     parser.add_argument(
         "--generate-jobscript", action="store_true", help=("""
         Instead of running KIMMDY directly, generate at jobscript.sh for slurm HPC clusters.
-        Save the jobscript to a file with e.g. `kimmdy --generate-jobscript > jobscript.sh`.
         You can then run this jobscript with sbatch jobscript.sh
         """)
     )
@@ -143,14 +143,32 @@ def _run(args: argparse.Namespace):
 
         exit()
 
+
+    if args.concat:
+        logging.info("KIMMDY will concatenate trrs and exit.")
+
+        run_dir = Path().cwd()
+        if type(args.concat) != bool:
+            run_dir = args.concat
+        concat_traj(run_dir)
+        exit()
+
+    logging.info("Welcome to KIMMDY")
+    logging.info("KIMMDY is running with these command line options:")
+    logging.info(args)
+
+
     if args.generate_jobscript:
-        print(
-            f"""
+        config = Config(args.input)
+        runmgr = RunManager(config)
+        runmgr.write_one_checkoint()
+
+        content = f"""
 #!/bin/env bash
-#SBATCH --job-name=kimmdy
+#SBATCH --job-name={args.name}
 #SBATCH --output=kimmdy-job.log
 #SBATCH --error=kimmdy-job.log
-#SBATCH -p <your-partition>.p
+# #SBATCH -p <your-partition>.p
 #SBATCH --time=24:00:00
 #SBATCH -N 1
 #SBATCH --ntasks-per-node=40
@@ -159,17 +177,18 @@ def _run(args: argparse.Namespace):
 #SBATCH --cpus-per-task=1
 #SBATCH --gpus 1
 #SBATCH --mail-type=ALL
-#SBATCH --mail-user=<your-email>
+# #SBATCH --mail-user=<your-email>
 
 echo "Job Name:"
 echo "$SLURM_JOB_NAME"
+JOB_NAME = "$SLURM_JOB_NAME"
 
 # Setup up your environment here
 # modules.sh might load lmod modules, set environment variables, etc.
 source ./_modules.sh
 
-JOB={args.input}
-CYCLE=21
+JOB={args.name}
+CYCLE=20
 SUBMIT="jobscript.sh $JOB"
 
 START=$(date +"%s")
@@ -190,22 +209,17 @@ else
   exit 2
 fi
             """
-        )
+        with open("jobscript.sh", "w") as f:
+            f.write(content)
 
         exit()
 
-    if args.concat:
-        logging.info("KIMMDY will concatenate trrs and exit.")
-
-        run_dir = Path().cwd()
-        if type(args.concat) != bool:
-            run_dir = args.concat
-        concat_traj(run_dir)
+    if args.from_latest_checkpoint:
+        config = Config(args.input)
+        name: str = config.name
+        cpt = "_kimmdy.cpt"
+        args.checkpoint = cpt
         exit()
-
-    logging.info("Welcome to KIMMDY")
-    logging.info("KIMMDY is running with these command line options:")
-    logging.info(args)
 
     if args.checkpoint:
         logging.info("KIMMDY is starting from a checkpoint.")
@@ -227,6 +241,7 @@ def kimmdy_run(
     loglevel: str = "DEBUG",
     logfile: Path = Path("kimmdy.log"),
     checkpoint: str = "",
+    from_latest_checkpoint: bool = False,
     concat: bool = False,
     show_plugins: bool = False,
     show_schema_path: bool = False,
@@ -244,6 +259,8 @@ def kimmdy_run(
         File path of the logfile.
     checkpoint :
         File path if a kimmdy.cpt file to restart KIMMDY from a checkpoint.
+    from_latest_checkpoint :
+        Start KIMMDY from the latest checkpoint.
     concat :
         Don't perform a full KIMMDY run but instead concatenate trajectories
         from a previous run.
@@ -259,6 +276,7 @@ def kimmdy_run(
         loglevel=loglevel,
         logfile=logfile,
         checkpoint=checkpoint,
+        from_latest_checkpoint=from_latest_checkpoint,
         concat=concat,
         show_plugins=show_plugins,
         show_schema_path=show_schema_path,

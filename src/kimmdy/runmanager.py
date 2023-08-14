@@ -145,19 +145,9 @@ class RunManager:
 
     def run(self):
         logging.info("Start run")
-        logging.info("Build task list")
 
         if not self.from_checkpoint:
-            # allows for mapping one config entry to multiple tasks
-            for entry in self.config.sequence:
-                if entry in self.config.mds.get_attributes():
-                    task = self.task_mapping["md"]
-                    logging.info(f"Put Task: {task}")
-                    self.tasks.put(Task(task, kwargs={"instance": entry}))
-                else:
-                    for task in self.task_mapping[entry]:
-                        logging.info(f"Put Task: {task}")
-                        self.tasks.put(Task(task))
+            self._setup_tasks()
 
         while not (self.state is State.DONE or (self.iteration >= self.config.max_tasks) or self.config.max_tasks == 0):
             logging.info("Write checkpoint before next task")
@@ -169,6 +159,35 @@ class RunManager:
             f"Finished running tasks, state: {self.state}, "
             f"iteration:{self.iteration}, max:{self.config.max_tasks}"
         )
+
+    def _setup_tasks(self):
+        """allows for mapping one config entry to multiple tasks
+        """
+        logging.info("Build task list")
+        for entry in self.config.sequence:
+            if entry in self.config.mds.get_attributes():
+                task = self.task_mapping["md"]
+                logging.info(f"Put Task: {task}")
+                self.tasks.put(Task(task, kwargs={"instance": entry}))
+            else:
+                for task in self.task_mapping[entry]:
+                    logging.info(f"Put Task: {task}")
+                    self.tasks.put(Task(task))
+
+    def write_one_checkoint(self):
+        """Just write the first checkpoint and then exit
+
+        Used to generate a starting point for jobscripts on hpc clusters
+        that can easily self-submit after a timelimit was exceeded.
+        """
+        logging.info("Initial setup for first checkpoint")
+        self._setup_tasks()
+        with open(self.cptfile, "wb") as f:
+            dill.dump(self, f)
+        logging.info(
+            f"Wrote checkpointfile to: {self.cptfile}, "
+        )
+
 
     def get_latest(self, suffix: str):
         """Returns path to latest file of given type.

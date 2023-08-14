@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=../../src/kimmdy/kimmdy-yaml-schema.json
 
 dryrun: false
-name: 'alanine_hat_000'
+name: 'alanine_hat'
 max_tasks: 100
 gromacs_alias: 'gmx'
 ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
