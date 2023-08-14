@@ -7,6 +7,7 @@ from kimmdy.topology.topology import Topology
 from kimmdy.topology.atomic import Bond, Angle, Dihedral, MultipleDihedrals
 from kimmdy.topology.utils import get_by_permutations
 from kimmdy.parameterize import Parameterizer
+from kimmdy.parsing import write_json
 
 import grappa.ff
 import openmm.unit
@@ -23,7 +24,7 @@ def convert_to_python_types(array: Union[list, np.ndarray]) -> list:
     return getattr(array, "tolist", lambda: array)()
 
 
-def order_proper(idxs: np.ndarray):
+def order_proper(idxs: np.ndarray) -> np.ndarray:
     # center atoms of dihedral must have ascending value
     # idx_list is array(array(list(i)),array(list(j)),array(list(k)),array(list(l)))
     if idxs[1] < idxs[2]:
@@ -50,7 +51,9 @@ def clean_parameters(parameters: dict) -> dict:
         "proper": {k: [] for k in dihedral_keys},
         "improper": {k: [] for k in dihedral_keys},
     }
-    parameters["proper_idxs"] = [order_proper(x) for x in parameters["proper_idxs"]]
+    parameters["proper_idxs"] = np.array(
+        [order_proper(x) for x in parameters["proper_idxs"]]
+    )
     try:
         for atomic in parameters_clean.keys():
             for parameter in parameters_clean[atomic].keys():
@@ -188,7 +191,7 @@ def apply_parameters(top: Topology, parameters: dict):
         for ii, n in enumerate(parameters["improper"]["ns"][i]):
             term.periodicity = "2" if term.periodicity == "" else term.periodicity
             if n != term.periodicity and not math.isclose(
-                parameters["improper"]["ks"][i][ii], 0.0
+                float(parameters["improper"]["ks"][i][ii]), 0.0
             ):
                 logging.warning(
                     f"Ignored improper with periodicity of {n} for idxs {tup}. This term should not be part of an amber style force field."
@@ -206,13 +209,15 @@ class GrappaInterface(Parameterizer):
     ) -> Topology:
         ## get atoms, bonds, radicals in required format
         input_dict = generate_input(current_topology)
+        write_json(input_dict, "in.json")
 
         ff = grappa.ff.ForceField.from_tag("radical_example")
         ff.units["angle"] = openmm.unit.degree
         # gromacs angle force constant are already in kJ/mol/rad-2]
         parameters = ff.params_from_topology_dict(input_dict)
-
+        write_json(parameters, "out_raw.json")
         parameters = clean_parameters(parameters)
+        write_json(parameters, "out_clean.json")
 
         apply_parameters(current_topology, parameters)
         return current_topology

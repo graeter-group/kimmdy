@@ -11,11 +11,6 @@ ndx: 'index.ndx'
 mds:
   equilibrium:
     mdp: 'md.mdp'
-  pull:
-    mdp: 'md.mdp'
-    plumed:
-      dat: 'plumed.dat'
-      distances: 'distances.dat'
   relax:
     mdp: 'md_parameter_growth.mdp'
 changer:
@@ -24,19 +19,14 @@ changer:
   topology:
     parameterization: 'grappa' 
 reactions:
-  homolysis:
-    edis: 'edissoc.dat'
-    itp: 'ffbonded.itp'
   hat_naive:
     frequency_factor: 100000000
     h_cutoff: 3
     polling_rate: 1
 sequence:
   - equilibrium
-  - pull
   -
     mult: 2
     tasks:
       - reactions
       - equilibrium
-      - pull

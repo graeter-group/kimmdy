@@ -413,8 +413,8 @@ class RunManager:
                     f"No parameter growth MD possible, trying classical MD relaxation."
                 )
                 run_parameter_growth = False
-        else:
-            logging.info(f'Wrote new coordinates to {files.output["trr"].parts[-3:]}')
+        # else:
+        #     logging.info(f'Wrote new coordinates to {files.output["trr"].parts[-3:]}')
 
         if not run_parameter_growth:
             if hasattr(self.config.changer.coordinates, "md"):
