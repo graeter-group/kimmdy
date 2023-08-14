@@ -465,6 +465,7 @@ class TestHexalaTopology:
         """Move H at 34 to C at 29
 
         TODO: this does not yet test patching parameters.
+        TODO: this does not use the canonical top.move_hydrogen that would be used for this case
         """
         top = deepcopy(hexala_top_fix)
         top_moved = deepcopy(top_move_34_29_fix)

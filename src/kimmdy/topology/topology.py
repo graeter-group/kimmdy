@@ -616,6 +616,12 @@ class Topology:
                     )
                     continue
 
+                residue_atomnames_current = [
+                    atom.atom
+                    for atom in self.atoms.values()
+                    if atom.resnr == other_atom.resnr
+                ]
+                type_set = False
                 for key, bond in aa.bonds.items():
                     if other_atom.atom in key and any(k.startswith("H") for k in key):
                         if key[0] == other_atom.atom:
@@ -624,10 +630,23 @@ class Topology:
                             h_name = bond.atom1
 
                         atom.type = aa.atoms[h_name].type
+                        if not h_name in residue_atomnames_current:
+                            atom.atom = h_name
+                        else:
+                            atom.atom = "HX"
+                            type_set = True
+                            continue
                         logging.info(f"HAT hydrogen will be bound to {other_atom}.")
                         break
                 else:
-                    logging.warn(f"Found no new atomtype for HAT hydrogen!")
+                    if type_set:
+                        logging.warning(
+                            f"Found new atomtype but not atomname for HAT hydrogen!"
+                        )
+                    else:
+                        logging.warning(
+                            f"Found neither new atomtype nor atomname for HAT hydrogen!"
+                        )
 
         # update bound_to
         atompair[0].bound_to_nrs.append(atompair[1].nr)
