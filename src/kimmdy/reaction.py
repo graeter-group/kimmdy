@@ -14,7 +14,6 @@ import logging
 from pathlib import Path
 import dill
 import csv
-import numpy as np
 
 
 class RecipeStep(ABC):
@@ -25,7 +24,7 @@ class RecipeStep(ABC):
     """
 
 
-@dataclass(unsafe_hash=True)
+@dataclass()
 class Move(RecipeStep):
     """Change topology and/or coordinates to move an atom.
 
@@ -134,7 +133,7 @@ class Move(RecipeStep):
         self._ix_to_break = int(value) - 1
 
 
-@dataclass(unsafe_hash=True)
+@dataclass
 class SingleOperation(RecipeStep):
     """Handle a single operation on the recipe step.
 
@@ -282,12 +281,6 @@ class Recipe:
     def __post_init__(self):
         self.check_consistency()
 
-    def __hash__(self):
-        h_recip = hash(tuple(map(hash, self.recipe_steps)))
-        h_rate = hash(tuple(map(hash, self.rates)))
-        h_time = hash(tuple(map(hash, tuple(*self.timespans))))
-        return h_recip ^ h_rate ^ h_time
-
     def calc_averages(self, window_size: int):
         """Calulate average rates over some window size
 
@@ -434,12 +427,14 @@ class RecipeCollection:
         Sums up to 1 over all recipes. Assumes constant rate for given timespan
         and rate zero otherwise.
         """
+        import numpy as np
+
         self.aggregate_reactions()
 
         cumprob = []
 
         for re in self.recipes:
-            integral = []
+            integral = 0
             for t, r in zip(re.timespans, re.rates):
                 dt = t[1] - t[0]
                 integral += r * dt
@@ -447,24 +442,23 @@ class RecipeCollection:
 
         return np.array(cumprob) / sum(cumprob)
 
-    def plot(self):
-        """Plot reaction rates over time"""
+    def plot(self, files, highlight_r=None, highlight_t=None):
+        """Plot reaction rates over time
+
+        Parameters
+        ----------
+        highlight_r : Recipe, optional
+            Recipe to highlight, by default None
+        highlight_t : float, optional
+            Time at which the reactions starts
+        """
+        import matplotlib as mpl
         import matplotlib.pyplot as plt
         import seaborn as sns
+        import numpy as np
 
-        # t_min = None
-        # t_max = None
-        # for re in self.recipes:
-        #     for t0, t1 in re.timespans:
-        #         if t_min is None or t_min > t0:
-        #             t_min = t0
-        #         if t_max is None or t_max < t1:
-        #             t_max = t1
+        mpl.use("svg")
 
-        # ax = plt.subplot()
-        # ax.set_xlim(t_min, t_max)
-
-        cmap = sns.color_palette("husl", len(self.recipes))
         cumprob = self.calc_cumprob()
         recipes = np.array(self.recipes)
         idxs = slice(None)
@@ -473,17 +467,36 @@ class RecipeCollection:
                 "More than 8 reactions found, displaying only 8 most likely ones."
             )
             idxs = np.argsort(cumprob)[-8:]
+            i_to_highlight = np.nonzero(recipes == highlight_r)[0]
+            idxs = list(set(np.concatenate([idxs, i_to_highlight])))
 
+        cmap = sns.color_palette("husl", len(idxs))
+
+        plt.figure()
         for r_i, re in enumerate(recipes[idxs]):
             name = re.get_recipe_name()
 
-            for t_i, (dt, r) in enumerate(zip(re.timespans, re.rates)):
-                sns.lineplot(
-                    x=np.array(dt),
-                    y=(r, r),
+            linestyle = "-"
+            linewidth = 0.8
+            if re == highlight_r:
+                linestyle = "-."
+                linewidth += 1.3
+
+                if highlight_t is not None:
+                    plt.axvline(highlight_t, color="red")
+
+            for dt, r in zip(re.timespans, re.rates):
+                marker = ""
+                if dt[1] == 0:
+                    marker = "."
+                plt.plot(
+                    np.array(dt),
+                    (r, r),
                     color=cmap[r_i],
                     label=name,
-                    legend="full",
+                    linestyle=linestyle,
+                    linewidth=linewidth,
+                    marker=marker,
                 )
         plt.xlabel("time [frames]")
         plt.ylabel("reaction rate")
@@ -493,6 +506,8 @@ class RecipeCollection:
         handles, labels = plt.gca().get_legend_handles_labels()
         by_label = dict(zip(labels, handles))
         plt.legend(by_label.values(), by_label.keys())
+
+        plt.savefig(files.outputdir / "reaction_rates.svg")
 
 
 class ReactionPlugin(ABC):

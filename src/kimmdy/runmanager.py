@@ -15,7 +15,7 @@ from typing import Callable, Union
 from kimmdy.config import Config
 from kimmdy.utils import increment_logfile
 from kimmdy.parsing import read_top, write_json
-from kimmdy.reaction import ReactionPlugin, RecipeCollection, RecipeStep
+from kimmdy.reaction import ReactionPlugin, RecipeCollection, Recipe
 import kimmdy.changemanager as changer
 from kimmdy.tasks import Task, TaskFiles, TaskMapping
 from kimmdy.utils import run_shell_cmd, run_gmx
@@ -105,7 +105,7 @@ class RunManager:
         self.iteration: int = 0
         self.state: State = State.IDLE
         self.recipe_collection: RecipeCollection = RecipeCollection([])
-        self.recipe_steps: Union[list[RecipeStep], None] = []
+        self.recipe: Union[Recipe, None] = None
         self.time: float = 0.0  # [ps]
         self.latest_files: dict[str, Path] = get_existing_files(config)
         logging.debug("Initialized latest files:")
@@ -130,6 +130,8 @@ class RunManager:
                 {"f": self._run_recipe, "out": "run_recipe"},
             ],
         }
+        if self.config.plot_rates:
+            self.task_mapping["reactions"][1]["out"] = "decide_recipe"
 
         # Instantiate reactions
         self.reaction_plugins: list[ReactionPlugin] = []
@@ -348,29 +350,40 @@ class RunManager:
         return files
 
     def _decide_recipe(
-        self,
-        decision_strategy: Callable[[RecipeCollection], KMCResult],
+        self, decision_strategy: Callable[[RecipeCollection], KMCResult], files=None
     ):
         logging.info("Decide on a recipe")
         logging.debug(f"Available reaction results: {self.recipe_collection}")
         decision_d = decision_strategy(self.recipe_collection)
-        self.recipe_steps = decision_d.recipe_steps
-        if decision_d.time_step:
-            self.time += decision_d.time_step
-        logging.info(f"Chosen recipe is: {self.recipe_steps} at time {self.time}")
+        self.recipe = decision_d.recipe
+        try:
+            if self.config.plot_rates:
+                kwargs = {"files": files, "highlight_r": self.recipe}
+                if decision_d.time_start is not None:
+                    kwargs["highlight_t"] = decision_d.time_start
+                self.recipe_collection.plot(**kwargs)
+        except Exception as e:
+            logging.warning(f"Error occured during plotting:\n{e}")
+
+        if decision_d.time_delta:
+            self.time += decision_d.time_delta
+        logging.info(
+            f"Chosen recipe is: {self.recipe.get_recipe_name()} at time {self.time}"
+        )
         return
 
     def _run_recipe(self, files) -> TaskFiles:
         logging.info(f"Start Recipe in KIMMDY iteration {self.iteration}")
-        logging.info(f"Recipe: {self.recipe_steps}")
+        logging.info(f"Recipe: {self.recipe.get_recipe_name()}")
 
+        recipe_steps = self.recipe.recipe_steps
         files.output = {"top": files.outputdir / "topol_mod.top"}
-        logging.debug(f"Chose recipe: {self.recipe_steps}")
+        logging.debug(f"Chose recipe steps: {recipe_steps}")
 
         # changes to topology
         top_prev = deepcopy(self.top)
         changer.modify_top(
-            self.recipe_steps,
+            recipe_steps,
             files,
             self.config.ffpatch,
             self.top,
@@ -381,7 +394,7 @@ class RunManager:
         if "plumed.dat" in self.latest_files:
             files.output["plumed.dat"] = files.outputdir / "plumed_mod.dat"
             changer.modify_plumed(
-                self.recipe_steps,
+                recipe_steps,
                 files.input["plumed.dat"],
                 files.output["plumed.dat"],
                 files.input["distances.dat"],
@@ -392,7 +405,7 @@ class RunManager:
 
         # changes to coordinates
         run_parameter_growth, top_merge_path = changer.modify_coords(
-            self.recipe_steps, files, top_prev, deepcopy(self.top)
+            recipe_steps, files, top_prev, deepcopy(self.top)
         )
         instance = None
 
@@ -430,5 +443,9 @@ class RunManager:
             {"time": self.time, "radicals": list(self.top.radicals.keys())},
             files.outputdir / "radicals.json",
         )
+
+        # Recipe done, reset runmanger state
+        self.recipe = None
+
         logging.info("Reaction done")
         return files
