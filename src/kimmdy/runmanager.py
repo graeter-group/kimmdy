@@ -130,7 +130,7 @@ class RunManager:
                 {"f": self._run_recipe, "out": "run_recipe"},
             ],
         }
-        if self.config.plot_rates:
+        if self.config.plot_rates or self.config.save_recipes:
             self.task_mapping["reactions"][1]["out"] = "decide_recipe"
 
         # Instantiate reactions
@@ -356,10 +356,14 @@ class RunManager:
         logging.debug(f"Available reaction results: {self.recipe_collection}")
         decision_d = decision_strategy(self.recipe_collection)
         self.recipe = decision_d.recipe
+
+        if self.config.save_recipes:
+            self.recipe_collection.to_csv(files.outputdir / "recipes.csv")
+
         try:
             if self.config.plot_rates:
                 kwargs = {"files": files, "highlight_r": self.recipe}
-                if decision_d.time_start is not None:
+                if (decision_d.time_start is not None) and (decision_d.time_start != 0):
                     kwargs["highlight_t"] = decision_d.time_start
                 self.recipe_collection.plot(**kwargs)
         except Exception as e:
