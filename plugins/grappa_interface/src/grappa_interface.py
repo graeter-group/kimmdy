@@ -51,9 +51,12 @@ def clean_parameters(parameters: dict) -> dict:
         "proper": {k: [] for k in dihedral_keys},
         "improper": {k: [] for k in dihedral_keys},
     }
+    # convert from kJ/mol/deg-2 to kJ/mol/rad-2 because GROMACS units are inconsistent
+    parameters["angle_k"] = parameters["angle_k"] * (180.0**2 / math.pi**2)
     parameters["proper_idxs"] = np.array(
         [order_proper(x) for x in parameters["proper_idxs"]]
     )
+
     try:
         for atomic in parameters_clean.keys():
             for parameter in parameters_clean[atomic].keys():
@@ -179,26 +182,25 @@ def apply_parameters(top: Topology, parameters: dict):
         )
 
     ## improper dihedrals
+    top.improper_dihedrals = {}
     for i, idx in enumerate(parameters["improper"]["idxs"]):
         tup = tuple(idx)
-        if not (term := get_by_permutations(top.improper_dihedrals, tup)):
-            raise KeyError(f"bad index {tup} in {list(top.improper_dihedrals.keys())}")
-            logging.warning(
-                f"Ignored parameters with invalid ids: {tup} for improper dihedrals"
-            )
-            continue
-        # dihedral_prm order should be [phase, kd]
         for ii, n in enumerate(parameters["improper"]["ns"][i]):
-            term.periodicity = "2" if term.periodicity == "" else term.periodicity
-            if n != term.periodicity and not math.isclose(
-                float(parameters["improper"]["ks"][i][ii]), 0.0
+            if not math.isclose(
+                float(parameters["improper"]["ks"][i][ii]), 0.0, abs_tol=1e-4
             ):
-                logging.warning(
-                    f"Ignored improper with periodicity of {n} for idxs {tup}. This term should not be part of an amber style force field."
-                )
-            else:
-                term.c0 = parameters["improper"]["phases"][i][ii]
-                term.c1 = parameters["improper"]["ks"][i][ii]
+                if not top.improper_dihedrals.get(tup):
+                    top.improper_dihedrals[tup] = Dihedral(
+                        *tup,
+                        funct="4",
+                        c0=parameters["proper"]["phases"][i][ii],
+                        c1=parameters["proper"]["ks"][i][ii],
+                        periodicity=n,
+                    )
+                else:
+                    logging.warning(
+                        f"There are multiple improper dihedrals for {tup} and only one can be chosen, dihedral {n} with amplitude of {parameters['proper']['ks'][i][ii]} will be ignored."
+                    )
 
     return
 

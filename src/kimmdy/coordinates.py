@@ -174,7 +174,7 @@ def merge_top_parameter_growth(
     hyperparameters = {
         "morse_well_depth": "400.0",
         "morse_steepness": "10.0",
-        "morse_dist_factor": 5,
+        "morse_dist_factor": 3,
     }  # well_depth D [kJ/mol], steepness [nm-1], dist_factor for bond length
 
     # TODO:
