@@ -149,9 +149,9 @@ def get_analysis_cmdline_args():
 class longFormatter(logging.Formatter):
     def format(self, record):
         saved_name = record.name  # save and restore for other formatters if desired
-        parts = saved_name.split('.')
+        parts = saved_name.split(".")
         if len(parts) > 1:
-            record.name = parts[0][0] + "." + '.'.join(p[:10] for p in parts[1:])
+            record.name = parts[0][0] + "." + ".".join(p[:10] for p in parts[1:])
         else:
             record.name = parts[0]
         result = super().format(record)
@@ -190,7 +190,7 @@ def configure_logger(log_path, log_level):
                 "()": longFormatter,
                 "format": "%(asctime)s %(name)-12s %(levelname)s: %(message)s",
                 "datefmt": "%d-%m-%y %H:%M",
-            }
+            },
         },
         "handlers": {
             "cmd": {

@@ -356,7 +356,7 @@ class RunManager:
     def _decide_recipe(
         self, decision_strategy: Callable[[RecipeCollection], KMCResult], files=None
     ):
-        if files is None: 
+        if files is None:
             global logger
         else:
             logger = files.logger

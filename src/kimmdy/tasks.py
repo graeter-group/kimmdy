@@ -51,6 +51,7 @@ class TaskFiles:
 def create_task_directory(runmng, postfix: str) -> TaskFiles:
     """Creates TaskFiles object, output directory and symlinks ff."""
     from kimmdy.cmd import longFormatter
+
     files = TaskFiles(runmng.get_latest)
     runmng.iteration += 1
     taskname = f"{runmng.iteration}_{postfix}"
