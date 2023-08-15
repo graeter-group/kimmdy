@@ -190,12 +190,18 @@ def _run(args: argparse.Namespace):
     configure_logging(args)
 
     if args.show_plugins:
-        from kimmdy import discovered_plugins
+        from kimmdy import (
+            discovered_reaction_plugins,
+            discovered_parameterization_plugins,
+        )
 
-        print("Available plugins:")
-        for plugin in discovered_plugins:
+        print("Available reaction plugins:")
+        for plugin in discovered_reaction_plugins:
             print(plugin)
 
+        print("Available parameterization plugins:")
+        for plugin in discovered_parameterization_plugins:
+            print(plugin)
         exit()
 
     if args.show_schema_path:
