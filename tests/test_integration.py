@@ -30,7 +30,6 @@ def setup_testdir(tmp_path, dirname) -> Path:
         assetsdir = Path("./tests/test_files") / "assets"
     testdir = tmp_path / "test_integration" / dirname
     shutil.copytree(filedir, testdir)
-    shutil.copy2(assetsdir / "amber99sb_patches.xml", testdir)
     Path(testdir / "amber99sb-star-ildnp.ff").symlink_to(
         assetsdir / "amber99sb-star-ildnp.ff",
         target_is_directory=True,

@@ -10,7 +10,7 @@ and because we have one reactant molecule
 from typing import Union
 import logging
 import numpy as np
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from numpy.random import default_rng
 from kimmdy.reaction import RecipeCollection, Recipe
 
@@ -34,7 +34,7 @@ class KMCResult:
         geometry/topology of this timestep and continues from there.
     """
 
-    recipe: Union[Recipe, None] = None
+    recipe: Recipe = field(default_factory=lambda: Recipe([], [], []))
     reaction_probability: Union[list[float], None] = None
     time_delta: Union[float, None] = None
     time_start: Union[float, None] = None
@@ -98,7 +98,7 @@ def frm(
     recipe_collection: RecipeCollection,
     rng: np.random.BitGenerator = default_rng(),
     MD_time: Union[float, None] = None,
-) -> dict:
+) -> KMCResult:
     """First Reaction Method variant of Kinetic Monte Carlo.
     takes RecipeCollection and choses a recipe based on which reaction would occur.
 

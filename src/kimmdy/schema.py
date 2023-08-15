@@ -12,7 +12,7 @@ Reserved keywords:
 import json
 import importlib.resources as pkg_resources
 import logging
-from kimmdy import plugins
+from kimmdy import reaction_plugins
 
 # needed for eval of type_scheme from schema
 # don't remove even if lsp says it's unused
@@ -65,7 +65,7 @@ def load_plugin_schemas() -> dict:
     """Return the schemas for the reaction plugins known to kimmdy"""
 
     schemas = {}
-    for plg_name, plugin in plugins.items():
+    for plg_name, plugin in reaction_plugins.items():
         logger.debug(f"Loading {plg_name}")
         # Catch loading exception
         if type(plugin) is ModuleNotFoundError:
