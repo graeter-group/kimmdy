@@ -19,13 +19,17 @@ from kimmdy.parsing import read_top, write_top, write_plumed, read_plumed
 import numpy as np
 from kimmdy.tasks import TaskFiles
 from kimmdy.topology.topology import Topology
+from kimmdy.parameterize import Parameterizer
 from kimmdy.coordinates import merge_top_parameter_growth
 from pathlib import Path
 import numpy as np
 
 
 def modify_coords(
-    recipe_steps: list[RecipeStep], files: TaskFiles, topA: Topology, topB: Topology
+    recipe_steps: list[RecipeStep],
+    files: TaskFiles,
+    topA: Topology,
+    topB: Topology,
 ) -> tuple[bool, Union[Path, None]]:
     """Modify the coordinates of the system according to the recipe steps.
 
@@ -70,6 +74,7 @@ def modify_coords(
     run_parameter_growth = False
 
     top_merge_path = None
+    # if recipe_steps:
     for step in recipe_steps:
         if isinstance(step, Move):
             if step.new_coords:
@@ -92,41 +97,41 @@ def modify_coords(
             run_parameter_growth = True
             ttime = u.trajectory[-1].time
 
-    np.unique(to_move, return_counts=True)
+        np.unique(to_move, return_counts=True)
 
-    for ts in u.trajectory[::-1]:
-        if abs(ts.time - ttime) > 1e-5:  # 0.01 fs
-            continue
-        for step in recipe_steps:
-            if isinstance(step, Move) and step.new_coords is not None:
-                atm_move = u.select_atoms(f"index {step.ix_to_move}")
-                atm_move[0].position = step.new_coords[0]
+        for ts in u.trajectory[::-1]:
+            if abs(ts.time - ttime) > 1e-5:  # 0.01 fs
+                continue
+            for step in recipe_steps:
+                if isinstance(step, Move) and step.new_coords is not None:
+                    atm_move = u.select_atoms(f"index {step.ix_to_move}")
+                    atm_move[0].position = step.new_coords[0]
 
-        break
-    else:
-        raise LookupError(
-            f"Did not find time {ttime} in trajectory "
-            f"with length {u.trajectory[-1].time}"
-        )
+            break
+        else:
+            raise LookupError(
+                f"Did not find time {ttime} in trajectory "
+                f"with length {u.trajectory[-1].time}"
+            )
 
-    if run_parameter_growth:
-        top_merge = merge_top_parameter_growth(topA, topB)
-        top_merge_path = files.outputdir / "top_merge.top"
-        write_top(top_merge.to_dict(), top_merge_path)
+        if run_parameter_growth:
+            top_merge = merge_top_parameter_growth(topA, topB)
+            top_merge_path = files.outputdir / "top_merge.top"
+            write_top(top_merge.to_dict(), top_merge_path)
 
-    else:
-        trr_out = files.outputdir / "coord_mod.trr"
-        gro_out = files.outputdir / "coord_mod.gro"
+        else:
+            trr_out = files.outputdir / "coord_mod.trr"
+            gro_out = files.outputdir / "coord_mod.gro"
 
-        u.atoms.write(trr_out)
-        u.atoms.write(gro_out)
+            u.atoms.write(trr_out)
+            u.atoms.write(gro_out)
 
-        files.output["trr"] = trr_out
-        files.output["gro"] = gro_out
+            files.output["trr"] = trr_out
+            files.output["gro"] = gro_out
 
-        logging.debug(
-            f"Exit modify_coords, final coordinates written to {trr_out.parts[-2:]}"
-        )
+            logging.debug(
+                f"Exit modify_coords, final coordinates written to {trr_out.parts[-2:]}"
+            )
 
     return run_parameter_growth, top_merge_path
 
@@ -134,8 +139,8 @@ def modify_coords(
 def modify_top(
     recipe_steps: list[RecipeStep],
     files: TaskFiles,
-    ffpatch: Optional[Path],
     topology: Optional[Topology],
+    parameterizer: Parameterizer,
 ) -> None:
     """Modify the topology of the system according to the recipe steps.
 
@@ -153,8 +158,6 @@ def modify_top(
             - top
         files.output:
             - top
-    ffpatch :
-        TODO: deprecate
     topology:
         TODO: make this required instead of optional
     """
@@ -165,9 +168,10 @@ def modify_top(
     logging.info(f"Reading: {oldtop} and writing modified topology to {newtop}.")
     if topology is None:
         topologyDict = read_top(oldtop)
-        topology = Topology(topologyDict, ffpatch)
+        topology = Topology(topologyDict)
 
     focus = set()
+    # if recipe_steps:
     for step in recipe_steps:
         if isinstance(step, Break):
             topology.break_bond((step.atom_id_1, step.atom_id_2))
@@ -196,8 +200,8 @@ def modify_top(
 
         else:
             raise NotImplementedError(f"RecipeStep {step} not implemented!")
-    topology._update_dict()
-    write_top(topology.top, newtop)
+    parameterizer.parameterize_topology(topology)
+    write_top(topology.to_dict(), newtop)
 
     return
 

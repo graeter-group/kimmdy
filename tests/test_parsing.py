@@ -19,7 +19,6 @@ def setup_testdir(tmp_path) -> Path:
         filedir = Path("./tests/test_files") / "test_parsing"
         assetsdir = Path("./tests/test_files") / "assets"
     shutil.copytree(filedir, tmp_path)
-    shutil.copy2(assetsdir / "amber99sb_patches.xml", tmp_path)
     Path(tmp_path / "amber99sb-star-ildnp.ff").symlink_to(
         assetsdir / "amber99sb-star-ildnp.ff",
         target_is_directory=True,

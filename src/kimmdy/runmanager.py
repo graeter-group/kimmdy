@@ -16,11 +16,12 @@ from kimmdy.config import Config
 from kimmdy.utils import increment_logfile
 from kimmdy.parsing import read_top, write_json
 from kimmdy.reaction import ReactionPlugin, RecipeCollection, Recipe
+from kimmdy.parameterize import BasicParameterizer
 import kimmdy.changemanager as changer
 from kimmdy.tasks import Task, TaskFiles, TaskMapping
 from kimmdy.utils import run_shell_cmd, run_gmx
 from pprint import pformat
-from kimmdy import plugins
+from kimmdy import reaction_plugins, parameterization_plugins
 from kimmdy.topology.topology import Topology
 from kimmdy.kmc import rf_kmc, KMCResult
 
@@ -87,8 +88,6 @@ class RunManager:
         Path to history file.
     cptfile :
         Path to checkpoint file.
-    ffpatch :
-        Path to force field patch file.
     top :
         Topology object.
     filehist :
@@ -112,11 +111,19 @@ class RunManager:
         logging.debug(pformat(self.latest_files))
         self.histfile: Path = increment_logfile(Path(f"{self.config.out}_history.log"))
         self.cptfile: Path = increment_logfile(Path(f"{self.config.out}_kimmdy.cpt"))
+
+        self.top = Topology(read_top(self.config.top))
         try:
-            _ = self.config.ffpatch
-        except AttributeError:
-            self.config.ffpatch = None
-        self.top = Topology(read_top(self.config.top), self.config.ffpatch)
+            if self.config.changer.topology.parameterization == "basic":
+                self.parameterizer = BasicParameterizer()
+            else:
+                self.parameterizer = parameterization_plugins[
+                    self.config.changer.topology.parameterization
+                ]()
+        except KeyError as e:
+            raise KeyError(
+                f"The parameterization tool chosen in the configuration file: '{self.config.changer.topology.parameterization}' can not be found in the parameterization plugins: {list(parameterization_plugins.keys())}"
+            ) from e
 
         self.filehist: list[dict[str, TaskFiles]] = [
             {"setup": TaskFiles(self.get_latest)}
@@ -138,7 +145,7 @@ class RunManager:
         react_names = self.config.reactions.get_attributes()
         # logging.info("Instantiating Reactions:", *react_names)
         for rp_name in react_names:
-            r = plugins[rp_name]
+            r = reaction_plugins[rp_name]
             reaction_plugin: ReactionPlugin = r(rp_name, self)
             self.reaction_plugins.append(reaction_plugin)
 
@@ -389,12 +396,7 @@ class RunManager:
 
         # changes to topology
         top_prev = deepcopy(self.top)
-        changer.modify_top(
-            recipe_steps,
-            files,
-            self.config.ffpatch,
-            self.top,
-        )
+        changer.modify_top(recipe_steps, files, self.top, self.parameterizer)
         logging.info(f'Wrote new topology to {files.output["top"].parts[-3:]}')
 
         # changes to plumed.dat
@@ -428,8 +430,8 @@ class RunManager:
                     f"No parameter growth MD possible, trying classical MD relaxation."
                 )
                 run_parameter_growth = False
-        else:
-            logging.info(f'Wrote new coordinates to {files.output["trr"].parts[-3:]}')
+        # else:
+        #     logging.info(f'Wrote new coordinates to {files.output["trr"].parts[-3:]}')
 
         if not run_parameter_growth:
             if hasattr(self.config.changer.coordinates, "md"):

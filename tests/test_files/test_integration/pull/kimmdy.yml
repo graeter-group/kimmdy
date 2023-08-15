@@ -21,6 +21,8 @@ mds:
 changer:
   coordinates:
     md: 'relax'     
+  topology:
+    parameterization: 'basic' 
 reactions:
   homolysis:
     edis: 'edissoc.dat'

@@ -18,7 +18,9 @@ mds:
     mdp: 'empty.mdp'
 changer:
   coordinates:
-    md: 'relax'     
+    md: 'relax'    
+  topology:
+    parameterization: 'grappa' 
 reactions:
   homolysis:
     edis: 'edissoc.dat'
