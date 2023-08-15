@@ -4,6 +4,7 @@ Also initialized logging and configuration.
 """
 import argparse
 import logging
+import logging.config
 from pathlib import Path
 import dill
 from kimmdy.config import Config
@@ -42,7 +43,7 @@ def get_cmdline_args():
         default="DEBUG",
     )
     parser.add_argument(
-        "--logfile", "-f", type=str, help="logfile", default="kimmdy.log"
+        "--logfile", "-f", type=Path, help="logfile", default="kimmdy.log"
     )
     parser.add_argument("--checkpoint", "-c", type=str, help="checkpoint file")
 
@@ -145,7 +146,7 @@ def get_analysis_cmdline_args():
     return parser.parse_args()
 
 
-def configure_logging(args: argparse.Namespace, color=False):
+def configure_logger(log_path, log_level):
     """Configure logging.
 
     Configures the logging module with optional colorcodes
@@ -153,30 +154,53 @@ def configure_logging(args: argparse.Namespace, color=False):
 
     Parameters
     ----------
-    args :
-        Command line arguments.
-    color :
-        Should logging output use colorcodes for terminal output?
+    log_path : Path
+        File path to log file
+    log_level : str
+        Log
     """
 
-    increment_logfile(Path(args.logfile))
-    if color:
-        logging.addLevelName(logging.INFO, "\033[35mINFO\033[00m")
-        logging.addLevelName(logging.ERROR, "\033[31mERROR\033[00m")
-        logging.addLevelName(logging.WARNING, "\033[33mWARN\033[00m")
-        format = "\033[34m %(asctime)s\033[00m: %(levelname)s: %(message)s"
-    else:
-        format = "%(asctime)s: %(levelname)s: %(message)s"
+    increment_logfile(log_path)
 
-    logging.basicConfig(
-        level=getattr(logging, args.loglevel.upper()),
-        handlers=[
-            logging.FileHandler(args.logfile, encoding="utf-8", mode="w"),
-            logging.StreamHandler(sys.stdout),
-        ],
-        format=format,
-        datefmt="%d-%m-%Y %H:%M",
-    )
+    log_conf = {
+        "version": 1,
+        "formatters": {
+            "short": {
+                "format": "%(name)-15s %(levelname)s: %(message)s",
+                "datefmt": "%H:%M",
+            },
+            "full": {
+                "format": "%(asctime)s %(name)-17s %(levelname)s: %(message)s",
+                "datefmt": "%d-%m-%y %H:%M",
+            },
+        },
+        "handlers": {
+            "cmd": {
+                "class": "logging.StreamHandler",
+                "formatter": "short",
+            },
+            "file": {
+                "class": "logging.FileHandler",
+                "formatter": "full",
+                "filename": log_path,
+            },
+            "null": {
+                "class": "logging.NullHandler",
+            },
+        },
+        "loggers": {
+            "kimmdy": {
+                "level": log_level.upper(),
+                "handlers": ["cmd", "file"],
+            },
+        },
+        # Mute others, e.g. tensorflow, matplotlib
+        "root": {
+            "level": "CRITICAL",
+            "handlers": ["null"],
+        },
+    }
+    logging.config.dictConfig(log_conf)
 
 
 def _run(args: argparse.Namespace):
@@ -187,7 +211,7 @@ def _run(args: argparse.Namespace):
     args :
         Command line arguments.
     """
-    configure_logging(args)
+    configure_logger(args.logfile, args.loglevel)
 
     if args.show_plugins:
         from kimmdy import discovered_plugins
@@ -204,21 +228,22 @@ def _run(args: argparse.Namespace):
 
         exit()
 
-    logging.info("Welcome to KIMMDY")
-    logging.info("KIMMDY is running with these command line options:")
-    logging.info(args)
+    logger = logging.getLogger("kimmdy")
+    logger.info("Welcome to KIMMDY")
+    logger.info("KIMMDY is running with these command line options:")
+    logger.info(args)
 
     if args.checkpoint:
-        logging.info("KIMMDY is starting from a checkpoint.")
+        logger.info("KIMMDY is starting from a checkpoint.")
         with open(args.checkpoint, "rb") as f:
             runmgr = dill.load(f)
             runmgr.from_checkpoint = True
     else:
         config = Config(args.input)
-        logging.debug(config)
+        logger.debug(config)
         runmgr = RunManager(config)
-        logging.debug("Using system GROMACS:")
-        logging.debug(check_gmx_version(config))
+        logger.debug("Using system GROMACS:")
+        logger.debug(check_gmx_version(config))
 
     runmgr.run()
 
@@ -252,7 +277,7 @@ def kimmdy_run(
     show_plugins :
         Show available plugins and exit.
     show_schema_path :
-        Print path to yaml schema for use with yaml-language-server e.g. in VSCode and Neovim
+        Print path to yaml schema for use with yaml-languconfigure_loggingage-server e.g. in VSCode and Neovim
     """
     args = argparse.Namespace(
         input=input,

@@ -20,6 +20,8 @@ import kimmdy
 import pathlib
 from pathlib import Path
 
+logger = logging.getLogger(__name__)
+
 
 class Sequence(list):
     """A sequence of tasks.
@@ -64,10 +66,10 @@ def load_plugin_schemas() -> dict:
 
     schemas = {}
     for plg_name, plugin in plugins.items():
-        logging.debug(f"Loading {plg_name}")
+        logger.debug(f"Loading {plg_name}")
         # Catch loading exception
         if type(plugin) is ModuleNotFoundError:
-            logging.warn(f"Plugin {plg_name} could not be loaded!\n{plugin}\n")
+            logger.warn(f"Plugin {plg_name} could not be loaded!\n{plugin}\n")
             continue
         # get main module from that plugin
         plg_module_name = plugin.__module__.split(".")[0]
@@ -76,7 +78,7 @@ def load_plugin_schemas() -> dict:
         schema_path = pkg_resources.files(plg_module_name) / "kimmdy-yaml-schema.json"
         with pkg_resources.as_file(schema_path) as p:
             if not p.exists():
-                logging.warn(
+                logger.warn(
                     f"{plg_name} did not provide a `kimmdy-yaml-schema.json`!\n"
                     "Schema will not be loaded!"
                 )

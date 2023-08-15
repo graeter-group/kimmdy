@@ -23,6 +23,8 @@ from kimmdy.coordinates import merge_top_parameter_growth
 from pathlib import Path
 import numpy as np
 
+logger = logging.getLogger(__name__)
+
 
 def modify_coords(
     recipe_steps: list[RecipeStep], files: TaskFiles, topA: Topology, topB: Topology
@@ -58,7 +60,7 @@ def modify_coords(
         Parameter-adjusted Topology
     """
 
-    logging.debug(f"Entering modify_coords with recipe_steps {recipe_steps}")
+    logger.debug(f"Entering modify_coords with recipe_steps {recipe_steps}")
 
     trr = files.input["trr"]
     tpr = files.input["tpr"]
@@ -81,7 +83,7 @@ def modify_coords(
                         f"Multiple coordinate changes requested at different times!"
                         "\nRecipeSteps:{recipe_steps}"
                     )
-                    logging.error(m)
+                    logger.error(m)
                     raise ValueError(m)
                 to_move.append(step.ix_to_move)
             else:
@@ -124,7 +126,7 @@ def modify_coords(
         files.output["trr"] = trr_out
         files.output["gro"] = gro_out
 
-        logging.debug(
+        logger.debug(
             f"Exit modify_coords, final coordinates written to {trr_out.parts[-2:]}"
         )
 
@@ -162,7 +164,7 @@ def modify_top(
     oldtop = files.input["top"]
     newtop = files.output["top"]
 
-    logging.info(f"Reading: {oldtop} and writing modified topology to {newtop}.")
+    logger.info(f"Reading: {oldtop} and writing modified topology to {newtop}.")
     if topology is None:
         topologyDict = read_top(oldtop)
         topology = Topology(topologyDict, ffpatch)
@@ -218,7 +220,7 @@ def modify_plumed(
         A list of [](`~kimmdy.reaction.RecipeStep`)s.
         parameter.
     """
-    logging.info(
+    logger.info(
         f"Reading: {oldplumeddat} and writing modified plumed input to {newplumeddat}."
     )
     plumeddat = read_plumed(oldplumeddat)
@@ -231,7 +233,7 @@ def modify_plumed(
         else:
             # TODO: handle BIND / MOVE
             # for now, we wouldn't bind or move bonds that are relevant for plumed
-            logging.debug(f"Plumed changes for {step} not implemented!")
+            logger.debug(f"Plumed changes for {step} not implemented!")
 
     write_plumed(plumeddat, newplumeddat)
 

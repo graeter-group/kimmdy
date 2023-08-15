@@ -5,6 +5,8 @@ import logging
 from typing import Optional
 from pathlib import Path
 
+logger = logging.getLogger(__name__)
+
 
 def get_gmx_dir() -> Path:
     """returns the path to the gromacs installation
@@ -64,7 +66,7 @@ def get_atominfo_from_plumedid(
         lookup_atomtype_atomid[atomids[1]],
     ]
     atomtypes = frozenset(atomtypes_list)
-    logging.debug(f"Found atomtypes {atomtypes} for plumedid {plumedid}.")
+    logger.debug(f"Found atomtypes {atomtypes} for plumedid {plumedid}.")
     return atomtypes, atomids
 
 
@@ -101,7 +103,7 @@ def get_bondprm_from_atomtypes(
             f"Did not find bond parameters for atomtypes {atomtypes} in ffbonded file"
         ) from e
 
-    logging.debug(f"Found bondprm {[b0,kb,E_dis]} for atomtypes {atomtypes}.")
+    logger.debug(f"Found bondprm {[b0,kb,E_dis]} for atomtypes {atomtypes}.")
     return float(b0), float(kb), float(E_dis)
 
 
@@ -181,7 +183,7 @@ def run_shell_cmd(s, cwd=None) -> sp.CompletedProcess:
 def run_gmx(s: str, cwd=None) -> Optional[sp.CalledProcessError]:
     result = run_shell_cmd(f"{s} -quiet", cwd)
     if result.returncode != 0:
-        logging.error(f"Gromacs process failed with exit code {result.returncode}.")
+        logger.error(f"Gromacs process failed with exit code {result.returncode}.")
         result.check_returncode()
 
 
@@ -206,7 +208,7 @@ def check_gmx_version(config):
         ][0]
     except Exception as e:
         m = "No system gromacs detected. With error: " + str(e)
-        logging.error(m)
+        logger.error(m)
         raise SystemError(m)
 
     if any(
@@ -216,8 +218,8 @@ def check_gmx_version(config):
         ]
     ) and (not ("MODIFIED" in version or "plumed" in version)):
         m = "GROMACS version does not contain MODIFIED or plumed, aborting due to lack of PLUMED patch."
-        logging.error(m)
-        logging.error("Version was: " + version)
+        logger.error(m)
+        logger.error("Version was: " + version)
         if not config.dryrun:
             raise SystemError(m)
     return version

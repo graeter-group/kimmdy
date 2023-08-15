@@ -3,6 +3,8 @@ from pathlib import Path
 from typing import Callable, Optional, TYPE_CHECKING, Union
 import logging
 
+logger = logging.getLogger(__name__)
+
 
 class AutoFillDict(dict):
     def __init__(self, get_missing: Callable):
@@ -50,7 +52,7 @@ def create_task_directory(runmng, postfix: str) -> TaskFiles:
     files = TaskFiles(runmng.get_latest)
     runmng.iteration += 1
     files.outputdir = runmng.config.out / f"{runmng.iteration}_{postfix}"
-    logging.debug(f"Creating Output directory: {files.outputdir}")
+    logger.debug(f"Creating Output directory: {files.outputdir}")
     files.outputdir.mkdir(exist_ok=runmng.from_checkpoint)
     if not (files.outputdir / runmng.config.ff.name).exists():
         (files.outputdir / runmng.config.ff.name).symlink_to(runmng.config.ff)
@@ -85,7 +87,7 @@ class Task:
         self.name = self.f.__name__
         self.out = out
 
-        logging.info(
+        logger.info(
             f"Init task {self.name}\n\tkwargs: {self.kwargs}\n\tOut: {self.out}"
         )
 
@@ -93,7 +95,7 @@ class Task:
         if self.out is not None:
             self.kwargs.update({"files": create_task_directory(self.runmng, self.out)})
 
-        logging.debug(f"Calling task {self.name} with kwargs: {self.kwargs}")
+        logger.debug(f"Calling task {self.name} with kwargs: {self.kwargs}")
         return self.f(**self.kwargs)
 
     def __repr__(self) -> str:

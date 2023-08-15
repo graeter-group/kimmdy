@@ -14,6 +14,8 @@ from dataclasses import dataclass
 from numpy.random import default_rng
 from kimmdy.reaction import RecipeCollection, Recipe
 
+logger = logging.getLogger(__name__)
+
 
 @dataclass
 class KMCResult:
@@ -57,7 +59,7 @@ def rf_kmc(
 
     # check for empty ReactionResult
     if len(recipe_collection.recipes) == 0:
-        logging.warning("Empty ReactionResult; no reaction chosen")
+        logger.warning("Empty ReactionResult; no reaction chosen")
         return KMCResult()
 
     # 0. Initialization
@@ -73,14 +75,14 @@ def rf_kmc(
     probability_sum = probability_cumulative[-1]
     # 3. Generate two independent uniform (0,1) random numbers u1,u2
     u = rng.random(2)
-    logging.debug(
+    logger.debug(
         f"Random values u: {u}, cumulative probability {probability_cumulative}, probability sum {probability_sum}"
     )
 
     # 4. Find the even to carry out, mu, using binary search (np.searchsorted)
     pos = np.searchsorted(probability_cumulative, u[0] * probability_sum)
     recipe = recipe_collection.recipes[pos]
-    logging.info(f"Chosen Recipe: {recipe}")
+    logger.info(f"Chosen Recipe: {recipe}")
     # 5. Calculate the time step associated with mu
     time_delta = 1 / probability_sum * np.log(1 / u[1])
 
@@ -120,7 +122,7 @@ def frm(
 
     # check for empty ReactionResult
     if len(recipe_collection.recipes) == 0:
-        logging.warning("Empty ReactionResult; no reaction chosen")
+        logger.warning("Empty ReactionResult; no reaction chosen")
         return KMCResult()
 
     # 0. Initialization
@@ -151,7 +153,7 @@ def frm(
         chosen_recipe = recipes[pos_event]
         time_delta = tau[pos_event]
     except ValueError:
-        logging.warning(
+        logger.warning(
             f"FRM recipe selection did not work, probably tau: {tau} is empty."
         )
         return KMCResult()
