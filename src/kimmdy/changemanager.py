@@ -26,7 +26,7 @@ import numpy as np
 
 
 def modify_coords(
-    recipe_steps: Union[list[RecipeStep], None],
+    recipe_steps: list[RecipeStep],
     files: TaskFiles,
     topA: Topology,
     topB: Topology,
@@ -74,28 +74,28 @@ def modify_coords(
     run_parameter_growth = False
 
     top_merge_path = None
-    if recipe_steps:
-        for step in recipe_steps:
-            if isinstance(step, Move):
-                if step.new_coords:
-                    if ttime is None:
-                        ttime = step.new_coords[1]
+    # if recipe_steps:
+    for step in recipe_steps:
+        if isinstance(step, Move):
+            if step.new_coords:
+                if ttime is None:
+                    ttime = step.new_coords[1]
 
-                    elif abs(ttime - step.new_coords[1]) > 1e-5:  # 0.01 fs
-                        m = (
-                            f"Multiple coordinate changes requested at different times!"
-                            "\nRecipeSteps:{recipe_steps}"
-                        )
-                        logging.error(m)
-                        raise ValueError(m)
-                    to_move.append(step.ix_to_move)
-                else:
-                    run_parameter_growth = True
-                    ttime = u.trajectory[-1].time
-
-            elif isinstance(step, Break) or isinstance(step, Bind):
+                elif abs(ttime - step.new_coords[1]) > 1e-5:  # 0.01 fs
+                    m = (
+                        f"Multiple coordinate changes requested at different times!"
+                        "\nRecipeSteps:{recipe_steps}"
+                    )
+                    logging.error(m)
+                    raise ValueError(m)
+                to_move.append(step.ix_to_move)
+            else:
                 run_parameter_growth = True
                 ttime = u.trajectory[-1].time
+
+        elif isinstance(step, Break) or isinstance(step, Bind):
+            run_parameter_growth = True
+            ttime = u.trajectory[-1].time
 
         np.unique(to_move, return_counts=True)
 
@@ -137,7 +137,7 @@ def modify_coords(
 
 
 def modify_top(
-    recipe_steps: Union[list[RecipeStep], None],
+    recipe_steps: list[RecipeStep],
     files: TaskFiles,
     ffpatch: Optional[Path],
     topology: Optional[Topology],
@@ -174,35 +174,35 @@ def modify_top(
         topology = Topology(topologyDict, ffpatch)
 
     focus = set()
-    if recipe_steps:
-        for step in recipe_steps:
-            if isinstance(step, Break):
-                topology.break_bond((step.atom_id_1, step.atom_id_2))
-                focus.add(step.atom_ix_1)
-                focus.add(step.atom_ix_2)
-            elif isinstance(step, Bind):
-                topology.bind_bond((step.atom_id_1, step.atom_id_2))
-                focus.add(step.atom_id_1)
-                focus.add(step.atom_id_2)
-            elif isinstance(step, Move):
-                top_done = False
-                if step.id_to_bind is not None and step.id_to_break is None:
-                    # implicit H-bond breaking
-                    topology.move_hydrogen((step.id_to_move, step.id_to_bind))
-                    focus.add(step.id_to_move)
-                    focus.add(step.id_to_bind)
-                    top_done = True
-                if step.id_to_break is not None and not top_done:
-                    topology.break_bond((step.id_to_move, step.id_to_break))
-                    focus.add(step.id_to_move)
-                    focus.add(step.id_to_break)
-                if step.id_to_bind is not None and not top_done:
-                    topology.bind_bond((step.id_to_move, step.id_to_bind))
-                    focus.add(step.id_to_move)
-                    focus.add(step.id_to_bind)
+    # if recipe_steps:
+    for step in recipe_steps:
+        if isinstance(step, Break):
+            topology.break_bond((step.atom_id_1, step.atom_id_2))
+            focus.add(step.atom_ix_1)
+            focus.add(step.atom_ix_2)
+        elif isinstance(step, Bind):
+            topology.bind_bond((step.atom_id_1, step.atom_id_2))
+            focus.add(step.atom_id_1)
+            focus.add(step.atom_id_2)
+        elif isinstance(step, Move):
+            top_done = False
+            if step.id_to_bind is not None and step.id_to_break is None:
+                # implicit H-bond breaking
+                topology.move_hydrogen((step.id_to_move, step.id_to_bind))
+                focus.add(step.id_to_move)
+                focus.add(step.id_to_bind)
+                top_done = True
+            if step.id_to_break is not None and not top_done:
+                topology.break_bond((step.id_to_move, step.id_to_break))
+                focus.add(step.id_to_move)
+                focus.add(step.id_to_break)
+            if step.id_to_bind is not None and not top_done:
+                topology.bind_bond((step.id_to_move, step.id_to_bind))
+                focus.add(step.id_to_move)
+                focus.add(step.id_to_bind)
 
-            else:
-                raise NotImplementedError(f"RecipeStep {step} not implemented!")
+        else:
+            raise NotImplementedError(f"RecipeStep {step} not implemented!")
     parameterizer.parameterize_topology(topology)
     write_top(topology.to_dict(), newtop)
 
