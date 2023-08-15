@@ -27,7 +27,7 @@ Reactive MD pipeline for GROMACS using Kinetic Monte Carlo / Molecular Dynamics 
 * `git clone https://github.com/hits-mbm-dev/kimmdy.git`
 * `cd kimmdy`
 * `pip install -r requirements.txt`
-* `Some rections need a GROMACS version patched with PLUMED, gromacs name should then contain `MODIFIED` or `plumed`
+* Some rections need a GROMACS version patched with PLUMED, gromacs name should then contain `MODIFIED` or `plumed`
 
 Other ways to install kimmdy are currently discouraged because of the high number of dependencies.
 
