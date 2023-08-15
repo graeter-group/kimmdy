@@ -139,7 +139,6 @@ def modify_coords(
 def modify_top(
     recipe_steps: list[RecipeStep],
     files: TaskFiles,
-    ffpatch: Optional[Path],
     topology: Optional[Topology],
     parameterizer: Parameterizer,
 ) -> None:
@@ -159,8 +158,6 @@ def modify_top(
             - top
         files.output:
             - top
-    ffpatch :
-        TODO: deprecate
     topology:
         TODO: make this required instead of optional
     """
@@ -171,7 +168,7 @@ def modify_top(
     logging.info(f"Reading: {oldtop} and writing modified topology to {newtop}.")
     if topology is None:
         topologyDict = read_top(oldtop)
-        topology = Topology(topologyDict, ffpatch)
+        topology = Topology(topologyDict)
 
     focus = set()
     # if recipe_steps:

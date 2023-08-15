@@ -88,8 +88,6 @@ class RunManager:
         Path to history file.
     cptfile :
         Path to checkpoint file.
-    ffpatch :
-        Path to force field patch file.
     top :
         Topology object.
     filehist :
@@ -113,11 +111,8 @@ class RunManager:
         logging.debug(pformat(self.latest_files))
         self.histfile: Path = increment_logfile(Path(f"{self.config.out}_history.log"))
         self.cptfile: Path = increment_logfile(Path(f"{self.config.out}_kimmdy.cpt"))
-        try:
-            _ = self.config.ffpatch
-        except AttributeError:
-            self.config.ffpatch = None
-        self.top = Topology(read_top(self.config.top), self.config.ffpatch)
+
+        self.top = Topology(read_top(self.config.top))
         try:
             if self.config.changer.topology.parameterization == "basic":
                 self.parameterizer = BasicParameterizer()
@@ -401,9 +396,7 @@ class RunManager:
 
         # changes to topology
         top_prev = deepcopy(self.top)
-        changer.modify_top(
-            recipe_steps, files, self.config.ffpatch, self.top, self.parameterizer
-        )
+        changer.modify_top(recipe_steps, files, self.top, self.parameterizer)
         logging.info(f'Wrote new topology to {files.output["top"].parts[-3:]}')
 
         # changes to plumed.dat

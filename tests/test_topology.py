@@ -50,9 +50,8 @@ def raw_urea_top_fix(filedir) -> TopologyDict:
 
 @pytest.fixture()
 def hexala_top_fix(assetsdir, filedir) -> Topology:
-    ffpatch = assetsdir / "amber99sb_patches.xml"
     hexala_top = read_top(filedir / "hexala.top")
-    return Topology(hexala_top, ffpatch)
+    return Topology(hexala_top)
 
 
 @st.composite
@@ -84,9 +83,8 @@ def random_topology_and_break(draw):
         dir = Path(__file__).parent / "test_files" / "test_topology"
     except NameError:
         dir = Path("./tests/test_files") / "test_topology"
-    ffpatch = dir / "amber99sb_patches.xml"
     hexala_top = read_top(dir / "hexala.top")
-    top = Topology(hexala_top, ffpatch)
+    top = Topology(hexala_top)
     atomlist = draw(random_atomlist())
     top.atoms = {atom.nr: atom for atom in atomlist}
     top._regenerate_topology_from_bound_to()
@@ -94,12 +92,11 @@ def random_topology_and_break(draw):
     return (top, break_this)
 
 
-class TestFFPatches:
+class TestMatch:
     @pytest.fixture
-    def top_fix(self, assetsdir, filedir) -> Topology:
-        ffpatch = assetsdir / "amber99sb_patches.xml"
+    def top_fix(self, filedir) -> Topology:
         hexala_top = read_top(filedir / "hexala.top")
-        return Topology(hexala_top, ffpatch)
+        return Topology(hexala_top)
 
     def test_match_atomic_item_to_atomic_type(self, top_fix):
         types = top_fix.ff.angletypes
@@ -225,16 +222,16 @@ class TestTopology:
 
 class TestHexalaTopology:
     @pytest.fixture
-    def top_break_29_35_fix(self, assetsdir, filedir) -> Topology:
-        ffpatch = assetsdir / "amber99sb_patches.xml"
+    def top_break_29_35_fix(self, filedir) -> Topology:
         hexala_top = read_top(filedir / "hexala_break29-35.top")
-        return Topology(hexala_top, ffpatch)
+        return Topology(hexala_top)
 
     @pytest.fixture
-    def top_move_34_29_fix(self, assetsdir, filedir) -> Topology:
-        ffpatch = assetsdir / "amber99sb_patches.xml"
+    def top_move_34_29_fix(self, filedir) -> Topology:
         hexala_top = read_top(filedir / "hexala_move34-29.top")
-        return Topology(hexala_top, ffpatch)
+        return Topology(
+            hexala_top,
+        )
 
     def test_all_terms_accounted_for(self, raw_hexala_top_fix, hexala_top_fix):
         atoms = get_protein_section(raw_hexala_top_fix, "atoms")
@@ -464,7 +461,6 @@ class TestHexalaTopology:
     def test_move_34_29_after_break(self, hexala_top_fix, top_move_34_29_fix):
         """Move H at 34 to C at 29
 
-        TODO: this does not yet test patching parameters.
         TODO: this does not use the canonical top.move_hydrogen that would be used for this case
         """
         top = deepcopy(hexala_top_fix)
@@ -472,7 +468,6 @@ class TestHexalaTopology:
         top.break_bond(("29", "35"))
         top.break_bond(("31", "34"))
         top.bind_bond(("34", "29"))
-        # patches are applied here, but parameters don't match, only number of parameters
         # the reference is shit anyway
         focus = set(["29", "31", "34", "35"])
 
@@ -481,7 +476,6 @@ class TestHexalaTopology:
         assert len(top.pairs) == len(top_moved.pairs)
         assert len(top.angles) == len(top_moved.angles)
         assert len(top.proper_dihedrals) == len(top_moved.proper_dihedrals)
-        # improper dihedral patches not implemented yet!
         # assert len(top.improper_dihedrals) == len(top_moved.improper_dihedrals)
 
         # inspect HAT hydrogen
@@ -521,41 +515,18 @@ class TestHexalaTopology:
 
 class TestRadicalAla:
     @pytest.fixture
-    def top_noprm_fix(self, assetsdir, filedir) -> Topology:
-        ffpatch = assetsdir / "amber99sb_patches.xml"
+    def top_noprm_fix(self, filedir) -> Topology:
         hexala_top = read_top(filedir / "Ala_R_noprm.top")
-        return Topology(hexala_top, ffpatch)
+        return Topology(hexala_top)
 
     @pytest.fixture
-    def top_prm_fix(self, assetsdir, filedir) -> Topology:
-        ffpatch = assetsdir / "amber99sb_patches.xml"
+    def top_prm_fix(self, filedir) -> Topology:
         hexala_top = read_top(filedir / "Ala_R_prm.top")
-        return Topology(hexala_top, ffpatch)
+        return Topology(hexala_top)
 
     def test_is_radical(self, top_noprm_fix):
         assert top_noprm_fix.atoms["9"].is_radical == True
         assert top_noprm_fix.atoms["10"].is_radical == False
 
-    # use this test when parameter assignments from graph are working
-    # def test_parameters_applied(self, top_noprm_fix, top_prm_fix):
-    #     top = deepcopy(top_noprm_fix)
-    #     focus = set(["9","10"])
-    #     top.patch_parameters(list(focus))
-    #     assert top_noprm_fix.atoms == top_prm_fix.atoms
-    #     top_dict = top.to_dict()
-    #     write_topol(top_dict,Path("/hits/fast/mbm/hartmaec/kimmdys/kimmdy/tests/test_files/test_topology/Ala_R_prm_curr.top"))
-    #     assert top_noprm_fix.bonds == top_prm_fix.bonds
-    #     assert top_noprm_fix.pairs == top_prm_fix.pairs
-    #     assert top_noprm_fix.angles == top_prm_fix.angles
-    #     assert top_noprm_fix.proper_dihedrals == top_prm_fix.proper_dihedrals
-    #     assert top_noprm_fix.improper_dihedrals == top_prm_fix.improper_dihedrals
-
-
-# {('9', '10'): Bond(ai='9', aj='10', funct='1', c0='0.14955', c1='259408.000000', c2=None, c3=None)} != {('9', '10'): Bond(ai='9', aj='10', funct='1', c0=None, c1=None, c2=None, c3=None)}
-# {('10', '13'): Bond(ai='10', aj='13', funct='1', c0='0.10900', c1='284512.0', c2=None, c3=None)} != {('10', '13'): Bond(ai='10', aj='13', funct='1', c0=None, c1=None, c2=None, c3=None)}
-# {('7', '9'): Bond(ai='7', aj='9', funct='1', c0='0.13600', c1='282001.600000', c2=None, c3=None)} != {('7', '9'): Bond(ai='7', aj='9', funct='1', c0=None, c1=None, c2=None, c3=None)}
-# {('9', '14'): Bond(ai='9', aj='14', funct='1', c0='0.14916', c1='265265.600000', c2=None, c3=None)} != {('9', '14'): Bond(ai='9', aj='14', funct='1', c0=None, c1=None, c2=None, c3=None)}
-# {('10', '11'): Bond(ai='10', aj='11', funct='1', c0='0.10900', c1='284512.0', c2=None, c3=None)} != {('10', '11'): Bond(ai='10', aj='11', funct='1', c0=None, c1=None, c2=None, c3=None)}
-# {('10', '12'): Bond(ai='10', aj='12', funct='1', c0='0.10900', c1='284512.0', c2=None, c3=None)} != {('10', '12'): Bond(ai='10', aj='12', funct='1', c0=None, c1=None, c2=None, c3=None)}
 
 # %%

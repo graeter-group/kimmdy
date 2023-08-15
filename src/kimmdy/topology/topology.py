@@ -5,13 +5,12 @@ from kimmdy.parsing import TopologyDict
 from kimmdy.topology.atomic import *
 from kimmdy.topology.utils import (
     get_protein_section,
-    match_id_to_patch,
     attributes_to_list,
     match_atomic_item_to_atomic_type,
     set_protein_section,
     set_top_section,
 )
-from kimmdy.topology.ff import FF, FFPatches, Patch
+from kimmdy.topology.ff import FF
 from itertools import permutations, combinations
 import textwrap
 import logging
@@ -24,7 +23,7 @@ PROTEIN_SECTION = "moleculetype_0"
 class Topology:
     """Smart container for parsed topology data.
 
-    A topology keeps track of connections and applies patches to parameters when bonds are broken or formed.
+    A topology keeps track of connections when bonds are broken or formed.
 
     Assumptions:
 
@@ -34,14 +33,11 @@ class Topology:
     ----------
     top :
         A dictionary containing the parsed topology data.
-    ffpatch : Optional[Path]
-        Path to a force field patch file. If None, no patching is applied.
     """
 
     def __init__(
         self,
         top: TopologyDict,
-        ffpatch: Optional[Path] = None,
     ) -> None:
         if top == {}:
             raise NotImplementedError(
@@ -70,10 +66,6 @@ class Topology:
         self.radicals: dict[str, Atom] = {}
 
         self.ff = FF(top)
-
-        self.ffpatches = None
-        if ffpatch:
-            self.ffpatches = FFPatches(ffpatch)
 
         self._parse_atoms()
         self._parse_bonds()
@@ -383,137 +375,6 @@ class Topology:
                 atom.is_radical = False
 
         return None
-
-    def _apply_param_patch(
-        self,
-        atomic_item: Atomic,
-        atomic_id: list[str],
-        patch: Patch,
-        types: AtomicTypes,
-    ):
-        """Apply a patch to an atomic item (Atom, Bond, Angle etc.).
-
-        Initial values are taken from the topology or the force field (supplied via `types`).
-        """
-        item_type = match_atomic_item_to_atomic_type(atomic_id, types)
-        for param, param_patch in patch.params.items():
-            initial = atomic_item.__dict__.get(param)
-            if initial is None:
-                # get initial value from the FF
-                initial = item_type.__dict__.get(param)
-            if initial is None:
-                logging.warning(
-                    f"Can't patch parameter because no initial parameter was found in the topology or the FF for: {atomic_id}, {atomic_item}."
-                )
-                continue
-
-            try:
-                initial = float(initial)
-            except ValueError as _:
-                logging.warning(
-                    f"Malformed patchfile. Some parameter patches couldn't be converted to a number: {param} with value {initial} of {atomic_item}."
-                )
-                continue
-            except TypeError as _:
-                continue
-
-            result = param_patch.apply(initial)
-            atomic_item.__dict__[param] = result
-
-    def _revert_param_patch(
-        self,
-        atomic_item: Atomic,
-        atomic_id: list[str],
-        types: AtomicTypes,
-    ):
-        """Revert a patch to an atomic item (Atom, Bond, Angle etc.).
-
-        Values reset to `None` if found in the forcefield (supplied via `types`).
-        """
-        raise NotImplementedError("Reverting patches is not finished yet.")
-        item_type = match_atomic_item_to_atomic_type(atomic_id, types)
-        if item_type is None:
-            logging.warning(
-                f"Won't revert patch because no initial parameter was found in the FF for: {atomic_id}, {atomic_item}."
-            )
-            return
-
-        print(f"item_type: {item_type}")
-        for param in atomic_item.__dict__.keys():
-            if re.match(r"^c\d", param):
-                atomic_item.__dict__[param] = None
-
-    def patch_parameters(self, focus_nr: list[str]):
-        raise NotImplementedError("Patching is not finished yet.")
-        if self.ffpatches is None:
-            return
-        focus = [self.atoms[nr] for nr in focus_nr]
-        logging.info(f"Applying parameter patches around these atoms: {focus}.")
-
-        # atoms
-        for atom in focus:
-            patch = match_id_to_patch([atom.radical_type()], self.ffpatches.atompatches)
-            if patch is None:
-                continue
-            self._apply_param_patch(atom, [atom.type], patch, self.ff.atomtypes)
-
-        # bonds
-        for atom in focus:
-            for bond_key in self._get_atom_bonds(atom.nr):
-                bond = self.bonds.get(bond_key)
-                if (
-                    bond is None
-                    or self.ffpatches is None
-                    or self.ffpatches.bondpatches is None
-                ):
-                    continue
-                id = [self.atoms[i].radical_type() for i in [bond.ai, bond.aj]]
-                patch = match_id_to_patch(id, self.ffpatches.bondpatches)
-                if patch is None:
-                    continue
-                id_base = [self.atoms[i].type for i in [bond.ai, bond.aj]]
-                self._apply_param_patch(bond, id_base, patch, self.ff.bondtypes)
-
-        angle_keys = self._get_atom_angles(focus_nr[0]) + self._get_atom_angles(
-            focus_nr[1]
-        )
-        for key in angle_keys:
-            angle = self.angles.get(key)
-            if (
-                angle is None
-                or self.ffpatches is None
-                or self.ffpatches.anglepatches is None
-            ):
-                continue
-            id = [self.atoms[i].radical_type() for i in key]
-            patch = match_id_to_patch(id, self.ffpatches.anglepatches)
-            if patch is None:
-                continue
-            id_base = [self.atoms[i].radical_type() for i in key]
-            self._apply_param_patch(angle, id_base, patch, self.ff.angletypes)
-
-        # proper dihedrals and pairs
-        dihedral_keys = self._get_atom_proper_dihedrals(
-            focus_nr[0]
-        ) + self._get_atom_proper_dihedrals(focus_nr[1])
-        for key in dihedral_keys:
-            dihedral = self.proper_dihedrals.get(key)
-            if (
-                dihedral is None
-                or self.ffpatches is None
-                or self.ffpatches.anglepatches is None
-            ):
-                continue
-            id = [self.atoms[i].radical_type() for i in key]
-            patch = match_id_to_patch(id, self.ffpatches.dihedralpatches)
-            if patch is None:
-                continue
-            id_base = [self.atoms[i].radical_type() for i in key]
-            self._apply_param_patch(
-                dihedral, id_base, patch, self.ff.proper_dihedraltypes
-            )
-
-        # TODO: improper dihedrals
 
     def break_bond(self, atompair_nrs: tuple[str, str]):
         """Break bonds in topology.
