@@ -19,6 +19,8 @@ mds:
 changer:
   coordinates:
     md: 'relax_noexistent'
+  topology:
+    parameterization: 'grappa' 
 reactions:
   homolysis:
     edis: 'edissoc.dat'

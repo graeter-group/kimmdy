@@ -5,11 +5,12 @@ import os
 import re
 from pathlib import Path
 from collections.abc import Iterable
-from typing import Generator, Optional
+from typing import Generator, Optional, Union
 import xml.etree.ElementTree as ET
 from itertools import takewhile
 import logging
 import json
+import numpy as np
 
 from kimmdy.utils import get_gmx_dir
 
@@ -447,13 +448,25 @@ def read_xml_ff(path: Path) -> ET.Element:
     return root
 
 
+class JSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        else:
+            return super(JSONEncoder, self).default(obj)
+
+
 def write_json(d: dict, path: Path) -> None:
     logging.debug(f"writing dictionary to json: {d}")
     with open(path, "w") as f:
-        json.dump(d, f)
+        json.dump(d, f, cls=JSONEncoder)
 
 
-def read_json(path: Path) -> dict:
+def read_json(path: Union[str, Path]) -> dict:
     with open(path, "r") as f:
         data = json.load(f)
     return data
