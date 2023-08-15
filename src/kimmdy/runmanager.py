@@ -99,7 +99,6 @@ class RunManager:
     """
 
     def __init__(self, config: Config):
-        self.start_time = time.time()
         self.config: Config = config
         self.from_checkpoint: bool = False
         self.tasks: queue.Queue[Task] = queue.Queue()  # tasks from config
@@ -145,24 +144,38 @@ class RunManager:
 
     def run(self):
         logging.info("Start run")
+        self.start_time = time.time()
+        self.current_time = time.time()
 
         if not self.from_checkpoint:
             self._setup_tasks()
 
-        while not (self.state is State.DONE or (self.iteration >= self.config.max_tasks) or self.config.max_tasks == 0):
+        while (
+            self.state is not State.DONE
+            and (
+                self.iteration <= self.config.max_tasks
+                or self.config.max_tasks == 0
+            )
+            and (
+                (self.current_time - self.start_time) / 3600 < self.config.max_hours
+                or self.config.max_hours == 0
+            )
+        ):
             logging.info("Write checkpoint before next task")
             with open(self.cptfile, "wb") as f:
                 dill.dump(self, f)
             next(self)
+            self.current_time = time.time()
+            logging.info("Done with:")
+            logging.info(f"task: {self.iteration}, max: {self.config.max_tasks}")
+            logging.info(f"hours: {(self.current_time - self.start_time) / 360}, max: {self.config.max_hours}")
 
         logging.info(
-            f"Finished running tasks, state: {self.state}, "
-            f"iteration:{self.iteration}, max:{self.config.max_tasks}"
+            f"Finished running tasks, state: {self.state}"
         )
 
     def _setup_tasks(self):
-        """allows for mapping one config entry to multiple tasks
-        """
+        """allows for mapping one config entry to multiple tasks"""
         logging.info("Build task list")
         for entry in self.config.sequence:
             if entry in self.config.mds.get_attributes():
@@ -184,10 +197,7 @@ class RunManager:
         self._setup_tasks()
         with open(self.cptfile, "wb") as f:
             dill.dump(self, f)
-        logging.info(
-            f"Wrote checkpointfile to: {self.cptfile}, "
-        )
-
+        logging.info(f"Wrote checkpointfile to: {self.cptfile}, ")
 
     def get_latest(self, suffix: str):
         """Returns path to latest file of given type.

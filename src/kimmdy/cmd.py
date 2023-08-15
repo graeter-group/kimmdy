@@ -4,6 +4,7 @@ Also initialized logging and configuration.
 """
 import argparse
 import logging
+from os import chmod
 from pathlib import Path
 import textwrap
 import dill
@@ -13,6 +14,7 @@ from kimmdy.runmanager import RunManager
 from kimmdy.utils import check_gmx_version, increment_logfile
 import importlib.resources as pkg_resources
 import sys
+from glob import glob
 
 if sys.version_info > (3, 10):
     from importlib_metadata import version
@@ -185,7 +187,7 @@ def _run(args: argparse.Namespace):
         # modules.sh might load lmod modules, set environment variables, etc.
         source ./_modules.sh
 
-        CYCLE=20
+        CYCLE=24
 
         START=$(date +"%s")
 
@@ -209,17 +211,20 @@ def _run(args: argparse.Namespace):
           exit 2
         fi
         """
-        with open("jobscript.sh", "w") as f:
+        path = "jobscript.sh"
+        with open(path, "w") as f:
             f.write(textwrap.dedent(content))
+
+        # TODO: make executable
+        # chmod(path, ...)
 
         exit()
 
     if args.from_latest_checkpoint:
         config = Config(args.input)
-        name: str = config.name
-        cpt = "_kimmdy.cpt"
-        args.checkpoint = cpt
-        exit()
+        cpts = glob(f"{config.name}*kimmdy.cpt")
+        cpts.sort()
+        args.checkpoint = cpts[-1]
 
     if args.checkpoint:
         logging.info("KIMMDY is starting from a checkpoint.")

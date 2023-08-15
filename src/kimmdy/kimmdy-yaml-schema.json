@@ -32,6 +32,12 @@
       "pytype": "int",
       "default": 0
     },
+    "max_hours": {
+      "description": "Stop KIMMDY after max_hours hours. Set this lower than the limit of your HPC cluster for use with a re-submit jobscript. 0 Means no limit.",
+      "type": "integer",
+      "pytype": "int",
+      "default": 0
+    },
     "run": {
       "description": "Replica number",
       "type": "integer",
