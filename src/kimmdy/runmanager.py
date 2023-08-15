@@ -263,6 +263,7 @@ class RunManager:
 
     def _run_md(self, instance, files) -> TaskFiles:
         """General MD simulation"""
+        logger = files.logger
         logger.info(f"Start MD {instance}")
         self.state = State.MD
 
@@ -342,6 +343,7 @@ class RunManager:
         return
 
     def _query_reaction(self, reaction_plugin, files):
+        logger = files.logger
         logger.info(f"Start query {reaction_plugin.name}")
 
         self.recipe_collection.recipes.extend(
@@ -354,6 +356,11 @@ class RunManager:
     def _decide_recipe(
         self, decision_strategy: Callable[[RecipeCollection], KMCResult], files=None
     ):
+        if files is None: 
+            global logger
+        else:
+            logger = files.logger
+
         logger.info("Decide on a recipe")
         logger.debug(f"Available reaction results: {self.recipe_collection}")
         decision_d = decision_strategy(self.recipe_collection)
@@ -382,6 +389,7 @@ class RunManager:
         return
 
     def _run_recipe(self, files) -> TaskFiles:
+        logger = files.logger
         logger.info(f"Start Recipe in KIMMDY iteration {self.iteration}")
         logger.info(f"Recipe: {self.recipe.get_recipe_name()}")
 
