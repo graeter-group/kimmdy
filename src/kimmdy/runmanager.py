@@ -16,6 +16,7 @@ from kimmdy.config import Config
 from kimmdy.utils import increment_logfile
 from kimmdy.parsing import read_top, write_json
 from kimmdy.reaction import ReactionPlugin, RecipeCollection, RecipeStep
+from kimmdy.parameterize import BasicParameterizer
 import kimmdy.changemanager as changer
 from kimmdy.tasks import Task, TaskFiles, TaskMapping
 from kimmdy.utils import run_shell_cmd, run_gmx
@@ -118,9 +119,12 @@ class RunManager:
             self.config.ffpatch = None
         self.top = Topology(read_top(self.config.top), self.config.ffpatch)
         try:
-            self.parameterizer = parameterization_plugins[
-                self.config.changer.topology.parameterization
-            ]()
+            if self.config.changer.topology.parameterization == "basic":
+                self.parameterizer = BasicParameterizer()
+            else:
+                self.parameterizer = parameterization_plugins[
+                    self.config.changer.topology.parameterization
+                ]()
         except KeyError as e:
             raise KeyError(
                 f"The parameterization tool chosen in the configuration file: '{self.config.changer.topology.parameterization}' can not be found in the parameterization plugins: {list(parameterization_plugins.keys())}"

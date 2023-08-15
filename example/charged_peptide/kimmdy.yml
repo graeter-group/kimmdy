@@ -22,7 +22,7 @@ changer:
   coordinates:
     md_parameter_growth: 'relax'    
   topology:
-    parameterization: 'grappa' 
+    parameterization: 'basic' 
 reactions:
   homolysis:
     edis: 'edissoc.dat'

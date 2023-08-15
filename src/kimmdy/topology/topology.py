@@ -617,9 +617,7 @@ class Topology:
                     continue
 
                 residue_atomnames_current = [
-                    atom.atom
-                    for atom in self.atoms.values()
-                    if atom.resnr == other_atom.resnr
+                    a.atom for a in self.atoms.values() if a.resnr == other_atom.resnr
                 ]
                 type_set = False
                 for key, bond in aa.bonds.items():
@@ -630,7 +628,10 @@ class Topology:
                             h_name = bond.atom1
 
                         atom.type = aa.atoms[h_name].type
-                        if not h_name in residue_atomnames_current:
+                        if (
+                            not h_name in residue_atomnames_current
+                            or h_name == atom.atom
+                        ):
                             atom.atom = h_name
                         else:
                             atom.atom = "HX"

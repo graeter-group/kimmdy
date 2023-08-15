@@ -193,8 +193,8 @@ def apply_parameters(top: Topology, parameters: dict):
                     top.improper_dihedrals[tup] = Dihedral(
                         *tup,
                         funct="4",
-                        c0=parameters["proper"]["phases"][i][ii],
-                        c1=parameters["proper"]["ks"][i][ii],
+                        c0=parameters["improper"]["phases"][i][ii],
+                        c1=parameters["improper"]["ks"][i][ii],
                         periodicity=n,
                     )
                 else:

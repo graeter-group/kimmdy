@@ -10,13 +10,9 @@ class Parameterizer(ABC):
         pass
 
 
-class DefaultParameterizer(Parameterizer):
-    """default for parameter patch: reconstruct base force field state"""
+class BasicParameterizer(Parameterizer):
+    """reconstruct base force field state"""
 
-    def parameterize_topology(self, current_topology):
-        raise NotImplementedError
-        # ToDo:
-        # use aminoacids.rtp from top.ff
-        # check atomtypes & connectivity (bonds)
-        # build angle, proper, improper terms
-        # update dicts
+    def parameterize_topology(self, current_topology: Topology) -> None:
+        # all necessary actions should already have happened in bind_bond and break_bond of Topology
+        pass

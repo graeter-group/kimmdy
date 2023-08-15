@@ -487,8 +487,9 @@ class TestHexalaTopology:
         # inspect HAT hydrogen
         h = top.atoms["34"]
         assert h.is_radical == False
-        # keeps name
-        assert h.atom == "HB3"
+        # changes name to 'HX' because HA already exists
+        # could be smart to change this behavior to get HA1 and HA2 in this case
+        assert h.atom == "HX"
         # changes type
         assert h.type == "H1"
         assert h.residue == "ALA"

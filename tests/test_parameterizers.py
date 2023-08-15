@@ -6,6 +6,7 @@ from grappa_interface import (
 )
 from kimmdy.topology.topology import Topology
 from copy import deepcopy
+import numpy as np
 
 # from kimmdy.parsing import write_json, read_json
 # import json
@@ -57,7 +58,9 @@ def test_generate_input(generic_topology):
 
 
 def test_clean_parameters(generic_parameter_output):
-    clean_parameters(generic_parameter_output)
+    parameter_prepared = deepcopy(generic_parameter_output)
+    parameter_prepared["angle_k"] = np.array(parameter_prepared["angle_k"])
+    clean_parameters(parameter_prepared)
     pass
 
 
@@ -83,7 +86,7 @@ def test_apply_parameters(generic_topology):
             "idxs": [["17", "16", "18", "21"]],
             "phases": [["20.0"]],
             "ks": [["0.0"]],
-            "ns": [["2"]],
+            "ns": [["1"]],
         },
         "improper": {
             "idxs": [["18", "14", "16", "17"]],
@@ -96,21 +99,30 @@ def test_apply_parameters(generic_topology):
     apply_parameters(generic_topology, parameters_clean)
 
     assert isinstance(generic_topology, Topology)
-    assert generic_topology.atoms[
-        str(parameters_clean["atom"]["idxs"][0])
-    ].charge == str(parameters_clean["atom"]["q"][0])
-    assert generic_topology.bonds[
-        tuple(str(x) for x in parameters_clean["bond"]["idxs"][0])
-    ].c1 == str(parameters_clean["bond"]["k"][0])
-    assert generic_topology.angles[
-        tuple(str(x) for x in parameters_clean["angle"]["idxs"][0])
-    ].c0 == str(parameters_clean["angle"]["eq"][0])
-    assert generic_topology.proper_dihedrals[
-        tuple(str(x) for x in parameters_clean["proper"]["idxs"][0])
-    ].dihedrals["2"].c0 == str(parameters_clean["proper"]["phases"][0][0])
-    assert generic_topology.improper_dihedrals[
-        tuple(["14", "18", "16", "17"])
-    ].c0 == str(parameters_clean["improper"]["phases"][0][0])
+    assert (
+        generic_topology.atoms[parameters_clean["atom"]["idxs"][0]].charge
+        == parameters_clean["atom"]["q"][0]
+    )
+    assert (
+        generic_topology.bonds[tuple(parameters_clean["bond"]["idxs"][0])].c1
+        == parameters_clean["bond"]["k"][0]
+    )
+    assert (
+        generic_topology.angles[tuple(parameters_clean["angle"]["idxs"][0])].c0
+        == parameters_clean["angle"]["eq"][0]
+    )
+    assert (
+        generic_topology.proper_dihedrals[tuple(parameters_clean["proper"]["idxs"][0])]
+        .dihedrals["1"]
+        .c0
+        == parameters_clean["proper"]["phases"][0][0]
+    )
+    assert (
+        generic_topology.improper_dihedrals[
+            tuple(parameters_clean["improper"]["idxs"][0])
+        ].c1
+        == parameters_clean["improper"]["ks"][0][0]
+    )
 
 
 def test_parameterize_topology(generic_topology):
