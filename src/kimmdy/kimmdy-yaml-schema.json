@@ -215,6 +215,18 @@
           "$ref": "../../plugins/default_reactions/src/dummyreaction/kimmdy-yaml-schema.json"
         }
       }
+    },
+    "plot_rates" : {
+      "description": "Plot the reaction rates",
+      "type": "boolean",
+      "pytype": "bool",
+      "default": false
+    },
+    "save_recipes" : {
+      "description": "Save recipes as csv during `decide_reaction`",
+      "type": "boolean",
+      "pytype": "bool",
+      "default": false
     }
   },
   "required": ["name", "sequence" ]

@@ -1,5 +1,55 @@
 # Changelog
 
+## [4.0.1](https://github.com/hits-mbm-dev/kimmdy/compare/v4.0.0...v4.0.1) (2023-08-11)
+
+
+### Documentation
+
+* **ci:** add docs build workflow ([#190](https://github.com/hits-mbm-dev/kimmdy/issues/190)) ([#198](https://github.com/hits-mbm-dev/kimmdy/issues/198)) ([5fdec0b](https://github.com/hits-mbm-dev/kimmdy/commit/5fdec0b4903a578abd2fe75cfadfc9b842168be1))
+* **dev:** add information for developers about conventional commits ([5fdec0b](https://github.com/hits-mbm-dev/kimmdy/commit/5fdec0b4903a578abd2fe75cfadfc9b842168be1))
+
+## [4.0.0](https://github.com/hits-mbm-dev/kimmdy/compare/v3.6.0...v4.0.0) (2023-08-11)
+
+
+### ⚠ BREAKING CHANGES
+
+* **ci:** does this work?
+
+### Features
+
+* **ci:** update encode to support unicode ([d9f16ad](https://github.com/hits-mbm-dev/kimmdy/commit/d9f16adb7470479a9e700ffd86597784caa2afe7))
+* **ci:** what if this doesn't have a body? ([d9f16ad](https://github.com/hits-mbm-dev/kimmdy/commit/d9f16adb7470479a9e700ffd86597784caa2afe7))
+* this is a release-please test ([d9f16ad](https://github.com/hits-mbm-dev/kimmdy/commit/d9f16adb7470479a9e700ffd86597784caa2afe7))
+
+
+### Bug Fixes
+
+* **ci:** or this? ([d9f16ad](https://github.com/hits-mbm-dev/kimmdy/commit/d9f16adb7470479a9e700ffd86597784caa2afe7))
+* **ci:** release please adds all the things ([d9f16ad](https://github.com/hits-mbm-dev/kimmdy/commit/d9f16adb7470479a9e700ffd86597784caa2afe7))
+
+## [3.6.0](https://github.com/hits-mbm-dev/kimmdy/compare/v3.5.1...v3.6.0) (2023-08-11)
+
+
+### Features
+
+* Analysis Module ([#176](https://github.com/hits-mbm-dev/kimmdy/issues/176)) ([f37d6c8](https://github.com/hits-mbm-dev/kimmdy/commit/f37d6c8fecc97c4f256c4992d63ceaf68633629c))
+* **ci:** run test on PR with testthis label ([072b4bf](https://github.com/hits-mbm-dev/kimmdy/commit/072b4bf2d9b8a0d8f9bbddede28701d59b79f6bf))
+
+
+### Bug Fixes
+
+* [#185](https://github.com/hits-mbm-dev/kimmdy/issues/185) find gromacs data dir in docker container ([#191](https://github.com/hits-mbm-dev/kimmdy/issues/191)) ([7c0b90c](https://github.com/hits-mbm-dev/kimmdy/commit/7c0b90cec39c625f780024ec0e766481113a274d))
+* **ci:** use correct event context variable ([33003a9](https://github.com/hits-mbm-dev/kimmdy/commit/33003a93be90470306410071f42a5b3cd880afe0))
+* don't run tests on pr twice ([7957269](https://github.com/hits-mbm-dev/kimmdy/commit/79572694e360db4e528a122afecfd2f61b106f6d))
+* fix [#187](https://github.com/hits-mbm-dev/kimmdy/issues/187) ([587c426](https://github.com/hits-mbm-dev/kimmdy/commit/587c426621cb9b403bed23ff008f5e3039e628f4))
+* merge issues ([5880dbb](https://github.com/hits-mbm-dev/kimmdy/commit/5880dbb67ae029a827dca77222b84a0c9e653cf1))
+* plumed_mod updating ([3f815a2](https://github.com/hits-mbm-dev/kimmdy/commit/3f815a21b00aa0b7e3556ad9159c8f84e0b95b2b))
+* register pytest mark properly ([6c56ed9](https://github.com/hits-mbm-dev/kimmdy/commit/6c56ed9892a9fe72b83e21b9da5c286289ad8df1))
+* remove unused tests ([8632f8b](https://github.com/hits-mbm-dev/kimmdy/commit/8632f8b5bf7fcd3f3da8b5090b01f2d115d897a9))
+* test releases in separate workflow to get easy link for a badge ([0a3e11c](https://github.com/hits-mbm-dev/kimmdy/commit/0a3e11cd6d08d35dfd7b8c781ecf9f07e3614b01))
+* tests compatible with local gh act ([71d8204](https://github.com/hits-mbm-dev/kimmdy/commit/71d8204c60e9134af21663c8fc6abe7a05a06c8c))
+* trigger workflow ([e86dccd](https://github.com/hits-mbm-dev/kimmdy/commit/e86dccd13fd06be4f27a4265df1b0d4b0fb7f399))
+
 ## [3.5.1](https://github.com/hits-mbm-dev/kimmdy/compare/v3.5.0...v3.5.1) (2023-08-08)
 
 

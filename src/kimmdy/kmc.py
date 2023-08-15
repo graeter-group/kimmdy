@@ -12,7 +12,7 @@ import logging
 import numpy as np
 from dataclasses import dataclass
 from numpy.random import default_rng
-from kimmdy.reaction import RecipeCollection, RecipeStep
+from kimmdy.reaction import RecipeCollection, Recipe
 
 
 @dataclass
@@ -21,17 +21,21 @@ class KMCResult:
 
     Attributes
     ----------
-    recipe_steps :
+    recipe : kimmdy.reaction.Recipe
         Single sequence of RecipeSteps to build product
-    reaction_probability :
+    reaction_probability : Union[list[float], None]
         Integral of reaction propensity with respect to time
-    time_step :
-        Time step during which the reaction occurs [ps]
+    time_delta : Union[float, None]
+        MC time jump during which the reaction occurs [ps]
+    time_start : Union[float, None]
+        Time, from which the reaction starts. The reaction changes the
+        geometry/topology of this timestep and continues from there.
     """
 
-    recipe_steps: Union[list[RecipeStep], None] = None
+    recipe: Union[Recipe, None] = None
     reaction_probability: Union[list[float], None] = None
-    time_step: Union[float, None] = None
+    time_delta: Union[float, None] = None
+    time_start: Union[float, None] = None
 
 
 def rf_kmc(
@@ -78,12 +82,13 @@ def rf_kmc(
     recipe = recipe_collection.recipes[pos]
     logging.info(f"Chosen Recipe: {recipe}")
     # 5. Calculate the time step associated with mu
-    time_step = 1 / probability_sum * np.log(1 / u[1])
+    time_delta = 1 / probability_sum * np.log(1 / u[1])
 
     return KMCResult(
-        recipe_steps=recipe.recipe_steps,
+        recipe=recipe,
         reaction_probability=reaction_probability,
-        time_step=time_step,
+        time_delta=time_delta,
+        time_start=0,
     )
 
 
@@ -107,6 +112,12 @@ def frm(
         time [ps] to compare conformational events with reaction events in the time domain
     """
 
+    # TODO:
+    # Currently, this looks at the complete traj and says something happens in this
+    # integral or not. It should split it into smaller junks, since the rates
+    # fluctuate. Then, still a whole integral is accepted, but one integral does not
+    # contain many different conformations.
+
     # check for empty ReactionResult
     if len(recipe_collection.recipes) == 0:
         logging.warning("Empty ReactionResult; no reaction chosen")
@@ -114,7 +125,8 @@ def frm(
 
     # 0. Initialization
     reaction_probability = []
-    recipes_steps = [["MD"]] if MD_time else []
+    # empty recipe for continuing the MD
+    recipes = [Recipe([], [], [])] if MD_time else []
     tau = [MD_time] if MD_time else []
     # conformational change is an event that occurs during MD time
     # 1. Generate M independent uniform (0,1) random numbers
@@ -132,12 +144,12 @@ def frm(
             # this means a reaction will take place during the defined time
             pos_time = np.searchsorted(cumulative_probability, p)
             tau.append(recipe.timespans[pos_time][1])
-            recipes_steps.append(recipe.recipe_steps)
+            recipes.append(recipe)
     # 4. Find the event whose putative time is least
     try:
         pos_event = np.argmin(tau)
-        chosen_steps = recipes_steps[pos_event]
-        time_step = tau[pos_event]
+        chosen_recipe = recipes[pos_event]
+        time_delta = tau[pos_event]
     except ValueError:
         logging.warning(
             f"FRM recipe selection did not work, probably tau: {tau} is empty."
@@ -145,7 +157,8 @@ def frm(
         return KMCResult()
 
     return KMCResult(
-        recipe_steps=chosen_steps,
+        recipe=chosen_recipe,
         reaction_probability=reaction_probability,
-        time_step=time_step,
+        time_delta=time_delta,
+        time_start=0,
     )
