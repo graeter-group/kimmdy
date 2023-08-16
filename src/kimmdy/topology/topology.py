@@ -144,7 +144,7 @@ class Topology:
         self._update_dict()
         return self.top
 
-    def __repr__(self) -> str:
+    def __str__(self) -> str:
         return textwrap.dedent(
             f"""\
         Topology with
@@ -156,6 +156,21 @@ class Topology:
         {len(self.improper_dihedrals)} improper dihedrals
         """
         )
+
+    def __repr__(self) -> str:
+        self._update_dict()
+        return f"Topology({self.top})"
+
+    def _repr_pretty_(self, p, cycle):
+        """A __repr__ for ipython.
+
+        This whill be used if just the name of the object is entered in the ipython shell
+        or a jupyter notebook.
+        
+        p is an instance of IPython.lib.pretty.RepresentationPrinter
+        <https://ipython.org/ipython-doc/3/api/generated/IPython.lib.pretty.html#IPython.lib.pretty.PrettyPrinter>
+        """
+        p.text(str(self))
 
     def reindex_atomnrs(self):
         """Reindex atom numbers in topology.
@@ -273,8 +288,6 @@ class Topology:
             new_pairs[(update_map[pair.ai], update_map[pair.aj])] = pair
         self.pairs = new_pairs
 
-    def __str__(self) -> str:
-        return str(self.atoms)
 
     def _parse_atoms(self):
         """Parse atoms from topology dictionary."""
