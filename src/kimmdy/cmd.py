@@ -145,6 +145,36 @@ def get_analysis_cmdline_args():
     return parser.parse_args()
 
 
+def get_remove_hydrogen_cmdline_args():
+    """
+    parse cmdline args for remove_hydrogen
+    """
+    parser = argparse.ArgumentParser(
+        description="Welcome to the KIMMDY remove hydrogen module",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+    parser.add_argument("gro", help="GROMACS gro file")
+    parser.add_argument("top", help="GROMACS top file")
+    parser.add_argument(
+        "nr", help="Atom number as indicated in the GROMACS gro and top file"
+    )
+    parser.add_argument(
+        "-p",
+        "--parameterize",
+        action="store_true",
+        help="Parameterize topology with grappa after removing hydrogen.",
+        default=False,
+    )
+    parser.add_argument(
+        "-e",
+        "--equilibrate",
+        action="store_true",
+        help="Do a minimization and equilibration with GROMACS. Uses mdp files from kimmdy assets.",
+        default=False,
+    )
+    return parser.parse_args()
+
+
 def configure_logging(args: argparse.Namespace, color=False):
     """Configure logging.
 
@@ -313,6 +343,14 @@ def analysis():
         radical_population(args)
     elif args.module == "plot_rates":
         plot_rates(args)
+
+
+def remove_hydrogen():
+    """Remove hydrogen by atom nr in a gro and topology file"""
+    args = get_remove_hydrogen_cmdline_args()
+    from kimmdy.tools import remove_hydrogen
+
+    remove_hydrogen(args)
 
 
 def kimmdy():
