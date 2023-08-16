@@ -358,6 +358,7 @@ class RunManager:
         )
         self.recipe_collection.aggregate_reactions()
 
+        logger.info(f"Recipes recived from {reaction_plugin.name}")
         return files
 
     def _decide_recipe(
@@ -368,8 +369,9 @@ class RunManager:
         else:
             logger = files.logger
 
-        logger.info("Decide on a recipe")
-        logger.debug(f"Available reaction results: {self.recipe_collection}")
+        logger.info(
+            f"Decide on a recipe from {len(self.recipe_collection.recipes)} available"
+        )
         decision_d = decision_strategy(self.recipe_collection)
         self.recipe = decision_d.recipe
 
