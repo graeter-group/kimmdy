@@ -55,6 +55,7 @@ class Config:
         recursive_dict: dict | None = None,
         scheme: dict | None = None,
         section: str = "config",
+        no_increment_output_dir: bool = False,
     ):
         # failure case: no input file and no values from dictionary
         if input_file is None and recursive_dict is None:
@@ -142,9 +143,9 @@ class Config:
 
         # validate on initial construction
         if section == "config":
-            self._validate()
+            self._validate(no_increment_output_dir=no_increment_output_dir)
 
-    def _validate(self, section: str = "config"):
+    def _validate(self, section: str = "config", no_increment_output_dir: bool = False):
         """Validates config."""
         logging.info(f"Validating Config")
         logging.info(f"Validating Config, section {section}")
@@ -201,7 +202,7 @@ class Config:
                 self.out = self.cwd / self.name
 
             # make sure self.out is empty
-            while self.out.exists():
+            while not no_increment_output_dir and self.out.exists():
                 logging.debug(f"Output dir {self.out} exists, incrementing name")
                 out_end = self.out.name[-3:]
                 if out_end.isdigit():
@@ -210,8 +211,9 @@ class Config:
                     )
                 else:
                     self.out = self.out.with_name(self.out.name + "_001")
-            self.out.mkdir()
-            logging.info(f"Created output dir {self.out}")
+            if not no_increment_output_dir:
+                self.out.mkdir()
+                logging.info(f"Created output dir {self.out}")
 
         # individual attributes, recursively
         for name, attr in self.__dict__.items():

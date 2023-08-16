@@ -221,8 +221,11 @@ def _run(args: argparse.Namespace):
         exit()
 
     if args.from_latest_checkpoint:
-        config = Config(args.input)
+        config = Config(args.input, no_increment_output_dir=True)
         cpts = glob(f"{config.name}*kimmdy.cpt")
+        if not cpts:
+            logging.error("No checkpoints found.")
+            exit()
         cpts.sort()
         args.checkpoint = cpts[-1]
 
