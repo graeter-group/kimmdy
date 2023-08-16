@@ -554,9 +554,9 @@ class ReactionPlugin(ABC):
 
     Parameters
     ----------
-    name :
+    name : str
         Name of the reaction
-    runmng :
+    runmng : Runmanager
         RunManager instance
     """
 

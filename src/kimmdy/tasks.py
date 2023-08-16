@@ -42,7 +42,7 @@ class TaskFiles:
     input: dict[str, Path] = field(default_factory=dict)
     output: dict[str, Path] = field(default_factory=dict)
     outputdir: Path = Path()
-    logger: logging.Logger = logging.getLogger("kimmdy")
+    logger: logging.Logger = logging.getLogger("kimmdy.basetask")
 
     def __post_init__(self):
         self.input = AutoFillDict(self.get_latest)
@@ -100,9 +100,7 @@ class Task:
         self.name = self.f.__name__
         self.out = out
 
-        logger.info(
-            f"Init task {self.name}\n\tkwargs: {self.kwargs}\n\tOut: {self.out}"
-        )
+        logger.info(f"Init task {self.name}\tkwargs: {self.kwargs}\tOut: {self.out}")
 
     def __call__(self) -> TaskFiles:
         if self.out is not None:
