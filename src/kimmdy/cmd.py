@@ -215,8 +215,7 @@ def _run(args: argparse.Namespace):
         with open(path, "w") as f:
             f.write(textwrap.dedent(content))
 
-        # TODO: make executable
-        # chmod(path, ...)
+        chmod(path, 0o755)
 
         exit()
 
