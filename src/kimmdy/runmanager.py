@@ -23,6 +23,7 @@ from kimmdy.utils import run_shell_cmd, run_gmx
 from pprint import pformat
 from kimmdy import reaction_plugins, parameterization_plugins
 from kimmdy.topology.topology import Topology
+import time
 from kimmdy.kmc import rf_kmc, KMCResult
 
 logger = logging.getLogger(__name__)
@@ -155,38 +156,58 @@ class RunManager:
         logger.debug(pformat(self.config.__dict__))
 
     def run(self):
-        logger.info("Start run")
-        logger.info("Build task list")
+        logging.info("Start run")
+        self.start_time = time.time()
+        self.current_time = time.time()
 
         if not self.from_checkpoint:
-            # allows for mapping one config entry to multiple tasks
-            for entry in self.config.sequence:
-                if entry in self.config.mds.get_attributes():
-                    task = Task(
-                        self,
-                        f=self.task_mapping["md"],
-                        kwargs={"instance": entry},
-                        out=entry,
-                    )
-                    self.tasks.put(task)
-                else:
-                    for task_kargs in self.task_mapping[entry]:
-                        self.tasks.put(Task(self, **task_kargs))
+            self._setup_tasks()
 
-        while not (
-            self.state is State.DONE
-            or (self.iteration >= self.config.max_tasks)
-            or self.config.max_tasks == 0
+        while (
+            self.state is not State.DONE
+            and (self.iteration <= self.config.max_tasks or self.config.max_tasks == 0)
+            and (
+                (self.current_time - self.start_time) / 3600 < self.config.max_hours
+                or self.config.max_hours == 0
+            )
         ):
-            logger.info("Write checkpoint before next task")
+            logging.info("Write checkpoint before next task")
             with open(self.cptfile, "wb") as f:
                 dill.dump(self, f)
             next(self)
+            self.current_time = time.time()
+            logging.info("Done with:")
+            logging.info(f"task: {self.iteration}, max: {self.config.max_tasks}")
+            logging.info(
+                f"hours: {(self.current_time - self.start_time) / 360}, max: {self.config.max_hours}"
+            )
 
-        logger.info(
-            f"Finished running tasks, state: {self.state}, "
-            f"iteration:{self.iteration}, max:{self.config.max_tasks}"
-        )
+        logging.info(f"Finished running tasks, state: {self.state}")
+
+    def _setup_tasks(self):
+        """allows for mapping one config entry to multiple tasks"""
+        logging.info("Build task list")
+        for entry in self.config.sequence:
+            if entry in self.config.mds.get_attributes():
+                task = self.task_mapping["md"]
+                logging.info(f"Put Task: {task}")
+                self.tasks.put(Task(task, kwargs={"instance": entry}))
+            else:
+                for task in self.task_mapping[entry]:
+                    logging.info(f"Put Task: {task}")
+                    self.tasks.put(Task(task))
+
+    def write_one_checkoint(self):
+        """Just write the first checkpoint and then exit
+
+        Used to generate a starting point for jobscripts on hpc clusters
+        that can easily self-submit after a timelimit was exceeded.
+        """
+        logging.info("Initial setup for first checkpoint")
+        self._setup_tasks()
+        with open(self.cptfile, "wb") as f:
+            dill.dump(self, f)
+        logging.info(f"Wrote checkpointfile to: {self.cptfile}, ")
 
     def get_latest(self, suffix: str):
         """Returns path to latest file of given type.
