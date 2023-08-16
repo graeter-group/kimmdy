@@ -152,10 +152,7 @@ class RunManager:
 
         while (
             self.state is not State.DONE
-            and (
-                self.iteration <= self.config.max_tasks
-                or self.config.max_tasks == 0
-            )
+            and (self.iteration <= self.config.max_tasks or self.config.max_tasks == 0)
             and (
                 (self.current_time - self.start_time) / 3600 < self.config.max_hours
                 or self.config.max_hours == 0
@@ -168,11 +165,11 @@ class RunManager:
             self.current_time = time.time()
             logging.info("Done with:")
             logging.info(f"task: {self.iteration}, max: {self.config.max_tasks}")
-            logging.info(f"hours: {(self.current_time - self.start_time) / 360}, max: {self.config.max_hours}")
+            logging.info(
+                f"hours: {(self.current_time - self.start_time) / 360}, max: {self.config.max_hours}"
+            )
 
-        logging.info(
-            f"Finished running tasks, state: {self.state}"
-        )
+        logging.info(f"Finished running tasks, state: {self.state}")
 
     def _setup_tasks(self):
         """allows for mapping one config entry to multiple tasks"""

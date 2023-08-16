@@ -4,7 +4,7 @@ from pathlib import Path
 
 from kimmdy.reaction import Break, Bind, Move, RecipeStep
 from kimmdy.parsing import read_plumed, read_top
-from kimmdy.changemanager import break_bond_plumed, modify_plumed,modify_coords
+from kimmdy.changemanager import break_bond_plumed, modify_plumed, modify_coords
 from kimmdy.topology.topology import Topology
 from conftest import SlimFiles
 import os
@@ -32,25 +32,27 @@ def test_plumed_break(tmpdir):
     plumed = read_plumed(tmpdir / "plumed_nat.dat")
     plumed_break_ref = read_plumed(tmpdir / "plumed_break29-35.dat")
 
-    breakpair = ('29', '35')
+    breakpair = ("29", "35")
     plumed_break = break_bond_plumed(plumed, breakpair, Path("distances.dat"))
 
     assert plumed_break["distances"] == plumed_break_ref["distances"]
     assert plumed_break["prints"] == plumed_break_ref["prints"]
 
+
 def test_plumed_modify(tmpdir):
-    plumeddat:Path = tmpdir / "plumed_nat.dat"
-    newplumeddat:Path = tmpdir / "plumed_test.dat"
-    recipe_steps = [Break(28,34)]
+    plumeddat: Path = tmpdir / "plumed_nat.dat"
+    newplumeddat: Path = tmpdir / "plumed_test.dat"
+    recipe_steps = [Break(28, 34)]
     plumeddist: Path = Path("distances.dat")
 
-    modify_plumed(recipe_steps,plumeddat,newplumeddat,plumeddist)
+    modify_plumed(recipe_steps, plumeddat, newplumeddat, plumeddist)
 
     plumed_break_ref = read_plumed(tmpdir / "plumed_break29-35.dat")
     plumed_break_test = read_plumed(newplumeddat)
 
     assert plumed_break_test["distances"] == plumed_break_ref["distances"]
     assert plumed_break_test["prints"] == plumed_break_ref["prints"]
+
 
 def test_modify_coords_break(tmpdir):
     steps: list[RecipeStep] = [Break(28, 34)]

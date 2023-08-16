@@ -47,8 +47,15 @@ def get_cmdline_args():
     parser.add_argument(
         "--logfile", "-f", type=str, help="logfile", default="kimmdy.log"
     )
-    parser.add_argument("--checkpoint", "-p", type=str, help="start KIMMDY from a checkpoint file")
-    parser.add_argument("--from-latest-checkpoint", "-c", action="store_true", help="continue. Start KIMMDY from the latest checkpoint file")
+    parser.add_argument(
+        "--checkpoint", "-p", type=str, help="start KIMMDY from a checkpoint file"
+    )
+    parser.add_argument(
+        "--from-latest-checkpoint",
+        "-c",
+        action="store_true",
+        help="continue. Start KIMMDY from the latest checkpoint file",
+    )
     parser.add_argument(
         "--concat",
         type=Path,
@@ -78,10 +85,14 @@ def get_cmdline_args():
 
     # flag to print an example jobscript for slurm hpc clusters
     parser.add_argument(
-        "--generate-jobscript", action="store_true", help=("""
+        "--generate-jobscript",
+        action="store_true",
+        help=(
+            """
         Instead of running KIMMDY directly, generate at jobscript.sh for slurm HPC clusters.
         You can then run this jobscript with sbatch jobscript.sh
-        """)
+        """
+        ),
     )
 
     return parser.parse_args()
@@ -146,7 +157,6 @@ def _run(args: argparse.Namespace):
 
         exit()
 
-
     if args.concat:
         logging.info("KIMMDY will concatenate trrs and exit.")
 
@@ -159,7 +169,6 @@ def _run(args: argparse.Namespace):
     logging.info("Welcome to KIMMDY")
     logging.info("KIMMDY is running with these command line options:")
     logging.info(args)
-
 
     if args.generate_jobscript:
         config = Config(args.input)
@@ -287,7 +296,7 @@ def kimmdy_run(
         concat=concat,
         show_plugins=show_plugins,
         show_schema_path=show_schema_path,
-        generate_jobscript=generate_jobscript
+        generate_jobscript=generate_jobscript,
     )
     _run(args)
     logging.shutdown()
