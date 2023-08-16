@@ -189,13 +189,18 @@ class RunManager:
         logging.info("Build task list")
         for entry in self.config.sequence:
             if entry in self.config.mds.get_attributes():
-                task = self.task_mapping["md"]
+                task = Task(
+                    self,
+                    f=self.task_mapping["md"],
+                    kwargs={"instance": entry},
+                    out=entry,
+                )
+                self.tasks.put(task)
                 logging.info(f"Put Task: {task}")
-                self.tasks.put(Task(task, kwargs={"instance": entry}))
+                self.tasks.put(task)
             else:
-                for task in self.task_mapping[entry]:
-                    logging.info(f"Put Task: {task}")
-                    self.tasks.put(Task(task))
+                for task_kargs in self.task_mapping[entry]:
+                    self.tasks.put(Task(self, **task_kargs))
 
     def write_one_checkoint(self):
         """Just write the first checkpoint and then exit
