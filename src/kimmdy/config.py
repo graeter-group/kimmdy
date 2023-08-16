@@ -11,6 +11,7 @@ from kimmdy import reaction_plugins
 from kimmdy.schema import Sequence, get_combined_scheme
 from kimmdy.utils import get_gmx_dir
 
+logger = logging.getLogger(__name__)
 
 GMX_BUILTIN_FF_DIR = get_gmx_dir() / "top"
 """Path to gromacs data directory with the built-in forcefields."""
@@ -19,7 +20,7 @@ GMX_BUILTIN_FF_DIR = get_gmx_dir() / "top"
 def check_file_exists(p: Path):
     if not p.exists():
         m = "File not found: " + str(p.resolve())
-        logging.error(m)
+        logger.error(m)
         raise LookupError(m)
 
 
@@ -59,7 +60,7 @@ class Config:
         # failure case: no input file and no values from dictionary
         if input_file is None and recursive_dict is None:
             m = "No input file was provided for Config"
-            logging.error(m)
+            logger.error(m)
             raise ValueError(m)
 
         # initial scheme
@@ -72,7 +73,7 @@ class Config:
                 raw = yaml.safe_load(f)
             if raw is None or not isinstance(raw, dict):
                 m = "Could not read input file"
-                logging.error(m)
+                logger.error(m)
                 raise ValueError(m)
             recursive_dict = raw
 
@@ -102,7 +103,7 @@ class Config:
                 opts = scheme.get(k)
                 if opts is None and global_opts is None:
                     m = f"Unknown option {section}.{k} found in config file."
-                    logging.error(m)
+                    logger.error(m)
                     raise ValueError(m)
                 if opts is None:
                     opts = {}
@@ -111,7 +112,7 @@ class Config:
                 pytype = opts.get("pytype")
                 if pytype is None:
                     m = f"No type found for {k}"
-                    logging.error(m)
+                    logger.error(m)
                     raise ValueError(m)
 
                 # cast to type
@@ -130,11 +131,11 @@ class Config:
                 pytype = v.get("pytype")
                 if default is None:
                     m = f"Option required but no default found for {section}.{k}"
-                    logging.debug(m)
+                    logger.debug(m)
                     continue
                 if pytype is None:
                     m = f"No type found for default value of {section}.{k}: {default}"
-                    logging.error(m)
+                    logger.error(m)
                     raise ValueError(m)
                 default = pytype(default)
 
@@ -146,8 +147,8 @@ class Config:
 
     def _validate(self, section: str = "config"):
         """Validates config."""
-        logging.info(f"Validating Config")
-        logging.info(f"Validating Config, section {section}")
+        logger.info(f"Validating Config")
+        logger.info(f"Validating Config, section {section}")
 
         # globals / interconnected
         if section == "config":
@@ -156,7 +157,7 @@ class Config:
             if ffdir == Path("*.ff"):
                 ffs = list(self.cwd.glob("*.ff"))
                 if len(ffs) > 1:
-                    logging.warn(
+                    logger.warn(
                         f"Found {len(ffs)} forcefields in cwd, using first one: {ffs[0]}"
                     )
                 assert ffs[0].is_dir(), "Forcefield should be a directory!"
@@ -166,7 +167,7 @@ class Config:
                 ffdir = GMX_BUILTIN_FF_DIR / ffdir
                 if not ffdir.exists():
                     m = f"Could not find forcefield {ffdir} in cwd or gromacs data directory"
-                    logging.error(m)
+                    logger.error(m)
                     raise AssertionError(m)
             self.ff = ffdir
 
@@ -202,7 +203,7 @@ class Config:
 
             # make sure self.out is empty
             while self.out.exists():
-                logging.debug(f"Output dir {self.out} exists, incrementing name")
+                logger.debug(f"Output dir {self.out} exists, incrementing name")
                 out_end = self.out.name[-3:]
                 if out_end.isdigit():
                     self.out = self.out.with_name(
@@ -211,7 +212,7 @@ class Config:
                 else:
                     self.out = self.out.with_name(self.out.name + "_001")
             self.out.mkdir()
-            logging.info(f"Created output dir {self.out}")
+            logger.info(f"Created output dir {self.out}")
 
         # individual attributes, recursively
         for name, attr in self.__dict__.items():

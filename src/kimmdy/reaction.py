@@ -15,6 +15,8 @@ from pathlib import Path
 import dill
 import csv
 
+logger = logging.getLogger(__name__)
+
 
 class RecipeStep(ABC):
     """Base class for all RecipeSteps.
@@ -368,7 +370,7 @@ class Recipe:
                     name += str(ix)
 
             else:
-                logging.warning(f"get_recipe_name got unknown step type: {type(rs)}")
+                logger.warning(f"get_recipe_name got unknown step type: {type(rs)}")
                 name += "?".join(list(map(str, rs.__dict__.values())))
         return name
 
@@ -500,7 +502,7 @@ class RecipeCollection:
         recipes = np.array(self.recipes)
         idxs = slice(None)
         if len(recipes) > 8:
-            logging.info(
+            logger.info(
                 "More than 8 reactions found, displaying only 8 most likely ones."
             )
             idxs = np.argsort(cumprob)[-8:]
@@ -564,7 +566,7 @@ class ReactionPlugin(ABC):
         # sub config, settings of this specific reaction:
         self.config: Config = self.runmng.config.reactions.__getattribute__(self.name)
 
-        logging.debug(f"Reaction {self.name} instatiated.")
+        logger.debug(f"Reaction {self.name} instatiated.")
 
     @abstractmethod
     def get_recipe_collection(self, files: TaskFiles) -> RecipeCollection:
