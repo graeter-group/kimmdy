@@ -23,7 +23,10 @@ from kimmdy.utils import run_shell_cmd, run_gmx
 from pprint import pformat
 from kimmdy import reaction_plugins, parameterization_plugins
 from kimmdy.topology.topology import Topology
+import time
 from kimmdy.kmc import rf_kmc, KMCResult
+
+logger = logging.getLogger(__name__)
 
 # file types of which there will be multiple files per type
 AMBIGUOUS_SUFFS = ["dat", "xvg", "log", "itp", "mdp"]
@@ -107,8 +110,8 @@ class RunManager:
         self.recipe: Union[Recipe, None] = None
         self.time: float = 0.0  # [ps]
         self.latest_files: dict[str, Path] = get_existing_files(config)
-        logging.debug("Initialized latest files:")
-        logging.debug(pformat(self.latest_files))
+        logger.debug("Initialized latest files:")
+        logger.debug(pformat(self.latest_files))
         self.histfile: Path = increment_logfile(Path(f"{self.config.out}_history.log"))
         self.cptfile: Path = increment_logfile(Path(f"{self.config.out}_kimmdy.cpt"))
 
@@ -143,48 +146,73 @@ class RunManager:
         # Instantiate reactions
         self.reaction_plugins: list[ReactionPlugin] = []
         react_names = self.config.reactions.get_attributes()
-        # logging.info("Instantiating Reactions:", *react_names)
+        # logger.info("Instantiating Reactions:", *react_names)
         for rp_name in react_names:
             r = reaction_plugins[rp_name]
             reaction_plugin: ReactionPlugin = r(rp_name, self)
             self.reaction_plugins.append(reaction_plugin)
 
-        logging.debug("Configuration from input file:")
-        logging.debug(pformat(self.config.__dict__))
+        logger.debug("Configuration from input file:")
+        logger.debug(pformat(self.config.__dict__))
 
     def run(self):
         logging.info("Start run")
-        logging.info("Build task list")
+        self.start_time = time.time()
+        self.current_time = time.time()
 
         if not self.from_checkpoint:
-            # allows for mapping one config entry to multiple tasks
-            for entry in self.config.sequence:
-                if entry in self.config.mds.get_attributes():
-                    task = Task(
-                        self,
-                        f=self.task_mapping["md"],
-                        kwargs={"instance": entry},
-                        out=entry,
-                    )
-                    self.tasks.put(task)
-                else:
-                    for task_kargs in self.task_mapping[entry]:
-                        self.tasks.put(Task(self, **task_kargs))
+            self._setup_tasks()
 
-        while not (
-            self.state is State.DONE
-            or (self.iteration >= self.config.max_tasks)
-            or self.config.max_tasks == 0
+        while (
+            self.state is not State.DONE
+            and (self.iteration <= self.config.max_tasks or self.config.max_tasks == 0)
+            and (
+                (self.current_time - self.start_time) / 3600 < self.config.max_hours
+                or self.config.max_hours == 0
+            )
         ):
             logging.info("Write checkpoint before next task")
             with open(self.cptfile, "wb") as f:
                 dill.dump(self, f)
             next(self)
+            self.current_time = time.time()
+            logging.info("Done with:")
+            logging.info(f"task: {self.iteration}, max: {self.config.max_tasks}")
+            logging.info(
+                f"hours: {(self.current_time - self.start_time) / 360}, max: {self.config.max_hours}"
+            )
 
-        logging.info(
-            f"Finished running tasks, state: {self.state}, "
-            f"iteration:{self.iteration}, max:{self.config.max_tasks}"
-        )
+        logging.info(f"Finished running tasks, state: {self.state}")
+
+    def _setup_tasks(self):
+        """allows for mapping one config entry to multiple tasks"""
+        logging.info("Build task list")
+        for entry in self.config.sequence:
+            if entry in self.config.mds.get_attributes():
+                task = Task(
+                    self,
+                    f=self.task_mapping["md"],
+                    kwargs={"instance": entry},
+                    out=entry,
+                )
+                self.tasks.put(task)
+                logging.info(f"Put Task: {task}")
+                self.tasks.put(task)
+            else:
+                for task_kargs in self.task_mapping[entry]:
+                    self.tasks.put(Task(self, **task_kargs))
+
+    def write_one_checkoint(self):
+        """Just write the first checkpoint and then exit
+
+        Used to generate a starting point for jobscripts on hpc clusters
+        that can easily self-submit after a timelimit was exceeded.
+        """
+        logging.info("Initial setup for first checkpoint")
+        self._setup_tasks()
+        with open(self.cptfile, "wb") as f:
+            dill.dump(self, f)
+        logging.info(f"Wrote checkpointfile to: {self.cptfile}, ")
 
     def get_latest(self, suffix: str):
         """Returns path to latest file of given type.
@@ -192,14 +220,14 @@ class RunManager:
         For .dat files (in general ambiguous extensions) use full file name.
         Errors if file is not found.
         """
-        logging.debug("Getting latest suffix: " + suffix)
+        logger.debug("Getting latest suffix: " + suffix)
         try:
             path = self.latest_files[suffix]
-            logging.debug("Found: " + str(path))
+            logger.debug("Found: " + str(path))
             return path
         except Exception:
             m = f"File {suffix} requested but not found!"
-            logging.error(m)
+            logger.error(m)
             raise FileNotFoundError(m)
 
     def __iter__(self):
@@ -214,9 +242,9 @@ class RunManager:
         else:
             task = self.tasks.get()
         if self.config.dryrun:
-            logging.info(f"Pretend to run: {task.name} with args: {task.kwargs}")
+            logger.info(f"Pretend to run: {task.name} with args: {task.kwargs}")
             return
-        logging.info("Starting task: " + pformat(task))
+        logger.info("Starting task: " + pformat(task))
         files = task()
         self._discover_output_files(task.name, files)
 
@@ -239,7 +267,7 @@ class RunManager:
                             "did not define with which to continue!\n"
                             f"Task {taskname}, Suffix {suff} found {c} times"
                         )
-                        logging.error(e)
+                        logger.error(e)
                         raise RuntimeError(e)
 
             for path in files.outputdir.iterdir():
@@ -250,32 +278,33 @@ class RunManager:
                     continue
                 files.output[suffix] = files.outputdir / path
 
-            logging.debug("Update latest files with: ")
-            logging.debug(pformat(files.output))
+            logger.debug("Update latest files with: ")
+            logger.debug(pformat(files.output))
             self.latest_files.update(files.output)
-            logging.debug("Append to file history")
+            logger.debug("Append to file history")
             self.filehist.append({taskname: files})
 
-            logging.info(f"Current task files:")
+            logger.info(f"Current task files:")
             m = f"""
             Task: {taskname} with output directory: {files.outputdir}
             Task: {taskname}, input:\n{pformat(files.input)}
             Task: {taskname}, output:\n{pformat(files.output)}
             """
-            logging.info(m)
+            logger.info(m)
             with open(self.histfile, "a") as f:
                 f.write(m)
 
     def _run_md(self, instance, files) -> TaskFiles:
         """General MD simulation"""
-        logging.info(f"Start MD {instance}")
+        logger = files.logger
+        logger.info(f"Start MD {instance}")
         self.state = State.MD
 
         md_config = self.config.mds.attr(instance)
         gmx_alias = self.config.gromacs_alias
         gmx_mdrun_flags = self.config.gmx_mdrun_flags
 
-        logging.warning(self.latest_files)
+        logger.warning(self.latest_files)
         top = files.input["top"]
         gro = files.input["gro"]
         mdp = md_config.mdp
@@ -317,16 +346,16 @@ class RunManager:
 
         # specify trr to prevent rotref trr getting set as standard trr
         files.output["trr"] = files.outputdir / f"{instance}.trr"
-        logging.debug(f"grompp cmd: {grompp_cmd}")
-        logging.debug(f"mdrun cmd: {mdrun_cmd}")
+        logger.debug(f"grompp cmd: {grompp_cmd}")
+        logger.debug(f"mdrun cmd: {mdrun_cmd}")
         run_gmx(grompp_cmd, outputdir)
         run_gmx(mdrun_cmd, outputdir)
 
-        logging.info(f"Done with MD {instance}")
+        logger.info(f"Done with MD {instance}")
         return files
 
     def _place_reaction_tasks(self):
-        logging.info("Query reactions")
+        logger.info("Query reactions")
         self.state = State.REACTION
         # empty list for every new round of queries
         self.recipe_collection: RecipeCollection = RecipeCollection([])
@@ -343,24 +372,32 @@ class RunManager:
                 )
             )
 
-        logging.info(f"Queued {len(self.reaction_plugins)} reaction plugin(s)")
+        logger.info(f"Queued {len(self.reaction_plugins)} reaction plugin(s)")
         return
 
     def _query_reaction(self, reaction_plugin, files):
-        logging.info(f"Start query {reaction_plugin.name}")
+        logger = files.logger
+        logger.info(f"Start query {reaction_plugin.name}")
 
         self.recipe_collection.recipes.extend(
             reaction_plugin.get_recipe_collection(files).recipes
         )
         self.recipe_collection.aggregate_reactions()
 
+        logger.info(f"Recipes recived from {reaction_plugin.name}")
         return files
 
     def _decide_recipe(
         self, decision_strategy: Callable[[RecipeCollection], KMCResult], files=None
     ):
-        logging.info("Decide on a recipe")
-        logging.debug(f"Available reaction results: {self.recipe_collection}")
+        if files is None:
+            global logger
+        else:
+            logger = files.logger
+
+        logger.info(
+            f"Decide on a recipe from {len(self.recipe_collection.recipes)} available"
+        )
         decision_d = decision_strategy(self.recipe_collection)
         self.recipe = decision_d.recipe
 
@@ -377,27 +414,28 @@ class RunManager:
                     kwargs["highlight_t"] = decision_d.time_start
                 self.recipe_collection.plot(**kwargs)
         except Exception as e:
-            logging.warning(f"Error occured during plotting:\n{e}")
+            logger.warning(f"Error occured during plotting:\n{e}")
 
         if decision_d.time_delta:
             self.time += decision_d.time_delta
-        logging.info(
+        logger.info(
             f"Chosen recipe is: {self.recipe.get_recipe_name()} at time {self.time}"
         )
         return
 
     def _run_recipe(self, files) -> TaskFiles:
-        logging.info(f"Start Recipe in KIMMDY iteration {self.iteration}")
-        logging.info(f"Recipe: {self.recipe.get_recipe_name()}")
+        logger = files.logger
+        logger.info(f"Start Recipe in KIMMDY iteration {self.iteration}")
+        logger.info(f"Recipe: {self.recipe.get_recipe_name()}")
 
         recipe_steps = self.recipe.recipe_steps
         files.output = {"top": files.outputdir / "topol_mod.top"}
-        logging.debug(f"Chose recipe steps: {recipe_steps}")
+        logger.debug(f"Chose recipe steps: {recipe_steps}")
 
         # changes to topology
         top_prev = deepcopy(self.top)
         changer.modify_top(recipe_steps, files, self.top, self.parameterizer)
-        logging.info(f'Wrote new topology to {files.output["top"].parts[-3:]}')
+        logger.info(f'Wrote new topology to {files.output["top"].parts[-3:]}')
 
         # changes to plumed.dat
         if "plumed.dat" in self.latest_files:
@@ -408,7 +446,7 @@ class RunManager:
                 files.output["plumed.dat"],
                 files.input["distances.dat"],
             )
-            logging.info(
+            logger.info(
                 f'Wrote new plumedfile to {files.output["plumed.dat"].parts[-3:]}'
             )
 
@@ -426,21 +464,18 @@ class RunManager:
                 instance = self.config.changer.coordinates.md_parameter_growth
 
             else:
-                logging.warning(
+                logger.warning(
                     f"No parameter growth MD possible, trying classical MD relaxation."
                 )
                 run_parameter_growth = False
-        # else:
-        #     logging.info(f'Wrote new coordinates to {files.output["trr"].parts[-3:]}')
-
         if not run_parameter_growth:
             if hasattr(self.config.changer.coordinates, "md"):
                 instance = self.config.changer.coordinates.md
             else:
-                logging.info(f"No MD relaxation after reaction.")
+                logger.info(f"No MD relaxation after reaction.")
 
         if instance:
-            logging.info("Starting relaxation md as part of reaction..")
+            logger.info("Starting relaxation md as part of reaction..")
 
             task = Task(
                 self, f=self._run_md, kwargs={"instance": instance}, out=instance
@@ -456,5 +491,5 @@ class RunManager:
         # Recipe done, reset runmanger state
         self.recipe = None
 
-        logging.info("Reaction done")
+        logger.info("Reaction done")
         return files

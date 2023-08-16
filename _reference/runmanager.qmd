@@ -37,7 +37,6 @@ rest of the program and keeps track of global state.
 | latest_files      | [dict](`dict`)\[[str](`str`), [Path](`pathlib.Path`)\]                                  | Dictionary of latest files.                               |
 | histfile          | [Path](`pathlib.Path`)                                                                  | Path to history file.                                     |
 | cptfile           | [Path](`pathlib.Path`)                                                                  | Path to checkpoint file.                                  |
-| ffpatch           |                                                                                         | Path to force field patch file.                           |
 | top               |                                                                                         | Topology object.                                          |
 | filehist          | [list](`list`)\[[dict](`dict`)\[[str](`str`), [TaskFiles](`kimmdy.tasks.TaskFiles`)\]\] | List of dictionaries of TaskFiles.                        |
 | task_mapping      | [TaskMapping](`kimmdy.tasks.TaskMapping`)                                               | Mapping of task names to runmanager methods.              |
@@ -47,6 +46,7 @@ rest of the program and keeps track of global state.
 | Name | Description |
 | --- | --- |
 | [get_latest](#kimmdy.runmanager.RunManager.get_latest) | Returns path to latest file of given type. |
+| [write_one_checkoint](#kimmdy.runmanager.RunManager.write_one_checkoint) | Just write the first checkpoint and then exit |
 
 ##### get_latest { #kimmdy.runmanager.RunManager.get_latest }
 
@@ -56,6 +56,15 @@ Returns path to latest file of given type.
 
 For .dat files (in general ambiguous extensions) use full file name.
 Errors if file is not found.
+
+##### write_one_checkoint { #kimmdy.runmanager.RunManager.write_one_checkoint }
+
+`runmanager.RunManager.write_one_checkoint(self)`
+
+Just write the first checkpoint and then exit
+
+Used to generate a starting point for jobscripts on hpc clusters
+that can easily self-submit after a timelimit was exceeded.
 
 ### State { #kimmdy.runmanager.State }
 

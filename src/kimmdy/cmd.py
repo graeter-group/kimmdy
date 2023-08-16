@@ -4,7 +4,10 @@ Also initialized logging and configuration.
 """
 import argparse
 import logging
+import logging.config
+from os import chmod
 from pathlib import Path
+import textwrap
 import dill
 from kimmdy.config import Config
 from kimmdy.misc_helper import _build_examples
@@ -12,6 +15,7 @@ from kimmdy.runmanager import RunManager
 from kimmdy.utils import check_gmx_version, increment_logfile
 import importlib.resources as pkg_resources
 import sys
+from glob import glob
 
 if sys.version_info > (3, 10):
     from importlib_metadata import version
@@ -42,9 +46,28 @@ def get_cmdline_args():
         default="DEBUG",
     )
     parser.add_argument(
-        "--logfile", "-f", type=str, help="logfile", default="kimmdy.log"
+        "--logfile", "-f", type=Path, help="logfile", default="kimmdy.log"
     )
-    parser.add_argument("--checkpoint", "-c", type=str, help="checkpoint file")
+    parser.add_argument(
+        "--checkpoint", "-p", type=str, help="start KIMMDY from a checkpoint file"
+    )
+    parser.add_argument(
+        "--from-latest-checkpoint",
+        "-c",
+        action="store_true",
+        help="continue. Start KIMMDY from the latest checkpoint file",
+    )
+    parser.add_argument(
+        "--concat",
+        type=Path,
+        nargs="?",
+        const=True,
+        help=(
+            "Concatenate trrs of this run"
+            "Optionally, the run directory can be give"
+            "Will save as concat.trr in current directory"
+        ),
+    )
 
     # flag to show available plugins
     parser.add_argument(
@@ -60,6 +83,19 @@ def get_cmdline_args():
             "# yaml-language-server: $schema=/path/to/kimmdy-yaml-schema.json"
         ),
     )
+
+    # flag to print an example jobscript for slurm hpc clusters
+    parser.add_argument(
+        "--generate-jobscript",
+        action="store_true",
+        help=(
+            """
+        Instead of running KIMMDY directly, generate at jobscript.sh for slurm HPC clusters.
+        You can then run this jobscript with sbatch jobscript.sh
+        """
+        ),
+    )
+
     return parser.parse_args()
 
 
@@ -175,7 +211,20 @@ def get_remove_hydrogen_cmdline_args():
     return parser.parse_args()
 
 
-def configure_logging(args: argparse.Namespace, color=False):
+class longFormatter(logging.Formatter):
+    def format(self, record):
+        saved_name = record.name  # save and restore for other formatters if desired
+        parts = saved_name.split(".")
+        if len(parts) > 1:
+            record.name = parts[0][0] + "." + ".".join(p[:10] for p in parts[1:])
+        else:
+            record.name = parts[0]
+        result = super().format(record)
+        record.name = saved_name
+        return result
+
+
+def configure_logger(log_path, log_level):
     """Configure logging.
 
     Configures the logging module with optional colorcodes
@@ -183,30 +232,58 @@ def configure_logging(args: argparse.Namespace, color=False):
 
     Parameters
     ----------
-    args :
-        Command line arguments.
-    color :
-        Should logging output use colorcodes for terminal output?
+    log_path : Path
+        File path to log file
+    log_level : str
+        Log
     """
 
-    increment_logfile(Path(args.logfile))
-    if color:
-        logging.addLevelName(logging.INFO, "\033[35mINFO\033[00m")
-        logging.addLevelName(logging.ERROR, "\033[31mERROR\033[00m")
-        logging.addLevelName(logging.WARNING, "\033[33mWARN\033[00m")
-        format = "\033[34m %(asctime)s\033[00m: %(levelname)s: %(message)s"
-    else:
-        format = "%(asctime)s: %(levelname)s: %(message)s"
+    increment_logfile(log_path)
 
-    logging.basicConfig(
-        level=getattr(logging, args.loglevel.upper()),
-        handlers=[
-            logging.FileHandler(args.logfile, encoding="utf-8", mode="w"),
-            logging.StreamHandler(sys.stdout),
-        ],
-        format=format,
-        datefmt="%d-%m-%Y %H:%M",
-    )
+    log_conf = {
+        "version": 1,
+        "formatters": {
+            "short": {
+                "format": "%(name)-15s %(levelname)s: %(message)s",
+                "datefmt": "%H:%M",
+            },
+            "full": {
+                "format": "%(asctime)s %(name)-17s %(levelname)s: %(message)s",
+                "datefmt": "%d-%m-%y %H:%M",
+            },
+            "full_cut": {
+                "()": longFormatter,
+                "format": "%(asctime)s %(name)-12s %(levelname)s: %(message)s",
+                "datefmt": "%d-%m-%y %H:%M",
+            },
+        },
+        "handlers": {
+            "cmd": {
+                "class": "logging.StreamHandler",
+                "formatter": "short",
+            },
+            "file": {
+                "class": "logging.FileHandler",
+                "formatter": "full_cut",
+                "filename": log_path,
+            },
+            "null": {
+                "class": "logging.NullHandler",
+            },
+        },
+        "loggers": {
+            "kimmdy": {
+                "level": log_level.upper(),
+                "handlers": ["cmd", "file"],
+            },
+        },
+        # Mute others, e.g. tensorflow, matplotlib
+        "root": {
+            "level": "CRITICAL",
+            "handlers": ["null"],
+        },
+    }
+    logging.config.dictConfig(log_conf)
 
 
 def _run(args: argparse.Namespace):
@@ -217,7 +294,7 @@ def _run(args: argparse.Namespace):
     args :
         Command line arguments.
     """
-    configure_logging(args)
+    configure_logger(args.logfile, args.loglevel)
 
     if args.show_plugins:
         from kimmdy import (
@@ -240,21 +317,89 @@ def _run(args: argparse.Namespace):
 
         exit()
 
-    logging.info("Welcome to KIMMDY")
-    logging.info("KIMMDY is running with these command line options:")
-    logging.info(args)
+    logger = logging.getLogger("kimmdy")
+    logger.info("Welcome to KIMMDY")
+    logger.info("KIMMDY is running with these command line options:")
+    logger.info(args)
+
+    if args.generate_jobscript:
+        config = Config(args.input)
+        runmgr = RunManager(config)
+        runmgr.write_one_checkoint()
+
+        content = f"""
+        #!/bin/env bash
+        #SBATCH --job-name={config.name}
+        #SBATCH --output=kimmdy-job.log
+        #SBATCH --error=kimmdy-job.log
+        #SBATCH --time=24:00:00
+        #SBATCH -N 1
+        #SBATCH --ntasks-per-node=40
+        #SBATCH --mincpus=40
+        #SBATCH --exclusive
+        #SBATCH --cpus-per-task=1
+        #SBATCH --gpus 1
+        #SBATCH --mail-type=ALL
+        # #SBATCH -p <your-partition>.p
+        # #SBATCH --mail-user=<your-email
+
+
+        # Setup up your environment here
+        # modules.sh might load lmod modules, set environment variables, etc.
+        source ./_modules.sh
+
+        CYCLE=24
+
+        START=$(date +"%s")
+
+        kimmdy --input {args.input} -c
+
+        END=$(date +"%s")
+
+        LEN=$((END-START))
+        HOURS=$((LEN/3600))
+
+        echo "$LEN seconds ran"
+        echo "$HOURS full hours ran"
+
+        let "CYCLE--"
+        if [ $HOURS -lt $CYCLE ]; then
+          echo "last cycle was just $HOURS h long, KIMMDY is done."
+          exit 3
+        else
+          echo "cycle resubmitting"
+          sbatch -J {config.name} ./jobscript.sh
+          exit 2
+        fi
+        """
+        path = "jobscript.sh"
+        with open(path, "w") as f:
+            f.write(textwrap.dedent(content))
+
+        chmod(path, 0o755)
+
+        exit()
+
+    if args.from_latest_checkpoint:
+        config = Config(args.input, no_increment_output_dir=True)
+        cpts = glob(f"{config.name}*kimmdy.cpt")
+        if not cpts:
+            logging.error("No checkpoints found.")
+            exit()
+        cpts.sort()
+        args.checkpoint = cpts[-1]
 
     if args.checkpoint:
-        logging.info("KIMMDY is starting from a checkpoint.")
+        logger.info("KIMMDY is starting from a checkpoint.")
         with open(args.checkpoint, "rb") as f:
             runmgr = dill.load(f)
             runmgr.from_checkpoint = True
     else:
         config = Config(args.input)
-        logging.debug(config)
+        logger.debug(config)
         runmgr = RunManager(config)
-        logging.debug("Using system GROMACS:")
-        logging.debug(check_gmx_version(config))
+        logger.debug("Using system GROMACS:")
+        logger.debug(check_gmx_version(config))
 
     runmgr.run()
 
@@ -264,16 +409,13 @@ def kimmdy_run(
     loglevel: str = "DEBUG",
     logfile: Path = Path("kimmdy.log"),
     checkpoint: str = "",
+    from_latest_checkpoint: bool = False,
+    concat: bool = False,
     show_plugins: bool = False,
     show_schema_path: bool = False,
+    generate_jobscript: bool = False,
 ):
     """Run KIMMDY from python.
-
-    TODO: The concat option looks like we probably
-    want an additional kimmdy analysis module,
-    maybe with its own subcommand(s)?
-    Like gromacs ``gmx <command>``?
-
 
     Parameters
     ----------
@@ -285,18 +427,28 @@ def kimmdy_run(
         File path of the logfile.
     checkpoint :
         File path if a kimmdy.cpt file to restart KIMMDY from a checkpoint.
+    from_latest_checkpoint :
+        Start KIMMDY from the latest checkpoint.
+    concat :
+        Don't perform a full KIMMDY run but instead concatenate trajectories
+        from a previous run.
     show_plugins :
         Show available plugins and exit.
     show_schema_path :
         Print path to yaml schema for use with yaml-language-server e.g. in VSCode and Neovim
+    generate_jobscript :
+        Instead of running KIMMDY directly, generate at jobscript.sh for slurm HPC clusters
     """
     args = argparse.Namespace(
         input=input,
         loglevel=loglevel,
         logfile=logfile,
         checkpoint=checkpoint,
+        from_latest_checkpoint=from_latest_checkpoint,
+        concat=concat,
         show_plugins=show_plugins,
         show_schema_path=show_schema_path,
+        generate_jobscript=generate_jobscript,
     )
     _run(args)
     logging.shutdown()
