@@ -166,7 +166,7 @@ class Topology:
 
         This whill be used if just the name of the object is entered in the ipython shell
         or a jupyter notebook.
-        
+
         p is an instance of IPython.lib.pretty.RepresentationPrinter
         <https://ipython.org/ipython-doc/3/api/generated/IPython.lib.pretty.html#IPython.lib.pretty.PrettyPrinter>
         """
@@ -178,8 +178,7 @@ class Topology:
         Starts at index 1.
         This also updates the numbers for bonds, angles, dihedrals and pairs.
         """
-        # TODO: check angles, dihedrals, pairs
-        raise NotImplementedError("reindex_atomrns is not finished yet.")
+
         update_map = {
             atom_nr: str(i + 1) for i, atom_nr in enumerate(self.atoms.keys())
         }
@@ -219,14 +218,22 @@ class Topology:
             angle.ai = ai
             angle.aj = aj
             angle.ak = ak
-            new_angles[
-                (update_map[angle.ai], update_map[angle.aj], update_map[angle.ak])
-            ] = angle
+            new_angles[(angle.ai, angle.aj, angle.ak)] = angle
         self.angles = new_angles
 
         new_pairs = {}
         new_multiple_dihedrals = {}
         for dihedrals in self.proper_dihedrals.values():
+            # do pairs before the ids are updated
+            pair = self.pairs.get((dihedrals.ai, dihedrals.al))
+            if pair:
+                ai = update_map.get(pair.ai)
+                aj = update_map.get(pair.aj)
+                if ai and aj:
+                    pair.ai = update_map[pair.ai]
+                    pair.aj = update_map[pair.aj]
+                    new_pairs[(ai, aj)] = pair
+
             ai = update_map.get(dihedrals.ai)
             aj = update_map.get(dihedrals.aj)
             ak = update_map.get(dihedrals.ak)
@@ -249,21 +256,15 @@ class Topology:
 
             new_multiple_dihedrals[
                 (
-                    update_map[dihedrals.ai],
-                    update_map[dihedrals.aj],
-                    update_map[dihedrals.ak],
-                    update_map[dihedrals.al],
+                    dihedrals.ai,
+                    dihedrals.aj,
+                    dihedrals.ak,
+                    dihedrals.al,
                 )
             ] = dihedrals
 
-            pair = self.pairs.get((dihedrals.ai, dihedrals.al))
-            if pair is None:
-                continue
-            pair.ai = update_map[pair.ai]
-            pair.aj = update_map[pair.aj]
-            new_pairs[(ai, al)] = pair
-
         self.proper_dihedrals = new_multiple_dihedrals
+        self.pairs = new_pairs
 
         new_dihedrals = {}
         for dihedral in self.improper_dihedrals.values():
@@ -278,16 +279,8 @@ class Topology:
             dihedral.aj = aj
             dihedral.ak = ak
             dihedral.al = al
-            new_dihedrals[(ai, aj, ak, al)] = new_dihedrals
-        self.dihedrals = new_dihedrals
-        self.pairs = new_pairs
-
-        for pair in self.pairs.values():
-            pair.ai = update_map[pair.ai]
-            pair.aj = update_map[pair.aj]
-            new_pairs[(update_map[pair.ai], update_map[pair.aj])] = pair
-        self.pairs = new_pairs
-
+            new_dihedrals[(ai, aj, ak, al)] = dihedral
+        self.improper_dihedrals = new_dihedrals
 
     def _parse_atoms(self):
         """Parse atoms from topology dictionary."""
