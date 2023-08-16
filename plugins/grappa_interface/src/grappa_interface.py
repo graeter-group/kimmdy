@@ -13,6 +13,9 @@ import grappa.ff
 import openmm.unit
 
 
+logger = logging.getLogger("kimmdy.grappa_interface")
+
+
 def check_equal_length(d: dict, name: str):
     lengths = [len(y) for y in d.values()]
     assert (
@@ -198,7 +201,7 @@ def apply_parameters(top: Topology, parameters: dict):
                         periodicity=n,
                     )
                 else:
-                    logging.warning(
+                    logger.warning(
                         f"There are multiple improper dihedrals for {tup} and only one can be chosen, dihedral {n} with amplitude of {parameters['proper']['ks'][i][ii]} will be ignored."
                     )
 
