@@ -4,7 +4,6 @@ Tests for homolysis reaction plugin.
 Assumes KIMMDY was installed with the plugin.
 E.g. via pip install -r requirements.txt.
 """
-import logging
 import pytest
 from pathlib import Path
 import numpy as np

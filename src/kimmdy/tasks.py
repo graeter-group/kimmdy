@@ -3,6 +3,8 @@ from pathlib import Path
 from typing import Callable, Optional, TYPE_CHECKING, Union
 import logging
 
+logger = logging.getLogger(__name__)
+
 
 class AutoFillDict(dict):
     def __init__(self, get_missing: Callable):
@@ -40,6 +42,7 @@ class TaskFiles:
     input: dict[str, Path] = field(default_factory=dict)
     output: dict[str, Path] = field(default_factory=dict)
     outputdir: Path = Path()
+    logger: logging.Logger = logging.getLogger("kimmdy")
 
     def __post_init__(self):
         self.input = AutoFillDict(self.get_latest)
@@ -47,11 +50,23 @@ class TaskFiles:
 
 def create_task_directory(runmng, postfix: str) -> TaskFiles:
     """Creates TaskFiles object, output directory and symlinks ff."""
+    from kimmdy.cmd import longFormatter
+
     files = TaskFiles(runmng.get_latest)
     runmng.iteration += 1
-    files.outputdir = runmng.config.out / f"{runmng.iteration}_{postfix}"
-    logging.debug(f"Creating Output directory: {files.outputdir}")
+    taskname = f"{runmng.iteration}_{postfix}"
+    files.outputdir = runmng.config.out / taskname
+    logger.debug(f"Creating Output directory: {files.outputdir}")
     files.outputdir.mkdir(exist_ok=runmng.from_checkpoint)
+    files.logger = logging.getLogger(f"kimmdy.{taskname}")
+    hand = logging.FileHandler(files.outputdir / (taskname + ".log"))
+    hand.setFormatter(
+        longFormatter(
+            "%(asctime)s %(name)-12s %(levelname)s: %(message)s", "%d-%m-%y %H:%M"
+        )
+    )
+    files.logger.addHandler(hand)
+
     if not (files.outputdir / runmng.config.ff.name).exists():
         (files.outputdir / runmng.config.ff.name).symlink_to(runmng.config.ff)
     return files
@@ -85,7 +100,7 @@ class Task:
         self.name = self.f.__name__
         self.out = out
 
-        logging.info(
+        logger.info(
             f"Init task {self.name}\n\tkwargs: {self.kwargs}\n\tOut: {self.out}"
         )
 
@@ -93,7 +108,7 @@ class Task:
         if self.out is not None:
             self.kwargs.update({"files": create_task_directory(self.runmng, self.out)})
 
-        logging.debug(f"Calling task {self.name} with kwargs: {self.kwargs}")
+        logger.debug(f"Calling task {self.name} with kwargs: {self.kwargs}")
         return self.f(**self.kwargs)
 
     def __repr__(self) -> str:
