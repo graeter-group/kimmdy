@@ -1,5 +1,3 @@
-from pathlib import Path
-from typing import Optional
 from kimmdy.constants import ATOMTYPE_BONDORDER_FLAT
 from kimmdy.parsing import TopologyDict
 from kimmdy.topology.atomic import *
