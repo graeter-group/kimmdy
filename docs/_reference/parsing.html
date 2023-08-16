@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.299">
+<meta name="generator" content="quarto-1.3.353">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -127,7 +127,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../_reference/index.html">Reference</a></li><li class="breadcrumb-item"><a href="../_reference/changemanager.html">changemanager</a></li><li class="breadcrumb-item"><a href="../_reference/parsing.html">parsing</a></li></ol></nav>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../_reference/index.html">Reference</a></li><li class="breadcrumb-item"><a href="../_reference/changemanager.html">Modules</a></li><li class="breadcrumb-item"><a href="../_reference/parsing.html">parsing</a></li></ol></nav>
       <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
       </a>
     </div>
@@ -156,30 +156,13 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../guide/user/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">User</span></a>
+            <a href="../guide/developer/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Developer</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../guide/user/options.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">KIMMDY Options</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a href="../guide/developer/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Developer</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../guide/developer/plugins.html" class="sidebar-item-text sidebar-link">
@@ -190,6 +173,29 @@ ul.task-list li input[type="checkbox"] {
   <div class="sidebar-item-container"> 
   <a href="../guide/developer/topology.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Hexala topology</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../guide/user/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">User</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guide/user/hcp.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">High Performance Computing</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guide/user/options.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">KIMMDY Options</span></a>
   </div>
 </li>
       </ul>
@@ -386,8 +392,6 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#attributes" id="toc-attributes" class="nav-link" data-scroll-target="#attributes">Attributes</a></li>
   <li><a href="#functions" id="toc-functions" class="nav-link" data-scroll-target="#functions">Functions</a>
   <ul>
-  <li><a href="#kimmdy.parsing.create_subsections" id="toc-kimmdy.parsing.create_subsections" class="nav-link" data-scroll-target="#kimmdy.parsing.create_subsections">create_subsections</a></li>
-  <li><a href="#kimmdy.parsing.is_not_comment" id="toc-kimmdy.parsing.is_not_comment" class="nav-link" data-scroll-target="#kimmdy.parsing.is_not_comment">is_not_comment</a></li>
   <li><a href="#kimmdy.parsing.read_distances_dat" id="toc-kimmdy.parsing.read_distances_dat" class="nav-link" data-scroll-target="#kimmdy.parsing.read_distances_dat">read_distances_dat</a></li>
   <li><a href="#kimmdy.parsing.read_edissoc" id="toc-kimmdy.parsing.read_edissoc" class="nav-link" data-scroll-target="#kimmdy.parsing.read_edissoc">read_edissoc</a>
   <ul class="collapse">
@@ -397,13 +401,11 @@ ul.task-list li input[type="checkbox"] {
   <ul class="collapse">
   <li><a href="#parameters-1" id="toc-parameters-1" class="nav-link" data-scroll-target="#parameters-1">Parameters</a></li>
   </ul></li>
-  <li><a href="#kimmdy.parsing.read_rtp" id="toc-kimmdy.parsing.read_rtp" class="nav-link" data-scroll-target="#kimmdy.parsing.read_rtp">read_rtp</a></li>
   <li><a href="#kimmdy.parsing.read_top" id="toc-kimmdy.parsing.read_top" class="nav-link" data-scroll-target="#kimmdy.parsing.read_top">read_top</a>
   <ul class="collapse">
   <li><a href="#parameters-2" id="toc-parameters-2" class="nav-link" data-scroll-target="#parameters-2">Parameters</a></li>
   <li><a href="#assumptions-and-limitation" id="toc-assumptions-and-limitation" class="nav-link" data-scroll-target="#assumptions-and-limitation">Assumptions And Limitation</a></li>
   </ul></li>
-  <li><a href="#kimmdy.parsing.read_xml_ff" id="toc-kimmdy.parsing.read_xml_ff" class="nav-link" data-scroll-target="#kimmdy.parsing.read_xml_ff">read_xml_ff</a></li>
   <li><a href="#kimmdy.parsing.resolve_includes" id="toc-kimmdy.parsing.resolve_includes" class="nav-link" data-scroll-target="#kimmdy.parsing.resolve_includes">resolve_includes</a>
   <ul class="collapse">
   <li><a href="#arguments" id="toc-arguments" class="nav-link" data-scroll-target="#arguments">Arguments</a></li>
@@ -445,10 +447,6 @@ ul.task-list li input[type="checkbox"] {
 <td><a href="#kimmdy.parsing.GMX_BUILTIN_FF_DIR">GMX_BUILTIN_FF_DIR</a></td>
 <td>Path to gromacs data directory with the built-in forcefields.</td>
 </tr>
-<tr class="even">
-<td><a href="#kimmdy.parsing.TopologyDict">TopologyDict</a></td>
-<td></td>
-</tr>
 </tbody>
 </table>
 </section>
@@ -463,14 +461,6 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
-<td><a href="#kimmdy.parsing.create_subsections">create_subsections</a></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.parsing.is_not_comment">is_not_comment</a></td>
-<td></td>
-</tr>
-<tr class="odd">
 <td><a href="#kimmdy.parsing.read_distances_dat">read_distances_dat</a></td>
 <td>Read a distances.dat plumed output file.</td>
 </tr>
@@ -483,16 +473,8 @@ ul.task-list li input[type="checkbox"] {
 <td>Read a plumed.dat configuration file.</td>
 </tr>
 <tr class="even">
-<td><a href="#kimmdy.parsing.read_rtp">read_rtp</a></td>
-<td></td>
-</tr>
-<tr class="odd">
 <td><a href="#kimmdy.parsing.read_top">read_top</a></td>
 <td>Read a topology file into a raw TopologyDict represenation.</td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.parsing.read_xml_ff">read_xml_ff</a></td>
-<td></td>
 </tr>
 <tr class="odd">
 <td><a href="#kimmdy.parsing.resolve_includes">resolve_includes</a></td>
@@ -508,14 +490,6 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 </tbody>
 </table>
-<section id="kimmdy.parsing.create_subsections" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.parsing.create_subsections">create_subsections</h3>
-<p><code>parsing.create_subsections(ls)</code></p>
-</section>
-<section id="kimmdy.parsing.is_not_comment" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.parsing.is_not_comment">is_not_comment</h3>
-<p><code>parsing.is_not_comment(c)</code></p>
-</section>
 <section id="kimmdy.parsing.read_distances_dat" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.parsing.read_distances_dat">read_distances_dat</h3>
 <p><code>parsing.read_distances_dat(distances_dat)</code></p>
@@ -573,10 +547,6 @@ ul.task-list li input[type="checkbox"] {
 </table>
 </section>
 </section>
-<section id="kimmdy.parsing.read_rtp" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.parsing.read_rtp">read_rtp</h3>
-<p><code>parsing.read_rtp(path)</code></p>
-</section>
 <section id="kimmdy.parsing.read_top" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.parsing.read_top">read_top</h3>
 <p><code>parsing.read_top(path)</code></p>
@@ -616,10 +586,6 @@ ul.task-list li input[type="checkbox"] {
 <li>sections that can have subsections can also exist multiple, separate times e.g.&nbsp;moleculetype will appear multiple times and they should not be merged</li>
 </ul>
 </section>
-</section>
-<section id="kimmdy.parsing.read_xml_ff" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.parsing.read_xml_ff">read_xml_ff</h3>
-<p><code>parsing.read_xml_ff(path)</code></p>
 </section>
 <section id="kimmdy.parsing.resolve_includes" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.parsing.resolve_includes">resolve_includes</h3>
@@ -694,7 +660,7 @@ ul.task-list li input[type="checkbox"] {
 <tbody>
 <tr class="odd">
 <td><code>top</code></td>
-<td><a href="../_reference/parsing.html#kimmdy.parsing.TopologyDict">TopologyDict</a></td>
+<td><code>TopologyDict</code></td>
 <td>Raw dictionary represenation of the topology.</td>
 <td><em>required</em></td>
 </tr>

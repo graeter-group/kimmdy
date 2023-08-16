@@ -8,6 +8,14 @@ subtitle: "Run KIMMDY on HPC clusters"
 You need an installation of python (`>= 3.10`) and (possibly PLUMED patched) GROMACS in your
 HPC environment.
 
+Example setup:
+
+```bash
+srun -t 1400:00 --mem=16000 -n20 --pty /bin/bash
+ml EasyBuild
+eb ./assets/Python-3.10.8.eb
+```
+
 Prepare a bash script `_modules.sh` that loads the required modules and activates
 the python environment in which KIMMDY is installed.
 

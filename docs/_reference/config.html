@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.299">
+<meta name="generator" content="quarto-1.3.353">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -127,7 +127,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../_reference/index.html">Reference</a></li><li class="breadcrumb-item"><a href="../_reference/changemanager.html">changemanager</a></li><li class="breadcrumb-item"><a href="../_reference/config.html">config</a></li></ol></nav>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../_reference/index.html">Reference</a></li><li class="breadcrumb-item"><a href="../_reference/changemanager.html">Modules</a></li><li class="breadcrumb-item"><a href="../_reference/config.html">config</a></li></ol></nav>
       <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
       </a>
     </div>
@@ -156,30 +156,13 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../guide/user/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">User</span></a>
+            <a href="../guide/developer/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Developer</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../guide/user/options.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">KIMMDY Options</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a href="../guide/developer/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Developer</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../guide/developer/plugins.html" class="sidebar-item-text sidebar-link">
@@ -190,6 +173,29 @@ ul.task-list li input[type="checkbox"] {
   <div class="sidebar-item-container"> 
   <a href="../guide/developer/topology.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Hexala topology</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../guide/user/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">User</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guide/user/hcp.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">High Performance Computing</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guide/user/options.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">KIMMDY Options</span></a>
   </div>
 </li>
       </ul>
@@ -384,9 +390,17 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#kimmdy.config" id="toc-kimmdy.config" class="nav-link active" data-scroll-target="#kimmdy.config">config</a>
   <ul>
   <li><a href="#attributes" id="toc-attributes" class="nav-link" data-scroll-target="#attributes">Attributes</a></li>
-  <li><a href="#functions" id="toc-functions" class="nav-link" data-scroll-target="#functions">Functions</a>
+  <li><a href="#classes" id="toc-classes" class="nav-link" data-scroll-target="#classes">Classes</a>
   <ul>
-  <li><a href="#kimmdy.config.check_file_exists" id="toc-kimmdy.config.check_file_exists" class="nav-link" data-scroll-target="#kimmdy.config.check_file_exists">check_file_exists</a></li>
+  <li><a href="#kimmdy.config.Config" id="toc-kimmdy.config.Config" class="nav-link" data-scroll-target="#kimmdy.config.Config">Config</a>
+  <ul class="collapse">
+  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
+  <ul class="collapse">
+  <li><a href="#kimmdy.config.Config.attr" id="toc-kimmdy.config.Config.attr" class="nav-link" data-scroll-target="#kimmdy.config.Config.attr">attr</a></li>
+  <li><a href="#kimmdy.config.Config.get_attributes" id="toc-kimmdy.config.Config.get_attributes" class="nav-link" data-scroll-target="#kimmdy.config.Config.get_attributes">get_attributes</a></li>
+  </ul></li>
+  </ul></li>
   </ul></li>
   </ul></li>
   </ul>
@@ -418,8 +432,8 @@ ul.task-list li input[type="checkbox"] {
 </tbody>
 </table>
 </section>
-<section id="functions" class="level2">
-<h2 class="anchored" data-anchor-id="functions">Functions</h2>
+<section id="classes" class="level2">
+<h2 class="anchored" data-anchor-id="classes">Classes</h2>
 <table class="table">
 <thead>
 <tr class="header">
@@ -429,16 +443,87 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
-<td><a href="#kimmdy.config.check_file_exists">check_file_exists</a></td>
-<td></td>
+<td><a href="#kimmdy.config.Config">Config</a></td>
+<td>Internal representation of the configuration generated</td>
 </tr>
 </tbody>
 </table>
-<section id="kimmdy.config.check_file_exists" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.config.check_file_exists">check_file_exists</h3>
-<p><code>config.check_file_exists(p)</code></p>
+<section id="kimmdy.config.Config" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.config.Config">Config</h3>
+<p><code>config.Config(self, input_file=None, recursive_dict=None, scheme=None, section='config', no_increment_output_dir=False)</code></p>
+<p>Internal representation of the configuration generated from the input file, which enables validation before running and computationally expensive operations.</p>
+<section id="parameters" class="level4">
+<h4 class="anchored" data-anchor-id="parameters">Parameters</h4>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>input_file</code></td>
+<td><a href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path">Path</a> | None</td>
+<td>Path to the config yaml file.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="even">
+<td><code>recursive_dict</code></td>
+<td><code>dict</code> | None</td>
+<td>For internal use only, used in reading settings in recursively.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="odd">
+<td><code>scheme</code></td>
+<td><code>dict</code> | None</td>
+<td>dict containing types and defaults for casting and validating settings.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="even">
+<td><code>section</code></td>
+<td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
+<td>current section e.g.&nbsp;to determine the level of recursion in nested configs e.g.&nbsp;“config”, “config.mds” or “config.reactions.homolysis”</td>
+<td><code>'config'</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="methods" class="level4">
+<h4 class="anchored" data-anchor-id="methods">Methods</h4>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="#kimmdy.config.Config.attr">attr</a></td>
+<td>Get the value of a specific attribute.</td>
+</tr>
+<tr class="even">
+<td><a href="#kimmdy.config.Config.get_attributes">get_attributes</a></td>
+<td>Get a list of all attributes</td>
+</tr>
+</tbody>
+</table>
+<section id="kimmdy.config.Config.attr" class="level5">
+<h5 class="anchored" data-anchor-id="kimmdy.config.Config.attr">attr</h5>
+<p><code>config.Config.attr(self, attribute)</code></p>
+<p>Get the value of a specific attribute. Alias for self.__getattribute__</p>
+</section>
+<section id="kimmdy.config.Config.get_attributes" class="level5">
+<h5 class="anchored" data-anchor-id="kimmdy.config.Config.get_attributes">get_attributes</h5>
+<p><code>config.Config.get_attributes(self)</code></p>
+<p>Get a list of all attributes</p>
 
 
+</section>
+</section>
 </section>
 </section>
 </section>

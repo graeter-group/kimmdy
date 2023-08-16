@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.299">
+<meta name="generator" content="quarto-1.3.353">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -127,7 +127,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../_reference/index.html">Reference</a></li><li class="breadcrumb-item"><a href="../_reference/changemanager.html">changemanager</a></li><li class="breadcrumb-item"><a href="../_reference/runmanager.html">runmanager</a></li></ol></nav>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../_reference/index.html">Reference</a></li><li class="breadcrumb-item"><a href="../_reference/changemanager.html">Modules</a></li><li class="breadcrumb-item"><a href="../_reference/runmanager.html">runmanager</a></li></ol></nav>
       <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
       </a>
     </div>
@@ -156,30 +156,13 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../guide/user/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">User</span></a>
+            <a href="../guide/developer/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Developer</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../guide/user/options.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">KIMMDY Options</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a href="../guide/developer/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Developer</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../guide/developer/plugins.html" class="sidebar-item-text sidebar-link">
@@ -190,6 +173,29 @@ ul.task-list li input[type="checkbox"] {
   <div class="sidebar-item-container"> 
   <a href="../guide/developer/topology.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Hexala topology</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../guide/user/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">User</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guide/user/hcp.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">High Performance Computing</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guide/user/options.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">KIMMDY Options</span></a>
   </div>
 </li>
       </ul>
@@ -383,7 +389,19 @@ ul.task-list li input[type="checkbox"] {
   <ul>
   <li><a href="#kimmdy.runmanager" id="toc-kimmdy.runmanager" class="nav-link active" data-scroll-target="#kimmdy.runmanager">runmanager</a>
   <ul>
+  <li><a href="#classes" id="toc-classes" class="nav-link" data-scroll-target="#classes">Classes</a>
+  <ul>
+  <li><a href="#kimmdy.runmanager.RunManager" id="toc-kimmdy.runmanager.RunManager" class="nav-link" data-scroll-target="#kimmdy.runmanager.RunManager">RunManager</a>
+  <ul class="collapse">
   <li><a href="#attributes" id="toc-attributes" class="nav-link" data-scroll-target="#attributes">Attributes</a></li>
+  <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
+  <ul class="collapse">
+  <li><a href="#kimmdy.runmanager.RunManager.get_latest" id="toc-kimmdy.runmanager.RunManager.get_latest" class="nav-link" data-scroll-target="#kimmdy.runmanager.RunManager.get_latest">get_latest</a></li>
+  <li><a href="#kimmdy.runmanager.RunManager.write_one_checkoint" id="toc-kimmdy.runmanager.RunManager.write_one_checkoint" class="nav-link" data-scroll-target="#kimmdy.runmanager.RunManager.write_one_checkoint">write_one_checkoint</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#kimmdy.runmanager.State" id="toc-kimmdy.runmanager.State" class="nav-link" data-scroll-target="#kimmdy.runmanager.State">State</a></li>
+  </ul></li>
   <li><a href="#functions" id="toc-functions" class="nav-link" data-scroll-target="#functions">Functions</a>
   <ul>
   <li><a href="#kimmdy.runmanager.get_existing_files" id="toc-kimmdy.runmanager.get_existing_files" class="nav-link" data-scroll-target="#kimmdy.runmanager.get_existing_files">get_existing_files</a></li>
@@ -402,8 +420,8 @@ ul.task-list li input[type="checkbox"] {
 <p><code>runmanager</code></p>
 <p>The Runmanager is the main entry point of the program.</p>
 <p>It manages the queue of tasks, communicates with the rest of the program and keeps track of global state.</p>
-<section id="attributes" class="level2">
-<h2 class="anchored" data-anchor-id="attributes">Attributes</h2>
+<section id="classes" class="level2">
+<h2 class="anchored" data-anchor-id="classes">Classes</h2>
 <table class="table">
 <thead>
 <tr class="header">
@@ -413,11 +431,143 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
-<td><a href="#kimmdy.runmanager.AMBIGUOUS_SUFFS">AMBIGUOUS_SUFFS</a></td>
-<td></td>
+<td><a href="#kimmdy.runmanager.RunManager">RunManager</a></td>
+<td>The Runmanager is the main entry point of the program.</td>
+</tr>
+<tr class="even">
+<td><a href="#kimmdy.runmanager.State">State</a></td>
+<td>State of the system.</td>
 </tr>
 </tbody>
 </table>
+<section id="kimmdy.runmanager.RunManager" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.runmanager.RunManager">RunManager</h3>
+<p><code>runmanager.RunManager(self, config)</code></p>
+<p>The Runmanager is the main entry point of the program.</p>
+<p>Manages the queue of tasks, communicates with the rest of the program and keeps track of global state.</p>
+<section id="attributes" class="level4">
+<h4 class="anchored" data-anchor-id="attributes">Attributes</h4>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>config</td>
+<td><a href="../_reference/config.html#kimmdy.config.Config">Config</a></td>
+<td>The configuration object.</td>
+</tr>
+<tr class="even">
+<td>from_checkpoint</td>
+<td><a href="https://docs.python.org/3.10/library/functions.html#bool">bool</a></td>
+<td>Whether the runmanager was initialized from a checkpoint.</td>
+</tr>
+<tr class="odd">
+<td>tasks</td>
+<td><a href="https://docs.python.org/3.10/library/queue.html#module-queue">queue</a>.<a href="https://docs.python.org/3.10/library/queue.html#queue.Queue">Queue</a>[<a href="../_reference/tasks.html#kimmdy.tasks.Task">Task</a>]</td>
+<td>Tasks from config.</td>
+</tr>
+<tr class="even">
+<td>crr_tasks</td>
+<td><a href="https://docs.python.org/3.10/library/queue.html#module-queue">queue</a>.<a href="https://docs.python.org/3.10/library/queue.html#queue.Queue">Queue</a>[<a href="../_reference/tasks.html#kimmdy.tasks.Task">Task</a>]</td>
+<td>Current tasks.</td>
+</tr>
+<tr class="odd">
+<td>iteration</td>
+<td><a href="https://docs.python.org/3.10/library/functions.html#int">int</a></td>
+<td>Current iteration.</td>
+</tr>
+<tr class="even">
+<td>state</td>
+<td><a href="../_reference/runmanager.html#kimmdy.runmanager.State">State</a></td>
+<td>Current state of the system.</td>
+</tr>
+<tr class="odd">
+<td>recipe_collection</td>
+<td><a href="../_reference/reaction.html#kimmdy.reaction.RecipeCollection">RecipeCollection</a></td>
+<td>Collection of recipes.</td>
+</tr>
+<tr class="even">
+<td>latest_files</td>
+<td><code>dict</code>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>, <a href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path">Path</a>]</td>
+<td>Dictionary of latest files.</td>
+</tr>
+<tr class="odd">
+<td>histfile</td>
+<td><a href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path">Path</a></td>
+<td>Path to history file.</td>
+</tr>
+<tr class="even">
+<td>cptfile</td>
+<td><a href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path">Path</a></td>
+<td>Path to checkpoint file.</td>
+</tr>
+<tr class="odd">
+<td>ffpatch</td>
+<td></td>
+<td>Path to force field patch file.</td>
+</tr>
+<tr class="even">
+<td>top</td>
+<td></td>
+<td>Topology object.</td>
+</tr>
+<tr class="odd">
+<td>filehist</td>
+<td><code>list</code>[<code>dict</code>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>, <a href="../_reference/tasks.html#kimmdy.tasks.TaskFiles">TaskFiles</a>]]</td>
+<td>List of dictionaries of TaskFiles.</td>
+</tr>
+<tr class="even">
+<td>task_mapping</td>
+<td><code>TaskMapping</code></td>
+<td>Mapping of task names to runmanager methods.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="methods" class="level4">
+<h4 class="anchored" data-anchor-id="methods">Methods</h4>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="#kimmdy.runmanager.RunManager.get_latest">get_latest</a></td>
+<td>Returns path to latest file of given type.</td>
+</tr>
+<tr class="even">
+<td><a href="#kimmdy.runmanager.RunManager.write_one_checkoint">write_one_checkoint</a></td>
+<td>Just write the first checkpoint and then exit</td>
+</tr>
+</tbody>
+</table>
+<section id="kimmdy.runmanager.RunManager.get_latest" class="level5">
+<h5 class="anchored" data-anchor-id="kimmdy.runmanager.RunManager.get_latest">get_latest</h5>
+<p><code>runmanager.RunManager.get_latest(self, suffix)</code></p>
+<p>Returns path to latest file of given type.</p>
+<p>For .dat files (in general ambiguous extensions) use full file name. Errors if file is not found.</p>
+</section>
+<section id="kimmdy.runmanager.RunManager.write_one_checkoint" class="level5">
+<h5 class="anchored" data-anchor-id="kimmdy.runmanager.RunManager.write_one_checkoint">write_one_checkoint</h5>
+<p><code>runmanager.RunManager.write_one_checkoint(self)</code></p>
+<p>Just write the first checkpoint and then exit</p>
+<p>Used to generate a starting point for jobscripts on hpc clusters that can easily self-submit after a timelimit was exceeded.</p>
+</section>
+</section>
+</section>
+<section id="kimmdy.runmanager.State" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.runmanager.State">State</h3>
+<p><code>runmanager.State()</code></p>
+<p>State of the system. one of IDLE, MD, REACTION, DONE.</p>
+</section>
 </section>
 <section id="functions" class="level2">
 <h2 class="anchored" data-anchor-id="functions">Functions</h2>

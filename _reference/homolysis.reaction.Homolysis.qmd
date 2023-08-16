@@ -4,13 +4,3 @@
 
 Homolytic bond breaking leading to 2 radicals.
 Implementation for time-varying rates
-
-## Methods
-
-| Name | Description |
-| --- | --- |
-| [get_recipe_collection](#homolysis.reaction.Homolysis.get_recipe_collection) |  |
-
-### get_recipe_collection { #homolysis.reaction.Homolysis.get_recipe_collection }
-
-`reaction.Homolysis.get_recipe_collection(self, files)`

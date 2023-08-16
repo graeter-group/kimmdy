@@ -14,14 +14,9 @@ directly. Need to unify.
 
 | Name | Description |
 | --- | --- |
-| [break_bond_plumed](#kimmdy.changemanager.break_bond_plumed) |  |
 | [modify_coords](#kimmdy.changemanager.modify_coords) | Modify the coordinates of the system according to the recipe steps. |
 | [modify_plumed](#kimmdy.changemanager.modify_plumed) | Modify plumed input files. |
 | [modify_top](#kimmdy.changemanager.modify_top) | Modify the topology of the system according to the recipe steps. |
-
-### break_bond_plumed { #kimmdy.changemanager.break_bond_plumed }
-
-`changemanager.break_bond_plumed(plumeddat, breakpair, plumeddist)`
 
 ### modify_coords { #kimmdy.changemanager.modify_coords }
 

@@ -3,13 +3,3 @@
 `reaction.DummyReaction()`
 
 Dummy reaction, returns empty RecipeCollection
-
-## Methods
-
-| Name | Description |
-| --- | --- |
-| [get_recipe_collection](#dummyreaction.reaction.DummyReaction.get_recipe_collection) |  |
-
-### get_recipe_collection { #dummyreaction.reaction.DummyReaction.get_recipe_collection }
-
-`reaction.DummyReaction.get_recipe_collection(self, files)`
