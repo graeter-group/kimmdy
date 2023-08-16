@@ -73,10 +73,10 @@ Reaction base class
 
 #### Parameters
 
-| Name     | Type                                         | Description          | Default    |
-|----------|----------------------------------------------|----------------------|------------|
-| `name`   | [str](`str`)                                 | Name of the reaction | _required_ |
-| `runmng` | [RunManager](`kimmdy.runmanager.RunManager`) | RunManager instance  | _required_ |
+| Name     | Type                       | Description          | Default    |
+|----------|----------------------------|----------------------|------------|
+| `name`   | [str](`str`)               | Name of the reaction | _required_ |
+| `runmng` | [Runmanager](`Runmanager`) | RunManager instance  | _required_ |
 
 #### Methods
 
@@ -167,6 +167,9 @@ They can originate from multiple reaction plugins, but do not need to.
 | Name | Description |
 | --- | --- |
 | [aggregate_reactions](#kimmdy.reaction.RecipeCollection.aggregate_reactions) | Combines reactions having the same sequence of RecipeSteps. |
+| [calc_cumprob](#kimmdy.reaction.RecipeCollection.calc_cumprob) | Calculate cumulative probability of all contained recipe steps. |
+| [from_csv](#kimmdy.reaction.RecipeCollection.from_csv) | Create a RecipeCollection object from a CSV file |
+| [plot](#kimmdy.reaction.RecipeCollection.plot) | Plot reaction rates over time |
 | [to_csv](#kimmdy.reaction.RecipeCollection.to_csv) | Write a ReactionResult as defined in the reaction module to a csv file |
 
 ##### aggregate_reactions { #kimmdy.reaction.RecipeCollection.aggregate_reactions }
@@ -175,9 +178,38 @@ They can originate from multiple reaction plugins, but do not need to.
 
 Combines reactions having the same sequence of RecipeSteps.
 
+##### calc_cumprob { #kimmdy.reaction.RecipeCollection.calc_cumprob }
+
+`reaction.RecipeCollection.calc_cumprob(self)`
+
+Calculate cumulative probability of all contained recipe steps.
+Sums up to 1 over all recipes. Assumes constant rate for given timespan
+and rate zero otherwise.
+
+##### from_csv { #kimmdy.reaction.RecipeCollection.from_csv }
+
+`reaction.RecipeCollection.from_csv(cls, path)`
+
+Create a RecipeCollection object from a CSV file
+Returns the recipe collection and a single recipe that was picked, otherwise None
+
+##### plot { #kimmdy.reaction.RecipeCollection.plot }
+
+`reaction.RecipeCollection.plot(self, outfile, highlight_r=None, highlight_t=None)`
+
+Plot reaction rates over time
+
+###### Parameters
+
+| Name          | Type                               | Description                                          | Default    |
+|---------------|------------------------------------|------------------------------------------------------|------------|
+| `outfile`     | [Path](`pathlib.Path`)             | Where to save the plot, must have compatible suffix. | _required_ |
+| `highlight_r` | [Recipe](`kimmdy.reaction.Recipe`) | Recipe to highlight, by default None                 | `None`     |
+| `highlight_t` | [float](`float`)                   | Time at which the reactions starts                   | `None`     |
+
 ##### to_csv { #kimmdy.reaction.RecipeCollection.to_csv }
 
-`reaction.RecipeCollection.to_csv(self, path)`
+`reaction.RecipeCollection.to_csv(self, path, picked_recipe=None)`
 
 Write a ReactionResult as defined in the reaction module to a csv file
 

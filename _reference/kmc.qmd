@@ -18,17 +18,18 @@ and because we have one reactant molecule
 
 ### KMCResult { #kimmdy.kmc.KMCResult }
 
-`kmc.KMCResult(recipe_steps=None, reaction_probability=None, time_step=None)`
+`kmc.KMCResult(recipe=field(default_factory=lambda : Recipe(\[\], \[\], \[\])), reaction_probability=None, time_delta=None, time_start=None)`
 
 The result of a KMC step. Similar to a Recipe but for the concrete realization of a reaction.
 
 #### Attributes
 
-| Name                 | Type                                                                                          | Description                                          |
-|----------------------|-----------------------------------------------------------------------------------------------|------------------------------------------------------|
-| recipe_steps         | [Union](`typing.Union`)\[[list](`list`)\[[RecipeStep](`kimmdy.reaction.RecipeStep`)\], None\] | Single sequence of RecipeSteps to build product      |
-| reaction_probability | [Union](`typing.Union`)\[[list](`list`)\[[float](`float`)\], None\]                           | Integral of reaction propensity with respect to time |
-| time_step            | [Union](`typing.Union`)\[[float](`float`), None\]                                             | Time step during which the reaction occurs           |
+| Name                 | Type                                                                                | Description                                                                                                                 |
+|----------------------|-------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|
+| recipe               | [kimmdy](`kimmdy`).[reaction](`kimmdy.reaction`).[Recipe](`kimmdy.reaction.Recipe`) | Single sequence of RecipeSteps to build product                                                                             |
+| reaction_probability | [Union](`typing.Union`)\[[list](`list`)\[[float](`float`)\], None\]                 | Integral of reaction propensity with respect to time                                                                        |
+| time_delta           | [Union](`typing.Union`)\[[float](`float`), None\]                                   | MC time jump during which the reaction occurs [ps]                                                                          |
+| time_start           | [Union](`typing.Union`)\[[float](`float`), None\]                                   | Time, from which the reaction starts. The reaction changes the geometry/topology of this timestep and continues from there. |
 
 ## Functions
 

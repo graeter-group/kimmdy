@@ -5,6 +5,7 @@
 
 # our own program output
 kimmdy.log
+jobscript.sh
 tmp/
 *.gif
 *.log

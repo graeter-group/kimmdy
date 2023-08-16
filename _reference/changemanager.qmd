@@ -35,12 +35,12 @@ We should either change the name or make it do what it says it does.
 
 #### Parameters
 
-| Name           | Type                                                         | Description                                                                                                                                  | Default    |
-|----------------|--------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------|------------|
-| `recipe_steps` | [list](`list`)\[[RecipeStep](`kimmdy.reaction.RecipeStep`)\] | A list of [](`~kimmdy.reaction.RecipeStep`) where each steps contains a `new_coords` parameter.                                              | _required_ |
-| `files`        | [TaskFiles](`kimmdy.tasks.TaskFiles`)                        | Input and output files for this [](`~kimmdy.tasks.Task`). files.input:     - trr     - tpr files.outputdir files.output:     - trr     - gro | _required_ |
-| `topA`         | [Topology](`kimmdy.topology.topology.Topology`)              | Previous Topology                                                                                                                            | _required_ |
-| `topB`         | [Topology](`kimmdy.topology.topology.Topology`)              | Parameter-adjusted Topology                                                                                                                  | _required_ |
+| Name           | Type                                                         | Description                                                                                                                  | Default    |
+|----------------|--------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------|------------|
+| `recipe_steps` | [list](`list`)\[[RecipeStep](`kimmdy.reaction.RecipeStep`)\] | A list of [](`~kimmdy.reaction.RecipeStep`) where each steps contains a `new_coords` parameter.                              | _required_ |
+| `files`        | [TaskFiles](`kimmdy.tasks.TaskFiles`)                        | Input and output files for this [](`~kimmdy.tasks.Task`). files.input: - trr - tpr files.outputdir files.output: - trr - gro | _required_ |
+| `topA`         | [Topology](`kimmdy.topology.topology.Topology`)              | Previous Topology                                                                                                            | _required_ |
+| `topB`         | [Topology](`kimmdy.topology.topology.Topology`)              | Parameter-adjusted Topology                                                                                                  | _required_ |
 
 ### modify_plumed { #kimmdy.changemanager.modify_plumed }
 
@@ -58,7 +58,7 @@ TODO: finish this function.
 
 ### modify_top { #kimmdy.changemanager.modify_top }
 
-`changemanager.modify_top(recipe_steps, files, ffpatch, topology)`
+`changemanager.modify_top(recipe_steps, files, topology, parameterizer)`
 
 Modify the topology of the system according to the recipe steps.
 
@@ -67,9 +67,8 @@ to a file to be used by external programs (gromacs).
 
 #### Parameters
 
-| Name           | Type                                                                             | Description                                                                                              | Default    |
-|----------------|----------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------|------------|
-| `recipe_steps` | [list](`list`)\[[RecipeStep](`kimmdy.reaction.RecipeStep`)\]                     | A list of [](`~kimmdy.reaction.RecipeStep`)s. parameter.                                                 | _required_ |
-| `files`        | [TaskFiles](`kimmdy.tasks.TaskFiles`)                                            | Input and output files for this [](`~kimmdy.tasks.Task`). files.input:     - top files.output:     - top | _required_ |
-| `ffpatch`      | [Optional](`typing.Optional`)\[[Path](`pathlib.Path`)\]                          | TODO: deprecate                                                                                          | _required_ |
-| `topology`     | [Optional](`typing.Optional`)\[[Topology](`kimmdy.topology.topology.Topology`)\] | TODO: make this required instead of optional                                                             | _required_ |
+| Name           | Type                                                                             | Description                                                                                      | Default    |
+|----------------|----------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|------------|
+| `recipe_steps` | [list](`list`)\[[RecipeStep](`kimmdy.reaction.RecipeStep`)\]                     | A list of [](`~kimmdy.reaction.RecipeStep`)s. parameter.                                         | _required_ |
+| `files`        | [TaskFiles](`kimmdy.tasks.TaskFiles`)                                            | Input and output files for this [](`~kimmdy.tasks.Task`). files.input: - top files.output: - top | _required_ |
+| `topology`     | [Optional](`typing.Optional`)\[[Topology](`kimmdy.topology.topology.Topology`)\] | TODO: make this required instead of optional                                                     | _required_ |
