@@ -9,7 +9,7 @@ from pathlib import Path
 import textwrap
 import dill
 from kimmdy.config import Config
-from kimmdy.misc_helper import concat_traj, _build_examples
+from kimmdy.misc_helper import _build_examples
 from kimmdy.runmanager import RunManager
 from kimmdy.utils import check_gmx_version, increment_logfile
 import importlib.resources as pkg_resources
@@ -45,7 +45,7 @@ def get_cmdline_args():
         default="DEBUG",
     )
     parser.add_argument(
-        "--logfile", "-f", type=str, help="logfile", default="kimmdy.log"
+        "--logfile", "-f", type=Path, help="logfile", default="kimmdy.log"
     )
     parser.add_argument(
         "--checkpoint", "-p", type=str, help="start KIMMDY from a checkpoint file"
@@ -98,7 +98,102 @@ def get_cmdline_args():
     return parser.parse_args()
 
 
-def configure_logging(args: argparse.Namespace, color=False):
+def get_analysis_cmdline_args():
+    """
+    concat :
+    Don't perform a full KIMMDY run but instead concatenate trajectories
+    from a previous run.
+    """
+    parser = argparse.ArgumentParser(
+        description="Welcome to the KIMMDY analysis module"
+    )
+    subparsers = parser.add_subparsers(required=True, metavar="module", dest="module")
+
+    ## trjcat
+    parser_trjcat = subparsers.add_parser(
+        name="trjcat", help="Concatenate trajectories of a KIMMDY run"
+    )
+    parser_trjcat.add_argument(
+        "dir", type=str, help="KIMMDY run directory to be analysed."
+    )
+    parser_trjcat.add_argument(
+        "--steps",
+        "-s",
+        nargs="*",
+        default="all",
+        help=(
+            "Apply analysis method to subdirectories with these names. Uses all subdirectories by default"
+        ),
+    )
+
+    ## plot_energy
+    parser_plot_energy = subparsers.add_parser(
+        name="plot_energy", help="Plot GROMACS energy for a KIMMDY run"
+    )
+    parser_plot_energy.add_argument(
+        "dir", type=str, help="KIMMDY run directory to be analysed."
+    )
+    parser_plot_energy.add_argument(
+        "--steps",
+        "-s",
+        nargs="*",
+        default="all",
+        help=(
+            "Apply analysis method to subdirectories with these names. Uses all subdirectories by default"
+        ),
+    )
+    parser_plot_energy.add_argument(
+        "--terms",
+        "-t",
+        nargs="*",
+        default=["Potential"],
+        help=(
+            "Terms from gmx energy that will be plotted. Uses 'Potential' by default"
+        ),
+    )
+
+    ## radical population
+    parser_radical_population = subparsers.add_parser(
+        name="radical_population",
+        help="Plot population of radicals for one or multiple KIMMDY run(s)",
+    )
+    parser_radical_population.add_argument(
+        "dir", nargs="+", help="KIMMDY run directory to be analysed. Can be multiple."
+    )
+    parser_radical_population.add_argument(
+        "--select_atoms",
+        "-a",
+        type=str,
+        help="Atoms chosen for radical population analysis, default is protein (uses MDAnalysis selection syntax)",
+        default="protein",
+    )
+
+    # plot rates at each decision step
+    parser_plot_rates = subparsers.add_parser(
+        name="plot_rates",
+        help="Plot rates of all possible reactions after a MD run. Rates must have been saved!",
+    )
+    parser_plot_rates.add_argument(
+        "dir", nargs="+", help="KIMMDY run directory to be analysed. Can be multiple."
+    )
+
+    return parser.parse_args()
+
+
+class longFormatter(logging.Formatter):
+    def format(self, record):
+        saved_name = record.name  # save and restore for other formatters if desired
+        parts = saved_name.split(".")
+        if len(parts) > 1:
+            record.name = parts[0][0] + "." + ".".join(p[:10] for p in parts[1:])
+        else:
+            record.name = parts[0]
+        result = super().format(record)
+        record.name = saved_name
+        return result
+
+
+def configure_logger(log_path, log_level):
     """Configure logging.
 
     Configures the logging module with optional colorcodes
@@ -106,30 +201,58 @@ def configure_logging(args: argparse.Namespace, color=False):
 
     Parameters
     ----------
-    args :
-        Command line arguments.
-    color :
-        Should logging output use colorcodes for terminal output?
+    log_path : Path
+        File path to log file
+    log_level : str
+        Log
     """
 
-    increment_logfile(Path(args.logfile))
-    if color:
-        logging.addLevelName(logging.INFO, "\033[35mINFO\033[00m")
-        logging.addLevelName(logging.ERROR, "\033[31mERROR\033[00m")
-        logging.addLevelName(logging.WARNING, "\033[33mWARN\033[00m")
-        format = "\033[34m %(asctime)s\033[00m: %(levelname)s: %(message)s"
-    else:
-        format = "%(asctime)s: %(levelname)s: %(message)s"
+    increment_logfile(log_path)
 
-    logging.basicConfig(
-        level=getattr(logging, args.loglevel.upper()),
-        handlers=[
-            logging.FileHandler(args.logfile, encoding="utf-8", mode="w"),
-            logging.StreamHandler(sys.stdout),
-        ],
-        format=format,
-        datefmt="%d-%m-%Y %H:%M",
-    )
+    log_conf = {
+        "version": 1,
+        "formatters": {
+            "short": {
+                "format": "%(name)-15s %(levelname)s: %(message)s",
+                "datefmt": "%H:%M",
+            },
+            "full": {
+                "format": "%(asctime)s %(name)-17s %(levelname)s: %(message)s",
+                "datefmt": "%d-%m-%y %H:%M",
+            },
+            "full_cut": {
+                "()": longFormatter,
+                "format": "%(asctime)s %(name)-12s %(levelname)s: %(message)s",
+                "datefmt": "%d-%m-%y %H:%M",
+            },
+        },
+        "handlers": {
+            "cmd": {
+                "class": "logging.StreamHandler",
+                "formatter": "short",
+            },
+            "file": {
+                "class": "logging.FileHandler",
+                "formatter": "full_cut",
+                "filename": log_path,
+            },
+            "null": {
+                "class": "logging.NullHandler",
+            },
+        },
+        "loggers": {
+            "kimmdy": {
+                "level": log_level.upper(),
+                "handlers": ["cmd", "file"],
+            },
+        },
+        # Mute others, e.g. tensorflow, matplotlib
+        "root": {
+            "level": "CRITICAL",
+            "handlers": ["null"],
+        },
+    }
+    logging.config.dictConfig(log_conf)
 
 
 def _run(args: argparse.Namespace):
@@ -140,15 +263,21 @@ def _run(args: argparse.Namespace):
     args :
         Command line arguments.
     """
-    configure_logging(args)
+    configure_logger(args.logfile, args.loglevel)
 
     if args.show_plugins:
-        from kimmdy import discovered_plugins
+        from kimmdy import (
+            discovered_reaction_plugins,
+            discovered_parameterization_plugins,
+        )
 
-        print("Available plugins:")
-        for plugin in discovered_plugins:
+        print("Available reaction plugins:")
+        for plugin in discovered_reaction_plugins:
             print(plugin)
 
+        print("Available parameterization plugins:")
+        for plugin in discovered_parameterization_plugins:
+            print(plugin)
         exit()
 
     if args.show_schema_path:
@@ -157,18 +286,10 @@ def _run(args: argparse.Namespace):
 
         exit()
 
-    if args.concat:
-        logging.info("KIMMDY will concatenate trrs and exit.")
-
-        run_dir = Path().cwd()
-        if type(args.concat) != bool:
-            run_dir = args.concat
-        concat_traj(run_dir)
-        exit()
-
-    logging.info("Welcome to KIMMDY")
-    logging.info("KIMMDY is running with these command line options:")
-    logging.info(args)
+    logger = logging.getLogger("kimmdy")
+    logger.info("Welcome to KIMMDY")
+    logger.info("KIMMDY is running with these command line options:")
+    logger.info(args)
 
     if args.generate_jobscript:
         config = Config(args.input)
@@ -238,16 +359,16 @@ def _run(args: argparse.Namespace):
         args.checkpoint = cpts[-1]
 
     if args.checkpoint:
-        logging.info("KIMMDY is starting from a checkpoint.")
+        logger.info("KIMMDY is starting from a checkpoint.")
         with open(args.checkpoint, "rb") as f:
             runmgr = dill.load(f)
             runmgr.from_checkpoint = True
     else:
         config = Config(args.input)
-        logging.debug(config)
+        logger.debug(config)
         runmgr = RunManager(config)
-        logging.debug("Using system GROMACS:")
-        logging.debug(check_gmx_version(config))
+        logger.debug("Using system GROMACS:")
+        logger.debug(check_gmx_version(config))
 
     runmgr.run()
 
@@ -326,6 +447,23 @@ def build_examples():
     args = get_build_example_args()
     _build_examples(args)
     pass
+
+
+def analysis():
+    """Analyse existing KIMMDY runs."""
+
+    args = get_analysis_cmdline_args()
+    print(args)
+    from kimmdy.analysis import concat_traj, plot_energy, radical_population, plot_rates
+
+    if args.module == "trjcat":
+        concat_traj(args)
+    elif args.module == "plot_energy":
+        plot_energy(args)
+    elif args.module == "radical_population":
+        radical_population(args)
+    elif args.module == "plot_rates":
+        plot_rates(args)
 
 
 def kimmdy():

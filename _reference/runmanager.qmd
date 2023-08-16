@@ -37,7 +37,6 @@ rest of the program and keeps track of global state.
 | latest_files      | [dict](`dict`)\[[str](`str`), [Path](`pathlib.Path`)\]                                  | Dictionary of latest files.                               |
 | histfile          | [Path](`pathlib.Path`)                                                                  | Path to history file.                                     |
 | cptfile           | [Path](`pathlib.Path`)                                                                  | Path to checkpoint file.                                  |
-| ffpatch           |                                                                                         | Path to force field patch file.                           |
 | top               |                                                                                         | Topology object.                                          |
 | filehist          | [list](`list`)\[[dict](`dict`)\[[str](`str`), [TaskFiles](`kimmdy.tasks.TaskFiles`)\]\] | List of dictionaries of TaskFiles.                        |
 | task_mapping      | [TaskMapping](`kimmdy.tasks.TaskMapping`)                                               | Mapping of task names to runmanager methods.              |

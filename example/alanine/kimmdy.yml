@@ -16,7 +16,9 @@ mds:
     mdp: 'md_parameter_growth.mdp'
 changer:
   coordinates:
-    md_parameter_growth: 'relax'      
+    md_parameter_growth: 'relax'  
+  topology:
+    parameterization: 'grappa'
 reactions:
   hat_naive:
     frequency_factor: 100000000

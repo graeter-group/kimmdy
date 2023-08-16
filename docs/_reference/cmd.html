@@ -391,11 +391,13 @@ ul.task-list li input[type="checkbox"] {
   <ul>
   <li><a href="#functions" id="toc-functions" class="nav-link" data-scroll-target="#functions">Functions</a>
   <ul>
+  <li><a href="#kimmdy.cmd.analysis" id="toc-kimmdy.cmd.analysis" class="nav-link" data-scroll-target="#kimmdy.cmd.analysis">analysis</a></li>
   <li><a href="#kimmdy.cmd.build_examples" id="toc-kimmdy.cmd.build_examples" class="nav-link" data-scroll-target="#kimmdy.cmd.build_examples">build_examples</a></li>
-  <li><a href="#kimmdy.cmd.configure_logging" id="toc-kimmdy.cmd.configure_logging" class="nav-link" data-scroll-target="#kimmdy.cmd.configure_logging">configure_logging</a>
+  <li><a href="#kimmdy.cmd.configure_logger" id="toc-kimmdy.cmd.configure_logger" class="nav-link" data-scroll-target="#kimmdy.cmd.configure_logger">configure_logger</a>
   <ul class="collapse">
   <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
   </ul></li>
+  <li><a href="#kimmdy.cmd.get_analysis_cmdline_args" id="toc-kimmdy.cmd.get_analysis_cmdline_args" class="nav-link" data-scroll-target="#kimmdy.cmd.get_analysis_cmdline_args">get_analysis_cmdline_args</a></li>
   <li><a href="#kimmdy.cmd.get_build_example_args" id="toc-kimmdy.cmd.get_build_example_args" class="nav-link" data-scroll-target="#kimmdy.cmd.get_build_example_args">get_build_example_args</a>
   <ul class="collapse">
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
@@ -434,12 +436,20 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
+<td><a href="#kimmdy.cmd.analysis">analysis</a></td>
+<td>Analyse existing KIMMDY runs.</td>
+</tr>
+<tr class="even">
 <td><a href="#kimmdy.cmd.build_examples">build_examples</a></td>
 <td>Build examples from the command line.</td>
 </tr>
-<tr class="even">
-<td><a href="#kimmdy.cmd.configure_logging">configure_logging</a></td>
+<tr class="odd">
+<td><a href="#kimmdy.cmd.configure_logger">configure_logger</a></td>
 <td>Configure logging.</td>
+</tr>
+<tr class="even">
+<td><a href="#kimmdy.cmd.get_analysis_cmdline_args">get_analysis_cmdline_args</a></td>
+<td>concat :</td>
 </tr>
 <tr class="odd">
 <td><a href="#kimmdy.cmd.get_build_example_args">get_build_example_args</a></td>
@@ -459,14 +469,19 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 </tbody>
 </table>
+<section id="kimmdy.cmd.analysis" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.cmd.analysis">analysis</h3>
+<p><code>cmd.analysis()</code></p>
+<p>Analyse existing KIMMDY runs.</p>
+</section>
 <section id="kimmdy.cmd.build_examples" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.cmd.build_examples">build_examples</h3>
 <p><code>cmd.build_examples()</code></p>
 <p>Build examples from the command line.</p>
 </section>
-<section id="kimmdy.cmd.configure_logging" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.cmd.configure_logging">configure_logging</h3>
-<p><code>cmd.configure_logging(args, color=False)</code></p>
+<section id="kimmdy.cmd.configure_logger" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.cmd.configure_logger">configure_logger</h3>
+<p><code>cmd.configure_logger(log_path, log_level)</code></p>
 <p>Configure logging.</p>
 <p>Configures the logging module with optional colorcodes for the terminal.</p>
 <section id="parameters" class="level4">
@@ -482,20 +497,25 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>args</code></td>
-<td><a href="https://docs.python.org/3.10/library/argparse.html#module-argparse">argparse</a>.<a href="https://docs.python.org/3.10/library/argparse.html#argparse.Namespace">Namespace</a></td>
-<td>Command line arguments.</td>
+<td><code>log_path</code></td>
+<td><a href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path">Path</a></td>
+<td>File path to log file</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
-<td><code>color</code></td>
-<td></td>
-<td>Should logging output use colorcodes for terminal output?</td>
-<td><code>False</code></td>
+<td><code>log_level</code></td>
+<td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
+<td>Log</td>
+<td><em>required</em></td>
 </tr>
 </tbody>
 </table>
 </section>
+</section>
+<section id="kimmdy.cmd.get_analysis_cmdline_args" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.cmd.get_analysis_cmdline_args">get_analysis_cmdline_args</h3>
+<p><code>cmd.get_analysis_cmdline_args()</code></p>
+<p>concat : Don't perform a full KIMMDY run but instead concatenate trajectories from a previous run.</p>
 </section>
 <section id="kimmdy.cmd.get_build_example_args" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.cmd.get_build_example_args">get_build_example_args</h3>

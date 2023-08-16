@@ -1,4 +1,3 @@
-import logging
 from kimmdy.reaction import (
     Break,
     Recipe,
@@ -26,7 +25,8 @@ class Homolysis(ReactionPlugin):
     """
 
     def get_recipe_collection(self, files: TaskFiles):
-        logging.debug("Getting recipe for reaction: homolysis")
+        logger = files.logger
+        logger.debug("Getting recipe for reaction: homolysis")
 
         # Initialization of filepaths
         plumed_dat = files.input["plumed.dat"]
@@ -51,7 +51,7 @@ class Homolysis(ReactionPlugin):
             atomtypes, atomids = get_atominfo_from_plumedid(plumedid, plumed, top)
             b0, kb, E_dis = get_bondprm_from_atomtypes(atomtypes, ffbonded, edissoc)
 
-            logging.debug(
+            logger.debug(
                 f"plumedid: {plumedid}, atomids: {atomids}, atomtypes: {atomtypes}, b0: {b0}, kb: {kb}, E_dis: {E_dis}"
             )
 

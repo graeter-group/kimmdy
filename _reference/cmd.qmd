@@ -9,12 +9,20 @@ Also initialized logging and configuration.
 
 | Name | Description |
 | --- | --- |
+| [analysis](#kimmdy.cmd.analysis) | Analyse existing KIMMDY runs. |
 | [build_examples](#kimmdy.cmd.build_examples) | Build examples from the command line. |
-| [configure_logging](#kimmdy.cmd.configure_logging) | Configure logging. |
+| [configure_logger](#kimmdy.cmd.configure_logger) | Configure logging. |
+| [get_analysis_cmdline_args](#kimmdy.cmd.get_analysis_cmdline_args) | concat : |
 | [get_build_example_args](#kimmdy.cmd.get_build_example_args) | Parse command line arguments. |
 | [get_cmdline_args](#kimmdy.cmd.get_cmdline_args) | Parse command line arguments and configure logger. |
 | [kimmdy](#kimmdy.cmd.kimmdy) | Run KIMMDY from the command line. |
 | [kimmdy_run](#kimmdy.cmd.kimmdy_run) | Run KIMMDY from python. |
+
+### analysis { #kimmdy.cmd.analysis }
+
+`cmd.analysis()`
+
+Analyse existing KIMMDY runs.
 
 ### build_examples { #kimmdy.cmd.build_examples }
 
@@ -22,9 +30,9 @@ Also initialized logging and configuration.
 
 Build examples from the command line.
 
-### configure_logging { #kimmdy.cmd.configure_logging }
+### configure_logger { #kimmdy.cmd.configure_logger }
 
-`cmd.configure_logging(args, color=False)`
+`cmd.configure_logger(log_path, log_level)`
 
 Configure logging.
 
@@ -33,10 +41,18 @@ for the terminal.
 
 #### Parameters
 
-| Name    | Type                                                     | Description                                               | Default    |
-|---------|----------------------------------------------------------|-----------------------------------------------------------|------------|
-| `args`  | [argparse](`argparse`).[Namespace](`argparse.Namespace`) | Command line arguments.                                   | _required_ |
-| `color` |                                                          | Should logging output use colorcodes for terminal output? | `False`    |
+| Name        | Type                   | Description           | Default    |
+|-------------|------------------------|-----------------------|------------|
+| `log_path`  | [Path](`pathlib.Path`) | File path to log file | _required_ |
+| `log_level` | [str](`str`)           | Log                   | _required_ |
+
+### get_analysis_cmdline_args { #kimmdy.cmd.get_analysis_cmdline_args }
+
+`cmd.get_analysis_cmdline_args()`
+
+concat :
+Don&#x27;t perform a full KIMMDY run but instead concatenate trajectories
+from a previous run.
 
 ### get_build_example_args { #kimmdy.cmd.get_build_example_args }
 

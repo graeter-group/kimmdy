@@ -5,13 +5,16 @@ import os
 import re
 from pathlib import Path
 from collections.abc import Iterable
-from typing import Generator, Optional
+from typing import Generator, Optional, Union
 import xml.etree.ElementTree as ET
 from itertools import takewhile
 import logging
+import json
+import numpy as np
 
 from kimmdy.utils import get_gmx_dir
 
+logger = logging.getLogger(__name__)
 TopologyDict = dict
 
 GMX_BUILTIN_FF_DIR = get_gmx_dir() / "top"
@@ -134,7 +137,7 @@ def resolve_includes(path: Path) -> tuple[list[str], Optional[Path]]:
                 if not ls_prime:
                     ls_prime, _ = resolve_includes(GMX_BUILTIN_FF_DIR / include_path)
                 if not ls_prime:
-                    logging.warning(
+                    logger.warning(
                         f"top include {include_path} could not be resolved. Line was dropped."
                     )
                 ls.extend(ls_prime)
@@ -196,7 +199,7 @@ def read_top(path: Path) -> TopologyDict:
 
     ls, ffdir = resolve_includes(path)
     if ffdir is None:
-        logging.warning(f"No #include for a forcefield directory found in {path}.")
+        logger.warning(f"No #include for a forcefield directory found in {path}.")
 
     ls = filter(lambda l: not l.startswith("*"), ls)
     d = {}
@@ -444,3 +447,27 @@ def read_xml_ff(path: Path) -> ET.Element:
     tree = ET.parse(path)
     root = tree.getroot()
     return root
+
+
+class JSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        else:
+            return super(JSONEncoder, self).default(obj)
+
+
+def write_json(d: dict, path: Path) -> None:
+    logger.debug(f"writing dictionary to json: {d}")
+    with open(path, "w") as f:
+        json.dump(d, f, cls=JSONEncoder)
+
+
+def read_json(path: Union[str, Path]) -> dict:
+    with open(path, "r") as f:
+        data = json.load(f)
+    return data

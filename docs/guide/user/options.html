@@ -642,66 +642,87 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td></td>
 </tr>
 <tr class="odd">
+<td><strong>changer.topology.parameterization</strong></td>
+<td></td>
+<td>str</td>
+<td>grappa</td>
+<td></td>
+</tr>
+<tr class="even">
 <td>sequence</td>
 <td>List of tasks. Each task can be a string (the name of the task) or an object with the task name and a multiplicity <code>mult: &lt;int&gt;</code></td>
 <td>Sequence</td>
 <td></td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>reactions</td>
 <td>Settings for reactions</td>
 <td></td>
 <td></td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>reactions.homolysis.edis</td>
 <td>Dissociation energies data file</td>
 <td>Path</td>
 <td>edissoc.dat</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>reactions.homolysis.itp</td>
 <td>Additional itp file with bonded parameters</td>
 <td>Path</td>
 <td>ffbonded.itp</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>reactions.hat_naive.frequency_factor</td>
 <td>Frequency factor</td>
 <td>float</td>
 <td>1</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>reactions.hat_naive.h_cutoff</td>
 <td>Cutoff for H atom</td>
 <td>float</td>
 <td>4</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>reactions.hat_naive.polling_rate</td>
 <td>Polling rate</td>
 <td>float</td>
 <td>1</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>reactions.dummyreaction.example</td>
 <td>This is an example of an option for a reaction.</td>
 <td>float</td>
 <td>0.0</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>reactions.dummyreaction.example2</td>
 <td>This is another example of an option for a reaction.</td>
 <td>str</td>
 <td>hello</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>plot_rates</td>
+<td>Plot the reaction rates</td>
+<td>bool</td>
+<td>False</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>save_recipes</td>
+<td>Save recipes as csv during <code>decide_reaction</code></td>
+<td>bool</td>
+<td>False</td>
 <td></td>
 </tr>
 </tbody>

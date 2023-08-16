@@ -3,7 +3,9 @@ tox
 black
 hypothesis
 jupyter
-# git+https://github.com/machow/quartodoc.git   
+git+https://github.com/machow/quartodoc.git   
+git+ssh://git@github.com/hits-mbm-dev/grappa.git
 pydantic<2
 -e .
--e ./plugins
+-e ./plugins/default_reactions
+-e ./plugins/grappa_interface

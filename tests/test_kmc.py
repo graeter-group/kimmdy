@@ -18,14 +18,16 @@ def recipe_collection():
 @pytest.fixture
 def reference_KMC():
     return KMCResult(
-        recipe_steps=[Bind(2, 3)],
-        time_step=0.04032167624965666,
+        recipe=Recipe(
+            [Bind(2, 3)], rates=[0.12, 0.0], timespans=[(0.0, 6.0), (6.0, 10.0)]
+        ),
+        time_delta=0.04032167624965666,
         reaction_probability=[0.0, 0.72, 0.54, 0.0],
     )
 
 
 def compare_to_ref(result: dict, reference: dict):
-    assert result.recipe_steps == reference.recipe_steps
+    assert result.recipe == reference.recipe
     for i in range(len(reference.reaction_probability)):
         assert (
             abs(result.reaction_probability[i] - reference.reaction_probability[i])
@@ -35,12 +37,12 @@ def compare_to_ref(result: dict, reference: dict):
 
 def test_rf_kmc_empty():
     KMC_dict = rf_kmc(RecipeCollection([]))
-    assert KMC_dict.recipe_steps == None
+    assert KMC_dict.recipe == Recipe([], [], [])
 
 
 def test_frm_empty():
     KMC_dict = frm(RecipeCollection([]))
-    assert KMC_dict.recipe_steps == None
+    assert KMC_dict.recipe == Recipe([], [], [])
 
 
 def test_rf_kmc_unlike_ref(reference_KMC):
@@ -56,7 +58,7 @@ def test_rf_kmc_calculation(recipe_collection, reference_KMC):
     # first random numbers are array([0.51182162, 0.9504637])
     KMC_dict = rf_kmc(recipe_collection, rng)
     compare_to_ref(KMC_dict, reference_KMC)
-    assert abs(KMC_dict.time_step - reference_KMC.time_step) < 1e-9
+    assert abs(KMC_dict.time_delta - reference_KMC.time_delta) < 1e-9
 
 
 def test_frm_calculation(recipe_collection, reference_KMC):
@@ -73,4 +75,4 @@ def test_frm_no_event(recipe_collection):
     # first random numbers are array([0.51182162, 0.9504637 , 0.14415961, 0.94864945])
     new_recipes = recipe_collection.recipes[2:4]
     KMC_dict = frm(RecipeCollection(new_recipes), rng, MD_time=None)
-    assert KMC_dict.recipe_steps == None
+    assert KMC_dict.recipe == Recipe([], [], [])

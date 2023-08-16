@@ -387,16 +387,7 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#kimmdy.misc_helper" id="toc-kimmdy.misc_helper" class="nav-link active" data-scroll-target="#kimmdy.misc_helper">misc_helper</a>
-  <ul>
-  <li><a href="#functions" id="toc-functions" class="nav-link" data-scroll-target="#functions">Functions</a>
-  <ul>
-  <li><a href="#kimmdy.misc_helper.concat_traj" id="toc-kimmdy.misc_helper.concat_traj" class="nav-link" data-scroll-target="#kimmdy.misc_helper.concat_traj">concat_traj</a>
-  <ul class="collapse">
-  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
-  </ul></li>
-  </ul></li>
-  </ul></li>
+  <li><a href="#kimmdy.misc_helper" id="toc-kimmdy.misc_helper" class="nav-link active" data-scroll-target="#kimmdy.misc_helper">misc_helper</a></li>
   </ul>
 <div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hits-mbm-dev/kimmdy/edit/main/_reference/misc_helper.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/hits-mbm-dev/kimmdy/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
@@ -409,63 +400,8 @@ ul.task-list li input[type="checkbox"] {
 <h1>misc_helper</h1>
 <p><code>misc_helper</code></p>
 <p>Miscelaneous utilitiies that didn't fit anywhere else for now.</p>
-<section id="functions" class="level2">
-<h2 class="anchored" data-anchor-id="functions">Functions</h2>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.misc_helper.concat_traj">concat_traj</a></td>
-<td>Find and concatenate trajectories from KIMMDY runs.</td>
-</tr>
-</tbody>
-</table>
-<section id="kimmdy.misc_helper.concat_traj" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.misc_helper.concat_traj">concat_traj</h3>
-<p><code>misc_helper.concat_traj(run_dir, out=None, run_types=None)</code></p>
-<p>Find and concatenate trajectories from KIMMDY runs.</p>
-<section id="parameters" class="level4">
-<h4 class="anchored" data-anchor-id="parameters">Parameters</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Type</th>
-<th>Description</th>
-<th>Default</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><code>run_dir</code></td>
-<td><a href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path">Path</a> | <a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
-<td>Directory containing directories of multiple tasks.</td>
-<td><em>required</em></td>
-</tr>
-<tr class="even">
-<td><code>out</code></td>
-<td><a href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path">Path</a></td>
-<td>File Path into the output trr will be written. Default <code>concat.trr</code> in given run_dir</td>
-<td><code>None</code></td>
-</tr>
-<tr class="odd">
-<td><code>run_types</code></td>
-<td><code>list</code></td>
-<td>List of tasks to get trrs from. If a task is not in this list it will be skipped. By default None</td>
-<td><code>None</code></td>
-</tr>
-</tbody>
-</table>
 
 
-</section>
-</section>
-</section>
 </section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->

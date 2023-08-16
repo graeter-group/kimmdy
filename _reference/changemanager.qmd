@@ -58,7 +58,7 @@ TODO: finish this function.
 
 ### modify_top { #kimmdy.changemanager.modify_top }
 
-`changemanager.modify_top(recipe_steps, files, ffpatch, topology)`
+`changemanager.modify_top(recipe_steps, files, topology, parameterizer)`
 
 Modify the topology of the system according to the recipe steps.
 
@@ -71,5 +71,4 @@ to a file to be used by external programs (gromacs).
 |----------------|----------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|------------|
 | `recipe_steps` | [list](`list`)\[[RecipeStep](`kimmdy.reaction.RecipeStep`)\]                     | A list of [](`~kimmdy.reaction.RecipeStep`)s. parameter.                                         | _required_ |
 | `files`        | [TaskFiles](`kimmdy.tasks.TaskFiles`)                                            | Input and output files for this [](`~kimmdy.tasks.Task`). files.input: - top files.output: - top | _required_ |
-| `ffpatch`      | [Optional](`typing.Optional`)\[[Path](`pathlib.Path`)\]                          | TODO: deprecate                                                                                  | _required_ |
 | `topology`     | [Optional](`typing.Optional`)\[[Topology](`kimmdy.topology.topology.Topology`)\] | TODO: make this required instead of optional                                                     | _required_ |

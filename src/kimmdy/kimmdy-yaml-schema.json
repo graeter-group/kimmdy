@@ -146,6 +146,20 @@
               "pytype": "str"
             }
           }
+        },
+        "topology": {
+          "type": "object",
+          "description": "Settings for parameter changes in the topology file",
+          "properties": {
+            "parameterization": {
+              "type": "string",
+              "pytype": "str",
+              "enum": ["grappa","basic"],
+              "default": "grappa"
+            }
+          },
+          "required": ["parameterization"],
+          "additionalProperties": false
         }
       }
     },
@@ -205,15 +219,27 @@
       "additionalProperties": true,
       "properties": {
         "homolysis": {
-          "$ref": "../../plugins/src/homolysis/kimmdy-yaml-schema.json"
+          "$ref": "../../plugins/default_reactions/src/homolysis/kimmdy-yaml-schema.json"
         },
         "hat_naive": {
-          "$ref": "../../plugins/src/hat_naive/kimmdy-yaml-schema.json"
+          "$ref": "../../plugins/default_reactions/src/hat_naive/kimmdy-yaml-schema.json"
         },
         "dummyreaction": {
-          "$ref": "../../plugins/src/dummyreaction/kimmdy-yaml-schema.json"
+          "$ref": "../../plugins/default_reactions/src/dummyreaction/kimmdy-yaml-schema.json"
         }
       }
+    },
+    "plot_rates" : {
+      "description": "Plot the reaction rates",
+      "type": "boolean",
+      "pytype": "bool",
+      "default": false
+    },
+    "save_recipes" : {
+      "description": "Save recipes as csv during `decide_reaction`",
+      "type": "boolean",
+      "pytype": "bool",
+      "default": false
     }
   },
   "required": ["name", "sequence" ]

@@ -11,16 +11,22 @@
 
 ### Task { #kimmdy.tasks.Task }
 
-`tasks.Task(self, f, kwargs={})`
+`tasks.Task(self, runmng, f, kwargs=None, out=None)`
 
-A task to be performed as as a step in the RunManager.
+#### Parameters:
 
-A task consists of a function and its keyword arguments and is
-itself callable. The function must return a TaskFiles object.
+runmng : kimmdy.runmanager.Runmanager
+    Runmanager instance
+f : Callable
+    Will be called when the task is called
+kwargs : dict
+    kwargs will be passed to f
+out : str, optional
+    If not None, an output dir will be created with this name
 
 ### TaskFiles { #kimmdy.tasks.TaskFiles }
 
-`tasks.TaskFiles(get_latest, input=field(default_factory=dict), output=field(default_factory=dict), outputdir=Path())`
+`tasks.TaskFiles(get_latest, input=field(default_factory=dict), output=field(default_factory=dict), outputdir=Path(), logger=logging.getLogger('kimmdy.basetask'))`
 
 Input and Output files and directories.
 
@@ -43,3 +49,15 @@ Files which can not be found by get_latest must be added manually.
 >>> files.input["top"]
 {'top': 'latest top'}
 ```
+
+## Functions
+
+| Name | Description |
+| --- | --- |
+| [create_task_directory](#kimmdy.tasks.create_task_directory) | Creates TaskFiles object, output directory and symlinks ff. |
+
+### create_task_directory { #kimmdy.tasks.create_task_directory }
+
+`tasks.create_task_directory(runmng, postfix)`
+
+Creates TaskFiles object, output directory and symlinks ff.

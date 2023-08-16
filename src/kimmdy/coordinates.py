@@ -18,6 +18,8 @@ from kimmdy.topology.utils import (
     set_protein_section,
 )
 
+logger = logging.getLogger(__name__)
+
 
 def is_parameterized(entry: Interaction):
     """Parameterized topology entries have c0 and c1 attributes != None"""
@@ -174,9 +176,8 @@ def merge_top_parameter_growth(
     hyperparameters = {
         "morse_well_depth": "400.0",
         "morse_steepness": "10.0",
-        "morse_dist_factor": 5,
+        "morse_dist_factor": 4,
     }  # well_depth D [kJ/mol], steepness [nm-1], dist_factor for bond length
-    logging.info(f"Merging topologies {topA} and {topB}")
 
     # TODO:
     # think about how to bring focus_nr into this
@@ -194,7 +195,7 @@ def merge_top_parameter_growth(
                 atomB.massB = deepcopy(atomB.mass)
                 atomB.mass = deepcopy(atomA.mass)
             else:
-                logging.debug(
+                logger.debug(
                     f"Atom {nr} with A:{atomA} and B:{atomB} changed during changemanager step but not the charges!"
                 )
 
@@ -306,7 +307,7 @@ def merge_top_parameter_growth(
                     c3=parameterizedB.c1,
                 )
             else:
-                logging.warning(f"Could not parameterize angle {key}.")
+                logger.warning(f"Could not parameterize angle {key}.")
 
     ## dihedrals
     ## proper dihedrals

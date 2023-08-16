@@ -425,11 +425,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#classes" id="toc-classes" class="nav-link" data-scroll-target="#classes">Classes</a>
   <ul>
-  <li><a href="#kimmdy.tasks.Task" id="toc-kimmdy.tasks.Task" class="nav-link" data-scroll-target="#kimmdy.tasks.Task">Task</a></li>
+  <li><a href="#kimmdy.tasks.Task" id="toc-kimmdy.tasks.Task" class="nav-link" data-scroll-target="#kimmdy.tasks.Task">Task</a>
+  <ul class="collapse">
+  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters:</a></li>
+  </ul></li>
   <li><a href="#kimmdy.tasks.TaskFiles" id="toc-kimmdy.tasks.TaskFiles" class="nav-link" data-scroll-target="#kimmdy.tasks.TaskFiles">TaskFiles</a>
   <ul class="collapse">
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul></li>
+  </ul></li>
+  <li><a href="#functions" id="toc-functions" class="nav-link" data-scroll-target="#functions">Functions</a>
+  <ul>
+  <li><a href="#kimmdy.tasks.create_task_directory" id="toc-kimmdy.tasks.create_task_directory" class="nav-link" data-scroll-target="#kimmdy.tasks.create_task_directory">create_task_directory</a></li>
   </ul></li>
   </ul></li>
   </ul>
@@ -465,13 +472,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </table>
 <section id="kimmdy.tasks.Task" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.tasks.Task">Task</h3>
-<p><code>tasks.Task(self, f, kwargs={})</code></p>
-<p>A task to be performed as as a step in the RunManager.</p>
-<p>A task consists of a function and its keyword arguments and is itself callable. The function must return a TaskFiles object.</p>
+<p><code>tasks.Task(self, runmng, f, kwargs=None, out=None)</code></p>
+<section id="parameters" class="level4">
+<h4 class="anchored" data-anchor-id="parameters">Parameters:</h4>
+<p>runmng : kimmdy.runmanager.Runmanager Runmanager instance f : Callable Will be called when the task is called kwargs : dict kwargs will be passed to f out : str, optional If not None, an output dir will be created with this name</p>
+</section>
 </section>
 <section id="kimmdy.tasks.TaskFiles" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.tasks.TaskFiles">TaskFiles</h3>
-<p><code>tasks.TaskFiles(get_latest, input=field(default_factory=dict), output=field(default_factory=dict), outputdir=Path())</code></p>
+<p><code>tasks.TaskFiles(get_latest, input=field(default_factory=dict), output=field(default_factory=dict), outputdir=Path(), logger=logging.getLogger('kimmdy.basetask'))</code></p>
 <p>Input and Output files and directories.</p>
 <p>Hosts the input and output files belonging to a task. A function or method that wants to be callable as a Task has to return a TaskFiles object. The input defaultdict is populated on the fly using get_latest of the runmanager to find newest files. Files which can not be found by get_latest must be added manually.</p>
 <section id="examples" class="level4">
@@ -484,9 +493,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> files.<span class="bu">input</span></span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> files.<span class="bu">input</span>[<span class="st">"top"</span>]</span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>{<span class="st">'top'</span>: <span class="st">'latest top'</span>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-
-
 </section>
+</section>
+</section>
+<section id="functions" class="level2">
+<h2 class="anchored" data-anchor-id="functions">Functions</h2>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="#kimmdy.tasks.create_task_directory">create_task_directory</a></td>
+<td>Creates TaskFiles object, output directory and symlinks ff.</td>
+</tr>
+</tbody>
+</table>
+<section id="kimmdy.tasks.create_task_directory" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.tasks.create_task_directory">create_task_directory</h3>
+<p><code>tasks.create_task_directory(runmng, postfix)</code></p>
+<p>Creates TaskFiles object, output directory and symlinks ff.</p>
+
+
 </section>
 </section>
 </section>
