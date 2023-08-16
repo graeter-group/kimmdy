@@ -166,7 +166,7 @@ class Topology:
 
         This whill be used if just the name of the object is entered in the ipython shell
         or a jupyter notebook.
-        
+
         p is an instance of IPython.lib.pretty.RepresentationPrinter
         <https://ipython.org/ipython-doc/3/api/generated/IPython.lib.pretty.html#IPython.lib.pretty.PrettyPrinter>
         """
@@ -281,7 +281,6 @@ class Topology:
             dihedral.al = al
             new_dihedrals[(ai, aj, ak, al)] = dihedral
         self.improper_dihedrals = new_dihedrals
-
 
     def _parse_atoms(self):
         """Parse atoms from topology dictionary."""
