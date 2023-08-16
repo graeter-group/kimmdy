@@ -4,6 +4,7 @@ Also initialized logging and configuration.
 """
 import argparse
 import logging
+import logging.config
 from os import chmod
 from pathlib import Path
 import textwrap
