@@ -36,9 +36,10 @@ save_recipes: true
 sequence:
   - equilibrium
   - pull
+  - homolysis
   -
     mult: 2
     tasks:
-      - reactions
       - equilibrium
       - pull
+      - reactions
