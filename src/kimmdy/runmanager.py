@@ -412,7 +412,7 @@ class RunManager:
         self, decision_strategy: Callable[[RecipeCollection], KMCResult], files=None
     ):
         if files is None:
-            global logger
+            logger = logging.getLogger(__name__)
         else:
             logger = files.logger
 
