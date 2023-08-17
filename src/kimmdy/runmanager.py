@@ -140,6 +140,7 @@ class RunManager:
                 {"f": self._run_recipe, "out": "run_recipe"},
             ],
         }
+        # decide_recipe only needs a outputdir some times:
         if self.config.plot_rates or self.config.save_recipes:
             self.task_mapping["reactions"][1]["out"] = "decide_recipe"
 
@@ -156,7 +157,7 @@ class RunManager:
         logger.debug(pformat(self.config.__dict__))
 
     def run(self):
-        logging.info("Start run")
+        logger.info("Start run")
         self.start_time = time.time()
         self.current_time = time.time()
 
@@ -171,22 +172,22 @@ class RunManager:
                 or self.config.max_hours == 0
             )
         ):
-            logging.info("Write checkpoint before next task")
+            logger.info("Write checkpoint before next task")
             with open(self.cptfile, "wb") as f:
                 dill.dump(self, f)
             next(self)
             self.current_time = time.time()
-            logging.info("Done with:")
-            logging.info(f"task: {self.iteration}, max: {self.config.max_tasks}")
-            logging.info(
+            logger.info("Done with:")
+            logger.info(f"task: {self.iteration}, max: {self.config.max_tasks}")
+            logger.info(
                 f"hours: {(self.current_time - self.start_time) / 360}, max: {self.config.max_hours}"
             )
 
-        logging.info(f"Finished running tasks, state: {self.state}")
+        logger.info(f"Finished running tasks, state: {self.state}")
 
     def _setup_tasks(self):
         """allows for mapping one config entry to multiple tasks"""
-        logging.info("Build task list")
+        logger.info("Build task list")
         for entry in self.config.sequence:
             if entry in self.config.mds.get_attributes():
                 task = Task(
@@ -196,7 +197,7 @@ class RunManager:
                     out=entry,
                 )
                 self.tasks.put(task)
-                logging.info(f"Put Task: {task}")
+                logger.info(f"Put Task: {task}")
                 self.tasks.put(task)
             else:
                 for task_kargs in self.task_mapping[entry]:
@@ -208,11 +209,11 @@ class RunManager:
         Used to generate a starting point for jobscripts on hpc clusters
         that can easily self-submit after a timelimit was exceeded.
         """
-        logging.info("Initial setup for first checkpoint")
+        logger.info("Initial setup for first checkpoint")
         self._setup_tasks()
         with open(self.cptfile, "wb") as f:
             dill.dump(self, f)
-        logging.info(f"Wrote checkpointfile to: {self.cptfile}, ")
+        logger.info(f"Wrote checkpointfile to: {self.cptfile}, ")
 
     def get_latest(self, suffix: str):
         """Returns path to latest file of given type.

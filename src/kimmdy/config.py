@@ -204,7 +204,7 @@ class Config:
 
             # make sure self.out is empty
             while not no_increment_output_dir and self.out.exists():
-                logging.debug(f"Output dir {self.out} exists, incrementing name")
+                logger.debug(f"Output dir {self.out} exists, incrementing name")
                 out_end = self.out.name[-3:]
                 if out_end.isdigit():
                     self.out = self.out.with_name(
@@ -214,7 +214,7 @@ class Config:
                     self.out = self.out.with_name(self.out.name + "_001")
             if not no_increment_output_dir:
                 self.out.mkdir()
-                logging.info(f"Created output dir {self.out}")
+                logger.info(f"Created output dir {self.out}")
 
         # individual attributes, recursively
         for name, attr in self.__dict__.items():
