@@ -118,7 +118,7 @@
                 },
                 "distances": {
                   "type": "string",
-                  "pytype": "str"
+                  "pytype": "Path"
                 }
               },
               "required": ["dat", "distances"],
