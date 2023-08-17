@@ -195,17 +195,19 @@ class RunManager:
         logger.info("Build task list")
         for entry in self.config.sequence:
             # handle md steps
-            if entry in self.config.mds.get_attributes():
-                task = Task(
-                    self,
-                    f=self.task_mapping["md"],
-                    kwargs={"instance": entry},
-                    out=entry,
-                )
-                self.tasks.put(task)
+            if hasattr(self.config, "mds"):
+                if entry in self.config.mds.get_attributes():
+                    task = Task(
+                        self,
+                        f=self.task_mapping["md"],
+                        kwargs={"instance": entry},
+                        out=entry,
+                    )
+                    self.tasks.put(task)
+                    continue
 
             # handle single reaction steps
-            elif entry in self.config.reactions.get_attributes():
+            if entry in self.config.reactions.get_attributes():
                 task_list = copy(self.task_mapping["reactions"])
                 task_list[0] = {
                     "f": self._place_reaction_tasks,
@@ -214,11 +216,17 @@ class RunManager:
 
                 for task_kargs in task_list:
                     self.tasks.put(Task(self, **task_kargs))
+                continue
 
             # handle combined reaction steps
-            else:
+            if entry == "reactions":
                 for task_kargs in self.task_mapping[entry]:
                     self.tasks.put(Task(self, **task_kargs))
+                continue
+            m = f"Unknown task encounterd: {entry}"
+            logger.error(m)
+            raise ValueError(m)
+
 
     def write_one_checkoint(self):
         """Just write the first checkpoint and then exit
@@ -485,7 +493,7 @@ class RunManager:
                 instance = self.config.changer.coordinates.md_parameter_growth
 
             else:
-                logger.warning(
+                logger.debug(
                     f"No parameter growth MD possible, trying classical MD relaxation."
                 )
                 run_parameter_growth = False
