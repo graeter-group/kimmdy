@@ -7,7 +7,7 @@ rest of the program and keeps track of global state.
 from __future__ import annotations
 import logging
 from pathlib import Path
-from copy import deepcopy
+from copy import copy, deepcopy
 import dill
 import queue
 from enum import Enum, auto
@@ -125,7 +125,9 @@ class RunManager:
                 ]()
         except KeyError as e:
             raise KeyError(
-                f"The parameterization tool chosen in the configuration file: '{self.config.changer.topology.parameterization}' can not be found in the parameterization plugins: {list(parameterization_plugins.keys())}"
+                f"The parameterization tool chosen in the configuration file: "
+                f"'{self.config.changer.topology.parameterization}' can not be found in "
+                f"the parameterization plugins: {list(parameterization_plugins.keys())}"
             ) from e
 
         self.filehist: list[dict[str, TaskFiles]] = [
@@ -140,6 +142,7 @@ class RunManager:
                 {"f": self._run_recipe, "out": "run_recipe"},
             ],
         }
+
         # decide_recipe only needs a outputdir some times:
         if self.config.plot_rates or self.config.save_recipes:
             self.task_mapping["reactions"][1]["out"] = "decide_recipe"
@@ -147,7 +150,7 @@ class RunManager:
         # Instantiate reactions
         self.reaction_plugins: list[ReactionPlugin] = []
         react_names = self.config.reactions.get_attributes()
-        # logger.info("Instantiating Reactions:", *react_names)
+        logger.debug(f"Instantiating Reactions: {react_names}")
         for rp_name in react_names:
             r = reaction_plugins[rp_name]
             reaction_plugin: ReactionPlugin = r(rp_name, self)
@@ -186,9 +189,12 @@ class RunManager:
         logger.info(f"Finished running tasks, state: {self.state}")
 
     def _setup_tasks(self):
-        """allows for mapping one config entry to multiple tasks"""
+        """Populates the tasks queue.
+        Allows for mapping one config entry to multiple tasks
+        """
         logger.info("Build task list")
         for entry in self.config.sequence:
+            # handle md steps
             if entry in self.config.mds.get_attributes():
                 task = Task(
                     self,
@@ -197,7 +203,19 @@ class RunManager:
                     out=entry,
                 )
                 self.tasks.put(task)
-                logger.info(f"Put Task: {task}")
+
+            # handle single reaction steps
+            elif entry in self.config.reactions.get_attributes():
+                task_list = copy(self.task_mapping["reactions"])
+                task_list[0] = {
+                    "f": self._place_reaction_tasks,
+                    "kwargs": {"selected": entry},
+                }
+
+                for task_kargs in task_list:
+                    self.tasks.put(Task(self, **task_kargs))
+
+            # handle combined reaction steps
             else:
                 for task_kargs in self.task_mapping[entry]:
                     self.tasks.put(Task(self, **task_kargs))
@@ -354,14 +372,17 @@ class RunManager:
         logger.info(f"Done with MD {instance}")
         return files
 
-    def _place_reaction_tasks(self):
+    def _place_reaction_tasks(self, selected: Union[str, None] = None):
         logger.info("Query reactions")
         self.state = State.REACTION
         # empty list for every new round of queries
         self.recipe_collection: RecipeCollection = RecipeCollection([])
 
+        # placing tasks in priority queue
         for reaction_plugin in self.reaction_plugins:
-            # placing tasks in priority queue
+            if selected is not None:
+                if reaction_plugin.name != selected:
+                    continue
 
             self.crr_tasks.put(
                 Task(
