@@ -69,6 +69,11 @@ def get_cmdline_args():
         ),
     )
 
+    # on error, drop into debugger
+    parser.add_argument(
+        "--debug", action="store_true", help=("on error, drop into debugger")
+    )
+
     # flag to show available plugins
     parser.add_argument(
         "--show-plugins", action="store_true", help=("List available plugins")
@@ -401,7 +406,15 @@ def _run(args: argparse.Namespace):
         logger.debug("Using system GROMACS:")
         logger.debug(check_gmx_version(config))
 
-    runmgr.run()
+    try:
+        runmgr.run()
+    except Exception as e:
+        if args.debug:
+            import pdb
+
+            pdb.post_mortem()
+        else:
+            raise e
 
 
 def kimmdy_run(
@@ -414,6 +427,7 @@ def kimmdy_run(
     show_plugins: bool = False,
     show_schema_path: bool = False,
     generate_jobscript: bool = False,
+    debug: bool = False,
 ):
     """Run KIMMDY from python.
 
@@ -449,6 +463,7 @@ def kimmdy_run(
         show_plugins=show_plugins,
         show_schema_path=show_schema_path,
         generate_jobscript=generate_jobscript,
+        debug=debug,
     )
     _run(args)
     logging.shutdown()
