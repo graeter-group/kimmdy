@@ -5,8 +5,8 @@ from kimmdy.parsing import TopologyDict
 from kimmdy.topology.atomic import *
 from kimmdy.topology.utils import (
     get_protein_section,
+    get_top_section,
     attributes_to_list,
-    match_atomic_item_to_atomic_type,
     set_protein_section,
     set_top_section,
 )
@@ -14,45 +14,19 @@ from kimmdy.topology.ff import FF
 from itertools import permutations, combinations
 import textwrap
 import logging
-import re
 
 
 PROTEIN_SECTION = "moleculetype_0"
 
-
-class Topology:
-    """Smart container for parsed topology data.
-
-    A topology keeps track of connections when bonds are broken or formed.
-
-    Assumptions:
-
-    - the topology of interest (the protein) is in section 'moleculetype_0'.
-
-    Parameters
-    ----------
-    top :
-        A dictionary containing the parsed topology data.
+class Molecule:
+    """One moleculetype in the topology
     """
+    def __init__(self, top: dict, ix: int) -> None:
+        self.ix = ix
+        self.moleculetype = f"moleculetype_{ix}"
+        self.name, self.nrexcl = top[self.moleculetype]['content']
+        self.top = top[self.moleculetype]["subsections"]
 
-    def __init__(
-        self,
-        top: TopologyDict,
-    ) -> None:
-        if top == {}:
-            raise NotImplementedError(
-                "Generating an empty Topology from an empty TopologyDict is not implemented."
-            )
-
-        if not top.get(PROTEIN_SECTION) or not top[PROTEIN_SECTION].get("subsections"):
-            raise ValueError(
-                "The topology does not contain a protein section."
-                "Please make sure the topology contains a section"
-                "called [ moleculetype ]."
-                "The first of which is assumed to be the protein of interest."
-            )
-        self.protein = top[PROTEIN_SECTION]["subsections"]
-        self.top = top
         self.atoms: dict[str, Atom] = {}
         self.bonds: dict[tuple[str, str], Bond] = {}
         self.pairs: dict[tuple[str, str], Pair] = {}
@@ -63,9 +37,8 @@ class Topology:
         self.dihedral_restraints: dict[
             tuple[str, str, str, str], DihedralRestraint
         ] = {}
+        # TODO: self.settles = {}
         self.radicals: dict[str, Atom] = {}
-
-        self.ff = FF(top)
 
         self._parse_atoms()
         self._parse_bonds()
@@ -75,102 +48,6 @@ class Topology:
         self._parse_restraints()
         self._initialize_graph()
         self._test_for_radicals()
-
-    def __eq__(self, other: object) -> bool:
-        if not isinstance(other, Topology):
-            return NotImplemented
-        return self.to_dict() == other.to_dict()
-
-    def _update_dict(self):
-        set_protein_section(
-            self.top, "atoms", [attributes_to_list(x) for x in self.atoms.values()]
-        )
-
-        set_protein_section(
-            self.top, "bonds", [attributes_to_list(x) for x in self.bonds.values()]
-        )
-
-        if len(self.pairs) > 0:
-            set_protein_section(
-                self.top, "pairs", [attributes_to_list(x) for x in self.pairs.values()]
-            )
-
-        if len(self.angles) > 0:
-            set_protein_section(
-                self.top,
-                "angles",
-                [attributes_to_list(x) for x in self.angles.values()],
-            )
-
-        if len(self.proper_dihedrals) > 0:
-            set_protein_section(
-                self.top,
-                "dihedrals",
-                [
-                    attributes_to_list(x)
-                    for dihedrals in self.proper_dihedrals.values()
-                    for x in dihedrals.dihedrals.values()
-                ]
-                + [attributes_to_list(x) for x in self.improper_dihedrals.values()],
-            )
-
-        set_top_section(
-            self.top,
-            "atomtypes",
-            [attributes_to_list(x) for x in self.ff.atomtypes.values()],
-        )
-
-        set_top_section(
-            self.top,
-            "bondtypes",
-            [attributes_to_list(x) for x in self.ff.bondtypes.values()],
-        )
-
-        set_top_section(
-            self.top,
-            "angletypes",
-            [attributes_to_list(x) for x in self.ff.angletypes.values()],
-        )
-
-        # activate again once this works
-        # set_top_section(
-        #     self.top,
-        #     "dihedraltypes",
-        #     [attributes_to_list(x) for x in self.ff.improper_dihedraltypes.values()]
-        #     + [attributes_to_list(x) for x in self.ff.proper_dihedraltypes.values()],
-        # )
-
-    def to_dict(self) -> TopologyDict:
-        self._update_dict()
-        return self.top
-
-    def __str__(self) -> str:
-        return textwrap.dedent(
-            f"""\
-        Topology with
-        {len(self.atoms)} atoms,
-        {len(self.bonds)} bonds,
-        {len(self.angles)} angles,
-        {len(self.pairs)} pairs,
-        {len(self.proper_dihedrals)} proper dihedrals
-        {len(self.improper_dihedrals)} improper dihedrals
-        """
-        )
-
-    def __repr__(self) -> str:
-        self._update_dict()
-        return f"Topology({self.top})"
-
-    def _repr_pretty_(self, p, cycle):
-        """A __repr__ for ipython.
-
-        This whill be used if just the name of the object is entered in the ipython shell
-        or a jupyter notebook.
-
-        p is an instance of IPython.lib.pretty.RepresentationPrinter
-        <https://ipython.org/ipython-doc/3/api/generated/IPython.lib.pretty.html#IPython.lib.pretty.PrettyPrinter>
-        """
-        p.text(str(self))
 
     def reindex_atomnrs(self):
         """Reindex atom numbers in topology.
@@ -284,7 +161,7 @@ class Topology:
 
     def _parse_atoms(self):
         """Parse atoms from topology dictionary."""
-        ls = get_protein_section(self.top, "atoms")
+        ls = get_top_section(self.top, "atoms")
         if ls is None:
             raise ValueError("No atoms found in topology.")
         for l in ls:
@@ -381,6 +258,140 @@ class Topology:
                 atom.is_radical = False
 
         return None
+
+
+
+class Topology:
+    """Smart container for parsed topology data.
+
+    A topology keeps track of connections when bonds are broken or formed.
+
+    Assumptions:
+
+    - the topology of interest (the protein) is in section 'moleculetype_0'.
+
+    Parameters
+    ----------
+    top :
+        A dictionary containing the parsed topology data.
+    """
+    def __init__(
+        self,
+        top: TopologyDict,
+    ) -> None:
+        if top == {}:
+            raise NotImplementedError(
+                "Generating an empty Topology from an empty TopologyDict is not implemented."
+            )
+
+        if not top.get(PROTEIN_SECTION) or not top[PROTEIN_SECTION].get("subsections"):
+            raise ValueError(
+                "The topology does not contain a protein section."
+                "Please make sure the topology contains a section"
+                "called [ moleculetype ]."
+                "The first of which is assumed to be the protein of interest."
+            )
+        self.protein = top[PROTEIN_SECTION]["subsections"]
+        self.top = top
+        self.molecules: dict[str, Molecule] = {}
+
+        self.ff = FF(top)
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Topology):
+            return NotImplemented
+        return self.to_dict() == other.to_dict()
+
+    def _update_dict(self):
+        set_protein_section(
+            self.top, "atoms", [attributes_to_list(x) for x in self.atoms.values()]
+        )
+
+        set_protein_section(
+            self.top, "bonds", [attributes_to_list(x) for x in self.bonds.values()]
+        )
+
+        if len(self.pairs) > 0:
+            set_protein_section(
+                self.top, "pairs", [attributes_to_list(x) for x in self.pairs.values()]
+            )
+
+        if len(self.angles) > 0:
+            set_protein_section(
+                self.top,
+                "angles",
+                [attributes_to_list(x) for x in self.angles.values()],
+            )
+
+        if len(self.proper_dihedrals) > 0:
+            set_protein_section(
+                self.top,
+                "dihedrals",
+                [
+                    attributes_to_list(x)
+                    for dihedrals in self.proper_dihedrals.values()
+                    for x in dihedrals.dihedrals.values()
+                ]
+                + [attributes_to_list(x) for x in self.improper_dihedrals.values()],
+            )
+
+        set_top_section(
+            self.top,
+            "atomtypes",
+            [attributes_to_list(x) for x in self.ff.atomtypes.values()],
+        )
+
+        set_top_section(
+            self.top,
+            "bondtypes",
+            [attributes_to_list(x) for x in self.ff.bondtypes.values()],
+        )
+
+        set_top_section(
+            self.top,
+            "angletypes",
+            [attributes_to_list(x) for x in self.ff.angletypes.values()],
+        )
+
+        # activate again once this works
+        # set_top_section(
+        #     self.top,
+        #     "dihedraltypes",
+        #     [attributes_to_list(x) for x in self.ff.improper_dihedraltypes.values()]
+        #     + [attributes_to_list(x) for x in self.ff.proper_dihedraltypes.values()],
+        # )
+
+    def to_dict(self) -> TopologyDict:
+        self._update_dict()
+        return self.top
+
+    def __str__(self) -> str:
+        return textwrap.dedent(
+            f"""\
+        Topology with
+        {len(self.atoms)} atoms,
+        {len(self.bonds)} bonds,
+        {len(self.angles)} angles,
+        {len(self.pairs)} pairs,
+        {len(self.proper_dihedrals)} proper dihedrals
+        {len(self.improper_dihedrals)} improper dihedrals
+        """
+        )
+
+    def __repr__(self) -> str:
+        self._update_dict()
+        return f"Topology({self.top})"
+
+    def _repr_pretty_(self, p, cycle):
+        """A __repr__ for ipython.
+
+        This whill be used if just the name of the object is entered in the ipython shell
+        or a jupyter notebook.
+
+        p is an instance of IPython.lib.pretty.RepresentationPrinter
+        <https://ipython.org/ipython-doc/3/api/generated/IPython.lib.pretty.html#IPython.lib.pretty.PrettyPrinter>
+        """
+        p.text(str(self))
 
     def break_bond(self, atompair_nrs: tuple[str, str]):
         """Break bonds in topology.
