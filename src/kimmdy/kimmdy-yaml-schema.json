@@ -87,6 +87,21 @@
       "pytype": "Path",
       "default": "*.ff"
     },
+    "distances": {
+      "description": ".dat file containing the distances for starting with reaction",
+      "type": "string",
+      "pytype": "Path"
+    },
+    "tpr": {
+      "description": ".tpr file of a finished simulation for starting with reaction",
+      "type": "string",
+      "pytype": "Path"
+    },
+    "trr": {
+      "description": ".trr file of a finished simulation for starting with reaction",
+      "type": "string",
+      "pytype": "Path"
+    },
     "mds": {
       "type": "object",
       "description": "Settings for MD steps, e.g. mdp files, plumed files, etc.",
@@ -118,7 +133,7 @@
                 },
                 "distances": {
                   "type": "string",
-                  "pytype": "Path"
+                  "pytype": "str"
                 }
               },
               "required": ["dat", "distances"],

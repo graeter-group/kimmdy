@@ -230,7 +230,7 @@ class Config:
                 path = path.resolve()
                 self.__setattr__(name, path)
                 # distances.dat wouldn't exist prior to the run
-                if not str(attr) in ["distances.dat"] and not path.is_dir():
+                if not path.is_dir():
                     check_file_exists(path)
 
     def attr(self, attribute):
