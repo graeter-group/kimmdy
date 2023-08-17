@@ -33,7 +33,9 @@ class Homolysis(ReactionPlugin):
         distances_dat = files.input["distances.dat"]
         topol_top = files.input["top"]
         ffbonded_itp = self.config.itp
+        files.input["itp"] = ffbonded_itp
         edissoc_dat = self.config.edis
+        files.input["edis"] = edissoc_dat
 
         # Initialization of objects from files
         distances = read_distances_dat(distances_dat)
