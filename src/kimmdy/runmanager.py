@@ -198,7 +198,6 @@ class RunManager:
                 )
                 self.tasks.put(task)
                 logger.info(f"Put Task: {task}")
-                self.tasks.put(task)
             else:
                 for task_kargs in self.task_mapping[entry]:
                     self.tasks.put(Task(self, **task_kargs))
