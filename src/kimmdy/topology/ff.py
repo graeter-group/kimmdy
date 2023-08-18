@@ -10,9 +10,9 @@ from kimmdy.topology.utils import get_top_section
 
 
 class FF:
-    """Conainer for parsed forcefield data."""
+    """Container for parsed forcefield data."""
 
-    def __init__(self, top):
+    def __init__(self, top: dict):
         self.atomtypes: dict[str, AtomType] = {}
         self.bondtypes: dict[tuple[str, str], BondType] = {}
         self.angletypes: dict[tuple[str, str, str], AngleType] = {}
@@ -106,7 +106,7 @@ class FF:
     def __repr__(self) -> str:
         return f"FF({self.__dict__})"
 
-    def _repr_pretty_(self, p, cycle):
+    def _repr_pretty_(self, p, _):
         """A __repr__ for ipython.
 
         This whill be used if just the name of the object is entered in the ipython shell

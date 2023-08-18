@@ -5,8 +5,8 @@ from kimmdy.topology.utils import (
     get_moleculetype_atomics,
     get_moleculetype_header,
     attributes_to_list,
+    get_top_section,
     set_moleculetype_atomics,
-    set_protein_section,
     set_top_section,
 )
 from kimmdy.topology.ff import FF
@@ -64,7 +64,7 @@ class MoleculeType:
     def __repr__(self) -> str:
         return f"Molecule({(self.name, self.nrexcl)}, {self.atomics})"
 
-    def _repr_pretty_(self, p, cycle):
+    def _repr_pretty_(self, p, _):
         """A __repr__ for ipython.
 
         This whill be used if just the name of the object is entered in the ipython shell
@@ -311,6 +311,10 @@ class Topology:
 
         self.top = top
         self.moleculetypes: dict[str, MoleculeType] = {}
+        molecules = get_top_section(top, 'molecules')
+        if molecules is None:
+            raise ValueError("molecules not found in top file")
+        self.molecules = {l[0]: l[1] for l in molecules}
 
         self.ff = FF(top)
         self._parse_molecules()
@@ -340,7 +344,13 @@ class Topology:
         for i, moleculetype in enumerate(self.moleculetypes.values()):
             moleculetype._update_atomics_dict()
             set_moleculetype_atomics(self.top, f"moleculetype_{i}", moleculetype.atomics)
-        
+
+        set_top_section(
+            self.top,
+            "molecules",
+            [[name, n] for name, n in self.molecules.items()],
+        )
+
         set_top_section(
             self.top,
             "atomtypes",
@@ -364,6 +374,15 @@ class Topology:
         self._update_dict()
         return self.top
 
+    def reindex_atomnrs(self):
+        """Reindex atom numbers in topology.
+
+        Starts at index 1.
+        This also updates the numbers for bonds, angles, dihedrals and pairs.
+        """
+        for moleculetype in self.moleculetypes.values():
+            moleculetype.reindex_atomnrs()
+
     def __str__(self) -> str:
         return textwrap.dedent(
         f"""
@@ -378,7 +397,7 @@ class Topology:
         self._update_dict()
         return f"Topology({self.top})"
 
-    def _repr_pretty_(self, p, cycle):
+    def _repr_pretty_(self, p, _):
         """A __repr__ for ipython.
 
         This whill be used if just the name of the object is entered in the ipython shell
