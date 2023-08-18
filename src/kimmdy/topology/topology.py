@@ -14,6 +14,8 @@ from itertools import permutations, combinations
 import textwrap
 import logging
 
+from kimmdy.utils import TopologyAtomAddress
+
 logger = logging.getLogger("kimmdy")
 
 class MoleculeType:
@@ -408,13 +410,28 @@ class Topology:
         """
         p.text(str(self))
 
-    def break_bond(self, atompair_nrs: tuple[str, str]):
+    def break_bond(self, atompair_nrs: tuple[TopologyAtomAddress, TopologyAtomAddress]):
         """Break bonds in topology.
 
         removes bond, angles and dihedrals where atompair was involved.
         Modifies the topology dictionary in place.
         """
+        if len(atompair_nrs[0]) == 1 and len(atompair_nrs[1]) == 1:
+            # old style atompair_nrs with only atom numbers
+            # thus refers to the first moleculeype, moleculetype_0
+            # with the name Protein
+            atompair_nrs = (atompair_nrs[0][0], atompair_nrs[1][0])
+            moleculename = "Protein"
+        else:
+            raise NotImplementedError(
+                "Breaking bonds in topology with atompair_nrs with more than one moleculetype is not implemented, yet."
+            )
+
+        moleculetype = self.moleculetypes[moleculename]
+
         atompair_nrs = tuple(sorted(atompair_nrs, key=int))
+
+
         atompair = [self.atoms[atompair_nrs[0]], self.atoms[atompair_nrs[1]]]
 
         # mark atoms as radicals

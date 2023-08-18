@@ -7,6 +7,12 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
+TopologyAtomAddress = str | tuple[str, str] | tuple[int, str]
+"""Address to an atom in the topology.
+
+One of (id: str), (moleculetype: str, id: str) or (moleculetype_ix: int, id).
+"""
+
 
 def get_gmx_dir() -> Path:
     """returns the path to the gromacs installation
