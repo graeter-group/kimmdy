@@ -90,9 +90,9 @@ class FF:
                     continue
                 self.residuetypes[k] = ResidueType.from_section(k, v)
 
-    def __repr__(self) -> str:
+    def __str__(self) -> str:
         return textwrap.dedent(
-            f"""\
+        f"""
         ForceField parameters with
         {len(self.atomtypes)} atomtypes,
         {len(self.bondtypes)} bondtypes,
@@ -102,3 +102,18 @@ class FF:
         {len(self.residuetypes)} residuetypes
         """
         )
+
+    def __repr__(self) -> str:
+        return f"FF({self.__dict__})"
+
+    def _repr_pretty_(self, p, cycle):
+        """A __repr__ for ipython.
+
+        This whill be used if just the name of the object is entered in the ipython shell
+        or a jupyter notebook.
+
+        p is an instance of IPython.lib.pretty.RepresentationPrinter
+        <https://ipython.org/ipython-doc/3/api/generated/IPython.lib.pretty.html#IPython.lib.pretty.PrettyPrinter>
+        """
+        p.text(str(self))
+

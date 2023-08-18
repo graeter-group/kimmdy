@@ -2,9 +2,10 @@ from kimmdy.constants import ATOMTYPE_BONDORDER_FLAT
 from kimmdy.parsing import TopologyDict
 from kimmdy.topology.atomic import *
 from kimmdy.topology.utils import (
-    get_protein_section,
-    get_top_section,
+    get_moleculetype_atomics,
+    get_moleculetype_header,
     attributes_to_list,
+    set_moleculetype_atomics,
     set_protein_section,
     set_top_section,
 )
@@ -13,17 +14,16 @@ from itertools import permutations, combinations
 import textwrap
 import logging
 
+logger = logging.getLogger("kimmdy")
 
-PROTEIN_SECTION = "moleculetype_0"
-
-class Molecule:
+class MoleculeType:
     """One moleculetype in the topology
     """
-    def __init__(self, top: dict, ix: int) -> None:
-        self.ix = ix
-        self.moleculetype = f"moleculetype_{ix}"
-        self.name, self.nrexcl = top[self.moleculetype]['content']
-        self.top = top[self.moleculetype]["subsections"]
+    def __init__(self, header: tuple[str, str], atomics: dict) -> None:
+        self.name, self.nrexcl = header
+        self.atomics = atomics
+
+        logger.info(f"parsing molecule {self.name}")
 
         self.atoms: dict[str, Atom] = {}
         self.bonds: dict[tuple[str, str], Bond] = {}
@@ -46,6 +46,132 @@ class Molecule:
         self._parse_restraints()
         self._initialize_graph()
         self._test_for_radicals()
+
+
+    def __str__(self) -> str:
+        return textwrap.dedent(
+            f"""\
+        Moleculetype {self.name} with:
+        {len(self.atoms)} atoms,
+        {len(self.bonds)} bonds,
+        {len(self.angles)} angles,
+        {len(self.pairs)} pairs,
+        {len(self.proper_dihedrals)} proper dihedrals
+        {len(self.improper_dihedrals)} improper dihedrals
+        """
+        )
+
+    def __repr__(self) -> str:
+        return f"Molecule({(self.name, self.nrexcl)}, {self.atomics})"
+
+    def _repr_pretty_(self, p, cycle):
+        """A __repr__ for ipython.
+
+        This whill be used if just the name of the object is entered in the ipython shell
+        or a jupyter notebook.
+
+        p is an instance of IPython.lib.pretty.RepresentationPrinter
+        <https://ipython.org/ipython-doc/3/api/generated/IPython.lib.pretty.html#IPython.lib.pretty.PrettyPrinter>
+        """
+        p.text(str(self))
+
+    def _parse_atoms(self):
+        """Parse atoms from topology dictionary."""
+        ls = self.atomics.get('atoms')
+        if ls is None:
+            raise ValueError(f"No atoms found in topology for molecule {self.name}.")
+        for l in ls:
+            atom = Atom.from_top_line(l)
+            self.atoms[atom.nr] = atom
+
+    def _parse_bonds(self):
+        """Parse bond from topology dictionary."""
+        ls = self.atomics.get('bonds')
+        if ls is None:
+            return
+        for l in ls:
+            bond = Bond.from_top_line(l)
+            self.bonds[(bond.ai, bond.aj)] = bond
+
+    def _parse_pairs(self):
+        """Parse pairs from topology dictionary."""
+        ls = self.atomics.get('pairs')
+        if ls is None:
+            return
+        for l in ls:
+            pair = Pair.from_top_line(l)
+            self.pairs[(pair.ai, pair.aj)] = pair
+
+    def _parse_angles(self):
+        """Parse angles from topology dictionary."""
+        ls = self.atomics.get('angles')
+        if ls is None:
+            return
+        for l in ls:
+            angle = Angle.from_top_line(l)
+            self.angles[(angle.ai, angle.aj, angle.ak)] = angle
+
+    def _parse_dihedrals(self):
+        """Parse improper and proper dihedrals from topology dictionary."""
+        ls = self.atomics.get('dihedrals')
+        if ls is None:
+            return
+        for l in ls:
+            dihedral = Dihedral.from_top_line(l)
+            key = (dihedral.ai, dihedral.aj, dihedral.ak, dihedral.al)
+            if dihedral.funct == "4":
+                self.improper_dihedrals[key] = dihedral
+            else:
+                if self.proper_dihedrals.get(key) is None:
+                    self.proper_dihedrals[key] = MultipleDihedrals(
+                        *key, dihedral.funct, dihedrals={}
+                    )
+                self.proper_dihedrals[key].dihedrals[dihedral.periodicity] = dihedral
+
+    def _parse_restraints(self):
+        """Parse restraints from topology dictionary."""
+        ls = self.atomics.get('position_restraints')
+        if not ls:
+            return
+        condition = None
+        for l in ls:
+            restraint = PositionRestraint.from_top_line(l, condition=condition)
+            self.position_restraints[restraint.ai] = restraint
+        ls = self.atomics.get('dihedral_restraints')
+        if not ls:
+            return
+        for l in ls:
+            restraint = DihedralRestraint.from_top_line(l)
+            self.dihedral_restraints[
+                (restraint.ai, restraint.aj, restraint.ak, restraint.al)
+            ] = restraint
+
+    def _initialize_graph(self):
+        """Add a list of atom nrs bound to an atom to each atom."""
+        for bond in self.bonds.values():
+            i = bond.ai
+            j = bond.aj
+            self.atoms[i].bound_to_nrs.append(j)
+            self.atoms[j].bound_to_nrs.append(i)
+
+    def _test_for_radicals(self):
+        """Iterate over all atoms and designate them as radicals if they have fewer bounds than their natural bond order"""
+        for atom in self.atoms.values():
+            bo = ATOMTYPE_BONDORDER_FLAT.get(atom.type)
+            if bo and bo > len(atom.bound_to_nrs):
+                atom.is_radical = True
+                self.radicals[atom.nr] = atom
+            else:
+                atom.is_radical = False
+
+        return None
+
+    def _update_atomics_dict(self):
+        for k in self.atomics.keys():
+            attrs = self.__dict__.get(k)
+            if attrs is None:
+                continue
+            self.atomics[k] = [attributes_to_list(x) for x in attrs.values()]
 
     def reindex_atomnrs(self):
         """Reindex atom numbers in topology.
@@ -157,105 +283,6 @@ class Molecule:
             new_dihedrals[(ai, aj, ak, al)] = dihedral
         self.improper_dihedrals = new_dihedrals
 
-    def _parse_atoms(self):
-        """Parse atoms from topology dictionary."""
-        ls = get_top_section(self.top, "atoms")
-        if ls is None:
-            raise ValueError("No atoms found in topology.")
-        for l in ls:
-            atom = Atom.from_top_line(l)
-            self.atoms[atom.nr] = atom
-
-    def _parse_bonds(self):
-        """Parse bond from topology dictionary."""
-        ls = get_protein_section(self.top, "bonds")
-        if ls is None:
-            raise ValueError("No bonds found in topology.")
-        for l in ls:
-            bond = Bond.from_top_line(l)
-            self.bonds[(bond.ai, bond.aj)] = bond
-
-    def _parse_pairs(self):
-        """Parse pairs from topology dictionary."""
-        ls = get_protein_section(self.top, "pairs")
-        if ls is None:
-            logging.warning("No pairs found in topology. Setting pairs to {}.")
-            return
-        for l in ls:
-            pair = Pair.from_top_line(l)
-            self.pairs[(pair.ai, pair.aj)] = pair
-
-    def _parse_angles(self):
-        """Parse angles from topology dictionary."""
-        ls = get_protein_section(self.top, "angles")
-        if ls is None:
-            logging.warning("No angles found in topology. Setting angles to {}.")
-            return
-        for l in ls:
-            angle = Angle.from_top_line(l)
-            self.angles[(angle.ai, angle.aj, angle.ak)] = angle
-
-    def _parse_dihedrals(self):
-        """Parse improper and proper dihedrals from topology dictionary."""
-        ls = get_protein_section(self.top, "dihedrals")
-        if ls is None:
-            logging.warning("No dihedrals found in topology. Setting dihedrals to {}.")
-            return
-        for l in ls:
-            dihedral = Dihedral.from_top_line(l)
-            key = (dihedral.ai, dihedral.aj, dihedral.ak, dihedral.al)
-            if dihedral.funct == "4":
-                self.improper_dihedrals[key] = dihedral
-            else:
-                if self.proper_dihedrals.get(key) is None:
-                    self.proper_dihedrals[key] = MultipleDihedrals(
-                        *key, dihedral.funct, dihedrals={}
-                    )
-                self.proper_dihedrals[key].dihedrals[dihedral.periodicity] = dihedral
-
-    def _parse_restraints(self):
-        """Parse restraints from topology dictionary."""
-        ls = self.protein.get("position_restraints")
-        if ls is None:
-            return
-        condition = None
-        for l in ls.get("content"):
-            if l[0] == "#ifdef":
-                condition = l[1]
-                continue
-            elif l[0] == "#endif":
-                condition = None
-                continue
-            restraint = PositionRestraint.from_top_line(l, condition=condition)
-            self.position_restraints[restraint.ai] = restraint
-        ls = self.protein.get("dihedral_restraints")
-        if ls is None:
-            return
-        for l in ls.get("content"):
-            restraint = DihedralRestraint.from_top_line(l)
-            self.dihedral_restraints[
-                (restraint.ai, restraint.aj, restraint.ak, restraint.al)
-            ] = restraint
-
-    def _initialize_graph(self):
-        """Add a list of atom nrs bound to an atom to each atom."""
-        for bond in self.bonds.values():
-            i = bond.ai
-            j = bond.aj
-            self.atoms[i].bound_to_nrs.append(j)
-            self.atoms[j].bound_to_nrs.append(i)
-
-    def _test_for_radicals(self):
-        """Iterate over all atoms and designate them as radicals if they have fewer bounds than their natural bond order"""
-        for atom in self.atoms.values():
-            bo = ATOMTYPE_BONDORDER_FLAT.get(atom.type)
-            if bo and bo > len(atom.bound_to_nrs):
-                atom.is_radical = True
-                self.radicals[atom.nr] = atom
-            else:
-                atom.is_radical = False
-
-        return None
 
 
 
@@ -282,18 +309,26 @@ class Topology:
                 "Generating an empty Topology from an empty TopologyDict is not implemented."
             )
 
-        if not top.get(PROTEIN_SECTION) or not top[PROTEIN_SECTION].get("subsections"):
-            raise ValueError(
-                "The topology does not contain a protein section."
-                "Please make sure the topology contains a section"
-                "called [ moleculetype ]."
-                "The first of which is assumed to be the protein of interest."
-            )
-        self.protein = top[PROTEIN_SECTION]["subsections"]
         self.top = top
-        self.molecules: dict[str, Molecule] = {}
+        self.moleculetypes: dict[str, MoleculeType] = {}
 
         self.ff = FF(top)
+        self._parse_molecules()
+
+    def _parse_molecules(self):
+        moleculetypes = [k for k in self.top.keys() if k.startswith("moleculetype")]
+        for moleculetype in moleculetypes:
+            header = get_moleculetype_header(self.top, moleculetype)
+            if header is None:
+                logger.warning(f"moleculetype {moleculetype} has no header. Skipping.")
+                continue
+            atomics = get_moleculetype_atomics(self.top, moleculetype)
+            if atomics is None:
+                logger.warning(f"moleculetype {moleculetype} has no atoms, bonds, angles etc. Skipping.")
+                continue
+            name = header[0]
+            self.moleculetypes[name] = MoleculeType(header, atomics)
+
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Topology):
@@ -301,38 +336,11 @@ class Topology:
         return self.to_dict() == other.to_dict()
 
     def _update_dict(self):
-        set_protein_section(
-            self.top, "atoms", [attributes_to_list(x) for x in self.atoms.values()]
-        )
-
-        set_protein_section(
-            self.top, "bonds", [attributes_to_list(x) for x in self.bonds.values()]
-        )
-
-        if len(self.pairs) > 0:
-            set_protein_section(
-                self.top, "pairs", [attributes_to_list(x) for x in self.pairs.values()]
-            )
-
-        if len(self.angles) > 0:
-            set_protein_section(
-                self.top,
-                "angles",
-                [attributes_to_list(x) for x in self.angles.values()],
-            )
-
-        if len(self.proper_dihedrals) > 0:
-            set_protein_section(
-                self.top,
-                "dihedrals",
-                [
-                    attributes_to_list(x)
-                    for dihedrals in self.proper_dihedrals.values()
-                    for x in dihedrals.dihedrals.values()
-                ]
-                + [attributes_to_list(x) for x in self.improper_dihedrals.values()],
-            )
-
+        """Update the topology dictionary with the current state of the topology."""
+        for i, moleculetype in enumerate(self.moleculetypes.values()):
+            moleculetype._update_atomics_dict()
+            set_moleculetype_atomics(self.top, f"moleculetype_{i}", moleculetype.atomics)
+        
         set_top_section(
             self.top,
             "atomtypes",
@@ -351,13 +359,6 @@ class Topology:
             [attributes_to_list(x) for x in self.ff.angletypes.values()],
         )
 
-        # activate again once this works
-        # set_top_section(
-        #     self.top,
-        #     "dihedraltypes",
-        #     [attributes_to_list(x) for x in self.ff.improper_dihedraltypes.values()]
-        #     + [attributes_to_list(x) for x in self.ff.proper_dihedraltypes.values()],
-        # )
 
     def to_dict(self) -> TopologyDict:
         self._update_dict()
@@ -365,14 +366,11 @@ class Topology:
 
     def __str__(self) -> str:
         return textwrap.dedent(
-            f"""\
-        Topology with
-        {len(self.atoms)} atoms,
-        {len(self.bonds)} bonds,
-        {len(self.angles)} angles,
-        {len(self.pairs)} pairs,
-        {len(self.proper_dihedrals)} proper dihedrals
-        {len(self.improper_dihedrals)} improper dihedrals
+        f"""
+        Topology with the following molecules:
+        {''.join([str(x) for x in self.moleculetypes.values()])}
+        And forcefield parameters:
+        {self.ff}
         """
         )
 
