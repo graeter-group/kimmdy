@@ -394,19 +394,19 @@ def _run(args: argparse.Namespace):
         cpts.sort()
         args.checkpoint = cpts[-1]
 
-    if args.checkpoint:
-        logger.info("KIMMDY is starting from a checkpoint.")
-        with open(args.checkpoint, "rb") as f:
-            runmgr = dill.load(f)
-            runmgr.from_checkpoint = True
-    else:
-        config = Config(args.input)
-        logger.debug(config)
-        runmgr = RunManager(config)
-        logger.debug("Using system GROMACS:")
-        logger.debug(check_gmx_version(config))
-
     try:
+        if args.checkpoint:
+            logger.info("KIMMDY is starting from a checkpoint.")
+            with open(args.checkpoint, "rb") as f:
+                runmgr = dill.load(f)
+                runmgr.from_checkpoint = True
+        else:
+            config = Config(args.input)
+            logger.debug(config)
+            runmgr = RunManager(config)
+            logger.debug("Using system GROMACS:")
+            logger.debug(check_gmx_version(config))
+
         runmgr.run()
     except Exception as e:
         if args.debug:

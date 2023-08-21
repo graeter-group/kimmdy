@@ -195,8 +195,8 @@ class Config:
                     if hasattr(self, "mds"):
                         if hasattr(self.mds, task):
                             continue
-                        if hasattr(self.reactions, task):
-                            continue
+                    if hasattr(self.reactions, task):
+                        continue
                     raise AssertionError(
                         f"Task {task} listed in sequence, but not defined!"
                     )
