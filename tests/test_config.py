@@ -102,6 +102,27 @@ def test_parse_config6_changer_bad_reference():
             d.rmdir()
 
 
+def test_parse_config7_start_with_reaction():
+    input_f = Path(__file__).parent / "test_files/test_config/config7.yml"
+    try:
+        os.chdir(input_f.parent)
+        assert input_f.exists(), "Input file not found"
+
+        config = Config(input_f)
+        
+        assert isinstance(config.tpr, Path)
+        assert isinstance(config.trr, Path)
+        assert isinstance(config.plumed, Config)
+        assert isinstance(config.plumed.dat, Path)
+        assert config.sequence == ["homolysis"]
+
+
+    finally:
+        for d in input_f.parent.glob("test_config_7*"):
+            [f.unlink() for f in d.iterdir()]
+            d.rmdir()
+
+
 def test_get_existing_files():
     input_f = Path(__file__).parent / "test_files/test_config/config1.yml"
     try:
