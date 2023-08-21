@@ -4,8 +4,9 @@ from pathlib import Path
 
 from kimmdy.reaction import Break, Bind, Move, RecipeStep
 from kimmdy.parsing import read_plumed, read_top
-from kimmdy.changemanager import break_bond_plumed, modify_plumed, modify_coords
+from kimmdy.changemanager import break_bond_plumed, modify_plumed, modify_coords, modify_top
 from kimmdy.topology.topology import Topology
+from kimmdy.parameterize import BasicParameterizer
 from conftest import SlimFiles
 import os
 
@@ -82,3 +83,17 @@ def test_modify_coords_move(tmpdir):
     assert files.output["gro"].exists()
     # could check whether the coordinates were actually changed, probably using mda
     # could even randomize idx and coords
+
+def test_modify_top(tmpdir,generic_topology):
+    steps = [Move(ix_to_move=2, ix_to_bind=1,new_coords=((0.0, 0.0, 0.0), 100.0))]
+    parameterizer = BasicParameterizer()
+    files = SlimFiles(outputdir=tmpdir)
+    files.input["top"] = tmpdir / ""
+    files.output["top"] = tmpdir / "out.top"
+
+    modify_top(steps,files,generic_topology,parameterizer)
+
+    assert files.output["top"].exists()
+
+
+    
