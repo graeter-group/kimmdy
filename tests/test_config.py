@@ -109,13 +109,12 @@ def test_parse_config7_start_with_reaction():
         assert input_f.exists(), "Input file not found"
 
         config = Config(input_f)
-        
+
         assert isinstance(config.tpr, Path)
         assert isinstance(config.trr, Path)
         assert isinstance(config.plumed, Config)
         assert isinstance(config.plumed.dat, Path)
         assert config.sequence == ["homolysis"]
-
 
     finally:
         for d in input_f.parent.glob("test_config_7*"):
