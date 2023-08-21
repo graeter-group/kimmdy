@@ -559,7 +559,11 @@ class Topology:
     def _update_dict(self):
         """Update the topology dictionary with the current state of the topology."""
         for i, moleculetype in enumerate(self.moleculetypes.values()):
+            if i == 0:
+                print(moleculetype.atomics['bonds'])
             moleculetype._update_atomics_dict()
+            if i == 0:
+                print(moleculetype.atomics['bonds'])
             set_moleculetype_atomics(self.top, f"moleculetype_{i}", moleculetype.atomics)
 
         set_top_section(

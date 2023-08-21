@@ -423,13 +423,12 @@ class TestHexalaTopology:
 
     def test_find_terms_around_atom(self, hexala_top_fix):
         top = deepcopy(hexala_top_fix)
+        protein = top.moleculetypes["Protein"]
         atomnr = "29"
-        # 29       CT       4        ALA      CA       29       0.0337   12.01
-
-        bonds = top._get_atom_bonds(atomnr)
-        angles = top._get_atom_angles(atomnr)
-        proper_dihedrals = top._get_atom_proper_dihedrals(atomnr)
-        improper_dihedrals = top._get_atom_improper_dihedrals(atomnr)
+        bonds = protein._get_atom_bonds(atomnr)
+        angles = protein._get_atom_angles(atomnr)
+        proper_dihedrals = protein._get_atom_proper_dihedrals(atomnr)
+        improper_dihedrals = protein._get_atom_improper_dihedrals(atomnr, top.ff)
 
         assert len(bonds) == 4
         assert len(angles) == 13
@@ -437,9 +436,9 @@ class TestHexalaTopology:
         assert len(improper_dihedrals) == 3
 
         atomnr = "9"
-        bonds = top._get_atom_bonds(atomnr)
-        angles = top._get_atom_angles(atomnr)
-        proper_dihedrals_center = top._get_center_atom_dihedrals(atomnr)
+        bonds = protein._get_atom_bonds(atomnr)
+        angles = protein._get_atom_angles(atomnr)
+        proper_dihedrals_center = protein._get_center_atom_dihedrals(atomnr)
 
         assert bonds == [("7", "9"), ("9", "10"), ("9", "11"), ("9", "15")]
         assert set(proper_dihedrals_center) == set(
