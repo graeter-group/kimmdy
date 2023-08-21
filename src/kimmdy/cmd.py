@@ -232,9 +232,6 @@ class longFormatter(logging.Formatter):
 def configure_logger(log_path, log_level):
     """Configure logging.
 
-    Configures the logging module with optional colorcodes
-    for the terminal.
-
     Parameters
     ----------
     log_path : Path
