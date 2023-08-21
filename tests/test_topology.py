@@ -201,7 +201,16 @@ class TestTopology:
     def test_generate_topology_from_bound_to(self, hexala_top_fix):
         og_top = deepcopy(hexala_top_fix)
         newtop = deepcopy(hexala_top_fix)
+        newtop.bonds.clear()
+        newtop.pairs.clear()
+        newtop.angles.clear()
+        newtop.proper_dihedrals.clear()
+
+        assert newtop.bonds == {}
+        assert newtop.moleculetypes["Protein"].bonds == {}
+
         newtop._regenerate_topology_from_bound_to()
+
         assert newtop.bonds == og_top.bonds
         assert newtop.pairs == og_top.pairs
         assert newtop.angles == og_top.angles

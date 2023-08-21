@@ -335,11 +335,11 @@ class MoleculeType:
 
     def _regenerate_topology_from_bound_to(self, ff):
         # clear all bonds, angles, dihedrals
-        self.bonds = {}
-        self.angles = {}
-        self.dihedrals = {}
-        self.proper_dihedrals = {}
-        self.improper_dihedrals = {}
+        self.bonds.clear()
+        self.angles.clear()
+        self.proper_dihedrals.clear()
+        self.proper_dihedrals.clear()
+        self.improper_dihedrals.clear()
 
         # bonds
         keys = []
@@ -599,6 +599,12 @@ class Topology:
         """
         for moleculetype in self.moleculetypes.values():
             moleculetype.reindex_atomnrs()
+
+    def _regenerate_topology_from_bound_to(self):
+        """Regenerate the topology from the bound_to lists of the atoms.
+        """
+        for moleculetype in self.moleculetypes.values():
+            moleculetype._regenerate_topology_from_bound_to(self.ff)
 
     def __str__(self) -> str:
         return textwrap.dedent(
