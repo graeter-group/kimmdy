@@ -523,6 +523,19 @@ class Topology:
         self.ff = FF(top)
         self._parse_molecules()
 
+        # link atoms, bonds etc. to the main moleculeype, assumed to be the first
+        # "moleculetype_0"
+        main_molecule_name = list(self.moleculetypes.keys())[0]
+        self.atoms = self.moleculetypes[main_molecule_name].atoms
+        self.bonds = self.moleculetypes[main_molecule_name].bonds
+        self.angles = self.moleculetypes[main_molecule_name].angles
+        self.proper_dihedrals = self.moleculetypes[main_molecule_name].proper_dihedrals
+        self.improper_dihedrals = self.moleculetypes[main_molecule_name].improper_dihedrals
+        self.pairs = self.moleculetypes[main_molecule_name].pairs
+        self.position_restraints = self.moleculetypes[main_molecule_name].position_restraints
+        self.dihedral_restraints = self.moleculetypes[main_molecule_name].dihedral_restraints
+        self.radicals = self.moleculetypes[main_molecule_name].radicals
+
     def _parse_molecules(self):
         moleculetypes = [k for k in self.top.keys() if k.startswith("moleculetype")]
         for moleculetype in moleculetypes:
@@ -612,24 +625,24 @@ class Topology:
         """
         p.text(str(self))
 
-    def break_bond(self, atompair_nrs: tuple[TopologyAtomAddress, TopologyAtomAddress]):
+    def break_bond(self, atompair_addresses: tuple[TopologyAtomAddress, TopologyAtomAddress]):
         """Break bonds in topology.
 
         removes bond, angles and dihedrals where atompair was involved.
         Modifies the topology dictionary in place.
         """
-        if len(atompair_nrs[0]) == 1 and len(atompair_nrs[1]) == 1:
+        if type(atompair_addresses[0]) == str and type(atompair_addresses[1]) == str:
             # old style atompair_nrs with only atom numbers
             # thus refers to the first moleculeype, moleculetype_0
             # with the name Protein
-            atompair_nrs = (atompair_nrs[0][0], atompair_nrs[1][0])
-            moleculename = "Protein"
+            atompair_nrs = (atompair_addresses[0], atompair_addresses[1])
+            main_molecule_name = list(self.moleculetypes.keys())[0]
         else:
             raise NotImplementedError(
                 "Breaking/Binding bonds in topology between atoms with different moleculetypes is not implemented, yet."
             )
 
-        moleculetype = self.moleculetypes[moleculename]
+        moleculetype = self.moleculetypes[main_molecule_name]
 
         atompair_nrs = tuple(sorted(atompair_nrs, key=int))
 
@@ -686,7 +699,7 @@ class Topology:
             m = f"tried to remove bond between already disconnected atoms: {atompair}."
             logging.warning(m)
 
-    def bind_bond(self, atompair_nrs: tuple[str, str]):
+    def bind_bond(self, atompair_addresses: tuple[str, str]):
         """Add a bond in topology.
 
         Modifies the topology dictionary in place.
@@ -701,27 +714,31 @@ class Topology:
             with `from`, the atom being moved and
             `to`, the atom to which the `from` atom will be bound
         """
-        if len(atompair_nrs[0]) == 1 and len(atompair_nrs[1]) == 1:
+        if type(atompair_addresses[0]) == str and type(atompair_addresses[1]) == str:
             # old style atompair_nrs with only atom numbers
             # thus refers to the first moleculeype, moleculetype_0
             # with the name Protein
-            atompair_nrs = (atompair_nrs[0][0], atompair_nrs[1][0])
-            moleculename = "Protein"
+            atompair_nrs = (atompair_addresses[0], atompair_addresses[1])
+            main_molecule_name = list(self.moleculetypes.keys())[0]
         else:
             raise NotImplementedError(
                 "Breaking/Binding bonds in topology between atoms with different moleculetypes is not implemented, yet."
             )
 
-        moleculetype = self.moleculetypes[moleculename]
+        moleculetype = self.moleculetypes[main_molecule_name]
 
         atompair_nrs = tuple(sorted(atompair_nrs, key=int))
+        print(atompair_nrs)
         atompair = [moleculetype.atoms[atompair_nrs[0]], moleculetype.atoms[atompair_nrs[1]]]
+        print(atompair)
 
         # de-radialize if re-combining two radicals
         if all(map(lambda x: x.is_radical, atompair)):
             atompair[0].is_radical = False
             atompair[1].is_radical = False
+            print(moleculetype.radicals)
             for a in atompair:
+                print(a)
                 moleculetype.radicals.pop(a.nr)
 
         # quickfix for jumping hydrogens
