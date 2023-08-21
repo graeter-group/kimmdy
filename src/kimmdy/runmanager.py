@@ -227,7 +227,6 @@ class RunManager:
             logger.error(m)
             raise ValueError(m)
 
-
     def write_one_checkoint(self):
         """Just write the first checkpoint and then exit
 
