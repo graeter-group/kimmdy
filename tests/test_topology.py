@@ -142,12 +142,14 @@ class TestUrea:
     def test_urea(self, raw_urea_top_fix):
         raw = deepcopy(raw_urea_top_fix)
         top = Topology(raw)
-        assert len(top.atoms) == 8
-        assert len(top.bonds) == 7
-        assert len(top.pairs) == 0
-        assert len(top.angles) == 0
-        assert len(top.proper_dihedrals) == 8
-        assert len(top.improper_dihedrals) == 3
+        protein = top.moleculetypes["Protein"]
+        assert len(protein.atoms) == 8
+        assert len(protein.bonds) == 7
+        assert len(protein.pairs) == 0
+        assert len(protein.angles) == 0
+        assert len(protein.proper_dihedrals) == 8
+        assert len(protein.improper_dihedrals) == 3
+
 
 
 class TestTopAB:
