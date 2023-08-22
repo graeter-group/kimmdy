@@ -87,6 +87,21 @@
       "pytype": "Path",
       "default": "*.ff"
     },
+    "plumed": {
+      "description": ".dat file containing plumed config for starting with reaction",
+      "type": "string",
+      "pytype": "Path"
+    },
+    "tpr": {
+      "description": ".tpr file of a finished simulation for starting with reaction",
+      "type": "string",
+      "pytype": "Path"
+    },
+    "trr": {
+      "description": ".trr file of a finished simulation for starting with reaction",
+      "type": "string",
+      "pytype": "Path"
+    },
     "mds": {
       "type": "object",
       "description": "Settings for MD steps, e.g. mdp files, plumed files, etc.",
@@ -110,19 +125,8 @@
               "description": "TODO: What is this?"
             },
             "plumed": {
-              "type": "object",
-              "properties": {
-                "dat": {
-                  "type": "string",
-                  "pytype": "Path"
-                },
-                "distances": {
-                  "type": "string",
-                  "pytype": "str"
-                }
-              },
-              "required": ["dat", "distances"],
-              "additionalProperties": false
+              "type": "string",
+              "pytype": "Path"
             }
           },
           "required": ["mdp"],
@@ -161,7 +165,8 @@
           "required": ["parameterization"],
           "additionalProperties": false
         }
-      }
+      },
+      "required": ["coordinates", "topology"]
     },
     "sequence": {
       "description": "List of tasks. Each task can be a string (the name of the task) or an object with the task name and a multiplicity `mult: <int>`",
@@ -242,5 +247,5 @@
       "default": false
     }
   },
-  "required": ["name", "sequence" ]
+  "required": ["name", "sequence", "changer"]
 }

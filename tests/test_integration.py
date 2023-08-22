@@ -79,6 +79,13 @@ def test_grompp_with_kimmdy_topology(tmp_path):
     )
 
 
+def test_integration_single_reaction(tmp_path):
+    testdir = setup_testdir(tmp_path, "single_reaction")
+
+    kimmdy_run()
+    assert "Finished running tasks" in read_last_line(testdir / "kimmdy.log")
+
+
 @pytest.mark.slow
 def test_integration_hat_reaction(tmp_path):
     testdir = setup_testdir(tmp_path, "hat_naive")

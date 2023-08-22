@@ -1,11 +1,11 @@
-# yaml-language-server: $schema=../../../src/kimmdy/kimmdy-yaml-schema.json
+# yaml-language-server: $schema=../../src/kimmdy/kimmdy-yaml-schema.json
 
 dryrun: false
-name: 'test_config_7'
+name: 'reaction_only_000'
 ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
-top: 'topol.top'
+top: 'hexala_out.top'
 gro: 'npt.gro'
-ndx: 'index_backbone.ndx'
+ndx: 'index.ndx'
 plumed: 'plumed.dat'
 tpr: 'pull.tpr'
 trr: 'pull.trr'
