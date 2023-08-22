@@ -12,7 +12,7 @@ import dill
 from kimmdy.config import Config
 from kimmdy.misc_helper import _build_examples
 from kimmdy.runmanager import RunManager
-from kimmdy.utils import check_gmx_version, increment_logfile
+from kimmdy.utils import check_gmx_version, backup_if_existing
 import importlib.resources as pkg_resources
 import sys
 from glob import glob
@@ -243,7 +243,7 @@ def configure_logger(log_path, log_level):
         Log
     """
 
-    increment_logfile(log_path)
+    backup_if_existing(log_path)
 
     log_conf = {
         "version": 1,
