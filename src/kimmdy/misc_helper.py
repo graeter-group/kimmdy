@@ -52,6 +52,7 @@ def _build_examples(args: argparse.Namespace):
         "homolysis": "hexalanine",
         "whole_run": "charged_peptide",
         "pull": "tripelhelix",
+        "single_reaction": "single_reaction",
     }
     basedir = Path(__file__).parents[2]
     testpath = basedir / "tests" / "test_files" / "test_integration"

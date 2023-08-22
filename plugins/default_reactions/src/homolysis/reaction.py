@@ -29,11 +29,13 @@ class Homolysis(ReactionPlugin):
         logger.debug("Getting recipe for reaction: homolysis")
 
         # Initialization of filepaths
-        plumed_dat = files.input["plumed.dat"]
-        distances_dat = files.input["distances.dat"]
+        plumed_dat = files.input["plumed"]
+        distances_dat = files.input["plumed_out"]
         topol_top = files.input["top"]
         ffbonded_itp = self.config.itp
+        files.input["itp"] = ffbonded_itp
         edissoc_dat = self.config.edis
+        files.input["edis"] = edissoc_dat
 
         # Initialization of objects from files
         distances = read_distances_dat(distances_dat)
