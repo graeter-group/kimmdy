@@ -159,8 +159,6 @@ def set_moleculetype_atomics(
         else:
             v["content"] = atomics[k]
 
-    return atomics
-
 
 def get_protein_section(top: dict, name: str) -> Optional[list[list]]:
     """

@@ -299,12 +299,19 @@ class TestHexalaTopology:
         pairs = get_protein_section(topology, "pairs")
         angles = get_protein_section(topology, "angles")
         dihedrals = get_protein_section(topology, "dihedrals")
+        assert dihedrals
+        proper_dihedrals = [x for x in dihedrals if x[4] == '9']
+        improper_dihedrals = [x for x in dihedrals if x[4] == '4']
 
         atoms_new = get_protein_section(topology_new, "atoms")
         bonds_new = get_protein_section(topology_new, "bonds")
         pairs_new = get_protein_section(topology_new, "pairs")
         angles_new = get_protein_section(topology_new, "angles")
         dihedrals_new = get_protein_section(topology_new, "dihedrals")
+        assert dihedrals_new
+        proper_dihedrals_new = [x for x in dihedrals_new if x[4] == '9']
+        improper_dihedrals_new = [x for x in dihedrals_new if x[4] == '4']
+
         assert atoms is not None
         assert bonds is not None
         assert pairs is not None
@@ -325,8 +332,11 @@ class TestHexalaTopology:
         anglediff = set([tuple(x[:3]) for x in angles]) - set(
             [tuple(x[:3]) for x in angles_new]
         )
-        dihedraldiff = set([tuple(x[:4]) for x in dihedrals]) - set(
-            [tuple(x[:4]) for x in dihedrals_new]
+        proper_dihedraldiff = set([tuple(x[:4]) for x in proper_dihedrals]) - set(
+            [tuple(x[:4]) for x in proper_dihedrals_new]
+        )
+        improper_dihedraldiff = set([tuple(x[:4]) for x in improper_dihedrals]) - set(
+            [tuple(x[:4]) for x in improper_dihedrals_new]
         )
 
         assert bonddiff == set([breakpair])
@@ -356,7 +366,7 @@ class TestHexalaTopology:
                 ("9", "15", "17"),
             ]
         )
-        assert dihedraldiff == set(
+        assert proper_dihedraldiff == set(
             [
                 ("5", "7", "9", "15"),
                 ("8", "7", "9", "15"),
@@ -371,14 +381,15 @@ class TestHexalaTopology:
                 ("11", "9", "15", "17"),
                 ("9", "15", "17", "18"),
                 ("9", "15", "17", "19"),
-                ("9", "17", "15", "16"),  # improper
+            ]
+        )
+        assert improper_dihedraldiff == set(
+            [
+                ("7", "9", "15", "17"),
+                ("9", "17", "15", "16"),
             ]
         )
 
-        assert len(bonddiff) == 1
-        assert len(pairdiff) == 13
-        assert len(anglediff) == 5
-        assert len(dihedraldiff) == 14
 
     def test_top_update_dict(self, raw_hexala_top_fix):
         raw = raw_hexala_top_fix
@@ -537,5 +548,3 @@ class TestRadicalAla:
         assert top_noprm_fix.atoms["9"].is_radical == True
         assert top_noprm_fix.atoms["10"].is_radical == False
 
-
-# %%

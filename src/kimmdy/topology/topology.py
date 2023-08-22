@@ -170,10 +170,15 @@ class MoleculeType:
 
     def _update_atomics_dict(self):
         for k in self.atomics.keys():
+            if k == "dihedrals":
+                continue
             attrs = self.__dict__.get(k)
             if attrs is None:
                 continue
             self.atomics[k] = [attributes_to_list(x) for x in attrs.values()]
+
+        # dihedrals combined from improper and proper_dihedrals
+        self.atomics["dihedrals"] = [attributes_to_list(x) for x in attrs.values()]
 
     def _get_atom_bonds(self, atom_nr: str) -> list[tuple[str, str]]:
         """Get all bonds a particular atom is involved in."""
@@ -565,11 +570,7 @@ class Topology:
     def _update_dict(self):
         """Update the topology dictionary with the current state of the topology."""
         for i, moleculetype in enumerate(self.moleculetypes.values()):
-            if i == 0:
-                print(moleculetype.atomics["bonds"])
             moleculetype._update_atomics_dict()
-            if i == 0:
-                print(moleculetype.atomics["bonds"])
             set_moleculetype_atomics(
                 self.top, f"moleculetype_{i}", moleculetype.atomics
             )
@@ -748,20 +749,16 @@ class Topology:
         moleculetype = self.moleculetypes[main_molecule_name]
 
         atompair_nrs = tuple(sorted(atompair_nrs, key=int))
-        print(atompair_nrs)
         atompair = [
             moleculetype.atoms[atompair_nrs[0]],
             moleculetype.atoms[atompair_nrs[1]],
         ]
-        print(atompair)
 
         # de-radialize if re-combining two radicals
         if all(map(lambda x: x.is_radical, atompair)):
             atompair[0].is_radical = False
             atompair[1].is_radical = False
-            print(moleculetype.radicals)
             for a in atompair:
-                print(a)
                 moleculetype.radicals.pop(a.nr)
 
         # quickfix for jumping hydrogens
