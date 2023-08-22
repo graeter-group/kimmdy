@@ -14,7 +14,7 @@ from enum import Enum, auto
 from typing import Callable, Union
 from kimmdy.config import Config
 from kimmdy.utils import increment_logfile
-from kimmdy.parsing import read_top, write_json
+from kimmdy.parsing import read_top, write_json, read_plumed
 from kimmdy.reaction import ReactionPlugin, RecipeCollection, Recipe
 from kimmdy.parameterize import BasicParameterizer
 import kimmdy.changemanager as changer
@@ -44,7 +44,20 @@ class State(Enum):
     DONE = auto()
 
 
-def get_existing_files(config: Config):
+def get_plumed_out(plumed: Path) -> str:
+    plumed_parsed = read_plumed(plumed)
+    plumed_out = None
+    for part in plumed_parsed["prints"]:
+        if file := part.get("FILE"):
+            if not plumed_out:
+                plumed_out = file
+                logger.debug(f"Found plumed print FILE {plumed_out}")
+            else:
+                raise RuntimeError("Multiple FILE sections found in plumed dat")
+    return plumed_out
+
+
+def get_existing_files(config: Config, section: str = "root") -> dict:
     """Initialize latest_files with every existing file defined in config"""
     file_d = {}
     attr_names = filter(lambda s: s[0] != "_", config.__dir__())
@@ -52,14 +65,23 @@ def get_existing_files(config: Config):
         attr = getattr(config, attr_name)
         if isinstance(attr, Path):
             if not attr.exists():
+                # File exists checks are in the config
                 continue
             key = attr.suffix[1:]  # rm the get_existing_files
+
             # AMBIGUOUS_SUFFS -> key whole name
             if attr.suffix[1:] in AMBIGUOUS_SUFFS:
                 key = attr.name
+
+            if attr_name == "plumed":
+                key = "plumed"
+                # only discover root plumed output, not in md sections
+                if section == "root":
+                    file_d["plumed_out"] = attr.parent / get_plumed_out(attr)
+
             file_d[key] = attr
         elif isinstance(attr, Config):
-            file_d.update(get_existing_files(attr))
+            file_d.update(get_existing_files(attr, attr_name))
     return file_d
 
 
@@ -295,13 +317,22 @@ class RunManager:
                         logger.error(e)
                         raise RuntimeError(e)
 
+            # discover output files
             for path in files.outputdir.iterdir():
                 suffix = path.suffix[1:]
                 if suffix in AMBIGUOUS_SUFFS:
                     suffix = path.name
+                # don't overwrite manually added keys in files.output
                 if files.output.get(suffix) is not None:
                     continue
                 files.output[suffix] = files.outputdir / path
+
+            # remove double entries
+            if "plumed" in files.input.keys():
+                if plumed := files.output.get("plumed"):
+                    files.output.pop(plumed.name)
+                if plumed_out := files.output.get("plumed_out"):
+                    files.output.pop(plumed_out.name)
 
             logger.debug("Update latest files with: ")
             logger.debug(pformat(files.output))
@@ -365,9 +396,15 @@ class RunManager:
         # replace the checkpoint file if gen_vel = no in the mdp file
 
         if "plumed" in md_config.get_attributes():
-            mdrun_cmd += f" -plumed {md_config.plumed.dat}"
-            files.output = {"plumed.dat": md_config.plumed.dat}
-            # add plumed.dat to output to indicate it as current plumed.dat file
+            # might have been modified, so latest_files has priority
+            try:
+                files.input["plumed"]
+            except FileNotFoundError:
+                files.input["plumed"] = md_config.plumed
+            mdrun_cmd += f" -plumed {files.input['plumed']}"
+
+            plumed_out = files.outputdir / get_plumed_out(files.input["plumed"])
+            files.output["plumed_out"] = plumed_out
 
         # specify trr to prevent rotref trr getting set as standard trr
         files.output["trr"] = files.outputdir / f"{instance}.trr"
@@ -375,7 +412,6 @@ class RunManager:
         logger.debug(f"mdrun cmd: {mdrun_cmd}")
         run_gmx(grompp_cmd, outputdir)
         run_gmx(mdrun_cmd, outputdir)
-
         logger.info(f"Done with MD {instance}")
         return files
 
@@ -466,17 +502,10 @@ class RunManager:
         logger.info(f'Wrote new topology to {files.output["top"].parts[-3:]}')
 
         # changes to plumed.dat
-        if "plumed.dat" in self.latest_files:
-            files.output["plumed.dat"] = files.outputdir / "plumed_mod.dat"
-            changer.modify_plumed(
-                recipe_steps,
-                files.input["plumed.dat"],
-                files.output["plumed.dat"],
-                files.input["distances.dat"],
-            )
-            logger.info(
-                f'Wrote new plumedfile to {files.output["plumed.dat"].parts[-3:]}'
-            )
+        if "plumed" in self.latest_files:
+            files.output["plumed"] = files.outputdir / "plumed_mod.dat"
+            changer.modify_plumed(recipe_steps, files)
+            logger.info(f'Wrote new plumedfile to {files.output["plumed"].parts[-3:]}')
 
         # changes to coordinates
         run_parameter_growth, top_merge_path = changer.modify_coords(

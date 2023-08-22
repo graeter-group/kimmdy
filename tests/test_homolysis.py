@@ -111,12 +111,14 @@ def test_get_recipe_collection(generic_rmgr):
 
     files = TaskFiles(generic_rmgr)
     files.input["top"] = Path("topol.top")
-    for f_path in ["plumed.dat", "distances.dat", "edissoc.dat", "ffbonded.itp"]:
-        files.input[f_path] = Path(f_path)
+    files.input["plumed"] = Path("plumed.dat")
+    files.input["plumed_out"] = Path("distances.dat")
+    files.input["edis"] = Path("edissoc.dat")
+    files.input["itp"] = Path("ffbonded.itp")
     r = Homolysis(name="homolysis", runmng=generic_rmgr)
     rc = r.get_recipe_collection(files)
 
-    plumed = read_plumed(files.input["plumed.dat"])
+    plumed = read_plumed(files.input["plumed"])
     assert len(rc.recipes) == len(plumed["distances"])
     for recipe in rc.recipes:
         assert len(recipe.recipe_steps) == 1

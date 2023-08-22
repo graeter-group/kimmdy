@@ -88,21 +88,9 @@
       "default": "*.ff"
     },
     "plumed": {
-      "type": "object",
-      "properties": {
-        "dat": {
-          "description": ".dat file containing plumed config for starting with reaction",
-          "type": "string",
-          "pytype": "Path"
-        },
-        "distances": {
-          "description": ".dat file containing the distances for starting with reaction",
-          "type": "string",
-          "pytype": "Path"
-        }
-      },
-      "required": ["dat", "distances"],
-      "additionalProperties": false
+      "description": ".dat file containing plumed config for starting with reaction",
+      "type": "string",
+      "pytype": "Path"
     },
     "tpr": {
       "description": ".tpr file of a finished simulation for starting with reaction",
@@ -137,19 +125,8 @@
               "description": "TODO: What is this?"
             },
             "plumed": {
-              "type": "object",
-              "properties": {
-                "dat": {
-                  "type": "string",
-                  "pytype": "Path"
-                },
-                "distances": {
-                  "type": "string",
-                  "pytype": "str"
-                }
-              },
-              "required": ["dat", "distances"],
-              "additionalProperties": false
+              "type": "string",
+              "pytype": "Path"
             }
           },
           "required": ["mdp"],

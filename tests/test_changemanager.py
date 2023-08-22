@@ -13,6 +13,7 @@ from kimmdy.changemanager import (
 from kimmdy.topology.topology import Topology
 from kimmdy.parameterize import BasicParameterizer
 from conftest import SlimFiles
+from kimmdy.tasks import TaskFiles
 import os
 
 
@@ -46,15 +47,20 @@ def test_plumed_break(tmpdir):
 
 
 def test_plumed_modify(tmpdir):
-    plumeddat: Path = tmpdir / "plumed_nat.dat"
-    newplumeddat: Path = tmpdir / "plumed_test.dat"
+    files = TaskFiles(
+        get_latest=lambda: f"DummyCallable",
+    )
+    files.input = {
+        "plumed": tmpdir / "plumed_nat.dat",
+        "plumed_out": Path("distances.dat"),
+    }
+    files.outputdir = tmpdir
     recipe_steps = [Break(28, 34)]
-    plumeddist: Path = Path("distances.dat")
 
-    modify_plumed(recipe_steps, plumeddat, newplumeddat, plumeddist)
+    modify_plumed(recipe_steps, files)
 
     plumed_break_ref = read_plumed(tmpdir / "plumed_break29-35.dat")
-    plumed_break_test = read_plumed(newplumeddat)
+    plumed_break_test = read_plumed(files.output["plumed"])
 
     assert plumed_break_test["distances"] == plumed_break_ref["distances"]
     assert plumed_break_test["prints"] == plumed_break_ref["prints"]

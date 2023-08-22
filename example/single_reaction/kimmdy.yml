@@ -6,9 +6,7 @@ ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default
 top: 'hexala_out.top'
 gro: 'npt.gro'
 ndx: 'index.ndx'
-plumed:
-  dat: 'plumed.dat'
-  distances: 'distances.dat'
+plumed: 'plumed.dat'
 tpr: 'pull.tpr'
 trr: 'pull.trr'
 changer:

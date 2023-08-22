@@ -13,9 +13,7 @@ mds:
     mdp: 'pullf1500_equil.mdp'
   prod:
     mdp: 'pullf1500.mdp'
-    plumed:
-      dat: 'plumed.dat'
-      distances: 'distances.dat'
+    plumed: 'plumed.dat'
   relax:
     mdp: 'pullf1500.mdp'
 changer:

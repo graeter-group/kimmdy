@@ -201,6 +201,16 @@ class Config:
                         f"Task {task} listed in sequence, but not defined!"
                     )
 
+            # Validate dat file only once defined
+            if hasattr(self, "plumed"):
+                if hasattr(self, "md"):
+                    if hasattr(self.md, "plumed"):
+                        raise AssertionError(
+                            "plumed dat file defined multiple times. When "
+                            "running md and loading existing measurements, "
+                            "only define it once in the md section."
+                        )
+
             if not hasattr(self, "out"):
                 self.out = self.cwd / self.name
 
@@ -229,7 +239,6 @@ class Config:
                 path = attr
                 path = path.resolve()
                 self.__setattr__(name, path)
-                # distances.dat wouldn't exist prior to the run
                 if not path.is_dir():
                     check_file_exists(path)
 
