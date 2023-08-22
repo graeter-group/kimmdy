@@ -1,9 +1,10 @@
 import subprocess as sp
-from kimmdy.topology.utils import get_protein_section
 import numpy as np
 import logging
 from typing import Optional
 from pathlib import Path
+
+from kimmdy.topology.utils import get_protein_section
 
 logger = logging.getLogger(__name__)
 
