@@ -116,7 +116,6 @@ class RunManager:
         self.cptfile: Path = Path(f"{self.config.out}_kimmdy.cpt")
         backup_if_existing(self.histfile)
         backup_if_existing(self.cptfile)
-                            
 
         self.top = Topology(read_top(self.config.top))
         try:

@@ -12,8 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 def run_shell_cmd(s, cwd=None) -> sp.CompletedProcess:
-    """Run command in shell.
-    """
+    """Run command in shell."""
     return sp.run(s, shell=True, cwd=cwd)
 
 
@@ -29,8 +28,7 @@ def run_gmx(s: str, cwd=None) -> Optional[sp.CalledProcessError]:
 
 
 def get_shell_stdout(s):
-    """Run command in shell and capture stdout.
-    """
+    """Run command in shell and capture stdout."""
     process = sp.run(s, shell=True, capture_output=True, encoding="utf-8")
     return process.stdout
 
@@ -151,9 +149,9 @@ def morse_transition_rate(
 ) -> tuple[list[float], list[float]]:
     """Calculates reaction rate constant for a bond breaking event.
 
-    Uses the Morse potential model for this calculation. For an array of bond distances of the same bond, 
-    first calculates the forces on the bond, then the minima and maxima of the shifted Morse potential 
-    to get an energy barrier and finally a reaction rate constant using the Arrhenius equation. 
+    Uses the Morse potential model for this calculation. For an array of bond distances of the same bond,
+    first calculates the forces on the bond, then the minima and maxima of the shifted Morse potential
+    to get an energy barrier and finally a reaction rate constant using the Arrhenius equation.
     For intramolecular reactions, the reaction rate constant is equal to the reaction rate.
 
     The calculation should be according to the derivation in the original KIMMDY paper: DOI: 10.1021/acs.jctc.9b00786
