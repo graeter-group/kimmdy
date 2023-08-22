@@ -13,6 +13,7 @@ mds:
 reactions:
   hat_naive: {}
 changer:
+  coordinates: {}
   topology:
     parameterization: 'grappa' 
 

@@ -208,12 +208,7 @@ def modify_top(
     return
 
 
-def modify_plumed(
-    recipe_steps: list[RecipeStep],
-    oldplumeddat: Path,
-    newplumeddat: Path,
-    plumeddist: Path,
-):
+def modify_plumed(recipe_steps: list[RecipeStep], files: TaskFiles):
     """Modify plumed input files.
 
     TODO: finish this function.
@@ -224,8 +219,14 @@ def modify_plumed(
         A list of [](`~kimmdy.reaction.RecipeStep`)s.
         parameter.
     """
+
+    oldplumeddat = files.input["plumed"]
+    plumeddist = files.input["plumed_out"]
+    files.output["plumed"] = files.outputdir / oldplumeddat.name
+
     logger.info(
-        f"Reading: {oldplumeddat} and writing modified plumed input to {newplumeddat}."
+        f"Reading: {oldplumeddat} and writing modified plumed input to "
+        f"{files.output['plumed']}."
     )
     plumeddat = read_plumed(oldplumeddat)
 
@@ -239,7 +240,7 @@ def modify_plumed(
             # for now, we wouldn't bind or move bonds that are relevant for plumed
             logger.debug(f"Plumed changes for {step} not implemented!")
 
-    write_plumed(plumeddat, newplumeddat)
+    write_plumed(plumeddat, files.output["plumed"])
 
 
 def break_bond_plumed(plumeddat, breakpair: tuple[str, str], plumeddist):

@@ -4,10 +4,16 @@ from pathlib import Path
 
 from kimmdy.reaction import Break, Bind, Move, RecipeStep
 from kimmdy.parsing import read_plumed, read_top
-from kimmdy.changemanager import break_bond_plumed, modify_plumed, modify_coords, modify_top
+from kimmdy.changemanager import (
+    break_bond_plumed,
+    modify_plumed,
+    modify_coords,
+    modify_top,
+)
 from kimmdy.topology.topology import Topology
 from kimmdy.parameterize import BasicParameterizer
 from conftest import SlimFiles
+from kimmdy.tasks import TaskFiles
 import os
 
 
@@ -41,15 +47,20 @@ def test_plumed_break(tmpdir):
 
 
 def test_plumed_modify(tmpdir):
-    plumeddat: Path = tmpdir / "plumed_nat.dat"
-    newplumeddat: Path = tmpdir / "plumed_test.dat"
+    files = TaskFiles(
+        get_latest=lambda: f"DummyCallable",
+    )
+    files.input = {
+        "plumed": tmpdir / "plumed_nat.dat",
+        "plumed_out": Path("distances.dat"),
+    }
+    files.outputdir = tmpdir
     recipe_steps = [Break(28, 34)]
-    plumeddist: Path = Path("distances.dat")
 
-    modify_plumed(recipe_steps, plumeddat, newplumeddat, plumeddist)
+    modify_plumed(recipe_steps, files)
 
     plumed_break_ref = read_plumed(tmpdir / "plumed_break29-35.dat")
-    plumed_break_test = read_plumed(newplumeddat)
+    plumed_break_test = read_plumed(files.output["plumed"])
 
     assert plumed_break_test["distances"] == plumed_break_ref["distances"]
     assert plumed_break_test["prints"] == plumed_break_ref["prints"]
@@ -84,16 +95,14 @@ def test_modify_coords_move(tmpdir):
     # could check whether the coordinates were actually changed, probably using mda
     # could even randomize idx and coords
 
-def test_modify_top(tmpdir,generic_topology):
-    steps = [Move(ix_to_move=2, ix_to_bind=1,new_coords=((0.0, 0.0, 0.0), 100.0))]
+
+def test_modify_top(tmpdir, generic_topology):
+    steps = [Move(ix_to_move=2, ix_to_bind=1, new_coords=((0.0, 0.0, 0.0), 100.0))]
     parameterizer = BasicParameterizer()
     files = SlimFiles(outputdir=tmpdir)
     files.input["top"] = tmpdir / ""
     files.output["top"] = tmpdir / "out.top"
 
-    modify_top(steps,files,generic_topology,parameterizer)
+    modify_top(steps, files, generic_topology, parameterizer)
 
     assert files.output["top"].exists()
-
-
-    

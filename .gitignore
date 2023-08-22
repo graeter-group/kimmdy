@@ -21,6 +21,8 @@ cat-center.gro
 *.cpt
 *.dill
 *.pickle
+.*.npz
+.*.lock
 
 # tutorials and example output files
 guide/kimmdy-tutorial

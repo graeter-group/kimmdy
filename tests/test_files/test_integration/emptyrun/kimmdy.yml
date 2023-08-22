@@ -11,6 +11,10 @@ ndx: 'emptyrun.txt'
 mds:
   prod:
     mdp: 'emptyrun.txt'
+changer:
+  coordinates: {}
+  topology:
+    parameterization: basic
 reactions:
   hat_naive: {}
 sequence:
