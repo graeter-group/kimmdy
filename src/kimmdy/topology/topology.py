@@ -18,9 +18,10 @@ from kimmdy.utils import TopologyAtomAddress
 
 logger = logging.getLogger("kimmdy")
 
+
 class MoleculeType:
-    """One moleculetype in the topology
-    """
+    """One moleculetype in the topology"""
+
     def __init__(self, header: tuple[str, str], atomics: dict) -> None:
         self.name, self.nrexcl = header
         self.atomics = atomics
@@ -48,7 +49,6 @@ class MoleculeType:
         self._parse_restraints()
         self._initialize_graph()
         self._test_for_radicals()
-
 
     def __str__(self) -> str:
         return textwrap.dedent(
@@ -79,7 +79,7 @@ class MoleculeType:
 
     def _parse_atoms(self):
         """Parse atoms from topology dictionary."""
-        ls = self.atomics.get('atoms')
+        ls = self.atomics.get("atoms")
         if ls is None:
             raise ValueError(f"No atoms found in topology for molecule {self.name}.")
         for l in ls:
@@ -88,7 +88,7 @@ class MoleculeType:
 
     def _parse_bonds(self):
         """Parse bond from topology dictionary."""
-        ls = self.atomics.get('bonds')
+        ls = self.atomics.get("bonds")
         if ls is None:
             return
         for l in ls:
@@ -97,7 +97,7 @@ class MoleculeType:
 
     def _parse_pairs(self):
         """Parse pairs from topology dictionary."""
-        ls = self.atomics.get('pairs')
+        ls = self.atomics.get("pairs")
         if ls is None:
             return
         for l in ls:
@@ -106,7 +106,7 @@ class MoleculeType:
 
     def _parse_angles(self):
         """Parse angles from topology dictionary."""
-        ls = self.atomics.get('angles')
+        ls = self.atomics.get("angles")
         if ls is None:
             return
         for l in ls:
@@ -115,7 +115,7 @@ class MoleculeType:
 
     def _parse_dihedrals(self):
         """Parse improper and proper dihedrals from topology dictionary."""
-        ls = self.atomics.get('dihedrals')
+        ls = self.atomics.get("dihedrals")
         if ls is None:
             return
         for l in ls:
@@ -132,14 +132,14 @@ class MoleculeType:
 
     def _parse_restraints(self):
         """Parse restraints from topology dictionary."""
-        ls = self.atomics.get('position_restraints')
+        ls = self.atomics.get("position_restraints")
         if not ls:
             return
         condition = None
         for l in ls:
             restraint = PositionRestraint.from_top_line(l, condition=condition)
             self.position_restraints[restraint.ai] = restraint
-        ls = self.atomics.get('dihedral_restraints')
+        ls = self.atomics.get("dihedral_restraints")
         if not ls:
             return
         for l in ls:
@@ -488,8 +488,6 @@ class MoleculeType:
         self.improper_dihedrals = new_dihedrals
 
 
-
-
 class Topology:
     """Smart container for parsed topology data.
 
@@ -504,6 +502,7 @@ class Topology:
     top :
         A dictionary containing the parsed topology data.
     """
+
     def __init__(
         self,
         top: TopologyDict,
@@ -515,7 +514,7 @@ class Topology:
 
         self.top = top
         self.moleculetypes: dict[str, MoleculeType] = {}
-        molecules = get_top_section(top, 'molecules')
+        molecules = get_top_section(top, "molecules")
         if molecules is None:
             raise ValueError("molecules not found in top file")
         self.molecules = {l[0]: l[1] for l in molecules}
@@ -530,10 +529,16 @@ class Topology:
         self.bonds = self.moleculetypes[main_molecule_name].bonds
         self.angles = self.moleculetypes[main_molecule_name].angles
         self.proper_dihedrals = self.moleculetypes[main_molecule_name].proper_dihedrals
-        self.improper_dihedrals = self.moleculetypes[main_molecule_name].improper_dihedrals
+        self.improper_dihedrals = self.moleculetypes[
+            main_molecule_name
+        ].improper_dihedrals
         self.pairs = self.moleculetypes[main_molecule_name].pairs
-        self.position_restraints = self.moleculetypes[main_molecule_name].position_restraints
-        self.dihedral_restraints = self.moleculetypes[main_molecule_name].dihedral_restraints
+        self.position_restraints = self.moleculetypes[
+            main_molecule_name
+        ].position_restraints
+        self.dihedral_restraints = self.moleculetypes[
+            main_molecule_name
+        ].dihedral_restraints
         self.radicals = self.moleculetypes[main_molecule_name].radicals
 
     def _parse_molecules(self):
@@ -545,11 +550,12 @@ class Topology:
                 continue
             atomics = get_moleculetype_atomics(self.top, moleculetype)
             if atomics is None:
-                logger.warning(f"moleculetype {moleculetype} has no atoms, bonds, angles etc. Skipping.")
+                logger.warning(
+                    f"moleculetype {moleculetype} has no atoms, bonds, angles etc. Skipping."
+                )
                 continue
             name = header[0]
             self.moleculetypes[name] = MoleculeType(header, atomics)
-
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Topology):
@@ -560,11 +566,13 @@ class Topology:
         """Update the topology dictionary with the current state of the topology."""
         for i, moleculetype in enumerate(self.moleculetypes.values()):
             if i == 0:
-                print(moleculetype.atomics['bonds'])
+                print(moleculetype.atomics["bonds"])
             moleculetype._update_atomics_dict()
             if i == 0:
-                print(moleculetype.atomics['bonds'])
-            set_moleculetype_atomics(self.top, f"moleculetype_{i}", moleculetype.atomics)
+                print(moleculetype.atomics["bonds"])
+            set_moleculetype_atomics(
+                self.top, f"moleculetype_{i}", moleculetype.atomics
+            )
 
         set_top_section(
             self.top,
@@ -590,7 +598,6 @@ class Topology:
             [attributes_to_list(x) for x in self.ff.angletypes.values()],
         )
 
-
     def to_dict(self) -> TopologyDict:
         self._update_dict()
         return self.top
@@ -605,20 +612,19 @@ class Topology:
             moleculetype.reindex_atomnrs()
 
     def _regenerate_topology_from_bound_to(self):
-        """Regenerate the topology from the bound_to lists of the atoms.
-        """
+        """Regenerate the topology from the bound_to lists of the atoms."""
         for moleculetype in self.moleculetypes.values():
             moleculetype._regenerate_topology_from_bound_to(self.ff)
 
     def __str__(self) -> str:
-        return textwrap.dedent(
-        f"""
-        Topology with the following molecules:
-        {''.join([str(x) for x in self.moleculetypes.values()])}
-        And forcefield parameters:
-        {self.ff}
-        """
+        molecules = "\n".join([name + ": " + n for name, n in self.molecules.items()])
+        main_molecule = list(self.moleculetypes.values())[0]
+        text = (
+            textwrap.dedent(f"Topology with the following molecules: \n{molecules}\n\n")
+            + textwrap.dedent(f"With {main_molecule}")
+            + textwrap.dedent(f"{self.ff}")
         )
+        return text
 
     def __repr__(self) -> str:
         self._update_dict()
@@ -635,7 +641,9 @@ class Topology:
         """
         p.text(str(self))
 
-    def break_bond(self, atompair_addresses: tuple[TopologyAtomAddress, TopologyAtomAddress]):
+    def break_bond(
+        self, atompair_addresses: tuple[TopologyAtomAddress, TopologyAtomAddress]
+    ):
         """Break bonds in topology.
 
         removes bond, angles and dihedrals where atompair was involved.
@@ -656,8 +664,10 @@ class Topology:
 
         atompair_nrs = tuple(sorted(atompair_nrs, key=int))
 
-
-        atompair = [moleculetype.atoms[atompair_nrs[0]], moleculetype.atoms[atompair_nrs[1]]]
+        atompair = [
+            moleculetype.atoms[atompair_nrs[0]],
+            moleculetype.atoms[atompair_nrs[1]],
+        ]
 
         # mark atoms as radicals
         for atom in atompair:
@@ -670,9 +680,9 @@ class Topology:
         logging.info(f"removed bond: {removed_bond}")
 
         # remove angles
-        angle_keys = moleculetype._get_atom_angles(atompair_nrs[0]) + moleculetype._get_atom_angles(
-            atompair_nrs[1]
-        )
+        angle_keys = moleculetype._get_atom_angles(
+            atompair_nrs[0]
+        ) + moleculetype._get_atom_angles(atompair_nrs[1])
         for key in angle_keys:
             if all([x in key for x in atompair_nrs]):
                 # angle contained a now deleted bond because
@@ -739,7 +749,10 @@ class Topology:
 
         atompair_nrs = tuple(sorted(atompair_nrs, key=int))
         print(atompair_nrs)
-        atompair = [moleculetype.atoms[atompair_nrs[0]], moleculetype.atoms[atompair_nrs[1]]]
+        atompair = [
+            moleculetype.atoms[atompair_nrs[0]],
+            moleculetype.atoms[atompair_nrs[1]],
+        ]
         print(atompair)
 
         # de-radialize if re-combining two radicals
@@ -768,7 +781,9 @@ class Topology:
                     continue
 
                 residue_atomnames_current = [
-                    a.atom for a in moleculetype.atoms.values() if a.resnr == other_atom.resnr
+                    a.atom
+                    for a in moleculetype.atoms.values()
+                    if a.resnr == other_atom.resnr
                 ]
                 type_set = False
                 for key, bond in aa.bonds.items():
@@ -811,9 +826,9 @@ class Topology:
         logging.info(f"added bond: {bond}")
 
         # add angles
-        angle_keys = moleculetype._get_atom_angles(atompair_nrs[0]) + moleculetype._get_atom_angles(
-            atompair_nrs[1]
-        )
+        angle_keys = moleculetype._get_atom_angles(
+            atompair_nrs[0]
+        ) + moleculetype._get_atom_angles(atompair_nrs[1])
         for key in angle_keys:
             if moleculetype.angles.get(key) is None:
                 moleculetype.angles[key] = Angle(key[0], key[1], key[2], "1")
@@ -877,4 +892,3 @@ class Topology:
             return
         self.break_bond((f, heavy))
         self.bind_bond((f, t))
-
