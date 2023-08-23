@@ -89,7 +89,7 @@ def get_moleculetype_header(
 def get_moleculetype_atomics(
     top: dict, moleculetype: str
 ) -> Optional[dict]:
-    """Get content of the atomics (atoms/bonds/angles etc.) of a moleculetype from a topology dict.
+    """Get content of subsections (atoms/bonds/angles etc.) of a moleculetype from a topology dict.
 
     By resolving any `#ifdef` statements by check in the top['define'] dict
     and choosing the 'content' or 'else_content' depending on the result.
@@ -173,6 +173,7 @@ def set_top_section(
     top: dict, name: str, value: list, moleculetype: Optional[int] = None
 ) -> Optional[list[list]]:
     """Set content of a section from a topology dict.
+
     By resolving any `#ifdef` statements by check in the top['define'] dict
     and choosing the 'content' or 'else_content' depending on the result.
     """

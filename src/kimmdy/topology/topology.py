@@ -175,6 +175,7 @@ class MoleculeType:
         self.atomics["bonds"] = [attributes_to_list(x) for x in self.bonds.values()]
         self.atomics["angles"] = [attributes_to_list(x) for x in self.angles.values()]
         self.atomics["pairs"] = [attributes_to_list(x) for x in self.pairs.values()]
+        self.atomics["exclusions"] = [attributes_to_list(x) for x in self.exclusions.values()]
         self.atomics["dihedrals"] = [
             attributes_to_list(x)
             for dihedrals in self.proper_dihedrals.values()
@@ -874,17 +875,18 @@ class Topology:
 
         This is typically H for Hydrogen Atom Transfer (HAT).
         """
-        if len(from_to[0]) == 1 and len(from_to[1]) == 1:
+        if type(from_to[0]) == str and type(from_to[1]) == str:
             # old style atompair_nrs with only atom numbers
             # thus refers to the first moleculeype, moleculetype_0
             # with the name Protein
-            from_to = (from_to[0][0], from_to[1][0])
-            moleculename = "Protein"
+            from_to = (from_to[0], from_to[1])
+            main_molecule_name = list(self.moleculetypes.keys())[0]
         else:
             raise NotImplementedError(
                 "Breaking/Binding bonds in topology between atoms with different moleculetypes is not implemented, yet."
             )
-        moleculetype = self.moleculetypes[moleculename]
+
+        moleculetype = self.moleculetypes[main_molecule_name]
 
         f, t = list(map(str, from_to))
         assert (

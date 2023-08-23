@@ -36,7 +36,6 @@ def get_gmx_dir() -> Path:
     gmx_dir = Path(gmx_prefix) / "share" / "gromacs"
     return gmx_dir
 
-
 def increment_logfile(f: Path) -> Path:
     backup_file_prefix = "#"
     backup_file_suffix = "#"

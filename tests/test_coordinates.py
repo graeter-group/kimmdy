@@ -1,7 +1,7 @@
 from kimmdy.parsing import read_top, write_top
 from kimmdy.topology.topology import Topology
 from kimmdy.topology.atomic import Bond
-from kimmdy.coordinates import merge_top_parameter_growth, get_explicit_or_type
+from kimmdy.coordinates import merge_top_moleculetypes_parameter_growth, get_explicit_or_type
 from conftest import SlimFiles
 
 
@@ -69,7 +69,7 @@ def test_get_bondobj(coordinates_files):
 
 def test_merge_prm_top(coordinates_files):
     """this tests a topology merge for a HAT reaction from a Ca (nr 19) radical to a N (nr 26) radical"""
-    topmerge = merge_top_parameter_growth(
+    topmerge = merge_top_moleculetypes_parameter_growth(
         coordinates_files["topA"], coordinates_files["topB"]
     )
 

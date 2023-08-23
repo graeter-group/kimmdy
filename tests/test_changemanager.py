@@ -73,7 +73,7 @@ def test_modify_coords_break(tmpdir):
 
 
 def test_modify_coords_move(tmpdir):
-    steps = [Move(ix_to_move=0, new_coords=[[0.0, 0.0, 0.0], 100.0])]
+    steps: list[RecipeStep] = [Move(ix_to_move=0, new_coords=((0.0, 0.0, 0.0), 100.0))]
     files = SlimFiles(outputdir=tmpdir)
     files.input["trr"] = tmpdir / "pull.trr"
     files.input["tpr"] = tmpdir / "pull.tpr"
