@@ -60,6 +60,8 @@ class MoleculeType:
         {len(self.pairs)} pairs,
         {len(self.proper_dihedrals)} proper dihedrals
         {len(self.improper_dihedrals)} improper dihedrals
+        {len(self.position_restraints)} position restraints
+        {len(self.dihedral_restraints)} dihedral restraints
         """
         )
 
@@ -169,16 +171,21 @@ class MoleculeType:
         return None
 
     def _update_atomics_dict(self):
-        for k in self.atomics.keys():
-            if k == "dihedrals":
-                continue
-            attrs = self.__dict__.get(k)
-            if attrs is None:
-                continue
-            self.atomics[k] = [attributes_to_list(x) for x in attrs.values()]
-
-        # dihedrals combined from improper and proper_dihedrals
-        self.atomics["dihedrals"] = [attributes_to_list(x) for x in attrs.values()]
+        self.atomics["atoms"] = [attributes_to_list(x) for x in self.atoms.values()]
+        self.atomics["bonds"] = [attributes_to_list(x) for x in self.bonds.values()]
+        self.atomics["angles"] = [attributes_to_list(x) for x in self.angles.values()]
+        self.atomics["pairs"] = [attributes_to_list(x) for x in self.pairs.values()]
+        self.atomics["dihedrals"] = [
+            attributes_to_list(x)
+            for dihedrals in self.proper_dihedrals.values()
+            for x in dihedrals.dihedrals.values()
+        ] + [attributes_to_list(x) for x in self.improper_dihedrals.values()]
+        self.atomics["position_restraints"] = [
+            attributes_to_list(x) for x in self.position_restraints.values()
+        ]
+        self.atomics["dihedral_restraints"] = [
+            attributes_to_list(x) for x in self.proper_dihedrals.values()
+        ]
 
     def _get_atom_bonds(self, atom_nr: str) -> list[tuple[str, str]]:
         """Get all bonds a particular atom is involved in."""
