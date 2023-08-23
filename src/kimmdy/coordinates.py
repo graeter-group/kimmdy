@@ -88,7 +88,7 @@ def get_explicit_or_type(
         return match_obj
     else:
         raise ValueError(
-            f"Could not find explicit parameters for {[type_key,interaction]} in line or in force field attached to {mol}."
+            f"Could not find explicit parameters for {[type_key,interaction]} in line or in force field {ff} attached to {mol}."
         )
 
 
