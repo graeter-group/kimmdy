@@ -1,3 +1,10 @@
+"""
+KIMMDY __init__ file. 
+
+Discovers and loads KIMMDY plugins.
+"""
+
+
 from __future__ import annotations
 import sys
 
