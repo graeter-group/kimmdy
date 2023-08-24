@@ -73,8 +73,9 @@ def test_modify_coords_break(tmpdir):
     files.input["tpr"] = tmpdir / "pull.tpr"
     files.input["top"] = tmpdir / "hexala_out.top"
     files.output["top"] = tmpdir / "topol_mod.top"
-    topA_dict = read_top(files.input["top"])
-    topB_dict = read_top(files.output["top"])
+    ffdir = tmpdir / Path('amber99sb-star-ildnp.ff')
+    topA_dict = read_top(files.input["top"], ffdir)
+    topB_dict = read_top(files.output["top"], ffdir)
     topA = Topology(topA_dict)
     topB = Topology(topB_dict)
     run_parameter_growth, top_merge_path = modify_coords(steps, files, topA, topB)
@@ -100,7 +101,6 @@ def test_modify_top(tmpdir, generic_topology):
     steps = [Move(ix_to_move=2, ix_to_bind=1, new_coords=((0.0, 0.0, 0.0), 100.0))]
     parameterizer = BasicParameterizer()
     files = SlimFiles(outputdir=tmpdir)
-    files.input["top"] = tmpdir / ""
     files.output["top"] = tmpdir / "out.top"
 
     modify_top(steps, files, generic_topology, parameterizer)

@@ -43,6 +43,7 @@ def generic_topology():
     top_path = filedir / "Ala_out.top"
     top_dict = read_top(top_path)
     top = Topology(top_dict)
+    print(top.ff)
     return top
 
 
