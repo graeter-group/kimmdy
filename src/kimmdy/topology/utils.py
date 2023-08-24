@@ -51,9 +51,8 @@ def get_top_section(
             )
     return section.get("content")
 
-def get_moleculetype_header(
-    top: dict, moleculetype: str
-) -> Optional[tuple[str, str]]:
+
+def get_moleculetype_header(top: dict, moleculetype: str) -> Optional[tuple[str, str]]:
     """Get content of the header of a moleculetype from a topology dict.
     By resolving any `#ifdef` statements by check in the top['define'] dict
     and choosing the 'content' or 'else_content' depending on the result.
@@ -86,9 +85,7 @@ def get_moleculetype_header(
     return header
 
 
-def get_moleculetype_atomics(
-    top: dict, moleculetype: str
-) -> Optional[dict]:
+def get_moleculetype_atomics(top: dict, moleculetype: str) -> Optional[dict]:
     """Get content of subsections (atoms/bonds/angles etc.) of a moleculetype from a topology dict.
 
     By resolving any `#ifdef` statements by check in the top['define'] dict
@@ -125,6 +122,7 @@ def get_moleculetype_atomics(
 
     return atomics
 
+
 def set_moleculetype_atomics(
     top: dict, moleculetype: str, atomics: dict
 ) -> Optional[dict]:
@@ -148,7 +146,7 @@ def set_moleculetype_atomics(
                 if condition_value in top["define"].keys():
                     v["content"] = atomics[k]
                 else:
-                    v["else_content"] = atomics[k] 
+                    v["else_content"] = atomics[k]
             elif condition_type == "ifndef":
                 if condition_value not in top["define"].keys():
                     v["content"] = atomics[k]

@@ -150,7 +150,6 @@ class TestUrea:
         assert len(top.improper_dihedrals) == 3
 
 
-
 class TestTopAB:
     def test_top_ab(self, raw_top_a_fix, raw_top_b_fix):
         topA = Topology(raw_top_a_fix)
@@ -300,8 +299,8 @@ class TestHexalaTopology:
         angles = get_protein_section(topology, "angles")
         dihedrals = get_protein_section(topology, "dihedrals")
         assert dihedrals
-        proper_dihedrals = [x for x in dihedrals if x[4] == '9']
-        improper_dihedrals = [x for x in dihedrals if x[4] == '4']
+        proper_dihedrals = [x for x in dihedrals if x[4] == "9"]
+        improper_dihedrals = [x for x in dihedrals if x[4] == "4"]
 
         atoms_new = get_protein_section(topology_new, "atoms")
         bonds_new = get_protein_section(topology_new, "bonds")
@@ -309,8 +308,8 @@ class TestHexalaTopology:
         angles_new = get_protein_section(topology_new, "angles")
         dihedrals_new = get_protein_section(topology_new, "dihedrals")
         assert dihedrals_new
-        proper_dihedrals_new = [x for x in dihedrals_new if x[4] == '9']
-        improper_dihedrals_new = [x for x in dihedrals_new if x[4] == '4']
+        proper_dihedrals_new = [x for x in dihedrals_new if x[4] == "9"]
+        improper_dihedrals_new = [x for x in dihedrals_new if x[4] == "4"]
 
         assert atoms is not None
         assert bonds is not None
@@ -389,7 +388,6 @@ class TestHexalaTopology:
                 ("9", "17", "15", "16"),
             ]
         )
-
 
     def test_top_update_dict(self, raw_hexala_top_fix):
         raw = raw_hexala_top_fix
@@ -547,4 +545,3 @@ class TestRadicalAla:
     def test_is_radical(self, top_noprm_fix):
         assert top_noprm_fix.atoms["9"].is_radical == True
         assert top_noprm_fix.atoms["10"].is_radical == False
-

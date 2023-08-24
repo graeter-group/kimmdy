@@ -32,7 +32,7 @@ def get_explicit_MultipleDihedrals(
     mol: MoleculeType,
     dihedrals_in: Optional[MultipleDihedrals],
     ff: FF,
-    periodicity_max: int = 6
+    periodicity_max: int = 6,
 ) -> Union[MultipleDihedrals, None]:
     """Takes a valid dihedral key and returns explicit
     dihedral parameters for a given topology
@@ -171,9 +171,11 @@ def merge_dihedrals(
     return dihedralmerge
 
 
-
 def merge_top_moleculetypes_parameter_growth(
-    molA: MoleculeType, molB: MoleculeType, ff: FF, focus_nr: Union[list[str], None] = None
+    molA: MoleculeType,
+    molB: MoleculeType,
+    ff: FF,
+    focus_nr: Union[list[str], None] = None,
 ) -> MoleculeType:
     """Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation"""
     hyperparameters = {
@@ -212,12 +214,8 @@ def merge_top_moleculetypes_parameter_growth(
         interactionB = molB.bonds.get(key)
 
         if interactionA != interactionB:
-            parameterizedA = get_explicit_or_type(
-                key, interactionA, ff.bondtypes, molA
-            )
-            parameterizedB = get_explicit_or_type(
-                key, interactionB, ff.bondtypes, molB
-            )
+            parameterizedA = get_explicit_or_type(key, interactionA, ff.bondtypes, molA)
+            parameterizedB = get_explicit_or_type(key, interactionB, ff.bondtypes, molB)
             if parameterizedA and parameterizedB:
                 molB.bonds[key] = Bond(
                     *key,
@@ -258,7 +256,7 @@ def merge_top_moleculetypes_parameter_growth(
 
     ## pairs and exclusions
     exclusions_content = molB.atomics.get("exclusions", [])
-        # maybe hook this up to empty_sections if it gets accessible
+    # maybe hook this up to empty_sections if it gets accessible
     for key in keysA - keysB:
         molB.pairs.pop(key, None)
         exclusions_content.append(list(key))
@@ -391,6 +389,7 @@ def merge_top_moleculetypes_parameter_growth(
 
     return molB
 
+
 def merge_top_parameter_growth(
     topA: Topology, topB: Topology, focus_nr: Union[list[str], None] = None
 ) -> Topology:
@@ -406,5 +405,3 @@ def merge_top_parameter_growth(
     molB = merge_top_moleculetypes_parameter_growth(molA, molB, topB.ff, focus_nr)
 
     return topB
-
-

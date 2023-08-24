@@ -73,7 +73,7 @@ def test_modify_coords_break(tmpdir):
     files.input["tpr"] = tmpdir / "pull.tpr"
     files.input["top"] = tmpdir / "hexala_out.top"
     files.output["top"] = tmpdir / "topol_mod.top"
-    ffdir = tmpdir / Path('amber99sb-star-ildnp.ff')
+    ffdir = tmpdir / Path("amber99sb-star-ildnp.ff")
     topA_dict = read_top(files.input["top"], ffdir)
     topB_dict = read_top(files.output["top"], ffdir)
     topA = Topology(topA_dict)

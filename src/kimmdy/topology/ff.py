@@ -92,7 +92,7 @@ class FF:
 
     def __str__(self) -> str:
         return textwrap.dedent(
-        f"""
+            f"""
         ForceField parameters with
         {len(self.atomtypes)} atomtypes,
         {len(self.bondtypes)} bondtypes,
@@ -116,4 +116,3 @@ class FF:
         <https://ipython.org/ipython-doc/3/api/generated/IPython.lib.pretty.html#IPython.lib.pretty.PrettyPrinter>
         """
         p.text(str(self))
-
