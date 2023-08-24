@@ -2,7 +2,7 @@ import pytest
 import shutil
 from pathlib import Path
 
-from kimmdy.reaction import Break, Bind, Move, RecipeStep
+from kimmdy.recipe import Break, Bind, Move, RecipeStep
 from kimmdy.parsing import read_plumed, read_top
 from kimmdy.changemanager import (
     break_bond_plumed,
@@ -11,7 +11,7 @@ from kimmdy.changemanager import (
     modify_top,
 )
 from kimmdy.topology.topology import Topology
-from kimmdy.parameterize import BasicParameterizer
+from kimmdy.plugins import BasicParameterizer
 from conftest import SlimFiles
 from kimmdy.tasks import TaskFiles
 import os

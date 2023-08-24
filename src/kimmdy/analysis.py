@@ -8,7 +8,7 @@ import MDAnalysis as mda
 
 from kimmdy.utils import run_shell_cmd
 from kimmdy.parsing import read_json, write_json
-from kimmdy.reaction import RecipeCollection
+from kimmdy.recipe import RecipeCollection
 
 
 def get_subdirs(run_dir: Path, steps: Union[list, str]):

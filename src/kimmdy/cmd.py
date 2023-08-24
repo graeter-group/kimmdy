@@ -10,7 +10,6 @@ from pathlib import Path
 import textwrap
 import dill
 from kimmdy.config import Config
-from kimmdy.tools import _build_examples
 from kimmdy.runmanager import RunManager
 from kimmdy.utils import check_gmx_version, backup_if_existing
 import importlib.resources as pkg_resources
