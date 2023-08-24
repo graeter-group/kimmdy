@@ -64,7 +64,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
-<link href="../../_reference/index.html" rel="next">
+<link href="../../guide/developer/index.html" rel="next">
 <link href="../../guide/user/hcp.html" rel="prev">
 <script src="../../site_libs/quarto-html/quarto.js"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
@@ -190,36 +190,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../../guide/developer/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Developer</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../guide/developer/plugins.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Writing Reaction Plugins</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../guide/developer/topology.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Hexala topology</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
             <a href="../../guide/user/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">User</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 show">  
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../guide/user/hcp.html" class="sidebar-item-text sidebar-link">
@@ -230,6 +207,29 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../../guide/user/options.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">KIMMDY Options</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../guide/developer/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Developer</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guide/developer/plugins.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Writing Reaction Plugins</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guide/developer/topology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Hexala topology</span></a>
   </div>
 </li>
       </ul>
@@ -586,139 +586,160 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td></td>
 </tr>
 <tr class="odd">
+<td>plumed</td>
+<td>.dat file containing plumed config for starting with reaction</td>
+<td>Path</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>tpr</td>
+<td>.tpr file of a finished simulation for starting with reaction</td>
+<td>Path</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>trr</td>
+<td>.trr file of a finished simulation for starting with reaction</td>
+<td>Path</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
 <td>mds</td>
 <td>Settings for MD steps, e.g.&nbsp;mdp files, plumed files, etc.</td>
 <td></td>
 <td></td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>mds.*.mdp</td>
 <td>MDP file for the MD step</td>
 <td>Path</td>
 <td></td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>mds.*.prefix</td>
 <td>TODO: What is this?</td>
 <td>str</td>
 <td></td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>mds.*.overwrite</td>
 <td>TODO: What is this?</td>
 <td>str</td>
 <td></td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><strong>mds.*.plumed</strong></td>
 <td></td>
-<td></td>
+<td>Path</td>
 <td></td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>changer</td>
 <td>Settings for the coordinate changer</td>
 <td></td>
 <td></td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><strong>changer.coordinates.md</strong></td>
 <td></td>
 <td>str</td>
 <td></td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><strong>changer.coordinates.md_parameter_growth</strong></td>
 <td></td>
 <td>str</td>
 <td></td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><strong>changer.topology.parameterization</strong></td>
 <td></td>
 <td>str</td>
 <td>grappa</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>sequence</td>
 <td>List of tasks. Each task can be a string (the name of the task) or an object with the task name and a multiplicity <code>mult: &lt;int&gt;</code></td>
 <td>Sequence</td>
 <td></td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>reactions</td>
 <td>Settings for reactions</td>
 <td></td>
 <td></td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>reactions.homolysis.edis</td>
 <td>Dissociation energies data file</td>
 <td>Path</td>
 <td>edissoc.dat</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>reactions.homolysis.itp</td>
 <td>Additional itp file with bonded parameters</td>
 <td>Path</td>
 <td>ffbonded.itp</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>reactions.hat_naive.frequency_factor</td>
 <td>Frequency factor</td>
 <td>float</td>
 <td>1</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>reactions.hat_naive.h_cutoff</td>
 <td>Cutoff for H atom</td>
 <td>float</td>
 <td>4</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>reactions.hat_naive.polling_rate</td>
 <td>Polling rate</td>
 <td>float</td>
 <td>1</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>reactions.dummyreaction.example</td>
 <td>This is an example of an option for a reaction.</td>
 <td>float</td>
 <td>0.0</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>reactions.dummyreaction.example2</td>
 <td>This is another example of an option for a reaction.</td>
 <td>str</td>
 <td>hello</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>plot_rates</td>
 <td>Plot the reaction rates</td>
 <td>bool</td>
 <td>False</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>save_recipes</td>
 <td>Save recipes as csv during <code>decide_reaction</code></td>
 <td>bool</td>
@@ -1123,8 +1144,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../../_reference/index.html" class="pagination-link">
-        <span class="nav-page-text">Reference</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../../guide/developer/index.html" class="pagination-link">
+        <span class="nav-page-text">Developer</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

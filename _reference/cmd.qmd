@@ -15,8 +15,10 @@ Also initialized logging and configuration.
 | [get_analysis_cmdline_args](#kimmdy.cmd.get_analysis_cmdline_args) | concat : |
 | [get_build_example_args](#kimmdy.cmd.get_build_example_args) | Parse command line arguments. |
 | [get_cmdline_args](#kimmdy.cmd.get_cmdline_args) | Parse command line arguments and configure logger. |
+| [get_remove_hydrogen_cmdline_args](#kimmdy.cmd.get_remove_hydrogen_cmdline_args) | parse cmdline args for remove_hydrogen |
 | [kimmdy](#kimmdy.cmd.kimmdy) | Run KIMMDY from the command line. |
 | [kimmdy_run](#kimmdy.cmd.kimmdy_run) | Run KIMMDY from python. |
+| [remove_hydrogen](#kimmdy.cmd.remove_hydrogen) | Remove hydrogen by atom nr in a gro and topology file |
 
 ### analysis { #kimmdy.cmd.analysis }
 
@@ -35,9 +37,6 @@ Build examples from the command line.
 `cmd.configure_logger(log_path, log_level)`
 
 Configure logging.
-
-Configures the logging module with optional colorcodes
-for the terminal.
 
 #### Parameters
 
@@ -78,6 +77,12 @@ Parse command line arguments and configure logger.
 |--------------------------|-------------------------------|
 | [Namespace](`Namespace`) | parsed command line arguments |
 
+### get_remove_hydrogen_cmdline_args { #kimmdy.cmd.get_remove_hydrogen_cmdline_args }
+
+`cmd.get_remove_hydrogen_cmdline_args()`
+
+parse cmdline args for remove_hydrogen
+
 ### kimmdy { #kimmdy.cmd.kimmdy }
 
 `cmd.kimmdy()`
@@ -89,7 +94,7 @@ which is `kimmdy.yml` by default.
 
 ### kimmdy_run { #kimmdy.cmd.kimmdy_run }
 
-`cmd.kimmdy_run(input=Path('kimmdy.yml'), loglevel='DEBUG', logfile=Path('kimmdy.log'), checkpoint='', from_latest_checkpoint=False, concat=False, show_plugins=False, show_schema_path=False, generate_jobscript=False)`
+`cmd.kimmdy_run(input=Path('kimmdy.yml'), loglevel='DEBUG', logfile=Path('kimmdy.log'), checkpoint='', from_latest_checkpoint=False, concat=False, show_plugins=False, show_schema_path=False, generate_jobscript=False, debug=False)`
 
 Run KIMMDY from python.
 
@@ -106,3 +111,9 @@ Run KIMMDY from python.
 | `show_plugins`           | [bool](`bool`)         | Show available plugins and exit.                                                          | `False`              |
 | `show_schema_path`       | [bool](`bool`)         | Print path to yaml schema for use with yaml-language-server e.g. in VSCode and Neovim     | `False`              |
 | `generate_jobscript`     | [bool](`bool`)         | Instead of running KIMMDY directly, generate at jobscript.sh for slurm HPC clusters       | `False`              |
+
+### remove_hydrogen { #kimmdy.cmd.remove_hydrogen }
+
+`cmd.remove_hydrogen()`
+
+Remove hydrogen by atom nr in a gro and topology file

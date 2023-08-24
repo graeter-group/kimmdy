@@ -10,6 +10,7 @@ from kimmdy.parsing import read_top
 from kimmdy.topology.topology import Topology
 from pathlib import Path
 from kimmdy.misc_helper import top_to_graph
+from kimmdy.topology.utils import get_protein_section
 ```
 
 
@@ -30,3 +31,5 @@ with open("ala-top.dot", "w") as f:
 //| fig-cap: "A diagram of the ala topology"
 //| file: ala-top.dot
 ```
+
+

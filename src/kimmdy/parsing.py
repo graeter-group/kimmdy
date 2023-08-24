@@ -149,7 +149,7 @@ def resolve_includes(path: Path) -> tuple[list[str], Optional[Path]]:
     return (ls, ffdir)
 
 
-def read_top(path: Path) -> TopologyDict:
+def read_top(path: Path, ffdir: Optional[Path] = None) -> TopologyDict:
     """Read a topology file into a raw TopologyDict represenation.
 
     Parameters
@@ -198,7 +198,9 @@ def read_top(path: Path) -> TopologyDict:
         "orientation_restraints",
     )
 
-    ls, ffdir = resolve_includes(path)
+    ls, parsed_ffdir = resolve_includes(path)
+    if ffdir is None and parsed_ffdir is not None:
+        ffdir = parsed_ffdir
     if ffdir is None:
         logger.warning(f"No #include for a forcefield directory found in {path}.")
 

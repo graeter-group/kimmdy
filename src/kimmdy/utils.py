@@ -8,6 +8,12 @@ from kimmdy.topology.utils import get_protein_section
 
 logger = logging.getLogger(__name__)
 
+TopologyAtomAddress = str | tuple[str, str] | tuple[int, str]
+"""Address to an atom in the topology.
+
+One of (id: str), (moleculetype: str, id: str) or (moleculetype_ix: int, id).
+"""
+
 
 ## input/output utility functions
 

@@ -10,18 +10,19 @@
 | [get_explicit_or_type](#kimmdy.coordinates.get_explicit_or_type) | Takes an Interaction and associated key, InteractionTypes, Topology |
 | [is_parameterized](#kimmdy.coordinates.is_parameterized) | Parameterized topology entries have c0 and c1 attributes != None |
 | [merge_dihedrals](#kimmdy.coordinates.merge_dihedrals) | Merge one to two Dihedrals or -Types into a Dihedral in free-energy syntax |
-| [merge_top_parameter_growth](#kimmdy.coordinates.merge_top_parameter_growth) | Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation |
+| [merge_top_moleculetypes_parameter_growth](#kimmdy.coordinates.merge_top_moleculetypes_parameter_growth) | Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation |
+| [merge_top_parameter_growth](#kimmdy.coordinates.merge_top_parameter_growth) | Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation. |
 
 ### get_explicit_MultipleDihedrals { #kimmdy.coordinates.get_explicit_MultipleDihedrals }
 
-`coordinates.get_explicit_MultipleDihedrals(dihedral_key, top, dihedrals_in, periodicity_max=6)`
+`coordinates.get_explicit_MultipleDihedrals(dihedral_key, mol, dihedrals_in, ff, periodicity_max=6)`
 
 Takes a valid dihedral key and returns explicit
 dihedral parameters for a given topology
 
 ### get_explicit_or_type { #kimmdy.coordinates.get_explicit_or_type }
 
-`coordinates.get_explicit_or_type(key, interaction, interaction_types, top, periodicity='')`
+`coordinates.get_explicit_or_type(key, interaction, interaction_types, mol, periodicity='')`
 
 Takes an Interaction and associated key, InteractionTypes, Topology
 and Periodicity (for dihedrals) and returns an object with the parameters of this Interaction
@@ -34,12 +35,21 @@ Parameterized topology entries have c0 and c1 attributes != None
 
 ### merge_dihedrals { #kimmdy.coordinates.merge_dihedrals }
 
-`coordinates.merge_dihedrals(dihedral_key, interactionA, interactionB, interaction_typesA, interaction_typesB, topA, topB, funct, periodicity)`
+`coordinates.merge_dihedrals(dihedral_key, interactionA, interactionB, interaction_typesA, interaction_typesB, molA, molB, funct, periodicity)`
 
 Merge one to two Dihedrals or -Types into a Dihedral in free-energy syntax
+
+### merge_top_moleculetypes_parameter_growth { #kimmdy.coordinates.merge_top_moleculetypes_parameter_growth }
+
+`coordinates.merge_top_moleculetypes_parameter_growth(molA, molB, ff, focus_nr=None)`
+
+Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation
 
 ### merge_top_parameter_growth { #kimmdy.coordinates.merge_top_parameter_growth }
 
 `coordinates.merge_top_parameter_growth(topA, topB, focus_nr=None)`
 
-Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation
+Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation.
+
+
+TODO: for now this assumes that only one moleculeype (the first, index 0) is of interest.

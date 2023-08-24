@@ -190,36 +190,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../guide/developer/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Developer</span></a>
+            <a href="../guide/user/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">User</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../guide/developer/plugins.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Writing Reaction Plugins</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../guide/developer/topology.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Hexala topology</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a href="../guide/user/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">User</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../guide/user/hcp.html" class="sidebar-item-text sidebar-link">
@@ -230,6 +207,29 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../guide/user/options.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">KIMMDY Options</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../guide/developer/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Developer</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guide/developer/plugins.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Writing Reaction Plugins</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guide/developer/topology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Hexala topology</span></a>
   </div>
 </li>
       </ul>
@@ -425,12 +425,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#classes" id="toc-classes" class="nav-link" data-scroll-target="#classes">Classes</a>
   <ul>
+  <li><a href="#kimmdy.tasks.AutoFillDict" id="toc-kimmdy.tasks.AutoFillDict" class="nav-link" data-scroll-target="#kimmdy.tasks.AutoFillDict">AutoFillDict</a></li>
   <li><a href="#kimmdy.tasks.Task" id="toc-kimmdy.tasks.Task" class="nav-link" data-scroll-target="#kimmdy.tasks.Task">Task</a>
   <ul class="collapse">
   <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters:</a></li>
   </ul></li>
   <li><a href="#kimmdy.tasks.TaskFiles" id="toc-kimmdy.tasks.TaskFiles" class="nav-link" data-scroll-target="#kimmdy.tasks.TaskFiles">TaskFiles</a>
   <ul class="collapse">
+  <li><a href="#atributes" id="toc-atributes" class="nav-link" data-scroll-target="#atributes">Atributes</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul></li>
   </ul></li>
@@ -450,6 +452,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="kimmdy.tasks" class="level1">
 <h1>tasks</h1>
 <p><code>tasks</code></p>
+<p>The tasks module holds the TaskFiles class which organizes input and output paths and the Task class for steps in the runmanager.</p>
 <section id="classes" class="level2">
 <h2 class="anchored" data-anchor-id="classes">Classes</h2>
 <table class="table">
@@ -461,15 +464,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody>
 <tr class="odd">
+<td><a href="#kimmdy.tasks.AutoFillDict">AutoFillDict</a></td>
+<td>Dictionary that gets populated by calling get_missing.</td>
+</tr>
+<tr class="even">
 <td><a href="#kimmdy.tasks.Task">Task</a></td>
 <td>A task to be performed as as a step in the RunManager.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#kimmdy.tasks.TaskFiles">TaskFiles</a></td>
-<td>Input and Output files and directories.</td>
+<td>Class for Task input and output files and directories.</td>
 </tr>
 </tbody>
 </table>
+<section id="kimmdy.tasks.AutoFillDict" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.tasks.AutoFillDict">AutoFillDict</h3>
+<p><code>tasks.AutoFillDict(self, get_missing)</code></p>
+<p>Dictionary that gets populated by calling get_missing.</p>
+</section>
 <section id="kimmdy.tasks.Task" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.tasks.Task">Task</h3>
 <p><code>tasks.Task(self, runmng, f, kwargs=None, out=None)</code></p>
@@ -481,8 +493,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="kimmdy.tasks.TaskFiles" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.tasks.TaskFiles">TaskFiles</h3>
 <p><code>tasks.TaskFiles(get_latest, input=field(default_factory=dict), output=field(default_factory=dict), outputdir=Path(), logger=logging.getLogger('kimmdy.basetask'))</code></p>
-<p>Input and Output files and directories.</p>
-<p>Hosts the input and output files belonging to a task. A function or method that wants to be callable as a Task has to return a TaskFiles object. The input defaultdict is populated on the fly using get_latest of the runmanager to find newest files. Files which can not be found by get_latest must be added manually.</p>
+<section id="atributes" class="level4">
+<h4 class="anchored" data-anchor-id="atributes">Atributes</h4>
+<p>get_latest: Runmanager.get_latest function that returns paths to the latest file of given type. input: Input file paths for a Task. Is populated by get_latest or manually. output: Output file paths for a Task. Is populated by runmanager._discover_output_files or manually. outputdir: Output directory for a Task. Typically populated by create_task_directory called by Task. logger: Logger for a Task. Initialized in create_task_directory.</p>
+</section>
 <section id="examples" class="level4">
 <h4 class="anchored" data-anchor-id="examples">Examples</h4>
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="kw">class</span> run():</span>
@@ -508,14 +522,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td><a href="#kimmdy.tasks.create_task_directory">create_task_directory</a></td>
-<td>Creates TaskFiles object, output directory and symlinks ff.</td>
+<td>Creates TaskFiles object, output directory, logger and symlinks ff.</td>
 </tr>
 </tbody>
 </table>
 <section id="kimmdy.tasks.create_task_directory" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.tasks.create_task_directory">create_task_directory</h3>
 <p><code>tasks.create_task_directory(runmng, postfix)</code></p>
-<p>Creates TaskFiles object, output directory and symlinks ff.</p>
+<p>Creates TaskFiles object, output directory, logger and symlinks ff.</p>
+<p>Gets called when a Task is called (from the runmanager.tasks queue).</p>
 
 
 </section>

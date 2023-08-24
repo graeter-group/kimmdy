@@ -200,7 +200,16 @@ class TestTopology:
     def test_generate_topology_from_bound_to(self, hexala_top_fix):
         og_top = deepcopy(hexala_top_fix)
         newtop = deepcopy(hexala_top_fix)
+        newtop.bonds.clear()
+        newtop.pairs.clear()
+        newtop.angles.clear()
+        newtop.proper_dihedrals.clear()
+
+        assert newtop.bonds == {}
+        assert newtop.moleculetypes["Protein"].bonds == {}
+
         newtop._regenerate_topology_from_bound_to()
+
         assert newtop.bonds == og_top.bonds
         assert newtop.pairs == og_top.pairs
         assert newtop.angles == og_top.angles
@@ -289,12 +298,19 @@ class TestHexalaTopology:
         pairs = get_protein_section(topology, "pairs")
         angles = get_protein_section(topology, "angles")
         dihedrals = get_protein_section(topology, "dihedrals")
+        assert dihedrals
+        proper_dihedrals = [x for x in dihedrals if x[4] == "9"]
+        improper_dihedrals = [x for x in dihedrals if x[4] == "4"]
 
         atoms_new = get_protein_section(topology_new, "atoms")
         bonds_new = get_protein_section(topology_new, "bonds")
         pairs_new = get_protein_section(topology_new, "pairs")
         angles_new = get_protein_section(topology_new, "angles")
         dihedrals_new = get_protein_section(topology_new, "dihedrals")
+        assert dihedrals_new
+        proper_dihedrals_new = [x for x in dihedrals_new if x[4] == "9"]
+        improper_dihedrals_new = [x for x in dihedrals_new if x[4] == "4"]
+
         assert atoms is not None
         assert bonds is not None
         assert pairs is not None
@@ -315,8 +331,11 @@ class TestHexalaTopology:
         anglediff = set([tuple(x[:3]) for x in angles]) - set(
             [tuple(x[:3]) for x in angles_new]
         )
-        dihedraldiff = set([tuple(x[:4]) for x in dihedrals]) - set(
-            [tuple(x[:4]) for x in dihedrals_new]
+        proper_dihedraldiff = set([tuple(x[:4]) for x in proper_dihedrals]) - set(
+            [tuple(x[:4]) for x in proper_dihedrals_new]
+        )
+        improper_dihedraldiff = set([tuple(x[:4]) for x in improper_dihedrals]) - set(
+            [tuple(x[:4]) for x in improper_dihedrals_new]
         )
 
         assert bonddiff == set([breakpair])
@@ -346,7 +365,7 @@ class TestHexalaTopology:
                 ("9", "15", "17"),
             ]
         )
-        assert dihedraldiff == set(
+        assert proper_dihedraldiff == set(
             [
                 ("5", "7", "9", "15"),
                 ("8", "7", "9", "15"),
@@ -361,14 +380,14 @@ class TestHexalaTopology:
                 ("11", "9", "15", "17"),
                 ("9", "15", "17", "18"),
                 ("9", "15", "17", "19"),
-                ("9", "17", "15", "16"),  # improper
             ]
         )
-
-        assert len(bonddiff) == 1
-        assert len(pairdiff) == 13
-        assert len(anglediff) == 5
-        assert len(dihedraldiff) == 14
+        assert improper_dihedraldiff == set(
+            [
+                ("7", "9", "15", "17"),
+                ("9", "17", "15", "16"),
+            ]
+        )
 
     def test_top_update_dict(self, raw_hexala_top_fix):
         raw = raw_hexala_top_fix
@@ -413,13 +432,12 @@ class TestHexalaTopology:
 
     def test_find_terms_around_atom(self, hexala_top_fix):
         top = deepcopy(hexala_top_fix)
+        protein = top.moleculetypes["Protein"]
         atomnr = "29"
-        # 29       CT       4        ALA      CA       29       0.0337   12.01
-
-        bonds = top._get_atom_bonds(atomnr)
-        angles = top._get_atom_angles(atomnr)
-        proper_dihedrals = top._get_atom_proper_dihedrals(atomnr)
-        improper_dihedrals = top._get_atom_improper_dihedrals(atomnr)
+        bonds = protein._get_atom_bonds(atomnr)
+        angles = protein._get_atom_angles(atomnr)
+        proper_dihedrals = protein._get_atom_proper_dihedrals(atomnr)
+        improper_dihedrals = protein._get_atom_improper_dihedrals(atomnr, top.ff)
 
         assert len(bonds) == 4
         assert len(angles) == 13
@@ -427,9 +445,9 @@ class TestHexalaTopology:
         assert len(improper_dihedrals) == 3
 
         atomnr = "9"
-        bonds = top._get_atom_bonds(atomnr)
-        angles = top._get_atom_angles(atomnr)
-        proper_dihedrals_center = top._get_center_atom_dihedrals(atomnr)
+        bonds = protein._get_atom_bonds(atomnr)
+        angles = protein._get_atom_angles(atomnr)
+        proper_dihedrals_center = protein._get_center_atom_dihedrals(atomnr)
 
         assert bonds == [("7", "9"), ("9", "10"), ("9", "11"), ("9", "15")]
         assert set(proper_dihedrals_center) == set(
@@ -527,6 +545,3 @@ class TestRadicalAla:
     def test_is_radical(self, top_noprm_fix):
         assert top_noprm_fix.atoms["9"].is_radical == True
         assert top_noprm_fix.atoms["10"].is_radical == False
-
-
-# %%
