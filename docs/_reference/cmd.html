@@ -156,36 +156,13 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../guide/developer/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Developer</span></a>
+            <a href="../guide/user/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">User</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../guide/developer/plugins.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Writing Reaction Plugins</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../guide/developer/topology.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Hexala topology</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a href="../guide/user/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">User</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../guide/user/hcp.html" class="sidebar-item-text sidebar-link">
@@ -196,6 +173,29 @@ ul.task-list li input[type="checkbox"] {
   <div class="sidebar-item-container"> 
   <a href="../guide/user/options.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">KIMMDY Options</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../guide/developer/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Developer</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guide/developer/plugins.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Writing Reaction Plugins</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guide/developer/topology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Hexala topology</span></a>
   </div>
 </li>
       </ul>
@@ -406,11 +406,13 @@ ul.task-list li input[type="checkbox"] {
   <ul class="collapse">
   <li><a href="#returns-1" id="toc-returns-1" class="nav-link" data-scroll-target="#returns-1">Returns</a></li>
   </ul></li>
+  <li><a href="#kimmdy.cmd.get_remove_hydrogen_cmdline_args" id="toc-kimmdy.cmd.get_remove_hydrogen_cmdline_args" class="nav-link" data-scroll-target="#kimmdy.cmd.get_remove_hydrogen_cmdline_args">get_remove_hydrogen_cmdline_args</a></li>
   <li><a href="#kimmdy.cmd.kimmdy" id="toc-kimmdy.cmd.kimmdy" class="nav-link" data-scroll-target="#kimmdy.cmd.kimmdy">kimmdy</a></li>
   <li><a href="#kimmdy.cmd.kimmdy_run" id="toc-kimmdy.cmd.kimmdy_run" class="nav-link" data-scroll-target="#kimmdy.cmd.kimmdy_run">kimmdy_run</a>
   <ul class="collapse">
   <li><a href="#parameters-1" id="toc-parameters-1" class="nav-link" data-scroll-target="#parameters-1">Parameters</a></li>
   </ul></li>
+  <li><a href="#kimmdy.cmd.remove_hydrogen" id="toc-kimmdy.cmd.remove_hydrogen" class="nav-link" data-scroll-target="#kimmdy.cmd.remove_hydrogen">remove_hydrogen</a></li>
   </ul></li>
   </ul></li>
   </ul>
@@ -460,12 +462,20 @@ ul.task-list li input[type="checkbox"] {
 <td>Parse command line arguments and configure logger.</td>
 </tr>
 <tr class="odd">
+<td><a href="#kimmdy.cmd.get_remove_hydrogen_cmdline_args">get_remove_hydrogen_cmdline_args</a></td>
+<td>parse cmdline args for remove_hydrogen</td>
+</tr>
+<tr class="even">
 <td><a href="#kimmdy.cmd.kimmdy">kimmdy</a></td>
 <td>Run KIMMDY from the command line.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#kimmdy.cmd.kimmdy_run">kimmdy_run</a></td>
 <td>Run KIMMDY from python.</td>
+</tr>
+<tr class="even">
+<td><a href="#kimmdy.cmd.remove_hydrogen">remove_hydrogen</a></td>
+<td>Remove hydrogen by atom nr in a gro and topology file</td>
 </tr>
 </tbody>
 </table>
@@ -483,7 +493,6 @@ ul.task-list li input[type="checkbox"] {
 <h3 class="anchored" data-anchor-id="kimmdy.cmd.configure_logger">configure_logger</h3>
 <p><code>cmd.configure_logger(log_path, log_level)</code></p>
 <p>Configure logging.</p>
-<p>Configures the logging module with optional colorcodes for the terminal.</p>
 <section id="parameters" class="level4">
 <h4 class="anchored" data-anchor-id="parameters">Parameters</h4>
 <table class="table">
@@ -561,6 +570,11 @@ ul.task-list li input[type="checkbox"] {
 </table>
 </section>
 </section>
+<section id="kimmdy.cmd.get_remove_hydrogen_cmdline_args" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.cmd.get_remove_hydrogen_cmdline_args">get_remove_hydrogen_cmdline_args</h3>
+<p><code>cmd.get_remove_hydrogen_cmdline_args()</code></p>
+<p>parse cmdline args for remove_hydrogen</p>
+</section>
 <section id="kimmdy.cmd.kimmdy" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.cmd.kimmdy">kimmdy</h3>
 <p><code>cmd.kimmdy()</code></p>
@@ -569,7 +583,7 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="kimmdy.cmd.kimmdy_run" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.cmd.kimmdy_run">kimmdy_run</h3>
-<p><code>cmd.kimmdy_run(input=Path('kimmdy.yml'), loglevel='DEBUG', logfile=Path('kimmdy.log'), checkpoint='', from_latest_checkpoint=False, concat=False, show_plugins=False, show_schema_path=False, generate_jobscript=False)</code></p>
+<p><code>cmd.kimmdy_run(input=Path('kimmdy.yml'), loglevel='DEBUG', logfile=Path('kimmdy.log'), checkpoint='', from_latest_checkpoint=False, concat=False, show_plugins=False, show_schema_path=False, generate_jobscript=False, debug=False)</code></p>
 <p>Run KIMMDY from python.</p>
 <section id="parameters-1" class="level4">
 <h4 class="anchored" data-anchor-id="parameters-1">Parameters</h4>
@@ -639,9 +653,14 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 </tbody>
 </table>
-
-
 </section>
+</section>
+<section id="kimmdy.cmd.remove_hydrogen" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.cmd.remove_hydrogen">remove_hydrogen</h3>
+<p><code>cmd.remove_hydrogen()</code></p>
+<p>Remove hydrogen by atom nr in a gro and topology file</p>
+
+
 </section>
 </section>
 </section>

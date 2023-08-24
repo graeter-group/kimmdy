@@ -30,10 +30,11 @@ def setup_testdir(tmp_path, dirname) -> Path:
         assetsdir = Path("./tests/test_files") / "assets"
     testdir = tmp_path / "test_integration" / dirname
     shutil.copytree(filedir, testdir)
-    Path(testdir / "amber99sb-star-ildnp.ff").symlink_to(
-        assetsdir / "amber99sb-star-ildnp.ff",
-        target_is_directory=True,
-    )
+    if not Path(testdir / "amber99sb-star-ildnp.ff").exists():
+        Path(testdir / "amber99sb-star-ildnp.ff").symlink_to(
+            assetsdir / "amber99sb-star-ildnp.ff",
+            target_is_directory=True,
+        )
     os.chdir(testdir.resolve())
     return testdir
 
@@ -87,7 +88,7 @@ def test_integration_single_reaction(tmp_path):
 
 
 @pytest.mark.slow
-def test_integration_hat_reaction(tmp_path):
+def test_integration_hat_naive_reaction(tmp_path):
     testdir = setup_testdir(tmp_path, "hat_naive")
 
     kimmdy_run()

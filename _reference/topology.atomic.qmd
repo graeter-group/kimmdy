@@ -55,7 +55,7 @@ where i,j,k are atomtypes
 
 ### Atom { #kimmdy.topology.atomic.Atom }
 
-`topology.atomic.Atom(nr, type, resnr, residue, atom, cgnr, charge, mass, typeB=None, chargeB=None, massB=None, bound_to_nrs=field(default_factory=list), is_radical=False)`
+`topology.atomic.Atom(nr, type, resnr, residue, atom, cgnr, charge, mass=None, typeB=None, chargeB=None, massB=None, bound_to_nrs=field(default_factory=list), is_radical=False)`
 
 Information about one atom
 

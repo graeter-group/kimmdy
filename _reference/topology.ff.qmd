@@ -6,10 +6,10 @@
 
 | Name | Description |
 | --- | --- |
-| [FF](#kimmdy.topology.ff.FF) | Conainer for parsed forcefield data. |
+| [FF](#kimmdy.topology.ff.FF) | Container for parsed forcefield data. |
 
 ### FF { #kimmdy.topology.ff.FF }
 
 `topology.ff.FF(self, top)`
 
-Conainer for parsed forcefield data.
+Container for parsed forcefield data.

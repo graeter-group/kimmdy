@@ -141,7 +141,7 @@ def modify_coords(
 def modify_top(
     recipe_steps: list[RecipeStep],
     files: TaskFiles,
-    topology: Optional[Topology],
+    topology: Topology,
     parameterizer: Parameterizer,
 ) -> None:
     """Modify the topology of the system according to the recipe steps.
@@ -161,19 +161,16 @@ def modify_top(
         files.output:
             - top
     topology:
-        TODO: make this required instead of optional
+        The topology to be modified.
     """
     files.output = {"top": files.outputdir / "topol_mod.top"}
-    oldtop = files.input["top"]
     newtop = files.output["top"]
 
-    logger.info(f"Reading: {oldtop} and writing modified topology to {newtop}.")
+    logger.info(f"Writing modified topology to {newtop}.")
     if topology is None:
-        topologyDict = read_top(oldtop)
-        topology = Topology(topologyDict)
+        raise ValueError("Topology must be provided.")
 
     focus = set()
-    # if recipe_steps:
     for step in recipe_steps:
         if isinstance(step, Break):
             topology.break_bond((step.atom_id_1, step.atom_id_2))

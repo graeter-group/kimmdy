@@ -139,7 +139,7 @@ class RunManager:
         backup_if_existing(self.histfile)
         backup_if_existing(self.cptfile)
 
-        self.top = Topology(read_top(self.config.top))
+        self.top = Topology(read_top(self.config.top, self.config.ff))
         try:
             if self.config.changer.topology.parameterization == "basic":
                 self.parameterizer = BasicParameterizer()

@@ -30,6 +30,7 @@ guide/kimmdy-tutorial
 
 # excludes
 !tests/test_files/test_changemanager/pull.trr
+!tests/test_files/test_config/pull.trr
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -6,10 +6,30 @@
 
 | Name | Description |
 | --- | --- |
+| [get_moleculetype_atomics](#kimmdy.topology.utils.get_moleculetype_atomics) | Get content of subsections (atoms/bonds/angles etc.) of a moleculetype from a topology dict. |
+| [get_moleculetype_header](#kimmdy.topology.utils.get_moleculetype_header) | Get content of the header of a moleculetype from a topology dict. |
 | [get_protein_section](#kimmdy.topology.utils.get_protein_section) | Get content of a section in the first moleculetype (protein) from a topology dict. |
 | [get_top_section](#kimmdy.topology.utils.get_top_section) | Get content of a section from a topology dict. |
+| [set_moleculetype_atomics](#kimmdy.topology.utils.set_moleculetype_atomics) | Set content of the atomics (atoms/bonds/angles etc.) of a moleculetype from a topology dict. |
 | [set_protein_section](#kimmdy.topology.utils.set_protein_section) | Set content of a section in the first moleculetype (protein) from a topology dict. |
 | [set_top_section](#kimmdy.topology.utils.set_top_section) | Set content of a section from a topology dict. |
+
+### get_moleculetype_atomics { #kimmdy.topology.utils.get_moleculetype_atomics }
+
+`topology.utils.get_moleculetype_atomics(top, moleculetype)`
+
+Get content of subsections (atoms/bonds/angles etc.) of a moleculetype from a topology dict.
+
+By resolving any `#ifdef` statements by check in the top[&#x27;define&#x27;] dict
+and choosing the &#x27;content&#x27; or &#x27;else_content&#x27; depending on the result.
+
+### get_moleculetype_header { #kimmdy.topology.utils.get_moleculetype_header }
+
+`topology.utils.get_moleculetype_header(top, moleculetype)`
+
+Get content of the header of a moleculetype from a topology dict.
+By resolving any `#ifdef` statements by check in the top[&#x27;define&#x27;] dict
+and choosing the &#x27;content&#x27; or &#x27;else_content&#x27; depending on the result.
 
 ### get_protein_section { #kimmdy.topology.utils.get_protein_section }
 
@@ -25,6 +45,15 @@ Get content of a section from a topology dict.
 By resolving any `#ifdef` statements by check in the top[&#x27;define&#x27;] dict
 and choosing the &#x27;content&#x27; or &#x27;else_content&#x27; depending on the result.
 
+### set_moleculetype_atomics { #kimmdy.topology.utils.set_moleculetype_atomics }
+
+`topology.utils.set_moleculetype_atomics(top, moleculetype, atomics)`
+
+Set content of the atomics (atoms/bonds/angles etc.) of a moleculetype from a topology dict.
+
+By resolving any `#ifdef` statements by check in the top[&#x27;define&#x27;] dict
+and choosing the &#x27;content&#x27; or &#x27;else_content&#x27; depending on the result.
+
 ### set_protein_section { #kimmdy.topology.utils.set_protein_section }
 
 `topology.utils.set_protein_section(top, name, value)`
@@ -36,5 +65,6 @@ Set content of a section in the first moleculetype (protein) from a topology dic
 `topology.utils.set_top_section(top, name, value, moleculetype=None)`
 
 Set content of a section from a topology dict.
+
 By resolving any `#ifdef` statements by check in the top[&#x27;define&#x27;] dict
 and choosing the &#x27;content&#x27; or &#x27;else_content&#x27; depending on the result.
