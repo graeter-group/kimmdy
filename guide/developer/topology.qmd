@@ -10,6 +10,7 @@ from kimmdy.parsing import read_top
 from kimmdy.topology.topology import Topology
 from pathlib import Path
 from kimmdy.misc_helper import top_to_graph
+from kimmdy.topology.utils import get_protein_section
 ```
 
 
@@ -36,6 +37,23 @@ with open("ala-top.dot", "w") as f:
 #| eval: false
 ala_top = read_top(Path('tests/test_files/test_topology/hexala.top'))
 top = Topology(ala_top)
-ala_top['moleculetype_0'].keys()
-ala_top['moleculetype_2']['subsections'].keys()
+```
+
+```{python}
+#| eval: false
+breakpair = ("9", "15")
+
+# top.break_bond(breakpair)
+
+dhs = get_protein_section(top.top, "dihedrals")
+assert dhs
+for l in dhs:
+  if all([breakpair[0] in l[:4], breakpair[1] in l[:4]]):
+    print(l)
+
+# top
+
+top.moleculetypes["Protein"].atomics.keys()
+top.moleculetypes["Protein"].__dict__.keys()
+
 ```
