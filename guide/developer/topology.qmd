@@ -9,7 +9,7 @@ mermaid-format: svg
 from kimmdy.parsing import read_top
 from kimmdy.topology.topology import Topology
 from pathlib import Path
-from kimmdy.misc_helper import top_to_graph
+from kimmdy.tools import top_to_graph
 from kimmdy.topology.utils import get_protein_section
 ```
 
