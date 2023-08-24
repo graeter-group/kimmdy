@@ -2,15 +2,40 @@
 
 `utils`
 
+## Attributes
+
+| Name | Description |
+| --- | --- |
+| [TopologyAtomAddress](#kimmdy.utils.TopologyAtomAddress) | Address to an atom in the topology. |
+
 ## Functions
 
 | Name | Description |
 | --- | --- |
+| [backup_if_existing](#kimmdy.utils.backup_if_existing) | Checks whether a file exists and if so, backs it up. |
 | [check_gmx_version](#kimmdy.utils.check_gmx_version) | Check for an existing gromacs installation. |
-| [get_atominfo_from_plumedid](#kimmdy.utils.get_atominfo_from_plumedid) | returns atomtypes for a plumedid with information from the plumed and topology file |
-| [get_bondprm_from_atomtypes](#kimmdy.utils.get_bondprm_from_atomtypes) | returns bond parameters (b0, kb, E_dis) for a set of atomtypes |
-| [get_gmx_dir](#kimmdy.utils.get_gmx_dir) | returns the path to the gromacs installation |
-| [morse_transition_rate](#kimmdy.utils.morse_transition_rate) | calculates energy barrier crossing rate [in 1/ps]; barrier based on the model V = V_morse - F*X |
+| [get_atominfo_from_plumedid](#kimmdy.utils.get_atominfo_from_plumedid) | For a plumedid, returns the corresponding atom types and nrs. |
+| [get_bondprm_from_atomtypes](#kimmdy.utils.get_bondprm_from_atomtypes) | Returns bond parameters (b0, kb, E_dis) for a set of two atomtypes. |
+| [get_gmx_dir](#kimmdy.utils.get_gmx_dir) | Returns the path to the gromacs installation |
+| [get_shell_stdout](#kimmdy.utils.get_shell_stdout) | Run command in shell and capture stdout. |
+| [morse_transition_rate](#kimmdy.utils.morse_transition_rate) | Calculates reaction rate constant for a bond breaking event. |
+| [run_gmx](#kimmdy.utils.run_gmx) | Run GROMACS command in shell. |
+| [run_shell_cmd](#kimmdy.utils.run_shell_cmd) | Run command in shell. |
+
+### backup_if_existing { #kimmdy.utils.backup_if_existing }
+
+`utils.backup_if_existing(f)`
+
+Checks whether a file exists and if so, backs it up.
+
+Mainly used for files from previous KIMMDY runs to
+prevent overwriting these files.
+
+#### Parameters
+
+| Name   | Type                   | Description                                         | Default    |
+|--------|------------------------|-----------------------------------------------------|------------|
+| `f`    | [Path](`pathlib.Path`) | Path to a file that will be backed up, if existing. | _required_ |
 
 ### check_gmx_version { #kimmdy.utils.check_gmx_version }
 
@@ -25,27 +50,84 @@ If PLUMED is meant to be used it additionally checks for the keyword
 
 `utils.get_atominfo_from_plumedid(plumedid, plumed, top)`
 
-returns atomtypes for a plumedid with information from the plumed and topology file
+For a plumedid, returns the corresponding atom types and nrs.
+
+To convert from plumedid to atomnr, information from the plumed file is used.
+Then, the topology atoms section can be used to convert from atomnr to atomtype
+
+#### Parameters
+
+| Name       | Type           | Description                                   | Default    |
+|------------|----------------|-----------------------------------------------|------------|
+| `plumedid` | [str](`str`)   | Identifier from a plumed input file (e.g d0). | _required_ |
+| `plumed`   | [dict](`dict`) | Parsed plumed input file                      | _required_ |
+| `top`      | [dict](`dict`) | Topology of the molecular system              | _required_ |
 
 ### get_bondprm_from_atomtypes { #kimmdy.utils.get_bondprm_from_atomtypes }
 
 `utils.get_bondprm_from_atomtypes(atomtypes, ffbonded, lookup_edissoc_atomtype)`
 
-returns bond parameters (b0, kb, E_dis) for a set of atomtypes
+Returns bond parameters (b0, kb, E_dis) for a set of two atomtypes.
+
+#### Parameters
+
+| Name                      | Type                     | Description                                                                       | Default    |
+|---------------------------|--------------------------|-----------------------------------------------------------------------------------|------------|
+| `atomtypes`               | [frozenset](`frozenset`) | Two atomtypes as defined in the respective force field                            | _required_ |
+| `ffbonded`                | [dict](`dict`)           | Force field ffbonded.itp file parsed through the rtp parser                       | _required_ |
+| `lookup_edissoc_atomtype` | [dict](`dict`)           | Parsed file with dissociation energies per bond between two atomtypes or elements | _required_ |
 
 ### get_gmx_dir { #kimmdy.utils.get_gmx_dir }
 
 `utils.get_gmx_dir()`
 
-returns the path to the gromacs installation
+Returns the path to the gromacs installation
 
 This does not check if the installation is valid.
 It just returns the path to the gromacs data directory.
 If `gmx` is not executable it still returns the default
 gromacs data directory in `/usr/share/gromacs`.
 
+### get_shell_stdout { #kimmdy.utils.get_shell_stdout }
+
+`utils.get_shell_stdout(s)`
+
+Run command in shell and capture stdout.
+
 ### morse_transition_rate { #kimmdy.utils.morse_transition_rate }
 
-`utils.morse_transition_rate(r_curr, r_0, dissociation_energies, k_f, k_0=0.288, kT=2.479)`
+`utils.morse_transition_rate(r_curr, r_0, dissociation_energy, k_f, k_0=0.288, kT=2.479)`
 
-calculates energy barrier crossing rate [in 1/ps]; barrier based on the model V = V_morse - F*X
+Calculates reaction rate constant for a bond breaking event.
+
+Uses the Morse potential model for this calculation. For an array of bond distances of the same bond,
+first calculates the forces on the bond, then the minima and maxima of the shifted Morse potential
+to get an energy barrier and finally a reaction rate constant using the Arrhenius equation.
+For intramolecular reactions, the reaction rate constant is equal to the reaction rate.
+
+The calculation should be according to the derivation in the original KIMMDY paper: DOI: 10.1021/acs.jctc.9b00786
+
+#### Parameters
+
+| Name           | Type                               | Description                                                                                                                                                               | Default    |
+|----------------|------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| `r_curr`       | [list](`list`)\[[float](`float`)\] | Bond distances for a single bond, typically from a time series.                                                                                                           | _required_ |
+| `r_0`          | [float](`float`)                   | Equilibrium bond length of the bond.                                                                                                                                      | _required_ |
+| `dissociation` |                                    | Dissociation energy of the bond.                                                                                                                                          | _required_ |
+| `k_f`          | [float](`float`)                   | Spring constant of the bond.                                                                                                                                              | _required_ |
+| `k_0`          | [float](`float`)                   | Prefactor of the Arrhenius equation in [1/ps]. Default value from fitting averaged C_a - N data to gromacs data, see original KIMMDY paper Alternatively 1/2pi sqrt(k/m). | `0.288`    |
+| `kT`           | [float](`float`)                   | Constant in the Arrhenius equation in GROMACS units [kJ mol-1], default for 310K.                                                                                         | `2.479`    |
+
+### run_gmx { #kimmdy.utils.run_gmx }
+
+`utils.run_gmx(s, cwd=None)`
+
+Run GROMACS command in shell.
+
+Adds a &#x27;-quiet&#x27; flag to the command and checks the return code.
+
+### run_shell_cmd { #kimmdy.utils.run_shell_cmd }
+
+`utils.run_shell_cmd(s, cwd=None)`
+
+Run command in shell.

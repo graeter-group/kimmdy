@@ -34,7 +34,7 @@ Modules
 | [misc_helper](misc_helper.qmd#kimmdy.misc_helper) | Miscelaneous utilitiies that didn&#x27;t fit anywhere else for now. |
 | [parsing](parsing.qmd#kimmdy.parsing) | All read_&lt;...&gt; and write_&lt;...&gt; functions. |
 | [runmanager](runmanager.qmd#kimmdy.runmanager) | The Runmanager is the main entry point of the program. |
-| [tasks](tasks.qmd#kimmdy.tasks) |  |
+| [tasks](tasks.qmd#kimmdy.tasks) | The tasks module holds the TaskFiles class which organizes input and  |
 | [utils](utils.qmd#kimmdy.utils) |  |
 | [reaction](reaction.qmd#kimmdy.reaction) | ReactionPlugin protocoll and reaction recipes. |
 

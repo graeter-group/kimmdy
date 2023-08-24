@@ -33,18 +33,3 @@ with open("ala-top.dot", "w") as f:
 ```
 
 
-```{python}
-#| eval: false
-ala_top = read_top(Path('tests/test_files/test_topology/hexala.top'))
-top = Topology(ala_top)
-```
-
-```{python}
-#| eval: false
-breakpair = ("9", "15")
-
-top.break_bond(breakpair)
-top._update_dict
-
-
-```
