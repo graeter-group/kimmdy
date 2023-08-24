@@ -1,3 +1,8 @@
+"""
+The tasks module holds the TaskFiles class which organizes input and 
+output paths and the Task class for steps in the runmanager.
+"""
+
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable, Optional, TYPE_CHECKING, Union
@@ -7,6 +12,8 @@ logger = logging.getLogger(__name__)
 
 
 class AutoFillDict(dict):
+    """Dictionary that gets populated by calling get_missing."""
+
     def __init__(self, get_missing: Callable):
         self.get_missing = get_missing
 
@@ -17,14 +24,27 @@ class AutoFillDict(dict):
 
 @dataclass
 class TaskFiles:
-    """Input and Output files and directories.
+    """Class for Task input and output files and directories.
 
-    Hosts the input and output files belonging to a task.
+    Hosts the input and output file paths belonging to a task.
     A function or method that wants to be callable as a Task
     has to return a TaskFiles object.
     The input defaultdict is populated on the fly using
     get_latest of the runmanager to find newest files.
     Files which can not be found by get_latest must be added manually.
+
+    Atributes
+    --------
+    get_latest:
+        Runmanager.get_latest function that returns paths to the latest file of given type.
+    input:
+        Input file paths for a Task. Is populated by get_latest or manually.
+    output:
+        Output file paths for a Task. Is populated by runmanager._discover_output_files or manually.
+    outputdir:
+        Output directory for a Task. Typically populated by create_task_directory called by Task.
+    logger:
+        Logger for a Task. Initialized in create_task_directory.
 
     Examples
     --------
@@ -49,15 +69,22 @@ class TaskFiles:
 
 
 def create_task_directory(runmng, postfix: str) -> TaskFiles:
-    """Creates TaskFiles object, output directory and symlinks ff."""
+    """Creates TaskFiles object, output directory, logger and symlinks ff.
+
+    Gets called when a Task is called (from the runmanager.tasks queue).
+    """
     from kimmdy.cmd import longFormatter
 
     files = TaskFiles(runmng.get_latest)
     runmng.iteration += 1
     taskname = f"{runmng.iteration}_{postfix}"
+
+    # create outputdir
     files.outputdir = runmng.config.out / taskname
     logger.debug(f"Creating Output directory: {files.outputdir}")
     files.outputdir.mkdir(exist_ok=runmng.from_checkpoint)
+
+    # set up logger
     files.logger = logging.getLogger(f"kimmdy.{taskname}")
     hand = logging.FileHandler(files.outputdir / (taskname + ".log"))
     hand.setFormatter(
@@ -66,9 +93,10 @@ def create_task_directory(runmng, postfix: str) -> TaskFiles:
         )
     )
     files.logger.addHandler(hand)
-
+    # symlink force field
     if not (files.outputdir / runmng.config.ff.name).exists():
         (files.outputdir / runmng.config.ff.name).symlink_to(runmng.config.ff)
+
     return files
 
 

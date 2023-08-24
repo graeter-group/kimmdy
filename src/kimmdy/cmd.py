@@ -12,7 +12,7 @@ import dill
 from kimmdy.config import Config
 from kimmdy.misc_helper import _build_examples
 from kimmdy.runmanager import RunManager
-from kimmdy.utils import check_gmx_version, increment_logfile
+from kimmdy.utils import check_gmx_version, backup_if_existing
 import importlib.resources as pkg_resources
 import sys
 from glob import glob
@@ -232,9 +232,6 @@ class longFormatter(logging.Formatter):
 def configure_logger(log_path, log_level):
     """Configure logging.
 
-    Configures the logging module with optional colorcodes
-    for the terminal.
-
     Parameters
     ----------
     log_path : Path
@@ -243,7 +240,7 @@ def configure_logger(log_path, log_level):
         Log
     """
 
-    increment_logfile(log_path)
+    backup_if_existing(log_path)
 
     log_conf = {
         "version": 1,
@@ -394,19 +391,19 @@ def _run(args: argparse.Namespace):
         cpts.sort()
         args.checkpoint = cpts[-1]
 
-    if args.checkpoint:
-        logger.info("KIMMDY is starting from a checkpoint.")
-        with open(args.checkpoint, "rb") as f:
-            runmgr = dill.load(f)
-            runmgr.from_checkpoint = True
-    else:
-        config = Config(args.input)
-        logger.debug(config)
-        runmgr = RunManager(config)
-        logger.debug("Using system GROMACS:")
-        logger.debug(check_gmx_version(config))
-
     try:
+        if args.checkpoint:
+            logger.info("KIMMDY is starting from a checkpoint.")
+            with open(args.checkpoint, "rb") as f:
+                runmgr = dill.load(f)
+                runmgr.from_checkpoint = True
+        else:
+            config = Config(args.input)
+            logger.debug(config)
+            runmgr = RunManager(config)
+            logger.debug("Using system GROMACS:")
+            logger.debug(check_gmx_version(config))
+
         runmgr.run()
     except Exception as e:
         if args.debug:

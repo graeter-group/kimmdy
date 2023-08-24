@@ -11,6 +11,7 @@ from itertools import takewhile
 import logging
 import json
 import numpy as np
+from typing import TypedDict
 
 from kimmdy.utils import get_gmx_dir
 
@@ -370,13 +371,24 @@ def read_edissoc(path: Path) -> dict:
     return edissocs
 
 
-def read_plumed(path: Path) -> dict:
+class Plumed_dict(TypedDict):
+    distances: list[dict]
+    prints: list[dict]
+
+
+def read_plumed(path: Path) -> Plumed_dict:
     """Read a plumed.dat configuration file.
 
     Parameters
     ----------
     path :
         Path to the file. E.g. "plumed.dat"
+
+    Returns
+    -------
+    dict :
+        dict with keys: 'distances' and 'prints'
+        Each is a list of dicts containing plumed keywords
     """
     with open(path, "r") as f:
         distances = []
@@ -401,20 +413,23 @@ def read_plumed(path: Path) -> dict:
 
                 # TODO this could be better. the keys may not exist
                 # and break the program here.
+                # TODO: output should be consolidated dicts instad of lists of dicts
                 d["ARG"] = d["ARG"].split(",")
                 d["STRIDE"] = int(d["STRIDE"])
                 d["FILE"] = Path(d["FILE"])
 
                 prints.append(d)
 
-        return {"distances": distances, "prints": prints}
+        return Plumed_dict(distances=distances, prints=prints)
 
 
-def write_plumed(d, path: Path) -> None:
+def write_plumed(d: Plumed_dict, path: Path) -> None:
     """Write a plumed.dat configuration file.
 
     Parameters
     ----------
+    d :
+        Dictionary containing 'distances' and 'prints'
     path :
         Path to the file. E.g. "plumed.dat"
     """
@@ -426,7 +441,7 @@ def write_plumed(d, path: Path) -> None:
         f.write("\n")
         for l in d["prints"]:
             f.write(
-                f"{l['PRINT']} ARG={','.join(l['ARG'])} STRIDE={str(l['STRIDE'])} FILE={str(l['FILE'])}\n"
+                f"{l['PRINT']} ARG={','.join(l['ARG'])} STRIDE={str(l['STRIDE'])} FILE={str(l['FILE'].name)}\n"
             )
 
 
