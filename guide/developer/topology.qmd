@@ -43,17 +43,8 @@ top = Topology(ala_top)
 #| eval: false
 breakpair = ("9", "15")
 
-# top.break_bond(breakpair)
+top.break_bond(breakpair)
+top._update_dict
 
-dhs = get_protein_section(top.top, "dihedrals")
-assert dhs
-for l in dhs:
-  if all([breakpair[0] in l[:4], breakpair[1] in l[:4]]):
-    print(l)
-
-# top
-
-top.moleculetypes["Protein"].atomics.keys()
-top.moleculetypes["Protein"].__dict__.keys()
 
 ```

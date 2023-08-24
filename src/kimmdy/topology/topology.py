@@ -175,7 +175,6 @@ class MoleculeType:
         self.atomics["bonds"] = [attributes_to_list(x) for x in self.bonds.values()]
         self.atomics["angles"] = [attributes_to_list(x) for x in self.angles.values()]
         self.atomics["pairs"] = [attributes_to_list(x) for x in self.pairs.values()]
-        self.atomics["exclusions"] = [attributes_to_list(x) for x in self.exclusions.values()]
         self.atomics["dihedrals"] = [
             attributes_to_list(x)
             for dihedrals in self.proper_dihedrals.values()
