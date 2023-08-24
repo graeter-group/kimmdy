@@ -56,17 +56,6 @@ def get_cmdline_args():
         action="store_true",
         help="continue. Start KIMMDY from the latest checkpoint file",
     )
-    parser.add_argument(
-        "--concat",
-        type=Path,
-        nargs="?",
-        const=True,
-        help=(
-            "Concatenate trrs of this run"
-            "Optionally, the run directory can be give"
-            "Will save as concat.trr in current directory"
-        ),
-    )
 
     # on error, drop into debugger
     parser.add_argument(
@@ -307,7 +296,6 @@ def kimmdy_run(
     logfile: Path = Path("kimmdy.log"),
     checkpoint: str = "",
     from_latest_checkpoint: bool = False,
-    concat: bool = False,
     show_plugins: bool = False,
     show_schema_path: bool = False,
     generate_jobscript: bool = False,
@@ -327,9 +315,6 @@ def kimmdy_run(
         File path if a kimmdy.cpt file to restart KIMMDY from a checkpoint.
     from_latest_checkpoint :
         Start KIMMDY from the latest checkpoint.
-    concat :
-        Don't perform a full KIMMDY run but instead concatenate trajectories
-        from a previous run.
     show_plugins :
         Show available plugins and exit.
     show_schema_path :
@@ -343,7 +328,6 @@ def kimmdy_run(
         logfile=logfile,
         checkpoint=checkpoint,
         from_latest_checkpoint=from_latest_checkpoint,
-        concat=concat,
         show_plugins=show_plugins,
         show_schema_path=show_schema_path,
         generate_jobscript=generate_jobscript,
@@ -386,7 +370,7 @@ def get_analysis_cmdline_args():
         name="trjcat", help="Concatenate trajectories of a KIMMDY run"
     )
     parser_trjcat.add_argument(
-        "dir", type=str, help="KIMMDY run directory to be analysed."
+        "rundir", type=str, help="KIMMDY run directory to be analysed."
     )
     parser_trjcat.add_argument(
         "--steps",
@@ -403,7 +387,7 @@ def get_analysis_cmdline_args():
         name="plot_energy", help="Plot GROMACS energy for a KIMMDY run"
     )
     parser_plot_energy.add_argument(
-        "dir", type=str, help="KIMMDY run directory to be analysed."
+        "rundir", type=str, help="KIMMDY run directory to be analysed."
     )
     parser_plot_energy.add_argument(
         "--steps",
@@ -429,7 +413,9 @@ def get_analysis_cmdline_args():
         help="Plot population of radicals for one or multiple KIMMDY run(s)",
     )
     parser_radical_population.add_argument(
-        "dir", nargs="+", help="KIMMDY run directory to be analysed. Can be multiple."
+        "rundir",
+        nargs="+",
+        help="KIMMDY run directory to be analysed. Can be multiple.",
     )
     parser_radical_population.add_argument(
         "--select_atoms",
@@ -445,7 +431,9 @@ def get_analysis_cmdline_args():
         help="Plot rates of all possible reactions after a MD run. Rates must have been saved!",
     )
     parser_plot_rates.add_argument(
-        "dir", nargs="+", help="KIMMDY run directory to be analysed. Can be multiple."
+        "rundir",
+        nargs="+",
+        help="KIMMDY run directory to be analysed. Can be multiple.",
     )
 
     return parser.parse_args()
@@ -456,15 +444,21 @@ def setup_analysis():
 
     args = get_analysis_cmdline_args()
     print(args)
+    print(vars(args))
+    print(*vars(args))
     from kimmdy.analysis import concat_traj, plot_energy, radical_population, plot_rates
 
     if args.module == "trjcat":
+        delattr(args, "module")
         concat_traj(**vars(args))
     elif args.module == "plot_energy":
+        delattr(args, "module")
         plot_energy(**vars(args))
     elif args.module == "radical_population":
+        delattr(args, "module")
         radical_population(**vars(args))
     elif args.module == "plot_rates":
+        delattr(args, "module")
         plot_rates(**vars(args))
 
 

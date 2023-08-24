@@ -6,9 +6,11 @@ Discovers and loads KIMMDY plugins.
 
 
 from __future__ import annotations
+from typing import TYPE_CHECKING
 import sys
 
-from kimmdy.plugins import Parameterizer, ReactionPlugin
+if TYPE_CHECKING:
+    from kimmdy.plugins import Parameterizer, ReactionPlugin
 
 if sys.version_info > (3, 10):
     from importlib_metadata import entry_points

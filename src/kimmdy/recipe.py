@@ -1,8 +1,7 @@
 """Reaction recipes.
 """
-
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional
+from typing import Optional
 
 from abc import ABC
 from dataclasses import dataclass, field, InitVar

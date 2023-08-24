@@ -1,17 +1,18 @@
 """Plugin base classes and basic instances thereof.
 """
 
+from __future__ import annotations
 from typing import TYPE_CHECKING
 from abc import ABC, abstractmethod
 import logging
-
-from kimmdy.tasks import TaskFiles
-from kimmdy.topology.topology import Topology
 
 if TYPE_CHECKING:
     from kimmdy.runmanager import RunManager
     from kimmdy.config import Config
     from kimmdy.recipe import RecipeCollection
+    from kimmdy.tasks import TaskFiles
+    from kimmdy.topology.topology import Topology
+
 
 logger = logging.getLogger(__name__)
 

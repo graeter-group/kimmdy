@@ -135,7 +135,7 @@ def plot_energy(rundir: str, steps: Union[list, str], terms: list):
     print(limy)
 
 
-def radical_population(rundir: str, select: str):
+def radical_population(rundir: str, select_atoms: str):
     # TODO: weigh radical population by time
 
     ## set up directory to store radical information
@@ -176,7 +176,7 @@ def radical_population(rundir: str, select: str):
     ## get info from gro file
     u = mda.Universe(str(gro[0]), format="gro")
     print(u)
-    atoms = u.select_atoms(select)
+    atoms = u.select_atoms(select_atoms)
     atoms_identifier = [
         "-".join(x)
         for x in list(
@@ -208,7 +208,7 @@ def radical_population(rundir: str, select: str):
     plt.savefig(str(run_dir / "analysis" / "radical_population_fingerprint"), dpi=300)
 
     u.add_TopologyAttr("tempfactors")
-    atoms = u.select_atoms(select)
+    atoms = u.select_atoms(select_atoms)
     print(list(counts.values()))
     print(atoms.tempfactors)
     atoms.tempfactors = list(counts.values())

@@ -11,6 +11,7 @@ from kimmdy.utils import run_gmx, run_shell_cmd
 
 
 def build_examples(restore: str):
+    print(f"build_examples arguments: restore {restore}")
     overwrite = True if restore else False
 
     rename = {
@@ -32,6 +33,7 @@ def build_examples(restore: str):
             dstpath = examplepath / v
             if restore == "hard":
                 shutil.rmtree(dstpath, ignore_errors=True)
+            print(srcpath, dstpath)
             shutil.copytree(srcpath, dstpath, dirs_exist_ok=overwrite)
             (dstpath / "amber99sb-star-ildnp.ff").unlink(missing_ok=True)
             (dstpath / "amber99sb-star-ildnp.ff").symlink_to(
