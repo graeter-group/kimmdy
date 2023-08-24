@@ -187,6 +187,8 @@ class Config:
                         f"Error: Reaction plugin {reaction_name} not found!\n"
                         + f"Available plugins: {ks}"
                     )
+                    if isinstance(reaction_plugins[reaction_name], Exception):
+                        raise reaction_plugins[reaction_name]
 
             # Validate sequence
             assert hasattr(self, "sequence"), "No sequence defined!"
