@@ -400,8 +400,9 @@ def merge_top_parameter_growth(
     TODO: for now this assumes that only one moleculeype (the first, index 0) is of interest.
     """
 
-    molA = list(topA.moleculetypes.values())[0]
-    molB = list(topB.moleculetypes.values())[0]
+    first_molecule = list(topA.moleculetypes.keys())[0]
+    molA = topA.moleculetypes[first_molecule]
+    molB = topB.moleculetypes[first_molecule]
     molB = merge_top_moleculetypes_parameter_growth(molA, molB, topB.ff, focus_nr)
 
     return topB
