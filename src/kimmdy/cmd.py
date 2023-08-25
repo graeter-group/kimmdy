@@ -331,6 +331,12 @@ def _run(args: argparse.Namespace):
     logger.info("Welcome to KIMMDY")
     logger.info("KIMMDY is running with these command line options:")
     logger.info(args)
+    logger.info("Run kimmdy -h for more information.")
+    if not Path(args.input).exists() and not args.checkpoint:
+        logger.error(
+            f"Input file {args.input} does not exist. Specify its name with --input and make sure that you are in the right directory."
+        )
+        exit()
 
     if args.generate_jobscript:
         config = Config(args.input)
@@ -394,14 +400,20 @@ def _run(args: argparse.Namespace):
         config = Config(args.input, no_increment_output_dir=True)
         cpts = glob(f"{config.name}*kimmdy.cpt")
         if not cpts:
-            logging.error("No checkpoints found.")
+            logging.error(
+                f"""
+                No checkpoints found for the current configuration at {args.input}.
+                Start a new KIMMDY run or generate an initial checkpoint with
+                kimmdy --generate-jobscript
+                """
+            )
             exit()
         cpts.sort()
         args.checkpoint = cpts[-1]
 
     try:
         if args.checkpoint:
-            logger.info("KIMMDY is starting from a checkpoint.")
+            logger.info(f"KIMMDY is starting from a checkpoint: {args.checkpoint}.")
             with open(args.checkpoint, "rb") as f:
                 runmgr = dill.load(f)
                 runmgr.from_checkpoint = True
@@ -435,6 +447,8 @@ def kimmdy_run(
     debug: bool = False,
 ):
     """Run KIMMDY from python.
+
+    Also see See [](`~kimmdy.cmd.get_cmdline_args`) or `kimmdy --help` for the descriptions of the arguments.
 
     Parameters
     ----------
