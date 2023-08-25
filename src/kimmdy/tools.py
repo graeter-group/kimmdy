@@ -65,35 +65,37 @@ def build_examples(restore: str):
 
 
 def remove_hydrogen(
-    gro_str: str,
-    top_str: str,
+    gro: str,
+    top: str,
     nr: str,
     parameterize: bool,
     equilibrate: bool,
     gmx_mdrun_flags: str,
 ):
     """remove hydrogen from a gro and top file"""
-    gro_path = Path(gro_str)
-    top_path = Path(top_str)
+    gro_path = Path(gro)
+    top_path = Path(top)
 
-    top = Topology(read_top(top_path))
+    topology = Topology(read_top(top_path))
 
     ## check for input validity
-    assert (atom_type := top.atoms[nr].type).startswith(
+    assert (atom_type := topology.atoms[nr].type).startswith(
         "H"
     ), f"Wrong atom type {atom_type} with nr {nr} for remove hydrogen, should start with 'H'"
 
     ## deal with top file, order is important here
-    [heavy_nr] = top.atoms[nr].bound_to_nrs
+    [heavy_nr] = topology.atoms[nr].bound_to_nrs
 
-    del top.atoms[nr]
+    del topology.atoms[nr]
 
-    top.atoms[heavy_nr].is_radical = True
-    top.radicals[heavy_nr] = top.atoms[heavy_nr]
+    topology.atoms[heavy_nr].is_radical = True
+    topology.radicals[heavy_nr] = topology.atoms[heavy_nr]
 
-    update_map = {atom_nr: str(i + 1) for i, atom_nr in enumerate(top.atoms.keys())}
+    update_map = {
+        atom_nr: str(i + 1) for i, atom_nr in enumerate(topology.atoms.keys())
+    }
 
-    top.reindex_atomnrs()
+    topology.reindex_atomnrs()
 
     ## parameterize with grappa
     if parameterize:
@@ -101,7 +103,7 @@ def remove_hydrogen(
 
         if "grappa" in parameterization_plugins.keys():
             grappa = parameterization_plugins["grappa"]()
-            grappa.parameterize_topology(top)
+            grappa.parameterize_topology(topology)
 
         else:
             raise KeyError(
@@ -111,7 +113,7 @@ def remove_hydrogen(
     ## write top file
     top_stem = top_path.stem
     top_outpath = top_path.with_stem(top_stem + f"_d{nr}")
-    write_top(top.to_dict(), top_outpath)
+    write_top(topology.to_dict(), top_outpath)
 
     ## deal with gro file
     with open(gro_path, "r") as f:

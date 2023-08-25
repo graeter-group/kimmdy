@@ -490,11 +490,13 @@ def get_remove_hydrogen_cmdline_args():
         default=False,
     )
     parser.add_argument(
-        "--gmx_mdrun_flags",
         "-f",
+        "--gmx_mdrun_flags",
         type=str,
+        help=(
+            "GMX mdrun flags. Will be appended to gmx mdrun commands. Requires leading space in string."
+        ),
         default="",
-        help=("GMX mdrun flags. Will be appended to gmx mdrun commands"),
     )
     return parser.parse_args()
 
