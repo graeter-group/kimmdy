@@ -15,10 +15,11 @@ mds:
     mdp: 'md.mdp'
     plumed: 'plumed.dat'
   relax:
-    mdp: 'md_parameter_growth.mdp'
+    mdp: 'md_slow_growth.mdp'
 changer:
   coordinates:
-    md_parameter_growth: 'relax'
+    md: 'relax'
+    slow_growth: True
   topology:
     parameterization: 'basic' 
 reactions:

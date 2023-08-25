@@ -1,4 +1,6 @@
 import pytest
+
+pytest.skip(reason="changemanager deleted", allow_module_level=True)
 import shutil
 from pathlib import Path
 
