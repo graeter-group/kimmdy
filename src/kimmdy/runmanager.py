@@ -163,7 +163,7 @@ class RunManager:
             "reactions": [
                 {"f": self._place_reaction_tasks},
                 {"f": self._decide_recipe, "kwargs": {"decision_strategy": rf_kmc}},
-                {"f": self._run_recipe, "out": "run_recipe"},
+                {"f": self._apply_recipe, "out": "run_recipe"},
             ],
         }
 
@@ -489,7 +489,7 @@ class RunManager:
         )
         return
 
-    def _run_recipe(self, files) -> TaskFiles:
+    def _apply_recipe(self, files) -> TaskFiles:
         logger = files.logger
         logger.info(f"Start Recipe in KIMMDY iteration {self.iteration}")
         logger.info(f"Recipe: {self.recipe.get_recipe_name()}")
