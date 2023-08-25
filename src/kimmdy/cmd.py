@@ -26,13 +26,13 @@ else:
     from importlib.metadata import version
 
 
-def get_cmdline_args():
-    """Parse command line arguments and configure logger.
+def get_cmdline_args() -> argparse.Namespace:
+    """Parse command line arguments.
 
     Returns
     -------
-    Namespace
-        parsed command line arguments
+    :
+        Parsed command line arguments
     """
     parser = argparse.ArgumentParser(description="Welcome to KIMMDY")
     parser.add_argument(
@@ -87,8 +87,10 @@ def get_cmdline_args():
         "--show-schema-path",
         action="store_true",
         help=(
-            "Print path to yaml schema for use with yaml-language-server e.g. in VSCode and Neovim"
-            "# yaml-language-server: $schema=/path/to/kimmdy-yaml-schema.json"
+            """
+            Print path to yaml schema for use with yaml-language-server e.g. in VSCode and Neovim
+            # yaml-language-server: $schema=/path/to/kimmdy-yaml-schema.json
+            """
         ),
     )
 
@@ -98,27 +100,28 @@ def get_cmdline_args():
         action="store_true",
         help=(
             """
-        Instead of running KIMMDY directly, generate at jobscript.sh for slurm HPC clusters.
-        You can then run this jobscript with sbatch jobscript.sh
-        """
+            Instead of running KIMMDY directly, generate at jobscript.sh for slurm HPC clusters.
+            You can then run this jobscript with sbatch jobscript.sh
+            """
         ),
     )
 
     return parser.parse_args()
 
 
-def get_analysis_cmdline_args():
-    """
-    concat :
-    Don't perform a full KIMMDY run but instead concatenate trajectories
-    from a previous run.
+def get_analysis_cmdline_args() -> argparse.Namespace:
+    """Parse command line arguments.
+
+    Returns
+    -------
+    :
+        Parsed command line arguments
     """
     parser = argparse.ArgumentParser(
         description="Welcome to the KIMMDY analysis module"
     )
     subparsers = parser.add_subparsers(required=True, metavar="module", dest="module")
 
-    ## trjcat
     parser_trjcat = subparsers.add_parser(
         name="trjcat", help="Concatenate trajectories of a KIMMDY run"
     )
@@ -232,18 +235,19 @@ class longFormatter(logging.Formatter):
         return result
 
 
-def configure_logger(log_path, log_level):
+def configure_logger(log_path: Path, log_level: str, no_increment_logfile: bool = False):
     """Configure logging.
 
     Parameters
     ----------
-    log_path : Path
+    log_path :
         File path to log file
-    log_level : str
-        Log
+    log_level :
+        Loglevel. One of ["INFO", "WARNING", "MESSAGE", "DEBUG"]
     """
 
-    backup_if_existing(log_path)
+    if not no_increment_logfile:
+        backup_if_existing(log_path)
 
     log_conf = {
         "version": 1,
@@ -297,9 +301,10 @@ def _run(args: argparse.Namespace):
     Parameters
     ----------
     args :
-        Command line arguments.
+        Command line arguments. See [](`~kimmdy.cmd.get_cmdline_args`)
     """
-    configure_logger(args.logfile, args.loglevel)
+    no_increment_logfile = args.from_latest_checkpoint or args.checkpoint
+    configure_logger(args.logfile, args.loglevel, no_increment_logfile)
 
     if args.show_plugins:
         from kimmdy import (
