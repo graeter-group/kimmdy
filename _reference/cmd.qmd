@@ -4,58 +4,78 @@
 
 Functions for starting KIMMDY either from python or the command line.
 Also initialized logging and configuration.
+Other entry points such as `kimmdy-analysis` also live here.
 
 ## Functions
 
 | Name | Description |
 | --- | --- |
-| [analysis](#kimmdy.cmd.analysis) | Analyse existing KIMMDY runs. |
-| [build_examples](#kimmdy.cmd.build_examples) | Build examples from the command line. |
 | [configure_logger](#kimmdy.cmd.configure_logger) | Configure logging. |
-| [get_analysis_cmdline_args](#kimmdy.cmd.get_analysis_cmdline_args) | concat : |
-| [get_build_example_args](#kimmdy.cmd.get_build_example_args) | Parse command line arguments. |
-| [get_cmdline_args](#kimmdy.cmd.get_cmdline_args) | Parse command line arguments and configure logger. |
+| [entry_point_analysis](#kimmdy.cmd.entry_point_analysis) | Analyse existing KIMMDY runs. |
+| [entry_point_build_examples](#kimmdy.cmd.entry_point_build_examples) | Build examples from the command line. |
+| [entry_point_kimmdy](#kimmdy.cmd.entry_point_kimmdy) | Run KIMMDY from the command line. |
+| [entry_point_remove_hydrogen](#kimmdy.cmd.entry_point_remove_hydrogen) | Remove hydrogen by atom nr in a gro and topology file |
+| [get_analysis_cmdline_args](#kimmdy.cmd.get_analysis_cmdline_args) | Parse command line arguments. |
+| [get_build_example_cmdline_args](#kimmdy.cmd.get_build_example_cmdline_args) | Parse command line arguments. |
+| [get_cmdline_args](#kimmdy.cmd.get_cmdline_args) | Parse command line arguments. |
 | [get_remove_hydrogen_cmdline_args](#kimmdy.cmd.get_remove_hydrogen_cmdline_args) | parse cmdline args for remove_hydrogen |
-| [kimmdy](#kimmdy.cmd.kimmdy) | Run KIMMDY from the command line. |
 | [kimmdy_run](#kimmdy.cmd.kimmdy_run) | Run KIMMDY from python. |
-| [remove_hydrogen](#kimmdy.cmd.remove_hydrogen) | Remove hydrogen by atom nr in a gro and topology file |
-
-### analysis { #kimmdy.cmd.analysis }
-
-`cmd.analysis()`
-
-Analyse existing KIMMDY runs.
-
-### build_examples { #kimmdy.cmd.build_examples }
-
-`cmd.build_examples()`
-
-Build examples from the command line.
 
 ### configure_logger { #kimmdy.cmd.configure_logger }
 
-`cmd.configure_logger(log_path, log_level)`
+`cmd.configure_logger(log_path, log_level, no_increment_logfile=False)`
 
 Configure logging.
 
 #### Parameters
 
-| Name        | Type                   | Description           | Default    |
-|-------------|------------------------|-----------------------|------------|
-| `log_path`  | [Path](`pathlib.Path`) | File path to log file | _required_ |
-| `log_level` | [str](`str`)           | Log                   | _required_ |
+| Name        | Type                   | Description                                              | Default    |
+|-------------|------------------------|----------------------------------------------------------|------------|
+| `log_path`  | [Path](`pathlib.Path`) | File path to log file                                    | _required_ |
+| `log_level` | [str](`str`)           | Loglevel. One of ["INFO", "WARNING", "MESSAGE", "DEBUG"] | _required_ |
+
+### entry_point_analysis { #kimmdy.cmd.entry_point_analysis }
+
+`cmd.entry_point_analysis()`
+
+Analyse existing KIMMDY runs.
+
+### entry_point_build_examples { #kimmdy.cmd.entry_point_build_examples }
+
+`cmd.entry_point_build_examples()`
+
+Build examples from the command line.
+
+### entry_point_kimmdy { #kimmdy.cmd.entry_point_kimmdy }
+
+`cmd.entry_point_kimmdy()`
+
+Run KIMMDY from the command line.
+
+The configuration is gathered from the input file,
+which is `kimmdy.yml` by default.
+
+### entry_point_remove_hydrogen { #kimmdy.cmd.entry_point_remove_hydrogen }
+
+`cmd.entry_point_remove_hydrogen()`
+
+Remove hydrogen by atom nr in a gro and topology file
 
 ### get_analysis_cmdline_args { #kimmdy.cmd.get_analysis_cmdline_args }
 
 `cmd.get_analysis_cmdline_args()`
 
-concat :
-Don&#x27;t perform a full KIMMDY run but instead concatenate trajectories
-from a previous run.
+Parse command line arguments.
 
-### get_build_example_args { #kimmdy.cmd.get_build_example_args }
+#### Returns
 
-`cmd.get_build_example_args()`
+| Type                                                     | Description                   |
+|----------------------------------------------------------|-------------------------------|
+| [argparse](`argparse`).[Namespace](`argparse.Namespace`) | Parsed command line arguments |
+
+### get_build_example_cmdline_args { #kimmdy.cmd.get_build_example_cmdline_args }
+
+`cmd.get_build_example_cmdline_args()`
 
 Parse command line arguments.
 
@@ -69,13 +89,13 @@ Parse command line arguments.
 
 `cmd.get_cmdline_args()`
 
-Parse command line arguments and configure logger.
+Parse command line arguments.
 
 #### Returns
 
-| Type                     | Description                   |
-|--------------------------|-------------------------------|
-| [Namespace](`Namespace`) | parsed command line arguments |
+| Type                                                     | Description                   |
+|----------------------------------------------------------|-------------------------------|
+| [argparse](`argparse`).[Namespace](`argparse.Namespace`) | Parsed command line arguments |
 
 ### get_remove_hydrogen_cmdline_args { #kimmdy.cmd.get_remove_hydrogen_cmdline_args }
 
@@ -83,20 +103,13 @@ Parse command line arguments and configure logger.
 
 parse cmdline args for remove_hydrogen
 
-### kimmdy { #kimmdy.cmd.kimmdy }
-
-`cmd.kimmdy()`
-
-Run KIMMDY from the command line.
-
-The configuration is gathered from the input file,
-which is `kimmdy.yml` by default.
-
 ### kimmdy_run { #kimmdy.cmd.kimmdy_run }
 
 `cmd.kimmdy_run(input=Path('kimmdy.yml'), loglevel='DEBUG', logfile=Path('kimmdy.log'), checkpoint='', from_latest_checkpoint=False, concat=False, show_plugins=False, show_schema_path=False, generate_jobscript=False, debug=False)`
 
 Run KIMMDY from python.
+
+Also see See [](`~kimmdy.cmd.get_cmdline_args`) or `kimmdy --help` for the descriptions of the arguments.
 
 #### Parameters
 
@@ -111,9 +124,3 @@ Run KIMMDY from python.
 | `show_plugins`           | [bool](`bool`)         | Show available plugins and exit.                                                          | `False`              |
 | `show_schema_path`       | [bool](`bool`)         | Print path to yaml schema for use with yaml-language-server e.g. in VSCode and Neovim     | `False`              |
 | `generate_jobscript`     | [bool](`bool`)         | Instead of running KIMMDY directly, generate at jobscript.sh for slurm HPC clusters       | `False`              |
-
-### remove_hydrogen { #kimmdy.cmd.remove_hydrogen }
-
-`cmd.remove_hydrogen()`
-
-Remove hydrogen by atom nr in a gro and topology file

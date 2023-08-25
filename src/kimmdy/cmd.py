@@ -232,7 +232,9 @@ class longFormatter(logging.Formatter):
         return result
 
 
-def configure_logger(log_path: Path, log_level: str, no_increment_logfile: bool = False):
+def configure_logger(
+    log_path: Path, log_level: str, no_increment_logfile: bool = False
+):
     """Configure logging.
 
     Parameters
