@@ -138,7 +138,6 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         ),
     )
 
-    ## plot_energy
     parser_plot_energy = subparsers.add_parser(
         name="plot_energy", help="Plot GROMACS energy for a KIMMDY run"
     )
@@ -164,7 +163,6 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         ),
     )
 
-    ## radical population
     parser_radical_population = subparsers.add_parser(
         name="radical_population",
         help="Plot population of radicals for one or multiple KIMMDY run(s)",
@@ -180,7 +178,6 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         default="protein",
     )
 
-    # plot rates at each decision step
     parser_plot_rates = subparsers.add_parser(
         name="plot_rates",
         help="Plot rates of all possible reactions after a MD run. Rates must have been saved!",
@@ -488,7 +485,7 @@ def kimmdy_run(
     logging.shutdown()
 
 
-def get_build_example_args():
+def get_build_example_cmdline_args() -> argparse.Namespace:
     """Parse command line arguments.
 
     Returns
@@ -507,19 +504,15 @@ def get_build_example_args():
     return parser.parse_args()
 
 
-def build_examples():
+def entry_point_build_examples():
     """Build examples from the command line."""
-    args = get_build_example_args()
+    args = get_build_example_cmdline_args()
     _build_examples(args)
-    pass
 
 
-def analysis():
+def entry_point_analysis():
     """Analyse existing KIMMDY runs."""
-
     args = get_analysis_cmdline_args()
-    print(args)
-    from kimmdy.analysis import concat_traj, plot_energy, radical_population, plot_rates
 
     if args.module == "trjcat":
         concat_traj(args)
@@ -531,15 +524,14 @@ def analysis():
         plot_rates(args)
 
 
-def remove_hydrogen():
+def entry_point_remove_hydrogen():
     """Remove hydrogen by atom nr in a gro and topology file"""
     args = get_remove_hydrogen_cmdline_args()
-    from kimmdy.tools import remove_hydrogen
 
     remove_hydrogen(args)
 
 
-def kimmdy():
+def entry_point_kimmdy():
     """Run KIMMDY from the command line.
 
     The configuration is gathered from the input file,
@@ -548,8 +540,3 @@ def kimmdy():
     args = get_cmdline_args()
     _run(args)
     logging.shutdown()
-
-
-if __name__ == "__main__":
-    kimmdy_run()
-
