@@ -8,7 +8,7 @@ import MDAnalysis as mda
 
 from kimmdy.utils import run_shell_cmd
 from kimmdy.parsing import read_json, write_json
-from kimmdy.reaction import RecipeCollection
+from kimmdy.recipe import RecipeCollection
 
 
 def get_subdirs(run_dir: Path, steps: Union[list, str]):
@@ -31,10 +31,9 @@ def get_subdirs(run_dir: Path, steps: Union[list, str]):
     return subdirs_matched
 
 
-def concat_traj(args: argparse.Namespace):
+def concat_traj(rundir: str, steps: Union[list, str]):
     """Find and concatenate trajectories (.xtc files) from KIMMDY runs."""
-    run_dir = Path(args.dir).expanduser().resolve()
-    steps: Union[list, str] = args.steps
+    run_dir = Path(rundir).expanduser().resolve()
 
     ## check if step argument is valid
     if not isinstance(steps, list):
@@ -72,12 +71,9 @@ def concat_traj(args: argparse.Namespace):
     )
 
 
-def plot_energy(args: argparse.Namespace):
-    run_dir = Path(args.dir).expanduser().resolve()
-    steps: Union[list, str] = args.steps
-    terms_list = args.terms
-    xvg_entries = ["time"] + terms_list
-    terms: str = "\n".join(args.terms)
+def plot_energy(rundir: str, steps: Union[list, str], terms: list):
+    run_dir = Path(rundir).expanduser().resolve()
+    xvg_entries = ["time"] + terms
 
     subdirs_matched = get_subdirs(run_dir, steps)
 
@@ -99,8 +95,9 @@ def plot_energy(args: argparse.Namespace):
     for edr in edrs:
         print(edr.parents[0].name + ".xvg")
         xvg = str(xvgs_dir / edr.parents[0].with_suffix(".xvg").name)
+        terms_str = "\n".join(terms)
         run_shell_cmd(
-            f"echo '{terms} \n\n' | gmx energy -f {str(edr)} -o {xvg}",
+            f"echo '{terms_str} \n\n' | gmx energy -f {str(edr)} -o {xvg}",
             cwd=run_dir,
         )
 
@@ -116,10 +113,10 @@ def plot_energy(args: argparse.Namespace):
     sim_start = [i for i in snapshot if isclose(energy[i]["time"], 0)]
     sim_names = [str(edr.parents[0].name).split("_")[1] for edr in edrs]
     # diffs =[j-i for i, j in zip(sim_start[:-1],sim_start[1:])]
-    limy = [energy[0][terms_list[0]], energy[0][terms_list[0]]]
+    limy = [energy[0][terms[0]], energy[0][terms[0]]]
     print(sim_start)
 
-    for term in terms_list:
+    for term in terms:
         val = [x[term] for x in energy]
         print(term, min(val), max(val))
         limy[0] = min(val) if min(val) < limy[0] else limy[0]
@@ -138,14 +135,13 @@ def plot_energy(args: argparse.Namespace):
     print(limy)
 
 
-def radical_population(args):
+def radical_population(rundir: str, select_atoms: str):
     # TODO: weigh radical population by time
 
-    select_atoms = args.select_atoms
     ## set up directory to store radical information
     radical_info = {"time": [], "radicals": []}
 
-    for curr_dir in args.dir[::-1]:
+    for curr_dir in rundir[::-1]:
         run_dir = Path(curr_dir).expanduser().resolve()
 
         ## find .gro file
@@ -220,8 +216,8 @@ def radical_population(args):
     protein.write(str(out))
 
 
-def plot_rates(args: argparse.Namespace):
-    for curr_dir in args.dir:
+def plot_rates(rundir: list):
+    for curr_dir in rundir:
         run_dir = Path(curr_dir).expanduser().resolve()
 
         ## create output dir (only goes to first mentioned run_dir)
