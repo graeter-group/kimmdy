@@ -1,12 +1,12 @@
 from kimmdy.topology.atomic import Atom
 from kimmdy.constants import ATOMTYPE_BONDORDER_FLAT
-from kimmdy.reaction import (
+from kimmdy.recipe import (
     Move,
     Recipe,
     RecipeCollection,
-    ReactionPlugin,
     RecipeStep,
 )
+from kimmdy.plugins import ReactionPlugin
 import MDAnalysis as mda
 import random as rng
 

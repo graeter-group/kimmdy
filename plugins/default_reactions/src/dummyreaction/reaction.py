@@ -1,4 +1,5 @@
-from kimmdy.reaction import RecipeCollection, ReactionPlugin
+from kimmdy.recipe import RecipeCollection
+from kimmdy.plugins import ReactionPlugin
 
 
 class DummyReaction(ReactionPlugin):

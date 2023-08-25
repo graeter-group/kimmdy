@@ -1,3 +1,7 @@
+"""
+Utilities for building plugins, shell convenience functions and GROMACS related functions
+"""
+
 import subprocess as sp
 import numpy as np
 import logging

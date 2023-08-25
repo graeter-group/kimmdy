@@ -14,12 +14,12 @@ from typing import Union
 import logging
 import MDAnalysis as mda
 from typing import Optional
-from kimmdy.reaction import Bind, Break, Move, RecipeStep
+from kimmdy.recipe import Bind, Break, Move, RecipeStep
 from kimmdy.parsing import read_top, write_top, write_plumed, read_plumed
 import numpy as np
 from kimmdy.tasks import TaskFiles
 from kimmdy.topology.topology import Topology
-from kimmdy.parameterize import Parameterizer
+from kimmdy.plugins import Parameterizer
 from kimmdy.coordinates import merge_top_parameter_growth
 from pathlib import Path
 import numpy as np

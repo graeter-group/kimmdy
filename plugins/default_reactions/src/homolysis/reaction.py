@@ -1,9 +1,9 @@
-from kimmdy.reaction import (
+from kimmdy.recipe import (
     Break,
     Recipe,
     RecipeCollection,
-    ReactionPlugin,
 )
+from kimmdy.plugins import ReactionPlugin
 from kimmdy.tasks import TaskFiles
 from kimmdy.utils import (
     morse_transition_rate,

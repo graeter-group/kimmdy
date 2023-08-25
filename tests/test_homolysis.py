@@ -8,7 +8,7 @@ import pytest
 from pathlib import Path
 import numpy as np
 from homolysis.reaction import Homolysis
-from kimmdy.reaction import Break
+from kimmdy.recipe import Break
 from kimmdy.parsing import (
     read_plumed,
     read_top,

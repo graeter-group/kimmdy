@@ -12,7 +12,7 @@ import logging
 import numpy as np
 from dataclasses import dataclass, field
 from numpy.random import default_rng
-from kimmdy.reaction import RecipeCollection, Recipe
+from kimmdy.recipe import RecipeCollection, Recipe
 
 logger = logging.getLogger(__name__)
 

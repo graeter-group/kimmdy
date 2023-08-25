@@ -1,6 +1,6 @@
 import pytest
 from numpy.random import default_rng
-from kimmdy.reaction import Recipe, RecipeCollection, Break, Bind, Move
+from kimmdy.recipe import Recipe, RecipeCollection, Break, Bind, Move
 from kimmdy.kmc import rf_kmc, frm, KMCResult
 
 
