@@ -688,9 +688,9 @@ class Topology:
         logging.info(f"removed bond: {removed_bond}")
 
         # remove angles
-        angle_keys = moleculetype._get_atom_angles(
+        angle_keys = moleculetype._get_center_atom_angles(
             atompair_nrs[0]
-        ) + moleculetype._get_atom_angles(atompair_nrs[1])
+        ) + moleculetype._get_center_atom_angles(atompair_nrs[1])
         for key in angle_keys:
             if all([x in key for x in atompair_nrs]):
                 # angle contained a now deleted bond because
