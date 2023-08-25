@@ -14,6 +14,8 @@ from kimmdy.config import Config
 from kimmdy.misc_helper import _build_examples
 from kimmdy.runmanager import RunManager
 from kimmdy.utils import check_gmx_version, backup_if_existing
+from kimmdy.analysis import concat_traj, plot_energy, radical_population, plot_rates
+from kimmdy.tools import remove_hydrogen
 import importlib.resources as pkg_resources
 import sys
 from glob import glob
