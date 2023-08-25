@@ -1,6 +1,7 @@
 """
 Functions for starting KIMMDY either from python or the command line.
 Also initialized logging and configuration.
+Other entry points such as `kimmdy-analysis` also live here.
 """
 import argparse
 import logging
