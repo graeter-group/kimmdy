@@ -869,31 +869,31 @@ class Topology:
                     key[0], key[1], key[2], key[3], "4", value.q0, value.cq, c2
                 )
 
-    def move_hydrogen(self, from_to: tuple[TopologyAtomAddress, TopologyAtomAddress]):
-        """Move a singly bound atom to a new location.
+    # def move_hydrogen(self, from_to: tuple[TopologyAtomAddress, TopologyAtomAddress]):
+    #     """Move a singly bound atom to a new location.
 
-        This is typically H for Hydrogen Atom Transfer (HAT).
-        """
-        if type(from_to[0]) == str and type(from_to[1]) == str:
-            # old style atompair_nrs with only atom numbers
-            # thus refers to the first moleculeype, moleculetype_0
-            # with the name Protein
-            from_to = (from_to[0], from_to[1])
-            main_molecule_name = list(self.moleculetypes.keys())[0]
-        else:
-            raise NotImplementedError(
-                "Breaking/Binding bonds in topology between atoms with different moleculetypes is not implemented, yet."
-            )
+    #     This is typically H for Hydrogen Atom Transfer (HAT).
+    #     """
+    #     if type(from_to[0]) == str and type(from_to[1]) == str:
+    #         # old style atompair_nrs with only atom numbers
+    #         # thus refers to the first moleculeype, moleculetype_0
+    #         # with the name Protein
+    #         from_to = (from_to[0], from_to[1])
+    #         main_molecule_name = list(self.moleculetypes.keys())[0]
+    #     else:
+    #         raise NotImplementedError(
+    #             "Breaking/Binding bonds in topology between atoms with different moleculetypes is not implemented, yet."
+    #         )
 
-        moleculetype = self.moleculetypes[main_molecule_name]
+    #     moleculetype = self.moleculetypes[main_molecule_name]
 
-        f, t = list(map(str, from_to))
-        assert (
-            moleculetype.atoms[f].type[0] == "H"
-        ), f"move_hydrogen called for non-hydrogen! type: {moleculetype.atoms[f].type}"
-        heavy = moleculetype.atoms[f].bound_to_nrs.pop()
-        if heavy is None:
-            logging.error(f"Atom {f} is not bound to anything.")
-            return
-        self.break_bond((f, heavy))
-        self.bind_bond((f, t))
+    #     f, t = list(map(str, from_to))
+    #     assert (
+    #         moleculetype.atoms[f].type[0] == "H"
+    #     ), f"move_hydrogen called for non-hydrogen! type: {moleculetype.atoms[f].type}"
+    #     heavy = moleculetype.atoms[f].bound_to_nrs.pop()
+    #     if heavy is None:
+    #         logging.error(f"Atom {f} is not bound to anything.")
+    #         return
+    #     self.break_bond((f, heavy))
+    #     self.bind_bond((f, t))

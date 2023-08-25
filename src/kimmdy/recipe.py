@@ -21,118 +21,69 @@ class RecipeStep(ABC):
     """
 
 
+class Relax(RecipeStep):
+    """Start a relaxation MD.
+
+    The molecular system coordinates are far out of equilibrium after most topology changes.
+    A relaxtion MD simulation using for example the slow growth method helps to reach the new equilibrium.
+    """
+
+
 @dataclass()
-class Move(RecipeStep):
-    """Change topology and/or coordinates to move an atom.
+class Place(RecipeStep):
+    """Change topology and/or coordinates to place an atom.
 
     Parameters
     ----------
-    ix_to_move : int
-        Index of atom to move. 0-based.
-    ix_to_bind : int
-        Bonding partner to form bond with. 0-based.
-    ix_to_break : int
-        Bonding partner to break bond with, default None. 0-based.
+    ix_to_place : int
+        Index of atom to place. 0-based.
     new_coords :
-        Optional new xyz coordinates for atom to move to, and the associated
+        Optional new xyz coordinates for atom to place to, and the associated
         time in ps default None.
-    id_to_move : str
-        Index of atom to move. 1-based
-    id_to_bind : str
-        Bonding partner to form bond with. 1-based
-    id_to_break : str
-        Bonding partner to break bond with, default None. 1-based
+    id_to_place : str
+        Index of atom to place. 1-based
     """
 
-    ix_to_move: Optional[int] = None
-    ix_to_bind: Optional[int] = None
-    ix_to_break: Optional[int] = None
-    new_coords: Optional[tuple[tuple[float, float, float], float]] = None
-    id_to_move: Optional[str] = None
-    id_to_bind: Optional[str] = None
-    id_to_break: Optional[str] = None
+    ix_to_place: Optional[int] = None
+    id_to_place: Optional[str] = None
 
-    _ix_to_move: Optional[int] = field(init=False, repr=False, default=None)
-    _ix_to_bind: Optional[int] = field(init=False, repr=False, default=None)
-    _ix_to_break: Optional[int] = field(init=False, repr=False, default=None)
+    new_coords: Optional[tuple[tuple[float, float, float], float]] = None
+
+    _ix_to_place: Optional[int] = field(init=False, repr=False, default=None)
 
     def __post_init__(self):
-        if self._ix_to_move is None:
-            raise ValueError("id_ or ix_ to_move must be provided!")
+        if self._ix_to_place is None:
+            raise ValueError("id_ or ix_ to_place must be provided!")
 
     # During init without given parameters, setters recive **not** the default
     # value, but a property instance -> Error in type conversion
 
     @property
-    def ix_to_move(self) -> Optional[int]:
-        return self._ix_to_move
+    def ix_to_place(self) -> Optional[int]:
+        return self._ix_to_place
 
-    @ix_to_move.setter
-    def ix_to_move(self, value: Optional[int]):
+    @ix_to_place.setter
+    def ix_to_place(self, value: Optional[int]):
         if isinstance(value, property):
             return
-        self._ix_to_move = value
+        self._ix_to_place = value
 
     @property
-    def id_to_move(self) -> Optional[str]:
-        if self._ix_to_move is None:
+    def id_to_place(self) -> Optional[str]:
+        if self._ix_to_place is None:
             return None
-        return str(self._ix_to_move + 1)
+        return str(self._ix_to_place + 1)
 
-    @id_to_move.setter
-    def id_to_move(self, value: Optional[str]):
+    @id_to_place.setter
+    def id_to_place(self, value: Optional[str]):
         if isinstance(value, property):
             return
-        self._ix_to_move = int(value) - 1
-
-    @property
-    def ix_to_bind(self) -> Optional[int]:
-        return self._ix_to_bind
-
-    @ix_to_bind.setter
-    def ix_to_bind(self, value: Optional[int]):
-        if isinstance(value, property):
-            return
-        self._ix_to_bind = value
-
-    @property
-    def id_to_bind(self) -> Optional[str]:
-        if self._ix_to_bind is None:
-            return None
-        return str(self._ix_to_bind + 1)
-
-    @id_to_bind.setter
-    def id_to_bind(self, value: Optional[str]):
-        if isinstance(value, property):
-            return
-        self._ix_to_bind = int(value) - 1
-
-    @property
-    def ix_to_break(self) -> Optional[int]:
-        return self._ix_to_break
-
-    @ix_to_break.setter
-    def ix_to_break(self, value: Optional[int]):
-        if isinstance(value, property):
-            return
-        self._ix_to_break = value
-
-    @property
-    def id_to_break(self) -> Optional[str]:
-        if self._ix_to_break is None:
-            return None
-        return str(self._ix_to_break + 1)
-
-    @id_to_break.setter
-    def id_to_break(self, value: Optional[str]):
-        if isinstance(value, property):
-            return
-        self._ix_to_break = int(value) - 1
+        self._ix_to_place = int(value) - 1
 
 
 @dataclass
-class SingleOperation(RecipeStep):
-    """Handle a single operation on the recipe step.
+class BondOperation(RecipeStep):
+    """Handle a bond operation on the recipe step.
 
     This class takes in either zero-based indices or one-base IDs for two atoms
 
@@ -220,7 +171,7 @@ class SingleOperation(RecipeStep):
         self._atom_ix_2 = value
 
 
-class Break(SingleOperation):
+class Break(BondOperation):
     """Change topology to break a bond
 
     Parameters
@@ -236,7 +187,7 @@ class Break(SingleOperation):
     """
 
 
-class Bind(SingleOperation):
+class Bind(BondOperation):
     """Change topology to form a bond
 
     Parameters
@@ -340,16 +291,10 @@ class Recipe:
         name = ""
         for rs in self.recipe_steps:
             name += " "
-            if isinstance(rs, Move):
-                if (ix := getattr(rs, "ix_to_break", None)) is not None:
+            if isinstance(rs, Place):
+                if (ix := getattr(rs, "ix_to_place", None)) is not None:
                     name += str(ix)
-                    name += "\u26A1"  # ⚡
-                if (ix := getattr(rs, "ix_to_move", None)) is not None:
-                    name += str(ix)
-                if (ix := getattr(rs, "ix_to_bind", None)) is not None:
                     name += "\u27A1"  # ➡
-                    name += str(ix)
-
             elif isinstance(rs, Bind):
                 if (ix := getattr(rs, "atom_ix_1", None)) is not None:
                     name += str(ix)
