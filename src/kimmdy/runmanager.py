@@ -75,9 +75,7 @@ def get_existing_files(config: Config, section: str = "root") -> dict:
 
             if attr_name == "plumed":
                 key = "plumed"
-                # only discover root plumed output, not in md sections
-                if section == "root":
-                    file_d["plumed_out"] = attr.parent / get_plumed_out(attr)
+                file_d["plumed_out"] = attr.parent / get_plumed_out(attr)
 
             file_d[key] = attr
         elif isinstance(attr, Config):
@@ -397,12 +395,7 @@ class RunManager:
         # -t and -e options from grompp
         # replace the checkpoint file if gen_vel = no in the mdp file
 
-        if "plumed" in md_config.get_attributes():
-            # might have been modified, so latest_files has priority
-            try:
-                files.input["plumed"]
-            except FileNotFoundError:
-                files.input["plumed"] = md_config.plumed
+        if getattr(md_config, "use_plumed"):
             mdrun_cmd += f" -plumed {files.input['plumed']}"
 
             plumed_out = files.outputdir / get_plumed_out(files.input["plumed"])

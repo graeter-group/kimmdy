@@ -22,7 +22,8 @@ def test_parse_config1_casting():
 
         assert isinstance(config.mds, Config)
         assert isinstance(config.mds.equilibrium1, Config)
-        assert isinstance(config.mds.pull1.plumed, Path)
+        assert isinstance(config.plumed, Path)
+        assert isinstance(config.mds.pull1.use_plumed, bool)
     finally:
         for d in input_f.parent.glob("test_config_1*"):
             # [f.unlink() for f in d.iterdir()]
@@ -120,6 +121,7 @@ def test_get_existing_files():
                 "ndx",
                 "ff",
                 "plumed",
+                "plumed_out",
                 "pullf1500_equil.mdp",
                 "pullf1500.mdp",
                 "broken_equil_f1000.mdp",
