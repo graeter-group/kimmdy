@@ -8,12 +8,13 @@ gromacs_alias: 'gmx'
 top: 'IMREE.top'
 gro: 'IMREE_npt.gro'
 ndx: 'index.ndx'
+plumed: 'plumed.dat'
 mds:
   equilibrium:
     mdp: 'md.mdp'
   pull:
     mdp: 'md.mdp'
-    plumed: 'plumed.dat'
+    use_plumed: true
   relax:
     mdp: 'md_parameter_growth.mdp'
 changer:
