@@ -1,5 +1,52 @@
 # Changelog
 
+## [4.1.0](https://github.com/hits-mbm-dev/kimmdy/compare/v4.0.1...v4.1.0) (2023-08-28)
+
+
+### Features
+
+* --debug for post-mortem debugging ([#214](https://github.com/hits-mbm-dev/kimmdy/issues/214)) ([91360d1](https://github.com/hits-mbm-dev/kimmdy/commit/91360d156a86094bb46111b8a3858404bc3d8daf))
+* add remove_hydrogen tool ([#213](https://github.com/hits-mbm-dev/kimmdy/issues/213)) ([b7f7e78](https://github.com/hits-mbm-dev/kimmdy/commit/b7f7e78273458cc89532f5db8c17e58f1d6c6e50))
+* Automatic Radical Parameterization ([#144](https://github.com/hits-mbm-dev/kimmdy/issues/144)) ([4b4641b](https://github.com/hits-mbm-dev/kimmdy/commit/4b4641bce00812be0859acd8200fce658577a316))
+* automatically stop and restart KIMMDY for joblength-restricted HPC clusters ([#162](https://github.com/hits-mbm-dev/kimmdy/issues/162)) ([602d864](https://github.com/hits-mbm-dev/kimmdy/commit/602d86483aff2f6bf039f4bd74d018e63cd9b7c4))
+* cleanup cmd.py ([#228](https://github.com/hits-mbm-dev/kimmdy/issues/228)) ([f77b6dc](https://github.com/hits-mbm-dev/kimmdy/commit/f77b6dcf00e77800bd8899dec6c3f40652f200b9))
+* config: use_plumed in md section ([#234](https://github.com/hits-mbm-dev/kimmdy/issues/234)) ([22dfacb](https://github.com/hits-mbm-dev/kimmdy/commit/22dfacbe38bf167ab79b391b40ba1883cf090881))
+* multimolecule topology ([#211](https://github.com/hits-mbm-dev/kimmdy/issues/211)) ([153af8c](https://github.com/hits-mbm-dev/kimmdy/commit/153af8ce6780dbff928160c89ff17a5a3c373969))
+* single reaction tasks in config ([#215](https://github.com/hits-mbm-dev/kimmdy/issues/215)) ([1c07689](https://github.com/hits-mbm-dev/kimmdy/commit/1c076897f429673dbe0d7dfec9caaf86a7018a71))
+* workflow for local testing ([092b89e](https://github.com/hits-mbm-dev/kimmdy/commit/092b89e5fcb1addcd2a3d09f9104c0ddc2b3c3eb))
+
+
+### Bug Fixes
+
+* 212 ([016aa56](https://github.com/hits-mbm-dev/kimmdy/commit/016aa56a630f64b953cb6cab7c9a25584c47a692))
+* allow reading topology with an empty forcefield ([#238](https://github.com/hits-mbm-dev/kimmdy/issues/238)) ([a0824c3](https://github.com/hits-mbm-dev/kimmdy/commit/a0824c37379f0ebdf87bbf73dd50a0b114bbeafe))
+* also fix [#200](https://github.com/hits-mbm-dev/kimmdy/issues/200) ([f2b2be2](https://github.com/hits-mbm-dev/kimmdy/commit/f2b2be2169bc7f91eeb925cf0e125a321733cb1c))
+* catch plugin loading exception ([268f77f](https://github.com/hits-mbm-dev/kimmdy/commit/268f77fdda7abee65d8347f6a14b8cfb5be57274))
+* **ci:** render docs ([a62f351](https://github.com/hits-mbm-dev/kimmdy/commit/a62f35162bbbd4b10f9f7f39138a52734cff65c7))
+* consolidate cmd interface with previous changes by [@ehhartmann](https://github.com/ehhartmann) ([f77b6dc](https://github.com/hits-mbm-dev/kimmdy/commit/f77b6dcf00e77800bd8899dec6c3f40652f200b9))
+* **docs:** getting started molstar resources ([f77b6dc](https://github.com/hits-mbm-dev/kimmdy/commit/f77b6dcf00e77800bd8899dec6c3f40652f200b9))
+* don't increment logfile if starting from a checkpoint ([f77b6dc](https://github.com/hits-mbm-dev/kimmdy/commit/f77b6dcf00e77800bd8899dec6c3f40652f200b9))
+* don't run tasks twice ([c756793](https://github.com/hits-mbm-dev/kimmdy/commit/c7567932bce51ded317d689e2bec7d74e2dbae4d))
+* examples use new plumed field ([9493a45](https://github.com/hits-mbm-dev/kimmdy/commit/9493a4582b57ce6cba065aaa11930a701d5d494c))
+* fix docstring references after https://github.com/hits-mbm-dev/kimmdy/pull/229 ([7c4ba75](https://github.com/hits-mbm-dev/kimmdy/commit/7c4ba75e2e72430f0691a4fa9019a87a2f507ee4))
+* install order and tox rquirements ([e7d5957](https://github.com/hits-mbm-dev/kimmdy/commit/e7d5957ca1bf757298c6a4eff5f9b4160f3290ef))
+* logger instead of logging ([272dd41](https://github.com/hits-mbm-dev/kimmdy/commit/272dd411d31ffbd7bb49ed3a1bd31364e9b4ad0f))
+* missing import ([0ac234f](https://github.com/hits-mbm-dev/kimmdy/commit/0ac234f8ce88279e0d48843dc7c71c51d28fd847))
+* morse transition rate homolysis tests fails on ci but not locally [#197](https://github.com/hits-mbm-dev/kimmdy/issues/197)  ([#201](https://github.com/hits-mbm-dev/kimmdy/issues/201)) ([f2b2be2](https://github.com/hits-mbm-dev/kimmdy/commit/f2b2be2169bc7f91eeb925cf0e125a321733cb1c))
+* new build example ([4c6b93e](https://github.com/hits-mbm-dev/kimmdy/commit/4c6b93e813acc7eedcd45cbc2f86acc2aefb4fb8))
+* plugins use task-logger ([#207](https://github.com/hits-mbm-dev/kimmdy/issues/207)) ([d5c419d](https://github.com/hits-mbm-dev/kimmdy/commit/d5c419d1dfe741958c0052465ad83c28b58ded65))
+* proper usage of __str__ and __repr__ for topology ([#210](https://github.com/hits-mbm-dev/kimmdy/issues/210)) ([6fd070f](https://github.com/hits-mbm-dev/kimmdy/commit/6fd070f6ec2dcafcb0d5329a7ff60a431eee743c))
+* removed need for strict bind break order ([#231](https://github.com/hits-mbm-dev/kimmdy/issues/231)) ([a7859ec](https://github.com/hits-mbm-dev/kimmdy/commit/a7859ec1100d8bd89eddbfa4816e2be0ada358e7))
+* requirements typo ([2f998d2](https://github.com/hits-mbm-dev/kimmdy/commit/2f998d232b62dbc802ba871fcb91efdb4b72f507))
+* runmng logger getting overwritten ([27baee9](https://github.com/hits-mbm-dev/kimmdy/commit/27baee9fd3a716930e99f3e8cb9a677e44e95047))
+* show plugins ([dcb92c8](https://github.com/hits-mbm-dev/kimmdy/commit/dcb92c8737b71efaaa8429cf2343d53000bef39c))
+
+
+### Documentation
+
+* improve layout and linking ([f77b6dc](https://github.com/hits-mbm-dev/kimmdy/commit/f77b6dcf00e77800bd8899dec6c3f40652f200b9))
+* more expressive docstrings ([f77b6dc](https://github.com/hits-mbm-dev/kimmdy/commit/f77b6dcf00e77800bd8899dec6c3f40652f200b9))
+
 ## [4.0.1](https://github.com/hits-mbm-dev/kimmdy/compare/v4.0.0...v4.0.1) (2023-08-11)
 
 
