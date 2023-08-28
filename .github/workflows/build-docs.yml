@@ -28,11 +28,12 @@ jobs:
         run: |
           make docs
       - name: Commit rendered docs
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git commit -am "chore(docs): render docs"
-          git push
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "chore(docs): render docs"
+          commit_user_name: "github-actions[bot]"
+          commit_user_email: "github-actions[bot]@users.noreply.github.com"
+          commit_author: "github-actions[bot] <github-actions[bot]@users.noreply.github.com>"
       # TODO: uncomment when public (necessary for gh pages)
       # - uses: peaceiris/actions-gh-pages@v3
       #   with:
