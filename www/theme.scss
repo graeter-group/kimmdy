@@ -10,6 +10,8 @@ $font-family-monospace: "Fira Mono", Menlo, Consolas, monospace !default;
 $gray-base:              #000 !default;
 $gray-dark:              lighten($gray-base, 20%) !default;   // #333
 
+$code-color: #1E4287;
+
 /*-- scss:rules --*/
 
 .video-container {

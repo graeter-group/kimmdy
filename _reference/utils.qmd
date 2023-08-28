@@ -2,6 +2,8 @@
 
 `utils`
 
+Utilities for building plugins, shell convenience functions and GROMACS related functions
+
 ## Attributes
 
 | Name | Description |

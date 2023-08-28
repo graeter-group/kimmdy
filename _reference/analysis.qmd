@@ -1,0 +1,15 @@
+# analysis { #kimmdy.analysis }
+
+`analysis`
+
+## Functions
+
+| Name | Description |
+| --- | --- |
+| [concat_traj](#kimmdy.analysis.concat_traj) | Find and concatenate trajectories (.xtc files) from KIMMDY runs. |
+
+### concat_traj { #kimmdy.analysis.concat_traj }
+
+`analysis.concat_traj(rundir, steps)`
+
+Find and concatenate trajectories (.xtc files) from KIMMDY runs.

@@ -9,6 +9,7 @@ All read_&lt;...&gt; and write_&lt;...&gt; functions.
 | Name | Description |
 | --- | --- |
 | [GMX_BUILTIN_FF_DIR](#kimmdy.parsing.GMX_BUILTIN_FF_DIR) | Path to gromacs data directory with the built-in forcefields. |
+| [TopologyDict](#kimmdy.parsing.TopologyDict) | A raw representation of a topology file. |
 
 ## Functions
 

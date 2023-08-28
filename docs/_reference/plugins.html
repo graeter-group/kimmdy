@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>KIMMDY – misc_helper</title>
+<title>KIMMDY – plugins</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -30,8 +30,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../_reference/parsing.html" rel="next">
-<link href="../_reference/kmc.html" rel="prev">
+<link href="../_reference/analysis.html" rel="next">
+<link href="../_reference/recipe.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -66,7 +66,7 @@ ul.task-list li input[type="checkbox"] {
 
 </head>
 
-<body class="nav-sidebar docked nav-fixed">
+<body class="nav-sidebar floating nav-fixed">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -127,7 +127,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../_reference/index.html">Reference</a></li><li class="breadcrumb-item"><a href="../_reference/changemanager.html">Modules</a></li><li class="breadcrumb-item"><a href="../_reference/misc_helper.html">misc_helper</a></li></ol></nav>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../_reference/index.html">Reference</a></li><li class="breadcrumb-item"><a href="../_reference/changemanager.html">Modules</a></li><li class="breadcrumb-item"><a href="../_reference/plugins.html">plugins</a></li></ol></nav>
       <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
       </a>
     </div>
@@ -136,7 +136,7 @@ ul.task-list li input[type="checkbox"] {
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation docked overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item sidebar-item-section">
@@ -310,12 +310,6 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/misc_helper.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">misc_helper</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="../_reference/parsing.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">parsing</span></a>
   </div>
@@ -334,14 +328,32 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../_reference/recipe.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">recipe</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/plugins.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">plugins</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/analysis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../_reference/utils.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">utils</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/reaction.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">reaction</span></a>
+  <a href="../_reference/tools.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">tools</span></a>
   </div>
 </li>
       </ul>
@@ -383,25 +395,141 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
+        <nav id="TOC" role="doc-toc" class="toc-active" data-toc-expanded="99">
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#kimmdy.misc_helper" id="toc-kimmdy.misc_helper" class="nav-link active" data-scroll-target="#kimmdy.misc_helper">misc_helper</a></li>
+  <li><a href="#kimmdy.plugins" id="toc-kimmdy.plugins" class="nav-link active" data-scroll-target="#kimmdy.plugins">plugins</a>
+  <ul>
+  <li><a href="#classes" id="toc-classes" class="nav-link" data-scroll-target="#classes">Classes</a>
+  <ul>
+  <li><a href="#kimmdy.plugins.BasicParameterizer" id="toc-kimmdy.plugins.BasicParameterizer" class="nav-link" data-scroll-target="#kimmdy.plugins.BasicParameterizer">BasicParameterizer</a></li>
+  <li><a href="#kimmdy.plugins.ReactionPlugin" id="toc-kimmdy.plugins.ReactionPlugin" class="nav-link" data-scroll-target="#kimmdy.plugins.ReactionPlugin">ReactionPlugin</a>
+  <ul class="collapse">
+  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
+  <ul class="collapse">
+  <li><a href="#kimmdy.plugins.ReactionPlugin.get_recipe_collection" id="toc-kimmdy.plugins.ReactionPlugin.get_recipe_collection" class="nav-link" data-scroll-target="#kimmdy.plugins.ReactionPlugin.get_recipe_collection">get_recipe_collection</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
   </ul>
-<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hits-mbm-dev/kimmdy/edit/main/_reference/misc_helper.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/hits-mbm-dev/kimmdy/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hits-mbm-dev/kimmdy/edit/main/_reference/plugins.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/hits-mbm-dev/kimmdy/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 
 
-<section id="kimmdy.misc_helper" class="level1">
-<h1>misc_helper</h1>
-<p><code>misc_helper</code></p>
-<p>Miscelaneous utilitiies that didn't fit anywhere else for now.</p>
+<section id="kimmdy.plugins" class="level1">
+<h1>plugins</h1>
+<p><code>plugins</code></p>
+<p>Plugin base classes and basic instances thereof.</p>
+<section id="classes" class="level2">
+<h2 class="anchored" data-anchor-id="classes">Classes</h2>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="#kimmdy.plugins.BasicParameterizer">BasicParameterizer</a></td>
+<td>reconstruct base force field state</td>
+</tr>
+<tr class="even">
+<td><a href="#kimmdy.plugins.ReactionPlugin">ReactionPlugin</a></td>
+<td>Reaction base class</td>
+</tr>
+</tbody>
+</table>
+<section id="kimmdy.plugins.BasicParameterizer" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.plugins.BasicParameterizer">BasicParameterizer</h3>
+<p><code>plugins.BasicParameterizer()</code></p>
+<p>reconstruct base force field state</p>
+</section>
+<section id="kimmdy.plugins.ReactionPlugin" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.plugins.ReactionPlugin">ReactionPlugin</h3>
+<p><code>plugins.ReactionPlugin(self, name, runmng)</code></p>
+<p>Reaction base class</p>
+<section id="parameters" class="level4">
+<h4 class="anchored" data-anchor-id="parameters">Parameters</h4>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>name</code></td>
+<td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
+<td>Name of the reaction</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td><code>runmng</code></td>
+<td><code>Runmanager</code></td>
+<td>RunManager instance</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="methods" class="level4">
+<h4 class="anchored" data-anchor-id="methods">Methods</h4>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="#kimmdy.plugins.ReactionPlugin.get_recipe_collection">get_recipe_collection</a></td>
+<td>Get a RecipeCollection as a result of the reaction.</td>
+</tr>
+</tbody>
+</table>
+<section id="kimmdy.plugins.ReactionPlugin.get_recipe_collection" class="level5">
+<h5 class="anchored" data-anchor-id="kimmdy.plugins.ReactionPlugin.get_recipe_collection">get_recipe_collection</h5>
+<p><code>plugins.ReactionPlugin.get_recipe_collection(self, files)</code></p>
+<p>Get a RecipeCollection as a result of the reaction.</p>
+<p>This is run as a <a href="../_reference/tasks.html#kimmdy.tasks.Task"><code>Task</code></a> in the RunManager. How the RecipeCollection is built is up to the reaction. It has access to the current state of the system via the runmanager <code>self.runmng</code> and the files.</p>
+<section id="parameters-1" class="level6">
+<h6 class="anchored" data-anchor-id="parameters-1">Parameters</h6>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>files</code></td>
+<td><a href="../_reference/tasks.html#kimmdy.tasks.TaskFiles">TaskFiles</a></td>
+<td>TaskFiles instance</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
 
 
+</section>
+</section>
+</section>
+</section>
+</section>
 </section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
@@ -755,13 +883,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../_reference/kmc.html" class="pagination-link">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">kmc</span>
+      <a href="../_reference/recipe.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">recipe</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../_reference/parsing.html" class="pagination-link">
-        <span class="nav-page-text">parsing</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../_reference/analysis.html" class="pagination-link">
+        <span class="nav-page-text">analysis</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

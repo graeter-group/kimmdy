@@ -1,6 +1,7 @@
 """
 Functions for starting KIMMDY either from python or the command line.
 Also initialized logging and configuration.
+Other entry points such as `kimmdy-analysis` also live here.
 """
 import argparse
 import logging
@@ -10,8 +11,11 @@ from pathlib import Path
 import textwrap
 import dill
 from kimmdy.config import Config
+from kimmdy.tools import build_examples
 from kimmdy.runmanager import RunManager
 from kimmdy.utils import check_gmx_version, backup_if_existing
+from kimmdy.analysis import concat_traj, plot_energy, radical_population, plot_rates
+from kimmdy.tools import remove_hydrogen
 import importlib.resources as pkg_resources
 import sys
 from glob import glob
@@ -22,13 +26,13 @@ else:
     from importlib.metadata import version
 
 
-def get_cmdline_args():
-    """Parse command line arguments and configure logger.
+def get_cmdline_args() -> argparse.Namespace:
+    """Parse command line arguments.
 
     Returns
     -------
-    Namespace
-        parsed command line arguments
+    :
+        Parsed command line arguments
     """
     parser = argparse.ArgumentParser(description="Welcome to KIMMDY")
     parser.add_argument(
@@ -56,6 +60,17 @@ def get_cmdline_args():
         action="store_true",
         help="continue. Start KIMMDY from the latest checkpoint file",
     )
+    parser.add_argument(
+        "--concat",
+        type=Path,
+        nargs="?",
+        const=True,
+        help=(
+            "Concatenate trrs of this run"
+            "Optionally, the run directory can be give"
+            "Will save as concat.trr in current directory"
+        ),
+    )
 
     # on error, drop into debugger
     parser.add_argument(
@@ -72,8 +87,10 @@ def get_cmdline_args():
         "--show-schema-path",
         action="store_true",
         help=(
-            "Print path to yaml schema for use with yaml-language-server e.g. in VSCode and Neovim"
-            "# yaml-language-server: $schema=/path/to/kimmdy-yaml-schema.json"
+            """
+            Print path to yaml schema for use with yaml-language-server e.g. in VSCode and Neovim
+            # yaml-language-server: $schema=/path/to/kimmdy-yaml-schema.json
+            """
         ),
     )
 
@@ -83,12 +100,122 @@ def get_cmdline_args():
         action="store_true",
         help=(
             """
-        Instead of running KIMMDY directly, generate at jobscript.sh for slurm HPC clusters.
-        You can then run this jobscript with sbatch jobscript.sh
-        """
+            Instead of running KIMMDY directly, generate at jobscript.sh for slurm HPC clusters.
+            You can then run this jobscript with sbatch jobscript.sh
+            """
         ),
     )
 
+    return parser.parse_args()
+
+
+def get_analysis_cmdline_args() -> argparse.Namespace:
+    """Parse command line arguments.
+
+    Returns
+    -------
+    :
+        Parsed command line arguments
+    """
+    parser = argparse.ArgumentParser(
+        description="Welcome to the KIMMDY analysis module"
+    )
+    subparsers = parser.add_subparsers(required=True, metavar="module", dest="module")
+
+    parser_trjcat = subparsers.add_parser(
+        name="trjcat", help="Concatenate trajectories of a KIMMDY run"
+    )
+    parser_trjcat.add_argument(
+        "dir", type=str, help="KIMMDY run directory to be analysed."
+    )
+    parser_trjcat.add_argument(
+        "--steps",
+        "-s",
+        nargs="*",
+        default="all",
+        help=(
+            "Apply analysis method to subdirectories with these names. Uses all subdirectories by default"
+        ),
+    )
+
+    parser_plot_energy = subparsers.add_parser(
+        name="plot_energy", help="Plot GROMACS energy for a KIMMDY run"
+    )
+    parser_plot_energy.add_argument(
+        "dir", type=str, help="KIMMDY run directory to be analysed."
+    )
+    parser_plot_energy.add_argument(
+        "--steps",
+        "-s",
+        nargs="*",
+        default="all",
+        help=(
+            "Apply analysis method to subdirectories with these names. Uses all subdirectories by default"
+        ),
+    )
+    parser_plot_energy.add_argument(
+        "--terms",
+        "-t",
+        nargs="*",
+        default=["Potential"],
+        help=(
+            "Terms from gmx energy that will be plotted. Uses 'Potential' by default"
+        ),
+    )
+
+    parser_radical_population = subparsers.add_parser(
+        name="radical_population",
+        help="Plot population of radicals for one or multiple KIMMDY run(s)",
+    )
+    parser_radical_population.add_argument(
+        "dir", nargs="+", help="KIMMDY run directory to be analysed. Can be multiple."
+    )
+    parser_radical_population.add_argument(
+        "--select_atoms",
+        "-a",
+        type=str,
+        help="Atoms chosen for radical population analysis, default is protein (uses MDAnalysis selection syntax)",
+        default="protein",
+    )
+
+    parser_plot_rates = subparsers.add_parser(
+        name="plot_rates",
+        help="Plot rates of all possible reactions after a MD run. Rates must have been saved!",
+    )
+    parser_plot_rates.add_argument(
+        "dir", nargs="+", help="KIMMDY run directory to be analysed. Can be multiple."
+    )
+
+    return parser.parse_args()
+
+
+def get_remove_hydrogen_cmdline_args():
+    """
+    parse cmdline args for remove_hydrogen
+    """
+    parser = argparse.ArgumentParser(
+        description="Welcome to the KIMMDY remove hydrogen module",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+    parser.add_argument("gro", help="GROMACS gro file")
+    parser.add_argument("top", help="GROMACS top file")
+    parser.add_argument(
+        "nr", help="Atom number as indicated in the GROMACS gro and top file"
+    )
+    parser.add_argument(
+        "-p",
+        "--parameterize",
+        action="store_true",
+        help="Parameterize topology with grappa after removing hydrogen.",
+        default=False,
+    )
+    parser.add_argument(
+        "-e",
+        "--equilibrate",
+        action="store_true",
+        help="Do a minimization and equilibration with GROMACS. Uses mdp files from kimmdy assets.",
+        default=False,
+    )
     return parser.parse_args()
 
 
@@ -105,18 +232,24 @@ class longFormatter(logging.Formatter):
         return result
 
 
-def configure_logger(log_path, log_level):
+def configure_logger(
+    log_path: Path, log_level: str, no_increment_logfile: bool = False
+):
     """Configure logging.
 
     Parameters
     ----------
-    log_path : Path
+    log_path :
         File path to log file
-    log_level : str
-        Log
+    log_level :
+        Loglevel. One of ["INFO", "WARNING", "MESSAGE", "DEBUG"]
+    no_increment_logfile :
+        If True, do not backup existing log file. This is used for
+        restarting from a checkpoint.
     """
 
-    backup_if_existing(log_path)
+    if not no_increment_logfile:
+        backup_if_existing(log_path)
 
     log_conf = {
         "version": 1,
@@ -170,9 +303,10 @@ def _run(args: argparse.Namespace):
     Parameters
     ----------
     args :
-        Command line arguments.
+        Command line arguments. See [](`~kimmdy.cmd.get_cmdline_args`)
     """
-    configure_logger(args.logfile, args.loglevel)
+    no_increment_logfile = args.from_latest_checkpoint or args.checkpoint
+    configure_logger(args.logfile, args.loglevel, no_increment_logfile)
 
     if args.show_plugins:
         from kimmdy import (
@@ -199,6 +333,12 @@ def _run(args: argparse.Namespace):
     logger.info("Welcome to KIMMDY")
     logger.info("KIMMDY is running with these command line options:")
     logger.info(args)
+    logger.info("Run kimmdy -h for more information.")
+    if not Path(args.input).exists() and not args.checkpoint:
+        logger.error(
+            f"Input file {args.input} does not exist. Specify its name with --input and make sure that you are in the right directory."
+        )
+        exit()
 
     if args.generate_jobscript:
         config = Config(args.input)
@@ -262,14 +402,20 @@ def _run(args: argparse.Namespace):
         config = Config(args.input, no_increment_output_dir=True)
         cpts = glob(f"{config.name}*kimmdy.cpt")
         if not cpts:
-            logging.error("No checkpoints found.")
+            logging.error(
+                f"""
+                No checkpoints found for the current configuration at {args.input}.
+                Start a new KIMMDY run or generate an initial checkpoint with
+                kimmdy --generate-jobscript
+                """
+            )
             exit()
         cpts.sort()
         args.checkpoint = cpts[-1]
 
     try:
         if args.checkpoint:
-            logger.info("KIMMDY is starting from a checkpoint.")
+            logger.info(f"KIMMDY is starting from a checkpoint: {args.checkpoint}.")
             with open(args.checkpoint, "rb") as f:
                 runmgr = dill.load(f)
                 runmgr.from_checkpoint = True
@@ -296,12 +442,15 @@ def kimmdy_run(
     logfile: Path = Path("kimmdy.log"),
     checkpoint: str = "",
     from_latest_checkpoint: bool = False,
+    concat: bool = False,
     show_plugins: bool = False,
     show_schema_path: bool = False,
     generate_jobscript: bool = False,
     debug: bool = False,
 ):
     """Run KIMMDY from python.
+
+    Also see See [](`~kimmdy.cmd.get_cmdline_args`) or `kimmdy --help` for the descriptions of the arguments.
 
     Parameters
     ----------
@@ -315,6 +464,9 @@ def kimmdy_run(
         File path if a kimmdy.cpt file to restart KIMMDY from a checkpoint.
     from_latest_checkpoint :
         Start KIMMDY from the latest checkpoint.
+    concat :
+        Don't perform a full KIMMDY run but instead concatenate trajectories
+        from a previous run.
     show_plugins :
         Show available plugins and exit.
     show_schema_path :
@@ -328,6 +480,7 @@ def kimmdy_run(
         logfile=logfile,
         checkpoint=checkpoint,
         from_latest_checkpoint=from_latest_checkpoint,
+        concat=concat,
         show_plugins=show_plugins,
         show_schema_path=show_schema_path,
         generate_jobscript=generate_jobscript,
@@ -337,179 +490,7 @@ def kimmdy_run(
     logging.shutdown()
 
 
-def kimmdy():
-    """Run KIMMDY from the command line.
-
-    The configuration is gathered from the input file,
-    which is `kimmdy.yml` by default.
-    """
-    args = get_cmdline_args()
-    _run(args)
-    logging.shutdown()
-
-
-if __name__ == "__main__":
-    kimmdy_run()
-
-## complementary tools and analysis
-
-
-def get_analysis_cmdline_args():
-    """
-    concat :
-    Don't perform a full KIMMDY run but instead concatenate trajectories
-    from a previous run.
-    """
-    parser = argparse.ArgumentParser(
-        description="Welcome to the KIMMDY analysis module"
-    )
-    subparsers = parser.add_subparsers(required=True, metavar="module", dest="module")
-
-    # trjcat
-    parser_trjcat = subparsers.add_parser(
-        name="trjcat", help="Concatenate trajectories of a KIMMDY run"
-    )
-    parser_trjcat.add_argument(
-        "rundir", type=str, help="KIMMDY run directory to be analysed."
-    )
-    parser_trjcat.add_argument(
-        "--steps",
-        "-s",
-        nargs="*",
-        default="all",
-        help=(
-            "Apply analysis method to subdirectories with these names. Uses all subdirectories by default"
-        ),
-    )
-
-    # plot_energy
-    parser_plot_energy = subparsers.add_parser(
-        name="plot_energy", help="Plot GROMACS energy for a KIMMDY run"
-    )
-    parser_plot_energy.add_argument(
-        "rundir", type=str, help="KIMMDY run directory to be analysed."
-    )
-    parser_plot_energy.add_argument(
-        "--steps",
-        "-s",
-        nargs="*",
-        default="all",
-        help=(
-            "Apply analysis method to subdirectories with these names. Uses all subdirectories by default"
-        ),
-    )
-    parser_plot_energy.add_argument(
-        "--terms",
-        "-t",
-        nargs="*",
-        default=["Potential"],
-        help=(
-            "Terms from gmx energy that will be plotted. Uses 'Potential' by default"
-        ),
-    )
-    # radical population
-    parser_radical_population = subparsers.add_parser(
-        name="radical_population",
-        help="Plot population of radicals for one or multiple KIMMDY run(s)",
-    )
-    parser_radical_population.add_argument(
-        "rundir",
-        nargs="+",
-        help="KIMMDY run directory to be analysed. Can be multiple.",
-    )
-    parser_radical_population.add_argument(
-        "--select_atoms",
-        "-a",
-        type=str,
-        help="Atoms chosen for radical population analysis, default is protein (uses MDAnalysis selection syntax)",
-        default="protein",
-    )
-
-    # plot rates at each decision step
-    parser_plot_rates = subparsers.add_parser(
-        name="plot_rates",
-        help="Plot rates of all possible reactions after a MD run. Rates must have been saved!",
-    )
-    parser_plot_rates.add_argument(
-        "rundir",
-        nargs="+",
-        help="KIMMDY run directory to be analysed. Can be multiple.",
-    )
-
-    return parser.parse_args()
-
-
-def setup_analysis():
-    """Analyse existing KIMMDY runs."""
-
-    args = get_analysis_cmdline_args()
-    print(args)
-    print(vars(args))
-    print(*vars(args))
-    from kimmdy.analysis import concat_traj, plot_energy, radical_population, plot_rates
-
-    if args.module == "trjcat":
-        delattr(args, "module")
-        concat_traj(**vars(args))
-    elif args.module == "plot_energy":
-        delattr(args, "module")
-        plot_energy(**vars(args))
-    elif args.module == "radical_population":
-        delattr(args, "module")
-        radical_population(**vars(args))
-    elif args.module == "plot_rates":
-        delattr(args, "module")
-        plot_rates(**vars(args))
-
-
-def get_remove_hydrogen_cmdline_args():
-    """
-    parse cmdline args for remove_hydrogen
-    """
-    parser = argparse.ArgumentParser(
-        description="Welcome to the KIMMDY remove hydrogen module",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-    )
-    parser.add_argument("gro", help="GROMACS gro file")
-    parser.add_argument("top", help="GROMACS top file")
-    parser.add_argument(
-        "nr", help="Atom number as indicated in the GROMACS gro and top file"
-    )
-    parser.add_argument(
-        "-p",
-        "--parameterize",
-        action="store_true",
-        help="Parameterize topology with grappa after removing hydrogen.",
-        default=False,
-    )
-    parser.add_argument(
-        "-e",
-        "--equilibrate",
-        action="store_true",
-        help="Do a minimization and equilibration with GROMACS. Uses mdp files from kimmdy assets.",
-        default=False,
-    )
-    parser.add_argument(
-        "-f",
-        "--gmx_mdrun_flags",
-        type=str,
-        help=(
-            "GMX mdrun flags. Will be appended to gmx mdrun commands. Requires leading space in string."
-        ),
-        default="",
-    )
-    return parser.parse_args()
-
-
-def setup_remove_hydrogen():
-    """Remove hydrogen by atom nr in a gro and topology file"""
-    args = get_remove_hydrogen_cmdline_args()
-    from kimmdy.tools import remove_hydrogen
-
-    remove_hydrogen(**vars(args))
-
-
-def get_build_example_args():
+def get_build_example_cmdline_args() -> argparse.Namespace:
     """Parse command line arguments.
 
     Returns
@@ -523,15 +504,46 @@ def get_build_example_args():
         "--restore",
         const=True,
         nargs="?",
+        type=str,
         help="Overwrite input files in existing example directories, use keyword 'hard' to also delete output files.",
     )
     return parser.parse_args()
 
 
-def setup_build_examples():
+def entry_point_build_examples():
     """Build examples from the command line."""
-    args = get_build_example_args()
-    from kimmdy.tools import build_examples
+    args = get_build_example_cmdline_args()
+    build_examples(args.restore)
 
-    build_examples(**vars(args))
-    pass
+
+def entry_point_analysis():
+    """Analyse existing KIMMDY runs."""
+    args = get_analysis_cmdline_args()
+
+    if args.module == "trjcat":
+        concat_traj(args.dir, args.steps)
+    elif args.module == "plot_energy":
+        plot_energy(args.dir, args.steps, args.terms)
+    elif args.module == "radical_population":
+        radical_population(args.dir, args.radical_population)
+    elif args.module == "plot_rates":
+        plot_rates(args.dir)
+
+
+def entry_point_remove_hydrogen():
+    """Remove hydrogen by atom nr in a gro and topology file"""
+    args = get_remove_hydrogen_cmdline_args()
+
+    remove_hydrogen(args.gro, args.top, args.nr, args.paremeterize, args.equilibrate)
+
+
+def entry_point_kimmdy():
+    """Run KIMMDY from the command line.
+
+    The configuration is gathered from the input file,
+    which is `kimmdy.yml` by default.
+    See [](`~kimmdy.cmd.get_cmdline_args`) or `kimmdy --help` for the descriptions of the arguments.
+    """
+    args = get_cmdline_args()
+    _run(args)
+    logging.shutdown()

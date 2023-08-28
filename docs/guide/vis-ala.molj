@@ -28,7 +28,7 @@
                   "url": {
                     "kind": "url",
                     "id": "-MMo9V_C7a8eNpFNgp0ksw",
-                    "url": "../example/example_ala/npt.gro"
+                    "url": "../example/alanine/npt.gro"
                   },
                   "label": "",
                   "isBinary": false

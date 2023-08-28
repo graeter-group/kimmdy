@@ -51,7 +51,7 @@ Compare e.g. &lt;https://en.wikipedia.org/wiki/Kinetic_Monte_Carlo#Time-dependen
 
 | Name                | Type                                                                               | Description                                                                        | Default         |
 |---------------------|------------------------------------------------------------------------------------|------------------------------------------------------------------------------------|-----------------|
-| `recipe_collection` | [RecipeCollection](`kimmdy.reaction.RecipeCollection`)                             | from which one will be choosen                                                     | _required_      |
+| `recipe_collection` | [RecipeCollection](`kimmdy.recipe.RecipeCollection`)                               | from which one will be choosen                                                     | _required_      |
 | `rng`               | [np](`numpy`).[random](`numpy.random`).[BitGenerator](`numpy.random.BitGenerator`) | to generate random numbers in the KMC step                                         | `default_rng()` |
 | `MD_time`           | [Union](`typing.Union`)\[[float](`float`), None\]                                  | time [ps] to compare conformational events with reaction events in the time domain | `None`          |
 
@@ -69,5 +69,5 @@ Compare e.g. &lt;https://en.wikipedia.org/wiki/Kinetic_Monte_Carlo#Rejection-fre
 
 | Name                | Type                                                                               | Description                                         | Default         |
 |---------------------|------------------------------------------------------------------------------------|-----------------------------------------------------|-----------------|
-| `recipe_collection` | [RecipeCollection](`kimmdy.reaction.RecipeCollection`)                             | from which one will be choosen                      | _required_      |
+| `recipe_collection` | [RecipeCollection](`kimmdy.recipe.RecipeCollection`)                               | from which one will be choosen                      | _required_      |
 | `rng`               | [np](`numpy`).[random](`numpy.random`).[BitGenerator](`numpy.random.BitGenerator`) | function to generate random numbers in the KMC step | `default_rng()` |
