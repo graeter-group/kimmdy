@@ -147,9 +147,10 @@
               "type": "string",
               "pytype": "str"
             },
-            "md_parameter_growth": {
-              "type": "string",
-              "pytype": "str"
+            "slow_growth": {
+              "type": "boolean",
+              "pytype": "bool",
+              "default": false
             }
           }
         },

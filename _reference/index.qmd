@@ -27,11 +27,10 @@ Modules
 | | |
 | --- | --- |
 | [analysis](analysis.qmd#kimmdy.analysis) |  |
-| [changemanager](changemanager.qmd#kimmdy.changemanager) | The changemanager module holds functions that modify the system |
 | [cmd](cmd.qmd#kimmdy.cmd) | Functions for starting KIMMDY either from python or the command line. |
 | [config](config.qmd#kimmdy.config) | Read and validate kimmdy.yml configuration files |
 | [constants](constants.qmd#kimmdy.constants) | Comstants used throughout KIMMDY |
-| [coordinates](coordinates.qmd#kimmdy.coordinates) |  |
+| [coordinates](coordinates.qmd#kimmdy.coordinates) | coordinate, topology and plumed modification functions |
 | [kmc](kmc.qmd#kimmdy.kmc) | Kinetic Monte Carlo (KMC) classes and functions. |
 | [parsing](parsing.qmd#kimmdy.parsing) | All read_&lt;...&gt; and write_&lt;...&gt; functions. |
 | [plugins](plugins.qmd#kimmdy.plugins) | Plugin base classes and basic instances thereof. |

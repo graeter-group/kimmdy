@@ -236,8 +236,8 @@ class TestHexalaTopology:
         return Topology(hexala_top)
 
     @pytest.fixture
-    def top_move_34_29_fix(self, filedir) -> Topology:
-        hexala_top = read_top(filedir / "hexala_move34-29.top")
+    def top_hat_34_to_29_fix(self, filedir) -> Topology:
+        hexala_top = read_top(filedir / "hexala_hat34-29.top")
         return Topology(
             hexala_top,
         )
@@ -476,13 +476,10 @@ class TestHexalaTopology:
             ]
         )
 
-    def test_move_34_29_after_break(self, hexala_top_fix, top_move_34_29_fix):
-        """Move H at 34 to C at 29
-
-        TODO: this does not use the canonical top.move_hydrogen that would be used for this case
-        """
+    def test_hat_34_to_29_after_break(self, hexala_top_fix, top_hat_34_to_29_fix):
+        """HAT of H at 34 to C at 29"""
         top = deepcopy(hexala_top_fix)
-        top_moved = deepcopy(top_move_34_29_fix)
+        top_ref = deepcopy(top_hat_34_to_29_fix)
         top.break_bond(("29", "35"))
         top.break_bond(("31", "34"))
         top.bind_bond(("34", "29"))
@@ -490,11 +487,11 @@ class TestHexalaTopology:
         focus = set(["29", "31", "34", "35"])
 
         # compare topologies
-        assert len(top.bonds) == len(top_moved.bonds)
-        assert len(top.pairs) == len(top_moved.pairs)
-        assert len(top.angles) == len(top_moved.angles)
-        assert len(top.proper_dihedrals) == len(top_moved.proper_dihedrals)
-        # assert len(top.improper_dihedrals) == len(top_moved.improper_dihedrals)
+        assert len(top.bonds) == len(top_ref.bonds)
+        assert len(top.pairs) == len(top_ref.pairs)
+        assert len(top.angles) == len(top_ref.angles)
+        assert len(top.proper_dihedrals) == len(top_ref.proper_dihedrals)
+        # assert len(top.improper_dihedrals) == len(top_ref.improper_dihedrals)
 
         # inspect HAT hydrogen
         h = top.atoms["34"]
