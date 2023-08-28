@@ -33,7 +33,7 @@ rest of the program and keeps track of global state.
 | crr_tasks         | [queue](`queue`).[Queue](`queue.Queue`)\[[Task](`kimmdy.tasks.Task`)\]                  | Current tasks.                                            |
 | iteration         | [int](`int`)                                                                            | Current iteration.                                        |
 | state             | [State](`kimmdy.runmanager.State`)                                                      | Current state of the system.                              |
-| recipe_collection | [RecipeCollection](`kimmdy.reaction.RecipeCollection`)                                  | Collection of recipes.                                    |
+| recipe_collection | [RecipeCollection](`kimmdy.recipe.RecipeCollection`)                                    | Collection of recipes.                                    |
 | latest_files      | [dict](`dict`)\[[str](`str`), [Path](`pathlib.Path`)\]                                  | Dictionary of latest files.                               |
 | histfile          | [Path](`pathlib.Path`)                                                                  | Path to history file.                                     |
 | cptfile           | [Path](`pathlib.Path`)                                                                  | Path to checkpoint file.                                  |

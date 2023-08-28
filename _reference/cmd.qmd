@@ -29,10 +29,11 @@ Configure logging.
 
 #### Parameters
 
-| Name        | Type                   | Description                                              | Default    |
-|-------------|------------------------|----------------------------------------------------------|------------|
-| `log_path`  | [Path](`pathlib.Path`) | File path to log file                                    | _required_ |
-| `log_level` | [str](`str`)           | Loglevel. One of ["INFO", "WARNING", "MESSAGE", "DEBUG"] | _required_ |
+| Name                   | Type                   | Description                                                                              | Default    |
+|------------------------|------------------------|------------------------------------------------------------------------------------------|------------|
+| `log_path`             | [Path](`pathlib.Path`) | File path to log file                                                                    | _required_ |
+| `log_level`            | [str](`str`)           | Loglevel. One of ["INFO", "WARNING", "MESSAGE", "DEBUG"]                                 | _required_ |
+| `no_increment_logfile` | [bool](`bool`)         | If True, do not backup existing log file. This is used for restarting from a checkpoint. | `False`    |
 
 ### entry_point_analysis { #kimmdy.cmd.entry_point_analysis }
 
@@ -54,6 +55,7 @@ Run KIMMDY from the command line.
 
 The configuration is gathered from the input file,
 which is `kimmdy.yml` by default.
+See [](`~kimmdy.cmd.get_cmdline_args`) or `kimmdy --help` for the descriptions of the arguments.
 
 ### entry_point_remove_hydrogen { #kimmdy.cmd.entry_point_remove_hydrogen }
 

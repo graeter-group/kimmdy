@@ -12,18 +12,21 @@ website:
       - _reference/topology.atomic.qmd
       section: Topology
     - contents:
+      - _reference/analysis.qmd
       - _reference/changemanager.qmd
+      - _reference/cmd.qmd
+      - _reference/config.qmd
       - _reference/constants.qmd
       - _reference/coordinates.qmd
-      - _reference/config.qmd
-      - _reference/schema.qmd
       - _reference/kmc.qmd
-      - _reference/misc_helper.qmd
       - _reference/parsing.qmd
+      - _reference/plugins.qmd
+      - _reference/recipe.qmd
       - _reference/runmanager.qmd
+      - _reference/schema.qmd
       - _reference/tasks.qmd
+      - _reference/tools.qmd
       - _reference/utils.qmd
-      - _reference/reaction.qmd
       section: Modules
     - contents:
       - _reference/homolysis.reaction.Homolysis.qmd

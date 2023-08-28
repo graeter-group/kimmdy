@@ -55,12 +55,14 @@ website:
           - _reference/coordinates.qmd
           - _reference/config.qmd
           - _reference/kmc.qmd
-          - _reference/misc_helper.qmd
           - _reference/parsing.qmd
           - _reference/runmanager.qmd
           - _reference/tasks.qmd
+          - _reference/recipe.qmd
+          - _reference/plugins.qmd
+          - _reference/analysis.qmd
           - _reference/utils.qmd
-          - _reference/reaction.qmd
+          - _reference/tools.qmd
           section: Modules
         - contents:
           - _reference/homolysis.reaction.Homolysis.qmd
@@ -124,18 +126,21 @@ quartodoc:
     - title: Modules
       desc: Modules
       contents:
+        - name: analysis
         - name: changemanager
+        - name: cmd
+        - name: config
         - name: constants
         - name: coordinates
-        - name: config
-        - name: schema
         - name: kmc
-        - name: misc_helper
         - name: parsing
+        - name: plugins
+        - name: recipe
         - name: runmanager
+        - name: schema
         - name: tasks
+        - name: tools
         - name: utils
-        - name: reaction
     - title: Reaction Plugins
       desc: Reaction plugins bundled with KIMMDY and the protocol to add a new reaction plugin to KIMMDY
       package: null
