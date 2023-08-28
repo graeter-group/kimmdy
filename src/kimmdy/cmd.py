@@ -243,6 +243,9 @@ def configure_logger(
         File path to log file
     log_level :
         Loglevel. One of ["INFO", "WARNING", "MESSAGE", "DEBUG"]
+    no_increment_logfile :
+        If True, do not backup existing log file. This is used for
+        restarting from a checkpoint.
     """
 
     if not no_increment_logfile:
@@ -539,6 +542,7 @@ def entry_point_kimmdy():
 
     The configuration is gathered from the input file,
     which is `kimmdy.yml` by default.
+    See [](`~kimmdy.cmd.get_cmdline_args`) or `kimmdy --help` for the descriptions of the arguments.
     """
     args = get_cmdline_args()
     _run(args)
