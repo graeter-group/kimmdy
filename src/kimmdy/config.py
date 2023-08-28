@@ -13,9 +13,6 @@ from kimmdy.utils import get_gmx_dir
 
 logger = logging.getLogger(__name__)
 
-GMX_BUILTIN_FF_DIR = get_gmx_dir() / "top"
-"""Path to gromacs data directory with the built-in forcefields."""
-
 
 def check_file_exists(p: Path):
     if not p.exists():
@@ -153,6 +150,7 @@ class Config:
 
         # globals / interconnected
         if section == "config":
+
             # forcfield
             ffdir = self.ff
             if ffdir == Path("*.ff"):
@@ -164,12 +162,14 @@ class Config:
                 assert ffs[0].is_dir(), "Forcefield should be a directory!"
                 ffdir = ffs[0].resolve()
             elif not ffdir.exists():
-                print(ffdir)
-                ffdir = GMX_BUILTIN_FF_DIR / ffdir
+                gmxdir = get_gmx_dir(self.gromacs_alias)
+                if gmxdir is None:
+                    logger.warn(f"Could not find gromacs data directory for {self.gromacs_alias}")
+                    gmxdir = self.cwd
+                gmx_builtin_ffs = gmxdir / "top"
+                ffdir = gmx_builtin_ffs / ffdir
                 if not ffdir.exists():
-                    m = f"Could not find forcefield {ffdir} in cwd or gromacs data directory"
-                    logger.error(m)
-                    raise AssertionError(m)
+                    logger.warn(f"Could not find forcefield {ffdir} in cwd or gromacs data directory")
             self.ff = ffdir
 
             # Validate changer reference
