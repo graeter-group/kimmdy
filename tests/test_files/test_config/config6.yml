@@ -6,12 +6,13 @@ gromacs_alias: 'gmx'
 top: 'topol.top'
 gro: 'npt.gro'
 ndx: 'index_backbone.ndx'
+plumed: 'plumed.dat'
 mds:
   equilibrium:
     mdp: 'pullf1500_equil.mdp'
   pull:
     mdp: 'pullf1500.mdp' 
-    plumed: 'plumed.dat'
+    use_plumed: true
   relax:
     mdp: 'broken_equil_f1000.mdp'
 changer:
