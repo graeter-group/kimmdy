@@ -30,7 +30,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../_reference/misc_helper.html" rel="next">
+<link href="../_reference/parsing.html" rel="next">
 <link href="../_reference/config.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
@@ -66,7 +66,7 @@ ul.task-list li input[type="checkbox"] {
 
 </head>
 
-<body class="nav-sidebar docked nav-fixed">
+<body class="nav-sidebar floating nav-fixed">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -136,7 +136,7 @@ ul.task-list li input[type="checkbox"] {
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation docked overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item sidebar-item-section">
@@ -310,12 +310,6 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/misc_helper.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">misc_helper</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="../_reference/parsing.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">parsing</span></a>
   </div>
@@ -334,14 +328,32 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../_reference/recipe.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">recipe</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/plugins.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">plugins</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/analysis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../_reference/utils.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">utils</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/reaction.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">reaction</span></a>
+  <a href="../_reference/tools.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">tools</span></a>
   </div>
 </li>
       </ul>
@@ -383,7 +395,7 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
+        <nav id="TOC" role="doc-toc" class="toc-active" data-toc-expanded="99">
     <h2 id="toc-title">On this page</h2>
    
   <ul>
@@ -454,12 +466,12 @@ ul.task-list li input[type="checkbox"] {
 <tbody>
 <tr class="odd">
 <td>recipe</td>
-<td><code>kimmdy</code>.<a href="../_reference/reaction.html#kimmdy.reaction">reaction</a>.<a href="../_reference/reaction.html#kimmdy.reaction.Recipe">Recipe</a></td>
+<td><code>kimmdy</code>.<code>reaction</code>.<code>Recipe</code></td>
 <td>Single sequence of RecipeSteps to build product</td>
 </tr>
 <tr class="even">
 <td>reaction_probability</td>
-<td><a href="https://docs.python.org/3.10/library/typing.html#typing.Union">Union</a>[<code>list</code>[<a href="https://docs.python.org/3.10/library/functions.html#float">float</a>], None]</td>
+<td><a href="https://docs.python.org/3.10/library/typing.html#typing.Union">Union</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#list">list</a>[<a href="https://docs.python.org/3.10/library/functions.html#float">float</a>], None]</td>
 <td>Integral of reaction propensity with respect to time</td>
 </tr>
 <tr class="odd">
@@ -516,7 +528,7 @@ ul.task-list li input[type="checkbox"] {
 <tbody>
 <tr class="odd">
 <td><code>recipe_collection</code></td>
-<td><a href="../_reference/reaction.html#kimmdy.reaction.RecipeCollection">RecipeCollection</a></td>
+<td><a href="../_reference/recipe.html#kimmdy.recipe.RecipeCollection">RecipeCollection</a></td>
 <td>from which one will be choosen</td>
 <td><em>required</em></td>
 </tr>
@@ -555,7 +567,7 @@ ul.task-list li input[type="checkbox"] {
 <tbody>
 <tr class="odd">
 <td><code>recipe_collection</code></td>
-<td><a href="../_reference/reaction.html#kimmdy.reaction.RecipeCollection">RecipeCollection</a></td>
+<td><a href="../_reference/recipe.html#kimmdy.recipe.RecipeCollection">RecipeCollection</a></td>
 <td>from which one will be choosen</td>
 <td><em>required</em></td>
 </tr>
@@ -930,8 +942,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../_reference/misc_helper.html" class="pagination-link">
-        <span class="nav-page-text">misc_helper</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../_reference/parsing.html" class="pagination-link">
+        <span class="nav-page-text">parsing</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

@@ -1,5 +1,0 @@
-# misc_helper { #kimmdy.misc_helper }
-
-`misc_helper`
-
-Miscelaneous utilitiies that didn&#x27;t fit anywhere else for now.

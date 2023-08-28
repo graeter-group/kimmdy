@@ -656,6 +656,12 @@ class Topology:
 
         removes bond, angles and dihedrals where atompair was involved.
         Modifies the topology dictionary in place.
+
+
+        Parameters
+        ----------
+        atompair_addresses :
+            Between which atoms to break the bond.
         """
         if type(atompair_addresses[0]) == str and type(atompair_addresses[1]) == str:
             # old style atompair_nrs with only atom numbers
@@ -727,7 +733,9 @@ class Topology:
             m = f"tried to remove bond between already disconnected atoms: {atompair}."
             logging.warning(m)
 
-    def bind_bond(self, atompair_addresses: tuple[str, str]):
+    def bind_bond(
+        self, atompair_addresses: tuple[TopologyAtomAddress, TopologyAtomAddress]
+    ):
         """Add a bond in topology.
 
         Modifies the topology dictionary in place.
@@ -737,10 +745,8 @@ class Topology:
 
         Parameters
         ----------
-        atompair_nrs :
-            A tuple of integers with the atoms ids (id, starting at 1)
-            with `from`, the atom being moved and
-            `to`, the atom to which the `from` atom will be bound
+        atompair_addresses :
+            Atoms to bind together.
         """
         if type(atompair_addresses[0]) == str and type(atompair_addresses[1]) == str:
             # old style atompair_nrs with only atom numbers
