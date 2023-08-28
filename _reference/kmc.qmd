@@ -24,12 +24,12 @@ The result of a KMC step. Similar to a Recipe but for the concrete realization o
 
 #### Attributes
 
-| Name                 | Type                                                                                | Description                                                                                                                 |
-|----------------------|-------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|
-| recipe               | [kimmdy](`kimmdy`).[reaction](`kimmdy.reaction`).[Recipe](`kimmdy.reaction.Recipe`) | Single sequence of RecipeSteps to build product                                                                             |
-| reaction_probability | [Union](`typing.Union`)\[[list](`list`)\[[float](`float`)\], None\]                 | Integral of reaction propensity with respect to time                                                                        |
-| time_delta           | [Union](`typing.Union`)\[[float](`float`), None\]                                   | MC time jump during which the reaction occurs [ps]                                                                          |
-| time_start           | [Union](`typing.Union`)\[[float](`float`), None\]                                   | Time, from which the reaction starts. The reaction changes the geometry/topology of this timestep and continues from there. |
+| Name                 | Type                                                                | Description                                                                                                                 |
+|----------------------|---------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|
+| recipe               | [Recipe](`kimmdy.recipe.Recipe`)                                    | Single sequence of RecipeSteps to build product                                                                             |
+| reaction_probability | [Union](`typing.Union`)\[[list](`list`)\[[float](`float`)\], None\] | Integral of reaction propensity with respect to time                                                                        |
+| time_delta           | [Union](`typing.Union`)\[[float](`float`), None\]                   | MC time jump during which the reaction occurs [ps]                                                                          |
+| time_start           | [Union](`typing.Union`)\[[float](`float`), None\]                   | Time, from which the reaction starts. The reaction changes the geometry/topology of this timestep and continues from there. |
 
 ## Functions
 

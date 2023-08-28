@@ -11,6 +11,18 @@ All read_&lt;...&gt; and write_&lt;...&gt; functions.
 | [GMX_BUILTIN_FF_DIR](#kimmdy.parsing.GMX_BUILTIN_FF_DIR) | Path to gromacs data directory with the built-in forcefields. |
 | [TopologyDict](#kimmdy.parsing.TopologyDict) | A raw representation of a topology file. |
 
+## Classes
+
+| Name | Description |
+| --- | --- |
+| [Plumed_dict](#kimmdy.parsing.Plumed_dict) | Dict representation of a plumed.dat file. |
+
+### Plumed_dict { #kimmdy.parsing.Plumed_dict }
+
+`parsing.Plumed_dict()`
+
+Dict representation of a plumed.dat file.
+
 ## Functions
 
 | Name | Description |

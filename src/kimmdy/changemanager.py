@@ -47,7 +47,7 @@ def modify_coords(
     Parameters
     ----------
     recipe_steps :
-        A list of [](`~kimmdy.reaction.RecipeStep`) where each steps contains a `new_coords`
+        A list of [](`~kimmdy.recipe.RecipeStep`) where each steps contains a `new_coords`
         parameter.
     files :
         Input and output files for this [](`~kimmdy.tasks.Task`).
@@ -152,7 +152,7 @@ def modify_top(
     Parameters
     ----------
     recipe_steps :
-        A list of [](`~kimmdy.reaction.RecipeStep`)s.
+        A list of [](`~kimmdy.recipe.RecipeStep`)s.
         parameter.
     files :
         Input and output files for this [](`~kimmdy.tasks.Task`).
@@ -213,7 +213,7 @@ def modify_plumed(recipe_steps: list[RecipeStep], files: TaskFiles):
     Parameters
     ----------
     recipe_steps :
-        A list of [](`~kimmdy.reaction.RecipeStep`)s.
+        A list of [](`~kimmdy.recipe.RecipeStep`)s.
         parameter.
     """
 

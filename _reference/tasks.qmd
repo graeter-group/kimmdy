@@ -5,6 +5,12 @@
 The tasks module holds the TaskFiles class which organizes input and 
 output paths and the Task class for steps in the runmanager.
 
+## Attributes
+
+| Name | Description |
+| --- | --- |
+| [TaskMapping](#kimmdy.tasks.TaskMapping) | Mapping of task names to functions. |
+
 ## Classes
 
 | Name | Description |
