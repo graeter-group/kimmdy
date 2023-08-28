@@ -295,15 +295,15 @@ def check_gmx_version(config):
         raise SystemError(m)
     # check version for plumed patch if necessary
     if hasattr(config, "mds"):
-        if any(
-            "plumed" in y
-            for y in [
-                config.mds.attr(x).get_attributes() for x in config.mds.get_attributes()
-            ]
-        ) and (not ("MODIFIED" in version or "plumed" in version)):
-            m = "GROMACS version does not contain 'MODIFIED' or 'plumed', aborting due to apparent lack of PLUMED patch."
-            logger.error(m)
-            logger.error("Version was: " + version)
-            if not config.dryrun:
-                raise SystemError(m)
+        for md in config.mds.get_attributes():
+            if config.mds.attr(md).use_plumed:
+                if not ("MODIFIED" in version or "plumed" in version):
+                    m = (
+                        "GROMACS version does not contain 'MODIFIED' or "
+                        "'plumed', aborting due to apparent lack of PLUMED patch."
+                    )
+                    logger.error(m)
+                    logger.error("Version was: " + version)
+                    if not config.dryrun:
+                        raise SystemError(m)
     return version
