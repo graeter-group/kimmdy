@@ -33,7 +33,7 @@ website:
         text: Reference
   sidebar:
     subtitle: "Reactive MD pipeline for GROMACS using Kinetic Monte Carlo / Molecular Dynamic"
-    style: "docked"
+    style: "floating"
     contents:
       - section: Guide
         contents: guide/**
@@ -48,6 +48,7 @@ website:
           - _reference/topology.ff.qmd
           - _reference/topology.utils.qmd
           - _reference/topology.atomic.qmd
+          - _reference/parsing.TopologyDict.qmd
           section: Topology
         - contents:
           - _reference/changemanager.qmd
@@ -81,6 +82,7 @@ format:
   html:
     toc: true
     toc-depth: 5
+    toc-expand: true
     mainfont: Roboto
     number-depth: 0
     theme:
@@ -123,6 +125,7 @@ quartodoc:
         - name: topology.ff
         - name: topology.utils
         - name: topology.atomic
+        - name: parsing.TopologyDict
     - title: Modules
       desc: Modules
       contents:
