@@ -16,7 +16,7 @@ from kimmdy.topology.utils import get_protein_section
 
 ```{python}
 #| eval: true
-ala_top = read_top(Path('../../tests/test_files/test_topology/hexala.top'))
+ala_top = read_top(Path('../../tests/test_files/test_topology/urea.top'), use_gmx_dir=False)
 top = Topology(ala_top)
 
 ls = top_to_graph(top) 
