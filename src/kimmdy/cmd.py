@@ -11,7 +11,7 @@ from pathlib import Path
 import textwrap
 import dill
 from kimmdy.config import Config
-from kimmdy.misc_helper import _build_examples
+from kimmdy.tools import build_examples
 from kimmdy.runmanager import RunManager
 from kimmdy.utils import check_gmx_version, backup_if_existing
 from kimmdy.analysis import concat_traj, plot_energy, radical_population, plot_rates
@@ -501,6 +501,7 @@ def get_build_example_cmdline_args() -> argparse.Namespace:
         "--restore",
         const=True,
         nargs="?",
+        type=str,
         help="Overwrite input files in existing example directories, use keyword 'hard' to also delete output files.",
     )
     return parser.parse_args()
@@ -509,7 +510,7 @@ def get_build_example_cmdline_args() -> argparse.Namespace:
 def entry_point_build_examples():
     """Build examples from the command line."""
     args = get_build_example_cmdline_args()
-    _build_examples(args)
+    build_examples(args.restore)
 
 
 def entry_point_analysis():
@@ -517,20 +518,20 @@ def entry_point_analysis():
     args = get_analysis_cmdline_args()
 
     if args.module == "trjcat":
-        concat_traj(args)
+        concat_traj(args.dir, args.steps)
     elif args.module == "plot_energy":
-        plot_energy(args)
+        plot_energy(args.dir, args.steps, args.terms)
     elif args.module == "radical_population":
-        radical_population(args)
+        radical_population(args.dir, args.radical_population)
     elif args.module == "plot_rates":
-        plot_rates(args)
+        plot_rates(args.dir)
 
 
 def entry_point_remove_hydrogen():
     """Remove hydrogen by atom nr in a gro and topology file"""
     args = get_remove_hydrogen_cmdline_args()
 
-    remove_hydrogen(args)
+    remove_hydrogen(args.gro, args.top, args.nr, args.paremeterize, args.equilibrate)
 
 
 def entry_point_kimmdy():

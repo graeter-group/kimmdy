@@ -70,7 +70,7 @@ def remove_hydrogen(
     nr: str,
     parameterize: bool,
     equilibrate: bool,
-    gmx_mdrun_flags: str,
+    gmx_mdrun_flags: str = ""
 ):
     """remove hydrogen from a gro and top file"""
     gro_path = Path(gro)
