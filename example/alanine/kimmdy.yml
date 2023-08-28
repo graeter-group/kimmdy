@@ -18,7 +18,7 @@ changer:
     md: 'relax'  
     slow_growth: True
   topology:
-    parameterization: 'grappa'
+    parameterization: 'basic'
 reactions:
   hat_naive:
     frequency_factor: 100000000

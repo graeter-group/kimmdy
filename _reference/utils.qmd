@@ -2,6 +2,8 @@
 
 `utils`
 
+Utilities for building plugins, shell convenience functions and GROMACS related functions
+
 ## Attributes
 
 | Name | Description |
@@ -79,7 +81,7 @@ Returns bond parameters (b0, kb, E_dis) for a set of two atomtypes.
 
 ### get_gmx_dir { #kimmdy.utils.get_gmx_dir }
 
-`utils.get_gmx_dir()`
+`utils.get_gmx_dir(gromacs_alias='gmx')`
 
 Returns the path to the gromacs installation
 

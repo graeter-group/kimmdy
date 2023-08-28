@@ -13,9 +13,6 @@ from kimmdy.utils import get_gmx_dir
 
 logger = logging.getLogger(__name__)
 
-GMX_BUILTIN_FF_DIR = get_gmx_dir() / "top"
-"""Path to gromacs data directory with the built-in forcefields."""
-
 
 def check_file_exists(p: Path):
     if not p.exists():
@@ -164,12 +161,18 @@ class Config:
                 assert ffs[0].is_dir(), "Forcefield should be a directory!"
                 ffdir = ffs[0].resolve()
             elif not ffdir.exists():
-                print(ffdir)
-                ffdir = GMX_BUILTIN_FF_DIR / ffdir
+                gmxdir = get_gmx_dir(self.gromacs_alias)
+                if gmxdir is None:
+                    logger.warn(
+                        f"Could not find gromacs data directory for {self.gromacs_alias}"
+                    )
+                    gmxdir = self.cwd
+                gmx_builtin_ffs = gmxdir / "top"
+                ffdir = gmx_builtin_ffs / ffdir
                 if not ffdir.exists():
-                    m = f"Could not find forcefield {ffdir} in cwd or gromacs data directory"
-                    logger.error(m)
-                    raise AssertionError(m)
+                    logger.warn(
+                        f"Could not find forcefield {ffdir} in cwd or gromacs data directory"
+                    )
             self.ff = ffdir
 
             # Validate changer reference
@@ -203,14 +206,17 @@ class Config:
                         f"Task {task} listed in sequence, but not defined!"
                     )
 
-            # Validate dat file only once defined
-            if hasattr(self, "plumed"):
-                if hasattr(self, "md"):
-                    if hasattr(self.md, "plumed"):
+            # Validate plumed defined if requested in md run
+            if hasattr(self, "mds"):
+                needs_plumed = False
+                for attr_name in self.mds.get_attributes():
+                    if hasattr(getattr(self.mds, attr_name), "use_plumed"):
+                        if getattr(getattr(self.mds, attr_name), "use_plumed"):
+                            needs_plumed = True
+                if needs_plumed:
+                    if not hasattr(self, "plumed"):
                         raise AssertionError(
-                            "plumed dat file defined multiple times. When "
-                            "running md and loading existing measurements, "
-                            "only define it once in the md section."
+                            "Plumed requested in md section, but not defined at config root"
                         )
 
             if not hasattr(self, "out"):

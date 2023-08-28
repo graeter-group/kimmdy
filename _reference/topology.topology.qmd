@@ -70,9 +70,9 @@ Furthermore, it modifies to function types in the topology to account for radica
 
 ###### Parameters
 
-| Name           | Type   | Description                                                                                                                                            | Default    |
-|----------------|--------|--------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
-| `atompair_nrs` |        | A tuple of integers with the atoms ids (id, starting at 1) with `from`, the atom being moved and `to`, the atom to which the `from` atom will be bound | _required_ |
+| Name                 | Type                                                                                                                                     | Description             | Default    |
+|----------------------|------------------------------------------------------------------------------------------------------------------------------------------|-------------------------|------------|
+| `atompair_addresses` | [tuple](`tuple`)\[[TopologyAtomAddress](`kimmdy.utils.TopologyAtomAddress`), [TopologyAtomAddress](`kimmdy.utils.TopologyAtomAddress`)\] | Atoms to bind together. | _required_ |
 
 ##### break_bond { #kimmdy.topology.topology.Topology.break_bond }
 
@@ -82,6 +82,12 @@ Break bonds in topology.
 
 removes bond, angles and dihedrals where atompair was involved.
 Modifies the topology dictionary in place.
+
+###### Parameters
+
+| Name                 | Type                                                                                                                                     | Description                            | Default    |
+|----------------------|------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------|------------|
+| `atompair_addresses` | [tuple](`tuple`)\[[TopologyAtomAddress](`kimmdy.utils.TopologyAtomAddress`), [TopologyAtomAddress](`kimmdy.utils.TopologyAtomAddress`)\] | Between which atoms to break the bond. | _required_ |
 
 ##### move_hydrogen { #kimmdy.topology.topology.Topology.move_hydrogen }
 

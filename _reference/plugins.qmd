@@ -1,0 +1,54 @@
+# plugins { #kimmdy.plugins }
+
+`plugins`
+
+Plugin base classes and basic instances thereof.
+
+## Classes
+
+| Name | Description |
+| --- | --- |
+| [BasicParameterizer](#kimmdy.plugins.BasicParameterizer) | reconstruct base force field state |
+| [ReactionPlugin](#kimmdy.plugins.ReactionPlugin) | Reaction base class |
+
+### BasicParameterizer { #kimmdy.plugins.BasicParameterizer }
+
+`plugins.BasicParameterizer()`
+
+reconstruct base force field state
+
+### ReactionPlugin { #kimmdy.plugins.ReactionPlugin }
+
+`plugins.ReactionPlugin(self, name, runmng)`
+
+Reaction base class
+
+#### Parameters
+
+| Name     | Type                       | Description          | Default    |
+|----------|----------------------------|----------------------|------------|
+| `name`   | [str](`str`)               | Name of the reaction | _required_ |
+| `runmng` | [Runmanager](`Runmanager`) | RunManager instance  | _required_ |
+
+#### Methods
+
+| Name | Description |
+| --- | --- |
+| [get_recipe_collection](#kimmdy.plugins.ReactionPlugin.get_recipe_collection) | Get a RecipeCollection as a result of the reaction. |
+
+##### get_recipe_collection { #kimmdy.plugins.ReactionPlugin.get_recipe_collection }
+
+`plugins.ReactionPlugin.get_recipe_collection(self, files)`
+
+Get a RecipeCollection as a result of the reaction.
+
+This is run as a [](`~kimmdy.tasks.Task`) in the RunManager.
+How the RecipeCollection is built is up to the reaction.
+It has access to the current state of the system via the
+runmanager `self.runmng` and the files.
+
+###### Parameters
+
+| Name    | Type                                  | Description        | Default    |
+|---------|---------------------------------------|--------------------|------------|
+| `files` | [TaskFiles](`kimmdy.tasks.TaskFiles`) | TaskFiles instance | _required_ |

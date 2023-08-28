@@ -251,7 +251,7 @@ def morse_transition_rate(
 ## GROMACS related functions
 
 
-def get_gmx_dir() -> Path:
+def get_gmx_dir(gromacs_alias: str = "gmx") -> Optional[Path]:
     """Returns the path to the gromacs installation
 
     This does not check if the installation is valid.
@@ -262,13 +262,21 @@ def get_gmx_dir() -> Path:
 
     # get the stder from calling `gmx` to search for the `Data prefix:`
     # line which contains the path to the gromacs installation
-    r = sp.run(["gmx"], check=False, capture_output=True, text=True)
+    try:
+        r = sp.run([gromacs_alias], check=False, capture_output=True, text=True)
+    except FileNotFoundError as _:
+        logger.warning("GROMACS not found.")
+        return None
 
-    gmx_prefix = "/usr"
+    gmx_prefix = None
     for l in r.stderr.splitlines():
         if l.startswith("Data prefix:"):
-            gmx_prefix = l.split()[2]
+            gmx_prefix = Path(l.split()[2])
             break
+
+    if gmx_prefix is None:
+        logger.warning("GROMACS data directory not found in gromacs message.")
+        return None
 
     gmx_dir = Path(gmx_prefix) / "share" / "gromacs"
     return gmx_dir
@@ -295,15 +303,15 @@ def check_gmx_version(config):
         raise SystemError(m)
     # check version for plumed patch if necessary
     if hasattr(config, "mds"):
-        if any(
-            "plumed" in y
-            for y in [
-                config.mds.attr(x).get_attributes() for x in config.mds.get_attributes()
-            ]
-        ) and (not ("MODIFIED" in version or "plumed" in version)):
-            m = "GROMACS version does not contain 'MODIFIED' or 'plumed', aborting due to apparent lack of PLUMED patch."
-            logger.error(m)
-            logger.error("Version was: " + version)
-            if not config.dryrun:
-                raise SystemError(m)
+        for md in config.mds.get_attributes():
+            if config.mds.attr(md).use_plumed:
+                if not ("MODIFIED" in version or "plumed" in version):
+                    m = (
+                        "GROMACS version does not contain 'MODIFIED' or "
+                        "'plumed', aborting due to apparent lack of PLUMED patch."
+                    )
+                    logger.error(m)
+                    logger.error("Version was: " + version)
+                    if not config.dryrun:
+                        raise SystemError(m)
     return version

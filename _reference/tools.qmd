@@ -1,0 +1,17 @@
+# tools { #kimmdy.tools }
+
+`tools`
+
+Standalone tools that are complementary to KIMMDY.
+
+## Functions
+
+| Name | Description |
+| --- | --- |
+| [remove_hydrogen](#kimmdy.tools.remove_hydrogen) | remove hydrogen from a gro and top file |
+
+### remove_hydrogen { #kimmdy.tools.remove_hydrogen }
+
+`tools.remove_hydrogen(gro, top, nr, parameterize, equilibrate, gmx_mdrun_flags='')`
+
+remove hydrogen from a gro and top file

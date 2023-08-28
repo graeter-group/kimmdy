@@ -88,7 +88,7 @@
       "default": "*.ff"
     },
     "plumed": {
-      "description": ".dat file containing plumed config for starting with reaction",
+      "description": ".dat file containing plumed config",
       "type": "string",
       "pytype": "Path"
     },
@@ -124,9 +124,11 @@
               "pytype": "str",
               "description": "TODO: What is this?"
             },
-            "plumed": {
-              "type": "string",
-              "pytype": "Path"
+            "use_plumed": {
+              "type": "boolean",
+              "pytype": "bool",
+              "default": false,
+              "description": "Whether plumed should be used for this run or not"
             }
           },
           "required": ["mdp"],

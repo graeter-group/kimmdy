@@ -17,9 +17,97 @@ from kimmdy.utils import get_gmx_dir
 
 logger = logging.getLogger(__name__)
 TopologyDict = dict
+"""A raw representation of a topology file.
 
-GMX_BUILTIN_FF_DIR = get_gmx_dir() / "top"
-"""Path to gromacs data directory with the built-in forcefields."""
+Every section, apart from `ffdir` and `define`,
+comes with a condition that can be checked against the
+`define`s by the helper functions to determine if the content
+(a list of lists) should come from `content` or `else_content`.
+Some sections such as `moleculetype` also come with `subsections`.
+
+Examples
+-------
+```python
+raw_top = 
+{'ffdir': PosixPath('/usr/share/gromacs/top/amber99.ff'),
+ 'define': {'_FF_AMBER': [], '_FF_AMBER99': []},
+ 'defaults': {'content': [['1', '2', 'yes', '0.5', '0.8333']],
+  'else_content': [],
+  'extra': [],
+  'condition': None},
+ 'atomtypes': {'content': [
+   ['C', '6', '12.01', '0.0000', 'A', '3.39967e-01', '3.59824e-01'],
+   ['MNH3', '0', '0.0000', '0.0000', 'A', '0.00000e+00', '0.00000e+00']],
+  'else_content': [],
+  'extra': [],
+  'condition': None},
+ 'moleculetype_0': {'content': [['Urea', '3']],
+  'else_content': [],
+  'extra': [],
+  'condition': None,
+  'subsections': {'atoms': {'content': [['1',
+      'C',
+      '1',
+      'URE',
+      'C',
+      '1',
+      '0.880229',
+      '12.01000'],
+     ['2', 'O', '1', 'URE', 'O', '2', '-0.613359', '16.00000'],
+     ['3', 'N', '1', 'URE', 'N1', '3', '-0.923545', '14.01000'],
+     ['4', 'H', '1', 'URE', 'H11', '4', '0.395055', '1.00800'],
+     ['5', 'H', '1', 'URE', 'H12', '5', '0.395055', '1.00800'],
+     ['6', 'N', '1', 'URE', 'N2', '6', '-0.923545', '14.01000'],
+     ['7', 'H', '1', 'URE', 'H21', '7', '0.395055', '1.00800'],
+     ['8', 'H', '1', 'URE', 'H22', '8', '0.395055', '1.00800']],
+    'else_content': [],
+    'extra': [],
+    'condition': None},
+   'bonds': {'content': [['1', '2'],
+     ['1', '3'],
+     ['1', '6'],
+     ['3', '4'],
+     ['3', '5'],
+     ['6', '7'],
+     ['6', '8']],
+    'else_content': [],
+    'extra': [],
+    'condition': None},
+   'dihedrals': {'content': [['2', '1', '3', '4', '9'],
+     ['2', '1', '3', '5', '9'],
+     ['2', '1', '6', '7', '9'],
+     ['2', '1', '6', '8', '9'],
+     ['3', '1', '6', '7', '9'],
+     ['3', '1', '6', '8', '9'],
+     ['6', '1', '3', '4', '9'],
+     ['6', '1', '3', '5', '9'],
+     ['3', '6', '1', '2', '4'],
+     ['1', '4', '3', '5', '4'],
+     ['1', '7', '6', '8', '4']],
+    'else_content': [],
+    'extra': [],
+    'condition': None},
+   'position_restraints': {'content': [['1', '1', '1000', '1000', '1000'],
+     ['2', '1', '1000', '0', '1000'],
+     ['3', '1', '1000', '0', '0']],
+    'else_content': [],
+    'extra': [],
+    'condition': None},
+   'dihedral_restraints': {'content': [['3',
+      '6',
+      '1',
+      '2',
+      '1',
+      '180',
+      '0',
+      '10'],
+     ['1', '4', '3', '5', '1', '180', '0', '10']],
+    'else_content': [],
+    'extra': [],
+    'condition': None}}},
+}
+```
+"""
 
 
 def is_not_comment(c: str) -> bool:
@@ -94,7 +182,9 @@ def read_rtp(path: Path) -> dict:
         return d
 
 
-def resolve_includes(path: Path) -> tuple[list[str], Optional[Path]]:
+def resolve_includes(
+    path: Path, gmx_builtin_ffs: Optional[Path] = None
+) -> tuple[list[str], Optional[Path]]:
     """Resolve #include statements in a (top/itp) file.
 
     Arguments
@@ -118,6 +208,7 @@ def resolve_includes(path: Path) -> tuple[list[str], Optional[Path]]:
     os.chdir(dir)
     ls = []
     ffdir = None
+
     with open(fname, "r") as f:
         for l in f:
             l = "".join(takewhile(is_not_comment, l)).strip()
@@ -131,12 +222,14 @@ def resolve_includes(path: Path) -> tuple[list[str], Optional[Path]]:
                     # e.g. #include "amber99.ff/forcefield.itp"
                     ffdir = include_path.parent
                     # test if the path is in the cwd, otherwise search in gmx ff dir
-                    if not ffdir.exists():
-                        ffdir = GMX_BUILTIN_FF_DIR / ffdir
+                    if not ffdir.exists() and gmx_builtin_ffs is not None:
+                        ffdir = gmx_builtin_ffs / ffdir
                     ffdir = ffdir.resolve()
-                ls_prime, _ = resolve_includes(include_path)
-                if not ls_prime:
-                    ls_prime, _ = resolve_includes(GMX_BUILTIN_FF_DIR / include_path)
+                ls_prime, _ = resolve_includes(include_path, gmx_builtin_ffs)
+                if not ls_prime and gmx_builtin_ffs is not None:
+                    ls_prime, _ = resolve_includes(
+                        gmx_builtin_ffs / include_path, gmx_builtin_ffs
+                    )
                 if not ls_prime:
                     logger.warning(
                         f"top include {include_path} could not be resolved. Line was dropped."
@@ -149,7 +242,9 @@ def resolve_includes(path: Path) -> tuple[list[str], Optional[Path]]:
     return (ls, ffdir)
 
 
-def read_top(path: Path, ffdir: Optional[Path] = None) -> TopologyDict:
+def read_top(
+    path: Path, ffdir: Optional[Path] = None, use_gmx_dir: bool = True
+) -> TopologyDict:
     """Read a topology file into a raw TopologyDict represenation.
 
     Parameters
@@ -198,7 +293,12 @@ def read_top(path: Path, ffdir: Optional[Path] = None) -> TopologyDict:
         "orientation_restraints",
     )
 
-    ls, parsed_ffdir = resolve_includes(path)
+    gmx_builtin_ffs = None
+    if use_gmx_dir:
+        gmxdir = get_gmx_dir()
+        if gmxdir is not None:
+            gmx_builtin_ffs = gmxdir / "top"
+    ls, parsed_ffdir = resolve_includes(path, gmx_builtin_ffs)
     if ffdir is None and parsed_ffdir is not None:
         ffdir = parsed_ffdir
     if ffdir is None:
@@ -374,6 +474,8 @@ def read_edissoc(path: Path) -> dict:
 
 
 class Plumed_dict(TypedDict):
+    """Dict representation of a plumed.dat file."""
+
     distances: list[dict]
     prints: list[dict]
 
