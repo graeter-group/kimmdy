@@ -25,3 +25,6 @@ clear-docs:
 	rm -rf _reference
 	rm -f ./objects.json
 	rm -f _sidebar.yml
+
+format:
+	black src tests plugins
