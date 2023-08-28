@@ -21,7 +21,7 @@ jobs:
           python -m pip install -r requirements.txt
       - name: Build docs
         run: |
-          make setup-docs
+          make docs
       # TODO: uncomment when public (necessary for gh pages)
       # - uses: peaceiris/actions-gh-pages@v3
       #   with:
