@@ -67,7 +67,7 @@ class Place(RecipeStep):
     def ix_to_place(self, value: Optional[int]):
         if isinstance(value, property):
             return
-        assert isinstance(value,int), f"ix_to_place is {type(value)}, should be int."
+        assert isinstance(value, int), f"ix_to_place is {type(value)}, should be int."
         self._ix_to_place = value
 
     @property
@@ -80,7 +80,7 @@ class Place(RecipeStep):
     def id_to_place(self, value: Optional[str]):
         if isinstance(value, property):
             return
-        assert isinstance(value,int), f"id_to_place is {type(value)}, should be str."
+        assert isinstance(value, str), f"id_to_place is {type(value)}, should be str."
         self._ix_to_place = int(value) - 1
 
 
@@ -139,7 +139,7 @@ class BondOperation(RecipeStep):
     def atom_id_1(self, value: str):
         if isinstance(value, property):
             return
-        assert isinstance(value,str), f"atom_id_1 is {type(value)}, should be str."
+        assert isinstance(value, str), f"atom_id_1 is {type(value)}, should be str."
         self._atom_ix_1 = int(value) - 1
 
     @property
@@ -150,7 +150,7 @@ class BondOperation(RecipeStep):
     def atom_ix_1(self, value: int):
         if isinstance(value, property):
             return
-        assert isinstance(value,int), f"atom_ix_1 is {type(value)}, should be int."
+        assert isinstance(value, int), f"atom_ix_1 is {type(value)}, should be int."
         self._atom_ix_1 = value
 
     @property
@@ -163,7 +163,7 @@ class BondOperation(RecipeStep):
     def atom_id_2(self, value: str):
         if isinstance(value, property):
             return
-        assert isinstance(value,str), f"atom_id_2 is {type(value)}, should be str."
+        assert isinstance(value, str), f"atom_id_2 is {type(value)}, should be str."
         self._atom_ix_2 = int(value) - 1
 
     @property
@@ -174,7 +174,7 @@ class BondOperation(RecipeStep):
     def atom_ix_2(self, value: int):
         if isinstance(value, property):
             return
-        assert isinstance(value,int), f"atom_ix_2 is {type(value)}, should be int."
+        assert isinstance(value, int), f"atom_ix_2 is {type(value)}, should be int."
         self._atom_ix_2 = value
 
 

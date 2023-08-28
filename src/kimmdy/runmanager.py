@@ -501,7 +501,13 @@ class RunManager:
             if isinstance(step, Break):
                 self.top.break_bond((step.atom_id_1, step.atom_id_2))
                 if hasattr(self.config, "plumed"):
-                    break_bond_plumed(files, (step.atom_id_1, step.atom_id_2))
+                    break_bond_plumed(
+                        files,
+                        (step.atom_id_1, step.atom_id_2),
+                        self.config.plumed.with_stem(
+                            self.config.plumed.stem + "_mod"
+                        ).name,
+                    )
             elif isinstance(step, Bind):
                 self.top.bind_bond((step.atom_id_1, step.atom_id_2))
             elif isinstance(step, Place):

@@ -4,9 +4,10 @@ import logging
 from typing import Optional, Union
 from copy import deepcopy
 import MDAnalysis as mda
+from pathlib import Path
 
 from kimmdy.tasks import TaskFiles
-from kimmdy.parsing import read_plumed
+from kimmdy.parsing import read_plumed, write_plumed
 from kimmdy.recipe import Place
 from kimmdy.topology.topology import MoleculeType, Topology
 from kimmdy.topology.ff import FF
@@ -31,14 +32,13 @@ logger = logging.getLogger(__name__)
 
 ## coordinates
 def place_atom(files: TaskFiles, step: Place, timespan: list[tuple[float, float]]):
-    """Place an atom to new coords at the last time point of the recipe timespans
-    """
+    """Place an atom to new coords at the last time point of the recipe timespans"""
     trr = files.input["trr"]
     tpr = files.input["tpr"]
 
     # if place_atom is called multiple times in one _apply_recipe task
     if "trr" in files.output.keys():
-        files.output["trr"]
+        trr = files.output["trr"]
 
     u = mda.Universe(str(tpr), str(trr), topology_format="tpr", format="trr")
 
@@ -460,7 +460,9 @@ def merge_top_slow_growth(
 ## plumed
 
 
-def break_bond_plumed(files: TaskFiles, breakpair: tuple[str, str]):
+def break_bond_plumed(
+    files: TaskFiles, breakpair: tuple[str, str], newplumed: Path
+) -> None:
     """Break bond in plumed configuration file.
 
     Parameters
@@ -470,8 +472,13 @@ def break_bond_plumed(files: TaskFiles, breakpair: tuple[str, str]):
     breakpair:
     """
 
-    plumeddat = read_plumed(files.input["plumed"])
-    files.output["plumed"] = files.outputdir / files.input["plumed"].name
+    plumed_path = files.input["plumed"]
+    # if break_bond_plumed is called multiple times in one _apply_recipe task
+    if "plumed" in files.output.keys():
+        plumed_path = files.output["trr"]
+    plumeddat = read_plumed(plumed_path)
+
+    files.output["plumed"] = newplumed
 
     logger.info(
         f"Reading: {files.input['plumed']} and writing modified plumed input to "
@@ -492,4 +499,4 @@ def break_bond_plumed(files: TaskFiles, breakpair: tuple[str, str]):
         line["ARG"] = [id for id in line["ARG"] if not id in broken_distances]
         line["FILE"] = files.input["plumed_out"]
 
-    return plumeddat
+    write_plumed(plumeddat, newplumed)

@@ -1,11 +1,40 @@
-from kimmdy.parsing import read_top, write_top
+import pytest
+import shutil
+from pathlib import Path
+import os
+import MDAnalysis as mda
+
+from kimmdy.recipe import Break, Bind, Place, Relax, RecipeStep
+from kimmdy.parsing import read_plumed, read_top, read_top
+from kimmdy.plugins import BasicParameterizer
+from conftest import SlimFiles
+from kimmdy.tasks import TaskFiles
 from kimmdy.topology.topology import Topology
 from kimmdy.topology.atomic import Bond
-from kimmdy.coordinates import merge_top_slow_growth, get_explicit_or_type
+from kimmdy.coordinates import (
+    merge_top_slow_growth,
+    get_explicit_or_type,
+    place_atom,
+    break_bond_plumed,
+)
 
 
-import pytest
-from pathlib import Path
+@pytest.fixture
+def tmpdir(tmp_path) -> Path:
+    dirname = "test_coordinates"
+    try:
+        filedir = Path(__file__).parent / "test_files" / dirname
+        assetsdir = Path(__file__).parent / "test_files" / "assets"
+    except NameError:
+        filedir = Path("./tests/test_files") / dirname
+        assetsdir = Path("./tests/test_files") / "assets"
+    test_dir = tmp_path / dirname
+    shutil.copytree(filedir, test_dir)
+
+    return test_dir
+
+
+## test coordinate changes
 
 
 @pytest.fixture(scope="module")
@@ -66,6 +95,57 @@ def test_get_bondobj(coordinates_files):
     ) == pytest.approx(282001.6)
 
 
+def test_place_atom(tmpdir):
+    files = TaskFiles(
+        get_latest=lambda: f"DummyCallable",
+    )
+    files.input = {
+        "tpr": tmpdir / "pull.tpr",
+        "trr": tmpdir / "pull.trr",
+    }
+    files.outputdir = tmpdir
+
+    step = Place(id_to_place="1", new_coords=(0, 0, 0))
+    timespan = [(0.0, 100.0)]
+
+    place_atom(files, step, timespan)
+
+    assert files.output["trr"].exists()
+    assert files.output["gro"].exists()
+
+    u = mda.Universe(str(files.output["gro"]))
+    coords = tuple(u.select_atoms(f"id {step.id_to_place}")[0].position)
+    assert coords == step.new_coords
+    print(coords)
+
+
+## test plumed changes
+
+
+def test_plumed_break(tmpdir):
+    files = TaskFiles(
+        get_latest=lambda: f"DummyCallable",
+    )
+    files.input = {
+        "plumed": tmpdir / "plumed_nat.dat",
+        "plumed_out": Path("distances.dat"),
+    }
+    files.outputdir = tmpdir
+    recipe_steps = [Break(28, 34)]
+    breakpair = (recipe_steps[0].atom_id_1, recipe_steps[0].atom_id_2)
+
+    break_bond_plumed(files, breakpair, Path("plumed_mod.dat"))
+
+    plumed_nat = read_plumed(files.input["plumed"])
+    plumed_break_ref = read_plumed(tmpdir / "plumed_break29-35.dat")
+    plumed_break_test = read_plumed(files.output["plumed"])
+
+    assert plumed_break_test["distances"] == plumed_break_ref["distances"]
+    assert plumed_break_test["prints"] == plumed_break_ref["prints"]
+    assert len(plumed_break_test["distances"]) == len(plumed_nat["distances"]) - 1
+
+
+## test topology changes
 def test_merge_prm_top(coordinates_files):
     """this tests a topology merge for a HAT reaction from a Ca (nr 19) radical to a N (nr 26) radical"""
     topmerge = merge_top_slow_growth(

@@ -50,7 +50,6 @@ website:
           - _reference/topology.atomic.qmd
           section: Topology
         - contents:
-          - _reference/changemanager.qmd
           - _reference/constants.qmd
           - _reference/coordinates.qmd
           - _reference/config.qmd
@@ -124,7 +123,6 @@ quartodoc:
     - title: Modules
       desc: Modules
       contents:
-        - name: changemanager
         - name: constants
         - name: coordinates
         - name: config
