@@ -1,5 +1,5 @@
 from hypothesis import given, strategies as st
-from kimmdy.reaction import *
+from kimmdy.recipe import *
 import csv
 import pytest
 from dataclasses import asdict

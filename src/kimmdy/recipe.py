@@ -1,17 +1,12 @@
-"""
-ReactionPlugin protocoll and reaction recipes.
+"""Reaction recipes.
 """
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional
+from typing import Optional
 
-if TYPE_CHECKING:
-    from kimmdy.runmanager import RunManager
-    from kimmdy.config import Config
-from abc import ABC, abstractmethod
+from abc import ABC
 from dataclasses import dataclass, field, InitVar
-from kimmdy.tasks import TaskFiles
-import logging
 from pathlib import Path
+import logging
 import dill
 import csv
 
@@ -547,39 +542,3 @@ class RecipeCollection:
         plt.legend(by_label.values(), by_label.keys())
 
         plt.savefig(outfile)
-
-
-class ReactionPlugin(ABC):
-    """Reaction base class
-
-    Parameters
-    ----------
-    name : str
-        Name of the reaction
-    runmng : Runmanager
-        RunManager instance
-    """
-
-    def __init__(self, name: str, runmng: RunManager):
-        self.name = name
-        self.runmng = runmng
-        # sub config, settings of this specific reaction:
-        self.config: Config = self.runmng.config.reactions.__getattribute__(self.name)
-
-        logger.debug(f"Reaction {self.name} instatiated.")
-
-    @abstractmethod
-    def get_recipe_collection(self, files: TaskFiles) -> RecipeCollection:
-        """Get a RecipeCollection as a result of the reaction.
-
-        This is run as a [](`~kimmdy.tasks.Task`) in the RunManager.
-        How the RecipeCollection is built is up to the reaction.
-        It has access to the current state of the system via the
-        runmanager `self.runmng` and the files.
-
-        Parameters
-        ----------
-        files :
-            TaskFiles instance
-        """
-        pass

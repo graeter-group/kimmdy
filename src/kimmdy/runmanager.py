@@ -15,8 +15,8 @@ from typing import Callable, Union
 from kimmdy.config import Config
 from kimmdy.utils import backup_if_existing
 from kimmdy.parsing import read_top, write_json, read_plumed
-from kimmdy.reaction import ReactionPlugin, RecipeCollection, Recipe
-from kimmdy.parameterize import BasicParameterizer
+from kimmdy.recipe import RecipeCollection, Recipe
+from kimmdy.plugins import ReactionPlugin, BasicParameterizer
 import kimmdy.changemanager as changer
 from kimmdy.tasks import Task, TaskFiles, TaskMapping
 from kimmdy.utils import run_shell_cmd, run_gmx

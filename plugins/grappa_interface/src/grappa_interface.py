@@ -6,7 +6,7 @@ from typing import Union
 from kimmdy.topology.topology import Topology
 from kimmdy.topology.atomic import Bond, Angle, Dihedral, MultipleDihedrals
 from kimmdy.topology.utils import get_by_permutations
-from kimmdy.parameterize import Parameterizer
+from kimmdy.plugins import Parameterizer
 from kimmdy.parsing import write_json
 
 import grappa.ff
