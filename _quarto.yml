@@ -51,7 +51,6 @@ website:
           - _reference/parsing.TopologyDict.qmd
           section: Topology
         - contents:
-          - _reference/changemanager.qmd
           - _reference/constants.qmd
           - _reference/coordinates.qmd
           - _reference/config.qmd
@@ -130,7 +129,6 @@ quartodoc:
       desc: Modules
       contents:
         - name: analysis
-        - name: changemanager
         - name: cmd
         - name: config
         - name: constants

@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.176">
+<meta name="generator" content="quarto-1.3.290">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -50,11 +50,6 @@ ul.task-list li input[type="checkbox"] {
   "panel-placement": "end",
   "type": "overlay",
   "limit": 20,
-  "keyboard-shortcut": [
-    "f",
-    "/",
-    "s"
-  ],
   "language": {
     "search-no-results-text": "No results",
     "search-matching-documents-text": "matching documents",
@@ -64,8 +59,7 @@ ul.task-list li input[type="checkbox"] {
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
     "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit",
-    "search-label": "Search"
+    "search-submit-button-title": "Submit"
   }
 }</script>
 
@@ -78,7 +72,7 @@ ul.task-list li input[type="checkbox"] {
   <header id="quarto-header" class="headroom fixed-top">
     <nav class="navbar navbar-expand-lg navbar-dark ">
       <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container mx-auto">
+      <div class="navbar-brand-container">
     <a class="navbar-brand" href="../index.html">
     <span class="navbar-title">KIMMDY</span>
     </a>
@@ -102,18 +96,17 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">Reference</span></a>
   </li>  
 </ul>
-          </div> <!-- /navcollapse -->
-          <div class="quarto-navbar-tools tools-wide">
+            <div class="quarto-navbar-tools ms-auto tools-wide">
     <div class="dropdown">
       <a href="" title="" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" aria-label=""><i class="bi bi-github"></i></a>
       <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="quarto-navigation-tool-dropdown-0">
           <li>
-            <a class="dropdown-item quarto-navbar-tools-item" href="https://github.com/hits-mbm-dev/kimmdy">
+            <a class="dropdown-item quarto-navbar-tools ms-auto-item" href="https://github.com/hits-mbm-dev/kimmdy">
             Source Code
             </a>
           </li>
           <li>
-            <a class="dropdown-item quarto-navbar-tools-item" href="https://github.com/hits-mbm-dev/kimmdy/issues/new">
+            <a class="dropdown-item quarto-navbar-tools ms-auto-item" href="https://github.com/hits-mbm-dev/kimmdy/issues/new">
             Report a Bug
             </a>
           </li>
@@ -126,6 +119,7 @@ ul.task-list li input[type="checkbox"] {
   </div>
 </a>
 </div>
+          </div> <!-- /navcollapse -->
       </div> <!-- /container-fluid -->
     </nav>
   <nav class="quarto-secondary-nav">
@@ -133,9 +127,9 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../_reference/index.html">Reference</a></li><li class="breadcrumb-item"><a href="../_reference/changemanager.html">Modules</a></li><li class="breadcrumb-item"><a href="../_reference/coordinates.html">coordinates</a></li></ol></nav>
-        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
-        </a>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../_reference/index.html">Reference</a></li><li class="breadcrumb-item"><a href="../_reference/constants.html">constants</a></li><li class="breadcrumb-item"><a href="../_reference/coordinates.html">coordinates</a></li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
     </div>
   </nav>
 </header>
@@ -292,12 +286,6 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/changemanager.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">changemanager</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="../_reference/constants.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">constants</span></a>
   </div>
@@ -415,12 +403,17 @@ ul.task-list li input[type="checkbox"] {
   <ul>
   <li><a href="#functions" id="toc-functions" class="nav-link" data-scroll-target="#functions">Functions</a>
   <ul>
+  <li><a href="#kimmdy.coordinates.break_bond_plumed" id="toc-kimmdy.coordinates.break_bond_plumed" class="nav-link" data-scroll-target="#kimmdy.coordinates.break_bond_plumed">break_bond_plumed</a>
+  <ul class="collapse">
+  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
+  </ul></li>
   <li><a href="#kimmdy.coordinates.get_explicit_MultipleDihedrals" id="toc-kimmdy.coordinates.get_explicit_MultipleDihedrals" class="nav-link" data-scroll-target="#kimmdy.coordinates.get_explicit_MultipleDihedrals">get_explicit_MultipleDihedrals</a></li>
   <li><a href="#kimmdy.coordinates.get_explicit_or_type" id="toc-kimmdy.coordinates.get_explicit_or_type" class="nav-link" data-scroll-target="#kimmdy.coordinates.get_explicit_or_type">get_explicit_or_type</a></li>
   <li><a href="#kimmdy.coordinates.is_parameterized" id="toc-kimmdy.coordinates.is_parameterized" class="nav-link" data-scroll-target="#kimmdy.coordinates.is_parameterized">is_parameterized</a></li>
   <li><a href="#kimmdy.coordinates.merge_dihedrals" id="toc-kimmdy.coordinates.merge_dihedrals" class="nav-link" data-scroll-target="#kimmdy.coordinates.merge_dihedrals">merge_dihedrals</a></li>
-  <li><a href="#kimmdy.coordinates.merge_top_moleculetypes_parameter_growth" id="toc-kimmdy.coordinates.merge_top_moleculetypes_parameter_growth" class="nav-link" data-scroll-target="#kimmdy.coordinates.merge_top_moleculetypes_parameter_growth">merge_top_moleculetypes_parameter_growth</a></li>
-  <li><a href="#kimmdy.coordinates.merge_top_parameter_growth" id="toc-kimmdy.coordinates.merge_top_parameter_growth" class="nav-link" data-scroll-target="#kimmdy.coordinates.merge_top_parameter_growth">merge_top_parameter_growth</a></li>
+  <li><a href="#kimmdy.coordinates.merge_top_moleculetypes_slow_growth" id="toc-kimmdy.coordinates.merge_top_moleculetypes_slow_growth" class="nav-link" data-scroll-target="#kimmdy.coordinates.merge_top_moleculetypes_slow_growth">merge_top_moleculetypes_slow_growth</a></li>
+  <li><a href="#kimmdy.coordinates.merge_top_slow_growth" id="toc-kimmdy.coordinates.merge_top_slow_growth" class="nav-link" data-scroll-target="#kimmdy.coordinates.merge_top_slow_growth">merge_top_slow_growth</a></li>
+  <li><a href="#kimmdy.coordinates.place_atom" id="toc-kimmdy.coordinates.place_atom" class="nav-link" data-scroll-target="#kimmdy.coordinates.place_atom">place_atom</a></li>
   </ul></li>
   </ul></li>
   </ul>
@@ -434,6 +427,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="kimmdy.coordinates" class="level1">
 <h1>coordinates</h1>
 <p><code>coordinates</code></p>
+<p>coordinate, topology and plumed modification functions</p>
 <section id="functions" class="level2">
 <h2 class="anchored" data-anchor-id="functions">Functions</h2>
 <table class="table">
@@ -445,31 +439,66 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
+<td><a href="#kimmdy.coordinates.break_bond_plumed">break_bond_plumed</a></td>
+<td>Break bond in plumed configuration file.</td>
+</tr>
+<tr class="even">
 <td><a href="#kimmdy.coordinates.get_explicit_MultipleDihedrals">get_explicit_MultipleDihedrals</a></td>
 <td>Takes a valid dihedral key and returns explicit</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#kimmdy.coordinates.get_explicit_or_type">get_explicit_or_type</a></td>
 <td>Takes an Interaction and associated key, InteractionTypes, Topology</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#kimmdy.coordinates.is_parameterized">is_parameterized</a></td>
 <td>Parameterized topology entries have c0 and c1 attributes != None</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#kimmdy.coordinates.merge_dihedrals">merge_dihedrals</a></td>
 <td>Merge one to two Dihedrals or -Types into a Dihedral in free-energy syntax</td>
 </tr>
-<tr class="odd">
-<td><a href="#kimmdy.coordinates.merge_top_moleculetypes_parameter_growth">merge_top_moleculetypes_parameter_growth</a></td>
+<tr class="even">
+<td><a href="#kimmdy.coordinates.merge_top_moleculetypes_slow_growth">merge_top_moleculetypes_slow_growth</a></td>
 <td>Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation</td>
 </tr>
-<tr class="even">
-<td><a href="#kimmdy.coordinates.merge_top_parameter_growth">merge_top_parameter_growth</a></td>
+<tr class="odd">
+<td><a href="#kimmdy.coordinates.merge_top_slow_growth">merge_top_slow_growth</a></td>
 <td>Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation.</td>
+</tr>
+<tr class="even">
+<td><a href="#kimmdy.coordinates.place_atom">place_atom</a></td>
+<td>Place an atom to new coords at the last time point of the recipe timespans</td>
 </tr>
 </tbody>
 </table>
+<section id="kimmdy.coordinates.break_bond_plumed" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.coordinates.break_bond_plumed">break_bond_plumed</h3>
+<p><code>coordinates.break_bond_plumed(files, breakpair, newplumed)</code></p>
+<p>Break bond in plumed configuration file.</p>
+<section id="parameters" class="level4">
+<h4 class="anchored" data-anchor-id="parameters">Parameters</h4>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>files</code></td>
+<td><a href="../_reference/tasks.html#kimmdy.tasks.TaskFiles">TaskFiles</a></td>
+<td></td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+<p>breakpair:</p>
+</section>
+</section>
 <section id="kimmdy.coordinates.get_explicit_MultipleDihedrals" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.coordinates.get_explicit_MultipleDihedrals">get_explicit_MultipleDihedrals</h3>
 <p><code>coordinates.get_explicit_MultipleDihedrals(dihedral_key, mol, dihedrals_in, ff, periodicity_max=6)</code></p>
@@ -490,16 +519,21 @@ ul.task-list li input[type="checkbox"] {
 <p><code>coordinates.merge_dihedrals(dihedral_key, interactionA, interactionB, interaction_typesA, interaction_typesB, molA, molB, funct, periodicity)</code></p>
 <p>Merge one to two Dihedrals or -Types into a Dihedral in free-energy syntax</p>
 </section>
-<section id="kimmdy.coordinates.merge_top_moleculetypes_parameter_growth" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.coordinates.merge_top_moleculetypes_parameter_growth">merge_top_moleculetypes_parameter_growth</h3>
-<p><code>coordinates.merge_top_moleculetypes_parameter_growth(molA, molB, ff, focus_nr=None)</code></p>
+<section id="kimmdy.coordinates.merge_top_moleculetypes_slow_growth" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.coordinates.merge_top_moleculetypes_slow_growth">merge_top_moleculetypes_slow_growth</h3>
+<p><code>coordinates.merge_top_moleculetypes_slow_growth(molA, molB, ff, focus_nr=None)</code></p>
 <p>Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation</p>
 </section>
-<section id="kimmdy.coordinates.merge_top_parameter_growth" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.coordinates.merge_top_parameter_growth">merge_top_parameter_growth</h3>
-<p><code>coordinates.merge_top_parameter_growth(topA, topB, focus_nr=None)</code></p>
+<section id="kimmdy.coordinates.merge_top_slow_growth" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.coordinates.merge_top_slow_growth">merge_top_slow_growth</h3>
+<p><code>coordinates.merge_top_slow_growth(topA, topB, focus_nr=None)</code></p>
 <p>Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation.</p>
 <p>TODO: for now this assumes that only one moleculeype (the first, index 0) is of interest.</p>
+</section>
+<section id="kimmdy.coordinates.place_atom" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.coordinates.place_atom">place_atom</h3>
+<p><code>coordinates.place_atom(files, step, timespan)</code></p>
+<p>Place an atom to new coords at the last time point of the recipe timespans</p>
 
 
 </section>
@@ -548,33 +582,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       } else {
         el.classList.add('notransition');
       }
-    }
-  }
-  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
-    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
-    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
-    let newTheme = '';
-    if(darkModeDefault) {
-      newTheme = isAlternate ? baseTheme : alternateTheme;
-    } else {
-      newTheme = isAlternate ? alternateTheme : baseTheme;
-    }
-    const changeGiscusTheme = () => {
-      // From: https://github.com/giscus/giscus/issues/336
-      const sendMessage = (message) => {
-        const iframe = document.querySelector('iframe.giscus-frame');
-        if (!iframe) return;
-        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
-      }
-      sendMessage({
-        setConfig: {
-          theme: newTheme
-        }
-      });
-    }
-    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
-    if (isGiscussLoaded) {
-      changeGiscusTheme();
     }
   }
   const toggleColorMode = (alternate) => {
@@ -643,15 +650,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       return localAlternateSentinel;
     }
   }
-  const darkModeDefault = false;
-  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+  let localAlternateSentinel = 'default';
   // Dark / light mode switch
   window.quartoToggleColorScheme = () => {
     // Read the current dark / light value 
     let toAlternate = !hasAlternateSentinel();
     toggleColorMode(toAlternate);
     setStyleSentinel(toAlternate);
-    toggleGiscusIfUsed(toAlternate, darkModeDefault);
   };
   // Ensure there is a toggle, if there isn't float one in the top right
   if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
@@ -730,9 +735,10 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     // clear code selection
     e.clearSelection();
   });
-  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+  function tippyHover(el, contentFn) {
     const config = {
       allowHTML: true,
+      content: contentFn,
       maxWidth: 500,
       delay: 100,
       arrow: false,
@@ -742,17 +748,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       interactive: true,
       interactiveBorder: 10,
       theme: 'quarto',
-      placement: 'bottom-start',
+      placement: 'bottom-start'
     };
-    if (contentFn) {
-      config.content = contentFn;
-    }
-    if (onTriggerFn) {
-      config.onTrigger = onTriggerFn;
-    }
-    if (onUntriggerFn) {
-      config.onUntrigger = onUntriggerFn;
-    }
     window.tippy(el, config); 
   }
   const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
@@ -765,60 +762,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
       return note.innerHTML;
-    });
-  }
-  const xrefs = window.document.querySelectorAll('a.quarto-xref');
-  const processXRef = (id, note) => {
-    if (id.startsWith('sec-')) {
-      // Special case sections, only their first couple elements
-      const container = document.createElement("div");
-      if (note.children && note.children.length > 2) {
-        for (let i = 0; i < 2; i++) {
-          container.appendChild(note.children[i].cloneNode(true));
-        }
-        return container.innerHTML
-      } else {
-        return note.innerHTML;
-      }
-    } else {
-      return note.innerHTML;
-    }
-  }
-  for (var i=0; i<xrefs.length; i++) {
-    const xref = xrefs[i];
-    tippyHover(xref, undefined, function(instance) {
-      instance.disable();
-      let url = xref.getAttribute('href');
-      let hash = undefined; 
-      try { hash = new URL(url).hash; } catch {}
-      const id = hash.replace(/^#\/?/, "");
-      const note = window.document.getElementById(id);
-      if (note !== null) {
-        try {
-          const html = processXRef(id, note);
-          instance.setContent(html);
-        } finally {
-          instance.enable();
-          instance.show();
-        }
-      } else {
-        // See if we can fetch this
-        fetch(url.split('#')[0])
-        .then(res => res.text())
-        .then(html => {
-          const parser = new DOMParser();
-          const htmlDoc = parser.parseFromString(html, "text/html");
-          const note = htmlDoc.getElementById(id);
-          if (note !== null) {
-            const html = processXRef(id, note);
-            instance.setContent(html);
-          } 
-        }).finally(() => {
-          instance.enable();
-          instance.show();
-        });
-      }
-    }, function(instance) {
     });
   }
       let selectedAnnoteEl;
@@ -862,7 +805,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             }
             div.style.top = top - 2 + "px";
             div.style.height = height + 4 + "px";
-            div.style.left = 0;
             let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
             if (gutterDiv === null) {
               gutterDiv = window.document.createElement("div");
@@ -960,7 +902,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   </div>
 </nav>
 </div> <!-- /content -->
-
 
 
 

@@ -1,6 +1,6 @@
 import pytest
 from numpy.random import default_rng
-from kimmdy.recipe import Recipe, RecipeCollection, Break, Bind, Move
+from kimmdy.recipe import Recipe, RecipeCollection, Break, Bind, Place, Relax
 from kimmdy.kmc import rf_kmc, frm, KMCResult
 
 
@@ -9,8 +9,12 @@ def recipe_collection():
     rps: list[Recipe] = [
         Recipe([Break(1, 2)], rates=[0.0], timespans=[(0.0, 1.0)]),
         Recipe([Bind(2, 3)], rates=[0.12, 0.0], timespans=[(0.0, 6.0), (6.0, 10.0)]),
-        Recipe([Move(3, 4, 5)], rates=[0.15, 0.06], timespans=[(2.0, 4.0), (4.0, 8.0)]),
-        Recipe([Move(4, 5, 6)], rates=[1.0], timespans=[(0.0, 0.0)]),
+        Recipe(
+            [Break(3, 4), Bind(4, 5)],
+            rates=[0.15, 0.06],
+            timespans=[(2.0, 4.0), (4.0, 8.0)],
+        ),
+        Recipe([Break(4, 5), Bind(5, 6)], rates=[1.0], timespans=[(0.0, 0.0)]),
     ]
     return RecipeCollection(rps)
 

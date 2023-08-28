@@ -54,7 +54,6 @@ Assumptions:
 | --- | --- |
 | [bind_bond](#kimmdy.topology.topology.Topology.bind_bond) | Add a bond in topology. |
 | [break_bond](#kimmdy.topology.topology.Topology.break_bond) | Break bonds in topology. |
-| [move_hydrogen](#kimmdy.topology.topology.Topology.move_hydrogen) | Move a singly bound atom to a new location. |
 | [reindex_atomnrs](#kimmdy.topology.topology.Topology.reindex_atomnrs) | Reindex atom numbers in topology. |
 
 ##### bind_bond { #kimmdy.topology.topology.Topology.bind_bond }
@@ -88,14 +87,6 @@ Modifies the topology dictionary in place.
 | Name                 | Type                                                                                                                                     | Description                            | Default    |
 |----------------------|------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------|------------|
 | `atompair_addresses` | [tuple](`tuple`)\[[TopologyAtomAddress](`kimmdy.utils.TopologyAtomAddress`), [TopologyAtomAddress](`kimmdy.utils.TopologyAtomAddress`)\] | Between which atoms to break the bond. | _required_ |
-
-##### move_hydrogen { #kimmdy.topology.topology.Topology.move_hydrogen }
-
-`topology.topology.Topology.move_hydrogen(self, from_to)`
-
-Move a singly bound atom to a new location.
-
-This is typically H for Hydrogen Atom Transfer (HAT).
 
 ##### reindex_atomnrs { #kimmdy.topology.topology.Topology.reindex_atomnrs }
 

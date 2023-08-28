@@ -14,10 +14,10 @@ from enum import Enum, auto
 from typing import Callable, Union
 from kimmdy.config import Config
 from kimmdy.utils import backup_if_existing
-from kimmdy.parsing import read_top, write_json, read_plumed
-from kimmdy.recipe import RecipeCollection, Recipe
+from kimmdy.parsing import read_top, write_json, read_plumed, write_top
+from kimmdy.recipe import RecipeCollection, Recipe, Break, Bind, Place, Relax
 from kimmdy.plugins import ReactionPlugin, BasicParameterizer
-import kimmdy.changemanager as changer
+from kimmdy.coordinates import place_atom, break_bond_plumed, merge_top_slow_growth
 from kimmdy.tasks import Task, TaskFiles, TaskMapping
 from kimmdy.utils import run_shell_cmd, run_gmx
 from pprint import pformat
@@ -161,7 +161,7 @@ class RunManager:
             "reactions": [
                 {"f": self._place_reaction_tasks},
                 {"f": self._decide_recipe, "kwargs": {"decision_strategy": rf_kmc}},
-                {"f": self._run_recipe, "out": "run_recipe"},
+                {"f": self._apply_recipe, "out": "run_recipe"},
             ],
         }
 
@@ -482,59 +482,62 @@ class RunManager:
         )
         return
 
-    def _run_recipe(self, files) -> TaskFiles:
+    def _apply_recipe(self, files: TaskFiles) -> TaskFiles:
         logger = files.logger
         logger.info(f"Start Recipe in KIMMDY iteration {self.iteration}")
         logger.info(f"Recipe: {self.recipe.get_recipe_name()}")
 
-        recipe_steps = self.recipe.recipe_steps
-        files.output = {"top": files.outputdir / "topol_mod.top"}
-        logger.debug(f"Chose recipe steps: {recipe_steps}")
+        logger.debug(f"Chose recipe steps: {self.recipe.recipe_steps}")
 
-        # changes to topology
-        top_prev = deepcopy(self.top)
-        changer.modify_top(recipe_steps, files, self.top, self.parameterizer)
-        logger.info(f'Wrote new topology to {files.output["top"].parts[-3:]}')
+        top_initial = deepcopy(self.top)
+        for step in self.recipe.recipe_steps:
+            if isinstance(step, Break):
+                self.top.break_bond((step.atom_id_1, step.atom_id_2))
+                if hasattr(self.config, "plumed"):
+                    break_bond_plumed(
+                        files,
+                        (step.atom_id_1, step.atom_id_2),
+                        self.config.plumed.with_stem(
+                            self.config.plumed.stem + "_mod"
+                        ).name,
+                    )
+            elif isinstance(step, Bind):
+                self.top.bind_bond((step.atom_id_1, step.atom_id_2))
+            elif isinstance(step, Place):
+                place_atom(files, step, self.recipe.timespans)
+            elif isinstance(step, Relax):
+                logger.info("Starting relaxation md as part of reaction..")
+                if not hasattr(self.config.changer.coordinates, "md"):
+                    logger.warning("Relax task requested but no MD specified for it!")
+                    continue
+                self.parameterizer.parameterize_topology(
+                    self.top
+                )  # not optimal that this is here
 
-        # changes to plumed.dat
-        if "plumed" in self.latest_files:
-            files.output["plumed"] = files.outputdir / "plumed_mod.dat"
-            changer.modify_plumed(recipe_steps, files)
-            logger.info(f'Wrote new plumedfile to {files.output["plumed"].parts[-3:]}')
-
-        # changes to coordinates
-        run_parameter_growth, top_merge_path = changer.modify_coords(
-            recipe_steps, files, top_prev, deepcopy(self.top)
-        )
-        instance = None
-
-        if run_parameter_growth:
-            if hasattr(self.config.changer.coordinates, "md_parameter_growth"):
-                # Only for sub-task run_md, afterwards, top will be set back properly
-                if top_merge_path:
+                if self.config.changer.coordinates.slow_growth:
+                    # Create a slow growth topology for sub-task run_md, afterwards, top will be set back properly
+                    top_merge = merge_top_slow_growth(top_initial, deepcopy(self.top))
+                    top_merge_path = (
+                        files.outputdir
+                        / self.config.top.with_stem(
+                            self.config.top.stem + "_merge"
+                        ).name
+                    )
+                    write_top(top_merge.to_dict(), top_merge_path)
                     self.latest_files["top"] = top_merge_path
-                instance = self.config.changer.coordinates.md_parameter_growth
-
-            else:
-                logger.debug(
-                    f"No parameter growth MD possible, trying classical MD relaxation."
-                )
-                run_parameter_growth = False
-        if not run_parameter_growth:
-            if hasattr(self.config.changer.coordinates, "md"):
                 instance = self.config.changer.coordinates.md
-            else:
-                logger.info(f"No MD relaxation after reaction.")
+                task = Task(
+                    self, f=self._run_md, kwargs={"instance": instance}, out=instance
+                )
+                md_files = task()
+                self._discover_output_files(task.name, md_files)
 
-        if instance:
-            logger.info("Starting relaxation md as part of reaction..")
+        # parameterize topology
+        self.parameterizer.parameterize_topology(self.top)
+        write_top(self.top.to_dict(), files.outputdir / self.config.top.name)
+        files.output["top"] = files.outputdir / self.config.top.name
 
-            task = Task(
-                self, f=self._run_md, kwargs={"instance": instance}, out=instance
-            )
-            md_files = task()
-            self._discover_output_files(task.name, md_files)
-
+        # capture state of radicals
         write_json(
             {"time": self.time, "radicals": list(self.top.radicals.keys())},
             files.outputdir / "radicals.json",

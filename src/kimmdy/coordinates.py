@@ -1,6 +1,14 @@
+"""coordinate, topology and plumed modification functions"""
+
 import logging
 from typing import Optional, Union
 from copy import deepcopy
+import MDAnalysis as mda
+from pathlib import Path
+
+from kimmdy.tasks import TaskFiles
+from kimmdy.parsing import read_plumed, write_plumed
+from kimmdy.recipe import Place
 from kimmdy.topology.topology import MoleculeType, Topology
 from kimmdy.topology.ff import FF
 from kimmdy.topology.atomic import (
@@ -20,6 +28,48 @@ from kimmdy.topology.utils import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+## coordinates
+def place_atom(files: TaskFiles, step: Place, timespan: list[tuple[float, float]]):
+    """Place an atom to new coords at the last time point of the recipe timespans"""
+    trr = files.input["trr"]
+    tpr = files.input["tpr"]
+
+    # if place_atom is called multiple times in one _apply_recipe task
+    if "trr" in files.output.keys():
+        trr = files.output["trr"]
+
+    u = mda.Universe(str(tpr), str(trr), topology_format="tpr", format="trr")
+
+    ttime = timespan[-1][-1]
+
+    for ts in u.trajectory[::-1]:
+        if abs(ts.time - ttime) > 1e-5:  # 0.01 fs
+            continue
+        atm_move = u.select_atoms(f"index {step.ix_to_place}")
+        atm_move[0].position = step.new_coords[0]
+
+        break
+    else:
+        raise LookupError(
+            f"Did not find time {ttime} in trajectory "
+            f"with length {u.trajectory[-1].time}"
+        )
+
+    trr_out = files.outputdir / "coord_mod.trr"
+    gro_out = files.outputdir / "coord_mod.gro"
+
+    u.atoms.write(trr_out)
+    u.atoms.write(gro_out)
+
+    files.output["trr"] = trr_out
+    files.output["gro"] = gro_out
+
+    logger.debug(f"Exit place_atom, final coordinates written to {trr_out.parts[-2:]}")
+
+
+## topology
 
 
 def is_parameterized(entry: Interaction):
@@ -171,7 +221,7 @@ def merge_dihedrals(
     return dihedralmerge
 
 
-def merge_top_moleculetypes_parameter_growth(
+def merge_top_moleculetypes_slow_growth(
     molA: MoleculeType,
     molB: MoleculeType,
     ff: FF,
@@ -201,7 +251,7 @@ def merge_top_moleculetypes_parameter_growth(
                 atomB.mass = deepcopy(atomA.mass)
             else:
                 logger.debug(
-                    f"Atom {nr} with A:{atomA} and B:{atomB} changed during changemanager step but not the charges!"
+                    f"Atom {nr} with A:{atomA} and B:{atomB} changed but not the charges!"
                 )
 
     ## bonds
@@ -390,7 +440,7 @@ def merge_top_moleculetypes_parameter_growth(
     return molB
 
 
-def merge_top_parameter_growth(
+def merge_top_slow_growth(
     topA: Topology, topB: Topology, focus_nr: Union[list[str], None] = None
 ) -> Topology:
     """Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation.
@@ -402,6 +452,51 @@ def merge_top_parameter_growth(
     first_molecule = list(topA.moleculetypes.keys())[0]
     molA = topA.moleculetypes[first_molecule]
     molB = topB.moleculetypes[first_molecule]
-    molB = merge_top_moleculetypes_parameter_growth(molA, molB, topB.ff, focus_nr)
+    molB = merge_top_moleculetypes_slow_growth(molA, molB, topB.ff, focus_nr)
 
     return topB
+
+
+## plumed
+
+
+def break_bond_plumed(
+    files: TaskFiles, breakpair: tuple[str, str], newplumed: Path
+) -> None:
+    """Break bond in plumed configuration file.
+
+    Parameters
+    ----------
+    files:
+
+    breakpair:
+    """
+
+    plumed_path = files.input["plumed"]
+    # if break_bond_plumed is called multiple times in one _apply_recipe task
+    if "plumed" in files.output.keys():
+        plumed_path = files.output["trr"]
+    plumeddat = read_plumed(plumed_path)
+
+    files.output["plumed"] = newplumed
+
+    logger.info(
+        f"Reading: {files.input['plumed']} and writing modified plumed input to "
+        f"{files.output['plumed']}."
+    )
+
+    new_distances = []
+    broken_distances = []
+    for line in plumeddat["distances"]:
+        if all(x in line["atoms"] for x in breakpair):
+            broken_distances.append(line["id"])
+        else:
+            new_distances.append(line)
+
+    plumeddat["distances"] = new_distances
+
+    for line in plumeddat["prints"]:
+        line["ARG"] = [id for id in line["ARG"] if not id in broken_distances]
+        line["FILE"] = files.input["plumed_out"]
+
+    write_plumed(plumeddat, newplumed)

@@ -9,12 +9,13 @@ Reaction recipes.
 | Name | Description |
 | --- | --- |
 | [Bind](#kimmdy.recipe.Bind) | Change topology to form a bond |
+| [BondOperation](#kimmdy.recipe.BondOperation) | Handle a bond operation on the recipe step. |
 | [Break](#kimmdy.recipe.Break) | Change topology to break a bond |
-| [Move](#kimmdy.recipe.Move) | Change topology and/or coordinates to move an atom. |
+| [Place](#kimmdy.recipe.Place) | Change topology and/or coordinates to place an atom. |
 | [Recipe](#kimmdy.recipe.Recipe) | A reaction path defined by one series of RecipeSteps. |
 | [RecipeCollection](#kimmdy.recipe.RecipeCollection) | A RecipeCollection encompasses a number of reaction paths. |
 | [RecipeStep](#kimmdy.recipe.RecipeStep) | Base class for all RecipeSteps. |
-| [SingleOperation](#kimmdy.recipe.SingleOperation) | Handle a single operation on the recipe step. |
+| [Relax](#kimmdy.recipe.Relax) | Start a relaxation MD. |
 
 ### Bind { #kimmdy.recipe.Bind }
 
@@ -31,6 +32,33 @@ Change topology to form a bond
 | `atom_id_1` | [str](`str`) | The ID of the first atom. one-based, by default None      | _required_ |
 | `atom_id_2` | [str](`str`) | The ID of the second atom. one-based, by default None     | _required_ |
 
+### BondOperation { #kimmdy.recipe.BondOperation }
+
+`recipe.BondOperation(atom_ix_1, atom_ix_2, atom_id_1, atom_id_2, _atom_ix_1=field(init=False, repr=False, default=None), _atom_ix_2=field(init=False, repr=False, default=None))`
+
+Handle a bond operation on the recipe step.
+
+This class takes in either zero-based indices or one-base IDs for two atoms
+
+#### Parameters
+
+| Name        | Type         | Description                                               | Default    |
+|-------------|--------------|-----------------------------------------------------------|------------|
+| `atom_ix_1` | [int](`int`) | The index of the first atom. zero-based, by default None  | _required_ |
+| `atom_ix_2` | [int](`int`) | The index of the second atom. zero-based, by default None | _required_ |
+| `atom_id_1` | [str](`str`) | The ID of the first atom. one-based, by default None      | _required_ |
+| `atom_id_2` | [str](`str`) | The ID of the second atom. one-based, by default None     | _required_ |
+
+#### Raises
+
+| Type                       | Description                                                     |
+|----------------------------|-----------------------------------------------------------------|
+| [ValueError](`ValueError`) | If neither an index nor an ID is provided for any of the atoms. |
+
+#### Notes
+
+Internally, this class stores the atom indices and converts IDs to indices as needed.
+
 ### Break { #kimmdy.recipe.Break }
 
 `recipe.Break()`
@@ -46,23 +74,23 @@ Change topology to break a bond
 | `atom_id_1` | [str](`str`) | The ID of the first atom. one-based, by default None      | _required_ |
 | `atom_id_2` | [str](`str`) | The ID of the second atom. one-based, by default None     | _required_ |
 
-### Move { #kimmdy.recipe.Move }
+### Place { #kimmdy.recipe.Place }
 
-`recipe.Move(ix_to_move, ix_to_bind, ix_to_break, new_coords=None, id_to_move, id_to_bind, id_to_break, _ix_to_move=field(init=False, repr=False, default=None), _ix_to_bind=field(init=False, repr=False, default=None), _ix_to_break=field(init=False, repr=False, default=None))`
+`recipe.Place(new_coords, ix_to_place, id_to_place, _ix_to_place=field(init=False, repr=False, default=None))`
 
-Change topology and/or coordinates to move an atom.
+Change topology and/or coordinates to place an atom.
 
 #### Parameters
 
-| Name          | Type                                                                                                                                            | Description                                                                                   | Default    |
-|---------------|-------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|------------|
-| `ix_to_move`  | [int](`int`)                                                                                                                                    | Index of atom to move. 0-based.                                                               | _required_ |
-| `ix_to_bind`  | [int](`int`)                                                                                                                                    | Bonding partner to form bond with. 0-based.                                                   | _required_ |
-| `ix_to_break` | [int](`int`)                                                                                                                                    | Bonding partner to break bond with, default None. 0-based.                                    | _required_ |
-| `new_coords`  | [Optional](`typing.Optional`)\[[tuple](`tuple`)\[[tuple](`tuple`)\[[float](`float`), [float](`float`), [float](`float`)\], [float](`float`)\]\] | Optional new xyz coordinates for atom to move to, and the associated time in ps default None. | `None`     |
-| `id_to_move`  | [str](`str`)                                                                                                                                    | Index of atom to move. 1-based                                                                | _required_ |
-| `id_to_bind`  | [str](`str`)                                                                                                                                    | Bonding partner to form bond with. 1-based                                                    | _required_ |
-| `id_to_break` | [str](`str`)                                                                                                                                    | Bonding partner to break bond with, default None. 1-based                                     | _required_ |
+| Name         | Type                                                                     | Description                                                                               | Default    |
+|--------------|--------------------------------------------------------------------------|-------------------------------------------------------------------------------------------|------------|
+| `new_coords` | [tuple](`tuple`)\[[float](`float`), [float](`float`), [float](`float`)\] | New xyz coordinates for atom to place to. Valid for the end point of the recipe timespan. | _required_ |
+
+ix_to_place : int
+    Index of atom to place. 0-based.
+
+id_to_place : str
+    Index of atom to place. 1-based
 
 ### Recipe { #kimmdy.recipe.Recipe }
 
@@ -185,29 +213,11 @@ Indices can be accessed as 0-based or 1-based.
 ix: 0-based, int
 id: 1-based, str
 
-### SingleOperation { #kimmdy.recipe.SingleOperation }
+### Relax { #kimmdy.recipe.Relax }
 
-`recipe.SingleOperation(atom_ix_1, atom_ix_2, atom_id_1, atom_id_2, _atom_ix_1=field(init=False, repr=False, default=None), _atom_ix_2=field(init=False, repr=False, default=None))`
+`recipe.Relax()`
 
-Handle a single operation on the recipe step.
+Start a relaxation MD.
 
-This class takes in either zero-based indices or one-base IDs for two atoms
-
-#### Parameters
-
-| Name        | Type         | Description                                               | Default    |
-|-------------|--------------|-----------------------------------------------------------|------------|
-| `atom_ix_1` | [int](`int`) | The index of the first atom. zero-based, by default None  | _required_ |
-| `atom_ix_2` | [int](`int`) | The index of the second atom. zero-based, by default None | _required_ |
-| `atom_id_1` | [str](`str`) | The ID of the first atom. one-based, by default None      | _required_ |
-| `atom_id_2` | [str](`str`) | The ID of the second atom. one-based, by default None     | _required_ |
-
-#### Raises
-
-| Type                       | Description                                                     |
-|----------------------------|-----------------------------------------------------------------|
-| [ValueError](`ValueError`) | If neither an index nor an ID is provided for any of the atoms. |
-
-#### Notes
-
-Internally, this class stores the atom indices and converts IDs to indices as needed.
+The molecular system coordinates are far out of equilibrium after most topology changes.
+A relaxtion MD simulation using for example the slow growth method helps to reach the new equilibrium.
