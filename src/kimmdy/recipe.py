@@ -36,12 +36,12 @@ class Place(RecipeStep):
     Parameters
     ----------
     new_coords :
-        New xyz coordinates for atom to place to. Valid for the end point of the 
+        New xyz coordinates for atom to place to. Valid for the end point of the
         recipe timespan.
 
     ix_to_place : int
         Index of atom to place. 0-based.
-    
+
     id_to_place : str
         Index of atom to place. 1-based
     """
@@ -49,7 +49,6 @@ class Place(RecipeStep):
     new_coords: tuple[float, float, float]
     ix_to_place: Optional[int] = None
     id_to_place: Optional[str] = None
-    
 
     _ix_to_place: Optional[int] = field(init=False, repr=False, default=None)
 
@@ -68,6 +67,7 @@ class Place(RecipeStep):
     def ix_to_place(self, value: Optional[int]):
         if isinstance(value, property):
             return
+        assert isinstance(value,int), f"ix_to_place is {type(value)}, should be int."
         self._ix_to_place = value
 
     @property
@@ -80,6 +80,7 @@ class Place(RecipeStep):
     def id_to_place(self, value: Optional[str]):
         if isinstance(value, property):
             return
+        assert isinstance(value,int), f"id_to_place is {type(value)}, should be str."
         self._ix_to_place = int(value) - 1
 
 
@@ -138,6 +139,7 @@ class BondOperation(RecipeStep):
     def atom_id_1(self, value: str):
         if isinstance(value, property):
             return
+        assert isinstance(value,str), f"atom_id_1 is {type(value)}, should be str."
         self._atom_ix_1 = int(value) - 1
 
     @property
@@ -148,6 +150,7 @@ class BondOperation(RecipeStep):
     def atom_ix_1(self, value: int):
         if isinstance(value, property):
             return
+        assert isinstance(value,int), f"atom_ix_1 is {type(value)}, should be int."
         self._atom_ix_1 = value
 
     @property
@@ -160,6 +163,7 @@ class BondOperation(RecipeStep):
     def atom_id_2(self, value: str):
         if isinstance(value, property):
             return
+        assert isinstance(value,str), f"atom_id_2 is {type(value)}, should be str."
         self._atom_ix_2 = int(value) - 1
 
     @property
@@ -170,6 +174,7 @@ class BondOperation(RecipeStep):
     def atom_ix_2(self, value: int):
         if isinstance(value, property):
             return
+        assert isinstance(value,int), f"atom_ix_2 is {type(value)}, should be int."
         self._atom_ix_2 = value
 
 
