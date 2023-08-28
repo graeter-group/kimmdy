@@ -465,6 +465,7 @@ def read_edissoc(path: Path) -> dict:
 
 
 class Plumed_dict(TypedDict):
+    """Dict representation of a plumed.dat file."""
     distances: list[dict]
     prints: list[dict]
 
