@@ -8,7 +8,6 @@ All read_&lt;...&gt; and write_&lt;...&gt; functions.
 
 | Name | Description |
 | --- | --- |
-| [GMX_BUILTIN_FF_DIR](#kimmdy.parsing.GMX_BUILTIN_FF_DIR) | Path to gromacs data directory with the built-in forcefields. |
 | [TopologyDict](#kimmdy.parsing.TopologyDict) | A raw representation of a topology file. |
 
 ## Classes
@@ -75,7 +74,7 @@ Read a plumed.dat configuration file.
 
 ### read_top { #kimmdy.parsing.read_top }
 
-`parsing.read_top(path, ffdir=None)`
+`parsing.read_top(path, ffdir=None, use_gmx_dir=True)`
 
 Read a topology file into a raw TopologyDict represenation.
 
@@ -104,7 +103,7 @@ Read a topology file into a raw TopologyDict represenation.
 
 ### resolve_includes { #kimmdy.parsing.resolve_includes }
 
-`parsing.resolve_includes(path)`
+`parsing.resolve_includes(path, gmx_builtin_ffs=None)`
 
 #### Arguments
 

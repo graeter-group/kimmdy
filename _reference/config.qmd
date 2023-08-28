@@ -5,12 +5,6 @@
 Read and validate kimmdy.yml configuration files
 and package into a parsed format for internal use.
 
-## Attributes
-
-| Name | Description |
-| --- | --- |
-| [GMX_BUILTIN_FF_DIR](#kimmdy.config.GMX_BUILTIN_FF_DIR) | Path to gromacs data directory with the built-in forcefields. |
-
 ## Classes
 
 | Name | Description |
