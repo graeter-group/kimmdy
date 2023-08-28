@@ -2,14 +2,19 @@ name: docs
 
 on:
   workflow_dispatch:
-  release:
-    types: [published]
+  pull_request:
+    branches: [ main ]
+    types: [labeled]
+
+permissions:
+  contents: write
 
 jobs:
   build-docs:
+    if: github.event.label.name == 'testthis' || github.event.label.name == 'docthis'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/setup-python@v2
         with:
           python-version: "3.10"
@@ -22,6 +27,12 @@ jobs:
       - name: Build docs
         run: |
           make docs
+      - name: Commit rendered docs
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git commit -am "chore(docs): render docs"
+          git push
       # TODO: uncomment when public (necessary for gh pages)
       # - uses: peaceiris/actions-gh-pages@v3
       #   with:
