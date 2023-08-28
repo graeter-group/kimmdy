@@ -34,12 +34,6 @@ class Atom:
     bound_to_nrs: list[str] = field(default_factory=list)
     is_radical: bool = False
 
-    def radical_type(self):
-        if self.is_radical:
-            return self.type + "_R"
-        else:
-            return self.type
-
     @classmethod
     def from_top_line(cls, l: list[str]):
         return cls(
