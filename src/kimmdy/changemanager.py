@@ -14,12 +14,12 @@ from typing import Union
 import logging
 import MDAnalysis as mda
 from typing import Optional
-from kimmdy.reaction import Bind, Break, Move, RecipeStep
+from kimmdy.recipe import Bind, Break, Move, RecipeStep
 from kimmdy.parsing import read_top, write_top, write_plumed, read_plumed
 import numpy as np
 from kimmdy.tasks import TaskFiles
 from kimmdy.topology.topology import Topology
-from kimmdy.parameterize import Parameterizer
+from kimmdy.plugins import Parameterizer
 from kimmdy.coordinates import merge_top_parameter_growth
 from pathlib import Path
 import numpy as np
@@ -47,7 +47,7 @@ def modify_coords(
     Parameters
     ----------
     recipe_steps :
-        A list of [](`~kimmdy.reaction.RecipeStep`) where each steps contains a `new_coords`
+        A list of [](`~kimmdy.recipe.RecipeStep`) where each steps contains a `new_coords`
         parameter.
     files :
         Input and output files for this [](`~kimmdy.tasks.Task`).
@@ -141,7 +141,7 @@ def modify_coords(
 def modify_top(
     recipe_steps: list[RecipeStep],
     files: TaskFiles,
-    topology: Optional[Topology],
+    topology: Topology,
     parameterizer: Parameterizer,
 ) -> None:
     """Modify the topology of the system according to the recipe steps.
@@ -152,7 +152,7 @@ def modify_top(
     Parameters
     ----------
     recipe_steps :
-        A list of [](`~kimmdy.reaction.RecipeStep`)s.
+        A list of [](`~kimmdy.recipe.RecipeStep`)s.
         parameter.
     files :
         Input and output files for this [](`~kimmdy.tasks.Task`).
@@ -161,19 +161,16 @@ def modify_top(
         files.output:
             - top
     topology:
-        TODO: make this required instead of optional
+        The topology to be modified.
     """
     files.output = {"top": files.outputdir / "topol_mod.top"}
-    oldtop = files.input["top"]
     newtop = files.output["top"]
 
-    logger.info(f"Reading: {oldtop} and writing modified topology to {newtop}.")
+    logger.info(f"Writing modified topology to {newtop}.")
     if topology is None:
-        topologyDict = read_top(oldtop)
-        topology = Topology(topologyDict)
+        raise ValueError("Topology must be provided.")
 
     focus = set()
-    # if recipe_steps:
     for step in recipe_steps:
         if isinstance(step, Break):
             topology.break_bond((step.atom_id_1, step.atom_id_2))
@@ -216,7 +213,7 @@ def modify_plumed(recipe_steps: list[RecipeStep], files: TaskFiles):
     Parameters
     ----------
     recipe_steps :
-        A list of [](`~kimmdy.reaction.RecipeStep`)s.
+        A list of [](`~kimmdy.recipe.RecipeStep`)s.
         parameter.
     """
 

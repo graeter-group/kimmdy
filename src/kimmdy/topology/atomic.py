@@ -27,7 +27,7 @@ class Atom:
     atom: str
     cgnr: str
     charge: str
-    mass: str
+    mass: Optional[str] = None
     typeB: Optional[str] = None
     chargeB: Optional[str] = None
     massB: Optional[str] = None
@@ -50,7 +50,7 @@ class Atom:
             atom=l[4],
             cgnr=l[5],
             charge=l[6],
-            mass=l[7],
+            mass=field_or_none(l, 7),
             typeB=field_or_none(l, 8),
             chargeB=field_or_none(l, 9),
             massB=field_or_none(l, 10),

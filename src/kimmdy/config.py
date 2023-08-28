@@ -187,6 +187,8 @@ class Config:
                         f"Error: Reaction plugin {reaction_name} not found!\n"
                         + f"Available plugins: {ks}"
                     )
+                    if isinstance(reaction_plugins[reaction_name], Exception):
+                        raise reaction_plugins[reaction_name]
 
             # Validate sequence
             assert hasattr(self, "sequence"), "No sequence defined!"
@@ -201,14 +203,17 @@ class Config:
                         f"Task {task} listed in sequence, but not defined!"
                     )
 
-            # Validate dat file only once defined
-            if hasattr(self, "plumed"):
-                if hasattr(self, "md"):
-                    if hasattr(self.md, "plumed"):
+            # Validate plumed defined if requested in md run
+            if hasattr(self, "mds"):
+                needs_plumed = False
+                for attr_name in self.mds.get_attributes():
+                    if hasattr(getattr(self.mds, attr_name), "use_plumed"):
+                        if getattr(getattr(self.mds, attr_name), "use_plumed"):
+                            needs_plumed = True
+                if needs_plumed:
+                    if not hasattr(self, "plumed"):
                         raise AssertionError(
-                            "plumed dat file defined multiple times. When "
-                            "running md and loading existing measurements, "
-                            "only define it once in the md section."
+                            "Plumed requested in md section, but not defined at config root"
                         )
 
             if not hasattr(self, "out"):

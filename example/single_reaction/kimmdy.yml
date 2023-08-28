@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=../../src/kimmdy/kimmdy-yaml-schema.json
 
 dryrun: false
-name: 'reaction_only_000'
+name: 'single_reaction_000'
 ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
 top: 'hexala_out.top'
 gro: 'npt.gro'

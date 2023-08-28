@@ -145,3 +145,4 @@ TaskMapping = dict[
     str,
     Union[list[Callable[..., Optional[TaskFiles]]], Callable[..., Optional[TaskFiles]]],
 ]
+"""Mapping of task names to functions."""

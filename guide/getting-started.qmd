@@ -1,7 +1,8 @@
 ---
 resources:
   - 'vis-ala.molj'
-  - '/example/example_ala/Ala_out.top'
+  - '../example/example_ala/Ala_out.top'
+  - '../example/alanine/npt.gro'
 ---
 
 # Getting Started

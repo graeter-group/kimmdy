@@ -1,12 +1,13 @@
 # yaml-language-server: $schema=../../../../src/kimmdy/kimmdy-yaml-schema.json
 
 name: 'minimal'
-dryrun: false
+dryrun: true
 max_tasks: 0
 gromacs_alias: 'gmx'
 top: 'minimal.top'
 gro: 'minimal.gro'
 ndx: 'minimal.ndx'
+gmx_mdrun_flags: -maxh 24 -dlb yes -nt 8
 mds:
   prod:
     mdp: 'minimal.mdp'
@@ -15,7 +16,7 @@ reactions:
 changer:
   coordinates: {}
   topology:
-    parameterization: 'grappa' 
+    parameterization: basic
 
 sequence:
   - reactions

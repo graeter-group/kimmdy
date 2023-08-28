@@ -8,14 +8,13 @@ ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default
 top: 'topol.top'
 gro: 'npt.gro'
 ndx: 'index_backbone.ndx'
+plumed: 'plumed.dat'
 mds:
   equilibrium:
     mdp: 'pullf1500_equil.mdp'
   prod:
     mdp: 'pullf1500.mdp'
-    plumed:
-      dat: 'plumed.dat'
-      distances: 'distances.dat'
+    use_plumed: true
   relax:
     mdp: 'pullf1500.mdp'
 changer:

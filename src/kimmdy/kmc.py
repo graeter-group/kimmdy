@@ -12,7 +12,7 @@ import logging
 import numpy as np
 from dataclasses import dataclass, field
 from numpy.random import default_rng
-from kimmdy.reaction import RecipeCollection, Recipe
+from kimmdy.recipe import RecipeCollection, Recipe
 
 logger = logging.getLogger(__name__)
 
@@ -23,13 +23,13 @@ class KMCResult:
 
     Attributes
     ----------
-    recipe : kimmdy.reaction.Recipe
+    recipe :
         Single sequence of RecipeSteps to build product
-    reaction_probability : Union[list[float], None]
+    reaction_probability :
         Integral of reaction propensity with respect to time
-    time_delta : Union[float, None]
+    time_delta :
         MC time jump during which the reaction occurs [ps]
-    time_start : Union[float, None]
+    time_start :
         Time, from which the reaction starts. The reaction changes the
         geometry/topology of this timestep and continues from there.
     """

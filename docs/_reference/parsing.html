@@ -31,7 +31,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
 <link href="../_reference/runmanager.html" rel="next">
-<link href="../_reference/misc_helper.html" rel="prev">
+<link href="../_reference/kmc.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -66,7 +66,7 @@ ul.task-list li input[type="checkbox"] {
 
 </head>
 
-<body class="nav-sidebar docked nav-fixed">
+<body class="nav-sidebar floating nav-fixed">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -136,7 +136,7 @@ ul.task-list li input[type="checkbox"] {
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation docked overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item sidebar-item-section">
@@ -156,36 +156,13 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../guide/developer/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Developer</span></a>
+            <a href="../guide/user/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">User</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../guide/developer/plugins.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Writing Reaction Plugins</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../guide/developer/topology.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Hexala topology</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a href="../guide/user/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">User</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../guide/user/hcp.html" class="sidebar-item-text sidebar-link">
@@ -196,6 +173,29 @@ ul.task-list li input[type="checkbox"] {
   <div class="sidebar-item-container"> 
   <a href="../guide/user/options.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">KIMMDY Options</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../guide/developer/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Developer</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guide/developer/plugins.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Writing Reaction Plugins</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guide/developer/topology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Hexala topology</span></a>
   </div>
 </li>
       </ul>
@@ -267,6 +267,12 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">topology.atomic</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/parsing.TopologyDict.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">parsing.TopologyDict</span></a>
+  </div>
+</li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
@@ -310,12 +316,6 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/misc_helper.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">misc_helper</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="../_reference/parsing.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">parsing</span></a>
   </div>
@@ -334,14 +334,32 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../_reference/recipe.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">recipe</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/plugins.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">plugins</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../_reference/analysis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../_reference/utils.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">utils</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/reaction.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">reaction</span></a>
+  <a href="../_reference/tools.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">tools</span></a>
   </div>
 </li>
       </ul>
@@ -383,13 +401,17 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
+        <nav id="TOC" role="doc-toc" class="toc-active" data-toc-expanded="99">
     <h2 id="toc-title">On this page</h2>
    
   <ul>
   <li><a href="#kimmdy.parsing" id="toc-kimmdy.parsing" class="nav-link active" data-scroll-target="#kimmdy.parsing">parsing</a>
   <ul>
   <li><a href="#attributes" id="toc-attributes" class="nav-link" data-scroll-target="#attributes">Attributes</a></li>
+  <li><a href="#classes" id="toc-classes" class="nav-link" data-scroll-target="#classes">Classes</a>
+  <ul>
+  <li><a href="#kimmdy.parsing.Plumed_dict" id="toc-kimmdy.parsing.Plumed_dict" class="nav-link" data-scroll-target="#kimmdy.parsing.Plumed_dict">Plumed_dict</a></li>
+  </ul></li>
   <li><a href="#functions" id="toc-functions" class="nav-link" data-scroll-target="#functions">Functions</a>
   <ul>
   <li><a href="#kimmdy.parsing.read_distances_dat" id="toc-kimmdy.parsing.read_distances_dat" class="nav-link" data-scroll-target="#kimmdy.parsing.read_distances_dat">read_distances_dat</a></li>
@@ -400,6 +422,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#kimmdy.parsing.read_plumed" id="toc-kimmdy.parsing.read_plumed" class="nav-link" data-scroll-target="#kimmdy.parsing.read_plumed">read_plumed</a>
   <ul class="collapse">
   <li><a href="#parameters-1" id="toc-parameters-1" class="nav-link" data-scroll-target="#parameters-1">Parameters</a></li>
+  <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
   </ul></li>
   <li><a href="#kimmdy.parsing.read_top" id="toc-kimmdy.parsing.read_top" class="nav-link" data-scroll-target="#kimmdy.parsing.read_top">read_top</a>
   <ul class="collapse">
@@ -409,7 +432,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#kimmdy.parsing.resolve_includes" id="toc-kimmdy.parsing.resolve_includes" class="nav-link" data-scroll-target="#kimmdy.parsing.resolve_includes">resolve_includes</a>
   <ul class="collapse">
   <li><a href="#arguments" id="toc-arguments" class="nav-link" data-scroll-target="#arguments">Arguments</a></li>
-  <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
+  <li><a href="#returns-1" id="toc-returns-1" class="nav-link" data-scroll-target="#returns-1">Returns</a></li>
   </ul></li>
   <li><a href="#kimmdy.parsing.write_plumed" id="toc-kimmdy.parsing.write_plumed" class="nav-link" data-scroll-target="#kimmdy.parsing.write_plumed">write_plumed</a>
   <ul class="collapse">
@@ -447,8 +470,34 @@ ul.task-list li input[type="checkbox"] {
 <td><a href="#kimmdy.parsing.GMX_BUILTIN_FF_DIR">GMX_BUILTIN_FF_DIR</a></td>
 <td>Path to gromacs data directory with the built-in forcefields.</td>
 </tr>
+<tr class="even">
+<td><a href="#kimmdy.parsing.TopologyDict">TopologyDict</a></td>
+<td>A raw representation of a topology file.</td>
+</tr>
 </tbody>
 </table>
+</section>
+<section id="classes" class="level2">
+<h2 class="anchored" data-anchor-id="classes">Classes</h2>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="#kimmdy.parsing.Plumed_dict">Plumed_dict</a></td>
+<td>Dict representation of a plumed.dat file.</td>
+</tr>
+</tbody>
+</table>
+<section id="kimmdy.parsing.Plumed_dict" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.parsing.Plumed_dict">Plumed_dict</h3>
+<p><code>parsing.Plumed_dict()</code></p>
+<p>Dict representation of a plumed.dat file.</p>
+</section>
 </section>
 <section id="functions" class="level2">
 <h2 class="anchored" data-anchor-id="functions">Functions</h2>
@@ -546,10 +595,27 @@ ul.task-list li input[type="checkbox"] {
 </tbody>
 </table>
 </section>
+<section id="returns" class="level4">
+<h4 class="anchored" data-anchor-id="returns">Returns</h4>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="../_reference/parsing.html#kimmdy.parsing.Plumed_dict">Plumed_dict</a></td>
+<td>dict with keys: ‘distances’ and ‘prints’ Each is a list of dicts containing plumed keywords</td>
+</tr>
+</tbody>
+</table>
+</section>
 </section>
 <section id="kimmdy.parsing.read_top" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.parsing.read_top">read_top</h3>
-<p><code>parsing.read_top(path)</code></p>
+<p><code>parsing.read_top(path, ffdir=None)</code></p>
 <p>Read a topology file into a raw TopologyDict represenation.</p>
 <section id="parameters-2" class="level4">
 <h4 class="anchored" data-anchor-id="parameters-2">Parameters</h4>
@@ -594,8 +660,8 @@ ul.task-list li input[type="checkbox"] {
 <h4 class="anchored" data-anchor-id="arguments">Arguments</h4>
 <p>path : Filepath to read.</p>
 </section>
-<section id="returns" class="level4">
-<h4 class="anchored" data-anchor-id="returns">Returns</h4>
+<section id="returns-1" class="level4">
+<h4 class="anchored" data-anchor-id="returns-1">Returns</h4>
 <table class="table">
 <thead>
 <tr class="header">
@@ -605,7 +671,7 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>list</code>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>]</td>
+<td><a href="https://docs.python.org/3.10/library/stdtypes.html#list">list</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>]</td>
 <td>List of lines.</td>
 </tr>
 <tr class="even">
@@ -633,6 +699,12 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
+<td><code>d</code></td>
+<td><a href="../_reference/parsing.html#kimmdy.parsing.Plumed_dict">Plumed_dict</a></td>
+<td>Dictionary containing ‘distances’ and ‘prints’</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
 <td><code>path</code></td>
 <td><a href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path">Path</a></td>
 <td>Path to the file. E.g. “plumed.dat”</td>
@@ -660,7 +732,7 @@ ul.task-list li input[type="checkbox"] {
 <tbody>
 <tr class="odd">
 <td><code>top</code></td>
-<td><code>TopologyDict</code></td>
+<td><a href="../_reference/parsing.TopologyDict.html#kimmdy.parsing.TopologyDict">TopologyDict</a></td>
 <td>Raw dictionary represenation of the topology.</td>
 <td><em>required</em></td>
 </tr>
@@ -1030,8 +1102,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../_reference/misc_helper.html" class="pagination-link">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">misc_helper</span>
+      <a href="../_reference/kmc.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">kmc</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">

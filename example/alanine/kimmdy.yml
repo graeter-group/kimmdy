@@ -17,7 +17,7 @@ changer:
   coordinates:
     md_parameter_growth: 'relax'  
   topology:
-    parameterization: 'grappa'
+    parameterization: 'basic'
 reactions:
   hat_naive:
     frequency_factor: 100000000

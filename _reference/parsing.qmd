@@ -9,6 +9,19 @@ All read_&lt;...&gt; and write_&lt;...&gt; functions.
 | Name | Description |
 | --- | --- |
 | [GMX_BUILTIN_FF_DIR](#kimmdy.parsing.GMX_BUILTIN_FF_DIR) | Path to gromacs data directory with the built-in forcefields. |
+| [TopologyDict](#kimmdy.parsing.TopologyDict) | A raw representation of a topology file. |
+
+## Classes
+
+| Name | Description |
+| --- | --- |
+| [Plumed_dict](#kimmdy.parsing.Plumed_dict) | Dict representation of a plumed.dat file. |
+
+### Plumed_dict { #kimmdy.parsing.Plumed_dict }
+
+`parsing.Plumed_dict()`
+
+Dict representation of a plumed.dat file.
 
 ## Functions
 
@@ -54,9 +67,15 @@ Read a plumed.dat configuration file.
 |--------|------------------------|-------------------------------------|------------|
 | `path` | [Path](`pathlib.Path`) | Path to the file. E.g. "plumed.dat" | _required_ |
 
+#### Returns
+
+| Type                                        | Description                                                                                 |
+|---------------------------------------------|---------------------------------------------------------------------------------------------|
+| [Plumed_dict](`kimmdy.parsing.Plumed_dict`) | dict with keys: 'distances' and 'prints' Each is a list of dicts containing plumed keywords |
+
 ### read_top { #kimmdy.parsing.read_top }
 
-`parsing.read_top(path)`
+`parsing.read_top(path, ffdir=None)`
 
 Read a topology file into a raw TopologyDict represenation.
 
@@ -107,9 +126,10 @@ Write a plumed.dat configuration file.
 
 #### Parameters
 
-| Name   | Type                   | Description                         | Default    |
-|--------|------------------------|-------------------------------------|------------|
-| `path` | [Path](`pathlib.Path`) | Path to the file. E.g. "plumed.dat" | _required_ |
+| Name   | Type                                        | Description                                    | Default    |
+|--------|---------------------------------------------|------------------------------------------------|------------|
+| `d`    | [Plumed_dict](`kimmdy.parsing.Plumed_dict`) | Dictionary containing 'distances' and 'prints' | _required_ |
+| `path` | [Path](`pathlib.Path`)                      | Path to the file. E.g. "plumed.dat"            | _required_ |
 
 ### write_top { #kimmdy.parsing.write_top }
 

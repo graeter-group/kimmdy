@@ -2,7 +2,6 @@ from kimmdy.parsing import read_top, write_top
 from kimmdy.topology.topology import Topology
 from kimmdy.topology.atomic import Bond
 from kimmdy.coordinates import merge_top_parameter_growth, get_explicit_or_type
-from conftest import SlimFiles
 
 
 import pytest

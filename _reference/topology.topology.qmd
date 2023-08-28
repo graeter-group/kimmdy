@@ -6,7 +6,29 @@
 
 | Name | Description |
 | --- | --- |
+| [MoleculeType](#kimmdy.topology.topology.MoleculeType) | One moleculetype in the topology |
 | [Topology](#kimmdy.topology.topology.Topology) | Smart container for parsed topology data. |
+
+### MoleculeType { #kimmdy.topology.topology.MoleculeType }
+
+`topology.topology.MoleculeType(self, header, atomics)`
+
+One moleculetype in the topology
+
+#### Methods
+
+| Name | Description |
+| --- | --- |
+| [reindex_atomnrs](#kimmdy.topology.topology.MoleculeType.reindex_atomnrs) | Reindex atom numbers in topology. |
+
+##### reindex_atomnrs { #kimmdy.topology.topology.MoleculeType.reindex_atomnrs }
+
+`topology.topology.MoleculeType.reindex_atomnrs(self)`
+
+Reindex atom numbers in topology.
+
+Starts at index 1.
+This also updates the numbers for bonds, angles, dihedrals and pairs.
 
 ### Topology { #kimmdy.topology.topology.Topology }
 
@@ -37,7 +59,7 @@ Assumptions:
 
 ##### bind_bond { #kimmdy.topology.topology.Topology.bind_bond }
 
-`topology.topology.Topology.bind_bond(self, atompair_nrs)`
+`topology.topology.Topology.bind_bond(self, atompair_addresses)`
 
 Add a bond in topology.
 
@@ -48,18 +70,24 @@ Furthermore, it modifies to function types in the topology to account for radica
 
 ###### Parameters
 
-| Name           | Type                                           | Description                                                                                                                                            | Default    |
-|----------------|------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
-| `atompair_nrs` | [tuple](`tuple`)\[[str](`str`), [str](`str`)\] | A tuple of integers with the atoms ids (id, starting at 1) with `from`, the atom being moved and `to`, the atom to which the `from` atom will be bound | _required_ |
+| Name                 | Type                                                                                                                                     | Description             | Default    |
+|----------------------|------------------------------------------------------------------------------------------------------------------------------------------|-------------------------|------------|
+| `atompair_addresses` | [tuple](`tuple`)\[[TopologyAtomAddress](`kimmdy.utils.TopologyAtomAddress`), [TopologyAtomAddress](`kimmdy.utils.TopologyAtomAddress`)\] | Atoms to bind together. | _required_ |
 
 ##### break_bond { #kimmdy.topology.topology.Topology.break_bond }
 
-`topology.topology.Topology.break_bond(self, atompair_nrs)`
+`topology.topology.Topology.break_bond(self, atompair_addresses)`
 
 Break bonds in topology.
 
 removes bond, angles and dihedrals where atompair was involved.
 Modifies the topology dictionary in place.
+
+###### Parameters
+
+| Name                 | Type                                                                                                                                     | Description                            | Default    |
+|----------------------|------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------|------------|
+| `atompair_addresses` | [tuple](`tuple`)\[[TopologyAtomAddress](`kimmdy.utils.TopologyAtomAddress`), [TopologyAtomAddress](`kimmdy.utils.TopologyAtomAddress`)\] | Between which atoms to break the bond. | _required_ |
 
 ##### move_hydrogen { #kimmdy.topology.topology.Topology.move_hydrogen }
 

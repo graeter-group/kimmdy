@@ -2,12 +2,28 @@
 
 `tasks`
 
+The tasks module holds the TaskFiles class which organizes input and 
+output paths and the Task class for steps in the runmanager.
+
+## Attributes
+
+| Name | Description |
+| --- | --- |
+| [TaskMapping](#kimmdy.tasks.TaskMapping) | Mapping of task names to functions. |
+
 ## Classes
 
 | Name | Description |
 | --- | --- |
+| [AutoFillDict](#kimmdy.tasks.AutoFillDict) | Dictionary that gets populated by calling get_missing. |
 | [Task](#kimmdy.tasks.Task) | A task to be performed as as a step in the RunManager. |
-| [TaskFiles](#kimmdy.tasks.TaskFiles) | Input and Output files and directories. |
+| [TaskFiles](#kimmdy.tasks.TaskFiles) | Class for Task input and output files and directories. |
+
+### AutoFillDict { #kimmdy.tasks.AutoFillDict }
+
+`tasks.AutoFillDict(self, get_missing)`
+
+Dictionary that gets populated by calling get_missing.
 
 ### Task { #kimmdy.tasks.Task }
 
@@ -28,14 +44,18 @@ out : str, optional
 
 `tasks.TaskFiles(get_latest, input=field(default_factory=dict), output=field(default_factory=dict), outputdir=Path(), logger=logging.getLogger('kimmdy.basetask'))`
 
-Input and Output files and directories.
+#### Atributes
 
-Hosts the input and output files belonging to a task.
-A function or method that wants to be callable as a Task
-has to return a TaskFiles object.
-The input defaultdict is populated on the fly using
-get_latest of the runmanager to find newest files.
-Files which can not be found by get_latest must be added manually.
+get_latest:
+    Runmanager.get_latest function that returns paths to the latest file of given type.
+input:
+    Input file paths for a Task. Is populated by get_latest or manually.
+output:
+    Output file paths for a Task. Is populated by runmanager._discover_output_files or manually.
+outputdir:
+    Output directory for a Task. Typically populated by create_task_directory called by Task.
+logger:
+    Logger for a Task. Initialized in create_task_directory.
 
 #### Examples
 
@@ -54,10 +74,12 @@ Files which can not be found by get_latest must be added manually.
 
 | Name | Description |
 | --- | --- |
-| [create_task_directory](#kimmdy.tasks.create_task_directory) | Creates TaskFiles object, output directory and symlinks ff. |
+| [create_task_directory](#kimmdy.tasks.create_task_directory) | Creates TaskFiles object, output directory, logger and symlinks ff. |
 
 ### create_task_directory { #kimmdy.tasks.create_task_directory }
 
 `tasks.create_task_directory(runmng, postfix)`
 
-Creates TaskFiles object, output directory and symlinks ff.
+Creates TaskFiles object, output directory, logger and symlinks ff.
+
+Gets called when a Task is called (from the runmanager.tasks queue).

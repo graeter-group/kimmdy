@@ -15,8 +15,8 @@ from typing import Callable, Union
 from kimmdy.config import Config
 from kimmdy.utils import backup_if_existing
 from kimmdy.parsing import read_top, write_json, read_plumed
-from kimmdy.reaction import ReactionPlugin, RecipeCollection, Recipe
-from kimmdy.parameterize import BasicParameterizer
+from kimmdy.recipe import RecipeCollection, Recipe
+from kimmdy.plugins import ReactionPlugin, BasicParameterizer
 import kimmdy.changemanager as changer
 from kimmdy.tasks import Task, TaskFiles, TaskMapping
 from kimmdy.utils import run_shell_cmd, run_gmx
@@ -75,9 +75,7 @@ def get_existing_files(config: Config, section: str = "root") -> dict:
 
             if attr_name == "plumed":
                 key = "plumed"
-                # only discover root plumed output, not in md sections
-                if section == "root":
-                    file_d["plumed_out"] = attr.parent / get_plumed_out(attr)
+                file_d["plumed_out"] = attr.parent / get_plumed_out(attr)
 
             file_d[key] = attr
         elif isinstance(attr, Config):
@@ -139,7 +137,7 @@ class RunManager:
         backup_if_existing(self.histfile)
         backup_if_existing(self.cptfile)
 
-        self.top = Topology(read_top(self.config.top))
+        self.top = Topology(read_top(self.config.top, self.config.ff))
         try:
             if self.config.changer.topology.parameterization == "basic":
                 self.parameterizer = BasicParameterizer()
@@ -397,12 +395,7 @@ class RunManager:
         # -t and -e options from grompp
         # replace the checkpoint file if gen_vel = no in the mdp file
 
-        if "plumed" in md_config.get_attributes():
-            # might have been modified, so latest_files has priority
-            try:
-                files.input["plumed"]
-            except FileNotFoundError:
-                files.input["plumed"] = md_config.plumed
+        if getattr(md_config, "use_plumed"):
             mdrun_cmd += f" -plumed {files.input['plumed']}"
 
             plumed_out = files.outputdir / get_plumed_out(files.input["plumed"])
