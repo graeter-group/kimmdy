@@ -10,6 +10,7 @@ from kimmdy.topology.utils import get_top_section
 
 logger = logging.getLogger(__name__)
 
+
 class FF:
     """Container for parsed forcefield data."""
 
@@ -27,7 +28,9 @@ class FF:
 
         atomtypes = get_top_section(top, "atomtypes")
         if atomtypes is None:
-            logger.warning("atomtypes not found in top dictionary. Is the forcefield in the correct directory?")
+            logger.warning(
+                "atomtypes not found in top dictionary. Is the forcefield in the correct directory?"
+            )
         else:
             for l in atomtypes:
                 atomtype = AtomType.from_top_line(l)
@@ -35,7 +38,9 @@ class FF:
 
         bondtypes = get_top_section(top, "bondtypes")
         if bondtypes is None:
-            logger.warning("bondtypes not found in top dictionary. Is the forcefield in the correct directory?")
+            logger.warning(
+                "bondtypes not found in top dictionary. Is the forcefield in the correct directory?"
+            )
         else:
             for l in bondtypes:
                 bondtype = BondType.from_top_line(l)
@@ -43,7 +48,9 @@ class FF:
 
         angletypes = get_top_section(top, "angletypes")
         if angletypes is None:
-            logger.warning("angletypes not found in top dictionary. Is the forcefield in the correct directory?")
+            logger.warning(
+                "angletypes not found in top dictionary. Is the forcefield in the correct directory?"
+            )
         else:
             for l in angletypes:
                 angletype = AngleType.from_top_line(l)
@@ -51,7 +58,9 @@ class FF:
 
         dihedraltypes = get_top_section(top, "dihedraltypes")
         if dihedraltypes is None:
-            logger.warning("dihedraltypes not found in top dictionary. Is the forcefield in the correct directory?")
+            logger.warning(
+                "dihedraltypes not found in top dictionary. Is the forcefield in the correct directory?"
+            )
         else:
             for l in dihedraltypes:
                 dihedraltype = DihedralType.from_top_line(l)
@@ -90,7 +99,9 @@ class FF:
             return
         aminoacids_path = ffdir / "aminoacids.rtp"
         if not aminoacids_path.exists():
-            logger.warning("aminoacids.rtp not found in ffdir. No residuetypes will be parsed.")
+            logger.warning(
+                "aminoacids.rtp not found in ffdir. No residuetypes will be parsed."
+            )
             return
         aminoacids = read_rtp(aminoacids_path)
         for k, v in aminoacids.items():

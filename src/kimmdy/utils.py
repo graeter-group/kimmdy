@@ -251,7 +251,7 @@ def morse_transition_rate(
 ## GROMACS related functions
 
 
-def get_gmx_dir(gromacs_alias: str = 'gmx') -> Optional[Path]:
+def get_gmx_dir(gromacs_alias: str = "gmx") -> Optional[Path]:
     """Returns the path to the gromacs installation
 
     This does not check if the installation is valid.

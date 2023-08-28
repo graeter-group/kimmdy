@@ -150,7 +150,6 @@ class Config:
 
         # globals / interconnected
         if section == "config":
-
             # forcfield
             ffdir = self.ff
             if ffdir == Path("*.ff"):
@@ -164,12 +163,16 @@ class Config:
             elif not ffdir.exists():
                 gmxdir = get_gmx_dir(self.gromacs_alias)
                 if gmxdir is None:
-                    logger.warn(f"Could not find gromacs data directory for {self.gromacs_alias}")
+                    logger.warn(
+                        f"Could not find gromacs data directory for {self.gromacs_alias}"
+                    )
                     gmxdir = self.cwd
                 gmx_builtin_ffs = gmxdir / "top"
                 ffdir = gmx_builtin_ffs / ffdir
                 if not ffdir.exists():
-                    logger.warn(f"Could not find forcefield {ffdir} in cwd or gromacs data directory")
+                    logger.warn(
+                        f"Could not find forcefield {ffdir} in cwd or gromacs data directory"
+                    )
             self.ff = ffdir
 
             # Validate changer reference
