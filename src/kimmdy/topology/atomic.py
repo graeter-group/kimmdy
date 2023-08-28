@@ -9,7 +9,7 @@ from typing import Optional, Union
 from kimmdy.topology.utils import field_or_none
 
 
-@dataclass(order=True)
+@dataclass()
 class Atom:
     """Information about one atom
 
@@ -57,7 +57,7 @@ class Atom:
         )
 
 
-@dataclass(order=True)
+@dataclass()
 class PositionRestraint:
     """Information about one position restraint.
 
@@ -95,7 +95,7 @@ class PositionRestraint:
 #     1    4     3    5     1  180     0  10
 
 
-@dataclass(order=True)
+@dataclass()
 class DihedralRestraint:
     """Information about one dihedral restraint.
 
@@ -128,7 +128,7 @@ class DihedralRestraint:
         )
 
 
-@dataclass(order=True)
+@dataclass()
 class AtomType:
     """Information about one atom
 
@@ -164,7 +164,7 @@ class AtomType:
         )
 
 
-@dataclass(order=True)
+@dataclass()
 class Bond:
     """Information about one bond
 
@@ -202,7 +202,7 @@ class Bond:
         )
 
 
-@dataclass(order=True)
+@dataclass()
 class BondType:
     """Information about one bondtype
 
@@ -240,7 +240,7 @@ class BondType:
         )
 
 
-@dataclass(order=True)
+@dataclass()
 class Pair:
     """Information about one pair
 
@@ -271,7 +271,7 @@ class Pair:
         )
 
 
-@dataclass(order=True)
+@dataclass()
 class Angle:
     """Information about one angle
 
@@ -305,7 +305,7 @@ class Angle:
         )
 
 
-@dataclass(order=True)
+@dataclass()
 class AngleType:
     """Information about one angle
 
@@ -343,7 +343,7 @@ class AngleType:
         )
 
 
-@dataclass(order=True)
+@dataclass()
 class Dihedral:
     """Information about one proper or improper dihedral
 
@@ -408,7 +408,7 @@ class MultipleDihedrals:
     dihedrals: dict[str, Dihedral]
 
 
-@dataclass(order=True)
+@dataclass()
 class DihedralType:
     """Information about one dihedral
 
@@ -461,7 +461,7 @@ class DihedralType:
         )
 
 
-@dataclass(order=True)
+@dataclass()
 class MultipleDihedralTypes:
     """
     Multiple ``DihedralTypes``s with the same ai, aj, ak, al
@@ -478,7 +478,7 @@ class MultipleDihedralTypes:
     dihedral_types: dict[str, DihedralType]
 
 
-@dataclass(order=True)
+@dataclass()
 class ResidueAtomSpec:
     """Information about one atom in a residue
     ; name  type  charge  chargegroup
@@ -494,7 +494,7 @@ class ResidueAtomSpec:
         return cls(name=l[0], type=l[1], charge=l[2], cgrp=l[3])
 
 
-@dataclass(order=True)
+@dataclass()
 class ResidueBondSpec:
     """Information about one bond in a residue
     ; atom1 atom2      b0      kb
@@ -512,7 +512,7 @@ class ResidueBondSpec:
         )
 
 
-@dataclass(order=True)
+@dataclass()
 class ResidueImproperSpec:
     """Information about one imroper dihedral in a residue
     ;atom1 atom2 atom3 atom4     q0     cq
@@ -537,7 +537,7 @@ class ResidueImproperSpec:
         )
 
 
-@dataclass(order=True)
+@dataclass()
 class ResidueProperSpec:
     """Information about one imroper dihedral in a residue
     ;atom1 atom2 atom3 atom4     q0     cq
@@ -560,7 +560,7 @@ class ResidueProperSpec:
         )
 
 
-@dataclass(order=True)
+@dataclass()
 class ResidueType:
     """Information about one residuetype from aminoacids.rtp"""
 
