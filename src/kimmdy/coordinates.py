@@ -30,9 +30,8 @@ logger = logging.getLogger(__name__)
 
 
 ## coordinates
-def place_atom(files: TaskFiles, step: Place):
-    """Would not work if new.coords are for different times.
-    But I see no reason why one recipe should have steps applied at different times.
+def place_atom(files: TaskFiles, step: Place, timespan: list[tuple[float, float]]):
+    """Place an atom to new coords at the last time point of the recipe timespans
     """
     trr = files.input["trr"]
     tpr = files.input["tpr"]
@@ -43,7 +42,7 @@ def place_atom(files: TaskFiles, step: Place):
 
     u = mda.Universe(str(tpr), str(trr), topology_format="tpr", format="trr")
 
-    ttime = step.new_coords[1]
+    ttime = timespan[-1][-1]
 
     for ts in u.trajectory[::-1]:
         if abs(ts.time - ttime) > 1e-5:  # 0.01 fs

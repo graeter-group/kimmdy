@@ -35,19 +35,21 @@ class Place(RecipeStep):
 
     Parameters
     ----------
+    new_coords :
+        New xyz coordinates for atom to place to. Valid for the end point of the 
+        recipe timespan.
+
     ix_to_place : int
         Index of atom to place. 0-based.
-    new_coords :
-        Optional new xyz coordinates for atom to place to, and the associated
-        time in ps default None.
+    
     id_to_place : str
         Index of atom to place. 1-based
     """
 
+    new_coords: tuple[float, float, float]
     ix_to_place: Optional[int] = None
     id_to_place: Optional[str] = None
-
-    new_coords: Optional[tuple[tuple[float, float, float], float]] = None
+    
 
     _ix_to_place: Optional[int] = field(init=False, repr=False, default=None)
 
