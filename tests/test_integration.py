@@ -81,7 +81,7 @@ def test_grompp_with_kimmdy_topology(tmp_path):
 
 
 def test_integration_single_reaction(tmp_path):
-    testdir = setup_testdir(tmp_path, "single_reaction")
+    testdir = setup_testdir(tmp_path, "hexalanine_single_reaction")
 
     kimmdy_run()
     assert "Finished running tasks" in read_last_line(testdir / "kimmdy.log")
@@ -89,7 +89,7 @@ def test_integration_single_reaction(tmp_path):
 
 @pytest.mark.slow
 def test_integration_hat_naive_reaction(tmp_path):
-    testdir = setup_testdir(tmp_path, "hat_naive")
+    testdir = setup_testdir(tmp_path, "alanine_hat_naive")
 
     kimmdy_run()
     assert "Finished running tasks" in read_last_line(testdir / "kimmdy.log")
@@ -97,7 +97,7 @@ def test_integration_hat_naive_reaction(tmp_path):
 
 @pytest.mark.slow
 def test_integration_homolysis_reaction(tmp_path):
-    testdir = setup_testdir(tmp_path, "homolysis")
+    testdir = setup_testdir(tmp_path, "hexalanine_homolysis")
 
     kimmdy_run()
     assert "Finished running tasks" in read_last_line(testdir / "kimmdy.log")
@@ -105,7 +105,7 @@ def test_integration_homolysis_reaction(tmp_path):
 
 @pytest.mark.slow
 def test_integration_pull(tmp_path):
-    testdir = setup_testdir(tmp_path, "pull")
+    testdir = setup_testdir(tmp_path, "triplehelix_pull")
 
     kimmdy_run()
     assert "Finished running tasks" in read_last_line(testdir / "kimmdy.log")
@@ -113,7 +113,7 @@ def test_integration_pull(tmp_path):
 
 @pytest.mark.slow
 def test_integration_whole_run(tmp_path):
-    testdir = setup_testdir(tmp_path, "whole_run")
+    testdir = setup_testdir(tmp_path, "charged_peptide_homolysis_hat_naive")
 
     kimmdy_run()
     assert "Finished running tasks" in read_last_line(testdir / "kimmdy.log")

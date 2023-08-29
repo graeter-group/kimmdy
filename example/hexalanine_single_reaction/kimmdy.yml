@@ -2,7 +2,7 @@
 
 dryrun: false
 name: 'single_reaction_000'
-ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
+ff: 'amber99sb-star-ildnp.ff'
 top: 'hexala_out.top'
 gro: 'npt.gro'
 ndx: 'index.ndx'
