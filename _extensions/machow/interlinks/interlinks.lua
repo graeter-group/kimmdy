@@ -31,7 +31,9 @@ local function lookup(search_object)
             if search_object.domain and item.domain ~= search_object.domain then
                 goto continue
             else
-                table.insert(results, item)
+                if item.domain == "py" then
+                  table.insert(results, item)
+                end
 
                 goto continue
             end
@@ -49,7 +51,6 @@ local function lookup(search_object)
     end
     if #results == 0 then
         quarto.log.warning("Found no matches for object: " .. search_object.name .. ".")
-        quarto.log.dump(search_object)
     end
 
     return nil

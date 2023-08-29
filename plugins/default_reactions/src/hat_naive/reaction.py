@@ -1,7 +1,9 @@
 from kimmdy.topology.atomic import Atom
 from kimmdy.constants import ATOMTYPE_BONDORDER_FLAT
 from kimmdy.recipe import (
-    Move,
+    Break,
+    Bind,
+    Relax,
     Recipe,
     RecipeCollection,
     RecipeStep,
@@ -71,11 +73,9 @@ class NaiveHAT(ReactionPlugin):
                 # int(x) - 1 to be zero based because h,f,r are from topology
                 recipe = Recipe(
                     recipe_steps=[
-                        Move(
-                            ix_to_move=int(h) - 1,
-                            ix_to_break=int(f) - 1,
-                            ix_to_bind=int(r) - 1,
-                        )
+                        Break(atom_id_1=f, atom_id_2=h),
+                        Bind(atom_id_1=h, atom_id_2=r),
+                        Relax(),
                     ],
                     rates=[1],
                     timespans=[(u.trajectory[0].time, u.trajectory[-1].time)],
@@ -85,3 +85,8 @@ class NaiveHAT(ReactionPlugin):
             return RecipeCollection([recipe])
 
         return RecipeCollection([])
+
+        #     Move(id_to_move=int(h) - 1,
+        #     ix_to_break=int(f) - 1,
+        #     ix_to_bind=int(r) - 1,
+        # ),

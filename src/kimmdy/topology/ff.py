@@ -5,6 +5,8 @@ from kimmdy.parsing import read_rtp
 
 from kimmdy.topology.utils import get_top_section
 
+logger = logging.getLogger(__name__)
+
 
 class FF:
     """Container for parsed forcefield data."""
@@ -17,75 +19,92 @@ class FF:
             tuple[str, str, str, str, str], DihedralType
         ] = {}
         self.improper_dihedraltypes: dict[tuple[str, str, str, str], DihedralType] = {}
-        self.residuetypes: dict[str, ResidueType]
+        self.residuetypes: dict[str, ResidueType] = {}
 
         ffdir = top["ffdir"]
 
         atomtypes = get_top_section(top, "atomtypes")
         if atomtypes is None:
-            raise ValueError("atomtypes not found in top file")
-        for l in atomtypes:
-            atomtype = AtomType.from_top_line(l)
-            self.atomtypes[atomtype.type] = atomtype
+            logger.warning(
+                "atomtypes not found in top dictionary. Is the forcefield in the correct directory?"
+            )
+        else:
+            for l in atomtypes:
+                atomtype = AtomType.from_top_line(l)
+                self.atomtypes[atomtype.type] = atomtype
 
         bondtypes = get_top_section(top, "bondtypes")
         if bondtypes is None:
-            raise ValueError("bondtypes not found in top file")
-        for l in bondtypes:
-            bondtype = BondType.from_top_line(l)
-            self.bondtypes[(bondtype.i, bondtype.j)] = bondtype
+            logger.warning(
+                "bondtypes not found in top dictionary. Is the forcefield in the correct directory?"
+            )
+        else:
+            for l in bondtypes:
+                bondtype = BondType.from_top_line(l)
+                self.bondtypes[(bondtype.i, bondtype.j)] = bondtype
 
         angletypes = get_top_section(top, "angletypes")
         if angletypes is None:
-            raise ValueError("angletypes not found in top file")
-        for l in angletypes:
-            angletype = AngleType.from_top_line(l)
-            self.angletypes[(angletype.i, angletype.j, angletype.k)] = angletype
+            logger.warning(
+                "angletypes not found in top dictionary. Is the forcefield in the correct directory?"
+            )
+        else:
+            for l in angletypes:
+                angletype = AngleType.from_top_line(l)
+                self.angletypes[(angletype.i, angletype.j, angletype.k)] = angletype
 
         dihedraltypes = get_top_section(top, "dihedraltypes")
         if dihedraltypes is None:
-            raise ValueError("dihedraltypes not found in top file")
-        for l in dihedraltypes:
-            dihedraltype = DihedralType.from_top_line(l)
-            # proper dihedrals can be defined multiple times
-            # with a different phase
-            if dihedraltype.funct == "4":
-                self.improper_dihedraltypes[
-                    (dihedraltype.i, dihedraltype.j, dihedraltype.k, dihedraltype.l)
-                ] = dihedraltype
-            else:
-                # e.g. proper dihedrals with dihedraltype.funct == "9":
-                if (
-                    self.proper_dihedraltypes.get(
-                        (
-                            dihedraltype.i,
-                            dihedraltype.j,
-                            dihedraltype.k,
-                            dihedraltype.l,
-                            dihedraltype.periodicity,
-                        )
-                    )
-                    is None
-                ):
-                    self.proper_dihedraltypes[
-                        (
-                            dihedraltype.i,
-                            dihedraltype.j,
-                            dihedraltype.k,
-                            dihedraltype.l,
-                            dihedraltype.periodicity,
-                        )
+            logger.warning(
+                "dihedraltypes not found in top dictionary. Is the forcefield in the correct directory?"
+            )
+        else:
+            for l in dihedraltypes:
+                dihedraltype = DihedralType.from_top_line(l)
+                # proper dihedrals can be defined multiple times
+                # with a different phase
+                if dihedraltype.funct == "4":
+                    self.improper_dihedraltypes[
+                        (dihedraltype.i, dihedraltype.j, dihedraltype.k, dihedraltype.l)
                     ] = dihedraltype
+                else:
+                    # e.g. proper dihedrals with dihedraltype.funct == "9":
+                    if (
+                        self.proper_dihedraltypes.get(
+                            (
+                                dihedraltype.i,
+                                dihedraltype.j,
+                                dihedraltype.k,
+                                dihedraltype.l,
+                                dihedraltype.periodicity,
+                            )
+                        )
+                        is None
+                    ):
+                        self.proper_dihedraltypes[
+                            (
+                                dihedraltype.i,
+                                dihedraltype.j,
+                                dihedraltype.k,
+                                dihedraltype.l,
+                                dihedraltype.periodicity,
+                            )
+                        ] = dihedraltype
 
-            self.residuetypes = {}
-            if ffdir is None:
-                return
-            aminoacids_path = ffdir / "aminoacids.rtp"
-            aminoacids = read_rtp(aminoacids_path)
-            for k, v in aminoacids.items():
-                if k.startswith("BLOCK") or k == "bondedtypes":
-                    continue
-                self.residuetypes[k] = ResidueType.from_section(k, v)
+        if ffdir is None:
+            logger.warning("ffdir is None. No residuetypes will be parsed.")
+            return
+        aminoacids_path = ffdir / "aminoacids.rtp"
+        if not aminoacids_path.exists():
+            logger.warning(
+                "aminoacids.rtp not found in ffdir. No residuetypes will be parsed."
+            )
+            return
+        aminoacids = read_rtp(aminoacids_path)
+        for k, v in aminoacids.items():
+            if k.startswith("BLOCK") or k == "bondedtypes":
+                continue
+            self.residuetypes[k] = ResidueType.from_section(k, v)
 
     def __str__(self) -> str:
         return textwrap.dedent(

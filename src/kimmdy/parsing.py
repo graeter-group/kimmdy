@@ -109,9 +109,6 @@ raw_top =
 ```
 """
 
-GMX_BUILTIN_FF_DIR = get_gmx_dir() / "top"
-"""Path to gromacs data directory with the built-in forcefields."""
-
 
 def is_not_comment(c: str) -> bool:
     return c != ";"
@@ -185,7 +182,9 @@ def read_rtp(path: Path) -> dict:
         return d
 
 
-def resolve_includes(path: Path) -> tuple[list[str], Optional[Path]]:
+def resolve_includes(
+    path: Path, gmx_builtin_ffs: Optional[Path] = None
+) -> tuple[list[str], Optional[Path]]:
     """Resolve #include statements in a (top/itp) file.
 
     Arguments
@@ -209,6 +208,7 @@ def resolve_includes(path: Path) -> tuple[list[str], Optional[Path]]:
     os.chdir(dir)
     ls = []
     ffdir = None
+
     with open(fname, "r") as f:
         for l in f:
             l = "".join(takewhile(is_not_comment, l)).strip()
@@ -222,12 +222,14 @@ def resolve_includes(path: Path) -> tuple[list[str], Optional[Path]]:
                     # e.g. #include "amber99.ff/forcefield.itp"
                     ffdir = include_path.parent
                     # test if the path is in the cwd, otherwise search in gmx ff dir
-                    if not ffdir.exists():
-                        ffdir = GMX_BUILTIN_FF_DIR / ffdir
+                    if not ffdir.exists() and gmx_builtin_ffs is not None:
+                        ffdir = gmx_builtin_ffs / ffdir
                     ffdir = ffdir.resolve()
-                ls_prime, _ = resolve_includes(include_path)
-                if not ls_prime:
-                    ls_prime, _ = resolve_includes(GMX_BUILTIN_FF_DIR / include_path)
+                ls_prime, _ = resolve_includes(include_path, gmx_builtin_ffs)
+                if not ls_prime and gmx_builtin_ffs is not None:
+                    ls_prime, _ = resolve_includes(
+                        gmx_builtin_ffs / include_path, gmx_builtin_ffs
+                    )
                 if not ls_prime:
                     logger.warning(
                         f"top include {include_path} could not be resolved. Line was dropped."
@@ -240,7 +242,9 @@ def resolve_includes(path: Path) -> tuple[list[str], Optional[Path]]:
     return (ls, ffdir)
 
 
-def read_top(path: Path, ffdir: Optional[Path] = None) -> TopologyDict:
+def read_top(
+    path: Path, ffdir: Optional[Path] = None, use_gmx_dir: bool = True
+) -> TopologyDict:
     """Read a topology file into a raw TopologyDict represenation.
 
     Parameters
@@ -289,7 +293,12 @@ def read_top(path: Path, ffdir: Optional[Path] = None) -> TopologyDict:
         "orientation_restraints",
     )
 
-    ls, parsed_ffdir = resolve_includes(path)
+    gmx_builtin_ffs = None
+    if use_gmx_dir:
+        gmxdir = get_gmx_dir()
+        if gmxdir is not None:
+            gmx_builtin_ffs = gmxdir / "top"
+    ls, parsed_ffdir = resolve_includes(path, gmx_builtin_ffs)
     if ffdir is None and parsed_ffdir is not None:
         ffdir = parsed_ffdir
     if ffdir is None:
@@ -466,6 +475,7 @@ def read_edissoc(path: Path) -> dict:
 
 class Plumed_dict(TypedDict):
     """Dict representation of a plumed.dat file."""
+
     distances: list[dict]
     prints: list[dict]
 
