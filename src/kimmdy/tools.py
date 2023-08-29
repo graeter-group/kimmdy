@@ -14,40 +14,40 @@ def build_examples(restore: str):
     print(f"build_examples arguments: restore {restore}")
     overwrite = True if restore else False
 
-    rename = {
-        "hat_naive": "alanine",
-        "homolysis": "hexalanine",
-        "whole_run": "charged_peptide",
-        "pull": "tripelhelix",
-        "single_reaction": "single_reaction",
-    }
-    basedir = Path(__file__).parents[2]
-    testpath = basedir / "tests" / "test_files" / "test_integration"
-    examplepath = basedir / "example"
-    relassetpath = Path(".") / ".." / ".." / "tests" / "test_files" / "assets"
+    example_directories = [
+        "alanine_hat_naive",
+        "hexalanine_homolysis",
+        "charged_peptide_homolysis_hat_naive",
+        "triplehelix_pull",
+        "hexalanine_single_reaction",
+    ]
+    root_dir = Path(__file__).parents[2]
+    testfiles_path = root_dir / "tests" / "test_files" / "test_integration"
+    examples_path = root_dir / "example"
+    assets_path = Path(".") / ".." / ".." / "tests" / "test_files" / "assets"
 
-    for k, v in rename.items():
+    for directory in example_directories:
         try:
-            print("Building example", v, "...", end="")
-            srcpath = testpath / k
-            dstpath = examplepath / v
+            print("Building example", directory, "...", end="")
+            src = testfiles_path / directory
+            dest = examples_path / directory
             if restore == "hard":
-                shutil.rmtree(dstpath, ignore_errors=True)
-            print(srcpath, dstpath)
-            shutil.copytree(srcpath, dstpath, dirs_exist_ok=overwrite)
-            (dstpath / "amber99sb-star-ildnp.ff").unlink(missing_ok=True)
-            (dstpath / "amber99sb-star-ildnp.ff").symlink_to(
-                relassetpath / "amber99sb-star-ildnp.ff",
+                shutil.rmtree(dest, ignore_errors=True)
+            print(src, dest)
+            shutil.copytree(src, dest, dirs_exist_ok=overwrite)
+            (dest / "amber99sb-star-ildnp.ff").unlink(missing_ok=True)
+            (dest / "amber99sb-star-ildnp.ff").symlink_to(
+                assets_path / "amber99sb-star-ildnp.ff",
                 target_is_directory=True,
             )
-            # fix scheme path
-            yml = dstpath / "kimmdy.yml"
-            if yml.exists():
-                scheme_p = (
+            # patch schema path
+            kimmdy_yml_path = dest / "kimmdy.yml"
+            if kimmdy_yml_path.exists():
+                schema_path = (
                     Path("..") / ".." / "src" / "kimmdy" / "kimmdy-yaml-schema.json"
                 )
-                first_line = f"# yaml-language-server: $schema={scheme_p}\n"
-                with open(yml, "r+") as f:
+                first_line = f"# yaml-language-server: $schema={schema_path}\n"
+                with open(kimmdy_yml_path, "r+") as f:
                     lines = f.readlines()
                     if lines[0][:22] == "# yaml-language-server":
                         lines[0] = first_line
@@ -60,7 +60,7 @@ def build_examples(restore: str):
             print("done")
         except FileExistsError as e:
             raise FileExistsError(
-                f"Could not build example directory {v} because it already exists. Try the --restore option to still build it."
+                f"Could not build example directory {directory} because it already exists. Try the --restore option to still build it."
             ) from e
 
 
