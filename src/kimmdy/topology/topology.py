@@ -429,7 +429,7 @@ class MoleculeType:
             aj = update_map.get(angle.aj)
             ak = update_map.get(angle.ak)
             # drop angles to a deleted atom
-            if ai is None or aj is None or ak is None:
+            if None in (ai, aj, ak):
                 continue
             angle.ai = ai
             angle.aj = aj
@@ -445,7 +445,7 @@ class MoleculeType:
             ak = update_map.get(dihedrals.ak)
             al = update_map.get(dihedrals.al)
             # drop dihedrals to a deleted atom
-            if ai is None or aj is None or ak is None or al is None:
+            if None in (ai, aj, ak, al):
                 continue
 
             # do pairs before the dihedrals are updated
@@ -480,7 +480,7 @@ class MoleculeType:
         self.proper_dihedrals = new_multiple_dihedrals
         self.pairs = new_pairs
 
-        new_dihedrals = {}
+        new_impropers = {}
         for dihedral in self.improper_dihedrals.values():
             ai = update_map.get(dihedral.ai)
             aj = update_map.get(dihedral.aj)
@@ -493,8 +493,8 @@ class MoleculeType:
             dihedral.aj = aj
             dihedral.ak = ak
             dihedral.al = al
-            new_dihedrals[(ai, aj, ak, al)] = dihedral
-        self.improper_dihedrals = new_dihedrals
+            new_impropers[(ai, aj, ak, al)] = dihedral
+        self.improper_dihedrals = new_impropers
 
 
 class Topology:
