@@ -1,10 +1,7 @@
 from __future__ import annotations
 import textwrap
-from pathlib import Path
-from xml.etree.ElementTree import Element
 from kimmdy.topology.atomic import *
-from kimmdy.parsing import read_top, read_xml_ff, read_rtp
-from typing import Union
+from kimmdy.parsing import read_rtp
 
 from kimmdy.topology.utils import get_top_section
 
@@ -113,6 +110,6 @@ class FF:
         or a jupyter notebook.
 
         p is an instance of IPython.lib.pretty.RepresentationPrinter
-        <https://ipython.org/ipython-doc/3/api/generated/IPython.lib.pretty.html#IPython.lib.pretty.PrettyPrinter>
+        https://ipython.org/ipython-doc/3/api/generated/IPython.lib.pretty.html#IPython.lib.pretty.PrettyPrinter
         """
         p.text(str(self))
