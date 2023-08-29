@@ -25,41 +25,25 @@ class FF:
         ffdir = top["ffdir"]
 
         atomtypes = get_top_section(top, "atomtypes")
-        if atomtypes is None:
-            logger.warning(
-                "atomtypes not found in top dictionary. Is the forcefield in the correct directory?"
-            )
-        else:
+        if atomtypes is not None:
             for l in atomtypes:
                 atomtype = AtomType.from_top_line(l)
                 self.atomtypes[atomtype.type] = atomtype
 
         bondtypes = get_top_section(top, "bondtypes")
-        if bondtypes is None:
-            logger.warning(
-                "bondtypes not found in top dictionary. Is the forcefield in the correct directory?"
-            )
-        else:
+        if bondtypes is not None:
             for l in bondtypes:
                 bondtype = BondType.from_top_line(l)
                 self.bondtypes[(bondtype.i, bondtype.j)] = bondtype
 
         angletypes = get_top_section(top, "angletypes")
-        if angletypes is None:
-            logger.warning(
-                "angletypes not found in top dictionary. Is the forcefield in the correct directory?"
-            )
-        else:
+        if angletypes is not None:
             for l in angletypes:
                 angletype = AngleType.from_top_line(l)
                 self.angletypes[(angletype.i, angletype.j, angletype.k)] = angletype
 
         dihedraltypes = get_top_section(top, "dihedraltypes")
-        if dihedraltypes is None:
-            logger.warning(
-                "dihedraltypes not found in top dictionary. Is the forcefield in the correct directory?"
-            )
-        else:
+        if dihedraltypes is not None:
             for l in dihedraltypes:
                 dihedraltype = DihedralType.from_top_line(l)
                 # proper dihedrals can be defined multiple times

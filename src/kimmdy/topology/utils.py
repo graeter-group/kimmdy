@@ -5,10 +5,12 @@ from xml.etree.ElementTree import Element
 import re
 from typing import TYPE_CHECKING
 
-from dill.logger import logging
+import logging
 
 if TYPE_CHECKING:
     from kimmdy.topology.atomic import AtomicType, AtomicTypes
+
+logger = logging.getLogger(__name__)
 
 
 def get_top_section(
@@ -22,14 +24,17 @@ def get_top_section(
         parent_name = f"moleculetype_{moleculetype}"
         parent_section = top.get(parent_name)
         if parent_section is None:
-            logging.warning(f"topology does not contain moleculetype {moleculetype}")
+            logger.warning(f"topology does not contain moleculetype {moleculetype}")
             return None
         section = parent_section["subsections"].get(name)
     else:
         section = top.get(name)
 
     if section is None:
-        logging.warning(f"topology does not contain section {name}")
+        logger.warning(
+            f"Topology does not contain section {name}. "
+            "Is the forcefield in the correct directory?"
+        )
         return None
     condition = section.get("condition")
     if condition is not None:
@@ -59,7 +64,7 @@ def get_moleculetype_header(top: dict, moleculetype: str) -> Optional[tuple[str,
     """
     section = top.get(moleculetype)
     if section is None:
-        logging.warning(f"topology does not contain moleculetype {moleculetype}")
+        logger.warning(f"topology does not contain moleculetype {moleculetype}")
         return None
 
     condition = section.get("condition")
@@ -93,7 +98,7 @@ def get_moleculetype_atomics(top: dict, moleculetype: str) -> Optional[dict]:
     """
     section = top.get(moleculetype)
     if section is None:
-        logging.warning(f"topology does not contain moleculetype {moleculetype}")
+        logger.warning(f"topology does not contain moleculetype {moleculetype}")
         return None
 
     subsections = section["subsections"]
@@ -133,7 +138,7 @@ def set_moleculetype_atomics(
     """
     section = top.get(moleculetype)
     if section is None:
-        logging.warning(f"topology does not contain moleculetype {moleculetype}")
+        logger.warning(f"topology does not contain moleculetype {moleculetype}")
         return None
 
     subsections = section["subsections"]
