@@ -47,7 +47,7 @@ def rf_kmc(
     takes RecipeCollection and choses a recipe based on the relative propensity of the events.
 
 
-    Compare e.g. <https://en.wikipedia.org/wiki/Kinetic_Monte_Carlo#Rejection-free_KMC>
+    Compare e.g. [Wikipedia KMC - rejection free](https://en.wikipedia.org/wiki/Kinetic_Monte_Carlo#Rejection-free_KMC)
 
     Parameters
     ---------
@@ -102,7 +102,7 @@ def frm(
     """First Reaction Method variant of Kinetic Monte Carlo.
     takes RecipeCollection and choses a recipe based on which reaction would occur.
 
-    Compare e.g. <https://en.wikipedia.org/wiki/Kinetic_Monte_Carlo#Time-dependent_Algorithms>
+    Compare e.g. [Wikipedia KMC - time dependent](https://en.wikipedia.org/wiki/Kinetic_Monte_Carlo#Time-dependent_Algorithms)
 
     Parameters
     ---------

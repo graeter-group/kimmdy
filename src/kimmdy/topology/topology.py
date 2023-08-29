@@ -74,8 +74,7 @@ class MoleculeType:
         This whill be used if just the name of the object is entered in the ipython shell
         or a jupyter notebook.
 
-        p is an instance of IPython.lib.pretty.RepresentationPrinter
-        <https://ipython.org/ipython-doc/3/api/generated/IPython.lib.pretty.html#IPython.lib.pretty.PrettyPrinter>
+        p is an instance of [IPython.lib.pretty.RepresentationPrinter](https://ipython.org/ipython-doc/3/api/generated/IPython.lib.pretty.html#IPython.lib.pretty.PrettyPrinter)
         """
         p.text(str(self))
 
@@ -644,8 +643,7 @@ class Topology:
         This whill be used if just the name of the object is entered in the ipython shell
         or a jupyter notebook.
 
-        p is an instance of IPython.lib.pretty.RepresentationPrinter
-        <https://ipython.org/ipython-doc/3/api/generated/IPython.lib.pretty.html#IPython.lib.pretty.PrettyPrinter>
+        p is an instance of [IPython.lib.pretty.RepresentationPrinter](https://ipython.org/ipython-doc/3/api/generated/IPython.lib.pretty.html#IPython.lib.pretty.PrettyPrinter)
         """
         p.text(str(self))
 

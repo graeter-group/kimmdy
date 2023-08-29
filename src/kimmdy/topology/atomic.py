@@ -1,7 +1,7 @@
 """
 Atomic datatypes for the topology such as Atom, Bond, Angle, Dihedral, etc.
 The order of the fields comes from the gromacs topology file format.
-See <https://manual.gromacs.org/current/reference-manual/topologies/topology-file-formats.html#topology-file>
+See [gromacs manual](https://manual.gromacs.org/current/reference-manual/topologies/topology-file-formats.html#topology-file)
 """
 
 from dataclasses import dataclass, field
