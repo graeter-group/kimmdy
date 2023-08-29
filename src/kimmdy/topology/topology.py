@@ -48,7 +48,7 @@ class MoleculeType:
         self._parse_dihedrals()
         self._parse_restraints()
         self._initialize_graph()
-        self._test_for_radicals()
+        self.test_for_radicals()
 
     def __str__(self) -> str:
         return textwrap.dedent(
@@ -157,8 +157,11 @@ class MoleculeType:
             self.atoms[i].bound_to_nrs.append(j)
             self.atoms[j].bound_to_nrs.append(i)
 
-    def _test_for_radicals(self):
-        """Iterate over all atoms and designate them as radicals if they have fewer bounds than their natural bond order"""
+    def test_for_radicals(self):
+        """Updates radical status per atom and in topology.
+        Iterate over all atoms and designate them as radicals if they have
+        fewer bounds than their natural bond order.
+        """
         for atom in self.atoms.values():
             bo = ATOMTYPE_BONDORDER_FLAT.get(atom.type)
             if bo and bo > len(atom.bound_to_nrs):
@@ -204,9 +207,9 @@ class MoleculeType:
 
     def _get_atom_angles(self, atom_nr: str) -> list[tuple[str, str, str]]:
         """
-        each atom has a list of atoms it is bound to
-        get a list of angles that one atom is involved in
-        based in these lists.
+        Gets a list of angles that one atom is involved in based on the bond
+        information stored in the atom.
+
         Angles between atoms ai, aj, ak satisfy ai < ak
         """
         return self._get_center_atom_angles(atom_nr) + self._get_margin_atom_angles(
@@ -242,9 +245,8 @@ class MoleculeType:
         self, atom_nr: str
     ) -> list[tuple[str, str, str, str]]:
         """
-        each atom has a list of atoms it is bound to.
-        get a list of dihedrals that one atom is involved in
-        based in these lists.
+        Gets a list of dihedrals that one atom is involved in based on the bond
+        information stored in the atom.
         """
         return self._get_center_atom_dihedrals(
             atom_nr
@@ -301,23 +303,21 @@ class MoleculeType:
         if residue is None:
             return []
 
-        # <https://manual.gromacs.org/current/reference-manual/functions/bonded-interactions.html#improper-dihedrals>
+        # https://manual.gromacs.org/current/reference-manual/functions/bonded-interactions.html#improper-dihedrals
         # atom in a line, like a regular dihedral:
         dihedrals = []
         dihedral_candidate_keys = self._get_margin_atom_dihedrals(
             atom_nr
         ) + self._get_center_atom_dihedrals(atom_nr)
 
-        # atom in the center of a star/tetrahedron:
+        # atom in the center of a triangle:
         ai = atom_nr
         partners = self.atoms[ai].bound_to_nrs
         if len(partners) >= 3:
-            combs = combinations(partners, 3)
-            for comb in combs:
-                aj, ak, al = comb
+            for aj, ak, al in combinations(partners, 3):
                 dihedral_candidate_keys.append((ai, aj, ak, al))
 
-        # atom in corner of a star/tetrahedron:
+        # atom in corner of a triangle:
         for a in self.atoms[atom_nr].bound_to_nrs:
             partners = self.atoms[a].bound_to_nrs
             if len(partners) >= 3:
