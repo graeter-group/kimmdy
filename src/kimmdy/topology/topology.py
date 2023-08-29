@@ -440,16 +440,6 @@ class MoleculeType:
         new_pairs = {}
         new_multiple_dihedrals = {}
         for dihedrals in self.proper_dihedrals.values():
-            # do pairs before the ids are updated
-            pair = self.pairs.get((dihedrals.ai, dihedrals.al))
-            if pair:
-                ai = update_map.get(pair.ai)
-                aj = update_map.get(pair.aj)
-                if ai and aj:
-                    pair.ai = update_map[pair.ai]
-                    pair.aj = update_map[pair.aj]
-                    new_pairs[(ai, aj)] = pair
-
             ai = update_map.get(dihedrals.ai)
             aj = update_map.get(dihedrals.aj)
             ak = update_map.get(dihedrals.ak)
@@ -457,6 +447,14 @@ class MoleculeType:
             # drop dihedrals to a deleted atom
             if ai is None or aj is None or ak is None or al is None:
                 continue
+
+            # do pairs before the dihedrals are updated
+            if pair := self.pairs.get((dihedrals.ai, dihedrals.al)):
+                pair.ai = update_map[pair.ai]
+                pair.aj = update_map[pair.aj]
+                if not None in [pair.ai, pair.aj]:
+                    new_pairs[(pair.ai, pair.aj)] = pair
+
             dihedrals.ai = ai
             dihedrals.aj = aj
             dihedrals.ak = ak
