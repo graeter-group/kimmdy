@@ -60,17 +60,6 @@ def get_cmdline_args() -> argparse.Namespace:
         action="store_true",
         help="continue. Start KIMMDY from the latest checkpoint file",
     )
-    parser.add_argument(
-        "--concat",
-        type=Path,
-        nargs="?",
-        const=True,
-        help=(
-            "Concatenate trrs of this run"
-            "Optionally, the run directory can be give"
-            "Will save as concat.trr in current directory"
-        ),
-    )
 
     # on error, drop into debugger
     parser.add_argument(
