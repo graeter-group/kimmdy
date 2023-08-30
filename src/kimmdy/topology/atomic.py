@@ -14,7 +14,7 @@ class Atom:
     """Information about one atom
 
     A class containing atom information as in the atoms section of the topology.
-    An atom keeps a list of which atoms it is bound to.
+    An atom keeps a list of which atoms it is bound to and its radical state.
 
     From gromacs topology:
     ; nr type resnr residue atom cgnr charge mass typeB chargeB massB
@@ -124,13 +124,12 @@ class DihedralRestraint:
 
 @dataclass()
 class AtomType:
-    """Information about one atom
+    """Information about one atom type
 
-    A class containing atom information as in the atoms section of the topology.
-    An atom keeps a list of which atoms it is bound to.
+    A class containing atom type information as in the atomtypes section of the forcefield.
 
     From gromacs version of the amber* ff:
-    ; name      at.num  mass     charge ptype  sigma      epsilon
+    ; name at.num mass charge ptype sigma epsilon
     """
 
     type: str
@@ -163,8 +162,9 @@ class Bond:
     """Information about one bond
 
     A class containing bond information as in the bonds section of the topology.
+    
     From gromacs topology:
-    'ai', 'aj', 'funct', 'c0', 'c1', 'c2', 'c3', 'c4', 'c5'
+    ; ai aj funct c0 c1 c2 c3 c4 c5
     With ai < aj
     """
 
@@ -200,9 +200,10 @@ class Bond:
 class BondType:
     """Information about one bondtype
 
-    A class containing bond information as in the bonds section of the topology.
-    From gromacs topology:
-    'i', 'j', 'funct', 'c0', 'c1', 'c2', 'c3
+    A class containing bond information as in the bondtype section of the forcefield.
+    
+    From gromacs version of the amber* ff:
+    ; i j func b0 kb
     Where i and j are atomtypes
     """
 
@@ -241,7 +242,7 @@ class Pair:
     A class containing pair information as in the pair section of the topology.
 
     From gromacs topology:
-    ai', 'aj', 'funct', 'c0', 'c1', 'c2', 'c3'
+    ; ai aj funct c0 c1 c2 c3
     """
 
     ai: str
@@ -272,7 +273,7 @@ class Angle:
     A class containing angle information as in the angles section of the topology.
 
     From gromacs topology:
-    ';', 'ai', 'aj', 'ak', 'funct', 'c0', 'c1', 'c2', 'c3'
+    ; ai aj ak funct c0 c1 c2 c3
     With aj < ai < ak
     """
 
@@ -301,13 +302,12 @@ class Angle:
 
 @dataclass()
 class AngleType:
-    """Information about one angle
+    """Information about one angletype
 
-    A class containing angle information as in the angles section of the topology.
+    A class containing angle type information as in the angletypes section of the forcefield.
 
-    From gromacs topology:
-    ';', 'i', 'j', 'k', 'funct', 'c0', 'c1', 'c2', 'c3'
-    where i,j,k are atomtypes
+    From gromacs version of the amber* ff:
+    ; i j k func th0 cth
     """
 
     i: str
@@ -341,15 +341,15 @@ class AngleType:
 class Dihedral:
     """Information about one proper or improper dihedral
 
-    A class containing bond information as in the dihedrals section of the topology.
+    A class containing dihedral information as in the dihedrals section of the topology.
     Improper dihedrals have funct 4.
-    Proper dihedrals have funct != 4. Mostly funct 9.
+    Proper dihedrals have funct != 4, mostly funct 9.
 
     Note that proper dihedrals of type 9 can be defined multiple times, for different
     periodicities. This is why would-be parameter c2 is called periodicity.
 
     From gromacs topology:
-    ';', 'ai', 'aj', 'ak', 'al', 'funct', 'c0', 'c1', 'periodicity', 'c3', 'c4', 'c5'
+    ; ai aj ak al funct c0 c1 c2 c3 c4 c5
     For proper dihedrals (funct 9): aj < ak
     """
 
@@ -391,7 +391,7 @@ class MultipleDihedrals:
     Multiple ``Dihedral``s with the same ai, aj, ak, al
     but different periodicities.
     funct should always be "9" when the length of dihedrals is > 1.
-    The key of the dict is the periodicity (c2).
+    The key of the dihedrals dict is the periodicity (c2).
     """
 
     ai: str
@@ -404,19 +404,18 @@ class MultipleDihedrals:
 
 @dataclass()
 class DihedralType:
-    """Information about one dihedral
+    """Information about one dihedraltype
 
-    A class containing bond information as in the dihedrals section of the topology.
-    Proper dihedrals have funct 9.
-    Improper dihedrals have funct 4.
+    A class containing dihedral type information as in the dihedraltypes 
+    section of the forcefield. 
+    Improper dihedrals have funct 4. Proper dihedrals have funct 9.
 
     Note that proper dihedrals of type 9 can be defined multiple times, for different
     periodicities. This is why would-be parameter c2 is called periodicity and part of
     the `id`.
 
-    From gromacs topology:
-    ';', 'i', 'j', 'k', 'l', 'funct', 'c0', 'c1', 'periodicity', 'c3', 'c4', 'c5'
-    Where i,j,k,l are atomtypes
+    From gromacs version of the amber* ff:
+    ; i j k l func phase kd pn
     """
 
     i: str
@@ -461,7 +460,7 @@ class MultipleDihedralTypes:
     Multiple ``DihedralTypes``s with the same ai, aj, ak, al
     but different periodicities.
     funct should always be "9" when the length of dihedrals is > 1.
-    The key of the dict is the periodicity (c2).
+    The key of the dihedral_types dict is the periodicity (c2).
     """
 
     ai: str
@@ -475,7 +474,8 @@ class MultipleDihedralTypes:
 @dataclass()
 class ResidueAtomSpec:
     """Information about one atom in a residue
-    ; name  type  charge  chargegroup
+
+    ; name type charge chargegroup
     """
 
     name: str
@@ -491,7 +491,8 @@ class ResidueAtomSpec:
 @dataclass()
 class ResidueBondSpec:
     """Information about one bond in a residue
-    ; atom1 atom2      b0      kb
+
+    ; atom1 atom2 b0 kb
     """
 
     atom1: str
@@ -509,7 +510,8 @@ class ResidueBondSpec:
 @dataclass()
 class ResidueImproperSpec:
     """Information about one imroper dihedral in a residue
-    ;atom1 atom2 atom3 atom4     q0     cq
+
+    ; atom1 atom2 atom3 atom4 q0 cq
     """
 
     atom1: str
@@ -534,7 +536,8 @@ class ResidueImproperSpec:
 @dataclass()
 class ResidueProperSpec:
     """Information about one imroper dihedral in a residue
-    ;atom1 atom2 atom3 atom4     q0     cq
+
+    ; atom1 atom2 atom3 atom4 q0 cq
     """
 
     atom1: str

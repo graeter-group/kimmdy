@@ -20,7 +20,22 @@ logger = logging.getLogger("kimmdy")
 
 
 class MoleculeType:
-    """One moleculetype in the topology"""
+    """One moleculetype in the topology
+
+    Attributes
+    ----------
+    atoms : dict[str, Atom]
+    bonds : dict[tuple[str, str], Bond]
+    pairs : dict[tuple[str, str], Pair]
+    angles : dict[tuple[str, str, str], Angle]
+    proper_dihedrals : dict[tuple[str, str, str, str], MultipleDihedrals]
+    improper_dihedrals : dict[tuple[str, str, str, str], Dihedral]
+    position_restraints : dict[str, PositionRestraint]
+    dihedral_restraints : dict[tuple[str, str, str, str], DihedralRestraint]
+    radicals : dict[str, Atom]
+        dict mapping atom indices to atom objects for storing all radical atoms
+
+    """
 
     def __init__(self, header: tuple[str, str], atomics: dict) -> None:
         self.name, self.nrexcl = header
@@ -74,7 +89,8 @@ class MoleculeType:
         This whill be used if just the name of the object is entered in the ipython shell
         or a jupyter notebook.
 
-        p is an instance of [IPython.lib.pretty.RepresentationPrinter](https://ipython.org/ipython-doc/3/api/generated/IPython.lib.pretty.html#IPython.lib.pretty.PrettyPrinter)
+        p is an instance of
+        [IPython.lib.pretty.PrettyPrinter](https://ipython.org/ipython-doc/3/api/generated/IPython.lib.pretty.html)
         """
         p.text(str(self))
 
@@ -159,6 +175,7 @@ class MoleculeType:
 
     def test_for_radicals(self):
         """Updates radical status per atom and in topology.
+
         Iterate over all atoms and designate them as radicals if they have
         fewer bounds than their natural bond order.
         """
@@ -508,14 +525,12 @@ class Topology:
 
     Parameters
     ----------
-    top :
-        A dictionary containing the parsed topology data.
+    top
+        A dictionary containing the parsed topology data, produced by
+        [](`kimmdy.parsing.read_top`)
     """
 
-    def __init__(
-        self,
-        top: TopologyDict,
-    ) -> None:
+    def __init__(self, top: TopologyDict) -> None:
         if top == {}:
             raise NotImplementedError(
                 "Generating an empty Topology from an empty TopologyDict is not implemented."
@@ -641,24 +656,27 @@ class Topology:
         This whill be used if just the name of the object is entered in the ipython shell
         or a jupyter notebook.
 
-        p is an instance of [IPython.lib.pretty.RepresentationPrinter](https://ipython.org/ipython-doc/3/api/generated/IPython.lib.pretty.html#IPython.lib.pretty.PrettyPrinter)
+        p is an instance of
+        [IPython.lib.pretty.PrettyPrinter](https://ipython.org/ipython-doc/3/api/generated/IPython.lib.pretty.html)
         """
         p.text(str(self))
 
     def break_bond(
         self, atompair_addresses: tuple[TopologyAtomAddress, TopologyAtomAddress]
     ):
-        """Break bonds in topology.
+        """Break bonds in topology homolytically.
 
-        removes bond, angles and dihedrals where atompair was involved.
+        Removes bond, angles and dihedrals where atompair was involved.
         Modifies the topology dictionary in place.
+        Atom pairs become radicals.
 
 
         Parameters
         ----------
-        atompair_addresses :
+        atompair_addresses
             Between which atoms to break the bond.
         """
+        # if all([isinstance(atompair_addresses[i], str) for i in (0,1)]):
         if type(atompair_addresses[0]) == str and type(atompair_addresses[1]) == str:
             # old style atompair_nrs with only atom numbers
             # thus refers to the first moleculeype, moleculetype_0
@@ -667,7 +685,8 @@ class Topology:
             main_molecule_name = list(self.moleculetypes.keys())[0]
         else:
             raise NotImplementedError(
-                "Breaking/Binding bonds in topology between atoms with different moleculetypes is not implemented, yet."
+                "Breaking/Binding bonds in topology between atoms with "
+                "different moleculetypes is not implemented."
             )
 
         moleculetype = self.moleculetypes[main_molecule_name]
@@ -741,7 +760,7 @@ class Topology:
 
         Parameters
         ----------
-        atompair_addresses :
+        atompair_addresses
             Atoms to bind together.
         """
         if type(atompair_addresses[0]) == str and type(atompair_addresses[1]) == str:
