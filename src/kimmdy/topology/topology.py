@@ -583,7 +583,7 @@ class Topology:
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Topology):
-            return NotImplemented
+            return False
         return self.to_dict() == other.to_dict()
 
     def _update_dict(self):
