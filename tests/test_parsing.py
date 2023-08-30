@@ -224,20 +224,20 @@ def test_parse_aminoacids_read_top():
         / "amber99sb-star-ildnp.ff"
         / "aminoacids.rtp"
     )
-    aminoacids_dict = parsing.read_top(aminoacids_path, use_gmx_dir=False)
+    aminoacids_dict = parsing.read_top(aminoacids_path, use_gmx_dir=False, nestable_upper=True)
     for aminoacid in AA3:
         assert (
             entry := aminoacids_dict.get(aminoacid)
         ), f"Aminoacid {aminoacid} not in {aminoacids_path.name}"
         ref_subsections = ["atoms", "bonds", "impropers"]
-        subsections = list(entry.keys())
+        subsections = list(entry['subsections'].keys())
 
         assert all(
             x in subsections for x in ref_subsections
         ), f"Aminoacid {aminoacid} does not have the subsections {ref_subsections} but {subsections}"
-        assert all(len(x) == 4 for x in entry["atoms"])
-        assert all(len(x) == 2 for x in entry["bonds"])
-        assert all(len(x) in [4, 7] for x in entry["impropers"])
+        assert all(len(x) == 4 for x in entry['subsections']["atoms"]['content'])
+        assert all(len(x) == 2 for x in entry['subsections']["bonds"]['content'])
+        assert all(len(x) in [4, 7] for x in entry['subsections']["impropers"]['content'])
 
 
 def test_parse_ffbonded():

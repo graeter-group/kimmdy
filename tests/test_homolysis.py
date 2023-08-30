@@ -30,7 +30,7 @@ def homolysis_files():
     top = read_top(filedir / "topol.top")
     plumed = read_plumed(filedir / "plumed.dat")
     distances = read_distances_dat(filedir / "distances.dat")
-    ffbonded = read_rtp(filedir / "ffbonded.itp")
+    ffbonded = read_top(filedir / "ffbonded.itp")
     edissoc = read_edissoc(filedir / "edissoc.dat")
 
     files = {

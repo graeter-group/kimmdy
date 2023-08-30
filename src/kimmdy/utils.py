@@ -120,7 +120,7 @@ def get_bondprm_from_atomtypes(
     atomtypes_list = list(atomtypes)
     lookup_ffbonded_atomtype = {
         frozenset(l[:2]): [float(l[3]), float(l[4])]
-        for l in ffbonded["bondtypes"]["other"]
+        for l in ffbonded["bondtypes"]["content"]
     }
     atomelements_list = [x[0] for x in atomtypes_list]
 

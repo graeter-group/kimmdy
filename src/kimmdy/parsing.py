@@ -8,11 +8,12 @@ import json
 import numpy as np
 from pathlib import Path
 from collections.abc import Iterable
-from typing import Generator, Optional, Union
+from typing import Generator, Optional, Union, Callable
 from itertools import takewhile
 from typing import TypedDict
 
 from kimmdy.utils import get_gmx_dir
+from kimmdy.constants import AA3
 
 logger = logging.getLogger(__name__)
 TopologyDict = dict
@@ -249,7 +250,7 @@ def resolve_includes(
 
 
 def read_top(
-    path: Path, ffdir: Optional[Path] = None, use_gmx_dir: bool = True
+    path: Path, ffdir: Optional[Path] = None, use_gmx_dir: bool = True, nestable_upper = False,
 ) -> TopologyDict:
     """Read a topology file into a raw TopologyDict represenation.
 
@@ -275,7 +276,12 @@ def read_top(
     - sections that can have subsections can also exist multiple, separate times
       e.g. moleculetype will appear multiple times and they should not be merged
     """
-    SECTIONS_WITH_SUBSECTIONS = ("moleculetype",)
+    
+    if nestable_upper:
+        subsection_eval: Callable[[str],bool] = lambda x: x.isupper()
+    else:
+        SECTIONS_WITH_SUBSECTIONS = ("moleculetype",)
+        subsection_eval: Callable[[str],bool] = lambda x: x in SECTIONS_WITH_SUBSECTIONS
     NESTABLE_SECTIONS = (
         "atoms",
         "bonds",
@@ -352,13 +358,15 @@ def read_top(
 
         elif l.startswith("["):
             # start a new section
-            section = l.strip("[] \n").lower()
-            if section in SECTIONS_WITH_SUBSECTIONS:
+            #section = l.strip("[] \n").lower()
+            section = l.strip("[] \n")
+            if subsection_eval(section):
                 parent_section = section
                 section = None
                 if d.get(parent_section) is None:
-                    parent_section = f"{parent_section}_{parent_section_index}"
-                    parent_section_index += 1
+                    if parent_section == 'moleculetype':
+                        parent_section = f"{parent_section}_{parent_section_index}"
+                        parent_section_index += 1
                     d[parent_section] = empty_section(condition)
                     d[parent_section]["subsections"] = {}
             else:

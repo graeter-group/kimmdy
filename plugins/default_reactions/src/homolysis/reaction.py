@@ -41,7 +41,7 @@ class Homolysis(ReactionPlugin):
         distances = read_distances_dat(distances_dat)
         plumed = read_plumed(plumed_dat)
         top = read_top(topol_top)
-        ffbonded = read_rtp(ffbonded_itp)
+        ffbonded = read_top(ffbonded_itp)
         edissoc = read_edissoc(edissoc_dat)
 
         #

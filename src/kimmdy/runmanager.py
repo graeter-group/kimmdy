@@ -497,9 +497,7 @@ class RunManager:
                     break_bond_plumed(
                         files,
                         (step.atom_id_1, step.atom_id_2),
-                        self.config.plumed.with_stem(
-                            self.config.plumed.stem + "_mod"
-                        ).name,
+                        files.outputdir / self.config.plumed.name.replace(".","_mod.")
                     )
             elif isinstance(step, Bind):
                 self.top.bind_bond((step.atom_id_1, step.atom_id_2))
@@ -519,9 +517,7 @@ class RunManager:
                     top_merge = merge_top_slow_growth(top_initial, deepcopy(self.top))
                     top_merge_path = (
                         files.outputdir
-                        / self.config.top.with_stem(
-                            self.config.top.stem + "_merge"
-                        ).name
+                        / self.config.top.name.replace(".","_mod.")
                     )
                     write_top(top_merge.to_dict(), top_merge_path)
                     self.latest_files["top"] = top_merge_path

@@ -475,7 +475,7 @@ def break_bond_plumed(
     plumed_path = files.input["plumed"]
     # if break_bond_plumed is called multiple times in one _apply_recipe task
     if "plumed" in files.output.keys():
-        plumed_path = files.output["trr"]
+        plumed_path = files.output["plumed"]
     plumeddat = read_plumed(plumed_path)
 
     files.output["plumed"] = newplumed
