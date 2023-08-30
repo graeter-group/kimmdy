@@ -2,9 +2,8 @@ from __future__ import annotations
 import textwrap
 import logging
 from pathlib import Path
-from xml.etree.ElementTree import Element
 from kimmdy.topology.atomic import *
-from kimmdy.parsing import read_top, read_xml_ff, read_rtp
+from kimmdy.parsing import read_top, read_rtp
 from typing import Union
 from kimmdy.topology.utils import get_top_section
 

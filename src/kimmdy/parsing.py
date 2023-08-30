@@ -3,14 +3,13 @@ All read_<...> and write_<...> functions.
 """
 import os
 import re
-from pathlib import Path
-from collections.abc import Iterable
-from typing import Generator, Optional, Union
-import xml.etree.ElementTree as ET
-from itertools import takewhile
 import logging
 import json
 import numpy as np
+from pathlib import Path
+from collections.abc import Iterable
+from typing import Generator, Optional, Union
+from itertools import takewhile
 from typing import TypedDict
 
 from kimmdy.utils import get_gmx_dir
@@ -110,11 +109,17 @@ raw_top =
 """
 
 
+## parsing convenience functions
 def is_not_comment(c: str) -> bool:
+    """Returns whether a string is not a comment.
+
+    Used for topology like files that use ';' for comments.
+    """
     return c != ";"
 
 
 def create_subsections(ls: list[list[str]]):
+    """ """
     d = {}
     subsection_name = "other"
     for _, l in enumerate(ls):
@@ -128,6 +133,7 @@ def create_subsections(ls: list[list[str]]):
     return d
 
 
+## parsing functions
 def read_rtp(path: Path) -> dict:
     # TODO: make this more elegant and performant
     # TODO combine with top parser?
@@ -455,22 +461,7 @@ def write_top(top: TopologyDict, outfile: Path):
                     write_section(f, name, section)
 
 
-def read_edissoc(path: Path) -> dict:
-    """reads a edissoc file and turns it into a dict.
-    the tuple of bond atoms make up the key,
-    the dissociation energy E_dissoc [kJ mol-1] is the value
-
-    Parameters
-    ----------
-    path :
-        Path to the file. E.g. Path("edissoc.dat")
-    """
-    with open(path, "r") as f:
-        edissocs = {}
-        for l in f:
-            at1, at2, edissoc, *_ = l.split()
-            edissocs[frozenset((at1, at2))] = float(edissoc)
-    return edissocs
+## Plumed read/write
 
 
 class Plumed_dict(TypedDict):
@@ -562,10 +553,7 @@ def read_distances_dat(distances_dat: Path):
     return d
 
 
-def read_xml_ff(path: Path) -> ET.Element:
-    tree = ET.parse(path)
-    root = tree.getroot()
-    return root
+## JSON read/write
 
 
 class JSONEncoder(json.JSONEncoder):
@@ -590,3 +578,24 @@ def read_json(path: Union[str, Path]) -> dict:
     with open(path, "r") as f:
         data = json.load(f)
     return data
+
+
+## Miscellaneous files read/write
+
+
+def read_edissoc(path: Path) -> dict:
+    """reads a edissoc file and turns it into a dict.
+    the tuple of bond atoms make up the key,
+    the dissociation energy E_dissoc [kJ mol-1] is the value
+
+    Parameters
+    ----------
+    path :
+        Path to the file. E.g. Path("edissoc.dat")
+    """
+    with open(path, "r") as f:
+        edissocs = {}
+        for l in f:
+            at1, at2, edissoc, *_ = l.split()
+            edissocs[frozenset((at1, at2))] = float(edissoc)
+    return edissocs
