@@ -34,7 +34,9 @@ def get_cmdline_args() -> argparse.Namespace:
     :
         Parsed command line arguments
     """
-    parser = argparse.ArgumentParser(description="Welcome to KIMMDY")
+    parser = argparse.ArgumentParser(description="""Welcome to KIMMDY. `kimmdy` runs KIMMDY, further tools are available as `kimmdy-...` commands.
+    These are `-analysis`, `-remove-hydrogen` and `-build-examples`. Access their help with `kimmdy-... -h.`
+    """)
     parser.add_argument(
         "--version", action="version", version=f'KIMMDY {version("kimmdy")}'
     )
@@ -107,7 +109,7 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         Parsed command line arguments
     """
     parser = argparse.ArgumentParser(
-        description="Welcome to the KIMMDY analysis module"
+        description="Welcome to the KIMMDY analysis module. Use this module to analyse existing KIMMDY runs.",
     )
     subparsers = parser.add_subparsers(required=True, metavar="module", dest="module")
 
@@ -123,9 +125,10 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         nargs="*",
         default="all",
         help=(
-            "Apply analysis method to subdirectories with these names. Uses all subdirectories by default"
+            "Apply analysis method to subdirectories with these names. Uses all subdirectories by default."
         ),
     )
+    parser_trjcat.add_argument("--open-vmd", action="store_true", help="Open VMD with the concatenated trajectory.")
 
     parser_plot_energy = subparsers.add_parser(
         name="plot_energy", help="Plot GROMACS energy for a KIMMDY run"
@@ -139,7 +142,7 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         nargs="*",
         default="all",
         help=(
-            "Apply analysis method to subdirectories with these names. Uses all subdirectories by default"
+            "Apply analysis method to subdirectories with these names. Uses all subdirectories by default."
         ),
     )
     parser_plot_energy.add_argument(
@@ -148,9 +151,10 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         nargs="*",
         default=["Potential"],
         help=(
-            "Terms from gmx energy that will be plotted. Uses 'Potential' by default"
+            "Terms from gmx energy that will be plotted. Uses 'Potential' by default."
         ),
     )
+    parser_plot_energy.add_argument("--open-plot", action="store_true", help="Open plot in default system viewer.")
 
     parser_radical_population = subparsers.add_parser(
         name="radical_population",
@@ -510,9 +514,9 @@ def entry_point_analysis():
     args = get_analysis_cmdline_args()
 
     if args.module == "trjcat":
-        concat_traj(args.dir, args.steps)
+        concat_traj(args.dir, args.steps, args.open_vmd)
     elif args.module == "plot_energy":
-        plot_energy(args.dir, args.steps, args.terms)
+        plot_energy(args.dir, args.steps, args.terms, args.open_plot)
     elif args.module == "radical_population":
         radical_population(args.dir, args.radical_population)
     elif args.module == "plot_rates":

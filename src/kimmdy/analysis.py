@@ -1,81 +1,105 @@
 from typing import Union
 from pathlib import Path
-import subprocess
-import argparse
 from math import isclose
 import matplotlib.pyplot as plt
 import MDAnalysis as mda
+import subprocess as sp
 
 from kimmdy.utils import run_shell_cmd
 from kimmdy.parsing import read_json, write_json
 from kimmdy.recipe import RecipeCollection
 
 
-def get_subdirs(run_dir: Path, steps: Union[list, str]):
-    ## create list of subdirectories of run_dir that match the ones named in steps
-    subdirs_sorted = sorted(
-        list(filter(lambda d: d.is_dir(), run_dir.glob("*_*/"))),
+def get_step_directories(dir: Path, steps: Union[list[str], str] = "all") -> list[Path]:
+    """
+    create list of subdirectories that match the steps.
+    If steps is "all", all subdirectories are returned.
+
+    Parameters
+    ----------
+    dir :
+        Directory to search for subdirectories
+    steps :
+        List of steps e.g. ["equilibrium", "production"]. Or a string "all" to return all subdirectories
+    """
+    directories = sorted(
+        [p for p in dir.glob("*_*/") if p.is_dir()],
         key=lambda p: int(p.name.split("_")[0]),
     )
     if steps == "all":
-        steps = list(set([x.name.split("_")[1] for x in subdirs_sorted]))
-    subdirs_matched = list(
-        filter(lambda d: d.name.split("_")[1] in steps, subdirs_sorted)
-    )
-
-    if not subdirs_matched:
-        raise ValueError(
-            f"Could not find directories {steps} in {run_dir}. Thus, no trajectories can be concatenated"
+        matching_directories = directories
+    else:
+        matching_directories = list(
+            filter(lambda d: d.name.split("_")[1] in steps, directories)
         )
 
-    return subdirs_matched
+    if not matching_directories:
+        raise ValueError(
+            f"Could not find directories {steps} in {dir}. Thus, no trajectories can be concatenated"
+        )
+
+    return matching_directories
 
 
-def concat_traj(rundir: str, steps: Union[list, str]):
-    """Find and concatenate trajectories (.xtc files) from KIMMDY runs."""
-    run_dir = Path(rundir).expanduser().resolve()
+def concat_traj(dir: str, steps: Union[list[str], str], open_vmd: bool = False):
+    """Find and concatenate trajectories (.xtc files) from a KIMMDY run into one trajectory.
+    The concatenated trajectory is centered and pbc corrected.
 
-    ## check if step argument is valid
-    if not isinstance(steps, list):
-        if not steps in ["all"]:
-            raise ValueError(f"Steps argument {steps} can not be dealt with.")
+    Parameters
+    ----------
+    dir :
+        Directory to search for subdirectories
+    steps :
+        List of steps e.g. ["equilibrium", "production"]. Or a string "all" to return all subdirectories
+    open_vmd :
+        Open concatenated trajectory in VMD
+    """
+    run_dir = Path(dir).expanduser().resolve()
 
-    subdirs_matched = get_subdirs(run_dir, steps)
+    directories = get_step_directories(run_dir, steps)
 
     ## create output dir
-    (run_dir / "analysis").mkdir(exist_ok=True)
-    out = run_dir / "analysis" / "concat.xtc"
-    out = Path(out).expanduser()
+    analysis_dir = run_dir / "analysis"
+    analysis_dir.mkdir(exist_ok=True)
+    out_xtc = analysis_dir / "concat.xtc"
 
     ## gather trajectories
     trajectories = []
     tprs = []
-    for d in subdirs_matched:
+    gros = []
+    for d in directories:
         trajectories.extend(d.glob("*.xtc"))
         tprs.extend(d.glob("*.tpr"))
+        gros.extend(d.glob("*.gro"))
 
-    # trajectories = list(filter(lambda p: "rotref" not in p.stem, trajectories))
-    trajectories = [str(t) for t in trajectories]
     assert (
         len(trajectories) > 0
     ), f"No trrs found to concatenate in {run_dir} with subdirectory names {steps}"
 
+    trajectories = [str(t) for t in trajectories]
+
     ## write concatenated trajectory
+    tmp_xtc = str(out_xtc.with_name("tmp.xtc"))
     run_shell_cmd(
-        f"gmx trjcat -f {' '.join(trajectories)} -o {str(out.with_name('tmp.xtc'))} -cat",
+        f"gmx trjcat -f {' '.join(trajectories)} -o {tmp_xtc} -cat",
         cwd=run_dir,
     )
     run_shell_cmd(
-        f"echo '1 0' | gmx trjconv -f {str(out.with_name('tmp.xtc'))} -s {tprs[0]} -o {str(out)} -center -pbc mol",
+        f"echo '1 0' | gmx trjconv -f {tmp_xtc} -s {tprs[0]} -o {str(out_xtc)} -center -pbc mol",
         cwd=run_dir,
     )
+    run_shell_cmd(f"rm {tmp_xtc}", cwd=run_dir)
+    if open_vmd:
+        gro = str(gros[0])
+        run_shell_cmd(f"cp {gro} {str(analysis_dir)}", cwd=run_dir)
+        run_shell_cmd(f"vmd {gro} {str(out_xtc)}", cwd=run_dir)
 
 
-def plot_energy(rundir: str, steps: Union[list, str], terms: list):
-    run_dir = Path(rundir).expanduser().resolve()
+def plot_energy(dir: str, steps: Union[list[str], str], terms: list[str], open_plot: bool = False):
+    run_dir = Path(dir).expanduser().resolve()
     xvg_entries = ["time"] + terms
 
-    subdirs_matched = get_subdirs(run_dir, steps)
+    subdirs_matched = get_step_directories(run_dir, steps)
 
     ## create output dir
     (run_dir / "analysis").mkdir(exist_ok=True)
@@ -103,10 +127,9 @@ def plot_energy(rundir: str, steps: Union[list, str], terms: list):
 
         ## read energy .xvg files
         with open(xvg, "r") as f:
-            energy_raw = f.readlines()
-        for line in energy_raw:
-            if line[0] not in ["@", "#"]:
-                energy.append({k: float(v) for k, v in zip(xvg_entries, line.split())})
+            for line in f:
+                if line[0] not in ["@", "#"]:
+                    energy.append({k: float(v) for k, v in zip(xvg_entries, line.split())})
 
     ## plot energy
     snapshot = range(len(energy))
@@ -118,7 +141,7 @@ def plot_energy(rundir: str, steps: Union[list, str], terms: list):
 
     for term in terms:
         val = [x[term] for x in energy]
-        print(term, min(val), max(val))
+        print(f"{term}: min {min(val)}, max {max(val)}")
         limy[0] = min(val) if min(val) < limy[0] else limy[0]
         limy[1] = max(val) if max(val) > limy[1] else limy[1]
         plt.plot(snapshot, val, label=term)
@@ -130,9 +153,13 @@ def plot_energy(rundir: str, steps: Union[list, str], terms: list):
     plt.xlabel("Snapshot #")
     plt.ylabel("Energy [kJ mol-1]")
     plt.legend()
-    plt.savefig(str(run_dir / "analysis" / "energy.png"), dpi=300)
+    output_path = str(run_dir / "analysis" / "energy.png")
+    plt.savefig(output_path, dpi=300)
 
-    print(limy)
+    # open png file with default system viewer
+    if open_plot:
+        sp.call(('xdg-open', output_path))
+
 
 
 def radical_population(rundir: str, select_atoms: str):
