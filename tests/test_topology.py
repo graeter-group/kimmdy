@@ -172,8 +172,12 @@ class TestTopology:
         bondindex = 24
         bond_key = list(top.bonds.keys())[bondindex]
         logging.info(f"bond_key: {bond_key}")
+        assert top.bonds.get(bond_key) is not None
         top.break_bond(bond_key)
+        assert top.bonds.get(bond_key) is None
         top.bind_bond(bond_key)
+        assert top.bonds.get(bond_key) is not None
+
         assert top.bonds == og_top.bonds
         assert top.pairs == og_top.pairs
         assert top.angles == og_top.angles
@@ -189,8 +193,12 @@ class TestTopology:
         top = deepcopy(hexala_top_fix)
         og_top = deepcopy(top)
         bond_key = list(top.bonds.keys())[bondindex]
+        assert top.bonds.get(bond_key) is not None
         top.break_bond(bond_key)
+        assert top.bonds.get(bond_key) is None
         top.bind_bond(bond_key)
+        assert top.bonds.get(bond_key) is not None
+
         assert top.bonds == og_top.bonds
         assert top.pairs == og_top.pairs
         assert top.angles == og_top.angles
@@ -221,8 +229,12 @@ class TestTopology:
     def test_break_bind_bond_invertible(self, top_break):
         top, to_break = top_break
         og_top = deepcopy(top)
+        assert top.bonds.get(to_break) is not None
         top.break_bond(to_break)
+        assert top.bonds.get(to_break) is None
         top.bind_bond(to_break)
+        assert top.bonds.get(to_break) is not None
+        
         assert top.bonds == og_top.bonds
         assert top.pairs == og_top.pairs
         assert top.angles == og_top.angles

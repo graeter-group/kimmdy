@@ -782,6 +782,20 @@ class Topology:
             moleculetype.atoms[atompair_nrs[1]],
         ]
 
+        # check whether they are bound already
+        bound = False
+        for i, atom in enumerate(atompair):
+            other = atompair[abs(i - 1)]
+            if other.nr in atom.bound_to_nrs:
+                bound = True
+                logger.warning(
+                    "Trying to bind to atoms already bound!"
+                    f"\n\tatom 1, nr {atom.nr}, type {atom.type}, res {atom.residue}"
+                    f"\n\tatom 2, nr {other.nr}, type {other.type}, res {other.residue}"
+                )
+        if bound:
+            return
+
         # de-radialize if re-combining two radicals
         if all(map(lambda x: x.is_radical, atompair)):
             atompair[0].is_radical = False
