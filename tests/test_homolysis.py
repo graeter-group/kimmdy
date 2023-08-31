@@ -14,7 +14,6 @@ from kimmdy.parsing import (
     read_top,
     read_distances_dat,
     read_edissoc,
-    read_rtp,
 )
 from kimmdy.utils import (
     get_atominfo_from_plumedid,
@@ -30,7 +29,7 @@ def homolysis_files():
     top = read_top(filedir / "topol.top")
     plumed = read_plumed(filedir / "plumed.dat")
     distances = read_distances_dat(filedir / "distances.dat")
-    ffbonded = read_rtp(filedir / "ffbonded.itp")
+    ffbonded = read_top(filedir / "ffbonded.itp")
     edissoc = read_edissoc(filedir / "edissoc.dat")
 
     files = {
@@ -119,7 +118,7 @@ def test_get_recipe_collection(generic_rmgr):
     rc = r.get_recipe_collection(files)
 
     plumed = read_plumed(files.input["plumed"])
-    assert len(rc.recipes) == len(plumed["distances"])
+    assert len(rc.recipes) == len(plumed["labeled_action"])
     for recipe in rc.recipes:
         assert len(recipe.recipe_steps) == 1
         assert type(recipe.recipe_steps[0]) == type(Break(1, 2))

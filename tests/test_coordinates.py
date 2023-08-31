@@ -140,9 +140,12 @@ def test_plumed_break(tmpdir):
     plumed_break_ref = read_plumed(tmpdir / "plumed_break29-35.dat")
     plumed_break_test = read_plumed(files.output["plumed"])
 
-    assert plumed_break_test["distances"] == plumed_break_ref["distances"]
+    assert plumed_break_test["labeled_action"] == plumed_break_ref["labeled_action"]
     assert plumed_break_test["prints"] == plumed_break_ref["prints"]
-    assert len(plumed_break_test["distances"]) == len(plumed_nat["distances"]) - 1
+    assert (
+        len(plumed_break_test["labeled_action"])
+        == len(plumed_nat["labeled_action"]) - 1
+    )
 
 
 ## test topology changes
