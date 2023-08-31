@@ -487,13 +487,13 @@ def break_bond_plumed(
 
     new_distances = {}
     broken_distances = []
-    for k, v in plumed_dict["distances"].items():
+    for k, v in plumed_dict["labeled_action"].items():
         if all(x in v["atoms"] for x in breakpair):
             broken_distances.append(k)
         else:
             new_distances[k] = v
 
-    plumed_dict["distances"] = new_distances
+    plumed_dict["labeled_action"] = new_distances
 
     for line in plumed_dict["prints"]:
         line["ARG"] = [id for id in line["ARG"] if not id in broken_distances]

@@ -88,7 +88,7 @@ def get_atominfo_from_plumedid(
         Topology of the molecular system"""
 
     lookup_atomnr_plumedid = {
-        k: frozenset(v["atoms"]) for k, v in plumed["distances"].items()
+        k: frozenset(v["atoms"]) for k, v in plumed["labeled_action"].items()
     }
     atoms = get_protein_section(top, "atoms")
     lookup_atomtype_atomnr = {str(atom[0]): atom[1] for atom in atoms}

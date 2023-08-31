@@ -118,7 +118,7 @@ def test_get_recipe_collection(generic_rmgr):
     rc = r.get_recipe_collection(files)
 
     plumed = read_plumed(files.input["plumed"])
-    assert len(rc.recipes) == len(plumed["distances"])
+    assert len(rc.recipes) == len(plumed["labeled_action"])
     for recipe in rc.recipes:
         assert len(recipe.recipe_steps) == 1
         assert type(recipe.recipe_steps[0]) == type(Break(1, 2))

@@ -212,7 +212,7 @@ def read_top(
     ```
     """
 
-    NESTABLE_SECTIONS = (
+    CHILD_SECTIONS = (
         "atoms",
         "bonds",
         "pairs",
@@ -258,7 +258,7 @@ def read_top(
     is_first_line_after_section_header = False
     content_key = "content"
 
-    def empty_section(condition):
+    def empty_section(condition: Union[dict, None]) -> dict:
         return {"content": [], "else_content": [], "extra": [], "condition": condition}
 
     for l in ls:
@@ -291,7 +291,7 @@ def read_top(
         elif l.startswith("["):
             section = l.strip("[] \n")
             # add nested structure for non-nestable sections
-            if section not in NESTABLE_SECTIONS:
+            if section not in CHILD_SECTIONS:
                 parent_section = section
                 section = None
                 if d.get(parent_section) is None:
@@ -303,7 +303,7 @@ def read_top(
             else:
                 if parent_section is not None:
                     # add empty section as subsection
-                    if section in NESTABLE_SECTIONS:
+                    if section in CHILD_SECTIONS:
                         if d[parent_section]["subsections"].get(section) is None:
                             d[parent_section]["subsections"][section] = empty_section(
                                 condition
@@ -406,12 +406,15 @@ def write_top(top: TopologyDict, outfile: Path):
 class Plumed_dict(TypedDict):
     """Dict representation of a plumed.dat file."""
 
-    distances: dict
+    other: list
+    labeled_action: dict
     prints: list[dict]
 
 
 def read_plumed(path: Path) -> Plumed_dict:
     """Read a plumed.dat configuration file.
+
+    Follows the plumed naming scheme of label, keyword, action.
 
     Parameters
     ----------
@@ -425,17 +428,12 @@ def read_plumed(path: Path) -> Plumed_dict:
         Each is a dict/list of dicts containing plumed keywords
     """
     with open(path, "r") as f:
-        distances = {}
+        other = []
+        labeled_action = {}
         prints = []
         for l in f:
-            if "DISTANCE" in l:
-                d = l.split()
-                distances[d[0].strip(":")] = {
-                    "keyword": d[1],
-                    "atoms": [str(x) for x in d[2].strip("ATOMS=").split(",")],
-                }
-
-            elif "PRINT" in l[:5]:
+            # deal with PRINT action
+            if l.startswith("PRINT"):
                 l = l.split()
                 d = {}
                 d["PRINT"] = l[0]
@@ -451,8 +449,24 @@ def read_plumed(path: Path) -> Plumed_dict:
                     d["FILE"] = Path(d["FILE"])
 
                 prints.append(d)
+            # deal with labeled action
+            elif ": " in l:
+                ll = l.split(sep=":")
 
-        return Plumed_dict(distances=distances, prints=prints)
+                action = ll[1].split()
+                if action[0] == "DISTANCE":
+                    labeled_action[ll[0]] = {
+                        "keyword": action[0],
+                        "atoms": [str(x) for x in action[1].strip("ATOMS=").split(",")],
+                    }
+                else:
+                    labeled_action[ll[0]] = {"action": action}
+            # deal with other lines in config
+            else:
+                if not any(l.strip().startswith(x) for x in ["#", "\n"]) and l.strip():
+                    other.append(l)
+
+        return Plumed_dict(other=other, labeled_action=labeled_action, prints=prints)
 
 
 def write_plumed(d: Plumed_dict, path: Path) -> None:
@@ -461,13 +475,20 @@ def write_plumed(d: Plumed_dict, path: Path) -> None:
     Parameters
     ----------
     d :
-        Dictionary containing 'distances' and 'prints'
+        Dictionary containing 'labeled_action', 'other' and 'prints'
     path :
         Path to the file. E.g. "plumed.dat"
     """
     with open(path, "w") as f:
-        for k, v in d["distances"].items():
-            f.write(f"{k}: {v['keyword']} ATOMS={','.join(v['atoms'])} \n")
+        for l in d["other"]:
+            f.write(f"{l}\n")
+        for k, v in d["labeled_action"].items():
+            if v.get("keyword") and v.get("atoms"):
+                f.write(f"{k}: {v['keyword']} ATOMS={','.join(v['atoms'])} \n")
+            elif v.get("action"):
+                f.write(f"{k}:{' '.join(v['action'])}\n")
+            else:
+                logger.debug(f"Skipping plumed config file line '{k}:{v}'\n")
         f.write("\n")
         for l in d["prints"]:
             f.write(
@@ -475,7 +496,7 @@ def write_plumed(d: Plumed_dict, path: Path) -> None:
             )
 
 
-def read_distances_dat(distances_dat: Path):
+def read_distances_dat(distances_dat: Path) -> dict:
     """Read a distances.dat plumed output file."""
     with open(distances_dat, "r") as f:
         colnames = f.readline()[10:].split()
@@ -503,11 +524,14 @@ class JSONEncoder(json.JSONEncoder):
             return super(JSONEncoder, self).default(obj)
 
 
-def write_json(d: dict, path: Path) -> None:
+def write_json(
+    d: dict,
+    path: Path,
+) -> None:
     """Write dict to file according to JSON format."""
     logger.debug(f"writing dictionary to json: {d}")
     with open(path, "w") as f:
-        json.dump(d, f, cls=JSONEncoder)
+        json.dump(d, f, cls=JSONEncoder, indent=4)
 
 
 def read_json(path: Union[str, Path]) -> dict:

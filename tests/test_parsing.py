@@ -197,7 +197,7 @@ def test_parse_aminoacids_read_top():
         / "aminoacids.rtp"
     )
     aminoacids_dict = parsing.read_top(aminoacids_path, use_gmx_dir=False)
-    for aminoacid in [x.lower() for x in AA3]:
+    for aminoacid in AA3:
         assert (
             entry := aminoacids_dict.get(aminoacid)
         ), f"Aminoacid {aminoacid} not in {aminoacids_path.name}"
@@ -246,9 +246,9 @@ def test_plumed_read(tmp_path):
     plumed_path = Path("plumed.dat")
     plumed_dict = parsing.read_plumed(plumed_path)
 
-    assert list(plumed_dict.keys()) == ["distances", "prints"]
-    assert isinstance(plumed_dict["distances"], dict)
-    assert len(plumed_dict["distances"]) == 12
+    assert set(plumed_dict.keys()) == set(["labeled_action", "prints", "other"])
+    assert isinstance(plumed_dict["labeled_action"], dict)
+    assert len(plumed_dict["labeled_action"]) == 12
     assert isinstance(plumed_dict["prints"], list)
     assert plumed_dict["prints"][0]["FILE"] == Path("distances.dat")
 
