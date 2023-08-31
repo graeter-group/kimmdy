@@ -134,59 +134,7 @@ def create_subsections(ls: list[list[str]]):
     return d
 
 
-## parsing functions
-def read_rtp(path: Path) -> dict:
-    # TODO: make this more elegant and performant
-    # TODO combine with top parser?
-    # would need a way to tell the parser
-    # that here, all sections have subsections
-    def get_sections(
-        seq: Iterable[str], section_marker: str
-    ) -> Generator[list[str], None, None]:
-        data = [""]
-        for line in seq:
-            line = "".join(takewhile(is_not_comment, line))
-            if line.strip(" ").startswith(section_marker):
-                if data:
-                    # first element will be empty
-                    # because newlines mark sections
-                    data.pop(0)
-                    # only yield section if non-empty
-                    if len(data) > 0:
-                        yield data
-                    data = [""]
-            data.append(line.strip("\n"))
-        if data:
-            yield data
-
-    def extract_section_name(ls: list[str]) -> tuple[str, list[str]]:
-        """takes a list of lines and return a tuple
-        with the name and the lines minus the
-        line that contained the name.
-        Returns the empty string as the name if no name was found.
-        """
-        for i, l in enumerate(ls):
-            if l and l[0] != ";" and "[" in l:
-                name = l.strip("[] \n")
-                ls.pop(i)
-                return (name, ls)
-        else:
-            return ("", ls)
-
-    with open(path, "r") as f:
-        sections = get_sections(f, "\n")
-        d = {}
-        for i, s in enumerate(sections):
-            # skip empty sections
-            if s == [""]:
-                continue
-            name, content = extract_section_name(s)
-            content = [c.split() for c in content if len(c.split()) > 0]
-            if not name:
-                name = f"BLOCK {i}"
-            d[name] = create_subsections(content)
-
-        return d
+## parsing functions ##
 
 
 def resolve_includes(
@@ -250,7 +198,9 @@ def resolve_includes(
 
 
 def read_top(
-    path: Path, ffdir: Optional[Path] = None, use_gmx_dir: bool = True, nestable_upper = False,
+    path: Path,
+    ffdir: Optional[Path] = None,
+    use_gmx_dir: bool = True,
 ) -> TopologyDict:
     """Read a topology file into a raw TopologyDict represenation.
 
@@ -276,12 +226,7 @@ def read_top(
     - sections that can have subsections can also exist multiple, separate times
       e.g. moleculetype will appear multiple times and they should not be merged
     """
-    
-    if nestable_upper:
-        subsection_eval: Callable[[str],bool] = lambda x: x.isupper()
-    else:
-        SECTIONS_WITH_SUBSECTIONS = ("moleculetype",)
-        subsection_eval: Callable[[str],bool] = lambda x: x in SECTIONS_WITH_SUBSECTIONS
+
     NESTABLE_SECTIONS = (
         "atoms",
         "bonds",
@@ -358,13 +303,12 @@ def read_top(
 
         elif l.startswith("["):
             # start a new section
-            #section = l.strip("[] \n").lower()
             section = l.strip("[] \n")
-            if subsection_eval(section):
+            if section not in NESTABLE_SECTIONS:
                 parent_section = section
                 section = None
                 if d.get(parent_section) is None:
-                    if parent_section == 'moleculetype':
+                    if parent_section == "moleculetype":
                         parent_section = f"{parent_section}_{parent_section_index}"
                         parent_section_index += 1
                     d[parent_section] = empty_section(condition)

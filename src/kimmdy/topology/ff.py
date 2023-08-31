@@ -102,9 +102,9 @@ class FF:
                 "aminoacids.rtp not found in ffdir. No residuetypes will be parsed."
             )
             return
-        aminoacids = read_top(aminoacids_path,use_gmx_dir=False,nestable_upper=True)
+        aminoacids = read_top(aminoacids_path, use_gmx_dir=False)
         for k, v in aminoacids.items():
-            if k.startswith("BLOCK") or k in ["bondedtypes", "ffdir","define"]:
+            if k.startswith("BLOCK") or k in ["bondedtypes", "ffdir", "define"]:
                 continue
             if not v.get("subsections"):
                 raise AssertionError(f"key {k} has no subsections, only {v}.")

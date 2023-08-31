@@ -9,6 +9,7 @@ from hypothesis import settings, HealthCheck, given, strategies as st
 from pathlib import Path
 
 from kimmdy import parsing
+from kimmdy.utils import get_gmx_dir
 from kimmdy.constants import AA3
 
 
@@ -60,6 +61,7 @@ def test_doubleparse_urea(tmp_path):
 def test_ff_includes_with_gmxdir(tmp_path):
     testdir = setup_testdir(tmp_path)
     urea_path = Path("urea.top")
+    assert get_gmx_dir(), f"Command 'gmx' not found, can't test gmx dir parsing."
     raw = parsing.read_top(urea_path)
 
     print(raw["moleculetype_1"])
@@ -192,30 +194,6 @@ def test_parser_fails_without_sections(ls, tmp_path):
 ## test rtp file parsing
 
 
-def test_parse_aminoacids():
-    aminoacids_path = (
-        Path(__file__).parent
-        / "test_files"
-        / "assets"
-        / "amber99sb-star-ildnp.ff"
-        / "aminoacids.rtp"
-    )
-    aminoacids_dict = parsing.read_rtp(aminoacids_path)
-
-    for aminoacid in AA3:
-        assert (
-            entry := aminoacids_dict.get(aminoacid)
-        ), f"Aminoacid {aminoacid} not in {aminoacids_path.name}"
-        ref_subsections = ["atoms", "bonds", "impropers"]
-        subsections = list(entry.keys())
-        assert all(
-            x in subsections for x in ref_subsections
-        ), f"Aminoacid {aminoacid} does not have the subsections {ref_subsections} but {subsections}"
-        assert all(len(x) == 4 for x in entry["atoms"])
-        assert all(len(x) == 2 for x in entry["bonds"])
-        assert all(len(x) in [4, 7] for x in entry["impropers"])
-
-
 def test_parse_aminoacids_read_top():
     aminoacids_path = (
         Path(__file__).parent
@@ -224,46 +202,22 @@ def test_parse_aminoacids_read_top():
         / "amber99sb-star-ildnp.ff"
         / "aminoacids.rtp"
     )
-    aminoacids_dict = parsing.read_top(aminoacids_path, use_gmx_dir=False, nestable_upper=True)
-    for aminoacid in AA3:
+    aminoacids_dict = parsing.read_top(aminoacids_path, use_gmx_dir=False)
+    for aminoacid in [x.lower() for x in AA3]:
         assert (
             entry := aminoacids_dict.get(aminoacid)
         ), f"Aminoacid {aminoacid} not in {aminoacids_path.name}"
         ref_subsections = ["atoms", "bonds", "impropers"]
-        subsections = list(entry['subsections'].keys())
+        subsections = list(entry["subsections"].keys())
 
         assert all(
             x in subsections for x in ref_subsections
         ), f"Aminoacid {aminoacid} does not have the subsections {ref_subsections} but {subsections}"
-        assert all(len(x) == 4 for x in entry['subsections']["atoms"]['content'])
-        assert all(len(x) == 2 for x in entry['subsections']["bonds"]['content'])
-        assert all(len(x) in [4, 7] for x in entry['subsections']["impropers"]['content'])
-
-
-def test_parse_ffbonded():
-    ffbonded_path = (
-        Path(__file__).parent
-        / "test_files"
-        / "assets"
-        / "amber99sb-star-ildnp.ff"
-        / "ffbonded.itp"
-    )
-    ffbonded_dict = parsing.read_rtp(ffbonded_path)
-    ref_sections = ["bondtypes", "angletypes", "dihedraltypes"]
-    ffbonded_sections = list(ffbonded_dict.keys())
-
-    assert all(
-        x in ffbonded_sections for x in ref_sections
-    ), f"Sections {ref_sections} should be in ffbonded sections: {ffbonded_sections}"
-    assert all(
-        len(x) == 5 for x in ffbonded_dict["bondtypes"]["other"]
-    ), "Unexpected number of elements in bondtypes"
-    assert all(
-        len(x) == 6 for x in ffbonded_dict["angletypes"]["other"]
-    ), "Unexpected number of elements in angletypes"
-    assert all(
-        len(x) == 8 for x in ffbonded_dict["dihedraltypes"]["other"]
-    ), "Unexpected number of elements in dihedraltypes"
+        assert all(len(x) == 4 for x in entry["subsections"]["atoms"]["content"])
+        assert all(len(x) == 2 for x in entry["subsections"]["bonds"]["content"])
+        assert all(
+            len(x) in [4, 7] for x in entry["subsections"]["impropers"]["content"]
+        )
 
 
 def test_parse_ffbonded_read_top():

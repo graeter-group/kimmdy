@@ -497,7 +497,7 @@ class RunManager:
                     break_bond_plumed(
                         files,
                         (step.atom_id_1, step.atom_id_2),
-                        files.outputdir / self.config.plumed.name.replace(".","_mod.")
+                        files.outputdir / self.config.plumed.name.replace(".", "_mod."),
                     )
             elif isinstance(step, Bind):
                 self.top.bind_bond((step.atom_id_1, step.atom_id_2))
@@ -515,9 +515,8 @@ class RunManager:
                 if self.config.changer.coordinates.slow_growth:
                     # Create a slow growth topology for sub-task run_md, afterwards, top will be set back properly
                     top_merge = merge_top_slow_growth(top_initial, deepcopy(self.top))
-                    top_merge_path = (
-                        files.outputdir
-                        / self.config.top.name.replace(".","_mod.")
+                    top_merge_path = files.outputdir / self.config.top.name.replace(
+                        ".", "_mod."
                     )
                     write_top(top_merge.to_dict(), top_merge_path)
                     self.latest_files["top"] = top_merge_path
