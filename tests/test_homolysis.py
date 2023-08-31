@@ -14,7 +14,6 @@ from kimmdy.parsing import (
     read_top,
     read_distances_dat,
     read_edissoc,
-    read_rtp,
 )
 from kimmdy.utils import (
     get_atominfo_from_plumedid,

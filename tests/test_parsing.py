@@ -1,10 +1,8 @@
-# %%
 import os
 import shutil
 import re
 import string
 import pytest
-import logging
 from hypothesis import settings, HealthCheck, given, strategies as st
 from pathlib import Path
 
@@ -32,8 +30,6 @@ def setup_testdir(tmp_path) -> Path:
 
 
 ## test topology parser
-
-
 def test_parser_doesnt_crash_on_example(tmp_path, caplog):
     """Example file urea.top
     from <https://manual.gromacs.org/documentation/current/reference-manual/topologies/topology-file-formats.html>
@@ -191,9 +187,7 @@ def test_parser_fails_without_sections(ls, tmp_path):
     assert True
 
 
-## test rtp file parsing
-
-
+## test ff file parsing
 def test_parse_aminoacids_read_top():
     aminoacids_path = (
         Path(__file__).parent
@@ -247,6 +241,27 @@ def test_parse_ffbonded_read_top():
 
 
 ## test plumed parsing
+def test_plumed_read(tmp_path):
+    testdir = setup_testdir(tmp_path)
+    plumed_path = Path("plumed.dat")
+    plumed_dict = parsing.read_plumed(plumed_path)
+
+    assert list(plumed_dict.keys()) == ["distances", "prints"]
+    assert isinstance(plumed_dict["distances"], dict)
+    assert len(plumed_dict["distances"]) == 12
+    assert isinstance(plumed_dict["prints"], list)
+    assert plumed_dict["prints"][0]["FILE"] == Path("distances.dat")
+
+
+def test_plumed_write_identity(tmp_path):
+    testdir = setup_testdir(tmp_path)
+    plumed_path = Path("plumed.dat")
+    plumed_mod_path = Path("plumed_mod.dat")
+    plumed_dict = parsing.read_plumed(plumed_path)
+    parsing.write_plumed(plumed_dict, plumed_mod_path)
+    plumed_mod_dict = parsing.read_plumed(plumed_mod_path)
+    assert plumed_mod_dict == plumed_dict
+
 
 ## test json parsing
 

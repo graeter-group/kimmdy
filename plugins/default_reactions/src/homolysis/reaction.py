@@ -12,7 +12,6 @@ from kimmdy.utils import (
 )
 from kimmdy.parsing import (
     read_top,
-    read_rtp,
     read_plumed,
     read_distances_dat,
     read_edissoc,
