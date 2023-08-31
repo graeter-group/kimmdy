@@ -1,21 +1,20 @@
 import pytest
 
-pytest.skip(reason="needs grappa plugin", allow_module_level=True)
-# from grappa_interface import (
-#     clean_parameters,
-#     generate_input,
-#     apply_parameters,
-#     GrappaInterface,
-# )
-from kimmdy.topology.topology import Topology
+pytest.importorskip("grappa_interface")
+pytest.importorskip("grappa")
+
 from copy import deepcopy
 import numpy as np
-
+from grappa_interface import (
+    clean_parameters,
+    generate_input,
+    apply_parameters,
+    GrappaInterface,
+)
+from kimmdy.topology.topology import Topology
 
 # from kimmdy.parsing import write_json, read_json
 # import json
-
-pytest.mark.skip(reason="needs grappa plugin")
 
 
 def test_generate_input(generic_topology):

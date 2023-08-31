@@ -1,10 +1,23 @@
 """
 Tests for homolysis reaction plugin.
 
-Assumes KIMMDY was installed with the plugin.
-E.g. via pip install -r requirements.txt.
+Is skipped if KIMMDY was installed without the plugin.
 """
 import pytest
+from kimmdy import reaction_plugins
+
+pytest.importorskip("homolysis")
+pytest.importorskip("hat_naive")
+pytest.importorskip("dummyreaction")
+pytest.mark.skipif(
+    not all(
+        x in reaction_plugins.keys()
+        for x in ["homolysis", "hat_naive", "dummyreaction"]
+    ),
+    reason=f"Not all default_reactions installed, only {reaction_plugins.keys()}",
+    allow_module_level=True,
+)
+
 from pathlib import Path
 import numpy as np
 from homolysis.reaction import Homolysis

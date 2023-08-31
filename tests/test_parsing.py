@@ -54,10 +54,12 @@ def test_doubleparse_urea(tmp_path):
     assert top2 == top3
 
 
+@pytest.mark.skipif(
+    not get_gmx_dir(), reason="Command 'gmx' not found, can't test gmx dir parsing."
+)
 def test_ff_includes_with_gmxdir(tmp_path):
     testdir = setup_testdir(tmp_path)
     urea_path = Path("urea.top")
-    assert get_gmx_dir(), f"Command 'gmx' not found, can't test gmx dir parsing."
     raw = parsing.read_top(urea_path)
 
     print(raw["moleculetype_1"])
