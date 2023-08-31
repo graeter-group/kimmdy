@@ -1,9 +1,12 @@
 from typing import Union
 from pathlib import Path
 from math import isclose
-import matplotlib.pyplot as plt
 import MDAnalysis as mda
 import subprocess as sp
+import matplotlib.pyplot as plt
+import seaborn.objects as so
+from seaborn import axes_style
+import pandas as pd
 
 from kimmdy.utils import run_shell_cmd
 from kimmdy.parsing import read_json, write_json
@@ -114,7 +117,10 @@ def plot_energy(dir: str, steps: Union[list[str], str], terms: list[str], open_p
         len(edrs) > 0
     ), f"No GROMACS energy files in {run_dir} with subdirectory names {steps}"
 
-    energy = []
+    energy = {}
+    for k in xvg_entries:
+        energy[k] = []
+
     ## write energy .xvg files
     for edr in edrs:
         print(edr.parents[0].name + ".xvg")
@@ -129,32 +135,28 @@ def plot_energy(dir: str, steps: Union[list[str], str], terms: list[str], open_p
         with open(xvg, "r") as f:
             for line in f:
                 if line[0] not in ["@", "#"]:
-                    energy.append({k: float(v) for k, v in zip(xvg_entries, line.split())})
+                    for k, v in zip(xvg_entries, line.split()):
+                        energy[k].append(float(v))
 
     ## plot energy
-    snapshot = range(len(energy))
-    sim_start = [i for i in snapshot if isclose(energy[i]["time"], 0)]
-    sim_names = [str(edr.parents[0].name).split("_")[1] for edr in edrs]
-    # diffs =[j-i for i, j in zip(sim_start[:-1],sim_start[1:])]
-    limy = [energy[0][terms[0]], energy[0][terms[0]]]
-    print(sim_start)
+    snapshot = range(len(energy['time']))
+    steps_starts = [i for i in snapshot if isclose(energy["time"][i], 0)]
+    steps_names = [str(edr.parents[0].name).split("_")[1] for edr in edrs]
 
-    for term in terms:
-        val = [x[term] for x in energy]
-        print(f"{term}: min {min(val)}, max {max(val)}")
-        limy[0] = min(val) if min(val) < limy[0] else limy[0]
-        limy[1] = max(val) if max(val) > limy[1] else limy[1]
-        plt.plot(snapshot, val, label=term)
+    df = pd.DataFrame(energy).melt(id_vars=["time"], value_vars=terms)
+    steps = pd.DataFrame({"time": steps_starts, "name": steps_names})
 
-    for i, pos in enumerate(sim_start):
-        plt.plot([pos, pos], limy, c="k", linewidth=1)
-        plt.text(pos + 1, limy[1] - 0.05 * (limy[1] - limy[0]), sim_names[i])
+    p = (so.Plot(df, x = "time", y = "value")
+        .facet(row="variable").share(x=True, y=False)
+        .add(so.Line())
+        # .add(so.Path(color="black"), data=steps)
+        .theme({**axes_style("white")})
+        .label(x = "Time [ps]", y = "Energy [kJ/mol]")
+    )
+    plt.axvline(x=5, color="black", linestyle="--")
 
-    plt.xlabel("Snapshot #")
-    plt.ylabel("Energy [kJ mol-1]")
-    plt.legend()
     output_path = str(run_dir / "analysis" / "energy.png")
-    plt.savefig(output_path, dpi=300)
+    p.save(output_path, dpi=300)
 
     # open png file with default system viewer
     if open_plot:
