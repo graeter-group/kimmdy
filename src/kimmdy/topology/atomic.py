@@ -162,7 +162,7 @@ class Bond:
     """Information about one bond
 
     A class containing bond information as in the bonds section of the topology.
-    
+
     From gromacs topology:
     ; ai aj funct c0 c1 c2 c3 c4 c5
     With ai < aj
@@ -201,7 +201,7 @@ class BondType:
     """Information about one bondtype
 
     A class containing bond information as in the bondtype section of the forcefield.
-    
+
     From gromacs version of the amber* ff:
     ; i j func b0 kb
     Where i and j are atomtypes
@@ -406,8 +406,8 @@ class MultipleDihedrals:
 class DihedralType:
     """Information about one dihedraltype
 
-    A class containing dihedral type information as in the dihedraltypes 
-    section of the forcefield. 
+    A class containing dihedral type information as in the dihedraltypes
+    section of the forcefield.
     Improper dihedrals have funct 4. Proper dihedrals have funct 9.
 
     Note that proper dihedrals of type 9 can be defined multiple times, for different

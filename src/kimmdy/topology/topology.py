@@ -676,7 +676,6 @@ class Topology:
         atompair_addresses
             Between which atoms to break the bond.
         """
-        # if all([isinstance(atompair_addresses[i], str) for i in (0,1)]):
         if type(atompair_addresses[0]) == str and type(atompair_addresses[1]) == str:
             # old style atompair_nrs with only atom numbers
             # thus refers to the first moleculeype, moleculetype_0
@@ -771,7 +770,8 @@ class Topology:
             main_molecule_name = list(self.moleculetypes.keys())[0]
         else:
             raise NotImplementedError(
-                "Breaking/Binding bonds in topology between atoms with different moleculetypes is not implemented, yet."
+                "Breaking/Binding bonds in topology between atoms with "
+                "different moleculetypes is not implemented."
             )
 
         moleculetype = self.moleculetypes[main_molecule_name]
@@ -787,7 +787,11 @@ class Topology:
             atompair[0].is_radical = False
             atompair[1].is_radical = False
             for a in atompair:
-                moleculetype.radicals.pop(a.nr)
+                if moleculetype.radicals.pop(a.nr) is None:
+                    logging.warning(
+                        f"Atom {a} should have been a radical but was "
+                        "not registed in moleculetype.radicals"
+                    )
 
         # quickfix for jumping hydrogens
         # to make them adopt the correct residuetype and atomtype
@@ -889,32 +893,3 @@ class Topology:
                 moleculetype.improper_dihedrals[key] = Dihedral(
                     key[0], key[1], key[2], key[3], "4", value.q0, value.cq, c2
                 )
-
-    # def move_hydrogen(self, from_to: tuple[TopologyAtomAddress, TopologyAtomAddress]):
-    #     """Move a singly bound atom to a new location.
-
-    #     This is typically H for Hydrogen Atom Transfer (HAT).
-    #     """
-    #     if type(from_to[0]) == str and type(from_to[1]) == str:
-    #         # old style atompair_nrs with only atom numbers
-    #         # thus refers to the first moleculeype, moleculetype_0
-    #         # with the name Protein
-    #         from_to = (from_to[0], from_to[1])
-    #         main_molecule_name = list(self.moleculetypes.keys())[0]
-    #     else:
-    #         raise NotImplementedError(
-    #             "Breaking/Binding bonds in topology between atoms with different moleculetypes is not implemented, yet."
-    #         )
-
-    #     moleculetype = self.moleculetypes[main_molecule_name]
-
-    #     f, t = list(map(str, from_to))
-    #     assert (
-    #         moleculetype.atoms[f].type[0] == "H"
-    #     ), f"move_hydrogen called for non-hydrogen! type: {moleculetype.atoms[f].type}"
-    #     heavy = moleculetype.atoms[f].bound_to_nrs.pop()
-    #     if heavy is None:
-    #         logging.error(f"Atom {f} is not bound to anything.")
-    #         return
-    #     self.break_bond((f, heavy))
-    #     self.bind_bond((f, t))
