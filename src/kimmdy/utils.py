@@ -88,7 +88,7 @@ def get_atominfo_from_plumedid(
         Topology of the molecular system"""
 
     lookup_atomnr_plumedid = {
-        entry["id"]: frozenset(entry["atoms"]) for entry in plumed["distances"]
+        k: frozenset(v["atoms"]) for k, v in plumed["labeled_action"].items()
     }
     atoms = get_protein_section(top, "atoms")
     lookup_atomtype_atomnr = {str(atom[0]): atom[1] for atom in atoms}
@@ -120,7 +120,7 @@ def get_bondprm_from_atomtypes(
     atomtypes_list = list(atomtypes)
     lookup_ffbonded_atomtype = {
         frozenset(l[:2]): [float(l[3]), float(l[4])]
-        for l in ffbonded["bondtypes"]["other"]
+        for l in ffbonded["bondtypes"]["content"]
     }
     atomelements_list = [x[0] for x in atomtypes_list]
 
