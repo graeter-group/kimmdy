@@ -1,3 +1,9 @@
+"""File for pytest configuration in python and fixture definition.
+
+The name 'conftest.py' is recognized by pytest to execute it before tests.
+"""
+
+import sys
 import pytest
 import shutil
 import os
@@ -9,11 +15,26 @@ from kimmdy.topology.topology import Topology
 from kimmdy.config import Config
 from kimmdy.tasks import TaskFiles
 from kimmdy.parsing import read_top, read_json
+from kimmdy.utils import get_gmx_dir
 from typing import Callable
 
-# name of this file is fixed for pytest to recognize the fixture without importing
+
+# create pytest mark decorators
+def pytest_configure(config):
+    # register an additional marker
+    config.addinivalue_line(
+        "markers", "require_gmx: mark test to run if gmx is executable"
+    )
 
 
+def pytest_runtest_setup(item):
+    require_gmx = [mark for mark in item.iter_markers(name="require_gmx")]
+    if require_gmx:
+        if not get_gmx_dir():
+            pytest.skip("Command 'gmx' not found, can't test gmx dir parsing.")
+
+
+# slim classes
 @dataclass
 class SlimFiles(TaskFiles):
     input: dict[str, Path] = field(default_factory=dict)
@@ -22,6 +43,10 @@ class SlimFiles(TaskFiles):
     get_latest: Callable = lambda x: x
 
 
+# fixtures for setup and teardown
+
+
+# general object fixtures
 @pytest.fixture
 def generic_rmgr(tmp_path):
     shutil.copytree(

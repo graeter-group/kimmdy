@@ -9,14 +9,6 @@ from kimmdy import reaction_plugins
 pytest.importorskip("homolysis")
 pytest.importorskip("hat_naive")
 pytest.importorskip("dummyreaction")
-pytest.mark.skipif(
-    not all(
-        x in reaction_plugins.keys()
-        for x in ["homolysis", "hat_naive", "dummyreaction"]
-    ),
-    reason=f"Not all default_reactions installed, only {reaction_plugins.keys()}",
-    allow_module_level=True,
-)
 
 from pathlib import Path
 import numpy as np
@@ -118,7 +110,7 @@ def test_morse_transition_rate(homolysis_files):
     assert all(np.isclose(fs, fs_ref))
 
 
-def test_get_recipe_collection(generic_rmgr):
+def test_get_recipe_collection(generic_rmgr=None):
     # curr_path = Path().cwd()
 
     files = TaskFiles(generic_rmgr)

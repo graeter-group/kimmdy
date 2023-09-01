@@ -5,12 +5,8 @@ from pathlib import Path
 import pytest
 import os
 
-require_gmx = pytest.mark.skipif(
-    not get_gmx_dir(), reason="Command 'gmx' not found, can't test gmx dir parsing."
-)
 
-
-@require_gmx
+@pytest.mark.require_gmx
 def test_parse_config1_casting():
     input_f = Path(__file__).parent / "test_files/test_config/config1.yml"
     try:
