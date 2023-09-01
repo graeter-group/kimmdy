@@ -213,8 +213,11 @@ def morse_transition_rate(
         (
             beta * dissociation_energy
             + np.sqrt(
-                beta**2 * dissociation_energy**2
-                - 2 * dissociation_energy * beta * fs
+                (
+                    beta**2 * dissociation_energy**2
+                    - 2 * dissociation_energy * beta * fs
+                )
+                + 1e-7 # prevent rounding issue close to zero
             )
         )
         / (2 * beta * dissociation_energy)
@@ -223,8 +226,11 @@ def morse_transition_rate(
         (
             beta * dissociation_energy
             - np.sqrt(
-                beta**2 * dissociation_energy**2
-                - 2 * dissociation_energy * beta * fs
+                (
+                    beta**2 * dissociation_energy**2
+                    - 2 * dissociation_energy * beta * fs
+                )
+                + 1e-7 # prevent rounding issue close to zero
             )
         )
         / (2 * beta * dissociation_energy)
