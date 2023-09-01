@@ -18,7 +18,7 @@ and because we have one reactant molecule
 
 ### KMCResult { #kimmdy.kmc.KMCResult }
 
-`kmc.KMCResult(recipe=field(default_factory=lambda : Recipe(\[\], \[\], \[\])), reaction_probability=None, time_delta=None, time_start=None)`
+`kmc.KMCResult(recipe=field(default_factory=lambda : Recipe([], [], [])), reaction_probability=None, time_delta=None, time_start=None)`
 
 The result of a KMC step. Similar to a Recipe but for the concrete realization of a reaction.
 

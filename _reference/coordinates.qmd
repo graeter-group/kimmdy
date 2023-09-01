@@ -25,11 +25,10 @@ Break bond in plumed configuration file.
 
 #### Parameters
 
-| Name    | Type                                  | Description   | Default    |
-|---------|---------------------------------------|---------------|------------|
-| `files` | [TaskFiles](`kimmdy.tasks.TaskFiles`) |               | _required_ |
-
-breakpair:
+| Name        | Type                                           | Description   | Default    |
+|-------------|------------------------------------------------|---------------|------------|
+| `files`     | [TaskFiles](`kimmdy.tasks.TaskFiles`)          |               | _required_ |
+| `breakpair` | [tuple](`tuple`)\[[str](`str`), [str](`str`)\] |               | _required_ |
 
 ### get_explicit_MultipleDihedrals { #kimmdy.coordinates.get_explicit_MultipleDihedrals }
 

@@ -2,6 +2,4 @@
 
 `parsing.TopologyDict`
 
-A raw representation of a topology file.
-
-Returned by [](`read_top`)
+A raw representation of a topology file returned by [](`~kimmdy.parsing.read_top`).
