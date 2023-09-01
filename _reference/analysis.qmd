@@ -2,14 +2,40 @@
 
 `analysis`
 
+
+
 ## Functions
 
 | Name | Description |
 | --- | --- |
-| [concat_traj](#kimmdy.analysis.concat_traj) | Find and concatenate trajectories (.xtc files) from KIMMDY runs. |
+| [concat_traj](#kimmdy.analysis.concat_traj) | Find and concatenate trajectories (.xtc files) from a KIMMDY run into one trajectory. |
+| [get_step_directories](#kimmdy.analysis.get_step_directories) | create list of subdirectories that match the steps. |
 
 ### concat_traj { #kimmdy.analysis.concat_traj }
 
-`analysis.concat_traj(rundir, steps)`
+`analysis.concat_traj(dir, steps, open_vmd=False)`
 
-Find and concatenate trajectories (.xtc files) from KIMMDY runs.
+Find and concatenate trajectories (.xtc files) from a KIMMDY run into one trajectory.
+The concatenated trajectory is centered and pbc corrected.
+
+#### Parameters
+
+| Name       | Type                                                                    | Description                                                                                      | Default    |
+|------------|-------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|------------|
+| `dir`      | [str](`str`)                                                            | Directory to search for subdirectories                                                           | _required_ |
+| `steps`    | [Union](`typing.Union`)\[[list](`list`)\[[str](`str`)\], [str](`str`)\] | List of steps e.g. ["equilibrium", "production"]. Or a string "all" to return all subdirectories | _required_ |
+| `open_vmd` | [bool](`bool`)                                                          | Open concatenated trajectory in VMD                                                              | `False`    |
+
+### get_step_directories { #kimmdy.analysis.get_step_directories }
+
+`analysis.get_step_directories(dir, steps='all')`
+
+create list of subdirectories that match the steps.
+If steps is "all", all subdirectories are returned.
+
+#### Parameters
+
+| Name    | Type                                                                    | Description                                                                                      | Default    |
+|---------|-------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|------------|
+| `dir`   | [Path](`pathlib.Path`)                                                  | Directory to search for subdirectories                                                           | _required_ |
+| `steps` | [Union](`typing.Union`)\[[list](`list`)\[[str](`str`)\], [str](`str`)\] | List of steps e.g. ["equilibrium", "production"]. Or a string "all" to return all subdirectories | `'all'`    |

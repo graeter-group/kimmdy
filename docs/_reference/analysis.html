@@ -409,7 +409,14 @@ ul.task-list li input[type="checkbox"] {
   <ul>
   <li><a href="#functions" id="toc-functions" class="nav-link" data-scroll-target="#functions">Functions</a>
   <ul>
-  <li><a href="#kimmdy.analysis.concat_traj" id="toc-kimmdy.analysis.concat_traj" class="nav-link" data-scroll-target="#kimmdy.analysis.concat_traj">concat_traj</a></li>
+  <li><a href="#kimmdy.analysis.concat_traj" id="toc-kimmdy.analysis.concat_traj" class="nav-link" data-scroll-target="#kimmdy.analysis.concat_traj">concat_traj</a>
+  <ul class="collapse">
+  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
+  </ul></li>
+  <li><a href="#kimmdy.analysis.get_step_directories" id="toc-kimmdy.analysis.get_step_directories" class="nav-link" data-scroll-target="#kimmdy.analysis.get_step_directories">get_step_directories</a>
+  <ul class="collapse">
+  <li><a href="#parameters-1" id="toc-parameters-1" class="nav-link" data-scroll-target="#parameters-1">Parameters</a></li>
+  </ul></li>
   </ul></li>
   </ul></li>
   </ul>
@@ -435,16 +442,85 @@ ul.task-list li input[type="checkbox"] {
 <tbody>
 <tr class="odd">
 <td><a href="#kimmdy.analysis.concat_traj">concat_traj</a></td>
-<td>Find and concatenate trajectories (.xtc files) from KIMMDY runs.</td>
+<td>Find and concatenate trajectories (.xtc files) from a KIMMDY run into one trajectory.</td>
+</tr>
+<tr class="even">
+<td><a href="#kimmdy.analysis.get_step_directories">get_step_directories</a></td>
+<td>create list of subdirectories that match the steps.</td>
 </tr>
 </tbody>
 </table>
 <section id="kimmdy.analysis.concat_traj" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.analysis.concat_traj">concat_traj</h3>
-<p><code>analysis.concat_traj(rundir, steps)</code></p>
-<p>Find and concatenate trajectories (.xtc files) from KIMMDY runs.</p>
+<p><code>analysis.concat_traj(dir, steps, open_vmd=False)</code></p>
+<p>Find and concatenate trajectories (.xtc files) from a KIMMDY run into one trajectory. The concatenated trajectory is centered and pbc corrected.</p>
+<section id="parameters" class="level4">
+<h4 class="anchored" data-anchor-id="parameters">Parameters</h4>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>dir</code></td>
+<td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
+<td>Directory to search for subdirectories</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td><code>steps</code></td>
+<td><a href="https://docs.python.org/3.10/library/typing.html#typing.Union">Union</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#list">list</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>], <a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>]</td>
+<td>List of steps e.g.&nbsp;[“equilibrium”, “production”]. Or a string “all” to return all subdirectories</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td><code>open_vmd</code></td>
+<td><a href="https://docs.python.org/3.10/library/functions.html#bool">bool</a></td>
+<td>Open concatenated trajectory in VMD</td>
+<td><code>False</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="kimmdy.analysis.get_step_directories" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.analysis.get_step_directories">get_step_directories</h3>
+<p><code>analysis.get_step_directories(dir, steps='all')</code></p>
+<p>create list of subdirectories that match the steps. If steps is “all”, all subdirectories are returned.</p>
+<section id="parameters-1" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-1">Parameters</h4>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>dir</code></td>
+<td><a href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path">Path</a></td>
+<td>Directory to search for subdirectories</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td><code>steps</code></td>
+<td><a href="https://docs.python.org/3.10/library/typing.html#typing.Union">Union</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#list">list</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>], <a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>]</td>
+<td>List of steps e.g.&nbsp;[“equilibrium”, “production”]. Or a string “all” to return all subdirectories</td>
+<td><code>'all'</code></td>
+</tr>
+</tbody>
+</table>
 
 
+</section>
 </section>
 </section>
 </section>
