@@ -82,15 +82,11 @@ Change topology and/or coordinates to place an atom.
 
 #### Parameters
 
-| Name         | Type                                                                     | Description                                                                               | Default    |
-|--------------|--------------------------------------------------------------------------|-------------------------------------------------------------------------------------------|------------|
-| `new_coords` | [tuple](`tuple`)\[[float](`float`), [float](`float`), [float](`float`)\] | New xyz coordinates for atom to place to. Valid for the end point of the recipe timespan. | _required_ |
-
-ix_to_place : int
-    Index of atom to place. 0-based.
-
-id_to_place : str
-    Index of atom to place. 1-based
+| Name          | Type                                                                     | Description                                                                               | Default    |
+|---------------|--------------------------------------------------------------------------|-------------------------------------------------------------------------------------------|------------|
+| `new_coords`  | [tuple](`tuple`)\[[float](`float`), [float](`float`), [float](`float`)\] | New xyz coordinates for atom to place to. Valid for the end point of the recipe timespan. | _required_ |
+| `ix_to_place` | [int](`int`)                                                             | Index of atom to place. 0-based.                                                          | _required_ |
+| `id_to_place` | [str](`str`)                                                             | Index of atom to place. 1-based                                                           | _required_ |
 
 ### Recipe { #kimmdy.recipe.Recipe }
 
