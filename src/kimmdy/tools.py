@@ -4,6 +4,7 @@ Standalone tools that are complementary to KIMMDY.
 
 from pathlib import Path
 import shutil
+import argparse
 
 from kimmdy.topology.topology import Topology
 from kimmdy.parsing import read_top, write_top
@@ -62,6 +63,30 @@ def build_examples(restore: str):
             raise FileExistsError(
                 f"Could not build example directory {directory} because it already exists. Try the --restore option to still build it."
             ) from e
+
+def get_build_example_cmdline_args() -> argparse.Namespace:
+    """Parse command line arguments.
+
+    Returns
+    -------
+    Namespace
+        parsed command line arguments
+    """
+    parser = argparse.ArgumentParser(description="Build examples for KIMMDY.")
+    parser.add_argument(
+        "-r",
+        "--restore",
+        const=True,
+        nargs="?",
+        type=str,
+        help="Overwrite input files in existing example directories, use keyword 'hard' to also delete output files.",
+    )
+    return parser.parse_args()
+
+def entry_point_build_examples():
+    """Build examples from the command line."""
+    args = get_build_example_cmdline_args()
+    build_examples(args.restore)
 
 
 def remove_hydrogen(
@@ -178,10 +203,43 @@ def remove_hydrogen(
             f"gmx mdrun -v -deffnm {gro_outpath.stem}_npt" + gmx_mdrun_flags, cwd=cwd
         )
 
+def get_remove_hydrogen_cmdline_args():
+    """
+    parse cmdline args for remove_hydrogen
+    """
+    parser = argparse.ArgumentParser(
+        description="Welcome to the KIMMDY remove hydrogen module",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+    parser.add_argument("gro", help="GROMACS gro file")
+    parser.add_argument("top", help="GROMACS top file")
+    parser.add_argument(
+        "nr", help="Atom number as indicated in the GROMACS gro and top file"
+    )
+    parser.add_argument(
+        "-p",
+        "--parameterize",
+        action="store_true",
+        help="Parameterize topology with grappa after removing hydrogen.",
+        default=False,
+    )
+    parser.add_argument(
+        "-e",
+        "--equilibrate",
+        action="store_true",
+        help="Do a minimization and equilibration with GROMACS. Uses mdp files from kimmdy assets.",
+        default=False,
+    )
+    return parser.parse_args()
+
+def entry_point_remove_hydrogen():
+    """Remove hydrogen by atom nr in a gro and topology file"""
+    args = get_remove_hydrogen_cmdline_args()
+
+    remove_hydrogen(args.gro, args.top, args.nr, args.paremeterize, args.equilibrate)
+
 
 ## dot graphs
-
-
 def topology_to_edgelist(top: Topology):
     ls = []
     for b in top.bonds:
