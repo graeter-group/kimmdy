@@ -102,6 +102,7 @@ def concat_traj(dir: str, steps: Union[list[str], str], open_vmd: bool = False):
 def plot_energy(dir: str, steps: Union[list[str], str], terms: list[str], open_plot: bool = False):
     run_dir = Path(dir).expanduser().resolve()
     xvg_entries = ["time"] + terms
+    terms_str = "\n".join(terms)
 
     subdirs_matched = get_step_directories(run_dir, steps)
 
@@ -122,42 +123,53 @@ def plot_energy(dir: str, steps: Union[list[str], str], terms: list[str], open_p
     for k in xvg_entries:
         energy[k] = []
 
+    energy['step'] = []
+    energy['step_ix'] = []
+
     ## write energy .xvg files
-    for edr in edrs:
-        print(edr.parents[0].name + ".xvg")
+    time_offset = 0
+    for i, edr in enumerate(edrs):
         xvg = str(xvgs_dir / edr.parents[0].with_suffix(".xvg").name)
-        terms_str = "\n".join(terms)
         run_shell_cmd(
             f"echo '{terms_str} \n\n' | gmx energy -f {str(edr)} -o {xvg}",
             cwd=run_dir,
         )
+        step_name = edr.parents[0].name.split("_")[1]
 
         ## read energy .xvg files
         with open(xvg, "r") as f:
             for line in f:
                 if line[0] not in ["@", "#"]:
+                    energy['step'].append(step_name)
+                    energy['step_ix'].append(i)
                     for k, v in zip(xvg_entries, line.split()):
-                        energy[k].append(float(v))
+                        if k == "time":
+                            energy[k].append(float(v) + time_offset)
+                        else:
+                            energy[k].append(float(v))
+
+        time_offset = energy["time"][-1]
 
     ## plot energy
-    snapshot = range(len(energy['time']))
-    steps_starts = [i for i in snapshot if isclose(energy["time"][i], 0)]
-    steps_names = [str(edr.parents[0].name).split("_")[1] for edr in edrs]
 
-    df = pd.DataFrame(energy).melt(id_vars=["time"], value_vars=terms)
-    steps = pd.DataFrame({"time": steps_starts, "name": steps_names})
+    df = pd.DataFrame(energy).melt(id_vars=["time", "step", "step_ix"], value_vars=terms)
+    # filter for unique steps
+    steps = df[df["variable"] == terms[0]]
+    steps = steps.groupby(['step', 'step_ix']).first().reset_index()
 
     p = (so.Plot(df, x = "time", y = "value")
         .facet(row="variable").share(x=True, y=False)
         .add(so.Line())
-        # .add(so.Path(color="black"), data=steps)
         .theme({**axes_style("white")})
         .label(x = "Time [ps]", y = "Energy [kJ/mol]")
     )
-    plt.axvline(x=5, color="black", linestyle="--")
+    p.plot(pyplot=True)
+    for t, s in zip(steps["time"], steps["step"]):
+        plt.axvline(x=t, color="black", linestyle="--")
 
     output_path = str(run_dir / "analysis" / "energy.png")
-    p.save(output_path, dpi=300)
+    plt.savefig(output_path, dpi=300)
+    # p.save(output_path, dpi=300)
 
     # open png file with default system viewer
     if open_plot:
