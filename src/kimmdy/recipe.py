@@ -21,6 +21,7 @@ class RecipeStep(ABC):
     """
 
 
+@dataclass
 class Relax(RecipeStep):
     """Start a relaxation MD.
 
@@ -29,7 +30,7 @@ class Relax(RecipeStep):
     """
 
 
-@dataclass()
+@dataclass
 class Place(RecipeStep):
     """Change topology and/or coordinates to place an atom.
 
