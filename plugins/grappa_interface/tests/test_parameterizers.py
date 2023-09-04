@@ -1,52 +1,40 @@
 import pytest
 
-pytest.skip(reason="needs grappa plugin", allow_module_level=True)
-# from grappa_interface import (
-#     clean_parameters,
-#     generate_input,
-#     apply_parameters,
-#     GrappaInterface,
-# )
-from kimmdy.topology.topology import Topology
+pytest.importorskip("grappa_interface")
+pytest.importorskip("grappa")
+
+import os
+from pathlib import Path
 from copy import deepcopy
 import numpy as np
+import json
+
+from grappa_interface import (
+    clean_parameters,
+    generate_input,
+    apply_parameters,
+    GrappaInterface,
+)
+from kimmdy.topology.topology import Topology
+from kimmdy.constants import AA3
+from kimmdy.parsing import write_json, read_json, read_top
 
 
-# from kimmdy.parsing import write_json, read_json
-# import json
+## fixtures ##
+@pytest.fixture
+def grappa_input():
+    return read_json(Path(__file__).parent / "GrAPPa_input_alanine.json")
 
-pytest.mark.skip(reason="needs grappa plugin")
+
+@pytest.fixture
+def grappa_output():
+    return read_json(Path(__file__).parent / "GrAPPa_output_alanine.json")
 
 
-def test_generate_input(generic_topology):
-    AA3 = [
-        "ALA",
-        "CYS",
-        "ASP",
-        "GLU",
-        "PHE",
-        "GLY",
-        "HIE",
-        "ILE",
-        "LYS",
-        "LEU",
-        "MET",
-        "ASN",
-        "PRO",
-        "HYP",
-        "GLN",
-        "ARG",
-        "SER",
-        "THR",
-        "VAL",
-        "TRP",
-        "TYR",
-        "DOP",
-        "ACE",
-        "NME",
-    ]
-
-    input_dict = generate_input(generic_topology)
+## test scripts ##
+def test_generate_input():
+    top = Topology(read_top(Path(__file__).parent / "Ala_out.top"))
+    input_dict = generate_input(top)
 
     # with open("GrAPPa_input_alanine.json", "w") as f:
     #     json.dump(input_dict, f)
@@ -63,25 +51,19 @@ def test_generate_input(generic_topology):
     assert all([x[2] in AA3 for x in input_dict["atoms"]])
 
 
-pytest.mark.skip(reason="needs grappa plugin")
-
-
-def test_clean_parameters(generic_parameter_output):
-    parameter_prepared = deepcopy(generic_parameter_output)
+def test_clean_parameters(grappa_output):
+    parameter_prepared = deepcopy(grappa_output)
     parameter_prepared["angle_k"] = np.array(parameter_prepared["angle_k"])
     clean_parameters(parameter_prepared)
     pass
 
 
-pytest.mark.skip(reason="needs grappa plugin")
-
-
-def test_generate_parameters(generic_parameter_input):
+def test_generate_parameters(grappa_input):
     import grappa.ff
 
     ff = grappa.ff.ForceField.from_tag("radical_example")
     # in rad to avoid import openmm
-    parameters = ff.params_from_topology_dict(generic_parameter_input)
+    parameters = ff.params_from_topology_dict(grappa_input)
     clean_parameters(parameters)
     # write_json(parameters, "GrAPPa_output_alanine.json")
     # with open("GrAPPa_output_alanine.json", "r") as f:
@@ -89,10 +71,9 @@ def test_generate_parameters(generic_parameter_input):
     # write_json(parameters, "GrAPPa_output_alanine.json")
 
 
-pytest.mark.skip(reason="needs grappa plugin")
+def test_apply_parameters():
+    top = Topology(read_top(Path(__file__).parent / "Ala_out.top"))
 
-
-def test_apply_parameters(generic_topology):
     parameters_clean = {
         "atom": {"idxs": ["1"], "q": ["0.1"]},
         "bond": {"idxs": [["1", "3"]], "eq": ["400.0"], "k": ["0.3"]},
@@ -111,40 +92,38 @@ def test_apply_parameters(generic_topology):
         },
     }
 
-    apply_parameters(generic_topology, parameters_clean)
+    apply_parameters(top, parameters_clean)
 
-    assert isinstance(generic_topology, Topology)
+    assert isinstance(top, Topology)
     assert (
-        generic_topology.atoms[parameters_clean["atom"]["idxs"][0]].charge
+        top.atoms[parameters_clean["atom"]["idxs"][0]].charge
         == parameters_clean["atom"]["q"][0]
     )
     assert (
-        generic_topology.bonds[tuple(parameters_clean["bond"]["idxs"][0])].c1
+        top.bonds[tuple(parameters_clean["bond"]["idxs"][0])].c1
         == parameters_clean["bond"]["k"][0]
     )
     assert (
-        generic_topology.angles[tuple(parameters_clean["angle"]["idxs"][0])].c0
+        top.angles[tuple(parameters_clean["angle"]["idxs"][0])].c0
         == parameters_clean["angle"]["eq"][0]
     )
     assert (
-        generic_topology.proper_dihedrals[tuple(parameters_clean["proper"]["idxs"][0])]
+        top.proper_dihedrals[tuple(parameters_clean["proper"]["idxs"][0])]
         .dihedrals["1"]
         .c0
         == parameters_clean["proper"]["phases"][0][0]
     )
     assert (
-        generic_topology.improper_dihedrals[
-            tuple(parameters_clean["improper"]["idxs"][0])
-        ].c1
+        top.improper_dihedrals[tuple(parameters_clean["improper"]["idxs"][0])].c1
         == parameters_clean["improper"]["ks"][0][0]
     )
 
 
-pytest.mark.skip(reason="needs grappa plugin")
+def test_parameterize_topology(tmp_path):
+    os.chdir(tmp_path.resolve())
+    top = Topology(read_top(Path(__file__).parent / "Ala_out.top"))
 
-
-def test_parameterize_topology(generic_topology):
     parameterizer = GrappaInterface()
-    curr_top = deepcopy(generic_topology)
+    curr_top = deepcopy(top)
     parameterizer.parameterize_topology(curr_top)
-    assert generic_topology != curr_top
+    assert top != curr_top
