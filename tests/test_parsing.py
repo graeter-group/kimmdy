@@ -30,11 +30,12 @@ def setup_testdir(tmp_path) -> Path:
 
 
 ## test topology parser
-def test_parser_doesnt_crash_on_example(tmp_path, caplog):
+@pytest.mark.parametrize("arranged_tmp_path", (["test_parsing"]), indirect=True)
+def test_parser_doesnt_crash_on_example(arranged_tmp_path, caplog):
     """Example file urea.top
     from <https://manual.gromacs.org/documentation/current/reference-manual/topologies/topology-file-formats.html>
     """
-    testdir = setup_testdir(tmp_path)
+
     urea_path = Path("urea.top")
     top = parsing.read_top(urea_path)
     assert isinstance(top, dict)

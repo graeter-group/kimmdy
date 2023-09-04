@@ -12,39 +12,13 @@ from grappa_interface import (
     GrappaInterface,
 )
 from kimmdy.topology.topology import Topology
+from kimmdy.constants import AA3
 
 # from kimmdy.parsing import write_json, read_json
 # import json
 
 
 def test_generate_input(generic_topology):
-    AA3 = [
-        "ALA",
-        "CYS",
-        "ASP",
-        "GLU",
-        "PHE",
-        "GLY",
-        "HIE",
-        "ILE",
-        "LYS",
-        "LEU",
-        "MET",
-        "ASN",
-        "PRO",
-        "HYP",
-        "GLN",
-        "ARG",
-        "SER",
-        "THR",
-        "VAL",
-        "TRP",
-        "TYR",
-        "DOP",
-        "ACE",
-        "NME",
-    ]
-
     input_dict = generate_input(generic_topology)
 
     # with open("GrAPPa_input_alanine.json", "w") as f:
@@ -62,17 +36,11 @@ def test_generate_input(generic_topology):
     assert all([x[2] in AA3 for x in input_dict["atoms"]])
 
 
-pytest.mark.skip(reason="needs grappa plugin")
-
-
 def test_clean_parameters(generic_parameter_output):
     parameter_prepared = deepcopy(generic_parameter_output)
     parameter_prepared["angle_k"] = np.array(parameter_prepared["angle_k"])
     clean_parameters(parameter_prepared)
     pass
-
-
-pytest.mark.skip(reason="needs grappa plugin")
 
 
 def test_generate_parameters(generic_parameter_input):
@@ -86,9 +54,6 @@ def test_generate_parameters(generic_parameter_input):
     # with open("GrAPPa_output_alanine.json", "r") as f:
     #     parameters = json.load(f,parse_float=lambda x: round(float(x), 3))
     # write_json(parameters, "GrAPPa_output_alanine.json")
-
-
-pytest.mark.skip(reason="needs grappa plugin")
 
 
 def test_apply_parameters(generic_topology):
@@ -137,9 +102,6 @@ def test_apply_parameters(generic_topology):
         ].c1
         == parameters_clean["improper"]["ks"][0][0]
     )
-
-
-pytest.mark.skip(reason="needs grappa plugin")
 
 
 def test_parameterize_topology(generic_topology):
