@@ -1,10 +1,15 @@
 """
 Tests for homolysis reaction plugin.
 
-Assumes KIMMDY was installed with the plugin.
-E.g. via pip install -r requirements.txt.
+Is skipped if KIMMDY was installed without the plugin.
 """
 import pytest
+from kimmdy import reaction_plugins
+
+pytest.importorskip("homolysis")
+pytest.importorskip("hat_naive")
+pytest.importorskip("dummyreaction")
+
 from pathlib import Path
 import numpy as np
 from homolysis.reaction import Homolysis
@@ -105,7 +110,7 @@ def test_morse_transition_rate(homolysis_files):
     assert all(np.isclose(fs, fs_ref))
 
 
-def test_get_recipe_collection(generic_rmgr):
+def test_get_recipe_collection(generic_rmgr=None):
     # curr_path = Path().cwd()
 
     files = TaskFiles(generic_rmgr)
