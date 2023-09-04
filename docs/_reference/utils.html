@@ -162,36 +162,13 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../guide/developer/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Developer</span></a>
+            <a href="../guide/user/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">User</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../guide/developer/plugins.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Writing Reaction Plugins</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../guide/developer/topology.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Hexala topology</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a href="../guide/user/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">User</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../guide/user/hcp.html" class="sidebar-item-text sidebar-link">
@@ -202,6 +179,29 @@ ul.task-list li input[type="checkbox"] {
   <div class="sidebar-item-container"> 
   <a href="../guide/user/options.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">KIMMDY Options</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../guide/developer/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Developer</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guide/developer/plugins.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Writing Reaction Plugins</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guide/developer/topology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Hexala topology</span></a>
   </div>
 </li>
       </ul>
@@ -541,7 +541,7 @@ ul.task-list li input[type="checkbox"] {
 <h3 class="anchored" data-anchor-id="kimmdy.utils.check_gmx_version">check_gmx_version</h3>
 <p><code>utils.check_gmx_version(config)</code></p>
 <p>Check for an existing gromacs installation.</p>
-<p>If PLUMED is meant to be used it additionally checks for the keyword 'MODIFIED' or 'plumed' in the version name.</p>
+<p>If PLUMED is meant to be used it additionally checks for the keyword ‘MODIFIED’ or ‘plumed’ in the version name.</p>
 </section>
 <section id="kimmdy.utils.get_atominfo_from_plumedid" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.utils.get_atominfo_from_plumedid">get_atominfo_from_plumedid</h3>
@@ -693,7 +693,7 @@ ul.task-list li input[type="checkbox"] {
 <h3 class="anchored" data-anchor-id="kimmdy.utils.run_gmx">run_gmx</h3>
 <p><code>utils.run_gmx(s, cwd=None)</code></p>
 <p>Run GROMACS command in shell.</p>
-<p>Adds a '-quiet' flag to the command and checks the return code.</p>
+<p>Adds a ‘-quiet’ flag to the command and checks the return code.</p>
 </section>
 <section id="kimmdy.utils.run_shell_cmd" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.utils.run_shell_cmd">run_shell_cmd</h3>

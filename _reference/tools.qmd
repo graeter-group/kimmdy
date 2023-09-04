@@ -8,7 +8,41 @@ Standalone tools that are complementary to KIMMDY.
 
 | Name | Description |
 | --- | --- |
+| [entry_point_build_examples](#kimmdy.tools.entry_point_build_examples) | Build examples from the command line. |
+| [entry_point_remove_hydrogen](#kimmdy.tools.entry_point_remove_hydrogen) | Remove hydrogen by atom nr in a gro and topology file |
+| [get_build_example_cmdline_args](#kimmdy.tools.get_build_example_cmdline_args) | Parse command line arguments. |
+| [get_remove_hydrogen_cmdline_args](#kimmdy.tools.get_remove_hydrogen_cmdline_args) | parse cmdline args for remove_hydrogen |
 | [remove_hydrogen](#kimmdy.tools.remove_hydrogen) | remove hydrogen from a gro and top file |
+
+### entry_point_build_examples { #kimmdy.tools.entry_point_build_examples }
+
+`tools.entry_point_build_examples()`
+
+Build examples from the command line.
+
+### entry_point_remove_hydrogen { #kimmdy.tools.entry_point_remove_hydrogen }
+
+`tools.entry_point_remove_hydrogen()`
+
+Remove hydrogen by atom nr in a gro and topology file
+
+### get_build_example_cmdline_args { #kimmdy.tools.get_build_example_cmdline_args }
+
+`tools.get_build_example_cmdline_args()`
+
+Parse command line arguments.
+
+#### Returns
+
+| Type                     | Description                   |
+|--------------------------|-------------------------------|
+| [Namespace](`Namespace`) | parsed command line arguments |
+
+### get_remove_hydrogen_cmdline_args { #kimmdy.tools.get_remove_hydrogen_cmdline_args }
+
+`tools.get_remove_hydrogen_cmdline_args()`
+
+parse cmdline args for remove_hydrogen
 
 ### remove_hydrogen { #kimmdy.tools.remove_hydrogen }
 

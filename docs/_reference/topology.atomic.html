@@ -162,36 +162,13 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../guide/developer/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Developer</span></a>
+            <a href="../guide/user/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">User</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../guide/developer/plugins.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Writing Reaction Plugins</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../guide/developer/topology.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Hexala topology</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a href="../guide/user/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">User</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../guide/user/hcp.html" class="sidebar-item-text sidebar-link">
@@ -202,6 +179,29 @@ ul.task-list li input[type="checkbox"] {
   <div class="sidebar-item-container"> 
   <a href="../guide/user/options.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">KIMMDY Options</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../guide/developer/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Developer</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guide/developer/plugins.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Writing Reaction Plugins</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guide/developer/topology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Hexala topology</span></a>
   </div>
 </li>
       </ul>
@@ -440,7 +440,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="kimmdy.topology.atomic" class="level1">
 <h1>topology.atomic</h1>
 <p><code>topology.atomic</code></p>
-<p>Atomic datatypes for the topology such as Atom, Bond, Angle, Dihedral, etc. The order of the fields comes from the gromacs topology file format. See &lt;https://manual.gromacs.org/current/reference-manual/topologies/topology-file-formats.html#topology-file&gt;</p>
+<p>Atomic datatypes for the topology such as Atom, Bond, Angle, Dihedral, etc. The order of the fields comes from the gromacs topology file format. See <a href="https://manual.gromacs.org/current/reference-manual/topologies/topology-file-formats.html#topology-file" class="uri">https://manual.gromacs.org/current/reference-manual/topologies/topology-file-formats.html#topology-file</a></p>
 <section id="classes" class="level2">
 <h2 class="anchored" data-anchor-id="classes">Classes</h2>
 <table class="table">
@@ -530,14 +530,14 @@ ul.task-list li input[type="checkbox"] {
 <p><code>topology.atomic.Angle(ai, aj, ak, funct, c0=None, c1=None, c2=None, c3=None)</code></p>
 <p>Information about one angle</p>
 <p>A class containing angle information as in the angles section of the topology.</p>
-<p>From gromacs topology: ';', 'ai', 'aj', 'ak', 'funct', 'c0', 'c1', 'c2', 'c3' With aj &lt; ai &lt; ak</p>
+<p>From gromacs topology: ‘;’, ‘ai’, ‘aj’, ‘ak’, ‘funct’, ‘c0’, ‘c1’, ‘c2’, ‘c3’ With aj &lt; ai &lt; ak</p>
 </section>
 <section id="kimmdy.topology.atomic.AngleType" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.AngleType">AngleType</h3>
 <p><code>topology.atomic.AngleType(i, j, k, id, id_sym, funct, c0=None, c1=None, c2=None, c3=None)</code></p>
 <p>Information about one angle</p>
 <p>A class containing angle information as in the angles section of the topology.</p>
-<p>From gromacs topology: ';', 'i', 'j', 'k', 'funct', 'c0', 'c1', 'c2', 'c3' where i,j,k are atomtypes</p>
+<p>From gromacs topology: ‘;’, ‘i’, ‘j’, ‘k’, ‘funct’, ‘c0’, ‘c1’, ‘c2’, ‘c3’ where i,j,k are atomtypes</p>
 </section>
 <section id="kimmdy.topology.atomic.Atom" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.Atom">Atom</h3>
@@ -557,13 +557,13 @@ ul.task-list li input[type="checkbox"] {
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.Bond">Bond</h3>
 <p><code>topology.atomic.Bond(ai, aj, funct, c0=None, c1=None, c2=None, c3=None, c4=None, c5=None)</code></p>
 <p>Information about one bond</p>
-<p>A class containing bond information as in the bonds section of the topology. From gromacs topology: 'ai', 'aj', 'funct', 'c0', 'c1', 'c2', 'c3', 'c4', 'c5' With ai &lt; aj</p>
+<p>A class containing bond information as in the bonds section of the topology. From gromacs topology: ‘ai’, ‘aj’, ‘funct’, ‘c0’, ‘c1’, ‘c2’, ‘c3’, ‘c4’, ‘c5’ With ai &lt; aj</p>
 </section>
 <section id="kimmdy.topology.atomic.BondType" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.BondType">BondType</h3>
 <p><code>topology.atomic.BondType(i, j, id, id_sym, funct, c0=None, c1=None, c2=None, c3=None)</code></p>
 <p>Information about one bondtype</p>
-<p>A class containing bond information as in the bonds section of the topology. From gromacs topology: 'i', 'j', 'funct', 'c0', 'c1', 'c2', 'c3 Where i and j are atomtypes</p>
+<p>A class containing bond information as in the bonds section of the topology. From gromacs topology: ‘i’, ‘j’, ‘funct’, ‘c0’, ‘c1’, ‘c2’, ’c3 Where i and j are atomtypes</p>
 </section>
 <section id="kimmdy.topology.atomic.Dihedral" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.Dihedral">Dihedral</h3>
@@ -571,7 +571,7 @@ ul.task-list li input[type="checkbox"] {
 <p>Information about one proper or improper dihedral</p>
 <p>A class containing bond information as in the dihedrals section of the topology. Improper dihedrals have funct 4. Proper dihedrals have funct != 4. Mostly funct 9.</p>
 <p>Note that proper dihedrals of type 9 can be defined multiple times, for different periodicities. This is why would-be parameter c2 is called periodicity.</p>
-<p>From gromacs topology: ';', 'ai', 'aj', 'ak', 'al', 'funct', 'c0', 'c1', 'periodicity', 'c3', 'c4', 'c5' For proper dihedrals (funct 9): aj &lt; ak</p>
+<p>From gromacs topology: ‘;’, ‘ai’, ‘aj’, ‘ak’, ‘al’, ‘funct’, ‘c0’, ‘c1’, ‘periodicity’, ‘c3’, ‘c4’, ‘c5’ For proper dihedrals (funct 9): aj &lt; ak</p>
 </section>
 <section id="kimmdy.topology.atomic.DihedralRestraint" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.DihedralRestraint">DihedralRestraint</h3>
@@ -586,24 +586,24 @@ ul.task-list li input[type="checkbox"] {
 <p>Information about one dihedral</p>
 <p>A class containing bond information as in the dihedrals section of the topology. Proper dihedrals have funct 9. Improper dihedrals have funct 4.</p>
 <p>Note that proper dihedrals of type 9 can be defined multiple times, for different periodicities. This is why would-be parameter c2 is called periodicity and part of the <code>id</code>.</p>
-<p>From gromacs topology: ';', 'i', 'j', 'k', 'l', 'funct', 'c0', 'c1', 'periodicity', 'c3', 'c4', 'c5' Where i,j,k,l are atomtypes</p>
+<p>From gromacs topology: ‘;’, ‘i’, ‘j’, ‘k’, ‘l’, ‘funct’, ‘c0’, ‘c1’, ‘periodicity’, ‘c3’, ‘c4’, ‘c5’ Where i,j,k,l are atomtypes</p>
 </section>
 <section id="kimmdy.topology.atomic.MultipleDihedralTypes" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.MultipleDihedralTypes">MultipleDihedralTypes</h3>
 <p><code>topology.atomic.MultipleDihedralTypes(ai, aj, ak, al, funct, dihedral_types)</code></p>
-<p>Multiple <code>DihedralTypes</code>s with the same ai, aj, ak, al but different periodicities. funct should always be "9" when the length of dihedrals is &gt; 1. The key of the dict is the periodicity (c2).</p>
+<p>Multiple <code>DihedralTypes</code>s with the same ai, aj, ak, al but different periodicities. funct should always be “9” when the length of dihedrals is &gt; 1. The key of the dict is the periodicity (c2).</p>
 </section>
 <section id="kimmdy.topology.atomic.MultipleDihedrals" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.MultipleDihedrals">MultipleDihedrals</h3>
 <p><code>topology.atomic.MultipleDihedrals(ai, aj, ak, al, funct, dihedrals)</code></p>
-<p>Multiple <code>Dihedral</code>s with the same ai, aj, ak, al but different periodicities. funct should always be "9" when the length of dihedrals is &gt; 1. The key of the dict is the periodicity (c2).</p>
+<p>Multiple <code>Dihedral</code>s with the same ai, aj, ak, al but different periodicities. funct should always be “9” when the length of dihedrals is &gt; 1. The key of the dict is the periodicity (c2).</p>
 </section>
 <section id="kimmdy.topology.atomic.Pair" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.Pair">Pair</h3>
 <p><code>topology.atomic.Pair(ai, aj, funct, c0=None, c1=None, c2=None, c3=None)</code></p>
 <p>Information about one pair</p>
 <p>A class containing pair information as in the pair section of the topology.</p>
-<p>From gromacs topology: ai', 'aj', 'funct', 'c0', 'c1', 'c2', 'c3'</p>
+<p>From gromacs topology: ai’, ‘aj’, ‘funct’, ‘c0’, ‘c1’, ‘c2’, ‘c3’</p>
 </section>
 <section id="kimmdy.topology.atomic.PositionRestraint" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.PositionRestraint">PositionRestraint</h3>
