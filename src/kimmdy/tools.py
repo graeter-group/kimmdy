@@ -64,6 +64,7 @@ def build_examples(restore: str):
                 f"Could not build example directory {directory} because it already exists. Try the --restore option to still build it."
             ) from e
 
+
 def get_build_example_cmdline_args() -> argparse.Namespace:
     """Parse command line arguments.
 
@@ -82,6 +83,7 @@ def get_build_example_cmdline_args() -> argparse.Namespace:
         help="Overwrite input files in existing example directories, use keyword 'hard' to also delete output files.",
     )
     return parser.parse_args()
+
 
 def entry_point_build_examples():
     """Build examples from the command line."""
@@ -203,6 +205,7 @@ def remove_hydrogen(
             f"gmx mdrun -v -deffnm {gro_outpath.stem}_npt" + gmx_mdrun_flags, cwd=cwd
         )
 
+
 def get_remove_hydrogen_cmdline_args():
     """
     parse cmdline args for remove_hydrogen
@@ -231,6 +234,7 @@ def get_remove_hydrogen_cmdline_args():
         default=False,
     )
     return parser.parse_args()
+
 
 def entry_point_remove_hydrogen():
     """Remove hydrogen by atom nr in a gro and topology file"""

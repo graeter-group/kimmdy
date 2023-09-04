@@ -1,6 +1,5 @@
 from typing import Union
 from pathlib import Path
-from math import isclose
 import MDAnalysis as mda
 import subprocess as sp
 import matplotlib.pyplot as plt
@@ -12,6 +11,7 @@ import pandas as pd
 from kimmdy.utils import run_shell_cmd
 from kimmdy.parsing import read_json, write_json
 from kimmdy.recipe import RecipeCollection
+
 
 def get_analysis_dir(dir: Path) -> Path:
     """Get analysis directory for a KIMMDY run.
@@ -30,6 +30,7 @@ def get_analysis_dir(dir: Path) -> Path:
     out = dir / "analysis"
     out.mkdir(exist_ok=True)
     return out
+
 
 def get_step_directories(dir: Path, steps: Union[list[str], str] = "all") -> list[Path]:
     """
@@ -114,7 +115,9 @@ def concat_traj(dir: str, steps: Union[list[str], str], open_vmd: bool = False):
         run_shell_cmd(f"vmd {gro} {str(out_xtc)}", cwd=run_dir)
 
 
-def plot_energy(dir: str, steps: Union[list[str], str], terms: list[str], open_plot: bool = False):
+def plot_energy(
+    dir: str, steps: Union[list[str], str], terms: list[str], open_plot: bool = False
+):
     """Plot GROMACS energy for a KIMMDY run.
 
     Parameters
@@ -151,8 +154,8 @@ def plot_energy(dir: str, steps: Union[list[str], str], terms: list[str], open_p
     for k in xvg_entries:
         energy[k] = []
 
-    energy['step'] = []
-    energy['step_ix'] = []
+    energy["step"] = []
+    energy["step_ix"] = []
 
     time_offset = 0
     for i, edr in enumerate(edrs):
@@ -169,8 +172,8 @@ def plot_energy(dir: str, steps: Union[list[str], str], terms: list[str], open_p
         with open(xvg, "r") as f:
             for line in f:
                 if line[0] not in ["@", "#"]:
-                    energy['step'].append(step_name)
-                    energy['step_ix'].append(i)
+                    energy["step"].append(step_name)
+                    energy["step_ix"].append(i)
                     for k, v in zip(xvg_entries, line.split()):
                         if k == "time":
                             energy[k].append(float(v) + time_offset)
@@ -179,33 +182,43 @@ def plot_energy(dir: str, steps: Union[list[str], str], terms: list[str], open_p
 
         time_offset = energy["time"][-1]
 
-    df = pd.DataFrame(energy).melt(id_vars=["time", "step", "step_ix"], value_vars=terms)
+    df = pd.DataFrame(energy).melt(
+        id_vars=["time", "step", "step_ix"], value_vars=terms
+    )
     step_names = df[df["variable"] == terms[0]]
     step_names["variable"] = "Step"
     step_names["value"] = step_names["step_ix"]
     df = pd.concat([df, step_names], ignore_index=True)
 
-    p = (so.Plot(df, x = "time", y = "value")
-      .add(so.Line())
-      .facet(row="variable").share(x=True, y=False)
-      .theme({**axes_style("white")})
-      .label(x = "Time [ps]", y = "Energy [kJ/mol]")
+    p = (
+        so.Plot(df, x="time", y="value")
+        .add(so.Line())
+        .facet(row="variable")
+        .share(x=True, y=False)
+        .theme({**axes_style("white")})
+        .label(x="Time [ps]", y="Energy [kJ/mol]")
     )
     p.plot(pyplot=True)
 
-    step_names = step_names.groupby(['step', 'step_ix']).first().reset_index()
+    step_names = step_names.groupby(["step", "step_ix"]).first().reset_index()
     for t, v, s in zip(step_names["time"], step_names["value"], step_names["step"]):
         plt.axvline(x=t, color="black", linestyle="--")
-        plt.text(x=t, y=v+0.5, s=s, fontsize=6)
+        plt.text(x=t, y=v + 0.5, s=s, fontsize=6)
 
     output_path = str(run_dir / "analysis" / "energy.png")
     plt.savefig(output_path, dpi=300)
 
     if open_plot:
-        sp.call(('xdg-open', output_path))
+        sp.call(("xdg-open", output_path))
 
 
-def radical_population(dir: str, steps: Union[list[str], str] = "all", select_atoms: str = "protein", open_plot: bool = False, open_vmd: bool = False):
+def radical_population(
+    dir: str,
+    steps: Union[list[str], str] = "all",
+    select_atoms: str = "protein",
+    open_plot: bool = False,
+    open_vmd: bool = False,
+):
     """Plot population of radicals for a KIMMDY run.
 
     Parameters
@@ -283,7 +296,7 @@ def radical_population(dir: str, steps: Union[list[str], str] = "all", select_at
     protein.write(pdb_output)
 
     if open_plot:
-        sp.call(('xdg-open', output_path))
+        sp.call(("xdg-open", output_path))
 
     if open_vmd:
         run_shell_cmd(f"vmd {pdb_output}", cwd=analysis_dir)
@@ -304,6 +317,7 @@ def plot_rates(dir: str):
         rc, picked_rp = RecipeCollection.from_csv(recipes)
         i = recipes.parent.name.split("_")[0]
         rc.plot(analysis_dir / f"{i}_reaction_rates.svg", highlight_r=picked_rp)
+
 
 def get_analysis_cmdline_args() -> argparse.Namespace:
     """Parse command line arguments.
@@ -332,7 +346,11 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
             "Apply analysis method to subdirectories with these names. Uses all subdirectories by default."
         ),
     )
-    parser_trjcat.add_argument("--open-vmd", action="store_true", help="Open VMD with the concatenated trajectory.")
+    parser_trjcat.add_argument(
+        "--open-vmd",
+        action="store_true",
+        help="Open VMD with the concatenated trajectory.",
+    )
 
     parser_plot_energy = subparsers.add_parser(
         name="plot_energy", help="Plot GROMACS energy for a KIMMDY run"
@@ -358,7 +376,9 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
             "Terms from gmx energy that will be plotted. Uses 'Potential' by default."
         ),
     )
-    parser_plot_energy.add_argument("--open-plot", action="store_true", help="Open plot in default system viewer.")
+    parser_plot_energy.add_argument(
+        "--open-plot", action="store_true", help="Open plot in default system viewer."
+    )
 
     parser_radical_population = subparsers.add_parser(
         name="radical_population",
@@ -383,9 +403,15 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
             "Apply analysis method to subdirectories with these names. Uses all subdirectories by default."
         ),
     )
-    parser_radical_population.add_argument("--open-plot", action="store_true", help="Open plot in default system viewer.")
-    parser_radical_population.add_argument("--open-vmd", action="store_true", help="Open VMD with the concatenated trajectory."
-                                           "To view the radical occupancy per atom, add a representation with the beta factor as color.")
+    parser_radical_population.add_argument(
+        "--open-plot", action="store_true", help="Open plot in default system viewer."
+    )
+    parser_radical_population.add_argument(
+        "--open-vmd",
+        action="store_true",
+        help="Open VMD with the concatenated trajectory."
+        "To view the radical occupancy per atom, add a representation with the beta factor as color.",
+    )
 
     parser_plot_rates = subparsers.add_parser(
         name="plot_rates",
@@ -407,9 +433,12 @@ def entry_point_analysis():
     elif args.module == "plot_energy":
         plot_energy(args.dir, args.steps, args.terms, args.open_plot)
     elif args.module == "radical_population":
-        radical_population(args.dir, args.steps, args.select_atoms, args.open_plot, args.open_vmd)
+        radical_population(
+            args.dir, args.steps, args.select_atoms, args.open_plot, args.open_vmd
+        )
     elif args.module == "plot_rates":
         plot_rates(args.dir)
     else:
-        print("No analysis module specified. Use -h for help and a list of available modules.")
-
+        print(
+            "No analysis module specified. Use -h for help and a list of available modules."
+        )

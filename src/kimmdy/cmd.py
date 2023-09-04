@@ -33,9 +33,11 @@ def get_cmdline_args() -> argparse.Namespace:
     :
         Parsed command line arguments
     """
-    parser = argparse.ArgumentParser(description="""Welcome to KIMMDY. `kimmdy` runs KIMMDY, further tools are available as `kimmdy-...` commands.
+    parser = argparse.ArgumentParser(
+        description="""Welcome to KIMMDY. `kimmdy` runs KIMMDY, further tools are available as `kimmdy-...` commands.
     These are `-analysis`, `-remove-hydrogen` and `-build-examples`. Access their help with `kimmdy-... -h.`
-    """)
+    """
+    )
     parser.add_argument(
         "--version", action="version", version=f'KIMMDY {version("kimmdy")}'
     )
