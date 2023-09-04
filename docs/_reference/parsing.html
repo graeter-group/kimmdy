@@ -196,36 +196,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../guide/developer/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Developer</span></a>
+            <a href="../guide/user/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">User</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../guide/developer/plugins.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Writing Reaction Plugins</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../guide/developer/topology.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Hexala topology</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a href="../guide/user/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">User</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../guide/user/hcp.html" class="sidebar-item-text sidebar-link">
@@ -236,6 +213,29 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../guide/user/options.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">KIMMDY Options</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../guide/developer/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Developer</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guide/developer/plugins.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Writing Reaction Plugins</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guide/developer/topology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Hexala topology</span></a>
   </div>
 </li>
       </ul>
@@ -600,7 +600,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="kimmdy.parsing.is_not_comment">is_not_comment</h3>
 <p><code>parsing.is_not_comment(c)</code></p>
 <p>Returns whether a string is not a comment.</p>
-<p>Used for topology like files that use ';' for comments.</p>
+<p>Used for topology like files that use ‘;’ for comments.</p>
 </section>
 <section id="kimmdy.parsing.read_distances_dat" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.parsing.read_distances_dat">read_distances_dat</h3>
@@ -717,8 +717,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><code>#undef</code> is not supported</li>
 <li>a section within <code>ifdef</code> may be a subsection of a section that was started outside of the <code>ifdef</code></li>
 <li><code>#if..#endif</code> statements only surround a full section or subsection, not individual lines within a section and a section may either be contained within if … else or it may not be, but it can not be duplicated with one part inside and one outside.</li>
-<li><code>if .. else</code> can't be nested</li>
-<li><code>#include</code> s that don't resolve to a valid file path are silently dropped</li>
+<li><code>if .. else</code> can’t be nested</li>
+<li><code>#include</code> s that don’t resolve to a valid file path are silently dropped</li>
 <li>sections that can have subsections can also exist multiple, separate times e.g.&nbsp;moleculetype will appear multiple times and they should not be merged</li>
 </ul>
 </section>

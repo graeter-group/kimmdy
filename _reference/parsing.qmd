@@ -2,7 +2,7 @@
 
 `parsing`
 
-All read_&lt;...&gt; and write_&lt;...&gt; functions.
+All read_<...> and write_<...> functions.
 
 ## Attributes
 
@@ -50,7 +50,7 @@ Dict representation of a plumed.dat file.
 
 Returns whether a string is not a comment.
 
-Used for topology like files that use &#x27;;&#x27; for comments.
+Used for topology like files that use ';' for comments.
 
 ### read_distances_dat { #kimmdy.parsing.read_distances_dat }
 
@@ -122,8 +122,8 @@ Read a topology file (*.top,*.itp,*.rtp) into a raw TopologyDict represenation.
   not individual lines within a section and
   a section may either be contained within if ... else or it may not be,
   but it can not be duplicated with one part inside and one outside.
-- `if .. else` can&#x27;t be nested
-- ``#include`` s that don&#x27;t resolve to a valid file path are silently dropped
+- `if .. else` can't be nested
+- ``#include`` s that don't resolve to a valid file path are silently dropped
 - sections that can have subsections can also exist multiple, separate times
   e.g. moleculetype will appear multiple times and they should not be merged
 

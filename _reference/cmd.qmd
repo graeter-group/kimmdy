@@ -11,14 +11,8 @@ Other entry points such as `kimmdy-analysis` also live here.
 | Name | Description |
 | --- | --- |
 | [configure_logger](#kimmdy.cmd.configure_logger) | Configure logging. |
-| [entry_point_analysis](#kimmdy.cmd.entry_point_analysis) | Analyse existing KIMMDY runs. |
-| [entry_point_build_examples](#kimmdy.cmd.entry_point_build_examples) | Build examples from the command line. |
 | [entry_point_kimmdy](#kimmdy.cmd.entry_point_kimmdy) | Run KIMMDY from the command line. |
-| [entry_point_remove_hydrogen](#kimmdy.cmd.entry_point_remove_hydrogen) | Remove hydrogen by atom nr in a gro and topology file |
-| [get_analysis_cmdline_args](#kimmdy.cmd.get_analysis_cmdline_args) | Parse command line arguments. |
-| [get_build_example_cmdline_args](#kimmdy.cmd.get_build_example_cmdline_args) | Parse command line arguments. |
 | [get_cmdline_args](#kimmdy.cmd.get_cmdline_args) | Parse command line arguments. |
-| [get_remove_hydrogen_cmdline_args](#kimmdy.cmd.get_remove_hydrogen_cmdline_args) | parse cmdline args for remove_hydrogen |
 | [kimmdy_run](#kimmdy.cmd.kimmdy_run) | Run KIMMDY from python. |
 
 ### configure_logger { #kimmdy.cmd.configure_logger }
@@ -35,18 +29,6 @@ Configure logging.
 | `log_level`            | [str](`str`)           | Loglevel. One of ["INFO", "WARNING", "MESSAGE", "DEBUG"]                                 | _required_ |
 | `no_increment_logfile` | [bool](`bool`)         | If True, do not backup existing log file. This is used for restarting from a checkpoint. | `False`    |
 
-### entry_point_analysis { #kimmdy.cmd.entry_point_analysis }
-
-`cmd.entry_point_analysis()`
-
-Analyse existing KIMMDY runs.
-
-### entry_point_build_examples { #kimmdy.cmd.entry_point_build_examples }
-
-`cmd.entry_point_build_examples()`
-
-Build examples from the command line.
-
 ### entry_point_kimmdy { #kimmdy.cmd.entry_point_kimmdy }
 
 `cmd.entry_point_kimmdy()`
@@ -56,36 +38,6 @@ Run KIMMDY from the command line.
 The configuration is gathered from the input file,
 which is `kimmdy.yml` by default.
 See [](`~kimmdy.cmd.get_cmdline_args`) or `kimmdy --help` for the descriptions of the arguments.
-
-### entry_point_remove_hydrogen { #kimmdy.cmd.entry_point_remove_hydrogen }
-
-`cmd.entry_point_remove_hydrogen()`
-
-Remove hydrogen by atom nr in a gro and topology file
-
-### get_analysis_cmdline_args { #kimmdy.cmd.get_analysis_cmdline_args }
-
-`cmd.get_analysis_cmdline_args()`
-
-Parse command line arguments.
-
-#### Returns
-
-| Type                                                     | Description                   |
-|----------------------------------------------------------|-------------------------------|
-| [argparse](`argparse`).[Namespace](`argparse.Namespace`) | Parsed command line arguments |
-
-### get_build_example_cmdline_args { #kimmdy.cmd.get_build_example_cmdline_args }
-
-`cmd.get_build_example_cmdline_args()`
-
-Parse command line arguments.
-
-#### Returns
-
-| Type                     | Description                   |
-|--------------------------|-------------------------------|
-| [Namespace](`Namespace`) | parsed command line arguments |
 
 ### get_cmdline_args { #kimmdy.cmd.get_cmdline_args }
 
@@ -98,12 +50,6 @@ Parse command line arguments.
 | Type                                                     | Description                   |
 |----------------------------------------------------------|-------------------------------|
 | [argparse](`argparse`).[Namespace](`argparse.Namespace`) | Parsed command line arguments |
-
-### get_remove_hydrogen_cmdline_args { #kimmdy.cmd.get_remove_hydrogen_cmdline_args }
-
-`cmd.get_remove_hydrogen_cmdline_args()`
-
-parse cmdline args for remove_hydrogen
 
 ### kimmdy_run { #kimmdy.cmd.kimmdy_run }
 

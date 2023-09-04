@@ -42,7 +42,7 @@ A topology keeps track of connections when bonds are broken or formed.
 
 Assumptions:
 
-- the topology of interest (the protein) is in section &#x27;moleculetype_0&#x27;.
+- the topology of interest (the protein) is in section 'moleculetype_0'.
 
 #### Parameters
 

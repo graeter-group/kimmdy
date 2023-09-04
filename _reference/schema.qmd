@@ -76,8 +76,8 @@ Recursively get properties and their desicripions from the scheme
 
 Return the schema for the config file.
 
-Nested scheme where each leaf entry is a dictionary with the &quot;pytype&quot;,
-&quot;default&quot; and &quot;description&quot;.
+Nested scheme where each leaf entry is a dictionary with the "pytype",
+"default" and "description".
 Contains the schema for the main kimmdy config file and all the plugins
 known at runtime.
 

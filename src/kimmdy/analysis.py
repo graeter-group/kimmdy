@@ -1,85 +1,148 @@
+"""Analysis tools for KIMMDY runs.
+For command line usage, run `kimmdy-analysis -h`.
+"""
 from typing import Union
 from pathlib import Path
-import subprocess
-import argparse
-from math import isclose
-import matplotlib.pyplot as plt
 import MDAnalysis as mda
+import subprocess as sp
+import matplotlib.pyplot as plt
+import seaborn.objects as so
+import argparse
+from seaborn import axes_style
+import pandas as pd
 
 from kimmdy.utils import run_shell_cmd
 from kimmdy.parsing import read_json, write_json
 from kimmdy.recipe import RecipeCollection
 
 
-def get_subdirs(run_dir: Path, steps: Union[list, str]):
-    ## create list of subdirectories of run_dir that match the ones named in steps
-    subdirs_sorted = sorted(
-        list(filter(lambda d: d.is_dir(), run_dir.glob("*_*/"))),
+def get_analysis_dir(dir: Path) -> Path:
+    """Get analysis directory for a KIMMDY run.
+
+    Creates the directory if it does not exist.
+
+    Parameters
+    ----------
+    dir
+        Directory of KIMMDY run
+
+    Returns
+    -------
+        Path to analysis directory
+    """
+    out = dir / "analysis"
+    out.mkdir(exist_ok=True)
+    return out
+
+
+def get_step_directories(dir: Path, steps: Union[list[str], str] = "all") -> list[Path]:
+    """
+    create list of subdirectories that match the steps.
+    If steps is "all", all subdirectories are returned.
+
+    Parameters
+    ----------
+    dir
+        Directory to search for subdirectories
+    steps
+        List of steps e.g. ["equilibrium", "production"]. Or a string "all" to return all subdirectories
+    """
+    directories = sorted(
+        [p for p in dir.glob("*_*/") if p.is_dir()],
         key=lambda p: int(p.name.split("_")[0]),
     )
     if steps == "all":
-        steps = list(set([x.name.split("_")[1] for x in subdirs_sorted]))
-    subdirs_matched = list(
-        filter(lambda d: d.name.split("_")[1] in steps, subdirs_sorted)
-    )
-
-    if not subdirs_matched:
-        raise ValueError(
-            f"Could not find directories {steps} in {run_dir}. Thus, no trajectories can be concatenated"
+        matching_directories = directories
+    else:
+        matching_directories = list(
+            filter(lambda d: d.name.split("_")[1] in steps, directories)
         )
 
-    return subdirs_matched
+    if not matching_directories:
+        raise ValueError(
+            f"Could not find directories {steps} in {dir}. Thus, no trajectories can be concatenated"
+        )
+
+    return matching_directories
 
 
-def concat_traj(rundir: str, steps: Union[list, str]):
-    """Find and concatenate trajectories (.xtc files) from KIMMDY runs."""
-    run_dir = Path(rundir).expanduser().resolve()
+def concat_traj(dir: str, steps: Union[list[str], str], open_vmd: bool = False):
+    """Find and concatenate trajectories (.xtc files) from a KIMMDY run into one trajectory.
+    The concatenated trajectory is centered and pbc corrected.
 
-    ## check if step argument is valid
-    if not isinstance(steps, list):
-        if not steps in ["all"]:
-            raise ValueError(f"Steps argument {steps} can not be dealt with.")
+    Parameters
+    ----------
+    dir
+        Directory to search for subdirectories
+    steps
+        List of steps e.g. ["equilibrium", "production"]. Or a string "all" to return all subdirectories
+    open_vmd
+        Open concatenated trajectory in VMD
+    """
+    run_dir = Path(dir).expanduser().resolve()
+    analysis_dir = get_analysis_dir(run_dir)
 
-    subdirs_matched = get_subdirs(run_dir, steps)
+    directories = get_step_directories(run_dir, steps)
 
-    ## create output dir
-    (run_dir / "analysis").mkdir(exist_ok=True)
-    out = run_dir / "analysis" / "concat.xtc"
-    out = Path(out).expanduser()
+    out_xtc = analysis_dir / "concat.xtc"
 
     ## gather trajectories
     trajectories = []
     tprs = []
-    for d in subdirs_matched:
+    gros = []
+    for d in directories:
         trajectories.extend(d.glob("*.xtc"))
         tprs.extend(d.glob("*.tpr"))
+        gros.extend(d.glob("*.gro"))
 
-    # trajectories = list(filter(lambda p: "rotref" not in p.stem, trajectories))
-    trajectories = [str(t) for t in trajectories]
     assert (
         len(trajectories) > 0
     ), f"No trrs found to concatenate in {run_dir} with subdirectory names {steps}"
 
+    trajectories = [str(t) for t in trajectories]
+
     ## write concatenated trajectory
+    tmp_xtc = str(out_xtc.with_name("tmp.xtc"))
     run_shell_cmd(
-        f"gmx trjcat -f {' '.join(trajectories)} -o {str(out.with_name('tmp.xtc'))} -cat",
+        f"gmx trjcat -f {' '.join(trajectories)} -o {tmp_xtc} -cat",
         cwd=run_dir,
     )
     run_shell_cmd(
-        f"echo '1 0' | gmx trjconv -f {str(out.with_name('tmp.xtc'))} -s {tprs[0]} -o {str(out)} -center -pbc mol",
+        f"echo '1 0' | gmx trjconv -f {tmp_xtc} -s {tprs[0]} -o {str(out_xtc)} -center -pbc mol",
         cwd=run_dir,
     )
+    run_shell_cmd(f"rm {tmp_xtc}", cwd=run_dir)
+    if open_vmd:
+        gro = str(gros[0])
+        run_shell_cmd(f"cp {gro} {str(analysis_dir)}", cwd=run_dir)
+        run_shell_cmd(f"vmd {gro} {str(out_xtc)}", cwd=run_dir)
 
 
-def plot_energy(rundir: str, steps: Union[list, str], terms: list):
-    run_dir = Path(rundir).expanduser().resolve()
+def plot_energy(
+    dir: str, steps: Union[list[str], str], terms: list[str], open_plot: bool = False
+):
+    """Plot GROMACS energy for a KIMMDY run.
+
+    Parameters
+    ----------
+    dir
+        Directory to search for subdirectories
+    steps
+        List of steps e.g. ["equilibrium", "production"]. Or a string "all" to return all subdirectories.
+        Default is "all".
+    terms
+        Terms from gmx energy that will be plotted. Uses 'Potential' by default.
+    open_plot :
+        Open plot in default system viewer.
+    """
+    run_dir = Path(dir).expanduser().resolve()
     xvg_entries = ["time"] + terms
+    terms_str = "\n".join(terms)
 
-    subdirs_matched = get_subdirs(run_dir, steps)
+    subdirs_matched = get_step_directories(run_dir, steps)
 
-    ## create output dir
-    (run_dir / "analysis").mkdir(exist_ok=True)
-    xvgs_dir = run_dir / "analysis" / "energy_xvgs"
+    analysis_dir = get_analysis_dir(run_dir)
+    xvgs_dir = analysis_dir / "energy_xvgs"
     xvgs_dir.mkdir(exist_ok=True)
 
     ## gather energy files
@@ -90,92 +153,115 @@ def plot_energy(rundir: str, steps: Union[list, str], terms: list):
         len(edrs) > 0
     ), f"No GROMACS energy files in {run_dir} with subdirectory names {steps}"
 
-    energy = []
-    ## write energy .xvg files
-    for edr in edrs:
-        print(edr.parents[0].name + ".xvg")
+    energy = {}
+    for k in xvg_entries:
+        energy[k] = []
+
+    energy["step"] = []
+    energy["step_ix"] = []
+
+    time_offset = 0
+    for i, edr in enumerate(edrs):
+        ## write energy .xvg file
         xvg = str(xvgs_dir / edr.parents[0].with_suffix(".xvg").name)
-        terms_str = "\n".join(terms)
+        step_name = edr.parents[0].name.split("_")[1]
+
         run_shell_cmd(
             f"echo '{terms_str} \n\n' | gmx energy -f {str(edr)} -o {xvg}",
             cwd=run_dir,
         )
 
-        ## read energy .xvg files
+        ## read energy .xvg file
         with open(xvg, "r") as f:
-            energy_raw = f.readlines()
-        for line in energy_raw:
-            if line[0] not in ["@", "#"]:
-                energy.append({k: float(v) for k, v in zip(xvg_entries, line.split())})
+            for line in f:
+                if line[0] not in ["@", "#"]:
+                    energy["step"].append(step_name)
+                    energy["step_ix"].append(i)
+                    for k, v in zip(xvg_entries, line.split()):
+                        if k == "time":
+                            energy[k].append(float(v) + time_offset)
+                        else:
+                            energy[k].append(float(v))
 
-    ## plot energy
-    snapshot = range(len(energy))
-    sim_start = [i for i in snapshot if isclose(energy[i]["time"], 0)]
-    sim_names = [str(edr.parents[0].name).split("_")[1] for edr in edrs]
-    # diffs =[j-i for i, j in zip(sim_start[:-1],sim_start[1:])]
-    limy = [energy[0][terms[0]], energy[0][terms[0]]]
-    print(sim_start)
+        time_offset = energy["time"][-1]
 
-    for term in terms:
-        val = [x[term] for x in energy]
-        print(term, min(val), max(val))
-        limy[0] = min(val) if min(val) < limy[0] else limy[0]
-        limy[1] = max(val) if max(val) > limy[1] else limy[1]
-        plt.plot(snapshot, val, label=term)
+    df = pd.DataFrame(energy).melt(
+        id_vars=["time", "step", "step_ix"], value_vars=terms
+    )
+    step_names = df[df["variable"] == terms[0]]
+    step_names["variable"] = "Step"
+    step_names["value"] = step_names["step_ix"]
+    df = pd.concat([df, step_names], ignore_index=True)
 
-    for i, pos in enumerate(sim_start):
-        plt.plot([pos, pos], limy, c="k", linewidth=1)
-        plt.text(pos + 1, limy[1] - 0.05 * (limy[1] - limy[0]), sim_names[i])
+    p = (
+        so.Plot(df, x="time", y="value")
+        .add(so.Line())
+        .facet(row="variable")
+        .share(x=True, y=False)
+        .theme({**axes_style("white")})
+        .label(x="Time [ps]", y="Energy [kJ/mol]")
+    )
+    p.plot(pyplot=True)
 
-    plt.xlabel("Snapshot #")
-    plt.ylabel("Energy [kJ mol-1]")
-    plt.legend()
-    plt.savefig(str(run_dir / "analysis" / "energy.png"), dpi=300)
+    step_names = step_names.groupby(["step", "step_ix"]).first().reset_index()
+    for t, v, s in zip(step_names["time"], step_names["value"], step_names["step"]):
+        plt.axvline(x=t, color="black", linestyle="--")
+        plt.text(x=t, y=v + 0.5, s=s, fontsize=6)
 
-    print(limy)
+    output_path = str(run_dir / "analysis" / "energy.png")
+    plt.savefig(output_path, dpi=300)
+
+    if open_plot:
+        sp.call(("xdg-open", output_path))
 
 
-def radical_population(rundir: str, select_atoms: str):
-    # TODO: weigh radical population by time
+def radical_population(
+    dir: str,
+    steps: Union[list[str], str] = "all",
+    select_atoms: str = "protein",
+    open_plot: bool = False,
+    open_vmd: bool = False,
+):
+    """Plot population of radicals for a KIMMDY run.
 
-    ## set up directory to store radical information
+    Parameters
+    ----------
+    dir
+        KIMMDY run directory to be analysed.
+    steps
+        List of steps e.g. ["equilibrium", "production"]. Or a string "all" to return all subdirectories.
+        Default is "all".
+    select_atoms
+        Atoms chosen for radical population analysis, default is protein (uses MDAnalysis selection syntax)
+    open_plot
+        Open plot in default system viewer.
+    open_vmd
+        Open a pdb in VMD with the radical occupation as B-factors.
+    """
+    run_dir = Path(dir).expanduser().resolve()
+    analysis_dir = get_analysis_dir(run_dir)
+
+    subdirs_matched = get_step_directories(run_dir, steps)
+    radical_jsons = run_dir.glob("**/radicals.json")
+
     radical_info = {"time": [], "radicals": []}
+    for radical_json in radical_jsons:
+        data = read_json(radical_json)
+        for k in radical_info.keys():
+            radical_info[k].append(data[k])
 
-    for curr_dir in rundir[::-1]:
-        run_dir = Path(curr_dir).expanduser().resolve()
+    write_json(radical_info, analysis_dir / "radical_population.json")
 
-        ## find .gro file
-        subdirs_sorted = sorted(
-            list(filter(lambda d: d.is_dir(), run_dir.glob("*_*/"))),
-            key=lambda p: int(p.name.split("_")[0]),
-        )
-        for subdir in subdirs_sorted:
-            gro = list(subdir.glob("*.gro"))
-            if gro:
-                break
-        assert gro
+    ## get atoms from gro file
+    gro = None
+    for subdir in subdirs_matched:
+        gro = list(subdir.glob("*.gro"))
+        if gro:
+            break
+    if not gro:
+        raise ValueError(f"No .gro file found in {run_dir}")
 
-        ## gather radical info
-        radical_jsons = run_dir.glob("**/radicals.json")
-        # print(list(radical_jsons))
-
-        ## parse radical info
-        for radical_json in radical_jsons:
-            data = read_json(radical_json)
-            for k in radical_info.keys():
-                radical_info[k].append(data[k])
-
-    ## create output dir (only goes to first mentioned run_dir)
-    (run_dir / "analysis").mkdir(exist_ok=True)
-    out = run_dir / "analysis"
-    out = Path(out).expanduser()
-
-    ## write gathered radical info
-    write_json(radical_info, out / "radical_population.json")
-
-    ## get info from gro file
     u = mda.Universe(str(gro[0]), format="gro")
-    print(u)
     atoms = u.select_atoms(select_atoms)
     atoms_identifier = [
         "-".join(x)
@@ -186,18 +272,15 @@ def radical_population(rundir: str, select_atoms: str):
             )
         )
     ]
-    atoms_id = atoms.ids
-    print(atoms_identifier)
-    print(atoms_id)
+    atom_ids = atoms.ids
 
     ## plot fingerprint
-    counts = {i: 0.0 for i in atoms_id}
+    counts = {i: 0.0 for i in atom_ids}
     n_states = len(radical_info["time"])
     for state in range(n_states):
         for idx in radical_info["radicals"][state]:
             if int(idx) in counts.keys():
                 counts[int(idx)] += 1 / n_states
-    print(counts)
 
     plt.bar(x=atoms_identifier, height=counts.values())
     plt.xlabel("Atom identifier")
@@ -205,26 +288,160 @@ def radical_population(rundir: str, select_atoms: str):
     plt.ylim(0, 1)
     plt.xticks(atoms_identifier, rotation=90, ha="right")
     plt.tight_layout()
-    plt.savefig(str(run_dir / "analysis" / "radical_population_fingerprint"), dpi=300)
+    output_path = str(analysis_dir / "radical_population_fingerprint.png")
+    plt.savefig(output_path, dpi=300)
 
     u.add_TopologyAttr("tempfactors")
     atoms = u.select_atoms(select_atoms)
-    print(list(counts.values()))
-    print(atoms.tempfactors)
     atoms.tempfactors = list(counts.values())
     protein = u.select_atoms("protein")
-    protein.write(str(out))
+    pdb_output = f"{analysis_dir}/radical_population.pdb"
+    protein.write(pdb_output)
+
+    if open_plot:
+        sp.call(("xdg-open", output_path))
+
+    if open_vmd:
+        run_shell_cmd(f"vmd {pdb_output}", cwd=analysis_dir)
 
 
-def plot_rates(rundir: list):
-    for curr_dir in rundir:
-        run_dir = Path(curr_dir).expanduser().resolve()
+def plot_rates(dir: str):
+    """Plot rates of all possible reactions for each 'decide_recipe' step.
 
-        ## create output dir (only goes to first mentioned run_dir)
-        (run_dir / "analysis").mkdir(exist_ok=True)
-        out = run_dir / "analysis"
+    Parameters
+    ----------
+    dir
+        Directory of KIMMDY run
+    """
+    run_dir = Path(dir).expanduser().resolve()
+    analysis_dir = get_analysis_dir(run_dir)
 
-        for recipes in run_dir.glob("*decide_recipe/recipes.csv"):
-            rc, picked_rp = RecipeCollection.from_csv(recipes)
-            i = recipes.parent.name.split("_")[0]
-            rc.plot(out / f"{i}_reaction_rates.svg", highlight_r=picked_rp)
+    for recipes in run_dir.glob("*decide_recipe/recipes.csv"):
+        rc, picked_rp = RecipeCollection.from_csv(recipes)
+        i = recipes.parent.name.split("_")[0]
+        rc.plot(analysis_dir / f"{i}_reaction_rates.svg", highlight_r=picked_rp)
+
+
+def get_analysis_cmdline_args() -> argparse.Namespace:
+    """Parse command line arguments.
+
+    Returns
+    -------
+        Parsed command line arguments
+    """
+    parser = argparse.ArgumentParser(
+        description="Welcome to the KIMMDY analysis module. Use this module to analyse existing KIMMDY runs.",
+    )
+    subparsers = parser.add_subparsers(metavar="module", dest="module")
+
+    parser_trjcat = subparsers.add_parser(
+        name="trjcat", help="Concatenate trajectories of a KIMMDY run"
+    )
+    parser_trjcat.add_argument(
+        "dir", type=str, help="KIMMDY run directory to be analysed."
+    )
+    parser_trjcat.add_argument(
+        "--steps",
+        "-s",
+        nargs="*",
+        default="all",
+        help=(
+            "Apply analysis method to subdirectories with these names. Uses all subdirectories by default."
+        ),
+    )
+    parser_trjcat.add_argument(
+        "--open-vmd",
+        action="store_true",
+        help="Open VMD with the concatenated trajectory.",
+    )
+
+    parser_plot_energy = subparsers.add_parser(
+        name="plot_energy", help="Plot GROMACS energy for a KIMMDY run"
+    )
+    parser_plot_energy.add_argument(
+        "dir", type=str, help="KIMMDY run directory to be analysed."
+    )
+    parser_plot_energy.add_argument(
+        "--steps",
+        "-s",
+        nargs="*",
+        default="all",
+        help=(
+            "Apply analysis method to subdirectories with these names. Uses all subdirectories by default."
+        ),
+    )
+    parser_plot_energy.add_argument(
+        "--terms",
+        "-t",
+        nargs="*",
+        default=["Potential"],
+        help=(
+            "Terms from gmx energy that will be plotted. Uses 'Potential' by default."
+        ),
+    )
+    parser_plot_energy.add_argument(
+        "--open-plot", action="store_true", help="Open plot in default system viewer."
+    )
+
+    parser_radical_population = subparsers.add_parser(
+        name="radical_population",
+        help="Plot population of radicals for one or multiple KIMMDY run(s)",
+    )
+    parser_radical_population.add_argument(
+        "dir", type=str, help="KIMMDY run directory to be analysed."
+    )
+    parser_radical_population.add_argument(
+        "--select_atoms",
+        "-a",
+        type=str,
+        help="Atoms chosen for radical population analysis, default is protein (uses MDAnalysis selection syntax)",
+        default="protein",
+    )
+    parser_radical_population.add_argument(
+        "--steps",
+        "-s",
+        nargs="*",
+        default="all",
+        help=(
+            "Apply analysis method to subdirectories with these names. Uses all subdirectories by default."
+        ),
+    )
+    parser_radical_population.add_argument(
+        "--open-plot", action="store_true", help="Open plot in default system viewer."
+    )
+    parser_radical_population.add_argument(
+        "--open-vmd",
+        action="store_true",
+        help="Open VMD with the concatenated trajectory."
+        "To view the radical occupancy per atom, add a representation with the beta factor as color.",
+    )
+
+    parser_plot_rates = subparsers.add_parser(
+        name="plot_rates",
+        help="Plot rates of all possible reactions after a MD run. Rates must have been saved!",
+    )
+    parser_plot_rates.add_argument(
+        "dir", type=str, help="KIMMDY run directory to be analysed."
+    )
+
+    return parser.parse_args()
+
+
+def entry_point_analysis():
+    """Analyse existing KIMMDY runs."""
+    args = get_analysis_cmdline_args()
+
+    if args.module == "trjcat":
+        concat_traj(args.dir, args.steps, args.open_vmd)
+    elif args.module == "plot_energy":
+        plot_energy(args.dir, args.steps, args.terms, args.open_plot)
+    elif args.module == "radical_population":
+        radical_population(
+            args.dir, args.steps, args.select_atoms, args.open_plot, args.open_vmd
+        )
+    elif args.module == "plot_rates":
+        plot_rates(args.dir)
+    else:
+        print(
+            "No analysis module specified. Use -h for help and a list of available modules."
+        )

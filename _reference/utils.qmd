@@ -46,7 +46,7 @@ prevent overwriting these files.
 Check for an existing gromacs installation.
 
 If PLUMED is meant to be used it additionally checks for the keyword
-&#x27;MODIFIED&#x27; or &#x27;plumed&#x27; in the version name.
+'MODIFIED' or 'plumed' in the version name.
 
 ### get_atominfo_from_plumedid { #kimmdy.utils.get_atominfo_from_plumedid }
 
@@ -126,7 +126,7 @@ The calculation should be according to the derivation in the original KIMMDY pap
 
 Run GROMACS command in shell.
 
-Adds a &#x27;-quiet&#x27; flag to the command and checks the return code.
+Adds a '-quiet' flag to the command and checks the return code.
 
 ### run_shell_cmd { #kimmdy.utils.run_shell_cmd }
 
