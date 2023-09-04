@@ -1,5 +1,22 @@
 # Changelog
 
+## [4.2.0](https://github.com/hits-mbm-dev/kimmdy/compare/v4.1.0...v4.2.0) (2023-09-04)
+
+
+### Features
+
+* **analysis:** open-plot and open-vmd options ([d306e66](https://github.com/hits-mbm-dev/kimmdy/commit/d306e66b893a72280bffbe12e26ab05c8777a8a9))
+* plot multiple energy terms ([d306e66](https://github.com/hits-mbm-dev/kimmdy/commit/d306e66b893a72280bffbe12e26ab05c8777a8a9))
+* review analysis ([#245](https://github.com/hits-mbm-dev/kimmdy/issues/245)) ([d306e66](https://github.com/hits-mbm-dev/kimmdy/commit/d306e66b893a72280bffbe12e26ab05c8777a8a9))
+
+
+### Bug Fixes
+
+* [#236](https://github.com/hits-mbm-dev/kimmdy/issues/236) rm concat cmd option ([#240](https://github.com/hits-mbm-dev/kimmdy/issues/240)) ([675ded5](https://github.com/hits-mbm-dev/kimmdy/commit/675ded537a6b241b59b02560c286945e76916f22))
+* missing test file ([1e805c1](https://github.com/hits-mbm-dev/kimmdy/commit/1e805c19a13d4f590a0c8f8e7841428f64ef1c71))
+* no grappa in tox tests ([feaff46](https://github.com/hits-mbm-dev/kimmdy/commit/feaff46e0d44316cf5cbf46c8045d9e0507850ed))
+* Recipe aggregation broken, closes [#252](https://github.com/hits-mbm-dev/kimmdy/issues/252) ([#253](https://github.com/hits-mbm-dev/kimmdy/issues/253)) ([a6177e3](https://github.com/hits-mbm-dev/kimmdy/commit/a6177e3d99af093700167d03311718c9ce571f63))
+
 ## [4.1.0](https://github.com/hits-mbm-dev/kimmdy/compare/v4.0.1...v4.1.0) (2023-08-28)
 
 
