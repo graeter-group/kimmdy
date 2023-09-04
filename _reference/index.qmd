@@ -18,7 +18,7 @@ Topology modules
 | [topology.ff](topology.ff.qmd#kimmdy.topology.ff) |  |
 | [topology.utils](topology.utils.qmd#kimmdy.topology.utils) |  |
 | [topology.atomic](topology.atomic.qmd#kimmdy.topology.atomic) | Atomic datatypes for the topology such as Atom, Bond, Angle, Dihedral, etc. |
-| [parsing.TopologyDict](parsing.TopologyDict.qmd#kimmdy.parsing.TopologyDict) | A raw representation of a topology file. |
+| [parsing.TopologyDict](parsing.TopologyDict.qmd#kimmdy.parsing.TopologyDict) | A raw representation of a topology file returned by [](`~kimmdy.parsing.read_top`). |
 
 ## Modules
 
@@ -26,7 +26,7 @@ Modules
 
 | | |
 | --- | --- |
-| [analysis](analysis.qmd#kimmdy.analysis) |  |
+| [analysis](analysis.qmd#kimmdy.analysis) | Analysis tools for KIMMDY runs. |
 | [cmd](cmd.qmd#kimmdy.cmd) | Functions for starting KIMMDY either from python or the command line. |
 | [config](config.qmd#kimmdy.config) | Read and validate kimmdy.yml configuration files |
 | [constants](constants.qmd#kimmdy.constants) | Comstants used throughout KIMMDY |

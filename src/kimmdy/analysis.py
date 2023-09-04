@@ -1,3 +1,6 @@
+"""Analysis tools for KIMMDY runs.
+For command line usage, run `kimmdy-analysis -h`.
+"""
 from typing import Union
 from pathlib import Path
 import MDAnalysis as mda

@@ -409,6 +409,13 @@ ul.task-list li input[type="checkbox"] {
   <ul>
   <li><a href="#functions" id="toc-functions" class="nav-link" data-scroll-target="#functions">Functions</a>
   <ul>
+  <li><a href="#kimmdy.tools.entry_point_build_examples" id="toc-kimmdy.tools.entry_point_build_examples" class="nav-link" data-scroll-target="#kimmdy.tools.entry_point_build_examples">entry_point_build_examples</a></li>
+  <li><a href="#kimmdy.tools.entry_point_remove_hydrogen" id="toc-kimmdy.tools.entry_point_remove_hydrogen" class="nav-link" data-scroll-target="#kimmdy.tools.entry_point_remove_hydrogen">entry_point_remove_hydrogen</a></li>
+  <li><a href="#kimmdy.tools.get_build_example_cmdline_args" id="toc-kimmdy.tools.get_build_example_cmdline_args" class="nav-link" data-scroll-target="#kimmdy.tools.get_build_example_cmdline_args">get_build_example_cmdline_args</a>
+  <ul class="collapse">
+  <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
+  </ul></li>
+  <li><a href="#kimmdy.tools.get_remove_hydrogen_cmdline_args" id="toc-kimmdy.tools.get_remove_hydrogen_cmdline_args" class="nav-link" data-scroll-target="#kimmdy.tools.get_remove_hydrogen_cmdline_args">get_remove_hydrogen_cmdline_args</a></li>
   <li><a href="#kimmdy.tools.remove_hydrogen" id="toc-kimmdy.tools.remove_hydrogen" class="nav-link" data-scroll-target="#kimmdy.tools.remove_hydrogen">remove_hydrogen</a></li>
   </ul></li>
   </ul></li>
@@ -435,11 +442,64 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
+<td><a href="#kimmdy.tools.entry_point_build_examples">entry_point_build_examples</a></td>
+<td>Build examples from the command line.</td>
+</tr>
+<tr class="even">
+<td><a href="#kimmdy.tools.entry_point_remove_hydrogen">entry_point_remove_hydrogen</a></td>
+<td>Remove hydrogen by atom nr in a gro and topology file</td>
+</tr>
+<tr class="odd">
+<td><a href="#kimmdy.tools.get_build_example_cmdline_args">get_build_example_cmdline_args</a></td>
+<td>Parse command line arguments.</td>
+</tr>
+<tr class="even">
+<td><a href="#kimmdy.tools.get_remove_hydrogen_cmdline_args">get_remove_hydrogen_cmdline_args</a></td>
+<td>parse cmdline args for remove_hydrogen</td>
+</tr>
+<tr class="odd">
 <td><a href="#kimmdy.tools.remove_hydrogen">remove_hydrogen</a></td>
 <td>remove hydrogen from a gro and top file</td>
 </tr>
 </tbody>
 </table>
+<section id="kimmdy.tools.entry_point_build_examples" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.tools.entry_point_build_examples">entry_point_build_examples</h3>
+<p><code>tools.entry_point_build_examples()</code></p>
+<p>Build examples from the command line.</p>
+</section>
+<section id="kimmdy.tools.entry_point_remove_hydrogen" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.tools.entry_point_remove_hydrogen">entry_point_remove_hydrogen</h3>
+<p><code>tools.entry_point_remove_hydrogen()</code></p>
+<p>Remove hydrogen by atom nr in a gro and topology file</p>
+</section>
+<section id="kimmdy.tools.get_build_example_cmdline_args" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.tools.get_build_example_cmdline_args">get_build_example_cmdline_args</h3>
+<p><code>tools.get_build_example_cmdline_args()</code></p>
+<p>Parse command line arguments.</p>
+<section id="returns" class="level4">
+<h4 class="anchored" data-anchor-id="returns">Returns</h4>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>Namespace</code></td>
+<td>parsed command line arguments</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="kimmdy.tools.get_remove_hydrogen_cmdline_args" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.tools.get_remove_hydrogen_cmdline_args">get_remove_hydrogen_cmdline_args</h3>
+<p><code>tools.get_remove_hydrogen_cmdline_args()</code></p>
+<p>parse cmdline args for remove_hydrogen</p>
+</section>
 <section id="kimmdy.tools.remove_hydrogen" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.tools.remove_hydrogen">remove_hydrogen</h3>
 <p><code>tools.remove_hydrogen(gro, top, nr, parameterize, equilibrate, gmx_mdrun_flags='')</code></p>

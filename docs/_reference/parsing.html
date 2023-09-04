@@ -20,6 +20,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -410,15 +444,18 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#attributes" id="toc-attributes" class="nav-link" data-scroll-target="#attributes">Attributes</a></li>
   <li><a href="#classes" id="toc-classes" class="nav-link" data-scroll-target="#classes">Classes</a>
   <ul>
+  <li><a href="#kimmdy.parsing.JSONEncoder" id="toc-kimmdy.parsing.JSONEncoder" class="nav-link" data-scroll-target="#kimmdy.parsing.JSONEncoder">JSONEncoder</a></li>
   <li><a href="#kimmdy.parsing.Plumed_dict" id="toc-kimmdy.parsing.Plumed_dict" class="nav-link" data-scroll-target="#kimmdy.parsing.Plumed_dict">Plumed_dict</a></li>
   </ul></li>
   <li><a href="#functions" id="toc-functions" class="nav-link" data-scroll-target="#functions">Functions</a>
   <ul>
+  <li><a href="#kimmdy.parsing.is_not_comment" id="toc-kimmdy.parsing.is_not_comment" class="nav-link" data-scroll-target="#kimmdy.parsing.is_not_comment">is_not_comment</a></li>
   <li><a href="#kimmdy.parsing.read_distances_dat" id="toc-kimmdy.parsing.read_distances_dat" class="nav-link" data-scroll-target="#kimmdy.parsing.read_distances_dat">read_distances_dat</a></li>
   <li><a href="#kimmdy.parsing.read_edissoc" id="toc-kimmdy.parsing.read_edissoc" class="nav-link" data-scroll-target="#kimmdy.parsing.read_edissoc">read_edissoc</a>
   <ul class="collapse">
   <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
   </ul></li>
+  <li><a href="#kimmdy.parsing.read_json" id="toc-kimmdy.parsing.read_json" class="nav-link" data-scroll-target="#kimmdy.parsing.read_json">read_json</a></li>
   <li><a href="#kimmdy.parsing.read_plumed" id="toc-kimmdy.parsing.read_plumed" class="nav-link" data-scroll-target="#kimmdy.parsing.read_plumed">read_plumed</a>
   <ul class="collapse">
   <li><a href="#parameters-1" id="toc-parameters-1" class="nav-link" data-scroll-target="#parameters-1">Parameters</a></li>
@@ -428,12 +465,15 @@ ul.task-list li input[type="checkbox"] {
   <ul class="collapse">
   <li><a href="#parameters-2" id="toc-parameters-2" class="nav-link" data-scroll-target="#parameters-2">Parameters</a></li>
   <li><a href="#assumptions-and-limitation" id="toc-assumptions-and-limitation" class="nav-link" data-scroll-target="#assumptions-and-limitation">Assumptions And Limitation</a></li>
+  <li><a href="#returns-1" id="toc-returns-1" class="nav-link" data-scroll-target="#returns-1">Returns</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul></li>
   <li><a href="#kimmdy.parsing.resolve_includes" id="toc-kimmdy.parsing.resolve_includes" class="nav-link" data-scroll-target="#kimmdy.parsing.resolve_includes">resolve_includes</a>
   <ul class="collapse">
   <li><a href="#arguments" id="toc-arguments" class="nav-link" data-scroll-target="#arguments">Arguments</a></li>
-  <li><a href="#returns-1" id="toc-returns-1" class="nav-link" data-scroll-target="#returns-1">Returns</a></li>
+  <li><a href="#returns-2" id="toc-returns-2" class="nav-link" data-scroll-target="#returns-2">Returns</a></li>
   </ul></li>
+  <li><a href="#kimmdy.parsing.write_json" id="toc-kimmdy.parsing.write_json" class="nav-link" data-scroll-target="#kimmdy.parsing.write_json">write_json</a></li>
   <li><a href="#kimmdy.parsing.write_plumed" id="toc-kimmdy.parsing.write_plumed" class="nav-link" data-scroll-target="#kimmdy.parsing.write_plumed">write_plumed</a>
   <ul class="collapse">
   <li><a href="#parameters-3" id="toc-parameters-3" class="nav-link" data-scroll-target="#parameters-3">Parameters</a></li>
@@ -468,7 +508,7 @@ ul.task-list li input[type="checkbox"] {
 <tbody>
 <tr class="odd">
 <td><a href="#kimmdy.parsing.TopologyDict">TopologyDict</a></td>
-<td>A raw representation of a topology file.</td>
+<td>A raw representation of a topology file returned by <a href="../_reference/parsing.html#kimmdy.parsing.read_top"><code>read_top</code></a>.</td>
 </tr>
 </tbody>
 </table>
@@ -484,11 +524,20 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
+<td><a href="#kimmdy.parsing.JSONEncoder">JSONEncoder</a></td>
+<td>Encoder that enables writing JSONs with numpy types.</td>
+</tr>
+<tr class="even">
 <td><a href="#kimmdy.parsing.Plumed_dict">Plumed_dict</a></td>
 <td>Dict representation of a plumed.dat file.</td>
 </tr>
 </tbody>
 </table>
+<section id="kimmdy.parsing.JSONEncoder" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.parsing.JSONEncoder">JSONEncoder</h3>
+<p><code>parsing.JSONEncoder()</code></p>
+<p>Encoder that enables writing JSONs with numpy types.</p>
+</section>
 <section id="kimmdy.parsing.Plumed_dict" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.parsing.Plumed_dict">Plumed_dict</h3>
 <p><code>parsing.Plumed_dict()</code></p>
@@ -506,12 +555,20 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
+<td><a href="#kimmdy.parsing.is_not_comment">is_not_comment</a></td>
+<td>Returns whether a string is not a comment.</td>
+</tr>
+<tr class="even">
 <td><a href="#kimmdy.parsing.read_distances_dat">read_distances_dat</a></td>
 <td>Read a distances.dat plumed output file.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#kimmdy.parsing.read_edissoc">read_edissoc</a></td>
-<td>reads a edissoc file and turns it into a dict.</td>
+<td>Reads a edissoc file and turns it into a dict.</td>
+</tr>
+<tr class="even">
+<td><a href="#kimmdy.parsing.read_json">read_json</a></td>
+<td>Return JSON file content as dict.</td>
 </tr>
 <tr class="odd">
 <td><a href="#kimmdy.parsing.read_plumed">read_plumed</a></td>
@@ -519,22 +576,32 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 <tr class="even">
 <td><a href="#kimmdy.parsing.read_top">read_top</a></td>
-<td>Read a topology file into a raw TopologyDict represenation.</td>
+<td>Read a topology file (<em>.top,</em>.itp,*.rtp) into a raw TopologyDict represenation.</td>
 </tr>
 <tr class="odd">
 <td><a href="#kimmdy.parsing.resolve_includes">resolve_includes</a></td>
 <td>Resolve #include statements in a (top/itp) file.</td>
 </tr>
 <tr class="even">
+<td><a href="#kimmdy.parsing.write_json">write_json</a></td>
+<td>Write dict to file according to JSON format.</td>
+</tr>
+<tr class="odd">
 <td><a href="#kimmdy.parsing.write_plumed">write_plumed</a></td>
 <td>Write a plumed.dat configuration file.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#kimmdy.parsing.write_top">write_top</a></td>
 <td>Write a TopologyDict to a topology file.</td>
 </tr>
 </tbody>
 </table>
+<section id="kimmdy.parsing.is_not_comment" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.parsing.is_not_comment">is_not_comment</h3>
+<p><code>parsing.is_not_comment(c)</code></p>
+<p>Returns whether a string is not a comment.</p>
+<p>Used for topology like files that use ‘;’ for comments.</p>
+</section>
 <section id="kimmdy.parsing.read_distances_dat" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.parsing.read_distances_dat">read_distances_dat</h3>
 <p><code>parsing.read_distances_dat(distances_dat)</code></p>
@@ -543,7 +610,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="kimmdy.parsing.read_edissoc" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.parsing.read_edissoc">read_edissoc</h3>
 <p><code>parsing.read_edissoc(path)</code></p>
-<p>reads a edissoc file and turns it into a dict. the tuple of bond atoms make up the key, the dissociation energy E_dissoc [kJ mol-1] is the value</p>
+<p>Reads a edissoc file and turns it into a dict.</p>
+<p>The tuple of bond atoms make up the key, the dissociation energy E_dissoc [kJ mol-1] is the value.</p>
 <section id="parameters" class="level4">
 <h4 class="anchored" data-anchor-id="parameters">Parameters</h4>
 <table class="table">
@@ -566,10 +634,16 @@ ul.task-list li input[type="checkbox"] {
 </table>
 </section>
 </section>
+<section id="kimmdy.parsing.read_json" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.parsing.read_json">read_json</h3>
+<p><code>parsing.read_json(path)</code></p>
+<p>Return JSON file content as dict.</p>
+</section>
 <section id="kimmdy.parsing.read_plumed" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.parsing.read_plumed">read_plumed</h3>
 <p><code>parsing.read_plumed(path)</code></p>
 <p>Read a plumed.dat configuration file.</p>
+<p>Follows the plumed naming scheme of label, keyword, action.</p>
 <section id="parameters-1" class="level4">
 <h4 class="anchored" data-anchor-id="parameters-1">Parameters</h4>
 <table class="table">
@@ -603,7 +677,7 @@ ul.task-list li input[type="checkbox"] {
 <tbody>
 <tr class="odd">
 <td><a href="../_reference/parsing.html#kimmdy.parsing.Plumed_dict">Plumed_dict</a></td>
-<td>dict with keys: ‘distances’ and ‘prints’ Each is a list of dicts containing plumed keywords</td>
+<td>dict with keys: ‘distances’ and ‘prints’ Each is a dict/list of dicts containing plumed keywords</td>
 </tr>
 </tbody>
 </table>
@@ -612,7 +686,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="kimmdy.parsing.read_top" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.parsing.read_top">read_top</h3>
 <p><code>parsing.read_top(path, ffdir=None, use_gmx_dir=True)</code></p>
-<p>Read a topology file into a raw TopologyDict represenation.</p>
+<p>Read a topology file (<em>.top,</em>.itp,*.rtp) into a raw TopologyDict represenation.</p>
 <section id="parameters-2" class="level4">
 <h4 class="anchored" data-anchor-id="parameters-2">Parameters</h4>
 <table class="table">
@@ -648,6 +722,124 @@ ul.task-list li input[type="checkbox"] {
 <li>sections that can have subsections can also exist multiple, separate times e.g.&nbsp;moleculetype will appear multiple times and they should not be merged</li>
 </ul>
 </section>
+<section id="returns-1" class="level4">
+<h4 class="anchored" data-anchor-id="returns-1">Returns</h4>
+<table class="table">
+<colgroup>
+<col style="width: 81%">
+<col style="width: 18%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Every section, apart from <code>ffdir</code> and <code>define</code>,</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>comes with a condition that can be checked against the</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><code>define</code>s by the helper functions to determine if the content</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>(a list of lists) should come from <code>content</code> or <code>else_content</code>.</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Some sections such as <code>moleculetype</code> also come with <code>subsections</code>.</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="examples" class="level4">
+<h4 class="anchored" data-anchor-id="examples">Examples</h4>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>raw_top <span class="op">=</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>{<span class="st">'ffdir'</span>: PosixPath(<span class="st">'/usr/share/gromacs/top/amber99.ff'</span>),</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="st">'define'</span>: {<span class="st">'_FF_AMBER'</span>: [], <span class="st">'_FF_AMBER99'</span>: []},</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="st">'defaults'</span>: {<span class="st">'content'</span>: [[<span class="st">'1'</span>, <span class="st">'2'</span>, <span class="st">'yes'</span>, <span class="st">'0.5'</span>, <span class="st">'0.8333'</span>]],</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="st">'else_content'</span>: [],</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="st">'extra'</span>: [],</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="st">'condition'</span>: <span class="va">None</span>},</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="st">'atomtypes'</span>: {<span class="st">'content'</span>: [</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>[<span class="st">'C'</span>, <span class="st">'6'</span>, <span class="st">'12.01'</span>, <span class="st">'0.0000'</span>, <span class="st">'A'</span>, <span class="st">'3.39967e-01'</span>, <span class="st">'3.59824e-01'</span>],</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>[<span class="st">'MNH3'</span>, <span class="st">'0'</span>, <span class="st">'0.0000'</span>, <span class="st">'0.0000'</span>, <span class="st">'A'</span>, <span class="st">'0.00000e+00'</span>, <span class="st">'0.00000e+00'</span>]],</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="st">'else_content'</span>: [],</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="st">'extra'</span>: [],</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="st">'condition'</span>: <span class="va">None</span>},</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="st">'moleculetype_0'</span>: {<span class="st">'content'</span>: [[<span class="st">'Urea'</span>, <span class="st">'3'</span>]],</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="st">'else_content'</span>: [],</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="st">'extra'</span>: [],</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="st">'condition'</span>: <span class="va">None</span>,</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="st">'subsections'</span>: {<span class="st">'atoms'</span>: {<span class="st">'content'</span>: [[<span class="st">'1'</span>,</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">'C'</span>,</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    <span class="st">'1'</span>,</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    <span class="st">'URE'</span>,</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    <span class="st">'C'</span>,</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    <span class="st">'1'</span>,</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    <span class="st">'0.880229'</span>,</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    <span class="st">'12.01000'</span>],</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'2'</span>, <span class="st">'O'</span>, <span class="st">'1'</span>, <span class="st">'URE'</span>, <span class="st">'O'</span>, <span class="st">'2'</span>, <span class="st">'-0.613359'</span>, <span class="st">'16.00000'</span>],</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'3'</span>, <span class="st">'N'</span>, <span class="st">'1'</span>, <span class="st">'URE'</span>, <span class="st">'N1'</span>, <span class="st">'3'</span>, <span class="st">'-0.923545'</span>, <span class="st">'14.01000'</span>],</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'4'</span>, <span class="st">'H'</span>, <span class="st">'1'</span>, <span class="st">'URE'</span>, <span class="st">'H11'</span>, <span class="st">'4'</span>, <span class="st">'0.395055'</span>, <span class="st">'1.00800'</span>],</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'5'</span>, <span class="st">'H'</span>, <span class="st">'1'</span>, <span class="st">'URE'</span>, <span class="st">'H12'</span>, <span class="st">'5'</span>, <span class="st">'0.395055'</span>, <span class="st">'1.00800'</span>],</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'6'</span>, <span class="st">'N'</span>, <span class="st">'1'</span>, <span class="st">'URE'</span>, <span class="st">'N2'</span>, <span class="st">'6'</span>, <span class="st">'-0.923545'</span>, <span class="st">'14.01000'</span>],</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'7'</span>, <span class="st">'H'</span>, <span class="st">'1'</span>, <span class="st">'URE'</span>, <span class="st">'H21'</span>, <span class="st">'7'</span>, <span class="st">'0.395055'</span>, <span class="st">'1.00800'</span>],</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'8'</span>, <span class="st">'H'</span>, <span class="st">'1'</span>, <span class="st">'URE'</span>, <span class="st">'H22'</span>, <span class="st">'8'</span>, <span class="st">'0.395055'</span>, <span class="st">'1.00800'</span>]],</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    <span class="st">'else_content'</span>: [],</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    <span class="st">'extra'</span>: [],</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>    <span class="st">'condition'</span>: <span class="va">None</span>},</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="st">'bonds'</span>: {<span class="st">'content'</span>: [[<span class="st">'1'</span>, <span class="st">'2'</span>],</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'1'</span>, <span class="st">'3'</span>],</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'1'</span>, <span class="st">'6'</span>],</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'3'</span>, <span class="st">'4'</span>],</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'3'</span>, <span class="st">'5'</span>],</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'6'</span>, <span class="st">'7'</span>],</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'6'</span>, <span class="st">'8'</span>]],</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>    <span class="st">'else_content'</span>: [],</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>    <span class="st">'extra'</span>: [],</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>    <span class="st">'condition'</span>: <span class="va">None</span>},</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a><span class="st">'dihedrals'</span>: {<span class="st">'content'</span>: [[<span class="st">'2'</span>, <span class="st">'1'</span>, <span class="st">'3'</span>, <span class="st">'4'</span>, <span class="st">'9'</span>],</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'2'</span>, <span class="st">'1'</span>, <span class="st">'3'</span>, <span class="st">'5'</span>, <span class="st">'9'</span>],</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'2'</span>, <span class="st">'1'</span>, <span class="st">'6'</span>, <span class="st">'7'</span>, <span class="st">'9'</span>],</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'2'</span>, <span class="st">'1'</span>, <span class="st">'6'</span>, <span class="st">'8'</span>, <span class="st">'9'</span>],</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'3'</span>, <span class="st">'1'</span>, <span class="st">'6'</span>, <span class="st">'7'</span>, <span class="st">'9'</span>],</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'3'</span>, <span class="st">'1'</span>, <span class="st">'6'</span>, <span class="st">'8'</span>, <span class="st">'9'</span>],</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'6'</span>, <span class="st">'1'</span>, <span class="st">'3'</span>, <span class="st">'4'</span>, <span class="st">'9'</span>],</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'6'</span>, <span class="st">'1'</span>, <span class="st">'3'</span>, <span class="st">'5'</span>, <span class="st">'9'</span>],</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'3'</span>, <span class="st">'6'</span>, <span class="st">'1'</span>, <span class="st">'2'</span>, <span class="st">'4'</span>],</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'1'</span>, <span class="st">'4'</span>, <span class="st">'3'</span>, <span class="st">'5'</span>, <span class="st">'4'</span>],</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'1'</span>, <span class="st">'7'</span>, <span class="st">'6'</span>, <span class="st">'8'</span>, <span class="st">'4'</span>]],</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>    <span class="st">'else_content'</span>: [],</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>    <span class="st">'extra'</span>: [],</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>    <span class="st">'condition'</span>: <span class="va">None</span>},</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a><span class="st">'position_restraints'</span>: {<span class="st">'content'</span>: [[<span class="st">'1'</span>, <span class="st">'1'</span>, <span class="st">'1000'</span>, <span class="st">'1000'</span>, <span class="st">'1000'</span>],</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'2'</span>, <span class="st">'1'</span>, <span class="st">'1000'</span>, <span class="st">'0'</span>, <span class="st">'1000'</span>],</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'3'</span>, <span class="st">'1'</span>, <span class="st">'1000'</span>, <span class="st">'0'</span>, <span class="st">'0'</span>]],</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>    <span class="st">'else_content'</span>: [],</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>    <span class="st">'extra'</span>: [],</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>    <span class="st">'condition'</span>: <span class="va">None</span>},</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a><span class="st">'dihedral_restraints'</span>: {<span class="st">'content'</span>: [[<span class="st">'3'</span>,</span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>    <span class="st">'6'</span>,</span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>    <span class="st">'1'</span>,</span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a>    <span class="st">'2'</span>,</span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a>    <span class="st">'1'</span>,</span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a>    <span class="st">'180'</span>,</span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a>    <span class="st">'0'</span>,</span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a>    <span class="st">'10'</span>],</span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'1'</span>, <span class="st">'4'</span>, <span class="st">'3'</span>, <span class="st">'5'</span>, <span class="st">'1'</span>, <span class="st">'180'</span>, <span class="st">'0'</span>, <span class="st">'10'</span>]],</span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a>    <span class="st">'else_content'</span>: [],</span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a>    <span class="st">'extra'</span>: [],</span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a>    <span class="st">'condition'</span>: <span class="va">None</span>}}},</span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
 </section>
 <section id="kimmdy.parsing.resolve_includes" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.parsing.resolve_includes">resolve_includes</h3>
@@ -656,8 +848,8 @@ ul.task-list li input[type="checkbox"] {
 <h4 class="anchored" data-anchor-id="arguments">Arguments</h4>
 <p>path : Filepath to read.</p>
 </section>
-<section id="returns-1" class="level4">
-<h4 class="anchored" data-anchor-id="returns-1">Returns</h4>
+<section id="returns-2" class="level4">
+<h4 class="anchored" data-anchor-id="returns-2">Returns</h4>
 <table class="table">
 <thead>
 <tr class="header">
@@ -678,6 +870,11 @@ ul.task-list li input[type="checkbox"] {
 </table>
 </section>
 </section>
+<section id="kimmdy.parsing.write_json" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.parsing.write_json">write_json</h3>
+<p><code>parsing.write_json(d, path)</code></p>
+<p>Write dict to file according to JSON format.</p>
+</section>
 <section id="kimmdy.parsing.write_plumed" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.parsing.write_plumed">write_plumed</h3>
 <p><code>parsing.write_plumed(d, path)</code></p>
@@ -697,7 +894,7 @@ ul.task-list li input[type="checkbox"] {
 <tr class="odd">
 <td><code>d</code></td>
 <td><a href="../_reference/parsing.html#kimmdy.parsing.Plumed_dict">Plumed_dict</a></td>
-<td>Dictionary containing ‘distances’ and ‘prints’</td>
+<td>Dictionary containing ‘labeled_action’, ‘other’ and ‘prints’</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">

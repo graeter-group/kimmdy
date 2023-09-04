@@ -3,183 +3,30 @@ All read_<...> and write_<...> functions.
 """
 import os
 import re
-from pathlib import Path
-from collections.abc import Iterable
-from typing import Generator, Optional, Union
-import xml.etree.ElementTree as ET
-from itertools import takewhile
 import logging
 import json
 import numpy as np
+from pathlib import Path
+from collections.abc import Iterable
+from typing import Generator, Optional, Union, Callable
+from itertools import takewhile
 from typing import TypedDict
 
 from kimmdy.utils import get_gmx_dir
 
 logger = logging.getLogger(__name__)
 TopologyDict = dict
-"""A raw representation of a topology file.
-
-Every section, apart from `ffdir` and `define`,
-comes with a condition that can be checked against the
-`define`s by the helper functions to determine if the content
-(a list of lists) should come from `content` or `else_content`.
-Some sections such as `moleculetype` also come with `subsections`.
-
-Examples
--------
-```python
-raw_top = 
-{'ffdir': PosixPath('/usr/share/gromacs/top/amber99.ff'),
- 'define': {'_FF_AMBER': [], '_FF_AMBER99': []},
- 'defaults': {'content': [['1', '2', 'yes', '0.5', '0.8333']],
-  'else_content': [],
-  'extra': [],
-  'condition': None},
- 'atomtypes': {'content': [
-   ['C', '6', '12.01', '0.0000', 'A', '3.39967e-01', '3.59824e-01'],
-   ['MNH3', '0', '0.0000', '0.0000', 'A', '0.00000e+00', '0.00000e+00']],
-  'else_content': [],
-  'extra': [],
-  'condition': None},
- 'moleculetype_0': {'content': [['Urea', '3']],
-  'else_content': [],
-  'extra': [],
-  'condition': None,
-  'subsections': {'atoms': {'content': [['1',
-      'C',
-      '1',
-      'URE',
-      'C',
-      '1',
-      '0.880229',
-      '12.01000'],
-     ['2', 'O', '1', 'URE', 'O', '2', '-0.613359', '16.00000'],
-     ['3', 'N', '1', 'URE', 'N1', '3', '-0.923545', '14.01000'],
-     ['4', 'H', '1', 'URE', 'H11', '4', '0.395055', '1.00800'],
-     ['5', 'H', '1', 'URE', 'H12', '5', '0.395055', '1.00800'],
-     ['6', 'N', '1', 'URE', 'N2', '6', '-0.923545', '14.01000'],
-     ['7', 'H', '1', 'URE', 'H21', '7', '0.395055', '1.00800'],
-     ['8', 'H', '1', 'URE', 'H22', '8', '0.395055', '1.00800']],
-    'else_content': [],
-    'extra': [],
-    'condition': None},
-   'bonds': {'content': [['1', '2'],
-     ['1', '3'],
-     ['1', '6'],
-     ['3', '4'],
-     ['3', '5'],
-     ['6', '7'],
-     ['6', '8']],
-    'else_content': [],
-    'extra': [],
-    'condition': None},
-   'dihedrals': {'content': [['2', '1', '3', '4', '9'],
-     ['2', '1', '3', '5', '9'],
-     ['2', '1', '6', '7', '9'],
-     ['2', '1', '6', '8', '9'],
-     ['3', '1', '6', '7', '9'],
-     ['3', '1', '6', '8', '9'],
-     ['6', '1', '3', '4', '9'],
-     ['6', '1', '3', '5', '9'],
-     ['3', '6', '1', '2', '4'],
-     ['1', '4', '3', '5', '4'],
-     ['1', '7', '6', '8', '4']],
-    'else_content': [],
-    'extra': [],
-    'condition': None},
-   'position_restraints': {'content': [['1', '1', '1000', '1000', '1000'],
-     ['2', '1', '1000', '0', '1000'],
-     ['3', '1', '1000', '0', '0']],
-    'else_content': [],
-    'extra': [],
-    'condition': None},
-   'dihedral_restraints': {'content': [['3',
-      '6',
-      '1',
-      '2',
-      '1',
-      '180',
-      '0',
-      '10'],
-     ['1', '4', '3', '5', '1', '180', '0', '10']],
-    'else_content': [],
-    'extra': [],
-    'condition': None}}},
-}
-```
+"""A raw representation of a topology file returned by [](`~kimmdy.parsing.read_top`).
 """
 
 
+## convenience functions
 def is_not_comment(c: str) -> bool:
+    """Returns whether a string is not a comment.
+
+    Used for topology like files that use ';' for comments.
+    """
     return c != ";"
-
-
-def create_subsections(ls: list[list[str]]):
-    d = {}
-    subsection_name = "other"
-    for _, l in enumerate(ls):
-        if l[0] == "[":
-            subsection_name = l[1]
-        else:
-            if subsection_name not in d:
-                d[subsection_name] = []
-            d[subsection_name].append(l)
-
-    return d
-
-
-def read_rtp(path: Path) -> dict:
-    # TODO: make this more elegant and performant
-    # TODO combine with top parser?
-    # would need a way to tell the parser
-    # that here, all sections have subsections
-    def get_sections(
-        seq: Iterable[str], section_marker: str
-    ) -> Generator[list[str], None, None]:
-        data = [""]
-        for line in seq:
-            line = "".join(takewhile(is_not_comment, line))
-            if line.strip(" ").startswith(section_marker):
-                if data:
-                    # first element will be empty
-                    # because newlines mark sections
-                    data.pop(0)
-                    # only yield section if non-empty
-                    if len(data) > 0:
-                        yield data
-                    data = [""]
-            data.append(line.strip("\n"))
-        if data:
-            yield data
-
-    def extract_section_name(ls: list[str]) -> tuple[str, list[str]]:
-        """takes a list of lines and return a tuple
-        with the name and the lines minus the
-        line that contained the name.
-        Returns the empty string as the name if no name was found.
-        """
-        for i, l in enumerate(ls):
-            if l and l[0] != ";" and "[" in l:
-                name = l.strip("[] \n")
-                ls.pop(i)
-                return (name, ls)
-        else:
-            return ("", ls)
-
-    with open(path, "r") as f:
-        sections = get_sections(f, "\n")
-        d = {}
-        for i, s in enumerate(sections):
-            # skip empty sections
-            if s == [""]:
-                continue
-            name, content = extract_section_name(s)
-            content = [c.split() for c in content if len(c.split()) > 0]
-            if not name:
-                name = f"BLOCK {i}"
-            d[name] = create_subsections(content)
-
-        return d
 
 
 def resolve_includes(
@@ -242,10 +89,14 @@ def resolve_includes(
     return (ls, ffdir)
 
 
+## parsing functions ##
+## topology
 def read_top(
-    path: Path, ffdir: Optional[Path] = None, use_gmx_dir: bool = True
+    path: Path,
+    ffdir: Optional[Path] = None,
+    use_gmx_dir: bool = True,
 ) -> TopologyDict:
-    """Read a topology file into a raw TopologyDict represenation.
+    """Read a topology file (*.top,*.itp,*.rtp) into a raw TopologyDict represenation.
 
     Parameters
     ----------
@@ -268,9 +119,100 @@ def read_top(
     - ``#include`` s that don't resolve to a valid file path are silently dropped
     - sections that can have subsections can also exist multiple, separate times
       e.g. moleculetype will appear multiple times and they should not be merged
+
+    Returns
+    ------
+    Every section, apart from `ffdir` and `define`,
+    comes with a condition that can be checked against the
+    `define`s by the helper functions to determine if the content
+    (a list of lists) should come from `content` or `else_content`.
+    Some sections such as `moleculetype` also come with `subsections`.
+
+    Examples
+    -------
+    ```python
+    raw_top =
+    {'ffdir': PosixPath('/usr/share/gromacs/top/amber99.ff'),
+    'define': {'_FF_AMBER': [], '_FF_AMBER99': []},
+    'defaults': {'content': [['1', '2', 'yes', '0.5', '0.8333']],
+    'else_content': [],
+    'extra': [],
+    'condition': None},
+    'atomtypes': {'content': [
+    ['C', '6', '12.01', '0.0000', 'A', '3.39967e-01', '3.59824e-01'],
+    ['MNH3', '0', '0.0000', '0.0000', 'A', '0.00000e+00', '0.00000e+00']],
+    'else_content': [],
+    'extra': [],
+    'condition': None},
+    'moleculetype_0': {'content': [['Urea', '3']],
+    'else_content': [],
+    'extra': [],
+    'condition': None,
+    'subsections': {'atoms': {'content': [['1',
+        'C',
+        '1',
+        'URE',
+        'C',
+        '1',
+        '0.880229',
+        '12.01000'],
+        ['2', 'O', '1', 'URE', 'O', '2', '-0.613359', '16.00000'],
+        ['3', 'N', '1', 'URE', 'N1', '3', '-0.923545', '14.01000'],
+        ['4', 'H', '1', 'URE', 'H11', '4', '0.395055', '1.00800'],
+        ['5', 'H', '1', 'URE', 'H12', '5', '0.395055', '1.00800'],
+        ['6', 'N', '1', 'URE', 'N2', '6', '-0.923545', '14.01000'],
+        ['7', 'H', '1', 'URE', 'H21', '7', '0.395055', '1.00800'],
+        ['8', 'H', '1', 'URE', 'H22', '8', '0.395055', '1.00800']],
+        'else_content': [],
+        'extra': [],
+        'condition': None},
+    'bonds': {'content': [['1', '2'],
+        ['1', '3'],
+        ['1', '6'],
+        ['3', '4'],
+        ['3', '5'],
+        ['6', '7'],
+        ['6', '8']],
+        'else_content': [],
+        'extra': [],
+        'condition': None},
+    'dihedrals': {'content': [['2', '1', '3', '4', '9'],
+        ['2', '1', '3', '5', '9'],
+        ['2', '1', '6', '7', '9'],
+        ['2', '1', '6', '8', '9'],
+        ['3', '1', '6', '7', '9'],
+        ['3', '1', '6', '8', '9'],
+        ['6', '1', '3', '4', '9'],
+        ['6', '1', '3', '5', '9'],
+        ['3', '6', '1', '2', '4'],
+        ['1', '4', '3', '5', '4'],
+        ['1', '7', '6', '8', '4']],
+        'else_content': [],
+        'extra': [],
+        'condition': None},
+    'position_restraints': {'content': [['1', '1', '1000', '1000', '1000'],
+        ['2', '1', '1000', '0', '1000'],
+        ['3', '1', '1000', '0', '0']],
+        'else_content': [],
+        'extra': [],
+        'condition': None},
+    'dihedral_restraints': {'content': [['3',
+        '6',
+        '1',
+        '2',
+        '1',
+        '180',
+        '0',
+        '10'],
+        ['1', '4', '3', '5', '1', '180', '0', '10']],
+        'else_content': [],
+        'extra': [],
+        'condition': None}}},
+    }
+    ```
     """
-    SECTIONS_WITH_SUBSECTIONS = ("moleculetype",)
-    NESTABLE_SECTIONS = (
+
+    CHILD_SECTIONS = (
         "atoms",
         "bonds",
         "pairs",
@@ -279,7 +221,8 @@ def read_top(
         "impropers",
         "pairs_nb",
         "exclusions",
-        "constraints" "virtual_sites",
+        "constraints",
+        "virtual_sites",
         "virtual_sites1",
         "virtual_sites2",
         "virtual_sites3",
@@ -315,11 +258,12 @@ def read_top(
     is_first_line_after_section_header = False
     content_key = "content"
 
-    def empty_section(condition):
+    def empty_section(condition: Union[dict, None]) -> dict:
         return {"content": [], "else_content": [], "extra": [], "condition": condition}
 
     for l in ls:
-        # where to put lines dependign on current context
+        # decide where to put lines depending on current context
+        # deal with statements
         if l.startswith("#define"):
             l = l.split()
             name = l[1]
@@ -343,36 +287,38 @@ def read_top(
             condition = None
             content_key = "content"
             continue
-
+        # deal with a new section
         elif l.startswith("["):
-            # start a new section
-            section = l.strip("[] \n").lower()
-            if section in SECTIONS_WITH_SUBSECTIONS:
+            section = l.strip("[] \n")
+            # add nested structure for non-nestable sections
+            if section not in CHILD_SECTIONS:
                 parent_section = section
                 section = None
                 if d.get(parent_section) is None:
-                    parent_section = f"{parent_section}_{parent_section_index}"
-                    parent_section_index += 1
+                    if parent_section == "moleculetype":
+                        parent_section = f"{parent_section}_{parent_section_index}"
+                        parent_section_index += 1
                     d[parent_section] = empty_section(condition)
                     d[parent_section]["subsections"] = {}
             else:
                 if parent_section is not None:
-                    # in a parent_section that can have subsections
-                    if section in NESTABLE_SECTIONS:
+                    # add empty section as subsection
+                    if section in CHILD_SECTIONS:
                         if d[parent_section]["subsections"].get(section) is None:
                             d[parent_section]["subsections"][section] = empty_section(
                                 condition
                             )
+                    # add regular section and exit parent_section by setting it to None
                     else:
-                        # exit parent_section by setting it to None
                         parent_section = None
                         if d.get(section) is None:
                             d[section] = empty_section(condition)
                 else:
+                    # add regular section
                     if d.get(section) is None:
-                        # regular section that is not a subsection
                         d[section] = empty_section(condition)
             is_first_line_after_section_header = True
+        # deal with content lines
         else:
             if parent_section is not None:
                 # line is in a section that can have subsections
@@ -390,6 +336,7 @@ def read_top(
                     raise ValueError(
                         f"topology file {path} contains lines outside of a section"
                     )
+                # adding content to dict here; this is where the loop goes 98% of the time
                 d[section][content_key].append(l.split())
             is_first_line_after_section_header = False
 
@@ -455,33 +402,19 @@ def write_top(top: TopologyDict, outfile: Path):
                     write_section(f, name, section)
 
 
-def read_edissoc(path: Path) -> dict:
-    """reads a edissoc file and turns it into a dict.
-    the tuple of bond atoms make up the key,
-    the dissociation energy E_dissoc [kJ mol-1] is the value
-
-    Parameters
-    ----------
-    path :
-        Path to the file. E.g. Path("edissoc.dat")
-    """
-    with open(path, "r") as f:
-        edissocs = {}
-        for l in f:
-            at1, at2, edissoc, *_ = l.split()
-            edissocs[frozenset((at1, at2))] = float(edissoc)
-    return edissocs
-
-
+## Plumed
 class Plumed_dict(TypedDict):
     """Dict representation of a plumed.dat file."""
 
-    distances: list[dict]
+    other: list
+    labeled_action: dict
     prints: list[dict]
 
 
 def read_plumed(path: Path) -> Plumed_dict:
     """Read a plumed.dat configuration file.
+
+    Follows the plumed naming scheme of label, keyword, action.
 
     Parameters
     ----------
@@ -492,22 +425,15 @@ def read_plumed(path: Path) -> Plumed_dict:
     -------
     dict :
         dict with keys: 'distances' and 'prints'
-        Each is a list of dicts containing plumed keywords
+        Each is a dict/list of dicts containing plumed keywords
     """
     with open(path, "r") as f:
-        distances = []
+        other = []
+        labeled_action = {}
         prints = []
         for l in f:
-            if "DISTANCE" in l:
-                d = l.split()
-                distances.append(
-                    {
-                        "id": d[0].strip(":"),
-                        "keyword": d[1],
-                        "atoms": [str(x) for x in d[2].strip("ATOMS=").split(",")],
-                    }
-                )
-            elif "PRINT" in l[:5]:
+            # deal with PRINT action
+            if l.startswith("PRINT"):
                 l = l.split()
                 d = {}
                 d["PRINT"] = l[0]
@@ -515,16 +441,32 @@ def read_plumed(path: Path) -> Plumed_dict:
                     key, value = x.split("=")
                     d[key] = value
 
-                # TODO this could be better. the keys may not exist
-                # and break the program here.
-                # TODO: output should be consolidated dicts instad of lists of dicts
-                d["ARG"] = d["ARG"].split(",")
+                # STRIDE is a mandatory keyword, others optional
                 d["STRIDE"] = int(d["STRIDE"])
-                d["FILE"] = Path(d["FILE"])
+                if d.get("ARG"):
+                    d["ARG"] = d["ARG"].split(",")
+                if d.get("FILE"):
+                    d["FILE"] = Path(d["FILE"])
 
                 prints.append(d)
+            # deal with labeled action
+            elif ": " in l:
+                ll = l.split(sep=":")
 
-        return Plumed_dict(distances=distances, prints=prints)
+                action = ll[1].split()
+                if action[0] == "DISTANCE":
+                    labeled_action[ll[0]] = {
+                        "keyword": action[0],
+                        "atoms": [str(x) for x in action[1].strip("ATOMS=").split(",")],
+                    }
+                else:
+                    labeled_action[ll[0]] = {"action": action}
+            # deal with other lines in config
+            else:
+                if not any(l.strip().startswith(x) for x in ["#", "\n"]) and l.strip():
+                    other.append(l)
+
+        return Plumed_dict(other=other, labeled_action=labeled_action, prints=prints)
 
 
 def write_plumed(d: Plumed_dict, path: Path) -> None:
@@ -533,15 +475,20 @@ def write_plumed(d: Plumed_dict, path: Path) -> None:
     Parameters
     ----------
     d :
-        Dictionary containing 'distances' and 'prints'
+        Dictionary containing 'labeled_action', 'other' and 'prints'
     path :
         Path to the file. E.g. "plumed.dat"
     """
     with open(path, "w") as f:
-        for l in d["distances"]:
-            f.write(
-                f"{l['id']}: {l['keyword']} ATOMS={l['atoms'][0]},{l['atoms'][1]} \n"
-            )
+        for l in d["other"]:
+            f.write(f"{l}\n")
+        for k, v in d["labeled_action"].items():
+            if v.get("keyword") and v.get("atoms"):
+                f.write(f"{k}: {v['keyword']} ATOMS={','.join(v['atoms'])} \n")
+            elif v.get("action"):
+                f.write(f"{k}:{' '.join(v['action'])}\n")
+            else:
+                logger.debug(f"Skipping plumed config file line '{k}:{v}'\n")
         f.write("\n")
         for l in d["prints"]:
             f.write(
@@ -549,7 +496,7 @@ def write_plumed(d: Plumed_dict, path: Path) -> None:
             )
 
 
-def read_distances_dat(distances_dat: Path):
+def read_distances_dat(distances_dat: Path) -> dict:
     """Read a distances.dat plumed output file."""
     with open(distances_dat, "r") as f:
         colnames = f.readline()[10:].split()
@@ -562,13 +509,10 @@ def read_distances_dat(distances_dat: Path):
     return d
 
 
-def read_xml_ff(path: Path) -> ET.Element:
-    tree = ET.parse(path)
-    root = tree.getroot()
-    return root
-
-
+## JSON
 class JSONEncoder(json.JSONEncoder):
+    """Encoder that enables writing JSONs with numpy types."""
+
     def default(self, obj):
         if isinstance(obj, np.integer):
             return int(obj)
@@ -580,13 +524,37 @@ class JSONEncoder(json.JSONEncoder):
             return super(JSONEncoder, self).default(obj)
 
 
-def write_json(d: dict, path: Path) -> None:
+def write_json(
+    d: dict,
+    path: Path,
+) -> None:
+    """Write dict to file according to JSON format."""
     logger.debug(f"writing dictionary to json: {d}")
     with open(path, "w") as f:
-        json.dump(d, f, cls=JSONEncoder)
+        json.dump(d, f, cls=JSONEncoder, indent=4)
 
 
 def read_json(path: Union[str, Path]) -> dict:
+    """Return JSON file content as dict."""
     with open(path, "r") as f:
         data = json.load(f)
     return data
+
+
+## Miscellaneous files
+def read_edissoc(path: Path) -> dict:
+    """Reads a edissoc file and turns it into a dict.
+
+    The tuple of bond atoms make up the key, the dissociation energy E_dissoc [kJ mol-1] is the value.
+
+    Parameters
+    ----------
+    path :
+        Path to the file. E.g. Path("edissoc.dat")
+    """
+    with open(path, "r") as f:
+        edissocs = {}
+        for l in f:
+            at1, at2, edissoc, *_ = l.split()
+            edissocs[frozenset((at1, at2))] = float(edissoc)
+    return edissocs

@@ -11,10 +11,8 @@ from pathlib import Path
 import textwrap
 import dill
 from kimmdy.config import Config
-from kimmdy.tools import build_examples
 from kimmdy.runmanager import RunManager
 from kimmdy.utils import check_gmx_version, backup_if_existing
-from kimmdy.tools import remove_hydrogen
 import importlib.resources as pkg_resources
 import sys
 from glob import glob

@@ -1,12 +1,14 @@
-# %%
 import os
+import shutil
 import re
 import string
-from hypothesis import settings, HealthCheck, given, strategies as st
-from kimmdy import parsing
-from pathlib import Path
 import pytest
-import shutil
+from hypothesis import settings, HealthCheck, given, strategies as st
+from pathlib import Path
+
+from kimmdy import parsing
+from kimmdy.utils import get_gmx_dir
+from kimmdy.constants import AA3
 
 
 def setup_testdir(tmp_path) -> Path:
@@ -27,6 +29,7 @@ def setup_testdir(tmp_path) -> Path:
     return tmp_path
 
 
+## test topology parser
 def test_parser_doesnt_crash_on_example(tmp_path, caplog):
     """Example file urea.top
     from <https://manual.gromacs.org/documentation/current/reference-manual/topologies/topology-file-formats.html>
@@ -37,7 +40,6 @@ def test_parser_doesnt_crash_on_example(tmp_path, caplog):
     assert isinstance(top, dict)
 
 
-# %%
 def test_doubleparse_urea(tmp_path):
     """Parsing it's own output should return the same top on urea.top"""
     testdir = setup_testdir(tmp_path)
@@ -52,10 +54,10 @@ def test_doubleparse_urea(tmp_path):
     assert top2 == top3
 
 
-# %%
 def test_ff_includes_with_gmxdir(tmp_path):
     testdir = setup_testdir(tmp_path)
     urea_path = Path("urea.top")
+    assert get_gmx_dir(), f"Command 'gmx' not found, can't test gmx dir parsing."
     raw = parsing.read_top(urea_path)
 
     print(raw["moleculetype_1"])
@@ -185,21 +187,82 @@ def test_parser_fails_without_sections(ls, tmp_path):
     assert True
 
 
-def test_parse_xml_ff(tmp_path):
-    testdir = setup_testdir(tmp_path)
-    ff_path = Path("amber99sb_trunc.xml")
-    xml = parsing.read_xml_ff(ff_path)
+## test ff file parsing
+def test_parse_aminoacids_read_top():
+    aminoacids_path = (
+        Path(__file__).parent
+        / "test_files"
+        / "assets"
+        / "amber99sb-star-ildnp.ff"
+        / "aminoacids.rtp"
+    )
+    aminoacids_dict = parsing.read_top(aminoacids_path, use_gmx_dir=False)
+    for aminoacid in AA3:
+        assert (
+            entry := aminoacids_dict.get(aminoacid)
+        ), f"Aminoacid {aminoacid} not in {aminoacids_path.name}"
+        ref_subsections = ["atoms", "bonds", "impropers"]
+        subsections = list(entry["subsections"].keys())
 
-    atomtypes = xml.find("AtomTypes")
-    assert atomtypes is not None
-    atomtypes.findall("Type")
-    assert atomtypes.findall("Type")[0].attrib == {
-        "class": "N",
-        "element": "N",
-        "mass": "14.00672",
-    }
-    assert atomtypes.findall("Type")[1].attrib == {
-        "class": "H",
-        "element": "H",
-        "mass": "1.007947",
-    }
+        assert all(
+            x in subsections for x in ref_subsections
+        ), f"Aminoacid {aminoacid} does not have the subsections {ref_subsections} but {subsections}"
+        assert all(len(x) == 4 for x in entry["subsections"]["atoms"]["content"])
+        assert all(len(x) == 2 for x in entry["subsections"]["bonds"]["content"])
+        assert all(
+            len(x) in [4, 7] for x in entry["subsections"]["impropers"]["content"]
+        )
+
+
+def test_parse_ffbonded_read_top():
+    ffbonded_path = (
+        Path(__file__).parent
+        / "test_files"
+        / "assets"
+        / "amber99sb-star-ildnp.ff"
+        / "ffbonded.itp"
+    )
+    ffbonded_dict = parsing.read_top(ffbonded_path)
+    ref_sections = ["bondtypes", "angletypes", "dihedraltypes"]
+    ffbonded_sections = list(ffbonded_dict.keys())
+
+    assert all(
+        x in ffbonded_sections for x in ref_sections
+    ), f"Sections {ref_sections} should be in ffbonded sections: {ffbonded_sections}"
+    assert all(
+        len(x) == 5 for x in ffbonded_dict["bondtypes"]["content"]
+    ), "Unexpected number of elements in bondtypes"
+    assert all(
+        len(x) == 6 for x in ffbonded_dict["angletypes"]["content"]
+    ), "Unexpected number of elements in angletypes"
+    assert all(
+        len(x) == 8 for x in ffbonded_dict["dihedraltypes"]["content"]
+    ), "Unexpected number of elements in dihedraltypes"
+
+
+## test plumed parsing
+def test_plumed_read(tmp_path):
+    testdir = setup_testdir(tmp_path)
+    plumed_path = Path("plumed.dat")
+    plumed_dict = parsing.read_plumed(plumed_path)
+
+    assert set(plumed_dict.keys()) == set(["labeled_action", "prints", "other"])
+    assert isinstance(plumed_dict["labeled_action"], dict)
+    assert len(plumed_dict["labeled_action"]) == 12
+    assert isinstance(plumed_dict["prints"], list)
+    assert plumed_dict["prints"][0]["FILE"] == Path("distances.dat")
+
+
+def test_plumed_write_identity(tmp_path):
+    testdir = setup_testdir(tmp_path)
+    plumed_path = Path("plumed.dat")
+    plumed_mod_path = Path("plumed_mod.dat")
+    plumed_dict = parsing.read_plumed(plumed_path)
+    parsing.write_plumed(plumed_dict, plumed_mod_path)
+    plumed_mod_dict = parsing.read_plumed(plumed_mod_path)
+    assert plumed_mod_dict == plumed_dict
+
+
+## test json parsing
+
+## test misc file parsing

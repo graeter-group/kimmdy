@@ -475,8 +475,8 @@ def break_bond_plumed(
     plumed_path = files.input["plumed"]
     # if break_bond_plumed is called multiple times in one _apply_recipe task
     if "plumed" in files.output.keys():
-        plumed_path = files.output["trr"]
-    plumeddat = read_plumed(plumed_path)
+        plumed_path = files.output["plumed"]
+    plumed_dict = read_plumed(plumed_path)
 
     files.output["plumed"] = newplumed
 
@@ -485,18 +485,18 @@ def break_bond_plumed(
         f"{files.output['plumed']}."
     )
 
-    new_distances = []
+    new_distances = {}
     broken_distances = []
-    for line in plumeddat["distances"]:
-        if all(x in line["atoms"] for x in breakpair):
-            broken_distances.append(line["id"])
+    for k, v in plumed_dict["labeled_action"].items():
+        if all(x in v["atoms"] for x in breakpair):
+            broken_distances.append(k)
         else:
-            new_distances.append(line)
+            new_distances[k] = v
 
-    plumeddat["distances"] = new_distances
+    plumed_dict["labeled_action"] = new_distances
 
-    for line in plumeddat["prints"]:
+    for line in plumed_dict["prints"]:
         line["ARG"] = [id for id in line["ARG"] if not id in broken_distances]
         line["FILE"] = files.input["plumed_out"]
 
-    write_plumed(plumeddat, newplumed)
+    write_plumed(plumed_dict, newplumed)
