@@ -150,9 +150,8 @@ def test_combine_recipes():
 
 # ToDo: test other recipe methods
 
+
 ## Test RecipeCollection
-
-
 @pytest.fixture
 def recipe_collection():
     rps = [

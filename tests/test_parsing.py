@@ -11,26 +11,7 @@ from kimmdy.utils import get_gmx_dir
 from kimmdy.constants import AA3
 
 
-def setup_testdir(tmp_path) -> Path:
-    if tmp_path.exists():
-        shutil.rmtree(tmp_path)
-    try:
-        filedir = Path(__file__).parent / "test_files" / "test_parsing"
-        assetsdir = Path(__file__).parent / "test_files" / "assets"
-    except NameError:
-        filedir = Path("./tests/test_files") / "test_parsing"
-        assetsdir = Path("./tests/test_files") / "assets"
-    shutil.copytree(filedir, tmp_path)
-    Path(tmp_path / "amber99sb-star-ildnp.ff").symlink_to(
-        assetsdir / "amber99sb-star-ildnp.ff",
-        target_is_directory=True,
-    )
-    os.chdir(tmp_path.resolve())
-    return tmp_path
-
-
 ## test topology parser
-@pytest.mark.parametrize("arranged_tmp_path", (["test_parsing"]), indirect=True)
 def test_parser_doesnt_crash_on_example(arranged_tmp_path, caplog):
     """Example file urea.top
     from <https://manual.gromacs.org/documentation/current/reference-manual/topologies/topology-file-formats.html>
@@ -41,9 +22,8 @@ def test_parser_doesnt_crash_on_example(arranged_tmp_path, caplog):
     assert isinstance(top, dict)
 
 
-def test_doubleparse_urea(tmp_path):
+def test_doubleparse_urea(arranged_tmp_path):
     """Parsing it's own output should return the same top on urea.top"""
-    testdir = setup_testdir(tmp_path)
     urea_path = Path("urea.top")
     top = parsing.read_top(urea_path)
     p = Path("pytest_urea.top")
@@ -58,8 +38,7 @@ def test_doubleparse_urea(tmp_path):
 @pytest.mark.skipif(
     not get_gmx_dir(), reason="Command 'gmx' not found, can't test gmx dir parsing."
 )
-def test_ff_includes_with_gmxdir(tmp_path):
-    testdir = setup_testdir(tmp_path)
+def test_ff_includes_with_gmxdir(arranged_tmp_path):
     urea_path = Path("urea.top")
     raw = parsing.read_top(urea_path)
 
@@ -115,8 +94,7 @@ def test_ff_includes_with_gmxdir(tmp_path):
     }
 
 
-def test_ff_includes_with_ff_in_cwd(tmp_path):
-    testdir = setup_testdir(tmp_path)
+def test_ff_includes_with_ff_in_cwd(arranged_tmp_path):
     urea_path = Path("hexala.top")
     raw = parsing.read_top(urea_path)
     assert raw["atomtypes"]
@@ -156,10 +134,9 @@ allowed_text = st.text(
     )
 )
 @settings(suppress_health_check=[HealthCheck.function_scoped_fixture])
-def test_parser_invertible(sections, tmp_path):
+def test_parser_invertible(sections, arranged_tmp_path):
     # flatten list of lists of strings to list of strings with subsection headers
     # use first element of each section as header
-    testdir = setup_testdir(tmp_path)
     for s in sections:
         header = s[0]
         header = re.sub(r"\d", "x", header)
@@ -179,8 +156,7 @@ def test_parser_invertible(sections, tmp_path):
 
 @given(ls=st.lists(allowed_text))
 @settings(suppress_health_check=[HealthCheck.function_scoped_fixture])
-def test_parser_fails_without_sections(ls, tmp_path):
-    testdir = setup_testdir(tmp_path)
+def test_parser_fails_without_sections(ls, arranged_tmp_path):
     p = Path("topol.top")
     p.parent.mkdir(exist_ok=True)
     with open(p, "w") as f:
@@ -244,8 +220,7 @@ def test_parse_ffbonded_read_top():
 
 
 ## test plumed parsing
-def test_plumed_read(tmp_path):
-    testdir = setup_testdir(tmp_path)
+def test_plumed_read(arranged_tmp_path):
     plumed_path = Path("plumed.dat")
     plumed_dict = parsing.read_plumed(plumed_path)
 
@@ -256,8 +231,7 @@ def test_plumed_read(tmp_path):
     assert plumed_dict["prints"][0]["FILE"] == Path("distances.dat")
 
 
-def test_plumed_write_identity(tmp_path):
-    testdir = setup_testdir(tmp_path)
+def test_plumed_write_identity(arranged_tmp_path):
     plumed_path = Path("plumed.dat")
     plumed_mod_path = Path("plumed_mod.dat")
     plumed_dict = parsing.read_plumed(plumed_path)

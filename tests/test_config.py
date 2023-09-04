@@ -7,141 +7,95 @@ import os
 
 
 @pytest.mark.require_gmx
-def test_parse_config1_casting():
-    input_f = Path(__file__).parent / "test_files/test_config/config1.yml"
-    try:
-        os.chdir(input_f.parent)
-        assert input_f.exists(), "Input file not found"
+def test_parse_config1_casting(arranged_tmp_path):
+    input_f = Path("config1.yml")
 
-        config = Config(input_f)
+    assert input_f.exists(), "Input file not found"
 
-        assert config.dryrun is True
-        assert isinstance(config.dryrun, bool)
-        assert config.max_tasks == 10
+    config = Config(input_f)
 
-        assert isinstance(config.cwd, Path)
-        assert isinstance(config.out, Path)
+    assert config.dryrun is True
+    assert isinstance(config.dryrun, bool)
+    assert config.max_tasks == 10
 
-        assert isinstance(config.mds, Config)
-        assert isinstance(config.mds.equilibrium1, Config)
-        assert isinstance(config.plumed, Path)
-        assert isinstance(config.mds.pull1.use_plumed, bool)
-    finally:
-        for d in input_f.parent.glob("test_config_1*"):
-            # [f.unlink() for f in d.iterdir()]
-            d.rmdir()
+    assert isinstance(config.cwd, Path)
+    assert isinstance(config.out, Path)
+
+    assert isinstance(config.mds, Config)
+    assert isinstance(config.mds.equilibrium1, Config)
+    assert isinstance(config.plumed, Path)
+    assert isinstance(config.mds.pull1.use_plumed, bool)
 
 
-def test_parse_config2_start_with_reaction():
-    input_f = Path(__file__).parent / "test_files/test_config/config2.yml"
-    try:
-        os.chdir(input_f.parent)
-        assert input_f.exists(), "Input file not found"
+def test_parse_config2_start_with_reaction(arranged_tmp_path):
+    input_f = Path("config2.yml")
 
-        config = Config(input_f)
+    assert input_f.exists(), "Input file not found"
 
-        assert isinstance(config.tpr, Path)
-        assert isinstance(config.trr, Path)
-        assert isinstance(config.plumed, Path)
-        assert config.sequence == ["homolysis"]
+    config = Config(input_f)
 
-    finally:
-        for d in input_f.parent.glob("test_config_7*"):
-            [f.unlink() for f in d.iterdir()]
-            d.rmdir()
+    assert isinstance(config.tpr, Path)
+    assert isinstance(config.trr, Path)
+    assert isinstance(config.plumed, Path)
+    assert config.sequence == ["homolysis"]
 
 
-def test_parse_config3_missing_mdp_file():
-    input_f = Path(__file__).parent / "test_files/test_config/config3.yml"
-    try:
-        os.chdir(input_f.parent)
-        assert input_f.exists(), "Input file not found"
+def test_parse_config3_missing_mdp_file(arranged_tmp_path):
+    input_f = Path("config3.yml")
 
-        with pytest.raises(LookupError):
-            Config(input_f)
-    finally:
-        for d in input_f.parent.glob("test_config_3*"):
-            [f.unlink() for f in d.iterdir()]
-            d.rmdir()
+    assert input_f.exists(), "Input file not found"
+
+    with pytest.raises(LookupError):
+        Config(input_f)
 
 
-def test_parse_config4_sequence_missing_entry():
-    input_f = Path(__file__).parent / "test_files/test_config/config4.yml"
-    try:
-        os.chdir(input_f.parent)
-        assert input_f.exists(), "Input file not found"
+def test_parse_config4_sequence_missing_entry(arranged_tmp_path):
+    input_f = Path("config4.yml")
 
-        with pytest.raises(AssertionError):
-            Config(input_f)
-    finally:
-        for d in input_f.parent.glob("test_config_4*"):
-            [f.unlink() for f in d.iterdir()]
-            d.rmdir()
+    assert input_f.exists(), "Input file not found"
+
+    with pytest.raises(AssertionError):
+        Config(input_f)
 
 
-def test_parse_config5_sequence_missing_entry_no_mds():
-    input_f = Path(__file__).parent / "test_files/test_config/config5.yml"
-    try:
-        os.chdir(input_f.parent)
-        assert input_f.exists(), "Input file not found"
+def test_parse_config5_sequence_missing_entry_no_mds(arranged_tmp_path):
+    input_f = Path("config5.yml")
 
-        with pytest.raises(AssertionError):
-            Config(input_f)
-    finally:
-        for d in input_f.parent.glob("test_config_5*"):
-            [f.unlink() for f in d.iterdir()]
-            d.rmdir()
+    assert input_f.exists(), "Input file not found"
+
+    with pytest.raises(AssertionError):
+        Config(input_f)
 
 
-def test_parse_config6_changer_bad_reference():
-    input_f = Path(__file__).parent / "test_files/test_config/config6.yml"
-    try:
-        os.chdir(input_f.parent)
-        assert input_f.exists(), "Input file not found"
+def test_parse_config6_changer_bad_reference(arranged_tmp_path):
+    input_f = Path("config6.yml")
 
-        with pytest.raises(AssertionError):
-            Config(input_f)
-    finally:
-        for d in input_f.parent.glob("test_config_6*"):
-            [f.unlink() for f in d.iterdir()]
-            d.rmdir()
+    assert input_f.exists(), "Input file not found"
+
+    with pytest.raises(AssertionError):
+        Config(input_f)
 
 
-def test_get_existing_files():
-    input_f = Path(__file__).parent / "test_files/test_config/config1.yml"
-    try:
-        os.chdir(input_f.parent)
-        assert input_f.exists(), "Input file not found"
+def test_get_existing_files(arranged_tmp_path):
+    input_f = Path("config1.yml")
 
-        config = Config(input_f)
-        file_d = get_existing_files(config)
-        assert set(file_d.keys()) == set(
-            [
-                "",
-                "top",
-                "gro",
-                "ndx",
-                "ff",
-                "plumed",
-                "plumed_out",
-                "pullf1500_equil.mdp",
-                "pullf1500.mdp",
-                "broken_equil_f1000.mdp",
-                "edissoc.dat",
-                "ffbonded.itp",
-            ]
-        )
+    assert input_f.exists(), "Input file not found"
 
-    finally:
-        for d in input_f.parent.glob("test_config_1*"):
-            [f.unlink() for f in d.iterdir()]
-            d.rmdir()
-
-
-if __name__ == "__main__":
-    test_parse_config1_casting()
-    test_parse_config2_start_with_reaction()
-    test_parse_config3_missing_mdp_file()
-    test_parse_config4_sequence_missing_entry()
-    test_parse_config5_sequence_missing_entry_no_mds()
-    test_parse_config6_changer_bad_reference()
+    config = Config(input_f)
+    file_d = get_existing_files(config)
+    assert set(file_d.keys()) == set(
+        [
+            "",
+            "top",
+            "gro",
+            "ndx",
+            "ff",
+            "plumed",
+            "plumed_out",
+            "pullf1500_equil.mdp",
+            "pullf1500.mdp",
+            "broken_equil_f1000.mdp",
+            "edissoc.dat",
+            "ffbonded.itp",
+        ]
+    )
