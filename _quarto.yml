@@ -106,8 +106,7 @@ interlinks:
 
 quartodoc:
   sidebar: "_sidebar.yml"
-  renderer:
-    style: _renderer.py
+  render_interlinks: true
   title: "Reference"
   package: kimmdy
   style: pkgdown
