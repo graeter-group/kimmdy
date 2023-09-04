@@ -186,7 +186,9 @@ class RunManager:
         self.start_time = time.time()
         self.current_time = time.time()
 
-        if not self.from_checkpoint:
+        if self.from_checkpoint:
+            logger.info(f"KIMMDY is starting from a checkpoint.")
+        else:
             self._setup_tasks()
 
         while (

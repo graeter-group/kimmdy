@@ -6,12 +6,83 @@ from __future__ import annotations
 from typing import Any, Optional
 import yaml
 import logging
+import logging.config
 from pathlib import Path
 from kimmdy import reaction_plugins
 from kimmdy.schema import Sequence, get_combined_scheme
 from kimmdy.utils import get_gmx_dir
 
 logger = logging.getLogger(__name__)
+
+class longFormatter(logging.Formatter):
+    def format(self, record):
+        saved_name = record.name  # save and restore for other formatters if desired
+        parts = saved_name.split(".")
+        if len(parts) > 1:
+            record.name = parts[0][0] + "." + ".".join(p[:10] for p in parts[1:])
+        else:
+            record.name = parts[0]
+        result = super().format(record)
+        record.name = saved_name
+        return result
+
+def configure_logger(log_path: Path, log_level: str):
+    """Configure logging.
+
+    Parameters
+    ----------
+    log_path
+        File path to log file
+    log_level
+        Loglevel. One of ["INFO", "WARNING", "MESSAGE", "DEBUG"]
+    no_increment_logfile
+        If True, do not backup existing log file. This is used for
+        restarting from a checkpoint.
+    """
+    log_conf = {
+        "version": 1,
+        "formatters": {
+            "short": {
+                "format": "%(name)-15s %(levelname)s: %(message)s",
+                "datefmt": "%H:%M",
+            },
+            "full": {
+                "format": "%(asctime)s %(name)-17s %(levelname)s: %(message)s",
+                "datefmt": "%d-%m-%y %H:%M",
+            },
+            "full_cut": {
+                "()": longFormatter,
+                "format": "%(asctime)s %(name)-12s %(levelname)s: %(message)s",
+                "datefmt": "%d-%m-%y %H:%M",
+            },
+        },
+        "handlers": {
+            "cmd": {
+                "class": "logging.StreamHandler",
+                "formatter": "short",
+            },
+            "file": {
+                "class": "logging.FileHandler",
+                "formatter": "full_cut",
+                "filename": log_path,
+            },
+            "null": {
+                "class": "logging.NullHandler",
+            },
+        },
+        "loggers": {
+            "kimmdy": {
+                "level": log_level.upper(),
+                "handlers": ["cmd", "file"],
+            },
+        },
+        # Mute others, e.g. tensorflow, matplotlib
+        "root": {
+            "level": "CRITICAL",
+            "handlers": ["null"],
+        },
+    }
+    logging.config.dictConfig(log_conf)
 
 
 def check_file_exists(p: Path):
@@ -28,13 +99,13 @@ class Config:
 
     Parameters
     ----------
-    input_file :
+    input_file
         Path to the config yaml file.
-    recursive_dict :
+    recursive_dict
         For internal use only, used in reading settings in recursively.
-    scheme :
+    scheme
         dict containing types and defaults for casting and validating settings.
-    section :
+    section
         current section e.g. to determine the level of recursion in nested configs
         e.g. "config", "config.mds" or "config.reactions.homolysis"
     """
@@ -53,7 +124,8 @@ class Config:
         recursive_dict: dict | None = None,
         scheme: dict | None = None,
         section: str = "config",
-        no_increment_output_dir: bool = False,
+        log_path: Optional[Path] = None,
+        log_level: Optional[str] = None,
     ):
         # failure case: no input file and no values from dictionary
         if input_file is None and recursive_dict is None:
@@ -141,9 +213,16 @@ class Config:
 
         # validate on initial construction
         if section == "config":
-            self._validate(no_increment_output_dir=no_increment_output_dir)
+            if log_path is None:
+                log_path = self.out / self.log.path
+            if log_level is None:
+                log_level = self.log.level
+            assert log_path
+            assert log_level
+            configure_logger(log_path, log_level)
+            self._validate()
 
-    def _validate(self, section: str = "config", no_increment_output_dir: bool = False):
+    def _validate(self, section: str = "config"):
         """Validates config."""
         logger.info(f"Validating Config")
         logger.info(f"Validating Config, section {section}")
@@ -223,7 +302,7 @@ class Config:
                 self.out = self.cwd / self.name
 
             # make sure self.out is empty
-            while not no_increment_output_dir and self.out.exists():
+            while self.out.exists():
                 logger.debug(f"Output dir {self.out} exists, incrementing name")
                 out_end = self.out.name[-3:]
                 if out_end.isdigit():
@@ -232,11 +311,12 @@ class Config:
                     )
                 else:
                     self.out = self.out.with_name(self.out.name + "_001")
-            if not no_increment_output_dir:
-                self.out.mkdir()
-                logger.info(f"Created output dir {self.out}")
+
+            self.out.mkdir()
+            logger.info(f"Created output dir {self.out}")
 
         # individual attributes, recursively
+        output_files = ['logfile']
         for name, attr in self.__dict__.items():
             if type(attr) is Config:
                 attr._validate(section=f"{section}.{name}")
@@ -247,7 +327,7 @@ class Config:
                 path = attr
                 path = path.resolve()
                 self.__setattr__(name, path)
-                if not path.is_dir():
+                if not path.is_dir() and not name in output_files:
                     check_file_exists(path)
 
     def attr(self, attribute):

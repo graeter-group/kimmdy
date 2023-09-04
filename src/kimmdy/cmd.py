@@ -1,18 +1,16 @@
 """
 Functions for starting KIMMDY either from python or the command line.
-Also initialized logging and configuration.
 Other entry points such as `kimmdy-analysis` also live here.
 """
 import argparse
-import logging
-import logging.config
 from os import chmod
 from pathlib import Path
 import textwrap
 import dill
+import logging
 from kimmdy.config import Config
 from kimmdy.runmanager import RunManager
-from kimmdy.utils import check_gmx_version, backup_if_existing
+from kimmdy.utils import check_gmx_version
 import importlib.resources as pkg_resources
 import sys
 from glob import glob
@@ -47,10 +45,10 @@ def get_cmdline_args() -> argparse.Namespace:
         "-l",
         type=str,
         help="logging level (CRITICAL, ERROR, WARNING, INFO, DEBUG)",
-        default="DEBUG",
+        default=None,
     )
     parser.add_argument(
-        "--logfile", "-f", type=Path, help="logfile", default="kimmdy.log"
+        "--logfile", "-f", type=Path, help="logfile", default=None
     )
     parser.add_argument(
         "--checkpoint", "-p", type=str, help="start KIMMDY from a checkpoint file"
@@ -99,90 +97,12 @@ def get_cmdline_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-class longFormatter(logging.Formatter):
-    def format(self, record):
-        saved_name = record.name  # save and restore for other formatters if desired
-        parts = saved_name.split(".")
-        if len(parts) > 1:
-            record.name = parts[0][0] + "." + ".".join(p[:10] for p in parts[1:])
-        else:
-            record.name = parts[0]
-        result = super().format(record)
-        record.name = saved_name
-        return result
-
-
-def configure_logger(
-    log_path: Path, log_level: str, no_increment_logfile: bool = False
-):
-    """Configure logging.
-
-    Parameters
-    ----------
-    log_path :
-        File path to log file
-    log_level :
-        Loglevel. One of ["INFO", "WARNING", "MESSAGE", "DEBUG"]
-    no_increment_logfile :
-        If True, do not backup existing log file. This is used for
-        restarting from a checkpoint.
-    """
-
-    if not no_increment_logfile:
-        backup_if_existing(log_path)
-
-    log_conf = {
-        "version": 1,
-        "formatters": {
-            "short": {
-                "format": "%(name)-15s %(levelname)s: %(message)s",
-                "datefmt": "%H:%M",
-            },
-            "full": {
-                "format": "%(asctime)s %(name)-17s %(levelname)s: %(message)s",
-                "datefmt": "%d-%m-%y %H:%M",
-            },
-            "full_cut": {
-                "()": longFormatter,
-                "format": "%(asctime)s %(name)-12s %(levelname)s: %(message)s",
-                "datefmt": "%d-%m-%y %H:%M",
-            },
-        },
-        "handlers": {
-            "cmd": {
-                "class": "logging.StreamHandler",
-                "formatter": "short",
-            },
-            "file": {
-                "class": "logging.FileHandler",
-                "formatter": "full_cut",
-                "filename": log_path,
-            },
-            "null": {
-                "class": "logging.NullHandler",
-            },
-        },
-        "loggers": {
-            "kimmdy": {
-                "level": log_level.upper(),
-                "handlers": ["cmd", "file"],
-            },
-        },
-        # Mute others, e.g. tensorflow, matplotlib
-        "root": {
-            "level": "CRITICAL",
-            "handlers": ["null"],
-        },
-    }
-    logging.config.dictConfig(log_conf)
-
-
 def _run(args: argparse.Namespace):
     """Run kimmdy.
 
     Parameters
     ----------
-    args :
+    args
         Command line arguments. See [](`~kimmdy.cmd.get_cmdline_args`)
     """
     no_increment_logfile = args.from_latest_checkpoint or args.checkpoint
@@ -209,16 +129,10 @@ def _run(args: argparse.Namespace):
 
         exit()
 
-    logger = logging.getLogger("kimmdy")
-    logger.info("Welcome to KIMMDY")
-    logger.info("KIMMDY is running with these command line options:")
-    logger.info(args)
-    logger.info("Run kimmdy -h for more information.")
     if not Path(args.input).exists() and not args.checkpoint:
-        logger.error(
+        raise FileNotFoundError(
             f"Input file {args.input} does not exist. Specify its name with --input and make sure that you are in the right directory."
         )
-        exit()
 
     if args.generate_jobscript:
         config = Config(args.input)
@@ -279,10 +193,10 @@ def _run(args: argparse.Namespace):
         exit()
 
     if args.from_latest_checkpoint:
-        config = Config(args.input, no_increment_output_dir=True)
+        config = Config(args.input)
         cpts = glob(f"{config.name}*kimmdy.cpt")
         if not cpts:
-            logging.error(
+            logger.error(
                 f"""
                 No checkpoints found for the current configuration at {args.input}.
                 Start a new KIMMDY run or generate an initial checkpoint with
@@ -295,13 +209,11 @@ def _run(args: argparse.Namespace):
 
     try:
         if args.checkpoint:
-            logger.info(f"KIMMDY is starting from a checkpoint: {args.checkpoint}.")
             with open(args.checkpoint, "rb") as f:
                 runmgr = dill.load(f)
                 runmgr.from_checkpoint = True
         else:
-            config = Config(args.input)
-            logger.debug(config)
+            config = Config(args.input, args.logfile, args.loglevel)
             runmgr = RunManager(config)
             logger.debug("Using system GROMACS:")
             logger.debug(check_gmx_version(config))

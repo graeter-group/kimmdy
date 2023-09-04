@@ -26,6 +26,27 @@
       "type": "string",
       "pytype": "Path"
     },
+    "log": {
+      "type": "object",
+      "description": "Settings for logging",
+      "additionalProperties": false,
+      "properties": {
+        "file": {
+          "description": "Logfile name",
+          "type": "string",
+          "pytype": "Path",
+          "default": "kimmdy.log"
+        },
+        "level": {
+          "description": "Loglevel",
+          "type": "string",
+          "pytype": "str",
+          "default": "INFO",
+          "enum": ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+        }
+      },
+      "required": ["file", "level"]
+    },
     "max_tasks": {
       "description": "Maximum number of tasks to run. This is useful when a task in the sequence can dymanically add more tasks. 0 means no limit.",
       "type": "integer",
