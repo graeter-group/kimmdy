@@ -164,15 +164,11 @@ def plot_energy(dir: str, steps: Union[list[str], str], terms: list[str], open_p
 
         time_offset = energy["time"][-1]
 
-    ## plot energy
-
     df = pd.DataFrame(energy).melt(id_vars=["time", "step", "step_ix"], value_vars=terms)
-    steps = df[df["variable"] == terms[0]]
-    steps["variable"] = "Step"
-    steps["value"] = steps["step_ix"]
-    df = pd.concat([df, steps], ignore_index=True)
-
-    steps = steps.groupby(['step', 'step_ix']).first().reset_index()
+    step_names = df[df["variable"] == terms[0]]
+    step_names["variable"] = "Step"
+    step_names["value"] = step_names["step_ix"]
+    df = pd.concat([df, step_names], ignore_index=True)
 
     p = (so.Plot(df, x = "time", y = "value")
       .add(so.Line())
@@ -182,13 +178,13 @@ def plot_energy(dir: str, steps: Union[list[str], str], terms: list[str], open_p
     )
     p.plot(pyplot=True)
 
-    for t, v, s in zip(steps["time"], steps["value"], steps["step"]):
+    step_names = step_names.groupby(['step', 'step_ix']).first().reset_index()
+    for t, v, s in zip(step_names["time"], step_names["value"], step_names["step"]):
         plt.axvline(x=t, color="black", linestyle="--")
         plt.text(x=t, y=v+0.5, s=s, fontsize=6)
 
     output_path = str(run_dir / "analysis" / "energy.png")
     plt.savefig(output_path, dpi=300)
-    # p.save(output_path, dpi=300)
 
     # open png file with default system viewer
     if open_plot:
