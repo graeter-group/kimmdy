@@ -100,6 +100,20 @@ def concat_traj(dir: str, steps: Union[list[str], str], open_vmd: bool = False):
 
 
 def plot_energy(dir: str, steps: Union[list[str], str], terms: list[str], open_plot: bool = False):
+    """Plot GROMACS energy for a KIMMDY run.
+
+    Parameters
+    ----------
+    dir :
+        Directory to search for subdirectories
+    steps :
+        List of steps e.g. ["equilibrium", "production"]. Or a string "all" to return all subdirectories.
+        Default is "all".
+    terms :
+        Terms from gmx energy that will be plotted. Uses 'Potential' by default.
+    open_plot :
+        Open plot in default system viewer.
+    """
     run_dir = Path(dir).expanduser().resolve()
     xvg_entries = ["time"] + terms
     terms_str = "\n".join(terms)
@@ -153,19 +167,24 @@ def plot_energy(dir: str, steps: Union[list[str], str], terms: list[str], open_p
     ## plot energy
 
     df = pd.DataFrame(energy).melt(id_vars=["time", "step", "step_ix"], value_vars=terms)
-    # filter for unique steps
     steps = df[df["variable"] == terms[0]]
+    steps["variable"] = "Step"
+    steps["value"] = steps["step_ix"]
+    df = pd.concat([df, steps], ignore_index=True)
+
     steps = steps.groupby(['step', 'step_ix']).first().reset_index()
 
     p = (so.Plot(df, x = "time", y = "value")
-        .facet(row="variable").share(x=True, y=False)
-        .add(so.Line())
-        .theme({**axes_style("white")})
-        .label(x = "Time [ps]", y = "Energy [kJ/mol]")
+      .add(so.Line())
+      .facet(row="variable").share(x=True, y=False)
+      .theme({**axes_style("white")})
+      .label(x = "Time [ps]", y = "Energy [kJ/mol]")
     )
     p.plot(pyplot=True)
-    for t, s in zip(steps["time"], steps["step"]):
+
+    for t, v, s in zip(steps["time"], steps["value"], steps["step"]):
         plt.axvline(x=t, color="black", linestyle="--")
+        plt.text(x=t, y=v+0.5, s=s, fontsize=6)
 
     output_path = str(run_dir / "analysis" / "energy.png")
     plt.savefig(output_path, dpi=300)
