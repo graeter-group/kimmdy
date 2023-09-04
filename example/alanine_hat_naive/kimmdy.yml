@@ -27,10 +27,8 @@ reactions:
     polling_rate: 1
 
 sequence:
-- mult: 10
-  tasks:
-    - equilibrium
-- mult: 2
-  tasks:
   - equilibrium
-  - reactions
+  - mult: 5
+    tasks:
+    - equilibrium
+    - reactions
