@@ -140,7 +140,7 @@ def _run(args: argparse.Namespace):
 
         content = f"""
         #!/bin/env bash
-        #SBATCH --job-name={config.name}
+        #SBATCH --job-name={config.out.name}
         #SBATCH --output=kimmdy-job.log
         #SBATCH --error=kimmdy-job.log
         #SBATCH --time=24:00:00
@@ -157,13 +157,13 @@ def _run(args: argparse.Namespace):
 
         # Setup up your environment here
         # modules.sh might load lmod modules, set environment variables, etc.
-        source ./_modules.sh
+        # source ./_modules.sh
 
         CYCLE=24
 
         START=$(date +"%s")
 
-        kimmdy --input {args.input} -c
+        kimmdy -p {config.out}/kimmdy.cpt
 
         END=$(date +"%s")
 
@@ -179,7 +179,7 @@ def _run(args: argparse.Namespace):
           exit 3
         else
           echo "cycle resubmitting"
-          sbatch -J {config.name} ./jobscript.sh
+          sbatch ./jobscript.sh
           exit 2
         fi
         """
@@ -190,21 +190,6 @@ def _run(args: argparse.Namespace):
         chmod(path, 0o755)
 
         exit()
-
-    if args.from_latest_checkpoint:
-        config = Config(args.input)
-        cpts = glob(f"{config.name}*kimmdy.cpt")
-        if not cpts:
-            print(
-                f"""
-                No checkpoints found for the current configuration at {args.input}.
-                Start a new KIMMDY run or generate an initial checkpoint with
-                kimmdy --generate-jobscript
-                """
-            )
-            exit()
-        cpts.sort()
-        args.checkpoint = cpts[-1]
 
     try:
         if args.checkpoint:
