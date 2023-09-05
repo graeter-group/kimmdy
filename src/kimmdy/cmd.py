@@ -6,6 +6,7 @@ import argparse
 from os import chmod
 from pathlib import Path
 import textwrap
+from typing import Optional
 import dill
 import logging
 from kimmdy.config import Config
@@ -105,8 +106,6 @@ def _run(args: argparse.Namespace):
     args
         Command line arguments. See [](`~kimmdy.cmd.get_cmdline_args`)
     """
-    no_increment_logfile = args.from_latest_checkpoint or args.checkpoint
-    configure_logger(args.logfile, args.loglevel, no_increment_logfile)
 
     if args.show_plugins:
         from kimmdy import (
@@ -135,7 +134,7 @@ def _run(args: argparse.Namespace):
         )
 
     if args.generate_jobscript:
-        config = Config(args.input)
+        config = Config(input_file=args.input, logfile=args.logfile, loglevel=args.loglevel)
         runmgr = RunManager(config)
         runmgr.write_one_checkoint()
 
@@ -196,7 +195,7 @@ def _run(args: argparse.Namespace):
         config = Config(args.input)
         cpts = glob(f"{config.name}*kimmdy.cpt")
         if not cpts:
-            logger.error(
+            print(
                 f"""
                 No checkpoints found for the current configuration at {args.input}.
                 Start a new KIMMDY run or generate an initial checkpoint with
@@ -213,10 +212,8 @@ def _run(args: argparse.Namespace):
                 runmgr = dill.load(f)
                 runmgr.from_checkpoint = True
         else:
-            config = Config(args.input, args.logfile, args.loglevel)
+            config = Config(input_file=args.input, logfile=args.logfile, loglevel=args.loglevel)
             runmgr = RunManager(config)
-            logger.debug("Using system GROMACS:")
-            logger.debug(check_gmx_version(config))
 
         runmgr.run()
     except Exception as e:
@@ -226,15 +223,17 @@ def _run(args: argparse.Namespace):
             pdb.post_mortem()
         else:
             raise e
+    finally:
+        logging.shutdown()
+
 
 
 def kimmdy_run(
     input: Path = Path("kimmdy.yml"),
-    loglevel: str = "DEBUG",
-    logfile: Path = Path("kimmdy.log"),
+    loglevel: Optional[str] = None,
+    logfile: Optional[Path] = None,
     checkpoint: str = "",
     from_latest_checkpoint: bool = False,
-    concat: bool = False,
     show_plugins: bool = False,
     show_schema_path: bool = False,
     generate_jobscript: bool = False,
@@ -246,24 +245,21 @@ def kimmdy_run(
 
     Parameters
     ----------
-    input :
+    input
         kimmdy input yml file.
-    loglevel :
+    loglevel
         Loglevel. One of ["INFO", "WARNING", "MESSAGE", "DEBUG"]
-    logfile :
+    logfile
         File path of the logfile.
-    checkpoint :
+    checkpoint
         File path if a kimmdy.cpt file to restart KIMMDY from a checkpoint.
-    from_latest_checkpoint :
+    from_latest_checkpoint
         Start KIMMDY from the latest checkpoint.
-    concat :
-        Don't perform a full KIMMDY run but instead concatenate trajectories
-        from a previous run.
-    show_plugins :
+    show_plugins
         Show available plugins and exit.
-    show_schema_path :
+    show_schema_path
         Print path to yaml schema for use with yaml-language-server e.g. in VSCode and Neovim
-    generate_jobscript :
+    generate_jobscript
         Instead of running KIMMDY directly, generate at jobscript.sh for slurm HPC clusters
     """
     args = argparse.Namespace(
@@ -272,14 +268,12 @@ def kimmdy_run(
         logfile=logfile,
         checkpoint=checkpoint,
         from_latest_checkpoint=from_latest_checkpoint,
-        concat=concat,
         show_plugins=show_plugins,
         show_schema_path=show_schema_path,
         generate_jobscript=generate_jobscript,
         debug=debug,
     )
     _run(args)
-    logging.shutdown()
 
 
 def entry_point_kimmdy():
@@ -291,4 +285,3 @@ def entry_point_kimmdy():
     """
     args = get_cmdline_args()
     _run(args)
-    logging.shutdown()

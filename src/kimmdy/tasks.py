@@ -7,6 +7,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable, Optional, TYPE_CHECKING, Union
 import logging
+from kimmdy.config import longFormatter
 
 logger = logging.getLogger(__name__)
 
@@ -73,7 +74,6 @@ def create_task_directory(runmng, postfix: str) -> TaskFiles:
 
     Gets called when a Task is called (from the runmanager.tasks queue).
     """
-    from kimmdy.cmd import longFormatter
 
     files = TaskFiles(runmng.get_latest)
     runmng.iteration += 1

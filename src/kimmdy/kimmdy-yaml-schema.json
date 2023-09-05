@@ -16,7 +16,7 @@
       "default": "."
     },
     "name": {
-      "description": "Used for output folder if out is not specified",
+      "description": "Used for output folder if `out` is not specified",
       "type": "string",
       "pytype": "str",
       "default": "kimmdy"
