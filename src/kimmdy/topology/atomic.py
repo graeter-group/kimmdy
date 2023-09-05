@@ -574,21 +574,21 @@ class ResidueType:
         propers = {}
         impropers = {}
         if ls := d.get("atoms"):
-            for l in ls:
+            for l in ls["content"]:
                 atom = ResidueAtomSpec.from_top_line(l)
                 atoms[atom.name] = atom
         if ls := d.get("bonds"):
-            for l in ls:
+            for l in ls["content"]:
                 bond = ResidueBondSpec.from_top_line(l)
                 bonds[(bond.atom1, bond.atom2)] = bond
         if ls := d.get("dihedrals"):
-            for l in ls:
+            for l in ls["content"]:
                 proper = ResidueProperSpec.from_top_line(l)
                 propers[
                     (proper.atom1, proper.atom2, proper.atom3, proper.atom4)
                 ] = proper
         if ls := d.get("impropers"):
-            for l in ls:
+            for l in ls["content"]:
                 improper = ResidueImproperSpec.from_top_line(l)
                 impropers[
                     (improper.atom1, improper.atom2, improper.atom3, improper.atom4)

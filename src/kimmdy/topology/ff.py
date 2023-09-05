@@ -2,8 +2,8 @@ from __future__ import annotations
 import textwrap
 import logging
 from kimmdy.topology.atomic import *
-from kimmdy.parsing import read_rtp
-
+from kimmdy.parsing import read_top
+from typing import Union
 from kimmdy.topology.utils import get_top_section
 
 logger = logging.getLogger(__name__)
@@ -85,11 +85,13 @@ class FF:
                 "aminoacids.rtp not found in ffdir. No residuetypes will be parsed."
             )
             return
-        aminoacids = read_rtp(aminoacids_path)
+        aminoacids = read_top(aminoacids_path, use_gmx_dir=False)
         for k, v in aminoacids.items():
-            if k.startswith("BLOCK") or k == "bondedtypes":
+            if k.startswith("BLOCK") or k in ["bondedtypes", "ffdir", "define"]:
                 continue
-            self.residuetypes[k] = ResidueType.from_section(k, v)
+            if not v.get("subsections"):
+                raise AssertionError(f"key {k} has no subsections, only {v}.")
+            self.residuetypes[k] = ResidueType.from_section(k, v["subsections"])
 
     def __str__(self) -> str:
         return textwrap.dedent(

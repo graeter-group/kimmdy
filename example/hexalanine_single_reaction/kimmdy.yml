@@ -1,0 +1,22 @@
+# yaml-language-server: $schema=../../src/kimmdy/kimmdy-yaml-schema.json
+
+dryrun: false
+name: 'single_reaction_000'
+ff: 'amber99sb-star-ildnp.ff'
+top: 'hexala_out.top'
+gro: 'npt.gro'
+ndx: 'index.ndx'
+plumed: 'plumed.dat'
+tpr: 'pull.tpr'
+trr: 'pull.trr'
+changer:
+  coordinates: {}
+  topology:
+    parameterization: 'basic' 
+reactions:
+  homolysis:
+    edis: 'edissoc.dat'
+    itp: 'ffbonded.itp'
+  dummyreaction: {}
+sequence:
+  - homolysis

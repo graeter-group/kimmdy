@@ -21,44 +21,29 @@ def read_last_line(file):
         return f.readline().decode()
 
 
-def setup_testdir(tmp_path, dirname) -> Path:
-    try:
-        filedir = Path(__file__).parent / "test_files" / "test_integration" / dirname
-        assetsdir = Path(__file__).parent / "test_files" / "assets"
-    except NameError:
-        filedir = Path("./tests/test_files") / "test_integration" / dirname
-        assetsdir = Path("./tests/test_files") / "assets"
-    testdir = tmp_path / "test_integration" / dirname
-    shutil.copytree(filedir, testdir)
-    if not Path(testdir / "amber99sb-star-ildnp.ff").exists():
-        Path(testdir / "amber99sb-star-ildnp.ff").symlink_to(
-            assetsdir / "amber99sb-star-ildnp.ff",
-            target_is_directory=True,
-        )
-    os.chdir(testdir.resolve())
-    return testdir
-
-
-def test_integration_emptyrun(tmp_path):
-    testdir = setup_testdir(tmp_path, "emptyrun")
-    (testdir / "emptyrun.txt").touch()
-
+@pytest.mark.parametrize(
+    "arranged_tmp_path", (["test_integration/emptyrun"]), indirect=True
+)
+def test_integration_emptyrun(arranged_tmp_path):
     # not expecting this to run
     # because the topology is empty
+    Path("emptyrun.txt").touch()
     with pytest.raises(ValueError) as e:
         kimmdy_run()
 
 
-def test_integration_valid_input_files(tmp_path):
-    testdir = setup_testdir(tmp_path, "minimal_input_files")
-    (testdir / "emptyrun.txt").touch()
-
+@pytest.mark.parametrize(
+    "arranged_tmp_path", (["test_integration/minimal_input_files"]), indirect=True
+)
+def test_integration_valid_input_files(arranged_tmp_path):
     kimmdy_run()
-    assert "Finished running tasks" in read_last_line(testdir / "kimmdy.log")
+    assert "Finished running tasks" in read_last_line(Path("kimmdy.log"))
 
 
-def test_grompp_with_kimmdy_topology(tmp_path):
-    testdir = setup_testdir(tmp_path, "minimal_input_files")
+@pytest.mark.parametrize(
+    "arranged_tmp_path", (["test_integration/minimal_input_files"]), indirect=True
+)
+def test_grompp_with_kimmdy_topology(arranged_tmp_path):
     raw_top = read_top(Path("minimal.top"))
     top = Topology(raw_top)
     top._update_dict()
@@ -80,40 +65,49 @@ def test_grompp_with_kimmdy_topology(tmp_path):
     )
 
 
-def test_integration_single_reaction(tmp_path):
-    testdir = setup_testdir(tmp_path, "single_reaction")
-
+@pytest.mark.parametrize(
+    "arranged_tmp_path",
+    (["test_integration/hexalanine_single_reaction"]),
+    indirect=True,
+)
+def test_integration_single_reaction(arranged_tmp_path):
     kimmdy_run()
-    assert "Finished running tasks" in read_last_line(testdir / "kimmdy.log")
+    assert "Finished running tasks" in read_last_line(Path("kimmdy.log"))
 
 
 @pytest.mark.slow
-def test_integration_hat_naive_reaction(tmp_path):
-    testdir = setup_testdir(tmp_path, "hat_naive")
-
+@pytest.mark.parametrize(
+    "arranged_tmp_path", (["test_integration/alanine_hat_naive"]), indirect=True
+)
+def test_integration_hat_naive_reaction(arranged_tmp_path):
     kimmdy_run()
-    assert "Finished running tasks" in read_last_line(testdir / "kimmdy.log")
+    assert "Finished running tasks" in read_last_line(Path("kimmdy.log"))
 
 
 @pytest.mark.slow
-def test_integration_homolysis_reaction(tmp_path):
-    testdir = setup_testdir(tmp_path, "homolysis")
-
+@pytest.mark.parametrize(
+    "arranged_tmp_path", (["test_integration/hexalanine_homolysis"]), indirect=True
+)
+def test_integration_homolysis_reaction(arranged_tmp_path):
     kimmdy_run()
-    assert "Finished running tasks" in read_last_line(testdir / "kimmdy.log")
+    assert "Finished running tasks" in read_last_line(Path("kimmdy.log"))
 
 
 @pytest.mark.slow
-def test_integration_pull(tmp_path):
-    testdir = setup_testdir(tmp_path, "pull")
-
+@pytest.mark.parametrize(
+    "arranged_tmp_path", (["test_integration/triplehelix_pull"]), indirect=True
+)
+def test_integration_pull(arranged_tmp_path):
     kimmdy_run()
-    assert "Finished running tasks" in read_last_line(testdir / "kimmdy.log")
+    assert "Finished running tasks" in read_last_line(Path("kimmdy.log"))
 
 
 @pytest.mark.slow
-def test_integration_whole_run(tmp_path):
-    testdir = setup_testdir(tmp_path, "whole_run")
-
+@pytest.mark.parametrize(
+    "arranged_tmp_path",
+    (["test_integration/charged_peptide_homolysis_hat_naive"]),
+    indirect=True,
+)
+def test_integration_whole_run(arranged_tmp_path):
     kimmdy_run()
-    assert "Finished running tasks" in read_last_line(testdir / "kimmdy.log")
+    assert "Finished running tasks" in read_last_line(Path("kimmdy.log"))

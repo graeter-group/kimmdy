@@ -1,0 +1,34 @@
+dryrun: false
+max_tasks: 10
+out: 'test_out_001'
+gromacs_alias: 'gmx'
+#ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
+top: 'topol.top'
+gro: 'npt.gro'
+ndx: 'index_backbone.ndx'
+plumed: 'plumed.dat'
+mds:
+  equilibrium:
+    mdp: 'empty.mdp'
+  prod:
+    mdp: 'empty.mdp'
+    use_plumed: true
+  relax:
+    mdp: 'empty.mdp'
+changer:
+  coordinates:
+    md: 'relax'    
+  topology:
+    parameterization: 'grappa' 
+reactions:
+  homolysis:
+    edis: 'edissoc.dat'
+    itp: 'ffbonded.itp'
+  dummyreaction: {}
+sequence:
+  - equilibrium
+  - mult: 2
+    tasks:
+      - prod
+      - reactions
+

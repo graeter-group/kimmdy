@@ -1,7 +1,6 @@
 from __future__ import annotations  # for 3.7 <= Python version < 3.10
 from itertools import permutations
 from typing import Optional, Any
-from xml.etree.ElementTree import Element
 import re
 from typing import TYPE_CHECKING
 
@@ -245,15 +244,6 @@ def get_by_permutations(d: dict, key) -> Optional[Any]:
         if value is not None:
             return value
     return None
-
-
-def get_element_id(e: Element) -> Optional[str]:
-    id = None
-    if e.tag == "Atom":
-        id = ""
-    elif e.tag == "Bond":
-        id = ""
-    return id
 
 
 def match_atomic_item_to_atomic_type(

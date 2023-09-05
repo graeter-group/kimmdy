@@ -118,8 +118,12 @@ def test_break_like_bo(id_1, id_2):
 def test_place_initialization():
     m1 = Place(ix_to_place=1, new_coords=(0, 0, 0))
     m11 = Place(id_to_place="2", new_coords=(0, 0, 0))
+    m2 = Place(ix_to_place=2, new_coords=(0, 0, 0))
+    m3 = Place(ix_to_place=2, new_coords=(0, 1, 0))
 
     assert m1 == m11
+    assert m1 != m2
+    assert m2 != m3
 
     with pytest.raises(TypeError):
         Place(ix_to_place=1)
@@ -129,6 +133,12 @@ def test_place_initialization():
 
 def test_relax_initialization():
     Relax()
+
+
+def test_relax_comparison():
+    r1 = Relax()
+    r2 = Relax()
+    assert r1 == r2
 
 
 ## Test Recipe
@@ -150,9 +160,8 @@ def test_combine_recipes():
 
 # ToDo: test other recipe methods
 
+
 ## Test RecipeCollection
-
-
 @pytest.fixture
 def recipe_collection():
     rps = [

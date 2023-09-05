@@ -11,11 +11,8 @@ from pathlib import Path
 import textwrap
 import dill
 from kimmdy.config import Config
-from kimmdy.tools import build_examples
 from kimmdy.runmanager import RunManager
 from kimmdy.utils import check_gmx_version, backup_if_existing
-from kimmdy.analysis import concat_traj, plot_energy, radical_population, plot_rates
-from kimmdy.tools import remove_hydrogen
 import importlib.resources as pkg_resources
 import sys
 from glob import glob
@@ -34,7 +31,11 @@ def get_cmdline_args() -> argparse.Namespace:
     :
         Parsed command line arguments
     """
-    parser = argparse.ArgumentParser(description="Welcome to KIMMDY")
+    parser = argparse.ArgumentParser(
+        description="""Welcome to KIMMDY. `kimmdy` runs KIMMDY, further tools are available as `kimmdy-...` commands.
+    These are `-analysis`, `-remove-hydrogen` and `-build-examples`. Access their help with `kimmdy-... -h.`
+    """
+    )
     parser.add_argument(
         "--version", action="version", version=f'KIMMDY {version("kimmdy")}'
     )
@@ -59,17 +60,6 @@ def get_cmdline_args() -> argparse.Namespace:
         "-c",
         action="store_true",
         help="continue. Start KIMMDY from the latest checkpoint file",
-    )
-    parser.add_argument(
-        "--concat",
-        type=Path,
-        nargs="?",
-        const=True,
-        help=(
-            "Concatenate trrs of this run"
-            "Optionally, the run directory can be give"
-            "Will save as concat.trr in current directory"
-        ),
     )
 
     # on error, drop into debugger
@@ -106,116 +96,6 @@ def get_cmdline_args() -> argparse.Namespace:
         ),
     )
 
-    return parser.parse_args()
-
-
-def get_analysis_cmdline_args() -> argparse.Namespace:
-    """Parse command line arguments.
-
-    Returns
-    -------
-    :
-        Parsed command line arguments
-    """
-    parser = argparse.ArgumentParser(
-        description="Welcome to the KIMMDY analysis module"
-    )
-    subparsers = parser.add_subparsers(required=True, metavar="module", dest="module")
-
-    parser_trjcat = subparsers.add_parser(
-        name="trjcat", help="Concatenate trajectories of a KIMMDY run"
-    )
-    parser_trjcat.add_argument(
-        "dir", type=str, help="KIMMDY run directory to be analysed."
-    )
-    parser_trjcat.add_argument(
-        "--steps",
-        "-s",
-        nargs="*",
-        default="all",
-        help=(
-            "Apply analysis method to subdirectories with these names. Uses all subdirectories by default"
-        ),
-    )
-
-    parser_plot_energy = subparsers.add_parser(
-        name="plot_energy", help="Plot GROMACS energy for a KIMMDY run"
-    )
-    parser_plot_energy.add_argument(
-        "dir", type=str, help="KIMMDY run directory to be analysed."
-    )
-    parser_plot_energy.add_argument(
-        "--steps",
-        "-s",
-        nargs="*",
-        default="all",
-        help=(
-            "Apply analysis method to subdirectories with these names. Uses all subdirectories by default"
-        ),
-    )
-    parser_plot_energy.add_argument(
-        "--terms",
-        "-t",
-        nargs="*",
-        default=["Potential"],
-        help=(
-            "Terms from gmx energy that will be plotted. Uses 'Potential' by default"
-        ),
-    )
-
-    parser_radical_population = subparsers.add_parser(
-        name="radical_population",
-        help="Plot population of radicals for one or multiple KIMMDY run(s)",
-    )
-    parser_radical_population.add_argument(
-        "dir", nargs="+", help="KIMMDY run directory to be analysed. Can be multiple."
-    )
-    parser_radical_population.add_argument(
-        "--select_atoms",
-        "-a",
-        type=str,
-        help="Atoms chosen for radical population analysis, default is protein (uses MDAnalysis selection syntax)",
-        default="protein",
-    )
-
-    parser_plot_rates = subparsers.add_parser(
-        name="plot_rates",
-        help="Plot rates of all possible reactions after a MD run. Rates must have been saved!",
-    )
-    parser_plot_rates.add_argument(
-        "dir", nargs="+", help="KIMMDY run directory to be analysed. Can be multiple."
-    )
-
-    return parser.parse_args()
-
-
-def get_remove_hydrogen_cmdline_args():
-    """
-    parse cmdline args for remove_hydrogen
-    """
-    parser = argparse.ArgumentParser(
-        description="Welcome to the KIMMDY remove hydrogen module",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-    )
-    parser.add_argument("gro", help="GROMACS gro file")
-    parser.add_argument("top", help="GROMACS top file")
-    parser.add_argument(
-        "nr", help="Atom number as indicated in the GROMACS gro and top file"
-    )
-    parser.add_argument(
-        "-p",
-        "--parameterize",
-        action="store_true",
-        help="Parameterize topology with grappa after removing hydrogen.",
-        default=False,
-    )
-    parser.add_argument(
-        "-e",
-        "--equilibrate",
-        action="store_true",
-        help="Do a minimization and equilibration with GROMACS. Uses mdp files from kimmdy assets.",
-        default=False,
-    )
     return parser.parse_args()
 
 
@@ -488,53 +368,6 @@ def kimmdy_run(
     )
     _run(args)
     logging.shutdown()
-
-
-def get_build_example_cmdline_args() -> argparse.Namespace:
-    """Parse command line arguments.
-
-    Returns
-    -------
-    Namespace
-        parsed command line arguments
-    """
-    parser = argparse.ArgumentParser(description="Build examples for KIMMDY.")
-    parser.add_argument(
-        "-r",
-        "--restore",
-        const=True,
-        nargs="?",
-        type=str,
-        help="Overwrite input files in existing example directories, use keyword 'hard' to also delete output files.",
-    )
-    return parser.parse_args()
-
-
-def entry_point_build_examples():
-    """Build examples from the command line."""
-    args = get_build_example_cmdline_args()
-    build_examples(args.restore)
-
-
-def entry_point_analysis():
-    """Analyse existing KIMMDY runs."""
-    args = get_analysis_cmdline_args()
-
-    if args.module == "trjcat":
-        concat_traj(args.dir, args.steps)
-    elif args.module == "plot_energy":
-        plot_energy(args.dir, args.steps, args.terms)
-    elif args.module == "radical_population":
-        radical_population(args.dir, args.radical_population)
-    elif args.module == "plot_rates":
-        plot_rates(args.dir)
-
-
-def entry_point_remove_hydrogen():
-    """Remove hydrogen by atom nr in a gro and topology file"""
-    args = get_remove_hydrogen_cmdline_args()
-
-    remove_hydrogen(args.gro, args.top, args.nr, args.paremeterize, args.equilibrate)
 
 
 def entry_point_kimmdy():

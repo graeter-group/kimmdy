@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.290">
+<meta name="generator" content="quarto-1.3.353">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -127,7 +127,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../_reference/index.html">Reference</a></li><li class="breadcrumb-item"><a href="../_reference/constants.html">constants</a></li><li class="breadcrumb-item"><a href="../_reference/analysis.html">analysis</a></li></ol></nav>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../_reference/index.html">Reference</a></li><li class="breadcrumb-item"><a href="../_reference/constants.html">Modules</a></li><li class="breadcrumb-item"><a href="../_reference/analysis.html">analysis</a></li></ol></nav>
       <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
       </a>
     </div>
@@ -156,36 +156,13 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../guide/developer/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Developer</span></a>
+            <a href="../guide/user/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">User</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../guide/developer/plugins.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Writing Reaction Plugins</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../guide/developer/topology.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Hexala topology</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a href="../guide/user/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">User</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../guide/user/hcp.html" class="sidebar-item-text sidebar-link">
@@ -196,6 +173,29 @@ ul.task-list li input[type="checkbox"] {
   <div class="sidebar-item-container"> 
   <a href="../guide/user/options.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">KIMMDY Options</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../guide/developer/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Developer</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guide/developer/plugins.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Writing Reaction Plugins</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guide/developer/topology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Hexala topology</span></a>
   </div>
 </li>
       </ul>
@@ -403,7 +403,36 @@ ul.task-list li input[type="checkbox"] {
   <ul>
   <li><a href="#functions" id="toc-functions" class="nav-link" data-scroll-target="#functions">Functions</a>
   <ul>
-  <li><a href="#kimmdy.analysis.concat_traj" id="toc-kimmdy.analysis.concat_traj" class="nav-link" data-scroll-target="#kimmdy.analysis.concat_traj">concat_traj</a></li>
+  <li><a href="#kimmdy.analysis.concat_traj" id="toc-kimmdy.analysis.concat_traj" class="nav-link" data-scroll-target="#kimmdy.analysis.concat_traj">concat_traj</a>
+  <ul class="collapse">
+  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
+  </ul></li>
+  <li><a href="#kimmdy.analysis.entry_point_analysis" id="toc-kimmdy.analysis.entry_point_analysis" class="nav-link" data-scroll-target="#kimmdy.analysis.entry_point_analysis">entry_point_analysis</a></li>
+  <li><a href="#kimmdy.analysis.get_analysis_cmdline_args" id="toc-kimmdy.analysis.get_analysis_cmdline_args" class="nav-link" data-scroll-target="#kimmdy.analysis.get_analysis_cmdline_args">get_analysis_cmdline_args</a>
+  <ul class="collapse">
+  <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
+  </ul></li>
+  <li><a href="#kimmdy.analysis.get_analysis_dir" id="toc-kimmdy.analysis.get_analysis_dir" class="nav-link" data-scroll-target="#kimmdy.analysis.get_analysis_dir">get_analysis_dir</a>
+  <ul class="collapse">
+  <li><a href="#parameters-1" id="toc-parameters-1" class="nav-link" data-scroll-target="#parameters-1">Parameters</a></li>
+  <li><a href="#returns-1" id="toc-returns-1" class="nav-link" data-scroll-target="#returns-1">Returns</a></li>
+  </ul></li>
+  <li><a href="#kimmdy.analysis.get_step_directories" id="toc-kimmdy.analysis.get_step_directories" class="nav-link" data-scroll-target="#kimmdy.analysis.get_step_directories">get_step_directories</a>
+  <ul class="collapse">
+  <li><a href="#parameters-2" id="toc-parameters-2" class="nav-link" data-scroll-target="#parameters-2">Parameters</a></li>
+  </ul></li>
+  <li><a href="#kimmdy.analysis.plot_energy" id="toc-kimmdy.analysis.plot_energy" class="nav-link" data-scroll-target="#kimmdy.analysis.plot_energy">plot_energy</a>
+  <ul class="collapse">
+  <li><a href="#parameters-3" id="toc-parameters-3" class="nav-link" data-scroll-target="#parameters-3">Parameters</a></li>
+  </ul></li>
+  <li><a href="#kimmdy.analysis.plot_rates" id="toc-kimmdy.analysis.plot_rates" class="nav-link" data-scroll-target="#kimmdy.analysis.plot_rates">plot_rates</a>
+  <ul class="collapse">
+  <li><a href="#parameters-4" id="toc-parameters-4" class="nav-link" data-scroll-target="#parameters-4">Parameters</a></li>
+  </ul></li>
+  <li><a href="#kimmdy.analysis.radical_population" id="toc-kimmdy.analysis.radical_population" class="nav-link" data-scroll-target="#kimmdy.analysis.radical_population">radical_population</a>
+  <ul class="collapse">
+  <li><a href="#parameters-5" id="toc-parameters-5" class="nav-link" data-scroll-target="#parameters-5">Parameters</a></li>
+  </ul></li>
   </ul></li>
   </ul></li>
   </ul>
@@ -417,6 +446,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="kimmdy.analysis" class="level1">
 <h1>analysis</h1>
 <p><code>analysis</code></p>
+<p>Analysis tools for KIMMDY runs. For command line usage, run <code>kimmdy-analysis -h</code>.</p>
 <section id="functions" class="level2">
 <h2 class="anchored" data-anchor-id="functions">Functions</h2>
 <table class="table">
@@ -429,16 +459,300 @@ ul.task-list li input[type="checkbox"] {
 <tbody>
 <tr class="odd">
 <td><a href="#kimmdy.analysis.concat_traj">concat_traj</a></td>
-<td>Find and concatenate trajectories (.xtc files) from KIMMDY runs.</td>
+<td>Find and concatenate trajectories (.xtc files) from a KIMMDY run into one trajectory.</td>
+</tr>
+<tr class="even">
+<td><a href="#kimmdy.analysis.entry_point_analysis">entry_point_analysis</a></td>
+<td>Analyse existing KIMMDY runs.</td>
+</tr>
+<tr class="odd">
+<td><a href="#kimmdy.analysis.get_analysis_cmdline_args">get_analysis_cmdline_args</a></td>
+<td>Parse command line arguments.</td>
+</tr>
+<tr class="even">
+<td><a href="#kimmdy.analysis.get_analysis_dir">get_analysis_dir</a></td>
+<td>Get analysis directory for a KIMMDY run.</td>
+</tr>
+<tr class="odd">
+<td><a href="#kimmdy.analysis.get_step_directories">get_step_directories</a></td>
+<td>create list of subdirectories that match the steps.</td>
+</tr>
+<tr class="even">
+<td><a href="#kimmdy.analysis.plot_energy">plot_energy</a></td>
+<td>Plot GROMACS energy for a KIMMDY run.</td>
+</tr>
+<tr class="odd">
+<td><a href="#kimmdy.analysis.plot_rates">plot_rates</a></td>
+<td>Plot rates of all possible reactions for each ‘decide_recipe’ step.</td>
+</tr>
+<tr class="even">
+<td><a href="#kimmdy.analysis.radical_population">radical_population</a></td>
+<td>Plot population of radicals for a KIMMDY run.</td>
 </tr>
 </tbody>
 </table>
 <section id="kimmdy.analysis.concat_traj" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.analysis.concat_traj">concat_traj</h3>
-<p><code>analysis.concat_traj(rundir, steps)</code></p>
-<p>Find and concatenate trajectories (.xtc files) from KIMMDY runs.</p>
+<p><code>analysis.concat_traj(dir, steps, open_vmd=False)</code></p>
+<p>Find and concatenate trajectories (.xtc files) from a KIMMDY run into one trajectory. The concatenated trajectory is centered and pbc corrected.</p>
+<section id="parameters" class="level4">
+<h4 class="anchored" data-anchor-id="parameters">Parameters</h4>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>dir</code></td>
+<td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
+<td>Directory to search for subdirectories</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td><code>steps</code></td>
+<td><a href="https://docs.python.org/3.10/library/typing.html#typing.Union">Union</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#list">list</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>], <a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>]</td>
+<td>List of steps e.g.&nbsp;[“equilibrium”, “production”]. Or a string “all” to return all subdirectories</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td><code>open_vmd</code></td>
+<td><a href="https://docs.python.org/3.10/library/functions.html#bool">bool</a></td>
+<td>Open concatenated trajectory in VMD</td>
+<td><code>False</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="kimmdy.analysis.entry_point_analysis" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.analysis.entry_point_analysis">entry_point_analysis</h3>
+<p><code>analysis.entry_point_analysis()</code></p>
+<p>Analyse existing KIMMDY runs.</p>
+</section>
+<section id="kimmdy.analysis.get_analysis_cmdline_args" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.analysis.get_analysis_cmdline_args">get_analysis_cmdline_args</h3>
+<p><code>analysis.get_analysis_cmdline_args()</code></p>
+<p>Parse command line arguments.</p>
+<section id="returns" class="level4">
+<h4 class="anchored" data-anchor-id="returns">Returns</h4>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Parsed command line arguments</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="kimmdy.analysis.get_analysis_dir" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.analysis.get_analysis_dir">get_analysis_dir</h3>
+<p><code>analysis.get_analysis_dir(dir)</code></p>
+<p>Get analysis directory for a KIMMDY run.</p>
+<p>Creates the directory if it does not exist.</p>
+<section id="parameters-1" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-1">Parameters</h4>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>dir</code></td>
+<td><a href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path">Path</a></td>
+<td>Directory of KIMMDY run</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-1" class="level4">
+<h4 class="anchored" data-anchor-id="returns-1">Returns</h4>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Path to analysis directory</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="kimmdy.analysis.get_step_directories" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.analysis.get_step_directories">get_step_directories</h3>
+<p><code>analysis.get_step_directories(dir, steps='all')</code></p>
+<p>create list of subdirectories that match the steps. If steps is “all”, all subdirectories are returned.</p>
+<section id="parameters-2" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-2">Parameters</h4>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>dir</code></td>
+<td><a href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path">Path</a></td>
+<td>Directory to search for subdirectories</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td><code>steps</code></td>
+<td><a href="https://docs.python.org/3.10/library/typing.html#typing.Union">Union</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#list">list</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>], <a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>]</td>
+<td>List of steps e.g.&nbsp;[“equilibrium”, “production”]. Or a string “all” to return all subdirectories</td>
+<td><code>'all'</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="kimmdy.analysis.plot_energy" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.analysis.plot_energy">plot_energy</h3>
+<p><code>analysis.plot_energy(dir, steps, terms, open_plot=False)</code></p>
+<p>Plot GROMACS energy for a KIMMDY run.</p>
+<section id="parameters-3" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-3">Parameters</h4>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>dir</code></td>
+<td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
+<td>Directory to search for subdirectories</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td><code>steps</code></td>
+<td><a href="https://docs.python.org/3.10/library/typing.html#typing.Union">Union</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#list">list</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>], <a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>]</td>
+<td>List of steps e.g.&nbsp;[“equilibrium”, “production”]. Or a string “all” to return all subdirectories. Default is “all”.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td><code>terms</code></td>
+<td><a href="https://docs.python.org/3.10/library/stdtypes.html#list">list</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>]</td>
+<td>Terms from gmx energy that will be plotted. Uses ‘Potential’ by default.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td><code>open_plot</code></td>
+<td><a href="https://docs.python.org/3.10/library/functions.html#bool">bool</a></td>
+<td>Open plot in default system viewer.</td>
+<td><code>False</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="kimmdy.analysis.plot_rates" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.analysis.plot_rates">plot_rates</h3>
+<p><code>analysis.plot_rates(dir)</code></p>
+<p>Plot rates of all possible reactions for each ‘decide_recipe’ step.</p>
+<section id="parameters-4" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-4">Parameters</h4>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>dir</code></td>
+<td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
+<td>Directory of KIMMDY run</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="kimmdy.analysis.radical_population" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.analysis.radical_population">radical_population</h3>
+<p><code>analysis.radical_population(dir, steps='all', select_atoms='protein', open_plot=False, open_vmd=False)</code></p>
+<p>Plot population of radicals for a KIMMDY run.</p>
+<section id="parameters-5" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-5">Parameters</h4>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>dir</code></td>
+<td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
+<td>KIMMDY run directory to be analysed.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td><code>steps</code></td>
+<td><a href="https://docs.python.org/3.10/library/typing.html#typing.Union">Union</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#list">list</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>], <a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>]</td>
+<td>List of steps e.g.&nbsp;[“equilibrium”, “production”]. Or a string “all” to return all subdirectories. Default is “all”.</td>
+<td><code>'all'</code></td>
+</tr>
+<tr class="odd">
+<td><code>select_atoms</code></td>
+<td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
+<td>Atoms chosen for radical population analysis, default is protein (uses MDAnalysis selection syntax)</td>
+<td><code>'protein'</code></td>
+</tr>
+<tr class="even">
+<td><code>open_plot</code></td>
+<td><a href="https://docs.python.org/3.10/library/functions.html#bool">bool</a></td>
+<td>Open plot in default system viewer.</td>
+<td><code>False</code></td>
+</tr>
+<tr class="odd">
+<td><code>open_vmd</code></td>
+<td><a href="https://docs.python.org/3.10/library/functions.html#bool">bool</a></td>
+<td>Open a pdb in VMD with the radical occupation as B-factors.</td>
+<td><code>False</code></td>
+</tr>
+</tbody>
+</table>
 
 
+</section>
 </section>
 </section>
 </section>
