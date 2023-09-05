@@ -179,7 +179,8 @@ def _run(args: argparse.Namespace):
           exit 3
         else
           echo "cycle resubmitting"
-          sbatch ./jobscript.sh
+          # sbatch ./jobscript.sh
+          ./jobscript.sh
           exit 2
         fi
         """

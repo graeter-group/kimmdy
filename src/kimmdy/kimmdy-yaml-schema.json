@@ -55,8 +55,8 @@
     },
     "max_hours": {
       "description": "Stop KIMMDY after max_hours hours. Set this lower than the limit of your HPC cluster for use with a re-submit jobscript. 0 Means no limit.",
-      "type": "integer",
-      "pytype": "int",
+      "type": "number",
+      "pytype": "float",
       "default": 0
     },
     "run": {
@@ -94,13 +94,6 @@
       "type": "string",
       "pytype": "str",
       "default": "-maxh 24 -dlb yes"
-    },
-    "maxh": {
-      "description": "Maximum number of hours to run KIMMDY until it stops to aviod running out of time on the cluster. This enables graceful shutdown of KIMMDY and allows it to resume from the last checkpoint e.g. via a jobscript.",
-      "type": "integer",
-      "pytype": "int",
-      "default": 24,
-      "minimum": 1
     },
     "ff": {
       "description": "Force field directory (looks for .ff in cwd if not set)",

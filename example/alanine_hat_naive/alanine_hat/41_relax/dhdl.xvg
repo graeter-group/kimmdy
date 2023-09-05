@@ -1,0 +1,69 @@
+# This file was created Tue Sep  5 17:03:17 2023
+# Created by:
+#              :-) GROMACS - gmx mdrun, 2021.4-Ubuntu-2021.4-2 (-:
+# 
+# Executable:   /usr/bin/gmx
+# Data prefix:  /usr
+# Working dir:  /data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/41_relax
+# Command line:
+#   gmx mdrun -s relax.tpr -cpi relax.cpt -x relax.xtc -o relax.trr -cpo relax.cpt -c relax.gro -g relax.log -e relax.edr -px relax_pullx.xvg -pf relax_pullf.xvg -ro relax-rotation.xvg -ra relax-rotangles.log -rs relax-rotslabs.log -rt relax-rottorque.log -maxh 24 -dlb yes -nt 8 -quiet
+# gmx mdrun is part of G R O M A C S:
+#
+# GRoups of Organic Molecules in ACtion for Science
+#
+@    title "dH/d\xl\f{}"
+@    xaxis  label "Time (ps)"
+@    yaxis  label "dH/d\xl\f{} (kJ/mol [\xl\f{}]\S-1\N)"
+@TYPE xy
+@ subtitle "T = 300 (K) "
+0.0000 23590.740
+0.2000 2055.3467
+0.4000 342.32520
+0.6000 -188.24103
+0.8000 -88.488098
+1.0000 -409.11383
+1.2000 -310.51700
+1.4000 -515.48444
+1.6000 -543.58466
+1.8000 -579.19690
+2.0000 -576.02307
+2.2000 -495.84445
+2.4000 -624.28009
+2.6000 -592.31573
+2.8000 -377.76581
+3.0000 -294.40936
+3.2000 -281.38330
+3.4000 -323.31403
+3.6000 -250.80438
+3.8000 -120.42461
+4.0000 85.042358
+4.2000 -21.990768
+4.4000 -132.14426
+4.6000 23.214579
+4.8000 45.489761
+5.0000 -192.44614
+5.2000 -64.956558
+5.4000 46.844833
+5.6000 -141.19086
+5.8000 -150.52510
+6.0000 -13.237457
+6.2000 33.260345
+6.4000 4.2124023
+6.6000 151.92813
+6.8000 307.37534
+7.0000 255.03711
+7.2000 164.60767
+7.4000 167.06046
+7.6000 358.17947
+7.8000 422.71939
+8.0000 423.51743
+8.2000 430.82437
+8.4000 345.46222
+8.6000 302.07990
+8.8000 307.50543
+9.0000 206.76440
+9.2000 53.990601
+9.4000 -106.43140
+9.6000 -950.08185
+9.8000 -3702.9004
+10.0000 -22930.809

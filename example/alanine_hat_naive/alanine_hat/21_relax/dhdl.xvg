@@ -1,0 +1,69 @@
+# This file was created Tue Sep  5 17:03:01 2023
+# Created by:
+#              :-) GROMACS - gmx mdrun, 2021.4-Ubuntu-2021.4-2 (-:
+# 
+# Executable:   /usr/bin/gmx
+# Data prefix:  /usr
+# Working dir:  /data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/21_relax
+# Command line:
+#   gmx mdrun -s relax.tpr -cpi relax.cpt -x relax.xtc -o relax.trr -cpo relax.cpt -c relax.gro -g relax.log -e relax.edr -px relax_pullx.xvg -pf relax_pullf.xvg -ro relax-rotation.xvg -ra relax-rotangles.log -rs relax-rotslabs.log -rt relax-rottorque.log -maxh 24 -dlb yes -nt 8 -quiet
+# gmx mdrun is part of G R O M A C S:
+#
+# GRowing Old MAkes el Chrono Sweat
+#
+@    title "dH/d\xl\f{}"
+@    xaxis  label "Time (ps)"
+@    yaxis  label "dH/d\xl\f{} (kJ/mol [\xl\f{}]\S-1\N)"
+@TYPE xy
+@ subtitle "T = 300 (K) "
+0.0000 39293.680
+0.2000 2941.5208
+0.4000 729.48730
+0.6000 -186.92078
+0.8000 -323.42505
+1.0000 -434.36865
+1.2000 -501.02740
+1.4000 -519.51379
+1.6000 -609.50073
+1.8000 -617.62109
+2.0000 -586.89758
+2.2000 -553.67847
+2.4000 -477.89600
+2.6000 -349.90158
+2.8000 -354.62173
+3.0000 -337.19492
+3.2000 -410.83508
+3.4000 -318.29248
+3.6000 115.32745
+3.8000 -386.20636
+4.0000 -302.90411
+4.2000 -291.23077
+4.4000 -106.00247
+4.6000 -301.76416
+4.8000 -243.34515
+5.0000 -27.668711
+5.2000 -63.289974
+5.4000 -129.92751
+5.6000 -179.75821
+5.8000 93.380997
+6.0000 -182.35135
+6.2000 -186.60989
+6.4000 248.78970
+6.6000 -102.60352
+6.8000 111.13235
+7.0000 264.77713
+7.2000 95.250000
+7.4000 191.60962
+7.6000 434.14359
+7.8000 325.20197
+8.0000 348.95102
+8.2000 384.26331
+8.4000 428.64966
+8.6000 352.89883
+8.8000 338.88840
+9.0000 251.61295
+9.2000 119.33261
+9.4000 -126.21640
+9.6000 -1154.6705
+9.8000 -2495.1301
+10.0000 -28828.465

@@ -175,8 +175,6 @@ class RunManager:
             reaction_plugin: ReactionPlugin = r(rp_name, self)
             self.reaction_plugins.append(reaction_plugin)
 
-        logger.debug("Configuration from input file:")
-        logger.debug(pformat(self.config.__dict__))
 
     def run(self):
         logger.info("Start run")
@@ -184,6 +182,7 @@ class RunManager:
         self.current_time = time.time()
 
         if self.from_checkpoint:
+            print(logger)
             logger.info(f"KIMMDY is starting from a checkpoint.")
         else:
             self._setup_tasks()

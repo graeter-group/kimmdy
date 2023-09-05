@@ -1,0 +1,503 @@
+
+            Task: _run_md with output directory: /data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/1_equilibrium
+            Task: _run_md, input:
+{'gro': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/npt.gro'),
+ 'mdp': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/md.mdp'),
+ 'ndx': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/index.ndx'),
+ 'top': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/Ala_out.top')}
+            Task: _run_md, output:
+{'1_equilibrium.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/1_equilibrium/1_equilibrium.log'),
+ 'cpt': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/1_equilibrium/equilibrium.cpt'),
+ 'edr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/1_equilibrium/equilibrium.edr'),
+ 'equilibrium.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/1_equilibrium/equilibrium.log'),
+ 'ff': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/1_equilibrium/amber99sb-star-ildnp.ff'),
+ 'gro': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/1_equilibrium/equilibrium.gro'),
+ 'mdout.mdp': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/1_equilibrium/mdout.mdp'),
+ 'tpr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/1_equilibrium/equilibrium.tpr'),
+ 'trr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/1_equilibrium/equilibrium.trr'),
+ 'xtc': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/1_equilibrium/equilibrium.xtc')}
+            
+            Task: _run_md with output directory: /data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/2_equilibrium
+            Task: _run_md, input:
+{'edr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/1_equilibrium/equilibrium.edr'),
+ 'gro': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/1_equilibrium/equilibrium.gro'),
+ 'mdp': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/md.mdp'),
+ 'ndx': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/index.ndx'),
+ 'top': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/Ala_out.top'),
+ 'trr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/1_equilibrium/equilibrium.trr')}
+            Task: _run_md, output:
+{'2_equilibrium.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/2_equilibrium/2_equilibrium.log'),
+ 'cpt': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/2_equilibrium/equilibrium.cpt'),
+ 'edr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/2_equilibrium/equilibrium.edr'),
+ 'equilibrium.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/2_equilibrium/equilibrium.log'),
+ 'ff': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/2_equilibrium/amber99sb-star-ildnp.ff'),
+ 'gro': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/2_equilibrium/equilibrium.gro'),
+ 'mdout.mdp': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/2_equilibrium/mdout.mdp'),
+ 'tpr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/2_equilibrium/equilibrium.tpr'),
+ 'trr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/2_equilibrium/equilibrium.trr'),
+ 'xtc': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/2_equilibrium/equilibrium.xtc')}
+            
+            Task: _query_reaction with output directory: /data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/3_hat_naive
+            Task: _query_reaction, input:
+{'tpr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/2_equilibrium/equilibrium.tpr'),
+ 'trr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/2_equilibrium/equilibrium.trr')}
+            Task: _query_reaction, output:
+{'3_hat_naive.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/3_hat_naive/3_hat_naive.log'),
+ 'ff': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/3_hat_naive/amber99sb-star-ildnp.ff')}
+            
+            Task: _run_md with output directory: /data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/6_relax
+            Task: _run_md, input:
+{'edr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/2_equilibrium/equilibrium.edr'),
+ 'gro': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/2_equilibrium/equilibrium.gro'),
+ 'mdp': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/md_slow_growth.mdp'),
+ 'ndx': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/index.ndx'),
+ 'top': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/5_apply_recipe/Ala_out_mod.top'),
+ 'trr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/2_equilibrium/equilibrium.trr')}
+            Task: _run_md, output:
+{'6_relax.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/6_relax/6_relax.log'),
+ 'cpt': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/6_relax/relax.cpt'),
+ 'dhdl.xvg': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/6_relax/dhdl.xvg'),
+ 'edr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/6_relax/relax.edr'),
+ 'ff': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/6_relax/amber99sb-star-ildnp.ff'),
+ 'gro': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/6_relax/relax.gro'),
+ 'mdout.mdp': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/6_relax/mdout.mdp'),
+ 'relax.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/6_relax/relax.log'),
+ 'tpr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/6_relax/relax.tpr'),
+ 'trr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/6_relax/relax.trr'),
+ 'xtc': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/6_relax/relax.xtc')}
+            
+            Task: _apply_recipe with output directory: /data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/5_apply_recipe
+            Task: _apply_recipe, input:
+{}
+            Task: _apply_recipe, output:
+{'5_apply_recipe.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/5_apply_recipe/5_apply_recipe.log'),
+ 'ff': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/5_apply_recipe/amber99sb-star-ildnp.ff'),
+ 'json': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/5_apply_recipe/radicals.json'),
+ 'top': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/5_apply_recipe/Ala_out.top')}
+            
+            Task: _run_md with output directory: /data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/7_equilibrium
+            Task: _run_md, input:
+{'edr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/6_relax/relax.edr'),
+ 'gro': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/6_relax/relax.gro'),
+ 'mdp': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/md.mdp'),
+ 'ndx': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/index.ndx'),
+ 'top': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/5_apply_recipe/Ala_out.top'),
+ 'trr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/6_relax/relax.trr')}
+            Task: _run_md, output:
+{'7_equilibrium.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/7_equilibrium/7_equilibrium.log'),
+ 'cpt': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/7_equilibrium/equilibrium.cpt'),
+ 'edr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/7_equilibrium/equilibrium.edr'),
+ 'equilibrium.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/7_equilibrium/equilibrium.log'),
+ 'ff': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/7_equilibrium/amber99sb-star-ildnp.ff'),
+ 'gro': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/7_equilibrium/equilibrium.gro'),
+ 'mdout.mdp': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/7_equilibrium/mdout.mdp'),
+ 'tpr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/7_equilibrium/equilibrium.tpr'),
+ 'trr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/7_equilibrium/equilibrium.trr'),
+ 'xtc': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/7_equilibrium/equilibrium.xtc')}
+            
+            Task: _query_reaction with output directory: /data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/8_hat_naive
+            Task: _query_reaction, input:
+{'tpr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/7_equilibrium/equilibrium.tpr'),
+ 'trr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/7_equilibrium/equilibrium.trr')}
+            Task: _query_reaction, output:
+{'8_hat_naive.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/8_hat_naive/8_hat_naive.log'),
+ 'ff': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/8_hat_naive/amber99sb-star-ildnp.ff')}
+            
+            Task: _run_md with output directory: /data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/11_relax
+            Task: _run_md, input:
+{'edr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/7_equilibrium/equilibrium.edr'),
+ 'gro': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/7_equilibrium/equilibrium.gro'),
+ 'mdp': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/md_slow_growth.mdp'),
+ 'ndx': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/index.ndx'),
+ 'top': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/10_apply_recipe/Ala_out_mod.top'),
+ 'trr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/7_equilibrium/equilibrium.trr')}
+            Task: _run_md, output:
+{'11_relax.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/11_relax/11_relax.log'),
+ 'cpt': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/11_relax/relax.cpt'),
+ 'dhdl.xvg': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/11_relax/dhdl.xvg'),
+ 'edr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/11_relax/relax.edr'),
+ 'ff': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/11_relax/amber99sb-star-ildnp.ff'),
+ 'gro': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/11_relax/relax.gro'),
+ 'mdout.mdp': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/11_relax/mdout.mdp'),
+ 'relax.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/11_relax/relax.log'),
+ 'tpr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/11_relax/relax.tpr'),
+ 'trr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/11_relax/relax.trr'),
+ 'xtc': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/11_relax/relax.xtc')}
+            
+            Task: _apply_recipe with output directory: /data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/10_apply_recipe
+            Task: _apply_recipe, input:
+{}
+            Task: _apply_recipe, output:
+{'10_apply_recipe.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/10_apply_recipe/10_apply_recipe.log'),
+ 'ff': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/10_apply_recipe/amber99sb-star-ildnp.ff'),
+ 'json': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/10_apply_recipe/radicals.json'),
+ 'top': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/10_apply_recipe/Ala_out.top')}
+            
+            Task: _run_md with output directory: /data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/12_equilibrium
+            Task: _run_md, input:
+{'edr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/11_relax/relax.edr'),
+ 'gro': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/11_relax/relax.gro'),
+ 'mdp': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/md.mdp'),
+ 'ndx': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/index.ndx'),
+ 'top': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/10_apply_recipe/Ala_out.top'),
+ 'trr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/11_relax/relax.trr')}
+            Task: _run_md, output:
+{'12_equilibrium.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/12_equilibrium/12_equilibrium.log'),
+ 'cpt': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/12_equilibrium/equilibrium.cpt'),
+ 'edr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/12_equilibrium/equilibrium.edr'),
+ 'equilibrium.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/12_equilibrium/equilibrium.log'),
+ 'ff': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/12_equilibrium/amber99sb-star-ildnp.ff'),
+ 'gro': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/12_equilibrium/equilibrium.gro'),
+ 'mdout.mdp': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/12_equilibrium/mdout.mdp'),
+ 'tpr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/12_equilibrium/equilibrium.tpr'),
+ 'trr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/12_equilibrium/equilibrium.trr'),
+ 'xtc': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/12_equilibrium/equilibrium.xtc')}
+            
+            Task: _query_reaction with output directory: /data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/13_hat_naive
+            Task: _query_reaction, input:
+{'tpr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/12_equilibrium/equilibrium.tpr'),
+ 'trr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/12_equilibrium/equilibrium.trr')}
+            Task: _query_reaction, output:
+{'13_hat_naive.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/13_hat_naive/13_hat_naive.log'),
+ 'ff': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/13_hat_naive/amber99sb-star-ildnp.ff')}
+            
+            Task: _run_md with output directory: /data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/16_relax
+            Task: _run_md, input:
+{'edr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/12_equilibrium/equilibrium.edr'),
+ 'gro': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/12_equilibrium/equilibrium.gro'),
+ 'mdp': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/md_slow_growth.mdp'),
+ 'ndx': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/index.ndx'),
+ 'top': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/15_apply_recipe/Ala_out_mod.top'),
+ 'trr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/12_equilibrium/equilibrium.trr')}
+            Task: _run_md, output:
+{'16_relax.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/16_relax/16_relax.log'),
+ 'cpt': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/16_relax/relax.cpt'),
+ 'dhdl.xvg': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/16_relax/dhdl.xvg'),
+ 'edr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/16_relax/relax.edr'),
+ 'ff': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/16_relax/amber99sb-star-ildnp.ff'),
+ 'gro': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/16_relax/relax.gro'),
+ 'mdout.mdp': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/16_relax/mdout.mdp'),
+ 'relax.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/16_relax/relax.log'),
+ 'tpr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/16_relax/relax.tpr'),
+ 'trr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/16_relax/relax.trr'),
+ 'xtc': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/16_relax/relax.xtc')}
+            
+            Task: _apply_recipe with output directory: /data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/15_apply_recipe
+            Task: _apply_recipe, input:
+{}
+            Task: _apply_recipe, output:
+{'15_apply_recipe.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/15_apply_recipe/15_apply_recipe.log'),
+ 'ff': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/15_apply_recipe/amber99sb-star-ildnp.ff'),
+ 'json': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/15_apply_recipe/radicals.json'),
+ 'top': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/15_apply_recipe/Ala_out.top')}
+            
+            Task: _run_md with output directory: /data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/17_equilibrium
+            Task: _run_md, input:
+{'edr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/16_relax/relax.edr'),
+ 'gro': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/16_relax/relax.gro'),
+ 'mdp': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/md.mdp'),
+ 'ndx': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/index.ndx'),
+ 'top': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/15_apply_recipe/Ala_out.top'),
+ 'trr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/16_relax/relax.trr')}
+            Task: _run_md, output:
+{'17_equilibrium.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/17_equilibrium/17_equilibrium.log'),
+ 'cpt': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/17_equilibrium/equilibrium.cpt'),
+ 'edr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/17_equilibrium/equilibrium.edr'),
+ 'equilibrium.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/17_equilibrium/equilibrium.log'),
+ 'ff': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/17_equilibrium/amber99sb-star-ildnp.ff'),
+ 'gro': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/17_equilibrium/equilibrium.gro'),
+ 'mdout.mdp': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/17_equilibrium/mdout.mdp'),
+ 'tpr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/17_equilibrium/equilibrium.tpr'),
+ 'trr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/17_equilibrium/equilibrium.trr'),
+ 'xtc': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/17_equilibrium/equilibrium.xtc')}
+            
+            Task: _query_reaction with output directory: /data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/18_hat_naive
+            Task: _query_reaction, input:
+{'tpr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/17_equilibrium/equilibrium.tpr'),
+ 'trr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/17_equilibrium/equilibrium.trr')}
+            Task: _query_reaction, output:
+{'18_hat_naive.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/18_hat_naive/18_hat_naive.log'),
+ 'ff': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/18_hat_naive/amber99sb-star-ildnp.ff')}
+            
+            Task: _run_md with output directory: /data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/21_relax
+            Task: _run_md, input:
+{'edr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/17_equilibrium/equilibrium.edr'),
+ 'gro': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/17_equilibrium/equilibrium.gro'),
+ 'mdp': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/md_slow_growth.mdp'),
+ 'ndx': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/index.ndx'),
+ 'top': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/20_apply_recipe/Ala_out_mod.top'),
+ 'trr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/17_equilibrium/equilibrium.trr')}
+            Task: _run_md, output:
+{'21_relax.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/21_relax/21_relax.log'),
+ 'cpt': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/21_relax/relax.cpt'),
+ 'dhdl.xvg': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/21_relax/dhdl.xvg'),
+ 'edr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/21_relax/relax.edr'),
+ 'ff': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/21_relax/amber99sb-star-ildnp.ff'),
+ 'gro': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/21_relax/relax.gro'),
+ 'mdout.mdp': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/21_relax/mdout.mdp'),
+ 'relax.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/21_relax/relax.log'),
+ 'tpr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/21_relax/relax.tpr'),
+ 'trr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/21_relax/relax.trr'),
+ 'xtc': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/21_relax/relax.xtc')}
+            
+            Task: _apply_recipe with output directory: /data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/20_apply_recipe
+            Task: _apply_recipe, input:
+{}
+            Task: _apply_recipe, output:
+{'20_apply_recipe.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/20_apply_recipe/20_apply_recipe.log'),
+ 'ff': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/20_apply_recipe/amber99sb-star-ildnp.ff'),
+ 'json': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/20_apply_recipe/radicals.json'),
+ 'top': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/20_apply_recipe/Ala_out.top')}
+            
+            Task: _run_md with output directory: /data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/22_equilibrium
+            Task: _run_md, input:
+{'edr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/21_relax/relax.edr'),
+ 'gro': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/21_relax/relax.gro'),
+ 'mdp': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/md.mdp'),
+ 'ndx': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/index.ndx'),
+ 'top': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/20_apply_recipe/Ala_out.top'),
+ 'trr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/21_relax/relax.trr')}
+            Task: _run_md, output:
+{'22_equilibrium.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/22_equilibrium/22_equilibrium.log'),
+ 'cpt': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/22_equilibrium/equilibrium.cpt'),
+ 'edr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/22_equilibrium/equilibrium.edr'),
+ 'equilibrium.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/22_equilibrium/equilibrium.log'),
+ 'ff': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/22_equilibrium/amber99sb-star-ildnp.ff'),
+ 'gro': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/22_equilibrium/equilibrium.gro'),
+ 'mdout.mdp': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/22_equilibrium/mdout.mdp'),
+ 'tpr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/22_equilibrium/equilibrium.tpr'),
+ 'trr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/22_equilibrium/equilibrium.trr'),
+ 'xtc': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/22_equilibrium/equilibrium.xtc')}
+            
+            Task: _query_reaction with output directory: /data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/23_hat_naive
+            Task: _query_reaction, input:
+{'tpr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/22_equilibrium/equilibrium.tpr'),
+ 'trr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/22_equilibrium/equilibrium.trr')}
+            Task: _query_reaction, output:
+{'23_hat_naive.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/23_hat_naive/23_hat_naive.log'),
+ 'ff': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/23_hat_naive/amber99sb-star-ildnp.ff')}
+            
+            Task: _run_md with output directory: /data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/26_relax
+            Task: _run_md, input:
+{'edr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/22_equilibrium/equilibrium.edr'),
+ 'gro': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/22_equilibrium/equilibrium.gro'),
+ 'mdp': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/md_slow_growth.mdp'),
+ 'ndx': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/index.ndx'),
+ 'top': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/25_apply_recipe/Ala_out_mod.top'),
+ 'trr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/22_equilibrium/equilibrium.trr')}
+            Task: _run_md, output:
+{'26_relax.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/26_relax/26_relax.log'),
+ 'cpt': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/26_relax/relax.cpt'),
+ 'dhdl.xvg': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/26_relax/dhdl.xvg'),
+ 'edr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/26_relax/relax.edr'),
+ 'ff': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/26_relax/amber99sb-star-ildnp.ff'),
+ 'gro': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/26_relax/relax.gro'),
+ 'mdout.mdp': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/26_relax/mdout.mdp'),
+ 'relax.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/26_relax/relax.log'),
+ 'tpr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/26_relax/relax.tpr'),
+ 'trr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/26_relax/relax.trr'),
+ 'xtc': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/26_relax/relax.xtc')}
+            
+            Task: _apply_recipe with output directory: /data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/25_apply_recipe
+            Task: _apply_recipe, input:
+{}
+            Task: _apply_recipe, output:
+{'25_apply_recipe.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/25_apply_recipe/25_apply_recipe.log'),
+ 'ff': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/25_apply_recipe/amber99sb-star-ildnp.ff'),
+ 'json': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/25_apply_recipe/radicals.json'),
+ 'top': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/25_apply_recipe/Ala_out.top')}
+            
+            Task: _run_md with output directory: /data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/27_equilibrium
+            Task: _run_md, input:
+{'edr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/26_relax/relax.edr'),
+ 'gro': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/26_relax/relax.gro'),
+ 'mdp': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/md.mdp'),
+ 'ndx': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/index.ndx'),
+ 'top': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/25_apply_recipe/Ala_out.top'),
+ 'trr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/26_relax/relax.trr')}
+            Task: _run_md, output:
+{'27_equilibrium.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/27_equilibrium/27_equilibrium.log'),
+ 'cpt': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/27_equilibrium/equilibrium.cpt'),
+ 'edr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/27_equilibrium/equilibrium.edr'),
+ 'equilibrium.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/27_equilibrium/equilibrium.log'),
+ 'ff': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/27_equilibrium/amber99sb-star-ildnp.ff'),
+ 'gro': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/27_equilibrium/equilibrium.gro'),
+ 'mdout.mdp': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/27_equilibrium/mdout.mdp'),
+ 'tpr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/27_equilibrium/equilibrium.tpr'),
+ 'trr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/27_equilibrium/equilibrium.trr'),
+ 'xtc': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/27_equilibrium/equilibrium.xtc')}
+            
+            Task: _query_reaction with output directory: /data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/28_hat_naive
+            Task: _query_reaction, input:
+{'tpr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/27_equilibrium/equilibrium.tpr'),
+ 'trr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/27_equilibrium/equilibrium.trr')}
+            Task: _query_reaction, output:
+{'28_hat_naive.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/28_hat_naive/28_hat_naive.log'),
+ 'ff': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/28_hat_naive/amber99sb-star-ildnp.ff')}
+            
+            Task: _run_md with output directory: /data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/31_relax
+            Task: _run_md, input:
+{'edr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/27_equilibrium/equilibrium.edr'),
+ 'gro': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/27_equilibrium/equilibrium.gro'),
+ 'mdp': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/md_slow_growth.mdp'),
+ 'ndx': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/index.ndx'),
+ 'top': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/30_apply_recipe/Ala_out_mod.top'),
+ 'trr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/27_equilibrium/equilibrium.trr')}
+            Task: _run_md, output:
+{'31_relax.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/31_relax/31_relax.log'),
+ 'cpt': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/31_relax/relax.cpt'),
+ 'dhdl.xvg': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/31_relax/dhdl.xvg'),
+ 'edr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/31_relax/relax.edr'),
+ 'ff': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/31_relax/amber99sb-star-ildnp.ff'),
+ 'gro': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/31_relax/relax.gro'),
+ 'mdout.mdp': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/31_relax/mdout.mdp'),
+ 'relax.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/31_relax/relax.log'),
+ 'tpr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/31_relax/relax.tpr'),
+ 'trr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/31_relax/relax.trr'),
+ 'xtc': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/31_relax/relax.xtc')}
+            
+            Task: _apply_recipe with output directory: /data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/30_apply_recipe
+            Task: _apply_recipe, input:
+{}
+            Task: _apply_recipe, output:
+{'30_apply_recipe.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/30_apply_recipe/30_apply_recipe.log'),
+ 'ff': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/30_apply_recipe/amber99sb-star-ildnp.ff'),
+ 'json': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/30_apply_recipe/radicals.json'),
+ 'top': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/30_apply_recipe/Ala_out.top')}
+            
+            Task: _run_md with output directory: /data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/32_equilibrium
+            Task: _run_md, input:
+{'edr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/31_relax/relax.edr'),
+ 'gro': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/31_relax/relax.gro'),
+ 'mdp': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/md.mdp'),
+ 'ndx': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/index.ndx'),
+ 'top': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/30_apply_recipe/Ala_out.top'),
+ 'trr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/31_relax/relax.trr')}
+            Task: _run_md, output:
+{'32_equilibrium.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/32_equilibrium/32_equilibrium.log'),
+ 'cpt': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/32_equilibrium/equilibrium.cpt'),
+ 'edr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/32_equilibrium/equilibrium.edr'),
+ 'equilibrium.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/32_equilibrium/equilibrium.log'),
+ 'ff': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/32_equilibrium/amber99sb-star-ildnp.ff'),
+ 'gro': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/32_equilibrium/equilibrium.gro'),
+ 'mdout.mdp': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/32_equilibrium/mdout.mdp'),
+ 'tpr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/32_equilibrium/equilibrium.tpr'),
+ 'trr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/32_equilibrium/equilibrium.trr'),
+ 'xtc': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/32_equilibrium/equilibrium.xtc')}
+            
+            Task: _query_reaction with output directory: /data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/33_hat_naive
+            Task: _query_reaction, input:
+{'tpr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/32_equilibrium/equilibrium.tpr'),
+ 'trr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/32_equilibrium/equilibrium.trr')}
+            Task: _query_reaction, output:
+{'33_hat_naive.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/33_hat_naive/33_hat_naive.log'),
+ 'ff': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/33_hat_naive/amber99sb-star-ildnp.ff')}
+            
+            Task: _run_md with output directory: /data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/36_relax
+            Task: _run_md, input:
+{'edr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/32_equilibrium/equilibrium.edr'),
+ 'gro': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/32_equilibrium/equilibrium.gro'),
+ 'mdp': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/md_slow_growth.mdp'),
+ 'ndx': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/index.ndx'),
+ 'top': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/35_apply_recipe/Ala_out_mod.top'),
+ 'trr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/32_equilibrium/equilibrium.trr')}
+            Task: _run_md, output:
+{'36_relax.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/36_relax/36_relax.log'),
+ 'cpt': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/36_relax/relax.cpt'),
+ 'dhdl.xvg': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/36_relax/dhdl.xvg'),
+ 'edr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/36_relax/relax.edr'),
+ 'ff': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/36_relax/amber99sb-star-ildnp.ff'),
+ 'gro': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/36_relax/relax.gro'),
+ 'mdout.mdp': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/36_relax/mdout.mdp'),
+ 'relax.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/36_relax/relax.log'),
+ 'tpr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/36_relax/relax.tpr'),
+ 'trr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/36_relax/relax.trr'),
+ 'xtc': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/36_relax/relax.xtc')}
+            
+            Task: _apply_recipe with output directory: /data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/35_apply_recipe
+            Task: _apply_recipe, input:
+{}
+            Task: _apply_recipe, output:
+{'35_apply_recipe.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/35_apply_recipe/35_apply_recipe.log'),
+ 'ff': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/35_apply_recipe/amber99sb-star-ildnp.ff'),
+ 'json': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/35_apply_recipe/radicals.json'),
+ 'top': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/35_apply_recipe/Ala_out.top')}
+            
+            Task: _run_md with output directory: /data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/37_equilibrium
+            Task: _run_md, input:
+{'edr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/36_relax/relax.edr'),
+ 'gro': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/36_relax/relax.gro'),
+ 'mdp': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/md.mdp'),
+ 'ndx': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/index.ndx'),
+ 'top': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/35_apply_recipe/Ala_out.top'),
+ 'trr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/36_relax/relax.trr')}
+            Task: _run_md, output:
+{'37_equilibrium.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/37_equilibrium/37_equilibrium.log'),
+ 'cpt': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/37_equilibrium/equilibrium.cpt'),
+ 'edr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/37_equilibrium/equilibrium.edr'),
+ 'equilibrium.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/37_equilibrium/equilibrium.log'),
+ 'ff': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/37_equilibrium/amber99sb-star-ildnp.ff'),
+ 'gro': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/37_equilibrium/equilibrium.gro'),
+ 'mdout.mdp': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/37_equilibrium/mdout.mdp'),
+ 'tpr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/37_equilibrium/equilibrium.tpr'),
+ 'trr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/37_equilibrium/equilibrium.trr'),
+ 'xtc': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/37_equilibrium/equilibrium.xtc')}
+            
+            Task: _query_reaction with output directory: /data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/38_hat_naive
+            Task: _query_reaction, input:
+{'tpr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/37_equilibrium/equilibrium.tpr'),
+ 'trr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/37_equilibrium/equilibrium.trr')}
+            Task: _query_reaction, output:
+{'38_hat_naive.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/38_hat_naive/38_hat_naive.log'),
+ 'ff': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/38_hat_naive/amber99sb-star-ildnp.ff')}
+            
+            Task: _run_md with output directory: /data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/41_relax
+            Task: _run_md, input:
+{'edr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/37_equilibrium/equilibrium.edr'),
+ 'gro': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/37_equilibrium/equilibrium.gro'),
+ 'mdp': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/md_slow_growth.mdp'),
+ 'ndx': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/index.ndx'),
+ 'top': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/40_apply_recipe/Ala_out_mod.top'),
+ 'trr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/37_equilibrium/equilibrium.trr')}
+            Task: _run_md, output:
+{'41_relax.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/41_relax/41_relax.log'),
+ 'cpt': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/41_relax/relax.cpt'),
+ 'dhdl.xvg': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/41_relax/dhdl.xvg'),
+ 'edr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/41_relax/relax.edr'),
+ 'ff': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/41_relax/amber99sb-star-ildnp.ff'),
+ 'gro': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/41_relax/relax.gro'),
+ 'mdout.mdp': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/41_relax/mdout.mdp'),
+ 'relax.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/41_relax/relax.log'),
+ 'tpr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/41_relax/relax.tpr'),
+ 'trr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/41_relax/relax.trr'),
+ 'xtc': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/41_relax/relax.xtc')}
+            
+            Task: _apply_recipe with output directory: /data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/40_apply_recipe
+            Task: _apply_recipe, input:
+{}
+            Task: _apply_recipe, output:
+{'40_apply_recipe.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/40_apply_recipe/40_apply_recipe.log'),
+ 'ff': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/40_apply_recipe/amber99sb-star-ildnp.ff'),
+ 'json': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/40_apply_recipe/radicals.json'),
+ 'top': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/40_apply_recipe/Ala_out.top')}
+            
+            Task: _run_md with output directory: /data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/42_equilibrium
+            Task: _run_md, input:
+{'edr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/41_relax/relax.edr'),
+ 'gro': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/41_relax/relax.gro'),
+ 'mdp': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/md.mdp'),
+ 'ndx': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/index.ndx'),
+ 'top': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/40_apply_recipe/Ala_out.top'),
+ 'trr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/41_relax/relax.trr')}
+            Task: _run_md, output:
+{'42_equilibrium.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/42_equilibrium/42_equilibrium.log'),
+ 'cpt': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/42_equilibrium/equilibrium.cpt'),
+ 'edr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/42_equilibrium/equilibrium.edr'),
+ 'equilibrium.log': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/42_equilibrium/equilibrium.log'),
+ 'ff': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/42_equilibrium/amber99sb-star-ildnp.ff'),
+ 'gro': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/42_equilibrium/equilibrium.gro'),
+ 'mdout.mdp': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/42_equilibrium/mdout.mdp'),
+ 'tpr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/42_equilibrium/equilibrium.tpr'),
+ 'trr': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/42_equilibrium/equilibrium.trr'),
+ 'xtc': PosixPath('/data/phd/kimmdy/example/alanine_hat_naive/alanine_hat/42_equilibrium/equilibrium.xtc')}
+            

@@ -2,11 +2,11 @@
 
 dryrun: false
 name: alanine_hat
-max_hours: 0.00001
+max_hours: 0.01
 save_recipes: true
 log:
   file: kimmdy.log
-  level: DEBUG
+  level: INFO
 max_tasks: 100
 gromacs_alias: 'gmx'
 gmx_mdrun_flags: -maxh 24 -dlb yes -nt 8

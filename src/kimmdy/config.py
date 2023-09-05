@@ -4,7 +4,6 @@ and package into a parsed format for internal use.
 """
 from __future__ import annotations
 import shutil
-import os
 from pprint import pformat
 from typing import Any, Optional
 import yaml
