@@ -12,11 +12,6 @@ from kimmdy import reaction_plugins
 from kimmdy.schema import Sequence, get_combined_scheme
 from kimmdy.utils import get_gmx_dir
 
-
-OUTPUT_FILES = ['config.log.file']
-"""List of options that refer to file paths that don't need to exist before a run.
-"""
-
 logger = logging.getLogger(__name__)
 
 class longFormatter(logging.Formatter):
@@ -217,7 +212,6 @@ class Config:
 
             # merge command line arguments
             # with config file
-            print(self)
             if logfile is None:
                 self.log.file = self.out / self.log.file
             else:
@@ -228,6 +222,11 @@ class Config:
                 self.log.level = loglevel
 
             configure_logger(self.log.file, self.log.level)
+            # symlink logfile of the latest run to kimmdy.log in cwd
+            log = self.cwd.joinpath("kimmdy.log")
+            if log.exists():
+                log.unlink()
+            log.symlink_to(self.log.file)
 
             for i in infos:
                 logger.info(i)
@@ -343,7 +342,7 @@ class Config:
                 path = attr
                 path = path.resolve()
                 self.__setattr__(name, path)
-                if not path.is_dir() and not f"{section}.{name}" in OUTPUT_FILES:
+                if not path.is_dir():
                     check_file_exists(path)
 
         return (warnings, infos)

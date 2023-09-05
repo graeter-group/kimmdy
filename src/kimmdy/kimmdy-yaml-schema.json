@@ -32,9 +32,9 @@
       "additionalProperties": false,
       "properties": {
         "file": {
-          "description": "Logfile name",
+          "description": "Logfile name (will result in a path relative to `out`)",
           "type": "string",
-          "pytype": "Path",
+          "pytype": "str",
           "default": "kimmdy.log"
         },
         "level": {

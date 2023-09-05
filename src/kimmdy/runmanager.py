@@ -13,7 +13,6 @@ import queue
 from enum import Enum, auto
 from typing import Callable, Union
 from kimmdy.config import Config
-from kimmdy.utils import backup_if_existing
 from kimmdy.parsing import read_top, write_json, read_plumed, write_top
 from kimmdy.recipe import RecipeCollection, Recipe, Break, Bind, Place, Relax
 from kimmdy.plugins import ReactionPlugin, BasicParameterizer
@@ -132,10 +131,8 @@ class RunManager:
         self.latest_files: dict[str, Path] = get_existing_files(config)
         logger.debug("Initialized latest files:")
         logger.debug(pformat(self.latest_files))
-        self.histfile: Path = Path(f"{self.config.out}_history.log")
-        self.cptfile: Path = Path(f"{self.config.out}_kimmdy.cpt")
-        backup_if_existing(self.histfile)
-        backup_if_existing(self.cptfile)
+        self.histfile: Path = self.config.out / "kimmdy.history"
+        self.cptfile: Path = self.config.out / "kimmdy.cpt"
 
         self.top = Topology(read_top(self.config.top, self.config.ff))
         try:

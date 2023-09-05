@@ -44,28 +44,6 @@ def get_shell_stdout(s):
     return process.stdout
 
 
-def backup_if_existing(f: Path) -> None:
-    """Checks whether a file exists and if so, backs it up.
-
-    Mainly used for files from previous KIMMDY runs to
-    prevent overwriting these files.
-
-    Parameters
-    ----------
-    f:
-        Path to a file that will be backed up, if existing.
-    """
-    backup_file_prefix = "#"
-    backup_file_suffix = "#"
-    if f.exists():
-        backup_count = 1
-        backup_file = f"{backup_file_prefix}{f}_{backup_count}{backup_file_suffix}"
-        while Path(backup_file).exists():
-            backup_count += 1
-            backup_file = f"{backup_file_prefix}{f}_{backup_count}{backup_file_suffix}"
-        f.rename(backup_file)
-
-
 ## reaction plugin building blocks
 
 
