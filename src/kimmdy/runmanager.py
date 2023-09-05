@@ -161,7 +161,7 @@ class RunManager:
             "reactions": [
                 {"f": self._place_reaction_tasks},
                 {"f": self._decide_recipe, "kwargs": {"decision_strategy": rf_kmc}},
-                {"f": self._apply_recipe, "out": "run_recipe"},
+                {"f": self._apply_recipe, "out": "apply_recipe"},
             ],
         }
 
