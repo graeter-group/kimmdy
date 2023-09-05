@@ -3,6 +3,9 @@ Read and validate kimmdy.yml configuration files
 and package into a parsed format for internal use.
 """
 from __future__ import annotations
+import shutil
+import os
+from pprint import pformat
 from typing import Any, Optional
 import yaml
 import logging
@@ -35,9 +38,6 @@ def configure_logger(log_path: Path, log_level: str):
         File path to log file
     log_level
         Loglevel. One of ["INFO", "WARNING", "MESSAGE", "DEBUG"]
-    no_increment_logfile
-        If True, do not backup existing log file. This is used for
-        restarting from a checkpoint.
     """
     log_conf = {
         "version": 1,
@@ -222,20 +222,24 @@ class Config:
                 self.log.level = loglevel
 
             configure_logger(self.log.file, self.log.level)
+
             # symlink logfile of the latest run to kimmdy.log in cwd
-            log = self.cwd.joinpath("kimmdy.log")
-            if log.exists():
+            log: Path = self.cwd.joinpath("kimmdy.log")
+            if log.is_symlink():
                 log.unlink()
-            log.symlink_to(self.log.file)
+                
+            log.symlink_to(self.out / self.log.file)
 
             for i in infos:
                 logger.info(i)
             for w in warnings:
                 logger.warning(w)
 
+            logger.info(f"Configuration:\n{self}")
+
             # write a copy of the config file to the output directory
-            with open(self.out / "kimmdy.yml", "w") as f:
-                yaml.dump(recursive_dict, f)
+            assert input_file, "No input file provided"
+            shutil.copy(input_file, self.out)
 
 
     def _validate(self, section: str = "config"):
@@ -320,10 +324,12 @@ class Config:
             # make sure self.out is empty
             while self.out.exists():
                 warnings.append(f"Output dir {self.out} exists, incrementing name")
-                out_end = self.out.name[-3:]
+                name = self.out.name.split("_")
+                out_end = name[-1]
+                out_start = "_".join(name[:-1])
                 if out_end.isdigit():
                     self.out = self.out.with_name(
-                        f"{self.out.name[:-3]}{int(out_end)+1:03}"
+                        f"{out_start}_{int(out_end)+1:03}"
                     )
                 else:
                     self.out = self.out.with_name(self.out.name + "_001")
@@ -358,5 +364,4 @@ class Config:
         return list(self.__dict__.keys())
 
     def __repr__(self):
-        repr = self.__dict__
-        return str(repr)
+        return pformat(self.__dict__, indent=2)

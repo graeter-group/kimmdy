@@ -196,7 +196,7 @@ class RunManager:
                 or self.config.max_hours == 0
             )
         ):
-            logger.info("Write checkpoint before next task")
+            logger.info("Writing checkpoint before next task")
             with open(self.cptfile, "wb") as f:
                 dill.dump(self, f)
             next(self)
@@ -359,7 +359,7 @@ class RunManager:
         gmx_alias = self.config.gromacs_alias
         gmx_mdrun_flags = self.config.gmx_mdrun_flags
 
-        logger.warning(self.latest_files)
+        logger.debug(self.latest_files)
         top = files.input["top"]
         gro = files.input["gro"]
         mdp = md_config.mdp
