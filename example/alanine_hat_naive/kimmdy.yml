@@ -2,6 +2,7 @@
 
 dryrun: false
 name: 'alanine_hat_000'
+save_recipes: true
 max_tasks: 100
 gromacs_alias: 'gmx'
 gmx_mdrun_flags: -maxh 24 -dlb yes -nt 8
