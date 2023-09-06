@@ -234,7 +234,7 @@ class TestTopology:
         assert top.bonds.get(to_break) is None
         top.bind_bond(to_break)
         assert top.bonds.get(to_break) is not None
-        
+
         assert top.bonds == og_top.bonds
         assert top.pairs == og_top.pairs
         assert top.angles == og_top.angles
