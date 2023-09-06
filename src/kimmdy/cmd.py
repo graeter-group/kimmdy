@@ -17,6 +17,7 @@ from kimmdy.assets.templates import jobscript
 from kimmdy.utils import longFormatter
 import importlib.resources as pkg_resources
 import sys
+import os
 from glob import glob
 
 if sys.version_info > (3, 10):
@@ -24,17 +25,16 @@ if sys.version_info > (3, 10):
 else:
     from importlib.metadata import version
 
+logger = logging.getLogger(__name__)
 
-
-def configure_logger(logfile: Path, loglevel: str):
+def configure_logger(config: Config):
     """Configure logging.
 
     Parameters
     ----------
-    log_path
-        File path to log file
-    log_level
-        Loglevel. One of ["INFO", "WARNING", "MESSAGE", "DEBUG"]
+    config
+        configuration that contains
+        log.level and log.file
     """
     log_conf = {
         "version": 1,
@@ -61,7 +61,7 @@ def configure_logger(logfile: Path, loglevel: str):
             "file": {
                 "class": "logging.FileHandler",
                 "formatter": "full_cut",
-                "filename": logfile,
+                "filename": config.log.file,
             },
             "null": {
                 "class": "logging.NullHandler",
@@ -69,7 +69,7 @@ def configure_logger(logfile: Path, loglevel: str):
         },
         "loggers": {
             "kimmdy": {
-                "level": loglevel.upper(),
+                "level": config.log.level.upper(),
                 "handlers": ["cmd", "file"],
             },
         },
@@ -80,6 +80,15 @@ def configure_logger(logfile: Path, loglevel: str):
         },
     }
     logging.config.dictConfig(log_conf)
+
+    # symlink logfile of the latest run to kimmdy.log in cwd
+    log: Path = config.cwd.joinpath("kimmdy.log")
+    if log.is_symlink():
+        log.unlink()
+    if log.exists():
+        os.remove(log)
+
+    log.symlink_to(config.out / config.log.file)
 
 
 def get_cmdline_args() -> argparse.Namespace:
@@ -204,26 +213,23 @@ def _run(args: argparse.Namespace):
             with open(cpt, "rb") as f:
                 runmgr = dill.load(f)
                 runmgr.from_checkpoint = True
-                configure_logger(runmgr.config.log.file, runmgr.config.log.level)
+                configure_logger(runmgr.config)
                 runmgr.run()
             exit()
 
         config = Config(input_file=args.input, logfile=args.logfile, loglevel=args.loglevel)
 
-        configure_logger(config.log.file, config.log.level)
-        logger = logging.getLogger(__file__)
-        logger.info(f"Configuration:\n{config}")
+        configure_logger(config)
+        logger.info("Welcome to KIMMDY")
+
         # write out collected log messages
         # from initial config parsing
         # before the logger was configured
         # (because the logger config depends on the config)
-        for k, v in config.logmessages.items():
-            if k == "infos":
-                logger.info(v)
-            elif k == "warnings":
-                logger.warning(v)
-            elif k == "errors":
-                logger.error(v)
+        for info in config._logmessages['infos']:
+            logger.info(info)
+        for warning in config._logmessages['warnings']:
+            logger.warning(warning)
 
         runmgr = RunManager(config)
 

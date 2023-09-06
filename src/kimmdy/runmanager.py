@@ -18,7 +18,7 @@ from kimmdy.recipe import RecipeCollection, Recipe, Break, Bind, Place, Relax
 from kimmdy.plugins import ReactionPlugin, BasicParameterizer
 from kimmdy.coordinates import place_atom, break_bond_plumed, merge_top_slow_growth
 from kimmdy.tasks import Task, TaskFiles, TaskMapping
-from kimmdy.utils import run_shell_cmd, run_gmx
+from kimmdy.utils import run_gmx
 from pprint import pformat
 from kimmdy import reaction_plugins, parameterization_plugins
 from kimmdy.topology.topology import Topology

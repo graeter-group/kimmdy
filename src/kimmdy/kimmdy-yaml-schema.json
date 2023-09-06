@@ -264,5 +264,5 @@
       "default": false
     }
   },
-  "required": ["name", "sequence", "changer"]
+  "required": ["sequence", "changer"]
 }

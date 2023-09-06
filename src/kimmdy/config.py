@@ -124,8 +124,6 @@ class Config:
                 default = v.get("default")
                 pytype = v.get("pytype")
                 if default is None:
-                    m = f"Option required but no default found for {section}.{k}"
-                    print(m)
                     continue
                 if pytype is None:
                     m = f"No type found for default value of {section}.{k}: {default}"
@@ -150,16 +148,6 @@ class Config:
             else:
                 self.log.level = loglevel
 
-            # symlink logfile of the latest run to kimmdy.log in cwd
-            log: Path = self.cwd.joinpath("kimmdy.log")
-            if log.is_symlink():
-                log.unlink()
-            if log.exists():
-                os.remove(log)
-                
-            log.symlink_to(self.out / self.log.file)
-
-
             # write a copy of the config file to the output directory
             assert input_file, "No input file provided"
             shutil.copy(input_file, self.out)
@@ -168,15 +156,17 @@ class Config:
     def _validate(self, section: str = "config"):
         """Validates config."""
 
+        # TODO: check for required attributes
+
         # globals / interconnected
         if section == "config":
-            self.logmessages = {"infos": [], "warnings": [], "errors": []}
+            self._logmessages = {"infos": [], "warnings": [], "errors": []}
 
             ffdir = self.ff
             if ffdir == Path("*.ff"):
                 ffs = list(self.cwd.glob("*.ff"))
                 if len(ffs) > 1:
-                    self.logmessages["warnings"].append(
+                    self._logmessages["warnings"].append(
                         f"Found {len(ffs)} forcefields in cwd, using first one: {ffs[0]}"
                     )
                 assert ffs[0].is_dir(), "Forcefield should be a directory!"
@@ -184,14 +174,14 @@ class Config:
             elif not ffdir.exists():
                 gmxdir = get_gmx_dir(self.gromacs_alias)
                 if gmxdir is None:
-                    self.logmessages["warnings"].append(
+                    self._logmessages["warnings"].append(
                         f"Could not find gromacs data directory for {self.gromacs_alias}"
                     )
                     gmxdir = self.cwd
                 gmx_builtin_ffs = gmxdir / "top"
                 ffdir = gmx_builtin_ffs / ffdir
                 if not ffdir.exists():
-                    self.logmessages["warnings"].append(
+                    self._logmessages["warnings"].append(
                         f"Could not find forcefield {ffdir} in cwd or gromacs data directory"
                     )
             self.ff = ffdir
@@ -245,7 +235,7 @@ class Config:
 
             # make sure self.out is empty
             while self.out.exists():
-                self.logmessages["warnings"].append(f"Output dir {self.out} exists, incrementing name")
+                self._logmessages["warnings"].append(f"Output dir {self.out} exists, incrementing name")
                 name = self.out.name.split("_")
                 out_end = name[-1]
                 out_start = "_".join(name[:-1])
@@ -257,7 +247,7 @@ class Config:
                     self.out = self.out.with_name(self.out.name + "_001")
 
             self.out.mkdir()
-            self.logmessages["infos"].append(f"Created output dir {self.out}")
+            self._logmessages["infos"].append(f"Created output dir {self.out}")
 
         # individual attributes, recursively
         for name, attr in self.__dict__.items():
@@ -287,3 +277,4 @@ class Config:
 
     def __repr__(self):
         return pformat(self.__dict__, indent=2)
+
