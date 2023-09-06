@@ -317,6 +317,9 @@ class Recipe:
                 if (ix := getattr(rs, "atom_ix_2", None)) is not None:
                     name += str(ix)
 
+            elif isinstance(rs, Relax):
+                pass
+
             else:
                 logger.warning(f"get_recipe_name got unknown step type: {type(rs)}")
                 name += "?".join(list(map(str, rs.__dict__.values())))
