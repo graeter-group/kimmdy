@@ -8,7 +8,7 @@ from pathlib import Path
 import shutil
 from typing import Callable, Optional, TYPE_CHECKING, Union
 import logging
-from kimmdy.config import longFormatter
+from kimmdy.utils import longFormatter
 
 logger = logging.getLogger(__name__)
 

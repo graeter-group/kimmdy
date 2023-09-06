@@ -3,6 +3,7 @@ Read and validate kimmdy.yml configuration files
 and package into a parsed format for internal use.
 """
 from __future__ import annotations
+import os
 import shutil
 from pprint import pformat
 from typing import Any, Optional
@@ -14,80 +15,9 @@ from kimmdy import reaction_plugins
 from kimmdy.schema import Sequence, get_combined_scheme
 from kimmdy.utils import get_gmx_dir
 
-logger = logging.getLogger(__name__)
-
-class longFormatter(logging.Formatter):
-    def format(self, record):
-        saved_name = record.name  # save and restore for other formatters if desired
-        parts = saved_name.split(".")
-        if len(parts) > 1:
-            record.name = parts[0][0] + "." + ".".join(p[:10] for p in parts[1:])
-        else:
-            record.name = parts[0]
-        result = super().format(record)
-        record.name = saved_name
-        return result
-
-def configure_logger(log_path: Path, log_level: str):
-    """Configure logging.
-
-    Parameters
-    ----------
-    log_path
-        File path to log file
-    log_level
-        Loglevel. One of ["INFO", "WARNING", "MESSAGE", "DEBUG"]
-    """
-    log_conf = {
-        "version": 1,
-        "formatters": {
-            "short": {
-                "format": "%(name)-15s %(levelname)s: %(message)s",
-                "datefmt": "%H:%M",
-            },
-            "full": {
-                "format": "%(asctime)s %(name)-17s %(levelname)s: %(message)s",
-                "datefmt": "%d-%m-%y %H:%M",
-            },
-            "full_cut": {
-                "()": longFormatter,
-                "format": "%(asctime)s %(name)-12s %(levelname)s: %(message)s",
-                "datefmt": "%d-%m-%y %H:%M",
-            },
-        },
-        "handlers": {
-            "cmd": {
-                "class": "logging.StreamHandler",
-                "formatter": "short",
-            },
-            "file": {
-                "class": "logging.FileHandler",
-                "formatter": "full_cut",
-                "filename": log_path,
-            },
-            "null": {
-                "class": "logging.NullHandler",
-            },
-        },
-        "loggers": {
-            "kimmdy": {
-                "level": log_level.upper(),
-                "handlers": ["cmd", "file"],
-            },
-        },
-        # Mute others, e.g. tensorflow, matplotlib
-        "root": {
-            "level": "CRITICAL",
-            "handlers": ["null"],
-        },
-    }
-    logging.config.dictConfig(log_conf)
-
-
 def check_file_exists(p: Path):
     if not p.exists():
         m = f"File not found: {p}"
-        logger.error(m)
         raise LookupError(m)
 
 class Config:
@@ -207,7 +137,7 @@ class Config:
         # validate on initial construction
         if section == "config":
 
-            warnings, infos = self._validate()
+            self._validate()
 
             # merge command line arguments
             # with config file
@@ -220,21 +150,15 @@ class Config:
             else:
                 self.log.level = loglevel
 
-            configure_logger(self.log.file, self.log.level)
-
             # symlink logfile of the latest run to kimmdy.log in cwd
             log: Path = self.cwd.joinpath("kimmdy.log")
             if log.is_symlink():
                 log.unlink()
+            if log.exists():
+                os.remove(log)
                 
             log.symlink_to(self.out / self.log.file)
 
-            for i in infos:
-                logger.info(i)
-            for w in warnings:
-                logger.warning(w)
-
-            logger.info(f"Configuration:\n{self}")
 
             # write a copy of the config file to the output directory
             assert input_file, "No input file provided"
@@ -243,17 +167,16 @@ class Config:
 
     def _validate(self, section: str = "config"):
         """Validates config."""
-        warnings = []
-        infos = []
 
         # globals / interconnected
         if section == "config":
-            # forcfield
+            self.logmessages = {"infos": [], "warnings": [], "errors": []}
+
             ffdir = self.ff
             if ffdir == Path("*.ff"):
                 ffs = list(self.cwd.glob("*.ff"))
                 if len(ffs) > 1:
-                    warnings.append(
+                    self.logmessages["warnings"].append(
                         f"Found {len(ffs)} forcefields in cwd, using first one: {ffs[0]}"
                     )
                 assert ffs[0].is_dir(), "Forcefield should be a directory!"
@@ -261,14 +184,14 @@ class Config:
             elif not ffdir.exists():
                 gmxdir = get_gmx_dir(self.gromacs_alias)
                 if gmxdir is None:
-                    warnings.append(
+                    self.logmessages["warnings"].append(
                         f"Could not find gromacs data directory for {self.gromacs_alias}"
                     )
                     gmxdir = self.cwd
                 gmx_builtin_ffs = gmxdir / "top"
                 ffdir = gmx_builtin_ffs / ffdir
                 if not ffdir.exists():
-                    warnings.append(
+                    self.logmessages["warnings"].append(
                         f"Could not find forcefield {ffdir} in cwd or gromacs data directory"
                     )
             self.ff = ffdir
@@ -322,7 +245,7 @@ class Config:
 
             # make sure self.out is empty
             while self.out.exists():
-                warnings.append(f"Output dir {self.out} exists, incrementing name")
+                self.logmessages["warnings"].append(f"Output dir {self.out} exists, incrementing name")
                 name = self.out.name.split("_")
                 out_end = name[-1]
                 out_start = "_".join(name[:-1])
@@ -334,7 +257,7 @@ class Config:
                     self.out = self.out.with_name(self.out.name + "_001")
 
             self.out.mkdir()
-            infos.append(f"Created output dir {self.out}")
+            self.logmessages["infos"].append(f"Created output dir {self.out}")
 
         # individual attributes, recursively
         for name, attr in self.__dict__.items():
@@ -350,7 +273,7 @@ class Config:
                 if not path.is_dir():
                     check_file_exists(path)
 
-        return (warnings, infos)
+        return
 
     def attr(self, attribute):
         """Get the value of a specific attribute.

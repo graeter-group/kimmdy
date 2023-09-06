@@ -9,9 +9,12 @@ import textwrap
 from typing import Optional
 import dill
 import logging
+import logging.config
 from kimmdy.config import Config
 from kimmdy.runmanager import RunManager
 from kimmdy.utils import check_gmx_version
+from kimmdy.assets.templates import jobscript
+from kimmdy.utils import longFormatter
 import importlib.resources as pkg_resources
 import sys
 from glob import glob
@@ -20,6 +23,63 @@ if sys.version_info > (3, 10):
     from importlib_metadata import version
 else:
     from importlib.metadata import version
+
+
+
+def configure_logger(logfile: Path, loglevel: str):
+    """Configure logging.
+
+    Parameters
+    ----------
+    log_path
+        File path to log file
+    log_level
+        Loglevel. One of ["INFO", "WARNING", "MESSAGE", "DEBUG"]
+    """
+    log_conf = {
+        "version": 1,
+        "formatters": {
+            "short": {
+                "format": "%(name)-15s %(levelname)s: %(message)s",
+                "datefmt": "%H:%M",
+            },
+            "full": {
+                "format": "%(asctime)s %(name)-17s %(levelname)s: %(message)s",
+                "datefmt": "%d-%m-%y %H:%M",
+            },
+            "full_cut": {
+                "()": longFormatter,
+                "format": "%(asctime)s %(name)-12s %(levelname)s: %(message)s",
+                "datefmt": "%d-%m-%y %H:%M",
+            },
+        },
+        "handlers": {
+            "cmd": {
+                "class": "logging.StreamHandler",
+                "formatter": "short",
+            },
+            "file": {
+                "class": "logging.FileHandler",
+                "formatter": "full_cut",
+                "filename": logfile,
+            },
+            "null": {
+                "class": "logging.NullHandler",
+            },
+        },
+        "loggers": {
+            "kimmdy": {
+                "level": loglevel.upper(),
+                "handlers": ["cmd", "file"],
+            },
+        },
+        # Mute others, e.g. tensorflow, matplotlib
+        "root": {
+            "level": "CRITICAL",
+            "handlers": ["null"],
+        },
+    }
+    logging.config.dictConfig(log_conf)
 
 
 def get_cmdline_args() -> argparse.Namespace:
@@ -125,7 +185,6 @@ def _run(args: argparse.Namespace):
     if args.show_schema_path:
         path = pkg_resources.files("kimmdy") / "kimmdy-yaml-schema.json"
         print(f"{path}")
-
         exit()
 
     if not Path(args.input).exists() and not args.checkpoint:
@@ -133,75 +192,53 @@ def _run(args: argparse.Namespace):
             f"Input file {args.input} does not exist. Specify its name with --input and make sure that you are in the right directory."
         )
 
-    if args.generate_jobscript:
-        config = Config(input_file=args.input, logfile=args.logfile, loglevel=args.loglevel)
-        runmgr = RunManager(config)
-        runmgr.write_one_checkoint()
-
-        content = f"""
-        #!/bin/env bash
-        #SBATCH --job-name={config.out.name}
-        #SBATCH --output=kimmdy-job.log
-        #SBATCH --error=kimmdy-job.log
-        #SBATCH --time=24:00:00
-        #SBATCH -N 1
-        #SBATCH --ntasks-per-node=40
-        #SBATCH --mincpus=40
-        #SBATCH --exclusive
-        #SBATCH --cpus-per-task=1
-        #SBATCH --gpus 1
-        #SBATCH --mail-type=ALL
-        # #SBATCH -p <your-partition>.p
-        # #SBATCH --mail-user=<your-email
-
-
-        # Setup up your environment here
-        # modules.sh might load lmod modules, set environment variables, etc.
-        # source ./_modules.sh
-
-        CYCLE=24
-
-        START=$(date +"%s")
-
-        kimmdy -p {config.out}/kimmdy.cpt
-
-        END=$(date +"%s")
-
-        LEN=$((END-START))
-        HOURS=$((LEN/3600))
-
-        echo "$LEN seconds ran"
-        echo "$HOURS full hours ran"
-
-        let "CYCLE--"
-        if [ $HOURS -lt $CYCLE ]; then
-          echo "last cycle was just $HOURS h long, KIMMDY is done."
-          exit 3
-        else
-          echo "cycle resubmitting"
-          # sbatch ./jobscript.sh
-          ./jobscript.sh
-          exit 2
-        fi
-        """
-        path = "jobscript.sh"
-        with open(path, "w") as f:
-            f.write(textwrap.dedent(content))
-
-        chmod(path, 0o755)
-
-        exit()
-
     try:
         if args.checkpoint:
-            with open(args.checkpoint, "rb") as f:
+            cpt = Path(args.checkpoint)
+            if cpt.is_dir():
+                cpt = cpt / "kimmdy.cpt"
+            if not cpt.exists():
+                raise FileNotFoundError(
+                    f"Checkpoint file {cpt} does not exist. Specify its path or directory with --checkpoint and make sure that you are in the right directory."
+                )
+            with open(cpt, "rb") as f:
                 runmgr = dill.load(f)
                 runmgr.from_checkpoint = True
-        else:
-            config = Config(input_file=args.input, logfile=args.logfile, loglevel=args.loglevel)
-            runmgr = RunManager(config)
+                configure_logger(runmgr.config.log.file, runmgr.config.log.level)
+                runmgr.run()
+            exit()
 
-        runmgr.run()
+        config = Config(input_file=args.input, logfile=args.logfile, loglevel=args.loglevel)
+
+        configure_logger(config.log.file, config.log.level)
+        logger = logging.getLogger(__file__)
+        logger.info(f"Configuration:\n{config}")
+        # write out collected log messages
+        # from initial config parsing
+        # before the logger was configured
+        # (because the logger config depends on the config)
+        for k, v in config.logmessages.items():
+            if k == "infos":
+                logger.info(v)
+            elif k == "warnings":
+                logger.warning(v)
+            elif k == "errors":
+                logger.error(v)
+
+        runmgr = RunManager(config)
+
+        if args.generate_jobscript:
+            runmgr.write_one_checkoint()
+            content = jobscript.format(config=config)
+            path = "jobscript.sh"
+
+            with open(path, "w") as f:
+                f.write(textwrap.dedent(content))
+
+            chmod(path, 0o755)
+        else:
+            runmgr.run()
+
     except Exception as e:
         if args.debug:
             import pdb

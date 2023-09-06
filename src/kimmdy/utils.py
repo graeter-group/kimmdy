@@ -19,6 +19,19 @@ One of (id: str), (moleculetype: str, id: str) or (moleculetype_ix: int, id).
 """
 
 
+class longFormatter(logging.Formatter):
+    def format(self, record):
+        saved_name = record.name  # save and restore for other formatters if desired
+        parts = saved_name.split(".")
+        if len(parts) > 1:
+            record.name = parts[0][0] + "." + ".".join(p[:10] for p in parts[1:])
+        else:
+            record.name = parts[0]
+        result = super().format(record)
+        record.name = saved_name
+        return result
+
+
 ## input/output utility functions
 
 
