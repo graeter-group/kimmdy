@@ -19,7 +19,7 @@ jobscript = """
 # modules.sh might load lmod modules, set environment variables, etc.
 # source ./_modules.sh
 
-CYCLE=24
+CYCLE={config.max_hours}
 
 START=$(date +"%s")
 
@@ -33,12 +33,11 @@ HOURS=$((LEN/3600))
 echo "$LEN seconds ran"
 echo "$HOURS full hours ran"
 
-let "CYCLE--"
 if [ $HOURS -lt $CYCLE ]; then
   echo "last cycle was just $HOURS h long, KIMMDY is done."
   exit 3
 else
-  echo "cycle resubmitting"
+  echo "jobscript resubmitting"
   # sbatch ./jobscript.sh
   ./jobscript.sh
   exit 2

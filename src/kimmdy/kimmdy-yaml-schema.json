@@ -44,8 +44,7 @@
           "default": "INFO",
           "enum": ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
         }
-      },
-      "required": ["file", "level"]
+      }
     },
     "max_tasks": {
       "description": "Maximum number of tasks to run. This is useful when a task in the sequence can dymanically add more tasks. 0 means no limit.",
@@ -55,8 +54,8 @@
     },
     "max_hours": {
       "description": "Stop KIMMDY after max_hours hours. Set this lower than the limit of your HPC cluster for use with a re-submit jobscript. 0 Means no limit.",
-      "type": "number",
-      "pytype": "float",
+      "type": "integer",
+      "pytype": "int",
       "default": 0
     },
     "run": {

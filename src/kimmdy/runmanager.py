@@ -203,7 +203,7 @@ class RunManager:
             logger.info("Done with:")
             logger.info(f"task: {self.iteration}, max: {self.config.max_tasks}")
             logger.info(
-                f"hours: {(self.current_time - self.start_time) / 360}, max: {self.config.max_hours}"
+                f"hours: {(self.current_time - self.start_time) / 3600}, max: {self.config.max_hours}"
             )
 
         logger.info(f"Finished running tasks, state: {self.state}")
