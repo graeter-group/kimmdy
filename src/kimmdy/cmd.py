@@ -25,6 +25,7 @@ else:
 
 logger = logging.getLogger(__name__)
 
+
 def configure_logger(config: Config):
     """Configure logging.
 
@@ -114,11 +115,12 @@ def get_cmdline_args() -> argparse.Namespace:
         help="logging level (CRITICAL, ERROR, WARNING, INFO, DEBUG)",
         default=None,
     )
+    parser.add_argument("--logfile", "-f", type=Path, help="logfile", default=None)
     parser.add_argument(
-        "--logfile", "-f", type=Path, help="logfile", default=None
-    )
-    parser.add_argument(
-        "--checkpoint", "-c", type=str, help="File path of a kimmdy.cpt file to restart KIMMDY from a checkpoint. If a directory is given, the file kimmdy.cpt in that directory is used."
+        "--checkpoint",
+        "-c",
+        type=str,
+        help="File path of a kimmdy.cpt file to restart KIMMDY from a checkpoint. If a directory is given, the file kimmdy.cpt in that directory is used.",
     )
 
     # on error, drop into debugger
@@ -208,7 +210,9 @@ def _run(args: argparse.Namespace):
                 runmgr.run()
             exit()
 
-        config = Config(input_file=args.input, logfile=args.logfile, loglevel=args.loglevel)
+        config = Config(
+            input_file=args.input, logfile=args.logfile, loglevel=args.loglevel
+        )
 
         configure_logger(config)
         logger.info("Welcome to KIMMDY")
@@ -217,9 +221,9 @@ def _run(args: argparse.Namespace):
         # from initial config parsing
         # before the logger was configured
         # (because the logger config depends on the config)
-        for info in config._logmessages['infos']:
+        for info in config._logmessages["infos"]:
             logger.info(info)
-        for warning in config._logmessages['warnings']:
+        for warning in config._logmessages["warnings"]:
             logger.warning(warning)
 
         runmgr = RunManager(config)
@@ -245,7 +249,6 @@ def _run(args: argparse.Namespace):
             raise e
     finally:
         logging.shutdown()
-
 
 
 def kimmdy_run(

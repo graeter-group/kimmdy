@@ -175,7 +175,6 @@ class RunManager:
             reaction_plugin: ReactionPlugin = r(rp_name, self)
             self.reaction_plugins.append(reaction_plugin)
 
-
     def run(self):
         logger.info("Start run")
         self.start_time = time.time()

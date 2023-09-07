@@ -84,7 +84,9 @@ def create_task_directory(runmng, postfix: str) -> TaskFiles:
     files.outputdir = runmng.config.out / taskname
     logger.debug(f"Creating Output directory: {files.outputdir}")
     if files.outputdir.exists():
-        logger.warning(f"Output directory {files.outputdir} for the task already exists. Deleting.")
+        logger.warning(
+            f"Output directory {files.outputdir} for the task already exists. Deleting."
+        )
         shutil.rmtree(files.outputdir)
     files.outputdir.mkdir()
 

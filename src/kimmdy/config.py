@@ -15,10 +15,12 @@ from kimmdy import reaction_plugins
 from kimmdy.schema import Sequence, get_combined_scheme
 from kimmdy.utils import get_gmx_dir
 
+
 def check_file_exists(p: Path):
     if not p.exists():
         m = f"File not found: {p}"
         raise LookupError(m)
+
 
 class Config:
     """Internal representation of the configuration generated
@@ -134,7 +136,6 @@ class Config:
 
         # validate on initial construction
         if section == "config":
-
             self._validate()
 
             # merge command line arguments
@@ -151,7 +152,6 @@ class Config:
             # write a copy of the config file to the output directory
             assert input_file, "No input file provided"
             shutil.copy(input_file, self.out)
-
 
     def _validate(self, section: str = "config"):
         """Validates config."""
@@ -235,14 +235,14 @@ class Config:
 
             # make sure self.out is empty
             while self.out.exists():
-                self._logmessages["warnings"].append(f"Output dir {self.out} exists, incrementing name")
+                self._logmessages["warnings"].append(
+                    f"Output dir {self.out} exists, incrementing name"
+                )
                 name = self.out.name.split("_")
                 out_end = name[-1]
                 out_start = "_".join(name[:-1])
                 if out_end.isdigit():
-                    self.out = self.out.with_name(
-                        f"{out_start}_{int(out_end)+1:03}"
-                    )
+                    self.out = self.out.with_name(f"{out_start}_{int(out_end)+1:03}")
                 else:
                     self.out = self.out.with_name(self.out.name + "_001")
 
@@ -277,4 +277,3 @@ class Config:
 
     def __repr__(self):
         return pformat(self.__dict__, indent=2)
-
