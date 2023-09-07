@@ -21,17 +21,15 @@ from kimmdy.topology.atomic import (
     InteractionType,
     InteractionTypes,
 )
-from kimmdy.topology.utils import (
-    match_atomic_item_to_atomic_type,
-    get_protein_section,
-    set_protein_section,
-)
+from kimmdy.topology.utils import match_atomic_item_to_atomic_type
 
 logger = logging.getLogger(__name__)
 
 
-## coordinates
-def place_atom(files: TaskFiles, step: Place, timespan: list[tuple[float, float]]):
+# coordinates
+def place_atom(
+    files: TaskFiles, step: Place, timespan: list[tuple[float, float]]
+) -> TaskFiles:
     """Place an atom to new coords at the last time point of the recipe timespans"""
     logger = files.logger
     logger.info("Starting place_atom task")
@@ -74,14 +72,15 @@ def place_atom(files: TaskFiles, step: Place, timespan: list[tuple[float, float]
         "Exit place_atom, final coordinates written to "
         f"{'/'.join(trr_out.parts[-2:])}"
     )
+    return files
 
 
-## topology
+# topology
 
 
 def is_parameterized(entry: Interaction):
     """Parameterized topology entries have c0 and c1 attributes != None"""
-    return entry.c0 != None and entry.c1 != None
+    return entry.c0 is not None and entry.c1 is not None
 
 
 def get_explicit_MultipleDihedrals(
@@ -97,7 +96,7 @@ def get_explicit_MultipleDihedrals(
     if not dihedrals_in:
         return None
 
-    if not "" in dihedrals_in.dihedrals.keys():
+    if "" not in dihedrals_in.dihedrals.keys():
         # empty string means implicit parameters
         return dihedrals_in
 
@@ -244,7 +243,7 @@ def merge_top_moleculetypes_slow_growth(
     # TODO:
     # think about how to bring focus_nr into this
 
-    ## atoms
+    # atoms
     for nr in molA.atoms.keys():
         atomA = molA.atoms[nr]
         atomB = molB.atoms[nr]
@@ -261,7 +260,7 @@ def merge_top_moleculetypes_slow_growth(
                     f"Atom {nr} with A:{atomA} and B:{atomB} changed but not the charges!"
                 )
 
-    ## bonds
+    # bonds
     keysA = set(molA.bonds.keys())
     keysB = set(molB.bonds.keys())
     keys = keysA | keysB
@@ -311,7 +310,7 @@ def merge_top_moleculetypes_slow_growth(
                     c5=hyperparameters["morse_steepness"],
                 )
 
-    ## pairs and exclusions
+    # pairs and exclusions
     exclusions_content = molB.atomics.get("exclusions", [])
     # maybe hook this up to empty_sections if it gets accessible
     for key in keysA - keysB:
@@ -320,7 +319,7 @@ def merge_top_moleculetypes_slow_growth(
 
     molB.atomics["exclusions"] = exclusions_content
 
-    ## angles
+    # angles
     keys = set(molA.angles.keys()) | set(molB.angles.keys())
     for key in keys:
         interactionA = molA.angles.get(key)
@@ -363,8 +362,8 @@ def merge_top_moleculetypes_slow_growth(
             else:
                 logger.warning(f"Could not parameterize angle {key}.")
 
-    ## dihedrals
-    ## proper dihedrals
+    # dihedrals
+    # proper dihedrals
     # proper dihedrals have a nested structure and need a different treatment from bonds, angles and improper dihedrals
     # if indices change atomtypes and parameters change because of that, it will ignore these parameter change
 
@@ -418,7 +417,7 @@ def merge_top_moleculetypes_slow_growth(
                     periodicity,
                 )
 
-    ## improper dihedrals
+    # improper dihedrals
     # all impropers in amber99SB ffbonded.itp have a periodicity of 2
     # but not the ones defined in aminoacids.rtp. For now, I am assuming
     # a periodicity of 2 in this section
@@ -441,7 +440,7 @@ def merge_top_moleculetypes_slow_growth(
                 "2",
             )
 
-    ## update is_radical attribute of Atom objects in topology
+    # update is_radical attribute of Atom objects in topology
     molB._test_for_radicals()
 
     return molB
@@ -464,7 +463,7 @@ def merge_top_slow_growth(
     return topB
 
 
-## plumed
+# plumed
 
 
 def break_bond_plumed(
@@ -503,7 +502,7 @@ def break_bond_plumed(
     plumed_dict["labeled_action"] = new_distances
 
     for line in plumed_dict["prints"]:
-        line["ARG"] = [id for id in line["ARG"] if not id in broken_distances]
+        line["ARG"] = [id for id in line["ARG"] if id not in broken_distances]
         line["FILE"] = files.input["plumed_out"]
 
     write_plumed(plumed_dict, newplumed)
