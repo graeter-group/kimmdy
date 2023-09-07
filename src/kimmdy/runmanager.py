@@ -501,7 +501,15 @@ class RunManager:
             elif isinstance(step, Bind):
                 self.top.bind_bond((step.atom_id_1, step.atom_id_2))
             elif isinstance(step, Place):
-                place_atom(files, step, self.recipe.timespans)
+                task = Task(
+                    self,
+                    f=place_atom,
+                    kwargs={"step": step, "timespan": self.recipe.timespans},
+                    out="place_atom",
+                )
+                place_files = task()
+                self._discover_output_files(task.name, place_files)
+
             elif isinstance(step, Relax):
                 logger.info("Starting relaxation md as part of reaction..")
                 if not hasattr(self.config.changer.coordinates, "md"):
