@@ -52,7 +52,7 @@ def place_atom(files: TaskFiles, step: Place, timespan: list[tuple[float, float]
         if abs(ts.time - ttime) > 1e-5:  # 0.01 fs
             continue
         atm_move = u.select_atoms(f"index {step.ix_to_place}")
-        atm_move[0].position = step.new_coords[0]
+        atm_move[0].position = step.new_coords
 
         break
     else:
