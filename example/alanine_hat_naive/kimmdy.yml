@@ -33,7 +33,7 @@ reactions:
 
 sequence:
   - equilibrium
-  - mult: 10
+  - mult: 5
     tasks:
     - equilibrium
     - reactions

@@ -207,6 +207,7 @@ class RunManager:
             )
 
         logger.info(f"Finished running tasks, state: {self.state}")
+        logger.info(f"KIMMDY is done.")
 
     def _setup_tasks(self):
         """Populates the tasks queue.

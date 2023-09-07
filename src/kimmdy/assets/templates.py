@@ -23,7 +23,7 @@ CYCLE={config.max_hours}
 
 START=$(date +"%s")
 
-kimmdy -p {config.out}/kimmdy.cpt
+kimmdy --checkpoint {config.out}/kimmdy.cpt
 
 END=$(date +"%s")
 
@@ -38,8 +38,7 @@ if [ $HOURS -lt $CYCLE ]; then
   exit 3
 else
   echo "jobscript resubmitting"
-  # sbatch ./jobscript.sh
-  ./jobscript.sh
+  sbatch ./jobscript.sh
   exit 2
 fi
 """

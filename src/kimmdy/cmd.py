@@ -12,13 +12,11 @@ import logging
 import logging.config
 from kimmdy.config import Config
 from kimmdy.runmanager import RunManager
-from kimmdy.utils import check_gmx_version
 from kimmdy.assets.templates import jobscript
 from kimmdy.utils import longFormatter
 import importlib.resources as pkg_resources
 import sys
 import os
-from glob import glob
 
 if sys.version_info > (3, 10):
     from importlib_metadata import version
@@ -96,7 +94,6 @@ def get_cmdline_args() -> argparse.Namespace:
 
     Returns
     -------
-    :
         Parsed command line arguments
     """
     parser = argparse.ArgumentParser(
@@ -121,13 +118,7 @@ def get_cmdline_args() -> argparse.Namespace:
         "--logfile", "-f", type=Path, help="logfile", default=None
     )
     parser.add_argument(
-        "--checkpoint", "-p", type=str, help="start KIMMDY from a checkpoint file"
-    )
-    parser.add_argument(
-        "--from-latest-checkpoint",
-        "-c",
-        action="store_true",
-        help="continue. Start KIMMDY from the latest checkpoint file",
+        "--checkpoint", "-c", type=str, help="File path of a kimmdy.cpt file to restart KIMMDY from a checkpoint. If a directory is given, the file kimmdy.cpt in that directory is used."
     )
 
     # on error, drop into debugger
@@ -262,7 +253,6 @@ def kimmdy_run(
     loglevel: Optional[str] = None,
     logfile: Optional[Path] = None,
     checkpoint: str = "",
-    from_latest_checkpoint: bool = False,
     show_plugins: bool = False,
     show_schema_path: bool = False,
     generate_jobscript: bool = False,
@@ -281,9 +271,7 @@ def kimmdy_run(
     logfile
         File path of the logfile.
     checkpoint
-        File path if a kimmdy.cpt file to restart KIMMDY from a checkpoint.
-    from_latest_checkpoint
-        Start KIMMDY from the latest checkpoint.
+        File path of a kimmdy.cpt file to restart KIMMDY from a checkpoint. If a directory is given, the file kimmdy.cpt in that directory is used.
     show_plugins
         Show available plugins and exit.
     show_schema_path
@@ -296,7 +284,6 @@ def kimmdy_run(
         loglevel=loglevel,
         logfile=logfile,
         checkpoint=checkpoint,
-        from_latest_checkpoint=from_latest_checkpoint,
         show_plugins=show_plugins,
         show_schema_path=show_schema_path,
         generate_jobscript=generate_jobscript,
