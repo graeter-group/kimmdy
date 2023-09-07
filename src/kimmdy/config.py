@@ -3,13 +3,10 @@ Read and validate kimmdy.yml configuration files
 and package into a parsed format for internal use.
 """
 from __future__ import annotations
-import os
 import shutil
 from pprint import pformat
 from typing import Any, Optional
 import yaml
-import logging
-import logging.config
 from pathlib import Path
 from kimmdy import reaction_plugins
 from kimmdy.schema import Sequence, get_combined_scheme
@@ -77,6 +74,8 @@ class Config:
 
         assert recursive_dict is not None
         assert scheme is not None
+        # go over parsed yaml file recursively
+        # this is what is on the config
         for k, v in recursive_dict.items():
             if isinstance(v, dict):
                 # recursive case
@@ -115,21 +114,24 @@ class Config:
                 v = pytype(v)
                 self.__setattr__(k, v)
 
-        # set defaults for attributes
+        # this is what is in the schema
+        # and may not be in the config already
+        # so we need to set defaults
         for k, v in scheme.items():
-            if "pytype" not in v:
-                # recursive case, skip.
-                # handled at base case
-                continue
+            if type(v) is not dict:
+                raise ValueError(f"Unexpected type {type(v)} in scheme. {k}: {v}")
             if not hasattr(self, k):
                 # get default if not set in yaml
                 default = v.get("default")
                 pytype = v.get("pytype")
+                if pytype is None:
+                    # this is a nested config
+                    # it may contain subsections
+                    # that have defaults so
+                    # we create it as an empty config
+                    continue
                 if default is None:
                     continue
-                if pytype is None:
-                    m = f"No type found for default value of {section}.{k}: {default}"
-                    raise ValueError(m)
                 default = pytype(default)
 
                 self.__setattr__(k, default)
