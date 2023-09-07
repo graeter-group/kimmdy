@@ -55,7 +55,7 @@ def test_place_atom(arranged_tmp_path):
     }
     files.outputdir = arranged_tmp_path
 
-    step = Place(id_to_place="1", new_coords=(0, 0, 0))
+    step = Place(id_to_place="1", new_coords=(1, 2, 3))
     timespan = [(0.0, 100.0)]
 
     place_atom(files, step, timespan)
