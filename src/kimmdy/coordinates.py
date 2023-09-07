@@ -33,6 +33,10 @@ logger = logging.getLogger(__name__)
 ## coordinates
 def place_atom(files: TaskFiles, step: Place, timespan: list[tuple[float, float]]):
     """Place an atom to new coords at the last time point of the recipe timespans"""
+    logger = files.logger
+    logger.info("Starting place_atom task")
+    logger.debug(step)
+    logger.debug(f"time {timespan}")
     trr = files.input["trr"]
     tpr = files.input["tpr"]
 
@@ -66,7 +70,10 @@ def place_atom(files: TaskFiles, step: Place, timespan: list[tuple[float, float]
     files.output["trr"] = trr_out
     files.output["gro"] = gro_out
 
-    logger.debug(f"Exit place_atom, final coordinates written to {trr_out.parts[-2:]}")
+    logger.debug(
+        "Exit place_atom, final coordinates written to "
+        f"{'/'.join(trr_out.parts[-2:])}"
+    )
 
 
 ## topology
