@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.2.1](https://github.com/hits-mbm-dev/kimmdy/compare/v4.2.0...v4.2.1) (2023-09-07)
+
+
+### Bug Fixes
+
+* apply_recipe naming ([6573886](https://github.com/hits-mbm-dev/kimmdy/commit/65738861ccc4c9418f4a1c7da3fd5f56afd33d14))
+* handle `Relax` in plot_rates ([3099210](https://github.com/hits-mbm-dev/kimmdy/commit/3099210335a38504dced4aa5ceffaeaa23617dd3))
+
 ## [4.2.0](https://github.com/hits-mbm-dev/kimmdy/compare/v4.1.0...v4.2.0) (2023-09-04)
 
 
