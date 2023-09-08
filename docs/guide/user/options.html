@@ -516,12 +516,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>cwd</td>
 <td>Working directory</td>
 <td>Path</td>
-<td>.</td>
+<td></td>
 <td></td>
 </tr>
 <tr class="odd">
 <td>name</td>
-<td>Used for output folder if out is not specified</td>
+<td>Used for output folder if <code>out</code> is not specified</td>
 <td>str</td>
 <td>kimmdy</td>
 <td></td>
@@ -534,66 +534,66 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td></td>
 </tr>
 <tr class="odd">
+<td>log</td>
+<td>Settings for logging</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
 <td>max_tasks</td>
 <td>Maximum number of tasks to run. This is useful when a task in the sequence can dymanically add more tasks. 0 means no limit.</td>
 <td>int</td>
 <td>0</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>max_hours</td>
 <td>Stop KIMMDY after max_hours hours. Set this lower than the limit of your HPC cluster for use with a re-submit jobscript. 0 Means no limit.</td>
 <td>int</td>
 <td>0</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>run</td>
 <td>Replica number</td>
 <td>int</td>
 <td>1</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>top</td>
 <td>Topology file</td>
 <td>Path</td>
 <td>topol.top</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>gro</td>
 <td>Coordinate file</td>
 <td>Path</td>
 <td>conf.gro</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>ndx</td>
 <td>Index file</td>
 <td>Path</td>
 <td>index.ndx</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>gromacs_alias</td>
 <td>Gromacs alias</td>
 <td>str</td>
 <td>gmx</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>gmx_mdrun_flags</td>
 <td>Flags passed to gmx mdrun. e.g.&nbsp;<code>-nt 8 -maxh 24</code></td>
 <td>str</td>
 <td>-maxh 24 -dlb yes</td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>maxh</td>
-<td>Maximum number of hours to run KIMMDY until it stops to aviod running out of time on the cluster. This enables graceful shutdown of KIMMDY and allows it to resume from the last checkpoint e.g.&nbsp;via a jobscript.</td>
-<td>int</td>
-<td>24</td>
 <td></td>
 </tr>
 <tr class="even">
@@ -635,20 +635,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>mds.*.mdp</td>
 <td>MDP file for the MD step</td>
 <td>Path</td>
-<td></td>
-<td></td>
-</tr>
-<tr class="even">
-<td>mds.*.prefix</td>
-<td>TODO: What is this?</td>
-<td>str</td>
-<td></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>mds.*.overwrite</td>
-<td>TODO: What is this?</td>
-<td>str</td>
 <td></td>
 <td></td>
 </tr>
