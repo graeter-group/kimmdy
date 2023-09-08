@@ -151,12 +151,28 @@ class Config:
                 self.out = self.cwd / self.name
 
 
+        # don't do anything for the description of a section
+        scheme.pop("description", None)
+
+        # if the section has a general subscheme
+        # merge it into all specific subschemes
+        # (yes, this has to happen twice, first in __init__ for setting
+        # the types and here for setting the defaults)
+        general_subscheme = scheme.pop(".*", None)
+        if general_subscheme is not None:
+            subsections = self.get_attributes()
+            for subsection in subsections:
+                subscheme = scheme.get(subsection, None)
+                if subscheme is None:
+                    scheme[subsection] = general_subscheme
+                else:
+                    general_subscheme.update(subscheme)
+                    scheme[subsection] = general_subscheme
+            
         for k, v in scheme.items():
-            if k == "description":
-                # don't do anything for the description of a section
-                continue
             if type(v) is not dict:
                 raise ValueError(f"Scheme entry {section}.{k}: {v} is not a dict. Like the dwarfs, someone dug too deep.")
+
             pytype = v.get("pytype")
             if pytype is not None:
                 # this is a base case since
@@ -176,7 +192,7 @@ class Config:
                     # the current section doen't exist
                     # but might have a default in a subsection
 
-                    # don't set defaults for reactions
+                    # don't set sections for all known reactions,
                     # as only those requested by the user
                     # should be defined
                     if section == "config.reactions":
