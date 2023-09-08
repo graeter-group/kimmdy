@@ -304,3 +304,6 @@ def entry_point_kimmdy():
     """
     args = get_cmdline_args()
     _run(args)
+
+if __name__ == "__main__":
+    entry_point_kimmdy()

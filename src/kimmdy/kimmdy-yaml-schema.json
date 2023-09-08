@@ -127,16 +127,6 @@
               "pytype": "Path",
               "description": "MDP file for the MD step"
             },
-            "prefix": {
-              "type": "string",
-              "pytype": "str",
-              "description": "TODO: What is this?"
-            },
-            "overwrite": {
-              "type": "string",
-              "pytype": "str",
-              "description": "TODO: What is this?"
-            },
             "use_plumed": {
               "type": "boolean",
               "pytype": "bool",

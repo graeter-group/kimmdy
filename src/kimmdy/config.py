@@ -75,12 +75,13 @@ class Config:
         assert recursive_dict is not None
         assert scheme is not None
         # go over parsed yaml file recursively
-        # this is what is on the config
+        # this is what is in the config
         for k, v in recursive_dict.items():
             if isinstance(v, dict):
                 # recursive case
 
                 # merge ".*" and specific schemes
+                # before recursing
                 general_subscheme = scheme.get(".*")
                 subscheme = scheme.get(k)
                 if subscheme is None:
@@ -96,15 +97,10 @@ class Config:
                 self.__setattr__(k, subconfig)
             else:
                 # base case for recursion
-                global_opts = scheme.get(".*")
                 opts = scheme.get(k)
-                if opts is None and global_opts is None:
+                if opts is None:
                     m = f"Unknown option {section}.{k} found in config file."
                     raise ValueError(m)
-                if opts is None:
-                    opts = {}
-                if global_opts is not None:
-                    opts.update(global_opts)
                 pytype = opts.get("pytype")
                 if pytype is None:
                     m = f"No type found for {section}.{k}"
@@ -118,10 +114,15 @@ class Config:
         if section == "config":
             self._logmessages = {"infos": [], "warnings": [], "errors": []}
             self._set_defaults(section, scheme)
+
+            print(self)
+            exit()
+
             self._validate()
 
             # merge command line arguments
             # with config file
+
             if logfile is None:
                 self.log.file = self.out / self.log.file
             else:
@@ -149,14 +150,13 @@ class Config:
             if not hasattr(self, "out"):
                 self.out = self.cwd / self.name
 
-        if section.startswith("config.mds"):
-            print('hello')
-            print(scheme)
-            exit()
 
         for k, v in scheme.items():
-            if type(v) is not dict:
+            if k == "description":
+                # don't do anything for the description of a section
                 continue
+            if type(v) is not dict:
+                raise ValueError(f"Scheme entry {section}.{k}: {v} is not a dict. Like the dwarfs, someone dug too deep.")
             pytype = v.get("pytype")
             if pytype is not None:
                 # this is a base case since
