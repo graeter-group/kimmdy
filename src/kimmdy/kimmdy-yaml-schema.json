@@ -2,6 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   "additionalProperties": false,
+  "required": ["sequence", "changer"],
   "properties": {
     "dryrun": {
       "description": "Don't run the actual simulations, just print the tasks",
@@ -12,8 +13,7 @@
     "cwd": {
       "description": "Working directory",
       "type": "string",
-      "pytype": "Path",
-      "default": "."
+      "pytype": "Path"
     },
     "name": {
       "description": "Used for output folder if `out` is not specified",
@@ -262,6 +262,5 @@
       "pytype": "bool",
       "default": false
     }
-  },
-  "required": ["sequence", "changer"]
+  }
 }

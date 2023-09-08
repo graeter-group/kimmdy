@@ -4,7 +4,7 @@ and package into a parsed format for internal use.
 """
 from __future__ import annotations
 import shutil
-from pprint import pformat
+from pprint import pformat, pprint
 from typing import Any, Optional
 import yaml
 from pathlib import Path
@@ -79,6 +79,8 @@ class Config:
         for k, v in recursive_dict.items():
             if isinstance(v, dict):
                 # recursive case
+
+                # merge ".*" and specific schemes
                 general_subscheme = scheme.get(".*")
                 subscheme = scheme.get(k)
                 if subscheme is None:
@@ -94,8 +96,6 @@ class Config:
                 self.__setattr__(k, subconfig)
             else:
                 # base case for recursion
-
-                # merge ".*" and specific schemes
                 global_opts = scheme.get(".*")
                 opts = scheme.get(k)
                 if opts is None and global_opts is None:
@@ -107,37 +107,17 @@ class Config:
                     opts.update(global_opts)
                 pytype = opts.get("pytype")
                 if pytype is None:
-                    m = f"No type found for {k}"
+                    m = f"No type found for {section}.{k}"
                     raise ValueError(m)
 
                 # cast to type
                 v = pytype(v)
                 self.__setattr__(k, v)
 
-        # this is what is in the schema
-        # and may not be in the config already
-        # so we need to set defaults
-        for k, v in scheme.items():
-            if type(v) is not dict:
-                raise ValueError(f"Unexpected type {type(v)} in scheme. {k}: {v}")
-            if not hasattr(self, k):
-                # get default if not set in yaml
-                default = v.get("default")
-                pytype = v.get("pytype")
-                if pytype is None:
-                    # this is a nested config
-                    # it may contain subsections
-                    # that have defaults so
-                    # we create it as an empty config
-                    continue
-                if default is None:
-                    continue
-                default = pytype(default)
-
-                self.__setattr__(k, default)
-
         # validate on initial construction
         if section == "config":
+            self._logmessages = {"infos": [], "warnings": [], "errors": []}
+            self._set_defaults(section, scheme)
             self._validate()
 
             # merge command line arguments
@@ -155,6 +135,62 @@ class Config:
             assert input_file, "No input file provided"
             shutil.copy(input_file, self.out)
 
+    def _set_defaults(self, section: str = "config", scheme: dict = {}):
+        """
+        Set defaults for attributes not set in yaml file but
+        specified in scheme (generated from the schema).
+        """
+
+        # implicit defaults not in the schema
+        # but defined in terms of other attributes
+        if section == "config":
+            if not hasattr(self, "cwd"):
+                self.cwd = Path.cwd()
+            if not hasattr(self, "out"):
+                self.out = self.cwd / self.name
+
+        if section.startswith("config.mds"):
+            print('hello')
+            print(scheme)
+            exit()
+
+        for k, v in scheme.items():
+            if type(v) is not dict:
+                continue
+            pytype = v.get("pytype")
+            if pytype is not None:
+                # this is a base case since
+                # only leaves have a pytype
+                if not hasattr(self, k):
+                    # get default if not set in yaml
+                    default = v.get("default")
+                    if default is None:
+                        # f"No default for required option {section}.{k} in schema and not set in yaml"
+                        continue
+                    default = pytype(default)
+                    self.__setattr__(k, default)
+
+            else:
+                # this is a recursive case
+                if not hasattr(self, k):
+                    # the current section doen't exist
+                    # but might have a default in a subsection
+
+                    # don't set defaults for reactions
+                    # as only those requested by the user
+                    # should be defined
+                    if section == "config.reactions":
+                        continue
+
+                    empty_config = Config.__new__(type(self))
+                    empty_config._set_defaults(f"{section}.{k}", v)
+                    self.__setattr__(k, empty_config)
+                else:
+                    # the current section exists
+                    # and might have defaults in a subsection
+                    self.__getattribute__(k)._set_defaults(f"{section}.{k}", v)
+
+
     def _validate(self, section: str = "config"):
         """Validates config."""
 
@@ -162,7 +198,6 @@ class Config:
 
         # globals / interconnected
         if section == "config":
-            self._logmessages = {"infos": [], "warnings": [], "errors": []}
 
             ffdir = self.ff
             if ffdir == Path("*.ff"):
@@ -231,9 +266,6 @@ class Config:
                         raise AssertionError(
                             "Plumed requested in md section, but not defined at config root"
                         )
-
-            if not hasattr(self, "out"):
-                self.out = self.cwd / self.name
 
             # make sure self.out is empty
             while self.out.exists():
