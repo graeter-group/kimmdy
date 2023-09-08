@@ -114,15 +114,9 @@ class Config:
         if section == "config":
             self._logmessages = {"infos": [], "warnings": [], "errors": []}
             self._set_defaults(section, scheme)
-
-            print(self)
-            exit()
-
             self._validate()
 
-            # merge command line arguments
-            # with config file
-
+            # merge with command line arguments
             if logfile is None:
                 self.log.file = self.out / self.log.file
             else:
