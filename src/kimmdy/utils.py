@@ -19,6 +19,19 @@ One of (id: str), (moleculetype: str, id: str) or (moleculetype_ix: int, id).
 """
 
 
+class longFormatter(logging.Formatter):
+    def format(self, record):
+        saved_name = record.name  # save and restore for other formatters if desired
+        parts = saved_name.split(".")
+        if len(parts) > 1:
+            record.name = parts[0][0] + "." + ".".join(p[:10] for p in parts[1:])
+        else:
+            record.name = parts[0]
+        result = super().format(record)
+        record.name = saved_name
+        return result
+
+
 ## input/output utility functions
 
 
@@ -42,28 +55,6 @@ def get_shell_stdout(s):
     """Run command in shell and capture stdout."""
     process = sp.run(s, shell=True, capture_output=True, encoding="utf-8")
     return process.stdout
-
-
-def backup_if_existing(f: Path) -> None:
-    """Checks whether a file exists and if so, backs it up.
-
-    Mainly used for files from previous KIMMDY runs to
-    prevent overwriting these files.
-
-    Parameters
-    ----------
-    f:
-        Path to a file that will be backed up, if existing.
-    """
-    backup_file_prefix = "#"
-    backup_file_suffix = "#"
-    if f.exists():
-        backup_count = 1
-        backup_file = f"{backup_file_prefix}{f}_{backup_count}{backup_file_suffix}"
-        while Path(backup_file).exists():
-            backup_count += 1
-            backup_file = f"{backup_file_prefix}{f}_{backup_count}{backup_file_suffix}"
-        f.rename(backup_file)
 
 
 ## reaction plugin building blocks

@@ -2,6 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   "additionalProperties": false,
+  "required": ["sequence", "changer"],
   "properties": {
     "dryrun": {
       "description": "Don't run the actual simulations, just print the tasks",
@@ -12,11 +13,10 @@
     "cwd": {
       "description": "Working directory",
       "type": "string",
-      "pytype": "Path",
-      "default": "."
+      "pytype": "Path"
     },
     "name": {
-      "description": "Used for output folder if out is not specified",
+      "description": "Used for output folder if `out` is not specified",
       "type": "string",
       "pytype": "str",
       "default": "kimmdy"
@@ -25,6 +25,26 @@
       "description": "Output folder",
       "type": "string",
       "pytype": "Path"
+    },
+    "log": {
+      "type": "object",
+      "description": "Settings for logging",
+      "additionalProperties": false,
+      "properties": {
+        "file": {
+          "description": "Logfile name (will result in a path relative to `out`)",
+          "type": "string",
+          "pytype": "str",
+          "default": "kimmdy.log"
+        },
+        "level": {
+          "description": "Loglevel",
+          "type": "string",
+          "pytype": "str",
+          "default": "INFO",
+          "enum": ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+        }
+      }
     },
     "max_tasks": {
       "description": "Maximum number of tasks to run. This is useful when a task in the sequence can dymanically add more tasks. 0 means no limit.",
@@ -74,13 +94,6 @@
       "pytype": "str",
       "default": "-maxh 24 -dlb yes"
     },
-    "maxh": {
-      "description": "Maximum number of hours to run KIMMDY until it stops to aviod running out of time on the cluster. This enables graceful shutdown of KIMMDY and allows it to resume from the last checkpoint e.g. via a jobscript.",
-      "type": "integer",
-      "pytype": "int",
-      "default": 24,
-      "minimum": 1
-    },
     "ff": {
       "description": "Force field directory (looks for .ff in cwd if not set)",
       "type": "string",
@@ -113,16 +126,6 @@
               "type": "string",
               "pytype": "Path",
               "description": "MDP file for the MD step"
-            },
-            "prefix": {
-              "type": "string",
-              "pytype": "str",
-              "description": "TODO: What is this?"
-            },
-            "overwrite": {
-              "type": "string",
-              "pytype": "str",
-              "description": "TODO: What is this?"
             },
             "use_plumed": {
               "type": "boolean",
@@ -249,6 +252,5 @@
       "pytype": "bool",
       "default": false
     }
-  },
-  "required": ["name", "sequence", "changer"]
+  }
 }

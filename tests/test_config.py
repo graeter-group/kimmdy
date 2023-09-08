@@ -1,9 +1,7 @@
 from kimmdy.config import Config
 from kimmdy.runmanager import get_existing_files
-from kimmdy.utils import get_gmx_dir
 from pathlib import Path
 import pytest
-import os
 
 
 @pytest.mark.require_gmx

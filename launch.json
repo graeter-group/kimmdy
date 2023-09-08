@@ -2,32 +2,11 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "KIMMDY short_example",
+            "name": "KIMMDY Alanine Hat Naive",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/src/kimmdy/cmd.py",
-            "cwd": "${workspaceFolder}/example/short_example/"
-        },
-        {
-            "name": "KIMMDY ala",
-            "type": "python",
-            "request": "launch",
-            "program": "${workspaceFolder}/src/kimmdy/cmd.py",
-            "cwd": "${workspaceFolder}/example/example_ala/"
-        },
-        {
-            "name": "KIMMDY triala",
-            "type": "python",
-            "request": "launch",
-            "program": "${workspaceFolder}/src/kimmdy/cmd.py",
-            "cwd": "${workspaceFolder}/example/example_triala/"
-        },
-        {
-            "name": "KIMMDY minimal",
-            "type": "python",
-            "request": "launch",
-            "program": "${workspaceFolder}/src/kimmdy/cmd.py",
-            "cwd": "${workspaceFolder}/example/minimal_example/"
+            "cwd": "${workspaceFolder}/example/alanine_hat_naive/"
         }
     ]
 }

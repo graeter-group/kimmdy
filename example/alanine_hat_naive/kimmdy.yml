@@ -1,12 +1,13 @@
 # yaml-language-server: $schema=../../src/kimmdy/kimmdy-yaml-schema.json
 
 dryrun: false
-name: 'alanine_hat_000'
+name: alanine_hat_000
+max_hours: 1
 save_recipes: true
 max_tasks: 100
 gromacs_alias: 'gmx'
 gmx_mdrun_flags: -maxh 24 -dlb yes -nt 8
-ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
+ff: 'amber99sb-star-ildnp.ff' 
 top: 'Ala_out.top'
 gro: 'npt.gro'
 ndx: 'index.ndx'
