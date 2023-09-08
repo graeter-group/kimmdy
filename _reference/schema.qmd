@@ -11,6 +11,7 @@ Reserved keywords:
     - default
     - description
     - type
+    - required
 
 ## Classes
 
@@ -60,9 +61,9 @@ Convert a dictionary from a raw json schema to a nested dictionary
 
 #### Returns
 
-| Type           | Description                                                                                                 |
-|----------------|-------------------------------------------------------------------------------------------------------------|
-| [dict](`dict`) | nested dictionary where each leaf entry is a dictionary with the "pytype", "default" and "description" keys |
+| Type                                                             | Description                                 |
+|------------------------------------------------------------------|---------------------------------------------|
+| nested dictionary where each leaf entry is a dictionary with the | "pytype", "default" and "description" keys. |
 
 ### flatten_scheme { #kimmdy.schema.flatten_scheme }
 

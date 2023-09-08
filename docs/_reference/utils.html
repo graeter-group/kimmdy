@@ -410,24 +410,20 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#attributes" id="toc-attributes" class="nav-link" data-scroll-target="#attributes">Attributes</a></li>
   <li><a href="#functions" id="toc-functions" class="nav-link" data-scroll-target="#functions">Functions</a>
   <ul>
-  <li><a href="#kimmdy.utils.backup_if_existing" id="toc-kimmdy.utils.backup_if_existing" class="nav-link" data-scroll-target="#kimmdy.utils.backup_if_existing">backup_if_existing</a>
-  <ul class="collapse">
-  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
-  </ul></li>
   <li><a href="#kimmdy.utils.check_gmx_version" id="toc-kimmdy.utils.check_gmx_version" class="nav-link" data-scroll-target="#kimmdy.utils.check_gmx_version">check_gmx_version</a></li>
   <li><a href="#kimmdy.utils.get_atominfo_from_plumedid" id="toc-kimmdy.utils.get_atominfo_from_plumedid" class="nav-link" data-scroll-target="#kimmdy.utils.get_atominfo_from_plumedid">get_atominfo_from_plumedid</a>
   <ul class="collapse">
-  <li><a href="#parameters-1" id="toc-parameters-1" class="nav-link" data-scroll-target="#parameters-1">Parameters</a></li>
+  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
   </ul></li>
   <li><a href="#kimmdy.utils.get_bondprm_from_atomtypes" id="toc-kimmdy.utils.get_bondprm_from_atomtypes" class="nav-link" data-scroll-target="#kimmdy.utils.get_bondprm_from_atomtypes">get_bondprm_from_atomtypes</a>
   <ul class="collapse">
-  <li><a href="#parameters-2" id="toc-parameters-2" class="nav-link" data-scroll-target="#parameters-2">Parameters</a></li>
+  <li><a href="#parameters-1" id="toc-parameters-1" class="nav-link" data-scroll-target="#parameters-1">Parameters</a></li>
   </ul></li>
   <li><a href="#kimmdy.utils.get_gmx_dir" id="toc-kimmdy.utils.get_gmx_dir" class="nav-link" data-scroll-target="#kimmdy.utils.get_gmx_dir">get_gmx_dir</a></li>
   <li><a href="#kimmdy.utils.get_shell_stdout" id="toc-kimmdy.utils.get_shell_stdout" class="nav-link" data-scroll-target="#kimmdy.utils.get_shell_stdout">get_shell_stdout</a></li>
   <li><a href="#kimmdy.utils.morse_transition_rate" id="toc-kimmdy.utils.morse_transition_rate" class="nav-link" data-scroll-target="#kimmdy.utils.morse_transition_rate">morse_transition_rate</a>
   <ul class="collapse">
-  <li><a href="#parameters-3" id="toc-parameters-3" class="nav-link" data-scroll-target="#parameters-3">Parameters</a></li>
+  <li><a href="#parameters-2" id="toc-parameters-2" class="nav-link" data-scroll-target="#parameters-2">Parameters</a></li>
   </ul></li>
   <li><a href="#kimmdy.utils.run_gmx" id="toc-kimmdy.utils.run_gmx" class="nav-link" data-scroll-target="#kimmdy.utils.run_gmx">run_gmx</a></li>
   <li><a href="#kimmdy.utils.run_shell_cmd" id="toc-kimmdy.utils.run_shell_cmd" class="nav-link" data-scroll-target="#kimmdy.utils.run_shell_cmd">run_shell_cmd</a></li>
@@ -473,70 +469,39 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
-<td><a href="#kimmdy.utils.backup_if_existing">backup_if_existing</a></td>
-<td>Checks whether a file exists and if so, backs it up.</td>
-</tr>
-<tr class="even">
 <td><a href="#kimmdy.utils.check_gmx_version">check_gmx_version</a></td>
 <td>Check for an existing gromacs installation.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#kimmdy.utils.get_atominfo_from_plumedid">get_atominfo_from_plumedid</a></td>
 <td>For a plumedid, returns the corresponding atom types and nrs.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#kimmdy.utils.get_bondprm_from_atomtypes">get_bondprm_from_atomtypes</a></td>
 <td>Returns bond parameters (b0, kb, E_dis) for a set of two atomtypes.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#kimmdy.utils.get_gmx_dir">get_gmx_dir</a></td>
 <td>Returns the path to the gromacs installation</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#kimmdy.utils.get_shell_stdout">get_shell_stdout</a></td>
 <td>Run command in shell and capture stdout.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#kimmdy.utils.morse_transition_rate">morse_transition_rate</a></td>
 <td>Calculates reaction rate constant for a bond breaking event.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#kimmdy.utils.run_gmx">run_gmx</a></td>
 <td>Run GROMACS command in shell.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#kimmdy.utils.run_shell_cmd">run_shell_cmd</a></td>
 <td>Run command in shell.</td>
 </tr>
 </tbody>
 </table>
-<section id="kimmdy.utils.backup_if_existing" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.utils.backup_if_existing">backup_if_existing</h3>
-<p><code>utils.backup_if_existing(f)</code></p>
-<p>Checks whether a file exists and if so, backs it up.</p>
-<p>Mainly used for files from previous KIMMDY runs to prevent overwriting these files.</p>
-<section id="parameters" class="level4">
-<h4 class="anchored" data-anchor-id="parameters">Parameters</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Type</th>
-<th>Description</th>
-<th>Default</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><code>f</code></td>
-<td><a href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path">Path</a></td>
-<td>Path to a file that will be backed up, if existing.</td>
-<td><em>required</em></td>
-</tr>
-</tbody>
-</table>
-</section>
-</section>
 <section id="kimmdy.utils.check_gmx_version" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.utils.check_gmx_version">check_gmx_version</h3>
 <p><code>utils.check_gmx_version(config)</code></p>
@@ -548,8 +513,8 @@ ul.task-list li input[type="checkbox"] {
 <p><code>utils.get_atominfo_from_plumedid(plumedid, plumed, top)</code></p>
 <p>For a plumedid, returns the corresponding atom types and nrs.</p>
 <p>To convert from plumedid to atomnr, information from the plumed file is used. Then, the topology atoms section can be used to convert from atomnr to atomtype</p>
-<section id="parameters-1" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-1">Parameters</h4>
+<section id="parameters" class="level4">
+<h4 class="anchored" data-anchor-id="parameters">Parameters</h4>
 <table class="table">
 <thead>
 <tr class="header">
@@ -586,8 +551,8 @@ ul.task-list li input[type="checkbox"] {
 <h3 class="anchored" data-anchor-id="kimmdy.utils.get_bondprm_from_atomtypes">get_bondprm_from_atomtypes</h3>
 <p><code>utils.get_bondprm_from_atomtypes(atomtypes, ffbonded, lookup_edissoc_atomtype)</code></p>
 <p>Returns bond parameters (b0, kb, E_dis) for a set of two atomtypes.</p>
-<section id="parameters-2" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-2">Parameters</h4>
+<section id="parameters-1" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-1">Parameters</h4>
 <table class="table">
 <thead>
 <tr class="header">
@@ -637,8 +602,8 @@ ul.task-list li input[type="checkbox"] {
 <p>Calculates reaction rate constant for a bond breaking event.</p>
 <p>Uses the Morse potential model for this calculation. For an array of bond distances of the same bond, first calculates the forces on the bond, then the minima and maxima of the shifted Morse potential to get an energy barrier and finally a reaction rate constant using the Arrhenius equation. For intramolecular reactions, the reaction rate constant is equal to the reaction rate.</p>
 <p>The calculation should be according to the derivation in the original KIMMDY paper: DOI: 10.1021/acs.jctc.9b00786</p>
-<section id="parameters-3" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-3">Parameters</h4>
+<section id="parameters-2" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-2">Parameters</h4>
 <table class="table">
 <thead>
 <tr class="header">
