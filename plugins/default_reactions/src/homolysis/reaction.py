@@ -63,7 +63,10 @@ class Homolysis(ReactionPlugin):
 
             recipes.append(
                 Recipe(
-                    recipe_steps=[Break(atom_id_1=atomids[0], atom_id_2=atomids[1]), Relax()],
+                    recipe_steps=[
+                        Break(atom_id_1=atomids[0], atom_id_2=atomids[1]),
+                        Relax(),
+                    ],
                     rates=[*k_avg],
                     timespans=[(distances["time"][0], distances["time"][-1])],
                 )
