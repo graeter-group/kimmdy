@@ -1,5 +1,21 @@
 # Changelog
 
+## [4.3.0](https://github.com/hits-mbm-dev/kimmdy/compare/v4.2.1...v4.3.0) (2023-09-08)
+
+
+### Features
+
+* unify output location ([#255](https://github.com/hits-mbm-dev/kimmdy/issues/255))! ([cbd4d5d](https://github.com/hits-mbm-dev/kimmdy/commit/cbd4d5db913b38f1ea02ce37d6ccfae0c50053e5))
+
+
+### Bug Fixes
+
+* closes  [#265](https://github.com/hits-mbm-dev/kimmdy/issues/265) , cleanup with flake8 ([d79adbc](https://github.com/hits-mbm-dev/kimmdy/commit/d79adbcd798cbe56ded35a96c09679eaf5e4b2c2))
+* jobscript and logging ([cbd4d5d](https://github.com/hits-mbm-dev/kimmdy/commit/cbd4d5db913b38f1ea02ce37d6ccfae0c50053e5))
+* place_atom ([0e0dc1d](https://github.com/hits-mbm-dev/kimmdy/commit/0e0dc1dbf4537f12b5af3cca32aba11c7a1ba4fc))
+* properly merge mds general '.*' section and general options with defaults ([cbd4d5d](https://github.com/hits-mbm-dev/kimmdy/commit/cbd4d5db913b38f1ea02ce37d6ccfae0c50053e5))
+* set defaults on non-existent sections. fixes [#264](https://github.com/hits-mbm-dev/kimmdy/issues/264) ([cbd4d5d](https://github.com/hits-mbm-dev/kimmdy/commit/cbd4d5db913b38f1ea02ce37d6ccfae0c50053e5))
+
 ## [4.2.1](https://github.com/hits-mbm-dev/kimmdy/compare/v4.2.0...v4.2.1) (2023-09-07)
 
 
