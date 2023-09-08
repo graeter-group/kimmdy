@@ -144,7 +144,6 @@ class Config:
             if not hasattr(self, "out"):
                 self.out = self.cwd / self.name
 
-
         # don't do anything for the description of a section
         scheme.pop("description", None)
 
@@ -162,10 +161,12 @@ class Config:
                 else:
                     general_subscheme.update(subscheme)
                     scheme[subsection] = general_subscheme
-            
+
         for k, v in scheme.items():
             if type(v) is not dict:
-                raise ValueError(f"Scheme entry {section}.{k}: {v} is not a dict. Like the dwarfs, someone dug too deep.")
+                raise ValueError(
+                    f"Scheme entry {section}.{k}: {v} is not a dict. Like the dwarfs, someone dug too deep."
+                )
 
             pytype = v.get("pytype")
             if pytype is not None:
@@ -200,7 +201,6 @@ class Config:
                     # and might have defaults in a subsection
                     self.__getattribute__(k)._set_defaults(f"{section}.{k}", v)
 
-
     def _validate(self, section: str = "config"):
         """Validates config."""
 
@@ -208,7 +208,6 @@ class Config:
 
         # globals / interconnected
         if section == "config":
-
             ffdir = self.ff
             if ffdir == Path("*.ff"):
                 ffs = list(self.cwd.glob("*.ff"))
