@@ -25,7 +25,7 @@ One moleculetype in the topology
 
 ##### reindex_atomnrs { #kimmdy.topology.topology.MoleculeType.reindex_atomnrs }
 
-`topology.topology.MoleculeType.reindex_atomnrs(self)`
+`topology.topology.MoleculeType.reindex_atomnrs()`
 
 Reindex atom numbers in topology.
 
@@ -60,7 +60,7 @@ Assumptions:
 
 ##### bind_bond { #kimmdy.topology.topology.Topology.bind_bond }
 
-`topology.topology.Topology.bind_bond(self, atompair_addresses)`
+`topology.topology.Topology.bind_bond(atompair_addresses)`
 
 Add a bond in topology.
 
@@ -77,7 +77,7 @@ Furthermore, it modifies to function types in the topology to account for radica
 
 ##### break_bond { #kimmdy.topology.topology.Topology.break_bond }
 
-`topology.topology.Topology.break_bond(self, atompair_addresses)`
+`topology.topology.Topology.break_bond(atompair_addresses)`
 
 Break bonds in topology.
 
@@ -92,7 +92,7 @@ Modifies the topology dictionary in place.
 
 ##### reindex_atomnrs { #kimmdy.topology.topology.Topology.reindex_atomnrs }
 
-`topology.topology.Topology.reindex_atomnrs(self)`
+`topology.topology.Topology.reindex_atomnrs()`
 
 Reindex atom numbers in topology.
 

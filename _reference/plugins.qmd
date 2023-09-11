@@ -38,7 +38,7 @@ Reaction base class
 
 ##### get_recipe_collection { #kimmdy.plugins.ReactionPlugin.get_recipe_collection }
 
-`plugins.ReactionPlugin.get_recipe_collection(self, files)`
+`plugins.ReactionPlugin.get_recipe_collection(files)`
 
 Get a RecipeCollection as a result of the reaction.
 
