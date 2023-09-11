@@ -126,13 +126,6 @@ Check the energy of the system:
 kimmdy-analysis plot_energy alanine_hat_000 --open-plot --terms Potential Kinetic
 ```
 
-Or do the same directly from python:
-
-```python
-from kimmdy.analysis import plot_energy
-plot_energy('alanine_hat_000', steps='all', terms=['Potential', 'Kinetic'], open_plot=True)
-```
-
 Visualize where the radical ended up:
 
 ```bash
@@ -145,7 +138,7 @@ Plot the reaction rates:
 kimmdy-analysis plot_rates alanine_hat_000
 ```
 
-or from python:
+Or do all oft the above directly from python:
 
 ```python
 from kimmdy.analysis import concat_trj, plot_energy, radical_population, plot_rates

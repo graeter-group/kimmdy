@@ -26,7 +26,6 @@ from kimmdy.topology.utils import match_atomic_item_to_atomic_type
 logger = logging.getLogger(__name__)
 
 
-# coordinates
 def place_atom(
     files: TaskFiles, step: Place, timespan: list[tuple[float, float]]
 ) -> TaskFiles:
@@ -75,9 +74,6 @@ def place_atom(
     return files
 
 
-# topology
-
-
 def is_parameterized(entry: Interaction):
     """Parameterized topology entries have c0 and c1 attributes != None"""
     return entry.c0 is not None and entry.c1 is not None
@@ -89,7 +85,7 @@ def get_explicit_MultipleDihedrals(
     dihedrals_in: Optional[MultipleDihedrals],
     ff: FF,
     periodicity_max: int = 6,
-) -> Union[MultipleDihedrals, None]:
+) -> Optional[MultipleDihedrals]:
     """Takes a valid dihedral key and returns explicit
     dihedral parameters for a given topology
     """
@@ -100,7 +96,7 @@ def get_explicit_MultipleDihedrals(
         # empty string means implicit parameters
         return dihedrals_in
 
-    type_key = [mol.atoms[x].type for x in dihedral_key]
+    type_key = [mol.atoms[id].type for id in dihedral_key]
 
     multiple_dihedrals = MultipleDihedrals(*dihedral_key, "9", {})
     for periodicity in range(1, periodicity_max + 1):
@@ -109,8 +105,7 @@ def get_explicit_MultipleDihedrals(
         )
         if match_obj:
             assert isinstance(match_obj, DihedralType)
-            l = [*dihedral_key, "9", match_obj.c0, match_obj.c1, match_obj.periodicity]
-            multiple_dihedrals.dihedrals[str(periodicity)] = Dihedral.from_top_line(l)
+            multiple_dihedrals.dihedrals[str(periodicity)] = Dihedral(*dihedral_key, funct="9", c0=match_obj.c0, c1=match_obj.c1, periodicity=match_obj.periodicity)
 
     if not multiple_dihedrals.dihedrals:
         return None
