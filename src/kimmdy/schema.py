@@ -8,6 +8,7 @@ Reserved keywords:
     - default
     - description
     - type
+    - required
 """
 import json
 import importlib.resources as pkg_resources
@@ -99,9 +100,8 @@ def convert_schema_to_dict(dictionary: dict) -> dict:
 
     Returns
     -------
-    dict:
         nested dictionary where each leaf entry is a dictionary with the
-        "pytype", "default" and "description" keys
+        "pytype", "default" and "description" keys.
     """
     result = {}
     properties = dictionary.get("properties")

@@ -13,7 +13,7 @@ and package into a parsed format for internal use.
 
 ### Config { #kimmdy.config.Config }
 
-`config.Config(self, input_file=None, recursive_dict=None, scheme=None, section='config', no_increment_output_dir=False)`
+`config.Config(self, input_file=None, recursive_dict=None, scheme=None, section='config', logfile=None, loglevel=None)`
 
 Internal representation of the configuration generated
 from the input file, which enables validation before running

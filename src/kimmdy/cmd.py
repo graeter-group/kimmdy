@@ -1,26 +1,93 @@
 """
 Functions for starting KIMMDY either from python or the command line.
-Also initialized logging and configuration.
 Other entry points such as `kimmdy-analysis` also live here.
 """
 import argparse
-import logging
-import logging.config
 from os import chmod
 from pathlib import Path
 import textwrap
+from typing import Optional
 import dill
+import logging
+import logging.config
 from kimmdy.config import Config
 from kimmdy.runmanager import RunManager
-from kimmdy.utils import check_gmx_version, backup_if_existing
+from kimmdy.assets.templates import jobscript
+from kimmdy.utils import longFormatter
 import importlib.resources as pkg_resources
 import sys
-from glob import glob
+import os
 
 if sys.version_info > (3, 10):
     from importlib_metadata import version
 else:
     from importlib.metadata import version
+
+logger = logging.getLogger(__name__)
+
+
+def configure_logger(config: Config):
+    """Configure logging.
+
+    Parameters
+    ----------
+    config
+        configuration that contains
+        log.level and log.file
+    """
+    log_conf = {
+        "version": 1,
+        "formatters": {
+            "short": {
+                "format": "%(name)-15s %(levelname)s: %(message)s",
+                "datefmt": "%H:%M",
+            },
+            "full": {
+                "format": "%(asctime)s %(name)-17s %(levelname)s: %(message)s",
+                "datefmt": "%d-%m-%y %H:%M",
+            },
+            "full_cut": {
+                "()": longFormatter,
+                "format": "%(asctime)s %(name)-12s %(levelname)s: %(message)s",
+                "datefmt": "%d-%m-%y %H:%M",
+            },
+        },
+        "handlers": {
+            "cmd": {
+                "class": "logging.StreamHandler",
+                "formatter": "short",
+            },
+            "file": {
+                "class": "logging.FileHandler",
+                "formatter": "full_cut",
+                "filename": config.log.file,
+            },
+            "null": {
+                "class": "logging.NullHandler",
+            },
+        },
+        "loggers": {
+            "kimmdy": {
+                "level": config.log.level.upper(),
+                "handlers": ["cmd", "file"],
+            },
+        },
+        # Mute others, e.g. tensorflow, matplotlib
+        "root": {
+            "level": "CRITICAL",
+            "handlers": ["null"],
+        },
+    }
+    logging.config.dictConfig(log_conf)
+
+    # symlink logfile of the latest run to kimmdy.log in cwd
+    log: Path = config.cwd.joinpath("kimmdy.log")
+    if log.is_symlink():
+        log.unlink()
+    if log.exists():
+        os.remove(log)
+
+    log.symlink_to(config.out / config.log.file)
 
 
 def get_cmdline_args() -> argparse.Namespace:
@@ -28,7 +95,6 @@ def get_cmdline_args() -> argparse.Namespace:
 
     Returns
     -------
-    :
         Parsed command line arguments
     """
     parser = argparse.ArgumentParser(
@@ -47,19 +113,14 @@ def get_cmdline_args() -> argparse.Namespace:
         "-l",
         type=str,
         help="logging level (CRITICAL, ERROR, WARNING, INFO, DEBUG)",
-        default="DEBUG",
+        default=None,
     )
+    parser.add_argument("--logfile", "-f", type=Path, help="logfile", default=None)
     parser.add_argument(
-        "--logfile", "-f", type=Path, help="logfile", default="kimmdy.log"
-    )
-    parser.add_argument(
-        "--checkpoint", "-p", type=str, help="start KIMMDY from a checkpoint file"
-    )
-    parser.add_argument(
-        "--from-latest-checkpoint",
+        "--checkpoint",
         "-c",
-        action="store_true",
-        help="continue. Start KIMMDY from the latest checkpoint file",
+        type=str,
+        help="File path of a kimmdy.cpt file to restart KIMMDY from a checkpoint. If a directory is given, the file kimmdy.cpt in that directory is used.",
     )
 
     # on error, drop into debugger
@@ -99,94 +160,14 @@ def get_cmdline_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-class longFormatter(logging.Formatter):
-    def format(self, record):
-        saved_name = record.name  # save and restore for other formatters if desired
-        parts = saved_name.split(".")
-        if len(parts) > 1:
-            record.name = parts[0][0] + "." + ".".join(p[:10] for p in parts[1:])
-        else:
-            record.name = parts[0]
-        result = super().format(record)
-        record.name = saved_name
-        return result
-
-
-def configure_logger(
-    log_path: Path, log_level: str, no_increment_logfile: bool = False
-):
-    """Configure logging.
-
-    Parameters
-    ----------
-    log_path :
-        File path to log file
-    log_level :
-        Loglevel. One of ["INFO", "WARNING", "MESSAGE", "DEBUG"]
-    no_increment_logfile :
-        If True, do not backup existing log file. This is used for
-        restarting from a checkpoint.
-    """
-
-    if not no_increment_logfile:
-        backup_if_existing(log_path)
-
-    log_conf = {
-        "version": 1,
-        "formatters": {
-            "short": {
-                "format": "%(name)-15s %(levelname)s: %(message)s",
-                "datefmt": "%H:%M",
-            },
-            "full": {
-                "format": "%(asctime)s %(name)-17s %(levelname)s: %(message)s",
-                "datefmt": "%d-%m-%y %H:%M",
-            },
-            "full_cut": {
-                "()": longFormatter,
-                "format": "%(asctime)s %(name)-12s %(levelname)s: %(message)s",
-                "datefmt": "%d-%m-%y %H:%M",
-            },
-        },
-        "handlers": {
-            "cmd": {
-                "class": "logging.StreamHandler",
-                "formatter": "short",
-            },
-            "file": {
-                "class": "logging.FileHandler",
-                "formatter": "full_cut",
-                "filename": log_path,
-            },
-            "null": {
-                "class": "logging.NullHandler",
-            },
-        },
-        "loggers": {
-            "kimmdy": {
-                "level": log_level.upper(),
-                "handlers": ["cmd", "file"],
-            },
-        },
-        # Mute others, e.g. tensorflow, matplotlib
-        "root": {
-            "level": "CRITICAL",
-            "handlers": ["null"],
-        },
-    }
-    logging.config.dictConfig(log_conf)
-
-
 def _run(args: argparse.Namespace):
     """Run kimmdy.
 
     Parameters
     ----------
-    args :
+    args
         Command line arguments. See [](`~kimmdy.cmd.get_cmdline_args`)
     """
-    no_increment_logfile = args.from_latest_checkpoint or args.checkpoint
-    configure_logger(args.logfile, args.loglevel, no_increment_logfile)
 
     if args.show_plugins:
         from kimmdy import (
@@ -206,107 +187,59 @@ def _run(args: argparse.Namespace):
     if args.show_schema_path:
         path = pkg_resources.files("kimmdy") / "kimmdy-yaml-schema.json"
         print(f"{path}")
-
         exit()
 
-    logger = logging.getLogger("kimmdy")
-    logger.info("Welcome to KIMMDY")
-    logger.info("KIMMDY is running with these command line options:")
-    logger.info(args)
-    logger.info("Run kimmdy -h for more information.")
     if not Path(args.input).exists() and not args.checkpoint:
-        logger.error(
+        raise FileNotFoundError(
             f"Input file {args.input} does not exist. Specify its name with --input and make sure that you are in the right directory."
         )
-        exit()
-
-    if args.generate_jobscript:
-        config = Config(args.input)
-        runmgr = RunManager(config)
-        runmgr.write_one_checkoint()
-
-        content = f"""
-        #!/bin/env bash
-        #SBATCH --job-name={config.name}
-        #SBATCH --output=kimmdy-job.log
-        #SBATCH --error=kimmdy-job.log
-        #SBATCH --time=24:00:00
-        #SBATCH -N 1
-        #SBATCH --ntasks-per-node=40
-        #SBATCH --mincpus=40
-        #SBATCH --exclusive
-        #SBATCH --cpus-per-task=1
-        #SBATCH --gpus 1
-        #SBATCH --mail-type=ALL
-        # #SBATCH -p <your-partition>.p
-        # #SBATCH --mail-user=<your-email
-
-
-        # Setup up your environment here
-        # modules.sh might load lmod modules, set environment variables, etc.
-        source ./_modules.sh
-
-        CYCLE=24
-
-        START=$(date +"%s")
-
-        kimmdy --input {args.input} -c
-
-        END=$(date +"%s")
-
-        LEN=$((END-START))
-        HOURS=$((LEN/3600))
-
-        echo "$LEN seconds ran"
-        echo "$HOURS full hours ran"
-
-        let "CYCLE--"
-        if [ $HOURS -lt $CYCLE ]; then
-          echo "last cycle was just $HOURS h long, KIMMDY is done."
-          exit 3
-        else
-          echo "cycle resubmitting"
-          sbatch -J {config.name} ./jobscript.sh
-          exit 2
-        fi
-        """
-        path = "jobscript.sh"
-        with open(path, "w") as f:
-            f.write(textwrap.dedent(content))
-
-        chmod(path, 0o755)
-
-        exit()
-
-    if args.from_latest_checkpoint:
-        config = Config(args.input, no_increment_output_dir=True)
-        cpts = glob(f"{config.name}*kimmdy.cpt")
-        if not cpts:
-            logging.error(
-                f"""
-                No checkpoints found for the current configuration at {args.input}.
-                Start a new KIMMDY run or generate an initial checkpoint with
-                kimmdy --generate-jobscript
-                """
-            )
-            exit()
-        cpts.sort()
-        args.checkpoint = cpts[-1]
 
     try:
         if args.checkpoint:
-            logger.info(f"KIMMDY is starting from a checkpoint: {args.checkpoint}.")
-            with open(args.checkpoint, "rb") as f:
+            cpt = Path(args.checkpoint)
+            if cpt.is_dir():
+                cpt = cpt / "kimmdy.cpt"
+            if not cpt.exists():
+                raise FileNotFoundError(
+                    f"Checkpoint file {cpt} does not exist. Specify its path or directory with --checkpoint and make sure that you are in the right directory."
+                )
+            with open(cpt, "rb") as f:
                 runmgr = dill.load(f)
                 runmgr.from_checkpoint = True
-        else:
-            config = Config(args.input)
-            logger.debug(config)
-            runmgr = RunManager(config)
-            logger.debug("Using system GROMACS:")
-            logger.debug(check_gmx_version(config))
+                configure_logger(runmgr.config)
+                runmgr.run()
+            exit()
 
-        runmgr.run()
+        config = Config(
+            input_file=args.input, logfile=args.logfile, loglevel=args.loglevel
+        )
+
+        configure_logger(config)
+        logger.info("Welcome to KIMMDY")
+
+        # write out collected log messages
+        # from initial config parsing
+        # before the logger was configured
+        # (because the logger config depends on the config)
+        for info in config._logmessages["infos"]:
+            logger.info(info)
+        for warning in config._logmessages["warnings"]:
+            logger.warning(warning)
+
+        runmgr = RunManager(config)
+
+        if args.generate_jobscript:
+            runmgr.write_one_checkoint()
+            content = jobscript.format(config=config)
+            path = "jobscript.sh"
+
+            with open(path, "w") as f:
+                f.write(textwrap.dedent(content))
+
+            chmod(path, 0o755)
+        else:
+            runmgr.run()
+
     except Exception as e:
         if args.debug:
             import pdb
@@ -314,15 +247,15 @@ def _run(args: argparse.Namespace):
             pdb.post_mortem()
         else:
             raise e
+    finally:
+        logging.shutdown()
 
 
 def kimmdy_run(
     input: Path = Path("kimmdy.yml"),
-    loglevel: str = "DEBUG",
-    logfile: Path = Path("kimmdy.log"),
+    loglevel: Optional[str] = None,
+    logfile: Optional[Path] = None,
     checkpoint: str = "",
-    from_latest_checkpoint: bool = False,
-    concat: bool = False,
     show_plugins: bool = False,
     show_schema_path: bool = False,
     generate_jobscript: bool = False,
@@ -334,24 +267,19 @@ def kimmdy_run(
 
     Parameters
     ----------
-    input :
+    input
         kimmdy input yml file.
-    loglevel :
+    loglevel
         Loglevel. One of ["INFO", "WARNING", "MESSAGE", "DEBUG"]
-    logfile :
+    logfile
         File path of the logfile.
-    checkpoint :
-        File path if a kimmdy.cpt file to restart KIMMDY from a checkpoint.
-    from_latest_checkpoint :
-        Start KIMMDY from the latest checkpoint.
-    concat :
-        Don't perform a full KIMMDY run but instead concatenate trajectories
-        from a previous run.
-    show_plugins :
+    checkpoint
+        File path of a kimmdy.cpt file to restart KIMMDY from a checkpoint. If a directory is given, the file kimmdy.cpt in that directory is used.
+    show_plugins
         Show available plugins and exit.
-    show_schema_path :
+    show_schema_path
         Print path to yaml schema for use with yaml-language-server e.g. in VSCode and Neovim
-    generate_jobscript :
+    generate_jobscript
         Instead of running KIMMDY directly, generate at jobscript.sh for slurm HPC clusters
     """
     args = argparse.Namespace(
@@ -359,15 +287,12 @@ def kimmdy_run(
         loglevel=loglevel,
         logfile=logfile,
         checkpoint=checkpoint,
-        from_latest_checkpoint=from_latest_checkpoint,
-        concat=concat,
         show_plugins=show_plugins,
         show_schema_path=show_schema_path,
         generate_jobscript=generate_jobscript,
         debug=debug,
     )
     _run(args)
-    logging.shutdown()
 
 
 def entry_point_kimmdy():
@@ -379,4 +304,7 @@ def entry_point_kimmdy():
     """
     args = get_cmdline_args()
     _run(args)
-    logging.shutdown()
+
+
+if __name__ == "__main__":
+    entry_point_kimmdy()

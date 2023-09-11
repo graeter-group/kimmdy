@@ -14,7 +14,6 @@ Utilities for building plugins, shell convenience functions and GROMACS related 
 
 | Name | Description |
 | --- | --- |
-| [backup_if_existing](#kimmdy.utils.backup_if_existing) | Checks whether a file exists and if so, backs it up. |
 | [check_gmx_version](#kimmdy.utils.check_gmx_version) | Check for an existing gromacs installation. |
 | [get_atominfo_from_plumedid](#kimmdy.utils.get_atominfo_from_plumedid) | For a plumedid, returns the corresponding atom types and nrs. |
 | [get_bondprm_from_atomtypes](#kimmdy.utils.get_bondprm_from_atomtypes) | Returns bond parameters (b0, kb, E_dis) for a set of two atomtypes. |
@@ -23,21 +22,6 @@ Utilities for building plugins, shell convenience functions and GROMACS related 
 | [morse_transition_rate](#kimmdy.utils.morse_transition_rate) | Calculates reaction rate constant for a bond breaking event. |
 | [run_gmx](#kimmdy.utils.run_gmx) | Run GROMACS command in shell. |
 | [run_shell_cmd](#kimmdy.utils.run_shell_cmd) | Run command in shell. |
-
-### backup_if_existing { #kimmdy.utils.backup_if_existing }
-
-`utils.backup_if_existing(f)`
-
-Checks whether a file exists and if so, backs it up.
-
-Mainly used for files from previous KIMMDY runs to
-prevent overwriting these files.
-
-#### Parameters
-
-| Name   | Type                   | Description                                         | Default    |
-|--------|------------------------|-----------------------------------------------------|------------|
-| `f`    | [Path](`pathlib.Path`) | Path to a file that will be backed up, if existing. | _required_ |
 
 ### check_gmx_version { #kimmdy.utils.check_gmx_version }
 

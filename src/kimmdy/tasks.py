@@ -5,8 +5,10 @@ output paths and the Task class for steps in the runmanager.
 
 from dataclasses import dataclass, field
 from pathlib import Path
+import shutil
 from typing import Callable, Optional, TYPE_CHECKING, Union
 import logging
+from kimmdy.utils import longFormatter
 
 logger = logging.getLogger(__name__)
 
@@ -73,7 +75,6 @@ def create_task_directory(runmng, postfix: str) -> TaskFiles:
 
     Gets called when a Task is called (from the runmanager.tasks queue).
     """
-    from kimmdy.cmd import longFormatter
 
     files = TaskFiles(runmng.get_latest)
     runmng.iteration += 1
@@ -82,7 +83,12 @@ def create_task_directory(runmng, postfix: str) -> TaskFiles:
     # create outputdir
     files.outputdir = runmng.config.out / taskname
     logger.debug(f"Creating Output directory: {files.outputdir}")
-    files.outputdir.mkdir(exist_ok=runmng.from_checkpoint)
+    if files.outputdir.exists():
+        logger.warning(
+            f"Output directory {files.outputdir} for the task already exists. Deleting."
+        )
+        shutil.rmtree(files.outputdir)
+    files.outputdir.mkdir()
 
     # set up logger
     files.logger = logging.getLogger(f"kimmdy.{taskname}")

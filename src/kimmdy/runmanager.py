@@ -13,13 +13,12 @@ import queue
 from enum import Enum, auto
 from typing import Callable, Union
 from kimmdy.config import Config
-from kimmdy.utils import backup_if_existing
 from kimmdy.parsing import read_top, write_json, read_plumed, write_top
 from kimmdy.recipe import RecipeCollection, Recipe, Break, Bind, Place, Relax
 from kimmdy.plugins import ReactionPlugin, BasicParameterizer
 from kimmdy.coordinates import place_atom, break_bond_plumed, merge_top_slow_growth
 from kimmdy.tasks import Task, TaskFiles, TaskMapping
-from kimmdy.utils import run_shell_cmd, run_gmx
+from kimmdy.utils import run_gmx
 from pprint import pformat
 from kimmdy import reaction_plugins, parameterization_plugins
 from kimmdy.topology.topology import Topology
@@ -132,10 +131,8 @@ class RunManager:
         self.latest_files: dict[str, Path] = get_existing_files(config)
         logger.debug("Initialized latest files:")
         logger.debug(pformat(self.latest_files))
-        self.histfile: Path = Path(f"{self.config.out}_history.log")
-        self.cptfile: Path = Path(f"{self.config.out}_kimmdy.cpt")
-        backup_if_existing(self.histfile)
-        backup_if_existing(self.cptfile)
+        self.histfile: Path = self.config.out / "kimmdy.history"
+        self.cptfile: Path = self.config.out / "kimmdy.cpt"
 
         self.top = Topology(read_top(self.config.top, self.config.ff))
         try:
@@ -178,15 +175,15 @@ class RunManager:
             reaction_plugin: ReactionPlugin = r(rp_name, self)
             self.reaction_plugins.append(reaction_plugin)
 
-        logger.debug("Configuration from input file:")
-        logger.debug(pformat(self.config.__dict__))
-
     def run(self):
         logger.info("Start run")
         self.start_time = time.time()
         self.current_time = time.time()
 
-        if not self.from_checkpoint:
+        if self.from_checkpoint:
+            print(logger)
+            logger.info(f"KIMMDY is starting from a checkpoint.")
+        else:
             self._setup_tasks()
 
         while (
@@ -197,7 +194,7 @@ class RunManager:
                 or self.config.max_hours == 0
             )
         ):
-            logger.info("Write checkpoint before next task")
+            logger.info("Writing checkpoint before next task")
             with open(self.cptfile, "wb") as f:
                 dill.dump(self, f)
             next(self)
@@ -205,7 +202,7 @@ class RunManager:
             logger.info("Done with:")
             logger.info(f"task: {self.iteration}, max: {self.config.max_tasks}")
             logger.info(
-                f"hours: {(self.current_time - self.start_time) / 360}, max: {self.config.max_hours}"
+                f"hours: {(self.current_time - self.start_time) / 3600}, max: {self.config.max_hours}"
             )
 
         logger.info(f"Finished running tasks, state: {self.state}")
@@ -360,7 +357,7 @@ class RunManager:
         gmx_alias = self.config.gromacs_alias
         gmx_mdrun_flags = self.config.gmx_mdrun_flags
 
-        logger.warning(self.latest_files)
+        logger.debug(self.latest_files)
         top = files.input["top"]
         gro = files.input["gro"]
         mdp = md_config.mdp
@@ -502,7 +499,15 @@ class RunManager:
             elif isinstance(step, Bind):
                 self.top.bind_bond((step.atom_id_1, step.atom_id_2))
             elif isinstance(step, Place):
-                place_atom(files, step, self.recipe.timespans)
+                task = Task(
+                    self,
+                    f=place_atom,
+                    kwargs={"step": step, "timespan": self.recipe.timespans},
+                    out="place_atom",
+                )
+                place_files = task()
+                self._discover_output_files(task.name, place_files)
+
             elif isinstance(step, Relax):
                 logger.info("Starting relaxation md as part of reaction..")
                 if not hasattr(self.config.changer.coordinates, "md"):
