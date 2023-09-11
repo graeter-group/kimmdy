@@ -2,7 +2,7 @@
 
 `recipe`
 
-Reaction recipes.
+Contains the Reaction Recipe, RecipeStep and RecipeCollection.
 
 ## Classes
 
