@@ -6,6 +6,7 @@ from pathlib import Path
 import MDAnalysis as mda
 import subprocess as sp
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 import seaborn.objects as so
 import argparse
 from seaborn import axes_style
@@ -208,6 +209,9 @@ def plot_energy(
         plt.axvline(x=t, color="black", linestyle="--")
         plt.text(x=t, y=v + 0.5, s=s, fontsize=6)
 
+    ax = plt.gca()
+    steps_y_axis = [c for c in ax.get_children() if isinstance(c, mpl.axis.YAxis)][0]
+    steps_y_axis.set_visible(False)
     output_path = str(run_dir / "analysis" / "energy.png")
     plt.savefig(output_path, dpi=300)
 
