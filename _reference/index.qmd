@@ -34,7 +34,7 @@ Modules
 | [kmc](kmc.qmd#kimmdy.kmc) | Kinetic Monte Carlo (KMC) classes and functions. |
 | [parsing](parsing.qmd#kimmdy.parsing) | All read_<...> and write_<...> functions. |
 | [plugins](plugins.qmd#kimmdy.plugins) | Plugin base classes and basic instances thereof. |
-| [recipe](recipe.qmd#kimmdy.recipe) | Reaction recipes. |
+| [recipe](recipe.qmd#kimmdy.recipe) | Contains the Reaction Recipe, RecipeStep and RecipeCollection. |
 | [runmanager](runmanager.qmd#kimmdy.runmanager) | The Runmanager is the main entry point of the program. |
 | [schema](schema.qmd#kimmdy.schema) | Handle the schema for the config file. |
 | [tasks](tasks.qmd#kimmdy.tasks) | The tasks module holds the TaskFiles class which organizes input and  |
