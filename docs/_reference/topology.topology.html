@@ -481,7 +481,7 @@ ul.task-list li input[type="checkbox"] {
 </table>
 <section id="kimmdy.topology.topology.MoleculeType.reindex_atomnrs" class="level5">
 <h5 class="anchored" data-anchor-id="kimmdy.topology.topology.MoleculeType.reindex_atomnrs">reindex_atomnrs</h5>
-<p><code>topology.topology.MoleculeType.reindex_atomnrs(self)</code></p>
+<p><code>topology.topology.MoleculeType.reindex_atomnrs()</code></p>
 <p>Reindex atom numbers in topology.</p>
 <p>Starts at index 1. This also updates the numbers for bonds, angles, dihedrals and pairs.</p>
 </section>
@@ -543,7 +543,7 @@ ul.task-list li input[type="checkbox"] {
 </table>
 <section id="kimmdy.topology.topology.Topology.bind_bond" class="level5">
 <h5 class="anchored" data-anchor-id="kimmdy.topology.topology.Topology.bind_bond">bind_bond</h5>
-<p><code>topology.topology.Topology.bind_bond(self, atompair_addresses)</code></p>
+<p><code>topology.topology.Topology.bind_bond(atompair_addresses)</code></p>
 <p>Add a bond in topology.</p>
 <p>Modifies the topology dictionary in place. It keeps track of affected terms in the topology via a graph representation of the topology and applies the necessary changes to bonds, angles and dihedrals (proper and improper). Furthermore, it modifies to function types in the topology to account for radicals.</p>
 <section id="parameters-1" class="level6">
@@ -570,7 +570,7 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="kimmdy.topology.topology.Topology.break_bond" class="level5">
 <h5 class="anchored" data-anchor-id="kimmdy.topology.topology.Topology.break_bond">break_bond</h5>
-<p><code>topology.topology.Topology.break_bond(self, atompair_addresses)</code></p>
+<p><code>topology.topology.Topology.break_bond(atompair_addresses)</code></p>
 <p>Break bonds in topology.</p>
 <p>removes bond, angles and dihedrals where atompair was involved. Modifies the topology dictionary in place.</p>
 <section id="parameters-2" class="level6">
@@ -597,7 +597,7 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="kimmdy.topology.topology.Topology.reindex_atomnrs" class="level5">
 <h5 class="anchored" data-anchor-id="kimmdy.topology.topology.Topology.reindex_atomnrs">reindex_atomnrs</h5>
-<p><code>topology.topology.Topology.reindex_atomnrs(self)</code></p>
+<p><code>topology.topology.Topology.reindex_atomnrs()</code></p>
 <p>Reindex atom numbers in topology.</p>
 <p>Starts at index 1. This also updates the numbers for bonds, angles, dihedrals and pairs.</p>
 

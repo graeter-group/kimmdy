@@ -114,7 +114,7 @@ product state from the educt state.
 
 ##### calc_averages { #kimmdy.recipe.Recipe.calc_averages }
 
-`recipe.Recipe.calc_averages(self, window_size)`
+`recipe.Recipe.calc_averages(window_size)`
 
 Calulate average rates over some window size
 
@@ -126,13 +126,13 @@ Calulate average rates over some window size
 
 ##### check_consistency { #kimmdy.recipe.Recipe.check_consistency }
 
-`recipe.Recipe.check_consistency(self)`
+`recipe.Recipe.check_consistency()`
 
 Run consistency checks for correct size of variables
 
 ##### combine_with { #kimmdy.recipe.Recipe.combine_with }
 
-`recipe.Recipe.combine_with(self, other)`
+`recipe.Recipe.combine_with(other)`
 
 Combines this Recipe with another with the same RecipeSteps.
 
@@ -161,13 +161,13 @@ They can originate from multiple reaction plugins, but do not need to.
 
 ##### aggregate_reactions { #kimmdy.recipe.RecipeCollection.aggregate_reactions }
 
-`recipe.RecipeCollection.aggregate_reactions(self)`
+`recipe.RecipeCollection.aggregate_reactions()`
 
 Combines reactions having the same sequence of RecipeSteps.
 
 ##### calc_cumprob { #kimmdy.recipe.RecipeCollection.calc_cumprob }
 
-`recipe.RecipeCollection.calc_cumprob(self)`
+`recipe.RecipeCollection.calc_cumprob()`
 
 Calculate cumulative probability of all contained recipe steps.
 Sums up to 1 over all recipes. Assumes constant rate for given timespan
@@ -175,14 +175,14 @@ and rate zero otherwise.
 
 ##### from_csv { #kimmdy.recipe.RecipeCollection.from_csv }
 
-`recipe.RecipeCollection.from_csv(cls, path)`
+`recipe.RecipeCollection.from_csv(path)`
 
 Create a RecipeCollection object from a CSV file
 Returns the recipe collection and a single recipe that was picked, otherwise None
 
 ##### plot { #kimmdy.recipe.RecipeCollection.plot }
 
-`recipe.RecipeCollection.plot(self, outfile, highlight_r=None, highlight_t=None)`
+`recipe.RecipeCollection.plot(outfile, highlight_r=None, highlight_t=None)`
 
 Plot reaction rates over time
 
@@ -196,7 +196,7 @@ Plot reaction rates over time
 
 ##### to_csv { #kimmdy.recipe.RecipeCollection.to_csv }
 
-`recipe.RecipeCollection.to_csv(self, path, picked_recipe=None)`
+`recipe.RecipeCollection.to_csv(path, picked_recipe=None)`
 
 Write a ReactionResult as defined in the reaction module to a csv file
 
