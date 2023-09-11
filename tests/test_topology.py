@@ -173,10 +173,18 @@ class TestTopology:
         bond_key = list(top.bonds.keys())[bondindex]
         logging.info(f"bond_key: {bond_key}")
         assert top.bonds.get(bond_key) is not None
+
         top.break_bond(bond_key)
         assert top.bonds.get(bond_key) is None
+        assert not top.validate_bond(top.atoms[bond_key[0]], top.atoms[bond_key[1]])
+        with pytest.raises(ValueError):
+            top.break_bond(bond_key)
+
         top.bind_bond(bond_key)
         assert top.bonds.get(bond_key) is not None
+        assert top.validate_bond(top.atoms[bond_key[0]], top.atoms[bond_key[1]])
+        with pytest.raises(ValueError):
+            top.bind_bond(bond_key)
 
         assert top.bonds == og_top.bonds
         assert top.pairs == og_top.pairs

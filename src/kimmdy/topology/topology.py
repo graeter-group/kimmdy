@@ -565,6 +565,30 @@ class Topology:
         ].dihedral_restraints
         self.radicals = self.moleculetypes[main_molecule_name].radicals
 
+    def validate_bond(self, atm1: Atom, atm2: Atom) -> bool:
+        """Validates bond consistency between both atoms and top
+        Returns True if bond exists, False if not.
+        Raises RuntimeError if bond is not consistent.
+        """
+
+        counter = 0
+        if (atm1.nr, atm2.nr) in self.bonds.keys():
+            counter += 1
+        if atm1.nr in atm2.bound_to_nrs:
+            counter += 1
+        if atm2.nr in atm1.bound_to_nrs:
+            counter += 1
+        if counter == 3:
+            return True
+        elif counter == 0:
+            return False
+        raise RuntimeError(
+            f"Bond between atom {atm1.nr} {atm1.type} and {atm2.nr} {atm2.type} "
+            "(1-based) is ill-defined!\n"
+            f"\tatm1.bound_to_nrs {atm1.bound_to_nrs}\n"
+            f"\tatm2.bound_to_nrs {atm2.bound_to_nrs}\n"
+        )
+
     def _parse_molecules(self):
         moleculetypes = [k for k in self.top.keys() if k.startswith("moleculetype")]
         for moleculetype in moleculetypes:
@@ -670,7 +694,6 @@ class Topology:
         Modifies the topology dictionary in place.
         Atom pairs become radicals.
 
-
         Parameters
         ----------
         atompair_addresses
@@ -696,6 +719,13 @@ class Topology:
             moleculetype.atoms[atompair_nrs[0]],
             moleculetype.atoms[atompair_nrs[1]],
         ]
+
+        if not self.validate_bond(*atompair):
+            raise ValueError(
+                "Trying to break non-existing bond!"
+                f"\n\tatom 1, nr {atompair[0].nr}, type {atompair[0].type}, res {atompair[0].residue}"
+                f"\n\tatom 2, nr {atompair[1].nr}, type {atompair[1].type}, res {atompair[1].residue}"
+            )
 
         # mark atoms as radicals
         for atom in atompair:
@@ -740,12 +770,8 @@ class Topology:
                 moleculetype.improper_dihedrals.pop(key, None)
 
         # update bound_to
-        try:
-            atompair[0].bound_to_nrs.remove(atompair[1].nr)
-            atompair[1].bound_to_nrs.remove(atompair[0].nr)
-        except ValueError as _:
-            m = f"tried to remove bond between already disconnected atoms: {atompair}."
-            logging.warning(m)
+        atompair[0].bound_to_nrs.remove(atompair[1].nr)
+        atompair[1].bound_to_nrs.remove(atompair[0].nr)
 
     def bind_bond(
         self, atompair_addresses: tuple[TopologyAtomAddress, TopologyAtomAddress]
@@ -783,18 +809,12 @@ class Topology:
         ]
 
         # check whether they are bound already
-        bound = False
-        for i, atom in enumerate(atompair):
-            other = atompair[abs(i - 1)]
-            if other.nr in atom.bound_to_nrs:
-                bound = True
-                logger.warning(
-                    "Trying to bind to atoms already bound!"
-                    f"\n\tatom 1, nr {atom.nr}, type {atom.type}, res {atom.residue}"
-                    f"\n\tatom 2, nr {other.nr}, type {other.type}, res {other.residue}"
-                )
-        if bound:
-            return
+        if self.validate_bond(*atompair):
+            raise ValueError(
+                "Trying to bind to atoms already bound!"
+                f"\n\tatom 1, nr {atompair[0].nr}, type {atompair[0].type}, res {atompair[0].residue}"
+                f"\n\tatom 2, nr {atompair[1].nr}, type {atompair[1].type}, res {atompair[1].residue}"
+            )
 
         # de-radialize if re-combining two radicals
         if all(map(lambda x: x.is_radical, atompair)):
