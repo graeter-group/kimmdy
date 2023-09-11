@@ -16,106 +16,48 @@ def test_parser_doesnt_crash_on_example(arranged_tmp_path, caplog):
     """Example file urea.top
     from <https://manual.gromacs.org/documentation/current/reference-manual/topologies/topology-file-formats.html>
     """
-
-    urea_path = Path("urea.top")
-    top = parsing.read_top(urea_path)
-    assert isinstance(top, dict)
+    top_dict = parsing.read_top(Path("urea.top"))
+    assert isinstance(top_dict, dict)
 
 
 def test_doubleparse_urea(arranged_tmp_path):
     """Parsing it's own output should return the same top on urea.top"""
-    urea_path = Path("urea.top")
-    top = parsing.read_top(urea_path)
-    p = Path("pytest_urea.top")
-    parsing.write_top(top, p)
-    top2 = parsing.read_top(p)
-    p2 = Path("pytest_urea2.top")
-    parsing.write_top(top2, p2)
-    top3 = parsing.read_top(p2)
-    assert top2 == top3
+    top_dict = parsing.read_top(Path("urea.top"))
+
+    top2_path = Path("pytest_urea.top")
+    parsing.write_top(top_dict, top2_path)
+    top2_dict = parsing.read_top(top2_path)
+
+    top3_path = Path("pytest_urea2.top")
+    parsing.write_top(top2_dict, top3_path)
+    top3_dict = parsing.read_top(top3_path)
+
+    assert top2_dict == top3_dict
 
 
 @pytest.mark.skipif(
-    not get_gmx_dir(), reason="Command 'gmx' not found, can't test gmx dir parsing."
+    not get_gmx_dir("gmx"),
+    reason="Command 'gmx' not found, can't test gmx dir parsing.",
 )
 def test_ff_includes_with_gmxdir(arranged_tmp_path):
-    urea_path = Path("urea.top")
-    raw = parsing.read_top(urea_path)
+    top_dict = parsing.read_top(Path("urea.top"))
+    gmx_dir = get_gmx_dir("gmx")
+    tip3_dict = parsing.read_top(gmx_dir / "top" / "amber99.ff" / "tip3p.itp")
 
-    print(raw["moleculetype_1"])
-    assert raw["atomtypes"]
-    assert raw["bondtypes"]
-    assert raw["moleculetype_1"] == {
-        "content": [["SOL", "2"]],
-        "else_content": [],
-        "extra": [],
-        "condition": None,
-        "subsections": {
-            "atoms": {
-                "content": [
-                    ["1", "OW", "1", "SOL", "OW", "1", "-0.834", "16.00000"],
-                    ["2", "HW", "1", "SOL", "HW1", "1", "0.417", "1.00800"],
-                    ["3", "HW", "1", "SOL", "HW2", "1", "0.417", "1.00800"],
-                ],
-                "else_content": [],
-                "extra": [],
-                "condition": None,
-            },
-            "settles": {
-                "content": [["1", "1", "0.09572", "0.15139"]],
-                "else_content": [],
-                "extra": [],
-                "condition": {"type": "ifndef", "value": "FLEXIBLE"},
-            },
-            "exclusions": {
-                "content": [["1", "2", "3"], ["2", "1", "3"], ["3", "1", "2"]],
-                "else_content": [],
-                "extra": [],
-                "condition": {"type": "ifndef", "value": "FLEXIBLE"},
-            },
-            "bonds": {
-                "content": [],
-                "else_content": [
-                    ["1", "2", "1", "0.09572", "502416.0", "0.09572", "502416.0"],
-                    ["1", "3", "1", "0.09572", "502416.0", "0.09572", "502416.0"],
-                ],
-                "extra": [],
-                "condition": {"type": "ifndef", "value": "FLEXIBLE"},
-            },
-            "angles": {
-                "content": [],
-                "else_content": [
-                    ["2", "1", "3", "1", "104.52", "628.02", "104.52", "628.02"]
-                ],
-                "extra": [],
-                "condition": {"type": "ifndef", "value": "FLEXIBLE"},
-            },
-        },
-    }
+    assert top_dict["atomtypes"]
+    assert top_dict["bondtypes"]
+    assert top_dict["moleculetype_1"] == tip3_dict["moleculetype_0"]
 
 
 def test_ff_includes_with_ff_in_cwd(arranged_tmp_path):
-    urea_path = Path("hexala.top")
-    raw = parsing.read_top(urea_path)
-    assert raw["atomtypes"]
-    assert raw["bondtypes"]
-    assert raw["moleculetype_11"] == {
-        "content": [["ZN", "1"]],
-        "else_content": [],
-        "extra": [],
-        "condition": None,
-        "subsections": {
-            "atoms": {
-                "content": [["1", "Zn", "1", "ZN", "ZN", "1", "2.00000"]],
-                "else_content": [],
-                "extra": [],
-                "condition": None,
-            }
-        },
-    }
+    top_dict = parsing.read_top(Path("hexala.top"))
+    ions_dict = parsing.read_top(Path("amber99sb-star-ildnp.ff/ions.itp"))
+    assert top_dict["atomtypes"]
+    assert top_dict["bondtypes"]
+    assert top_dict["moleculetype_11"] == ions_dict["moleculetype_9"]
 
 
-#### Parsing should be invertible ####
+# test whether topology parsing is invertible
 allowed_text = st.text(
     string.ascii_letters + string.digits + "!\"$%&'()*+,-./:<=>?@\\^_`{|}~", min_size=1
 )
@@ -142,22 +84,21 @@ def test_parser_invertible(sections, arranged_tmp_path):
         header = re.sub(r"\d", "x", header)
         s[0] = f"[ {header} ]"
     ls = [l for s in sections for l in s]
-    print(ls)
-    p = Path("topol.top")
-    p2 = Path("topol2.top")
-    p.parent.mkdir(exist_ok=True)
-    with open(p, "w") as f:
+
+    top_path = Path("topol.top")
+    top2_path = Path("topol2.top")
+    with open(top_path, "w") as f:
         f.write("\n".join(ls))
-    top = parsing.read_top(p)
-    parsing.write_top(top, p2)
-    top2 = parsing.read_top(p2)
-    assert top == top2
+    top_dict = parsing.read_top(top_path)
+    parsing.write_top(top_dict, top2_path)
+    top2_dict = parsing.read_top(top2_path)
+    assert top_dict == top2_dict
 
 
 @given(ls=st.lists(allowed_text))
 @settings(suppress_health_check=[HealthCheck.function_scoped_fixture])
 def test_parser_fails_without_sections(ls, arranged_tmp_path):
-    p = Path("topol.top")
+    p = Path("nonexisting.top")
     p.parent.mkdir(exist_ok=True)
     with open(p, "w") as f:
         f.writelines(ls)
@@ -221,8 +162,7 @@ def test_parse_ffbonded_read_top():
 
 ## test plumed parsing
 def test_plumed_read(arranged_tmp_path):
-    plumed_path = Path("plumed.dat")
-    plumed_dict = parsing.read_plumed(plumed_path)
+    plumed_dict = parsing.read_plumed(Path("plumed.dat"))
 
     assert set(plumed_dict.keys()) == set(["labeled_action", "prints", "other"])
     assert isinstance(plumed_dict["labeled_action"], dict)
@@ -232,11 +172,11 @@ def test_plumed_read(arranged_tmp_path):
 
 
 def test_plumed_write_identity(arranged_tmp_path):
-    plumed_path = Path("plumed.dat")
+    plumed_dict = parsing.read_plumed(Path("plumed.dat"))
     plumed_mod_path = Path("plumed_mod.dat")
-    plumed_dict = parsing.read_plumed(plumed_path)
     parsing.write_plumed(plumed_dict, plumed_mod_path)
     plumed_mod_dict = parsing.read_plumed(plumed_mod_path)
+
     assert plumed_mod_dict == plumed_dict
 
 
