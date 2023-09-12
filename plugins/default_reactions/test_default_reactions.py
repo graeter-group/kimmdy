@@ -74,6 +74,7 @@ def homolysis_files(tmp_path: Path):
     return files
 
 
+## test homolysis
 def test_get_atomnrs(homolysis_files):
     atomnrs = get_atomnrs_from_plumedid("d1", homolysis_files["plumed"])
     assert atomnrs == ["7", "9"]
@@ -165,3 +166,10 @@ def test_get_recipe_collection(homolysis_files):
         assert len(recipe.timespans[0]) == 2
         for time in recipe.timespans[0]:
             assert type(time) in [float, np.float32, np.float64]
+
+
+## test hat_naive
+# TODO:
+
+## test dummyreaction
+# TODO:

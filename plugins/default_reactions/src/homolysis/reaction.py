@@ -29,10 +29,6 @@ class Homolysis(ReactionPlugin):
         logger = files.logger
         logger.debug("Getting recipe for reaction: homolysis")
 
-        # Initialization of filepaths
-        # files.input["itp"] = self.config.itp
-        # files.input["edis"] = self.config.edis
-
         # Initialization of objects from files
         distances = read_distances_dat(files.input["plumed_out"])
         plumed = read_plumed(files.input["plumed"])
