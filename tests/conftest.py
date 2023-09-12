@@ -31,14 +31,16 @@ def pytest_runtest_setup(item):
     require_gmx = [mark for mark in item.iter_markers(name="require_gmx")]
     if require_gmx:
         if not get_gmx_dir():
-            pytest.skip("Command 'gmx' not found, can't test gmx dir parsing.")
+            pytest.skip(
+                f"{item.name} skipped. Command 'gmx' not found, can't test gmx dir parsing."
+            )
 
     require_grappa = [mark for mark in item.iter_markers(name="require_grappa")]
     if require_grappa:
         try:
             import grappa
         except ModuleNotFoundError:
-            pytest.skip("Can't import module grappa.")
+            pytest.skip(f"{item.name} skipped. Can't import module grappa.")
 
 
 ## fixtures for setup and teardown ##
