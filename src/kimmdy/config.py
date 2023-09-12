@@ -10,7 +10,7 @@ import yaml
 from pathlib import Path
 from kimmdy import reaction_plugins
 from kimmdy.schema import Sequence, get_combined_scheme
-from kimmdy.utils import get_gmx_dir
+from kimmdy.utils import get_gmx_dir, check_gmx_version
 
 
 def check_file_exists(p: Path):
@@ -275,6 +275,7 @@ class Config:
                         raise AssertionError(
                             "Plumed requested in md section, but not defined at config root"
                         )
+                    check_gmx_version(self)
 
             # make sure self.out is empty
             while self.out.exists():
