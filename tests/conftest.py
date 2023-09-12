@@ -21,6 +21,9 @@ def pytest_configure(config):
     config.addinivalue_line(
         "markers", "require_gmx: mark test to run if gmx is executable"
     )
+    config.addinivalue_line(
+        "markers", "require_grappa: mark test to run if grappa is available"
+    )
 
 
 # look for mark and define mark action
@@ -29,6 +32,13 @@ def pytest_runtest_setup(item):
     if require_gmx:
         if not get_gmx_dir():
             pytest.skip("Command 'gmx' not found, can't test gmx dir parsing.")
+
+    require_grappa = [mark for mark in item.iter_markers(name="require_grappa")]
+    if require_grappa:
+        try:
+            import grappa
+        except ModuleNotFoundError:
+            pytest.skip("Can't import module grappa.")
 
 
 ## fixtures for setup and teardown ##

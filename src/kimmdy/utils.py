@@ -57,6 +57,12 @@ def get_shell_stdout(s):
     return process.stdout
 
 
+def check_file_exists(p: Path):
+    if not p.exists():
+        m = f"File not found: {p}"
+        raise LookupError(m)
+
+
 ## reaction plugin building blocks
 
 

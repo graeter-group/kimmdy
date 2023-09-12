@@ -1,3 +1,5 @@
+import yaml
+
 from kimmdy.config import Config
 from kimmdy.runmanager import get_existing_files
 from pathlib import Path
@@ -6,8 +8,7 @@ import pytest
 
 @pytest.mark.require_gmx
 def test_parse_config1_casting(arranged_tmp_path):
-    input_f = Path("config1.yml")
-    config = Config(input_f)
+    config = Config(Path("config1.yml"))
 
     assert config.dryrun is True
     assert isinstance(config.dryrun, bool)
@@ -25,51 +26,49 @@ def test_parse_config1_casting(arranged_tmp_path):
 def test_non_existent_sections_with_defaults_in_subsections_are_created(
     arranged_tmp_path,
 ):
-    path = Path("config1.yml")
-    config = Config(path)
+    config = Config(Path("config1.yml"))
+
     assert config.log.file.name == "kimmdy.log"
     assert config.log.level == "INFO"
 
 
 def test_no_sections_are_created_for_not_mentioned_reactions(arranged_tmp_path):
-    path = Path("config1.yml")
-    config = Config(path)
-    assert config.reactions.homolysis
-    assert config.reactions.homolysis.edis.name == "edissoc.dat"
-    assert len(config.reactions.__dict__) == 1
+    config_1 = Config(Path("config1.yml"))
+    config_2 = Config(Path("config2.yml"))
 
-    path = Path("config7.yml")
-    config = Config(path)
-    assert len(config.reactions.__dict__) == 2
-    assert config.reactions.homolysis
-    assert config.reactions.homolysis.edis.name == "edissoc.dat"
-    assert config.reactions.hat_naive
-    assert config.reactions.hat_naive.polling_rate == 1
-    assert config.reactions.hat_naive.h_cutoff == 4
+    assert config_1.reactions.homolysis
+    assert config_1.reactions.homolysis.edis.name == "edissoc.dat"
+    assert len(config_1.reactions.__dict__) == 1
+
+    assert len(config_2.reactions.__dict__) == 2
+    assert config_2.reactions.homolysis
+    assert config_2.reactions.homolysis.edis.name == "edissoc.dat"
+    assert config_2.reactions.hat_naive
+    assert config_2.reactions.hat_naive.polling_rate == 1
+    assert config_2.reactions.hat_naive.h_cutoff == 4
 
 
 def test_subsections_with_defaults_are_kept(arranged_tmp_path):
-    path = Path("config7.yml")
-    config = Config(path)
+    config = Config(Path("config2.yml"))
+
     assert config.log.file.name == "kimmdy.log"
     assert config.log.level == "DEBUG"
 
 
 def test_out_is_generated_from_name_if_not_set(arranged_tmp_path):
-    path = Path("config1.yml")
-    config = Config(path)
-    assert config.name == "kimmdy"
-    assert config.out.name == "test_config_1"
+    config_1 = Config(Path("config1.yml"))
+    config_2 = Config(Path("config2.yml"))
 
-    path = Path("config7.yml")
-    config = Config(path)
-    assert config.name == "config7"
-    assert config.out.name == "config7"
+    assert config_1.name == "kimmdy"
+    assert config_1.out.name == "test_config_1"
+
+    assert config_2.name == "config2"
+    assert config_2.out.name == "config2"
 
 
 def test_general_settings_for_mds_are_set(arranged_tmp_path):
-    path = Path("config1.yml")
-    config = Config(path)
+    config = Config(Path("config1.yml"))
+
     assert len(config.mds.__dict__) == 3
     # explicitly set:
     assert config.mds.equilibrium1.mdp.name == "pullf1500_equil.mdp"
@@ -79,17 +78,27 @@ def test_general_settings_for_mds_are_set(arranged_tmp_path):
 
 
 def test_complains_if_plumed_used_but_not_set(arranged_tmp_path):
-    path = Path("config8.yml")
+    with open(Path("config1.yml"), "r") as f:
+        raw = yaml.safe_load(f)
+    del raw["plumed"]
+
     with pytest.raises(
         AssertionError,
         match="Plumed requested in md section, but not defined at config root",
     ):
-        _ = Config(path)
+        _ = Config(recursive_dict=raw)
 
 
-def test_parse_config2_start_with_reaction(arranged_tmp_path):
-    input_f = Path("config2.yml")
-    config = Config(input_f)
+def test_parse_reaction_only(arranged_tmp_path):
+    with open(Path("config1.yml"), "r") as f:
+        raw = yaml.safe_load(f)
+    raw["tpr"] = "pull.tpr"
+    raw["trr"] = "pull.trr"
+    del raw["mds"]
+    del raw["changer"]["coordinates"]["md"]
+    raw["sequence"] = ["homolysis"]
+
+    config = Config(recursive_dict=raw)
 
     assert isinstance(config.tpr, Path)
     assert isinstance(config.trr, Path)
@@ -97,37 +106,55 @@ def test_parse_config2_start_with_reaction(arranged_tmp_path):
     assert config.sequence == ["homolysis"]
 
 
-def test_parse_config3_missing_mdp_file(arranged_tmp_path):
-    input_f = Path("config3.yml")
-
-    with pytest.raises(LookupError):
-        Config(input_f)
-
-
-def test_parse_config4_sequence_missing_entry(arranged_tmp_path):
-    input_f = Path("config4.yml")
-
-    with pytest.raises(AssertionError):
-        Config(input_f)
+def test_parse_missing_mdp_file(arranged_tmp_path):
+    with open(Path("config1.yml"), "r") as f:
+        raw = yaml.safe_load(f)
+    raw["mds"]["relax"]["mdp"] = "nonexisting.mdp"
+    with pytest.raises(LookupError, match="File not found:"):
+        Config(recursive_dict=raw)
 
 
-def test_parse_config5_sequence_missing_entry_no_mds(arranged_tmp_path):
-    input_f = Path("config5.yml")
+def test_parse_missing_required_mdp_section(arranged_tmp_path):
+    with open(Path("config1.yml"), "r") as f:
+        raw = yaml.safe_load(f)
+    del raw["mds"]["relax"]["mdp"]
+    with pytest.raises(
+        AssertionError, match="MD instance defined but contains no mdp file."
+    ):
+        Config(recursive_dict=raw)
 
-    with pytest.raises(AssertionError):
-        Config(input_f)
+
+def test_parse_sequence_missing_entry(arranged_tmp_path):
+    with open(Path("config1.yml"), "r") as f:
+        raw = yaml.safe_load(f)
+    raw["sequence"][1]["tasks"][0] = "nonexistent_entry"
+    with pytest.raises(
+        AssertionError,
+        match="Task nonexistent_entry listed in sequence, but not defined!",
+    ):
+        Config(recursive_dict=raw)
 
 
-def test_parse_config6_changer_bad_reference(arranged_tmp_path):
-    input_f = Path("config6.yml")
+def test_parse_sequence_missing(arranged_tmp_path):
+    with open(Path("config1.yml"), "r") as f:
+        raw = yaml.safe_load(f)
+    del raw["sequence"]
+    with pytest.raises(AssertionError, match="No sequence defined!"):
+        Config(recursive_dict=raw)
 
-    with pytest.raises(AssertionError):
-        Config(input_f)
+
+def test_parse_coordinates_bad_reference(arranged_tmp_path):
+    with open(Path("config1.yml"), "r") as f:
+        raw = yaml.safe_load(f)
+    raw["changer"]["coordinates"]["md"] = "relax_nonexistent.mdp"
+    with pytest.raises(
+        AssertionError, match="Relax MD relax_nonexistent.mdp not in MD section!"
+    ):
+        Config(recursive_dict=raw)
 
 
 def test_get_existing_files(arranged_tmp_path):
-    input_f = Path("config1.yml")
-    config = Config(input_f)
+    config = Config(Path("config1.yml"))
     file_d = get_existing_files(config)
     assert set(file_d.keys()) == set(
         [

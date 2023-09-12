@@ -193,6 +193,10 @@ def flatten_scheme(scheme, section="") -> list:
 
 
 def generate_markdown_table(scheme, append=False):
+    """Generate markdown table from scheme
+
+    Used in documentation generation.
+    """
     table = []
     if not append:
         table.append("| Option | Description | Type | Default |")
