@@ -96,13 +96,11 @@ def test_parser_invertible(sections, arranged_tmp_path):
 @given(ls=st.lists(allowed_text))
 @settings(suppress_health_check=[HealthCheck.function_scoped_fixture])
 def test_parser_fails_without_sections(ls, arranged_tmp_path):
-    p = Path("nonexisting.top")
-    p.parent.mkdir(exist_ok=True)
+    p = Path("random_content.top")
     with open(p, "w") as f:
         f.writelines(ls)
     with pytest.raises(ValueError):
         parsing.read_top(p)
-    assert True
 
 
 ## test ff file parsing
