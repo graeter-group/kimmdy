@@ -165,6 +165,28 @@ class TestTopAB:
 
 
 class TestTopology:
+    @given(atomindex=st.integers(min_value=1, max_value=72))
+    @settings(suppress_health_check=[HealthCheck.function_scoped_fixture])
+    def test_del_atom_hexala(self, hexala_top_fix, atomindex):
+        # def test_del_atom_hexala(self, hexala_top_fix):
+        top: Topology = deepcopy(hexala_top_fix)
+
+        atom = top.atoms[str(atomindex)]
+        bound_nrs = deepcopy(atom.bound_to_nrs)
+        bound_atms = [top.atoms[i] for i in bound_nrs]
+
+        top.del_atom(str(atomindex), parameterize=False)
+
+        for nr, atm in zip(bound_nrs, bound_atms):
+            if int(nr) > atomindex:
+                assert int(atm.nr) == int(nr) - 1
+            else:
+                assert int(atm.nr) == int(nr)
+            assert atm.is_radical
+
+        assert atom not in top.atoms.values()
+        assert len(atom.bound_to_nrs) == 0
+
     def test_break_bind_bond_hexala(self, hexala_top_fix):
         top = deepcopy(hexala_top_fix)
         og_top = deepcopy(top)
