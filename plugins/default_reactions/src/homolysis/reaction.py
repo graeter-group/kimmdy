@@ -8,7 +8,8 @@ from kimmdy.plugins import ReactionPlugin
 from kimmdy.tasks import TaskFiles
 from kimmdy.utils import (
     morse_transition_rate,
-    get_atominfo_from_plumedid,
+    get_atomnrs_from_plumedid,
+    get_atomtypes_from_atomnrs,
     get_bondprm_from_atomtypes,
 )
 from kimmdy.parsing import (
@@ -29,20 +30,15 @@ class Homolysis(ReactionPlugin):
         logger.debug("Getting recipe for reaction: homolysis")
 
         # Initialization of filepaths
-        plumed_dat = files.input["plumed"]
-        distances_dat = files.input["plumed_out"]
-        topol_top = files.input["top"]
-        ffbonded_itp = self.config.itp
-        files.input["itp"] = ffbonded_itp
-        edissoc_dat = self.config.edis
-        files.input["edis"] = edissoc_dat
+        files.input["itp"] = self.config.itp
+        files.input["edis"] = self.config.edis
 
         # Initialization of objects from files
-        distances = read_distances_dat(distances_dat)
-        plumed = read_plumed(plumed_dat)
-        top = read_top(topol_top)
-        ffbonded = read_top(ffbonded_itp)
-        edissoc = read_edissoc(edissoc_dat)
+        distances = read_distances_dat(files.input["plumed_out"])
+        plumed = read_plumed(files.input["plumed"])
+        top = self.runmng.top
+        ffbonded = read_top(files.input["itp"])
+        edissoc = read_edissoc(files.input["edis"])
 
         #
         recipes = []
@@ -50,11 +46,12 @@ class Homolysis(ReactionPlugin):
             if plumedid == "time":
                 continue
             # get from plumedid to b0 and kb of the bond via atomtypes
-            atomtypes, atomids = get_atominfo_from_plumedid(plumedid, plumed, top)
+            atomnrs = get_atomnrs_from_plumedid(plumedid, plumed)
+            atomtypes = get_atomtypes_from_atomnrs(atomnrs, top)
             b0, kb, E_dis = get_bondprm_from_atomtypes(atomtypes, ffbonded, edissoc)
 
             logger.debug(
-                f"plumedid: {plumedid}, atomids: {atomids}, atomtypes: {atomtypes}, b0: {b0}, kb: {kb}, E_dis: {E_dis}"
+                f"plumedid: {plumedid}, atomids: {atomnrs}, atomtypes: {atomtypes}, b0: {b0}, kb: {kb}, E_dis: {E_dis}"
             )
 
             k_avg, _ = morse_transition_rate([sum(dists) / len(dists)], b0, E_dis, kb)
@@ -64,7 +61,7 @@ class Homolysis(ReactionPlugin):
             recipes.append(
                 Recipe(
                     recipe_steps=[
-                        Break(atom_id_1=atomids[0], atom_id_2=atomids[1]),
+                        Break(atom_id_1=atomnrs[0], atom_id_2=atomnrs[1]),
                         Relax(),
                     ],
                     rates=[*k_avg],

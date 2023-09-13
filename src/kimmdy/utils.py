@@ -1,14 +1,16 @@
 """
 Utilities for building plugins, shell convenience functions and GROMACS related functions
 """
-
+from __future__ import annotations
 import subprocess as sp
 import numpy as np
 import logging
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 from pathlib import Path
 
-from kimmdy.topology.utils import get_protein_section
+if TYPE_CHECKING:
+    from kimmdy.topology.topology import Topology
+    from kimmdy.parsing import Plumed_dict
 
 logger = logging.getLogger(__name__)
 
@@ -66,14 +68,12 @@ def check_file_exists(p: Path):
 ## reaction plugin building blocks
 
 
-def get_atominfo_from_plumedid(
-    plumedid: str, plumed: dict, top: dict
-) -> tuple[frozenset[str], list[str]]:
+def get_atomnrs_from_plumedid(
+    plumedid: str,
+    plumed: Plumed_dict,
+) -> list[str]:
     """
-    For a plumedid, returns the corresponding atom types and nrs.
-
-    To convert from plumedid to atomnr, information from the plumed file is used.
-    Then, the topology atoms section can be used to convert from atomnr to atomtype
+    Convert from plumedid to atomnr, information from the plumed file is used.
 
     Parameters
     ----------
@@ -81,27 +81,30 @@ def get_atominfo_from_plumedid(
         Identifier from a plumed input file (e.g d0).
     plumed:
         Parsed plumed input file
-    top:
-        Topology of the molecular system"""
+    """
+    # lookup_atomnr_plumedid = {k: frozenset(v["atoms"])
+    plumed_action = plumed["labeled_action"][plumedid]
+    if a := plumed_action.get("atoms"):
+        atomnrs = sorted(a, key=int)
+        logger.debug(f"Found atomnumbers {atomnrs} for plumedid {plumedid}.")
+        return atomnrs
+    else:
+        raise NotImplementedError(
+            f"Can't get atomnrs for {plumedid}, is this for an unexpected plumed action?"
+        )
 
-    lookup_atomnr_plumedid = {
-        k: frozenset(v["atoms"]) for k, v in plumed["labeled_action"].items()
-    }
-    atoms = get_protein_section(top, "atoms")
-    lookup_atomtype_atomnr = {str(atom[0]): atom[1] for atom in atoms}
-    atomnrs = sorted(lookup_atomnr_plumedid[plumedid], key=int)
-    atomtypes = frozenset(
-        [
-            lookup_atomtype_atomnr[atomnrs[0]],
-            lookup_atomtype_atomnr[atomnrs[1]],
-        ]
-    )
-    logger.debug(f"Found atomtypes {atomtypes} for plumedid {plumedid}.")
-    return atomtypes, atomnrs
+
+def get_atomtypes_from_atomnrs(atomnrs: list[str], top: Topology):
+    """Use topology atoms section to convert from atomnr to atomtype"""
+    atomtypes = []
+    for atomnr in atomnrs:
+        atomtypes.append(top.atoms[atomnr].type)
+    logger.debug(f"Found atomtypes {atomtypes} for atom numbers {atomnrs}.")
+    return atomtypes
 
 
 def get_bondprm_from_atomtypes(
-    atomtypes: frozenset, ffbonded: dict, lookup_edissoc_atomtype: dict
+    atomtypes: list[str], ffbonded: dict, edissoc: dict
 ) -> tuple[float, float, float]:
     """Returns bond parameters (b0, kb, E_dis) for a set of two atomtypes.
 
@@ -111,40 +114,38 @@ def get_bondprm_from_atomtypes(
         Two atomtypes as defined in the respective force field
     ffbonded:
         Force field ffbonded.itp file parsed through the rtp parser
-    lookup_edissoc_atomtype:
+    edissoc:
         Parsed file with dissociation energies per bond between two atomtypes or elements
     """
-    atomtypes_list = list(atomtypes)
-    lookup_ffbonded_atomtype = {
-        frozenset(l[:2]): [float(l[3]), float(l[4])]
-        for l in ffbonded["bondtypes"]["content"]
-    }
-    atomelements_list = [x[0] for x in atomtypes_list]
+    atomelements = [x[0] for x in atomtypes]
 
     # dissociation energy can be for bonds between atomtypes or elements or mixtures of both
     for comb in [
-        atomtypes_list,
-        [atomtypes_list[0], atomelements_list[1]],
-        [atomelements_list[0], atomtypes_list[1]],
-        atomelements_list,
+        atomtypes,
+        [atomtypes[0], atomelements[1]],
+        [atomelements[0], atomtypes[1]],
+        atomelements,
     ]:
-        if (comb_set := frozenset(comb)) in lookup_edissoc_atomtype.keys():
-            E_dis = lookup_edissoc_atomtype[comb_set]
+        if E_dis := edissoc.get(tuple(comb)):
+            break
+        elif E_dis := edissoc.get(tuple(comb[::-1])):
             break
     else:
         raise KeyError(
             f"Did not find dissociation energy for atomtypes {atomtypes} in edissoc file"
         )
-
-    try:
-        b0, kb = lookup_ffbonded_atomtype[atomtypes]
-    except KeyError as e:
+    # search for b0 and kb for the given atomtypes in ffbonded bondtypes
+    for bondtype in ffbonded["bondtypes"]["content"]:
+        if set(atomtypes) == set(bondtype[:2]):
+            b0, kb = [float(x) for x in bondtype[3:5]]
+            break
+    else:
         raise KeyError(
             f"Did not find bond parameters for atomtypes {atomtypes} in ffbonded file"
-        ) from e
+        )
 
     logger.debug(f"Found bondprm {[b0,kb,E_dis]} for atomtypes {atomtypes}.")
-    return float(b0), float(kb), float(E_dis)
+    return b0, kb, E_dis
 
 
 def morse_transition_rate(
