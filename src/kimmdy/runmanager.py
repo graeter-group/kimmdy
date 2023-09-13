@@ -134,12 +134,11 @@ class RunManager:
         self.histfile: Path = self.config.out / "kimmdy.history"
         self.cptfile: Path = self.config.out / "kimmdy.cpt"
 
-        self.top = Topology(read_top(self.config.top, self.config.ff))
         try:
             if self.config.changer.topology.parameterization == "basic":
-                self.parameterizer = BasicParameterizer()
+                parameterizer = BasicParameterizer()
             else:
-                self.parameterizer = parameterization_plugins[
+                parameterizer = parameterization_plugins[
                     self.config.changer.topology.parameterization
                 ]()
         except KeyError as e:
@@ -148,6 +147,7 @@ class RunManager:
                 f"'{self.config.changer.topology.parameterization}' can not be found in "
                 f"the parameterization plugins: {list(parameterization_plugins.keys())}"
             ) from e
+        self.top = Topology(read_top(self.config.top, self.config.ff), parameterizer)
 
         self.filehist: list[dict[str, TaskFiles]] = [
             {"setup": TaskFiles(self.get_latest)}
@@ -385,6 +385,7 @@ class RunManager:
             f"-px {instance}_pullx.xvg -pf {instance}_pullf.xvg "
             f"-ro {instance}-rotation.xvg -ra {instance}-rotangles.log "
             f"-rs {instance}-rotslabs.log -rt {instance}-rottorque.log "
+            "-npme 0 -ntmpi 1 "
             f"{gmx_mdrun_flags}  "
         )
         # -ntomp {ntomp} removed for now
@@ -513,9 +514,6 @@ class RunManager:
                 if not hasattr(self.config.changer.coordinates, "md"):
                     logger.warning("Relax task requested but no MD specified for it!")
                     continue
-                self.parameterizer.parameterize_topology(
-                    self.top
-                )  # not optimal that this is here
 
                 if self.config.changer.coordinates.slow_growth:
                     # Create a slow growth topology for sub-task run_md, afterwards, top will be set back properly
@@ -532,8 +530,6 @@ class RunManager:
                 md_files = task()
                 self._discover_output_files(task.name, md_files)
 
-        # parameterize topology
-        self.parameterizer.parameterize_topology(self.top)
         write_top(self.top.to_dict(), files.outputdir / self.config.top.name)
         files.output["top"] = files.outputdir / self.config.top.name
 

@@ -46,8 +46,7 @@ def test_integration_valid_input_files(arranged_tmp_path):
 def test_grompp_with_kimmdy_topology(arranged_tmp_path):
     raw_top = read_top(Path("minimal.top"))
     top = Topology(raw_top)
-    top._update_dict()
-    write_top(top.top, Path("output.top"))
+    write_top(top.to_dict(), Path("output.top"))
     assert sp.run(
         [
             "gmx",

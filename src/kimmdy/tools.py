@@ -111,31 +111,21 @@ def remove_hydrogen(
     ), f"Wrong atom type {atom_type} with nr {nr} for remove hydrogen, should start with 'H'"
 
     ## deal with top file, order is important here
-    [heavy_nr] = topology.atoms[nr].bound_to_nrs
+    # [heavy_nr] = topology.atoms[nr].bound_to_nrs
 
-    del topology.atoms[nr]
-
-    topology.atoms[heavy_nr].is_radical = True
-    topology.radicals[heavy_nr] = topology.atoms[heavy_nr]
-
-    update_map = {
-        atom_nr: str(i + 1) for i, atom_nr in enumerate(topology.atoms.keys())
-    }
-
-    topology.reindex_atomnrs()
-
-    ## parameterize with grappa
+    # parameterize with grappa
     if parameterize:
         from kimmdy import parameterization_plugins
 
         if "grappa" in parameterization_plugins.keys():
-            grappa = parameterization_plugins["grappa"]()
-            grappa.parameterize_topology(topology)
+            topology.parametrizer = parameterization_plugins["grappa"]()
 
         else:
             raise KeyError(
                 "No grappa in parameterization plugins. Can't continue to parameterize molecule"
             )
+
+    update_map = topology.del_atom(nr, parameterize=parameterize)
 
     ## write top file
     top_stem = top_path.stem
@@ -240,7 +230,7 @@ def entry_point_remove_hydrogen():
     """Remove hydrogen by atom nr in a gro and topology file"""
     args = get_remove_hydrogen_cmdline_args()
 
-    remove_hydrogen(args.gro, args.top, args.nr, args.paremeterize, args.equilibrate)
+    remove_hydrogen(args.gro, args.top, args.nr, args.parameterize, args.equilibrate)
 
 
 ## dot graphs
