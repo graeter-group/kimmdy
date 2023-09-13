@@ -59,4 +59,3 @@ To run the test locally, you must:
 - run tests with `gh extension exec act -j test --artifact-server-path ./artifacts`
     - customize which python versions to test in `tox.ini` 
     - html coverage report is exported into `artifacts`
-
