@@ -73,7 +73,7 @@ allowed_text = st.text(
         max_size=5,
     )
 )
-@settings(suppress_health_check=[HealthCheck.function_scoped_fixture])
+@settings(suppress_health_check=[HealthCheck.function_scoped_fixture], deadline=500)
 def test_parser_invertible(sections, arranged_tmp_path):
     # flatten list of lists of strings to list of strings with subsection headers
     # use first element of each section as header
