@@ -15,7 +15,8 @@ Utilities for building plugins, shell convenience functions and GROMACS related 
 | Name | Description |
 | --- | --- |
 | [check_gmx_version](#kimmdy.utils.check_gmx_version) | Check for an existing gromacs installation. |
-| [get_atominfo_from_plumedid](#kimmdy.utils.get_atominfo_from_plumedid) | For a plumedid, returns the corresponding atom types and nrs. |
+| [get_atomnrs_from_plumedid](#kimmdy.utils.get_atomnrs_from_plumedid) | Convert from plumedid to atomnr, information from the plumed file is used. |
+| [get_atomtypes_from_atomnrs](#kimmdy.utils.get_atomtypes_from_atomnrs) | Use topology atoms section to convert from atomnr to atomtype |
 | [get_bondprm_from_atomtypes](#kimmdy.utils.get_bondprm_from_atomtypes) | Returns bond parameters (b0, kb, E_dis) for a set of two atomtypes. |
 | [get_gmx_dir](#kimmdy.utils.get_gmx_dir) | Returns the path to the gromacs installation |
 | [get_shell_stdout](#kimmdy.utils.get_shell_stdout) | Run command in shell and capture stdout. |
@@ -32,36 +33,38 @@ Check for an existing gromacs installation.
 If PLUMED is meant to be used it additionally checks for the keyword
 'MODIFIED' or 'plumed' in the version name.
 
-### get_atominfo_from_plumedid { #kimmdy.utils.get_atominfo_from_plumedid }
+### get_atomnrs_from_plumedid { #kimmdy.utils.get_atomnrs_from_plumedid }
 
-`utils.get_atominfo_from_plumedid(plumedid, plumed, top)`
+`utils.get_atomnrs_from_plumedid(plumedid, plumed)`
 
-For a plumedid, returns the corresponding atom types and nrs.
-
-To convert from plumedid to atomnr, information from the plumed file is used.
-Then, the topology atoms section can be used to convert from atomnr to atomtype
+Convert from plumedid to atomnr, information from the plumed file is used.
 
 #### Parameters
 
-| Name       | Type           | Description                                   | Default    |
-|------------|----------------|-----------------------------------------------|------------|
-| `plumedid` | [str](`str`)   | Identifier from a plumed input file (e.g d0). | _required_ |
-| `plumed`   | [dict](`dict`) | Parsed plumed input file                      | _required_ |
-| `top`      | [dict](`dict`) | Topology of the molecular system              | _required_ |
+| Name       | Type                                        | Description                                   | Default    |
+|------------|---------------------------------------------|-----------------------------------------------|------------|
+| `plumedid` | [str](`str`)                                | Identifier from a plumed input file (e.g d0). | _required_ |
+| `plumed`   | [Plumed_dict](`kimmdy.parsing.Plumed_dict`) | Parsed plumed input file                      | _required_ |
+
+### get_atomtypes_from_atomnrs { #kimmdy.utils.get_atomtypes_from_atomnrs }
+
+`utils.get_atomtypes_from_atomnrs(atomnrs, top)`
+
+Use topology atoms section to convert from atomnr to atomtype
 
 ### get_bondprm_from_atomtypes { #kimmdy.utils.get_bondprm_from_atomtypes }
 
-`utils.get_bondprm_from_atomtypes(atomtypes, ffbonded, lookup_edissoc_atomtype)`
+`utils.get_bondprm_from_atomtypes(atomtypes, ffbonded, edissoc)`
 
 Returns bond parameters (b0, kb, E_dis) for a set of two atomtypes.
 
 #### Parameters
 
-| Name                      | Type                     | Description                                                                       | Default    |
-|---------------------------|--------------------------|-----------------------------------------------------------------------------------|------------|
-| `atomtypes`               | [frozenset](`frozenset`) | Two atomtypes as defined in the respective force field                            | _required_ |
-| `ffbonded`                | [dict](`dict`)           | Force field ffbonded.itp file parsed through the rtp parser                       | _required_ |
-| `lookup_edissoc_atomtype` | [dict](`dict`)           | Parsed file with dissociation energies per bond between two atomtypes or elements | _required_ |
+| Name        | Type                           | Description                                                                       | Default    |
+|-------------|--------------------------------|-----------------------------------------------------------------------------------|------------|
+| `atomtypes` | [list](`list`)\[[str](`str`)\] | Two atomtypes as defined in the respective force field                            | _required_ |
+| `ffbonded`  | [dict](`dict`)                 | Force field ffbonded.itp file parsed through the rtp parser                       | _required_ |
+| `edissoc`   | [dict](`dict`)                 | Parsed file with dissociation energies per bond between two atomtypes or elements | _required_ |
 
 ### get_gmx_dir { #kimmdy.utils.get_gmx_dir }
 

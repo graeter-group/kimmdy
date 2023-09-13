@@ -411,10 +411,11 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#functions" id="toc-functions" class="nav-link" data-scroll-target="#functions">Functions</a>
   <ul>
   <li><a href="#kimmdy.utils.check_gmx_version" id="toc-kimmdy.utils.check_gmx_version" class="nav-link" data-scroll-target="#kimmdy.utils.check_gmx_version">check_gmx_version</a></li>
-  <li><a href="#kimmdy.utils.get_atominfo_from_plumedid" id="toc-kimmdy.utils.get_atominfo_from_plumedid" class="nav-link" data-scroll-target="#kimmdy.utils.get_atominfo_from_plumedid">get_atominfo_from_plumedid</a>
+  <li><a href="#kimmdy.utils.get_atomnrs_from_plumedid" id="toc-kimmdy.utils.get_atomnrs_from_plumedid" class="nav-link" data-scroll-target="#kimmdy.utils.get_atomnrs_from_plumedid">get_atomnrs_from_plumedid</a>
   <ul class="collapse">
   <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
   </ul></li>
+  <li><a href="#kimmdy.utils.get_atomtypes_from_atomnrs" id="toc-kimmdy.utils.get_atomtypes_from_atomnrs" class="nav-link" data-scroll-target="#kimmdy.utils.get_atomtypes_from_atomnrs">get_atomtypes_from_atomnrs</a></li>
   <li><a href="#kimmdy.utils.get_bondprm_from_atomtypes" id="toc-kimmdy.utils.get_bondprm_from_atomtypes" class="nav-link" data-scroll-target="#kimmdy.utils.get_bondprm_from_atomtypes">get_bondprm_from_atomtypes</a>
   <ul class="collapse">
   <li><a href="#parameters-1" id="toc-parameters-1" class="nav-link" data-scroll-target="#parameters-1">Parameters</a></li>
@@ -473,30 +474,34 @@ ul.task-list li input[type="checkbox"] {
 <td>Check for an existing gromacs installation.</td>
 </tr>
 <tr class="even">
-<td><a href="#kimmdy.utils.get_atominfo_from_plumedid">get_atominfo_from_plumedid</a></td>
-<td>For a plumedid, returns the corresponding atom types and nrs.</td>
+<td><a href="#kimmdy.utils.get_atomnrs_from_plumedid">get_atomnrs_from_plumedid</a></td>
+<td>Convert from plumedid to atomnr, information from the plumed file is used.</td>
 </tr>
 <tr class="odd">
+<td><a href="#kimmdy.utils.get_atomtypes_from_atomnrs">get_atomtypes_from_atomnrs</a></td>
+<td>Use topology atoms section to convert from atomnr to atomtype</td>
+</tr>
+<tr class="even">
 <td><a href="#kimmdy.utils.get_bondprm_from_atomtypes">get_bondprm_from_atomtypes</a></td>
 <td>Returns bond parameters (b0, kb, E_dis) for a set of two atomtypes.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#kimmdy.utils.get_gmx_dir">get_gmx_dir</a></td>
 <td>Returns the path to the gromacs installation</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#kimmdy.utils.get_shell_stdout">get_shell_stdout</a></td>
 <td>Run command in shell and capture stdout.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#kimmdy.utils.morse_transition_rate">morse_transition_rate</a></td>
 <td>Calculates reaction rate constant for a bond breaking event.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#kimmdy.utils.run_gmx">run_gmx</a></td>
 <td>Run GROMACS command in shell.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#kimmdy.utils.run_shell_cmd">run_shell_cmd</a></td>
 <td>Run command in shell.</td>
 </tr>
@@ -508,11 +513,10 @@ ul.task-list li input[type="checkbox"] {
 <p>Check for an existing gromacs installation.</p>
 <p>If PLUMED is meant to be used it additionally checks for the keyword ‘MODIFIED’ or ‘plumed’ in the version name.</p>
 </section>
-<section id="kimmdy.utils.get_atominfo_from_plumedid" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.utils.get_atominfo_from_plumedid">get_atominfo_from_plumedid</h3>
-<p><code>utils.get_atominfo_from_plumedid(plumedid, plumed, top)</code></p>
-<p>For a plumedid, returns the corresponding atom types and nrs.</p>
-<p>To convert from plumedid to atomnr, information from the plumed file is used. Then, the topology atoms section can be used to convert from atomnr to atomtype</p>
+<section id="kimmdy.utils.get_atomnrs_from_plumedid" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.utils.get_atomnrs_from_plumedid">get_atomnrs_from_plumedid</h3>
+<p><code>utils.get_atomnrs_from_plumedid(plumedid, plumed)</code></p>
+<p>Convert from plumedid to atomnr, information from the plumed file is used.</p>
 <section id="parameters" class="level4">
 <h4 class="anchored" data-anchor-id="parameters">Parameters</h4>
 <table class="table">
@@ -533,23 +537,22 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 <tr class="even">
 <td><code>plumed</code></td>
-<td><a href="https://docs.python.org/3.10/library/stdtypes.html#dict">dict</a></td>
+<td><a href="../_reference/parsing.html#kimmdy.parsing.Plumed_dict">Plumed_dict</a></td>
 <td>Parsed plumed input file</td>
-<td><em>required</em></td>
-</tr>
-<tr class="odd">
-<td><code>top</code></td>
-<td><a href="https://docs.python.org/3.10/library/stdtypes.html#dict">dict</a></td>
-<td>Topology of the molecular system</td>
 <td><em>required</em></td>
 </tr>
 </tbody>
 </table>
 </section>
 </section>
+<section id="kimmdy.utils.get_atomtypes_from_atomnrs" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.utils.get_atomtypes_from_atomnrs">get_atomtypes_from_atomnrs</h3>
+<p><code>utils.get_atomtypes_from_atomnrs(atomnrs, top)</code></p>
+<p>Use topology atoms section to convert from atomnr to atomtype</p>
+</section>
 <section id="kimmdy.utils.get_bondprm_from_atomtypes" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.utils.get_bondprm_from_atomtypes">get_bondprm_from_atomtypes</h3>
-<p><code>utils.get_bondprm_from_atomtypes(atomtypes, ffbonded, lookup_edissoc_atomtype)</code></p>
+<p><code>utils.get_bondprm_from_atomtypes(atomtypes, ffbonded, edissoc)</code></p>
 <p>Returns bond parameters (b0, kb, E_dis) for a set of two atomtypes.</p>
 <section id="parameters-1" class="level4">
 <h4 class="anchored" data-anchor-id="parameters-1">Parameters</h4>
@@ -565,7 +568,7 @@ ul.task-list li input[type="checkbox"] {
 <tbody>
 <tr class="odd">
 <td><code>atomtypes</code></td>
-<td><a href="https://docs.python.org/3.10/library/stdtypes.html#frozenset">frozenset</a></td>
+<td><a href="https://docs.python.org/3.10/library/stdtypes.html#list">list</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>]</td>
 <td>Two atomtypes as defined in the respective force field</td>
 <td><em>required</em></td>
 </tr>
@@ -576,7 +579,7 @@ ul.task-list li input[type="checkbox"] {
 <td><em>required</em></td>
 </tr>
 <tr class="odd">
-<td><code>lookup_edissoc_atomtype</code></td>
+<td><code>edissoc</code></td>
 <td><a href="https://docs.python.org/3.10/library/stdtypes.html#dict">dict</a></td>
 <td>Parsed file with dissociation energies per bond between two atomtypes or elements</td>
 <td><em>required</em></td>

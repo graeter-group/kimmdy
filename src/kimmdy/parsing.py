@@ -556,5 +556,5 @@ def read_edissoc(path: Path) -> dict:
         edissocs = {}
         for l in f:
             at1, at2, edissoc, *_ = l.split()
-            edissocs[frozenset((at1, at2))] = float(edissoc)
+            edissocs[tuple([at1, at2])] = float(edissoc)
     return edissocs
