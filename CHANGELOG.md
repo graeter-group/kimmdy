@@ -1,5 +1,19 @@
 # Changelog
 
+## [4.4.0](https://github.com/hits-mbm-dev/kimmdy/compare/v4.3.0...v4.4.0) (2023-09-13)
+
+
+### Features
+
+* **dummy:** this is not a feature, just a release trigger ([6aa1190](https://github.com/hits-mbm-dev/kimmdy/commit/6aa1190fb0eca93388a8e9d7e95c8b2f5945a55d))
+
+
+### Bug Fixes
+
+* **analysis:** remove y axis label for steps panel in plot_energy ([a2bc88a](https://github.com/hits-mbm-dev/kimmdy/commit/a2bc88ac4b8405ae940f0f241fe4778c2039552e))
+* **test:** increase hypothesis deadline ([4b9823d](https://github.com/hits-mbm-dev/kimmdy/commit/4b9823d45265aecfada2d7bd1f4b90640164d31a))
+* **test:** increase hypothesis deadline ([9810e84](https://github.com/hits-mbm-dev/kimmdy/commit/9810e8478375e43311e0458d71cc9748ae80d684))
+
 ## [4.3.0](https://github.com/hits-mbm-dev/kimmdy/compare/v4.2.1...v4.3.0) (2023-09-08)
 
 
