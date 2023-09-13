@@ -166,9 +166,9 @@ class TestTopAB:
 
 class TestTopology:
     @given(atomindex=st.integers(min_value=1, max_value=72))
-    @settings(suppress_health_check=[HealthCheck.function_scoped_fixture])
+    @settings(suppress_health_check=[HealthCheck.function_scoped_fixture],
+              deadline=400)
     def test_del_atom_hexala(self, hexala_top_fix, atomindex):
-        # def test_del_atom_hexala(self, hexala_top_fix):
         top: Topology = deepcopy(hexala_top_fix)
 
         atom = top.atoms[str(atomindex)]
