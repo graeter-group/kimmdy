@@ -37,13 +37,13 @@ and computationally expensive operations.
 
 ##### attr { #kimmdy.config.Config.attr }
 
-`config.Config.attr(self, attribute)`
+`config.Config.attr(attribute)`
 
 Get the value of a specific attribute.
 Alias for self.__getattribute__
 
 ##### get_attributes { #kimmdy.config.Config.get_attributes }
 
-`config.Config.get_attributes(self)`
+`config.Config.get_attributes()`
 
 Get a list of all attributes

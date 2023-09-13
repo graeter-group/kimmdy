@@ -10,13 +10,7 @@ import yaml
 from pathlib import Path
 from kimmdy import reaction_plugins
 from kimmdy.schema import Sequence, get_combined_scheme
-from kimmdy.utils import get_gmx_dir, check_gmx_version
-
-
-def check_file_exists(p: Path):
-    if not p.exists():
-        m = f"File not found: {p}"
-        raise LookupError(m)
+from kimmdy.utils import get_gmx_dir, check_file_exists, check_gmx_version
 
 
 class Config:
@@ -127,8 +121,12 @@ class Config:
                 self.log.level = loglevel
 
             # write a copy of the config file to the output directory
-            assert input_file, "No input file provided"
-            shutil.copy(input_file, self.out)
+            if input_file is not None:
+                shutil.copy(input_file, self.out)
+            else:
+                self._logmessages["infos"].append(
+                    "Config initialized without input file, can't copy to output directory."
+                )
 
     def _set_defaults(self, section: str = "config", scheme: dict = {}):
         """
@@ -203,9 +201,6 @@ class Config:
 
     def _validate(self, section: str = "config"):
         """Validates config."""
-
-        # TODO: check for required attributes
-
         # globals / interconnected
         if section == "config":
             ffdir = self.ff
@@ -250,6 +245,7 @@ class Config:
                     if isinstance(reaction_plugins[reaction_name], Exception):
                         raise reaction_plugins[reaction_name]
 
+            # ToDo: this requirement should be defined in schema.json
             # Validate sequence
             assert hasattr(self, "sequence"), "No sequence defined!"
             for task in self.sequence:
@@ -267,6 +263,11 @@ class Config:
             if hasattr(self, "mds"):
                 needs_plumed = False
                 for attr_name in self.mds.get_attributes():
+                    # also check whether section has mdp file
+                    if not hasattr(getattr(self.mds, attr_name), "mdp"):
+                        raise AssertionError(
+                            "MD instance defined but contains no mdp file."
+                        )
                     if hasattr(getattr(self.mds, attr_name), "use_plumed"):
                         if getattr(getattr(self.mds, attr_name), "use_plumed"):
                             needs_plumed = True

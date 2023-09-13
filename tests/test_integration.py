@@ -101,6 +101,7 @@ def test_integration_pull(arranged_tmp_path):
     assert "Finished running tasks" in read_last_line(Path("kimmdy.log"))
 
 
+@pytest.mark.require_grappa
 @pytest.mark.slow
 @pytest.mark.parametrize(
     "arranged_tmp_path",

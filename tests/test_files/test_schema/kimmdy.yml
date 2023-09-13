@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=../../../../src/kimmdy/kimmdy-yaml-schema.json
+# yaml-language-server: $schema=../../../src/kimmdy/kimmdy-yaml-schema.json
 
 name: 'kimmdy_001'
 dryrun: false
@@ -22,7 +22,7 @@ changer:
     md: 'relax'    
     slow_growth: True
   topology:
-    parameterization: 'grappa' 
+    parameterization: 'basic' 
 reactions:
   homolysis:
     edis: 'edissoc.dat'

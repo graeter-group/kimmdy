@@ -121,6 +121,7 @@
       "patternProperties": {
         ".*": {
           "type": "object",
+          "description":"Name of a MD instance",
           "properties": {
             "mdp": {
               "type": "string",
@@ -141,17 +142,20 @@
     },
     "changer": {
       "type": "object",
-      "description": "Settings for the coordinate changer",
+      "description": "Settings for applying a reaction recipe",
       "properties": {
         "coordinates": {
           "type": "object",
+          "description": "Settings related to coordinate/geometry changes when applying a recipe",
           "properties": {
             "md": {
               "type": "string",
+              "description": "Which MD instance from the 'mds' section is used for relaxation MDs",
               "pytype": "str"
             },
             "slow_growth": {
               "type": "boolean",
+              "description": "Whether the chosen MD instance is a slow growth/free-energy simulation",
               "pytype": "bool",
               "default": false
             }
@@ -163,12 +167,12 @@
           "properties": {
             "parameterization": {
               "type": "string",
+              "description": "Parameterization scheme that is used on the topology file after changes to it",
               "pytype": "str",
               "enum": ["grappa","basic"],
-              "default": "grappa"
+              "default": "basic"
             }
           },
-          "required": ["parameterization"],
           "additionalProperties": false
         }
       },

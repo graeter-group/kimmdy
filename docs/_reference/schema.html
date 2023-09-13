@@ -420,6 +420,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
   </ul></li>
   <li><a href="#kimmdy.schema.flatten_scheme" id="toc-kimmdy.schema.flatten_scheme" class="nav-link" data-scroll-target="#kimmdy.schema.flatten_scheme">flatten_scheme</a></li>
+  <li><a href="#kimmdy.schema.generate_markdown_table" id="toc-kimmdy.schema.generate_markdown_table" class="nav-link" data-scroll-target="#kimmdy.schema.generate_markdown_table">generate_markdown_table</a></li>
   <li><a href="#kimmdy.schema.get_combined_scheme" id="toc-kimmdy.schema.get_combined_scheme" class="nav-link" data-scroll-target="#kimmdy.schema.get_combined_scheme">get_combined_scheme</a></li>
   <li><a href="#kimmdy.schema.load_kimmdy_schema" id="toc-kimmdy.schema.load_kimmdy_schema" class="nav-link" data-scroll-target="#kimmdy.schema.load_kimmdy_schema">load_kimmdy_schema</a></li>
   <li><a href="#kimmdy.schema.load_plugin_schemas" id="toc-kimmdy.schema.load_plugin_schemas" class="nav-link" data-scroll-target="#kimmdy.schema.load_plugin_schemas">load_plugin_schemas</a></li>
@@ -500,18 +501,22 @@ ul.task-list li input[type="checkbox"] {
 <td>Recursively get properties and their desicripions from the scheme</td>
 </tr>
 <tr class="odd">
+<td><a href="#kimmdy.schema.generate_markdown_table">generate_markdown_table</a></td>
+<td>Generate markdown table from scheme</td>
+</tr>
+<tr class="even">
 <td><a href="#kimmdy.schema.get_combined_scheme">get_combined_scheme</a></td>
 <td>Return the schema for the config file.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#kimmdy.schema.load_kimmdy_schema">load_kimmdy_schema</a></td>
 <td>Return the schema for the config file</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#kimmdy.schema.load_plugin_schemas">load_plugin_schemas</a></td>
 <td>Return the schemas for the reaction plugins known to kimmdy</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#kimmdy.schema.prune">prune</a></td>
 <td>Remove empty dicts from a nested dict</td>
 </tr>
@@ -568,6 +573,12 @@ ul.task-list li input[type="checkbox"] {
 <h3 class="anchored" data-anchor-id="kimmdy.schema.flatten_scheme">flatten_scheme</h3>
 <p><code>schema.flatten_scheme(scheme, section='')</code></p>
 <p>Recursively get properties and their desicripions from the scheme</p>
+</section>
+<section id="kimmdy.schema.generate_markdown_table" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.schema.generate_markdown_table">generate_markdown_table</h3>
+<p><code>schema.generate_markdown_table(scheme, append=False)</code></p>
+<p>Generate markdown table from scheme</p>
+<p>Used in documentation generation.</p>
 </section>
 <section id="kimmdy.schema.get_combined_scheme" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.schema.get_combined_scheme">get_combined_scheme</h3>

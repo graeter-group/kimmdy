@@ -1,10 +1,10 @@
-"""Reaction recipes.
+"""Contains the Reaction Recipe, RecipeStep and RecipeCollection.
 """
 from __future__ import annotations
 from typing import Optional
 
 from abc import ABC
-from dataclasses import dataclass, field, InitVar
+from dataclasses import dataclass, field
 from pathlib import Path
 import logging
 import dill
@@ -56,9 +56,6 @@ class Place(RecipeStep):
     def __post_init__(self):
         if self._ix_to_place is None:
             raise ValueError("id_ or ix_ to_place must be provided!")
-
-    # During init without given parameters, setters recive **not** the default
-    # value, but a property instance -> Error in type conversion
 
     @property
     def ix_to_place(self) -> Optional[int]:
