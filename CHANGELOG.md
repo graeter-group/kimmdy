@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.4.1](https://github.com/hits-mbm-dev/kimmdy/compare/v4.4.0...v4.4.1) (2023-09-13)
+
+
+### Bug Fixes
+
+* **test:** increase hypothesis deadline ([f7d8867](https://github.com/hits-mbm-dev/kimmdy/commit/f7d8867560600c04099da99a28be12311cb3b0af))
+
 ## [4.4.0](https://github.com/hits-mbm-dev/kimmdy/compare/v4.3.0...v4.4.0) (2023-09-13)
 
 
