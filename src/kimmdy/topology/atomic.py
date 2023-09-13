@@ -1,7 +1,7 @@
 """
 Atomic datatypes for the topology such as Atom, Bond, Angle, Dihedral, etc.
 The order of the fields comes from the gromacs topology file format.
-See <https://manual.gromacs.org/current/reference-manual/topologies/topology-file-formats.html#topology-file>
+See [gromacs manual](https://manual.gromacs.org/current/reference-manual/topologies/topology-file-formats.html#topology-file)
 """
 
 from dataclasses import dataclass, field
@@ -9,12 +9,12 @@ from typing import Optional, Union
 from kimmdy.topology.utils import field_or_none
 
 
-@dataclass(order=True)
+@dataclass()
 class Atom:
     """Information about one atom
 
     A class containing atom information as in the atoms section of the topology.
-    An atom keeps a list of which atoms it is bound to.
+    An atom keeps a list of which atoms it is bound to and its radical state.
 
     From gromacs topology:
     ; nr type resnr residue atom cgnr charge mass typeB chargeB massB
@@ -34,12 +34,6 @@ class Atom:
     bound_to_nrs: list[str] = field(default_factory=list)
     is_radical: bool = False
 
-    def radical_type(self):
-        if self.is_radical:
-            return self.type + "_R"
-        else:
-            return self.type
-
     @classmethod
     def from_top_line(cls, l: list[str]):
         return cls(
@@ -57,7 +51,7 @@ class Atom:
         )
 
 
-@dataclass(order=True)
+@dataclass()
 class PositionRestraint:
     """Information about one position restraint.
 
@@ -95,7 +89,7 @@ class PositionRestraint:
 #     1    4     3    5     1  180     0  10
 
 
-@dataclass(order=True)
+@dataclass()
 class DihedralRestraint:
     """Information about one dihedral restraint.
 
@@ -128,15 +122,14 @@ class DihedralRestraint:
         )
 
 
-@dataclass(order=True)
+@dataclass()
 class AtomType:
-    """Information about one atom
+    """Information about one atom type
 
-    A class containing atom information as in the atoms section of the topology.
-    An atom keeps a list of which atoms it is bound to.
+    A class containing atom type information as in the atomtypes section of the forcefield.
 
     From gromacs version of the amber* ff:
-    ; name      at.num  mass     charge ptype  sigma      epsilon
+    ; name at.num mass charge ptype sigma epsilon
     """
 
     type: str
@@ -164,13 +157,14 @@ class AtomType:
         )
 
 
-@dataclass(order=True)
+@dataclass()
 class Bond:
     """Information about one bond
 
     A class containing bond information as in the bonds section of the topology.
+
     From gromacs topology:
-    'ai', 'aj', 'funct', 'c0', 'c1', 'c2', 'c3', 'c4', 'c5'
+    ; ai aj funct c0 c1 c2 c3 c4 c5
     With ai < aj
     """
 
@@ -202,13 +196,14 @@ class Bond:
         )
 
 
-@dataclass(order=True)
+@dataclass()
 class BondType:
     """Information about one bondtype
 
-    A class containing bond information as in the bonds section of the topology.
-    From gromacs topology:
-    'i', 'j', 'funct', 'c0', 'c1', 'c2', 'c3
+    A class containing bond information as in the bondtype section of the forcefield.
+
+    From gromacs version of the amber* ff:
+    ; i j func b0 kb
     Where i and j are atomtypes
     """
 
@@ -240,14 +235,14 @@ class BondType:
         )
 
 
-@dataclass(order=True)
+@dataclass()
 class Pair:
     """Information about one pair
 
     A class containing pair information as in the pair section of the topology.
 
     From gromacs topology:
-    ai', 'aj', 'funct', 'c0', 'c1', 'c2', 'c3'
+    ; ai aj funct c0 c1 c2 c3
     """
 
     ai: str
@@ -271,14 +266,14 @@ class Pair:
         )
 
 
-@dataclass(order=True)
+@dataclass()
 class Angle:
     """Information about one angle
 
     A class containing angle information as in the angles section of the topology.
 
     From gromacs topology:
-    ';', 'ai', 'aj', 'ak', 'funct', 'c0', 'c1', 'c2', 'c3'
+    ; ai aj ak funct c0 c1 c2 c3
     With aj < ai < ak
     """
 
@@ -305,15 +300,14 @@ class Angle:
         )
 
 
-@dataclass(order=True)
+@dataclass()
 class AngleType:
-    """Information about one angle
+    """Information about one angletype
 
-    A class containing angle information as in the angles section of the topology.
+    A class containing angle type information as in the angletypes section of the forcefield.
 
-    From gromacs topology:
-    ';', 'i', 'j', 'k', 'funct', 'c0', 'c1', 'c2', 'c3'
-    where i,j,k are atomtypes
+    From gromacs version of the amber* ff:
+    ; i j k func th0 cth
     """
 
     i: str
@@ -343,19 +337,19 @@ class AngleType:
         )
 
 
-@dataclass(order=True)
+@dataclass()
 class Dihedral:
     """Information about one proper or improper dihedral
 
-    A class containing bond information as in the dihedrals section of the topology.
+    A class containing dihedral information as in the dihedrals section of the topology.
     Improper dihedrals have funct 4.
-    Proper dihedrals have funct != 4. Mostly funct 9.
+    Proper dihedrals have funct != 4, mostly funct 9.
 
     Note that proper dihedrals of type 9 can be defined multiple times, for different
     periodicities. This is why would-be parameter c2 is called periodicity.
 
     From gromacs topology:
-    ';', 'ai', 'aj', 'ak', 'al', 'funct', 'c0', 'c1', 'periodicity', 'c3', 'c4', 'c5'
+    ; ai aj ak al funct c0 c1 c2 c3 c4 c5
     For proper dihedrals (funct 9): aj < ak
     """
 
@@ -397,7 +391,7 @@ class MultipleDihedrals:
     Multiple ``Dihedral``s with the same ai, aj, ak, al
     but different periodicities.
     funct should always be "9" when the length of dihedrals is > 1.
-    The key of the dict is the periodicity (c2).
+    The key of the dihedrals dict is the periodicity (c2).
     """
 
     ai: str
@@ -408,21 +402,20 @@ class MultipleDihedrals:
     dihedrals: dict[str, Dihedral]
 
 
-@dataclass(order=True)
+@dataclass()
 class DihedralType:
-    """Information about one dihedral
+    """Information about one dihedraltype
 
-    A class containing bond information as in the dihedrals section of the topology.
-    Proper dihedrals have funct 9.
-    Improper dihedrals have funct 4.
+    A class containing dihedral type information as in the dihedraltypes
+    section of the forcefield.
+    Improper dihedrals have funct 4. Proper dihedrals have funct 9.
 
     Note that proper dihedrals of type 9 can be defined multiple times, for different
     periodicities. This is why would-be parameter c2 is called periodicity and part of
     the `id`.
 
-    From gromacs topology:
-    ';', 'i', 'j', 'k', 'l', 'funct', 'c0', 'c1', 'periodicity', 'c3', 'c4', 'c5'
-    Where i,j,k,l are atomtypes
+    From gromacs version of the amber* ff:
+    ; i j k l func phase kd pn
     """
 
     i: str
@@ -461,13 +454,13 @@ class DihedralType:
         )
 
 
-@dataclass(order=True)
+@dataclass()
 class MultipleDihedralTypes:
     """
     Multiple ``DihedralTypes``s with the same ai, aj, ak, al
     but different periodicities.
     funct should always be "9" when the length of dihedrals is > 1.
-    The key of the dict is the periodicity (c2).
+    The key of the dihedral_types dict is the periodicity (c2).
     """
 
     ai: str
@@ -478,10 +471,11 @@ class MultipleDihedralTypes:
     dihedral_types: dict[str, DihedralType]
 
 
-@dataclass(order=True)
+@dataclass()
 class ResidueAtomSpec:
     """Information about one atom in a residue
-    ; name  type  charge  chargegroup
+
+    ; name type charge chargegroup
     """
 
     name: str
@@ -494,10 +488,11 @@ class ResidueAtomSpec:
         return cls(name=l[0], type=l[1], charge=l[2], cgrp=l[3])
 
 
-@dataclass(order=True)
+@dataclass()
 class ResidueBondSpec:
     """Information about one bond in a residue
-    ; atom1 atom2      b0      kb
+
+    ; atom1 atom2 b0 kb
     """
 
     atom1: str
@@ -512,10 +507,11 @@ class ResidueBondSpec:
         )
 
 
-@dataclass(order=True)
+@dataclass()
 class ResidueImproperSpec:
     """Information about one imroper dihedral in a residue
-    ;atom1 atom2 atom3 atom4     q0     cq
+
+    ; atom1 atom2 atom3 atom4 q0 cq
     """
 
     atom1: str
@@ -537,10 +533,11 @@ class ResidueImproperSpec:
         )
 
 
-@dataclass(order=True)
+@dataclass()
 class ResidueProperSpec:
     """Information about one imroper dihedral in a residue
-    ;atom1 atom2 atom3 atom4     q0     cq
+
+    ; atom1 atom2 atom3 atom4 q0 cq
     """
 
     atom1: str
@@ -560,7 +557,7 @@ class ResidueProperSpec:
         )
 
 
-@dataclass(order=True)
+@dataclass()
 class ResidueType:
     """Information about one residuetype from aminoacids.rtp"""
 

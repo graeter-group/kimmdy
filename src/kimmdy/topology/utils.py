@@ -4,31 +4,37 @@ from typing import Optional, Any
 import re
 from typing import TYPE_CHECKING
 
-from dill.logger import logging
+import logging
 
 if TYPE_CHECKING:
     from kimmdy.topology.atomic import AtomicType, AtomicTypes
+
+logger = logging.getLogger(__name__)
 
 
 def get_top_section(
     top: dict, name: str, moleculetype: Optional[int] = None
 ) -> Optional[list[list]]:
     """Get content of a section from a topology dict.
-    By resolving any `#ifdef` statements by check in the top['define'] dict
-    and choosing the 'content' or 'else_content' depending on the result.
+
+    Resolves any `#ifdef` statements by check in the top['define'] dict
+    and chooses the 'content' or 'else_content' depending on the result.
     """
     if moleculetype is not None:
         parent_name = f"moleculetype_{moleculetype}"
         parent_section = top.get(parent_name)
         if parent_section is None:
-            logging.warning(f"topology does not contain moleculetype {moleculetype}")
+            logger.warning(f"topology does not contain moleculetype {moleculetype}")
             return None
         section = parent_section["subsections"].get(name)
     else:
         section = top.get(name)
 
     if section is None:
-        logging.warning(f"topology does not contain section {name}")
+        logger.warning(
+            f"Topology does not contain section {name}. "
+            "Is the forcefield in the correct directory?"
+        )
         return None
     condition = section.get("condition")
     if condition is not None:
@@ -53,12 +59,13 @@ def get_top_section(
 
 def get_moleculetype_header(top: dict, moleculetype: str) -> Optional[tuple[str, str]]:
     """Get content of the header of a moleculetype from a topology dict.
-    By resolving any `#ifdef` statements by check in the top['define'] dict
-    and choosing the 'content' or 'else_content' depending on the result.
+
+    Resolves any `#ifdef` statements by check in the top['define'] dict
+    and chooses the 'content' or 'else_content' depending on the result.
     """
     section = top.get(moleculetype)
     if section is None:
-        logging.warning(f"topology does not contain moleculetype {moleculetype}")
+        logger.warning(f"topology does not contain moleculetype {moleculetype}")
         return None
 
     condition = section.get("condition")
@@ -87,12 +94,12 @@ def get_moleculetype_header(top: dict, moleculetype: str) -> Optional[tuple[str,
 def get_moleculetype_atomics(top: dict, moleculetype: str) -> Optional[dict]:
     """Get content of subsections (atoms/bonds/angles etc.) of a moleculetype from a topology dict.
 
-    By resolving any `#ifdef` statements by check in the top['define'] dict
-    and choosing the 'content' or 'else_content' depending on the result.
+    Resolves any `#ifdef` statements by check in the top['define'] dict
+    and chooses the 'content' or 'else_content' depending on the result.
     """
     section = top.get(moleculetype)
     if section is None:
-        logging.warning(f"topology does not contain moleculetype {moleculetype}")
+        logger.warning(f"topology does not contain moleculetype {moleculetype}")
         return None
 
     subsections = section["subsections"]
@@ -127,12 +134,12 @@ def set_moleculetype_atomics(
 ) -> Optional[dict]:
     """Set content of the atomics (atoms/bonds/angles etc.) of a moleculetype from a topology dict.
 
-    By resolving any `#ifdef` statements by check in the top['define'] dict
-    and choosing the 'content' or 'else_content' depending on the result.
+    Resolves any `#ifdef` statements by check in the top['define'] dict
+    and chooses the 'content' or 'else_content' depending on the result.
     """
     section = top.get(moleculetype)
     if section is None:
-        logging.warning(f"topology does not contain moleculetype {moleculetype}")
+        logger.warning(f"topology does not contain moleculetype {moleculetype}")
         return None
 
     subsections = section["subsections"]
@@ -160,9 +167,7 @@ def set_moleculetype_atomics(
 
 
 def get_protein_section(top: dict, name: str) -> Optional[list[list]]:
-    """
-    Get content of a section in the first moleculetype (protein) from a topology dict.
-    """
+    """Get content of a section in the first moleculetype (protein) from a topology dict."""
     return get_top_section(top, name, moleculetype=0)
 
 
@@ -171,8 +176,8 @@ def set_top_section(
 ) -> Optional[list[list]]:
     """Set content of a section from a topology dict.
 
-    By resolving any `#ifdef` statements by check in the top['define'] dict
-    and choosing the 'content' or 'else_content' depending on the result.
+    Resolves any `#ifdef` statements by check in the top['define'] dict
+    and chooses the 'content' or 'else_content' depending on the result.
     """
     if moleculetype is not None:
         parent_name = f"moleculetype_{moleculetype}"
@@ -207,9 +212,7 @@ def set_top_section(
 
 
 def set_protein_section(top: dict, name: str, value: list) -> Optional[list[list]]:
-    """
-    Set content of a section in the first moleculetype (protein) from a topology dict.
-    """
+    """Set content of a section in the first moleculetype (protein) from a topology dict."""
     set_top_section(top, name, value, moleculetype=0)
 
 
