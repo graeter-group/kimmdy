@@ -27,16 +27,18 @@ else:
         "kimmdy.parameterization_plugins"
     ]
 
-reaction_plugins: dict[str, ReactionPlugin | Exception] = {}
+reaction_plugins: dict[str, ReactionPlugin] = {}
+broken_reaction_plugins: dict[str, Exception] = {}
 for _ep in discovered_reaction_plugins:
     try:
         reaction_plugins[_ep.name] = _ep.load()
     except Exception as _e:
-        reaction_plugins[_ep.name] = _e
+        broken_reaction_plugins[_ep.name] = _e
 
-parameterization_plugins: dict[str, Parameterizer | Exception] = {}
+parameterization_plugins: dict[str, Parameterizer] = {}
+broken_parameterization_plugins: dict[str, Exception] = {}
 for _ep in discovered_parameterization_plugins:
     try:
         parameterization_plugins[_ep.name] = _ep.load()
     except Exception as _e:
-        parameterization_plugins[_ep.name] = _e
+        broken_parameterization_plugins[_ep.name] = _e
