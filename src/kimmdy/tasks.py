@@ -6,7 +6,7 @@ output paths and the Task class for steps in the runmanager.
 from dataclasses import dataclass, field
 from pathlib import Path
 import shutil
-from typing import Callable, Optional, TYPE_CHECKING, Union
+from typing import Any, Callable, Optional, Union
 import logging
 from kimmdy.utils import longFormatter
 
@@ -115,17 +115,17 @@ class Task:
 
     Parameters:
     -----------
-    runmng : kimmdy.runmanager.Runmanager
-        Runmanager instance
-    f : Callable
-        Will be called when the task is called
-    kwargs : dict
-        kwargs will be passed to f
-    out : str, optional
+    runmng
+        Runmanager instance from which the task is called
+    f 
+        Function that will be called when the task is called
+    kwargs
+        kwargs to be passed to f
+    out
         If not None, an output dir will be created with this name
     """
 
-    def __init__(self, runmng, f: Callable[..., TaskFiles], kwargs=None, out=None):
+    def __init__(self, runmng, f: Callable[..., TaskFiles], kwargs: Optional[dict[str, Any]] = None, out: Optional[str] = None):
         self.runmng = runmng
         self.f = f
         if kwargs is None:
@@ -147,8 +147,15 @@ class Task:
         return str(self.name) + " args: " + str(self.kwargs)
 
 
+TaskClosure = Callable[..., Optional[TaskFiles]]
+TaskMappingItem = dict[str, Union[TaskClosure, str]]
+
 TaskMapping = dict[
     str,
-    Union[list[Callable[..., Optional[TaskFiles]]], Callable[..., Optional[TaskFiles]]],
+    Union[
+        list[TaskMappingItem],
+        TaskMappingItem
+    ]
 ]
-"""Mapping of task names to functions."""
+"""Mapping of task names to functions.""" 
+
