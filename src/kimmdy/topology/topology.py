@@ -10,7 +10,7 @@ from kimmdy.topology.utils import (
     set_top_section,
 )
 from kimmdy.topology.ff import FF
-from kimmdy.plugins import Parameterizer
+from kimmdy.plugins import BasicParameterizer, Parameterizer
 from itertools import permutations, combinations
 import textwrap
 import logging
@@ -391,7 +391,7 @@ class MoleculeType:
                 self.proper_dihedrals[key] = MultipleDihedrals(
                     *key, "9", dihedrals={"": Dihedral(*key, "9")}
                 )
-                pairkey = tuple(str(x) for x in sorted([key[0], key[3]], key=int))
+                pairkey: tuple[str, str] = tuple(str(x) for x in sorted([key[0], key[3]], key=int)) # type: ignore
                 if self.pairs.get(pairkey) is None:
                     self.pairs[pairkey] = Pair(pairkey[0], pairkey[1], "1")
 
@@ -451,9 +451,10 @@ class MoleculeType:
             # drop angles to a deleted atom
             if None in (ai, aj, ak):
                 continue
-            angle.ai = ai
-            angle.aj = aj
-            angle.ak = ak
+            # pyright does not grok `None in ...`
+            angle.ai = ai # type: ignore
+            angle.aj = aj # type: ignore
+            angle.ak = ak # type: ignore
             new_angles[(angle.ai, angle.aj, angle.ak)] = angle
         self.angles = new_angles
 
@@ -471,21 +472,21 @@ class MoleculeType:
 
             # do pairs before the dihedrals are updated
             if pair := self.pairs.get((dihedrals.ai, dihedrals.al)):
-                pair.ai = update_map.get(pair.ai)
-                pair.aj = update_map.get(pair.aj)
-                if not None in [pair.ai, pair.aj]:
-                    new_pairs[(pair.ai, pair.aj)] = pair
+                pair_ai = update_map.get(pair.ai)
+                pair_aj = update_map.get(pair.aj)
+                if not None in (pair_ai, pair_aj):
+                    new_pairs[(pair_ai, pair_aj)] = pair
 
-            dihedrals.ai = ai
-            dihedrals.aj = aj
-            dihedrals.ak = ak
-            dihedrals.al = al
+            dihedrals.ai = ai # type: ignore
+            dihedrals.aj = aj # type: ignore
+            dihedrals.ak = ak # type: ignore
+            dihedrals.al = al # type: ignore
 
             for dihedral in dihedrals.dihedrals.values():
-                dihedral.ai = ai
-                dihedral.aj = aj
-                dihedral.ak = ak
-                dihedral.al = al
+                dihedral.ai = ai # type: ignore
+                dihedral.aj = aj # type: ignore
+                dihedral.ak = ak # type: ignore
+                dihedral.al = al # type: ignore
                 new_dihedrals[dihedral.periodicity] = dihedral
 
             new_multiple_dihedrals[
@@ -509,10 +510,10 @@ class MoleculeType:
             # drop dihedrals to a deleted atom
             if None in (ai, aj, ak, al):
                 continue
-            dihedral.ai = ai
-            dihedral.aj = aj
-            dihedral.ak = ak
-            dihedral.al = al
+            dihedral.ai = ai # type: ignore
+            dihedral.aj = aj # type: ignore
+            dihedral.ak = ak # type: ignore
+            dihedral.al = al # type: ignore
             new_impropers[(ai, aj, ak, al)] = dihedral
         self.improper_dihedrals = new_impropers
 
@@ -537,7 +538,7 @@ class Topology:
         [](`kimmdy.parsing.read_top`)
     """
 
-    def __init__(self, top: TopologyDict, parametrizer: Parameterizer = None) -> None:
+    def __init__(self, top: TopologyDict, parametrizer: Parameterizer = BasicParameterizer()) -> None:
         if top == {}:
             raise NotImplementedError(
                 "Generating an empty Topology from an empty TopologyDict is not implemented."
@@ -657,12 +658,7 @@ class Topology:
 
     def _update_parameters(self):
         if self.needs_parameterization:
-            try:
-                self.parametrizer.parameterize_topology(self.top)
-            except AttributeError as e:
-                raise RuntimeError(
-                    f"No Parametrizer was initialized in this topology!\n{e}"
-                )
+            self.parametrizer.parameterize_topology(self)
             self.needs_parameterization = False
 
     def to_dict(self) -> TopologyDict:
@@ -779,7 +775,9 @@ class Topology:
 
         moleculetype = self.main_molecule
 
-        atompair_nrs = tuple(sorted(atompair_nrs, key=int))
+        # tuple -> list -> sorted -> tuple still makes it a tuple of two strings
+        # so pyright can chill.
+        atompair_nrs: tuple[str, str] = tuple(sorted(atompair_nrs, key=int)) # type: ignore
 
         atompair = [
             moleculetype.atoms[atompair_nrs[0]],
@@ -826,7 +824,7 @@ class Topology:
                 # dihedral contained a now deleted bond because
                 # it had both atoms of the broken bond
                 moleculetype.proper_dihedrals.pop(key, None)
-                pairkey = tuple(sorted((key[0], key[3]), key=int))
+                pairkey : tuple[str, str] = tuple(sorted((key[0], key[3]), key=int)) # type: ignore
                 moleculetype.pairs.pop(pairkey, None)
 
         # and improper dihedrals
@@ -882,7 +880,7 @@ class Topology:
 
         moleculetype = self.main_molecule
 
-        atompair_nrs = tuple(sorted(atompair_nrs, key=int))
+        atompair_nrs: tuple[str, str] = tuple(sorted(atompair_nrs, key=int)) # type: ignore
         atompair = [
             moleculetype.atoms[atompair_nrs[0]],
             moleculetype.atoms[atompair_nrs[1]],
@@ -992,7 +990,7 @@ class Topology:
                 moleculetype.proper_dihedrals[key] = MultipleDihedrals(
                     *key, "9", dihedrals={"": Dihedral(*key, "9")}
                 )
-            pairkey = tuple(str(x) for x in sorted([key[0], key[3]], key=int))
+            pairkey: tuple[str, str] = tuple(str(x) for x in sorted([key[0], key[3]], key=int)) # type: ignore
             if moleculetype.pairs.get(pairkey) is None:
                 moleculetype.pairs[pairkey] = Pair(pairkey[0], pairkey[1], "1")
 
