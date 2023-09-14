@@ -465,14 +465,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="hexala" class="level1">
 <h1>Hexala</h1>
-<div id="1208f6ba" class="cell" data-execution_count="1">
+<div id="808ef97b" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> kimmdy.parsing <span class="im">import</span> read_top</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> kimmdy.topology.topology <span class="im">import</span> Topology</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> kimmdy.tools <span class="im">import</span> top_to_graph</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> kimmdy.topology.utils <span class="im">import</span> get_protein_section</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="c02620a5" class="cell" data-execution_count="2">
+<div id="8d966402" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>ala_top <span class="op">=</span> read_top(Path(<span class="st">'../../tests/test_files/test_topology/urea.top'</span>), use_gmx_dir<span class="op">=</span><span class="va">False</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>top <span class="op">=</span> Topology(ala_top)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>

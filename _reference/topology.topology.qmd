@@ -17,28 +17,55 @@
 
 One moleculetype in the topology
 
+#### Attributes
+
+| Name                | Type                                                                                                                                   | Description                                                             |
+|---------------------|----------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------|
+| atoms               | [dict](`dict`)\[[str](`str`), [Atom](`Atom`)\]                                                                                         |                                                                         |
+| bonds               | [dict](`dict`)\[[tuple](`tuple`)\[[str](`str`), [str](`str`)\], [Bond](`Bond`)\]                                                       |                                                                         |
+| pairs               | [dict](`dict`)\[[tuple](`tuple`)\[[str](`str`), [str](`str`)\], [Pair](`Pair`)\]                                                       |                                                                         |
+| angles              | [dict](`dict`)\[[tuple](`tuple`)\[[str](`str`), [str](`str`), [str](`str`)\], [Angle](`Angle`)\]                                       |                                                                         |
+| proper_dihedrals    | [dict](`dict`)\[[tuple](`tuple`)\[[str](`str`), [str](`str`), [str](`str`), [str](`str`)\], [MultipleDihedrals](`MultipleDihedrals`)\] |                                                                         |
+| improper_dihedrals  | [dict](`dict`)\[[tuple](`tuple`)\[[str](`str`), [str](`str`), [str](`str`), [str](`str`)\], [Dihedral](`Dihedral`)\]                   |                                                                         |
+| position_restraints | [dict](`dict`)\[[str](`str`), [PositionRestraint](`PositionRestraint`)\]                                                               |                                                                         |
+| dihedral_restraints | [dict](`dict`)\[[tuple](`tuple`)\[[str](`str`), [str](`str`), [str](`str`), [str](`str`)\], [DihedralRestraint](`DihedralRestraint`)\] |                                                                         |
+| radicals            | [dict](`dict`)\[[str](`str`), [Atom](`Atom`)\]                                                                                         | dict mapping atom indices to atom objects for storing all radical atoms |
+
 #### Methods
 
 | Name | Description |
 | --- | --- |
 | [reindex_atomnrs](#kimmdy.topology.topology.MoleculeType.reindex_atomnrs) | Reindex atom numbers in topology. |
+| [test_for_radicals](#kimmdy.topology.topology.MoleculeType.test_for_radicals) | Updates radical status per atom and in topology. |
 
 ##### reindex_atomnrs { #kimmdy.topology.topology.MoleculeType.reindex_atomnrs }
 
-`topology.topology.MoleculeType.reindex_atomnrs(self)`
+`topology.topology.MoleculeType.reindex_atomnrs()`
 
 Reindex atom numbers in topology.
 
 Starts at index 1.
 This also updates the numbers for bonds, angles, dihedrals and pairs.
+Returns a dict, mapping of old atom number strings to new ones
+
+##### test_for_radicals { #kimmdy.topology.topology.MoleculeType.test_for_radicals }
+
+`topology.topology.MoleculeType.test_for_radicals()`
+
+Updates radical status per atom and in topology.
+
+Iterate over all atoms and designate them as radicals if they have
+fewer bounds than their natural bond order.
 
 ### Topology { #kimmdy.topology.topology.Topology }
 
-`topology.topology.Topology(self, top)`
+`topology.topology.Topology(self, top, parametrizer=None)`
 
 Smart container for parsed topology data.
 
 A topology keeps track of connections when bonds are broken or formed.
+Reparametrization is triggerd automatically if `to_dict` is called
+after bonds have changed.
 
 Assumptions:
 
@@ -46,21 +73,23 @@ Assumptions:
 
 #### Parameters
 
-| Name   | Type                                          | Description                                       | Default    |
-|--------|-----------------------------------------------|---------------------------------------------------|------------|
-| `top`  | [TopologyDict](`kimmdy.parsing.TopologyDict`) | A dictionary containing the parsed topology data. | _required_ |
+| Name   | Type                                          | Description                                                                                 | Default    |
+|--------|-----------------------------------------------|---------------------------------------------------------------------------------------------|------------|
+| `top`  | [TopologyDict](`kimmdy.parsing.TopologyDict`) | A dictionary containing the parsed topology data, produced by [](`kimmdy.parsing.read_top`) | _required_ |
 
 #### Methods
 
 | Name | Description |
 | --- | --- |
 | [bind_bond](#kimmdy.topology.topology.Topology.bind_bond) | Add a bond in topology. |
-| [break_bond](#kimmdy.topology.topology.Topology.break_bond) | Break bonds in topology. |
+| [break_bond](#kimmdy.topology.topology.Topology.break_bond) | Break bonds in topology homolytically. |
+| [del_atom](#kimmdy.topology.topology.Topology.del_atom) | Deletes atom |
 | [reindex_atomnrs](#kimmdy.topology.topology.Topology.reindex_atomnrs) | Reindex atom numbers in topology. |
+| [validate_bond](#kimmdy.topology.topology.Topology.validate_bond) | Validates bond consistency between both atoms and top |
 
 ##### bind_bond { #kimmdy.topology.topology.Topology.bind_bond }
 
-`topology.topology.Topology.bind_bond(self, atompair_addresses)`
+`topology.topology.Topology.bind_bond(atompair_addresses)`
 
 Add a bond in topology.
 
@@ -77,12 +106,13 @@ Furthermore, it modifies to function types in the topology to account for radica
 
 ##### break_bond { #kimmdy.topology.topology.Topology.break_bond }
 
-`topology.topology.Topology.break_bond(self, atompair_addresses)`
+`topology.topology.Topology.break_bond(atompair_addresses)`
 
-Break bonds in topology.
+Break bonds in topology homolytically.
 
-removes bond, angles and dihedrals where atompair was involved.
+Removes bond, angles and dihedrals where atompair was involved.
 Modifies the topology dictionary in place.
+Atom pairs become radicals.
 
 ###### Parameters
 
@@ -90,11 +120,42 @@ Modifies the topology dictionary in place.
 |----------------------|------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------|------------|
 | `atompair_addresses` | [tuple](`tuple`)\[[TopologyAtomAddress](`kimmdy.utils.TopologyAtomAddress`), [TopologyAtomAddress](`kimmdy.utils.TopologyAtomAddress`)\] | Between which atoms to break the bond. | _required_ |
 
+##### del_atom { #kimmdy.topology.topology.Topology.del_atom }
+
+`topology.topology.Topology.del_atom(atom_nr, parameterize=True)`
+
+Deletes atom
+
+Deletes atom and all attached bonds. Reindexes the top and updates the
+parameters if requested.
+
+###### Parameters
+
+| Name           | Type           | Description                                                                | Default    |
+|----------------|----------------|----------------------------------------------------------------------------|------------|
+| `atom_nr`      | [str](`str`)   | 1-based atom number as string to delete                                    | _required_ |
+| `parameterize` | [bool](`bool`) | If true and bonds are removed triggers reparameterization, by default True | `True`     |
+
+###### Returns
+
+| Type                       | Description                                           |
+|----------------------------|-------------------------------------------------------|
+| [update_map](`update_map`) | Dict, mapping of old atom number strings to new ones. |
+
 ##### reindex_atomnrs { #kimmdy.topology.topology.Topology.reindex_atomnrs }
 
-`topology.topology.Topology.reindex_atomnrs(self)`
+`topology.topology.Topology.reindex_atomnrs()`
 
 Reindex atom numbers in topology.
 
 Starts at index 1.
 This also updates the numbers for bonds, angles, dihedrals and pairs.
+Returns a dict of all moleculetypes to their update maps (old -> new).
+
+##### validate_bond { #kimmdy.topology.topology.Topology.validate_bond }
+
+`topology.topology.Topology.validate_bond(atm1, atm2)`
+
+Validates bond consistency between both atoms and top
+Returns True if bond exists, False if not.
+Raises RuntimeError if bond is not consistent.

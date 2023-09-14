@@ -436,7 +436,7 @@ def merge_top_moleculetypes_slow_growth(
             )
 
     # update is_radical attribute of Atom objects in topology
-    molB._test_for_radicals()
+    molB.test_for_radicals()
 
     return molB
 

@@ -411,9 +411,11 @@ ul.task-list li input[type="checkbox"] {
   <ul>
   <li><a href="#kimmdy.topology.topology.MoleculeType" id="toc-kimmdy.topology.topology.MoleculeType" class="nav-link" data-scroll-target="#kimmdy.topology.topology.MoleculeType">MoleculeType</a>
   <ul class="collapse">
+  <li><a href="#attributes" id="toc-attributes" class="nav-link" data-scroll-target="#attributes">Attributes</a></li>
   <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
   <ul class="collapse">
   <li><a href="#kimmdy.topology.topology.MoleculeType.reindex_atomnrs" id="toc-kimmdy.topology.topology.MoleculeType.reindex_atomnrs" class="nav-link" data-scroll-target="#kimmdy.topology.topology.MoleculeType.reindex_atomnrs">reindex_atomnrs</a></li>
+  <li><a href="#kimmdy.topology.topology.MoleculeType.test_for_radicals" id="toc-kimmdy.topology.topology.MoleculeType.test_for_radicals" class="nav-link" data-scroll-target="#kimmdy.topology.topology.MoleculeType.test_for_radicals">test_for_radicals</a></li>
   </ul></li>
   </ul></li>
   <li><a href="#kimmdy.topology.topology.Topology" id="toc-kimmdy.topology.topology.Topology" class="nav-link" data-scroll-target="#kimmdy.topology.topology.Topology">Topology</a>
@@ -423,7 +425,9 @@ ul.task-list li input[type="checkbox"] {
   <ul class="collapse">
   <li><a href="#kimmdy.topology.topology.Topology.bind_bond" id="toc-kimmdy.topology.topology.Topology.bind_bond" class="nav-link" data-scroll-target="#kimmdy.topology.topology.Topology.bind_bond">bind_bond</a></li>
   <li><a href="#kimmdy.topology.topology.Topology.break_bond" id="toc-kimmdy.topology.topology.Topology.break_bond" class="nav-link" data-scroll-target="#kimmdy.topology.topology.Topology.break_bond">break_bond</a></li>
+  <li><a href="#kimmdy.topology.topology.Topology.del_atom" id="toc-kimmdy.topology.topology.Topology.del_atom" class="nav-link" data-scroll-target="#kimmdy.topology.topology.Topology.del_atom">del_atom</a></li>
   <li><a href="#kimmdy.topology.topology.Topology.reindex_atomnrs" id="toc-kimmdy.topology.topology.Topology.reindex_atomnrs" class="nav-link" data-scroll-target="#kimmdy.topology.topology.Topology.reindex_atomnrs">reindex_atomnrs</a></li>
+  <li><a href="#kimmdy.topology.topology.Topology.validate_bond" id="toc-kimmdy.topology.topology.Topology.validate_bond" class="nav-link" data-scroll-target="#kimmdy.topology.topology.Topology.validate_bond">validate_bond</a></li>
   </ul></li>
   </ul></li>
   </ul></li>
@@ -463,6 +467,65 @@ ul.task-list li input[type="checkbox"] {
 <h3 class="anchored" data-anchor-id="kimmdy.topology.topology.MoleculeType">MoleculeType</h3>
 <p><code>topology.topology.MoleculeType(self, header, atomics)</code></p>
 <p>One moleculetype in the topology</p>
+<section id="attributes" class="level4">
+<h4 class="anchored" data-anchor-id="attributes">Attributes</h4>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>atoms</td>
+<td><a href="https://docs.python.org/3.10/library/stdtypes.html#dict">dict</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>, <code>Atom</code>]</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>bonds</td>
+<td><a href="https://docs.python.org/3.10/library/stdtypes.html#dict">dict</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#tuple">tuple</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>, <a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>], <code>Bond</code>]</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>pairs</td>
+<td><a href="https://docs.python.org/3.10/library/stdtypes.html#dict">dict</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#tuple">tuple</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>, <a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>], <code>Pair</code>]</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>angles</td>
+<td><a href="https://docs.python.org/3.10/library/stdtypes.html#dict">dict</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#tuple">tuple</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>, <a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>, <a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>], <code>Angle</code>]</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>proper_dihedrals</td>
+<td><a href="https://docs.python.org/3.10/library/stdtypes.html#dict">dict</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#tuple">tuple</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>, <a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>, <a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>, <a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>], <code>MultipleDihedrals</code>]</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>improper_dihedrals</td>
+<td><a href="https://docs.python.org/3.10/library/stdtypes.html#dict">dict</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#tuple">tuple</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>, <a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>, <a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>, <a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>], <code>Dihedral</code>]</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>position_restraints</td>
+<td><a href="https://docs.python.org/3.10/library/stdtypes.html#dict">dict</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>, <code>PositionRestraint</code>]</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>dihedral_restraints</td>
+<td><a href="https://docs.python.org/3.10/library/stdtypes.html#dict">dict</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#tuple">tuple</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>, <a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>, <a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>, <a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>], <code>DihedralRestraint</code>]</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>radicals</td>
+<td><a href="https://docs.python.org/3.10/library/stdtypes.html#dict">dict</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>, <code>Atom</code>]</td>
+<td>dict mapping atom indices to atom objects for storing all radical atoms</td>
+</tr>
+</tbody>
+</table>
+</section>
 <section id="methods" class="level4">
 <h4 class="anchored" data-anchor-id="methods">Methods</h4>
 <table class="table">
@@ -477,21 +540,31 @@ ul.task-list li input[type="checkbox"] {
 <td><a href="#kimmdy.topology.topology.MoleculeType.reindex_atomnrs">reindex_atomnrs</a></td>
 <td>Reindex atom numbers in topology.</td>
 </tr>
+<tr class="even">
+<td><a href="#kimmdy.topology.topology.MoleculeType.test_for_radicals">test_for_radicals</a></td>
+<td>Updates radical status per atom and in topology.</td>
+</tr>
 </tbody>
 </table>
 <section id="kimmdy.topology.topology.MoleculeType.reindex_atomnrs" class="level5">
 <h5 class="anchored" data-anchor-id="kimmdy.topology.topology.MoleculeType.reindex_atomnrs">reindex_atomnrs</h5>
-<p><code>topology.topology.MoleculeType.reindex_atomnrs(self)</code></p>
+<p><code>topology.topology.MoleculeType.reindex_atomnrs()</code></p>
 <p>Reindex atom numbers in topology.</p>
-<p>Starts at index 1. This also updates the numbers for bonds, angles, dihedrals and pairs.</p>
+<p>Starts at index 1. This also updates the numbers for bonds, angles, dihedrals and pairs. Returns a dict, mapping of old atom number strings to new ones</p>
+</section>
+<section id="kimmdy.topology.topology.MoleculeType.test_for_radicals" class="level5">
+<h5 class="anchored" data-anchor-id="kimmdy.topology.topology.MoleculeType.test_for_radicals">test_for_radicals</h5>
+<p><code>topology.topology.MoleculeType.test_for_radicals()</code></p>
+<p>Updates radical status per atom and in topology.</p>
+<p>Iterate over all atoms and designate them as radicals if they have fewer bounds than their natural bond order.</p>
 </section>
 </section>
 </section>
 <section id="kimmdy.topology.topology.Topology" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.topology.Topology">Topology</h3>
-<p><code>topology.topology.Topology(self, top)</code></p>
+<p><code>topology.topology.Topology(self, top, parametrizer=None)</code></p>
 <p>Smart container for parsed topology data.</p>
-<p>A topology keeps track of connections when bonds are broken or formed.</p>
+<p>A topology keeps track of connections when bonds are broken or formed. Reparametrization is triggerd automatically if <code>to_dict</code> is called after bonds have changed.</p>
 <p>Assumptions:</p>
 <ul>
 <li>the topology of interest (the protein) is in section ‘moleculetype_0’.</li>
@@ -511,7 +584,7 @@ ul.task-list li input[type="checkbox"] {
 <tr class="odd">
 <td><code>top</code></td>
 <td><a href="../_reference/parsing.TopologyDict.html#kimmdy.parsing.TopologyDict">TopologyDict</a></td>
-<td>A dictionary containing the parsed topology data.</td>
+<td>A dictionary containing the parsed topology data, produced by <a href="../_reference/parsing.html#kimmdy.parsing.read_top"><code>kimmdy.parsing.read_top</code></a></td>
 <td><em>required</em></td>
 </tr>
 </tbody>
@@ -533,17 +606,25 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 <tr class="even">
 <td><a href="#kimmdy.topology.topology.Topology.break_bond">break_bond</a></td>
-<td>Break bonds in topology.</td>
+<td>Break bonds in topology homolytically.</td>
 </tr>
 <tr class="odd">
+<td><a href="#kimmdy.topology.topology.Topology.del_atom">del_atom</a></td>
+<td>Deletes atom</td>
+</tr>
+<tr class="even">
 <td><a href="#kimmdy.topology.topology.Topology.reindex_atomnrs">reindex_atomnrs</a></td>
 <td>Reindex atom numbers in topology.</td>
+</tr>
+<tr class="odd">
+<td><a href="#kimmdy.topology.topology.Topology.validate_bond">validate_bond</a></td>
+<td>Validates bond consistency between both atoms and top</td>
 </tr>
 </tbody>
 </table>
 <section id="kimmdy.topology.topology.Topology.bind_bond" class="level5">
 <h5 class="anchored" data-anchor-id="kimmdy.topology.topology.Topology.bind_bond">bind_bond</h5>
-<p><code>topology.topology.Topology.bind_bond(self, atompair_addresses)</code></p>
+<p><code>topology.topology.Topology.bind_bond(atompair_addresses)</code></p>
 <p>Add a bond in topology.</p>
 <p>Modifies the topology dictionary in place. It keeps track of affected terms in the topology via a graph representation of the topology and applies the necessary changes to bonds, angles and dihedrals (proper and improper). Furthermore, it modifies to function types in the topology to account for radicals.</p>
 <section id="parameters-1" class="level6">
@@ -570,9 +651,9 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="kimmdy.topology.topology.Topology.break_bond" class="level5">
 <h5 class="anchored" data-anchor-id="kimmdy.topology.topology.Topology.break_bond">break_bond</h5>
-<p><code>topology.topology.Topology.break_bond(self, atompair_addresses)</code></p>
-<p>Break bonds in topology.</p>
-<p>removes bond, angles and dihedrals where atompair was involved. Modifies the topology dictionary in place.</p>
+<p><code>topology.topology.Topology.break_bond(atompair_addresses)</code></p>
+<p>Break bonds in topology homolytically.</p>
+<p>Removes bond, angles and dihedrals where atompair was involved. Modifies the topology dictionary in place. Atom pairs become radicals.</p>
 <section id="parameters-2" class="level6">
 <h6 class="anchored" data-anchor-id="parameters-2">Parameters</h6>
 <table class="table">
@@ -595,11 +676,70 @@ ul.task-list li input[type="checkbox"] {
 </table>
 </section>
 </section>
+<section id="kimmdy.topology.topology.Topology.del_atom" class="level5">
+<h5 class="anchored" data-anchor-id="kimmdy.topology.topology.Topology.del_atom">del_atom</h5>
+<p><code>topology.topology.Topology.del_atom(atom_nr, parameterize=True)</code></p>
+<p>Deletes atom</p>
+<p>Deletes atom and all attached bonds. Reindexes the top and updates the parameters if requested.</p>
+<section id="parameters-3" class="level6">
+<h6 class="anchored" data-anchor-id="parameters-3">Parameters</h6>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>atom_nr</code></td>
+<td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
+<td>1-based atom number as string to delete</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td><code>parameterize</code></td>
+<td><a href="https://docs.python.org/3.10/library/functions.html#bool">bool</a></td>
+<td>If true and bonds are removed triggers reparameterization, by default True</td>
+<td><code>True</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns" class="level6">
+<h6 class="anchored" data-anchor-id="returns">Returns</h6>
+<table class="table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 66%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>update_map</code></td>
+<td>Dict, mapping of old atom number strings to new ones.</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
 <section id="kimmdy.topology.topology.Topology.reindex_atomnrs" class="level5">
 <h5 class="anchored" data-anchor-id="kimmdy.topology.topology.Topology.reindex_atomnrs">reindex_atomnrs</h5>
-<p><code>topology.topology.Topology.reindex_atomnrs(self)</code></p>
+<p><code>topology.topology.Topology.reindex_atomnrs()</code></p>
 <p>Reindex atom numbers in topology.</p>
-<p>Starts at index 1. This also updates the numbers for bonds, angles, dihedrals and pairs.</p>
+<p>Starts at index 1. This also updates the numbers for bonds, angles, dihedrals and pairs. Returns a dict of all moleculetypes to their update maps (old -&gt; new).</p>
+</section>
+<section id="kimmdy.topology.topology.Topology.validate_bond" class="level5">
+<h5 class="anchored" data-anchor-id="kimmdy.topology.topology.Topology.validate_bond">validate_bond</h5>
+<p><code>topology.topology.Topology.validate_bond(atm1, atm2)</code></p>
+<p>Validates bond consistency between both atoms and top Returns True if bond exists, False if not. Raises RuntimeError if bond is not consistent.</p>
 
 
 </section>
