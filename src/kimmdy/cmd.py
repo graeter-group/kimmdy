@@ -229,7 +229,7 @@ def _run(args: argparse.Namespace):
         runmgr = RunManager(config)
 
         if args.generate_jobscript:
-            runmgr.write_one_checkoint()
+            runmgr.write_one_checkpoint()
             content = jobscript.format(config=config)
             path = "jobscript.sh"
 
