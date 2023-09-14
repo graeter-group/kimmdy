@@ -11,7 +11,7 @@ from copy import copy, deepcopy
 import dill
 import queue
 from enum import Enum, auto
-from typing import Callable, Union
+from typing import Callable, Optional
 from kimmdy.config import Config
 from kimmdy.parsing import read_top, write_json, read_plumed, write_top
 from kimmdy.recipe import RecipeCollection, Recipe, Break, Bind, Place, Relax
@@ -90,31 +90,31 @@ class RunManager:
 
     Attributes
     ----------
-    config :
+    config
         The configuration object.
-    from_checkpoint :
+    from_checkpoint
         Whether the runmanager was initialized from a checkpoint.
-    tasks :
+    tasks
         Tasks from config.
-    crr_tasks :
+    crr_tasks
         Current tasks.
-    iteration :
+    iteration
         Current iteration.
-    state :
+    state
         Current state of the system.
-    recipe_collection :
+    recipe_collection
         Collection of recipes.
-    latest_files :
+    latest_files
         Dictionary of latest files.
-    histfile :
+    histfile
         Path to history file.
-    cptfile :
+    cptfile
         Path to checkpoint file.
-    top :
+    top
         Topology object.
-    filehist :
+    filehist
         List of dictionaries of TaskFiles.
-    task_mapping :
+    task_mapping
         Mapping of task names to runmanager methods.
     """
 
@@ -126,7 +126,7 @@ class RunManager:
         self.iteration: int = 0
         self.state: State = State.IDLE
         self.recipe_collection: RecipeCollection = RecipeCollection([])
-        self.recipe: Union[Recipe, None] = None
+        self.recipe: Optional[Recipe] = None
         self.time: float = 0.0  # [ps]
         self.latest_files: dict[str, Path] = get_existing_files(config)
         logger.debug("Initialized latest files:")
@@ -171,8 +171,8 @@ class RunManager:
         react_names = self.config.reactions.get_attributes()
         logger.debug(f"Instantiating Reactions: {react_names}")
         for rp_name in react_names:
-            r = reaction_plugins[rp_name]
-            reaction_plugin: ReactionPlugin = r(rp_name, self)
+            Plugin = reaction_plugins[rp_name]
+            reaction_plugin: ReactionPlugin = Plugin(rp_name, self)
             self.reaction_plugins.append(reaction_plugin)
 
     def run(self):
@@ -214,16 +214,15 @@ class RunManager:
         logger.info("Build task list")
         for entry in self.config.sequence:
             # handle md steps
-            if hasattr(self.config, "mds"):
-                if entry in self.config.mds.get_attributes():
-                    task = Task(
-                        self,
-                        f=self.task_mapping["md"],
-                        kwargs={"instance": entry},
-                        out=entry,
-                    )
-                    self.tasks.put(task)
-                    continue
+            if entry in self.config.mds.get_attributes():
+                task = Task(
+                    self,
+                    f=self.task_mapping["md"],
+                    kwargs={"instance": entry},
+                    out=entry,
+                )
+                self.tasks.put(task)
+                continue
 
             # handle single reaction steps
             if entry in self.config.reactions.get_attributes():
@@ -233,20 +232,21 @@ class RunManager:
                     "kwargs": {"selected": entry},
                 }
 
-                for task_kargs in task_list:
-                    self.tasks.put(Task(self, **task_kargs))
+                for task_kwargs in task_list:
+                    self.tasks.put(Task(self, **task_kwargs))
                 continue
 
             # handle combined reaction steps
             if entry == "reactions":
-                for task_kargs in self.task_mapping[entry]:
-                    self.tasks.put(Task(self, **task_kargs))
+                for task_kwargs in self.task_mapping[entry]:
+                    self.tasks.put(Task(self, **task_kwargs))
                 continue
-            m = f"Unknown task encounterd: {entry}"
+
+            m = f"Unknown task encountered: {entry}"
             logger.error(m)
             raise ValueError(m)
 
-    def write_one_checkoint(self):
+    def write_one_checkpoint(self):
         """Just write the first checkpoint and then exit
 
         Used to generate a starting point for jobscripts on hpc clusters
@@ -408,7 +408,7 @@ class RunManager:
         logger.info(f"Done with MD {instance}")
         return files
 
-    def _place_reaction_tasks(self, selected: Union[str, None] = None):
+    def _place_reaction_tasks(self, selected: Optional[str] = None):
         logger.info("Query reactions")
         self.state = State.REACTION
         # empty list for every new round of queries
