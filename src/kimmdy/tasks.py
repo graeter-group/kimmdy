@@ -118,7 +118,7 @@ class Task:
     -----------
     runmng
         Runmanager instance from which the task is called
-    f 
+    f
         Function that will be called when the task is called
     kwargs
         kwargs to be passed to f
@@ -126,7 +126,13 @@ class Task:
         If not None, an output dir will be created with this name
     """
 
-    def __init__(self, runmng, f: Callable[..., TaskFiles], kwargs: Optional[dict[str, Any]] = None, out: Optional[str] = None):
+    def __init__(
+        self,
+        runmng,
+        f: Callable[..., TaskFiles],
+        kwargs: Optional[dict[str, Any]] = None,
+        out: Optional[str] = None,
+    ):
         self.runmng = runmng
         self.f = f
         if kwargs is None:

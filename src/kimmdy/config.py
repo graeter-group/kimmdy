@@ -8,7 +8,12 @@ from pprint import pformat, pprint
 from typing import Any, Optional
 import yaml
 from pathlib import Path
-from kimmdy import reaction_plugins, broken_reaction_plugins, parameterization_plugins, broken_parameterization_plugins
+from kimmdy import (
+    reaction_plugins,
+    broken_reaction_plugins,
+    parameterization_plugins,
+    broken_parameterization_plugins,
+)
 from kimmdy.schema import Sequence, get_combined_scheme
 from kimmdy.utils import get_gmx_dir, check_file_exists, check_gmx_version
 
@@ -239,7 +244,9 @@ class Config:
             if hasattr(self, "reactions"):
                 for reaction_name in self.reactions.__dict__.keys():
                     if reaction_name not in (ks := list(reaction_plugins.keys())):
-                        if reaction_name in (ks := list(broken_reaction_plugins.keys())):
+                        if reaction_name in (
+                            ks := list(broken_reaction_plugins.keys())
+                        ):
                             m = f"Reaction plugin {reaction_name} could not be loaded."
                             self._logmessages["errors"].append(m)
                             raise broken_reaction_plugins[reaction_name]
@@ -251,8 +258,12 @@ class Config:
             # Validate parameterization plugins
             parameterizer_name = self.changer.topology.parameterization
             if parameterizer_name != "basic":
-                if parameterizer_name not in (ks := list(parameterization_plugins.keys())):
-                    if parameterizer_name in (ks := list(broken_parameterization_plugins.keys())):
+                if parameterizer_name not in (
+                    ks := list(parameterization_plugins.keys())
+                ):
+                    if parameterizer_name in (
+                        ks := list(broken_parameterization_plugins.keys())
+                    ):
                         m = f"Parameterization plugin {parameterizer_name} could not be loaded."
                         self._logmessages["errors"].append(m)
                         raise broken_parameterization_plugins[parameterizer_name]
@@ -333,7 +344,7 @@ class Config:
 
     def get_attributes(self):
         """Get a list of all attributes without hidden ones (_<...>)."""
-        return list(filter(lambda x: not x.startswith('_'), self.__dict__.keys()))
+        return list(filter(lambda x: not x.startswith("_"), self.__dict__.keys()))
 
     def __repr__(self):
         return pformat(self.__dict__, indent=2)

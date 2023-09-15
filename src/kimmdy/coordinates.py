@@ -105,7 +105,13 @@ def get_explicit_MultipleDihedrals(
         )
         if match_obj:
             assert isinstance(match_obj, DihedralType)
-            multiple_dihedrals.dihedrals[str(periodicity)] = Dihedral(*dihedral_key, funct="9", c0=match_obj.c0, c1=match_obj.c1, periodicity=match_obj.periodicity)
+            multiple_dihedrals.dihedrals[str(periodicity)] = Dihedral(
+                *dihedral_key,
+                funct="9",
+                c0=match_obj.c0,
+                c1=match_obj.c1,
+                periodicity=match_obj.periodicity,
+            )
 
     if not multiple_dihedrals.dihedrals:
         return None

@@ -391,7 +391,7 @@ class MoleculeType:
                 self.proper_dihedrals[key] = MultipleDihedrals(
                     *key, "9", dihedrals={"": Dihedral(*key, "9")}
                 )
-                pairkey: tuple[str, str] = tuple(str(x) for x in sorted([key[0], key[3]], key=int)) # type: ignore
+                pairkey: tuple[str, str] = tuple(str(x) for x in sorted([key[0], key[3]], key=int))  # type: ignore
                 if self.pairs.get(pairkey) is None:
                     self.pairs[pairkey] = Pair(pairkey[0], pairkey[1], "1")
 
@@ -452,9 +452,9 @@ class MoleculeType:
             if None in (ai, aj, ak):
                 continue
             # pyright does not grok `None in ...`
-            angle.ai = ai # type: ignore
-            angle.aj = aj # type: ignore
-            angle.ak = ak # type: ignore
+            angle.ai = ai  # type: ignore
+            angle.aj = aj  # type: ignore
+            angle.ak = ak  # type: ignore
             new_angles[(angle.ai, angle.aj, angle.ak)] = angle
         self.angles = new_angles
 
@@ -477,16 +477,16 @@ class MoleculeType:
                 if not None in (pair_ai, pair_aj):
                     new_pairs[(pair_ai, pair_aj)] = pair
 
-            dihedrals.ai = ai # type: ignore
-            dihedrals.aj = aj # type: ignore
-            dihedrals.ak = ak # type: ignore
-            dihedrals.al = al # type: ignore
+            dihedrals.ai = ai  # type: ignore
+            dihedrals.aj = aj  # type: ignore
+            dihedrals.ak = ak  # type: ignore
+            dihedrals.al = al  # type: ignore
 
             for dihedral in dihedrals.dihedrals.values():
-                dihedral.ai = ai # type: ignore
-                dihedral.aj = aj # type: ignore
-                dihedral.ak = ak # type: ignore
-                dihedral.al = al # type: ignore
+                dihedral.ai = ai  # type: ignore
+                dihedral.aj = aj  # type: ignore
+                dihedral.ak = ak  # type: ignore
+                dihedral.al = al  # type: ignore
                 new_dihedrals[dihedral.periodicity] = dihedral
 
             new_multiple_dihedrals[
@@ -510,10 +510,10 @@ class MoleculeType:
             # drop dihedrals to a deleted atom
             if None in (ai, aj, ak, al):
                 continue
-            dihedral.ai = ai # type: ignore
-            dihedral.aj = aj # type: ignore
-            dihedral.ak = ak # type: ignore
-            dihedral.al = al # type: ignore
+            dihedral.ai = ai  # type: ignore
+            dihedral.aj = aj  # type: ignore
+            dihedral.ak = ak  # type: ignore
+            dihedral.al = al  # type: ignore
             new_impropers[(ai, aj, ak, al)] = dihedral
         self.improper_dihedrals = new_impropers
 
@@ -538,7 +538,9 @@ class Topology:
         [](`kimmdy.parsing.read_top`)
     """
 
-    def __init__(self, top: TopologyDict, parametrizer: Parameterizer = BasicParameterizer()) -> None:
+    def __init__(
+        self, top: TopologyDict, parametrizer: Parameterizer = BasicParameterizer()
+    ) -> None:
         if top == {}:
             raise NotImplementedError(
                 "Generating an empty Topology from an empty TopologyDict is not implemented."
@@ -777,7 +779,7 @@ class Topology:
 
         # tuple -> list -> sorted -> tuple still makes it a tuple of two strings
         # so pyright can chill.
-        atompair_nrs: tuple[str, str] = tuple(sorted(atompair_nrs, key=int)) # type: ignore
+        atompair_nrs: tuple[str, str] = tuple(sorted(atompair_nrs, key=int))  # type: ignore
 
         atompair = [
             moleculetype.atoms[atompair_nrs[0]],
@@ -824,7 +826,7 @@ class Topology:
                 # dihedral contained a now deleted bond because
                 # it had both atoms of the broken bond
                 moleculetype.proper_dihedrals.pop(key, None)
-                pairkey : tuple[str, str] = tuple(sorted((key[0], key[3]), key=int)) # type: ignore
+                pairkey: tuple[str, str] = tuple(sorted((key[0], key[3]), key=int))  # type: ignore
                 moleculetype.pairs.pop(pairkey, None)
 
         # and improper dihedrals
@@ -880,7 +882,7 @@ class Topology:
 
         moleculetype = self.main_molecule
 
-        atompair_nrs: tuple[str, str] = tuple(sorted(atompair_nrs, key=int)) # type: ignore
+        atompair_nrs: tuple[str, str] = tuple(sorted(atompair_nrs, key=int))  # type: ignore
         atompair = [
             moleculetype.atoms[atompair_nrs[0]],
             moleculetype.atoms[atompair_nrs[1]],
@@ -990,7 +992,7 @@ class Topology:
                 moleculetype.proper_dihedrals[key] = MultipleDihedrals(
                     *key, "9", dihedrals={"": Dihedral(*key, "9")}
                 )
-            pairkey: tuple[str, str] = tuple(str(x) for x in sorted([key[0], key[3]], key=int)) # type: ignore
+            pairkey: tuple[str, str] = tuple(str(x) for x in sorted([key[0], key[3]], key=int))  # type: ignore
             if moleculetype.pairs.get(pairkey) is None:
                 moleculetype.pairs[pairkey] = Pair(pairkey[0], pairkey[1], "1")
 

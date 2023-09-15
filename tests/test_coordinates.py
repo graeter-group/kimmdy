@@ -15,20 +15,26 @@ from kimmdy.coordinates import (
     break_bond_plumed,
 )
 
+
 ## helpers
 def test_get_explicit_MultipleDihedrals(arranged_tmp_path):
     top_a = Topology(read_top(Path("topol_stateA.top")))
     # has only one dihedral
-    key1 = ('1', '5', '7', '8')
-    assert top_a.proper_dihedrals[key1].dihedrals[''] == Dihedral(*key1, "9")
+    key1 = ("1", "5", "7", "8")
+    assert top_a.proper_dihedrals[key1].dihedrals[""] == Dihedral(*key1, "9")
 
     # has multiple dihedrals
-    key_mult = ('15', '17', '19', '24')
-    assert top_a.proper_dihedrals[key_mult].dihedrals.keys() == {'1', '2', '3'}
-    assert top_a.proper_dihedrals[key_mult].dihedrals['1'] == Dihedral(*key_mult, funct='9', c0='180.000000', c1='1.6279944', periodicity='1')
-    assert top_a.proper_dihedrals[key_mult].dihedrals['2'] == Dihedral(*key_mult, funct='9', c0='180.000000', c1='21.068532', periodicity='2')
-    assert top_a.proper_dihedrals[key_mult].dihedrals['3'] == Dihedral(*key_mult, funct='9', c0='180.000000', c1='1.447664', periodicity='3')
-
+    key_mult = ("15", "17", "19", "24")
+    assert top_a.proper_dihedrals[key_mult].dihedrals.keys() == {"1", "2", "3"}
+    assert top_a.proper_dihedrals[key_mult].dihedrals["1"] == Dihedral(
+        *key_mult, funct="9", c0="180.000000", c1="1.6279944", periodicity="1"
+    )
+    assert top_a.proper_dihedrals[key_mult].dihedrals["2"] == Dihedral(
+        *key_mult, funct="9", c0="180.000000", c1="21.068532", periodicity="2"
+    )
+    assert top_a.proper_dihedrals[key_mult].dihedrals["3"] == Dihedral(
+        *key_mult, funct="9", c0="180.000000", c1="1.447664", periodicity="3"
+    )
 
 
 ## test coordinate changes

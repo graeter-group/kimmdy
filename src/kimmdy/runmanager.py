@@ -43,7 +43,6 @@ class State(Enum):
     DONE = auto()
 
 
-
 def get_existing_files(config: Config, section: str = "root") -> dict:
     """Initialize latest_files with every existing file defined in config"""
     file_d = {}
@@ -147,12 +146,15 @@ class RunManager:
             "md": {"f": self._run_md, "kwargs": {}, "out": None},
             "reactions": [
                 {"f": self._place_reaction_tasks, "kwargs": {}, "out": None},
-                {"f": self._decide_recipe, "kwargs": {"decision_strategy": rf_kmc}, "out": "decide_recipe"},
+                {
+                    "f": self._decide_recipe,
+                    "kwargs": {"decision_strategy": rf_kmc},
+                    "out": "decide_recipe",
+                },
                 {"f": self._apply_recipe, "kwargs": {}, "out": "apply_recipe"},
             ],
         }
-        """Mapping of task names to functions and their keyword arguments.""" 
-
+        """Mapping of task names to functions and their keyword arguments."""
 
         # Initialize reaction plugins used in the sequence
         self.reaction_plugins: list[ReactionPlugin] = []
@@ -424,7 +426,9 @@ class RunManager:
         return files
 
     def _decide_recipe(
-        self, decision_strategy: Callable[[RecipeCollection], KMCResult], files: Optional[TaskFiles]=None
+        self,
+        decision_strategy: Callable[[RecipeCollection], KMCResult],
+        files: Optional[TaskFiles] = None,
     ):
         if files is None:
             logger = logging.getLogger(__name__)
