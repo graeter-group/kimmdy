@@ -146,8 +146,7 @@ def test_morse_transition_rate(homolysis_files):
 
 def test_get_recipe_collection(homolysis_files):
     config = Config(Path("kimmdy.yml"))
-    top = Topology(read_top(homolysis_files["top"]))
-    rmgr = DummyRunmanager(top, config)
+    rmgr = DummyRunmanager(homolysis_files["top"], config)
 
     files = DummyFiles()
     files.input["plumed"] = Path("plumed.dat")
