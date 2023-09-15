@@ -5,6 +5,7 @@ Is skipped if KIMMDY was installed without the plugin.
 """
 import pytest
 from kimmdy import reaction_plugins
+from kimmdy.runmanager import RunManager
 
 pytest.importorskip("homolysis")
 pytest.importorskip("hat_naive")
@@ -36,7 +37,7 @@ from kimmdy.tasks import TaskFiles
 
 
 @dataclass
-class DummyRunmanager:
+class DummyRunmanager(RunManager):
     top: Topology
     config: Config
 
@@ -145,7 +146,8 @@ def test_morse_transition_rate(homolysis_files):
 
 def test_get_recipe_collection(homolysis_files):
     config = Config(Path("kimmdy.yml"))
-    rmgr = DummyRunmanager(homolysis_files["top"], config)
+    top = Topology(read_top(homolysis_files["top"]))
+    rmgr = DummyRunmanager(top, config)
 
     files = DummyFiles()
     files.input["plumed"] = Path("plumed.dat")
