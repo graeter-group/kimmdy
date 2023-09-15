@@ -84,7 +84,6 @@ def test_place_atom(arranged_tmp_path):
     u = mda.Universe(str(files.output["gro"]))
     coords = tuple(u.select_atoms(f"id {step.id_to_place}")[0].position)
     assert coords == step.new_coords
-    print(coords)
 
 
 def test_plumed_break(arranged_tmp_path):

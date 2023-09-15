@@ -6,8 +6,9 @@ output paths and the Task class for steps in the runmanager.
 from dataclasses import dataclass, field
 from pathlib import Path
 import shutil
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, Optional
 import logging
+from kimmdy.parsing import read_plumed
 from kimmdy.utils import longFormatter
 
 logger = logging.getLogger(__name__)
@@ -147,15 +148,17 @@ class Task:
         return str(self.name) + " args: " + str(self.kwargs)
 
 
-TaskClosure = Callable[..., Optional[TaskFiles]]
-TaskMappingItem = dict[str, Union[TaskClosure, str]]
+def get_plumed_out(plumed: Path) -> str:
+    plumed_parsed = read_plumed(plumed)
+    plumed_out = None
+    for part in plumed_parsed["prints"]:
+        if file := part.get("FILE"):
+            if not plumed_out:
+                plumed_out = file
+                logger.debug(f"Found plumed print FILE {plumed_out}")
+            else:
+                raise RuntimeError("Multiple FILE sections found in plumed dat")
+    if plumed_out is None:
+        raise RuntimeError("No FILE section found in plumed dat")
 
-TaskMapping = dict[
-    str,
-    Union[
-        list[TaskMappingItem],
-        TaskMappingItem
-    ]
-]
-"""Mapping of task names to functions.""" 
-
+    return plumed_out

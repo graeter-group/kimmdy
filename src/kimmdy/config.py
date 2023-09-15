@@ -332,8 +332,8 @@ class Config:
         return self.__getattribute__(attribute)
 
     def get_attributes(self):
-        """Get a list of all attributes"""
-        return list(self.__dict__.keys())
+        """Get a list of all attributes without hidden ones (_<...>)."""
+        return list(filter(lambda x: not x.startswith('_'), self.__dict__.keys()))
 
     def __repr__(self):
         return pformat(self.__dict__, indent=2)

@@ -9,7 +9,6 @@ from pathlib import Path
 from dataclasses import dataclass
 from typing import Callable
 
-from kimmdy.recipe import Recipe, RecipeCollection, BondOperation
 from kimmdy.tasks import TaskFiles
 from kimmdy.utils import get_gmx_dir
 

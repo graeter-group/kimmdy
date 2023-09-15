@@ -16,7 +16,6 @@ def test_tasks_are_set_up(arranged_tmp_path):
     items = []
     while not runmgr.tasks.empty():
         items.append(runmgr.tasks.get().name)
-    print(items)
     assert items == [
         "_run_md",
         "_run_md",
