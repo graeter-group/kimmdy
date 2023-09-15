@@ -542,7 +542,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Our starting structure is a simple ACE/NME-capped Alanine molecule in a box of water.</p>
     <div id="app-vis-ala.molj" class="molstar-app"></div>
     <script type="text/javascript">
-    molstar.Viewer.create("app-vis-ala.molj", {"pdbProvider":"rcsb","viewportShowAnimation":true,"viewportShowSelectionMode":false,"layoutShowLog":false,"viewportShowExpand":true,"layoutShowControls":false,"emdbProvider":"rcsb","layoutShowRemoteState":false,"layoutShowSequence":false,"layoutIsExpanded":false,"layoutShowLeftPanel":true}).then(viewer => {
+    molstar.Viewer.create("app-vis-ala.molj", {"viewportShowSelectionMode":false,"layoutIsExpanded":false,"viewportShowExpand":true,"layoutShowRemoteState":false,"emdbProvider":"rcsb","viewportShowAnimation":true,"layoutShowControls":false,"layoutShowLeftPanel":true,"layoutShowLog":false,"layoutShowSequence":false,"pdbProvider":"rcsb"}).then(viewer => {
     viewer.loadSnapshotFromUrl(url="vis-ala.molj", "molj");    });
     </script>
     
