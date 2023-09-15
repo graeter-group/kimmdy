@@ -415,7 +415,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
   <ul class="collapse">
   <li><a href="#kimmdy.runmanager.RunManager.get_latest" id="toc-kimmdy.runmanager.RunManager.get_latest" class="nav-link" data-scroll-target="#kimmdy.runmanager.RunManager.get_latest">get_latest</a></li>
-  <li><a href="#kimmdy.runmanager.RunManager.write_one_checkoint" id="toc-kimmdy.runmanager.RunManager.write_one_checkoint" class="nav-link" data-scroll-target="#kimmdy.runmanager.RunManager.write_one_checkoint">write_one_checkoint</a></li>
+  <li><a href="#kimmdy.runmanager.RunManager.write_one_checkpoint" id="toc-kimmdy.runmanager.RunManager.write_one_checkpoint" class="nav-link" data-scroll-target="#kimmdy.runmanager.RunManager.write_one_checkpoint">write_one_checkpoint</a></li>
   </ul></li>
   </ul></li>
   <li><a href="#kimmdy.runmanager.State" id="toc-kimmdy.runmanager.State" class="nav-link" data-scroll-target="#kimmdy.runmanager.State">State</a></li>
@@ -536,8 +536,13 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 <tr class="odd">
 <td>task_mapping</td>
-<td><a href="../_reference/tasks.html#kimmdy.tasks.TaskMapping">TaskMapping</a></td>
+<td></td>
 <td>Mapping of task names to runmanager methods.</td>
+</tr>
+<tr class="even">
+<td>reaction_plugins</td>
+<td><a href="https://docs.python.org/3.10/library/stdtypes.html#list">list</a>[<a href="../_reference/plugins.html#kimmdy.plugins.ReactionPlugin">ReactionPlugin</a>]</td>
+<td>List of initialized reaction plugins used in the sequence.</td>
 </tr>
 </tbody>
 </table>
@@ -557,7 +562,7 @@ ul.task-list li input[type="checkbox"] {
 <td>Returns path to latest file of given type.</td>
 </tr>
 <tr class="even">
-<td><a href="#kimmdy.runmanager.RunManager.write_one_checkoint">write_one_checkoint</a></td>
+<td><a href="#kimmdy.runmanager.RunManager.write_one_checkpoint">write_one_checkpoint</a></td>
 <td>Just write the first checkpoint and then exit</td>
 </tr>
 </tbody>
@@ -568,9 +573,9 @@ ul.task-list li input[type="checkbox"] {
 <p>Returns path to latest file of given type.</p>
 <p>For .dat files (in general ambiguous extensions) use full file name. Errors if file is not found.</p>
 </section>
-<section id="kimmdy.runmanager.RunManager.write_one_checkoint" class="level5">
-<h5 class="anchored" data-anchor-id="kimmdy.runmanager.RunManager.write_one_checkoint">write_one_checkoint</h5>
-<p><code>runmanager.RunManager.write_one_checkoint()</code></p>
+<section id="kimmdy.runmanager.RunManager.write_one_checkpoint" class="level5">
+<h5 class="anchored" data-anchor-id="kimmdy.runmanager.RunManager.write_one_checkpoint">write_one_checkpoint</h5>
+<p><code>runmanager.RunManager.write_one_checkpoint()</code></p>
 <p>Just write the first checkpoint and then exit</p>
 <p>Used to generate a starting point for jobscripts on hpc clusters that can easily self-submit after a timelimit was exceeded.</p>
 </section>

@@ -59,7 +59,7 @@ fewer bounds than their natural bond order.
 
 ### Topology { #kimmdy.topology.topology.Topology }
 
-`topology.topology.Topology(self, top, parametrizer=None)`
+`topology.topology.Topology(self, top, parametrizer=BasicParameterizer())`
 
 Smart container for parsed topology data.
 

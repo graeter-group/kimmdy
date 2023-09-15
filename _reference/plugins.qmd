@@ -17,6 +17,19 @@ Plugin base classes and basic instances thereof.
 
 reconstruct base force field state
 
+#### Methods
+
+| Name | Description |
+| --- | --- |
+| [parameterize_topology](#kimmdy.plugins.BasicParameterizer.parameterize_topology) | Do nothing, |
+
+##### parameterize_topology { #kimmdy.plugins.BasicParameterizer.parameterize_topology }
+
+`plugins.BasicParameterizer.parameterize_topology(current_topology)`
+
+Do nothing,
+all necessary actions should already have happened in bind_bond and break_bond of Topology
+
 ### ReactionPlugin { #kimmdy.plugins.ReactionPlugin }
 
 `plugins.ReactionPlugin(self, name, runmng)`
