@@ -658,7 +658,7 @@ class Topology:
     def _update_parameters(self):
         if self.needs_parameterization:
             try:
-                self.parametrizer.parameterize_topology(self.top)
+                self.parametrizer.parameterize_topology(self)
             except AttributeError as e:
                 raise RuntimeError(
                     f"No Parametrizer was initialized in this topology!\n{e}"
