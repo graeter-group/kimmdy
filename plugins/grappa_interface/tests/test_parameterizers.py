@@ -125,5 +125,6 @@ def test_parameterize_topology(tmp_path):
     top = Topology(read_top(Path(__file__).parent / "Ala_out.top"), parameterizer)
 
     curr_top = deepcopy(top)
+    curr_top.needs_parameterization = True
     curr_top._update_parameters()
     assert top != curr_top
