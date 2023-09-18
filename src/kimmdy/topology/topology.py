@@ -657,12 +657,13 @@ class Topology:
 
     def _update_parameters(self):
         if self.needs_parameterization:
-            try:
-                self.parametrizer.parameterize_topology(self)
-            except AttributeError as e:
-                raise RuntimeError(
-                    f"No Parametrizer was initialized in this topology!\n{e}"
+            if self.parametrizer is not None:
+                logger.info(
+                    f"Starting parametrization using {self.parametrizer.__class__.__name__}"
                 )
+                self.parametrizer.parameterize_topology(self)
+            else:
+                raise RuntimeError("No Parametrizer was initialized in this topology!")
             self.needs_parameterization = False
 
     def to_dict(self) -> TopologyDict:
