@@ -7,7 +7,7 @@ In our system, the reaction rate r = (deterministic) reaction constant k
 because of the fundamental premise of chemical kinetics
 and because we have one reactant molecule
 """
-from typing import Union
+from typing import Optional
 import logging
 import numpy as np
 from dataclasses import dataclass, field
@@ -23,37 +23,36 @@ class KMCResult:
 
     Attributes
     ----------
-    recipe :
+    recipe
         Single sequence of RecipeSteps to build product
-    reaction_probability :
+    reaction_probability
         Integral of reaction propensity with respect to time
-    time_delta :
+    time_delta
         MC time jump during which the reaction occurs [ps]
-    time_start :
+    time_start
         Time, from which the reaction starts. The reaction changes the
         geometry/topology of this timestep and continues from there.
     """
 
     recipe: Recipe = field(default_factory=lambda: Recipe([], [], []))
-    reaction_probability: Union[list[float], None] = None
-    time_delta: Union[float, None] = None
-    time_start: Union[float, None] = None
+    reaction_probability: Optional[list[float]] = None
+    time_delta: Optional[float] = None
+    time_start: Optional[float] = None
 
 
 def rf_kmc(
     recipe_collection: RecipeCollection, rng: np.random.BitGenerator = default_rng()
 ) -> KMCResult:
     """Rejection-Free Monte Carlo.
-    takes RecipeCollection and choses a recipe based on the relative propensity of the events.
-
+    Takes RecipeCollection and choses a recipe based on the relative propensity of the events.
 
     Compare e.g. [Wikipedia KMC - rejection free](https://en.wikipedia.org/wiki/Kinetic_Monte_Carlo#Rejection-free_KMC)
 
     Parameters
     ---------
-    recipe_collection :
+    recipe_collection
         from which one will be choosen
-    rng :
+    rng
         function to generate random numbers in the KMC step
     """
 
@@ -65,14 +64,17 @@ def rf_kmc(
     # 0. Initialization
     reaction_probability = []
     recipes = []
+
+    # 1. Calculate the probability for each reaction
     for recipe in recipe_collection.recipes:
-        # 1.1 Calculate the probability for each reaction
         dt = [x[1] - x[0] for x in recipe.timespans]
         reaction_probability.append(sum(map(lambda x, y: x * y, dt, recipe.rates)))
         recipes.append(recipe)
+
     # 2. Set the total rate to the sum of individual rates
     probability_cumulative = np.cumsum(reaction_probability)
     probability_sum = probability_cumulative[-1]
+
     # 3. Generate two independent uniform (0,1) random numbers u1,u2
     u = rng.random(2)
     logger.debug(
@@ -83,6 +85,7 @@ def rf_kmc(
     pos = np.searchsorted(probability_cumulative, u[0] * probability_sum)
     recipe = recipe_collection.recipes[pos]
     logger.info(f"Chosen Recipe: {recipe}")
+
     # 5. Calculate the time step associated with mu
     time_delta = 1 / probability_sum * np.log(1 / u[1])
 
@@ -97,7 +100,7 @@ def rf_kmc(
 def frm(
     recipe_collection: RecipeCollection,
     rng: np.random.BitGenerator = default_rng(),
-    MD_time: Union[float, None] = None,
+    MD_time: Optional[float] = None,
 ) -> KMCResult:
     """First Reaction Method variant of Kinetic Monte Carlo.
     takes RecipeCollection and choses a recipe based on which reaction would occur.
@@ -106,11 +109,11 @@ def frm(
 
     Parameters
     ---------
-    recipe_collection :
+    recipe_collection
         from which one will be choosen
-    rng :
+    rng
         to generate random numbers in the KMC step
-    MD_time :
+    MD_time
         time [ps] to compare conformational events with reaction events in the time domain
     """
 
