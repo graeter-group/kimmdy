@@ -63,13 +63,11 @@ def rf_kmc(
 
     # 0. Initialization
     reaction_probability = []
-    recipes = []
 
     # 1. Calculate the probability for each reaction
     for recipe in recipe_collection.recipes:
         dt = [x[1] - x[0] for x in recipe.timespans]
-        reaction_probability.append(sum(map(lambda x, y: x * y, dt, recipe.rates)))
-        recipes.append(recipe)
+        reaction_probability.append(sum(np.multiply(dt, recipe.rates)))
 
     # 2. Set the total rate to the sum of individual rates
     probability_cumulative = np.cumsum(reaction_probability)
@@ -87,7 +85,7 @@ def rf_kmc(
     logger.info(f"Chosen Recipe: {recipe}")
 
     # 5. Calculate the time step associated with mu
-    time_delta = 1 / probability_sum * np.log(1 / u[1])
+    time_delta = np.log(1 / u[1]) / probability_sum
 
     return KMCResult(
         recipe=recipe,
