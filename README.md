@@ -47,7 +47,6 @@ Other ways to install kimmdy with all plugins are currently discouraged because 
 ## First simulation
 
 * change directory to `example_triala`
-* `ln -s ../../tests/test_files/assets/amber99sb-star-ildnp.ff ./amber99sb-star-ildnp.ff`
 * run kimmdy: `kimmdy -l INFO`
 * check output: `kimmdy.log`, `test_out_00X/`
 
