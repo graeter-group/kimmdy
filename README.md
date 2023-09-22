@@ -16,7 +16,7 @@ python -m venv .venv
 source .venv/bin/activate
 python -m pip install -e ./
 ```
-This installation includes only the most basic functionality as no plugins and analysis tool dependencies are installed. 
+This installation includes only the most basic functionality as no plugins and analysis tool dependencies are installed. Plugins can be installed using `python -m pip install -e ./` in their module directories (e.g. `kimmdy/plugins/default_reactions`). The analysis tool dependencies can be installed with `python -m pip install -e ./[analysis]` in `kimmdy/`.
 
 ### Full installation
 ```
