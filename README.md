@@ -33,6 +33,7 @@ cd ..
 git clone https://github.com/hits-mbm-dev/kimmdy.git
 cd kimmdy
 pip install -r requirements.txt
+pip install -e ./plugins/grappa_interface
 ```
 Other ways to install kimmdy with all plugins are currently discouraged because of the high number of dependencies.
 
