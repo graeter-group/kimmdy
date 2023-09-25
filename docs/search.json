@@ -523,5 +523,33 @@
     "title": "Explanations",
     "section": "",
     "text": "Pages that help you understand the inner workings of KIMMDY\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "guide/tutorials/colbuilder.html",
+    "href": "guide/tutorials/colbuilder.html",
+    "title": "1. Run KIMMDY from Colbuilder fibril",
+    "section": "",
+    "text": "Download the desired model and the ff parameters for gromacs from colbuilder\nClean the force field files by moving ‘amber99sb-star-ildnp.ff’ up to the working directory, adding ‘residuetypes.dat’ and ‘specbond.dat’ to the working directory, removing temporary files ’._*’ and deleting the rest of collagen.ff\nConvert the pdb file to .gro format and create a unified topology file (this may take a while)\n\ngmx pdb2gmx -f Homo_sapiens_aln_N_HLKNL_12_C_PYD_2_fibril.pdb -o fibril.gro -ignh -merge all\n\nCreate a KIMMDY config file (kimmdy.yml) or modify an existing one\nSupply the necessary mdp files\nSet up the simulation box and equilibrate the system\n\n\n\n\nkimmdy\n\n\n\nkimmdy-analysis"
+  },
+  {
+    "objectID": "guide/tutorials/colbuilder.html#preparation",
+    "href": "guide/tutorials/colbuilder.html#preparation",
+    "title": "1. Run KIMMDY from Colbuilder fibril",
+    "section": "",
+    "text": "Download the desired model and the ff parameters for gromacs from colbuilder\nClean the force field files by moving ‘amber99sb-star-ildnp.ff’ up to the working directory, adding ‘residuetypes.dat’ and ‘specbond.dat’ to the working directory, removing temporary files ’._*’ and deleting the rest of collagen.ff\nConvert the pdb file to .gro format and create a unified topology file (this may take a while)\n\ngmx pdb2gmx -f Homo_sapiens_aln_N_HLKNL_12_C_PYD_2_fibril.pdb -o fibril.gro -ignh -merge all\n\nCreate a KIMMDY config file (kimmdy.yml) or modify an existing one\nSupply the necessary mdp files\nSet up the simulation box and equilibrate the system"
+  },
+  {
+    "objectID": "guide/tutorials/colbuilder.html#simulation",
+    "href": "guide/tutorials/colbuilder.html#simulation",
+    "title": "1. Run KIMMDY from Colbuilder fibril",
+    "section": "",
+    "text": "kimmdy"
+  },
+  {
+    "objectID": "guide/tutorials/colbuilder.html#analysis",
+    "href": "guide/tutorials/colbuilder.html#analysis",
+    "title": "1. Run KIMMDY from Colbuilder fibril",
+    "section": "",
+    "text": "kimmdy-analysis"
   }
 ]

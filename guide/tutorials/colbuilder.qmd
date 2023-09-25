@@ -1,0 +1,20 @@
+# 1. Run KIMMDY from Colbuilder fibril
+
+## Preparation
+- Download the desired model and the ff parameters for gromacs from [colbuilder](https://colbuilder.h-its.org/)
+- Clean the force field files by moving 'amber99sb-star-ildnp.ff' up to the working directory, adding 'residuetypes.dat' and 'specbond.dat' to the working directory, removing temporary files '._*' and deleting the rest of collagen.ff
+- Convert the pdb file to .gro format and create a unified topology file (this may take a while)
+
+`gmx pdb2gmx -f Homo_sapiens_aln_N_HLKNL_12_C_PYD_2_fibril.pdb -o fibril.gro -ignh -merge all`
+
+- Create a KIMMDY config file (kimmdy.yml) or modify an existing one 
+- Supply the necessary mdp files
+- Set up the simulation box and equilibrate the system
+
+## Simulation
+
+`kimmdy`
+
+## Analysis
+
+`kimmdy-analysis`
