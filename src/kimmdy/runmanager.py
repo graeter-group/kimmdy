@@ -370,13 +370,14 @@ class RunManager:
             f"{gmx_alias} grompp -p {top} -c {gro} "
             f"-f {mdp} -n {ndx} -o {instance}.tpr -maxwarn 5"
         )
-        # only appends these lines if there are trr and edr files
-        try:
+
+        # optional files for grompp:
+        if self.latest_files.get("trr") is not None:
             trr = files.input["trr"]
+            grompp_cmd += f" -t {trr}"
+        if self.latest_files.get("edr") is not None:
             edr = files.input["edr"]
-            grompp_cmd += f" -t {trr} -e {edr}"
-        except FileNotFoundError:
-            pass
+            grompp_cmd += f" -e {edr}"
 
         mdrun_cmd = (
             f"{gmx_alias} mdrun -s {instance}.tpr -cpi {instance}.cpt "
