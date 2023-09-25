@@ -94,19 +94,24 @@ def get_atomnrs_from_plumedid(
         )
 
 
-def get_atomtypes_from_atomnrs(atomnrs: list[str], top: Topology):
+def get_atominfo_from_atomnrs(
+    atomnrs: list[str], top: Topology
+) -> tuple[list[str], list[str]]:
     """Use topology atoms section to convert from atomnr to atomtype"""
     atomtypes = []
+    atomnames = []
     for atomnr in atomnrs:
         atomtypes.append(top.atoms[atomnr].type)
-    logger.debug(f"Found atomtypes {atomtypes} for atom numbers {atomnrs}.")
-    return atomtypes
+        atomnames.append(top.atoms[atomnr].atom)
+    logger.debug(f"Found atomtypes {[atomtypes,atomnames]} for atom numbers {atomnrs}.")
+    return atomtypes, atomnames
 
 
 def get_bondprm_from_atomtypes(
-    atomtypes: list[str], ffbonded: dict, edissoc: dict
-) -> tuple[float, float, float]:
-    """Returns bond parameters (b0, kb, E_dis) for a set of two atomtypes.
+    atomtypes: list[str],
+    ffbonded: dict,
+) -> tuple[float, float]:
+    """Returns bond parameters (b0, kb) for a set of two atomtypes.
 
     Parameters
     ----------
@@ -114,26 +119,7 @@ def get_bondprm_from_atomtypes(
         Two atomtypes as defined in the respective force field
     ffbonded:
         Force field ffbonded.itp file parsed through the rtp parser
-    edissoc:
-        Parsed file with dissociation energies per bond between two atomtypes or elements
     """
-    atomelements = [x[0] for x in atomtypes]
-
-    # dissociation energy can be for bonds between atomtypes or elements or mixtures of both
-    for comb in [
-        atomtypes,
-        [atomtypes[0], atomelements[1]],
-        [atomelements[0], atomtypes[1]],
-        atomelements,
-    ]:
-        if E_dis := edissoc.get(tuple(comb)):
-            break
-        elif E_dis := edissoc.get(tuple(comb[::-1])):
-            break
-    else:
-        raise KeyError(
-            f"Did not find dissociation energy for atomtypes {atomtypes} in edissoc file"
-        )
     # search for b0 and kb for the given atomtypes in ffbonded bondtypes
     for bondtype in ffbonded["bondtypes"]["content"]:
         if set(atomtypes) == set(bondtype[:2]):
@@ -144,8 +130,38 @@ def get_bondprm_from_atomtypes(
             f"Did not find bond parameters for atomtypes {atomtypes} in ffbonded file"
         )
 
-    logger.debug(f"Found bondprm {[b0,kb,E_dis]} for atomtypes {atomtypes}.")
-    return b0, kb, E_dis
+    logger.debug(f"Found bondprm {[b0,kb]} for atomtypes {atomtypes}.")
+    return b0, kb
+
+
+def get_edissoc_from_atomnames(atomnames: list[str], edissoc: dict) -> float:
+    """Returns dissociation energy E_dissoc for a set of two atomnames.
+
+    Parameters
+    ----------
+    atomnames:
+        Two atomnames as defined in the respective force field
+    edissoc:
+        Parsed file with dissociation energies per bond between two atomtypes or elements
+    """
+    # dissociation energy can be for bonds between atomtypes or elements or mixtures of both
+    atomelements = [x[0] for x in atomnames]
+    for comb in [
+        atomnames,
+        [atomnames[0], atomelements[1]],
+        [atomelements[0], atomnames[1]],
+        atomelements,
+    ]:
+        if E_dis := edissoc.get(tuple(comb)):
+            break
+        elif E_dis := edissoc.get(tuple(comb[::-1])):
+            break
+    else:
+        raise KeyError(
+            f"Did not find dissociation energy for atomtypes {atomnames} in edissoc file"
+        )
+    logger.debug(f"Found dissociation energy {E_dis} for atomtypes {atomnames}.")
+    return E_dis
 
 
 def morse_transition_rate(

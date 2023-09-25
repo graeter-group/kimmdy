@@ -9,8 +9,9 @@ from kimmdy.tasks import TaskFiles
 from kimmdy.utils import (
     morse_transition_rate,
     get_atomnrs_from_plumedid,
-    get_atomtypes_from_atomnrs,
+    get_atominfo_from_atomnrs,
     get_bondprm_from_atomtypes,
+    get_edissoc_from_atomnames,
 )
 from kimmdy.parsing import (
     read_top,
@@ -47,8 +48,9 @@ class Homolysis(ReactionPlugin):
                 continue
             # get from plumedid to b0 and kb of the bond via atomtypes
             atomnrs = get_atomnrs_from_plumedid(plumedid, plumed)
-            atomtypes = get_atomtypes_from_atomnrs(atomnrs, top)
-            b0, kb, E_dis = get_bondprm_from_atomtypes(atomtypes, ffbonded, edissoc)
+            atomtypes, atomnames = get_atominfo_from_atomnrs(atomnrs, top)
+            b0, kb = get_bondprm_from_atomtypes(atomtypes, ffbonded)
+            E_dis = get_edissoc_from_atomnames(atomnames, edissoc)
 
             logger.debug(
                 f"plumedid: {plumedid}, atomids: {atomnrs}, atomtypes: {atomtypes}, b0: {b0}, kb: {kb}, E_dis: {E_dis}"
