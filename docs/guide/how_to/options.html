@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>KIMMDY – utils</title>
+<title>KIMMDY - KIMMDY Options</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,29 +20,63 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
-<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="../site_libs/quarto-nav/headroom.min.js"></script>
-<script src="../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="../site_libs/quarto-search/fuse.min.js"></script>
-<script src="../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../">
-<link href="../_reference/tools.html" rel="next">
-<link href="../_reference/analysis.html" rel="prev">
-<script src="../site_libs/quarto-html/quarto.js"></script>
-<script src="../site_libs/quarto-html/popper.min.js"></script>
-<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../guide/how_to/plugins.html" rel="next">
+<link href="../../guide/how_to/hcp.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -73,7 +107,7 @@ ul.task-list li input[type="checkbox"] {
     <nav class="navbar navbar-expand-lg navbar-dark ">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container">
-    <a class="navbar-brand" href="../index.html">
+    <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">KIMMDY</span>
     </a>
   </div>
@@ -84,15 +118,15 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="../guide/tutorials/getting-started.html" rel="" target="" aria-current="page">
+    <a class="nav-link active" href="../../guide/tutorials/getting-started.html" rel="" target="" aria-current="page">
  <span class="menu-text">Getting Started</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../guide/index.html" rel="" target="">
+    <a class="nav-link" href="../../guide/index.html" rel="" target="">
  <span class="menu-text">Guide</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../_reference/index.html" rel="" target="">
+    <a class="nav-link" href="../../_reference/index.html" rel="" target="">
  <span class="menu-text">Reference</span></a>
   </li>  
 </ul>
@@ -127,7 +161,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../_reference/index.html">Reference</a></li><li class="breadcrumb-item"><a href="../_reference/constants.html">constants</a></li><li class="breadcrumb-item"><a href="../_reference/utils.html">utils</a></li></ol></nav>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../guide/index.html">Guide</a></li><li class="breadcrumb-item"><a href="../../guide/how_to/index.html">How-To</a></li><li class="breadcrumb-item"><a href="../../guide/how_to/options.html">KIMMDY Options</a></li></ol></nav>
       <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
       </a>
     </div>
@@ -141,7 +175,7 @@ ul.task-list li input[type="checkbox"] {
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../guide/index.html" class="sidebar-item-text sidebar-link">
+            <a href="../../guide/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Guide</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
@@ -150,19 +184,19 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../guide/colbuilder.html" class="sidebar-item-text sidebar-link">
+  <a href="../../guide/colbuilder.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Preparation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../guide/explanation/index.html" class="sidebar-item-text sidebar-link">
+  <a href="../../guide/explanation/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Explanations</span></a>
   </div>
 </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../guide/tutorials/index.html" class="sidebar-item-text sidebar-link">
+            <a href="../../guide/tutorials/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Tutorials</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
@@ -171,7 +205,7 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../guide/tutorials/getting-started.html" class="sidebar-item-text sidebar-link">
+  <a href="../../guide/tutorials/getting-started.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">0. Getting Started</span></a>
   </div>
 </li>
@@ -179,40 +213,40 @@ ul.task-list li input[type="checkbox"] {
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../guide/how_to/index.html" class="sidebar-item-text sidebar-link">
+            <a href="../../guide/how_to/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">How-To</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../guide/how_to/contribute.html" class="sidebar-item-text sidebar-link">
+  <a href="../../guide/how_to/contribute.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Contribute</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../guide/how_to/hcp.html" class="sidebar-item-text sidebar-link">
+  <a href="../../guide/how_to/hcp.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">High Performance Computing</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../guide/how_to/options.html" class="sidebar-item-text sidebar-link">
+  <a href="../../guide/how_to/options.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">KIMMDY Options</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../guide/how_to/plugins.html" class="sidebar-item-text sidebar-link">
+  <a href="../../guide/how_to/plugins.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Write Reaction Plugins</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../guide/how_to/topology.html" class="sidebar-item-text sidebar-link">
+  <a href="../../guide/how_to/topology.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Visualize Topologies</span></a>
   </div>
 </li>
@@ -231,7 +265,7 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/index.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Reference</span></a>
   </div>
 </li>
@@ -246,7 +280,7 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/cmd.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/cmd.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">cmd</span></a>
   </div>
 </li>
@@ -263,31 +297,31 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/topology.topology.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/topology.topology.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">topology.topology</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/topology.ff.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/topology.ff.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">topology.ff</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/topology.utils.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/topology.utils.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">topology.utils</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/topology.atomic.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/topology.atomic.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">topology.atomic</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/parsing.TopologyDict.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/parsing.TopologyDict.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">parsing.TopologyDict</span></a>
   </div>
 </li>
@@ -295,82 +329,82 @@ ul.task-list li input[type="checkbox"] {
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="false">
  <span class="menu-text">Modules</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth2 show">  
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/constants.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/constants.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">constants</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/coordinates.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/coordinates.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">coordinates</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/config.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/config.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">config</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/kmc.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/kmc.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">kmc</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/parsing.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/parsing.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">parsing</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/runmanager.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/runmanager.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">runmanager</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/tasks.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/tasks.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">tasks</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/recipe.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/recipe.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">recipe</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/plugins.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/plugins.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">plugins</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/analysis.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/analysis.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">analysis</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/utils.html" class="sidebar-item-text sidebar-link active">
+  <a href="../../_reference/utils.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">utils</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/tools.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/tools.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">tools</span></a>
   </div>
 </li>
@@ -387,19 +421,19 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/homolysis.reaction.Homolysis.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/homolysis.reaction.Homolysis.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">homolysis.reaction.Homolysis</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/hat_naive.reaction.NaiveHAT.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/hat_naive.reaction.NaiveHAT.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">hat_naive.reaction.NaiveHAT</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/dummyreaction.reaction.DummyReaction.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/dummyreaction.reaction.DummyReaction.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">dummyreaction.reaction.DummyReaction</span></a>
   </div>
 </li>
@@ -417,306 +451,406 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#kimmdy.utils" id="toc-kimmdy.utils" class="nav-link active" data-scroll-target="#kimmdy.utils">utils</a>
-  <ul>
-  <li><a href="#attributes" id="toc-attributes" class="nav-link" data-scroll-target="#attributes">Attributes</a></li>
-  <li><a href="#functions" id="toc-functions" class="nav-link" data-scroll-target="#functions">Functions</a>
-  <ul>
-  <li><a href="#kimmdy.utils.check_gmx_version" id="toc-kimmdy.utils.check_gmx_version" class="nav-link" data-scroll-target="#kimmdy.utils.check_gmx_version">check_gmx_version</a></li>
-  <li><a href="#kimmdy.utils.get_atominfo_from_atomnrs" id="toc-kimmdy.utils.get_atominfo_from_atomnrs" class="nav-link" data-scroll-target="#kimmdy.utils.get_atominfo_from_atomnrs">get_atominfo_from_atomnrs</a></li>
-  <li><a href="#kimmdy.utils.get_atomnrs_from_plumedid" id="toc-kimmdy.utils.get_atomnrs_from_plumedid" class="nav-link" data-scroll-target="#kimmdy.utils.get_atomnrs_from_plumedid">get_atomnrs_from_plumedid</a>
-  <ul class="collapse">
-  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
-  </ul></li>
-  <li><a href="#kimmdy.utils.get_bondprm_from_atomtypes" id="toc-kimmdy.utils.get_bondprm_from_atomtypes" class="nav-link" data-scroll-target="#kimmdy.utils.get_bondprm_from_atomtypes">get_bondprm_from_atomtypes</a>
-  <ul class="collapse">
-  <li><a href="#parameters-1" id="toc-parameters-1" class="nav-link" data-scroll-target="#parameters-1">Parameters</a></li>
-  </ul></li>
-  <li><a href="#kimmdy.utils.get_edissoc_from_atomnames" id="toc-kimmdy.utils.get_edissoc_from_atomnames" class="nav-link" data-scroll-target="#kimmdy.utils.get_edissoc_from_atomnames">get_edissoc_from_atomnames</a>
-  <ul class="collapse">
-  <li><a href="#parameters-2" id="toc-parameters-2" class="nav-link" data-scroll-target="#parameters-2">Parameters</a></li>
-  </ul></li>
-  <li><a href="#kimmdy.utils.get_gmx_dir" id="toc-kimmdy.utils.get_gmx_dir" class="nav-link" data-scroll-target="#kimmdy.utils.get_gmx_dir">get_gmx_dir</a></li>
-  <li><a href="#kimmdy.utils.get_shell_stdout" id="toc-kimmdy.utils.get_shell_stdout" class="nav-link" data-scroll-target="#kimmdy.utils.get_shell_stdout">get_shell_stdout</a></li>
-  <li><a href="#kimmdy.utils.morse_transition_rate" id="toc-kimmdy.utils.morse_transition_rate" class="nav-link" data-scroll-target="#kimmdy.utils.morse_transition_rate">morse_transition_rate</a>
-  <ul class="collapse">
-  <li><a href="#parameters-3" id="toc-parameters-3" class="nav-link" data-scroll-target="#parameters-3">Parameters</a></li>
-  </ul></li>
-  <li><a href="#kimmdy.utils.run_gmx" id="toc-kimmdy.utils.run_gmx" class="nav-link" data-scroll-target="#kimmdy.utils.run_gmx">run_gmx</a></li>
-  <li><a href="#kimmdy.utils.run_shell_cmd" id="toc-kimmdy.utils.run_shell_cmd" class="nav-link" data-scroll-target="#kimmdy.utils.run_shell_cmd">run_shell_cmd</a></li>
-  </ul></li>
-  </ul></li>
+  <li><a href="#autocompletion" id="toc-autocompletion" class="nav-link active" data-scroll-target="#autocompletion">Autocompletion</a></li>
+  <li><a href="#all-options" id="toc-all-options" class="nav-link" data-scroll-target="#all-options">All Options</a></li>
+  <li><a href="#example-kimmdy.yml-files" id="toc-example-kimmdy.yml-files" class="nav-link" data-scroll-target="#example-kimmdy.yml-files">Example <code>kimmdy.yml</code> Files</a></li>
   </ul>
-<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hits-mbm-dev/kimmdy/edit/main/_reference/utils.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/hits-mbm-dev/kimmdy/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hits-mbm-dev/kimmdy/edit/main/guide/how_to/options.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/hits-mbm-dev/kimmdy/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">KIMMDY Options</h1>
+</div>
 
 
-<section id="kimmdy.utils" class="level1">
-<h1>utils</h1>
-<p><code>utils</code></p>
-<p>Utilities for building plugins, shell convenience functions and GROMACS related functions</p>
-<section id="attributes" class="level2">
-<h2 class="anchored" data-anchor-id="attributes">Attributes</h2>
-<table class="table">
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="autocompletion" class="level2">
+<h2 class="anchored" data-anchor-id="autocompletion">Autocompletion</h2>
+<p>KIMMDY comes with autocompletion for the <code>kimmdy.yml</code> file. Run <code>kimmdy --show-schema-path</code> to get the path to the schema file. Then, add the following to either the top of your <code>kimmmdy.yml</code> file or add the schema to the global configuration of the <code>yaml-language-server</code> in your editor (e.g.&nbsp;VS Code or Neovim).</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>kimmdy.yml</strong></pre>
+</div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># yaml-language-server: $schema=/your/path/to/kimmdy-yaml-schema.json</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Once KIMMDY is public, you can replace the path with the following url:</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>kimmdy.yml</strong></pre>
+</div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># yaml-language-server: $schema=https://raw.githubusercontent.com/hits-mbm-dev/kimmdy/main/src/kimmdy/kimmdy-yaml-schema.json</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="all-options" class="level2">
+<h2 class="anchored" data-anchor-id="all-options">All Options</h2>
+<p>The following is a list of the options that can be set in the <code>kimmdy.yml</code> file. It includes reactions currently available in KIMMDY as plugins. Nested options are separated by a <code>.</code>. <code>*</code> denotes an arbitrary name for a section. The key for a section is <strong>bold</strong>.</p>
+<div id="tbl-options" class="anchored">
+<table class="table-striped table-hover table">
+<caption>Table&nbsp;1: KIMMDY options</caption>
+<colgroup>
+<col style="width: 21%">
+<col style="width: 42%">
+<col style="width: 13%">
+<col style="width: 13%">
+<col style="width: 13%">
+</colgroup>
 <thead>
 <tr class="header">
-<th>Name</th>
+<th>Option</th>
 <th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.utils.TopologyAtomAddress">TopologyAtomAddress</a></td>
-<td>Address to an atom in the topology.</td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="functions" class="level2">
-<h2 class="anchored" data-anchor-id="functions">Functions</h2>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.utils.check_gmx_version">check_gmx_version</a></td>
-<td>Check for an existing gromacs installation.</td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.utils.get_atominfo_from_atomnrs">get_atominfo_from_atomnrs</a></td>
-<td>Use topology atoms section to convert from atomnr to atomtype</td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.utils.get_atomnrs_from_plumedid">get_atomnrs_from_plumedid</a></td>
-<td>Convert from plumedid to atomnr, information from the plumed file is used.</td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.utils.get_bondprm_from_atomtypes">get_bondprm_from_atomtypes</a></td>
-<td>Returns bond parameters (b0, kb) for a set of two atomtypes.</td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.utils.get_edissoc_from_atomnames">get_edissoc_from_atomnames</a></td>
-<td>Returns dissociation energy E_dissoc for a set of two atomnames.</td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.utils.get_gmx_dir">get_gmx_dir</a></td>
-<td>Returns the path to the gromacs installation</td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.utils.get_shell_stdout">get_shell_stdout</a></td>
-<td>Run command in shell and capture stdout.</td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.utils.morse_transition_rate">morse_transition_rate</a></td>
-<td>Calculates reaction rate constant for a bond breaking event.</td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.utils.run_gmx">run_gmx</a></td>
-<td>Run GROMACS command in shell.</td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.utils.run_shell_cmd">run_shell_cmd</a></td>
-<td>Run command in shell.</td>
-</tr>
-</tbody>
-</table>
-<section id="kimmdy.utils.check_gmx_version" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.utils.check_gmx_version">check_gmx_version</h3>
-<p><code>utils.check_gmx_version(config)</code></p>
-<p>Check for an existing gromacs installation.</p>
-<p>If PLUMED is meant to be used it additionally checks for the keyword ‘MODIFIED’ or ‘plumed’ in the version name.</p>
-</section>
-<section id="kimmdy.utils.get_atominfo_from_atomnrs" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.utils.get_atominfo_from_atomnrs">get_atominfo_from_atomnrs</h3>
-<p><code>utils.get_atominfo_from_atomnrs(atomnrs, top)</code></p>
-<p>Use topology atoms section to convert from atomnr to atomtype</p>
-</section>
-<section id="kimmdy.utils.get_atomnrs_from_plumedid" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.utils.get_atomnrs_from_plumedid">get_atomnrs_from_plumedid</h3>
-<p><code>utils.get_atomnrs_from_plumedid(plumedid, plumed)</code></p>
-<p>Convert from plumedid to atomnr, information from the plumed file is used.</p>
-<section id="parameters" class="level4">
-<h4 class="anchored" data-anchor-id="parameters">Parameters</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
 <th>Type</th>
-<th>Description</th>
 <th>Default</th>
+<th></th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>plumedid</code></td>
-<td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
-<td>Identifier from a plumed input file (e.g d0).</td>
-<td><em>required</em></td>
-</tr>
-<tr class="even">
-<td><code>plumed</code></td>
-<td><a href="../_reference/parsing.html#kimmdy.parsing.Plumed_dict">Plumed_dict</a></td>
-<td>Parsed plumed input file</td>
-<td><em>required</em></td>
-</tr>
-</tbody>
-</table>
-</section>
-</section>
-<section id="kimmdy.utils.get_bondprm_from_atomtypes" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.utils.get_bondprm_from_atomtypes">get_bondprm_from_atomtypes</h3>
-<p><code>utils.get_bondprm_from_atomtypes(atomtypes, ffbonded)</code></p>
-<p>Returns bond parameters (b0, kb) for a set of two atomtypes.</p>
-<section id="parameters-1" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-1">Parameters</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Type</th>
-<th>Description</th>
-<th>Default</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><code>atomtypes</code></td>
-<td><a href="https://docs.python.org/3.10/library/stdtypes.html#list">list</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>]</td>
-<td>Two atomtypes as defined in the respective force field</td>
-<td><em>required</em></td>
-</tr>
-<tr class="even">
-<td><code>ffbonded</code></td>
-<td><a href="https://docs.python.org/3.10/library/stdtypes.html#dict">dict</a></td>
-<td>Force field ffbonded.itp file parsed through the rtp parser</td>
-<td><em>required</em></td>
-</tr>
-</tbody>
-</table>
-</section>
-</section>
-<section id="kimmdy.utils.get_edissoc_from_atomnames" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.utils.get_edissoc_from_atomnames">get_edissoc_from_atomnames</h3>
-<p><code>utils.get_edissoc_from_atomnames(atomnames, edissoc)</code></p>
-<p>Returns dissociation energy E_dissoc for a set of two atomnames.</p>
-<section id="parameters-2" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-2">Parameters</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Type</th>
-<th>Description</th>
-<th>Default</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><code>atomnames</code></td>
-<td><a href="https://docs.python.org/3.10/library/stdtypes.html#list">list</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>]</td>
-<td>Two atomnames as defined in the respective force field</td>
-<td><em>required</em></td>
-</tr>
-<tr class="even">
-<td><code>edissoc</code></td>
-<td><a href="https://docs.python.org/3.10/library/stdtypes.html#dict">dict</a></td>
-<td>Parsed file with dissociation energies per bond between two atomtypes or elements</td>
-<td><em>required</em></td>
-</tr>
-</tbody>
-</table>
-</section>
-</section>
-<section id="kimmdy.utils.get_gmx_dir" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.utils.get_gmx_dir">get_gmx_dir</h3>
-<p><code>utils.get_gmx_dir(gromacs_alias='gmx')</code></p>
-<p>Returns the path to the gromacs installation</p>
-<p>This does not check if the installation is valid. It just returns the path to the gromacs data directory. If <code>gmx</code> is not executable it still returns the default gromacs data directory in <code>/usr/share/gromacs</code>.</p>
-</section>
-<section id="kimmdy.utils.get_shell_stdout" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.utils.get_shell_stdout">get_shell_stdout</h3>
-<p><code>utils.get_shell_stdout(s)</code></p>
-<p>Run command in shell and capture stdout.</p>
-</section>
-<section id="kimmdy.utils.morse_transition_rate" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.utils.morse_transition_rate">morse_transition_rate</h3>
-<p><code>utils.morse_transition_rate(r_curr, r_0, dissociation_energy, k_f, k_0=0.288, kT=2.479)</code></p>
-<p>Calculates reaction rate constant for a bond breaking event.</p>
-<p>Uses the Morse potential model for this calculation. For an array of bond distances of the same bond, first calculates the forces on the bond, then the minima and maxima of the shifted Morse potential to get an energy barrier and finally a reaction rate constant using the Arrhenius equation. For intramolecular reactions, the reaction rate constant is equal to the reaction rate.</p>
-<p>The calculation should be according to the derivation in the original KIMMDY paper: DOI: 10.1021/acs.jctc.9b00786</p>
-<section id="parameters-3" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-3">Parameters</h4>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Type</th>
-<th>Description</th>
-<th>Default</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><code>r_curr</code></td>
-<td><a href="https://docs.python.org/3.10/library/stdtypes.html#list">list</a>[<a href="https://docs.python.org/3.10/library/functions.html#float">float</a>]</td>
-<td>Bond distances for a single bond, typically from a time series.</td>
-<td><em>required</em></td>
-</tr>
-<tr class="even">
-<td><code>r_0</code></td>
-<td><a href="https://docs.python.org/3.10/library/functions.html#float">float</a></td>
-<td>Equilibrium bond length of the bond.</td>
-<td><em>required</em></td>
-</tr>
-<tr class="odd">
-<td><code>dissociation</code></td>
+<td>dryrun</td>
+<td>Don’t run the actual simulations, just print the tasks</td>
+<td>bool</td>
+<td>False</td>
 <td></td>
-<td>Dissociation energy of the bond.</td>
-<td><em>required</em></td>
 </tr>
 <tr class="even">
-<td><code>k_f</code></td>
-<td><a href="https://docs.python.org/3.10/library/functions.html#float">float</a></td>
-<td>Spring constant of the bond.</td>
-<td><em>required</em></td>
+<td>cwd</td>
+<td>Working directory</td>
+<td>Path</td>
+<td></td>
+<td></td>
 </tr>
 <tr class="odd">
-<td><code>k_0</code></td>
-<td><a href="https://docs.python.org/3.10/library/functions.html#float">float</a></td>
-<td>Prefactor of the Arrhenius equation in [1/ps]. Default value from fitting averaged C_a - N data to gromacs data, see original KIMMDY paper Alternatively 1/2pi sqrt(k/m).</td>
-<td><code>0.288</code></td>
+<td>name</td>
+<td>Used for output folder if <code>out</code> is not specified</td>
+<td>str</td>
+<td>kimmdy</td>
+<td></td>
 </tr>
 <tr class="even">
-<td><code>kT</code></td>
-<td><a href="https://docs.python.org/3.10/library/functions.html#float">float</a></td>
-<td>Constant in the Arrhenius equation in GROMACS units [kJ mol-1], default for 310K.</td>
-<td><code>2.479</code></td>
+<td>out</td>
+<td>Output folder</td>
+<td>Path</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>log</td>
+<td>Settings for logging</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>max_tasks</td>
+<td>Maximum number of tasks to run. This is useful when a task in the sequence can dymanically add more tasks. 0 means no limit.</td>
+<td>int</td>
+<td>0</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>max_hours</td>
+<td>Stop KIMMDY after max_hours hours. Set this lower than the limit of your HPC cluster for use with a re-submit jobscript. 0 Means no limit.</td>
+<td>int</td>
+<td>0</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>run</td>
+<td>Replica number</td>
+<td>int</td>
+<td>1</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>top</td>
+<td>Topology file</td>
+<td>Path</td>
+<td>topol.top</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>gro</td>
+<td>Coordinate file</td>
+<td>Path</td>
+<td>conf.gro</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>ndx</td>
+<td>Index file</td>
+<td>Path</td>
+<td>index.ndx</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>gromacs_alias</td>
+<td>Gromacs alias</td>
+<td>str</td>
+<td>gmx</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>gmx_mdrun_flags</td>
+<td>Flags passed to gmx mdrun. e.g.&nbsp;<code>-nt 8 -maxh 24</code></td>
+<td>str</td>
+<td>-maxh 24 -dlb yes</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>ff</td>
+<td>Force field directory (looks for .ff in cwd if not set)</td>
+<td>Path</td>
+<td>*.ff</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>plumed</td>
+<td>.dat file containing plumed config</td>
+<td>Path</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>tpr</td>
+<td>.tpr file of a finished simulation for starting with reaction</td>
+<td>Path</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>trr</td>
+<td>.trr file of a finished simulation for starting with reaction</td>
+<td>Path</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>mds</td>
+<td>Settings for MD steps, e.g.&nbsp;mdp files, plumed files, etc.</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>mds.*.mdp</td>
+<td>MDP file for the MD step</td>
+<td>Path</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>mds.*.use_plumed</td>
+<td>Whether plumed should be used for this run or not</td>
+<td>bool</td>
+<td>False</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>changer</td>
+<td>Settings for applying a reaction recipe</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>changer.coordinates.md</td>
+<td>Which MD instance from the ‘mds’ section is used for relaxation MDs</td>
+<td>str</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>changer.coordinates.slow_growth</td>
+<td>Whether the chosen MD instance is a slow growth/free-energy simulation</td>
+<td>bool</td>
+<td>False</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>changer.topology.parameterization</td>
+<td>Parameterization scheme that is used on the topology file after changes to it</td>
+<td>str</td>
+<td>basic</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>sequence</td>
+<td>List of tasks. Each task can be a string (the name of the task) or an object with the task name and a multiplicity <code>mult: &lt;int&gt;</code></td>
+<td>Sequence</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>reactions</td>
+<td>Settings for reactions</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>reactions.homolysis.edis</td>
+<td>Dissociation energies data file</td>
+<td>Path</td>
+<td>edissoc.dat</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>reactions.homolysis.itp</td>
+<td>Additional itp file with bonded parameters</td>
+<td>Path</td>
+<td>ffbonded.itp</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>reactions.hat_naive.frequency_factor</td>
+<td>Frequency factor</td>
+<td>float</td>
+<td>1</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>reactions.hat_naive.h_cutoff</td>
+<td>Cutoff for H atom</td>
+<td>float</td>
+<td>4</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>reactions.hat_naive.polling_rate</td>
+<td>Polling rate</td>
+<td>float</td>
+<td>1</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>reactions.dummyreaction.example</td>
+<td>This is an example of an option for a reaction.</td>
+<td>float</td>
+<td>0.0</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>reactions.dummyreaction.example2</td>
+<td>This is another example of an option for a reaction.</td>
+<td>str</td>
+<td>hello</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>reactions.hat_reaction.frequency_factor</td>
+<td>Frequency factor</td>
+<td>float</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>reactions.hat_reaction.h_cutoff</td>
+<td>Cutoff for H atom</td>
+<td>float</td>
+<td>3</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>reactions.hat_reaction.model</td>
+<td>Model name, optional</td>
+<td>str</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>reactions.hat_reaction.ensemble_size</td>
+<td>Number of models to use, defaults to all, optional</td>
+<td>int</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>reactions.hat_reaction.polling_rate</td>
+<td>Polling rate, defaults to 10</td>
+<td>int</td>
+<td>10</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>reactions.hat_reaction.radicals</td>
+<td>Radical index, usually supplied through kimmdy, optional</td>
+<td>int</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>reactions.hat_reaction.change_coords</td>
+<td>How to change coordinates. H can be placed at the new position, or a (lambda)-dynamics simulation can be performed. For lambda-dynamics, set up the coordinate changer with slow_growth=True</td>
+<td>str</td>
+<td>place</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>plot_rates</td>
+<td>Plot the reaction rates</td>
+<td>bool</td>
+<td>False</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>save_recipes</td>
+<td>Save recipes as csv during <code>decide_reaction</code></td>
+<td>bool</td>
+<td>False</td>
+<td></td>
 </tr>
 </tbody>
 </table>
+</div>
 </section>
-</section>
-<section id="kimmdy.utils.run_gmx" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.utils.run_gmx">run_gmx</h3>
-<p><code>utils.run_gmx(s, cwd=None)</code></p>
-<p>Run GROMACS command in shell.</p>
-<p>Adds a ‘-quiet’ flag to the command and checks the return code.</p>
-</section>
-<section id="kimmdy.utils.run_shell_cmd" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.utils.run_shell_cmd">run_shell_cmd</h3>
-<p><code>utils.run_shell_cmd(s, cwd=None)</code></p>
-<p>Run command in shell.</p>
+<section id="example-kimmdy.yml-files" class="level2">
+<h2 class="anchored" data-anchor-id="example-kimmdy.yml-files">Example <code>kimmdy.yml</code> Files</h2>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>kimmdy.yml</strong></pre>
+</div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dryrun</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">max_tasks</span><span class="kw">:</span><span class="at"> </span><span class="dv">100</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">name</span><span class="kw">:</span><span class="at"> </span><span class="st">'hat_tf_000'</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">gromacs_alias</span><span class="kw">:</span><span class="at"> </span><span class="st">'gmx'</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">top</span><span class="kw">:</span><span class="at"> </span><span class="st">'Ala_out.top'</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="fu">gro</span><span class="kw">:</span><span class="at"> </span><span class="st">'npt.gro'</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ndx</span><span class="kw">:</span><span class="at"> </span><span class="st">'index.ndx'</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="fu">mds</span><span class="kw">:</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">equilibrium</span><span class="kw">:</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">mdp</span><span class="kw">:</span><span class="at"> </span><span class="st">'md.mdp'</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">relax</span><span class="kw">:</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">mdp</span><span class="kw">:</span><span class="at"> </span><span class="st">'md_slow.mdp'</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="fu">changer</span><span class="kw">:</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">coordinates</span><span class="kw">:</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">md</span><span class="kw">:</span><span class="at"> </span><span class="st">'relax'</span><span class="at">      </span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="fu">reactions</span><span class="kw">:</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">hat_reaction</span><span class="kw">:</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">frequency_factor</span><span class="kw">:</span><span class="at"> </span><span class="dv">100000000</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">h_cutoff</span><span class="kw">:</span><span class="at"> </span><span class="dv">3</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">polling_rate</span><span class="kw">:</span><span class="at"> </span><span class="dv">1</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="fu">sequence</span><span class="kw">:</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> equilibrium</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">mult</span><span class="kw">:</span><span class="at"> </span><span class="dv">2</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">tasks</span><span class="kw">:</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> equilibrium</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> reactions</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 
 
-</section>
-</section>
 </section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
@@ -1070,13 +1204,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../_reference/analysis.html" class="pagination-link">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">analysis</span>
+      <a href="../../guide/how_to/hcp.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">High Performance Computing</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../_reference/tools.html" class="pagination-link">
-        <span class="nav-page-text">tools</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../../guide/how_to/plugins.html" class="pagination-link">
+        <span class="nav-page-text">Write Reaction Plugins</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
