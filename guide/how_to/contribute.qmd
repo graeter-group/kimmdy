@@ -1,10 +1,4 @@
----
-title: Developer
----
-
-Resources for developers.
-
-## Contributing
+# Contribute
 
 KIMMDY uses conventional commits and semantic versioning,
 automated via [release please](https://github.com/googleapis/release-please).

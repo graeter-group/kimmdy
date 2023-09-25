@@ -2,12 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.176">
+<meta name="generator" content="quarto-1.3.290">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>KIMMDY – getting-started</title>
+<title>KIMMDY - High Performance Computing</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -57,29 +57,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="../site_libs/quarto-nav/headroom.min.js"></script>
-<script src="../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="../site_libs/quarto-search/fuse.min.js"></script>
-<script src="../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../">
-<link href="../guide/developer/index.html" rel="next">
-<link href="../guide/index.html" rel="prev">
-<script src="../site_libs/quarto-html/quarto.js"></script>
-<script src="../site_libs/quarto-html/popper.min.js"></script>
-<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<script src="../site_libs/quarto-contrib/molstar-v3.13.0/molstar.js"></script>
-<link href="../site_libs/quarto-contrib/molstar-v3.13.0/molstar.css" rel="stylesheet">
-<link href="../site_libs/quarto-contrib/molstar-v3.13.0/app-container.css" rel="stylesheet">
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../guide/how_to/options.html" rel="next">
+<link href="../../guide/how_to/contribute.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -87,11 +84,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   "panel-placement": "end",
   "type": "overlay",
   "limit": 20,
-  "keyboard-shortcut": [
-    "f",
-    "/",
-    "s"
-  ],
   "language": {
     "search-no-results-text": "No results",
     "search-matching-documents-text": "matching documents",
@@ -101,8 +93,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
     "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit",
-    "search-label": "Search"
+    "search-submit-button-title": "Submit"
   }
 }</script>
 
@@ -115,8 +106,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <header id="quarto-header" class="headroom fixed-top">
     <nav class="navbar navbar-expand-lg navbar-dark ">
       <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="../index.html">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">KIMMDY</span>
     </a>
   </div>
@@ -127,30 +118,29 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="../guide/getting-started.html" rel="" target="" aria-current="page">
+    <a class="nav-link active" href="../../guide/tutorials/getting-started.html" rel="" target="" aria-current="page">
  <span class="menu-text">Getting Started</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../guide/index.html" rel="" target="">
+    <a class="nav-link" href="../../guide/index.html" rel="" target="">
  <span class="menu-text">Guide</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../_reference/index.html" rel="" target="">
+    <a class="nav-link" href="../../_reference/index.html" rel="" target="">
  <span class="menu-text">Reference</span></a>
   </li>  
 </ul>
-          </div> <!-- /navcollapse -->
-          <div class="quarto-navbar-tools tools-wide">
+            <div class="quarto-navbar-tools ms-auto tools-wide">
     <div class="dropdown">
       <a href="" title="" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" aria-label=""><i class="bi bi-github"></i></a>
       <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="quarto-navigation-tool-dropdown-0">
           <li>
-            <a class="dropdown-item quarto-navbar-tools-item" href="https://github.com/hits-mbm-dev/kimmdy">
+            <a class="dropdown-item quarto-navbar-tools ms-auto-item" href="https://github.com/hits-mbm-dev/kimmdy">
             Source Code
             </a>
           </li>
           <li>
-            <a class="dropdown-item quarto-navbar-tools-item" href="https://github.com/hits-mbm-dev/kimmdy/issues/new">
+            <a class="dropdown-item quarto-navbar-tools ms-auto-item" href="https://github.com/hits-mbm-dev/kimmdy/issues/new">
             Report a Bug
             </a>
           </li>
@@ -163,6 +153,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </div>
 </a>
 </div>
+          </div> <!-- /navcollapse -->
       </div> <!-- /container-fluid -->
     </nav>
   <nav class="quarto-secondary-nav">
@@ -170,9 +161,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../guide/index.html">Guide</a></li><li class="breadcrumb-item"><a href="../guide/getting-started.html">Getting Started</a></li></ol></nav>
-        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
-        </a>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../guide/index.html">Guide</a></li><li class="breadcrumb-item"><a href="../../guide/how_to/index.html">How-To</a></li><li class="breadcrumb-item"><a href="../../guide/how_to/hcp.html">High Performance Computing</a></li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
     </div>
   </nav>
 </header>
@@ -184,7 +175,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../guide/index.html" class="sidebar-item-text sidebar-link">
+            <a href="../../guide/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Guide</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
@@ -193,14 +184,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../guide/getting-started.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Getting Started</span></a>
+  <a href="../../guide/colbuilder.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preparation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guide/explanation/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Explanations</span></a>
   </div>
 </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../guide/developer/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Developer</span></a>
+            <a href="../../guide/tutorials/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tutorials</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -208,37 +205,49 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../guide/developer/plugins.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Writing Reaction Plugins</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../guide/developer/topology.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Hexala topology</span></a>
+  <a href="../../guide/tutorials/getting-started.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">0. Getting Started</span></a>
   </div>
 </li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../guide/user/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">User</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="false" aria-label="Toggle section">
+            <a href="../../guide/how_to/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">How-To</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../guide/user/hcp.html" class="sidebar-item-text sidebar-link">
+  <a href="../../guide/how_to/contribute.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Contribute</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guide/how_to/hcp.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">High Performance Computing</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../guide/user/options.html" class="sidebar-item-text sidebar-link">
+  <a href="../../guide/how_to/options.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">KIMMDY Options</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guide/how_to/plugins.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Write Reaction Plugins</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guide/how_to/topology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visualize Topologies</span></a>
   </div>
 </li>
       </ul>
@@ -256,7 +265,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/index.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Reference</span></a>
   </div>
 </li>
@@ -271,7 +280,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/cmd.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/cmd.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">cmd</span></a>
   </div>
 </li>
@@ -288,31 +297,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/topology.topology.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/topology.topology.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">topology.topology</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/topology.ff.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/topology.ff.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">topology.ff</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/topology.utils.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/topology.utils.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">topology.utils</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/topology.atomic.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/topology.atomic.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">topology.atomic</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/parsing.TopologyDict.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/parsing.TopologyDict.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">parsing.TopologyDict</span></a>
   </div>
 </li>
@@ -329,73 +338,73 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/constants.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/constants.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">constants</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/coordinates.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/coordinates.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">coordinates</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/config.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/config.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">config</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/kmc.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/kmc.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">kmc</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/parsing.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/parsing.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">parsing</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/runmanager.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/runmanager.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">runmanager</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/tasks.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/tasks.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">tasks</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/recipe.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/recipe.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">recipe</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/plugins.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/plugins.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">plugins</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/analysis.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/analysis.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">analysis</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/utils.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/utils.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">utils</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/tools.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/tools.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">tools</span></a>
   </div>
 </li>
@@ -412,19 +421,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/homolysis.reaction.Homolysis.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/homolysis.reaction.Homolysis.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">homolysis.reaction.Homolysis</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/hat_naive.reaction.NaiveHAT.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/hat_naive.reaction.NaiveHAT.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">hat_naive.reaction.NaiveHAT</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/dummyreaction.reaction.DummyReaction.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/dummyreaction.reaction.DummyReaction.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">dummyreaction.reaction.DummyReaction</span></a>
   </div>
 </li>
@@ -442,141 +451,47 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#getting-started" id="toc-getting-started" class="nav-link active" data-scroll-target="#getting-started">Getting Started</a>
-  <ul>
-  <li><a href="#installation" id="toc-installation" class="nav-link" data-scroll-target="#installation">Installation</a>
-  <ul>
-  <li><a href="#prerequisites" id="toc-prerequisites" class="nav-link" data-scroll-target="#prerequisites">Prerequisites</a></li>
-  </ul></li>
-  <li><a href="#installation-1" id="toc-installation-1" class="nav-link" data-scroll-target="#installation-1">Installation</a></li>
-  <li><a href="#setup-the-simulation" id="toc-setup-the-simulation" class="nav-link" data-scroll-target="#setup-the-simulation">Setup the Simulation</a></li>
-  <li><a href="#run-the-simulation" id="toc-run-the-simulation" class="nav-link" data-scroll-target="#run-the-simulation">Run the Simulation</a></li>
-  <li><a href="#analyse-the-simulation" id="toc-analyse-the-simulation" class="nav-link" data-scroll-target="#analyse-the-simulation">Analyse the Simulation</a></li>
-  </ul></li>
+  <li><a href="#setup" id="toc-setup" class="nav-link active" data-scroll-target="#setup">Setup</a></li>
   </ul>
-<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hits-mbm-dev/kimmdy/edit/main/guide/getting-started.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/hits-mbm-dev/kimmdy/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hits-mbm-dev/kimmdy/edit/main/guide/how_to/hcp.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/hits-mbm-dev/kimmdy/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">High Performance Computing</h1>
+<p class="subtitle lead">Run KIMMDY on HPC clusters</p>
+</div>
 
 
-<section id="getting-started" class="level1">
-<h1>Getting Started</h1>
-<p>Let’s jump right in!</p>
-<section id="installation" class="level2">
-<h2 class="anchored" data-anchor-id="installation">Installation</h2>
-<section id="prerequisites" class="level3">
-<h3 class="anchored" data-anchor-id="prerequisites">Prerequisites</h3>
-<ul>
-<li><code>python3.9</code> or higher</li>
-<li><code>gromacs</code> (tested with version 2021.4, <code>gmx</code> should be available in the <code>PATH</code>)</li>
-</ul>
-<p>Optional:</p>
-<ul>
-<li><code>plumed</code>-patched version of <code>gromacs</code></li>
-</ul>
-</section>
-</section>
-<section id="installation-1" class="level2">
-<h2 class="anchored" data-anchor-id="installation-1">Installation</h2>
-<p>Let’s first create a virtual environment for <code>kimmdy</code>:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> kimmdy-tutorial</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> kimmdy-tutorial</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> venv .venv</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> .venv/bin/activate</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Because we’ll be using optional reaction plugins directly from the git repository, we’ll need to install <code>kimmdy</code> from GitHub with the <code>plugins</code> extra:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">TODO</span><span class="co">: update with https instead of ssh when repo is public</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">'git+ssh://git@github.com/hits-mbm-dev/kimmdy.git#egg=kimmdy[plugins]'</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># pip install 'git+ssh://git@github.com/hits-mbm-dev/kimmdy.git#egg&amp;subdirectory=plugins'</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># pip install 'git+ssh://git@github.com/hits-mbm-dev/kimmdy.git@docs/config-completion#egg=kimmdy[plugins]'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="setup-the-simulation" class="level2">
-<h2 class="anchored" data-anchor-id="setup-the-simulation">Setup the Simulation</h2>
-<p>Download the <a href="../example/example_ala/kimmdy.yml">example kimmdy.yml file</a> to this directory. It should look like this:</p>
-<div class="code-with-filename">
-<div class="code-with-filename-file">
-<pre><strong>kimmdy.yml</strong></pre>
-</div>
-<div class="sourceCode" id="cb3"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dryrun</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">max_tasks</span><span class="kw">:</span><span class="at"> </span><span class="dv">100</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">name</span><span class="kw">:</span><span class="at"> </span><span class="st">'hat_tf_000'</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">gromacs_alias</span><span class="kw">:</span><span class="at"> </span><span class="st">'gmx'</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">top</span><span class="kw">:</span><span class="at"> </span><span class="st">'Ala_out.top'</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="fu">gro</span><span class="kw">:</span><span class="at"> </span><span class="st">'npt.gro'</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ndx</span><span class="kw">:</span><span class="at"> </span><span class="st">'index.ndx'</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="fu">mds</span><span class="kw">:</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">equilibrium</span><span class="kw">:</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">mdp</span><span class="kw">:</span><span class="at"> </span><span class="st">'md.mdp'</span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">relax</span><span class="kw">:</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">mdp</span><span class="kw">:</span><span class="at"> </span><span class="st">'md_slow.mdp'</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="fu">changer</span><span class="kw">:</span></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">coordinates</span><span class="kw">:</span></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">md</span><span class="kw">:</span><span class="at"> </span><span class="st">'relax'</span><span class="at">      </span></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="fu">reactions</span><span class="kw">:</span></span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">hat_reaction</span><span class="kw">:</span></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">frequency_factor</span><span class="kw">:</span><span class="at"> </span><span class="dv">100000000</span></span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">h_cutoff</span><span class="kw">:</span><span class="at"> </span><span class="dv">3</span></span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">polling_rate</span><span class="kw">:</span><span class="at"> </span><span class="dv">1</span></span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="fu">sequence</span><span class="kw">:</span></span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> equilibrium</span></span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">mult</span><span class="kw">:</span><span class="at"> </span><span class="dv">2</span></span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">tasks</span><span class="kw">:</span></span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> equilibrium</span></span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> reactions</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Let’s also fetch the other input files:</p>
-<ul>
-<li><a href="../example/alanine_hat_naive/Ala_out.top">Ala_out.top</a></li>
-<li><a href="../example/alanine_hat_naive/npt.gro">npt.gro</a></li>
-<li><a href="../example/alanine_hat_naive/cat-center.gro">cat-center.gro</a></li>
-<li><a href="../example/alanine_hat_naive/index.ndx">index.ndx</a></li>
-<li><a href="../example/alanine_hat_naive/md.mdp">md.mdp</a></li>
-<li><a href="../example/alanine_hat_naive/md_slow.mdp">md_slow.mdp</a></li>
-<li><a href="../example/alanine_hat_naive/minim.mdp">minim.mdp</a></li>
-</ul>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">TODO</span><span class="co">: while dev, copy run in example dir</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># from KIMMDY root directory</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> example/alanine_hat_naive</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Our starting structure is a simple ACE/NME-capped Alanine molecule in a box of water.</p>
-    <div id="app-vis-ala.molj" class="molstar-app"></div>
-    <script type="text/javascript">
-    molstar.Viewer.create("app-vis-ala.molj", {"layoutIsExpanded":false,"layoutShowControls":false,"emdbProvider":"rcsb","layoutShowLog":false,"layoutShowLeftPanel":true,"layoutShowRemoteState":false,"viewportShowSelectionMode":false,"viewportShowAnimation":true,"viewportShowExpand":true,"pdbProvider":"rcsb","layoutShowSequence":false}).then(viewer => {
-    viewer.loadSnapshotFromUrl(url="vis-ala.molj", "molj");    });
-    </script>
+
+<div class="quarto-title-meta">
+
     
-<p>Start a KIMMDY run with <code>kimmdy</code> command:</p>
-</section>
-<section id="run-the-simulation" class="level2">
-<h2 class="anchored" data-anchor-id="run-the-simulation">Run the Simulation</h2>
-<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kimmdy</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>You can also run kimmdy directly from python with</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> kimmdy.cmd <span class="im">import</span> kimmdy_run</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>kimmdy_run()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="analyse-the-simulation" class="level2">
-<h2 class="anchored" data-anchor-id="analyse-the-simulation">Analyse the Simulation</h2>
-<p>Concatenate the trajectories from the individual steps into one for viewing:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kimmdy-analysis</span> trjcat alanine_hat_000 <span class="at">--open-vmd</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Check the energy of the system:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kimmdy-analysis</span> plot_energy alanine_hat_000 <span class="at">--open-plot</span> <span class="at">--terms</span> Potential Kinetic</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Or do the same directly from python:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> kimmdy.analysis <span class="im">import</span> plot_energy</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>plot_energy(<span class="st">'alanine_hat_000'</span>, steps<span class="op">=</span><span class="st">'all'</span>, terms<span class="op">=</span>[<span class="st">'Potential'</span>, <span class="st">'Kinetic'</span>], open_plot<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Visualize where the radical ended up:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kimmdy-analysis</span> radical_population alanine_hat_000 <span class="at">--open-plot</span> <span class="at">--open-vmd</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Plot the reaction rates:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kimmdy-analysis</span> plot_rates alanine_hat_000</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>or from python:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> kimmdy.analysis <span class="im">import</span> concat_trj, plot_energy, radical_population, plot_rates</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>concat_trj(<span class="st">'alanine_hat_000'</span>, open_vmd<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>plot_energy(<span class="st">'alanine_hat_000'</span>, terms<span class="op">=</span>[<span class="st">'Potential'</span>, <span class="st">'Kinetic'</span>], open_plot<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>radical_population(<span class="st">'alanine_hat_000'</span>, open_plot<span class="op">=</span><span class="va">True</span>, open_vmd<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>plot_rates(<span class="st">'alanine_hat_000'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="setup" class="level2">
+<h2 class="anchored" data-anchor-id="setup">Setup</h2>
+<p>You need an installation of python (<code>&gt;= 3.10</code>) and (possibly PLUMED patched) GROMACS in your HPC environment.</p>
+<p>Example setup:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">srun</span> <span class="at">-t</span> 1400:00 <span class="at">--mem</span><span class="op">=</span>16000 <span class="at">-n20</span> <span class="at">--pty</span> /bin/bash</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">ml</span> EasyBuild</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">eb</span> ./assets/Python-3.10.8.eb</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Prepare a bash script <code>_modules.sh</code> that loads the required modules and activates the python environment in which KIMMDY is installed.</p>
+<p>Run</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kimmdy</span> <span class="at">--generate-jobscript</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>to generate a file <code>jobscript.sh</code> that can be submitted to the HPC cluster.</p>
+<p>This commands generates a kimmdy checkpoint and prepares the output folder. KIMMDY can then be started and re-started from the checkpoint via the jobscript, which uses</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># -c = continue, same  as --from-latest-checkpoint</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">kimmdy</span> <span class="at">-c</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 
-</section>
 </section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
@@ -621,33 +536,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       } else {
         el.classList.add('notransition');
       }
-    }
-  }
-  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
-    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
-    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
-    let newTheme = '';
-    if(darkModeDefault) {
-      newTheme = isAlternate ? baseTheme : alternateTheme;
-    } else {
-      newTheme = isAlternate ? alternateTheme : baseTheme;
-    }
-    const changeGiscusTheme = () => {
-      // From: https://github.com/giscus/giscus/issues/336
-      const sendMessage = (message) => {
-        const iframe = document.querySelector('iframe.giscus-frame');
-        if (!iframe) return;
-        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
-      }
-      sendMessage({
-        setConfig: {
-          theme: newTheme
-        }
-      });
-    }
-    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
-    if (isGiscussLoaded) {
-      changeGiscusTheme();
     }
   }
   const toggleColorMode = (alternate) => {
@@ -716,15 +604,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       return localAlternateSentinel;
     }
   }
-  const darkModeDefault = false;
-  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+  let localAlternateSentinel = 'default';
   // Dark / light mode switch
   window.quartoToggleColorScheme = () => {
     // Read the current dark / light value 
     let toAlternate = !hasAlternateSentinel();
     toggleColorMode(toAlternate);
     setStyleSentinel(toAlternate);
-    toggleGiscusIfUsed(toAlternate, darkModeDefault);
   };
   // Ensure there is a toggle, if there isn't float one in the top right
   if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
@@ -803,9 +689,10 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     // clear code selection
     e.clearSelection();
   });
-  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+  function tippyHover(el, contentFn) {
     const config = {
       allowHTML: true,
+      content: contentFn,
       maxWidth: 500,
       delay: 100,
       arrow: false,
@@ -815,17 +702,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       interactive: true,
       interactiveBorder: 10,
       theme: 'quarto',
-      placement: 'bottom-start',
+      placement: 'bottom-start'
     };
-    if (contentFn) {
-      config.content = contentFn;
-    }
-    if (onTriggerFn) {
-      config.onTrigger = onTriggerFn;
-    }
-    if (onUntriggerFn) {
-      config.onUntrigger = onUntriggerFn;
-    }
     window.tippy(el, config); 
   }
   const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
@@ -838,60 +716,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
       return note.innerHTML;
-    });
-  }
-  const xrefs = window.document.querySelectorAll('a.quarto-xref');
-  const processXRef = (id, note) => {
-    if (id.startsWith('sec-')) {
-      // Special case sections, only their first couple elements
-      const container = document.createElement("div");
-      if (note.children && note.children.length > 2) {
-        for (let i = 0; i < 2; i++) {
-          container.appendChild(note.children[i].cloneNode(true));
-        }
-        return container.innerHTML
-      } else {
-        return note.innerHTML;
-      }
-    } else {
-      return note.innerHTML;
-    }
-  }
-  for (var i=0; i<xrefs.length; i++) {
-    const xref = xrefs[i];
-    tippyHover(xref, undefined, function(instance) {
-      instance.disable();
-      let url = xref.getAttribute('href');
-      let hash = undefined; 
-      try { hash = new URL(url).hash; } catch {}
-      const id = hash.replace(/^#\/?/, "");
-      const note = window.document.getElementById(id);
-      if (note !== null) {
-        try {
-          const html = processXRef(id, note);
-          instance.setContent(html);
-        } finally {
-          instance.enable();
-          instance.show();
-        }
-      } else {
-        // See if we can fetch this
-        fetch(url.split('#')[0])
-        .then(res => res.text())
-        .then(html => {
-          const parser = new DOMParser();
-          const htmlDoc = parser.parseFromString(html, "text/html");
-          const note = htmlDoc.getElementById(id);
-          if (note !== null) {
-            const html = processXRef(id, note);
-            instance.setContent(html);
-          } 
-        }).finally(() => {
-          instance.enable();
-          instance.show();
-        });
-      }
-    }, function(instance) {
     });
   }
       let selectedAnnoteEl;
@@ -935,7 +759,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             }
             div.style.top = top - 2 + "px";
             div.style.height = height + 4 + "px";
-            div.style.left = 0;
             let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
             if (gutterDiv === null) {
               gutterDiv = window.document.createElement("div");
@@ -1022,18 +845,17 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../guide/index.html" class="pagination-link">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Guide</span>
+      <a href="../../guide/how_to/contribute.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Contribute</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../guide/developer/index.html" class="pagination-link">
-        <span class="nav-page-text">Developer</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../../guide/how_to/options.html" class="pagination-link">
+        <span class="nav-page-text">KIMMDY Options</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
 </div> <!-- /content -->
-
 
 
 

@@ -25,7 +25,7 @@ website:
           - text: Report a Bug
             url:  https://github.com/hits-mbm-dev/kimmdy/issues/new
     left:
-      - file: ./guide/getting-started.qmd
+      - file: ./guide/tutorials/getting-started.qmd
         text: Getting Started 
       - file: ./guide/index.qmd
         text: Guide

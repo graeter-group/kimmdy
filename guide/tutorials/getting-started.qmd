@@ -1,11 +1,11 @@
 ---
 resources:
   - 'vis-ala.molj'
-  - '../example/alanine_hat_naive/Ala_out.top'
-  - '../example/alanine_hat_naive/npt.gro'
+  - '../../example/alanine_hat_naive/Ala_out.top'
+  - '../../example/alanine_hat_naive/npt.gro'
 ---
 
-# Getting Started
+# 0. Getting Started
 
 Let's jump right in!
 
@@ -43,7 +43,7 @@ pip install 'git+ssh://git@github.com/hits-mbm-dev/kimmdy.git#egg=kimmdy[plugins
 
 ## Setup the Simulation
 
-Download the [example kimmdy.yml file](../example/example_ala/kimmdy.yml) to this directory.
+Download the [example kimmdy.yml file](../../example/example_ala/kimmdy.yml) to this directory.
 It should look like this:
 
 ```{.yaml filename='kimmdy.yml'}
