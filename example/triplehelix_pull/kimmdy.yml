@@ -4,6 +4,7 @@ name: 'kimmdy_001'
 dryrun: false
 max_tasks: 10
 gromacs_alias: 'gmx'
+gmx_mdrun_flags: -maxh 24 -dlb yes -nt 8
 ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
 top: 'topol.top'
 gro: 'npt.gro'

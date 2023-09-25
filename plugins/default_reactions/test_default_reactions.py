@@ -28,8 +28,9 @@ from kimmdy.parsing import (
 )
 from kimmdy.utils import (
     get_atomnrs_from_plumedid,
-    get_atomtypes_from_atomnrs,
+    get_atominfo_from_atomnrs,
     get_bondprm_from_atomtypes,
+    get_edissoc_from_atomnames,
     morse_transition_rate,
 )
 from kimmdy.tasks import TaskFiles
@@ -80,65 +81,73 @@ def test_get_atomnrs(homolysis_files):
     assert atomnrs == ["7", "9"]
 
 
-def test_get_atomntypes(homolysis_files):
+def test_get_atomtypes(homolysis_files):
     atomnrs = ["7", "9"]
-    atomtypes = get_atomtypes_from_atomnrs(atomnrs, homolysis_files["top"])
+    atomtypes, atomnames = get_atominfo_from_atomnrs(atomnrs, homolysis_files["top"])
     assert atomtypes == ["N", "CT"]
+    assert atomnames == ["N", "CA"]
 
 
 def test_lookup_bondprm(homolysis_files):
-    b0, kb, E_dis = get_bondprm_from_atomtypes(
-        ["CT", "C"], homolysis_files["ffbonded"], homolysis_files["edissoc"]
-    )
+    b0, kb = get_bondprm_from_atomtypes(["CT", "C"], homolysis_files["ffbonded"])
     assert abs(b0 - 0.15220) < 1e-9
     assert abs(kb - 265265.6) < 1e-9
-    assert abs(E_dis - 348) < 1e-9
+
+
+def test_lookup_edissoc(homolysis_files):
+    e_dis = get_edissoc_from_atomnames(["CA", "C"], homolysis_files["edissoc"])
+    assert abs(e_dis - 341) < 1e-9
 
 
 def test_fail_lookup_bondprm(homolysis_files):
+    with pytest.raises(KeyError, match="Did not find bond parameters for atomtypes"):
+        b0, kb = get_bondprm_from_atomtypes(
+            ["X", "Z"],
+            homolysis_files["ffbonded"],
+        )
+
+
+def test_fail_lookup_edissoc(homolysis_files):
     with pytest.raises(
         KeyError, match="Did not find dissociation energy for atomtypes"
     ):
-        b0, kb, e_dis = get_bondprm_from_atomtypes(
+        e_dis = get_edissoc_from_atomnames(
             ["X", "Z"],
-            homolysis_files["ffbonded"],
             homolysis_files["edissoc"],
         )
 
 
 def test_morse_transition_rate(homolysis_files):
-    b0, kb, es_dis = get_bondprm_from_atomtypes(
-        ["CT", "C"], homolysis_files["ffbonded"], homolysis_files["edissoc"]
-    )
+    b0, kb = get_bondprm_from_atomtypes(["CT", "C"], homolysis_files["ffbonded"])
+    e_dis = get_edissoc_from_atomnames(["CA", "C"], homolysis_files["edissoc"])
 
     rs_ref = list(np.linspace(0.9, 1.3, 8) * b0)
-    ks, fs = morse_transition_rate(rs_ref, b0, es_dis, kb)
+    ks, fs = morse_transition_rate(rs_ref, b0, e_dis, kb)
 
     ks_ref = np.asarray(
         [
             0.00000000e00,
             0.00000000e00,
-            6.34487872e-42,
-            1.01004484e-11,
-            2.67853959e-03,
-            2.07275944e-01,
+            5.79066994e-41,
+            2.51010748e-11,
+            3.59809866e-03,
+            2.17080461e-01,
             2.88000000e-01,
             2.88000000e-01,
         ]
     )
     fs_ref = np.asarray(
         [
-            -6327.85756373,
-            -2095.88999762,
-            541.22525767,
-            2101.46367022,
-            2944.48244374,
-            3318.63831687,
-            3396.91825041,
-            3396.91825041,
+            -6357.20305659,
+            -2100.01133653,
+            540.87430205,
+            2094.72356994,
+            2927.66683909,
+            3291.55831528,
+            3362.580289,
+            3362.580289,
         ]
     )
-
     assert all(np.isclose(ks, ks_ref))
     assert all(np.isclose(fs, fs_ref))
 
