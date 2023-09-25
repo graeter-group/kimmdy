@@ -411,20 +411,24 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#functions" id="toc-functions" class="nav-link" data-scroll-target="#functions">Functions</a>
   <ul>
   <li><a href="#kimmdy.utils.check_gmx_version" id="toc-kimmdy.utils.check_gmx_version" class="nav-link" data-scroll-target="#kimmdy.utils.check_gmx_version">check_gmx_version</a></li>
+  <li><a href="#kimmdy.utils.get_atominfo_from_atomnrs" id="toc-kimmdy.utils.get_atominfo_from_atomnrs" class="nav-link" data-scroll-target="#kimmdy.utils.get_atominfo_from_atomnrs">get_atominfo_from_atomnrs</a></li>
   <li><a href="#kimmdy.utils.get_atomnrs_from_plumedid" id="toc-kimmdy.utils.get_atomnrs_from_plumedid" class="nav-link" data-scroll-target="#kimmdy.utils.get_atomnrs_from_plumedid">get_atomnrs_from_plumedid</a>
   <ul class="collapse">
   <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
   </ul></li>
-  <li><a href="#kimmdy.utils.get_atomtypes_from_atomnrs" id="toc-kimmdy.utils.get_atomtypes_from_atomnrs" class="nav-link" data-scroll-target="#kimmdy.utils.get_atomtypes_from_atomnrs">get_atomtypes_from_atomnrs</a></li>
   <li><a href="#kimmdy.utils.get_bondprm_from_atomtypes" id="toc-kimmdy.utils.get_bondprm_from_atomtypes" class="nav-link" data-scroll-target="#kimmdy.utils.get_bondprm_from_atomtypes">get_bondprm_from_atomtypes</a>
   <ul class="collapse">
   <li><a href="#parameters-1" id="toc-parameters-1" class="nav-link" data-scroll-target="#parameters-1">Parameters</a></li>
+  </ul></li>
+  <li><a href="#kimmdy.utils.get_edissoc_from_atomnames" id="toc-kimmdy.utils.get_edissoc_from_atomnames" class="nav-link" data-scroll-target="#kimmdy.utils.get_edissoc_from_atomnames">get_edissoc_from_atomnames</a>
+  <ul class="collapse">
+  <li><a href="#parameters-2" id="toc-parameters-2" class="nav-link" data-scroll-target="#parameters-2">Parameters</a></li>
   </ul></li>
   <li><a href="#kimmdy.utils.get_gmx_dir" id="toc-kimmdy.utils.get_gmx_dir" class="nav-link" data-scroll-target="#kimmdy.utils.get_gmx_dir">get_gmx_dir</a></li>
   <li><a href="#kimmdy.utils.get_shell_stdout" id="toc-kimmdy.utils.get_shell_stdout" class="nav-link" data-scroll-target="#kimmdy.utils.get_shell_stdout">get_shell_stdout</a></li>
   <li><a href="#kimmdy.utils.morse_transition_rate" id="toc-kimmdy.utils.morse_transition_rate" class="nav-link" data-scroll-target="#kimmdy.utils.morse_transition_rate">morse_transition_rate</a>
   <ul class="collapse">
-  <li><a href="#parameters-2" id="toc-parameters-2" class="nav-link" data-scroll-target="#parameters-2">Parameters</a></li>
+  <li><a href="#parameters-3" id="toc-parameters-3" class="nav-link" data-scroll-target="#parameters-3">Parameters</a></li>
   </ul></li>
   <li><a href="#kimmdy.utils.run_gmx" id="toc-kimmdy.utils.run_gmx" class="nav-link" data-scroll-target="#kimmdy.utils.run_gmx">run_gmx</a></li>
   <li><a href="#kimmdy.utils.run_shell_cmd" id="toc-kimmdy.utils.run_shell_cmd" class="nav-link" data-scroll-target="#kimmdy.utils.run_shell_cmd">run_shell_cmd</a></li>
@@ -474,34 +478,38 @@ ul.task-list li input[type="checkbox"] {
 <td>Check for an existing gromacs installation.</td>
 </tr>
 <tr class="even">
+<td><a href="#kimmdy.utils.get_atominfo_from_atomnrs">get_atominfo_from_atomnrs</a></td>
+<td>Use topology atoms section to convert from atomnr to atomtype</td>
+</tr>
+<tr class="odd">
 <td><a href="#kimmdy.utils.get_atomnrs_from_plumedid">get_atomnrs_from_plumedid</a></td>
 <td>Convert from plumedid to atomnr, information from the plumed file is used.</td>
 </tr>
-<tr class="odd">
-<td><a href="#kimmdy.utils.get_atomtypes_from_atomnrs">get_atomtypes_from_atomnrs</a></td>
-<td>Use topology atoms section to convert from atomnr to atomtype</td>
-</tr>
 <tr class="even">
 <td><a href="#kimmdy.utils.get_bondprm_from_atomtypes">get_bondprm_from_atomtypes</a></td>
-<td>Returns bond parameters (b0, kb, E_dis) for a set of two atomtypes.</td>
+<td>Returns bond parameters (b0, kb) for a set of two atomtypes.</td>
 </tr>
 <tr class="odd">
+<td><a href="#kimmdy.utils.get_edissoc_from_atomnames">get_edissoc_from_atomnames</a></td>
+<td>Returns dissociation energy E_dissoc for a set of two atomnames.</td>
+</tr>
+<tr class="even">
 <td><a href="#kimmdy.utils.get_gmx_dir">get_gmx_dir</a></td>
 <td>Returns the path to the gromacs installation</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#kimmdy.utils.get_shell_stdout">get_shell_stdout</a></td>
 <td>Run command in shell and capture stdout.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#kimmdy.utils.morse_transition_rate">morse_transition_rate</a></td>
 <td>Calculates reaction rate constant for a bond breaking event.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#kimmdy.utils.run_gmx">run_gmx</a></td>
 <td>Run GROMACS command in shell.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#kimmdy.utils.run_shell_cmd">run_shell_cmd</a></td>
 <td>Run command in shell.</td>
 </tr>
@@ -512,6 +520,11 @@ ul.task-list li input[type="checkbox"] {
 <p><code>utils.check_gmx_version(config)</code></p>
 <p>Check for an existing gromacs installation.</p>
 <p>If PLUMED is meant to be used it additionally checks for the keyword ‘MODIFIED’ or ‘plumed’ in the version name.</p>
+</section>
+<section id="kimmdy.utils.get_atominfo_from_atomnrs" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.utils.get_atominfo_from_atomnrs">get_atominfo_from_atomnrs</h3>
+<p><code>utils.get_atominfo_from_atomnrs(atomnrs, top)</code></p>
+<p>Use topology atoms section to convert from atomnr to atomtype</p>
 </section>
 <section id="kimmdy.utils.get_atomnrs_from_plumedid" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.utils.get_atomnrs_from_plumedid">get_atomnrs_from_plumedid</h3>
@@ -545,15 +558,10 @@ ul.task-list li input[type="checkbox"] {
 </table>
 </section>
 </section>
-<section id="kimmdy.utils.get_atomtypes_from_atomnrs" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.utils.get_atomtypes_from_atomnrs">get_atomtypes_from_atomnrs</h3>
-<p><code>utils.get_atomtypes_from_atomnrs(atomnrs, top)</code></p>
-<p>Use topology atoms section to convert from atomnr to atomtype</p>
-</section>
 <section id="kimmdy.utils.get_bondprm_from_atomtypes" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.utils.get_bondprm_from_atomtypes">get_bondprm_from_atomtypes</h3>
-<p><code>utils.get_bondprm_from_atomtypes(atomtypes, ffbonded, edissoc)</code></p>
-<p>Returns bond parameters (b0, kb, E_dis) for a set of two atomtypes.</p>
+<p><code>utils.get_bondprm_from_atomtypes(atomtypes, ffbonded)</code></p>
+<p>Returns bond parameters (b0, kb) for a set of two atomtypes.</p>
 <section id="parameters-1" class="level4">
 <h4 class="anchored" data-anchor-id="parameters-1">Parameters</h4>
 <table class="table">
@@ -578,7 +586,33 @@ ul.task-list li input[type="checkbox"] {
 <td>Force field ffbonded.itp file parsed through the rtp parser</td>
 <td><em>required</em></td>
 </tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="kimmdy.utils.get_edissoc_from_atomnames" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.utils.get_edissoc_from_atomnames">get_edissoc_from_atomnames</h3>
+<p><code>utils.get_edissoc_from_atomnames(atomnames, edissoc)</code></p>
+<p>Returns dissociation energy E_dissoc for a set of two atomnames.</p>
+<section id="parameters-2" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-2">Parameters</h4>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
 <tr class="odd">
+<td><code>atomnames</code></td>
+<td><a href="https://docs.python.org/3.10/library/stdtypes.html#list">list</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>]</td>
+<td>Two atomnames as defined in the respective force field</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
 <td><code>edissoc</code></td>
 <td><a href="https://docs.python.org/3.10/library/stdtypes.html#dict">dict</a></td>
 <td>Parsed file with dissociation energies per bond between two atomtypes or elements</td>
@@ -605,8 +639,8 @@ ul.task-list li input[type="checkbox"] {
 <p>Calculates reaction rate constant for a bond breaking event.</p>
 <p>Uses the Morse potential model for this calculation. For an array of bond distances of the same bond, first calculates the forces on the bond, then the minima and maxima of the shifted Morse potential to get an energy barrier and finally a reaction rate constant using the Arrhenius equation. For intramolecular reactions, the reaction rate constant is equal to the reaction rate.</p>
 <p>The calculation should be according to the derivation in the original KIMMDY paper: DOI: 10.1021/acs.jctc.9b00786</p>
-<section id="parameters-2" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-2">Parameters</h4>
+<section id="parameters-3" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-3">Parameters</h4>
 <table class="table">
 <thead>
 <tr class="header">
