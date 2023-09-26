@@ -326,6 +326,78 @@ def plot_rates(dir: str):
         rc.plot(analysis_dir / f"{i}_reaction_rates.svg", highlight_r=picked_rp)
 
 
+def plot_runtime(dir: str, log_str: str, datefmt: str):
+    """Plot runtime of all tasks.
+
+    Parameters
+    ----------
+    dir
+        Directory of KIMMDY run
+    logfile
+        KIMMDY logfile
+    datefmt
+        Date format in the KIMMDY logfile
+    """
+
+    def time_from_logline(line: str, sep: int):
+        return datetime.strptime(" ".join(line.split()[:sep]), datefmt)
+
+    import re
+    from datetime import datetime
+
+    run_dir = Path(dir).expanduser().resolve()
+    analysis_dir = get_analysis_dir(run_dir)
+
+    log_path = run_dir / log_str
+    datefmt_substrings = len(datefmt.split())
+
+    start_str = " INFO: Start "
+    runstart_str = " INFO: Start run\n"
+    end_str = " INFO: Done with "
+
+    with open(log_path, "r") as f:
+        log = f.readlines()
+
+    starttime = time_from_logline(log[0], datefmt_substrings)
+    endtime = time_from_logline(log[-1], datefmt_substrings)
+    walltime = endtime - starttime
+    print(starttime, endtime)
+    print(walltime)
+
+    # regex to find start of task
+
+    # regex to find end of task
+    # match both
+    #
+    task_dict = {}
+    tasks = []
+    runtimes = []
+    for line in log:
+        if start_str in line:
+            if runstart_str in line:
+                continue
+            print(line)
+            linesplit = line.split()
+            # task name comes after datefmt in logging format
+            task_dict[linesplit[datefmt_substrings]] = time_from_logline(
+                line, datefmt_substrings
+            )
+        if end_str in line:
+            print(line)
+            linesplit = line.split()
+            runtime = (
+                time_from_logline(line, datefmt_substrings)
+                - task_dict[linesplit[datefmt_substrings]]
+            )
+
+            tasks.append(linesplit[datefmt_substrings])
+            runtimes.append(runtime.total_seconds())
+
+    print(tasks, runtimes)
+    plt.bar(tasks, runtimes)
+    plt.savefig(analysis_dir / "test_runtime.png")
+
+
 def get_analysis_cmdline_args() -> argparse.Namespace:
     """Parse command line arguments.
 
@@ -428,6 +500,23 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         "dir", type=str, help="KIMMDY run directory to be analysed."
     )
 
+    parser_runtime = subparsers.add_parser(
+        name="runtime",
+        help="Plot runtime of the tasks of a kimmdy run.",
+    )
+    parser_runtime.add_argument(
+        "dir", type=str, help="KIMMDY run directory to be analysed."
+    )
+    parser_runtime.add_argument(
+        "--logfile", type=str, default="kimmdy.log", help="KIMMDY logfile."
+    )
+    parser_runtime.add_argument(
+        "--datefmt",
+        type=str,
+        default="%d-%m-%y %H:%M:%S",
+        help="Date format in the KIMMDY logfile.",
+    )
+
     return parser.parse_args()
 
 
@@ -445,6 +534,8 @@ def entry_point_analysis():
         )
     elif args.module == "plot_rates":
         plot_rates(args.dir)
+    elif args.module == "runtime":
+        plot_runtime(args.dir, args.logfile, args.datefmt)
     else:
         print(
             "No analysis module specified. Use -h for help and a list of available modules."

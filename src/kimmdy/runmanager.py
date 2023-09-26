@@ -442,7 +442,9 @@ class RunManager:
         )
         self.recipe_collection.aggregate_reactions()
 
-        logger.info(f"Recipes recived from {reaction_plugin.name}")
+        logger.info(
+            f"Done with Query reactions, recipes recived from {reaction_plugin.name}"
+        )
         return files
 
     def _decide_recipe(
@@ -454,7 +456,7 @@ class RunManager:
             logger = files.logger
 
         logger.info(
-            f"Decide on a recipe from {len(self.recipe_collection.recipes)} available"
+            f"Start Decide recipe, {len(self.recipe_collection.recipes)} available"
         )
         decision_d = decision_strategy(self.recipe_collection)
         self.recipe = decision_d.recipe
@@ -477,7 +479,7 @@ class RunManager:
         if decision_d.time_delta:
             self.time += decision_d.time_delta
         logger.info(
-            f"Chosen recipe is: {self.recipe.get_recipe_name()} at time {self.time}"
+            f"Done with Decide recipe, chosen recipe is: {self.recipe.get_recipe_name()} at time {self.time}"
         )
         return
 
@@ -543,5 +545,5 @@ class RunManager:
         # Recipe done, reset runmanger state
         self.recipe = None
 
-        logger.info("Reaction done")
+        logger.info("Done with Apply recipe")
         return files
