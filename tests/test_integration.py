@@ -1,5 +1,4 @@
 import os
-import shutil
 import subprocess as sp
 from pathlib import Path
 

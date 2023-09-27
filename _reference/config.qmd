@@ -33,7 +33,7 @@ and computationally expensive operations.
 | Name | Description |
 | --- | --- |
 | [attr](#kimmdy.config.Config.attr) | Get the value of a specific attribute. |
-| [get_attributes](#kimmdy.config.Config.get_attributes) | Get a list of all attributes |
+| [get_attributes](#kimmdy.config.Config.get_attributes) | Get a list of all attributes without hidden ones (_<...>). |
 
 ##### attr { #kimmdy.config.Config.attr }
 
@@ -46,4 +46,4 @@ Alias for self.__getattribute__
 
 `config.Config.get_attributes()`
 
-Get a list of all attributes
+Get a list of all attributes without hidden ones (_<...>).

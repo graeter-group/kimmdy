@@ -13,7 +13,7 @@ Reserved keywords:
 import json
 import importlib.resources as pkg_resources
 import logging
-from kimmdy import reaction_plugins
+from kimmdy.plugins import reaction_plugins
 
 # needed for eval of type_scheme from schema
 # don't remove even if lsp says it's unused

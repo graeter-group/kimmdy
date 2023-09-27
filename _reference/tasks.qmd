@@ -5,12 +5,6 @@
 The tasks module holds the TaskFiles class which organizes input and 
 output paths and the Task class for steps in the runmanager.
 
-## Attributes
-
-| Name | Description |
-| --- | --- |
-| [TaskMapping](#kimmdy.tasks.TaskMapping) | Mapping of task names to functions. |
-
 ## Classes
 
 | Name | Description |
@@ -31,13 +25,13 @@ Dictionary that gets populated by calling get_missing.
 
 #### Parameters:
 
-runmng : kimmdy.runmanager.Runmanager
-    Runmanager instance
-f : Callable
-    Will be called when the task is called
-kwargs : dict
-    kwargs will be passed to f
-out : str, optional
+runmng
+    Runmanager instance from which the task is called
+f
+    Function that will be called when the task is called
+kwargs
+    kwargs to be passed to f
+out
     If not None, an output dir will be created with this name
 
 ### TaskFiles { #kimmdy.tasks.TaskFiles }
