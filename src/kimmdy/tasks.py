@@ -129,7 +129,7 @@ class Task:
     def __init__(
         self,
         runmng,
-        f: Callable[..., TaskFiles],
+        f: Callable[..., Optional[TaskFiles]],
         kwargs: Optional[dict[str, Any]] = None,
         out: Optional[str] = None,
     ):

@@ -281,7 +281,9 @@ class RunManager:
         files = task()
         self._discover_output_files(task.name, files)
 
-    def _discover_output_files(self, taskname, files: TaskFiles):
+    def _discover_output_files(
+        self, taskname: str, files: TaskFiles
+    ) -> Optional[TaskFiles]:
         """Discover further files written by a task.
 
         and add those files to the `files` as well as
@@ -336,7 +338,12 @@ class RunManager:
             with open(self.histfile, "a") as f:
                 f.write(m)
 
-    def _run_md(self, instance, files) -> TaskFiles:
+            return files
+        else:
+            logger.warning("No output directory found for task: " + taskname)
+            return None
+
+    def _run_md(self, instance: str, files: TaskFiles) -> TaskFiles:
         """General MD simulation"""
         logger = files.logger
         logger.info(f"Start MD {instance}")
@@ -394,7 +401,7 @@ class RunManager:
         logger.info(f"Done with MD {instance}")
         return files
 
-    def _place_reaction_tasks(self, selected: Optional[str] = None):
+    def _place_reaction_tasks(self, selected: Optional[str] = None) -> None:
         logger.info("Query reactions")
         self.state = State.REACTION
         # empty list for every new round of queries
@@ -416,9 +423,11 @@ class RunManager:
             )
 
         logger.info(f"Queued {len(self.reaction_plugins)} reaction plugin(s)")
-        return
+        return None
 
-    def _query_reaction(self, reaction_plugin: ReactionPlugin, files: TaskFiles):
+    def _query_reaction(
+        self, reaction_plugin: ReactionPlugin, files: TaskFiles
+    ) -> TaskFiles:
         logger = files.logger
         logger.info(f"Start query {reaction_plugin.name}")
 
@@ -433,12 +442,9 @@ class RunManager:
     def _decide_recipe(
         self,
         decision_strategy: Callable[[RecipeCollection], KMCResult],
-        files: Optional[TaskFiles] = None,
-    ):
-        if files is None:
-            logger = logging.getLogger(__name__)
-        else:
-            logger = files.logger
+        files: TaskFiles,
+    ) -> None:
+        logger = files.logger
 
         logger.info(
             f"Decide on a recipe from {len(self.recipe_collection.recipes)} available"
@@ -466,13 +472,18 @@ class RunManager:
         logger.info(
             f"Chosen recipe is: {self.recipe.get_recipe_name()} at time {self.time}"
         )
-        return
+        return None
 
     def _apply_recipe(self, files: TaskFiles) -> TaskFiles:
         logger = files.logger
         logger.info(f"Start Recipe in KIMMDY iteration {self.iteration}")
-        logger.info(f"Recipe: {self.recipe.get_recipe_name()}")
 
+        if self.recipe is None:
+            m = "Attempting to _apply_recipe without having chosen one with _decide_recipe."
+            logger.error(m)
+            raise RuntimeError(m)
+
+        logger.info(f"Recipe: {self.recipe.get_recipe_name()}")
         logger.debug(f"Chose recipe steps: {self.recipe.recipe_steps}")
 
         top_initial = deepcopy(self.top)
@@ -504,7 +515,7 @@ class RunManager:
                     continue
 
                 if self.config.changer.coordinates.slow_growth:
-                    # Create a slow growth topology for sub-task run_md, afterwards, top will be set back properly
+                    # Create a slow growth topology for sub-task run_md, afterwards, top will be reset properly
                     top_merge = merge_top_slow_growth(top_initial, deepcopy(self.top))
                     top_merge_path = files.outputdir / self.config.top.name.replace(
                         ".", "_mod."

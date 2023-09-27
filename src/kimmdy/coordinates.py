@@ -151,10 +151,10 @@ def get_explicit_or_type(
 
 def merge_dihedrals(
     dihedral_key: tuple[str, str, str, str],
-    interactionA: Union[Dihedral, None],
-    interactionB: Union[Dihedral, None],
-    interaction_typesA: dict[tuple[str, ...], DihedralType],
-    interaction_typesB: dict[tuple[str, ...], DihedralType],
+    interactionA: Optional[Dihedral],
+    interactionB: Optional[Dihedral],
+    interaction_typesA: InteractionTypes,
+    interaction_typesB: InteractionTypes,
     molA: MoleculeType,
     molB: MoleculeType,
     funct: str,
@@ -222,9 +222,9 @@ def merge_dihedrals(
             c5=parameterizedB.periodicity,
         )
     else:
-        raise ValueError(
-            f"Tried to merge two dihedrals of {dihedral_key} but no parameterized dihedrals found!"
-        )
+        m = f"Tried to merge two dihedrals of {dihedral_key} but no parameterized dihedrals found!"
+        logger.error(m)
+        raise ValueError(m)
     return dihedralmerge
 
 
@@ -462,9 +462,6 @@ def merge_top_slow_growth(
     molB = merge_top_moleculetypes_slow_growth(molA, molB, topB.ff, focus_nr)
 
     return topB
-
-
-# plumed
 
 
 def break_bond_plumed(
