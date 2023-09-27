@@ -4,6 +4,8 @@
 
 Plugin base classes and basic instances thereof.
 
+Also discovers and loads KIMMDY plugins.
+
 ## Classes
 
 | Name | Description |

@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.290">
+<meta name="generator" content="quarto-1.3.450">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -93,7 +93,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
     "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit"
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
   }
 }</script>
 
@@ -196,30 +197,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../../guide/tutorials/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Tutorials</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../guide/tutorials/getting-started.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">0. Getting Started</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
             <a href="../../guide/how_to/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">How-To</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 show">  
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../guide/how_to/contribute.html" class="sidebar-item-text sidebar-link">
@@ -248,6 +232,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../../guide/how_to/topology.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Visualize Topologies</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../guide/tutorials/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tutorials</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guide/tutorials/getting-started.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">0. Getting Started</span></a>
   </div>
 </li>
       </ul>
@@ -697,104 +698,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>Settings for reactions</td>
 <td></td>
 <td></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>reactions.homolysis.edis</td>
-<td>Dissociation energies data file</td>
-<td>Path</td>
-<td>edissoc.dat</td>
-<td></td>
-</tr>
-<tr class="even">
-<td>reactions.homolysis.itp</td>
-<td>Additional itp file with bonded parameters</td>
-<td>Path</td>
-<td>ffbonded.itp</td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>reactions.hat_naive.frequency_factor</td>
-<td>Frequency factor</td>
-<td>float</td>
-<td>1</td>
-<td></td>
-</tr>
-<tr class="even">
-<td>reactions.hat_naive.h_cutoff</td>
-<td>Cutoff for H atom</td>
-<td>float</td>
-<td>4</td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>reactions.hat_naive.polling_rate</td>
-<td>Polling rate</td>
-<td>float</td>
-<td>1</td>
-<td></td>
-</tr>
-<tr class="even">
-<td>reactions.dummyreaction.example</td>
-<td>This is an example of an option for a reaction.</td>
-<td>float</td>
-<td>0.0</td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>reactions.dummyreaction.example2</td>
-<td>This is another example of an option for a reaction.</td>
-<td>str</td>
-<td>hello</td>
-<td></td>
-</tr>
-<tr class="even">
-<td>reactions.hat_reaction.frequency_factor</td>
-<td>Frequency factor</td>
-<td>float</td>
-<td></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>reactions.hat_reaction.h_cutoff</td>
-<td>Cutoff for H atom</td>
-<td>float</td>
-<td>3</td>
-<td></td>
-</tr>
-<tr class="even">
-<td>reactions.hat_reaction.model</td>
-<td>Model name, optional</td>
-<td>str</td>
-<td></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>reactions.hat_reaction.ensemble_size</td>
-<td>Number of models to use, defaults to all, optional</td>
-<td>int</td>
-<td></td>
-<td></td>
-</tr>
-<tr class="even">
-<td>reactions.hat_reaction.polling_rate</td>
-<td>Polling rate, defaults to 10</td>
-<td>int</td>
-<td>10</td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>reactions.hat_reaction.radicals</td>
-<td>Radical index, usually supplied through kimmdy, optional</td>
-<td>int</td>
-<td></td>
-<td></td>
-</tr>
-<tr class="even">
-<td>reactions.hat_reaction.change_coords</td>
-<td>How to change coordinates. H can be placed at the new position, or a (lambda)-dynamics simulation can be performed. For lambda-dynamics, set up the coordinate changer with slow_growth=True</td>
-<td>str</td>
-<td>place</td>
 <td></td>
 </tr>
 <tr class="odd">
