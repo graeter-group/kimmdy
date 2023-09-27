@@ -1,25 +1,23 @@
 import pytest
-import shutil
 from pathlib import Path
-import os
+import re
 import MDAnalysis as mda
-
-from kimmdy.recipe import Break, Bind, Place, Relax, RecipeStep
-from kimmdy.parsing import read_plumed, read_top, read_top
-from kimmdy.plugins import BasicParameterizer
+import subprocess as sp
+from kimmdy.recipe import Break, Place
+from kimmdy.parsing import read_plumed, read_top
 from conftest import DummyFiles
 from kimmdy.tasks import TaskFiles
 from kimmdy.topology.topology import Topology
-from kimmdy.topology.atomic import Bond
 from kimmdy.coordinates import (
     merge_top_slow_growth,
     get_explicit_or_type,
     place_atom,
     break_bond_plumed,
 )
+from kimmdy.utils import truncate_sim_files
 
 
-## test coordinate changes
+# test coordinate changes
 def test_get_bondobj(arranged_tmp_path):
     top_A = Topology(read_top(Path("topol_stateA.top")))
 
@@ -56,9 +54,8 @@ def test_place_atom(arranged_tmp_path):
     files.outputdir = arranged_tmp_path
 
     step = Place(id_to_place="1", new_coords=(1, 2, 3))
-    timespan = [(0.0, 100.0)]
 
-    place_atom(files, step, timespan)
+    place_atom(files, step, ttime=100)
 
     assert files.output["trr"].exists()
     assert files.output["gro"].exists()
@@ -69,12 +66,12 @@ def test_place_atom(arranged_tmp_path):
     print(coords)
 
 
-## test plumed changes
+# test plumed changes
 
 
 def test_plumed_break(arranged_tmp_path):
     files = TaskFiles(
-        get_latest=lambda: f"DummyCallable",
+        get_latest=lambda: "DummyCallable",
     )
     files.input = {
         "plumed": arranged_tmp_path / "plumed_nat.dat",
@@ -98,7 +95,7 @@ def test_plumed_break(arranged_tmp_path):
     )
 
 
-## test topology changes
+# test topology changes
 def test_merge_prm_top(arranged_tmp_path):
     """this tests a topology merge for a HAT reaction from a Ca (nr 19) radical to a N (nr 26) radical"""
 
@@ -126,7 +123,36 @@ def test_merge_prm_top(arranged_tmp_path):
 
     assert top_merge.bonds[("19", "27")].funct == "3"
     assert top_merge.bonds[("26", "27")].funct == "3"
-    assert top_merge.angles[("17", "19", "20")].c3 != None
+    assert top_merge.angles[("17", "19", "20")].c3 is not None
     assert top_merge.proper_dihedrals[("15", "17", "19", "24")].dihedrals["3"].c5 == "3"
     assert top_merge.improper_dihedrals[("17", "20", "19", "24")].c5 == "2"
     # assert one dihedral merge improper/proper
+
+
+@pytest.mark.require_gmx
+def test_truncate_sim_files(arranged_tmp_path):
+    files = DummyFiles()
+    files.input = {
+        "trr": arranged_tmp_path / "relax.trr",
+        "xtc": arranged_tmp_path / "relax.xtc",
+        "edr": arranged_tmp_path / "relax.edr",
+        "gro": arranged_tmp_path / "relax.gro",
+    }
+    files.outputdir = arranged_tmp_path
+    time = 5.2
+    truncate_sim_files(files, time)
+
+    for p in files.input.values():
+        assert p.exists()
+        assert p.with_name(p.name + ".tail").exists()
+
+    p = sp.run(
+        f"gmx -quiet -nocopyright check -f {files.input['trr']}",
+        text=True,
+        capture_output=True,
+        shell=True,
+    )
+    # FOR SOME REASON gmx check writes in stderr instead of stdout
+    m = re.search(r"Last frame.*time\s+(\d+\.\d+)", p.stderr)
+    last_time = m.group(1)
+    assert last_time == "6.000"
