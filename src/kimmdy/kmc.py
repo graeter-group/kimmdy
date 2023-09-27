@@ -167,3 +167,11 @@ def frm(
         time_delta=time_delta,
         time_start=0,
     )
+
+
+def extrande(
+    recipe_collection: RecipeCollection,
+    rng: np.random.BitGenerator = default_rng(),
+    MD_time: Optional[float] = None,
+) -> KMCResult:
+    pass
