@@ -15,9 +15,10 @@ Utilities for building plugins, shell convenience functions and GROMACS related 
 | Name | Description |
 | --- | --- |
 | [check_gmx_version](#kimmdy.utils.check_gmx_version) | Check for an existing gromacs installation. |
+| [get_atominfo_from_atomnrs](#kimmdy.utils.get_atominfo_from_atomnrs) | Use topology atoms section to convert from atomnr to atomtype |
 | [get_atomnrs_from_plumedid](#kimmdy.utils.get_atomnrs_from_plumedid) | Convert from plumedid to atomnr, information from the plumed file is used. |
-| [get_atomtypes_from_atomnrs](#kimmdy.utils.get_atomtypes_from_atomnrs) | Use topology atoms section to convert from atomnr to atomtype |
-| [get_bondprm_from_atomtypes](#kimmdy.utils.get_bondprm_from_atomtypes) | Returns bond parameters (b0, kb, E_dis) for a set of two atomtypes. |
+| [get_bondprm_from_atomtypes](#kimmdy.utils.get_bondprm_from_atomtypes) | Returns bond parameters (b0, kb) for a set of two atomtypes. |
+| [get_edissoc_from_atomnames](#kimmdy.utils.get_edissoc_from_atomnames) | Returns dissociation energy E_dissoc for a set of two atomnames. |
 | [get_gmx_dir](#kimmdy.utils.get_gmx_dir) | Returns the path to the gromacs installation |
 | [get_shell_stdout](#kimmdy.utils.get_shell_stdout) | Run command in shell and capture stdout. |
 | [morse_transition_rate](#kimmdy.utils.morse_transition_rate) | Calculates reaction rate constant for a bond breaking event. |
@@ -33,6 +34,12 @@ Check for an existing gromacs installation.
 If PLUMED is meant to be used it additionally checks for the keyword
 'MODIFIED' or 'plumed' in the version name.
 
+### get_atominfo_from_atomnrs { #kimmdy.utils.get_atominfo_from_atomnrs }
+
+`utils.get_atominfo_from_atomnrs(atomnrs, top)`
+
+Use topology atoms section to convert from atomnr to atomtype
+
 ### get_atomnrs_from_plumedid { #kimmdy.utils.get_atomnrs_from_plumedid }
 
 `utils.get_atomnrs_from_plumedid(plumedid, plumed)`
@@ -46,24 +53,30 @@ Convert from plumedid to atomnr, information from the plumed file is used.
 | `plumedid` | [str](`str`)                                | Identifier from a plumed input file (e.g d0). | _required_ |
 | `plumed`   | [Plumed_dict](`kimmdy.parsing.Plumed_dict`) | Parsed plumed input file                      | _required_ |
 
-### get_atomtypes_from_atomnrs { #kimmdy.utils.get_atomtypes_from_atomnrs }
-
-`utils.get_atomtypes_from_atomnrs(atomnrs, top)`
-
-Use topology atoms section to convert from atomnr to atomtype
-
 ### get_bondprm_from_atomtypes { #kimmdy.utils.get_bondprm_from_atomtypes }
 
-`utils.get_bondprm_from_atomtypes(atomtypes, ffbonded, edissoc)`
+`utils.get_bondprm_from_atomtypes(atomtypes, ffbonded)`
 
-Returns bond parameters (b0, kb, E_dis) for a set of two atomtypes.
+Returns bond parameters (b0, kb) for a set of two atomtypes.
+
+#### Parameters
+
+| Name        | Type                           | Description                                                 | Default    |
+|-------------|--------------------------------|-------------------------------------------------------------|------------|
+| `atomtypes` | [list](`list`)\[[str](`str`)\] | Two atomtypes as defined in the respective force field      | _required_ |
+| `ffbonded`  | [dict](`dict`)                 | Force field ffbonded.itp file parsed through the rtp parser | _required_ |
+
+### get_edissoc_from_atomnames { #kimmdy.utils.get_edissoc_from_atomnames }
+
+`utils.get_edissoc_from_atomnames(atomnames, edissoc)`
+
+Returns dissociation energy E_dissoc for a set of two atomnames.
 
 #### Parameters
 
 | Name        | Type                           | Description                                                                       | Default    |
 |-------------|--------------------------------|-----------------------------------------------------------------------------------|------------|
-| `atomtypes` | [list](`list`)\[[str](`str`)\] | Two atomtypes as defined in the respective force field                            | _required_ |
-| `ffbonded`  | [dict](`dict`)                 | Force field ffbonded.itp file parsed through the rtp parser                       | _required_ |
+| `atomnames` | [list](`list`)\[[str](`str`)\] | Two atomnames as defined in the respective force field                            | _required_ |
 | `edissoc`   | [dict](`dict`)                 | Parsed file with dissociation energies per bond between two atomtypes or elements | _required_ |
 
 ### get_gmx_dir { #kimmdy.utils.get_gmx_dir }

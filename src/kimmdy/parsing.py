@@ -555,6 +555,8 @@ def read_edissoc(path: Path) -> dict:
     with open(path, "r") as f:
         edissocs = {}
         for l in f:
+            if l.startswith(";") or len(l.split()) < 3:
+                continue
             at1, at2, edissoc, *_ = l.split()
             edissocs[tuple([at1, at2])] = float(edissoc)
     return edissocs

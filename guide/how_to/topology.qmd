@@ -1,5 +1,5 @@
 ---
-title: Hexala topology
+title: Visualize Topologies
 mermaid-format: svg
 ---
 

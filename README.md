@@ -4,37 +4,42 @@
 
 Reactive MD pipeline for GROMACS using Kinetic Monte Carlo / Molecular Dynamics (KIMMDY)
 
-## Quick start
+## Installation
 
-* clone repository, e.g. `git clone https://github.com/hits-mbm-dev/kimmdy.git`
-* `cd kimmdy`
-* `python -m venv .venv`
-* `source ./venv/bin/activate`
-* `python -m pip install -e ./`
-* Some reactions need a GROMACS version patched with PLUMED, gromacs name should then contain `MODIFIED` or `plumed`
+| :exclamation:    | Some reactions need a GROMACS version patched with PLUMED, gromacs name should then contain `MODIFIED` or `plumed` |
+|---------------|:------------------------|
 
-## Full installation
+### Bare Installation
+```
+git clone https://github.com/hits-mbm-dev/kimmdy.git
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install -e ./
+```
+This installation includes only the most basic functionality as no plugins and analysis tool dependencies are installed. Plugins can be installed using `python -m pip install -e ./` in their module directories (e.g. `kimmdy/plugins/default_reactions`). The analysis tool dependencies can be installed with `python -m pip install -e ./[analysis]` in `kimmdy/`.
 
-* install conda and activate it
-* `conda create -n "kimmdy" python=3.10`, i.e. create an environment for python 3.10 
-* `conda activate kimmdy`
-* `conda install -c conda-forge tensorflow==2.10` for the HAT plugin
-* `conda install -c conda-forge openmm` for grappa parameterization
-* `git clone https://github.com/hits-mbm-dev/HAT_reaction_plugin.git`
-* `cd HAT_reaction_plugin/`
-* `pip install -r requirements.txt`
-* `cd ..`
-* `git clone https://github.com/hits-mbm-dev/kimmdy.git`
-* `cd kimmdy`
-* `pip install -r requirements.txt`
-* Some reactions need a GROMACS version patched with PLUMED, gromacs name should then contain `MODIFIED` or `plumed`
-
-Other ways to install kimmdy are currently discouraged because of the high number of dependencies.
-
+### Full installation
+```
+conda create -n kimmdy_full python=3.10 tensorflow==2.10 openmm
+conda activate kimmdy_full
+git clone https://github.com/hits-mbm-dev/HAT_reaction_plugin.git
+cd HAT_reaction_plugin/
+pip install -r requirements.txt
+cd ..
+git clone https://github.com/hits-mbm-dev/grappa.git
+cd grappa
+pip install -e .
+cd ..
+git clone https://github.com/hits-mbm-dev/kimmdy.git
+cd kimmdy
+pip install -r requirements.txt
+pip install -e ./[parameterization_plugins]
+```
+Other ways to install kimmdy with all plugins are currently discouraged because of the high number of dependencies.
 
 ## Development setup
 
-* `python -m pip install -r requirements.txt`
+* install packages necessary for developmentmake `python -m pip install -r requirements.txt`
 * code style: black
 * docstrings: numpy
 * [Conventional commit](https://www.conventionalcommits.org/en/v1.0.0/) messages when possible for pretty release notes.
@@ -43,7 +48,6 @@ Other ways to install kimmdy are currently discouraged because of the high numbe
 ## First simulation
 
 * change directory to `example_triala`
-* `ln -s ../../tests/test_files/assets/amber99sb-star-ildnp.ff ./amber99sb-star-ildnp.ff`
 * run kimmdy: `kimmdy -l INFO`
 * check output: `kimmdy.log`, `test_out_00X/`
 
