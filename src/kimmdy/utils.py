@@ -375,9 +375,11 @@ def truncate_sim_files(files: TaskFiles, time: float, keep_tail: bool = True):
         shell=True,
     )
     # FOR SOME REASON gmx check writes in stderr instead of stdout
-    m = re.search(r"Last frame.*time\s+(\d+\.\d+)", p.stderr)
-    last_time = float(m.group(1))
-    assert last_time * 1.01 >= time, "Request to truncate trajectory after last frame"
+    if m := re.search(r"Last frame.*time\s+(\d+\.\d+)", p.stderr):
+        last_time = float(m.group(1))
+        assert last_time * 1.01 >= time, "Request to truncate trajectory after last frame"
+    else:
+        raise RuntimeError(f"gmx check failed:\n{p.stdout}\n{p.stderr}")
 
     # backup the tails of trajectories
     for trj in [paths["trr"], paths["xtc"]]:
