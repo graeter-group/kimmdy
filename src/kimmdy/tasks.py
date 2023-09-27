@@ -95,7 +95,7 @@ def create_task_directory(runmng, postfix: str) -> TaskFiles:
     hand = logging.FileHandler(files.outputdir / (taskname + ".log"))
     hand.setFormatter(
         longFormatter(
-            "%(asctime)s %(name)-12s %(levelname)s: %(message)s", "%d-%m-%y %H:%M"
+            "%(asctime)s %(name)-12s %(levelname)s: %(message)s", "%d-%m-%y %H:%M:%S"
         )
     )
     files.logger.addHandler(hand)
