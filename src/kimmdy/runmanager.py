@@ -11,20 +11,15 @@ from copy import copy, deepcopy
 import dill
 import queue
 from enum import Enum, auto
-from typing import Any, Callable, Literal, Optional, Union
+from typing import Callable, Optional, Union
 from kimmdy.config import Config
 from kimmdy.parsing import read_top, write_json, write_top
-from kimmdy.recipe import RecipeCollection, Recipe, Break, Bind, Place, Relax
+from kimmdy.plugins import BasicParameterizer, parameterization_plugins, reaction_plugins, ReactionPlugin
+from kimmdy.recipe import RecipeCollection, Break, Bind, Place, Relax
+from kimmdy.utils import run_gmx, truncate_sim_files
 from kimmdy.coordinates import place_atom, break_bond_plumed, merge_top_slow_growth
 from kimmdy.tasks import Task, TaskFiles, get_plumed_out
-from kimmdy.utils import run_gmx
 from pprint import pformat
-from kimmdy.plugins import (
-    reaction_plugins,
-    parameterization_plugins,
-    ReactionPlugin,
-    BasicParameterizer,
-)
 from kimmdy.topology.topology import Topology
 import time
 from kimmdy.kmc import rf_kmc, KMCResult
@@ -119,7 +114,7 @@ class RunManager:
         self.iteration: int = 0
         self.state: State = State.IDLE
         self.recipe_collection: RecipeCollection = RecipeCollection([])
-        self.recipe: Optional[Recipe] = None
+        self.kmcresult: Union[KMCResult, None] = None
         self.time: float = 0.0  # [ps]
         self.latest_files: dict[str, Path] = get_existing_files(config)
         logger.debug("Initialized latest files:")
@@ -328,7 +323,7 @@ class RunManager:
             logger.debug("Append to file history")
             self.filehist.append({taskname: files})
 
-            logger.info(f"Current task files:")
+            logger.info("Current task files:")
             m = f"""
             Task: {taskname} with output directory: {files.outputdir}
             Task: {taskname}, input:\n{pformat(files.input)}
@@ -449,45 +444,51 @@ class RunManager:
         logger.info(
             f"Decide on a recipe from {len(self.recipe_collection.recipes)} available"
         )
-        decision_d = decision_strategy(self.recipe_collection)
-        self.recipe = decision_d.recipe
+        self.kmcresult = decision_strategy(self.recipe_collection)
+        recipe = self.kmcresult.recipe
 
         if self.config.save_recipes:
-            self.recipe_collection.to_csv(files.outputdir / "recipes.csv", self.recipe)
+            self.recipe_collection.to_csv(files.outputdir / "recipes.csv", recipe)
 
         try:
             if self.config.plot_rates:
                 kwargs = {
                     "outfile": files.outputdir / "reaction_rates.svg",
-                    "highlight_r": self.recipe,
+                    "highlight_r": recipe,
                 }
-                if (decision_d.time_start is not None) and (decision_d.time_start != 0):
-                    kwargs["highlight_t"] = decision_d.time_start
+                if (self.kmcresult.time_start is not None) and (
+                    self.kmcresult.time_start != 0
+                ):
+                    kwargs["highlight_t"] = self.kmcresult.time_start
                 self.recipe_collection.plot(**kwargs)
         except Exception as e:
             logger.warning(f"Error occured during plotting:\n{e}")
 
-        if decision_d.time_delta:
-            self.time += decision_d.time_delta
-        logger.info(
-            f"Chosen recipe is: {self.recipe.get_recipe_name()} at time {self.time}"
-        )
-        return None
+        if self.kmcresult.time_delta:
+            self.time += self.kmcresult.time_delta
+        logger.info(f"Chosen recipe is: {recipe.get_recipe_name()} at time {self.time}")
+        return
 
     def _apply_recipe(self, files: TaskFiles) -> TaskFiles:
         logger = files.logger
-        logger.info(f"Start Recipe in KIMMDY iteration {self.iteration}")
 
-        if self.recipe is None:
+        if self.kmcresult is None:
             m = "Attempting to _apply_recipe without having chosen one with _decide_recipe."
             logger.error(m)
             raise RuntimeError(m)
 
-        logger.info(f"Recipe: {self.recipe.get_recipe_name()}")
-        logger.debug(f"Chose recipe steps: {self.recipe.recipe_steps}")
+        recipe = self.kmcresult.recipe
+        logger.info(f"Start Recipe in KIMMDY iteration {self.iteration}")
+        logger.info(f"Recipe: {recipe.get_recipe_name()}")
+
+        logger.debug(f"Chose recipe steps: {recipe.recipe_steps}")
+
+        # Set time to chosen 'time_start' of KMCResult
+        if self.kmcresult.time_start is not None:
+            truncate_sim_files(files, self.kmcresult.time_start)
 
         top_initial = deepcopy(self.top)
-        for step in self.recipe.recipe_steps:
+        for step in recipe.recipe_steps:
             if isinstance(step, Break):
                 self.top.break_bond((step.atom_id_1, step.atom_id_2))
                 if hasattr(self.config, "plumed"):
@@ -502,7 +503,7 @@ class RunManager:
                 task = Task(
                     self,
                     f=place_atom,
-                    kwargs={"step": step, "timespan": self.recipe.timespans},
+                    kwargs={"step": step, "ttime": self.kmcresult.time_start},
                     out="place_atom",
                 )
                 place_files = task()
@@ -539,7 +540,7 @@ class RunManager:
         )
 
         # Recipe done, reset runmanger state
-        self.recipe = None
+        self.kmcresult = None
 
         logger.info("Reaction done")
         return files
