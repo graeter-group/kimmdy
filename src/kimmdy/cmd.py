@@ -15,7 +15,12 @@ from kimmdy.runmanager import RunManager
 from kimmdy.assets.templates import jobscript
 from kimmdy.utils import longFormatter
 from kimmdy.plugins import discover_plugins
-from kimmdy.plugins import reaction_plugins, broken_reaction_plugins, parameterization_plugins, broken_parameterization_plugins
+from kimmdy.plugins import (
+    reaction_plugins,
+    broken_reaction_plugins,
+    parameterization_plugins,
+    broken_parameterization_plugins,
+)
 import importlib.resources as pkg_resources
 import sys
 import os
@@ -185,7 +190,7 @@ def _run(args: argparse.Namespace):
         print("Available parameterization plugins:")
         for plugin in parameterization_plugins:
             print(plugin)
-        
+
         print("Found but not loadable parameterization plugins:")
         for plugin in broken_parameterization_plugins:
             print(plugin)

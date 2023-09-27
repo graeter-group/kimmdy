@@ -19,7 +19,12 @@ from kimmdy.coordinates import place_atom, break_bond_plumed, merge_top_slow_gro
 from kimmdy.tasks import Task, TaskFiles, get_plumed_out
 from kimmdy.utils import run_gmx
 from pprint import pformat
-from kimmdy.plugins import reaction_plugins, parameterization_plugins, ReactionPlugin, BasicParameterizer
+from kimmdy.plugins import (
+    reaction_plugins,
+    parameterization_plugins,
+    ReactionPlugin,
+    BasicParameterizer,
+)
 from kimmdy.topology.topology import Topology
 import time
 from kimmdy.kmc import rf_kmc, KMCResult

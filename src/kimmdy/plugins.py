@@ -22,6 +22,7 @@ broken_reaction_plugins: dict[str, Exception] = {}
 parameterization_plugins: dict[str, type[Parameterizer]] = {}
 broken_parameterization_plugins: dict[str, Exception] = {}
 
+
 def discover_plugins():
     if sys.version_info > (3, 10):
         from importlib_metadata import entry_points
