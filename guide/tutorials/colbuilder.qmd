@@ -9,7 +9,10 @@
 
 - Create a KIMMDY config file (kimmdy.yml) or modify an existing one 
 - Supply the necessary mdp files
+- Generate the necessary plumed configuration file (plumed.dat)
+- Add the edissoc.dat and ffbonded.itp file to the run directory
 - Set up the simulation box and equilibrate the system
+
 
 ## Simulation
 

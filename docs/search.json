@@ -378,11 +378,32 @@
     "text": "Name\nDescription\n\n\n\n\nBind\nChange topology to form a bond\n\n\nBondOperation\nHandle a bond operation on the recipe step.\n\n\nBreak\nChange topology to break a bond\n\n\nPlace\nChange topology and/or coordinates to place an atom.\n\n\nRecipe\nA reaction path defined by one series of RecipeSteps.\n\n\nRecipeCollection\nA RecipeCollection encompasses a number of reaction paths.\n\n\nRecipeStep\nBase class for all RecipeSteps.\n\n\nRelax\nStart a relaxation MD.\n\n\n\n\n\nrecipe.Bind()\nChange topology to form a bond\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\natom_ix_1\nint\nThe index of the first atom. zero-based, by default None\nrequired\n\n\natom_ix_2\nint\nThe index of the second atom. zero-based, by default None\nrequired\n\n\natom_id_1\nstr\nThe ID of the first atom. one-based, by default None\nrequired\n\n\natom_id_2\nstr\nThe ID of the second atom. one-based, by default None\nrequired\n\n\n\n\n\n\n\nrecipe.BondOperation(atom_ix_1, atom_ix_2, atom_id_1, atom_id_2, _atom_ix_1=field(init=False, repr=False, default=None), _atom_ix_2=field(init=False, repr=False, default=None))\nHandle a bond operation on the recipe step.\nThis class takes in either zero-based indices or one-base IDs for two atoms\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\natom_ix_1\nint\nThe index of the first atom. zero-based, by default None\nrequired\n\n\natom_ix_2\nint\nThe index of the second atom. zero-based, by default None\nrequired\n\n\natom_id_1\nstr\nThe ID of the first atom. one-based, by default None\nrequired\n\n\natom_id_2\nstr\nThe ID of the second atom. one-based, by default None\nrequired\n\n\n\n\n\n\n\n\n\nType\nDescription\n\n\n\n\nValueError\nIf neither an index nor an ID is provided for any of the atoms.\n\n\n\n\n\n\nInternally, this class stores the atom indices and converts IDs to indices as needed.\n\n\n\n\nrecipe.Break()\nChange topology to break a bond\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\natom_ix_1\nint\nThe index of the first atom. zero-based, by default None\nrequired\n\n\natom_ix_2\nint\nThe index of the second atom. zero-based, by default None\nrequired\n\n\natom_id_1\nstr\nThe ID of the first atom. one-based, by default None\nrequired\n\n\natom_id_2\nstr\nThe ID of the second atom. one-based, by default None\nrequired\n\n\n\n\n\n\n\nrecipe.Place(new_coords, ix_to_place, id_to_place, _ix_to_place=field(init=False, repr=False, default=None))\nChange topology and/or coordinates to place an atom.\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nnew_coords\ntuple[float, float, float]\nNew xyz coordinates for atom to place to. Valid for the end point of the recipe timespan.\nrequired\n\n\nix_to_place\nint\nIndex of atom to place. 0-based.\nrequired\n\n\nid_to_place\nstr\nIndex of atom to place. 1-based\nrequired\n\n\n\n\n\n\n\nrecipe.Recipe(recipe_steps, rates, timespans)\nA reaction path defined by one series of RecipeSteps. Defines everything necessart to build the product state from the educt state.\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nrecipe_steps\nlist[RecipeStep]\nSingle sequence of RecipeSteps to build product\nrequired\n\n\nrates\nlist[float]\nReaction rates corresponding 1:1 to timespans.\nrequired\n\n\ntimespans\nlist[list[float, float]]\nList of half-open timespans (t1, t2] in ps, at which this reaction path applies. Must have same number of timespans as rates. t1 can equal t2 for the first frame.\nrequired\n\n\n\n\n\n\n\n\n\nName\nDescription\n\n\n\n\ncalc_averages\nCalulate average rates over some window size\n\n\ncheck_consistency\nRun consistency checks for correct size of variables\n\n\ncombine_with\nCombines this Recipe with another with the same RecipeSteps.\n\n\n\n\n\nrecipe.Recipe.calc_averages(window_size)\nCalulate average rates over some window size\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nwindow_size\nint\nSize of the window to average over, -1 to average over whole available range.\nrequired\n\n\n\n\n\n\n\nrecipe.Recipe.check_consistency()\nRun consistency checks for correct size of variables\n\n\n\nrecipe.Recipe.combine_with(other)\nCombines this Recipe with another with the same RecipeSteps.\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nother\nRecipe\n\nrequired\n\n\n\n\n\n\n\n\n\nrecipe.RecipeCollection(recipes)\nA RecipeCollection encompasses a number of reaction paths. They can originate from multiple reaction plugins, but do not need to.\n\n\n\n\n\nName\nDescription\n\n\n\n\naggregate_reactions\nCombines reactions having the same sequence of RecipeSteps.\n\n\ncalc_cumprob\nCalculate cumulative probability of all contained recipe steps.\n\n\nfrom_csv\nCreate a RecipeCollection object from a CSV file\n\n\nplot\nPlot reaction rates over time\n\n\nto_csv\nWrite a ReactionResult as defined in the reaction module to a csv file\n\n\n\n\n\nrecipe.RecipeCollection.aggregate_reactions()\nCombines reactions having the same sequence of RecipeSteps.\n\n\n\nrecipe.RecipeCollection.calc_cumprob()\nCalculate cumulative probability of all contained recipe steps. Sums up to 1 over all recipes. Assumes constant rate for given timespan and rate zero otherwise.\n\n\n\nrecipe.RecipeCollection.from_csv(path)\nCreate a RecipeCollection object from a CSV file Returns the recipe collection and a single recipe that was picked, otherwise None\n\n\n\nrecipe.RecipeCollection.plot(outfile, highlight_r=None, highlight_t=None)\nPlot reaction rates over time\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\noutfile\nPath\nWhere to save the plot, must have compatible suffix.\nrequired\n\n\nhighlight_r\nRecipe\nRecipe to highlight, by default None\nNone\n\n\nhighlight_t\nfloat\nTime at which the reactions starts\nNone\n\n\n\n\n\n\n\nrecipe.RecipeCollection.to_csv(path, picked_recipe=None)\nWrite a ReactionResult as defined in the reaction module to a csv file\n\n\n\n\n\nrecipe.RecipeStep()\nBase class for all RecipeSteps. Indices can be accessed as 0-based or 1-based. ix: 0-based, int id: 1-based, str\n\n\n\nrecipe.Relax()\nStart a relaxation MD.\nThe molecular system coordinates are far out of equilibrium after most topology changes. A relaxtion MD simulation using for example the slow growth method helps to reach the new equilibrium."
   },
   {
-    "objectID": "guide/colbuilder.html",
-    "href": "guide/colbuilder.html",
-    "title": "Preparation",
+    "objectID": "guide/tutorials/colbuilder.html",
+    "href": "guide/tutorials/colbuilder.html",
+    "title": "1. Run KIMMDY from Colbuilder fibril",
     "section": "",
-    "text": "Preparation\n\n\nSimulation\n#Analysis\n\n\n\n\n Back to top"
+    "text": "Download the desired model and the ff parameters for gromacs from colbuilder\nClean the force field files by moving ‘amber99sb-star-ildnp.ff’ up to the working directory, adding ‘residuetypes.dat’ and ‘specbond.dat’ to the working directory, removing temporary files ’._*’ and deleting the rest of collagen.ff\nConvert the pdb file to .gro format and create a unified topology file (this may take a while)\n\ngmx pdb2gmx -f Homo_sapiens_aln_N_HLKNL_12_C_PYD_2_fibril.pdb -o fibril.gro -ignh -merge all\n\nCreate a KIMMDY config file (kimmdy.yml) or modify an existing one\nSupply the necessary mdp files\nSet up the simulation box and equilibrate the system\n\n\n\n\nkimmdy\n\n\n\nkimmdy-analysis"
+  },
+  {
+    "objectID": "guide/tutorials/colbuilder.html#preparation",
+    "href": "guide/tutorials/colbuilder.html#preparation",
+    "title": "1. Run KIMMDY from Colbuilder fibril",
+    "section": "",
+    "text": "Download the desired model and the ff parameters for gromacs from colbuilder\nClean the force field files by moving ‘amber99sb-star-ildnp.ff’ up to the working directory, adding ‘residuetypes.dat’ and ‘specbond.dat’ to the working directory, removing temporary files ’._*’ and deleting the rest of collagen.ff\nConvert the pdb file to .gro format and create a unified topology file (this may take a while)\n\ngmx pdb2gmx -f Homo_sapiens_aln_N_HLKNL_12_C_PYD_2_fibril.pdb -o fibril.gro -ignh -merge all\n\nCreate a KIMMDY config file (kimmdy.yml) or modify an existing one\nSupply the necessary mdp files\nSet up the simulation box and equilibrate the system"
+  },
+  {
+    "objectID": "guide/tutorials/colbuilder.html#simulation",
+    "href": "guide/tutorials/colbuilder.html#simulation",
+    "title": "1. Run KIMMDY from Colbuilder fibril",
+    "section": "",
+    "text": "kimmdy"
+  },
+  {
+    "objectID": "guide/tutorials/colbuilder.html#analysis",
+    "href": "guide/tutorials/colbuilder.html#analysis",
+    "title": "1. Run KIMMDY from Colbuilder fibril",
+    "section": "",
+    "text": "kimmdy-analysis"
   },
   {
     "objectID": "guide/tutorials/index.html",
@@ -523,33 +544,5 @@
     "title": "Explanations",
     "section": "",
     "text": "Pages that help you understand the inner workings of KIMMDY\n\n\n\n Back to top"
-  },
-  {
-    "objectID": "guide/tutorials/colbuilder.html",
-    "href": "guide/tutorials/colbuilder.html",
-    "title": "1. Run KIMMDY from Colbuilder fibril",
-    "section": "",
-    "text": "Download the desired model and the ff parameters for gromacs from colbuilder\nClean the force field files by moving ‘amber99sb-star-ildnp.ff’ up to the working directory, adding ‘residuetypes.dat’ and ‘specbond.dat’ to the working directory, removing temporary files ’._*’ and deleting the rest of collagen.ff\nConvert the pdb file to .gro format and create a unified topology file (this may take a while)\n\ngmx pdb2gmx -f Homo_sapiens_aln_N_HLKNL_12_C_PYD_2_fibril.pdb -o fibril.gro -ignh -merge all\n\nCreate a KIMMDY config file (kimmdy.yml) or modify an existing one\nSupply the necessary mdp files\nSet up the simulation box and equilibrate the system\n\n\n\n\nkimmdy\n\n\n\nkimmdy-analysis"
-  },
-  {
-    "objectID": "guide/tutorials/colbuilder.html#preparation",
-    "href": "guide/tutorials/colbuilder.html#preparation",
-    "title": "1. Run KIMMDY from Colbuilder fibril",
-    "section": "",
-    "text": "Download the desired model and the ff parameters for gromacs from colbuilder\nClean the force field files by moving ‘amber99sb-star-ildnp.ff’ up to the working directory, adding ‘residuetypes.dat’ and ‘specbond.dat’ to the working directory, removing temporary files ’._*’ and deleting the rest of collagen.ff\nConvert the pdb file to .gro format and create a unified topology file (this may take a while)\n\ngmx pdb2gmx -f Homo_sapiens_aln_N_HLKNL_12_C_PYD_2_fibril.pdb -o fibril.gro -ignh -merge all\n\nCreate a KIMMDY config file (kimmdy.yml) or modify an existing one\nSupply the necessary mdp files\nSet up the simulation box and equilibrate the system"
-  },
-  {
-    "objectID": "guide/tutorials/colbuilder.html#simulation",
-    "href": "guide/tutorials/colbuilder.html#simulation",
-    "title": "1. Run KIMMDY from Colbuilder fibril",
-    "section": "",
-    "text": "kimmdy"
-  },
-  {
-    "objectID": "guide/tutorials/colbuilder.html#analysis",
-    "href": "guide/tutorials/colbuilder.html#analysis",
-    "title": "1. Run KIMMDY from Colbuilder fibril",
-    "section": "",
-    "text": "kimmdy-analysis"
   }
 ]
