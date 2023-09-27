@@ -363,8 +363,8 @@ def truncate_sim_files(files: TaskFiles, time: float, keep_tail: bool = True):
             paths[s] = None
 
     # trr or xtc must be present
-    if (traj := paths['trr']) is None:
-        if (traj := paths['xtc']) is None:
+    if (traj := paths["trr"]) is None:
+        if (traj := paths["xtc"]) is None:
             raise RuntimeError("No trajectory file!")
 
     # check time exists in traj

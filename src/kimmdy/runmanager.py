@@ -468,7 +468,9 @@ class RunManager:
                     "outfile": files.outputdir / "reaction_rates.svg",
                     "highlight_r": recipe,
                 }
-                if (self.kmcresult.time_start is not None) and (self.kmcresult.time_start != 0):
+                if (self.kmcresult.time_start is not None) and (
+                    self.kmcresult.time_start != 0
+                ):
                     kwargs["highlight_t"] = self.kmcresult.time_start
                 self.recipe_collection.plot(**kwargs)
         except Exception as e:
@@ -476,9 +478,7 @@ class RunManager:
 
         if self.kmcresult.time_delta:
             self.time += self.kmcresult.time_delta
-        logger.info(
-            f"Chosen recipe is: {recipe.get_recipe_name()} at time {self.time}"
-        )
+        logger.info(f"Chosen recipe is: {recipe.get_recipe_name()} at time {self.time}")
         return
 
     def _apply_recipe(self, files: TaskFiles) -> TaskFiles:
