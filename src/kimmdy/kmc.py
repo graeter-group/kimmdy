@@ -31,7 +31,7 @@ class KMCResult:
         MC time jump during which the reaction occurs [ps]
     time_start
         Time, from which the reaction starts. The reaction changes the
-        geometry/topology of this timestep and continues from there.
+        geometry/topology of this timestep and continues from there. [ps]
     """
 
     recipe: Recipe = field(default_factory=lambda: Recipe([], [], []))
@@ -45,6 +45,7 @@ def rf_kmc(
 ) -> KMCResult:
     """Rejection-Free Monte Carlo.
     Takes RecipeCollection and choses a recipe based on the relative propensity of the events.
+    The 'start' time of the reaction is the time of the highest rate of the accepted reaction.
 
     Compare e.g. [Wikipedia KMC - rejection free](https://en.wikipedia.org/wiki/Kinetic_Monte_Carlo#Rejection-free_KMC)
 
@@ -83,7 +84,7 @@ def rf_kmc(
     pos = np.searchsorted(probability_cumulative, u[0] * probability_sum)
     recipe = recipe_collection.recipes[pos]
     reaction_time = recipe.timespans[np.argmax(recipe.rates)][1]
-    logger.info(f"Chosen Recipe: {recipe}")
+    logger.info(f"Chosen Recipe: {recipe} at time {reaction_time}")
 
     # 5. Calculate the time step associated with mu
     time_delta = np.log(1 / u[1]) / probability_sum
