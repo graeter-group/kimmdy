@@ -11,16 +11,20 @@ from copy import copy, deepcopy
 import dill
 import queue
 from enum import Enum, auto
-from typing import Callable, Union
+from typing import Callable, Optional, Union
 from kimmdy.config import Config
-from kimmdy.parsing import read_top, write_json, read_plumed, write_top
+from kimmdy.parsing import read_top, write_json, write_top
+from kimmdy.plugins import (
+    BasicParameterizer,
+    parameterization_plugins,
+    reaction_plugins,
+    ReactionPlugin,
+)
 from kimmdy.recipe import RecipeCollection, Break, Bind, Place, Relax
-from kimmdy.plugins import ReactionPlugin, BasicParameterizer
-from kimmdy.coordinates import place_atom, break_bond_plumed, merge_top_slow_growth
-from kimmdy.tasks import Task, TaskFiles, TaskMapping
 from kimmdy.utils import run_gmx, truncate_sim_files
+from kimmdy.coordinates import place_atom, break_bond_plumed, merge_top_slow_growth
+from kimmdy.tasks import Task, TaskFiles, get_plumed_out
 from pprint import pformat
-from kimmdy import reaction_plugins, parameterization_plugins
 from kimmdy.topology.topology import Topology
 import time
 from kimmdy.kmc import rf_kmc, KMCResult
@@ -43,33 +47,20 @@ class State(Enum):
     DONE = auto()
 
 
-def get_plumed_out(plumed: Path) -> str:
-    plumed_parsed = read_plumed(plumed)
-    plumed_out = None
-    for part in plumed_parsed["prints"]:
-        if file := part.get("FILE"):
-            if not plumed_out:
-                plumed_out = file
-                logger.debug(f"Found plumed print FILE {plumed_out}")
-            else:
-                raise RuntimeError("Multiple FILE sections found in plumed dat")
-    return plumed_out
-
-
 def get_existing_files(config: Config, section: str = "root") -> dict:
     """Initialize latest_files with every existing file defined in config"""
     file_d = {}
-    attr_names = filter(lambda s: s[0] != "_", config.__dir__())
+    attr_names = config.get_attributes()
     for attr_name in attr_names:
         attr = getattr(config, attr_name)
         if isinstance(attr, Path):
-            if not attr.exists():
-                # File exists checks are in the config
+            if attr.is_dir() or not attr.exists():
                 continue
-            key = attr.suffix[1:]  # rm the get_existing_files
+            # suffix without dot
+            key = attr.suffix[1:]
 
             # AMBIGUOUS_SUFFS -> key whole name
-            if attr.suffix[1:] in AMBIGUOUS_SUFFS:
+            if key in AMBIGUOUS_SUFFS:
                 key = attr.name
 
             if attr_name == "plumed":
@@ -90,32 +81,34 @@ class RunManager:
 
     Attributes
     ----------
-    config :
+    config
         The configuration object.
-    from_checkpoint :
+    from_checkpoint
         Whether the runmanager was initialized from a checkpoint.
-    tasks :
+    tasks
         Tasks from config.
-    crr_tasks :
+    crr_tasks
         Current tasks.
-    iteration :
+    iteration
         Current iteration.
-    state :
+    state
         Current state of the system.
-    recipe_collection :
+    recipe_collection
         Collection of recipes.
-    latest_files :
+    latest_files
         Dictionary of latest files.
-    histfile :
+    histfile
         Path to history file.
-    cptfile :
+    cptfile
         Path to checkpoint file.
-    top :
+    top
         Topology object.
-    filehist :
+    filehist
         List of dictionaries of TaskFiles.
-    task_mapping :
+    task_mapping
         Mapping of task names to runmanager methods.
+    reaction_plugins
+        List of initialized reaction plugins used in the sequence.
     """
 
     def __init__(self, config: Config):
@@ -153,36 +146,35 @@ class RunManager:
             {"setup": TaskFiles(self.get_latest)}
         ]
 
-        self.task_mapping: TaskMapping = {
-            "md": self._run_md,
+        self.task_mapping = {
+            "md": {"f": self._run_md, "kwargs": {}, "out": None},
             "reactions": [
-                {"f": self._place_reaction_tasks},
-                {"f": self._decide_recipe, "kwargs": {"decision_strategy": rf_kmc}},
-                {"f": self._apply_recipe, "out": "apply_recipe"},
+                {"f": self._place_reaction_tasks, "kwargs": {}, "out": None},
+                {
+                    "f": self._decide_recipe,
+                    "kwargs": {"decision_strategy": rf_kmc},
+                    "out": "decide_recipe",
+                },
+                {"f": self._apply_recipe, "kwargs": {}, "out": "apply_recipe"},
             ],
         }
+        """Mapping of task names to functions and their keyword arguments."""
 
-        # decide_recipe only needs a outputdir some times:
-        if self.config.plot_rates or self.config.save_recipes:
-            self.task_mapping["reactions"][1]["out"] = "decide_recipe"
-
-        # Instantiate reactions
+        # Initialize reaction plugins used in the sequence
         self.reaction_plugins: list[ReactionPlugin] = []
-        react_names = self.config.reactions.get_attributes()
-        logger.debug(f"Instantiating Reactions: {react_names}")
-        for rp_name in react_names:
-            r = reaction_plugins[rp_name]
-            reaction_plugin: ReactionPlugin = r(rp_name, self)
+        for name in self.config.reactions.get_attributes():
+            logger.debug(f"Initializing reaction: {name}")
+            Plugin = reaction_plugins[name]
+            reaction_plugin = Plugin(name, self)
             self.reaction_plugins.append(reaction_plugin)
 
     def run(self):
         logger.info("Start run")
         self.start_time = time.time()
-        self.current_time = time.time()
+        self.current_time = self.start_time
 
         if self.from_checkpoint:
-            print(logger)
-            logger.info("KIMMDY is starting from a checkpoint.")
+            logger.info(f"KIMMDY is starting from a checkpoint.")
         else:
             self._setup_tasks()
 
@@ -209,44 +201,41 @@ class RunManager:
 
     def _setup_tasks(self):
         """Populates the tasks queue.
-        Allows for mapping one config entry to multiple tasks
+        Allows for mapping one sequence entry in the config to multiple tasks
         """
-        logger.info("Build task list")
-        for entry in self.config.sequence:
-            # handle md steps
-            if hasattr(self.config, "mds"):
-                if entry in self.config.mds.get_attributes():
-                    task = Task(
-                        self,
-                        f=self.task_mapping["md"],
-                        kwargs={"instance": entry},
-                        out=entry,
-                    )
-                    self.tasks.put(task)
-                    continue
+        logger.info("Building task list")
+        for step in self.config.sequence:
+            if step in self.config.mds.get_attributes():
+                # entry is a type of MD
+                md = self.task_mapping["md"]
+                kwargs: dict = copy(md["kwargs"])
+                kwargs.update({"instance": step})
+                task = Task(
+                    self,
+                    f=md["f"],
+                    kwargs=kwargs,
+                    out=step,
+                )
+                self.tasks.put(task)
 
-            # handle single reaction steps
-            if entry in self.config.reactions.get_attributes():
+            elif step in self.config.reactions.get_attributes():
+                # entry is a single reaction
                 task_list = copy(self.task_mapping["reactions"])
-                task_list[0] = {
-                    "f": self._place_reaction_tasks,
-                    "kwargs": {"selected": entry},
-                }
+                # 0 is place_reaction_tasks
+                task_list[0]["kwargs"].update({"selected": step})
 
-                for task_kargs in task_list:
-                    self.tasks.put(Task(self, **task_kargs))
-                continue
+                for task_kwargs in task_list:
+                    self.tasks.put(Task(self, **task_kwargs))
+            elif step == "reactions":
+                # check all reactions
+                for task_kwargs in self.task_mapping["reactions"]:
+                    self.tasks.put(Task(self, **task_kwargs))
+            else:
+                m = f"Unknown task encountered in the sequence: {step}"
+                logger.error(m)
+                raise ValueError(m)
 
-            # handle combined reaction steps
-            if entry == "reactions":
-                for task_kargs in self.task_mapping[entry]:
-                    self.tasks.put(Task(self, **task_kargs))
-                continue
-            m = f"Unknown task encounterd: {entry}"
-            logger.error(m)
-            raise ValueError(m)
-
-    def write_one_checkoint(self):
+    def write_one_checkpoint(self):
         """Just write the first checkpoint and then exit
 
         Used to generate a starting point for jobscripts on hpc clusters
@@ -292,7 +281,9 @@ class RunManager:
         files = task()
         self._discover_output_files(task.name, files)
 
-    def _discover_output_files(self, taskname, files: TaskFiles):
+    def _discover_output_files(
+        self, taskname: str, files: TaskFiles
+    ) -> Optional[TaskFiles]:
         """Discover further files written by a task.
 
         and add those files to the `files` as well as
@@ -347,7 +338,12 @@ class RunManager:
             with open(self.histfile, "a") as f:
                 f.write(m)
 
-    def _run_md(self, instance, files) -> TaskFiles:
+            return files
+        else:
+            logger.warning("No output directory found for task: " + taskname)
+            return None
+
+    def _run_md(self, instance: str, files: TaskFiles) -> TaskFiles:
         """General MD simulation"""
         logger = files.logger
         logger.info(f"Start MD {instance}")
@@ -389,10 +385,6 @@ class RunManager:
             "-npme 0 -ntmpi 1 "
             f"{gmx_mdrun_flags}  "
         )
-        # -ntomp {ntomp} removed for now
-        # like this, the previous checkpoint file would not be used,
-        # -t and -e options from grompp
-        # replace the checkpoint file if gen_vel = no in the mdp file
 
         if getattr(md_config, "use_plumed"):
             mdrun_cmd += f" -plumed {files.input['plumed']}"
@@ -409,7 +401,7 @@ class RunManager:
         logger.info(f"Done with MD {instance}")
         return files
 
-    def _place_reaction_tasks(self, selected: Union[str, None] = None):
+    def _place_reaction_tasks(self, selected: Optional[str] = None) -> None:
         logger.info("Query reactions")
         self.state = State.REACTION
         # empty list for every new round of queries
@@ -431,9 +423,11 @@ class RunManager:
             )
 
         logger.info(f"Queued {len(self.reaction_plugins)} reaction plugin(s)")
-        return
+        return None
 
-    def _query_reaction(self, reaction_plugin, files):
+    def _query_reaction(
+        self, reaction_plugin: ReactionPlugin, files: TaskFiles
+    ) -> TaskFiles:
         logger = files.logger
         logger.info(f"Start query {reaction_plugin.name}")
 
@@ -446,12 +440,11 @@ class RunManager:
         return files
 
     def _decide_recipe(
-        self, decision_strategy: Callable[[RecipeCollection], KMCResult], files=None
-    ):
-        if files is None:
-            logger = logging.getLogger(__name__)
-        else:
-            logger = files.logger
+        self,
+        decision_strategy: Callable[[RecipeCollection], KMCResult],
+        files: TaskFiles,
+    ) -> None:
+        logger = files.logger
 
         logger.info(
             f"Decide on a recipe from {len(self.recipe_collection.recipes)} available"
@@ -483,6 +476,12 @@ class RunManager:
 
     def _apply_recipe(self, files: TaskFiles) -> TaskFiles:
         logger = files.logger
+
+        if self.kmcresult is None:
+            m = "Attempting to _apply_recipe without having chosen one with _decide_recipe."
+            logger.error(m)
+            raise RuntimeError(m)
+
         recipe = self.kmcresult.recipe
         logger.info(f"Start Recipe in KIMMDY iteration {self.iteration}")
         logger.info(f"Recipe: {recipe.get_recipe_name()}")
@@ -490,7 +489,8 @@ class RunManager:
         logger.debug(f"Chose recipe steps: {recipe.recipe_steps}")
 
         # Set time to chosen 'time_start' of KMCResult
-        truncate_sim_files(files, self.kmcresult.time_start)
+        if self.kmcresult.time_start is not None:
+            truncate_sim_files(files, self.kmcresult.time_start)
 
         top_initial = deepcopy(self.top)
         for step in recipe.recipe_steps:
@@ -521,7 +521,7 @@ class RunManager:
                     continue
 
                 if self.config.changer.coordinates.slow_growth:
-                    # Create a slow growth topology for sub-task run_md, afterwards, top will be set back properly
+                    # Create a slow growth topology for sub-task run_md, afterwards, top will be reset properly
                     top_merge = merge_top_slow_growth(top_initial, deepcopy(self.top))
                     top_merge_path = files.outputdir / self.config.top.name.replace(
                         ".", "_mod."

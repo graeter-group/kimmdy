@@ -72,9 +72,6 @@ def place_atom(files: TaskFiles, step: Place, ttime: float = -1.0) -> TaskFiles:
     return files
 
 
-# topology
-
-
 def is_parameterized(entry: Interaction):
     """Parameterized topology entries have c0 and c1 attributes != None"""
     return entry.c0 is not None and entry.c1 is not None
@@ -86,7 +83,7 @@ def get_explicit_MultipleDihedrals(
     dihedrals_in: Optional[MultipleDihedrals],
     ff: FF,
     periodicity_max: int = 6,
-) -> Union[MultipleDihedrals, None]:
+) -> Optional[MultipleDihedrals]:
     """Takes a valid dihedral key and returns explicit
     dihedral parameters for a given topology
     """
@@ -97,7 +94,7 @@ def get_explicit_MultipleDihedrals(
         # empty string means implicit parameters
         return dihedrals_in
 
-    type_key = [mol.atoms[x].type for x in dihedral_key]
+    type_key = [mol.atoms[id].type for id in dihedral_key]
 
     multiple_dihedrals = MultipleDihedrals(*dihedral_key, "9", {})
     for periodicity in range(1, periodicity_max + 1):
@@ -106,8 +103,13 @@ def get_explicit_MultipleDihedrals(
         )
         if match_obj:
             assert isinstance(match_obj, DihedralType)
-            l = [*dihedral_key, "9", match_obj.c0, match_obj.c1, match_obj.periodicity]
-            multiple_dihedrals.dihedrals[str(periodicity)] = Dihedral.from_top_line(l)
+            multiple_dihedrals.dihedrals[str(periodicity)] = Dihedral(
+                *dihedral_key,
+                funct="9",
+                c0=match_obj.c0,
+                c1=match_obj.c1,
+                periodicity=match_obj.periodicity,
+            )
 
     if not multiple_dihedrals.dihedrals:
         return None
@@ -147,10 +149,10 @@ def get_explicit_or_type(
 
 def merge_dihedrals(
     dihedral_key: tuple[str, str, str, str],
-    interactionA: Union[Dihedral, None],
-    interactionB: Union[Dihedral, None],
-    interaction_typesA: dict[tuple[str, ...], DihedralType],
-    interaction_typesB: dict[tuple[str, ...], DihedralType],
+    interactionA: Optional[Dihedral],
+    interactionB: Optional[Dihedral],
+    interaction_typesA: InteractionTypes,
+    interaction_typesB: InteractionTypes,
     molA: MoleculeType,
     molB: MoleculeType,
     funct: str,
@@ -218,9 +220,9 @@ def merge_dihedrals(
             c5=parameterizedB.periodicity,
         )
     else:
-        raise ValueError(
-            f"Tried to merge two dihedrals of {dihedral_key} but no parameterized dihedrals found!"
-        )
+        m = f"Tried to merge two dihedrals of {dihedral_key} but no parameterized dihedrals found!"
+        logger.error(m)
+        raise ValueError(m)
     return dihedralmerge
 
 
@@ -458,9 +460,6 @@ def merge_top_slow_growth(
     molB = merge_top_moleculetypes_slow_growth(molA, molB, topB.ff, focus_nr)
 
     return topB
-
-
-# plumed
 
 
 def break_bond_plumed(

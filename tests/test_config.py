@@ -158,11 +158,9 @@ def test_get_existing_files(arranged_tmp_path):
     file_d = get_existing_files(config)
     assert set(file_d.keys()) == set(
         [
-            "",
             "top",
             "gro",
             "ndx",
-            "ff",
             "plumed",
             "plumed_out",
             "pullf1500_equil.mdp",
