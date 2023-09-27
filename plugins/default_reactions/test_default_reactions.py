@@ -4,7 +4,6 @@ Tests for default_reactions reaction plugin.
 Is skipped if KIMMDY was installed without the plugin.
 """
 import pytest
-from kimmdy import reaction_plugins
 from kimmdy.runmanager import RunManager
 
 pytest.importorskip("homolysis")

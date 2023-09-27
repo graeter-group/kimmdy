@@ -8,7 +8,7 @@ from pprint import pformat, pprint
 from typing import Any, Optional
 import yaml
 from pathlib import Path
-from kimmdy import (
+from kimmdy.plugins import (
     reaction_plugins,
     broken_reaction_plugins,
     parameterization_plugins,

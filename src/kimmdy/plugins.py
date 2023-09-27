@@ -1,10 +1,13 @@
 """Plugin base classes and basic instances thereof.
+
+Also discovers and loads KIMMDY plugins.
 """
 
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from abc import ABC, abstractmethod
 import logging
+import sys
 
 if TYPE_CHECKING:
     from kimmdy.runmanager import RunManager
@@ -12,6 +15,40 @@ if TYPE_CHECKING:
     from kimmdy.recipe import RecipeCollection
     from kimmdy.tasks import TaskFiles
     from kimmdy.topology.topology import Topology
+
+
+reaction_plugins: dict[str, type[ReactionPlugin]] = {}
+broken_reaction_plugins: dict[str, Exception] = {}
+parameterization_plugins: dict[str, type[Parameterizer]] = {}
+broken_parameterization_plugins: dict[str, Exception] = {}
+
+def discover_plugins():
+    if sys.version_info > (3, 10):
+        from importlib_metadata import entry_points
+
+        discovered_reaction_plugins = entry_points(group="kimmdy.reaction_plugins")
+        discovered_parameterization_plugins = entry_points(
+            group="kimmdy.parameterization_plugins"
+        )
+    else:
+        from importlib.metadata import entry_points
+
+        discovered_reaction_plugins = entry_points()["kimmdy.reaction_plugins"]
+        discovered_parameterization_plugins = entry_points()[
+            "kimmdy.parameterization_plugins"
+        ]
+
+    for _ep in discovered_reaction_plugins:
+        try:
+            reaction_plugins[_ep.name] = _ep.load()
+        except Exception as _e:
+            broken_reaction_plugins[_ep.name] = _e
+
+    for _ep in discovered_parameterization_plugins:
+        try:
+            parameterization_plugins[_ep.name] = _ep.load()
+        except Exception as _e:
+            broken_parameterization_plugins[_ep.name] = _e
 
 
 logger = logging.getLogger(__name__)

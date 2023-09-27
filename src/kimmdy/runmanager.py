@@ -15,12 +15,11 @@ from typing import Any, Callable, Literal, Optional, Union
 from kimmdy.config import Config
 from kimmdy.parsing import read_top, write_json, write_top
 from kimmdy.recipe import RecipeCollection, Recipe, Break, Bind, Place, Relax
-from kimmdy.plugins import ReactionPlugin, BasicParameterizer
 from kimmdy.coordinates import place_atom, break_bond_plumed, merge_top_slow_growth
 from kimmdy.tasks import Task, TaskFiles, get_plumed_out
 from kimmdy.utils import run_gmx
 from pprint import pformat
-from kimmdy import reaction_plugins, parameterization_plugins
+from kimmdy.plugins import reaction_plugins, parameterization_plugins, ReactionPlugin, BasicParameterizer
 from kimmdy.topology.topology import Topology
 import time
 from kimmdy.kmc import rf_kmc, KMCResult
