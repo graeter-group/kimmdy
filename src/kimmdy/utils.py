@@ -369,7 +369,7 @@ def truncate_sim_files(files: TaskFiles, time: float, keep_tail: bool = True):
 
     # check time exists in traj
     p = sp.run(
-        f"gmx -quiet -nocopyright check -f {paths['trr']}",
+        f"gmx -quiet -nocopyright check -f {traj}",
         text=True,
         capture_output=True,
         shell=True,
