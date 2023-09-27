@@ -24,6 +24,7 @@ Utilities for building plugins, shell convenience functions and GROMACS related 
 | [morse_transition_rate](#kimmdy.utils.morse_transition_rate) | Calculates reaction rate constant for a bond breaking event. |
 | [run_gmx](#kimmdy.utils.run_gmx) | Run GROMACS command in shell. |
 | [run_shell_cmd](#kimmdy.utils.run_shell_cmd) | Run command in shell. |
+| [truncate_sim_files](#kimmdy.utils.truncate_sim_files) | Truncates latest trr, xtc, edr, and gro to the time to a previous |
 
 ### check_gmx_version { #kimmdy.utils.check_gmx_version }
 
@@ -133,3 +134,20 @@ Adds a '-quiet' flag to the command and checks the return code.
 `utils.run_shell_cmd(s, cwd=None)`
 
 Run command in shell.
+
+### truncate_sim_files { #kimmdy.utils.truncate_sim_files }
+
+`utils.truncate_sim_files(files, time, keep_tail=True)`
+
+Truncates latest trr, xtc, edr, and gro to the time to a previous
+point in time.
+
+The files stay in place, the truncated tail is by default kept and renamed
+to '[...xtc].tail'
+
+#### Parameters
+
+| Name    | Type                                  | Description                                          | Default    |
+|---------|---------------------------------------|------------------------------------------------------|------------|
+| `time`  | [float](`float`)                      | Time in ps up to which the data should be truncated. | _required_ |
+| `files` | [TaskFiles](`kimmdy.tasks.TaskFiles`) | TaskFiles to get the latest files.                   | _required_ |

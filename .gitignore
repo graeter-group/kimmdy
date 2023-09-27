@@ -30,6 +30,8 @@ guide/kimmdy-tutorial
 
 # excludes
 !tests/test_files/test_coordinates/pull.trr
+!tests/test_files/test_coordinates/relax.trr
+!tests/test_files/test_coordinates/relax.xtc
 !tests/test_files/test_config/pull.trr
 !tests/test_files/test_integration/hexalanine_single_reaction/pull.trr
 
