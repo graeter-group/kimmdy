@@ -14,7 +14,12 @@ from enum import Enum, auto
 from typing import Callable, Optional, Union
 from kimmdy.config import Config
 from kimmdy.parsing import read_top, write_json, write_top
-from kimmdy.plugins import BasicParameterizer, parameterization_plugins, reaction_plugins, ReactionPlugin
+from kimmdy.plugins import (
+    BasicParameterizer,
+    parameterization_plugins,
+    reaction_plugins,
+    ReactionPlugin,
+)
 from kimmdy.recipe import RecipeCollection, Break, Bind, Place, Relax
 from kimmdy.utils import run_gmx, truncate_sim_files
 from kimmdy.coordinates import place_atom, break_bond_plumed, merge_top_slow_growth
