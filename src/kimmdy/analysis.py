@@ -6,11 +6,13 @@ from pathlib import Path
 import MDAnalysis as mda
 import subprocess as sp
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 import matplotlib as mpl
 import seaborn.objects as so
 import argparse
 from seaborn import axes_style
 import pandas as pd
+from datetime import datetime
 
 from kimmdy.utils import run_shell_cmd
 from kimmdy.parsing import read_json, write_json
@@ -326,6 +328,84 @@ def plot_rates(dir: str):
         rc.plot(analysis_dir / f"{i}_reaction_rates.svg", highlight_r=picked_rp)
 
 
+def plot_runtime(dir: str, md_tasks: list, datefmt: str):
+    """Plot runtime of all tasks.
+
+    Parameters
+    ----------
+    dir
+        Directory of KIMMDY run
+    datefmt
+        Date format in the KIMMDY logfile
+    """
+
+    def time_from_logfile(log_path: Path, sep: int, factor: float = 1.0):
+        with open(log_path, "r") as f:
+            log = f.readlines()
+        starttime = datetime.strptime(" ".join(log[0].split()[:sep]), datefmt)
+        endtime = datetime.strptime(" ".join(log[-1].split()[:sep]), datefmt)
+        return (endtime - starttime).total_seconds() * factor
+
+    run_dir = Path(dir).expanduser().resolve()
+    analysis_dir = get_analysis_dir(run_dir)
+    n_datefmt_substrings = len(datefmt.split())
+
+    run_log = next(run_dir.glob("*.log"))
+    walltime = time_from_logfile(run_log, n_datefmt_substrings)
+
+    # set scale of plot to hour, minute or second
+    if walltime < 120:
+        t_factor = 1.0
+        t_unit = "s"
+    elif walltime < 7200:
+        t_factor = 1 / 60
+        t_unit = "min"
+    else:
+        t_factor = 1 / 3600
+        t_unit = "h"
+    walltime = walltime * t_factor
+
+    tasks = []
+    runtimes = []
+    # sort by task number which is the number before _ in the logfile name
+    for log_path in sorted(
+        run_dir.glob("*_*/*_*.log"), key=lambda x: int(x.name.split(sep="_")[0])
+    ):
+        tasks.append(log_path.stem)
+        runtimes.append(time_from_logfile(log_path, n_datefmt_substrings, t_factor))
+    overhead = walltime - sum(runtimes)
+    # sns muted palette
+    c_palette = [
+        "#4878d0",
+        "#ee854a",
+        "#6acc64",
+        "#d65f5f",
+        "#956cb4",
+        "#8c613c",
+        "#dc7ec0",
+        "#797979",
+        "#d5bb67",
+        "#82c6e2",
+    ]
+    c = [
+        c_palette[0] if x.split(sep="_")[1] in md_tasks else c_palette[1] for x in tasks
+    ]
+
+    l1 = mpatches.Patch(color="#4878d0", label="MD task")
+    l2 = mpatches.Patch(color="#ee854a", label="Reaction task")
+    l3 = mpatches.Patch(color="#d65f5f", label="Overhead")
+    plt.legend(handles=[l1, l2, l3])
+
+    plt.barh(tasks[::-1], runtimes[::-1], color=c[::-1])
+    plt.barh("KIMMDY overhead", overhead, color=c_palette[3])
+    plt.xlabel(f"Time [{t_unit}]")
+    plt.title(f"Runtime of {run_dir.name}; overall {walltime} {t_unit}")
+    plt.tight_layout()
+    plt.savefig(analysis_dir / "runtime.png", dpi=300)
+
+    print(f"Finished analyzing runtime of {run_dir}.")
+
+
 def get_analysis_cmdline_args() -> argparse.Namespace:
     """Parse command line arguments.
 
@@ -428,6 +508,26 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         "dir", type=str, help="KIMMDY run directory to be analysed."
     )
 
+    parser_runtime = subparsers.add_parser(
+        name="runtime",
+        help="Plot runtime of the tasks of a kimmdy run.",
+    )
+    parser_runtime.add_argument(
+        "dir", type=str, help="KIMMDY run directory to be analysed."
+    )
+    parser_runtime.add_argument(
+        "--MDtasks",
+        nargs="*",
+        default=["equilibrium", "pull", "relax", "prod"],
+        help="Names of MD tasks of the specified KIMMDY run",
+    )
+    parser_runtime.add_argument(
+        "--datefmt",
+        type=str,
+        default="%d-%m-%y %H:%M:%S",
+        help="Date format in the KIMMDY logfile.",
+    )
+
     return parser.parse_args()
 
 
@@ -445,6 +545,8 @@ def entry_point_analysis():
         )
     elif args.module == "plot_rates":
         plot_rates(args.dir)
+    elif args.module == "runtime":
+        plot_runtime(args.dir, args.MDtasks, args.datefmt)
     else:
         print(
             "No analysis module specified. Use -h for help and a list of available modules."

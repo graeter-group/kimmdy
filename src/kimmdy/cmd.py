@@ -51,12 +51,12 @@ def configure_logger(config: Config):
             },
             "full": {
                 "format": "%(asctime)s %(name)-17s %(levelname)s: %(message)s",
-                "datefmt": "%d-%m-%y %H:%M",
+                "datefmt": "%d-%m-%y %H:%M:%S",
             },
             "full_cut": {
                 "()": longFormatter,
                 "format": "%(asctime)s %(name)-12s %(levelname)s: %(message)s",
-                "datefmt": "%d-%m-%y %H:%M",
+                "datefmt": "%d-%m-%y %H:%M:%S",
             },
         },
         "handlers": {
