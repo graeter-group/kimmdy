@@ -560,9 +560,9 @@ class Topology:
 
         # link atoms, bonds etc. to the main moleculeype, assumed to be the first
         # "moleculetype_0"
-        self.main_molecule_idx = 0
+        self.main_molecule_ix = 0
         self.main_molecule_name = list(self.moleculetypes.keys())[
-            self.main_molecule_idx
+            self.main_molecule_ix
         ]
         self.main_molecule = self.moleculetypes[self.main_molecule_name]
         self.atoms = self.main_molecule.atoms
