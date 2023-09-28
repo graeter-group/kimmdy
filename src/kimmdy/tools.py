@@ -9,6 +9,8 @@ import argparse
 from kimmdy.topology.topology import Topology
 from kimmdy.parsing import read_top, write_top
 from kimmdy.utils import run_gmx, run_shell_cmd
+from kimmdy.plugins import parameterization_plugins
+from kimmdy.plugins import discover_plugins
 
 
 def build_examples(restore: str):
@@ -115,7 +117,7 @@ def remove_hydrogen(
 
     # parameterize with grappa
     if parameterize:
-        from kimmdy import parameterization_plugins
+        discover_plugins()
 
         if "grappa" in parameterization_plugins.keys():
             topology.parametrizer = parameterization_plugins["grappa"]()

@@ -14,6 +14,13 @@ from kimmdy.config import Config
 from kimmdy.runmanager import RunManager
 from kimmdy.assets.templates import jobscript
 from kimmdy.utils import longFormatter
+from kimmdy.plugins import discover_plugins
+from kimmdy.plugins import (
+    reaction_plugins,
+    broken_reaction_plugins,
+    parameterization_plugins,
+    broken_parameterization_plugins,
+)
 import importlib.resources as pkg_resources
 import sys
 import os
@@ -170,18 +177,24 @@ def _run(args: argparse.Namespace):
     """
 
     if args.show_plugins:
-        from kimmdy import (
-            discovered_reaction_plugins,
-            discovered_parameterization_plugins,
-        )
+        discover_plugins()
 
         print("Available reaction plugins:")
-        for plugin in discovered_reaction_plugins:
+        for plugin in reaction_plugins:
+            print(plugin)
+
+        print("Found but not loadable reaction plugins:")
+        for plugin in broken_reaction_plugins:
             print(plugin)
 
         print("Available parameterization plugins:")
-        for plugin in discovered_parameterization_plugins:
+        for plugin in parameterization_plugins:
             print(plugin)
+
+        print("Found but not loadable parameterization plugins:")
+        for plugin in broken_parameterization_plugins:
+            print(plugin)
+
         exit()
 
     if args.show_schema_path:
@@ -210,6 +223,7 @@ def _run(args: argparse.Namespace):
                 runmgr.run()
             exit()
 
+        discover_plugins()
         config = Config(
             input_file=args.input, logfile=args.logfile, loglevel=args.loglevel
         )
@@ -229,7 +243,7 @@ def _run(args: argparse.Namespace):
         runmgr = RunManager(config)
 
         if args.generate_jobscript:
-            runmgr.write_one_checkoint()
+            runmgr.write_one_checkpoint()
             content = jobscript.format(config=config)
             path = "jobscript.sh"
 
