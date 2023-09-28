@@ -12,7 +12,7 @@ jobs:
         with:
           release-type: python
           package-name: kimmdy
-          changelog-notes-type: github
+          changelog-notes-type: default
       - uses: actions/checkout@v3
       - name: tag stable versions
         if: ${{ steps.release.outputs.release_created }}
