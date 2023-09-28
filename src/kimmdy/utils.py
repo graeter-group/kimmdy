@@ -389,7 +389,9 @@ def truncate_sim_files(files: TaskFiles, time: float, keep_tail: bool = True):
             continue
         tmp = trj.rename(trj.with_name("tmp_backup_" + trj.name))
         if keep_tail:
-            run_gmx(f"gmx trjconv -f {tmp} -b {time} -o {trj}",)
+            run_gmx(
+                f"gmx trjconv -f {tmp} -b {time} -o {trj}",
+            )
             trj.rename(str(trj) + ".tail")
 
         run_gmx(f"gmx trjconv -f {tmp} -e {time} -o {trj}")
