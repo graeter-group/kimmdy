@@ -328,15 +328,19 @@ def plot_rates(dir: str):
         rc.plot(analysis_dir / f"{i}_reaction_rates.svg", highlight_r=picked_rp)
 
 
-def plot_runtime(dir: str, md_tasks: list, datefmt: str):
+def plot_runtime(dir: str, md_tasks: list, datefmt: str, open_plot: bool = False):
     """Plot runtime of all tasks.
 
     Parameters
     ----------
     dir
         Directory of KIMMDY run
+    md_tasks
+        Names of MD tasks to color
     datefmt
         Date format in the KIMMDY logfile
+    open_plot
+        Open plot in default system viewer.
     """
 
     def time_from_logfile(log_path: Path, sep: int, factor: float = 1.0):
@@ -401,9 +405,15 @@ def plot_runtime(dir: str, md_tasks: list, datefmt: str):
     plt.xlabel(f"Time [{t_unit}]")
     plt.title(f"Runtime of {run_dir.name}; overall {walltime} {t_unit}")
     plt.tight_layout()
-    plt.savefig(analysis_dir / "runtime.png", dpi=300)
+
+    output_path = analysis_dir / "runtime.png"
+    plt.savefig(output_path, dpi=300)
 
     print(f"Finished analyzing runtime of {run_dir}.")
+
+    if open_plot:
+        sp.call(("xdg-open", output_path))
+
 
 
 def get_analysis_cmdline_args() -> argparse.Namespace:
@@ -439,13 +449,13 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         help="Open VMD with the concatenated trajectory.",
     )
 
-    parser_plot_energy = subparsers.add_parser(
-        name="plot_energy", help="Plot GROMACS energy for a KIMMDY run"
+    parser_energy = subparsers.add_parser(
+        name="energy", help="Plot GROMACS energy for a KIMMDY run"
     )
-    parser_plot_energy.add_argument(
+    parser_energy.add_argument(
         "dir", type=str, help="KIMMDY run directory to be analysed."
     )
-    parser_plot_energy.add_argument(
+    parser_energy.add_argument(
         "--steps",
         "-s",
         nargs="*",
@@ -454,7 +464,7 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
             "Apply analysis method to subdirectories with these names. Uses all subdirectories by default."
         ),
     )
-    parser_plot_energy.add_argument(
+    parser_energy.add_argument(
         "--terms",
         "-t",
         nargs="*",
@@ -463,8 +473,8 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
             "Terms from gmx energy that will be plotted. Uses 'Potential' by default."
         ),
     )
-    parser_plot_energy.add_argument(
-        "--open-plot", action="store_true", help="Open plot in default system viewer."
+    parser_energy.add_argument(
+        "--open-plot", "-p", action="store_true", help="Open plot in default system viewer."
     )
 
     parser_radical_population = subparsers.add_parser(
@@ -491,20 +501,21 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         ),
     )
     parser_radical_population.add_argument(
-        "--open-plot", action="store_true", help="Open plot in default system viewer."
+        "--open-plot", "-p", action="store_true", help="Open plot in default system viewer."
     )
     parser_radical_population.add_argument(
         "--open-vmd",
+        "-v",
         action="store_true",
         help="Open VMD with the concatenated trajectory."
         "To view the radical occupancy per atom, add a representation with the beta factor as color.",
     )
 
-    parser_plot_rates = subparsers.add_parser(
-        name="plot_rates",
+    parser_rates = subparsers.add_parser(
+        name="rates",
         help="Plot rates of all possible reactions after a MD run. Rates must have been saved!",
     )
-    parser_plot_rates.add_argument(
+    parser_rates.add_argument(
         "dir", type=str, help="KIMMDY run directory to be analysed."
     )
 
@@ -516,7 +527,7 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         "dir", type=str, help="KIMMDY run directory to be analysed."
     )
     parser_runtime.add_argument(
-        "--MDtasks",
+        "--md-tasks",
         nargs="*",
         default=["equilibrium", "pull", "relax", "prod"],
         help="Names of MD tasks of the specified KIMMDY run",
@@ -526,6 +537,9 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         type=str,
         default="%d-%m-%y %H:%M:%S",
         help="Date format in the KIMMDY logfile.",
+    )
+    parser_runtime.add_argument(
+        "--open-plot", "-p", action="store_true", help="Open plot in default system viewer."
     )
 
     return parser.parse_args()
@@ -537,16 +551,16 @@ def entry_point_analysis():
 
     if args.module == "trjcat":
         concat_traj(args.dir, args.steps, args.open_vmd)
-    elif args.module == "plot_energy":
+    elif args.module == "energy":
         plot_energy(args.dir, args.steps, args.terms, args.open_plot)
     elif args.module == "radical_population":
         radical_population(
             args.dir, args.steps, args.select_atoms, args.open_plot, args.open_vmd
         )
-    elif args.module == "plot_rates":
+    elif args.module == "rates":
         plot_rates(args.dir)
     elif args.module == "runtime":
-        plot_runtime(args.dir, args.MDtasks, args.datefmt)
+        plot_runtime(args.dir, args.md_tasks, args.datefmt, args.open_plot)
     else:
         print(
             "No analysis module specified. Use -h for help and a list of available modules."
