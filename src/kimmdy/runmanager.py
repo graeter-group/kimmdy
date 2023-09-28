@@ -473,7 +473,9 @@ class RunManager:
 
         if self.kmcresult.time_delta:
             self.time += self.kmcresult.time_delta
-        logger.info(f"Done with Decide recipe, chosen recipe is: {recipe.get_recipe_name()} at time {self.time}")
+        logger.info(
+            f"Done with Decide recipe, chosen recipe is: {recipe.get_recipe_name()} at time {self.time}"
+        )
         return
 
     def _apply_recipe(self, files: TaskFiles) -> TaskFiles:
