@@ -429,4 +429,3 @@ def truncate_sim_files(files: TaskFiles, time: float, keep_tail: bool = True):
         if not keep_tail:
             bck_edr.unlink()
     exit()
-

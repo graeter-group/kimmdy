@@ -415,7 +415,6 @@ def plot_runtime(dir: str, md_tasks: list, datefmt: str, open_plot: bool = False
         sp.call(("xdg-open", output_path))
 
 
-
 def get_analysis_cmdline_args() -> argparse.Namespace:
     """Parse command line arguments.
 
@@ -474,7 +473,10 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         ),
     )
     parser_energy.add_argument(
-        "--open-plot", "-p", action="store_true", help="Open plot in default system viewer."
+        "--open-plot",
+        "-p",
+        action="store_true",
+        help="Open plot in default system viewer.",
     )
 
     parser_radical_population = subparsers.add_parser(
@@ -501,7 +503,10 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         ),
     )
     parser_radical_population.add_argument(
-        "--open-plot", "-p", action="store_true", help="Open plot in default system viewer."
+        "--open-plot",
+        "-p",
+        action="store_true",
+        help="Open plot in default system viewer.",
     )
     parser_radical_population.add_argument(
         "--open-vmd",
@@ -539,7 +544,10 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         help="Date format in the KIMMDY logfile.",
     )
     parser_runtime.add_argument(
-        "--open-plot", "-p", action="store_true", help="Open plot in default system viewer."
+        "--open-plot",
+        "-p",
+        action="store_true",
+        help="Open plot in default system viewer.",
     )
 
     return parser.parse_args()

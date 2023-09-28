@@ -296,6 +296,7 @@ def top_to_graph(top: Topology, overlap: str = "true"):
     """
     return edgelist_to_dot_graph(topology_to_edgelist(top), overlap)
 
+
 def write_top_as_dot(top: Topology, path: str, overlap: str = "true"):
     """Write a topology as a dot graph to a file.
 
@@ -303,4 +304,3 @@ def write_top_as_dot(top: Topology, path: str, overlap: str = "true"):
     """
     with open(path, "w") as f:
         f.write(top_to_graph(top, overlap))
-
