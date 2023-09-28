@@ -387,23 +387,13 @@ def truncate_sim_files(files: TaskFiles, time: float, keep_tail: bool = True):
     for trj in [paths["trr"], paths["xtc"]]:
         if trj is None:
             continue
+        tmp = trj.rename(trj.with_name("tmp_backup_" + trj.name))
         if keep_tail:
-            out = trj.with_name("tmp_backup_" + trj.name)
-            assert not out.exists(), f"{out} should not exists but it does."
-            sp.run(
-                f"gmx trjconv -f {trj} -b {time} -o {out}",
-                text=True,
-                input="0",
-                shell=True,
-            )
-            out.rename(str(trj) + ".tail")
+            run_gmx(f"gmx trjconv -f {tmp} -b {time} -o {trj}",)
+            trj.rename(str(trj) + ".tail")
 
-        sp.run(
-            f"gmx trjconv -f {trj} -trunc {time}",
-            text=True,
-            input="YES",
-            shell=True,
-        )
+        run_gmx(f"gmx trjconv -f {tmp} -e {time} -o {trj}")
+        tmp.unlink()
 
     # backup the gro
     bck_gro = paths["gro"].rename(
