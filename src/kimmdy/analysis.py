@@ -356,6 +356,29 @@ def plot_runtime(dir: str, md_tasks: list, datefmt: str, open_plot: bool = False
 
     run_log = next(run_dir.glob("*.log"))
     walltime = time_from_logfile(run_log, n_datefmt_substrings)
+    # sensitive to changes in runmanager logging
+    open_task = False
+    task_is_nested = []
+    with open(run_log, "r") as f:
+        foo = f.readlines()
+    for i, line in enumerate(foo):
+        if "Starting task: " in line:
+            if any(
+                x in line
+                for x in [
+                    "Starting task: _place_reaction_tasks",
+                    "Starting task: _decide_recipe",
+                ]
+            ):
+                continue
+            open_task = True
+            task_is_nested.append(False)
+        elif " Current task files:" in line:
+            if open_task is False:
+                task_is_nested[-1] = True
+                # set False for the nested task itself
+                task_is_nested.append(False)
+            open_task = False
 
     # set scale of plot to hour, minute or second
     if walltime < 120:
@@ -377,6 +400,11 @@ def plot_runtime(dir: str, md_tasks: list, datefmt: str, open_plot: bool = False
     ):
         tasks.append(log_path.stem)
         runtimes.append(time_from_logfile(log_path, n_datefmt_substrings, t_factor))
+    # remove duration of nested task for mother task
+    for i, is_nested in enumerate(task_is_nested):
+        if is_nested:
+            runtimes[i] -= runtimes[i + 1]
+
     overhead = walltime - sum(runtimes)
     # sns muted palette
     c_palette = [
@@ -413,7 +441,6 @@ def plot_runtime(dir: str, md_tasks: list, datefmt: str, open_plot: bool = False
 
     if open_plot:
         sp.call(("xdg-open", output_path))
-
 
 
 def get_analysis_cmdline_args() -> argparse.Namespace:
@@ -474,7 +501,10 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         ),
     )
     parser_energy.add_argument(
-        "--open-plot", "-p", action="store_true", help="Open plot in default system viewer."
+        "--open-plot",
+        "-p",
+        action="store_true",
+        help="Open plot in default system viewer.",
     )
 
     parser_radical_population = subparsers.add_parser(
@@ -501,7 +531,10 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         ),
     )
     parser_radical_population.add_argument(
-        "--open-plot", "-p", action="store_true", help="Open plot in default system viewer."
+        "--open-plot",
+        "-p",
+        action="store_true",
+        help="Open plot in default system viewer.",
     )
     parser_radical_population.add_argument(
         "--open-vmd",
@@ -539,7 +572,10 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         help="Date format in the KIMMDY logfile.",
     )
     parser_runtime.add_argument(
-        "--open-plot", "-p", action="store_true", help="Open plot in default system viewer."
+        "--open-plot",
+        "-p",
+        action="store_true",
+        help="Open plot in default system viewer.",
     )
 
     return parser.parse_args()
