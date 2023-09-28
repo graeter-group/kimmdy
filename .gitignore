@@ -23,6 +23,7 @@ cat-center.gro
 *.pickle
 .*.npz
 .*.lock
+*.tail
 
 # tutorials and example output files
 guide/kimmdy-tutorial
