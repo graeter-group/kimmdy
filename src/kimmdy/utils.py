@@ -428,4 +428,4 @@ def truncate_sim_files(files: TaskFiles, time: float, keep_tail: bool = True):
         bck_edr.rename(str(paths["edr"]) + ".tail")
         if not keep_tail:
             bck_edr.unlink()
-    exit()
+    return
