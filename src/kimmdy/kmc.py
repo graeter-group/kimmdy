@@ -41,7 +41,7 @@ class KMCResult:
 
 
 def rf_kmc(
-    recipe_collection: RecipeCollection, rng: np.random.BitGenerator = default_rng()
+    recipe_collection: RecipeCollection, rng: np.random.Generator = default_rng()
 ) -> KMCResult:
     """Rejection-Free Monte Carlo.
     Takes RecipeCollection and choses a recipe based on the relative propensity of the events.
@@ -99,7 +99,7 @@ def rf_kmc(
 
 def frm(
     recipe_collection: RecipeCollection,
-    rng: np.random.BitGenerator = default_rng(),
+    rng: np.random.Generator = default_rng(),
     MD_time: Optional[float] = None,
 ) -> KMCResult:
     """First Reaction Method variant of Kinetic Monte Carlo.
@@ -171,7 +171,79 @@ def frm(
 
 def extrande(
     recipe_collection: RecipeCollection,
-    rng: np.random.BitGenerator = default_rng(),
-    MD_time: Optional[float] = None,
+    rng: np.random.Generator = default_rng(),
+    tau_scale: float = 1.0,
 ) -> KMCResult:
-    pass
+    """Extrande KMC
+
+    Implemented as in
+    `Stochastic Simulation of Biomolecular Networks in Dynamic Environments`
+    [10.1371/journal.pcbi.1004923](https://doi.org/10.1371/journal.pcbi.1004923)
+
+    Parameters
+    ----------
+    recipe_collection
+        from which one will be choosen
+    rng
+        function to generate random numbers in the KMC step
+    tau_scale
+        Scaling factor for tau, by default 1.0
+
+    Returns
+    -------
+    KMCResult
+        time delta set to 0
+    """
+
+    # check for empty ReactionResult
+    if len(recipe_collection.recipes) == 0:
+        logger.warning("Empty ReactionResult; no reaction chosen")
+        return KMCResult()
+
+    # initialize t
+    t = 0
+    chosen_recipe = None
+
+    # Find L and B
+    boarders, rate_windows, recipe_windows = recipe_collection.calc_ratesum()
+    # time of last rate, should be last MD time
+    t_max = boarders[-1]
+
+    while t < t_max:
+        crr_window_idx = np.searchsorted(boarders, t, side="right") - 1
+        b = max([sum(l) for l in rate_windows[crr_window_idx:]])
+        l = t_max - t
+
+        tau = tau_scale * rng.exponential(1 / b)
+        if tau > l:
+            # reject
+            logger.info("Tau exceeded simulation frame, no reaction to perform.")
+            logger.debug(f"Tau:\t{tau}\nl:\t{l}\nt_max:\t{t_max}\nb:\t{b}")
+            return KMCResult()
+
+        t += tau
+        new_window_idx = np.searchsorted(boarders, t, side="right") - 1
+        a0 = rate_windows[new_window_idx]
+
+        u = rng.random()
+        if a0 >= b * u:
+            # Accept time, chose reaction
+            re_idx = np.searchsorted(recipe_windows[new_window_idx], b * u)
+            chosen_recipe = recipe_windows[new_window_idx][re_idx]
+            break
+
+        # Extra reaction channel, repeat for new t
+        logger.debug(
+            f"Extra reaction channel was chose\na0:\t{a0}\nb:\t{b}\nb*u:\t{b*u}"
+        )
+
+    if chosen_recipe is None:
+        logger.info("No reaction was chosen")
+        return KMCResult()
+
+    return KMCResult(
+        recipe=chosen_recipe,
+        reaction_probability=None,
+        time_delta=0,  # instantaneous reaction
+        time_start=t,
+    )
