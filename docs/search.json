@@ -60,7 +60,7 @@
     "href": "guide/how_to/topology.html",
     "title": "Visualize Topologies",
     "section": "",
-    "text": "Hexala\n\nfrom kimmdy.parsing import read_top\nfrom kimmdy.topology.topology import Topology\nfrom pathlib import Path\nfrom kimmdy.tools import top_to_graph\nfrom kimmdy.topology.utils import get_protein_section\n\n\nala_top = read_top(Path('../../tests/test_files/test_topology/urea.top'), use_gmx_dir=False)\ntop = Topology(ala_top)\n\nls = top_to_graph(top) \nwith open(\"ala-top.dot\", \"w\") as f:\n  f.writelines(ls)\n\n\n\n\n\n\n\n\n\nG\n\n  \n\n1 C\n\n 1 C   \n\n2 O\n\n 2 O   \n\n1 C–2 O\n\n   \n\n3 N\n\n 3 N   \n\n1 C–3 N\n\n   \n\n6 N\n\n 6 N   \n\n1 C–6 N\n\n   \n\n4 H\n\n 4 H   \n\n3 N–4 H\n\n   \n\n5 H\n\n 5 H   \n\n3 N–5 H\n\n   \n\n7 H\n\n 7 H   \n\n6 N–7 H\n\n   \n\n8 H\n\n 8 H   \n\n6 N–8 H\n\n  \n\n\nFigure 1: A diagram of the ala topology\n\n\n\n\n\n\n\n\n Back to top"
+    "text": "Hexala\n\nfrom kimmdy.parsing import read_top\nfrom kimmdy.topology.topology import Topology\nfrom pathlib import Path\nfrom kimmdy.tools import write_top_as_dot\n\n\nala_top = read_top(Path('../../tests/test_files/test_topology/urea.top'), use_gmx_dir=False)\ntop = Topology(ala_top)\n\nwrite_top_as_dot(top, \"ala-top.dot\")\n\n\n\n\n\n\n\n\n\nG\n\n  \n\n1 C\n\n 1 C   \n\n2 O\n\n 2 O   \n\n1 C–2 O\n\n   \n\n3 N\n\n 3 N   \n\n1 C–3 N\n\n   \n\n6 N\n\n 6 N   \n\n1 C–6 N\n\n   \n\n4 H\n\n 4 H   \n\n3 N–4 H\n\n   \n\n5 H\n\n 5 H   \n\n3 N–5 H\n\n   \n\n7 H\n\n 7 H   \n\n6 N–7 H\n\n   \n\n8 H\n\n 8 H   \n\n6 N–8 H\n\n  \n\n\nFigure 1: A diagram of the ala topology\n\n\n\n\n\n\n\n\n Back to top"
   },
   {
     "objectID": "guide/how_to/options.html",
