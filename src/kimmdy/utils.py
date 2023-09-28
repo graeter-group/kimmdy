@@ -379,7 +379,7 @@ def truncate_sim_files(files: TaskFiles, time: float, keep_tail: bool = True):
         last_time = float(m.group(1))
         assert (
             last_time * 1.01 >= time
-        ), "Request to truncate trajectory after last frame"
+        ), "Requested to truncate trajectory after last frame"
     else:
         raise RuntimeError(f"gmx check failed:\n{p.stdout}\n{p.stderr}")
 
@@ -390,14 +390,13 @@ def truncate_sim_files(files: TaskFiles, time: float, keep_tail: bool = True):
         if keep_tail:
             out = trj.with_name("tmp_backup_" + trj.name)
             assert not out.exists(), f"{out} should not exists but it does."
-            # run_shell_cmd(f"gmx trjconv -f {trj} -s {gro} -b {time} -o {out}")
             sp.run(
                 f"gmx trjconv -f {trj} -b {time} -o {out}",
                 text=True,
                 input="0",
                 shell=True,
             )
-            out.rename(trj.name + ".tail")
+            out.rename(str(trj) + ".tail")
 
         sp.run(
             f"gmx trjconv -f {trj} -trunc {time}",
@@ -416,7 +415,7 @@ def truncate_sim_files(files: TaskFiles, time: float, keep_tail: bool = True):
         input="0",
         shell=True,
     )
-    bck_gro.rename(paths["gro"].name + ".tail")
+    bck_gro.rename(str(paths["gro"]) + ".tail")
     if not keep_tail:
         bck_gro.unlink()
 
@@ -426,6 +425,8 @@ def truncate_sim_files(files: TaskFiles, time: float, keep_tail: bool = True):
             paths["edr"].with_name("tmp_backup_" + paths["edr"].name)
         )
         run_shell_cmd(f"gmx eneconv -f {bck_edr} -e {time} -o {paths['edr']}")
-        bck_edr.rename(paths["edr"].name + ".tail")
+        bck_edr.rename(str(paths["edr"]) + ".tail")
         if not keep_tail:
             bck_edr.unlink()
+    exit()
+
