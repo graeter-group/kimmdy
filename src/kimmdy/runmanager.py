@@ -222,7 +222,8 @@ class RunManager:
                 # entry is a single reaction
                 task_list = copy(self.task_mapping["reactions"])
                 # 0 is place_reaction_tasks
-                task_list[0]["kwargs"].update({"selected": step})
+                task_list[0] = copy(task_list[0])
+                task_list[0]["kwargs"] = {"selected": step}
 
                 for task_kwargs in task_list:
                     self.tasks.put(Task(self, **task_kwargs))
