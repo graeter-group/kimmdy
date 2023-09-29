@@ -14,8 +14,6 @@ from dataclasses import dataclass, field
 from numpy.random import default_rng
 from kimmdy.recipe import RecipeCollection, Recipe
 
-logger = logging.getLogger(__name__)
-
 
 @dataclass
 class KMCResult:
@@ -41,7 +39,9 @@ class KMCResult:
 
 
 def rf_kmc(
-    recipe_collection: RecipeCollection, rng: np.random.Generator = default_rng()
+    recipe_collection: RecipeCollection,
+    logger: logging.Logger = logging.getLogger(__name__),
+    rng: np.random.Generator = default_rng(),
 ) -> KMCResult:
     """Rejection-Free Monte Carlo.
     Takes RecipeCollection and choses a recipe based on the relative propensity of the events.
@@ -99,6 +99,7 @@ def rf_kmc(
 
 def frm(
     recipe_collection: RecipeCollection,
+    logger: logging.Logger = logging.getLogger(__name__),
     rng: np.random.Generator = default_rng(),
     MD_time: Optional[float] = None,
 ) -> KMCResult:
@@ -171,6 +172,7 @@ def frm(
 
 def extrande(
     recipe_collection: RecipeCollection,
+    logger: logging.Logger = logging.getLogger(__name__),
     rng: np.random.Generator = default_rng(),
     tau_scale: float = 1.0,
 ) -> KMCResult:
@@ -223,27 +225,26 @@ def extrande(
 
         t += tau
         new_window_idx = np.searchsorted(boarders, t, side="right") - 1
-        a0 = sum(rate_windows[new_window_idx])
+        rate_cumsum = np.cumsum(rate_windows[new_window_idx])
+        a0 = rate_cumsum[-1]
 
         u = rng.random()
         if a0 >= b * u:
             # Accept time, chose reaction
-            crr_rates = np.array(rate_windows[new_window_idx])
-            crr_recipes = np.array(recipe_windows[new_window_idx])
-            order = np.argsort(crr_rates)
-            re_idx = np.searchsorted(crr_rates, b * u, sorter=order)
-            chosen_recipe = crr_recipes[order][re_idx]
+            idx = np.searchsorted(rate_cumsum, b * u)
+            chosen_recipe = recipe_windows[new_window_idx][idx]
             break
 
         # Extra reaction channel, repeat for new t
-        logger.debug(
-            f"Extra reaction channel was chose\na0:\t{a0}\nb:\t{b}\nb*u:\t{b*u}"
-        )
+        logger.info(f"Extra reaction channel was chose at time {t}")
+        logger.debug(f"\ta0:\t\t{a0}\n\tb:\t\t{b}\n\tb*u:\t{b*u}")
 
     if chosen_recipe is None:
         logger.info("No reaction was chosen")
         return KMCResult()
 
+    logger.info(f"Reaction {chosen_recipe.get_recipe_name()} was chose at time {t}")
+    logger.debug(f"\ta0:\t\t{a0}\n\tb:\t\t{b}\n\tb*u:\t{b*u}")
     return KMCResult(
         recipe=chosen_recipe,
         reaction_probability=None,

@@ -11,7 +11,8 @@ from copy import copy, deepcopy
 import dill
 import queue
 from enum import Enum, auto
-from typing import Callable, Optional, Union
+from functools import partial
+from typing import Optional, Union
 from kimmdy.config import Config
 from kimmdy.parsing import read_top, write_json, write_top
 from kimmdy.plugins import (
@@ -27,7 +28,7 @@ from kimmdy.tasks import Task, TaskFiles, get_plumed_out
 from pprint import pformat
 from kimmdy.topology.topology import Topology
 import time
-from kimmdy.kmc import rf_kmc, KMCResult
+from kimmdy.kmc import KMCResult, rf_kmc, extrande, frm
 
 logger = logging.getLogger(__name__)
 
@@ -126,6 +127,7 @@ class RunManager:
         logger.debug(pformat(self.latest_files))
         self.histfile: Path = self.config.out / "kimmdy.history"
         self.cptfile: Path = self.config.out / "kimmdy.cpt"
+        self.kmc_algorithm: Optional[str] = None
 
         try:
             if self.config.changer.topology.parameterization == "basic":
@@ -146,20 +148,6 @@ class RunManager:
             {"setup": TaskFiles(self.get_latest)}
         ]
 
-        self.task_mapping = {
-            "md": {"f": self._run_md, "kwargs": {}, "out": None},
-            "reactions": [
-                {"f": self._place_reaction_tasks, "kwargs": {}, "out": None},
-                {
-                    "f": self._decide_recipe,
-                    "kwargs": {"decision_strategy": rf_kmc},
-                    "out": "decide_recipe",
-                },
-                {"f": self._apply_recipe, "kwargs": {}, "out": "apply_recipe"},
-            ],
-        }
-        """Mapping of task names to functions and their keyword arguments."""
-
         # Initialize reaction plugins used in the sequence
         self.reaction_plugins: list[ReactionPlugin] = []
         for name in self.config.reactions.get_attributes():
@@ -167,6 +155,22 @@ class RunManager:
             Plugin = reaction_plugins[name]
             reaction_plugin = Plugin(name, self)
             self.reaction_plugins.append(reaction_plugin)
+
+        self.kmc_mapping = {"extrande": extrande, "rfkmc": rf_kmc, "frm": frm}
+
+        self.task_mapping = {
+            "md": {"f": self._run_md, "kwargs": {}, "out": None},
+            "reactions": [
+                {"f": self._place_reaction_tasks, "kwargs": {}, "out": None},
+                {
+                    "f": self._decide_recipe,
+                    "kwargs": {},
+                    "out": "decide_recipe",
+                },
+                {"f": self._apply_recipe, "kwargs": {}, "out": "apply_recipe"},
+            ],
+        }
+        """Mapping of task names to functions and their keyword arguments."""
 
     def run(self):
         logger.info("Start run")
@@ -408,6 +412,7 @@ class RunManager:
         self.recipe_collection: RecipeCollection = RecipeCollection([])
 
         # placing tasks in priority queue
+        strategies = []
         for reaction_plugin in self.reaction_plugins:
             if selected is not None:
                 if reaction_plugin.name != selected:
@@ -421,6 +426,25 @@ class RunManager:
                     out=reaction_plugin.name,
                 )
             )
+
+            # get supported kmc algorithm
+            strategies.append(reaction_plugin.config.kmc)
+
+        # find decision strategy
+        if len(kmc := self.config.kmc) > 0:
+            # algorithm overwrite
+            self.kmc_algorithm = kmc
+
+        else:
+            # get algorithm from reaction
+            if len(set(strategies)) > 1:
+                raise RuntimeError(
+                    "Incompatible kmc algorithms chosen in the same reaction.\n"
+                    "Split the reactions in separate steps or chose different algorithms\n"
+                    "Attempted to combine:\n"
+                    f"{ {rp.name:rp.config.kmc for rp in self.reaction_plugins} }"
+                )
+            self.kmc_algorithm = strategies[0]
 
         logger.info(f"Queued {len(self.reaction_plugins)} reaction plugin(s)")
         return None
@@ -443,15 +467,16 @@ class RunManager:
 
     def _decide_recipe(
         self,
-        decision_strategy: Callable[[RecipeCollection], KMCResult],
         files: TaskFiles,
     ) -> None:
         logger = files.logger
-
         logger.info(
             f"Start Decide recipe, {len(self.recipe_collection.recipes)} available"
         )
-        self.kmcresult = decision_strategy(self.recipe_collection)
+        kmc = self.kmc_mapping[self.kmc_algorithm.lower()]
+        if self.kmc_algorithm.lower() == "extrande":
+            kmc = partial(kmc, tau_scale=self.config.tau_scale)
+        self.kmcresult: KMCResult = kmc(self.recipe_collection, logger)
         recipe = self.kmcresult.recipe
 
         if self.config.save_recipes:

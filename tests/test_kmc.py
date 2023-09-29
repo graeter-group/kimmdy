@@ -1,6 +1,6 @@
 import pytest
 from numpy.random import default_rng
-from kimmdy.recipe import Recipe, RecipeCollection, Break, Bind, Place, Relax
+from kimmdy.recipe import Recipe, RecipeCollection, Break, Bind
 from kimmdy.kmc import rf_kmc, frm, KMCResult
 
 
@@ -30,7 +30,7 @@ def reference_KMC():
     )
 
 
-def compare_to_ref(result: dict, reference: dict):
+def compare_to_ref(result: KMCResult, reference: KMCResult):
     assert result.recipe == reference.recipe
     for i in range(len(reference.reaction_probability)):
         assert (
@@ -52,7 +52,7 @@ def test_frm_empty():
 def test_rf_kmc_unlike_ref(reference_KMC):
     rng = default_rng(1)
     # first random numbers are array([0.51182162, 0.9504637])
-    KMC_dict = rf_kmc(RecipeCollection([]), rng)
+    KMC_dict = rf_kmc(RecipeCollection([]), rng=rng)
     with pytest.raises(AssertionError):
         compare_to_ref(KMC_dict, reference_KMC)
 
@@ -60,7 +60,7 @@ def test_rf_kmc_unlike_ref(reference_KMC):
 def test_rf_kmc_calculation(recipe_collection, reference_KMC):
     rng = default_rng(1)
     # first random numbers are array([0.51182162, 0.9504637])
-    KMC_dict = rf_kmc(recipe_collection, rng)
+    KMC_dict = rf_kmc(recipe_collection, rng=rng)
     compare_to_ref(KMC_dict, reference_KMC)
     assert abs(KMC_dict.time_delta - reference_KMC.time_delta) < 1e-9
 
@@ -70,7 +70,7 @@ def test_frm_calculation(recipe_collection, reference_KMC):
     # first random numbers are array([0.51182162, 0.9504637 , 0.14415961, 0.94864945])
     # with the seed 0, the second reaction is picked, so that the time step for rfKMC and FRM are equal
     # because the same random value is used to determine the time step
-    KMC_dict = frm(recipe_collection, rng, MD_time=10)
+    KMC_dict = frm(recipe_collection, rng=rng, MD_time=10)
     compare_to_ref(KMC_dict, reference_KMC)
 
 
@@ -78,5 +78,5 @@ def test_frm_no_event(recipe_collection):
     rng = default_rng(1)
     # first random numbers are array([0.51182162, 0.9504637 , 0.14415961, 0.94864945])
     new_recipes = recipe_collection.recipes[2:4]
-    KMC_dict = frm(RecipeCollection(new_recipes), rng, MD_time=None)
+    KMC_dict = frm(RecipeCollection(new_recipes), rng=rng, MD_time=None)
     assert KMC_dict.recipe == Recipe([], [], [])
