@@ -223,13 +223,16 @@ def extrande(
 
         t += tau
         new_window_idx = np.searchsorted(boarders, t, side="right") - 1
-        a0 = rate_windows[new_window_idx]
+        a0 = sum(rate_windows[new_window_idx])
 
         u = rng.random()
         if a0 >= b * u:
             # Accept time, chose reaction
-            re_idx = np.searchsorted(recipe_windows[new_window_idx], b * u)
-            chosen_recipe = recipe_windows[new_window_idx][re_idx]
+            crr_rates = np.array(rate_windows[new_window_idx])
+            crr_recipes = np.array(recipe_windows[new_window_idx])
+            order = np.argsort(crr_rates)
+            re_idx = np.searchsorted(crr_rates, b * u, sorter=order)
+            chosen_recipe = crr_recipes[order][re_idx]
             break
 
         # Extra reaction channel, repeat for new t
