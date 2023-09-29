@@ -244,9 +244,7 @@ class Config:
             if hasattr(self, "reactions"):
                 for reaction_name in self.reactions.__dict__.keys():
                     if reaction_name not in (ks := list(reaction_plugins.keys())):
-                        if reaction_name in (
-                            ks := list(broken_reaction_plugins.keys())
-                        ):
+                        if reaction_name in (list(broken_reaction_plugins.keys())):
                             m = f"Reaction plugin {reaction_name} could not be loaded."
                             self._logmessages["errors"].append(m)
                             raise broken_reaction_plugins[reaction_name]
@@ -262,7 +260,7 @@ class Config:
                     ks := list(parameterization_plugins.keys())
                 ):
                     if parameterizer_name in (
-                        ks := list(broken_parameterization_plugins.keys())
+                        list(broken_parameterization_plugins.keys())
                     ):
                         m = f"Parameterization plugin {parameterizer_name} could not be loaded."
                         self._logmessages["errors"].append(m)
