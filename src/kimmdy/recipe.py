@@ -457,7 +457,7 @@ class RecipeCollection:
             i_to_highlight = np.nonzero(recipes == highlight_r)[0]
             idxs = list(set(np.concatenate([idxs, i_to_highlight])))
 
-        cmap = sns.color_palette("husl", len(idxs))
+        cmap = sns.color_palette("husl", len(recipes[idxs]))
 
         plt.figure()
         for r_i, re in enumerate(recipes[idxs]):
