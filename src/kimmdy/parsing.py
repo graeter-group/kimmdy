@@ -529,7 +529,7 @@ def write_json(
     path: Path,
 ) -> None:
     """Write dict to file according to JSON format."""
-    logger.debug(f"writing dictionary to json: {d}")
+    logger.debug(f"writing dictionary to json: {path}")
     with open(path, "w") as f:
         json.dump(d, f, cls=JSONEncoder, indent=4)
 
