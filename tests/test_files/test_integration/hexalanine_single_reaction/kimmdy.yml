@@ -8,7 +8,6 @@ top: 'hexala_out.top'
 gro: 'npt.gro'
 ndx: 'index.ndx'
 plumed: 'plumed.dat'
-tpr: 'pull.tpr'
 trr: 'pull.trr'
 changer:
   coordinates: {}

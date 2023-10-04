@@ -35,6 +35,7 @@ guide/kimmdy-tutorial
 !tests/test_files/test_coordinates/relax.xtc
 !tests/test_files/test_config/pull.trr
 !tests/test_files/test_integration/hexalanine_single_reaction/pull.trr
+!examples/hexalanine_single_reaction/pull.trr
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
