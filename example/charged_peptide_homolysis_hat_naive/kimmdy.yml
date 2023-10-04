@@ -9,6 +9,7 @@ gmx_mdrun_flags: -maxh 24 -dlb yes -nt 8
 top: 'IMREE.top'
 gro: 'IMREE_npt.gro'
 ndx: 'index.ndx'
+kmc: rfkmc
 plumed: 'plumed.dat'
 mds:
   equilibrium:

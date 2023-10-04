@@ -23,6 +23,13 @@
       "description": "Polling rate",
       "pytype": "float",
       "default": 1
+    },
+    "kmc": {
+      "description": "KMC algorithm for this reaction.",
+      "type": "string",
+      "pytype": "str",
+      "enum": ["rfkmc", "frm", "extrande"],
+      "default": "extrande"
     }
   },
   "required": [  ]

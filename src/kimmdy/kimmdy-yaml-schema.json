@@ -58,6 +58,19 @@
       "pytype": "int",
       "default": 0
     },
+    "kmc": {
+      "description": "KMC algorithm overwrite. Should be set by the reactions, but can be changed here.",
+      "type": "string",
+      "pytype": "str",
+      "enum": ["", "rfkmc", "frm", "extrande"],
+      "default": ""
+    },
+    "tau_scale": {
+      "description": "Scaling parameter for tau in the extrande kmc algorithm.",
+      "type": "number",
+      "pytype": "float",
+      "default": "1.0"
+    },
     "run": {
       "description": "Replica number",
       "type": "integer",

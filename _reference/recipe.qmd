@@ -155,6 +155,7 @@ They can originate from multiple reaction plugins, but do not need to.
 | --- | --- |
 | [aggregate_reactions](#kimmdy.recipe.RecipeCollection.aggregate_reactions) | Combines reactions having the same sequence of RecipeSteps. |
 | [calc_cumprob](#kimmdy.recipe.RecipeCollection.calc_cumprob) | Calculate cumulative probability of all contained recipe steps. |
+| [calc_ratesum](#kimmdy.recipe.RecipeCollection.calc_ratesum) | Calculate the sum of rates over all timesteps |
 | [from_csv](#kimmdy.recipe.RecipeCollection.from_csv) | Create a RecipeCollection object from a CSV file |
 | [plot](#kimmdy.recipe.RecipeCollection.plot) | Plot reaction rates over time |
 | [to_csv](#kimmdy.recipe.RecipeCollection.to_csv) | Write a ReactionResult as defined in the reaction module to a csv file |
@@ -172,6 +173,20 @@ Combines reactions having the same sequence of RecipeSteps.
 Calculate cumulative probability of all contained recipe steps.
 Sums up to 1 over all recipes. Assumes constant rate for given timespan
 and rate zero otherwise.
+
+##### calc_ratesum { #kimmdy.recipe.RecipeCollection.calc_ratesum }
+
+`recipe.RecipeCollection.calc_ratesum()`
+
+Calculate the sum of rates over all timesteps
+
+###### Returns
+
+| Type                               | Description                                                                                            |
+|------------------------------------|--------------------------------------------------------------------------------------------------------|
+| [boarders](`boarders`)             | flat list containing times of rate changes marking the boarders of the windows                         |
+| [rate_windows](`rate_windows`)     | flat list containing all rates in between the boarders. Each window is orderd as in recipe_windows     |
+| [recipe_windows](`recipe_windows`) | flat list containing the recipes of the corresponding window. Each window is orderd as in rate_windows |
 
 ##### from_csv { #kimmdy.recipe.RecipeCollection.from_csv }
 
