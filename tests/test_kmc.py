@@ -1,7 +1,7 @@
 import pytest
 from numpy.random import default_rng
 from kimmdy.recipe import Recipe, RecipeCollection, Break, Bind
-from kimmdy.kmc import rf_kmc, frm, KMCResult
+from kimmdy.kmc import rf_kmc, frm, extrande, KMCResult
 
 
 @pytest.fixture
@@ -20,13 +20,27 @@ def recipe_collection():
 
 
 @pytest.fixture
-def reference_KMC():
+def reference_KMC() -> KMCResult:
     return KMCResult(
         recipe=Recipe(
             [Bind(2, 3)], rates=[0.12, 0.0], timespans=[(0.0, 6.0), (6.0, 10.0)]
         ),
         time_delta=0.04032167624965666,
         reaction_probability=[0.0, 0.72, 0.54, 0.0],
+    )
+
+
+@pytest.fixture
+def reference_extrande_KMC() -> KMCResult:
+    return KMCResult(
+        recipe=Recipe(
+            [Break(3, 4), Bind(4, 5)],
+            rates=[0.15, 0.06],
+            timespans=[(2.0, 4.0), (4.0, 8.0)],
+        ),
+        time_delta=0,
+        time_start=3.9741815791575505,
+        reaction_probability=None,
     )
 
 
@@ -49,12 +63,26 @@ def test_frm_empty():
     assert KMC_dict.recipe == Recipe([], [], [])
 
 
+def test_extrande_empty():
+    KMC_dict = extrande(RecipeCollection([]))
+    assert KMC_dict.recipe == Recipe([], [], [])
+
+
 def test_rf_kmc_unlike_ref(reference_KMC):
     rng = default_rng(1)
     # first random numbers are array([0.51182162, 0.9504637])
     KMC_dict = rf_kmc(RecipeCollection([]), rng=rng)
     with pytest.raises(AssertionError):
         compare_to_ref(KMC_dict, reference_KMC)
+
+
+def test_extrande_calculation(recipe_collection, reference_extrande_KMC):
+    rng = default_rng(1)
+    # first random numbers are array([0.51182162, 0.9504637])
+    KMC_dict = extrande(recipe_collection, rng=rng)
+    assert KMC_dict.recipe == reference_extrande_KMC.recipe
+    assert abs(KMC_dict.time_start - reference_extrande_KMC.time_start) < 1e-9
+    assert abs(KMC_dict.time_delta - reference_extrande_KMC.time_delta) < 1e-9
 
 
 def test_rf_kmc_calculation(recipe_collection, reference_KMC):
