@@ -9,6 +9,7 @@ from pathlib import Path
 import logging
 import dill
 import csv
+import numpy as np
 
 logger = logging.getLogger(__name__)
 
@@ -414,7 +415,6 @@ class RecipeCollection:
         Sums up to 1 over all recipes. Assumes constant rate for given timespan
         and rate zero otherwise.
         """
-        import numpy as np
 
         self.aggregate_reactions()
 
@@ -428,6 +428,45 @@ class RecipeCollection:
             cumprob.append(integral)
 
         return np.array(cumprob) / sum(cumprob)
+
+    def calc_ratesum(self) -> tuple[list, list, list]:
+        """Calculate the sum of rates over all timesteps
+
+        Returns
+        -------
+        boarders
+            flat list containing times of rate changes marking the
+            boarders of the windows
+        rate_windows
+            flat list containing all rates in between the boarders.
+            Each window is orderd as in recipe_windows
+        recipe_windows
+            flat list containing the recipes of the corresponding window.
+            Each window is orderd as in rate_windows
+        """
+
+        self.aggregate_reactions()
+
+        # non-overlapping window boaders
+        boarders = set()
+
+        for re in self.recipes:
+            for ts in re.timespans:
+                for t in ts:
+                    boarders.add(t)
+
+        boarders = sorted(boarders)
+        rate_windows = [[] for _ in range(len(boarders) - 1)]
+        recipe_windows = [[] for _ in range(len(boarders) - 1)]
+
+        for re in self.recipes:
+            for r, ts in zip(re.rates, re.timespans):
+                left_idx = boarders.index(ts[0])
+                right_idx = boarders.index(ts[1])
+                [l.append(r) for l in rate_windows[left_idx:right_idx]]
+                [l.append(re) for l in recipe_windows[left_idx:right_idx]]
+
+        return boarders, rate_windows, recipe_windows
 
     def plot(self, outfile, highlight_r=None, highlight_t=None):
         """Plot reaction rates over time
