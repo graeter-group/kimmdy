@@ -27,7 +27,9 @@ logger = logging.getLogger(__name__)
 
 
 # coordinates
-def place_atom(files: TaskFiles, step: Place, ttime: Optional[float] = None) -> TaskFiles:
+def place_atom(
+    files: TaskFiles, step: Place, ttime: Optional[float] = None
+) -> TaskFiles:
     """Place an atom to new coords at the last time point of the trajectory"""
     logger = files.logger
     logger.info("Starting place_atom task")
@@ -119,7 +121,7 @@ def get_explicit_MultipleDihedrals(
 
 def get_explicit_or_type(
     key: tuple[str, ...],
-    interaction: Union[Interaction, None],
+    interaction: Optional[Interaction],
     interaction_types: InteractionTypes,
     mol: MoleculeType,
     periodicity: str = "",
@@ -230,7 +232,7 @@ def merge_top_moleculetypes_slow_growth(
     molA: MoleculeType,
     molB: MoleculeType,
     ff: FF,
-    focus_nr: Union[list[str], None] = None,
+    focus_nr: Optional[list[str]] = None,
 ) -> MoleculeType:
     """Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation"""
     hyperparameters = {
@@ -256,7 +258,7 @@ def merge_top_moleculetypes_slow_growth(
                 atomB.mass = deepcopy(atomA.mass)
             else:
                 logger.debug(
-                    f"Atom {nr} with A:{atomA} and B:{atomB} changed but not the charges!"
+                    f"Atom {nr} changed but not the charges!\n\tA:{atomA}\n\tB:{atomB} "
                 )
 
     # bonds
@@ -446,7 +448,7 @@ def merge_top_moleculetypes_slow_growth(
 
 
 def merge_top_slow_growth(
-    topA: Topology, topB: Topology, focus_nr: Union[list[str], None] = None
+    topA: Topology, topB: Topology, focus_nr: Optional[list[str]] = None
 ) -> Topology:
     """Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation.
 
@@ -482,7 +484,7 @@ def break_bond_plumed(
 
     files.output["plumed"] = newplumed
 
-    logger.info(
+    logger.debug(
         f"Reading: {files.input['plumed']} and writing modified plumed input to "
         f"{files.output['plumed']}."
     )

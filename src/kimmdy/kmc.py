@@ -77,14 +77,15 @@ def rf_kmc(
     # 3. Generate two independent uniform (0,1) random numbers u1,u2
     u = rng.random(2)
     logger.debug(
-        f"Random values u: {u}, cumulative probability {probability_cumulative}, probability sum {probability_sum}"
+        f"Random values u: {u}, number cumulative probabilities "
+        f"{len(probability_cumulative)}, probability sum {probability_sum}"
     )
 
     # 4. Find the even to carry out, mu, using binary search (np.searchsorted)
     pos = np.searchsorted(probability_cumulative, u[0] * probability_sum)
     recipe = recipe_collection.recipes[pos]
     reaction_time = recipe.timespans[np.argmax(recipe.rates)][1]
-    logger.info(f"Chosen Recipe: {recipe} at time {reaction_time}")
+    logger.debug(f"Chosen Recipe: {recipe} at time {reaction_time}")
 
     # 5. Calculate the time step associated with mu
     time_delta = np.log(1 / u[1]) / probability_sum

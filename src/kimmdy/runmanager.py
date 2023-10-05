@@ -12,6 +12,7 @@ import dill
 import queue
 from enum import Enum, auto
 from functools import partial
+from datetime import timedelta
 from typing import Optional, Union
 from kimmdy.config import Config
 from kimmdy.parsing import read_top, write_json, write_top
@@ -123,8 +124,7 @@ class RunManager:
         self.kmcresult: Union[KMCResult, None] = None
         self.time: float = 0.0  # [ps]
         self.latest_files: dict[str, Path] = get_existing_files(config)
-        logger.debug("Initialized latest files:")
-        logger.debug(pformat(self.latest_files))
+        logger.debug(f"Initialized latest files:\n{pformat(self.latest_files)}")
         self.histfile: Path = self.config.out / "kimmdy.history"
         self.cptfile: Path = self.config.out / "kimmdy.cpt"
         self.kmc_algorithm: Optional[str] = None
@@ -175,10 +175,9 @@ class RunManager:
     def run(self):
         logger.info("Start run")
         self.start_time = time.time()
-        self.current_time = self.start_time
 
         if self.from_checkpoint:
-            logger.info(f"KIMMDY is starting from a checkpoint.")
+            logger.info("KIMMDY is starting from a checkpoint.")
         else:
             self._setup_tasks()
 
@@ -186,7 +185,7 @@ class RunManager:
             self.state is not State.DONE
             and (self.iteration <= self.config.max_tasks or self.config.max_tasks == 0)
             and (
-                (self.current_time - self.start_time) / 3600 < self.config.max_hours
+                (time.time() - self.start_time) / 3600 < self.config.max_hours
                 or self.config.max_hours == 0
             )
         ):
@@ -194,14 +193,11 @@ class RunManager:
             with open(self.cptfile, "wb") as f:
                 dill.dump(self, f)
             next(self)
-            self.current_time = time.time()
-            logger.info("Done with:")
-            logger.info(f"task: {self.iteration}, max: {self.config.max_tasks}")
-            logger.info(
-                f"hours: {(self.current_time - self.start_time) / 3600}, max: {self.config.max_hours}"
-            )
 
-        logger.info(f"Finished running tasks, state: {self.state}")
+        logger.info(
+            f"Finished running tasks, state: {self.state} after "
+            f"{timedelta(seconds=(time.time() - self.start_time))}"
+        )
 
     def _setup_tasks(self):
         """Populates the tasks queue.
@@ -239,6 +235,7 @@ class RunManager:
                 m = f"Unknown task encountered in the sequence: {step}"
                 logger.error(m)
                 raise ValueError(m)
+        logger.info(f"Task list build:\n{pformat(list(self.tasks.queue), indent=8)}")
 
     def write_one_checkpoint(self):
         """Just write the first checkpoint and then exit
@@ -272,6 +269,7 @@ class RunManager:
         return self
 
     def __next__(self):
+        current_time = time.time()
         if self.tasks.empty() and self.crr_tasks.empty():
             self.state = State.DONE
             return
@@ -282,8 +280,12 @@ class RunManager:
         if self.config.dryrun:
             logger.info(f"Pretend to run: {task.name} with args: {task.kwargs}")
             return
-        logger.info("Starting task: " + pformat(task))
+        logger.info(f"Starting task: {task.name} with args: {task.kwargs}")
         files = task()
+        logger.info(
+            f"Finished task: {task.name} after "
+            f"{timedelta(seconds=(time.time() - current_time))}"
+        )
         self._discover_output_files(task.name, files)
 
     def _discover_output_files(
@@ -327,25 +329,21 @@ class RunManager:
                 if plumed_out := files.output.get("plumed_out"):
                     files.output.pop(plumed_out.name)
 
-            logger.debug("Update latest files with: ")
-            logger.debug(pformat(files.output))
+            logger.debug(f"Update latest files with:\n{pformat(files.output)}")
             self.latest_files.update(files.output)
-            logger.debug("Append to file history")
             self.filehist.append({taskname: files})
 
-            logger.info("Current task files:")
             m = f"""
             Task: {taskname} with output directory: {files.outputdir}
             Task: {taskname}, input:\n{pformat(files.input)}
             Task: {taskname}, output:\n{pformat(files.output)}
             """
-            logger.info(m)
             with open(self.histfile, "a") as f:
                 f.write(m)
 
             return files
         else:
-            logger.warning("No output directory found for task: " + taskname)
+            logger.debug("No output directory found for task: " + taskname)
             return None
 
     def _run_md(self, instance: str, files: TaskFiles) -> TaskFiles:
@@ -358,7 +356,6 @@ class RunManager:
         gmx_alias = self.config.gromacs_alias
         gmx_mdrun_flags = self.config.gmx_mdrun_flags
 
-        logger.debug(self.latest_files)
         top = files.input["top"]
         gro = files.input["gro"]
         mdp = md_config.mdp
@@ -407,7 +404,7 @@ class RunManager:
         return files
 
     def _place_reaction_tasks(self, selected: Optional[str] = None) -> None:
-        logger.info("Query reactions")
+        logger.info("Start query reactions")
         self.state = State.REACTION
         # empty list for every new round of queries
         self.recipe_collection: RecipeCollection = RecipeCollection([])
@@ -456,10 +453,13 @@ class RunManager:
         logger = files.logger
         logger.info(f"Start query {reaction_plugin.name}")
 
-        self.recipe_collection.recipes.extend(
-            reaction_plugin.get_recipe_collection(files).recipes
+        new_recipes = reaction_plugin.get_recipe_collection(files).recipes
+        self.recipe_collection.recipes.extend(new_recipes)
+
+        logger.info(
+            f"Done with Query reactions, {len(new_recipes)} "
+            f"recipes recived from {reaction_plugin.name}"
         )
-        self.recipe_collection.aggregate_reactions()
 
         logger.info(
             f"Done with Query reactions, recipes recived from {reaction_plugin.name}"
@@ -469,8 +469,9 @@ class RunManager:
     def _decide_recipe(
         self,
         files: TaskFiles,
-    ) -> None:
+    ) -> TaskFiles:
         logger = files.logger
+        self.recipe_collection.aggregate_reactions()
         logger.info(
             f"Start Decide recipe, {len(self.recipe_collection.recipes)} available"
         )
@@ -500,9 +501,9 @@ class RunManager:
         if self.kmcresult.time_delta:
             self.time += self.kmcresult.time_delta
         logger.info(
-            f"Done with Decide recipe, chosen recipe is: {recipe.get_recipe_name()} at time {self.time}"
+            f"Done with Decide recipe, chosen recipe is: {recipe.get_recipe_name()} at time {self.time:.2f}"
         )
-        return
+        return files
 
     def _apply_recipe(self, files: TaskFiles) -> TaskFiles:
         logger = files.logger
@@ -515,8 +516,7 @@ class RunManager:
         recipe = self.kmcresult.recipe
         logger.info(f"Start Recipe in KIMMDY iteration {self.iteration}")
         logger.info(f"Recipe: {recipe.get_recipe_name()}")
-
-        logger.debug(f"Chose recipe steps: {recipe.recipe_steps}")
+        logger.debug(f"Performing recipe steps:\n{pformat(recipe.recipe_steps)}")
 
         # Set time to chosen 'time_start' of KMCResult
         truncate_sim_files(files, self.kmcresult.time_start)
@@ -540,7 +540,9 @@ class RunManager:
                     kwargs={"step": step, "ttime": None},
                     out="place_atom",
                 )
+                logger.info(f"Starting task: {task.name} with args: {task.kwargs}")
                 place_files = task()
+                logger.info(f"Finished task: {task.name}")
                 self._discover_output_files(task.name, place_files)
 
             elif isinstance(step, Relax):
@@ -562,7 +564,9 @@ class RunManager:
                 task = Task(
                     self, f=self._run_md, kwargs={"instance": instance}, out=instance
                 )
+                logger.info(f"Starting task: {task.name} with args: {task.kwargs}")
                 md_files = task()
+                logger.info(f"Finished task: {task.name}")
                 self._discover_output_files(task.name, md_files)
 
         write_top(self.top.to_dict(), files.outputdir / self.config.top.name)
@@ -579,3 +583,6 @@ class RunManager:
 
         logger.info("Done with Apply recipe")
         return files
+
+    def __repr__(self):
+        return "Runmanager"

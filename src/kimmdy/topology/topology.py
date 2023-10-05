@@ -18,7 +18,7 @@ from copy import copy
 
 from kimmdy.utils import TopologyAtomAddress
 
-logger = logging.getLogger("kimmdy")
+logger = logging.getLogger("kimmdy.topology")
 
 
 class MoleculeType:
@@ -43,7 +43,7 @@ class MoleculeType:
         self.name, self.nrexcl = header
         self.atomics = atomics
 
-        logger.info(f"parsing molecule {self.name}")
+        logger.debug(f"parsing molecule {self.name}")
 
         self.atoms: dict[str, Atom] = {}
         self.bonds: dict[tuple[str, str], Bond] = {}
