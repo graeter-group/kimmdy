@@ -235,6 +235,8 @@ def _run(args: argparse.Namespace):
         # from initial config parsing
         # before the logger was configured
         # (because the logger config depends on the config)
+        for info in config._logmessages["debug"]:
+            logger.debug(info)
         for info in config._logmessages["infos"]:
             logger.info(info)
         for warning in config._logmessages["warnings"]:

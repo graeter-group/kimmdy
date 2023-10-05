@@ -141,7 +141,7 @@ class Task:
         self.name = self.f.__name__
         self.out = out
 
-        logger.info(f"Init task {self.name}\tkwargs: {self.kwargs}\tOut: {self.out}")
+        logger.debug(f"Init task {self.name}\tkwargs: {self.kwargs}\tOut: {self.out}")
 
     def __call__(self) -> TaskFiles:
         if self.out is not None:

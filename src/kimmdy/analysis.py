@@ -362,7 +362,7 @@ def plot_runtime(dir: str, md_tasks: list, datefmt: str, open_plot: bool = False
     with open(run_log, "r") as f:
         foo = f.readlines()
     for i, line in enumerate(foo):
-        if "Starting task: " in line:
+        if "Starting task:" in line:
             if any(
                 x in line
                 for x in [
@@ -373,7 +373,7 @@ def plot_runtime(dir: str, md_tasks: list, datefmt: str, open_plot: bool = False
                 continue
             open_task = True
             task_is_nested.append(False)
-        elif " Current task files:" in line:
+        elif "Finished task:" in line:
             if open_task is False:
                 task_is_nested[-1] = True
                 # set False for the nested task itself

@@ -72,7 +72,10 @@ class ReactionPlugin(ABC):
         # sub config, settings of this specific reaction:
         self.config: Config = self.runmng.config.reactions.__getattribute__(self.name)
 
-        logger.debug(f"Reaction {self.name} instatiated.")
+        logger.debug(f"Reaction {self.name} instantiated.")
+
+    def __repr__(self):
+        return self.name
 
     @abstractmethod
     def get_recipe_collection(self, files: TaskFiles) -> RecipeCollection:

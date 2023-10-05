@@ -58,18 +58,15 @@ class NaiveHAT(ReactionPlugin):
                         if atom2.type.startswith("H"):
                             froms.append(atom.nr)
                             hs.append(atom2.nr)
-                logger.info(f"hs: {hs}")
-                logger.info(f"froms: {froms}")
                 if len(hs) == 0:
                     continue
                 i = rng.randint(0, len(hs) - 1)
                 r = rad.nr
                 h = hs[i]
                 f = froms[i]
-                logger.info(f"i: {i}")
-                logger.info(f"radical: {rad}")
-                logger.info(f"h: {top.atoms[h]}")
-                logger.info(f"from: {top.atoms[f]}")
+                logger.debug(f"radical: {rad}")
+                logger.debug(f"h: {top.atoms[h]}")
+                logger.debug(f"from: {top.atoms[f]}")
                 # int(x) - 1 to be zero based because h,f,r are from topology
                 recipe = Recipe(
                     recipe_steps=[
@@ -85,8 +82,3 @@ class NaiveHAT(ReactionPlugin):
             return RecipeCollection([recipe])
 
         return RecipeCollection([])
-
-        #     Move(id_to_move=int(h) - 1,
-        #     ix_to_break=int(f) - 1,
-        #     ix_to_bind=int(r) - 1,
-        # ),

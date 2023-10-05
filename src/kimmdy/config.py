@@ -111,7 +111,7 @@ class Config:
 
         # validate on initial construction
         if section == "config":
-            self._logmessages = {"infos": [], "warnings": [], "errors": []}
+            self._logmessages = {"infos": [], "warnings": [], "errors": [], "debug": []}
             self._set_defaults(section, scheme)
             self._validate()
 
@@ -304,7 +304,7 @@ class Config:
 
             # make sure self.out is empty
             while self.out.exists():
-                self._logmessages["warnings"].append(
+                self._logmessages["debug"].append(
                     f"Output dir {self.out} exists, incrementing name"
                 )
                 name = self.out.name.split("_")
