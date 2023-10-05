@@ -156,6 +156,7 @@ def frm(
         pos_event = np.argmin(tau)
         chosen_recipe = recipes[pos_event]
         time_delta = tau[pos_event]
+        reaction_time = chosen_recipe.timespans[np.argmax(chosen_recipe.rates)][1]
     except ValueError:
         logger.warning(
             f"FRM recipe selection did not work, probably tau: {tau} is empty."
@@ -166,7 +167,7 @@ def frm(
         recipe=chosen_recipe,
         reaction_probability=reaction_probability,
         time_delta=time_delta,
-        time_start=0,
+        time_start=reaction_time,
     )
 
 

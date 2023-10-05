@@ -27,12 +27,12 @@ logger = logging.getLogger(__name__)
 
 
 # coordinates
-def place_atom(files: TaskFiles, step: Place, ttime: float = -1.0) -> TaskFiles:
+def place_atom(files: TaskFiles, step: Place, ttime: Optional[float] = None) -> TaskFiles:
     """Place an atom to new coords at the last time point of the trajectory"""
     logger = files.logger
     logger.info("Starting place_atom task")
     logger.debug(step)
-    logger.debug(ttime)
+    logger.debug(f"ttime {ttime}")
     trr = files.input["trr"]
     tpr = files.input["tpr"]
 
@@ -43,7 +43,7 @@ def place_atom(files: TaskFiles, step: Place, ttime: float = -1.0) -> TaskFiles:
     u = mda.Universe(str(tpr), str(trr), topology_format="tpr", format="trr")
 
     for ts in u.trajectory[::-1]:
-        if ttime != -1.0:
+        if ttime is not None:
             if abs(ts.time - ttime) > 1e-5:  # 0.01 fs
                 continue
         atm_move = u.select_atoms(f"index {step.ix_to_place}")

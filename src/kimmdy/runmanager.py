@@ -519,8 +519,7 @@ class RunManager:
         logger.debug(f"Chose recipe steps: {recipe.recipe_steps}")
 
         # Set time to chosen 'time_start' of KMCResult
-        if self.kmcresult.time_start is not None:
-            truncate_sim_files(files, self.kmcresult.time_start)
+        truncate_sim_files(files, self.kmcresult.time_start)
 
         top_initial = deepcopy(self.top)
         for step in recipe.recipe_steps:
@@ -538,7 +537,7 @@ class RunManager:
                 task = Task(
                     self,
                     f=place_atom,
-                    kwargs={"step": step, "ttime": self.kmcresult.time_start},
+                    kwargs={"step": step, "ttime": None},
                     out="place_atom",
                 )
                 place_files = task()

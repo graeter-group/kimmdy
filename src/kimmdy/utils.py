@@ -339,7 +339,7 @@ def check_gmx_version(config):
     return version
 
 
-def truncate_sim_files(files: TaskFiles, time: float, keep_tail: bool = True):
+def truncate_sim_files(files: TaskFiles, time: Optional[float], keep_tail: bool = True):
     """Truncates latest trr, xtc, edr, and gro to the time to a previous
     point in time.
 
@@ -353,6 +353,10 @@ def truncate_sim_files(files: TaskFiles, time: float, keep_tail: bool = True):
     files
         TaskFiles to get the latest files.
     """
+
+    if time is None:
+        logger.debug("time is None, nothing to truncate")
+        return
 
     paths = {}
     paths["gro"] = files.input["gro"]
