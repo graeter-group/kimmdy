@@ -656,7 +656,7 @@ class Topology:
             [attributes_to_list(x) for x in self.ff.angletypes.values()],
         )
 
-    def _update_parameters(self):
+    def update_parameters(self):
         if self.needs_parameterization:
             if self.parametrizer is not None:
                 logger.info(
@@ -668,7 +668,7 @@ class Topology:
             self.needs_parameterization = False
 
     def to_dict(self) -> TopologyDict:
-        self._update_parameters()
+        self.update_parameters()
         self._update_dict()
         return self.top
 
@@ -705,7 +705,7 @@ class Topology:
         update_map = update_map_all[self.main_molecule_name]
 
         if parameterize:
-            self._update_parameters()
+            self.update_parameters()
         # Overwriting in case of no parameterization wanted
         self.needs_parameterization = False
 

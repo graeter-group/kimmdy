@@ -552,6 +552,7 @@ class RunManager:
 
                 if self.config.changer.coordinates.slow_growth:
                     # Create a slow growth topology for sub-task run_md, afterwards, top will be reset properly
+                    self.top.update_parameters()
                     top_merge = merge_top_slow_growth(top_initial, deepcopy(self.top))
                     top_merge_path = files.outputdir / self.config.top.name.replace(
                         ".", "_mod."
