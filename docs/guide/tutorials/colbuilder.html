@@ -420,6 +420,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#run-kimmdy-from-colbuilder-fibril" id="toc-run-kimmdy-from-colbuilder-fibril" class="nav-link active" data-scroll-target="#run-kimmdy-from-colbuilder-fibril">1. Run KIMMDY from Colbuilder fibril</a>
   <ul>
   <li><a href="#preparation" id="toc-preparation" class="nav-link" data-scroll-target="#preparation">Preparation</a></li>
+  <li><a href="#equilibration" id="toc-equilibration" class="nav-link" data-scroll-target="#equilibration">Equilibration</a></li>
   <li><a href="#simulation" id="toc-simulation" class="nav-link" data-scroll-target="#simulation">Simulation</a></li>
   <li><a href="#analysis" id="toc-analysis" class="nav-link" data-scroll-target="#analysis">Analysis</a></li>
   </ul></li>
@@ -441,15 +442,24 @@ ul.task-list li input[type="checkbox"] {
 <li>Convert the pdb file to .gro format and create a unified topology file (this may take a while)</li>
 </ul>
 <p><code>gmx pdb2gmx -f Homo_sapiens_aln_N_HLKNL_12_C_PYD_2_fibril.pdb -o fibril.gro -ignh -merge all</code></p>
+</section>
+<section id="equilibration" class="level2">
+<h2 class="anchored" data-anchor-id="equilibration">Equilibration</h2>
+<p>-mdp files are in <code>&lt;kimmdy root&gt;/guide/tutorials/colbuilder/files</code></p>
+<p><code>gmx editconf -f fibril.gro -o fibril_box.gro -c -d 2.0 -bt triclinic</code> - change the long axis (z-axis) to a 95 A to accomodate the stretched fibril <code>gmx solvate -cp fibril_box.gro -p topol.top -o fibril_solv.gro</code> <code>touch ions.mdp</code> <code>gmx grompp -f ions.mdp -c fibril_solv.gro -p topol.top -o fibril_genion.tpr</code> <code>gmx genion -s fibril_genion.tpr -p topol.top -o fibril_ion.gro -conc 0.15 -neutral</code> <code>gmx grompp -f minim.mdp -c fibril_ion.gro -p topol.top -o pep_min.tpr</code> <code>gmx mdrun -deffnm pep_min -v</code></p>
 <ul>
-<li>Create a KIMMDY config file (kimmdy.yml) or modify an existing one</li>
-<li>Supply the necessary mdp files</li>
-<li>Set up the simulation box and equilibrate the system</li>
+<li>heavy computational load from here on <code>gmx grompp -f nvt.mdp -c fibril_min_renamed.gro -r fibril_min_renamed.gro -p topol_renamed.top -o nvt.tpr</code> <code>gmx mdrun -deffnm nvt -v -dlb yes -ntomp 4 -ntmpi 10  -pme gpu -bonded gpu -npme 1</code></li>
 </ul>
+<p><code>gmx grompp -f npt.mdp -c nvt.gro -r nvt.gro -p topol_renamed.top -o npt.tpr</code> <code>gmx mdrun -deffnm npt -v -dlb yes -ntomp 4 -ntmpi 10  -pme gpu -bonded gpu -npme 1</code></p>
 </section>
 <section id="simulation" class="level2">
 <h2 class="anchored" data-anchor-id="simulation">Simulation</h2>
-<p><code>kimmdy</code></p>
+<ul>
+<li>Create a KIMMDY config file (kimmdy.yml) or modify an existing one</li>
+<li>Supply the necessary mdp files</li>
+<li>Generate the necessary plumed configuration file (plumed.dat)</li>
+<li>Add the edissoc.dat and ffbonded.itp file to the run directory <code>kimmdy</code></li>
+</ul>
 </section>
 <section id="analysis" class="level2">
 <h2 class="anchored" data-anchor-id="analysis">Analysis</h2>

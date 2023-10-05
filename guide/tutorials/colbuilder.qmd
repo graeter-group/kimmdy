@@ -7,15 +7,31 @@
 
 `gmx pdb2gmx -f Homo_sapiens_aln_N_HLKNL_12_C_PYD_2_fibril.pdb -o fibril.gro -ignh -merge all`
 
+## Equilibration
+-mdp files are in `<kimmdy root>/guide/tutorials/colbuilder/files`
+
+`gmx editconf -f fibril.gro -o fibril_box.gro -c -d 2.0 -bt triclinic`
+- change the long axis (z-axis) to a 95 A to accomodate the stretched fibril
+`gmx solvate -cp fibril_box.gro -p topol.top -o fibril_solv.gro`
+`touch ions.mdp`
+`gmx grompp -f ions.mdp -c fibril_solv.gro -p topol.top -o fibril_genion.tpr`
+`gmx genion -s fibril_genion.tpr -p topol.top -o fibril_ion.gro -conc 0.15 -neutral`
+`gmx grompp -f minim.mdp -c fibril_ion.gro -p topol.top -o pep_min.tpr`
+`gmx mdrun -deffnm pep_min -v`
+
+- heavy computational load from here on
+`gmx grompp -f nvt.mdp -c fibril_min_renamed.gro -r fibril_min_renamed.gro -p topol_renamed.top -o nvt.tpr`
+`gmx mdrun -deffnm nvt -v -dlb yes -ntomp 4 -ntmpi 10  -pme gpu -bonded gpu -npme 1`
+
+`gmx grompp -f npt.mdp -c nvt.gro -r nvt.gro -p topol_renamed.top -o npt.tpr`
+`gmx mdrun -deffnm npt -v -dlb yes -ntomp 4 -ntmpi 10  -pme gpu -bonded gpu -npme 1`
+
+
+## Simulation
 - Create a KIMMDY config file (kimmdy.yml) or modify an existing one 
 - Supply the necessary mdp files
 - Generate the necessary plumed configuration file (plumed.dat)
 - Add the edissoc.dat and ffbonded.itp file to the run directory
-- Set up the simulation box and equilibrate the system
-
-
-## Simulation
-
 `kimmdy`
 
 ## Analysis
