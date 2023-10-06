@@ -516,7 +516,12 @@ class RunManager:
         logger.debug(f"Performing recipe steps:\n{pformat(recipe.recipe_steps)}")
 
         # Set time to chosen 'time_start' of KMCResult
-        truncate_sim_files(files, self.kmcresult.time_start)
+        ttime = self.kmcresult.time_start
+        if any([isinstance(step, Place) for step in recipe.recipe_steps]):
+            # only first time of interval is valid for placement
+            ttime = recipe.timespans[0][0]
+
+        truncate_sim_files(files, ttime)
 
         top_initial = deepcopy(self.top)
         for step in recipe.recipe_steps:

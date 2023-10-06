@@ -246,7 +246,7 @@ def extrande(
         return KMCResult()
 
     logger.info(f"Reaction {chosen_recipe.get_recipe_name()} was chose at time {t}")
-    logger.debug(f"\ta0:\t\t{a0}\n\tb:\t\t{b}\n\tb*u:\t{b*u}")
+    logger.debug(f"\n\ta0:\t\t{a0}\n\tb:\t\t{b}\n\tb*u:\t{b*u}")
     return KMCResult(
         recipe=chosen_recipe,
         reaction_probability=None,
