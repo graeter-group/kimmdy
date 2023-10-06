@@ -439,18 +439,30 @@ ul.task-list li input[type="checkbox"] {
 <ul>
 <li>Download the desired model and the ff parameters for gromacs from <a href="https://colbuilder.h-its.org/">colbuilder</a></li>
 <li>Clean the force field files by moving ‘amber99sb-star-ildnp.ff’ up to the working directory, adding ‘residuetypes.dat’ and ‘specbond.dat’ to the working directory, removing temporary files ’._*’ and deleting the rest of collagen.ff</li>
-<li>Convert the pdb file to .gro format and create a unified topology file (this may take a while)</li>
+<li>Convert the pdb file to .gro format and create a unified topology file (this may take a while (~16 hours))</li>
 </ul>
 <p><code>gmx pdb2gmx -f Homo_sapiens_aln_N_HLKNL_12_C_PYD_2_fibril.pdb -o fibril.gro -ignh -merge all</code></p>
 </section>
 <section id="equilibration" class="level2">
 <h2 class="anchored" data-anchor-id="equilibration">Equilibration</h2>
-<p>-mdp files are in <code>&lt;kimmdy root&gt;/guide/tutorials/colbuilder/files</code></p>
-<p><code>gmx editconf -f fibril.gro -o fibril_box.gro -c -d 2.0 -bt triclinic</code> - change the long axis (z-axis) to a 95 A to accomodate the stretched fibril <code>gmx solvate -cp fibril_box.gro -p topol.top -o fibril_solv.gro</code> <code>touch ions.mdp</code> <code>gmx grompp -f ions.mdp -c fibril_solv.gro -p topol.top -o fibril_genion.tpr</code> <code>gmx genion -s fibril_genion.tpr -p topol.top -o fibril_ion.gro -conc 0.15 -neutral</code> <code>gmx grompp -f minim.mdp -c fibril_ion.gro -p topol.top -o pep_min.tpr</code> <code>gmx mdrun -deffnm pep_min -v</code></p>
+<p>Mdp files for the following steps are located in <code>&lt;kimmdy root&gt;/guide/tutorials/colbuilder/files</code>.</p>
+<p><code>gmx editconf -f fibril.gro -o fibril_box.gro -c -d 2.0 -bt triclinic</code></p>
 <ul>
-<li>heavy computational load from here on <code>gmx grompp -f nvt.mdp -c fibril_min_renamed.gro -r fibril_min_renamed.gro -p topol_renamed.top -o nvt.tpr</code> <code>gmx mdrun -deffnm nvt -v -dlb yes -ntomp 4 -ntmpi 10  -pme gpu -bonded gpu -npme 1</code></li>
+<li>change the long axis (z-axis) to a 95 A to accomodate the stretched fibril</li>
 </ul>
-<p><code>gmx grompp -f npt.mdp -c nvt.gro -r nvt.gro -p topol_renamed.top -o npt.tpr</code> <code>gmx mdrun -deffnm npt -v -dlb yes -ntomp 4 -ntmpi 10  -pme gpu -bonded gpu -npme 1</code></p>
+<p><code>gmx solvate -cp fibril_box.gro -p topol.top -o fibril_solv.gro</code></p>
+<p><code>touch ions.mdp</code></p>
+<p><code>gmx grompp -f ions.mdp -c fibril_solv.gro -p topol.top -o fibril_genion.tpr</code></p>
+<p><code>gmx genion -s fibril_genion.tpr -p topol.top -o fibril_ion.gro -conc 0.15 -neutral</code></p>
+<p><code>gmx grompp -f minim.mdp -c fibril_ion.gro -p topol.top -o pep_min.tpr</code></p>
+<p><code>gmx mdrun -deffnm pep_min -v</code></p>
+<ul>
+<li>heavy computational load from here on</li>
+</ul>
+<p><code>gmx grompp -f nvt.mdp -c fibril_min.gro -r fibril_min.gro -p topol.top -o nvt.tpr</code></p>
+<p><code>gmx mdrun -deffnm nvt -v -dlb yes -ntomp 4 -ntmpi 10  -pme gpu -bonded gpu -npme 1</code></p>
+<p><code>gmx grompp -f npt.mdp -c nvt.gro -r nvt.gro -p topol.top -o npt.tpr</code></p>
+<p><code>gmx mdrun -deffnm npt -v -dlb yes -ntomp 4 -ntmpi 10  -pme gpu -bonded gpu -npme 1</code></p>
 </section>
 <section id="simulation" class="level2">
 <h2 class="anchored" data-anchor-id="simulation">Simulation</h2>
