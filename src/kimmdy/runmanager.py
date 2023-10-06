@@ -461,9 +461,6 @@ class RunManager:
             f"recipes recived from {reaction_plugin.name}"
         )
 
-        logger.info(
-            f"Done with Query reactions, recipes recived from {reaction_plugin.name}"
-        )
         return files
 
     def _decide_recipe(
