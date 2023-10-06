@@ -1,1 +1,0 @@
-Sitemap: http://hits-mbm-dev.github.io/kimmdy/sitemap.xml
