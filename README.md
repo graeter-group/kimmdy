@@ -12,6 +12,7 @@ Reactive MD pipeline for GROMACS using Kinetic Monte Carlo / Molecular Dynamics 
 ### Bare Installation
 ```bash
 git clone https://github.com/hits-mbm-dev/kimmdy.git
+cd kimmdy
 python -m venv .venv
 source .venv/bin/activate
 python -m pip install -e ./
@@ -41,8 +42,7 @@ Other ways to install kimmdy with all plugins are currently discouraged because 
 
 ### GitHub pages
 
-| 🚧    | GitHub pages documentation will be available once kimmdy is public |
-|---------------|:------------------------|
+[GitHub Pages documentation](https://hits-mbm-dev.github.io/kimmdy/)
 
 ### Local documentation
 ```bash
