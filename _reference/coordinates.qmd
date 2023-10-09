@@ -73,6 +73,6 @@ TODO: for now this assumes that only one moleculeype (the first, index 0) is of 
 
 ### place_atom { #kimmdy.coordinates.place_atom }
 
-`coordinates.place_atom(files, step, ttime=-1.0)`
+`coordinates.place_atom(files, step, ttime=None)`
 
 Place an atom to new coords at the last time point of the trajectory

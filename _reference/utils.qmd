@@ -147,7 +147,7 @@ to '[...xtc].tail'
 
 #### Parameters
 
-| Name    | Type                                  | Description                                          | Default    |
-|---------|---------------------------------------|------------------------------------------------------|------------|
-| `time`  | [float](`float`)                      | Time in ps up to which the data should be truncated. | _required_ |
-| `files` | [TaskFiles](`kimmdy.tasks.TaskFiles`) | TaskFiles to get the latest files.                   | _required_ |
+| Name    | Type                                              | Description                                          | Default    |
+|---------|---------------------------------------------------|------------------------------------------------------|------------|
+| `time`  | [Optional](`typing.Optional`)\[[float](`float`)\] | Time in ps up to which the data should be truncated. | _required_ |
+| `files` | [TaskFiles](`kimmdy.tasks.TaskFiles`)             | TaskFiles to get the latest files.                   | _required_ |
