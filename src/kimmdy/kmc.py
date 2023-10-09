@@ -221,13 +221,15 @@ def extrande(
         l = t_max - t
 
         tau = tau_scale * rng.exponential(1 / b)
+        logger.debug(
+            f"Extrande stats:\nTau:\t{tau}\nl:\t\t{l}\nt_max:\t{t_max}\nb:\t\t{b}"
+        )
         if tau > l:
             # reject
             logger.info(
                 "Tau exceeded simulation frame, no reaction to perform.\n"
                 f"accepted: 0, rejected: 1, extra: {n_extra}"
             )
-            logger.debug(f"\nTau:\t{tau}\nl:\t{l}\nt_max:\t{t_max}\nb:\t{b}")
             return KMCResult()
 
         t += tau
@@ -245,7 +247,7 @@ def extrande(
         # Extra reaction channel, repeat for new t
         n_extra += 1
         logger.info(f"Extra reaction channel was chose at time {t}")
-        logger.debug(f"\n\ta0:\t\t{a0}\n\tb:\t\t{b}\n\tb*u:\t{b*u}")
+        logger.debug(f"Extrande stats:\n\ta0:\t\t{a0}\n\tb:\t\t{b}\n\tb*u:\t{b*u}")
 
     if chosen_recipe is None:
         logger.info(
@@ -257,7 +259,7 @@ def extrande(
         f"Reaction {chosen_recipe.get_recipe_name()} was chose at time {t}\n"
         f"accepted: 1, rejected: 0, extra: {n_extra}"
     )
-    logger.debug(f"\n\ta0:\t\t{a0}\n\tb:\t\t{b}\n\tb*u:\t{b*u}")
+    logger.debug(f"Extrande stats:\n\ta0:\t\t{a0}\n\tb:\t\t{b}\n\tb*u:\t{b*u}")
     return KMCResult(
         recipe=chosen_recipe,
         reaction_probability=None,
