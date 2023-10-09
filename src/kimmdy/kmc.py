@@ -213,6 +213,8 @@ def extrande(
     # time of last rate, should be last MD time
     t_max = boarders[-1]
 
+    n_extra = 0
+
     while t < t_max:
         crr_window_idx = np.searchsorted(boarders, t, side="right") - 1
         b = max([sum(l) for l in rate_windows[crr_window_idx:]])
@@ -221,8 +223,11 @@ def extrande(
         tau = tau_scale * rng.exponential(1 / b)
         if tau > l:
             # reject
-            logger.info("Tau exceeded simulation frame, no reaction to perform.")
-            logger.debug(f"Tau:\t{tau}\nl:\t{l}\nt_max:\t{t_max}\nb:\t{b}")
+            logger.info(
+                "Tau exceeded simulation frame, no reaction to perform.\n"
+                f"accepted: 0, rejected: 1, extra: {n_extra}"
+            )
+            logger.debug(f"\nTau:\t{tau}\nl:\t{l}\nt_max:\t{t_max}\nb:\t{b}")
             return KMCResult()
 
         t += tau
@@ -238,14 +243,20 @@ def extrande(
             break
 
         # Extra reaction channel, repeat for new t
+        n_extra += 1
         logger.info(f"Extra reaction channel was chose at time {t}")
-        logger.debug(f"\ta0:\t\t{a0}\n\tb:\t\t{b}\n\tb*u:\t{b*u}")
+        logger.debug(f"\n\ta0:\t\t{a0}\n\tb:\t\t{b}\n\tb*u:\t{b*u}")
 
     if chosen_recipe is None:
-        logger.info("No reaction was chosen")
+        logger.info(
+            "No reaction was chosen\n" f"accepted: 0, rejected: 1, extra: {n_extra}"
+        )
         return KMCResult()
 
-    logger.info(f"Reaction {chosen_recipe.get_recipe_name()} was chose at time {t}")
+    logger.info(
+        f"Reaction {chosen_recipe.get_recipe_name()} was chose at time {t}\n"
+        f"accepted: 1, rejected: 0, extra: {n_extra}"
+    )
     logger.debug(f"\n\ta0:\t\t{a0}\n\tb:\t\t{b}\n\tb*u:\t{b*u}")
     return KMCResult(
         recipe=chosen_recipe,
