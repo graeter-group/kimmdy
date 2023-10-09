@@ -382,6 +382,9 @@ def truncate_sim_files(files: TaskFiles, time: Optional[float], keep_tail: bool 
         ), "Requested to truncate trajectory after last frame"
     else:
         raise RuntimeError(f"gmx check failed:\n{p.stdout}\n{p.stderr}")
+    logger.info(
+        f"Truncating trajectories to {time:.4} ps. Trajectory time was {last_time:.4} ps"
+    )
 
     # backup the tails of trajectories
     for trj in [paths["trr"], paths["xtc"]]:
@@ -402,7 +405,7 @@ def truncate_sim_files(files: TaskFiles, time: Optional[float], keep_tail: bool 
         paths["gro"].with_name("tmp_backup_" + paths["gro"].name)
     )
     sp.run(
-        f"gmx trjconv -f {traj} -s {bck_gro} -dump {time} -o {paths['gro']}",
+        f"gmx trjconv -f {traj} -s {bck_gro} -dump -1 -o {paths['gro']}",
         text=True,
         input="0",
         shell=True,
