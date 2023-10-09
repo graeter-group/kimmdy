@@ -64,7 +64,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
-<link href="../../_reference/index.html" rel="next">
+<link href="../../guide/tutorials/write-plugin.html" rel="next">
 <link href="../../guide/tutorials/index.html" rel="prev">
 <script src="../../site_libs/quarto-html/quarto.js"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
@@ -257,6 +257,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../../guide/tutorials/getting-started.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">0. Getting Started</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guide/tutorials/write-plugin.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2. Writing a Reaction Plugin</span></a>
   </div>
 </li>
       </ul>
@@ -560,7 +566,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Our starting structure is a simple ACE/NME-capped Alanine molecule in a box of water.</p>
     <div id="app-vis-ala.molj" class="molstar-app"></div>
     <script type="text/javascript">
-    molstar.Viewer.create("app-vis-ala.molj", {"layoutShowRemoteState":false,"viewportShowAnimation":true,"layoutShowControls":false,"pdbProvider":"rcsb","layoutShowLog":false,"layoutShowSequence":false,"emdbProvider":"rcsb","viewportShowSelectionMode":false,"viewportShowExpand":true,"layoutShowLeftPanel":true,"layoutIsExpanded":false}).then(viewer => {
+    molstar.Viewer.create("app-vis-ala.molj", {"viewportShowExpand":true,"layoutShowSequence":false,"layoutShowControls":false,"viewportShowSelectionMode":false,"layoutShowLog":false,"layoutIsExpanded":false,"layoutShowLeftPanel":true,"emdbProvider":"rcsb","pdbProvider":"rcsb","viewportShowAnimation":true,"layoutShowRemoteState":false}).then(viewer => {
     viewer.loadSnapshotFromUrl(url="vis-ala.molj", "molj");    });
     </script>
     
@@ -1042,8 +1048,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../../_reference/index.html" class="pagination-link">
-        <span class="nav-page-text">Reference</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../../guide/tutorials/write-plugin.html" class="pagination-link">
+        <span class="nav-page-text">2. Writing a Reaction Plugin</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
