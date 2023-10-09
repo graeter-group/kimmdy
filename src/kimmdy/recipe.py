@@ -224,7 +224,7 @@ class Recipe:
         Reaction rates corresponding 1:1 to timespans.
     timespans : list[list[float, float]]
         List of half-open timespans (t1, t2] in ps, at which this rate is valid.
-        Recipe steps which change the coordinates only need to be applicable 
+        Recipe steps which change the coordinates only need to be applicable
         at the first time in the interval.
         Must have same number of timespans as rates.
         t1 can equal t2 for the last frame.
