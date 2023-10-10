@@ -225,7 +225,7 @@ def extrande(
     n_extra = 0
     while t < t_max:
         crr_window_idx = np.searchsorted(boarders, t, side="right") - 1
-        b = max(rate_sums[crr_window_idx:crr_window_idx+1])
+        b = max(rate_sums[crr_window_idx : crr_window_idx + 1])
         l = t_max - t
 
         tau = tau_scale * rng.exponential(1 / b)
