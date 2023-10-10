@@ -35,8 +35,8 @@ def reference_extrande_KMC() -> KMCResult:
     return KMCResult(
         recipe=Recipe(
             [Break(3, 4), Bind(4, 5)],
-            rates=[0.15, 0.06],
-            timespans=[(2.0, 4.0), (4.0, 8.0)],
+            rates=[0.15],
+            timespans=[(2.0, 4.0)],
         ),
         time_delta=0,
         time_start=3.9741815791575505,

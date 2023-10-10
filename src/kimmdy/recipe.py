@@ -7,6 +7,7 @@ from abc import ABC
 from dataclasses import dataclass, field
 from pathlib import Path
 import logging
+from copy import copy
 import dill
 import csv
 import numpy as np
@@ -222,9 +223,11 @@ class Recipe:
     rates : list[float]
         Reaction rates corresponding 1:1 to timespans.
     timespans : list[list[float, float]]
-        List of half-open timespans (t1, t2] in ps, at which this reaction
-        path applies. Must have same number of timespans as rates.
-        t1 can equal t2 for the first frame.
+        List of half-open timespans (t1, t2] in ps, at which this rate is valid.
+        Recipe steps which change the coordinates only need to be applicable
+        at the first time in the interval.
+        Must have same number of timespans as rates.
+        t1 can equal t2 for the last frame.
 
     """
 
@@ -463,8 +466,13 @@ class RecipeCollection:
             for r, ts in zip(re.rates, re.timespans):
                 left_idx = boarders.index(ts[0])
                 right_idx = boarders.index(ts[1])
+                # timespan <- boarder
+                # the selected recipe must tell where it should be applied
+                re_copy = copy(re)
+                re_copy.timespans = [ts]
+                re_copy.rates = [r]
                 [l.append(r) for l in rate_windows[left_idx:right_idx]]
-                [l.append(re) for l in recipe_windows[left_idx:right_idx]]
+                [l.append(re_copy) for l in recipe_windows[left_idx:right_idx]]
 
         return boarders, rate_windows, recipe_windows
 

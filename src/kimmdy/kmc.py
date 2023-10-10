@@ -213,16 +213,32 @@ def extrande(
     # time of last rate, should be last MD time
     t_max = boarders[-1]
 
+    rate_sums = [sum(l) for l in rate_windows]
+    idx_rate_max = np.argmax(rate_sums)
+    expected_tau = np.mean(tau_scale * rng.exponential(1 / max(rate_sums), 10))
+    logger.debug(
+        f"Max of summed rate of {rate_sums[idx_rate_max]:.2} between t "
+        f"{boarders[idx_rate_max]} - {boarders[idx_rate_max+1]}\n"
+        f"\t\texpected tau: {expected_tau}"
+    )
+
+    n_extra = 0
     while t < t_max:
         crr_window_idx = np.searchsorted(boarders, t, side="right") - 1
-        b = max([sum(l) for l in rate_windows[crr_window_idx:]])
+        b = max(rate_sums[crr_window_idx:])
         l = t_max - t
 
         tau = tau_scale * rng.exponential(1 / b)
         if tau > l:
             # reject
-            logger.info("Tau exceeded simulation frame, no reaction to perform.")
-            logger.debug(f"Tau:\t{tau}\nl:\t{l}\nt_max:\t{t_max}\nb:\t{b}")
+            logger.info(
+                "Tau exceeded simulation frame, no reaction to perform.\n"
+                f"accepted: 0, rejected: 1, extra: {n_extra}"
+            )
+            logger.debug(
+                f"Extrande stats:\n\tb:\t\t{b}\n\tTau:\t{tau}"
+                f"\n\tl:\t\t{l}\n\tt:\t\t{t}\n\tt_max:\t{t_max}"
+            )
             return KMCResult()
 
         t += tau
@@ -238,15 +254,30 @@ def extrande(
             break
 
         # Extra reaction channel, repeat for new t
-        logger.info(f"Extra reaction channel was chose at time {t}")
-        logger.debug(f"\ta0:\t\t{a0}\n\tb:\t\t{b}\n\tb*u:\t{b*u}")
+        n_extra += 1
+        if n_extra == len(boarders * 1000):
+            logger.warning(
+                f"{n_extra} extra reactions performed during extrande KMC calculation. Try increasing tau_scale"
+            )
 
     if chosen_recipe is None:
-        logger.info("No reaction was chosen")
+        logger.info(
+            f"No reaction was chosen\naccepted: 0, rejected: 1, extra: {n_extra}"
+        )
+        logger.debug(
+            f"Extrande stats:\n\ta0:\t\t{a0}\n\tb:\t\t{b}\n\tb*u:\t{b*u}"
+            f"\n\tTau:\t{tau}\n\tl:\t\t{l}\n\tt:\t\t{t}\n\tt_max:\t{t_max}"
+        )
         return KMCResult()
 
-    logger.info(f"Reaction {chosen_recipe.get_recipe_name()} was chose at time {t}")
-    logger.debug(f"\ta0:\t\t{a0}\n\tb:\t\t{b}\n\tb*u:\t{b*u}")
+    logger.info(
+        f"Reaction {chosen_recipe.get_recipe_name()} was chose at time {t}\n"
+        f"accepted: 1, rejected: 0, extra: {n_extra}"
+    )
+    logger.debug(
+        f"Extrande stats:\n\ta0:\t\t{a0}\n\tb:\t\t{b}\n\tb*u:\t{b*u}"
+        f"\n\tTau:\t{tau}\n\tl:\t\t{l}\n\tt:\t\t{t}\n\tt_max:\t{t_max}"
+    )
     return KMCResult(
         recipe=chosen_recipe,
         reaction_probability=None,
