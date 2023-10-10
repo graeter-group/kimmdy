@@ -470,6 +470,7 @@ class RecipeCollection:
                 # the selected recipe must tell where it should be applied
                 re_copy = copy(re)
                 re_copy.timespans = [ts]
+                re_copy.rates = [r]
                 [l.append(r) for l in rate_windows[left_idx:right_idx]]
                 [l.append(re_copy) for l in recipe_windows[left_idx:right_idx]]
 
