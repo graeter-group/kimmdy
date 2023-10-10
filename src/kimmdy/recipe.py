@@ -480,7 +480,7 @@ class RecipeCollection:
         highlight_t : float, optional
             Time at which the reactions starts
         """
-        import matplotlib as mpl
+
         import matplotlib.pyplot as plt
         import seaborn as sns
         import numpy as np
@@ -497,32 +497,35 @@ class RecipeCollection:
             idxs = list(set(np.concatenate([idxs, i_to_highlight])))
 
         cmap = sns.color_palette("husl", len(recipes[idxs]))
+        name_to_args = {}
 
         plt.figure()
         for r_i, re in enumerate(recipes[idxs]):
             name = re.get_recipe_name()
+            if name not in name_to_args:
+                kwargs = {}
+                kwargs["color"] = cmap[r_i]
+                kwargs["label"] = name
 
-            linestyle = "-"
-            linewidth = 0.8
+                kwargs["linestyle"] = "-"
+                kwargs["linewidth"] = 0.8
+                name_to_args[name] = kwargs
+
             if re == highlight_r:
-                linestyle = "-."
-                linewidth += 1.3
-
                 if highlight_t is not None:
                     plt.axvline(highlight_t, color="red")
+                    name_to_args[name]["linestyle"] = "-."
+                    name_to_args[name]["linewidth"] = 2.1
 
             for dt, r in zip(re.timespans, re.rates):
                 marker = ""
-                if dt[1] == 0:
+                if dt[0] == dt[1]:
                     marker = "."
                 plt.plot(
                     np.array(dt),
                     (r, r),
-                    color=cmap[r_i],
-                    label=name,
-                    linestyle=linestyle,
-                    linewidth=linewidth,
                     marker=marker,
+                    **name_to_args[name],
                 )
         plt.xlabel("time [frames]")
         plt.ylabel("reaction rate")
