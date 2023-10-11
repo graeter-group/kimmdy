@@ -1,7 +1,7 @@
 import pytest
 from numpy.random import default_rng
 from kimmdy.recipe import Recipe, RecipeCollection, Break, Bind
-from kimmdy.kmc import rf_kmc, frm, extrande, KMCResult
+from kimmdy.kmc import rf_kmc, frm, extrande, extrande_mod, KMCResult
 
 
 @pytest.fixture
@@ -68,6 +68,11 @@ def test_extrande_empty():
     assert KMC_dict.recipe == Recipe([], [], [])
 
 
+def test_extrande_mod_empty():
+    KMC_dict = extrande_mod(RecipeCollection([]))
+    assert KMC_dict.recipe == Recipe([], [], [])
+
+
 def test_rf_kmc_unlike_ref(reference_KMC):
     rng = default_rng(1)
     # first random numbers are array([0.51182162, 0.9504637])
@@ -79,7 +84,17 @@ def test_rf_kmc_unlike_ref(reference_KMC):
 def test_extrande_calculation(recipe_collection, reference_extrande_KMC):
     rng = default_rng(1)
     # first random numbers are array([0.51182162, 0.9504637])
+    breakpoint()
     KMC_dict = extrande(recipe_collection, rng=rng)
+    assert KMC_dict.recipe == reference_extrande_KMC.recipe
+    assert abs(KMC_dict.time_start - reference_extrande_KMC.time_start) < 1e-9
+    assert abs(KMC_dict.time_delta - reference_extrande_KMC.time_delta) < 1e-9
+
+
+def test_extrande_mod_calculation(recipe_collection, reference_extrande_KMC):
+    rng = default_rng(1)
+    # first random numbers are array([0.51182162, 0.9504637])
+    KMC_dict = extrande_mod(recipe_collection, rng=rng)
     assert KMC_dict.recipe == reference_extrande_KMC.recipe
     assert abs(KMC_dict.time_start - reference_extrande_KMC.time_start) < 1e-9
     assert abs(KMC_dict.time_delta - reference_extrande_KMC.time_delta) < 1e-9
