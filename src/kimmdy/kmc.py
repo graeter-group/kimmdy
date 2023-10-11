@@ -190,7 +190,7 @@ def extrande_mod(
     a0 are the same, and the 'extra' side channel can not be triggered anymore.
 
     This should be more efficient given a limited number of time windows
-    containing constant rates. 
+    containing constant rates.
 
     Parameters
     ----------
@@ -281,6 +281,7 @@ def extrande_mod(
         time_delta=0,  # instantaneous reaction
         time_start=t,
     )
+
 
 def extrande(
     recipe_collection: RecipeCollection,
