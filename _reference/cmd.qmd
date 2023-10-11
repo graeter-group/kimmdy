@@ -3,7 +3,6 @@
 `cmd`
 
 Functions for starting KIMMDY either from python or the command line.
-Also initialized logging and configuration.
 Other entry points such as `kimmdy-analysis` also live here.
 
 ## Functions
@@ -17,17 +16,15 @@ Other entry points such as `kimmdy-analysis` also live here.
 
 ### configure_logger { #kimmdy.cmd.configure_logger }
 
-`cmd.configure_logger(log_path, log_level, no_increment_logfile=False)`
+`cmd.configure_logger(config)`
 
 Configure logging.
 
 #### Parameters
 
-| Name                   | Type                   | Description                                                                              | Default    |
-|------------------------|------------------------|------------------------------------------------------------------------------------------|------------|
-| `log_path`             | [Path](`pathlib.Path`) | File path to log file                                                                    | _required_ |
-| `log_level`            | [str](`str`)           | Loglevel. One of ["INFO", "WARNING", "MESSAGE", "DEBUG"]                                 | _required_ |
-| `no_increment_logfile` | [bool](`bool`)         | If True, do not backup existing log file. This is used for restarting from a checkpoint. | `False`    |
+| Name     | Type                             | Description                                        | Default    |
+|----------|----------------------------------|----------------------------------------------------|------------|
+| `config` | [Config](`kimmdy.config.Config`) | configuration that contains log.level and log.file | _required_ |
 
 ### entry_point_kimmdy { #kimmdy.cmd.entry_point_kimmdy }
 
@@ -47,13 +44,13 @@ Parse command line arguments.
 
 #### Returns
 
-| Type                                                     | Description                   |
-|----------------------------------------------------------|-------------------------------|
-| [argparse](`argparse`).[Namespace](`argparse.Namespace`) | Parsed command line arguments |
+| Type                          | Description   |
+|-------------------------------|---------------|
+| Parsed command line arguments |               |
 
 ### kimmdy_run { #kimmdy.cmd.kimmdy_run }
 
-`cmd.kimmdy_run(input=Path('kimmdy.yml'), loglevel='DEBUG', logfile=Path('kimmdy.log'), checkpoint='', from_latest_checkpoint=False, concat=False, show_plugins=False, show_schema_path=False, generate_jobscript=False, debug=False)`
+`cmd.kimmdy_run(input=Path('kimmdy.yml'), loglevel=None, logfile=None, checkpoint='', show_plugins=False, show_schema_path=False, generate_jobscript=False, debug=False)`
 
 Run KIMMDY from python.
 
@@ -61,14 +58,12 @@ Also see See [](`~kimmdy.cmd.get_cmdline_args`) or `kimmdy --help` for the descr
 
 #### Parameters
 
-| Name                     | Type                   | Description                                                                               | Default              |
-|--------------------------|------------------------|-------------------------------------------------------------------------------------------|----------------------|
-| `input`                  | [Path](`pathlib.Path`) | kimmdy input yml file.                                                                    | `Path('kimmdy.yml')` |
-| `loglevel`               | [str](`str`)           | Loglevel. One of ["INFO", "WARNING", "MESSAGE", "DEBUG"]                                  | `'DEBUG'`            |
-| `logfile`                | [Path](`pathlib.Path`) | File path of the logfile.                                                                 | `Path('kimmdy.log')` |
-| `checkpoint`             | [str](`str`)           | File path if a kimmdy.cpt file to restart KIMMDY from a checkpoint.                       | `''`                 |
-| `from_latest_checkpoint` | [bool](`bool`)         | Start KIMMDY from the latest checkpoint.                                                  | `False`              |
-| `concat`                 | [bool](`bool`)         | Don't perform a full KIMMDY run but instead concatenate trajectories from a previous run. | `False`              |
-| `show_plugins`           | [bool](`bool`)         | Show available plugins and exit.                                                          | `False`              |
-| `show_schema_path`       | [bool](`bool`)         | Print path to yaml schema for use with yaml-language-server e.g. in VSCode and Neovim     | `False`              |
-| `generate_jobscript`     | [bool](`bool`)         | Instead of running KIMMDY directly, generate at jobscript.sh for slurm HPC clusters       | `False`              |
+| Name                 | Type                                                    | Description                                                                                                                                 | Default              |
+|----------------------|---------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------|----------------------|
+| `input`              | [Path](`pathlib.Path`)                                  | kimmdy input yml file.                                                                                                                      | `Path('kimmdy.yml')` |
+| `loglevel`           | [Optional](`typing.Optional`)\[[str](`str`)\]           | Loglevel. One of ["INFO", "WARNING", "MESSAGE", "DEBUG"]                                                                                    | `None`               |
+| `logfile`            | [Optional](`typing.Optional`)\[[Path](`pathlib.Path`)\] | File path of the logfile.                                                                                                                   | `None`               |
+| `checkpoint`         | [str](`str`)                                            | File path of a kimmdy.cpt file to restart KIMMDY from a checkpoint. If a directory is given, the file kimmdy.cpt in that directory is used. | `''`                 |
+| `show_plugins`       | [bool](`bool`)                                          | Show available plugins and exit.                                                                                                            | `False`              |
+| `show_schema_path`   | [bool](`bool`)                                          | Print path to yaml schema for use with yaml-language-server e.g. in VSCode and Neovim                                                       | `False`              |
+| `generate_jobscript` | [bool](`bool`)                                          | Instead of running KIMMDY directly, generate at jobscript.sh for slurm HPC clusters                                                         | `False`              |

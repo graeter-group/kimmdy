@@ -16,6 +16,13 @@
       "pytype": "Path",
       "description": "Additional itp file with bonded parameters",
       "default": "ffbonded.itp"
+    },
+    "kmc": {
+      "description": "KMC algorithm for this reaction.",
+      "type": "string",
+      "pytype": "str",
+      "enum": ["rfkmc", "frm", "extrande"],
+      "default": "rfkmc"
     }
   },
   "required": [ "edis", "itp" ]

@@ -10,23 +10,40 @@ from kimmdy.topology.utils import (
     set_top_section,
 )
 from kimmdy.topology.ff import FF
+from kimmdy.plugins import BasicParameterizer, Parameterizer
 from itertools import permutations, combinations
 import textwrap
 import logging
+from copy import copy
 
 from kimmdy.utils import TopologyAtomAddress
 
-logger = logging.getLogger("kimmdy")
+logger = logging.getLogger("kimmdy.topology")
 
 
 class MoleculeType:
-    """One moleculetype in the topology"""
+    """One moleculetype in the topology
+
+    Attributes
+    ----------
+    atoms : dict[str, Atom]
+    bonds : dict[tuple[str, str], Bond]
+    pairs : dict[tuple[str, str], Pair]
+    angles : dict[tuple[str, str, str], Angle]
+    proper_dihedrals : dict[tuple[str, str, str, str], MultipleDihedrals]
+    improper_dihedrals : dict[tuple[str, str, str, str], Dihedral]
+    position_restraints : dict[str, PositionRestraint]
+    dihedral_restraints : dict[tuple[str, str, str, str], DihedralRestraint]
+    radicals : dict[str, Atom]
+        dict mapping atom indices to atom objects for storing all radical atoms
+
+    """
 
     def __init__(self, header: tuple[str, str], atomics: dict) -> None:
         self.name, self.nrexcl = header
         self.atomics = atomics
 
-        logger.info(f"parsing molecule {self.name}")
+        logger.debug(f"parsing molecule {self.name}")
 
         self.atoms: dict[str, Atom] = {}
         self.bonds: dict[tuple[str, str], Bond] = {}
@@ -48,7 +65,7 @@ class MoleculeType:
         self._parse_dihedrals()
         self._parse_restraints()
         self._initialize_graph()
-        self._test_for_radicals()
+        self.test_for_radicals()
 
     def __str__(self) -> str:
         return textwrap.dedent(
@@ -74,8 +91,8 @@ class MoleculeType:
         This whill be used if just the name of the object is entered in the ipython shell
         or a jupyter notebook.
 
-        p is an instance of IPython.lib.pretty.RepresentationPrinter
-        <https://ipython.org/ipython-doc/3/api/generated/IPython.lib.pretty.html#IPython.lib.pretty.PrettyPrinter>
+        p is an instance of
+        [IPython.lib.pretty.PrettyPrinter](https://ipython.org/ipython-doc/3/api/generated/IPython.lib.pretty.html)
         """
         p.text(str(self))
 
@@ -158,8 +175,12 @@ class MoleculeType:
             self.atoms[i].bound_to_nrs.append(j)
             self.atoms[j].bound_to_nrs.append(i)
 
-    def _test_for_radicals(self):
-        """Iterate over all atoms and designate them as radicals if they have fewer bounds than their natural bond order"""
+    def test_for_radicals(self):
+        """Updates radical status per atom and in topology.
+
+        Iterate over all atoms and designate them as radicals if they have
+        fewer bounds than their natural bond order.
+        """
         for atom in self.atoms.values():
             bo = ATOMTYPE_BONDORDER_FLAT.get(atom.type)
             if bo and bo > len(atom.bound_to_nrs):
@@ -205,9 +226,9 @@ class MoleculeType:
 
     def _get_atom_angles(self, atom_nr: str) -> list[tuple[str, str, str]]:
         """
-        each atom has a list of atoms it is bound to
-        get a list of angles that one atom is involved in
-        based in these lists.
+        Gets a list of angles that one atom is involved in based on the bond
+        information stored in the atom.
+
         Angles between atoms ai, aj, ak satisfy ai < ak
         """
         return self._get_center_atom_angles(atom_nr) + self._get_margin_atom_angles(
@@ -243,9 +264,8 @@ class MoleculeType:
         self, atom_nr: str
     ) -> list[tuple[str, str, str, str]]:
         """
-        each atom has a list of atoms it is bound to.
-        get a list of dihedrals that one atom is involved in
-        based in these lists.
+        Gets a list of dihedrals that one atom is involved in based on the bond
+        information stored in the atom.
         """
         return self._get_center_atom_dihedrals(
             atom_nr
@@ -302,23 +322,21 @@ class MoleculeType:
         if residue is None:
             return []
 
-        # <https://manual.gromacs.org/current/reference-manual/functions/bonded-interactions.html#improper-dihedrals>
+        # https://manual.gromacs.org/current/reference-manual/functions/bonded-interactions.html#improper-dihedrals
         # atom in a line, like a regular dihedral:
         dihedrals = []
         dihedral_candidate_keys = self._get_margin_atom_dihedrals(
             atom_nr
         ) + self._get_center_atom_dihedrals(atom_nr)
 
-        # atom in the center of a star/tetrahedron:
+        # atom in the center of a triangle:
         ai = atom_nr
         partners = self.atoms[ai].bound_to_nrs
         if len(partners) >= 3:
-            combs = combinations(partners, 3)
-            for comb in combs:
-                aj, ak, al = comb
+            for aj, ak, al in combinations(partners, 3):
                 dihedral_candidate_keys.append((ai, aj, ak, al))
 
-        # atom in corner of a star/tetrahedron:
+        # atom in corner of a triangle:
         for a in self.atoms[atom_nr].bound_to_nrs:
             partners = self.atoms[a].bound_to_nrs
             if len(partners) >= 3:
@@ -373,7 +391,7 @@ class MoleculeType:
                 self.proper_dihedrals[key] = MultipleDihedrals(
                     *key, "9", dihedrals={"": Dihedral(*key, "9")}
                 )
-                pairkey = tuple(str(x) for x in sorted([key[0], key[3]], key=int))
+                pairkey: tuple[str, str] = tuple(str(x) for x in sorted([key[0], key[3]], key=int))  # type: ignore
                 if self.pairs.get(pairkey) is None:
                     self.pairs[pairkey] = Pair(pairkey[0], pairkey[1], "1")
 
@@ -389,11 +407,12 @@ class MoleculeType:
                     improper.cq,
                 )
 
-    def reindex_atomnrs(self):
+    def reindex_atomnrs(self) -> dict[str, str]:
         """Reindex atom numbers in topology.
 
         Starts at index 1.
         This also updates the numbers for bonds, angles, dihedrals and pairs.
+        Returns a dict, mapping of old atom number strings to new ones
         """
 
         update_map = {
@@ -430,45 +449,44 @@ class MoleculeType:
             aj = update_map.get(angle.aj)
             ak = update_map.get(angle.ak)
             # drop angles to a deleted atom
-            if ai is None or aj is None or ak is None:
+            if None in (ai, aj, ak):
                 continue
-            angle.ai = ai
-            angle.aj = aj
-            angle.ak = ak
+            # pyright does not grok `None in ...`
+            angle.ai = ai  # type: ignore
+            angle.aj = aj  # type: ignore
+            angle.ak = ak  # type: ignore
             new_angles[(angle.ai, angle.aj, angle.ak)] = angle
         self.angles = new_angles
 
         new_pairs = {}
         new_multiple_dihedrals = {}
+        new_dihedrals = {}
         for dihedrals in self.proper_dihedrals.values():
-            # do pairs before the ids are updated
-            pair = self.pairs.get((dihedrals.ai, dihedrals.al))
-            if pair:
-                ai = update_map.get(pair.ai)
-                aj = update_map.get(pair.aj)
-                if ai and aj:
-                    pair.ai = update_map[pair.ai]
-                    pair.aj = update_map[pair.aj]
-                    new_pairs[(ai, aj)] = pair
-
             ai = update_map.get(dihedrals.ai)
             aj = update_map.get(dihedrals.aj)
             ak = update_map.get(dihedrals.ak)
             al = update_map.get(dihedrals.al)
             # drop dihedrals to a deleted atom
-            if ai is None or aj is None or ak is None or al is None:
+            if None in (ai, aj, ak, al):
                 continue
-            dihedrals.ai = ai
-            dihedrals.aj = aj
-            dihedrals.ak = ak
-            dihedrals.al = al
 
-            new_dihedrals = {}
+            # do pairs before the dihedrals are updated
+            if pair := self.pairs.get((dihedrals.ai, dihedrals.al)):
+                pair_ai = update_map.get(pair.ai)
+                pair_aj = update_map.get(pair.aj)
+                if not None in (pair_ai, pair_aj):
+                    new_pairs[(pair_ai, pair_aj)] = pair
+
+            dihedrals.ai = ai  # type: ignore
+            dihedrals.aj = aj  # type: ignore
+            dihedrals.ak = ak  # type: ignore
+            dihedrals.al = al  # type: ignore
+
             for dihedral in dihedrals.dihedrals.values():
-                dihedral.ai = ai
-                dihedral.aj = aj
-                dihedral.ak = ak
-                dihedral.al = al
+                dihedral.ai = ai  # type: ignore
+                dihedral.aj = aj  # type: ignore
+                dihedral.ak = ak  # type: ignore
+                dihedral.al = al  # type: ignore
                 new_dihedrals[dihedral.periodicity] = dihedral
 
             new_multiple_dihedrals[
@@ -483,27 +501,31 @@ class MoleculeType:
         self.proper_dihedrals = new_multiple_dihedrals
         self.pairs = new_pairs
 
-        new_dihedrals = {}
+        new_impropers = {}
         for dihedral in self.improper_dihedrals.values():
             ai = update_map.get(dihedral.ai)
             aj = update_map.get(dihedral.aj)
             ak = update_map.get(dihedral.ak)
             al = update_map.get(dihedral.al)
             # drop dihedrals to a deleted atom
-            if ai is None or aj is None or ak is None or al is None:
+            if None in (ai, aj, ak, al):
                 continue
-            dihedral.ai = ai
-            dihedral.aj = aj
-            dihedral.ak = ak
-            dihedral.al = al
-            new_dihedrals[(ai, aj, ak, al)] = dihedral
-        self.improper_dihedrals = new_dihedrals
+            dihedral.ai = ai  # type: ignore
+            dihedral.aj = aj  # type: ignore
+            dihedral.ak = ak  # type: ignore
+            dihedral.al = al  # type: ignore
+            new_impropers[(ai, aj, ak, al)] = dihedral
+        self.improper_dihedrals = new_impropers
+
+        return update_map
 
 
 class Topology:
     """Smart container for parsed topology data.
 
     A topology keeps track of connections when bonds are broken or formed.
+    Reparametrization is triggerd automatically if `to_dict` is called
+    after bonds have changed.
 
     Assumptions:
 
@@ -511,13 +533,13 @@ class Topology:
 
     Parameters
     ----------
-    top :
-        A dictionary containing the parsed topology data.
+    top
+        A dictionary containing the parsed topology data, produced by
+        [](`kimmdy.parsing.read_top`)
     """
 
     def __init__(
-        self,
-        top: TopologyDict,
+        self, top: TopologyDict, parametrizer: Parameterizer = BasicParameterizer()
     ) -> None:
         if top == {}:
             raise NotImplementedError(
@@ -533,25 +555,53 @@ class Topology:
 
         self.ff = FF(top)
         self._parse_molecules()
+        self.parametrizer = parametrizer
+        self.needs_parameterization = False
 
         # link atoms, bonds etc. to the main moleculeype, assumed to be the first
         # "moleculetype_0"
-        main_molecule_name = list(self.moleculetypes.keys())[0]
-        self.atoms = self.moleculetypes[main_molecule_name].atoms
-        self.bonds = self.moleculetypes[main_molecule_name].bonds
-        self.angles = self.moleculetypes[main_molecule_name].angles
-        self.proper_dihedrals = self.moleculetypes[main_molecule_name].proper_dihedrals
+        self.main_molecule_ix = 0
+        self.main_molecule_name = list(self.moleculetypes.keys())[self.main_molecule_ix]
+        self.main_molecule = self.moleculetypes[self.main_molecule_name]
+        self.atoms = self.main_molecule.atoms
+        self.bonds = self.main_molecule.bonds
+        self.angles = self.main_molecule.angles
+        self.proper_dihedrals = self.main_molecule.proper_dihedrals
         self.improper_dihedrals = self.moleculetypes[
-            main_molecule_name
+            self.main_molecule_name
         ].improper_dihedrals
-        self.pairs = self.moleculetypes[main_molecule_name].pairs
+        self.pairs = self.main_molecule.pairs
         self.position_restraints = self.moleculetypes[
-            main_molecule_name
+            self.main_molecule_name
         ].position_restraints
         self.dihedral_restraints = self.moleculetypes[
-            main_molecule_name
+            self.main_molecule_name
         ].dihedral_restraints
-        self.radicals = self.moleculetypes[main_molecule_name].radicals
+        self.radicals = self.main_molecule.radicals
+
+    def validate_bond(self, atm1: Atom, atm2: Atom) -> bool:
+        """Validates bond consistency between both atoms and top
+        Returns True if bond exists, False if not.
+        Raises RuntimeError if bond is not consistent.
+        """
+
+        counter = 0
+        if (atm1.nr, atm2.nr) in self.bonds.keys():
+            counter += 1
+        if atm1.nr in atm2.bound_to_nrs:
+            counter += 1
+        if atm2.nr in atm1.bound_to_nrs:
+            counter += 1
+        if counter == 3:
+            return True
+        elif counter == 0:
+            return False
+        raise RuntimeError(
+            f"Bond between atom {atm1.nr} {atm1.type} and {atm2.nr} {atm2.type} "
+            "(1-based) is ill-defined!\n"
+            f"\tatm1.bound_to_nrs {atm1.bound_to_nrs}\n"
+            f"\tatm2.bound_to_nrs {atm2.bound_to_nrs}\n"
+        )
 
     def _parse_molecules(self):
         moleculetypes = [k for k in self.top.keys() if k.startswith("moleculetype")]
@@ -571,7 +621,7 @@ class Topology:
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Topology):
-            return NotImplemented
+            return False
         return self.to_dict() == other.to_dict()
 
     def _update_dict(self):
@@ -606,18 +656,72 @@ class Topology:
             [attributes_to_list(x) for x in self.ff.angletypes.values()],
         )
 
+    def update_parameters(self):
+        if self.needs_parameterization:
+            if self.parametrizer is not None:
+                logger.info(
+                    f"Starting parametrization using {self.parametrizer.__class__.__name__}"
+                )
+                self.parametrizer.parameterize_topology(self)
+            else:
+                raise RuntimeError("No Parametrizer was initialized in this topology!")
+            self.needs_parameterization = False
+
     def to_dict(self) -> TopologyDict:
+        self.update_parameters()
         self._update_dict()
         return self.top
 
-    def reindex_atomnrs(self):
+    def del_atom(self, atom_nr: str, parameterize: bool = True) -> dict[str, str]:
+        """Deletes atom
+
+        Deletes atom and all attached bonds. Reindexes the top and updates the
+        parameters if requested.
+
+        Parameters
+        ----------
+        atom_nr
+            1-based atom number as string to delete
+        parameterize
+            If true and bonds are removed triggers reparameterization,
+            by default True
+
+        Returns
+        -------
+        update_map
+            Dict, mapping of old atom number strings to new ones.
+        """
+        atom = self.atoms[atom_nr]
+        logger.debug(
+            f"Deleting Atom nr {atom.nr}, type {atom.type}, res {atom.residue}"
+        )
+
+        # break all bonds and delete all pairs, diheadrals etc
+        for bound_nr in copy(atom.bound_to_nrs):
+            self.break_bond((bound_nr, atom_nr))
+
+        self.atoms.pop(atom_nr)
+        update_map_all = self.reindex_atomnrs()
+        update_map = update_map_all[self.main_molecule_name]
+
+        if parameterize:
+            self.update_parameters()
+        # Overwriting in case of no parameterization wanted
+        self.needs_parameterization = False
+
+        return update_map
+
+    def reindex_atomnrs(self) -> dict[str, dict[str, str]]:
         """Reindex atom numbers in topology.
 
         Starts at index 1.
         This also updates the numbers for bonds, angles, dihedrals and pairs.
+        Returns a dict of all moleculetypes to their update maps (old -> new).
         """
-        for moleculetype in self.moleculetypes.values():
-            moleculetype.reindex_atomnrs()
+        update_map_all = {}
+        for id, moleculetype in self.moleculetypes.items():
+            update_map_all[id] = moleculetype.reindex_atomnrs()
+        return update_map_all
 
     def _regenerate_topology_from_bound_to(self):
         """Regenerate the topology from the bound_to lists of the atoms."""
@@ -644,44 +748,56 @@ class Topology:
         This whill be used if just the name of the object is entered in the ipython shell
         or a jupyter notebook.
 
-        p is an instance of IPython.lib.pretty.RepresentationPrinter
-        <https://ipython.org/ipython-doc/3/api/generated/IPython.lib.pretty.html#IPython.lib.pretty.PrettyPrinter>
+        p is an instance of
+        [IPython.lib.pretty.PrettyPrinter](https://ipython.org/ipython-doc/3/api/generated/IPython.lib.pretty.html)
         """
         p.text(str(self))
 
     def break_bond(
         self, atompair_addresses: tuple[TopologyAtomAddress, TopologyAtomAddress]
     ):
-        """Break bonds in topology.
+        """Break bonds in topology homolytically.
 
-        removes bond, angles and dihedrals where atompair was involved.
+        Removes bond, angles and dihedrals where atompair was involved.
         Modifies the topology dictionary in place.
-
+        Atom pairs become radicals.
 
         Parameters
         ----------
-        atompair_addresses :
+        atompair_addresses
             Between which atoms to break the bond.
         """
+        logger.debug(f"Breaking bond between {atompair_addresses}")
         if type(atompair_addresses[0]) == str and type(atompair_addresses[1]) == str:
             # old style atompair_nrs with only atom numbers
             # thus refers to the first moleculeype, moleculetype_0
             # with the name Protein
             atompair_nrs = (atompair_addresses[0], atompair_addresses[1])
-            main_molecule_name = list(self.moleculetypes.keys())[0]
         else:
             raise NotImplementedError(
-                "Breaking/Binding bonds in topology between atoms with different moleculetypes is not implemented, yet."
+                "Breaking/Binding bonds in topology between atoms with "
+                "different moleculetypes is not implemented."
             )
 
-        moleculetype = self.moleculetypes[main_molecule_name]
+        moleculetype = self.main_molecule
 
-        atompair_nrs = tuple(sorted(atompair_nrs, key=int))
+        # tuple -> list -> sorted -> tuple still makes it a tuple of two strings
+        # so pyright can chill.
+        atompair_nrs: tuple[str, str] = tuple(sorted(atompair_nrs, key=int))  # type: ignore
 
         atompair = [
             moleculetype.atoms[atompair_nrs[0]],
             moleculetype.atoms[atompair_nrs[1]],
         ]
+
+        if not self.validate_bond(*atompair):
+            raise ValueError(
+                "Trying to break non-existing bond!"
+                f"\n\tatom 1, nr {atompair[0].nr}, type {atompair[0].type}, res {atompair[0].residue}"
+                f"\n\tatom 2, nr {atompair[1].nr}, type {atompair[1].type}, res {atompair[1].residue}"
+            )
+
+        self.needs_parameterization = True
 
         # mark atoms as radicals
         for atom in atompair:
@@ -690,8 +806,8 @@ class Topology:
 
         # bonds
         # remove bond
-        removed_bond = moleculetype.bonds.pop(atompair_nrs, None)
-        logging.info(f"removed bond: {removed_bond}")
+        removed_bond = moleculetype.bonds.pop(atompair_nrs)
+        logging.debug(f"removed bond: {removed_bond}")
 
         # remove angles
         angle_keys = moleculetype._get_center_atom_angles(
@@ -714,7 +830,7 @@ class Topology:
                 # dihedral contained a now deleted bond because
                 # it had both atoms of the broken bond
                 moleculetype.proper_dihedrals.pop(key, None)
-                pairkey = tuple(sorted((key[0], key[3]), key=int))
+                pairkey: tuple[str, str] = tuple(sorted((key[0], key[3]), key=int))  # type: ignore
                 moleculetype.pairs.pop(pairkey, None)
 
         # and improper dihedrals
@@ -725,13 +841,21 @@ class Topology:
             if all([x in key for x in atompair_nrs]):
                 moleculetype.improper_dihedrals.pop(key, None)
 
+        # warn if atom is part of restraint
+        for atom in atompair:
+            posres = atom.nr in self.position_restraints.keys()
+            dihres = any([atom.nr in atms for atms in self.position_restraints.keys()])
+            if posres or dihres:
+                logging.warning(
+                    "Deleting bond with atom involved in a restraint!"
+                    "This may causes unwanted behaviour.\n"
+                    f"\n\tatom 1, nr {atompair[0].nr}, type {atompair[0].type}, res {atompair[0].residue}"
+                    f"\n\tatom 2, nr {atompair[1].nr}, type {atompair[1].type}, res {atompair[1].residue}"
+                )
+
         # update bound_to
-        try:
-            atompair[0].bound_to_nrs.remove(atompair[1].nr)
-            atompair[1].bound_to_nrs.remove(atompair[0].nr)
-        except ValueError as _:
-            m = f"tried to remove bond between already disconnected atoms: {atompair}."
-            logging.warning(m)
+        atompair[0].bound_to_nrs.remove(atompair[1].nr)
+        atompair[1].bound_to_nrs.remove(atompair[0].nr)
 
     def bind_bond(
         self, atompair_addresses: tuple[TopologyAtomAddress, TopologyAtomAddress]
@@ -745,34 +869,49 @@ class Topology:
 
         Parameters
         ----------
-        atompair_addresses :
+        atompair_addresses
             Atoms to bind together.
         """
+        logger.debug(f"Creating bond between {atompair_addresses}")
         if type(atompair_addresses[0]) == str and type(atompair_addresses[1]) == str:
             # old style atompair_nrs with only atom numbers
             # thus refers to the first moleculeype, moleculetype_0
             # with the name Protein
             atompair_nrs = (atompair_addresses[0], atompair_addresses[1])
-            main_molecule_name = list(self.moleculetypes.keys())[0]
         else:
             raise NotImplementedError(
-                "Breaking/Binding bonds in topology between atoms with different moleculetypes is not implemented, yet."
+                "Breaking/Binding bonds in topology between atoms with "
+                "different moleculetypes is not implemented."
             )
 
-        moleculetype = self.moleculetypes[main_molecule_name]
+        moleculetype = self.main_molecule
 
-        atompair_nrs = tuple(sorted(atompair_nrs, key=int))
+        atompair_nrs: tuple[str, str] = tuple(sorted(atompair_nrs, key=int))  # type: ignore
         atompair = [
             moleculetype.atoms[atompair_nrs[0]],
             moleculetype.atoms[atompair_nrs[1]],
         ]
+
+        # check whether they are bound already
+        if self.validate_bond(*atompair):
+            raise ValueError(
+                "Trying to bind to atoms already bound!"
+                f"\n\tatom 1, nr {atompair[0].nr}, type {atompair[0].type}, res {atompair[0].residue}"
+                f"\n\tatom 2, nr {atompair[1].nr}, type {atompair[1].type}, res {atompair[1].residue}"
+            )
+
+        self.needs_parameterization = True
 
         # de-radialize if re-combining two radicals
         if all(map(lambda x: x.is_radical, atompair)):
             atompair[0].is_radical = False
             atompair[1].is_radical = False
             for a in atompair:
-                moleculetype.radicals.pop(a.nr)
+                if moleculetype.radicals.pop(a.nr) is None:
+                    logging.warning(
+                        f"Atom {a} should have been a radical but was "
+                        "not registed in moleculetype.radicals"
+                    )
 
         # quickfix for jumping hydrogens
         # to make them adopt the correct residuetype and atomtype
@@ -818,11 +957,11 @@ class Topology:
                 else:
                     if type_set:
                         logging.warning(
-                            f"Found new atomtype but not atomname for HAT hydrogen!"
+                            "Found new atomtype but not atomname for HAT hydrogen!"
                         )
                     else:
                         logging.warning(
-                            f"Found neither new atomtype nor atomname for HAT hydrogen!"
+                            "Found neither new atomtype nor atomname for HAT hydrogen!"
                         )
 
         # update bound_to
@@ -857,7 +996,7 @@ class Topology:
                 moleculetype.proper_dihedrals[key] = MultipleDihedrals(
                     *key, "9", dihedrals={"": Dihedral(*key, "9")}
                 )
-            pairkey = tuple(str(x) for x in sorted([key[0], key[3]], key=int))
+            pairkey: tuple[str, str] = tuple(str(x) for x in sorted([key[0], key[3]], key=int))  # type: ignore
             if moleculetype.pairs.get(pairkey) is None:
                 moleculetype.pairs[pairkey] = Pair(pairkey[0], pairkey[1], "1")
 
@@ -874,32 +1013,3 @@ class Topology:
                 moleculetype.improper_dihedrals[key] = Dihedral(
                     key[0], key[1], key[2], key[3], "4", value.q0, value.cq, c2
                 )
-
-    # def move_hydrogen(self, from_to: tuple[TopologyAtomAddress, TopologyAtomAddress]):
-    #     """Move a singly bound atom to a new location.
-
-    #     This is typically H for Hydrogen Atom Transfer (HAT).
-    #     """
-    #     if type(from_to[0]) == str and type(from_to[1]) == str:
-    #         # old style atompair_nrs with only atom numbers
-    #         # thus refers to the first moleculeype, moleculetype_0
-    #         # with the name Protein
-    #         from_to = (from_to[0], from_to[1])
-    #         main_molecule_name = list(self.moleculetypes.keys())[0]
-    #     else:
-    #         raise NotImplementedError(
-    #             "Breaking/Binding bonds in topology between atoms with different moleculetypes is not implemented, yet."
-    #         )
-
-    #     moleculetype = self.moleculetypes[main_molecule_name]
-
-    #     f, t = list(map(str, from_to))
-    #     assert (
-    #         moleculetype.atoms[f].type[0] == "H"
-    #     ), f"move_hydrogen called for non-hydrogen! type: {moleculetype.atoms[f].type}"
-    #     heavy = moleculetype.atoms[f].bound_to_nrs.pop()
-    #     if heavy is None:
-    #         logging.error(f"Atom {f} is not bound to anything.")
-    #         return
-    #     self.break_bond((f, heavy))
-    #     self.bind_bond((f, t))

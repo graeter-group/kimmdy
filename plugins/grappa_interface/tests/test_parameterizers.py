@@ -121,9 +121,10 @@ def test_apply_parameters():
 
 def test_parameterize_topology(tmp_path):
     os.chdir(tmp_path.resolve())
-    top = Topology(read_top(Path(__file__).parent / "Ala_out.top"))
-
     parameterizer = GrappaInterface()
+    top = Topology(read_top(Path(__file__).parent / "Ala_out.top"), parameterizer)
+
     curr_top = deepcopy(top)
-    parameterizer.parameterize_topology(curr_top)
+    curr_top.needs_parameterization = True
+    curr_top.update_parameters()
     assert top != curr_top

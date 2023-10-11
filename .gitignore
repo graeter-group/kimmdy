@@ -23,6 +23,7 @@ cat-center.gro
 *.pickle
 .*.npz
 .*.lock
+*.tail
 
 # tutorials and example output files
 guide/kimmdy-tutorial
@@ -30,8 +31,11 @@ guide/kimmdy-tutorial
 
 # excludes
 !tests/test_files/test_coordinates/pull.trr
+!tests/test_files/test_coordinates/relax.trr
+!tests/test_files/test_coordinates/relax.xtc
 !tests/test_files/test_config/pull.trr
 !tests/test_files/test_integration/hexalanine_single_reaction/pull.trr
+!example/hexalanine_single_reaction/pull.trr
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

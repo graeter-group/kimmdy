@@ -1,5 +1,50 @@
 # Changelog
 
+## [4.4.1](https://github.com/hits-mbm-dev/kimmdy/compare/v4.4.0...v4.4.1) (2023-09-13)
+
+
+### Bug Fixes
+
+* **test:** increase hypothesis deadline ([f7d8867](https://github.com/hits-mbm-dev/kimmdy/commit/f7d8867560600c04099da99a28be12311cb3b0af))
+
+## [4.4.0](https://github.com/hits-mbm-dev/kimmdy/compare/v4.3.0...v4.4.0) (2023-09-13)
+
+
+### Features
+
+* **dummy:** this is not a feature, just a release trigger ([6aa1190](https://github.com/hits-mbm-dev/kimmdy/commit/6aa1190fb0eca93388a8e9d7e95c8b2f5945a55d))
+
+
+### Bug Fixes
+
+* **analysis:** remove y axis label for steps panel in plot_energy ([a2bc88a](https://github.com/hits-mbm-dev/kimmdy/commit/a2bc88ac4b8405ae940f0f241fe4778c2039552e))
+* **test:** increase hypothesis deadline ([4b9823d](https://github.com/hits-mbm-dev/kimmdy/commit/4b9823d45265aecfada2d7bd1f4b90640164d31a))
+* **test:** increase hypothesis deadline ([9810e84](https://github.com/hits-mbm-dev/kimmdy/commit/9810e8478375e43311e0458d71cc9748ae80d684))
+
+## [4.3.0](https://github.com/hits-mbm-dev/kimmdy/compare/v4.2.1...v4.3.0) (2023-09-08)
+
+
+### Features
+
+* unify output location ([#255](https://github.com/hits-mbm-dev/kimmdy/issues/255))! ([cbd4d5d](https://github.com/hits-mbm-dev/kimmdy/commit/cbd4d5db913b38f1ea02ce37d6ccfae0c50053e5))
+
+
+### Bug Fixes
+
+* closes  [#265](https://github.com/hits-mbm-dev/kimmdy/issues/265) , cleanup with flake8 ([d79adbc](https://github.com/hits-mbm-dev/kimmdy/commit/d79adbcd798cbe56ded35a96c09679eaf5e4b2c2))
+* jobscript and logging ([cbd4d5d](https://github.com/hits-mbm-dev/kimmdy/commit/cbd4d5db913b38f1ea02ce37d6ccfae0c50053e5))
+* place_atom ([0e0dc1d](https://github.com/hits-mbm-dev/kimmdy/commit/0e0dc1dbf4537f12b5af3cca32aba11c7a1ba4fc))
+* properly merge mds general '.*' section and general options with defaults ([cbd4d5d](https://github.com/hits-mbm-dev/kimmdy/commit/cbd4d5db913b38f1ea02ce37d6ccfae0c50053e5))
+* set defaults on non-existent sections. fixes [#264](https://github.com/hits-mbm-dev/kimmdy/issues/264) ([cbd4d5d](https://github.com/hits-mbm-dev/kimmdy/commit/cbd4d5db913b38f1ea02ce37d6ccfae0c50053e5))
+
+## [4.2.1](https://github.com/hits-mbm-dev/kimmdy/compare/v4.2.0...v4.2.1) (2023-09-07)
+
+
+### Bug Fixes
+
+* apply_recipe naming ([6573886](https://github.com/hits-mbm-dev/kimmdy/commit/65738861ccc4c9418f4a1c7da3fd5f56afd33d14))
+* handle `Relax` in plot_rates ([3099210](https://github.com/hits-mbm-dev/kimmdy/commit/3099210335a38504dced4aa5ceffaeaa23617dd3))
+
 ## [4.2.0](https://github.com/hits-mbm-dev/kimmdy/compare/v4.1.0...v4.2.0) (2023-09-04)
 
 

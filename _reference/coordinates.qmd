@@ -15,7 +15,7 @@ coordinate, topology and plumed modification functions
 | [merge_dihedrals](#kimmdy.coordinates.merge_dihedrals) | Merge one to two Dihedrals or -Types into a Dihedral in free-energy syntax |
 | [merge_top_moleculetypes_slow_growth](#kimmdy.coordinates.merge_top_moleculetypes_slow_growth) | Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation |
 | [merge_top_slow_growth](#kimmdy.coordinates.merge_top_slow_growth) | Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation. |
-| [place_atom](#kimmdy.coordinates.place_atom) | Place an atom to new coords at the last time point of the recipe timespans |
+| [place_atom](#kimmdy.coordinates.place_atom) | Place an atom to new coords at the last time point of the trajectory |
 
 ### break_bond_plumed { #kimmdy.coordinates.break_bond_plumed }
 
@@ -73,6 +73,6 @@ TODO: for now this assumes that only one moleculeype (the first, index 0) is of 
 
 ### place_atom { #kimmdy.coordinates.place_atom }
 
-`coordinates.place_atom(files, step, timespan)`
+`coordinates.place_atom(files, step, ttime=None)`
 
-Place an atom to new coords at the last time point of the recipe timespans
+Place an atom to new coords at the last time point of the trajectory

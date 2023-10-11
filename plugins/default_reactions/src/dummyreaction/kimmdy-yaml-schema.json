@@ -16,6 +16,13 @@
       "pytype": "str",
       "description": "This is another example of an option for a reaction.",
       "default": "hello"
+    },
+    "kmc": {
+      "description": "KMC algorithm for this reaction.",
+      "type": "string",
+      "pytype": "str",
+      "enum": ["rfkmc", "frm", "extrande"],
+      "default": "extrande"
     }
   },
   "required": [  ]
