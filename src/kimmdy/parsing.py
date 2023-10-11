@@ -48,7 +48,6 @@ def resolve_includes(
     """
     path = path.resolve()
     dir = path.parent
-    fname = path.name
     cwd = Path.cwd()
     if not dir.exists() or not path.exists():
         return ([], None)
@@ -56,7 +55,7 @@ def resolve_includes(
     ls = []
     ffdir = None
 
-    with open(fname, "r") as f:
+    with open(path, "r") as f:
         for l in f:
             l = "".join(takewhile(is_not_comment, l)).strip()
             if not l:
@@ -78,7 +77,7 @@ def resolve_includes(
                         gmx_builtin_ffs / include_path, gmx_builtin_ffs
                     )
                 if not ls_prime:
-                    logger.warning(
+                    logger.info(
                         f"top include {include_path} could not be resolved. Line was dropped."
                     )
                 ls.extend(ls_prime)
@@ -245,7 +244,7 @@ def read_top(
     if ffdir is None and parsed_ffdir is not None:
         ffdir = parsed_ffdir
     if ffdir is None:
-        logger.warning(f"No #include for a forcefield directory found in {path}.")
+        logger.debug(f"No #include for a forcefield directory found in {path}.")
 
     ls = filter(lambda l: not l.startswith("*"), ls)
     d = {}
@@ -529,7 +528,7 @@ def write_json(
     path: Path,
 ) -> None:
     """Write dict to file according to JSON format."""
-    logger.debug(f"writing dictionary to json: {d}")
+    logger.debug(f"writing dictionary to json: {path}")
     with open(path, "w") as f:
         json.dump(d, f, cls=JSONEncoder, indent=4)
 
@@ -555,6 +554,8 @@ def read_edissoc(path: Path) -> dict:
     with open(path, "r") as f:
         edissocs = {}
         for l in f:
+            if l.startswith(";") or len(l.split()) < 3:
+                continue
             at1, at2, edissoc, *_ = l.split()
-            edissocs[frozenset((at1, at2))] = float(edissoc)
+            edissocs[tuple([at1, at2])] = float(edissoc)
     return edissocs

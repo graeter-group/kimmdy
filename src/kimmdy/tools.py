@@ -9,10 +9,19 @@ import argparse
 from kimmdy.topology.topology import Topology
 from kimmdy.parsing import read_top, write_top
 from kimmdy.utils import run_gmx, run_shell_cmd
+from kimmdy.plugins import parameterization_plugins
+from kimmdy.plugins import discover_plugins
 
 
 def build_examples(restore: str):
-    print(f"build_examples arguments: restore {restore}")
+    """Build example directories for KIMMDY from integration tests.
+
+    Parameters
+    ----------
+    restore
+        If True, overwrite input files in existing example directories. If "hard", also delete output files.
+    """
+    print(f'build_examples with restore option "{restore}"')
     overwrite = True if restore else False
 
     example_directories = [
@@ -41,14 +50,13 @@ def build_examples(restore: str):
                 assets_path / "amber99sb-star-ildnp.ff",
                 target_is_directory=True,
             )
-            # patch schema path
-            kimmdy_yml_path = dest / "kimmdy.yml"
-            if kimmdy_yml_path.exists():
+            kimmdy_yml_schema_path = dest / "kimmdy.yml"
+            if kimmdy_yml_schema_path.exists():
                 schema_path = (
                     Path("..") / ".." / "src" / "kimmdy" / "kimmdy-yaml-schema.json"
                 )
                 first_line = f"# yaml-language-server: $schema={schema_path}\n"
-                with open(kimmdy_yml_path, "r+") as f:
+                with open(kimmdy_yml_schema_path, "r+") as f:
                     lines = f.readlines()
                     if lines[0][:22] == "# yaml-language-server":
                         lines[0] = first_line
@@ -99,7 +107,21 @@ def remove_hydrogen(
     equilibrate: bool,
     gmx_mdrun_flags: str = "",
 ):
-    """remove hydrogen from a gro and top file"""
+    """Remove one hydrogen from a gro and top file to create a radical.
+
+    Parameters
+    ----------
+    gro
+        Path to GROMACS gro file
+    top
+        Path to GROMACS top file
+    nr
+        Atom number as indicated in the GROMACS gro and top file
+    parameterize
+        Parameterize topology with grappa after removing hydrogen.
+    equilibrate
+        Do a minimization and equilibration with GROMACS. Uses mdp files from kimmdy assets.
+    """
     gro_path = Path(gro)
     top_path = Path(top)
 
@@ -111,31 +133,21 @@ def remove_hydrogen(
     ), f"Wrong atom type {atom_type} with nr {nr} for remove hydrogen, should start with 'H'"
 
     ## deal with top file, order is important here
-    [heavy_nr] = topology.atoms[nr].bound_to_nrs
+    # [heavy_nr] = topology.atoms[nr].bound_to_nrs
 
-    del topology.atoms[nr]
-
-    topology.atoms[heavy_nr].is_radical = True
-    topology.radicals[heavy_nr] = topology.atoms[heavy_nr]
-
-    update_map = {
-        atom_nr: str(i + 1) for i, atom_nr in enumerate(topology.atoms.keys())
-    }
-
-    topology.reindex_atomnrs()
-
-    ## parameterize with grappa
+    # parameterize with grappa
     if parameterize:
-        from kimmdy import parameterization_plugins
+        discover_plugins()
 
         if "grappa" in parameterization_plugins.keys():
-            grappa = parameterization_plugins["grappa"]()
-            grappa.parameterize_topology(topology)
+            topology.parametrizer = parameterization_plugins["grappa"]()
 
         else:
             raise KeyError(
                 "No grappa in parameterization plugins. Can't continue to parameterize molecule"
             )
+
+    update_map = topology.del_atom(nr, parameterize=parameterize)
 
     ## write top file
     top_stem = top_path.stem
@@ -206,7 +218,7 @@ def remove_hydrogen(
         )
 
 
-def get_remove_hydrogen_cmdline_args():
+def get_remove_hydrogen_cmdline_args() -> argparse.Namespace:
     """
     parse cmdline args for remove_hydrogen
     """
@@ -240,11 +252,12 @@ def entry_point_remove_hydrogen():
     """Remove hydrogen by atom nr in a gro and topology file"""
     args = get_remove_hydrogen_cmdline_args()
 
-    remove_hydrogen(args.gro, args.top, args.nr, args.paremeterize, args.equilibrate)
+    remove_hydrogen(args.gro, args.top, args.nr, args.parameterize, args.equilibrate)
 
 
 ## dot graphs
 def topology_to_edgelist(top: Topology):
+    """Convert a topology to a list of edges for a dot graph."""
     ls = []
     for b in top.bonds:
         ai = b[0]
@@ -262,6 +275,7 @@ def topology_to_edgelist(top: Topology):
 
 
 def edgelist_to_dot_graph(ls: list[str], overlap: str = "true"):
+    """Convert a list of edges to a dot graph."""
     header = f"""
         graph G {{
           layout=neato
@@ -276,4 +290,17 @@ def edgelist_to_dot_graph(ls: list[str], overlap: str = "true"):
 
 
 def top_to_graph(top: Topology, overlap: str = "true"):
+    """Convert a topology to a dot graph.
+
+    Can be used in notebooks to write a dot file and render with quarto.
+    """
     return edgelist_to_dot_graph(topology_to_edgelist(top), overlap)
+
+
+def write_top_as_dot(top: Topology, path: str, overlap: str = "true"):
+    """Write a topology as a dot graph to a file.
+
+    Can be used in notebooks to write a dot file and render with quarto.
+    """
+    with open(path, "w") as f:
+        f.write(top_to_graph(top, overlap))

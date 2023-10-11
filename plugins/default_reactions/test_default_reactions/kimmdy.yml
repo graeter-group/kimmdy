@@ -2,7 +2,6 @@ dryrun: false
 max_tasks: 10
 out: 'test_out_001'
 gromacs_alias: 'gmx'
-#ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
 top: 'topol.top'
 gro: 'npt.gro'
 ndx: 'index_backbone.ndx'
@@ -19,7 +18,7 @@ changer:
   coordinates:
     md: 'relax'    
   topology:
-    parameterization: 'grappa' 
+    parameterization: 'basic' 
 reactions:
   homolysis:
     edis: 'edissoc.dat'

@@ -8,11 +8,12 @@ Reserved keywords:
     - default
     - description
     - type
+    - required
 """
 import json
 import importlib.resources as pkg_resources
 import logging
-from kimmdy import reaction_plugins
+from kimmdy.plugins import reaction_plugins
 
 # needed for eval of type_scheme from schema
 # don't remove even if lsp says it's unused
@@ -69,7 +70,7 @@ def load_plugin_schemas() -> dict:
         logger.debug(f"Loading {plg_name}")
         # Catch loading exception
         if type(plugin) is ModuleNotFoundError:
-            logger.warn(f"Plugin {plg_name} could not be loaded!\n{plugin}\n")
+            logger.warning(f"Plugin {plg_name} could not be loaded!\n{plugin}\n")
             continue
         # get main module from that plugin
         plg_module_name = plugin.__module__.split(".")[0]
@@ -78,7 +79,7 @@ def load_plugin_schemas() -> dict:
         schema_path = pkg_resources.files(plg_module_name) / "kimmdy-yaml-schema.json"
         with pkg_resources.as_file(schema_path) as p:
             if not p.exists():
-                logger.warn(
+                logger.warning(
                     f"{plg_name} did not provide a `kimmdy-yaml-schema.json`!\n"
                     "Schema will not be loaded!"
                 )
@@ -99,9 +100,8 @@ def convert_schema_to_dict(dictionary: dict) -> dict:
 
     Returns
     -------
-    dict:
         nested dictionary where each leaf entry is a dictionary with the
-        "pytype", "default" and "description" keys
+        "pytype", "default" and "description" keys.
     """
     result = {}
     properties = dictionary.get("properties")
@@ -193,6 +193,10 @@ def flatten_scheme(scheme, section="") -> list:
 
 
 def generate_markdown_table(scheme, append=False):
+    """Generate markdown table from scheme
+
+    Used in documentation generation.
+    """
     table = []
     if not append:
         table.append("| Option | Description | Type | Default |")

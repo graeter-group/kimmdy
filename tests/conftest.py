@@ -8,8 +8,8 @@ import os
 from pathlib import Path
 from dataclasses import dataclass
 from typing import Callable
+from kimmdy.plugins import discover_plugins
 
-from kimmdy.recipe import Recipe, RecipeCollection, BondOperation
 from kimmdy.tasks import TaskFiles
 from kimmdy.utils import get_gmx_dir
 
@@ -21,6 +21,9 @@ def pytest_configure(config):
     config.addinivalue_line(
         "markers", "require_gmx: mark test to run if gmx is executable"
     )
+    config.addinivalue_line(
+        "markers", "require_grappa: mark test to run if grappa is available"
+    )
 
 
 # look for mark and define mark action
@@ -28,12 +31,28 @@ def pytest_runtest_setup(item):
     require_gmx = [mark for mark in item.iter_markers(name="require_gmx")]
     if require_gmx:
         if not get_gmx_dir():
-            pytest.skip("Command 'gmx' not found, can't test gmx dir parsing.")
+            pytest.skip(
+                f"{item.name} skipped. Command 'gmx' not found, can't test gmx dir parsing."
+            )
+
+    require_grappa = [mark for mark in item.iter_markers(name="require_grappa")]
+    if require_grappa:
+        try:
+            import grappa
+        except ModuleNotFoundError:
+            pytest.skip(f"{item.name} skipped. Can't import module grappa.")
 
 
 ## fixtures for setup and teardown ##
 @pytest.fixture
 def arranged_tmp_path(tmp_path: Path, request: pytest.FixtureRequest):
+    """Arrange temporary directory for tests.
+
+    With files for the test and a symlink to forcefield.
+    """
+
+    discover_plugins()
+
     # if fixture was parameterized, use this for directory with input files
     if hasattr(request, "param"):
         file_dir = Path(__file__).parent / "test_files" / request.param

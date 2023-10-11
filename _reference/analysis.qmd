@@ -16,6 +16,7 @@ For command line usage, run `kimmdy-analysis -h`.
 | [get_step_directories](#kimmdy.analysis.get_step_directories) | create list of subdirectories that match the steps. |
 | [plot_energy](#kimmdy.analysis.plot_energy) | Plot GROMACS energy for a KIMMDY run. |
 | [plot_rates](#kimmdy.analysis.plot_rates) | Plot rates of all possible reactions for each 'decide_recipe' step. |
+| [plot_runtime](#kimmdy.analysis.plot_runtime) | Plot runtime of all tasks. |
 | [radical_population](#kimmdy.analysis.radical_population) | Plot population of radicals for a KIMMDY run. |
 
 ### concat_traj { #kimmdy.analysis.concat_traj }
@@ -111,6 +112,21 @@ Plot rates of all possible reactions for each 'decide_recipe' step.
 | Name   | Type         | Description             | Default    |
 |--------|--------------|-------------------------|------------|
 | `dir`  | [str](`str`) | Directory of KIMMDY run | _required_ |
+
+### plot_runtime { #kimmdy.analysis.plot_runtime }
+
+`analysis.plot_runtime(dir, md_tasks, datefmt, open_plot=False)`
+
+Plot runtime of all tasks.
+
+#### Parameters
+
+| Name        | Type           | Description                         | Default    |
+|-------------|----------------|-------------------------------------|------------|
+| `dir`       | [str](`str`)   | Directory of KIMMDY run             | _required_ |
+| `md_tasks`  | [list](`list`) | Names of MD tasks to color          | _required_ |
+| `datefmt`   | [str](`str`)   | Date format in the KIMMDY logfile   | _required_ |
+| `open_plot` | [bool](`bool`) | Open plot in default system viewer. | `False`    |
 
 ### radical_population { #kimmdy.analysis.radical_population }
 

@@ -21,18 +21,20 @@ from kimmdy.topology.atomic import (
     InteractionType,
     InteractionTypes,
 )
-from kimmdy.topology.utils import (
-    match_atomic_item_to_atomic_type,
-    get_protein_section,
-    set_protein_section,
-)
+from kimmdy.topology.utils import match_atomic_item_to_atomic_type
 
 logger = logging.getLogger(__name__)
 
 
-## coordinates
-def place_atom(files: TaskFiles, step: Place, timespan: list[tuple[float, float]]):
-    """Place an atom to new coords at the last time point of the recipe timespans"""
+# coordinates
+def place_atom(
+    files: TaskFiles, step: Place, ttime: Optional[float] = None
+) -> TaskFiles:
+    """Place an atom to new coords at the last time point of the trajectory"""
+    logger = files.logger
+    logger.info("Starting place_atom task")
+    logger.debug(step)
+    logger.debug(f"ttime {ttime}")
     trr = files.input["trr"]
     tpr = files.input["tpr"]
 
@@ -42,13 +44,12 @@ def place_atom(files: TaskFiles, step: Place, timespan: list[tuple[float, float]
 
     u = mda.Universe(str(tpr), str(trr), topology_format="tpr", format="trr")
 
-    ttime = timespan[-1][-1]
-
     for ts in u.trajectory[::-1]:
-        if abs(ts.time - ttime) > 1e-5:  # 0.01 fs
-            continue
+        if ttime is not None:
+            if abs(ts.time - ttime) > 1e-5:  # 0.01 fs
+                continue
         atm_move = u.select_atoms(f"index {step.ix_to_place}")
-        atm_move[0].position = step.new_coords[0]
+        atm_move[0].position = step.new_coords
 
         break
     else:
@@ -66,15 +67,16 @@ def place_atom(files: TaskFiles, step: Place, timespan: list[tuple[float, float]
     files.output["trr"] = trr_out
     files.output["gro"] = gro_out
 
-    logger.debug(f"Exit place_atom, final coordinates written to {trr_out.parts[-2:]}")
-
-
-## topology
+    logger.debug(
+        "Exit place_atom, final coordinates written to "
+        f"{'/'.join(trr_out.parts[-2:])}"
+    )
+    return files
 
 
 def is_parameterized(entry: Interaction):
     """Parameterized topology entries have c0 and c1 attributes != None"""
-    return entry.c0 != None and entry.c1 != None
+    return entry.c0 is not None and entry.c1 is not None
 
 
 def get_explicit_MultipleDihedrals(
@@ -83,18 +85,18 @@ def get_explicit_MultipleDihedrals(
     dihedrals_in: Optional[MultipleDihedrals],
     ff: FF,
     periodicity_max: int = 6,
-) -> Union[MultipleDihedrals, None]:
+) -> Optional[MultipleDihedrals]:
     """Takes a valid dihedral key and returns explicit
     dihedral parameters for a given topology
     """
     if not dihedrals_in:
         return None
 
-    if not "" in dihedrals_in.dihedrals.keys():
+    if "" not in dihedrals_in.dihedrals.keys():
         # empty string means implicit parameters
         return dihedrals_in
 
-    type_key = [mol.atoms[x].type for x in dihedral_key]
+    type_key = [mol.atoms[id].type for id in dihedral_key]
 
     multiple_dihedrals = MultipleDihedrals(*dihedral_key, "9", {})
     for periodicity in range(1, periodicity_max + 1):
@@ -103,8 +105,13 @@ def get_explicit_MultipleDihedrals(
         )
         if match_obj:
             assert isinstance(match_obj, DihedralType)
-            l = [*dihedral_key, "9", match_obj.c0, match_obj.c1, match_obj.periodicity]
-            multiple_dihedrals.dihedrals[str(periodicity)] = Dihedral.from_top_line(l)
+            multiple_dihedrals.dihedrals[str(periodicity)] = Dihedral(
+                *dihedral_key,
+                funct="9",
+                c0=match_obj.c0,
+                c1=match_obj.c1,
+                periodicity=match_obj.periodicity,
+            )
 
     if not multiple_dihedrals.dihedrals:
         return None
@@ -114,7 +121,7 @@ def get_explicit_MultipleDihedrals(
 
 def get_explicit_or_type(
     key: tuple[str, ...],
-    interaction: Union[Interaction, None],
+    interaction: Optional[Interaction],
     interaction_types: InteractionTypes,
     mol: MoleculeType,
     periodicity: str = "",
@@ -144,10 +151,10 @@ def get_explicit_or_type(
 
 def merge_dihedrals(
     dihedral_key: tuple[str, str, str, str],
-    interactionA: Union[Dihedral, None],
-    interactionB: Union[Dihedral, None],
-    interaction_typesA: dict[tuple[str, ...], DihedralType],
-    interaction_typesB: dict[tuple[str, ...], DihedralType],
+    interactionA: Optional[Dihedral],
+    interactionB: Optional[Dihedral],
+    interaction_typesA: InteractionTypes,
+    interaction_typesB: InteractionTypes,
     molA: MoleculeType,
     molB: MoleculeType,
     funct: str,
@@ -215,9 +222,9 @@ def merge_dihedrals(
             c5=parameterizedB.periodicity,
         )
     else:
-        raise ValueError(
-            f"Tried to merge two dihedrals of {dihedral_key} but no parameterized dihedrals found!"
-        )
+        m = f"Tried to merge two dihedrals of {dihedral_key} but no parameterized dihedrals found!"
+        logger.error(m)
+        raise ValueError(m)
     return dihedralmerge
 
 
@@ -225,7 +232,7 @@ def merge_top_moleculetypes_slow_growth(
     molA: MoleculeType,
     molB: MoleculeType,
     ff: FF,
-    focus_nr: Union[list[str], None] = None,
+    focus_nr: Optional[list[str]] = None,
 ) -> MoleculeType:
     """Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation"""
     hyperparameters = {
@@ -237,7 +244,7 @@ def merge_top_moleculetypes_slow_growth(
     # TODO:
     # think about how to bring focus_nr into this
 
-    ## atoms
+    # atoms
     for nr in molA.atoms.keys():
         atomA = molA.atoms[nr]
         atomB = molB.atoms[nr]
@@ -251,10 +258,10 @@ def merge_top_moleculetypes_slow_growth(
                 atomB.mass = deepcopy(atomA.mass)
             else:
                 logger.debug(
-                    f"Atom {nr} with A:{atomA} and B:{atomB} changed but not the charges!"
+                    f"Atom {nr} changed but not the charges!\n\tA:{atomA}\n\tB:{atomB} "
                 )
 
-    ## bonds
+    # bonds
     keysA = set(molA.bonds.keys())
     keysB = set(molB.bonds.keys())
     keys = keysA | keysB
@@ -304,7 +311,7 @@ def merge_top_moleculetypes_slow_growth(
                     c5=hyperparameters["morse_steepness"],
                 )
 
-    ## pairs and exclusions
+    # pairs and exclusions
     exclusions_content = molB.atomics.get("exclusions", [])
     # maybe hook this up to empty_sections if it gets accessible
     for key in keysA - keysB:
@@ -313,7 +320,7 @@ def merge_top_moleculetypes_slow_growth(
 
     molB.atomics["exclusions"] = exclusions_content
 
-    ## angles
+    # angles
     keys = set(molA.angles.keys()) | set(molB.angles.keys())
     for key in keys:
         interactionA = molA.angles.get(key)
@@ -356,8 +363,8 @@ def merge_top_moleculetypes_slow_growth(
             else:
                 logger.warning(f"Could not parameterize angle {key}.")
 
-    ## dihedrals
-    ## proper dihedrals
+    # dihedrals
+    # proper dihedrals
     # proper dihedrals have a nested structure and need a different treatment from bonds, angles and improper dihedrals
     # if indices change atomtypes and parameters change because of that, it will ignore these parameter change
 
@@ -411,7 +418,7 @@ def merge_top_moleculetypes_slow_growth(
                     periodicity,
                 )
 
-    ## improper dihedrals
+    # improper dihedrals
     # all impropers in amber99SB ffbonded.itp have a periodicity of 2
     # but not the ones defined in aminoacids.rtp. For now, I am assuming
     # a periodicity of 2 in this section
@@ -434,14 +441,14 @@ def merge_top_moleculetypes_slow_growth(
                 "2",
             )
 
-    ## update is_radical attribute of Atom objects in topology
-    molB._test_for_radicals()
+    # update is_radical attribute of Atom objects in topology
+    molB.test_for_radicals()
 
     return molB
 
 
 def merge_top_slow_growth(
-    topA: Topology, topB: Topology, focus_nr: Union[list[str], None] = None
+    topA: Topology, topB: Topology, focus_nr: Optional[list[str]] = None
 ) -> Topology:
     """Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation.
 
@@ -455,9 +462,6 @@ def merge_top_slow_growth(
     molB = merge_top_moleculetypes_slow_growth(molA, molB, topB.ff, focus_nr)
 
     return topB
-
-
-## plumed
 
 
 def break_bond_plumed(
@@ -480,7 +484,7 @@ def break_bond_plumed(
 
     files.output["plumed"] = newplumed
 
-    logger.info(
+    logger.debug(
         f"Reading: {files.input['plumed']} and writing modified plumed input to "
         f"{files.output['plumed']}."
     )
@@ -496,7 +500,7 @@ def break_bond_plumed(
     plumed_dict["labeled_action"] = new_distances
 
     for line in plumed_dict["prints"]:
-        line["ARG"] = [id for id in line["ARG"] if not id in broken_distances]
+        line["ARG"] = [id for id in line["ARG"] if id not in broken_distances]
         line["FILE"] = files.input["plumed_out"]
 
     write_plumed(plumed_dict, newplumed)

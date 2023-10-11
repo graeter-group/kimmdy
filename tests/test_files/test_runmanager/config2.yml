@@ -1,0 +1,37 @@
+dryrun: true
+max_tasks: 10
+name: 'config2'
+gromacs_alias: 'gmx'
+top: 'topol.top'
+gro: 'npt.gro'
+ndx: 'index_backbone.ndx'
+plumed: 'plumed.dat'
+log:
+  level: 'DEBUG'
+mds:
+  equilibrium1:
+    mdp: 'pullf1500_equil.mdp'
+  pull1:
+    mdp: 'pullf1500.mdp'
+    use_plumed: true
+  relax:
+    mdp: 'broken_equil_f1000.mdp'
+changer:
+  coordinates:
+    md: 'relax'
+  topology:
+    parameterization: 'basic' 
+reactions:
+  homolysis:
+    edis: 'edissoc.dat'
+    itp: 'ffbonded.itp'
+  hat_naive: {}
+sequence:
+  - mult: 1
+    tasks:
+    - equilibrium1
+  - pull1
+  - homolysis
+  - hat_naive
+  - equilibrium1
+ 

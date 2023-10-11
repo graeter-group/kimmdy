@@ -14,30 +14,17 @@ Utilities for building plugins, shell convenience functions and GROMACS related 
 
 | Name | Description |
 | --- | --- |
-| [backup_if_existing](#kimmdy.utils.backup_if_existing) | Checks whether a file exists and if so, backs it up. |
 | [check_gmx_version](#kimmdy.utils.check_gmx_version) | Check for an existing gromacs installation. |
-| [get_atominfo_from_plumedid](#kimmdy.utils.get_atominfo_from_plumedid) | For a plumedid, returns the corresponding atom types and nrs. |
-| [get_bondprm_from_atomtypes](#kimmdy.utils.get_bondprm_from_atomtypes) | Returns bond parameters (b0, kb, E_dis) for a set of two atomtypes. |
+| [get_atominfo_from_atomnrs](#kimmdy.utils.get_atominfo_from_atomnrs) | Use topology atoms section to convert from atomnr to atomtype |
+| [get_atomnrs_from_plumedid](#kimmdy.utils.get_atomnrs_from_plumedid) | Convert from plumedid to atomnr, information from the plumed file is used. |
+| [get_bondprm_from_atomtypes](#kimmdy.utils.get_bondprm_from_atomtypes) | Returns bond parameters (b0, kb) for a set of two atomtypes. |
+| [get_edissoc_from_atomnames](#kimmdy.utils.get_edissoc_from_atomnames) | Returns dissociation energy E_dissoc for a set of two atomnames. |
 | [get_gmx_dir](#kimmdy.utils.get_gmx_dir) | Returns the path to the gromacs installation |
 | [get_shell_stdout](#kimmdy.utils.get_shell_stdout) | Run command in shell and capture stdout. |
 | [morse_transition_rate](#kimmdy.utils.morse_transition_rate) | Calculates reaction rate constant for a bond breaking event. |
 | [run_gmx](#kimmdy.utils.run_gmx) | Run GROMACS command in shell. |
 | [run_shell_cmd](#kimmdy.utils.run_shell_cmd) | Run command in shell. |
-
-### backup_if_existing { #kimmdy.utils.backup_if_existing }
-
-`utils.backup_if_existing(f)`
-
-Checks whether a file exists and if so, backs it up.
-
-Mainly used for files from previous KIMMDY runs to
-prevent overwriting these files.
-
-#### Parameters
-
-| Name   | Type                   | Description                                         | Default    |
-|--------|------------------------|-----------------------------------------------------|------------|
-| `f`    | [Path](`pathlib.Path`) | Path to a file that will be backed up, if existing. | _required_ |
+| [truncate_sim_files](#kimmdy.utils.truncate_sim_files) | Truncates latest trr, xtc, edr, and gro to the time to a previous |
 
 ### check_gmx_version { #kimmdy.utils.check_gmx_version }
 
@@ -48,36 +35,50 @@ Check for an existing gromacs installation.
 If PLUMED is meant to be used it additionally checks for the keyword
 'MODIFIED' or 'plumed' in the version name.
 
-### get_atominfo_from_plumedid { #kimmdy.utils.get_atominfo_from_plumedid }
+### get_atominfo_from_atomnrs { #kimmdy.utils.get_atominfo_from_atomnrs }
 
-`utils.get_atominfo_from_plumedid(plumedid, plumed, top)`
+`utils.get_atominfo_from_atomnrs(atomnrs, top)`
 
-For a plumedid, returns the corresponding atom types and nrs.
+Use topology atoms section to convert from atomnr to atomtype
 
-To convert from plumedid to atomnr, information from the plumed file is used.
-Then, the topology atoms section can be used to convert from atomnr to atomtype
+### get_atomnrs_from_plumedid { #kimmdy.utils.get_atomnrs_from_plumedid }
+
+`utils.get_atomnrs_from_plumedid(plumedid, plumed)`
+
+Convert from plumedid to atomnr, information from the plumed file is used.
 
 #### Parameters
 
-| Name       | Type           | Description                                   | Default    |
-|------------|----------------|-----------------------------------------------|------------|
-| `plumedid` | [str](`str`)   | Identifier from a plumed input file (e.g d0). | _required_ |
-| `plumed`   | [dict](`dict`) | Parsed plumed input file                      | _required_ |
-| `top`      | [dict](`dict`) | Topology of the molecular system              | _required_ |
+| Name       | Type                                        | Description                                   | Default    |
+|------------|---------------------------------------------|-----------------------------------------------|------------|
+| `plumedid` | [str](`str`)                                | Identifier from a plumed input file (e.g d0). | _required_ |
+| `plumed`   | [Plumed_dict](`kimmdy.parsing.Plumed_dict`) | Parsed plumed input file                      | _required_ |
 
 ### get_bondprm_from_atomtypes { #kimmdy.utils.get_bondprm_from_atomtypes }
 
-`utils.get_bondprm_from_atomtypes(atomtypes, ffbonded, lookup_edissoc_atomtype)`
+`utils.get_bondprm_from_atomtypes(atomtypes, ffbonded)`
 
-Returns bond parameters (b0, kb, E_dis) for a set of two atomtypes.
+Returns bond parameters (b0, kb) for a set of two atomtypes.
 
 #### Parameters
 
-| Name                      | Type                     | Description                                                                       | Default    |
-|---------------------------|--------------------------|-----------------------------------------------------------------------------------|------------|
-| `atomtypes`               | [frozenset](`frozenset`) | Two atomtypes as defined in the respective force field                            | _required_ |
-| `ffbonded`                | [dict](`dict`)           | Force field ffbonded.itp file parsed through the rtp parser                       | _required_ |
-| `lookup_edissoc_atomtype` | [dict](`dict`)           | Parsed file with dissociation energies per bond between two atomtypes or elements | _required_ |
+| Name        | Type                           | Description                                                 | Default    |
+|-------------|--------------------------------|-------------------------------------------------------------|------------|
+| `atomtypes` | [list](`list`)\[[str](`str`)\] | Two atomtypes as defined in the respective force field      | _required_ |
+| `ffbonded`  | [dict](`dict`)                 | Force field ffbonded.itp file parsed through the rtp parser | _required_ |
+
+### get_edissoc_from_atomnames { #kimmdy.utils.get_edissoc_from_atomnames }
+
+`utils.get_edissoc_from_atomnames(atomnames, edissoc)`
+
+Returns dissociation energy E_dissoc for a set of two atomnames.
+
+#### Parameters
+
+| Name        | Type                           | Description                                                                       | Default    |
+|-------------|--------------------------------|-----------------------------------------------------------------------------------|------------|
+| `atomnames` | [list](`list`)\[[str](`str`)\] | Two atomnames as defined in the respective force field                            | _required_ |
+| `edissoc`   | [dict](`dict`)                 | Parsed file with dissociation energies per bond between two atomtypes or elements | _required_ |
 
 ### get_gmx_dir { #kimmdy.utils.get_gmx_dir }
 
@@ -133,3 +134,20 @@ Adds a '-quiet' flag to the command and checks the return code.
 `utils.run_shell_cmd(s, cwd=None)`
 
 Run command in shell.
+
+### truncate_sim_files { #kimmdy.utils.truncate_sim_files }
+
+`utils.truncate_sim_files(files, time, keep_tail=True)`
+
+Truncates latest trr, xtc, edr, and gro to the time to a previous
+point in time.
+
+The files stay in place, the truncated tail is by default kept and renamed
+to '[...xtc].tail'
+
+#### Parameters
+
+| Name    | Type                                              | Description                                          | Default    |
+|---------|---------------------------------------------------|------------------------------------------------------|------------|
+| `time`  | [Optional](`typing.Optional`)\[[float](`float`)\] | Time in ps up to which the data should be truncated. | _required_ |
+| `files` | [TaskFiles](`kimmdy.tasks.TaskFiles`)             | TaskFiles to get the latest files.                   | _required_ |

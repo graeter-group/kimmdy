@@ -1,14 +1,16 @@
-"""Reaction recipes.
+"""Contains the Reaction Recipe, RecipeStep and RecipeCollection.
 """
 from __future__ import annotations
 from typing import Optional
 
 from abc import ABC
-from dataclasses import dataclass, field, InitVar
+from dataclasses import dataclass, field
 from pathlib import Path
 import logging
+from copy import copy
 import dill
 import csv
+import numpy as np
 
 logger = logging.getLogger(__name__)
 
@@ -56,9 +58,6 @@ class Place(RecipeStep):
     def __post_init__(self):
         if self._ix_to_place is None:
             raise ValueError("id_ or ix_ to_place must be provided!")
-
-    # During init without given parameters, setters recive **not** the default
-    # value, but a property instance -> Error in type conversion
 
     @property
     def ix_to_place(self) -> Optional[int]:
@@ -224,9 +223,11 @@ class Recipe:
     rates : list[float]
         Reaction rates corresponding 1:1 to timespans.
     timespans : list[list[float, float]]
-        List of half-open timespans (t1, t2] in ps, at which this reaction
-        path applies. Must have same number of timespans as rates.
-        t1 can equal t2 for the first frame.
+        List of half-open timespans (t1, t2] in ps, at which this rate is valid.
+        Recipe steps which change the coordinates only need to be applicable
+        at the first time in the interval.
+        Must have same number of timespans as rates.
+        t1 can equal t2 for the last frame.
 
     """
 
@@ -316,6 +317,9 @@ class Recipe:
                     name += "\u26A1"  # ➡
                 if (ix := getattr(rs, "atom_ix_2", None)) is not None:
                     name += str(ix)
+
+            elif isinstance(rs, Relax):
+                pass
 
             else:
                 logger.warning(f"get_recipe_name got unknown step type: {type(rs)}")
@@ -414,7 +418,6 @@ class RecipeCollection:
         Sums up to 1 over all recipes. Assumes constant rate for given timespan
         and rate zero otherwise.
         """
-        import numpy as np
 
         self.aggregate_reactions()
 
@@ -429,6 +432,50 @@ class RecipeCollection:
 
         return np.array(cumprob) / sum(cumprob)
 
+    def calc_ratesum(self) -> tuple[list, list, list]:
+        """Calculate the sum of rates over all timesteps
+
+        Returns
+        -------
+        boarders
+            flat list containing times of rate changes marking the
+            boarders of the windows
+        rate_windows
+            flat list containing all rates in between the boarders.
+            Each window is orderd as in recipe_windows
+        recipe_windows
+            flat list containing the recipes of the corresponding window.
+            Each window is orderd as in rate_windows
+        """
+
+        self.aggregate_reactions()
+
+        # non-overlapping window boaders
+        boarders = set()
+
+        for re in self.recipes:
+            for ts in re.timespans:
+                for t in ts:
+                    boarders.add(t)
+
+        boarders = sorted(boarders)
+        rate_windows = [[] for _ in range(len(boarders) - 1)]
+        recipe_windows = [[] for _ in range(len(boarders) - 1)]
+
+        for re in self.recipes:
+            for r, ts in zip(re.rates, re.timespans):
+                left_idx = boarders.index(ts[0])
+                right_idx = boarders.index(ts[1])
+                # timespan <- boarder
+                # the selected recipe must tell where it should be applied
+                re_copy = copy(re)
+                re_copy.timespans = [ts]
+                re_copy.rates = [r]
+                [l.append(r) for l in rate_windows[left_idx:right_idx]]
+                [l.append(re_copy) for l in recipe_windows[left_idx:right_idx]]
+
+        return boarders, rate_windows, recipe_windows
+
     def plot(self, outfile, highlight_r=None, highlight_t=None):
         """Plot reaction rates over time
 
@@ -441,7 +488,7 @@ class RecipeCollection:
         highlight_t : float, optional
             Time at which the reactions starts
         """
-        import matplotlib as mpl
+
         import matplotlib.pyplot as plt
         import seaborn as sns
         import numpy as np
@@ -457,33 +504,36 @@ class RecipeCollection:
             i_to_highlight = np.nonzero(recipes == highlight_r)[0]
             idxs = list(set(np.concatenate([idxs, i_to_highlight])))
 
-        cmap = sns.color_palette("husl", len(idxs))
+        cmap = sns.color_palette("husl", len(recipes[idxs]))
+        name_to_args = {}
 
         plt.figure()
         for r_i, re in enumerate(recipes[idxs]):
             name = re.get_recipe_name()
+            if name not in name_to_args:
+                kwargs = {}
+                kwargs["color"] = cmap[r_i]
+                kwargs["label"] = name
 
-            linestyle = "-"
-            linewidth = 0.8
+                kwargs["linestyle"] = "-"
+                kwargs["linewidth"] = 0.8
+                name_to_args[name] = kwargs
+
             if re == highlight_r:
-                linestyle = "-."
-                linewidth += 1.3
-
                 if highlight_t is not None:
                     plt.axvline(highlight_t, color="red")
+                    name_to_args[name]["linestyle"] = "-."
+                    name_to_args[name]["linewidth"] = 2.1
 
             for dt, r in zip(re.timespans, re.rates):
                 marker = ""
-                if dt[1] == 0:
+                if dt[0] == dt[1]:
                     marker = "."
                 plt.plot(
                     np.array(dt),
                     (r, r),
-                    color=cmap[r_i],
-                    label=name,
-                    linestyle=linestyle,
-                    linewidth=linewidth,
                     marker=marker,
+                    **name_to_args[name],
                 )
         plt.xlabel("time [frames]")
         plt.ylabel("reaction rate")

@@ -25,41 +25,42 @@ rest of the program and keeps track of global state.
 
 #### Attributes
 
-| Name              | Type                                                                                    | Description                                               |
-|-------------------|-----------------------------------------------------------------------------------------|-----------------------------------------------------------|
-| config            | [Config](`kimmdy.config.Config`)                                                        | The configuration object.                                 |
-| from_checkpoint   | [bool](`bool`)                                                                          | Whether the runmanager was initialized from a checkpoint. |
-| tasks             | [queue](`queue`).[Queue](`queue.Queue`)\[[Task](`kimmdy.tasks.Task`)\]                  | Tasks from config.                                        |
-| crr_tasks         | [queue](`queue`).[Queue](`queue.Queue`)\[[Task](`kimmdy.tasks.Task`)\]                  | Current tasks.                                            |
-| iteration         | [int](`int`)                                                                            | Current iteration.                                        |
-| state             | [State](`kimmdy.runmanager.State`)                                                      | Current state of the system.                              |
-| recipe_collection | [RecipeCollection](`kimmdy.recipe.RecipeCollection`)                                    | Collection of recipes.                                    |
-| latest_files      | [dict](`dict`)\[[str](`str`), [Path](`pathlib.Path`)\]                                  | Dictionary of latest files.                               |
-| histfile          | [Path](`pathlib.Path`)                                                                  | Path to history file.                                     |
-| cptfile           | [Path](`pathlib.Path`)                                                                  | Path to checkpoint file.                                  |
-| top               |                                                                                         | Topology object.                                          |
-| filehist          | [list](`list`)\[[dict](`dict`)\[[str](`str`), [TaskFiles](`kimmdy.tasks.TaskFiles`)\]\] | List of dictionaries of TaskFiles.                        |
-| task_mapping      | [TaskMapping](`kimmdy.tasks.TaskMapping`)                                               | Mapping of task names to runmanager methods.              |
+| Name              | Type                                                                                    | Description                                                |
+|-------------------|-----------------------------------------------------------------------------------------|------------------------------------------------------------|
+| config            | [Config](`kimmdy.config.Config`)                                                        | The configuration object.                                  |
+| from_checkpoint   | [bool](`bool`)                                                                          | Whether the runmanager was initialized from a checkpoint.  |
+| tasks             | [queue](`queue`).[Queue](`queue.Queue`)\[[Task](`kimmdy.tasks.Task`)\]                  | Tasks from config.                                         |
+| crr_tasks         | [queue](`queue`).[Queue](`queue.Queue`)\[[Task](`kimmdy.tasks.Task`)\]                  | Current tasks.                                             |
+| iteration         | [int](`int`)                                                                            | Current iteration.                                         |
+| state             | [State](`kimmdy.runmanager.State`)                                                      | Current state of the system.                               |
+| recipe_collection | [RecipeCollection](`kimmdy.recipe.RecipeCollection`)                                    | Collection of recipes.                                     |
+| latest_files      | [dict](`dict`)\[[str](`str`), [Path](`pathlib.Path`)\]                                  | Dictionary of latest files.                                |
+| histfile          | [Path](`pathlib.Path`)                                                                  | Path to history file.                                      |
+| cptfile           | [Path](`pathlib.Path`)                                                                  | Path to checkpoint file.                                   |
+| top               |                                                                                         | Topology object.                                           |
+| filehist          | [list](`list`)\[[dict](`dict`)\[[str](`str`), [TaskFiles](`kimmdy.tasks.TaskFiles`)\]\] | List of dictionaries of TaskFiles.                         |
+| task_mapping      |                                                                                         | Mapping of task names to runmanager methods.               |
+| reaction_plugins  | [list](`list`)\[[ReactionPlugin](`kimmdy.plugins.ReactionPlugin`)\]                     | List of initialized reaction plugins used in the sequence. |
 
 #### Methods
 
 | Name | Description |
 | --- | --- |
 | [get_latest](#kimmdy.runmanager.RunManager.get_latest) | Returns path to latest file of given type. |
-| [write_one_checkoint](#kimmdy.runmanager.RunManager.write_one_checkoint) | Just write the first checkpoint and then exit |
+| [write_one_checkpoint](#kimmdy.runmanager.RunManager.write_one_checkpoint) | Just write the first checkpoint and then exit |
 
 ##### get_latest { #kimmdy.runmanager.RunManager.get_latest }
 
-`runmanager.RunManager.get_latest(self, suffix)`
+`runmanager.RunManager.get_latest(suffix)`
 
 Returns path to latest file of given type.
 
 For .dat files (in general ambiguous extensions) use full file name.
 Errors if file is not found.
 
-##### write_one_checkoint { #kimmdy.runmanager.RunManager.write_one_checkoint }
+##### write_one_checkpoint { #kimmdy.runmanager.RunManager.write_one_checkpoint }
 
-`runmanager.RunManager.write_one_checkoint(self)`
+`runmanager.RunManager.write_one_checkpoint()`
 
 Just write the first checkpoint and then exit
 

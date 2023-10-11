@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.353">
+<meta name="generator" content="quarto-1.4.176">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -50,6 +50,11 @@ ul.task-list li input[type="checkbox"] {
   "panel-placement": "end",
   "type": "overlay",
   "limit": 20,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
   "language": {
     "search-no-results-text": "No results",
     "search-matching-documents-text": "matching documents",
@@ -59,7 +64,8 @@ ul.task-list li input[type="checkbox"] {
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
     "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit"
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
   }
 }</script>
 
@@ -72,7 +78,7 @@ ul.task-list li input[type="checkbox"] {
   <header id="quarto-header" class="headroom fixed-top">
     <nav class="navbar navbar-expand-lg navbar-dark ">
       <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container">
+      <div class="navbar-brand-container mx-auto">
     <a class="navbar-brand" href="../index.html">
     <span class="navbar-title">KIMMDY</span>
     </a>
@@ -84,7 +90,7 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="../guide/getting-started.html" rel="" target="" aria-current="page">
+    <a class="nav-link active" href="../guide/tutorials/getting-started.html" rel="" target="" aria-current="page">
  <span class="menu-text">Getting Started</span></a>
   </li>  
   <li class="nav-item">
@@ -96,17 +102,18 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">Reference</span></a>
   </li>  
 </ul>
-            <div class="quarto-navbar-tools ms-auto tools-wide">
+          </div> <!-- /navcollapse -->
+          <div class="quarto-navbar-tools tools-wide">
     <div class="dropdown">
       <a href="" title="" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" aria-label=""><i class="bi bi-github"></i></a>
       <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="quarto-navigation-tool-dropdown-0">
           <li>
-            <a class="dropdown-item quarto-navbar-tools ms-auto-item" href="https://github.com/hits-mbm-dev/kimmdy">
+            <a class="dropdown-item quarto-navbar-tools-item" href="https://github.com/hits-mbm-dev/kimmdy">
             Source Code
             </a>
           </li>
           <li>
-            <a class="dropdown-item quarto-navbar-tools ms-auto-item" href="https://github.com/hits-mbm-dev/kimmdy/issues/new">
+            <a class="dropdown-item quarto-navbar-tools-item" href="https://github.com/hits-mbm-dev/kimmdy/issues/new">
             Report a Bug
             </a>
           </li>
@@ -119,7 +126,6 @@ ul.task-list li input[type="checkbox"] {
   </div>
 </a>
 </div>
-          </div> <!-- /navcollapse -->
       </div> <!-- /container-fluid -->
     </nav>
   <nav class="quarto-secondary-nav">
@@ -127,9 +133,9 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../_reference/index.html">Reference</a></li><li class="breadcrumb-item"><a href="../_reference/constants.html">Modules</a></li><li class="breadcrumb-item"><a href="../_reference/recipe.html">recipe</a></li></ol></nav>
-      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
-      </a>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../_reference/index.html">Reference</a></li><li class="breadcrumb-item"><a href="../_reference/constants.html">Modules</a></li><li class="breadcrumb-item"><a href="../_reference/recipe.html">recipe</a></li></ol></nav>
+        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
     </div>
   </nav>
 </header>
@@ -150,14 +156,20 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../guide/getting-started.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Getting Started</span></a>
+  <a href="../guide/colbuilder.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preparation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guide/explanation/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Explanations</span></a>
   </div>
 </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../guide/user/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">User</span></a>
+            <a href="../guide/how_to/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">How-To</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -165,22 +177,40 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../guide/user/hcp.html" class="sidebar-item-text sidebar-link">
+  <a href="../guide/how_to/contribute.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Contribute</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guide/how_to/hcp.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">High Performance Computing</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../guide/user/options.html" class="sidebar-item-text sidebar-link">
+  <a href="../guide/how_to/options.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">KIMMDY Options</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guide/how_to/plugins.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Write Reaction Plugins</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guide/how_to/topology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visualize Topologies</span></a>
   </div>
 </li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../guide/developer/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Developer</span></a>
+            <a href="../guide/tutorials/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tutorials</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -188,14 +218,14 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../guide/developer/plugins.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Writing Reaction Plugins</span></a>
+  <a href="../guide/tutorials/getting-started.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">0. Getting Started</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../guide/developer/topology.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Hexala topology</span></a>
+  <a href="../guide/tutorials/write-plugin.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2. Writing a Reaction Plugin</span></a>
   </div>
 </li>
       </ul>
@@ -437,6 +467,7 @@ ul.task-list li input[type="checkbox"] {
   <ul class="collapse">
   <li><a href="#kimmdy.recipe.RecipeCollection.aggregate_reactions" id="toc-kimmdy.recipe.RecipeCollection.aggregate_reactions" class="nav-link" data-scroll-target="#kimmdy.recipe.RecipeCollection.aggregate_reactions">aggregate_reactions</a></li>
   <li><a href="#kimmdy.recipe.RecipeCollection.calc_cumprob" id="toc-kimmdy.recipe.RecipeCollection.calc_cumprob" class="nav-link" data-scroll-target="#kimmdy.recipe.RecipeCollection.calc_cumprob">calc_cumprob</a></li>
+  <li><a href="#kimmdy.recipe.RecipeCollection.calc_ratesum" id="toc-kimmdy.recipe.RecipeCollection.calc_ratesum" class="nav-link" data-scroll-target="#kimmdy.recipe.RecipeCollection.calc_ratesum">calc_ratesum</a></li>
   <li><a href="#kimmdy.recipe.RecipeCollection.from_csv" id="toc-kimmdy.recipe.RecipeCollection.from_csv" class="nav-link" data-scroll-target="#kimmdy.recipe.RecipeCollection.from_csv">from_csv</a></li>
   <li><a href="#kimmdy.recipe.RecipeCollection.plot" id="toc-kimmdy.recipe.RecipeCollection.plot" class="nav-link" data-scroll-target="#kimmdy.recipe.RecipeCollection.plot">plot</a></li>
   <li><a href="#kimmdy.recipe.RecipeCollection.to_csv" id="toc-kimmdy.recipe.RecipeCollection.to_csv" class="nav-link" data-scroll-target="#kimmdy.recipe.RecipeCollection.to_csv">to_csv</a></li>
@@ -457,7 +488,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="kimmdy.recipe" class="level1">
 <h1>recipe</h1>
 <p><code>recipe</code></p>
-<p>Reaction recipes.</p>
+<p>Contains the Reaction Recipe, RecipeStep and RecipeCollection.</p>
 <section id="classes" class="level2">
 <h2 class="anchored" data-anchor-id="classes">Classes</h2>
 <table class="table">
@@ -757,7 +788,7 @@ ul.task-list li input[type="checkbox"] {
 </table>
 <section id="kimmdy.recipe.Recipe.calc_averages" class="level5">
 <h5 class="anchored" data-anchor-id="kimmdy.recipe.Recipe.calc_averages">calc_averages</h5>
-<p><code>recipe.Recipe.calc_averages(self, window_size)</code></p>
+<p><code>recipe.Recipe.calc_averages(window_size)</code></p>
 <p>Calulate average rates over some window size</p>
 <section id="parameters-5" class="level6">
 <h6 class="anchored" data-anchor-id="parameters-5">Parameters</h6>
@@ -783,12 +814,12 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="kimmdy.recipe.Recipe.check_consistency" class="level5">
 <h5 class="anchored" data-anchor-id="kimmdy.recipe.Recipe.check_consistency">check_consistency</h5>
-<p><code>recipe.Recipe.check_consistency(self)</code></p>
+<p><code>recipe.Recipe.check_consistency()</code></p>
 <p>Run consistency checks for correct size of variables</p>
 </section>
 <section id="kimmdy.recipe.Recipe.combine_with" class="level5">
 <h5 class="anchored" data-anchor-id="kimmdy.recipe.Recipe.combine_with">combine_with</h5>
-<p><code>recipe.Recipe.combine_with(self, other)</code></p>
+<p><code>recipe.Recipe.combine_with(other)</code></p>
 <p>Combines this Recipe with another with the same RecipeSteps.</p>
 <section id="parameters-6" class="level6">
 <h6 class="anchored" data-anchor-id="parameters-6">Parameters</h6>
@@ -837,14 +868,18 @@ ul.task-list li input[type="checkbox"] {
 <td>Calculate cumulative probability of all contained recipe steps.</td>
 </tr>
 <tr class="odd">
+<td><a href="#kimmdy.recipe.RecipeCollection.calc_ratesum">calc_ratesum</a></td>
+<td>Calculate the sum of rates over all timesteps</td>
+</tr>
+<tr class="even">
 <td><a href="#kimmdy.recipe.RecipeCollection.from_csv">from_csv</a></td>
 <td>Create a RecipeCollection object from a CSV file</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#kimmdy.recipe.RecipeCollection.plot">plot</a></td>
 <td>Plot reaction rates over time</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#kimmdy.recipe.RecipeCollection.to_csv">to_csv</a></td>
 <td>Write a ReactionResult as defined in the reaction module to a csv file</td>
 </tr>
@@ -852,22 +887,56 @@ ul.task-list li input[type="checkbox"] {
 </table>
 <section id="kimmdy.recipe.RecipeCollection.aggregate_reactions" class="level5">
 <h5 class="anchored" data-anchor-id="kimmdy.recipe.RecipeCollection.aggregate_reactions">aggregate_reactions</h5>
-<p><code>recipe.RecipeCollection.aggregate_reactions(self)</code></p>
+<p><code>recipe.RecipeCollection.aggregate_reactions()</code></p>
 <p>Combines reactions having the same sequence of RecipeSteps.</p>
 </section>
 <section id="kimmdy.recipe.RecipeCollection.calc_cumprob" class="level5">
 <h5 class="anchored" data-anchor-id="kimmdy.recipe.RecipeCollection.calc_cumprob">calc_cumprob</h5>
-<p><code>recipe.RecipeCollection.calc_cumprob(self)</code></p>
+<p><code>recipe.RecipeCollection.calc_cumprob()</code></p>
 <p>Calculate cumulative probability of all contained recipe steps. Sums up to 1 over all recipes. Assumes constant rate for given timespan and rate zero otherwise.</p>
+</section>
+<section id="kimmdy.recipe.RecipeCollection.calc_ratesum" class="level5">
+<h5 class="anchored" data-anchor-id="kimmdy.recipe.RecipeCollection.calc_ratesum">calc_ratesum</h5>
+<p><code>recipe.RecipeCollection.calc_ratesum()</code></p>
+<p>Calculate the sum of rates over all timesteps</p>
+<section id="returns" class="level6">
+<h6 class="anchored" data-anchor-id="returns">Returns</h6>
+<table class="table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 74%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>boarders</code></td>
+<td>flat list containing times of rate changes marking the boarders of the windows</td>
+</tr>
+<tr class="even">
+<td><code>rate_windows</code></td>
+<td>flat list containing all rates in between the boarders. Each window is orderd as in recipe_windows</td>
+</tr>
+<tr class="odd">
+<td><code>recipe_windows</code></td>
+<td>flat list containing the recipes of the corresponding window. Each window is orderd as in rate_windows</td>
+</tr>
+</tbody>
+</table>
+</section>
 </section>
 <section id="kimmdy.recipe.RecipeCollection.from_csv" class="level5">
 <h5 class="anchored" data-anchor-id="kimmdy.recipe.RecipeCollection.from_csv">from_csv</h5>
-<p><code>recipe.RecipeCollection.from_csv(cls, path)</code></p>
+<p><code>recipe.RecipeCollection.from_csv(path)</code></p>
 <p>Create a RecipeCollection object from a CSV file Returns the recipe collection and a single recipe that was picked, otherwise None</p>
 </section>
 <section id="kimmdy.recipe.RecipeCollection.plot" class="level5">
 <h5 class="anchored" data-anchor-id="kimmdy.recipe.RecipeCollection.plot">plot</h5>
-<p><code>recipe.RecipeCollection.plot(self, outfile, highlight_r=None, highlight_t=None)</code></p>
+<p><code>recipe.RecipeCollection.plot(outfile, highlight_r=None, highlight_t=None)</code></p>
 <p>Plot reaction rates over time</p>
 <section id="parameters-7" class="level6">
 <h6 class="anchored" data-anchor-id="parameters-7">Parameters</h6>
@@ -905,7 +974,7 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="kimmdy.recipe.RecipeCollection.to_csv" class="level5">
 <h5 class="anchored" data-anchor-id="kimmdy.recipe.RecipeCollection.to_csv">to_csv</h5>
-<p><code>recipe.RecipeCollection.to_csv(self, path, picked_recipe=None)</code></p>
+<p><code>recipe.RecipeCollection.to_csv(path, picked_recipe=None)</code></p>
 <p>Write a ReactionResult as defined in the reaction module to a csv file</p>
 </section>
 </section>
@@ -968,6 +1037,33 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       } else {
         el.classList.add('notransition');
       }
+    }
+  }
+  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeGiscusTheme = () => {
+      // From: https://github.com/giscus/giscus/issues/336
+      const sendMessage = (message) => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+      sendMessage({
+        setConfig: {
+          theme: newTheme
+        }
+      });
+    }
+    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+    if (isGiscussLoaded) {
+      changeGiscusTheme();
     }
   }
   const toggleColorMode = (alternate) => {
@@ -1036,13 +1132,15 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       return localAlternateSentinel;
     }
   }
-  let localAlternateSentinel = 'default';
+  const darkModeDefault = false;
+  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
   // Dark / light mode switch
   window.quartoToggleColorScheme = () => {
     // Read the current dark / light value 
     let toAlternate = !hasAlternateSentinel();
     toggleColorMode(toAlternate);
     setStyleSentinel(toAlternate);
+    toggleGiscusIfUsed(toAlternate, darkModeDefault);
   };
   // Ensure there is a toggle, if there isn't float one in the top right
   if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
@@ -1121,10 +1219,9 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     // clear code selection
     e.clearSelection();
   });
-  function tippyHover(el, contentFn) {
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
     const config = {
       allowHTML: true,
-      content: contentFn,
       maxWidth: 500,
       delay: 100,
       arrow: false,
@@ -1134,8 +1231,17 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       interactive: true,
       interactiveBorder: 10,
       theme: 'quarto',
-      placement: 'bottom-start'
+      placement: 'bottom-start',
     };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
     window.tippy(el, config); 
   }
   const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
@@ -1148,6 +1254,60 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
       return note.innerHTML;
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    if (id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        for (let i = 0; i < 2; i++) {
+          container.appendChild(note.children[i].cloneNode(true));
+        }
+        return container.innerHTML
+      } else {
+        return note.innerHTML;
+      }
+    } else {
+      return note.innerHTML;
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      try { hash = new URL(url).hash; } catch {}
+      const id = hash.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note !== null) {
+        try {
+          const html = processXRef(id, note);
+          instance.setContent(html);
+        } finally {
+          instance.enable();
+          instance.show();
+        }
+      } else {
+        // See if we can fetch this
+        fetch(url.split('#')[0])
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.getElementById(id);
+          if (note !== null) {
+            const html = processXRef(id, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
     });
   }
       let selectedAnnoteEl;
@@ -1191,6 +1351,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             }
             div.style.top = top - 2 + "px";
             div.style.height = height + 4 + "px";
+            div.style.left = 0;
             let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
             if (gutterDiv === null) {
               gutterDiv = window.document.createElement("div");
@@ -1288,6 +1449,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   </div>
 </nav>
 </div> <!-- /content -->
+
 
 
 

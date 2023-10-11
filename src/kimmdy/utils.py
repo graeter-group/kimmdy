@@ -1,14 +1,18 @@
 """
 Utilities for building plugins, shell convenience functions and GROMACS related functions
 """
-
+from __future__ import annotations
 import subprocess as sp
 import numpy as np
+import re
 import logging
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 from pathlib import Path
 
-from kimmdy.topology.utils import get_protein_section
+if TYPE_CHECKING:
+    from kimmdy.tasks import TaskFiles
+    from kimmdy.topology.topology import Topology
+    from kimmdy.parsing import Plumed_dict
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +23,20 @@ One of (id: str), (moleculetype: str, id: str) or (moleculetype_ix: int, id).
 """
 
 
-## input/output utility functions
+class longFormatter(logging.Formatter):
+    def format(self, record):
+        saved_name = record.name  # save and restore for other formatters if desired
+        parts = saved_name.split(".")
+        if len(parts) > 1:
+            record.name = parts[0][0] + "." + ".".join(p[:10] for p in parts[1:])
+        else:
+            record.name = parts[0]
+        result = super().format(record)
+        record.name = saved_name
+        return result
+
+
+# input/output utility functions
 
 
 def run_shell_cmd(s, cwd=None) -> sp.CompletedProcess:
@@ -44,39 +61,21 @@ def get_shell_stdout(s):
     return process.stdout
 
 
-def backup_if_existing(f: Path) -> None:
-    """Checks whether a file exists and if so, backs it up.
+def check_file_exists(p: Path):
+    if not p.exists():
+        m = f"File not found: {p}"
+        raise LookupError(m)
 
-    Mainly used for files from previous KIMMDY runs to
-    prevent overwriting these files.
 
-    Parameters
-    ----------
-    f:
-        Path to a file that will be backed up, if existing.
+# reaction plugin building blocks
+
+
+def get_atomnrs_from_plumedid(
+    plumedid: str,
+    plumed: Plumed_dict,
+) -> list[str]:
     """
-    backup_file_prefix = "#"
-    backup_file_suffix = "#"
-    if f.exists():
-        backup_count = 1
-        backup_file = f"{backup_file_prefix}{f}_{backup_count}{backup_file_suffix}"
-        while Path(backup_file).exists():
-            backup_count += 1
-            backup_file = f"{backup_file_prefix}{f}_{backup_count}{backup_file_suffix}"
-        f.rename(backup_file)
-
-
-## reaction plugin building blocks
-
-
-def get_atominfo_from_plumedid(
-    plumedid: str, plumed: dict, top: dict
-) -> tuple[frozenset[str], list[str]]:
-    """
-    For a plumedid, returns the corresponding atom types and nrs.
-
-    To convert from plumedid to atomnr, information from the plumed file is used.
-    Then, the topology atoms section can be used to convert from atomnr to atomtype
+    Convert from plumedid to atomnr, information from the plumed file is used.
 
     Parameters
     ----------
@@ -84,29 +83,35 @@ def get_atominfo_from_plumedid(
         Identifier from a plumed input file (e.g d0).
     plumed:
         Parsed plumed input file
-    top:
-        Topology of the molecular system"""
+    """
+    # lookup_atomnr_plumedid = {k: frozenset(v["atoms"])
+    plumed_action = plumed["labeled_action"][plumedid]
+    if a := plumed_action.get("atoms"):
+        atomnrs = sorted(a, key=int)
+        return atomnrs
+    else:
+        raise NotImplementedError(
+            f"Can't get atomnrs for {plumedid}, is this for an unexpected plumed action?"
+        )
 
-    lookup_atomnr_plumedid = {
-        k: frozenset(v["atoms"]) for k, v in plumed["labeled_action"].items()
-    }
-    atoms = get_protein_section(top, "atoms")
-    lookup_atomtype_atomnr = {str(atom[0]): atom[1] for atom in atoms}
-    atomnrs = sorted(lookup_atomnr_plumedid[plumedid], key=int)
-    atomtypes = frozenset(
-        [
-            lookup_atomtype_atomnr[atomnrs[0]],
-            lookup_atomtype_atomnr[atomnrs[1]],
-        ]
-    )
-    logger.debug(f"Found atomtypes {atomtypes} for plumedid {plumedid}.")
-    return atomtypes, atomnrs
+
+def get_atominfo_from_atomnrs(
+    atomnrs: list[str], top: Topology
+) -> tuple[list[str], list[str]]:
+    """Use topology atoms section to convert from atomnr to atomtype"""
+    atomtypes = []
+    atomnames = []
+    for atomnr in atomnrs:
+        atomtypes.append(top.atoms[atomnr].type)
+        atomnames.append(top.atoms[atomnr].atom)
+    return atomtypes, atomnames
 
 
 def get_bondprm_from_atomtypes(
-    atomtypes: frozenset, ffbonded: dict, lookup_edissoc_atomtype: dict
-) -> tuple[float, float, float]:
-    """Returns bond parameters (b0, kb, E_dis) for a set of two atomtypes.
+    atomtypes: list[str],
+    ffbonded: dict,
+) -> tuple[float, float]:
+    """Returns bond parameters (b0, kb) for a set of two atomtypes.
 
     Parameters
     ----------
@@ -114,40 +119,47 @@ def get_bondprm_from_atomtypes(
         Two atomtypes as defined in the respective force field
     ffbonded:
         Force field ffbonded.itp file parsed through the rtp parser
-    lookup_edissoc_atomtype:
-        Parsed file with dissociation energies per bond between two atomtypes or elements
     """
-    atomtypes_list = list(atomtypes)
-    lookup_ffbonded_atomtype = {
-        frozenset(l[:2]): [float(l[3]), float(l[4])]
-        for l in ffbonded["bondtypes"]["content"]
-    }
-    atomelements_list = [x[0] for x in atomtypes_list]
-
-    # dissociation energy can be for bonds between atomtypes or elements or mixtures of both
-    for comb in [
-        atomtypes_list,
-        [atomtypes_list[0], atomelements_list[1]],
-        [atomelements_list[0], atomtypes_list[1]],
-        atomelements_list,
-    ]:
-        if (comb_set := frozenset(comb)) in lookup_edissoc_atomtype.keys():
-            E_dis = lookup_edissoc_atomtype[comb_set]
+    # search for b0 and kb for the given atomtypes in ffbonded bondtypes
+    for bondtype in ffbonded["bondtypes"]["content"]:
+        if set(atomtypes) == set(bondtype[:2]):
+            b0, kb = [float(x) for x in bondtype[3:5]]
             break
     else:
         raise KeyError(
-            f"Did not find dissociation energy for atomtypes {atomtypes} in edissoc file"
+            f"Did not find bond parameters for atomtypes {atomtypes} in ffbonded file"
         )
 
-    try:
-        b0, kb = lookup_ffbonded_atomtype[atomtypes]
-    except KeyError as e:
-        raise KeyError(
-            f"Did not find bond parameters for atomtypes {atomtypes} in ffbonded file"
-        ) from e
+    return b0, kb
 
-    logger.debug(f"Found bondprm {[b0,kb,E_dis]} for atomtypes {atomtypes}.")
-    return float(b0), float(kb), float(E_dis)
+
+def get_edissoc_from_atomnames(atomnames: list[str], edissoc: dict) -> float:
+    """Returns dissociation energy E_dissoc for a set of two atomnames.
+
+    Parameters
+    ----------
+    atomnames:
+        Two atomnames as defined in the respective force field
+    edissoc:
+        Parsed file with dissociation energies per bond between two atomtypes or elements
+    """
+    # dissociation energy can be for bonds between atomtypes or elements or mixtures of both
+    atomelements = [x[0] for x in atomnames]
+    for comb in [
+        atomnames,
+        [atomnames[0], atomelements[1]],
+        [atomelements[0], atomnames[1]],
+        atomelements,
+    ]:
+        if E_dis := edissoc.get(tuple(comb)):
+            break
+        elif E_dis := edissoc.get(tuple(comb[::-1])):
+            break
+    else:
+        raise KeyError(
+            f"Did not find dissociation energy for atomtypes {atomnames} in edissoc file"
+        )
+    return E_dis
 
 
 def morse_transition_rate(
@@ -254,7 +266,7 @@ def morse_transition_rate(
     return k, fs
 
 
-## GROMACS related functions
+# GROMACS related functions
 
 
 def get_gmx_dir(gromacs_alias: str = "gmx") -> Optional[Path]:
@@ -270,7 +282,7 @@ def get_gmx_dir(gromacs_alias: str = "gmx") -> Optional[Path]:
     # line which contains the path to the gromacs installation
     try:
         r = sp.run([gromacs_alias], check=False, capture_output=True, text=True)
-    except FileNotFoundError as _:
+    except FileNotFoundError:
         logger.warning("GROMACS not found.")
         return None
 
@@ -321,3 +333,94 @@ def check_gmx_version(config):
                     if not config.dryrun:
                         raise SystemError(m)
     return version
+
+
+def truncate_sim_files(files: TaskFiles, time: Optional[float], keep_tail: bool = True):
+    """Truncates latest trr, xtc, edr, and gro to the time to a previous
+    point in time.
+
+    The files stay in place, the truncated tail is by default kept and renamed
+    to '[...xtc].tail'
+
+    Parameters
+    ----------
+    time
+        Time in ps up to which the data should be truncated.
+    files
+        TaskFiles to get the latest files.
+    """
+
+    if time is None:
+        logger.debug("time is None, nothing to truncate")
+        return
+
+    paths = {}
+    paths["gro"] = files.input["gro"]
+    for s in ["trr", "xtc", "edr"]:
+        try:
+            paths[s] = files.input[s]
+        except FileNotFoundError:
+            paths[s] = None
+
+    # trr or xtc must be present
+    if (traj := paths["trr"]) is None:
+        if (traj := paths["xtc"]) is None:
+            raise RuntimeError("No trajectory file!")
+
+    # check time exists in traj
+    p = sp.run(
+        f"gmx -quiet -nocopyright check -f {traj}",
+        text=True,
+        capture_output=True,
+        shell=True,
+    )
+    # FOR SOME REASON gmx check writes in stderr instead of stdout
+    if m := re.search(r"Last frame.*time\s+(\d+\.\d+)", p.stderr):
+        last_time = float(m.group(1))
+        assert (
+            last_time * 1.01 >= time
+        ), "Requested to truncate trajectory after last frame"
+    else:
+        raise RuntimeError(f"gmx check failed:\n{p.stdout}\n{p.stderr}")
+    logger.info(
+        f"Truncating trajectories to {time:.4} ps. Trajectory time was {last_time:.4} ps"
+    )
+
+    # backup the tails of trajectories
+    for trj in [paths["trr"], paths["xtc"]]:
+        if trj is None:
+            continue
+        tmp = trj.rename(trj.with_name("tmp_backup_" + trj.name))
+        if keep_tail:
+            run_gmx(
+                f"gmx trjconv -f {tmp} -b {time} -o {trj}",
+            )
+            trj.rename(str(trj) + ".tail")
+
+        run_gmx(f"gmx trjconv -f {tmp} -e {time} -o {trj}")
+        tmp.unlink()
+
+    # backup the gro
+    bck_gro = paths["gro"].rename(
+        paths["gro"].with_name("tmp_backup_" + paths["gro"].name)
+    )
+    sp.run(
+        f"gmx trjconv -f {traj} -s {bck_gro} -dump -1 -o {paths['gro']}",
+        text=True,
+        input="0",
+        shell=True,
+    )
+    bck_gro.rename(str(paths["gro"]) + ".tail")
+    if not keep_tail:
+        bck_gro.unlink()
+
+    # backup the edr
+    if paths["edr"] is not None:
+        bck_edr = paths["edr"].rename(
+            paths["edr"].with_name("tmp_backup_" + paths["edr"].name)
+        )
+        run_shell_cmd(f"gmx eneconv -f {bck_edr} -e {time} -o {paths['edr']}")
+        bck_edr.rename(str(paths["edr"]) + ".tail")
+        if not keep_tail:
+            bck_edr.unlink()
+    return

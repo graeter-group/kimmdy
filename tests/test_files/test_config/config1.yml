@@ -17,9 +17,8 @@ mds:
 changer:
   coordinates:
     md: 'relax'
-    # points to which md should be performed for relaxation
   topology:
-    parameterization: 'grappa' 
+    parameterization: 'basic' 
 reactions:
   homolysis:
     edis: 'edissoc.dat'

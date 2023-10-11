@@ -165,6 +165,27 @@ class TestTopAB:
 
 
 class TestTopology:
+    @given(atomindex=st.integers(min_value=1, max_value=72))
+    @settings(suppress_health_check=[HealthCheck.function_scoped_fixture], deadline=400)
+    def test_del_atom_hexala(self, hexala_top_fix, atomindex):
+        top: Topology = deepcopy(hexala_top_fix)
+
+        atom = top.atoms[str(atomindex)]
+        bound_nrs = deepcopy(atom.bound_to_nrs)
+        bound_atms = [top.atoms[i] for i in bound_nrs]
+
+        top.del_atom(str(atomindex), parameterize=False)
+
+        for nr, atm in zip(bound_nrs, bound_atms):
+            if int(nr) > atomindex:
+                assert int(atm.nr) == int(nr) - 1
+            else:
+                assert int(atm.nr) == int(nr)
+            assert atm.is_radical
+
+        assert atom not in top.atoms.values()
+        assert len(atom.bound_to_nrs) == 0
+
     def test_break_bind_bond_hexala(self, hexala_top_fix):
         top = deepcopy(hexala_top_fix)
         og_top = deepcopy(top)
@@ -172,8 +193,20 @@ class TestTopology:
         bondindex = 24
         bond_key = list(top.bonds.keys())[bondindex]
         logging.info(f"bond_key: {bond_key}")
+        assert top.bonds.get(bond_key) is not None
+
         top.break_bond(bond_key)
+        assert top.bonds.get(bond_key) is None
+        assert not top.validate_bond(top.atoms[bond_key[0]], top.atoms[bond_key[1]])
+        with pytest.raises(ValueError):
+            top.break_bond(bond_key)
+
         top.bind_bond(bond_key)
+        assert top.bonds.get(bond_key) is not None
+        assert top.validate_bond(top.atoms[bond_key[0]], top.atoms[bond_key[1]])
+        with pytest.raises(ValueError):
+            top.bind_bond(bond_key)
+
         assert top.bonds == og_top.bonds
         assert top.pairs == og_top.pairs
         assert top.angles == og_top.angles
@@ -189,8 +222,12 @@ class TestTopology:
         top = deepcopy(hexala_top_fix)
         og_top = deepcopy(top)
         bond_key = list(top.bonds.keys())[bondindex]
+        assert top.bonds.get(bond_key) is not None
         top.break_bond(bond_key)
+        assert top.bonds.get(bond_key) is None
         top.bind_bond(bond_key)
+        assert top.bonds.get(bond_key) is not None
+
         assert top.bonds == og_top.bonds
         assert top.pairs == og_top.pairs
         assert top.angles == og_top.angles
@@ -216,13 +253,17 @@ class TestTopology:
         assert newtop.proper_dihedrals == og_top.proper_dihedrals
 
     @pytest.mark.slow
-    @settings(max_examples=1, phases=[Phase.generate])
+    @settings(max_examples=1, phases=[Phase.generate], deadline=600)
     @given(top_break=random_topology_and_break())
     def test_break_bind_bond_invertible(self, top_break):
         top, to_break = top_break
         og_top = deepcopy(top)
+        assert top.bonds.get(to_break) is not None
         top.break_bond(to_break)
+        assert top.bonds.get(to_break) is None
         top.bind_bond(to_break)
+        assert top.bonds.get(to_break) is not None
+
         assert top.bonds == og_top.bonds
         assert top.pairs == og_top.pairs
         assert top.angles == og_top.angles

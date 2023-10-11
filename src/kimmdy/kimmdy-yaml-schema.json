@@ -2,6 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   "additionalProperties": false,
+  "required": ["sequence", "changer"],
   "properties": {
     "dryrun": {
       "description": "Don't run the actual simulations, just print the tasks",
@@ -12,11 +13,10 @@
     "cwd": {
       "description": "Working directory",
       "type": "string",
-      "pytype": "Path",
-      "default": "."
+      "pytype": "Path"
     },
     "name": {
-      "description": "Used for output folder if out is not specified",
+      "description": "Used for output folder if `out` is not specified",
       "type": "string",
       "pytype": "str",
       "default": "kimmdy"
@@ -25,6 +25,26 @@
       "description": "Output folder",
       "type": "string",
       "pytype": "Path"
+    },
+    "log": {
+      "type": "object",
+      "description": "Settings for logging",
+      "additionalProperties": false,
+      "properties": {
+        "file": {
+          "description": "Logfile name (will result in a path relative to `out`)",
+          "type": "string",
+          "pytype": "str",
+          "default": "kimmdy.log"
+        },
+        "level": {
+          "description": "Loglevel",
+          "type": "string",
+          "pytype": "str",
+          "default": "INFO",
+          "enum": ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+        }
+      }
     },
     "max_tasks": {
       "description": "Maximum number of tasks to run. This is useful when a task in the sequence can dymanically add more tasks. 0 means no limit.",
@@ -37,6 +57,19 @@
       "type": "integer",
       "pytype": "int",
       "default": 0
+    },
+    "kmc": {
+      "description": "KMC algorithm overwrite. Should be set by the reactions, but can be changed here.",
+      "type": "string",
+      "pytype": "str",
+      "enum": ["", "rfkmc", "frm", "extrande"],
+      "default": ""
+    },
+    "tau_scale": {
+      "description": "Scaling parameter for tau in the extrande kmc algorithm.",
+      "type": "number",
+      "pytype": "float",
+      "default": "1.0"
     },
     "run": {
       "description": "Replica number",
@@ -74,13 +107,6 @@
       "pytype": "str",
       "default": "-maxh 24 -dlb yes"
     },
-    "maxh": {
-      "description": "Maximum number of hours to run KIMMDY until it stops to aviod running out of time on the cluster. This enables graceful shutdown of KIMMDY and allows it to resume from the last checkpoint e.g. via a jobscript.",
-      "type": "integer",
-      "pytype": "int",
-      "default": 24,
-      "minimum": 1
-    },
     "ff": {
       "description": "Force field directory (looks for .ff in cwd if not set)",
       "type": "string",
@@ -108,21 +134,12 @@
       "patternProperties": {
         ".*": {
           "type": "object",
+          "description":"Name of a MD instance",
           "properties": {
             "mdp": {
               "type": "string",
               "pytype": "Path",
               "description": "MDP file for the MD step"
-            },
-            "prefix": {
-              "type": "string",
-              "pytype": "str",
-              "description": "TODO: What is this?"
-            },
-            "overwrite": {
-              "type": "string",
-              "pytype": "str",
-              "description": "TODO: What is this?"
             },
             "use_plumed": {
               "type": "boolean",
@@ -138,17 +155,20 @@
     },
     "changer": {
       "type": "object",
-      "description": "Settings for the coordinate changer",
+      "description": "Settings for applying a reaction recipe",
       "properties": {
         "coordinates": {
           "type": "object",
+          "description": "Settings related to coordinate/geometry changes when applying a recipe",
           "properties": {
             "md": {
               "type": "string",
+              "description": "Which MD instance from the 'mds' section is used for relaxation MDs",
               "pytype": "str"
             },
             "slow_growth": {
               "type": "boolean",
+              "description": "Whether the chosen MD instance is a slow growth/free-energy simulation",
               "pytype": "bool",
               "default": false
             }
@@ -160,12 +180,12 @@
           "properties": {
             "parameterization": {
               "type": "string",
+              "description": "Parameterization scheme that is used on the topology file after changes to it",
               "pytype": "str",
               "enum": ["grappa","basic"],
-              "default": "grappa"
+              "default": "basic"
             }
           },
-          "required": ["parameterization"],
           "additionalProperties": false
         }
       },
@@ -241,14 +261,13 @@
       "description": "Plot the reaction rates",
       "type": "boolean",
       "pytype": "bool",
-      "default": false
+      "default": true
     },
     "save_recipes" : {
       "description": "Save recipes as csv during `decide_reaction`",
       "type": "boolean",
       "pytype": "bool",
-      "default": false
+      "default": true
     }
-  },
-  "required": ["name", "sequence", "changer"]
+  }
 }

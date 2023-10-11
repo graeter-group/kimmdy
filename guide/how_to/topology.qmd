@@ -1,0 +1,32 @@
+---
+title: Visualize Topologies
+mermaid-format: svg
+---
+
+# Hexala
+
+```{python}
+from kimmdy.parsing import read_top
+from kimmdy.topology.topology import Topology
+from pathlib import Path
+from kimmdy.tools import write_top_as_dot
+```
+
+
+```{python}
+#| eval: true
+ala_top = read_top(Path('../../tests/test_files/test_topology/urea.top'), use_gmx_dir=False)
+top = Topology(ala_top)
+
+write_top_as_dot(top, "ala-top.dot")
+```
+
+
+```{dot}
+//| echo: false
+//| label: fig-ala
+//| fig-cap: "A diagram of the ala topology"
+//| file: ala-top.dot
+```
+
+

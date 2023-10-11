@@ -13,7 +13,7 @@ and package into a parsed format for internal use.
 
 ### Config { #kimmdy.config.Config }
 
-`config.Config(self, input_file=None, recursive_dict=None, scheme=None, section='config', no_increment_output_dir=False)`
+`config.Config(self, input_file=None, recursive_dict=None, scheme=None, section='config', logfile=None, loglevel=None)`
 
 Internal representation of the configuration generated
 from the input file, which enables validation before running
@@ -33,17 +33,17 @@ and computationally expensive operations.
 | Name | Description |
 | --- | --- |
 | [attr](#kimmdy.config.Config.attr) | Get the value of a specific attribute. |
-| [get_attributes](#kimmdy.config.Config.get_attributes) | Get a list of all attributes |
+| [get_attributes](#kimmdy.config.Config.get_attributes) | Get a list of all attributes without hidden ones (_<...>). |
 
 ##### attr { #kimmdy.config.Config.attr }
 
-`config.Config.attr(self, attribute)`
+`config.Config.attr(attribute)`
 
 Get the value of a specific attribute.
 Alias for self.__getattribute__
 
 ##### get_attributes { #kimmdy.config.Config.get_attributes }
 
-`config.Config.get_attributes(self)`
+`config.Config.get_attributes()`
 
-Get a list of all attributes
+Get a list of all attributes without hidden ones (_<...>).
