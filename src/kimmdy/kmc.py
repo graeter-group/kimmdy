@@ -206,6 +206,9 @@ def extrande(
 
     # initialize t
     t = 0
+    a0 = -1
+    u = -1
+    b = -1
     chosen_recipe = None
 
     # Find L and B
@@ -225,6 +228,11 @@ def extrande(
     n_extra = 0
     while t < t_max:
         crr_window_idx = np.searchsorted(boarders, t, side="right") - 1
+        # only 0 rates left -> skip to end
+        if not any([r > 0 for r in rate_sums[crr_window_idx:]]):
+            t = t_max
+            break
+
         b = max(rate_sums[crr_window_idx:])
         l = t_max - t
 
@@ -244,6 +252,11 @@ def extrande(
         t += tau
         new_window_idx = np.searchsorted(boarders, t, side="right") - 1
         rate_cumsum = np.cumsum(rate_windows[new_window_idx])
+        # catch landing in window with no recipes -> next window
+        if len(rate_cumsum) == 0:
+            t = boarders[crr_window_idx + 1]
+            logger.debug(f"Jumped to frame with no recip, new t={t}")
+            continue
         a0 = rate_cumsum[-1]
 
         u = rng.random()
