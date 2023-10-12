@@ -98,11 +98,11 @@ product state from the educt state.
 
 #### Parameters
 
-| Name           | Type                                                                   | Description                                                                                                                                                        | Default    |
-|----------------|------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
-| `recipe_steps` | [list](`list`)\[[RecipeStep](`kimmdy.recipe.RecipeStep`)\]             | Single sequence of RecipeSteps to build product                                                                                                                    | _required_ |
-| `rates`        | [list](`list`)\[[float](`float`)\]                                     | Reaction rates corresponding 1:1 to timespans.                                                                                                                     | _required_ |
-| `timespans`    | [list](`list`)\[[list](`list`)\[[float](`float`), [float](`float`)\]\] | List of half-open timespans (t1, t2] in ps, at which this reaction path applies. Must have same number of timespans as rates. t1 can equal t2 for the first frame. | _required_ |
+| Name           | Type                                                                   | Description                                                                                                                                                                                                                                                       | Default    |
+|----------------|------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| `recipe_steps` | [list](`list`)\[[RecipeStep](`kimmdy.recipe.RecipeStep`)\]             | Single sequence of RecipeSteps to build product                                                                                                                                                                                                                   | _required_ |
+| `rates`        | [list](`list`)\[[float](`float`)\]                                     | Reaction rates corresponding 1:1 to timespans.                                                                                                                                                                                                                    | _required_ |
+| `timespans`    | [list](`list`)\[[list](`list`)\[[float](`float`), [float](`float`)\]\] | List of half-open timespans (t1, t2] in ps, at which this rate is valid. Recipe steps which change the coordinates only need to be applicable at the first time in the interval. Must have same number of timespans as rates. t1 can equal t2 for the last frame. | _required_ |
 
 #### Methods
 

@@ -10,6 +10,7 @@ and because we have one reactant molecule
 from typing import Optional
 import logging
 import numpy as np
+from itertools import pairwise
 from dataclasses import dataclass, field
 from numpy.random import default_rng
 from kimmdy.recipe import RecipeCollection, Recipe
@@ -172,11 +173,121 @@ def frm(
     )
 
 
-def extrande(
+def extrande_mod(
     recipe_collection: RecipeCollection,
+    tau_scale: float,
     logger: logging.Logger = logging.getLogger(__name__),
     rng: np.random.Generator = default_rng(),
-    tau_scale: float = 1.0,
+) -> KMCResult:
+    """Modified Extrande KMC
+
+    Improved implementation of
+    `Stochastic Simulation of Biomolecular Networks in Dynamic Environments`
+    [10.1371/journal.pcbi.1004923](https://doi.org/10.1371/journal.pcbi.1004923)
+    Changes: The considered time window is chosen to be a window containing
+    constant rates. This prevents very small tau caused by a spike in the rate
+    at a later point. As a side effect, the upper rate bound b and current rate
+    a0 are the same, and the 'extra' side channel can not be triggered anymore.
+
+    This should be more efficient given a limited number of time windows
+    containing constant rates.
+
+    Parameters
+    ----------
+    recipe_collection
+        from which one will be choosen
+    rng
+        function to generate random numbers in the KMC step
+    tau_scale
+        Scaling factor for tau, by default 1.0
+
+    Returns
+    -------
+    KMCResult
+        time delta set to 0
+    """
+
+    # check for empty ReactionResult
+    if len(recipe_collection.recipes) == 0:
+        logger.warning("Empty ReactionResult; no reaction chosen")
+        return KMCResult()
+
+    # initialize
+    t = 0
+    n_extra = 0
+    rejected = 0
+    chosen_recipe = None
+
+    boarders, rate_windows, recipe_windows = recipe_collection.calc_ratesum()
+
+    rate_sums = [float(sum(l)) for l in rate_windows]
+    idx_rate_max = np.argmax(rate_sums)
+    expected_tau = np.mean(tau_scale * rng.exponential(1 / max(rate_sums), 50))
+    logger.debug(
+        f"Max of summed rate of {rate_sums[idx_rate_max]:.2} between t "
+        f"{boarders[idx_rate_max]} - {boarders[idx_rate_max+1]}\n"
+        f"\t\texpected tau: {expected_tau}"
+    )
+
+    for cr_boarders, cr_rates, cr_recipes in zip(
+        pairwise(boarders), rate_windows, recipe_windows
+    ):
+        t_max = cr_boarders[1]
+        rate_cumsum = np.cumsum(cr_rates)
+        b = rate_cumsum[-1]
+        tau = tau_scale * rng.exponential(1 / b)
+
+        while t < t_max:
+            l = t_max - t
+            if tau > l:
+                # reject, goto next window
+                logger.debug(f"Tau exceeded window {cr_boarders}.")
+                t = t_max
+                rejected += 1
+                continue
+
+            # Accept time, chose reaction
+            t += tau
+            u = rng.random()
+            idx = np.searchsorted(rate_cumsum, b * u)
+            chosen_recipe = cr_recipes[idx]
+            break
+
+        if chosen_recipe is not None:
+            break
+
+    if chosen_recipe is None:
+        logger.info(
+            f"No reaction was chosen\naccepted: 0, rejected: {rejected}, extra: {n_extra}"
+        )
+        logger.debug(
+            f"Extrande stats:\n\tb:\t\t{b}"
+            f"\n\tTau:\t{tau}\n\tl:\t\t{l}\n\tt:\t\t{t}\n\tt_max:\t{t_max}"
+        )
+        return KMCResult()
+
+    logger.info(
+        f"Reaction {chosen_recipe.get_recipe_name()} was chose at time {t}\n"
+        f"accepted: 1, rejected: {rejected}, extra: {n_extra}"
+    )
+    logger.debug(
+        f"Extrande stats:\n\tb:\t\t{b}"
+        f"\n\tTau:\t{tau}\n\tl:\t\t{l}\n\tt:\t\t{t}\n\tt_max:\t{t_max}"
+    )
+
+    return KMCResult(
+        recipe=chosen_recipe,
+        reaction_probability=None,
+        time_delta=0,  # instantaneous reaction
+        time_start=t,
+    )
+
+
+def extrande(
+    recipe_collection: RecipeCollection,
+    tau_scale: float,
+    logger: logging.Logger = logging.getLogger(__name__),
+    rng: np.random.Generator = default_rng(),
 ) -> KMCResult:
     """Extrande KMC
 

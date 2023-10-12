@@ -36,12 +36,13 @@ The result of a KMC step. Similar to a Recipe but for the concrete realization o
 | Name | Description |
 | --- | --- |
 | [extrande](#kimmdy.kmc.extrande) | Extrande KMC |
+| [extrande_mod](#kimmdy.kmc.extrande_mod) | Modified Extrande KMC |
 | [frm](#kimmdy.kmc.frm) | First Reaction Method variant of Kinetic Monte Carlo. |
 | [rf_kmc](#kimmdy.kmc.rf_kmc) | Rejection-Free Monte Carlo. |
 
 ### extrande { #kimmdy.kmc.extrande }
 
-`kmc.extrande(recipe_collection, logger=logging.getLogger(__name__), rng=default_rng(), tau_scale=1.0)`
+`kmc.extrande(recipe_collection, tau_scale, logger=logging.getLogger(__name__), rng=default_rng())`
 
 Extrande KMC
 
@@ -55,7 +56,38 @@ Implemented as in
 |---------------------|------------------------------------------------------------------------------|-----------------------------------------------------|-----------------|
 | `recipe_collection` | [RecipeCollection](`kimmdy.recipe.RecipeCollection`)                         | from which one will be choosen                      | _required_      |
 | `rng`               | [np](`numpy`).[random](`numpy.random`).[Generator](`numpy.random.Generator`) | function to generate random numbers in the KMC step | `default_rng()` |
-| `tau_scale`         | [float](`float`)                                                             | Scaling factor for tau, by default 1.0              | `1.0`           |
+| `tau_scale`         | [float](`float`)                                                             | Scaling factor for tau, by default 1.0              | _required_      |
+
+#### Returns
+
+| Type                                | Description         |
+|-------------------------------------|---------------------|
+| [KMCResult](`kimmdy.kmc.KMCResult`) | time delta set to 0 |
+
+### extrande_mod { #kimmdy.kmc.extrande_mod }
+
+`kmc.extrande_mod(recipe_collection, tau_scale, logger=logging.getLogger(__name__), rng=default_rng())`
+
+Modified Extrande KMC
+
+Improved implementation of
+`Stochastic Simulation of Biomolecular Networks in Dynamic Environments`
+[10.1371/journal.pcbi.1004923](https://doi.org/10.1371/journal.pcbi.1004923)
+Changes: The considered time window is chosen to be a window containing
+constant rates. This prevents very small tau caused by a spike in the rate
+at a later point. As a side effect, the upper rate bound b and current rate
+a0 are the same, and the 'extra' side channel can not be triggered anymore.
+
+This should be more efficient given a limited number of time windows
+containing constant rates.
+
+#### Parameters
+
+| Name                | Type                                                                         | Description                                         | Default         |
+|---------------------|------------------------------------------------------------------------------|-----------------------------------------------------|-----------------|
+| `recipe_collection` | [RecipeCollection](`kimmdy.recipe.RecipeCollection`)                         | from which one will be choosen                      | _required_      |
+| `rng`               | [np](`numpy`).[random](`numpy.random`).[Generator](`numpy.random.Generator`) | function to generate random numbers in the KMC step | `default_rng()` |
+| `tau_scale`         | [float](`float`)                                                             | Scaling factor for tau, by default 1.0              | _required_      |
 
 #### Returns
 

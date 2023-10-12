@@ -224,6 +224,10 @@ raw_top =
 
 `parsing.resolve_includes(path, gmx_builtin_ffs=None)`
 
+Resolve #include statements in a (top/itp) file.
+
+
+
 #### Arguments
 
 path :
