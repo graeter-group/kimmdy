@@ -29,7 +29,7 @@ from kimmdy.tasks import Task, TaskFiles, get_plumed_out
 from pprint import pformat
 from kimmdy.topology.topology import Topology
 import time
-from kimmdy.kmc import KMCResult, rf_kmc, extrande, frm
+from kimmdy.kmc import KMCResult, rf_kmc, extrande, frm, extrande_mod
 
 logger = logging.getLogger(__name__)
 
@@ -156,7 +156,12 @@ class RunManager:
             reaction_plugin = Plugin(name, self)
             self.reaction_plugins.append(reaction_plugin)
 
-        self.kmc_mapping = {"extrande": extrande, "rfkmc": rf_kmc, "frm": frm}
+        self.kmc_mapping = {
+            "extrande": extrande,
+            "rfkmc": rf_kmc,
+            "frm": frm,
+            "extrande_mod": extrande_mod,
+        }
 
         self.task_mapping = {
             "md": {"f": self._run_md, "kwargs": {}, "out": None},
@@ -473,9 +478,9 @@ class RunManager:
             f"Start Decide recipe, {len(self.recipe_collection.recipes)} available"
         )
         kmc = self.kmc_mapping[self.kmc_algorithm.lower()]
-        if self.kmc_algorithm.lower() == "extrande":
+        if "extrande" in self.kmc_algorithm.lower():
             kmc = partial(kmc, tau_scale=self.config.tau_scale)
-        self.kmcresult: KMCResult = kmc(self.recipe_collection, logger)
+        self.kmcresult: KMCResult = kmc(self.recipe_collection, logger=logger)
         recipe = self.kmcresult.recipe
 
         if self.config.save_recipes:

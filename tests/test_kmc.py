@@ -1,7 +1,8 @@
 import pytest
+import numpy as np
 from numpy.random import default_rng
 from kimmdy.recipe import Recipe, RecipeCollection, Break, Bind
-from kimmdy.kmc import rf_kmc, frm, extrande, KMCResult
+from kimmdy.kmc import rf_kmc, frm, extrande, extrande_mod, KMCResult
 
 
 @pytest.fixture
@@ -33,13 +34,9 @@ def reference_KMC() -> KMCResult:
 @pytest.fixture
 def reference_extrande_KMC() -> KMCResult:
     return KMCResult(
-        recipe=Recipe(
-            [Break(3, 4), Bind(4, 5)],
-            rates=[0.15],
-            timespans=[(2.0, 4.0)],
-        ),
+        recipe=Recipe([Bind(2, 3)], rates=[0.12], timespans=[(0.0, 6.0)]),
         time_delta=0,
-        time_start=3.9741815791575505,
+        time_start=3.85725338647224,
         reaction_probability=None,
     )
 
@@ -64,7 +61,12 @@ def test_frm_empty():
 
 
 def test_extrande_empty():
-    KMC_dict = extrande(RecipeCollection([]))
+    KMC_dict = extrande(RecipeCollection([]), 1.0)
+    assert KMC_dict.recipe == Recipe([], [], [])
+
+
+def test_extrande_mod_empty():
+    KMC_dict = extrande_mod(RecipeCollection([]), 1.0)
     assert KMC_dict.recipe == Recipe([], [], [])
 
 
@@ -79,9 +81,20 @@ def test_rf_kmc_unlike_ref(reference_KMC):
 def test_extrande_calculation(recipe_collection, reference_extrande_KMC):
     rng = default_rng(1)
     # first random numbers are array([0.51182162, 0.9504637])
-    KMC_dict = extrande(recipe_collection, rng=rng)
+    KMC_dict = extrande(recipe_collection, 1.0, rng=rng)
     assert KMC_dict.recipe == reference_extrande_KMC.recipe
     assert abs(KMC_dict.time_start - reference_extrande_KMC.time_start) < 1e-9
+    assert abs(KMC_dict.time_delta - reference_extrande_KMC.time_delta) < 1e-9
+
+
+def test_extrande_mod_calculation(recipe_collection, reference_extrande_KMC):
+    rng = default_rng(1)
+    # first random numbers are array([0.51182162, 0.9504637])
+    KMC_dict = extrande_mod(recipe_collection, 1.0, rng=rng)
+    assert KMC_dict.recipe == reference_extrande_KMC.recipe
+    assert (
+        abs(KMC_dict.time_start - 2.4632908726674225) < 1e-9
+    )  # single result different, same distribution?
     assert abs(KMC_dict.time_delta - reference_extrande_KMC.time_delta) < 1e-9
 
 
@@ -108,3 +121,23 @@ def test_frm_no_event(recipe_collection):
     new_recipes = recipe_collection.recipes[2:4]
     KMC_dict = frm(RecipeCollection(new_recipes), rng=rng, MD_time=None)
     assert KMC_dict.recipe == Recipe([], [], [])
+
+
+def test_compare_extrande_extrande_mod(recipe_collection):
+    rng = default_rng(1)
+
+    extrande_list = [extrande(recipe_collection, 1.0, rng=rng) for _ in range(2000)]
+    extrande_mod_list = [
+        extrande_mod(recipe_collection, 1.0, rng=rng) for _ in range(2000)
+    ]
+    ext_ts = np.array([r.time_start for r in extrande_list])
+    extmod_ts = np.array([r.time_start for r in extrande_mod_list])
+    mask = np.nonzero(ext_ts != np.array(None))[0]
+    mmask = np.nonzero(extmod_ts != np.array(None))[0]
+
+    assert abs(ext_ts[mask].mean() - extmod_ts[mmask].mean()) < 0.1
+
+    ext_rs = np.concatenate([r.recipe.rates for r in extrande_list])
+    extmod_rs = np.concatenate([r.recipe.rates for r in extrande_mod_list])
+
+    assert abs(ext_rs.mean() - extmod_rs.mean()) < 0.002

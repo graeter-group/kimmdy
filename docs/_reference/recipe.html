@@ -756,7 +756,7 @@ ul.task-list li input[type="checkbox"] {
 <tr class="odd">
 <td><code>timespans</code></td>
 <td><a href="https://docs.python.org/3.10/library/stdtypes.html#list">list</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#list">list</a>[<a href="https://docs.python.org/3.10/library/functions.html#float">float</a>, <a href="https://docs.python.org/3.10/library/functions.html#float">float</a>]]</td>
-<td>List of half-open timespans (t1, t2] in ps, at which this reaction path applies. Must have same number of timespans as rates. t1 can equal t2 for the first frame.</td>
+<td>List of half-open timespans (t1, t2] in ps, at which this rate is valid. Recipe steps which change the coordinates only need to be applicable at the first time in the interval. Must have same number of timespans as rates. t1 can equal t2 for the last frame.</td>
 <td><em>required</em></td>
 </tr>
 </tbody>

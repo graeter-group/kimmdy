@@ -527,6 +527,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="kimmdy.tasks.Task" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.tasks.Task">Task</h3>
 <p><code>tasks.Task(self, runmng, f, kwargs=None, out=None)</code></p>
+<p>A task to be performed as as a step in the RunManager.</p>
+<p>A task consists of a function and its keyword arguments. Calling a taks calls the stored function. The function must return a TaskFiles object.</p>
 <section id="parameters" class="level4">
 <h4 class="anchored" data-anchor-id="parameters">Parameters:</h4>
 <p>runmng Runmanager instance from which the task is called f Function that will be called when the task is called kwargs kwargs to be passed to f out If not None, an output dir will be created with this name</p>
@@ -535,6 +537,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="kimmdy.tasks.TaskFiles" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.tasks.TaskFiles">TaskFiles</h3>
 <p><code>tasks.TaskFiles(get_latest, input=field(default_factory=dict), output=field(default_factory=dict), outputdir=Path(), logger=logging.getLogger('kimmdy.basetask'))</code></p>
+<p>Class for Task input and output files and directories.</p>
+<p>Hosts the input and output file paths belonging to a task. A function or method that wants to be callable as a Task has to return a TaskFiles object. The input defaultdict is populated on the fly using get_latest of the runmanager to find newest files. Files which can not be found by get_latest must be added manually.</p>
 <section id="atributes" class="level4">
 <h4 class="anchored" data-anchor-id="atributes">Atributes</h4>
 <p>get_latest: Runmanager.get_latest function that returns paths to the latest file of given type. input: Input file paths for a Task. Is populated by get_latest or manually. output: Output file paths for a Task. Is populated by runmanager._discover_output_files or manually. outputdir: Output directory for a Task. Typically populated by create_task_directory called by Task. logger: Logger for a Task. Initialized in create_task_directory.</p>

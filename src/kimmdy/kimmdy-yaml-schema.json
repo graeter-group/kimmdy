@@ -62,7 +62,7 @@
       "description": "KMC algorithm overwrite. Should be set by the reactions, but can be changed here.",
       "type": "string",
       "pytype": "str",
-      "enum": ["", "rfkmc", "frm", "extrande"],
+      "enum": ["", "rfkmc", "frm", "extrande", "extrande_mod"],
       "default": ""
     },
     "tau_scale": {
