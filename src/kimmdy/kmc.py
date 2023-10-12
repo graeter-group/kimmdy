@@ -175,9 +175,9 @@ def frm(
 
 def extrande_mod(
     recipe_collection: RecipeCollection,
+    tau_scale: float,
     logger: logging.Logger = logging.getLogger(__name__),
     rng: np.random.Generator = default_rng(),
-    tau_scale: float = 1.0,
 ) -> KMCResult:
     """Modified Extrande KMC
 
@@ -285,9 +285,9 @@ def extrande_mod(
 
 def extrande(
     recipe_collection: RecipeCollection,
+    tau_scale: float,
     logger: logging.Logger = logging.getLogger(__name__),
     rng: np.random.Generator = default_rng(),
-    tau_scale: float = 1.0,
 ) -> KMCResult:
     """Extrande KMC
 
