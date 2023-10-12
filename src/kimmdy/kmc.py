@@ -220,7 +220,7 @@ def extrande_mod(
 
     boarders, rate_windows, recipe_windows = recipe_collection.calc_ratesum()
 
-    rate_sums = [sum(l) for l in rate_windows]
+    rate_sums = [float(sum(l)) for l in rate_windows]
     idx_rate_max = np.argmax(rate_sums)
     expected_tau = np.mean(tau_scale * rng.exponential(1 / max(rate_sums), 50))
     logger.debug(
