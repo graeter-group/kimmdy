@@ -238,6 +238,13 @@ class Recipe:
     def __post_init__(self):
         self.check_consistency()
 
+    def copy(self):
+        return Recipe(
+            list(self.recipe_steps),
+            list(self.rates),
+            list(self.timespans),
+        )
+
     def calc_averages(self, window_size: int):
         """Calulate average rates over some window size
 
@@ -331,6 +338,12 @@ class Recipe:
 class RecipeCollection:
     """A RecipeCollection encompasses a number of reaction paths.
     They can originate from multiple reaction plugins, but do not need to.
+
+    Returns
+    -------
+    unique_recipes_ixs
+        List of lists binning the old recipe indices and maps to the new
+        recipes list.
     """
 
     recipes: list[Recipe]
@@ -352,6 +365,8 @@ class RecipeCollection:
 
         # merge every dublicate into first reaction path
         for uri in unique_recipes_ixs:
+            # copy to not change outside references to this recip
+            self.recipes[uri[0]] = self.recipes[uri[0]].copy()
             if len(uri) > 1:
                 for uri_double in uri[1:]:
                     self.recipes[uri[0]].combine_with(self.recipes[uri_double])
@@ -360,6 +375,7 @@ class RecipeCollection:
         for uri in unique_recipes_ixs:
             urps.append(self.recipes[uri[0]])
         self.recipes = urps
+        return unique_recipes_ixs
 
     def to_csv(self, path: Path, picked_recipe=None):
         """Write a ReactionResult as defined in the reaction module to a csv file"""
@@ -493,37 +509,51 @@ class RecipeCollection:
         import seaborn as sns
         import numpy as np
 
+        self.aggregate_reactions()
         cumprob = self.calc_cumprob()
         recipes = np.array(self.recipes)
-        idxs = slice(None)
-        if len(recipes) > 8:
-            logger.info(
-                "More than 8 reactions found, displaying only 8 most likely ones."
-            )
-            idxs = np.argsort(cumprob)[-8:]
-            i_to_highlight = np.nonzero(recipes == highlight_r)[0]
+        recipe_steps = np.empty(len(self.recipes), dtype=object)
+        for i, r in enumerate(self.recipes):
+            recipe_steps[i] = r.recipe_steps
+
+        idxs = np.argsort(cumprob)[-8:]
+        ref = np.empty((1,), dtype=object)
+        if highlight_r is not None:
+            ref[0] = highlight_r.recipe_steps
+            i_to_highlight = np.nonzero(recipe_steps == ref)[0]
             idxs = list(set(np.concatenate([idxs, i_to_highlight])))
 
-        cmap = sns.color_palette("husl", len(recipes[idxs]))
+        cmap = sns.color_palette("husl", len(idxs))
         name_to_args = {}
 
-        plt.figure()
-        for r_i, re in enumerate(recipes[idxs]):
+        for r_i, re in enumerate(recipes):
             name = re.get_recipe_name()
+            kwargs = {}
+            kwargs["linestyle"] = "-"
+            kwargs["linewidth"] = 1.0
+
             if name not in name_to_args:
-                kwargs = {}
-                kwargs["color"] = cmap[r_i]
-                kwargs["label"] = name
-
-                kwargs["linestyle"] = "-"
-                kwargs["linewidth"] = 0.8
+                kwargs["color"] = (0.7, 0.7, 0.7)
+                kwargs["label"] = "REMOVE"
+                if r_i in idxs:
+                    kwargs["color"] = cmap[idxs.index(r_i)]
+                    kwargs["label"] = name
                 name_to_args[name] = kwargs
+            else:
+                if r_i in idxs:
+                    if name_to_args[name]["label"] == "REMOVE":
+                        kwargs["color"] = cmap[idxs.index(r_i)]
+                        kwargs["label"] = name
+                        name_to_args[name] = kwargs
 
-            if re == highlight_r:
-                if highlight_t is not None:
-                    plt.axvline(highlight_t, color="red")
-                    name_to_args[name]["linestyle"] = "-."
-                    name_to_args[name]["linewidth"] = 2.1
+        plt.figure()
+        if highlight_t is not None:
+            plt.axvline(highlight_t, color="red")
+        for r_i, re in enumerate(recipes):
+            name = re.get_recipe_name()
+            if name == highlight_r.get_recipe_name():
+                name_to_args[name]["linestyle"] = "-."
+                name_to_args[name]["linewidth"] = 2.2
 
             for dt, r in zip(re.timespans, re.rates):
                 marker = ""
@@ -535,13 +565,13 @@ class RecipeCollection:
                     marker=marker,
                     **name_to_args[name],
                 )
-        plt.xlabel("time [frames]")
+        plt.xlabel("time [ps]")
         plt.ylabel("reaction rate")
         plt.yscale("log")
-
         # removing duplicates in legend
         handles, labels = plt.gca().get_legend_handles_labels()
         by_label = dict(zip(labels, handles))
+        by_label.pop("REMOVE", None)
         plt.legend(by_label.values(), by_label.keys())
 
         plt.savefig(outfile)
