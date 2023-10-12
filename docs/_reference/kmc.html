@@ -445,13 +445,18 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
   </ul></li>
-  <li><a href="#kimmdy.kmc.frm" id="toc-kimmdy.kmc.frm" class="nav-link" data-scroll-target="#kimmdy.kmc.frm">frm</a>
+  <li><a href="#kimmdy.kmc.extrande_mod" id="toc-kimmdy.kmc.extrande_mod" class="nav-link" data-scroll-target="#kimmdy.kmc.extrande_mod">extrande_mod</a>
   <ul class="collapse">
   <li><a href="#parameters-1" id="toc-parameters-1" class="nav-link" data-scroll-target="#parameters-1">Parameters</a></li>
+  <li><a href="#returns-1" id="toc-returns-1" class="nav-link" data-scroll-target="#returns-1">Returns</a></li>
+  </ul></li>
+  <li><a href="#kimmdy.kmc.frm" id="toc-kimmdy.kmc.frm" class="nav-link" data-scroll-target="#kimmdy.kmc.frm">frm</a>
+  <ul class="collapse">
+  <li><a href="#parameters-2" id="toc-parameters-2" class="nav-link" data-scroll-target="#parameters-2">Parameters</a></li>
   </ul></li>
   <li><a href="#kimmdy.kmc.rf_kmc" id="toc-kimmdy.kmc.rf_kmc" class="nav-link" data-scroll-target="#kimmdy.kmc.rf_kmc">rf_kmc</a>
   <ul class="collapse">
-  <li><a href="#parameters-2" id="toc-parameters-2" class="nav-link" data-scroll-target="#parameters-2">Parameters</a></li>
+  <li><a href="#parameters-3" id="toc-parameters-3" class="nav-link" data-scroll-target="#parameters-3">Parameters</a></li>
   </ul></li>
   </ul></li>
   </ul></li>
@@ -539,10 +544,14 @@ ul.task-list li input[type="checkbox"] {
 <td>Extrande KMC</td>
 </tr>
 <tr class="even">
+<td><a href="#kimmdy.kmc.extrande_mod">extrande_mod</a></td>
+<td>Modified Extrande KMC</td>
+</tr>
+<tr class="odd">
 <td><a href="#kimmdy.kmc.frm">frm</a></td>
 <td>First Reaction Method variant of Kinetic Monte Carlo.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#kimmdy.kmc.rf_kmc">rf_kmc</a></td>
 <td>Rejection-Free Monte Carlo.</td>
 </tr>
@@ -550,7 +559,7 @@ ul.task-list li input[type="checkbox"] {
 </table>
 <section id="kimmdy.kmc.extrande" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.kmc.extrande">extrande</h3>
-<p><code>kmc.extrande(recipe_collection, logger=logging.getLogger(__name__), rng=default_rng(), tau_scale=1.0)</code></p>
+<p><code>kmc.extrande(recipe_collection, tau_scale, logger=logging.getLogger(__name__), rng=default_rng())</code></p>
 <p>Extrande KMC</p>
 <p>Implemented as in <code>Stochastic Simulation of Biomolecular Networks in Dynamic Environments</code> <a href="https://doi.org/10.1371/journal.pcbi.1004923">10.1371/journal.pcbi.1004923</a></p>
 <section id="parameters" class="level4">
@@ -581,7 +590,7 @@ ul.task-list li input[type="checkbox"] {
 <td><code>tau_scale</code></td>
 <td><a href="https://docs.python.org/3.10/library/functions.html#float">float</a></td>
 <td>Scaling factor for tau, by default 1.0</td>
-<td><code>1.0</code></td>
+<td><em>required</em></td>
 </tr>
 </tbody>
 </table>
@@ -604,13 +613,70 @@ ul.task-list li input[type="checkbox"] {
 </table>
 </section>
 </section>
+<section id="kimmdy.kmc.extrande_mod" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.kmc.extrande_mod">extrande_mod</h3>
+<p><code>kmc.extrande_mod(recipe_collection, tau_scale, logger=logging.getLogger(__name__), rng=default_rng())</code></p>
+<p>Modified Extrande KMC</p>
+<p>Improved implementation of <code>Stochastic Simulation of Biomolecular Networks in Dynamic Environments</code> <a href="https://doi.org/10.1371/journal.pcbi.1004923">10.1371/journal.pcbi.1004923</a> Changes: The considered time window is chosen to be a window containing constant rates. This prevents very small tau caused by a spike in the rate at a later point. As a side effect, the upper rate bound b and current rate a0 are the same, and the ‘extra’ side channel can not be triggered anymore.</p>
+<p>This should be more efficient given a limited number of time windows containing constant rates.</p>
+<section id="parameters-1" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-1">Parameters</h4>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>recipe_collection</code></td>
+<td><a href="../_reference/recipe.html#kimmdy.recipe.RecipeCollection">RecipeCollection</a></td>
+<td>from which one will be choosen</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td><code>rng</code></td>
+<td><a href="https://numpy.org/doc/stable/reference/index.html#module-numpy">np</a>.<a href="https://numpy.org/doc/stable/reference/random/index.html#module-numpy.random">random</a>.<a href="https://numpy.org/doc/stable/reference/random/generator.html#numpy.random.Generator">Generator</a></td>
+<td>function to generate random numbers in the KMC step</td>
+<td><code>default_rng()</code></td>
+</tr>
+<tr class="odd">
+<td><code>tau_scale</code></td>
+<td><a href="https://docs.python.org/3.10/library/functions.html#float">float</a></td>
+<td>Scaling factor for tau, by default 1.0</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-1" class="level4">
+<h4 class="anchored" data-anchor-id="returns-1">Returns</h4>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="../_reference/kmc.html#kimmdy.kmc.KMCResult">KMCResult</a></td>
+<td>time delta set to 0</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
 <section id="kimmdy.kmc.frm" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.kmc.frm">frm</h3>
 <p><code>kmc.frm(recipe_collection, logger=logging.getLogger(__name__), rng=default_rng(), MD_time=None)</code></p>
 <p>First Reaction Method variant of Kinetic Monte Carlo. takes RecipeCollection and choses a recipe based on which reaction would occur.</p>
 <p>Compare e.g.&nbsp;<a href="https://en.wikipedia.org/wiki/Kinetic_Monte_Carlo#Time-dependent_Algorithms">Wikipedia KMC - time dependent</a></p>
-<section id="parameters-1" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-1">Parameters</h4>
+<section id="parameters-2" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-2">Parameters</h4>
 <table class="table">
 <thead>
 <tr class="header">
@@ -648,8 +714,8 @@ ul.task-list li input[type="checkbox"] {
 <p><code>kmc.rf_kmc(recipe_collection, logger=logging.getLogger(__name__), rng=default_rng())</code></p>
 <p>Rejection-Free Monte Carlo. Takes RecipeCollection and choses a recipe based on the relative propensity of the events. The ‘start’ time of the reaction is the time of the highest rate of the accepted reaction.</p>
 <p>Compare e.g.&nbsp;<a href="https://en.wikipedia.org/wiki/Kinetic_Monte_Carlo#Rejection-free_KMC">Wikipedia KMC - rejection free</a></p>
-<section id="parameters-2" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-2">Parameters</h4>
+<section id="parameters-3" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-3">Parameters</h4>
 <table class="table">
 <thead>
 <tr class="header">
