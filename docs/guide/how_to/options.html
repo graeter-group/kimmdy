@@ -209,6 +209,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">0. Getting Started</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guide/tutorials/write-plugin.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2. Writing a Reaction Plugin</span></a>
+  </div>
+</li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
@@ -567,6 +573,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td></td>
 </tr>
 <tr class="even">
+<td>kmc</td>
+<td>KMC algorithm overwrite. Should be set by the reactions, but can be changed here.</td>
+<td>str</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>tau_scale</td>
+<td>Scaling parameter for tau in the extrande kmc algorithm.</td>
+<td>float</td>
+<td>1.0</td>
+<td></td>
+</tr>
+<tr class="even">
 <td>run</td>
 <td>Replica number</td>
 <td>int</td>
@@ -700,115 +720,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td></td>
 </tr>
 <tr class="odd">
-<td>reactions.homolysis.edis</td>
-<td>Dissociation energies data file</td>
-<td>Path</td>
-<td>edissoc.dat</td>
-<td></td>
-</tr>
-<tr class="even">
-<td>reactions.homolysis.itp</td>
-<td>Additional itp file with bonded parameters</td>
-<td>Path</td>
-<td>ffbonded.itp</td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>reactions.hat_naive.frequency_factor</td>
-<td>Frequency factor</td>
-<td>float</td>
-<td>1</td>
-<td></td>
-</tr>
-<tr class="even">
-<td>reactions.hat_naive.h_cutoff</td>
-<td>Cutoff for H atom</td>
-<td>float</td>
-<td>4</td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>reactions.hat_naive.polling_rate</td>
-<td>Polling rate</td>
-<td>float</td>
-<td>1</td>
-<td></td>
-</tr>
-<tr class="even">
-<td>reactions.dummyreaction.example</td>
-<td>This is an example of an option for a reaction.</td>
-<td>float</td>
-<td>0.0</td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>reactions.dummyreaction.example2</td>
-<td>This is another example of an option for a reaction.</td>
-<td>str</td>
-<td>hello</td>
-<td></td>
-</tr>
-<tr class="even">
-<td>reactions.hat_reaction.frequency_factor</td>
-<td>Frequency factor</td>
-<td>float</td>
-<td></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>reactions.hat_reaction.h_cutoff</td>
-<td>Cutoff for H atom</td>
-<td>float</td>
-<td>3</td>
-<td></td>
-</tr>
-<tr class="even">
-<td>reactions.hat_reaction.model</td>
-<td>Model name, optional</td>
-<td>str</td>
-<td></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>reactions.hat_reaction.ensemble_size</td>
-<td>Number of models to use, defaults to all, optional</td>
-<td>int</td>
-<td></td>
-<td></td>
-</tr>
-<tr class="even">
-<td>reactions.hat_reaction.polling_rate</td>
-<td>Polling rate, defaults to 10</td>
-<td>int</td>
-<td>10</td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>reactions.hat_reaction.radicals</td>
-<td>Radical index, usually supplied through kimmdy, optional</td>
-<td>int</td>
-<td></td>
-<td></td>
-</tr>
-<tr class="even">
-<td>reactions.hat_reaction.change_coords</td>
-<td>How to change coordinates. H can be placed at the new position, or a (lambda)-dynamics simulation can be performed. For lambda-dynamics, set up the coordinate changer with slow_growth=True</td>
-<td>str</td>
-<td>place</td>
-<td></td>
-</tr>
-<tr class="odd">
 <td>plot_rates</td>
 <td>Plot the reaction rates</td>
 <td>bool</td>
-<td>False</td>
+<td>True</td>
 <td></td>
 </tr>
 <tr class="even">
 <td>save_recipes</td>
 <td>Save recipes as csv during <code>decide_reaction</code></td>
 <td>bool</td>
-<td>False</td>
+<td>True</td>
 <td></td>
 </tr>
 </tbody>

@@ -7,8 +7,10 @@ from abc import ABC
 from dataclasses import dataclass, field
 from pathlib import Path
 import logging
+from copy import copy
 import dill
 import csv
+import numpy as np
 
 logger = logging.getLogger(__name__)
 
@@ -221,9 +223,11 @@ class Recipe:
     rates : list[float]
         Reaction rates corresponding 1:1 to timespans.
     timespans : list[list[float, float]]
-        List of half-open timespans (t1, t2] in ps, at which this reaction
-        path applies. Must have same number of timespans as rates.
-        t1 can equal t2 for the first frame.
+        List of half-open timespans (t1, t2] in ps, at which this rate is valid.
+        Recipe steps which change the coordinates only need to be applicable
+        at the first time in the interval.
+        Must have same number of timespans as rates.
+        t1 can equal t2 for the last frame.
 
     """
 
@@ -233,6 +237,13 @@ class Recipe:
 
     def __post_init__(self):
         self.check_consistency()
+
+    def copy(self):
+        return Recipe(
+            list(self.recipe_steps),
+            list(self.rates),
+            list(self.timespans),
+        )
 
     def calc_averages(self, window_size: int):
         """Calulate average rates over some window size
@@ -327,6 +338,12 @@ class Recipe:
 class RecipeCollection:
     """A RecipeCollection encompasses a number of reaction paths.
     They can originate from multiple reaction plugins, but do not need to.
+
+    Returns
+    -------
+    unique_recipes_ixs
+        List of lists binning the old recipe indices and maps to the new
+        recipes list.
     """
 
     recipes: list[Recipe]
@@ -348,6 +365,8 @@ class RecipeCollection:
 
         # merge every dublicate into first reaction path
         for uri in unique_recipes_ixs:
+            # copy to not change outside references to this recip
+            self.recipes[uri[0]] = self.recipes[uri[0]].copy()
             if len(uri) > 1:
                 for uri_double in uri[1:]:
                     self.recipes[uri[0]].combine_with(self.recipes[uri_double])
@@ -356,6 +375,7 @@ class RecipeCollection:
         for uri in unique_recipes_ixs:
             urps.append(self.recipes[uri[0]])
         self.recipes = urps
+        return unique_recipes_ixs
 
     def to_csv(self, path: Path, picked_recipe=None):
         """Write a ReactionResult as defined in the reaction module to a csv file"""
@@ -414,7 +434,6 @@ class RecipeCollection:
         Sums up to 1 over all recipes. Assumes constant rate for given timespan
         and rate zero otherwise.
         """
-        import numpy as np
 
         self.aggregate_reactions()
 
@@ -429,6 +448,50 @@ class RecipeCollection:
 
         return np.array(cumprob) / sum(cumprob)
 
+    def calc_ratesum(self) -> tuple[list, list, list]:
+        """Calculate the sum of rates over all timesteps
+
+        Returns
+        -------
+        boarders
+            flat list containing times of rate changes marking the
+            boarders of the windows
+        rate_windows
+            flat list containing all rates in between the boarders.
+            Each window is orderd as in recipe_windows
+        recipe_windows
+            flat list containing the recipes of the corresponding window.
+            Each window is orderd as in rate_windows
+        """
+
+        self.aggregate_reactions()
+
+        # non-overlapping window boaders
+        boarders = set()
+
+        for re in self.recipes:
+            for ts in re.timespans:
+                for t in ts:
+                    boarders.add(t)
+
+        boarders = sorted(boarders)
+        rate_windows = [[] for _ in range(len(boarders) - 1)]
+        recipe_windows = [[] for _ in range(len(boarders) - 1)]
+
+        for re in self.recipes:
+            for r, ts in zip(re.rates, re.timespans):
+                left_idx = boarders.index(ts[0])
+                right_idx = boarders.index(ts[1])
+                # timespan <- boarder
+                # the selected recipe must tell where it should be applied
+                re_copy = copy(re)
+                re_copy.timespans = [ts]
+                re_copy.rates = [r]
+                [l.append(r) for l in rate_windows[left_idx:right_idx]]
+                [l.append(re_copy) for l in recipe_windows[left_idx:right_idx]]
+
+        return boarders, rate_windows, recipe_windows
+
     def plot(self, outfile, highlight_r=None, highlight_t=None):
         """Plot reaction rates over time
 
@@ -441,57 +504,74 @@ class RecipeCollection:
         highlight_t : float, optional
             Time at which the reactions starts
         """
-        import matplotlib as mpl
+
         import matplotlib.pyplot as plt
         import seaborn as sns
         import numpy as np
 
+        self.aggregate_reactions()
         cumprob = self.calc_cumprob()
         recipes = np.array(self.recipes)
-        idxs = slice(None)
-        if len(recipes) > 8:
-            logger.info(
-                "More than 8 reactions found, displaying only 8 most likely ones."
-            )
-            idxs = np.argsort(cumprob)[-8:]
-            i_to_highlight = np.nonzero(recipes == highlight_r)[0]
+        recipe_steps = np.empty(len(self.recipes), dtype=object)
+        for i, r in enumerate(self.recipes):
+            recipe_steps[i] = r.recipe_steps
+
+        idxs = np.argsort(cumprob)[-8:]
+        ref = np.empty((1,), dtype=object)
+        if highlight_r is not None:
+            ref[0] = highlight_r.recipe_steps
+            i_to_highlight = np.nonzero(recipe_steps == ref)[0]
             idxs = list(set(np.concatenate([idxs, i_to_highlight])))
 
         cmap = sns.color_palette("husl", len(idxs))
+        name_to_args = {}
+
+        for r_i, re in enumerate(recipes):
+            name = re.get_recipe_name()
+            kwargs = {}
+            kwargs["linestyle"] = "-"
+            kwargs["linewidth"] = 1.0
+
+            if name not in name_to_args:
+                kwargs["color"] = (0.7, 0.7, 0.7)
+                kwargs["label"] = "REMOVE"
+                if r_i in idxs:
+                    kwargs["color"] = cmap[idxs.index(r_i)]
+                    kwargs["label"] = name
+                name_to_args[name] = kwargs
+            else:
+                if r_i in idxs:
+                    if name_to_args[name]["label"] == "REMOVE":
+                        kwargs["color"] = cmap[idxs.index(r_i)]
+                        kwargs["label"] = name
+                        name_to_args[name] = kwargs
 
         plt.figure()
-        for r_i, re in enumerate(recipes[idxs]):
+        if highlight_t is not None:
+            plt.axvline(highlight_t, color="red")
+        for r_i, re in enumerate(recipes):
             name = re.get_recipe_name()
-
-            linestyle = "-"
-            linewidth = 0.8
-            if re == highlight_r:
-                linestyle = "-."
-                linewidth += 1.3
-
-                if highlight_t is not None:
-                    plt.axvline(highlight_t, color="red")
+            if name == highlight_r.get_recipe_name():
+                name_to_args[name]["linestyle"] = "-."
+                name_to_args[name]["linewidth"] = 2.2
 
             for dt, r in zip(re.timespans, re.rates):
                 marker = ""
-                if dt[1] == 0:
+                if dt[0] == dt[1]:
                     marker = "."
                 plt.plot(
                     np.array(dt),
                     (r, r),
-                    color=cmap[r_i],
-                    label=name,
-                    linestyle=linestyle,
-                    linewidth=linewidth,
                     marker=marker,
+                    **name_to_args[name],
                 )
-        plt.xlabel("time [frames]")
+        plt.xlabel("time [ps]")
         plt.ylabel("reaction rate")
         plt.yscale("log")
-
         # removing duplicates in legend
         handles, labels = plt.gca().get_legend_handles_labels()
         by_label = dict(zip(labels, handles))
+        by_label.pop("REMOVE", None)
         plt.legend(by_label.values(), by_label.keys())
 
         plt.savefig(outfile)

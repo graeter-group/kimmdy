@@ -4,11 +4,13 @@ Utilities for building plugins, shell convenience functions and GROMACS related 
 from __future__ import annotations
 import subprocess as sp
 import numpy as np
+import re
 import logging
 from typing import Optional, TYPE_CHECKING
 from pathlib import Path
 
 if TYPE_CHECKING:
+    from kimmdy.tasks import TaskFiles
     from kimmdy.topology.topology import Topology
     from kimmdy.parsing import Plumed_dict
 
@@ -34,7 +36,7 @@ class longFormatter(logging.Formatter):
         return result
 
 
-## input/output utility functions
+# input/output utility functions
 
 
 def run_shell_cmd(s, cwd=None) -> sp.CompletedProcess:
@@ -65,7 +67,7 @@ def check_file_exists(p: Path):
         raise LookupError(m)
 
 
-## reaction plugin building blocks
+# reaction plugin building blocks
 
 
 def get_atomnrs_from_plumedid(
@@ -86,7 +88,6 @@ def get_atomnrs_from_plumedid(
     plumed_action = plumed["labeled_action"][plumedid]
     if a := plumed_action.get("atoms"):
         atomnrs = sorted(a, key=int)
-        logger.debug(f"Found atomnumbers {atomnrs} for plumedid {plumedid}.")
         return atomnrs
     else:
         raise NotImplementedError(
@@ -103,7 +104,6 @@ def get_atominfo_from_atomnrs(
     for atomnr in atomnrs:
         atomtypes.append(top.atoms[atomnr].type)
         atomnames.append(top.atoms[atomnr].atom)
-    logger.debug(f"Found atomtypes {[atomtypes,atomnames]} for atom numbers {atomnrs}.")
     return atomtypes, atomnames
 
 
@@ -130,7 +130,6 @@ def get_bondprm_from_atomtypes(
             f"Did not find bond parameters for atomtypes {atomtypes} in ffbonded file"
         )
 
-    logger.debug(f"Found bondprm {[b0,kb]} for atomtypes {atomtypes}.")
     return b0, kb
 
 
@@ -160,7 +159,6 @@ def get_edissoc_from_atomnames(atomnames: list[str], edissoc: dict) -> float:
         raise KeyError(
             f"Did not find dissociation energy for atomtypes {atomnames} in edissoc file"
         )
-    logger.debug(f"Found dissociation energy {E_dis} for atomtypes {atomnames}.")
     return E_dis
 
 
@@ -268,7 +266,7 @@ def morse_transition_rate(
     return k, fs
 
 
-## GROMACS related functions
+# GROMACS related functions
 
 
 def get_gmx_dir(gromacs_alias: str = "gmx") -> Optional[Path]:
@@ -284,7 +282,7 @@ def get_gmx_dir(gromacs_alias: str = "gmx") -> Optional[Path]:
     # line which contains the path to the gromacs installation
     try:
         r = sp.run([gromacs_alias], check=False, capture_output=True, text=True)
-    except FileNotFoundError as _:
+    except FileNotFoundError:
         logger.warning("GROMACS not found.")
         return None
 
@@ -335,3 +333,94 @@ def check_gmx_version(config):
                     if not config.dryrun:
                         raise SystemError(m)
     return version
+
+
+def truncate_sim_files(files: TaskFiles, time: Optional[float], keep_tail: bool = True):
+    """Truncates latest trr, xtc, edr, and gro to the time to a previous
+    point in time.
+
+    The files stay in place, the truncated tail is by default kept and renamed
+    to '[...xtc].tail'
+
+    Parameters
+    ----------
+    time
+        Time in ps up to which the data should be truncated.
+    files
+        TaskFiles to get the latest files.
+    """
+
+    if time is None:
+        logger.debug("time is None, nothing to truncate")
+        return
+
+    paths = {}
+    paths["gro"] = files.input["gro"]
+    for s in ["trr", "xtc", "edr"]:
+        try:
+            paths[s] = files.input[s]
+        except FileNotFoundError:
+            paths[s] = None
+
+    # trr or xtc must be present
+    if (traj := paths["trr"]) is None:
+        if (traj := paths["xtc"]) is None:
+            raise RuntimeError("No trajectory file!")
+
+    # check time exists in traj
+    p = sp.run(
+        f"gmx -quiet -nocopyright check -f {traj}",
+        text=True,
+        capture_output=True,
+        shell=True,
+    )
+    # FOR SOME REASON gmx check writes in stderr instead of stdout
+    if m := re.search(r"Last frame.*time\s+(\d+\.\d+)", p.stderr):
+        last_time = float(m.group(1))
+        assert (
+            last_time * 1.01 >= time
+        ), "Requested to truncate trajectory after last frame"
+    else:
+        raise RuntimeError(f"gmx check failed:\n{p.stdout}\n{p.stderr}")
+    logger.info(
+        f"Truncating trajectories to {time:.4} ps. Trajectory time was {last_time:.4} ps"
+    )
+
+    # backup the tails of trajectories
+    for trj in [paths["trr"], paths["xtc"]]:
+        if trj is None:
+            continue
+        tmp = trj.rename(trj.with_name("tmp_backup_" + trj.name))
+        if keep_tail:
+            run_gmx(
+                f"gmx trjconv -f {tmp} -b {time} -o {trj}",
+            )
+            trj.rename(str(trj) + ".tail")
+
+        run_gmx(f"gmx trjconv -f {tmp} -e {time} -o {trj}")
+        tmp.unlink()
+
+    # backup the gro
+    bck_gro = paths["gro"].rename(
+        paths["gro"].with_name("tmp_backup_" + paths["gro"].name)
+    )
+    sp.run(
+        f"gmx trjconv -f {traj} -s {bck_gro} -dump -1 -o {paths['gro']}",
+        text=True,
+        input="0",
+        shell=True,
+    )
+    bck_gro.rename(str(paths["gro"]) + ".tail")
+    if not keep_tail:
+        bck_gro.unlink()
+
+    # backup the edr
+    if paths["edr"] is not None:
+        bck_edr = paths["edr"].rename(
+            paths["edr"].with_name("tmp_backup_" + paths["edr"].name)
+        )
+        run_shell_cmd(f"gmx eneconv -f {bck_edr} -e {time} -o {paths['edr']}")
+        bck_edr.rename(str(paths["edr"]) + ".tail")
+        if not keep_tail:
+            bck_edr.unlink()
+    return

@@ -10,8 +10,9 @@ Reactive MD pipeline for GROMACS using Kinetic Monte Carlo / Molecular Dynamics 
 |---------------|:------------------------|
 
 ### Bare Installation
-```
+```bash
 git clone https://github.com/hits-mbm-dev/kimmdy.git
+cd kimmdy
 python -m venv .venv
 source .venv/bin/activate
 python -m pip install -e ./
@@ -19,7 +20,7 @@ python -m pip install -e ./
 This installation includes only the most basic functionality as no plugins and analysis tool dependencies are installed. Plugins can be installed using `python -m pip install -e ./` in their module directories (e.g. `kimmdy/plugins/default_reactions`). The analysis tool dependencies can be installed with `python -m pip install -e ./[analysis]` in `kimmdy/`.
 
 ### Full installation
-```
+```bash
 conda create -n kimmdy_full python=3.10 tensorflow==2.10 openmm
 conda activate kimmdy_full
 git clone https://github.com/hits-mbm-dev/HAT_reaction_plugin.git
@@ -36,6 +37,20 @@ pip install -r requirements.txt
 pip install -e ./[parameterization_plugins]
 ```
 Other ways to install kimmdy with all plugins are currently discouraged because of the high number of dependencies.
+
+## Documentation
+
+### GitHub pages
+
+[GitHub Pages documentation](https://hits-mbm-dev.github.io/kimmdy/)
+
+### Local documentation
+```bash
+cd <kimmdy root directory>
+pip install -r requirements.txt # Documentation depends on packages in requirements.txt
+make docs
+quarto preview # Should open the documentation in your standard browser
+```
 
 ## Development setup
 

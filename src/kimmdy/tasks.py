@@ -6,8 +6,9 @@ output paths and the Task class for steps in the runmanager.
 from dataclasses import dataclass, field
 from pathlib import Path
 import shutil
-from typing import Callable, Optional, TYPE_CHECKING, Union
+from typing import Any, Callable, Optional
 import logging
+from kimmdy.parsing import read_plumed
 from kimmdy.utils import longFormatter
 
 logger = logging.getLogger(__name__)
@@ -95,7 +96,7 @@ def create_task_directory(runmng, postfix: str) -> TaskFiles:
     hand = logging.FileHandler(files.outputdir / (taskname + ".log"))
     hand.setFormatter(
         longFormatter(
-            "%(asctime)s %(name)-12s %(levelname)s: %(message)s", "%d-%m-%y %H:%M"
+            "%(asctime)s %(name)-12s %(levelname)s: %(message)s", "%d-%m-%y %H:%M:%S"
         )
     )
     files.logger.addHandler(hand)
@@ -115,17 +116,23 @@ class Task:
 
     Parameters:
     -----------
-    runmng : kimmdy.runmanager.Runmanager
-        Runmanager instance
-    f : Callable
-        Will be called when the task is called
-    kwargs : dict
-        kwargs will be passed to f
-    out : str, optional
+    runmng
+        Runmanager instance from which the task is called
+    f
+        Function that will be called when the task is called
+    kwargs
+        kwargs to be passed to f
+    out
         If not None, an output dir will be created with this name
     """
 
-    def __init__(self, runmng, f: Callable[..., TaskFiles], kwargs=None, out=None):
+    def __init__(
+        self,
+        runmng,
+        f: Callable[..., Optional[TaskFiles]],
+        kwargs: Optional[dict[str, Any]] = None,
+        out: Optional[str] = None,
+    ):
         self.runmng = runmng
         self.f = f
         if kwargs is None:
@@ -134,7 +141,7 @@ class Task:
         self.name = self.f.__name__
         self.out = out
 
-        logger.info(f"Init task {self.name}\tkwargs: {self.kwargs}\tOut: {self.out}")
+        logger.debug(f"Init task {self.name}\tkwargs: {self.kwargs}\tOut: {self.out}")
 
     def __call__(self) -> TaskFiles:
         if self.out is not None:
@@ -147,8 +154,17 @@ class Task:
         return str(self.name) + " args: " + str(self.kwargs)
 
 
-TaskMapping = dict[
-    str,
-    Union[list[Callable[..., Optional[TaskFiles]]], Callable[..., Optional[TaskFiles]]],
-]
-"""Mapping of task names to functions."""
+def get_plumed_out(plumed: Path) -> str:
+    plumed_parsed = read_plumed(plumed)
+    plumed_out = None
+    for part in plumed_parsed["prints"]:
+        if file := part.get("FILE"):
+            if not plumed_out:
+                plumed_out = file
+                logger.debug(f"Found plumed print FILE {plumed_out}")
+            else:
+                raise RuntimeError("Multiple FILE sections found in plumed dat")
+    if plumed_out is None:
+        raise RuntimeError("No FILE section found in plumed dat")
+
+    return plumed_out

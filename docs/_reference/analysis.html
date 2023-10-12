@@ -175,6 +175,12 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">0. Getting Started</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guide/tutorials/write-plugin.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2. Writing a Reaction Plugin</span></a>
+  </div>
+</li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
@@ -447,9 +453,13 @@ ul.task-list li input[type="checkbox"] {
   <ul class="collapse">
   <li><a href="#parameters-4" id="toc-parameters-4" class="nav-link" data-scroll-target="#parameters-4">Parameters</a></li>
   </ul></li>
-  <li><a href="#kimmdy.analysis.radical_population" id="toc-kimmdy.analysis.radical_population" class="nav-link" data-scroll-target="#kimmdy.analysis.radical_population">radical_population</a>
+  <li><a href="#kimmdy.analysis.plot_runtime" id="toc-kimmdy.analysis.plot_runtime" class="nav-link" data-scroll-target="#kimmdy.analysis.plot_runtime">plot_runtime</a>
   <ul class="collapse">
   <li><a href="#parameters-5" id="toc-parameters-5" class="nav-link" data-scroll-target="#parameters-5">Parameters</a></li>
+  </ul></li>
+  <li><a href="#kimmdy.analysis.radical_population" id="toc-kimmdy.analysis.radical_population" class="nav-link" data-scroll-target="#kimmdy.analysis.radical_population">radical_population</a>
+  <ul class="collapse">
+  <li><a href="#parameters-6" id="toc-parameters-6" class="nav-link" data-scroll-target="#parameters-6">Parameters</a></li>
   </ul></li>
   </ul></li>
   </ul></li>
@@ -504,6 +514,10 @@ ul.task-list li input[type="checkbox"] {
 <td>Plot rates of all possible reactions for each ‘decide_recipe’ step.</td>
 </tr>
 <tr class="even">
+<td><a href="#kimmdy.analysis.plot_runtime">plot_runtime</a></td>
+<td>Plot runtime of all tasks.</td>
+</tr>
+<tr class="odd">
 <td><a href="#kimmdy.analysis.radical_population">radical_population</a></td>
 <td>Plot population of radicals for a KIMMDY run.</td>
 </tr>
@@ -720,12 +734,56 @@ ul.task-list li input[type="checkbox"] {
 </table>
 </section>
 </section>
+<section id="kimmdy.analysis.plot_runtime" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.analysis.plot_runtime">plot_runtime</h3>
+<p><code>analysis.plot_runtime(dir, md_tasks, datefmt, open_plot=False)</code></p>
+<p>Plot runtime of all tasks.</p>
+<section id="parameters-5" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-5">Parameters</h4>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>dir</code></td>
+<td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
+<td>Directory of KIMMDY run</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td><code>md_tasks</code></td>
+<td><a href="https://docs.python.org/3.10/library/stdtypes.html#list">list</a></td>
+<td>Names of MD tasks to color</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td><code>datefmt</code></td>
+<td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
+<td>Date format in the KIMMDY logfile</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td><code>open_plot</code></td>
+<td><a href="https://docs.python.org/3.10/library/functions.html#bool">bool</a></td>
+<td>Open plot in default system viewer.</td>
+<td><code>False</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
 <section id="kimmdy.analysis.radical_population" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.analysis.radical_population">radical_population</h3>
 <p><code>analysis.radical_population(dir, steps='all', select_atoms='protein', open_plot=False, open_vmd=False)</code></p>
 <p>Plot population of radicals for a KIMMDY run.</p>
-<section id="parameters-5" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-5">Parameters</h4>
+<section id="parameters-6" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-6">Parameters</h4>
 <table class="table">
 <thead>
 <tr class="header">

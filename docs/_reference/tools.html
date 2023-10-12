@@ -175,6 +175,12 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">0. Getting Started</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guide/tutorials/write-plugin.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2. Writing a Reaction Plugin</span></a>
+  </div>
+</li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
@@ -421,6 +427,11 @@ ul.task-list li input[type="checkbox"] {
   <ul>
   <li><a href="#functions" id="toc-functions" class="nav-link" data-scroll-target="#functions">Functions</a>
   <ul>
+  <li><a href="#kimmdy.tools.build_examples" id="toc-kimmdy.tools.build_examples" class="nav-link" data-scroll-target="#kimmdy.tools.build_examples">build_examples</a>
+  <ul class="collapse">
+  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
+  </ul></li>
+  <li><a href="#kimmdy.tools.edgelist_to_dot_graph" id="toc-kimmdy.tools.edgelist_to_dot_graph" class="nav-link" data-scroll-target="#kimmdy.tools.edgelist_to_dot_graph">edgelist_to_dot_graph</a></li>
   <li><a href="#kimmdy.tools.entry_point_build_examples" id="toc-kimmdy.tools.entry_point_build_examples" class="nav-link" data-scroll-target="#kimmdy.tools.entry_point_build_examples">entry_point_build_examples</a></li>
   <li><a href="#kimmdy.tools.entry_point_remove_hydrogen" id="toc-kimmdy.tools.entry_point_remove_hydrogen" class="nav-link" data-scroll-target="#kimmdy.tools.entry_point_remove_hydrogen">entry_point_remove_hydrogen</a></li>
   <li><a href="#kimmdy.tools.get_build_example_cmdline_args" id="toc-kimmdy.tools.get_build_example_cmdline_args" class="nav-link" data-scroll-target="#kimmdy.tools.get_build_example_cmdline_args">get_build_example_cmdline_args</a>
@@ -428,7 +439,13 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
   </ul></li>
   <li><a href="#kimmdy.tools.get_remove_hydrogen_cmdline_args" id="toc-kimmdy.tools.get_remove_hydrogen_cmdline_args" class="nav-link" data-scroll-target="#kimmdy.tools.get_remove_hydrogen_cmdline_args">get_remove_hydrogen_cmdline_args</a></li>
-  <li><a href="#kimmdy.tools.remove_hydrogen" id="toc-kimmdy.tools.remove_hydrogen" class="nav-link" data-scroll-target="#kimmdy.tools.remove_hydrogen">remove_hydrogen</a></li>
+  <li><a href="#kimmdy.tools.remove_hydrogen" id="toc-kimmdy.tools.remove_hydrogen" class="nav-link" data-scroll-target="#kimmdy.tools.remove_hydrogen">remove_hydrogen</a>
+  <ul class="collapse">
+  <li><a href="#parameters-1" id="toc-parameters-1" class="nav-link" data-scroll-target="#parameters-1">Parameters</a></li>
+  </ul></li>
+  <li><a href="#kimmdy.tools.top_to_graph" id="toc-kimmdy.tools.top_to_graph" class="nav-link" data-scroll-target="#kimmdy.tools.top_to_graph">top_to_graph</a></li>
+  <li><a href="#kimmdy.tools.topology_to_edgelist" id="toc-kimmdy.tools.topology_to_edgelist" class="nav-link" data-scroll-target="#kimmdy.tools.topology_to_edgelist">topology_to_edgelist</a></li>
+  <li><a href="#kimmdy.tools.write_top_as_dot" id="toc-kimmdy.tools.write_top_as_dot" class="nav-link" data-scroll-target="#kimmdy.tools.write_top_as_dot">write_top_as_dot</a></li>
   </ul></li>
   </ul></li>
   </ul>
@@ -454,6 +471,14 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
+<td><a href="#kimmdy.tools.build_examples">build_examples</a></td>
+<td>Build example directories for KIMMDY from integration tests.</td>
+</tr>
+<tr class="even">
+<td><a href="#kimmdy.tools.edgelist_to_dot_graph">edgelist_to_dot_graph</a></td>
+<td>Convert a list of edges to a dot graph.</td>
+</tr>
+<tr class="odd">
 <td><a href="#kimmdy.tools.entry_point_build_examples">entry_point_build_examples</a></td>
 <td>Build examples from the command line.</td>
 </tr>
@@ -471,10 +496,53 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 <tr class="odd">
 <td><a href="#kimmdy.tools.remove_hydrogen">remove_hydrogen</a></td>
-<td>remove hydrogen from a gro and top file</td>
+<td>Remove one hydrogen from a gro and top file to create a radical.</td>
+</tr>
+<tr class="even">
+<td><a href="#kimmdy.tools.top_to_graph">top_to_graph</a></td>
+<td>Convert a topology to a dot graph.</td>
+</tr>
+<tr class="odd">
+<td><a href="#kimmdy.tools.topology_to_edgelist">topology_to_edgelist</a></td>
+<td>Convert a topology to a list of edges for a dot graph.</td>
+</tr>
+<tr class="even">
+<td><a href="#kimmdy.tools.write_top_as_dot">write_top_as_dot</a></td>
+<td>Write a topology as a dot graph to a file.</td>
 </tr>
 </tbody>
 </table>
+<section id="kimmdy.tools.build_examples" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.tools.build_examples">build_examples</h3>
+<p><code>tools.build_examples(restore)</code></p>
+<p>Build example directories for KIMMDY from integration tests.</p>
+<section id="parameters" class="level4">
+<h4 class="anchored" data-anchor-id="parameters">Parameters</h4>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>restore</code></td>
+<td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
+<td>If True, overwrite input files in existing example directories. If “hard”, also delete output files.</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="kimmdy.tools.edgelist_to_dot_graph" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.tools.edgelist_to_dot_graph">edgelist_to_dot_graph</h3>
+<p><code>tools.edgelist_to_dot_graph(ls, overlap='true')</code></p>
+<p>Convert a list of edges to a dot graph.</p>
+</section>
 <section id="kimmdy.tools.entry_point_build_examples" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.tools.entry_point_build_examples">entry_point_build_examples</h3>
 <p><code>tools.entry_point_build_examples()</code></p>
@@ -515,7 +583,69 @@ ul.task-list li input[type="checkbox"] {
 <section id="kimmdy.tools.remove_hydrogen" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.tools.remove_hydrogen">remove_hydrogen</h3>
 <p><code>tools.remove_hydrogen(gro, top, nr, parameterize, equilibrate, gmx_mdrun_flags='')</code></p>
-<p>remove hydrogen from a gro and top file</p>
+<p>Remove one hydrogen from a gro and top file to create a radical.</p>
+<section id="parameters-1" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-1">Parameters</h4>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>gro</code></td>
+<td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
+<td>Path to GROMACS gro file</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td><code>top</code></td>
+<td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
+<td>Path to GROMACS top file</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td><code>nr</code></td>
+<td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
+<td>Atom number as indicated in the GROMACS gro and top file</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td><code>parameterize</code></td>
+<td><a href="https://docs.python.org/3.10/library/functions.html#bool">bool</a></td>
+<td>Parameterize topology with grappa after removing hydrogen.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td><code>equilibrate</code></td>
+<td><a href="https://docs.python.org/3.10/library/functions.html#bool">bool</a></td>
+<td>Do a minimization and equilibration with GROMACS. Uses mdp files from kimmdy assets.</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="kimmdy.tools.top_to_graph" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.tools.top_to_graph">top_to_graph</h3>
+<p><code>tools.top_to_graph(top, overlap='true')</code></p>
+<p>Convert a topology to a dot graph.</p>
+<p>Can be used in notebooks to write a dot file and render with quarto.</p>
+</section>
+<section id="kimmdy.tools.topology_to_edgelist" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.tools.topology_to_edgelist">topology_to_edgelist</h3>
+<p><code>tools.topology_to_edgelist(top)</code></p>
+<p>Convert a topology to a list of edges for a dot graph.</p>
+</section>
+<section id="kimmdy.tools.write_top_as_dot" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.tools.write_top_as_dot">write_top_as_dot</h3>
+<p><code>tools.write_top_as_dot(top, path, overlap='true')</code></p>
+<p>Write a topology as a dot graph to a file.</p>
+<p>Can be used in notebooks to write a dot file and render with quarto.</p>
 
 
 </section>

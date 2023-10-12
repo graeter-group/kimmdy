@@ -209,6 +209,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">0. Getting Started</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guide/tutorials/write-plugin.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2. Writing a Reaction Plugin</span></a>
+  </div>
+</li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
@@ -506,7 +512,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><code>gmx mdrun -deffnm nvt -v -dlb yes -ntomp 4 -ntmpi 10  -pme gpu -bonded gpu -npme 1</code></p>
 <p><code>gmx grompp -f npt.mdp -c nvt.gro -r nvt.gro -p topol.top -o npt.tpr</code></p>
 <p><code>gmx mdrun -deffnm npt -v -dlb yes -ntomp 4 -ntmpi 10  -pme gpu -bonded gpu -npme 1</code></p>
-<p>The equilibration process can take up to 4 days. An equilibrated system is provided in the tutorial files.</p>
+<p>The equilibration process can take up to 4 days. An equilibrated system is provided in the release assets(?).</p>
 </section>
 <section id="simulation" class="level2">
 <h2 class="anchored" data-anchor-id="simulation">Simulation</h2>

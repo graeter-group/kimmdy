@@ -175,6 +175,12 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">0. Getting Started</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guide/tutorials/write-plugin.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2. Writing a Reaction Plugin</span></a>
+  </div>
+</li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
@@ -451,10 +457,12 @@ ul.task-list li input[type="checkbox"] {
   </ul></li>
   <li><a href="#kimmdy.recipe.RecipeCollection" id="toc-kimmdy.recipe.RecipeCollection" class="nav-link" data-scroll-target="#kimmdy.recipe.RecipeCollection">RecipeCollection</a>
   <ul class="collapse">
+  <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
   <li><a href="#methods-1" id="toc-methods-1" class="nav-link" data-scroll-target="#methods-1">Methods</a>
   <ul class="collapse">
   <li><a href="#kimmdy.recipe.RecipeCollection.aggregate_reactions" id="toc-kimmdy.recipe.RecipeCollection.aggregate_reactions" class="nav-link" data-scroll-target="#kimmdy.recipe.RecipeCollection.aggregate_reactions">aggregate_reactions</a></li>
   <li><a href="#kimmdy.recipe.RecipeCollection.calc_cumprob" id="toc-kimmdy.recipe.RecipeCollection.calc_cumprob" class="nav-link" data-scroll-target="#kimmdy.recipe.RecipeCollection.calc_cumprob">calc_cumprob</a></li>
+  <li><a href="#kimmdy.recipe.RecipeCollection.calc_ratesum" id="toc-kimmdy.recipe.RecipeCollection.calc_ratesum" class="nav-link" data-scroll-target="#kimmdy.recipe.RecipeCollection.calc_ratesum">calc_ratesum</a></li>
   <li><a href="#kimmdy.recipe.RecipeCollection.from_csv" id="toc-kimmdy.recipe.RecipeCollection.from_csv" class="nav-link" data-scroll-target="#kimmdy.recipe.RecipeCollection.from_csv">from_csv</a></li>
   <li><a href="#kimmdy.recipe.RecipeCollection.plot" id="toc-kimmdy.recipe.RecipeCollection.plot" class="nav-link" data-scroll-target="#kimmdy.recipe.RecipeCollection.plot">plot</a></li>
   <li><a href="#kimmdy.recipe.RecipeCollection.to_csv" id="toc-kimmdy.recipe.RecipeCollection.to_csv" class="nav-link" data-scroll-target="#kimmdy.recipe.RecipeCollection.to_csv">to_csv</a></li>
@@ -743,7 +751,7 @@ ul.task-list li input[type="checkbox"] {
 <tr class="odd">
 <td><code>timespans</code></td>
 <td><a href="https://docs.python.org/3.10/library/stdtypes.html#list">list</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#list">list</a>[<a href="https://docs.python.org/3.10/library/functions.html#float">float</a>, <a href="https://docs.python.org/3.10/library/functions.html#float">float</a>]]</td>
-<td>List of half-open timespans (t1, t2] in ps, at which this reaction path applies. Must have same number of timespans as rates. t1 can equal t2 for the first frame.</td>
+<td>List of half-open timespans (t1, t2] in ps, at which this rate is valid. Recipe steps which change the coordinates only need to be applicable at the first time in the interval. Must have same number of timespans as rates. t1 can equal t2 for the last frame.</td>
 <td><em>required</em></td>
 </tr>
 </tbody>
@@ -836,6 +844,27 @@ ul.task-list li input[type="checkbox"] {
 <h3 class="anchored" data-anchor-id="kimmdy.recipe.RecipeCollection">RecipeCollection</h3>
 <p><code>recipe.RecipeCollection(recipes)</code></p>
 <p>A RecipeCollection encompasses a number of reaction paths. They can originate from multiple reaction plugins, but do not need to.</p>
+<section id="returns" class="level4">
+<h4 class="anchored" data-anchor-id="returns">Returns</h4>
+<table class="table">
+<colgroup>
+<col style="width: 35%">
+<col style="width: 64%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>unique_recipes_ixs</code></td>
+<td>List of lists binning the old recipe indices and maps to the new recipes list.</td>
+</tr>
+</tbody>
+</table>
+</section>
 <section id="methods-1" class="level4">
 <h4 class="anchored" data-anchor-id="methods-1">Methods</h4>
 <table class="table">
@@ -855,14 +884,18 @@ ul.task-list li input[type="checkbox"] {
 <td>Calculate cumulative probability of all contained recipe steps.</td>
 </tr>
 <tr class="odd">
+<td><a href="#kimmdy.recipe.RecipeCollection.calc_ratesum">calc_ratesum</a></td>
+<td>Calculate the sum of rates over all timesteps</td>
+</tr>
+<tr class="even">
 <td><a href="#kimmdy.recipe.RecipeCollection.from_csv">from_csv</a></td>
 <td>Create a RecipeCollection object from a CSV file</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#kimmdy.recipe.RecipeCollection.plot">plot</a></td>
 <td>Plot reaction rates over time</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#kimmdy.recipe.RecipeCollection.to_csv">to_csv</a></td>
 <td>Write a ReactionResult as defined in the reaction module to a csv file</td>
 </tr>
@@ -877,6 +910,40 @@ ul.task-list li input[type="checkbox"] {
 <h5 class="anchored" data-anchor-id="kimmdy.recipe.RecipeCollection.calc_cumprob">calc_cumprob</h5>
 <p><code>recipe.RecipeCollection.calc_cumprob()</code></p>
 <p>Calculate cumulative probability of all contained recipe steps. Sums up to 1 over all recipes. Assumes constant rate for given timespan and rate zero otherwise.</p>
+</section>
+<section id="kimmdy.recipe.RecipeCollection.calc_ratesum" class="level5">
+<h5 class="anchored" data-anchor-id="kimmdy.recipe.RecipeCollection.calc_ratesum">calc_ratesum</h5>
+<p><code>recipe.RecipeCollection.calc_ratesum()</code></p>
+<p>Calculate the sum of rates over all timesteps</p>
+<section id="returns-1" class="level6">
+<h6 class="anchored" data-anchor-id="returns-1">Returns</h6>
+<table class="table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 74%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>boarders</code></td>
+<td>flat list containing times of rate changes marking the boarders of the windows</td>
+</tr>
+<tr class="even">
+<td><code>rate_windows</code></td>
+<td>flat list containing all rates in between the boarders. Each window is orderd as in recipe_windows</td>
+</tr>
+<tr class="odd">
+<td><code>recipe_windows</code></td>
+<td>flat list containing the recipes of the corresponding window. Each window is orderd as in rate_windows</td>
+</tr>
+</tbody>
+</table>
+</section>
 </section>
 <section id="kimmdy.recipe.RecipeCollection.from_csv" class="level5">
 <h5 class="anchored" data-anchor-id="kimmdy.recipe.RecipeCollection.from_csv">from_csv</h5>

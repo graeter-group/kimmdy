@@ -175,6 +175,12 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">0. Getting Started</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guide/tutorials/write-plugin.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2. Writing a Reaction Plugin</span></a>
+  </div>
+</li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
@@ -421,11 +427,17 @@ ul.task-list li input[type="checkbox"] {
   <ul>
   <li><a href="#classes" id="toc-classes" class="nav-link" data-scroll-target="#classes">Classes</a>
   <ul>
-  <li><a href="#kimmdy.plugins.BasicParameterizer" id="toc-kimmdy.plugins.BasicParameterizer" class="nav-link" data-scroll-target="#kimmdy.plugins.BasicParameterizer">BasicParameterizer</a></li>
+  <li><a href="#kimmdy.plugins.BasicParameterizer" id="toc-kimmdy.plugins.BasicParameterizer" class="nav-link" data-scroll-target="#kimmdy.plugins.BasicParameterizer">BasicParameterizer</a>
+  <ul class="collapse">
+  <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
+  <ul class="collapse">
+  <li><a href="#kimmdy.plugins.BasicParameterizer.parameterize_topology" id="toc-kimmdy.plugins.BasicParameterizer.parameterize_topology" class="nav-link" data-scroll-target="#kimmdy.plugins.BasicParameterizer.parameterize_topology">parameterize_topology</a></li>
+  </ul></li>
+  </ul></li>
   <li><a href="#kimmdy.plugins.ReactionPlugin" id="toc-kimmdy.plugins.ReactionPlugin" class="nav-link" data-scroll-target="#kimmdy.plugins.ReactionPlugin">ReactionPlugin</a>
   <ul class="collapse">
   <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
-  <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
+  <li><a href="#methods-1" id="toc-methods-1" class="nav-link" data-scroll-target="#methods-1">Methods</a>
   <ul class="collapse">
   <li><a href="#kimmdy.plugins.ReactionPlugin.get_recipe_collection" id="toc-kimmdy.plugins.ReactionPlugin.get_recipe_collection" class="nav-link" data-scroll-target="#kimmdy.plugins.ReactionPlugin.get_recipe_collection">get_recipe_collection</a></li>
   </ul></li>
@@ -444,6 +456,7 @@ ul.task-list li input[type="checkbox"] {
 <h1>plugins</h1>
 <p><code>plugins</code></p>
 <p>Plugin base classes and basic instances thereof.</p>
+<p>Also discovers and loads KIMMDY plugins.</p>
 <section id="classes" class="level2">
 <h2 class="anchored" data-anchor-id="classes">Classes</h2>
 <table class="table">
@@ -468,6 +481,28 @@ ul.task-list li input[type="checkbox"] {
 <h3 class="anchored" data-anchor-id="kimmdy.plugins.BasicParameterizer">BasicParameterizer</h3>
 <p><code>plugins.BasicParameterizer()</code></p>
 <p>reconstruct base force field state</p>
+<section id="methods" class="level4">
+<h4 class="anchored" data-anchor-id="methods">Methods</h4>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="#kimmdy.plugins.BasicParameterizer.parameterize_topology">parameterize_topology</a></td>
+<td>Do nothing,</td>
+</tr>
+</tbody>
+</table>
+<section id="kimmdy.plugins.BasicParameterizer.parameterize_topology" class="level5">
+<h5 class="anchored" data-anchor-id="kimmdy.plugins.BasicParameterizer.parameterize_topology">parameterize_topology</h5>
+<p><code>plugins.BasicParameterizer.parameterize_topology(current_topology)</code></p>
+<p>Do nothing, all necessary actions should already have happened in bind_bond and break_bond of Topology</p>
+</section>
+</section>
 </section>
 <section id="kimmdy.plugins.ReactionPlugin" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.plugins.ReactionPlugin">ReactionPlugin</h3>
@@ -500,8 +535,8 @@ ul.task-list li input[type="checkbox"] {
 </tbody>
 </table>
 </section>
-<section id="methods" class="level4">
-<h4 class="anchored" data-anchor-id="methods">Methods</h4>
+<section id="methods-1" class="level4">
+<h4 class="anchored" data-anchor-id="methods-1">Methods</h4>
 <table class="table">
 <thead>
 <tr class="header">

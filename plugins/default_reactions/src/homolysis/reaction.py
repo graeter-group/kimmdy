@@ -52,9 +52,9 @@ class Homolysis(ReactionPlugin):
             b0, kb = get_bondprm_from_atomtypes(atomtypes, ffbonded)
             E_dis = get_edissoc_from_atomnames(atomnames, edissoc)
 
-            logger.debug(
-                f"plumedid: {plumedid}, atomids: {atomnrs}, atomtypes: {atomtypes}, b0: {b0}, kb: {kb}, E_dis: {E_dis}"
-            )
+            # logger.debug(
+            #     f"plumedid: {plumedid}, atomids: {atomnrs}, atomtypes: {atomtypes}, b0: {b0}, kb: {kb}, E_dis: {E_dis}"
+            # )
 
             k_avg, _ = morse_transition_rate([sum(dists) / len(dists)], b0, E_dis, kb)
             # averaging distances works here because we typically have

@@ -175,6 +175,12 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">0. Getting Started</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guide/tutorials/write-plugin.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2. Writing a Reaction Plugin</span></a>
+  </div>
+</li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
@@ -574,7 +580,7 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="kimmdy.topology.topology.Topology" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.topology.Topology">Topology</h3>
-<p><code>topology.topology.Topology(self, top, parametrizer=None)</code></p>
+<p><code>topology.topology.Topology(self, top, parametrizer=BasicParameterizer())</code></p>
 <p>Smart container for parsed topology data.</p>
 <p>A topology keeps track of connections when bonds are broken or formed. Reparametrization is triggerd automatically if <code>to_dict</code> is called after bonds have changed.</p>
 <p>Assumptions:</p>

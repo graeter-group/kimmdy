@@ -98,11 +98,11 @@ product state from the educt state.
 
 #### Parameters
 
-| Name           | Type                                                                   | Description                                                                                                                                                        | Default    |
-|----------------|------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
-| `recipe_steps` | [list](`list`)\[[RecipeStep](`kimmdy.recipe.RecipeStep`)\]             | Single sequence of RecipeSteps to build product                                                                                                                    | _required_ |
-| `rates`        | [list](`list`)\[[float](`float`)\]                                     | Reaction rates corresponding 1:1 to timespans.                                                                                                                     | _required_ |
-| `timespans`    | [list](`list`)\[[list](`list`)\[[float](`float`), [float](`float`)\]\] | List of half-open timespans (t1, t2] in ps, at which this reaction path applies. Must have same number of timespans as rates. t1 can equal t2 for the first frame. | _required_ |
+| Name           | Type                                                                   | Description                                                                                                                                                                                                                                                       | Default    |
+|----------------|------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| `recipe_steps` | [list](`list`)\[[RecipeStep](`kimmdy.recipe.RecipeStep`)\]             | Single sequence of RecipeSteps to build product                                                                                                                                                                                                                   | _required_ |
+| `rates`        | [list](`list`)\[[float](`float`)\]                                     | Reaction rates corresponding 1:1 to timespans.                                                                                                                                                                                                                    | _required_ |
+| `timespans`    | [list](`list`)\[[list](`list`)\[[float](`float`), [float](`float`)\]\] | List of half-open timespans (t1, t2] in ps, at which this rate is valid. Recipe steps which change the coordinates only need to be applicable at the first time in the interval. Must have same number of timespans as rates. t1 can equal t2 for the last frame. | _required_ |
 
 #### Methods
 
@@ -149,12 +149,19 @@ Combines this Recipe with another with the same RecipeSteps.
 A RecipeCollection encompasses a number of reaction paths.
 They can originate from multiple reaction plugins, but do not need to.
 
+#### Returns
+
+| Type                                       | Description                                                                    |
+|--------------------------------------------|--------------------------------------------------------------------------------|
+| [unique_recipes_ixs](`unique_recipes_ixs`) | List of lists binning the old recipe indices and maps to the new recipes list. |
+
 #### Methods
 
 | Name | Description |
 | --- | --- |
 | [aggregate_reactions](#kimmdy.recipe.RecipeCollection.aggregate_reactions) | Combines reactions having the same sequence of RecipeSteps. |
 | [calc_cumprob](#kimmdy.recipe.RecipeCollection.calc_cumprob) | Calculate cumulative probability of all contained recipe steps. |
+| [calc_ratesum](#kimmdy.recipe.RecipeCollection.calc_ratesum) | Calculate the sum of rates over all timesteps |
 | [from_csv](#kimmdy.recipe.RecipeCollection.from_csv) | Create a RecipeCollection object from a CSV file |
 | [plot](#kimmdy.recipe.RecipeCollection.plot) | Plot reaction rates over time |
 | [to_csv](#kimmdy.recipe.RecipeCollection.to_csv) | Write a ReactionResult as defined in the reaction module to a csv file |
@@ -172,6 +179,20 @@ Combines reactions having the same sequence of RecipeSteps.
 Calculate cumulative probability of all contained recipe steps.
 Sums up to 1 over all recipes. Assumes constant rate for given timespan
 and rate zero otherwise.
+
+##### calc_ratesum { #kimmdy.recipe.RecipeCollection.calc_ratesum }
+
+`recipe.RecipeCollection.calc_ratesum()`
+
+Calculate the sum of rates over all timesteps
+
+###### Returns
+
+| Type                               | Description                                                                                            |
+|------------------------------------|--------------------------------------------------------------------------------------------------------|
+| [boarders](`boarders`)             | flat list containing times of rate changes marking the boarders of the windows                         |
+| [rate_windows](`rate_windows`)     | flat list containing all rates in between the boarders. Each window is orderd as in recipe_windows     |
+| [recipe_windows](`recipe_windows`) | flat list containing the recipes of the corresponding window. Each window is orderd as in rate_windows |
 
 ##### from_csv { #kimmdy.recipe.RecipeCollection.from_csv }
 
