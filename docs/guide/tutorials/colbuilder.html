@@ -20,6 +20,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -417,23 +451,33 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#run-kimmdy-from-colbuilder-fibril" id="toc-run-kimmdy-from-colbuilder-fibril" class="nav-link active" data-scroll-target="#run-kimmdy-from-colbuilder-fibril">1. Run KIMMDY from Colbuilder fibril</a>
-  <ul>
-  <li><a href="#preparation" id="toc-preparation" class="nav-link" data-scroll-target="#preparation">Preparation</a></li>
+  <li><a href="#preparation" id="toc-preparation" class="nav-link active" data-scroll-target="#preparation">Preparation</a></li>
   <li><a href="#equilibration" id="toc-equilibration" class="nav-link" data-scroll-target="#equilibration">Equilibration</a></li>
   <li><a href="#simulation" id="toc-simulation" class="nav-link" data-scroll-target="#simulation">Simulation</a></li>
   <li><a href="#analysis" id="toc-analysis" class="nav-link" data-scroll-target="#analysis">Analysis</a></li>
-  </ul></li>
   </ul>
 <div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hits-mbm-dev/kimmdy/edit/main/guide/tutorials/colbuilder.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/hits-mbm-dev/kimmdy/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">1. Run KIMMDY from Colbuilder fibril</h1>
+</div>
 
 
-<section id="run-kimmdy-from-colbuilder-fibril" class="level1">
-<h1>1. Run KIMMDY from Colbuilder fibril</h1>
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
 <section id="preparation" class="level2">
 <h2 class="anchored" data-anchor-id="preparation">Preparation</h2>
 <ul>
@@ -441,15 +485,14 @@ ul.task-list li input[type="checkbox"] {
 <li>Clean the force field files by moving ‘amber99sb-star-ildnp.ff’ up to the working directory, adding ‘residuetypes.dat’ and ‘specbond.dat’ to the working directory, removing temporary files ’._*’ and deleting the rest of collagen.ff</li>
 <li>Convert the pdb file to .gro format and create a unified topology file (this may take a while (~16 hours))</li>
 </ul>
-<p><code>gmx pdb2gmx -f Homo_sapiens_aln_N_HLKNL_12_C_PYD_2_fibril.pdb -o fibril.gro -ignh -merge all</code></p>
+<p><code>gmx pdb2gmx -f Homo_sapiens_aln_N_HLKNL_12_C_PYD_2_fibril.pdb -o fibril2.gro -ignh -water tip3p -merge all &lt;&lt;&lt;1</code></p>
 </section>
 <section id="equilibration" class="level2">
 <h2 class="anchored" data-anchor-id="equilibration">Equilibration</h2>
-<p>Mdp files for the following steps are located in <code>&lt;kimmdy root&gt;/guide/tutorials/colbuilder/files</code>.</p>
-<p><code>gmx editconf -f fibril.gro -o fibril_box.gro -c -d 2.0 -bt triclinic</code></p>
-<ul>
-<li>change the long axis (z-axis) to a 95 A to accomodate the stretched fibril</li>
-</ul>
+<p>Mdp files for the following steps are located in <code>&lt;kimmdy root&gt;/guide/tutorials/colbuilder_files</code>.</p>
+<p><code>gmx editconf -f fibril.gro -o fibril_x.gro -c -princ  &lt;&lt;&lt;1</code></p>
+<p><code>gmx editconf -f fibril_x.gro -o fibril_z.gro -rotate 0 270 0 -c</code></p>
+<p><code>gmx editconf -f fibril_z.gro -o fibril_box.gro -c -box 16.3 17.7 95.0 -bt triclinic</code></p>
 <p><code>gmx solvate -cp fibril_box.gro -p topol.top -o fibril_solv.gro</code></p>
 <p><code>touch ions.mdp</code></p>
 <p><code>gmx grompp -f ions.mdp -c fibril_solv.gro -p topol.top -o fibril_genion.tpr</code></p>
@@ -463,22 +506,105 @@ ul.task-list li input[type="checkbox"] {
 <p><code>gmx mdrun -deffnm nvt -v -dlb yes -ntomp 4 -ntmpi 10  -pme gpu -bonded gpu -npme 1</code></p>
 <p><code>gmx grompp -f npt.mdp -c nvt.gro -r nvt.gro -p topol.top -o npt.tpr</code></p>
 <p><code>gmx mdrun -deffnm npt -v -dlb yes -ntomp 4 -ntmpi 10  -pme gpu -bonded gpu -npme 1</code></p>
+<p>The equilibration process can take up to 4 days. An equilibrated system is provided in the tutorial files.</p>
 </section>
 <section id="simulation" class="level2">
 <h2 class="anchored" data-anchor-id="simulation">Simulation</h2>
-<ul>
-<li>Create a KIMMDY config file (kimmdy.yml) or modify an existing one</li>
-<li>Supply the necessary mdp files</li>
-<li>Generate the necessary plumed configuration file (plumed.dat)</li>
-<li>Add the edissoc.dat and ffbonded.itp file to the run directory <code>kimmdy</code></li>
-</ul>
+<p>For a KIMMDY run, some additional setup is required. A suitable KIMMDY config file for homolysis can be found in the hexalanine_homolysis example:</p>
+<div class="cell" data-execution_count="1">
+<details>
+<summary>KIMMDY config file (kimmdy.yml)</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># yaml-language-server: $schema=../../src/kimmdy/kimmdy-yaml-schema.json</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>dryrun: false</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>name: <span class="st">'hexalanine_homolysis_000'</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>max_tasks: <span class="dv">100</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>gromacs_alias: <span class="st">'gmx'</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>gmx_mdrun_flags: <span class="op">-</span>maxh <span class="dv">24</span> <span class="op">-</span>dlb yes <span class="op">-</span>nt <span class="dv">8</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>ff: <span class="st">'amber99sb-star-ildnp.ff'</span> <span class="co"># optional, dir endinng with .ff by default </span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>top: <span class="st">'topol.top'</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>gro: <span class="st">'npt.gro'</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>ndx: <span class="st">'index.ndx'</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>plumed: <span class="st">'plumed.dat'</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>mds:</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  pull:</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    mdp: <span class="st">'pull_fibril.mdp'</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  pull:</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    mdp: <span class="st">'md.mdp'</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    use_plumed: true</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  relax:</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    mdp: <span class="st">'md_slow_growth.mdp'</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>changer:</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  coordinates:</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    md: <span class="st">'relax'</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    slow_growth: <span class="va">True</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>  topology:</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    parameterization: <span class="st">'basic'</span> </span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>reactions:</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>  homolysis:</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    edis: <span class="st">'edissoc.dat'</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    itp: <span class="st">'ffbonded.itp'</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>sequence:</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>  <span class="op">-</span> equilibrium</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>  <span class="op">-</span> pull  </span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>  <span class="op">-</span> reactions</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>  <span class="op">-</span> equilibrium</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>  <span class="op">-</span> pull</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>The config file mentions three important gromacs file for your system: top, gro, idx. We have the top and gro file from the equilibration and can update the file names in the config file. A basic index file can be generated with <code>echo 'q' | gmx make_ndx -f npt.gro</code>.</p>
+<p>The next entry in the config file is plumed and references a plumed configuration file (plumed.dat) which we don’t yet have. This file is needed for the homolysis reaction plugin. In the reactions section, other files which are necessary for the homolysis reaction can also be seen: edissoc.dat and ffbonded.itp. The ffbonded.itp file is specific to the force field and can be copied from the force field directory. Edissoc.dat contains a table of bond dissociation energies by atom name and can be taken from the hexalanine_homolysis example if only standard amino acids and the HLKNL and PYD crosslinks are part of the system. For other crosslinks, the bond dissociation energy has to be provided by the user.</p>
+<p>If the HLKNL and/or PYD are present in the system, their atom names need to be changed to unique names specified in edissoc.dat. A script for renaming HLKNL and PYD crosslink atom names in the gro and top file can be found in the tutorial files.</p>
+<p>For homolysis, the plumed.dat file should contain instructions to sample distances between bonds. Homolysis can then occur for the bonds mentioned in this file. A script to create a plumed.dat file can be found in the turoail files. We want to sample homolysis in the backbone and in crosslinks. By providing a gromacs index file with all backbone and crosslink atoms, the script generates the necessary plumed.dat file. Such a index file can be generated with <code>echo 'backbone | r LY2 LY3_L4Y_L5Y_LYX' | gmx make_ndx -n index.ndx -o index.ndx</code>.</p>
+<p>Now let’s look at the sequence. It mentions the reactions, which we have taken care of, and the names of different md runs. A good first would include a first pulling simulation to stretch the fibril followed by a pulling simulation with distance sampling for the subsequent reaction and a final pulling simulation. For both types of pulling simulation the same mdp file can be used from the tutorial files. The pulling simulations also need torque restraints to prevent unphysiological unwinding of the fibrils. The torque restraints are applied to the capping groups of a tripelhelix. For this, additional index groups are needed which can be generated with a script provided in the tutorial files (prepare_enforced_rotation.py). Bond distance sampling can be turned on for a md run by the tag <code>use_plumed</code>. Another md run, in this case called relax, is mentioned under changer/coordinates/md. It is used after the homolysis reaction to interpolate between new and old parameters. An example mdp file is included in the tutorial files.</p>
+<p>Finally, the KIMMDY run name and gmx_mdrun_flags can be adjusted. A final KIMMDY config file could look like this:</p>
+<div class="cell" data-execution_count="2">
+<details>
+<summary>KIMMDY config file (kimmdy.yml)</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># yaml-language-server: $schema=../../src/kimmdy/kimmdy-yaml-schema.json</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>dryrun: false</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>name: <span class="st">'fibril_000'</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>max_tasks: <span class="dv">100</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>gromacs_alias: <span class="st">'gmx'</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>gmx_mdrun_flags: <span class="op">-</span>maxh <span class="dv">24</span> <span class="op">-</span>dlb yes <span class="op">-</span>ntomp <span class="dv">4</span> <span class="op">-</span>ntmpi <span class="dv">10</span>  <span class="op">-</span>pme gpu <span class="op">-</span>bonded gpu <span class="op">-</span>npme <span class="dv">1</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>ff: <span class="st">'amber99sb-star-ildnp.ff'</span> <span class="co"># optional, dir endinng with .ff by default </span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>top: <span class="st">'hexala_out.top'</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>gro: <span class="st">'npt.gro'</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>ndx: <span class="st">'index.ndx'</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>plumed: <span class="st">'plumed.dat'</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>mds:</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  pull:</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    mdp: <span class="st">'pull_fibril.mdp'</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  pull_sample:</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    mdp: <span class="st">'pull_fibril.mdp'</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    use_plumed: true</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  relax:</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    mdp: <span class="st">'pull_fibril_slow_growth.mdp'</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>changer:</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  coordinates:</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    md: <span class="st">'relax'</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    slow_growth: <span class="va">True</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>  topology:</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    parameterization: <span class="st">'basic'</span> </span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>reactions:</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>  homolysis:</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>    edis: <span class="st">'edissoc.dat'</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    itp: <span class="st">'ffbonded.itp'</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>sequence:</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>  <span class="op">-</span> pull</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>  <span class="op">-</span> pull_sample  </span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>  <span class="op">-</span> reactions</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>  <span class="op">-</span> pull</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>The run can be started by typing <code>kimmdy</code> in the command line. The output files are located in <code>fibril_000</code></p>
 </section>
 <section id="analysis" class="level2">
 <h2 class="anchored" data-anchor-id="analysis">Analysis</h2>
-<p><code>kimmdy-analysis</code></p>
+<p>Try the options in <code>kimmdy-analysis</code> to visualize your kimmdy run.</p>
 
 
-</section>
 </section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
