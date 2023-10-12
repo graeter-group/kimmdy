@@ -216,7 +216,7 @@ def extrande(
     # time of last rate, should be last MD time
     t_max = boarders[-1]
 
-    rate_sums = [sum(l) for l in rate_windows]
+    rate_sums = [float(sum(l)) for l in rate_windows]
     idx_rate_max = np.argmax(rate_sums)
     expected_tau = np.mean(tau_scale * rng.exponential(1 / max(rate_sums), 10))
     logger.debug(
