@@ -1,68 +1,83 @@
----
-execute:
-  eval: false
-format:
-  html:
-    code-fold: true
----
-
 # 1. Run KIMMDY from Colbuilder fibril
 
 ## Preparation
-- Download the desired model and the ff parameters for gromacs from [colbuilder](https://colbuilder.h-its.org/)
-- Clean the force field files by moving 'amber99sb-star-ildnp.ff' up to the working directory, adding 'residuetypes.dat' and 'specbond.dat' to the working directory, removing temporary files '._*' and deleting the rest of collagen.ff
-- Convert the pdb file to .gro format and create a unified topology file (this may take a while (~16 hours))
 
-`gmx pdb2gmx -f Homo_sapiens_aln_N_HLKNL_12_C_PYD_2_fibril.pdb -o fibril2.gro -ignh -water tip3p -merge all <<<1`
+- Download the desired model and the ff parameters for gromacs from [colbuilder](https://colbuilder.h-its.org/)
+- Clean the force field files by moving `amber99sb-star-ildnp.ff` up to the working directory, adding `residuetypes.dat` and `specbond.dat` to the working directory, removing temporary files `._*` and deleting the rest of `collagen.ff`
+- Convert the pdb file to `.gro` format and create a unified topology file
+
+::: {.callout-caution}
+Due to some issues in GROMACS, `pdb2gmx` may take a while (~16 hours).
+The majority of the time is actually spend on checks that happen just before the final lines are written to the file.
+It is possible to stop the process early and add the final lines manually.
+:::
+
+```bash
+gmx pdb2gmx -f Homo_sapiens_aln_N_HLKNL_12_C_PYD_2_fibril.pdb -o fibril2.gro -ignh -water tip3p -merge all <<<1
+```
+
 
 ## Equilibration
-Mdp files for the following steps are located in `<kimmdy root>/guide/tutorials/colbuilder_files`.
 
-`gmx editconf -f fibril.gro -o fibril_x.gro -c -princ  <<<1`
+`mdp` files for the following steps are located in `<kimmdy root>/guide/tutorials/colbuilder_files.`
 
-`gmx editconf -f fibril_x.gro -o fibril_z.gro -rotate 0 270 0 -c`
+```bash
+gmx editconf -f fibril.gro -o fibril_x.gro -c -princ  <<<1
 
-`gmx editconf -f fibril_z.gro -o fibril_box.gro -c -box 16.3 17.7 95.0 -bt triclinic`
+gmx editconf -f fibril_x.gro -o fibril_z.gro -rotate 0 270 0 -c
 
-`gmx solvate -cp fibril_box.gro -p topol.top -o fibril_solv.gro`
+gmx editconf -f fibril_z.gro -o fibril_box.gro -c -box 16.3 17.7 95.0 -bt triclinic
 
-`touch ions.mdp`
+gmx solvate -cp fibril_box.gro -p topol.top -o fibril_solv.gro
 
-`gmx grompp -f ions.mdp -c fibril_solv.gro -p topol.top -o fibril_genion.tpr`
+touch ions.mdp
 
-`gmx genion -s fibril_genion.tpr -p topol.top -o fibril_ion.gro -conc 0.15 -neutral`
+gmx grompp -f ions.mdp -c fibril_solv.gro -p topol.top -o fibril_genion.tpr
 
-`gmx grompp -f minim.mdp -c fibril_ion.gro -p topol.top -o pep_min.tpr`
+gmx genion -s fibril_genion.tpr -p topol.top -o fibril_ion.gro -conc 0.15 -neutral
 
-`gmx mdrun -deffnm pep_min -v`
+gmx grompp -f minim.mdp -c fibril_ion.gro -p topol.top -o pep_min.tpr
 
-- heavy computational load from here on
+gmx mdrun -deffnm pep_min -v
+```
 
-`gmx grompp -f nvt.mdp -c fibril_min.gro -r fibril_min.gro -p topol.top -o nvt.tpr`
 
-`gmx mdrun -deffnm nvt -v -dlb yes -ntomp 4 -ntmpi 10  -pme gpu -bonded gpu -npme 1`
+::: {.callout-caution}
+Heavy computational load from here on.
+:::
 
-`gmx grompp -f npt.mdp -c nvt.gro -r nvt.gro -p topol.top -o npt.tpr`
 
-`gmx mdrun -deffnm npt -v -dlb yes -ntomp 4 -ntmpi 10  -pme gpu -bonded gpu -npme 1`
+```bash
+gmx grompp -f nvt.mdp -c fibril_min.gro -r fibril_min.gro -p topol.top -o nvt.tpr
 
-The equilibration process can take up to 4 days. An equilibrated system is provided in the release assets(?).
+gmx mdrun -deffnm nvt -v -dlb yes -ntomp 4 -ntmpi 10  -pme gpu -bonded gpu -npme 1
+
+gmx grompp -f npt.mdp -c nvt.gro -r nvt.gro -p topol.top -o npt.tpr
+
+gmx mdrun -deffnm npt -v -dlb yes -ntomp 4 -ntmpi 10  -pme gpu -bonded gpu -npme 1
+```
+
+
+::: {.callout-tip}
+The equilibration process can take up to 4 days. An equilibrated system will be provided in the release assets.
+<!-- TODO: add link to release assets -->
+:::
 
 ## Simulation
+
 For a KIMMDY run, some additional setup is required. A suitable KIMMDY config file for homolysis can be found in the hexalanine_homolysis example: 
 
-```{python}
-#| code-fold: true
-#| code-summary: "KIMMDY config file (kimmdy.yml)"
+<details>
+  <summary>KIMMDY config file (kimmdy.yml)</summary>
 
+```{.yml filename='kimmdy.yml'}
 # yaml-language-server: $schema=../../src/kimmdy/kimmdy-yaml-schema.json
-
 dryrun: false
 name: 'hexalanine_homolysis_000'
 max_tasks: 100
 gromacs_alias: 'gmx'
 gmx_mdrun_flags: -maxh 24 -dlb yes -nt 8
-ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
+ff: 'amber99sb-star-ildnp.ff'
 top: 'topol.top'
 gro: 'npt.gro'
 ndx: 'index.ndx'
@@ -94,22 +109,57 @@ sequence:
 
 ```
 
-The config file mentions three important gromacs file for your system: top, gro, idx. We have the top and gro file from the equilibration and can update the file names in the config file. A basic index file can be generated with `echo 'q' | gmx make_ndx -f npt.gro`. 
 
-The next entry in the config file is plumed and references a plumed configuration file (plumed.dat) which we don't yet have. This file is needed for the homolysis reaction plugin. In the reactions section, other files which are necessary for the homolysis reaction can also be seen: edissoc.dat and ffbonded.itp. The ffbonded.itp file is specific to the force field and can be copied from the force field directory. Edissoc.dat contains a table of bond dissociation energies by atom name and can be taken from the hexalanine_homolysis example if only standard amino acids and the HLKNL and PYD crosslinks are part of the system. For other crosslinks, the bond dissociation energy has to be provided by the user.
+</details>
 
-If the HLKNL and/or PYD are present in the system, their atom names need to be changed to unique names specified in edissoc.dat. A script for renaming HLKNL and PYD crosslink atom names in the gro and top file can be found in the tutorial files.
+The config file mentions three important gromacs file for your system: top, gro, idx.
+We have the top and gro file from the equilibration and can update the file names in the config file.
+A basic index file can be generated with
 
-For homolysis, the plumed.dat file should contain instructions to sample distances between bonds. Homolysis can then occur for the bonds mentioned in this file. A script to create a plumed.dat file can be found in the turoail files. We want to sample homolysis in the backbone and in crosslinks. By providing a gromacs index file with all backbone and crosslink atoms, the script generates the necessary plumed.dat file. Such a index file can be generated with `echo 'backbone | r LY2 LY3_L4Y_L5Y_LYX' | gmx make_ndx -n index.ndx -o index.ndx`. 
+```bash
+echo 'q' | gmx make_ndx -f npt.gro
+```
 
-Now let's look at the sequence. It mentions the reactions, which we have taken care of, and the names of different md runs. A good first would include a first pulling simulation to stretch the fibril followed by a pulling simulation with distance sampling for the subsequent reaction and a final pulling simulation. For both types of pulling simulation the same mdp file can be used from the tutorial files. The pulling simulations also need torque restraints to prevent unphysiological unwinding of the fibrils. The torque restraints are applied to the capping groups of a tripelhelix. For this, additional index groups are needed which can be generated with a script provided in the tutorial files (prepare_enforced_rotation.py). Bond distance sampling can be turned on for a md run by the tag `use_plumed`. Another md run, in this case called relax, is mentioned under changer/coordinates/md. It is used after the homolysis reaction to interpolate between new and old parameters. An example mdp file is included in the tutorial files. 
+The next entry in the config file is plumed and references a plumed configuration file (plumed.dat) which we don't yet have.
+This file is needed for the homolysis reaction plugin.
+In the reactions section, other files which are necessary for the homolysis reaction can also be seen: `edissoc.dat` and `ffbonded.itp.`
+The ffbonded.itp file is specific to the force field and can be copied from the force field directory.
+Edissoc.dat contains a table of bond dissociation energies by atom name and can be taken from the hexalanine_homolysis example if only standard amino acids and the HLKNL and PYD crosslinks are part of the system.
+For other crosslinks, the bond dissociation energy has to be provided by the user.
 
-Finally, the KIMMDY run name and gmx_mdrun_flags can be adjusted. A final KIMMDY config file could look like this:
+If the HLKNL and/or PYD are present in the system, their atom names need to be changed to unique names specified in edissoc.dat.
+A script for renaming HLKNL and PYD crosslink atom names in the gro and top file can be found in the tutorial files.
 
-```{python}
-#| code-fold: true
-#| code-summary: "KIMMDY config file (kimmdy.yml)"
+For homolysis, the plumed.dat file should contain instructions to sample distances between bonds.
+Homolysis can then occur for the bonds mentioned in this file.
+A script to create a plumed.dat file can be found in the turoail files.
+We want to sample homolysis in the backbone and in crosslinks.
+By providing a gromacs index file with all backbone and crosslink atoms, the script generates the necessary plumed.dat file.
+Such a index file can be generated with 
 
+```bash
+echo 'backbone | r LY2 LY3_L4Y_L5Y_LYX' | gmx make_ndx -n index.ndx -o index.ndx
+```
+
+Now let's look at the sequence.
+It mentions the reactions, which we have taken care of, and the names of different md runs.
+A good first would include a first pulling simulation to stretch the fibril followed by a pulling simulation with distance sampling for the subsequent reaction and a final pulling simulation.
+For both types of pulling simulation the same mdp file can be used from the tutorial files.
+The pulling simulations also need torque restraints to prevent unphysiological unwinding of the fibrils.
+The torque restraints are applied to the capping groups of a tripelhelix.
+For this, additional index groups are needed which can be generated with a script provided in the tutorial files (prepare_enforced_rotation.py).
+Bond distance sampling can be turned on for a md run by the tag `use_plumed`.
+Another md run, in this case called relax, is mentioned under `changer.coordinates.md`.
+It is used after the homolysis reaction to interpolate between new and old parameters.
+An example mdp file is included in the tutorial files. 
+
+Finally, the KIMMDY run name and gmx_mdrun_flags can be adjusted.
+A final KIMMDY config file could look like this:
+
+<details>
+  <summary>KIMMDY config file (kimmdy.yml)</summary>
+
+```{.yml filename='kimmdy.yml'}
 # yaml-language-server: $schema=../../src/kimmdy/kimmdy-yaml-schema.json
 
 dryrun: false
@@ -117,7 +167,7 @@ name: 'fibril_000'
 max_tasks: 100
 gromacs_alias: 'gmx'
 gmx_mdrun_flags: -maxh 24 -dlb yes -ntomp 4 -ntmpi 10  -pme gpu -bonded gpu -npme 1
-ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
+ff: 'amber99sb-star-ildnp.ff'
 top: 'hexala_out.top'
 gro: 'npt.gro'
 ndx: 'index.ndx'
@@ -145,10 +195,12 @@ sequence:
   - pull_sample  
   - reactions
   - pull
-
 ```
 
-The run can be started by typing `kimmdy` in the command line. The output files are located in `fibril_000`
+</details>
+
+The run can be started by typing `kimmdy` in the command line.
+The output files are located in `fibril_000`
 
 ## Analysis
 
