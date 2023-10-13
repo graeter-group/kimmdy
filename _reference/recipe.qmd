@@ -149,6 +149,12 @@ Combines this Recipe with another with the same RecipeSteps.
 A RecipeCollection encompasses a number of reaction paths.
 They can originate from multiple reaction plugins, but do not need to.
 
+#### Returns
+
+| Type                                       | Description                                                                    |
+|--------------------------------------------|--------------------------------------------------------------------------------|
+| [unique_recipes_ixs](`unique_recipes_ixs`) | List of lists binning the old recipe indices and maps to the new recipes list. |
+
 #### Methods
 
 | Name | Description |
