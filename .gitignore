@@ -1,6 +1,7 @@
 # editors / tooling
 .vscode
 .quarto
+.vdoc.py
 /os
 
 # our own program output
