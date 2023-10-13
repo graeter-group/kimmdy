@@ -2,12 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.176">
+<meta name="generator" content="quarto-1.4.415">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>KIMMDY – write-plugin</title>
+<title>KIMMDY – colbuilder</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -22,7 +22,7 @@ ul.task-list li input[type="checkbox"] {
 }
 /* CSS for syntax highlighting */
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -64,8 +64,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
-<link href="../../_reference/index.html" rel="next">
-<link href="../../guide/tutorials/getting-started.html" rel="prev">
+<link href="../../guide/tutorials/getting-started.html" rel="next">
+<link href="../../guide/tutorials/index.html" rel="prev">
 <script src="../../site_libs/quarto-html/quarto.js"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -83,12 +83,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   "collapse-after": 3,
   "panel-placement": "end",
   "type": "overlay",
-  "limit": 20,
+  "limit": 50,
   "keyboard-shortcut": [
     "f",
     "/",
     "s"
   ],
+  "show-item-context": false,
   "language": {
     "search-no-results-text": "No results",
     "search-matching-documents-text": "matching documents",
@@ -124,16 +125,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="../../guide/tutorials/getting-started.html" rel="" target="" aria-current="page">
- <span class="menu-text">Getting Started</span></a>
+    <a class="nav-link active" href="../../guide/tutorials/getting-started.html" aria-current="page"> 
+<span class="menu-text">Getting Started</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../../guide/index.html" rel="" target="">
- <span class="menu-text">Guide</span></a>
+    <a class="nav-link" href="../../guide/index.html"> 
+<span class="menu-text">Guide</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../../_reference/index.html" rel="" target="">
- <span class="menu-text">Reference</span></a>
+    <a class="nav-link" href="../../_reference/index.html"> 
+<span class="menu-text">Reference</span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -167,7 +168,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../guide/index.html">Guide</a></li><li class="breadcrumb-item"><a href="../../guide/tutorials/index.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../../guide/tutorials/write-plugin.html">2. Writing a Reaction Plugin</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../guide/index.html">Guide</a></li><li class="breadcrumb-item"><a href="../../guide/tutorials/index.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../../guide/tutorials/colbuilder.html">1. Run KIMMDY from Colbuilder fibril</a></li></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -246,7 +247,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../guide/tutorials/colbuilder.html" class="sidebar-item-text sidebar-link">
+  <a href="../../guide/tutorials/colbuilder.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">1. Run KIMMDY from Colbuilder fibril</span></a>
   </div>
 </li>
@@ -258,7 +259,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../guide/tutorials/write-plugin.html" class="sidebar-item-text sidebar-link active">
+  <a href="../../guide/tutorials/write-plugin.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">2. Writing a Reaction Plugin</span></a>
   </div>
 </li>
@@ -463,189 +464,209 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#creating-a-github-repository" id="toc-creating-a-github-repository" class="nav-link active" data-scroll-target="#creating-a-github-repository">Creating a GitHub repository</a></li>
-  <li><a href="#adding-the-functionality-of-the-plugin" id="toc-adding-the-functionality-of-the-plugin" class="nav-link" data-scroll-target="#adding-the-functionality-of-the-plugin">Adding the functionality of the plugin</a>
+  <li><a href="#run-kimmdy-from-colbuilder-fibril" id="toc-run-kimmdy-from-colbuilder-fibril" class="nav-link active" data-scroll-target="#run-kimmdy-from-colbuilder-fibril">1. Run KIMMDY from Colbuilder fibril</a>
   <ul>
-  <li><a href="#main-code" id="toc-main-code" class="nav-link" data-scroll-target="#main-code">Main code</a></li>
-  <li><a href="#configuration-file-schema" id="toc-configuration-file-schema" class="nav-link" data-scroll-target="#configuration-file-schema">Configuration file schema</a></li>
+  <li><a href="#preparation" id="toc-preparation" class="nav-link" data-scroll-target="#preparation">Preparation</a></li>
+  <li><a href="#equilibration" id="toc-equilibration" class="nav-link" data-scroll-target="#equilibration">Equilibration</a></li>
+  <li><a href="#simulation" id="toc-simulation" class="nav-link" data-scroll-target="#simulation">Simulation</a></li>
+  <li><a href="#analysis" id="toc-analysis" class="nav-link" data-scroll-target="#analysis">Analysis</a></li>
   </ul></li>
-  <li><a href="#making-a-python-package" id="toc-making-a-python-package" class="nav-link" data-scroll-target="#making-a-python-package">Making a python package</a></li>
-  <li><a href="#improving-code-quality-and-reproducibility" id="toc-improving-code-quality-and-reproducibility" class="nav-link" data-scroll-target="#improving-code-quality-and-reproducibility">Improving code quality and reproducibility</a></li>
   </ul>
-<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hits-mbm-dev/kimmdy/edit/main/guide/tutorials/write-plugin.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/hits-mbm-dev/kimmdy/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/hits-mbm-dev/kimmdy/edit/main/guide/tutorials/colbuilder.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/hits-mbm-dev/kimmdy/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../guide/index.html">Guide</a></li><li class="breadcrumb-item"><a href="../../guide/tutorials/index.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../../guide/tutorials/write-plugin.html">2. Writing a Reaction Plugin</a></li></ol></nav>
-<div class="quarto-title">
-<h1 class="title">2. Writing a Reaction Plugin</h1>
+
+
+
+<section id="run-kimmdy-from-colbuilder-fibril" class="level1">
+<h1>1. Run KIMMDY from Colbuilder fibril</h1>
+<section id="preparation" class="level2">
+<h2 class="anchored" data-anchor-id="preparation">Preparation</h2>
+<ul>
+<li>Download the desired model and the ff parameters for gromacs from <a href="https://colbuilder.h-its.org/">colbuilder</a></li>
+<li>Clean the force field files by moving <code>amber99sb-star-ildnp.ff</code> up to the working directory, adding <code>residuetypes.dat</code> and <code>specbond.dat</code> to the working directory, removing temporary files <code>._*</code> and deleting the rest of <code>collagen.ff</code></li>
+<li>Convert the pdb file to <code>.gro</code> format and create a unified topology file</li>
+</ul>
+<div class="callout callout-style-default callout-caution callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
 </div>
-
-
-
-<div class="quarto-title-meta">
-
-    
-  
-    
-  </div>
-  
-
-</header>
-
-<p>In this tutorial, you will learn how to create your own reaction plugin in a GitHub repository.</p>
-<section id="creating-a-github-repository" class="level2">
-<h2 class="anchored" data-anchor-id="creating-a-github-repository">Creating a GitHub repository</h2>
-<p>By creating a GitHub repository, you have version control for your plugin and can share it with others. To set it up, follow <a href="https://docs.github.com/en/get-started/quickstart/create-a-repo">these instructions</a>.</p>
-</section>
-<section id="adding-the-functionality-of-the-plugin" class="level2">
-<h2 class="anchored" data-anchor-id="adding-the-functionality-of-the-plugin">Adding the functionality of the plugin</h2>
-<section id="main-code" class="level3">
-<h3 class="anchored" data-anchor-id="main-code">Main code</h3>
-<p>A reaction plugin has to be a derived class from the <code>ReactionPlugin</code> base class. Such a class has the attributes <code>name</code>, <code>runmng</code> and <code>config</code> and the method <code>get_recipe_collection</code>, which takes a <code>TaskFiles</code> object as argument and returns a <code>RecipeCollection</code>.</p>
-<p>The <code>name</code> is a simple string and may be useful for logging. <code>runmng</code> is the central <code>RunManager</code> of a kimmdy run and has plenty of useful attributes for your plugin, especially the system <code>Topology</code>, which can be accessed via <code>self.runmg.top</code>. <code>config</code> contains the reaction plugin configuration as specified in the kimmdy configuration file (typically named kimmdy.yml). A <code>RecipeCollection</code> contains <code>Recipe</code>s with predefined <code>RecipeStep</code>s that can be used to define the modification to the system for the reaction. A <code>Recipe</code> also contains the <code>rates</code> of the specified reaction and the <code>timespans</code> during which the corresponding rates are valid. An example plugin can be seen below.</p>
-<div id="03c806ef" class="cell" data-execution_count="1">
-<details>
-<summary>Plugin main code (reaction.py)</summary>
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> kimmdy.recipe <span class="im">import</span> (</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    Bind,</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    Recipe,</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    RecipeCollection,</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> kimmdy.plugins <span class="im">import</span> ReactionPlugin</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> kimmdy.tasks <span class="im">import</span> TaskFiles</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> kimmdy.utils <span class="im">import</span> (</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    get_atomnrs_from_plumedid,</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> kimmdy.parsing <span class="im">import</span> (</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    read_plumed,</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    read_distances_dat,</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> BindReaction(ReactionPlugin):</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Reaction to bind two particles if they are in proximity</span></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> get_recipe_collection(<span class="va">self</span>, files: TaskFiles):</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>        logger <span class="op">=</span> files.logger</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>        logger.debug(<span class="st">"Getting recipe for reaction: Bind"</span>)</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>        <span class="co"># get cutoff distance from config, unit is [nm]</span></span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>        cutoff <span class="op">=</span> <span class="va">self</span>.config.distance</span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Initialization of objects from files</span></span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>        distances <span class="op">=</span> read_distances_dat(files.<span class="bu">input</span>[<span class="st">"plumed_out"</span>])</span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>        plumed <span class="op">=</span> read_plumed(files.<span class="bu">input</span>[<span class="st">"plumed"</span>])</span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>        recipes <span class="op">=</span> []</span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>        <span class="co"># check distances file for values lower than the cutoff</span></span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> plumedid, dists <span class="kw">in</span> distances.items():</span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> plumedid <span class="op">==</span> <span class="st">"time"</span>:</span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>                <span class="cf">continue</span></span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>            <span class="co"># checks only last frame</span></span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> dists[<span class="op">-</span><span class="dv">1</span>] <span class="op">&lt;</span> cutoff:</span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>                <span class="co"># get atomnrs from plumedid </span></span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>                atomnrs <span class="op">=</span> get_atomnrs_from_plumedid(plumedid, plumed)</span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>                recipes.append(</span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>                    Recipe(</span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>                        recipe_steps<span class="op">=</span>[</span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>                            Bind(atom_id_1<span class="op">=</span>atomnrs[<span class="dv">0</span>], atom_id_2<span class="op">=</span>atomnrs[<span class="dv">1</span>]),</span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>                        ],</span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>                        rates<span class="op">=</span>[<span class="dv">1</span>],</span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>                        timespans<span class="op">=</span>[(distances[<span class="st">"time"</span>][<span class="dv">0</span>], distances[<span class="st">"time"</span>][<span class="op">-</span><span class="dv">1</span>])],</span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>                    )</span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>                )</span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> RecipeCollection(recipes)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
+<div class="callout-title-container flex-fill">
+Caution
 </div>
-</section>
-<section id="configuration-file-schema" class="level3">
-<h3 class="anchored" data-anchor-id="configuration-file-schema">Configuration file schema</h3>
-<p>A plugin defines which variables it needs in a schema. The schema can contain default values and types of these variables. For a Kimmdy run, reaction plugin variables are defined in the configuration file (kimmdy.yml). An example schema can be seen below.</p>
-<div id="f0a17726" class="cell" data-execution_count="2">
-<details>
-<summary>Plugin schema (kimmdy-yaml-schema.json)</summary>
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>{</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"$schema"</span>: <span class="st">"https://json-schema.org/draft/2020-12/schema"</span>,</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"type"</span>: <span class="st">"object"</span>,</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"$id"</span>: <span class="st">"bind-config"</span>,</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"description"</span>: <span class="st">"Settings for bind reactions"</span>,</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"additionalProperties"</span>: false,</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">"properties"</span>: {</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"distance"</span>: {</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>      <span class="st">"description"</span>: <span class="st">"Cutoff distance for two particles to bind [nm]"</span>,</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>      <span class="st">"type"</span>: <span class="st">"float"</span>,</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>      <span class="st">"pytype"</span>: <span class="st">"float"</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    },</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"kmc"</span>: {</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>      <span class="st">"description"</span>: <span class="st">"KMC algorithm for this reaction."</span>,</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>      <span class="st">"type"</span>: <span class="st">"string"</span>,</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>      <span class="st">"pytype"</span>: <span class="st">"str"</span>,</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>      <span class="st">"enum"</span>: [<span class="st">"rfkmc"</span>, <span class="st">"frm"</span>, <span class="st">"extrande"</span>],</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>      <span class="st">"default"</span>: <span class="st">"rfkmc"</span></span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  },</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>  <span class="st">"required"</span>: [<span class="st">"distance"</span>]</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
+<div class="callout-body-container callout-body">
+<p>Due to some issues in GROMACS, <code>pdb2gmx</code> may take a while (~16 hours). The majority of the time is actually spend on checks that happen just before the final lines are written to the file. It is possible to stop the process early and add the final lines manually.</p>
+</div>
+</div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">gmx</span> pdb2gmx <span class="at">-f</span> Homo_sapiens_aln_N_HLKNL_12_C_PYD_2_fibril.pdb <span class="at">-o</span> fibril2.gro <span class="at">-ignh</span> <span class="at">-water</span> tip3p <span class="at">-merge</span> all <span class="op">&lt;&lt;&lt;</span>1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-</section>
-<section id="making-a-python-package" class="level2">
-<h2 class="anchored" data-anchor-id="making-a-python-package">Making a python package</h2>
-<p>It is necessary to make the plugin a python package to interface with Kimmdy. For this, package setup configuration files are necessary, for example <code>setup.py</code> and <code>setup.cfg</code>. In <code>setup.cfg</code> dependencies can be specified, which will be installed alongside the plugin. The interface with kimmdy is specified in the <code>[options.entry_points]</code> section. This section needs to refer to the class we created in the plugin main code and assign it to <code>kimmdy.reaction_plugins</code>, i.e.&nbsp;<code>kimmdy.reaction_plugins = bind = &lt;path&gt;.&lt;to&gt;.&lt;main file&gt;:&lt;ClassName&gt;</code>. Also, the directory containing the source code (typically <code>src</code>) is defined in <code>[options.packages.find]</code>. An example for <code>setup.py</code> and <code>setup.cfg</code> can be found below.</p>
-<div id="c9c6ec73" class="cell" data-execution_count="3">
-<details>
-<summary>setup.py</summary>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> setuptools <span class="im">import</span> setup</span>
+<section id="equilibration" class="level2">
+<h2 class="anchored" data-anchor-id="equilibration">Equilibration</h2>
+<p><code>mdp</code> files for the following steps are located in <code>&lt;kimmdy root&gt;/guide/tutorials/colbuilder_files.</code></p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">gmx</span> editconf <span class="at">-f</span> fibril.gro <span class="at">-o</span> fibril_x.gro <span class="at">-c</span> <span class="at">-princ</span>  <span class="op">&lt;&lt;&lt;</span>1</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">gmx</span> editconf <span class="at">-f</span> fibril_x.gro <span class="at">-o</span> fibril_z.gro <span class="at">-rotate</span> 0 270 0 <span class="at">-c</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ex">gmx</span> editconf <span class="at">-f</span> fibril_z.gro <span class="at">-o</span> fibril_box.gro <span class="at">-c</span> <span class="at">-box</span> 16.3 17.7 95.0 <span class="at">-bt</span> triclinic</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="ex">gmx</span> solvate <span class="at">-cp</span> fibril_box.gro <span class="at">-p</span> topol.top <span class="at">-o</span> fibril_solv.gro</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="fu">touch</span> ions.mdp</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="ex">gmx</span> grompp <span class="at">-f</span> ions.mdp <span class="at">-c</span> fibril_solv.gro <span class="at">-p</span> topol.top <span class="at">-o</span> fibril_genion.tpr</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="ex">gmx</span> genion <span class="at">-s</span> fibril_genion.tpr <span class="at">-p</span> topol.top <span class="at">-o</span> fibril_ion.gro <span class="at">-conc</span> 0.15 <span class="at">-neutral</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="ex">gmx</span> grompp <span class="at">-f</span> minim.mdp <span class="at">-c</span> fibril_ion.gro <span class="at">-p</span> topol.top <span class="at">-o</span> pep_min.tpr</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="ex">gmx</span> mdrun <span class="at">-deffnm</span> pep_min <span class="at">-v</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="callout callout-style-default callout-caution callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Caution
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Heavy computational load from here on.</p>
+</div>
+</div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">gmx</span> grompp <span class="at">-f</span> nvt.mdp <span class="at">-c</span> fibril_min.gro <span class="at">-r</span> fibril_min.gro <span class="at">-p</span> topol.top <span class="at">-o</span> nvt.tpr</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>setup()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="ex">gmx</span> mdrun <span class="at">-deffnm</span> nvt <span class="at">-v</span> <span class="at">-dlb</span> yes <span class="at">-ntomp</span> 4 <span class="at">-ntmpi</span> 10  <span class="at">-pme</span> gpu <span class="at">-bonded</span> gpu <span class="at">-npme</span> 1</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="ex">gmx</span> grompp <span class="at">-f</span> npt.mdp <span class="at">-c</span> nvt.gro <span class="at">-r</span> nvt.gro <span class="at">-p</span> topol.top <span class="at">-o</span> npt.tpr</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="ex">gmx</span> mdrun <span class="at">-deffnm</span> npt <span class="at">-v</span> <span class="at">-dlb</span> yes <span class="at">-ntomp</span> 4 <span class="at">-ntmpi</span> 10  <span class="at">-pme</span> gpu <span class="at">-bonded</span> gpu <span class="at">-npme</span> 1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
 </div>
-<div id="445d13e6" class="cell" data-execution_count="4">
-<details>
-<summary>setup.cfg</summary>
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>[metadata]</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>name <span class="op">=</span> kimmdy<span class="op">-</span>reactions</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>version <span class="op">=</span> <span class="fl">0.1</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>license <span class="op">=</span> GPL<span class="op">-</span><span class="fl">3.0</span> </span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>description <span class="op">=</span> Reaction template <span class="cf">for</span> KIMMDY</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>long_description <span class="op">=</span> <span class="bu">file</span>: README.md</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>author <span class="op">=</span> Eric Hartmann</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>author_email <span class="op">=</span> eric.Hartmann<span class="op">@</span>h<span class="op">-</span>its.org</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>classifiers<span class="op">=</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>        Programming Language :: Python :: <span class="dv">3</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>        License :: OSI Approved :: MIT License</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>        Operating System :: OS Independent</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>[options]</span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>packages <span class="op">=</span> find:</span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>package_dir <span class="op">=</span></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    <span class="op">=</span>src</span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>include_package_data <span class="op">=</span> <span class="va">True</span></span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>install_requires <span class="op">=</span></span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    MDAnalysis</span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>python_requires <span class="op">=</span> <span class="op">&gt;=</span> <span class="fl">3.9</span></span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>[options.packages.find]</span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>where<span class="op">=</span>src</span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>[options.entry_points]</span>
-<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>kimmdy.reaction_plugins <span class="op">=</span></span>
-<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>    bind <span class="op">=</span> bind.reaction:BindReaction</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
+<div class="callout-title-container flex-fill">
+Tip
 </div>
-<p>The main code and configuration schema file should then be moved to the specified source directory in a directory that has the name of the reaction plugin, i.e.&nbsp;<code>src/&lt;plugin name&gt;/</code>.</p>
+</div>
+<div class="callout-body-container callout-body">
+<p>The equilibration process can take up to 4 days. An equilibrated system will be provided in the release assets. <!-- TODO: add link to release assets --></p>
+</div>
+</div>
 </section>
-<section id="improving-code-quality-and-reproducibility" class="level2">
-<h2 class="anchored" data-anchor-id="improving-code-quality-and-reproducibility">Improving code quality and reproducibility</h2>
-<p>Adding tests will help in ensuring the plugin is working as expected. An example would help users to understand what your plugin does.</p>
+<section id="simulation" class="level2">
+<h2 class="anchored" data-anchor-id="simulation">Simulation</h2>
+<p>For a KIMMDY run, some additional setup is required. A suitable KIMMDY config file for homolysis can be found in the hexalanine_homolysis example:</p>
+<details>
+<summary>
+KIMMDY config file (kimmdy.yml)
+</summary>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>kimmdy.yml</strong></pre>
+</div>
+<div class="sourceCode" id="cb4" data-filename="kimmdy.yml"><pre class="sourceCode yml code-with-copy"><code class="sourceCode yaml"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># yaml-language-server: $schema=../../src/kimmdy/kimmdy-yaml-schema.json</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dryrun</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">name</span><span class="kw">:</span><span class="at"> </span><span class="st">'hexalanine_homolysis_000'</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">max_tasks</span><span class="kw">:</span><span class="at"> </span><span class="dv">100</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">gromacs_alias</span><span class="kw">:</span><span class="at"> </span><span class="st">'gmx'</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="fu">gmx_mdrun_flags</span><span class="kw">:</span><span class="at"> -maxh 24 -dlb yes -nt 8</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ff</span><span class="kw">:</span><span class="at"> </span><span class="st">'amber99sb-star-ildnp.ff'</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="fu">top</span><span class="kw">:</span><span class="at"> </span><span class="st">'topol.top'</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="fu">gro</span><span class="kw">:</span><span class="at"> </span><span class="st">'npt.gro'</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="fu">ndx</span><span class="kw">:</span><span class="at"> </span><span class="st">'index.ndx'</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="fu">plumed</span><span class="kw">:</span><span class="at"> </span><span class="st">'plumed.dat'</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="fu">mds</span><span class="kw">:</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">pull</span><span class="kw">:</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">mdp</span><span class="kw">:</span><span class="at"> </span><span class="st">'pull_fibril.mdp'</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">pull</span><span class="kw">:</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">mdp</span><span class="kw">:</span><span class="at"> </span><span class="st">'md.mdp'</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">use_plumed</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">relax</span><span class="kw">:</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">mdp</span><span class="kw">:</span><span class="at"> </span><span class="st">'md_slow_growth.mdp'</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="fu">changer</span><span class="kw">:</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">coordinates</span><span class="kw">:</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">md</span><span class="kw">:</span><span class="at"> </span><span class="st">'relax'</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">slow_growth</span><span class="kw">:</span><span class="at"> </span><span class="ch">True</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">topology</span><span class="kw">:</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">parameterization</span><span class="kw">:</span><span class="at"> </span><span class="st">'basic'</span><span class="at"> </span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="fu">reactions</span><span class="kw">:</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">homolysis</span><span class="kw">:</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">edis</span><span class="kw">:</span><span class="at"> </span><span class="st">'edissoc.dat'</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">itp</span><span class="kw">:</span><span class="at"> </span><span class="st">'ffbonded.itp'</span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="fu">sequence</span><span class="kw">:</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> equilibrium</span></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> pull  </span></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> reactions</span></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> equilibrium</span></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> pull</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</details>
+<p>The config file mentions three important gromacs file for your system: top, gro, idx. We have the top and gro file from the equilibration and can update the file names in the config file. A basic index file can be generated with</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">'q'</span> <span class="kw">|</span> <span class="ex">gmx</span> make_ndx <span class="at">-f</span> npt.gro</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The next entry in the config file is plumed and references a plumed configuration file (plumed.dat) which we don’t yet have. This file is needed for the homolysis reaction plugin. In the reactions section, other files which are necessary for the homolysis reaction can also be seen: <code>edissoc.dat</code> and <code>ffbonded.itp.</code> The ffbonded.itp file is specific to the force field and can be copied from the force field directory. Edissoc.dat contains a table of bond dissociation energies by atom name and can be taken from the hexalanine_homolysis example if only standard amino acids and the HLKNL and PYD crosslinks are part of the system. For other crosslinks, the bond dissociation energy has to be provided by the user.</p>
+<p>If the HLKNL and/or PYD are present in the system, their atom names need to be changed to unique names specified in edissoc.dat. A script for renaming HLKNL and PYD crosslink atom names in the gro and top file can be found in the tutorial files.</p>
+<p>For homolysis, the plumed.dat file should contain instructions to sample distances between bonds. Homolysis can then occur for the bonds mentioned in this file. A script to create a plumed.dat file can be found in the turoail files. We want to sample homolysis in the backbone and in crosslinks. By providing a gromacs index file with all backbone and crosslink atoms, the script generates the necessary plumed.dat file. Such a index file can be generated with</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">'backbone | r LY2 LY3_L4Y_L5Y_LYX'</span> <span class="kw">|</span> <span class="ex">gmx</span> make_ndx <span class="at">-n</span> index.ndx <span class="at">-o</span> index.ndx</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Now let’s look at the sequence. It mentions the reactions, which we have taken care of, and the names of different md runs. A good first would include a first pulling simulation to stretch the fibril followed by a pulling simulation with distance sampling for the subsequent reaction and a final pulling simulation. For both types of pulling simulation the same mdp file can be used from the tutorial files. The pulling simulations also need torque restraints to prevent unphysiological unwinding of the fibrils. The torque restraints are applied to the capping groups of a tripelhelix. For this, additional index groups are needed which can be generated with a script provided in the tutorial files (prepare_enforced_rotation.py). Bond distance sampling can be turned on for a md run by the tag <code>use_plumed</code>. Another md run, in this case called relax, is mentioned under <code>changer.coordinates.md</code>. It is used after the homolysis reaction to interpolate between new and old parameters. An example mdp file is included in the tutorial files.</p>
+<p>Finally, the KIMMDY run name and gmx_mdrun_flags can be adjusted. A final KIMMDY config file could look like this:</p>
+<details>
+<summary>
+KIMMDY config file (kimmdy.yml)
+</summary>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>kimmdy.yml</strong></pre>
+</div>
+<div class="sourceCode" id="cb7" data-filename="kimmdy.yml"><pre class="sourceCode yml code-with-copy"><code class="sourceCode yaml"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># yaml-language-server: $schema=../../src/kimmdy/kimmdy-yaml-schema.json</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">dryrun</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">name</span><span class="kw">:</span><span class="at"> </span><span class="st">'fibril_000'</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="fu">max_tasks</span><span class="kw">:</span><span class="at"> </span><span class="dv">100</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="fu">gromacs_alias</span><span class="kw">:</span><span class="at"> </span><span class="st">'gmx'</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="fu">gmx_mdrun_flags</span><span class="kw">:</span><span class="at"> -maxh 24 -dlb yes -ntomp 4 -ntmpi 10  -pme gpu -bonded gpu -npme 1</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="fu">ff</span><span class="kw">:</span><span class="at"> </span><span class="st">'amber99sb-star-ildnp.ff'</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="fu">top</span><span class="kw">:</span><span class="at"> </span><span class="st">'hexala_out.top'</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="fu">gro</span><span class="kw">:</span><span class="at"> </span><span class="st">'npt.gro'</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="fu">ndx</span><span class="kw">:</span><span class="at"> </span><span class="st">'index.ndx'</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="fu">plumed</span><span class="kw">:</span><span class="at"> </span><span class="st">'plumed.dat'</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="fu">mds</span><span class="kw">:</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">pull</span><span class="kw">:</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">mdp</span><span class="kw">:</span><span class="at"> </span><span class="st">'pull_fibril.mdp'</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">pull_sample</span><span class="kw">:</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">mdp</span><span class="kw">:</span><span class="at"> </span><span class="st">'pull_fibril.mdp'</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">use_plumed</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">relax</span><span class="kw">:</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">mdp</span><span class="kw">:</span><span class="at"> </span><span class="st">'pull_fibril_slow_growth.mdp'</span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="fu">changer</span><span class="kw">:</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">coordinates</span><span class="kw">:</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">md</span><span class="kw">:</span><span class="at"> </span><span class="st">'relax'</span></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">slow_growth</span><span class="kw">:</span><span class="at"> </span><span class="ch">True</span></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">topology</span><span class="kw">:</span></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">parameterization</span><span class="kw">:</span><span class="at"> </span><span class="st">'basic'</span><span class="at"> </span></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a><span class="fu">reactions</span><span class="kw">:</span></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">homolysis</span><span class="kw">:</span></span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">edis</span><span class="kw">:</span><span class="at"> </span><span class="st">'edissoc.dat'</span></span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">itp</span><span class="kw">:</span><span class="at"> </span><span class="st">'ffbonded.itp'</span></span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a><span class="fu">sequence</span><span class="kw">:</span></span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> pull</span></span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> pull_sample  </span></span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> reactions</span></span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> pull</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</details>
+<p>The run can be started by typing <code>kimmdy</code> in the command line. The output files are located in <code>fibril_000</code></p>
+</section>
+<section id="analysis" class="level2">
+<h2 class="anchored" data-anchor-id="analysis">Analysis</h2>
+<p>Try the options in <code>kimmdy-analysis</code> to visualize your kimmdy run.</p>
 
 
+</section>
 </section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
@@ -911,18 +932,57 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
   const xrefs = window.document.querySelectorAll('a.quarto-xref');
   const processXRef = (id, note) => {
-    if (id.startsWith('sec-')) {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    const typesetMath = (el) => {
+      if (window.MathJax) {
+        // MathJax Typeset
+        window.MathJax.typeset([el]);
+      } else if (window.katex) {
+        // KaTeX Render
+        var mathElements = el.getElementsByClassName("math");
+        var macros = [];
+        for (var i = 0; i < mathElements.length; i++) {
+          var texText = mathElements[i].firstChild;
+          if (mathElements[i].tagName == "SPAN") {
+            window.katex.render(texText.data, mathElements[i], {
+              displayMode: mathElements[i].classList.contains('display'),
+              throwOnError: false,
+              macros: macros,
+              fleqn: false
+            });
+          }
+        }
+      }
+    }
+    if (id === null || id.startsWith('sec-')) {
       // Special case sections, only their first couple elements
       const container = document.createElement("div");
       if (note.children && note.children.length > 2) {
         for (let i = 0; i < 2; i++) {
           container.appendChild(note.children[i].cloneNode(true));
         }
+        typesetMath(container);
         return container.innerHTML
       } else {
+        typesetMath(note);
         return note.innerHTML;
       }
     } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      typesetMath(note);
       return note.innerHTML;
     }
   }
@@ -932,27 +992,56 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       instance.disable();
       let url = xref.getAttribute('href');
       let hash = undefined; 
-      try { hash = new URL(url).hash; } catch {}
-      const id = hash.replace(/^#\/?/, "");
-      const note = window.document.getElementById(id);
-      if (note !== null) {
-        try {
-          const html = processXRef(id, note);
-          instance.setContent(html);
-        } finally {
-          instance.enable();
-          instance.show();
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
         }
       } else {
-        // See if we can fetch this
-        fetch(url.split('#')[0])
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
         .then(res => res.text())
         .then(html => {
           const parser = new DOMParser();
           const htmlDoc = parser.parseFromString(html, "text/html");
-          const note = htmlDoc.getElementById(id);
+          const note = htmlDoc.querySelector('main.content');
           if (note !== null) {
-            const html = processXRef(id, note);
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
             instance.setContent(html);
           } 
         }).finally(() => {
@@ -1030,6 +1119,32 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         });
         selectedAnnoteEl = undefined;
       };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
       // Attach click handler to the DT
       const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
       for (const annoteDlNode of annoteDls) {
@@ -1091,13 +1206,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../../guide/tutorials/getting-started.html" class="pagination-link">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">0. Getting Started</span>
+      <a href="../../guide/tutorials/index.html" class="pagination-link  aria-label=" tutorials"="">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Tutorials</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../../_reference/index.html" class="pagination-link">
-        <span class="nav-page-text">Reference</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../../guide/tutorials/getting-started.html" class="pagination-link" aria-label="0. Getting Started">
+        <span class="nav-page-text">0. Getting Started</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

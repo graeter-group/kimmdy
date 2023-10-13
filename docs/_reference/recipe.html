@@ -156,12 +156,6 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../guide/colbuilder.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Preparation</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="../guide/explanation/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Explanations</span></a>
   </div>
@@ -216,6 +210,12 @@ ul.task-list li input[type="checkbox"] {
           </a> 
       </div>
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guide/tutorials/colbuilder.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1. Run KIMMDY from Colbuilder fibril</span></a>
+  </div>
+</li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../guide/tutorials/getting-started.html" class="sidebar-item-text sidebar-link">
@@ -463,6 +463,7 @@ ul.task-list li input[type="checkbox"] {
   </ul></li>
   <li><a href="#kimmdy.recipe.RecipeCollection" id="toc-kimmdy.recipe.RecipeCollection" class="nav-link" data-scroll-target="#kimmdy.recipe.RecipeCollection">RecipeCollection</a>
   <ul class="collapse">
+  <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
   <li><a href="#methods-1" id="toc-methods-1" class="nav-link" data-scroll-target="#methods-1">Methods</a>
   <ul class="collapse">
   <li><a href="#kimmdy.recipe.RecipeCollection.aggregate_reactions" id="toc-kimmdy.recipe.RecipeCollection.aggregate_reactions" class="nav-link" data-scroll-target="#kimmdy.recipe.RecipeCollection.aggregate_reactions">aggregate_reactions</a></li>
@@ -849,6 +850,27 @@ ul.task-list li input[type="checkbox"] {
 <h3 class="anchored" data-anchor-id="kimmdy.recipe.RecipeCollection">RecipeCollection</h3>
 <p><code>recipe.RecipeCollection(recipes)</code></p>
 <p>A RecipeCollection encompasses a number of reaction paths. They can originate from multiple reaction plugins, but do not need to.</p>
+<section id="returns" class="level4">
+<h4 class="anchored" data-anchor-id="returns">Returns</h4>
+<table class="table">
+<colgroup>
+<col style="width: 35%">
+<col style="width: 64%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>unique_recipes_ixs</code></td>
+<td>List of lists binning the old recipe indices and maps to the new recipes list.</td>
+</tr>
+</tbody>
+</table>
+</section>
 <section id="methods-1" class="level4">
 <h4 class="anchored" data-anchor-id="methods-1">Methods</h4>
 <table class="table">
@@ -899,8 +921,8 @@ ul.task-list li input[type="checkbox"] {
 <h5 class="anchored" data-anchor-id="kimmdy.recipe.RecipeCollection.calc_ratesum">calc_ratesum</h5>
 <p><code>recipe.RecipeCollection.calc_ratesum()</code></p>
 <p>Calculate the sum of rates over all timesteps</p>
-<section id="returns" class="level6">
-<h6 class="anchored" data-anchor-id="returns">Returns</h6>
+<section id="returns-1" class="level6">
+<h6 class="anchored" data-anchor-id="returns-1">Returns</h6>
 <table class="table">
 <colgroup>
 <col style="width: 25%">
