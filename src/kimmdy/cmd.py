@@ -165,6 +165,12 @@ def get_cmdline_args() -> argparse.Namespace:
         "--debug", action="store_true", help=("on error, drop into debugger")
     )
 
+    # visualize call stack
+    parser.add_argument(
+        "--callgraph",
+        action="store_true",
+        help="Generate visualization of function calls. Mostly useful for "
+        "debugging and documentation.",
     )
 
     return parser.parse_args()
@@ -259,7 +265,29 @@ def _run(args: argparse.Namespace):
 
             chmod(path, 0o755)
         else:
-            runmgr.run()
+            if args.callgraph:
+                try:
+                    from pycallgraph2 import PyCallGraph
+                    from pycallgraph2.output import GraphvizOutput
+                    from pycallgraph2.config import Config as Vis_conf
+                    from pycallgraph2.globbing_filter import GlobbingFilter
+                except ImportError as e:
+                    logger.error(
+                        "pycallgraph2 needed for call visualization. Get it with `pip install pycallgraph2`"
+                    )
+
+                    out = GraphvizOutput()
+                    out.output_type = "svg"
+                    trace_filter = GlobbingFilter(
+                        exclude=["pycallgraph.*"],
+                        include=["kimmdy.*"],
+                    )
+                    vis_conf = Vis_conf(trace_filter=trace_filter)
+                    with PyCallGraph(output=out, config=vis_conf):
+                        runmgr.run()
+
+            else:
+                runmgr.run()
 
     except Exception as e:
         if args.debug:
@@ -282,6 +310,7 @@ def kimmdy_run(
     show_schema_path: bool = False,
     generate_jobscript: bool = False,
     debug: bool = False,
+    callgraph: bool = False,
 ):
     """Run KIMMDY from python.
 
@@ -314,6 +343,7 @@ def kimmdy_run(
         show_schema_path=show_schema_path,
         generate_jobscript=generate_jobscript,
         debug=debug,
+        callgraph=callgraph,
     )
     _run(args)
 
@@ -323,7 +353,7 @@ def entry_point_kimmdy():
 
     The configuration is gathered from the input file,
     which is `kimmdy.yml` by default.
-    See [](`~kimmdy.cmd.get_cmdline_args`) or `kimmdy --help` 
+    See [](`~kimmdy.cmd.get_cmdline_args`) or `kimmdy --help`
     for the descriptions of the arguments.
     """
     args = get_cmdline_args()
