@@ -105,15 +105,25 @@ def get_cmdline_args() -> argparse.Namespace:
         Parsed command line arguments
     """
     parser = argparse.ArgumentParser(
-        description="""Welcome to KIMMDY. `kimmdy` runs KIMMDY, further tools are available as `kimmdy-...` commands.
-    These are `-analysis`, `-remove-hydrogen` and `-build-examples`. Access their help with `kimmdy-... -h.`
-    """
+        description="Welcome to KIMMDY. `kimmdy` runs KIMMDY, further tools "
+        "are available as `kimmdy-...` commands. These are `-analysis`, "
+        "`-remove-hydrogen` and `-build-examples`. Access their help with "
+        "`kimmdy-... -h.`"
     )
     parser.add_argument(
-        "--version", action="version", version=f'KIMMDY {version("kimmdy")}'
+        "--input",
+        "-i",
+        type=str,
+        help="Kimmdy input file. Default",
+        default="kimmdy.yml",
     )
     parser.add_argument(
-        "--input", "-i", type=str, help="kimmdy input file", default="kimmdy.yml"
+        "--checkpoint",
+        "-c",
+        type=str,
+        help="File path of a kimmdy.cpt file to restart KIMMDY from a "
+        "checkpoint. If a directory is given, the file kimmdy.cpt in "
+        "that directory is used.",
     )
     parser.add_argument(
         "--loglevel",
@@ -123,17 +133,6 @@ def get_cmdline_args() -> argparse.Namespace:
         default=None,
     )
     parser.add_argument("--logfile", "-f", type=Path, help="logfile", default=None)
-    parser.add_argument(
-        "--checkpoint",
-        "-c",
-        type=str,
-        help="File path of a kimmdy.cpt file to restart KIMMDY from a checkpoint. If a directory is given, the file kimmdy.cpt in that directory is used.",
-    )
-
-    # on error, drop into debugger
-    parser.add_argument(
-        "--debug", action="store_true", help=("on error, drop into debugger")
-    )
 
     # flag to show available plugins
     parser.add_argument(
@@ -144,24 +143,28 @@ def get_cmdline_args() -> argparse.Namespace:
     parser.add_argument(
         "--show-schema-path",
         action="store_true",
-        help=(
-            """
-            Print path to yaml schema for use with yaml-language-server e.g. in VSCode and Neovim
-            # yaml-language-server: $schema=/path/to/kimmdy-yaml-schema.json
-            """
-        ),
+        help="Print path to yaml schema for use with yaml-language-server e.g."
+        " in VSCode and Neovim",
     )
 
     # flag to print an example jobscript for slurm hpc clusters
     parser.add_argument(
         "--generate-jobscript",
         action="store_true",
-        help=(
-            """
-            Instead of running KIMMDY directly, generate at jobscript.sh for slurm HPC clusters.
-            You can then run this jobscript with sbatch jobscript.sh
-            """
-        ),
+        help="Instead of running KIMMDY directly, generate at jobscript.sh for"
+        " slurm HPC clusters."
+        "You can then run this jobscript with sbatch jobscript.sh",
+    )
+
+    parser.add_argument(
+        "--version", action="version", version=f'KIMMDY {version("kimmdy")}'
+    )
+
+    # on error, drop into debugger
+    parser.add_argument(
+        "--debug", action="store_true", help=("on error, drop into debugger")
+    )
+
     )
 
     return parser.parse_args()
@@ -204,7 +207,8 @@ def _run(args: argparse.Namespace):
 
     if not Path(args.input).exists() and not args.checkpoint:
         raise FileNotFoundError(
-            f"Input file {args.input} does not exist. Specify its name with --input and make sure that you are in the right directory."
+            f"Input file {args.input} does not exist. Specify its name with "
+            "--input and make sure that you are in the right directory."
         )
 
     try:
@@ -214,7 +218,8 @@ def _run(args: argparse.Namespace):
                 cpt = cpt / "kimmdy.cpt"
             if not cpt.exists():
                 raise FileNotFoundError(
-                    f"Checkpoint file {cpt} does not exist. Specify its path or directory with --checkpoint and make sure that you are in the right directory."
+                    f"Checkpoint file {cpt} does not exist. Specify its path "
+                    "or directory with --checkpoint and make sure that you are in the right directory."
                 )
             with open(cpt, "rb") as f:
                 runmgr = dill.load(f)
@@ -258,6 +263,7 @@ def _run(args: argparse.Namespace):
 
     except Exception as e:
         if args.debug:
+            print(e)
             import pdb
 
             pdb.post_mortem()
@@ -290,7 +296,8 @@ def kimmdy_run(
     logfile
         File path of the logfile.
     checkpoint
-        File path of a kimmdy.cpt file to restart KIMMDY from a checkpoint. If a directory is given, the file kimmdy.cpt in that directory is used.
+        File path of a kimmdy.cpt file to restart KIMMDY from a checkpoint.
+        If a directory is given, the file kimmdy.cpt in that directory is used.
     show_plugins
         Show available plugins and exit.
     show_schema_path
@@ -316,7 +323,8 @@ def entry_point_kimmdy():
 
     The configuration is gathered from the input file,
     which is `kimmdy.yml` by default.
-    See [](`~kimmdy.cmd.get_cmdline_args`) or `kimmdy --help` for the descriptions of the arguments.
+    See [](`~kimmdy.cmd.get_cmdline_args`) or `kimmdy --help` 
+    for the descriptions of the arguments.
     """
     args = get_cmdline_args()
     _run(args)
