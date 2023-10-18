@@ -143,7 +143,7 @@ echo 'backbone | r LY2 LY3_L4Y_L5Y_LYX' | gmx make_ndx -n index.ndx -o index.ndx
 
 Now let's look at the sequence.
 It mentions the reactions, which we have taken care of, and the names of different md runs.
-A good first would include a first pulling simulation to stretch the fibril followed by a pulling simulation with distance sampling for the subsequent reaction and a final pulling simulation.
+A good first Kimmdy run would include a first pulling simulation to stretch the fibril followed by a pulling simulation with distance sampling for the subsequent reaction and a final pulling simulation.
 For both types of pulling simulation the same mdp file can be used from the tutorial files.
 The pulling simulations also need torque restraints to prevent unphysiological unwinding of the fibrils.
 The torque restraints are applied to the capping groups of a tripelhelix.
@@ -175,7 +175,7 @@ plumed: 'plumed.dat'
 mds:
   pull:
     mdp: 'pull_fibril.mdp'
-  pull_sample:
+  sample:
     mdp: 'pull_fibril.mdp'
     use_plumed: true
   relax:
@@ -192,7 +192,7 @@ reactions:
     itp: 'ffbonded.itp'
 sequence:
   - pull
-  - pull_sample  
+  - sample  
   - reactions
   - pull
 ```
