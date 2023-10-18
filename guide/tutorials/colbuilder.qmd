@@ -19,7 +19,7 @@ gmx pdb2gmx -f Homo_sapiens_aln_N_HLKNL_12_C_PYD_2_fibril.pdb -o fibril2.gro -ig
 
 ## Equilibration
 
-`mdp` files for the following steps are located in `<kimmdy root>/guide/tutorials/colbuilder_files.`
+`mdp` files for the following steps are located in `<kimmdy root>/www/colbuilder_files.`
 
 ```bash
 gmx editconf -f fibril.gro -o fibril_x.gro -c -princ  <<<1
