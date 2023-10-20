@@ -271,11 +271,6 @@ def morse_transition_rate(
 
 def get_gmx_dir(gromacs_alias: str = "gmx") -> Optional[Path]:
     """Returns the path to the gromacs installation
-
-    This does not check if the installation is valid.
-    It just returns the path to the gromacs data directory.
-    If `gmx` is not executable it still returns the default
-    gromacs data directory in `/usr/share/gromacs`.
     """
 
     # get the stder from calling `gmx` to search for the `Data prefix:`
