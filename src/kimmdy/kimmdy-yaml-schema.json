@@ -102,7 +102,7 @@
       "default": "gmx"
     },
     "gmx_mdrun_flags": {
-      "description": "Flags passed to gmx mdrun. e.g. `-nt 8 -maxh 24`",
+      "description": "Flags passed to gmx mdrun. e.g. `-nt 8 -maxh 24 -dbl yes`",
       "type": "string",
       "pytype": "str",
       "default": "-maxh 24 -dlb yes"
