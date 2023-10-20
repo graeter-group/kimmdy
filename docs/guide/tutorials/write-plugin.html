@@ -64,7 +64,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
-<link href="../../_reference/index.html" rel="next">
+<link href="../../guide/how_to/index.html" rel="next">
 <link href="../../guide/tutorials/getting-started.html" rel="prev">
 <script src="../../site_libs/quarto-html/quarto.js"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
@@ -196,13 +196,42 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../../guide/how_to/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">How-To</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="false" aria-label="Toggle section">
+            <a href="../../guide/tutorials/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tutorials</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guide/tutorials/colbuilder.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1. Run KIMMDY from Colbuilder fibril</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guide/tutorials/getting-started.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">0. Getting Started</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guide/tutorials/write-plugin.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">2. Writing a Reaction Plugin</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../guide/how_to/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">How-To</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../guide/how_to/contribute.html" class="sidebar-item-text sidebar-link">
@@ -231,35 +260,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../../guide/how_to/topology.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Visualize Topologies</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a href="../../guide/tutorials/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Tutorials</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 show">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../guide/tutorials/colbuilder.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">1. Run KIMMDY from Colbuilder fibril</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../guide/tutorials/getting-started.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">0. Getting Started</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../guide/tutorials/write-plugin.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">2. Writing a Reaction Plugin</span></a>
   </div>
 </li>
       </ul>
@@ -505,7 +505,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="main-code">Main code</h3>
 <p>A reaction plugin has to be a derived class from the <code>ReactionPlugin</code> base class. Such a class has the attributes <code>name</code>, <code>runmng</code> and <code>config</code> and the method <code>get_recipe_collection</code>, which takes a <code>TaskFiles</code> object as argument and returns a <code>RecipeCollection</code>.</p>
 <p>The <code>name</code> is a simple string and may be useful for logging. <code>runmng</code> is the central <code>RunManager</code> of a kimmdy run and has plenty of useful attributes for your plugin, especially the system <code>Topology</code>, which can be accessed via <code>self.runmg.top</code>. <code>config</code> contains the reaction plugin configuration as specified in the kimmdy configuration file (typically named kimmdy.yml). A <code>RecipeCollection</code> contains <code>Recipe</code>s with predefined <code>RecipeStep</code>s that can be used to define the modification to the system for the reaction. A <code>Recipe</code> also contains the <code>rates</code> of the specified reaction and the <code>timespans</code> during which the corresponding rates are valid. An example plugin can be seen below.</p>
-<div id="03c806ef" class="cell" data-execution_count="1">
+<div id="9a245ff3" class="cell" data-execution_count="1">
 <details>
 <summary>Plugin main code (reaction.py)</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> kimmdy.recipe <span class="im">import</span> (</span>
@@ -565,7 +565,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="configuration-file-schema" class="level3">
 <h3 class="anchored" data-anchor-id="configuration-file-schema">Configuration file schema</h3>
 <p>A plugin defines which variables it needs in a schema. The schema can contain default values and types of these variables. For a Kimmdy run, reaction plugin variables are defined in the configuration file (kimmdy.yml). An example schema can be seen below.</p>
-<div id="f0a17726" class="cell" data-execution_count="2">
+<div id="4b1bedfb" class="cell" data-execution_count="2">
 <details>
 <summary>Plugin schema (kimmdy-yaml-schema.json)</summary>
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>{</span>
@@ -597,7 +597,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="making-a-python-package" class="level2">
 <h2 class="anchored" data-anchor-id="making-a-python-package">Making a python package</h2>
 <p>It is necessary to make the plugin a python package to interface with Kimmdy. For this, package setup configuration files are necessary, for example <code>setup.py</code> and <code>setup.cfg</code>. In <code>setup.cfg</code> dependencies can be specified, which will be installed alongside the plugin. The interface with kimmdy is specified in the <code>[options.entry_points]</code> section. This section needs to refer to the class we created in the plugin main code and assign it to <code>kimmdy.reaction_plugins</code>, i.e.&nbsp;<code>kimmdy.reaction_plugins = bind = &lt;path&gt;.&lt;to&gt;.&lt;main file&gt;:&lt;ClassName&gt;</code>. Also, the directory containing the source code (typically <code>src</code>) is defined in <code>[options.packages.find]</code>. An example for <code>setup.py</code> and <code>setup.cfg</code> can be found below.</p>
-<div id="c9c6ec73" class="cell" data-execution_count="3">
+<div id="388c0133" class="cell" data-execution_count="3">
 <details>
 <summary>setup.py</summary>
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> setuptools <span class="im">import</span> setup</span>
@@ -605,7 +605,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>setup()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<div id="445d13e6" class="cell" data-execution_count="4">
+<div id="5d5217ce" class="cell" data-execution_count="4">
 <details>
 <summary>setup.cfg</summary>
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>[metadata]</span>
@@ -1096,8 +1096,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../../_reference/index.html" class="pagination-link">
-        <span class="nav-page-text">Reference</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../../guide/how_to/index.html" class="pagination-link">
+        <span class="nav-page-text">How-To</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
