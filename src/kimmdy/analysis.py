@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import matplotlib as mpl
 import seaborn.objects as so
+import seaborn as sns
 import argparse
 from seaborn import axes_style
 import pandas as pd
@@ -288,12 +289,16 @@ def radical_population(
             if int(idx) in counts.keys():
                 counts[int(idx)] += 1 / n_states
 
-    plt.bar(x=atoms_identifier, height=counts.values())
+    # filter out atoms with zero occupancy
+    occupied_counts = {atoms_identifier[k]: v for k, v in counts.items() if v > 0}
+
+    sns.barplot(x=list(occupied_counts.keys()),
+                    y=list(occupied_counts.values()),
+                    errorbar=None
+                    )
+
     plt.xlabel("Atom identifier")
     plt.ylabel("Fractional Radical Occupancy")
-    plt.ylim(0, 1)
-    plt.xticks(atoms_identifier, rotation=90, ha="right")
-    plt.tight_layout()
     output_path = str(analysis_dir / "radical_population_fingerprint.png")
     plt.savefig(output_path, dpi=300)
 
