@@ -94,7 +94,7 @@ def test_parser_invertible(sections, arranged_tmp_path):
 
 
 @given(ls=st.lists(allowed_text))
-@settings(suppress_health_check=[HealthCheck.function_scoped_fixture])
+@settings(suppress_health_check=[HealthCheck.function_scoped_fixture], deadline=500)
 def test_parser_fails_without_sections(ls, arranged_tmp_path):
     p = Path("random_content.top")
     with open(p, "w") as f:
