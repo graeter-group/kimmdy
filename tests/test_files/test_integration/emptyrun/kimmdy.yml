@@ -4,7 +4,7 @@ name: 'emptyrun_001'
 dryrun: false
 max_tasks: 0
 gromacs_alias: 'gmx'
-# ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
+gmx_mdrun_flags: -maxh 24 -dlb yes -nt 8 -npme 0 -ntmpi 1
 top: 'emptyrun.txt'
 gro: 'emptyrun.txt'
 ndx: 'emptyrun.txt'

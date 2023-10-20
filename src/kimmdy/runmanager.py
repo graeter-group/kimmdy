@@ -389,7 +389,6 @@ class RunManager:
             f"-px {instance}_pullx.xvg -pf {instance}_pullf.xvg "
             f"-ro {instance}-rotation.xvg -ra {instance}-rotangles.log "
             f"-rs {instance}-rotslabs.log -rt {instance}-rottorque.log "
-            "-npme 0 -ntmpi 1 "
             f"{gmx_mdrun_flags}  "
         )
 
