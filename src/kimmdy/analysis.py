@@ -271,13 +271,8 @@ def radical_population(
     u = mda.Universe(str(gro[0]), format="gro")
     atoms = u.select_atoms(select_atoms)
     atoms_identifier = [
-        "-".join(x)
-        for x in list(
-            zip(
-                [str(resid) for resid in atoms.resids],
-                [str(name) for name in atoms.names],
-            )
-        )
+        "-".join(str(x) for x in [a.resid, a.resname, a.name])
+        for a in atoms
     ]
     atom_ids = atoms.ids
 
