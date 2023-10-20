@@ -215,8 +215,12 @@ class Config:
                     self._logmessages["warnings"].append(
                         f"Found {len(ffs)} forcefields in cwd, using first one: {ffs[0]}"
                     )
-                assert ffs[0].is_dir(), "Forcefield should be a directory!"
+                if len(ffs) == 0:
+                    m = f"Found 0 forcefields in cwd. Please specify a forcefield to be used from the gromacs directory or add a .ff folder to the cwd."
+                    self._logmessages["errors"].append(m)
+                    raise FileNotFoundError(m)
                 ffdir = ffs[0].resolve()
+                assert ffdir.is_dir(), "Forcefield should be a directory!"
             elif not ffdir.exists():
                 gmxdir = get_gmx_dir(self.gromacs_alias)
                 if gmxdir is None:
