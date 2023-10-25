@@ -1,5 +1,58 @@
 # Changelog
 
+## [5.0.0](https://github.com/hits-mbm-dev/kimmdy/compare/v4.4.1...v5.0.0) (2023-10-25)
+
+
+### ⚠ BREAKING CHANGES
+
+* choose highest rate as reaction start time
+
+### Features
+
+* Allow having single optional file for mdrun ([#151](https://github.com/hits-mbm-dev/kimmdy/issues/151)) ([6b61a8c](https://github.com/hits-mbm-dev/kimmdy/commit/6b61a8c44db785bedcc762bc5689486adc061703))
+* choose highest rate as reaction start time ([fc822b3](https://github.com/hits-mbm-dev/kimmdy/commit/fc822b32d1b3c34a5f5930574e7daa2ad8f7547a))
+* display residue name for radical population ([77a8d72](https://github.com/hits-mbm-dev/kimmdy/commit/77a8d726c223d45233c15100437d641c0c1cfc65))
+* extrande KMC algorithm ([d1671db](https://github.com/hits-mbm-dev/kimmdy/commit/d1671db75d6d86f34d9f925adbd8d42747f05c34))
+* only plot radical occupied atoms ([#308](https://github.com/hits-mbm-dev/kimmdy/issues/308)) ([77a8d72](https://github.com/hits-mbm-dev/kimmdy/commit/77a8d726c223d45233c15100437d641c0c1cfc65))
+* Runtime analysis tool ([#283](https://github.com/hits-mbm-dev/kimmdy/issues/283)) ([e302be3](https://github.com/hits-mbm-dev/kimmdy/commit/e302be358fdf77c749d8c9a369871ad7a3cc353e))
+* trr without edr can now be used. ([6b61a8c](https://github.com/hits-mbm-dev/kimmdy/commit/6b61a8c44db785bedcc762bc5689486adc061703))
+
+
+### Bug Fixes
+
+* [#261](https://github.com/hits-mbm-dev/kimmdy/issues/261) improve error message if ff is not found in cwd ([#307](https://github.com/hits-mbm-dev/kimmdy/issues/307)) ([ab03cbe](https://github.com/hits-mbm-dev/kimmdy/commit/ab03cbe8b4c93b1db4e52b78e119de7fb91ece7a))
+* after truncating place doesn't need a time ([233d83c](https://github.com/hits-mbm-dev/kimmdy/commit/233d83cbba88396194d989a200f9f420e862aae3))
+* catch edge cases in extrande algorithm ([01d4df9](https://github.com/hits-mbm-dev/kimmdy/commit/01d4df9b0e8fba921337f24cf2b4a1927885e016))
+* closes [#286](https://github.com/hits-mbm-dev/kimmdy/issues/286) don't modify task mapping inplace ([c40f360](https://github.com/hits-mbm-dev/kimmdy/commit/c40f360acd8d5282b4adc4c2eba56777be6f708b))
+* consistent naming for remove hydrogen cli ([e615370](https://github.com/hits-mbm-dev/kimmdy/commit/e615370a0bec48ead5f66a351f2bc682a0234028))
+* coordinates and runmanager ([#271](https://github.com/hits-mbm-dev/kimmdy/issues/271)) ([695026c](https://github.com/hits-mbm-dev/kimmdy/commit/695026cc76d2311923c6a4b78608c3abee9d45a3))
+* correct error message ([facda23](https://github.com/hits-mbm-dev/kimmdy/commit/facda238da55f887635728b01afb0a05861e68ef))
+* correct truncated gro ([2c49c80](https://github.com/hits-mbm-dev/kimmdy/commit/2c49c809de992bee9f6da516fbe76734460b7c2f))
+* duplicate key in yaml ([6204e1e](https://github.com/hits-mbm-dev/kimmdy/commit/6204e1e52d151ca53af13b122dbce45c6e66acd3))
+* error handling ([d0dc8e7](https://github.com/hits-mbm-dev/kimmdy/commit/d0dc8e7ee770711f63fa5544190d1269e3f77b2b))
+* execute `place` at first time in recipe ([7234d72](https://github.com/hits-mbm-dev/kimmdy/commit/7234d721a54e25ef8d43ebb2b7444a914adb37da))
+* gmx trjconv --trunc not working with xtc ([ba0b922](https://github.com/hits-mbm-dev/kimmdy/commit/ba0b92255b0aecaac67f341d1dfeb9db9a7621fe))
+* improved rate plotting ([d0f6d19](https://github.com/hits-mbm-dev/kimmdy/commit/d0f6d19a42c705082c8cdd5e498885d426256bca))
+* improved reliability of rate plotting ([6a355d4](https://github.com/hits-mbm-dev/kimmdy/commit/6a355d439683c44b9fcef68874ff548c6b24d8a4))
+* make plugins and plugin schemas discoverable by pip install ([73da927](https://github.com/hits-mbm-dev/kimmdy/commit/73da927a01de4570bf5c0571cb1bd07f8c225b10))
+* only use mpme and ntmpi in test config. fixes [#302](https://github.com/hits-mbm-dev/kimmdy/issues/302) ([#304](https://github.com/hits-mbm-dev/kimmdy/issues/304)) ([764b083](https://github.com/hits-mbm-dev/kimmdy/commit/764b0830127f0faa2181d15069c405e3385fa3f1))
+* parametrize before slow growth ([ff14694](https://github.com/hits-mbm-dev/kimmdy/commit/ff146945531795b9179b220db3bf0d97b7b2d870))
+* rate plot with less than 9 recipes ([eb557d4](https://github.com/hits-mbm-dev/kimmdy/commit/eb557d474b5f829b9ed67e9eb6fdc155113ceaf3))
+* remove double log message ([#290](https://github.com/hits-mbm-dev/kimmdy/issues/290)) ([0182d20](https://github.com/hits-mbm-dev/kimmdy/commit/0182d204636f9ea67bd198f0acd06b687bac928a))
+* rename idx to ix for moleculetype for consistency ([e615370](https://github.com/hits-mbm-dev/kimmdy/commit/e615370a0bec48ead5f66a351f2bc682a0234028))
+* runtime analysis double counting ([14a875a](https://github.com/hits-mbm-dev/kimmdy/commit/14a875a3dc6b47550976f1635a74123285c45f9f))
+* set needs_parametrization ([e7a2996](https://github.com/hits-mbm-dev/kimmdy/commit/e7a29963724d09b7979c5a27792d27519d182d60))
+* truncate bug ([bfc175c](https://github.com/hits-mbm-dev/kimmdy/commit/bfc175c819564dd73c0c30b53ed2ce489aa9ca2c))
+* type issue in log message formatting ([fdee768](https://github.com/hits-mbm-dev/kimmdy/commit/fdee7684a5756ac3f75938ecdf3775703151c834))
+* write backups of truncated trajectories to the correct directory ([e615370](https://github.com/hits-mbm-dev/kimmdy/commit/e615370a0bec48ead5f66a351f2bc682a0234028))
+* wrong type of top when parametrizing ([fb2eb08](https://github.com/hits-mbm-dev/kimmdy/commit/fb2eb08af86c12be3a175e3cca2e20819e705da4))
+
+
+### Documentation
+
+* document kimmdy.yml yaml language server config ([#309](https://github.com/hits-mbm-dev/kimmdy/issues/309)) ([2fa494e](https://github.com/hits-mbm-dev/kimmdy/commit/2fa494ec3f8bca78ba3e707b0091171d34eb3bf2))
+* render ([8637990](https://github.com/hits-mbm-dev/kimmdy/commit/86379905c0b18086874cc76e134de3c9b059d245))
+
 ## [4.4.1](https://github.com/hits-mbm-dev/kimmdy/compare/v4.4.0...v4.4.1) (2023-09-13)
 
 
