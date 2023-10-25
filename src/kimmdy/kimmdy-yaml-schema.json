@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
-  "$id": "https://raw.githubusercontent.com/hits-mbm-dev/kimmdy/main/kimmdy-yaml-schema.json",
+  "$id": "https://raw.githubusercontent.com/hits-mbm-dev/kimmdy/main/src/kimmdy/kimmdy-yaml-schema.json",
   "additionalProperties": false,
   "required": ["sequence", "changer"],
   "properties": {
