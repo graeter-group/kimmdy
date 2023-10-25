@@ -50,23 +50,7 @@ def build_examples(restore: str):
                 assets_path / "amber99sb-star-ildnp.ff",
                 target_is_directory=True,
             )
-            kimmdy_yml_schema_path = dest / "kimmdy.yml"
-            if kimmdy_yml_schema_path.exists():
-                schema_path = (
-                    Path("..") / ".." / "src" / "kimmdy" / "kimmdy-yaml-schema.json"
-                )
-                first_line = f"# yaml-language-server: $schema={schema_path}\n"
-                with open(kimmdy_yml_schema_path, "r+") as f:
-                    lines = f.readlines()
-                    if lines[0][:22] == "# yaml-language-server":
-                        lines[0] = first_line
-                    else:
-                        lines = [first_line] + lines
-                    f.seek(0)
-                    f.writelines(lines)
-                    f.truncate()
-
-            print("done")
+            print("done building examples")
         except FileExistsError as e:
             raise FileExistsError(
                 f"Could not build example directory {directory} because it already exists. Try the --restore option to still build it."
