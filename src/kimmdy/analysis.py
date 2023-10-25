@@ -271,8 +271,7 @@ def radical_population(
     u = mda.Universe(str(gro[0]), format="gro")
     atoms = u.select_atoms(select_atoms)
     atoms_identifier = [
-        "-".join(str(x) for x in [a.resid, a.resname, a.name])
-        for a in atoms
+        "-".join(str(x) for x in [a.resid, a.resname, a.name]) for a in atoms
     ]
     atom_ids = atoms.ids
 
@@ -287,10 +286,9 @@ def radical_population(
     # filter out atoms with zero occupancy
     occupied_counts = {atoms_identifier[k]: v for k, v in counts.items() if v > 0}
 
-    sns.barplot(x=list(occupied_counts.keys()),
-                    y=list(occupied_counts.values()),
-                    errorbar=None
-                    )
+    sns.barplot(
+        x=list(occupied_counts.keys()), y=list(occupied_counts.values()), errorbar=None
+    )
 
     plt.xlabel("Atom identifier")
     plt.ylabel("Fractional Radical Occupancy")
