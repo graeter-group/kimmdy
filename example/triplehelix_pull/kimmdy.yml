@@ -1,5 +1,3 @@
-# yaml-language-server: $schema=../../src/kimmdy/kimmdy-yaml-schema.json
-
 name: 'kimmdy_001'
 dryrun: false
 max_tasks: 10
