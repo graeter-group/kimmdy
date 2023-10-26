@@ -194,9 +194,10 @@ class RunManager:
                 or self.config.max_hours == 0
             )
         ):
-            logger.info("Writing checkpoint before next task")
-            with open(self.cptfile, "wb") as f:
-                dill.dump(self, f)
+            if self.config.checkpoints:
+                logger.info("Writing checkpoint before next task")
+                with open(self.cptfile, "wb") as f:
+                    dill.dump(self, f)
             next(self)
 
         logger.info(

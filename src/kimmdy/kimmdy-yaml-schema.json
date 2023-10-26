@@ -11,6 +11,12 @@
       "pytype": "bool",
       "default": false
     },
+    "checkpoints": {
+      "description": "Write checkpoints to continue a KIMMDY run from. Default True",
+      "type": "boolean",
+      "pytype": "bool",
+      "default": true
+    },
     "cwd": {
       "description": "Working directory",
       "type": "string",
