@@ -922,6 +922,7 @@ class Topology:
                 other_atom = atompair[other_i]
                 other_res = other_atom.residue
                 atom.residue = other_res
+                atom.resnr = other_atom.resnr
                 aa = self.ff.residuetypes.get(other_res)
                 if not aa:
                     logging.warning(
