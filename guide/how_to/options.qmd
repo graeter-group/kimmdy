@@ -7,19 +7,33 @@ execute:
 ## Autocompletion
 
 KIMMDY comes with autocompletion for the `kimmdy.yml` file.
-Run `kimmdy --show-schema-path` to get the path to the schema file.
-Then, add the following to either the top of your `kimmmdy.yml` file or
-add the schema to the global configuration of the `yaml-language-server` in your editor
-(e.g. VS Code or Neovim).
+You can add the schema to the configuration of the [yaml-language-server](https://github.com/redhat-developer/yaml-language-server) in your editor
+(e.g. [VS Code](https://code.visualstudio.com/) via the [YAML extension](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml) or [Neovim](https://neovim.io/) via [lspconfig](https://github.com/neovim/nvim-lspconfig)).
+To associate `kimmdy.yml` files with KIMMDY, add the following to your
 
-```{.yaml filename='kimmdy.yml'}
-# yaml-language-server: $schema=/your/path/to/kimmdy-yaml-schema.json
+### VS Code settings
+
+```{.json filename='settings.json'}
+"yaml.schemas": {
+    "https://raw.githubusercontent.com/hits-mbm-dev/kimmdy/main/src/kimmdy/kimmdy-yaml-schema.json": "kimmdy.yml",
+}
 ```
 
-Once KIMMDY is public, you can replace the path with the following url:
+### Neovim settings
 
-```{.yaml filename='kimmdy.yml'}
-# yaml-language-server: $schema=https://raw.githubusercontent.com/hits-mbm-dev/kimmdy/main/src/kimmdy/kimmdy-yaml-schema.json
+```{.lua filename='init.lua'}
+require("lspconfig").yamlls.setup({
+  on_attach = on_attach,
+  capabilities = capabilities,
+  flags = lsp_flags,
+  settings = {
+    yaml = {
+      schemas = {
+        ["https://raw.githubusercontent.com/hits-mbm-dev/kimmdy/main/src/kimmdy/kimmdy-yaml-schema.json"] = "kimmdy.yml",
+      },
+    },
+  },
+})
 ```
 
 ## All Options

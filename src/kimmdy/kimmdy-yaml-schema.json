@@ -1,6 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
+  "$id": "https://raw.githubusercontent.com/hits-mbm-dev/kimmdy/main/src/kimmdy/kimmdy-yaml-schema.json",
   "additionalProperties": false,
   "required": ["sequence", "changer"],
   "properties": {
@@ -9,6 +10,12 @@
       "type": "boolean",
       "pytype": "bool",
       "default": false
+    },
+    "write_checkpoint": {
+      "description": "Write checkpoints to continue a KIMMDY run from. Default True",
+      "type": "boolean",
+      "pytype": "bool",
+      "default": true
     },
     "cwd": {
       "description": "Working directory. Default is current working directory",
@@ -96,7 +103,7 @@
       "default": "gmx"
     },
     "gmx_mdrun_flags": {
-      "description": "Flags passed to gmx mdrun. e.g. `-nt 8 -maxh 24`",
+      "description": "Flags passed to gmx mdrun. Default `-maxh 24 -dlb yes`",
       "type": "string",
       "pytype": "str",
       "default": "-maxh 24 -dlb yes"
@@ -241,13 +248,13 @@
       "additionalProperties": true,
       "properties": {
         "homolysis": {
-          "$ref": "../../plugins/default_reactions/src/homolysis/kimmdy-yaml-schema.json"
+          "$ref": "https://raw.githubusercontent.com/hits-mbm-dev/kimmdy/main/plugins/default_reactions/src/homolysis/kimmdy-yaml-schema.json"
         },
         "hat_naive": {
-          "$ref": "../../plugins/default_reactions/src/hat_naive/kimmdy-yaml-schema.json"
+          "$ref": "https://raw.githubusercontent.com/hits-mbm-dev/kimmdy/main/plugins/default_reactions/src/hat_naive/kimmdy-yaml-schema.json"
         },
         "dummyreaction": {
-          "$ref": "../../plugins/default_reactions/src/dummyreaction/kimmdy-yaml-schema.json"
+          "$ref": "https://raw.githubusercontent.com/hits-mbm-dev/kimmdy/main/plugins/default_reactions/src/dummyreaction/kimmdy-yaml-schema.json"
         }
       }
     },

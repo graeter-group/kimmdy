@@ -1,10 +1,8 @@
-# yaml-language-server: $schema=../../src/kimmdy/kimmdy-yaml-schema.json
-
 name: 'kimmdy_001'
 dryrun: false
 max_tasks: 10
 gromacs_alias: 'gmx'
-gmx_mdrun_flags: -maxh 24 -dlb yes -nt 8
+gmx_mdrun_flags: -maxh 24 -dlb yes -nt 8 -npme 0 -ntmpi 1
 ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
 top: 'topol.top'
 gro: 'npt.gro'

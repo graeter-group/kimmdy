@@ -2,6 +2,7 @@ dryrun: false
 max_tasks: 10
 out: 'test_out_001'
 gromacs_alias: 'gmx'
+gmx_mdrun_flags: -maxh 24 -dlb yes -nt 8 -npme 0 -ntmpi 1
 top: 'topol.top'
 gro: 'npt.gro'
 ndx: 'index_backbone.ndx'

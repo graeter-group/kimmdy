@@ -1,5 +1,3 @@
-# yaml-language-server: $schema=../../../../src/kimmdy/kimmdy-yaml-schema.json
-
 name: 'minimal'
 dryrun: true
 max_tasks: 0
@@ -7,7 +5,7 @@ gromacs_alias: 'gmx'
 top: 'minimal.top'
 gro: 'minimal.gro'
 ndx: 'minimal.ndx'
-gmx_mdrun_flags: -maxh 24 -dlb yes -nt 8
+gmx_mdrun_flags: -maxh 24 -dlb yes -nt 8 -npme 0 -ntmpi 1
 mds:
   prod:
     mdp: 'minimal.mdp'

@@ -1,11 +1,9 @@
-# yaml-language-server: $schema=../../../../src/kimmdy/kimmdy-yaml-schema.json
-
 dryrun: false
 name: 'hexalanine_homolysis_000'
 max_tasks: 100
 gromacs_alias: 'gmx'
-gmx_mdrun_flags: -maxh 24 -dlb yes -nt 8
-ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
+gmx_mdrun_flags: -maxh 24 -dlb yes -nt 8 -npme 0 -ntmpi 1
+ff: 'amber99sb-star-ildnp.ff'
 top: 'hexala_out.top'
 gro: 'npt.gro'
 ndx: 'index.ndx'

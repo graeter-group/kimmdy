@@ -86,11 +86,6 @@ Returns dissociation energy E_dissoc for a set of two atomnames.
 
 Returns the path to the gromacs installation
 
-This does not check if the installation is valid.
-It just returns the path to the gromacs data directory.
-If `gmx` is not executable it still returns the default
-gromacs data directory in `/usr/share/gromacs`.
-
 ### get_shell_stdout { #kimmdy.utils.get_shell_stdout }
 
 `utils.get_shell_stdout(s)`

@@ -194,9 +194,10 @@ class RunManager:
                 or self.config.max_hours == 0
             )
         ):
-            logger.info("Writing checkpoint before next task")
-            with open(self.cptfile, "wb") as f:
-                dill.dump(self, f)
+            if self.config.write_checkpoint:
+                logger.info("Writing checkpoint before next task")
+                with open(self.cptfile, "wb") as f:
+                    dill.dump(self, f)
             next(self)
 
         logger.info(
@@ -389,7 +390,6 @@ class RunManager:
             f"-px {instance}_pullx.xvg -pf {instance}_pullf.xvg "
             f"-ro {instance}-rotation.xvg -ra {instance}-rotangles.log "
             f"-rs {instance}-rotslabs.log -rt {instance}-rottorque.log "
-            "-npme 0 -ntmpi 1 "
             f"{gmx_mdrun_flags}  "
         )
 
