@@ -11,7 +11,7 @@
       "pytype": "bool",
       "default": false
     },
-    "checkpoints": {
+    "write_checkpoint": {
       "description": "Write checkpoints to continue a KIMMDY run from. Default True",
       "type": "boolean",
       "pytype": "bool",
