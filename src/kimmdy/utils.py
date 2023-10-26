@@ -41,7 +41,7 @@ class longFormatter(logging.Formatter):
 
 def run_shell_cmd(s, cwd=None) -> sp.CompletedProcess:
     """Run command in shell."""
-    return sp.run(s, shell=True, cwd=cwd)
+    return sp.run(s, shell=True, cwd=cwd, capture_output=True, text=True)
 
 
 def run_gmx(s: str, cwd=None) -> Optional[sp.CalledProcessError]:
@@ -52,6 +52,8 @@ def run_gmx(s: str, cwd=None) -> Optional[sp.CalledProcessError]:
     result = run_shell_cmd(f"{s} -quiet", cwd)
     if result.returncode != 0:
         logger.error(f"Gromacs process failed with exit code {result.returncode}.")
+        logger.error(f"Gromacs stdout:\n{result.stdout}.")
+        logger.error(f"Gromacs stderr:\n{result.stderr}.")
         result.check_returncode()
 
 
