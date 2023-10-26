@@ -25,6 +25,7 @@ cat-center.gro
 .*.npz
 .*.lock
 *.tail
+example/**/pycallgraph.png
 
 # tutorials and example output files
 guide/kimmdy-tutorial
