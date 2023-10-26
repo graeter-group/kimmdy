@@ -275,16 +275,17 @@ def _run(args: argparse.Namespace):
                     logger.error(
                         "pycallgraph2 needed for call visualization. Get it with `pip install pycallgraph2`"
                     )
+                    exit()
 
-                    out = GraphvizOutput()
-                    out.output_type = "svg"
-                    trace_filter = GlobbingFilter(
-                        exclude=["pycallgraph.*"],
-                        include=["kimmdy.*"],
-                    )
-                    vis_conf = Vis_conf(trace_filter=trace_filter)
-                    with PyCallGraph(output=out, config=vis_conf):
-                        runmgr.run()
+                out = GraphvizOutput()
+                out.output_type = "svg"
+                trace_filter = GlobbingFilter(
+                    exclude=["pycallgraph.*"],
+                    include=["kimmdy.*"],
+                )
+                vis_conf = Vis_conf(trace_filter=trace_filter)
+                with PyCallGraph(output=out, config=vis_conf):
+                    runmgr.run()
 
             else:
                 runmgr.run()
