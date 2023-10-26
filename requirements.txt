@@ -9,3 +9,4 @@ pydantic<2
 # -e ./plugins/grappa_interface
 -e .[analysis]
 -e ./plugins/default_reactions
+pycallgraph2
