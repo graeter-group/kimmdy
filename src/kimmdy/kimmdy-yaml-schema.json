@@ -18,7 +18,7 @@
       "default": true
     },
     "cwd": {
-      "description": "Working directory",
+      "description": "Working directory. Default is current working directory",
       "type": "string",
       "pytype": "Path"
     },
@@ -78,12 +78,6 @@
       "pytype": "float",
       "default": "1.0"
     },
-    "run": {
-      "description": "Replica number",
-      "type": "integer",
-      "pytype": "int",
-      "default": "1"
-    },
     "top": {
       "description": "Topology file",
       "type": "string",
@@ -97,13 +91,13 @@
       "default": "conf.gro"
     },
     "ndx": {
-      "description": "Index file",
+      "description": "Gromaxs index file",
       "type": "string",
       "pytype": "Path",
       "default": "index.ndx"
     },
     "gromacs_alias": {
-      "description": "Gromacs alias",
+      "description": "Gromacs alias. e.g. `gmx` or `mpirun gmx_mpi`",
       "type": "string",
       "pytype": "str",
       "default": "gmx"
@@ -126,12 +120,12 @@
       "pytype": "Path"
     },
     "tpr": {
-      "description": ".tpr file of a finished simulation for starting with reaction",
+      "description": ".tpr file of a finished simulation for starting directly with a reaction",
       "type": "string",
       "pytype": "Path"
     },
     "trr": {
-      "description": ".trr file of a finished simulation for starting with reaction",
+      "description": ".trr file of a finished simulation for starting directly with a reaction",
       "type": "string",
       "pytype": "Path"
     },
@@ -141,7 +135,7 @@
       "patternProperties": {
         ".*": {
           "type": "object",
-          "description":"Name of a MD instance",
+          "description":"Name of an MD step",
           "properties": {
             "mdp": {
               "type": "string",
@@ -170,12 +164,12 @@
           "properties": {
             "md": {
               "type": "string",
-              "description": "Which MD instance from the 'mds' section is used for relaxation MDs",
+              "description": "MD step from the 'mds' section that is used for relaxation MDs",
               "pytype": "str"
             },
             "slow_growth": {
               "type": "boolean",
-              "description": "Whether the chosen MD instance is a slow growth/free-energy simulation",
+              "description": "Whether the chosen MD step is a slow growth/free-energy simulation",
               "pytype": "bool",
               "default": false
             }
@@ -265,13 +259,13 @@
       }
     },
     "plot_rates" : {
-      "description": "Plot the reaction rates",
+      "description": "Plot the reaction rates during the reactions step",
       "type": "boolean",
       "pytype": "bool",
       "default": true
     },
     "save_recipes" : {
-      "description": "Save recipes as csv during `decide_reaction`",
+      "description": "Save recipes as csv during the reactions step",
       "type": "boolean",
       "pytype": "bool",
       "default": true
