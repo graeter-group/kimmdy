@@ -6,8 +6,7 @@ Reactive MD pipeline for GROMACS using Kinetic Monte Carlo / Molecular Dynamics 
 
 ## Installation
 
-| :exclamation:    | Some reactions need a GROMACS version patched with PLUMED, gromacs name should then contain `MODIFIED` or `plumed` |
-|---------------|:------------------------|
+**Note**: Some reactions need a GROMACS version patched with PLUMED, gromacs name should then contain `MODIFIED` or `plumed`.
 
 ### Bare Installation
 ```bash
