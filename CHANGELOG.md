@@ -1,5 +1,26 @@
 # Changelog
 
+## [5.1.0](https://github.com/hits-mbm-dev/kimmdy/compare/v5.0.0...v5.1.0) (2023-10-27)
+
+
+### Features
+
+* adjust resnum of a moving hydrogen ([#312](https://github.com/hits-mbm-dev/kimmdy/issues/312)) ([481cd84](https://github.com/hits-mbm-dev/kimmdy/commit/481cd84582620a6ee486253638a7ed1db2299934))
+* Checkpoints optional ([#311](https://github.com/hits-mbm-dev/kimmdy/issues/311)) ([5e93913](https://github.com/hits-mbm-dev/kimmdy/commit/5e939139c867f51a7208049a2a94bef49947ebbf))
+* **ci:** publish to PyPi ([e513fb6](https://github.com/hits-mbm-dev/kimmdy/commit/e513fb645c38ca2b3e791262b8c43c9baa1f8f49))
+* **dev:** visualize call graph with Pycallgraph ([#303](https://github.com/hits-mbm-dev/kimmdy/issues/303)) ([ab6ffe5](https://github.com/hits-mbm-dev/kimmdy/commit/ab6ffe527041d76cedc3cc5edeb893c297ddb47d))
+* show gmx errors in log. fixes [#260](https://github.com/hits-mbm-dev/kimmdy/issues/260) ([#313](https://github.com/hits-mbm-dev/kimmdy/issues/313)) ([489eb2d](https://github.com/hits-mbm-dev/kimmdy/commit/489eb2d9c0927db2a5a52712bef2632c15f89037))
+
+
+### Bug Fixes
+
+* id in scheme ([a597bba](https://github.com/hits-mbm-dev/kimmdy/commit/a597bbab89f87e8284c8e4aa4ba188468653ce92))
+
+
+### Documentation
+
+* add missing config descriptions and remove unused config.run option ([#305](https://github.com/hits-mbm-dev/kimmdy/issues/305)) ([1696f66](https://github.com/hits-mbm-dev/kimmdy/commit/1696f6679245ca0306d3d6fe021b594cbd11a24b))
+
 ## [5.0.0](https://github.com/hits-mbm-dev/kimmdy/compare/v4.4.1...v5.0.0) (2023-10-25)
 
 
