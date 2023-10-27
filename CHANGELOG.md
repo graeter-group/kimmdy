@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.1.6](https://github.com/hits-mbm-dev/kimmdy/compare/v5.1.5...v5.1.6) (2023-10-27)
+
+
+### Bug Fixes
+
+* **ci:** set markdown content type for description ([6dc116c](https://github.com/hits-mbm-dev/kimmdy/commit/6dc116c0568f27437b55acf5c9cedcf0e7ae0eec))
+
 ## [5.1.5](https://github.com/hits-mbm-dev/kimmdy/compare/v5.1.4...v5.1.5) (2023-10-27)
 
 
