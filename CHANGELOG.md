@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.1.1](https://github.com/hits-mbm-dev/kimmdy/compare/v5.1.0...v5.1.1) (2023-10-27)
+
+
+### Bug Fixes
+
+* **ci:** only build package on tag push 'stable' ([3a839a3](https://github.com/hits-mbm-dev/kimmdy/commit/3a839a32121de8b9c7cf3038a7cd3b16a36c68dc))
+
 ## [5.1.0](https://github.com/hits-mbm-dev/kimmdy/compare/v5.0.0...v5.1.0) (2023-10-27)
 
 
