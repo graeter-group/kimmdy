@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.1.2](https://github.com/hits-mbm-dev/kimmdy/compare/v5.1.1...v5.1.2) (2023-10-27)
+
+
+### Bug Fixes
+
+* **ci:** unify release workflow ([488779f](https://github.com/hits-mbm-dev/kimmdy/commit/488779fc4271c9112136d5c1e9f4496f433fc0c1))
+
 ## [5.1.1](https://github.com/hits-mbm-dev/kimmdy/compare/v5.1.0...v5.1.1) (2023-10-27)
 
 
