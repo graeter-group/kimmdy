@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.1.4](https://github.com/hits-mbm-dev/kimmdy/compare/v5.1.3...v5.1.4) (2023-10-27)
+
+
+### Bug Fixes
+
+* **ci:** markdown in readme ([8a41e39](https://github.com/hits-mbm-dev/kimmdy/commit/8a41e39e346e5c6aaaa25dde63eebbc821f9e2b7))
+
 ## [5.1.3](https://github.com/hits-mbm-dev/kimmdy/compare/v5.1.2...v5.1.3) (2023-10-27)
 
 
