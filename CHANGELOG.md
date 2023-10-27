@@ -1,5 +1,13 @@
 # Changelog
 
+## [5.1.3](https://github.com/hits-mbm-dev/kimmdy/compare/v5.1.2...v5.1.3) (2023-10-27)
+
+
+### Bug Fixes
+
+* **ci:** add testpyi ([390217b](https://github.com/hits-mbm-dev/kimmdy/commit/390217b5f29cce34e784437f053f0f8a6e1e1222))
+* setup.cfg long description type ([1c31db5](https://github.com/hits-mbm-dev/kimmdy/commit/1c31db5ec26399699df0465aa21f401dbda421e5))
+
 ## [5.1.2](https://github.com/hits-mbm-dev/kimmdy/compare/v5.1.1...v5.1.2) (2023-10-27)
 
 
