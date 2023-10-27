@@ -16,6 +16,7 @@ python -m venv .venv
 source .venv/bin/activate
 python -m pip install -e ./
 ```
+
 This installation includes only the most basic functionality as no plugins and analysis tool dependencies are installed. Plugins can be installed using `python -m pip install -e ./` in their module directories (e.g. `kimmdy/plugins/default_reactions`). The analysis tool dependencies can be installed with `python -m pip install -e ./[analysis]` in `kimmdy/`.
 
 ### Full installation
@@ -35,6 +36,7 @@ cd kimmdy
 pip install -r requirements.txt
 pip install -e ./[parameterization_plugins]
 ```
+
 Other ways to install kimmdy with all plugins are currently discouraged because of the high number of dependencies.
 
 ## Documentation
@@ -70,10 +72,9 @@ quarto preview # Should open the documentation in your standard browser
 
 For developoment, we provide a docker image containing gromacs and multiple python versions to test against.  
 To run the test locally, you must:
+
 - install docker
-- install [act](https://github.com/nektos/act), easiest option is with github cli
-    - install github cli (`gh`)
-    - `gh extension install https://github.com/nektos/gh-act`
+- install [act](https://github.com/nektos/act), the easiest option is with github cli via `gh extension install https://github.com/nektos/gh-act`
 - run tests with `gh extension exec act -j test --artifact-server-path ./artifacts`
-    - customize which python versions to test in `tox.ini` 
-    - html coverage report is exported into `artifacts`
+- html coverage report is exported into `artifacts`
+
