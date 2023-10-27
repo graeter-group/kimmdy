@@ -1,11 +1,35 @@
-name: Publish Python 🐍 distribution 📦 to PyPI and TestPyPI
+name: release-please
 on:
   push:
-    tags:
-      - stable
+    branches: [ main ]
 
 jobs:
+  release:
+    runs-on: ubuntu-latest
+    outputs:
+      created: ${{ steps.release.outputs.release_created }}
+    steps:
+      - uses: google-github-actions/release-please-action@v3
+        id: release
+        with:
+          release-type: python
+          package-name: kimmdy
+          changelog-notes-type: default
+      - uses: actions/checkout@v3
+      - name: tag stable versions
+        if: ${{ steps.release.outputs.release_created }}
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email github-actions[bot]@users.noreply.github.com
+          git remote add gh-token "https://${{ secrets.GITHUB_TOKEN }}@github.com/google-github-actions/release-please-action.git"
+          git tag -d stable || true
+          git push origin :stable || true
+          git tag -a stable -m "Last Stable Release"
+          git push origin stable
+
   build:
+    needs: release
+    if: ${{ needs.release.outputs.created }}
     name: Build distribution 📦
     runs-on: ubuntu-latest
 
@@ -32,9 +56,11 @@ jobs:
   publish-to-pypi:
     name: >-
       Publish Python 🐍 distribution 📦 to PyPI
-    if: startsWith(github.ref, 'refs/tags/')  # only publish to PyPI on tag pushes
+    # if: startsWith(github.ref, 'refs/tags/')  # only publish to PyPI on tag pushes
+    if: ${{ needs.release.outputs.created }}
     needs:
     - build
+    - release
     runs-on: ubuntu-latest
     environment:
       name: pypi
