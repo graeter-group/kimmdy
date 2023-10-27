@@ -88,7 +88,12 @@ class Config:
                 if general_subscheme is not None:
                     general_subscheme.update(subscheme)
                     subscheme = general_subscheme
-                assert subscheme is not None, (k, v, scheme)
+                if subscheme is None:
+                    raise RuntimeError(
+                        "Config could not be generated. \nCheck installed "
+                        "plugins with --show-plugins and your input .yml\n"
+                        f"k: {k}\nv: {v}\nscheme: {scheme}"
+                    )
                 subsection = f"{section}.{k}"
                 subconfig = Config(
                     recursive_dict=v, scheme=subscheme, section=subsection
