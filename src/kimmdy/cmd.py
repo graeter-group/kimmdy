@@ -188,21 +188,23 @@ def _run(args: argparse.Namespace):
     if args.show_plugins:
         discover_plugins()
 
-        print("Available reaction plugins:")
+        print("\nAvailable reaction plugins:")
         for plugin in reaction_plugins:
             print(plugin)
 
-        print("Found but not loadable reaction plugins:")
+        print("\nFound but not loadable reaction plugins:")
         for plugin in broken_reaction_plugins:
             print(plugin)
+            print(f"\tException: {broken_reaction_plugins[plugin]}")
 
-        print("Available parameterization plugins:")
+        print("\nAvailable parameterization plugins:")
         for plugin in parameterization_plugins:
             print(plugin)
 
-        print("Found but not loadable parameterization plugins:")
+        print("\nFound but not loadable parameterization plugins:")
         for plugin in broken_parameterization_plugins:
             print(plugin)
+            print(f"\tException: {broken_parameterization_plugins[plugin]}")
 
         exit()
 
