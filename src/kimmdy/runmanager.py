@@ -443,7 +443,7 @@ class RunManager:
             if len(set(strategies)) > 1:
                 raise RuntimeError(
                     "Incompatible kmc algorithms chosen in the same reaction.\n"
-                    "Split the reactions in separate steps or chose different algorithms\n"
+                    "Split the reactions in separate steps or choose different algorithms\n"
                     "Attempted to combine:\n"
                     f"{ {rp.name:rp.config.kmc for rp in self.reaction_plugins} }"
                 )
@@ -475,7 +475,8 @@ class RunManager:
         logger = files.logger
         self.recipe_collection.aggregate_reactions()
         logger.info(
-            f"Start Decide recipe, {len(self.recipe_collection.recipes)} available"
+            f"Start Decide recipe using {self.kmc_algorithm}, "
+            f"{len(self.recipe_collection.recipes)} recipes available."
         )
         kmc = self.kmc_mapping[self.kmc_algorithm.lower()]
         if "extrande" in self.kmc_algorithm.lower():
