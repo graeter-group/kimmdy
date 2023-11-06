@@ -5,8 +5,10 @@ hypothesis
 jupyter
 git+https://github.com/machow/quartodoc.git   
 pydantic<2
-# git+ssh://git@github.com/hits-mbm-dev/grappa.git
-# -e ./plugins/grappa_interface
 -e .[analysis]
--e ./plugins/default_reactions
 pycallgraph2
+# git+ssh://git@github.com/hits-mbm-dev/grappa.git
+## replace with path to your local copy of the plugins
+## for plugin development and kimmdy testing
+-e ../kimmdy-grappa
+-e ../kimmdy-reactions

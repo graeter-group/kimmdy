@@ -248,13 +248,13 @@
       "additionalProperties": true,
       "properties": {
         "homolysis": {
-          "$ref": "https://raw.githubusercontent.com/hits-mbm-dev/kimmdy/main/plugins/default_reactions/src/homolysis/kimmdy-yaml-schema.json"
+          "$ref": "https://raw.githubusercontent.com/hits-mbm-dev/kimmdy-reactions/main/src/homolysis/kimmdy-yaml-schema.json"
         },
         "hat_naive": {
-          "$ref": "https://raw.githubusercontent.com/hits-mbm-dev/kimmdy/main/plugins/default_reactions/src/hat_naive/kimmdy-yaml-schema.json"
+          "$ref": "https://raw.githubusercontent.com/hits-mbm-dev/kimmdy-reactions/main/src/hat_naive/kimmdy-yaml-schema.json"
         },
         "dummyreaction": {
-          "$ref": "https://raw.githubusercontent.com/hits-mbm-dev/kimmdy/main/plugins/default_reactions/src/dummyreaction/kimmdy-yaml-schema.json"
+          "$ref": "https://raw.githubusercontent.com/hits-mbm-dev/kimmdy-reactions/main/src/dummyreaction/kimmdy-yaml-schema.json"
         }
       }
     },
