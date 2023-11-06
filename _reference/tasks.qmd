@@ -23,14 +23,6 @@ Dictionary that gets populated by calling get_missing.
 
 `tasks.Task(self, runmng, f, kwargs=None, out=None)`
 
-A task to be performed as as a step in the RunManager.
-
-A task consists of a function and its keyword arguments.
-Calling a taks calls the stored function.
-The function must return a TaskFiles object.
-
-
-
 #### Parameters:
 
 runmng
@@ -45,17 +37,6 @@ out
 ### TaskFiles { #kimmdy.tasks.TaskFiles }
 
 `tasks.TaskFiles(get_latest, input=field(default_factory=dict), output=field(default_factory=dict), outputdir=Path(), logger=logging.getLogger('kimmdy.basetask'))`
-
-Class for Task input and output files and directories.
-
-Hosts the input and output file paths belonging to a task.
-A function or method that wants to be callable as a Task
-has to return a TaskFiles object.
-The input defaultdict is populated on the fly using
-get_latest of the runmanager to find newest files.
-Files which can not be found by get_latest must be added manually.
-
-
 
 #### Atributes
 
