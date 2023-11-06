@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.1.7](https://github.com/hits-mbm-dev/kimmdy/compare/v5.1.6...v5.1.7) (2023-11-06)
+
+
+### Bug Fixes
+
+* always write system and molecules top sections last ([c49aa9c](https://github.com/hits-mbm-dev/kimmdy/commit/c49aa9c552cfacd605121c39a17846226b84c0c0))
+
 ## [5.1.6](https://github.com/hits-mbm-dev/kimmdy/compare/v5.1.5...v5.1.6) (2023-10-27)
 
 
