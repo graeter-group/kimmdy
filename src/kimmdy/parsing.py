@@ -384,6 +384,7 @@ def write_top(top: TopologyDict, outfile: Path):
             f.write("#endif\n")
 
     with open(outfile, "w") as f:
+        # write defines first
         define = top.get("define")
         if define is not None:
             for name, value in define.items():
@@ -391,7 +392,7 @@ def write_top(top: TopologyDict, outfile: Path):
                 f.write("\n")
 
         for name, section in top.items():
-            if name in ["define", "ffdir"]:
+            if name in ["define", "ffdir", "system", "molecules"]:
                 continue
             f.write("\n")
             subsections = section.get("subsections")
@@ -399,6 +400,16 @@ def write_top(top: TopologyDict, outfile: Path):
             if subsections is not None:
                 for name, section in subsections.items():
                     write_section(f, name, section)
+
+        # write system and molecules last
+        for name in ["system", "molecules"]:
+            section = top.get(name)
+            if section is not None:
+                f.write("\n")
+                write_section(f, name, section)
+
+
+
 
 
 ## Plumed
