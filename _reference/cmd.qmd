@@ -34,7 +34,8 @@ Run KIMMDY from the command line.
 
 The configuration is gathered from the input file,
 which is `kimmdy.yml` by default.
-See [](`~kimmdy.cmd.get_cmdline_args`) or `kimmdy --help` for the descriptions of the arguments.
+See [](`~kimmdy.cmd.get_cmdline_args`) or `kimmdy --help`
+for the descriptions of the arguments.
 
 ### get_cmdline_args { #kimmdy.cmd.get_cmdline_args }
 
@@ -50,7 +51,7 @@ Parse command line arguments.
 
 ### kimmdy_run { #kimmdy.cmd.kimmdy_run }
 
-`cmd.kimmdy_run(input=Path('kimmdy.yml'), loglevel=None, logfile=None, checkpoint='', show_plugins=False, show_schema_path=False, generate_jobscript=False, debug=False)`
+`cmd.kimmdy_run(input=Path('kimmdy.yml'), loglevel=None, logfile=None, checkpoint='', show_plugins=False, show_schema_path=False, generate_jobscript=False, debug=False, callgraph=False)`
 
 Run KIMMDY from python.
 
