@@ -1,5 +1,13 @@
 # Changelog
 
+## [5.1.8](https://github.com/hits-mbm-dev/kimmdy/compare/v5.1.7...v5.1.8) (2023-11-07)
+
+
+### Bug Fixes
+
+* building docs ([99506c5](https://github.com/hits-mbm-dev/kimmdy/commit/99506c592d0a8e1e25eb9ff2566542f23dd40628))
+* tests with plugins ([218adf6](https://github.com/hits-mbm-dev/kimmdy/commit/218adf6b66455ec34c1dde5c33394cf5d81e0a05))
+
 ## [5.1.7](https://github.com/hits-mbm-dev/kimmdy/compare/v5.1.6...v5.1.7) (2023-11-06)
 
 
