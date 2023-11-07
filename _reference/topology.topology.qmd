@@ -40,7 +40,7 @@ One moleculetype in the topology
 
 ##### reindex_atomnrs { #kimmdy.topology.topology.MoleculeType.reindex_atomnrs }
 
-`topology.topology.MoleculeType.reindex_atomnrs(self)`
+`topology.topology.MoleculeType.reindex_atomnrs()`
 
 Reindex atom numbers in topology.
 
@@ -50,7 +50,7 @@ Returns a dict, mapping of old atom number strings to new ones
 
 ##### test_for_radicals { #kimmdy.topology.topology.MoleculeType.test_for_radicals }
 
-`topology.topology.MoleculeType.test_for_radicals(self)`
+`topology.topology.MoleculeType.test_for_radicals()`
 
 Updates radical status per atom and in topology.
 
@@ -89,7 +89,7 @@ Assumptions:
 
 ##### bind_bond { #kimmdy.topology.topology.Topology.bind_bond }
 
-`topology.topology.Topology.bind_bond(self, atompair_addresses)`
+`topology.topology.Topology.bind_bond(atompair_addresses)`
 
 Add a bond in topology.
 
@@ -106,7 +106,7 @@ Furthermore, it modifies to function types in the topology to account for radica
 
 ##### break_bond { #kimmdy.topology.topology.Topology.break_bond }
 
-`topology.topology.Topology.break_bond(self, atompair_addresses)`
+`topology.topology.Topology.break_bond(atompair_addresses)`
 
 Break bonds in topology homolytically.
 
@@ -122,7 +122,7 @@ Atom pairs become radicals.
 
 ##### del_atom { #kimmdy.topology.topology.Topology.del_atom }
 
-`topology.topology.Topology.del_atom(self, atom_nr, parameterize=True)`
+`topology.topology.Topology.del_atom(atom_nr, parameterize=True)`
 
 Deletes atom
 
@@ -144,7 +144,7 @@ parameters if requested.
 
 ##### reindex_atomnrs { #kimmdy.topology.topology.Topology.reindex_atomnrs }
 
-`topology.topology.Topology.reindex_atomnrs(self)`
+`topology.topology.Topology.reindex_atomnrs()`
 
 Reindex atom numbers in topology.
 
@@ -154,7 +154,7 @@ Returns a dict of all moleculetypes to their update maps (old -> new).
 
 ##### validate_bond { #kimmdy.topology.topology.Topology.validate_bond }
 
-`topology.topology.Topology.validate_bond(self, atm1, atm2)`
+`topology.topology.Topology.validate_bond(atm1, atm2)`
 
 Validates bond consistency between both atoms and top
 Returns True if bond exists, False if not.
