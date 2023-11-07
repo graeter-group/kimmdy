@@ -27,7 +27,7 @@ reconstruct base force field state
 
 ##### parameterize_topology { #kimmdy.plugins.BasicParameterizer.parameterize_topology }
 
-`plugins.BasicParameterizer.parameterize_topology(self, current_topology)`
+`plugins.BasicParameterizer.parameterize_topology(current_topology)`
 
 Do nothing,
 all necessary actions should already have happened in bind_bond and break_bond of Topology
@@ -53,7 +53,7 @@ Reaction base class
 
 ##### get_recipe_collection { #kimmdy.plugins.ReactionPlugin.get_recipe_collection }
 
-`plugins.ReactionPlugin.get_recipe_collection(self, files)`
+`plugins.ReactionPlugin.get_recipe_collection(files)`
 
 Get a RecipeCollection as a result of the reaction.
 
