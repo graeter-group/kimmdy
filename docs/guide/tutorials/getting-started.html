@@ -570,7 +570,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Our starting structure is a simple ACE/NME-capped Alanine molecule in a box of water. Note, how it has a missing hydrogen atom on the alpha carbon. This is a radical. We will use the builtin <code>hat_reaction</code> to simulate hydrogen atom transfer reactions from nearby hydrogens to the radical position.</p>
     <div id="app-vis-ala.molj" class="molstar-app"></div>
     <script type="text/javascript">
-    molstar.Viewer.create("app-vis-ala.molj", {"layoutShowLeftPanel":true,"layoutShowControls":false,"layoutShowRemoteState":false,"layoutShowLog":false,"emdbProvider":"rcsb","layoutIsExpanded":false,"pdbProvider":"rcsb","viewportShowExpand":true,"viewportShowAnimation":true,"viewportShowSelectionMode":false,"layoutShowSequence":false}).then(viewer => {
+    molstar.Viewer.create("app-vis-ala.molj", {"layoutShowLeftPanel":true,"pdbProvider":"rcsb","viewportShowAnimation":true,"layoutShowLog":false,"layoutShowRemoteState":false,"emdbProvider":"rcsb","viewportShowSelectionMode":false,"layoutIsExpanded":false,"layoutShowSequence":false,"viewportShowExpand":true,"layoutShowControls":false}).then(viewer => {
     viewer.loadSnapshotFromUrl(url="vis-ala.molj", "molj");    });
     </script>
     
@@ -606,7 +606,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="./img/getting-started-vmd-radicals.png" class="img-fluid figure-img"></p>
+<p><img src="./img/getting-started-radicals.png" class="img-fluid figure-img"></p>
 <figcaption>Radical population plot</figcaption>
 </figure>
 </div>
@@ -630,7 +630,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="next-steps" class="level2">
 <h2 class="anchored" data-anchor-id="next-steps">Next steps</h2>
 <ul>
-<li><a href="../../docs/kimmdy-input-file">Learn more about the KIMMDY input file</a></li>
+<li><a href="">Learn more about the KIMMDY input file</a></li>
 <li><a href="../../docs/reactions">Learn more about the builtin reaction plugins</a></li>
 <li><a href="../../docs/analysis">Learn more about the builtin analysis tools</a></li>
 </ul>

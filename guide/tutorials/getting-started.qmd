@@ -127,7 +127,7 @@ In VMD, color the atoms by beta factor to show the radical occupancy.
 
 ![VMD representation settings](./img/getting-started-vmd-radicals.png)
 
-![Radical population plot](./img/getting-started-vmd-radicals.png)
+![Radical population plot](./img/getting-started-radicals.png)
 
 Plot the reaction rates:
 
@@ -154,7 +154,7 @@ Congratulations, you have successfully run your first KIMMDY simulation!
 
 ## Next steps
 
-- [Learn more about the KIMMDY input file](/docs/kimmdy-input-file)
+- [Learn more about the KIMMDY input file]()
 - [Learn more about the builtin reaction plugins](/docs/reactions)
 - [Learn more about the builtin analysis tools](/docs/analysis)
 
