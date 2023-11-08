@@ -1,5 +1,13 @@
 # Changelog
 
+## [5.1.9](https://github.com/hits-mbm-dev/kimmdy/compare/v5.1.8...v5.1.9) (2023-11-08)
+
+
+### Bug Fixes
+
+* add dev dependencies to build docs on gh pages ([9bd83df](https://github.com/hits-mbm-dev/kimmdy/commit/9bd83dfa8eb17bcfebbca3c0e27462af0e095a50))
+* tox, ci ([1e3826a](https://github.com/hits-mbm-dev/kimmdy/commit/1e3826afdad54d2e6bb38c7d3b617d74198fc669))
+
 ## [5.1.8](https://github.com/hits-mbm-dev/kimmdy/compare/v5.1.7...v5.1.8) (2023-11-07)
 
 
