@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.1.10](https://github.com/hits-mbm-dev/kimmdy/compare/v5.1.9...v5.1.10) (2023-11-08)
+
+
+### Bug Fixes
+
+* discover plugins for building docs ([22018e4](https://github.com/hits-mbm-dev/kimmdy/commit/22018e42d0ccb3768379f82d68a5521f1985101e))
+
 ## [5.1.9](https://github.com/hits-mbm-dev/kimmdy/compare/v5.1.8...v5.1.9) (2023-11-08)
 
 
