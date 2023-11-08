@@ -1,4 +1,4 @@
-# 1. Run KIMMDY from Colbuilder fibril
+# Run KIMMDY from Colbuilder fibril
 
 ## Preparation
 

@@ -6,7 +6,7 @@ format:
     code-fold: true
 ---
 
-# 2. Writing a Reaction Plugin
+# Writing a Reaction Plugin
 
 In this tutorial, you will learn how to create your own reaction plugin in a GitHub repository.
 

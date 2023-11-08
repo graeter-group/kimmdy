@@ -1,7 +1,0 @@
----
-title: Guide
----
-
-Welcome to the KIMMDY documentation. Here you will find all the information you need to get started with KIMMDY.
-
-

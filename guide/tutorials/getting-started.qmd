@@ -1,11 +1,9 @@
 ---
 resources:
-  - 'vis-ala.molj'
-  - '../../example/alanine_hat_naive/Ala_out.top'
-  - '../../example/alanine_hat_naive/npt.gro'
+  - './getting-started-files/*'
 ---
 
-# 0. Getting Started
+# Getting Started
 
 Let's jump right in!
 
@@ -18,11 +16,11 @@ Let's jump right in!
 
 Optional:
 
-- `plumed`-patched version of `gromacs`
+- `plumed`-patched version of `gromacs` (for the homolysis reaction).
 
 ## Installation
 
-Let's first create a virtual environment for `kimmdy`:
+Let's first create a directory and a virtual environment for `kimmdy`:
 
 ```bash
 mkdir kimmdy-tutorial
@@ -31,20 +29,23 @@ python -m venv .venv
 source .venv/bin/activate
 ```
 
-Because we'll be using optional reaction plugins directly from the git repository, we'll need to install `kimmdy` from GitHub with the `plugins` extra:
-
+To install KIMMDY, the builtin reaction plugins and the analysis tools use
 
 ```bash
-# TODO: update with https instead of ssh when repo is public
-pip install 'git+ssh://git@github.com/hits-mbm-dev/kimmdy.git#egg=kimmdy[plugins]'
-# pip install 'git+ssh://git@github.com/hits-mbm-dev/kimmdy.git#egg&subdirectory=plugins'
-# pip install 'git+ssh://git@github.com/hits-mbm-dev/kimmdy.git@docs/config-completion#egg=kimmdy[plugins]'
+pip install kimmdy[reactions,analysis]
 ```
 
 ## Setup the Simulation
 
-Download the [example kimmdy.yml file](../../example/example_ala/kimmdy.yml) to this directory.
-It should look like this:
+Download and unzip the [input files](./getting-started-files/setup.zip) to this directory.
+
+```bash
+# TODO: add link to gihtub user content
+wget ...
+unzip setup.zip
+```
+
+The `kimmdy.yml` file should look like this:
 
 ```{.yaml filename='kimmdy.yml'}
 dryrun: false
@@ -76,28 +77,16 @@ sequence:
   - reactions
 ```
 
-Let's also fetch the other input files:
-
-- [Ala_out.top](/example/alanine_hat_naive/Ala_out.top)
-- [npt.gro](/example/alanine_hat_naive/npt.gro)
-- [cat-center.gro](/example/alanine_hat_naive/cat-center.gro)
-- [index.ndx](/example/alanine_hat_naive/index.ndx)
-- [md.mdp](/example/alanine_hat_naive/md.mdp)
-- [md_slow.mdp](/example/alanine_hat_naive/md_slow.mdp)
-- [minim.mdp](/example/alanine_hat_naive/minim.mdp)
-
-
-```bash
-# TODO: while dev, copy run in example dir
-# from KIMMDY root directory
-cd example/alanine_hat_naive
-```
 
 Our starting structure is a simple ACE/NME-capped Alanine molecule in a box of water.
+Note, how it has a missing hydrogen atom on the alpha carbon.
+This is a radical.
+We will use the builtin `hat_reaction` to simulate hydrogen atom transfer reactions
+from nearby hydrogens to the radical position.
 
 {{< mol-snapshot vis-ala.molj >}}
 
-Start a KIMMDY run with `kimmdy` command:
+Start the KIMMDY run with the `kimmdy` command:
 
 ## Run the Simulation
 
@@ -123,22 +112,35 @@ kimmdy-analysis trjcat alanine_hat_000 --open-vmd
 Check the energy of the system:
 
 ```bash
-kimmdy-analysis plot_energy alanine_hat_000 --open-plot --terms Potential Kinetic
+kimmdy-analysis energy alanine_hat_000 --open-plot --terms Potential Kinetic
 ```
 
-Visualize where the radical ended up:
+![Energy plot](./img/getting-started-energy.png)
+
+Visualize where the radicals end up:
 
 ```bash
 kimmdy-analysis radical_population alanine_hat_000 --open-plot --open-vmd
 ```
 
+In VMD, color the atoms by beta factor to show the radical occupancy.
+
+![VMD representation settings](./img/getting-started-vmd-radicals.png)
+
+![Radical population plot](./img/getting-started-vmd-radicals.png)
+
 Plot the reaction rates:
 
 ```bash
-kimmdy-analysis plot_rates alanine_hat_000
+kimmdy-analysis rates alanine_hat_000
 ```
 
-Or do all oft the above directly from python:
+In the `alanine_hat_000/analysis` directory you will then find a plot of rates
+for each possible reaction at every step they were queried, e.g.
+
+![Reaction rates plot](./img/getting-started-rates.svg)
+
+Or do all of the above directly from python:
 
 ```python
 from kimmdy.analysis import concat_trj, plot_energy, radical_population, plot_rates
@@ -147,5 +149,14 @@ plot_energy('alanine_hat_000', terms=['Potential', 'Kinetic'], open_plot=True)
 radical_population('alanine_hat_000', open_plot=True, open_vmd=True)
 plot_rates('alanine_hat_000')
 ```
+
+Congratulations, you have successfully run your first KIMMDY simulation!
+
+## Next steps
+
+- [Learn more about the KIMMDY input file](/docs/kimmdy-input-file)
+- [Learn more about the builtin reaction plugins](/docs/reactions)
+- [Learn more about the builtin analysis tools](/docs/analysis)
+
 
 

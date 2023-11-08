@@ -1,5 +1,7 @@
 ---
 title: Tutorials
+listing:
+  type: table
 ---
 
 Tutorials to help you get familiar with KIMMDY.
