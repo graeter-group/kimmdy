@@ -8,7 +8,7 @@
 
 <meta name="author" content="Jannik Buhr">
 
-<title>KIMMDY - Getting Started</title>
+<title>KIMMDY - Get Started</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -133,7 +133,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span class="menu-text">Getting Started</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../../guide/how_to/index.html"> 
+    <a class="nav-link" href="../../guide/how-to/index.html"> 
 <span class="menu-text">How-To</span></a>
   </li>  
   <li class="nav-item">
@@ -209,8 +209,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../../guide/how_to/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">How-To</span></a>
+            <a href="../../guide/explanation/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Explanations</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -218,22 +218,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../guide/how_to/contribute.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Contribute</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../guide/how_to/hcp.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">High Performance Computing</span></a>
+  <a href="../../guide/explanation/topology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visualize Topologies</span></a>
   </div>
 </li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../../guide/explanation/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Explanations</span></a>
+            <a href="../../guide/how-to/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">How-To</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -241,8 +235,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../guide/explanation/topology.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Visualize Topologies</span></a>
+  <a href="../../guide/how-to/contribute.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Contribute</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guide/how-to/hcp.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">High Performance Computing</span></a>
   </div>
 </li>
       </ul>
@@ -491,7 +491,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../guide/options.html">Guide</a></li><li class="breadcrumb-item"><a href="../../guide/tutorials/index.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../../guide/tutorials/getting-started.html">Getting Started</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Getting Started</h1>
+<h1 class="title">Get Started</h1>
   <div class="quarto-categories">
     <div class="quarto-category">user</div>
   </div>
@@ -581,7 +581,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Our starting structure is a simple ACE/NME-capped Alanine molecule in a box of water. Note, how it has a missing hydrogen atom on the alpha carbon. This is a radical. We will use the builtin <code>hat_reaction</code> to simulate hydrogen atom transfer reactions from nearby hydrogens to the radical position.</p>
     <div id="app-vis-ala.molj" class="molstar-app"></div>
     <script type="text/javascript">
-    molstar.Viewer.create("app-vis-ala.molj", {"viewportShowAnimation":true,"layoutIsExpanded":false,"pdbProvider":"rcsb","layoutShowRemoteState":false,"emdbProvider":"rcsb","layoutShowLog":false,"layoutShowControls":false,"viewportShowSelectionMode":false,"viewportShowExpand":true,"layoutShowSequence":false,"layoutShowLeftPanel":true}).then(viewer => {
+    molstar.Viewer.create("app-vis-ala.molj", {"layoutShowRemoteState":false,"viewportShowAnimation":true,"layoutShowLog":false,"layoutShowLeftPanel":true,"layoutIsExpanded":false,"layoutShowControls":false,"emdbProvider":"rcsb","viewportShowExpand":true,"viewportShowSelectionMode":false,"pdbProvider":"rcsb","layoutShowSequence":false}).then(viewer => {
     viewer.loadSnapshotFromUrl(url="vis-ala.molj", "molj");    });
     </script>
     

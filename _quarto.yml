@@ -27,7 +27,7 @@ website:
     left:
       - file: ./guide/tutorials/getting-started.qmd
         text: Getting Started 
-      - file: ./guide/how_to/index.qmd
+      - file: ./guide/how-to/index.qmd
         text: How-To
       - file: ./guide/tutorials/index.qmd
         text: Tutorials

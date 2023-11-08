@@ -9,7 +9,7 @@
 <meta name="author" content="Eric Hartmann">
 <meta name="description" content="In this tutorial, you will learn how to create your own reaction plugin in a GitHub repository.">
 
-<title>KIMMDY - Writing a Reaction Plugin</title>
+<title>KIMMDY - Write a Reaction Plugin</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -131,7 +131,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span class="menu-text">Getting Started</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../../guide/how_to/index.html"> 
+    <a class="nav-link" href="../../guide/how-to/index.html"> 
 <span class="menu-text">How-To</span></a>
   </li>  
   <li class="nav-item">
@@ -207,8 +207,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../../guide/how_to/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">How-To</span></a>
+            <a href="../../guide/explanation/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Explanations</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -216,22 +216,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../guide/how_to/contribute.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Contribute</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../guide/how_to/hcp.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">High Performance Computing</span></a>
+  <a href="../../guide/explanation/topology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visualize Topologies</span></a>
   </div>
 </li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../../guide/explanation/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Explanations</span></a>
+            <a href="../../guide/how-to/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">How-To</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -239,8 +233,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../guide/explanation/topology.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Visualize Topologies</span></a>
+  <a href="../../guide/how-to/contribute.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Contribute</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guide/how-to/hcp.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">High Performance Computing</span></a>
   </div>
 </li>
       </ul>
@@ -489,7 +489,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../guide/options.html">Guide</a></li><li class="breadcrumb-item"><a href="../../guide/tutorials/index.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../../guide/tutorials/write-plugin.html">Writing a Reaction Plugin</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Writing a Reaction Plugin</h1>
+<h1 class="title">Write a Reaction Plugin</h1>
   <div class="quarto-categories">
     <div class="quarto-category">developer</div>
   </div>
@@ -530,7 +530,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="main-code">Main code</h3>
 <p>A reaction plugin has to be a derived class from the <code>ReactionPlugin</code> base class. Such a class has the attributes <code>name</code>, <code>runmng</code> and <code>config</code> and the method <code>get_recipe_collection</code>, which takes a <code>TaskFiles</code> object as argument and returns a <code>RecipeCollection</code>.</p>
 <p>The <code>name</code> is a simple string and may be useful for logging. <code>runmng</code> is the central <code>RunManager</code> of a kimmdy run and has plenty of useful attributes for your plugin, especially the system <code>Topology</code>, which can be accessed via <code>self.runmg.top</code>. <code>config</code> contains the reaction plugin configuration as specified in the kimmdy configuration file (typically named kimmdy.yml). A <code>RecipeCollection</code> contains <code>Recipe</code>s with predefined <code>RecipeStep</code>s that can be used to define the modification to the system for the reaction. A <code>Recipe</code> also contains the <code>rates</code> of the specified reaction and the <code>timespans</code> during which the corresponding rates are valid. An example plugin can be seen below.</p>
-<div id="104e0c01" class="cell" data-execution_count="1">
+<div id="50d28062" class="cell" data-execution_count="1">
 <details>
 <summary>Plugin main code (reaction.py)</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> kimmdy.recipe <span class="im">import</span> (</span>
@@ -627,7 +627,7 @@ Plugin schema (kimmdy-yaml-schema.json)
 <section id="making-a-python-package" class="level2">
 <h2 class="anchored" data-anchor-id="making-a-python-package">Making a python package</h2>
 <p>It is necessary to make the plugin a python package to interface with Kimmdy. For this, package setup configuration files are necessary, for example <code>setup.py</code> and <code>setup.cfg</code>. In <code>setup.cfg</code> dependencies can be specified, which will be installed alongside the plugin. The interface with kimmdy is specified in the <code>[options.entry_points]</code> section. This section needs to refer to the class we created in the plugin main code and assign it to <code>kimmdy.reaction_plugins</code>, i.e.&nbsp;<code>kimmdy.reaction_plugins = bind = &lt;path&gt;.&lt;to&gt;.&lt;main file&gt;:&lt;ClassName&gt;</code>. Also, the directory containing the source code (typically <code>src</code>) is defined in <code>[options.packages.find]</code>. An example for <code>setup.py</code> and <code>setup.cfg</code> can be found below.</p>
-<div id="0e62d021" class="cell" data-execution_count="2">
+<div id="d2d26e94" class="cell" data-execution_count="2">
 <details>
 <summary>setup.py</summary>
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> setuptools <span class="im">import</span> setup</span>

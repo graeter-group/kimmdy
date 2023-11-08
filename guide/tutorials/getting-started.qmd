@@ -1,5 +1,5 @@
 ---
-title: Getting Started
+title: Get Started
 resources:
   - './getting-started-files/*'
 image: ./img/getting-started-vmd-radicals.png
