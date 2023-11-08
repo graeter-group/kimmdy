@@ -570,7 +570,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Our starting structure is a simple ACE/NME-capped Alanine molecule in a box of water. Note, how it has a missing hydrogen atom on the alpha carbon. This is a radical. We will use the builtin <code>hat_reaction</code> to simulate hydrogen atom transfer reactions from nearby hydrogens to the radical position.</p>
     <div id="app-vis-ala.molj" class="molstar-app"></div>
     <script type="text/javascript">
-    molstar.Viewer.create("app-vis-ala.molj", {"layoutShowLeftPanel":true,"pdbProvider":"rcsb","viewportShowAnimation":true,"layoutShowLog":false,"layoutShowRemoteState":false,"emdbProvider":"rcsb","viewportShowSelectionMode":false,"layoutIsExpanded":false,"layoutShowSequence":false,"viewportShowExpand":true,"layoutShowControls":false}).then(viewer => {
+    molstar.Viewer.create("app-vis-ala.molj", {"pdbProvider":"rcsb","layoutShowRemoteState":false,"layoutShowControls":false,"viewportShowExpand":true,"viewportShowAnimation":true,"layoutIsExpanded":false,"layoutShowLog":false,"emdbProvider":"rcsb","viewportShowSelectionMode":false,"layoutShowLeftPanel":true,"layoutShowSequence":false}).then(viewer => {
     viewer.loadSnapshotFromUrl(url="vis-ala.molj", "molj");    });
     </script>
     
@@ -630,7 +630,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="next-steps" class="level2">
 <h2 class="anchored" data-anchor-id="next-steps">Next steps</h2>
 <ul>
-<li><a href="">Learn more about the KIMMDY input file</a></li>
+<li>[Learn more about the KIMMDY input file]()</li>
 <li><a href="../../docs/reactions">Learn more about the builtin reaction plugins</a></li>
 <li><a href="../../docs/analysis">Learn more about the builtin analysis tools</a></li>
 </ul>

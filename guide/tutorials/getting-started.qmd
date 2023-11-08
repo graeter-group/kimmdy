@@ -154,7 +154,7 @@ Congratulations, you have successfully run your first KIMMDY simulation!
 
 ## Next steps
 
-- [Learn more about the KIMMDY input file]()
+- [Learn more about the KIMMDY input file]()
 - [Learn more about the builtin reaction plugins](/docs/reactions)
 - [Learn more about the builtin analysis tools](/docs/analysis)
 
