@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.1.11](https://github.com/hits-mbm-dev/kimmdy/compare/v5.1.10...v5.1.11) (2023-11-08)
+
+
+### Documentation
+
+* clean up docs and error messages ([#325](https://github.com/hits-mbm-dev/kimmdy/issues/325)) ([7458940](https://github.com/hits-mbm-dev/kimmdy/commit/74589405f998406847f54faa514d290c2c6a4564))
+
 ## [5.1.10](https://github.com/hits-mbm-dev/kimmdy/compare/v5.1.9...v5.1.10) (2023-11-08)
 
 
