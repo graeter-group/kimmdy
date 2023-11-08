@@ -1,5 +1,7 @@
 ---
 title: Explanations
+listing:
+  type: table
 ---
 
 Pages that help you understand the inner workings of KIMMDY

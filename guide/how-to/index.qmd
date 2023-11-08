@@ -1,5 +1,8 @@
 ---
 title: How-To
+listing:
+  type: table
 ---
+
 
 How-To Guides
