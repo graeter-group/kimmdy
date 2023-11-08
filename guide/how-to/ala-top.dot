@@ -1,0 +1,14 @@
+
+        graph G {
+          layout=neato
+          overlap=true
+          node [shape="circle"]
+    "1 C"  -- "2 O" ;
+"1 C"  -- "3 N" ;
+"1 C"  -- "6 N" ;
+"3 N"  -- "4 H" ;
+"3 N"  -- "5 H" ;
+"6 N"  -- "7 H" ;
+"6 N"  -- "8 H" ;
+        }
+    

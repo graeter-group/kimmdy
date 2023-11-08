@@ -27,8 +27,12 @@ website:
     left:
       - file: ./guide/tutorials/getting-started.qmd
         text: Getting Started 
-      - file: ./guide/index.qmd
-        text: Guide
+      - file: ./guide/how-to/index.qmd
+        text: How-To
+      - file: ./guide/tutorials/index.qmd
+        text: Tutorials
+      - file: ./guide/explanation/index.qmd
+        text: Explanations
       - file: _reference/index.qmd
         text: Reference
   sidebar:
@@ -37,7 +41,7 @@ website:
     contents:
       - section: Guide
         contents: guide/**
-      - section: Reference
+      - section: Function Reference
         contents:
         - _reference/index.qmd
         - contents:

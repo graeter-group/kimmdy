@@ -1,0 +1,31 @@
+[
+  {
+    "listing": "/guide/how_to/index.html",
+    "items": [
+      "/guide/how_to/contribute.html",
+      "/guide/how_to/hcp.html",
+      "/guide/how_to/plugins.html"
+    ]
+  },
+  {
+    "listing": "/guide/tutorials/index.html",
+    "items": [
+      "/guide/tutorials/getting-started.html",
+      "/guide/tutorials/colbuilder.html",
+      "/guide/tutorials/write-plugin.html"
+    ]
+  },
+  {
+    "listing": "/guide/explanation/index.html",
+    "items": [
+      "/guide/explanation/topology.html"
+    ]
+  },
+  {
+    "listing": "/guide/how-to/index.html",
+    "items": [
+      "/guide/how-to/contribute.html",
+      "/guide/how-to/hcp.html"
+    ]
+  }
+]

@@ -409,9 +409,6 @@ def write_top(top: TopologyDict, outfile: Path):
                 write_section(f, name, section)
 
 
-
-
-
 ## Plumed
 class Plumed_dict(TypedDict):
     """Dict representation of a plumed.dat file."""

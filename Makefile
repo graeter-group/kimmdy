@@ -27,4 +27,4 @@ clear-docs:
 	rm -f _sidebar.yml
 
 format:
-	black src tests plugins
+	black src tests

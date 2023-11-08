@@ -104,6 +104,8 @@ class Config:
                 opts = scheme.get(k)
                 if opts is None:
                     m = f"Unknown option {section}.{k} found in config file."
+                    if "reactions." in section:
+                        m += "\nCheck installed plugins with --show-plugins and your input .yml"
                     raise ValueError(m)
                 pytype = opts.get("pytype")
                 if pytype is None:

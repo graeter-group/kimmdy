@@ -139,14 +139,6 @@ def get_cmdline_args() -> argparse.Namespace:
         "--show-plugins", action="store_true", help=("List available plugins")
     )
 
-    # flag to print path to yaml schema
-    parser.add_argument(
-        "--show-schema-path",
-        action="store_true",
-        help="Print path to yaml schema for use with yaml-language-server e.g."
-        " in VSCode and Neovim",
-    )
-
     # flag to print an example jobscript for slurm hpc clusters
     parser.add_argument(
         "--generate-jobscript",
