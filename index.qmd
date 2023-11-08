@@ -1,6 +1,1 @@
-# KIMMDY
-
-Welcome to KIMMDY!
-
-Head over to the [Getting Started](/guide/tutorials/getting-started.qmd) section to jump right in.
-
+{{< include README.md >}}

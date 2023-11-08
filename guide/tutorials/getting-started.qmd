@@ -1,11 +1,14 @@
 ---
+title: Getting Started
 resources:
   - './getting-started-files/*'
+image: ./img/getting-started-vmd-radicals.png
+author: Jannik Buhr
+categories:
+  - user
 ---
 
-# Getting Started
-
-Let's jump right in!
+In this tutorial we will be simulating hydrogen atom transfer in a simple ACE/NME-capped Alanine molecule in a box of water.
 
 ## Installation
 
@@ -17,8 +20,6 @@ Let's jump right in!
 Optional:
 
 - `plumed`-patched version of `gromacs` (for the homolysis reaction).
-
-## Installation
 
 Let's first create a directory and a virtual environment for `kimmdy`:
 

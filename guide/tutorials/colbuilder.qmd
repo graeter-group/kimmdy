@@ -1,4 +1,13 @@
-# Run KIMMDY from Colbuilder fibril
+---
+title: Run KIMMDY from Colbuilder fibril
+author: Eric Hartmann
+image: ./img/colbuilder.png
+categories:
+  - user
+---
+
+In this tutorial we will download a collagen fibril from [colbuilder](https://colbuilder.h-its.org/)
+and run a KIMMDY simulation on it.
 
 ## Preparation
 

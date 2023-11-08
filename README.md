@@ -30,7 +30,7 @@ pip install kimmdy[reactions,analysis]
 
 ## Documentation
 
-The documentation is available on [GitHub Pages documentation](https://hits-mbm-dev.github.io/kimmdy/).
+The documentation is available [here](https://hits-mbm-dev.github.io/kimmdy/).
 
 ## Getting started
 

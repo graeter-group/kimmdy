@@ -1,12 +1,13 @@
 ---
+title: Writing a Reaction Plugin
+description: In this tutorial, you will learn how to create your own reaction plugin in a GitHub repository.
 execute:
   eval: false
 code-fold: true
+author: Eric Hartmann
+categories:
+  - developer
 ---
-
-# Writing a Reaction Plugin
-
-In this tutorial, you will learn how to create your own reaction plugin in a GitHub repository.
 
 ## Creating a GitHub repository
 
