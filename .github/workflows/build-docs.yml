@@ -23,10 +23,10 @@ jobs:
           version: "1.4.176"
       - name: Install dependencies
         run: |
-          python -m pip install .[plugins]
+          python -m pip install .[dev]
       - name: Build docs
         run: |
-          make docs
+          make setup-docs
       - name: Commit rendered docs
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
@@ -34,8 +34,7 @@ jobs:
           commit_user_name: "github-actions[bot]"
           commit_user_email: "github-actions[bot]@users.noreply.github.com"
           commit_author: "github-actions[bot] <github-actions[bot]@users.noreply.github.com>"
-      # TODO: uncomment when public (necessary for gh pages)
-      # - uses: peaceiris/actions-gh-pages@v3
-      #   with:
-      #     github_token: ${{ secrets.GITHUB_TOKEN }}
-      #     publish_dir: docs
+      - uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs

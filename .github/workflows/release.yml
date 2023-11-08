@@ -56,17 +56,15 @@ jobs:
   publish-to-pypi:
     name: >-
       Publish Python 🐍 distribution 📦 to PyPI
-    # if: startsWith(github.ref, 'refs/tags/')  # only publish to PyPI on tag pushes
     if: ${{ needs.release.outputs.created }}
     needs:
     - build
-    - release
     runs-on: ubuntu-latest
     environment:
       name: pypi
       url: https://pypi.org/p/kimmdy
     permissions:
-      id-token: write  # IMPORTANT: mandatory for trusted publishing
+      id-token: write
 
     steps:
     - name: Download all the dists
@@ -82,7 +80,6 @@ jobs:
     if: ${{ needs.release.outputs.created }}
     needs:
     - build
-    - release
     runs-on: ubuntu-latest
 
     environment:
@@ -90,7 +87,7 @@ jobs:
       url: https://test.pypi.org/p/kimmdy
 
     permissions:
-      id-token: write  # IMPORTANT: mandatory for trusted publishing
+      id-token: write
 
     steps:
     - name: Download all the dists

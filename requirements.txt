@@ -1,12 +1,4 @@
-pytest
-tox
-black
-hypothesis
-jupyter
-git+https://github.com/machow/quartodoc.git   
-pydantic<2
--e .[analysis]
-pycallgraph2
+-e .[devel]
 # git+ssh://git@github.com/hits-mbm-dev/grappa.git
 ## replace with path to your local copy of the plugins
 ## for plugin development and kimmdy testing
