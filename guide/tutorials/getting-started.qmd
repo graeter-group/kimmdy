@@ -154,9 +154,10 @@ Congratulations, you have successfully run your first KIMMDY simulation!
 
 ## Next steps
 
-- [Learn more about the KIMMDY input file]()
-- [Learn more about the builtin reaction plugins](/docs/reactions)
-- [Learn more about the builtin analysis tools](/docs/analysis)
+- [Learn more about the `kimmdy.yml` input file](../options.qmd)
+- [Run KIMMDY with a collagen fibril from Colbuilder](./colbuilder.qmd)
+- [Write your own reaction plugin](./write-plugin.qmd)
+- [Discover more plugins by looking for the `kimmdy` tag on GitHub](https://github.com/topics/kimmdy)
 
 
 

@@ -41,7 +41,7 @@ website:
     contents:
       - section: Guide
         contents: guide/**
-      - section: Reference
+      - section: Function Reference
         contents:
         - _reference/index.qmd
         - contents:

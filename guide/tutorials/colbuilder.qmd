@@ -71,7 +71,6 @@ For a KIMMDY run, some additional setup is required. A suitable KIMMDY config fi
   <summary>KIMMDY config file (kimmdy.yml)</summary>
 
 ```{.yml filename='kimmdy.yml'}
-# yaml-language-server: $schema=../../src/kimmdy/kimmdy-yaml-schema.json
 dryrun: false
 name: 'hexalanine_homolysis_000'
 max_tasks: 100

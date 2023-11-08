@@ -1,9 +1,7 @@
 ---
 execute:
   eval: false
-format:
-  html:
-    code-fold: true
+code-fold: true
 ---
 
 # Writing a Reaction Plugin
@@ -84,10 +82,11 @@ class BindReaction(ReactionPlugin):
 A plugin defines which variables it needs in a schema. The schema can contain default values and types of these variables. For a Kimmdy run, reaction plugin variables are defined in the configuration file (kimmdy.yml). An example schema can be seen below.
 
 
-```{python}
-#| code-fold: true
-#| code-summary: "Plugin schema (kimmdy-yaml-schema.json)"
+<details>
+  <summary>Plugin schema (kimmdy-yaml-schema.json)</summary>
 
+
+```{.json filename='kimmdy-yaml-schema.json'}
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
@@ -112,6 +111,8 @@ A plugin defines which variables it needs in a schema. The schema can contain de
 }
 ```
 
+</details>
+
 ## Making a python package
 
 It is necessary to make the plugin a python package to interface with Kimmdy. For this, package setup configuration files are necessary, for example `setup.py` and `setup.cfg`. In `setup.cfg` dependencies can be specified, which will be installed alongside the plugin. The interface with kimmdy is specified in the `[options.entry_points]` section. This section needs to refer to the class we created in the plugin main code and assign it to `kimmdy.reaction_plugins`, i.e. ` kimmdy.reaction_plugins = bind = <path>.<to>.<main file>:<ClassName>`. Also, the directory containing the source code (typically `src`) is defined in `[options.packages.find]`. An example for `setup.py` and `setup.cfg` can be found below.
@@ -125,10 +126,11 @@ from setuptools import setup
 setup()
 ```
 
-```{python}
-#| code-fold: true
-#| code-summary: "setup.cfg"
 
+<details>
+  <summary>setup.cfg</summary>
+
+```{.ini filename='setup.cfg'}
 [metadata]
 name = kimmdy-reactions
 version = 0.1
@@ -160,7 +162,14 @@ kimmdy.reaction_plugins =
     bind = bind.reaction:BindReaction
 ```
 
+</details>
+
 The main code and configuration schema file should then be moved to the specified source directory in a directory that has the name of the reaction plugin, i.e. `src/<plugin name>/`. 
+
+:::callout-tip
+By adding the `kimmdy` tag on GitHub you can make your plugin discoverable by other users.
+It will show up in [this list](https://github.com/topics/kimmdy)
+:::
 
 ## Improving code quality and reproducibility
 
