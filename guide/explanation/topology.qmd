@@ -142,7 +142,7 @@ for name, n in molecules.items():
 
 reactive_moleculetype = MoleculeType(("Reactive", "1"), atomics)
 top.moleculetypes["Reactive"] = reactive_moleculetype
-top.moleculetypes["Reactive"].atomics
+
 top._update_dict()
 ```
 
