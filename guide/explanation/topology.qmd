@@ -74,10 +74,12 @@ urea_dict = read_top(Path('../../tests/test_files/test_topology/urea-times-2.top
 urea = Topology(urea_dict)
 top = urea
 
-def get_mergable_molecules(top: Topology):
-  molecules = {}
+def extract_mergable_molecules(top: Topology):
+  reactive_molecules = {}
+  new_molecules = []
   started_merging = False
   stopped_merging = False
+  added_reactive_molecule = False
   for (m, n) in top.molecules.items():
     if is_not_solvent_or_ion(m):
       if stopped_merging:
@@ -87,12 +89,19 @@ def get_mergable_molecules(top: Topology):
         """
         raise ValueError(m)
       started_merging = True
-      molecules[m] = int(n)
-    elif started_merging:
-      stopped_merging = True
-    return molecules
+      reactive_molecules[m] = int(n)
+      if not added_reactive_molecule:
+        new_molecules += [("Reactive", "1")]
+        added_reactive_molecule = True
+    else:
+      if started_merging:
+        stopped_merging = True
+      new_molecules += [(m, n)]
 
-molecules = get_mergable_molecules(urea)
+  top.molecules = {k: v for k, v in new_molecules}
+  return reactive_molecules
+
+molecules = extract_mergable_molecules(urea)
 
 def increment_field(l: list[str], i: int, n: int):
   l[i] = str(int(l[i]) + n)
@@ -132,12 +141,12 @@ for name, n in molecules.items():
   del top.moleculetypes[name]
 
 reactive_moleculetype = MoleculeType(("Reactive", "1"), atomics)
-
-top.moleculetypes
+top.moleculetypes["Reactive"] = reactive_moleculetype
+top.moleculetypes["Reactive"].atomics
+top._update_dict()
 ```
 
 ```{python}
-
 write_top_as_dot(urea, "urea-2-top.dot")
 ```
 
