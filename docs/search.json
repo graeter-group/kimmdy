@@ -4,11 +4,7 @@
     "href": "guide/explanation/index.html",
     "title": "Explanations",
     "section": "",
-    "text": "Pages that help you understand the inner workings of KIMMDY\n\n\n\n\n\n\n   \n     \n     \n       Order By\n       Default\n         \n          Title\n        \n         \n          Author\n        \n     \n  \n    \n      \n      \n    \n\n\n\n\n\nTitle\n\n\nAuthor\n\n\n\n\n\n\nVisualize Topologies\n\n\n \n\n\n\n\n\nNo matching items\n\n Back to top",
-    "crumbs": [
-      "Guide",
-      "Explanations"
-    ]
+    "text": "Pages that help you understand the inner workings of KIMMDY\n\n\n\n\n\n\n   \n     \n     \n       Order By\n       Default\n         \n          Title\n        \n         \n          Author\n        \n     \n  \n    \n      \n      \n    \n\n\n\n\n\n\nTitle\n\n\nAuthor\n\n\n\n\n\n\nVisualize Topologies\n\n\n\n\n\n\n\n\n\nNo matching items\n\n Back to top"
   },
   {
     "objectID": "guide/how_to/hcp.html",
@@ -86,71 +82,42 @@
     "href": "guide/tutorials/colbuilder.html",
     "title": "Run KIMMDY from Colbuilder fibril",
     "section": "",
-    "text": "In this tutorial we will download a collagen fibril from colbuilder and run a KIMMDY simulation on it.",
-    "crumbs": [
-      "Guide",
-      "Tutorials",
-      "Run KIMMDY from Colbuilder fibril"
-    ]
+    "text": "In this tutorial we will download a collagen fibril from colbuilder and run a KIMMDY simulation on it."
   },
   {
     "objectID": "guide/tutorials/colbuilder.html#preparation",
     "href": "guide/tutorials/colbuilder.html#preparation",
     "title": "Run KIMMDY from Colbuilder fibril",
     "section": "Preparation",
-    "text": "Preparation\n\nDownload the desired model and the ff parameters for gromacs from colbuilder\nClean the force field files by moving amber99sb-star-ildnp.ff up to the working directory, adding residuetypes.dat and specbond.dat to the working directory, removing temporary files ._* and deleting the rest of collagen.ff\nConvert the pdb file to .gro format and create a unified topology file\n\n\n\n\n\n\n\nCaution\n\n\n\nDue to some issues in GROMACS, pdb2gmx may take a while (~16 hours). The majority of the time is actually spend on checks that happen just before the final lines are written to the file. It is possible to stop the process early and add the final lines manually.\n\n\ngmx pdb2gmx -f Homo_sapiens_aln_N_HLKNL_12_C_PYD_2_fibril.pdb -o fibril2.gro -ignh -water tip3p -merge all &lt;&lt;&lt;1",
-    "crumbs": [
-      "Guide",
-      "Tutorials",
-      "Run KIMMDY from Colbuilder fibril"
-    ]
+    "text": "Preparation\n\nDownload the desired model and the ff parameters for gromacs from colbuilder\nClean the force field files by moving amber99sb-star-ildnp.ff up to the working directory, adding residuetypes.dat and specbond.dat to the working directory, removing temporary files ._* and deleting the rest of collagen.ff\nConvert the pdb file to .gro format and create a unified topology file\n\n\n\n\n\n\n\nCaution\n\n\n\nDue to some issues in GROMACS, pdb2gmx may take a while (~16 hours). The majority of the time is actually spend on checks that happen just before the final lines are written to the file. It is possible to stop the process early and add the final lines manually.\n\n\ngmx pdb2gmx -f Homo_sapiens_aln_N_HLKNL_12_C_PYD_2_fibril.pdb -o fibril2.gro -ignh -water tip3p -merge all &lt;&lt;&lt;1"
   },
   {
     "objectID": "guide/tutorials/colbuilder.html#equilibration",
     "href": "guide/tutorials/colbuilder.html#equilibration",
     "title": "Run KIMMDY from Colbuilder fibril",
     "section": "Equilibration",
-    "text": "Equilibration\nmdp files for the following steps are located in &lt;kimmdy root&gt;/www/colbuilder_files.\ngmx editconf -f fibril.gro -o fibril_x.gro -c -princ  &lt;&lt;&lt;1\n\ngmx editconf -f fibril_x.gro -o fibril_z.gro -rotate 0 270 0 -c\n\ngmx editconf -f fibril_z.gro -o fibril_box.gro -c -box 16.3 17.7 95.0 -bt triclinic\n\ngmx solvate -cp fibril_box.gro -p topol.top -o fibril_solv.gro\n\ntouch ions.mdp\n\ngmx grompp -f ions.mdp -c fibril_solv.gro -p topol.top -o fibril_genion.tpr\n\ngmx genion -s fibril_genion.tpr -p topol.top -o fibril_ion.gro -conc 0.15 -neutral\n\ngmx grompp -f minim.mdp -c fibril_ion.gro -p topol.top -o pep_min.tpr\n\ngmx mdrun -deffnm pep_min -v\n\n\n\n\n\n\nCaution\n\n\n\nHeavy computational load from here on.\n\n\ngmx grompp -f nvt.mdp -c fibril_min.gro -r fibril_min.gro -p topol.top -o nvt.tpr\n\ngmx mdrun -deffnm nvt -v -dlb yes -ntomp 4 -ntmpi 10  -pme gpu -bonded gpu -npme 1\n\ngmx grompp -f npt.mdp -c nvt.gro -r nvt.gro -p topol.top -o npt.tpr\n\ngmx mdrun -deffnm npt -v -dlb yes -ntomp 4 -ntmpi 10  -pme gpu -bonded gpu -npme 1\n\n\n\n\n\n\nTip\n\n\n\nThe equilibration process can take up to 4 days. An equilibrated system will be provided in the release assets.",
-    "crumbs": [
-      "Guide",
-      "Tutorials",
-      "Run KIMMDY from Colbuilder fibril"
-    ]
+    "text": "Equilibration\nmdp files for the following steps are located in &lt;kimmdy root&gt;/www/colbuilder_files.\ngmx editconf -f fibril.gro -o fibril_x.gro -c -princ  &lt;&lt;&lt;1\n\ngmx editconf -f fibril_x.gro -o fibril_z.gro -rotate 0 270 0 -c\n\ngmx editconf -f fibril_z.gro -o fibril_box.gro -c -box 16.3 17.7 95.0 -bt triclinic\n\ngmx solvate -cp fibril_box.gro -p topol.top -o fibril_solv.gro\n\ntouch ions.mdp\n\ngmx grompp -f ions.mdp -c fibril_solv.gro -p topol.top -o fibril_genion.tpr\n\ngmx genion -s fibril_genion.tpr -p topol.top -o fibril_ion.gro -conc 0.15 -neutral\n\ngmx grompp -f minim.mdp -c fibril_ion.gro -p topol.top -o pep_min.tpr\n\ngmx mdrun -deffnm pep_min -v\n\n\n\n\n\n\nCaution\n\n\n\nHeavy computational load from here on.\n\n\ngmx grompp -f nvt.mdp -c fibril_min.gro -r fibril_min.gro -p topol.top -o nvt.tpr\n\ngmx mdrun -deffnm nvt -v -dlb yes -ntomp 4 -ntmpi 10  -pme gpu -bonded gpu -npme 1\n\ngmx grompp -f npt.mdp -c nvt.gro -r nvt.gro -p topol.top -o npt.tpr\n\ngmx mdrun -deffnm npt -v -dlb yes -ntomp 4 -ntmpi 10  -pme gpu -bonded gpu -npme 1\n\n\n\n\n\n\nTip\n\n\n\nThe equilibration process can take up to 4 days. An equilibrated system will be provided in the release assets."
   },
   {
     "objectID": "guide/tutorials/colbuilder.html#simulation",
     "href": "guide/tutorials/colbuilder.html#simulation",
     "title": "Run KIMMDY from Colbuilder fibril",
     "section": "Simulation",
-    "text": "Simulation\nFor a KIMMDY run, some additional setup is required. A suitable KIMMDY config file for homolysis can be found in the hexalanine_homolysis example:\n\n\nKIMMDY config file (kimmdy.yml)\n\n\n\nkimmdy.yml\n\ndryrun: false\nname: 'hexalanine_homolysis_000'\nmax_tasks: 100\ngromacs_alias: 'gmx'\ngmx_mdrun_flags: -maxh 24 -dlb yes -nt 8\nff: 'amber99sb-star-ildnp.ff'\ntop: 'hexala_out.top'\ngro: 'npt.gro'\nndx: 'index.ndx'\nplumed: 'plumed.dat'\nmds:\n  pull:\n    mdp: 'pull_fibril.mdp'\n  pull:\n    mdp: 'md.mdp'\n    use_plumed: true\n  relax:\n    mdp: 'md_slow_growth.mdp'\nchanger:\n  coordinates:\n    md: 'relax'\n    slow_growth: True\n  topology:\n    parameterization: 'basic' \nreactions:\n  homolysis:\n    edis: 'edissoc.dat'\n    itp: 'ffbonded.itp'\nsequence:\n  - equilibrium\n  - pull  \n  - reactions\n  - equilibrium\n  - pull\n\n\nThe config file mentions three important gromacs file for your system: top, gro, idx. We have the top and gro file from the equilibration and can update the file names in the config file. A basic index file can be generated with\necho 'q' | gmx make_ndx -f npt.gro\nThe next entry in the config file is plumed and references a plumed configuration file (plumed.dat) which we don’t yet have. This file is needed for the homolysis reaction plugin. In the reactions section, other files which are necessary for the homolysis reaction can also be seen: edissoc.dat and ffbonded.itp. The ffbonded.itp file is specific to the force field and can be copied from the force field directory. Edissoc.dat contains a table of bond dissociation energies by atom name and can be taken from the hexalanine_homolysis example if only standard amino acids and the HLKNL and PYD crosslinks are part of the system. For other crosslinks, the bond dissociation energy has to be provided by the user.\nIf the HLKNL and/or PYD are present in the system, their atom names need to be changed to unique names specified in edissoc.dat. A script for renaming HLKNL and PYD crosslink atom names in the gro and top file can be found in the tutorial files.\nFor homolysis, the plumed.dat file should contain instructions to sample distances between bonds. Homolysis can then occur for the bonds mentioned in this file. A script to create a plumed.dat file can be found in the turoail files. We want to sample homolysis in the backbone and in crosslinks. By providing a gromacs index file with all backbone and crosslink atoms, the script generates the necessary plumed.dat file. Such a index file can be generated with\necho 'backbone | r LY2 LY3_L4Y_L5Y_LYX' | gmx make_ndx -n index.ndx -o index.ndx\nNow let’s look at the sequence. It mentions the reactions, which we have taken care of, and the names of different md runs. A good first Kimmdy run would include a first pulling simulation to stretch the fibril followed by a pulling simulation with distance sampling for the subsequent reaction and a final pulling simulation. For both types of pulling simulation the same mdp file can be used from the tutorial files. The pulling simulations also need torque restraints to prevent unphysiological unwinding of the fibrils. The torque restraints are applied to the capping groups of a tripelhelix. For this, additional index groups are needed which can be generated with a script provided in the tutorial files (prepare_enforced_rotation.py). Bond distance sampling can be turned on for a md run by the tag use_plumed. Another md run, in this case called relax, is mentioned under changer.coordinates.md. It is used after the homolysis reaction to interpolate between new and old parameters. An example mdp file is included in the tutorial files.\nFinally, the KIMMDY run name and gmx_mdrun_flags can be adjusted. A final KIMMDY config file could look like this:\n\n\nKIMMDY config file (kimmdy.yml)\n\n\n\nkimmdy.yml\n\n# yaml-language-server: $schema=../../src/kimmdy/kimmdy-yaml-schema.json\n\ndryrun: false\nname: 'fibril_000'\nmax_tasks: 100\ngromacs_alias: 'gmx'\ngmx_mdrun_flags: -maxh 24 -dlb yes -ntomp 4 -ntmpi 10  -pme gpu -bonded gpu -npme 1\nff: 'amber99sb-star-ildnp.ff'\ntop: 'topol.top'\ngro: 'npt.gro'\nndx: 'index.ndx'\nplumed: 'plumed.dat'\nmds:\n  pull:\n    mdp: 'pull_fibril.mdp'\n  sample:\n    mdp: 'pull_fibril.mdp'\n    use_plumed: true\n  relax:\n    mdp: 'pull_fibril_slow_growth.mdp'\nchanger:\n  coordinates:\n    md: 'relax'\n    slow_growth: True\n  topology:\n    parameterization: 'basic' \nreactions:\n  homolysis:\n    edis: 'edissoc.dat'\n    itp: 'ffbonded.itp'\nsequence:\n  - pull\n  - sample  \n  - reactions\n  - pull\n\n\nThe run can be started by typing kimmdy in the command line. The output files are located in fibril_000",
-    "crumbs": [
-      "Guide",
-      "Tutorials",
-      "Run KIMMDY from Colbuilder fibril"
-    ]
+    "text": "Simulation\nFor a KIMMDY run, some additional setup is required. A suitable KIMMDY config file for homolysis can be found in the hexalanine_homolysis example:\n\n\nKIMMDY config file (kimmdy.yml)\n\n\n\nkimmdy.yml\n\ndryrun: false\nname: 'hexalanine_homolysis_000'\nmax_tasks: 100\ngromacs_alias: 'gmx'\ngmx_mdrun_flags: -maxh 24 -dlb yes -nt 8\nff: 'amber99sb-star-ildnp.ff'\ntop: 'hexala_out.top'\ngro: 'npt.gro'\nndx: 'index.ndx'\nplumed: 'plumed.dat'\nmds:\n  pull:\n    mdp: 'pull_fibril.mdp'\n  pull:\n    mdp: 'md.mdp'\n    use_plumed: true\n  relax:\n    mdp: 'md_slow_growth.mdp'\nchanger:\n  coordinates:\n    md: 'relax'\n    slow_growth: True\n  topology:\n    parameterization: 'basic' \nreactions:\n  homolysis:\n    edis: 'edissoc.dat'\n    itp: 'ffbonded.itp'\nsequence:\n  - equilibrium\n  - pull  \n  - reactions\n  - equilibrium\n  - pull\n\n\nThe config file mentions three important gromacs file for your system: top, gro, idx. We have the top and gro file from the equilibration and can update the file names in the config file. A basic index file can be generated with\necho 'q' | gmx make_ndx -f npt.gro\nThe next entry in the config file is plumed and references a plumed configuration file (plumed.dat) which we don’t yet have. This file is needed for the homolysis reaction plugin. In the reactions section, other files which are necessary for the homolysis reaction can also be seen: edissoc.dat and ffbonded.itp. The ffbonded.itp file is specific to the force field and can be copied from the force field directory. Edissoc.dat contains a table of bond dissociation energies by atom name and can be taken from the hexalanine_homolysis example if only standard amino acids and the HLKNL and PYD crosslinks are part of the system. For other crosslinks, the bond dissociation energy has to be provided by the user.\nIf the HLKNL and/or PYD are present in the system, their atom names need to be changed to unique names specified in edissoc.dat. A script for renaming HLKNL and PYD crosslink atom names in the gro and top file can be found in the tutorial files.\nFor homolysis, the plumed.dat file should contain instructions to sample distances between bonds. Homolysis can then occur for the bonds mentioned in this file. A script to create a plumed.dat file can be found in the turoail files. We want to sample homolysis in the backbone and in crosslinks. By providing a gromacs index file with all backbone and crosslink atoms, the script generates the necessary plumed.dat file. Such a index file can be generated with\necho 'backbone | r LY2 LY3_L4Y_L5Y_LYX' | gmx make_ndx -n index.ndx -o index.ndx\nNow let’s look at the sequence. It mentions the reactions, which we have taken care of, and the names of different md runs. A good first Kimmdy run would include a first pulling simulation to stretch the fibril followed by a pulling simulation with distance sampling for the subsequent reaction and a final pulling simulation. For both types of pulling simulation the same mdp file can be used from the tutorial files. The pulling simulations also need torque restraints to prevent unphysiological unwinding of the fibrils. The torque restraints are applied to the capping groups of a tripelhelix. For this, additional index groups are needed which can be generated with a script provided in the tutorial files (prepare_enforced_rotation.py). Bond distance sampling can be turned on for a md run by the tag use_plumed. Another md run, in this case called relax, is mentioned under changer.coordinates.md. It is used after the homolysis reaction to interpolate between new and old parameters. An example mdp file is included in the tutorial files.\nFinally, the KIMMDY run name and gmx_mdrun_flags can be adjusted. A final KIMMDY config file could look like this:\n\n\nKIMMDY config file (kimmdy.yml)\n\n\n\nkimmdy.yml\n\n# yaml-language-server: $schema=../../src/kimmdy/kimmdy-yaml-schema.json\n\ndryrun: false\nname: 'fibril_000'\nmax_tasks: 100\ngromacs_alias: 'gmx'\ngmx_mdrun_flags: -maxh 24 -dlb yes -ntomp 4 -ntmpi 10  -pme gpu -bonded gpu -npme 1\nff: 'amber99sb-star-ildnp.ff'\ntop: 'topol.top'\ngro: 'npt.gro'\nndx: 'index.ndx'\nplumed: 'plumed.dat'\nmds:\n  pull:\n    mdp: 'pull_fibril.mdp'\n  sample:\n    mdp: 'pull_fibril.mdp'\n    use_plumed: true\n  relax:\n    mdp: 'pull_fibril_slow_growth.mdp'\nchanger:\n  coordinates:\n    md: 'relax'\n    slow_growth: True\n  topology:\n    parameterization: 'basic' \nreactions:\n  homolysis:\n    edis: 'edissoc.dat'\n    itp: 'ffbonded.itp'\nsequence:\n  - pull\n  - sample  \n  - reactions\n  - pull\n\n\nThe run can be started by typing kimmdy in the command line. The output files are located in fibril_000"
   },
   {
     "objectID": "guide/tutorials/colbuilder.html#analysis",
     "href": "guide/tutorials/colbuilder.html#analysis",
     "title": "Run KIMMDY from Colbuilder fibril",
     "section": "Analysis",
-    "text": "Analysis\nTry the options in kimmdy-analysis to visualize your kimmdy run.",
-    "crumbs": [
-      "Guide",
-      "Tutorials",
-      "Run KIMMDY from Colbuilder fibril"
-    ]
+    "text": "Analysis\nTry the options in kimmdy-analysis to visualize your kimmdy run."
   },
   {
     "objectID": "guide/tutorials/index.html",
     "href": "guide/tutorials/index.html",
     "title": "Tutorials",
     "section": "",
-    "text": "Tutorials to help you get familiar with KIMMDY.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nGetting Started\n\n\n\n\n\n\nuser\n\n\n\n\n\n\n\n\n\nJannik Buhr\n\n\n\n\n\n\n\n\n\n\n\n\nRun KIMMDY from Colbuilder fibril\n\n\n\n\n\n\nuser\n\n\n\n\n\n\n\n\n\nEric Hartmann\n\n\n\n\n\n\n\n\n\n\n\n\nWriting a Reaction Plugin\n\n\n\n\n\n\ndeveloper\n\n\n\nIn this tutorial, you will learn how to create your own reaction plugin in a GitHub repository.\n\n\n\n\n\nEric Hartmann\n\n\n\n\n\n\nNo matching items\n\n Back to top",
-    "crumbs": [
-      "Guide",
-      "Tutorials"
-    ]
+    "text": "Tutorials to help you get familiar with KIMMDY.\n\n\n\n\n\n\n\n\n  \n\n\n\n\nGet Started\n\n\n\n\n\n\n\nuser\n\n\n\n\n\n\n\n\n\n\n\nJannik Buhr\n\n\n\n\n\n\n  \n\n\n\n\nRun KIMMDY from Colbuilder fibril\n\n\n\n\n\n\n\nuser\n\n\n\n\n\n\n\n\n\n\n\nEric Hartmann\n\n\n\n\n\n\n  \n\n\n\n\nWrite a Reaction Plugin\n\n\n\n\n\n\n\ndeveloper\n\n\n\n\nIn this tutorial, you will learn how to create your own reaction plugin in a GitHub repository.\n\n\n\n\n\n\nEric Hartmann\n\n\n\n\n\n\nNo matching items\n\n Back to top"
   },
   {
     "objectID": "_reference/dummyreaction.reaction.DummyReaction.html",
@@ -391,7 +358,7 @@
     "href": "index.html",
     "title": "KIMMDY",
     "section": "",
-    "text": "Reactive MD pipeline for GROMACS using Kinetic Monte Carlo / Molecular Dynamics (KIMMDY)\n\n\nNote: KIMMDY requires GROMACS to be installed. Some reactions need a GROMACS version patched with PLUMED. The gromacs version name should then contain MODIFIED or plumed.\npip install kimmdy\nThis installation includes only the most basic functionality as no plugins and analysis tools are installed.\nTo install the builtin reaction plugins, use\npip install kimmdy[reactions]\nTo install the builtin reactions and analysis tools use\npip install kimmdy[reactions,analysis]\n\n\n\nThe documentation is available here.\n\n\n\nHead over to the getting started tutorial.\n\n\n\n\n\nClone kimmdy and the default reaction and parameterization plugins and install requirements and kimmdy as editable via\ngit clone git@github.com:hits-mbm-dev/kimmdy.git\ngit clone git@github.com:hits-mbm-dev/kimmdy-reactions.git\ngit clone git@github.com:hits-mbm-dev/kimmdy-grappa.git\ncd kimmdy\npython -m venv .venv\nsource ./venv/bin/activate\npip install -r requirements.txt\nConventions:\n\ncode style: black\ndocstrings: numpy\nConventional commit messages when possible for pretty release notes.\n\n\n\n\nFor developoment, we provide a docker image containing gromacs and multiple python versions to test against.\nTo run the test locally, you must:\n\ninstall docker\ninstall act, the easiest option is with github cli via gh extension install https://github.com/nektos/gh-act\nrun tests with gh extension exec act -j test --artifact-server-path ./artifacts\nhtml coverage report is exported into artifacts"
+    "text": "tests on latest release\n\n\nReactive MD pipeline for GROMACS using Kinetic Monte Carlo / Molecular Dynamics (KIMMDY)\n\n\nNote: KIMMDY requires GROMACS to be installed. Some reactions need a GROMACS version patched with PLUMED. The gromacs version name should then contain MODIFIED or plumed.\npip install kimmdy\nThis installation includes only the most basic functionality as no plugins and analysis tools are installed.\nTo install the builtin reaction plugins, use\npip install kimmdy[reactions]\nTo install the builtin reactions and analysis tools use\npip install kimmdy[reactions,analysis]\n\n\n\nThe documentation is available here.\n\n\n\nHead over to the getting started tutorial.\n\n\n\n\n\nClone kimmdy and the default reaction and parameterization plugins and install requirements and kimmdy as editable via\ngit clone git@github.com:hits-mbm-dev/kimmdy.git\ngit clone git@github.com:hits-mbm-dev/kimmdy-reactions.git\ngit clone git@github.com:hits-mbm-dev/kimmdy-grappa.git\ncd kimmdy\npython -m venv .venv\nsource ./venv/bin/activate\npip install -r requirements.txt\nConventions:\n\ncode style: black\ndocstrings: numpy\nConventional commit messages when possible for pretty release notes.\n\n\n\n\nFor developoment, we provide a docker image containing gromacs and multiple python versions to test against.\nTo run the test locally, you must:\n\ninstall docker\ninstall act, the easiest option is with github cli via gh extension install https://github.com/nektos/gh-act\nrun tests with gh extension exec act -j test --artifact-server-path ./artifacts\nhtml coverage report is exported into artifacts"
   },
   {
     "objectID": "_reference/topology.atomic.html",
@@ -613,24 +580,14 @@
     "href": "guide/tutorials/getting-started.html",
     "title": "Get Started",
     "section": "",
-    "text": "In this tutorial we will be simulating hydrogen atom transfer in a simple ACE/NME-capped Alanine molecule in a box of water.",
-    "crumbs": [
-      "Guide",
-      "Tutorials",
-      "Getting Started"
-    ]
+    "text": "In this tutorial we will be simulating hydrogen atom transfer in a simple ACE/NME-capped Alanine molecule in a box of water."
   },
   {
     "objectID": "guide/tutorials/getting-started.html#installation",
     "href": "guide/tutorials/getting-started.html#installation",
     "title": "Get Started",
     "section": "Installation",
-    "text": "Installation\n\nPrerequisites\n\npython3.9 or higher\ngromacs (tested with version 2021.4, gmx should be available in the PATH)\n\nOptional:\n\nplumed-patched version of gromacs (for the homolysis reaction).\n\nLet’s first create a directory and a virtual environment for kimmdy:\nmkdir kimmdy-tutorial\ncd kimmdy-tutorial\npython -m venv .venv\nsource .venv/bin/activate\nTo install KIMMDY, the builtin reaction plugins and the analysis tools use\npip install kimmdy[reactions,analysis]",
-    "crumbs": [
-      "Guide",
-      "Tutorials",
-      "Getting Started"
-    ]
+    "text": "Installation\n\nPrerequisites\n\npython3.9 or higher\ngromacs (tested with version 2021.4, gmx should be available in the PATH)\n\nOptional:\n\nplumed-patched version of gromacs (for the homolysis reaction).\n\nLet’s first create a directory and a virtual environment for kimmdy:\nmkdir kimmdy-tutorial\ncd kimmdy-tutorial\npython -m venv .venv\nsource .venv/bin/activate\nTo install KIMMDY, the builtin reaction plugins and the analysis tools use\npip install kimmdy[reactions,analysis]"
   },
   {
     "objectID": "guide/tutorials/getting-started.html#installation-1",
@@ -649,96 +606,56 @@
     "href": "guide/tutorials/getting-started.html#setup-the-simulation",
     "title": "Get Started",
     "section": "Setup the Simulation",
-    "text": "Setup the Simulation\nDownload and unzip the input files to this directory.\n# TODO: add link to gihtub user content\nwget ...\nunzip setup.zip\nThe kimmdy.yml file should look like this:\n\n\nkimmdy.yml\n\ndryrun: false\nmax_tasks: 100\nname: 'hat_tf_000'\ngromacs_alias: 'gmx'\ntop: 'Ala_out.top'\ngro: 'npt.gro'\nndx: 'index.ndx'\nmds:\n  equilibrium:\n    mdp: 'md.mdp'\n  relax:\n    mdp: 'md_slow.mdp'\nchanger:\n  coordinates:\n    md: 'relax'      \nreactions:\n  hat_reaction:\n    frequency_factor: 100000000\n    h_cutoff: 3\n    polling_rate: 1\n\nsequence:\n- equilibrium\n- mult: 2\n  tasks:\n  - equilibrium\n  - reactions\n\nOur starting structure is a simple ACE/NME-capped Alanine molecule in a box of water. Note, how it has a missing hydrogen atom on the alpha carbon. This is a radical. We will use the builtin hat_reaction to simulate hydrogen atom transfer reactions from nearby hydrogens to the radical position.\n    \n    \n    \nStart the KIMMDY run with the kimmdy command:",
-    "crumbs": [
-      "Guide",
-      "Tutorials",
-      "Getting Started"
-    ]
+    "text": "Setup the Simulation\nDownload and unzip the input files to this directory.\n# TODO: add link to gihtub user content\nwget ...\nunzip setup.zip\nThe kimmdy.yml file should look like this:\n\n\nkimmdy.yml\n\ndryrun: false\nmax_tasks: 100\nname: 'hat_tf_000'\ngromacs_alias: 'gmx'\ntop: 'Ala_out.top'\ngro: 'npt.gro'\nndx: 'index.ndx'\nmds:\n  equilibrium:\n    mdp: 'md.mdp'\n  relax:\n    mdp: 'md_slow.mdp'\nchanger:\n  coordinates:\n    md: 'relax'      \nreactions:\n  hat_reaction:\n    frequency_factor: 100000000\n    h_cutoff: 3\n    polling_rate: 1\n\nsequence:\n- equilibrium\n- mult: 2\n  tasks:\n  - equilibrium\n  - reactions\n\nOur starting structure is a simple ACE/NME-capped Alanine molecule in a box of water. Note, how it has a missing hydrogen atom on the alpha carbon. This is a radical. We will use the builtin hat_reaction to simulate hydrogen atom transfer reactions from nearby hydrogens to the radical position.\n    \n    \n    \nStart the KIMMDY run with the kimmdy command:"
   },
   {
     "objectID": "guide/tutorials/getting-started.html#run-the-simulation",
     "href": "guide/tutorials/getting-started.html#run-the-simulation",
     "title": "Get Started",
     "section": "Run the Simulation",
-    "text": "Run the Simulation\nkimmdy\nYou can also run kimmdy directly from python with\nfrom kimmdy.cmd import kimmdy_run\nkimmdy_run()",
-    "crumbs": [
-      "Guide",
-      "Tutorials",
-      "Getting Started"
-    ]
+    "text": "Run the Simulation\nkimmdy\nYou can also run kimmdy directly from python with\nfrom kimmdy.cmd import kimmdy_run\nkimmdy_run()"
   },
   {
     "objectID": "guide/tutorials/getting-started.html#analyse-the-simulation",
     "href": "guide/tutorials/getting-started.html#analyse-the-simulation",
     "title": "Get Started",
     "section": "Analyse the Simulation",
-    "text": "Analyse the Simulation\nConcatenate the trajectories from the individual steps into one for viewing:\nkimmdy-analysis trjcat alanine_hat_000 --open-vmd\nCheck the energy of the system:\nkimmdy-analysis energy alanine_hat_000 --open-plot --terms Potential Kinetic\n\n\n\nEnergy plot\n\n\nVisualize where the radicals end up:\nkimmdy-analysis radical_population alanine_hat_000 --open-plot --open-vmd\nIn VMD, color the atoms by beta factor to show the radical occupancy.\n\n\n\nVMD representation settings\n\n\n\n\n\nRadical population plot\n\n\nPlot the reaction rates:\nkimmdy-analysis rates alanine_hat_000\nIn the alanine_hat_000/analysis directory you will then find a plot of rates for each possible reaction at every step they were queried, e.g.\n\n\n\nReaction rates plot\n\n\nOr do all of the above directly from python:\nfrom kimmdy.analysis import concat_trj, plot_energy, radical_population, plot_rates\nconcat_trj('alanine_hat_000', open_vmd=True)\nplot_energy('alanine_hat_000', terms=['Potential', 'Kinetic'], open_plot=True)\nradical_population('alanine_hat_000', open_plot=True, open_vmd=True)\nplot_rates('alanine_hat_000')\nCongratulations, you have successfully run your first KIMMDY simulation!",
-    "crumbs": [
-      "Guide",
-      "Tutorials",
-      "Getting Started"
-    ]
+    "text": "Analyse the Simulation\nConcatenate the trajectories from the individual steps into one for viewing:\nkimmdy-analysis trjcat alanine_hat_000 --open-vmd\nCheck the energy of the system:\nkimmdy-analysis energy alanine_hat_000 --open-plot --terms Potential Kinetic\n\n\n\nEnergy plot\n\n\nVisualize where the radicals end up:\nkimmdy-analysis radical_population alanine_hat_000 --open-plot --open-vmd\nIn VMD, color the atoms by beta factor to show the radical occupancy.\n\n\n\nVMD representation settings\n\n\n\n\n\nRadical population plot\n\n\nPlot the reaction rates:\nkimmdy-analysis rates alanine_hat_000\nIn the alanine_hat_000/analysis directory you will then find a plot of rates for each possible reaction at every step they were queried, e.g.\n\n\n\nReaction rates plot\n\n\nOr do all of the above directly from python:\nfrom kimmdy.analysis import concat_trj, plot_energy, radical_population, plot_rates\nconcat_trj('alanine_hat_000', open_vmd=True)\nplot_energy('alanine_hat_000', terms=['Potential', 'Kinetic'], open_plot=True)\nradical_population('alanine_hat_000', open_plot=True, open_vmd=True)\nplot_rates('alanine_hat_000')\nCongratulations, you have successfully run your first KIMMDY simulation!"
   },
   {
     "objectID": "guide/tutorials/write-plugin.html",
     "href": "guide/tutorials/write-plugin.html",
     "title": "Write a Reaction Plugin",
     "section": "",
-    "text": "By creating a GitHub repository, you have version control for your plugin and can share it with others. To set it up, follow these instructions.",
-    "crumbs": [
-      "Guide",
-      "Tutorials",
-      "Writing a Reaction Plugin"
-    ]
+    "text": "By creating a GitHub repository, you have version control for your plugin and can share it with others. To set it up, follow these instructions."
   },
   {
     "objectID": "guide/tutorials/write-plugin.html#creating-a-github-repository",
     "href": "guide/tutorials/write-plugin.html#creating-a-github-repository",
     "title": "Write a Reaction Plugin",
     "section": "",
-    "text": "By creating a GitHub repository, you have version control for your plugin and can share it with others. To set it up, follow these instructions.",
-    "crumbs": [
-      "Guide",
-      "Tutorials",
-      "Writing a Reaction Plugin"
-    ]
+    "text": "By creating a GitHub repository, you have version control for your plugin and can share it with others. To set it up, follow these instructions."
   },
   {
     "objectID": "guide/tutorials/write-plugin.html#adding-the-functionality-of-the-plugin",
     "href": "guide/tutorials/write-plugin.html#adding-the-functionality-of-the-plugin",
     "title": "Write a Reaction Plugin",
     "section": "Adding the functionality of the plugin",
-    "text": "Adding the functionality of the plugin\n\nMain code\nA reaction plugin has to be a derived class from the ReactionPlugin base class. Such a class has the attributes name, runmng and config and the method get_recipe_collection, which takes a TaskFiles object as argument and returns a RecipeCollection.\nThe name is a simple string and may be useful for logging. runmng is the central RunManager of a kimmdy run and has plenty of useful attributes for your plugin, especially the system Topology, which can be accessed via self.runmg.top. config contains the reaction plugin configuration as specified in the kimmdy configuration file (typically named kimmdy.yml). A RecipeCollection contains Recipes with predefined RecipeSteps that can be used to define the modification to the system for the reaction. A Recipe also contains the rates of the specified reaction and the timespans during which the corresponding rates are valid. An example plugin can be seen below.\n\n\nPlugin main code (reaction.py)\nfrom kimmdy.recipe import (\n    Bind,\n    Recipe,\n    RecipeCollection,\n)\nfrom kimmdy.plugins import ReactionPlugin\nfrom kimmdy.tasks import TaskFiles\nfrom kimmdy.utils import (\n    get_atomnrs_from_plumedid,\n)\nfrom kimmdy.parsing import (\n    read_plumed,\n    read_distances_dat,\n)\n\n\nclass BindReaction(ReactionPlugin):\n    \"\"\"Reaction to bind two particles if they are in proximity\n    \"\"\"\n\n    def get_recipe_collection(self, files: TaskFiles):\n        logger = files.logger\n        logger.debug(\"Getting recipe for reaction: Bind\")\n\n        # get cutoff distance from config, unit is [nm]\n        cutoff = self.config.distance\n\n        # Initialization of objects from files\n        distances = read_distances_dat(files.input[\"plumed_out\"])\n        plumed = read_plumed(files.input[\"plumed\"])\n\n        recipes = []\n        # check distances file for values lower than the cutoff\n        for plumedid, dists in distances.items():\n            if plumedid == \"time\":\n                continue\n            # checks only last frame\n            if dists[-1] &lt; cutoff:\n                # get atomnrs from plumedid \n                atomnrs = get_atomnrs_from_plumedid(plumedid, plumed)\n                recipes.append(\n                    Recipe(\n                        recipe_steps=[\n                            Bind(atom_id_1=atomnrs[0], atom_id_2=atomnrs[1]),\n                        ],\n                        rates=[1],\n                        timespans=[(distances[\"time\"][0], distances[\"time\"][-1])],\n                    )\n                )\n\n        return RecipeCollection(recipes)\n\n\n\n\nConfiguration file schema\nA plugin defines which variables it needs in a schema. The schema can contain default values and types of these variables. For a Kimmdy run, reaction plugin variables are defined in the configuration file (kimmdy.yml). An example schema can be seen below.\n\n\nPlugin schema (kimmdy-yaml-schema.json)\n\n\n\nkimmdy-yaml-schema.json\n\n{\n  \"$schema\": \"https://json-schema.org/draft/2020-12/schema\",\n  \"type\": \"object\",\n  \"$id\": \"bind-config\",\n  \"description\": \"Settings for bind reactions\",\n  \"additionalProperties\": false,\n  \"properties\": {\n    \"distance\": {\n      \"description\": \"Cutoff distance for two particles to bind [nm]\",\n      \"type\": \"float\",\n      \"pytype\": \"float\"\n    },\n    \"kmc\": {\n      \"description\": \"KMC algorithm for this reaction.\",\n      \"type\": \"string\",\n      \"pytype\": \"str\",\n      \"enum\": [\"rfkmc\", \"frm\", \"extrande\"],\n      \"default\": \"rfkmc\"\n    }\n  },\n  \"required\": [\"distance\"]\n}",
-    "crumbs": [
-      "Guide",
-      "Tutorials",
-      "Writing a Reaction Plugin"
-    ]
+    "text": "Adding the functionality of the plugin\n\nMain code\nA reaction plugin has to be a derived class from the ReactionPlugin base class. Such a class has the attributes name, runmng and config and the method get_recipe_collection, which takes a TaskFiles object as argument and returns a RecipeCollection.\nThe name is a simple string and may be useful for logging. runmng is the central RunManager of a kimmdy run and has plenty of useful attributes for your plugin, especially the system Topology, which can be accessed via self.runmg.top. config contains the reaction plugin configuration as specified in the kimmdy configuration file (typically named kimmdy.yml). A RecipeCollection contains Recipes with predefined RecipeSteps that can be used to define the modification to the system for the reaction. A Recipe also contains the rates of the specified reaction and the timespans during which the corresponding rates are valid. An example plugin can be seen below.\n\n\nPlugin main code (reaction.py)\nfrom kimmdy.recipe import (\n    Bind,\n    Recipe,\n    RecipeCollection,\n)\nfrom kimmdy.plugins import ReactionPlugin\nfrom kimmdy.tasks import TaskFiles\nfrom kimmdy.utils import (\n    get_atomnrs_from_plumedid,\n)\nfrom kimmdy.parsing import (\n    read_plumed,\n    read_distances_dat,\n)\n\n\nclass BindReaction(ReactionPlugin):\n    \"\"\"Reaction to bind two particles if they are in proximity\n    \"\"\"\n\n    def get_recipe_collection(self, files: TaskFiles):\n        logger = files.logger\n        logger.debug(\"Getting recipe for reaction: Bind\")\n\n        # get cutoff distance from config, unit is [nm]\n        cutoff = self.config.distance\n\n        # Initialization of objects from files\n        distances = read_distances_dat(files.input[\"plumed_out\"])\n        plumed = read_plumed(files.input[\"plumed\"])\n\n        recipes = []\n        # check distances file for values lower than the cutoff\n        for plumedid, dists in distances.items():\n            if plumedid == \"time\":\n                continue\n            # checks only last frame\n            if dists[-1] &lt; cutoff:\n                # get atomnrs from plumedid \n                atomnrs = get_atomnrs_from_plumedid(plumedid, plumed)\n                recipes.append(\n                    Recipe(\n                        recipe_steps=[\n                            Bind(atom_id_1=atomnrs[0], atom_id_2=atomnrs[1]),\n                        ],\n                        rates=[1],\n                        timespans=[(distances[\"time\"][0], distances[\"time\"][-1])],\n                    )\n                )\n\n        return RecipeCollection(recipes)\n\n\n\n\nConfiguration file schema\nA plugin defines which variables it needs in a schema. The schema can contain default values and types of these variables. For a Kimmdy run, reaction plugin variables are defined in the configuration file (kimmdy.yml). An example schema can be seen below.\n\n\nPlugin schema (kimmdy-yaml-schema.json)\n\n\n\nkimmdy-yaml-schema.json\n\n{\n  \"$schema\": \"https://json-schema.org/draft/2020-12/schema\",\n  \"type\": \"object\",\n  \"$id\": \"bind-config\",\n  \"description\": \"Settings for bind reactions\",\n  \"additionalProperties\": false,\n  \"properties\": {\n    \"distance\": {\n      \"description\": \"Cutoff distance for two particles to bind [nm]\",\n      \"type\": \"float\",\n      \"pytype\": \"float\"\n    },\n    \"kmc\": {\n      \"description\": \"KMC algorithm for this reaction.\",\n      \"type\": \"string\",\n      \"pytype\": \"str\",\n      \"enum\": [\"rfkmc\", \"frm\", \"extrande\"],\n      \"default\": \"rfkmc\"\n    }\n  },\n  \"required\": [\"distance\"]\n}"
   },
   {
     "objectID": "guide/tutorials/write-plugin.html#making-a-python-package",
     "href": "guide/tutorials/write-plugin.html#making-a-python-package",
     "title": "Write a Reaction Plugin",
     "section": "Making a python package",
-    "text": "Making a python package\nIt is necessary to make the plugin a python package to interface with Kimmdy. For this, package setup configuration files are necessary, for example setup.py and setup.cfg. In setup.cfg dependencies can be specified, which will be installed alongside the plugin. The interface with kimmdy is specified in the [options.entry_points] section. This section needs to refer to the class we created in the plugin main code and assign it to kimmdy.reaction_plugins, i.e. kimmdy.reaction_plugins = bind = &lt;path&gt;.&lt;to&gt;.&lt;main file&gt;:&lt;ClassName&gt;. Also, the directory containing the source code (typically src) is defined in [options.packages.find]. An example for setup.py and setup.cfg can be found below.\n\n\nsetup.py\nfrom setuptools import setup\n\nsetup()\n\n\n\n\nsetup.cfg\n\n\n\nsetup.cfg\n\n[metadata]\nname = kimmdy-reactions\nversion = 0.1\nlicense = GPL-3.0 \ndescription = Reaction template for KIMMDY\nlong_description = file: README.md\nauthor = Eric Hartmann\nauthor_email = eric.Hartmann@h-its.org\nclassifiers=\n        Programming Language :: Python :: 3\n        License :: OSI Approved :: MIT License\n        Operating System :: OS Independent\n\n[options]\npackages = find:\npackage_dir =\n    =src\ninclude_package_data = True\ninstall_requires =\n    MDAnalysis\n\npython_requires = &gt;= 3.9\n\n[options.packages.find]\nwhere=src\n\n[options.entry_points]\nkimmdy.reaction_plugins =\n    bind = bind.reaction:BindReaction\n\n\nThe main code and configuration schema file should then be moved to the specified source directory in a directory that has the name of the reaction plugin, i.e. src/&lt;plugin name&gt;/.\n\n\n\n\n\n\nTip\n\n\n\nBy adding the kimmdy tag on GitHub you can make your plugin discoverable by other users. It will show up in this list",
-    "crumbs": [
-      "Guide",
-      "Tutorials",
-      "Writing a Reaction Plugin"
-    ]
+    "text": "Making a python package\nIt is necessary to make the plugin a python package to interface with Kimmdy. For this, package setup configuration files are necessary, for example setup.py and setup.cfg. In setup.cfg dependencies can be specified, which will be installed alongside the plugin. The interface with kimmdy is specified in the [options.entry_points] section. This section needs to refer to the class we created in the plugin main code and assign it to kimmdy.reaction_plugins, i.e. kimmdy.reaction_plugins = bind = &lt;path&gt;.&lt;to&gt;.&lt;main file&gt;:&lt;ClassName&gt;. Also, the directory containing the source code (typically src) is defined in [options.packages.find]. An example for setup.py and setup.cfg can be found below.\n\n\nsetup.py\nfrom setuptools import setup\n\nsetup()\n\n\n\n\nsetup.cfg\n\n\n\nsetup.cfg\n\n[metadata]\nname = kimmdy-reactions\nversion = 0.1\nlicense = GPL-3.0 \ndescription = Reaction template for KIMMDY\nlong_description = file: README.md\nauthor = Eric Hartmann\nauthor_email = eric.Hartmann@h-its.org\nclassifiers=\n        Programming Language :: Python :: 3\n        License :: OSI Approved :: MIT License\n        Operating System :: OS Independent\n\n[options]\npackages = find:\npackage_dir =\n    =src\ninclude_package_data = True\ninstall_requires =\n    MDAnalysis\n\npython_requires = &gt;= 3.9\n\n[options.packages.find]\nwhere=src\n\n[options.entry_points]\nkimmdy.reaction_plugins =\n    bind = bind.reaction:BindReaction\n\n\nThe main code and configuration schema file should then be moved to the specified source directory in a directory that has the name of the reaction plugin, i.e. src/&lt;plugin name&gt;/.\n\n\n\n\n\n\nTip\n\n\n\nBy adding the kimmdy tag on GitHub you can make your plugin discoverable by other users. It will show up in this list"
   },
   {
     "objectID": "guide/tutorials/write-plugin.html#improving-code-quality-and-reproducibility",
     "href": "guide/tutorials/write-plugin.html#improving-code-quality-and-reproducibility",
     "title": "Write a Reaction Plugin",
     "section": "Improving code quality and reproducibility",
-    "text": "Improving code quality and reproducibility\nAdding tests will help in ensuring the plugin is working as expected. An example would help users to understand what your plugin does.",
-    "crumbs": [
-      "Guide",
-      "Tutorials",
-      "Writing a Reaction Plugin"
-    ]
+    "text": "Improving code quality and reproducibility\nAdding tests will help in ensuring the plugin is working as expected. An example would help users to understand what your plugin does."
   },
   {
     "objectID": "guide/how_to/contribute.html",
@@ -801,24 +718,14 @@
     "href": "guide/explanation/topology.html",
     "title": "Visualize Topologies",
     "section": "",
-    "text": "Hexala\n\nfrom kimmdy.parsing import read_top\nfrom kimmdy.topology.topology import Topology\nfrom pathlib import Path\nfrom kimmdy.tools import write_top_as_dot\n\n\nala_top = read_top(Path('../../tests/test_files/test_topology/urea.top'), use_gmx_dir=False)\ntop = Topology(ala_top)\n\nwrite_top_as_dot(top, \"ala-top.dot\")\n\n\n\n\n\n\n\n\n\nG\n\n\n\n1 C\n\n1 C\n\n\n\n2 O\n\n2 O\n\n\n\n1 C--2 O\n\n\n\n\n3 N\n\n3 N\n\n\n\n1 C--3 N\n\n\n\n\n6 N\n\n6 N\n\n\n\n1 C--6 N\n\n\n\n\n4 H\n\n4 H\n\n\n\n3 N--4 H\n\n\n\n\n5 H\n\n5 H\n\n\n\n3 N--5 H\n\n\n\n\n7 H\n\n7 H\n\n\n\n6 N--7 H\n\n\n\n\n8 H\n\n8 H\n\n\n\n6 N--8 H\n\n\n\n\n\n\n\nFigure 1: A diagram of the ala topology\n\n\n\n\n\n\n\n\n\n Back to top",
-    "crumbs": [
-      "Guide",
-      "Explanations",
-      "Visualize Topologies"
-    ]
+    "text": "from kimmdy.parsing import read_top\nfrom kimmdy.topology.topology import MoleculeType, Topology\nfrom pathlib import Path\nfrom kimmdy.tools import write_top_as_dot\nfrom kimmdy.topology.utils import get_moleculetype_header\n\n\nala_top = read_top(Path('../../tests/test_files/test_topology/Ala_R_prm.top'), use_gmx_dir=False)\ntop = Topology(ala_top)\n\nwrite_top_as_dot(top, \"ala-top.dot\")\n\n\n\n\n\n\n\n\n\nG\n\n  \n\n1 CT\n\n 1 CT   \n\n2 HC\n\n 2 HC   \n\n1 CT–2 HC\n\n   \n\n3 HC\n\n 3 HC   \n\n1 CT–3 HC\n\n   \n\n4 HC\n\n 4 HC   \n\n1 CT–4 HC\n\n   \n\n5 C\n\n 5 C   \n\n1 CT–5 C\n\n   \n\n6 O\n\n 6 O   \n\n5 C–6 O\n\n   \n\n7 N\n\n 7 N   \n\n5 C–7 N\n\n   \n\n8 H\n\n 8 H   \n\n7 N–8 H\n\n   \n\n9 CT\n\n 9 CT   \n\n7 N–9 CT\n\n   \n\n10 CT\n\n 10 CT   \n\n9 CT–10 CT\n\n   \n\n14 C\n\n 14 C   \n\n9 CT–14 C\n\n   \n\n11 HC\n\n 11 HC   \n\n10 CT–11 HC\n\n   \n\n12 HC\n\n 12 HC   \n\n10 CT–12 HC\n\n   \n\n13 HC\n\n 13 HC   \n\n10 CT–13 HC\n\n   \n\n15 O\n\n 15 O   \n\n14 C–15 O\n\n   \n\n16 N\n\n 16 N   \n\n14 C–16 N\n\n   \n\n17 H\n\n 17 H   \n\n16 N–17 H\n\n   \n\n18 CT\n\n 18 CT   \n\n16 N–18 CT\n\n   \n\n19 H1\n\n 19 H1   \n\n18 CT–19 H1\n\n   \n\n20 H1\n\n 20 H1   \n\n18 CT–20 H1\n\n   \n\n21 H1\n\n 21 H1   \n\n18 CT–21 H1\n\n  \n\n\nFigure 1: A diagram of the Ala topology"
   },
   {
     "objectID": "guide/tutorials/getting-started.html#next-steps",
     "href": "guide/tutorials/getting-started.html#next-steps",
     "title": "Get Started",
     "section": "Next steps",
-    "text": "Next steps\n\nLearn more about the kimmdy.yml input file\nRun KIMMDY with a collagen fibril from Colbuilder\nWrite your own reaction plugin\nDiscover more plugins by looking for the kimmdy tag on GitHub",
-    "crumbs": [
-      "Guide",
-      "Tutorials",
-      "Getting Started"
-    ]
+    "text": "Next steps\n\nLearn more about the kimmdy.yml input file\nRun KIMMDY with a collagen fibril from Colbuilder\nWrite your own reaction plugin\nDiscover more plugins by looking for the kimmdy tag on GitHub"
   },
   {
     "objectID": "guide/reference/options.html",
@@ -873,44 +780,28 @@
     "href": "guide/options.html",
     "title": "Options",
     "section": "",
-    "text": "KIMMDY comes with autocompletion for the kimmdy.yml file. You can add the schema to the configuration of the yaml-language-server in your editor (e.g. VS Code via the YAML extension or Neovim via lspconfig). To associate kimmdy.yml files with KIMMDY, add the following to your\n\n\n\n\nsettings.json\n\n\"yaml.schemas\": {\n    \"https://raw.githubusercontent.com/hits-mbm-dev/kimmdy/main/src/kimmdy/kimmdy-yaml-schema.json\": \"kimmdy.yml\",\n}\n\n\n\n\n\n\ninit.lua\n\nrequire(\"lspconfig\").yamlls.setup({\n  on_attach = on_attach,\n  capabilities = capabilities,\n  flags = lsp_flags,\n  settings = {\n    yaml = {\n      schemas = {\n        [\"https://raw.githubusercontent.com/hits-mbm-dev/kimmdy/main/src/kimmdy/kimmdy-yaml-schema.json\"] = \"kimmdy.yml\",\n      },\n    },\n  },\n})",
-    "crumbs": [
-      "Guide",
-      "Options"
-    ]
+    "text": "KIMMDY comes with autocompletion for the kimmdy.yml file. You can add the schema to the configuration of the yaml-language-server in your editor (e.g. VS Code via the YAML extension or Neovim via lspconfig). To associate kimmdy.yml files with KIMMDY, add the following to your\n\n\n\n\nsettings.json\n\n\"yaml.schemas\": {\n    \"https://raw.githubusercontent.com/hits-mbm-dev/kimmdy/main/src/kimmdy/kimmdy-yaml-schema.json\": \"kimmdy.yml\",\n}\n\n\n\n\n\n\ninit.lua\n\nrequire(\"lspconfig\").yamlls.setup({\n  on_attach = on_attach,\n  capabilities = capabilities,\n  flags = lsp_flags,\n  settings = {\n    yaml = {\n      schemas = {\n        [\"https://raw.githubusercontent.com/hits-mbm-dev/kimmdy/main/src/kimmdy/kimmdy-yaml-schema.json\"] = \"kimmdy.yml\",\n      },\n    },\n  },\n})"
   },
   {
     "objectID": "guide/options.html#autocompletion",
     "href": "guide/options.html#autocompletion",
     "title": "Options",
     "section": "",
-    "text": "KIMMDY comes with autocompletion for the kimmdy.yml file. You can add the schema to the configuration of the yaml-language-server in your editor (e.g. VS Code via the YAML extension or Neovim via lspconfig). To associate kimmdy.yml files with KIMMDY, add the following to your\n\n\n\n\nsettings.json\n\n\"yaml.schemas\": {\n    \"https://raw.githubusercontent.com/hits-mbm-dev/kimmdy/main/src/kimmdy/kimmdy-yaml-schema.json\": \"kimmdy.yml\",\n}\n\n\n\n\n\n\ninit.lua\n\nrequire(\"lspconfig\").yamlls.setup({\n  on_attach = on_attach,\n  capabilities = capabilities,\n  flags = lsp_flags,\n  settings = {\n    yaml = {\n      schemas = {\n        [\"https://raw.githubusercontent.com/hits-mbm-dev/kimmdy/main/src/kimmdy/kimmdy-yaml-schema.json\"] = \"kimmdy.yml\",\n      },\n    },\n  },\n})",
-    "crumbs": [
-      "Guide",
-      "Options"
-    ]
+    "text": "KIMMDY comes with autocompletion for the kimmdy.yml file. You can add the schema to the configuration of the yaml-language-server in your editor (e.g. VS Code via the YAML extension or Neovim via lspconfig). To associate kimmdy.yml files with KIMMDY, add the following to your\n\n\n\n\nsettings.json\n\n\"yaml.schemas\": {\n    \"https://raw.githubusercontent.com/hits-mbm-dev/kimmdy/main/src/kimmdy/kimmdy-yaml-schema.json\": \"kimmdy.yml\",\n}\n\n\n\n\n\n\ninit.lua\n\nrequire(\"lspconfig\").yamlls.setup({\n  on_attach = on_attach,\n  capabilities = capabilities,\n  flags = lsp_flags,\n  settings = {\n    yaml = {\n      schemas = {\n        [\"https://raw.githubusercontent.com/hits-mbm-dev/kimmdy/main/src/kimmdy/kimmdy-yaml-schema.json\"] = \"kimmdy.yml\",\n      },\n    },\n  },\n})"
   },
   {
     "objectID": "guide/options.html#all-options",
     "href": "guide/options.html#all-options",
     "title": "Options",
     "section": "All Options",
-    "text": "All Options\nThe following is a list of the options that can be set in the kimmdy.yml file. It includes reactions currently available in KIMMDY as plugins. Nested options are separated by a .. * denotes an arbitrary name for a section. The key for a section is bold.\n\n\n\nTable 1: KIMMDY options\n\n\n\n\n\n\n\n\n\n\n\n\nOption\nDescription\nType\nDefault\n\n\n\n\n\ndryrun\nDon’t run the actual simulations, just print the tasks\nbool\nFalse\n\n\n\nwrite_checkpoint\nWrite checkpoints to continue a KIMMDY run from. Default True\nbool\nTrue\n\n\n\ncwd\nWorking directory. Default is current working directory\nPath\n\n\n\n\nname\nUsed for output folder if out is not specified\nstr\nkimmdy\n\n\n\nout\nOutput folder\nPath\n\n\n\n\nlog\nSettings for logging\n\n\n\n\n\nmax_tasks\nMaximum number of tasks to run. This is useful when a task in the sequence can dymanically add more tasks. 0 means no limit.\nint\n0\n\n\n\nmax_hours\nStop KIMMDY after max_hours hours. Set this lower than the limit of your HPC cluster for use with a re-submit jobscript. 0 Means no limit.\nint\n0\n\n\n\nkmc\nKMC algorithm overwrite. Should be set by the reactions, but can be changed here.\nstr\n\n\n\n\ntau_scale\nScaling parameter for tau in the extrande kmc algorithm.\nfloat\n1.0\n\n\n\ntop\nTopology file\nPath\ntopol.top\n\n\n\ngro\nCoordinate file\nPath\nconf.gro\n\n\n\nndx\nGromaxs index file\nPath\nindex.ndx\n\n\n\ngromacs_alias\nGromacs alias. e.g. gmx or mpirun gmx_mpi\nstr\ngmx\n\n\n\ngmx_mdrun_flags\nFlags passed to gmx mdrun. Default -maxh 24 -dlb yes\nstr\n-maxh 24 -dlb yes\n\n\n\nff\nForce field directory (looks for .ff in cwd if not set)\nPath\n*.ff\n\n\n\nplumed\n.dat file containing plumed config\nPath\n\n\n\n\ntpr\n.tpr file of a finished simulation for starting directly with a reaction\nPath\n\n\n\n\ntrr\n.trr file of a finished simulation for starting directly with a reaction\nPath\n\n\n\n\nmds\nSettings for MD steps, e.g. mdp files, plumed files, etc.\n\n\n\n\n\nmds.*.mdp\nMDP file for the MD step\nPath\n\n\n\n\nmds.*.use_plumed\nWhether plumed should be used for this run or not\nbool\nFalse\n\n\n\nchanger\nSettings for applying a reaction recipe\n\n\n\n\n\nchanger.coordinates.md\nMD step from the ‘mds’ section that is used for relaxation MDs\nstr\n\n\n\n\nchanger.coordinates.slow_growth\nWhether the chosen MD step is a slow growth/free-energy simulation\nbool\nFalse\n\n\n\nchanger.topology.parameterization\nParameterization scheme that is used on the topology file after changes to it\nstr\nbasic\n\n\n\nsequence\nList of tasks. Each task can be a string (the name of the task) or an object with the task name and a multiplicity mult: &lt;int&gt;\nSequence\n\n\n\n\nreactions\nSettings for reactions\n\n\n\n\n\nreactions.homolysis.edis\nDissociation energies data file\nPath\nedissoc.dat\n\n\n\nreactions.homolysis.itp\nAdditional itp file with bonded parameters\nPath\nffbonded.itp\n\n\n\nreactions.homolysis.kmc\nKMC algorithm for this reaction.\nstr\nrfkmc\n\n\n\nreactions.hat_naive.frequency_factor\nFrequency factor\nfloat\n1\n\n\n\nreactions.hat_naive.h_cutoff\nCutoff for H atom\nfloat\n4\n\n\n\nreactions.hat_naive.polling_rate\nPolling rate\nfloat\n1\n\n\n\nreactions.hat_naive.kmc\nKMC algorithm for this reaction.\nstr\nextrande_mod\n\n\n\nreactions.dummyreaction.example\nThis is an example of an option for a reaction.\nfloat\n0.0\n\n\n\nreactions.dummyreaction.example2\nThis is another example of an option for a reaction.\nstr\nhello\n\n\n\nreactions.dummyreaction.kmc\nKMC algorithm for this reaction.\nstr\nextrande_mod\n\n\n\nplot_rates\nPlot the reaction rates during the reactions step\nbool\nTrue\n\n\n\nsave_recipes\nSave recipes as csv during the reactions step\nbool\nTrue",
-    "crumbs": [
-      "Guide",
-      "Options"
-    ]
+    "text": "All Options\nThe following is a list of the options that can be set in the kimmdy.yml file. It includes reactions currently available in KIMMDY as plugins. Nested options are separated by a .. * denotes an arbitrary name for a section. The key for a section is bold.\n\n\nTable 1: KIMMDY options\n\n\n\n\n\n\n\n\n\nOption\nDescription\nType\nDefault\n\n\n\n\n\ndryrun\nDon’t run the actual simulations, just print the tasks\nbool\nFalse\n\n\n\nwrite_checkpoint\nWrite checkpoints to continue a KIMMDY run from. Default True\nbool\nTrue\n\n\n\ncwd\nWorking directory. Default is current working directory\nPath\n\n\n\n\nname\nUsed for output folder if out is not specified\nstr\nkimmdy\n\n\n\nout\nOutput folder\nPath\n\n\n\n\nlog\nSettings for logging\n\n\n\n\n\nmax_tasks\nMaximum number of tasks to run. This is useful when a task in the sequence can dymanically add more tasks. 0 means no limit.\nint\n0\n\n\n\nmax_hours\nStop KIMMDY after max_hours hours. Set this lower than the limit of your HPC cluster for use with a re-submit jobscript. 0 Means no limit.\nint\n0\n\n\n\nkmc\nKMC algorithm overwrite. Should be set by the reactions, but can be changed here.\nstr\n\n\n\n\ntau_scale\nScaling parameter for tau in the extrande kmc algorithm.\nfloat\n1.0\n\n\n\ntop\nTopology file\nPath\ntopol.top\n\n\n\ngro\nCoordinate file\nPath\nconf.gro\n\n\n\nndx\nGromaxs index file\nPath\nindex.ndx\n\n\n\ngromacs_alias\nGromacs alias. e.g. gmx or mpirun gmx_mpi\nstr\ngmx\n\n\n\ngmx_mdrun_flags\nFlags passed to gmx mdrun. Default -maxh 24 -dlb yes\nstr\n-maxh 24 -dlb yes\n\n\n\nff\nForce field directory (looks for .ff in cwd if not set)\nPath\n*.ff\n\n\n\nplumed\n.dat file containing plumed config\nPath\n\n\n\n\ntpr\n.tpr file of a finished simulation for starting directly with a reaction\nPath\n\n\n\n\ntrr\n.trr file of a finished simulation for starting directly with a reaction\nPath\n\n\n\n\nmds\nSettings for MD steps, e.g. mdp files, plumed files, etc.\n\n\n\n\n\nmds.*.mdp\nMDP file for the MD step\nPath\n\n\n\n\nmds.*.use_plumed\nWhether plumed should be used for this run or not\nbool\nFalse\n\n\n\nchanger\nSettings for applying a reaction recipe\n\n\n\n\n\nchanger.coordinates.md\nMD step from the ‘mds’ section that is used for relaxation MDs\nstr\n\n\n\n\nchanger.coordinates.slow_growth\nWhether the chosen MD step is a slow growth/free-energy simulation\nbool\nFalse\n\n\n\nchanger.topology.parameterization\nParameterization scheme that is used on the topology file after changes to it\nstr\nbasic\n\n\n\nsequence\nList of tasks. Each task can be a string (the name of the task) or an object with the task name and a multiplicity mult: &lt;int&gt;\nSequence\n\n\n\n\nreactions\nSettings for reactions\n\n\n\n\n\nreactions.homolysis.edis\nDissociation energies data file\nPath\nedissoc.dat\n\n\n\nreactions.homolysis.itp\nAdditional itp file with bonded parameters\nPath\nffbonded.itp\n\n\n\nreactions.homolysis.kmc\nKMC algorithm for this reaction.\nstr\nrfkmc\n\n\n\nreactions.hat_naive.frequency_factor\nFrequency factor\nfloat\n1\n\n\n\nreactions.hat_naive.h_cutoff\nCutoff for H atom\nfloat\n4\n\n\n\nreactions.hat_naive.polling_rate\nPolling rate\nfloat\n1\n\n\n\nreactions.hat_naive.kmc\nKMC algorithm for this reaction.\nstr\nextrande_mod\n\n\n\nreactions.dummyreaction.example\nThis is an example of an option for a reaction.\nfloat\n0.0\n\n\n\nreactions.dummyreaction.example2\nThis is another example of an option for a reaction.\nstr\nhello\n\n\n\nreactions.dummyreaction.kmc\nKMC algorithm for this reaction.\nstr\nextrande_mod\n\n\n\nplot_rates\nPlot the reaction rates during the reactions step\nbool\nTrue\n\n\n\nsave_recipes\nSave recipes as csv during the reactions step\nbool\nTrue"
   },
   {
     "objectID": "guide/options.html#example-kimmdy.yml-files",
     "href": "guide/options.html#example-kimmdy.yml-files",
     "title": "Options",
     "section": "Example kimmdy.yml Files",
-    "text": "Example kimmdy.yml Files\n\n\nkimmdy.yml\n\ndryrun: false\nmax_tasks: 100\nname: 'hat_tf_000'\ngromacs_alias: 'gmx'\ntop: 'Ala_out.top'\ngro: 'npt.gro'\nndx: 'index.ndx'\nmds:\n  equilibrium:\n    mdp: 'md.mdp'\n  relax:\n    mdp: 'md_slow.mdp'\nchanger:\n  coordinates:\n    md: 'relax'      \nreactions:\n  hat_reaction:\n    frequency_factor: 100000000\n    h_cutoff: 3\n    polling_rate: 1\n\nsequence:\n- equilibrium\n- mult: 2\n  tasks:\n  - equilibrium\n  - reactions",
-    "crumbs": [
-      "Guide",
-      "Options"
-    ]
+    "text": "Example kimmdy.yml Files\n\n\nkimmdy.yml\n\ndryrun: false\nmax_tasks: 100\nname: 'hat_tf_000'\ngromacs_alias: 'gmx'\ntop: 'Ala_out.top'\ngro: 'npt.gro'\nndx: 'index.ndx'\nmds:\n  equilibrium:\n    mdp: 'md.mdp'\n  relax:\n    mdp: 'md_slow.mdp'\nchanger:\n  coordinates:\n    md: 'relax'      \nreactions:\n  hat_reaction:\n    frequency_factor: 100000000\n    h_cutoff: 3\n    polling_rate: 1\n\nsequence:\n- equilibrium\n- mult: 2\n  tasks:\n  - equilibrium\n  - reactions"
   },
   {
     "objectID": "index.html#installation",
@@ -945,58 +836,48 @@
     "href": "guide/how-to/contribute.html",
     "title": "Contribute",
     "section": "",
-    "text": "KIMMDY uses conventional commits and semantic versioning, automated via release please.\nIf a PR adds multiple commits, we use the squash and merge option to keep the commit history clean. If a PR unavoidably contains changes the message can be edited before merging to ensure release please picks up all changes.\nThe following example message (first line is the title in the GitHub UI, the rest is the body in the window below):\nfeat: this is a release-please test\n\nIt should add 3 features and a 2 fixes\nMaybe this first body is the important\npart of the commit message\n\nfix(ci): release please adds all the things\n  BREAKING-CHANGE: does this work?\n\nfeat(ci): update encode to support unicode\n  do I add a body here?\n\nfeat(ci): what if this doesn't have a body?\n\nfix(ci): or this?\nGenerates the following changelog:\n:robot: I have created a release *beep* *boop*\n---\n\n\n## [4.0.0](https://github.com/hits-mbm-dev/kimmdy/compare/v3.6.0...v4.0.0) (2023-08-11)\n\n\n### ⚠ BREAKING CHANGES\n\n* **ci:** does this work?\n\n### Features\n\n* **ci:** update encode to support unicode ([d9f16ad](https://github.com/hits-mbm-dev/kimmdy/commit/d9f16adb7470479a9e700ffd86597784caa2afe7))\n* **ci:** what if this doesn't have a body? ([d9f16ad](https://github.com/hits-mbm-dev/kimmdy/commit/d9f16adb7470479a9e700ffd86597784caa2afe7))\n* this is a release-please test ([d9f16ad](https://github.com/hits-mbm-dev/kimmdy/commit/d9f16adb7470479a9e700ffd86597784caa2afe7))\n\n\n### Bug Fixes\n\n* **ci:** or this? ([d9f16ad](https://github.com/hits-mbm-dev/kimmdy/commit/d9f16adb7470479a9e700ffd86597784caa2afe7))\n* **ci:** release please adds all the things ([d9f16ad](https://github.com/hits-mbm-dev/kimmdy/commit/d9f16adb7470479a9e700ffd86597784caa2afe7))\n\n---\nThis PR was generated with [Release Please](https://github.com/googleapis/release-please). See [documentation](https://github.com/googleapis/release-please#release-please).\n\n\nFor developoment, we provide a docker image containing gromacs and multiple python versions to test against.\nTo run the test locally, you must:\n\ninstall docker\ninstall act, easiest option is with github cli\n\ninstall github cli (gh)\ngh extension install https://github.com/nektos/gh-act\n\nrun tests with gh extension exec act -j test --artifact-server-path ./artifacts\n\ncustomize which python versions to test in tox.ini\nhtml coverage report is exported into artifacts",
-    "crumbs": [
-      "Guide",
-      "How-To",
-      "Contribute"
-    ]
+    "text": "KIMMDY uses conventional commits and semantic versioning, automated via release please.\nIf a PR adds multiple commits, we use the squash and merge option to keep the commit history clean. If a PR unavoidably contains changes the message can be edited before merging to ensure release please picks up all changes.\nThe following example message (first line is the title in the GitHub UI, the rest is the body in the window below):\nfeat: this is a release-please test\n\nIt should add 3 features and a 2 fixes\nMaybe this first body is the important\npart of the commit message\n\nfix(ci): release please adds all the things\n  BREAKING-CHANGE: does this work?\n\nfeat(ci): update encode to support unicode\n  do I add a body here?\n\nfeat(ci): what if this doesn't have a body?\n\nfix(ci): or this?\nGenerates the following changelog:\n:robot: I have created a release *beep* *boop*\n---\n\n\n## [4.0.0](https://github.com/hits-mbm-dev/kimmdy/compare/v3.6.0...v4.0.0) (2023-08-11)\n\n\n### ⚠ BREAKING CHANGES\n\n* **ci:** does this work?\n\n### Features\n\n* **ci:** update encode to support unicode ([d9f16ad](https://github.com/hits-mbm-dev/kimmdy/commit/d9f16adb7470479a9e700ffd86597784caa2afe7))\n* **ci:** what if this doesn't have a body? ([d9f16ad](https://github.com/hits-mbm-dev/kimmdy/commit/d9f16adb7470479a9e700ffd86597784caa2afe7))\n* this is a release-please test ([d9f16ad](https://github.com/hits-mbm-dev/kimmdy/commit/d9f16adb7470479a9e700ffd86597784caa2afe7))\n\n\n### Bug Fixes\n\n* **ci:** or this? ([d9f16ad](https://github.com/hits-mbm-dev/kimmdy/commit/d9f16adb7470479a9e700ffd86597784caa2afe7))\n* **ci:** release please adds all the things ([d9f16ad](https://github.com/hits-mbm-dev/kimmdy/commit/d9f16adb7470479a9e700ffd86597784caa2afe7))\n\n---\nThis PR was generated with [Release Please](https://github.com/googleapis/release-please). See [documentation](https://github.com/googleapis/release-please#release-please).\n\n\nFor developoment, we provide a docker image containing gromacs and multiple python versions to test against.\nTo run the test locally, you must:\n\ninstall docker\ninstall act, easiest option is with github cli\n\ninstall github cli (gh)\ngh extension install https://github.com/nektos/gh-act\n\nrun tests with gh extension exec act -j test --artifact-server-path ./artifacts\n\ncustomize which python versions to test in tox.ini\nhtml coverage report is exported into artifacts"
   },
   {
     "objectID": "guide/how-to/contribute.html#local-testing",
     "href": "guide/how-to/contribute.html#local-testing",
     "title": "Contribute",
     "section": "",
-    "text": "For developoment, we provide a docker image containing gromacs and multiple python versions to test against.\nTo run the test locally, you must:\n\ninstall docker\ninstall act, easiest option is with github cli\n\ninstall github cli (gh)\ngh extension install https://github.com/nektos/gh-act\n\nrun tests with gh extension exec act -j test --artifact-server-path ./artifacts\n\ncustomize which python versions to test in tox.ini\nhtml coverage report is exported into artifacts",
-    "crumbs": [
-      "Guide",
-      "How-To",
-      "Contribute"
-    ]
+    "text": "For developoment, we provide a docker image containing gromacs and multiple python versions to test against.\nTo run the test locally, you must:\n\ninstall docker\ninstall act, easiest option is with github cli\n\ninstall github cli (gh)\ngh extension install https://github.com/nektos/gh-act\n\nrun tests with gh extension exec act -j test --artifact-server-path ./artifacts\n\ncustomize which python versions to test in tox.ini\nhtml coverage report is exported into artifacts"
   },
   {
     "objectID": "guide/how-to/index.html",
     "href": "guide/how-to/index.html",
     "title": "How-To",
     "section": "",
-    "text": "How-To Guides\n\n\n\n\n\n\n   \n     \n     \n       Order By\n       Default\n         \n          Title\n        \n         \n          Author\n        \n     \n  \n    \n      \n      \n    \n\n\n\n\n\nTitle\n\n\nAuthor\n\n\n\n\n\n\nContribute\n\n\n \n\n\n\n\nHigh Performance Computing\n\n\n \n\n\n\n\n\nNo matching items\n\n Back to top",
-    "crumbs": [
-      "Guide",
-      "How-To"
-    ]
+    "text": "How-To Guides\n\n\n\n\n\n\n   \n     \n     \n       Order By\n       Default\n         \n          Title\n        \n         \n          Author\n        \n     \n  \n    \n      \n      \n    \n\n\n\n\n\n\nTitle\n\n\nAuthor\n\n\n\n\n\n\nContribute\n\n\n\n\n\n\n\nHigh Performance Computing\n\n\n\n\n\n\n\n\n\nNo matching items\n\n Back to top"
   },
   {
     "objectID": "guide/how-to/hcp.html",
     "href": "guide/how-to/hcp.html",
     "title": "High Performance Computing",
     "section": "",
-    "text": "You need an installation of python (&gt;= 3.10) and (possibly PLUMED patched) GROMACS in your HPC environment.\nExample setup:\nsrun -t 1400:00 --mem=16000 -n20 --pty /bin/bash\nml EasyBuild\neb ./assets/Python-3.10.8.eb\nPrepare a bash script _modules.sh that loads the required modules and activates the python environment in which KIMMDY is installed.\nRun\nkimmdy --generate-jobscript\nto generate a file jobscript.sh that can be submitted to the HPC cluster.\nThis commands generates a kimmdy checkpoint and prepares the output folder. KIMMDY can then be started and re-started from the checkpoint via the jobscript, which uses\n# -c = continue, same  as --from-latest-checkpoint\nkimmdy -c",
-    "crumbs": [
-      "Guide",
-      "How-To",
-      "High Performance Computing"
-    ]
+    "text": "You need an installation of python (&gt;= 3.10) and (possibly PLUMED patched) GROMACS in your HPC environment.\nExample setup:\nsrun -t 1400:00 --mem=16000 -n20 --pty /bin/bash\nml EasyBuild\neb ./assets/Python-3.10.8.eb\nPrepare a bash script _modules.sh that loads the required modules and activates the python environment in which KIMMDY is installed.\nRun\nkimmdy --generate-jobscript\nto generate a file jobscript.sh that can be submitted to the HPC cluster.\nThis commands generates a kimmdy checkpoint and prepares the output folder. KIMMDY can then be started and re-started from the checkpoint via the jobscript, which uses\n# -c = continue, same  as --from-latest-checkpoint\nkimmdy -c"
   },
   {
     "objectID": "guide/how-to/hcp.html#setup",
     "href": "guide/how-to/hcp.html#setup",
     "title": "High Performance Computing",
     "section": "",
-    "text": "You need an installation of python (&gt;= 3.10) and (possibly PLUMED patched) GROMACS in your HPC environment.\nExample setup:\nsrun -t 1400:00 --mem=16000 -n20 --pty /bin/bash\nml EasyBuild\neb ./assets/Python-3.10.8.eb\nPrepare a bash script _modules.sh that loads the required modules and activates the python environment in which KIMMDY is installed.\nRun\nkimmdy --generate-jobscript\nto generate a file jobscript.sh that can be submitted to the HPC cluster.\nThis commands generates a kimmdy checkpoint and prepares the output folder. KIMMDY can then be started and re-started from the checkpoint via the jobscript, which uses\n# -c = continue, same  as --from-latest-checkpoint\nkimmdy -c",
-    "crumbs": [
-      "Guide",
-      "How-To",
-      "High Performance Computing"
-    ]
+    "text": "You need an installation of python (&gt;= 3.10) and (possibly PLUMED patched) GROMACS in your HPC environment.\nExample setup:\nsrun -t 1400:00 --mem=16000 -n20 --pty /bin/bash\nml EasyBuild\neb ./assets/Python-3.10.8.eb\nPrepare a bash script _modules.sh that loads the required modules and activates the python environment in which KIMMDY is installed.\nRun\nkimmdy --generate-jobscript\nto generate a file jobscript.sh that can be submitted to the HPC cluster.\nThis commands generates a kimmdy checkpoint and prepares the output folder. KIMMDY can then be started and re-started from the checkpoint via the jobscript, which uses\n# -c = continue, same  as --from-latest-checkpoint\nkimmdy -c"
+  },
+  {
+    "objectID": "guide/explanation/topology.html#capped-alanine-with-a-radical",
+    "href": "guide/explanation/topology.html#capped-alanine-with-a-radical",
+    "title": "Visualize Topologies",
+    "section": "",
+    "text": "from kimmdy.parsing import read_top\nfrom kimmdy.topology.topology import MoleculeType, Topology\nfrom pathlib import Path\nfrom kimmdy.tools import write_top_as_dot\nfrom kimmdy.topology.utils import get_moleculetype_header\n\n\nala_top = read_top(Path('../../tests/test_files/test_topology/Ala_R_prm.top'), use_gmx_dir=False)\ntop = Topology(ala_top)\n\nwrite_top_as_dot(top, \"ala-top.dot\")\n\n\n\n\n\n\n\n\n\nG\n\n  \n\n1 CT\n\n 1 CT   \n\n2 HC\n\n 2 HC   \n\n1 CT–2 HC\n\n   \n\n3 HC\n\n 3 HC   \n\n1 CT–3 HC\n\n   \n\n4 HC\n\n 4 HC   \n\n1 CT–4 HC\n\n   \n\n5 C\n\n 5 C   \n\n1 CT–5 C\n\n   \n\n6 O\n\n 6 O   \n\n5 C–6 O\n\n   \n\n7 N\n\n 7 N   \n\n5 C–7 N\n\n   \n\n8 H\n\n 8 H   \n\n7 N–8 H\n\n   \n\n9 CT\n\n 9 CT   \n\n7 N–9 CT\n\n   \n\n10 CT\n\n 10 CT   \n\n9 CT–10 CT\n\n   \n\n14 C\n\n 14 C   \n\n9 CT–14 C\n\n   \n\n11 HC\n\n 11 HC   \n\n10 CT–11 HC\n\n   \n\n12 HC\n\n 12 HC   \n\n10 CT–12 HC\n\n   \n\n13 HC\n\n 13 HC   \n\n10 CT–13 HC\n\n   \n\n15 O\n\n 15 O   \n\n14 C–15 O\n\n   \n\n16 N\n\n 16 N   \n\n14 C–16 N\n\n   \n\n17 H\n\n 17 H   \n\n16 N–17 H\n\n   \n\n18 CT\n\n 18 CT   \n\n16 N–18 CT\n\n   \n\n19 H1\n\n 19 H1   \n\n18 CT–19 H1\n\n   \n\n20 H1\n\n 20 H1   \n\n18 CT–20 H1\n\n   \n\n21 H1\n\n 21 H1   \n\n18 CT–21 H1\n\n  \n\n\nFigure 1: A diagram of the Ala topology"
+  },
+  {
+    "objectID": "guide/explanation/topology.html#multiple-molecules",
+    "href": "guide/explanation/topology.html#multiple-molecules",
+    "title": "Visualize Topologies",
+    "section": "Multiple molecules",
+    "text": "Multiple molecules\n\nurea_dict = read_top(Path('../../tests/test_files/test_topology/urea.top'), use_gmx_dir=False)\nurea = Topology(urea_dict)\n\nwrite_top_as_dot(urea, \"urea-top.dot\")\n\n\n\n\n\n\n\n\n\nG\n\n  \n\n1 C\n\n 1 C   \n\n2 O\n\n 2 O   \n\n1 C–2 O\n\n   \n\n3 N\n\n 3 N   \n\n1 C–3 N\n\n   \n\n6 N\n\n 6 N   \n\n1 C–6 N\n\n   \n\n4 H\n\n 4 H   \n\n3 N–4 H\n\n   \n\n5 H\n\n 5 H   \n\n3 N–5 H\n\n   \n\n7 H\n\n 7 H   \n\n6 N–7 H\n\n   \n\n8 H\n\n 8 H   \n\n6 N–8 H\n\n  \n\n\nFigure 2: Topology of one molecule of urea\n\n\n\n\nWhen we want to run reactions within molecules that are either separate moleculetypes or multiples of the same moleculetype, KIMMDY can combine those into a single moleculetype and make multiples explicit.\ni.e. if we have a topology with two molecules of urea defined as:\n[ system ]\nUrea in Water\n\n[ molecules ]\n;molecule name   nr.\nUrea             2\nSOL              1000\n\nfrom kimmdy.topology.utils import is_not_solvent_or_ion\nurea_dict = read_top(Path('../../tests/test_files/test_topology/urea-times-2.top'), use_gmx_dir=False)\nurea = Topology(urea_dict)\ntop = urea\n\ndef get_mergable_molecules(top: Topology):\n  molecules = {}\n  started_merging = False\n  stopped_merging = False\n  for (m, n) in top.molecules.items():\n    if is_not_solvent_or_ion(m):\n      if stopped_merging:\n        m = f\"\"\"Attempting to merge a moleculetype {m} interspersed with non-merging moleculetypes.\n        Please make sure that all moleculetypes to be merged (all non-solvent molecules or ions by default)\n        are listed consecutively in the [molecules] section of the topology and in the coordinates file (.gro)\n        \"\"\"\n        raise ValueError(m)\n      started_merging = True\n      molecules[m] = n\n    elif started_merging:\n      stopped_merging = True\n    return molecules\n\nmolecules = get_mergable_molecules(urea)\n\ndef increment_field(l: list[str], i: int, n: int):\n  l[i] = str(int(l[i]) + n)\n\nATOM_ID_FIELDS = {\n  'atoms': [0,5], # atomnr, chargegroup\n  'bonds': [0, 1],\n  'angles': [0, 1, 2],\n  'dihedrals': [0, 1, 2, 3],\n  'pairs': [0, 1],\n  'position_restraints': [0],\n  'dihedral_restraints': [0, 1, 2, 3],\n}\n\nRESNR_ID_FIELDS = {\n  'atoms': [2],\n}\n\natomics = top.moleculetypes[\"Urea\"].atomics\nn_atoms = len(atomics[\"atoms\"])\n\n\nwrite_top_as_dot(urea, \"urea-2-top.dot\")\n\n\n\n\n\n\n\n\n\nG\n\n  \n\n1 C\n\n 1 C   \n\n2 O\n\n 2 O   \n\n1 C–2 O\n\n   \n\n3 N\n\n 3 N   \n\n1 C–3 N\n\n   \n\n6 N\n\n 6 N   \n\n1 C–6 N\n\n   \n\n4 H\n\n 4 H   \n\n3 N–4 H\n\n   \n\n5 H\n\n 5 H   \n\n3 N–5 H\n\n   \n\n7 H\n\n 7 H   \n\n6 N–7 H\n\n   \n\n8 H\n\n 8 H   \n\n6 N–8 H\n\n  \n\n\nFigure 3: A diagram of the ala topology"
   }
 ]

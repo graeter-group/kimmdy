@@ -1,10 +1,13 @@
 from __future__ import annotations  # for 3.7 <= Python version < 3.10
+from kimmdy.constants import ION_NAMES, SOLVENT_NAMES
 from itertools import permutations
-from typing import Optional, Any
+from typing import Callable, Optional, Any
 import re
 from typing import TYPE_CHECKING
 
 import logging
+
+from kimmdy.parsing import TopologyDict
 
 if TYPE_CHECKING:
     from kimmdy.topology.atomic import AtomicType, AtomicTypes
@@ -283,3 +286,9 @@ def match_atomic_item_to_atomic_type(
                     result = atomic_type
 
     return result
+
+
+def is_not_solvent_or_ion(name: str) -> bool:
+    """Returns whether a moleculetype name is not solvent or ion."""
+    return name.lower() not in [x.lower() for x in SOLVENT_NAMES + ION_NAMES]
+

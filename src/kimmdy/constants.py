@@ -3,6 +3,30 @@ Comstants used throughout KIMMDY
 """
 
 
+SOLVENT_NAMES: list[str] = [
+    "SOL",
+    "WATER",
+    "TIP3P",
+    "TIP4P",
+    "TIP4P-Ew",
+    "SPC",
+    "SPC/E",
+]
+
+ION_NAMES: list[str] = [
+    "I",
+    "F",
+    "CA",
+    "CL",
+    "NA",
+    "MG",
+    "K",
+    "RB",
+    "CS",
+    "LI",
+    "ZN",
+]
+
 # compare to atom type perception paper (2006) doi:10.1016/j.jmgm.2005.12.005
 ATOMTYPE_BONDORDER: dict[tuple, int]
 """
