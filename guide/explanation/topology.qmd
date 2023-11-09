@@ -6,6 +6,7 @@ mermaid-format: svg
 ## Capped Alanine with a radical
 
 ```{python}
+from copy import deepcopy
 from kimmdy.parsing import read_top
 from kimmdy.topology.topology import MoleculeType, Topology
 from pathlib import Path
@@ -69,7 +70,7 @@ SOL              1000
 
 ```{python}
 from kimmdy.topology.utils import is_not_solvent_or_ion
-urea_dict = read_top(Path('../../tests/test_files/test_topology/urea-times-2.top'), use_gmx_dir=False)
+urea_dict = read_top(Path('../../tests/test_files/test_topology/urea-times-2.top'), use_gmx_dir=True)
 urea = Topology(urea_dict)
 top = urea
 
@@ -86,7 +87,7 @@ def get_mergable_molecules(top: Topology):
         """
         raise ValueError(m)
       started_merging = True
-      molecules[m] = n
+      molecules[m] = int(n)
     elif started_merging:
       stopped_merging = True
     return molecules
@@ -95,6 +96,7 @@ molecules = get_mergable_molecules(urea)
 
 def increment_field(l: list[str], i: int, n: int):
   l[i] = str(int(l[i]) + n)
+  return l
 
 ATOM_ID_FIELDS = {
   'atoms': [0,5], # atomnr, chargegroup
@@ -110,9 +112,28 @@ RESNR_ID_FIELDS = {
   'atoms': [2],
 }
 
-atomics = top.moleculetypes["Urea"].atomics
-n_atoms = len(atomics["atoms"])
+assert molecules, "No molecules to merge"
+atomics = {}
+offset = 0
+for name, n in molecules.items():
+  add_atomics = top.moleculetypes[name].atomics
+  n_atoms = len(add_atomics["atoms"])
+  for i in range(n):
+    for section_name, values in add_atomics.items():
+      section = deepcopy(add_atomics[section_name])
+      for line in section:
+        fields = ATOM_ID_FIELDS[section_name]
+        for field in fields:
+          increment_field(line, field, offset)
+      if atomics.get(section_name) is None:
+        atomics[section_name] = []
+      atomics[section_name] += section
+    offset += n_atoms
+  del top.moleculetypes[name]
 
+reactive_moleculetype = MoleculeType(("Reactive", "1"), atomics)
+
+top.moleculetypes
 ```
 
 ```{python}
