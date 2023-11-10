@@ -493,7 +493,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="capped-alanine-with-a-radical" class="level2">
 <h2 class="anchored" data-anchor-id="capped-alanine-with-a-radical">Capped Alanine with a radical</h2>
 <div class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> kimmdy.parsing <span class="im">import</span> read_top</span>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> kimmdy.parsing <span class="im">import</span> read_top, write_top</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> kimmdy.topology.topology <span class="im">import</span> MoleculeType, Topology</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> kimmdy.tools <span class="im">import</span> write_top_as_dot</span>
@@ -504,24 +504,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>top <span class="op">=</span> Topology(ala_top)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>write_top_as_dot(top, <span class="st">"ala-top.dot"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>moleculetype_Protein
-moleculetype_SOL
-settles
-exclusions
-bonds
-angles
-moleculetype_IB+
-moleculetype_CA
-moleculetype_CL
-moleculetype_NA
-moleculetype_MG
-moleculetype_K
-moleculetype_RB
-moleculetype_CS
-moleculetype_LI
-moleculetype_ZN</code></pre>
-</div>
 </div>
 <div class="cell" data-file="ala-top.dot">
 <div class="cell-output-display">
@@ -709,13 +691,10 @@ G
 <section id="multiple-molecules" class="level2">
 <h2 class="anchored" data-anchor-id="multiple-molecules">Multiple molecules</h2>
 <div class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>urea_dict <span class="op">=</span> read_top(Path(<span class="st">'../../tests/test_files/test_topology/urea.top'</span>), use_gmx_dir<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>urea <span class="op">=</span> Topology(urea_dict)</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>write_top_as_dot(urea, <span class="st">"urea-top.dot"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>moleculetype_Urea</code></pre>
-</div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>urea_dict <span class="op">=</span> read_top(Path(<span class="st">'../../tests/test_files/test_topology/urea.top'</span>), use_gmx_dir<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>urea <span class="op">=</span> Topology(urea_dict)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>write_top_as_dot(urea, <span class="st">"urea-top.dot"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-file="urea-top.dot">
 <div class="cell-output-display">
@@ -797,20 +776,17 @@ G
 </div>
 <p>When we want to run reactions within molecules that are either separate moleculetypes or multiples of the same moleculetype, KIMMDY can combine those into a single moleculetype and make multiples explicit.</p>
 <p>i.e.&nbsp;if we have a topology with two molecules of urea defined as:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode ini code-with-copy"><code class="sourceCode ini"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">[ system ]</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Urea in Water</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="kw">[ molecules ]</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">;molecule name   nr.</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="dt">Urea             2</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="dt">SOL              1000</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode ini code-with-copy"><code class="sourceCode ini"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">[ system ]</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Urea in Water</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="kw">[ molecules ]</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co">;molecule name   nr.</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="dt">Urea             2</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="dt">SOL              1000</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>urea_dict <span class="op">=</span> read_top(Path(<span class="st">'../../tests/test_files/test_topology/urea-times-2.top'</span>), use_gmx_dir<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>urea <span class="op">=</span> Topology(urea_dict)</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>write_top_as_dot(urea, <span class="st">"urea-2-top.dot"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>moleculetype_Urea</code></pre>
-</div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>urea_dict <span class="op">=</span> read_top(Path(<span class="st">'../../tests/test_files/test_topology/urea-times-2.top'</span>), use_gmx_dir<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>urea <span class="op">=</span> Topology(urea_dict)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>write_top_as_dot(urea, <span class="st">"urea-2-top.dot"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-file="urea-2-top.dot">
 <div class="cell-output-display">
@@ -951,30 +927,14 @@ G
 </div>
 </div>
 <div class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>top_dict <span class="op">=</span> read_top(Path(<span class="st">'../../tests/test_files/test_topology/hexala.top'</span>), use_gmx_dir<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>top <span class="op">=</span> Topology(top_dict)</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>top.moleculetypes[<span class="st">"SOL"</span>].bonds</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>moleculetype_Protein
-moleculetype_SOL
-settles
-exclusions
-bonds
-angles
-moleculetype_IB+
-moleculetype_CA
-moleculetype_CL
-moleculetype_NA
-moleculetype_MG
-moleculetype_K
-moleculetype_RB
-moleculetype_CS
-moleculetype_LI
-moleculetype_ZN</code></pre>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>top_dict <span class="op">=</span> read_top(Path(<span class="st">'../../tests/test_files/test_topology/hexala.top'</span>), use_gmx_dir<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>top <span class="op">=</span> Topology(top_dict)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>write_top(top.to_dict(), Path(<span class="st">'test.top'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell-output cell-output-display" data-execution_count="5">
-<pre><code>{}</code></pre>
-</div>
+<div class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>top_dict <span class="op">=</span> read_top(Path(<span class="st">'../../tests/test_files/test_topology/minimal.top'</span>), use_gmx_dir<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>top <span class="op">=</span> Topology(top_dict)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>write_top(top.to_dict(), Path(<span class="st">'test2.top'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 

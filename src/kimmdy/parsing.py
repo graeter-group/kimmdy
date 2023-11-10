@@ -357,8 +357,11 @@ def write_top(top: TopologyDict, outfile: Path):
         Path to the topology file to write to.
     """
 
-    def write_section(f, name, section):
-        printname = re.sub(r"_\d+", "", name)
+    def write_section(f, name: str, section):
+        if name.startswith("moleculetype_"):
+            printname = "moleculetype"
+        else:
+            printname = name
         condition = section.get("condition")
         f.write("\n")
         if condition is None:

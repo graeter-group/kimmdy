@@ -155,12 +155,18 @@ class Exclusion:
     ; nr funct doh dhh
     """
 
-    nrs: list[str]
+    ai: str
+    aj: str
+    ak: Optional[str] = None
+    al: Optional[str] = None
 
     @classmethod
     def from_top_line(cls, l: list[str]):
         return cls(
-            nrs=l,
+            ai=l[0],
+            aj=l[1],
+            ak=field_or_none(l, 2),
+            al=field_or_none(l, 3),
         )
 
 

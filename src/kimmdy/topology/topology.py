@@ -158,14 +158,14 @@ class MoleculeType:
         """Parse restraints from topology dictionary."""
         ls = self.atomics.get("position_restraints")
         if not ls:
-            return
+            ls = []
         condition = None
         for l in ls:
             restraint = PositionRestraint.from_top_line(l, condition=condition)
             self.position_restraints[restraint.ai] = restraint
         ls = self.atomics.get("dihedral_restraints")
         if not ls:
-            return
+            ls = []
         for l in ls:
             restraint = DihedralRestraint.from_top_line(l)
             self.dihedral_restraints[
@@ -228,7 +228,11 @@ class MoleculeType:
             attributes_to_list(x) for x in self.position_restraints.values()
         ]
         self.atomics["dihedral_restraints"] = [
-            attributes_to_list(x) for x in self.proper_dihedrals.values()
+            attributes_to_list(x) for x in self.dihedral_restraints.values()
+        ]
+        self.atomics["settles"] = [attributes_to_list(x) for x in self.settles.values()]
+        self.atomics["exclusions"] = [
+            attributes_to_list(x) for x in self.exclusions.values()
         ]
 
     def _get_atom_bonds(self, atom_nr: str) -> list[tuple[str, str]]:

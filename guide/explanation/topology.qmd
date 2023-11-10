@@ -6,7 +6,7 @@ mermaid-format: svg
 ## Capped Alanine with a radical
 
 ```{python}
-from kimmdy.parsing import read_top
+from kimmdy.parsing import read_top, write_top
 from kimmdy.topology.topology import MoleculeType, Topology
 from pathlib import Path
 from kimmdy.tools import write_top_as_dot
@@ -83,7 +83,14 @@ write_top_as_dot(urea, "urea-2-top.dot")
 ```{python}
 top_dict = read_top(Path('../../tests/test_files/test_topology/hexala.top'), use_gmx_dir=False)
 top = Topology(top_dict)
-top.moleculetypes["SOL"].bonds
+write_top(top.to_dict(), Path('test.top'))
+```
+
+
+```{python}
+top_dict = read_top(Path('../../tests/test_files/test_topology/minimal.top'), use_gmx_dir=False)
+top = Topology(top_dict)
+write_top(top.to_dict(), Path('test2.top'))
 ```
 
 
