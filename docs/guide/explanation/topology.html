@@ -493,18 +493,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="capped-alanine-with-a-radical" class="level2">
 <h2 class="anchored" data-anchor-id="capped-alanine-with-a-radical">Capped Alanine with a radical</h2>
 <div class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> copy <span class="im">import</span> deepcopy</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> kimmdy.parsing <span class="im">import</span> read_top</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> kimmdy.topology.topology <span class="im">import</span> MoleculeType, Topology</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> kimmdy.tools <span class="im">import</span> write_top_as_dot</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> kimmdy.topology.utils <span class="im">import</span> get_moleculetype_header</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> kimmdy.parsing <span class="im">import</span> read_top</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> kimmdy.topology.topology <span class="im">import</span> MoleculeType, Topology</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> kimmdy.tools <span class="im">import</span> write_top_as_dot</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> kimmdy.topology.utils <span class="im">import</span> get_moleculetype_header</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>ala_top <span class="op">=</span> read_top(Path(<span class="st">'../../tests/test_files/test_topology/Ala_R_prm.top'</span>), use_gmx_dir<span class="op">=</span><span class="va">False</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>top <span class="op">=</span> Topology(ala_top)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>write_top_as_dot(top, <span class="st">"ala-top.dot"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>moleculetype_Protein
+moleculetype_SOL
+settles
+exclusions
+bonds
+angles
+moleculetype_IB+
+moleculetype_CA
+moleculetype_CL
+moleculetype_NA
+moleculetype_MG
+moleculetype_K
+moleculetype_RB
+moleculetype_CS
+moleculetype_LI
+moleculetype_ZN</code></pre>
+</div>
 </div>
 <div class="cell" data-file="ala-top.dot">
 <div class="cell-output-display">
@@ -692,10 +709,13 @@ G
 <section id="multiple-molecules" class="level2">
 <h2 class="anchored" data-anchor-id="multiple-molecules">Multiple molecules</h2>
 <div class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>urea_dict <span class="op">=</span> read_top(Path(<span class="st">'../../tests/test_files/test_topology/urea.top'</span>), use_gmx_dir<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>urea <span class="op">=</span> Topology(urea_dict)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>write_top_as_dot(urea, <span class="st">"urea-top.dot"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>urea_dict <span class="op">=</span> read_top(Path(<span class="st">'../../tests/test_files/test_topology/urea.top'</span>), use_gmx_dir<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>urea <span class="op">=</span> Topology(urea_dict)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>write_top_as_dot(urea, <span class="st">"urea-top.dot"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>moleculetype_Urea</code></pre>
+</div>
 </div>
 <div class="cell" data-file="urea-top.dot">
 <div class="cell-output-display">
@@ -777,108 +797,32 @@ G
 </div>
 <p>When we want to run reactions within molecules that are either separate moleculetypes or multiples of the same moleculetype, KIMMDY can combine those into a single moleculetype and make multiples explicit.</p>
 <p>i.e.&nbsp;if we have a topology with two molecules of urea defined as:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode ini code-with-copy"><code class="sourceCode ini"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">[ system ]</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Urea in Water</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="kw">[ molecules ]</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co">;molecule name   nr.</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="dt">Urea             2</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="dt">SOL              1000</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode ini code-with-copy"><code class="sourceCode ini"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">[ system ]</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Urea in Water</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="kw">[ molecules ]</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">;molecule name   nr.</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="dt">Urea             2</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="dt">SOL              1000</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> kimmdy.topology.utils <span class="im">import</span> is_not_solvent_or_ion</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>urea_dict <span class="op">=</span> read_top(Path(<span class="st">'../../tests/test_files/test_topology/urea-times-2.top'</span>), use_gmx_dir<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>urea <span class="op">=</span> Topology(urea_dict)</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>top <span class="op">=</span> urea</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> extract_mergable_molecules(top: Topology):</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  reactive_molecules <span class="op">=</span> {}</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  new_molecules <span class="op">=</span> []</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  started_merging <span class="op">=</span> <span class="va">False</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  stopped_merging <span class="op">=</span> <span class="va">False</span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  added_reactive_molecule <span class="op">=</span> <span class="va">False</span></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (m, n) <span class="kw">in</span> top.molecules.items():</span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> is_not_solvent_or_ion(m):</span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> stopped_merging:</span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>        m <span class="op">=</span> <span class="ss">f"""Attempting to merge a moleculetype </span><span class="sc">{</span>m<span class="sc">}</span><span class="ss"> interspersed with non-merging moleculetypes.</span></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="ss">        Please make sure that all moleculetypes to be merged (all non-solvent molecules or ions by default)</span></span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="ss">        are listed consecutively in the [molecules] section of the topology and in the coordinates file (.gro)</span></span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="ss">        """</span></span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(m)</span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>      started_merging <span class="op">=</span> <span class="va">True</span></span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>      reactive_molecules[m] <span class="op">=</span> <span class="bu">int</span>(n)</span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="kw">not</span> added_reactive_molecule:</span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>        new_molecules <span class="op">+=</span> [(<span class="st">"Reactive"</span>, <span class="st">"1"</span>)]</span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>        added_reactive_molecule <span class="op">=</span> <span class="va">True</span></span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> started_merging:</span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>        stopped_merging <span class="op">=</span> <span class="va">True</span></span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>      new_molecules <span class="op">+=</span> [(m, n)]</span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>  top.molecules <span class="op">=</span> {k: v <span class="cf">for</span> k, v <span class="kw">in</span> new_molecules}</span>
-<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> reactive_molecules</span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>molecules <span class="op">=</span> extract_mergable_molecules(urea)</span>
-<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> increment_field(l: <span class="bu">list</span>[<span class="bu">str</span>], i: <span class="bu">int</span>, n: <span class="bu">int</span>):</span>
-<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>  l[i] <span class="op">=</span> <span class="bu">str</span>(<span class="bu">int</span>(l[i]) <span class="op">+</span> n)</span>
-<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> l</span>
-<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>ATOM_ID_FIELDS <span class="op">=</span> {</span>
-<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>  <span class="st">'atoms'</span>: [<span class="dv">0</span>,<span class="dv">5</span>], <span class="co"># atomnr, chargegroup</span></span>
-<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>  <span class="st">'bonds'</span>: [<span class="dv">0</span>, <span class="dv">1</span>],</span>
-<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>  <span class="st">'angles'</span>: [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>],</span>
-<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>  <span class="st">'dihedrals'</span>: [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>],</span>
-<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>  <span class="st">'pairs'</span>: [<span class="dv">0</span>, <span class="dv">1</span>],</span>
-<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>  <span class="st">'position_restraints'</span>: [<span class="dv">0</span>],</span>
-<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>  <span class="st">'dihedral_restraints'</span>: [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>],</span>
-<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>RESNR_ID_FIELDS <span class="op">=</span> {</span>
-<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>  <span class="st">'atoms'</span>: [<span class="dv">2</span>],</span>
-<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> molecules, <span class="st">"No molecules to merge"</span></span>
-<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a>atomics <span class="op">=</span> {}</span>
-<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>offset <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name, n <span class="kw">in</span> molecules.items():</span>
-<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>  add_atomics <span class="op">=</span> top.moleculetypes[name].atomics</span>
-<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a>  n_atoms <span class="op">=</span> <span class="bu">len</span>(add_atomics[<span class="st">"atoms"</span>])</span>
-<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n):</span>
-<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> section_name, values <span class="kw">in</span> add_atomics.items():</span>
-<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a>      section <span class="op">=</span> deepcopy(add_atomics[section_name])</span>
-<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a>      <span class="cf">for</span> line <span class="kw">in</span> section:</span>
-<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a>        fields <span class="op">=</span> ATOM_ID_FIELDS[section_name]</span>
-<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> field <span class="kw">in</span> fields:</span>
-<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a>          increment_field(line, field, offset)</span>
-<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> atomics.get(section_name) <span class="kw">is</span> <span class="va">None</span>:</span>
-<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a>        atomics[section_name] <span class="op">=</span> []</span>
-<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a>      atomics[section_name] <span class="op">+=</span> section</span>
-<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a>    offset <span class="op">+=</span> n_atoms</span>
-<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a>  <span class="kw">del</span> top.moleculetypes[name]</span>
-<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a>reactive_moleculetype <span class="op">=</span> MoleculeType((<span class="st">"Reactive"</span>, <span class="st">"1"</span>), atomics)</span>
-<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a>top.moleculetypes[<span class="st">"Reactive"</span>] <span class="op">=</span> reactive_moleculetype</span>
-<span id="cb5-74"><a href="#cb5-74" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-75"><a href="#cb5-75" aria-hidden="true" tabindex="-1"></a>top.moleculetypes</span>
-<span id="cb5-76"><a href="#cb5-76" aria-hidden="true" tabindex="-1"></a>top.molecules</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="4">
-<pre><code>{'Reactive': '1', 'SOL': '1000'}</code></pre>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>urea_dict <span class="op">=</span> read_top(Path(<span class="st">'../../tests/test_files/test_topology/urea-times-2.top'</span>), use_gmx_dir<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>urea <span class="op">=</span> Topology(urea_dict)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>write_top_as_dot(urea, <span class="st">"urea-2-top.dot"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>moleculetype_Urea</code></pre>
 </div>
-</div>
-<div class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>write_top_as_dot(urea, <span class="st">"urea-2-top.dot"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-file="urea-2-top.dot">
 <div class="cell-output-display">
 <div id="fig-ala" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <div>
-<svg width="672" height="480" viewbox="0.00 0.00 296.28 333.31" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="; max-width: none; max-height: none">
-<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 329.31)">
+<svg width="672" height="480" viewbox="0.00 0.00 593.94 594.97" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="; max-width: none; max-height: none">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 590.97)">
 <title>
 G
 </title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-329.31 292.28,-329.31 292.28,4 -4,4"></polygon> <!-- 1 C --> <g id="node1" class="node">
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-590.97 589.94,-590.97 589.94,4 -4,4"></polygon> <!-- 1 C --> <g id="node1" class="node">
 <title>
 1 C
 </title>
@@ -938,12 +882,98 @@ G
 <title>
 6 N–8 H
 </title>
-<path fill="none" stroke="black" d="M102.24,-79.19C101.72,-70.02 101.14,-59.69 100.63,-50.54"></path> </g> </g>
+<path fill="none" stroke="black" d="M102.24,-79.19C101.72,-70.02 101.14,-59.69 100.63,-50.54"></path> </g> <!-- 9 C --> <g id="node9" class="node">
+<title>
+9 C
+</title>
+<ellipse fill="none" stroke="black" cx="464.32" cy="-407.79" rx="24.94" ry="24.94"></ellipse> <text text-anchor="middle" x="464.32" y="-403.59" font-family="Times,serif" font-size="14.00">9 C</text> </g> <!-- 10 O --> <g id="node10" class="node">
+<title>
+10 O
+</title>
+<ellipse fill="none" stroke="black" cx="531.42" cy="-361.6" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="531.42" y="-357.4" font-family="Times,serif" font-size="14.00">10 O</text> </g> <!-- 9 C&#45;&#45;10 O --> <g id="edge8" class="edge">
+<title>
+9 C–10 O
+</title>
+<path fill="none" stroke="black" d="M484.81,-393.68C491.6,-389.02 499.22,-383.77 506.31,-378.89"></path> </g> <!-- 11 N --> <g id="node11" class="node">
+<title>
+11 N
+</title>
+<ellipse fill="none" stroke="black" cx="483.25" cy="-487.62" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="483.25" y="-483.42" font-family="Times,serif" font-size="14.00">11 N</text> </g> <!-- 9 C&#45;&#45;11 N --> <g id="edge9" class="edge">
+<title>
+9 C–11 N
+</title>
+<path fill="none" stroke="black" d="M470.1,-432.18C472.06,-440.43 474.26,-449.74 476.3,-458.33"></path> </g> <!-- 14 N --> <g id="node12" class="node">
+<title>
+14 N
+</title>
+<ellipse fill="none" stroke="black" cx="396.51" cy="-361.63" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="396.51" y="-357.43" font-family="Times,serif" font-size="14.00">14 N</text> </g> <!-- 9 C&#45;&#45;14 N --> <g id="edge10" class="edge">
+<title>
+9 C–14 N
+</title>
+<path fill="none" stroke="black" d="M443.6,-393.69C436.59,-388.92 428.69,-383.54 421.39,-378.57"></path> </g> <!-- 12 H --> <g id="node13" class="node">
+<title>
+12 H
+</title>
+<ellipse fill="none" stroke="black" cx="555.86" cy="-520.34" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="555.86" y="-516.14" font-family="Times,serif" font-size="14.00">12 H</text> </g> <!-- 11 N&#45;&#45;12 H --> <g id="edge11" class="edge">
+<title>
+11 N–12 H
+</title>
+<path fill="none" stroke="black" d="M510.7,-499.99C516.48,-502.6 522.59,-505.35 528.37,-507.95"></path> </g> <!-- 13 H --> <g id="node14" class="node">
+<title>
+13 H
+</title>
+<ellipse fill="none" stroke="black" cx="444.89" cy="-556.89" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="444.89" y="-552.69" font-family="Times,serif" font-size="14.00">13 H</text> </g> <!-- 11 N&#45;&#45;13 H --> <g id="edge12" class="edge">
+<title>
+11 N–13 H
+</title>
+<path fill="none" stroke="black" d="M468.53,-514.21C465.57,-519.55 462.47,-525.16 459.51,-530.49"></path> </g> <!-- 15 H --> <g id="node15" class="node">
+<title>
+15 H
+</title>
+<ellipse fill="none" stroke="black" cx="318.08" cy="-372.52" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="318.08" y="-368.32" font-family="Times,serif" font-size="14.00">15 H</text> </g> <!-- 14 N&#45;&#45;15 H --> <g id="edge13" class="edge">
+<title>
+14 N–15 H
+</title>
+<path fill="none" stroke="black" d="M366.41,-365.81C360.36,-366.65 354.01,-367.53 347.97,-368.37"></path> </g> <!-- 16 H --> <g id="node16" class="node">
+<title>
+16 H
+</title>
+<ellipse fill="none" stroke="black" cx="392.04" cy="-282.08" rx="30.16" ry="30.16"></ellipse> <text text-anchor="middle" x="392.04" y="-277.88" font-family="Times,serif" font-size="14.00">16 H</text> </g> <!-- 14 N&#45;&#45;16 H --> <g id="edge14" class="edge">
+<title>
+14 N–16 H
+</title>
+<path fill="none" stroke="black" d="M394.82,-331.55C394.46,-325.22 394.09,-318.53 393.73,-312.2"></path> </g> </g>
 </svg>
 </div>
 <figcaption class="figure-caption">Figure&nbsp;3: A diagram of the ala topology</figcaption>
 </figure>
 </div>
+</div>
+</div>
+<div class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>top_dict <span class="op">=</span> read_top(Path(<span class="st">'../../tests/test_files/test_topology/hexala.top'</span>), use_gmx_dir<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>top <span class="op">=</span> Topology(top_dict)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>top.moleculetypes[<span class="st">"SOL"</span>].bonds</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>moleculetype_Protein
+moleculetype_SOL
+settles
+exclusions
+bonds
+angles
+moleculetype_IB+
+moleculetype_CA
+moleculetype_CL
+moleculetype_NA
+moleculetype_MG
+moleculetype_K
+moleculetype_RB
+moleculetype_CS
+moleculetype_LI
+moleculetype_ZN</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<pre><code>{}</code></pre>
 </div>
 </div>
 

@@ -68,20 +68,10 @@ SOL              1000
 
 
 ```{python}
-urea_dict = read_top(Path('../../tests/test_files/test_topology/urea-times-2.top'), use_gmx_dir=True)
+urea_dict = read_top(Path('../../tests/test_files/test_topology/urea-times-2.top'), use_gmx_dir=False)
 urea = Topology(urea_dict)
-urea
-```
-
-```{python}
-top_dict = read_top(Path('../../tests/test_files/test_topology/topol_stateA.top'), use_gmx_dir=True)
-top = Topology(top_dict)
-```
-
-```{python}
 write_top_as_dot(urea, "urea-2-top.dot")
 ```
-
 
 ```{dot}
 //| echo: false
@@ -90,7 +80,11 @@ write_top_as_dot(urea, "urea-2-top.dot")
 //| file: urea-2-top.dot
 ```
 
-
+```{python}
+top_dict = read_top(Path('../../tests/test_files/test_topology/hexala.top'), use_gmx_dir=False)
+top = Topology(top_dict)
+top.moleculetypes["SOL"].bonds
+```
 
 
 

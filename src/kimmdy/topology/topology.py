@@ -57,7 +57,8 @@ class MoleculeType:
         self.dihedral_restraints: dict[
             tuple[str, str, str, str], DihedralRestraint
         ] = {}
-        # TODO: self.settles = {}
+        self.settles = {}
+        self.exclusions = {}
         self.radicals: dict[str, Atom] = {}
 
         self._parse_atoms()
@@ -66,6 +67,8 @@ class MoleculeType:
         self._parse_angles()
         self._parse_dihedrals()
         self._parse_restraints()
+        self._parse_settles()
+        self._parse_exclusions()
         self._initialize_graph()
         self.test_for_radicals()
 
@@ -168,6 +171,24 @@ class MoleculeType:
             self.dihedral_restraints[
                 (restraint.ai, restraint.aj, restraint.ak, restraint.al)
             ] = restraint
+
+    def _parse_settles(self):
+        """Parse settles from topology dictionary."""
+        ls = self.atomics.get("settles")
+        if not ls:
+            return
+        for l in ls:
+            settle = Settle.from_top_line(l)
+            self.settles[settle.nr] = settle
+
+    def _parse_exclusions(self):
+        """Parse exclusions from topology dictionary."""
+        ls = self.atomics.get("exclusions")
+        if not ls:
+            return
+        for i, l in enumerate(ls):
+            exclusion = Exclusion.from_top_line(l)
+            self.exclusions[i] = exclusion
 
     def _initialize_graph(self):
         """Add a list of atom nrs bound to an atom to each atom."""

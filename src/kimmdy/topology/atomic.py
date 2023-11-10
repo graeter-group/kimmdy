@@ -121,6 +121,48 @@ class DihedralRestraint:
             fc=l[7],
         )
 
+@dataclass()
+class Settle:
+    """Information about one settles
+
+    A class containing atom information as in the settle section of the topology.
+
+    From gromacs topology:
+    ; nr funct doh dhh
+    """
+
+    nr: str
+    funct: str
+    doh: str
+    dhh: str
+
+    @classmethod
+    def from_top_line(cls, l: list[str]):
+        return cls(
+            nr=l[0],
+            funct=l[1],
+            doh=l[2],
+            dhh=l[3],
+        )
+
+@dataclass()
+class Exclusion:
+    """Information about one exclusion
+
+    A class containing atom information as in the exclusions section of the topology.
+
+    From gromacs topology:
+    ; nr funct doh dhh
+    """
+
+    nrs: list[str]
+
+    @classmethod
+    def from_top_line(cls, l: list[str]):
+        return cls(
+            nrs=l,
+        )
+
 
 @dataclass()
 class AtomType:

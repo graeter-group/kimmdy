@@ -106,6 +106,7 @@ def get_moleculetype_atomics(top: dict, moleculetype: str) -> Optional[dict]:
         logger.warning(f"topology does not contain moleculetype {moleculetype}")
         return None
 
+    print(moleculetype)
     subsections = section["subsections"]
     atomics = {}
     for k, v in subsections.items():
@@ -120,6 +121,7 @@ def get_moleculetype_atomics(top: dict, moleculetype: str) -> Optional[dict]:
                     atomics[k] = v.get("else_content")
             elif condition_type == "ifndef":
                 if condition_value not in top["define"].keys():
+                    print(k)
                     atomics[k] = v.get("content")
                 else:
                     atomics[k] = v.get("else_content")
@@ -149,7 +151,7 @@ def set_moleculetype_atomics(
         if create:
             logger.info(f"topology does not contain {moleculetype}. Creating new section.")
             section = empty_section()
-            section["content"] = [(name, "3")]
+            section["content"] = [[name, "3"]]
             section["subsections"] = {k: empty_section() for k in atomics.keys()}
             top[moleculetype] = section
         else:
@@ -206,7 +208,9 @@ def set_top_section(
         section = top.get(name)
 
     if section is None:
-        raise ValueError(f"topology does not contain section {name}")
+        m = f"topology does not contain section {name}"
+        logger.warning(m)
+        return None
     condition = section.get("condition")
     if condition is not None:
         condition_type = condition.get("type")
