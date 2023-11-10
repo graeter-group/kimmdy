@@ -3,6 +3,23 @@ Comstants used throughout KIMMDY
 """
 
 
+ATOM_ID_FIELDS = {
+    "atoms": [0, 5],  # atomnr, chargegroup
+    "bonds": [0, 1],
+    "angles": [0, 1, 2],
+    "dihedrals": [0, 1, 2, 3],
+    "pairs": [0, 1],
+    "position_restraints": [0],
+    "dihedral_restraints": [0, 1, 2, 3],
+}
+
+RESNR_ID_FIELDS = {
+    "atoms": [2],
+}
+
+REACTIVE_MOLECULEYPE = "Reactive"
+
+
 SOLVENT_NAMES: list[str] = [
     "SOL",
     "WATER",

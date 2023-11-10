@@ -6,7 +6,6 @@ mermaid-format: svg
 ## Capped Alanine with a radical
 
 ```{python}
-from copy import deepcopy
 from kimmdy.parsing import read_top
 from kimmdy.topology.topology import MoleculeType, Topology
 from pathlib import Path
@@ -69,81 +68,14 @@ SOL              1000
 
 
 ```{python}
-from kimmdy.topology.utils import is_not_solvent_or_ion
 urea_dict = read_top(Path('../../tests/test_files/test_topology/urea-times-2.top'), use_gmx_dir=True)
 urea = Topology(urea_dict)
-top = urea
+urea
+```
 
-def extract_mergable_molecules(top: Topology):
-  reactive_molecules = {}
-  new_molecules = []
-  started_merging = False
-  stopped_merging = False
-  added_reactive_molecule = False
-  for (m, n) in top.molecules.items():
-    if is_not_solvent_or_ion(m):
-      if stopped_merging:
-        m = f"""Attempting to merge a moleculetype {m} interspersed with non-merging moleculetypes.
-        Please make sure that all moleculetypes to be merged (all non-solvent molecules or ions by default)
-        are listed consecutively in the [molecules] section of the topology and in the coordinates file (.gro)
-        """
-        raise ValueError(m)
-      started_merging = True
-      reactive_molecules[m] = int(n)
-      if not added_reactive_molecule:
-        new_molecules += [("Reactive", "1")]
-        added_reactive_molecule = True
-    else:
-      if started_merging:
-        stopped_merging = True
-      new_molecules += [(m, n)]
-
-  top.molecules = {k: v for k, v in new_molecules}
-  return reactive_molecules
-
-molecules = extract_mergable_molecules(urea)
-
-def increment_field(l: list[str], i: int, n: int):
-  l[i] = str(int(l[i]) + n)
-  return l
-
-ATOM_ID_FIELDS = {
-  'atoms': [0,5], # atomnr, chargegroup
-  'bonds': [0, 1],
-  'angles': [0, 1, 2],
-  'dihedrals': [0, 1, 2, 3],
-  'pairs': [0, 1],
-  'position_restraints': [0],
-  'dihedral_restraints': [0, 1, 2, 3],
-}
-
-RESNR_ID_FIELDS = {
-  'atoms': [2],
-}
-
-assert molecules, "No molecules to merge"
-atomics = {}
-offset = 0
-for name, n in molecules.items():
-  add_atomics = top.moleculetypes[name].atomics
-  n_atoms = len(add_atomics["atoms"])
-  for i in range(n):
-    for section_name, values in add_atomics.items():
-      section = deepcopy(add_atomics[section_name])
-      for line in section:
-        fields = ATOM_ID_FIELDS[section_name]
-        for field in fields:
-          increment_field(line, field, offset)
-      if atomics.get(section_name) is None:
-        atomics[section_name] = []
-      atomics[section_name] += section
-    offset += n_atoms
-  del top.moleculetypes[name]
-
-reactive_moleculetype = MoleculeType(("Reactive", "1"), atomics)
-top.moleculetypes["Reactive"] = reactive_moleculetype
-
-top._update_dict()
+```{python}
+top_dict = read_top(Path('../../tests/test_files/test_topology/topol_stateA.top'), use_gmx_dir=True)
+top = Topology(top_dict)
 ```
 
 ```{python}

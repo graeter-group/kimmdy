@@ -6,6 +6,7 @@ from kimmdy.topology.utils import (
     get_moleculetype_header,
     attributes_to_list,
     get_top_section,
+    is_not_solvent_or_ion,
     set_moleculetype_atomics,
     set_top_section,
 )
@@ -14,7 +15,8 @@ from kimmdy.plugins import BasicParameterizer, Parameterizer
 from itertools import permutations, combinations
 import textwrap
 import logging
-from copy import copy
+from copy import copy, deepcopy
+from kimmdy.constants import ATOM_ID_FIELDS, RESNR_ID_FIELDS, REACTIVE_MOLECULEYPE
 
 from kimmdy.utils import TopologyAtomAddress
 
@@ -520,6 +522,11 @@ class MoleculeType:
         return update_map
 
 
+def increment_field(l: list[str], i: int, n: int):
+    l[i] = str(int(l[i]) + n)
+    return l
+
+
 class Topology:
     """Smart container for parsed topology data.
 
@@ -529,7 +536,7 @@ class Topology:
 
     Assumptions:
 
-    - the topology of interest (the protein) is in section 'moleculetype_0'.
+    - the topology of interest (the Reactive moleculetype) consists of the first moleculetypes (non-solvent).
 
     Parameters
     ----------
@@ -558,26 +565,96 @@ class Topology:
         self.parametrizer = parametrizer
         self.needs_parameterization = False
 
-        # link atoms, bonds etc. to the main moleculeype, assumed to be the first
-        # "moleculetype_0"
-        self.main_molecule_ix = 0
-        self.main_molecule_name = list(self.moleculetypes.keys())[self.main_molecule_ix]
-        self.main_molecule = self.moleculetypes[self.main_molecule_name]
-        self.atoms = self.main_molecule.atoms
-        self.bonds = self.main_molecule.bonds
-        self.angles = self.main_molecule.angles
-        self.proper_dihedrals = self.main_molecule.proper_dihedrals
+        self._merge_moleculetypes()
+        self._link_atomics()
+        self._update_dict()
+
+    def _link_atomics(self):
+        """
+        link atoms, bonds etc. to the main moleculeype, REACTIVE_MOLECULEYPE
+        """
+        self.reactive_molecule = self.moleculetypes[REACTIVE_MOLECULEYPE]
+        self.atoms = self.reactive_molecule.atoms
+        self.bonds = self.reactive_molecule.bonds
+        self.angles = self.reactive_molecule.angles
+        self.proper_dihedrals = self.reactive_molecule.proper_dihedrals
         self.improper_dihedrals = self.moleculetypes[
-            self.main_molecule_name
+            REACTIVE_MOLECULEYPE
         ].improper_dihedrals
-        self.pairs = self.main_molecule.pairs
+        self.pairs = self.reactive_molecule.pairs
         self.position_restraints = self.moleculetypes[
-            self.main_molecule_name
+            REACTIVE_MOLECULEYPE
         ].position_restraints
         self.dihedral_restraints = self.moleculetypes[
-            self.main_molecule_name
+            REACTIVE_MOLECULEYPE
         ].dihedral_restraints
-        self.radicals = self.main_molecule.radicals
+        self.radicals = self.reactive_molecule.radicals
+
+    def _extract_mergable_molecules(self):
+        """Extract all molecules that are to be merged into one moleculetype.
+        And replaces them with a single moleculetype with the name REACTIVE_MOLECULEYPE
+        """
+        reactive_molecules = {}
+        new_molecules = []
+        started_merging = False
+        stopped_merging = False
+        added_reactive_molecule = False
+        for m, n in self.molecules.items():
+            if is_not_solvent_or_ion(m):
+                if stopped_merging:
+                    m = f"""Attempting to merge a moleculetype {m} interspersed with non-merging moleculetypes.
+            Please make sure that all moleculetypes to be merged (all non-solvent molecules or ions by default)
+            are listed consecutively in the [molecules] section of the topology and in the coordinates file (.gro)
+            """
+                    logger.error(m)
+                    raise ValueError(m)
+                started_merging = True
+                reactive_molecules[m] = int(n)
+                if not added_reactive_molecule:
+                    new_molecules += [(REACTIVE_MOLECULEYPE, "1")]
+                    added_reactive_molecule = True
+            else:
+                if started_merging:
+                    stopped_merging = True
+                new_molecules += [(m, n)]
+
+        self.molecules = {k: v for k, v in new_molecules}
+        return reactive_molecules
+
+    def _merge_moleculetypes(self):
+        """
+        Merge all moleculetypes within which reactions can happen into one moleculetype.
+        This also makes multiples explicit.
+        Reactive molecules have to be in a continuous block in the [molecules] section of the topology
+        and the gro file, preferably the start.
+        Atom ids (gromacs, 1-based) are updated accordingly and thus correspond directly
+        to the atom numbers in the coordinates file (.gro) (ignoring gromacs overflow
+        problems in the atomnr column, the correct internal atom nr is always "gro file line number" - 2).
+        """
+        molecules = self._extract_mergable_molecules()
+        reactive_atomics = {}
+        offset = 0
+        for name, n in molecules.items():
+            add_atomics = self.moleculetypes[name].atomics
+            n_atoms = len(add_atomics["atoms"])
+            for _ in range(n):
+                for section_name, values in add_atomics.items():
+                    section = deepcopy(values)
+                    for line in section:
+                        fields = ATOM_ID_FIELDS[section_name]
+                        for field in fields:
+                            increment_field(line, field, offset)
+                    if reactive_atomics.get(section_name) is None:
+                        reactive_atomics[section_name] = []
+                    reactive_atomics[section_name] += section
+                offset += n_atoms
+            # remove now merged moleculetype from topology
+            del self.moleculetypes[name]
+            # and the topology dict
+            del self.top[f"moleculetype_{name}"]
+
+        reactive_moleculetype = MoleculeType((REACTIVE_MOLECULEYPE, "1"), reactive_atomics)
+        self.moleculetypes[REACTIVE_MOLECULEYPE] = reactive_moleculetype
 
     def validate_bond(self, atm1: Atom, atm2: Atom) -> bool:
         """Validates bond consistency between both atoms and top
@@ -626,11 +703,16 @@ class Topology:
 
     def _update_dict(self):
         """Update the topology dictionary with the current state of the topology."""
-        for i, moleculetype in enumerate(self.moleculetypes.values()):
+        for name, moleculetype in self.moleculetypes.items():
             moleculetype._update_atomics_dict()
-            set_moleculetype_atomics(
-                self.top, f"moleculetype_{i}", moleculetype.atomics
-            )
+            if name == REACTIVE_MOLECULEYPE:
+                set_moleculetype_atomics(
+                    self.top, name, moleculetype.atomics, create=True
+                )
+            else:
+                set_moleculetype_atomics(
+                    self.top, name, moleculetype.atomics
+                )
 
         set_top_section(
             self.top,
@@ -702,7 +784,7 @@ class Topology:
 
         self.atoms.pop(atom_nr)
         update_map_all = self.reindex_atomnrs()
-        update_map = update_map_all[self.main_molecule_name]
+        update_map = update_map_all[REACTIVE_MOLECULEYPE]
 
         if parameterize:
             self.update_parameters()
@@ -730,10 +812,10 @@ class Topology:
 
     def __str__(self) -> str:
         molecules = "\n".join([name + ": " + n for name, n in self.molecules.items()])
-        main_molecule = list(self.moleculetypes.values())[0]
+        reactive_moleculetype = self.moleculetypes.get(REACTIVE_MOLECULEYPE)
         text = (
             textwrap.dedent(f"Topology with the following molecules: \n{molecules}\n\n")
-            + textwrap.dedent(f"With {main_molecule}")
+            + textwrap.dedent(f"With {reactive_moleculetype}")
             + textwrap.dedent(f"{self.ff}")
         )
         return text
@@ -769,9 +851,6 @@ class Topology:
         """
         logger.debug(f"Breaking bond between {atompair_addresses}")
         if type(atompair_addresses[0]) == str and type(atompair_addresses[1]) == str:
-            # old style atompair_nrs with only atom numbers
-            # thus refers to the first moleculeype, moleculetype_0
-            # with the name Protein
             atompair_nrs = (atompair_addresses[0], atompair_addresses[1])
         else:
             raise NotImplementedError(
@@ -779,7 +858,7 @@ class Topology:
                 "different moleculetypes is not implemented."
             )
 
-        moleculetype = self.main_molecule
+        moleculetype = self.reactive_molecule
 
         # tuple -> list -> sorted -> tuple still makes it a tuple of two strings
         # so pyright can chill.
@@ -874,9 +953,6 @@ class Topology:
         """
         logger.debug(f"Creating bond between {atompair_addresses}")
         if type(atompair_addresses[0]) == str and type(atompair_addresses[1]) == str:
-            # old style atompair_nrs with only atom numbers
-            # thus refers to the first moleculeype, moleculetype_0
-            # with the name Protein
             atompair_nrs = (atompair_addresses[0], atompair_addresses[1])
         else:
             raise NotImplementedError(
@@ -884,7 +960,7 @@ class Topology:
                 "different moleculetypes is not implemented."
             )
 
-        moleculetype = self.main_molecule
+        moleculetype = self.reactive_molecule
 
         atompair_nrs: tuple[str, str] = tuple(sorted(atompair_nrs, key=int))  # type: ignore
         atompair = [
