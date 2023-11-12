@@ -583,7 +583,7 @@ class Topology:
         molecules = get_top_section(top, "molecules")
         if molecules is None:
             raise ValueError("molecules not found in top file")
-        self.molecules = {l[0]: l[1] for l in molecules}
+        self.molecules = [(l[0], l[1]) for l in molecules]
 
         self.ff = FF(top)
         self._parse_molecules()
@@ -624,7 +624,7 @@ class Topology:
         started_merging = False
         stopped_merging = False
         added_reactive_molecule = False
-        for m, n in self.molecules.items():
+        for m, n in self.molecules:
             if is_not_solvent_or_ion(m):
                 if stopped_merging:
                     m = f"""Attempting to merge a moleculetype {m} interspersed with non-merging moleculetypes.
@@ -643,7 +643,7 @@ class Topology:
                     stopped_merging = True
                 new_molecules += [(m, n)]
 
-        self.molecules = {k: v for k, v in new_molecules}
+        self.molecules = new_molecules
         return reactive_molecules
 
     def _merge_moleculetypes(self):
@@ -742,7 +742,7 @@ class Topology:
         set_top_section(
             self.top,
             "molecules",
-            [[name, n] for name, n in self.molecules.items()],
+            [[name, n] for name, n in self.molecules],
         )
 
         set_top_section(
@@ -836,7 +836,7 @@ class Topology:
             moleculetype._regenerate_topology_from_bound_to(self.ff)
 
     def __str__(self) -> str:
-        molecules = "\n".join([name + ": " + n for name, n in self.molecules.items()])
+        molecules = "\n".join([name + ": " + n for name, n in self.molecules])
         reactive_moleculetype = self.moleculetypes.get(REACTIVE_MOLECULEYPE)
         text = (
             textwrap.dedent(f"Topology with the following molecules: \n{molecules}\n\n")
