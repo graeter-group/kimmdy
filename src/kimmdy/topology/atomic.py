@@ -121,6 +121,7 @@ class DihedralRestraint:
             fc=l[7],
         )
 
+
 @dataclass()
 class Settle:
     """Information about one settles
@@ -144,6 +145,7 @@ class Settle:
             doh=l[2],
             dhh=l[3],
         )
+
 
 @dataclass()
 class Exclusion:

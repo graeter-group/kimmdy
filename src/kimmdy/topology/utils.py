@@ -147,13 +147,17 @@ def set_moleculetype_atomics(
     section = top.get(moleculetype)
     if section is None:
         if create:
-            logger.info(f"topology does not contain {moleculetype}. Creating new section.")
+            logger.info(
+                f"topology does not contain {moleculetype}. Creating new section."
+            )
             section = empty_section()
             section["content"] = [[name, "3"]]
             section["subsections"] = {k: empty_section() for k in atomics.keys()}
             top[moleculetype] = section
         else:
-            logger.warning(f"topology does not contain {moleculetype} and create=False. Not creating new section.")
+            logger.warning(
+                f"topology does not contain {moleculetype} and create=False. Not creating new section."
+            )
             return None
 
     subsections = section["subsections"]
@@ -192,9 +196,11 @@ def get_protein_section(top: dict, name: str) -> Optional[list[list]]:
     """Get content of a section in the first moleculetype (protein) from a topology dict."""
     return get_top_section(top, name, moleculetype="Protein")
 
+
 def get_reactive_section(top: dict, name: str) -> Optional[list[list]]:
     """Get content of a section in the Reactive moleculetype from a topology dict."""
     return get_top_section(top, name, moleculetype=REACTIVE_MOLECULEYPE)
+
 
 def set_top_section(
     top: dict, name: str, value: list, moleculetype: Optional[str] = None
@@ -241,6 +247,7 @@ def set_top_section(
 def set_protein_section(top: dict, name: str, value: list) -> Optional[list[list]]:
     """Set content of a section in the first moleculetype (protein) from a topology dict."""
     set_top_section(top, name, value, moleculetype="Protein")
+
 
 def set_reactive_section(top: dict, name: str, value: list) -> Optional[list[list]]:
     """Set content of a section in the first moleculetype (protein) from a topology dict."""
@@ -319,4 +326,3 @@ def match_atomic_item_to_atomic_type(
 def is_not_solvent_or_ion(name: str) -> bool:
     """Returns whether a moleculetype name is not solvent or ion."""
     return name.lower() not in [x.lower() for x in SOLVENT_NAMES + ION_NAMES]
-

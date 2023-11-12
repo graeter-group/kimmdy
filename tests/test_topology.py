@@ -448,7 +448,10 @@ class TestHexalaTopology:
 
         assert raw["moleculetype_Protein"]["content"][0] == ["Protein", "3"]
         assert top.top["moleculetype_Reactive"]["content"][0] == ["Reactive", "3"]
-        assert top.top["moleculetype_Reactive"]["subsections"] == raw["moleculetype_Protein"]["subsections"]
+        assert (
+            top.top["moleculetype_Reactive"]["subsections"]
+            == raw["moleculetype_Protein"]["subsections"]
+        )
 
         assert top.top == raw
 

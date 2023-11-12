@@ -1,6 +1,19 @@
 from kimmdy.constants import ATOMTYPE_BONDORDER_FLAT
 from kimmdy.parsing import TopologyDict
-from kimmdy.topology.atomic import *
+from kimmdy.topology.atomic import (
+    Atom,
+    Bond,
+    Pair,
+    Angle,
+    Dihedral,
+    MultipleDihedrals,
+    PositionRestraint,
+    DihedralRestraint,
+    ResidueImproperSpec,
+    ResidueProperSpec,
+    Settle,
+    Exclusion,
+)
 from kimmdy.topology.utils import (
     get_moleculetype_atomics,
     get_moleculetype_header,
@@ -57,8 +70,8 @@ class MoleculeType:
         self.dihedral_restraints: dict[
             tuple[str, str, str, str], DihedralRestraint
         ] = {}
-        self.settles = {}
-        self.exclusions = {}
+        self.settles: dict[str, Settle] = {}
+        self.exclusions: dict[int, Exclusion] = {}
         self.radicals: dict[str, Atom] = {}
 
         self._parse_atoms()
@@ -383,8 +396,7 @@ class MoleculeType:
                     elif candidate_key[i] == "N":
                         candidate_key[i] = "+N"
 
-            candidate_key = tuple(candidate_key)
-            dihedral = residue.improper_dihedrals.get(candidate_key)
+            dihedral = residue.improper_dihedrals.get(tuple(candidate_key))
             if dihedral:
                 dihedrals.append((candidate, dihedral))
 
@@ -678,7 +690,9 @@ class Topology:
             # and the topology dict
             del self.top[f"moleculetype_{name}"]
 
-        reactive_moleculetype = MoleculeType((REACTIVE_MOLECULEYPE, "1"), reactive_atomics)
+        reactive_moleculetype = MoleculeType(
+            (REACTIVE_MOLECULEYPE, "1"), reactive_atomics
+        )
         self.moleculetypes[REACTIVE_MOLECULEYPE] = reactive_moleculetype
 
     def validate_bond(self, atm1: Atom, atm2: Atom) -> bool:
@@ -735,9 +749,7 @@ class Topology:
                     self.top, name, moleculetype.atomics, create=True
                 )
             else:
-                set_moleculetype_atomics(
-                    self.top, name, moleculetype.atomics
-                )
+                set_moleculetype_atomics(self.top, name, moleculetype.atomics)
 
         set_top_section(
             self.top,

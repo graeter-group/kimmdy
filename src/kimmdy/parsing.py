@@ -93,6 +93,7 @@ def resolve_includes(
 def empty_section(condition: Optional[dict] = None) -> dict:
     return {"content": [], "else_content": [], "extra": [], "condition": condition}
 
+
 def read_top(
     path: Path,
     ffdir: Optional[Path] = None,
