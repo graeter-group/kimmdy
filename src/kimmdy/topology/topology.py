@@ -670,7 +670,8 @@ class Topology:
         """
         molecules = self._extract_mergable_molecules()
         reactive_atomics = {}
-        offset = 0
+        atomnr_offset = 0
+        resnr_offset = 0
         for name, n in molecules.items():
             add_atomics = self.moleculetypes[name].atomics
             n_atoms = len(add_atomics["atoms"])
@@ -678,13 +679,21 @@ class Topology:
                 for section_name, values in add_atomics.items():
                     section = deepcopy(values)
                     for line in section:
-                        fields = ATOM_ID_FIELDS[section_name]
-                        for field in fields:
-                            increment_field(line, field, offset)
+                        fields = ATOM_ID_FIELDS.get(section_name)
+                        if fields is not None:
+                            for field in fields:
+                                increment_field(line, field, atomnr_offset)
+                        fields = RESNR_ID_FIELDS.get(section_name)
+                        if fields is not None:
+                            for field in fields:
+                                increment_field(line, field, resnr_offset)
                     if reactive_atomics.get(section_name) is None:
                         reactive_atomics[section_name] = []
                     reactive_atomics[section_name] += section
-                offset += n_atoms
+                    if section_name == "atoms":
+                        # use last line to get lates resnr
+                        resnr_offset += int(section[-1][5])
+                atomnr_offset += n_atoms
             # remove now merged moleculetype from topology
             del self.moleculetypes[name]
             # and the topology dict
