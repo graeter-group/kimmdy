@@ -200,11 +200,6 @@ def _run(args: argparse.Namespace):
 
         exit()
 
-    if args.show_schema_path:
-        path = pkg_resources.files("kimmdy") / "kimmdy-yaml-schema.json"
-        print(f"{path}")
-        exit()
-
     if not Path(args.input).exists() and not args.checkpoint:
         raise FileNotFoundError(
             f"Input file {args.input} does not exist. Specify its name with "
@@ -302,7 +297,6 @@ def kimmdy_run(
     logfile: Optional[Path] = None,
     checkpoint: str = "",
     show_plugins: bool = False,
-    show_schema_path: bool = False,
     generate_jobscript: bool = False,
     debug: bool = False,
     callgraph: bool = False,
@@ -324,8 +318,6 @@ def kimmdy_run(
         If a directory is given, the file kimmdy.cpt in that directory is used.
     show_plugins
         Show available plugins and exit.
-    show_schema_path
-        Print path to yaml schema for use with yaml-language-server e.g. in VSCode and Neovim
     generate_jobscript
         Instead of running KIMMDY directly, generate at jobscript.sh for slurm HPC clusters
     """
@@ -335,7 +327,6 @@ def kimmdy_run(
         logfile=logfile,
         checkpoint=checkpoint,
         show_plugins=show_plugins,
-        show_schema_path=show_schema_path,
         generate_jobscript=generate_jobscript,
         debug=debug,
         callgraph=callgraph,
