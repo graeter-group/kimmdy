@@ -51,7 +51,7 @@ rest of the program and keeps track of global state.
 
 ##### get_latest { #kimmdy.runmanager.RunManager.get_latest }
 
-`runmanager.RunManager.get_latest(self, suffix)`
+`runmanager.RunManager.get_latest(suffix)`
 
 Returns path to latest file of given type.
 
@@ -60,7 +60,7 @@ Errors if file is not found.
 
 ##### write_one_checkpoint { #kimmdy.runmanager.RunManager.write_one_checkpoint }
 
-`runmanager.RunManager.write_one_checkpoint(self)`
+`runmanager.RunManager.write_one_checkpoint()`
 
 Just write the first checkpoint and then exit
 
