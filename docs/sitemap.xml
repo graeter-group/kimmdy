@@ -74,7 +74,7 @@
   </url>
   <url>
     <loc>http://hits-mbm-dev.github.io/kimmdy/index.html</loc>
-    <lastmod>2023-11-09T10:46:12.325Z</lastmod>
+    <lastmod>2023-11-13T12:09:22.119Z</lastmod>
   </url>
   <url>
     <loc>http://hits-mbm-dev.github.io/kimmdy/_reference/topology.atomic.html</loc>
@@ -126,7 +126,7 @@
   </url>
   <url>
     <loc>http://hits-mbm-dev.github.io/kimmdy/guide/tutorials/getting-started.html</loc>
-    <lastmod>2023-11-09T10:46:26.074Z</lastmod>
+    <lastmod>2023-11-13T12:09:22.115Z</lastmod>
   </url>
   <url>
     <loc>http://hits-mbm-dev.github.io/kimmdy/guide/tutorials/write-plugin.html</loc>
@@ -150,7 +150,7 @@
   </url>
   <url>
     <loc>http://hits-mbm-dev.github.io/kimmdy/guide/explanation/topology.html</loc>
-    <lastmod>2023-11-13T09:53:41.660Z</lastmod>
+    <lastmod>2023-11-13T12:32:15.729Z</lastmod>
   </url>
   <url>
     <loc>http://hits-mbm-dev.github.io/kimmdy/guide/reference/options.html</loc>
@@ -166,10 +166,14 @@
   </url>
   <url>
     <loc>http://hits-mbm-dev.github.io/kimmdy/guide/how-to/index.html</loc>
-    <lastmod>2023-11-09T10:36:13.734Z</lastmod>
+    <lastmod>2023-11-13T12:09:22.115Z</lastmod>
   </url>
   <url>
     <loc>http://hits-mbm-dev.github.io/kimmdy/guide/how-to/hcp.html</loc>
-    <lastmod>2023-11-09T10:36:13.734Z</lastmod>
+    <lastmod>2023-11-13T12:09:22.115Z</lastmod>
+  </url>
+  <url>
+    <loc>http://hits-mbm-dev.github.io/kimmdy/guide/how-to/examples.html</loc>
+    <lastmod>2023-11-13T12:54:11.673Z</lastmod>
   </url>
 </urlset>

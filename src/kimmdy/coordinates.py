@@ -8,6 +8,7 @@ from pathlib import Path
 
 from kimmdy.tasks import TaskFiles
 from kimmdy.parsing import read_plumed, write_plumed
+from kimmdy.constants import REACTIVE_MOLECULEYPE
 from kimmdy.recipe import Place
 from kimmdy.topology.topology import MoleculeType, Topology
 from kimmdy.topology.ff import FF
@@ -456,9 +457,8 @@ def merge_top_slow_growth(
     TODO: for now this assumes that only one moleculeype (the first, index 0) is of interest.
     """
 
-    first_molecule = list(topA.moleculetypes.keys())[0]
-    molA = topA.moleculetypes[first_molecule]
-    molB = topB.moleculetypes[first_molecule]
+    molA = topA.moleculetypes[REACTIVE_MOLECULEYPE]
+    molB = topB.moleculetypes[REACTIVE_MOLECULEYPE]
     molB = merge_top_moleculetypes_slow_growth(molA, molB, topB.ff, focus_nr)
 
     return topB

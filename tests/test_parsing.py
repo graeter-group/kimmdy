@@ -44,7 +44,7 @@ def test_ff_includes_with_gmxdir(arranged_tmp_path):
 
     assert top_dict["atomtypes"]
     assert top_dict["bondtypes"]
-    assert top_dict["moleculetype_1"] == tip3_dict["moleculetype_0"]
+    assert top_dict["moleculetype_SOL"] == tip3_dict["moleculetype_SOL"]
 
 
 def test_ff_includes_with_ff_in_cwd(arranged_tmp_path):
@@ -52,7 +52,23 @@ def test_ff_includes_with_ff_in_cwd(arranged_tmp_path):
     ions_dict = parsing.read_top(Path("amber99sb-star-ildnp.ff/ions.itp"))
     assert top_dict["atomtypes"]
     assert top_dict["bondtypes"]
-    assert top_dict["moleculetype_11"] == ions_dict["moleculetype_9"]
+    for k, v in top_dict.items():
+        print(k)
+    for k, v in ions_dict.items():
+        print(k)
+    for ion in [
+        "IB+",
+        "CA",
+        "CL",
+        "NA",
+        "MG",
+        "K",
+        "RB",
+        "CS",
+        "LI",
+        "ZN",
+    ]:
+        assert top_dict[f"moleculetype_{ion}"] == ions_dict[f"moleculetype_{ion}"]
 
 
 # test whether topology parsing is invertible

@@ -5,6 +5,7 @@ import MDAnalysis as mda
 import subprocess as sp
 from kimmdy.recipe import Break, Place
 from kimmdy.parsing import read_plumed, read_top
+from kimmdy.constants import REACTIVE_MOLECULEYPE
 from conftest import DummyFiles
 from kimmdy.tasks import TaskFiles
 from kimmdy.topology.atomic import Dihedral
@@ -46,7 +47,7 @@ def test_get_bondobj(arranged_tmp_path):
         bond1_keys,
         top_a.bonds[bond1_keys],
         top_a.ff.bondtypes,
-        top_a.moleculetypes["Protein"],
+        top_a.moleculetypes[REACTIVE_MOLECULEYPE],
     )
 
     bond2_keys = ("17", "19")
@@ -54,7 +55,7 @@ def test_get_bondobj(arranged_tmp_path):
         bond2_keys,
         top_a.bonds[bond2_keys],
         top_a.ff.bondtypes,
-        top_a.moleculetypes["Protein"],
+        top_a.moleculetypes[REACTIVE_MOLECULEYPE],
     )
     assert bond1obj is not None
     assert bond2obj is not None

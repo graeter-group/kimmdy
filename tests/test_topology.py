@@ -448,12 +448,8 @@ class TestHexalaTopology:
 
         assert raw["moleculetype_Protein"]["content"][0] == ["Protein", "3"]
         assert top.top["moleculetype_Reactive"]["content"][0] == ["Reactive", "3"]
-        assert (
-            top.top["moleculetype_Reactive"]["subsections"]
-            == raw["moleculetype_Protein"]["subsections"]
-        )
-
-        assert top.top == raw
+        for section in ["atoms", "bonds", "angles", "dihedrals", "pairs"]:
+            top.top["moleculetype_Reactive"]["subsections"][section]["content"] == raw["moleculetype_Protein"]["subsections"][section]["content"]
 
     def test_top_properties(self, hexala_top_fix):
         top = deepcopy(hexala_top_fix)

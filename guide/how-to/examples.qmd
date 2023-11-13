@@ -1,0 +1,17 @@
+---
+title: "Examples"
+subtitle: "Examples for running KIMMDY with different options for various systems"
+---
+
+## Further Examples
+
+KIMMDY contains examples generated from our internal test systems.
+Those examples don't currently have extensive documentation,
+but they can be used as a starting point for your own simulations.
+
+The examples are located in the `examples` directory of the KIMMDY source code
+[here](https://github.com/hits-mbm-dev/kimmdy/tree/main/example).
+
+
+
+

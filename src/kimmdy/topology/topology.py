@@ -10,7 +10,6 @@ from kimmdy.topology.atomic import (
     PositionRestraint,
     DihedralRestraint,
     ResidueImproperSpec,
-    ResidueProperSpec,
     Settle,
     Exclusion,
 )
@@ -513,7 +512,7 @@ class MoleculeType:
             if pair := self.pairs.get((dihedrals.ai, dihedrals.al)):
                 pair_ai = update_map.get(pair.ai)
                 pair_aj = update_map.get(pair.aj)
-                if not None in (pair_ai, pair_aj):
+                if None not in (pair_ai, pair_aj):
                     new_pairs[(pair_ai, pair_aj)] = pair
 
             dihedrals.ai = ai  # type: ignore

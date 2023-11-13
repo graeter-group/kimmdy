@@ -25,6 +25,7 @@
     "listing": "/guide/how-to/index.html",
     "items": [
       "/guide/how-to/contribute.html",
+      "/guide/how-to/examples.html",
       "/guide/how-to/hcp.html"
     ]
   }
