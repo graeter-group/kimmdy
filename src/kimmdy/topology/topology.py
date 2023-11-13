@@ -899,7 +899,7 @@ class Topology:
 
         # tuple -> list -> sorted -> tuple still makes it a tuple of two strings
         # so pyright can chill.
-        atompair_nrs: tuple[str, str] = tuple(sorted(atompair_nrs, key=int))  # type: ignore
+        atompair_nrs: tuple[str, str] = tuple(sorted(atompair_addresses, key=int))  # type: ignore
 
         atompair = [
             reactive_moleculetype.atoms[atompair_nrs[0]],
@@ -992,7 +992,7 @@ class Topology:
 
         reactive_moleculetype = self.reactive_molecule
 
-        atompair_nrs: tuple[str, str] = tuple(sorted(atompair_nrs, key=int))  # type: ignore
+        atompair_nrs: tuple[str, str] = tuple(sorted(atompair_addresses, key=int))  # type: ignore
         atompair = [
             reactive_moleculetype.atoms[atompair_nrs[0]],
             reactive_moleculetype.atoms[atompair_nrs[1]],
