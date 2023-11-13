@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.1.12](https://github.com/hits-mbm-dev/kimmdy/compare/v5.1.11...v5.1.12) (2023-11-13)
+
+
+### Bug Fixes
+
+* remove show schema path option ([2285246](https://github.com/hits-mbm-dev/kimmdy/commit/2285246c355b0f52cc65f1edd24645af7f4e4e9b))
+
 ## [5.1.11](https://github.com/hits-mbm-dev/kimmdy/compare/v5.1.10...v5.1.11) (2023-11-08)
 
 
