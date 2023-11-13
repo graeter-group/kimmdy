@@ -685,6 +685,7 @@ class Topology:
                                 increment_field(line, field, atomnr_offset)
                         fields = RESNR_ID_FIELDS.get(section_name)
                         if fields is not None:
+                            print(fields)
                             for field in fields:
                                 increment_field(line, field, resnr_offset)
                     if reactive_atomics.get(section_name) is None:
