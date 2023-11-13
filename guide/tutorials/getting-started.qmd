@@ -85,7 +85,7 @@ This is a radical.
 We will use the builtin `hat_reaction` to simulate hydrogen atom transfer reactions
 from nearby hydrogens to the radical position.
 
-{{< mol-snapshot vis-ala.molj >}}
+{{< mol-snapshot ./getting-started-files/vis-ala.molj >}}
 
 Start the KIMMDY run with the `kimmdy` command:
 

@@ -19,6 +19,7 @@ See [gromacs manual](https://manual.gromacs.org/current/reference-manual/topolog
 | [Dihedral](#kimmdy.topology.atomic.Dihedral) | Information about one proper or improper dihedral |
 | [DihedralRestraint](#kimmdy.topology.atomic.DihedralRestraint) | Information about one dihedral restraint. |
 | [DihedralType](#kimmdy.topology.atomic.DihedralType) | Information about one dihedraltype |
+| [Exclusion](#kimmdy.topology.atomic.Exclusion) | Information about one exclusion |
 | [MultipleDihedralTypes](#kimmdy.topology.atomic.MultipleDihedralTypes) | Multiple ``DihedralTypes``s with the same ai, aj, ak, al |
 | [MultipleDihedrals](#kimmdy.topology.atomic.MultipleDihedrals) | Multiple ``Dihedral``s with the same ai, aj, ak, al |
 | [Pair](#kimmdy.topology.atomic.Pair) | Information about one pair |
@@ -28,6 +29,7 @@ See [gromacs manual](https://manual.gromacs.org/current/reference-manual/topolog
 | [ResidueImproperSpec](#kimmdy.topology.atomic.ResidueImproperSpec) | Information about one imroper dihedral in a residue |
 | [ResidueProperSpec](#kimmdy.topology.atomic.ResidueProperSpec) | Information about one imroper dihedral in a residue |
 | [ResidueType](#kimmdy.topology.atomic.ResidueType) | Information about one residuetype from aminoacids.rtp |
+| [Settle](#kimmdy.topology.atomic.Settle) | Information about one settles |
 
 ### Angle { #kimmdy.topology.atomic.Angle }
 
@@ -144,6 +146,17 @@ the `id`.
 From gromacs version of the amber* ff:
 ; i j k l func phase kd pn
 
+### Exclusion { #kimmdy.topology.atomic.Exclusion }
+
+`topology.atomic.Exclusion(ai, aj, ak=None, al=None)`
+
+Information about one exclusion
+
+A class containing atom information as in the exclusions section of the topology.
+
+From gromacs topology:
+; nr funct doh dhh
+
 ### MultipleDihedralTypes { #kimmdy.topology.atomic.MultipleDihedralTypes }
 
 `topology.atomic.MultipleDihedralTypes(ai, aj, ak, al, funct, dihedral_types)`
@@ -221,3 +234,14 @@ Information about one imroper dihedral in a residue
 `topology.atomic.ResidueType(residue, atoms, bonds, proper_dihedrals, improper_dihedrals)`
 
 Information about one residuetype from aminoacids.rtp
+
+### Settle { #kimmdy.topology.atomic.Settle }
+
+`topology.atomic.Settle(nr, funct, doh, dhh)`
+
+Information about one settles
+
+A class containing atom information as in the settle section of the topology.
+
+From gromacs topology:
+; nr funct doh dhh

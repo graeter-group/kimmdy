@@ -80,6 +80,7 @@ website:
 execute:
   warning: false
   echo: true
+  freeze: auto
 
 format:
   html:

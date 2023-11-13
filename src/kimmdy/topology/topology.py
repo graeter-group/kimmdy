@@ -895,23 +895,15 @@ class Topology:
             Between which atoms to break the bond.
         """
         logger.debug(f"Breaking bond between {atompair_addresses}")
-        if type(atompair_addresses[0]) == str and type(atompair_addresses[1]) == str:
-            atompair_nrs = (atompair_addresses[0], atompair_addresses[1])
-        else:
-            raise NotImplementedError(
-                "Breaking/Binding bonds in topology between atoms with "
-                "different moleculetypes is not implemented."
-            )
-
-        moleculetype = self.reactive_molecule
+        reactive_moleculetype = self.reactive_molecule
 
         # tuple -> list -> sorted -> tuple still makes it a tuple of two strings
         # so pyright can chill.
         atompair_nrs: tuple[str, str] = tuple(sorted(atompair_nrs, key=int))  # type: ignore
 
         atompair = [
-            moleculetype.atoms[atompair_nrs[0]],
-            moleculetype.atoms[atompair_nrs[1]],
+            reactive_moleculetype.atoms[atompair_nrs[0]],
+            reactive_moleculetype.atoms[atompair_nrs[1]],
         ]
 
         if not self.validate_bond(*atompair):
@@ -926,44 +918,44 @@ class Topology:
         # mark atoms as radicals
         for atom in atompair:
             atom.is_radical = True
-            moleculetype.radicals[atom.nr] = atom
+            reactive_moleculetype.radicals[atom.nr] = atom
 
         # bonds
         # remove bond
-        removed_bond = moleculetype.bonds.pop(atompair_nrs)
+        removed_bond = reactive_moleculetype.bonds.pop(atompair_nrs)
         logging.debug(f"removed bond: {removed_bond}")
 
         # remove angles
-        angle_keys = moleculetype._get_center_atom_angles(
+        angle_keys = reactive_moleculetype._get_center_atom_angles(
             atompair_nrs[0]
-        ) + moleculetype._get_center_atom_angles(atompair_nrs[1])
+        ) + reactive_moleculetype._get_center_atom_angles(atompair_nrs[1])
         for key in angle_keys:
             if all([x in key for x in atompair_nrs]):
                 # angle contained a now deleted bond because
                 # it had both atoms of the broken bond
-                moleculetype.angles.pop(key, None)
+                reactive_moleculetype.angles.pop(key, None)
 
         # remove proper dihedrals
         # and pairs
-        dihedral_keys = moleculetype._get_atom_proper_dihedrals(
+        dihedral_keys = reactive_moleculetype._get_atom_proper_dihedrals(
             atompair_nrs[0]
-        ) + moleculetype._get_atom_proper_dihedrals(atompair_nrs[1])
+        ) + reactive_moleculetype._get_atom_proper_dihedrals(atompair_nrs[1])
         for key in dihedral_keys:
             # don't use periodicity in key for checking atompair_nrs
             if all([x in key for x in atompair_nrs]):
                 # dihedral contained a now deleted bond because
                 # it had both atoms of the broken bond
-                moleculetype.proper_dihedrals.pop(key, None)
+                reactive_moleculetype.proper_dihedrals.pop(key, None)
                 pairkey: tuple[str, str] = tuple(sorted((key[0], key[3]), key=int))  # type: ignore
-                moleculetype.pairs.pop(pairkey, None)
+                reactive_moleculetype.pairs.pop(pairkey, None)
 
         # and improper dihedrals
-        dihedral_k_v = moleculetype._get_atom_improper_dihedrals(
+        dihedral_k_v = reactive_moleculetype._get_atom_improper_dihedrals(
             atompair_nrs[0], self.ff
-        ) + moleculetype._get_atom_improper_dihedrals(atompair_nrs[1], self.ff)
+        ) + reactive_moleculetype._get_atom_improper_dihedrals(atompair_nrs[1], self.ff)
         for key, _ in dihedral_k_v:
             if all([x in key for x in atompair_nrs]):
-                moleculetype.improper_dihedrals.pop(key, None)
+                reactive_moleculetype.improper_dihedrals.pop(key, None)
 
         # warn if atom is part of restraint
         for atom in atompair:
@@ -997,20 +989,13 @@ class Topology:
             Atoms to bind together.
         """
         logger.debug(f"Creating bond between {atompair_addresses}")
-        if type(atompair_addresses[0]) == str and type(atompair_addresses[1]) == str:
-            atompair_nrs = (atompair_addresses[0], atompair_addresses[1])
-        else:
-            raise NotImplementedError(
-                "Breaking/Binding bonds in topology between atoms with "
-                "different moleculetypes is not implemented."
-            )
 
-        moleculetype = self.reactive_molecule
+        reactive_moleculetype = self.reactive_molecule
 
         atompair_nrs: tuple[str, str] = tuple(sorted(atompair_nrs, key=int))  # type: ignore
         atompair = [
-            moleculetype.atoms[atompair_nrs[0]],
-            moleculetype.atoms[atompair_nrs[1]],
+            reactive_moleculetype.atoms[atompair_nrs[0]],
+            reactive_moleculetype.atoms[atompair_nrs[1]],
         ]
 
         # check whether they are bound already
@@ -1028,7 +1013,7 @@ class Topology:
             atompair[0].is_radical = False
             atompair[1].is_radical = False
             for a in atompair:
-                if moleculetype.radicals.pop(a.nr) is None:
+                if reactive_moleculetype.radicals.pop(a.nr) is None:
                     logging.warning(
                         f"Atom {a} should have been a radical but was "
                         "not registed in moleculetype.radicals"
@@ -1053,7 +1038,7 @@ class Topology:
 
                 residue_atomnames_current = [
                     a.atom
-                    for a in moleculetype.atoms.values()
+                    for a in reactive_moleculetype.atoms.values()
                     if a.resnr == other_atom.resnr
                 ]
                 type_set = False
@@ -1093,16 +1078,16 @@ class Topology:
         # bonds
         # add bond
         bond = Bond(atompair_nrs[0], atompair_nrs[1], "1")
-        moleculetype.bonds[atompair_nrs] = bond
+        reactive_moleculetype.bonds[atompair_nrs] = bond
         logging.info(f"added bond: {bond}")
 
         # add angles
-        angle_keys = moleculetype._get_atom_angles(
+        angle_keys = reactive_moleculetype._get_atom_angles(
             atompair_nrs[0]
-        ) + moleculetype._get_atom_angles(atompair_nrs[1])
+        ) + reactive_moleculetype._get_atom_angles(atompair_nrs[1])
         for key in angle_keys:
-            if moleculetype.angles.get(key) is None:
-                moleculetype.angles[key] = Angle(key[0], key[1], key[2], "1")
+            if reactive_moleculetype.angles.get(key) is None:
+                reactive_moleculetype.angles[key] = Angle(key[0], key[1], key[2], "1")
 
         # add proper and improper dihedrals
         # add proper dihedrals and pairs
@@ -1110,28 +1095,28 @@ class Topology:
         # and adds all possible dihedrals (and pairs)
         # later we should check the ff if there are multiple
         # dihedrals for the same atoms with different periodicities.
-        dihedral_keys = moleculetype._get_atom_proper_dihedrals(
+        dihedral_keys = reactive_moleculetype._get_atom_proper_dihedrals(
             atompair_nrs[0]
-        ) + moleculetype._get_atom_proper_dihedrals(atompair_nrs[1])
+        ) + reactive_moleculetype._get_atom_proper_dihedrals(atompair_nrs[1])
         for key in dihedral_keys:
-            if moleculetype.proper_dihedrals.get(key) is None:
-                moleculetype.proper_dihedrals[key] = MultipleDihedrals(
+            if reactive_moleculetype.proper_dihedrals.get(key) is None:
+                reactive_moleculetype.proper_dihedrals[key] = MultipleDihedrals(
                     *key, "9", dihedrals={"": Dihedral(*key, "9")}
                 )
             pairkey: tuple[str, str] = tuple(str(x) for x in sorted([key[0], key[3]], key=int))  # type: ignore
-            if moleculetype.pairs.get(pairkey) is None:
-                moleculetype.pairs[pairkey] = Pair(pairkey[0], pairkey[1], "1")
+            if reactive_moleculetype.pairs.get(pairkey) is None:
+                reactive_moleculetype.pairs[pairkey] = Pair(pairkey[0], pairkey[1], "1")
 
         # improper dihedral
-        dihedral_k_v = moleculetype._get_atom_improper_dihedrals(
+        dihedral_k_v = reactive_moleculetype._get_atom_improper_dihedrals(
             atompair_nrs[0], self.ff
-        ) + moleculetype._get_atom_improper_dihedrals(atompair_nrs[1], self.ff)
+        ) + reactive_moleculetype._get_atom_improper_dihedrals(atompair_nrs[1], self.ff)
         for key, value in dihedral_k_v:
-            if moleculetype.improper_dihedrals.get(key) is None:
+            if reactive_moleculetype.improper_dihedrals.get(key) is None:
                 # TODO: fix this
                 c2 = ""
                 if value.q0 is not None:
                     c2 = "1"
-                moleculetype.improper_dihedrals[key] = Dihedral(
+                reactive_moleculetype.improper_dihedrals[key] = Dihedral(
                     key[0], key[1], key[2], key[3], "4", value.q0, value.cq, c2
                 )

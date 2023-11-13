@@ -203,6 +203,12 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../guide/how-to/examples.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Examples</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../guide/how-to/hcp.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">High Performance Computing</span></a>
   </div>
@@ -227,13 +233,13 @@ ul.task-list li input[type="checkbox"] {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../guide/tutorials/getting-started.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Getting Started</span></a>
+ <span class="menu-text">Get Started</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../guide/tutorials/write-plugin.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Writing a Reaction Plugin</span></a>
+ <span class="menu-text">Write a Reaction Plugin</span></a>
   </div>
 </li>
       </ul>
@@ -553,7 +559,7 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="kimmdy.cmd.kimmdy_run" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.cmd.kimmdy_run">kimmdy_run</h3>
-<p><code>cmd.kimmdy_run(input=Path('kimmdy.yml'), loglevel=None, logfile=None, checkpoint='', show_plugins=False, show_schema_path=False, generate_jobscript=False, debug=False, callgraph=False)</code></p>
+<p><code>cmd.kimmdy_run(input=Path('kimmdy.yml'), loglevel=None, logfile=None, checkpoint='', show_plugins=False, generate_jobscript=False, debug=False, callgraph=False)</code></p>
 <p>Run KIMMDY from python.</p>
 <p>Also see See <a href="../_reference/cmd.html#kimmdy.cmd.get_cmdline_args"><code>get_cmdline_args</code></a> or <code>kimmdy --help</code> for the descriptions of the arguments.</p>
 <section id="parameters-1" class="level4">
@@ -599,12 +605,6 @@ ul.task-list li input[type="checkbox"] {
 <td><code>False</code></td>
 </tr>
 <tr class="even">
-<td><code>show_schema_path</code></td>
-<td><a href="https://docs.python.org/3.10/library/functions.html#bool">bool</a></td>
-<td>Print path to yaml schema for use with yaml-language-server e.g.&nbsp;in VSCode and Neovim</td>
-<td><code>False</code></td>
-</tr>
-<tr class="odd">
 <td><code>generate_jobscript</code></td>
 <td><a href="https://docs.python.org/3.10/library/functions.html#bool">bool</a></td>
 <td>Instead of running KIMMDY directly, generate at jobscript.sh for slurm HPC clusters</td>

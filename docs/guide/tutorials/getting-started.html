@@ -585,10 +585,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> reactions</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Our starting structure is a simple ACE/NME-capped Alanine molecule in a box of water. Note, how it has a missing hydrogen atom on the alpha carbon. This is a radical. We will use the builtin <code>hat_reaction</code> to simulate hydrogen atom transfer reactions from nearby hydrogens to the radical position.</p>
-    <div id="app-vis-ala.molj" class="molstar-app"></div>
+    <div id="app-./getting-started-files/vis-ala.molj" class="molstar-app"></div>
     <script type="text/javascript">
-    molstar.Viewer.create("app-vis-ala.molj", {"pdbProvider":"rcsb","layoutShowRemoteState":false,"layoutIsExpanded":false,"layoutShowLog":false,"layoutShowSequence":false,"viewportShowSelectionMode":false,"viewportShowExpand":true,"layoutShowControls":false,"emdbProvider":"rcsb","viewportShowAnimation":true,"layoutShowLeftPanel":true}).then(viewer => {
-    viewer.loadSnapshotFromUrl(url="vis-ala.molj", "molj");    });
+    molstar.Viewer.create("app-./getting-started-files/vis-ala.molj", {"layoutIsExpanded":false,"layoutShowControls":false,"layoutShowLog":false,"emdbProvider":"rcsb","viewportShowAnimation":true,"layoutShowRemoteState":false,"layoutShowSequence":false,"viewportShowExpand":true,"viewportShowSelectionMode":false,"pdbProvider":"rcsb","layoutShowLeftPanel":true}).then(viewer => {
+    viewer.loadSnapshotFromUrl(url="./getting-started-files/vis-ala.molj", "molj");    });
     </script>
     
 <p>Start the KIMMDY run with the <code>kimmdy</code> command:</p>
