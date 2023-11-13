@@ -88,6 +88,7 @@ format:
     toc-expand: true
     mainfont: Roboto
     number-depth: 0
+    highlight-style: github
     theme:
       light:
       - default

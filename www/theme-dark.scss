@@ -1,7 +1,7 @@
 /*-- scss:defaults --*/
 
 // Base document colors
-$body-bg: #181818;
+$body-bg: #050725;
 $body-color: white;
 $link-color: #75AADB;
 
@@ -11,12 +11,12 @@ $gray-base:              #000 !default;
 $gray-dark:              lighten($gray-base, 20%) !default;   // #333
 
 // Navigation element colors
-$footer-bg: #181818;
-$navbar-bg: #303030;
-$sidebar-bg: #303030;
+$footer-bg: #030316;
+$navbar-bg: #030316;
+$sidebar-bg: #030316;
 
 // Code blocks
-$code-block-bg-alpha: -.8;
+$code-block-bg-alpha: -.90;
 
 // Bootstrap popovers
 $popover-bg: #242424;
@@ -29,3 +29,8 @@ $input-bg: #242424;
 .navbar-light .navbar-brand {
     color: white;
 }
+
+pre code {
+  color: $body-color;
+}
+

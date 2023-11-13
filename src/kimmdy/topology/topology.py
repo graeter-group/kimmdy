@@ -604,7 +604,6 @@ class Topology:
 
         self._merge_moleculetypes()
         self._link_atomics()
-        self._update_dict()
 
     def _link_atomics(self):
         """
@@ -678,32 +677,32 @@ class Topology:
             for _ in range(n):
                 for section_name, values in add_atomics.items():
                     section = deepcopy(values)
+                    atomnr_fields = ATOM_ID_FIELDS.get(section_name, [])
+                    resnr_fields = RESNR_ID_FIELDS.get(section_name, [])
                     for line in section:
-                        fields = ATOM_ID_FIELDS.get(section_name)
-                        if fields is not None:
-                            for field in fields:
-                                increment_field(line, field, atomnr_offset)
-                        fields = RESNR_ID_FIELDS.get(section_name)
-                        if fields is not None:
-                            print(fields)
-                            for field in fields:
-                                increment_field(line, field, resnr_offset)
+                        for field in atomnr_fields:
+                            increment_field(line, field, atomnr_offset)
+                        for field in resnr_fields:
+                            increment_field(line, field, resnr_offset)
                     if reactive_atomics.get(section_name) is None:
                         reactive_atomics[section_name] = []
                     reactive_atomics[section_name] += section
-                    if section_name == "atoms":
-                        # use last line to get lates resnr
-                        resnr_offset += int(section[-1][5])
+                    if section_name == "atoms" and resnr_fields:
+                        # use last line to get latest resnr
+                        resnr_offset += int(section[-1][resnr_fields[0]])
                 atomnr_offset += n_atoms
             # remove now merged moleculetype from topology
-            del self.moleculetypes[name]
             # and the topology dict
+            del self.moleculetypes[name]
             del self.top[f"moleculetype_{name}"]
 
+        # add merged moleculetype to topology
         reactive_moleculetype = MoleculeType(
             (REACTIVE_MOLECULEYPE, "1"), reactive_atomics
         )
         self.moleculetypes[REACTIVE_MOLECULEYPE] = reactive_moleculetype
+        # update topology dict
+        self._update_dict()
 
     def validate_bond(self, atm1: Atom, atm2: Atom) -> bool:
         """Validates bond consistency between both atoms and top
