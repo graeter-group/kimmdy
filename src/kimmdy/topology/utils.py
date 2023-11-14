@@ -12,6 +12,7 @@ from kimmdy.parsing import TopologyDict, empty_section
 
 if TYPE_CHECKING:
     from kimmdy.topology.atomic import AtomicType, AtomicTypes
+    from kimmdy.config import Config
 
 logger = logging.getLogger(__name__)
 
@@ -322,7 +323,25 @@ def match_atomic_item_to_atomic_type(
 
     return result
 
+def increment_field(l: list[str], i: int, n: int):
+    l[i] = str(int(l[i]) + n)
+    return l
 
 def is_not_solvent_or_ion(name: str) -> bool:
     """Returns whether a moleculetype name is not solvent or ion."""
     return name.lower() not in [x.lower() for x in SOLVENT_NAMES + ION_NAMES]
+
+def get_is_reactive_predicate_f(cfg: Config) -> Callable[[str], bool]:
+    """Returns whether a moleculetype name is configured to be recognized as reactive."""
+    include = [x.lower() for x in cfg.include.split()]
+    exclude = [x.lower() for x in cfg.exclude.split()]
+    default_excludes = [x.lower() for x in SOLVENT_NAMES + ION_NAMES]
+
+    def f(name: str) -> bool:
+        lower_name = name.lower()
+        return lower_name not in exclude and (lower_name not in default_excludes or lower_name in include)
+
+    return f
+
+
+

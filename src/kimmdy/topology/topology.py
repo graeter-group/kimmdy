@@ -29,8 +29,10 @@ import textwrap
 import logging
 from copy import copy, deepcopy
 from kimmdy.constants import ATOM_ID_FIELDS, RESNR_ID_FIELDS, REACTIVE_MOLECULEYPE
+from typing import Callable
 
 from kimmdy.utils import TopologyAtomAddress
+from kimmdy.topology.utils import increment_field
 
 logger = logging.getLogger("kimmdy.topology")
 
@@ -558,11 +560,6 @@ class MoleculeType:
         return update_map
 
 
-def increment_field(l: list[str], i: int, n: int):
-    l[i] = str(int(l[i]) + n)
-    return l
-
-
 class Topology:
     """Smart container for parsed topology data.
 
@@ -582,7 +579,8 @@ class Topology:
     """
 
     def __init__(
-        self, top: TopologyDict, parametrizer: Parameterizer = BasicParameterizer()
+        self, top: TopologyDict, parametrizer: Parameterizer = BasicParameterizer(),
+        is_reactive_predicate_f: Callable[[str], bool] = is_not_solvent_or_ion
     ) -> None:
         if top == {}:
             raise NotImplementedError(
@@ -599,6 +597,8 @@ class Topology:
         self.ff = FF(top)
         self._parse_molecules()
         self.parametrizer = parametrizer
+        self._check_is_reactive_molecule = is_reactive_predicate_f
+
         self.needs_parameterization = False
 
         self._merge_moleculetypes()
@@ -635,7 +635,7 @@ class Topology:
         stopped_merging = False
         added_reactive_molecule = False
         for m, n in self.molecules:
-            if is_not_solvent_or_ion(m):
+            if self._check_is_reactive_molecule(m):
                 if stopped_merging:
                     m = f"""Attempting to merge a moleculetype {m} interspersed with non-merging moleculetypes.
             Please make sure that all moleculetypes to be merged (all non-solvent molecules or ions by default)

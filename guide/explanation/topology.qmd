@@ -34,7 +34,6 @@ write_top_as_dot(top, "ala-top.dot")
 ```{python}
 urea_dict = read_top(Path('../../tests/test_files/test_topology/urea.top'), use_gmx_dir=False)
 urea = Topology(urea_dict)
-
 write_top_as_dot(urea, "urea-top.dot")
 ```
 
@@ -83,11 +82,5 @@ We end up with
 This way, explicit atom numbers match up with the atom numbers
 in the coordinate file (or rather, line numbers - 2, since the
 numbers in the actual `atomnr` column can overflow due to the fixed-width file format).
-
-```{python}
-urea_dict = read_top(Path('../../tests/test_files/test_topology/urea-times-2.top'), use_gmx_dir=False)
-urea = Topology(urea_dict)
-urea
-```
 
 

@@ -28,6 +28,7 @@ from kimmdy.coordinates import place_atom, break_bond_plumed, merge_top_slow_gro
 from kimmdy.tasks import Task, TaskFiles, get_plumed_out
 from pprint import pformat
 from kimmdy.topology.topology import Topology
+from kimmdy.topology.utils import get_is_reactive_predicate_f
 import time
 from kimmdy.kmc import KMCResult, rf_kmc, extrande, frm, extrande_mod
 
@@ -142,7 +143,11 @@ class RunManager:
                 f"'{self.config.changer.topology.parameterization}' can not be found in "
                 f"the parameterization plugins: {list(parameterization_plugins.keys())}"
             ) from e
-        self.top = Topology(read_top(self.config.top, self.config.ff), parameterizer)
+        self.top = Topology(
+            top=read_top(self.config.top, self.config.ff),
+            parametrizer=parameterizer,
+            is_reactive_predicate_f=get_is_reactive_predicate_f(self.config.topology.reactive),
+        )
 
         self.filehist: list[dict[str, TaskFiles]] = [
             {"setup": TaskFiles(self.get_latest)}
