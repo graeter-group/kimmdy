@@ -579,8 +579,10 @@ class Topology:
     """
 
     def __init__(
-        self, top: TopologyDict, parametrizer: Parameterizer = BasicParameterizer(),
-        is_reactive_predicate_f: Callable[[str], bool] = is_not_solvent_or_ion
+        self,
+        top: TopologyDict,
+        parametrizer: Parameterizer = BasicParameterizer(),
+        is_reactive_predicate_f: Callable[[str], bool] = is_not_solvent_or_ion,
     ) -> None:
         if top == {}:
             raise NotImplementedError(
@@ -655,7 +657,9 @@ class Topology:
                 new_molecules += [(m, n)]
 
         self.molecules = new_molecules
-        logger.info("Merging the following molecules into the Reactive moleculetype and making their multiples explicit:")
+        logger.info(
+            "Merging the following molecules into the Reactive moleculetype and making their multiples explicit:"
+        )
         for m, n in reactive_molecules.items():
             logger.info(f"\t{m} {n}")
         return reactive_molecules

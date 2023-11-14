@@ -147,7 +147,9 @@ class RunManager:
         self.top = Topology(
             top=read_top(self.config.top, self.config.ff),
             parametrizer=parameterizer,
-            is_reactive_predicate_f=get_is_reactive_predicate_f(self.config.topology.reactive),
+            is_reactive_predicate_f=get_is_reactive_predicate_f(
+                self.config.topology.reactive
+            ),
         )
 
         self.filehist: list[dict[str, TaskFiles]] = [

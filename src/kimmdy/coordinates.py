@@ -21,7 +21,7 @@ from kimmdy.topology.atomic import (
     Interaction,
     InteractionType,
     InteractionTypes,
-    Exclusion
+    Exclusion,
 )
 from kimmdy.topology.utils import match_atomic_item_to_atomic_type
 

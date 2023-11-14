@@ -323,13 +323,16 @@ def match_atomic_item_to_atomic_type(
 
     return result
 
+
 def increment_field(l: list[str], i: int, n: int):
     l[i] = str(int(l[i]) + n)
     return l
 
+
 def is_not_solvent_or_ion(name: str) -> bool:
     """Returns whether a moleculetype name is not solvent or ion."""
     return name.lower() not in [x.lower() for x in SOLVENT_NAMES + ION_NAMES]
+
 
 def get_is_reactive_predicate_f(cfg: Config) -> Callable[[str], bool]:
     """Returns whether a moleculetype name is configured to be recognized as reactive."""
@@ -339,9 +342,8 @@ def get_is_reactive_predicate_f(cfg: Config) -> Callable[[str], bool]:
 
     def f(name: str) -> bool:
         lower_name = name.lower()
-        return lower_name not in exclude and (lower_name not in default_excludes or lower_name in include)
+        return lower_name not in exclude and (
+            lower_name not in default_excludes or lower_name in include
+        )
 
     return f
-
-
-

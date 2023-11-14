@@ -48,14 +48,16 @@ def raw_top_b_fix(filedir) -> TopologyDict:
 def raw_urea_top_fix(filedir) -> TopologyDict:
     return read_top(filedir / "urea.top")
 
+
 @pytest.fixture()
 def raw_urea_times_two_top_fix(filedir) -> TopologyDict:
     return read_top(filedir / "urea-times-2.top")
 
+
 @pytest.fixture()
 def raw_two_different_ureas_top_fix(filedir) -> TopologyDict:
     return read_top(filedir / "two-different-ureas.top")
- 
+
 
 @pytest.fixture()
 def hexala_top_fix(assetsdir, filedir) -> Topology:
@@ -210,7 +212,6 @@ class TestUrea:
                 assert int(a1.resnr) == int(a2.resnr) - 2
             else:
                 assert int(a1.resnr) == int(a2.resnr) - 1
-
 
 
 class TestTopAB:
