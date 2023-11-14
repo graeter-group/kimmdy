@@ -1,5 +1,31 @@
 # Changelog
 
+## [5.2.0](https://github.com/hits-mbm-dev/kimmdy/compare/v5.1.12...v5.2.0) (2023-11-14)
+
+
+### Features
+
+* add config for exclude and include in reactive moleculetype ([44121e4](https://github.com/hits-mbm-dev/kimmdy/commit/44121e4c253decb8b2af566e3c72dff10ed8b251))
+* merge react-able molecules and make multiples explicit ([#327](https://github.com/hits-mbm-dev/kimmdy/issues/327)) ([ae8d45e](https://github.com/hits-mbm-dev/kimmdy/commit/ae8d45ea714713180989a59043d8c21224697700))
+* parse settles and exclusions ([44121e4](https://github.com/hits-mbm-dev/kimmdy/commit/44121e4c253decb8b2af566e3c72dff10ed8b251))
+* use parsed exclusions for top merge ([44121e4](https://github.com/hits-mbm-dev/kimmdy/commit/44121e4c253decb8b2af566e3c72dff10ed8b251))
+
+
+### Bug Fixes
+
+* declare kimmdy as being a typed library ([44121e4](https://github.com/hits-mbm-dev/kimmdy/commit/44121e4c253decb8b2af566e3c72dff10ed8b251))
+* expected length of output folders including the new setup task ([8fd2b44](https://github.com/hits-mbm-dev/kimmdy/commit/8fd2b4462e664c0ad374eeff161388e6f1010040))
+* make molecules section a list instead of dict because order is important ([44121e4](https://github.com/hits-mbm-dev/kimmdy/commit/44121e4c253decb8b2af566e3c72dff10ed8b251))
+* start iteration at -1 such that setup task has index 0 ([44121e4](https://github.com/hits-mbm-dev/kimmdy/commit/44121e4c253decb8b2af566e3c72dff10ed8b251))
+* tasklist test after integrating setup task ([44121e4](https://github.com/hits-mbm-dev/kimmdy/commit/44121e4c253decb8b2af566e3c72dff10ed8b251))
+
+
+### Documentation
+
+* improve dark theme ([44121e4](https://github.com/hits-mbm-dev/kimmdy/commit/44121e4c253decb8b2af566e3c72dff10ed8b251))
+* more detailed ML installation instructions for upcoming plugins ([c128069](https://github.com/hits-mbm-dev/kimmdy/commit/c128069beb5940b27d2833de1135560bd7eedd5f))
+* use freeze to only re-render changed qmd docs ([44121e4](https://github.com/hits-mbm-dev/kimmdy/commit/44121e4c253decb8b2af566e3c72dff10ed8b251))
+
 ## [5.1.12](https://github.com/hits-mbm-dev/kimmdy/compare/v5.1.11...v5.1.12) (2023-11-13)
 
 

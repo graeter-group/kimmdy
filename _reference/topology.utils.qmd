@@ -8,6 +8,7 @@
 
 | Name | Description |
 | --- | --- |
+| [get_is_reactive_predicate_f](#kimmdy.topology.utils.get_is_reactive_predicate_f) | Returns whether a moleculetype name is configured to be recognized as reactive. |
 | [get_moleculetype_atomics](#kimmdy.topology.utils.get_moleculetype_atomics) | Get content of subsections (atoms/bonds/angles etc.) of a moleculetype from a topology dict. |
 | [get_moleculetype_header](#kimmdy.topology.utils.get_moleculetype_header) | Get content of the header of a moleculetype from a topology dict. |
 | [get_protein_section](#kimmdy.topology.utils.get_protein_section) | Get content of a section in the first moleculetype (protein) from a topology dict. |
@@ -18,6 +19,12 @@
 | [set_protein_section](#kimmdy.topology.utils.set_protein_section) | Set content of a section in the first moleculetype (protein) from a topology dict. |
 | [set_reactive_section](#kimmdy.topology.utils.set_reactive_section) | Set content of a section in the first moleculetype (protein) from a topology dict. |
 | [set_top_section](#kimmdy.topology.utils.set_top_section) | Set content of a section from a topology dict. |
+
+### get_is_reactive_predicate_f { #kimmdy.topology.utils.get_is_reactive_predicate_f }
+
+`topology.utils.get_is_reactive_predicate_f(cfg)`
+
+Returns whether a moleculetype name is configured to be recognized as reactive.
 
 ### get_moleculetype_atomics { #kimmdy.topology.utils.get_moleculetype_atomics }
 

@@ -72,7 +72,7 @@ that can easily self-submit after a timelimit was exceeded.
 `runmanager.State()`
 
 State of the system.
-one of IDLE, MD, REACTION, DONE.
+one of IDLE, MD, REACTION, SETUP, DONE.
 
 ## Functions
 
