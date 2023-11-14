@@ -52,6 +52,10 @@ def raw_urea_top_fix(filedir) -> TopologyDict:
 def raw_urea_times_two_top_fix(filedir) -> TopologyDict:
     return read_top(filedir / "urea-times-2.top")
 
+@pytest.fixture()
+def raw_two_different_ureas_top_fix(filedir) -> TopologyDict:
+    return read_top(filedir / "two-different-ureas.top")
+ 
 
 @pytest.fixture()
 def hexala_top_fix(assetsdir, filedir) -> Topology:
@@ -174,6 +178,39 @@ class TestUrea:
             assert a1.mass == a2.mass
             assert int(a2.nr) == int(a1.nr) + 8
             assert int(a2.cgnr) == int(a1.cgnr) + 8
+
+    def test_merging_molecules(self, raw_two_different_ureas_top_fix):
+        raw = deepcopy(raw_two_different_ureas_top_fix)
+        top = Topology(raw)
+        assert len(top.atoms) == 16
+        assert len(top.bonds) == 14
+        assert len(top.pairs) == 0
+        assert len(top.angles) == 0
+        assert len(top.proper_dihedrals) == 16
+        assert len(top.improper_dihedrals) == 6
+        assert top.moleculetypes["Reactive"].atoms == top.atoms
+        for i in range(8):
+            n1 = str(i + 1)
+            n2 = str(i + 9)
+            a1 = top.atoms[n1]
+            a2 = top.atoms[n2]
+            assert a1.atom == a2.atom
+            assert a1.type == a2.type
+            assert a1.mass == a2.mass
+            if i == 7:
+                assert a1.residue == "TOTALLYNOTUREA"
+                assert a2.residue == "URE"
+            else:
+                assert a1.residue == "URE"
+                assert a2.residue == "URE"
+            assert int(a2.nr) == int(a1.nr) + 8
+            assert int(a2.cgnr) == int(a1.cgnr) + 8
+            assert a1.bound_to_nrs == [str(int(x) - 8) for x in a2.bound_to_nrs]
+            if i < 7:
+                assert int(a1.resnr) == int(a2.resnr) - 2
+            else:
+                assert int(a1.resnr) == int(a2.resnr) - 1
+
 
 
 class TestTopAB:
