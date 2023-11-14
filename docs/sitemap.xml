@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>http://hits-mbm-dev.github.io/kimmdy/guide/explanation/topology.html</loc>
-    <lastmod>2023-11-14T14:48:43.846Z</lastmod>
+    <lastmod>2023-11-14T21:37:46.313Z</lastmod>
   </url>
   <url>
     <loc>http://hits-mbm-dev.github.io/kimmdy/guide/options.html</loc>
@@ -22,7 +22,7 @@
   </url>
   <url>
     <loc>http://hits-mbm-dev.github.io/kimmdy/guide/how-to/examples.html</loc>
-    <lastmod>2023-11-14T11:01:20.687Z</lastmod>
+    <lastmod>2023-11-14T21:37:46.313Z</lastmod>
   </url>
   <url>
     <loc>http://hits-mbm-dev.github.io/kimmdy/_reference/dummyreaction.reaction.DummyReaction.html</loc>
@@ -70,7 +70,7 @@
   </url>
   <url>
     <loc>http://hits-mbm-dev.github.io/kimmdy/index.html</loc>
-    <lastmod>2023-11-13T14:59:39.271Z</lastmod>
+    <lastmod>2023-11-14T22:27:37.910Z</lastmod>
   </url>
   <url>
     <loc>http://hits-mbm-dev.github.io/kimmdy/_reference/topology.atomic.html</loc>
@@ -122,7 +122,7 @@
   </url>
   <url>
     <loc>http://hits-mbm-dev.github.io/kimmdy/guide/how-to/contribute.html</loc>
-    <lastmod>2023-11-14T11:01:20.687Z</lastmod>
+    <lastmod>2023-11-14T21:37:46.313Z</lastmod>
   </url>
   <url>
     <loc>http://hits-mbm-dev.github.io/kimmdy/guide/how-to/hcp.html</loc>
@@ -130,7 +130,7 @@
   </url>
   <url>
     <loc>http://hits-mbm-dev.github.io/kimmdy/guide/tutorials/getting-started.html</loc>
-    <lastmod>2023-11-14T15:56:28.419Z</lastmod>
+    <lastmod>2023-11-14T21:37:46.317Z</lastmod>
   </url>
   <url>
     <loc>http://hits-mbm-dev.github.io/kimmdy/guide/tutorials/write-plugin.html</loc>
@@ -139,5 +139,9 @@
   <url>
     <loc>http://hits-mbm-dev.github.io/kimmdy/guide/explanation/index.html</loc>
     <lastmod>2023-11-09T10:36:13.734Z</lastmod>
+  </url>
+  <url>
+    <loc>http://hits-mbm-dev.github.io/kimmdy/guide/how-to/install-ml-plugins.html</loc>
+    <lastmod>2023-11-14T22:45:04.671Z</lastmod>
   </url>
 </urlset>
