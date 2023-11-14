@@ -17,6 +17,7 @@ def test_tasks_are_set_up(arranged_tmp_path):
     while not runmgr.tasks.empty():
         items.append(runmgr.tasks.get().name)
     assert items == [
+        "_setup",
         "_run_md",
         "_run_md",
         "_place_reaction_tasks",
@@ -32,6 +33,7 @@ def test_tasks_are_set_up(arranged_tmp_path):
     while not runmgr2.tasks.empty():
         items.append(runmgr2.tasks.get().name)
     assert items == [
+        "_setup",
         "_run_md",
         "_run_md",
         "_place_reaction_tasks",
