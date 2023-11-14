@@ -3,7 +3,7 @@ title: Visualize Topologies
 mermaid-format: svg
 ---
 
-# Hexala
+## Capped Alanine with a radical
 
 ```{python}
 from kimmdy.parsing import read_top
@@ -15,7 +15,7 @@ from kimmdy.tools import write_top_as_dot
 
 ```{python}
 #| eval: true
-ala_top = read_top(Path('../../tests/test_files/test_topology/urea.top'), use_gmx_dir=False)
+ala_top = read_top(Path('../../tests/test_files/test_topology/Ala_R_prm.top'), use_gmx_dir=False)
 top = Topology(ala_top)
 
 write_top_as_dot(top, "ala-top.dot")
@@ -25,8 +25,62 @@ write_top_as_dot(top, "ala-top.dot")
 ```{dot}
 //| echo: false
 //| label: fig-ala
-//| fig-cap: "A diagram of the ala topology"
+//| fig-cap: "A diagram of the Ala topology"
 //| file: ala-top.dot
 ```
+
+## Multiple molecules
+
+```{python}
+urea_dict = read_top(Path('../../tests/test_files/test_topology/urea.top'), use_gmx_dir=False)
+urea = Topology(urea_dict)
+write_top_as_dot(urea, "urea-top.dot")
+```
+
+
+```{dot}
+//| echo: false
+//| label: fig-ala
+//| fig-cap: "Topology of one molecule of urea"
+//| file: urea-top.dot
+```
+
+
+When we want to run reactions within molecules that are either
+separate moleculetypes or multiples of the same moleculetype,
+KIMMDY can combine those into a single moleculetype and
+make multiples explicit.
+
+i.e. if we have a topology with two molecules of urea
+defined as:
+
+```ini
+[ system ]
+Urea in Water
+
+[ molecules ]
+;molecule name   nr.
+Urea             2
+SOL              1000
+```
+
+```{python}
+urea_dict = read_top(Path('../../tests/test_files/test_topology/urea-times-2.top'), use_gmx_dir=False)
+urea = Topology(urea_dict)
+write_top_as_dot(urea, "urea-2-top.dot")
+```
+
+We end up with
+
+```{dot}
+//| echo: false
+//| label: fig-ala
+//| fig-cap: "A diagram of the two urea molecules topology"
+//| file: urea-2-top.dot
+```
+
+This way, explicit atom numbers match up with the atom numbers
+in the coordinate file (or rather, line numbers - 2, since the
+numbers in the actual `atomnr` column can overflow due to the fixed-width file format).
 
 

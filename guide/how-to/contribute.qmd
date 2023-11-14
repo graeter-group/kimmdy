@@ -1,4 +1,7 @@
-# Contribute
+---
+title: "Contribute"
+subtitle: "How to contribute to KIMMDY"
+---
 
 KIMMDY uses conventional commits and semantic versioning,
 automated via [release please](https://github.com/googleapis/release-please).

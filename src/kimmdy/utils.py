@@ -16,10 +16,14 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
-TopologyAtomAddress = str | tuple[str, str] | tuple[int, str]
+TopologyAtomAddress = str
 """Address to an atom in the topology.
 
-One of (id: str), (moleculetype: str, id: str) or (moleculetype_ix: int, id).
+Corresponds to the 1-based id in the topology and coordinates file.
+Note, that gromacs ids in the atomnr column of the gro file
+can overflow due to the fixed width file format.
+The line number - 2 (for the title and the number of atoms) is always
+the correct the atom id.
 """
 
 

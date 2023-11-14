@@ -19,17 +19,17 @@ One moleculetype in the topology
 
 #### Attributes
 
-| Name                | Type                                                                                                                                   | Description                                                             |
-|---------------------|----------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------|
-| atoms               | [dict](`dict`)\[[str](`str`), [Atom](`Atom`)\]                                                                                         |                                                                         |
-| bonds               | [dict](`dict`)\[[tuple](`tuple`)\[[str](`str`), [str](`str`)\], [Bond](`Bond`)\]                                                       |                                                                         |
-| pairs               | [dict](`dict`)\[[tuple](`tuple`)\[[str](`str`), [str](`str`)\], [Pair](`Pair`)\]                                                       |                                                                         |
-| angles              | [dict](`dict`)\[[tuple](`tuple`)\[[str](`str`), [str](`str`), [str](`str`)\], [Angle](`Angle`)\]                                       |                                                                         |
-| proper_dihedrals    | [dict](`dict`)\[[tuple](`tuple`)\[[str](`str`), [str](`str`), [str](`str`), [str](`str`)\], [MultipleDihedrals](`MultipleDihedrals`)\] |                                                                         |
-| improper_dihedrals  | [dict](`dict`)\[[tuple](`tuple`)\[[str](`str`), [str](`str`), [str](`str`), [str](`str`)\], [Dihedral](`Dihedral`)\]                   |                                                                         |
-| position_restraints | [dict](`dict`)\[[str](`str`), [PositionRestraint](`PositionRestraint`)\]                                                               |                                                                         |
-| dihedral_restraints | [dict](`dict`)\[[tuple](`tuple`)\[[str](`str`), [str](`str`), [str](`str`), [str](`str`)\], [DihedralRestraint](`DihedralRestraint`)\] |                                                                         |
-| radicals            | [dict](`dict`)\[[str](`str`), [Atom](`Atom`)\]                                                                                         | dict mapping atom indices to atom objects for storing all radical atoms |
+| Name                | Type                                                                                                                                                          | Description                                                             |
+|---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------|
+| atoms               | [dict](`dict`)\[[str](`str`), [Atom](`kimmdy.topology.atomic.Atom`)\]                                                                                         |                                                                         |
+| bonds               | [dict](`dict`)\[[tuple](`tuple`)\[[str](`str`), [str](`str`)\], [Bond](`kimmdy.topology.atomic.Bond`)\]                                                       |                                                                         |
+| pairs               | [dict](`dict`)\[[tuple](`tuple`)\[[str](`str`), [str](`str`)\], [Pair](`kimmdy.topology.atomic.Pair`)\]                                                       |                                                                         |
+| angles              | [dict](`dict`)\[[tuple](`tuple`)\[[str](`str`), [str](`str`), [str](`str`)\], [Angle](`kimmdy.topology.atomic.Angle`)\]                                       |                                                                         |
+| proper_dihedrals    | [dict](`dict`)\[[tuple](`tuple`)\[[str](`str`), [str](`str`), [str](`str`), [str](`str`)\], [MultipleDihedrals](`kimmdy.topology.atomic.MultipleDihedrals`)\] |                                                                         |
+| improper_dihedrals  | [dict](`dict`)\[[tuple](`tuple`)\[[str](`str`), [str](`str`), [str](`str`), [str](`str`)\], [Dihedral](`kimmdy.topology.atomic.Dihedral`)\]                   |                                                                         |
+| position_restraints | [dict](`dict`)\[[str](`str`), [PositionRestraint](`kimmdy.topology.atomic.PositionRestraint`)\]                                                               |                                                                         |
+| dihedral_restraints | [dict](`dict`)\[[tuple](`tuple`)\[[str](`str`), [str](`str`), [str](`str`), [str](`str`)\], [DihedralRestraint](`kimmdy.topology.atomic.DihedralRestraint`)\] |                                                                         |
+| radicals            | [dict](`dict`)\[[str](`str`), [Atom](`kimmdy.topology.atomic.Atom`)\]                                                                                         | dict mapping atom indices to atom objects for storing all radical atoms |
 
 #### Methods
 
@@ -69,7 +69,7 @@ after bonds have changed.
 
 Assumptions:
 
-- the topology of interest (the protein) is in section 'moleculetype_0'.
+- the topology of interest (the Reactive moleculetype) consists of the first moleculetypes (non-solvent).
 
 #### Parameters
 

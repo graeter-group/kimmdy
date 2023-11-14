@@ -84,6 +84,30 @@
       "pytype": "Path",
       "default": "topol.top"
     },
+    "topology": {
+      "type": "object",
+      "description": "Settings for handling the topology file.",
+      "properties": {
+        "reactive": {
+          "type": "object",
+          "description": "Specify what moleculetypes will be part of the Reactive moleculetype. By default, solvent and ions are excluded.",
+          "properties": {
+            "include": {
+              "description": "Explicitly include a moleculetype or list of moleculetypes as a space-separated string.",
+              "type": "string",
+              "pytype": "str",
+              "default": ""
+            },
+            "exclude": {
+              "description": "Explicitly exclude a moleculetype or a list as a space-separated string. For example the lipid moleculetype in a bilayer simulation e.g. `DPPC POPC'`",
+              "type": "string",
+              "pytype": "str",
+              "default": ""
+            }
+          }
+        }
+      }
+    },
     "gro": {
       "description": "Coordinate file",
       "type": "string",

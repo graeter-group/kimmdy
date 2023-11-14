@@ -1,0 +1,12 @@
+{
+  "hash": "90ba6398249abc36e7c21c3447ef113e",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: Visualize Topologies\nmermaid-format: svg\n---\n\n## Capped Alanine with a radical\n\n::: {#e416bbb7 .cell execution_count=1}\n``` {.python .cell-code}\nfrom kimmdy.parsing import read_top\nfrom kimmdy.topology.topology import Topology\nfrom pathlib import Path\nfrom kimmdy.tools import write_top_as_dot\n```\n:::\n\n\n::: {#f063962d .cell execution_count=2}\n``` {.python .cell-code}\nala_top = read_top(Path('../../tests/test_files/test_topology/Ala_R_prm.top'), use_gmx_dir=False)\ntop = Topology(ala_top)\n\nwrite_top_as_dot(top, \"ala-top.dot\")\n```\n:::\n\n\n```{dot}\n//| echo: false\n//| label: fig-ala\n//| fig-cap: \"A diagram of the Ala topology\"\n//| file: ala-top.dot\n```\n\n\n## Multiple molecules\n\n::: {#3d5b8d8c .cell execution_count=3}\n``` {.python .cell-code}\nurea_dict = read_top(Path('../../tests/test_files/test_topology/urea.top'), use_gmx_dir=False)\nurea = Topology(urea_dict)\nwrite_top_as_dot(urea, \"urea-top.dot\")\n```\n:::\n\n\n```{dot}\n//| echo: false\n//| label: fig-ala\n//| fig-cap: \"Topology of one molecule of urea\"\n//| file: urea-top.dot\n```\n\n\n\nWhen we want to run reactions within molecules that are either\nseparate moleculetypes or multiples of the same moleculetype,\nKIMMDY can combine those into a single moleculetype and\nmake multiples explicit.\n\ni.e. if we have a topology with two molecules of urea\ndefined as:\n\n```ini\n[ system ]\nUrea in Water\n\n[ molecules ]\n;molecule name   nr.\nUrea             2\nSOL              1000\n```\n\n::: {#796fa027 .cell execution_count=4}\n``` {.python .cell-code}\nurea_dict = read_top(Path('../../tests/test_files/test_topology/urea-times-2.top'), use_gmx_dir=False)\nurea = Topology(urea_dict)\nwrite_top_as_dot(urea, \"urea-2-top.dot\")\n```\n:::\n\n\nWe end up with\n\n\n```{dot}\n//| echo: false\n//| label: fig-ala\n//| fig-cap: \"A diagram of the two urea molecules topology\"\n//| file: urea-2-top.dot\n```\n\n\nThis way, explicit atom numbers match up with the atom numbers\nin the coordinate file (or rather, line numbers - 2, since the\nnumbers in the actual `atomnr` column can overflow due to the fixed-width file format).\n\n",
+    "supporting": [
+      "topology_files/figure-html"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.415">
+<meta name="generator" content="quarto-1.4.489">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -31,7 +31,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
 <link href="../../guide/tutorials/colbuilder.html" rel="next">
-<link href="../../guide/how-to/hcp.html" rel="prev">
+<link href="../../guide/explanation/topology.html" rel="prev">
 <script src="../../site_libs/quarto-listing/list.min.js"></script>
 <script src="../../site_libs/quarto-listing/quarto-listing.js"></script>
 <script src="../../site_libs/quarto-html/quarto.js"></script>
@@ -110,7 +110,7 @@ ul.task-list li input[type="checkbox"] {
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
-    <nav class="navbar navbar-expand-lg navbar-dark ">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a class="navbar-brand" href="../../index.html">
@@ -172,11 +172,11 @@ ul.task-list li input[type="checkbox"] {
     </nav>
   <nav class="quarto-secondary-nav">
     <div class="container-fluid d-flex">
-      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
         <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../guide/options.html">Guide</a></li><li class="breadcrumb-item"><a href="../../guide/tutorials/index.html">Tutorials</a></li></ol></nav>
-        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
   </nav>
@@ -184,7 +184,7 @@ ul.task-list li input[type="checkbox"] {
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item sidebar-item-section">
@@ -204,30 +204,13 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../../guide/explanation/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Explanations</span></a>
+            <a href="../../guide/how-to/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">How-To</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../guide/explanation/topology.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Visualize Topologies</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a href="../../guide/how-to/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">How-To</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../guide/how-to/contribute.html" class="sidebar-item-text sidebar-link">
@@ -236,8 +219,31 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../../guide/how-to/examples.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Examples</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../../guide/how-to/hcp.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">High Performance Computing</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../guide/explanation/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Explanations</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guide/explanation/topology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visualize Topologies</span></a>
   </div>
 </li>
       </ul>
@@ -260,13 +266,13 @@ ul.task-list li input[type="checkbox"] {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../guide/tutorials/getting-started.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Getting Started</span></a>
+ <span class="menu-text">Get Started</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../guide/tutorials/write-plugin.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Writing a Reaction Plugin</span></a>
+ <span class="menu-text">Write a Reaction Plugin</span></a>
   </div>
 </li>
       </ul>
@@ -463,7 +469,7 @@ ul.task-list li input[type="checkbox"] {
     </ul>
     </div>
 </nav>
-<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         
@@ -497,18 +503,18 @@ ul.task-list li input[type="checkbox"] {
 
 <div class="quarto-listing quarto-listing-container-default" id="listing-listing">
 <div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="user" data-listing-file-modified-sort="1699467254417" data-listing-reading-time-sort="2" data-listing-word-count-sort="373">
+<div class="quarto-post image-right" data-index="0" data-categories="user" data-listing-file-modified-sort="1699977388419" data-listing-reading-time-sort="3" data-listing-word-count-sort="450">
 <div class="thumbnail">
-<p><a href="../../guide/tutorials/getting-started.html"></a></p><a href="../../guide/tutorials/getting-started.html">
+<p><a href="../../guide/tutorials/getting-started.html" class="no-external"></a></p><a href="../../guide/tutorials/getting-started.html" class="no-external">
 <p><img src="../../guide/tutorials/img/getting-started-vmd-radicals.png" class="thumbnail-image"></p>
-</a><p><a href="../../guide/tutorials/getting-started.html"></a></p>
+</a><p><a href="../../guide/tutorials/getting-started.html" class="no-external"></a></p>
 </div>
 <div class="body">
 <h3 class="no-anchor listing-title">
-<a href="../../guide/tutorials/getting-started.html">Getting Started</a>
+<a href="../../guide/tutorials/getting-started.html" class="no-external">Get Started</a>
 </h3>
 <div class="listing-subtitle">
-<a href="../../guide/tutorials/getting-started.html"></a>
+<a href="../../guide/tutorials/getting-started.html" class="no-external"></a>
 </div>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('user'); return false;">
@@ -516,29 +522,29 @@ user
 </div>
 </div>
 <div class="listing-description">
-<a href="../../guide/tutorials/getting-started.html">In this tutorial we will be simulating hydrogen atom transfer in a simple ACE/NME-capped Alanine molecule in a box of water.</a>
+<a href="../../guide/tutorials/getting-started.html" class="no-external">In this tutorial we will be simulating hydrogen atom transfer in a simple ACE/NME-capped Alanine molecule in a box of water.</a>
 </div>
 </div>
 <div class="metadata">
-<p><a href="../../guide/tutorials/getting-started.html"></a></p><a href="../../guide/tutorials/getting-started.html">
+<p><a href="../../guide/tutorials/getting-started.html" class="no-external"></a></p><a href="../../guide/tutorials/getting-started.html" class="no-external">
 <div class="listing-author">
 Jannik Buhr
 </div>
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="1" data-categories="user" data-listing-file-modified-sort="1699467493833" data-listing-reading-time-sort="5" data-listing-word-count-sort="995">
+<div class="quarto-post image-right" data-index="1" data-categories="user" data-listing-file-modified-sort="1699526173734" data-listing-reading-time-sort="6" data-listing-word-count-sort="1011">
 <div class="thumbnail">
-<p><a href="../../guide/tutorials/colbuilder.html"></a></p><a href="../../guide/tutorials/colbuilder.html">
+<p><a href="../../guide/tutorials/colbuilder.html" class="no-external"></a></p><a href="../../guide/tutorials/colbuilder.html" class="no-external">
 <p><img src="../../guide/tutorials/img/colbuilder.png" class="thumbnail-image"></p>
-</a><p><a href="../../guide/tutorials/colbuilder.html"></a></p>
+</a><p><a href="../../guide/tutorials/colbuilder.html" class="no-external"></a></p>
 </div>
 <div class="body">
 <h3 class="no-anchor listing-title">
-<a href="../../guide/tutorials/colbuilder.html">Run KIMMDY from Colbuilder fibril</a>
+<a href="../../guide/tutorials/colbuilder.html" class="no-external">Run KIMMDY from Colbuilder fibril</a>
 </h3>
 <div class="listing-subtitle">
-<a href="../../guide/tutorials/colbuilder.html"></a>
+<a href="../../guide/tutorials/colbuilder.html" class="no-external"></a>
 </div>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('user'); return false;">
@@ -546,29 +552,29 @@ user
 </div>
 </div>
 <div class="listing-description">
-<a href="../../guide/tutorials/colbuilder.html">In this tutorial we will download a collagen fibril from colbuilder and run a KIMMDY simulation on it.</a>
+<a href="../../guide/tutorials/colbuilder.html" class="no-external">In this tutorial we will download a collagen fibril from colbuilder and run a KIMMDY simulation on it.</a>
 </div>
 </div>
 <div class="metadata">
-<p><a href="../../guide/tutorials/colbuilder.html"></a></p><a href="../../guide/tutorials/colbuilder.html">
+<p><a href="../../guide/tutorials/colbuilder.html" class="no-external"></a></p><a href="../../guide/tutorials/colbuilder.html" class="no-external">
 <div class="listing-author">
 Eric Hartmann
 </div>
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="2" data-categories="developer" data-listing-file-modified-sort="1699467667266" data-listing-reading-time-sort="6" data-listing-word-count-sort="1112">
+<div class="quarto-post image-right" data-index="2" data-categories="developer" data-listing-file-modified-sort="1699526173742" data-listing-reading-time-sort="6" data-listing-word-count-sort="1112">
 <div class="thumbnail">
-<p><a href="../../guide/tutorials/write-plugin.html"></a></p><a href="../../guide/tutorials/write-plugin.html">
+<p><a href="../../guide/tutorials/write-plugin.html" class="no-external"></a></p><a href="../../guide/tutorials/write-plugin.html" class="no-external">
 <div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-</a><p><a href="../../guide/tutorials/write-plugin.html"></a></p>
+</a><p><a href="../../guide/tutorials/write-plugin.html" class="no-external"></a></p>
 </div>
 <div class="body">
 <h3 class="no-anchor listing-title">
-<a href="../../guide/tutorials/write-plugin.html">Writing a Reaction Plugin</a>
+<a href="../../guide/tutorials/write-plugin.html" class="no-external">Write a Reaction Plugin</a>
 </h3>
 <div class="listing-subtitle">
-<a href="../../guide/tutorials/write-plugin.html"></a>
+<a href="../../guide/tutorials/write-plugin.html" class="no-external"></a>
 </div>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('developer'); return false;">
@@ -576,11 +582,11 @@ developer
 </div>
 </div>
 <div class="listing-description">
-<a href="../../guide/tutorials/write-plugin.html">In this tutorial, you will learn how to create your own reaction plugin in a GitHub repository.</a>
+<a href="../../guide/tutorials/write-plugin.html" class="no-external">In this tutorial, you will learn how to create your own reaction plugin in a GitHub repository.</a>
 </div>
 </div>
 <div class="metadata">
-<p><a href="../../guide/tutorials/write-plugin.html"></a></p><a href="../../guide/tutorials/write-plugin.html">
+<p><a href="../../guide/tutorials/write-plugin.html" class="no-external"></a></p><a href="../../guide/tutorials/write-plugin.html" class="no-external">
 <div class="listing-author">
 Eric Hartmann
 </div>
@@ -1128,8 +1134,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../../guide/how-to/hcp.html" class="pagination-link  aria-label=" high="" performance="" computing"="">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">High Performance Computing</span>
+      <a href="../../guide/explanation/topology.html" class="pagination-link  aria-label=" visualize="" topologies"="">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Visualize Topologies</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">

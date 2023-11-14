@@ -8,6 +8,7 @@ from pathlib import Path
 
 from kimmdy.tasks import TaskFiles
 from kimmdy.parsing import read_plumed, write_plumed
+from kimmdy.constants import REACTIVE_MOLECULEYPE
 from kimmdy.recipe import Place
 from kimmdy.topology.topology import MoleculeType, Topology
 from kimmdy.topology.ff import FF
@@ -20,6 +21,7 @@ from kimmdy.topology.atomic import (
     Interaction,
     InteractionType,
     InteractionTypes,
+    Exclusion,
 )
 from kimmdy.topology.utils import match_atomic_item_to_atomic_type
 
@@ -312,13 +314,11 @@ def merge_top_moleculetypes_slow_growth(
                 )
 
     # pairs and exclusions
-    exclusions_content = molB.atomics.get("exclusions", [])
-    # maybe hook this up to empty_sections if it gets accessible
+    exclusions = molB.exclusions
     for key in keysA - keysB:
         molB.pairs.pop(key, None)
-        exclusions_content.append(list(key))
-
-    molB.atomics["exclusions"] = exclusions_content
+        exclusion = Exclusion(*key)
+        exclusions[key] = exclusion
 
     # angles
     keys = set(molA.angles.keys()) | set(molB.angles.keys())
@@ -456,9 +456,8 @@ def merge_top_slow_growth(
     TODO: for now this assumes that only one moleculeype (the first, index 0) is of interest.
     """
 
-    first_molecule = list(topA.moleculetypes.keys())[0]
-    molA = topA.moleculetypes[first_molecule]
-    molB = topB.moleculetypes[first_molecule]
+    molA = topA.moleculetypes[REACTIVE_MOLECULEYPE]
+    molB = topB.moleculetypes[REACTIVE_MOLECULEYPE]
     molB = merge_top_moleculetypes_slow_growth(molA, molB, topB.ff, focus_nr)
 
     return topB

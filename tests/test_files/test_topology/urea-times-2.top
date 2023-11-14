@@ -1,0 +1,68 @@
+;
+;       Example topology file
+;
+; The force-field files to be included
+#include "amber99.ff/forcefield.itp"
+
+[ moleculetype ]
+; name  nrexcl
+Urea         3
+
+[ atoms ]
+   1  C  1  URE      C      1     0.880229  12.01000   ; amber C  type
+   2  O  1  URE      O      2    -0.613359  16.00000   ; amber O  type
+   3  N  1  URE     N1      3    -0.923545  14.01000   ; amber N  type
+   4  H  1  URE    H11      4     0.395055   1.00800   ; amber H  type
+   5  H  1  URE    H12      5     0.395055   1.00800   ; amber H  type
+   6  N  1  URE     N2      6    -0.923545  14.01000   ; amber N  type
+   7  H  1  URE    H21      7     0.395055   1.00800   ; amber H  type
+   8  H  1  URE    H22      8     0.395055   1.00800   ; amber H  type
+
+[ bonds ]
+    1    2
+    1    3
+    1    6
+    3    4
+    3    5
+    6    7
+    6    8
+
+[ dihedrals ]
+;   ai    aj    ak    al funct  definition
+     2     1     3     4   9
+     2     1     3     5   9
+     2     1     6     7   9
+     2     1     6     8   9
+     3     1     6     7   9
+     3     1     6     8   9
+     6     1     3     4   9
+     6     1     3     5   9
+
+[ dihedrals ]
+     3     6     1     2   4
+     1     4     3     5   4
+     1     7     6     8   4
+
+[ position_restraints ]
+; you wouldn't normally use this for a molecule like Urea,
+; but we include it here for didactic purposes
+; ai   funct    fc
+   1     1     1000    1000    1000 ; Restrain to a point
+   2     1     1000       0    1000 ; Restrain to a line (Y-axis)
+   3     1     1000       0       0 ; Restrain to a plane (Y-Z-plane)
+
+[ dihedral_restraints ]
+; ai   aj    ak    al  type  phi  dphi  fc
+    3    6     1    2     1  180     0  10
+    1    4     3    5     1  180     0  10
+
+; Include TIP3P water topology
+#include "amber99.ff/tip3p.itp"
+
+[ system ]
+Urea in Water
+
+[ molecules ]
+;molecule name   nr.
+Urea             2
+SOL              1000

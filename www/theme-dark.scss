@@ -1,31 +1,32 @@
 /*-- scss:defaults --*/
 
 // Base document colors
-$body-bg: #181818;
-$body-color: white;
+$body-bg: #050725;
+$body-color: #ffffffde;
 $link-color: #75AADB;
 
-$light: #525252;
+$input-color: $link-color;
 
-$gray-base:              #000 !default;
-$gray-dark:              lighten($gray-base, 20%) !default;   // #333
+$input-group-text-color: orange;
 
 // Navigation element colors
-$footer-bg: #181818;
-$navbar-bg: #303030;
-$sidebar-bg: #303030;
+$footer-bg: #030316;
+$navbar-bg: #030316;
+$sidebar-bg: #030316;
 
 // Code blocks
-$code-block-bg-alpha: -.8;
-
-// Bootstrap popovers
-$popover-bg: #242424;
-
-// Bootstrap inputs
-$input-bg: #242424;
-
+$code-block-bg-alpha: -.90;
 
 /*-- scss:rules --*/
 .navbar-light .navbar-brand {
-    color: white;
+    color: #ffffffde;
+}
+
+pre code {
+  color: $body-color;
+}
+
+:root {
+// inline code
+  --bs-code-color: #769dff;
 }
