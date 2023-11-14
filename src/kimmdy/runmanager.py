@@ -120,7 +120,7 @@ class RunManager:
         self.from_checkpoint: bool = False
         self.tasks: queue.Queue[Task] = queue.Queue()  # tasks from config
         self.crr_tasks: queue.Queue[Task] = queue.Queue()  # current tasks
-        self.iteration: int = 0
+        self.iteration: int = -1  # start at -1 to have iteration 0 be the initial setup
         self.state: State = State.IDLE
         self.recipe_collection: RecipeCollection = RecipeCollection([])
         self.kmcresult: Union[KMCResult, None] = None
