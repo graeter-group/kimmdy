@@ -27,6 +27,25 @@ To install the builtin reactions and analysis tools use
 pip install kimmdy[reactions,analysis]
 ```
 
+### Installation with ML plugins
+```
+conda create -n kimmdy_full python=3.10 tensorflow==2.10 openmm
+conda activate kimmdy_full
+git clone https://github.com/hits-mbm-dev/HAT_reaction_plugin.git
+cd HAT_reaction_plugin/
+pip install -r requirements.txt
+cd ..
+git clone https://github.com/hits-mbm-dev/grappa.git
+cd grappa
+pip install -e .
+cd ..
+git clone https://github.com/hits-mbm-dev/kimmdy.git
+git clone git@github.com:hits-mbm-dev/kimmdy-reactions.git
+git clone git@github.com:hits-mbm-dev/kimmdy-grappa.git
+cd kimmdy
+pip install -r requirements.txt
+```
+Other ways to install kimmdy with all plugins are currently discouraged because of the high number of dependencies.
 
 ## Documentation
 
