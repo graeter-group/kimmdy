@@ -138,6 +138,8 @@ def test_merge_prm_top(arranged_tmp_path):
     assert (
         top_merge.improper_dihedrals.keys() == top_merge_ref.improper_dihedrals.keys()
     )
+    assert len(top_merge.exclusions) == 1
+    assert top_merge.exclusions == top_merge_ref.exclusions
 
     assert top_merge.bonds[("19", "27")].funct == "3"
     assert top_merge.bonds[("26", "27")].funct == "3"

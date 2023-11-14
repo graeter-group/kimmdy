@@ -202,7 +202,7 @@ class MoleculeType:
             return
         for i, l in enumerate(ls):
             exclusion = Exclusion.from_top_line(l)
-            self.exclusions[i] = exclusion
+            self.exclusions[tuple(l)] = exclusion
 
     def _initialize_graph(self):
         """Add a list of atom nrs bound to an atom to each atom."""
@@ -612,6 +612,7 @@ class Topology:
         self.atoms = self.reactive_molecule.atoms
         self.bonds = self.reactive_molecule.bonds
         self.angles = self.reactive_molecule.angles
+        self.exclusions = self.reactive_molecule.exclusions
         self.proper_dihedrals = self.reactive_molecule.proper_dihedrals
         self.improper_dihedrals = self.moleculetypes[
             REACTIVE_MOLECULEYPE

@@ -21,6 +21,7 @@ from kimmdy.topology.atomic import (
     Interaction,
     InteractionType,
     InteractionTypes,
+    Exclusion
 )
 from kimmdy.topology.utils import match_atomic_item_to_atomic_type
 
@@ -313,13 +314,11 @@ def merge_top_moleculetypes_slow_growth(
                 )
 
     # pairs and exclusions
-    exclusions_content = molB.atomics.get("exclusions", [])
-    # maybe hook this up to empty_sections if it gets accessible
+    exclusions = molB.exclusions
     for key in keysA - keysB:
         molB.pairs.pop(key, None)
-        exclusions_content.append(list(key))
-
-    molB.atomics["exclusions"] = exclusions_content
+        exclusion = Exclusion(*key)
+        exclusions[key] = exclusion
 
     # angles
     keys = set(molA.angles.keys()) | set(molB.angles.keys())
