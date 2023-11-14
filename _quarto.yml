@@ -80,6 +80,7 @@ website:
 execute:
   warning: false
   echo: true
+  freeze: auto
 
 format:
   html:
@@ -88,12 +89,11 @@ format:
     toc-expand: true
     mainfont: Roboto
     number-depth: 0
+    highlight-style: arrow
     theme:
       light:
-      - default
       - www/theme.scss
       dark:
-      - default
       - www/theme.scss
       - www/theme-dark.scss
     code-copy: true

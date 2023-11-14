@@ -2,6 +2,8 @@
 .vscode
 .quarto
 .vdoc.py
+.mypy_cache
+*.otter.py
 /os
 
 # our own program output

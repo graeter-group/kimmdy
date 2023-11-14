@@ -7,10 +7,10 @@ import logging
 import json
 import numpy as np
 from pathlib import Path
-from collections.abc import Iterable
-from typing import Generator, Optional, Union, Callable
+from typing import Optional, Union
 from itertools import takewhile
 from typing import TypedDict
+from kimmdy.constants import ATOM_ID_FIELDS, RESNR_ID_FIELDS, REACTIVE_MOLECULEYPE
 
 from kimmdy.utils import get_gmx_dir
 
@@ -90,6 +90,10 @@ def resolve_includes(
 
 ## parsing functions ##
 ## topology
+def empty_section(condition: Optional[dict] = None) -> dict:
+    return {"content": [], "else_content": [], "extra": [], "condition": condition}
+
+
 def read_top(
     path: Path,
     ffdir: Optional[Path] = None,
@@ -143,7 +147,7 @@ def read_top(
     'else_content': [],
     'extra': [],
     'condition': None},
-    'moleculetype_0': {'content': [['Urea', '3']],
+    'moleculetype_Urea': {'content': [['Urea', '3']],
     'else_content': [],
     'extra': [],
     'condition': None,
@@ -246,21 +250,17 @@ def read_top(
     if ffdir is None:
         logger.debug(f"No #include for a forcefield directory found in {path}.")
 
-    ls = filter(lambda l: not l.startswith("*"), ls)
+    ls = [l for l in ls if not l.startswith("*")]
     d = {}
     d["ffdir"] = ffdir
     d["define"] = {}
-    parent_section_index = 0
     parent_section = None
     section = None
     condition = None
     is_first_line_after_section_header = False
     content_key = "content"
 
-    def empty_section(condition: Union[dict, None]) -> dict:
-        return {"content": [], "else_content": [], "extra": [], "condition": condition}
-
-    for l in ls:
+    for i, l in enumerate(ls):
         # decide where to put lines depending on current context
         # deal with statements
         if l.startswith("#define"):
@@ -295,8 +295,10 @@ def read_top(
                 section = None
                 if d.get(parent_section) is None:
                     if parent_section == "moleculetype":
-                        parent_section = f"{parent_section}_{parent_section_index}"
-                        parent_section_index += 1
+                        # append the name of the moleculetype to the section name
+                        # but the name comes on the next line
+                        moleculetype_name = ls[i + 1].split()[0]
+                        parent_section = f"{parent_section}_{moleculetype_name}"
                     d[parent_section] = empty_section(condition)
                     d[parent_section]["subsections"] = {}
             else:
@@ -356,8 +358,11 @@ def write_top(top: TopologyDict, outfile: Path):
         Path to the topology file to write to.
     """
 
-    def write_section(f, name, section):
-        printname = re.sub(r"_\d+", "", name)
+    def write_section(f, name: str, section):
+        if name.startswith("moleculetype_"):
+            printname = "moleculetype"
+        else:
+            printname = name
         condition = section.get("condition")
         f.write("\n")
         if condition is None:

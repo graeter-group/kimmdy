@@ -1,16 +1,16 @@
 {
-  "timestamp": 1688983038867,
+  "timestamp": 1699885128680,
   "version": "3.16.0",
-  "current": "i3cGf1YY37NmHTeL15ddhw",
+  "current": "ZiKwCg0WTIB9Tv1dvMkP8g",
   "playback": {
     "isPlaying": false,
     "nextSnapshotDelayInMs": 1500
   },
   "entries": [
     {
-      "timestamp": 1688983038866,
+      "timestamp": 1699885128679,
       "snapshot": {
-        "id": "i3cGf1YY37NmHTeL15ddhw",
+        "id": "ZiKwCg0WTIB9Tv1dvMkP8g",
         "data": {
           "tree": {
             "transforms": [
@@ -28,7 +28,7 @@
                   "url": {
                     "kind": "url",
                     "id": "-MMo9V_C7a8eNpFNgp0ksw",
-                    "url": "../../example/alanine_hat_naive/npt.gro"
+                    "url": "./getting-started-files/npt-just-ala.gro"
                   },
                   "label": "",
                   "isBinary": false
@@ -748,22 +748,22 @@
             "mode": "perspective",
             "fov": 0.7853981633974483,
             "position": [
-              40.36894346241753,
-              8.783932281201556,
-              33.18571826568319
+              25.531895161098845,
+              9.550602151764636,
+              22.337396595033614
             ],
             "up": [
-              0.4437376395578276,
-              -0.7617720306730502,
-              -0.47201724600263095
+              0.696978649837271,
+              -0.6603626629513677,
+              -0.27953875411255513
             ],
             "target": [
-              19.520254377314753,
-              10.60083390218662,
-              10.653887045706437
+              23.05435446591695,
+              10.075926008032377,
+              14.919114876404175
             ],
-            "radius": 21.513527052882626,
-            "radiusMax": 21.513527052882626,
+            "radius": 5.593531631856632,
+            "radiusMax": 5.593531631856632,
             "fog": 15,
             "clipFar": true
           },
@@ -906,7 +906,7 @@
               "staticMoving": true,
               "dynamicDampingFactor": 0.2,
               "minDistance": 5,
-              "maxDistance": 215.13527052882625,
+              "maxDistance": 55.93531631856632,
               "gestureScaleFactor": 1,
               "maxWheelDelta": 0.02,
               "bindings": {

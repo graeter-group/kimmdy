@@ -1,19 +1,24 @@
 from __future__ import annotations  # for 3.7 <= Python version < 3.10
+from kimmdy.constants import ION_NAMES, SOLVENT_NAMES
 from itertools import permutations
-from typing import Optional, Any
+from typing import Callable, Optional, Any
 import re
 from typing import TYPE_CHECKING
+from kimmdy.constants import ATOM_ID_FIELDS, RESNR_ID_FIELDS, REACTIVE_MOLECULEYPE
 
 import logging
 
+from kimmdy.parsing import TopologyDict, empty_section
+
 if TYPE_CHECKING:
     from kimmdy.topology.atomic import AtomicType, AtomicTypes
+    from kimmdy.config import Config
 
 logger = logging.getLogger(__name__)
 
 
 def get_top_section(
-    top: dict, name: str, moleculetype: Optional[int] = None
+    top: dict, name: str, moleculetype: Optional[str] = None
 ) -> Optional[list[list]]:
     """Get content of a section from a topology dict.
 
@@ -130,20 +135,42 @@ def get_moleculetype_atomics(top: dict, moleculetype: str) -> Optional[dict]:
 
 
 def set_moleculetype_atomics(
-    top: dict, moleculetype: str, atomics: dict
+    top: dict, name: str, atomics: dict, create: bool = False
 ) -> Optional[dict]:
     """Set content of the atomics (atoms/bonds/angles etc.) of a moleculetype from a topology dict.
 
     Resolves any `#ifdef` statements by check in the top['define'] dict
     and chooses the 'content' or 'else_content' depending on the result.
+
+    If create is True, a new section is created if it does not exist.
     """
+    moleculetype = f"moleculetype_{name}"
     section = top.get(moleculetype)
     if section is None:
-        logger.warning(f"topology does not contain moleculetype {moleculetype}")
-        return None
+        if create:
+            logger.info(
+                f"topology does not contain {moleculetype}. Creating new section."
+            )
+            section = empty_section()
+            section["content"] = [[name, "3"]]
+            section["subsections"] = {k: empty_section() for k in atomics.keys()}
+            top[moleculetype] = section
+        else:
+            logger.warning(
+                f"topology does not contain {moleculetype} and create=False. Not creating new section."
+            )
+            return None
 
     subsections = section["subsections"]
-    for k, v in subsections.items():
+    for k in list(subsections.keys()):
+        # # if atomics section is empty,
+        # # remove the subsection from the topology
+        # if atomics[k] == []:
+        #     logger.debug(f"Removing subsection {k} from {moleculetype}")
+        #     del subsections[k]
+        #     continue
+
+        v = subsections[k]
         condition = v.get("condition")
         if condition is not None:
             condition_type = condition.get("type")
@@ -168,11 +195,16 @@ def set_moleculetype_atomics(
 
 def get_protein_section(top: dict, name: str) -> Optional[list[list]]:
     """Get content of a section in the first moleculetype (protein) from a topology dict."""
-    return get_top_section(top, name, moleculetype=0)
+    return get_top_section(top, name, moleculetype="Protein")
+
+
+def get_reactive_section(top: dict, name: str) -> Optional[list[list]]:
+    """Get content of a section in the Reactive moleculetype from a topology dict."""
+    return get_top_section(top, name, moleculetype=REACTIVE_MOLECULEYPE)
 
 
 def set_top_section(
-    top: dict, name: str, value: list, moleculetype: Optional[int] = None
+    top: dict, name: str, value: list, moleculetype: Optional[str] = None
 ) -> Optional[list[list]]:
     """Set content of a section from a topology dict.
 
@@ -189,7 +221,9 @@ def set_top_section(
         section = top.get(name)
 
     if section is None:
-        raise ValueError(f"topology does not contain section {name}")
+        m = f"topology does not contain section {name}"
+        logger.warning(m)
+        return None
     condition = section.get("condition")
     if condition is not None:
         condition_type = condition.get("type")
@@ -213,7 +247,12 @@ def set_top_section(
 
 def set_protein_section(top: dict, name: str, value: list) -> Optional[list[list]]:
     """Set content of a section in the first moleculetype (protein) from a topology dict."""
-    set_top_section(top, name, value, moleculetype=0)
+    set_top_section(top, name, value, moleculetype="Protein")
+
+
+def set_reactive_section(top: dict, name: str, value: list) -> Optional[list[list]]:
+    """Set content of a section in the first moleculetype (protein) from a topology dict."""
+    set_top_section(top, name, value, moleculetype=REACTIVE_MOLECULEYPE)
 
 
 def field_or_none(l: list[str], i) -> Optional[str]:
@@ -283,3 +322,28 @@ def match_atomic_item_to_atomic_type(
                     result = atomic_type
 
     return result
+
+
+def increment_field(l: list[str], i: int, n: int):
+    l[i] = str(int(l[i]) + n)
+    return l
+
+
+def is_not_solvent_or_ion(name: str) -> bool:
+    """Returns whether a moleculetype name is not solvent or ion."""
+    return name.lower() not in [x.lower() for x in SOLVENT_NAMES + ION_NAMES]
+
+
+def get_is_reactive_predicate_f(cfg: Config) -> Callable[[str], bool]:
+    """Returns whether a moleculetype name is configured to be recognized as reactive."""
+    include = [x.lower() for x in cfg.include.split()]
+    exclude = [x.lower() for x in cfg.exclude.split()]
+    default_excludes = [x.lower() for x in SOLVENT_NAMES + ION_NAMES]
+
+    def f(name: str) -> bool:
+        lower_name = name.lower()
+        return lower_name not in exclude and (
+            lower_name not in default_excludes or lower_name in include
+        )
+
+    return f

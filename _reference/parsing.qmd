@@ -153,7 +153,7 @@ raw_top =
 'else_content': [],
 'extra': [],
 'condition': None},
-'moleculetype_0': {'content': [['Urea', '3']],
+'moleculetype_Urea': {'content': [['Urea', '3']],
 'else_content': [],
 'extra': [],
 'condition': None,

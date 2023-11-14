@@ -1,9 +1,26 @@
 from __future__ import annotations
 import textwrap
 import logging
-from kimmdy.topology.atomic import *
+from kimmdy.topology.atomic import (
+    Atom,
+    Bond,
+    Pair,
+    Angle,
+    Dihedral,
+    MultipleDihedrals,
+    PositionRestraint,
+    DihedralRestraint,
+    ResidueImproperSpec,
+    ResidueProperSpec,
+    Settle,
+    Exclusion,
+    AtomType,
+    BondType,
+    AngleType,
+    DihedralType,
+    ResidueType,
+)
 from kimmdy.parsing import read_top
-from typing import Union
 from kimmdy.topology.utils import get_top_section
 
 logger = logging.getLogger(__name__)

@@ -28,6 +28,7 @@ from kimmdy.coordinates import place_atom, break_bond_plumed, merge_top_slow_gro
 from kimmdy.tasks import Task, TaskFiles, get_plumed_out
 from pprint import pformat
 from kimmdy.topology.topology import Topology
+from kimmdy.topology.utils import get_is_reactive_predicate_f
 import time
 from kimmdy.kmc import KMCResult, rf_kmc, extrande, frm, extrande_mod
 
@@ -40,9 +41,10 @@ AMBIGUOUS_SUFFS = ["dat", "xvg", "log", "itp", "mdp"]
 
 class State(Enum):
     """State of the system.
-    one of IDLE, MD, REACTION, DONE.
+    one of IDLE, MD, REACTION, SETUP, DONE.
     """
 
+    SETUP = auto()
     IDLE = auto()
     MD = auto()
     REACTION = auto()
@@ -118,7 +120,7 @@ class RunManager:
         self.from_checkpoint: bool = False
         self.tasks: queue.Queue[Task] = queue.Queue()  # tasks from config
         self.crr_tasks: queue.Queue[Task] = queue.Queue()  # current tasks
-        self.iteration: int = 0
+        self.iteration: int = -1  # start at -1 to have iteration 0 be the initial setup
         self.state: State = State.IDLE
         self.recipe_collection: RecipeCollection = RecipeCollection([])
         self.kmcresult: Union[KMCResult, None] = None
@@ -142,7 +144,13 @@ class RunManager:
                 f"'{self.config.changer.topology.parameterization}' can not be found in "
                 f"the parameterization plugins: {list(parameterization_plugins.keys())}"
             ) from e
-        self.top = Topology(read_top(self.config.top, self.config.ff), parameterizer)
+        self.top = Topology(
+            top=read_top(self.config.top, self.config.ff),
+            parametrizer=parameterizer,
+            is_reactive_predicate_f=get_is_reactive_predicate_f(
+                self.config.topology.reactive
+            ),
+        )
 
         self.filehist: list[dict[str, TaskFiles]] = [
             {"setup": TaskFiles(self.get_latest)}
@@ -210,6 +218,15 @@ class RunManager:
         Allows for mapping one sequence entry in the config to multiple tasks
         """
         logger.info("Building task list")
+        # setup task
+        task = Task(
+            self,
+            f=self._setup,
+            kwargs={},
+            out="setup",
+        )
+        self.tasks.put(task)
+        # configured sequence
         for step in self.config.sequence:
             if step in self.config.mds.get_attributes():
                 # entry is a type of MD
@@ -351,6 +368,17 @@ class RunManager:
         else:
             logger.debug("No output directory found for task: " + taskname)
             return None
+
+    def _setup(self, files: TaskFiles) -> TaskFiles:
+        """A setup task to collect files processed by kimmdy such as the topology"""
+        logger = files.logger
+        logger.info("Start setup task")
+        self.state = State.SETUP
+        logger.info("Writing initial topology after parsing")
+        write_top(self.top.to_dict(), files.outputdir / self.config.top.name)
+        files.output["top"] = files.outputdir / self.config.top.name
+        logger.info("Done with setup")
+        return files
 
     def _run_md(self, instance: str, files: TaskFiles) -> TaskFiles:
         """General MD simulation"""

@@ -4,9 +4,10 @@ import pytest
 
 from kimmdy.parsing import read_top, TopologyDict
 from hypothesis import Phase, given, settings, HealthCheck, strategies as st
-from kimmdy.topology.topology import Topology
+from kimmdy.topology.topology import REACTIVE_MOLECULEYPE, Topology
 from kimmdy.topology.atomic import *
 from kimmdy.topology.utils import (
+    get_reactive_section,
     match_atomic_item_to_atomic_type,
     get_protein_section,
 )
@@ -46,6 +47,16 @@ def raw_top_b_fix(filedir) -> TopologyDict:
 @pytest.fixture()
 def raw_urea_top_fix(filedir) -> TopologyDict:
     return read_top(filedir / "urea.top")
+
+
+@pytest.fixture()
+def raw_urea_times_two_top_fix(filedir) -> TopologyDict:
+    return read_top(filedir / "urea-times-2.top")
+
+
+@pytest.fixture()
+def raw_two_different_ureas_top_fix(filedir) -> TopologyDict:
+    return read_top(filedir / "two-different-ureas.top")
 
 
 @pytest.fixture()
@@ -149,6 +160,59 @@ class TestUrea:
         assert len(top.proper_dihedrals) == 8
         assert len(top.improper_dihedrals) == 3
 
+    def test_making_molecules_explicit(self, raw_urea_times_two_top_fix):
+        raw = deepcopy(raw_urea_times_two_top_fix)
+        top = Topology(raw)
+        assert len(top.atoms) == 16
+        assert len(top.bonds) == 14
+        assert len(top.pairs) == 0
+        assert len(top.angles) == 0
+        assert len(top.proper_dihedrals) == 16
+        assert len(top.improper_dihedrals) == 6
+        assert top.moleculetypes["Reactive"].atoms == top.atoms
+        for i in range(8):
+            n1 = str(i + 1)
+            n2 = str(i + 9)
+            a1 = top.atoms[n1]
+            a2 = top.atoms[n2]
+            assert a1.atom == a2.atom
+            assert a1.type == a2.type
+            assert a1.mass == a2.mass
+            assert int(a2.nr) == int(a1.nr) + 8
+            assert int(a2.cgnr) == int(a1.cgnr) + 8
+
+    def test_merging_molecules(self, raw_two_different_ureas_top_fix):
+        raw = deepcopy(raw_two_different_ureas_top_fix)
+        top = Topology(raw)
+        assert len(top.atoms) == 16
+        assert len(top.bonds) == 14
+        assert len(top.pairs) == 0
+        assert len(top.angles) == 0
+        assert len(top.proper_dihedrals) == 16
+        assert len(top.improper_dihedrals) == 6
+        assert top.moleculetypes["Reactive"].atoms == top.atoms
+        for i in range(8):
+            n1 = str(i + 1)
+            n2 = str(i + 9)
+            a1 = top.atoms[n1]
+            a2 = top.atoms[n2]
+            assert a1.atom == a2.atom
+            assert a1.type == a2.type
+            assert a1.mass == a2.mass
+            if i == 7:
+                assert a1.residue == "TOTALLYNOTUREA"
+                assert a2.residue == "URE"
+            else:
+                assert a1.residue == "URE"
+                assert a2.residue == "URE"
+            assert int(a2.nr) == int(a1.nr) + 8
+            assert int(a2.cgnr) == int(a1.cgnr) + 8
+            assert a1.bound_to_nrs == [str(int(x) - 8) for x in a2.bound_to_nrs]
+            if i < 7:
+                assert int(a1.resnr) == int(a2.resnr) - 2
+            else:
+                assert int(a1.resnr) == int(a2.resnr) - 1
+
 
 class TestTopAB:
     def test_top_ab(self, raw_top_a_fix, raw_top_b_fix):
@@ -243,7 +307,7 @@ class TestTopology:
         newtop.proper_dihedrals.clear()
 
         assert newtop.bonds == {}
-        assert newtop.moleculetypes["Protein"].bonds == {}
+        assert newtop.moleculetypes[REACTIVE_MOLECULEYPE].bonds == {}
 
         newtop._regenerate_topology_from_bound_to()
 
@@ -334,20 +398,20 @@ class TestHexalaTopology:
         topology = og_top.top
         topology_new = top.top
 
-        atoms = get_protein_section(topology, "atoms")
-        bonds = get_protein_section(topology, "bonds")
-        pairs = get_protein_section(topology, "pairs")
-        angles = get_protein_section(topology, "angles")
-        dihedrals = get_protein_section(topology, "dihedrals")
+        atoms = get_reactive_section(topology, "atoms")
+        bonds = get_reactive_section(topology, "bonds")
+        pairs = get_reactive_section(topology, "pairs")
+        angles = get_reactive_section(topology, "angles")
+        dihedrals = get_reactive_section(topology, "dihedrals")
         assert dihedrals
         proper_dihedrals = [x for x in dihedrals if x[4] == "9"]
         improper_dihedrals = [x for x in dihedrals if x[4] == "4"]
 
-        atoms_new = get_protein_section(topology_new, "atoms")
-        bonds_new = get_protein_section(topology_new, "bonds")
-        pairs_new = get_protein_section(topology_new, "pairs")
-        angles_new = get_protein_section(topology_new, "angles")
-        dihedrals_new = get_protein_section(topology_new, "dihedrals")
+        atoms_new = get_reactive_section(topology_new, "atoms")
+        bonds_new = get_reactive_section(topology_new, "bonds")
+        pairs_new = get_reactive_section(topology_new, "pairs")
+        angles_new = get_reactive_section(topology_new, "angles")
+        dihedrals_new = get_reactive_section(topology_new, "dihedrals")
         assert dihedrals_new
         proper_dihedrals_new = [x for x in dihedrals_new if x[4] == "9"]
         improper_dihedrals_new = [x for x in dihedrals_new if x[4] == "4"]
@@ -437,10 +501,20 @@ class TestHexalaTopology:
         top._update_dict()
         assert top.top["dihedraltypes"]["content"] == raw["dihedraltypes"]["content"]
         assert (
-            top.top["moleculetype_0"]["subsections"]["dihedrals"]["content"]
-            == raw["moleculetype_0"]["subsections"]["dihedrals"]["content"]
+            top.top["moleculetype_Reactive"]["subsections"]["dihedrals"]["content"]
+            == raw["moleculetype_Protein"]["subsections"]["dihedrals"]["content"]
         )
-        assert top.top == raw
+        # "fix" the expected differences to test the rest
+        assert raw["molecules"]["content"][0] == ["Protein", "1"]
+        assert top.top["molecules"]["content"][0] == ["Reactive", "1"]
+        raw["molecules"]["content"][0] = ["Reactive", "1"]
+
+        assert raw["moleculetype_Protein"]["content"][0] == ["Protein", "3"]
+        assert top.top["moleculetype_Reactive"]["content"][0] == ["Reactive", "3"]
+        for section in ["atoms", "bonds", "angles", "dihedrals", "pairs"]:
+            top.top["moleculetype_Reactive"]["subsections"][section]["content"] == raw[
+                "moleculetype_Protein"
+            ]["subsections"][section]["content"]
 
     def test_top_properties(self, hexala_top_fix):
         top = deepcopy(hexala_top_fix)
@@ -473,7 +547,7 @@ class TestHexalaTopology:
 
     def test_find_terms_around_atom(self, hexala_top_fix):
         top = deepcopy(hexala_top_fix)
-        protein = top.moleculetypes["Protein"]
+        protein = top.moleculetypes[REACTIVE_MOLECULEYPE]
         atomnr = "29"
         bonds = protein._get_atom_bonds(atomnr)
         angles = protein._get_atom_angles(atomnr)
