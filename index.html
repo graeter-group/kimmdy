@@ -476,7 +476,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#kimmdy" id="toc-kimmdy" class="nav-link active" data-scroll-target="#kimmdy">KIMMDY</a>
   <ul>
-  <li><a href="#installation" id="toc-installation" class="nav-link" data-scroll-target="#installation">Installation</a></li>
+  <li><a href="#installation" id="toc-installation" class="nav-link" data-scroll-target="#installation">Installation</a>
+  <ul>
+  <li><a href="#installation-with-ml-plugins" id="toc-installation-with-ml-plugins" class="nav-link" data-scroll-target="#installation-with-ml-plugins">Installation with ML plugins</a></li>
+  </ul></li>
   <li><a href="#documentation" id="toc-documentation" class="nav-link" data-scroll-target="#documentation">Documentation</a></li>
   <li><a href="#getting-started" id="toc-getting-started" class="nav-link" data-scroll-target="#getting-started">Getting started</a></li>
   <li><a href="#development" id="toc-development" class="nav-link" data-scroll-target="#development">Development</a>
@@ -511,6 +514,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install kimmdy<span class="pp">[</span><span class="ss">reactions</span><span class="pp">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>To install the builtin reactions and analysis tools use</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install kimmdy<span class="pp">[</span><span class="ss">reactions,analysis</span><span class="pp">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="installation-with-ml-plugins" class="level3">
+<h3 class="anchored" data-anchor-id="installation-with-ml-plugins">Installation with ML plugins</h3>
+<pre><code>conda create -n kimmdy_full python=3.10 tensorflow==2.10 openmm
+conda activate kimmdy_full
+git clone https://github.com/hits-mbm-dev/HAT_reaction_plugin.git
+cd HAT_reaction_plugin/
+pip install -r requirements.txt
+cd ..
+git clone https://github.com/hits-mbm-dev/grappa.git
+cd grappa
+pip install -e .
+cd ..
+git clone https://github.com/hits-mbm-dev/kimmdy.git
+git clone git@github.com:hits-mbm-dev/kimmdy-reactions.git
+git clone git@github.com:hits-mbm-dev/kimmdy-grappa.git
+cd kimmdy
+pip install -r requirements.txt</code></pre>
+<p>Other ways to install kimmdy with all plugins are currently discouraged because of the high number of dependencies.</p>
+</section>
 </section>
 <section id="documentation" class="level2">
 <h2 class="anchored" data-anchor-id="documentation">Documentation</h2>
@@ -525,13 +547,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="development-setup" class="level3">
 <h3 class="anchored" data-anchor-id="development-setup">Development setup</h3>
 <p>Clone kimmdy and the default reaction and parameterization plugins and install requirements and kimmdy as editable via</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone git@github.com:hits-mbm-dev/kimmdy.git</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone git@github.com:hits-mbm-dev/kimmdy-reactions.git</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone git@github.com:hits-mbm-dev/kimmdy-grappa.git</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> kimmdy</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> venv .venv</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> ./venv/bin/activate</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="at">-r</span> requirements.txt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone git@github.com:hits-mbm-dev/kimmdy.git</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone git@github.com:hits-mbm-dev/kimmdy-reactions.git</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone git@github.com:hits-mbm-dev/kimmdy-grappa.git</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> kimmdy</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> venv .venv</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> ./venv/bin/activate</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="at">-r</span> requirements.txt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Conventions:</p>
 <ul>
 <li>code style: black</li>

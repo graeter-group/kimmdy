@@ -641,202 +641,223 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td></td>
 </tr>
 <tr class="even">
+<td>topology</td>
+<td>Settings for handling the topology file.</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>topology.reactive.include</td>
+<td>Explicitly include a moleculetype or list of moleculetypes as a space-separated string.</td>
+<td>str</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>topology.reactive.exclude</td>
+<td>Explicitly exclude a moleculetype or a list as a space-separated string. For example the lipid moleculetype in a bilayer simulation e.g.&nbsp;<code>DPPC POPC'</code></td>
+<td>str</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
 <td>gro</td>
 <td>Coordinate file</td>
 <td>Path</td>
 <td>conf.gro</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>ndx</td>
 <td>Gromaxs index file</td>
 <td>Path</td>
 <td>index.ndx</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>gromacs_alias</td>
 <td>Gromacs alias. e.g.&nbsp;<code>gmx</code> or <code>mpirun gmx_mpi</code></td>
 <td>str</td>
 <td>gmx</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>gmx_mdrun_flags</td>
 <td>Flags passed to gmx mdrun. Default <code>-maxh 24 -dlb yes</code></td>
 <td>str</td>
 <td>-maxh 24 -dlb yes</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>ff</td>
 <td>Force field directory (looks for .ff in cwd if not set)</td>
 <td>Path</td>
 <td>*.ff</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>plumed</td>
 <td>.dat file containing plumed config</td>
 <td>Path</td>
 <td></td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>tpr</td>
 <td>.tpr file of a finished simulation for starting directly with a reaction</td>
 <td>Path</td>
 <td></td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>trr</td>
 <td>.trr file of a finished simulation for starting directly with a reaction</td>
 <td>Path</td>
 <td></td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>mds</td>
 <td>Settings for MD steps, e.g.&nbsp;mdp files, plumed files, etc.</td>
 <td></td>
 <td></td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>mds.*.mdp</td>
 <td>MDP file for the MD step</td>
 <td>Path</td>
 <td></td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>mds.*.use_plumed</td>
 <td>Whether plumed should be used for this run or not</td>
 <td>bool</td>
 <td>False</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>changer</td>
 <td>Settings for applying a reaction recipe</td>
 <td></td>
 <td></td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>changer.coordinates.md</td>
 <td>MD step from the ‘mds’ section that is used for relaxation MDs</td>
 <td>str</td>
 <td></td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>changer.coordinates.slow_growth</td>
 <td>Whether the chosen MD step is a slow growth/free-energy simulation</td>
 <td>bool</td>
 <td>False</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>changer.topology.parameterization</td>
 <td>Parameterization scheme that is used on the topology file after changes to it</td>
 <td>str</td>
 <td>basic</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>sequence</td>
 <td>List of tasks. Each task can be a string (the name of the task) or an object with the task name and a multiplicity <code>mult: &lt;int&gt;</code></td>
 <td>Sequence</td>
 <td></td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>reactions</td>
 <td>Settings for reactions</td>
 <td></td>
 <td></td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>reactions.homolysis.edis</td>
 <td>Dissociation energies data file</td>
 <td>Path</td>
 <td>edissoc.dat</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>reactions.homolysis.itp</td>
 <td>Additional itp file with bonded parameters</td>
 <td>Path</td>
 <td>ffbonded.itp</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>reactions.homolysis.kmc</td>
 <td>KMC algorithm for this reaction.</td>
 <td>str</td>
 <td>rfkmc</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>reactions.hat_naive.frequency_factor</td>
 <td>Frequency factor</td>
 <td>float</td>
 <td>1</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>reactions.hat_naive.h_cutoff</td>
 <td>Cutoff for H atom</td>
 <td>float</td>
 <td>4</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>reactions.hat_naive.polling_rate</td>
 <td>Polling rate</td>
 <td>float</td>
 <td>1</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>reactions.hat_naive.kmc</td>
 <td>KMC algorithm for this reaction.</td>
 <td>str</td>
 <td>extrande_mod</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>reactions.dummyreaction.example</td>
 <td>This is an example of an option for a reaction.</td>
 <td>float</td>
 <td>0.0</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>reactions.dummyreaction.example2</td>
 <td>This is another example of an option for a reaction.</td>
 <td>str</td>
 <td>hello</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>reactions.dummyreaction.kmc</td>
 <td>KMC algorithm for this reaction.</td>
 <td>str</td>
 <td>extrande_mod</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>plot_rates</td>
 <td>Plot the reaction rates during the reactions step</td>
 <td>bool</td>
 <td>True</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>save_recipes</td>
 <td>Save recipes as csv during the reactions step</td>
 <td>bool</td>

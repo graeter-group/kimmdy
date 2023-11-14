@@ -584,7 +584,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Our starting structure is a simple ACE/NME-capped Alanine molecule in a box of water. Note, how it has a missing hydrogen atom on the alpha carbon. This is a radical. We will use the builtin <code>hat_reaction</code> to simulate hydrogen atom transfer reactions from nearby hydrogens to the radical position.</p>
     <div id="app-./getting-started-files/vis-ala.molj" class="molstar-app"></div>
     <script type="text/javascript">
-    molstar.Viewer.create("app-./getting-started-files/vis-ala.molj", {"viewportShowSelectionMode":false,"viewportShowExpand":true,"viewportShowAnimation":true,"layoutShowRemoteState":false,"layoutShowLeftPanel":true,"pdbProvider":"rcsb","layoutShowLog":false,"emdbProvider":"rcsb","layoutShowControls":false,"layoutIsExpanded":false,"layoutShowSequence":false}).then(viewer => {
+    molstar.Viewer.create("app-./getting-started-files/vis-ala.molj", {"layoutShowLog":false,"emdbProvider":"rcsb","layoutIsExpanded":false,"layoutShowSequence":false,"layoutShowLeftPanel":true,"viewportShowExpand":true,"layoutShowRemoteState":false,"viewportShowSelectionMode":false,"layoutShowControls":false,"pdbProvider":"rcsb","viewportShowAnimation":true}).then(viewer => {
     viewer.loadSnapshotFromUrl(url="./getting-started-files/vis-ala.molj", "molj");    });
     </script>
     
@@ -596,6 +596,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>You can also run kimmdy directly from python with</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> kimmdy.cmd <span class="im">import</span> kimmdy_run</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>kimmdy_run()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>KIMMDY parses your topology to generate its internal representation and writes out a new topology to be used in future steps. This topology includes everything gromacs needs to run the simulation, including forcefield parameters. KIMMDY combines all moleculetypes that are meant to take part in reactions into one moleculetype named “Reactive”. It also makes multiples explicit (e.g.&nbsp;10 molecules of a peptide), such that each reactive atom has a unique representation. You can always find this topology in the output directory for the kimmdy setup task, e.g.&nbsp;<code>alanine_hat_000/0_setup/&lt;name-of-your-top.top</code>. By default, everything that is not a solvent or ion is considered reactive. To exclude or include certain moleculetypes from this (e.g.&nbsp;in a lipid bilayer simulation), check out the <code>topology.reactive</code> options in the <a href="../../guide/options.html">options documentation</a>. You can find another example of merging topologies in <a href="../../guide/explanation/topology.html">the topology explanation</a>.</p>
+</div>
+</div>
 </section>
 <section id="analyse-the-simulation" class="level2">
 <h2 class="anchored" data-anchor-id="analyse-the-simulation">Analyse the Simulation</h2>
