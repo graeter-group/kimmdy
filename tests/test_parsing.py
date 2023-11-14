@@ -52,10 +52,6 @@ def test_ff_includes_with_ff_in_cwd(arranged_tmp_path):
     ions_dict = parsing.read_top(Path("amber99sb-star-ildnp.ff/ions.itp"))
     assert top_dict["atomtypes"]
     assert top_dict["bondtypes"]
-    for k, v in top_dict.items():
-        print(k)
-    for k, v in ions_dict.items():
-        print(k)
     for ion in [
         "IB+",
         "CA",
