@@ -154,7 +154,7 @@ class Exclusion:
     A class containing atom information as in the exclusions section of the topology.
 
     From gromacs topology:
-    ; nr funct doh dhh
+    ; ai aj ak al
     """
 
     ai: str
