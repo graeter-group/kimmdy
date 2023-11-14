@@ -73,7 +73,7 @@ def test_grompp_with_kimmdy_topology(arranged_tmp_path):
 def test_integration_single_reaction(arranged_tmp_path):
     kimmdy_run()
     assert "Finished running tasks" in read_last_line(Path("kimmdy.log"))
-    assert len(list(Path.cwd().glob("single_reaction_000/*"))) == 7
+    assert len(list(Path.cwd().glob("single_reaction_000/*"))) == 8
 
 
 @pytest.mark.slow
@@ -83,7 +83,7 @@ def test_integration_single_reaction(arranged_tmp_path):
 def test_integration_hat_naive_reaction(arranged_tmp_path):
     kimmdy_run()
     assert "Finished running tasks" in read_last_line(Path("kimmdy.log"))
-    assert len(list(Path.cwd().glob("alanine_hat_000/*"))) == 15
+    assert len(list(Path.cwd().glob("alanine_hat_000/*"))) == 16
 
 
 @pytest.mark.slow
@@ -93,7 +93,7 @@ def test_integration_hat_naive_reaction(arranged_tmp_path):
 def test_integration_homolysis_reaction(arranged_tmp_path):
     kimmdy_run()
     assert "Finished running tasks" in read_last_line(Path("kimmdy.log"))
-    assert len(list(Path.cwd().glob("hexalanine_homolysis_000/*"))) == 12
+    assert len(list(Path.cwd().glob("hexalanine_homolysis_000/*"))) == 13
 
 
 @pytest.mark.slow
@@ -103,7 +103,7 @@ def test_integration_homolysis_reaction(arranged_tmp_path):
 def test_integration_pull(arranged_tmp_path):
     kimmdy_run()
     assert "Finished running tasks" in read_last_line(Path("kimmdy.log"))
-    assert len(list(Path.cwd().glob("kimmdy_001/*"))) == 10
+    assert len(list(Path.cwd().glob("kimmdy_001/*"))) == 11
 
 
 @pytest.mark.require_grappa
@@ -116,4 +116,4 @@ def test_integration_pull(arranged_tmp_path):
 def test_integration_whole_run(arranged_tmp_path):
     kimmdy_run()
     assert "Finished running tasks" in read_last_line(Path("kimmdy.log"))
-    assert len(list(Path.cwd().glob("*/*"))) == 22
+    assert len(list(Path.cwd().glob("*/*"))) == 23
