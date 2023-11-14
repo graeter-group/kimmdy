@@ -1,0 +1,67 @@
+---
+title: "Install Machine Learning Plugins"
+subtitle: "How to install machine learning based plugins (GraPPA and HAT) and their dependencies"
+---
+
+:::callout-warning
+The following plugins are not yet publicly available.
+As such, this guide is only for internal use
+and will be updated once the plugins are ready.
+:::
+
+## Complete Installation with ML Plugins
+
+`conda` is required for this installation to access the tensorflow and openmm packages.
+Solving the dependencies of the environment can overflow memory on the original conda solver.
+So we change the solver to the new `libmamba`.
+We also add the `conda-forge` channel to access the `openmm` package.
+
+```bash
+conda install -n base conda-libmamba-solver
+conda config --set solver libmamba
+conda config --append channels conda-forge
+```
+
+Create a new environment.
+
+```bash
+conda create -n kimmdy_full python=3.10 tensorflow==2.10 openmm
+conda activate kimmdy_full
+```
+
+Clone all repositories and install them in editable mode for development.
+
+```bash
+git clone git@github.com:hits-mbm-dev/kimmdy.git
+git clone git@github.com:hits-mbm-dev/kimmdy-reactions.git
+git clone git@github.com:hits-mbm-dev/kimmdy-grappa.git
+git clone git@github.com:hits-mbm-dev/HAT_reaction_plugin.git
+git clone git@github.com:hits-mbm-dev/grappa.git
+
+pushd kimmdy
+# installs kimmdy, kimmdy-reactions and kimmdy-grappa
+pip install -r requirements.txt
+popd
+
+pushd HAT_reaction_plugin
+pip install -r requirements.txt
+popd
+
+pushd grappa
+pip install -e .
+popd
+```
+
+### Potential problems when running
+
+- openmm can't find the correct libstdc++.so.6
+  - symlink system libstdc++.so.6 to the conda libstdc++.so.6
+
+```bash
+pushd $CONDA_PREFIX/lib
+mv libstdc++.so.6 libstdc++.so.6.old
+ln -s /usr/lib/x86_64-linux-gnu/libstdc++.so.6 libstdc++.so.6
+popd
+```
+
+
