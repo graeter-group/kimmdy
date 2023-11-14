@@ -48,6 +48,10 @@ def raw_top_b_fix(filedir) -> TopologyDict:
 def raw_urea_top_fix(filedir) -> TopologyDict:
     return read_top(filedir / "urea.top")
 
+@pytest.fixture()
+def raw_urea_times_two_top_fix(filedir) -> TopologyDict:
+    return read_top(filedir / "urea-times-2.top")
+
 
 @pytest.fixture()
 def hexala_top_fix(assetsdir, filedir) -> Topology:
@@ -149,6 +153,27 @@ class TestUrea:
         assert len(top.angles) == 0
         assert len(top.proper_dihedrals) == 8
         assert len(top.improper_dihedrals) == 3
+
+    def test_making_molecules_explicit(self, raw_urea_times_two_top_fix):
+        raw = deepcopy(raw_urea_times_two_top_fix)
+        top = Topology(raw)
+        assert len(top.atoms) == 16
+        assert len(top.bonds) == 14
+        assert len(top.pairs) == 0
+        assert len(top.angles) == 0
+        assert len(top.proper_dihedrals) == 16
+        assert len(top.improper_dihedrals) == 6
+        assert top.moleculetypes["Reactive"].atoms == top.atoms
+        for i in range(8):
+            n1 = str(i + 1)
+            n2 = str(i + 9)
+            a1 = top.atoms[n1]
+            a2 = top.atoms[n2]
+            assert a1.atom == a2.atom
+            assert a1.type == a2.type
+            assert a1.mass == a2.mass
+            assert int(a2.nr) == int(a1.nr) + 8
+            assert int(a2.cgnr) == int(a1.cgnr) + 8
 
 
 class TestTopAB:
