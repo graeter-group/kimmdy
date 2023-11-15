@@ -515,6 +515,8 @@ class MoleculeType:
                 pair_ai = update_map.get(pair.ai)
                 pair_aj = update_map.get(pair.aj)
                 if None not in (pair_ai, pair_aj):
+                    pair.ai = pair_ai
+                    pair.aj = pair_aj
                     new_pairs[(pair_ai, pair_aj)] = pair
 
             dihedrals.ai = ai  # type: ignore
@@ -834,6 +836,7 @@ class Topology:
         # break all bonds and delete all pairs, diheadrals etc
         for bound_nr in copy(atom.bound_to_nrs):
             self.break_bond((bound_nr, atom_nr))
+        self.radicals.pop(atom_nr)
 
         self.atoms.pop(atom_nr)
         update_map_all = self.reindex_atomnrs()
@@ -856,6 +859,7 @@ class Topology:
         update_map_all = {}
         for id, moleculetype in self.moleculetypes.items():
             update_map_all[id] = moleculetype.reindex_atomnrs()
+        self._link_atomics()  # necessary because reindex_atomnrs creates a new dict
         return update_map_all
 
     def _regenerate_topology_from_bound_to(self):
