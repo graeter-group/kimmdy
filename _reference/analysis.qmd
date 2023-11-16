@@ -130,16 +130,17 @@ Plot runtime of all tasks.
 
 ### radical_population { #kimmdy.analysis.radical_population }
 
-`analysis.radical_population(dir, steps='all', select_atoms='protein', open_plot=False, open_vmd=False)`
+`analysis.radical_population(dir, population_type='frequency', steps='all', select_atoms='protein', open_plot=False, open_vmd=False)`
 
 Plot population of radicals for a KIMMDY run.
 
 #### Parameters
 
-| Name           | Type                                                                    | Description                                                                                                         | Default     |
-|----------------|-------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------|-------------|
-| `dir`          | [str](`str`)                                                            | KIMMDY run directory to be analysed.                                                                                | _required_  |
-| `steps`        | [Union](`typing.Union`)\[[list](`list`)\[[str](`str`)\], [str](`str`)\] | List of steps e.g. ["equilibrium", "production"]. Or a string "all" to return all subdirectories. Default is "all". | `'all'`     |
-| `select_atoms` | [str](`str`)                                                            | Atoms chosen for radical population analysis, default is protein (uses MDAnalysis selection syntax)                 | `'protein'` |
-| `open_plot`    | [bool](`bool`)                                                          | Open plot in default system viewer.                                                                                 | `False`     |
-| `open_vmd`     | [bool](`bool`)                                                          | Open a pdb in VMD with the radical occupation as B-factors.                                                         | `False`     |
+| Name              | Type                                                                    | Description                                                                                                         | Default       |
+|-------------------|-------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------|---------------|
+| `dir`             | [str](`str`)                                                            | KIMMDY run directory to be analysed.                                                                                | _required_    |
+| `population_type` | [str](`str`)                                                            | How to calculate the fractional radical occupancy. Available are 'frequency' and 'time'                             | `'frequency'` |
+| `steps`           | [Union](`typing.Union`)\[[list](`list`)\[[str](`str`)\], [str](`str`)\] | List of steps e.g. ["equilibrium", "production"]. Or a string "all" to return all subdirectories. Default is "all". | `'all'`       |
+| `select_atoms`    | [str](`str`)                                                            | Atoms chosen for radical population analysis, default is protein (uses MDAnalysis selection syntax)                 | `'protein'`   |
+| `open_plot`       | [bool](`bool`)                                                          | Open plot in default system viewer.                                                                                 | `False`       |
+| `open_vmd`        | [bool](`bool`)                                                          | Open a pdb in VMD with the radical occupation as B-factors.                                                         | `False`       |
