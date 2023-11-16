@@ -36,6 +36,8 @@ logger = logging.getLogger(__name__)
 
 # file types of which there will be multiple files per type
 AMBIGUOUS_SUFFS = ["dat", "xvg", "log", "itp", "mdp"]
+# file strings which to ignore
+IGNORE_SUBSTR = ["_prev.cpt"]
 # are there cases where we have multiple trr files?
 
 
@@ -322,7 +324,12 @@ class RunManager:
         # discover other files written by the task
         if hasattr(files, "outputdir"):
             # check whether double suffs are properly defined in files by the task
-            suffs = [p.suffix[1:] for p in files.outputdir.iterdir()]
+            discovered_files = [
+                p
+                for p in files.outputdir.iterdir()
+                if not any(s in p.name for s in IGNORE_SUBSTR)
+            ]
+            suffs = [p.suffix[1:] for p in discovered_files]
             counts = [suffs.count(s) for s in suffs]
             for suff, c in zip(suffs, counts):
                 if c != 1 and suff not in AMBIGUOUS_SUFFS:
