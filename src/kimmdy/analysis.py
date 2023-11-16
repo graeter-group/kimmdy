@@ -308,7 +308,10 @@ def radical_population(
         )
 
     # filter out atoms with zero occupancy
-    occupied_counts = {atoms_identifier[k]: v for k, v in occupancy.items() if v > 0}
+    print(f"Occupancy: {occupancy}.")
+    occupied_counts = {
+        atoms_identifier[k - 1]: v for k, v in occupancy.items() if v > 0
+    }
 
     sns.barplot(
         x=list(occupied_counts.keys()), y=list(occupied_counts.values()), errorbar=None
