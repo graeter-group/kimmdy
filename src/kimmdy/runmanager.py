@@ -414,9 +414,10 @@ class RunManager:
         if self.latest_files.get("trr") is not None:
             trr = files.input["trr"]
             grompp_cmd += f" -t {trr}"
-        if self.latest_files.get("edr") is not None:
-            edr = files.input["edr"]
-            grompp_cmd += f" -e {edr}"
+        ## disable use of edr for now
+        # if self.latest_files.get("edr") is not None:
+        #     edr = files.input["edr"]
+        #     grompp_cmd += f" -e {edr}"
 
         mdrun_cmd = (
             f"{gmx_alias} mdrun -s {instance}.tpr -cpi {instance}.cpt "
