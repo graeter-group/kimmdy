@@ -532,8 +532,19 @@ class RunManager:
         if self.kmcresult.time_delta:
             self.time += self.kmcresult.time_delta
         logger.info(
-            f"Done with Decide recipe, chosen recipe is: {recipe.get_recipe_name()} at time {self.time:.2f}"
+            f"Done with Decide recipe, chosen recipe is: {recipe.get_recipe_name()} at overall time {self.time*1e-12:.4e} s, reaction occured after {self.kmcresult.time_delta*1e-12:.4e} s"
         )
+
+        # capture state of radicals
+        write_json(
+            {
+                "overall_time": self.time,
+                "residence_time": self.kmcresult.time_delta,
+                "radicals": list(self.top.radicals.keys()),
+            },
+            files.outputdir / "radicals.json",
+        )
+
         return files
 
     def _apply_recipe(self, files: TaskFiles) -> TaskFiles:
@@ -607,12 +618,6 @@ class RunManager:
 
         write_top(self.top.to_dict(), files.outputdir / self.config.top.name)
         files.output["top"] = files.outputdir / self.config.top.name
-
-        # capture state of radicals
-        write_json(
-            {"time": self.time, "radicals": list(self.top.radicals.keys())},
-            files.outputdir / "radicals.json",
-        )
 
         # Recipe done, reset runmanger state
         self.kmcresult = None

@@ -224,6 +224,7 @@ def plot_energy(
 
 def radical_population(
     dir: str,
+    population_type: str = "frequency",
     steps: Union[list[str], str] = "all",
     select_atoms: str = "protein",
     open_plot: bool = False,
@@ -235,6 +236,8 @@ def radical_population(
     ----------
     dir
         KIMMDY run directory to be analysed.
+    population_type
+        How to calculate the fractional radical occupancy. Available are 'frequency' and 'time'
     steps
         List of steps e.g. ["equilibrium", "production"]. Or a string "all" to return all subdirectories.
         Default is "all".
@@ -249,9 +252,12 @@ def radical_population(
     analysis_dir = get_analysis_dir(run_dir)
 
     subdirs_matched = get_step_directories(run_dir, steps)
-    radical_jsons = run_dir.glob("**/radicals.json")
+    radical_jsons = list(run_dir.glob("**/radicals.json"))
+    radical_jsons.sort(
+        key=lambda x: int(x.parents[0].name.split("_")[0])
+    )  # sort by task number
 
-    radical_info = {"time": [], "radicals": []}
+    radical_info = {"overall_time": [], "residence_time": [], "radicals": []}
     for radical_json in radical_jsons:
         data = read_json(radical_json)
         for k in radical_info.keys():
@@ -274,17 +280,35 @@ def radical_population(
         "-".join(str(x) for x in [a.resid, a.resname, a.name]) for a in atoms
     ]
     atom_ids = atoms.ids
+    # print(f"Found {len(atom_ids)} atom ids: {atom_ids}")
 
     ## plot fingerprint
-    counts = {i: 0.0 for i in atom_ids}
-    n_states = len(radical_info["time"])
-    for state in range(n_states):
-        for idx in radical_info["radicals"][state]:
-            if int(idx) in counts.keys():
-                counts[int(idx)] += 1 / n_states
+    occupancy = {i: 0.0 for i in atom_ids}
+    total_time = float(radical_info["overall_time"][-1])
+    if population_type == "frequency":
+        print(
+            "Will determine occupancy by how often an atom was the educt radical of a reaction."
+        )
+        n_states = len(radical_info["radicals"])
+        print(f"Found {n_states} states!")
+        for state in range(n_states):
+            for idx in radical_info["radicals"][state]:
+                if int(idx) in occupancy.keys():
+                    occupancy[int(idx)] += 1 / n_states
+    elif population_type == "time":
+        print("Will determine occupancy by time of residence for a radical state.")
+        for i, radicals in enumerate(radical_info["radicals"]):
+            for radical in radicals:
+                occupancy[int(radical)] += (
+                    float(radical_info["residence_time"][i]) / total_time
+                )
+    else:
+        raise NotImplementedError(
+            f"Selected radical occupancy calculation type: {population_type}."
+        )
 
     # filter out atoms with zero occupancy
-    occupied_counts = {atoms_identifier[k]: v for k, v in counts.items() if v > 0}
+    occupied_counts = {atoms_identifier[k]: v for k, v in occupancy.items() if v > 0}
 
     sns.barplot(
         x=list(occupied_counts.keys()), y=list(occupied_counts.values()), errorbar=None
@@ -297,10 +321,12 @@ def radical_population(
 
     u.add_TopologyAttr("tempfactors")
     atoms = u.select_atoms(select_atoms)
-    atoms.tempfactors = list(counts.values())
+    atoms.tempfactors = list(occupancy.values())
+    pdb_output = f"{analysis_dir}/radical_population_selection.pdb"
+    atoms.write(pdb_output)
     protein = u.select_atoms("protein")
-    pdb_output = f"{analysis_dir}/radical_population.pdb"
-    protein.write(pdb_output)
+    pdb_output_protein = f"{analysis_dir}/radical_population.pdb"
+    protein.write(pdb_output_protein)
 
     if open_plot:
         sp.call(("xdg-open", output_path))
@@ -513,6 +539,13 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         "dir", type=str, help="KIMMDY run directory to be analysed."
     )
     parser_radical_population.add_argument(
+        "--population_type",
+        "-t",
+        type=str,
+        help="How to calculate the fractional radical occupancy. Available are 'frequency' and 'time'",
+        default="frequency",
+    )
+    parser_radical_population.add_argument(
         "--select_atoms",
         "-a",
         type=str,
@@ -589,7 +622,12 @@ def entry_point_analysis():
         plot_energy(args.dir, args.steps, args.terms, args.open_plot)
     elif args.module == "radical_population":
         radical_population(
-            args.dir, args.steps, args.select_atoms, args.open_plot, args.open_vmd
+            args.dir,
+            args.population_type,
+            args.steps,
+            args.select_atoms,
+            args.open_plot,
+            args.open_vmd,
         )
     elif args.module == "rates":
         plot_rates(args.dir)
