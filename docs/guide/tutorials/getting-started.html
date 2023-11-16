@@ -590,7 +590,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Our starting structure is a simple ACE/NME-capped Alanine molecule in a box of water. Note, how it has a missing hydrogen atom on the alpha carbon. This is a radical. We will use the builtin <code>hat_reaction</code> to simulate hydrogen atom transfer reactions from nearby hydrogens to the radical position.</p>
     <div id="app-./getting-started-files/vis-ala.molj" class="molstar-app"></div>
     <script type="text/javascript">
-    molstar.Viewer.create("app-./getting-started-files/vis-ala.molj", {"layoutShowControls":false,"layoutShowLog":false,"viewportShowSelectionMode":false,"layoutIsExpanded":false,"layoutShowLeftPanel":true,"viewportShowAnimation":true,"layoutShowSequence":false,"layoutShowRemoteState":false,"pdbProvider":"rcsb","emdbProvider":"rcsb","viewportShowExpand":true}).then(viewer => {
+    molstar.Viewer.create("app-./getting-started-files/vis-ala.molj", {"layoutShowLog":false,"emdbProvider":"rcsb","layoutShowControls":false,"layoutIsExpanded":false,"viewportShowExpand":true,"viewportShowAnimation":true,"layoutShowLeftPanel":true,"layoutShowSequence":false,"viewportShowSelectionMode":false,"layoutShowRemoteState":false,"pdbProvider":"rcsb"}).then(viewer => {
     viewer.loadSnapshotFromUrl(url="./getting-started-files/vis-ala.molj", "molj");    });
     </script>
     
