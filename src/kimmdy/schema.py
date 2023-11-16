@@ -15,8 +15,9 @@ import importlib.resources as pkg_resources
 import logging
 from kimmdy.plugins import reaction_plugins
 
-# needed for eval of type_scheme from schema
+# **Attention**
 # don't remove even if lsp says it's unused
+# needed for eval of type_scheme from schema
 import kimmdy
 import pathlib
 from pathlib import Path

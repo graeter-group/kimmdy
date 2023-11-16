@@ -218,21 +218,21 @@ def extrande_mod(
     rejected = 0
     chosen_recipe = None
 
-    boarders, rate_windows, recipe_windows = recipe_collection.calc_ratesum()
+    borders, rate_windows, recipe_windows = recipe_collection.calc_ratesum()
 
     rate_sums = [float(sum(l)) for l in rate_windows]
     idx_rate_max = np.argmax(rate_sums)
     expected_tau = np.mean(tau_scale * rng.exponential(1 / max(rate_sums), 50))
     logger.debug(
         f"Max of summed rate of {rate_sums[idx_rate_max]:.2} between t "
-        f"{boarders[idx_rate_max]} - {boarders[idx_rate_max+1]}\n"
+        f"{borders[idx_rate_max]} - {borders[idx_rate_max+1]}\n"
         f"\t\texpected tau: {expected_tau}"
     )
 
-    for cr_boarders, cr_rates, cr_recipes in zip(
-        pairwise(boarders), rate_windows, recipe_windows
+    for cr_borders, cr_rates, cr_recipes in zip(
+        pairwise(borders), rate_windows, recipe_windows
     ):
-        t_max = cr_boarders[1]
+        t_max = cr_borders[1]
         rate_cumsum = np.cumsum(cr_rates)
         b = rate_cumsum[-1]
         tau = tau_scale * rng.exponential(1 / b)
@@ -241,7 +241,7 @@ def extrande_mod(
             l = t_max - t
             if tau > l:
                 # reject, goto next window
-                logger.debug(f"Tau exceeded window {cr_boarders}.")
+                logger.debug(f"Tau exceeded window {cr_borders}.")
                 t = t_max
                 rejected += 1
                 continue
@@ -323,22 +323,22 @@ def extrande(
     chosen_recipe = None
 
     # Find L and B
-    boarders, rate_windows, recipe_windows = recipe_collection.calc_ratesum()
+    borders, rate_windows, recipe_windows = recipe_collection.calc_ratesum()
     # time of last rate, should be last MD time
-    t_max = boarders[-1]
+    t_max = borders[-1]
 
     rate_sums = [float(sum(l)) for l in rate_windows]
     idx_rate_max = np.argmax(rate_sums)
     expected_tau = np.mean(tau_scale * rng.exponential(1 / max(rate_sums), 10))
     logger.debug(
         f"Max of summed rate of {rate_sums[idx_rate_max]:.2} between t "
-        f"{boarders[idx_rate_max]} - {boarders[idx_rate_max+1]}\n"
+        f"{borders[idx_rate_max]} - {borders[idx_rate_max+1]}\n"
         f"\t\texpected tau: {expected_tau}"
     )
 
     n_extra = 0
     while t < t_max:
-        crr_window_idx = np.searchsorted(boarders, t, side="right") - 1
+        crr_window_idx = np.searchsorted(borders, t, side="right") - 1
         # only 0 rates left -> skip to end
         if not any([r > 0 for r in rate_sums[crr_window_idx:]]):
             t = t_max
@@ -361,11 +361,11 @@ def extrande(
             return KMCResult()
 
         t += tau
-        new_window_idx = np.searchsorted(boarders, t, side="right") - 1
+        new_window_idx = np.searchsorted(borders, t, side="right") - 1
         rate_cumsum = np.cumsum(rate_windows[new_window_idx])
         # catch landing in window with no recipes -> next window
         if len(rate_cumsum) == 0:
-            t = boarders[crr_window_idx + 1]
+            t = borders[crr_window_idx + 1]
             logger.debug(f"Jumped to frame with no recip, new t={t}")
             continue
         a0 = rate_cumsum[-1]
@@ -379,7 +379,7 @@ def extrande(
 
         # Extra reaction channel, repeat for new t
         n_extra += 1
-        if n_extra == len(boarders * 1000):
+        if n_extra == len(borders * 1000):
             logger.warning(
                 f"{n_extra} extra reactions performed during extrande KMC calculation. Try increasing tau_scale"
             )

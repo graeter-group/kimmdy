@@ -112,7 +112,8 @@ class Task:
 
     A task consists of a function and its keyword arguments.
     Calling a taks calls the stored function.
-    The function must return a TaskFiles object.
+    The function must return a TaskFiles object or None
+    if no files are created by the task.
 
     Parameters:
     -----------
@@ -143,7 +144,7 @@ class Task:
 
         logger.debug(f"Init task {self.name}\tkwargs: {self.kwargs}\tOut: {self.out}")
 
-    def __call__(self) -> TaskFiles:
+    def __call__(self) -> Optional[TaskFiles]:
         if self.out is not None:
             self.kwargs.update({"files": create_task_directory(self.runmng, self.out)})
 

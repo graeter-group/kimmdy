@@ -453,11 +453,11 @@ class RecipeCollection:
 
         Returns
         -------
-        boarders
+        borders
             flat list containing times of rate changes marking the
-            boarders of the windows
+            borders of the windows
         rate_windows
-            flat list containing all rates in between the boarders.
+            flat list containing all rates in between the border.
             Each window is orderd as in recipe_windows
         recipe_windows
             flat list containing the recipes of the corresponding window.
@@ -467,22 +467,22 @@ class RecipeCollection:
         self.aggregate_reactions()
 
         # non-overlapping window boaders
-        boarders = set()
+        borders = set()
 
         for re in self.recipes:
             for ts in re.timespans:
                 for t in ts:
-                    boarders.add(t)
+                    borders.add(t)
 
-        boarders = sorted(boarders)
-        rate_windows = [[] for _ in range(len(boarders) - 1)]
-        recipe_windows = [[] for _ in range(len(boarders) - 1)]
+        borders = sorted(borders)
+        rate_windows = [[] for _ in range(len(borders) - 1)]
+        recipe_windows = [[] for _ in range(len(borders) - 1)]
 
         for re in self.recipes:
             for r, ts in zip(re.rates, re.timespans):
-                left_idx = boarders.index(ts[0])
-                right_idx = boarders.index(ts[1])
-                # timespan <- boarder
+                left_idx = borders.index(ts[0])
+                right_idx = borders.index(ts[1])
+                # timespan <- border
                 # the selected recipe must tell where it should be applied
                 re_copy = copy(re)
                 re_copy.timespans = [ts]
@@ -490,7 +490,7 @@ class RecipeCollection:
                 [l.append(r) for l in rate_windows[left_idx:right_idx]]
                 [l.append(re_copy) for l in recipe_windows[left_idx:right_idx]]
 
-        return boarders, rate_windows, recipe_windows
+        return borders, rate_windows, recipe_windows
 
     def plot(self, outfile, highlight_r=None, highlight_t=None):
         """Plot reaction rates over time

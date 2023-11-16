@@ -12,7 +12,7 @@ from pathlib import Path
 if TYPE_CHECKING:
     from kimmdy.tasks import TaskFiles
     from kimmdy.topology.topology import Topology
-    from kimmdy.parsing import Plumed_dict
+    from kimmdy.parsing import PlumedDict
 
 logger = logging.getLogger(__name__)
 
@@ -78,7 +78,7 @@ def check_file_exists(p: Path):
 
 def get_atomnrs_from_plumedid(
     plumedid: str,
-    plumed: Plumed_dict,
+    plumed: PlumedDict,
 ) -> list[str]:
     """
     Convert from plumedid to atomnr, information from the plumed file is used.

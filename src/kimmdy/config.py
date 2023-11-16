@@ -4,7 +4,7 @@ and package into a parsed format for internal use.
 """
 from __future__ import annotations
 import shutil
-from pprint import pformat, pprint
+from pprint import pformat
 from typing import Any, Optional
 import yaml
 from pathlib import Path
@@ -14,7 +14,7 @@ from kimmdy.plugins import (
     parameterization_plugins,
     broken_parameterization_plugins,
 )
-from kimmdy.schema import Sequence, get_combined_scheme
+from kimmdy.schema import get_combined_scheme
 from kimmdy.utils import get_gmx_dir, check_file_exists, check_gmx_version
 
 

@@ -51,7 +51,7 @@ class State(Enum):
     DONE = auto()
 
 
-def get_existing_files(config: Config, section: str = "root") -> dict:
+def get_existing_files(config: Config) -> dict:
     """Initialize latest_files with every existing file defined in config"""
     file_d = {}
     attr_names = config.get_attributes()
@@ -73,7 +73,7 @@ def get_existing_files(config: Config, section: str = "root") -> dict:
 
             file_d[key] = attr
         elif isinstance(attr, Config):
-            file_d.update(get_existing_files(attr, attr_name))
+            file_d.update(get_existing_files(attr))
     return file_d
 
 
@@ -129,7 +129,7 @@ class RunManager:
         logger.debug(f"Initialized latest files:\n{pformat(self.latest_files)}")
         self.histfile: Path = self.config.out / "kimmdy.history"
         self.cptfile: Path = self.config.out / "kimmdy.cpt"
-        self.kmc_algorithm: Optional[str] = None
+        self.kmc_algorithm: str
 
         try:
             if self.config.changer.topology.parameterization == "basic":
@@ -464,7 +464,7 @@ class RunManager:
         # find decision strategy
         if len(kmc := self.config.kmc) > 0:
             # algorithm overwrite
-            self.kmc_algorithm = kmc
+            self.kmc_algorithm = kmc.lower()
 
         else:
             # get algorithm from reaction
@@ -475,7 +475,7 @@ class RunManager:
                     "Attempted to combine:\n"
                     f"{ {rp.name:rp.config.kmc for rp in self.reaction_plugins} }"
                 )
-            self.kmc_algorithm = strategies[0]
+            self.kmc_algorithm = strategies[0].lower()
 
         logger.info(f"Queued {len(self.reaction_plugins)} reaction plugin(s)")
         return None
@@ -506,10 +506,10 @@ class RunManager:
             f"Start Decide recipe using {self.kmc_algorithm}, "
             f"{len(self.recipe_collection.recipes)} recipes available."
         )
-        kmc = self.kmc_mapping[self.kmc_algorithm.lower()]
-        if "extrande" in self.kmc_algorithm.lower():
+        kmc = self.kmc_mapping[self.kmc_algorithm]
+        if "extrande" in self.kmc_algorithm:
             kmc = partial(kmc, tau_scale=self.config.tau_scale)
-        self.kmcresult: KMCResult = kmc(self.recipe_collection, logger=logger)
+        self.kmcresult = kmc(self.recipe_collection, logger=logger)
         recipe = self.kmcresult.recipe
 
         if self.config.save_recipes:

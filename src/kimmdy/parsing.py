@@ -2,7 +2,6 @@
 All read_<...> and write_<...> functions.
 """
 import os
-import re
 import logging
 import json
 import numpy as np
@@ -10,7 +9,6 @@ from pathlib import Path
 from typing import Optional, Union
 from itertools import takewhile
 from typing import TypedDict
-from kimmdy.constants import ATOM_ID_FIELDS, RESNR_ID_FIELDS, REACTIVE_MOLECULEYPE
 
 from kimmdy.utils import get_gmx_dir
 
@@ -415,7 +413,7 @@ def write_top(top: TopologyDict, outfile: Path):
 
 
 ## Plumed
-class Plumed_dict(TypedDict):
+class PlumedDict(TypedDict):
     """Dict representation of a plumed.dat file."""
 
     other: list
@@ -423,7 +421,7 @@ class Plumed_dict(TypedDict):
     prints: list[dict]
 
 
-def read_plumed(path: Path) -> Plumed_dict:
+def read_plumed(path: Path) -> PlumedDict:
     """Read a plumed.dat configuration file.
 
     Follows the plumed naming scheme of label, keyword, action.
@@ -478,10 +476,10 @@ def read_plumed(path: Path) -> Plumed_dict:
                 if not any(l.strip().startswith(x) for x in ["#", "\n"]) and l.strip():
                     other.append(l)
 
-        return Plumed_dict(other=other, labeled_action=labeled_action, prints=prints)
+        return PlumedDict(other=other, labeled_action=labeled_action, prints=prints)
 
 
-def write_plumed(d: Plumed_dict, path: Path) -> None:
+def write_plumed(d: PlumedDict, path: Path) -> None:
     """Write a plumed.dat configuration file.
 
     Parameters

@@ -36,7 +36,7 @@ def get_top_section(
         section = top.get(name)
 
     if section is None:
-        logger.warning(
+        logger.debug(
             f"Topology does not contain section {name}. "
             "Is the forcefield in the correct directory?"
         )

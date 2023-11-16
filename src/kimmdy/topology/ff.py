@@ -2,18 +2,6 @@ from __future__ import annotations
 import textwrap
 import logging
 from kimmdy.topology.atomic import (
-    Atom,
-    Bond,
-    Pair,
-    Angle,
-    Dihedral,
-    MultipleDihedrals,
-    PositionRestraint,
-    DihedralRestraint,
-    ResidueImproperSpec,
-    ResidueProperSpec,
-    Settle,
-    Exclusion,
     AtomType,
     BondType,
     AngleType,

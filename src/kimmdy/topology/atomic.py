@@ -6,7 +6,8 @@ See [gromacs manual](https://manual.gromacs.org/current/reference-manual/topolog
 
 from dataclasses import dataclass, field
 from typing import Optional, Union
-from kimmdy.topology.utils import field_or_none
+from kimmdy.parsing import TopologyDict
+from kimmdy.topology.utils import field_or_none, get_top_section
 
 
 @dataclass()
@@ -71,7 +72,7 @@ class PositionRestraint:
         return cls(
             ai=l[0],
             funct=l[1],
-            fc=tuple(l[2:]),
+            fc=(l[2], l[3], l[4]),
             condition=condition,
         )
 
@@ -618,27 +619,27 @@ class ResidueType:
     improper_dihedrals: dict[tuple[str, str, str, str], ResidueImproperSpec]
 
     @classmethod
-    def from_section(cls, residue, d: dict[str, list[list[str]]]):
+    def from_section(cls, residue, d: TopologyDict):
         atoms = {}
         bonds = {}
         propers = {}
         impropers = {}
-        if ls := d.get("atoms"):
-            for l in ls["content"]:
+        if ls := get_top_section(d, "atoms"):
+            for l in ls:
                 atom = ResidueAtomSpec.from_top_line(l)
                 atoms[atom.name] = atom
-        if ls := d.get("bonds"):
-            for l in ls["content"]:
+        if ls := get_top_section(d, "bonds"):
+            for l in ls:
                 bond = ResidueBondSpec.from_top_line(l)
                 bonds[(bond.atom1, bond.atom2)] = bond
-        if ls := d.get("dihedrals"):
-            for l in ls["content"]:
+        if ls := get_top_section(d, "dihedrals"):
+            for l in ls:
                 proper = ResidueProperSpec.from_top_line(l)
                 propers[
                     (proper.atom1, proper.atom2, proper.atom3, proper.atom4)
                 ] = proper
-        if ls := d.get("impropers"):
-            for l in ls["content"]:
+        if ls := get_top_section(d, "impropers"):
+            for l in ls:
                 improper = ResidueImproperSpec.from_top_line(l)
                 impropers[
                     (improper.atom1, improper.atom2, improper.atom3, improper.atom4)

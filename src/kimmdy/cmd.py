@@ -21,7 +21,6 @@ from kimmdy.plugins import (
     parameterization_plugins,
     broken_parameterization_plugins,
 )
-import importlib.resources as pkg_resources
 import sys
 import os
 

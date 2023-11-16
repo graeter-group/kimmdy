@@ -84,3 +84,12 @@ in the coordinate file (or rather, line numbers - 2, since the
 numbers in the actual `atomnr` column can overflow due to the fixed-width file format).
 
 
+```{python}
+#| eval: false
+#| echo: false
+# debug code cell
+urea_dict = read_top(Path('../../tests/test_files/test_topology/urea.top'), use_gmx_dir=True)
+urea = Topology(urea_dict)
+urea.ff.residuetypes["ALA"].proper_dihedrals
+```
+

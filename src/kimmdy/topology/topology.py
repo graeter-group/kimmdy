@@ -72,7 +72,7 @@ class MoleculeType:
             tuple[str, str, str, str], DihedralRestraint
         ] = {}
         self.settles: dict[str, Settle] = {}
-        self.exclusions: dict[int, Exclusion] = {}
+        self.exclusions: dict[tuple, Exclusion] = {}
         self.radicals: dict[str, Atom] = {}
 
         self._parse_atoms()
@@ -200,7 +200,7 @@ class MoleculeType:
         ls = self.atomics.get("exclusions")
         if not ls:
             return
-        for i, l in enumerate(ls):
+        for l in ls:
             exclusion = Exclusion.from_top_line(l)
             self.exclusions[tuple(l)] = exclusion
 
@@ -515,8 +515,8 @@ class MoleculeType:
                 pair_ai = update_map.get(pair.ai)
                 pair_aj = update_map.get(pair.aj)
                 if None not in (pair_ai, pair_aj):
-                    pair.ai = pair_ai
-                    pair.aj = pair_aj
+                    pair.ai = pair_ai # type: ignore
+                    pair.aj = pair_aj # type: ignore
                     new_pairs[(pair_ai, pair_aj)] = pair
 
             dihedrals.ai = ai  # type: ignore

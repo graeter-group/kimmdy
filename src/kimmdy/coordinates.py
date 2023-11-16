@@ -164,6 +164,7 @@ def merge_dihedrals(
 ) -> Dihedral:
     """Merge one to two Dihedrals or -Types into a Dihedral in free-energy syntax"""
     # convert implicit standard ff parameters to explicit, if necessary
+    parameterizedA: Union[Dihedral,DihedralType,None]
     if interactionA:
         parameterizedA = get_explicit_or_type(
             dihedral_key,
@@ -171,10 +172,11 @@ def merge_dihedrals(
             interaction_typesA,
             molA,
             periodicity,
-        )
+        ) # type: ignore
     else:
         parameterizedA = None
 
+    parameterizedB: Union[Dihedral,DihedralType,None]
     if interactionB:
         parameterizedB = get_explicit_or_type(
             dihedral_key,
@@ -182,7 +184,7 @@ def merge_dihedrals(
             interaction_typesB,
             molB,
             periodicity,
-        )
+        ) # type: ignore
     else:
         parameterizedB = None
 
@@ -451,9 +453,6 @@ def merge_top_slow_growth(
     topA: Topology, topB: Topology, focus_nr: Optional[list[str]] = None
 ) -> Topology:
     """Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation.
-
-
-    TODO: for now this assumes that only one moleculeype (the first, index 0) is of interest.
     """
 
     molA = topA.moleculetypes[REACTIVE_MOLECULEYPE]
