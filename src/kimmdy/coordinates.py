@@ -313,7 +313,7 @@ def merge_top_moleculetypes_slow_growth(
                 atomtypes = [molB.atoms[atom_id].type for atom_id in key]
                 # use combination rule type 2 (typically used by amber force fields)
                 sigmas = [ff.atomtypes[at].sigma for at in atomtypes]
-                sigmaij = float(sigmas[0]) + float(sigmas[1])
+                sigmaij = 0.5 * float(sigmas[0]) + float(sigmas[1])
                 epsilons = [ff.atomtypes[at].epsilon for at in atomtypes]
                 epsilonij = np.sqrt(float(epsilons[0]) * float(epsilons[1]))
                 # morse well steepness
