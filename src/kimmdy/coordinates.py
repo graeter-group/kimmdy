@@ -5,6 +5,7 @@ from typing import Optional, Union
 from copy import deepcopy
 import MDAnalysis as mda
 from pathlib import Path
+import numpy as np
 
 from kimmdy.tasks import TaskFiles
 from kimmdy.parsing import read_plumed, write_plumed
@@ -237,11 +238,7 @@ def merge_top_moleculetypes_slow_growth(
     focus_nr: Optional[list[str]] = None,
 ) -> MoleculeType:
     """Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation"""
-    hyperparameters = {
-        "morse_well_depth": "400.0",
-        "morse_steepness": "10.0",
-        "morse_dist_factor": 4,
-    }  # well_depth D [kJ/mol], steepness [nm-1], dist_factor for bond length
+    hyperparameters = {"morse_well_depth":300} #[kJ mol-1]
 
     # TODO:
     # think about how to bring focus_nr into this
@@ -285,15 +282,24 @@ def merge_top_moleculetypes_slow_growth(
                     c3=parameterizedB.c1,
                 )
             elif parameterizedA:
+                atomtypes = [molA.atoms[atom_id].type for atom_id in key]
+                # use combination rule type 2 (typically used by amber force fields)
+                sigmas = [ff.atomtypes[at].sigma for at in atomtypes]
+                sigmaij = 0.5*(float(sigmas[0]) + float(sigmas[1]))
+                epsilons = [ff.atomtypes[at].epsilon for at in atomtypes]
+                epsilonij = np.sqrt(float(epsilons[0])*float(epsilons[1]))
+                # morse well steepness
+                beta = np.sqrt(float(parameterizedA.c1)/(2*hyperparameters["morse_well_depth"]))
+
                 molB.bonds[key] = Bond(
                     *key,
                     funct="3",
                     c0=parameterizedA.c0,
-                    c1=hyperparameters["morse_well_depth"],
-                    c2=hyperparameters["morse_steepness"],
-                    c3=f"{float(parameterizedA.c0)*hyperparameters['morse_dist_factor']:7.5f}",
-                    c4="0.00",
-                    c5=hyperparameters["morse_steepness"],
+                    c1=f"{hyperparameters['morse_well_depth']:5.3f}",
+                    c2=f"{beta:5.3f}",
+                    c3=f"{sigmaij*1.12:7.5f}",  # sigmaij* 1.12 = LJ minimum
+                    c4=f"{epsilonij:7.5f}",     # well depth is epsilonij
+                    c5=f"{beta:5.3f}",
                 )
 
                 # update bound_to
@@ -302,15 +308,23 @@ def merge_top_moleculetypes_slow_growth(
                 atompair[1].bound_to_nrs.append(atompair[0].nr)
 
             elif parameterizedB:
+                atomtypes = [molB.atoms[atom_id].type for atom_id in key]
+                # use combination rule type 2 (typically used by amber force fields)
+                sigmas = [ff.atomtypes[at].sigma for at in atomtypes]
+                sigmaij = float(sigmas[0]) + float(sigmas[1])
+                epsilons = [ff.atomtypes[at].epsilon for at in atomtypes]
+                epsilonij = np.sqrt(float(epsilons[0])*float(epsilons[1]))
+                # morse well steepness
+                beta = np.sqrt(float(parameterizedB.c1)/(2*hyperparameters["morse_well_depth"]))
                 molB.bonds[key] = Bond(
                     *key,
                     funct="3",
-                    c0=f"{float(parameterizedB.c0)*hyperparameters['morse_dist_factor']:7.5f}",
-                    c1="0.00",
-                    c2=hyperparameters["morse_steepness"],
+                    c0=f"{sigmaij*1.12:7.5f}",  # sigmaij* 1.12 = LJ minimum
+                    c1=f"{epsilonij:7.5f}",     # well depth is epsilonij
+                    c2=f"{beta:5.3f}",
                     c3=parameterizedB.c0,
-                    c4=hyperparameters["morse_well_depth"],
-                    c5=hyperparameters["morse_steepness"],
+                    c4=f"{hyperparameters['morse_well_depth']:5.3f}",
+                    c5=f"{beta:5.3f}",
                 )
 
     # pairs and exclusions
