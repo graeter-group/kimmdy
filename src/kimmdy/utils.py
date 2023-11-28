@@ -139,6 +139,7 @@ def get_bondprm_from_atomtypes(
 
     return b0, kb
 
+
 def get_edissoc_from_atomnames(atomnames: list[str], edissoc: dict) -> float:
     """Returns dissociation energy E_dissoc for a set of two atomnames.
 

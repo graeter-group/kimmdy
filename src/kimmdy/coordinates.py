@@ -238,7 +238,7 @@ def merge_top_moleculetypes_slow_growth(
     focus_nr: Optional[list[str]] = None,
 ) -> MoleculeType:
     """Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation"""
-    hyperparameters = {"morse_well_depth":300} #[kJ mol-1]
+    hyperparameters = {"morse_well_depth": 300}  # [kJ mol-1]
 
     # TODO:
     # think about how to bring focus_nr into this
@@ -285,11 +285,13 @@ def merge_top_moleculetypes_slow_growth(
                 atomtypes = [molA.atoms[atom_id].type for atom_id in key]
                 # use combination rule type 2 (typically used by amber force fields)
                 sigmas = [ff.atomtypes[at].sigma for at in atomtypes]
-                sigmaij = 0.5*(float(sigmas[0]) + float(sigmas[1]))
+                sigmaij = 0.5 * (float(sigmas[0]) + float(sigmas[1]))
                 epsilons = [ff.atomtypes[at].epsilon for at in atomtypes]
-                epsilonij = np.sqrt(float(epsilons[0])*float(epsilons[1]))
+                epsilonij = np.sqrt(float(epsilons[0]) * float(epsilons[1]))
                 # morse well steepness
-                beta = np.sqrt(float(parameterizedA.c1)/(2*hyperparameters["morse_well_depth"]))
+                beta = np.sqrt(
+                    float(parameterizedA.c1) / (2 * hyperparameters["morse_well_depth"])
+                )
 
                 molB.bonds[key] = Bond(
                     *key,
@@ -298,7 +300,7 @@ def merge_top_moleculetypes_slow_growth(
                     c1=f"{hyperparameters['morse_well_depth']:5.3f}",
                     c2=f"{beta:5.3f}",
                     c3=f"{sigmaij*1.12:7.5f}",  # sigmaij* 1.12 = LJ minimum
-                    c4=f"{epsilonij:7.5f}",     # well depth is epsilonij
+                    c4=f"{epsilonij:7.5f}",  # well depth is epsilonij
                     c5=f"{beta:5.3f}",
                 )
 
@@ -313,14 +315,16 @@ def merge_top_moleculetypes_slow_growth(
                 sigmas = [ff.atomtypes[at].sigma for at in atomtypes]
                 sigmaij = float(sigmas[0]) + float(sigmas[1])
                 epsilons = [ff.atomtypes[at].epsilon for at in atomtypes]
-                epsilonij = np.sqrt(float(epsilons[0])*float(epsilons[1]))
+                epsilonij = np.sqrt(float(epsilons[0]) * float(epsilons[1]))
                 # morse well steepness
-                beta = np.sqrt(float(parameterizedB.c1)/(2*hyperparameters["morse_well_depth"]))
+                beta = np.sqrt(
+                    float(parameterizedB.c1) / (2 * hyperparameters["morse_well_depth"])
+                )
                 molB.bonds[key] = Bond(
                     *key,
                     funct="3",
                     c0=f"{sigmaij*1.12:7.5f}",  # sigmaij* 1.12 = LJ minimum
-                    c1=f"{epsilonij:7.5f}",     # well depth is epsilonij
+                    c1=f"{epsilonij:7.5f}",  # well depth is epsilonij
                     c2=f"{beta:5.3f}",
                     c3=parameterizedB.c0,
                     c4=f"{hyperparameters['morse_well_depth']:5.3f}",

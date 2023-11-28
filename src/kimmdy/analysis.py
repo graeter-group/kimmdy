@@ -98,7 +98,7 @@ def concat_traj(dir: str, steps: Union[list[str], str], open_vmd: bool = False):
         trajectories.extend(d.glob("*.xtc"))
         tprs.extend(d.glob("*.tpr"))
         gros.extend(d.glob("*.gro"))
-    
+
     assert (
         len(trajectories) > 0
     ), f"No trrs found to concatenate in {run_dir} with subdirectory names {steps}"
