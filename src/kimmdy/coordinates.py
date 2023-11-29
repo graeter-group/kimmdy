@@ -260,6 +260,8 @@ def merge_top_moleculetypes_slow_growth(
                     f"Atom {nr} changed but not the charges!\n\tA:{atomA}\n\tB:{atomB} "
                 )
 
+    break_bind_atoms = {}
+
     # bonds
     keysA = set(molA.bonds.keys())
     keysB = set(molB.bonds.keys())
@@ -283,6 +285,8 @@ def merge_top_moleculetypes_slow_growth(
                 )
             elif parameterizedA:
                 atomtypes = [molA.atoms[atom_id].type for atom_id in key]
+                break_bind_atoms[key[0]] = atomtypes[0]
+                break_bind_atoms[key[1]] = atomtypes[1]
                 # use combination rule type 2 (typically used by amber force fields)
                 sigmas = [ff.atomtypes[at].sigma for at in atomtypes]
                 sigmaij = 0.5 * (float(sigmas[0]) + float(sigmas[1]))
@@ -311,9 +315,11 @@ def merge_top_moleculetypes_slow_growth(
 
             elif parameterizedB:
                 atomtypes = [molB.atoms[atom_id].type for atom_id in key]
+                break_bind_atoms[key[0]] = atomtypes[0]
+                break_bind_atoms[key[1]] = atomtypes[1]
                 # use combination rule type 2 (typically used by amber force fields)
                 sigmas = [ff.atomtypes[at].sigma for at in atomtypes]
-                sigmaij = 0.5 * float(sigmas[0]) + float(sigmas[1])
+                sigmaij = 0.5 * (float(sigmas[0]) + float(sigmas[1]))
                 epsilons = [ff.atomtypes[at].epsilon for at in atomtypes]
                 epsilonij = np.sqrt(float(epsilons[0]) * float(epsilons[1]))
                 # morse well steepness
@@ -458,6 +464,17 @@ def merge_top_moleculetypes_slow_growth(
                 "4",
                 "2",
             )
+
+    # amber fix for breaking/binding atom types without LJ potential
+    #breakpoint()
+
+    for k,v in break_bind_atoms.items():
+        if v in ['HW','HO']:
+            molB.atoms[k].type = 'H1'
+            if molB.atoms[k].typeB is not None:
+                molB.atoms[k].typeB = 'H1'
+
+
 
     # update is_radical attribute of Atom objects in topology
     molB.test_for_radicals()
