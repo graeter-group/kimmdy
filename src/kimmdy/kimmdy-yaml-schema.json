@@ -1,39 +1,46 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
+  "title": "kimmdy config",
   "$id": "https://raw.githubusercontent.com/hits-mbm-dev/kimmdy/main/src/kimmdy/kimmdy-yaml-schema.json",
   "additionalProperties": false,
   "required": ["sequence", "changer"],
   "properties": {
     "dryrun": {
+      "title": "dryrun",
       "description": "Don't run the actual simulations, just print the tasks",
       "type": "boolean",
       "pytype": "bool",
       "default": false
     },
     "write_checkpoint": {
+      "title": "write_checkpoint",
       "description": "Write checkpoints to continue a KIMMDY run from. Default True",
       "type": "boolean",
       "pytype": "bool",
       "default": true
     },
     "cwd": {
+      "title": "cwd",
       "description": "Working directory. Default is current working directory",
       "type": "string",
       "pytype": "Path"
     },
     "name": {
+      "title": "name",
       "description": "Used for output folder if `out` is not specified",
       "type": "string",
       "pytype": "str",
       "default": "kimmdy"
     },
     "out": {
+      "title": "out",
       "description": "Output folder",
       "type": "string",
       "pytype": "Path"
     },
     "log": {
+      "title": "log",
       "type": "object",
       "description": "Settings for logging",
       "additionalProperties": false,
@@ -54,18 +61,21 @@
       }
     },
     "max_tasks": {
+      "title": "max_tasks",
       "description": "Maximum number of tasks to run. This is useful when a task in the sequence can dymanically add more tasks. 0 means no limit.",
       "type": "integer",
       "pytype": "int",
       "default": 0
     },
     "max_hours": {
+      "title": "max_hours",
       "description": "Stop KIMMDY after max_hours hours. Set this lower than the limit of your HPC cluster for use with a re-submit jobscript. 0 Means no limit.",
       "type": "integer",
       "pytype": "int",
       "default": 0
     },
     "kmc": {
+      "title": "kmc",
       "description": "KMC algorithm overwrite. Should be set by the reactions, but can be changed here.",
       "type": "string",
       "pytype": "str",
@@ -73,22 +83,26 @@
       "default": ""
     },
     "tau_scale": {
+      "title": "tau_scale",
       "description": "Scaling parameter for tau in the extrande kmc algorithm.",
       "type": "number",
       "pytype": "float",
       "default": "1.0"
     },
     "top": {
+      "title": "top",
       "description": "Topology file",
       "type": "string",
       "pytype": "Path",
       "default": "topol.top"
     },
     "topology": {
+      "title": "topology",
       "type": "object",
       "description": "Settings for handling the topology file.",
       "properties": {
         "reactive": {
+          "title": "reactive",
           "type": "object",
           "description": "Specify what moleculetypes will be part of the Reactive moleculetype. By default, solvent and ions are excluded.",
           "properties": {
@@ -109,51 +123,60 @@
       }
     },
     "gro": {
+      "title": "gro",
       "description": "Coordinate file",
       "type": "string",
       "pytype": "Path",
       "default": "conf.gro"
     },
     "ndx": {
+      "title": "ndx",
       "description": "Gromaxs index file",
       "type": "string",
       "pytype": "Path",
       "default": "index.ndx"
     },
     "gromacs_alias": {
+      "title": "gromacs_alias",
       "description": "Gromacs alias. e.g. `gmx` or `mpirun gmx_mpi`",
       "type": "string",
       "pytype": "str",
       "default": "gmx"
     },
     "gmx_mdrun_flags": {
+      "title": "gmx_mdrun_flags",
       "description": "Flags passed to gmx mdrun. Default `-maxh 24 -dlb yes`",
       "type": "string",
       "pytype": "str",
       "default": "-maxh 24 -dlb yes"
     },
     "ff": {
+      "title": "ff",
       "description": "Force field directory (looks for .ff in cwd if not set)",
       "type": "string",
       "pytype": "Path",
       "default": "*.ff"
     },
     "plumed": {
+      "title": "plumed",
       "description": ".dat file containing plumed config",
       "type": "string",
       "pytype": "Path"
     },
     "tpr": {
+      "title": "tpr",
       "description": ".tpr file of a finished simulation for starting directly with a reaction",
       "type": "string",
       "pytype": "Path"
     },
     "trr": {
+      "title": "trr",
       "description": ".trr file of a finished simulation for starting directly with a reaction",
       "type": "string",
       "pytype": "Path"
     },
     "mds": {
+      "title": "mds",
       "type": "object",
       "description": "Settings for MD steps, e.g. mdp files, plumed files, etc.",
       "patternProperties": {
@@ -179,10 +202,12 @@
       }
     },
     "changer": {
+      "title": "changer",
       "type": "object",
       "description": "Settings for applying a reaction recipe",
       "properties": {
         "coordinates": {
+          "title": "coordinates",
           "type": "object",
           "description": "Settings related to coordinate/geometry changes when applying a recipe",
           "properties": {
@@ -200,6 +225,7 @@
           }
         },
         "topology": {
+          "title": "topology",
           "type": "object",
           "description": "Settings for parameter changes in the topology file",
           "properties": {
@@ -217,6 +243,7 @@
       "required": ["coordinates", "topology"]
     },
     "sequence": {
+      "title": "sequence",
       "description": "List of tasks. Each task can be a string (the name of the task) or an object with the task name and a multiplicity `mult: <int>`",
       "pytype": "Sequence",
       "type": "array",
@@ -267,6 +294,7 @@
       }
     },
     "reactions": {
+      "title": "reactions",
       "type": "object",
       "description": "Settings for reactions",
       "additionalProperties": true,
@@ -283,12 +311,14 @@
       }
     },
     "plot_rates" : {
+      "title": "plot_rates",
       "description": "Plot the reaction rates during the reactions step",
       "type": "boolean",
       "pytype": "bool",
       "default": true
     },
     "save_recipes" : {
+      "title": "save_recipes",
       "description": "Save recipes as csv during the reactions step",
       "type": "boolean",
       "pytype": "bool",
