@@ -1,5 +1,15 @@
 # Changelog
 
+## [5.2.1](https://github.com/hits-mbm-dev/kimmdy/compare/v5.2.0...v5.2.1) (2023-12-07)
+
+
+### Bug Fixes
+
+* add title to scheme ([#341](https://github.com/hits-mbm-dev/kimmdy/issues/341)) ([a1b1ae5](https://github.com/hits-mbm-dev/kimmdy/commit/a1b1ae5f429d86555c3429ee9a4e01f5df618882))
+* kimmdy run bugs ([#336](https://github.com/hits-mbm-dev/kimmdy/issues/336)) ([ce558e7](https://github.com/hits-mbm-dev/kimmdy/commit/ce558e7fb528800f75ac0133e8dde871179bd70c))
+* make forcefield directory optional, only warn ([#332](https://github.com/hits-mbm-dev/kimmdy/issues/332)) ([eac4131](https://github.com/hits-mbm-dev/kimmdy/commit/eac41311e2230bdf014c3df15d141993ac2617ae))
+* renumber atomnrs ([#331](https://github.com/hits-mbm-dev/kimmdy/issues/331)) ([e88f8cc](https://github.com/hits-mbm-dev/kimmdy/commit/e88f8cc809056462249b828960b98565f3768908))
+
 ## [5.2.0](https://github.com/hits-mbm-dev/kimmdy/compare/v5.1.12...v5.2.0) (2023-11-14)
 
 
