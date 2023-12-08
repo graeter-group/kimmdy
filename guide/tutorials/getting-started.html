@@ -208,13 +208,30 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../../guide/tutorials/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Tutorials</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
+            <a href="../../guide/explanation/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Explanations</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 show">  
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guide/explanation/topology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visualize Topologies</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../guide/tutorials/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tutorials</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../guide/tutorials/colbuilder.html" class="sidebar-item-text sidebar-link">
@@ -231,23 +248,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../../guide/tutorials/write-plugin.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Write a Reaction Plugin</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a href="../../guide/explanation/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Explanations</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../guide/explanation/topology.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Visualize Topologies</span></a>
   </div>
 </li>
       </ul>
@@ -590,7 +590,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Our starting structure is a simple ACE/NME-capped Alanine molecule in a box of water. Note, how it has a missing hydrogen atom on the alpha carbon. This is a radical. We will use the builtin <code>hat_reaction</code> to simulate hydrogen atom transfer reactions from nearby hydrogens to the radical position.</p>
     <div id="app-./getting-started-files/vis-ala.molj" class="molstar-app"></div>
     <script type="text/javascript">
-    molstar.Viewer.create("app-./getting-started-files/vis-ala.molj", {"layoutShowRemoteState":false,"layoutShowControls":false,"pdbProvider":"rcsb","layoutIsExpanded":false,"layoutShowLog":false,"layoutShowSequence":false,"emdbProvider":"rcsb","viewportShowSelectionMode":false,"viewportShowAnimation":true,"viewportShowExpand":true,"layoutShowLeftPanel":true}).then(viewer => {
+    molstar.Viewer.create("app-./getting-started-files/vis-ala.molj", {"layoutShowLeftPanel":true,"viewportShowAnimation":true,"emdbProvider":"rcsb","layoutIsExpanded":false,"viewportShowSelectionMode":false,"layoutShowControls":false,"pdbProvider":"rcsb","layoutShowRemoteState":false,"viewportShowExpand":true,"layoutShowLog":false,"layoutShowSequence":false}).then(viewer => {
     viewer.loadSnapshotFromUrl(url="./getting-started-files/vis-ala.molj", "molj");    });
     </script>
     
