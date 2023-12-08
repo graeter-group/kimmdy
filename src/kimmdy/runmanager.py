@@ -397,11 +397,11 @@ class RunManager:
         gmx_alias = self.config.gromacs_alias
         gmx_mdrun_flags = self.config.gmx_mdrun_flags
 
-        top = str(files.input["top"]).replace(" ", r"\ ")
-        gro = str(files.input["gro"]).replace(" ", r"\ ")
+        top = files.input["top"]
+        gro = files.input["gro"]
         files.input["mdp"] = md_config.mdp
-        mdp = str(files.input["mdp"]).replace(" ", r"\ ")
-        ndx = str(files.input["ndx"]).replace(" ", r"\ ")
+        mdp = files.input["mdp"]
+        ndx = files.input["ndx"]
 
         outputdir = files.outputdir
 
@@ -412,7 +412,7 @@ class RunManager:
 
         # optional files for grompp:
         if self.latest_files.get("trr") is not None:
-            trr = str(files.input["trr"]).replace(" ", r"\ ")
+            trr = files.input["trr"]
             grompp_cmd += f" -t {trr}"
         ## disable use of edr for now
         # if self.latest_files.get("edr") is not None:
@@ -430,8 +430,7 @@ class RunManager:
         )
 
         if getattr(md_config, "use_plumed"):
-            plumed = str(files.input['plumed']).replace(" ", r"\ ")
-            mdrun_cmd += f" -plumed {plumed}"
+            mdrun_cmd += f" -plumed {files.input['plumed']}"
 
             plumed_out = files.outputdir / get_plumed_out(files.input["plumed"])
             files.output["plumed_out"] = plumed_out
