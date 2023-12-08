@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.2.3](https://github.com/hits-mbm-dev/kimmdy/compare/v5.2.2...v5.2.3) (2023-12-08)
+
+
+### Bug Fixes
+
+* fix an issue where merging multiples of a moleculetype incremented the residuenumbers too fast ([#344](https://github.com/hits-mbm-dev/kimmdy/issues/344)) ([7e78665](https://github.com/hits-mbm-dev/kimmdy/commit/7e78665ea1593d65b4b49daa7c1a71a99c87e94d))
+
 ## [5.2.2](https://github.com/hits-mbm-dev/kimmdy/compare/v5.2.1...v5.2.2) (2023-12-08)
 
 
