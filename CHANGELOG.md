@@ -1,5 +1,14 @@
 # Changelog
 
+## [5.2.2](https://github.com/hits-mbm-dev/kimmdy/compare/v5.2.1...v5.2.2) (2023-12-08)
+
+
+### Bug Fixes
+
+* escape file paths for shell commands ([914550a](https://github.com/hits-mbm-dev/kimmdy/commit/914550ae57cf6428845a57cb95b388b33f29ee40))
+* make ff dir optional in config ([02c5d9f](https://github.com/hits-mbm-dev/kimmdy/commit/02c5d9f3cb157b8ffc1db9ceec9285f667e73d1c))
+* replace spaces in name and out in config ([304de69](https://github.com/hits-mbm-dev/kimmdy/commit/304de69b4047ad56df6caa64b381f60bc8c16ce0))
+
 ## [5.2.1](https://github.com/hits-mbm-dev/kimmdy/compare/v5.2.0...v5.2.1) (2023-12-07)
 
 
