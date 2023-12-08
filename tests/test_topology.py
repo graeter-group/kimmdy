@@ -60,6 +60,11 @@ def raw_two_different_ureas_top_fix(filedir) -> TopologyDict:
 
 
 @pytest.fixture()
+def hexala_rawtop_fix(assetsdir, filedir) -> TopologyDict:
+    return read_top(filedir / "hexala.top")
+
+
+@pytest.fixture()
 def hexala_top_fix(assetsdir, filedir) -> Topology:
     hexala_top = read_top(filedir / "hexala.top")
     return Topology(hexala_top)
@@ -212,6 +217,22 @@ class TestUrea:
                 assert int(a1.resnr) == int(a2.resnr) - 2
             else:
                 assert int(a1.resnr) == int(a2.resnr) - 1
+
+    def test_merging_solvent(self, hexala_rawtop_fix):
+        top = Topology(
+            deepcopy(hexala_rawtop_fix),
+            is_reactive_predicate_f=lambda mol: mol in ["Protein", "SOL"],
+        )
+        assert len(top.atoms) == 38013
+        assert top.atoms["73"].resnr == "9"
+        assert top.atoms["74"].resnr == "9"
+        assert top.atoms["75"].resnr == "9"
+        assert top.atoms["76"].resnr == "10"
+        assert top.atoms["77"].resnr == "10"
+        assert top.atoms["78"].resnr == "10"
+        assert top.atoms["79"].resnr == "11"
+        assert top.atoms["80"].resnr == "11"
+        assert top.atoms["81"].resnr == "11"
 
 
 class TestTopAB:
