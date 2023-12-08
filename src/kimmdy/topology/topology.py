@@ -683,9 +683,10 @@ class Topology:
         for name, n in molecules.items():
             add_atomics = self.moleculetypes[name].atomics
             n_atoms = len(add_atomics["atoms"])
-            for _ in range(n):
-                for section_name, values in add_atomics.items():
-                    section = deepcopy(values)
+            highest_resnr = int(add_atomics["atoms"][-1][RESNR_ID_FIELDS["atoms"][0]])
+            for i in range(n):
+                for section_name, section in add_atomics.items():
+                    section = deepcopy(section)
                     atomnr_fields = ATOM_ID_FIELDS.get(section_name, [])
                     resnr_fields = RESNR_ID_FIELDS.get(section_name, [])
                     for line in section:
@@ -696,10 +697,9 @@ class Topology:
                     if reactive_atomics.get(section_name) is None:
                         reactive_atomics[section_name] = []
                     reactive_atomics[section_name] += section
-                    if section_name == "atoms" and resnr_fields:
-                        # use last line to get latest resnr
-                        resnr_offset += int(section[-1][resnr_fields[0]])
+
                 atomnr_offset += n_atoms
+                resnr_offset += highest_resnr
             # remove now merged moleculetype from topology
             # and the topology dict
             del self.moleculetypes[name]
