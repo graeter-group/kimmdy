@@ -214,7 +214,7 @@ class Bind(BondOperation):
 
 @dataclass
 class CustomTopMod(RecipeStep):
-    """A custom recipe step that can be used to define a custom reaction path.
+    """A custom recipe step that can be used to define a custom topology modification.
 
     Parameters
     ----------
