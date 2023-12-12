@@ -11,6 +11,7 @@ Contains the Reaction Recipe, RecipeStep and RecipeCollection.
 | [Bind](#kimmdy.recipe.Bind) | Change topology to form a bond |
 | [BondOperation](#kimmdy.recipe.BondOperation) | Handle a bond operation on the recipe step. |
 | [Break](#kimmdy.recipe.Break) | Change topology to break a bond |
+| [CustomTopMod](#kimmdy.recipe.CustomTopMod) | A custom recipe step that can be used to define a custom topology modification. |
 | [Place](#kimmdy.recipe.Place) | Change topology and/or coordinates to place an atom. |
 | [Recipe](#kimmdy.recipe.Recipe) | A reaction path defined by one series of RecipeSteps. |
 | [RecipeCollection](#kimmdy.recipe.RecipeCollection) | A RecipeCollection encompasses a number of reaction paths. |
@@ -73,6 +74,18 @@ Change topology to break a bond
 | `atom_ix_2` | [int](`int`) | The index of the second atom. zero-based, by default None | _required_ |
 | `atom_id_1` | [str](`str`) | The ID of the first atom. one-based, by default None      | _required_ |
 | `atom_id_2` | [str](`str`) | The ID of the second atom. one-based, by default None     | _required_ |
+
+### CustomTopMod { #kimmdy.recipe.CustomTopMod }
+
+`recipe.CustomTopMod(f)`
+
+A custom recipe step that can be used to define a custom topology modification.
+
+#### Parameters
+
+| Name   | Type                                                                                                                                  | Description                                                       | Default    |
+|--------|---------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------|------------|
+| `f`    | [Callable](`typing.Callable`)\[\[[Topology](`kimmdy.topology.topology.Topology`)\], [Topology](`kimmdy.topology.topology.Topology`)\] | A function that takes a Topology object and modifies it in place. | _required_ |
 
 ### Place { #kimmdy.recipe.Place }
 
