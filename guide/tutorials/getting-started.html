@@ -551,9 +551,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="setup-the-simulation" class="level2">
 <h2 class="anchored" data-anchor-id="setup-the-simulation">Setup the Simulation</h2>
 <p>Download and unzip the <a href="./getting-started-files/setup.zip">input files</a> to this directory.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">TODO</span><span class="co">: add link to gihtub user content</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">wget</span> ...</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">unzip</span> setup.zip</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">wget</span> https://hits-mbm-dev.github.io/kimmdy/guide/tutorials/getting-started-files/setup.zip</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">unzip</span> setup.zip</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>The <code>kimmdy.yml</code> file should look like this:</p>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
@@ -590,7 +589,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Our starting structure is a simple ACE/NME-capped Alanine molecule in a box of water. Note, how it has a missing hydrogen atom on the alpha carbon. This is a radical. We will use the builtin <code>hat_reaction</code> to simulate hydrogen atom transfer reactions from nearby hydrogens to the radical position.</p>
     <div id="app-./getting-started-files/vis-ala.molj" class="molstar-app"></div>
     <script type="text/javascript">
-    molstar.Viewer.create("app-./getting-started-files/vis-ala.molj", {"layoutShowLeftPanel":true,"viewportShowAnimation":true,"emdbProvider":"rcsb","layoutIsExpanded":false,"viewportShowSelectionMode":false,"layoutShowControls":false,"pdbProvider":"rcsb","layoutShowRemoteState":false,"viewportShowExpand":true,"layoutShowLog":false,"layoutShowSequence":false}).then(viewer => {
+    molstar.Viewer.create("app-./getting-started-files/vis-ala.molj", {"viewportShowExpand":true,"layoutShowRemoteState":false,"viewportShowAnimation":true,"layoutShowLog":false,"layoutShowLeftPanel":true,"emdbProvider":"rcsb","pdbProvider":"rcsb","layoutShowControls":false,"layoutIsExpanded":false,"viewportShowSelectionMode":false,"layoutShowSequence":false}).then(viewer => {
     viewer.loadSnapshotFromUrl(url="./getting-started-files/vis-ala.molj", "molj");    });
     </script>
     

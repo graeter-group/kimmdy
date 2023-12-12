@@ -466,13 +466,17 @@ ul.task-list li input[type="checkbox"] {
   <ul class="collapse">
   <li><a href="#parameters-2" id="toc-parameters-2" class="nav-link" data-scroll-target="#parameters-2">Parameters</a></li>
   </ul></li>
-  <li><a href="#kimmdy.recipe.Place" id="toc-kimmdy.recipe.Place" class="nav-link" data-scroll-target="#kimmdy.recipe.Place">Place</a>
+  <li><a href="#kimmdy.recipe.CustomTopMod" id="toc-kimmdy.recipe.CustomTopMod" class="nav-link" data-scroll-target="#kimmdy.recipe.CustomTopMod">CustomTopMod</a>
   <ul class="collapse">
   <li><a href="#parameters-3" id="toc-parameters-3" class="nav-link" data-scroll-target="#parameters-3">Parameters</a></li>
   </ul></li>
-  <li><a href="#kimmdy.recipe.Recipe" id="toc-kimmdy.recipe.Recipe" class="nav-link" data-scroll-target="#kimmdy.recipe.Recipe">Recipe</a>
+  <li><a href="#kimmdy.recipe.Place" id="toc-kimmdy.recipe.Place" class="nav-link" data-scroll-target="#kimmdy.recipe.Place">Place</a>
   <ul class="collapse">
   <li><a href="#parameters-4" id="toc-parameters-4" class="nav-link" data-scroll-target="#parameters-4">Parameters</a></li>
+  </ul></li>
+  <li><a href="#kimmdy.recipe.Recipe" id="toc-kimmdy.recipe.Recipe" class="nav-link" data-scroll-target="#kimmdy.recipe.Recipe">Recipe</a>
+  <ul class="collapse">
+  <li><a href="#parameters-5" id="toc-parameters-5" class="nav-link" data-scroll-target="#parameters-5">Parameters</a></li>
   <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
   <ul class="collapse">
   <li><a href="#kimmdy.recipe.Recipe.calc_averages" id="toc-kimmdy.recipe.Recipe.calc_averages" class="nav-link" data-scroll-target="#kimmdy.recipe.Recipe.calc_averages">calc_averages</a></li>
@@ -532,22 +536,26 @@ ul.task-list li input[type="checkbox"] {
 <td>Change topology to break a bond</td>
 </tr>
 <tr class="even">
+<td><a href="#kimmdy.recipe.CustomTopMod">CustomTopMod</a></td>
+<td>A custom recipe step that can be used to define a custom topology modification.</td>
+</tr>
+<tr class="odd">
 <td><a href="#kimmdy.recipe.Place">Place</a></td>
 <td>Change topology and/or coordinates to place an atom.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#kimmdy.recipe.Recipe">Recipe</a></td>
 <td>A reaction path defined by one series of RecipeSteps.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#kimmdy.recipe.RecipeCollection">RecipeCollection</a></td>
 <td>A RecipeCollection encompasses a number of reaction paths.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#kimmdy.recipe.RecipeStep">RecipeStep</a></td>
 <td>Base class for all RecipeSteps.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#kimmdy.recipe.Relax">Relax</a></td>
 <td>Start a relaxation MD.</td>
 </tr>
@@ -707,12 +715,38 @@ ul.task-list li input[type="checkbox"] {
 </table>
 </section>
 </section>
+<section id="kimmdy.recipe.CustomTopMod" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.recipe.CustomTopMod">CustomTopMod</h3>
+<p><code>recipe.CustomTopMod(f)</code></p>
+<p>A custom recipe step that can be used to define a custom topology modification.</p>
+<section id="parameters-3" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-3">Parameters</h4>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>f</code></td>
+<td><a href="https://docs.python.org/3.10/library/typing.html#typing.Callable">Callable</a>[[<a href="../_reference/topology.topology.html#kimmdy.topology.topology.Topology">Topology</a>], <a href="../_reference/topology.topology.html#kimmdy.topology.topology.Topology">Topology</a>]</td>
+<td>A function that takes a Topology object and modifies it in place.</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
 <section id="kimmdy.recipe.Place" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.recipe.Place">Place</h3>
 <p><code>recipe.Place(new_coords, ix_to_place, id_to_place, _ix_to_place=field(init=False, repr=False, default=None))</code></p>
 <p>Change topology and/or coordinates to place an atom.</p>
-<section id="parameters-3" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-3">Parameters</h4>
+<section id="parameters-4" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-4">Parameters</h4>
 <table class="table">
 <thead>
 <tr class="header">
@@ -749,8 +783,8 @@ ul.task-list li input[type="checkbox"] {
 <h3 class="anchored" data-anchor-id="kimmdy.recipe.Recipe">Recipe</h3>
 <p><code>recipe.Recipe(recipe_steps, rates, timespans)</code></p>
 <p>A reaction path defined by one series of RecipeSteps. Defines everything necessart to build the product state from the educt state.</p>
-<section id="parameters-4" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-4">Parameters</h4>
+<section id="parameters-5" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-5">Parameters</h4>
 <table class="table">
 <thead>
 <tr class="header">
@@ -810,8 +844,8 @@ ul.task-list li input[type="checkbox"] {
 <h5 class="anchored" data-anchor-id="kimmdy.recipe.Recipe.calc_averages">calc_averages</h5>
 <p><code>recipe.Recipe.calc_averages(window_size)</code></p>
 <p>Calulate average rates over some window size</p>
-<section id="parameters-5" class="level6">
-<h6 class="anchored" data-anchor-id="parameters-5">Parameters</h6>
+<section id="parameters-6" class="level6">
+<h6 class="anchored" data-anchor-id="parameters-6">Parameters</h6>
 <table class="table">
 <thead>
 <tr class="header">
@@ -841,8 +875,8 @@ ul.task-list li input[type="checkbox"] {
 <h5 class="anchored" data-anchor-id="kimmdy.recipe.Recipe.combine_with">combine_with</h5>
 <p><code>recipe.Recipe.combine_with(other)</code></p>
 <p>Combines this Recipe with another with the same RecipeSteps.</p>
-<section id="parameters-6" class="level6">
-<h6 class="anchored" data-anchor-id="parameters-6">Parameters</h6>
+<section id="parameters-7" class="level6">
+<h6 class="anchored" data-anchor-id="parameters-7">Parameters</h6>
 <table class="table">
 <thead>
 <tr class="header">
@@ -979,8 +1013,8 @@ ul.task-list li input[type="checkbox"] {
 <h5 class="anchored" data-anchor-id="kimmdy.recipe.RecipeCollection.plot">plot</h5>
 <p><code>recipe.RecipeCollection.plot(outfile, highlight_r=None, highlight_t=None)</code></p>
 <p>Plot reaction rates over time</p>
-<section id="parameters-7" class="level6">
-<h6 class="anchored" data-anchor-id="parameters-7">Parameters</h6>
+<section id="parameters-8" class="level6">
+<h6 class="anchored" data-anchor-id="parameters-8">Parameters</h6>
 <table class="table">
 <thead>
 <tr class="header">
