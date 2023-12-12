@@ -1,7 +1,7 @@
 """Contains the Reaction Recipe, RecipeStep and RecipeCollection.
 """
 from __future__ import annotations
-from typing import Optional
+from typing import TYPE_CHECKING, Callable, Optional
 
 from abc import ABC
 from dataclasses import dataclass, field
@@ -13,6 +13,9 @@ import csv
 import numpy as np
 
 logger = logging.getLogger(__name__)
+
+if TYPE_CHECKING:
+    from kimmdy.topology.topology import Topology
 
 
 class RecipeStep(ABC):
@@ -211,6 +214,19 @@ class Bind(BondOperation):
 
 
 @dataclass
+class CustomTopMod(RecipeStep):
+    """A custom recipe step that can be used to define a custom topology modification.
+
+    Parameters
+    ----------
+    f : Callable[[Topology], Topology]
+        A function that takes a Topology object and modifies it in place.
+    """
+
+    f: Callable[[Topology], None]
+
+
+@dataclass
 class Recipe:
     """A reaction path defined by one series of RecipeSteps.
     Defines everything necessart to build the
@@ -327,6 +343,9 @@ class Recipe:
 
             elif isinstance(rs, Relax):
                 pass
+
+            elif isinstance(rs, CustomTopMod):
+                name += "🪛"
 
             else:
                 logger.warning(f"get_recipe_name got unknown step type: {type(rs)}")
