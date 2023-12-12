@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.3.0](https://github.com/hits-mbm-dev/kimmdy/compare/v5.2.3...v5.3.0) (2023-12-12)
+
+
+### Features
+
+* custom step ([#346](https://github.com/hits-mbm-dev/kimmdy/issues/346)) ([5b28f04](https://github.com/hits-mbm-dev/kimmdy/commit/5b28f049dda4ca6e56b959b413778eb73ba3de0d))
+
 ## [5.2.3](https://github.com/hits-mbm-dev/kimmdy/compare/v5.2.2...v5.2.3) (2023-12-08)
 
 
