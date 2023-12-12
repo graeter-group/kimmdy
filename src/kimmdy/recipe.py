@@ -212,6 +212,7 @@ class Bind(BondOperation):
         The ID of the second atom. one-based, by default None
     """
 
+
 @dataclass
 class CustomTopMod(RecipeStep):
     """A custom recipe step that can be used to define a custom topology modification.
@@ -221,6 +222,7 @@ class CustomTopMod(RecipeStep):
     f : Callable[[Topology], Topology]
         A function that takes a Topology object and modifies it in place.
     """
+
     f: Callable[[Topology], None]
 
 
