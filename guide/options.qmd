@@ -6,35 +6,46 @@ execute:
 
 ## Autocompletion
 
-KIMMDY comes with autocompletion for the `kimmdy.yml` file.
-You can add the schema to the configuration of the [yaml-language-server](https://github.com/redhat-developer/yaml-language-server) in your editor
-(e.g. [VS Code](https://code.visualstudio.com/) via the [YAML extension](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml) or [Neovim](https://neovim.io/) via [lspconfig](https://github.com/neovim/nvim-lspconfig)).
-To associate `kimmdy.yml` files with KIMMDY, add the following to your
+KIMMDY comes with autocompletion and tooltips insight your editor for its configuration file `kimmdy.yml`. 
 
+All you need to do is activate a [yaml-language-server](https://github.com/redhat-developer/yaml-language-server)
+in your editor (e.g. [VS Code](https://code.visualstudio.com/) via the 
+[YAML extension](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml) or 
+[Neovim](https://neovim.io/) via [lspconfig](https://github.com/neovim/nvim-lspconfig)).
+
+Activating this is very much recommended, as it prevents many typos and missaligned braces.
+
+::: {.callout-tip appearance="simple"}
+This only works, if your config file is actually called `kimmdy.yml`
+:::
+
+::: {.callout-note collapse=true}
 ### VS Code settings
 
-```{.json filename='settings.json'}
-"yaml.schemas": {
-    "https://raw.githubusercontent.com/hits-mbm-dev/kimmdy/main/src/kimmdy/kimmdy-yaml-schema.json": "kimmdy.yml",
-}
-```
+Make sure that the following option is activated in your VS Code settings:
 
+```
+Yaml > Schema Store: Enable
+```
+:::
+
+::: {.callout-note collapse=true}
 ### Neovim settings
 
 ```{.lua filename='init.lua'}
-require("lspconfig").yamlls.setup({
-  on_attach = on_attach,
-  capabilities = capabilities,
-  flags = lsp_flags,
+local lspconfig = require('lspconfig')
+lspconfig.yamlls.setup({
+  -- ...
   settings = {
     yaml = {
-      schemas = {
-        ["https://raw.githubusercontent.com/hits-mbm-dev/kimmdy/main/src/kimmdy/kimmdy-yaml-schema.json"] = "kimmdy.yml",
+      schemaStore = {
+        enable = true,
       },
     },
   },
 })
 ```
+:::
 
 ## All Options
 
