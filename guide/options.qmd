@@ -19,19 +19,27 @@ Activating this is very much recommended, as it prevents many typos and missalig
 This only works, if your config file is actually called `kimmdy.yml`
 :::
 
+::: {.callout-note collapse=true}
+### VS Code settings
+
+Make sure that the following option is activated in your VS Code settings:
+
+```
+Yaml > Schema Store: Enable
+```
+:::
 
 ::: {.callout-note collapse=true}
 ### Neovim settings
 
 ```{.lua filename='init.lua'}
-require("lspconfig").yamlls.setup({
-  on_attach = on_attach,
-  capabilities = capabilities,
-  flags = lsp_flags,
+local lspconfig = require('lspconfig')
+lspconfig.yamlls.setup({
+  -- ...
   settings = {
     yaml = {
-      schemas = {
-        ["https://raw.githubusercontent.com/hits-mbm-dev/kimmdy/main/src/kimmdy/kimmdy-yaml-schema.json"] = "kimmdy.yml",
+      schemaStore = {
+        enable = true,
       },
     },
   },
