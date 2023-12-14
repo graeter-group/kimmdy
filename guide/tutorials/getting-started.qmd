@@ -113,7 +113,7 @@ representation.
 You can always find this topology in the output directory for the kimmdy setup task, e.g. `alanine_hat_000/0_setup/<name-of-your-top.top`.
 By default, everything that is not a solvent or ion is considered reactive.
 To exclude or include certain moleculetypes from this (e.g. in a lipid bilayer simulation),
-check out the `topology.reactive` options in the [options documentation](/guide/options.qmd).
+check out the `topology.reactive` options in the [input file documentation](/guide/references/input.qmd).
 You can find another example of merging topologies in [the topology explanation](/guide/explanation/topology.qmd).
 :::
 
@@ -170,7 +170,7 @@ Congratulations, you have successfully run your first KIMMDY simulation!
 
 ## Next steps
 
-- [Learn more about the `kimmdy.yml` input file](../options.qmd)
+- [Learn more about the `kimmdy.yml` input file](../references/input.qmd)
 - [Run KIMMDY with a collagen fibril from Colbuilder](./colbuilder.qmd)
 - [Write your own reaction plugin](./write-plugin.qmd)
 - [Discover more plugins by looking for the `kimmdy` tag on GitHub](https://github.com/topics/kimmdy)

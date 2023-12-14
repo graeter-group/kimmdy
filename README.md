@@ -1,6 +1,6 @@
 # KIMMDY
 
-[![tests on latest release](https://github.com/hits-mbm-dev/kimmdy/actions/workflows/test-release.yml/badge.svg)](https://github.com/hits-mbm-dev/kimmdy/actions/workflows/test-release.yml)
+[![](https://github.com/hits-mbm-dev/kimmdy/actions/workflows/test-release.yml/badge.svg)](https://github.com/hits-mbm-dev/kimmdy/actions/workflows/test-release.yml)
 
 Reactive MD pipeline for GROMACS using Kinetic Monte Carlo / Molecular Dynamics (KIMMDY)
 
