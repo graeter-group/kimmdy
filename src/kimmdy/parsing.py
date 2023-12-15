@@ -340,7 +340,8 @@ def read_top(
             is_first_line_after_section_header = False
 
     if len(d) <= 2:
-        raise ValueError(f"topology file {path} does not contain any sections")
+        m = f"topology file {path} does not contain any sections"
+        logger.warning(m)
 
     return d
 
