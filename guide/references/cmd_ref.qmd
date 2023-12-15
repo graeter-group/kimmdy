@@ -1,0 +1,38 @@
+---
+execute:
+  echo: true
+---
+
+# CLI Arguments
+
+The prefered method of starting a KIMMDY run is via the command line, though [Python entry points](../../_reference/cmd.qmd) are supported as well.
+
+## KIMMDY
+
+```{python}
+!kimmdy --help
+```
+
+## Analysis
+
+```{python}
+!kimmdy-analysis --help
+```
+
+## Remove Hydrogen
+
+This module builds or restores the example directory in the package.
+
+```{python}
+!kimmdy-remove-hydrogen --help
+```
+
+## Examples
+
+This module builds or restores the example directory in the package.
+
+```{python}
+!kimmdy-build-examples --help
+```
+
+

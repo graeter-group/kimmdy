@@ -1,5 +1,11 @@
 [
   {
+    "listing": "/guide/explanation/index.html",
+    "items": [
+      "/guide/explanation/topology.html"
+    ]
+  },
+  {
     "listing": "/guide/how-to/index.html",
     "items": [
       "/guide/how-to/contribute.html",
@@ -14,12 +20,6 @@
       "/guide/tutorials/getting-started.html",
       "/guide/tutorials/colbuilder.html",
       "/guide/tutorials/write-plugin.html"
-    ]
-  },
-  {
-    "listing": "/guide/explanation/index.html",
-    "items": [
-      "/guide/explanation/topology.html"
     ]
   }
 ]
