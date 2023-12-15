@@ -1,5 +1,13 @@
 # Changelog
 
+## [5.3.1](https://github.com/hits-mbm-dev/kimmdy/compare/v5.3.0...v5.3.1) (2023-12-15)
+
+
+### Bug Fixes
+
+* don't write top section headers for empty sections ([#351](https://github.com/hits-mbm-dev/kimmdy/issues/351)) ([1632f6f](https://github.com/hits-mbm-dev/kimmdy/commit/1632f6f2f78c7c63cf97f3a77821bbef54ea0863))
+* update scheme url in examples and docs ([#348](https://github.com/hits-mbm-dev/kimmdy/issues/348)) ([2a72b90](https://github.com/hits-mbm-dev/kimmdy/commit/2a72b905d6cdd9a914106554de791a1abd346bf8))
+
 ## [5.3.0](https://github.com/hits-mbm-dev/kimmdy/compare/v5.2.3...v5.3.0) (2023-12-12)
 
 
