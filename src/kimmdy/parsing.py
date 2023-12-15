@@ -341,7 +341,8 @@ def read_top(
 
     if len(d) <= 2:
         m = f"topology file {path} does not contain any sections"
-        logger.warning(m)
+        logger.error(m)
+        raise ValueError(m)
 
     return d
 
