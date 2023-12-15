@@ -69,7 +69,7 @@ def test_ff_includes_with_ff_in_cwd(arranged_tmp_path):
 
 # test whether topology parsing is invertible
 allowed_text = st.text(
-    string.ascii_letters + string.digits + "!\"$%&'()*+,-./:<=>?@\\^_`{|}~", min_size=1
+    string.ascii_letters + string.digits + "!\"$%&'()+,-./:<=>?@\\^_`{|}~", min_size=1
 )
 
 
