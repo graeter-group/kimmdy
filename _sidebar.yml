@@ -2,9 +2,13 @@ website:
   sidebar:
   - contents:
     - _reference/index.qmd
+    - contents: []
+      section: Input file
+    - contents: []
+      section: Command Line Interface
     - contents:
       - _reference/cmd.qmd
-      section: API
+      section: Python API
     - contents:
       - _reference/topology.topology.qmd
       - _reference/topology.ff.qmd
