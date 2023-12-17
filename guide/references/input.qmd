@@ -16,35 +16,8 @@ in your editor (e.g. [VS Code](https://code.visualstudio.com/) via the
 Activating this is very much recommended, as it prevents many typos and missaligned braces.
 
 ::: {.callout-tip appearance="simple"}
-This only works, if your config file is actually called `kimmdy.yml`
-:::
-
-::: {.callout-note collapse=true}
-### VS Code settings
-
-Make sure that the following option is activated in your VS Code settings:
-
-```
-Yaml > Schema Store: Enable
-```
-:::
-
-::: {.callout-note collapse=true}
-### Neovim settings
-
-```{.lua filename='init.lua'}
-local lspconfig = require('lspconfig')
-lspconfig.yamlls.setup({
-  -- ...
-  settings = {
-    yaml = {
-      schemaStore = {
-        enable = true,
-      },
-    },
-  },
-})
-```
+This only works, if your config file is called `kimmdy.yml` and the Scheme Store hasn't been disabled
+in your editor settings (e.g. `Yaml > Schema Store: Enable`.
 :::
 
 ## All Options
