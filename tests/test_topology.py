@@ -720,7 +720,6 @@ class TestChargeAssignment:
         top_charged.update_partial_charges(recipe_steps)
         fragment1_nrs = [str(i) for i in range(26, 36)] + ["48", "49"]
         fragment2_nrs = [str(i) for i in range(36, 48)]
-        breakpoint()
         assert np.isclose(
             sum([float(top_charged.atoms[nr].charge) for nr in fragment1_nrs]), 0
         )
