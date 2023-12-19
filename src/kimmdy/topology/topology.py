@@ -819,22 +819,24 @@ class Topology:
             start1: Atom,
             start2: Atom,
             iterations: int = 20,
-        ) -> tuple[list, list]:
+        ) -> tuple[set, set]:
             residue_nrs = set([atom.nr for atom in residue])
             # could remove duplicate calculations
-            fragments = [[start1.nr], [start2.nr]]
+            fragments = [set([start1.nr]), set([start2.nr])]
             for fragment in fragments:
                 for i in range(iterations):
                     neighbors = set()
                     for nr in fragment:
                         neighbors.update(set(top.atoms[nr].bound_to_nrs))
-                    fragment.extend(list(neighbors.intersection(residue_nrs)))
+                    fragment.update(neighbors.intersection(residue_nrs))
                 if (
                     len(fragment) == len(residue)
-                    or len(set(fragment).intersection(set(start2.nr))) == 1
+                    or len(fragment.intersection(set([start2.nr]))) == 1
                 ):
-                    logger.warning("Calculating fragments, but residue is whole!")
-                    return fragment, []
+                    logger.warning(
+                        "Calculating fragments, but residue is whole! Could be break + bind reaction!"
+                    )
+                    return fragment, set()
             if len(fragments[0]) + len(fragments[1]) != len(residue):
                 logger.warning("Residue fragments do not make up the original residue!")
             return fragments[0], fragments[1]
@@ -855,19 +857,39 @@ class Topology:
                     fragment1, fragment2 = get_residue_fragments(
                         self, self.residues[atom1.resnr], atom1, atom2
                     )
-
-                    charge_residue = [
-                        float(atom.charge) for atom in self.residues[atom1.resnr]
-                    ]
-                    charge_fragment1 = [
-                        float(self.atoms[nr].charge) for nr in fragment1
-                    ]
-                    charge_fragment2 = [
-                        float(self.atoms[nr].charge) for nr in fragment2
-                    ]
-
-                    atom1.charge = str(float(atom1.charge) - sum(charge_fragment1))
-                    atom1.charge = str(float(atom2.charge) - sum(charge_fragment2))
+                    if fragment2 == set():
+                        # HAT case (or similar)
+                        if atom1.type.startswith("H"):
+                            atom2.charge = (
+                                f"{float(atom2.charge) + float(atom1.charge):7.4f}"
+                            )
+                            atom1.charge = "0.0"
+                        elif atom2.type.startswith("H"):
+                            atom1.charge = (
+                                f"{float(atom1.charge) + float(atom2.charge):7.4f}"
+                            )
+                            atom2.charge = "0.0"
+                        else:
+                            logger.warning(
+                                "Residue is not fragmented and no break atom is hydrogen. Doing nothing!"
+                            )
+                            continue
+                    else:
+                        # homolysis case (or similar)
+                        charge_residue = [
+                            float(atom.charge) for atom in self.residues[atom1.resnr]
+                        ]
+                        charge_fragment1 = [
+                            float(self.atoms[nr].charge) for nr in fragment1
+                        ]
+                        charge_fragment2 = [
+                            float(self.atoms[nr].charge) for nr in fragment2
+                        ]
+                        diff1 = sum(charge_fragment1) - round(sum(charge_fragment1))
+                        diff2 = sum(charge_fragment2) - round(sum(charge_fragment2))
+                        breakpoint()
+                        atom1.charge = f"{float(atom1.charge) - diff1:7.4f}"
+                        atom2.charge = f"{float(atom2.charge) - diff2:7.4f}"
                 else:
                     # no change in partial charges necessary
                     continue
@@ -877,7 +899,7 @@ class Topology:
                     atom2 = self.atoms[step.atom_id_2]
                     # check whether bond exists in topology
                     residue = atom1.residue
-                    bondtype = (atom1.type, atom2.type)
+                    bondtype = (atom1.atom, atom2.atom)
                     residue_bond_spec = self.ff.residuetypes[residue].bonds.get(
                         bondtype,
                         self.ff.residuetypes[residue].bonds.get(bondtype[::-1]),
