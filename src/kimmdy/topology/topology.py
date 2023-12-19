@@ -916,7 +916,6 @@ class Topology:
                     continue
             else:
                 continue
-            breakpoint()
 
     def to_dict(self) -> TopologyDict:
         self.update_parameters()
