@@ -1,5 +1,46 @@
 # Changelog
 
+## [5.3.1](https://github.com/hits-mbm-dev/kimmdy/compare/v5.3.0...v5.3.1) (2023-12-15)
+
+
+### Bug Fixes
+
+* don't write top section headers for empty sections ([#351](https://github.com/hits-mbm-dev/kimmdy/issues/351)) ([1632f6f](https://github.com/hits-mbm-dev/kimmdy/commit/1632f6f2f78c7c63cf97f3a77821bbef54ea0863))
+* update scheme url in examples and docs ([#348](https://github.com/hits-mbm-dev/kimmdy/issues/348)) ([2a72b90](https://github.com/hits-mbm-dev/kimmdy/commit/2a72b905d6cdd9a914106554de791a1abd346bf8))
+
+## [5.3.0](https://github.com/hits-mbm-dev/kimmdy/compare/v5.2.3...v5.3.0) (2023-12-12)
+
+
+### Features
+
+* custom step ([#346](https://github.com/hits-mbm-dev/kimmdy/issues/346)) ([5b28f04](https://github.com/hits-mbm-dev/kimmdy/commit/5b28f049dda4ca6e56b959b413778eb73ba3de0d))
+
+## [5.2.3](https://github.com/hits-mbm-dev/kimmdy/compare/v5.2.2...v5.2.3) (2023-12-08)
+
+
+### Bug Fixes
+
+* fix an issue where merging multiples of a moleculetype incremented the residuenumbers too fast ([#344](https://github.com/hits-mbm-dev/kimmdy/issues/344)) ([7e78665](https://github.com/hits-mbm-dev/kimmdy/commit/7e78665ea1593d65b4b49daa7c1a71a99c87e94d))
+
+## [5.2.2](https://github.com/hits-mbm-dev/kimmdy/compare/v5.2.1...v5.2.2) (2023-12-08)
+
+
+### Bug Fixes
+
+* escape file paths for shell commands ([914550a](https://github.com/hits-mbm-dev/kimmdy/commit/914550ae57cf6428845a57cb95b388b33f29ee40))
+* make ff dir optional in config ([02c5d9f](https://github.com/hits-mbm-dev/kimmdy/commit/02c5d9f3cb157b8ffc1db9ceec9285f667e73d1c))
+* replace spaces in name and out in config ([304de69](https://github.com/hits-mbm-dev/kimmdy/commit/304de69b4047ad56df6caa64b381f60bc8c16ce0))
+
+## [5.2.1](https://github.com/hits-mbm-dev/kimmdy/compare/v5.2.0...v5.2.1) (2023-12-07)
+
+
+### Bug Fixes
+
+* add title to scheme ([#341](https://github.com/hits-mbm-dev/kimmdy/issues/341)) ([a1b1ae5](https://github.com/hits-mbm-dev/kimmdy/commit/a1b1ae5f429d86555c3429ee9a4e01f5df618882))
+* kimmdy run bugs ([#336](https://github.com/hits-mbm-dev/kimmdy/issues/336)) ([ce558e7](https://github.com/hits-mbm-dev/kimmdy/commit/ce558e7fb528800f75ac0133e8dde871179bd70c))
+* make forcefield directory optional, only warn ([#332](https://github.com/hits-mbm-dev/kimmdy/issues/332)) ([eac4131](https://github.com/hits-mbm-dev/kimmdy/commit/eac41311e2230bdf014c3df15d141993ac2617ae))
+* renumber atomnrs ([#331](https://github.com/hits-mbm-dev/kimmdy/issues/331)) ([e88f8cc](https://github.com/hits-mbm-dev/kimmdy/commit/e88f8cc809056462249b828960b98565f3768908))
+
 ## [5.2.0](https://github.com/hits-mbm-dev/kimmdy/compare/v5.1.12...v5.2.0) (2023-11-14)
 
 

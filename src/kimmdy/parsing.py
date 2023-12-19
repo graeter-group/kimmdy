@@ -2,7 +2,6 @@
 All read_<...> and write_<...> functions.
 """
 import os
-import re
 import logging
 import json
 import numpy as np
@@ -10,7 +9,6 @@ from pathlib import Path
 from typing import Optional, Union
 from itertools import takewhile
 from typing import TypedDict
-from kimmdy.constants import ATOM_ID_FIELDS, RESNR_ID_FIELDS, REACTIVE_MOLECULEYPE
 
 from kimmdy.utils import get_gmx_dir
 
@@ -342,7 +340,9 @@ def read_top(
             is_first_line_after_section_header = False
 
     if len(d) <= 2:
-        raise ValueError(f"topology file {path} does not contain any sections")
+        m = f"topology file {path} does not contain any sections"
+        logger.error(m)
+        raise ValueError(m)
 
     return d
 
@@ -358,6 +358,13 @@ def write_top(top: TopologyDict, outfile: Path):
         Path to the topology file to write to.
     """
 
+    def write_if_nonempty(f, printname, ls):
+        if ls:
+            f.write(f"[ {printname} ]\n")
+            for l in ls:
+                f.writelines(" ".join(l))
+                f.write("\n")
+
     def write_section(f, name: str, section):
         if name.startswith("moleculetype_"):
             printname = "moleculetype"
@@ -366,26 +373,17 @@ def write_top(top: TopologyDict, outfile: Path):
         condition = section.get("condition")
         f.write("\n")
         if condition is None:
-            f.write(f"[ {printname} ]\n")
-            for l in section["content"]:
-                f.writelines(" ".join(l))
-                f.write("\n")
+            write_if_nonempty(f, printname, section["content"])
         else:
             condition_type = condition["type"]
             condition_value = condition["value"]
             f.write(f"#{condition_type} {condition_value}")
             f.write("\n")
-            f.write(f"[ {printname} ]\n")
-            for l in section["content"]:
-                f.writelines(" ".join(l))
-                f.write("\n")
+            write_if_nonempty(f, printname, section["content"])
             else_content = section.get("else_content")
             if else_content:
                 f.write("#else\n")
-                f.write(f"[ {printname} ]\n")
-                for l in else_content:
-                    f.writelines(" ".join(l))
-                    f.write("\n")
+                write_if_nonempty(f, printname, else_content)
             f.write("#endif\n")
 
     with open(outfile, "w") as f:

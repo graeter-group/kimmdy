@@ -1,40 +1,24 @@
 ---
-title: "Options"
+title: "Input File"
 execute:
   echo: false
 ---
 
 ## Autocompletion
 
-KIMMDY comes with autocompletion for the `kimmdy.yml` file.
-You can add the schema to the configuration of the [yaml-language-server](https://github.com/redhat-developer/yaml-language-server) in your editor
-(e.g. [VS Code](https://code.visualstudio.com/) via the [YAML extension](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml) or [Neovim](https://neovim.io/) via [lspconfig](https://github.com/neovim/nvim-lspconfig)).
-To associate `kimmdy.yml` files with KIMMDY, add the following to your
+KIMMDY comes with autocompletion and tooltips insight your editor for its configuration file `kimmdy.yml`. 
 
-### VS Code settings
+All you need to do is activate a [yaml-language-server](https://github.com/redhat-developer/yaml-language-server)
+in your editor (e.g. [VS Code](https://code.visualstudio.com/) via the 
+[YAML extension](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml) or 
+[Neovim](https://neovim.io/) via [lspconfig](https://github.com/neovim/nvim-lspconfig)).
 
-```{.json filename='settings.json'}
-"yaml.schemas": {
-    "https://raw.githubusercontent.com/hits-mbm-dev/kimmdy/main/src/kimmdy/kimmdy-yaml-schema.json": "kimmdy.yml",
-}
-```
+Activating this is very much recommended, as it prevents many typos and missaligned braces.
 
-### Neovim settings
-
-```{.lua filename='init.lua'}
-require("lspconfig").yamlls.setup({
-  on_attach = on_attach,
-  capabilities = capabilities,
-  flags = lsp_flags,
-  settings = {
-    yaml = {
-      schemas = {
-        ["https://raw.githubusercontent.com/hits-mbm-dev/kimmdy/main/src/kimmdy/kimmdy-yaml-schema.json"] = "kimmdy.yml",
-      },
-    },
-  },
-})
-```
+::: {.callout-tip appearance="simple"}
+This only works, if your config file is called `kimmdy.yml` and the Scheme Store hasn't been disabled
+in your editor settings (e.g. `Yaml > Schema Store: Enable`.
+:::
 
 ## All Options
 

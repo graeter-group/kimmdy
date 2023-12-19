@@ -114,7 +114,7 @@ def get_cmdline_args() -> argparse.Namespace:
         "--input",
         "-i",
         type=str,
-        help="Kimmdy input file. Default",
+        help="Kimmdy input file. Default `kimmdy.yml`",
         default="kimmdy.yml",
     )
     parser.add_argument(

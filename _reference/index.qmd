@@ -1,6 +1,14 @@
-# Reference
+# References {.doc .doc-index}
 
-## API
+## Input file
+
+[Options of the main KIMMDY input file](/guide/references/input.qmd)
+
+## Command Line Interface
+
+[Arguments of all KIMMDY parts.](../guide/references/cmd_ref.qmd)
+
+## Python API
 
 Start KIMMDY from a python script or the command line
 

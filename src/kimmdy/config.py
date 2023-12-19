@@ -244,6 +244,9 @@ class Config:
                     )
             self.ff = ffdir
 
+            self.name = self.name.replace(" ", "_")
+            self.out = self.out.with_name(self.out.name.replace(" ", "_"))
+
             # Validate changer reference
             if hasattr(self, "changer"):
                 if hasattr(self.changer, "coordinates"):

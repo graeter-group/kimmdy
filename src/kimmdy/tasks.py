@@ -101,8 +101,9 @@ def create_task_directory(runmng, postfix: str) -> TaskFiles:
     )
     files.logger.addHandler(hand)
     # symlink force field
-    if not (files.outputdir / runmng.config.ff.name).exists():
-        (files.outputdir / runmng.config.ff.name).symlink_to(runmng.config.ff)
+    if runmng.config.ff is not None:
+        if not (files.outputdir / runmng.config.ff.name).exists():
+            (files.outputdir / runmng.config.ff.name).symlink_to(runmng.config.ff)
 
     return files
 

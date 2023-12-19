@@ -22,7 +22,7 @@ from kimmdy.plugins import (
     reaction_plugins,
     ReactionPlugin,
 )
-from kimmdy.recipe import RecipeCollection, Break, Bind, Place, Relax
+from kimmdy.recipe import CustomTopMod, RecipeCollection, Break, Bind, Place, Relax
 from kimmdy.utils import run_gmx, truncate_sim_files
 from kimmdy.coordinates import place_atom, break_bond_plumed, merge_top_slow_growth
 from kimmdy.tasks import Task, TaskFiles, get_plumed_out
@@ -399,8 +399,8 @@ class RunManager:
 
         top = files.input["top"]
         gro = files.input["gro"]
-        mdp = md_config.mdp
-        files.input["mdp"] = mdp
+        files.input["mdp"] = md_config.mdp
+        mdp = files.input["mdp"]
         ndx = files.input["ndx"]
 
         outputdir = files.outputdir
@@ -623,6 +623,9 @@ class RunManager:
                 md_files = task()
                 logger.info(f"Finished task: {task.name}")
                 self._discover_output_files(task.name, md_files)
+
+            elif isinstance(step, CustomTopMod):
+                step.f(self.top)
 
         write_top(self.top.to_dict(), files.outputdir / self.config.top.name)
         files.output["top"] = files.outputdir / self.config.top.name
