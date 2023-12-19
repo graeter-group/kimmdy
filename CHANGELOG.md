@@ -1,5 +1,13 @@
 # Changelog
 
+## [5.3.2](https://github.com/hits-mbm-dev/kimmdy/compare/v5.3.1...v5.3.2) (2023-12-19)
+
+
+### Bug Fixes
+
+* Improve slowgrowth ([#338](https://github.com/hits-mbm-dev/kimmdy/issues/338)) ([31a0464](https://github.com/hits-mbm-dev/kimmdy/commit/31a046447ed50d8a545ec1eda138a30a24dd939f))
+* more verbose debugger in rf kmc ([97f4a9a](https://github.com/hits-mbm-dev/kimmdy/commit/97f4a9a0e20f370202d2b70a1e7209af7eecc99f))
+
 ## [5.3.1](https://github.com/hits-mbm-dev/kimmdy/compare/v5.3.0...v5.3.1) (2023-12-15)
 
 
