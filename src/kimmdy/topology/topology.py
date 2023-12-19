@@ -33,6 +33,7 @@ from typing import Callable
 
 from kimmdy.utils import TopologyAtomAddress
 from kimmdy.topology.utils import increment_field
+from kimmdy.recipe import RecipeStep, Bind, Break
 
 logger = logging.getLogger("kimmdy.topology")
 
@@ -803,6 +804,100 @@ class Topology:
             else:
                 raise RuntimeError("No Parametrizer was initialized in this topology!")
             self.needs_parameterization = False
+
+    def update_partial_charges(self, recipe_steps: list[RecipeStep]) -> None:
+        """Update the topology atom partial charges based on recipe_steps.
+
+        Update rules follow a simple assignment scheme that works well with grappa.
+        If fragments are created, their partial charges are kept integers. If previously
+        broken bonds are formed again, the original partial charges are restored
+        """
+
+        def get_residue_fragments(
+            top: Topology,
+            residue: list[Atom],
+            start1: Atom,
+            start2: Atom,
+            iterations: int = 20,
+        ) -> tuple[list, list]:
+            residue_nrs = set([atom.nr for atom in residue])
+            # could remove duplicate calculations
+            fragments = [[start1.nr], [start2.nr]]
+            for fragment in fragments:
+                for i in range(iterations):
+                    neighbors = set()
+                    for nr in fragment:
+                        neighbors.update(set(top.atoms[nr].bound_to_nrs))
+                    fragment.extend(list(neighbors.intersection(residue_nrs)))
+                if (
+                    len(fragment) == len(residue)
+                    or len(set(fragment).intersection(set(start2.nr))) == 1
+                ):
+                    logger.warning("Calculating fragments, but residue is whole!")
+                    return fragment, []
+            if len(fragments[0]) + len(fragments[1]) != len(residue):
+                logger.warning("Residue fragments do not make up the original residue!")
+            return fragments[0], fragments[1]
+
+        # TODO: build updated list of atoms by residue for topology so that this does not need to be repeated
+        self.residues = {}
+        for atom in self.atoms.values():
+            if self.residues.get(atom.resnr) is None:
+                self.residues[atom.resnr] = []
+            self.residues[atom.resnr].append(atom)
+
+        for step in recipe_steps:
+            if isinstance(step, Break):
+                # make partial charges on either side of the break integer
+                if self.atoms[step.atom_id_1].resnr == self.atoms[step.atom_id_2].resnr:
+                    atom1 = self.atoms[step.atom_id_1]
+                    atom2 = self.atoms[step.atom_id_2]
+                    fragment1, fragment2 = get_residue_fragments(
+                        self, self.residues[atom1.resnr], atom1, atom2
+                    )
+
+                    charge_residue = [
+                        float(atom.charge) for atom in self.residues[atom1.resnr]
+                    ]
+                    charge_fragment1 = [
+                        float(self.atoms[nr].charge) for nr in fragment1
+                    ]
+                    charge_fragment2 = [
+                        float(self.atoms[nr].charge) for nr in fragment2
+                    ]
+
+                    atom1.charge = str(float(atom1.charge) - sum(charge_fragment1))
+                    atom1.charge = str(float(atom2.charge) - sum(charge_fragment2))
+                else:
+                    # no change in partial charges necessary
+                    continue
+            elif isinstance(step, Bind):
+                if self.atoms[step.atom_id_1].resnr == self.atoms[step.atom_id_2].resnr:
+                    atom1 = self.atoms[step.atom_id_1]
+                    atom2 = self.atoms[step.atom_id_2]
+                    # check whether bond exists in topology
+                    residue = atom1.residue
+                    bondtype = (atom1.type, atom2.type)
+                    residue_bond_spec = self.ff.residuetypes[residue].bonds.get(
+                        bondtype,
+                        self.ff.residuetypes[residue].bonds.get(bondtype[::-1]),
+                    )
+                    if residue_bond_spec:
+                        atom1.charge = (
+                            self.ff.residuetypes[residue].atoms[atom1.atom].charge
+                        )
+                        atom2.charge = (
+                            self.ff.residuetypes[residue].atoms[atom2.atom].charge
+                        )
+                    else:
+                        logger.warning(
+                            f"New bond defined in {step} but can't be found in residuetypes definition. Not changing the partial charges!"
+                        )
+                else:
+                    # no change in partial charges necessary
+                    continue
+            else:
+                continue
 
     def to_dict(self) -> TopologyDict:
         self.update_parameters()
