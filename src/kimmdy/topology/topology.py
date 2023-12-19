@@ -829,10 +829,7 @@ class Topology:
                     for nr in fragment:
                         neighbors.update(set(top.atoms[nr].bound_to_nrs))
                     fragment.update(neighbors.intersection(residue_nrs))
-                if (
-                    len(fragment) == len(residue)
-                    or len(fragment.intersection(set([start2.nr]))) == 1
-                ):
+                if len(fragment) == len(residue):
                     logger.warning(
                         "Calculating fragments, but residue is whole! Could be break + bind reaction!"
                     )
@@ -887,7 +884,6 @@ class Topology:
                         ]
                         diff1 = sum(charge_fragment1) - round(sum(charge_fragment1))
                         diff2 = sum(charge_fragment2) - round(sum(charge_fragment2))
-                        breakpoint()
                         atom1.charge = f"{float(atom1.charge) - diff1:7.4f}"
                         atom2.charge = f"{float(atom2.charge) - diff2:7.4f}"
                 else:
@@ -920,6 +916,7 @@ class Topology:
                     continue
             else:
                 continue
+            breakpoint()
 
     def to_dict(self) -> TopologyDict:
         self.update_parameters()
@@ -930,7 +927,7 @@ class Topology:
         """Deletes atom
 
         Deletes atom and all attached bonds. Reindexes the top and updates the
-        parameters if requested.
+        parameters if requested. Also moves charges to first bound_nrs atom.
 
         Parameters
         ----------
@@ -949,6 +946,10 @@ class Topology:
         logger.debug(
             f"Deleting Atom nr {atom.nr}, type {atom.type}, res {atom.residue}"
         )
+        # move charge to first neighbor
+        self.atoms[
+            atom.bound_to_nrs[0]
+        ].charge = f"{float(self.atoms[atom.bound_to_nrs[0]].charge) + float(atom.charge):7.4f}"
 
         # break all bonds and delete all pairs, diheadrals etc
         for bound_nr in copy(atom.bound_to_nrs):
