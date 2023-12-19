@@ -70,7 +70,9 @@ def get_step_directories(dir: Path, steps: Union[list[str], str] = "all") -> lis
     return matching_directories
 
 
-def concat_traj(dir: str, filetype:str,steps: Union[list[str], str], open_vmd: bool = False):
+def concat_traj(
+    dir: str, filetype: str, steps: Union[list[str], str], open_vmd: bool = False
+):
     """Find and concatenate trajectories (.xtc files) from a KIMMDY run into one trajectory.
     The concatenated trajectory is centered and pbc corrected.
 
@@ -90,9 +92,11 @@ def concat_traj(dir: str, filetype:str,steps: Union[list[str], str], open_vmd: b
 
     out_xtc = analysis_dir / "concat.xtc"
 
-    if not any([filetype in ["xtc","trr"]]):
-        raise NotImplementedError(f"Filetype {filetype} not implemented as trajectory file type. Try 'xtc', 'trr'.")
-    filetype_conv = {'xtc':1,'trr':0}
+    if not any([filetype in ["xtc", "trr"]]):
+        raise NotImplementedError(
+            f"Filetype {filetype} not implemented as trajectory file type. Try 'xtc', 'trr'."
+        )
+    filetype_conv = {"xtc": 1, "trr": 0}
 
     ## gather trajectories
     trajectories = []
@@ -492,11 +496,7 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
     parser_trjcat.add_argument(
         "dir", type=str, help="KIMMDY run directory to be analysed."
     )
-    parser_trjcat.add_argument(
-        "--filetype",
-        "-f",
-        default="xtc"
-    )
+    parser_trjcat.add_argument("--filetype", "-f", default="xtc")
     parser_trjcat.add_argument(
         "--steps",
         "-s",

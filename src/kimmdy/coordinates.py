@@ -466,15 +466,13 @@ def merge_top_moleculetypes_slow_growth(
             )
 
     # amber fix for breaking/binding atom types without LJ potential
-    #breakpoint()
+    # breakpoint()
 
-    for k,v in break_bind_atoms.items():
-        if v in ['HW','HO']:
-            molB.atoms[k].type = 'H1'
+    for k, v in break_bind_atoms.items():
+        if v in ["HW", "HO"]:
+            molB.atoms[k].type = "H1"
             if molB.atoms[k].typeB is not None:
-                molB.atoms[k].typeB = 'H1'
-
-
+                molB.atoms[k].typeB = "H1"
 
     # update is_radical attribute of Atom objects in topology
     molB.test_for_radicals()
