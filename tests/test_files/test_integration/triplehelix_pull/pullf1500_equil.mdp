@@ -154,11 +154,8 @@ rot-ngroups              = 2
 rot-group0               = 1_NME
 rot-group1               = 1_ACE
 ; Rotation potential. Can be iso, iso-pf, pm, pm-pf, rm, rm-pf, rm2, rm2-pf, flex, flex-t, flex2, flex2-t
-rot-type0                = flex2-t
-rot-type1                = flex2-t
-; Use mass-weighting of the rotation group positions
-rot-massw0               = yes
-rot-massw1               = yes
+rot-type0                = rm-pf
+rot-type1                = rm-pf
 ; Rotation vector, will get normalized
 rot-vec0                 = 0 0 1
 rot-vec1                 = 0 0 1
@@ -166,25 +163,7 @@ rot-vec1                 = 0 0 1
 ;rot-pivot0               = 2.31852e+00  2.73201e+00  10.89800e+00
 ; Rotation rate [degree/ps] and force constant [kJ/(mol*nm^2)]
 rot-rate0                = 0.0
-rot-k0                   = 2000.0
 rot-rate1                = 0.0
-rot-k1                   = 2000.0
-; Slab distance for flexible axis rotation [nm]
-rot-slab-dist0           = 1.5
-rot-slab-dist1           = 1.5
-; Minimum value of Gaussian function for the force to be evaluated (for flex* potentials)
-rot-min-gauss0           = 0.001
-rot-min-gauss1           = 0.001
-; Value of additive constant epsilon' [nm^2] for rm2* and flex2* potentials
-rot-eps0                 = 0.0001
-rot-eps1                 = 0.0001
 ; Fitting method to determine angle of rotation group (rmsd, norm, or potential)
 rot-fit-method0          = norm
 rot-fit-method1          = norm
-; For fit type 'potential', nr. of angles around the reference for which the pot. is evaluated
-rot-potfit-nsteps0       = 21
-rot-potfit-nsteps1       = 21
-; For fit type 'potential', distance in degrees between two consecutive angles
-rot-potfit-step0         = 0.25
-rot-potfit-step1         = 0.25
-
