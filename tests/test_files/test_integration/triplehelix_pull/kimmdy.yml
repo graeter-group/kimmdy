@@ -15,10 +15,11 @@ mds:
     mdp: 'pullf1500.mdp'
     use_plumed: true
   relax:
-    mdp: 'pullf1500.mdp'
+    mdp: 'pullf1500_slow_growth.mdp'
 changer:
   coordinates:
     md: 'relax'     
+    slow_growth: true
   topology:
     parameterization: 'basic' 
 reactions:
@@ -31,4 +32,5 @@ sequence:
     tasks:
       - prod
       - reactions
+  - equilibrium
 

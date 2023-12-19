@@ -1,22 +1,21 @@
-title                    = Pulling simulation
-;define                   =      -DPOSRES_NC
-
+title                   = free-energy simulation
 ; Run parameters
+;define                   =      -DPOSRES_NC
 integrator  = md
-dt          = 0.002
+dt          = 0.001
 tinit       = 0
-nsteps      = 1000    ; 
+nsteps      = 10000    ; 
 nstcomm     = 10
 ; Output parameters
-nstxout     = 100      ; every x ps
-nstvout     = 100 
-nstfout     = 100
-nstxtcout   = 100       ; every x ps
-nstlog	    = 100
-nstenergy   = 200
+nstxout     = 500      ; every x ps
+nstvout     = 500 
+nstfout     = 500
+nstxtcout   = 500       ; every x ps
+nstlog	    = 500
+nstenergy   = 500
 ; Bond parameters
 constraint_algorithm    = lincs
-constraints             = h-bonds
+constraints             = none
 continuation            = yes       ; continuing from NPT 
 morse                       = yes	; Convert harmonic bonds to morse potentials
 
@@ -62,7 +61,14 @@ DispCorr    = EnerPres
 ; default, all atoms will be written.
 compressed-x-grps        = Protein
 ; Selection of energy groups
-			 
+
+; free-energy parameters
+free-energy             = yes
+init-lambda             = 0.0
+delta-lambda            = 0.0001		; should be 1/nsteps
+separate-dhdl-file      = yes
+nstdhdl                 = 100 
+	 
 ; COM PULLING
 pull                     = yes
 ;pull-print-com           = yes
@@ -167,5 +173,3 @@ rot-rate1                = 0.0
 ; Fitting method to determine angle of rotation group (rmsd, norm, or potential)
 rot-fit-method0          = norm
 rot-fit-method1          = norm
-
-

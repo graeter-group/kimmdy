@@ -21,7 +21,7 @@ For command line usage, run `kimmdy-analysis -h`.
 
 ### concat_traj { #kimmdy.analysis.concat_traj }
 
-`analysis.concat_traj(dir, steps, open_vmd=False)`
+`analysis.concat_traj(dir, filetype, steps, open_vmd=False)`
 
 Find and concatenate trajectories (.xtc files) from a KIMMDY run into one trajectory.
 The concatenated trajectory is centered and pbc corrected.
