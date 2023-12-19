@@ -17,7 +17,7 @@ nstenergy   = 500
 constraint_algorithm    = lincs
 constraints             = none
 continuation            = yes       ; continuing from NPT 
-morse                       = yes	; Convert harmonic bonds to morse potentials
+morse                       = no	; Convert harmonic bonds to morse potentials
 
 
 ; Single-range cutoff scheme
