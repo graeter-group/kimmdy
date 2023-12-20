@@ -816,7 +816,10 @@ class Topology:
         formed again, the original partial charges are restored.
         """
 
-        # build updated list of atoms by residue for topology so that this does not need to be repeated
+        # build updated list of atoms by residue for topology so that this does
+        # not need to be repeated
+        # Warning: resnr not unique for each residue, 'residues' can map to
+        # more than one real residue
         residues = {}
         for atom in self.atoms.values():
             if residues.get(atom.resnr) is None:
