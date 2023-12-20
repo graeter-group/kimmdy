@@ -21,6 +21,7 @@ from kimmdy.topology.utils import (
     is_not_solvent_or_ion,
     set_moleculetype_atomics,
     set_top_section,
+    get_residue_fragments,
 )
 from kimmdy.topology.ff import FF
 from kimmdy.plugins import BasicParameterizer, Parameterizer
@@ -806,44 +807,21 @@ class Topology:
             self.needs_parameterization = False
 
     def update_partial_charges(self, recipe_steps: list[RecipeStep]) -> None:
-        """Update the topology atom partial charges based on recipe_steps.
+        """Update the topology atom partial charges.
 
-        Update rules follow a simple assignment scheme that works well with grappa.
-        If fragments are created, their partial charges are kept integers. If previously
-        broken bonds are formed again, the original partial charges are restored
+        This function must be called after the recipe_steps are applied.
+        Changes are based on the recipe_steps. Update rules follow a simple
+        assignment scheme that works well with grappa. If fragments are created,
+        their partial charges are kept integers. If previously broken bonds are
+        formed again, the original partial charges are restored.
         """
 
-        def get_residue_fragments(
-            top: Topology,
-            residue: list[Atom],
-            start1: Atom,
-            start2: Atom,
-            iterations: int = 20,
-        ) -> tuple[set, set]:
-            residue_nrs = set([atom.nr for atom in residue])
-            # could remove duplicate calculations
-            fragments = [set([start1.nr]), set([start2.nr])]
-            for fragment in fragments:
-                for i in range(iterations):
-                    neighbors = set()
-                    for nr in fragment:
-                        neighbors.update(set(top.atoms[nr].bound_to_nrs))
-                    fragment.update(neighbors.intersection(residue_nrs))
-                if len(fragment) == len(residue):
-                    logger.warning(
-                        "Calculating fragments, but residue is whole! Could be break + bind reaction!"
-                    )
-                    return fragment, set()
-            if len(fragments[0]) + len(fragments[1]) != len(residue):
-                logger.warning("Residue fragments do not make up the original residue!")
-            return fragments[0], fragments[1]
-
-        # TODO: build updated list of atoms by residue for topology so that this does not need to be repeated
-        self.residues = {}
+        # build updated list of atoms by residue for topology so that this does not need to be repeated
+        residues = {}
         for atom in self.atoms.values():
-            if self.residues.get(atom.resnr) is None:
-                self.residues[atom.resnr] = []
-            self.residues[atom.resnr].append(atom)
+            if residues.get(atom.resnr) is None:
+                residues[atom.resnr] = []
+            residues[atom.resnr].append(atom)
 
         for step in recipe_steps:
             if isinstance(step, Break):
@@ -852,10 +830,10 @@ class Topology:
                     atom1 = self.atoms[step.atom_id_1]
                     atom2 = self.atoms[step.atom_id_2]
                     fragment1, fragment2 = get_residue_fragments(
-                        self, self.residues[atom1.resnr], atom1, atom2
+                        self, residues[atom1.resnr], atom1, atom2
                     )
-                    if fragment2 == set():
-                        # HAT case (or similar)
+                    if len(fragment2) in (0, 1):
+                        # intra-residue HAT case (or similar)
                         if atom1.type.startswith("H"):
                             atom2.charge = (
                                 f"{float(atom2.charge) + float(atom1.charge):7.4f}"
@@ -873,9 +851,7 @@ class Topology:
                             continue
                     else:
                         # homolysis case (or similar)
-                        charge_residue = [
-                            float(atom.charge) for atom in self.residues[atom1.resnr]
-                        ]
+
                         charge_fragment1 = [
                             float(self.atoms[nr].charge) for nr in fragment1
                         ]
@@ -887,7 +863,7 @@ class Topology:
                         atom1.charge = f"{float(atom1.charge) - diff1:7.4f}"
                         atom2.charge = f"{float(atom2.charge) - diff2:7.4f}"
                 else:
-                    # no change in partial charges necessary
+                    # no change in partial charges necessary for break between residues
                     continue
             elif isinstance(step, Bind):
                 if self.atoms[step.atom_id_1].resnr == self.atoms[step.atom_id_2].resnr:
