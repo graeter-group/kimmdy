@@ -465,6 +465,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#kimmdy.topology.topology.Topology.break_bond" id="toc-kimmdy.topology.topology.Topology.break_bond" class="nav-link" data-scroll-target="#kimmdy.topology.topology.Topology.break_bond">break_bond</a></li>
   <li><a href="#kimmdy.topology.topology.Topology.del_atom" id="toc-kimmdy.topology.topology.Topology.del_atom" class="nav-link" data-scroll-target="#kimmdy.topology.topology.Topology.del_atom">del_atom</a></li>
   <li><a href="#kimmdy.topology.topology.Topology.reindex_atomnrs" id="toc-kimmdy.topology.topology.Topology.reindex_atomnrs" class="nav-link" data-scroll-target="#kimmdy.topology.topology.Topology.reindex_atomnrs">reindex_atomnrs</a></li>
+  <li><a href="#kimmdy.topology.topology.Topology.update_partial_charges" id="toc-kimmdy.topology.topology.Topology.update_partial_charges" class="nav-link" data-scroll-target="#kimmdy.topology.topology.Topology.update_partial_charges">update_partial_charges</a></li>
   <li><a href="#kimmdy.topology.topology.Topology.validate_bond" id="toc-kimmdy.topology.topology.Topology.validate_bond" class="nav-link" data-scroll-target="#kimmdy.topology.topology.Topology.validate_bond">validate_bond</a></li>
   </ul></li>
   </ul></li>
@@ -655,6 +656,10 @@ ul.task-list li input[type="checkbox"] {
 <td>Reindex atom numbers in topology.</td>
 </tr>
 <tr class="odd">
+<td><a href="#kimmdy.topology.topology.Topology.update_partial_charges">update_partial_charges</a></td>
+<td>Update the topology atom partial charges based on recipe_steps.</td>
+</tr>
+<tr class="even">
 <td><a href="#kimmdy.topology.topology.Topology.validate_bond">validate_bond</a></td>
 <td>Validates bond consistency between both atoms and top</td>
 </tr>
@@ -718,7 +723,7 @@ ul.task-list li input[type="checkbox"] {
 <h5 class="anchored" data-anchor-id="kimmdy.topology.topology.Topology.del_atom">del_atom</h5>
 <p><code>topology.topology.Topology.del_atom(atom_nr, parameterize=True)</code></p>
 <p>Deletes atom</p>
-<p>Deletes atom and all attached bonds. Reindexes the top and updates the parameters if requested.</p>
+<p>Deletes atom and all attached bonds. Reindexes the top and updates the parameters if requested. Also moves charges to first bound_nrs atom.</p>
 <section id="parameters-3" class="level6">
 <h6 class="anchored" data-anchor-id="parameters-3">Parameters</h6>
 <table class="table">
@@ -773,6 +778,12 @@ ul.task-list li input[type="checkbox"] {
 <p><code>topology.topology.Topology.reindex_atomnrs()</code></p>
 <p>Reindex atom numbers in topology.</p>
 <p>Starts at index 1. This also updates the numbers for bonds, angles, dihedrals and pairs. Returns a dict of all moleculetypes to their update maps (old -&gt; new).</p>
+</section>
+<section id="kimmdy.topology.topology.Topology.update_partial_charges" class="level5">
+<h5 class="anchored" data-anchor-id="kimmdy.topology.topology.Topology.update_partial_charges">update_partial_charges</h5>
+<p><code>topology.topology.Topology.update_partial_charges(recipe_steps)</code></p>
+<p>Update the topology atom partial charges based on recipe_steps.</p>
+<p>Update rules follow a simple assignment scheme that works well with grappa. If fragments are created, their partial charges are kept integers. If previously broken bonds are formed again, the original partial charges are restored</p>
 </section>
 <section id="kimmdy.topology.topology.Topology.validate_bond" class="level5">
 <h5 class="anchored" data-anchor-id="kimmdy.topology.topology.Topology.validate_bond">validate_bond</h5>

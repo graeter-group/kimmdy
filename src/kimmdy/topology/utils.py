@@ -11,7 +11,8 @@ import logging
 from kimmdy.parsing import TopologyDict, empty_section
 
 if TYPE_CHECKING:
-    from kimmdy.topology.atomic import AtomicType, AtomicTypes
+    from kimmdy.topology.atomic import AtomicType, AtomicTypes, Atom
+    from kimmdy.topology.topology import Topology
     from kimmdy.config import Config
 
 logger = logging.getLogger(__name__)
@@ -347,3 +348,50 @@ def get_is_reactive_predicate_f(cfg: Config) -> Callable[[str], bool]:
         )
 
     return f
+
+
+def get_residue_fragments(
+    top: Topology,
+    residue: list[Atom],
+    start1: Atom,
+    start2: Atom,
+    iterations: int = 20,
+) -> tuple[set, set]:
+    """Splits a residue into fragments after a bond has been broken.
+
+    Parameters
+    ----------
+    top
+        Topology
+    residue
+        All atoms of current residue. Ok, when it contains more atoms
+        as long as those are not connected to broken bond.
+    start1
+        First atom with broken bond
+    start2
+        Second atom with broken bond
+    iterations
+        Max number of bonds from start atoms to be included when
+        building fragmets, by default 20
+
+    Returns
+    -------
+        Two fragments, or one fragment and empty set in case the
+        residue did not change its size.
+    """
+    residue_nrs = set([atom.nr for atom in residue])
+    # could remove duplicate calculations
+    fragments = [set([start1.nr]), set([start2.nr])]
+    for fragment in fragments:
+        for i in range(iterations):
+            neighbors = set()
+            for nr in fragment:
+                neighbors.update(set(top.atoms[nr].bound_to_nrs))
+            fragment.update(neighbors.intersection(residue_nrs))
+        if len(fragment) == len(residue):
+            logger.debug(
+                "Calculating residue fragments, but residue is whole! "
+                "Could be intra-residue reaction!"
+            )
+            return fragment, set()
+    return fragments[0], fragments[1]

@@ -1,8 +1,10 @@
 from copy import deepcopy
 from pathlib import Path
 import pytest
+import numpy as np
 
 from kimmdy.parsing import read_top, TopologyDict
+from kimmdy.recipe import Break, Bind
 from hypothesis import Phase, given, settings, HealthCheck, strategies as st
 from kimmdy.topology.topology import REACTIVE_MOLECULEYPE, Topology
 from kimmdy.topology.atomic import *
@@ -678,3 +680,63 @@ class TestRadicalAla:
     def test_is_radical(self, top_noprm_fix):
         assert top_noprm_fix.atoms["9"].is_radical == True
         assert top_noprm_fix.atoms["10"].is_radical == False
+
+
+class TestChargeAssignment:
+    @pytest.fixture
+    def top_charged(self, filedir) -> Topology:
+        top = read_top(filedir / "IMREE.top")
+        return Topology(top)
+
+    def test_break_neutral(self, top_charged: Topology):
+        recipe_steps = [Break(atom_id_1="7", atom_id_2="9")]
+        top_charged.break_bond((recipe_steps[0].atom_id_1, recipe_steps[0].atom_id_2))
+        top_charged.update_partial_charges(recipe_steps)
+        fragment1_nrs = ["7", "8"]
+        fragment2_nrs = [str(i) for i in range(9, 26)]
+        assert np.isclose(
+            sum([float(top_charged.atoms[nr].charge) for nr in fragment1_nrs]), 0
+        )
+        assert np.isclose(
+            sum([float(top_charged.atoms[nr].charge) for nr in fragment2_nrs]), 0
+        )
+
+    def test_break_negative(self, top_charged: Topology):
+        recipe_steps = [Break(atom_id_1="69", atom_id_2="80")]
+        top_charged.break_bond((recipe_steps[0].atom_id_1, recipe_steps[0].atom_id_2))
+        top_charged.update_partial_charges(recipe_steps)
+        fragment1_nrs = [str(i) for i in range(67, 80)]
+        fragment2_nrs = ["80", "81"]
+        assert np.isclose(
+            sum([float(top_charged.atoms[nr].charge) for nr in fragment1_nrs]), -1
+        )
+        assert np.isclose(
+            sum([float(top_charged.atoms[nr].charge) for nr in fragment2_nrs]), 0
+        )
+
+    def test_break_positive(self, top_charged: Topology):
+        recipe_steps = [Break(atom_id_1="33", atom_id_2="36")]
+        top_charged.break_bond((recipe_steps[0].atom_id_1, recipe_steps[0].atom_id_2))
+        top_charged.update_partial_charges(recipe_steps)
+        fragment1_nrs = [str(i) for i in range(26, 36)] + ["48", "49"]
+        fragment2_nrs = [str(i) for i in range(36, 48)]
+        assert np.isclose(
+            sum([float(top_charged.atoms[nr].charge) for nr in fragment1_nrs]), 0
+        )
+        assert np.isclose(
+            sum([float(top_charged.atoms[nr].charge) for nr in fragment2_nrs]), 1
+        )
+
+    def test_HAT_charge_assignment(self, top_charged: Topology):
+        recipe_steps = [
+            Break(atom_id_1="50", atom_id_2="51"),
+            Bind(atom_id_1="52", atom_id_2="51"),
+        ]
+        top_charged.del_atom("53")
+        top_charged.break_bond((recipe_steps[0].atom_id_1, recipe_steps[0].atom_id_2))
+        top_charged.bind_bond((recipe_steps[1].atom_id_1, recipe_steps[1].atom_id_2))
+        top_charged.update_partial_charges(recipe_steps)
+        fragment1_nrs = [str(i) for i in range(50, 66)]
+        assert np.isclose(
+            sum([float(top_charged.atoms[nr].charge) for nr in fragment1_nrs]), 0
+        )
