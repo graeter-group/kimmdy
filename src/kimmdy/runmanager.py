@@ -627,6 +627,9 @@ class RunManager:
             elif isinstance(step, CustomTopMod):
                 step.f(self.top)
 
+        # update partial charges
+        self.top.update_partial_charges(recipe.recipe_steps)
+
         write_top(self.top.to_dict(), files.outputdir / self.config.top.name)
         files.output["top"] = files.outputdir / self.config.top.name
 

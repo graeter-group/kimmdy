@@ -85,6 +85,7 @@ Assumptions:
 | [break_bond](#kimmdy.topology.topology.Topology.break_bond) | Break bonds in topology homolytically. |
 | [del_atom](#kimmdy.topology.topology.Topology.del_atom) | Deletes atom |
 | [reindex_atomnrs](#kimmdy.topology.topology.Topology.reindex_atomnrs) | Reindex atom numbers in topology. |
+| [update_partial_charges](#kimmdy.topology.topology.Topology.update_partial_charges) | Update the topology atom partial charges based on recipe_steps. |
 | [validate_bond](#kimmdy.topology.topology.Topology.validate_bond) | Validates bond consistency between both atoms and top |
 
 ##### bind_bond { #kimmdy.topology.topology.Topology.bind_bond }
@@ -127,7 +128,7 @@ Atom pairs become radicals.
 Deletes atom
 
 Deletes atom and all attached bonds. Reindexes the top and updates the
-parameters if requested.
+parameters if requested. Also moves charges to first bound_nrs atom.
 
 ###### Parameters
 
@@ -151,6 +152,16 @@ Reindex atom numbers in topology.
 Starts at index 1.
 This also updates the numbers for bonds, angles, dihedrals and pairs.
 Returns a dict of all moleculetypes to their update maps (old -> new).
+
+##### update_partial_charges { #kimmdy.topology.topology.Topology.update_partial_charges }
+
+`topology.topology.Topology.update_partial_charges(recipe_steps)`
+
+Update the topology atom partial charges based on recipe_steps.
+
+Update rules follow a simple assignment scheme that works well with grappa.
+If fragments are created, their partial charges are kept integers. If previously
+broken bonds are formed again, the original partial charges are restored
 
 ##### validate_bond { #kimmdy.topology.topology.Topology.validate_bond }
 

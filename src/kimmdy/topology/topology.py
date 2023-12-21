@@ -21,6 +21,7 @@ from kimmdy.topology.utils import (
     is_not_solvent_or_ion,
     set_moleculetype_atomics,
     set_top_section,
+    get_residue_fragments,
 )
 from kimmdy.topology.ff import FF
 from kimmdy.plugins import BasicParameterizer, Parameterizer
@@ -33,6 +34,7 @@ from typing import Callable
 
 from kimmdy.utils import TopologyAtomAddress
 from kimmdy.topology.utils import increment_field
+from kimmdy.recipe import RecipeStep, Bind, Break
 
 logger = logging.getLogger("kimmdy.topology")
 
@@ -804,6 +806,96 @@ class Topology:
                 raise RuntimeError("No Parametrizer was initialized in this topology!")
             self.needs_parameterization = False
 
+    def update_partial_charges(self, recipe_steps: list[RecipeStep]) -> None:
+        """Update the topology atom partial charges.
+
+        This function must be called after the recipe_steps are applied.
+        Changes are based on the recipe_steps. Update rules follow a simple
+        assignment scheme that works well with grappa. If fragments are created,
+        their partial charges are kept integers. If previously broken bonds are
+        formed again, the original partial charges are restored.
+        """
+
+        # build updated list of atoms by residue for topology so that this does
+        # not need to be repeated
+        # Warning: resnr not unique for each residue, 'residues' can map to
+        # more than one real residue
+        residues = {}
+        for atom in self.atoms.values():
+            if residues.get(atom.resnr) is None:
+                residues[atom.resnr] = []
+            residues[atom.resnr].append(atom)
+
+        for step in recipe_steps:
+            if isinstance(step, Break):
+                # make partial charges on either side of the break integer
+                if self.atoms[step.atom_id_1].resnr == self.atoms[step.atom_id_2].resnr:
+                    atom1 = self.atoms[step.atom_id_1]
+                    atom2 = self.atoms[step.atom_id_2]
+                    fragment1, fragment2 = get_residue_fragments(
+                        self, residues[atom1.resnr], atom1, atom2
+                    )
+                    if len(fragment2) in (0, 1):
+                        # intra-residue HAT case (or similar)
+                        if atom1.type.startswith("H"):
+                            atom2.charge = (
+                                f"{float(atom2.charge) + float(atom1.charge):7.4f}"
+                            )
+                            atom1.charge = "0.0"
+                        elif atom2.type.startswith("H"):
+                            atom1.charge = (
+                                f"{float(atom1.charge) + float(atom2.charge):7.4f}"
+                            )
+                            atom2.charge = "0.0"
+                        else:
+                            logger.warning(
+                                "Residue is not fragmented and no break atom is hydrogen. Doing nothing!"
+                            )
+                            continue
+                    else:
+                        # homolysis case (or similar)
+
+                        charge_fragment1 = [
+                            float(self.atoms[nr].charge) for nr in fragment1
+                        ]
+                        charge_fragment2 = [
+                            float(self.atoms[nr].charge) for nr in fragment2
+                        ]
+                        diff1 = sum(charge_fragment1) - round(sum(charge_fragment1))
+                        diff2 = sum(charge_fragment2) - round(sum(charge_fragment2))
+                        atom1.charge = f"{float(atom1.charge) - diff1:7.4f}"
+                        atom2.charge = f"{float(atom2.charge) - diff2:7.4f}"
+                else:
+                    # no change in partial charges necessary for break between residues
+                    continue
+            elif isinstance(step, Bind):
+                if self.atoms[step.atom_id_1].resnr == self.atoms[step.atom_id_2].resnr:
+                    atom1 = self.atoms[step.atom_id_1]
+                    atom2 = self.atoms[step.atom_id_2]
+                    # check whether bond exists in topology
+                    residue = atom1.residue
+                    bondtype = (atom1.atom, atom2.atom)
+                    residue_bond_spec = self.ff.residuetypes[residue].bonds.get(
+                        bondtype,
+                        self.ff.residuetypes[residue].bonds.get(bondtype[::-1]),
+                    )
+                    if residue_bond_spec:
+                        atom1.charge = (
+                            self.ff.residuetypes[residue].atoms[atom1.atom].charge
+                        )
+                        atom2.charge = (
+                            self.ff.residuetypes[residue].atoms[atom2.atom].charge
+                        )
+                    else:
+                        logger.warning(
+                            f"New bond defined in {step} but can't be found in residuetypes definition. Not changing the partial charges!"
+                        )
+                else:
+                    # no change in partial charges necessary
+                    continue
+            else:
+                continue
+
     def to_dict(self) -> TopologyDict:
         self.update_parameters()
         self._update_dict()
@@ -813,7 +905,7 @@ class Topology:
         """Deletes atom
 
         Deletes atom and all attached bonds. Reindexes the top and updates the
-        parameters if requested.
+        parameters if requested. Also moves charges to first bound_nrs atom.
 
         Parameters
         ----------
@@ -832,6 +924,10 @@ class Topology:
         logger.debug(
             f"Deleting Atom nr {atom.nr}, type {atom.type}, res {atom.residue}"
         )
+        # move charge to first neighbor
+        self.atoms[
+            atom.bound_to_nrs[0]
+        ].charge = f"{float(self.atoms[atom.bound_to_nrs[0]].charge) + float(atom.charge):7.4f}"
 
         # break all bonds and delete all pairs, diheadrals etc
         for bound_nr in copy(atom.bound_to_nrs):
