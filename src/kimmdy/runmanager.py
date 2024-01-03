@@ -509,12 +509,15 @@ class RunManager:
         files: TaskFiles,
     ) -> TaskFiles:
         logger = files.logger
-        self.recipe_collection.aggregate_reactions()
         logger.info(
             f"Start Decide recipe using {self.kmc_algorithm}, "
             f"{len(self.recipe_collection.recipes)} recipes available."
         )
         kmc = self.kmc_mapping[self.kmc_algorithm.lower()]
+
+        # FIXME Hotfix for #355 aggregate not working for big systems
+        if "rfkmc" != self.kmc_algorithm.lower():
+            self.recipe_collection.aggregate_reactions()
         if "extrande" in self.kmc_algorithm.lower():
             kmc = partial(kmc, tau_scale=self.config.tau_scale)
         self.kmcresult: KMCResult = kmc(self.recipe_collection, logger=logger)
