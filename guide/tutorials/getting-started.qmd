@@ -21,6 +21,10 @@ Optional:
 
 - `plumed`-patched version of `gromacs` (for the homolysis reaction).
 
+::: {.callout-tip appearance="simple"}
+If you plan to use our machine-learning plugins, take a look at the [full installation instruction](../how-to/install-ml-plugins.qmd)
+:::
+
 Let's first create a directory and a virtual environment for `kimmdy`:
 
 ```bash
