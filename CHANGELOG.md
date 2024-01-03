@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.0.1](https://github.com/hits-mbm-dev/kimmdy/compare/v6.0.0...v6.0.1) (2024-01-03)
+
+
+### Documentation
+
+* minor improvement ([111112e](https://github.com/hits-mbm-dev/kimmdy/commit/111112ebcbd3ef79e5a3fea7026c1df9b64402ce))
+
 ## [6.0.0](https://github.com/hits-mbm-dev/kimmdy/compare/v5.3.2...v6.0.0) (2024-01-03)
 
 

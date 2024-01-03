@@ -13,6 +13,7 @@
 | [get_moleculetype_header](#kimmdy.topology.utils.get_moleculetype_header) | Get content of the header of a moleculetype from a topology dict. |
 | [get_protein_section](#kimmdy.topology.utils.get_protein_section) | Get content of a section in the first moleculetype (protein) from a topology dict. |
 | [get_reactive_section](#kimmdy.topology.utils.get_reactive_section) | Get content of a section in the Reactive moleculetype from a topology dict. |
+| [get_residue_fragments](#kimmdy.topology.utils.get_residue_fragments) | Splits a residue into fragments after a bond has been broken. |
 | [get_top_section](#kimmdy.topology.utils.get_top_section) | Get content of a section from a topology dict. |
 | [is_not_solvent_or_ion](#kimmdy.topology.utils.is_not_solvent_or_ion) | Returns whether a moleculetype name is not solvent or ion. |
 | [set_moleculetype_atomics](#kimmdy.topology.utils.set_moleculetype_atomics) | Set content of the atomics (atoms/bonds/angles etc.) of a moleculetype from a topology dict. |
@@ -55,6 +56,28 @@ Get content of a section in the first moleculetype (protein) from a topology dic
 `topology.utils.get_reactive_section(top, name)`
 
 Get content of a section in the Reactive moleculetype from a topology dict.
+
+### get_residue_fragments { #kimmdy.topology.utils.get_residue_fragments }
+
+`topology.utils.get_residue_fragments(top, residue, start1, start2, iterations=20)`
+
+Splits a residue into fragments after a bond has been broken.
+
+#### Parameters
+
+| Name         | Type                                                    | Description                                                                                                      | Default    |
+|--------------|---------------------------------------------------------|------------------------------------------------------------------------------------------------------------------|------------|
+| `top`        | [Topology](`kimmdy.topology.topology.Topology`)         | Topology                                                                                                         | _required_ |
+| `residue`    | [list](`list`)\[[Atom](`kimmdy.topology.atomic.Atom`)\] | All atoms of current residue. Ok, when it contains more atoms as long as those are not connected to broken bond. | _required_ |
+| `start1`     | [Atom](`kimmdy.topology.atomic.Atom`)                   | First atom with broken bond                                                                                      | _required_ |
+| `start2`     | [Atom](`kimmdy.topology.atomic.Atom`)                   | Second atom with broken bond                                                                                     | _required_ |
+| `iterations` | [int](`int`)                                            | Max number of bonds from start atoms to be included when building fragmets, by default 20                        | `20`       |
+
+#### Returns
+
+| Type                                                     | Description                      |
+|----------------------------------------------------------|----------------------------------|
+| Two fragments, or one fragment and empty set in case the | residue did not change its size. |
 
 ### get_top_section { #kimmdy.topology.utils.get_top_section }
 
