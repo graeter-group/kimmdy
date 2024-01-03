@@ -370,6 +370,7 @@ class RecipeCollection:
     def aggregate_reactions(self):
         """Combines reactions having the same sequence of RecipeSteps."""
 
+        logger.debug(f"Aggregating {len(self.recipes)} recipes")
         unique_recipes = []
         unique_recipes_ixs = []
 

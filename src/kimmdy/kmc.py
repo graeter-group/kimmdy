@@ -69,18 +69,15 @@ def rf_kmc(
     reaction_probability = []
 
     # 1. Calculate the probability for each reaction
-    logger.debug("KMC 1/4")
     for recipe in recipe_collection.recipes:
         dt = [x[1] - x[0] for x in recipe.timespans]
         reaction_probability.append(sum(np.multiply(dt, recipe.rates)))
 
     # 2. Set the total rate to the sum of individual rates
-    logger.debug("KMC 2/4")
     probability_cumulative = np.cumsum(reaction_probability)
     probability_sum = probability_cumulative[-1]
 
     # 3. Generate two independent uniform (0,1) random numbers u1,u2
-    logger.debug("KMC 3/4")
     u = rng.random(2)
     logger.debug(
         f"\tRandom values u: {u}, number cumulative probabilities "
@@ -88,7 +85,6 @@ def rf_kmc(
     )
 
     # 4. Find the even to carry out, mu, using binary search (np.searchsorted)
-    logger.debug("KMC 4/4")
     pos = np.searchsorted(probability_cumulative, u[0] * probability_sum)
     recipe = recipe_collection.recipes[pos]
     reaction_time = recipe.timespans[np.argmax(recipe.rates)][1]
