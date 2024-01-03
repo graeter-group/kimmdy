@@ -1,5 +1,23 @@
 # Changelog
 
+## [6.0.0](https://github.com/hits-mbm-dev/kimmdy/compare/v5.3.2...v6.0.0) (2024-01-03)
+
+
+### ⚠ BREAKING CHANGES
+
+* Partial charge treatment ([#353](https://github.com/hits-mbm-dev/kimmdy/issues/353))
+
+### Features
+
+* Partial charge treatment ([#353](https://github.com/hits-mbm-dev/kimmdy/issues/353)) ([1c057b3](https://github.com/hits-mbm-dev/kimmdy/commit/1c057b36f3afe8b027eb07b215923f611e72cd0a))
+
+
+### Bug Fixes
+
+* don't truncate if there is no trajectory. ([4e6e011](https://github.com/hits-mbm-dev/kimmdy/commit/4e6e01183ae084b120bf4f0970c327cc9d7f91ee))
+* don't try to truncate to time 0 ([52099e5](https://github.com/hits-mbm-dev/kimmdy/commit/52099e50adec95022d69c0001b9ddb8a9913975d))
+* hotfix for aggregate_reactions hangs [#355](https://github.com/hits-mbm-dev/kimmdy/issues/355) ([b5bc285](https://github.com/hits-mbm-dev/kimmdy/commit/b5bc285524041338565b54e7dd29cc311d22eca3))
+
 ## [5.3.2](https://github.com/hits-mbm-dev/kimmdy/compare/v5.3.1...v5.3.2) (2023-12-19)
 
 
