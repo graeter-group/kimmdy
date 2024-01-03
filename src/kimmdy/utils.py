@@ -378,6 +378,9 @@ def truncate_sim_files(files: TaskFiles, time: Optional[float], keep_tail: bool 
     # FOR SOME REASON gmx check writes in stderr instead of stdout
     if m := re.search(r"Last frame.*time\s+(\d+\.\d+)", p.stderr):
         last_time = float(m.group(1))
+        if last_time == 0.0:
+            logger.info("Last traj contains single frame, will not truncate anything.")
+            return
         assert (
             last_time * 1.01 >= time
         ), "Requested to truncate trajectory after last frame"
