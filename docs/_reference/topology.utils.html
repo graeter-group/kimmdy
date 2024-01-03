@@ -452,6 +452,11 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#kimmdy.topology.utils.get_moleculetype_header" id="toc-kimmdy.topology.utils.get_moleculetype_header" class="nav-link" data-scroll-target="#kimmdy.topology.utils.get_moleculetype_header">get_moleculetype_header</a></li>
   <li><a href="#kimmdy.topology.utils.get_protein_section" id="toc-kimmdy.topology.utils.get_protein_section" class="nav-link" data-scroll-target="#kimmdy.topology.utils.get_protein_section">get_protein_section</a></li>
   <li><a href="#kimmdy.topology.utils.get_reactive_section" id="toc-kimmdy.topology.utils.get_reactive_section" class="nav-link" data-scroll-target="#kimmdy.topology.utils.get_reactive_section">get_reactive_section</a></li>
+  <li><a href="#kimmdy.topology.utils.get_residue_fragments" id="toc-kimmdy.topology.utils.get_residue_fragments" class="nav-link" data-scroll-target="#kimmdy.topology.utils.get_residue_fragments">get_residue_fragments</a>
+  <ul class="collapse">
+  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
+  </ul></li>
   <li><a href="#kimmdy.topology.utils.get_top_section" id="toc-kimmdy.topology.utils.get_top_section" class="nav-link" data-scroll-target="#kimmdy.topology.utils.get_top_section">get_top_section</a></li>
   <li><a href="#kimmdy.topology.utils.is_not_solvent_or_ion" id="toc-kimmdy.topology.utils.is_not_solvent_or_ion" class="nav-link" data-scroll-target="#kimmdy.topology.utils.is_not_solvent_or_ion">is_not_solvent_or_ion</a></li>
   <li><a href="#kimmdy.topology.utils.set_moleculetype_atomics" id="toc-kimmdy.topology.utils.set_moleculetype_atomics" class="nav-link" data-scroll-target="#kimmdy.topology.utils.set_moleculetype_atomics">set_moleculetype_atomics</a></li>
@@ -502,26 +507,30 @@ ul.task-list li input[type="checkbox"] {
 <td>Get content of a section in the Reactive moleculetype from a topology dict.</td>
 </tr>
 <tr class="even">
+<td><a href="#kimmdy.topology.utils.get_residue_fragments">get_residue_fragments</a></td>
+<td>Splits a residue into fragments after a bond has been broken.</td>
+</tr>
+<tr class="odd">
 <td><a href="#kimmdy.topology.utils.get_top_section">get_top_section</a></td>
 <td>Get content of a section from a topology dict.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#kimmdy.topology.utils.is_not_solvent_or_ion">is_not_solvent_or_ion</a></td>
 <td>Returns whether a moleculetype name is not solvent or ion.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#kimmdy.topology.utils.set_moleculetype_atomics">set_moleculetype_atomics</a></td>
 <td>Set content of the atomics (atoms/bonds/angles etc.) of a moleculetype from a topology dict.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#kimmdy.topology.utils.set_protein_section">set_protein_section</a></td>
 <td>Set content of a section in the first moleculetype (protein) from a topology dict.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#kimmdy.topology.utils.set_reactive_section">set_reactive_section</a></td>
 <td>Set content of a section in the first moleculetype (protein) from a topology dict.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#kimmdy.topology.utils.set_top_section">set_top_section</a></td>
 <td>Set content of a section from a topology dict.</td>
 </tr>
@@ -553,6 +562,77 @@ ul.task-list li input[type="checkbox"] {
 <h3 class="anchored" data-anchor-id="kimmdy.topology.utils.get_reactive_section">get_reactive_section</h3>
 <p><code>topology.utils.get_reactive_section(top, name)</code></p>
 <p>Get content of a section in the Reactive moleculetype from a topology dict.</p>
+</section>
+<section id="kimmdy.topology.utils.get_residue_fragments" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.topology.utils.get_residue_fragments">get_residue_fragments</h3>
+<p><code>topology.utils.get_residue_fragments(top, residue, start1, start2, iterations=20)</code></p>
+<p>Splits a residue into fragments after a bond has been broken.</p>
+<section id="parameters" class="level4">
+<h4 class="anchored" data-anchor-id="parameters">Parameters</h4>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>top</code></td>
+<td><a href="../_reference/topology.topology.html#kimmdy.topology.topology.Topology">Topology</a></td>
+<td>Topology</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td><code>residue</code></td>
+<td><a href="https://docs.python.org/3.10/library/stdtypes.html#list">list</a>[<a href="../_reference/topology.atomic.html#kimmdy.topology.atomic.Atom">Atom</a>]</td>
+<td>All atoms of current residue. Ok, when it contains more atoms as long as those are not connected to broken bond.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td><code>start1</code></td>
+<td><a href="../_reference/topology.atomic.html#kimmdy.topology.atomic.Atom">Atom</a></td>
+<td>First atom with broken bond</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td><code>start2</code></td>
+<td><a href="../_reference/topology.atomic.html#kimmdy.topology.atomic.Atom">Atom</a></td>
+<td>Second atom with broken bond</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td><code>iterations</code></td>
+<td><a href="https://docs.python.org/3.10/library/functions.html#int">int</a></td>
+<td>Max number of bonds from start atoms to be included when building fragmets, by default 20</td>
+<td><code>20</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns" class="level4">
+<h4 class="anchored" data-anchor-id="returns">Returns</h4>
+<table class="table">
+<colgroup>
+<col style="width: 63%">
+<col style="width: 36%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Two fragments, or one fragment and empty set in case the</td>
+<td>residue did not change its size.</td>
+</tr>
+</tbody>
+</table>
+</section>
 </section>
 <section id="kimmdy.topology.utils.get_top_section" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.utils.get_top_section">get_top_section</h3>

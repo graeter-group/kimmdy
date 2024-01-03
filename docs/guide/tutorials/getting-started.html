@@ -534,6 +534,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <ul>
 <li><code>plumed</code>-patched version of <code>gromacs</code> (for the homolysis reaction).</li>
 </ul>
+<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>If you plan to use our machine-learning plugins, take a look at the <a href="../../guide/how-to/install-ml-plugins.html">full installation instruction</a></p>
+</div>
+</div>
 <p>Let’s first create a directory and a virtual environment for <code>kimmdy</code>:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> kimmdy-tutorial</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> kimmdy-tutorial</span>
@@ -584,7 +597,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Our starting structure is a simple ACE/NME-capped Alanine molecule in a box of water. Note, how it has a missing hydrogen atom on the alpha carbon. This is a radical. We will use the builtin <code>hat_reaction</code> to simulate hydrogen atom transfer reactions from nearby hydrogens to the radical position.</p>
     <div id="app-./getting-started-files/vis-ala.molj" class="molstar-app"></div>
     <script type="text/javascript">
-    molstar.Viewer.create("app-./getting-started-files/vis-ala.molj", {"layoutShowLog":false,"layoutShowRemoteState":false,"layoutShowLeftPanel":true,"viewportShowExpand":true,"viewportShowAnimation":true,"emdbProvider":"rcsb","layoutShowSequence":false,"layoutIsExpanded":false,"pdbProvider":"rcsb","viewportShowSelectionMode":false,"layoutShowControls":false}).then(viewer => {
+    molstar.Viewer.create("app-./getting-started-files/vis-ala.molj", {"layoutIsExpanded":false,"viewportShowExpand":true,"emdbProvider":"rcsb","layoutShowRemoteState":false,"layoutShowLeftPanel":true,"pdbProvider":"rcsb","layoutShowSequence":false,"viewportShowAnimation":true,"layoutShowLog":false,"layoutShowControls":false,"viewportShowSelectionMode":false}).then(viewer => {
     viewer.loadSnapshotFromUrl(url="./getting-started-files/vis-ala.molj", "molj");    });
     </script>
     
