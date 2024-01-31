@@ -1,6 +1,8 @@
 from __future__ import annotations
 import textwrap
 import logging
+from pathlib import Path
+from typing import Optional
 from kimmdy.topology.atomic import (
     Atom,
     Bond,
@@ -29,7 +31,7 @@ logger = logging.getLogger(__name__)
 class FF:
     """Container for parsed forcefield data."""
 
-    def __init__(self, top: dict):
+    def __init__(self, top: dict, residuetypes_path: Optional[Path] = None):
         self.atomtypes: dict[str, AtomType] = {}
         self.bondtypes: dict[tuple[str, str], BondType] = {}
         self.angletypes: dict[tuple[str, str, str], AngleType] = {}
@@ -93,17 +95,21 @@ class FF:
                             )
                         ] = dihedraltype
 
-        if ffdir is None:
-            logger.warning("ffdir is None. No residuetypes will be parsed.")
-            return
-        aminoacids_path = ffdir / "aminoacids.rtp"
-        if not aminoacids_path.exists():
-            logger.warning(
-                "aminoacids.rtp not found in ffdir. No residuetypes will be parsed."
-            )
-            return
-        aminoacids = read_top(aminoacids_path, use_gmx_dir=False)
-        for k, v in aminoacids.items():
+        if residuetypes_path:
+            logger.debug(f"Using specified residuetypes file: {residuetypes_path}")
+        else:
+            logger.debug("Trying to use default amber protein residuetypes file.")
+            if ffdir is None:
+                logger.warning("ffdir is None. No residuetypes will be parsed.")
+                return
+            residuetypes_path = ffdir / "aminoacids.rtp"
+            if residuetypes_path is None:
+                logger.warning(
+                    "aminoacids.rtp not found in ffdir. No residuetypes will be parsed."
+                )
+                return
+        residuetypes_dict = read_top(residuetypes_path, use_gmx_dir=False)
+        for k, v in residuetypes_dict.items():
             if k.startswith("BLOCK") or k in ["bondedtypes", "ffdir", "define"]:
                 continue
             if not v.get("subsections"):

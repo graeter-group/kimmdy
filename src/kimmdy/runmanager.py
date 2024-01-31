@@ -152,6 +152,7 @@ class RunManager:
             is_reactive_predicate_f=get_is_reactive_predicate_f(
                 self.config.topology.reactive
             ),
+            residuetypes_path=self.config.residuetypes,
         )
 
         self.filehist: list[dict[str, TaskFiles]] = [

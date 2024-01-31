@@ -159,13 +159,13 @@
     },
     "residuetypes": {
       "title": "residuetypes",
-      "description": "GROMACS rtp file that contains residuetypes.",
+      "description": "GROMACS rtp file that contains residuetypes",
       "type": "string",
       "ptype": "Path"
     },
     "radicals": {
       "title": "radicals",
-      "description": "radical atom id or space-separated string of atom ids.",
+      "description": "radical atom id or space-separated string of atom ids",
       "type": "string",
       "ptype": "str"
     },    

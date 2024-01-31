@@ -28,7 +28,9 @@ from kimmdy.plugins import BasicParameterizer, Parameterizer
 from itertools import permutations, combinations
 import textwrap
 import logging
+from typing import Optional
 from copy import copy, deepcopy
+from pathlib import Path
 from kimmdy.constants import ATOM_ID_FIELDS, RESNR_ID_FIELDS, REACTIVE_MOLECULEYPE
 from typing import Callable
 
@@ -587,6 +589,7 @@ class Topology:
         top: TopologyDict,
         parametrizer: Parameterizer = BasicParameterizer(),
         is_reactive_predicate_f: Callable[[str], bool] = is_not_solvent_or_ion,
+        residuetypes_path: Optional[Path] = None,
     ) -> None:
         if top == {}:
             raise NotImplementedError(
@@ -600,7 +603,7 @@ class Topology:
             raise ValueError("molecules not found in top file")
         self.molecules = [(l[0], l[1]) for l in molecules]
 
-        self.ff = FF(top)
+        self.ff = FF(top,residuetypes_path)
         self._parse_molecules()
         self.parametrizer = parametrizer
         self._check_is_reactive_molecule = is_reactive_predicate_f
