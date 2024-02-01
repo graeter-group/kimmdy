@@ -161,13 +161,13 @@
       "title": "residuetypes",
       "description": "GROMACS rtp file that contains residuetypes",
       "type": "string",
-      "ptype": "Path"
+      "pytype": "Path"
     },
     "radicals": {
       "title": "radicals",
-      "description": "radical atom id or space-separated string of atom ids",
+      "description": "space-separated string of radical atom ids, can be empty",
       "type": "string",
-      "ptype": "str"
+      "pytype": "str"
     },    
     "plumed": {
       "title": "plumed",
