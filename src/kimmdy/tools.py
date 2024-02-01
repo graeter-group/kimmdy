@@ -83,160 +83,124 @@ def entry_point_build_examples():
     build_examples(args.restore)
 
 
-def remove_hydrogen(
-    gro: str,
-    top: str,
-    nr: str,
+def modify_top(
+    top_path: str,
+    out_path: str,
     parameterize: bool,
-    equilibrate: bool,
+    removeH: list,
+    grofile: str,
     gmx_mdrun_flags: str = "",
 ):
-    """Remove one hydrogen from a gro and top file to create a radical.
+    """Modify topology in various ways.
 
     Parameters
     ----------
-    gro
-        Path to GROMACS gro file
-    top
+    top_path
         Path to GROMACS top file
-    nr
-        Atom number as indicated in the GROMACS gro and top file
+    out_path
+        Output topology file name
     parameterize
-        Parameterize topology with grappa after removing hydrogen.
-    equilibrate
-        Do a minimization and equilibration with GROMACS. Uses mdp files from kimmdy assets.
+        Parameterize topology with grappa after removing hydrogen
+    removeH
+        Remove one or more hydrogens by atom nrs in the top file
+    grofile
+        GROMACS gro file; keep compatible with top file
     """
-    gro_path = Path(gro)
-    top_path = Path(top)
+    print(top_path,out_path,parameterize,removeH,grofile)
 
-    topology = Topology(read_top(top_path))
+    top = Topology(read_top(Path(top_path)))
 
-    ## check for input validity
-    assert (atom_type := topology.atoms[nr].type).startswith(
-        "H"
-    ), f"Wrong atom type {atom_type} with nr {nr} for remove hydrogen, should start with 'H'"
-
-    ## deal with top file, order is important here
-    # [heavy_nr] = topology.atoms[nr].bound_to_nrs
-
-    # parameterize with grappa
+    ## remove hydrogen
+    if removeH:
+        for nr in removeH:
+            # check for input validity
+            if (atom_type := top.atoms[str(nr)].type).startswith("H"):
+                update_map = top.del_atom(str(nr), parameterize=parameterize)
+            else:
+                print( f"Wrong atom type {atom_type} with nr {nr} for remove hydrogen, should start with 'H'.")
+                continue
+            
+    ## parameterize with grappa
     if parameterize:
+        # load grappa
         discover_plugins()
-
         if "grappa" in parameterization_plugins.keys():
-            topology.parametrizer = parameterization_plugins["grappa"]()
-
+            top.parametrizer = parameterization_plugins["grappa"]()
         else:
             raise KeyError(
                 "No grappa in parameterization plugins. Can't continue to parameterize molecule"
             )
+        # require parameterization when writing topology to dict
+        top.needs_parameterization = True
+        
 
-    update_map = topology.del_atom(nr, parameterize=parameterize)
-
+    
     ## write top file
-    top_stem = top_path.stem
-    top_outpath = top_path.with_stem(top_stem + f"_d{nr}")
-    write_top(topology.to_dict(), top_outpath)
+    write_top(top.to_dict(), Path(out_path))
 
     ## deal with gro file
-    with open(gro_path, "r") as f:
-        gro_raw = f.readlines()
+    if grofile:
+        with open(gro_path, "r") as f:
+            gro_raw = f.readlines()
 
-    if len(gro_raw[3].split()) > 6:
-        print("gro file likely contains velocities. These will be discarded.")
+        if len(gro_raw[3].split()) > 6:
+            print("gro file likely contains velocities. These will be discarded.")
 
-    gro_stem = gro_path.stem
-    gro_outpath = gro_path.with_stem(gro_stem + f"_d{nr}")
-    with open(gro_outpath, "w") as f:
-        f.write(gro_raw[0])
-        f.write(f"   {str(int(gro_raw[1])-1)}\n")
-        for line in gro_raw[2:-1]:
-            linesplit = line.split()
-            if val := update_map.get(linesplit[2]):
-                linesplit[2] = val
-            else:
-                continue
-            f.write("{:>8s}   {:>4s} {:>4s} {:>7s} {:>7s} {:>7s}\n".format(*linesplit))
-            # format not exactly as defined by GROMACS but should be good enough
-        f.write(gro_raw[-1])
-
-    ## minimize and equilibrate system using GROMACS
-    if equilibrate:
-        cwd = top_outpath.parent
-        run_shell_cmd(
-            f"cp {str(Path(__file__).parents[2] / 'tests'/'test_files'/'assets'/'md'/'*')} .",
-            cwd=cwd,
-        )
-        run_gmx(
-            f"gmx editconf -f {gro_outpath.name} -o {gro_outpath.stem}_box.gro -c -d 1.0 -bt dodecahedron",
-            cwd=cwd,
-        )
-        run_gmx(
-            f"gmx solvate -cp {gro_outpath.stem}_box.gro -p {top_outpath.name} -o {gro_outpath.stem}_solv.gro",
-            cwd=cwd,
-        )
-        run_gmx(
-            f"gmx grompp -f ions.mdp -c {gro_outpath.stem}_solv.gro -p {top_outpath.name} -o {gro_outpath.stem}_genion.tpr",
-            cwd=cwd,
-        )
-        run_gmx(
-            f"echo 'SOL' | gmx genion -s {gro_outpath.stem}_genion.tpr -p {top_outpath.name} -o {gro_outpath.stem}_ion.gro -conc 0.15 -neutral",
-            cwd=cwd,
-        )
-        run_gmx(
-            f"gmx grompp -f minim.mdp -c {gro_outpath.stem}_ion.gro -p {top_outpath.name} -o {gro_outpath.stem}_min.tpr -maxwarn 2",
-            cwd=cwd,
-        )
-        run_gmx(f"gmx mdrun -deffnm {gro_outpath.stem}_min" + gmx_mdrun_flags, cwd=cwd)
-        run_gmx(
-            f"gmx grompp -f nvt.mdp -c {gro_outpath.stem}_min.gro -p {top_outpath.name} -o {gro_outpath.stem}_nvt.tpr -maxwarn 2",
-            cwd=cwd,
-        )
-        run_gmx(f"gmx mdrun -deffnm {gro_outpath.stem}_nvt" + gmx_mdrun_flags, cwd=cwd)
-        run_gmx(
-            f"gmx grompp -f npt.mdp -c {gro_outpath.stem}_nvt.gro -p {top_outpath.name} -o {gro_outpath.stem}_npt.tpr -maxwarn 2",
-            cwd=cwd,
-        )
-        run_gmx(
-            f"gmx mdrun -v -deffnm {gro_outpath.stem}_npt" + gmx_mdrun_flags, cwd=cwd
-        )
+        gro_stem = gro_path.stem
+        gro_outpath = gro_path.with_stem(gro_stem + f"_d{nr}")
+        with open(gro_outpath, "w") as f:
+            f.write(gro_raw[0])
+            f.write(f"   {str(int(gro_raw[1])-1)}\n")
+            for line in gro_raw[2:-1]:
+                linesplit = line.split()
+                if val := update_map.get(linesplit[2]):
+                    linesplit[2] = val
+                else:
+                    continue
+                f.write("{:>8s}   {:>4s} {:>4s} {:>7s} {:>7s} {:>7s}\n".format(*linesplit))
+                # format not exactly as defined by GROMACS but should be good enough
+            f.write(gro_raw[-1])
 
 
-def get_remove_hydrogen_cmdline_args() -> argparse.Namespace:
+def get_modify_top_cmdline_args() -> argparse.Namespace:
     """
-    parse cmdline args for remove_hydrogen
+    parse cmdline args for modify_top
     """
     parser = argparse.ArgumentParser(
-        description="Welcome to the KIMMDY remove hydrogen module",
+        description="Welcome to the KIMMDY modify top module",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
-    parser.add_argument("gro", help="GROMACS gro file")
     parser.add_argument("top", help="GROMACS top file")
-    parser.add_argument(
-        "nr", help="Atom number as indicated in the GROMACS gro and top file"
-    )
+    parser.add_argument("out", help="Output top file name")
+
     parser.add_argument(
         "-p",
         "--parameterize",
         action="store_true",
-        help="Parameterize topology with grappa after removing hydrogen.",
+        help="Parameterize topology with grappa.",
         default=False,
     )
     parser.add_argument(
-        "-e",
-        "--equilibrate",
-        action="store_true",
-        help="Do a minimization and equilibration with GROMACS. Uses mdp files from kimmdy assets.",
-        default=False,
+        "-r",
+        "--removeH",
+        help="Remove one or more hydrogens by atom nrs in the top file.",
+        nargs="+",
+        type=int,
+    )
+    parser.add_argument(
+        "-c",
+        "--grofile",
+        help="If necessary, also apply actions on gro file to create a compatible gro/top file pair.",
+        type=str,
     )
     return parser.parse_args()
 
 
-def entry_point_remove_hydrogen():
-    """Remove hydrogen by atom nr in a gro and topology file"""
-    args = get_remove_hydrogen_cmdline_args()
+def entry_point_modify_top():
+    """Modify topology file in various ways"""
+    args = get_modify_top_cmdline_args()
 
-    remove_hydrogen(args.gro, args.top, args.nr, args.parameterize, args.equilibrate)
+    modify_top(args.top, args.out, args.parameterize, args.removeH, args.grofile)
 
 
 ## dot graphs
