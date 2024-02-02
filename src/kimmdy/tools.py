@@ -119,15 +119,19 @@ def modify_top(
 
     # remove hydrogen
     if removeH:
-        for nr in removeH:
-            # check for input validity
-            if (atom_type := top.atoms[str(nr)].type).startswith("H"):
-                update_map = top.del_atom(str(nr), parameterize=parameterize)
-            else:
+        broken_idxs = []
+        # check for input validity
+        for i, nr in enumerate(removeH):
+            if not (atom_type := top.atoms[str(nr)].type).startswith("H"):
                 print(
                     f"Wrong atom type {atom_type} with nr {nr} for remove hydrogen, should start with 'H'."
                 )
+                broken_idxs.append(i)
                 continue
+        for broken_idx in sorted(broken_idxs, reverse=True):
+            removeH.pop(broken_idx)
+
+        update_map = top.del_atom([str(nr) for nr in removeH], parameterize=parameterize)
 
     # parameterize with grappa
     if parameterize:
