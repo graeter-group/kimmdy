@@ -30,7 +30,7 @@ import textwrap
 import logging
 from copy import copy, deepcopy
 from kimmdy.constants import ATOM_ID_FIELDS, RESNR_ID_FIELDS, REACTIVE_MOLECULEYPE
-from typing import Callable
+from typing import Callable, Union
 
 from kimmdy.utils import TopologyAtomAddress
 from kimmdy.topology.utils import increment_field
@@ -901,7 +901,7 @@ class Topology:
         self._update_dict()
         return self.top
 
-    def del_atom(self, atom_nr: str, parameterize: bool = True) -> dict[str, str]:
+    def del_atom(self, atom_nr: Union[list[str], str], parameterize: bool = True) -> dict[str, str]:
         """Deletes atom
 
         Deletes atom and all attached bonds. Reindexes the top and updates the
@@ -920,21 +920,25 @@ class Topology:
         update_map
             Dict, mapping of old atom number strings to new ones.
         """
-        atom = self.atoms[atom_nr]
-        logger.debug(
-            f"Deleting Atom nr {atom.nr}, type {atom.type}, res {atom.residue}"
-        )
-        # move charge to first neighbor
-        self.atoms[
-            atom.bound_to_nrs[0]
-        ].charge = f"{float(self.atoms[atom.bound_to_nrs[0]].charge) + float(atom.charge):7.4f}"
+        if not isinstance(atom_nr, list):
+            atom_nr = [atom_nr]
+        for _atom_nr in atom_nr:
+            atom = self.atoms[_atom_nr]
+            logger.debug(
+                f"Deleting Atom nr {atom.nr}, type {atom.type}, res {atom.residue}"
+            )
+            # move charge to first neighbor
+            self.atoms[
+                atom.bound_to_nrs[0]
+            ].charge = f"{float(self.atoms[atom.bound_to_nrs[0]].charge) + float(atom.charge):7.4f}"
 
-        # break all bonds and delete all pairs, diheadrals etc
-        for bound_nr in copy(atom.bound_to_nrs):
-            self.break_bond((bound_nr, atom_nr))
-        self.radicals.pop(atom_nr)
+            # break all bonds and delete all pairs, diheadrals etc
+            for bound_nr in copy(atom.bound_to_nrs):
+                self.break_bond((bound_nr, _atom_nr))
+            self.radicals.pop(_atom_nr)
 
-        self.atoms.pop(atom_nr)
+            self.atoms.pop(_atom_nr)
+
         update_map_all = self.reindex_atomnrs()
         update_map = update_map_all[REACTIVE_MOLECULEYPE]
 
