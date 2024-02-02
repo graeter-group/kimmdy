@@ -901,7 +901,9 @@ class Topology:
         self._update_dict()
         return self.top
 
-    def del_atom(self, atom_nr: Union[list[str], str], parameterize: bool = True) -> dict[str, str]:
+    def del_atom(
+        self, atom_nr: Union[list[str], str], parameterize: bool = True
+    ) -> dict[str, str]:
         """Deletes atom
 
         Deletes atom and all attached bonds. Reindexes the top and updates the
