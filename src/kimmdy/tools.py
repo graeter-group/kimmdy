@@ -5,6 +5,7 @@ Standalone tools that are complementary to KIMMDY.
 from pathlib import Path
 import shutil
 import argparse
+from typing import Optional
 
 from kimmdy.topology.topology import Topology
 from kimmdy.parsing import read_top, write_top
@@ -86,8 +87,8 @@ def modify_top(
     top_path: str,
     out_path: str,
     parameterize: bool,
-    removeH: list,
-    grofile: str,
+    removeH: Optional(list[int]),
+    grofile: Optional(str),
     gmx_mdrun_flags: str = "",
 ):
     """Modify topology in various ways.
