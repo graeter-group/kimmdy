@@ -8,7 +8,6 @@ import argparse
 
 from kimmdy.topology.topology import Topology
 from kimmdy.parsing import read_top, write_top
-from kimmdy.utils import run_gmx, run_shell_cmd
 from kimmdy.plugins import parameterization_plugins
 from kimmdy.plugins import discover_plugins
 
@@ -106,21 +105,30 @@ def modify_top(
     grofile
         GROMACS gro file; keep compatible with top file
     """
-    print(top_path,out_path,parameterize,removeH,grofile)
+    print(
+        "Changing topology\n"
+        f"top: {top_path}\n"
+        f"output: {out_path}\n"
+        f"parameterize: {parameterize}\n"
+        f"remove hydrogen: {removeH}\n"
+        f"optional gro: {grofile}\n"
+    )
 
     top = Topology(read_top(Path(top_path)))
 
-    ## remove hydrogen
+    # remove hydrogen
     if removeH:
         for nr in removeH:
             # check for input validity
             if (atom_type := top.atoms[str(nr)].type).startswith("H"):
                 update_map = top.del_atom(str(nr), parameterize=parameterize)
             else:
-                print( f"Wrong atom type {atom_type} with nr {nr} for remove hydrogen, should start with 'H'.")
+                print(
+                    f"Wrong atom type {atom_type} with nr {nr} for remove hydrogen, should start with 'H'."
+                )
                 continue
-            
-    ## parameterize with grappa
+
+    # parameterize with grappa
     if parameterize:
         # load grappa
         discover_plugins()
@@ -132,13 +140,11 @@ def modify_top(
             )
         # require parameterization when writing topology to dict
         top.needs_parameterization = True
-        
 
-    
-    ## write top file
+    # write top file
     write_top(top.to_dict(), Path(out_path))
 
-    ## deal with gro file
+    # deal with gro file
     if grofile:
         with open(gro_path, "r") as f:
             gro_raw = f.readlines()
@@ -157,7 +163,9 @@ def modify_top(
                     linesplit[2] = val
                 else:
                     continue
-                f.write("{:>8s}   {:>4s} {:>4s} {:>7s} {:>7s} {:>7s}\n".format(*linesplit))
+                f.write(
+                    "{:>8s}   {:>4s} {:>4s} {:>7s} {:>7s} {:>7s}\n".format(*linesplit)
+                )
                 # format not exactly as defined by GROMACS but should be good enough
             f.write(gro_raw[-1])
 
@@ -203,7 +211,7 @@ def entry_point_modify_top():
     modify_top(args.top, args.out, args.parameterize, args.removeH, args.grofile)
 
 
-## dot graphs
+# dot graphs
 def topology_to_edgelist(top: Topology):
     """Convert a topology to a list of edges for a dot graph."""
     ls = []
