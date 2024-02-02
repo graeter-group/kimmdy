@@ -87,8 +87,8 @@ def modify_top(
     top_path: str,
     out_path: str,
     parameterize: bool,
-    removeH: Optional(list[int]),
-    grofile: Optional(str),
+    removeH: Optional[list[int]],
+    grofile: Optional[str],
     gmx_mdrun_flags: str = "",
 ):
     """Modify topology in various ways.
