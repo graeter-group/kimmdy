@@ -117,7 +117,8 @@ def modify_top(
 
     top = Topology(read_top(Path(top_str)))
     out_path = Path(out_str)
-
+    update_map = {}
+    
     # remove hydrogen
     if removeH:
         broken_idxs = []
