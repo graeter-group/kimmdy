@@ -2,6 +2,8 @@ import yaml
 
 from kimmdy.config import Config
 from kimmdy.runmanager import get_existing_files
+from kimmdy.topology.ff import FF
+from kimmdy.parsing import read_top
 from pathlib import Path
 import pytest
 
@@ -170,3 +172,13 @@ def test_get_existing_files(arranged_tmp_path):
             "ffbonded.itp",
         ]
     )
+
+def test_explicit_residuetypes(arranged_tmp_path):
+    config = Config(Path("config1.yml"))
+    config.residuetypes = Path("aminoacids.rtp")
+    ff = FF(top=read_top(config.top),residuetypes_path=config.residuetypes)
+
+    assert len(ff.residuetypes.keys()) == 5
+    assert ff.residuetypes['ALA']
+
+
