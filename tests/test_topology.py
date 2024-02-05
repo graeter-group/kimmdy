@@ -673,6 +673,11 @@ class TestRadicalAla:
         return Topology(hexala_top)
 
     @pytest.fixture
+    def top_noprm_explicitR_fix(self, filedir) -> Topology:
+        hexala_top = read_top(filedir / "Ala_R_noprm.top")
+        return Topology(hexala_top, radicals="9")
+
+    @pytest.fixture
     def top_prm_fix(self, filedir) -> Topology:
         hexala_top = read_top(filedir / "Ala_R_prm.top")
         return Topology(hexala_top)
@@ -680,6 +685,10 @@ class TestRadicalAla:
     def test_is_radical(self, top_noprm_fix):
         assert top_noprm_fix.atoms["9"].is_radical == True
         assert top_noprm_fix.atoms["10"].is_radical == False
+
+    def test_is_radical_explicit(self, top_noprm_explicitR_fix):
+        assert top_noprm_explicitR_fix.atoms["9"].is_radical == True
+        assert top_noprm_explicitR_fix.atoms["10"].is_radical == False
 
 
 class TestChargeAssignment:

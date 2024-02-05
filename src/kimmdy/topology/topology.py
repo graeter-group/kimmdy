@@ -59,7 +59,9 @@ class MoleculeType:
 
     """
 
-    def __init__(self, header: tuple[str, str], atomics: dict) -> None:
+    def __init__(
+        self, header: tuple[str, str], atomics: dict, radicals: Optional[str] = None
+    ) -> None:
         self.name, self.nrexcl = header
         self.atomics = atomics
 
@@ -77,7 +79,6 @@ class MoleculeType:
         ] = {}
         self.settles: dict[str, Settle] = {}
         self.exclusions: dict[int, Exclusion] = {}
-        self.radicals: dict[str, Atom] = {}
 
         self._parse_atoms()
         self._parse_bonds()
@@ -88,7 +89,25 @@ class MoleculeType:
         self._parse_settles()
         self._parse_exclusions()
         self._initialize_graph()
-        self.test_for_radicals()
+
+        # must be after self._parse_atoms
+        self.radicals: dict[str, Atom] = {}
+        if radicals is not None:
+            if self.name == "Reactive":
+                logger.debug(
+                    f"Using 'radicals' section from config file with entries: '{radicals}'."
+                )
+            for radical in radicals.split(sep=" "):
+                atom = self.atoms.get(radical)
+                if atom:
+                    self.radicals[radical] = atom
+                else:
+                    logger.debug(
+                        f"Atom nr {radical} from 'radicals' section in config file not in topology. Ignoring this entry."
+                    )
+        else:
+            self.find_radicals()
+        self.set_atom_is_radical()
 
     def __str__(self) -> str:
         return textwrap.dedent(
@@ -216,21 +235,29 @@ class MoleculeType:
             self.atoms[i].bound_to_nrs.append(j)
             self.atoms[j].bound_to_nrs.append(i)
 
-    def test_for_radicals(self):
-        """Updates radical status per atom and in topology.
+    def find_radicals(self):
+        """Find atoms that are radicals and update self.radicals.
 
         Iterate over all atoms and designate them as radicals if they have
         fewer bounds than their natural bond order.
         """
+        logger.debug(
+            "Trying to infer radical status based on AMBER(!!) atomtype bond order."
+        )
+        self.radicals = {}
         for atom in self.atoms.values():
-            bo = ATOMTYPE_BONDORDER_FLAT.get(atom.type)
+            bo = ATOMTYPE_BONDORDER_FLAT[atom.type]
             if bo and bo > len(atom.bound_to_nrs):
-                atom.is_radical = True
                 self.radicals[atom.nr] = atom
+        return None
+
+    def set_atom_is_radical(self):
+        """Set radical status per atom and in topology based on self.radicals."""
+        for atom in self.atoms.values():
+            if atom.nr in self.radicals:
+                atom.is_radical = True
             else:
                 atom.is_radical = False
-
-        return None
 
     def _update_atomics_dict(self):
         self.atomics["atoms"] = [attributes_to_list(x) for x in self.atoms.values()]
@@ -589,6 +616,7 @@ class Topology:
         top: TopologyDict,
         parametrizer: Parameterizer = BasicParameterizer(),
         is_reactive_predicate_f: Callable[[str], bool] = is_not_solvent_or_ion,
+        radicals: Optional[str] = None,
         residuetypes_path: Optional[Path] = None,
     ) -> None:
         if top == {}:
@@ -603,14 +631,14 @@ class Topology:
             raise ValueError("molecules not found in top file")
         self.molecules = [(l[0], l[1]) for l in molecules]
 
-        self.ff = FF(top,residuetypes_path)
+        self.ff = FF(top, residuetypes_path)
         self._parse_molecules()
         self.parametrizer = parametrizer
         self._check_is_reactive_molecule = is_reactive_predicate_f
 
         self.needs_parameterization = False
 
-        self._merge_moleculetypes()
+        self._merge_moleculetypes(radicals)
         self._link_atomics()
 
     def _link_atomics(self):
@@ -671,7 +699,7 @@ class Topology:
             logger.info(f"\t{m} {n}")
         return reactive_molecules
 
-    def _merge_moleculetypes(self):
+    def _merge_moleculetypes(self, radicals: Optional[list[int]] = None):
         """
         Merge all moleculetypes within which reactions can happen into one moleculetype.
         This also makes multiples explicit.
@@ -712,7 +740,7 @@ class Topology:
 
         # add merged moleculetype to topology
         reactive_moleculetype = MoleculeType(
-            (REACTIVE_MOLECULEYPE, "1"), reactive_atomics
+            (REACTIVE_MOLECULEYPE, "1"), reactive_atomics, radicals
         )
         self.moleculetypes[REACTIVE_MOLECULEYPE] = reactive_moleculetype
         # update topology dict
@@ -756,7 +784,7 @@ class Topology:
                 )
                 continue
             name = header[0]
-            self.moleculetypes[name] = MoleculeType(header, atomics)
+            self.moleculetypes[name] = MoleculeType(header, atomics, radicals="")
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Topology):

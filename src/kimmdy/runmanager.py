@@ -146,13 +146,15 @@ class RunManager:
                 f"'{self.config.changer.topology.parameterization}' can not be found in "
                 f"the parameterization plugins: {list(parameterization_plugins.keys())}"
             ) from e
+
         self.top = Topology(
             top=read_top(self.config.top, self.config.ff),
             parametrizer=parameterizer,
             is_reactive_predicate_f=get_is_reactive_predicate_f(
                 self.config.topology.reactive
             ),
-            residuetypes_path=getattr(self.config,"residuetypes",None),
+            radicals=getattr(self.config, "radicals", None),
+            residuetypes_path=getattr(self.config, "residuetypes", None),
         )
 
         self.filehist: list[dict[str, TaskFiles]] = [
