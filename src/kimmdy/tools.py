@@ -89,7 +89,6 @@ def modify_top(
     parameterize: bool,
     removeH: Optional[list[int]],
     gro_str: Optional[str],
-    gmx_mdrun_flags: str = "",
 ):
     """Modify topology in various ways.
 
@@ -98,27 +97,41 @@ def modify_top(
     top_path
         Path to GROMACS top file
     out_path
-        Output topology file name
+        Output topology file name, stem also used for gro
     parameterize
         Parameterize topology with grappa after removing hydrogen
     removeH
-        Remove one or more hydrogens by atom nrs in the top file
+        Remove one or more hydrogens by atom nrs in the top file.
+        One based.
     gro_path
-        GROMACS gro file; keep compatible with top file
+        GROMACS gro input file. Updates structure when deleting H.
+        Output named like top output.
     """
+
+    top_path = Path(top_str)
+    out_path = top_path.with_stem(out_str).with_suffix(".top")
+    update_map = {}
+    gro_out = None
+
+    if gro_str:
+        if removeH:
+            gro_path = Path(gro_str)
+            gro_out = gro_path.with_stem(out_path.stem)
+            while gro_out.exists():
+                gro_out = gro_out.with_stem(gro_out.stem + "_mod")
+
     print(
         "Changing topology\n"
-        f"top: {top_str}\n"
-        f"output: {out_str}\n"
-        f"parameterize: {parameterize}\n"
-        f"remove hydrogen: {removeH}\n"
-        f"optional gro: {gro_str}\n"
+        f"top: \t\t\t{top_str}\n"
+        f"output: \t\t{out_str}\n"
+        f"parameterize: \t\t{parameterize}\n"
+        f"remove hydrogen: \t{removeH}\n"
+        f"optional gro: \t\t{gro_str}\n"
+        f"gro output: \t\t{gro_out}\n"
     )
 
-    top = Topology(read_top(Path(top_str)))
-    out_path = Path(out_str)
-    update_map = {}
-    
+    top = Topology(read_top(top_path))
+
     # remove hydrogen
     if removeH:
         broken_idxs = []
@@ -133,9 +146,7 @@ def modify_top(
         for broken_idx in sorted(broken_idxs, reverse=True):
             removeH.pop(broken_idx)
 
-        update_map = top.del_atom(
-            [str(nr) for nr in removeH], parameterize=parameterize
-        )
+        top.del_atom([str(nr) for nr in removeH], parameterize=parameterize)
 
     # parameterize with grappa
     if parameterize:
@@ -156,32 +167,17 @@ def modify_top(
     # deal with gro file
     if gro_str:
         if removeH:
-            gro_path = Path(gro_str)
-            with open(gro_str, "r") as f:
+            with open(gro_path, "r") as f:
                 gro_raw = f.readlines()
 
-            if len(gro_raw[3].split()) > 6:
-                print("Detected velocities in gro file.")
-                atom_string = (
-                    "{:>8s}   {:>4s} {:>4s} {:>7s} {:>7s} {:>7s} {:>7s} {:>7s} {:>7s}\n"
-                )
-            else:
-                print("No velocities detected.")
-                atom_string = "{:>8s}   {:>4s} {:>4s} {:>7s} {:>7s} {:>7s}\n"
-
-            gro_out = gro_path.with_stem(out_path.stem)
             with open(gro_out, "w") as f:
                 f.write(gro_raw[0])
                 f.write(f"   {str(int(gro_raw[1])-len(removeH))}\n")
-                for line in gro_raw[2:-1]:
-                    linesplit = line.split()
-                    if val := update_map.get(linesplit[2]):
-                        linesplit[2] = val
-                    else:
+
+                for i, line in enumerate(gro_raw[2:]):
+                    if i + 1 in removeH:
                         continue
-                    f.write(atom_string.format(*linesplit))
-                    # format not exactly as defined by GROMACS but should be good enough
-                f.write(gro_raw[-1])
+                    f.write(line)
         else:
             print(
                 "Gro file supplied but no action requested that requires changes to it."
