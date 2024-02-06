@@ -2,7 +2,6 @@
 Comstants used throughout KIMMDY
 """
 
-
 ATOM_ID_FIELDS = {
     "atoms": [0, 5],  # atomnr, chargegroup
     "bonds": [0, 1],

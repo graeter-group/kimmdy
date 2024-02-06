@@ -4,6 +4,7 @@ The Runmanager is the main entry point of the program.
 It manages the queue of tasks, communicates with the
 rest of the program and keeps track of global state.
 """
+
 from __future__ import annotations
 import logging
 from pathlib import Path

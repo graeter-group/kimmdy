@@ -10,6 +10,7 @@ Reserved keywords:
     - type
     - required
 """
+
 import json
 import importlib.resources as pkg_resources
 import logging
