@@ -109,7 +109,7 @@ def modify_top(
     """
 
     top_path = Path(top_str)
-    out_path = top_path.with_stem(out_str).with_suffix(".top")
+    out_path = top_path.with_name(out_str).with_suffix(".top")
     update_map = {}
     gro_out = None
 
