@@ -139,7 +139,9 @@ def modify_top(
         f"radicals: \t\t{radicals}\n"
     )
 
-    top = Topology(read_top(top_path),radicals = radicals, residuetypes_path= residuetypes_path)
+    top = Topology(
+        read_top(top_path), radicals=radicals, residuetypes_path=residuetypes_path
+    )
 
     # remove hydrogen
     if removeH:
@@ -235,7 +237,7 @@ def get_modify_top_cmdline_args() -> argparse.Namespace:
         "--radicals",
         help="Radicals in the system PRIOR to removing hydrogens with the removeH option.",
         type=str,
-        default='',
+        default="",
     )
     return parser.parse_args()
 
@@ -244,7 +246,15 @@ def entry_point_modify_top():
     """Modify topology file in various ways"""
     args = get_modify_top_cmdline_args()
 
-    modify_top(args.top, args.out, args.parameterize, args.removeH, args.grofile, args.residuetypes, args.radicals)
+    modify_top(
+        args.top,
+        args.out,
+        args.parameterize,
+        args.removeH,
+        args.grofile,
+        args.residuetypes,
+        args.radicals,
+    )
 
 
 # dot graphs
