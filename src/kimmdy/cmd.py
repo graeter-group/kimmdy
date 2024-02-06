@@ -2,6 +2,7 @@
 Functions for starting KIMMDY either from python or the command line.
 Other entry points such as `kimmdy-analysis` also live here.
 """
+
 import argparse
 from os import chmod
 from pathlib import Path

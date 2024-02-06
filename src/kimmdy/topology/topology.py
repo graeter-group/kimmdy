@@ -70,9 +70,9 @@ class MoleculeType:
         self.proper_dihedrals: dict[tuple[str, str, str, str], MultipleDihedrals] = {}
         self.improper_dihedrals: dict[tuple[str, str, str, str], Dihedral] = {}
         self.position_restraints: dict[str, PositionRestraint] = {}
-        self.dihedral_restraints: dict[
-            tuple[str, str, str, str], DihedralRestraint
-        ] = {}
+        self.dihedral_restraints: dict[tuple[str, str, str, str], DihedralRestraint] = (
+            {}
+        )
         self.settles: dict[str, Settle] = {}
         self.exclusions: dict[int, Exclusion] = {}
         self.radicals: dict[str, Atom] = {}
@@ -930,9 +930,9 @@ class Topology:
                 f"Deleting Atom nr {atom.nr}, type {atom.type}, res {atom.residue}"
             )
             # move charge to first neighbor
-            self.atoms[
-                atom.bound_to_nrs[0]
-            ].charge = f"{float(self.atoms[atom.bound_to_nrs[0]].charge) + float(atom.charge):7.4f}"
+            self.atoms[atom.bound_to_nrs[0]].charge = (
+                f"{float(self.atoms[atom.bound_to_nrs[0]].charge) + float(atom.charge):7.4f}"
+            )
 
             # break all bonds and delete all pairs, diheadrals etc
             for bound_nr in copy(atom.bound_to_nrs):

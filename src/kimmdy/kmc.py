@@ -7,6 +7,7 @@ In our system, the reaction rate r = (deterministic) reaction constant k
 because of the fundamental premise of chemical kinetics
 and because we have one reactant molecule
 """
+
 from typing import Optional
 import logging
 import numpy as np
