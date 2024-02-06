@@ -2,6 +2,7 @@
 Functions for starting KIMMDY either from python or the command line.
 Other entry points such as `kimmdy-analysis` also live here.
 """
+
 import argparse
 from os import chmod
 from pathlib import Path
@@ -107,7 +108,7 @@ def get_cmdline_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Welcome to KIMMDY. `kimmdy` runs KIMMDY, further tools "
         "are available as `kimmdy-...` commands. These are `-analysis`, "
-        "`-remove-hydrogen` and `-build-examples`. Access their help with "
+        "`-modify-top` and `-build-examples`. Access their help with "
         "`kimmdy-... -h.`"
     )
     parser.add_argument(

@@ -24,7 +24,7 @@ The prefered method of starting a KIMMDY run is via the command line, though [Py
 This module builds or restores the example directory in the package.
 
 ```{python}
-!kimmdy-remove-hydrogen --help
+!kimmdy-modify-top --help
 ```
 
 ## Examples
