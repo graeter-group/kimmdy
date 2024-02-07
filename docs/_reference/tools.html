@@ -2,12 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.176">
+<meta name="generator" content="quarto-99.9.9">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>KIMMDY – tools</title>
+<title>KIMMDY</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -48,12 +48,13 @@ ul.task-list li input[type="checkbox"] {
   "collapse-after": 3,
   "panel-placement": "end",
   "type": "overlay",
-  "limit": 20,
+  "limit": 50,
   "keyboard-shortcut": [
     "f",
     "/",
     "s"
   ],
+  "show-item-context": false,
   "language": {
     "search-no-results-text": "No results",
     "search-matching-documents-text": "matching documents",
@@ -62,6 +63,7 @@ ul.task-list li input[type="checkbox"] {
     "search-more-match-text": "more match in this document",
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
     "search-detached-cancel-button-title": "Cancel",
     "search-submit-button-title": "Submit",
     "search-label": "Search"
@@ -75,7 +77,7 @@ ul.task-list li input[type="checkbox"] {
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
-    <nav class="navbar navbar-expand-lg navbar-dark ">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a class="navbar-brand" href="../index.html">
@@ -89,24 +91,24 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="../guide/tutorials/getting-started.html" rel="" target="" aria-current="page">
- <span class="menu-text">Getting Started</span></a>
+    <a class="nav-link active" href="../guide/tutorials/getting-started.html" aria-current="page"> 
+<span class="menu-text">Getting Started</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../guide/how-to/index.html" rel="" target="">
- <span class="menu-text">How-To</span></a>
+    <a class="nav-link" href="../guide/how-to/index.html"> 
+<span class="menu-text">How-To</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../guide/tutorials/index.html" rel="" target="">
- <span class="menu-text">Tutorials</span></a>
+    <a class="nav-link" href="../guide/tutorials/index.html"> 
+<span class="menu-text">Tutorials</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../guide/explanation/index.html" rel="" target="">
- <span class="menu-text">Explanations</span></a>
+    <a class="nav-link" href="../guide/explanation/index.html"> 
+<span class="menu-text">Explanations</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../_reference/index.html" rel="" target="">
- <span class="menu-text">Reference</span></a>
+    <a class="nav-link" href="../_reference/index.html"> 
+<span class="menu-text">Reference</span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -137,11 +139,11 @@ ul.task-list li input[type="checkbox"] {
     </nav>
   <nav class="quarto-secondary-nav">
     <div class="container-fluid d-flex">
-      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
         <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../_reference/index.html">Reference</a></li><li class="breadcrumb-item"><a href="../_reference/cmd.html">Python API</a></li><li class="breadcrumb-item"><a href="../_reference/constants.html">Other Modules</a></li><li class="breadcrumb-item"><a href="../_reference/tools.html">tools</a></li></ol></nav>
-        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
   </nav>
@@ -149,7 +151,7 @@ ul.task-list li input[type="checkbox"] {
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
@@ -435,7 +437,7 @@ ul.task-list li input[type="checkbox"] {
     </ul>
     </div>
 </nav>
-<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active" data-toc-expanded="99">
@@ -452,13 +454,13 @@ ul.task-list li input[type="checkbox"] {
   </ul></li>
   <li><a href="#kimmdy.tools.edgelist_to_dot_graph" id="toc-kimmdy.tools.edgelist_to_dot_graph" class="nav-link" data-scroll-target="#kimmdy.tools.edgelist_to_dot_graph">edgelist_to_dot_graph</a></li>
   <li><a href="#kimmdy.tools.entry_point_build_examples" id="toc-kimmdy.tools.entry_point_build_examples" class="nav-link" data-scroll-target="#kimmdy.tools.entry_point_build_examples">entry_point_build_examples</a></li>
-  <li><a href="#kimmdy.tools.entry_point_remove_hydrogen" id="toc-kimmdy.tools.entry_point_remove_hydrogen" class="nav-link" data-scroll-target="#kimmdy.tools.entry_point_remove_hydrogen">entry_point_remove_hydrogen</a></li>
+  <li><a href="#kimmdy.tools.entry_point_modify_top" id="toc-kimmdy.tools.entry_point_modify_top" class="nav-link" data-scroll-target="#kimmdy.tools.entry_point_modify_top">entry_point_modify_top</a></li>
   <li><a href="#kimmdy.tools.get_build_example_cmdline_args" id="toc-kimmdy.tools.get_build_example_cmdline_args" class="nav-link" data-scroll-target="#kimmdy.tools.get_build_example_cmdline_args">get_build_example_cmdline_args</a>
   <ul class="collapse">
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
   </ul></li>
-  <li><a href="#kimmdy.tools.get_remove_hydrogen_cmdline_args" id="toc-kimmdy.tools.get_remove_hydrogen_cmdline_args" class="nav-link" data-scroll-target="#kimmdy.tools.get_remove_hydrogen_cmdline_args">get_remove_hydrogen_cmdline_args</a></li>
-  <li><a href="#kimmdy.tools.remove_hydrogen" id="toc-kimmdy.tools.remove_hydrogen" class="nav-link" data-scroll-target="#kimmdy.tools.remove_hydrogen">remove_hydrogen</a>
+  <li><a href="#kimmdy.tools.get_modify_top_cmdline_args" id="toc-kimmdy.tools.get_modify_top_cmdline_args" class="nav-link" data-scroll-target="#kimmdy.tools.get_modify_top_cmdline_args">get_modify_top_cmdline_args</a></li>
+  <li><a href="#kimmdy.tools.modify_top" id="toc-kimmdy.tools.modify_top" class="nav-link" data-scroll-target="#kimmdy.tools.modify_top">modify_top</a>
   <ul class="collapse">
   <li><a href="#parameters-1" id="toc-parameters-1" class="nav-link" data-scroll-target="#parameters-1">Parameters</a></li>
   </ul></li>
@@ -468,10 +470,11 @@ ul.task-list li input[type="checkbox"] {
   </ul></li>
   </ul></li>
   </ul>
-<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hits-mbm-dev/kimmdy/edit/main/_reference/tools.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/hits-mbm-dev/kimmdy/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/hits-mbm-dev/kimmdy/edit/main/_reference/tools.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/hits-mbm-dev/kimmdy/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
+
 
 
 
@@ -502,20 +505,20 @@ ul.task-list li input[type="checkbox"] {
 <td>Build examples from the command line.</td>
 </tr>
 <tr class="even">
-<td><a href="#kimmdy.tools.entry_point_remove_hydrogen">entry_point_remove_hydrogen</a></td>
-<td>Remove hydrogen by atom nr in a gro and topology file</td>
+<td><a href="#kimmdy.tools.entry_point_modify_top">entry_point_modify_top</a></td>
+<td>Modify topology file in various ways</td>
 </tr>
 <tr class="odd">
 <td><a href="#kimmdy.tools.get_build_example_cmdline_args">get_build_example_cmdline_args</a></td>
 <td>Parse command line arguments.</td>
 </tr>
 <tr class="even">
-<td><a href="#kimmdy.tools.get_remove_hydrogen_cmdline_args">get_remove_hydrogen_cmdline_args</a></td>
-<td>parse cmdline args for remove_hydrogen</td>
+<td><a href="#kimmdy.tools.get_modify_top_cmdline_args">get_modify_top_cmdline_args</a></td>
+<td>parse cmdline args for modify_top</td>
 </tr>
 <tr class="odd">
-<td><a href="#kimmdy.tools.remove_hydrogen">remove_hydrogen</a></td>
-<td>Remove one hydrogen from a gro and top file to create a radical.</td>
+<td><a href="#kimmdy.tools.modify_top">modify_top</a></td>
+<td>Modify topology in various ways.</td>
 </tr>
 <tr class="even">
 <td><a href="#kimmdy.tools.top_to_graph">top_to_graph</a></td>
@@ -567,10 +570,10 @@ ul.task-list li input[type="checkbox"] {
 <p><code>tools.entry_point_build_examples()</code></p>
 <p>Build examples from the command line.</p>
 </section>
-<section id="kimmdy.tools.entry_point_remove_hydrogen" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.tools.entry_point_remove_hydrogen">entry_point_remove_hydrogen</h3>
-<p><code>tools.entry_point_remove_hydrogen()</code></p>
-<p>Remove hydrogen by atom nr in a gro and topology file</p>
+<section id="kimmdy.tools.entry_point_modify_top" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.tools.entry_point_modify_top">entry_point_modify_top</h3>
+<p><code>tools.entry_point_modify_top()</code></p>
+<p>Modify topology file in various ways</p>
 </section>
 <section id="kimmdy.tools.get_build_example_cmdline_args" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.tools.get_build_example_cmdline_args">get_build_example_cmdline_args</h3>
@@ -594,15 +597,15 @@ ul.task-list li input[type="checkbox"] {
 </table>
 </section>
 </section>
-<section id="kimmdy.tools.get_remove_hydrogen_cmdline_args" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.tools.get_remove_hydrogen_cmdline_args">get_remove_hydrogen_cmdline_args</h3>
-<p><code>tools.get_remove_hydrogen_cmdline_args()</code></p>
-<p>parse cmdline args for remove_hydrogen</p>
+<section id="kimmdy.tools.get_modify_top_cmdline_args" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.tools.get_modify_top_cmdline_args">get_modify_top_cmdline_args</h3>
+<p><code>tools.get_modify_top_cmdline_args()</code></p>
+<p>parse cmdline args for modify_top</p>
 </section>
-<section id="kimmdy.tools.remove_hydrogen" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.tools.remove_hydrogen">remove_hydrogen</h3>
-<p><code>tools.remove_hydrogen(gro, top, nr, parameterize, equilibrate, gmx_mdrun_flags='')</code></p>
-<p>Remove one hydrogen from a gro and top file to create a radical.</p>
+<section id="kimmdy.tools.modify_top" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.tools.modify_top">modify_top</h3>
+<p><code>tools.modify_top(top_str, out_str, parameterize, removeH, gro_str, residuetypes, radicals)</code></p>
+<p>Modify topology in various ways.</p>
 <section id="parameters-1" class="level4">
 <h4 class="anchored" data-anchor-id="parameters-1">Parameters</h4>
 <table class="table">
@@ -616,33 +619,45 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>gro</code></td>
-<td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
-<td>Path to GROMACS gro file</td>
-<td><em>required</em></td>
-</tr>
-<tr class="even">
-<td><code>top</code></td>
-<td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
+<td><code>top_path</code></td>
+<td></td>
 <td>Path to GROMACS top file</td>
 <td><em>required</em></td>
 </tr>
+<tr class="even">
+<td><code>out_path</code></td>
+<td></td>
+<td>Output topology file name, stem also used for gro</td>
+<td><em>required</em></td>
+</tr>
 <tr class="odd">
-<td><code>nr</code></td>
-<td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
-<td>Atom number as indicated in the GROMACS gro and top file</td>
+<td><code>parameterize</code></td>
+<td><a href="https://docs.python.org/3.10/library/functions.html#bool">bool</a></td>
+<td>Parameterize topology with grappa after removing hydrogen</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
-<td><code>parameterize</code></td>
-<td><a href="https://docs.python.org/3.10/library/functions.html#bool">bool</a></td>
-<td>Parameterize topology with grappa after removing hydrogen.</td>
+<td><code>removeH</code></td>
+<td><a href="https://docs.python.org/3.10/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#list">list</a>[<a href="https://docs.python.org/3.10/library/functions.html#int">int</a>]]</td>
+<td>Remove one or more hydrogens by atom nrs in the top file. One based.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="odd">
-<td><code>equilibrate</code></td>
-<td><a href="https://docs.python.org/3.10/library/functions.html#bool">bool</a></td>
-<td>Do a minimization and equilibration with GROMACS. Uses mdp files from kimmdy assets.</td>
+<td><code>gro_path</code></td>
+<td></td>
+<td>GROMACS gro input file. Updates structure when deleting H. Output named like top output.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td><code>residuetypes</code></td>
+<td><a href="https://docs.python.org/3.10/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>]</td>
+<td>GROMACS style residuetypes file. Necessary for parameterization with non-amber atom types.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td><code>radicals</code></td>
+<td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
+<td>Radicals in the system PRIOR to removing hydrogens with the removeH option.</td>
 <td><em>required</em></td>
 </tr>
 </tbody>
@@ -934,18 +949,49 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
   const xrefs = window.document.querySelectorAll('a.quarto-xref');
   const processXRef = (id, note) => {
-    if (id.startsWith('sec-')) {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
       // Special case sections, only their first couple elements
       const container = document.createElement("div");
       if (note.children && note.children.length > 2) {
-        for (let i = 0; i < 2; i++) {
-          container.appendChild(note.children[i].cloneNode(true));
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
         }
         return container.innerHTML
       } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
         return note.innerHTML;
       }
     } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
       return note.innerHTML;
     }
   }
@@ -955,27 +1001,56 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       instance.disable();
       let url = xref.getAttribute('href');
       let hash = undefined; 
-      try { hash = new URL(url).hash; } catch {}
-      const id = hash.replace(/^#\/?/, "");
-      const note = window.document.getElementById(id);
-      if (note !== null) {
-        try {
-          const html = processXRef(id, note);
-          instance.setContent(html);
-        } finally {
-          instance.enable();
-          instance.show();
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
         }
       } else {
-        // See if we can fetch this
-        fetch(url.split('#')[0])
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
         .then(res => res.text())
         .then(html => {
           const parser = new DOMParser();
           const htmlDoc = parser.parseFromString(html, "text/html");
-          const note = htmlDoc.getElementById(id);
+          const note = htmlDoc.querySelector('main.content');
           if (note !== null) {
-            const html = processXRef(id, note);
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
             instance.setContent(html);
           } 
         }).finally(() => {
@@ -1053,6 +1128,32 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         });
         selectedAnnoteEl = undefined;
       };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
       // Attach click handler to the DT
       const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
       for (const annoteDlNode of annoteDls) {
@@ -1114,7 +1215,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../_reference/utils.html" class="pagination-link">
+      <a href="../_reference/utils.html" class="pagination-link  aria-label=" utils"="">
         <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">utils</span>
       </a>          
   </div>
@@ -1126,4 +1227,4 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 
 
 
-</body></html>
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/hits-mbm-dev/kimmdy/edit/main/_reference/tools.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/hits-mbm-dev/kimmdy/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>
