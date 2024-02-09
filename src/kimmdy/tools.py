@@ -85,7 +85,7 @@ def entry_point_build_examples():
 
 
 def modify_top(
-    top: str,
+    topology: str,
     out: str,
     parameterize: bool,
     removeH: Optional[list[int]],
@@ -95,7 +95,7 @@ def modify_top(
 
     Parameters
     ----------
-    top
+    topology
         Path to GROMACS top file
     out
         Output topology file path, stem also used for gro.
@@ -110,8 +110,8 @@ def modify_top(
         Output named like top output.
     """
 
-    top_path = Path(top).with_suffix(".top").resolve()
-    assert top_path.exists(), f"Error finding gro {top_path}"
+    top_path = Path(topology).with_suffix(".top").resolve()
+    assert top_path.exists(), f"Error finding top {top_path}"
 
     out_path = Path(out)
     if not out_path.is_absolute():
@@ -141,7 +141,7 @@ def modify_top(
     )
 
     print("Reading topology..", end="")
-    topol = Topology(read_top(top_path))
+    top = Topology(read_top(top_path))
     print("Done")
 
     # remove hydrogen
@@ -154,7 +154,7 @@ def modify_top(
         broken_idxs = []
         # check for input validity
         for i, nr in enumerate(removeH):
-            if not (atom_type := topol.atoms[str(nr)].type).startswith("H"):
+            if not (atom_type := top.atoms[str(nr)].type).startswith("H"):
                 print(
                     f"Wrong atom type {atom_type} with nr {nr} for remove hydrogen, should start with 'H'."
                 )
@@ -163,7 +163,7 @@ def modify_top(
         for broken_idx in sorted(broken_idxs, reverse=True):
             removeH.pop(broken_idx)
 
-        update_map = topol.del_atom(
+        update_map = top.del_atom(
             [str(nr) for nr in removeH], parameterize=parameterize
         )
         with open(json_out, "w") as f:
@@ -183,11 +183,11 @@ def modify_top(
                 "No grappa in parameterization plugins. Can't continue to parameterize molecule"
             )
         # require parameterization when writing topology to dict
-        topol.needs_parameterization = True
+        top.needs_parameterization = True
 
     # write top file
     print("Writing top..", end="")
-    write_top(topol.to_dict(), out_path)
+    write_top(top.to_dict(), out_path)
     print("Done")
 
     # deal with gro file
@@ -254,7 +254,7 @@ def entry_point_modify_top():
     """Modify topology file in various ways"""
     args = get_modify_top_cmdline_args()
 
-    modify_top(args.top, args.out, args.parameterize, args.removeH, args.grofile)
+    modify_top(args.top, args.out, args.parameterize, args.removeH, args.gro)
 
 
 # dot graphs
