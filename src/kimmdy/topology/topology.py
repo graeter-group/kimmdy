@@ -868,12 +868,12 @@ class Topology:
                     )
                     if len(fragment2) in (0, 1):
                         # intra-residue HAT case (or similar)
-                        if atom1.type.startswith("H"):
+                        if atom1.type.upper().startswith("H"):
                             atom2.charge = (
                                 f"{float(atom2.charge) + float(atom1.charge):7.4f}"
                             )
                             atom1.charge = "0.0"
-                        elif atom2.type.startswith("H"):
+                        elif atom2.type.upper().startswith("H"):
                             atom1.charge = (
                                 f"{float(atom1.charge) + float(atom2.charge):7.4f}"
                             )
@@ -1168,7 +1168,7 @@ class Topology:
         # to make them adopt the correct residuetype and atomtype
         # when bound to a new heavy atom
         for i, atom in enumerate(atompair):
-            if atom.type.startswith("H"):
+            if atom.type.upper().startswith("H"):
                 other_i = abs(i - 1)
                 other_atom = atompair[other_i]
                 other_res = other_atom.residue
@@ -1188,7 +1188,9 @@ class Topology:
                 ]
                 type_set = False
                 for key, bond in aa.bonds.items():
-                    if other_atom.atom in key and any(k.startswith("H") for k in key):
+                    if other_atom.atom in key and any(
+                        k.upper().startswith("H") for k in key
+                    ):
                         if key[0] == other_atom.atom:
                             h_name = bond.atom2
                         else:
