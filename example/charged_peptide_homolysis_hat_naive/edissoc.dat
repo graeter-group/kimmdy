@@ -6,6 +6,10 @@
 ; BDEs within the pyridine core  were not calculated but only set to a large value (500 kj/mol),
 ; as they are not expected to rupture.
 
+; The comments are used to assign the following dissociation energies to a residue.
+; The format provided by GROMACS does not allow for this in a fixed format 
+; but KIMMDY can read the comments for the assignment.
+
 ;;; for GROMACS (averaged or standard values)
 ;;; this should be before the KIMMDY section because GROMACS parses from the top of the file
 ; gmx
@@ -19,8 +23,8 @@ CD  CE  400
 CE  NZ  400
 
 ;;; for KIMMDY (per residue definition of edissoc for bonds based on atom names)
-; averages
-C   N   500 ;    Is not expected to break due to partial  double bond character
+; general
+C   N   500 ; Is not expected to break due to partial  double bond character
 CA  C   341 ; float average of Ala, Gly and Pro
 CA  N   379 ; float average of Ala and Gly
 ; GLY
