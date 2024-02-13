@@ -195,9 +195,8 @@ def test_plumed_write_identity(arranged_tmp_path):
 
 def test_edissoc_read(arranged_tmp_path):
     edissoc_dict = parsing.read_edissoc(Path("edissoc.dat"))
-
     assert len(edissoc_dict.keys()) == 14
     for k, v in edissoc_dict.items():
         for kv, vv in v.items():
-            assert isinstance(kv, tuple)
+            assert isinstance(kv, frozenset)
             assert isinstance(vv, float)

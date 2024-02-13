@@ -141,7 +141,9 @@ def get_bondprm_from_atomtypes(
     return b0, kb
 
 
-def get_edissoc_from_atomnames(atomnames: list[str], edissoc: dict) -> float:
+def get_edissoc_from_atomnames(
+    atomnames: list[str], edissoc: dict, residue: str = "_"
+) -> float:
     """Returns dissociation energy E_dissoc for a set of two atomnames.
 
     Parameters
@@ -150,23 +152,30 @@ def get_edissoc_from_atomnames(atomnames: list[str], edissoc: dict) -> float:
         Two atomnames as defined in the respective force field
     edissoc:
         Parsed file with dissociation energies per bond between two atomtypes or elements
+    residue:
+        Residue for which the atomnames are defined
     """
-    # dissociation energy can be for bonds between atomtypes or elements or mixtures of both
-    atomelements = [x[0] for x in atomnames]
-    for comb in [
-        atomnames,
-        [atomnames[0], atomelements[1]],
-        [atomelements[0], atomnames[1]],
-        atomelements,
-    ]:
-        if E_dis := edissoc.get(tuple(comb)):
-            break
-        elif E_dis := edissoc.get(tuple(comb[::-1])):
-            break
-    else:
-        raise KeyError(
-            f"Did not find dissociation energy for atomtypes {atomnames} in edissoc file"
+    if residue not in edissoc.keys():
+        if (residue := "general") in edissoc.keys():
+            logger.debug(
+                f"residue not in edissoc keys: {edissoc.keys()}, using 'general' as residue."
+            )
+        else:
+            raise KeyError(f"Did not find residue {residue} in edissoc file")
+
+    try:
+        E_dis = edissoc[residue][frozenset(atomnames)]
+    except KeyError as e:
+        # continue with guessed edissoc
+        logger.warning(
+            f"Did not find dissociation energy for atomtypes {atomnames}, residue {residue} in edissoc file, using standard value of 400.0"
         )
+        E_dis = 400.0
+        # # raise Error
+        # raise KeyError(
+        #     f"Did not find dissociation energy for atomtypes {atomnames}, residue {residue} in edissoc file"
+        # ) from e
+
     return E_dis
 
 

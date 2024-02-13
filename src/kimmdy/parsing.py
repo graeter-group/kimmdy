@@ -557,7 +557,7 @@ def read_edissoc(path: Path) -> dict:
     """Reads a edissoc file and turns it into a dict.
 
     The dissociation energy is assigned per pair of atom names. Atom names are unique to a residue, and the dict is nested by residues.
-    The tuple of bond atoms make up the key, the dissociation energy E_dissoc [kJ mol-1] is the value.
+    The set of bond atoms make up the key, the dissociation energy E_dissoc [kJ mol-1] is the value.
 
 
     Parameters
@@ -566,16 +566,17 @@ def read_edissoc(path: Path) -> dict:
         Path to the file. E.g. Path("edissoc.dat")
     """
     with open(path, "r") as f:
-        edissocs = {"_": {}}
+        key = "_"
+        edissocs = {key: {}}
         for l in f:
             if l.startswith(";"):
                 continue
             elif l.strip().startswith("[") and l.strip().endswith("]"):
                 key = l.strip().strip("[]")
                 edissocs[key] = {}
-            elif len(l.split()) == 3:
+            elif len(l.split(sep=";")[0].split()) == 3:
                 at1, at2, edissoc, *_ = l.split()
-                edissocs[key][tuple([at1, at2])] = float(edissoc)
+                edissocs[key][frozenset([at1, at2])] = float(edissoc)
             else:
                 logger.debug(f"Unexpected line in edissoc file: {l}")
     return edissocs
