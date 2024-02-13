@@ -566,12 +566,12 @@ def read_edissoc(path: Path) -> dict:
         Path to the file. E.g. Path("edissoc.dat")
     """
     with open(path, "r") as f:
-        edissocs = {'_':{}}
+        edissocs = {"_": {}}
         for l in f:
             if l.startswith(";"):
                 continue
-            elif l.strip().startswith('[') and l.strip().endswith(']'):
-                key = l.strip().strip('[]')
+            elif l.strip().startswith("[") and l.strip().endswith("]"):
+                key = l.strip().strip("[]")
                 edissocs[key] = {}
             elif len(l.split()) == 3:
                 at1, at2, edissoc, *_ = l.split()
