@@ -6,13 +6,13 @@
 ; BDEs within the pyridine core  were not calculated but only set to a large value (500 kj/mol),
 ; as they are not expected to rupture.
 
-; The comments are used to assign the following dissociation energies to a residue.
-; The format provided by GROMACS does not allow for this in a fixed format 
-; but KIMMDY can read the comments for the assignment.
+; The bracketed lines are used to assign the following dissociation energies to a residue.
+; GROMACS treats all lines with three space separated words as dissociation energies and other lines are ignored.
+; e.g. '[gmx]' will be ignored but '[ gmx ]' results in an error.
 
 ;;; for GROMACS (averaged or standard values)
 ;;; this should be before the KIMMDY section because GROMACS parses from the top of the file
-; gmx
+[gmx]
 C   N   500 
 CA  C   341 
 CA  N   379 
@@ -23,7 +23,7 @@ CD  CE  400
 CE  NZ  400
 
 ;;; for KIMMDY (per residue definition of edissoc for bonds based on atom names)
-; general
+[general] 
 C   N   500 ; Is not expected to break due to partial  double bond character
 CA  C   341 ; float average of Ala, Gly and Pro
 CA  N   379 ; float average of Ala and Gly
@@ -38,7 +38,7 @@ CA  C   337
 
 ;; Crosslinks
 ;; PYD
-; LYX
+[LYX]
 CA  CB  306
 CB  CG  371
 CG  CD  354
@@ -50,16 +50,16 @@ C12  C11    500
 C11  C10    500
 C13  C14    500
 C13  C12    500
-; LY3
+[LY3]
 CA  CB  313
 CB  CG  344
 CG  C13 456
-; LY2
+[LY2]
 CA  CB  282 ; use 220 if deprotonated and 282 otherwise
 CB  C12 480
 
 ;; DPD
-; LXX
+[LXX]
 CA  CB  306 ; taken from PYD
 CB  CG  371 ; taken from PYD
 CG  CD  370 ; taken from PYD CD CE
@@ -71,22 +71,22 @@ C12  C11   500
 C11  C10   500
 C13  C14   500
 C13  C12   500
-; LX3
+[LX3]
 CA  CB  313 ; taken from PYD
 CB  CG  344 ; taken from PYD
 CG  C13 456 ; taken from PYD
-; LX2
+[LX2]
 CA  CB  282
 CB  C12 481
 
 ;; HLKNL
-;L5Y
+[L5Y]
 CA  CB  313
 CB  CG  341
 CG  CD  341
 CD  CE  296
 CE  NZ  303
-;L4Y
+[L4Y]
 CA  CB  312
 CB  CG  376
 CG  CD  355

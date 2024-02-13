@@ -556,7 +556,9 @@ def read_json(path: Union[str, Path]) -> dict:
 def read_edissoc(path: Path) -> dict:
     """Reads a edissoc file and turns it into a dict.
 
+    The dissociation energy is assigned per pair of atom names. Atom names are unique to a residue, and the dict is nested by residues.
     The tuple of bond atoms make up the key, the dissociation energy E_dissoc [kJ mol-1] is the value.
+
 
     Parameters
     ----------
