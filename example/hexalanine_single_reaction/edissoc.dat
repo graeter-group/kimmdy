@@ -27,13 +27,13 @@ CE  NZ  400
 C   N   500 ; Is not expected to break due to partial  double bond character
 CA  C   341 ; float average of Ala, Gly and Pro
 CA  N   379 ; float average of Ala and Gly
-; GLY
+[GLY]
 CA  C   341
 CA  N   382
-; ALA
+[ALA]
 CA  C   344
 CA  N   376
-; PRO
+[PRO]
 CA  C   337
 
 ;; Crosslinks

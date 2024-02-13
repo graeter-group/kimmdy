@@ -566,10 +566,16 @@ def read_edissoc(path: Path) -> dict:
         Path to the file. E.g. Path("edissoc.dat")
     """
     with open(path, "r") as f:
-        edissocs = {}
+        edissocs = {'_':{}}
         for l in f:
-            if l.startswith(";") or len(l.split()) < 3:
+            if l.startswith(";"):
                 continue
-            at1, at2, edissoc, *_ = l.split()
-            edissocs[tuple([at1, at2])] = float(edissoc)
+            elif l.strip().startswith('[') and l.strip().endswith(']'):
+                key = l.strip().strip('[]')
+                edissocs[key] = {}
+            elif len(l.split()) == 3:
+                at1, at2, edissoc, *_ = l.split()
+                edissocs[key][tuple([at1, at2])] = float(edissoc)
+            else:
+                logger.debug(f"Unexpected line in edissoc file: {l}")
     return edissocs

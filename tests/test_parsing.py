@@ -191,3 +191,12 @@ def test_plumed_write_identity(arranged_tmp_path):
 ## test json parsing
 
 ## test misc file parsing
+    
+def test_edissoc_read(arranged_tmp_path):
+    edissoc_dict = parsing.read_edissoc(Path("edissoc.dat"))
+    
+    assert len(edissoc_dict.keys()) == 14
+    for k,v in edissoc_dict.items():
+        for kv,vv in v.items():
+            assert isinstance(kv,tuple)
+            assert isinstance(vv,float)
