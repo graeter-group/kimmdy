@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.1.0](https://github.com/hits-mbm-dev/kimmdy/compare/v6.0.1...v6.1.0) (2024-02-14)
+
+
+### Features
+
+* modify_top saves mapping of old and new indices ([#364](https://github.com/hits-mbm-dev/kimmdy/issues/364)) ([0086bbe](https://github.com/hits-mbm-dev/kimmdy/commit/0086bbe2ff7cab9e900ea879da293f7b1f02757c))
+
 ## [6.0.1](https://github.com/hits-mbm-dev/kimmdy/compare/v6.0.0...v6.0.1) (2024-01-03)
 
 
