@@ -130,10 +130,12 @@ def modify_top(
         f"gro output: \t\t{gro_out}\n"
     )
 
+    print("--Reading Topology--")
     top = Topology(read_top(top_path))
 
     # remove hydrogen
     if removeH:
+        print("--Removing Hydrogen--")
         broken_idxs = []
         # check for input validity
         for i, nr in enumerate(removeH):
@@ -150,6 +152,7 @@ def modify_top(
 
     # parameterize with grappa
     if parameterize:
+        print("--Parameterizing")
         # load grappa
         discover_plugins()
         if "grappa" in parameterization_plugins.keys():
@@ -167,6 +170,7 @@ def modify_top(
     # deal with gro file
     if gro_str:
         if removeH:
+            print("--Removing Hydrogen in GRO File--")
             with open(gro_path, "r") as f:
                 gro_raw = f.readlines()
 

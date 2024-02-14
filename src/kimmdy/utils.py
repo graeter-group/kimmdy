@@ -156,10 +156,11 @@ def get_edissoc_from_atomnames(
         Residue for which the atomnames are defined
     """
     if residue not in edissoc.keys():
-        if (residue := "general") in edissoc.keys():
+        if "general" in edissoc.keys():
             logger.debug(
-                f"residue not in edissoc keys: {edissoc.keys()}, using 'general' as residue."
+                f"residue {residue} not in edissoc keys: {edissoc.keys()}, using 'general' as residue."
             )
+            residue = "general"
         else:
             raise KeyError(f"Did not find residue {residue} in edissoc file")
 
