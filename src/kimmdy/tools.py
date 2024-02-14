@@ -113,9 +113,9 @@ def modify_top(
     top_path = Path(topology).with_suffix(".top").resolve()
     assert top_path.exists(), f"Error finding top {top_path}"
 
-    out_path = Path(out)
+    out_path = Path(out).with_suffix(".top")
     if not out_path.is_absolute():
-        out_path = out_path.resolve().with_suffix(".top")
+        out_path = out_path.resolve()
 
     update_map = {}
     gro_path = None
@@ -174,7 +174,7 @@ def modify_top(
     # parameterize with grappa
     if parameterize:
         # load grappa
-        print("Parametrizing, ", end="")
+        print("Loading Plugins..", end="")
         discover_plugins()
         if "grappa" in parameterization_plugins.keys():
             top.parametrizer = parameterization_plugins["grappa"]()
@@ -184,6 +184,7 @@ def modify_top(
             )
         # require parameterization when writing topology to dict
         top.needs_parameterization = True
+        print("Done")
 
     # write top file
     print("Writing top..", end="")
