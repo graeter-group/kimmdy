@@ -605,7 +605,7 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="kimmdy.recipe.BondOperation" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.recipe.BondOperation">BondOperation</h3>
-<p><code>recipe.BondOperation(atom_ix_1, atom_ix_2, atom_id_1, atom_id_2, _atom_ix_1=field(init=False, repr=False, default=None), _atom_ix_2=field(init=False, repr=False, default=None))</code></p>
+<p><code>recipe.BondOperation(_atom_ix_1=field(init=False, repr=False, default=None), _atom_ix_2=field(init=False, repr=False, default=None))</code></p>
 <p>Handle a bond operation on the recipe step.</p>
 <p>This class takes in either zero-based indices or one-base IDs for two atoms</p>
 <section id="parameters-1" class="level4">
@@ -741,7 +741,7 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="kimmdy.recipe.Place" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.recipe.Place">Place</h3>
-<p><code>recipe.Place(new_coords, ix_to_place, id_to_place, _ix_to_place=field(init=False, repr=False, default=None))</code></p>
+<p><code>recipe.Place(new_coords, _ix_to_place=field(init=False, repr=False, default=None))</code></p>
 <p>Change topology and/or coordinates to place an atom.</p>
 <section id="parameters-4" class="level4">
 <h4 class="anchored" data-anchor-id="parameters-4">Parameters</h4>

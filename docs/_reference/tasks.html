@@ -486,11 +486,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#kimmdy.tasks.AutoFillDict" id="toc-kimmdy.tasks.AutoFillDict" class="nav-link" data-scroll-target="#kimmdy.tasks.AutoFillDict">AutoFillDict</a></li>
   <li><a href="#kimmdy.tasks.Task" id="toc-kimmdy.tasks.Task" class="nav-link" data-scroll-target="#kimmdy.tasks.Task">Task</a>
   <ul class="collapse">
-  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters:</a></li>
+  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
   </ul></li>
   <li><a href="#kimmdy.tasks.TaskFiles" id="toc-kimmdy.tasks.TaskFiles" class="nav-link" data-scroll-target="#kimmdy.tasks.TaskFiles">TaskFiles</a>
   <ul class="collapse">
-  <li><a href="#atributes" id="toc-atributes" class="nav-link" data-scroll-target="#atributes">Atributes</a></li>
+  <li><a href="#attributes" id="toc-attributes" class="nav-link" data-scroll-target="#attributes">Attributes</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul></li>
   </ul></li>
@@ -547,8 +547,43 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>A task to be performed as as a step in the RunManager.</p>
 <p>A task consists of a function and its keyword arguments. Calling a taks calls the stored function. The function must return a TaskFiles object.</p>
 <section id="parameters" class="level4">
-<h4 class="anchored" data-anchor-id="parameters">Parameters:</h4>
-<p>runmng Runmanager instance from which the task is called f Function that will be called when the task is called kwargs kwargs to be passed to f out If not None, an output dir will be created with this name</p>
+<h4 class="anchored" data-anchor-id="parameters">Parameters</h4>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>runmng</code></td>
+<td></td>
+<td>Runmanager instance from which the task is called</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td><code>f</code></td>
+<td><a href="https://docs.python.org/3.10/library/typing.html#typing.Callable">Callable</a>[…, <a href="https://docs.python.org/3.10/library/typing.html#typing.Optional">Optional</a>[<a href="../_reference/tasks.html#kimmdy.tasks.TaskFiles">TaskFiles</a>]]</td>
+<td>Function that will be called when the task is called</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td><code>kwargs</code></td>
+<td><a href="https://docs.python.org/3.10/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#dict">dict</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>, <a href="https://docs.python.org/3.10/library/typing.html#typing.Any">Any</a>]]</td>
+<td>kwargs to be passed to f</td>
+<td><code>None</code></td>
+</tr>
+<tr class="even">
+<td><code>out</code></td>
+<td><a href="https://docs.python.org/3.10/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>]</td>
+<td>If not None, an output dir will be created with this name</td>
+<td><code>None</code></td>
+</tr>
+</tbody>
+</table>
 </section>
 </section>
 <section id="kimmdy.tasks.TaskFiles" class="level3">
@@ -556,9 +591,44 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><code>tasks.TaskFiles(get_latest, input=field(default_factory=dict), output=field(default_factory=dict), outputdir=Path(), logger=logging.getLogger('kimmdy.basetask'))</code></p>
 <p>Class for Task input and output files and directories.</p>
 <p>Hosts the input and output file paths belonging to a task. A function or method that wants to be callable as a Task has to return a TaskFiles object. The input defaultdict is populated on the fly using get_latest of the runmanager to find newest files. Files which can not be found by get_latest must be added manually.</p>
-<section id="atributes" class="level4">
-<h4 class="anchored" data-anchor-id="atributes">Atributes</h4>
-<p>get_latest: Runmanager.get_latest function that returns paths to the latest file of given type. input: Input file paths for a Task. Is populated by get_latest or manually. output: Output file paths for a Task. Is populated by runmanager._discover_output_files or manually. outputdir: Output directory for a Task. Typically populated by create_task_directory called by Task. logger: Logger for a Task. Initialized in create_task_directory.</p>
+<section id="attributes" class="level4">
+<h4 class="anchored" data-anchor-id="attributes">Attributes</h4>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>get_latest</td>
+<td><a href="https://docs.python.org/3.10/library/typing.html#typing.Callable">Callable</a></td>
+<td>Runmanager.get_latest function that returns paths to the latest file of given type.</td>
+</tr>
+<tr class="even">
+<td>input</td>
+<td><a href="https://docs.python.org/3.10/library/stdtypes.html#dict">dict</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>, <a href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path">Path</a>]</td>
+<td>Input file paths for a Task. Is populated by get_latest or manually.</td>
+</tr>
+<tr class="odd">
+<td>output</td>
+<td><a href="https://docs.python.org/3.10/library/stdtypes.html#dict">dict</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>, <a href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path">Path</a>]</td>
+<td>Output file paths for a Task. Is populated by runmanager._discover_output_files or manually.</td>
+</tr>
+<tr class="even">
+<td>outputdir</td>
+<td><a href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path">Path</a></td>
+<td>Output directory for a Task. Typically populated by create_task_directory called by Task.</td>
+</tr>
+<tr class="odd">
+<td>logger</td>
+<td><a href="https://docs.python.org/3.10/library/logging.html#module-logging">logging</a>.<a href="https://docs.python.org/3.10/library/logging.html#logging.Logger">Logger</a></td>
+<td>Logger for a Task. Initialized in create_task_directory.</td>
+</tr>
+</tbody>
+</table>
 </section>
 <section id="examples" class="level4">
 <h4 class="anchored" data-anchor-id="examples">Examples</h4>

@@ -37,7 +37,6 @@ One moleculetype in the topology
 | --- | --- |
 | [find_radicals](#kimmdy.topology.topology.MoleculeType.find_radicals) | Find atoms that are radicals and update self.radicals. |
 | [reindex_atomnrs](#kimmdy.topology.topology.MoleculeType.reindex_atomnrs) | Reindex atom numbers in topology. |
-| [set_atom_is_radical](#kimmdy.topology.topology.MoleculeType.set_atom_is_radical) | Set radical status per atom and in topology based on self.radicals. |
 
 ##### find_radicals { #kimmdy.topology.topology.MoleculeType.find_radicals }
 
@@ -57,12 +56,6 @@ Reindex atom numbers in topology.
 Starts at index 1.
 This also updates the numbers for bonds, angles, dihedrals and pairs.
 Returns a dict, mapping of old atom number strings to new ones
-
-##### set_atom_is_radical { #kimmdy.topology.topology.MoleculeType.set_atom_is_radical }
-
-`topology.topology.MoleculeType.set_atom_is_radical()`
-
-Set radical status per atom and in topology based on self.radicals.
 
 ### Topology { #kimmdy.topology.topology.Topology }
 

@@ -504,23 +504,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#kimmdy.parsing.read_top" id="toc-kimmdy.parsing.read_top" class="nav-link" data-scroll-target="#kimmdy.parsing.read_top">read_top</a>
   <ul class="collapse">
   <li><a href="#parameters-2" id="toc-parameters-2" class="nav-link" data-scroll-target="#parameters-2">Parameters</a></li>
-  <li><a href="#assumptions-and-limitation" id="toc-assumptions-and-limitation" class="nav-link" data-scroll-target="#assumptions-and-limitation">Assumptions And Limitation</a></li>
   <li><a href="#returns-1" id="toc-returns-1" class="nav-link" data-scroll-target="#returns-1">Returns</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul></li>
   <li><a href="#kimmdy.parsing.resolve_includes" id="toc-kimmdy.parsing.resolve_includes" class="nav-link" data-scroll-target="#kimmdy.parsing.resolve_includes">resolve_includes</a>
   <ul class="collapse">
-  <li><a href="#arguments" id="toc-arguments" class="nav-link" data-scroll-target="#arguments">Arguments</a></li>
+  <li><a href="#parameters-3" id="toc-parameters-3" class="nav-link" data-scroll-target="#parameters-3">Parameters</a></li>
   <li><a href="#returns-2" id="toc-returns-2" class="nav-link" data-scroll-target="#returns-2">Returns</a></li>
   </ul></li>
   <li><a href="#kimmdy.parsing.write_json" id="toc-kimmdy.parsing.write_json" class="nav-link" data-scroll-target="#kimmdy.parsing.write_json">write_json</a></li>
   <li><a href="#kimmdy.parsing.write_plumed" id="toc-kimmdy.parsing.write_plumed" class="nav-link" data-scroll-target="#kimmdy.parsing.write_plumed">write_plumed</a>
   <ul class="collapse">
-  <li><a href="#parameters-3" id="toc-parameters-3" class="nav-link" data-scroll-target="#parameters-3">Parameters</a></li>
+  <li><a href="#parameters-4" id="toc-parameters-4" class="nav-link" data-scroll-target="#parameters-4">Parameters</a></li>
   </ul></li>
   <li><a href="#kimmdy.parsing.write_top" id="toc-kimmdy.parsing.write_top" class="nav-link" data-scroll-target="#kimmdy.parsing.write_top">write_top</a>
   <ul class="collapse">
-  <li><a href="#parameters-4" id="toc-parameters-4" class="nav-link" data-scroll-target="#parameters-4">Parameters</a></li>
+  <li><a href="#parameters-5" id="toc-parameters-5" class="nav-link" data-scroll-target="#parameters-5">Parameters</a></li>
   </ul></li>
   </ul></li>
   </ul></li>
@@ -728,6 +727,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="kimmdy.parsing.read_top">read_top</h3>
 <p><code>parsing.read_top(path, ffdir=None, use_gmx_dir=True)</code></p>
 <p>Read a topology file (<em>.top,</em>.itp,*.rtp) into a raw TopologyDict represenation.</p>
+<p>Assumptions and limitation:</p>
+<ul>
+<li><code>#include</code> statements will be resolved</li>
+<li>comments will be removed</li>
+<li>all lines are stripped of leading and trailing whitespace</li>
+<li><code>#undef</code> is not supported</li>
+<li>a section within <code>ifdef</code> may be a subsection of a section that was started outside of the <code>ifdef</code></li>
+<li><code>#if..#endif</code> statements only surround a full section or subsection, not individual lines within a section and a section may either be contained within if … else or it may not be, but it can not be duplicated with one part inside and one outside.</li>
+<li><code>if .. else</code> can’t be nested</li>
+<li><code>#include</code> s that don’t resolve to a valid file path are silently dropped</li>
+<li>sections that can have subsections can also exist multiple, separate times e.g.&nbsp;moleculetype will appear multiple times and they should not be merged</li>
+</ul>
 <section id="parameters-2" class="level4">
 <h4 class="anchored" data-anchor-id="parameters-2">Parameters</h4>
 <table class="table">
@@ -748,20 +759,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 </tbody>
 </table>
-</section>
-<section id="assumptions-and-limitation" class="level4">
-<h4 class="anchored" data-anchor-id="assumptions-and-limitation">Assumptions And Limitation</h4>
-<ul>
-<li><code>#include</code> statements will be resolved</li>
-<li>comments will be removed</li>
-<li>all lines are stripped of leading and trailing whitespace</li>
-<li><code>#undef</code> is not supported</li>
-<li>a section within <code>ifdef</code> may be a subsection of a section that was started outside of the <code>ifdef</code></li>
-<li><code>#if..#endif</code> statements only surround a full section or subsection, not individual lines within a section and a section may either be contained within if … else or it may not be, but it can not be duplicated with one part inside and one outside.</li>
-<li><code>if .. else</code> can’t be nested</li>
-<li><code>#include</code> s that don’t resolve to a valid file path are silently dropped</li>
-<li>sections that can have subsections can also exist multiple, separate times e.g.&nbsp;moleculetype will appear multiple times and they should not be merged</li>
-</ul>
 </section>
 <section id="returns-1" class="level4">
 <h4 class="anchored" data-anchor-id="returns-1">Returns</h4>
@@ -886,9 +883,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="kimmdy.parsing.resolve_includes">resolve_includes</h3>
 <p><code>parsing.resolve_includes(path, gmx_builtin_ffs=None)</code></p>
 <p>Resolve #include statements in a (top/itp) file.</p>
-<section id="arguments" class="level4">
-<h4 class="anchored" data-anchor-id="arguments">Arguments</h4>
-<p>path : Filepath to read.</p>
+<section id="parameters-3" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-3">Parameters</h4>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>path</code></td>
+<td><a href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path">Path</a></td>
+<td>Filepath to read.</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
 </section>
 <section id="returns-2" class="level4">
 <h4 class="anchored" data-anchor-id="returns-2">Returns</h4>
@@ -921,8 +935,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="kimmdy.parsing.write_plumed">write_plumed</h3>
 <p><code>parsing.write_plumed(d, path)</code></p>
 <p>Write a plumed.dat configuration file.</p>
-<section id="parameters-3" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-3">Parameters</h4>
+<section id="parameters-4" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-4">Parameters</h4>
 <table class="table">
 <thead>
 <tr class="header">
@@ -953,8 +967,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="kimmdy.parsing.write_top">write_top</h3>
 <p><code>parsing.write_top(top, outfile)</code></p>
 <p>Write a TopologyDict to a topology file.</p>
-<section id="parameters-4" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-4">Parameters</h4>
+<section id="parameters-5" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-5">Parameters</h4>
 <table class="table">
 <thead>
 <tr class="header">

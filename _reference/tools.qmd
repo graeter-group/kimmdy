@@ -69,7 +69,7 @@ parse cmdline args for modify_top
 
 ### modify_top { #kimmdy.tools.modify_top }
 
-`tools.modify_top(top_str, out_str, parameterize, removeH, gro_str, residuetypes, radicals)`
+`tools.modify_top(topology, out, parameterize, removeH, gro, residuetypes, radicals)`
 
 Modify topology in various ways.
 
@@ -77,11 +77,11 @@ Modify topology in various ways.
 
 | Name           | Type                                                            | Description                                                                                | Default    |
 |----------------|-----------------------------------------------------------------|--------------------------------------------------------------------------------------------|------------|
-| `top_path`     |                                                                 | Path to GROMACS top file                                                                   | _required_ |
-| `out_path`     |                                                                 | Output topology file name, stem also used for gro                                          | _required_ |
+| `topology`     | [str](`str`)                                                    | Path to GROMACS top file                                                                   | _required_ |
+| `out`          | [str](`str`)                                                    | Output topology file path, stem also used for gro. Can be relative to cwd.                 | _required_ |
 | `parameterize` | [bool](`bool`)                                                  | Parameterize topology with grappa after removing hydrogen                                  | _required_ |
 | `removeH`      | [Optional](`typing.Optional`)\[[list](`list`)\[[int](`int`)\]\] | Remove one or more hydrogens by atom nrs in the top file. One based.                       | _required_ |
-| `gro_path`     |                                                                 | GROMACS gro input file. Updates structure when deleting H. Output named like top output.   | _required_ |
+| `gro`          | [Optional](`typing.Optional`)\[[str](`str`)\]                   | GROMACS gro input file. Updates structure when deleting H. Output named like top output.   | _required_ |
 | `residuetypes` | [Optional](`typing.Optional`)\[[str](`str`)\]                   | GROMACS style residuetypes file. Necessary for parameterization with non-amber atom types. | _required_ |
 | `radicals`     | [str](`str`)                                                    | Radicals in the system PRIOR to removing hydrogens with the removeH option.                | _required_ |
 
