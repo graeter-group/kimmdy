@@ -6,6 +6,7 @@ from pathlib import Path
 import shutil
 import argparse
 from typing import Optional
+import json
 
 from kimmdy.topology.topology import Topology
 from kimmdy.parsing import read_top, write_top
@@ -84,11 +85,11 @@ def entry_point_build_examples():
 
 
 def modify_top(
-    top_str: str,
-    out_str: str,
+    topology: str,
+    out: str,
     parameterize: bool,
     removeH: Optional[list[int]],
-    gro_str: Optional[str],
+    gro: Optional[str],
     residuetypes: Optional[str],
     radicals: str,
 ):
@@ -96,16 +97,17 @@ def modify_top(
 
     Parameters
     ----------
-    top_path
+    topology
         Path to GROMACS top file
-    out_path
-        Output topology file name, stem also used for gro
+    out
+        Output topology file path, stem also used for gro.
+        Can be relative to cwd.
     parameterize
         Parameterize topology with grappa after removing hydrogen
     removeH
         Remove one or more hydrogens by atom nrs in the top file.
         One based.
-    gro_path
+    gro
         GROMACS gro input file. Updates structure when deleting H.
         Output named like top output.
     residuetypes
@@ -114,37 +116,52 @@ def modify_top(
         Radicals in the system PRIOR to removing hydrogens with the removeH option.
     """
 
-    top_path = Path(top_str)
-    out_path = top_path.with_name(out_str).with_suffix(".top")
+    top_path = Path(topology).with_suffix(".top").resolve()
+    assert top_path.exists(), f"Error finding top {top_path}"
+
+    out_path = Path(out).with_suffix(".top")
+    if not out_path.is_absolute():
+        out_path = out_path.resolve()
+
     update_map = {}
+    gro_path = None
     gro_out = None
     residuetypes_path = Path(residuetypes) if residuetypes else None
 
-    if gro_str:
+    if gro:
         if removeH:
-            gro_path = Path(gro_str)
-            gro_out = gro_path.with_stem(out_path.stem)
+            gro_path = Path(gro).resolve()
+            assert gro_path.exists(), f"Error finding gro {gro_path}"
+
+            gro_out = out_path.with_suffix(".gro")
             while gro_out.exists():
                 gro_out = gro_out.with_stem(gro_out.stem + "_mod")
 
     print(
         "Changing topology\n"
-        f"top: \t\t\t{top_str}\n"
-        f"output: \t\t{out_str}\n"
+        f"top: \t\t\t{top_path}\n"
+        f"output: \t\t{out_path}\n"
         f"parameterize: \t\t{parameterize}\n"
         f"remove hydrogen: \t{removeH}\n"
-        f"optional gro: \t\t{gro_str}\n"
+        f"optional gro: \t\t{gro_path}\n"
         f"gro output: \t\t{gro_out}\n"
         f"residuetypes: \t\t{residuetypes_path}\n"
         f"radicals: \t\t{radicals}\n"
     )
 
+    print("Reading topology..", end="")
     top = Topology(
         read_top(top_path), radicals=radicals, residuetypes_path=residuetypes_path
     )
+    print("Done")
 
     # remove hydrogen
     if removeH:
+        json_out = out_path.with_name("modify_top_dict.json")
+        while json_out.exists():
+            json_out = json_out.with_stem(json_out.stem + "_mod")
+
+        print("Removing Hydrogens..", end="")
         broken_idxs = []
         # check for input validity
         for i, nr in enumerate(removeH):
@@ -157,11 +174,18 @@ def modify_top(
         for broken_idx in sorted(broken_idxs, reverse=True):
             removeH.pop(broken_idx)
 
-        top.del_atom([str(nr) for nr in removeH], parameterize=parameterize)
+        update_map = top.del_atom(
+            [str(nr) for nr in removeH], parameterize=parameterize
+        )
+        with open(json_out, "w") as f:
+            json.dump(update_map, f, indent=0)
+
+        print("Done")
 
     # parameterize with grappa
     if parameterize:
         # load grappa
+        print("Loading Plugins..", end="")
         discover_plugins()
         if "grappa" in parameterization_plugins.keys():
             top.parametrizer = parameterization_plugins["grappa"]()
@@ -171,13 +195,17 @@ def modify_top(
             )
         # require parameterization when writing topology to dict
         top.needs_parameterization = True
+        print("Done")
 
     # write top file
+    print("Writing top..", end="")
     write_top(top.to_dict(), out_path)
+    print("Done")
 
     # deal with gro file
-    if gro_str:
+    if gro:
         if removeH:
+            print("Writing gro..", end="")
             with open(gro_path, "r") as f:
                 gro_raw = f.readlines()
 
@@ -189,10 +217,12 @@ def modify_top(
                     if i + 1 in removeH:
                         continue
                     f.write(line)
+            print("Done")
         else:
             print(
                 "Gro file supplied but no action requested that requires changes to it."
             )
+    return update_map
 
 
 def get_modify_top_cmdline_args() -> argparse.Namespace:
@@ -204,7 +234,9 @@ def get_modify_top_cmdline_args() -> argparse.Namespace:
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument("top", help="GROMACS top file")
-    parser.add_argument("out", help="Output top file name")
+    parser.add_argument(
+        "out", help="Output top file name. Stem reused for gro if applicabel."
+    )
 
     parser.add_argument(
         "-p",
@@ -222,8 +254,9 @@ def get_modify_top_cmdline_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "-c",
-        "--grofile",
-        help="If necessary, also apply actions on gro file to create a compatible gro/top file pair.",
+        "--gro",
+        help="If necessary, also apply actions on gro file to create a "
+        "compatible gro/top file pair. Output analog to top.",
         type=str,
     )
     parser.add_argument(
