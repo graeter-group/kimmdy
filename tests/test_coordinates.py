@@ -174,5 +174,6 @@ def test_truncate_sim_files(arranged_tmp_path):
     )
     # FOR SOME REASON gmx check writes in stderr instead of stdout
     m = re.search(r"Last frame.*time\s+(\d+\.\d+)", p.stderr)
+    assert m, p.stderr
     last_time = m.group(1)
     assert last_time == "5.000"

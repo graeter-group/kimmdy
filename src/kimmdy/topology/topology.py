@@ -28,7 +28,9 @@ from kimmdy.plugins import BasicParameterizer, Parameterizer
 from itertools import permutations, combinations
 import textwrap
 import logging
+from typing import Optional
 from copy import copy, deepcopy
+from pathlib import Path
 from kimmdy.constants import ATOM_ID_FIELDS, RESNR_ID_FIELDS, REACTIVE_MOLECULEYPE
 from typing import Callable, Union
 
@@ -57,7 +59,9 @@ class MoleculeType:
 
     """
 
-    def __init__(self, header: tuple[str, str], atomics: dict) -> None:
+    def __init__(
+        self, header: tuple[str, str], atomics: dict, radicals: Optional[str] = None
+    ) -> None:
         self.name, self.nrexcl = header
         self.atomics = atomics
 
@@ -74,8 +78,7 @@ class MoleculeType:
             {}
         )
         self.settles: dict[str, Settle] = {}
-        self.exclusions: dict[int, Exclusion] = {}
-        self.radicals: dict[str, Atom] = {}
+        self.exclusions: dict[tuple[str, str], Exclusion] = {}
 
         self._parse_atoms()
         self._parse_bonds()
@@ -86,7 +89,25 @@ class MoleculeType:
         self._parse_settles()
         self._parse_exclusions()
         self._initialize_graph()
-        self.test_for_radicals()
+
+        # must be after self._parse_atoms
+        self.radicals: dict[str, Atom] = {}
+        if radicals is not None:
+            if self.name == "Reactive":
+                logger.debug(
+                    f"Using 'radicals' section from config file with entries: '{radicals}'."
+                )
+            for radical in radicals.split(sep=" "):
+                atom = self.atoms.get(radical)
+                if atom:
+                    self.radicals[radical] = atom
+                    atom.is_radical = True
+                else:
+                    logger.debug(
+                        f"Atom nr {radical} from 'radicals' section in config file not in topology. Ignoring this entry."
+                    )
+        else:
+            self.find_radicals()
 
     def __str__(self) -> str:
         return textwrap.dedent(
@@ -202,9 +223,9 @@ class MoleculeType:
         ls = self.atomics.get("exclusions")
         if not ls:
             return
-        for i, l in enumerate(ls):
+        for _, l in enumerate(ls):
             exclusion = Exclusion.from_top_line(l)
-            self.exclusions[tuple(l)] = exclusion
+            self.exclusions[(l[0], l[1])] = exclusion
 
     def _initialize_graph(self):
         """Add a list of atom nrs bound to an atom to each atom."""
@@ -214,20 +235,23 @@ class MoleculeType:
             self.atoms[i].bound_to_nrs.append(j)
             self.atoms[j].bound_to_nrs.append(i)
 
-    def test_for_radicals(self):
-        """Updates radical status per atom and in topology.
+    def find_radicals(self):
+        """Find atoms that are radicals and update self.radicals.
 
         Iterate over all atoms and designate them as radicals if they have
         fewer bounds than their natural bond order.
         """
+        logger.debug(
+            "Trying to infer radical status based on AMBER(!!) atomtype bond order."
+        )
+        self.radicals = {}
         for atom in self.atoms.values():
-            bo = ATOMTYPE_BONDORDER_FLAT.get(atom.type)
+            bo = ATOMTYPE_BONDORDER_FLAT[atom.type]
             if bo and bo > len(atom.bound_to_nrs):
-                atom.is_radical = True
                 self.radicals[atom.nr] = atom
+                atom.is_radical = True
             else:
                 atom.is_radical = False
-
         return None
 
     def _update_atomics_dict(self):
@@ -517,8 +541,8 @@ class MoleculeType:
                 pair_ai = update_map.get(pair.ai)
                 pair_aj = update_map.get(pair.aj)
                 if None not in (pair_ai, pair_aj):
-                    pair.ai = pair_ai
-                    pair.aj = pair_aj
+                    pair.ai = pair_ai  # type: ignore (pyright bug)
+                    pair.aj = pair_aj  # type: ignore
                     new_pairs[(pair_ai, pair_aj)] = pair
 
             dihedrals.ai = ai  # type: ignore
@@ -587,6 +611,8 @@ class Topology:
         top: TopologyDict,
         parametrizer: Parameterizer = BasicParameterizer(),
         is_reactive_predicate_f: Callable[[str], bool] = is_not_solvent_or_ion,
+        radicals: Optional[str] = None,
+        residuetypes_path: Optional[Path] = None,
     ) -> None:
         if top == {}:
             raise NotImplementedError(
@@ -600,14 +626,14 @@ class Topology:
             raise ValueError("molecules not found in top file")
         self.molecules = [(l[0], l[1]) for l in molecules]
 
-        self.ff = FF(top)
+        self.ff = FF(top, residuetypes_path)
         self._parse_molecules()
         self.parametrizer = parametrizer
         self._check_is_reactive_molecule = is_reactive_predicate_f
 
         self.needs_parameterization = False
 
-        self._merge_moleculetypes()
+        self._merge_moleculetypes(radicals)
         self._link_atomics()
 
     def _link_atomics(self):
@@ -668,7 +694,7 @@ class Topology:
             logger.info(f"\t{m} {n}")
         return reactive_molecules
 
-    def _merge_moleculetypes(self):
+    def _merge_moleculetypes(self, radicals: Optional[str] = None):
         """
         Merge all moleculetypes within which reactions can happen into one moleculetype.
         This also makes multiples explicit.
@@ -686,7 +712,7 @@ class Topology:
             add_atomics = self.moleculetypes[name].atomics
             n_atoms = len(add_atomics["atoms"])
             highest_resnr = int(add_atomics["atoms"][-1][RESNR_ID_FIELDS["atoms"][0]])
-            for i in range(n):
+            for _ in range(n):
                 for section_name, section in add_atomics.items():
                     section = deepcopy(section)
                     atomnr_fields = ATOM_ID_FIELDS.get(section_name, [])
@@ -709,7 +735,7 @@ class Topology:
 
         # add merged moleculetype to topology
         reactive_moleculetype = MoleculeType(
-            (REACTIVE_MOLECULEYPE, "1"), reactive_atomics
+            (REACTIVE_MOLECULEYPE, "1"), reactive_atomics, radicals
         )
         self.moleculetypes[REACTIVE_MOLECULEYPE] = reactive_moleculetype
         # update topology dict
@@ -753,7 +779,7 @@ class Topology:
                 )
                 continue
             name = header[0]
-            self.moleculetypes[name] = MoleculeType(header, atomics)
+            self.moleculetypes[name] = MoleculeType(header, atomics, radicals="")
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Topology):
@@ -837,12 +863,12 @@ class Topology:
                     )
                     if len(fragment2) in (0, 1):
                         # intra-residue HAT case (or similar)
-                        if atom1.type.startswith("H"):
+                        if atom1.type.upper().startswith("H"):
                             atom2.charge = (
                                 f"{float(atom2.charge) + float(atom1.charge):7.4f}"
                             )
                             atom1.charge = "0.0"
-                        elif atom2.type.startswith("H"):
+                        elif atom2.type.upper().startswith("H"):
                             atom1.charge = (
                                 f"{float(atom1.charge) + float(atom2.charge):7.4f}"
                             )
@@ -877,7 +903,9 @@ class Topology:
                     bondtype = (atom1.atom, atom2.atom)
                     residue_bond_spec = self.ff.residuetypes[residue].bonds.get(
                         bondtype,
-                        self.ff.residuetypes[residue].bonds.get(bondtype[::-1]),
+                        self.ff.residuetypes[residue].bonds.get(
+                            (bondtype[-1], bondtype[-2])
+                        ),
                     )
                     if residue_bond_spec:
                         atom1.charge = (
@@ -1137,7 +1165,7 @@ class Topology:
         # to make them adopt the correct residuetype and atomtype
         # when bound to a new heavy atom
         for i, atom in enumerate(atompair):
-            if atom.type.startswith("H"):
+            if atom.type.upper().startswith("H"):
                 other_i = abs(i - 1)
                 other_atom = atompair[other_i]
                 other_res = other_atom.residue
@@ -1157,7 +1185,9 @@ class Topology:
                 ]
                 type_set = False
                 for key, bond in aa.bonds.items():
-                    if other_atom.atom in key and any(k.startswith("H") for k in key):
+                    if other_atom.atom in key and any(
+                        k.upper().startswith("H") for k in key
+                    ):
                         if key[0] == other_atom.atom:
                             h_name = bond.atom2
                         else:

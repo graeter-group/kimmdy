@@ -507,7 +507,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>The prefered method of starting a KIMMDY run is via the command line, though <a href="../../_reference/cmd.html">Python entry points</a> are supported as well.</p>
 <section id="kimmdy" class="level2">
 <h2 class="anchored" data-anchor-id="kimmdy">KIMMDY</h2>
-<div id="182f72df" class="cell" data-execution_count="1">
+<div id="f025a1ca" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>kimmdy <span class="op">--</span><span class="bu">help</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>usage: kimmdy [-h] [--input INPUT] [--checkpoint CHECKPOINT]
@@ -515,7 +515,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
               [--generate-jobscript] [--version] [--debug] [--callgraph]
 
 Welcome to KIMMDY. `kimmdy` runs KIMMDY, further tools are available as
-`kimmdy-...` commands. These are `-analysis`, `-remove-hydrogen` and `-build-
+`kimmdy-...` commands. These are `-analysis`, `-modify-top` and `-build-
 examples`. Access their help with `kimmdy-... -h.`
 
 options:
@@ -543,7 +543,7 @@ options:
 </section>
 <section id="analysis" class="level2">
 <h2 class="anchored" data-anchor-id="analysis">Analysis</h2>
-<div id="5b4acca3" class="cell" data-execution_count="2">
+<div id="ae57bf41" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>kimmdy<span class="op">-</span>analysis <span class="op">--</span><span class="bu">help</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>usage: kimmdy-analysis [-h] module ...
@@ -570,31 +570,42 @@ options:
 <section id="remove-hydrogen" class="level2">
 <h2 class="anchored" data-anchor-id="remove-hydrogen">Remove Hydrogen</h2>
 <p>This module builds or restores the example directory in the package.</p>
-<div id="f57291b9" class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>kimmdy<span class="op">-</span>remove<span class="op">-</span>hydrogen <span class="op">--</span><span class="bu">help</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="d354a57c" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>kimmdy<span class="op">-</span>modify<span class="op">-</span>top <span class="op">--</span><span class="bu">help</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>usage: kimmdy-remove-hydrogen [-h] [-p] [-e] gro top nr
+<pre><code>usage: kimmdy-modify-top [-h] [-p] [-r REMOVEH [REMOVEH ...]] [-c GROFILE]
+                         [-t RESIDUETYPES] [-x RADICALS]
+                         top out
 
-Welcome to the KIMMDY remove hydrogen module
+Welcome to the KIMMDY modify top module
 
 positional arguments:
-  gro                 GROMACS gro file
-  top                 GROMACS top file
-  nr                  Atom number as indicated in the GROMACS gro and top file
+  top                   GROMACS top file
+  out                   Output top file name
 
 options:
-  -h, --help          show this help message and exit
-  -p, --parameterize  Parameterize topology with grappa after removing
-                      hydrogen. (default: False)
-  -e, --equilibrate   Do a minimization and equilibration with GROMACS. Uses
-                      mdp files from kimmdy assets. (default: False)</code></pre>
+  -h, --help            show this help message and exit
+  -p, --parameterize    Parameterize topology with grappa. (default: False)
+  -r REMOVEH [REMOVEH ...], --removeH REMOVEH [REMOVEH ...]
+                        Remove one or more hydrogens by atom nrs in the top
+                        file. (default: None)
+  -c GROFILE, --grofile GROFILE
+                        If necessary, also apply actions on gro file to create
+                        a compatible gro/top file pair. (default: None)
+  -t RESIDUETYPES, --residuetypes RESIDUETYPES
+                        GROMACS style residuetypes file. Necessary for
+                        parameterization with non-amber atom types. (default:
+                        None)
+  -x RADICALS, --radicals RADICALS
+                        Radicals in the system PRIOR to removing hydrogens
+                        with the removeH option. (default: )</code></pre>
 </div>
 </div>
 </section>
 <section id="examples" class="level2">
 <h2 class="anchored" data-anchor-id="examples">Examples</h2>
 <p>This module builds or restores the example directory in the package.</p>
-<div id="fc24c863" class="cell" data-execution_count="4">
+<div id="8f4df5b5" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>kimmdy<span class="op">-</span>build<span class="op">-</span>examples <span class="op">--</span><span class="bu">help</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>usage: kimmdy-build-examples [-h] [-r [RESTORE]]

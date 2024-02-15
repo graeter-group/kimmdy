@@ -621,8 +621,6 @@ class TestHexalaTopology:
         top.break_bond(("29", "35"))
         top.break_bond(("31", "34"))
         top.bind_bond(("34", "29"))
-        # the reference is shit anyway
-        focus = set(["29", "31", "34", "35"])
 
         # compare topologies
         assert len(top.bonds) == len(top_ref.bonds)
@@ -673,6 +671,11 @@ class TestRadicalAla:
         return Topology(hexala_top)
 
     @pytest.fixture
+    def top_noprm_explicitR_fix(self, filedir) -> Topology:
+        hexala_top = read_top(filedir / "Ala_R_noprm.top")
+        return Topology(hexala_top, radicals="9")
+
+    @pytest.fixture
     def top_prm_fix(self, filedir) -> Topology:
         hexala_top = read_top(filedir / "Ala_R_prm.top")
         return Topology(hexala_top)
@@ -680,6 +683,10 @@ class TestRadicalAla:
     def test_is_radical(self, top_noprm_fix):
         assert top_noprm_fix.atoms["9"].is_radical == True
         assert top_noprm_fix.atoms["10"].is_radical == False
+
+    def test_is_radical_explicit(self, top_noprm_explicitR_fix):
+        assert top_noprm_explicitR_fix.atoms["9"].is_radical == True
+        assert top_noprm_explicitR_fix.atoms["10"].is_radical == False
 
 
 class TestChargeAssignment:
