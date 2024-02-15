@@ -14,7 +14,7 @@ import queue
 from enum import Enum, auto
 from functools import partial
 from datetime import timedelta
-from typing import Optional, Union
+from typing import Optional
 from kimmdy.config import Config
 from kimmdy.parsing import read_top, write_json, write_top
 from kimmdy.plugins import (

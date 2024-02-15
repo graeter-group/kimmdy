@@ -4,7 +4,7 @@ import pytest
 import numpy as np
 
 from kimmdy.parsing import read_top, TopologyDict
-from kimmdy.recipe import Break, Bind, RecipeStep
+from kimmdy.recipe import Break, Bind
 from hypothesis import Phase, given, settings, HealthCheck, strategies as st
 from kimmdy.topology.topology import REACTIVE_MOLECULEYPE, Topology
 from kimmdy.topology.atomic import *
@@ -621,8 +621,6 @@ class TestHexalaTopology:
         top.break_bond(("29", "35"))
         top.break_bond(("31", "34"))
         top.bind_bond(("34", "29"))
-        # the reference is shit anyway
-        focus = set(["29", "31", "34", "35"])
 
         # compare topologies
         assert len(top.bonds) == len(top_ref.bonds)
