@@ -4,7 +4,7 @@ import pytest
 import numpy as np
 
 from kimmdy.parsing import read_top, TopologyDict
-from kimmdy.recipe import Break, Bind
+from kimmdy.recipe import Break, Bind, RecipeStep
 from hypothesis import Phase, given, settings, HealthCheck, strategies as st
 from kimmdy.topology.topology import REACTIVE_MOLECULEYPE, Topology
 from kimmdy.topology.atomic import *

@@ -18,6 +18,7 @@ from kimmdy.topology.atomic import (
     Angle,
     Dihedral,
     DihedralType,
+    ProperDihedralId,
     MultipleDihedrals,
     Interaction,
     InteractionType,
@@ -154,10 +155,10 @@ def get_explicit_or_type(
 
 def merge_dihedrals(
     dihedral_key: tuple[str, str, str, str],
-    interactionA: Optional[Dihedral],
-    interactionB: Optional[Dihedral],
-    interaction_typesA: InteractionTypes,
-    interaction_typesB: InteractionTypes,
+    dihedral_a: Optional[Dihedral],
+    dihedral_b: Optional[Dihedral],
+    dihedral_types_a: dict[ProperDihedralId, DihedralType],
+    dihedral_types_b: dict[ProperDihedralId, DihedralType],
     molA: MoleculeType,
     molB: MoleculeType,
     funct: str,
@@ -165,22 +166,22 @@ def merge_dihedrals(
 ) -> Dihedral:
     """Merge one to two Dihedrals or -Types into a Dihedral in free-energy syntax"""
     # convert implicit standard ff parameters to explicit, if necessary
-    if interactionA:
+    if dihedral_a:
         parameterizedA = get_explicit_or_type(
             dihedral_key,
-            interactionA,
-            interaction_typesA,
+            dihedral_a,
+            dihedral_types_a,
             molA,
             periodicity,
         )
     else:
         parameterizedA = None
 
-    if interactionB:
+    if dihedral_b:
         parameterizedB = get_explicit_or_type(
             dihedral_key,
-            interactionB,
-            interaction_typesB,
+            dihedral_b,
+            dihedral_types_b,
             molB,
             periodicity,
         )

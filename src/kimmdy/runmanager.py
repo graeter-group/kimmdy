@@ -132,7 +132,7 @@ class RunManager:
         logger.debug(f"Initialized latest files:\n{pformat(self.latest_files)}")
         self.histfile: Path = self.config.out / "kimmdy.history"
         self.cptfile: Path = self.config.out / "kimmdy.cpt"
-        self.kmc_algorithm: Optional[str] = None
+        self.kmc_algorithm: str
 
         try:
             if self.config.changer.topology.parameterization == "basic":

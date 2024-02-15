@@ -223,9 +223,9 @@ class MoleculeType:
         ls = self.atomics.get("exclusions")
         if not ls:
             return
-        for i, l in enumerate(ls):
+        for _, l in enumerate(ls):
             exclusion = Exclusion.from_top_line(l)
-            self.exclusions[tuple(l)] = exclusion
+            self.exclusions[(l[0], l[1])] = exclusion
 
     def _initialize_graph(self):
         """Add a list of atom nrs bound to an atom to each atom."""
@@ -543,8 +543,8 @@ class MoleculeType:
                 pair_ai = update_map.get(pair.ai)
                 pair_aj = update_map.get(pair.aj)
                 if None not in (pair_ai, pair_aj):
-                    pair.ai = pair_ai
-                    pair.aj = pair_aj
+                    pair.ai = pair_ai # type: ignore (pyright bug)
+                    pair.aj = pair_aj # type: ignore
                     new_pairs[(pair_ai, pair_aj)] = pair
 
             dihedrals.ai = ai  # type: ignore
@@ -905,7 +905,7 @@ class Topology:
                     bondtype = (atom1.atom, atom2.atom)
                     residue_bond_spec = self.ff.residuetypes[residue].bonds.get(
                         bondtype,
-                        self.ff.residuetypes[residue].bonds.get(bondtype[::-1]),
+                        self.ff.residuetypes[residue].bonds.get((bondtype[-1], bondtype[-2])),
                     )
                     if residue_bond_spec:
                         atom1.charge = (
