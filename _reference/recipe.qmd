@@ -35,7 +35,7 @@ Change topology to form a bond
 
 ### BondOperation { #kimmdy.recipe.BondOperation }
 
-`recipe.BondOperation(atom_ix_1, atom_ix_2, atom_id_1, atom_id_2, _atom_ix_1=field(init=False, repr=False, default=None), _atom_ix_2=field(init=False, repr=False, default=None))`
+`recipe.BondOperation(_atom_ix_1=field(init=False, repr=False, default=None), _atom_ix_2=field(init=False, repr=False, default=None))`
 
 Handle a bond operation on the recipe step.
 
@@ -89,7 +89,7 @@ A custom recipe step that can be used to define a custom topology modification.
 
 ### Place { #kimmdy.recipe.Place }
 
-`recipe.Place(new_coords, ix_to_place, id_to_place, _ix_to_place=field(init=False, repr=False, default=None))`
+`recipe.Place(new_coords, _ix_to_place=field(init=False, repr=False, default=None))`
 
 Change topology and/or coordinates to place an atom.
 

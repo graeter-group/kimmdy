@@ -12,6 +12,6 @@
 
 ### FF { #kimmdy.topology.ff.FF }
 
-`topology.ff.FF(self, top)`
+`topology.ff.FF(self, top, residuetypes_path=None)`
 
 Container for parsed forcefield data.

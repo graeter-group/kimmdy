@@ -452,8 +452,8 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#attributes" id="toc-attributes" class="nav-link" data-scroll-target="#attributes">Attributes</a></li>
   <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
   <ul class="collapse">
+  <li><a href="#kimmdy.topology.topology.MoleculeType.find_radicals" id="toc-kimmdy.topology.topology.MoleculeType.find_radicals" class="nav-link" data-scroll-target="#kimmdy.topology.topology.MoleculeType.find_radicals">find_radicals</a></li>
   <li><a href="#kimmdy.topology.topology.MoleculeType.reindex_atomnrs" id="toc-kimmdy.topology.topology.MoleculeType.reindex_atomnrs" class="nav-link" data-scroll-target="#kimmdy.topology.topology.MoleculeType.reindex_atomnrs">reindex_atomnrs</a></li>
-  <li><a href="#kimmdy.topology.topology.MoleculeType.test_for_radicals" id="toc-kimmdy.topology.topology.MoleculeType.test_for_radicals" class="nav-link" data-scroll-target="#kimmdy.topology.topology.MoleculeType.test_for_radicals">test_for_radicals</a></li>
   </ul></li>
   </ul></li>
   <li><a href="#kimmdy.topology.topology.Topology" id="toc-kimmdy.topology.topology.Topology" class="nav-link" data-scroll-target="#kimmdy.topology.topology.Topology">Topology</a>
@@ -504,7 +504,7 @@ ul.task-list li input[type="checkbox"] {
 </table>
 <section id="kimmdy.topology.topology.MoleculeType" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.topology.MoleculeType">MoleculeType</h3>
-<p><code>topology.topology.MoleculeType(self, header, atomics)</code></p>
+<p><code>topology.topology.MoleculeType(self, header, atomics, radicals=None)</code></p>
 <p>One moleculetype in the topology</p>
 <section id="attributes" class="level4">
 <h4 class="anchored" data-anchor-id="attributes">Attributes</h4>
@@ -576,32 +576,32 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
+<td><a href="#kimmdy.topology.topology.MoleculeType.find_radicals">find_radicals</a></td>
+<td>Find atoms that are radicals and update self.radicals.</td>
+</tr>
+<tr class="even">
 <td><a href="#kimmdy.topology.topology.MoleculeType.reindex_atomnrs">reindex_atomnrs</a></td>
 <td>Reindex atom numbers in topology.</td>
 </tr>
-<tr class="even">
-<td><a href="#kimmdy.topology.topology.MoleculeType.test_for_radicals">test_for_radicals</a></td>
-<td>Updates radical status per atom and in topology.</td>
-</tr>
 </tbody>
 </table>
+<section id="kimmdy.topology.topology.MoleculeType.find_radicals" class="level5">
+<h5 class="anchored" data-anchor-id="kimmdy.topology.topology.MoleculeType.find_radicals">find_radicals</h5>
+<p><code>topology.topology.MoleculeType.find_radicals()</code></p>
+<p>Find atoms that are radicals and update self.radicals.</p>
+<p>Iterate over all atoms and designate them as radicals if they have fewer bounds than their natural bond order.</p>
+</section>
 <section id="kimmdy.topology.topology.MoleculeType.reindex_atomnrs" class="level5">
 <h5 class="anchored" data-anchor-id="kimmdy.topology.topology.MoleculeType.reindex_atomnrs">reindex_atomnrs</h5>
 <p><code>topology.topology.MoleculeType.reindex_atomnrs()</code></p>
 <p>Reindex atom numbers in topology.</p>
 <p>Starts at index 1. This also updates the numbers for bonds, angles, dihedrals and pairs. Returns a dict, mapping of old atom number strings to new ones</p>
 </section>
-<section id="kimmdy.topology.topology.MoleculeType.test_for_radicals" class="level5">
-<h5 class="anchored" data-anchor-id="kimmdy.topology.topology.MoleculeType.test_for_radicals">test_for_radicals</h5>
-<p><code>topology.topology.MoleculeType.test_for_radicals()</code></p>
-<p>Updates radical status per atom and in topology.</p>
-<p>Iterate over all atoms and designate them as radicals if they have fewer bounds than their natural bond order.</p>
-</section>
 </section>
 </section>
 <section id="kimmdy.topology.topology.Topology" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.topology.Topology">Topology</h3>
-<p><code>topology.topology.Topology(self, top, parametrizer=BasicParameterizer(), is_reactive_predicate_f=is_not_solvent_or_ion)</code></p>
+<p><code>topology.topology.Topology(self, top, parametrizer=BasicParameterizer(), is_reactive_predicate_f=is_not_solvent_or_ion, radicals=None, residuetypes_path=None)</code></p>
 <p>Smart container for parsed topology data.</p>
 <p>A topology keeps track of connections when bonds are broken or formed. Reparametrization is triggerd automatically if <code>to_dict</code> is called after bonds have changed.</p>
 <p>Assumptions:</p>
@@ -738,7 +738,7 @@ ul.task-list li input[type="checkbox"] {
 <tbody>
 <tr class="odd">
 <td><code>atom_nr</code></td>
-<td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
+<td><a href="https://docs.python.org/3.10/library/typing.html#typing.Union">Union</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#list">list</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>], <a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>]</td>
 <td>1-based atom number as string to delete</td>
 <td><em>required</em></td>
 </tr>

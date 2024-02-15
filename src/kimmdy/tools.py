@@ -90,6 +90,8 @@ def modify_top(
     parameterize: bool,
     removeH: Optional[list[int]],
     gro: Optional[str],
+    residuetypes: Optional[str],
+    radicals: str,
 ):
     """Modify topology in various ways.
 
@@ -108,6 +110,10 @@ def modify_top(
     gro
         GROMACS gro input file. Updates structure when deleting H.
         Output named like top output.
+    residuetypes
+        GROMACS style residuetypes file. Necessary for parameterization with non-amber atom types.
+    radicals
+        Radicals in the system PRIOR to removing hydrogens with the removeH option.
     """
 
     top_path = Path(topology).with_suffix(".top").resolve()
@@ -120,6 +126,7 @@ def modify_top(
     update_map = {}
     gro_path = None
     gro_out = None
+    residuetypes_path = Path(residuetypes) if residuetypes else None
 
     if gro:
         if removeH:
@@ -138,10 +145,14 @@ def modify_top(
         f"remove hydrogen: \t{removeH}\n"
         f"optional gro: \t\t{gro_path}\n"
         f"gro output: \t\t{gro_out}\n"
+        f"residuetypes: \t\t{residuetypes_path}\n"
+        f"radicals: \t\t{radicals}\n"
     )
 
     print("Reading topology..", end="")
-    top = Topology(read_top(top_path))
+    top = Topology(
+        read_top(top_path), radicals=radicals, residuetypes_path=residuetypes_path
+    )
     print("Done")
 
     # remove hydrogen
@@ -154,7 +165,7 @@ def modify_top(
         broken_idxs = []
         # check for input validity
         for i, nr in enumerate(removeH):
-            if not (atom_type := top.atoms[str(nr)].type).startswith("H"):
+            if not (atom_type := top.atoms[str(nr)].type).upper().startswith("H"):
                 print(
                     f"Wrong atom type {atom_type} with nr {nr} for remove hydrogen, should start with 'H'."
                 )
@@ -248,6 +259,19 @@ def get_modify_top_cmdline_args() -> argparse.Namespace:
         "compatible gro/top file pair. Output analog to top.",
         type=str,
     )
+    parser.add_argument(
+        "-t",
+        "--residuetypes",
+        help="GROMACS style residuetypes file. Necessary for parameterization with non-amber atom types.",
+        type=str,
+    )
+    parser.add_argument(
+        "-x",
+        "--radicals",
+        help="Radicals in the system PRIOR to removing hydrogens with the removeH option.",
+        type=str,
+        default="",
+    )
     return parser.parse_args()
 
 
@@ -255,7 +279,15 @@ def entry_point_modify_top():
     """Modify topology file in various ways"""
     args = get_modify_top_cmdline_args()
 
-    modify_top(args.top, args.out, args.parameterize, args.removeH, args.gro)
+    modify_top(
+        args.top,
+        args.out,
+        args.parameterize,
+        args.removeH,
+        args.grofile,
+        args.residuetypes,
+        args.radicals,
+    )
 
 
 # dot graphs
