@@ -101,13 +101,13 @@ class MoleculeType:
                 atom = self.atoms.get(radical)
                 if atom:
                     self.radicals[radical] = atom
+                    atom.is_radical = True
                 else:
                     logger.debug(
                         f"Atom nr {radical} from 'radicals' section in config file not in topology. Ignoring this entry."
                     )
         else:
             self.find_radicals()
-        self.set_atom_is_radical()
 
     def __str__(self) -> str:
         return textwrap.dedent(
@@ -249,15 +249,12 @@ class MoleculeType:
             bo = ATOMTYPE_BONDORDER_FLAT[atom.type]
             if bo and bo > len(atom.bound_to_nrs):
                 self.radicals[atom.nr] = atom
-        return None
-
-    def set_atom_is_radical(self):
-        """Set radical status per atom and in topology based on self.radicals."""
-        for atom in self.atoms.values():
-            if atom.nr in self.radicals:
                 atom.is_radical = True
             else:
                 atom.is_radical = False
+        return None
+
+    
 
     def _update_atomics_dict(self):
         self.atomics["atoms"] = [attributes_to_list(x) for x in self.atoms.values()]
