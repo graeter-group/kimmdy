@@ -254,8 +254,6 @@ class MoleculeType:
                 atom.is_radical = False
         return None
 
-    
-
     def _update_atomics_dict(self):
         self.atomics["atoms"] = [attributes_to_list(x) for x in self.atoms.values()]
         self.atomics["bonds"] = [attributes_to_list(x) for x in self.bonds.values()]
@@ -543,8 +541,8 @@ class MoleculeType:
                 pair_ai = update_map.get(pair.ai)
                 pair_aj = update_map.get(pair.aj)
                 if None not in (pair_ai, pair_aj):
-                    pair.ai = pair_ai # type: ignore (pyright bug)
-                    pair.aj = pair_aj # type: ignore
+                    pair.ai = pair_ai  # type: ignore (pyright bug)
+                    pair.aj = pair_aj  # type: ignore
                     new_pairs[(pair_ai, pair_aj)] = pair
 
             dihedrals.ai = ai  # type: ignore
@@ -905,7 +903,9 @@ class Topology:
                     bondtype = (atom1.atom, atom2.atom)
                     residue_bond_spec = self.ff.residuetypes[residue].bonds.get(
                         bondtype,
-                        self.ff.residuetypes[residue].bonds.get((bondtype[-1], bondtype[-2])),
+                        self.ff.residuetypes[residue].bonds.get(
+                            (bondtype[-1], bondtype[-2])
+                        ),
                     )
                     if residue_bond_spec:
                         atom1.charge = (

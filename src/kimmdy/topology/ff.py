@@ -28,9 +28,7 @@ class FF:
         self.atomtypes: dict[AtomId, AtomType] = {}
         self.bondtypes: dict[BondId, BondType] = {}
         self.angletypes: dict[AngleId, AngleType] = {}
-        self.proper_dihedraltypes: dict[
-            ProperDihedralId, DihedralType
-        ] = {}
+        self.proper_dihedraltypes: dict[ProperDihedralId, DihedralType] = {}
         self.improper_dihedraltypes: dict[ImproperDihedralId, DihedralType] = {}
         self.residuetypes: dict[str, ResidueType] = {}
 
