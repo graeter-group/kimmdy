@@ -52,7 +52,7 @@ Parameterized topology entries have c0 and c1 attributes != None
 
 ### merge_dihedrals { #kimmdy.coordinates.merge_dihedrals }
 
-`coordinates.merge_dihedrals(dihedral_key, interactionA, interactionB, interaction_typesA, interaction_typesB, molA, molB, funct, periodicity)`
+`coordinates.merge_dihedrals(dihedral_key, dihedral_a, dihedral_b, dihedral_types_a, dihedral_types_b, molA, molB, funct, periodicity)`
 
 Merge one to two Dihedrals or -Types into a Dihedral in free-energy syntax
 

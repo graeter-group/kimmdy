@@ -13,7 +13,7 @@
 
 ### MoleculeType { #kimmdy.topology.topology.MoleculeType }
 
-`topology.topology.MoleculeType(self, header, atomics)`
+`topology.topology.MoleculeType(self, header, atomics, radicals=None)`
 
 One moleculetype in the topology
 
@@ -35,8 +35,17 @@ One moleculetype in the topology
 
 | Name | Description |
 | --- | --- |
+| [find_radicals](#kimmdy.topology.topology.MoleculeType.find_radicals) | Find atoms that are radicals and update self.radicals. |
 | [reindex_atomnrs](#kimmdy.topology.topology.MoleculeType.reindex_atomnrs) | Reindex atom numbers in topology. |
-| [test_for_radicals](#kimmdy.topology.topology.MoleculeType.test_for_radicals) | Updates radical status per atom and in topology. |
+
+##### find_radicals { #kimmdy.topology.topology.MoleculeType.find_radicals }
+
+`topology.topology.MoleculeType.find_radicals()`
+
+Find atoms that are radicals and update self.radicals.
+
+Iterate over all atoms and designate them as radicals if they have
+fewer bounds than their natural bond order.
 
 ##### reindex_atomnrs { #kimmdy.topology.topology.MoleculeType.reindex_atomnrs }
 
@@ -48,18 +57,9 @@ Starts at index 1.
 This also updates the numbers for bonds, angles, dihedrals and pairs.
 Returns a dict, mapping of old atom number strings to new ones
 
-##### test_for_radicals { #kimmdy.topology.topology.MoleculeType.test_for_radicals }
-
-`topology.topology.MoleculeType.test_for_radicals()`
-
-Updates radical status per atom and in topology.
-
-Iterate over all atoms and designate them as radicals if they have
-fewer bounds than their natural bond order.
-
 ### Topology { #kimmdy.topology.topology.Topology }
 
-`topology.topology.Topology(self, top, parametrizer=BasicParameterizer(), is_reactive_predicate_f=is_not_solvent_or_ion)`
+`topology.topology.Topology(self, top, parametrizer=BasicParameterizer(), is_reactive_predicate_f=is_not_solvent_or_ion, radicals=None, residuetypes_path=None)`
 
 Smart container for parsed topology data.
 
@@ -132,10 +132,10 @@ parameters if requested. Also moves charges to first bound_nrs atom.
 
 ###### Parameters
 
-| Name           | Type           | Description                                                                | Default    |
-|----------------|----------------|----------------------------------------------------------------------------|------------|
-| `atom_nr`      | [str](`str`)   | 1-based atom number as string to delete                                    | _required_ |
-| `parameterize` | [bool](`bool`) | If true and bonds are removed triggers reparameterization, by default True | `True`     |
+| Name           | Type                                                                    | Description                                                                | Default    |
+|----------------|-------------------------------------------------------------------------|----------------------------------------------------------------------------|------------|
+| `atom_nr`      | [Union](`typing.Union`)\[[list](`list`)\[[str](`str`)\], [str](`str`)\] | 1-based atom number as string to delete                                    | _required_ |
+| `parameterize` | [bool](`bool`)                                                          | If true and bonds are removed triggers reparameterization, by default True | `True`     |
 
 ###### Returns
 

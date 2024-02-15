@@ -43,6 +43,9 @@ def reference_extrande_KMC() -> KMCResult:
 
 def compare_to_ref(result: KMCResult, reference: KMCResult):
     assert result.recipe == reference.recipe
+    assert reference.reaction_probability, "Reference reaction probability is None"
+    assert reference.reaction_probability, "Reference reaction probability is None"
+    assert result.reaction_probability, "Result reaction probability is None"
     for i in range(len(reference.reaction_probability)):
         assert (
             abs(result.reaction_probability[i] - reference.reaction_probability[i])

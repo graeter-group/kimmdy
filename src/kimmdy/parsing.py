@@ -33,8 +33,8 @@ def resolve_includes(
 ) -> tuple[list[str], Optional[Path]]:
     """Resolve #include statements in a (top/itp) file.
 
-    Arguments
-    ---------
+    Parameters
+    ----------
     path :
         Filepath to read.
 
@@ -100,13 +100,8 @@ def read_top(
 ) -> TopologyDict:
     """Read a topology file (*.top,*.itp,*.rtp) into a raw TopologyDict represenation.
 
-    Parameters
-    ----------
-    path :
-        Path to the topology file.
+    Assumptions and limitation:
 
-    Assumptions and limitation
-    -----
     - `#include` statements will be resolved
     - comments will be removed
     - all lines are stripped of leading and trailing whitespace
@@ -121,6 +116,11 @@ def read_top(
     - ``#include`` s that don't resolve to a valid file path are silently dropped
     - sections that can have subsections can also exist multiple, separate times
       e.g. moleculetype will appear multiple times and they should not be merged
+
+    Parameters
+    ----------
+    path :
+        Path to the topology file.
 
     Returns
     ------

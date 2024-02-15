@@ -14,7 +14,7 @@ import queue
 from enum import Enum, auto
 from functools import partial
 from datetime import timedelta
-from typing import Optional, Union
+from typing import Optional
 from kimmdy.config import Config
 from kimmdy.parsing import read_top, write_json, write_top
 from kimmdy.plugins import (
@@ -126,13 +126,13 @@ class RunManager:
         self.iteration: int = -1  # start at -1 to have iteration 0 be the initial setup
         self.state: State = State.IDLE
         self.recipe_collection: RecipeCollection = RecipeCollection([])
-        self.kmcresult: Union[KMCResult, None] = None
+        self.kmcresult: Optional[KMCResult] = None
         self.time: float = 0.0  # [ps]
         self.latest_files: dict[str, Path] = get_existing_files(config)
         logger.debug(f"Initialized latest files:\n{pformat(self.latest_files)}")
         self.histfile: Path = self.config.out / "kimmdy.history"
         self.cptfile: Path = self.config.out / "kimmdy.cpt"
-        self.kmc_algorithm: Optional[str] = None
+        self.kmc_algorithm: str
 
         try:
             if self.config.changer.topology.parameterization == "basic":
@@ -147,12 +147,15 @@ class RunManager:
                 f"'{self.config.changer.topology.parameterization}' can not be found in "
                 f"the parameterization plugins: {list(parameterization_plugins.keys())}"
             ) from e
+
         self.top = Topology(
             top=read_top(self.config.top, self.config.ff),
             parametrizer=parameterizer,
             is_reactive_predicate_f=get_is_reactive_predicate_f(
                 self.config.topology.reactive
             ),
+            radicals=getattr(self.config, "radicals", None),
+            residuetypes_path=getattr(self.config, "residuetypes", None),
         )
 
         self.filehist: list[dict[str, TaskFiles]] = [
@@ -521,7 +524,7 @@ class RunManager:
             self.recipe_collection.aggregate_reactions()
         if "extrande" in self.kmc_algorithm.lower():
             kmc = partial(kmc, tau_scale=self.config.tau_scale)
-        self.kmcresult: KMCResult = kmc(self.recipe_collection, logger=logger)
+        self.kmcresult = kmc(self.recipe_collection, logger=logger)
         recipe = self.kmcresult.recipe
 
         if self.config.save_recipes:

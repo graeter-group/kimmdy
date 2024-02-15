@@ -157,6 +157,18 @@
       "pytype": "Path",
       "default": "*.ff"
     },
+    "residuetypes": {
+      "title": "residuetypes",
+      "description": "GROMACS rtp file that contains residuetypes. Looks for `aminoacids.rtp` it not set. KIMMDY will first look in the current working directory and then relative to the forecfield directory.",
+      "type": "string",
+      "pytype": "Path"
+    },
+    "radicals": {
+      "title": "radicals",
+      "description": "space-separated string of radical atom ids, can be empty",
+      "type": "string",
+      "pytype": "str"
+    },    
     "plumed": {
       "title": "plumed",
       "description": ".dat file containing plumed config",

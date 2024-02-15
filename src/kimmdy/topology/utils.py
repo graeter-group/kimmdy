@@ -4,11 +4,11 @@ from itertools import permutations
 from typing import Callable, Optional, Any
 import re
 from typing import TYPE_CHECKING
-from kimmdy.constants import ATOM_ID_FIELDS, RESNR_ID_FIELDS, REACTIVE_MOLECULEYPE
+from kimmdy.constants import REACTIVE_MOLECULEYPE
 
 import logging
 
-from kimmdy.parsing import TopologyDict, empty_section
+from kimmdy.parsing import empty_section
 
 if TYPE_CHECKING:
     from kimmdy.topology.atomic import AtomicType, AtomicTypes, Atom
@@ -383,7 +383,7 @@ def get_residue_fragments(
     # could remove duplicate calculations
     fragments = [set([start1.nr]), set([start2.nr])]
     for fragment in fragments:
-        for i in range(iterations):
+        for _ in range(iterations):
             neighbors = set()
             for nr in fragment:
                 neighbors.update(set(top.atoms[nr].bound_to_nrs))

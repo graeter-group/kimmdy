@@ -11,10 +11,10 @@ Standalone tools that are complementary to KIMMDY.
 | [build_examples](#kimmdy.tools.build_examples) | Build example directories for KIMMDY from integration tests. |
 | [edgelist_to_dot_graph](#kimmdy.tools.edgelist_to_dot_graph) | Convert a list of edges to a dot graph. |
 | [entry_point_build_examples](#kimmdy.tools.entry_point_build_examples) | Build examples from the command line. |
-| [entry_point_remove_hydrogen](#kimmdy.tools.entry_point_remove_hydrogen) | Remove hydrogen by atom nr in a gro and topology file |
+| [entry_point_modify_top](#kimmdy.tools.entry_point_modify_top) | Modify topology file in various ways |
 | [get_build_example_cmdline_args](#kimmdy.tools.get_build_example_cmdline_args) | Parse command line arguments. |
-| [get_remove_hydrogen_cmdline_args](#kimmdy.tools.get_remove_hydrogen_cmdline_args) | parse cmdline args for remove_hydrogen |
-| [remove_hydrogen](#kimmdy.tools.remove_hydrogen) | Remove one hydrogen from a gro and top file to create a radical. |
+| [get_modify_top_cmdline_args](#kimmdy.tools.get_modify_top_cmdline_args) | parse cmdline args for modify_top |
+| [modify_top](#kimmdy.tools.modify_top) | Modify topology in various ways. |
 | [top_to_graph](#kimmdy.tools.top_to_graph) | Convert a topology to a dot graph. |
 | [topology_to_edgelist](#kimmdy.tools.topology_to_edgelist) | Convert a topology to a list of edges for a dot graph. |
 | [write_top_as_dot](#kimmdy.tools.write_top_as_dot) | Write a topology as a dot graph to a file. |
@@ -43,11 +43,11 @@ Convert a list of edges to a dot graph.
 
 Build examples from the command line.
 
-### entry_point_remove_hydrogen { #kimmdy.tools.entry_point_remove_hydrogen }
+### entry_point_modify_top { #kimmdy.tools.entry_point_modify_top }
 
-`tools.entry_point_remove_hydrogen()`
+`tools.entry_point_modify_top()`
 
-Remove hydrogen by atom nr in a gro and topology file
+Modify topology file in various ways
 
 ### get_build_example_cmdline_args { #kimmdy.tools.get_build_example_cmdline_args }
 
@@ -61,27 +61,29 @@ Parse command line arguments.
 |--------------------------|-------------------------------|
 | [Namespace](`Namespace`) | parsed command line arguments |
 
-### get_remove_hydrogen_cmdline_args { #kimmdy.tools.get_remove_hydrogen_cmdline_args }
+### get_modify_top_cmdline_args { #kimmdy.tools.get_modify_top_cmdline_args }
 
-`tools.get_remove_hydrogen_cmdline_args()`
+`tools.get_modify_top_cmdline_args()`
 
-parse cmdline args for remove_hydrogen
+parse cmdline args for modify_top
 
-### remove_hydrogen { #kimmdy.tools.remove_hydrogen }
+### modify_top { #kimmdy.tools.modify_top }
 
-`tools.remove_hydrogen(gro, top, nr, parameterize, equilibrate, gmx_mdrun_flags='')`
+`tools.modify_top(topology, out, parameterize, removeH, gro, residuetypes, radicals)`
 
-Remove one hydrogen from a gro and top file to create a radical.
+Modify topology in various ways.
 
 #### Parameters
 
-| Name           | Type           | Description                                                                          | Default    |
-|----------------|----------------|--------------------------------------------------------------------------------------|------------|
-| `gro`          | [str](`str`)   | Path to GROMACS gro file                                                             | _required_ |
-| `top`          | [str](`str`)   | Path to GROMACS top file                                                             | _required_ |
-| `nr`           | [str](`str`)   | Atom number as indicated in the GROMACS gro and top file                             | _required_ |
-| `parameterize` | [bool](`bool`) | Parameterize topology with grappa after removing hydrogen.                           | _required_ |
-| `equilibrate`  | [bool](`bool`) | Do a minimization and equilibration with GROMACS. Uses mdp files from kimmdy assets. | _required_ |
+| Name           | Type                                                            | Description                                                                                | Default    |
+|----------------|-----------------------------------------------------------------|--------------------------------------------------------------------------------------------|------------|
+| `topology`     | [str](`str`)                                                    | Path to GROMACS top file                                                                   | _required_ |
+| `out`          | [str](`str`)                                                    | Output topology file path, stem also used for gro. Can be relative to cwd.                 | _required_ |
+| `parameterize` | [bool](`bool`)                                                  | Parameterize topology with grappa after removing hydrogen                                  | _required_ |
+| `removeH`      | [Optional](`typing.Optional`)\[[list](`list`)\[[int](`int`)\]\] | Remove one or more hydrogens by atom nrs in the top file. One based.                       | _required_ |
+| `gro`          | [Optional](`typing.Optional`)\[[str](`str`)\]                   | GROMACS gro input file. Updates structure when deleting H. Output named like top output.   | _required_ |
+| `residuetypes` | [Optional](`typing.Optional`)\[[str](`str`)\]                   | GROMACS style residuetypes file. Necessary for parameterization with non-amber atom types. | _required_ |
+| `radicals`     | [str](`str`)                                                    | Radicals in the system PRIOR to removing hydrogens with the removeH option.                | _required_ |
 
 ### top_to_graph { #kimmdy.tools.top_to_graph }
 

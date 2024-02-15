@@ -452,13 +452,13 @@ ul.task-list li input[type="checkbox"] {
   </ul></li>
   <li><a href="#kimmdy.tools.edgelist_to_dot_graph" id="toc-kimmdy.tools.edgelist_to_dot_graph" class="nav-link" data-scroll-target="#kimmdy.tools.edgelist_to_dot_graph">edgelist_to_dot_graph</a></li>
   <li><a href="#kimmdy.tools.entry_point_build_examples" id="toc-kimmdy.tools.entry_point_build_examples" class="nav-link" data-scroll-target="#kimmdy.tools.entry_point_build_examples">entry_point_build_examples</a></li>
-  <li><a href="#kimmdy.tools.entry_point_remove_hydrogen" id="toc-kimmdy.tools.entry_point_remove_hydrogen" class="nav-link" data-scroll-target="#kimmdy.tools.entry_point_remove_hydrogen">entry_point_remove_hydrogen</a></li>
+  <li><a href="#kimmdy.tools.entry_point_modify_top" id="toc-kimmdy.tools.entry_point_modify_top" class="nav-link" data-scroll-target="#kimmdy.tools.entry_point_modify_top">entry_point_modify_top</a></li>
   <li><a href="#kimmdy.tools.get_build_example_cmdline_args" id="toc-kimmdy.tools.get_build_example_cmdline_args" class="nav-link" data-scroll-target="#kimmdy.tools.get_build_example_cmdline_args">get_build_example_cmdline_args</a>
   <ul class="collapse">
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
   </ul></li>
-  <li><a href="#kimmdy.tools.get_remove_hydrogen_cmdline_args" id="toc-kimmdy.tools.get_remove_hydrogen_cmdline_args" class="nav-link" data-scroll-target="#kimmdy.tools.get_remove_hydrogen_cmdline_args">get_remove_hydrogen_cmdline_args</a></li>
-  <li><a href="#kimmdy.tools.remove_hydrogen" id="toc-kimmdy.tools.remove_hydrogen" class="nav-link" data-scroll-target="#kimmdy.tools.remove_hydrogen">remove_hydrogen</a>
+  <li><a href="#kimmdy.tools.get_modify_top_cmdline_args" id="toc-kimmdy.tools.get_modify_top_cmdline_args" class="nav-link" data-scroll-target="#kimmdy.tools.get_modify_top_cmdline_args">get_modify_top_cmdline_args</a></li>
+  <li><a href="#kimmdy.tools.modify_top" id="toc-kimmdy.tools.modify_top" class="nav-link" data-scroll-target="#kimmdy.tools.modify_top">modify_top</a>
   <ul class="collapse">
   <li><a href="#parameters-1" id="toc-parameters-1" class="nav-link" data-scroll-target="#parameters-1">Parameters</a></li>
   </ul></li>
@@ -502,20 +502,20 @@ ul.task-list li input[type="checkbox"] {
 <td>Build examples from the command line.</td>
 </tr>
 <tr class="even">
-<td><a href="#kimmdy.tools.entry_point_remove_hydrogen">entry_point_remove_hydrogen</a></td>
-<td>Remove hydrogen by atom nr in a gro and topology file</td>
+<td><a href="#kimmdy.tools.entry_point_modify_top">entry_point_modify_top</a></td>
+<td>Modify topology file in various ways</td>
 </tr>
 <tr class="odd">
 <td><a href="#kimmdy.tools.get_build_example_cmdline_args">get_build_example_cmdline_args</a></td>
 <td>Parse command line arguments.</td>
 </tr>
 <tr class="even">
-<td><a href="#kimmdy.tools.get_remove_hydrogen_cmdline_args">get_remove_hydrogen_cmdline_args</a></td>
-<td>parse cmdline args for remove_hydrogen</td>
+<td><a href="#kimmdy.tools.get_modify_top_cmdline_args">get_modify_top_cmdline_args</a></td>
+<td>parse cmdline args for modify_top</td>
 </tr>
 <tr class="odd">
-<td><a href="#kimmdy.tools.remove_hydrogen">remove_hydrogen</a></td>
-<td>Remove one hydrogen from a gro and top file to create a radical.</td>
+<td><a href="#kimmdy.tools.modify_top">modify_top</a></td>
+<td>Modify topology in various ways.</td>
 </tr>
 <tr class="even">
 <td><a href="#kimmdy.tools.top_to_graph">top_to_graph</a></td>
@@ -567,10 +567,10 @@ ul.task-list li input[type="checkbox"] {
 <p><code>tools.entry_point_build_examples()</code></p>
 <p>Build examples from the command line.</p>
 </section>
-<section id="kimmdy.tools.entry_point_remove_hydrogen" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.tools.entry_point_remove_hydrogen">entry_point_remove_hydrogen</h3>
-<p><code>tools.entry_point_remove_hydrogen()</code></p>
-<p>Remove hydrogen by atom nr in a gro and topology file</p>
+<section id="kimmdy.tools.entry_point_modify_top" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.tools.entry_point_modify_top">entry_point_modify_top</h3>
+<p><code>tools.entry_point_modify_top()</code></p>
+<p>Modify topology file in various ways</p>
 </section>
 <section id="kimmdy.tools.get_build_example_cmdline_args" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.tools.get_build_example_cmdline_args">get_build_example_cmdline_args</h3>
@@ -594,15 +594,15 @@ ul.task-list li input[type="checkbox"] {
 </table>
 </section>
 </section>
-<section id="kimmdy.tools.get_remove_hydrogen_cmdline_args" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.tools.get_remove_hydrogen_cmdline_args">get_remove_hydrogen_cmdline_args</h3>
-<p><code>tools.get_remove_hydrogen_cmdline_args()</code></p>
-<p>parse cmdline args for remove_hydrogen</p>
+<section id="kimmdy.tools.get_modify_top_cmdline_args" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.tools.get_modify_top_cmdline_args">get_modify_top_cmdline_args</h3>
+<p><code>tools.get_modify_top_cmdline_args()</code></p>
+<p>parse cmdline args for modify_top</p>
 </section>
-<section id="kimmdy.tools.remove_hydrogen" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.tools.remove_hydrogen">remove_hydrogen</h3>
-<p><code>tools.remove_hydrogen(gro, top, nr, parameterize, equilibrate, gmx_mdrun_flags='')</code></p>
-<p>Remove one hydrogen from a gro and top file to create a radical.</p>
+<section id="kimmdy.tools.modify_top" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.tools.modify_top">modify_top</h3>
+<p><code>tools.modify_top(topology, out, parameterize, removeH, gro, residuetypes, radicals)</code></p>
+<p>Modify topology in various ways.</p>
 <section id="parameters-1" class="level4">
 <h4 class="anchored" data-anchor-id="parameters-1">Parameters</h4>
 <table class="table">
@@ -616,33 +616,45 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>gro</code></td>
-<td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
-<td>Path to GROMACS gro file</td>
-<td><em>required</em></td>
-</tr>
-<tr class="even">
-<td><code>top</code></td>
+<td><code>topology</code></td>
 <td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
 <td>Path to GROMACS top file</td>
 <td><em>required</em></td>
 </tr>
-<tr class="odd">
-<td><code>nr</code></td>
+<tr class="even">
+<td><code>out</code></td>
 <td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
-<td>Atom number as indicated in the GROMACS gro and top file</td>
+<td>Output topology file path, stem also used for gro. Can be relative to cwd.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td><code>parameterize</code></td>
+<td><a href="https://docs.python.org/3.10/library/functions.html#bool">bool</a></td>
+<td>Parameterize topology with grappa after removing hydrogen</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
-<td><code>parameterize</code></td>
-<td><a href="https://docs.python.org/3.10/library/functions.html#bool">bool</a></td>
-<td>Parameterize topology with grappa after removing hydrogen.</td>
+<td><code>removeH</code></td>
+<td><a href="https://docs.python.org/3.10/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#list">list</a>[<a href="https://docs.python.org/3.10/library/functions.html#int">int</a>]]</td>
+<td>Remove one or more hydrogens by atom nrs in the top file. One based.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="odd">
-<td><code>equilibrate</code></td>
-<td><a href="https://docs.python.org/3.10/library/functions.html#bool">bool</a></td>
-<td>Do a minimization and equilibration with GROMACS. Uses mdp files from kimmdy assets.</td>
+<td><code>gro</code></td>
+<td><a href="https://docs.python.org/3.10/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>]</td>
+<td>GROMACS gro input file. Updates structure when deleting H. Output named like top output.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td><code>residuetypes</code></td>
+<td><a href="https://docs.python.org/3.10/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>]</td>
+<td>GROMACS style residuetypes file. Necessary for parameterization with non-amber atom types.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td><code>radicals</code></td>
+<td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
+<td>Radicals in the system PRIOR to removing hydrogens with the removeH option.</td>
 <td><em>required</em></td>
 </tr>
 </tbody>

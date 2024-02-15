@@ -71,7 +71,7 @@ class PositionRestraint:
         return cls(
             ai=l[0],
             funct=l[1],
-            fc=tuple(l[2:]),
+            fc=(l[2], l[3], l[4]),
             condition=condition,
         )
 
@@ -618,7 +618,7 @@ class ResidueType:
     improper_dihedrals: dict[tuple[str, str, str, str], ResidueImproperSpec]
 
     @classmethod
-    def from_section(cls, residue, d: dict[str, list[list[str]]]):
+    def from_section(cls, residue, d: dict[str, dict[str, list[list[str]]]]):
         atoms = {}
         bonds = {}
         propers = {}
@@ -650,25 +650,29 @@ class ResidueType:
 AtomId = str
 BondId = tuple[str, str]
 AngleId = tuple[str, str, str]
-DihedralId = tuple[str, str, str, str, str]
+ProperDihedralId = tuple[str, str, str, str, str]
+ImproperDihedralId = tuple[str, str, str, str]
 Atomic = Union[Atom, Bond, Pair, Angle, Dihedral]
 AtomicType = Union[AtomType, BondType, AngleType, DihedralType]
 AtomicTypes = Union[
     dict[AtomId, AtomType],
     dict[BondId, BondType],
     dict[AngleId, AngleType],
-    dict[DihedralId, DihedralType],
+    dict[ProperDihedralId, DihedralType],
+    dict[ImproperDihedralId, DihedralType],
 ]
-InteractionIds = Union[BondId, AngleId, DihedralId]
+InteractionIds = Union[BondId, AngleId, ProperDihedralId, ImproperDihedralId]
 Interaction = Union[Bond, Pair, Angle, Dihedral]
 Interactions = Union[
     dict[BondId, Bond],
     dict[AngleId, Angle],
-    dict[DihedralId, Dihedral],
+    dict[ProperDihedralId, Dihedral],
+    dict[ImproperDihedralId, Dihedral],
 ]
 InteractionType = Union[BondType, AngleType, DihedralType]
 InteractionTypes = Union[
     dict[BondId, BondType],
     dict[AngleId, AngleType],
-    dict[DihedralId, DihedralType],
+    dict[ProperDihedralId, DihedralType],
+    dict[ImproperDihedralId, DihedralType],
 ]

@@ -104,13 +104,7 @@ Follows the plumed naming scheme of label, keyword, action.
 
 Read a topology file (*.top,*.itp,*.rtp) into a raw TopologyDict represenation.
 
-#### Parameters
-
-| Name   | Type                   | Description                | Default    |
-|--------|------------------------|----------------------------|------------|
-| `path` | [Path](`pathlib.Path`) | Path to the topology file. | _required_ |
-
-#### Assumptions And Limitation
+Assumptions and limitation:
 
 - `#include` statements will be resolved
 - comments will be removed
@@ -126,6 +120,12 @@ Read a topology file (*.top,*.itp,*.rtp) into a raw TopologyDict represenation.
 - ``#include`` s that don't resolve to a valid file path are silently dropped
 - sections that can have subsections can also exist multiple, separate times
   e.g. moleculetype will appear multiple times and they should not be merged
+
+#### Parameters
+
+| Name   | Type                   | Description                | Default    |
+|--------|------------------------|----------------------------|------------|
+| `path` | [Path](`pathlib.Path`) | Path to the topology file. | _required_ |
 
 #### Returns
 
@@ -226,12 +226,11 @@ raw_top =
 
 Resolve #include statements in a (top/itp) file.
 
+#### Parameters
 
-
-#### Arguments
-
-path :
-    Filepath to read.
+| Name   | Type                   | Description       | Default    |
+|--------|------------------------|-------------------|------------|
+| `path` | [Path](`pathlib.Path`) | Filepath to read. | _required_ |
 
 #### Returns
 

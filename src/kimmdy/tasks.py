@@ -36,8 +36,8 @@ class TaskFiles:
     get_latest of the runmanager to find newest files.
     Files which can not be found by get_latest must be added manually.
 
-    Atributes
-    --------
+    Attributes
+    ----------
     get_latest:
         Runmanager.get_latest function that returns paths to the latest file of given type.
     input:
@@ -115,8 +115,8 @@ class Task:
     Calling a taks calls the stored function.
     The function must return a TaskFiles object.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     runmng
         Runmanager instance from which the task is called
     f

@@ -29,18 +29,14 @@ A task consists of a function and its keyword arguments.
 Calling a taks calls the stored function.
 The function must return a TaskFiles object.
 
+#### Parameters
 
-
-#### Parameters:
-
-runmng
-    Runmanager instance from which the task is called
-f
-    Function that will be called when the task is called
-kwargs
-    kwargs to be passed to f
-out
-    If not None, an output dir will be created with this name
+| Name     | Type                                                                                                         | Description                                               | Default    |
+|----------|--------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------|------------|
+| `runmng` |                                                                                                              | Runmanager instance from which the task is called         | _required_ |
+| `f`      | [Callable](`typing.Callable`)\[..., [Optional](`typing.Optional`)\[[TaskFiles](`kimmdy.tasks.TaskFiles`)\]\] | Function that will be called when the task is called      | _required_ |
+| `kwargs` | [Optional](`typing.Optional`)\[[dict](`dict`)\[[str](`str`), [Any](`typing.Any`)\]\]                         | kwargs to be passed to f                                  | `None`     |
+| `out`    | [Optional](`typing.Optional`)\[[str](`str`)\]                                                                | If not None, an output dir will be created with this name | `None`     |
 
 ### TaskFiles { #kimmdy.tasks.TaskFiles }
 
@@ -55,20 +51,15 @@ The input defaultdict is populated on the fly using
 get_latest of the runmanager to find newest files.
 Files which can not be found by get_latest must be added manually.
 
+#### Attributes
 
-
-#### Atributes
-
-get_latest:
-    Runmanager.get_latest function that returns paths to the latest file of given type.
-input:
-    Input file paths for a Task. Is populated by get_latest or manually.
-output:
-    Output file paths for a Task. Is populated by runmanager._discover_output_files or manually.
-outputdir:
-    Output directory for a Task. Typically populated by create_task_directory called by Task.
-logger:
-    Logger for a Task. Initialized in create_task_directory.
+| Name       | Type                                                   | Description                                                                                  |
+|------------|--------------------------------------------------------|----------------------------------------------------------------------------------------------|
+| get_latest | [Callable](`typing.Callable`)                          | Runmanager.get_latest function that returns paths to the latest file of given type.          |
+| input      | [dict](`dict`)\[[str](`str`), [Path](`pathlib.Path`)\] | Input file paths for a Task. Is populated by get_latest or manually.                         |
+| output     | [dict](`dict`)\[[str](`str`), [Path](`pathlib.Path`)\] | Output file paths for a Task. Is populated by runmanager._discover_output_files or manually. |
+| outputdir  | [Path](`pathlib.Path`)                                 | Output directory for a Task. Typically populated by create_task_directory called by Task.    |
+| logger     | [logging](`logging`).[Logger](`logging.Logger`)        | Logger for a Task. Initialized in create_task_directory.                                     |
 
 #### Examples
 
