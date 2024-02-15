@@ -78,7 +78,7 @@ class MoleculeType:
             {}
         )
         self.settles: dict[str, Settle] = {}
-        self.exclusions: dict[int, Exclusion] = {}
+        self.exclusions: dict[tuple[str, str], Exclusion] = {}
 
         self._parse_atoms()
         self._parse_bonds()
@@ -696,7 +696,7 @@ class Topology:
             logger.info(f"\t{m} {n}")
         return reactive_molecules
 
-    def _merge_moleculetypes(self, radicals: Optional[list[int]] = None):
+    def _merge_moleculetypes(self, radicals: Optional[str] = None):
         """
         Merge all moleculetypes within which reactions can happen into one moleculetype.
         This also makes multiples explicit.
@@ -714,7 +714,7 @@ class Topology:
             add_atomics = self.moleculetypes[name].atomics
             n_atoms = len(add_atomics["atoms"])
             highest_resnr = int(add_atomics["atoms"][-1][RESNR_ID_FIELDS["atoms"][0]])
-            for i in range(n):
+            for _ in range(n):
                 for section_name, section in add_atomics.items():
                     section = deepcopy(section)
                     atomnr_fields = ATOM_ID_FIELDS.get(section_name, [])

@@ -292,7 +292,9 @@ def merge_top_moleculetypes_slow_growth(
                 sigmaij = 0.5 * (float(sigmas[0]) + float(sigmas[1]))
                 epsilons = [ff.atomtypes[at].epsilon for at in atomtypes]
                 epsilonij = np.sqrt(float(epsilons[0]) * float(epsilons[1]))
+
                 # morse well steepness
+                assert parameterizedA.c1 is not None, f"parameterizedA.c1 is not set"
                 beta = np.sqrt(
                     float(parameterizedA.c1) / (2 * hyperparameters["morse_well_depth"])
                 )
@@ -323,6 +325,7 @@ def merge_top_moleculetypes_slow_growth(
                 epsilons = [ff.atomtypes[at].epsilon for at in atomtypes]
                 epsilonij = np.sqrt(float(epsilons[0]) * float(epsilons[1]))
                 # morse well steepness
+                assert parameterizedB.c1 is not None, f"parameterizedB.c1 is not set"
                 beta = np.sqrt(
                     float(parameterizedB.c1) / (2 * hyperparameters["morse_well_depth"])
                 )
