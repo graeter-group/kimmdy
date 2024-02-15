@@ -28,17 +28,24 @@ C   N   500 ; Is not expected to break due to partial  double bond character
 CA  C   341 ; float average of Ala, Gly and Pro
 CA  N   379 ; float average of Ala and Gly
 [GLY]
+C   N   500 
 CA  C   341
 CA  N   382
 [ALA]
+C   N   500 
 CA  C   344
 CA  N   376
 [PRO]
+C   N   500 
 CA  C   337
+CA  N   500
 
 ;; Crosslinks
 ;; PYD
 [LYX]
+C   N   500 
+CA  C   341 
+CA  N   379 
 CA  CB  306
 CB  CG  371
 CG  CD  354
@@ -50,16 +57,27 @@ C12  C11    500
 C11  C10    500
 C13  C14    500
 C13  C12    500
+C12  CB   480   ; same as in LY2
+C13  CG   456   ; same as in LY3
 [LY3]
+C   N   500 
+CA  C   341 
+CA  N   379 
 CA  CB  313
 CB  CG  344
 CG  C13 456
 [LY2]
+C   N   500 
+CA  C   341 
+CA  N   379 
 CA  CB  282 ; use 220 if deprotonated and 282 otherwise
 CB  C12 480
 
 ;; DPD
 [LXX]
+C   N   500 
+CA  C   341 
+CA  N   379 
 CA  CB  306 ; taken from PYD
 CB  CG  371 ; taken from PYD
 CG  CD  370 ; taken from PYD CD CE
@@ -71,22 +89,37 @@ C12  C11   500
 C11  C10   500
 C13  C14   500
 C13  C12   500
+C12  CB 481 ; same as in LY2, taken from PYD
+C13  CG 456 ; same as in LY3, taken from PYD
+
 [LX3]
+C   N   500 
+CA  C   341 
+CA  N   379 
 CA  CB  313 ; taken from PYD
 CB  CG  344 ; taken from PYD
 CG  C13 456 ; taken from PYD
 [LX2]
+C   N   500 
+CA  C   341 
+CA  N   379 
 CA  CB  282
 CB  C12 481
 
 ;; HLKNL
 [L5Y]
+C   N   500 
+CA  C   341 
+CA  N   379 
 CA  CB  313
 CB  CG  341
 CG  CD  341
 CD  CE  296
-CE  NZ  303
+CE  NZ  303 ; current setup may lead to confusion with L4Y CE L4Y NZ bond under certain circumstances
 [L4Y]
+C   N   500 
+CA  C   341 
+CA  N   379 
 CA  CB  312
 CB  CG  376
 CG  CD  355
