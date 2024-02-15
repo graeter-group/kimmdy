@@ -184,7 +184,6 @@ def modify_top(
 
     # parameterize with grappa
     if parameterize:
-        print("--Parameterizing")
         # load grappa
         print("Loading Plugins..", end="")
         discover_plugins()
@@ -199,7 +198,7 @@ def modify_top(
         print("Done")
 
     # write top file
-    print("Writing top..", end="")
+    print("Parameterizing and writing top..", end="")
     write_top(top.to_dict(), out_path)
     print("Done")
 
