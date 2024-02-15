@@ -11,17 +11,17 @@ Here are some important points for doing so.
 
 If you want to start your sequence of tasks with a reaction, you have to
 give KIMMDY a trajectory.
-This, you do with the `trr` key in the `kimmdy.yml` file.
+This, you do with the `trr` key in the [`kimmdy.yml`](/guide/references/input.qmd) file.
 
 
 ## Pre-averaged plumed input
 
 Sometimes it is handy to pre-compute the averages of the distances plumed recordes.
-Usually, the plumed output (distances.dat) contains one line per 
+Usually, the plumed output (`distances.dat`) contains one line per 
 timestep, each line starting with the time.
 
 If you calculate the averages yourself, you end up having only one line, 
-but need to tell KIMMDY how long the timeframe was, whic was averaged.
+but need to tell KIMMDY how long the timeframe was, which was averaged.
 To do this, make sure to write the **duration** of your averaged simulation 
 in the time field like this for a 10ps simulation:
 
