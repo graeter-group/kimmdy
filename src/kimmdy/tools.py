@@ -196,9 +196,10 @@ def modify_top(
         # require parameterization when writing topology to dict
         top.needs_parameterization = True
         print("Done")
+        print("Parameterizing and ", end="")
 
     # write top file
-    print("Parameterizing and writing top..", end="")
+    print("Writing top..", end="")
     write_top(top.to_dict(), out_path)
     print("Done")
 
