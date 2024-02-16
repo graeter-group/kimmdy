@@ -69,7 +69,7 @@ Returns bond parameters (b0, kb) for a set of two atomtypes.
 
 ### get_edissoc_from_atomnames { #kimmdy.utils.get_edissoc_from_atomnames }
 
-`utils.get_edissoc_from_atomnames(atomnames, edissoc)`
+`utils.get_edissoc_from_atomnames(atomnames, edissoc, residue='_')`
 
 Returns dissociation energy E_dissoc for a set of two atomnames.
 
@@ -79,6 +79,7 @@ Returns dissociation energy E_dissoc for a set of two atomnames.
 |-------------|--------------------------------|-----------------------------------------------------------------------------------|------------|
 | `atomnames` | [list](`list`)\[[str](`str`)\] | Two atomnames as defined in the respective force field                            | _required_ |
 | `edissoc`   | [dict](`dict`)                 | Parsed file with dissociation energies per bond between two atomtypes or elements | _required_ |
+| `residue`   | [str](`str`)                   | Residue for which the atomnames are defined                                       | `'_'`      |
 
 ### get_gmx_dir { #kimmdy.utils.get_gmx_dir }
 
