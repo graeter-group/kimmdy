@@ -648,7 +648,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="kimmdy.parsing.read_edissoc">read_edissoc</h3>
 <p><code>parsing.read_edissoc(path)</code></p>
 <p>Reads a edissoc file and turns it into a dict.</p>
-<p>The tuple of bond atoms make up the key, the dissociation energy E_dissoc [kJ mol-1] is the value.</p>
+<p>The dissociation energy is assigned per pair of atom names. Atom names are unique to a residue, and the dict is nested by residues. The set of bond atoms make up the key, the dissociation energy E_dissoc [kJ mol-1] is the value.</p>
 <section id="parameters" class="level4">
 <h4 class="anchored" data-anchor-id="parameters">Parameters</h4>
 <table class="table">
