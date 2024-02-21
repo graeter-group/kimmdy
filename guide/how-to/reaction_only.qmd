@@ -1,0 +1,38 @@
+---
+title: Reaction only
+subtitle: Perform reactions on precomputed Trajectory
+author: Kai Riedmiller
+---
+
+You might want to apply a KIMMDY reaction to an already existing simulation.
+Here are some important points for doing so.
+
+## KIMMDY yaml
+
+If you want to start your sequence of tasks with a reaction, you have to
+give KIMMDY a trajectory.
+This, you do with the `trr` key in the [`kimmdy.yml`](/guide/references/input.qmd) file.
+
+
+## Pre-averaged plumed input
+
+Sometimes it is handy to pre-compute the averages of the distances plumed recordes.
+Usually, the plumed output (`distances.dat`) contains one line per 
+timestep, each line starting with the time.
+
+If you calculate the averages yourself, you end up having only one line, 
+but need to tell KIMMDY how long the timeframe was, which was averaged.
+To do this, make sure to write the **duration** of your averaged simulation 
+in the time field like this for a 10ps simulation:
+
+```
+#! FIELDS time d0 d1 d2 d3 d4
+10.000000 0.142401 0.151588 0.143725 0.156734 0.152581
+```
+
+You still need the plumed config file, even if KIMMDY does not execute plumed 
+in the current example, as KIMMDY reads the filename of the plumed output
+from the plumed config.
+
+
+

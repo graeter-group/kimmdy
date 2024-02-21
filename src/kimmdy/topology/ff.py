@@ -4,18 +4,11 @@ import logging
 from pathlib import Path
 from typing import Optional
 from kimmdy.topology.atomic import (
-    Atom,
-    Bond,
-    Pair,
-    Angle,
-    Dihedral,
-    MultipleDihedrals,
-    PositionRestraint,
-    DihedralRestraint,
-    ResidueImproperSpec,
-    ResidueProperSpec,
-    Settle,
-    Exclusion,
+    AngleId,
+    AtomId,
+    BondId,
+    ImproperDihedralId,
+    ProperDihedralId,
     AtomType,
     BondType,
     AngleType,
@@ -32,13 +25,11 @@ class FF:
     """Container for parsed forcefield data."""
 
     def __init__(self, top: dict, residuetypes_path: Optional[Path] = None):
-        self.atomtypes: dict[str, AtomType] = {}
-        self.bondtypes: dict[tuple[str, str], BondType] = {}
-        self.angletypes: dict[tuple[str, str, str], AngleType] = {}
-        self.proper_dihedraltypes: dict[
-            tuple[str, str, str, str, str], DihedralType
-        ] = {}
-        self.improper_dihedraltypes: dict[tuple[str, str, str, str], DihedralType] = {}
+        self.atomtypes: dict[AtomId, AtomType] = {}
+        self.bondtypes: dict[BondId, BondType] = {}
+        self.angletypes: dict[AngleId, AngleType] = {}
+        self.proper_dihedraltypes: dict[ProperDihedralId, DihedralType] = {}
+        self.improper_dihedraltypes: dict[ImproperDihedralId, DihedralType] = {}
         self.residuetypes: dict[str, ResidueType] = {}
 
         ffdir = top["ffdir"]

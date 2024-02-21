@@ -1,5 +1,20 @@
 # Changelog
 
+## [6.2.0](https://github.com/hits-mbm-dev/kimmdy/compare/v6.1.0...v6.2.0) (2024-02-16)
+
+
+### Features
+
+* Generalize ff interaction ([#360](https://github.com/hits-mbm-dev/kimmdy/issues/360)) ([49bdb54](https://github.com/hits-mbm-dev/kimmdy/commit/49bdb54c4f46909125df954915c7a061b5eaed11))
+* improve edissoc ([#366](https://github.com/hits-mbm-dev/kimmdy/issues/366)) ([37bb8da](https://github.com/hits-mbm-dev/kimmdy/commit/37bb8da0bfe2e1a69a24e3440b702d7c39430e17))
+
+## [6.1.0](https://github.com/hits-mbm-dev/kimmdy/compare/v6.0.1...v6.1.0) (2024-02-14)
+
+
+### Features
+
+* modify_top saves mapping of old and new indices ([#364](https://github.com/hits-mbm-dev/kimmdy/issues/364)) ([0086bbe](https://github.com/hits-mbm-dev/kimmdy/commit/0086bbe2ff7cab9e900ea879da293f7b1f02757c))
+
 ## [6.0.1](https://github.com/hits-mbm-dev/kimmdy/compare/v6.0.0...v6.0.1) (2024-01-03)
 
 

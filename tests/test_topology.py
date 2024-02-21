@@ -621,8 +621,6 @@ class TestHexalaTopology:
         top.break_bond(("29", "35"))
         top.break_bond(("31", "34"))
         top.bind_bond(("34", "29"))
-        # the reference is shit anyway
-        focus = set(["29", "31", "34", "35"])
 
         # compare topologies
         assert len(top.bonds) == len(top_ref.bonds)

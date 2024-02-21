@@ -78,7 +78,7 @@ class MoleculeType:
             {}
         )
         self.settles: dict[str, Settle] = {}
-        self.exclusions: dict[int, Exclusion] = {}
+        self.exclusions: dict[tuple[str, str], Exclusion] = {}
 
         self._parse_atoms()
         self._parse_bonds()
@@ -101,13 +101,13 @@ class MoleculeType:
                 atom = self.atoms.get(radical)
                 if atom:
                     self.radicals[radical] = atom
+                    atom.is_radical = True
                 else:
                     logger.debug(
                         f"Atom nr {radical} from 'radicals' section in config file not in topology. Ignoring this entry."
                     )
         else:
             self.find_radicals()
-        self.set_atom_is_radical()
 
     def __str__(self) -> str:
         return textwrap.dedent(
@@ -223,9 +223,9 @@ class MoleculeType:
         ls = self.atomics.get("exclusions")
         if not ls:
             return
-        for i, l in enumerate(ls):
+        for _, l in enumerate(ls):
             exclusion = Exclusion.from_top_line(l)
-            self.exclusions[tuple(l)] = exclusion
+            self.exclusions[(l[0], l[1])] = exclusion
 
     def _initialize_graph(self):
         """Add a list of atom nrs bound to an atom to each atom."""
@@ -249,15 +249,10 @@ class MoleculeType:
             bo = ATOMTYPE_BONDORDER_FLAT[atom.type]
             if bo and bo > len(atom.bound_to_nrs):
                 self.radicals[atom.nr] = atom
-        return None
-
-    def set_atom_is_radical(self):
-        """Set radical status per atom and in topology based on self.radicals."""
-        for atom in self.atoms.values():
-            if atom.nr in self.radicals:
                 atom.is_radical = True
             else:
                 atom.is_radical = False
+        return None
 
     def _update_atomics_dict(self):
         self.atomics["atoms"] = [attributes_to_list(x) for x in self.atoms.values()]
@@ -546,8 +541,8 @@ class MoleculeType:
                 pair_ai = update_map.get(pair.ai)
                 pair_aj = update_map.get(pair.aj)
                 if None not in (pair_ai, pair_aj):
-                    pair.ai = pair_ai
-                    pair.aj = pair_aj
+                    pair.ai = pair_ai  # type: ignore (pyright bug)
+                    pair.aj = pair_aj  # type: ignore
                     new_pairs[(pair_ai, pair_aj)] = pair
 
             dihedrals.ai = ai  # type: ignore
@@ -699,7 +694,7 @@ class Topology:
             logger.info(f"\t{m} {n}")
         return reactive_molecules
 
-    def _merge_moleculetypes(self, radicals: Optional[list[int]] = None):
+    def _merge_moleculetypes(self, radicals: Optional[str] = None):
         """
         Merge all moleculetypes within which reactions can happen into one moleculetype.
         This also makes multiples explicit.
@@ -717,7 +712,7 @@ class Topology:
             add_atomics = self.moleculetypes[name].atomics
             n_atoms = len(add_atomics["atoms"])
             highest_resnr = int(add_atomics["atoms"][-1][RESNR_ID_FIELDS["atoms"][0]])
-            for i in range(n):
+            for _ in range(n):
                 for section_name, section in add_atomics.items():
                     section = deepcopy(section)
                     atomnr_fields = ATOM_ID_FIELDS.get(section_name, [])
@@ -908,7 +903,9 @@ class Topology:
                     bondtype = (atom1.atom, atom2.atom)
                     residue_bond_spec = self.ff.residuetypes[residue].bonds.get(
                         bondtype,
-                        self.ff.residuetypes[residue].bonds.get(bondtype[::-1]),
+                        self.ff.residuetypes[residue].bonds.get(
+                            (bondtype[-1], bondtype[-2])
+                        ),
                     )
                     if residue_bond_spec:
                         atom1.charge = (

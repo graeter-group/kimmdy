@@ -176,8 +176,7 @@ def test_get_existing_files(arranged_tmp_path):
 
 
 def test_explicit_residuetypes(arranged_tmp_path):
-    config = Config(Path("config1.yml"))
-    config.residuetypes = Path("aminoacids.rtp")
+    config = Config(Path("config3.yml"))
     ff = FF(top=read_top(config.top), residuetypes_path=config.residuetypes)
 
     assert len(ff.residuetypes.keys()) == 5

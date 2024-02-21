@@ -159,7 +159,7 @@
     },
     "residuetypes": {
       "title": "residuetypes",
-      "description": "GROMACS rtp file that contains residuetypes",
+      "description": "GROMACS rtp file that contains residuetypes. Looks for `aminoacids.rtp` it not set. KIMMDY will first look in the current working directory and then relative to the forecfield directory.",
       "type": "string",
       "pytype": "Path"
     },

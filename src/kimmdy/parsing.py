@@ -33,8 +33,8 @@ def resolve_includes(
 ) -> tuple[list[str], Optional[Path]]:
     """Resolve #include statements in a (top/itp) file.
 
-    Arguments
-    ---------
+    Parameters
+    ----------
     path :
         Filepath to read.
 
@@ -100,13 +100,8 @@ def read_top(
 ) -> TopologyDict:
     """Read a topology file (*.top,*.itp,*.rtp) into a raw TopologyDict represenation.
 
-    Parameters
-    ----------
-    path :
-        Path to the topology file.
+    Assumptions and limitation:
 
-    Assumptions and limitation
-    -----
     - `#include` statements will be resolved
     - comments will be removed
     - all lines are stripped of leading and trailing whitespace
@@ -121,6 +116,11 @@ def read_top(
     - ``#include`` s that don't resolve to a valid file path are silently dropped
     - sections that can have subsections can also exist multiple, separate times
       e.g. moleculetype will appear multiple times and they should not be merged
+
+    Parameters
+    ----------
+    path :
+        Path to the topology file.
 
     Returns
     ------
@@ -556,7 +556,9 @@ def read_json(path: Union[str, Path]) -> dict:
 def read_edissoc(path: Path) -> dict:
     """Reads a edissoc file and turns it into a dict.
 
-    The tuple of bond atoms make up the key, the dissociation energy E_dissoc [kJ mol-1] is the value.
+    The dissociation energy is assigned per pair of atom names. Atom names are unique to a residue, and the dict is nested by residues.
+    The set of bond atoms make up the key, the dissociation energy E_dissoc [kJ mol-1] is the value.
+
 
     Parameters
     ----------
@@ -564,10 +566,17 @@ def read_edissoc(path: Path) -> dict:
         Path to the file. E.g. Path("edissoc.dat")
     """
     with open(path, "r") as f:
-        edissocs = {}
+        key = "_"
+        edissocs = {key: {}}
         for l in f:
-            if l.startswith(";") or len(l.split()) < 3:
+            if l.startswith(";"):
                 continue
-            at1, at2, edissoc, *_ = l.split()
-            edissocs[tuple([at1, at2])] = float(edissoc)
+            elif l.strip().startswith("[") and l.strip().endswith("]"):
+                key = l.strip().strip("[]")
+                edissocs[key] = {}
+            elif len(l.split(sep=";")[0].split()) == 3:
+                at1, at2, edissoc, *_ = l.split()
+                edissocs[key][frozenset([at1, at2])] = float(edissoc)
+            else:
+                logger.debug(f"Unexpected line in edissoc file: {l}")
     return edissocs

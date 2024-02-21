@@ -64,7 +64,8 @@ Read a distances.dat plumed output file.
 
 Reads a edissoc file and turns it into a dict.
 
-The tuple of bond atoms make up the key, the dissociation energy E_dissoc [kJ mol-1] is the value.
+The dissociation energy is assigned per pair of atom names. Atom names are unique to a residue, and the dict is nested by residues.
+The set of bond atoms make up the key, the dissociation energy E_dissoc [kJ mol-1] is the value.
 
 #### Parameters
 
@@ -104,13 +105,7 @@ Follows the plumed naming scheme of label, keyword, action.
 
 Read a topology file (*.top,*.itp,*.rtp) into a raw TopologyDict represenation.
 
-#### Parameters
-
-| Name   | Type                   | Description                | Default    |
-|--------|------------------------|----------------------------|------------|
-| `path` | [Path](`pathlib.Path`) | Path to the topology file. | _required_ |
-
-#### Assumptions And Limitation
+Assumptions and limitation:
 
 - `#include` statements will be resolved
 - comments will be removed
@@ -126,6 +121,12 @@ Read a topology file (*.top,*.itp,*.rtp) into a raw TopologyDict represenation.
 - ``#include`` s that don't resolve to a valid file path are silently dropped
 - sections that can have subsections can also exist multiple, separate times
   e.g. moleculetype will appear multiple times and they should not be merged
+
+#### Parameters
+
+| Name   | Type                   | Description                | Default    |
+|--------|------------------------|----------------------------|------------|
+| `path` | [Path](`pathlib.Path`) | Path to the topology file. | _required_ |
 
 #### Returns
 
@@ -226,12 +227,11 @@ raw_top =
 
 Resolve #include statements in a (top/itp) file.
 
+#### Parameters
 
-
-#### Arguments
-
-path :
-    Filepath to read.
+| Name   | Type                   | Description       | Default    |
+|--------|------------------------|-------------------|------------|
+| `path` | [Path](`pathlib.Path`) | Filepath to read. | _required_ |
 
 #### Returns
 
