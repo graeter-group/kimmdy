@@ -18,7 +18,7 @@ from datetime import datetime
 
 from kimmdy.utils import run_shell_cmd
 from kimmdy.parsing import read_json, write_json
-from kimmdy.recipe import RecipeCollection
+from kimmdy.recipe import RecipeCollection, Break, Bind, Place, Relax
 
 
 def get_analysis_dir(dir: Path) -> Path:
@@ -336,9 +336,12 @@ def radical_population(
     atoms.tempfactors = list(occupancy.values())
     pdb_output = f"{analysis_dir}/radical_population_selection.pdb"
     atoms.write(pdb_output)
-    protein = u.select_atoms("protein")
-    pdb_output_protein = f"{analysis_dir}/radical_population.pdb"
-    protein.write(pdb_output_protein)
+    try:
+        protein = u.select_atoms("protein")
+        pdb_output_protein = f"{analysis_dir}/radical_population.pdb"
+        protein.write(pdb_output_protein)
+    except IndexError:
+        print("Problem with writing protein pdb. Continuing.")
 
     if open_plot:
         sp.call(("xdg-open", output_path))
@@ -475,6 +478,59 @@ def plot_runtime(dir: str, md_tasks: list, datefmt: str, open_plot: bool = False
 
     print(f"Finished analyzing runtime of {run_dir}.")
 
+    if open_plot:
+        sp.call(("xdg-open", output_path))
+
+
+def reaction_participation(dir: str, open_plot: bool = False):
+    """Plot runtime of all tasks.
+
+    Parameters
+    ----------
+    dir
+        Directory of KIMMDY run
+    open_plot
+        Open plot in default system viewer.
+    """
+    print(
+        "Count reaction participation\n"
+        f"dir: \t\t\t{dir}\n"
+        f"open_plot: \t\t{open_plot}\n"
+    )
+
+    run_dir = Path(dir).expanduser().resolve()
+    analysis_dir = get_analysis_dir(run_dir)
+
+    reaction_count = {"overall": 0}
+    for recipes in run_dir.glob("*decide_recipe/recipes.csv"):
+        # get picked recipe
+        rc, picked_rp = RecipeCollection.from_csv(recipes)
+        # get involved atoms
+        reaction_atom_ids = set()
+        for step in picked_rp.recipe_steps:
+            if isinstance(step, Break) or isinstance(step, Bind):
+                reaction_atom_ids |= set([step.atom_id_1, step.atom_id_2])
+            elif isinstance(step, Place):
+                reaction_atom_ids |= set([step.id_to_place])
+            else:
+                continue
+        # update count
+        for atom_id in reaction_atom_ids:
+            if atom_id in reaction_count:
+                reaction_count[atom_id] += 1
+            else:
+                reaction_count[atom_id] = 1
+        reaction_count["overall"] += 1
+
+    reaction_count = dict(sorted(reaction_count.items()))
+    sns.barplot(
+        x=list(reaction_count.keys()), y=list(reaction_count.values()), errorbar=None
+    )
+
+    plt.xlabel("Atom identifier")
+    plt.ylabel("Reaction participation count")
+    output_path = str(analysis_dir / "reaction_participation_fingerprint.png")
+    plt.savefig(output_path, dpi=300)
     if open_plot:
         sp.call(("xdg-open", output_path))
 
@@ -621,7 +677,19 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         action="store_true",
         help="Open plot in default system viewer.",
     )
-
+    parser_reaction_participation = subparsers.add_parser(
+        name="reaction_participation",
+        help="Plot counts of reaction participation per atom id",
+    )
+    parser_reaction_participation.add_argument(
+        "dir", type=str, help="KIMMDY run directory to be analysed."
+    )
+    parser_reaction_participation.add_argument(
+        "--open-plot",
+        "-p",
+        action="store_true",
+        help="Open plot in default system viewer.",
+    )
     return parser.parse_args()
 
 
@@ -646,6 +714,11 @@ def entry_point_analysis():
         plot_rates(args.dir)
     elif args.module == "runtime":
         plot_runtime(args.dir, args.md_tasks, args.datefmt, args.open_plot)
+    elif args.module == "reaction_participation":
+        reaction_participation(
+            args.dir,
+            args.open_plot,
+        )
     else:
         print(
             "No analysis module specified. Use -h for help and a list of available modules."
