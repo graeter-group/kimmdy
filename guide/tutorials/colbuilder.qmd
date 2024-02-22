@@ -45,9 +45,9 @@ gmx grompp -f ions.mdp -c fibril_solv.gro -p topol.top -o fibril_genion.tpr
 
 gmx genion -s fibril_genion.tpr -p topol.top -o fibril_ion.gro -conc 0.15 -neutral
 
-gmx grompp -f minim.mdp -c fibril_ion.gro -p topol.top -o pep_min.tpr
+gmx grompp -f minim.mdp -c fibril_ion.gro -p topol.top -o fibril_min.tpr
 
-gmx mdrun -deffnm pep_min -v
+gmx mdrun -deffnm fibril_min -v
 ```
 
 
@@ -57,13 +57,13 @@ Heavy computational load from here on.
 
 
 ```bash
-gmx grompp -f nvt.mdp -c fibril_min.gro -r fibril_min.gro -p topol.top -o nvt.tpr
+gmx grompp -f nvt.mdp -c fibril_min.gro -r fibril_min.gro -p topol.top -o fibril_nvt.tpr
 
-gmx mdrun -deffnm nvt -v -dlb yes -ntomp 4 -ntmpi 10  -pme gpu -bonded gpu -npme 1
+gmx mdrun -deffnm fibril_nvt -v -dlb yes -ntomp 4 -ntmpi 10  -pme gpu -bonded gpu -npme 1
 
-gmx grompp -f npt.mdp -c nvt.gro -r nvt.gro -p topol.top -o npt.tpr
+gmx grompp -f npt.mdp -c fibril_nvt.gro -r fibril_nvt.gro -p topol.top -o fibril_npt.tpr
 
-gmx mdrun -deffnm npt -v -dlb yes -ntomp 4 -ntmpi 10  -pme gpu -bonded gpu -npme 1
+gmx mdrun -deffnm fibril_npt -v -dlb yes -ntomp 4 -ntmpi 10  -pme gpu -bonded gpu -npme 1
 ```
 
 
