@@ -702,7 +702,9 @@ class Topology:
             logger.info(f"\t{m} {n}")
         return reactive_molecules
 
-    def _merge_moleculetypes(self, radicals: Optional[list[int]] = None, search_amber_rad: bool = True):
+    def _merge_moleculetypes(
+        self, radicals: Optional[list[int]] = None, search_amber_rad: bool = True
+    ):
         """
         Merge all moleculetypes within which reactions can happen into one moleculetype.
         This also makes multiples explicit.
