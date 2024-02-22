@@ -153,7 +153,9 @@ def modify_top(
 
     print("Reading topology..", end="")
     top = Topology(
-        read_top(top_path), radicals=" ".join(radicals), residuetypes_path=residuetypes_path
+        read_top(top_path),
+        radicals=" ".join(radicals),
+        residuetypes_path=residuetypes_path,
     )
     print("Done")
 
