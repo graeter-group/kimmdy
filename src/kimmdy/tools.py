@@ -92,6 +92,7 @@ def modify_top(
     gro: Optional[str] = None,
     residuetypes: Optional[str] = None,
     radicals: Optional[list[int]] = None,
+    search_amber_rad: bool = True,
 ):
     """Modify topology in various ways.
 
@@ -115,7 +116,11 @@ def modify_top(
         non-amber atom types.
     radicals
         Radicals in the system PRIOR to removing hydrogens with the removeH
-        option. One based.
+        option. One based. Can be detected automatically in amber topologies.
+    search_amber_rad
+        Automatic radical search only implemented for amber. If you do use
+        another ff, set this to false, and provide a list of radicals
+        manually, if necessary.
     """
 
     top_path = Path(topology).with_suffix(".top").resolve()
@@ -154,8 +159,9 @@ def modify_top(
     print("Reading topology..", end="")
     top = Topology(
         read_top(top_path),
-        radicals=" ".join(radicals),
+        radicals=radicals,
         residuetypes_path=residuetypes_path,
+        search_amber_rad=search_amber_rad,
     )
     print("Done")
 
@@ -265,6 +271,15 @@ def get_modify_top_cmdline_args() -> argparse.Namespace:
         type=str,
     )
     parser.add_argument(
+        "-a",
+        "--search_amber_rad",
+        action="store_true",
+        help="Automatic radical search only implemented for amber. If you do"
+        "use another ff, set this to false, and provide a list of radicals"
+        "manually, if necessary.",
+        default=True,
+    )
+    parser.add_argument(
         "-t",
         "--residuetypes",
         help="GROMACS style residuetypes file. Necessary for parameterization with non-amber atom types.",
@@ -285,13 +300,14 @@ def entry_point_modify_top():
     args = get_modify_top_cmdline_args()
 
     modify_top(
-        args.top,
-        args.out,
-        args.parameterize,
-        args.removeH,
-        args.gro,
-        args.residuetypes,
-        args.radicals,
+        topology=args.top,
+        out=args.out,
+        parameterize=args.parameterize,
+        removeH=args.removeH,
+        gro=args.gro,
+        residuetypes=args.residuetypes,
+        radicals=args.radicals,
+        search_amber_rad=args.search_amber_rad,
     )
 
 
