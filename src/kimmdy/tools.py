@@ -157,7 +157,7 @@ def modify_top(
     )
 
     print("Reading topology..", end="")
-    
+
     # radicals == None -> find_rad()
     # radicals != None -> iterate over rad_str.split, can be empty
     rad_str = None
