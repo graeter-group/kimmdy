@@ -157,9 +157,18 @@ def modify_top(
     )
 
     print("Reading topology..", end="")
+    
+    # radicals == None -> find_rad()
+    # radicals != None -> iterate over rad_str.split, can be empty
+    rad_str = None
+    if radicals is not None:
+        rad_str = " ".join(radicals)
+    elif not search_amber_rad:
+        rad_str = ""
+
     top = Topology(
         read_top(top_path),
-        radicals=" ".join(radicals) if search_amber_rad else None,
+        radicals=rad_str,
         residuetypes_path=residuetypes_path,
     )
     print("Done")
