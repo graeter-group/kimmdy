@@ -730,7 +730,7 @@ def entry_point_analysis():
             args.open_plot,
             args.open_vmd,
         )
-    elif args.module == 'radical_migration':
+    elif args.module == "radical_migration":
         radical_migration()
     elif args.module == "rates":
         plot_rates(args.dir)
