@@ -91,7 +91,7 @@ def modify_top(
     removeH: Optional[list[int]],
     gro: Optional[str],
     residuetypes: Optional[str],
-    radicals: str,
+    radicals: Optional[list[int]],
 ):
     """Modify topology in various ways.
 
@@ -111,9 +111,11 @@ def modify_top(
         GROMACS gro input file. Updates structure when deleting H.
         Output named like top output.
     residuetypes
-        GROMACS style residuetypes file. Necessary for parameterization with non-amber atom types.
+        GROMACS style residuetypes file. Necessary for parameterization with
+        non-amber atom types.
     radicals
-        Radicals in the system PRIOR to removing hydrogens with the removeH option.
+        Radicals in the system PRIOR to removing hydrogens with the removeH
+        option. One based.
     """
 
     top_path = Path(topology).with_suffix(".top").resolve()
@@ -151,7 +153,7 @@ def modify_top(
 
     print("Reading topology..", end="")
     top = Topology(
-        read_top(top_path), radicals=radicals, residuetypes_path=residuetypes_path
+        read_top(top_path), radicals=" ".join(radicals), residuetypes_path=residuetypes_path
     )
     print("Done")
 
@@ -270,8 +272,8 @@ def get_modify_top_cmdline_args() -> argparse.Namespace:
         "-x",
         "--radicals",
         help="Radicals in the system PRIOR to removing hydrogens with the removeH option.",
-        type=str,
-        default="",
+        nargs="+",
+        type=int,
     )
     return parser.parse_args()
 
