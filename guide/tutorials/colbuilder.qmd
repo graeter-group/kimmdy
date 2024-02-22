@@ -43,7 +43,7 @@ touch ions.mdp
 
 gmx grompp -f ions.mdp -c fibril_solv.gro -p topol.top -o fibril_genion.tpr
 
-gmx genion -s fibril_genion.tpr -p topol.top -o fibril_ion.gro -conc 0.15 -neutral
+gmx genion -s fibril_genion.tpr -p topol.top -o fibril_ion.gro -conc 0.15 -neutral < SOL
 
 gmx grompp -f minim.mdp -c fibril_ion.gro -p topol.top -o fibril_min.tpr
 
