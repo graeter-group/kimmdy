@@ -643,7 +643,27 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         help="Open VMD with the concatenated trajectory."
         "To view the radical occupancy per atom, add a representation with the beta factor as color.",
     )
-
+    parser_radical_migration = subparsers.add_parser(
+        name="radical_migration",
+        help="Create a csv of radical migration events for further analysis.",
+    )
+    parser_radical_migration.add_argument(
+        "dir", type=str, help="KIMMDY run directory to be analysed."
+    )
+    parser_radical_population.add_argument(
+        "--cutoff_qualitative",
+        "-c",
+        type=int,
+        help="Analyse radical migration qualitatively. Add radical migrations that occurred at least as often as the cutoff value",
+        default=1,
+    )
+    parser_radical_population.add_argument(
+        "quantitative",
+        "-q",
+        type=str,
+        help="Analyse radical migration qualitatively. Available are 'frequency' and 'time'",
+        default="frequency",
+    )
     parser_rates = subparsers.add_parser(
         name="rates",
         help="Plot rates of all possible reactions after a MD run. Rates must have been saved!",
@@ -710,6 +730,8 @@ def entry_point_analysis():
             args.open_plot,
             args.open_vmd,
         )
+    elif args.module == 'radical_migration':
+        radical_migration()
     elif args.module == "rates":
         plot_rates(args.dir)
     elif args.module == "runtime":
