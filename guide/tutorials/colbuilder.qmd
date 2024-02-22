@@ -146,7 +146,7 @@ By providing a gromacs index file with all backbone and crosslink atoms, the scr
 Such a index file can be generated with 
 
 ```bash
-echo 'backbone | r LY2 LY3_L4Y_L5Y_LYX' | gmx make_ndx -n index.ndx -o index.ndx
+echo -ne "r ACE & a CH3\nr NME & a CH3\n\"Protein\"|\"Other\"\n\"Backbone\"| r LY2 LY3 L4Y L5Y LYX\nq\n"| gmx make_ndx -f npt.gro
 ```
 
 Now let's look at the sequence.
