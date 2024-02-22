@@ -285,7 +285,7 @@ def entry_point_modify_top():
         args.out,
         args.parameterize,
         args.removeH,
-        args.grofile,
+        args.gro,
         args.residuetypes,
         args.radicals,
     )
