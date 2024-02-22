@@ -87,11 +87,11 @@ def entry_point_build_examples():
 def modify_top(
     topology: str,
     out: str,
-    parameterize: bool,
-    removeH: Optional[list[int]],
-    gro: Optional[str],
-    residuetypes: Optional[str],
-    radicals: Optional[list[int]],
+    parameterize: bool = False,
+    removeH: Optional[list[int]] = None,
+    gro: Optional[str] = None,
+    residuetypes: Optional[str] = None,
+    radicals: Optional[list[int]] = None,
 ):
     """Modify topology in various ways.
 
