@@ -1,5 +1,23 @@
 # Changelog
 
+## [6.2.1](https://github.com/hits-mbm-dev/kimmdy/compare/v6.2.0...v6.2.1) (2024-02-22)
+
+
+### Features
+
+* analyse reaction participation ([#365](https://github.com/hits-mbm-dev/kimmdy/issues/365)) ([c9c7898](https://github.com/hits-mbm-dev/kimmdy/commit/c9c7898d429dfbb65a1dabb26cdad7cb2aad1ada))
+
+
+### Bug Fixes
+
+* merge regression ([9f9b162](https://github.com/hits-mbm-dev/kimmdy/commit/9f9b162c40aaf91f691b3963578030592f0ec0a5))
+
+
+### Documentation
+
+* add how-to for starting with reaction ([#369](https://github.com/hits-mbm-dev/kimmdy/issues/369)) ([937c786](https://github.com/hits-mbm-dev/kimmdy/commit/937c7864c530d000fb4475d1b33c746265b8c599))
+* fix make_ndx command ([69b3d74](https://github.com/hits-mbm-dev/kimmdy/commit/69b3d74172c2f50171e85ab56500abef2adc200d))
+
 ## [6.2.0](https://github.com/hits-mbm-dev/kimmdy/compare/v6.1.0...v6.2.0) (2024-02-16)
 
 
