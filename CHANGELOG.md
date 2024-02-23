@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.2.2](https://github.com/hits-mbm-dev/kimmdy/compare/v6.2.1...v6.2.2) (2024-02-23)
+
+
+### Bug Fixes
+
+* release-please config ([b9a3622](https://github.com/hits-mbm-dev/kimmdy/commit/b9a362288ab1b650975d2e072b6f34eb8ca993e3))
+
 ## [6.2.1](https://github.com/hits-mbm-dev/kimmdy/compare/v6.2.0...v6.2.1) (2024-02-22)
 
 
