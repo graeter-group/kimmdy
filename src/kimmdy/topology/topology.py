@@ -539,8 +539,8 @@ class MoleculeType:
 
         new_pairs = {}
         new_multiple_dihedrals = {}
-        new_dihedrals = {}
         for dihedrals in self.proper_dihedrals.values():
+            new_dihedrals = {}
             ai = update_map.get(dihedrals.ai)
             aj = update_map.get(dihedrals.aj)
             ak = update_map.get(dihedrals.ak)
@@ -550,9 +550,10 @@ class MoleculeType:
                 continue
 
             # do pairs before the dihedrals are updated
-            if pair := self.pairs.get((dihedrals.ai, dihedrals.al)):
+            if pair := self.pairs.pop((dihedrals.ai, dihedrals.al), False):
                 pair_ai = update_map.get(pair.ai)
                 pair_aj = update_map.get(pair.aj)
+
                 if None not in (pair_ai, pair_aj):
                     pair.ai = pair_ai  # type: ignore (pyright bug)
                     pair.aj = pair_aj  # type: ignore
@@ -569,6 +570,7 @@ class MoleculeType:
                 dihedral.ak = ak  # type: ignore
                 dihedral.al = al  # type: ignore
                 new_dihedrals[dihedral.periodicity] = dihedral
+            dihedrals.dihedrals = new_dihedrals
 
             new_multiple_dihedrals[
                 (
