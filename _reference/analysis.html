@@ -487,6 +487,10 @@ ul.task-list li input[type="checkbox"] {
   <ul class="collapse">
   <li><a href="#parameters-6" id="toc-parameters-6" class="nav-link" data-scroll-target="#parameters-6">Parameters</a></li>
   </ul></li>
+  <li><a href="#kimmdy.analysis.reaction_participation" id="toc-kimmdy.analysis.reaction_participation" class="nav-link" data-scroll-target="#kimmdy.analysis.reaction_participation">reaction_participation</a>
+  <ul class="collapse">
+  <li><a href="#parameters-7" id="toc-parameters-7" class="nav-link" data-scroll-target="#parameters-7">Parameters</a></li>
+  </ul></li>
   </ul></li>
   </ul></li>
   </ul>
@@ -546,6 +550,10 @@ ul.task-list li input[type="checkbox"] {
 <tr class="odd">
 <td><a href="#kimmdy.analysis.radical_population">radical_population</a></td>
 <td>Plot population of radicals for a KIMMDY run.</td>
+</tr>
+<tr class="even">
+<td><a href="#kimmdy.analysis.reaction_participation">reaction_participation</a></td>
+<td>Plot runtime of all tasks.</td>
 </tr>
 </tbody>
 </table>
@@ -854,6 +862,38 @@ ul.task-list li input[type="checkbox"] {
 <td><code>open_vmd</code></td>
 <td><a href="https://docs.python.org/3.10/library/functions.html#bool">bool</a></td>
 <td>Open a pdb in VMD with the radical occupation as B-factors.</td>
+<td><code>False</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="kimmdy.analysis.reaction_participation" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.analysis.reaction_participation">reaction_participation</h3>
+<p><code>analysis.reaction_participation(dir, open_plot=False)</code></p>
+<p>Plot runtime of all tasks.</p>
+<section id="parameters-7" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-7">Parameters</h4>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>dir</code></td>
+<td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
+<td>Directory of KIMMDY run</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td><code>open_plot</code></td>
+<td><a href="https://docs.python.org/3.10/library/functions.html#bool">bool</a></td>
+<td>Open plot in default system viewer.</td>
 <td><code>False</code></td>
 </tr>
 </tbody>
