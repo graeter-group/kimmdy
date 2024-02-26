@@ -15,6 +15,7 @@ import argparse
 from seaborn import axes_style
 import pandas as pd
 from datetime import datetime
+import json
 
 from kimmdy.utils import run_shell_cmd
 from kimmdy.parsing import read_json, write_json
@@ -384,25 +385,46 @@ def radical_migration(
         picked_recipes[task_nr] = picked_recipe
     sorted_recipes = [val for key, val in sorted(picked_recipes.items())]
 
-    unique_migrations = {}
+    migrations = []
     for sorted_recipe in sorted_recipes:
         connectivity_difference = {}
-        for step in sorted_recipe.recipes:
+        for step in sorted_recipe.recipe_steps:
             if isinstance(step, Break):
                 for atom_id in [step.atom_id_1, step.atom_id_2]:
-                    if atom_id in unique_migrations:
+                    if atom_id in connectivity_difference.keys():
                         connectivity_difference[atom_id] += -1
                     else:
                         connectivity_difference[atom_id] = -1
             elif isinstance(step, Bind):
                 for atom_id in [step.atom_id_1, step.atom_id_2]:
-                    if atom_id in unique_migrations:
+                    if atom_id in connectivity_difference.keys():
                         connectivity_difference[atom_id] += 1
                     else:
                         connectivity_difference[atom_id] = 1
-    print(connectivity_difference)
 
-    breakpoint()
+        from_atom = [
+            key for key, value in connectivity_difference.items() if value == 1
+        ]
+        to_atom = [key for key, value in connectivity_difference.items() if value == -1]
+        if len(from_atom) == 1 and len(to_atom) == 1:
+            migrations.append([from_atom[0], to_atom[0], max(sorted_recipe.rates)])
+    print(migrations)
+    # get unique migrations
+    unique_migrations = {}
+    for migration in migrations:
+        key = "_".join(migration[:2])
+        if key not in unique_migrations.keys():
+            unique_migrations[key] = {"count": 0, "max_rate": 1e-70}
+        unique_migrations[key]["count"] += 1
+        if migration[2] > unique_migrations[key]["max_rate"]:
+            unique_migrations[key]["max_rate"] = migration[2]
+
+    # filter by cutoff
+
+    # write json
+    out_path = analysis_dir / "radical_migration.json"
+    with open(out_path, "w") as json_file:
+        json.dump(unique_migrations, json_file)
 
 
 def plot_rates(dir: str):
