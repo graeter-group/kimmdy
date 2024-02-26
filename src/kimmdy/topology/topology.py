@@ -267,7 +267,9 @@ class MoleculeType:
             attributes_to_list(x)
             for dihedrals in self.proper_dihedrals.values()
             for x in dihedrals.dihedrals.values()
-        ] + [attributes_to_list(x) for x in self.improper_dihedrals.values()]
+        ] + [attributes_to_list(x) 
+            for dihedrals in self.improper_dihedrals.values()
+            for x in dihedrals.dihedrals.values()]
         self.atomics["position_restraints"] = [
             attributes_to_list(x) for x in self.position_restraints.values()
         ]
