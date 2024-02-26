@@ -349,9 +349,10 @@ def radical_population(
     if open_vmd:
         run_shell_cmd(f"vmd {pdb_output}", cwd=analysis_dir)
 
+
 def radical_migration(
     dir: str,
-    type:str = 'qualitative',
+    type: str = "qualitative",
     cutoff: int = 1,
 ):
     """Plot population of radicals for a KIMMDY run.
@@ -373,7 +374,6 @@ def radical_migration(
         f"cutoff: \t{cutoff}\n"
     )
 
-
     run_dir = Path(dir).expanduser().resolve()
     analysis_dir = get_analysis_dir(run_dir)
 
@@ -388,22 +388,21 @@ def radical_migration(
     for sorted_recipe in sorted_recipes:
         connectivity_difference = {}
         for step in sorted_recipe.recipes:
-            if isinstance(step,Break):
-                for atom_id in [step.atom_id_1,step.atom_id_2]:
+            if isinstance(step, Break):
+                for atom_id in [step.atom_id_1, step.atom_id_2]:
                     if atom_id in unique_migrations:
                         connectivity_difference[atom_id] += -1
                     else:
                         connectivity_difference[atom_id] = -1
-            elif isinstance(step,Bind):
-                for atom_id in [step.atom_id_1,step.atom_id_2]:
+            elif isinstance(step, Bind):
+                for atom_id in [step.atom_id_1, step.atom_id_2]:
                     if atom_id in unique_migrations:
                         connectivity_difference[atom_id] += 1
                     else:
                         connectivity_difference[atom_id] = 1
     print(connectivity_difference)
-    
-    breakpoint()
 
+    breakpoint()
 
 
 def plot_rates(dir: str):
@@ -711,7 +710,7 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         "-t",
         type=str,
         help="How to analyse radical migration. Available are 'qualitative','occurence' and 'min_rate'",
-        default='qualitative',
+        default="qualitative",
     )
     parser_radical_migration.add_argument(
         "--cutoff",
@@ -787,11 +786,7 @@ def entry_point_analysis():
             args.open_vmd,
         )
     elif args.module == "radical_migration":
-        radical_migration(
-            args.dir,
-            args.type,
-            args.cutoff
-        )
+        radical_migration(args.dir, args.type, args.cutoff)
     elif args.module == "rates":
         plot_rates(args.dir)
     elif args.module == "runtime":
