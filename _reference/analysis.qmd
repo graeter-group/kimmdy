@@ -18,6 +18,7 @@ For command line usage, run `kimmdy-analysis -h`.
 | [plot_rates](#kimmdy.analysis.plot_rates) | Plot rates of all possible reactions for each 'decide_recipe' step. |
 | [plot_runtime](#kimmdy.analysis.plot_runtime) | Plot runtime of all tasks. |
 | [radical_population](#kimmdy.analysis.radical_population) | Plot population of radicals for a KIMMDY run. |
+| [reaction_participation](#kimmdy.analysis.reaction_participation) | Plot runtime of all tasks. |
 
 ### concat_traj { #kimmdy.analysis.concat_traj }
 
@@ -144,3 +145,16 @@ Plot population of radicals for a KIMMDY run.
 | `select_atoms`    | [str](`str`)                                                            | Atoms chosen for radical population analysis, default is protein (uses MDAnalysis selection syntax)                 | `'protein'`   |
 | `open_plot`       | [bool](`bool`)                                                          | Open plot in default system viewer.                                                                                 | `False`       |
 | `open_vmd`        | [bool](`bool`)                                                          | Open a pdb in VMD with the radical occupation as B-factors.                                                         | `False`       |
+
+### reaction_participation { #kimmdy.analysis.reaction_participation }
+
+`analysis.reaction_participation(dir, open_plot=False)`
+
+Plot runtime of all tasks.
+
+#### Parameters
+
+| Name        | Type           | Description                         | Default    |
+|-------------|----------------|-------------------------------------|------------|
+| `dir`       | [str](`str`)   | Directory of KIMMDY run             | _required_ |
+| `open_plot` | [bool](`bool`) | Open plot in default system viewer. | `False`    |
