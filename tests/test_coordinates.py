@@ -145,7 +145,9 @@ def test_merge_prm_top(arranged_tmp_path):
     assert top_merge.bonds[("26", "27")].funct == "3"
     assert top_merge.angles[("17", "19", "20")].c3 is not None
     assert top_merge.proper_dihedrals[("15", "17", "19", "24")].dihedrals["3"].c5 == "3"
-    assert top_merge.improper_dihedrals[("17", "20", "19", "24")].c5 == "2"
+    assert (
+        top_merge.improper_dihedrals[("17", "20", "19", "24")].dihedrals["2"].c5 == "2"
+    )
     # assert one dihedral merge improper/proper
 
 
