@@ -72,7 +72,7 @@ class MoleculeType:
         self.pairs: dict[tuple[str, str], Pair] = {}
         self.angles: dict[tuple[str, str, str], Angle] = {}
         self.proper_dihedrals: dict[tuple[str, str, str, str], MultipleDihedrals] = {}
-        self.improper_dihedrals: dict[tuple[str, str, str, str], Dihedral] = {}
+        self.improper_dihedrals: dict[tuple[str, str, str, str], MultipleDihedrals] = {}
         self.position_restraints: dict[str, PositionRestraint] = {}
         self.dihedral_restraints: dict[tuple[str, str, str, str], DihedralRestraint] = (
             {}
@@ -183,7 +183,11 @@ class MoleculeType:
             dihedral = Dihedral.from_top_line(l)
             key = (dihedral.ai, dihedral.aj, dihedral.ak, dihedral.al)
             if dihedral.funct == "4":
-                self.improper_dihedrals[key] = dihedral
+                if self.improper_dihedrals.get(key) is None:
+                    self.improper_dihedrals[key] = MultipleDihedrals(
+                        *key, dihedral.funct, dihedrals={}
+                    )
+                self.improper_dihedrals[key].dihedrals[dihedral.periodicity] = dihedral
             else:
                 if self.proper_dihedrals.get(key) is None:
                     self.proper_dihedrals[key] = MultipleDihedrals(
@@ -464,13 +468,18 @@ class MoleculeType:
         for atom in self.atoms.values():
             impropers = self._get_atom_improper_dihedrals(atom.nr, ff)
             for key, improper in impropers:
-                self.improper_dihedrals[key] = Dihedral(
-                    improper.atom1,
-                    improper.atom2,
-                    improper.atom3,
-                    improper.atom4,
+                self.improper_dihedrals[key] = MultipleDihedrals(
+                    *key,
                     "4",
-                    improper.cq,
+                    dihedrals={
+                        "": Dihedral(
+                            *key,
+                            "4",
+                            c0=improper.c0,
+                            c1=improper.c1,
+                            periodicity=improper.c2,
+                        )
+                    },
                 )
 
     def reindex_atomnrs(self) -> dict[str, str]:
@@ -1256,11 +1265,12 @@ class Topology:
             atompair_nrs[0], self.ff
         ) + reactive_moleculetype._get_atom_improper_dihedrals(atompair_nrs[1], self.ff)
         for key, value in dihedral_k_v:
+            if value.c2 is None:
+                value.c2 = ""
             if reactive_moleculetype.improper_dihedrals.get(key) is None:
-                # TODO: fix this
-                c2 = ""
-                if value.q0 is not None:
-                    c2 = "1"
-                reactive_moleculetype.improper_dihedrals[key] = Dihedral(
-                    key[0], key[1], key[2], key[3], "4", value.q0, value.cq, c2
+                reactive_moleculetype.improper_dihedrals[key] = MultipleDihedrals(
+                    *key, "4", dihedrals={}
                 )
+            reactive_moleculetype.improper_dihedrals[key].dihedrals[value.c2] = (
+                Dihedral(*key, "4", c0=value.c0, c1=value.c1, periodicity=value.c2)
+            )
