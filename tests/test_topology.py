@@ -270,10 +270,6 @@ class TestTopology:
         assert org_top.proper_dihedrals == hexala_top_fix.proper_dihedrals
         assert org_top.improper_dihedrals == hexala_top_fix.improper_dihedrals
 
-    def test_reindex(self, hexala_top_fix: Topology):
-        org_top: Topology = deepcopy(hexala_top_fix)
-        hexala_top_fix.del_atom()
-
     @given(atomindex=st.integers(min_value=1, max_value=72))
     @settings(suppress_health_check=[HealthCheck.function_scoped_fixture], deadline=400)
     def test_del_atom_hexala(self, hexala_top_fix, atomindex):
@@ -323,7 +319,7 @@ class TestTopology:
 
         # angles
         for a_del in angles_to_delete:
-            assert top.angles.get(a_del) is None
+            assert None in [update.get(a) for a in a_del]
         for a_up in angles_to_update:
             new = top.angles[tuple([update.get(a) for a in a_up])]
             old = hexala_top_fix.angles[a_up]
@@ -333,7 +329,7 @@ class TestTopology:
 
         # proper dihedrals
         for pd_del in pd_to_delete:
-            assert top.proper_dihedrals.get(pd_del) is None
+            assert None in tuple([update.get(a) for a in pd_del])
         for pd_up in pd_to_update:
             new = top.proper_dihedrals[tuple([update.get(a) for a in pd_up])]
             old = hexala_top_fix.proper_dihedrals[pd_up]
@@ -353,7 +349,7 @@ class TestTopology:
         # TODO: Activate once #387 is merged
         # # improper dihedrals
         # for id_del in pd_to_delete:
-        #     assert top.improper_dihedrals.get(id_del) is None
+        #     assert None in tuple([update.get(a) for a in id_del])
         # for id_up in pd_to_update:
         #     new = top.improper_dihedrals[tuple([update.get(a) for a in id_up])]
         #     old = hexala_top_fix.improper_dihedrals[id_up]
