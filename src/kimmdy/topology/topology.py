@@ -408,8 +408,11 @@ class MoleculeType:
         ai = atom_nr
         partners = self.atoms[ai].bound_to_nrs
         if len(partners) >= 3:
-            for aj, ak, al in combinations(partners, 3):
-                dihedral_candidate_keys.append((ai, aj, ak, al))
+            combs = permutations(partners, 3)
+            for comb in combs:
+                aj, ak, al = comb
+                # center atom is at position 3
+                dihedral_candidate_keys.append((aj, ak, ai, al))
 
         # atom in corner of a triangle:
         for a in self.atoms[atom_nr].bound_to_nrs:
@@ -1130,12 +1133,12 @@ class Topology:
                 reactive_moleculetype.pairs.pop(pairkey, None)
 
         # and improper dihedrals
-        dihedral_k_v = reactive_moleculetype._get_atom_improper_dihedrals(
-            atompair_nrs[0], self.ff
-        ) + reactive_moleculetype._get_atom_improper_dihedrals(atompair_nrs[1], self.ff)
-        for key, _ in dihedral_k_v:
+        keys_remove = []
+        for key in reactive_moleculetype.improper_dihedrals:
             if all([x in key for x in atompair_nrs]):
-                reactive_moleculetype.improper_dihedrals.pop(key, None)
+                keys_remove.append(key)
+        for key in keys_remove:
+            reactive_moleculetype.improper_dihedrals.pop(key, None)
 
         # warn if atom is part of restraint
         for atom in atompair:
@@ -1221,7 +1224,7 @@ class Topology:
                     for a in reactive_moleculetype.atoms.values()
                     if a.resnr == other_atom.resnr
                 ]
-                type_set = False
+                name_set = False
                 for key, bond in aa.bonds.items():
                     if other_atom.atom in key and any(
                         k.upper().startswith("H") for k in key
@@ -1237,21 +1240,25 @@ class Topology:
                             or h_name == atom.atom
                         ):
                             atom.atom = h_name
+                            name_set = True
                         else:
                             atom.atom = "HX"
-                            type_set = True
+                            name_set = True
                             continue
-                        logging.info(f"HAT hydrogen will be bound to {other_atom}.")
+                        logger.info(f"HAT hydrogen will be bound to {other_atom}.")
                         break
                 else:
-                    if type_set:
-                        logging.warning(
+                    if name_set:
+                        logger.warning(
                             "Found new atomtype but not atomname for HAT hydrogen!"
                         )
                     else:
-                        logging.warning(
+                        logger.warning(
                             "Found neither new atomtype nor atomname for HAT hydrogen!"
                         )
+                if not name_set:
+                    atom.atom = "HX"
+                    logger.warning(f"Named newly bonded hydrogen 'HX'")
 
         # update bound_to
         atompair[0].bound_to_nrs.append(atompair[1].nr)
