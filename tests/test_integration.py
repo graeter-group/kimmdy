@@ -117,4 +117,4 @@ def test_integration_pull(arranged_tmp_path):
 def test_integration_whole_run(arranged_tmp_path):
     kimmdy_run()
     assert "Finished running tasks" in read_last_line(Path("kimmdy.log"))
-    assert len(list(Path.cwd().glob("*/*"))) == 23
+    assert len(list(Path.cwd().glob("kimmdy_001/*"))) == 25
