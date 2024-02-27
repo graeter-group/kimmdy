@@ -425,7 +425,6 @@ class MoleculeType:
 
         # residues on aminoacids.rtp specify a dihedral to the next or previous
         # AA with -C and +N as the atomname
-        candidate_keys = []
         for candidate in dihedral_candidate_keys:
             candidate_key = [self.atoms[atom_nr].atom for atom_nr in candidate]
             for i, nr in enumerate(candidate):
@@ -436,8 +435,6 @@ class MoleculeType:
                         candidate_key[i] = "+N"
 
             dihedral = residue.improper_dihedrals.get(tuple(candidate_key))
-            if atom_nr == "65":
-                candidate_keys.append(candidate_key)
             if dihedral:
                 dihedrals.append((candidate, dihedral))
 
