@@ -1,5 +1,44 @@
 # Changelog
 
+## [6.2.4](https://github.com/hits-mbm-dev/kimmdy/compare/v6.2.3...v6.2.4) (2024-02-27)
+
+
+### Bug Fixes
+
+* commit rendered docs with force ([#391](https://github.com/hits-mbm-dev/kimmdy/issues/391)) ([144d5ac](https://github.com/hits-mbm-dev/kimmdy/commit/144d5acdfcd3e92371a19be57303eae2f715d8b9))
+
+## [6.2.3](https://github.com/hits-mbm-dev/kimmdy/compare/v6.2.2...v6.2.3) (2024-02-27)
+
+
+### Bug Fixes
+
+* update dihedrals, make pairs unique ([#383](https://github.com/hits-mbm-dev/kimmdy/issues/383)) fixes [#376](https://github.com/hits-mbm-dev/kimmdy/issues/376) ([9283e68](https://github.com/hits-mbm-dev/kimmdy/commit/9283e68065108566c7e0162d7aec543a5b9c41f8))
+
+## [6.2.2](https://github.com/hits-mbm-dev/kimmdy/compare/v6.2.1...v6.2.2) (2024-02-23)
+
+
+### Bug Fixes
+
+* release-please config ([b9a3622](https://github.com/hits-mbm-dev/kimmdy/commit/b9a362288ab1b650975d2e072b6f34eb8ca993e3))
+
+## [6.2.1](https://github.com/hits-mbm-dev/kimmdy/compare/v6.2.0...v6.2.1) (2024-02-22)
+
+
+### Features
+
+* analyse reaction participation ([#365](https://github.com/hits-mbm-dev/kimmdy/issues/365)) ([c9c7898](https://github.com/hits-mbm-dev/kimmdy/commit/c9c7898d429dfbb65a1dabb26cdad7cb2aad1ada))
+
+
+### Bug Fixes
+
+* merge regression ([9f9b162](https://github.com/hits-mbm-dev/kimmdy/commit/9f9b162c40aaf91f691b3963578030592f0ec0a5))
+
+
+### Documentation
+
+* add how-to for starting with reaction ([#369](https://github.com/hits-mbm-dev/kimmdy/issues/369)) ([937c786](https://github.com/hits-mbm-dev/kimmdy/commit/937c7864c530d000fb4475d1b33c746265b8c599))
+* fix make_ndx command ([69b3d74](https://github.com/hits-mbm-dev/kimmdy/commit/69b3d74172c2f50171e85ab56500abef2adc200d))
+
 ## [6.2.0](https://github.com/hits-mbm-dev/kimmdy/compare/v6.1.0...v6.2.0) (2024-02-16)
 
 

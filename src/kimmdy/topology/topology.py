@@ -72,7 +72,7 @@ class MoleculeType:
         self.pairs: dict[tuple[str, str], Pair] = {}
         self.angles: dict[tuple[str, str, str], Angle] = {}
         self.proper_dihedrals: dict[tuple[str, str, str, str], MultipleDihedrals] = {}
-        self.improper_dihedrals: dict[tuple[str, str, str, str], Dihedral] = {}
+        self.improper_dihedrals: dict[tuple[str, str, str, str], MultipleDihedrals] = {}
         self.position_restraints: dict[str, PositionRestraint] = {}
         self.dihedral_restraints: dict[tuple[str, str, str, str], DihedralRestraint] = (
             {}
@@ -183,7 +183,11 @@ class MoleculeType:
             dihedral = Dihedral.from_top_line(l)
             key = (dihedral.ai, dihedral.aj, dihedral.ak, dihedral.al)
             if dihedral.funct == "4":
-                self.improper_dihedrals[key] = dihedral
+                if self.improper_dihedrals.get(key) is None:
+                    self.improper_dihedrals[key] = MultipleDihedrals(
+                        *key, dihedral.funct, dihedrals={}
+                    )
+                self.improper_dihedrals[key].dihedrals[dihedral.periodicity] = dihedral
             else:
                 if self.proper_dihedrals.get(key) is None:
                     self.proper_dihedrals[key] = MultipleDihedrals(
@@ -263,7 +267,11 @@ class MoleculeType:
             attributes_to_list(x)
             for dihedrals in self.proper_dihedrals.values()
             for x in dihedrals.dihedrals.values()
-        ] + [attributes_to_list(x) for x in self.improper_dihedrals.values()]
+        ] + [
+            attributes_to_list(x)
+            for dihedrals in self.improper_dihedrals.values()
+            for x in dihedrals.dihedrals.values()
+        ]
         self.atomics["position_restraints"] = [
             attributes_to_list(x) for x in self.position_restraints.values()
         ]
@@ -400,8 +408,11 @@ class MoleculeType:
         ai = atom_nr
         partners = self.atoms[ai].bound_to_nrs
         if len(partners) >= 3:
-            for aj, ak, al in combinations(partners, 3):
-                dihedral_candidate_keys.append((ai, aj, ak, al))
+            combs = permutations(partners, 3)
+            for comb in combs:
+                aj, ak, al = comb
+                # center atom is at position 3
+                dihedral_candidate_keys.append((aj, ak, ai, al))
 
         # atom in corner of a triangle:
         for a in self.atoms[atom_nr].bound_to_nrs:
@@ -464,13 +475,18 @@ class MoleculeType:
         for atom in self.atoms.values():
             impropers = self._get_atom_improper_dihedrals(atom.nr, ff)
             for key, improper in impropers:
-                self.improper_dihedrals[key] = Dihedral(
-                    improper.atom1,
-                    improper.atom2,
-                    improper.atom3,
-                    improper.atom4,
+                self.improper_dihedrals[key] = MultipleDihedrals(
+                    *key,
                     "4",
-                    improper.cq,
+                    dihedrals={
+                        "": Dihedral(
+                            *key,
+                            "4",
+                            c0=improper.c0,
+                            c1=improper.c1,
+                            periodicity=improper.c2,
+                        )
+                    },
                 )
 
     def reindex_atomnrs(self) -> dict[str, str]:
@@ -482,7 +498,8 @@ class MoleculeType:
         """
 
         update_map = {
-            atom_nr: str(i + 1) for i, atom_nr in enumerate(self.atoms.keys())
+            atom_nr: str(i + 1)
+            for i, atom_nr in enumerate(sorted(list(self.atoms.keys()), key=int))
         }
 
         new_atoms = {}
@@ -526,8 +543,8 @@ class MoleculeType:
 
         new_pairs = {}
         new_multiple_dihedrals = {}
-        new_dihedrals = {}
         for dihedrals in self.proper_dihedrals.values():
+            new_dihedrals = {}
             ai = update_map.get(dihedrals.ai)
             aj = update_map.get(dihedrals.aj)
             ak = update_map.get(dihedrals.ak)
@@ -537,9 +554,10 @@ class MoleculeType:
                 continue
 
             # do pairs before the dihedrals are updated
-            if pair := self.pairs.get((dihedrals.ai, dihedrals.al)):
+            if pair := self.pairs.pop((dihedrals.ai, dihedrals.al), False):
                 pair_ai = update_map.get(pair.ai)
                 pair_aj = update_map.get(pair.aj)
+
                 if None not in (pair_ai, pair_aj):
                     pair.ai = pair_ai  # type: ignore (pyright bug)
                     pair.aj = pair_aj  # type: ignore
@@ -556,6 +574,7 @@ class MoleculeType:
                 dihedral.ak = ak  # type: ignore
                 dihedral.al = al  # type: ignore
                 new_dihedrals[dihedral.periodicity] = dihedral
+            dihedrals.dihedrals = new_dihedrals
 
             new_multiple_dihedrals[
                 (
@@ -569,21 +588,31 @@ class MoleculeType:
         self.proper_dihedrals = new_multiple_dihedrals
         self.pairs = new_pairs
 
-        new_impropers = {}
-        for dihedral in self.improper_dihedrals.values():
-            ai = update_map.get(dihedral.ai)
-            aj = update_map.get(dihedral.aj)
-            ak = update_map.get(dihedral.ak)
-            al = update_map.get(dihedral.al)
+        new_multiple_dihedrals = {}
+        for dihedrals in self.improper_dihedrals.values():
+            new_dihedrals = {}
+            ai = update_map.get(dihedrals.ai)
+            aj = update_map.get(dihedrals.aj)
+            ak = update_map.get(dihedrals.ak)
+            al = update_map.get(dihedrals.al)
             # drop dihedrals to a deleted atom
             if None in (ai, aj, ak, al):
                 continue
-            dihedral.ai = ai  # type: ignore
-            dihedral.aj = aj  # type: ignore
-            dihedral.ak = ak  # type: ignore
-            dihedral.al = al  # type: ignore
-            new_impropers[(ai, aj, ak, al)] = dihedral
-        self.improper_dihedrals = new_impropers
+            dihedrals.ai = ai  # type: ignore
+            dihedrals.aj = aj  # type: ignore
+            dihedrals.ak = ak  # type: ignore
+            dihedrals.al = al  # type: ignore
+
+            for dihedral in dihedrals.dihedrals.values():
+                dihedral.ai = ai  # type: ignore
+                dihedral.aj = aj  # type: ignore
+                dihedral.ak = ak  # type: ignore
+                dihedral.al = al  # type: ignore
+                new_dihedrals[dihedral.periodicity] = dihedral
+            dihedrals.dihedrals = new_dihedrals
+
+            new_multiple_dihedrals[(ai, aj, ak, al)] = dihedrals
+        self.improper_dihedrals = new_multiple_dihedrals
 
         return update_map
 
@@ -962,11 +991,23 @@ class Topology:
                 f"{float(self.atoms[atom.bound_to_nrs[0]].charge) + float(atom.charge):7.4f}"
             )
 
-            # break all bonds and delete all pairs, diheadrals etc
+            # break all bonds and delete all pairs, diheadrals with these bonds
             for bound_nr in copy(atom.bound_to_nrs):
                 self.break_bond((bound_nr, _atom_nr))
-            self.radicals.pop(_atom_nr)
 
+            for an in tuple(self.angles.keys()):
+                if _atom_nr in an:
+                    self.angles.pop(an)
+
+            for pd in tuple(self.proper_dihedrals.keys()):
+                if _atom_nr in pd:
+                    self.proper_dihedrals.pop(pd)
+
+            for id in tuple(self.improper_dihedrals.keys()):
+                if _atom_nr in id:
+                    self.improper_dihedrals.pop(id)
+
+            self.radicals.pop(_atom_nr)
             self.atoms.pop(_atom_nr)
 
         update_map_all = self.reindex_atomnrs()
@@ -1092,12 +1133,12 @@ class Topology:
                 reactive_moleculetype.pairs.pop(pairkey, None)
 
         # and improper dihedrals
-        dihedral_k_v = reactive_moleculetype._get_atom_improper_dihedrals(
-            atompair_nrs[0], self.ff
-        ) + reactive_moleculetype._get_atom_improper_dihedrals(atompair_nrs[1], self.ff)
-        for key, _ in dihedral_k_v:
+        keys_remove = []
+        for key in reactive_moleculetype.improper_dihedrals:
             if all([x in key for x in atompair_nrs]):
-                reactive_moleculetype.improper_dihedrals.pop(key, None)
+                keys_remove.append(key)
+        for key in keys_remove:
+            reactive_moleculetype.improper_dihedrals.pop(key, None)
 
         # warn if atom is part of restraint
         for atom in atompair:
@@ -1183,7 +1224,7 @@ class Topology:
                     for a in reactive_moleculetype.atoms.values()
                     if a.resnr == other_atom.resnr
                 ]
-                type_set = False
+                name_set = False
                 for key, bond in aa.bonds.items():
                     if other_atom.atom in key and any(
                         k.upper().startswith("H") for k in key
@@ -1199,21 +1240,25 @@ class Topology:
                             or h_name == atom.atom
                         ):
                             atom.atom = h_name
+                            name_set = True
                         else:
                             atom.atom = "HX"
-                            type_set = True
+                            name_set = True
                             continue
-                        logging.info(f"HAT hydrogen will be bound to {other_atom}.")
+                        logger.info(f"HAT hydrogen will be bound to {other_atom}.")
                         break
                 else:
-                    if type_set:
-                        logging.warning(
+                    if name_set:
+                        logger.warning(
                             "Found new atomtype but not atomname for HAT hydrogen!"
                         )
                     else:
-                        logging.warning(
+                        logger.warning(
                             "Found neither new atomtype nor atomname for HAT hydrogen!"
                         )
+                if not name_set:
+                    atom.atom = "HX"
+                    logger.warning(f"Named newly bonded hydrogen 'HX'")
 
         # update bound_to
         atompair[0].bound_to_nrs.append(atompair[1].nr)
@@ -1256,11 +1301,12 @@ class Topology:
             atompair_nrs[0], self.ff
         ) + reactive_moleculetype._get_atom_improper_dihedrals(atompair_nrs[1], self.ff)
         for key, value in dihedral_k_v:
+            if value.c2 is None:
+                value.c2 = ""
             if reactive_moleculetype.improper_dihedrals.get(key) is None:
-                # TODO: fix this
-                c2 = ""
-                if value.q0 is not None:
-                    c2 = "1"
-                reactive_moleculetype.improper_dihedrals[key] = Dihedral(
-                    key[0], key[1], key[2], key[3], "4", value.q0, value.cq, c2
+                reactive_moleculetype.improper_dihedrals[key] = MultipleDihedrals(
+                    *key, "4", dihedrals={}
                 )
+            reactive_moleculetype.improper_dihedrals[key].dihedrals[value.c2] = (
+                Dihedral(*key, "4", c0=value.c0, c1=value.c1, periodicity=value.c2)
+            )
