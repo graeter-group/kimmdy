@@ -346,25 +346,24 @@ class TestTopology:
                 assert new_d.ak == update.get(old_d.ak)
                 assert new_d.al == update.get(old_d.al)
 
-        # TODO: Activate once #387 is merged
-        # # improper dihedrals
-        # for id_del in pd_to_delete:
-        #     assert None in tuple([update.get(a) for a in id_del])
-        # for id_up in pd_to_update:
-        #     new = top.improper_dihedrals[tuple([update.get(a) for a in id_up])]
-        #     old = hexala_top_fix.improper_dihedrals[id_up]
-        #     assert old.ai == rev_update.get(new.ai)
-        #     assert old.aj == rev_update.get(new.aj)
-        #     assert old.ak == rev_update.get(new.ak)
-        #     assert old.al == rev_update.get(new.al)
+        # improper dihedrals
+        for id_del in id_to_delete:
+            assert None in tuple([update.get(a) for a in id_del])
+        for id_up in id_to_update:
+            new = top.improper_dihedrals[tuple([update.get(a) for a in id_up])]
+            old = hexala_top_fix.improper_dihedrals[id_up]
+            assert old.ai == rev_update.get(new.ai)
+            assert old.aj == rev_update.get(new.aj)
+            assert old.ak == rev_update.get(new.ak)
+            assert old.al == rev_update.get(new.al)
 
-        #     for d_key in old.dihedrals:
-        #         old_d = old.dihedrals[d_key]
-        #         new_d = new.dihedrals[d_key]
-        #         assert new_d.ai == update.get(old_d.ai)
-        #         assert new_d.aj == update.get(old_d.aj)
-        #         assert new_d.ak == update.get(old_d.ak)
-        #         assert new_d.al == update.get(old_d.al)
+            for d_key in old.dihedrals:
+                old_d = old.dihedrals[d_key]
+                new_d = new.dihedrals[d_key]
+                assert new_d.ai == update.get(old_d.ai)
+                assert new_d.aj == update.get(old_d.aj)
+                assert new_d.ak == update.get(old_d.ak)
+                assert new_d.al == update.get(old_d.al)
 
     def test_break_bind_bond_hexala(self, hexala_top_fix):
         top = deepcopy(hexala_top_fix)

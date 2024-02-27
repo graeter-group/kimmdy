@@ -585,21 +585,31 @@ class MoleculeType:
         self.proper_dihedrals = new_multiple_dihedrals
         self.pairs = new_pairs
 
-        new_impropers = {}
-        for dihedral in self.improper_dihedrals.values():
-            ai = update_map.get(dihedral.ai)
-            aj = update_map.get(dihedral.aj)
-            ak = update_map.get(dihedral.ak)
-            al = update_map.get(dihedral.al)
+        new_multiple_dihedrals = {}
+        for dihedrals in self.improper_dihedrals.values():
+            new_dihedrals = {}
+            ai = update_map.get(dihedrals.ai)
+            aj = update_map.get(dihedrals.aj)
+            ak = update_map.get(dihedrals.ak)
+            al = update_map.get(dihedrals.al)
             # drop dihedrals to a deleted atom
             if None in (ai, aj, ak, al):
                 continue
-            dihedral.ai = ai  # type: ignore
-            dihedral.aj = aj  # type: ignore
-            dihedral.ak = ak  # type: ignore
-            dihedral.al = al  # type: ignore
-            new_impropers[(ai, aj, ak, al)] = dihedral
-        self.improper_dihedrals = new_impropers
+            dihedrals.ai = ai  # type: ignore
+            dihedrals.aj = aj  # type: ignore
+            dihedrals.ak = ak  # type: ignore
+            dihedrals.al = al  # type: ignore
+
+            for dihedral in dihedrals.dihedrals.values():
+                dihedral.ai = ai  # type: ignore
+                dihedral.aj = aj  # type: ignore
+                dihedral.ak = ak  # type: ignore
+                dihedral.al = al  # type: ignore
+                new_dihedrals[dihedral.periodicity] = dihedral
+            dihedrals.dihedrals = new_dihedrals
+
+            new_multiple_dihedrals[(ai, aj, ak, al)] = dihedrals
+        self.improper_dihedrals = new_multiple_dihedrals
 
         return update_map
 
