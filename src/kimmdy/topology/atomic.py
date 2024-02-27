@@ -559,17 +559,18 @@ class ResidueBondSpec:
 
 @dataclass()
 class ResidueImproperSpec:
-    """Information about one imroper dihedral in a residue
+    """Information about one improper dihedral in a residue
 
-    ; atom1 atom2 atom3 atom4 q0 cq
+    ; atom1 atom2 atom3 atom4 c0(q0) c1(cp) c2(mult)
     """
 
     atom1: str
     atom2: str
     atom3: str
     atom4: str
-    q0: Optional[str]
-    cq: Optional[str]
+    c0: Optional[str]
+    c1: Optional[str]
+    c2: Optional[str]
 
     @classmethod
     def from_top_line(cls, l: list[str]):
@@ -578,23 +579,26 @@ class ResidueImproperSpec:
             atom2=l[1],
             atom3=l[2],
             atom4=l[3],
-            q0=field_or_none(l, 4),
-            cq=field_or_none(l, 5),
+            c0=field_or_none(l, 4),
+            c1=field_or_none(l, 5),
+            c2=field_or_none(l, 6),
         )
 
 
 @dataclass()
 class ResidueProperSpec:
-    """Information about one imroper dihedral in a residue
+    """Information about one proper dihedral in a residue
 
-    ; atom1 atom2 atom3 atom4 q0 cq
+    ; atom1 atom2 atom3 atom4 c0(q0) c1(cq) c2
     """
 
     atom1: str
     atom2: str
     atom3: str
     atom4: str
-    q0: Optional[str]
+    c0: Optional[str]
+    c1: Optional[str]
+    c2: Optional[str]
 
     @classmethod
     def from_top_line(cls, l: list[str]):
@@ -603,7 +607,9 @@ class ResidueProperSpec:
             atom2=l[1],
             atom3=l[2],
             atom4=l[3],
-            q0=field_or_none(l, 4),
+            c0=field_or_none(l, 4),
+            c1=field_or_none(l, 5),
+            c2=field_or_none(l, 6),
         )
 
 
