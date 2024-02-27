@@ -408,8 +408,11 @@ class MoleculeType:
         ai = atom_nr
         partners = self.atoms[ai].bound_to_nrs
         if len(partners) >= 3:
-            for aj, ak, al in combinations(partners, 3):
-                dihedral_candidate_keys.append((ai, aj, ak, al))
+            combs = permutations(partners, 3)
+            for comb in combs:
+                aj, ak, al = comb
+                # center atom is at position 3
+                dihedral_candidate_keys.append((aj, ak, ai, al))
 
         # atom in corner of a triangle:
         for a in self.atoms[atom_nr].bound_to_nrs:
@@ -422,6 +425,7 @@ class MoleculeType:
 
         # residues on aminoacids.rtp specify a dihedral to the next or previous
         # AA with -C and +N as the atomname
+        candidate_keys = []
         for candidate in dihedral_candidate_keys:
             candidate_key = [self.atoms[atom_nr].atom for atom_nr in candidate]
             for i, nr in enumerate(candidate):
@@ -432,6 +436,8 @@ class MoleculeType:
                         candidate_key[i] = "+N"
 
             dihedral = residue.improper_dihedrals.get(tuple(candidate_key))
+            if atom_nr == "65":
+                candidate_keys.append(candidate_key)
             if dihedral:
                 dihedrals.append((candidate, dihedral))
 
