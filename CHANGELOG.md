@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.2.4](https://github.com/hits-mbm-dev/kimmdy/compare/v6.2.3...v6.2.4) (2024-02-27)
+
+
+### Bug Fixes
+
+* commit rendered docs with force ([#391](https://github.com/hits-mbm-dev/kimmdy/issues/391)) ([144d5ac](https://github.com/hits-mbm-dev/kimmdy/commit/144d5acdfcd3e92371a19be57303eae2f715d8b9))
+
 ## [6.2.3](https://github.com/hits-mbm-dev/kimmdy/compare/v6.2.2...v6.2.3) (2024-02-27)
 
 
