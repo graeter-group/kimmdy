@@ -495,7 +495,8 @@ class MoleculeType:
         """
 
         update_map = {
-            atom_nr: str(i + 1) for i, atom_nr in enumerate(self.atoms.keys())
+            atom_nr: str(i + 1)
+            for i, atom_nr in enumerate(sorted(list(self.atoms.keys()), key=int))
         }
 
         new_atoms = {}
