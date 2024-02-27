@@ -47,6 +47,7 @@ def test_integration_valid_input_files(arranged_tmp_path):
 def test_grompp_with_kimmdy_topology(arranged_tmp_path):
     raw_top = read_top(Path("minimal.top"))
     top = Topology(raw_top)
+    top_dict = top.to_dict()
     write_top(top.to_dict(), Path("output.top"))
     assert sp.run(
         [
@@ -103,7 +104,7 @@ def test_integration_homolysis_reaction(arranged_tmp_path):
 def test_integration_pull(arranged_tmp_path):
     kimmdy_run()
     assert "Finished running tasks" in read_last_line(Path("kimmdy.log"))
-    assert len(list(Path.cwd().glob("kimmdy_001/*"))) == 11
+    assert len(list(Path.cwd().glob("kimmdy_001/*"))) == 12
 
 
 @pytest.mark.require_grappa
@@ -116,4 +117,4 @@ def test_integration_pull(arranged_tmp_path):
 def test_integration_whole_run(arranged_tmp_path):
     kimmdy_run()
     assert "Finished running tasks" in read_last_line(Path("kimmdy.log"))
-    assert len(list(Path.cwd().glob("*/*"))) == 23
+    assert len(list(Path.cwd().glob("kimmdy_001/*"))) == 25
