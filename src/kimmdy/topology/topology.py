@@ -495,7 +495,8 @@ class MoleculeType:
         """
 
         update_map = {
-            atom_nr: str(i + 1) for i, atom_nr in enumerate(self.atoms.keys())
+            atom_nr: str(i + 1)
+            for i, atom_nr in enumerate(sorted(list(self.atoms.keys()), key=int))
         }
 
         new_atoms = {}
@@ -539,8 +540,8 @@ class MoleculeType:
 
         new_pairs = {}
         new_multiple_dihedrals = {}
-        new_dihedrals = {}
         for dihedrals in self.proper_dihedrals.values():
+            new_dihedrals = {}
             ai = update_map.get(dihedrals.ai)
             aj = update_map.get(dihedrals.aj)
             ak = update_map.get(dihedrals.ak)
@@ -550,9 +551,10 @@ class MoleculeType:
                 continue
 
             # do pairs before the dihedrals are updated
-            if pair := self.pairs.get((dihedrals.ai, dihedrals.al)):
+            if pair := self.pairs.pop((dihedrals.ai, dihedrals.al), False):
                 pair_ai = update_map.get(pair.ai)
                 pair_aj = update_map.get(pair.aj)
+
                 if None not in (pair_ai, pair_aj):
                     pair.ai = pair_ai  # type: ignore (pyright bug)
                     pair.aj = pair_aj  # type: ignore
@@ -569,6 +571,7 @@ class MoleculeType:
                 dihedral.ak = ak  # type: ignore
                 dihedral.al = al  # type: ignore
                 new_dihedrals[dihedral.periodicity] = dihedral
+            dihedrals.dihedrals = new_dihedrals
 
             new_multiple_dihedrals[
                 (
@@ -582,21 +585,31 @@ class MoleculeType:
         self.proper_dihedrals = new_multiple_dihedrals
         self.pairs = new_pairs
 
-        new_impropers = {}
-        for dihedral in self.improper_dihedrals.values():
-            ai = update_map.get(dihedral.ai)
-            aj = update_map.get(dihedral.aj)
-            ak = update_map.get(dihedral.ak)
-            al = update_map.get(dihedral.al)
+        new_multiple_dihedrals = {}
+        for dihedrals in self.improper_dihedrals.values():
+            new_dihedrals = {}
+            ai = update_map.get(dihedrals.ai)
+            aj = update_map.get(dihedrals.aj)
+            ak = update_map.get(dihedrals.ak)
+            al = update_map.get(dihedrals.al)
             # drop dihedrals to a deleted atom
             if None in (ai, aj, ak, al):
                 continue
-            dihedral.ai = ai  # type: ignore
-            dihedral.aj = aj  # type: ignore
-            dihedral.ak = ak  # type: ignore
-            dihedral.al = al  # type: ignore
-            new_impropers[(ai, aj, ak, al)] = dihedral
-        self.improper_dihedrals = new_impropers
+            dihedrals.ai = ai  # type: ignore
+            dihedrals.aj = aj  # type: ignore
+            dihedrals.ak = ak  # type: ignore
+            dihedrals.al = al  # type: ignore
+
+            for dihedral in dihedrals.dihedrals.values():
+                dihedral.ai = ai  # type: ignore
+                dihedral.aj = aj  # type: ignore
+                dihedral.ak = ak  # type: ignore
+                dihedral.al = al  # type: ignore
+                new_dihedrals[dihedral.periodicity] = dihedral
+            dihedrals.dihedrals = new_dihedrals
+
+            new_multiple_dihedrals[(ai, aj, ak, al)] = dihedrals
+        self.improper_dihedrals = new_multiple_dihedrals
 
         return update_map
 
@@ -975,11 +988,23 @@ class Topology:
                 f"{float(self.atoms[atom.bound_to_nrs[0]].charge) + float(atom.charge):7.4f}"
             )
 
-            # break all bonds and delete all pairs, diheadrals etc
+            # break all bonds and delete all pairs, diheadrals with these bonds
             for bound_nr in copy(atom.bound_to_nrs):
                 self.break_bond((bound_nr, _atom_nr))
-            self.radicals.pop(_atom_nr)
 
+            for an in tuple(self.angles.keys()):
+                if _atom_nr in an:
+                    self.angles.pop(an)
+
+            for pd in tuple(self.proper_dihedrals.keys()):
+                if _atom_nr in pd:
+                    self.proper_dihedrals.pop(pd)
+
+            for id in tuple(self.improper_dihedrals.keys()):
+                if _atom_nr in id:
+                    self.improper_dihedrals.pop(id)
+
+            self.radicals.pop(_atom_nr)
             self.atoms.pop(_atom_nr)
 
         update_map_all = self.reindex_atomnrs()

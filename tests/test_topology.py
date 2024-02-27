@@ -252,16 +252,60 @@ class TestTopAB:
 
 
 class TestTopology:
+
+    def test_reindex_no_change(self, hexala_top_fix: Topology):
+        org_top: Topology = deepcopy(hexala_top_fix)
+        update = hexala_top_fix.reindex_atomnrs()
+
+        # test produced mapping
+        assert len(update.keys()) == 12
+        for mapping in update.values():
+            for k, v in mapping.items():
+                assert k == v
+
+        # test topology
+        assert org_top.atoms == hexala_top_fix.atoms
+        assert org_top.bonds == hexala_top_fix.bonds
+        assert org_top.angles == hexala_top_fix.angles
+        assert org_top.proper_dihedrals == hexala_top_fix.proper_dihedrals
+        assert org_top.improper_dihedrals == hexala_top_fix.improper_dihedrals
+
     @given(atomindex=st.integers(min_value=1, max_value=72))
     @settings(suppress_health_check=[HealthCheck.function_scoped_fixture], deadline=400)
     def test_del_atom_hexala(self, hexala_top_fix, atomindex):
         top: Topology = deepcopy(hexala_top_fix)
 
         atom = top.atoms[str(atomindex)]
+        # bonds
         bound_nrs = deepcopy(atom.bound_to_nrs)
         bound_atms = [top.atoms[i] for i in bound_nrs]
+        # angles
+        angles_to_delete = []
+        angles_to_update = []
+        for key in top.angles.keys():
+            if str(atomindex) in key:
+                angles_to_delete.append(key)
+            else:
+                angles_to_update.append(key)
+        # proper dihedrals
+        pd_to_delete = []
+        pd_to_update = []
+        for key in top.proper_dihedrals.keys():
+            if str(atomindex) in key:
+                pd_to_delete.append(key)
+            else:
+                pd_to_update.append(key)
+        # improper dihedrals
+        id_to_delete = []
+        id_to_update = []
+        for key in top.improper_dihedrals.keys():
+            if str(atomindex) in key:
+                id_to_delete.append(key)
+            else:
+                id_to_update.append(key)
 
-        top.del_atom(str(atomindex), parameterize=False)
+        update = top.del_atom(str(atomindex), parameterize=False)
+        rev_update = {v: k for k, v in update.items()}
 
         for nr, atm in zip(bound_nrs, bound_atms):
             if int(nr) > atomindex:
@@ -272,6 +316,54 @@ class TestTopology:
 
         assert atom not in top.atoms.values()
         assert len(atom.bound_to_nrs) == 0
+
+        # angles
+        for a_del in angles_to_delete:
+            assert None in [update.get(a) for a in a_del]
+        for a_up in angles_to_update:
+            new = top.angles[tuple([update.get(a) for a in a_up])]
+            old = hexala_top_fix.angles[a_up]
+            assert old.ai == rev_update.get(new.ai)
+            assert old.aj == rev_update.get(new.aj)
+            assert old.ak == rev_update.get(new.ak)
+
+        # proper dihedrals
+        for pd_del in pd_to_delete:
+            assert None in tuple([update.get(a) for a in pd_del])
+        for pd_up in pd_to_update:
+            new = top.proper_dihedrals[tuple([update.get(a) for a in pd_up])]
+            old = hexala_top_fix.proper_dihedrals[pd_up]
+            assert old.ai == rev_update.get(new.ai)
+            assert old.aj == rev_update.get(new.aj)
+            assert old.ak == rev_update.get(new.ak)
+            assert old.al == rev_update.get(new.al)
+
+            for d_key in old.dihedrals:
+                old_d = old.dihedrals[d_key]
+                new_d = new.dihedrals[d_key]
+                assert new_d.ai == update.get(old_d.ai)
+                assert new_d.aj == update.get(old_d.aj)
+                assert new_d.ak == update.get(old_d.ak)
+                assert new_d.al == update.get(old_d.al)
+
+        # improper dihedrals
+        for id_del in id_to_delete:
+            assert None in tuple([update.get(a) for a in id_del])
+        for id_up in id_to_update:
+            new = top.improper_dihedrals[tuple([update.get(a) for a in id_up])]
+            old = hexala_top_fix.improper_dihedrals[id_up]
+            assert old.ai == rev_update.get(new.ai)
+            assert old.aj == rev_update.get(new.aj)
+            assert old.ak == rev_update.get(new.ak)
+            assert old.al == rev_update.get(new.al)
+
+            for d_key in old.dihedrals:
+                old_d = old.dihedrals[d_key]
+                new_d = new.dihedrals[d_key]
+                assert new_d.ai == update.get(old_d.ai)
+                assert new_d.aj == update.get(old_d.aj)
+                assert new_d.ak == update.get(old_d.ak)
+                assert new_d.al == update.get(old_d.al)
 
     def test_break_bind_bond_hexala(self, hexala_top_fix):
         top = deepcopy(hexala_top_fix)
