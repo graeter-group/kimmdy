@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.2.3](https://github.com/hits-mbm-dev/kimmdy/compare/v6.2.2...v6.2.3) (2024-02-27)
+
+
+### Bug Fixes
+
+* update dihedrals, make pairs unique ([#383](https://github.com/hits-mbm-dev/kimmdy/issues/383)) fixes [#376](https://github.com/hits-mbm-dev/kimmdy/issues/376) ([9283e68](https://github.com/hits-mbm-dev/kimmdy/commit/9283e68065108566c7e0162d7aec543a5b9c41f8))
+
 ## [6.2.2](https://github.com/hits-mbm-dev/kimmdy/compare/v6.2.1...v6.2.2) (2024-02-23)
 
 
