@@ -104,7 +104,7 @@ def test_integration_homolysis_reaction(arranged_tmp_path):
 def test_integration_pull(arranged_tmp_path):
     kimmdy_run()
     assert "Finished running tasks" in read_last_line(Path("kimmdy.log"))
-    assert len(list(Path.cwd().glob("kimmdy_001/*"))) == 11
+    assert len(list(Path.cwd().glob("kimmdy_001/*"))) == 12
 
 
 @pytest.mark.require_grappa
