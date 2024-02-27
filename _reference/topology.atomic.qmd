@@ -26,8 +26,8 @@ See [gromacs manual](https://manual.gromacs.org/current/reference-manual/topolog
 | [PositionRestraint](#kimmdy.topology.atomic.PositionRestraint) | Information about one position restraint. |
 | [ResidueAtomSpec](#kimmdy.topology.atomic.ResidueAtomSpec) | Information about one atom in a residue |
 | [ResidueBondSpec](#kimmdy.topology.atomic.ResidueBondSpec) | Information about one bond in a residue |
-| [ResidueImproperSpec](#kimmdy.topology.atomic.ResidueImproperSpec) | Information about one imroper dihedral in a residue |
-| [ResidueProperSpec](#kimmdy.topology.atomic.ResidueProperSpec) | Information about one imroper dihedral in a residue |
+| [ResidueImproperSpec](#kimmdy.topology.atomic.ResidueImproperSpec) | Information about one improper dihedral in a residue |
+| [ResidueProperSpec](#kimmdy.topology.atomic.ResidueProperSpec) | Information about one proper dihedral in a residue |
 | [ResidueType](#kimmdy.topology.atomic.ResidueType) | Information about one residuetype from aminoacids.rtp |
 | [Settle](#kimmdy.topology.atomic.Settle) | Information about one settles |
 
@@ -215,19 +215,19 @@ Information about one bond in a residue
 
 ### ResidueImproperSpec { #kimmdy.topology.atomic.ResidueImproperSpec }
 
-`topology.atomic.ResidueImproperSpec(atom1, atom2, atom3, atom4, q0, cq)`
+`topology.atomic.ResidueImproperSpec(atom1, atom2, atom3, atom4, c0, c1, c2)`
 
-Information about one imroper dihedral in a residue
+Information about one improper dihedral in a residue
 
-; atom1 atom2 atom3 atom4 q0 cq
+; atom1 atom2 atom3 atom4 c0(q0) c1(cp) c2(mult)
 
 ### ResidueProperSpec { #kimmdy.topology.atomic.ResidueProperSpec }
 
-`topology.atomic.ResidueProperSpec(atom1, atom2, atom3, atom4, q0)`
+`topology.atomic.ResidueProperSpec(atom1, atom2, atom3, atom4, c0, c1, c2)`
 
-Information about one imroper dihedral in a residue
+Information about one proper dihedral in a residue
 
-; atom1 atom2 atom3 atom4 q0 cq
+; atom1 atom2 atom3 atom4 c0(q0) c1(cq) c2
 
 ### ResidueType { #kimmdy.topology.atomic.ResidueType }
 
