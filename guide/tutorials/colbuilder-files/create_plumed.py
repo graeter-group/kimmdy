@@ -624,9 +624,12 @@ def write_conditions_in_plumedfile(topfile, indexfile, indexgroup, parameterfile
         if "[ pairs ]" in data_all[j]:  # stop when done with all bonds
             break
 
-        if len(data_array[j]) > 0:
+        if len(data_array[j]) > 1:
             nbr1 = data_array[j][0]
-            nbr2 = data_array[j][1]
+            try:
+                nbr2 = data_array[j][1]
+            except IndexError:
+                breakpoint()
             # skip irrelevant bonds (e.g. side chains which are not under force)
             if nbr1 not in relevant_atoms:
                 continue

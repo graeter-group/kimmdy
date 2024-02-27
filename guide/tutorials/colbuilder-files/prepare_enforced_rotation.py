@@ -27,6 +27,7 @@ def prepare(file_dict: dict):
     idx_append = []
     rotation_groups = []
     for key in ["ACE_&_CH3", "NME_&_CH3"]:
+        assert idx_dict.get(key),f"[ {key} ] section not in index file. Please add this group to the index file."
         name = key[:3]
         chunks = list(yield_chunks(idx_dict[key], 3))
         for i, chunk in enumerate(chunks):
