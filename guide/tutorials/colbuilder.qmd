@@ -179,7 +179,7 @@ In a mdp file you would also define temperature coupling groups. To separate bet
 echo -ne "r ACE & a CH3\nr NME & a CH3\n\"Protein\"|\"Other\"\n\"Backbone\"| r LY2 LY3 L4Y L5Y LYX\nq\n"| gmx make_ndx -f fibril_npt.gro -o index.ndx
 ```
 
-Finally, the KIMMDY run name and gmx_mdrun_flags can be adjusted.
+Finally, the KIMMDY run name and gmx_mdrun_flags can be adjusted. For large systems, writing checkpoints takes considerable time. This is why the write_checkpoint setting is on False for our tutorial run. 
 A final KIMMDY config file could look like this:
 
 <details>
@@ -191,6 +191,7 @@ A final KIMMDY config file could look like this:
 dryrun: false
 name: 'fibril_000'
 max_tasks: 100
+write_checkpoint: False
 gromacs_alias: 'gmx'
 gmx_mdrun_flags: -maxh 24 -dlb yes -ntomp 4 -ntmpi 10  -pme gpu -bonded gpu -npme 1
 ff: 'amber99sb-star-ildnp.ff'
