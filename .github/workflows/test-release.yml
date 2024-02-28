@@ -10,13 +10,13 @@ jobs:
     runs-on: ubuntu-latest
     container: riedmiki/gromacs-plumed-python:2021
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: run tox
         run: tox
       - name: zip coverage report
         if: ${{ !cancelled() }}
         run: zip -r htmlcov.zip htmlcov || true
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
           name: coverage artifact
