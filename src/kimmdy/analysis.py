@@ -372,42 +372,46 @@ def radical_migration(
         "Running radical migration analysis\n"
         f"dir: \t\t{dir}\n"
         f"type: \t\t{type}\n"
-        f"cutoff: \t{cutoff}\n"
+        f"cutoff: \t{cutoff}\n\n"
+        f"Writing analysis files in {dir[0]}"
     )
 
-    run_dir = Path(dir).expanduser().resolve()
-    analysis_dir = get_analysis_dir(run_dir)
-
-    picked_recipes = {}
-    for recipes in run_dir.glob("*decide_recipe/recipes.csv"):
-        task_nr = int(recipes.parents[0].stem.split(sep="_")[0])
-        rc, picked_recipe = RecipeCollection.from_csv(recipes)
-        picked_recipes[task_nr] = picked_recipe
-    sorted_recipes = [val for key, val in sorted(picked_recipes.items())]
-
     migrations = []
-    for sorted_recipe in sorted_recipes:
-        connectivity_difference = {}
-        for step in sorted_recipe.recipe_steps:
-            if isinstance(step, Break):
-                for atom_id in [step.atom_id_1, step.atom_id_2]:
-                    if atom_id in connectivity_difference.keys():
-                        connectivity_difference[atom_id] += -1
-                    else:
-                        connectivity_difference[atom_id] = -1
-            elif isinstance(step, Bind):
-                for atom_id in [step.atom_id_1, step.atom_id_2]:
-                    if atom_id in connectivity_difference.keys():
-                        connectivity_difference[atom_id] += 1
-                    else:
-                        connectivity_difference[atom_id] = 1
+    analysis_dir = get_analysis_dir(Path(dir[0]))
+    for d in dir:
+        run_dir = Path(d).expanduser().resolve()
 
-        from_atom = [
-            key for key, value in connectivity_difference.items() if value == 1
-        ]
-        to_atom = [key for key, value in connectivity_difference.items() if value == -1]
-        if len(from_atom) == 1 and len(to_atom) == 1:
-            migrations.append([from_atom[0], to_atom[0], max(sorted_recipe.rates)])
+        picked_recipes = {}
+        for recipes in run_dir.glob("*decide_recipe/recipes.csv"):
+            task_nr = int(recipes.parents[0].stem.split(sep="_")[0])
+            rc, picked_recipe = RecipeCollection.from_csv(recipes)
+            picked_recipes[task_nr] = picked_recipe
+        sorted_recipes = [val for key, val in sorted(picked_recipes.items())]
+
+        for sorted_recipe in sorted_recipes:
+            connectivity_difference = {}
+            for step in sorted_recipe.recipe_steps:
+                if isinstance(step, Break):
+                    for atom_id in [step.atom_id_1, step.atom_id_2]:
+                        if atom_id in connectivity_difference.keys():
+                            connectivity_difference[atom_id] += -1
+                        else:
+                            connectivity_difference[atom_id] = -1
+                elif isinstance(step, Bind):
+                    for atom_id in [step.atom_id_1, step.atom_id_2]:
+                        if atom_id in connectivity_difference.keys():
+                            connectivity_difference[atom_id] += 1
+                        else:
+                            connectivity_difference[atom_id] = 1
+
+            from_atom = [
+                key for key, value in connectivity_difference.items() if value == 1
+            ]
+            to_atom = [
+                key for key, value in connectivity_difference.items() if value == -1
+            ]
+            if len(from_atom) == 1 and len(to_atom) == 1:
+                migrations.append([from_atom[0], to_atom[0], max(sorted_recipe.rates)])
     print(migrations)
     # get unique migrations
     unique_migrations = {}
@@ -725,7 +729,10 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         help="Create a csv of radical migration events for further analysis.",
     )
     parser_radical_migration.add_argument(
-        "dir", type=str, help="KIMMDY run directory to be analysed."
+        "dir",
+        type=str,
+        help="One or multiple KIMMDY run directories to be analysed.",
+        nargs="+",
     )
     parser_radical_migration.add_argument(
         "--type",
