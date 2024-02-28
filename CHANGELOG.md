@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.2.5](https://github.com/hits-mbm-dev/kimmdy/compare/v6.2.4...v6.2.5) (2024-02-27)
+
+
+### Bug Fixes
+
+* integration tests ([#390](https://github.com/hits-mbm-dev/kimmdy/issues/390)) ([526d888](https://github.com/hits-mbm-dev/kimmdy/commit/526d888d9198b450a654a5a9de03429a5c6f2e95))
+
 ## [6.2.4](https://github.com/hits-mbm-dev/kimmdy/compare/v6.2.3...v6.2.4) (2024-02-27)
 
 
