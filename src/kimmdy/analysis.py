@@ -72,7 +72,11 @@ def get_step_directories(dir: Path, steps: Union[list[str], str] = "all") -> lis
 
 
 def concat_traj(
-    dir: str, filetype: str, steps: Union[list[str], str], open_vmd: bool = False, output_group: Optional[str] = None
+    dir: str,
+    filetype: str,
+    steps: Union[list[str], str],
+    open_vmd: bool = False,
+    output_group: Optional[str] = None,
 ):
     """Find and concatenate trajectories (.xtc files) from a KIMMDY run into one trajectory.
     The concatenated trajectory is centered and pbc corrected.
@@ -710,7 +714,9 @@ def entry_point_analysis():
     args = get_analysis_cmdline_args()
 
     if args.module == "trjcat":
-        concat_traj(args.dir, args.filetype, args.steps, args.open_vmd, args.output_group)
+        concat_traj(
+            args.dir, args.filetype, args.steps, args.open_vmd, args.output_group
+        )
     elif args.module == "energy":
         plot_energy(args.dir, args.steps, args.terms, args.open_plot)
     elif args.module == "radical_population":
