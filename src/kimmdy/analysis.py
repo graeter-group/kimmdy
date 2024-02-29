@@ -15,6 +15,7 @@ import argparse
 from seaborn import axes_style
 import pandas as pd
 from datetime import datetime
+import json
 
 from kimmdy.utils import run_shell_cmd
 from kimmdy.parsing import read_json, write_json
@@ -350,6 +351,87 @@ def radical_population(
         run_shell_cmd(f"vmd {pdb_output}", cwd=analysis_dir)
 
 
+def radical_migration(
+    dirs: list[str],
+    type: str = "qualitative",
+    cutoff: int = 1,
+):
+    """Plot population of radicals for a KIMMDY run.
+
+    Parameters
+    ----------
+    dirs
+        KIMMDY run directories to be analysed.
+    type
+        How to analyse radical migration. Available are 'qualitative','occurence' and 'min_rate'",
+    cutoff
+        Ignore migration between two atoms if it happened less often than the specified value.
+
+    """
+    print(
+        "Running radical migration analysis\n"
+        f"dirs: \t\t{dirs}\n"
+        f"type: \t\t{type}\n"
+        f"cutoff: \t{cutoff}\n\n"
+        f"Writing analysis files in {dirs[0]}"
+    )
+
+    migrations = []
+    analysis_dir = get_analysis_dir(Path(dirs[0]))
+    for d in dirs:
+        run_dir = Path(d).expanduser().resolve()
+
+        picked_recipes = {}
+        for recipes in run_dir.glob("*decide_recipe/recipes.csv"):
+            task_nr = int(recipes.parents[0].stem.split(sep="_")[0])
+            rc, picked_recipe = RecipeCollection.from_csv(recipes)
+            picked_recipes[task_nr] = picked_recipe
+        sorted_recipes = [val for key, val in sorted(picked_recipes.items())]
+
+        for sorted_recipe in sorted_recipes:
+            connectivity_difference = {}
+            for step in sorted_recipe.recipe_steps:
+                if isinstance(step, Break):
+                    for atom_id in [step.atom_id_1, step.atom_id_2]:
+                        if atom_id in connectivity_difference.keys():
+                            connectivity_difference[atom_id] += -1
+                        else:
+                            connectivity_difference[atom_id] = -1
+                elif isinstance(step, Bind):
+                    for atom_id in [step.atom_id_1, step.atom_id_2]:
+                        if atom_id in connectivity_difference.keys():
+                            connectivity_difference[atom_id] += 1
+                        else:
+                            connectivity_difference[atom_id] = 1
+
+            from_atom = [
+                key for key, value in connectivity_difference.items() if value == 1
+            ]
+            to_atom = [
+                key for key, value in connectivity_difference.items() if value == -1
+            ]
+            if len(from_atom) == 1 and len(to_atom) == 1:
+                migrations.append([from_atom[0], to_atom[0], max(sorted_recipe.rates)])
+
+    # get unique migrations
+    unique_migrations = {}
+    for migration in migrations:
+        key = "_".join(migration[:2])
+        if key not in unique_migrations.keys():
+            unique_migrations[key] = {"count": 0, "max_rate": 1e-70}
+        unique_migrations[key]["count"] += 1
+        if migration[2] > unique_migrations[key]["max_rate"]:
+            unique_migrations[key]["max_rate"] = migration[2]
+
+    # filter by cutoff
+
+    # write json
+    out_path = analysis_dir / "radical_migration.json"
+    with open(out_path, "w") as json_file:
+        json.dump(unique_migrations, json_file)
+    print("Done!")
+
+
 def plot_rates(dir: str):
     """Plot rates of all possible reactions for each 'decide_recipe' step.
 
@@ -643,7 +725,30 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         help="Open VMD with the concatenated trajectory."
         "To view the radical occupancy per atom, add a representation with the beta factor as color.",
     )
-
+    parser_radical_migration = subparsers.add_parser(
+        name="radical_migration",
+        help="Create a json of radical migration events for further analysis.",
+    )
+    parser_radical_migration.add_argument(
+        "dirs",
+        type=str,
+        help="One or multiple KIMMDY run directories to be analysed.",
+        nargs="+",
+    )
+    parser_radical_migration.add_argument(
+        "--type",
+        "-t",
+        type=str,
+        help="How to analyse radical migration. Available are 'qualitative','occurence' and 'min_rate'",
+        default="qualitative",
+    )
+    parser_radical_migration.add_argument(
+        "--cutoff",
+        "-c",
+        type=int,
+        help="Ignore migration between two atoms if it happened less often than the specified value.",
+        default=1,
+    )
     parser_rates = subparsers.add_parser(
         name="rates",
         help="Plot rates of all possible reactions after a MD run. Rates must have been saved!",
@@ -710,6 +815,8 @@ def entry_point_analysis():
             args.open_plot,
             args.open_vmd,
         )
+    elif args.module == "radical_migration":
+        radical_migration(args.dirs, args.type, args.cutoff)
     elif args.module == "rates":
         plot_rates(args.dir)
     elif args.module == "runtime":
