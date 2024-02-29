@@ -352,7 +352,7 @@ def radical_population(
 
 
 def radical_migration(
-    dir: str,
+    dirs: list[str],
     type: str = "qualitative",
     cutoff: int = 1,
 ):
@@ -360,8 +360,8 @@ def radical_migration(
 
     Parameters
     ----------
-    dir
-        KIMMDY run directory to be analysed.
+    dirs
+        KIMMDY run directories to be analysed.
     type
         How to analyse radical migration. Available are 'qualitative','occurence' and 'min_rate'",
     cutoff
@@ -370,15 +370,15 @@ def radical_migration(
     """
     print(
         "Running radical migration analysis\n"
-        f"dir: \t\t{dir}\n"
+        f"dirs: \t\t{dirs}\n"
         f"type: \t\t{type}\n"
         f"cutoff: \t{cutoff}\n\n"
-        f"Writing analysis files in {dir[0]}"
+        f"Writing analysis files in {dirs[0]}"
     )
 
     migrations = []
-    analysis_dir = get_analysis_dir(Path(dir[0]))
-    for d in dir:
+    analysis_dir = get_analysis_dir(Path(dirs[0]))
+    for d in dirs:
         run_dir = Path(d).expanduser().resolve()
 
         picked_recipes = {}
@@ -412,7 +412,7 @@ def radical_migration(
             ]
             if len(from_atom) == 1 and len(to_atom) == 1:
                 migrations.append([from_atom[0], to_atom[0], max(sorted_recipe.rates)])
-    print(migrations)
+
     # get unique migrations
     unique_migrations = {}
     for migration in migrations:
@@ -429,6 +429,7 @@ def radical_migration(
     out_path = analysis_dir / "radical_migration.json"
     with open(out_path, "w") as json_file:
         json.dump(unique_migrations, json_file)
+    print("Done!")
 
 
 def plot_rates(dir: str):
@@ -726,10 +727,10 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
     )
     parser_radical_migration = subparsers.add_parser(
         name="radical_migration",
-        help="Create a csv of radical migration events for further analysis.",
+        help="Create a json of radical migration events for further analysis.",
     )
     parser_radical_migration.add_argument(
-        "dir",
+        "dirs",
         type=str,
         help="One or multiple KIMMDY run directories to be analysed.",
         nargs="+",
@@ -815,7 +816,7 @@ def entry_point_analysis():
             args.open_vmd,
         )
     elif args.module == "radical_migration":
-        radical_migration(args.dir, args.type, args.cutoff)
+        radical_migration(args.dirs, args.type, args.cutoff)
     elif args.module == "rates":
         plot_rates(args.dir)
     elif args.module == "runtime":
