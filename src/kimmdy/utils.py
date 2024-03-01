@@ -292,18 +292,23 @@ def get_gmx_dir(gromacs_alias: str = "gmx") -> Optional[Path]:
         logger.warning("GROMACS not found.")
         return None
 
+    from_source = False
     gmx_prefix = None
     for l in r.stderr.splitlines():
         if l.startswith("Data prefix:"):
             gmx_prefix = Path(l.split()[2])
+            if "(source tree)" in l:
+                from_source = True
             break
 
     if gmx_prefix is None:
         logger.warning("GROMACS data directory not found in gromacs message.")
         return None
 
-    gmx_dir = Path(gmx_prefix) / "share" / "gromacs"
-    return gmx_dir
+    if from_source:
+        return Path(gmx_prefix) / "share"
+    else:
+        return Path(gmx_prefix) / "share" / "gromacs"
 
 
 def check_gmx_version(config):

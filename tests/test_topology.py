@@ -15,6 +15,8 @@ from kimmdy.topology.utils import (
 )
 import logging
 
+from kimmdy.utils import get_gmx_dir
+
 
 @pytest.fixture(scope="module")
 def filedir() -> Path:
@@ -108,6 +110,12 @@ def random_topology_and_break(draw):
     top._regenerate_topology_from_bound_to()
     break_this = draw(st.sampled_from(list(top.bonds.keys())))
     return (top, break_this)
+
+class TestGMX:
+    def test_gmx_dir_is_found(self):
+        gmx = get_gmx_dir()
+        assert gmx
+        assert Path(gmx).is_dir()
 
 
 class TestMatch:
