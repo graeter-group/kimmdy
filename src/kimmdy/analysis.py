@@ -587,6 +587,7 @@ def reaction_participation(dir: str, open_plot: bool = False):
     for recipes in run_dir.glob("*decide_recipe/recipes.csv"):
         # get picked recipe
         rc, picked_rp = RecipeCollection.from_csv(recipes)
+        assert picked_rp, f"No picked recipe found in {recipes}."
         # get involved atoms
         reaction_atom_ids = set()
         for step in picked_rp.recipe_steps:
