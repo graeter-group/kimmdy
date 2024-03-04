@@ -2,7 +2,7 @@
 For command line usage, run `kimmdy-analysis -h`.
 """
 
-from typing import Union
+from typing import Optional, Union
 from pathlib import Path
 import MDAnalysis as mda
 import subprocess as sp
@@ -73,7 +73,11 @@ def get_step_directories(dir: Path, steps: Union[list[str], str] = "all") -> lis
 
 
 def concat_traj(
-    dir: str, filetype: str, steps: Union[list[str], str], open_vmd: bool = False
+    dir: str,
+    filetype: str,
+    steps: Union[list[str], str],
+    open_vmd: bool = False,
+    output_group: Optional[str] = None,
 ):
     """Find and concatenate trajectories (.xtc files) from a KIMMDY run into one trajectory.
     The concatenated trajectory is centered and pbc corrected.
@@ -86,6 +90,8 @@ def concat_traj(
         List of steps e.g. ["equilibrium", "production"]. Or a string "all" to return all subdirectories
     open_vmd
         Open concatenated trajectory in VMD
+    output_group
+        index group for output. Default is "Protein" for xtc and "System" for trr.
     """
     run_dir = Path(dir).expanduser().resolve()
     analysis_dir = get_analysis_dir(run_dir)
@@ -98,7 +104,12 @@ def concat_traj(
         raise NotImplementedError(
             f"Filetype {filetype} not implemented as trajectory file type. Try 'xtc', 'trr'."
         )
-    filetype_conv = {"xtc": 1, "trr": 0}
+
+    filetype_ouput_group_default = {"xtc": "Protein", "trr": "System"}
+    if output_group is None:
+        output = filetype_ouput_group_default[filetype]
+    else:
+        output = output_group
 
     ## gather trajectories
     trajectories = []
@@ -122,7 +133,7 @@ def concat_traj(
         cwd=run_dir,
     )
     run_shell_cmd(
-        f"echo '1 {filetype_conv[filetype]}' | gmx trjconv -f {tmp_xtc} -s {tprs[0]} -o {str(out_xtc)} -center -pbc mol",
+        f"echo 'Protein\n{output}' | gmx trjconv -dt 0 -f {tmp_xtc} -s {tprs[0]} -o {str(out_xtc)} -center -pbc mol",
         cwd=run_dir,
     )
     run_shell_cmd(f"rm {tmp_xtc}", cwd=run_dir)
@@ -651,6 +662,11 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         action="store_true",
         help="Open VMD with the concatenated trajectory.",
     )
+    parser_trjcat.add_argument(
+        "--output-group",
+        type=str,
+        help="Index group to include in the output. Default is 'Protein' for xtc and 'System' for trr.",
+    )
 
     parser_energy = subparsers.add_parser(
         name="energy", help="Plot GROMACS energy for a KIMMDY run"
@@ -804,7 +820,9 @@ def entry_point_analysis():
     args = get_analysis_cmdline_args()
 
     if args.module == "trjcat":
-        concat_traj(args.dir, args.filetype, args.steps, args.open_vmd)
+        concat_traj(
+            args.dir, args.filetype, args.steps, args.open_vmd, args.output_group
+        )
     elif args.module == "energy":
         plot_energy(args.dir, args.steps, args.terms, args.open_plot)
     elif args.module == "radical_population":
