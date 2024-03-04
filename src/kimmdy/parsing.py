@@ -2,14 +2,14 @@
 All read_<...> and write_<...> functions.
 """
 
-import os
-import logging
 import json
-import numpy as np
-from pathlib import Path
-from typing import Optional, Union
+import logging
+import os
 from itertools import takewhile
-from typing import TypedDict
+from pathlib import Path
+from typing import Optional, TypedDict, Union
+
+import numpy as np
 
 from kimmdy.utils import get_gmx_dir
 

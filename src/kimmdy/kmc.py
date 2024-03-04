@@ -8,13 +8,15 @@ because of the fundamental premise of chemical kinetics
 and because we have one reactant molecule
 """
 
-from typing import Optional
 import logging
-import numpy as np
-from itertools import pairwise
 from dataclasses import dataclass, field
+from itertools import pairwise
+from typing import Optional
+
+import numpy as np
 from numpy.random import default_rng
-from kimmdy.recipe import RecipeCollection, Recipe
+
+from kimmdy.recipe import Recipe, RecipeCollection
 
 
 @dataclass

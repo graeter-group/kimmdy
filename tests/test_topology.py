@@ -1,20 +1,21 @@
+import logging
 from copy import deepcopy
 from pathlib import Path
-import pytest
-import numpy as np
 
-from kimmdy.parsing import read_top, TopologyDict
-from kimmdy.recipe import Break, Bind
-from hypothesis import Phase, given, settings, HealthCheck, strategies as st
-from kimmdy.topology.topology import REACTIVE_MOLECULEYPE, Topology
+import numpy as np
+import pytest
+from hypothesis import HealthCheck, Phase, given, settings
+from hypothesis import strategies as st
+
+from kimmdy.parsing import TopologyDict, read_top
+from kimmdy.recipe import Bind, Break
 from kimmdy.topology.atomic import *
+from kimmdy.topology.topology import REACTIVE_MOLECULEYPE, Topology
 from kimmdy.topology.utils import (
+    get_protein_section,
     get_reactive_section,
     match_atomic_item_to_atomic_type,
-    get_protein_section,
 )
-import logging
-
 from kimmdy.utils import get_gmx_dir
 
 
@@ -110,6 +111,7 @@ def random_topology_and_break(draw):
     top._regenerate_topology_from_bound_to()
     break_this = draw(st.sampled_from(list(top.bonds.keys())))
     return (top, break_this)
+
 
 class TestGMX:
     def test_gmx_dir_is_found(self):

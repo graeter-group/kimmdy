@@ -4,19 +4,22 @@ and package into a parsed format for internal use.
 """
 
 from __future__ import annotations
+
 import shutil
-from pprint import pformat, pprint
-from typing import Any, Optional
-import yaml
 from pathlib import Path
+from pprint import pformat
+from typing import Any, Optional
+
+import yaml
+
 from kimmdy.plugins import (
-    reaction_plugins,
+    broken_parameterization_plugins,
     broken_reaction_plugins,
     parameterization_plugins,
-    broken_parameterization_plugins,
+    reaction_plugins,
 )
-from kimmdy.schema import Sequence, get_combined_scheme
-from kimmdy.utils import get_gmx_dir, check_file_exists, check_gmx_version
+from kimmdy.schema import get_combined_scheme
+from kimmdy.utils import check_file_exists, check_gmx_version, get_gmx_dir
 
 
 class Config:

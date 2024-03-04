@@ -4,15 +4,16 @@ Also discovers and loads KIMMDY plugins.
 """
 
 from __future__ import annotations
-from typing import TYPE_CHECKING
-from abc import ABC, abstractmethod
+
 import logging
 import sys
+from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from kimmdy.runmanager import RunManager
     from kimmdy.config import Config
     from kimmdy.recipe import RecipeCollection
+    from kimmdy.runmanager import RunManager
     from kimmdy.tasks import TaskFiles
     from kimmdy.topology.topology import Topology
 

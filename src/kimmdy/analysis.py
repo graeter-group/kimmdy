@@ -2,24 +2,25 @@
 For command line usage, run `kimmdy-analysis -h`.
 """
 
-from typing import Optional, Union
-from pathlib import Path
-import MDAnalysis as mda
-import subprocess as sp
-import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
-import matplotlib as mpl
-import seaborn.objects as so
-import seaborn as sns
 import argparse
-from seaborn import axes_style
-import pandas as pd
-from datetime import datetime
 import json
+import subprocess as sp
+from datetime import datetime
+from pathlib import Path
+from typing import Optional, Union
 
-from kimmdy.utils import run_shell_cmd
+import matplotlib as mpl
+import matplotlib.patches as mpatches
+import matplotlib.pyplot as plt
+import MDAnalysis as mda
+import pandas as pd
+import seaborn as sns
+import seaborn.objects as so
+from seaborn import axes_style
+
 from kimmdy.parsing import read_json, write_json
-from kimmdy.recipe import RecipeCollection, Break, Bind, Place, Relax
+from kimmdy.recipe import Bind, Break, Place, RecipeCollection
+from kimmdy.utils import run_shell_cmd
 
 
 def get_analysis_dir(dir: Path) -> Path:

@@ -11,16 +11,17 @@ Reserved keywords:
     - required
 """
 
-import json
 import importlib.resources as pkg_resources
+import json
 import logging
-from kimmdy.plugins import reaction_plugins
 
 # needed for eval of type_scheme from schema
 # don't remove even if lsp says it's unused
-import kimmdy
 import pathlib
 from pathlib import Path
+
+import kimmdy
+from kimmdy.plugins import reaction_plugins
 
 logger = logging.getLogger(__name__)
 

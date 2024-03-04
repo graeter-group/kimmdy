@@ -1,31 +1,32 @@
 """coordinate, topology and plumed modification functions"""
 
 import logging
-from typing import Optional, Union
 from copy import deepcopy
-import MDAnalysis as mda
 from pathlib import Path
+from typing import Optional, Union
+
+import MDAnalysis as mda
 import numpy as np
 
-from kimmdy.tasks import TaskFiles
-from kimmdy.parsing import read_plumed, write_plumed
 from kimmdy.constants import REACTIVE_MOLECULEYPE
+from kimmdy.parsing import read_plumed, write_plumed
 from kimmdy.recipe import Place
-from kimmdy.topology.topology import MoleculeType, Topology
-from kimmdy.topology.ff import FF
+from kimmdy.tasks import TaskFiles
 from kimmdy.topology.atomic import (
-    Bond,
     Angle,
+    Bond,
     Dihedral,
     DihedralType,
-    ProperDihedralId,
+    Exclusion,
     ImproperDihedralId,
-    MultipleDihedrals,
     Interaction,
     InteractionType,
     InteractionTypes,
-    Exclusion,
+    MultipleDihedrals,
+    ProperDihedralId,
 )
+from kimmdy.topology.ff import FF
+from kimmdy.topology.topology import MoleculeType, Topology
 from kimmdy.topology.utils import match_atomic_item_to_atomic_type
 
 logger = logging.getLogger(__name__)

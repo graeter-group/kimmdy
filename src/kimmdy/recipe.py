@@ -2,15 +2,16 @@
 """
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Callable, Optional
 
+import csv
+import logging
 from abc import ABC
+from copy import copy
 from dataclasses import dataclass, field
 from pathlib import Path
-import logging
-from copy import copy
+from typing import TYPE_CHECKING, Callable, Optional
+
 import dill
-import csv
 import numpy as np
 
 logger = logging.getLogger(__name__)
@@ -527,8 +528,8 @@ class RecipeCollection:
         """
 
         import matplotlib.pyplot as plt
-        import seaborn as sns
         import numpy as np
+        import seaborn as sns
 
         self.aggregate_reactions()
         cumprob = self.calc_cumprob()

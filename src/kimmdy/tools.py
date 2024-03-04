@@ -2,16 +2,15 @@
 Standalone tools that are complementary to KIMMDY.
 """
 
-from pathlib import Path
-import shutil
 import argparse
-from typing import Optional
 import json
+import shutil
+from pathlib import Path
+from typing import Optional
 
-from kimmdy.topology.topology import Topology
 from kimmdy.parsing import read_top, write_top
-from kimmdy.plugins import parameterization_plugins
-from kimmdy.plugins import discover_plugins
+from kimmdy.plugins import discover_plugins, parameterization_plugins
+from kimmdy.topology.topology import Topology
 
 
 def build_examples(restore: str):

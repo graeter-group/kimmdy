@@ -3,17 +3,19 @@ Utilities for building plugins, shell convenience functions and GROMACS related 
 """
 
 from __future__ import annotations
-import subprocess as sp
-import numpy as np
-import re
+
 import logging
-from typing import Optional, TYPE_CHECKING
+import re
+import subprocess as sp
 from pathlib import Path
+from typing import TYPE_CHECKING, Optional
+
+import numpy as np
 
 if TYPE_CHECKING:
+    from kimmdy.parsing import Plumed_dict
     from kimmdy.tasks import TaskFiles
     from kimmdy.topology.topology import Topology
-    from kimmdy.parsing import Plumed_dict
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +43,7 @@ class longFormatter(logging.Formatter):
         return result
 
 
-# input/output utility functions
+### IO utility functions ###
 
 
 def run_shell_cmd(s, cwd=None) -> sp.CompletedProcess:
@@ -75,7 +77,7 @@ def check_file_exists(p: Path):
         raise LookupError(m)
 
 
-# reaction plugin building blocks
+### reaction plugin building blocks ###
 
 
 def get_atomnrs_from_plumedid(
@@ -278,7 +280,7 @@ def morse_transition_rate(
     return k, fs
 
 
-# GROMACS related functions
+### GROMACS related functions ###
 
 
 def get_gmx_dir(gromacs_alias: str = "gmx") -> Optional[Path]:
