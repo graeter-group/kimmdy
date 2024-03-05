@@ -396,9 +396,9 @@ def radical_migration(
         picked_recipes = {}
         for recipes in run_dir.glob("*decide_recipe/recipes.csv"):
             task_nr = int(recipes.parents[0].stem.split(sep="_")[0])
-            rc, picked_recipe = RecipeCollection.from_csv(recipes)
+            _, picked_recipe = RecipeCollection.from_csv(recipes)
             picked_recipes[task_nr] = picked_recipe
-        sorted_recipes = [val for key, val in sorted(picked_recipes.items())]
+        sorted_recipes = [v for _, v in sorted(picked_recipes.items())]
 
         for sorted_recipe in sorted_recipes:
             connectivity_difference = {}
@@ -598,7 +598,7 @@ def reaction_participation(dir: str, open_plot: bool = False):
     reaction_count = {"overall": 0}
     for recipes in run_dir.glob("*decide_recipe/recipes.csv"):
         # get picked recipe
-        rc, picked_rp = RecipeCollection.from_csv(recipes)
+        _, picked_rp = RecipeCollection.from_csv(recipes)
         assert picked_rp, f"No picked recipe found in {recipes}."
         # get involved atoms
         reaction_atom_ids = set()

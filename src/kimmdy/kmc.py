@@ -235,6 +235,10 @@ def extrande_mod(
         f"\t\texpected tau: {expected_tau}"
     )
 
+    b = None
+    tau = None
+    l = None
+    t_max = None
     for cr_boarders, cr_rates, cr_recipes in zip(
         pairwise(boarders), rate_windows, recipe_windows
     ):
@@ -261,6 +265,9 @@ def extrande_mod(
 
         if chosen_recipe is not None:
             break
+
+    if None in [b, tau, l, t_max]:
+        logger.error(f"Extrande calculation failed, some variables are None.")
 
     if chosen_recipe is None:
         logger.info(
@@ -343,6 +350,8 @@ def extrande(
     )
 
     n_extra = 0
+    tau = None
+    l = None
     while t < t_max:
         crr_window_idx = np.searchsorted(boarders, t, side="right") - 1
         # only 0 rates left -> skip to end
@@ -389,6 +398,9 @@ def extrande(
             logger.warning(
                 f"{n_extra} extra reactions performed during extrande KMC calculation. Try increasing tau_scale"
             )
+
+    if None in [tau, l]:
+        logger.error(f"Extrande calculation failed, some variables are None.")
 
     if chosen_recipe is None:
         logger.info(

@@ -524,15 +524,15 @@ def read_distances_dat(distances_dat: Path) -> dict:
 class JSONEncoder(json.JSONEncoder):
     """Encoder that enables writing JSONs with numpy types."""
 
-    def default(self, obj):
-        if isinstance(obj, np.integer):
-            return int(obj)
-        elif isinstance(obj, np.floating):
-            return float(obj)
-        elif isinstance(obj, np.ndarray):
-            return obj.tolist()
+    def default(self, o):
+        if isinstance(o, np.integer):
+            return int(o)
+        elif isinstance(o, np.floating):
+            return float(o)
+        elif isinstance(o, np.ndarray):
+            return o.tolist()
         else:
-            return super(JSONEncoder, self).default(obj)
+            return super(JSONEncoder, self).default(o)
 
 
 def write_json(

@@ -328,9 +328,10 @@ class Config:
                 )
                 name = self.out.name.split("_")
                 out_end = name[-1]
-                out_start = "_".join(name[:-1])
                 if out_end.isdigit():
-                    self.out = self.out.with_name(f"{out_start}_{int(out_end)+1:03}")
+                    self.out = self.out.with_name(
+                        f"{'_'.join(name[:-1])}_{int(out_end)+1:03}"
+                    )
                 else:
                     self.out = self.out.with_name(self.out.name + "_001")
 
