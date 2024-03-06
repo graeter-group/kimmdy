@@ -331,7 +331,8 @@ class TestTopology:
         for a_del in angles_to_delete:
             assert None in [update.get(a) for a in a_del]
         for a_up in angles_to_update:
-            new = top.angles[tuple([update.get(a) for a in a_up])]
+            k1, k2, k3 = [update[a] for a in a_up]
+            new = top.angles[k1, k2, k3]
             old = hexala_top_fix.angles[a_up]
             assert old.ai == rev_update.get(new.ai)
             assert old.aj == rev_update.get(new.aj)
@@ -341,7 +342,8 @@ class TestTopology:
         for pd_del in pd_to_delete:
             assert None in tuple([update.get(a) for a in pd_del])
         for pd_up in pd_to_update:
-            new = top.proper_dihedrals[tuple([update.get(a) for a in pd_up])]
+            k1, k2, k3, k4 = [update[a] for a in pd_up]
+            new = top.proper_dihedrals[k1, k2, k3, k4]
             old = hexala_top_fix.proper_dihedrals[pd_up]
             assert old.ai == rev_update.get(new.ai)
             assert old.aj == rev_update.get(new.aj)
@@ -360,7 +362,8 @@ class TestTopology:
         for id_del in id_to_delete:
             assert None in tuple([update.get(a) for a in id_del])
         for id_up in id_to_update:
-            new = top.improper_dihedrals[tuple([update.get(a) for a in id_up])]
+            k1, k2, k3, k4 = [update[a] for a in id_up]
+            new = top.improper_dihedrals[k1, k2, k3, k4]
             old = hexala_top_fix.improper_dihedrals[id_up]
             assert old.ai == rev_update.get(new.ai)
             assert old.aj == rev_update.get(new.aj)
@@ -637,9 +640,10 @@ class TestHexalaTopology:
         assert raw["moleculetype_Protein"]["content"][0] == ["Protein", "3"]
         assert top.top["moleculetype_Reactive"]["content"][0] == ["Reactive", "3"]
         for section in ["atoms", "bonds", "angles", "dihedrals", "pairs"]:
-            top.top["moleculetype_Reactive"]["subsections"][section]["content"] == raw[
-                "moleculetype_Protein"
-            ]["subsections"][section]["content"]
+            assert (
+                top.top["moleculetype_Reactive"]["subsections"][section]["content"]
+                == raw["moleculetype_Protein"]["subsections"][section]["content"]
+            )
 
     def test_top_properties(self, hexala_top_fix):
         top = deepcopy(hexala_top_fix)

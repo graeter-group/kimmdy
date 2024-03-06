@@ -128,9 +128,9 @@ def test_place_initialization():
     assert m2 != m3
 
     with pytest.raises(TypeError):
-        recipe.Place(ix_to_place=1)
+        recipe.Place(ix_to_place=1)  # type: ignore
     with pytest.raises(ValueError):
-        recipe.Place(id_to_place=1, new_coords=(0, 0, 0))
+        recipe.Place(id_to_place=1, new_coords=(0, 0, 0))  # type: ignore
 
 
 def test_relax_initialization():
