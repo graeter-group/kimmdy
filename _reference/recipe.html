@@ -480,6 +480,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#parameters-5" id="toc-parameters-5" class="nav-link" data-scroll-target="#parameters-5">Parameters</a></li>
   <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
   <ul class="collapse">
+  <li><a href="#kimmdy.recipe.Recipe.calc_averages" id="toc-kimmdy.recipe.Recipe.calc_averages" class="nav-link" data-scroll-target="#kimmdy.recipe.Recipe.calc_averages">calc_averages</a></li>
   <li><a href="#kimmdy.recipe.Recipe.check_consistency" id="toc-kimmdy.recipe.Recipe.check_consistency" class="nav-link" data-scroll-target="#kimmdy.recipe.Recipe.check_consistency">check_consistency</a></li>
   <li><a href="#kimmdy.recipe.Recipe.combine_with" id="toc-kimmdy.recipe.Recipe.combine_with" class="nav-link" data-scroll-target="#kimmdy.recipe.Recipe.combine_with">combine_with</a></li>
   </ul></li>
@@ -563,7 +564,7 @@ ul.task-list li input[type="checkbox"] {
 </table>
 <section id="kimmdy.recipe.Bind" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.recipe.Bind">Bind</h3>
-<p><code>recipe.Bind(self, atom_ix_1=None, atom_ix_2=None, atom_id_1=None, atom_id_2=None)</code></p>
+<p><code>recipe.Bind()</code></p>
 <p>Change topology to form a bond</p>
 <section id="parameters" class="level4">
 <h4 class="anchored" data-anchor-id="parameters">Parameters</h4>
@@ -581,25 +582,25 @@ ul.task-list li input[type="checkbox"] {
 <td><code>atom_ix_1</code></td>
 <td><a href="https://docs.python.org/3.10/library/functions.html#int">int</a></td>
 <td>The index of the first atom. zero-based, by default None</td>
-<td><code>None</code></td>
+<td><em>required</em></td>
 </tr>
 <tr class="even">
 <td><code>atom_ix_2</code></td>
 <td><a href="https://docs.python.org/3.10/library/functions.html#int">int</a></td>
 <td>The index of the second atom. zero-based, by default None</td>
-<td><code>None</code></td>
+<td><em>required</em></td>
 </tr>
 <tr class="odd">
 <td><code>atom_id_1</code></td>
 <td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
 <td>The ID of the first atom. one-based, by default None</td>
-<td><code>None</code></td>
+<td><em>required</em></td>
 </tr>
 <tr class="even">
 <td><code>atom_id_2</code></td>
 <td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
 <td>The ID of the second atom. one-based, by default None</td>
-<td><code>None</code></td>
+<td><em>required</em></td>
 </tr>
 </tbody>
 </table>
@@ -607,9 +608,9 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="kimmdy.recipe.BondOperation" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.recipe.BondOperation">BondOperation</h3>
-<p><code>recipe.BondOperation(self, atom_ix_1=None, atom_ix_2=None, atom_id_1=None, atom_id_2=None)</code></p>
+<p><code>recipe.BondOperation(_atom_ix_1=field(init=False, repr=False, default=None), _atom_ix_2=field(init=False, repr=False, default=None))</code></p>
 <p>Handle a bond operation on the recipe step.</p>
-<p>This class takes in either zero-based indices or one-base IDs for two atoms.</p>
+<p>This class takes in either zero-based indices or one-base IDs for two atoms</p>
 <section id="parameters-1" class="level4">
 <h4 class="anchored" data-anchor-id="parameters-1">Parameters</h4>
 <table class="table">
@@ -626,25 +627,25 @@ ul.task-list li input[type="checkbox"] {
 <td><code>atom_ix_1</code></td>
 <td><a href="https://docs.python.org/3.10/library/functions.html#int">int</a></td>
 <td>The index of the first atom. zero-based, by default None</td>
-<td><code>None</code></td>
+<td><em>required</em></td>
 </tr>
 <tr class="even">
 <td><code>atom_ix_2</code></td>
 <td><a href="https://docs.python.org/3.10/library/functions.html#int">int</a></td>
 <td>The index of the second atom. zero-based, by default None</td>
-<td><code>None</code></td>
+<td><em>required</em></td>
 </tr>
 <tr class="odd">
 <td><code>atom_id_1</code></td>
 <td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
 <td>The ID of the first atom. one-based, by default None</td>
-<td><code>None</code></td>
+<td><em>required</em></td>
 </tr>
 <tr class="even">
 <td><code>atom_id_2</code></td>
 <td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
 <td>The ID of the second atom. one-based, by default None</td>
-<td><code>None</code></td>
+<td><em>required</em></td>
 </tr>
 </tbody>
 </table>
@@ -673,7 +674,7 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="kimmdy.recipe.Break" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.recipe.Break">Break</h3>
-<p><code>recipe.Break(self, atom_ix_1=None, atom_ix_2=None, atom_id_1=None, atom_id_2=None)</code></p>
+<p><code>recipe.Break()</code></p>
 <p>Change topology to break a bond</p>
 <section id="parameters-2" class="level4">
 <h4 class="anchored" data-anchor-id="parameters-2">Parameters</h4>
@@ -691,25 +692,25 @@ ul.task-list li input[type="checkbox"] {
 <td><code>atom_ix_1</code></td>
 <td><a href="https://docs.python.org/3.10/library/functions.html#int">int</a></td>
 <td>The index of the first atom. zero-based, by default None</td>
-<td><code>None</code></td>
+<td><em>required</em></td>
 </tr>
 <tr class="even">
 <td><code>atom_ix_2</code></td>
 <td><a href="https://docs.python.org/3.10/library/functions.html#int">int</a></td>
 <td>The index of the second atom. zero-based, by default None</td>
-<td><code>None</code></td>
+<td><em>required</em></td>
 </tr>
 <tr class="odd">
 <td><code>atom_id_1</code></td>
 <td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
 <td>The ID of the first atom. one-based, by default None</td>
-<td><code>None</code></td>
+<td><em>required</em></td>
 </tr>
 <tr class="even">
 <td><code>atom_id_2</code></td>
 <td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
 <td>The ID of the second atom. one-based, by default None</td>
-<td><code>None</code></td>
+<td><em>required</em></td>
 </tr>
 </tbody>
 </table>
@@ -743,9 +744,8 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="kimmdy.recipe.Place" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.recipe.Place">Place</h3>
-<p><code>recipe.Place(self, new_coords, ix_to_place=None, id_to_place=None)</code></p>
+<p><code>recipe.Place(new_coords, _ix_to_place=field(init=False, repr=False, default=None))</code></p>
 <p>Change topology and/or coordinates to place an atom.</p>
-<p>Either provide the index (ix_to_place) or the ID (id_to_place) of the atom to place.</p>
 <section id="parameters-4" class="level4">
 <h4 class="anchored" data-anchor-id="parameters-4">Parameters</h4>
 <table class="table">
@@ -768,13 +768,13 @@ ul.task-list li input[type="checkbox"] {
 <td><code>ix_to_place</code></td>
 <td><a href="https://docs.python.org/3.10/library/functions.html#int">int</a></td>
 <td>Index of atom to place. 0-based.</td>
-<td><code>None</code></td>
+<td><em>required</em></td>
 </tr>
 <tr class="odd">
 <td><code>id_to_place</code></td>
 <td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
 <td>Index of atom to place. 1-based</td>
-<td><code>None</code></td>
+<td><em>required</em></td>
 </tr>
 </tbody>
 </table>
@@ -828,15 +828,45 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
+<td><a href="#kimmdy.recipe.Recipe.calc_averages">calc_averages</a></td>
+<td>Calulate average rates over some window size</td>
+</tr>
+<tr class="even">
 <td><a href="#kimmdy.recipe.Recipe.check_consistency">check_consistency</a></td>
 <td>Run consistency checks for correct size of variables</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#kimmdy.recipe.Recipe.combine_with">combine_with</a></td>
 <td>Combines this Recipe with another with the same RecipeSteps.</td>
 </tr>
 </tbody>
 </table>
+<section id="kimmdy.recipe.Recipe.calc_averages" class="level5">
+<h5 class="anchored" data-anchor-id="kimmdy.recipe.Recipe.calc_averages">calc_averages</h5>
+<p><code>recipe.Recipe.calc_averages(window_size)</code></p>
+<p>Calulate average rates over some window size</p>
+<section id="parameters-6" class="level6">
+<h6 class="anchored" data-anchor-id="parameters-6">Parameters</h6>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>window_size</code></td>
+<td><a href="https://docs.python.org/3.10/library/functions.html#int">int</a></td>
+<td>Size of the window to average over, -1 to average over whole available range.</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
 <section id="kimmdy.recipe.Recipe.check_consistency" class="level5">
 <h5 class="anchored" data-anchor-id="kimmdy.recipe.Recipe.check_consistency">check_consistency</h5>
 <p><code>recipe.Recipe.check_consistency()</code></p>
@@ -846,8 +876,8 @@ ul.task-list li input[type="checkbox"] {
 <h5 class="anchored" data-anchor-id="kimmdy.recipe.Recipe.combine_with">combine_with</h5>
 <p><code>recipe.Recipe.combine_with(other)</code></p>
 <p>Combines this Recipe with another with the same RecipeSteps.</p>
-<section id="parameters-6" class="level6">
-<h6 class="anchored" data-anchor-id="parameters-6">Parameters</h6>
+<section id="parameters-7" class="level6">
+<h6 class="anchored" data-anchor-id="parameters-7">Parameters</h6>
 <table class="table">
 <thead>
 <tr class="header">
@@ -984,8 +1014,8 @@ ul.task-list li input[type="checkbox"] {
 <h5 class="anchored" data-anchor-id="kimmdy.recipe.RecipeCollection.plot">plot</h5>
 <p><code>recipe.RecipeCollection.plot(outfile, highlight_r=None, highlight_t=None)</code></p>
 <p>Plot reaction rates over time</p>
-<section id="parameters-7" class="level6">
-<h6 class="anchored" data-anchor-id="parameters-7">Parameters</h6>
+<section id="parameters-8" class="level6">
+<h6 class="anchored" data-anchor-id="parameters-8">Parameters</h6>
 <table class="table">
 <thead>
 <tr class="header">
