@@ -1063,6 +1063,17 @@ class Topology:
         """
         p.text(str(self))
 
+    def get_neighbors(self, initial_atoms: set[str], order: int):
+        explored_atoms = initial_atoms
+        frontier = initial_atoms
+        for _ in range(order):
+            new_frontier = set()
+            for atom in frontier:
+                new_frontier.update(self.atoms[atom].bound_to_nrs)
+            frontier = new_frontier - explored_atoms
+            explored_atoms |= new_frontier
+        return explored_atoms
+
     def break_bond(
         self, atompair_addresses: tuple[TopologyAtomAddress, TopologyAtomAddress]
     ):

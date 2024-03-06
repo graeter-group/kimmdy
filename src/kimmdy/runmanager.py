@@ -157,7 +157,6 @@ class RunManager:
             radicals=getattr(self.config, "radicals", None),
             residuetypes_path=getattr(self.config, "residuetypes", None),
         )
-
         self.filehist: list[dict[str, TaskFiles]] = [
             {"setup": TaskFiles(self.get_latest)}
         ]
