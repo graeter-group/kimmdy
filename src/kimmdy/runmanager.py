@@ -386,6 +386,10 @@ class RunManager:
         logger.info("Start setup task")
         self.state = State.SETUP
         logger.info("Writing initial topology after parsing")
+
+        if self.config.parameterize_at_setup:
+            self.top.needs_parameterization = True
+
         write_top(self.top.to_dict(), files.outputdir / self.config.top.name)
         files.output["top"] = files.outputdir / self.config.top.name
         logger.info("Done with setup")
