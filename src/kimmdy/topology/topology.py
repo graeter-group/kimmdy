@@ -850,13 +850,13 @@ class Topology:
             [attributes_to_list(x) for x in self.ff.angletypes.values()],
         )
 
-    def update_parameters(self):
+    def update_parameters(self, focus_nrs: set = set()):
         if self.needs_parameterization:
             if self.parametrizer is not None:
                 logger.info(
                     f"Starting parametrization using {self.parametrizer.__class__.__name__}"
                 )
-                self.parametrizer.parameterize_topology(self)
+                self.parametrizer.parameterize_topology(self, focus_nrs)
             else:
                 raise RuntimeError("No Parametrizer was initialized in this topology!")
             self.needs_parameterization = False

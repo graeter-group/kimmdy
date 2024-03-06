@@ -388,7 +388,9 @@ class RunManager:
         logger.info("Writing initial topology after parsing")
 
         if self.config.parameterize_at_setup:
+            focus_nrs = set([atom.nr for atom in self.top.atoms.values()])
             self.top.needs_parameterization = True
+            self.top.update_parameters(focus_nrs)
 
         write_top(self.top.to_dict(), files.outputdir / self.config.top.name)
         files.output["top"] = files.outputdir / self.config.top.name
@@ -588,9 +590,11 @@ class RunManager:
         truncate_sim_files(files, ttime)
 
         top_initial = deepcopy(self.top)
+        focus_nrs = set()
         for step in recipe.recipe_steps:
             if isinstance(step, Break):
                 self.top.break_bond((step.atom_id_1, step.atom_id_2))
+                focus_nrs.update([step.atom_id_1, step.atom_id_2])
                 if hasattr(self.config, "plumed"):
                     break_bond_plumed(
                         files,
@@ -599,6 +603,7 @@ class RunManager:
                     )
             elif isinstance(step, Bind):
                 self.top.bind_bond((step.atom_id_1, step.atom_id_2))
+                focus_nrs.update([step.atom_id_1, step.atom_id_2])
             elif isinstance(step, Place):
                 task = Task(
                     self,
@@ -610,6 +615,7 @@ class RunManager:
                 place_files = task()
                 logger.info(f"Finished task: {task.name}")
                 self._discover_output_files(task.name, place_files)
+                focus_nrs.update([step.id_to_place])
 
             elif isinstance(step, Relax):
                 logger.info("Starting relaxation md as part of reaction..")
@@ -619,7 +625,7 @@ class RunManager:
 
                 if self.config.changer.coordinates.slow_growth:
                     # Create a slow growth topology for sub-task run_md, afterwards, top will be reset properly
-                    self.top.update_parameters()
+                    self.top.update_parameters(focus_nrs)
                     top_merge = merge_top_slow_growth(top_initial, deepcopy(self.top))
                     top_merge_path = files.outputdir / self.config.top.name.replace(
                         ".", "_mod."
@@ -638,8 +644,8 @@ class RunManager:
             elif isinstance(step, CustomTopMod):
                 step.f(self.top)
 
-        # update partial charges
         self.top.update_partial_charges(recipe.recipe_steps)
+        self.top.update_parameters(focus_nrs)
 
         write_top(self.top.to_dict(), files.outputdir / self.config.top.name)
         files.output["top"] = files.outputdir / self.config.top.name
