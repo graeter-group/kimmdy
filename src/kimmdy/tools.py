@@ -161,7 +161,7 @@ def modify_top(
     # radicals != None -> iterate over rad_str.split, can be empty
     rad_str = None
     if radicals is not None:
-        rad_str = " ".join(radicals)
+        rad_str = " ".join([str(r) for r in radicals])
     elif not search_amber_rad:
         rad_str = ""
 
@@ -221,7 +221,7 @@ def modify_top(
     print("Done")
 
     # deal with gro file
-    if gro:
+    if gro_path is not None and gro_out is not None:
         if removeH:
             print("Writing gro..", end="")
             with open(gro_path, "r") as f:

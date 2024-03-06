@@ -59,7 +59,7 @@ class Sequence(list):
 def load_kimmdy_schema() -> dict:
     """Return the schema for the config file"""
     path = pkg_resources.files(kimmdy) / "kimmdy-yaml-schema.json"
-    with path.open("rt") as f:
+    with path.open("r") as f:
         schema = json.load(f)
     return schema
 

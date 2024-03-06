@@ -362,17 +362,6 @@ class Recipe:
             list(self.timespans),
         )
 
-    def calc_averages(self, window_size: int):
-        """Calulate average rates over some window size
-
-        Parameters
-        ----------
-        window_size : int
-            Size of the window to average over,
-            -1 to average over whole available range.
-        """
-        raise NotImplementedError("calc_averages not implemented yet")
-
     def combine_with(self, other: Recipe):
         """Combines this Recipe with another with the same RecipeSteps.
 
@@ -613,7 +602,12 @@ class RecipeCollection:
 
         return boarders, rate_windows, recipe_windows
 
-    def plot(self, outfile, highlight_r=None, highlight_t=None):
+    def plot(
+        self,
+        outfile,
+        highlight_r: Optional[Recipe] = None,
+        highlight_t: Optional[float] = None,
+    ):
         """Plot reaction rates over time
 
         Parameters
@@ -637,7 +631,7 @@ class RecipeCollection:
         for i, r in enumerate(self.recipes):
             recipe_steps[i] = r.recipe_steps
 
-        idxs = np.argsort(cumprob)[-8:]
+        idxs = list(np.argsort(cumprob)[-8:])
         ref = np.empty((1,), dtype=object)
         if highlight_r is not None:
             ref[0] = highlight_r.recipe_steps
@@ -672,7 +666,7 @@ class RecipeCollection:
             plt.axvline(highlight_t, color="red")
         for r_i, re in enumerate(recipes):
             name = re.get_recipe_name()
-            if name == highlight_r.get_recipe_name():
+            if highlight_r is not None and name == highlight_r.get_recipe_name():
                 name_to_args[name]["linestyle"] = "-."
                 name_to_args[name]["linewidth"] = 2.2
 

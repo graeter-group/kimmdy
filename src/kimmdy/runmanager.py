@@ -57,7 +57,7 @@ class State(Enum):
     DONE = auto()
 
 
-def get_existing_files(config: Config, section: str = "root") -> dict:
+def get_existing_files(config: Config) -> dict:
     """Initialize latest_files with every existing file defined in config"""
     file_d = {}
     attr_names = config.get_attributes()
@@ -79,7 +79,7 @@ def get_existing_files(config: Config, section: str = "root") -> dict:
 
             file_d[key] = attr
         elif isinstance(attr, Config):
-            file_d.update(get_existing_files(attr, attr_name))
+            file_d.update(get_existing_files(attr))
     return file_d
 
 
@@ -318,7 +318,8 @@ class RunManager:
             f"Finished task: {task.name} after "
             f"{timedelta(seconds=(time.time() - current_time))}"
         )
-        self._discover_output_files(task.name, files)
+        if files is not None:
+            self._discover_output_files(task.name, files)
 
     def _discover_output_files(
         self, taskname: str, files: TaskFiles
@@ -608,7 +609,8 @@ class RunManager:
                 logger.info(f"Starting task: {task.name} with args: {task.kwargs}")
                 place_files = task()
                 logger.info(f"Finished task: {task.name}")
-                self._discover_output_files(task.name, place_files)
+                if place_files is not None:
+                    self._discover_output_files(task.name, place_files)
 
             elif isinstance(step, Relax):
                 logger.info("Starting relaxation md as part of reaction..")
@@ -632,7 +634,8 @@ class RunManager:
                 logger.info(f"Starting task: {task.name} with args: {task.kwargs}")
                 md_files = task()
                 logger.info(f"Finished task: {task.name}")
-                self._discover_output_files(task.name, md_files)
+                if md_files is not None:
+                    self._discover_output_files(task.name, md_files)
 
             elif isinstance(step, CustomTopMod):
                 step.f(self.top)

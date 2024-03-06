@@ -168,7 +168,7 @@ def get_edissoc_from_atomnames(
 
     try:
         E_dis = edissoc[residue][frozenset(atomnames)]
-    except KeyError as e:
+    except KeyError:
         # continue with guessed edissoc
         logger.warning(
             f"Did not find dissociation energy for atomtypes {atomnames}, residue {residue} in edissoc file, using standard value of 400.0"
