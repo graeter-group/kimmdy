@@ -1,31 +1,32 @@
 """coordinate, topology and plumed modification functions"""
 
 import logging
-from typing import Optional, Union
 from copy import deepcopy
-import MDAnalysis as mda
 from pathlib import Path
+from typing import Optional, Union
+
+import MDAnalysis as mda
 import numpy as np
 
-from kimmdy.tasks import TaskFiles
-from kimmdy.parsing import read_plumed, write_plumed
 from kimmdy.constants import REACTIVE_MOLECULEYPE
+from kimmdy.parsing import read_plumed, write_plumed
 from kimmdy.recipe import Place
-from kimmdy.topology.topology import MoleculeType, Topology
-from kimmdy.topology.ff import FF
+from kimmdy.tasks import TaskFiles
 from kimmdy.topology.atomic import (
-    Bond,
     Angle,
+    Bond,
     Dihedral,
     DihedralType,
-    ProperDihedralId,
+    Exclusion,
     ImproperDihedralId,
-    MultipleDihedrals,
     Interaction,
     InteractionType,
     InteractionTypes,
-    Exclusion,
+    MultipleDihedrals,
+    ProperDihedralId,
 )
+from kimmdy.topology.ff import FF
+from kimmdy.topology.topology import MoleculeType, Topology
 from kimmdy.topology.utils import match_atomic_item_to_atomic_type
 
 logger = logging.getLogger(__name__)
@@ -194,8 +195,12 @@ def merge_dihedrals(
         parameterizedB = None
 
     # construct parameterized Dihedral
-    if parameterizedA and parameterizedB:
+    if parameterizedA is not None and parameterizedB is not None:
         # same
+
+        assert type(parameterizedA) == Dihedral or type(parameterizedA) == DihedralType
+        assert type(parameterizedB) == Dihedral or type(parameterizedB) == DihedralType
+
         dihedralmerge = Dihedral(
             *dihedral_key,
             funct=funct,
@@ -206,8 +211,9 @@ def merge_dihedrals(
             c4=parameterizedB.c1,
             c5=parameterizedB.periodicity,
         )
-    elif parameterizedA:
+    elif parameterizedA is not None:
         # breaking
+        assert type(parameterizedA) == Dihedral or type(parameterizedA) == DihedralType
         dihedralmerge = Dihedral(
             *dihedral_key,
             funct=funct,
@@ -218,8 +224,9 @@ def merge_dihedrals(
             c4="0.00",
             c5=parameterizedA.periodicity,
         )
-    elif parameterizedB:
+    elif parameterizedB is not None:
         # binding
+        assert type(parameterizedB) == Dihedral or type(parameterizedB) == DihedralType
         dihedralmerge = Dihedral(
             *dihedral_key,
             funct="9",
@@ -241,13 +248,9 @@ def merge_top_moleculetypes_slow_growth(
     molA: MoleculeType,
     molB: MoleculeType,
     ff: FF,
-    focus_nr: Optional[list[str]] = None,
 ) -> MoleculeType:
     """Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation"""
     hyperparameters = {"morse_well_depth": 300}  # [kJ mol-1]
-
-    # TODO:
-    # think about how to bring focus_nr into this
 
     # atoms
     for nr in molA.atoms.keys():
@@ -519,9 +522,7 @@ def merge_top_moleculetypes_slow_growth(
     return molB
 
 
-def merge_top_slow_growth(
-    topA: Topology, topB: Topology, focus_nr: Optional[list[str]] = None
-) -> Topology:
+def merge_top_slow_growth(topA: Topology, topB: Topology) -> Topology:
     """Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation.
 
 
@@ -530,7 +531,7 @@ def merge_top_slow_growth(
 
     molA = topA.moleculetypes[REACTIVE_MOLECULEYPE]
     molB = topB.moleculetypes[REACTIVE_MOLECULEYPE]
-    molB = merge_top_moleculetypes_slow_growth(molA, molB, topB.ff, focus_nr)
+    molB = merge_top_moleculetypes_slow_growth(molA, molB, topB.ff)
 
     return topB
 

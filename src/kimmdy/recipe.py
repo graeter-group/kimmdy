@@ -2,15 +2,16 @@
 """
 
 from __future__ import annotations
+
+import csv
+import logging
+from abc import ABC
+from copy import copy
+from dataclasses import dataclass
+from pathlib import Path
 from typing import TYPE_CHECKING, Callable, Optional
 
-from abc import ABC
-from dataclasses import dataclass, field
-from pathlib import Path
-import logging
-from copy import copy
 import dill
-import csv
 import numpy as np
 
 logger = logging.getLogger(__name__)
@@ -36,9 +37,10 @@ class Relax(RecipeStep):
     """
 
 
-@dataclass
 class Place(RecipeStep):
     """Change topology and/or coordinates to place an atom.
+
+    Either provide the index (ix_to_place) or the ID (id_to_place) of the atom to place.
 
     Parameters
     ----------
@@ -53,13 +55,43 @@ class Place(RecipeStep):
         Index of atom to place. 1-based
     """
 
-    new_coords: tuple[float, float, float]
-    ix_to_place: Optional[int] = None
-    id_to_place: Optional[str] = None
+    def __init__(
+        self,
+        new_coords: tuple[float, float, float],
+        ix_to_place: Optional[int] = None,
+        id_to_place: Optional[str] = None,
+    ):
+        """Create a new Place RecipeStep instance.
 
-    _ix_to_place: Optional[int] = field(init=False, repr=False, default=None)
+        of the first and second atom, either the id (1-based, str) or ix
+        (0-based, int) can be given. If both are given, the ix is used.
 
-    def __post_init__(self):
+        Parameters
+        ----------
+        new_coords :
+            New xyz coordinates for atom to place to. Valid for the end point of the recipe timespan.
+        ix_to_place :
+            The index of the atom. zero-based, by default None
+        id_to_place :
+            The ID of the atom. one-based, by default None
+
+        Raises
+        ------
+        ValueError
+            If neither an index nor an ID is provided for any of the atoms.
+        """
+        self.new_coords = new_coords
+        self._ix_to_place: int
+        if id_to_place is not None:
+            if type(id_to_place) is not str:
+                raise ValueError(f"atom_id_1 is {type(id_to_place)}, should be str.")
+            self._ix_to_place = int(id_to_place) - 1
+        if ix_to_place is not None:
+            if type(ix_to_place) is not int:
+                raise ValueError(f"atom_ix_1 is {type(ix_to_place)}, should be int.")
+            self._ix_to_place = ix_to_place
+        if id_to_place is not None and ix_to_place is not None:
+            logger.warning(f"Both atom_ix_1 and atom_id_1 are given, using atom_ix_1.")
         if self._ix_to_place is None:
             raise ValueError("id_ or ix_ to_place must be provided!")
 
@@ -76,8 +108,6 @@ class Place(RecipeStep):
 
     @property
     def id_to_place(self) -> Optional[str]:
-        if self._ix_to_place is None:
-            return None
         return str(self._ix_to_place + 1)
 
     @id_to_place.setter
@@ -87,12 +117,33 @@ class Place(RecipeStep):
         assert isinstance(value, str), f"id_to_place is {type(value)}, should be str."
         self._ix_to_place = int(value) - 1
 
+    def __eq__(self, other):
+        """Two Placements are equal if their atom indices are equal and they have the same new coordinates."""
 
-@dataclass
+        if not isinstance(other, Place) or type(self) != type(other):
+            logger.warning(
+                f"Comparing RecipeSteps with different types: {type(self)} and {type(other)}. Returning False."
+            )
+            return False
+        return (
+            self._ix_to_place == other._ix_to_place
+            and self.new_coords == other.new_coords
+        )
+
+    def __hash__(self):
+        return hash((self._ix_to_place, self.new_coords, type(self).__name__))
+
+    def __repr__(self):
+        return f"{type(self).__name__}(ix_to_place={self._ix_to_place}, new_coords={self.new_coords})"
+
+    def __str__(self):
+        return f"{type(self).__name__}({self._ix_to_place}, {self.new_coords})"
+
+
 class BondOperation(RecipeStep):
     """Handle a bond operation on the recipe step.
 
-    This class takes in either zero-based indices or one-base IDs for two atoms
+    This class takes in either zero-based indices or one-base IDs for two atoms.
 
     Parameters
     ----------
@@ -116,27 +167,57 @@ class BondOperation(RecipeStep):
 
     """
 
-    atom_ix_1: Optional[int] = None
-    atom_ix_2: Optional[int] = None
-    atom_id_1: Optional[str] = None
-    atom_id_2: Optional[str] = None
+    def __init__(
+        self,
+        atom_ix_1: Optional[int] = None,
+        atom_ix_2: Optional[int] = None,
+        atom_id_1: Optional[str] = None,
+        atom_id_2: Optional[str] = None,
+    ):
+        """Create a new BondOperation instance.
 
-    _atom_ix_1: int = field(init=False, repr=False, default=None)
-    _atom_ix_2: int = field(init=False, repr=False, default=None)
+        of the first and second atom, either the id (1-based, str) or ix
+        (0-based, int) can be given. If both are given, the ix is used.
 
-    def __post_init__(self):
-        e = ""
-        if not (isinstance(self.atom_ix_1, int) or isinstance(self.atom_id_1, str)):
-            e += "Exactly on of atom_ix_1 and atom_id_1 must be given!\n"
-        if not (isinstance(self.atom_ix_2, int) or isinstance(self.atom_id_2, str)):
-            e += "Exactly on of atom_ix_2 and atom_id_2 must be given!\n"
-        if len(e) > 0:
-            raise ValueError(e)
+        Parameters
+        ----------
+        atom_ix_1 : int, optional
+            The index of the first atom. zero-based, by default None
+        atom_ix_2 : int, optional
+            The index of the second atom. zero-based, by default None
+        atom_id_1 : str, optional
+            The ID of the first atom. one-based, by default None
+        atom_id_2 : str, optional
+            The ID of the second atom. one-based, by default None
+
+        Raises
+        ------
+        ValueError
+            If neither an index nor an ID is provided for any of the atoms.
+        """
+        self._atom_ix_1: int
+        self._atom_ix_2: int
+        if atom_id_1 is not None:
+            if type(atom_id_1) is not str:
+                raise ValueError(f"atom_id_1 is {type(atom_id_1)}, should be str.")
+            self._atom_ix_1 = int(atom_id_1) - 1
+        if atom_id_2 is not None:
+            if type(atom_id_2) is not str:
+                raise ValueError(f"atom_id_2 is {type(atom_id_2)}, should be str.")
+            self._atom_ix_2 = int(atom_id_2) - 1
+        if atom_ix_1 is not None:
+            if type(atom_ix_1) is not int:
+                raise ValueError(f"atom_ix_1 is {type(atom_ix_1)}, should be int.")
+            self._atom_ix_1 = atom_ix_1
+        if atom_ix_2 is not None:
+            if type(atom_ix_2) is not int:
+                raise ValueError(f"atom_ix_2 is {type(atom_ix_2)}, should be int.")
+            self._atom_ix_2 = atom_ix_2
+        if atom_ix_1 is not None and atom_id_1 is not None:
+            logger.warning(f"Both atom_ix_1 and atom_id_1 are given, using atom_ix_1.")
 
     @property
     def atom_id_1(self) -> str:
-        if self._atom_ix_1 is None:
-            return None
         return str(self._atom_ix_1 + 1)
 
     @atom_id_1.setter
@@ -159,8 +240,6 @@ class BondOperation(RecipeStep):
 
     @property
     def atom_id_2(self) -> str:
-        if self._atom_ix_2 is None:
-            return None
         return str(self._atom_ix_2 + 1)
 
     @atom_id_2.setter
@@ -180,6 +259,27 @@ class BondOperation(RecipeStep):
             return
         assert isinstance(value, int), f"atom_ix_2 is {type(value)}, should be int."
         self._atom_ix_2 = value
+
+    def __eq__(self, other):
+        """Two BondOperations are equal if their atom indices are equal and they are of the same type."""
+
+        if not isinstance(other, BondOperation) or type(self) != type(other):
+            logger.warning(
+                f"Comparing RecipeSteps with different types: {type(self)} and {type(other)}. Returning False."
+            )
+            return False
+        return (
+            self._atom_ix_1 == other._atom_ix_1 and self._atom_ix_2 == other._atom_ix_2
+        )
+
+    def __hash__(self):
+        return hash((self._atom_ix_1, self._atom_ix_2, type(self).__name__))
+
+    def __repr__(self):
+        return f"{type(self).__name__}(atom_ix_1={self._atom_ix_1}, atom_ix_2={self._atom_ix_2})"
+
+    def __str__(self):
+        return f"{type(self).__name__}({self._atom_ix_1}, {self._atom_ix_2})"
 
 
 class Break(BondOperation):
@@ -261,17 +361,6 @@ class Recipe:
             list(self.rates),
             list(self.timespans),
         )
-
-    def calc_averages(self, window_size: int):
-        """Calulate average rates over some window size
-
-        Parameters
-        ----------
-        window_size : int
-            Size of the window to average over,
-            -1 to average over whole available range.
-        """
-        raise NotImplementedError("calc_averages not implemented yet")
 
     def combine_with(self, other: Recipe):
         """Combines this Recipe with another with the same RecipeSteps.
@@ -422,10 +511,10 @@ class RecipeCollection:
 
         with open(path, "r") as f:
             reader = csv.reader(f)
-            header = next(reader)  # Skip the header row
+            _ = next(reader)  # Skip the header row
             picked_rp = None
             for row in reader:
-                index_s, picked_s, recipe_steps_s, timespans_s, rates_s = row
+                _, picked_s, recipe_steps_s, timespans_s, rates_s = row
 
                 picked = eval(picked_s)
                 recipe_steps = eval(recipe_steps_s)
@@ -513,7 +602,12 @@ class RecipeCollection:
 
         return boarders, rate_windows, recipe_windows
 
-    def plot(self, outfile, highlight_r=None, highlight_t=None):
+    def plot(
+        self,
+        outfile,
+        highlight_r: Optional[Recipe] = None,
+        highlight_t: Optional[float] = None,
+    ):
         """Plot reaction rates over time
 
         Parameters
@@ -527,8 +621,8 @@ class RecipeCollection:
         """
 
         import matplotlib.pyplot as plt
-        import seaborn as sns
         import numpy as np
+        import seaborn as sns
 
         self.aggregate_reactions()
         cumprob = self.calc_cumprob()
@@ -537,7 +631,7 @@ class RecipeCollection:
         for i, r in enumerate(self.recipes):
             recipe_steps[i] = r.recipe_steps
 
-        idxs = np.argsort(cumprob)[-8:]
+        idxs = list(np.argsort(cumprob)[-8:])
         ref = np.empty((1,), dtype=object)
         if highlight_r is not None:
             ref[0] = highlight_r.recipe_steps
@@ -572,7 +666,7 @@ class RecipeCollection:
             plt.axvline(highlight_t, color="red")
         for r_i, re in enumerate(recipes):
             name = re.get_recipe_name()
-            if name == highlight_r.get_recipe_name():
+            if highlight_r is not None and name == highlight_r.get_recipe_name():
                 name_to_args[name]["linestyle"] = "-."
                 name_to_args[name]["linewidth"] = 2.2
 

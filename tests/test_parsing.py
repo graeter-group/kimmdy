@@ -1,12 +1,14 @@
 import re
 import string
-import pytest
-from hypothesis import settings, HealthCheck, given, strategies as st
 from pathlib import Path
 
+import pytest
+from hypothesis import HealthCheck, given, settings
+from hypothesis import strategies as st
+
 from kimmdy import parsing
-from kimmdy.utils import get_gmx_dir
 from kimmdy.constants import AA3
+from kimmdy.utils import get_gmx_dir
 
 
 ## test topology parser
@@ -40,6 +42,7 @@ def test_doubleparse_urea(arranged_tmp_path):
 def test_ff_includes_with_gmxdir(arranged_tmp_path):
     top_dict = parsing.read_top(Path("urea.top"))
     gmx_dir = get_gmx_dir("gmx")
+    assert gmx_dir is not None, "gmx dir not found"
     tip3_dict = parsing.read_top(gmx_dir / "top" / "amber99.ff" / "tip3p.itp")
 
     assert top_dict["atomtypes"]

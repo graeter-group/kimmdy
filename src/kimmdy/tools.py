@@ -2,16 +2,15 @@
 Standalone tools that are complementary to KIMMDY.
 """
 
-from pathlib import Path
-import shutil
 import argparse
-from typing import Optional
 import json
+import shutil
+from pathlib import Path
+from typing import Optional
 
-from kimmdy.topology.topology import Topology
 from kimmdy.parsing import read_top, write_top
-from kimmdy.plugins import parameterization_plugins
-from kimmdy.plugins import discover_plugins
+from kimmdy.plugins import discover_plugins, parameterization_plugins
+from kimmdy.topology.topology import Topology
 
 
 def build_examples(restore: str):
@@ -162,7 +161,7 @@ def modify_top(
     # radicals != None -> iterate over rad_str.split, can be empty
     rad_str = None
     if radicals is not None:
-        rad_str = " ".join(radicals)
+        rad_str = " ".join([str(r) for r in radicals])
     elif not search_amber_rad:
         rad_str = ""
 
@@ -222,7 +221,7 @@ def modify_top(
     print("Done")
 
     # deal with gro file
-    if gro:
+    if gro_path is not None and gro_out is not None:
         if removeH:
             print("Writing gro..", end="")
             with open(gro_path, "r") as f:

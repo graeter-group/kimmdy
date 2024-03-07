@@ -1,8 +1,11 @@
-from hypothesis import given, strategies as st
-from kimmdy import recipe
 import csv
-import pytest
 from dataclasses import asdict
+
+import pytest
+from hypothesis import given
+from hypothesis import strategies as st
+
+from kimmdy import recipe
 
 
 ## Test RecipeSteps
@@ -78,10 +81,10 @@ def test_bo_initialization_unequal():
 
 def test_bo_initialization_wrong_type():
     # Should raise an error because initialization is with the wrong type
-    with pytest.raises(AssertionError):
-        recipe.BondOperation("1", "2")
-    with pytest.raises(AssertionError):
-        recipe.BondOperation(atom_id_1=0, atom_id_2=1)
+    with pytest.raises(ValueError):
+        recipe.BondOperation("1", "2")  # type: ignore
+    with pytest.raises(ValueError):
+        recipe.BondOperation(atom_id_1=0, atom_id_2=1)  # type: ignore
 
 
 @given(
@@ -125,9 +128,9 @@ def test_place_initialization():
     assert m2 != m3
 
     with pytest.raises(TypeError):
-        recipe.Place(ix_to_place=1)
-    with pytest.raises(AssertionError):
-        recipe.Place(id_to_place=1, new_coords=(0, 0, 0))
+        recipe.Place(ix_to_place=1)  # type: ignore
+    with pytest.raises(ValueError):
+        recipe.Place(id_to_place=1, new_coords=(0, 0, 0))  # type: ignore
 
 
 def test_relax_initialization():

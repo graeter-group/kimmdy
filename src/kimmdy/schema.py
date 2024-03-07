@@ -11,16 +11,17 @@ Reserved keywords:
     - required
 """
 
-import json
 import importlib.resources as pkg_resources
+import json
 import logging
-from kimmdy.plugins import reaction_plugins
 
 # needed for eval of type_scheme from schema
 # don't remove even if lsp says it's unused
-import kimmdy
 import pathlib
 from pathlib import Path
+
+import kimmdy
+from kimmdy.plugins import reaction_plugins
 
 logger = logging.getLogger(__name__)
 
@@ -58,7 +59,7 @@ class Sequence(list):
 def load_kimmdy_schema() -> dict:
     """Return the schema for the config file"""
     path = pkg_resources.files(kimmdy) / "kimmdy-yaml-schema.json"
-    with path.open("rt") as f:
+    with path.open("r") as f:
         schema = json.load(f)
     return schema
 

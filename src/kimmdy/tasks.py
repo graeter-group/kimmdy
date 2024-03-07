@@ -3,11 +3,12 @@ The tasks module holds the TaskFiles class which organizes input and
 output paths and the Task class for steps in the runmanager.
 """
 
+import logging
+import shutil
 from dataclasses import dataclass, field
 from pathlib import Path
-import shutil
 from typing import Any, Callable, Optional
-import logging
+
 from kimmdy.parsing import read_plumed
 from kimmdy.utils import longFormatter
 
@@ -144,7 +145,7 @@ class Task:
 
         logger.debug(f"Init task {self.name}\tkwargs: {self.kwargs}\tOut: {self.out}")
 
-    def __call__(self) -> TaskFiles:
+    def __call__(self) -> Optional[TaskFiles]:
         if self.out is not None:
             self.kwargs.update({"files": create_task_directory(self.runmng, self.out)})
 

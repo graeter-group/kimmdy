@@ -1,42 +1,45 @@
-from kimmdy.constants import ATOMTYPE_BONDORDER_FLAT
+import logging
+import textwrap
+from copy import copy, deepcopy
+from itertools import permutations
+from pathlib import Path
+from typing import Callable, Optional, Union
+
+from kimmdy.constants import (
+    ATOM_ID_FIELDS,
+    ATOMTYPE_BONDORDER_FLAT,
+    REACTIVE_MOLECULEYPE,
+    RESNR_ID_FIELDS,
+)
 from kimmdy.parsing import TopologyDict
+from kimmdy.plugins import BasicParameterizer, Parameterizer
+from kimmdy.recipe import Bind, Break, RecipeStep
 from kimmdy.topology.atomic import (
+    Angle,
     Atom,
     Bond,
-    Pair,
-    Angle,
     Dihedral,
-    MultipleDihedrals,
-    PositionRestraint,
     DihedralRestraint,
+    Exclusion,
+    MultipleDihedrals,
+    Pair,
+    PositionRestraint,
     ResidueImproperSpec,
     Settle,
-    Exclusion,
 )
+from kimmdy.topology.ff import FF
 from kimmdy.topology.utils import (
+    attributes_to_list,
     get_moleculetype_atomics,
     get_moleculetype_header,
-    attributes_to_list,
+    get_residue_fragments,
     get_top_section,
+    increment_field,
     is_not_solvent_or_ion,
     set_moleculetype_atomics,
     set_top_section,
-    get_residue_fragments,
 )
-from kimmdy.topology.ff import FF
-from kimmdy.plugins import BasicParameterizer, Parameterizer
-from itertools import permutations, combinations
-import textwrap
-import logging
-from typing import Optional
-from copy import copy, deepcopy
-from pathlib import Path
-from kimmdy.constants import ATOM_ID_FIELDS, RESNR_ID_FIELDS, REACTIVE_MOLECULEYPE
-from typing import Callable, Union
-
 from kimmdy.utils import TopologyAtomAddress
-from kimmdy.topology.utils import increment_field
-from kimmdy.recipe import RecipeStep, Bind, Break
 
 logger = logging.getLogger("kimmdy.topology")
 
@@ -475,6 +478,9 @@ class MoleculeType:
         for atom in self.atoms.values():
             impropers = self._get_atom_improper_dihedrals(atom.nr, ff)
             for key, improper in impropers:
+                periodicity = ""
+                if improper.c2 is not None:
+                    periodicity = improper.c2
                 self.improper_dihedrals[key] = MultipleDihedrals(
                     *key,
                     "4",
@@ -484,7 +490,7 @@ class MoleculeType:
                             "4",
                             c0=improper.c0,
                             c1=improper.c1,
-                            periodicity=improper.c2,
+                            periodicity=periodicity,
                         )
                     },
                 )
@@ -554,7 +560,8 @@ class MoleculeType:
                 continue
 
             # do pairs before the dihedrals are updated
-            if pair := self.pairs.pop((dihedrals.ai, dihedrals.al), False):
+            pair = self.pairs.pop((dihedrals.ai, dihedrals.al), None)
+            if pair is not None:
                 pair_ai = update_map.get(pair.ai)
                 pair_aj = update_map.get(pair.aj)
 

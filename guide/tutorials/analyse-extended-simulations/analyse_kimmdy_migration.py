@@ -26,6 +26,7 @@ with open(interactions_path, "r") as json_file:
     interactions = json.load(json_file)
 
 # %%
+rgb = None
 if analysis_type == "quantitative":
     rgb = np.tile(np.asarray([0.62, 0.59, 0.98]), (len(interactions.keys()), 1))
 elif analysis_type == "max_rate":
@@ -51,6 +52,8 @@ elif analysis_type == "count":
     min_count = np.min(counts)
     if not manual_max_count:
         max_count = np.max(counts)
+    else:
+        max_count = manual_max_count
 
     norm_counts = (counts - min_count) / (max_count - min_count)
     print(f"min count: {min_count}, max count: {max_count}")
@@ -62,7 +65,6 @@ elif analysis_type == "count":
     # Get RGB values for the normalized counts
     rgb = [np.asarray(cmap(value)[:3]) for value in norm_counts]
 
-# breakpoint()
 # %%
 radius = 10
 counter = 0
@@ -78,29 +80,29 @@ for k, v in interactions.items():
     p1 = get_inbetween(a1, a2, 0.1)
     p2 = get_inbetween(a1, a2, 0.9)
 
-    if do_arrow:
+    if do_arrow and rgb:
         p1_far = get_inbetween(a1, a2, 0.18)
 
-    cylinder = (
-        [cgo.CYLINDER]
-        + p1_far.tolist()
-        + p_cap.tolist()
-        + [radius]
-        + rgb[counter].tolist()
-        + rgb[counter].tolist()
-    )
-    head = (
-        [cgo.CONE]
-        + p_cap.tolist()
-        + p2.tolist()
-        + [radius * 2, 0.0]
-        + rgb[counter].tolist()
-        + rgb[counter].tolist()
-        + [1.0, 0.0]
-    )
-    # cmd.load_cgo(cylinder,f"cylinder{i}")
-    cmd.load_cgo(cylinder + head, f"cylinder{k}")
-    counter += 1
+        cylinder = (
+            [cgo.CYLINDER]
+            + p1_far.tolist()
+            + p_cap.tolist()
+            + [radius]
+            + rgb[counter].tolist()
+            + rgb[counter].tolist()
+        )
+        head = (
+            [cgo.CONE]
+            + p_cap.tolist()
+            + p2.tolist()
+            + [radius * 2, 0.0]
+            + rgb[counter].tolist()
+            + rgb[counter].tolist()
+            + [1.0, 0.0]
+        )
+        # cmd.load_cgo(cylinder,f"cylinder{i}")
+        cmd.load_cgo(cylinder + head, f"cylinder{k}")
+        counter += 1
 print(f"Loading geometry file")
 cmd.load(geometry_path.as_posix())
 print("Changing default settings")
