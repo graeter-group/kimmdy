@@ -1,5 +1,18 @@
 # Changelog
 
+## [6.3.0](https://github.com/hits-mbm-dev/kimmdy/compare/v6.2.5...v6.3.0) (2024-03-07)
+
+
+### Features
+
+* allow customizing trjconv output group ([#396](https://github.com/hits-mbm-dev/kimmdy/issues/396)) ([97b5588](https://github.com/hits-mbm-dev/kimmdy/commit/97b55880a791436c22d8c474d2d88541051f831b))
+* analysis radical migration tool ([#388](https://github.com/hits-mbm-dev/kimmdy/issues/388)) ([ba4cb0f](https://github.com/hits-mbm-dev/kimmdy/commit/ba4cb0f12224c6801e21a2961a52e3f3c3172fc1))
+
+
+### Bug Fixes
+
+* squiggly lines begone ([#399](https://github.com/hits-mbm-dev/kimmdy/issues/399)) ([b1210e4](https://github.com/hits-mbm-dev/kimmdy/commit/b1210e44f222204a67e1385ce8467ff7e41dabd2))
+
 ## [6.2.5](https://github.com/hits-mbm-dev/kimmdy/compare/v6.2.4...v6.2.5) (2024-02-27)
 
 
