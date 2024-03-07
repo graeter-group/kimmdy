@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.4.0](https://github.com/hits-mbm-dev/kimmdy/compare/v6.3.0...v6.4.0) (2024-03-07)
+
+
+### Features
+
+* add focus to grappa parameterizer ([#408](https://github.com/hits-mbm-dev/kimmdy/issues/408)) ([9abe754](https://github.com/hits-mbm-dev/kimmdy/commit/9abe7546cf0ec9b3c1283c30e0412df5902b2e85))
+
 ## [6.3.0](https://github.com/hits-mbm-dev/kimmdy/compare/v6.2.5...v6.3.0) (2024-03-07)
 
 
