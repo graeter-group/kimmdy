@@ -1,19 +1,22 @@
+import logging
 from copy import deepcopy
 from pathlib import Path
-import pytest
-import numpy as np
 
-from kimmdy.parsing import read_top, TopologyDict
-from kimmdy.recipe import Break, Bind
-from hypothesis import Phase, given, settings, HealthCheck, strategies as st
-from kimmdy.topology.topology import REACTIVE_MOLECULEYPE, Topology
+import numpy as np
+import pytest
+from hypothesis import HealthCheck, Phase, given, settings
+from hypothesis import strategies as st
+
+from kimmdy.parsing import TopologyDict, read_top
+from kimmdy.recipe import Bind, Break
 from kimmdy.topology.atomic import *
+from kimmdy.topology.topology import REACTIVE_MOLECULEYPE, Topology
 from kimmdy.topology.utils import (
+    get_protein_section,
     get_reactive_section,
     match_atomic_item_to_atomic_type,
-    get_protein_section,
 )
-import logging
+from kimmdy.utils import get_gmx_dir
 
 
 @pytest.fixture(scope="module")
@@ -108,6 +111,13 @@ def random_topology_and_break(draw):
     top._regenerate_topology_from_bound_to()
     break_this = draw(st.sampled_from(list(top.bonds.keys())))
     return (top, break_this)
+
+
+class TestGMX:
+    def test_gmx_dir_is_found(self):
+        gmx = get_gmx_dir()
+        assert gmx
+        assert Path(gmx).is_dir()
 
 
 class TestMatch:
@@ -321,7 +331,8 @@ class TestTopology:
         for a_del in angles_to_delete:
             assert None in [update.get(a) for a in a_del]
         for a_up in angles_to_update:
-            new = top.angles[tuple([update.get(a) for a in a_up])]
+            k1, k2, k3 = [update[a] for a in a_up]
+            new = top.angles[k1, k2, k3]
             old = hexala_top_fix.angles[a_up]
             assert old.ai == rev_update.get(new.ai)
             assert old.aj == rev_update.get(new.aj)
@@ -331,7 +342,8 @@ class TestTopology:
         for pd_del in pd_to_delete:
             assert None in tuple([update.get(a) for a in pd_del])
         for pd_up in pd_to_update:
-            new = top.proper_dihedrals[tuple([update.get(a) for a in pd_up])]
+            k1, k2, k3, k4 = [update[a] for a in pd_up]
+            new = top.proper_dihedrals[k1, k2, k3, k4]
             old = hexala_top_fix.proper_dihedrals[pd_up]
             assert old.ai == rev_update.get(new.ai)
             assert old.aj == rev_update.get(new.aj)
@@ -350,7 +362,8 @@ class TestTopology:
         for id_del in id_to_delete:
             assert None in tuple([update.get(a) for a in id_del])
         for id_up in id_to_update:
-            new = top.improper_dihedrals[tuple([update.get(a) for a in id_up])]
+            k1, k2, k3, k4 = [update[a] for a in id_up]
+            new = top.improper_dihedrals[k1, k2, k3, k4]
             old = hexala_top_fix.improper_dihedrals[id_up]
             assert old.ai == rev_update.get(new.ai)
             assert old.aj == rev_update.get(new.aj)
@@ -627,9 +640,10 @@ class TestHexalaTopology:
         assert raw["moleculetype_Protein"]["content"][0] == ["Protein", "3"]
         assert top.top["moleculetype_Reactive"]["content"][0] == ["Reactive", "3"]
         for section in ["atoms", "bonds", "angles", "dihedrals", "pairs"]:
-            top.top["moleculetype_Reactive"]["subsections"][section]["content"] == raw[
-                "moleculetype_Protein"
-            ]["subsections"][section]["content"]
+            assert (
+                top.top["moleculetype_Reactive"]["subsections"][section]["content"]
+                == raw["moleculetype_Protein"]["subsections"][section]["content"]
+            )
 
     def test_top_properties(self, hexala_top_fix):
         top = deepcopy(hexala_top_fix)

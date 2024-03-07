@@ -4,27 +4,28 @@ Other entry points such as `kimmdy-analysis` also live here.
 """
 
 import argparse
-from os import chmod
-from pathlib import Path
-import textwrap
-from typing import Optional
-import dill
 import logging
 import logging.config
-from kimmdy.config import Config
-from kimmdy.runmanager import RunManager
-from kimmdy.assets.templates import jobscript
-from kimmdy.utils import longFormatter
-from kimmdy.plugins import discover_plugins
-from kimmdy.plugins import (
-    reaction_plugins,
-    broken_reaction_plugins,
-    parameterization_plugins,
-    broken_parameterization_plugins,
-)
-import importlib.resources as pkg_resources
-import sys
 import os
+import sys
+import textwrap
+from os import chmod
+from pathlib import Path
+from typing import Optional
+
+import dill
+
+from kimmdy.assets.templates import jobscript
+from kimmdy.config import Config
+from kimmdy.plugins import (
+    broken_parameterization_plugins,
+    broken_reaction_plugins,
+    discover_plugins,
+    parameterization_plugins,
+    reaction_plugins,
+)
+from kimmdy.runmanager import RunManager
+from kimmdy.utils import longFormatter
 
 if sys.version_info > (3, 10):
     from importlib_metadata import version
@@ -258,9 +259,9 @@ def _run(args: argparse.Namespace):
             if args.callgraph:
                 try:
                     from pycallgraph2 import PyCallGraph
-                    from pycallgraph2.output import GraphvizOutput
                     from pycallgraph2.config import Config as Vis_conf
                     from pycallgraph2.globbing_filter import GlobbingFilter
+                    from pycallgraph2.output import GraphvizOutput
                 except ImportError as e:
                     logger.error(
                         "pycallgraph2 needed for call visualization. Get it with `pip install pycallgraph2`"

@@ -3,17 +3,19 @@ Utilities for building plugins, shell convenience functions and GROMACS related 
 """
 
 from __future__ import annotations
-import subprocess as sp
-import numpy as np
-import re
+
 import logging
-from typing import Optional, TYPE_CHECKING
+import re
+import subprocess as sp
 from pathlib import Path
+from typing import TYPE_CHECKING, Optional
+
+import numpy as np
 
 if TYPE_CHECKING:
+    from kimmdy.parsing import Plumed_dict
     from kimmdy.tasks import TaskFiles
     from kimmdy.topology.topology import Topology
-    from kimmdy.parsing import Plumed_dict
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +43,7 @@ class longFormatter(logging.Formatter):
         return result
 
 
-# input/output utility functions
+### IO utility functions ###
 
 
 def run_shell_cmd(s, cwd=None) -> sp.CompletedProcess:
@@ -75,7 +77,7 @@ def check_file_exists(p: Path):
         raise LookupError(m)
 
 
-# reaction plugin building blocks
+### reaction plugin building blocks ###
 
 
 def get_atomnrs_from_plumedid(
@@ -166,7 +168,7 @@ def get_edissoc_from_atomnames(
 
     try:
         E_dis = edissoc[residue][frozenset(atomnames)]
-    except KeyError as e:
+    except KeyError:
         # continue with guessed edissoc
         logger.warning(
             f"Did not find dissociation energy for atomtypes {atomnames}, residue {residue} in edissoc file, using standard value of 400.0"
@@ -278,7 +280,7 @@ def morse_transition_rate(
     return k, fs
 
 
-# GROMACS related functions
+### GROMACS related functions ###
 
 
 def get_gmx_dir(gromacs_alias: str = "gmx") -> Optional[Path]:
@@ -292,18 +294,23 @@ def get_gmx_dir(gromacs_alias: str = "gmx") -> Optional[Path]:
         logger.warning("GROMACS not found.")
         return None
 
+    from_source = False
     gmx_prefix = None
     for l in r.stderr.splitlines():
         if l.startswith("Data prefix:"):
             gmx_prefix = Path(l.split()[2])
+            if "(source tree)" in l:
+                from_source = True
             break
 
     if gmx_prefix is None:
         logger.warning("GROMACS data directory not found in gromacs message.")
         return None
 
-    gmx_dir = Path(gmx_prefix) / "share" / "gromacs"
-    return gmx_dir
+    if from_source:
+        return Path(gmx_prefix) / "share"
+    else:
+        return Path(gmx_prefix) / "share" / "gromacs"
 
 
 def check_gmx_version(config):

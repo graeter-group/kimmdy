@@ -6,32 +6,35 @@ rest of the program and keeps track of global state.
 """
 
 from __future__ import annotations
+
 import logging
-from pathlib import Path
-from copy import copy, deepcopy
-import dill
 import queue
+import time
+from copy import copy, deepcopy
+from datetime import timedelta
 from enum import Enum, auto
 from functools import partial
-from datetime import timedelta
+from pathlib import Path
+from pprint import pformat
 from typing import Optional
+
+import dill
+
 from kimmdy.config import Config
+from kimmdy.coordinates import break_bond_plumed, merge_top_slow_growth, place_atom
+from kimmdy.kmc import KMCResult, extrande, extrande_mod, frm, rf_kmc
 from kimmdy.parsing import read_top, write_json, write_top
 from kimmdy.plugins import (
     BasicParameterizer,
+    ReactionPlugin,
     parameterization_plugins,
     reaction_plugins,
-    ReactionPlugin,
 )
-from kimmdy.recipe import CustomTopMod, RecipeCollection, Break, Bind, Place, Relax
-from kimmdy.utils import run_gmx, truncate_sim_files
-from kimmdy.coordinates import place_atom, break_bond_plumed, merge_top_slow_growth
+from kimmdy.recipe import Bind, Break, CustomTopMod, Place, RecipeCollection, Relax
 from kimmdy.tasks import Task, TaskFiles, get_plumed_out
-from pprint import pformat
 from kimmdy.topology.topology import Topology
 from kimmdy.topology.utils import get_is_reactive_predicate_f
-import time
-from kimmdy.kmc import KMCResult, rf_kmc, extrande, frm, extrande_mod
+from kimmdy.utils import run_gmx, truncate_sim_files
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +57,7 @@ class State(Enum):
     DONE = auto()
 
 
-def get_existing_files(config: Config, section: str = "root") -> dict:
+def get_existing_files(config: Config) -> dict:
     """Initialize latest_files with every existing file defined in config"""
     file_d = {}
     attr_names = config.get_attributes()
@@ -76,7 +79,7 @@ def get_existing_files(config: Config, section: str = "root") -> dict:
 
             file_d[key] = attr
         elif isinstance(attr, Config):
-            file_d.update(get_existing_files(attr, attr_name))
+            file_d.update(get_existing_files(attr))
     return file_d
 
 
@@ -314,7 +317,8 @@ class RunManager:
             f"Finished task: {task.name} after "
             f"{timedelta(seconds=(time.time() - current_time))}"
         )
-        self._discover_output_files(task.name, files)
+        if files is not None:
+            self._discover_output_files(task.name, files)
 
     def _discover_output_files(
         self, taskname: str, files: TaskFiles
@@ -613,7 +617,8 @@ class RunManager:
                 logger.info(f"Starting task: {task.name} with args: {task.kwargs}")
                 place_files = task()
                 logger.info(f"Finished task: {task.name}")
-                self._discover_output_files(task.name, place_files)
+                if place_files is not None:
+                    self._discover_output_files(task.name, place_files)
                 focus_nrs.update([step.id_to_place])
 
             elif isinstance(step, Relax):
@@ -638,7 +643,8 @@ class RunManager:
                 logger.info(f"Starting task: {task.name} with args: {task.kwargs}")
                 md_files = task()
                 logger.info(f"Finished task: {task.name}")
-                self._discover_output_files(task.name, md_files)
+                if md_files is not None:
+                    self._discover_output_files(task.name, md_files)
 
             elif isinstance(step, CustomTopMod):
                 step.f(self.top)

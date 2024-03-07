@@ -4,15 +4,16 @@ Also discovers and loads KIMMDY plugins.
 """
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional
-from abc import ABC, abstractmethod
+
 import logging
 import sys
+from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:
-    from kimmdy.runmanager import RunManager
     from kimmdy.config import Config
     from kimmdy.recipe import RecipeCollection
+    from kimmdy.runmanager import RunManager
     from kimmdy.tasks import TaskFiles
     from kimmdy.topology.topology import Topology
 
@@ -109,8 +110,8 @@ class BasicParameterizer(Parameterizer):
 
     def parameterize_topology(
         self, current_topology: Topology, focus_nrs: Optional[set[str]] = None
-    ) -> None:
+    ) -> Topology:
         """Do nothing,
         all necessary actions should already have happened in bind_bond and break_bond of Topology
         """
-        pass
+        return current_topology
