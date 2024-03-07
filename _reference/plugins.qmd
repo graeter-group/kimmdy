@@ -27,7 +27,7 @@ reconstruct base force field state
 
 ##### parameterize_topology { #kimmdy.plugins.BasicParameterizer.parameterize_topology }
 
-`plugins.BasicParameterizer.parameterize_topology(current_topology)`
+`plugins.BasicParameterizer.parameterize_topology(current_topology, focus_nrs=None)`
 
 Do nothing,
 all necessary actions should already have happened in bind_bond and break_bond of Topology

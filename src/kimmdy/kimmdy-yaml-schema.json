@@ -20,6 +20,13 @@
       "pytype": "bool",
       "default": true
     },
+    "parameterize_at_setup": {
+      "title": "parameterize_at_setup",
+      "description": "parameterize the topology during the setup task",
+      "type": "boolean",
+      "pytype": "bool",
+      "default": true
+    },
     "cwd": {
       "title": "cwd",
       "description": "Working directory. Default is current working directory",

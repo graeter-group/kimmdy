@@ -8,7 +8,7 @@ from __future__ import annotations
 import logging
 import sys
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:
     from kimmdy.config import Config
@@ -99,14 +99,18 @@ class Parameterizer(ABC):
     type_scheme = dict()
 
     @abstractmethod
-    def parameterize_topology(self, current_topology: Topology) -> Topology:
+    def parameterize_topology(
+        self, current_topology: Topology, focus_nrs: Optional[set[str]]
+    ) -> Topology:
         pass
 
 
 class BasicParameterizer(Parameterizer):
     """reconstruct base force field state"""
 
-    def parameterize_topology(self, current_topology: Topology) -> Topology:
+    def parameterize_topology(
+        self, current_topology: Topology, focus_nrs: Optional[set[str]] = None
+    ) -> Topology:
         """Do nothing,
         all necessary actions should already have happened in bind_bond and break_bond of Topology
         """

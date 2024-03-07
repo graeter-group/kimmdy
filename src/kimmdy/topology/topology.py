@@ -857,13 +857,13 @@ class Topology:
             [attributes_to_list(x) for x in self.ff.angletypes.values()],
         )
 
-    def update_parameters(self):
+    def update_parameters(self, focus_nrs: Optional[set[str]] = None):
         if self.needs_parameterization:
             if self.parametrizer is not None:
                 logger.info(
                     f"Starting parametrization using {self.parametrizer.__class__.__name__}"
                 )
-                self.parametrizer.parameterize_topology(self)
+                self.parametrizer.parameterize_topology(self, focus_nrs)
             else:
                 raise RuntimeError("No Parametrizer was initialized in this topology!")
             self.needs_parameterization = False
@@ -1069,6 +1069,17 @@ class Topology:
         [IPython.lib.pretty.PrettyPrinter](https://ipython.org/ipython-doc/3/api/generated/IPython.lib.pretty.html)
         """
         p.text(str(self))
+
+    def get_neighbors(self, initial_atoms: set[str], order: int):
+        explored_atoms = initial_atoms
+        frontier = initial_atoms
+        for _ in range(order):
+            new_frontier = set()
+            for atom in frontier:
+                new_frontier.update(self.atoms[atom].bound_to_nrs)
+            frontier = new_frontier - explored_atoms
+            explored_atoms |= new_frontier
+        return explored_atoms
 
     def break_bond(
         self, atompair_addresses: tuple[TopologyAtomAddress, TopologyAtomAddress]
