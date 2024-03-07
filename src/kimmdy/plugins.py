@@ -4,15 +4,16 @@ Also discovers and loads KIMMDY plugins.
 """
 
 from __future__ import annotations
-from typing import TYPE_CHECKING
-from abc import ABC, abstractmethod
+
 import logging
 import sys
+from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from kimmdy.runmanager import RunManager
     from kimmdy.config import Config
     from kimmdy.recipe import RecipeCollection
+    from kimmdy.runmanager import RunManager
     from kimmdy.tasks import TaskFiles
     from kimmdy.topology.topology import Topology
 
@@ -105,8 +106,8 @@ class Parameterizer(ABC):
 class BasicParameterizer(Parameterizer):
     """reconstruct base force field state"""
 
-    def parameterize_topology(self, current_topology: Topology) -> None:
+    def parameterize_topology(self, current_topology: Topology) -> Topology:
         """Do nothing,
         all necessary actions should already have happened in bind_bond and break_bond of Topology
         """
-        pass
+        return current_topology

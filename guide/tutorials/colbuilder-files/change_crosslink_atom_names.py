@@ -3,8 +3,8 @@ def main(run_info):
     from functions_v4 import get_data_from_file, store_linelist_to_file
 
     # Extracting data
-    top_all, top_array = get_data_from_file(run_info["path_top_file"])
-    gro_all, gro_array = get_data_from_file(run_info["path_gro_file"])
+    top_all, _ = get_data_from_file(run_info["path_top_file"])
+    gro_all, _ = get_data_from_file(run_info["path_gro_file"])
 
     # Dictionaries of corsslinks
     LYX = {"CB": "CBYX", "CG": "CGYX", "CD": "CDYX", "CE": "CEYX"}

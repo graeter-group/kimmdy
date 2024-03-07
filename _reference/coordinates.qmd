@@ -58,13 +58,13 @@ Merge one to two Dihedrals or -Types into a Dihedral in free-energy syntax
 
 ### merge_top_moleculetypes_slow_growth { #kimmdy.coordinates.merge_top_moleculetypes_slow_growth }
 
-`coordinates.merge_top_moleculetypes_slow_growth(molA, molB, ff, focus_nr=None)`
+`coordinates.merge_top_moleculetypes_slow_growth(molA, molB, ff)`
 
 Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation
 
 ### merge_top_slow_growth { #kimmdy.coordinates.merge_top_slow_growth }
 
-`coordinates.merge_top_slow_growth(topA, topB, focus_nr=None)`
+`coordinates.merge_top_slow_growth(topA, topB)`
 
 Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation.
 

@@ -2,24 +2,25 @@
 For command line usage, run `kimmdy-analysis -h`.
 """
 
-from typing import Optional, Union
-from pathlib import Path
-import MDAnalysis as mda
-import subprocess as sp
-import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
-import matplotlib as mpl
-import seaborn.objects as so
-import seaborn as sns
 import argparse
-from seaborn import axes_style
-import pandas as pd
-from datetime import datetime
 import json
+import subprocess as sp
+from datetime import datetime
+from pathlib import Path
+from typing import Optional, Union
 
-from kimmdy.utils import run_shell_cmd
+import matplotlib as mpl
+import matplotlib.patches as mpatches
+import matplotlib.pyplot as plt
+import MDAnalysis as mda
+import pandas as pd
+import seaborn as sns
+import seaborn.objects as so
+from seaborn import axes_style
+
 from kimmdy.parsing import read_json, write_json
-from kimmdy.recipe import RecipeCollection, Break, Bind, Place, Relax
+from kimmdy.recipe import Bind, Break, Place, RecipeCollection
+from kimmdy.utils import run_shell_cmd
 
 
 def get_analysis_dir(dir: Path) -> Path:
@@ -395,9 +396,9 @@ def radical_migration(
         picked_recipes = {}
         for recipes in run_dir.glob("*decide_recipe/recipes.csv"):
             task_nr = int(recipes.parents[0].stem.split(sep="_")[0])
-            rc, picked_recipe = RecipeCollection.from_csv(recipes)
+            _, picked_recipe = RecipeCollection.from_csv(recipes)
             picked_recipes[task_nr] = picked_recipe
-        sorted_recipes = [val for key, val in sorted(picked_recipes.items())]
+        sorted_recipes = [v for _, v in sorted(picked_recipes.items())]
 
         for sorted_recipe in sorted_recipes:
             connectivity_difference = {}
@@ -597,7 +598,8 @@ def reaction_participation(dir: str, open_plot: bool = False):
     reaction_count = {"overall": 0}
     for recipes in run_dir.glob("*decide_recipe/recipes.csv"):
         # get picked recipe
-        rc, picked_rp = RecipeCollection.from_csv(recipes)
+        _, picked_rp = RecipeCollection.from_csv(recipes)
+        assert picked_rp, f"No picked recipe found in {recipes}."
         # get involved atoms
         reaction_atom_ids = set()
         for step in picked_rp.recipe_steps:
