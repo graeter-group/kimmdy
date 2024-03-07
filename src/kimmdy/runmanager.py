@@ -387,7 +387,7 @@ class RunManager:
         logger.info("Writing initial topology after parsing")
 
         if self.config.parameterize_at_setup:
-            focus_nrs = set([atom.nr for atom in self.top.atoms.values()])
+            focus_nrs = set(self.top.atoms.keys())
             self.top.needs_parameterization = True
             self.top.update_parameters(focus_nrs)
 

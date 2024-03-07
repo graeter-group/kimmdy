@@ -850,7 +850,7 @@ class Topology:
             [attributes_to_list(x) for x in self.ff.angletypes.values()],
         )
 
-    def update_parameters(self, focus_nrs: set = set()):
+    def update_parameters(self, focus_nrs: Optional[set[str]] = None):
         if self.needs_parameterization:
             if self.parametrizer is not None:
                 logger.info(

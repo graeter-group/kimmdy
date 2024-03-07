@@ -4,7 +4,7 @@ Also discovers and loads KIMMDY plugins.
 """
 
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 from abc import ABC, abstractmethod
 import logging
 import sys
@@ -99,7 +99,7 @@ class Parameterizer(ABC):
 
     @abstractmethod
     def parameterize_topology(
-        self, current_topology: Topology, focus_nrs: dict[str, set[str]] = {}
+        self, current_topology: Topology, focus_nrs: Optional[set[str]]
     ) -> Topology:
         pass
 
@@ -108,7 +108,7 @@ class BasicParameterizer(Parameterizer):
     """reconstruct base force field state"""
 
     def parameterize_topology(
-        self, current_topology: Topology, focus_nrs: dict[str, set[str]] = {}
+        self, current_topology: Topology, focus_nrs: Optional[set[str]] = None
     ) -> None:
         """Do nothing,
         all necessary actions should already have happened in bind_bond and break_bond of Topology
