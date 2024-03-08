@@ -93,8 +93,6 @@ class RunManager:
     ----------
     config
         The configuration object.
-    from_checkpoint
-        Whether the runmanager was initialized from a checkpoint.
     tasks
         Tasks from config.
     crr_tasks
@@ -109,8 +107,6 @@ class RunManager:
         Dictionary of latest files.
     histfile
         Path to history file.
-    cptfile
-        Path to checkpoint file.
     top
         Topology object.
     filehist
@@ -123,7 +119,6 @@ class RunManager:
 
     def __init__(self, config: Config):
         self.config: Config = config
-        self.from_checkpoint: bool = False
         self.tasks: queue.Queue[Task] = queue.Queue()  # tasks from config
         self.crr_tasks: queue.Queue[Task] = queue.Queue()  # current tasks
         self.iteration: int = -1  # start at -1 to have iteration 0 be the initial setup
@@ -197,10 +192,7 @@ class RunManager:
         logger.info("Start run")
         self.start_time = time.time()
 
-        if self.from_checkpoint:
-            logger.info("KIMMDY is starting from a checkpoint.")
-        else:
-            self._setup_tasks()
+        self._setup_tasks()
 
         while (
             self.state is not State.DONE
@@ -210,10 +202,6 @@ class RunManager:
                 or self.config.max_hours == 0
             )
         ):
-            if self.config.write_checkpoint:
-                logger.info("Writing checkpoint before next task")
-                with open(self.cptfile, "wb") as f:
-                    dill.dump(self, f)
             next(self)
 
         logger.info(
@@ -267,18 +255,6 @@ class RunManager:
                 logger.error(m)
                 raise ValueError(m)
         logger.info(f"Task list build:\n{pformat(list(self.tasks.queue), indent=8)}")
-
-    def write_one_checkpoint(self):
-        """Just write the first checkpoint and then exit
-
-        Used to generate a starting point for jobscripts on hpc clusters
-        that can easily self-submit after a timelimit was exceeded.
-        """
-        logger.info("Initial setup for first checkpoint")
-        self._setup_tasks()
-        with open(self.cptfile, "wb") as f:
-            dill.dump(self, f)
-        logger.info(f"Wrote checkpointfile to: {self.cptfile}, ")
 
     def get_latest(self, suffix: str):
         """Returns path to latest file of given type.

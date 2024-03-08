@@ -23,7 +23,8 @@ CYCLE={config.max_hours}
 
 START=$(date +"%s")
 
-kimmdy --checkpoint {config.out}/kimmdy.cpt
+#TODO: make this work without checkpoint
+# kimmdy --checkpoint {config.out}/kimmdy.cpt
 
 END=$(date +"%s")
 
