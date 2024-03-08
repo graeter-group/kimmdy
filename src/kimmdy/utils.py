@@ -56,6 +56,7 @@ def run_gmx(s: str, cwd=None) -> Optional[sp.CalledProcessError]:
 
     Adds a '-quiet' flag to the command and checks the return code.
     """
+    logger.debug(f"Starting Gromacs process with command {s} in {cwd}.")
     result = run_shell_cmd(f"{s} -quiet", cwd)
     if result.returncode != 0:
         logger.error(f"Gromacs process with command {s} in {cwd} failed.")

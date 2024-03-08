@@ -16,6 +16,7 @@ from enum import Enum, auto
 from functools import partial
 from pathlib import Path
 from pprint import pformat
+from subprocess import CalledProcessError
 from typing import Optional
 
 import dill
@@ -23,7 +24,7 @@ import dill
 from kimmdy.config import Config
 from kimmdy.coordinates import break_bond_plumed, merge_top_slow_growth, place_atom
 from kimmdy.kmc import KMCResult, extrande, extrande_mod, frm, rf_kmc
-from kimmdy.parsing import read_top, write_json, write_top
+from kimmdy.parsing import read_top, write_json, write_top, write_time_marker
 from kimmdy.plugins import (
     BasicParameterizer,
     ReactionPlugin,
@@ -41,7 +42,7 @@ logger = logging.getLogger(__name__)
 # file types of which there will be multiple files per type
 AMBIGUOUS_SUFFS = ["dat", "xvg", "log", "itp", "mdp"]
 # file strings which to ignore
-IGNORE_SUBSTR = ["_prev.cpt"]
+IGNORE_SUBSTR = ["_prev.cpt", ".start", ".done", ".failed"]
 # are there cases where we have multiple trr files?
 
 
@@ -428,8 +429,13 @@ class RunManager:
         files.output["trr"] = files.outputdir / f"{instance}.trr"
         logger.debug(f"grompp cmd: {grompp_cmd}")
         logger.debug(f"mdrun cmd: {mdrun_cmd}")
-        run_gmx(grompp_cmd, outputdir)
-        run_gmx(mdrun_cmd, outputdir)
+        try:
+            run_gmx(grompp_cmd, outputdir)
+            run_gmx(mdrun_cmd, outputdir)
+        except CalledProcessError as e:
+            write_time_marker(files.outputdir / ".failed", "failed")
+            raise e
+
         logger.info(f"Done with MD {instance}")
         return files
 
@@ -553,6 +559,7 @@ class RunManager:
         if self.kmcresult is None:
             m = "Attempting to _apply_recipe without having chosen one with _decide_recipe."
             logger.error(m)
+            write_time_marker(files.outputdir / ".failed", "failed")
             raise RuntimeError(m)
 
         recipe = self.kmcresult.recipe
