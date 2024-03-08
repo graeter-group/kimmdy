@@ -13,13 +13,6 @@
       "pytype": "bool",
       "default": false
     },
-    "write_checkpoint": {
-      "title": "write_checkpoint",
-      "description": "Write checkpoints to continue a KIMMDY run from. Default True",
-      "type": "boolean",
-      "pytype": "bool",
-      "default": true
-    },
     "parameterize_at_setup": {
       "title": "parameterize_at_setup",
       "description": "parameterize the topology during the setup task",

@@ -39,7 +39,7 @@ def test_integration_emptyrun(arranged_tmp_path):
 def test_integration_valid_input_files(arranged_tmp_path):
     kimmdy_run()
     assert "Finished running tasks" in read_last_line(Path("kimmdy.log"))
-    assert len(list(Path.cwd().glob("minimal/*"))) == 3
+    assert len(list(Path.cwd().glob("minimal/*"))) == 2
 
 
 @pytest.mark.parametrize(
@@ -120,7 +120,7 @@ def test_grappa_partial_parameterization(arranged_tmp_path):
 def test_integration_single_reaction(arranged_tmp_path):
     kimmdy_run()
     assert "Finished running tasks" in read_last_line(Path("kimmdy.log"))
-    assert len(list(Path.cwd().glob("single_reaction_000/*"))) == 8
+    assert len(list(Path.cwd().glob("single_reaction_000/*"))) == 7
 
 
 @pytest.mark.slow
@@ -130,7 +130,7 @@ def test_integration_single_reaction(arranged_tmp_path):
 def test_integration_hat_naive_reaction(arranged_tmp_path):
     kimmdy_run()
     assert "Finished running tasks" in read_last_line(Path("kimmdy.log"))
-    assert len(list(Path.cwd().glob("alanine_hat_000/*"))) == 16
+    assert len(list(Path.cwd().glob("alanine_hat_000/*"))) == 15
 
 
 @pytest.mark.slow
@@ -140,7 +140,7 @@ def test_integration_hat_naive_reaction(arranged_tmp_path):
 def test_integration_homolysis_reaction(arranged_tmp_path):
     kimmdy_run()
     assert "Finished running tasks" in read_last_line(Path("kimmdy.log"))
-    assert len(list(Path.cwd().glob("hexalanine_homolysis_000/*"))) == 13
+    assert len(list(Path.cwd().glob("hexalanine_homolysis_000/*"))) == 12
 
 
 @pytest.mark.slow
@@ -150,7 +150,7 @@ def test_integration_homolysis_reaction(arranged_tmp_path):
 def test_integration_pull(arranged_tmp_path):
     kimmdy_run()
     assert "Finished running tasks" in read_last_line(Path("kimmdy.log"))
-    assert len(list(Path.cwd().glob("kimmdy_001/*"))) == 12
+    assert len(list(Path.cwd().glob("kimmdy_001/*"))) == 11
 
 
 @pytest.mark.require_grappa
@@ -163,4 +163,4 @@ def test_integration_pull(arranged_tmp_path):
 def test_integration_whole_run(arranged_tmp_path):
     kimmdy_run()
     assert "Finished running tasks" in read_last_line(Path("kimmdy.log"))
-    assert len(list(Path.cwd().glob("kimmdy_001/*"))) == 25
+    assert len(list(Path.cwd().glob("kimmdy_001/*"))) == 24
