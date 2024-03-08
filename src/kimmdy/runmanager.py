@@ -19,8 +19,6 @@ from pprint import pformat
 from subprocess import CalledProcessError
 from typing import Optional
 
-import dill
-
 from kimmdy.config import Config
 from kimmdy.coordinates import break_bond_plumed, merge_top_slow_growth, place_atom
 from kimmdy.kmc import KMCResult, extrande, extrande_mod, frm, rf_kmc
@@ -194,6 +192,9 @@ class RunManager:
         self.start_time = time.time()
 
         self._setup_tasks()
+
+        if self.config.restart:
+            self._restart_from_rundir()
 
         while (
             self.state is not State.DONE
@@ -376,6 +377,18 @@ class RunManager:
         files.output["top"] = files.outputdir / self.config.top.name
         logger.info("Done with setup")
         return files
+
+    def _restart_from_rundir(self):
+        # go through self.tasks
+        ## check whether the job failed -> raise error
+        ## check whether job is done, if so, check whether it is next in self.config.sequence, if next is restart, raise error
+        ## if not, add it to list of nested tasks (log that list later with dirname)
+        ## if yes, move sequence pointer ahead
+        ##TODO: logic for unfinished task
+        # if next sequence step is restart, log that it matches, else raise error if safe restart or log warning if unsafe restart
+        # TODO: finish
+
+        pass
 
     def _run_md(self, instance: str, files: TaskFiles) -> TaskFiles:
         """General MD simulation"""
