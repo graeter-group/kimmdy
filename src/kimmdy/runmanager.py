@@ -19,6 +19,7 @@ from pprint import pformat
 from subprocess import CalledProcessError
 from typing import Optional
 
+from kimmdy.analysis import get_step_directories
 from kimmdy.config import Config
 from kimmdy.coordinates import break_bond_plumed, merge_top_slow_growth, place_atom
 from kimmdy.kmc import KMCResult, extrande, extrande_mod, frm, rf_kmc
@@ -42,6 +43,7 @@ AMBIGUOUS_SUFFS = ["dat", "xvg", "log", "itp", "mdp"]
 # file strings which to ignore
 IGNORE_SUBSTR = ["_prev.cpt", ".start", ".done", ".failed"]
 # are there cases where we have multiple trr files?
+TASKS_WITHOUT_DIR = ["place_reaction_task"]
 
 
 class State(Enum):
@@ -193,7 +195,7 @@ class RunManager:
 
         self._setup_tasks()
 
-        if self.config.restart:
+        if getattr(self.config.restart, "run_directory", None):
             self._restart_from_rundir()
 
         while (
@@ -379,14 +381,48 @@ class RunManager:
         return files
 
     def _restart_from_rundir(self):
-        # go through self.tasks
+        """Set up RunManager to restart from a run directory"""
+
+        task_dirs = get_step_directories(self.config.restart.run_directory, "all")
+        logging.debug(f"Found task directories in restart run directory: {task_dirs}")
+
+        completed_tasks = []
+        nested_tasks = []
+        iteration = 0
+        while not self.tasks.empty():
+            task = self.tasks.queue[0]
+            if task.out is None:
+                completed_tasks.append(self.tasks.queue.popleft())
+            else:
+                for task_dir in task_dirs[iteration:]:
+                    if (task_dir / ".start").exists():
+                        if (task_dir / ".done").exists():
+                            task_name = task_dir.name.split(sep="_")[1]
+                            if task_name == task.out:
+                                completed_tasks.append(self.tasks.queue.popleft())
+                                break
+                            else:
+                                nested_tasks.append(task_name)
+                        elif (task_dir / ".failed").exists():
+                            raise RuntimeError(
+                                f"Task in directory `{task_dir}` is indicated to have failed. Aborting restart. Remove this task directory if you want to restart from before the failed task."
+                            )
+                        else:
+                            # assumes test started and did not finish break and give signal to while?
+                            pass
+                    else:
+                        raise RuntimeError(
+                            f"Encountered task directory but the task is not indicated to have started. Aborting restart."
+                        )
+        breakpoint()
         ## check whether the job failed -> raise error
-        ## check whether job is done, if so, check whether it is next in self.config.sequence, if next is restart, raise error
+        ## check whether job is done, if so, check whether it is next in self.config.sequence, if next is restart, raise error (move this somewhere else)
         ## if not, add it to list of nested tasks (log that list later with dirname)
         ## if yes, move sequence pointer ahead
         ##TODO: logic for unfinished task
         # if next sequence step is restart, log that it matches, else raise error if safe restart or log warning if unsafe restart
         # TODO: finish
+        # TODO: how about tasks in queue that generate no dir?
 
         pass
 

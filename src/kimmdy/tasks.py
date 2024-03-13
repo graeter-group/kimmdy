@@ -160,6 +160,7 @@ class Task:
         return str(self.name) + " args: " + str(self.kwargs)
 
 
+# TODO: move this to appropriate place
 def get_plumed_out(plumed: Path) -> str:
     plumed_parsed = read_plumed(plumed)
     plumed_out = None
