@@ -186,6 +186,7 @@ class RunManager:
                 },
                 {"f": self._apply_recipe, "kwargs": {}, "out": "apply_recipe"},
             ],
+            "restart": {f"f": self._restart_task, "kwargs": {}, "out": None},
         }
         """Mapping of task names to functions and their keyword arguments."""
 
@@ -254,6 +255,16 @@ class RunManager:
                 # check all reactions
                 for task_kwargs in self.task_mapping["reactions"]:
                     self.tasks.put(Task(self, **task_kwargs))
+            elif step == "restart":
+                restart = self.task_mapping["restart"]
+                kwargs: dict = copy(restart["kwargs"])
+                task = Task(
+                    self,
+                    f=restart["f"],
+                    kwargs=kwargs,
+                    out=step,
+                )
+                self.tasks.put(task)
             else:
                 m = f"Unknown task encountered in the sequence: {step}"
                 logger.error(m)
@@ -433,6 +444,17 @@ class RunManager:
                                     logger.info(
                                         f"Will continue after task {completed_tasks[-1].kwargs['files'].outputdir}"
                                     )
+                                    # if using a manual restart, check whether first task in queue is `runmgr._restart_task`
+                                    if self.config.restart.manual:
+                                        logger.debug(
+                                            f"Tasks in queue: {self.tasks.queue}\n",
+                                            f"Completed tasks: {completed_tasks}",
+                                        )
+                                        first_task = self.tasks.get()
+                                        assert (
+                                            first_task.name == "_restart_task"
+                                        ), f"Manual restart chosen but restart task is not in the first position of the queue. Either it is in the wrong position or missing from the config file sequence."
+
                                     self.iteration -= 1
                                     restart_setup_done = True
                                     break
@@ -486,6 +508,11 @@ class RunManager:
             ),
             radicals=getattr(self.config, "radicals", None),
             residuetypes_path=getattr(self.config, "residuetypes", None),
+        )
+
+    def _restart_task(self) -> None:
+        raise RuntimeError(
+            f"Called restart task. This task is only for finding the restart point in the sequence and should never be called!"
         )
 
     def _run_md(self, instance: str, files: TaskFiles) -> TaskFiles:
