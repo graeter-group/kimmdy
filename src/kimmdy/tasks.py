@@ -161,7 +161,7 @@ class Task:
 
 
 # TODO: move this to appropriate place
-def get_plumed_out(plumed: Path) -> str:
+def get_plumed_out(plumed: Path) -> Path:
     plumed_parsed = read_plumed(plumed)
     plumed_out = None
     for part in plumed_parsed["prints"]:

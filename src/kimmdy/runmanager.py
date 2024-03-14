@@ -41,7 +41,7 @@ logger = logging.getLogger(__name__)
 # file types of which there will be multiple files per type
 AMBIGUOUS_SUFFS = ["dat", "xvg", "log", "itp", "mdp"]
 # file strings which to ignore
-IGNORE_SUBSTR = ["_prev.cpt", ".start", ".done", ".failed", ".tail"]
+IGNORE_SUBSTR = ["_prev.cpt", ".start", ".done", ".failed", ".tail", "_mod.top"]
 # are there cases where we have multiple trr files?
 TASKS_WITHOUT_DIR = ["place_reaction_task"]
 
@@ -135,9 +135,9 @@ class RunManager:
 
         try:
             if self.config.changer.topology.parameterization == "basic":
-                parameterizer = BasicParameterizer()
+                self.parameterizer = BasicParameterizer()
             else:
-                parameterizer = parameterization_plugins[
+                self.parameterizer = parameterization_plugins[
                     self.config.changer.topology.parameterization
                 ]()
         except KeyError as e:
@@ -149,7 +149,7 @@ class RunManager:
 
         self.top = Topology(
             top=read_top(self.config.top, self.config.ff),
-            parametrizer=parameterizer,
+            parametrizer=self.parameterizer,
             is_reactive_predicate_f=get_is_reactive_predicate_f(
                 self.config.topology.reactive
             ),
@@ -385,70 +385,108 @@ class RunManager:
 
         task_dirs = get_step_directories(self.config.restart.run_directory, "all")
         logger.debug(f"Found task directories in restart run directory: {task_dirs}")
+        logger.debug(f"Task queue: {self.tasks.queue}")
 
-        completed_tasks = []
-        nested_tasks = []
-        while not self.tasks.empty():
+        completed_tasks: list[Task] = []
+        nested_tasks: dict = {}
+        self.iteration = 0
+        restart_setup_done = False
+        while not self.tasks.empty() and not restart_setup_done:
             task: Task = self.tasks.queue[0]
             if task.out is None:
-                # self.iteration+=1
                 completed_tasks.append(self.tasks.queue.popleft())
             else:
-                for task_dir in task_dirs[self.iteration + 1 :]:
+                for task_dir in task_dirs[self.iteration :]:
                     if (task_dir / ".start").exists():
                         if (task_dir / ".done").exists():
-                            task_name = task_dir.name.split(sep="_")[1]
+
+                            # symlink task directories from previous output and discover their files
+                            symlink_dir = self.config.out / task_dir.name
+                            symlink_dir.symlink_to(task_dir, target_is_directory=True)
+                            self.iteration += 1
+
+                            task_name = "_".join(task_dir.name.split(sep="_")[1:])
                             if task_name == task.out:
-                                self.iteration += 1
                                 task.kwargs.update(
                                     {
                                         "files": TaskFiles(
-                                            self.get_latest,
-                                            {},
-                                            {},
-                                            self.config.out
-                                            / f"{self.iteration}_{task.out}",
+                                            self.get_latest, {}, {}, symlink_dir
                                         )
                                     }
                                 )
-                                task.kwargs["files"].outputdir.symlink_to(
-                                    task_dir, target_is_directory=True
-                                )
-                                breakpoint()
-                                self._discover_output_files(
-                                    task.name, task.kwargs["files"]
-                                )
                                 completed_tasks.append(self.tasks.queue.popleft())
-
                                 break
                             else:
-                                nested_tasks.append(task_name)
+                                # task probably not unique but having the latest of one kind should suffice
+                                if not completed_tasks[-1] in nested_tasks.keys():
+                                    nested_tasks[completed_tasks[-1]] = []
+                                nested_tasks[completed_tasks[-1]].append(symlink_dir)
                         elif (task_dir / ".failed").exists():
                             raise RuntimeError(
                                 f"Task in directory `{task_dir}` is indicated to have failed. Aborting restart. Remove this task directory if you want to restart from before the failed task."
                             )
                         else:
-                            logger.info(
-                                f"Found started task {task_dir}. Run will continue from there."
-                            )
-                            breakpoint()
-                            # assumes test started and did not finish break and give signal to while?
-                            pass
+                            logger.info(f"Found started task {task_dir}.")
+                            # add completed tasks to queue again until a reliable restart point (i.e after MD) is reached
+                            while completed_tasks:
+                                if completed_tasks[-1].name == "_run_md":
+                                    logger.info(
+                                        f"Will continue after task {completed_tasks[-1].kwargs['files'].outputdir}"
+                                    )
+                                    self.iteration -= 1
+                                    restart_setup_done = True
+                                    break
+                                else:
+                                    current_nested_task_dirs = nested_tasks.get(
+                                        completed_tasks[-1], []
+                                    )
+                                    try:
+                                        current_task_dir = [
+                                            completed_tasks[-1]
+                                            .kwargs["files"]
+                                            .outputdir
+                                        ]
+                                    except KeyError:
+                                        current_task_dir = []
+                                    for task_dir in [
+                                        *current_nested_task_dirs,
+                                        *current_task_dir,
+                                    ]:
+                                        task_dir.unlink(missing_ok=True)
+                                        self.iteration -= 1
+                                    completed_tasks[-1].kwargs.pop("files", None)
+                                    self.tasks.queue.appendleft(completed_tasks.pop())
+                            break
                     else:
                         raise RuntimeError(
                             f"Encountered task directory but the task is not indicated to have started. Aborting restart."
                         )
-        breakpoint()
-        ## check whether the job failed -> raise error
-        ## check whether job is done, if so, check whether it is next in self.config.sequence, if next is restart, raise error (move this somewhere else)
-        ## if not, add it to list of nested tasks (log that list later with dirname)
-        ## if yes, move sequence pointer ahead
-        ##TODO: logic for unfinished task
-        # if next sequence step is restart, log that it matches, else raise error if safe restart or log warning if unsafe restart
-        # TODO: finish
-        # TODO: how about tasks in queue that generate no dir?
 
-        pass
+        # discover after it is clear which tasks will be in queue
+        for task_dir in get_step_directories(self.config.out, "all"):
+            task_name = "_".join(task_dir.name.split(sep="_")[1:])
+            task_files = TaskFiles(
+                self.get_latest, {}, {}, self.config.out / task_dir.name
+            )
+            self._discover_output_files(task_name, task_files)
+
+        # plumed fix
+        for md_config in self.config.mds.__dict__.values():
+            if getattr(md_config, "use_plumed"):
+                plumed_out_name = get_plumed_out(self.latest_files["plumed"]).name
+                self.latest_files["plumed_out"] = self.get_latest(plumed_out_name)
+                self.latest_files.pop(plumed_out_name)
+
+        # use latest top file
+        self.top = Topology(
+            top=read_top(self.get_latest("top"), self.config.ff),
+            parametrizer=self.parameterizer,
+            is_reactive_predicate_f=get_is_reactive_predicate_f(
+                self.config.topology.reactive
+            ),
+            radicals=getattr(self.config, "radicals", None),
+            residuetypes_path=getattr(self.config, "residuetypes", None),
+        )
 
     def _run_md(self, instance: str, files: TaskFiles) -> TaskFiles:
         """General MD simulation"""
