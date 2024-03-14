@@ -41,7 +41,7 @@ logger = logging.getLogger(__name__)
 # file types of which there will be multiple files per type
 AMBIGUOUS_SUFFS = ["dat", "xvg", "log", "itp", "mdp"]
 # file strings which to ignore
-IGNORE_SUBSTR = ["_prev.cpt", ".start", ".done", ".failed"]
+IGNORE_SUBSTR = ["_prev.cpt", ".start", ".done", ".failed", ".tail"]
 # are there cases where we have multiple trr files?
 TASKS_WITHOUT_DIR = ["place_reaction_task"]
 
@@ -384,22 +384,42 @@ class RunManager:
         """Set up RunManager to restart from a run directory"""
 
         task_dirs = get_step_directories(self.config.restart.run_directory, "all")
-        logging.debug(f"Found task directories in restart run directory: {task_dirs}")
+        logger.debug(f"Found task directories in restart run directory: {task_dirs}")
 
         completed_tasks = []
         nested_tasks = []
-        iteration = 0
         while not self.tasks.empty():
-            task = self.tasks.queue[0]
+            task: Task = self.tasks.queue[0]
             if task.out is None:
+                # self.iteration+=1
                 completed_tasks.append(self.tasks.queue.popleft())
             else:
-                for task_dir in task_dirs[iteration:]:
+                for task_dir in task_dirs[self.iteration + 1 :]:
                     if (task_dir / ".start").exists():
                         if (task_dir / ".done").exists():
                             task_name = task_dir.name.split(sep="_")[1]
                             if task_name == task.out:
+                                self.iteration += 1
+                                task.kwargs.update(
+                                    {
+                                        "files": TaskFiles(
+                                            self.get_latest,
+                                            {},
+                                            {},
+                                            self.config.out
+                                            / f"{self.iteration}_{task.out}",
+                                        )
+                                    }
+                                )
+                                task.kwargs["files"].outputdir.symlink_to(
+                                    task_dir, target_is_directory=True
+                                )
+                                breakpoint()
+                                self._discover_output_files(
+                                    task.name, task.kwargs["files"]
+                                )
                                 completed_tasks.append(self.tasks.queue.popleft())
+
                                 break
                             else:
                                 nested_tasks.append(task_name)
@@ -408,6 +428,10 @@ class RunManager:
                                 f"Task in directory `{task_dir}` is indicated to have failed. Aborting restart. Remove this task directory if you want to restart from before the failed task."
                             )
                         else:
+                            logger.info(
+                                f"Found started task {task_dir}. Run will continue from there."
+                            )
+                            breakpoint()
                             # assumes test started and did not finish break and give signal to while?
                             pass
                     else:
