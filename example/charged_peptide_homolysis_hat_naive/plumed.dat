@@ -11,4 +11,4 @@ d8: DISTANCE ATOMS=82,84
 d9: DISTANCE ATOMS=84,95 
  
 #Print distances ARG to FILE every STRIDE steps 
-PRINT ARG=d0,d1,d2,d3,d4,d5,d6,d7,d8,d9, STRIDE=500 FILE=distances.dat
+PRINT ARG=d0,d1,d2,d3,d4,d5,d6,d7,d8,d9, STRIDE=100 FILE=distances.dat

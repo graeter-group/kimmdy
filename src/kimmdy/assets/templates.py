@@ -1,12 +1,12 @@
 jobscript = """
 #!/bin/env bash
 #SBATCH --job-name={config.out.name}
-#SBATCH --output=kimmdy-job.log
-#SBATCH --error=kimmdy-job.log
-#SBATCH --time=24:00:00
+#SBATCH --output={config.out.name}-job.log
+#SBATCH --error={config.out.name}-job.log
+#SBATCH --time={config.max_hours}:00:00
 #SBATCH -N 1
-#SBATCH --ntasks-per-node=40
-#SBATCH --mincpus=40
+#SBATCH --ntasks-per-node=20
+#SBATCH --mincpus=20
 #SBATCH --exclusive
 #SBATCH --cpus-per-task=1
 #SBATCH --gpus 1
@@ -17,14 +17,15 @@ jobscript = """
 
 # Setup up your environment here
 # modules.sh might load lmod modules, set environment variables, etc.
-# source ./_modules.sh
+source ./_modules.sh
 
 CYCLE={config.max_hours}
+CYCLE_buffered=$(echo "scale=2; $CYCLE - 0.08" | bc)
+
 
 START=$(date +"%s")
 
-#TODO: make this work without checkpoint
-# kimmdy --checkpoint {config.out}/kimmdy.cpt
+timeout ${{CYCLE_buffered}}h kimmdy
 
 END=$(date +"%s")
 
@@ -39,6 +40,8 @@ if [ $HOURS -lt $CYCLE ]; then
   exit 3
 else
   echo "jobscript resubmitting"
+  sed -i "s/\(run_directory:\s*\).*/\\1'{config.out.name}'/" kimmdy.yml
+  kimmdy --generate-jobscript
   sbatch ./jobscript.sh
   exit 2
 fi

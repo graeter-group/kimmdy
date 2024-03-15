@@ -2,7 +2,7 @@ name: 'kimmdy_001'
 dryrun: false
 max_tasks: 100
 gromacs_alias: 'gmx'
-gmx_mdrun_flags: -maxh 24 -dlb yes 
+gmx_mdrun_flags: -maxh 24 -dlb yes -nt 8
 top: 'IMREE.top'
 gro: 'IMREE_npt.gro'
 ndx: 'index.ndx'
@@ -37,7 +37,7 @@ sequence:
   - pull
   - homolysis
   -
-    mult: 5
+    mult: 2
     tasks:
       - equilibrium
       - pull

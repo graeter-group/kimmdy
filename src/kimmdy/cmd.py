@@ -11,6 +11,7 @@ import sys
 import textwrap
 from os import chmod
 from pathlib import Path
+import shutil
 from typing import Optional
 
 import dill
@@ -224,8 +225,7 @@ def _run(args: argparse.Namespace):
         runmgr = RunManager(config)
 
         if args.generate_jobscript:
-            # TODO: make this work with the new checkpoint system
-            content = jobscript.format(config=config)
+            content = jobscript.format(config=config).strip("\n")
             path = "jobscript.sh"
 
             with open(path, "w") as f:
@@ -268,6 +268,8 @@ def _run(args: argparse.Namespace):
             raise e
     finally:
         logging.shutdown()
+        if args.generate_jobscript:
+            shutil.rmtree(config.out)
 
 
 def kimmdy_run(
