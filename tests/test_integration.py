@@ -8,6 +8,7 @@ from kimmdy.cmd import kimmdy_run
 from kimmdy.parsing import read_top, write_top
 from kimmdy.topology.topology import Topology
 from kimmdy.plugins import parameterization_plugins
+from kimmdy.analysis import get_step_directories
 
 
 def read_last_line(file):
@@ -164,3 +165,23 @@ def test_integration_whole_run(arranged_tmp_path):
     kimmdy_run()
     assert "Finished running tasks" in read_last_line(Path("kimmdy.log"))
     assert len(list(Path.cwd().glob("kimmdy_001/*"))) == 24
+
+
+@pytest.mark.slow
+@pytest.mark.parametrize(
+    "arranged_tmp_path", (["test_integration/alanine_hat_naive"]), indirect=True
+)
+def test_integration_restart(arranged_tmp_path):
+    run_dir = Path("alanine_hat_000")
+    restart_dir = Path("alanine_hat_001")
+    # get reference
+    kimmdy_run(input=Path("kimmdy_restart.yml"))
+    n_files_original = len(list(run_dir.glob("*")))
+    # make run directory look unfinished
+    task_dirs = get_step_directories(run_dir, "all")
+    (task_dirs[-4] / ".done").unlink()
+    kimmdy_run(input=Path("kimmdy_restart.yml"))
+    n_files_restart = len(list(restart_dir.glob("*")))
+
+    assert "Finished running tasks" in read_last_line(Path("kimmdy.log"))
+    assert n_files_original == n_files_restart == 15

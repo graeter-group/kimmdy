@@ -7,6 +7,7 @@ ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default
 top: 'Ala_out.top'
 gro: 'npt.gro'
 ndx: 'index.ndx'
+kmc: "rfkmc"
 mds:
   equilibrium:
     mdp: 'md.mdp'

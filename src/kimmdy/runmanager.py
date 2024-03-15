@@ -487,6 +487,8 @@ class RunManager:
                     self.iteration -= 1
                 completed_tasks[-1].kwargs.pop("files", None)
                 self.tasks.queue.appendleft(completed_tasks.pop())
+        else:
+            self.iteration -= 1
 
         # discover after it is clear which tasks will be in queue
         for task_dir in get_step_directories(self.config.out, "all"):
