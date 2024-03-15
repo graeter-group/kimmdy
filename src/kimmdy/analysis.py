@@ -66,9 +66,7 @@ def get_step_directories(dir: Path, steps: Union[list[str], str] = "all") -> lis
         )
 
     if not matching_directories:
-        raise ValueError(
-            f"Could not find directories {steps} in {dir}. Thus, no trajectories can be concatenated"
-        )
+        print(f"WARNING: Could not find directories {steps} in {dir}.")
 
     return matching_directories
 
@@ -98,6 +96,10 @@ def concat_traj(
     analysis_dir = get_analysis_dir(run_dir)
 
     directories = get_step_directories(run_dir, steps)
+    if not directories:
+        raise ValueError(
+            f"Could not find directories {steps} in {dir}. Thus, no trajectories can be concatenated"
+        )
 
     out_xtc = analysis_dir / "concat.xtc"
 

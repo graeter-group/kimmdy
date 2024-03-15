@@ -401,12 +401,18 @@ class RunManager:
         completed_tasks: list[Task] = []
         nested_tasks: dict = {}
         self.iteration = 0
-        restart_setup_done = False
-        while not self.tasks.empty() and not restart_setup_done:
+        found_run_end = False
+        while not self.tasks.empty() and not found_run_end:
             task: Task = self.tasks.queue[0]
             if task.out is None:
                 completed_tasks.append(self.tasks.queue.popleft())
             else:
+                if task_dirs[self.iteration :] == []:
+                    logger.info(
+                        f"Found last finished task with task number {self.iteration}."
+                    )
+                    # Condition 1: Continue from the last finished task
+                    found_run_end = True
                 for task_dir in task_dirs[self.iteration :]:
                     if (task_dir / ".start").exists():
                         if (task_dir / ".done").exists():
@@ -437,52 +443,50 @@ class RunManager:
                                 f"Task in directory `{task_dir}` is indicated to have failed. Aborting restart. Remove this task directory if you want to restart from before the failed task."
                             )
                         else:
-                            logger.info(f"Found started task {task_dir}.")
-                            # add completed tasks to queue again until a reliable restart point (i.e after MD) is reached
-                            while completed_tasks:
-                                if completed_tasks[-1].name == "_run_md":
-                                    logger.info(
-                                        f"Will continue after task {completed_tasks[-1].kwargs['files'].outputdir}"
-                                    )
-                                    # if using a manual restart, check whether first task in queue is `runmgr._restart_task`
-                                    if self.config.restart.manual:
-                                        logger.debug(
-                                            f"Tasks in queue: {self.tasks.queue}\n",
-                                            f"Completed tasks: {completed_tasks}",
-                                        )
-                                        first_task = self.tasks.get()
-                                        assert (
-                                            first_task.name == "_restart_task"
-                                        ), f"Manual restart chosen but restart task is not in the first position of the queue. Either it is in the wrong position or missing from the config file sequence."
-
-                                    self.iteration -= 1
-                                    restart_setup_done = True
-                                    break
-                                else:
-                                    current_nested_task_dirs = nested_tasks.get(
-                                        completed_tasks[-1], []
-                                    )
-                                    try:
-                                        current_task_dir = [
-                                            completed_tasks[-1]
-                                            .kwargs["files"]
-                                            .outputdir
-                                        ]
-                                    except KeyError:
-                                        current_task_dir = []
-                                    for task_dir in [
-                                        *current_nested_task_dirs,
-                                        *current_task_dir,
-                                    ]:
-                                        task_dir.unlink(missing_ok=True)
-                                        self.iteration -= 1
-                                    completed_tasks[-1].kwargs.pop("files", None)
-                                    self.tasks.queue.appendleft(completed_tasks.pop())
+                            logger.info(
+                                f"Found started but not finished task {task_dir}."
+                            )
+                            # Condition 2: Continue from started but not finished task
+                            found_run_end = True
                             break
                     else:
                         raise RuntimeError(
                             f"Encountered task directory but the task is not indicated to have started. Aborting restart."
                         )
+
+        # add completed tasks to queue again until a reliable restart point (i.e after MD) is reached
+        while completed_tasks:
+            if completed_tasks[-1].name == "_run_md":
+                logger.info(
+                    f"Will continue after task {completed_tasks[-1].kwargs['files'].outputdir}"
+                )
+                # if using a manual restart, check whether first task in queue is `runmgr._restart_task`
+                if self.config.restart.manual:
+                    logger.debug(
+                        f"Tasks in queue: {self.tasks.queue}\n",
+                        f"Completed tasks: {completed_tasks}",
+                    )
+                    first_task = self.tasks.get()
+                    assert (
+                        first_task.name == "_restart_task"
+                    ), f"Manual restart chosen but restart task is not in the first position of the queue. Either it is in the wrong position or missing from the config file sequence."
+
+                self.iteration -= 1
+                break
+            else:
+                current_nested_task_dirs = nested_tasks.get(completed_tasks[-1], [])
+                try:
+                    current_task_dir = [completed_tasks[-1].kwargs["files"].outputdir]
+                except KeyError:
+                    current_task_dir = []
+                for task_dir in [
+                    *current_nested_task_dirs,
+                    *current_task_dir,
+                ]:
+                    task_dir.unlink(missing_ok=True)
+                    self.iteration -= 1
+                completed_tasks[-1].kwargs.pop("files", None)
+                self.tasks.queue.appendleft(completed_tasks.pop())
 
         # discover after it is clear which tasks will be in queue
         for task_dir in get_step_directories(self.config.out, "all"):
@@ -495,9 +499,12 @@ class RunManager:
         # plumed fix
         for md_config in self.config.mds.__dict__.values():
             if getattr(md_config, "use_plumed"):
-                plumed_out_name = get_plumed_out(self.latest_files["plumed"]).name
-                self.latest_files["plumed_out"] = self.get_latest(plumed_out_name)
-                self.latest_files.pop(plumed_out_name)
+                try:
+                    plumed_out_name = get_plumed_out(self.latest_files["plumed"]).name
+                    self.latest_files["plumed_out"] = self.get_latest(plumed_out_name)
+                    self.latest_files.pop(plumed_out_name)
+                except FileNotFoundError as e:
+                    logger.debug(e)
 
         # use latest top file
         self.top = Topology(
