@@ -406,7 +406,7 @@ class Recipe:
 
         except ValueError as e:
             raise ValueError(
-                f"Consistency error in Recipe {self.recipe_steps}" " " + e.args[0]
+                f"Consistency error in Recipe {self.recipe_steps}\n" + e.args[0]
             )
 
     def get_recipe_name(self):

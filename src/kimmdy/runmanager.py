@@ -555,9 +555,13 @@ class RunManager:
 
         if self.kmcresult.time_delta:
             self.time += self.kmcresult.time_delta
-        logger.info(
-            f"Done with Decide recipe, chosen recipe is: {recipe.get_recipe_name()} at overall time {self.time*1e-12:.4e} s, reaction occured after {self.kmcresult.time_delta*1e-12:.4e} s"
-        )
+        logger.info("Done with Decide recipe.")
+        if len(recipe.rates) == 0:
+            logger.info("No reaction selected")
+        elif self.kmcresult.time_delta:
+            logger.info(
+                f"Overall time {self.time*1e-12:.4e} s, reaction occured after {self.kmcresult.time_delta*1e-12:.4e} s"
+            )
 
         # capture state of radicals
         write_json(
