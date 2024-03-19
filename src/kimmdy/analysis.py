@@ -219,8 +219,8 @@ def plot_energy(
         id_vars=["time", "step", "step_ix"], value_vars=terms
     )
     step_names = df[df["variable"] == terms[0]]
-    step_names["variable"] = "Step"
-    step_names["value"] = step_names["step_ix"]
+    step_names.loc[:, "variable"] = "Step"
+    step_names.loc[:, "value"] = step_names["step_ix"]
     df = pd.concat([df, step_names], ignore_index=True)
 
     p = (
