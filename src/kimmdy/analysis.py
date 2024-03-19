@@ -8,6 +8,7 @@ import subprocess as sp
 from datetime import datetime
 from pathlib import Path
 from typing import Optional, Union
+import re
 
 import matplotlib as mpl
 import matplotlib.patches as mpatches
@@ -208,6 +209,9 @@ def plot_energy(
                             energy[k].append(float(v) + time_offset)
                         else:
                             energy[k].append(float(v))
+                # get correct order of xvg_entries, not as in cmd!
+                elif match := re.match(r"@ s(\d+) legend \"(.*)\"", line):
+                    xvg_entries[int(match.group(1)) + 1] = match.group(2)
 
         time_offset = energy["time"][-1]
 
