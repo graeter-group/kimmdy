@@ -21,6 +21,7 @@ from typing import Optional
 
 from kimmdy.analysis import get_step_directories
 from kimmdy.config import Config
+from kimmdy.constants import MARKER_FILES
 from kimmdy.coordinates import break_bond_plumed, merge_top_slow_growth, place_atom
 from kimmdy.kmc import KMCResult, extrande, extrande_mod, frm, rf_kmc
 from kimmdy.parsing import read_top, write_json, write_top, write_time_marker
@@ -41,7 +42,14 @@ logger = logging.getLogger(__name__)
 # file types of which there will be multiple files per type
 AMBIGUOUS_SUFFS = ["dat", "xvg", "log", "itp", "mdp"]
 # file strings which to ignore
-IGNORE_SUBSTR = ["_prev.cpt", ".start", ".done", ".failed", ".tail", "_mod.top"]
+IGNORE_SUBSTR = [
+    "_prev.cpt",
+    MARKER_FILES["start"],
+    MARKER_FILES["done"],
+    MARKER_FILES["fail"],
+    ".tail",
+    "_mod.top",
+]
 # are there cases where we have multiple trr files?
 TASKS_WITHOUT_DIR = ["place_reaction_task"]
 
@@ -414,8 +422,8 @@ class RunManager:
                     # Condition 1: Continue from the last finished task
                     found_run_end = True
                 for task_dir in task_dirs[self.iteration :]:
-                    if (task_dir / ".start").exists():
-                        if (task_dir / ".done").exists():
+                    if (task_dir / MARKER_FILES["start"]).exists():
+                        if (task_dir / MARKER_FILES["done"]).exists():
 
                             # symlink task directories from previous output and discover their files
                             symlink_dir = self.config.out / task_dir.name
@@ -438,7 +446,7 @@ class RunManager:
                                 if not completed_tasks[-1] in nested_tasks.keys():
                                     nested_tasks[completed_tasks[-1]] = []
                                 nested_tasks[completed_tasks[-1]].append(symlink_dir)
-                        elif (task_dir / ".failed").exists():
+                        elif (task_dir / MARKER_FILES["fail"]).exists():
                             raise RuntimeError(
                                 f"Task in directory `{task_dir}` is indicated to have failed. Aborting restart. Remove this task directory if you want to restart from before the failed task."
                             )
@@ -580,7 +588,7 @@ class RunManager:
             run_gmx(grompp_cmd, outputdir)
             run_gmx(mdrun_cmd, outputdir)
         except CalledProcessError as e:
-            write_time_marker(files.outputdir / ".failed", "failed")
+            write_time_marker(files.outputdir / MARKER_FILES["fail"], "failed")
             raise e
 
         logger.info(f"Done with MD {instance}")
@@ -706,7 +714,7 @@ class RunManager:
         if self.kmcresult is None:
             m = "Attempting to _apply_recipe without having chosen one with _decide_recipe."
             logger.error(m)
-            write_time_marker(files.outputdir / ".failed", "failed")
+            write_time_marker(files.outputdir / MARKER_FILES["fail"], "failed")
             raise RuntimeError(m)
 
         recipe = self.kmcresult.recipe

@@ -2,6 +2,12 @@
 Comstants used throughout KIMMDY
 """
 
+MARKER_FILES = {
+    "start": ".kimmdy_start",
+    "done": ".kimmdy_done",
+    "fail": ".kimmdy_failed",
+}
+
 ATOM_ID_FIELDS = {
     "atoms": [0, 5],  # atomnr, chargegroup
     "bonds": [0, 1],

@@ -9,6 +9,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable, Optional
 
+from kimmdy.constants import MARKER_FILES
 from kimmdy.parsing import read_plumed, write_time_marker
 from kimmdy.utils import longFormatter
 
@@ -149,10 +150,14 @@ class Task:
         logger.info(f"Starting task: {self.name} with args: {self.kwargs}")
         if self.out is not None:
             self.kwargs.update({"files": create_task_directory(self.runmng, self.out)})
-            write_time_marker(self.kwargs["files"].outputdir / ".start", "start")
+            write_time_marker(
+                self.kwargs["files"].outputdir / MARKER_FILES["start"], "start"
+            )
         files = self.f(**self.kwargs)
         if self.out is not None:
-            write_time_marker(self.kwargs["files"].outputdir / ".done", "done")
+            write_time_marker(
+                self.kwargs["files"].outputdir / MARKER_FILES["done"], "done"
+            )
         logger.info(f"Finished task: {self.name}")
         return files
 
