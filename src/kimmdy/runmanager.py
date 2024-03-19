@@ -307,12 +307,7 @@ class RunManager:
         if self.config.dryrun:
             logger.info(f"Pretend to run: {task.name} with args: {task.kwargs}")
             return
-        logger.info(f"Starting task: {task.name} with args: {task.kwargs}")
         files = task()
-        logger.info(
-            f"Finished task: {task.name} after "
-            f"{timedelta(seconds=(time.time() - current_time))}"
-        )
         if files is not None:
             self._discover_output_files(task.name, files)
 
@@ -749,9 +744,7 @@ class RunManager:
                     kwargs={"step": step, "ttime": None},
                     out="place_atom",
                 )
-                logger.info(f"Starting task: {task.name} with args: {task.kwargs}")
                 place_files = task()
-                logger.info(f"Finished task: {task.name}")
                 if place_files is not None:
                     self._discover_output_files(task.name, place_files)
                 focus_nrs.update([step.id_to_place])
@@ -775,9 +768,7 @@ class RunManager:
                 task = Task(
                     self, f=self._run_md, kwargs={"instance": instance}, out=instance
                 )
-                logger.info(f"Starting task: {task.name} with args: {task.kwargs}")
                 md_files = task()
-                logger.info(f"Finished task: {task.name}")
                 if md_files is not None:
                     self._discover_output_files(task.name, md_files)
 
