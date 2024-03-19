@@ -404,8 +404,13 @@ class RunManager:
         found_run_end = False
         while not self.tasks.empty() and not found_run_end:
             task: Task = self.tasks.queue[0]
+            if task.name == "_restart_task":
+                logger.info("Found restart task.")
+                self.tasks.queue.popleft()
+                break
             if task.out is None:
                 completed_tasks.append(self.tasks.queue.popleft())
+
             else:
                 if task_dirs[self.iteration :] == []:
                     logger.info(
@@ -416,7 +421,6 @@ class RunManager:
                 for task_dir in task_dirs[self.iteration :]:
                     if (task_dir / MARK_STARTED).exists():
                         if (task_dir / MARK_DONE).exists():
-
                             # symlink task directories from previous output and discover their files
                             symlink_dir = self.config.out / task_dir.name
                             symlink_dir.symlink_to(task_dir, target_is_directory=True)
@@ -460,16 +464,6 @@ class RunManager:
                 logger.info(
                     f"Will continue after task {completed_tasks[-1].kwargs['files'].outputdir}"
                 )
-                # if using a manual restart, check whether first task in queue is `runmgr._restart_task`
-                if self.config.restart.manual:
-                    logger.debug(
-                        f"Tasks in queue: {self.tasks.queue}\n",
-                        f"Completed tasks: {completed_tasks}",
-                    )
-                    first_task = self.tasks.get()
-                    assert (
-                        first_task.name == "_restart_task"
-                    ), f"Manual restart chosen but restart task is not in the first position of the queue. Either it is in the wrong position or missing from the config file sequence."
 
                 self.iteration -= 1
                 break
@@ -519,7 +513,7 @@ class RunManager:
             residuetypes_path=getattr(self.config, "residuetypes", None),
         )
 
-    def _restart_task(self) -> None:
+    def _restart_task(self, files: TaskFiles) -> None:
         raise RuntimeError(
             f"Called restart task. This task is only for finding the restart point in the sequence and should never be called!"
         )

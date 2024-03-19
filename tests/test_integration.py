@@ -178,7 +178,15 @@ def test_integration_restart(arranged_tmp_path):
     # get reference
     kimmdy_run(input=Path("kimmdy_restart.yml"))
     n_files_original = len(list(run_dir.glob("*")))
-    # make run directory look unfinished
+
+    # try restart from restart task
+    kimmdy_run(input=Path("kimmdy_restart_task.yml"))
+    n_files_restart_task = len(list(restart_dir.glob("*")))
+
+    assert "Finished running tasks" in read_last_line(Path("kimmdy.log"))
+    assert n_files_original == n_files_restart_task == 15
+
+    # try restart from finished task
     task_dirs = get_task_directories(run_dir, "all")
     (task_dirs[-4] / MARK_DONE).unlink()
     kimmdy_run(input=Path("kimmdy_restart.yml"))

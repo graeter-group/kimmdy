@@ -3,7 +3,7 @@ Comstants used throughout KIMMDY
 """
 
 MARK_STARTED = ".kimmdy_started"
-MARK_DONE = ".kimmdy_running"
+MARK_DONE = ".kimmdy_done"
 MARK_FAILED = ".kimmdy_failed"
 MARKERS = [MARK_STARTED, MARK_DONE, MARK_FAILED]
 

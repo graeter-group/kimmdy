@@ -196,12 +196,6 @@
           "type": "string",
           "pytype": "Path",
           "description": "KIMMDY run directory to restart from"
-        },
-        "manual": {
-          "type": "boolean",
-          "pytype": "bool",
-          "default": false,
-          "description": "Option to make sure the restart is from a specific point in the sequence. Put a `restart` task in the sequence based on where you expect the run to continue and if it matches with the actual starting point, the KIMMDY run continues."
         }
       },
       "required": ["run_directory"]

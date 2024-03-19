@@ -29,7 +29,8 @@ reactions:
 
 sequence:
 - equilibrium
-- mult: 2
-  tasks:
-  - equilibrium
-  - reactions
+- equilibrium
+- reactions
+- equilibrium
+- restart
+- reactions
