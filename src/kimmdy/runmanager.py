@@ -17,6 +17,7 @@ from functools import partial
 from pathlib import Path
 from pprint import pformat
 from typing import Optional
+import re
 
 import dill
 
@@ -41,7 +42,7 @@ logger = logging.getLogger(__name__)
 # file types of which there will be multiple files per type
 AMBIGUOUS_SUFFS = ["dat", "xvg", "log", "itp", "mdp"]
 # file strings which to ignore
-IGNORE_SUBSTR = ["_prev.cpt"]
+IGNORE_SUBSTR = ["_prev.cpt", r"step\d+[bc]\.pdb"]
 # are there cases where we have multiple trr files?
 
 
@@ -334,7 +335,7 @@ class RunManager:
             discovered_files = [
                 p
                 for p in files.outputdir.iterdir()
-                if not any(s in p.name for s in IGNORE_SUBSTR)
+                if not any(re.search(s, p.name) for s in IGNORE_SUBSTR)
             ]
             suffs = [p.suffix[1:] for p in discovered_files]
             counts = [suffs.count(s) for s in suffs]
