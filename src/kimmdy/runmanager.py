@@ -19,6 +19,7 @@ from pprint import pformat
 import shutil
 from subprocess import CalledProcessError
 from typing import Optional
+import re
 
 from kimmdy.analysis import get_task_directories
 from kimmdy.config import Config
@@ -44,10 +45,10 @@ logger = logging.getLogger(__name__)
 AMBIGUOUS_SUFFS = ["dat", "xvg", "log", "itp", "mdp"]
 # file strings which to ignore
 IGNORE_SUBSTR = [
-    "_prev.cpt",
-    ".tail",
-    "_mod.top",
-    ".1#",
+    "_prev.cpt", r"step\d+[bc]\.pdb",
+    r"\.tail",
+    r"_mod\.top",
+    r"\.1#",
 ] + MARKERS
 # are there cases where we have multiple trr files?
 TASKS_WITHOUT_DIR = ["place_reaction_task"]
@@ -327,7 +328,7 @@ class RunManager:
             discovered_files = [
                 p
                 for p in files.outputdir.iterdir()
-                if not any(s in p.name for s in IGNORE_SUBSTR)
+                if not any(re.search(s, p.name) for s in IGNORE_SUBSTR)
             ]
             suffs = [p.suffix[1:] for p in discovered_files]
             counts = [suffs.count(s) for s in suffs]
@@ -700,9 +701,13 @@ class RunManager:
 
         if self.kmcresult.time_delta:
             self.time += self.kmcresult.time_delta
-        logger.info(
-            f"Done with Decide recipe, chosen recipe is: {recipe.get_recipe_name()} at overall time {self.time*1e-12:.4e} s, reaction occured after {self.kmcresult.time_delta*1e-12:.4e} s"
-        )
+        logger.info("Done with Decide recipe.")
+        if len(recipe.rates) == 0:
+            logger.info("No reaction selected")
+        elif self.kmcresult.time_delta:
+            logger.info(
+                f"Overall time {self.time*1e-12:.4e} s, reaction occured after {self.kmcresult.time_delta*1e-12:.4e} s"
+            )
 
         # capture state of radicals
         write_json(

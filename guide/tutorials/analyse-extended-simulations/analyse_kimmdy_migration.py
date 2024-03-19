@@ -1,9 +1,11 @@
+#%%
 import MDAnalysis as mda
 from pymol import cmd
 from pymol import cgo
 import numpy as np
 from pathlib import Path
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 import json
 
 
@@ -48,23 +50,11 @@ elif analysis_type == "count":
 
     counts = np.array([entry["count"] for entry in interactions.values()])
 
-    # Normalize the counts to the range [0, 1]
-    min_count = np.min(counts)
-    if not manual_max_count:
-        max_count = np.max(counts)
-    else:
-        max_count = manual_max_count
+    cmap = mpl.colormaps["autumn"].reversed()
+    norm = mpl.colors.Normalize(vmin=counts.min(), vmax=counts.max())
+    rgb = [np.asarray(cmap(norm(value))[:3]) for value in counts]
 
-    norm_counts = (counts - min_count) / (max_count - min_count)
-    print(f"min count: {min_count}, max count: {max_count}")
-    print(norm_counts)
-
-    # Use the purple sequential colormap
-    cmap = plt.get_cmap("Blues")
-
-    # Get RGB values for the normalized counts
-    rgb = [np.asarray(cmap(value)[:3]) for value in norm_counts]
-
+    
 # %%
 radius = 10
 counter = 0
