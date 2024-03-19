@@ -8,6 +8,7 @@ import subprocess as sp
 from datetime import datetime
 from pathlib import Path
 from typing import Optional, Union
+import re
 
 import matplotlib as mpl
 import matplotlib.patches as mpatches
@@ -208,6 +209,9 @@ def plot_energy(
                             energy[k].append(float(v) + time_offset)
                         else:
                             energy[k].append(float(v))
+                # get correct order of xvg_entries, not as in cmd!
+                elif match := re.match(r"@ s(\d+) legend \"(.*)\"", line):
+                    xvg_entries[int(match.group(1)) + 1] = match.group(2)
 
         time_offset = energy["time"][-1]
 
@@ -215,8 +219,8 @@ def plot_energy(
         id_vars=["time", "step", "step_ix"], value_vars=terms
     )
     step_names = df[df["variable"] == terms[0]]
-    step_names["variable"] = "Step"
-    step_names["value"] = step_names["step_ix"]
+    step_names.loc[:, "variable"] = "Step"
+    step_names.loc[:, "value"] = step_names["step_ix"]
     df = pd.concat([df, step_names], ignore_index=True)
 
     p = (
@@ -577,7 +581,7 @@ def plot_runtime(dir: str, md_tasks: list, datefmt: str, open_plot: bool = False
 
 
 def reaction_participation(dir: str, open_plot: bool = False):
-    """Plot runtime of all tasks.
+    """Plot which atoms participate in reactions.
 
     Parameters
     ----------
@@ -599,7 +603,8 @@ def reaction_participation(dir: str, open_plot: bool = False):
     for recipes in run_dir.glob("*decide_recipe/recipes.csv"):
         # get picked recipe
         _, picked_rp = RecipeCollection.from_csv(recipes)
-        assert picked_rp, f"No picked recipe found in {recipes}."
+        if not picked_rp:
+            continue
         # get involved atoms
         reaction_atom_ids = set()
         for step in picked_rp.recipe_steps:

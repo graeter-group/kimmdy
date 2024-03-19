@@ -40,7 +40,7 @@ The function must return a TaskFiles object.
 
 ### TaskFiles { #kimmdy.tasks.TaskFiles }
 
-`tasks.TaskFiles(get_latest, input=field(default_factory=dict), output=field(default_factory=dict), outputdir=Path(), logger=logging.getLogger('kimmdy.basetask'))`
+`tasks.TaskFiles(self, get_latest, input=dict(), output=dict(), outputdir=Path(), logger=logging.getLogger('kimmdy.basetask'))`
 
 Class for Task input and output files and directories.
 
