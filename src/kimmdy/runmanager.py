@@ -16,6 +16,7 @@ from enum import Enum, auto
 from functools import partial
 from pathlib import Path
 from pprint import pformat
+import shutil
 from subprocess import CalledProcessError
 from typing import Optional
 
@@ -46,6 +47,7 @@ IGNORE_SUBSTR = [
     "_prev.cpt",
     ".tail",
     "_mod.top",
+    ".1#",
 ] + MARKERS
 # are there cases where we have multiple trr files?
 TASKS_WITHOUT_DIR = ["place_reaction_task"]
@@ -419,43 +421,55 @@ class RunManager:
                     # Condition 1: Continue from the last finished task
                     found_run_end = True
                 for task_dir in task_dirs[self.iteration :]:
+                    if (task_dir / MARK_FAILED).exists():
+                        raise RuntimeError(
+                            f"Task in directory `{task_dir}` is indicated to have failed. Aborting restart. Remove this task directory if you want to restart from before the failed task."
+                        )
                     if (task_dir / MARK_STARTED).exists():
-                        if (task_dir / MARK_DONE).exists():
-                            # symlink task directories from previous output and discover their files
-                            symlink_dir = self.config.out / task_dir.name
-                            symlink_dir.symlink_to(task_dir, target_is_directory=True)
-                            self.iteration += 1
+                        # symlink task directories from previous output and discover their files
+                        symlink_dir = self.config.out / task_dir.name
+                        symlink_dir.symlink_to(task_dir, target_is_directory=True)
+                        self.iteration += 1
 
-                            task_name = "_".join(task_dir.name.split(sep="_")[1:])
-                            if task_name == task.out:
-                                task.kwargs.update(
-                                    {
-                                        "files": TaskFiles(
-                                            self.get_latest, {}, {}, symlink_dir
-                                        )
-                                    }
+                        task_name = "_".join(task_dir.name.split(sep="_")[1:])
+                        if task_name == task.out:
+                            task.kwargs.update(
+                                {
+                                    "files": TaskFiles(
+                                        self.get_latest, {}, {}, symlink_dir
+                                    )
+                                }
+                            )
+                            completed_tasks.append(self.tasks.queue.popleft())
+                            if not (task_dir / MARK_DONE).exists():
+                                logger.info(
+                                    f"Found started but not finished task {task_dir}."
                                 )
-                                completed_tasks.append(self.tasks.queue.popleft())
-                                break
-                            else:
-                                # task probably not unique but having the latest of one kind should suffice
-                                if not completed_tasks[-1] in nested_tasks.keys():
-                                    nested_tasks[completed_tasks[-1]] = []
-                                nested_tasks[completed_tasks[-1]].append(symlink_dir)
-                        elif (task_dir / MARK_FAILED).exists():
-                            raise RuntimeError(
-                                f"Task in directory `{task_dir}` is indicated to have failed. Aborting restart. Remove this task directory if you want to restart from before the failed task."
-                            )
-                        else:
-                            logger.info(
-                                f"Found started but not finished task {task_dir}."
-                            )
-                            # Condition 2: Continue from started but not finished task
-                            found_run_end = True
+                                if completed_tasks[-1].name == "_run_md":
+                                    symlink_dir.unlink(missing_ok=True)
+                                    shutil.copytree(
+                                        task_dir, self.config.out / task_dir.name
+                                    )
+                                    kwargs: dict = copy(task.kwargs)
+                                    continue_md_task = Task(
+                                        self, f=self._run_md, kwargs=kwargs, out=None
+                                    )
+
+                                    continue_md_task.kwargs.update(
+                                        {"continue_md": True}
+                                    )
+                                    self.crr_tasks.put(continue_md_task)
+                                # Condition 2: Continue from started but not finished task
+                                found_run_end = True
                             break
+                        else:
+                            # task probably not unique but having the latest of one kind should suffice
+                            if not completed_tasks[-1] in nested_tasks.keys():
+                                nested_tasks[completed_tasks[-1]] = []
+                            nested_tasks[completed_tasks[-1]].append(symlink_dir)
                     else:
                         raise RuntimeError(
-                            f"Encountered task directory but the task is not indicated to have started. Aborting restart."
+                            f"Encountered task directory {task_dir.name} but the task is not indicated to have started. Aborting restart."
                         )
 
         # add completed tasks to queue again until a reliable restart point (i.e after MD) is reached
@@ -518,7 +532,9 @@ class RunManager:
             f"Called restart task. This task is only for finding the restart point in the sequence and should never be called!"
         )
 
-    def _run_md(self, instance: str, files: TaskFiles) -> TaskFiles:
+    def _run_md(
+        self, instance: str, files: TaskFiles, continue_md: bool = False
+    ) -> TaskFiles:
         """General MD simulation"""
         logger = files.logger
         logger.info(f"Start MD {instance}")
@@ -527,12 +543,18 @@ class RunManager:
         md_config = self.config.mds.attr(instance)
         gmx_alias = self.config.gromacs_alias
         gmx_mdrun_flags = self.config.gmx_mdrun_flags
-
         top = files.input["top"]
         gro = files.input["gro"]
         files.input["mdp"] = md_config.mdp
         mdp = files.input["mdp"]
         ndx = files.input["ndx"]
+
+        # to continue MD after timeout
+        if continue_md:
+            cpt = files.input["cpt"]
+            logger.info(f"Restart from checkpoint file: {cpt}")
+        else:
+            cpt = f"{instance}.cpt"
 
         outputdir = files.outputdir
 
@@ -551,7 +573,7 @@ class RunManager:
         #     grompp_cmd += f" -e {edr}"
 
         mdrun_cmd = (
-            f"{gmx_alias} mdrun -s {instance}.tpr -cpi {instance}.cpt "
+            f"{gmx_alias} mdrun -s {instance}.tpr -cpi {cpt} "
             f"-x {instance}.xtc -o {instance}.trr -cpo {instance}.cpt "
             f"-c {instance}.gro -g {instance}.log -e {instance}.edr "
             f"-px {instance}_pullx.xvg -pf {instance}_pullf.xvg "
