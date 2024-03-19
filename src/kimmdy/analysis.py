@@ -581,7 +581,7 @@ def plot_runtime(dir: str, md_tasks: list, datefmt: str, open_plot: bool = False
 
 
 def reaction_participation(dir: str, open_plot: bool = False):
-    """Plot runtime of all tasks.
+    """Plot which atoms participate in reactions.
 
     Parameters
     ----------
