@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from kimmdy.cmd import kimmdy_run
-from kimmdy.constants import MARKER_FILES
+from kimmdy.constants import MARK_DONE
 from kimmdy.parsing import read_top, write_top
 from kimmdy.topology.topology import Topology
 from kimmdy.plugins import parameterization_plugins
@@ -180,7 +180,7 @@ def test_integration_restart(arranged_tmp_path):
     n_files_original = len(list(run_dir.glob("*")))
     # make run directory look unfinished
     task_dirs = get_task_directories(run_dir, "all")
-    (task_dirs[-4] / MARKER_FILES["done"]).unlink()
+    (task_dirs[-4] / MARK_DONE).unlink()
     kimmdy_run(input=Path("kimmdy_restart.yml"))
     n_files_restart = len(list(restart_dir.glob("*")))
 
