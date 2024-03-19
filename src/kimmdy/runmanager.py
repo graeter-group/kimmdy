@@ -19,7 +19,7 @@ from pprint import pformat
 from subprocess import CalledProcessError
 from typing import Optional
 
-from kimmdy.analysis import get_step_directories
+from kimmdy.analysis import get_task_directories
 from kimmdy.config import Config
 from kimmdy.constants import MARKER_FILES
 from kimmdy.coordinates import break_bond_plumed, merge_top_slow_growth, place_atom
@@ -402,7 +402,7 @@ class RunManager:
     def _restart_from_rundir(self):
         """Set up RunManager to restart from a run directory"""
 
-        task_dirs = get_step_directories(self.config.restart.run_directory, "all")
+        task_dirs = get_task_directories(self.config.restart.run_directory, "all")
         logger.debug(f"Found task directories in restart run directory: {task_dirs}")
         logger.debug(f"Task queue: {self.tasks.queue}")
 
@@ -499,7 +499,7 @@ class RunManager:
             self.iteration -= 1
 
         # discover after it is clear which tasks will be in queue
-        for task_dir in get_step_directories(self.config.out, "all"):
+        for task_dir in get_task_directories(self.config.out, "all"):
             task_name = "_".join(task_dir.name.split(sep="_")[1:])
             task_files = TaskFiles(
                 self.get_latest, {}, {}, self.config.out / task_dir.name

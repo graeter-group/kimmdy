@@ -20,7 +20,7 @@ from seaborn import axes_style
 
 from kimmdy.parsing import read_json, write_json
 from kimmdy.recipe import Bind, Break, Place, RecipeCollection
-from kimmdy.utils import run_shell_cmd
+from kimmdy.utils import run_shell_cmd, get_task_directories
 
 
 def get_analysis_dir(dir: Path) -> Path:
@@ -40,35 +40,6 @@ def get_analysis_dir(dir: Path) -> Path:
     out = dir / "analysis"
     out.mkdir(exist_ok=True)
     return out
-
-
-def get_step_directories(dir: Path, steps: Union[list[str], str] = "all") -> list[Path]:
-    """
-    create list of subdirectories that match the steps.
-    If steps is "all", all subdirectories are returned.
-
-    Parameters
-    ----------
-    dir
-        Directory to search for subdirectories
-    steps
-        List of steps e.g. ["equilibrium", "production"]. Or a string "all" to return all subdirectories
-    """
-    directories = sorted(
-        [p for p in dir.glob("*_*/") if p.is_dir()],
-        key=lambda p: int(p.name.split("_")[0]),
-    )
-    if steps == "all":
-        matching_directories = directories
-    else:
-        matching_directories = list(
-            filter(lambda d: d.name.split("_")[1] in steps, directories)
-        )
-
-    if not matching_directories:
-        print(f"WARNING: Could not find directories {steps} in {dir}.")
-
-    return matching_directories
 
 
 def concat_traj(
@@ -95,7 +66,7 @@ def concat_traj(
     run_dir = Path(dir).expanduser().resolve()
     analysis_dir = get_analysis_dir(run_dir)
 
-    directories = get_step_directories(run_dir, steps)
+    directories = get_task_directories(run_dir, steps)
     if not directories:
         raise ValueError(
             f"Could not find directories {steps} in {dir}. Thus, no trajectories can be concatenated"
@@ -167,7 +138,7 @@ def plot_energy(
     xvg_entries = ["time"] + terms
     terms_str = "\n".join(terms)
 
-    subdirs_matched = get_step_directories(run_dir, steps)
+    subdirs_matched = get_task_directories(run_dir, steps)
 
     analysis_dir = get_analysis_dir(run_dir)
     xvgs_dir = analysis_dir / "energy_xvgs"
@@ -275,7 +246,7 @@ def radical_population(
     run_dir = Path(dir).expanduser().resolve()
     analysis_dir = get_analysis_dir(run_dir)
 
-    subdirs_matched = get_step_directories(run_dir, steps)
+    subdirs_matched = get_task_directories(run_dir, steps)
     radical_jsons = list(run_dir.glob("**/radicals.json"))
     radical_jsons.sort(
         key=lambda x: int(x.parents[0].name.split("_")[0])

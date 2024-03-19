@@ -9,7 +9,7 @@ from kimmdy.constants import MARKER_FILES
 from kimmdy.parsing import read_top, write_top
 from kimmdy.topology.topology import Topology
 from kimmdy.plugins import parameterization_plugins
-from kimmdy.analysis import get_step_directories
+from kimmdy.analysis import get_task_directories
 
 
 def read_last_line(file):
@@ -179,7 +179,7 @@ def test_integration_restart(arranged_tmp_path):
     kimmdy_run(input=Path("kimmdy_restart.yml"))
     n_files_original = len(list(run_dir.glob("*")))
     # make run directory look unfinished
-    task_dirs = get_step_directories(run_dir, "all")
+    task_dirs = get_task_directories(run_dir, "all")
     (task_dirs[-4] / MARKER_FILES["done"]).unlink()
     kimmdy_run(input=Path("kimmdy_restart.yml"))
     n_files_restart = len(list(restart_dir.glob("*")))
