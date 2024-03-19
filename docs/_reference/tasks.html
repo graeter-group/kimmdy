@@ -591,7 +591,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="kimmdy.tasks.TaskFiles" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.tasks.TaskFiles">TaskFiles</h3>
-<p><code>tasks.TaskFiles(get_latest, input=field(default_factory=dict), output=field(default_factory=dict), outputdir=Path(), logger=logging.getLogger('kimmdy.basetask'))</code></p>
+<p><code>tasks.TaskFiles(self, get_latest, input=dict(), output=dict(), outputdir=Path(), logger=logging.getLogger('kimmdy.basetask'))</code></p>
 <p>Class for Task input and output files and directories.</p>
 <p>Hosts the input and output file paths belonging to a task. A function or method that wants to be callable as a Task has to return a TaskFiles object. The input defaultdict is populated on the fly using get_latest of the runmanager to find newest files. Files which can not be found by get_latest must be added manually.</p>
 <section id="attributes" class="level4">

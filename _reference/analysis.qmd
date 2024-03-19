@@ -19,7 +19,7 @@ For command line usage, run `kimmdy-analysis -h`.
 | [plot_runtime](#kimmdy.analysis.plot_runtime) | Plot runtime of all tasks. |
 | [radical_migration](#kimmdy.analysis.radical_migration) | Plot population of radicals for a KIMMDY run. |
 | [radical_population](#kimmdy.analysis.radical_population) | Plot population of radicals for a KIMMDY run. |
-| [reaction_participation](#kimmdy.analysis.reaction_participation) | Plot runtime of all tasks. |
+| [reaction_participation](#kimmdy.analysis.reaction_participation) | Plot which atoms participate in reactions. |
 
 ### concat_traj { #kimmdy.analysis.concat_traj }
 
@@ -166,7 +166,7 @@ Plot population of radicals for a KIMMDY run.
 
 `analysis.reaction_participation(dir, open_plot=False)`
 
-Plot runtime of all tasks.
+Plot which atoms participate in reactions.
 
 #### Parameters
 
