@@ -717,7 +717,7 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="kimmdy.recipe.CustomTopMod" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.recipe.CustomTopMod">CustomTopMod</h3>
-<p><code>recipe.CustomTopMod(f)</code></p>
+<p><code>recipe.CustomTopMod(self, f)</code></p>
 <p>A custom recipe step that can be used to define a custom topology modification.</p>
 <section id="parameters-3" class="level4">
 <h4 class="anchored" data-anchor-id="parameters-3">Parameters</h4>
@@ -782,7 +782,7 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="kimmdy.recipe.Recipe" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.recipe.Recipe">Recipe</h3>
-<p><code>recipe.Recipe(recipe_steps, rates, timespans)</code></p>
+<p><code>recipe.Recipe(self, recipe_steps, rates, timespans)</code></p>
 <p>A reaction path defined by one series of RecipeSteps. Defines everything necessart to build the product state from the educt state.</p>
 <section id="parameters-5" class="level4">
 <h4 class="anchored" data-anchor-id="parameters-5">Parameters</h4>
@@ -872,7 +872,7 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="kimmdy.recipe.RecipeCollection" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.recipe.RecipeCollection">RecipeCollection</h3>
-<p><code>recipe.RecipeCollection(recipes)</code></p>
+<p><code>recipe.RecipeCollection(self, recipes)</code></p>
 <p>A RecipeCollection encompasses a number of reaction paths. They can originate from multiple reaction plugins, but do not need to.</p>
 <section id="returns" class="level4">
 <h4 class="anchored" data-anchor-id="returns">Returns</h4>
@@ -1032,7 +1032,7 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="kimmdy.recipe.Relax" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.recipe.Relax">Relax</h3>
-<p><code>recipe.Relax()</code></p>
+<p><code>recipe.Relax(self)</code></p>
 <p>Start a relaxation MD.</p>
 <p>The molecular system coordinates are far out of equilibrium after most topology changes. A relaxtion MD simulation using for example the slow growth method helps to reach the new equilibrium.</p>
 

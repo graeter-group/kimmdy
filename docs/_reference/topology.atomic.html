@@ -581,49 +581,49 @@ ul.task-list li input[type="checkbox"] {
 </table>
 <section id="kimmdy.topology.atomic.Angle" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.Angle">Angle</h3>
-<p><code>topology.atomic.Angle(ai, aj, ak, funct, c0=None, c1=None, c2=None, c3=None)</code></p>
+<p><code>topology.atomic.Angle(self, ai, aj, ak, funct, c0=None, c1=None, c2=None, c3=None)</code></p>
 <p>Information about one angle</p>
 <p>A class containing angle information as in the angles section of the topology.</p>
 <p>From gromacs topology: ; ai aj ak funct c0 c1 c2 c3 With aj &lt; ai &lt; ak</p>
 </section>
 <section id="kimmdy.topology.atomic.AngleType" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.AngleType">AngleType</h3>
-<p><code>topology.atomic.AngleType(i, j, k, id, id_sym, funct, c0=None, c1=None, c2=None, c3=None)</code></p>
+<p><code>topology.atomic.AngleType(self, i, j, k, id, id_sym, funct, c0=None, c1=None, c2=None, c3=None)</code></p>
 <p>Information about one angletype</p>
 <p>A class containing angle type information as in the angletypes section of the forcefield.</p>
 <p>From gromacs version of the amber* ff: ; i j k func th0 cth</p>
 </section>
 <section id="kimmdy.topology.atomic.Atom" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.Atom">Atom</h3>
-<p><code>topology.atomic.Atom(nr, type, resnr, residue, atom, cgnr, charge, mass=None, typeB=None, chargeB=None, massB=None, bound_to_nrs=field(default_factory=list), is_radical=False)</code></p>
+<p><code>topology.atomic.Atom(self, nr, type, resnr, residue, atom, cgnr, charge, mass=None, typeB=None, chargeB=None, massB=None, bound_to_nrs=list(), is_radical=False)</code></p>
 <p>Information about one atom</p>
 <p>A class containing atom information as in the atoms section of the topology. An atom keeps a list of which atoms it is bound to and its radical state.</p>
 <p>From gromacs topology: ; nr type resnr residue atom cgnr charge mass typeB chargeB massB</p>
 </section>
 <section id="kimmdy.topology.atomic.AtomType" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.AtomType">AtomType</h3>
-<p><code>topology.atomic.AtomType(type, id_sym, at_num, mass, charge, ptype, sigma, epsilon, id)</code></p>
+<p><code>topology.atomic.AtomType(self, type, id_sym, at_num, mass, charge, ptype, sigma, epsilon, id)</code></p>
 <p>Information about one atom type</p>
 <p>A class containing atom type information as in the atomtypes section of the forcefield.</p>
 <p>From gromacs version of the amber* ff: ; name at.num mass charge ptype sigma epsilon</p>
 </section>
 <section id="kimmdy.topology.atomic.Bond" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.Bond">Bond</h3>
-<p><code>topology.atomic.Bond(ai, aj, funct, c0=None, c1=None, c2=None, c3=None, c4=None, c5=None)</code></p>
+<p><code>topology.atomic.Bond(self, ai, aj, funct, c0=None, c1=None, c2=None, c3=None, c4=None, c5=None)</code></p>
 <p>Information about one bond</p>
 <p>A class containing bond information as in the bonds section of the topology.</p>
 <p>From gromacs topology: ; ai aj funct c0 c1 c2 c3 c4 c5 With ai &lt; aj</p>
 </section>
 <section id="kimmdy.topology.atomic.BondType" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.BondType">BondType</h3>
-<p><code>topology.atomic.BondType(i, j, id, id_sym, funct, c0=None, c1=None, c2=None, c3=None)</code></p>
+<p><code>topology.atomic.BondType(self, i, j, id, id_sym, funct, c0=None, c1=None, c2=None, c3=None)</code></p>
 <p>Information about one bondtype</p>
 <p>A class containing bond information as in the bondtype section of the forcefield.</p>
 <p>From gromacs version of the amber* ff: ; i j func b0 kb Where i and j are atomtypes</p>
 </section>
 <section id="kimmdy.topology.atomic.Dihedral" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.Dihedral">Dihedral</h3>
-<p><code>topology.atomic.Dihedral(ai, aj, ak, al, funct, c0=None, c1=None, periodicity='', c3=None, c4=None, c5=None)</code></p>
+<p><code>topology.atomic.Dihedral(self, ai, aj, ak, al, funct, c0=None, c1=None, periodicity='', c3=None, c4=None, c5=None)</code></p>
 <p>Information about one proper or improper dihedral</p>
 <p>A class containing dihedral information as in the dihedrals section of the topology. Improper dihedrals have funct 4. Proper dihedrals have funct != 4, mostly funct 9.</p>
 <p>Note that proper dihedrals of type 9 can be defined multiple times, for different periodicities. This is why would-be parameter c2 is called periodicity.</p>
@@ -631,14 +631,14 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="kimmdy.topology.atomic.DihedralRestraint" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.DihedralRestraint">DihedralRestraint</h3>
-<p><code>topology.atomic.DihedralRestraint(ai, aj, ak, al, type, phi, dphi, fc)</code></p>
+<p><code>topology.atomic.DihedralRestraint(self, ai, aj, ak, al, type, phi, dphi, fc)</code></p>
 <p>Information about one dihedral restraint.</p>
 <p>A class containing information as in the dihedral_restraints section of the topology.</p>
 <p>From gromacs topology: ; ai aj ak al type phi dphi fc</p>
 </section>
 <section id="kimmdy.topology.atomic.DihedralType" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.DihedralType">DihedralType</h3>
-<p><code>topology.atomic.DihedralType(i, j, k, l, id, id_sym, funct, c0, c1, periodicity, c3=None, c4=None, c5=None)</code></p>
+<p><code>topology.atomic.DihedralType(self, i, j, k, l, id, id_sym, funct, c0, c1, periodicity, c3=None, c4=None, c5=None)</code></p>
 <p>Information about one dihedraltype</p>
 <p>A class containing dihedral type information as in the dihedraltypes section of the forcefield. Improper dihedrals have funct 4. Proper dihedrals have funct 9.</p>
 <p>Note that proper dihedrals of type 9 can be defined multiple times, for different periodicities. This is why would-be parameter c2 is called periodicity and part of the <code>id</code>.</p>
@@ -646,67 +646,67 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="kimmdy.topology.atomic.Exclusion" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.Exclusion">Exclusion</h3>
-<p><code>topology.atomic.Exclusion(ai, aj, ak=None, al=None)</code></p>
+<p><code>topology.atomic.Exclusion(self, ai, aj, ak=None, al=None)</code></p>
 <p>Information about one exclusion</p>
 <p>A class containing atom information as in the exclusions section of the topology.</p>
 <p>From gromacs topology: ; ai aj ak al</p>
 </section>
 <section id="kimmdy.topology.atomic.MultipleDihedralTypes" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.MultipleDihedralTypes">MultipleDihedralTypes</h3>
-<p><code>topology.atomic.MultipleDihedralTypes(ai, aj, ak, al, funct, dihedral_types)</code></p>
+<p><code>topology.atomic.MultipleDihedralTypes(self, ai, aj, ak, al, funct, dihedral_types)</code></p>
 <p>Multiple <code>DihedralTypes</code>s with the same ai, aj, ak, al but different periodicities. funct should always be “9” when the length of dihedrals is &gt; 1. The key of the dihedral_types dict is the periodicity (c2).</p>
 </section>
 <section id="kimmdy.topology.atomic.MultipleDihedrals" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.MultipleDihedrals">MultipleDihedrals</h3>
-<p><code>topology.atomic.MultipleDihedrals(ai, aj, ak, al, funct, dihedrals)</code></p>
+<p><code>topology.atomic.MultipleDihedrals(self, ai, aj, ak, al, funct, dihedrals)</code></p>
 <p>Multiple <code>Dihedral</code>s with the same ai, aj, ak, al but different periodicities. funct should always be “9” when the length of dihedrals is &gt; 1. The key of the dihedrals dict is the periodicity (c2).</p>
 </section>
 <section id="kimmdy.topology.atomic.Pair" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.Pair">Pair</h3>
-<p><code>topology.atomic.Pair(ai, aj, funct, c0=None, c1=None, c2=None, c3=None)</code></p>
+<p><code>topology.atomic.Pair(self, ai, aj, funct, c0=None, c1=None, c2=None, c3=None)</code></p>
 <p>Information about one pair</p>
 <p>A class containing pair information as in the pair section of the topology.</p>
 <p>From gromacs topology: ; ai aj funct c0 c1 c2 c3</p>
 </section>
 <section id="kimmdy.topology.atomic.PositionRestraint" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.PositionRestraint">PositionRestraint</h3>
-<p><code>topology.atomic.PositionRestraint(ai, funct, fc, condition=None)</code></p>
+<p><code>topology.atomic.PositionRestraint(self, ai, funct, fc, condition=None)</code></p>
 <p>Information about one position restraint.</p>
 <p>A class containing information as in the position_restraints section of the topology.</p>
 <p>From gromacs topology: ; ai funct fc(x,y,z)</p>
 </section>
 <section id="kimmdy.topology.atomic.ResidueAtomSpec" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.ResidueAtomSpec">ResidueAtomSpec</h3>
-<p><code>topology.atomic.ResidueAtomSpec(name, type, charge, cgrp)</code></p>
+<p><code>topology.atomic.ResidueAtomSpec(self, name, type, charge, cgrp)</code></p>
 <p>Information about one atom in a residue</p>
 <p>; name type charge chargegroup</p>
 </section>
 <section id="kimmdy.topology.atomic.ResidueBondSpec" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.ResidueBondSpec">ResidueBondSpec</h3>
-<p><code>topology.atomic.ResidueBondSpec(atom1, atom2, b0=None, kb=None)</code></p>
+<p><code>topology.atomic.ResidueBondSpec(self, atom1, atom2, b0=None, kb=None)</code></p>
 <p>Information about one bond in a residue</p>
 <p>; atom1 atom2 b0 kb</p>
 </section>
 <section id="kimmdy.topology.atomic.ResidueImproperSpec" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.ResidueImproperSpec">ResidueImproperSpec</h3>
-<p><code>topology.atomic.ResidueImproperSpec(atom1, atom2, atom3, atom4, c0, c1, c2)</code></p>
+<p><code>topology.atomic.ResidueImproperSpec(self, atom1, atom2, atom3, atom4, c0, c1, c2)</code></p>
 <p>Information about one improper dihedral in a residue</p>
 <p>; atom1 atom2 atom3 atom4 c0(q0) c1(cp) c2(mult)</p>
 </section>
 <section id="kimmdy.topology.atomic.ResidueProperSpec" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.ResidueProperSpec">ResidueProperSpec</h3>
-<p><code>topology.atomic.ResidueProperSpec(atom1, atom2, atom3, atom4, c0, c1, c2)</code></p>
+<p><code>topology.atomic.ResidueProperSpec(self, atom1, atom2, atom3, atom4, c0, c1, c2)</code></p>
 <p>Information about one proper dihedral in a residue</p>
 <p>; atom1 atom2 atom3 atom4 c0(q0) c1(cq) c2</p>
 </section>
 <section id="kimmdy.topology.atomic.ResidueType" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.ResidueType">ResidueType</h3>
-<p><code>topology.atomic.ResidueType(residue, atoms, bonds, proper_dihedrals, improper_dihedrals)</code></p>
+<p><code>topology.atomic.ResidueType(self, residue, atoms, bonds, proper_dihedrals, improper_dihedrals)</code></p>
 <p>Information about one residuetype from aminoacids.rtp</p>
 </section>
 <section id="kimmdy.topology.atomic.Settle" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.Settle">Settle</h3>
-<p><code>topology.atomic.Settle(nr, funct, doh, dhh)</code></p>
+<p><code>topology.atomic.Settle(self, nr, funct, doh, dhh)</code></p>
 <p>Information about one settles</p>
 <p>A class containing atom information as in the settle section of the topology.</p>
 <p>From gromacs topology: ; nr funct doh dhh</p>
