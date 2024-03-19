@@ -45,7 +45,8 @@ logger = logging.getLogger(__name__)
 AMBIGUOUS_SUFFS = ["dat", "xvg", "log", "itp", "mdp"]
 # file strings which to ignore
 IGNORE_SUBSTR = [
-    "_prev.cpt", r"step\d+[bc]\.pdb",
+    "_prev.cpt",
+    r"step\d+[bc]\.pdb",
     r"\.tail",
     r"_mod\.top",
     r"\.1#",
