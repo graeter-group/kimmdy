@@ -5,10 +5,11 @@ For command line usage, run `kimmdy-analysis -h`.
 import argparse
 import json
 import subprocess as sp
+import re
 from datetime import datetime
 from pathlib import Path
 from typing import Optional, Union
-import re
+from collections import defaultdict
 
 import matplotlib as mpl
 import matplotlib.patches as mpatches
@@ -180,12 +181,7 @@ def plot_energy(
         len(edrs) > 0
     ), f"No GROMACS energy files in {run_dir} with subdirectory names {steps}"
 
-    energy = {}
-    for k in xvg_entries:
-        energy[k] = []
-
-    energy["step"] = []
-    energy["step_ix"] = []
+    energy = defaultdict(list)
 
     time_offset = 0
     for i, edr in enumerate(edrs):
@@ -214,6 +210,9 @@ def plot_energy(
                     xvg_entries[int(match.group(1)) + 1] = match.group(2)
 
         time_offset = energy["time"][-1]
+
+    # resolve eventual term numbers to strings
+    terms = xvg_entries[1:]
 
     df = pd.DataFrame(energy).melt(
         id_vars=["time", "step", "step_ix"], value_vars=terms
