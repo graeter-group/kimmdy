@@ -187,8 +187,8 @@ def morse_transition_rate(
     r_0: float,
     dissociation_energy: float,
     k_f: float,
-    k_0: float = 0.288,
-    kT: float = 2.479,
+    frequency_factor: float = 0.288,
+    temperature: float = 300,
 ) -> tuple[list[float], list[float]]:
     """Calculates reaction rate constant for a bond breaking event.
 
@@ -209,11 +209,11 @@ def morse_transition_rate(
         Dissociation energy of the bond.
     k_f:
         Spring constant of the bond.
-    k_0:
+    frequency_factor:
         Prefactor of the Arrhenius equation in [1/ps]. Default value from fitting averaged C_a - N data to gromacs data, see original KIMMDY paper
         Alternatively 1/2pi sqrt(k/m).
-    kT:
-        Constant in the Arrhenius equation in GROMACS units [kJ mol-1], default for 310K.
+    temperature:
+        Temperature for the Arrhenius equation in GROMACS units.
 
     """
     rs = np.asarray(r_curr)
@@ -275,7 +275,8 @@ def morse_transition_rate(
     delta_v = v_max - v_min
 
     # calculate reaction rate constant from barrier heigth
-    k = k_0 * np.exp(-delta_v / kT)  # [1/ps]
+    R = 8.31446261815324e-3  # [kJ K-1 mol-1]
+    k = frequency_factor * np.exp(-delta_v / (R * temperature))  # [1/ps]
 
     return k, fs
 
