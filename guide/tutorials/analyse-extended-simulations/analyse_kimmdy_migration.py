@@ -1,4 +1,4 @@
-#%%
+# %%
 import MDAnalysis as mda
 from pymol import cmd
 from pymol import cgo
@@ -54,7 +54,7 @@ elif analysis_type == "count":
     norm = mpl.colors.Normalize(vmin=counts.min(), vmax=counts.max())
     rgb = [np.asarray(cmap(norm(value))[:3]) for value in counts]
 
-    
+
 # %%
 radius = 10
 counter = 0
