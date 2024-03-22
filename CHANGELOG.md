@@ -1,5 +1,23 @@
 # Changelog
 
+## [6.4.1](https://github.com/hits-mbm-dev/kimmdy/compare/v6.4.0...v6.4.1) (2024-03-21)
+
+
+### Bug Fixes
+
+* allow reactions with no chosen recipe ([171c7e1](https://github.com/hits-mbm-dev/kimmdy/commit/171c7e1df818b8da71198a99e9dbcb0738b7f800))
+* colormap normalization ([#415](https://github.com/hits-mbm-dev/kimmdy/issues/415)) ([1238397](https://github.com/hits-mbm-dev/kimmdy/commit/12383974b1930af38a89ccdcd7b9d1f5c74ed60a))
+* energy labels sorted correctly ([855272f](https://github.com/hits-mbm-dev/kimmdy/commit/855272f44f965d9240abd2cb529449597badd8da))
+* expose arrhenius equation in morse function and fix wrong default value ([#417](https://github.com/hits-mbm-dev/kimmdy/issues/417)) ([58c47b3](https://github.com/hits-mbm-dev/kimmdy/commit/58c47b31dda698f6005e52e5fc8cf4e7736a5774))
+* plot_energy now handles numbers in terms correctly. ([c16888b](https://github.com/hits-mbm-dev/kimmdy/commit/c16888bf6fc08715c0819638a2869fd435831d90))
+* remove pd warning ([abc4afe](https://github.com/hits-mbm-dev/kimmdy/commit/abc4afe11fa0ddb5e35bfdd7889afe1114c0a576))
+* runmanager now handles empty kmcresults correctly. ([c94bd2a](https://github.com/hits-mbm-dev/kimmdy/commit/c94bd2a2a92765a4e2d88496ea377725fd11d3b5))
+
+
+### Documentation
+
+* fix docstring ([9572791](https://github.com/hits-mbm-dev/kimmdy/commit/9572791ef4e3375bcb82def24c9cf1af2d7c4678))
+
 ## [6.4.0](https://github.com/hits-mbm-dev/kimmdy/compare/v6.3.0...v6.4.0) (2024-03-07)
 
 
