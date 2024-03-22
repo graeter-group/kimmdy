@@ -95,7 +95,7 @@ Run command in shell and capture stdout.
 
 ### morse_transition_rate { #kimmdy.utils.morse_transition_rate }
 
-`utils.morse_transition_rate(r_curr, r_0, dissociation_energy, k_f, k_0=0.288, kT=2.479)`
+`utils.morse_transition_rate(r_curr, r_0, dissociation_energy, k_f, frequency_factor=0.288, temperature=300)`
 
 Calculates reaction rate constant for a bond breaking event.
 
@@ -108,14 +108,14 @@ The calculation should be according to the derivation in the original KIMMDY pap
 
 #### Parameters
 
-| Name           | Type                               | Description                                                                                                                                                               | Default    |
-|----------------|------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
-| `r_curr`       | [list](`list`)\[[float](`float`)\] | Bond distances for a single bond, typically from a time series.                                                                                                           | _required_ |
-| `r_0`          | [float](`float`)                   | Equilibrium bond length of the bond.                                                                                                                                      | _required_ |
-| `dissociation` |                                    | Dissociation energy of the bond.                                                                                                                                          | _required_ |
-| `k_f`          | [float](`float`)                   | Spring constant of the bond.                                                                                                                                              | _required_ |
-| `k_0`          | [float](`float`)                   | Prefactor of the Arrhenius equation in [1/ps]. Default value from fitting averaged C_a - N data to gromacs data, see original KIMMDY paper Alternatively 1/2pi sqrt(k/m). | `0.288`    |
-| `kT`           | [float](`float`)                   | Constant in the Arrhenius equation in GROMACS units [kJ mol-1], default for 310K.                                                                                         | `2.479`    |
+| Name               | Type                               | Description                                                                                                                                                               | Default    |
+|--------------------|------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| `r_curr`           | [list](`list`)\[[float](`float`)\] | Bond distances for a single bond, typically from a time series.                                                                                                           | _required_ |
+| `r_0`              | [float](`float`)                   | Equilibrium bond length of the bond.                                                                                                                                      | _required_ |
+| `dissociation`     |                                    | Dissociation energy of the bond.                                                                                                                                          | _required_ |
+| `k_f`              | [float](`float`)                   | Spring constant of the bond.                                                                                                                                              | _required_ |
+| `frequency_factor` | [float](`float`)                   | Prefactor of the Arrhenius equation in [1/ps]. Default value from fitting averaged C_a - N data to gromacs data, see original KIMMDY paper Alternatively 1/2pi sqrt(k/m). | `0.288`    |
+| `temperature`      | [float](`float`)                   | Temperature for the Arrhenius equation in GROMACS units.                                                                                                                  | `300`      |
 
 ### run_gmx { #kimmdy.utils.run_gmx }
 
