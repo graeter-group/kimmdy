@@ -470,15 +470,19 @@ ul.task-list li input[type="checkbox"] {
   </ul></li>
   <li><a href="#kimmdy.utils.get_gmx_dir" id="toc-kimmdy.utils.get_gmx_dir" class="nav-link" data-scroll-target="#kimmdy.utils.get_gmx_dir">get_gmx_dir</a></li>
   <li><a href="#kimmdy.utils.get_shell_stdout" id="toc-kimmdy.utils.get_shell_stdout" class="nav-link" data-scroll-target="#kimmdy.utils.get_shell_stdout">get_shell_stdout</a></li>
-  <li><a href="#kimmdy.utils.morse_transition_rate" id="toc-kimmdy.utils.morse_transition_rate" class="nav-link" data-scroll-target="#kimmdy.utils.morse_transition_rate">morse_transition_rate</a>
+  <li><a href="#kimmdy.utils.get_task_directories" id="toc-kimmdy.utils.get_task_directories" class="nav-link" data-scroll-target="#kimmdy.utils.get_task_directories">get_task_directories</a>
   <ul class="collapse">
   <li><a href="#parameters-3" id="toc-parameters-3" class="nav-link" data-scroll-target="#parameters-3">Parameters</a></li>
+  </ul></li>
+  <li><a href="#kimmdy.utils.morse_transition_rate" id="toc-kimmdy.utils.morse_transition_rate" class="nav-link" data-scroll-target="#kimmdy.utils.morse_transition_rate">morse_transition_rate</a>
+  <ul class="collapse">
+  <li><a href="#parameters-4" id="toc-parameters-4" class="nav-link" data-scroll-target="#parameters-4">Parameters</a></li>
   </ul></li>
   <li><a href="#kimmdy.utils.run_gmx" id="toc-kimmdy.utils.run_gmx" class="nav-link" data-scroll-target="#kimmdy.utils.run_gmx">run_gmx</a></li>
   <li><a href="#kimmdy.utils.run_shell_cmd" id="toc-kimmdy.utils.run_shell_cmd" class="nav-link" data-scroll-target="#kimmdy.utils.run_shell_cmd">run_shell_cmd</a></li>
   <li><a href="#kimmdy.utils.truncate_sim_files" id="toc-kimmdy.utils.truncate_sim_files" class="nav-link" data-scroll-target="#kimmdy.utils.truncate_sim_files">truncate_sim_files</a>
   <ul class="collapse">
-  <li><a href="#parameters-4" id="toc-parameters-4" class="nav-link" data-scroll-target="#parameters-4">Parameters</a></li>
+  <li><a href="#parameters-5" id="toc-parameters-5" class="nav-link" data-scroll-target="#parameters-5">Parameters</a></li>
   </ul></li>
   </ul></li>
   </ul></li>
@@ -550,18 +554,22 @@ ul.task-list li input[type="checkbox"] {
 <td>Run command in shell and capture stdout.</td>
 </tr>
 <tr class="even">
+<td><a href="#kimmdy.utils.get_task_directories">get_task_directories</a></td>
+<td>create list of subdirectories that match the tasks.</td>
+</tr>
+<tr class="odd">
 <td><a href="#kimmdy.utils.morse_transition_rate">morse_transition_rate</a></td>
 <td>Calculates reaction rate constant for a bond breaking event.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#kimmdy.utils.run_gmx">run_gmx</a></td>
 <td>Run GROMACS command in shell.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#kimmdy.utils.run_shell_cmd">run_shell_cmd</a></td>
 <td>Run command in shell.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#kimmdy.utils.truncate_sim_files">truncate_sim_files</a></td>
 <td>Truncates latest trr, xtc, edr, and gro to the time to a previous</td>
 </tr>
@@ -690,14 +698,46 @@ ul.task-list li input[type="checkbox"] {
 <p><code>utils.get_shell_stdout(s)</code></p>
 <p>Run command in shell and capture stdout.</p>
 </section>
+<section id="kimmdy.utils.get_task_directories" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.utils.get_task_directories">get_task_directories</h3>
+<p><code>utils.get_task_directories(dir, tasks='all')</code></p>
+<p>create list of subdirectories that match the tasks. If tasks is “all”, all subdirectories are returned.</p>
+<section id="parameters-3" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-3">Parameters</h4>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>dir</code></td>
+<td><a href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path">Path</a></td>
+<td>Directory to search for subdirectories</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td><code>tasks</code></td>
+<td><a href="https://docs.python.org/3.10/library/typing.html#typing.Union">Union</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#list">list</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>], <a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>]</td>
+<td>List of steps e.g.&nbsp;[“equilibrium”, “production”]. Or a string “all” to return all subdirectories</td>
+<td><code>'all'</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
 <section id="kimmdy.utils.morse_transition_rate" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.utils.morse_transition_rate">morse_transition_rate</h3>
 <p><code>utils.morse_transition_rate(r_curr, r_0, dissociation_energy, k_f, frequency_factor=0.288, temperature=300)</code></p>
 <p>Calculates reaction rate constant for a bond breaking event.</p>
 <p>Uses the Morse potential model for this calculation. For an array of bond distances of the same bond, first calculates the forces on the bond, then the minima and maxima of the shifted Morse potential to get an energy barrier and finally a reaction rate constant using the Arrhenius equation. For intramolecular reactions, the reaction rate constant is equal to the reaction rate.</p>
 <p>The calculation should be according to the derivation in the original KIMMDY paper: DOI: 10.1021/acs.jctc.9b00786</p>
-<section id="parameters-3" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-3">Parameters</h4>
+<section id="parameters-4" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-4">Parameters</h4>
 <table class="table">
 <thead>
 <tr class="header">
@@ -764,8 +804,8 @@ ul.task-list li input[type="checkbox"] {
 <p><code>utils.truncate_sim_files(files, time, keep_tail=True)</code></p>
 <p>Truncates latest trr, xtc, edr, and gro to the time to a previous point in time.</p>
 <p>The files stay in place, the truncated tail is by default kept and renamed to ‘[…xtc].tail’</p>
-<section id="parameters-4" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-4">Parameters</h4>
+<section id="parameters-5" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-5">Parameters</h4>
 <table class="table">
 <thead>
 <tr class="header">

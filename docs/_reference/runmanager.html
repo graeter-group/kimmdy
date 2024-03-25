@@ -459,7 +459,6 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
   <ul class="collapse">
   <li><a href="#kimmdy.runmanager.RunManager.get_latest" id="toc-kimmdy.runmanager.RunManager.get_latest" class="nav-link" data-scroll-target="#kimmdy.runmanager.RunManager.get_latest">get_latest</a></li>
-  <li><a href="#kimmdy.runmanager.RunManager.write_one_checkpoint" id="toc-kimmdy.runmanager.RunManager.write_one_checkpoint" class="nav-link" data-scroll-target="#kimmdy.runmanager.RunManager.write_one_checkpoint">write_one_checkpoint</a></li>
   </ul></li>
   </ul></li>
   <li><a href="#kimmdy.runmanager.State" id="toc-kimmdy.runmanager.State" class="nav-link" data-scroll-target="#kimmdy.runmanager.State">State</a></li>
@@ -524,49 +523,39 @@ ul.task-list li input[type="checkbox"] {
 <td>The configuration object.</td>
 </tr>
 <tr class="even">
-<td>from_checkpoint</td>
-<td><a href="https://docs.python.org/3.10/library/functions.html#bool">bool</a></td>
-<td>Whether the runmanager was initialized from a checkpoint.</td>
-</tr>
-<tr class="odd">
 <td>tasks</td>
 <td><a href="https://docs.python.org/3.10/library/queue.html#module-queue">queue</a>.<a href="https://docs.python.org/3.10/library/queue.html#queue.Queue">Queue</a>[<a href="../_reference/tasks.html#kimmdy.tasks.Task">Task</a>]</td>
 <td>Tasks from config.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>crr_tasks</td>
 <td><a href="https://docs.python.org/3.10/library/queue.html#module-queue">queue</a>.<a href="https://docs.python.org/3.10/library/queue.html#queue.Queue">Queue</a>[<a href="../_reference/tasks.html#kimmdy.tasks.Task">Task</a>]</td>
 <td>Current tasks.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>iteration</td>
 <td><a href="https://docs.python.org/3.10/library/functions.html#int">int</a></td>
 <td>Current iteration.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>state</td>
 <td><a href="../_reference/runmanager.html#kimmdy.runmanager.State">State</a></td>
 <td>Current state of the system.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>recipe_collection</td>
 <td><a href="../_reference/recipe.html#kimmdy.recipe.RecipeCollection">RecipeCollection</a></td>
 <td>Collection of recipes.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>latest_files</td>
 <td><a href="https://docs.python.org/3.10/library/stdtypes.html#dict">dict</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>, <a href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path">Path</a>]</td>
 <td>Dictionary of latest files.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>histfile</td>
 <td><a href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path">Path</a></td>
 <td>Path to history file.</td>
-</tr>
-<tr class="even">
-<td>cptfile</td>
-<td><a href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path">Path</a></td>
-<td>Path to checkpoint file.</td>
 </tr>
 <tr class="odd">
 <td>top</td>
@@ -605,10 +594,6 @@ ul.task-list li input[type="checkbox"] {
 <td><a href="#kimmdy.runmanager.RunManager.get_latest">get_latest</a></td>
 <td>Returns path to latest file of given type.</td>
 </tr>
-<tr class="even">
-<td><a href="#kimmdy.runmanager.RunManager.write_one_checkpoint">write_one_checkpoint</a></td>
-<td>Just write the first checkpoint and then exit</td>
-</tr>
 </tbody>
 </table>
 <section id="kimmdy.runmanager.RunManager.get_latest" class="level5">
@@ -616,12 +601,6 @@ ul.task-list li input[type="checkbox"] {
 <p><code>runmanager.RunManager.get_latest(suffix)</code></p>
 <p>Returns path to latest file of given type.</p>
 <p>For .dat files (in general ambiguous extensions) use full file name. Errors if file is not found.</p>
-</section>
-<section id="kimmdy.runmanager.RunManager.write_one_checkpoint" class="level5">
-<h5 class="anchored" data-anchor-id="kimmdy.runmanager.RunManager.write_one_checkpoint">write_one_checkpoint</h5>
-<p><code>runmanager.RunManager.write_one_checkpoint()</code></p>
-<p>Just write the first checkpoint and then exit</p>
-<p>Used to generate a starting point for jobscripts on hpc clusters that can easily self-submit after a timelimit was exceeded.</p>
 </section>
 </section>
 </section>
