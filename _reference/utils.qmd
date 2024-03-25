@@ -21,6 +21,7 @@ Utilities for building plugins, shell convenience functions and GROMACS related 
 | [get_edissoc_from_atomnames](#kimmdy.utils.get_edissoc_from_atomnames) | Returns dissociation energy E_dissoc for a set of two atomnames. |
 | [get_gmx_dir](#kimmdy.utils.get_gmx_dir) | Returns the path to the gromacs installation |
 | [get_shell_stdout](#kimmdy.utils.get_shell_stdout) | Run command in shell and capture stdout. |
+| [get_task_directories](#kimmdy.utils.get_task_directories) | create list of subdirectories that match the tasks. |
 | [morse_transition_rate](#kimmdy.utils.morse_transition_rate) | Calculates reaction rate constant for a bond breaking event. |
 | [run_gmx](#kimmdy.utils.run_gmx) | Run GROMACS command in shell. |
 | [run_shell_cmd](#kimmdy.utils.run_shell_cmd) | Run command in shell. |
@@ -92,6 +93,20 @@ Returns the path to the gromacs installation
 `utils.get_shell_stdout(s)`
 
 Run command in shell and capture stdout.
+
+### get_task_directories { #kimmdy.utils.get_task_directories }
+
+`utils.get_task_directories(dir, tasks='all')`
+
+create list of subdirectories that match the tasks.
+If tasks is "all", all subdirectories are returned.
+
+#### Parameters
+
+| Name    | Type                                                                    | Description                                                                                      | Default    |
+|---------|-------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|------------|
+| `dir`   | [Path](`pathlib.Path`)                                                  | Directory to search for subdirectories                                                           | _required_ |
+| `tasks` | [Union](`typing.Union`)\[[list](`list`)\[[str](`str`)\], [str](`str`)\] | List of steps e.g. ["equilibrium", "production"]. Or a string "all" to return all subdirectories | `'all'`    |
 
 ### morse_transition_rate { #kimmdy.utils.morse_transition_rate }
 

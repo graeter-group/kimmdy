@@ -13,7 +13,6 @@ For command line usage, run `kimmdy-analysis -h`.
 | [entry_point_analysis](#kimmdy.analysis.entry_point_analysis) | Analyse existing KIMMDY runs. |
 | [get_analysis_cmdline_args](#kimmdy.analysis.get_analysis_cmdline_args) | Parse command line arguments. |
 | [get_analysis_dir](#kimmdy.analysis.get_analysis_dir) | Get analysis directory for a KIMMDY run. |
-| [get_step_directories](#kimmdy.analysis.get_step_directories) | create list of subdirectories that match the steps. |
 | [plot_energy](#kimmdy.analysis.plot_energy) | Plot GROMACS energy for a KIMMDY run. |
 | [plot_rates](#kimmdy.analysis.plot_rates) | Plot rates of all possible reactions for each 'decide_recipe' step. |
 | [plot_runtime](#kimmdy.analysis.plot_runtime) | Plot runtime of all tasks. |
@@ -74,20 +73,6 @@ Creates the directory if it does not exist.
 | Type                       | Description   |
 |----------------------------|---------------|
 | Path to analysis directory |               |
-
-### get_step_directories { #kimmdy.analysis.get_step_directories }
-
-`analysis.get_step_directories(dir, steps='all')`
-
-create list of subdirectories that match the steps.
-If steps is "all", all subdirectories are returned.
-
-#### Parameters
-
-| Name    | Type                                                                    | Description                                                                                      | Default    |
-|---------|-------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|------------|
-| `dir`   | [Path](`pathlib.Path`)                                                  | Directory to search for subdirectories                                                           | _required_ |
-| `steps` | [Union](`typing.Union`)\[[list](`list`)\[[str](`str`)\], [str](`str`)\] | List of steps e.g. ["equilibrium", "production"]. Or a string "all" to return all subdirectories | `'all'`    |
 
 ### plot_energy { #kimmdy.analysis.plot_energy }
 
