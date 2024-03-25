@@ -9,7 +9,7 @@ from kimmdy.constants import MARK_DONE
 from kimmdy.parsing import read_top, write_top
 from kimmdy.topology.topology import Topology
 from kimmdy.plugins import parameterization_plugins
-from kimmdy.analysis import get_task_directories
+from kimmdy.utils import get_task_directories
 
 
 def read_last_line(file):

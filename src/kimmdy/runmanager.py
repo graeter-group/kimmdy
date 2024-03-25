@@ -21,7 +21,6 @@ from subprocess import CalledProcessError
 from typing import Optional
 import re
 
-from kimmdy.analysis import get_task_directories
 from kimmdy.config import Config
 from kimmdy.constants import MARK_STARTED, MARK_DONE, MARK_FAILED, MARKERS
 from kimmdy.coordinates import break_bond_plumed, merge_top_slow_growth, place_atom
@@ -37,7 +36,7 @@ from kimmdy.recipe import Bind, Break, CustomTopMod, Place, RecipeCollection, Re
 from kimmdy.tasks import Task, TaskFiles, get_plumed_out
 from kimmdy.topology.topology import Topology
 from kimmdy.topology.utils import get_is_reactive_predicate_f
-from kimmdy.utils import run_gmx, truncate_sim_files
+from kimmdy.utils import run_gmx, truncate_sim_files, get_task_directories
 
 logger = logging.getLogger(__name__)
 
