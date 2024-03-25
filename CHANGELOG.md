@@ -1,5 +1,17 @@
 # Changelog
 
+## [6.5.0](https://github.com/hits-mbm-dev/kimmdy/compare/v6.4.1...v6.5.0) (2024-03-25)
+
+
+### Features
+
+* Restart from run directory([#410](https://github.com/hits-mbm-dev/kimmdy/issues/410)) ([40ee0d2](https://github.com/hits-mbm-dev/kimmdy/commit/40ee0d20a2a8c704eb2dd3a0898101a46702c695))
+
+
+### Bug Fixes
+
+* import get_task_directories from utils ([8d4ba4d](https://github.com/hits-mbm-dev/kimmdy/commit/8d4ba4de90d33dc9b5b90f450a5d417fcb7d288a))
+
 ## [6.4.1](https://github.com/hits-mbm-dev/kimmdy/compare/v6.4.0...v6.4.1) (2024-03-21)
 
 
