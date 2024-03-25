@@ -25,7 +25,7 @@ CYCLE_buffered=$(echo "scale=2; $CYCLE - 0.08" | bc)
 
 START=$(date +"%s")
 
-timeout ${{CYCLE_buffered}}h kimmdy
+timeout ${{CYCLE_buffered}}h kimmdy -i {config.input_file}
 
 END=$(date +"%s")
 
@@ -40,7 +40,7 @@ if [ $HOURS -lt $CYCLE ]; then
   exit 3
 else
   echo "jobscript resubmitting"
-  sed -i "s/\(run_directory:\s*\).*/\\1'{config.out.name}'/" kimmdy.yml
+  sed -i.bak "s/\(run_directory:\s*\).*/\\1'{config.out.name}'/" {config.input_file}
   kimmdy --generate-jobscript
   sbatch ./jobscript.sh
   exit 2

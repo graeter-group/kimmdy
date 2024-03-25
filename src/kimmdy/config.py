@@ -127,6 +127,7 @@ class Config:
             self._validate()
 
             # merge with command line arguments
+            self.input_file = input_file
             if logfile is None:
                 self.log.file = self.out / self.log.file
             else:

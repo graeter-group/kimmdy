@@ -50,6 +50,7 @@ IGNORE_SUBSTR = [
     r"\.tail",
     r"_mod\.top",
     r"\.1#",
+    "rotref",
 ] + MARKERS
 # are there cases where we have multiple trr files?
 TASKS_WITHOUT_DIR = ["place_reaction_task"]
