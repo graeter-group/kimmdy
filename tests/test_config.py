@@ -171,6 +171,7 @@ def test_get_existing_files(arranged_tmp_path):
             "broken_equil_f1000.mdp",
             "edissoc.dat",
             "ffbonded.itp",
+            "yml",
         ]
     )
 
