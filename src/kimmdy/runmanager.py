@@ -16,15 +16,17 @@ from enum import Enum, auto
 from functools import partial
 from pathlib import Path
 from pprint import pformat
+import shutil
+from subprocess import CalledProcessError
 from typing import Optional
 import re
 
-import dill
-
+from kimmdy.analysis import get_task_directories
 from kimmdy.config import Config
+from kimmdy.constants import MARK_STARTED, MARK_DONE, MARK_FAILED, MARKERS
 from kimmdy.coordinates import break_bond_plumed, merge_top_slow_growth, place_atom
 from kimmdy.kmc import KMCResult, extrande, extrande_mod, frm, rf_kmc
-from kimmdy.parsing import read_top, write_json, write_top
+from kimmdy.parsing import read_top, write_json, write_top, write_time_marker
 from kimmdy.plugins import (
     BasicParameterizer,
     ReactionPlugin,
@@ -42,8 +44,16 @@ logger = logging.getLogger(__name__)
 # file types of which there will be multiple files per type
 AMBIGUOUS_SUFFS = ["dat", "xvg", "log", "itp", "mdp"]
 # file strings which to ignore
-IGNORE_SUBSTR = ["_prev.cpt", r"step\d+[bc]\.pdb"]
+IGNORE_SUBSTR = [
+    "_prev.cpt",
+    r"step\d+[bc]\.pdb",
+    r"\.tail",
+    r"_mod\.top",
+    r"\.1#",
+    "rotref",
+] + MARKERS
 # are there cases where we have multiple trr files?
+TASKS_WITHOUT_DIR = ["place_reaction_task"]
 
 
 class State(Enum):
@@ -94,8 +104,6 @@ class RunManager:
     ----------
     config
         The configuration object.
-    from_checkpoint
-        Whether the runmanager was initialized from a checkpoint.
     tasks
         Tasks from config.
     crr_tasks
@@ -110,8 +118,6 @@ class RunManager:
         Dictionary of latest files.
     histfile
         Path to history file.
-    cptfile
-        Path to checkpoint file.
     top
         Topology object.
     filehist
@@ -124,7 +130,6 @@ class RunManager:
 
     def __init__(self, config: Config):
         self.config: Config = config
-        self.from_checkpoint: bool = False
         self.tasks: queue.Queue[Task] = queue.Queue()  # tasks from config
         self.crr_tasks: queue.Queue[Task] = queue.Queue()  # current tasks
         self.iteration: int = -1  # start at -1 to have iteration 0 be the initial setup
@@ -140,9 +145,9 @@ class RunManager:
 
         try:
             if self.config.changer.topology.parameterization == "basic":
-                parameterizer = BasicParameterizer()
+                self.parameterizer = BasicParameterizer()
             else:
-                parameterizer = parameterization_plugins[
+                self.parameterizer = parameterization_plugins[
                     self.config.changer.topology.parameterization
                 ]()
         except KeyError as e:
@@ -154,7 +159,7 @@ class RunManager:
 
         self.top = Topology(
             top=read_top(self.config.top, self.config.ff),
-            parametrizer=parameterizer,
+            parametrizer=self.parameterizer,
             is_reactive_predicate_f=get_is_reactive_predicate_f(
                 self.config.topology.reactive
             ),
@@ -191,6 +196,7 @@ class RunManager:
                 },
                 {"f": self._apply_recipe, "kwargs": {}, "out": "apply_recipe"},
             ],
+            "restart": {f"f": self._restart_task, "kwargs": {}, "out": None},
         }
         """Mapping of task names to functions and their keyword arguments."""
 
@@ -198,10 +204,10 @@ class RunManager:
         logger.info("Start run")
         self.start_time = time.time()
 
-        if self.from_checkpoint:
-            logger.info("KIMMDY is starting from a checkpoint.")
-        else:
-            self._setup_tasks()
+        self._setup_tasks()
+
+        if getattr(self.config.restart, "run_directory", None):
+            self._restart_from_rundir()
 
         while (
             self.state is not State.DONE
@@ -211,10 +217,6 @@ class RunManager:
                 or self.config.max_hours == 0
             )
         ):
-            if self.config.write_checkpoint:
-                logger.info("Writing checkpoint before next task")
-                with open(self.cptfile, "wb") as f:
-                    dill.dump(self, f)
             next(self)
 
         logger.info(
@@ -263,23 +265,21 @@ class RunManager:
                 # check all reactions
                 for task_kwargs in self.task_mapping["reactions"]:
                     self.tasks.put(Task(self, **task_kwargs))
+            elif step == "restart":
+                restart = self.task_mapping["restart"]
+                kwargs: dict = copy(restart["kwargs"])
+                task = Task(
+                    self,
+                    f=restart["f"],
+                    kwargs=kwargs,
+                    out=step,
+                )
+                self.tasks.put(task)
             else:
                 m = f"Unknown task encountered in the sequence: {step}"
                 logger.error(m)
                 raise ValueError(m)
         logger.info(f"Task list build:\n{pformat(list(self.tasks.queue), indent=8)}")
-
-    def write_one_checkpoint(self):
-        """Just write the first checkpoint and then exit
-
-        Used to generate a starting point for jobscripts on hpc clusters
-        that can easily self-submit after a timelimit was exceeded.
-        """
-        logger.info("Initial setup for first checkpoint")
-        self._setup_tasks()
-        with open(self.cptfile, "wb") as f:
-            dill.dump(self, f)
-        logger.info(f"Wrote checkpointfile to: {self.cptfile}, ")
 
     def get_latest(self, suffix: str):
         """Returns path to latest file of given type.
@@ -312,12 +312,7 @@ class RunManager:
         if self.config.dryrun:
             logger.info(f"Pretend to run: {task.name} with args: {task.kwargs}")
             return
-        logger.info(f"Starting task: {task.name} with args: {task.kwargs}")
         files = task()
-        logger.info(
-            f"Finished task: {task.name} after "
-            f"{timedelta(seconds=(time.time() - current_time))}"
-        )
         if files is not None:
             self._discover_output_files(task.name, files)
 
@@ -401,7 +396,148 @@ class RunManager:
         logger.info("Done with setup")
         return files
 
-    def _run_md(self, instance: str, files: TaskFiles) -> TaskFiles:
+    def _restart_from_rundir(self):
+        """Set up RunManager to restart from a run directory"""
+
+        task_dirs = get_task_directories(self.config.restart.run_directory, "all")
+        logger.debug(f"Found task directories in restart run directory: {task_dirs}")
+        logger.debug(f"Task queue: {self.tasks.queue}")
+
+        completed_tasks: list[Task] = []
+        nested_tasks: dict = {}
+        self.iteration = 0
+        found_run_end = False
+        while not self.tasks.empty() and not found_run_end:
+            task: Task = self.tasks.queue[0]
+            if task.name == "_restart_task":
+                logger.info("Found restart task.")
+                self.tasks.queue.popleft()
+                break
+            if task.out is None:
+                completed_tasks.append(self.tasks.queue.popleft())
+
+            else:
+                if task_dirs[self.iteration :] == []:
+                    logger.info(
+                        f"Found last finished task with task number {self.iteration}."
+                    )
+                    # Condition 1: Continue from the last finished task
+                    found_run_end = True
+                for task_dir in task_dirs[self.iteration :]:
+                    if (task_dir / MARK_FAILED).exists():
+                        raise RuntimeError(
+                            f"Task in directory `{task_dir}` is indicated to have failed. Aborting restart. Remove this task directory if you want to restart from before the failed task."
+                        )
+                    if (task_dir / MARK_STARTED).exists():
+                        # symlink task directories from previous output and discover their files
+                        symlink_dir = self.config.out / task_dir.name
+                        symlink_dir.symlink_to(task_dir, target_is_directory=True)
+                        self.iteration += 1
+
+                        task_name = "_".join(task_dir.name.split(sep="_")[1:])
+                        if task_name == task.out:
+                            task.kwargs.update(
+                                {
+                                    "files": TaskFiles(
+                                        self.get_latest, {}, {}, symlink_dir
+                                    )
+                                }
+                            )
+                            completed_tasks.append(self.tasks.queue.popleft())
+                            if not (task_dir / MARK_DONE).exists():
+                                logger.info(
+                                    f"Found started but not finished task {task_dir}."
+                                )
+                                if completed_tasks[-1].name == "_run_md":
+                                    symlink_dir.unlink(missing_ok=True)
+                                    shutil.copytree(
+                                        task_dir, self.config.out / task_dir.name
+                                    )
+                                    kwargs: dict = copy(task.kwargs)
+                                    continue_md_task = Task(
+                                        self, f=self._run_md, kwargs=kwargs, out=None
+                                    )
+
+                                    continue_md_task.kwargs.update(
+                                        {"continue_md": True}
+                                    )
+                                    self.crr_tasks.put(continue_md_task)
+                                # Condition 2: Continue from started but not finished task
+                                found_run_end = True
+                            break
+                        else:
+                            # task probably not unique but having the latest of one kind should suffice
+                            if not completed_tasks[-1] in nested_tasks.keys():
+                                nested_tasks[completed_tasks[-1]] = []
+                            nested_tasks[completed_tasks[-1]].append(symlink_dir)
+                    else:
+                        raise RuntimeError(
+                            f"Encountered task directory {task_dir.name} but the task is not indicated to have started. Aborting restart."
+                        )
+
+        # add completed tasks to queue again until a reliable restart point (i.e after MD) is reached
+        while completed_tasks:
+            if completed_tasks[-1].name == "_run_md":
+                logger.info(
+                    f"Will continue after task {completed_tasks[-1].kwargs['files'].outputdir}"
+                )
+
+                self.iteration -= 1
+                break
+            else:
+                current_nested_task_dirs = nested_tasks.get(completed_tasks[-1], [])
+                try:
+                    current_task_dir = [completed_tasks[-1].kwargs["files"].outputdir]
+                except KeyError:
+                    current_task_dir = []
+                for task_dir in [
+                    *current_nested_task_dirs,
+                    *current_task_dir,
+                ]:
+                    task_dir.unlink(missing_ok=True)
+                    self.iteration -= 1
+                completed_tasks[-1].kwargs.pop("files", None)
+                self.tasks.queue.appendleft(completed_tasks.pop())
+        else:
+            self.iteration -= 1
+
+        # discover after it is clear which tasks will be in queue
+        for task_dir in get_task_directories(self.config.out, "all"):
+            task_name = "_".join(task_dir.name.split(sep="_")[1:])
+            task_files = TaskFiles(
+                self.get_latest, {}, {}, self.config.out / task_dir.name
+            )
+            self._discover_output_files(task_name, task_files)
+
+        # plumed fix
+        for md_config in self.config.mds.__dict__.values():
+            if getattr(md_config, "use_plumed"):
+                try:
+                    plumed_out_name = get_plumed_out(self.latest_files["plumed"]).name
+                    self.latest_files["plumed_out"] = self.get_latest(plumed_out_name)
+                    self.latest_files.pop(plumed_out_name)
+                except FileNotFoundError as e:
+                    logger.debug(e)
+
+        # use latest top file
+        self.top = Topology(
+            top=read_top(self.get_latest("top"), self.config.ff),
+            parametrizer=self.parameterizer,
+            is_reactive_predicate_f=get_is_reactive_predicate_f(
+                self.config.topology.reactive
+            ),
+            radicals=getattr(self.config, "radicals", None),
+            residuetypes_path=getattr(self.config, "residuetypes", None),
+        )
+
+    def _restart_task(self, files: TaskFiles) -> None:
+        raise RuntimeError(
+            f"Called restart task. This task is only for finding the restart point in the sequence and should never be called!"
+        )
+
+    def _run_md(
+        self, instance: str, files: TaskFiles, continue_md: bool = False
+    ) -> TaskFiles:
         """General MD simulation"""
         logger = files.logger
         logger.info(f"Start MD {instance}")
@@ -410,12 +546,18 @@ class RunManager:
         md_config = self.config.mds.attr(instance)
         gmx_alias = self.config.gromacs_alias
         gmx_mdrun_flags = self.config.gmx_mdrun_flags
-
         top = files.input["top"]
         gro = files.input["gro"]
         files.input["mdp"] = md_config.mdp
         mdp = files.input["mdp"]
         ndx = files.input["ndx"]
+
+        # to continue MD after timeout
+        if continue_md:
+            cpt = files.input["cpt"]
+            logger.info(f"Restart from checkpoint file: {cpt}")
+        else:
+            cpt = f"{instance}.cpt"
 
         outputdir = files.outputdir
 
@@ -434,7 +576,7 @@ class RunManager:
         #     grompp_cmd += f" -e {edr}"
 
         mdrun_cmd = (
-            f"{gmx_alias} mdrun -s {instance}.tpr -cpi {instance}.cpt "
+            f"{gmx_alias} mdrun -s {instance}.tpr -cpi {cpt} "
             f"-x {instance}.xtc -o {instance}.trr -cpo {instance}.cpt "
             f"-c {instance}.gro -g {instance}.log -e {instance}.edr "
             f"-px {instance}_pullx.xvg -pf {instance}_pullf.xvg "
@@ -453,8 +595,13 @@ class RunManager:
         files.output["trr"] = files.outputdir / f"{instance}.trr"
         logger.debug(f"grompp cmd: {grompp_cmd}")
         logger.debug(f"mdrun cmd: {mdrun_cmd}")
-        run_gmx(grompp_cmd, outputdir)
-        run_gmx(mdrun_cmd, outputdir)
+        try:
+            run_gmx(grompp_cmd, outputdir)
+            run_gmx(mdrun_cmd, outputdir)
+        except CalledProcessError as e:
+            write_time_marker(files.outputdir / MARK_FAILED, "failed")
+            raise e
+
         logger.info(f"Done with MD {instance}")
         return files
 
@@ -582,6 +729,7 @@ class RunManager:
         if self.kmcresult is None:
             m = "Attempting to _apply_recipe without having chosen one with _decide_recipe."
             logger.error(m)
+            write_time_marker(files.outputdir / MARK_FAILED, "failed")
             raise RuntimeError(m)
 
         recipe = self.kmcresult.recipe
@@ -619,9 +767,7 @@ class RunManager:
                     kwargs={"step": step, "ttime": None},
                     out="place_atom",
                 )
-                logger.info(f"Starting task: {task.name} with args: {task.kwargs}")
                 place_files = task()
-                logger.info(f"Finished task: {task.name}")
                 if place_files is not None:
                     self._discover_output_files(task.name, place_files)
                 focus_nrs.update([step.id_to_place])
@@ -645,9 +791,7 @@ class RunManager:
                 task = Task(
                     self, f=self._run_md, kwargs={"instance": instance}, out=instance
                 )
-                logger.info(f"Starting task: {task.name} with args: {task.kwargs}")
                 md_files = task()
-                logger.info(f"Finished task: {task.name}")
                 if md_files is not None:
                     self._discover_output_files(task.name, md_files)
 

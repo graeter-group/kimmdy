@@ -7,6 +7,7 @@ import logging
 import os
 from itertools import takewhile
 from pathlib import Path
+import time
 from typing import Optional, TypedDict, Union
 
 import numpy as np
@@ -580,3 +581,8 @@ def read_edissoc(path: Path) -> dict:
             else:
                 logger.debug(f"Unexpected line in edissoc file: {l}")
     return edissocs
+
+
+def write_time_marker(p: Path, marker: str):
+    with open(p, "a") as f:
+        f.write(f"{marker},{time.time()}\n")

@@ -8,6 +8,8 @@ top: 'Ala_out.top'
 gro: 'npt.gro'
 ndx: 'index.ndx'
 kmc: "rfkmc"
+restart:
+  run_directory: 'alanine_hat_000'
 mds:
   equilibrium:
     mdp: 'md.mdp'
@@ -27,7 +29,9 @@ reactions:
 
 sequence:
 - equilibrium
-- mult: 2
-  tasks:
-  - equilibrium
-  - reactions
+- equilibrium
+- reactions
+- equilibrium
+- restart
+- reactions
+- equilibrium
