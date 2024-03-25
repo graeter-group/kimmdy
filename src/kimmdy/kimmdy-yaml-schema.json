@@ -13,13 +13,6 @@
       "pytype": "bool",
       "default": false
     },
-    "write_checkpoint": {
-      "title": "write_checkpoint",
-      "description": "Write checkpoints to continue a KIMMDY run from. Default True",
-      "type": "boolean",
-      "pytype": "bool",
-      "default": true
-    },
     "parameterize_at_setup": {
       "title": "parameterize_at_setup",
       "description": "parameterize the topology during the setup task",
@@ -193,6 +186,19 @@
       "description": ".trr file of a finished simulation for starting directly with a reaction",
       "type": "string",
       "pytype": "Path"
+    },
+    "restart": {
+      "title": "restart",
+      "type": "object",
+      "description": "Restart from a previous run.",
+      "properties": {
+        "run_directory": {
+          "type": "string",
+          "pytype": "Path",
+          "description": "KIMMDY run directory to restart from"
+        }
+      },
+      "required": ["run_directory"]
     },
     "mds": {
       "title": "mds",

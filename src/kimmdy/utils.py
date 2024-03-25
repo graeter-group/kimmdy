@@ -8,7 +8,7 @@ import logging
 import re
 import subprocess as sp
 from pathlib import Path
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, Union
 
 import numpy as np
 
@@ -56,6 +56,7 @@ def run_gmx(s: str, cwd=None) -> Optional[sp.CalledProcessError]:
 
     Adds a '-quiet' flag to the command and checks the return code.
     """
+    logger.debug(f"Starting Gromacs process with command {s} in {cwd}.")
     result = run_shell_cmd(f"{s} -quiet", cwd)
     if result.returncode != 0:
         logger.error(f"Gromacs process with command {s} in {cwd} failed.")
@@ -442,3 +443,32 @@ def truncate_sim_files(files: TaskFiles, time: Optional[float], keep_tail: bool 
         if not keep_tail:
             bck_edr.unlink()
     return
+
+
+def get_task_directories(dir: Path, tasks: Union[list[str], str] = "all") -> list[Path]:
+    """
+    create list of subdirectories that match the tasks.
+    If tasks is "all", all subdirectories are returned.
+
+    Parameters
+    ----------
+    dir
+        Directory to search for subdirectories
+    tasks
+        List of steps e.g. ["equilibrium", "production"]. Or a string "all" to return all subdirectories
+    """
+    directories = sorted(
+        [p for p in dir.glob("*_*/") if p.is_dir()],
+        key=lambda p: int(p.name.split("_")[0]),
+    )
+    if tasks == "all":
+        matching_directories = directories
+    else:
+        matching_directories = list(
+            filter(lambda d: d.name.split("_")[1] in tasks, directories)
+        )
+
+    if not matching_directories:
+        print(f"WARNING: Could not find directories {tasks} in {dir}.")
+
+    return matching_directories

@@ -9,7 +9,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable, Optional
 
-from kimmdy.parsing import read_plumed
+from kimmdy.constants import MARK_STARTED, MARK_DONE
+from kimmdy.parsing import read_plumed, write_time_marker
 from kimmdy.utils import longFormatter
 
 logger = logging.getLogger(__name__)
@@ -146,17 +147,22 @@ class Task:
         logger.debug(f"Init task {self.name}\tkwargs: {self.kwargs}\tOut: {self.out}")
 
     def __call__(self) -> Optional[TaskFiles]:
+        logger.info(f"Starting task: {self.name} with args: {self.kwargs}")
         if self.out is not None:
             self.kwargs.update({"files": create_task_directory(self.runmng, self.out)})
-
-        logger.debug(f"Calling task {self.name} with kwargs: {self.kwargs}")
-        return self.f(**self.kwargs)
+            write_time_marker(self.kwargs["files"].outputdir / MARK_STARTED, "start")
+        files = self.f(**self.kwargs)
+        if self.out is not None:
+            write_time_marker(self.kwargs["files"].outputdir / MARK_DONE, "done")
+        logger.info(f"Finished task: {self.name}")
+        return files
 
     def __repr__(self) -> str:
         return str(self.name) + " args: " + str(self.kwargs)
 
 
-def get_plumed_out(plumed: Path) -> str:
+# TODO: move this to appropriate place
+def get_plumed_out(plumed: Path) -> Path:
     plumed_parsed = read_plumed(plumed)
     plumed_out = None
     for part in plumed_parsed["prints"]:

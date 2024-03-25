@@ -11,6 +11,7 @@ import sys
 import textwrap
 from os import chmod
 from pathlib import Path
+import shutil
 from typing import Optional
 
 import dill
@@ -120,14 +121,6 @@ def get_cmdline_args() -> argparse.Namespace:
         default="kimmdy.yml",
     )
     parser.add_argument(
-        "--checkpoint",
-        "-c",
-        type=str,
-        help="File path of a kimmdy.cpt file to restart KIMMDY from a "
-        "checkpoint. If a directory is given, the file kimmdy.cpt in "
-        "that directory is used.",
-    )
-    parser.add_argument(
         "--loglevel",
         "-l",
         type=str,
@@ -202,28 +195,13 @@ def _run(args: argparse.Namespace):
 
         exit()
 
-    if not Path(args.input).exists() and not args.checkpoint:
+    if not Path(args.input).exists():
         raise FileNotFoundError(
             f"Input file {args.input} does not exist. Specify its name with "
             "--input and make sure that you are in the right directory."
         )
 
     try:
-        if args.checkpoint:
-            cpt = Path(args.checkpoint)
-            if cpt.is_dir():
-                cpt = cpt / "kimmdy.cpt"
-            if not cpt.exists():
-                raise FileNotFoundError(
-                    f"Checkpoint file {cpt} does not exist. Specify its path "
-                    "or directory with --checkpoint and make sure that you are in the right directory."
-                )
-            with open(cpt, "rb") as f:
-                runmgr = dill.load(f)
-                runmgr.from_checkpoint = True
-                configure_logger(runmgr.config)
-                runmgr.run()
-            exit()
 
         discover_plugins()
         config = Config(
@@ -247,8 +225,7 @@ def _run(args: argparse.Namespace):
         runmgr = RunManager(config)
 
         if args.generate_jobscript:
-            runmgr.write_one_checkpoint()
-            content = jobscript.format(config=config)
+            content = jobscript.format(config=config).strip("\n")
             path = "jobscript.sh"
 
             with open(path, "w") as f:
@@ -291,13 +268,14 @@ def _run(args: argparse.Namespace):
             raise e
     finally:
         logging.shutdown()
+        if args.generate_jobscript:
+            shutil.rmtree(config.out)
 
 
 def kimmdy_run(
     input: Path = Path("kimmdy.yml"),
     loglevel: Optional[str] = None,
     logfile: Optional[Path] = None,
-    checkpoint: str = "",
     show_plugins: bool = False,
     generate_jobscript: bool = False,
     debug: bool = False,
@@ -315,9 +293,6 @@ def kimmdy_run(
         Loglevel. One of ["INFO", "WARNING", "MESSAGE", "DEBUG"]
     logfile
         File path of the logfile.
-    checkpoint
-        File path of a kimmdy.cpt file to restart KIMMDY from a checkpoint.
-        If a directory is given, the file kimmdy.cpt in that directory is used.
     show_plugins
         Show available plugins and exit.
     generate_jobscript
@@ -327,7 +302,6 @@ def kimmdy_run(
         input=input,
         loglevel=loglevel,
         logfile=logfile,
-        checkpoint=checkpoint,
         show_plugins=show_plugins,
         generate_jobscript=generate_jobscript,
         debug=debug,
