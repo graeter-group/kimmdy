@@ -542,6 +542,8 @@ def runtime_analysis(dir: str, open_plot: bool = False):
     pure_dts = []
     pure_dts_min = []
 
+    steps_names = list(map(lambda s: s.split("_")[1], steps))
+
     # remove time of nested tasks
     for i in range(len(steps)):
         dt = ends[i] - starts[i]
@@ -564,11 +566,13 @@ def runtime_analysis(dir: str, open_plot: bool = False):
     df["starts"] = starts
     df["ends"] = ends
     df["Stage"] = events
+    df["Task"] = steps_names
     df["Durations"] = pure_dts_min
     df.loc[len(df)] = [
         "KIMMDY",
         starts.min(),
         ends.max(),
+        "Overall",
         "Overall",
         dt_all.total_seconds() / 60,
     ]
@@ -589,7 +593,7 @@ def runtime_analysis(dir: str, open_plot: bool = False):
     longest_task = steps[np.argmax(pure_dts)]
     longest_task_dt = max(pure_dts)
 
-    # make plots
+    # grouped by stage
     sns.histplot(
         data=df,
         y="Stage",
@@ -600,13 +604,36 @@ def runtime_analysis(dir: str, open_plot: bool = False):
         palette="viridis",
     )
     plt.xlabel("Minutes")
-    plt.title("Runtime per task")
+    plt.title("Runtime per stage")
     plt.tight_layout()
+
     output_path = str(analysis_dir / "runtime_per_stage.svg")
     plt.savefig(output_path, dpi=300)
     if open_plot:
         sp.Popen(("xdg-open", output_path))
+    plt.show()
 
+    # grouped by task
+    sns.histplot(
+        data=df,
+        y="Task",
+        weights="Durations",
+        multiple="stack",
+        hue="starts",
+        legend=False,
+        palette="viridis",
+    )
+    plt.xlabel("Minutes")
+    plt.title("Runtime per task")
+    plt.tight_layout()
+
+    output_path = str(analysis_dir / "runtime_per_task.svg")
+    plt.savefig(output_path, dpi=300)
+    if open_plot:
+        sp.Popen(("xdg-open", output_path))
+    plt.show()
+
+    # Not grouped
     plt.figure(figsize=(8, max(0.3 * len(steps), 4)))
     sns.histplot(
         data=df.loc[df.Step != "KIMMDY"],
@@ -616,8 +643,9 @@ def runtime_analysis(dir: str, open_plot: bool = False):
     )
     plt.title("Runtime per step")
     plt.xlabel("Minutes")
+    plt.tight_layout()
 
-    output_path = str(analysis_dir / "runtime_per_task.svg")
+    output_path = str(analysis_dir / "runtime_all.svg")
     plt.savefig(output_path, dpi=300)
     if open_plot:
         sp.Popen(("xdg-open", output_path))
