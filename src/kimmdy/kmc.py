@@ -243,6 +243,11 @@ def extrande_mod(
         pairwise(boarders), rate_windows, recipe_windows
     ):
         t_max = cr_boarders[1]
+        if len(cr_rates) == 0:
+            logger.debug(f"No rates in window {cr_boarders}.")
+            t = t_max
+            rejected += 1
+            continue
         rate_cumsum = np.cumsum(cr_rates)
         b = rate_cumsum[-1]
         tau = tau_scale * rng.exponential(1 / b)
@@ -265,9 +270,6 @@ def extrande_mod(
 
         if chosen_recipe is not None:
             break
-
-    if None in [b, tau, l, t_max]:
-        logger.error(f"Extrande calculation failed, some variables are None.")
 
     if chosen_recipe is None:
         logger.info(
