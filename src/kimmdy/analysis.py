@@ -594,6 +594,7 @@ def runtime_analysis(dir: str, open_plot: bool = False):
     longest_task_dt = max(pure_dts)
 
     # grouped by stage
+    plt.figure()
     sns.histplot(
         data=df,
         y="Stage",
@@ -611,9 +612,9 @@ def runtime_analysis(dir: str, open_plot: bool = False):
     plt.savefig(output_path, dpi=300)
     if open_plot:
         sp.Popen(("xdg-open", output_path))
-    plt.show()
 
     # grouped by task
+    plt.figure()
     sns.histplot(
         data=df,
         y="Task",
@@ -631,7 +632,6 @@ def runtime_analysis(dir: str, open_plot: bool = False):
     plt.savefig(output_path, dpi=300)
     if open_plot:
         sp.Popen(("xdg-open", output_path))
-    plt.show()
 
     # Not grouped
     plt.figure(figsize=(8, max(0.3 * len(steps), 4)))
