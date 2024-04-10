@@ -195,7 +195,7 @@ class RunManager:
                 },
                 {"f": self._apply_recipe, "kwargs": {}, "out": "apply_recipe"},
             ],
-            "restart": {f"f": self._restart_task, "kwargs": {}, "out": None},
+            "restart": {"f": self._restart_task, "kwargs": {}, "out": None},
         }
         """Mapping of task names to functions and their keyword arguments."""
 
@@ -300,7 +300,6 @@ class RunManager:
         return self
 
     def __next__(self):
-        current_time = time.time()
         if self.tasks.empty() and self.crr_tasks.empty():
             self.state = State.DONE
             return
@@ -425,7 +424,9 @@ class RunManager:
                 for task_dir in task_dirs[self.iteration :]:
                     if (task_dir / MARK_FAILED).exists():
                         raise RuntimeError(
-                            f"Task in directory `{task_dir}` is indicated to have failed. Aborting restart. Remove this task directory if you want to restart from before the failed task."
+                            f"Task in directory `{task_dir}` is indicated to "
+                            "have failed. Aborting restart. Remove this task "
+                            "directory if you want to restart from before the failed task."
                         )
                     if (task_dir / MARK_STARTED).exists():
                         # symlink task directories from previous output and discover their files
@@ -471,7 +472,8 @@ class RunManager:
                             nested_tasks[completed_tasks[-1]].append(symlink_dir)
                     else:
                         raise RuntimeError(
-                            f"Encountered task directory {task_dir.name} but the task is not indicated to have started. Aborting restart."
+                            f"Encountered task directory {task_dir.name} but the"
+                            " task is not indicated to have started. Aborting restart."
                         )
 
         # add completed tasks to queue again until a reliable restart point (i.e after MD) is reached
@@ -531,7 +533,8 @@ class RunManager:
 
     def _restart_task(self, files: TaskFiles) -> None:
         raise RuntimeError(
-            f"Called restart task. This task is only for finding the restart point in the sequence and should never be called!"
+            "Called restart task. This task is only for finding the restart "
+            "point in the sequence and should never be called!"
         )
 
     def _run_md(

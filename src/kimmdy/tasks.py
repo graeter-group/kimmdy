@@ -141,7 +141,7 @@ class Task:
         if kwargs is None:
             kwargs = {}
         self.kwargs = kwargs
-        self.name = self.f.__name__
+        self.name = self.f.__name__.strip("_")
         self.out = out
 
         logger.debug(f"Init task {self.name}\tkwargs: {self.kwargs}\tOut: {self.out}")
@@ -150,10 +150,10 @@ class Task:
         logger.info(f"Starting task: {self.name} with args: {self.kwargs}")
         if self.out is not None:
             self.kwargs.update({"files": create_task_directory(self.runmng, self.out)})
-            write_time_marker(self.kwargs["files"].outputdir / MARK_STARTED, "start")
+            write_time_marker(self.kwargs["files"].outputdir / MARK_STARTED, self.name)
         files = self.f(**self.kwargs)
         if self.out is not None:
-            write_time_marker(self.kwargs["files"].outputdir / MARK_DONE, "done")
+            write_time_marker(self.kwargs["files"].outputdir / MARK_DONE, self.name)
         logger.info(f"Finished task: {self.name}")
         return files
 

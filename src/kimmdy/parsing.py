@@ -7,7 +7,7 @@ import logging
 import os
 from itertools import takewhile
 from pathlib import Path
-import time
+from datetime import datetime
 from typing import Optional, TypedDict, Union
 
 import numpy as np
@@ -585,4 +585,19 @@ def read_edissoc(path: Path) -> dict:
 
 def write_time_marker(p: Path, marker: str):
     with open(p, "a") as f:
-        f.write(f"{marker},{time.time()}\n")
+        f.write(f"{marker},{datetime.now().isoformat()}\n")
+
+
+def read_time_marker(p: Path) -> tuple[list[str], list[datetime]]:
+    with open(p) as f:
+        lines = f.readlines()
+    events = []
+    times = []
+    for line in lines:
+        e, t = line.strip().split(",")
+        try:
+            events.append(e)
+            times.append(datetime.fromisoformat(t))
+        except ValueError as err:
+            logger.error(f"Error trying to read time for event {e}: {err}\nfile: {p}")
+    return events, times
