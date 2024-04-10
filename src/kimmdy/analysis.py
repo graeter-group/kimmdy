@@ -6,7 +6,7 @@ import argparse
 import json
 import subprocess as sp
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Optional, Union
 from collections import defaultdict
@@ -15,14 +15,16 @@ import matplotlib as mpl
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 import MDAnalysis as mda
+import numpy as np
 import pandas as pd
 import seaborn as sns
 import seaborn.objects as so
 from seaborn import axes_style
 
-from kimmdy.parsing import read_json, write_json
+from kimmdy.parsing import read_json, write_json, read_time_marker
 from kimmdy.recipe import Bind, Break, Place, RecipeCollection
 from kimmdy.utils import run_shell_cmd, get_task_directories
+from kimmdy.constants import MARK_DONE, MARK_STARTED
 
 
 def get_analysis_dir(dir: Path) -> Path:
@@ -437,121 +439,6 @@ def plot_rates(dir: str):
         rc.plot(analysis_dir / f"{i}_reaction_rates.svg", highlight_r=picked_rp)
 
 
-def plot_runtime(dir: str, md_tasks: list, datefmt: str, open_plot: bool = False):
-    """Plot runtime of all tasks.
-
-    Parameters
-    ----------
-    dir
-        Directory of KIMMDY run
-    md_tasks
-        Names of MD tasks to color
-    datefmt
-        Date format in the KIMMDY logfile
-    open_plot
-        Open plot in default system viewer.
-    """
-
-    def time_from_logfile(log_path: Path, sep: int, factor: float = 1.0):
-        with open(log_path, "r") as f:
-            log = f.readlines()
-        starttime = datetime.strptime(" ".join(log[0].split()[:sep]), datefmt)
-        endtime = datetime.strptime(" ".join(log[-1].split()[:sep]), datefmt)
-        return (endtime - starttime).total_seconds() * factor
-
-    run_dir = Path(dir).expanduser().resolve()
-    analysis_dir = get_analysis_dir(run_dir)
-    n_datefmt_substrings = len(datefmt.split())
-
-    run_log = next(run_dir.glob("*.log"))
-    walltime = time_from_logfile(run_log, n_datefmt_substrings)
-    # sensitive to changes in runmanager logging
-    open_task = False
-    task_is_nested = []
-    with open(run_log, "r") as f:
-        foo = f.readlines()
-    for i, line in enumerate(foo):
-        if "Starting task:" in line:
-            if any(
-                x in line
-                for x in [
-                    "Starting task: _place_reaction_tasks",
-                    "Starting task: _decide_recipe",
-                ]
-            ):
-                continue
-            open_task = True
-            task_is_nested.append(False)
-        elif "Finished task:" in line:
-            if open_task is False:
-                task_is_nested[-1] = True
-                # set False for the nested task itself
-                task_is_nested.append(False)
-            open_task = False
-
-    # set scale of plot to hour, minute or second
-    if walltime < 120:
-        t_factor = 1.0
-        t_unit = "s"
-    elif walltime < 7200:
-        t_factor = 1 / 60
-        t_unit = "min"
-    else:
-        t_factor = 1 / 3600
-        t_unit = "h"
-    walltime = walltime * t_factor
-
-    tasks = []
-    runtimes = []
-    # sort by task number which is the number before _ in the logfile name
-    for log_path in sorted(
-        run_dir.glob("*_*/*_*.log"), key=lambda x: int(x.name.split(sep="_")[0])
-    ):
-        tasks.append(log_path.stem)
-        runtimes.append(time_from_logfile(log_path, n_datefmt_substrings, t_factor))
-    # remove duration of nested task for mother task
-    for i, is_nested in enumerate(task_is_nested):
-        if is_nested:
-            runtimes[i] -= runtimes[i + 1]
-
-    overhead = walltime - sum(runtimes)
-    # sns muted palette
-    c_palette = [
-        "#4878d0",
-        "#ee854a",
-        "#6acc64",
-        "#d65f5f",
-        "#956cb4",
-        "#8c613c",
-        "#dc7ec0",
-        "#797979",
-        "#d5bb67",
-        "#82c6e2",
-    ]
-    c = [
-        c_palette[0] if x.split(sep="_")[1] in md_tasks else c_palette[1] for x in tasks
-    ]
-
-    l1 = mpatches.Patch(color="#4878d0", label="MD task")
-    l2 = mpatches.Patch(color="#ee854a", label="Reaction task")
-    l3 = mpatches.Patch(color="#d65f5f", label="Overhead")
-    plt.legend(handles=[l1, l2, l3])
-
-    plt.barh(tasks[::-1], runtimes[::-1], color=c[::-1])
-    plt.barh("KIMMDY overhead", overhead, color=c_palette[3])
-    plt.xlabel(f"Time [{t_unit}]")
-    plt.title(f"Runtime of {run_dir.name}; overall {walltime} {t_unit}")
-    plt.tight_layout()
-
-    output_path = analysis_dir / "runtime.png"
-    plt.savefig(output_path, dpi=300)
-
-    print(f"Finished analyzing runtime of {run_dir}.")
-
-    if open_plot:
-        sp.call(("xdg-open", output_path))
-
-
 def reaction_participation(dir: str, open_plot: bool = False):
     """Plot which atoms participate in reactions.
 
@@ -605,6 +492,176 @@ def reaction_participation(dir: str, open_plot: bool = False):
     plt.savefig(output_path, dpi=300)
     if open_plot:
         sp.call(("xdg-open", output_path))
+
+
+def runtime_analysis(dir: str, open_plot: bool = False):
+    """Plot which atoms participate in reactions.
+
+    Parameters
+    ----------
+    dir
+        Directory of KIMMDY run
+    open_plot
+        Open plot in default system viewer.
+    """
+
+    run_dir = Path(dir).expanduser().resolve()
+    analysis_dir = get_analysis_dir(run_dir)
+
+    steps = []
+    starts = []
+    ends = []
+    raw_dt = []
+    events = []
+
+    for marker in run_dir.rglob(MARK_STARTED):
+        if not marker.with_name(MARK_DONE).exists():
+            print(f"Step {marker.parent.name} did not finish!")
+            continue
+        e_started, t_started = read_time_marker(marker)
+        e_done, t_done = read_time_marker(marker.with_name(MARK_DONE))
+
+        assert sorted(e_started) == sorted(
+            e_done
+        ), f"Not all tasks have finished! Error in {marker.parent.name}"
+
+        for event, time_s in zip(e_started, t_started):
+            time_e = t_done[e_done.index(event)]
+            steps.append(marker.parent.name)
+            starts.append(time_s)
+            ends.append(time_e)
+            raw_dt.append(time_e - time_s)
+            events.append(event)
+
+    start_sort = np.argsort(starts)
+    starts = np.array(starts)[start_sort]
+    steps = np.array(steps)[start_sort]
+    ends = np.array(ends)[start_sort]
+    raw_dt = np.array(raw_dt)[start_sort]
+    events = np.array(events)[start_sort]
+    pure_dts = []
+    pure_dts_min = []
+
+    steps_names = list(map(lambda s: s.split("_")[1], steps))
+
+    # remove time of nested tasks
+    for i in range(len(steps)):
+        dt = ends[i] - starts[i]
+        crr_start = starts[i]
+
+        for j in range(i + 1, len(steps)):
+            # next element starts after crr_start
+            if starts[j] > crr_start:
+                # next element ends before this one
+                if ends[j] < ends[i]:
+                    dt -= raw_dt[j]
+                    crr_start = ends[j]
+        pure_dts.append(dt)
+        pure_dts_min.append(dt.total_seconds() / 60)
+
+    dt_all = ends.max() - starts.min()
+
+    df = pd.DataFrame()
+    df["Step"] = steps
+    df["starts"] = starts
+    df["ends"] = ends
+    df["Stage"] = events
+    df["Task"] = steps_names
+    df["Durations"] = pure_dts_min
+    df.loc[len(df)] = [
+        "KIMMDY",
+        starts.min(),
+        ends.max(),
+        "Overall",
+        "Overall",
+        dt_all.total_seconds() / 60,
+    ]
+
+    # get longest stage
+    cum_times = defaultdict(timedelta)
+    for e, dt in zip(events, pure_dts):
+        cum_times[e] += dt
+
+    longest_stage = ""
+    longest_stage_dt = timedelta()
+    for e, dt in cum_times.items():
+        if dt > longest_stage_dt:
+            longest_stage = e
+            longest_stage_dt = dt
+
+    # get longest task
+    longest_task = steps[np.argmax(pure_dts)]
+    longest_task_dt = max(pure_dts)
+
+    # grouped by stage
+    plt.figure()
+    sns.histplot(
+        data=df,
+        y="Stage",
+        weights="Durations",
+        multiple="stack",
+        hue="starts",
+        legend=False,
+        palette="viridis",
+    )
+    plt.xlabel("Minutes")
+    plt.title("Runtime per stage")
+    plt.tight_layout()
+
+    output_path = str(analysis_dir / "runtime_per_stage.svg")
+    plt.savefig(output_path, dpi=300)
+    if open_plot:
+        sp.Popen(("xdg-open", output_path))
+
+    # grouped by task
+    plt.figure()
+    sns.histplot(
+        data=df,
+        y="Task",
+        weights="Durations",
+        multiple="stack",
+        hue="starts",
+        legend=False,
+        palette="viridis",
+    )
+    plt.xlabel("Minutes")
+    plt.title("Runtime per task")
+    plt.tight_layout()
+
+    output_path = str(analysis_dir / "runtime_per_task.svg")
+    plt.savefig(output_path, dpi=300)
+    if open_plot:
+        sp.Popen(("xdg-open", output_path))
+
+    # Not grouped
+    plt.figure(figsize=(8, max(0.3 * len(steps), 4)))
+    sns.histplot(
+        data=df.loc[df.Step != "KIMMDY"],
+        y="Step",
+        weights="Durations",
+        multiple="stack",
+    )
+    plt.title("Runtime per step")
+    plt.xlabel("Minutes")
+    plt.tight_layout()
+
+    output_path = str(analysis_dir / "runtime_all.svg")
+    plt.savefig(output_path, dpi=300)
+    if open_plot:
+        sp.Popen(("xdg-open", output_path))
+
+    print(
+        f"""
+    Summary of KIMMDY run in \
+    {"/".join(run_dir.parts[-2:])}
+
+    Overall duration: {dt_all}
+    Longest single step: {longest_task}
+    Duration of longest step: {longest_task_dt}
+    Longest stage, cumulative: {longest_stage}
+    Longest stage time, cumulative: {longest_stage_dt}
+    """
+    )
 
 
 def get_analysis_cmdline_args() -> argparse.Namespace:
@@ -760,18 +817,6 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         "dir", type=str, help="KIMMDY run directory to be analysed."
     )
     parser_runtime.add_argument(
-        "--md-tasks",
-        nargs="*",
-        default=["equilibrium", "pull", "relax", "prod"],
-        help="Names of MD tasks of the specified KIMMDY run",
-    )
-    parser_runtime.add_argument(
-        "--datefmt",
-        type=str,
-        default="%d-%m-%y %H:%M:%S",
-        help="Date format in the KIMMDY logfile.",
-    )
-    parser_runtime.add_argument(
         "--open-plot",
         "-p",
         action="store_true",
@@ -817,7 +862,7 @@ def entry_point_analysis():
     elif args.module == "rates":
         plot_rates(args.dir)
     elif args.module == "runtime":
-        plot_runtime(args.dir, args.md_tasks, args.datefmt, args.open_plot)
+        runtime_analysis(args.dir, args.open_plot)
     elif args.module == "reaction_participation":
         reaction_participation(
             args.dir,

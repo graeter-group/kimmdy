@@ -203,3 +203,27 @@ def test_edissoc_read(arranged_tmp_path):
         for kv, vv in v.items():
             assert isinstance(kv, frozenset)
             assert isinstance(vv, float)
+
+
+def test_marker_file_parsing(tmp_path: Path):
+    parsing.write_time_marker(tmp_path / "marker_file1", "event1")
+    parsing.write_time_marker(tmp_path / "marker_file2", "event1")
+    parsing.write_time_marker(tmp_path / "marker_file2", "event2")
+    parsing.write_time_marker(tmp_path / "marker_file2", "event3")
+    parsing.write_time_marker(tmp_path / "marker_file2", "event2")
+
+    es1, ts1 = parsing.read_time_marker(tmp_path / "marker_file1")
+    es2, ts2 = parsing.read_time_marker(tmp_path / "marker_file2")
+
+    assert len(es1) == len(ts1) == 1
+    assert len(es2) == len(ts2) == 4
+
+    assert "event1" in es1
+    assert "event0" not in es1
+
+    assert "event0" not in es2
+    assert "event1" in es2
+    assert "event2" in es2
+    assert "event3" in es2
+
+    assert (ts2[1] - ts2[0]).total_seconds() > 0
