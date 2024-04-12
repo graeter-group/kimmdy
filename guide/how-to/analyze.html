@@ -6,8 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Kai Riedmiller">
 
-<title>KIMMDY – constants</title>
+<title>KIMMDY - Analyze a KIMMDY run</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -23,26 +24,26 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="../site_libs/quarto-nav/headroom.min.js"></script>
-<script src="../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="../site_libs/quarto-search/fuse.min.js"></script>
-<script src="../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../">
-<link href="../_reference/coordinates.html" rel="next">
-<link href="../_reference/dummyreaction.reaction.DummyReaction.html" rel="prev">
-<script src="../site_libs/quarto-html/quarto.js"></script>
-<script src="../site_libs/quarto-html/popper.min.js"></script>
-<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../guide/how-to/contribute.html" rel="next">
+<link href="../../guide/how-to/index.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -79,7 +80,7 @@ ul.task-list li input[type="checkbox"] {
     <nav class="navbar navbar-expand-lg navbar-dark ">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="../index.html">
+    <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">KIMMDY</span>
     </a>
   </div>
@@ -90,23 +91,23 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="../guide/tutorials/getting-started.html" rel="" target="" aria-current="page">
+    <a class="nav-link active" href="../../guide/tutorials/getting-started.html" rel="" target="" aria-current="page">
  <span class="menu-text">Getting Started</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../guide/how-to/index.html" rel="" target="">
+    <a class="nav-link" href="../../guide/how-to/index.html" rel="" target="">
  <span class="menu-text">How-To</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../guide/tutorials/index.html" rel="" target="">
+    <a class="nav-link" href="../../guide/tutorials/index.html" rel="" target="">
  <span class="menu-text">Tutorials</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../guide/explanation/index.html" rel="" target="">
+    <a class="nav-link" href="../../guide/explanation/index.html" rel="" target="">
  <span class="menu-text">Explanations</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../_reference/index.html" rel="" target="">
+    <a class="nav-link" href="../../_reference/index.html" rel="" target="">
  <span class="menu-text">Reference</span></a>
   </li>  
 </ul>
@@ -141,7 +142,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../_reference/index.html">Reference</a></li><li class="breadcrumb-item"><a href="../_reference/cmd.html">Python API</a></li><li class="breadcrumb-item"><a href="../_reference/constants.html">Other Modules</a></li><li class="breadcrumb-item"><a href="../_reference/constants.html">constants</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../guide/how-to/index.html">How-To</a></li><li class="breadcrumb-item"><a href="../../guide/how-to/analyze.html">Analyze a KIMMDY run</a></li></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -155,13 +156,13 @@ ul.task-list li input[type="checkbox"] {
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../index.html" class="sidebar-item-text sidebar-link">
+  <a href="../../index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">KIMMDY</span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../guide/tutorials/index.html" class="sidebar-item-text sidebar-link">
+            <a href="../../guide/tutorials/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Tutorials</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
@@ -170,19 +171,19 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../guide/tutorials/colbuilder.html" class="sidebar-item-text sidebar-link">
+  <a href="../../guide/tutorials/colbuilder.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Run KIMMDY from Colbuilder fibril</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../guide/tutorials/getting-started.html" class="sidebar-item-text sidebar-link">
+  <a href="../../guide/tutorials/getting-started.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Get Started</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../guide/tutorials/write-plugin.html" class="sidebar-item-text sidebar-link">
+  <a href="../../guide/tutorials/write-plugin.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Write a Reaction Plugin</span></a>
   </div>
 </li>
@@ -190,46 +191,46 @@ ul.task-list li input[type="checkbox"] {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../guide/how-to/index.html" class="sidebar-item-text sidebar-link">
+            <a href="../../guide/how-to/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">How-To</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../guide/how-to/analyze.html" class="sidebar-item-text sidebar-link">
+  <a href="../../guide/how-to/analyze.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Analyze a KIMMDY run</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../guide/how-to/contribute.html" class="sidebar-item-text sidebar-link">
+  <a href="../../guide/how-to/contribute.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Contribute</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../guide/how-to/examples.html" class="sidebar-item-text sidebar-link">
+  <a href="../../guide/how-to/examples.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Examples</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../guide/how-to/hcp.html" class="sidebar-item-text sidebar-link">
+  <a href="../../guide/how-to/hcp.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">High Performance Computing</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../guide/how-to/install-ml-plugins.html" class="sidebar-item-text sidebar-link">
+  <a href="../../guide/how-to/install-ml-plugins.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Install Machine Learning Plugins</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../guide/how-to/reaction_only.html" class="sidebar-item-text sidebar-link">
+  <a href="../../guide/how-to/reaction_only.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Reaction only</span></a>
   </div>
 </li>
@@ -237,7 +238,7 @@ ul.task-list li input[type="checkbox"] {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../guide/explanation/index.html" class="sidebar-item-text sidebar-link">
+            <a href="../../guide/explanation/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Explanation</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
@@ -246,13 +247,13 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../guide/explanation/components.html" class="sidebar-item-text sidebar-link">
+  <a href="../../guide/explanation/components.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Components of KIMMDY</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../guide/explanation/topology.html" class="sidebar-item-text sidebar-link">
+  <a href="../../guide/explanation/topology.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Visualize Topologies</span></a>
   </div>
 </li>
@@ -260,37 +261,37 @@ ul.task-list li input[type="checkbox"] {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../_reference/index.html" class="sidebar-item-text sidebar-link">
+            <a href="../../_reference/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Reference</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../guide/references/input.html" class="sidebar-item-text sidebar-link">
+  <a href="../../guide/references/input.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Input File</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../guide/references/cmd_ref.html" class="sidebar-item-text sidebar-link">
+  <a href="../../guide/references/cmd_ref.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">CLI Arguments</span></a>
   </div>
 </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="false">
  <span class="menu-text">Python API</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 show">  
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/cmd.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/cmd.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">cmd</span></a>
   </div>
 </li>
@@ -305,31 +306,31 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/topology.topology.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/topology.topology.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">topology.topology</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/topology.ff.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/topology.ff.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">topology.ff</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/topology.utils.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/topology.utils.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">topology.utils</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/topology.atomic.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/topology.atomic.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">topology.atomic</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/parsing.TopologyDict.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/parsing.TopologyDict.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">parsing.TopologyDict</span></a>
   </div>
 </li>
@@ -346,19 +347,19 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/homolysis.reaction.Homolysis.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/homolysis.reaction.Homolysis.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">homolysis.reaction.Homolysis</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/hat_naive.reaction.NaiveHAT.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/hat_naive.reaction.NaiveHAT.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">hat_naive.reaction.NaiveHAT</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/dummyreaction.reaction.DummyReaction.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/dummyreaction.reaction.DummyReaction.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">dummyreaction.reaction.DummyReaction</span></a>
   </div>
 </li>
@@ -366,82 +367,82 @@ ul.task-list li input[type="checkbox"] {
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" aria-expanded="false">
  <span class="menu-text">Other Modules</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth3 show">  
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/constants.html" class="sidebar-item-text sidebar-link active">
+  <a href="../../_reference/constants.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">constants</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/coordinates.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/coordinates.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">coordinates</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/config.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/config.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">config</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/kmc.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/kmc.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">kmc</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/parsing.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/parsing.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">parsing</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/runmanager.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/runmanager.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">runmanager</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/tasks.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/tasks.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">tasks</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/recipe.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/recipe.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">recipe</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/plugins.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/plugins.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">plugins</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/analysis.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/analysis.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">analysis</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/utils.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/utils.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">utils</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../_reference/tools.html" class="sidebar-item-text sidebar-link">
+  <a href="../../_reference/tools.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">tools</span></a>
   </div>
 </li>
@@ -461,45 +462,86 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#kimmdy.constants" id="toc-kimmdy.constants" class="nav-link active" data-scroll-target="#kimmdy.constants">constants</a>
-  <ul>
-  <li><a href="#attributes" id="toc-attributes" class="nav-link" data-scroll-target="#attributes">Attributes</a></li>
-  </ul></li>
+  <li><a href="#energy" id="toc-energy" class="nav-link active" data-scroll-target="#energy">Energy</a></li>
+  <li><a href="#radical-occupancy" id="toc-radical-occupancy" class="nav-link" data-scroll-target="#radical-occupancy">Radical Occupancy</a></li>
+  <li><a href="#radical-migrations" id="toc-radical-migrations" class="nav-link" data-scroll-target="#radical-migrations">Radical Migrations</a></li>
+  <li><a href="#reaction-rates" id="toc-reaction-rates" class="nav-link" data-scroll-target="#reaction-rates">Reaction Rates</a></li>
+  <li><a href="#runtimes" id="toc-runtimes" class="nav-link" data-scroll-target="#runtimes">Runtimes</a></li>
   </ul>
-<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hits-mbm-dev/kimmdy/edit/main/_reference/constants.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/hits-mbm-dev/kimmdy/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hits-mbm-dev/kimmdy/edit/main/guide/how-to/analyze.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/hits-mbm-dev/kimmdy/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../guide/how-to/index.html">How-To</a></li><li class="breadcrumb-item"><a href="../../guide/how-to/analyze.html">Analyze a KIMMDY run</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Analyze a KIMMDY run</h1>
+</div>
 
 
-<section id="kimmdy.constants" class="level1">
-<h1>constants</h1>
-<p><code>constants</code></p>
-<p>Comstants used throughout KIMMDY</p>
-<section id="attributes" class="level2">
-<h2 class="anchored" data-anchor-id="attributes">Attributes</h2>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#kimmdy.constants.ATOMTYPE_BONDORDER">ATOMTYPE_BONDORDER</a></td>
-<td>To determin if an atom is a radical.</td>
-</tr>
-<tr class="even">
-<td><a href="#kimmdy.constants.ATOMTYPE_BONDORDER_FLAT">ATOMTYPE_BONDORDER_FLAT</a></td>
-<td>To determin if an atom is a radical.</td>
-</tr>
-</tbody>
-</table>
 
+<div class="quarto-title-meta">
 
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Kai Riedmiller </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<p>Through <a href="../../guide/references/cmd_ref.html#analysis"><code>kimmdy-analysis</code></a>, several tools are provided to analyze various aspects of KIMMDY runs.</p>
+<section id="energy" class="level2">
+<h2 class="anchored" data-anchor-id="energy">Energy</h2>
+<p><code>kimmdy-analysis energy</code> sets the usual energy analysis by gmx energy into the context of KIMMDY, by showing the KIMMDY MD steps next to the energy plot. An example KIMMDY run of three HAT reactions is shown below.</p>
+<p>All energy terms supported in the GROMACS tool <code>gmx energy</code> can be plotted. The lowest plot shows which KIMMDY MD run is running at a given time. Here, three HAT reactions are performed, each in between two equilibrium MD simulations.</p>
+<p><img src="../../guide/how-to/analysis_figures/ala_3hat_energy.png" class="lightbox img-fluid" style="width:60.0%"></p>
 </section>
+<section id="radical-occupancy" class="level2">
+<h2 class="anchored" data-anchor-id="radical-occupancy">Radical Occupancy</h2>
+<p><code>kimmdy-analysis radical_population</code> analyzes where, and for how long radi- cals are in the system. The resulting statistic can be visualized in two ways. First, as values on a three-dimensional snapshot of the system, as shown in below. For this, a pdb file of the structure is generated, containing the calculated radical occupancy as its beta value for visualization with established software, like vmd. And second, as a bar plot of the fractional radical occupancy per atom. Depending on the number of involved atoms, the structure, or the bar plot might be more useful.</p>
+<div class="quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="../../guide/how-to/analysis_figures/hat_ch_pep_occ.png" class="img-fluid"></p>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="../../guide/how-to/analysis_figures/hat_radical_population_fingerprint.png" class="img-fluid"></p>
+</div>
+</div>
+</div>
+</section>
+<section id="radical-migrations" class="level2">
+<h2 class="anchored" data-anchor-id="radical-migrations">Radical Migrations</h2>
+<p>The <code>kimmdy-analysis radical_migration</code> tool can generate visualizations. Depicting between which atoms HAT reactions occur. The arrows can be colored according to the number of HAT reactions, or the maximum rate for the respective transition.</p>
+<p><img src="../../guide/how-to/analysis_figures/hat_ch_pep_arr.png" class="img-fluid" style="width:60.0%"></p>
+</section>
+<section id="reaction-rates" class="level2">
+<h2 class="anchored" data-anchor-id="reaction-rates">Reaction Rates</h2>
+<p><code>kimmdy-analysis rates</code> can generate plots of all available rates entering a kMC step. By default, KIMMDY generates in the kMC step of every reaction a plot, showing calculated rates over the course of the latest simulation. This can be turned off in the input yaml. If in the kMC step a reaction is chosen, the corresponding rates are highlighted bold and dashed. Each reaction recipe has a string representation, consisting of the involved atom numbers and symbols for the actions. Bonds breaking are depicted as bolt. A new bond, and a movement are both represented with an arrow.</p>
+<p><img src="../../guide/how-to/analysis_figures/reaction_rates.svg" class="lightbox img-fluid" style="width:60.0%"></p>
+</section>
+<section id="runtimes" class="level2">
+<h2 class="anchored" data-anchor-id="runtimes">Runtimes</h2>
+<p><code>kimmdy-analysis runtime</code> analyzes the runtime of kimmdy. Besides showing the runtime of all tasks performed it can group tasks, and types of tasks together. The example analyzes the runtime of KIMMDY performing 20 consecutive HAT reactions after an initial homolysis reaction. As the simulated system is quite small (the charged_peptide example is used), the MD simulations are comparatively fast. For bigger systems, the MD runtime will increase, while the time required for HAT reaction barrier predictions will not, as it only atoms close to a radical are taken into account. Therefore, the computational overhead of KIMMDY should be negligible in most use cases.</p>
+<div class="quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="../../guide/how-to/analysis_figures/runtime_per_stage.svg" class="lightbox img-fluid"></p>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="../../guide/how-to/analysis_figures/runtime_per_task.svg" class="lightbox img-fluid"></p>
+</div>
+</div>
+</div>
+
+
 </section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
@@ -945,13 +987,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../_reference/dummyreaction.reaction.DummyReaction.html" class="pagination-link">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">dummyreaction.reaction.DummyReaction</span>
+      <a href="../../guide/how-to/index.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">How-To</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../_reference/coordinates.html" class="pagination-link">
-        <span class="nav-page-text">coordinates</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../../guide/how-to/contribute.html" class="pagination-link">
+        <span class="nav-page-text">Contribute</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
