@@ -92,6 +92,8 @@ def modify_top(
     residuetypes: Optional[str] = None,
     radicals: Optional[list[int]] = None,
     search_amber_rad: bool = True,
+    include: Optional[str] = None,
+    exclude: Optional[str] = None,
 ):
     """Modify topology in various ways.
 
@@ -120,6 +122,10 @@ def modify_top(
         Automatic radical search only implemented for amber. If you do use
         another ff, set this to false, and provide a list of radicals
         manually, if necessary.
+    include
+        Include certain GROMACS topology molecules in `Reactive` molecule. Reads molecule names from a csv file.
+    exclude
+        Exclude certain GROMACS topology molecules in `Reactive` molecule. Reads molecule names from a csv file.
     """
 
     top_path = Path(topology).with_suffix(".top").resolve()
@@ -153,6 +159,8 @@ def modify_top(
         f"gro output: \t\t{gro_out}\n"
         f"residuetypes: \t\t{residuetypes_path}\n"
         f"radicals: \t\t{radicals}\n"
+        f"include: \t\t{include}\n"
+        f"exclude: \t\t{exclude}\n"
     )
 
     print("Reading topology..", end="")
@@ -299,6 +307,18 @@ def get_modify_top_cmdline_args() -> argparse.Namespace:
         nargs="+",
         type=int,
     )
+    parser.add_argument(
+        "-w",
+        "--include",
+        help="Include certain GROMACS topology molecules in `Reactive` molecule. Reads molecule names from a csv file.",
+        type=str,
+    )
+    parser.add_argument(
+        "-b",
+        "--exclude",
+        help="Exclude certain GROMACS topology molecules in `Reactive` molecule. Reads molecule names from a csv file.",
+        type=str,
+    )
     return parser.parse_args()
 
 
@@ -315,6 +335,8 @@ def entry_point_modify_top():
         residuetypes=args.residuetypes,
         radicals=args.radicals,
         search_amber_rad=args.search_amber_rad,
+        include=args.include,
+        exclude=args.exclude,
     )
 
 
