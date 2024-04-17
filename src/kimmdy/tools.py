@@ -8,9 +8,10 @@ import shutil
 from pathlib import Path
 from typing import Optional
 
-from kimmdy.parsing import read_top, write_top
+from kimmdy.parsing import read_top, write_top, read_csv_to_list
 from kimmdy.plugins import discover_plugins, parameterization_plugins
 from kimmdy.topology.topology import Topology
+from kimmdy.topology.utils import get_is_reactive_predicate_f
 
 
 def build_examples(restore: str):
@@ -159,6 +160,7 @@ def modify_top(
         f"gro output: \t\t{gro_out}\n"
         f"residuetypes: \t\t{residuetypes_path}\n"
         f"radicals: \t\t{radicals}\n"
+        f"search_amber_rad: \t{search_amber_rad}\n"
         f"include: \t\t{include}\n"
         f"exclude: \t\t{exclude}\n"
     )
@@ -173,10 +175,20 @@ def modify_top(
     elif not search_amber_rad:
         rad_str = ""
 
+    if include:
+        include_list = read_csv_to_list(Path(include))
+    else:
+        include_list = []
+    if exclude:
+        exclude_list = read_csv_to_list(Path(exclude))
+    else:
+        exclude_list = []
+
     top = Topology(
         read_top(top_path),
         radicals=rad_str,
         residuetypes_path=residuetypes_path,
+        is_reactive_predicate_f=get_is_reactive_predicate_f(include_list, exclude_list),
     )
     print("Done")
 
@@ -292,7 +304,6 @@ def get_modify_top_cmdline_args() -> argparse.Namespace:
         help="Automatic radical search only implemented for amber. If you do"
         "use another ff, set this to false, and provide a list of radicals"
         "manually, if necessary.",
-        default=True,
     )
     parser.add_argument(
         "-t",
