@@ -1,13 +1,16 @@
 [
   {
-    "listing": "/guide/explanation/index.html",
+    "listing": "/guide/tutorials/index.html",
     "items": [
-      "/guide/explanation/topology.html"
+      "/guide/tutorials/getting-started.html",
+      "/guide/tutorials/colbuilder.html",
+      "/guide/tutorials/write-plugin.html"
     ]
   },
   {
     "listing": "/guide/how-to/index.html",
     "items": [
+      "/guide/how-to/analyze.html",
       "/guide/how-to/contribute.html",
       "/guide/how-to/examples.html",
       "/guide/how-to/hcp.html",
@@ -16,11 +19,10 @@
     ]
   },
   {
-    "listing": "/guide/tutorials/index.html",
+    "listing": "/guide/explanation/index.html",
     "items": [
-      "/guide/tutorials/getting-started.html",
-      "/guide/tutorials/colbuilder.html",
-      "/guide/tutorials/write-plugin.html"
+      "/guide/explanation/components.html",
+      "/guide/explanation/topology.html"
     ]
   }
 ]
