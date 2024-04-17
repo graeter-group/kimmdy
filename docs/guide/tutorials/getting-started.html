@@ -237,6 +237,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../../guide/how-to/analyze.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Analyze a KIMMDY run</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../../guide/how-to/contribute.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Contribute</span></a>
   </div>
@@ -276,6 +282,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           </a> 
       </div>
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guide/explanation/components.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Components of KIMMDY</span></a>
+  </div>
+</li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../guide/explanation/topology.html" class="sidebar-item-text sidebar-link">
@@ -603,7 +615,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Our starting structure is a simple ACE/NME-capped Alanine molecule in a box of water. Note, how it has a missing hydrogen atom on the alpha carbon. This is a radical. We will use the builtin <code>hat_reaction</code> to simulate hydrogen atom transfer reactions from nearby hydrogens to the radical position.</p>
     <div id="app-./getting-started-files/vis-ala.molj" class="molstar-app"></div>
     <script type="text/javascript">
-    molstar.Viewer.create("app-./getting-started-files/vis-ala.molj", {"layoutShowSequence":false,"layoutShowLog":false,"viewportShowSelectionMode":false,"emdbProvider":"rcsb","layoutIsExpanded":false,"pdbProvider":"rcsb","viewportShowAnimation":true,"layoutShowControls":false,"layoutShowLeftPanel":true,"layoutShowRemoteState":false,"viewportShowExpand":true}).then(viewer => {
+    molstar.Viewer.create("app-./getting-started-files/vis-ala.molj", {"viewportShowSelectionMode":false,"layoutShowRemoteState":false,"layoutShowControls":false,"layoutIsExpanded":false,"emdbProvider":"rcsb","layoutShowLeftPanel":true,"viewportShowAnimation":true,"layoutShowLog":false,"viewportShowExpand":true,"pdbProvider":"rcsb","layoutShowSequence":false}).then(viewer => {
     viewer.loadSnapshotFromUrl(url="./getting-started-files/vis-ala.molj", "molj");    });
     </script>
     

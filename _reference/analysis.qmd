@@ -15,10 +15,10 @@ For command line usage, run `kimmdy-analysis -h`.
 | [get_analysis_dir](#kimmdy.analysis.get_analysis_dir) | Get analysis directory for a KIMMDY run. |
 | [plot_energy](#kimmdy.analysis.plot_energy) | Plot GROMACS energy for a KIMMDY run. |
 | [plot_rates](#kimmdy.analysis.plot_rates) | Plot rates of all possible reactions for each 'decide_recipe' step. |
-| [plot_runtime](#kimmdy.analysis.plot_runtime) | Plot runtime of all tasks. |
 | [radical_migration](#kimmdy.analysis.radical_migration) | Plot population of radicals for a KIMMDY run. |
 | [radical_population](#kimmdy.analysis.radical_population) | Plot population of radicals for a KIMMDY run. |
 | [reaction_participation](#kimmdy.analysis.reaction_participation) | Plot which atoms participate in reactions. |
+| [runtime_analysis](#kimmdy.analysis.runtime_analysis) | Plot which atoms participate in reactions. |
 
 ### concat_traj { #kimmdy.analysis.concat_traj }
 
@@ -101,21 +101,6 @@ Plot rates of all possible reactions for each 'decide_recipe' step.
 |--------|--------------|-------------------------|------------|
 | `dir`  | [str](`str`) | Directory of KIMMDY run | _required_ |
 
-### plot_runtime { #kimmdy.analysis.plot_runtime }
-
-`analysis.plot_runtime(dir, md_tasks, datefmt, open_plot=False)`
-
-Plot runtime of all tasks.
-
-#### Parameters
-
-| Name        | Type           | Description                         | Default    |
-|-------------|----------------|-------------------------------------|------------|
-| `dir`       | [str](`str`)   | Directory of KIMMDY run             | _required_ |
-| `md_tasks`  | [list](`list`) | Names of MD tasks to color          | _required_ |
-| `datefmt`   | [str](`str`)   | Date format in the KIMMDY logfile   | _required_ |
-| `open_plot` | [bool](`bool`) | Open plot in default system viewer. | `False`    |
-
 ### radical_migration { #kimmdy.analysis.radical_migration }
 
 `analysis.radical_migration(dirs, type='qualitative', cutoff=1)`
@@ -150,6 +135,19 @@ Plot population of radicals for a KIMMDY run.
 ### reaction_participation { #kimmdy.analysis.reaction_participation }
 
 `analysis.reaction_participation(dir, open_plot=False)`
+
+Plot which atoms participate in reactions.
+
+#### Parameters
+
+| Name        | Type           | Description                         | Default    |
+|-------------|----------------|-------------------------------------|------------|
+| `dir`       | [str](`str`)   | Directory of KIMMDY run             | _required_ |
+| `open_plot` | [bool](`bool`) | Open plot in default system viewer. | `False`    |
+
+### runtime_analysis { #kimmdy.analysis.runtime_analysis }
+
+`analysis.runtime_analysis(dir, open_plot=False)`
 
 Plot which atoms participate in reactions.
 
