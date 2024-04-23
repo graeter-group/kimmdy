@@ -19,7 +19,7 @@ mkdir <tutorial-directory>
 cd  <tutorial-directory>
 # use an environment with kimmdy
 # download files and create topology
-https://hits-mbm-dev.github.io/kimmdy/guide/tutorials/modify-topology-files/pep.pdb
+wget https://hits-mbm-dev.github.io/kimmdy/guide/tutorials/modify-topology-files/pep.pdb
 gmx pdb2gmx -f pep.pdb -ignh  # select and appropriate force field
 ```
 
