@@ -35,7 +35,7 @@ from kimmdy.plugins import (
 from kimmdy.recipe import Bind, Break, CustomTopMod, Place, RecipeCollection, Relax
 from kimmdy.tasks import Task, TaskFiles, get_plumed_out
 from kimmdy.topology.topology import Topology
-from kimmdy.topology.utils import get_is_reactive_predicate_f
+from kimmdy.topology.utils import get_is_reactive_predicate_from_config_f
 from kimmdy.utils import run_gmx, truncate_sim_files, get_task_directories
 
 logger = logging.getLogger(__name__)
@@ -159,7 +159,7 @@ class RunManager:
         self.top = Topology(
             top=read_top(self.config.top, self.config.ff),
             parametrizer=self.parameterizer,
-            is_reactive_predicate_f=get_is_reactive_predicate_f(
+            is_reactive_predicate_f=get_is_reactive_predicate_from_config_f(
                 self.config.topology.reactive
             ),
             radicals=getattr(self.config, "radicals", None),
@@ -524,7 +524,7 @@ class RunManager:
         self.top = Topology(
             top=read_top(self.get_latest("top"), self.config.ff),
             parametrizer=self.parameterizer,
-            is_reactive_predicate_f=get_is_reactive_predicate_f(
+            is_reactive_predicate_f=get_is_reactive_predicate_from_config_f(
                 self.config.topology.reactive
             ),
             radicals=getattr(self.config, "radicals", None),

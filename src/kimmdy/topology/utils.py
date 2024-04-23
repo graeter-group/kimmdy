@@ -335,10 +335,15 @@ def is_not_solvent_or_ion(name: str) -> bool:
     return name.lower() not in [x.lower() for x in SOLVENT_NAMES + ION_NAMES]
 
 
-def get_is_reactive_predicate_f(cfg: Config) -> Callable[[str], bool]:
+def get_is_reactive_predicate_from_config_f(cfg: Config) -> Callable[[str], bool]:
     """Returns whether a moleculetype name is configured to be recognized as reactive."""
     include = [x.lower() for x in cfg.include.split()]
     exclude = [x.lower() for x in cfg.exclude.split()]
+    return get_is_reactive_predicate_f(include, exclude)
+
+
+def get_is_reactive_predicate_f(include: list, exclude: list) -> Callable[[str], bool]:
+    """Returns whether a moleculetype name is configured to be recognized as reactive."""
     default_excludes = [x.lower() for x in SOLVENT_NAMES + ION_NAMES]
 
     def f(name: str) -> bool:

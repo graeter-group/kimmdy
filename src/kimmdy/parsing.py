@@ -2,6 +2,7 @@
 All read_<...> and write_<...> functions.
 """
 
+import csv
 import json
 import logging
 import os
@@ -550,6 +551,15 @@ def read_json(path: Union[str, Path]) -> dict:
     """Return JSON file content as dict."""
     with open(path, "r") as f:
         data = json.load(f)
+    return data
+
+
+def read_csv_to_list(csv_file: Path) -> list:
+    data = []
+    with open(csv_file, "r") as file:
+        csv_reader = csv.reader(file)
+        for row in csv_reader:
+            data.extend(row)
     return data
 
 

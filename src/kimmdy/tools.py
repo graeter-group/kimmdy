@@ -8,9 +8,10 @@ import shutil
 from pathlib import Path
 from typing import Optional
 
-from kimmdy.parsing import read_top, write_top
+from kimmdy.parsing import read_top, write_top, read_csv_to_list
 from kimmdy.plugins import discover_plugins, parameterization_plugins
 from kimmdy.topology.topology import Topology
+from kimmdy.topology.utils import get_is_reactive_predicate_f
 
 
 def build_examples(restore: str):
@@ -92,6 +93,8 @@ def modify_top(
     residuetypes: Optional[str] = None,
     radicals: Optional[list[int]] = None,
     search_amber_rad: bool = True,
+    include: Optional[str] = None,
+    exclude: Optional[str] = None,
 ):
     """Modify topology in various ways.
 
@@ -120,6 +123,10 @@ def modify_top(
         Automatic radical search only implemented for amber. If you do use
         another ff, set this to false, and provide a list of radicals
         manually, if necessary.
+    include
+        Include certain GROMACS topology molecules in `Reactive` molecule. Reads molecule names from a csv file.
+    exclude
+        Exclude certain GROMACS topology molecules in `Reactive` molecule. Reads molecule names from a csv file.
     """
 
     top_path = Path(topology).with_suffix(".top").resolve()
@@ -153,6 +160,9 @@ def modify_top(
         f"gro output: \t\t{gro_out}\n"
         f"residuetypes: \t\t{residuetypes_path}\n"
         f"radicals: \t\t{radicals}\n"
+        f"search_amber_rad: \t{search_amber_rad}\n"
+        f"include: \t\t{include}\n"
+        f"exclude: \t\t{exclude}\n"
     )
 
     print("Reading topology..", end="")
@@ -165,10 +175,20 @@ def modify_top(
     elif not search_amber_rad:
         rad_str = ""
 
+    if include:
+        include_list = read_csv_to_list(Path(include))
+    else:
+        include_list = []
+    if exclude:
+        exclude_list = read_csv_to_list(Path(exclude))
+    else:
+        exclude_list = []
+
     top = Topology(
         read_top(top_path),
         radicals=rad_str,
         residuetypes_path=residuetypes_path,
+        is_reactive_predicate_f=get_is_reactive_predicate_f(include_list, exclude_list),
     )
     print("Done")
 
@@ -284,7 +304,6 @@ def get_modify_top_cmdline_args() -> argparse.Namespace:
         help="Automatic radical search only implemented for amber. If you do"
         "use another ff, set this to false, and provide a list of radicals"
         "manually, if necessary.",
-        default=True,
     )
     parser.add_argument(
         "-t",
@@ -298,6 +317,18 @@ def get_modify_top_cmdline_args() -> argparse.Namespace:
         help="Radicals in the system PRIOR to removing hydrogens with the removeH option.",
         nargs="+",
         type=int,
+    )
+    parser.add_argument(
+        "-w",
+        "--include",
+        help="Include certain GROMACS topology molecules in `Reactive` molecule. Reads molecule names from a csv file.",
+        type=str,
+    )
+    parser.add_argument(
+        "-b",
+        "--exclude",
+        help="Exclude certain GROMACS topology molecules in `Reactive` molecule. Reads molecule names from a csv file.",
+        type=str,
     )
     return parser.parse_args()
 
@@ -315,6 +346,8 @@ def entry_point_modify_top():
         residuetypes=args.residuetypes,
         radicals=args.radicals,
         search_amber_rad=args.search_amber_rad,
+        include=args.include,
+        exclude=args.exclude,
     )
 
 
