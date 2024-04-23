@@ -6,9 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Kai Riedmiller">
+<meta name="author" content="Eric Hartmann">
 
-<title>KIMMDY - Analyze a KIMMDY run</title>
+<title>KIMMDY - Modify a Topology</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -21,6 +21,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -31,8 +65,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
-<link href="../../guide/how-to/contribute.html" rel="next">
-<link href="../../guide/how-to/index.html" rel="prev">
+<link href="../../guide/tutorials/write-plugin.html" rel="next">
+<link href="../../guide/tutorials/getting-started.html" rel="prev">
 <script src="../../site_libs/quarto-html/quarto.js"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -44,9 +78,9 @@ ul.task-list li input[type="checkbox"] {
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
 <link href="../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<script src="../../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
-<link href="../../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
-<link href="../../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script src="../../site_libs/quarto-contrib/molstar-v3.13.0/molstar.js"></script>
+<link href="../../site_libs/quarto-contrib/molstar-v3.13.0/molstar.css" rel="stylesheet">
+<link href="../../site_libs/quarto-contrib/molstar-v3.13.0/app-container.css" rel="stylesheet">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -147,7 +181,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../guide/how-to/index.html">How-To</a></li><li class="breadcrumb-item"><a href="../../guide/how-to/analyze.html">Analyze a KIMMDY run</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../guide/tutorials/index.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../../guide/tutorials/modify-topology.html">Modify a Topology</a></li></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -169,11 +203,11 @@ ul.task-list li input[type="checkbox"] {
       <div class="sidebar-item-container"> 
             <a href="../../guide/tutorials/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Tutorials</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../guide/tutorials/colbuilder.html" class="sidebar-item-text sidebar-link">
@@ -188,7 +222,7 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../guide/tutorials/modify-topology.html" class="sidebar-item-text sidebar-link">
+  <a href="../../guide/tutorials/modify-topology.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Modify a Topology</span></a>
   </div>
 </li>
@@ -204,14 +238,14 @@ ul.task-list li input[type="checkbox"] {
       <div class="sidebar-item-container"> 
             <a href="../../guide/how-to/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">How-To</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../guide/how-to/analyze.html" class="sidebar-item-text sidebar-link active">
+  <a href="../../guide/how-to/analyze.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Analyze a KIMMDY run</span></a>
   </div>
 </li>
@@ -473,21 +507,26 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#energy" id="toc-energy" class="nav-link active" data-scroll-target="#energy">Energy</a></li>
-  <li><a href="#radical-occupancy" id="toc-radical-occupancy" class="nav-link" data-scroll-target="#radical-occupancy">Radical Occupancy</a></li>
-  <li><a href="#radical-migrations" id="toc-radical-migrations" class="nav-link" data-scroll-target="#radical-migrations">Radical Migrations</a></li>
-  <li><a href="#reaction-rates" id="toc-reaction-rates" class="nav-link" data-scroll-target="#reaction-rates">Reaction Rates</a></li>
-  <li><a href="#runtimes" id="toc-runtimes" class="nav-link" data-scroll-target="#runtimes">Runtimes</a></li>
+  <li><a href="#parameterize-a-molecule-with-grappa" id="toc-parameterize-a-molecule-with-grappa" class="nav-link active" data-scroll-target="#parameterize-a-molecule-with-grappa">Parameterize a Molecule with Grappa</a></li>
+  <li><a href="#remove-hydrogens-for-radical-starting-structures" id="toc-remove-hydrogens-for-radical-starting-structures" class="nav-link" data-scroll-target="#remove-hydrogens-for-radical-starting-structures">Remove Hydrogens for radical starting structures</a>
+  <ul>
+  <li><a href="#minimized-structure-of-native-peptide" id="toc-minimized-structure-of-native-peptide" class="nav-link" data-scroll-target="#minimized-structure-of-native-peptide">Minimized structure of native peptide</a></li>
+  <li><a href="#minimized-structure-with-deleted-hydrogen" id="toc-minimized-structure-with-deleted-hydrogen" class="nav-link" data-scroll-target="#minimized-structure-with-deleted-hydrogen">Minimized structure with deleted hydrogen</a></li>
+  </ul></li>
+  <li><a href="#complex-parameterization" id="toc-complex-parameterization" class="nav-link" data-scroll-target="#complex-parameterization">Complex Parameterization</a></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/hits-mbm-dev/kimmdy/edit/main/guide/how-to/analyze.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/hits-mbm-dev/kimmdy/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/hits-mbm-dev/kimmdy/edit/main/guide/tutorials/modify-topology.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/hits-mbm-dev/kimmdy/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../guide/how-to/index.html">How-To</a></li><li class="breadcrumb-item"><a href="../../guide/how-to/analyze.html">Analyze a KIMMDY run</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../guide/tutorials/index.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../../guide/tutorials/modify-topology.html">Modify a Topology</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Analyze a KIMMDY run</h1>
-</div>
+<h1 class="title">Modify a Topology</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">user</div>
+  </div>
+  </div>
 
 
 
@@ -496,7 +535,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Author</div>
     <div class="quarto-title-meta-contents">
-             <p>Kai Riedmiller </p>
+             <p>Eric Hartmann </p>
           </div>
   </div>
     
@@ -509,53 +548,117 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>Through <a href="../../guide/references/cmd_ref.html#analysis"><code>kimmdy-analysis</code></a>, several tools are provided to analyze various aspects of KIMMDY runs.</p>
-<section id="energy" class="level2">
-<h2 class="anchored" data-anchor-id="energy">Energy</h2>
-<p><code>kimmdy-analysis energy</code> sets the usual energy analysis by gmx energy into the context of KIMMDY, by showing the KIMMDY MD steps next to the energy plot. An example KIMMDY run of three HAT reactions is shown below.</p>
-<p>All energy terms supported in the GROMACS tool <code>gmx energy</code> can be plotted. The lowest plot shows which KIMMDY MD run is running at a given time. Here, three HAT reactions are performed, each in between two equilibrium MD simulations.</p>
-<p><a href="../../guide/how-to/analysis_figures/ala_3hat_energy.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="../../guide/how-to/analysis_figures/ala_3hat_energy.png" class="img-fluid" style="width:60.0%"></a></p>
+<p>In this tutorial we will check out different ways to process GROMACS topology files with the command-line interface <code>kimmdy-modify-top</code>. Use <code>kimmdy-modify-top -h</code> to see the arguments you can pass to it for your kimmdy version. You need a GROMACS installation and an environment with kimmdy for the tutorial.</p>
+<section id="parameterize-a-molecule-with-grappa" class="level1">
+<h1>Parameterize a Molecule with Grappa</h1>
+<p>To parameterize a molecule with grappa using <code>kimmdy-modify-top</code>, you first need to have a GROMACS topology file for your system. Here, we will use a Ace-Ala-Nme peptide. First, download the peptide pdb and create a topology file using a grappa-compatible force field.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># set up your directory</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="op">&lt;</span>tutorial-directory<span class="op">&gt;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span>  <span class="op">&lt;</span>tutorial-directory<span class="op">&gt;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># use an environment with kimmdy</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># download files and create topology</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ex">https://hits-mbm-dev.github.io/kimmdy/guide/tutorials/modify-topology-files/pep.pdb</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ex">gmx</span> pdb2gmx <span class="at">-f</span> pep.pdb <span class="at">-ignh</span>  <span class="co"># select and appropriate force field</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Next, parameterize the peptide and check out the resulting topology file.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># parameterize peptide</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">kimmdy-modify-top</span> topol.top topol_grappa.top <span class="at">-p</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># check out result</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">vim</span> topol_grappa.top</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>You will notice many changes compared to the topology file generated by <code>gmx pdb2gmx</code>. First, all includes were resolved to create a standalone topology file. That’s the reason for having the <code>[ atomtypes ]</code>, <code>[ bondtypes ]</code> and other parameter definitions as well as ion and water topology definitions with <code>[ moleculetype ]</code>, <code>[atoms]</code> and <code>[bonds]</code> sections.</p>
+<p>The change through parameterization will become more apparent by comparing with a non-parameterized, converted topology file.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># parameterize peptide</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">kimmdy-modify-top</span> topol.top topol_vanilla.top </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># compare results</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="ex">vimdiff</span> topol_grappa.top topol_vanilla.top</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>You should see explicit parameters for bonds, angles dihedrals (e.g <code>2 1 5 6 9 180.0 1.5141575 1</code>) in the grappa parameterized file while the non-parameterized file has implicit parameters which are defined in the interaction type section (<code>2 1 5 6 9</code>). If that’s the case, you have successfully parameterized a molecule with grappa and are finished with this section of the tutorial!</p>
 </section>
-<section id="radical-occupancy" class="level2">
-<h2 class="anchored" data-anchor-id="radical-occupancy">Radical Occupancy</h2>
-<p><code>kimmdy-analysis radical_population</code> analyzes where, and for how long radi- cals are in the system. The resulting statistic can be visualized in two ways. First, as values on a three-dimensional snapshot of the system, as shown in below. For this, a pdb file of the structure is generated, containing the calculated radical occupancy as its beta value for visualization with established software, like vmd. And second, as a bar plot of the fractional radical occupancy per atom. Depending on the number of involved atoms, the structure, or the bar plot might be more useful.</p>
-<div>
-
+<section id="remove-hydrogens-for-radical-starting-structures" class="level1">
+<h1>Remove Hydrogens for radical starting structures</h1>
+<p>An additional capability of the tool is to remove hydrogens to create radicals. Which hydrogen will be removed is defined by its atom nr in the topology file (first column). Additionally, the structure file has to be modified to get a compatible pair of structure and topology file. Look for the atom nr of the hydrogen connected to the Ala C-alpha and remove it. Keep the <code>-p</code> flag to reparameterize the molecule. Use a text editor or molecule visualization program to verify the successful removal of the hydrogen of choice.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># remove hydrogen and parameterize peptide</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">kimmdy-modify-top</span> topol.top topol_grappa_CA.top <span class="at">-p</span> <span class="at">-c</span> conf.gro <span class="at">-r</span> <span class="op">&lt;</span>hydrogen nr<span class="op">&gt;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># look at the result</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>To see how removal of a hydrogen changes the minimum energy structure, run a minimization on both the native and radical peptide. Most strikingly, you should see the radical C-alpha become planar, as expected from QM calculations. Use the mdp file mentioned below. Both structures are also shown in molstar panels.</p>
+<details>
+<summary>
+GROMACS mdp file (minim.mdp)
+</summary>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>minim.mdp</strong></pre>
 </div>
-<div class="quarto-layout-panel" data-layout-ncol="2">
-<div class="quarto-layout-row">
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<p><a href="../../guide/how-to/analysis_figures/hat_ch_pep_occ.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img src="../../guide/how-to/analysis_figures/hat_ch_pep_occ.png" class="img-fluid"></a></p>
+<div class="sourceCode" id="cb5" data-filename="minim.mdp"><pre class="sourceCode yml code-with-copy"><code class="sourceCode yaml"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="at">; minim.mdp - used as input into grompp to generate em.tpr</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="at">; Parameters describing what to do, when to stop and what to save</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="at">integrator  = steep         ; Algorithm (steep = steepest descent minimization)</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="at">emtol       = 10.0        ; Stop minimization when the maximum force &lt; 10.0 kJ/mol/nm</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="at">emstep      = 0.01          ; Minimization step size</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="at">nsteps      = 50000         ; Maximum number of (minimization) steps to perform</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="at">; Parameters describing how to find the neighbors of each atom and how to calculate the interactions</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="at">nstlist         = 1         ; Frequency to update the neighbor list and long range forces</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="at">cutoff-scheme   = Verlet    ; Buffered neighbor searching</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="at">ns_type         = grid      ; Method to determine neighbor list (simple, grid)</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="at">coulombtype     = PME       ; Treatment of long range electrostatic interactions</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="at">rcoulomb        = 1.0       ; Short-range electrostatic cut-off</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="at">rvdw            = 1.0       ; Short-range Van der Waals cut-off</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="at">pbc             = xyz       ; Periodic Boundary Conditions in all 3 dimensions</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<p><a href="../../guide/how-to/analysis_figures/hat_radical_population_fingerprint.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3"><img src="../../guide/how-to/analysis_figures/hat_radical_population_fingerprint.png" class="img-fluid"></a></p>
+</details>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># minimize radical peptide</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">gmx</span> editconf <span class="at">-f</span> topol_grappa_CA.gro <span class="at">-o</span> topol_grappa_CA_box.gro <span class="at">-d</span> 1 <span class="at">-bt</span> cubic</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ex">gmx</span> grompp <span class="at">-f</span> minim.mdp <span class="at">-c</span> topol_grappa_CA_box.gro <span class="at">-p</span> topol_grappa_CA.top <span class="at">-o</span> minim.tpr</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="ex">gmx</span> mdrun <span class="at">-deffnm</span> minim</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co"># do the same for the native peptide</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co"># look at the result</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="minimized-structure-of-native-peptide" class="level3">
+<h3 class="anchored" data-anchor-id="minimized-structure-of-native-peptide">Minimized structure of native peptide</h3>
+    <div id="app-./modify-topology-files/minim.pdb" class="molstar-app"></div>
+    <script type="text/javascript">
+    molstar.Viewer.create("app-./modify-topology-files/minim.pdb", {"emdbProvider":"rcsb","layoutShowLeftPanel":true,"viewportShowSelectionMode":false,"viewportShowAnimation":true,"layoutIsExpanded":false,"layoutShowControls":false,"pdbProvider":"rcsb","layoutShowSequence":false,"viewportShowExpand":true,"layoutShowRemoteState":false,"layoutShowLog":false}).then(viewer => {
+    viewer.loadStructureFromUrl("./modify-topology-files/minim.pdb", format="pdb");    });
+    </script>
+    
+</section>
+<section id="minimized-structure-with-deleted-hydrogen" class="level3">
+<h3 class="anchored" data-anchor-id="minimized-structure-with-deleted-hydrogen">Minimized structure with deleted hydrogen</h3>
+    <div id="app-./modify-topology-files/minim_delH.pdb" class="molstar-app"></div>
+    <script type="text/javascript">
+    molstar.Viewer.create("app-./modify-topology-files/minim_delH.pdb", {"emdbProvider":"rcsb","layoutShowLeftPanel":true,"viewportShowSelectionMode":false,"viewportShowAnimation":true,"layoutIsExpanded":false,"layoutShowControls":false,"pdbProvider":"rcsb","layoutShowSequence":false,"viewportShowExpand":true,"layoutShowRemoteState":false,"layoutShowLog":false}).then(viewer => {
+    viewer.loadStructureFromUrl("./modify-topology-files/minim_delH.pdb", format="pdb");    });
+    </script>
+    
+<div class="callout callout-style-simple callout-warning">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p>This has only been validated for proteins but the implementation is designed to provide a general solution. Hence, non-verified and possibly wrong parameters can easily be generated. For further information, refer to appendix of the original <a href="https://doi.org/10.48550/arXiv.2404.00050">grappa paper</a>.</p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-simple callout-warning">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p>When using the option to remove hydrogens, make sure to keep a distance of at least 16-20 bonds (corresponding to 2 times the field-of-view of the grappa model) between radicals because grappa is not trained on systems with multiple radicals.</p>
 </div>
 </div>
 </div>
 </section>
-<section id="radical-migrations" class="level2">
-<h2 class="anchored" data-anchor-id="radical-migrations">Radical Migrations</h2>
-<p>The <code>kimmdy-analysis radical_migration</code> tool can generate visualizations. Depicting between which atoms HAT reactions occur. The arrows can be colored according to the number of HAT reactions, or the maximum rate for the respective transition.</p>
-<p><a href="../../guide/how-to/analysis_figures/hat_ch_pep_arr.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4"><img src="../../guide/how-to/analysis_figures/hat_ch_pep_arr.png" class="img-fluid" style="width:60.0%"></a></p>
 </section>
-<section id="reaction-rates" class="level2">
-<h2 class="anchored" data-anchor-id="reaction-rates">Reaction Rates</h2>
-<p><code>kimmdy-analysis rates</code> can generate plots of all available rates entering a kMC step. By default, KIMMDY generates in the kMC step of every reaction a plot, showing calculated rates over the course of the latest simulation. This can be turned off in the input yaml. If in the kMC step a reaction is chosen, the corresponding rates are highlighted bold and dashed. Each reaction recipe has a string representation, consisting of the involved atom numbers and symbols for the actions. Bonds breaking are depicted as bolt. A new bond, and a movement are both represented with an arrow.</p>
-<p><a href="../../guide/how-to/analysis_figures/reaction_rates.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-5"><img src="../../guide/how-to/analysis_figures/reaction_rates.svg" class="img-fluid" style="width:60.0%"></a></p>
-</section>
-<section id="runtimes" class="level2">
-<h2 class="anchored" data-anchor-id="runtimes">Runtimes</h2>
-<p><code>kimmdy-analysis runtime</code> analyzes the runtime of kimmdy. Besides showing the runtime of all tasks performed it can group tasks, and types of tasks together. The example analyzes the runtime of KIMMDY performing 20 consecutive HAT reactions after an initial homolysis reaction. As the simulated system is quite small (the charged_peptide example is used), the MD simulations are comparatively fast. For bigger systems, the MD runtime will increase, while the time required for HAT reaction barrier predictions will not, as it only atoms close to a radical are taken into account. Therefore, the computational overhead of KIMMDY should be negligible in most use cases.</p>
-<div>
-
+<section id="complex-parameterization" class="level1">
+<h1>Complex Parameterization</h1>
+<div class="callout callout-style-simple callout-tip">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
 </div>
-<div class="quarto-layout-panel" data-layout-ncol="2">
-<div class="quarto-layout-row">
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<p><a href="../../guide/how-to/analysis_figures/runtime_per_stage.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-6"><img src="../../guide/how-to/analysis_figures/runtime_per_stage.svg" class="img-fluid"></a></p>
-</div>
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<p><a href="../../guide/how-to/analysis_figures/runtime_per_task.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-7"><img src="../../guide/how-to/analysis_figures/runtime_per_task.svg" class="img-fluid"></a></p>
+<div class="callout-body-container">
+<p>While parsing a topology file, molecules that are neither water nor ions (as identified by the molecule name) are grouped in the <code>Reactive</code> molecule. This <code>Reactive</code> molecule is passed to grappa for parameterization. For topologies with multiple solute components such as protein:DNA complexes or membrane proteins as well as files where the default recognition of water and ions does not work, you can explicitly define included and excluded moleculetypes in the topology. The includes and excludes are supplied as .csv files.</p>
 </div>
 </div>
 </div>
@@ -1097,44 +1200,19 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../../guide/how-to/index.html" class="pagination-link" aria-label="How-To">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">How-To</span>
+      <a href="../../guide/tutorials/getting-started.html" class="pagination-link" aria-label="Get Started">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Get Started</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../../guide/how-to/contribute.html" class="pagination-link" aria-label="Contribute">
-        <span class="nav-page-text">Contribute</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../../guide/tutorials/write-plugin.html" class="pagination-link" aria-label="Write a Reaction Plugin">
+        <span class="nav-page-text">Write a Reaction Plugin</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
 </div> <!-- /content -->
-<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/hits-mbm-dev/kimmdy/edit/main/guide/how-to/analyze.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/hits-mbm-dev/kimmdy/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div></div></footer><script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","selector":".lightbox","descPosition":"bottom","openEffect":"zoom","loop":false});
-window.onload = () => {
-  lightboxQuarto.on('slide_before_load', (data) => {
-    const { slideIndex, slideNode, slideConfig, player, trigger } = data;
-    const href = trigger.getAttribute('href');
-    if (href !== null) {
-      const imgEl = window.document.querySelector(`a[href="${href}"] img`);
-      if (imgEl !== null) {
-        const srcAttr = imgEl.getAttribute("src");
-        if (srcAttr && srcAttr.startsWith("data:")) {
-          slideConfig.href = srcAttr;
-        }
-      }
-    } 
-  });
-
-  lightboxQuarto.on('slide_after_load', (data) => {
-    const { slideIndex, slideNode, slideConfig, player, trigger } = data;
-    if (window.Quarto?.typesetMath) {
-      window.Quarto.typesetMath(slideNode);
-    }
-  });
-
-};
-          </script>
 
 
 
 
-</body></html>
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/hits-mbm-dev/kimmdy/edit/main/guide/tutorials/modify-topology.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/hits-mbm-dev/kimmdy/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>
