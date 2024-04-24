@@ -88,6 +88,8 @@ def modify_top(
     topology: str,
     out: str,
     parameterize: bool = False,
+    grappa_tag: str = "latest",
+    grappa_charge_model: str = "amber99",
     removeH: Optional[list[int]] = None,
     gro: Optional[str] = None,
     residuetypes: Optional[str] = None,
@@ -107,6 +109,10 @@ def modify_top(
         Can be relative to cwd.
     parameterize
         Parameterize topology with grappa after removing hydrogen
+    grappa_tag
+        grappa model tag for parameterization.
+    grappa_charge_model",
+        grappa charge model for parameterization.
     removeH
         Remove one or more hydrogens by atom nrs in the top file.
         One based.
@@ -155,6 +161,8 @@ def modify_top(
         f"top: \t\t\t{top_path}\n"
         f"output: \t\t{out_path}\n"
         f"parameterize: \t\t{parameterize}\n"
+        f"grappa_tag: \t\t{grappa_tag}\n"
+        f"grappa_charge_model: \t{grappa_charge_model}\n"
         f"remove hydrogen: \t{removeH}\n"
         f"optional gro: \t\t{gro_path}\n"
         f"gro output: \t\t{gro_out}\n"
@@ -225,7 +233,9 @@ def modify_top(
         print("Loading Plugins..", end="")
         discover_plugins()
         if "grappa" in parameterization_plugins.keys():
-            top.parametrizer = parameterization_plugins["grappa"]()
+            top.parametrizer = parameterization_plugins["grappa"](
+                grappa_tag=grappa_tag, charge_model=grappa_charge_model
+            )
         else:
             raise KeyError(
                 "No grappa in parameterization plugins. Can't continue to parameterize molecule"
@@ -282,6 +292,18 @@ def get_modify_top_cmdline_args() -> argparse.Namespace:
         action="store_true",
         help="Parameterize topology with grappa.",
         default=False,
+    )
+    parser.add_argument(
+        "--grappa_tag",
+        help="Set grappa model tag for parameterization.",
+        type=str,
+        default="latest",
+    )
+    parser.add_argument(
+        "--grappa_charge_model",
+        help="Set grappa charge model for parameterization.",
+        type=str,
+        default="amber99",
     )
     parser.add_argument(
         "-r",
@@ -341,6 +363,8 @@ def entry_point_modify_top():
         topology=args.top,
         out=args.out,
         parameterize=args.parameterize,
+        grappa_tag=args.grappa_tag,
+        grappa_charge_model=args.grappa_charge_model,
         removeH=args.removeH,
         gro=args.gro,
         residuetypes=args.residuetypes,
