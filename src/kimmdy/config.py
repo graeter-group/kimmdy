@@ -107,7 +107,7 @@ class Config:
                 # base case for recursion
                 opts = scheme.get(k)
                 if opts is None:
-                    if scheme.get('additional_properties'):
+                    if scheme.get("additional_properties"):
                         # property "additional_properties" marks objects that have additional properties
                         self.__setattr__(k, v)
                         continue
