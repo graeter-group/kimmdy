@@ -20,13 +20,13 @@ cd  <tutorial-directory>
 # use an environment with kimmdy
 # download files and create topology
 wget https://hits-mbm-dev.github.io/kimmdy/guide/tutorials/modify-topology-files/pep.pdb
-gmx pdb2gmx -f pep.pdb -ignh  # select and appropriate force field
+gmx pdb2gmx -f pep.pdb -ignh  # select an appropriate force field from which partial charges and LJ parameters will be taken, e.g. amber99sbildn
 ```
 
-Next, parameterize the peptide and check out the resulting topology file. Make sure to change the values for `-grappa_tag` and `grappa_charge_model` if the defaults are not applicable.
+Next, re-parameterize the peptide with grappa and check out the resulting topology file. Make sure to change the values for `-grappa_tag` and `grappa_charge_model` if the defaults are not applicable.
 
 ```bash
-# parameterize peptide
+# parameterize peptide with grappa
 kimmdy-modify-top topol.top topol_grappa.top -p
 # check out the output file; use a text editor of your choice
 gedit topol_grappa.top
@@ -52,10 +52,10 @@ You should see explicit parameters for bonds, angles dihedrals (e.g `2 1 5 6 9 1
 
 # Remove Hydrogens and parameterize for radical starting structures
 
-An additional capability of the tool is to remove hydrogens to create radicals. Which hydrogen will be removed is defined by its atom nr in the topology file (first column). Additionally, the structure file has to be modified to get a compatible pair of structure and topology file. Look for the atom nr of the hydrogen connected to the Ala C-alpha and remove it. Keep the `-p` flag to reparameterize the molecule using grappa. Use a text editor or molecule visualization program to verify the successful removal of the hydrogen of choice.
+An additional capability of the tool is to remove hydrogens to create radicals. Which hydrogen will be removed is defined by its atom nr in the topology file (first column). Additionally, the structure file has to be modified to get a compatible pair of structure and topology file. Look for the atom nr of the hydrogen connected to the Ala C-alpha and remove it. Keep the `-p` flag to reparameterize the molecule using grappa. Use a text editor or molecule visualization program to verify the successful removal of the hydrogen of choice. The nonbonded parameters all stay the same, except for the partial charge of the heavy atom from which the hydrogen is detached: The partial charge of the hydrogen will be added to the heavy atom upon removal of the hydrogen.
 
 ```bash
-# remove hydrogen and parameterize peptide
+# remove hydrogen and re-parameterize peptide with grappa
 kimmdy-modify-top topol.top topol_grappa_CA.top -p -c conf.gro -r <hydrogen nr>
 # look at the result
 ```
