@@ -28,7 +28,7 @@ Next, parameterize the peptide and check out the resulting topology file.
 ```bash
 # parameterize peptide
 kimmdy-modify-top topol.top topol_grappa.top -p
-# check out result
+# check out the output file; use a text editor of your choice
 vim topol_grappa.top
 ```
 
