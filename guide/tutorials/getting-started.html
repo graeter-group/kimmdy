@@ -65,7 +65,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
-<link href="../../guide/tutorials/write-plugin.html" rel="next">
+<link href="../../guide/tutorials/modify-topology.html" rel="next">
 <link href="../../guide/tutorials/colbuilder.html" rel="prev">
 <script src="../../site_libs/quarto-html/quarto.js"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
@@ -216,6 +216,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../../guide/tutorials/getting-started.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Get Started</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guide/tutorials/modify-topology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Modify a Topology</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -615,7 +621,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Our starting structure is a simple ACE/NME-capped Alanine molecule in a box of water. Note, how it has a missing hydrogen atom on the alpha carbon. This is a radical. We will use the builtin <code>hat_reaction</code> to simulate hydrogen atom transfer reactions from nearby hydrogens to the radical position.</p>
     <div id="app-./getting-started-files/vis-ala.molj" class="molstar-app"></div>
     <script type="text/javascript">
-    molstar.Viewer.create("app-./getting-started-files/vis-ala.molj", {"viewportShowSelectionMode":false,"layoutShowRemoteState":false,"layoutShowControls":false,"layoutIsExpanded":false,"emdbProvider":"rcsb","layoutShowLeftPanel":true,"viewportShowAnimation":true,"layoutShowLog":false,"viewportShowExpand":true,"pdbProvider":"rcsb","layoutShowSequence":false}).then(viewer => {
+    molstar.Viewer.create("app-./getting-started-files/vis-ala.molj", {"viewportShowAnimation":true,"layoutShowLog":false,"layoutShowControls":false,"layoutIsExpanded":false,"layoutShowSequence":false,"layoutShowLeftPanel":true,"layoutShowRemoteState":false,"emdbProvider":"rcsb","pdbProvider":"rcsb","viewportShowSelectionMode":false,"viewportShowExpand":true}).then(viewer => {
     viewer.loadSnapshotFromUrl(url="./getting-started-files/vis-ala.molj", "molj");    });
     </script>
     
@@ -1145,8 +1151,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../../guide/tutorials/write-plugin.html" class="pagination-link">
-        <span class="nav-page-text">Write a Reaction Plugin</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../../guide/tutorials/modify-topology.html" class="pagination-link">
+        <span class="nav-page-text">Modify a Topology</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
