@@ -148,7 +148,7 @@ class RunManager:
             else:
                 self.parameterizer = parameterization_plugins[
                     self.config.changer.topology.parameterization
-                ]()
+                ](**self.config.changer.topology.parameterization_kwargs.__dict__)
         except KeyError as e:
             raise KeyError(
                 f"The parameterization tool chosen in the configuration file: "

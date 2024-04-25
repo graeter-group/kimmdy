@@ -69,22 +69,26 @@ parse cmdline args for modify_top
 
 ### modify_top { #kimmdy.tools.modify_top }
 
-`tools.modify_top(topology, out, parameterize=False, removeH=None, gro=None, residuetypes=None, radicals=None, search_amber_rad=True)`
+`tools.modify_top(topology, out, parameterize=False, grappa_tag='latest', grappa_charge_model='amber99', removeH=None, gro=None, residuetypes=None, radicals=None, search_amber_rad=True, include=None, exclude=None)`
 
 Modify topology in various ways.
 
 #### Parameters
 
-| Name               | Type                                                            | Description                                                                                                                                              | Default    |
-|--------------------|-----------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
-| `topology`         | [str](`str`)                                                    | Path to GROMACS top file                                                                                                                                 | _required_ |
-| `out`              | [str](`str`)                                                    | Output topology file path, stem also used for gro. Can be relative to cwd.                                                                               | _required_ |
-| `parameterize`     | [bool](`bool`)                                                  | Parameterize topology with grappa after removing hydrogen                                                                                                | `False`    |
-| `removeH`          | [Optional](`typing.Optional`)\[[list](`list`)\[[int](`int`)\]\] | Remove one or more hydrogens by atom nrs in the top file. One based.                                                                                     | `None`     |
-| `gro`              | [Optional](`typing.Optional`)\[[str](`str`)\]                   | GROMACS gro input file. Updates structure when deleting H. Output named like top output.                                                                 | `None`     |
-| `residuetypes`     | [Optional](`typing.Optional`)\[[str](`str`)\]                   | GROMACS style residuetypes file. Necessary for parameterization with non-amber atom types.                                                               | `None`     |
-| `radicals`         | [Optional](`typing.Optional`)\[[list](`list`)\[[int](`int`)\]\] | Radicals in the system PRIOR to removing hydrogens with the removeH option. One based. Can be detected automatically in amber topologies.                | `None`     |
-| `search_amber_rad` | [bool](`bool`)                                                  | Automatic radical search only implemented for amber. If you do use another ff, set this to false, and provide a list of radicals manually, if necessary. | `True`     |
+| Name                  | Type                                                            | Description                                                                                                                                              | Default     |
+|-----------------------|-----------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|-------------|
+| `topology`            | [str](`str`)                                                    | Path to GROMACS top file                                                                                                                                 | _required_  |
+| `out`                 | [str](`str`)                                                    | Output topology file path, stem also used for gro. Can be relative to cwd.                                                                               | _required_  |
+| `parameterize`        | [bool](`bool`)                                                  | Parameterize topology with grappa after removing hydrogen                                                                                                | `False`     |
+| `grappa_tag`          | [str](`str`)                                                    | grappa model tag for parameterization.                                                                                                                   | `'latest'`  |
+| `grappa_charge_model` | [str](`str`)                                                    | grappa charge model for parameterization.                                                                                                                | `'amber99'` |
+| `removeH`             | [Optional](`typing.Optional`)\[[list](`list`)\[[int](`int`)\]\] | Remove one or more hydrogens by atom nrs in the top file. One based.                                                                                     | `None`      |
+| `gro`                 | [Optional](`typing.Optional`)\[[str](`str`)\]                   | GROMACS gro input file. Updates structure when deleting H. Output named like top output.                                                                 | `None`      |
+| `residuetypes`        | [Optional](`typing.Optional`)\[[str](`str`)\]                   | GROMACS style residuetypes file. Necessary for parameterization with non-amber atom types.                                                               | `None`      |
+| `radicals`            | [Optional](`typing.Optional`)\[[list](`list`)\[[int](`int`)\]\] | Radicals in the system PRIOR to removing hydrogens with the removeH option. One based. Can be detected automatically in amber topologies.                | `None`      |
+| `search_amber_rad`    | [bool](`bool`)                                                  | Automatic radical search only implemented for amber. If you do use another ff, set this to false, and provide a list of radicals manually, if necessary. | `True`      |
+| `include`             | [Optional](`typing.Optional`)\[[str](`str`)\]                   | Include certain GROMACS topology molecules in `Reactive` molecule. Reads molecule names from a csv file.                                                 | `None`      |
+| `exclude`             | [Optional](`typing.Optional`)\[[str](`str`)\]                   | Exclude certain GROMACS topology molecules in `Reactive` molecule. Reads molecule names from a csv file.                                                 | `None`      |
 
 ### top_to_graph { #kimmdy.tools.top_to_graph }
 

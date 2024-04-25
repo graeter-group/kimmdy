@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.550">
+<meta name="generator" content="quarto-1.4.176">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -23,7 +23,7 @@ ul.task-list li input[type="checkbox"] {
 }
 /* CSS for syntax highlighting */
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -87,13 +87,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   "collapse-after": 3,
   "panel-placement": "end",
   "type": "overlay",
-  "limit": 50,
+  "limit": 20,
   "keyboard-shortcut": [
     "f",
     "/",
     "s"
   ],
-  "show-item-context": false,
   "language": {
     "search-no-results-text": "No results",
     "search-matching-documents-text": "matching documents",
@@ -102,7 +101,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-more-match-text": "more match in this document",
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
-    "search-text-placeholder": "",
     "search-detached-cancel-button-title": "Cancel",
     "search-submit-button-title": "Submit",
     "search-label": "Search"
@@ -116,7 +114,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
-    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a class="navbar-brand" href="../../index.html">
@@ -130,24 +128,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="../../guide/tutorials/getting-started.html" aria-current="page"> 
-<span class="menu-text">Getting Started</span></a>
+    <a class="nav-link active" href="../../guide/tutorials/getting-started.html" rel="" target="" aria-current="page">
+ <span class="menu-text">Getting Started</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../../guide/how-to/index.html"> 
-<span class="menu-text">How-To</span></a>
+    <a class="nav-link" href="../../guide/how-to/index.html" rel="" target="">
+ <span class="menu-text">How-To</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../../guide/tutorials/index.html"> 
-<span class="menu-text">Tutorials</span></a>
+    <a class="nav-link" href="../../guide/tutorials/index.html" rel="" target="">
+ <span class="menu-text">Tutorials</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../../guide/explanation/index.html"> 
-<span class="menu-text">Explanations</span></a>
+    <a class="nav-link" href="../../guide/explanation/index.html" rel="" target="">
+ <span class="menu-text">Explanations</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../../_reference/index.html"> 
-<span class="menu-text">Reference</span></a>
+    <a class="nav-link" href="../../_reference/index.html" rel="" target="">
+ <span class="menu-text">Reference</span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -178,11 +176,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </nav>
   <nav class="quarto-secondary-nav">
     <div class="container-fluid d-flex">
-      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
         <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../guide/tutorials/index.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../../guide/tutorials/modify-topology.html">Modify a Topology</a></li></ol></nav>
-        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
   </nav>
@@ -190,7 +188,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
@@ -500,7 +498,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </ul>
     </div>
 </nav>
-<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active" data-toc-expanded="99">
@@ -508,14 +506,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#parameterize-a-molecule-with-grappa" id="toc-parameterize-a-molecule-with-grappa" class="nav-link active" data-scroll-target="#parameterize-a-molecule-with-grappa">Parameterize a Molecule with Grappa</a></li>
-  <li><a href="#remove-hydrogens-for-radical-starting-structures" id="toc-remove-hydrogens-for-radical-starting-structures" class="nav-link" data-scroll-target="#remove-hydrogens-for-radical-starting-structures">Remove Hydrogens for radical starting structures</a>
+  <li><a href="#remove-hydrogens-and-parameterize-for-radical-starting-structures" id="toc-remove-hydrogens-and-parameterize-for-radical-starting-structures" class="nav-link" data-scroll-target="#remove-hydrogens-and-parameterize-for-radical-starting-structures">Remove Hydrogens and parameterize for radical starting structures</a>
   <ul>
   <li><a href="#minimized-structure-of-native-peptide" id="toc-minimized-structure-of-native-peptide" class="nav-link" data-scroll-target="#minimized-structure-of-native-peptide">Minimized structure of native peptide</a></li>
   <li><a href="#minimized-structure-with-deleted-hydrogen" id="toc-minimized-structure-with-deleted-hydrogen" class="nav-link" data-scroll-target="#minimized-structure-with-deleted-hydrogen">Minimized structure with deleted hydrogen</a></li>
   </ul></li>
   <li><a href="#complex-parameterization" id="toc-complex-parameterization" class="nav-link" data-scroll-target="#complex-parameterization">Complex Parameterization</a></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/hits-mbm-dev/kimmdy/edit/main/guide/tutorials/modify-topology.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/hits-mbm-dev/kimmdy/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hits-mbm-dev/kimmdy/edit/main/guide/tutorials/modify-topology.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/hits-mbm-dev/kimmdy/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -544,11 +542,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </div>
   
 
-
 </header>
 
-
-<p>In this tutorial we will check out different ways to process GROMACS topology files with the command-line interface <code>kimmdy-modify-top</code>. Use <code>kimmdy-modify-top -h</code> to see the arguments you can pass to it for your kimmdy version. You need a GROMACS installation and an environment with kimmdy for the tutorial.</p>
+<p>In this tutorial we will check out different ways to process GROMACS topology files with the command-line interface <code>kimmdy-modify-top</code>. Use <code>kimmdy-modify-top -h</code> to see the arguments you can pass to it for your kimmdy version. The python API can be found in the <a href="https://hits-mbm-dev.github.io/kimmdy/_reference/tools.html#kimmdy.tools.modify_top">Reference</a>. You need a GROMACS installation and an environment with kimmdy for the tutorial.</p>
 <section id="parameterize-a-molecule-with-grappa" class="level1">
 <h1>Parameterize a Molecule with Grappa</h1>
 <p>To parameterize a molecule with grappa using <code>kimmdy-modify-top</code>, you first need to have a GROMACS topology file for your system. Here, we will use a Ace-Ala-Nme peptide. First, download the peptide pdb and create a topology file using a grappa-compatible force field.</p>
@@ -557,27 +553,29 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span>  <span class="op">&lt;</span>tutorial-directory<span class="op">&gt;</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># use an environment with kimmdy</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># download files and create topology</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ex">https://hits-mbm-dev.github.io/kimmdy/guide/tutorials/modify-topology-files/pep.pdb</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ex">gmx</span> pdb2gmx <span class="at">-f</span> pep.pdb <span class="at">-ignh</span>  <span class="co"># select and appropriate force field</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Next, parameterize the peptide and check out the resulting topology file.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># parameterize peptide</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">wget</span> https://hits-mbm-dev.github.io/kimmdy/guide/tutorials/modify-topology-files/pep.pdb</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ex">gmx</span> pdb2gmx <span class="at">-f</span> pep.pdb <span class="at">-ignh</span>  <span class="co"># select an appropriate force field from which partial charges and LJ parameters will be taken, e.g. amber99sbildn</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Next, re-parameterize the peptide with grappa and check out the resulting topology file. Make sure to change the values for <code>-grappa_tag</code> and <code>grappa_charge_model</code> if the defaults are not applicable.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># parameterize peptide with grappa</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">kimmdy-modify-top</span> topol.top topol_grappa.top <span class="at">-p</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># check out result</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">vim</span> topol_grappa.top</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># check out the output file; use a text editor of your choice</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">gedit</span> topol_grappa.top</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>For this task you can also use the command-line interface of grappa <code>grappa-gmx</code>. The same results as with the <code>kimmdy-modify-top</code> command above can be achieved with the command below.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">grappa_gmx</span> <span class="at">-f</span> topol.top <span class="at">-o</span> topol_grappa.top <span class="at">-t</span> <span class="st">'latest'</span> <span class="at">-c</span> <span class="st">'amber99'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>You will notice many changes compared to the topology file generated by <code>gmx pdb2gmx</code>. First, all includes were resolved to create a standalone topology file. That’s the reason for having the <code>[ atomtypes ]</code>, <code>[ bondtypes ]</code> and other parameter definitions as well as ion and water topology definitions with <code>[ moleculetype ]</code>, <code>[atoms]</code> and <code>[bonds]</code> sections.</p>
 <p>The change through parameterization will become more apparent by comparing with a non-parameterized, converted topology file.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># parameterize peptide</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">kimmdy-modify-top</span> topol.top topol_vanilla.top </span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># compare results</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="ex">vimdiff</span> topol_grappa.top topol_vanilla.top</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># parameterize peptide</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">kimmdy-modify-top</span> topol.top topol_vanilla.top </span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># compare results</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="ex">vimdiff</span> topol_grappa.top topol_vanilla.top</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>You should see explicit parameters for bonds, angles dihedrals (e.g <code>2 1 5 6 9 180.0 1.5141575 1</code>) in the grappa parameterized file while the non-parameterized file has implicit parameters which are defined in the interaction type section (<code>2 1 5 6 9</code>). If that’s the case, you have successfully parameterized a molecule with grappa and are finished with this section of the tutorial!</p>
 </section>
-<section id="remove-hydrogens-for-radical-starting-structures" class="level1">
-<h1>Remove Hydrogens for radical starting structures</h1>
-<p>An additional capability of the tool is to remove hydrogens to create radicals. Which hydrogen will be removed is defined by its atom nr in the topology file (first column). Additionally, the structure file has to be modified to get a compatible pair of structure and topology file. Look for the atom nr of the hydrogen connected to the Ala C-alpha and remove it. Keep the <code>-p</code> flag to reparameterize the molecule. Use a text editor or molecule visualization program to verify the successful removal of the hydrogen of choice.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># remove hydrogen and parameterize peptide</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">kimmdy-modify-top</span> topol.top topol_grappa_CA.top <span class="at">-p</span> <span class="at">-c</span> conf.gro <span class="at">-r</span> <span class="op">&lt;</span>hydrogen nr<span class="op">&gt;</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># look at the result</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="remove-hydrogens-and-parameterize-for-radical-starting-structures" class="level1">
+<h1>Remove Hydrogens and parameterize for radical starting structures</h1>
+<p>An additional capability of the tool is to remove hydrogens to create radicals. Which hydrogen will be removed is defined by its atom nr in the topology file (first column). Additionally, the structure file has to be modified to get a compatible pair of structure and topology file. Look for the atom nr of the hydrogen connected to the Ala C-alpha and remove it. Keep the <code>-p</code> flag to reparameterize the molecule using grappa. Use a text editor or molecule visualization program to verify the successful removal of the hydrogen of choice. The nonbonded parameters all stay the same, except for the partial charge of the heavy atom from which the hydrogen is detached: The partial charge of the hydrogen will be added to the heavy atom upon removal of the hydrogen.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># remove hydrogen and re-parameterize peptide with grappa</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">kimmdy-modify-top</span> topol.top topol_grappa_CA.top <span class="at">-p</span> <span class="at">-c</span> conf.gro <span class="at">-r</span> <span class="op">&lt;</span>hydrogen nr<span class="op">&gt;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># look at the result</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>To see how removal of a hydrogen changes the minimum energy structure, run a minimization on both the native and radical peptide. Most strikingly, you should see the radical C-alpha become planar, as expected from QM calculations. Use the mdp file mentioned below. Both structures are also shown in molstar panels.</p>
 <details>
 <summary>
@@ -587,35 +585,35 @@ GROMACS mdp file (minim.mdp)
 <div class="code-with-filename-file">
 <pre><strong>minim.mdp</strong></pre>
 </div>
-<div class="sourceCode" id="cb5" data-filename="minim.mdp"><pre class="sourceCode yml code-with-copy"><code class="sourceCode yaml"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="at">; minim.mdp - used as input into grompp to generate em.tpr</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="at">; Parameters describing what to do, when to stop and what to save</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="at">integrator  = steep         ; Algorithm (steep = steepest descent minimization)</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="at">emtol       = 10.0        ; Stop minimization when the maximum force &lt; 10.0 kJ/mol/nm</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="at">emstep      = 0.01          ; Minimization step size</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="at">nsteps      = 50000         ; Maximum number of (minimization) steps to perform</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="at">; Parameters describing how to find the neighbors of each atom and how to calculate the interactions</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="at">nstlist         = 1         ; Frequency to update the neighbor list and long range forces</span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="at">cutoff-scheme   = Verlet    ; Buffered neighbor searching</span></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="at">ns_type         = grid      ; Method to determine neighbor list (simple, grid)</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="at">coulombtype     = PME       ; Treatment of long range electrostatic interactions</span></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="at">rcoulomb        = 1.0       ; Short-range electrostatic cut-off</span></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="at">rvdw            = 1.0       ; Short-range Van der Waals cut-off</span></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="at">pbc             = xyz       ; Periodic Boundary Conditions in all 3 dimensions</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode yml code-with-copy"><code class="sourceCode yaml"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="at">; minim.mdp - used as input into grompp to generate em.tpr</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="at">; Parameters describing what to do, when to stop and what to save</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="at">integrator  = steep         ; Algorithm (steep = steepest descent minimization)</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="at">emtol       = 10.0        ; Stop minimization when the maximum force &lt; 10.0 kJ/mol/nm</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="at">emstep      = 0.01          ; Minimization step size</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="at">nsteps      = 50000         ; Maximum number of (minimization) steps to perform</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="at">; Parameters describing how to find the neighbors of each atom and how to calculate the interactions</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="at">nstlist         = 1         ; Frequency to update the neighbor list and long range forces</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="at">cutoff-scheme   = Verlet    ; Buffered neighbor searching</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="at">ns_type         = grid      ; Method to determine neighbor list (simple, grid)</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="at">coulombtype     = PME       ; Treatment of long range electrostatic interactions</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="at">rcoulomb        = 1.0       ; Short-range electrostatic cut-off</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="at">rvdw            = 1.0       ; Short-range Van der Waals cut-off</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="at">pbc             = xyz       ; Periodic Boundary Conditions in all 3 dimensions</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </details>
-<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># minimize radical peptide</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">gmx</span> editconf <span class="at">-f</span> topol_grappa_CA.gro <span class="at">-o</span> topol_grappa_CA_box.gro <span class="at">-d</span> 1 <span class="at">-bt</span> cubic</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ex">gmx</span> grompp <span class="at">-f</span> minim.mdp <span class="at">-c</span> topol_grappa_CA_box.gro <span class="at">-p</span> topol_grappa_CA.top <span class="at">-o</span> minim.tpr</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="ex">gmx</span> mdrun <span class="at">-deffnm</span> minim</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co"># do the same for the native peptide</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co"># look at the result</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># minimize radical peptide</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">gmx</span> editconf <span class="at">-f</span> topol_grappa_CA.gro <span class="at">-o</span> topol_grappa_CA_box.gro <span class="at">-d</span> 1 <span class="at">-bt</span> cubic</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="ex">gmx</span> grompp <span class="at">-f</span> minim.mdp <span class="at">-c</span> topol_grappa_CA_box.gro <span class="at">-p</span> topol_grappa_CA.top <span class="at">-o</span> minim.tpr</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="ex">gmx</span> mdrun <span class="at">-deffnm</span> minim</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co"># do the same for the native peptide</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co"># look at the result</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <section id="minimized-structure-of-native-peptide" class="level3">
 <h3 class="anchored" data-anchor-id="minimized-structure-of-native-peptide">Minimized structure of native peptide</h3>
     <div id="app-./modify-topology-files/minim.pdb" class="molstar-app"></div>
     <script type="text/javascript">
-    molstar.Viewer.create("app-./modify-topology-files/minim.pdb", {"emdbProvider":"rcsb","layoutShowLeftPanel":true,"viewportShowSelectionMode":false,"viewportShowAnimation":true,"layoutIsExpanded":false,"layoutShowControls":false,"pdbProvider":"rcsb","layoutShowSequence":false,"viewportShowExpand":true,"layoutShowRemoteState":false,"layoutShowLog":false}).then(viewer => {
+    molstar.Viewer.create("app-./modify-topology-files/minim.pdb", {"pdbProvider":"rcsb","layoutIsExpanded":false,"layoutShowSequence":false,"viewportShowSelectionMode":false,"layoutShowRemoteState":false,"emdbProvider":"rcsb","layoutShowControls":false,"viewportShowAnimation":true,"layoutShowLog":false,"layoutShowLeftPanel":true,"viewportShowExpand":true}).then(viewer => {
     viewer.loadStructureFromUrl("./modify-topology-files/minim.pdb", format="pdb");    });
     </script>
     
@@ -624,42 +622,51 @@ GROMACS mdp file (minim.mdp)
 <h3 class="anchored" data-anchor-id="minimized-structure-with-deleted-hydrogen">Minimized structure with deleted hydrogen</h3>
     <div id="app-./modify-topology-files/minim_delH.pdb" class="molstar-app"></div>
     <script type="text/javascript">
-    molstar.Viewer.create("app-./modify-topology-files/minim_delH.pdb", {"emdbProvider":"rcsb","layoutShowLeftPanel":true,"viewportShowSelectionMode":false,"viewportShowAnimation":true,"layoutIsExpanded":false,"layoutShowControls":false,"pdbProvider":"rcsb","layoutShowSequence":false,"viewportShowExpand":true,"layoutShowRemoteState":false,"layoutShowLog":false}).then(viewer => {
+    molstar.Viewer.create("app-./modify-topology-files/minim_delH.pdb", {"pdbProvider":"rcsb","layoutIsExpanded":false,"layoutShowSequence":false,"viewportShowSelectionMode":false,"layoutShowRemoteState":false,"emdbProvider":"rcsb","layoutShowControls":false,"viewportShowAnimation":true,"layoutShowLog":false,"layoutShowLeftPanel":true,"viewportShowExpand":true}).then(viewer => {
     viewer.loadStructureFromUrl("./modify-topology-files/minim_delH.pdb", format="pdb");    });
     </script>
     
-<div class="callout callout-style-simple callout-warning">
-<div class="callout-body d-flex">
+<div class="callout callout-style-simple callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<div class="callout-body-container">
+<div class="callout-title-container flex-fill">
+
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <p>This has only been validated for proteins but the implementation is designed to provide a general solution. Hence, non-verified and possibly wrong parameters can easily be generated. For further information, refer to appendix of the original <a href="https://doi.org/10.48550/arXiv.2404.00050">grappa paper</a>.</p>
 </div>
 </div>
-</div>
-<div class="callout callout-style-simple callout-warning">
-<div class="callout-body d-flex">
+<div class="callout callout-style-simple callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<div class="callout-body-container">
-<p>When using the option to remove hydrogens, make sure to keep a distance of at least 16-20 bonds (corresponding to 2 times the field-of-view of the grappa model) between radicals because grappa is not trained on systems with multiple radicals.</p>
+<div class="callout-title-container flex-fill">
+
 </div>
+</div>
+<div class="callout-body-container callout-body">
+<p>When using the option to remove hydrogens, make sure to keep a distance of at least 16-20 bonds (corresponding to 2 times the field-of-view of the grappa model) between radicals because grappa is not trained on systems with multiple radicals.</p>
 </div>
 </div>
 </section>
 </section>
 <section id="complex-parameterization" class="level1">
 <h1>Complex Parameterization</h1>
-<div class="callout callout-style-simple callout-tip">
-<div class="callout-body d-flex">
+<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<div class="callout-body-container">
-<p>While parsing a topology file, molecules that are neither water nor ions (as identified by the molecule name) are grouped in the <code>Reactive</code> molecule. This <code>Reactive</code> molecule is passed to grappa for parameterization. For topologies with multiple solute components such as protein:DNA complexes or membrane proteins as well as files where the default recognition of water and ions does not work, you can explicitly define included and excluded moleculetypes in the topology. The includes and excludes are supplied as .csv files.</p>
+<div class="callout-title-container flex-fill">
+
 </div>
+</div>
+<div class="callout-body-container callout-body">
+<p>While parsing a topology file, molecules that are neither water nor ions (as identified by the molecule name) are grouped in the <code>Reactive</code> molecule. This <code>Reactive</code> molecule is passed to grappa for parameterization. For topologies with multiple solute components such as protein:DNA complexes or membrane proteins as well as files where the default recognition of water and ions does not work, you can explicitly define included and excluded moleculetypes in the topology. The includes and excludes are supplied as .csv files.</p>
 </div>
 </div>
 
@@ -929,55 +936,19 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
   const xrefs = window.document.querySelectorAll('a.quarto-xref');
   const processXRef = (id, note) => {
-    // Strip column container classes
-    const stripColumnClz = (el) => {
-      el.classList.remove("page-full", "page-columns");
-      if (el.children) {
-        for (const child of el.children) {
-          stripColumnClz(child);
-        }
-      }
-    }
-    stripColumnClz(note)
-    if (id === null || id.startsWith('sec-')) {
+    if (id.startsWith('sec-')) {
       // Special case sections, only their first couple elements
       const container = document.createElement("div");
       if (note.children && note.children.length > 2) {
-        container.appendChild(note.children[0].cloneNode(true));
-        for (let i = 1; i < note.children.length; i++) {
-          const child = note.children[i];
-          if (child.tagName === "P" && child.innerText === "") {
-            continue;
-          } else {
-            container.appendChild(child.cloneNode(true));
-            break;
-          }
-        }
-        if (window.Quarto?.typesetMath) {
-          window.Quarto.typesetMath(container);
+        for (let i = 0; i < 2; i++) {
+          container.appendChild(note.children[i].cloneNode(true));
         }
         return container.innerHTML
       } else {
-        if (window.Quarto?.typesetMath) {
-          window.Quarto.typesetMath(note);
-        }
         return note.innerHTML;
       }
     } else {
-      // Remove any anchor links if they are present
-      const anchorLink = note.querySelector('a.anchorjs-link');
-      if (anchorLink) {
-        anchorLink.remove();
-      }
-      if (window.Quarto?.typesetMath) {
-        window.Quarto.typesetMath(note);
-      }
-      // TODO in 1.5, we should make sure this works without a callout special case
-      if (note.classList.contains("callout")) {
-        return note.outerHTML;
-      } else {
-        return note.innerHTML;
-      }
+      return note.innerHTML;
     }
   }
   for (var i=0; i<xrefs.length; i++) {
@@ -986,56 +957,27 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       instance.disable();
       let url = xref.getAttribute('href');
       let hash = undefined; 
-      if (url.startsWith('#')) {
-        hash = url;
-      } else {
-        try { hash = new URL(url).hash; } catch {}
-      }
-      if (hash) {
-        const id = hash.replace(/^#\/?/, "");
-        const note = window.document.getElementById(id);
-        if (note !== null) {
-          try {
-            const html = processXRef(id, note.cloneNode(true));
-            instance.setContent(html);
-          } finally {
-            instance.enable();
-            instance.show();
-          }
-        } else {
-          // See if we can fetch this
-          fetch(url.split('#')[0])
-          .then(res => res.text())
-          .then(html => {
-            const parser = new DOMParser();
-            const htmlDoc = parser.parseFromString(html, "text/html");
-            const note = htmlDoc.getElementById(id);
-            if (note !== null) {
-              const html = processXRef(id, note);
-              instance.setContent(html);
-            } 
-          }).finally(() => {
-            instance.enable();
-            instance.show();
-          });
+      try { hash = new URL(url).hash; } catch {}
+      const id = hash.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note !== null) {
+        try {
+          const html = processXRef(id, note);
+          instance.setContent(html);
+        } finally {
+          instance.enable();
+          instance.show();
         }
       } else {
-        // See if we can fetch a full url (with no hash to target)
-        // This is a special case and we should probably do some content thinning / targeting
-        fetch(url)
+        // See if we can fetch this
+        fetch(url.split('#')[0])
         .then(res => res.text())
         .then(html => {
           const parser = new DOMParser();
           const htmlDoc = parser.parseFromString(html, "text/html");
-          const note = htmlDoc.querySelector('main.content');
+          const note = htmlDoc.getElementById(id);
           if (note !== null) {
-            // This should only happen for chapter cross references
-            // (since there is no id in the URL)
-            // remove the first header
-            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
-              note.children[0].remove();
-            }
-            const html = processXRef(null, note);
+            const html = processXRef(id, note);
             instance.setContent(html);
           } 
         }).finally(() => {
@@ -1113,32 +1055,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         });
         selectedAnnoteEl = undefined;
       };
-        // Handle positioning of the toggle
-    window.addEventListener(
-      "resize",
-      throttle(() => {
-        elRect = undefined;
-        if (selectedAnnoteEl) {
-          selectCodeLines(selectedAnnoteEl);
-        }
-      }, 10)
-    );
-    function throttle(fn, ms) {
-    let throttle = false;
-    let timer;
-      return (...args) => {
-        if(!throttle) { // first call gets through
-            fn.apply(this, args);
-            throttle = true;
-        } else { // all the others get throttled
-            if(timer) clearTimeout(timer); // cancel #2
-            timer = setTimeout(() => {
-              fn.apply(this, args);
-              timer = throttle = false;
-            }, ms);
-        }
-      };
-    }
       // Attach click handler to the DT
       const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
       for (const annoteDlNode of annoteDls) {
@@ -1200,12 +1116,12 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../../guide/tutorials/getting-started.html" class="pagination-link" aria-label="Get Started">
+      <a href="../../guide/tutorials/getting-started.html" class="pagination-link">
         <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Get Started</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../../guide/tutorials/write-plugin.html" class="pagination-link" aria-label="Write a Reaction Plugin">
+      <a href="../../guide/tutorials/write-plugin.html" class="pagination-link">
         <span class="nav-page-text">Write a Reaction Plugin</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
@@ -1215,4 +1131,4 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 
 
 
-<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/hits-mbm-dev/kimmdy/edit/main/guide/tutorials/modify-topology.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/hits-mbm-dev/kimmdy/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>
+</body></html>

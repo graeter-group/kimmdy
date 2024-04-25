@@ -107,6 +107,10 @@ class Config:
                 # base case for recursion
                 opts = scheme.get(k)
                 if opts is None:
+                    if scheme.get("additional_properties"):
+                        # property "additional_properties" marks objects that have additional properties
+                        self.__setattr__(k, v)
+                        continue
                     m = f"Unknown option {section}.{k} found in config file."
                     if "reactions." in section:
                         m += "\nCheck installed plugins with --show-plugins and your input .yml"
