@@ -260,6 +260,17 @@
               "pytype": "str",
               "enum": ["grappa","basic"],
               "default": "basic"
+            },
+            "parameterization_kwargs":{
+              "type": "object",
+              "description": "Keyword argument container for the selected parameterization scheme", 
+              "properties": {
+                "additional_properties":{
+                  "type": "bool",
+                  "description": "This allows the parent object to have additional properties"
+                }
+              },
+              "additionalProperties": true
             }
           },
           "additionalProperties": false

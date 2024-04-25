@@ -96,7 +96,8 @@ class ReactionPlugin(ABC):
 
 
 class Parameterizer(ABC):
-    type_scheme = dict()
+    def __init__(self, **kwargs):
+        self.type_scheme = dict()
 
     @abstractmethod
     def parameterize_topology(

@@ -15,7 +15,7 @@ Also discovers and loads KIMMDY plugins.
 
 ### BasicParameterizer { #kimmdy.plugins.BasicParameterizer }
 
-`plugins.BasicParameterizer()`
+`plugins.BasicParameterizer(self, **kwargs)`
 
 reconstruct base force field state
 
