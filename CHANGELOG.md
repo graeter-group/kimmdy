@@ -1,5 +1,25 @@
 # Changelog
 
+## [6.6.0](https://github.com/hits-mbm-dev/kimmdy/compare/v6.5.0...v6.6.0) (2024-04-25)
+
+
+### Features
+
+* add explicit includes and excludes for modify_top ([#427](https://github.com/hits-mbm-dev/kimmdy/issues/427)) ([c1318c3](https://github.com/hits-mbm-dev/kimmdy/commit/c1318c3d55bb21e6ee0e82e32301cc45ca8e7f24))
+* Expose grappa model and charge type ([#430](https://github.com/hits-mbm-dev/kimmdy/issues/430)) ([57af388](https://github.com/hits-mbm-dev/kimmdy/commit/57af38808dd510640cc53420803d2299f5e172f5))
+* modify top tut ([#428](https://github.com/hits-mbm-dev/kimmdy/issues/428)) ([823b7ff](https://github.com/hits-mbm-dev/kimmdy/commit/823b7ffe631c13501266804a90ecd11f8397886b))
+
+
+### Bug Fixes
+
+* handle time windows w/ no rates in extrande_mod correctly ([f5c3f7c](https://github.com/hits-mbm-dev/kimmdy/commit/f5c3f7c76f4c18a7e98cf2fe13afbe1c47041ead))
+* typo ([7130aff](https://github.com/hits-mbm-dev/kimmdy/commit/7130aff8f09dbe56231b1d2c20ee2b620db8aaca))
+
+
+### Documentation
+
+* how_to page for analysis ([#424](https://github.com/hits-mbm-dev/kimmdy/issues/424)) ([b35e1c8](https://github.com/hits-mbm-dev/kimmdy/commit/b35e1c86534dc59090150d2a94c912f9903f0c83))
+
 ## [6.5.0](https://github.com/hits-mbm-dev/kimmdy/compare/v6.4.1...v6.5.0) (2024-03-25)
 
 
