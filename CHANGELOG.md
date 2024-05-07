@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.6.1](https://github.com/hits-mbm-dev/kimmdy/compare/v6.6.0...v6.6.1) (2024-05-07)
+
+
+### Bug Fixes
+
+* generate matching gro for xtc in trjconv ([800de0a](https://github.com/hits-mbm-dev/kimmdy/commit/800de0ac16f1b21af8d41c94718fd34bdf3ab4df))
+
 ## [6.6.0](https://github.com/hits-mbm-dev/kimmdy/compare/v6.5.0...v6.6.0) (2024-04-25)
 
 
