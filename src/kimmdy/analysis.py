@@ -77,6 +77,7 @@ def concat_traj(
         )
 
     out_xtc = analysis_dir / "concat.xtc"
+    out_gro = analysis_dir / "concat.gro"
 
     if not any([filetype in ["xtc", "trr"]]):
         raise NotImplementedError(
@@ -114,10 +115,13 @@ def concat_traj(
         f"echo 'Protein\n{output}' | gmx trjconv -dt 0 -f {tmp_xtc} -s {tprs[0]} -o {str(out_xtc)} -center -pbc mol",
         cwd=run_dir,
     )
+    run_shell_cmd(
+        f"echo 'Protein\n{output}' | gmx trjconv -dump 0 -f {tmp_xtc} -s {tprs[0]} -o {str(out_gro)} -center -pbc mol",
+        cwd=run_dir,
+    )
     run_shell_cmd(f"rm {tmp_xtc}", cwd=run_dir)
     if open_vmd:
         gro = str(gros[0])
-        run_shell_cmd(f"cp {gro} {str(analysis_dir)}", cwd=run_dir)
         run_shell_cmd(f"vmd {gro} {str(out_xtc)}", cwd=run_dir)
 
 
