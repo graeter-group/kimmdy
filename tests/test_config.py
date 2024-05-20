@@ -1,12 +1,13 @@
+from pathlib import Path
+
+import pytest
 import yaml
 
 from kimmdy.config import Config
+from kimmdy.parsing import read_top
 from kimmdy.runmanager import get_existing_files
 from kimmdy.topology.ff import FF
 from kimmdy.topology.topology import Topology
-from kimmdy.parsing import read_top
-from pathlib import Path
-import pytest
 
 
 @pytest.mark.require_gmx
