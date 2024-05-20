@@ -12,7 +12,7 @@ jobscript = """
 #SBATCH --gpus 1
 #SBATCH --mail-type=ALL
 # #SBATCH -p <your-partition>.p
-# #SBATCH --mail-user=<your-email
+# #SBATCH --mail-user=<your-email>
 
 
 # Setup up your environment here

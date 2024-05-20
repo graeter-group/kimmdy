@@ -18,10 +18,13 @@ mds:
     mdp: 'pullf1500_slow_growth.mdp'
 changer:
   coordinates:
-    md: 'relax'     
+    md: 'relax'
     slow_growth: true
   topology:
     parameterization: 'basic' 
+    parameterization_kwargs: 
+      arg1: hello
+      arg2: 1
 reactions:
   homolysis:
     edis: 'edissoc.dat'
