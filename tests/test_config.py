@@ -193,3 +193,10 @@ def test_explicit_radicals(arranged_tmp_path):
     assert len(top.radicals) == 4
     for radical in config.radicals.split(sep=" "):
         assert top.radicals.get(radical)
+
+
+def test_config_retains_additional_kwargs(
+    arranged_tmp_path,
+):
+    config = Config(Path("config4.yml"))
+    assert config.changer.topology.parameterization_kwargs.test_arg == "hello"

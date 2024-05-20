@@ -17,7 +17,7 @@
           "pytype": "int",
           "default": 1
         },
-        "ntasks": {
+        "ntasks_per_node": {
           "type": "integer",
           "description": "n tasks per node",
           "pytype": "int",
@@ -29,7 +29,7 @@
           "pytype": "int",
           "default": 20
         },
-        "cpus": {
+        "cpus_per_task": {
           "type": "integer",
           "description": "cpus per task",
           "pytype": "int",
