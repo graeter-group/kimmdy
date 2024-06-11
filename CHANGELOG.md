@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.8.0](https://github.com/hits-mbm-dev/kimmdy/compare/v6.7.0...v6.8.0) (2024-06-11)
+
+
+### Features
+
+* parse coarse-grained polymer ffs ([#435](https://github.com/hits-mbm-dev/kimmdy/issues/435)) ([ab696dc](https://github.com/hits-mbm-dev/kimmdy/commit/ab696dc8ab73c464ff1076c4ec7e3a97f8b778d6))
+
 ## [6.7.0](https://github.com/hits-mbm-dev/kimmdy/compare/v6.6.1...v6.7.0) (2024-05-20)
 
 
