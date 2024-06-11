@@ -483,6 +483,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#kimmdy.topology.atomic.Exclusion" id="toc-kimmdy.topology.atomic.Exclusion" class="nav-link" data-scroll-target="#kimmdy.topology.atomic.Exclusion">Exclusion</a></li>
   <li><a href="#kimmdy.topology.atomic.MultipleDihedralTypes" id="toc-kimmdy.topology.atomic.MultipleDihedralTypes" class="nav-link" data-scroll-target="#kimmdy.topology.atomic.MultipleDihedralTypes">MultipleDihedralTypes</a></li>
   <li><a href="#kimmdy.topology.atomic.MultipleDihedrals" id="toc-kimmdy.topology.atomic.MultipleDihedrals" class="nav-link" data-scroll-target="#kimmdy.topology.atomic.MultipleDihedrals">MultipleDihedrals</a></li>
+  <li><a href="#kimmdy.topology.atomic.NonbondParamType" id="toc-kimmdy.topology.atomic.NonbondParamType" class="nav-link" data-scroll-target="#kimmdy.topology.atomic.NonbondParamType">NonbondParamType</a></li>
   <li><a href="#kimmdy.topology.atomic.Pair" id="toc-kimmdy.topology.atomic.Pair" class="nav-link" data-scroll-target="#kimmdy.topology.atomic.Pair">Pair</a></li>
   <li><a href="#kimmdy.topology.atomic.PositionRestraint" id="toc-kimmdy.topology.atomic.PositionRestraint" class="nav-link" data-scroll-target="#kimmdy.topology.atomic.PositionRestraint">PositionRestraint</a></li>
   <li><a href="#kimmdy.topology.atomic.ResidueAtomSpec" id="toc-kimmdy.topology.atomic.ResidueAtomSpec" class="nav-link" data-scroll-target="#kimmdy.topology.atomic.ResidueAtomSpec">ResidueAtomSpec</a></li>
@@ -564,34 +565,38 @@ ul.task-list li input[type="checkbox"] {
 <td>Multiple <code>Dihedral</code>s with the same ai, aj, ak, al</td>
 </tr>
 <tr class="odd">
+<td><a href="#kimmdy.topology.atomic.NonbondParamType">NonbondParamType</a></td>
+<td>Information about one nonbonded parameterize</td>
+</tr>
+<tr class="even">
 <td><a href="#kimmdy.topology.atomic.Pair">Pair</a></td>
 <td>Information about one pair</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#kimmdy.topology.atomic.PositionRestraint">PositionRestraint</a></td>
 <td>Information about one position restraint.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#kimmdy.topology.atomic.ResidueAtomSpec">ResidueAtomSpec</a></td>
 <td>Information about one atom in a residue</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#kimmdy.topology.atomic.ResidueBondSpec">ResidueBondSpec</a></td>
 <td>Information about one bond in a residue</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#kimmdy.topology.atomic.ResidueImproperSpec">ResidueImproperSpec</a></td>
 <td>Information about one improper dihedral in a residue</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#kimmdy.topology.atomic.ResidueProperSpec">ResidueProperSpec</a></td>
 <td>Information about one proper dihedral in a residue</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#kimmdy.topology.atomic.ResidueType">ResidueType</a></td>
 <td>Information about one residuetype from aminoacids.rtp</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#kimmdy.topology.atomic.Settle">Settle</a></td>
 <td>Information about one settles</td>
 </tr>
@@ -620,7 +625,7 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="kimmdy.topology.atomic.AtomType" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.AtomType">AtomType</h3>
-<p><code>topology.atomic.AtomType(self, type, id_sym, at_num, mass, charge, ptype, sigma, epsilon, id)</code></p>
+<p><code>topology.atomic.AtomType(self, type, id, id_sym, mass, charge, ptype, sigma, epsilon, at_num=None)</code></p>
 <p>Information about one atom type</p>
 <p>A class containing atom type information as in the atomtypes section of the forcefield.</p>
 <p>From gromacs version of the amber* ff: ; name at.num mass charge ptype sigma epsilon</p>
@@ -678,6 +683,13 @@ ul.task-list li input[type="checkbox"] {
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.MultipleDihedrals">MultipleDihedrals</h3>
 <p><code>topology.atomic.MultipleDihedrals(self, ai, aj, ak, al, funct, dihedrals)</code></p>
 <p>Multiple <code>Dihedral</code>s with the same ai, aj, ak, al but different periodicities. funct should always be “9” when the length of dihedrals is &gt; 1. The key of the dihedrals dict is the periodicity (c2).</p>
+</section>
+<section id="kimmdy.topology.atomic.NonbondParamType" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.NonbondParamType">NonbondParamType</h3>
+<p><code>topology.atomic.NonbondParamType(self, i, j, id, id_sym, funct, c0=None, c1=None, c2=None)</code></p>
+<p>Information about one nonbonded parameterize</p>
+<p>typical in coarse grained models. A class containing nonbonded information as in the nonbond_params section of the forcefield.</p>
+<p>From gromacs: ; Lennard jones between beads ; i j funda sigma(nm) epsilon (kmol/mol) Where i and j are atomtypes</p>
 </section>
 <section id="kimmdy.topology.atomic.Pair" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.Pair">Pair</h3>
