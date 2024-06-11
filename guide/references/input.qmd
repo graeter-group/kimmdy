@@ -29,11 +29,14 @@ Nested options are separated by a `.`.
 The key for a section is **bold**.
 
 ```{python}
-#| output: asis
-from kimmdy.plugins import discover_plugins
+from kimmdy.plugins import discover_plugins, reaction_plugins
 from kimmdy.schema import get_combined_scheme, flatten_scheme, generate_markdown_table
 
 discover_plugins()
+```
+
+```{python}
+#| output: asis
 scheme = get_combined_scheme()
 flat_scheme = flatten_scheme(scheme)
 table = generate_markdown_table(flat_scheme)
