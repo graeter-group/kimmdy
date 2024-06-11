@@ -797,14 +797,6 @@ class TestPolymerFF:
             epsilon="0.0",
         )
 
-    def test_parser_invertible(self, filedir: Path, tmp_path: Path):
-        path = filedir / "polymer/topol.top"
-        raw_top = read_top(path)
-        top = Topology(raw_top)
-        new_raw_top = top.to_dict()
-        assert raw_top == new_raw_top
-        write_top(new_raw_top, Path("/home/jannik/Desktop/topol.top"))
-
 
 class TestRadicalAla:
     @pytest.fixture
