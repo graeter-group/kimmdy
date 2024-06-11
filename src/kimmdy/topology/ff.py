@@ -36,7 +36,7 @@ class FF:
         self.residuetypes: dict[str, ResidueType] = {}
         self.nonbond_params: dict[BondId, NonbondParamType] = {}
 
-        ffdir = top["ffdir"]
+        ffdir: Optional[Path] = top["ffdir"]
 
         atomtypes = get_top_section(top, "atomtypes")
         if atomtypes is not None:
@@ -104,7 +104,7 @@ class FF:
                 logger.warning("ffdir is None. No residuetypes will be parsed.")
                 return
             residuetypes_path = ffdir / "aminoacids.rtp"
-            if residuetypes_path is None:
+            if not residuetypes_path.exists():
                 logger.warning(
                     "aminoacids.rtp not found in ffdir. No residuetypes will be parsed."
                 )
