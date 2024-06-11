@@ -22,6 +22,7 @@ See [gromacs manual](https://manual.gromacs.org/current/reference-manual/topolog
 | [Exclusion](#kimmdy.topology.atomic.Exclusion) | Information about one exclusion |
 | [MultipleDihedralTypes](#kimmdy.topology.atomic.MultipleDihedralTypes) | Multiple ``DihedralTypes``s with the same ai, aj, ak, al |
 | [MultipleDihedrals](#kimmdy.topology.atomic.MultipleDihedrals) | Multiple ``Dihedral``s with the same ai, aj, ak, al |
+| [NonbondParamType](#kimmdy.topology.atomic.NonbondParamType) | Information about one nonbonded parameterize |
 | [Pair](#kimmdy.topology.atomic.Pair) | Information about one pair |
 | [PositionRestraint](#kimmdy.topology.atomic.PositionRestraint) | Information about one position restraint. |
 | [ResidueAtomSpec](#kimmdy.topology.atomic.ResidueAtomSpec) | Information about one atom in a residue |
@@ -68,7 +69,7 @@ From gromacs topology:
 
 ### AtomType { #kimmdy.topology.atomic.AtomType }
 
-`topology.atomic.AtomType(self, type, id_sym, at_num, mass, charge, ptype, sigma, epsilon, id)`
+`topology.atomic.AtomType(self, type, id, id_sym, mass, charge, ptype, sigma, epsilon, at_num=None)`
 
 Information about one atom type
 
@@ -174,6 +175,20 @@ Multiple ``Dihedral``s with the same ai, aj, ak, al
 but different periodicities.
 funct should always be "9" when the length of dihedrals is > 1.
 The key of the dihedrals dict is the periodicity (c2).
+
+### NonbondParamType { #kimmdy.topology.atomic.NonbondParamType }
+
+`topology.atomic.NonbondParamType(self, i, j, id, id_sym, funct, c0=None, c1=None, c2=None)`
+
+Information about one nonbonded parameterize
+
+typical in coarse grained models.
+A class containing nonbonded information as in the nonbond_params section of the forcefield.
+
+From gromacs:
+; Lennard jones between beads
+; i j funda sigma(nm) epsilon (kmol/mol)
+Where i and j are atomtypes
 
 ### Pair { #kimmdy.topology.atomic.Pair }
 

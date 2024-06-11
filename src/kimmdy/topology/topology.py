@@ -253,7 +253,11 @@ class MoleculeType:
         )
         self.radicals = {}
         for atom in self.atoms.values():
-            bo = ATOMTYPE_BONDORDER_FLAT[atom.type]
+            bo = ATOMTYPE_BONDORDER_FLAT.get(atom.type)
+            if bo is None:
+                logger.warning(
+                    f"Atomtype {atom.type} not found in AMBER atomtypes. Cannot infer radical status."
+                )
             if bo and bo > len(atom.bound_to_nrs):
                 self.radicals[atom.nr] = atom
                 atom.is_radical = True
@@ -850,7 +854,11 @@ class Topology:
             "bondtypes",
             [attributes_to_list(x) for x in self.ff.bondtypes.values()],
         )
-
+        set_top_section(
+            self.top,
+            "nonbond_params",
+            [attributes_to_list(x) for x in self.ff.nonbond_params.values()],
+        )
         set_top_section(
             self.top,
             "angletypes",

@@ -7,8 +7,8 @@ import pytest
 from kimmdy.cmd import kimmdy_run
 from kimmdy.constants import MARK_DONE
 from kimmdy.parsing import read_top, write_top
-from kimmdy.topology.topology import Topology
 from kimmdy.plugins import parameterization_plugins
+from kimmdy.topology.topology import Topology
 from kimmdy.utils import get_task_directories
 
 

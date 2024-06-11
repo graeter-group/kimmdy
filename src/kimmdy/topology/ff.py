@@ -1,21 +1,24 @@
 from __future__ import annotations
-import textwrap
+
 import logging
+import textwrap
 from pathlib import Path
 from typing import Optional
+
+from kimmdy.parsing import read_top
 from kimmdy.topology.atomic import (
     AngleId,
-    AtomId,
-    BondId,
-    ImproperDihedralId,
-    ProperDihedralId,
-    AtomType,
-    BondType,
     AngleType,
+    AtomId,
+    AtomType,
+    BondId,
+    BondType,
     DihedralType,
+    ImproperDihedralId,
+    NonbondParamType,
+    ProperDihedralId,
     ResidueType,
 )
-from kimmdy.parsing import read_top
 from kimmdy.topology.utils import get_top_section
 
 logger = logging.getLogger(__name__)
@@ -31,6 +34,7 @@ class FF:
         self.proper_dihedraltypes: dict[ProperDihedralId, DihedralType] = {}
         self.improper_dihedraltypes: dict[ImproperDihedralId, DihedralType] = {}
         self.residuetypes: dict[str, ResidueType] = {}
+        self.nonbond_params: dict[BondId, NonbondParamType] = {}
 
         ffdir = top["ffdir"]
 
@@ -45,6 +49,12 @@ class FF:
             for l in bondtypes:
                 bondtype = BondType.from_top_line(l)
                 self.bondtypes[(bondtype.i, bondtype.j)] = bondtype
+
+        nonbond_params = get_top_section(top, "nonbond_params")
+        if nonbond_params is not None:
+            for l in nonbond_params:
+                nonbond_param = NonbondParamType.from_top_line(l)
+                self.nonbond_params[(nonbond_param.i, nonbond_param.j)] = nonbond_param
 
         angletypes = get_top_section(top, "angletypes")
         if angletypes is not None:
