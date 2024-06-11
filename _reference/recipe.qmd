@@ -77,7 +77,7 @@ Change topology to break a bond
 
 ### CustomTopMod { #kimmdy.recipe.CustomTopMod }
 
-`recipe.CustomTopMod(self, f)`
+`recipe.CustomTopMod(f)`
 
 A custom recipe step that can be used to define a custom topology modification.
 
@@ -105,7 +105,7 @@ Either provide the index (ix_to_place) or the ID (id_to_place) of the atom to pl
 
 ### Recipe { #kimmdy.recipe.Recipe }
 
-`recipe.Recipe(self, recipe_steps, rates, timespans)`
+`recipe.Recipe(recipe_steps, rates, timespans)`
 
 A reaction path defined by one series of RecipeSteps.
 Defines everything necessart to build the
@@ -146,7 +146,7 @@ Combines this Recipe with another with the same RecipeSteps.
 
 ### RecipeCollection { #kimmdy.recipe.RecipeCollection }
 
-`recipe.RecipeCollection(self, recipes)`
+`recipe.RecipeCollection(recipes)`
 
 A RecipeCollection encompasses a number of reaction paths.
 They can originate from multiple reaction plugins, but do not need to.
@@ -234,7 +234,7 @@ id: 1-based, str
 
 ### Relax { #kimmdy.recipe.Relax }
 
-`recipe.Relax(self)`
+`recipe.Relax()`
 
 Start a relaxation MD.
 
