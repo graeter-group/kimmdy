@@ -7,7 +7,7 @@ import pytest
 from hypothesis import HealthCheck, Phase, given, settings
 from hypothesis import strategies as st
 
-from kimmdy.parsing import TopologyDict, read_top
+from kimmdy.parsing import TopologyDict, read_top, write_top
 from kimmdy.recipe import Bind, Break
 from kimmdy.topology.atomic import *
 from kimmdy.topology.topology import REACTIVE_MOLECULEYPE, Topology
@@ -768,6 +768,34 @@ class TestHexalaTopology:
         )
 
         assert top.ff.residuetypes["HOH"] == res
+
+
+class TestPolymerFF:
+
+    def test_sections_are_complete(self, filedir):
+        path = filedir / "polymer/topol.top"
+        raw_top = read_top(path)
+        top = Topology(raw_top)
+        assert len(top.ff.nonbond_params) == 6
+        assert top.ff.nonbond_params[("B0", "B0")] == NonbondParamType(
+            i="B0",
+            j="B0",
+            funct="1",
+            c0="2.5",
+            c1="2.5",
+            id="B0---B0",
+            id_sym="B0---B0",
+        )
+        assert top.ff.atomtypes["B1"] == AtomType(
+            type="B1",
+            id="B1",
+            id_sym="B1",
+            mass="20000.0",
+            charge="0.000",
+            ptype="A",
+            sigma="0.0",
+            epsilon="0.0",
+        )
 
 
 class TestRadicalAla:

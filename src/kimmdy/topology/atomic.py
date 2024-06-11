@@ -6,6 +6,7 @@ See [gromacs manual](https://manual.gromacs.org/current/reference-manual/topolog
 
 from dataclasses import dataclass, field
 from typing import Optional, Union
+
 from kimmdy.topology.utils import field_or_none
 
 
@@ -183,27 +184,34 @@ class AtomType:
     """
 
     type: str
+    id: str
     id_sym: str
-    at_num: str
     mass: str
     charge: str
     ptype: str
     sigma: str
     epsilon: str
-    id: str
+    at_num: Optional[str] = None
 
     @classmethod
     def from_top_line(cls, l: list[str]):
+        length = len(l)
+        has_at_num = length >= 7
+        if has_at_num:
+            offset = 1
+        else:
+            offset = 0
+        at_num = l[1] if has_at_num else None
         return cls(
             type=l[0],
-            id_sym=l[0],
-            at_num=l[1],
-            mass=l[2],
-            charge=l[3],
-            ptype=l[4],
-            sigma=l[5],
-            epsilon=l[6],
             id=l[0],
+            id_sym=l[0],
+            at_num=at_num,
+            mass=l[1 + offset],
+            charge=l[2 + offset],
+            ptype=l[3 + offset],
+            sigma=l[4 + offset],
+            epsilon=l[5 + offset],
         )
 
 
@@ -282,6 +290,42 @@ class BondType:
             c1=field_or_none(l, 4),
             c2=field_or_none(l, 5),
             c3=field_or_none(l, 6),
+        )
+
+
+@dataclass()
+class NonbondParamType:
+    """Information about one nonbonded parameterize
+
+    typical in coarse grained models.
+    A class containing nonbonded information as in the nonbond_params section of the forcefield.
+
+    From gromacs:
+    ; Lennard jones between beads
+    ; i j funda sigma(nm) epsilon (kmol/mol)
+    Where i and j are atomtypes
+    """
+
+    i: str
+    j: str
+    id: str
+    id_sym: str
+    funct: str
+    c0: Optional[str] = None
+    c1: Optional[str] = None
+    c2: Optional[str] = None
+
+    @classmethod
+    def from_top_line(cls, l: list[str]):
+        return cls(
+            i=l[0],
+            j=l[1],
+            id="---".join(l[:2]),
+            id_sym="---".join(reversed(l[:2])),
+            funct=l[2],
+            c0=field_or_none(l, 3),
+            c1=field_or_none(l, 4),
+            c2=field_or_none(l, 5),
         )
 
 

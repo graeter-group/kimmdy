@@ -170,6 +170,8 @@ def prune(d: dict) -> dict:
 def flatten_scheme(scheme, section="") -> list:
     """Recursively get properties and their desicripions from the scheme"""
     ls = []
+    if not isinstance(scheme, dict):
+        return ls
     for key, value in scheme.items():
         if not isinstance(value, dict):
             continue
