@@ -20,7 +20,7 @@ def test_parser_doesnt_crash_on_example(arranged_tmp_path, caplog):
     assert isinstance(top_dict, dict)
 
 
-def test_doubleparse_urea(arranged_tkmp_path):
+def test_doubleparse_urea(arranged_tmp_path):
     """Parsing it's own output should return the same top on urea.top"""
     top_dict = parsing.read_top(Path("urea.top"))
 
