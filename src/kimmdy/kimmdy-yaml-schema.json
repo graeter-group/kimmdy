@@ -114,7 +114,7 @@
     },
     "kmc": {
       "title": "kmc",
-      "description": "KMC algorithm overwrite. Should be set by the reactions, but can be changed here.",
+      "description": "KMC algorithm overwrite. Should be set by the reactions, but can be changed here. Not all reactions may support all algorithms.",
       "type": "string",
       "pytype": "str",
       "enum": ["", "rfkmc", "frm", "extrande", "extrande_mod"],
