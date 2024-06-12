@@ -80,7 +80,7 @@ mds:
     mdp: 'md_slow.mdp'
 changer:
   coordinates:
-    md: 'relax'      
+    md: 'relax'
 reactions:
   hat_reaction:
     frequency_factor: 100000000

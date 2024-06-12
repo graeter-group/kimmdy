@@ -135,7 +135,7 @@
     "href": "guide/references/input.html#example-kimmdy.yml-files",
     "title": "Input File",
     "section": "Example kimmdy.yml Files",
-    "text": "Example kimmdy.yml Files\n\n\nkimmdy.yml\n\ndryrun: false\nmax_tasks: 100\nname: 'hat_tf_000'\ngromacs_alias: 'gmx'\ntop: 'Ala_out.top'\ngro: 'npt.gro'\nndx: 'index.ndx'\nmds:\n  equilibrium:\n    mdp: 'md.mdp'\n  relax:\n    mdp: 'md_slow.mdp'\nchanger:\n  coordinates:\n    md: 'relax'      \nreactions:\n  hat_reaction:\n    frequency_factor: 100000000\n    h_cutoff: 3\n    polling_rate: 1\n\nsequence:\n- equilibrium\n- mult: 2\n  tasks:\n  - equilibrium\n  - reactions",
+    "text": "Example kimmdy.yml Files\n\n\nkimmdy.yml\n\ndryrun: false\nmax_tasks: 100\nname: 'hat_tf_000'\ngromacs_alias: 'gmx'\ntop: 'Ala_out.top'\ngro: 'npt.gro'\nndx: 'index.ndx'\nmds:\n  equilibrium:\n    mdp: 'md.mdp'\n  relax:\n    mdp: 'md_slow.mdp'\nchanger:\n  coordinates:\n    md: 'relax'\nreactions:\n  hat_reaction:\n    frequency_factor: 100000000\n    h_cutoff: 3\n    polling_rate: 1\n\nsequence:\n- equilibrium\n- mult: 2\n  tasks:\n  - equilibrium\n  - reactions",
     "crumbs": [
       "Getting Started",
       "Reference",
