@@ -377,7 +377,7 @@ def truncate_sim_files(files: TaskFiles, time: Optional[float], keep_tail: bool 
         except FileNotFoundError:
             paths[s] = None
 
-    trjs = [p for p in [paths["trr"], paths["xtc"]] if p is not None]
+    trjs = [p for p in [paths["trr"], paths["xtc"]] if p is not None and p.exists()]
 
     # trr or xtc must be present
     if len(trjs) == 0:
