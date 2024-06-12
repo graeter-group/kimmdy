@@ -684,9 +684,9 @@ class ResidueType:
         if ls := d.get("dihedrals"):
             for l in ls["content"]:
                 proper = ResidueProperSpec.from_top_line(l)
-                propers[(proper.atom1, proper.atom2, proper.atom3, proper.atom4)] = (
-                    proper
-                )
+                propers[
+                    (proper.atom1, proper.atom2, proper.atom3, proper.atom4)
+                ] = proper
         if ls := d.get("impropers"):
             for l in ls["content"]:
                 improper = ResidueImproperSpec.from_top_line(l)

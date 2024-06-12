@@ -77,9 +77,9 @@ class MoleculeType:
         self.proper_dihedrals: dict[tuple[str, str, str, str], MultipleDihedrals] = {}
         self.improper_dihedrals: dict[tuple[str, str, str, str], MultipleDihedrals] = {}
         self.position_restraints: dict[str, PositionRestraint] = {}
-        self.dihedral_restraints: dict[tuple[str, str, str, str], DihedralRestraint] = (
-            {}
-        )
+        self.dihedral_restraints: dict[
+            tuple[str, str, str, str], DihedralRestraint
+        ] = {}
         self.settles: dict[str, Settle] = {}
         self.exclusions: dict[tuple[str, str], Exclusion] = {}
 
@@ -1002,9 +1002,9 @@ class Topology:
                 f"Deleting Atom nr {atom.nr}, type {atom.type}, res {atom.residue}"
             )
             # move charge to first neighbor
-            self.atoms[atom.bound_to_nrs[0]].charge = (
-                f"{float(self.atoms[atom.bound_to_nrs[0]].charge) + float(atom.charge):7.4f}"
-            )
+            self.atoms[
+                atom.bound_to_nrs[0]
+            ].charge = f"{float(self.atoms[atom.bound_to_nrs[0]].charge) + float(atom.charge):7.4f}"
 
             # break all bonds and delete all pairs, diheadrals with these bonds
             for bound_nr in copy(atom.bound_to_nrs):
@@ -1333,6 +1333,6 @@ class Topology:
                 reactive_moleculetype.improper_dihedrals[key] = MultipleDihedrals(
                     *key, "4", dihedrals={}
                 )
-            reactive_moleculetype.improper_dihedrals[key].dihedrals[value.c2] = (
-                Dihedral(*key, "4", c0=value.c0, c1=value.c1, periodicity=value.c2)
-            )
+            reactive_moleculetype.improper_dihedrals[key].dihedrals[
+                value.c2
+            ] = Dihedral(*key, "4", c0=value.c0, c1=value.c1, periodicity=value.c2)

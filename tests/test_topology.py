@@ -262,7 +262,6 @@ class TestTopAB:
 
 
 class TestTopology:
-
     def test_reindex_no_change(self, hexala_top_fix: Topology):
         org_top: Topology = deepcopy(hexala_top_fix)
         update = hexala_top_fix.reindex_atomnrs()
@@ -771,7 +770,6 @@ class TestHexalaTopology:
 
 
 class TestPolymerFF:
-
     def test_sections_are_complete(self, filedir):
         path = filedir / "polymer/topol.top"
         raw_top = read_top(path)

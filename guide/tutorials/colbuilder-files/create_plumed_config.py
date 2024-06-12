@@ -8,7 +8,6 @@ from kimmdy.parsing import read_top
 def create_plumed_dat(
     top_path: Path, idx_path: Path, idx_group: str, entries_to_remove: list
 ):
-
     print(
         "Creating plumed file with following settings:\n\n"
         f"top_path: \t\t{top_path}\n"

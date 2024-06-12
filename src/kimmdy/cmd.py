@@ -200,7 +200,6 @@ def _run(args: argparse.Namespace):
         )
 
     try:
-
         discover_plugins()
         config = Config(
             input_file=args.input, logfile=args.logfile, loglevel=args.loglevel
