@@ -5,41 +5,25 @@ from itertools import permutations
 from pathlib import Path
 from typing import Callable, Optional, Union
 
-from kimmdy.constants import (
-    ATOM_ID_FIELDS,
-    ATOMTYPE_BONDORDER_FLAT,
-    REACTIVE_MOLECULEYPE,
-    RESNR_ID_FIELDS,
-)
-from kimmdy.parsing import TopologyDict
+from numpy import empty
+
+from kimmdy.constants import (ATOM_ID_FIELDS, ATOMTYPE_BONDORDER_FLAT,
+                              REACTIVE_MOLECULEYPE, RESNR_ID_FIELDS)
+from kimmdy.parsing import TopologyDict, empty_section
 from kimmdy.plugins import BasicParameterizer, Parameterizer
 from kimmdy.recipe import Bind, Break, RecipeStep
-from kimmdy.topology.atomic import (
-    Angle,
-    Atom,
-    Bond,
-    Dihedral,
-    DihedralRestraint,
-    Exclusion,
-    MoleculeTypeHeader,
-    MultipleDihedrals,
-    Pair,
-    PositionRestraint,
-    ResidueImproperSpec,
-    Settle,
-)
+from kimmdy.topology.atomic import (Angle, Atom, Bond, Dihedral,
+                                    DihedralRestraint, Exclusion,
+                                    MoleculeTypeHeader, MultipleDihedrals,
+                                    Pair, PositionRestraint,
+                                    ResidueImproperSpec, Settle)
 from kimmdy.topology.ff import FF
-from kimmdy.topology.utils import (
-    attributes_to_list,
-    get_moleculetype_atomics,
-    get_moleculetype_header,
-    get_residue_fragments,
-    get_top_section,
-    increment_field,
-    is_not_solvent_or_ion,
-    set_moleculetype_atomics,
-    set_top_section,
-)
+from kimmdy.topology.utils import (attributes_to_list,
+                                   get_moleculetype_atomics,
+                                   get_moleculetype_header,
+                                   get_residue_fragments, get_top_section,
+                                   increment_field, is_not_solvent_or_ion,
+                                   set_top_section)
 from kimmdy.utils import TopologyAtomAddress
 
 logger = logging.getLogger("kimmdy.topology")
@@ -847,16 +831,77 @@ class Topology:
             return False
         return self.to_dict() == other.to_dict()
 
+
+    def _update_dict_from_moleculetype_atomics(
+        self, moleculetype: MoleculeType, create: bool = False
+    ):
+        """Set content of the atomics (atoms/bonds/angles etc.) in the a topology dict from of a moleculetype.
+
+        Resolves any `#ifdef` statements by check in the top['define'] dict
+        and chooses the 'content' or 'else_content' depending on the result.
+
+        If create is True, a new section is created if it does not exist.
+        """
+        name = moleculetype.name
+        atomics = moleculetype.atomics
+        top = self.top
+        moleculetype_name = f"moleculetype_{name}"
+        section = top.get(moleculetype_name)
+        if section is None:
+            if create:
+                logger.info(
+                    f"topology does not contain {moleculetype_name}. Creating new section."
+                )
+                section = empty_section()
+                section["content"] = [[name, moleculetype.nrexcl]]
+                section["subsections"] = {k: empty_section() for k in atomics.keys()}
+                top[moleculetype_name] = section
+            else:
+                logger.warning(
+                    f"topology does not contain {moleculetype_name} and create=False. Not creating new section."
+                )
+                return None
+
+        subsections = section["subsections"]
+        for k in list(subsections.keys()):
+            # # if atomics section is empty,
+            # # remove the subsection from the topology
+            # if atomics[k] == []:
+            #     logger.debug(f"Removing subsection {k} from {moleculetype_name}")
+            #     del subsections[k]
+            #     continue
+
+            v = subsections[k]
+            condition = v.get("condition")
+            if condition is not None:
+                condition_type = condition.get("type")
+                condition_value = condition.get("value")
+                if condition_type == "ifdef":
+                    if condition_value in top["define"].keys():
+                        v["content"] = atomics[k]
+                    else:
+                        v["else_content"] = atomics[k]
+                elif condition_type == "ifndef":
+                    if condition_value not in top["define"].keys():
+                        v["content"] = atomics[k]
+                    else:
+                        v["else_content"] = atomics[k]
+                else:
+                    raise NotImplementedError(
+                        f"condition type {condition_type} is not supported"
+                    )
+            else:
+                v["content"] = atomics[k]
+
+
     def _update_dict(self):
         """Update the topology dictionary with the current state of the topology."""
         for name, moleculetype in self.moleculetypes.items():
             moleculetype._update_atomics_dict()
             if name == REACTIVE_MOLECULEYPE:
-                set_moleculetype_atomics(
-                    self.top, name, moleculetype.atomics, create=True
-                )
+                self._update_dict_from_moleculetype_atomics(moleculetype, create=True)
             else:
-                set_moleculetype_atomics(self.top, name, moleculetype.atomics)
+                self._update_dict_from_moleculetype_atomics(moleculetype)
 
         set_top_section(
             self.top,

@@ -799,7 +799,7 @@ class TestPolymerFF:
     def test_nrexcl_from_the_correct_moleculetype(self, filedir):
         path = filedir / "polymer/topol.top"
         raw_top = read_top(path)
-        top = Topology(raw_top, reactive_nrexcl="1")
+        top = Topology(raw_top)
         assert top.moleculetypes["Reactive"].nrexcl == "1"
 
 

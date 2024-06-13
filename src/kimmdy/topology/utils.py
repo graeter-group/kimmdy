@@ -95,8 +95,14 @@ def get_moleculetype_header(
             )
     name, nrexcl = section.get("content")[0]
     if name is None:
+        logger.info(
+            f"name not found in moleculetype {moleculetype}. Defaulting to Unknown."
+        )
         name = "Unknown"
     if nrexcl is None:
+        logger.info(
+            f"nrexcl not found in moleculetype {moleculetype}. Defaulting to 3."
+        )
         nrexcl = "3"
     return MoleculeTypeHeader(name=name, nrexcl=nrexcl)
 
@@ -137,65 +143,6 @@ def get_moleculetype_atomics(top: dict, moleculetype: str) -> Optional[dict]:
             atomics[k] = v["content"]
 
     return atomics
-
-
-def set_moleculetype_atomics(
-    top: dict, name: str, atomics: dict, create: bool = False
-) -> Optional[dict]:
-    """Set content of the atomics (atoms/bonds/angles etc.) of a moleculetype from a topology dict.
-
-    Resolves any `#ifdef` statements by check in the top['define'] dict
-    and chooses the 'content' or 'else_content' depending on the result.
-
-    If create is True, a new section is created if it does not exist.
-    """
-    moleculetype = f"moleculetype_{name}"
-    section = top.get(moleculetype)
-    if section is None:
-        if create:
-            logger.info(
-                f"topology does not contain {moleculetype}. Creating new section."
-            )
-            section = empty_section()
-            section["content"] = [[name, "3"]]
-            section["subsections"] = {k: empty_section() for k in atomics.keys()}
-            top[moleculetype] = section
-        else:
-            logger.warning(
-                f"topology does not contain {moleculetype} and create=False. Not creating new section."
-            )
-            return None
-
-    subsections = section["subsections"]
-    for k in list(subsections.keys()):
-        # # if atomics section is empty,
-        # # remove the subsection from the topology
-        # if atomics[k] == []:
-        #     logger.debug(f"Removing subsection {k} from {moleculetype}")
-        #     del subsections[k]
-        #     continue
-
-        v = subsections[k]
-        condition = v.get("condition")
-        if condition is not None:
-            condition_type = condition.get("type")
-            condition_value = condition.get("value")
-            if condition_type == "ifdef":
-                if condition_value in top["define"].keys():
-                    v["content"] = atomics[k]
-                else:
-                    v["else_content"] = atomics[k]
-            elif condition_type == "ifndef":
-                if condition_value not in top["define"].keys():
-                    v["content"] = atomics[k]
-                else:
-                    v["else_content"] = atomics[k]
-            else:
-                raise NotImplementedError(
-                    f"condition type {condition_type} is not supported"
-                )
-        else:
-            v["content"] = atomics[k]
 
 
 def get_protein_section(top: dict, name: str) -> Optional[list[list]]:
