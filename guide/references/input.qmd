@@ -6,7 +6,7 @@ execute:
 
 ## Autocompletion
 
-KIMMDY comes with autocompletion and tooltips insight your editor for its configuration file `kimmdy.yml`. 
+KIMMDY comes with autocompletion and tooltips inside your editor for its configuration file `kimmdy.yml`. 
 
 All you need to do is activate a [yaml-language-server](https://github.com/redhat-developer/yaml-language-server)
 in your editor (e.g. [VS Code](https://code.visualstudio.com/) via the 
