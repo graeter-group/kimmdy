@@ -5,23 +5,41 @@ from itertools import permutations
 from pathlib import Path
 from typing import Callable, Optional, Union
 
-from kimmdy.constants import (ATOM_ID_FIELDS, ATOMTYPE_BONDORDER_FLAT,
-                              REACTIVE_MOLECULEYPE, RESNR_ID_FIELDS)
+from kimmdy.constants import (
+    ATOM_ID_FIELDS,
+    ATOMTYPE_BONDORDER_FLAT,
+    REACTIVE_MOLECULEYPE,
+    RESNR_ID_FIELDS,
+)
 from kimmdy.parsing import TopologyDict
 from kimmdy.plugins import BasicParameterizer, Parameterizer
 from kimmdy.recipe import Bind, Break, RecipeStep
-from kimmdy.topology.atomic import (Angle, Atom, Bond, Dihedral,
-                                    DihedralRestraint, Exclusion,
-                                    MoleculeTypeHeader, MultipleDihedrals,
-                                    Pair, PositionRestraint,
-                                    ResidueImproperSpec, Settle)
+from kimmdy.topology.atomic import (
+    Angle,
+    Atom,
+    Bond,
+    Dihedral,
+    DihedralRestraint,
+    Exclusion,
+    MoleculeTypeHeader,
+    MultipleDihedrals,
+    Pair,
+    PositionRestraint,
+    ResidueImproperSpec,
+    Settle,
+)
 from kimmdy.topology.ff import FF
-from kimmdy.topology.utils import (attributes_to_list,
-                                   get_moleculetype_atomics,
-                                   get_moleculetype_header,
-                                   get_residue_fragments, get_top_section,
-                                   increment_field, is_not_solvent_or_ion,
-                                   set_moleculetype_atomics, set_top_section)
+from kimmdy.topology.utils import (
+    attributes_to_list,
+    get_moleculetype_atomics,
+    get_moleculetype_header,
+    get_residue_fragments,
+    get_top_section,
+    increment_field,
+    is_not_solvent_or_ion,
+    set_moleculetype_atomics,
+    set_top_section,
+)
 from kimmdy.utils import TopologyAtomAddress
 
 logger = logging.getLogger("kimmdy.topology")
@@ -730,7 +748,9 @@ class Topology:
             logger.info(f"\t{m} {n}")
         return reactive_molecules
 
-    def _merge_moleculetypes(self, radicals: Optional[str] = None, nrexcl: Optional[str] = None):
+    def _merge_moleculetypes(
+        self, radicals: Optional[str] = None, nrexcl: Optional[str] = None
+    ):
         """
         Merge all moleculetypes within which reactions can happen into one moleculetype.
         This also makes multiples explicit.
