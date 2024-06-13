@@ -5,40 +5,23 @@ from itertools import permutations
 from pathlib import Path
 from typing import Callable, Optional, Union
 
-from kimmdy.constants import (
-    ATOM_ID_FIELDS,
-    ATOMTYPE_BONDORDER_FLAT,
-    REACTIVE_MOLECULEYPE,
-    RESNR_ID_FIELDS,
-)
+from kimmdy.constants import (ATOM_ID_FIELDS, ATOMTYPE_BONDORDER_FLAT,
+                              REACTIVE_MOLECULEYPE, RESNR_ID_FIELDS)
 from kimmdy.parsing import TopologyDict
 from kimmdy.plugins import BasicParameterizer, Parameterizer
 from kimmdy.recipe import Bind, Break, RecipeStep
-from kimmdy.topology.atomic import (
-    Angle,
-    Atom,
-    Bond,
-    Dihedral,
-    DihedralRestraint,
-    Exclusion,
-    MultipleDihedrals,
-    Pair,
-    PositionRestraint,
-    ResidueImproperSpec,
-    Settle,
-)
+from kimmdy.topology.atomic import (Angle, Atom, Bond, Dihedral,
+                                    DihedralRestraint, Exclusion,
+                                    MoleculeTypeHeader, MultipleDihedrals,
+                                    Pair, PositionRestraint,
+                                    ResidueImproperSpec, Settle)
 from kimmdy.topology.ff import FF
-from kimmdy.topology.utils import (
-    attributes_to_list,
-    get_moleculetype_atomics,
-    get_moleculetype_header,
-    get_residue_fragments,
-    get_top_section,
-    increment_field,
-    is_not_solvent_or_ion,
-    set_moleculetype_atomics,
-    set_top_section,
-)
+from kimmdy.topology.utils import (attributes_to_list,
+                                   get_moleculetype_atomics,
+                                   get_moleculetype_header,
+                                   get_residue_fragments, get_top_section,
+                                   increment_field, is_not_solvent_or_ion,
+                                   set_moleculetype_atomics, set_top_section)
 from kimmdy.utils import TopologyAtomAddress
 
 logger = logging.getLogger("kimmdy.topology")
@@ -63,9 +46,10 @@ class MoleculeType:
     """
 
     def __init__(
-        self, header: tuple[str, str], atomics: dict, radicals: Optional[str] = None
+        self, header: MoleculeTypeHeader, atomics: dict, radicals: Optional[str] = None
     ) -> None:
-        self.name, self.nrexcl = header
+        self.name = header.name
+        self.nrexcl = header.nrexcl
         self.atomics = atomics
 
         logger.debug(f"parsing molecule {self.name}")
@@ -644,6 +628,17 @@ class Topology:
     top
         A dictionary containing the parsed topology data, produced by
         [](`kimmdy.parsing.read_top`)
+    parametrizer
+        The parametrizer to use when reparametrizing the topology.
+    is_reactive_predicate_f
+        A function that takes a moleculetype name and returns True if the moleculetype
+        should be merged into the reactive moleculetype.
+    radicals
+        A string of atom numbers that are radicals.
+    residuetypes_path
+        Path to the residue types file.
+    reactive_nrexcl
+        Overwrite nrexcl value for the reactive moleculetype. Otherwise takes the nrexcl of the first reactive moleculetype.
     """
 
     def __init__(
@@ -653,6 +648,7 @@ class Topology:
         is_reactive_predicate_f: Callable[[str], bool] = is_not_solvent_or_ion,
         radicals: Optional[str] = None,
         residuetypes_path: Optional[Path] = None,
+        reactive_nrexcl: Optional[str] = None,
     ) -> None:
         if top == {}:
             raise NotImplementedError(
@@ -673,7 +669,7 @@ class Topology:
 
         self.needs_parameterization = False
 
-        self._merge_moleculetypes(radicals)
+        self._merge_moleculetypes(radicals=radicals, nrexcl=reactive_nrexcl)
         self._link_atomics()
 
     def _link_atomics(self):
@@ -698,7 +694,7 @@ class Topology:
         ].dihedral_restraints
         self.radicals = self.reactive_molecule.radicals
 
-    def _extract_mergable_molecules(self):
+    def _extract_mergable_molecules(self) -> dict[str, int]:
         """Extract all molecules that are to be merged into one moleculetype.
         And replaces them with a single moleculetype with the name REACTIVE_MOLECULEYPE
         """
@@ -734,7 +730,7 @@ class Topology:
             logger.info(f"\t{m} {n}")
         return reactive_molecules
 
-    def _merge_moleculetypes(self, radicals: Optional[str] = None):
+    def _merge_moleculetypes(self, radicals: Optional[str] = None, nrexcl: Optional[str] = None):
         """
         Merge all moleculetypes within which reactions can happen into one moleculetype.
         This also makes multiples explicit.
@@ -745,6 +741,9 @@ class Topology:
         problems in the atomnr column, the correct internal atom nr is always "gro file line number" - 2).
         """
         molecules = self._extract_mergable_molecules()
+        first_reactive_molecule = list(molecules.keys())[0]
+        if nrexcl is None:
+            nrexcl = self.moleculetypes[first_reactive_molecule].nrexcl
         reactive_atomics = {}
         atomnr_offset = 0
         resnr_offset = 0
@@ -775,7 +774,9 @@ class Topology:
 
         # add merged moleculetype to topology
         reactive_moleculetype = MoleculeType(
-            (REACTIVE_MOLECULEYPE, "1"), reactive_atomics, radicals
+            MoleculeTypeHeader(name=REACTIVE_MOLECULEYPE, nrexcl=nrexcl),
+            reactive_atomics,
+            radicals,
         )
         self.moleculetypes[REACTIVE_MOLECULEYPE] = reactive_moleculetype
         # update topology dict
@@ -818,7 +819,7 @@ class Topology:
                     f"moleculetype {moleculetype} has no atoms, bonds, angles etc. Skipping."
                 )
                 continue
-            name = header[0]
+            name = header.name
             self.moleculetypes[name] = MoleculeType(header, atomics, radicals="")
 
     def __eq__(self, other: object) -> bool:

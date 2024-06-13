@@ -156,6 +156,7 @@ class RunManager:
                 f"the parameterization plugins: {list(parameterization_plugins.keys())}"
             ) from e
 
+        nrexcl = getattr(self.config.topology, "nrexcl", None)
         self.top = Topology(
             top=read_top(self.config.top, self.config.ff),
             parametrizer=self.parameterizer,
@@ -164,6 +165,7 @@ class RunManager:
             ),
             radicals=getattr(self.config, "radicals", None),
             residuetypes_path=getattr(self.config, "residuetypes", None),
+            reactive_nrexcl=nrexcl,
         )
         self.filehist: list[dict[str, TaskFiles]] = [
             {"setup": TaskFiles(self.get_latest)}

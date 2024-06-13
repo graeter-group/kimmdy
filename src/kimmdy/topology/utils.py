@@ -1,19 +1,18 @@
 from __future__ import annotations  # for 3.7 <= Python version < 3.10
-from kimmdy.constants import ION_NAMES, SOLVENT_NAMES
-from itertools import permutations
-from typing import Callable, Optional, Any
-import re
-from typing import TYPE_CHECKING
-from kimmdy.constants import REACTIVE_MOLECULEYPE
 
 import logging
+import re
+from itertools import permutations
+from typing import TYPE_CHECKING, Any, Callable, Optional
 
+from kimmdy.constants import ION_NAMES, REACTIVE_MOLECULEYPE, SOLVENT_NAMES
 from kimmdy.parsing import empty_section
+from kimmdy.topology.atomic import MoleculeTypeHeader
 
 if TYPE_CHECKING:
-    from kimmdy.topology.atomic import AtomicType, AtomicTypes, Atom
-    from kimmdy.topology.topology import Topology
     from kimmdy.config import Config
+    from kimmdy.topology.atomic import Atom, AtomicType, AtomicTypes
+    from kimmdy.topology.topology import Topology
 
 logger = logging.getLogger(__name__)
 
@@ -63,7 +62,9 @@ def get_top_section(
     return section.get("content")
 
 
-def get_moleculetype_header(top: dict, moleculetype: str) -> Optional[tuple[str, str]]:
+def get_moleculetype_header(
+    top: dict, moleculetype: str
+) -> Optional[MoleculeTypeHeader]:
     """Get content of the header of a moleculetype from a topology dict.
 
     Resolves any `#ifdef` statements by check in the top['define'] dict
@@ -93,8 +94,11 @@ def get_moleculetype_header(top: dict, moleculetype: str) -> Optional[tuple[str,
                 f"condition type {condition_type} is not supported"
             )
     name, nrexcl = section.get("content")[0]
-    header = (name, nrexcl)
-    return header
+    if name is None:
+        name = "Unknown"
+    if nrexcl is None:
+        nrexcl = "3"
+    return MoleculeTypeHeader(name=name, nrexcl=nrexcl)
 
 
 def get_moleculetype_atomics(top: dict, moleculetype: str) -> Optional[dict]:
@@ -254,13 +258,6 @@ def set_protein_section(top: dict, name: str, value: list) -> Optional[list[list
 def set_reactive_section(top: dict, name: str, value: list) -> Optional[list[list]]:
     """Set content of a section in the first moleculetype (protein) from a topology dict."""
     set_top_section(top, name, value, moleculetype=REACTIVE_MOLECULEYPE)
-
-
-def field_or_none(l: list[str], i) -> Optional[str]:
-    try:
-        return l[i]
-    except IndexError as _:
-        return None
 
 
 def attributes_to_list(obj) -> list[str]:

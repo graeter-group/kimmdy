@@ -25,6 +25,7 @@ def test_parse_config1_casting(arranged_tmp_path):
     assert isinstance(config.mds.equilibrium1, Config)
     assert isinstance(config.plumed, Path)
     assert isinstance(config.mds.pull1.use_plumed, bool)
+    assert isinstance(config.mds.pull1.mdp, Path)
 
 
 def test_non_existent_sections_with_defaults_in_subsections_are_created(
@@ -57,6 +58,8 @@ def test_subsections_with_defaults_are_kept(arranged_tmp_path):
 
     assert config.log.file.name == "kimmdy.log"
     assert config.log.level == "DEBUG"
+    assert config.topology.reactive
+    assert getattr(config.topology.reactive, "nrexcl", None) is None
 
 
 def test_out_is_generated_from_name_if_not_set(arranged_tmp_path):

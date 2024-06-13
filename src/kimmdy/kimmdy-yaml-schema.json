@@ -155,6 +155,11 @@
               "type": "string",
               "pytype": "str",
               "default": ""
+            },
+            "nrexcl": {
+              "description": "Explictly set the nrexcl value for the Reactive moleculetype. By default the value is taken from the first found reactive moleculetype.",
+              "type": "integer",
+              "pytype": "int"
             }
           }
         }

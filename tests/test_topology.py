@@ -176,6 +176,7 @@ class TestUrea:
         assert len(top.angles) == 0
         assert len(top.proper_dihedrals) == 8
         assert len(top.improper_dihedrals) == 3
+        assert top.moleculetypes["Reactive"].nrexcl == "3"
 
     def test_making_molecules_explicit(self, raw_urea_times_two_top_fix):
         raw = deepcopy(raw_urea_times_two_top_fix)
@@ -794,6 +795,12 @@ class TestPolymerFF:
             sigma="0.0",
             epsilon="0.0",
         )
+
+    def test_nrexcl_from_the_correct_moleculetype(self, filedir):
+        path = filedir / "polymer/topol.top"
+        raw_top = read_top(path)
+        top = Topology(raw_top, reactive_nrexcl="1")
+        assert top.moleculetypes["Reactive"].nrexcl == "1"
 
 
 class TestRadicalAla:

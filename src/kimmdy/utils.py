@@ -30,6 +30,13 @@ the correct the atom id.
 """
 
 
+def field_or_none(l: list[str], i) -> Optional[str]:
+    try:
+        return l[i]
+    except IndexError as _:
+        return None
+
+
 class longFormatter(logging.Formatter):
     def format(self, record):
         saved_name = record.name  # save and restore for other formatters if desired

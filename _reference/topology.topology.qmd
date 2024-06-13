@@ -59,7 +59,7 @@ Returns a dict, mapping of old atom number strings to new ones
 
 ### Topology { #kimmdy.topology.topology.Topology }
 
-`topology.topology.Topology(self, top, parametrizer=BasicParameterizer(), is_reactive_predicate_f=is_not_solvent_or_ion, radicals=None, residuetypes_path=None)`
+`topology.topology.Topology(self, top, parametrizer=BasicParameterizer(), is_reactive_predicate_f=is_not_solvent_or_ion, radicals=None, residuetypes_path=None, reactive_nrexcl=None)`
 
 Smart container for parsed topology data.
 
@@ -73,9 +73,14 @@ Assumptions:
 
 #### Parameters
 
-| Name   | Type                                          | Description                                                                                 | Default    |
-|--------|-----------------------------------------------|---------------------------------------------------------------------------------------------|------------|
-| `top`  | [TopologyDict](`kimmdy.parsing.TopologyDict`) | A dictionary containing the parsed topology data, produced by [](`kimmdy.parsing.read_top`) | _required_ |
+| Name                      | Type                                                              | Description                                                                                                                     | Default                 |
+|---------------------------|-------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------|-------------------------|
+| `top`                     | [TopologyDict](`kimmdy.parsing.TopologyDict`)                     | A dictionary containing the parsed topology data, produced by [](`kimmdy.parsing.read_top`)                                     | _required_              |
+| `parametrizer`            | [Parameterizer](`kimmdy.plugins.Parameterizer`)                   | The parametrizer to use when reparametrizing the topology.                                                                      | `BasicParameterizer()`  |
+| `is_reactive_predicate_f` | [Callable](`typing.Callable`)\[\[[str](`str`)\], [bool](`bool`)\] | A function that takes a moleculetype name and returns True if the moleculetype should be merged into the reactive moleculetype. | `is_not_solvent_or_ion` |
+| `radicals`                | [Optional](`typing.Optional`)\[[str](`str`)\]                     | A string of atom numbers that are radicals.                                                                                     | `None`                  |
+| `residuetypes_path`       | [Optional](`typing.Optional`)\[[Path](`pathlib.Path`)\]           | Path to the residue types file.                                                                                                 | `None`                  |
+| `reactive_nrexcl`         | [Optional](`typing.Optional`)\[[str](`str`)\]                     | Overwrite nrexcl value for the reactive moleculetype. Otherwise takes the nrexcl of the first reactive moleculetype.            | `None`                  |
 
 #### Methods
 
