@@ -1352,7 +1352,7 @@ class Topology:
                             atom.atom = "HX"
                             name_set = True
                             continue
-                        logger.info(f"HAT hydrogen will be bound to {other_atom}.")
+                        logger.info(f"Hydrogen will be bound to {other_atom}.")
                         break
                 else:
                     if name_set:
