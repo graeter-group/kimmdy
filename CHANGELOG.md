@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.8.2](https://github.com/hits-mbm-dev/kimmdy/compare/v6.8.1...v6.8.2) (2024-06-17)
+
+
+### Bug Fixes
+
+* throw useful error when edissoc is wrong. closes [#437](https://github.com/hits-mbm-dev/kimmdy/issues/437) ([9c66963](https://github.com/hits-mbm-dev/kimmdy/commit/9c66963a68755dc6953d70140cf5f65457e60cfb))
+
 ## [6.8.1](https://github.com/hits-mbm-dev/kimmdy/compare/v6.8.0...v6.8.1) (2024-06-17)
 
 
