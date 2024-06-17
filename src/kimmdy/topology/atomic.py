@@ -7,7 +7,13 @@ See [gromacs manual](https://manual.gromacs.org/current/reference-manual/topolog
 from dataclasses import dataclass, field
 from typing import Optional, Union
 
-from kimmdy.topology.utils import field_or_none
+from kimmdy.utils import field_or_none
+
+
+@dataclass
+class MoleculeTypeHeader:
+    name: str
+    nrexcl: str
 
 
 @dataclass()

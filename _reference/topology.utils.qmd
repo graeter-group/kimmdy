@@ -17,7 +17,6 @@
 | [get_residue_fragments](#kimmdy.topology.utils.get_residue_fragments) | Splits a residue into fragments after a bond has been broken. |
 | [get_top_section](#kimmdy.topology.utils.get_top_section) | Get content of a section from a topology dict. |
 | [is_not_solvent_or_ion](#kimmdy.topology.utils.is_not_solvent_or_ion) | Returns whether a moleculetype name is not solvent or ion. |
-| [set_moleculetype_atomics](#kimmdy.topology.utils.set_moleculetype_atomics) | Set content of the atomics (atoms/bonds/angles etc.) of a moleculetype from a topology dict. |
 | [set_protein_section](#kimmdy.topology.utils.set_protein_section) | Set content of a section in the first moleculetype (protein) from a topology dict. |
 | [set_reactive_section](#kimmdy.topology.utils.set_reactive_section) | Set content of a section in the first moleculetype (protein) from a topology dict. |
 | [set_top_section](#kimmdy.topology.utils.set_top_section) | Set content of a section from a topology dict. |
@@ -100,17 +99,6 @@ and chooses the 'content' or 'else_content' depending on the result.
 `topology.utils.is_not_solvent_or_ion(name)`
 
 Returns whether a moleculetype name is not solvent or ion.
-
-### set_moleculetype_atomics { #kimmdy.topology.utils.set_moleculetype_atomics }
-
-`topology.utils.set_moleculetype_atomics(top, name, atomics, create=False)`
-
-Set content of the atomics (atoms/bonds/angles etc.) of a moleculetype from a topology dict.
-
-Resolves any `#ifdef` statements by check in the top['define'] dict
-and chooses the 'content' or 'else_content' depending on the result.
-
-If create is True, a new section is created if it does not exist.
 
 ### set_protein_section { #kimmdy.topology.utils.set_protein_section }
 

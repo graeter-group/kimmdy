@@ -1,19 +1,18 @@
 from __future__ import annotations  # for 3.7 <= Python version < 3.10
-from kimmdy.constants import ION_NAMES, SOLVENT_NAMES
-from itertools import permutations
-from typing import Callable, Optional, Any
-import re
-from typing import TYPE_CHECKING
-from kimmdy.constants import REACTIVE_MOLECULEYPE
 
 import logging
+import re
+from itertools import permutations
+from typing import TYPE_CHECKING, Any, Callable, Optional
 
+from kimmdy.constants import ION_NAMES, REACTIVE_MOLECULEYPE, SOLVENT_NAMES
 from kimmdy.parsing import empty_section
+from kimmdy.topology.atomic import MoleculeTypeHeader
 
 if TYPE_CHECKING:
-    from kimmdy.topology.atomic import AtomicType, AtomicTypes, Atom
-    from kimmdy.topology.topology import Topology
     from kimmdy.config import Config
+    from kimmdy.topology.atomic import Atom, AtomicType, AtomicTypes
+    from kimmdy.topology.topology import Topology
 
 logger = logging.getLogger(__name__)
 
@@ -63,7 +62,9 @@ def get_top_section(
     return section.get("content")
 
 
-def get_moleculetype_header(top: dict, moleculetype: str) -> Optional[tuple[str, str]]:
+def get_moleculetype_header(
+    top: dict, moleculetype: str
+) -> Optional[MoleculeTypeHeader]:
     """Get content of the header of a moleculetype from a topology dict.
 
     Resolves any `#ifdef` statements by check in the top['define'] dict
@@ -93,8 +94,17 @@ def get_moleculetype_header(top: dict, moleculetype: str) -> Optional[tuple[str,
                 f"condition type {condition_type} is not supported"
             )
     name, nrexcl = section.get("content")[0]
-    header = (name, nrexcl)
-    return header
+    if name is None:
+        logger.info(
+            f"name not found in moleculetype {moleculetype}. Defaulting to Unknown."
+        )
+        name = "Unknown"
+    if nrexcl is None:
+        logger.info(
+            f"nrexcl not found in moleculetype {moleculetype}. Defaulting to 3."
+        )
+        nrexcl = "3"
+    return MoleculeTypeHeader(name=name, nrexcl=nrexcl)
 
 
 def get_moleculetype_atomics(top: dict, moleculetype: str) -> Optional[dict]:
@@ -133,65 +143,6 @@ def get_moleculetype_atomics(top: dict, moleculetype: str) -> Optional[dict]:
             atomics[k] = v["content"]
 
     return atomics
-
-
-def set_moleculetype_atomics(
-    top: dict, name: str, atomics: dict, create: bool = False
-) -> Optional[dict]:
-    """Set content of the atomics (atoms/bonds/angles etc.) of a moleculetype from a topology dict.
-
-    Resolves any `#ifdef` statements by check in the top['define'] dict
-    and chooses the 'content' or 'else_content' depending on the result.
-
-    If create is True, a new section is created if it does not exist.
-    """
-    moleculetype = f"moleculetype_{name}"
-    section = top.get(moleculetype)
-    if section is None:
-        if create:
-            logger.info(
-                f"topology does not contain {moleculetype}. Creating new section."
-            )
-            section = empty_section()
-            section["content"] = [[name, "3"]]
-            section["subsections"] = {k: empty_section() for k in atomics.keys()}
-            top[moleculetype] = section
-        else:
-            logger.warning(
-                f"topology does not contain {moleculetype} and create=False. Not creating new section."
-            )
-            return None
-
-    subsections = section["subsections"]
-    for k in list(subsections.keys()):
-        # # if atomics section is empty,
-        # # remove the subsection from the topology
-        # if atomics[k] == []:
-        #     logger.debug(f"Removing subsection {k} from {moleculetype}")
-        #     del subsections[k]
-        #     continue
-
-        v = subsections[k]
-        condition = v.get("condition")
-        if condition is not None:
-            condition_type = condition.get("type")
-            condition_value = condition.get("value")
-            if condition_type == "ifdef":
-                if condition_value in top["define"].keys():
-                    v["content"] = atomics[k]
-                else:
-                    v["else_content"] = atomics[k]
-            elif condition_type == "ifndef":
-                if condition_value not in top["define"].keys():
-                    v["content"] = atomics[k]
-                else:
-                    v["else_content"] = atomics[k]
-            else:
-                raise NotImplementedError(
-                    f"condition type {condition_type} is not supported"
-                )
-        else:
-            v["content"] = atomics[k]
 
 
 def get_protein_section(top: dict, name: str) -> Optional[list[list]]:
@@ -254,13 +205,6 @@ def set_protein_section(top: dict, name: str, value: list) -> Optional[list[list
 def set_reactive_section(top: dict, name: str, value: list) -> Optional[list[list]]:
     """Set content of a section in the first moleculetype (protein) from a topology dict."""
     set_top_section(top, name, value, moleculetype=REACTIVE_MOLECULEYPE)
-
-
-def field_or_none(l: list[str], i) -> Optional[str]:
-    try:
-        return l[i]
-    except IndexError as _:
-        return None
 
 
 def attributes_to_list(obj) -> list[str]:

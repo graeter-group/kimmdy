@@ -30,6 +30,13 @@ the correct the atom id.
 """
 
 
+def field_or_none(l: list[str], i) -> Optional[str]:
+    try:
+        return l[i]
+    except IndexError as _:
+        return None
+
+
 class longFormatter(logging.Formatter):
     def format(self, record):
         saved_name = record.name  # save and restore for other formatters if desired
@@ -377,38 +384,42 @@ def truncate_sim_files(files: TaskFiles, time: Optional[float], keep_tail: bool 
         except FileNotFoundError:
             paths[s] = None
 
-    # trr or xtc must be present
-    if (traj := paths["trr"]) is None:
-        if (traj := paths["xtc"]) is None:
-            logger.info("No trajectory files found, nothing to truncate.")
-            return
+    trjs = [p for p in [paths["trr"], paths["xtc"]] if p is not None and p.exists()]
 
-    # check time exists in traj
-    p = sp.run(
-        f"gmx -quiet -nocopyright check -f {traj}",
-        text=True,
-        capture_output=True,
-        shell=True,
-    )
-    # FOR SOME REASON gmx check writes in stderr instead of stdout
-    if m := re.search(r"Last frame.*time\s+(\d+\.\d+)", p.stderr):
-        last_time = float(m.group(1))
-        if last_time == 0.0:
-            logger.info("Last traj contains single frame, will not truncate anything.")
-            return
-        assert (
-            last_time * 1.01 >= time
-        ), "Requested to truncate trajectory after last frame"
-    else:
-        raise RuntimeError(f"gmx check failed:\n{p.stdout}\n{p.stderr}")
-    logger.info(
-        f"Truncating trajectories to {time:.4} ps. Trajectory time was {last_time:.4} ps"
-    )
+    # trr or xtc must be present
+    if len(trjs) == 0:
+        logger.info("No trajectory files found, nothing to truncate.")
+        return
+
+    for trj in trjs:
+        # check time exists in traj
+        p = sp.run(
+            f"gmx -quiet -nocopyright check -f {trj}",
+            text=True,
+            capture_output=True,
+            shell=True,
+        )
+        # FOR SOME REASON gmx check writes in stderr instead of stdout
+        if m := re.search(r"Last frame.*time\s+(\d+\.\d+)", p.stderr):
+            last_time = float(m.group(1))
+            if last_time == 0.0:
+                logger.info(
+                    "Last traj contains single frame, will not truncate anything."
+                )
+                return
+            assert (
+                last_time * 1.01 >= time
+            ), "Requested to truncate trajectory after last frame"
+        else:
+            m = f"gmx check failed:\n{p.stdout}\n{p.stderr}"
+            logger.error(m)
+            raise RuntimeError(m)
+        logger.info(
+            f"Truncating trajectories to {time:.4} ps. Trajectory time was {last_time:.4} ps"
+        )
 
     # backup the tails of trajectories
-    for trj in [paths["trr"], paths["xtc"]]:
-        if trj is None:
-            continue
+    for trj in trjs:
         tmp = trj.rename(trj.with_name("tmp_backup_" + trj.name))
         if keep_tail:
             run_gmx(
@@ -424,7 +435,7 @@ def truncate_sim_files(files: TaskFiles, time: Optional[float], keep_tail: bool 
         paths["gro"].with_name("tmp_backup_" + paths["gro"].name)
     )
     sp.run(
-        f"gmx trjconv -f {traj} -s {bck_gro} -dump -1 -o {paths['gro']}",
+        f"gmx trjconv -f {trjs[0]} -s {bck_gro} -dump -1 -o {paths['gro']}",
         text=True,
         input="0",
         shell=True,
