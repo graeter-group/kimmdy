@@ -125,6 +125,7 @@ def convert_schema_to_dict(dictionary: dict) -> dict:
         pytype = value.get("pytype")
         default = value.get("default")
         description = value.get("description")
+        enum = value.get("enum")
         additionalProperties = value.get("additionalProperties")
         if pytype is not None:
             result[key]["pytype"] = eval(pytype)
@@ -132,6 +133,8 @@ def convert_schema_to_dict(dictionary: dict) -> dict:
             result[key]["default"] = default
         if description is not None:
             result[key]["description"] = description
+        if enum is not None:
+            result[key]["enum"] = enum
         if additionalProperties is not None:
             result[key]["additionalProperties"] = additionalProperties
 
@@ -185,11 +188,20 @@ def flatten_scheme(scheme, section="") -> list:
         else:
             pytype = ""
         default = value.get("default", "")
+        enum = value.get("enum", "")
 
-        ls.append((key, description, pytype, default))
+        ls.append(
+            {
+                "key": key,
+                "desc": description,
+                "type": pytype,
+                "default": default,
+                "enum": enum,
+            }
+        )
 
         for k in value.keys():
-            if k not in ["pytype", "default", "description", "type"]:
+            if k not in ["pytype", "default", "description", "type", "enum"]:
                 k_esc = k
                 if k == ".*":
                     k_esc = "\\*"
@@ -206,13 +218,13 @@ def generate_markdown_table(scheme, append=False):
     """
     table = []
     if not append:
-        table.append("| Option | Description | Type | Default |")
-        table.append("| --- | --- | --- | --- | --- |")
+        table.append("| Option | Description | Type | Default | Options |")
+        table.append("| --- | --- | --- | --- | --- | --- |")
 
-    for key, pytype, description, default in scheme:
+    for key, pytype, description, default, enum in scheme:
         if pytype == "":
             key = f"**{key}**"
-        row = f"| {key} | {pytype} | {description} | {default} |"
+        row = f"| {key} | {pytype} | {description} | {default} | {enum} |"
         table.append(row)
 
     return "\n".join(table)

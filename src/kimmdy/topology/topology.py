@@ -5,13 +5,15 @@ from itertools import permutations
 from pathlib import Path
 from typing import Callable, Optional, Union
 
+from numpy import empty
+
 from kimmdy.constants import (
     ATOM_ID_FIELDS,
     ATOMTYPE_BONDORDER_FLAT,
     REACTIVE_MOLECULEYPE,
     RESNR_ID_FIELDS,
 )
-from kimmdy.parsing import TopologyDict
+from kimmdy.parsing import TopologyDict, empty_section
 from kimmdy.plugins import BasicParameterizer, Parameterizer
 from kimmdy.recipe import Bind, Break, RecipeStep
 from kimmdy.topology.atomic import (
@@ -21,6 +23,7 @@ from kimmdy.topology.atomic import (
     Dihedral,
     DihedralRestraint,
     Exclusion,
+    MoleculeTypeHeader,
     MultipleDihedrals,
     Pair,
     PositionRestraint,
@@ -36,7 +39,6 @@ from kimmdy.topology.utils import (
     get_top_section,
     increment_field,
     is_not_solvent_or_ion,
-    set_moleculetype_atomics,
     set_top_section,
 )
 from kimmdy.utils import TopologyAtomAddress
@@ -63,9 +65,10 @@ class MoleculeType:
     """
 
     def __init__(
-        self, header: tuple[str, str], atomics: dict, radicals: Optional[str] = None
+        self, header: MoleculeTypeHeader, atomics: dict, radicals: Optional[str] = None
     ) -> None:
-        self.name, self.nrexcl = header
+        self.name = header.name
+        self.nrexcl = header.nrexcl
         self.atomics = atomics
 
         logger.debug(f"parsing molecule {self.name}")
@@ -644,6 +647,17 @@ class Topology:
     top
         A dictionary containing the parsed topology data, produced by
         [](`kimmdy.parsing.read_top`)
+    parametrizer
+        The parametrizer to use when reparametrizing the topology.
+    is_reactive_predicate_f
+        A function that takes a moleculetype name and returns True if the moleculetype
+        should be merged into the reactive moleculetype.
+    radicals
+        A string of atom numbers that are radicals.
+    residuetypes_path
+        Path to the residue types file.
+    reactive_nrexcl
+        Overwrite nrexcl value for the reactive moleculetype. Otherwise takes the nrexcl of the first reactive moleculetype.
     """
 
     def __init__(
@@ -653,6 +667,7 @@ class Topology:
         is_reactive_predicate_f: Callable[[str], bool] = is_not_solvent_or_ion,
         radicals: Optional[str] = None,
         residuetypes_path: Optional[Path] = None,
+        reactive_nrexcl: Optional[str] = None,
     ) -> None:
         if top == {}:
             raise NotImplementedError(
@@ -673,7 +688,7 @@ class Topology:
 
         self.needs_parameterization = False
 
-        self._merge_moleculetypes(radicals)
+        self._merge_moleculetypes(radicals=radicals, nrexcl=reactive_nrexcl)
         self._link_atomics()
 
     def _link_atomics(self):
@@ -698,7 +713,7 @@ class Topology:
         ].dihedral_restraints
         self.radicals = self.reactive_molecule.radicals
 
-    def _extract_mergable_molecules(self):
+    def _extract_mergable_molecules(self) -> dict[str, int]:
         """Extract all molecules that are to be merged into one moleculetype.
         And replaces them with a single moleculetype with the name REACTIVE_MOLECULEYPE
         """
@@ -734,7 +749,9 @@ class Topology:
             logger.info(f"\t{m} {n}")
         return reactive_molecules
 
-    def _merge_moleculetypes(self, radicals: Optional[str] = None):
+    def _merge_moleculetypes(
+        self, radicals: Optional[str] = None, nrexcl: Optional[str] = None
+    ):
         """
         Merge all moleculetypes within which reactions can happen into one moleculetype.
         This also makes multiples explicit.
@@ -745,6 +762,9 @@ class Topology:
         problems in the atomnr column, the correct internal atom nr is always "gro file line number" - 2).
         """
         molecules = self._extract_mergable_molecules()
+        first_reactive_molecule = list(molecules.keys())[0]
+        if nrexcl is None:
+            nrexcl = self.moleculetypes[first_reactive_molecule].nrexcl
         reactive_atomics = {}
         atomnr_offset = 0
         resnr_offset = 0
@@ -775,7 +795,9 @@ class Topology:
 
         # add merged moleculetype to topology
         reactive_moleculetype = MoleculeType(
-            (REACTIVE_MOLECULEYPE, "1"), reactive_atomics, radicals
+            MoleculeTypeHeader(name=REACTIVE_MOLECULEYPE, nrexcl=nrexcl),
+            reactive_atomics,
+            radicals,
         )
         self.moleculetypes[REACTIVE_MOLECULEYPE] = reactive_moleculetype
         # update topology dict
@@ -818,7 +840,7 @@ class Topology:
                     f"moleculetype {moleculetype} has no atoms, bonds, angles etc. Skipping."
                 )
                 continue
-            name = header[0]
+            name = header.name
             self.moleculetypes[name] = MoleculeType(header, atomics, radicals="")
 
     def __eq__(self, other: object) -> bool:
@@ -826,16 +848,75 @@ class Topology:
             return False
         return self.to_dict() == other.to_dict()
 
+    def _update_dict_from_moleculetype_atomics(
+        self, moleculetype: MoleculeType, create: bool = False
+    ):
+        """Set content of the atomics (atoms/bonds/angles etc.) in the a topology dict from of a moleculetype.
+
+        Resolves any `#ifdef` statements by check in the top['define'] dict
+        and chooses the 'content' or 'else_content' depending on the result.
+
+        If create is True, a new section is created if it does not exist.
+        """
+        name = moleculetype.name
+        atomics = moleculetype.atomics
+        top = self.top
+        moleculetype_name = f"moleculetype_{name}"
+        section = top.get(moleculetype_name)
+        if section is None:
+            if create:
+                logger.info(
+                    f"topology does not contain {moleculetype_name}. Creating new section."
+                )
+                section = empty_section()
+                section["content"] = [[name, moleculetype.nrexcl]]
+                section["subsections"] = {k: empty_section() for k in atomics.keys()}
+                top[moleculetype_name] = section
+            else:
+                logger.warning(
+                    f"topology does not contain {moleculetype_name} and create=False. Not creating new section."
+                )
+                return None
+
+        subsections = section["subsections"]
+        for k in list(subsections.keys()):
+            # # if atomics section is empty,
+            # # remove the subsection from the topology
+            # if atomics[k] == []:
+            #     logger.debug(f"Removing subsection {k} from {moleculetype_name}")
+            #     del subsections[k]
+            #     continue
+
+            v = subsections[k]
+            condition = v.get("condition")
+            if condition is not None:
+                condition_type = condition.get("type")
+                condition_value = condition.get("value")
+                if condition_type == "ifdef":
+                    if condition_value in top["define"].keys():
+                        v["content"] = atomics[k]
+                    else:
+                        v["else_content"] = atomics[k]
+                elif condition_type == "ifndef":
+                    if condition_value not in top["define"].keys():
+                        v["content"] = atomics[k]
+                    else:
+                        v["else_content"] = atomics[k]
+                else:
+                    raise NotImplementedError(
+                        f"condition type {condition_type} is not supported"
+                    )
+            else:
+                v["content"] = atomics[k]
+
     def _update_dict(self):
         """Update the topology dictionary with the current state of the topology."""
         for name, moleculetype in self.moleculetypes.items():
             moleculetype._update_atomics_dict()
             if name == REACTIVE_MOLECULEYPE:
-                set_moleculetype_atomics(
-                    self.top, name, moleculetype.atomics, create=True
-                )
+                self._update_dict_from_moleculetype_atomics(moleculetype, create=True)
             else:
-                set_moleculetype_atomics(self.top, name, moleculetype.atomics)
+                self._update_dict_from_moleculetype_atomics(moleculetype)
 
         set_top_section(
             self.top,
@@ -1271,7 +1352,7 @@ class Topology:
                             atom.atom = "HX"
                             name_set = True
                             continue
-                        logger.info(f"HAT hydrogen will be bound to {other_atom}.")
+                        logger.info(f"Hydrogen will be bound to {other_atom}.")
                         break
                 else:
                     if name_set:

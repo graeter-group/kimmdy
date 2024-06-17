@@ -23,7 +23,7 @@ CD  CE  400
 CE  NZ  400
 
 ;;; for KIMMDY (per residue definition of edissoc for bonds based on atom names)
-[general] 
+[ general ] 
 C   N   500 ; Is not expected to break due to partial  double bond character
 CA  C   341 ; float average of Ala, Gly and Pro
 CA  N   379 ; float average of Ala and Gly
@@ -31,7 +31,7 @@ CA  N   379 ; float average of Ala and Gly
 C   N   500 
 CA  C   341
 CA  N   382
-[ALA]
+[ ALA ]
 C   N   500 
 CA  C   344
 CA  N   376

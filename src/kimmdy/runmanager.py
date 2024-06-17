@@ -9,6 +9,8 @@ from __future__ import annotations
 
 import logging
 import queue
+import re
+import shutil
 import time
 from copy import copy, deepcopy
 from datetime import timedelta
@@ -16,16 +18,14 @@ from enum import Enum, auto
 from functools import partial
 from pathlib import Path
 from pprint import pformat
-import shutil
 from subprocess import CalledProcessError
 from typing import Optional
-import re
 
 from kimmdy.config import Config
-from kimmdy.constants import MARK_STARTED, MARK_DONE, MARK_FAILED, MARKERS
+from kimmdy.constants import MARK_DONE, MARK_FAILED, MARK_STARTED, MARKERS
 from kimmdy.coordinates import break_bond_plumed, merge_top_slow_growth, place_atom
 from kimmdy.kmc import KMCResult, extrande, extrande_mod, frm, rf_kmc
-from kimmdy.parsing import read_top, write_json, write_top, write_time_marker
+from kimmdy.parsing import read_top, write_json, write_time_marker, write_top
 from kimmdy.plugins import (
     BasicParameterizer,
     ReactionPlugin,
@@ -36,7 +36,7 @@ from kimmdy.recipe import Bind, Break, CustomTopMod, Place, RecipeCollection, Re
 from kimmdy.tasks import Task, TaskFiles, get_plumed_out
 from kimmdy.topology.topology import Topology
 from kimmdy.topology.utils import get_is_reactive_predicate_from_config_f
-from kimmdy.utils import run_gmx, truncate_sim_files, get_task_directories
+from kimmdy.utils import get_task_directories, run_gmx, truncate_sim_files
 
 logger = logging.getLogger(__name__)
 
@@ -156,6 +156,7 @@ class RunManager:
                 f"the parameterization plugins: {list(parameterization_plugins.keys())}"
             ) from e
 
+        nrexcl = getattr(self.config.topology, "nrexcl", None)
         self.top = Topology(
             top=read_top(self.config.top, self.config.ff),
             parametrizer=self.parameterizer,
@@ -164,6 +165,7 @@ class RunManager:
             ),
             radicals=getattr(self.config, "radicals", None),
             residuetypes_path=getattr(self.config, "residuetypes", None),
+            reactive_nrexcl=nrexcl,
         )
         self.filehist: list[dict[str, TaskFiles]] = [
             {"setup": TaskFiles(self.get_latest)}
@@ -579,7 +581,8 @@ class RunManager:
 
         mdrun_cmd = (
             f"{gmx_alias} mdrun -s {instance}.tpr -cpi {cpt} "
-            f"-x {instance}.xtc -o {instance}.trr -cpo {instance}.cpt "
+            f"-x {instance}.xtc -o {instance}.trr "
+            f"-cpo {instance}.cpt "
             f"-c {instance}.gro -g {instance}.log -e {instance}.edr "
             f"-px {instance}_pullx.xvg -pf {instance}_pullf.xvg "
             f"-ro {instance}-rotation.xvg -ra {instance}-rotangles.log "
@@ -593,15 +596,20 @@ class RunManager:
             plumed_out = files.outputdir / get_plumed_out(files.input["plumed"])
             files.output["plumed_out"] = plumed_out
 
-        # specify trr to prevent rotref trr getting set as standard trr
-        files.output["trr"] = files.outputdir / f"{instance}.trr"
         logger.debug(f"grompp cmd: {grompp_cmd}")
         logger.debug(f"mdrun cmd: {mdrun_cmd}")
         try:
             run_gmx(grompp_cmd, outputdir)
             run_gmx(mdrun_cmd, outputdir)
+
+            # specify trr to prevent rotref trr getting set as standard trr
+            path = files.outputdir / f"{instance}.trr"
+            if path.exists():
+                files.output["trr"] = path
+
         except CalledProcessError as e:
             write_time_marker(files.outputdir / MARK_FAILED, "failed")
+            logger.error(f"Error occured during MD {instance}:\n{e}")
             raise e
 
         logger.info(f"Done with MD {instance}")
