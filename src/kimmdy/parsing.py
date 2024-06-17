@@ -583,7 +583,11 @@ def read_edissoc(path: Path) -> dict:
             if l.startswith(";"):
                 continue
             elif l.strip().startswith("[") and l.strip().endswith("]"):
-                key = l.strip().strip("[]").strip()
+                key = l.strip().strip("[]")
+                if key != key.strip():
+                    m = f"Unexpected whitespace in edissoc file {path} for key: {l}. Please remove it and try again."
+                    logger.error(m)
+                    raise ValueError(m)
                 edissocs[key] = {}
             elif len(l.split(sep=";")[0].split()) == 3:
                 at1, at2, edissoc, *_ = l.split()

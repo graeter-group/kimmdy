@@ -199,13 +199,19 @@ def test_plumed_write_identity(arranged_tmp_path):
 def test_edissoc_read(arranged_tmp_path):
     edissoc_dict = parsing.read_edissoc(Path("edissoc.dat"))
     assert len(edissoc_dict.keys()) == 14
-    # works with and without spacs around keys in `[ ... ]`
     assert edissoc_dict.get("ALA") is not None
     assert edissoc_dict.get("GLY") is not None
     for k, v in edissoc_dict.items():
         for kv, vv in v.items():
             assert isinstance(kv, frozenset)
             assert isinstance(vv, float)
+
+
+def test_edissoc_read_correct_error(arranged_tmp_path):
+    # works with and without spacs around keys in `[ ... ]`
+    # should throw ValueError if the file is not formatted correctly
+    with pytest.raises(ValueError):
+        edissoc_dict = parsing.read_edissoc(Path("edissoc-error.dat"))
 
 
 def test_marker_file_parsing(tmp_path: Path):
