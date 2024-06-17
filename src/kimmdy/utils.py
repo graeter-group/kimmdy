@@ -357,7 +357,11 @@ def check_gmx_version(config):
     return version
 
 
-def truncate_sim_files(files: TaskFiles, time: Optional[float], keep_tail: bool = True):
+def truncate_sim_files(
+    files: TaskFiles,
+    time: Optional[float],
+    keep_tail: bool = True,
+):
     """Truncates latest trr, xtc, edr, and gro to the time to a previous
     point in time.
 
@@ -400,8 +404,12 @@ def truncate_sim_files(files: TaskFiles, time: Optional[float], keep_tail: bool 
             shell=True,
         )
         # FOR SOME REASON gmx check writes in stderr instead of stdout
-        if m := re.search(r"Last frame.*time\s+(\d+\.\d+)", p.stderr):
-            last_time = float(m.group(1))
+        if ms := re.findall(r"Reading frame\s.*time\s+(\d+\.\d+)", p.stderr):
+            if len(ms) == 0:
+                m = f"Could not find time in trajectory {trj} with gmx check."
+                logger.warning(m)
+                return
+            last_time = float(ms[-1])
             if last_time == 0.0:
                 logger.info(
                     "Last traj contains single frame, will not truncate anything."

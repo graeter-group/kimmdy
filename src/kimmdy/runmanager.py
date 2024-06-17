@@ -754,7 +754,7 @@ class RunManager:
             # only first time of interval is valid for placement
             ttime = recipe.timespans[0][0]
 
-        truncate_sim_files(files, ttime)
+        truncate_sim_files(files=files, time=ttime)
 
         top_initial = deepcopy(self.top)
         focus_nrs = set()
