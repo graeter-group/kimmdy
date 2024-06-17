@@ -484,7 +484,6 @@ ul.task-list li input[type="checkbox"] {
   </ul></li>
   <li><a href="#kimmdy.topology.utils.get_top_section" id="toc-kimmdy.topology.utils.get_top_section" class="nav-link" data-scroll-target="#kimmdy.topology.utils.get_top_section">get_top_section</a></li>
   <li><a href="#kimmdy.topology.utils.is_not_solvent_or_ion" id="toc-kimmdy.topology.utils.is_not_solvent_or_ion" class="nav-link" data-scroll-target="#kimmdy.topology.utils.is_not_solvent_or_ion">is_not_solvent_or_ion</a></li>
-  <li><a href="#kimmdy.topology.utils.set_moleculetype_atomics" id="toc-kimmdy.topology.utils.set_moleculetype_atomics" class="nav-link" data-scroll-target="#kimmdy.topology.utils.set_moleculetype_atomics">set_moleculetype_atomics</a></li>
   <li><a href="#kimmdy.topology.utils.set_protein_section" id="toc-kimmdy.topology.utils.set_protein_section" class="nav-link" data-scroll-target="#kimmdy.topology.utils.set_protein_section">set_protein_section</a></li>
   <li><a href="#kimmdy.topology.utils.set_reactive_section" id="toc-kimmdy.topology.utils.set_reactive_section" class="nav-link" data-scroll-target="#kimmdy.topology.utils.set_reactive_section">set_reactive_section</a></li>
   <li><a href="#kimmdy.topology.utils.set_top_section" id="toc-kimmdy.topology.utils.set_top_section" class="nav-link" data-scroll-target="#kimmdy.topology.utils.set_top_section">set_top_section</a></li>
@@ -548,18 +547,14 @@ ul.task-list li input[type="checkbox"] {
 <td>Returns whether a moleculetype name is not solvent or ion.</td>
 </tr>
 <tr class="even">
-<td><a href="#kimmdy.topology.utils.set_moleculetype_atomics">set_moleculetype_atomics</a></td>
-<td>Set content of the atomics (atoms/bonds/angles etc.) of a moleculetype from a topology dict.</td>
-</tr>
-<tr class="odd">
 <td><a href="#kimmdy.topology.utils.set_protein_section">set_protein_section</a></td>
 <td>Set content of a section in the first moleculetype (protein) from a topology dict.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#kimmdy.topology.utils.set_reactive_section">set_reactive_section</a></td>
 <td>Set content of a section in the first moleculetype (protein) from a topology dict.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#kimmdy.topology.utils.set_top_section">set_top_section</a></td>
 <td>Set content of a section from a topology dict.</td>
 </tr>
@@ -678,13 +673,6 @@ ul.task-list li input[type="checkbox"] {
 <h3 class="anchored" data-anchor-id="kimmdy.topology.utils.is_not_solvent_or_ion">is_not_solvent_or_ion</h3>
 <p><code>topology.utils.is_not_solvent_or_ion(name)</code></p>
 <p>Returns whether a moleculetype name is not solvent or ion.</p>
-</section>
-<section id="kimmdy.topology.utils.set_moleculetype_atomics" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.topology.utils.set_moleculetype_atomics">set_moleculetype_atomics</h3>
-<p><code>topology.utils.set_moleculetype_atomics(top, name, atomics, create=False)</code></p>
-<p>Set content of the atomics (atoms/bonds/angles etc.) of a moleculetype from a topology dict.</p>
-<p>Resolves any <code>#ifdef</code> statements by check in the top[‘define’] dict and chooses the ‘content’ or ‘else_content’ depending on the result.</p>
-<p>If create is True, a new section is created if it does not exist.</p>
 </section>
 <section id="kimmdy.topology.utils.set_protein_section" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.utils.set_protein_section">set_protein_section</h3>

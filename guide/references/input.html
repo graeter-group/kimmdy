@@ -519,6 +519,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#topology" id="toc-topology" class="nav-link" data-scroll-target="#topology">topology</a></li>
   <li><a href="#topology.reactive.include" id="toc-topology.reactive.include" class="nav-link" data-scroll-target="#topology.reactive.include">topology.reactive.include</a></li>
   <li><a href="#topology.reactive.exclude" id="toc-topology.reactive.exclude" class="nav-link" data-scroll-target="#topology.reactive.exclude">topology.reactive.exclude</a></li>
+  <li><a href="#topology.reactive.nrexcl" id="toc-topology.reactive.nrexcl" class="nav-link" data-scroll-target="#topology.reactive.nrexcl">topology.reactive.nrexcl</a></li>
   <li><a href="#gro" id="toc-gro" class="nav-link" data-scroll-target="#gro">gro</a></li>
   <li><a href="#ndx" id="toc-ndx" class="nav-link" data-scroll-target="#ndx">ndx</a></li>
   <li><a href="#gromacs_alias" id="toc-gromacs_alias" class="nav-link" data-scroll-target="#gromacs_alias">gromacs_alias</a></li>
@@ -543,8 +544,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#reactions.homolysis.edis" id="toc-reactions.homolysis.edis" class="nav-link" data-scroll-target="#reactions.homolysis.edis">reactions.homolysis.edis</a></li>
   <li><a href="#reactions.homolysis.itp" id="toc-reactions.homolysis.itp" class="nav-link" data-scroll-target="#reactions.homolysis.itp">reactions.homolysis.itp</a></li>
   <li><a href="#reactions.homolysis.kmc" id="toc-reactions.homolysis.kmc" class="nav-link" data-scroll-target="#reactions.homolysis.kmc">reactions.homolysis.kmc</a></li>
-  <li><a href="#reactions.homolysis.check_bound" id="toc-reactions.homolysis.check_bound" class="nav-link" data-scroll-target="#reactions.homolysis.check_bound">reactions.homolysis.check_bound</a></li>
-  <li><a href="#reactions.homolysis.arrhenius_equation" id="toc-reactions.homolysis.arrhenius_equation" class="nav-link" data-scroll-target="#reactions.homolysis.arrhenius_equation">reactions.homolysis.arrhenius_equation</a></li>
   <li><a href="#reactions.hat_naive.frequency_factor" id="toc-reactions.hat_naive.frequency_factor" class="nav-link" data-scroll-target="#reactions.hat_naive.frequency_factor">reactions.hat_naive.frequency_factor</a></li>
   <li><a href="#reactions.hat_naive.h_cutoff" id="toc-reactions.hat_naive.h_cutoff" class="nav-link" data-scroll-target="#reactions.hat_naive.h_cutoff">reactions.hat_naive.h_cutoff</a></li>
   <li><a href="#reactions.hat_naive.polling_rate" id="toc-reactions.hat_naive.polling_rate" class="nav-link" data-scroll-target="#reactions.hat_naive.polling_rate">reactions.hat_naive.polling_rate</a></li>
@@ -552,6 +551,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#reactions.dummyreaction.example" id="toc-reactions.dummyreaction.example" class="nav-link" data-scroll-target="#reactions.dummyreaction.example">reactions.dummyreaction.example</a></li>
   <li><a href="#reactions.dummyreaction.example2" id="toc-reactions.dummyreaction.example2" class="nav-link" data-scroll-target="#reactions.dummyreaction.example2">reactions.dummyreaction.example2</a></li>
   <li><a href="#reactions.dummyreaction.kmc" id="toc-reactions.dummyreaction.kmc" class="nav-link" data-scroll-target="#reactions.dummyreaction.kmc">reactions.dummyreaction.kmc</a></li>
+  <li><a href="#reactions.hydrolysis_naive.cutoff" id="toc-reactions.hydrolysis_naive.cutoff" class="nav-link" data-scroll-target="#reactions.hydrolysis_naive.cutoff">reactions.hydrolysis_naive.cutoff</a></li>
+  <li><a href="#reactions.hydrolysis_naive.kmc" id="toc-reactions.hydrolysis_naive.kmc" class="nav-link" data-scroll-target="#reactions.hydrolysis_naive.kmc">reactions.hydrolysis_naive.kmc</a></li>
   <li><a href="#plot_rates" id="toc-plot_rates" class="nav-link" data-scroll-target="#plot_rates">plot_rates</a></li>
   <li><a href="#save_recipes" id="toc-save_recipes" class="nav-link" data-scroll-target="#save_recipes">save_recipes</a></li>
   </ul></li>
@@ -581,7 +582,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="autocompletion" class="level2">
 <h2 class="anchored" data-anchor-id="autocompletion">Autocompletion</h2>
-<p>KIMMDY comes with autocompletion and tooltips insight your editor for its configuration file <code>kimmdy.yml</code>.</p>
+<p>KIMMDY comes with autocompletion and tooltips inside your editor for its configuration file <code>kimmdy.yml</code>.</p>
 <p>All you need to do is activate a <a href="https://github.com/redhat-developer/yaml-language-server">yaml-language-server</a> in your editor (e.g.&nbsp;<a href="https://code.visualstudio.com/">VS Code</a> via the <a href="https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml">YAML extension</a> or <a href="https://neovim.io/">Neovim</a> via <a href="https://github.com/neovim/nvim-lspconfig">lspconfig</a>).</p>
 <p>Activating this is very much recommended, as it prevents many typos, missaligned braces and especially incorrect indentation (people love YAML for its readability, but hate it for its whitespace sensitivity).</p>
 <div class="callout callout-style-simple callout-tip callout-titled">
@@ -686,6 +687,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="topology.reactive.exclude">topology.reactive.exclude</h3>
 <p>Explicitly exclude a moleculetype or a list as a space-separated string. For example the lipid moleculetype in a bilayer simulation e.g.&nbsp;<code>DPPC POPC'</code></p>
 <p><strong>Type</strong>: str</p>
+</section>
+<section id="topology.reactive.nrexcl" class="level3">
+<h3 class="anchored" data-anchor-id="topology.reactive.nrexcl">topology.reactive.nrexcl</h3>
+<p>Explictly set the nrexcl value for the Reactive moleculetype. By default the value is taken from the first found reactive moleculetype.</p>
+<p><strong>Type</strong>: int</p>
 </section>
 <section id="gro" class="level3">
 <h3 class="anchored" data-anchor-id="gro">gro</h3>
@@ -815,16 +821,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><strong>Options</strong>: [‘rfkmc’, ‘frm’, ‘extrande’, ‘extrande_mod’]</p>
 <p><strong>Default</strong>: rfkmc</p>
 </section>
-<section id="reactions.homolysis.check_bound" class="level3">
-<h3 class="anchored" data-anchor-id="reactions.homolysis.check_bound">reactions.homolysis.check_bound</h3>
-<p>Check the topology for bonds between plumed atom pairs</p>
-<p><strong>Type</strong>: bool</p>
-<p><strong>Default</strong>: False</p>
-</section>
-<section id="reactions.homolysis.arrhenius_equation" class="level3">
-<h3 class="anchored" data-anchor-id="reactions.homolysis.arrhenius_equation">reactions.homolysis.arrhenius_equation</h3>
-<p>For setting values in the arrhenius equation</p>
-</section>
 <section id="reactions.hat_naive.frequency_factor" class="level3">
 <h3 class="anchored" data-anchor-id="reactions.hat_naive.frequency_factor">reactions.hat_naive.frequency_factor</h3>
 <p>Frequency factor</p>
@@ -868,6 +864,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><strong>Type</strong>: str</p>
 <p><strong>Options</strong>: [‘rfkmc’, ‘frm’, ‘extrande’, ‘extrande_mod’]</p>
 <p><strong>Default</strong>: extrande_mod</p>
+</section>
+<section id="reactions.hydrolysis_naive.cutoff" class="level3">
+<h3 class="anchored" data-anchor-id="reactions.hydrolysis_naive.cutoff">reactions.hydrolysis_naive.cutoff</h3>
+<p>Cutoff distance [nm] for the reaction. Water within this distance from the peptide bond will be considered for hydrolysis.</p>
+<p><strong>Type</strong>: float</p>
+<p><strong>Default</strong>: 1</p>
+</section>
+<section id="reactions.hydrolysis_naive.kmc" class="level3">
+<h3 class="anchored" data-anchor-id="reactions.hydrolysis_naive.kmc">reactions.hydrolysis_naive.kmc</h3>
+<p>KMC algorithm for this reaction.</p>
+<p><strong>Type</strong>: str</p>
+<p><strong>Options</strong>: [‘rfkmc’, ‘frm’, ‘extrande’]</p>
+<p><strong>Default</strong>: rfkmc</p>
 </section>
 <section id="plot_rates" class="level3">
 <h3 class="anchored" data-anchor-id="plot_rates">plot_rates</h3>
