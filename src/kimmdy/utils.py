@@ -415,11 +415,11 @@ def truncate_sim_files(
                     "Last traj contains single frame, will not truncate anything."
                 )
                 return
-            assert (
-                last_time * 1.01 >= time
-            ), "Requested to truncate trajectory after last frame"
+            if last_time * 1.01 >= time:
+                m = f"Requested to truncate trajectory at time {time} but last frame according to gmx check is at {last_time:.4} ps. This might led to unexpected results."
+                logger.warning(m)
         else:
-            m = f"gmx check failed:\n{p.stdout}\n{p.stderr}"
+            m = f"gmx check failed:\n{p.stdout}\n{p.stderr}.\nMay not be able to truncate trajectory {trj}."
             logger.error(m)
             raise RuntimeError(m)
         logger.info(
