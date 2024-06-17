@@ -61,10 +61,13 @@ class ReactionPlugin(ABC):
 
     Parameters
     ----------
-    name : str
-        Name of the reaction
-    runmng : Runmanager
-        RunManager instance
+    name
+        Name of the reaction.
+    runmng
+        RunManager instance.
+    config
+        Subconfig of the reaction (i.e. `self.runmng.config.reactions.__getattribute__(self.name)`.
+        Use this to access and pass settings to the reaction.
     """
 
     def __init__(self, name: str, runmng: RunManager):
