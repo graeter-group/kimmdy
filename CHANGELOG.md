@@ -1,5 +1,20 @@
 # Changelog
 
+## [6.8.1](https://github.com/hits-mbm-dev/kimmdy/compare/v6.8.0...v6.8.1) (2024-06-17)
+
+
+### Bug Fixes
+
+* check for residuetypes.rtp existence ([c4e831c](https://github.com/hits-mbm-dev/kimmdy/commit/c4e831c85b061b1f1916d9a8855908deb7ed6580))
+* fix [#440](https://github.com/hits-mbm-dev/kimmdy/issues/440) ([c4e831c](https://github.com/hits-mbm-dev/kimmdy/commit/c4e831c85b061b1f1916d9a8855908deb7ed6580))
+* onlye require xtc or trr, not both ([#439](https://github.com/hits-mbm-dev/kimmdy/issues/439)) ([c4e831c](https://github.com/hits-mbm-dev/kimmdy/commit/c4e831c85b061b1f1916d9a8855908deb7ed6580))
+* use nrexcl from first reactive molecultetype ([c4e831c](https://github.com/hits-mbm-dev/kimmdy/commit/c4e831c85b061b1f1916d9a8855908deb7ed6580))
+
+
+### Documentation
+
+* make docs of kimmdy.yml much more readable ([c4e831c](https://github.com/hits-mbm-dev/kimmdy/commit/c4e831c85b061b1f1916d9a8855908deb7ed6580))
+
 ## [6.8.0](https://github.com/hits-mbm-dev/kimmdy/compare/v6.7.0...v6.8.0) (2024-06-11)
 
 
