@@ -158,7 +158,8 @@ def test_combine_recipes():
         rp1a.combine_with(rp2)
 
 
-# ToDo: test other recipe methods
+def id(x):
+    return x
 
 
 ## Test RecipeCollection
@@ -168,7 +169,9 @@ def recipe_collection():
         recipe.Recipe(
             [
                 recipe.BondOperation(1, 5),
-                recipe.BondOperation(2, 6),
+                recipe.Break(2, 6),
+                recipe.Bind(1, 2),
+                recipe.CustomTopMod(id),
                 recipe.BondOperation(3, 7),
             ],
             rates=[1],

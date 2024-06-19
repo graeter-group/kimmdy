@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import ast
 import csv
 import logging
 from abc import ABC
@@ -326,6 +327,12 @@ class CustomTopMod(RecipeStep):
 
     f: Callable[[Topology], None]
 
+    def __repr__(self):
+        return f"{type(self).__name__}(f={self.f.__name__})"
+
+    def __str__(self):
+        return f"{type(self).__name__}(f={self.f.__name__})"
+
 
 @dataclass
 class Recipe:
@@ -490,12 +497,11 @@ class RecipeCollection:
     def to_csv(self, path: Path, picked_recipe=None):
         """Write a ReactionResult as defined in the reaction module to a csv file"""
 
-        header = ["recipe_steps", "timespans", "rates"]
+        header = ["index", "picked", "recipe_steps", "timespans", "rates"]
         rows = []
         for i, rp in enumerate(self.recipes):
-            picked = rp == picked_recipe
-            rows.append([i] + [picked] + [rp.__getattribute__(h) for h in header])
-        header = ["index", "picked"] + header
+            was_picked = rp == picked_recipe
+            rows.append([i] + [was_picked] + [rp.recipe_steps, rp.timespans, rp.rates])
 
         with open(path, "w", newline="") as f:
             writer = csv.writer(f)
@@ -516,10 +522,10 @@ class RecipeCollection:
             for row in reader:
                 _, picked_s, recipe_steps_s, timespans_s, rates_s = row
 
-                picked = eval(picked_s)
+                picked = picked_s == "True"
                 recipe_steps = eval(recipe_steps_s)
-                timespans = eval(timespans_s)
-                rates = eval(rates_s)
+                timespans = ast.literal_eval(timespans_s)
+                rates = ast.literal_eval(rates_s)
 
                 recipe = Recipe(
                     recipe_steps=recipe_steps, timespans=timespans, rates=rates
