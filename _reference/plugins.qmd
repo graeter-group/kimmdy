@@ -15,7 +15,7 @@ Also discovers and loads KIMMDY plugins.
 
 ### BasicParameterizer { #kimmdy.plugins.BasicParameterizer }
 
-`plugins.BasicParameterizer(self, **kwargs)`
+`plugins.BasicParameterizer()`
 
 reconstruct base force field state
 
@@ -27,7 +27,7 @@ reconstruct base force field state
 
 ##### parameterize_topology { #kimmdy.plugins.BasicParameterizer.parameterize_topology }
 
-`plugins.BasicParameterizer.parameterize_topology(current_topology, focus_nrs=None)`
+`plugins.BasicParameterizer.parameterize_topology(self, current_topology, focus_nrs=None)`
 
 Do nothing,
 all necessary actions should already have happened in bind_bond and break_bond of Topology
@@ -40,10 +40,11 @@ Reaction base class
 
 #### Parameters
 
-| Name     | Type                       | Description          | Default    |
-|----------|----------------------------|----------------------|------------|
-| `name`   | [str](`str`)               | Name of the reaction | _required_ |
-| `runmng` | [Runmanager](`Runmanager`) | RunManager instance  | _required_ |
+| Name     | Type                                         | Description                                                                                                                                       | Default    |
+|----------|----------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| `name`   | [str](`str`)                                 | Name of the reaction.                                                                                                                             | _required_ |
+| `runmng` | [RunManager](`kimmdy.runmanager.RunManager`) | RunManager instance.                                                                                                                              | _required_ |
+| `config` |                                              | Subconfig of the reaction (i.e. `self.runmng.config.reactions.__getattribute__(self.name)`. Use this to access and pass settings to the reaction. | _required_ |
 
 #### Methods
 
@@ -53,7 +54,7 @@ Reaction base class
 
 ##### get_recipe_collection { #kimmdy.plugins.ReactionPlugin.get_recipe_collection }
 
-`plugins.ReactionPlugin.get_recipe_collection(files)`
+`plugins.ReactionPlugin.get_recipe_collection(self, files)`
 
 Get a RecipeCollection as a result of the reaction.
 

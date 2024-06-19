@@ -45,7 +45,7 @@ pip install kimmdy[reactions,analysis]
 Download and unzip the [input files](./getting-started-files/setup.zip) to this directory.
 
 ```bash
-wget https://hits-mbm-dev.github.io/kimmdy/guide/tutorials/getting-started-files/setup.zip
+wget https://graeter-group.github.io/kimmdy/guide/tutorials/getting-started-files/setup.zip
 unzip setup.zip
 ```
 

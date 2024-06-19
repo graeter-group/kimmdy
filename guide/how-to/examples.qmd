@@ -10,7 +10,7 @@ Those examples don't currently have extensive documentation,
 but they can be used as a starting point for your own simulations.
 
 The examples are located in the `examples` directory of the KIMMDY source code
-[here](https://github.com/hits-mbm-dev/kimmdy/tree/main/example).
+[here](https://github.com/graeter-group/kimmdy/tree/main/example).
 
 Here are their `kimmdy.yml` files at a glance:
 

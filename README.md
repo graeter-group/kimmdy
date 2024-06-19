@@ -1,6 +1,6 @@
 # KIMMDY
 
-[![](https://github.com/hits-mbm-dev/kimmdy/actions/workflows/test-release.yml/badge.svg)](https://github.com/hits-mbm-dev/kimmdy/actions/workflows/test-release.yml)
+![](https://github.com/graeter-group/kimmdy/actions/workflows/test-release.yml/badge.svg)](https://github.com/grater-group/kimmdy/actions/workflows/test-release.yml)
 
 Reactive MD pipeline for GROMACS using Kinetic Monte Carlo / Molecular Dynamics (KIMMDY)
 
@@ -32,15 +32,15 @@ However, this is only half the fun!
 KIMMDY has two exciting plugins in the making, which properly parameterize your molecules
 for radicals using GrAPPa (Graph Attentional Protein Parametrization) and predict
 Hydrogen Atom Transfer (HAT) rates.
-Full installation instructions are available [here](https://hits-mbm-dev.github.io/kimmdy/guide/how-to/install-ml-plugins.html)
+Full installation instructions are available [here](https://grater-group.github.io/kimmdy/guide/how-to/install-ml-plugins.html)
 
 ## Documentation
 
-The documentation is available [here](https://hits-mbm-dev.github.io/kimmdy/).
+The documentation is available [here](https://grater-group.github.io/kimmdy/).
 
 ## Getting started
 
-Head over to the [getting started](https://hits-mbm-dev.github.io/kimmdy/guide/tutorials/getting-started.html) tutorial.
+Head over to the [getting started](https://grater-group.github.io/kimmdy/guide/tutorials/getting-started.html) tutorial.
 
 ## Development
 
@@ -49,9 +49,9 @@ Head over to the [getting started](https://hits-mbm-dev.github.io/kimmdy/guide/t
 Clone kimmdy and the default reaction and parameterization plugins and install requirements and kimmdy as editable via
 
 ```bash
-git clone git@github.com:hits-mbm-dev/kimmdy.git
-git clone git@github.com:hits-mbm-dev/kimmdy-reactions.git
-git clone git@github.com:hits-mbm-dev/kimmdy-grappa.git
+git clone git@github.com:grater-group/kimmdy.git
+git clone git@github.com:grater-group/kimmdy-reactions.git
+git clone git@github.com:grater-group/kimmdy-grappa.git
 cd kimmdy
 python -m venv .venv
 source ./venv/bin/activate

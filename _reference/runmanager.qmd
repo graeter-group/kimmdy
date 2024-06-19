@@ -48,7 +48,7 @@ rest of the program and keeps track of global state.
 
 ##### get_latest { #kimmdy.runmanager.RunManager.get_latest }
 
-`runmanager.RunManager.get_latest(suffix)`
+`runmanager.RunManager.get_latest(self, suffix)`
 
 Returns path to latest file of given type.
 
