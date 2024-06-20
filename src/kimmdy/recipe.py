@@ -28,6 +28,37 @@ class RecipeStep(ABC):
     id: 1-based, str
     """
 
+    @classmethod
+    def from_str(cls, s: str) -> RecipeStep | None:
+        """Parses expressions of the following forms into RecipeStep objects:
+
+        - Place: Place(ix_to_place=0, new_coords=(0.0, 0.0, 0.0))
+        - Break: Break(atom_ix_1=0, atom_ix_2=1)
+        - Bind: Bind(atom_ix_1=0, atom_ix_2=1)
+        - Relax: Relax()
+        - CustomTopMod: CustomTopMod(f=<function f at 0x7f7f7f7f7f7f>)
+
+        Parameters
+        ----------
+        s
+            String representation of a RecipeStep object.
+        """
+
+        if s.startswith("Place"):
+            return Place._from_str(s)
+        elif s.startswith("Break"):
+            return Break._from_str(s)
+        elif s.startswith("Bind"):
+            return Bind._from_str(s)
+        elif s.startswith("Relax"):
+            return Relax._from_str(s)
+        elif s.startswith("CustomTopMod"):
+            return CustomTopMod._from_str(s)
+        else:
+            m = f"Unknown RecipeStep type: {s}"
+            logger.warning(m)
+            return None
+
 
 @dataclass
 class Relax(RecipeStep):
@@ -36,6 +67,10 @@ class Relax(RecipeStep):
     The molecular system coordinates are far out of equilibrium after most topology changes.
     A relaxtion MD simulation using for example the slow growth method helps to reach the new equilibrium.
     """
+
+    @classmethod
+    def _from_str(cls, s: str):
+        return Relax()
 
 
 class Place(RecipeStep):
@@ -139,6 +174,13 @@ class Place(RecipeStep):
 
     def __str__(self):
         return f"{type(self).__name__}({self._ix_to_place}, {self.new_coords})"
+
+    @classmethod
+    def _from_str(cls, s: str):
+        args = s.split("Place(")[1].split(")")[0]
+        # args = ix_to_place=0, new_coords=(0.0, 0.0, 0.0)
+        args = args.split(", ", maxsplit=1)
+        ix_to_place = int(args[0].split("=")[1])
 
 
 class BondOperation(RecipeStep):
@@ -327,6 +369,19 @@ class CustomTopMod(RecipeStep):
 
     f: Callable[[Topology], None]
 
+    def __eq__(self, other):
+        """Two CustomTopMods are considered equal if their functions have the same name and hash."""
+
+        if not isinstance(other, CustomTopMod):
+            logger.warning(
+                f"Comparing RecipeSteps with different types: {type(self)} and {type(other)}. Returning False."
+            )
+            return False
+        return self.__hash__() == other.__hash__()
+
+    def __hash__(self):
+        return hash((self.f.__name__, self.f.__hash__))
+
     def __repr__(self):
         return f"{type(self).__name__}(f={self.f.__name__})"
 
@@ -501,7 +556,8 @@ class RecipeCollection:
         rows = []
         for i, rp in enumerate(self.recipes):
             was_picked = rp == picked_recipe
-            rows.append([i] + [was_picked] + [rp.recipe_steps, rp.timespans, rp.rates])
+            steps = "<>".join([rs.__repr__() for rs in rp.recipe_steps])
+            rows.append([i] + [was_picked] + [steps] + [rp.timespans] + [rp.rates])
 
         with open(path, "w", newline="") as f:
             writer = csv.writer(f)
@@ -522,8 +578,10 @@ class RecipeCollection:
             for row in reader:
                 _, picked_s, recipe_steps_s, timespans_s, rates_s = row
 
-                picked = picked_s == "True"
-                recipe_steps = eval(recipe_steps_s)
+                picked = ast.literal_eval(picked_s)
+                recipe_steps = [
+                    RecipeStep.from_str(rs) for rs in recipe_steps_s.split("<>")
+                ]
                 timespans = ast.literal_eval(timespans_s)
                 rates = ast.literal_eval(rates_s)
 

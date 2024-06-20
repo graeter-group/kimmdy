@@ -1,5 +1,6 @@
 import csv
 from dataclasses import asdict
+from pathlib import Path
 
 import pytest
 from hypothesis import given
@@ -164,46 +165,51 @@ def id(x):
 
 ## Test RecipeCollection
 @pytest.fixture
-def recipe_collection():
+def recipe_collection() -> recipe.RecipeCollection:
     rps = [
         recipe.Recipe(
             [
-                recipe.BondOperation(1, 5),
-                recipe.Break(2, 6),
-                recipe.Bind(1, 2),
-                recipe.CustomTopMod(id),
-                recipe.BondOperation(3, 7),
+                recipe.Break(1, 5),
+                recipe.Break(3, 7),
             ],
             rates=[1],
             timespans=[(0.0, 1.0)],
         ),
-        recipe.Recipe([recipe.BondOperation(1, 5)], rates=[1], timespans=[(0.0, 1.0)]),
-        recipe.Recipe([recipe.BondOperation(1, 5)], rates=[2], timespans=[(1.0, 2.0)]),
+        recipe.Recipe([recipe.Break(1, 5)], rates=[1], timespans=[(0.0, 1.0)]),
+        recipe.Recipe([recipe.Break(1, 5)], rates=[2], timespans=[(1.0, 2.0)]),
         recipe.Recipe(
-            [recipe.BondOperation(1, 5), recipe.BondOperation(1, 5)],
+            [recipe.Break(1, 5), recipe.Break(1, 5)],
             rates=[1],
             timespans=[(2.0, 3.0)],
         ),
-        recipe.Recipe([recipe.BondOperation(2, 6)], rates=[1], timespans=[(3.0, 4.0)]),
+        recipe.Recipe([recipe.Break(2, 6)], rates=[1], timespans=[(3.0, 4.0)]),
         recipe.Recipe(
-            [recipe.BondOperation(1, 5), recipe.BondOperation(1, 5)],
+            [recipe.Break(1, 5), recipe.Break(1, 5)],
             rates=[3],
             timespans=[(4.0, 5.0)],
         ),
         recipe.Recipe(
-            [recipe.BondOperation(2, 6), recipe.BondOperation(3, 7)],
+            [recipe.Break(2, 6), recipe.Break(3, 7)],
             rates=[1],
             timespans=[(4.0, 5.0)],
+        ),
+        recipe.Recipe(
+            [recipe.Break(1, 5), recipe.Bind(5, 2)], rates=[1], timespans=[(0.0, 1.0)]
+        ),
+        recipe.Recipe(
+            [recipe.CustomTopMod(f=id), recipe.Relax()],
+            rates=[1],
+            timespans=[(0.0, 1.0)],
         ),
     ]
     return recipe.RecipeCollection(rps)
 
 
-def test_aggregate_recipe_collection(recipe_collection):
-    assert len(recipe_collection.recipes) == 7
+def test_aggregate_recipe_collection(recipe_collection: recipe.RecipeCollection):
+    assert len(recipe_collection.recipes) == 9
     recipe_collection.aggregate_reactions()
 
-    assert len(recipe_collection.recipes) == 5
+    assert len(recipe_collection.recipes) == 7
     assert recipe_collection.recipes[1].timespans == [
         (0.0, 1.0),
         (1.0, 2.0),
@@ -211,14 +217,21 @@ def test_aggregate_recipe_collection(recipe_collection):
     assert recipe_collection.recipes[2].timespans == [(2.0, 3.0), (4.0, 5.0)]
 
 
-def test_recipe_collection_from_csv(tmp_path, recipe_collection):
+def test_recipe_collection_from_csv(
+    tmp_path: Path, recipe_collection: recipe.RecipeCollection
+):
     csv_path = tmp_path / "test_out.csv"
     recipe_collection.to_csv(csv_path)
     loaded = recipe.RecipeCollection.from_csv(csv_path)[0]
+    print(recipe_collection)
+    print(loaded)
+    assert loaded.recipes == recipe_collection.recipes
     assert loaded == recipe_collection
 
 
-def test_recipe_collection_from_csv_picked(tmp_path, recipe_collection):
+def test_recipe_collection_from_csv_picked(
+    tmp_path: Path, recipe_collection: recipe.RecipeCollection
+):
     csv_path = tmp_path / "test_out.csv"
     picked = recipe_collection.recipes[2]
     recipe_collection.to_csv(csv_path, picked_recipe=picked)
@@ -227,7 +240,9 @@ def test_recipe_collection_from_csv_picked(tmp_path, recipe_collection):
     assert picked == loaded_pick
 
 
-def test_recipe_collection_to_csv(tmp_path, recipe_collection):
+def test_recipe_collection_to_csv(
+    tmp_path: Path, recipe_collection: recipe.RecipeCollection
+):
     csv_path = tmp_path / "test_out.csv"
     recipe_collection.to_csv(csv_path)
     with open(csv_path, newline="") as f:
@@ -243,7 +258,9 @@ def test_recipe_collection_to_csv(tmp_path, recipe_collection):
             assert org_val == read_rp[key], f"{org_rp_d[key]} != {read_rp[key]}"
 
 
-def test_recipe_collection_to_csv_picked(tmp_path, recipe_collection):
+def test_recipe_collection_to_csv_picked(
+    tmp_path: Path, recipe_collection: recipe.RecipeCollection
+):
     csv_path = tmp_path / "test_out.csv"
     picked = recipe_collection.recipes[2]
     recipe_collection.to_csv(csv_path, picked_recipe=picked)
@@ -260,7 +277,9 @@ def test_recipe_collection_to_csv_picked(tmp_path, recipe_collection):
             assert org_val == read_rp[key], f"{org_rp_d[key]} != {read_rp[key]}"
 
 
-def test_recipe_collection_to_dill(tmp_path, recipe_collection):
+def test_recipe_collection_to_dill(
+    tmp_path: Path, recipe_collection: recipe.RecipeCollection
+):
     csv_path = tmp_path / "test_out.dill"
     recipe_collection.to_dill(csv_path)
     loaded_rr = recipe.RecipeCollection.from_dill(csv_path)
