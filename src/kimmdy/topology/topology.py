@@ -971,6 +971,7 @@ class Topology:
         # not need to be repeated
         # Warning: resnr not unique for each residue, 'residues' can map to
         # more than one real residue
+
         residues = {}
         for atom in self.atoms.values():
             if residues.get(atom.resnr) is None:
@@ -1025,6 +1026,14 @@ class Topology:
                     atom2 = self.atoms[step.atom_id_2]
                     # check whether bond exists in topology
                     residue = atom1.residue
+
+                    # only attempt update if residuetype exists
+                    if self.ff.residuetypes.get(residue) is None:
+                        logger.warning(
+                            f"Residue `{residue}` not in list of residuetypes. Not changing partial charges for Bind recipe step {step}!"
+                        )
+                        continue
+
                     bondtype = (atom1.atom, atom2.atom)
                     residue_bond_spec = self.ff.residuetypes[residue].bonds.get(
                         bondtype,
