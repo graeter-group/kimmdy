@@ -1,5 +1,5 @@
 -e .[dev]
-# git+ssh://git@github.com/hits-mbm-dev/grappa.git
+# git+ssh://git@github.com/graeter-group/grappa.git
 ## replace with path to your local copy of the plugins
 ## for plugin development and kimmdy testing
 -e ../kimmdy-grappa

@@ -32,11 +32,11 @@ conda activate kimmdy_full
 Clone all repositories and install them in editable mode for development.
 
 ```bash
-git clone git@github.com:hits-mbm-dev/kimmdy.git
-git clone git@github.com:hits-mbm-dev/kimmdy-reactions.git
-git clone git@github.com:hits-mbm-dev/kimmdy-grappa.git
-git clone git@github.com:hits-mbm-dev/HAT_reaction_plugin.git
-git clone git@github.com:hits-mbm-dev/grappa.git
+git clone git@github.com:graeter-group/kimmdy.git
+git clone git@github.com:graeter-group/kimmdy-reactions.git
+git clone git@github.com:graeter-group/kimmdy-grappa.git
+git clone git@github.com:graeter-group/HAT_reaction_plugin.git
+git clone git@github.com:graeter-group/grappa.git
 
 pushd kimmdy
 # installs kimmdy, kimmdy-reactions and kimmdy-grappa

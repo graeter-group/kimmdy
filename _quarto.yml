@@ -10,8 +10,8 @@ project:
 
 website:
   page-navigation: true
-  site-url: http://hits-mbm-dev.github.io/kimmdy
-  repo-url: https://github.com/hits-mbm-dev/kimmdy
+  site-url: http://graeter-group.github.io/kimmdy
+  repo-url: https://github.com/graeter-group/kimmdy
   repo-actions: [edit, issue]
   reader-mode: true
   back-to-top-navigation: true
@@ -21,9 +21,9 @@ website:
       - icon: github
         menu:
           - text: Source Code
-            url:  https://github.com/hits-mbm-dev/kimmdy
+            url:  https://github.com/graeter-group/kimmdy
           - text: Report a Bug
-            url:  https://github.com/hits-mbm-dev/kimmdy/issues/new
+            url:  https://github.com/graeter-group/kimmdy/issues/new
     left:
       - file: ./guide/tutorials/getting-started.qmd
         text: Getting Started

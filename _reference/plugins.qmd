@@ -40,10 +40,11 @@ Reaction base class
 
 #### Parameters
 
-| Name     | Type                       | Description          | Default    |
-|----------|----------------------------|----------------------|------------|
-| `name`   | [str](`str`)               | Name of the reaction | _required_ |
-| `runmng` | [Runmanager](`Runmanager`) | RunManager instance  | _required_ |
+| Name     | Type                                         | Description                                                                                                                                       | Default    |
+|----------|----------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| `name`   | [str](`str`)                                 | Name of the reaction.                                                                                                                             | _required_ |
+| `runmng` | [RunManager](`kimmdy.runmanager.RunManager`) | RunManager instance.                                                                                                                              | _required_ |
+| `config` |                                              | Subconfig of the reaction (i.e. `self.runmng.config.reactions.__getattribute__(self.name)`. Use this to access and pass settings to the reaction. | _required_ |
 
 #### Methods
 
