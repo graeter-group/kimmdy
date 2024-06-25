@@ -935,11 +935,12 @@ class Topology:
             "bondtypes",
             [attributes_to_list(x) for x in self.ff.bondtypes.values()],
         )
-        set_top_section(
-            self.top,
-            "nonbond_params",
-            [attributes_to_list(x) for x in self.ff.nonbond_params.values()],
-        )
+        if self.ff.nonbond_params is not {}:
+            set_top_section(
+                self.top,
+                "nonbond_params",
+                [attributes_to_list(x) for x in self.ff.nonbond_params.values()],
+            )
         set_top_section(
             self.top,
             "angletypes",

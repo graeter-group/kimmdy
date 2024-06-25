@@ -435,7 +435,7 @@ class Recipe:
                 pass
 
             elif isinstance(rs, CustomTopMod):
-                name += "🪛"
+                name += "f"
 
             else:
                 logger.warning(f"get_recipe_name got unknown step type: {type(rs)}")

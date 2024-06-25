@@ -91,11 +91,11 @@ def rf_kmc(
     pos = np.searchsorted(probability_cumulative, u[0] * probability_sum)
     recipe = recipe_collection.recipes[pos]
     reaction_time = recipe.timespans[np.argmax(recipe.rates)][1]
-    logger.debug(f"Chosen Recipe: {recipe} at time {reaction_time}")
+    logger.info(f"Chosen Recipe: {recipe} at time {reaction_time}")
 
     # 5. Calculate the time step associated with mu
     time_delta = np.log(1 / u[1]) / probability_sum
-    logger.debug(f"Time delta: {time_delta}\nprobability {reaction_probability}")
+    logger.info(f"Time delta: {time_delta}\nprobability {reaction_probability}")
 
     return KMCResult(
         recipe=recipe,
