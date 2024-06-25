@@ -1,14 +1,5 @@
 [
   {
-    "listing": "/guide/tutorials/index.html",
-    "items": [
-      "/guide/tutorials/getting-started.html",
-      "/guide/tutorials/modify-topology.html",
-      "/guide/tutorials/colbuilder.html",
-      "/guide/tutorials/write-plugin.html"
-    ]
-  },
-  {
     "listing": "/guide/how-to/index.html",
     "items": [
       "/guide/how-to/analyze.html",
@@ -24,6 +15,15 @@
     "items": [
       "/guide/explanation/components.html",
       "/guide/explanation/topology.html"
+    ]
+  },
+  {
+    "listing": "/guide/tutorials/index.html",
+    "items": [
+      "/guide/tutorials/getting-started.html",
+      "/guide/tutorials/modify-topology.html",
+      "/guide/tutorials/colbuilder.html",
+      "/guide/tutorials/write-plugin.html"
     ]
   }
 ]
