@@ -20,18 +20,18 @@ Contains the Reaction Recipe, RecipeStep and RecipeCollection.
 
 ### Bind { #kimmdy.recipe.Bind }
 
-`recipe.Bind()`
+`recipe.Bind(self, atom_ix_1=None, atom_ix_2=None, atom_id_1=None, atom_id_2=None)`
 
 Change topology to form a bond
 
 #### Parameters
 
-| Name        | Type         | Description                                               | Default    |
-|-------------|--------------|-----------------------------------------------------------|------------|
-| `atom_ix_1` | [int](`int`) | The index of the first atom. zero-based, by default None  | _required_ |
-| `atom_ix_2` | [int](`int`) | The index of the second atom. zero-based, by default None | _required_ |
-| `atom_id_1` | [str](`str`) | The ID of the first atom. one-based, by default None      | _required_ |
-| `atom_id_2` | [str](`str`) | The ID of the second atom. one-based, by default None     | _required_ |
+| Name        | Type         | Description                                               | Default   |
+|-------------|--------------|-----------------------------------------------------------|-----------|
+| `atom_ix_1` | [int](`int`) | The index of the first atom. zero-based, by default None  | `None`    |
+| `atom_ix_2` | [int](`int`) | The index of the second atom. zero-based, by default None | `None`    |
+| `atom_id_1` | [str](`str`) | The ID of the first atom. one-based, by default None      | `None`    |
+| `atom_id_2` | [str](`str`) | The ID of the second atom. one-based, by default None     | `None`    |
 
 ### BondOperation { #kimmdy.recipe.BondOperation }
 
@@ -62,22 +62,22 @@ Internally, this class stores the atom indices and converts IDs to indices as ne
 
 ### Break { #kimmdy.recipe.Break }
 
-`recipe.Break()`
+`recipe.Break(self, atom_ix_1=None, atom_ix_2=None, atom_id_1=None, atom_id_2=None)`
 
 Change topology to break a bond
 
 #### Parameters
 
-| Name        | Type         | Description                                               | Default    |
-|-------------|--------------|-----------------------------------------------------------|------------|
-| `atom_ix_1` | [int](`int`) | The index of the first atom. zero-based, by default None  | _required_ |
-| `atom_ix_2` | [int](`int`) | The index of the second atom. zero-based, by default None | _required_ |
-| `atom_id_1` | [str](`str`) | The ID of the first atom. one-based, by default None      | _required_ |
-| `atom_id_2` | [str](`str`) | The ID of the second atom. one-based, by default None     | _required_ |
+| Name        | Type         | Description                                               | Default   |
+|-------------|--------------|-----------------------------------------------------------|-----------|
+| `atom_ix_1` | [int](`int`) | The index of the first atom. zero-based, by default None  | `None`    |
+| `atom_ix_2` | [int](`int`) | The index of the second atom. zero-based, by default None | `None`    |
+| `atom_id_1` | [str](`str`) | The ID of the first atom. one-based, by default None      | `None`    |
+| `atom_id_2` | [str](`str`) | The ID of the second atom. one-based, by default None     | `None`    |
 
 ### CustomTopMod { #kimmdy.recipe.CustomTopMod }
 
-`recipe.CustomTopMod(f)`
+`recipe.CustomTopMod(self, f)`
 
 A custom recipe step that can be used to define a custom topology modification.
 
@@ -105,7 +105,7 @@ Either provide the index (ix_to_place) or the ID (id_to_place) of the atom to pl
 
 ### Recipe { #kimmdy.recipe.Recipe }
 
-`recipe.Recipe(recipe_steps, rates, timespans)`
+`recipe.Recipe(self, recipe_steps, rates, timespans)`
 
 A reaction path defined by one series of RecipeSteps.
 Defines everything necessart to build the
@@ -128,13 +128,13 @@ product state from the educt state.
 
 ##### check_consistency { #kimmdy.recipe.Recipe.check_consistency }
 
-`recipe.Recipe.check_consistency(self)`
+`recipe.Recipe.check_consistency()`
 
 Run consistency checks for correct size of variables
 
 ##### combine_with { #kimmdy.recipe.Recipe.combine_with }
 
-`recipe.Recipe.combine_with(self, other)`
+`recipe.Recipe.combine_with(other)`
 
 Combines this Recipe with another with the same RecipeSteps.
 
@@ -146,7 +146,7 @@ Combines this Recipe with another with the same RecipeSteps.
 
 ### RecipeCollection { #kimmdy.recipe.RecipeCollection }
 
-`recipe.RecipeCollection(recipes)`
+`recipe.RecipeCollection(self, recipes)`
 
 A RecipeCollection encompasses a number of reaction paths.
 They can originate from multiple reaction plugins, but do not need to.
@@ -170,13 +170,13 @@ They can originate from multiple reaction plugins, but do not need to.
 
 ##### aggregate_reactions { #kimmdy.recipe.RecipeCollection.aggregate_reactions }
 
-`recipe.RecipeCollection.aggregate_reactions(self)`
+`recipe.RecipeCollection.aggregate_reactions()`
 
 Combines reactions having the same sequence of RecipeSteps.
 
 ##### calc_cumprob { #kimmdy.recipe.RecipeCollection.calc_cumprob }
 
-`recipe.RecipeCollection.calc_cumprob(self)`
+`recipe.RecipeCollection.calc_cumprob()`
 
 Calculate cumulative probability of all contained recipe steps.
 Sums up to 1 over all recipes. Assumes constant rate for given timespan
@@ -184,7 +184,7 @@ and rate zero otherwise.
 
 ##### calc_ratesum { #kimmdy.recipe.RecipeCollection.calc_ratesum }
 
-`recipe.RecipeCollection.calc_ratesum(self)`
+`recipe.RecipeCollection.calc_ratesum()`
 
 Calculate the sum of rates over all timesteps
 
@@ -198,14 +198,14 @@ Calculate the sum of rates over all timesteps
 
 ##### from_csv { #kimmdy.recipe.RecipeCollection.from_csv }
 
-`recipe.RecipeCollection.from_csv(cls, path)`
+`recipe.RecipeCollection.from_csv(path)`
 
 Create a RecipeCollection object from a CSV file
 Returns the recipe collection and a single recipe that was picked, otherwise None
 
 ##### plot { #kimmdy.recipe.RecipeCollection.plot }
 
-`recipe.RecipeCollection.plot(self, outfile, highlight_r=None, highlight_t=None)`
+`recipe.RecipeCollection.plot(outfile, highlight_r=None, highlight_t=None)`
 
 Plot reaction rates over time
 
@@ -219,7 +219,7 @@ Plot reaction rates over time
 
 ##### to_csv { #kimmdy.recipe.RecipeCollection.to_csv }
 
-`recipe.RecipeCollection.to_csv(self, path, picked_recipe=None)`
+`recipe.RecipeCollection.to_csv(path, picked_recipe=None)`
 
 Write a ReactionResult as defined in the reaction module to a csv file
 
@@ -234,7 +234,7 @@ id: 1-based, str
 
 ### Relax { #kimmdy.recipe.Relax }
 
-`recipe.Relax()`
+`recipe.Relax(self)`
 
 Start a relaxation MD.
 
