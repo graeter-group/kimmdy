@@ -1,5 +1,13 @@
 # Changelog
 
+## [6.8.3](https://github.com/graeter-group/kimmdy/compare/v6.8.2...v6.8.3) (2024-06-25)
+
+
+### Bug Fixes
+
+* more robust output checking for gmx check ([#445](https://github.com/graeter-group/kimmdy/issues/445)) ([0a25161](https://github.com/graeter-group/kimmdy/commit/0a2516158110b3ab16421e513d203006a6cfc076))
+* name ([595df32](https://github.com/graeter-group/kimmdy/commit/595df32480d4dd1d2902cef0e5fa9dd0289392bd))
+
 ## [6.8.1](https://github.com/graeter-group/kimmdy/compare/v6.8.0...v6.8.1) (2024-06-17)
 
 
