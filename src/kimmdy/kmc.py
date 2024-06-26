@@ -81,6 +81,8 @@ def rf_kmc(
     # 2. Set the total rate to the sum of individual rates
     probability_cumulative = np.cumsum(reaction_probability)
     probability_sum = probability_cumulative[-1]
+    if any(np.isnan(probability_cumulative)):
+        logger.error(f"nan in cumulative probability: {probability_cumulative}. Please check the timesteps and rates for this step!")
 
     # 3. Generate two independent uniform (0,1) random numbers u1,u2
     u = rng.random(2)
@@ -98,7 +100,7 @@ def rf_kmc(
     # 5. Calculate the time step associated with mu
     time_delta = np.log(1 / u[1]) / probability_sum
     logger.debug(f"Time delta: {time_delta}\nprobability {reaction_probability}")
-
+    breakpoint()
     return KMCResult(
         recipe=recipe,
         reaction_probability=reaction_probability,
