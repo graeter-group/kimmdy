@@ -82,7 +82,9 @@ def rf_kmc(
     probability_cumulative = np.cumsum(reaction_probability)
     probability_sum = probability_cumulative[-1]
     if any(np.isnan(probability_cumulative)):
-        logger.error(f"nan in cumulative probability: {probability_cumulative}. Please check the timesteps and rates for this step!")
+        logger.error(
+            f"nan in cumulative probability: {probability_cumulative}. Please check the timesteps and rates for this step!"
+        )
 
     # 3. Generate two independent uniform (0,1) random numbers u1,u2
     u = rng.random(2)
