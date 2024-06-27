@@ -102,7 +102,6 @@ def rf_kmc(
     # 5. Calculate the time step associated with mu
     time_delta = np.log(1 / u[1]) / probability_sum
     logger.debug(f"Time delta: {time_delta}\nprobability {reaction_probability}")
-    breakpoint()
     return KMCResult(
         recipe=recipe,
         reaction_probability=reaction_probability,
