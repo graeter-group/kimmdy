@@ -19,7 +19,7 @@ from functools import partial
 from pathlib import Path
 from pprint import pformat
 from subprocess import CalledProcessError
-from typing import Optional
+from typing import Callable, Optional
 
 from kimmdy.config import Config
 from kimmdy.constants import MARK_DONE, MARK_FAILED, MARK_STARTED, MARKERS
@@ -105,8 +105,8 @@ class RunManager:
         The configuration object.
     tasks
         Tasks from config.
-    crr_tasks
-        Current tasks.
+    tasks_added
+        Additional tasks added during the run by other tasks.
     iteration
         Current iteration.
     state
@@ -130,7 +130,7 @@ class RunManager:
     def __init__(self, config: Config):
         self.config: Config = config
         self.tasks: queue.Queue[Task] = queue.Queue()  # tasks from config
-        self.crr_tasks: queue.Queue[Task] = queue.Queue()  # current tasks
+        self.tasks_added: queue.Queue[Task] = queue.Queue()  # current tasks
         self.iteration: int = -1  # start at -1 to have iteration 0 be the initial setup
         self.state: State = State.IDLE
         self.recipe_collection: RecipeCollection = RecipeCollection([])
@@ -179,7 +179,7 @@ class RunManager:
             reaction_plugin = Plugin(name, self)
             self.reaction_plugins.append(reaction_plugin)
 
-        self.kmc_mapping = {
+        self.kmc_mapping: dict[str, Callable[..., KMCResult]] = {
             "extrande": extrande,
             "rfkmc": rf_kmc,
             "frm": frm,
@@ -303,11 +303,11 @@ class RunManager:
         return self
 
     def __next__(self):
-        if self.tasks.empty() and self.crr_tasks.empty():
+        if self.tasks.empty() and self.tasks_added.empty():
             self.state = State.DONE
             return
-        if not self.crr_tasks.empty():
-            task = self.crr_tasks.get()
+        if not self.tasks_added.empty():
+            task = self.tasks_added.get()
         else:
             task = self.tasks.get()
         if self.config.dryrun:
@@ -464,7 +464,7 @@ class RunManager:
                                     continue_md_task.kwargs.update(
                                         {"continue_md": True}
                                     )
-                                    self.crr_tasks.put(continue_md_task)
+                                    self.tasks_added.put(continue_md_task)
                                 # Condition 2: Continue from started but not finished task
                                 found_run_end = True
                             break
@@ -629,7 +629,7 @@ class RunManager:
                 if reaction_plugin.name != selected:
                     continue
 
-            self.crr_tasks.put(
+            self.tasks_added.put(
                 Task(
                     self,
                     f=self._query_reaction,
@@ -644,7 +644,7 @@ class RunManager:
         # find decision strategy
         if len(kmc := self.config.kmc) > 0:
             # algorithm overwrite
-            self.kmc_algorithm = kmc
+            self.kmc_algorithm = kmc.lower()
 
         else:
             # get algorithm from reaction
@@ -655,7 +655,7 @@ class RunManager:
                     "Attempted to combine:\n"
                     f"{ {rp.name:rp.config.kmc for rp in self.reaction_plugins} }"
                 )
-            self.kmc_algorithm = strategies[0]
+            self.kmc_algorithm = strategies[0].lower()
 
         logger.info(f"Queued {len(self.reaction_plugins)} reaction plugin(s)")
         return None
@@ -685,12 +685,16 @@ class RunManager:
             f"Start Decide recipe using {self.kmc_algorithm}, "
             f"{len(self.recipe_collection.recipes)} recipes available."
         )
-        kmc = self.kmc_mapping[self.kmc_algorithm.lower()]
+        kmc = self.kmc_mapping.get(self.kmc_algorithm, None)
+        if kmc is None:
+            m = f"Unknown KMC algorithm: {self.kmc_algorithm}"
+            logger.error(m)
+            raise ValueError(m)
 
-        # FIXME Hotfix for #355 aggregate not working for big systems
-        if "rfkmc" != self.kmc_algorithm.lower():
+        # FIXME: Hotfix for #355 aggregate not working for big systems
+        if "rfkmc" != self.kmc_algorithm:
             self.recipe_collection.aggregate_reactions()
-        if "extrande" in self.kmc_algorithm.lower():
+        if "extrande" in self.kmc_algorithm:
             kmc = partial(kmc, tau_scale=self.config.tau_scale)
         self.kmcresult = kmc(self.recipe_collection, logger=logger)
         recipe = self.kmcresult.recipe
