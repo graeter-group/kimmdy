@@ -651,7 +651,7 @@ class RunManager:
             if len(set(strategies)) > 1:
                 raise RuntimeError(
                     "Incompatible kmc algorithms chosen in the same reaction.\n"
-                    "Split the reactions in separate steps or choose different algorithms\n"
+                    "Split the reactions in separate tasks or choose different algorithms\n"
                     "Attempted to combine:\n"
                     f"{ {rp.name:rp.config.kmc for rp in self.reaction_plugins} }"
                 )
