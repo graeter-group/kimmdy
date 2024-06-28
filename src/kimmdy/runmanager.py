@@ -201,11 +201,11 @@ class RunManager:
         }
         """Mapping of task names to functions and their keyword arguments."""
 
+        self._setup_tasks()
+
     def run(self):
         logger.info("Start run")
         self.start_time = time.time()
-
-        self._setup_tasks()
 
         if getattr(self.config.restart, "run_directory", None):
             self._restart_from_rundir()
