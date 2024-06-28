@@ -240,45 +240,45 @@ class RunManager:
         )
         self.tasks.put(task)
         # configured sequence
-        for step in self.config.sequence:
-            if step in self.config.mds.get_attributes():
+        for task_name in self.config.sequence:
+            if task_name in self.config.mds.get_attributes():
                 # entry is a type of MD
                 md = self.task_mapping["md"]
                 kwargs: dict = copy(md["kwargs"])
-                kwargs.update({"instance": step})
+                kwargs.update({"instance": task_name})
                 task = Task(
                     self,
                     f=md["f"],
                     kwargs=kwargs,
-                    out=step,
+                    out=task_name,
                 )
                 self.tasks.put(task)
 
-            elif step in self.config.reactions.get_attributes():
+            elif task_name in self.config.reactions.get_attributes():
                 # entry is a single reaction
                 task_list = copy(self.task_mapping["reactions"])
                 # 0 is place_reaction_tasks
                 task_list[0] = copy(task_list[0])
-                task_list[0]["kwargs"] = {"selected": step}
+                task_list[0]["kwargs"] = {"selected": task_name}
 
                 for task_kwargs in task_list:
                     self.tasks.put(Task(self, **task_kwargs))
-            elif step == "reactions":
+            elif task_name == "reactions":
                 # check all reactions
                 for task_kwargs in self.task_mapping["reactions"]:
                     self.tasks.put(Task(self, **task_kwargs))
-            elif step == "restart":
+            elif task_name == "restart":
                 restart = self.task_mapping["restart"]
                 kwargs: dict = copy(restart["kwargs"])
                 task = Task(
                     self,
                     f=restart["f"],
                     kwargs=kwargs,
-                    out=step,
+                    out=task_name,
                 )
                 self.tasks.put(task)
             else:
-                m = f"Unknown task encountered in the sequence: {step}"
+                m = f"Unknown task encountered in the sequence: {task_name}"
                 logger.error(m)
                 raise ValueError(m)
         logger.info(f"Task list build:\n{pformat(list(self.tasks.queue), indent=8)}")
