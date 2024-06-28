@@ -51,20 +51,22 @@ class Config:
     def __init__(
         self,
         input_file: Path | None = None,
-        recursive_dict: dict | None = None,
+        opts: dict | None = None,
         scheme: dict | None = None,
         section: str = "config",
         logfile: Optional[Path] = None,
         loglevel: Optional[str] = None,
     ):
-        # failure case: no input file and no values from dictionary
-        if input_file is None and recursive_dict is None:
-            m = "No input file was provided for Config"
-            raise ValueError(m)
 
         # initial scheme
         if scheme is None:
             scheme = get_combined_scheme()
+
+        if input_file is None and opts is None:
+            # No input file was provided for Config
+            # and not currently in recursion
+            # creating config object from the default scheme
+            raise ValueError("No input file or opts dict provided to Config.")
 
         # read initial input file
         if input_file is not None:
@@ -73,13 +75,13 @@ class Config:
             if raw is None or not isinstance(raw, dict):
                 m = "Could not read input file"
                 raise ValueError(m)
-            recursive_dict = raw
+            opts = raw
 
-        assert recursive_dict is not None
+        assert opts is not None
         assert scheme is not None
         # go over parsed yaml file recursively
         # this is what is in the config
-        for k, v in recursive_dict.items():
+        for k, v in opts.items():
             if isinstance(v, dict):
                 # recursive case
 
@@ -99,14 +101,12 @@ class Config:
                         f"k: {k}\nv: {v}\nscheme: {scheme}"
                     )
                 subsection = f"{section}.{k}"
-                subconfig = Config(
-                    recursive_dict=v, scheme=subscheme, section=subsection
-                )
+                subconfig = Config(opts=v, scheme=subscheme, section=subsection)
                 self.__setattr__(k, subconfig)
             else:
                 # base case for recursion
-                opts = scheme.get(k)
-                if opts is None:
+                subscheme = scheme.get(k)
+                if subscheme is None:
                     if scheme.get("additionalProperties"):
                         # property "additionalProperties" marks objects that have additional properties
                         # so we can just set them
@@ -116,7 +116,7 @@ class Config:
                     if "reactions." in section:
                         m += "\nCheck installed plugins with --show-plugins and your input .yml"
                     raise ValueError(m)
-                pytype = opts.get("pytype")
+                pytype = subscheme.get("pytype")
                 if pytype is None:
                     m = f"No type found for {section}.{k}"
                     raise ValueError(m)
@@ -155,15 +155,6 @@ class Config:
         Set defaults for attributes not set in yaml file but
         specified in scheme (generated from the schema).
         """
-
-        # implicit defaults not in the schema
-        # but defined in terms of other attributes
-        if section == "config":
-            if not hasattr(self, "cwd"):
-                self.cwd = Path.cwd()
-            if not hasattr(self, "out"):
-                self.out = self.cwd / self.name
-
         # don't do anything for the description of a section
         scheme.pop("description", None)
 
@@ -219,6 +210,14 @@ class Config:
                     # the current section exists
                     # and might have defaults in a subsection
                     self.__getattribute__(k)._set_defaults(f"{section}.{k}", v)
+
+        # implicit defaults not in the schema
+        # but defined in terms of other attributes
+        if section == "config":
+            if not hasattr(self, "cwd"):
+                self.cwd = Path.cwd()
+            if not hasattr(self, "out"):
+                self.out = self.cwd / self.name
 
     def _validate(self, section: str = "config"):
         """Validates config."""
@@ -295,7 +294,11 @@ class Config:
                         raise ModuleNotFoundError(m)
 
             # Validate sequence
-            assert hasattr(self, "sequence"), "No sequence defined!"
+            if not hasattr(self, "sequence"):
+                m = "No sequence defined in config!"
+                self._logmessages["warnings"].append(m)
+                raise AssertionError(m)
+
             for task in self.sequence:
                 if not hasattr(self, task):
                     if hasattr(self, "mds"):
@@ -355,7 +358,10 @@ class Config:
                 path = path.resolve()
                 self.__setattr__(name, path)
                 if not path.is_dir():
-                    check_file_exists(path)
+                    check_file_exists(
+                        path=path,
+                        option_name=f"{section}.{name}",
+                    )
 
         return
 
