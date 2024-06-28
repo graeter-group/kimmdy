@@ -5,6 +5,9 @@ and package into a parsed format for internal use.
 
 from __future__ import annotations
 
+import logging
+import logging.config
+import os
 import shutil
 from pathlib import Path
 from pprint import pformat
@@ -19,7 +22,76 @@ from kimmdy.plugins import (
     reaction_plugins,
 )
 from kimmdy.schema import get_combined_scheme
-from kimmdy.utils import check_file_exists, check_gmx_version, get_gmx_dir
+from kimmdy.utils import (
+    check_file_exists,
+    check_gmx_version,
+    get_gmx_dir,
+    longFormatter,
+)
+
+
+def configure_logger(config: Config):
+    """Configure logging.
+
+    Parameters
+    ----------
+    config
+        configuration that contains
+        log.level and log.file
+    """
+    log_conf = {
+        "version": 1,
+        "formatters": {
+            "short": {
+                "format": "%(name)-15s %(levelname)s: %(message)s",
+                "datefmt": "%H:%M",
+            },
+            "full": {
+                "format": "%(asctime)s %(name)-17s %(levelname)s: %(message)s",
+                "datefmt": "%d-%m-%y %H:%M:%S",
+            },
+            "full_cut": {
+                "()": longFormatter,
+                "format": "%(asctime)s %(name)-12s %(levelname)s: %(message)s",
+                "datefmt": "%d-%m-%y %H:%M:%S",
+            },
+        },
+        "handlers": {
+            "cmd": {
+                "class": "logging.StreamHandler",
+                "formatter": "short",
+            },
+            "file": {
+                "class": "logging.FileHandler",
+                "formatter": "full_cut",
+                "filename": config.log.file,
+            },
+            "null": {
+                "class": "logging.NullHandler",
+            },
+        },
+        "loggers": {
+            "kimmdy": {
+                "level": config.log.level.upper(),
+                "handlers": ["cmd", "file"],
+            },
+        },
+        # Mute others, e.g. tensorflow, matplotlib
+        "root": {
+            "level": "CRITICAL",
+            "handlers": ["null"],
+        },
+    }
+    logging.config.dictConfig(log_conf)
+
+    # symlink logfile of the latest run to kimmdy.log in cwd
+    log: Path = config.cwd.joinpath("kimmdy.log")
+    if log.is_symlink():
+        log.unlink()
+    if log.exists():
+        os.remove(log)
+
+    log.symlink_to(config.out / config.log.file)
 
 
 class Config:
@@ -149,6 +221,9 @@ class Config:
                 self._logmessages["infos"].append(
                     "Config initialized without input file, can't copy to output directory."
                 )
+
+            # use the constructed config to set up the logger
+            configure_logger(self)
 
     def _set_defaults(self, section: str = "config", scheme: dict = {}):
         """
