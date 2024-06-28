@@ -712,6 +712,7 @@ class Topology:
             REACTIVE_MOLECULEYPE
         ].dihedral_restraints
         self.radicals = self.reactive_molecule.radicals
+        self.nrexcl = self.reactive_molecule.nrexcl
 
     def _extract_mergable_molecules(self) -> dict[str, int]:
         """Extract all molecules that are to be merged into one moleculetype.
