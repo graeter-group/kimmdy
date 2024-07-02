@@ -155,6 +155,9 @@ class Task:
         if self.out is not None:
             write_time_marker(self.kwargs["files"].outputdir / MARK_DONE, self.name)
         logger.info(f"Finished task: {self.name}")
+        if files is not None and files.logger:
+            for h in files.logger.handlers:
+                h.close()
         return files
 
     def __repr__(self) -> str:
