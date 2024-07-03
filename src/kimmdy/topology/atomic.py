@@ -192,12 +192,12 @@ class AtomType:
     type: str
     id: str
     id_sym: str
+    at_num: str
     mass: str
     charge: str
     ptype: str
     sigma: str
     epsilon: str
-    at_num: Optional[str] = None
 
     @classmethod
     def from_top_line(cls, l: list[str]):
@@ -207,7 +207,7 @@ class AtomType:
             offset = 1
         else:
             offset = 0
-        at_num = l[1] if has_at_num else None
+        at_num = l[1] if has_at_num else ''
         return cls(
             type=l[0],
             id=l[0],
