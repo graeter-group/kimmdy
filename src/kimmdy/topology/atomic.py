@@ -207,7 +207,7 @@ class AtomType:
             offset = 1
         else:
             offset = 0
-        at_num = l[1] if has_at_num else ''
+        at_num = l[1] if has_at_num else ""
         return cls(
             type=l[0],
             id=l[0],
