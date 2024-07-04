@@ -201,7 +201,7 @@ class Config:
         if section == "config":
             self._logmessages = {"infos": [], "warnings": [], "errors": [], "debug": []}
             self._set_defaults(section, scheme)
-            self._validate()
+            self._validate(section=section, cwd=self.cwd)
 
             # merge with command line arguments
             self.input_file = input_file
@@ -292,9 +292,11 @@ class Config:
             if not hasattr(self, "cwd"):
                 self.cwd = Path.cwd()
             if not hasattr(self, "out"):
-                self.out = self.cwd / self.name
+                # relative to self.cwd
+                # will be resolved in _validate
+                self.out = Path(self.name)
 
-    def _validate(self, section: str = "config"):
+    def _validate(self, section: str = "config", cwd: Path = Path(".")):
         """Validates config."""
         # globals / interconnected
         if section == "config":
@@ -328,7 +330,7 @@ class Config:
             self.ff = ffdir
 
             self.name = self.name.replace(" ", "_")
-            self.out = self.out.with_name(self.out.name.replace(" ", "_"))
+            self.out = self.out.with_name(self.out.name)
 
             # Validate changer reference
             if hasattr(self, "changer"):
@@ -424,12 +426,14 @@ class Config:
         # individual attributes, recursively
         for name, attr in self.__dict__.items():
             if type(attr) is Config:
-                attr._validate(section=f"{section}.{name}")
+                attr._validate(section=f"{section}.{name}", cwd=cwd)
                 continue
 
             # Check files from scheme
             elif isinstance(attr, Path):
                 path = attr
+                if not name == "cwd" and not path.is_absolute():
+                    path = cwd / path
                 path = path.resolve()
                 self.__setattr__(name, path)
                 if not path.is_dir():
