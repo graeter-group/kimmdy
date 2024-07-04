@@ -43,7 +43,6 @@ class FF:
             for l in atomtypes:
                 atomtype = AtomType.from_top_line(l)
                 self.atomtypes[atomtype.type] = atomtype
-
         bondtypes = get_top_section(top, "bondtypes")
         if bondtypes is not None:
             for l in bondtypes:
