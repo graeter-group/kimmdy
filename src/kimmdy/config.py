@@ -289,12 +289,28 @@ class Config:
         # implicit defaults not in the schema
         # but defined in terms of other attributes
         if section == "config":
+            self.name = self.name.replace(" ", "_")
             if not hasattr(self, "cwd"):
                 self.cwd = Path.cwd()
             if not hasattr(self, "out"):
-                # relative to self.cwd
-                # will be resolved in _validate
-                self.out = Path(self.name)
+                self.out = self.cwd / Path(self.name)
+
+                # make sure self.out is empty
+                while self.out.exists():
+                    self._logmessages["debug"].append(
+                        f"Output dir {self.out} exists, incrementing name"
+                    )
+                    name = self.out.name.split("_")
+                    out_end = name[-1]
+                    if out_end.isdigit():
+                        self.out = self.out.with_name(
+                            f"{'_'.join(name[:-1])}_{int(out_end)+1:03}"
+                        )
+                    else:
+                        self.out = self.out.with_name(self.out.name + "_001")
+
+                self.out.mkdir()
+                self._logmessages["infos"].append(f"Created output dir {self.out}")
 
     def _validate(self, section: str = "config", cwd: Path = Path(".")):
         """Validates config."""
@@ -328,9 +344,6 @@ class Config:
                         f"Could not find forcefield {ffdir} in cwd or gromacs data directory"
                     )
             self.ff = ffdir
-
-            self.name = self.name.replace(" ", "_")
-            self.out = self.out.with_name(self.out.name)
 
             # Validate changer reference
             if hasattr(self, "changer"):
@@ -406,22 +419,6 @@ class Config:
                         )
                     check_gmx_version(self)
 
-            # make sure self.out is empty
-            while self.out.exists():
-                self._logmessages["debug"].append(
-                    f"Output dir {self.out} exists, incrementing name"
-                )
-                name = self.out.name.split("_")
-                out_end = name[-1]
-                if out_end.isdigit():
-                    self.out = self.out.with_name(
-                        f"{'_'.join(name[:-1])}_{int(out_end)+1:03}"
-                    )
-                else:
-                    self.out = self.out.with_name(self.out.name + "_001")
-
-            self.out.mkdir()
-            self._logmessages["infos"].append(f"Created output dir {self.out}")
 
         # individual attributes, recursively
         for name, attr in self.__dict__.items():
@@ -432,7 +429,7 @@ class Config:
             # Check files from scheme
             elif isinstance(attr, Path):
                 path = attr
-                if not name == "cwd" and not path.is_absolute():
+                if not f"{section}.{name}" in ["config.cwd", "config.out"] and not path.is_absolute():
                     path = cwd / path
                 path = path.resolve()
                 self.__setattr__(name, path)
