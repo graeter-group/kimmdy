@@ -146,7 +146,7 @@ def test_parse_sequence_missing(arranged_tmp_path):
     with open(Path("config1.yml"), "r") as f:
         raw = yaml.safe_load(f)
     del raw["sequence"]
-    with pytest.raises(AssertionError, match="No sequence defined!"):
+    with pytest.raises(AssertionError, match="No sequence defined in config!"):
         Config(opts=raw)
 
 
@@ -165,6 +165,7 @@ def test_get_existing_files(arranged_tmp_path):
     file_d = get_existing_files(config)
     assert set(file_d.keys()) == set(
         [
+            "kimmdy.log",
             "top",
             "gro",
             "ndx",

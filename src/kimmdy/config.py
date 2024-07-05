@@ -295,22 +295,22 @@ class Config:
             if not hasattr(self, "out"):
                 self.out = self.cwd / Path(self.name)
 
-                # make sure self.out is empty
-                while self.out.exists():
-                    self._logmessages["debug"].append(
-                        f"Output dir {self.out} exists, incrementing name"
+            # make sure self.out is empty
+            while self.out.exists():
+                self._logmessages["debug"].append(
+                    f"Output dir {self.out} exists, incrementing name"
+                )
+                name = self.out.name.split("_")
+                out_end = name[-1]
+                if out_end.isdigit():
+                    self.out = self.out.with_name(
+                        f"{'_'.join(name[:-1])}_{int(out_end)+1:03}"
                     )
-                    name = self.out.name.split("_")
-                    out_end = name[-1]
-                    if out_end.isdigit():
-                        self.out = self.out.with_name(
-                            f"{'_'.join(name[:-1])}_{int(out_end)+1:03}"
-                        )
-                    else:
-                        self.out = self.out.with_name(self.out.name + "_001")
+                else:
+                    self.out = self.out.with_name(self.out.name + "_001")
 
-                self.out.mkdir()
-                self._logmessages["infos"].append(f"Created output dir {self.out}")
+            self.out.mkdir()
+            self._logmessages["infos"].append(f"Created output dir {self.out}")
 
     def _validate(self, section: str = "config", cwd: Path = Path(".")):
         """Validates config."""
