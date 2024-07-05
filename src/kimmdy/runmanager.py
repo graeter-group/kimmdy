@@ -105,7 +105,7 @@ class RunManager:
         The configuration object.
     tasks
         Tasks from config.
-    tasks_added
+    slotted_tasks
         Additional tasks added during the run by other tasks.
     iteration
         Current iteration.
@@ -129,8 +129,8 @@ class RunManager:
 
     def __init__(self, config: Config):
         self.config: Config = config
-        self.tasks: queue.Queue[Task] = queue.Queue()  # tasks from config
-        self.tasks_added: queue.Queue[Task] = queue.Queue()  # current tasks
+        self.tasks: queue.Queue[Task] = queue.Queue()
+        self.slotted_tasks: queue.Queue[Task] = queue.Queue()
         self.iteration: int = -1  # start at -1 to have iteration 0 be the initial setup
         self.state: State = State.IDLE
         self.recipe_collection: RecipeCollection = RecipeCollection([])
@@ -142,6 +142,7 @@ class RunManager:
         self.cptfile: Path = self.config.out / "kimmdy.cpt"
         self.kmc_algorithm: str
 
+        logger.info(f"Initialized RunManager at cwd: {config.cwd} with output directory {config.out}")
         try:
             if self.config.changer.topology.parameterization == "basic":
                 self.parameterizer = BasicParameterizer()
@@ -303,11 +304,11 @@ class RunManager:
         return self
 
     def __next__(self):
-        if self.tasks.empty() and self.tasks_added.empty():
+        if self.tasks.empty() and self.slotted_tasks.empty():
             self.state = State.DONE
             return
-        if not self.tasks_added.empty():
-            task = self.tasks_added.get()
+        if not self.slotted_tasks.empty():
+            task = self.slotted_tasks.get()
         else:
             task = self.tasks.get()
         if self.config.dryrun:
@@ -464,7 +465,7 @@ class RunManager:
                                     continue_md_task.kwargs.update(
                                         {"continue_md": True}
                                     )
-                                    self.tasks_added.put(continue_md_task)
+                                    self.slotted_tasks.put(continue_md_task)
                                 # Condition 2: Continue from started but not finished task
                                 found_run_end = True
                             break
@@ -629,7 +630,7 @@ class RunManager:
                 if reaction_plugin.name != selected:
                     continue
 
-            self.tasks_added.put(
+            self.slotted_tasks.put(
                 Task(
                     self,
                     f=self._query_reaction,
