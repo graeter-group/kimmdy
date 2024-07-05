@@ -7,23 +7,40 @@ from typing import Callable, Optional, Union
 
 from numpy import empty
 
-from kimmdy.constants import (ATOM_ID_FIELDS, ATOMTYPE_BONDORDER_FLAT,
-                              REACTIVE_MOLECULEYPE, RESNR_ID_FIELDS)
+from kimmdy.constants import (
+    ATOM_ID_FIELDS,
+    ATOMTYPE_BONDORDER_FLAT,
+    REACTIVE_MOLECULEYPE,
+    RESNR_ID_FIELDS,
+)
 from kimmdy.parsing import TopologyDict, empty_section
 from kimmdy.plugins import BasicParameterizer, Parameterizer
 from kimmdy.recipe import Bind, Break, RecipeStep
-from kimmdy.topology.atomic import (Angle, Atom, Bond, Dihedral,
-                                    DihedralRestraint, Exclusion,
-                                    MoleculeTypeHeader, MultipleDihedrals,
-                                    Pair, PositionRestraint,
-                                    ResidueImproperSpec, Settle)
+from kimmdy.topology.atomic import (
+    Angle,
+    Atom,
+    Bond,
+    Dihedral,
+    DihedralRestraint,
+    Exclusion,
+    MoleculeTypeHeader,
+    MultipleDihedrals,
+    Pair,
+    PositionRestraint,
+    ResidueImproperSpec,
+    Settle,
+)
 from kimmdy.topology.ff import FF
-from kimmdy.topology.utils import (attributes_to_list,
-                                   get_moleculetype_atomics,
-                                   get_moleculetype_header,
-                                   get_residue_fragments, get_top_section,
-                                   increment_field, is_not_solvent_or_ion,
-                                   set_top_section)
+from kimmdy.topology.utils import (
+    attributes_to_list,
+    get_moleculetype_atomics,
+    get_moleculetype_header,
+    get_residue_fragments,
+    get_top_section,
+    increment_field,
+    is_not_solvent_or_ion,
+    set_top_section,
+)
 from kimmdy.utils import TopologyAtomAddress
 
 logger = logging.getLogger("kimmdy.topology")

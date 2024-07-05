@@ -142,7 +142,9 @@ class RunManager:
         self.cptfile: Path = self.config.out / "kimmdy.cpt"
         self.kmc_algorithm: str
 
-        logger.info(f"Initialized RunManager at cwd: {config.cwd} with output directory {config.out}")
+        logger.info(
+            f"Initialized RunManager at cwd: {config.cwd} with output directory {config.out}"
+        )
         try:
             if self.config.changer.topology.parameterization == "basic":
                 self.parameterizer = BasicParameterizer()

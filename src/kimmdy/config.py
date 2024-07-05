@@ -419,7 +419,6 @@ class Config:
                         )
                     check_gmx_version(self)
 
-
         # individual attributes, recursively
         for name, attr in self.__dict__.items():
             if type(attr) is Config:
@@ -429,7 +428,10 @@ class Config:
             # Check files from scheme
             elif isinstance(attr, Path):
                 path = attr
-                if not f"{section}.{name}" in ["config.cwd", "config.out"] and not path.is_absolute():
+                if (
+                    not f"{section}.{name}" in ["config.cwd", "config.out"]
+                    and not path.is_absolute()
+                ):
                     path = cwd / path
                 path = path.resolve()
                 self.__setattr__(name, path)
