@@ -789,6 +789,7 @@ class TestPolymerFF:
             type="B1",
             id="B1",
             id_sym="B1",
+            at_num="",
             mass="20000.0",
             charge="0.000",
             ptype="A",
