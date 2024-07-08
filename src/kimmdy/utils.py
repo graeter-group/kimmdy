@@ -435,7 +435,7 @@ def truncate_sim_files(files: TaskFiles, time: Optional[float], keep_tail: bool 
         paths["gro"].with_name("tmp_backup_" + paths["gro"].name)
     )
     sp.run(
-        f"gmx trjconv -f {trjs[0]} -s {bck_gro} -dump -1 -o {paths['gro']}",
+        f"gmx trjconv -f {trjs[0]} -s {bck_gro} -dump {time} -o {paths['gro']}",
         text=True,
         input="0",
         shell=True,
