@@ -443,7 +443,7 @@ def truncate_sim_files(
         paths["gro"].with_name("tmp_backup_" + paths["gro"].name)
     )
     sp.run(
-        f"gmx trjconv -f {trjs[0]} -s {bck_gro} -dump -1 -o {paths['gro']}",
+        f"gmx trjconv -f {trjs[0]} -s {bck_gro} -dump {time} -o {paths['gro']}",
         text=True,
         input="0",
         shell=True,
