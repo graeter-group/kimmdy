@@ -34,7 +34,7 @@ See [gromacs manual](https://manual.gromacs.org/current/reference-manual/topolog
 
 ### Angle { #kimmdy.topology.atomic.Angle }
 
-`topology.atomic.Angle(ai, aj, ak, funct, c0=None, c1=None, c2=None, c3=None)`
+`topology.atomic.Angle(self, ai, aj, ak, funct, c0=None, c1=None, c2=None, c3=None)`
 
 Information about one angle
 
@@ -46,7 +46,7 @@ With aj < ai < ak
 
 ### AngleType { #kimmdy.topology.atomic.AngleType }
 
-`topology.atomic.AngleType(i, j, k, id, id_sym, funct, c0=None, c1=None, c2=None, c3=None)`
+`topology.atomic.AngleType(self, i, j, k, id, id_sym, funct, c0=None, c1=None, c2=None, c3=None)`
 
 Information about one angletype
 
@@ -57,7 +57,7 @@ From gromacs version of the amber* ff:
 
 ### Atom { #kimmdy.topology.atomic.Atom }
 
-`topology.atomic.Atom(nr, type, resnr, residue, atom, cgnr, charge, mass=None, typeB=None, chargeB=None, massB=None, bound_to_nrs=field(default_factory=list), is_radical=False)`
+`topology.atomic.Atom(self, nr, type, resnr, residue, atom, cgnr, charge, mass=None, typeB=None, chargeB=None, massB=None, bound_to_nrs=list(), is_radical=False)`
 
 Information about one atom
 
@@ -69,7 +69,7 @@ From gromacs topology:
 
 ### AtomType { #kimmdy.topology.atomic.AtomType }
 
-`topology.atomic.AtomType(type, id, id_sym, mass, charge, ptype, sigma, epsilon, at_num=None)`
+`topology.atomic.AtomType(self, type, id, id_sym, at_num, mass, charge, ptype, sigma, epsilon)`
 
 Information about one atom type
 
@@ -80,7 +80,7 @@ From gromacs version of the amber* ff:
 
 ### Bond { #kimmdy.topology.atomic.Bond }
 
-`topology.atomic.Bond(ai, aj, funct, c0=None, c1=None, c2=None, c3=None, c4=None, c5=None)`
+`topology.atomic.Bond(self, ai, aj, funct, c0=None, c1=None, c2=None, c3=None, c4=None, c5=None)`
 
 Information about one bond
 
@@ -92,7 +92,7 @@ With ai < aj
 
 ### BondType { #kimmdy.topology.atomic.BondType }
 
-`topology.atomic.BondType(i, j, id, id_sym, funct, c0=None, c1=None, c2=None, c3=None)`
+`topology.atomic.BondType(self, i, j, id, id_sym, funct, c0=None, c1=None, c2=None, c3=None)`
 
 Information about one bondtype
 
@@ -104,7 +104,7 @@ Where i and j are atomtypes
 
 ### Dihedral { #kimmdy.topology.atomic.Dihedral }
 
-`topology.atomic.Dihedral(ai, aj, ak, al, funct, c0=None, c1=None, periodicity='', c3=None, c4=None, c5=None)`
+`topology.atomic.Dihedral(self, ai, aj, ak, al, funct, c0=None, c1=None, periodicity='', c3=None, c4=None, c5=None)`
 
 Information about one proper or improper dihedral
 
@@ -121,7 +121,7 @@ For proper dihedrals (funct 9): aj < ak
 
 ### DihedralRestraint { #kimmdy.topology.atomic.DihedralRestraint }
 
-`topology.atomic.DihedralRestraint(ai, aj, ak, al, type, phi, dphi, fc)`
+`topology.atomic.DihedralRestraint(self, ai, aj, ak, al, type, phi, dphi, fc)`
 
 Information about one dihedral restraint.
 
@@ -132,7 +132,7 @@ From gromacs topology:
 
 ### DihedralType { #kimmdy.topology.atomic.DihedralType }
 
-`topology.atomic.DihedralType(i, j, k, l, id, id_sym, funct, c0, c1, periodicity, c3=None, c4=None, c5=None)`
+`topology.atomic.DihedralType(self, i, j, k, l, id, id_sym, funct, c0, c1, periodicity, c3=None, c4=None, c5=None)`
 
 Information about one dihedraltype
 
@@ -149,7 +149,7 @@ From gromacs version of the amber* ff:
 
 ### Exclusion { #kimmdy.topology.atomic.Exclusion }
 
-`topology.atomic.Exclusion(ai, aj, ak=None, al=None)`
+`topology.atomic.Exclusion(self, ai, aj, ak=None, al=None)`
 
 Information about one exclusion
 
@@ -160,7 +160,7 @@ From gromacs topology:
 
 ### MultipleDihedralTypes { #kimmdy.topology.atomic.MultipleDihedralTypes }
 
-`topology.atomic.MultipleDihedralTypes(ai, aj, ak, al, funct, dihedral_types)`
+`topology.atomic.MultipleDihedralTypes(self, ai, aj, ak, al, funct, dihedral_types)`
 
 Multiple ``DihedralTypes``s with the same ai, aj, ak, al
 but different periodicities.
@@ -169,7 +169,7 @@ The key of the dihedral_types dict is the periodicity (c2).
 
 ### MultipleDihedrals { #kimmdy.topology.atomic.MultipleDihedrals }
 
-`topology.atomic.MultipleDihedrals(ai, aj, ak, al, funct, dihedrals)`
+`topology.atomic.MultipleDihedrals(self, ai, aj, ak, al, funct, dihedrals)`
 
 Multiple ``Dihedral``s with the same ai, aj, ak, al
 but different periodicities.
@@ -178,7 +178,7 @@ The key of the dihedrals dict is the periodicity (c2).
 
 ### NonbondParamType { #kimmdy.topology.atomic.NonbondParamType }
 
-`topology.atomic.NonbondParamType(i, j, id, id_sym, funct, c0=None, c1=None, c2=None)`
+`topology.atomic.NonbondParamType(self, i, j, id, id_sym, funct, c0=None, c1=None, c2=None)`
 
 Information about one nonbonded parameterize
 
@@ -192,7 +192,7 @@ Where i and j are atomtypes
 
 ### Pair { #kimmdy.topology.atomic.Pair }
 
-`topology.atomic.Pair(ai, aj, funct, c0=None, c1=None, c2=None, c3=None)`
+`topology.atomic.Pair(self, ai, aj, funct, c0=None, c1=None, c2=None, c3=None)`
 
 Information about one pair
 
@@ -203,7 +203,7 @@ From gromacs topology:
 
 ### PositionRestraint { #kimmdy.topology.atomic.PositionRestraint }
 
-`topology.atomic.PositionRestraint(ai, funct, fc, condition=None)`
+`topology.atomic.PositionRestraint(self, ai, funct, fc, condition=None)`
 
 Information about one position restraint.
 
@@ -214,7 +214,7 @@ From gromacs topology:
 
 ### ResidueAtomSpec { #kimmdy.topology.atomic.ResidueAtomSpec }
 
-`topology.atomic.ResidueAtomSpec(name, type, charge, cgrp)`
+`topology.atomic.ResidueAtomSpec(self, name, type, charge, cgrp)`
 
 Information about one atom in a residue
 
@@ -222,7 +222,7 @@ Information about one atom in a residue
 
 ### ResidueBondSpec { #kimmdy.topology.atomic.ResidueBondSpec }
 
-`topology.atomic.ResidueBondSpec(atom1, atom2, b0=None, kb=None)`
+`topology.atomic.ResidueBondSpec(self, atom1, atom2, b0=None, kb=None)`
 
 Information about one bond in a residue
 
@@ -230,7 +230,7 @@ Information about one bond in a residue
 
 ### ResidueImproperSpec { #kimmdy.topology.atomic.ResidueImproperSpec }
 
-`topology.atomic.ResidueImproperSpec(atom1, atom2, atom3, atom4, c0, c1, c2)`
+`topology.atomic.ResidueImproperSpec(self, atom1, atom2, atom3, atom4, c0, c1, c2)`
 
 Information about one improper dihedral in a residue
 
@@ -238,7 +238,7 @@ Information about one improper dihedral in a residue
 
 ### ResidueProperSpec { #kimmdy.topology.atomic.ResidueProperSpec }
 
-`topology.atomic.ResidueProperSpec(atom1, atom2, atom3, atom4, c0, c1, c2)`
+`topology.atomic.ResidueProperSpec(self, atom1, atom2, atom3, atom4, c0, c1, c2)`
 
 Information about one proper dihedral in a residue
 
@@ -246,13 +246,13 @@ Information about one proper dihedral in a residue
 
 ### ResidueType { #kimmdy.topology.atomic.ResidueType }
 
-`topology.atomic.ResidueType(residue, atoms, bonds, proper_dihedrals, improper_dihedrals)`
+`topology.atomic.ResidueType(self, residue, atoms, bonds, proper_dihedrals, improper_dihedrals)`
 
 Information about one residuetype from aminoacids.rtp
 
 ### Settle { #kimmdy.topology.atomic.Settle }
 
-`topology.atomic.Settle(nr, funct, doh, dhh)`
+`topology.atomic.Settle(self, nr, funct, doh, dhh)`
 
 Information about one settles
 

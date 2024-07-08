@@ -1,4 +1,4 @@
-# References
+# References {.doc .doc-index}
 
 ## Input file
 

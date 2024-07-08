@@ -40,7 +40,7 @@ One moleculetype in the topology
 
 ##### find_radicals { #kimmdy.topology.topology.MoleculeType.find_radicals }
 
-`topology.topology.MoleculeType.find_radicals(self)`
+`topology.topology.MoleculeType.find_radicals()`
 
 Find atoms that are radicals and update self.radicals.
 
@@ -49,7 +49,7 @@ fewer bounds than their natural bond order.
 
 ##### reindex_atomnrs { #kimmdy.topology.topology.MoleculeType.reindex_atomnrs }
 
-`topology.topology.MoleculeType.reindex_atomnrs(self)`
+`topology.topology.MoleculeType.reindex_atomnrs()`
 
 Reindex atom numbers in topology.
 
@@ -95,7 +95,7 @@ Assumptions:
 
 ##### bind_bond { #kimmdy.topology.topology.Topology.bind_bond }
 
-`topology.topology.Topology.bind_bond(self, atompair_addresses)`
+`topology.topology.Topology.bind_bond(atompair_addresses)`
 
 Add a bond in topology.
 
@@ -112,7 +112,7 @@ Furthermore, it modifies to function types in the topology to account for radica
 
 ##### break_bond { #kimmdy.topology.topology.Topology.break_bond }
 
-`topology.topology.Topology.break_bond(self, atompair_addresses)`
+`topology.topology.Topology.break_bond(atompair_addresses)`
 
 Break bonds in topology homolytically.
 
@@ -128,7 +128,7 @@ Atom pairs become radicals.
 
 ##### del_atom { #kimmdy.topology.topology.Topology.del_atom }
 
-`topology.topology.Topology.del_atom(self, atom_nr, parameterize=True)`
+`topology.topology.Topology.del_atom(atom_nr, parameterize=True)`
 
 Deletes atom
 
@@ -150,7 +150,7 @@ parameters if requested. Also moves charges to first bound_nrs atom.
 
 ##### reindex_atomnrs { #kimmdy.topology.topology.Topology.reindex_atomnrs }
 
-`topology.topology.Topology.reindex_atomnrs(self)`
+`topology.topology.Topology.reindex_atomnrs()`
 
 Reindex atom numbers in topology.
 
@@ -160,7 +160,7 @@ Returns a dict of all moleculetypes to their update maps (old -> new).
 
 ##### update_partial_charges { #kimmdy.topology.topology.Topology.update_partial_charges }
 
-`topology.topology.Topology.update_partial_charges(self, recipe_steps)`
+`topology.topology.Topology.update_partial_charges(recipe_steps)`
 
 Update the topology atom partial charges.
 
@@ -172,7 +172,7 @@ formed again, the original partial charges are restored.
 
 ##### validate_bond { #kimmdy.topology.topology.Topology.validate_bond }
 
-`topology.topology.Topology.validate_bond(self, atm1, atm2)`
+`topology.topology.Topology.validate_bond(atm1, atm2)`
 
 Validates bond consistency between both atoms and top
 Returns True if bond exists, False if not.
