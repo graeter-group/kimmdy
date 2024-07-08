@@ -712,6 +712,7 @@ class Topology:
             REACTIVE_MOLECULEYPE
         ].dihedral_restraints
         self.radicals = self.reactive_molecule.radicals
+        self.nrexcl = self.reactive_molecule.nrexcl
 
     def _extract_mergable_molecules(self) -> dict[str, int]:
         """Extract all molecules that are to be merged into one moleculetype.
@@ -935,7 +936,7 @@ class Topology:
             "bondtypes",
             [attributes_to_list(x) for x in self.ff.bondtypes.values()],
         )
-        if self.ff.nonbond_params is not {}:
+        if self.ff.nonbond_params != {}:
             set_top_section(
                 self.top,
                 "nonbond_params",

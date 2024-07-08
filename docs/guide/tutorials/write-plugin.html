@@ -562,7 +562,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="main-code">Main code</h3>
 <p>A reaction plugin has to be a derived class from the <code>ReactionPlugin</code> base class. Such a class has the attributes <code>name</code>, <code>runmng</code> and <code>config</code> and the method <code>get_recipe_collection</code>, which takes a <code>TaskFiles</code> object as argument and returns a <code>RecipeCollection</code>.</p>
 <p>The <code>name</code> is a simple string and may be useful for logging. <code>runmng</code> is the central <code>RunManager</code> of a kimmdy run and has plenty of useful attributes for your plugin, especially the system <code>Topology</code>, which can be accessed via <code>self.runmg.top</code>. <code>config</code> contains the reaction plugin configuration as specified in the kimmdy configuration file (typically named kimmdy.yml). A <code>RecipeCollection</code> contains <code>Recipe</code>s with predefined <code>RecipeStep</code>s that can be used to define the modification to the system for the reaction. A <code>Recipe</code> also contains the <code>rates</code> of the specified reaction and the <code>timespans</code> during which the corresponding rates are valid. An example plugin can be seen below.</p>
-<div id="2641ff7c" class="cell" data-execution_count="1">
+<div id="71789652" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>Plugin main code (reaction.py)</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> kimmdy.recipe <span class="im">import</span> (</span>
@@ -575,47 +575,51 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> kimmdy.utils <span class="im">import</span> (</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    get_atomnrs_from_plumedid,</span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> kimmdy.parsing <span class="im">import</span> (</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    read_plumed,</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    read_distances_dat,</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> logging</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> kimmdy.parsing <span class="im">import</span> (</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    read_plumed,</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    read_distances_dat,</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> BindReaction(ReactionPlugin):</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Reaction to bind two particles if they are in proximity</span></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co"># start the name of your logger with kimmdy.&lt;plugin name&gt;</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co"># such that it ends up in the kimmdy log file</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>logger <span class="op">=</span> logging.getLogger(<span class="st">"kimmdy.hydrolysis"</span>)</span>
 <span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> get_recipe_collection(<span class="va">self</span>, files: TaskFiles):</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>        logger <span class="op">=</span> files.logger</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>        logger.debug(<span class="st">"Getting recipe for reaction: Bind"</span>)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> BindReaction(ReactionPlugin):</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Reaction to bind two particles if they are in proximity</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
 <span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>        <span class="co"># get cutoff distance from config, unit is [nm]</span></span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>        cutoff <span class="op">=</span> <span class="va">self</span>.config.distance</span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Initialization of objects from files</span></span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>        distances <span class="op">=</span> read_distances_dat(files.<span class="bu">input</span>[<span class="st">"plumed_out"</span>])</span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>        plumed <span class="op">=</span> read_plumed(files.<span class="bu">input</span>[<span class="st">"plumed"</span>])</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> get_recipe_collection(<span class="va">self</span>, files: TaskFiles):</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>        logger <span class="op">=</span> files.logger</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>        logger.debug(<span class="st">"Getting recipe for reaction: Bind"</span>)</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>        <span class="co"># get cutoff distance from config, unit is [nm]</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>        cutoff <span class="op">=</span> <span class="va">self</span>.config.distance</span>
 <span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>        recipes <span class="op">=</span> []</span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>        <span class="co"># check distances file for values lower than the cutoff</span></span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> plumedid, dists <span class="kw">in</span> distances.items():</span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> plumedid <span class="op">==</span> <span class="st">"time"</span>:</span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>                <span class="cf">continue</span></span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>            <span class="co"># checks only last frame</span></span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> dists[<span class="op">-</span><span class="dv">1</span>] <span class="op">&lt;</span> cutoff:</span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>                <span class="co"># get atomnrs from plumedid </span></span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>                atomnrs <span class="op">=</span> get_atomnrs_from_plumedid(plumedid, plumed)</span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>                recipes.append(</span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>                    Recipe(</span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>                        recipe_steps<span class="op">=</span>[</span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>                            Bind(atom_id_1<span class="op">=</span>atomnrs[<span class="dv">0</span>], atom_id_2<span class="op">=</span>atomnrs[<span class="dv">1</span>]),</span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>                        ],</span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>                        rates<span class="op">=</span>[<span class="dv">1</span>],</span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>                        timespans<span class="op">=</span>[(distances[<span class="st">"time"</span>][<span class="dv">0</span>], distances[<span class="st">"time"</span>][<span class="op">-</span><span class="dv">1</span>])],</span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>                    )</span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>                )</span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> RecipeCollection(recipes)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Initialization of objects from files</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>        distances <span class="op">=</span> read_distances_dat(files.<span class="bu">input</span>[<span class="st">"plumed_out"</span>])</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>        plumed <span class="op">=</span> read_plumed(files.<span class="bu">input</span>[<span class="st">"plumed"</span>])</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>        recipes <span class="op">=</span> []</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>        <span class="co"># check distances file for values lower than the cutoff</span></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> plumedid, dists <span class="kw">in</span> distances.items():</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> plumedid <span class="op">==</span> <span class="st">"time"</span>:</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>                <span class="cf">continue</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>            <span class="co"># checks only last frame</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> dists[<span class="op">-</span><span class="dv">1</span>] <span class="op">&lt;</span> cutoff:</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>                <span class="co"># get atomnrs from plumedid </span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>                atomnrs <span class="op">=</span> get_atomnrs_from_plumedid(plumedid, plumed)</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>                recipes.append(</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>                    Recipe(</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>                        recipe_steps<span class="op">=</span>[</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>                            Bind(atom_id_1<span class="op">=</span>atomnrs[<span class="dv">0</span>], atom_id_2<span class="op">=</span>atomnrs[<span class="dv">1</span>]),</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>                        ],</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>                        rates<span class="op">=</span>[<span class="dv">1</span>],</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>                        timespans<span class="op">=</span>[(distances[<span class="st">"time"</span>][<span class="dv">0</span>], distances[<span class="st">"time"</span>][<span class="op">-</span><span class="dv">1</span>])],</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>                    )</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>                )</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> RecipeCollection(recipes)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section>
@@ -659,7 +663,7 @@ Plugin schema (kimmdy-yaml-schema.json)
 <section id="making-a-python-package" class="level2">
 <h2 class="anchored" data-anchor-id="making-a-python-package">Making a python package</h2>
 <p>It is necessary to make the plugin a python package to interface with Kimmdy. For this, package setup configuration files are necessary, for example <code>setup.py</code> and <code>setup.cfg</code>. In <code>setup.cfg</code> dependencies can be specified, which will be installed alongside the plugin. The interface with kimmdy is specified in the <code>[options.entry_points]</code> section. This section needs to refer to the class we created in the plugin main code and assign it to <code>kimmdy.reaction_plugins</code>, i.e.&nbsp;<code>kimmdy.reaction_plugins = bind = &lt;path&gt;.&lt;to&gt;.&lt;main file&gt;:&lt;ClassName&gt;</code>. Also, the directory containing the source code (typically <code>src</code>) is defined in <code>[options.packages.find]</code>. An example for <code>setup.py</code> and <code>setup.cfg</code> can be found below.</p>
-<div id="e96ba74b" class="cell" data-execution_count="2">
+<div id="9dceb279" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>setup.py</summary>
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> setuptools <span class="im">import</span> setup</span>

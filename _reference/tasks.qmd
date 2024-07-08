@@ -3,14 +3,14 @@
 `tasks`
 
 The tasks module holds the TaskFiles class which organizes input and 
-output paths and the Task class for steps in the runmanager.
+output paths and the Task class for tasks in the runmanager queue.
 
 ## Classes
 
 | Name | Description |
 | --- | --- |
 | [AutoFillDict](#kimmdy.tasks.AutoFillDict) | Dictionary that gets populated by calling get_missing. |
-| [Task](#kimmdy.tasks.Task) | A task to be performed as as a step in the RunManager. |
+| [Task](#kimmdy.tasks.Task) | A task to be performed as part of the RunManager Queue. |
 | [TaskFiles](#kimmdy.tasks.TaskFiles) | Class for Task input and output files and directories. |
 
 ### AutoFillDict { #kimmdy.tasks.AutoFillDict }
@@ -23,7 +23,7 @@ Dictionary that gets populated by calling get_missing.
 
 `tasks.Task(self, runmng, f, kwargs=None, out=None)`
 
-A task to be performed as as a step in the RunManager.
+A task to be performed as part of the RunManager Queue.
 
 A task consists of a function and its keyword arguments.
 Calling a taks calls the stored function.

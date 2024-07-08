@@ -535,7 +535,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="kimmdy.tasks" class="level1">
 <h1>tasks</h1>
 <p><code>tasks</code></p>
-<p>The tasks module holds the TaskFiles class which organizes input and output paths and the Task class for steps in the runmanager.</p>
+<p>The tasks module holds the TaskFiles class which organizes input and output paths and the Task class for tasks in the runmanager queue.</p>
 <section id="classes" class="level2">
 <h2 class="anchored" data-anchor-id="classes">Classes</h2>
 <table class="caption-top table">
@@ -552,7 +552,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 <tr class="even">
 <td><a href="#kimmdy.tasks.Task">Task</a></td>
-<td>A task to be performed as as a step in the RunManager.</td>
+<td>A task to be performed as part of the RunManager Queue.</td>
 </tr>
 <tr class="odd">
 <td><a href="#kimmdy.tasks.TaskFiles">TaskFiles</a></td>
@@ -568,7 +568,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="kimmdy.tasks.Task" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.tasks.Task">Task</h3>
 <p><code>tasks.Task(self, runmng, f, kwargs=None, out=None)</code></p>
-<p>A task to be performed as as a step in the RunManager.</p>
+<p>A task to be performed as part of the RunManager Queue.</p>
 <p>A task consists of a function and its keyword arguments. Calling a taks calls the stored function. The function must return a TaskFiles object.</p>
 <section id="parameters" class="level4">
 <h4 class="anchored" data-anchor-id="parameters">Parameters</h4>

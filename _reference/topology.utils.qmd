@@ -17,7 +17,6 @@
 | [get_residue_fragments](#kimmdy.topology.utils.get_residue_fragments) | Splits a residue into fragments after a bond has been broken. |
 | [get_top_section](#kimmdy.topology.utils.get_top_section) | Get content of a section from a topology dict. |
 | [is_not_solvent_or_ion](#kimmdy.topology.utils.is_not_solvent_or_ion) | Returns whether a moleculetype name is not solvent or ion. |
-| [set_protein_section](#kimmdy.topology.utils.set_protein_section) | Set content of a section in the first moleculetype (protein) from a topology dict. |
 | [set_reactive_section](#kimmdy.topology.utils.set_reactive_section) | Set content of a section in the first moleculetype (protein) from a topology dict. |
 | [set_top_section](#kimmdy.topology.utils.set_top_section) | Set content of a section from a topology dict. |
 
@@ -99,12 +98,6 @@ and chooses the 'content' or 'else_content' depending on the result.
 `topology.utils.is_not_solvent_or_ion(name)`
 
 Returns whether a moleculetype name is not solvent or ion.
-
-### set_protein_section { #kimmdy.topology.utils.set_protein_section }
-
-`topology.utils.set_protein_section(top, name, value)`
-
-Set content of a section in the first moleculetype (protein) from a topology dict.
 
 ### set_reactive_section { #kimmdy.topology.utils.set_reactive_section }
 
