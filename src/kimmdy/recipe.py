@@ -20,6 +20,8 @@ logger = logging.getLogger(__name__)
 if TYPE_CHECKING:
     from kimmdy.topology.topology import Topology
 
+def recipe_steps_from_str(recipe_steps_s: str) -> list[RecipeStep|None]:
+    return [RecipeStep.from_str(rs) for rs in recipe_steps_s.split("<>")]
 
 class RecipeStep(ABC):
     """Base class for all RecipeSteps.
@@ -181,6 +183,8 @@ class Place(RecipeStep):
         # args = ix_to_place=0, new_coords=(0.0, 0.0, 0.0)
         args = args.split(", ", maxsplit=1)
         ix_to_place = int(args[0].split("=")[1])
+        new_coords = ast.literal_eval(args[1].split("=")[1])
+        return cls(ix_to_place=ix_to_place, new_coords=new_coords)
 
 
 class BondOperation(RecipeStep):
@@ -339,6 +343,14 @@ class Break(BondOperation):
     atom_id_2 : str, optional
         The ID of the second atom. one-based, by default None
     """
+    @classmethod
+    def _from_str(cls, s: str):
+        args = s.split("Break(")[1].split(")")[0]
+        # args = atom_ix_1=0, atom_ix_2=1
+        args = args.split(", ")
+        atom_ix_1 = int(args[0].split("=")[1])
+        atom_ix_2 = int(args[1].split("=")[1])
+        return cls(atom_ix_1=atom_ix_1, atom_ix_2=atom_ix_2)
 
 
 class Bind(BondOperation):
@@ -355,6 +367,14 @@ class Bind(BondOperation):
     atom_id_2 : str, optional
         The ID of the second atom. one-based, by default None
     """
+    @classmethod
+    def _from_str(cls, s: str):
+        args = s.split("Bind(")[1].split(")")[0]
+        # args = atom_ix_1=0, atom_ix_2=1
+        args = args.split(", ")
+        atom_ix_1 = int(args[0].split("=")[1])
+        atom_ix_2 = int(args[1].split("=")[1])
+        return cls(atom_ix_1=atom_ix_1, atom_ix_2=atom_ix_2)
 
 
 @dataclass
@@ -367,7 +387,7 @@ class CustomTopMod(RecipeStep):
         A function that takes a Topology object and modifies it in place.
     """
 
-    f: Callable[[Topology], None]
+    f: Callable[[Topology], Topology]
 
     def __eq__(self, other):
         """Two CustomTopMods are considered equal if their functions have the same name and hash."""
@@ -379,6 +399,15 @@ class CustomTopMod(RecipeStep):
             return False
         return self.__hash__() == other.__hash__()
 
+    def __almost_eq__(self, other):
+        """For reading from a csv file and testing, two CustomTopMods are considered equal if their functions have the same name."""
+        if not isinstance(other, CustomTopMod):
+            logger.warning(
+                f"Comparing RecipeSteps with different types: {type(self)} and {type(other)}. Returning False."
+            )
+            return False
+        return self.f.__name__ == other.f.__name__
+
     def __hash__(self):
         return hash((self.f.__name__, self.f.__hash__))
 
@@ -387,6 +416,16 @@ class CustomTopMod(RecipeStep):
 
     def __str__(self):
         return f"{type(self).__name__}(f={self.f.__name__})"
+
+    @classmethod
+    def _from_str(cls, s: str):
+        args = s.split("CustomTopMod(")[1].split(")")[0]
+        # args = f=name_of_f
+        args = args.split("=")[1]
+        def f(top: Topology) -> Topology:
+            return top
+        f.__name__ = args
+        return cls(f=f)
 
 
 @dataclass
@@ -504,6 +543,10 @@ class Recipe:
                 name += "?".join(list(map(str, rs.__dict__.values())))
         return name
 
+        @classmethod
+        def from_str(cls, s: str) -> cls:
+            pass
+
 
 @dataclass
 class RecipeCollection:
@@ -579,9 +622,10 @@ class RecipeCollection:
                 _, picked_s, recipe_steps_s, timespans_s, rates_s = row
 
                 picked = ast.literal_eval(picked_s)
-                recipe_steps = [
-                    RecipeStep.from_str(rs) for rs in recipe_steps_s.split("<>")
-                ]
+                if recipe_steps_s != "":
+                    recipe_steps = [rs for rs in recipe_steps_from_str(recipe_steps_s) if rs is not None]
+                else:
+                    recipe_steps = []
                 timespans = ast.literal_eval(timespans_s)
                 rates = ast.literal_eval(rates_s)
 

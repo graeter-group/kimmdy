@@ -229,6 +229,17 @@ def test_recipe_collection_from_csv(
     assert loaded == recipe_collection
 
 
+def test_recipe_steps_from_string():
+    s = "Break(atom_ix_1=1710, atom_ix_2=1712)<>Break(atom_ix_1=52385, atom_ix_2=52386)<>Break(atom_ix_1=52385, atom_ix_2=52387)<>Bind(atom_ix_1=52385, atom_ix_2=1710)<>Bind(atom_ix_1=52386, atom_ix_2=1712)<>Bind(atom_ix_1=52387, atom_ix_2=1712)<>Relax()<>CustomTopMod(f=id)"
+    def id(x):
+        return x
+    steps = recipe.recipe_steps_from_str(s)
+    assert len(steps) == 8
+    assert steps[0] == recipe.Break(1710, 1712)
+    assert isinstance(steps[7], recipe.CustomTopMod)
+    assert steps[7].__almost_eq__(recipe.CustomTopMod(f=id))
+
+
 def test_recipe_collection_from_csv_picked(
     tmp_path: Path, recipe_collection: recipe.RecipeCollection
 ):
