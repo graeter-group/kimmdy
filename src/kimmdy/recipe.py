@@ -20,8 +20,10 @@ logger = logging.getLogger(__name__)
 if TYPE_CHECKING:
     from kimmdy.topology.topology import Topology
 
-def recipe_steps_from_str(recipe_steps_s: str) -> list[RecipeStep|None]:
+
+def recipe_steps_from_str(recipe_steps_s: str) -> list[RecipeStep | None]:
     return [RecipeStep.from_str(rs) for rs in recipe_steps_s.split("<>")]
+
 
 class RecipeStep(ABC):
     """Base class for all RecipeSteps.
@@ -343,6 +345,7 @@ class Break(BondOperation):
     atom_id_2 : str, optional
         The ID of the second atom. one-based, by default None
     """
+
     @classmethod
     def _from_str(cls, s: str):
         args = s.split("Break(")[1].split(")")[0]
@@ -367,6 +370,7 @@ class Bind(BondOperation):
     atom_id_2 : str, optional
         The ID of the second atom. one-based, by default None
     """
+
     @classmethod
     def _from_str(cls, s: str):
         args = s.split("Bind(")[1].split(")")[0]
@@ -422,8 +426,10 @@ class CustomTopMod(RecipeStep):
         args = s.split("CustomTopMod(")[1].split(")")[0]
         # args = f=name_of_f
         args = args.split("=")[1]
+
         def f(top: Topology) -> Topology:
             return top
+
         f.__name__ = args
         return cls(f=f)
 
@@ -656,7 +662,11 @@ class RecipeCollection:
 
                 picked = ast.literal_eval(picked_s)
                 if recipe_steps_s != "":
-                    recipe_steps = [rs for rs in recipe_steps_from_str(recipe_steps_s) if rs is not None]
+                    recipe_steps = [
+                        rs
+                        for rs in recipe_steps_from_str(recipe_steps_s)
+                        if rs is not None
+                    ]
                 else:
                     recipe_steps = []
                 timespans = ast.literal_eval(timespans_s)

@@ -230,8 +230,10 @@ def test_recipe_collection_from_csv(
 
 def test_recipe_steps_from_string():
     s = "Break(atom_ix_1=1710, atom_ix_2=1712)<>Break(atom_ix_1=52385, atom_ix_2=52386)<>Break(atom_ix_1=52385, atom_ix_2=52387)<>Bind(atom_ix_1=52385, atom_ix_2=1710)<>Bind(atom_ix_1=52386, atom_ix_2=1712)<>Bind(atom_ix_1=52387, atom_ix_2=1712)<>Relax()<>CustomTopMod(f=id)"
+
     def id(x):
         return x
+
     steps = recipe.recipe_steps_from_str(s)
     assert len(steps) == 8
     assert steps[0] == recipe.Break(1710, 1712)
@@ -286,5 +288,3 @@ def test_recipe_collection_to_csv_picked(
             if org_val == "None":
                 org_val = ""
             assert org_val == read_rp[key], f"{org_rp_d[key]} != {read_rp[key]}"
-
-
