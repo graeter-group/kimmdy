@@ -543,9 +543,42 @@ class Recipe:
                 name += "?".join(list(map(str, rs.__dict__.values())))
         return name
 
-        @classmethod
-        def from_str(cls, s: str) -> cls:
-            pass
+    def __eq__(self, other):
+        """Two Recipes are considered equal if they have the same recipe steps, rates, and timespans."""
+
+        if not isinstance(other, Recipe):
+            logger.warning(
+                f"Comparing Recipes with different types: {type(self)} and {type(other)}. Returning False."
+            )
+            return False
+        return (
+            self.recipe_steps == other.recipe_steps
+            and self.rates == other.rates
+            and self.timespans == other.timespans
+        )
+
+    def __almost_eq__(self, other):
+        """For reading from a csv file and testing, two Recipes are also considered equal if CustomTopMod steps
+        just have the same function name and not the same hash."""
+
+        if not isinstance(other, Recipe):
+            logger.warning(
+                f"Comparing Recipes with different types: {type(self)} and {type(other)}. Returning False."
+            )
+            return False
+
+        if len(self.recipe_steps) != len(other.recipe_steps):
+            return False
+
+        for rs1, rs2 in zip(self.recipe_steps, other.recipe_steps):
+            if isinstance(rs1, CustomTopMod):
+                if not rs1.__almost_eq__(rs2):
+                    return False
+            else:
+                if rs1 != rs2:
+                    return False
+
+        return self.rates == other.rates and self.timespans == other.timespans
 
 
 @dataclass
@@ -638,14 +671,24 @@ class RecipeCollection:
 
         return cls(recipes=recipes), picked_rp
 
-    def to_dill(self, path: Path):
-        with open(path, "wb") as f:
-            dill.dump(self, f)
+    def __almost_eq__(self, other):
+        """Two RecipeCollections are considered equal if they contain the same recipes.
+        But CustomModTop functions are only compared by name, not by hash, for testing purposes.
+        """
 
-    @classmethod
-    def from_dill(cls, path: Path):
-        with open(path, "rb") as f:
-            return dill.load(f)
+        if not isinstance(other, RecipeCollection):
+            logger.warning(
+                f"Comparing RecipeCollections with different types: {type(self)} and {type(other)}. Returning False."
+            )
+            return False
+        for r1, r2 in zip(self.recipes, other.recipes):
+            if isinstance(r1, CustomTopMod):
+                if not r1.__almost_eq__(r2):
+                    return False
+            else:
+                if r1 != r2:
+                    return False
+        return True
 
     def calc_cumprob(self):
         """Calculate cumulative probability of all contained recipe steps.

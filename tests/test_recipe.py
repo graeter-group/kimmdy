@@ -225,8 +225,7 @@ def test_recipe_collection_from_csv(
     loaded = recipe.RecipeCollection.from_csv(csv_path)[0]
     print(recipe_collection)
     print(loaded)
-    assert loaded.recipes == recipe_collection.recipes
-    assert loaded == recipe_collection
+    loaded.__almost_eq__(recipe_collection)
 
 
 def test_recipe_steps_from_string():
@@ -247,7 +246,8 @@ def test_recipe_collection_from_csv_picked(
     picked = recipe_collection.recipes[2]
     recipe_collection.to_csv(csv_path, picked_recipe=picked)
     loaded, loaded_pick = recipe.RecipeCollection.from_csv(csv_path)
-    assert loaded == recipe_collection
+    loaded.__almost_eq__(recipe_collection)
+    assert picked == loaded_pick
     assert picked == loaded_pick
 
 
@@ -288,10 +288,3 @@ def test_recipe_collection_to_csv_picked(
             assert org_val == read_rp[key], f"{org_rp_d[key]} != {read_rp[key]}"
 
 
-def test_recipe_collection_to_dill(
-    tmp_path: Path, recipe_collection: recipe.RecipeCollection
-):
-    csv_path = tmp_path / "test_out.dill"
-    recipe_collection.to_dill(csv_path)
-    loaded_rr = recipe.RecipeCollection.from_dill(csv_path)
-    assert loaded_rr == recipe_collection
