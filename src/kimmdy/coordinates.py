@@ -213,7 +213,10 @@ def merge_dihedrals(
         )
     elif parameterizedA is not None:
         # breaking
-        assert type(parameterizedA) == Dihedral or type(parameterizedA) == DihedralType
+        if not (type(parameterizedA) == Dihedral or type(parameterizedA) == DihedralType):
+            m = f"parameterizedA {parameterizedA} is not a Dihedral or DihedralType"
+            logger.warning(m)
+            raise ValueError(m)
         dihedralmerge = Dihedral(
             *dihedral_key,
             funct=funct,

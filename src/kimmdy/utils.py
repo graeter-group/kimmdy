@@ -379,6 +379,10 @@ def truncate_sim_files(
         TaskFiles to get the latest files.
     """
 
+    # TODO: fix this to correctly use the working directory
+    # and do things in it's own directory and not
+    # modify the input files in place
+
     if time is None:
         logger.debug("time is None, nothing to truncate")
         return
