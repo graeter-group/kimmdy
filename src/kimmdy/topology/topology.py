@@ -700,6 +700,7 @@ class Topology:
         self.bonds = self.reactive_molecule.bonds
         self.angles = self.reactive_molecule.angles
         self.exclusions = self.reactive_molecule.exclusions
+        self.settles = self.reactive_molecule.settles
         self.proper_dihedrals = self.reactive_molecule.proper_dihedrals
         self.improper_dihedrals = self.moleculetypes[
             REACTIVE_MOLECULEYPE
@@ -881,13 +882,6 @@ class Topology:
 
         subsections = section["subsections"]
         for k in list(subsections.keys()):
-            # # if atomics section is empty,
-            # # remove the subsection from the topology
-            # if atomics[k] == []:
-            #     logger.debug(f"Removing subsection {k} from {moleculetype_name}")
-            #     del subsections[k]
-            #     continue
-
             v = subsections[k]
             condition = v.get("condition")
             if condition is not None:
