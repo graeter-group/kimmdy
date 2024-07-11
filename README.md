@@ -1,6 +1,10 @@
 # KIMMDY
 
+<<<<<<< HEAD
+![](https://github.com/graeter-group/kimmdy/actions/workflows/test-release.yml/badge.svg)](https://github.com/grater-group/kimmdy/actions/workflows/test-release.yml)
+=======
 [![](https://github.com/graeter-group/kimmdy/actions/workflows/test-release.yml/badge.svg)](https://github.com/graeter-group/kimmdy/actions/workflows/test-release.yml)
+>>>>>>> main
 
 Reactive MD pipeline for GROMACS using Kinetic Monte Carlo / Molecular Dynamics (KIMMDY)
 
@@ -32,6 +36,17 @@ However, this is only half the fun!
 KIMMDY has two exciting plugins in the making, which properly parameterize your molecules
 for radicals using GrAPPa (Graph Attentional Protein Parametrization) and predict
 Hydrogen Atom Transfer (HAT) rates.
+<<<<<<< HEAD
+Full installation instructions are available [here](https://grater-group.github.io/kimmdy/guide/how-to/install-ml-plugins.html)
+
+## Documentation
+
+The documentation is available [here](https://grater-group.github.io/kimmdy/).
+
+## Getting started
+
+Head over to the [getting started](https://grater-group.github.io/kimmdy/guide/tutorials/getting-started.html) tutorial.
+=======
 Full installation instructions are available [here](https://graeter-group.github.io/kimmdy/guide/how-to/install-ml-plugins.html)
 
 ## Documentation
@@ -41,6 +56,7 @@ The documentation is available [here](https://graeter-group.github.io/kimmdy/).
 ## Getting started
 
 Head over to the [getting started](https://graeter-group.github.io/kimmdy/guide/tutorials/getting-started.html) tutorial.
+>>>>>>> main
 
 ## Development
 
@@ -49,9 +65,15 @@ Head over to the [getting started](https://graeter-group.github.io/kimmdy/guide/
 Clone kimmdy and the default reaction and parameterization plugins and install requirements and kimmdy as editable via
 
 ```bash
+<<<<<<< HEAD
+git clone git@github.com:grater-group/kimmdy.git
+git clone git@github.com:grater-group/kimmdy-reactions.git
+git clone git@github.com:grater-group/kimmdy-grappa.git
+=======
 git clone git@github.com:graeter-group/kimmdy.git
 git clone git@github.com:graeter-group/kimmdy-reactions.git
 git clone git@github.com:graeter-group/kimmdy-grappa.git
+>>>>>>> main
 cd kimmdy
 python -m venv .venv
 source ./venv/bin/activate

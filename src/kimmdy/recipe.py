@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import ast
 import csv
 import logging
 from abc import ABC
@@ -20,12 +21,47 @@ if TYPE_CHECKING:
     from kimmdy.topology.topology import Topology
 
 
+def recipe_steps_from_str(recipe_steps_s: str) -> list[RecipeStep | None]:
+    return [RecipeStep.from_str(rs) for rs in recipe_steps_s.split("<>")]
+
+
 class RecipeStep(ABC):
     """Base class for all RecipeSteps.
     Indices can be accessed as 0-based or 1-based.
     ix: 0-based, int
     id: 1-based, str
     """
+
+    @classmethod
+    def from_str(cls, s: str) -> RecipeStep | None:
+        """Parses expressions of the following forms into RecipeStep objects:
+
+        - Place: Place(ix_to_place=0, new_coords=(0.0, 0.0, 0.0))
+        - Break: Break(atom_ix_1=0, atom_ix_2=1)
+        - Bind: Bind(atom_ix_1=0, atom_ix_2=1)
+        - Relax: Relax()
+        - CustomTopMod: CustomTopMod(f=<function f at 0x7f7f7f7f7f7f>)
+
+        Parameters
+        ----------
+        s
+            String representation of a RecipeStep object.
+        """
+
+        if s.startswith("Place"):
+            return Place._from_str(s)
+        elif s.startswith("Break"):
+            return Break._from_str(s)
+        elif s.startswith("Bind"):
+            return Bind._from_str(s)
+        elif s.startswith("Relax"):
+            return Relax._from_str(s)
+        elif s.startswith("CustomTopMod"):
+            return CustomTopMod._from_str(s)
+        else:
+            m = f"Unknown RecipeStep type: {s}"
+            logger.warning(m)
+            return None
 
 
 @dataclass
@@ -35,6 +71,10 @@ class Relax(RecipeStep):
     The molecular system coordinates are far out of equilibrium after most topology changes.
     A relaxtion MD simulation using for example the slow growth method helps to reach the new equilibrium.
     """
+
+    @classmethod
+    def _from_str(cls, s: str):
+        return Relax()
 
 
 class Place(RecipeStep):
@@ -138,6 +178,15 @@ class Place(RecipeStep):
 
     def __str__(self):
         return f"{type(self).__name__}({self._ix_to_place}, {self.new_coords})"
+
+    @classmethod
+    def _from_str(cls, s: str):
+        args = s.split("Place(")[1].split(")")[0]
+        # args = ix_to_place=0, new_coords=(0.0, 0.0, 0.0)
+        args = args.split(", ", maxsplit=1)
+        ix_to_place = int(args[0].split("=")[1])
+        new_coords = ast.literal_eval(args[1].split("=")[1])
+        return cls(ix_to_place=ix_to_place, new_coords=new_coords)
 
 
 class BondOperation(RecipeStep):
@@ -297,6 +346,15 @@ class Break(BondOperation):
         The ID of the second atom. one-based, by default None
     """
 
+    @classmethod
+    def _from_str(cls, s: str):
+        args = s.split("Break(")[1].split(")")[0]
+        # args = atom_ix_1=0, atom_ix_2=1
+        args = args.split(", ")
+        atom_ix_1 = int(args[0].split("=")[1])
+        atom_ix_2 = int(args[1].split("=")[1])
+        return cls(atom_ix_1=atom_ix_1, atom_ix_2=atom_ix_2)
+
 
 class Bind(BondOperation):
     """Change topology to form a bond
@@ -313,6 +371,15 @@ class Bind(BondOperation):
         The ID of the second atom. one-based, by default None
     """
 
+    @classmethod
+    def _from_str(cls, s: str):
+        args = s.split("Bind(")[1].split(")")[0]
+        # args = atom_ix_1=0, atom_ix_2=1
+        args = args.split(", ")
+        atom_ix_1 = int(args[0].split("=")[1])
+        atom_ix_2 = int(args[1].split("=")[1])
+        return cls(atom_ix_1=atom_ix_1, atom_ix_2=atom_ix_2)
+
 
 @dataclass
 class CustomTopMod(RecipeStep):
@@ -324,7 +391,47 @@ class CustomTopMod(RecipeStep):
         A function that takes a Topology object and modifies it in place.
     """
 
-    f: Callable[[Topology], None]
+    f: Callable[[Topology], Topology]
+
+    def __eq__(self, other):
+        """Two CustomTopMods are considered equal if their functions have the same name and hash."""
+
+        if not isinstance(other, CustomTopMod):
+            logger.warning(
+                f"Comparing RecipeSteps with different types: {type(self)} and {type(other)}. Returning False."
+            )
+            return False
+        return self.__hash__() == other.__hash__()
+
+    def __almost_eq__(self, other):
+        """For reading from a csv file and testing, two CustomTopMods are considered equal if their functions have the same name."""
+        if not isinstance(other, CustomTopMod):
+            logger.warning(
+                f"Comparing RecipeSteps with different types: {type(self)} and {type(other)}. Returning False."
+            )
+            return False
+        return self.f.__name__ == other.f.__name__
+
+    def __hash__(self):
+        return hash((self.f.__name__, self.f.__hash__))
+
+    def __repr__(self):
+        return f"{type(self).__name__}(f={self.f.__name__})"
+
+    def __str__(self):
+        return f"{type(self).__name__}(f={self.f.__name__})"
+
+    @classmethod
+    def _from_str(cls, s: str):
+        args = s.split("CustomTopMod(")[1].split(")")[0]
+        # args = f=name_of_f
+        args = args.split("=")[1]
+
+        def f(top: Topology) -> Topology:
+            return top
+
+        f.__name__ = args
+        return cls(f=f)
 
 
 @dataclass
@@ -442,6 +549,43 @@ class Recipe:
                 name += "?".join(list(map(str, rs.__dict__.values())))
         return name
 
+    def __eq__(self, other):
+        """Two Recipes are considered equal if they have the same recipe steps, rates, and timespans."""
+
+        if not isinstance(other, Recipe):
+            logger.warning(
+                f"Comparing Recipes with different types: {type(self)} and {type(other)}. Returning False."
+            )
+            return False
+        return (
+            self.recipe_steps == other.recipe_steps
+            and self.rates == other.rates
+            and self.timespans == other.timespans
+        )
+
+    def __almost_eq__(self, other):
+        """For reading from a csv file and testing, two Recipes are also considered equal if CustomTopMod steps
+        just have the same function name and not the same hash."""
+
+        if not isinstance(other, Recipe):
+            logger.warning(
+                f"Comparing Recipes with different types: {type(self)} and {type(other)}. Returning False."
+            )
+            return False
+
+        if len(self.recipe_steps) != len(other.recipe_steps):
+            return False
+
+        for rs1, rs2 in zip(self.recipe_steps, other.recipe_steps):
+            if isinstance(rs1, CustomTopMod):
+                if not rs1.__almost_eq__(rs2):
+                    return False
+            else:
+                if rs1 != rs2:
+                    return False
+
+        return self.rates == other.rates and self.timespans == other.timespans
+
 
 @dataclass
 class RecipeCollection:
@@ -490,12 +634,12 @@ class RecipeCollection:
     def to_csv(self, path: Path, picked_recipe=None):
         """Write a ReactionResult as defined in the reaction module to a csv file"""
 
-        header = ["recipe_steps", "timespans", "rates"]
+        header = ["index", "picked", "recipe_steps", "timespans", "rates"]
         rows = []
         for i, rp in enumerate(self.recipes):
-            picked = rp == picked_recipe
-            rows.append([i] + [picked] + [rp.__getattribute__(h) for h in header])
-        header = ["index", "picked"] + header
+            was_picked = rp == picked_recipe
+            steps = "<>".join([rs.__repr__() for rs in rp.recipe_steps])
+            rows.append([i] + [was_picked] + [steps] + [rp.timespans] + [rp.rates])
 
         with open(path, "w", newline="") as f:
             writer = csv.writer(f)
@@ -516,10 +660,17 @@ class RecipeCollection:
             for row in reader:
                 _, picked_s, recipe_steps_s, timespans_s, rates_s = row
 
-                picked = eval(picked_s)
-                recipe_steps = eval(recipe_steps_s)
-                timespans = eval(timespans_s)
-                rates = eval(rates_s)
+                picked = ast.literal_eval(picked_s)
+                if recipe_steps_s != "":
+                    recipe_steps = [
+                        rs
+                        for rs in recipe_steps_from_str(recipe_steps_s)
+                        if rs is not None
+                    ]
+                else:
+                    recipe_steps = []
+                timespans = ast.literal_eval(timespans_s)
+                rates = ast.literal_eval(rates_s)
 
                 recipe = Recipe(
                     recipe_steps=recipe_steps, timespans=timespans, rates=rates
@@ -530,14 +681,24 @@ class RecipeCollection:
 
         return cls(recipes=recipes), picked_rp
 
-    def to_dill(self, path: Path):
-        with open(path, "wb") as f:
-            dill.dump(self, f)
+    def __almost_eq__(self, other):
+        """Two RecipeCollections are considered equal if they contain the same recipes.
+        But CustomModTop functions are only compared by name, not by hash, for testing purposes.
+        """
 
-    @classmethod
-    def from_dill(cls, path: Path):
-        with open(path, "rb") as f:
-            return dill.load(f)
+        if not isinstance(other, RecipeCollection):
+            logger.warning(
+                f"Comparing RecipeCollections with different types: {type(self)} and {type(other)}. Returning False."
+            )
+            return False
+        for r1, r2 in zip(self.recipes, other.recipes):
+            if isinstance(r1, CustomTopMod):
+                if not r1.__almost_eq__(r2):
+                    return False
+            else:
+                if r1 != r2:
+                    return False
+        return True
 
     def calc_cumprob(self):
         """Calculate cumulative probability of all contained recipe steps.
