@@ -1,6 +1,6 @@
 # Changelog
 
-<<<<<<< HEAD
+
 ## [6.9.0](https://github.com/graeter-group/kimmdy/compare/v6.8.3...v6.9.0) (2024-07-11)
 
 
@@ -26,29 +26,22 @@
 * update quarto version ([95160df](https://github.com/graeter-group/kimmdy/commit/95160df3b38e4328e67f6f14f6672163c0745eb0))
 
 ## [6.8.1](https://github.com/graeter-group/kimmdy/compare/v6.8.0...v6.8.1) (2024-06-17)
-=======
-## [6.8.3](https://github.com/graeter-group/kimmdy/compare/v6.8.2...v6.8.3) (2024-06-25)
->>>>>>> main
 
+## [6.8.3](https://github.com/graeter-group/kimmdy/compare/v6.8.2...v6.8.3) (2024-06-25)
 
 ### Bug Fixes
 
-<<<<<<< HEAD
-=======
 * more robust output checking for gmx check ([#445](https://github.com/graeter-group/kimmdy/issues/445)) ([0a25161](https://github.com/graeter-group/kimmdy/commit/0a2516158110b3ab16421e513d203006a6cfc076))
 * name ([595df32](https://github.com/graeter-group/kimmdy/commit/595df32480d4dd1d2902cef0e5fa9dd0289392bd))
 
 ## [6.8.1](https://github.com/graeter-group/kimmdy/compare/v6.8.0...v6.8.1) (2024-06-17)
 
-
 ### Bug Fixes
 
->>>>>>> main
 * check for residuetypes.rtp existence ([c4e831c](https://github.com/graeter-group/kimmdy/commit/c4e831c85b061b1f1916d9a8855908deb7ed6580))
 * fix [#440](https://github.com/graeter-group/kimmdy/issues/440) ([c4e831c](https://github.com/graeter-group/kimmdy/commit/c4e831c85b061b1f1916d9a8855908deb7ed6580))
 * onlye require xtc or trr, not both ([#439](https://github.com/graeter-group/kimmdy/issues/439)) ([c4e831c](https://github.com/graeter-group/kimmdy/commit/c4e831c85b061b1f1916d9a8855908deb7ed6580))
 * use nrexcl from first reactive molecultetype ([c4e831c](https://github.com/graeter-group/kimmdy/commit/c4e831c85b061b1f1916d9a8855908deb7ed6580))
-
 
 ### Documentation
 
