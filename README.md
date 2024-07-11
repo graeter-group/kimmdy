@@ -64,7 +64,6 @@ Conventions:
 * docstrings: numpy
 * [Conventional commit](https://www.conventionalcommits.org/en/v1.0.0/) messages when possible for pretty release notes.
 
-
 ### Local testing
 
 For developoment, we provide a docker image containing gromacs and multiple python versions to test against.  
