@@ -225,7 +225,7 @@ class RunManager:
 
         logger.info(
             f"Finished running tasks, state: {self.state} after "
-            f"{timedelta(seconds=(time.time() - self.start_time))}"
+            f"{timedelta(seconds=(time.time() - self.start_time))} "
             f"In output directory {self.config.out}"
         )
 
