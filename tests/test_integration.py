@@ -131,7 +131,7 @@ def test_integration_single_reaction(arranged_tmp_path):
     indirect=True,
 )
 def test_integration_just_reactions(arranged_tmp_path):
-    kimmdy_run(input=Path("kimmdy2.yml"))
+    kimmdy_run(input=Path("alternative_kimmdy.yml"))
     assert "Finished running tasks" in read_last_line(Path("kimmdy.log"))
     assert len(list(Path.cwd().glob("single_reaction_000/*"))) == 7
 

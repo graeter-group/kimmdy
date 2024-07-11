@@ -105,7 +105,7 @@ class RunManager:
         The configuration object.
     tasks
         Tasks from config.
-    slotted_tasks
+    priority_tasks
         Additional tasks added during the run by other tasks.
     iteration
         Current iteration.
@@ -130,7 +130,7 @@ class RunManager:
     def __init__(self, config: Config):
         self.config: Config = config
         self.tasks: queue.Queue[Task] = queue.Queue()
-        self.slotted_tasks: queue.Queue[Task] = queue.Queue()
+        self.priority_tasks: queue.Queue[Task] = queue.Queue()
         self.iteration: int = -1  # start at -1 to have iteration 0 be the initial setup
         self.state: State = State.IDLE
         self.recipe_collection: RecipeCollection = RecipeCollection([])
@@ -306,11 +306,11 @@ class RunManager:
         return self
 
     def __next__(self):
-        if self.tasks.empty() and self.slotted_tasks.empty():
+        if self.tasks.empty() and self.priority_tasks.empty():
             self.state = State.DONE
             return
-        if not self.slotted_tasks.empty():
-            task = self.slotted_tasks.get()
+        if not self.priority_tasks.empty():
+            task = self.priority_tasks.get()
         else:
             task = self.tasks.get()
         if self.config.dryrun:
@@ -467,7 +467,7 @@ class RunManager:
                                     continue_md_task.kwargs.update(
                                         {"continue_md": True}
                                     )
-                                    self.slotted_tasks.put(continue_md_task)
+                                    self.priority_tasks.put(continue_md_task)
                                 # Condition 2: Continue from started but not finished task
                                 found_run_end = True
                             break
@@ -632,7 +632,7 @@ class RunManager:
                 if reaction_plugin.name != selected:
                     continue
 
-            self.slotted_tasks.put(
+            self.priority_tasks.put(
                 Task(
                     self,
                     f=self._query_reaction,
