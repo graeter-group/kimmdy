@@ -32,7 +32,7 @@ However, this is only half the fun!
 KIMMDY has two exciting plugins in the making, which properly parameterize your molecules
 for radicals using GrAPPa (Graph Attentional Protein Parametrization) and predict
 Hydrogen Atom Transfer (HAT) rates.
-<<<<<<< HEAD
+
 Full installation instructions are available [here](https://grater-group.github.io/kimmdy/guide/how-to/install-ml-plugins.html)
 
 ## Documentation
@@ -43,8 +43,6 @@ The documentation is available [here](https://grater-group.github.io/kimmdy/).
 
 Head over to the [getting started](https://grater-group.github.io/kimmdy/guide/tutorials/getting-started.html) tutorial.
 
-Full installation instructions are available [here](https://graeter-group.github.io/kimmdy/guide/how-to/install-ml-plugins.html)
-
 ## Documentation
 
 The documentation is available [here](https://graeter-group.github.io/kimmdy/).
@@ -52,7 +50,6 @@ The documentation is available [here](https://graeter-group.github.io/kimmdy/).
 ## Getting started
 
 Head over to the [getting started](https://graeter-group.github.io/kimmdy/guide/tutorials/getting-started.html) tutorial.
->>>>>>> main
 
 ## Development
 
