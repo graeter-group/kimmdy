@@ -69,7 +69,7 @@ From gromacs topology:
 
 ### AtomType { #kimmdy.topology.atomic.AtomType }
 
-`topology.atomic.AtomType(self, type, id, id_sym, mass, charge, ptype, sigma, epsilon, at_num=None)`
+`topology.atomic.AtomType(self, type, id, id_sym, at_num, mass, charge, ptype, sigma, epsilon)`
 
 Information about one atom type
 

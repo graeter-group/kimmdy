@@ -9,22 +9,9 @@ Other entry points such as `kimmdy-analysis` also live here.
 
 | Name | Description |
 | --- | --- |
-| [configure_logger](#kimmdy.cmd.configure_logger) | Configure logging. |
 | [entry_point_kimmdy](#kimmdy.cmd.entry_point_kimmdy) | Run KIMMDY from the command line. |
 | [get_cmdline_args](#kimmdy.cmd.get_cmdline_args) | Parse command line arguments. |
 | [kimmdy_run](#kimmdy.cmd.kimmdy_run) | Run KIMMDY from python. |
-
-### configure_logger { #kimmdy.cmd.configure_logger }
-
-`cmd.configure_logger(config)`
-
-Configure logging.
-
-#### Parameters
-
-| Name     | Type                             | Description                                        | Default    |
-|----------|----------------------------------|----------------------------------------------------|------------|
-| `config` | [Config](`kimmdy.config.Config`) | configuration that contains log.level and log.file | _required_ |
 
 ### entry_point_kimmdy { #kimmdy.cmd.entry_point_kimmdy }
 

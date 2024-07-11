@@ -104,6 +104,7 @@ def concat_traj(
     ), f"No trrs found to concatenate in {run_dir} with subdirectory names {steps}"
 
     trajectories = [str(t) for t in trajectories]
+    print(trajectories)
 
     ## write concatenated trajectory
     tmp_xtc = str(out_xtc.with_name("tmp.xtc"))
