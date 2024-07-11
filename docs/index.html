@@ -507,6 +507,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#installation" id="toc-installation" class="nav-link" data-scroll-target="#installation">Installation</a></li>
   <li><a href="#documentation" id="toc-documentation" class="nav-link" data-scroll-target="#documentation">Documentation</a></li>
   <li><a href="#getting-started" id="toc-getting-started" class="nav-link" data-scroll-target="#getting-started">Getting started</a></li>
+  </ul></li>
+  <li><a href="#head-over-to-the-getting-started-tutorial." id="toc-head-over-to-the-getting-started-tutorial." class="nav-link" data-scroll-target="#head-over-to-the-getting-started-tutorial.">Head over to the getting started tutorial.</a>
+  <ul>
+  <li><a href="#documentation-1" id="toc-documentation-1" class="nav-link" data-scroll-target="#documentation-1">Documentation</a></li>
+  <li><a href="#getting-started-1" id="toc-getting-started-1" class="nav-link" data-scroll-target="#getting-started-1">Getting started</a></li>
   <li><a href="#development" id="toc-development" class="nav-link" data-scroll-target="#development">Development</a>
   <ul>
   <li><a href="#development-setup" id="toc-development-setup" class="nav-link" data-scroll-target="#development-setup">Development setup</a></li>
@@ -524,7 +529,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="kimmdy" class="level1">
 <h1>KIMMDY</h1>
-<p><a href="https://github.com/graeter-group/kimmdy/actions/workflows/test-release.yml"><img src="https://github.com/graeter-group/kimmdy/actions/workflows/test-release.yml/badge.svg" class="img-fluid"></a></p>
+<p>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD <img src="https://github.com/graeter-group/kimmdy/actions/workflows/test-release.yml/badge.svg" class="img-fluid">](https://github.com/grater-group/kimmdy/actions/workflows/test-release.yml) ======= <a href="https://github.com/graeter-group/kimmdy/actions/workflows/test-release.yml"><img src="https://github.com/graeter-group/kimmdy/actions/workflows/test-release.yml/badge.svg" class="img-fluid"></a> &gt;&gt;&gt;&gt;&gt;&gt;&gt; main</p>
 <p>Reactive MD pipeline for GROMACS using Kinetic Monte Carlo / Molecular Dynamics (KIMMDY)</p>
 <section id="installation" class="level2">
 <h2 class="anchored" data-anchor-id="installation">Installation</h2>
@@ -536,28 +541,45 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>To install the builtin reactions and analysis tools use</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install kimmdy<span class="pp">[</span><span class="ss">reactions,analysis</span><span class="pp">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>However, this is only half the fun!</p>
-<p>KIMMDY has two exciting plugins in the making, which properly parameterize your molecules for radicals using GrAPPa (Graph Attentional Protein Parametrization) and predict Hydrogen Atom Transfer (HAT) rates. Full installation instructions are available <a href="https://graeter-group.github.io/kimmdy/guide/how-to/install-ml-plugins.html">here</a></p>
+<p>KIMMDY has two exciting plugins in the making, which properly parameterize your molecules for radicals using GrAPPa (Graph Attentional Protein Parametrization) and predict Hydrogen Atom Transfer (HAT) rates. &lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD Full installation instructions are available <a href="https://grater-group.github.io/kimmdy/guide/how-to/install-ml-plugins.html">here</a></p>
 </section>
 <section id="documentation" class="level2">
 <h2 class="anchored" data-anchor-id="documentation">Documentation</h2>
-<p>The documentation is available <a href="https://graeter-group.github.io/kimmdy/">here</a>.</p>
+<p>The documentation is available <a href="https://grater-group.github.io/kimmdy/">here</a>.</p>
 </section>
 <section id="getting-started" class="level2">
 <h2 class="anchored" data-anchor-id="getting-started">Getting started</h2>
-<p>Head over to the <a href="https://graeter-group.github.io/kimmdy/guide/tutorials/getting-started.html">getting started</a> tutorial.</p>
+</section>
+</section>
+<section id="head-over-to-the-getting-started-tutorial." class="level1">
+<h1>Head over to the <a href="https://grater-group.github.io/kimmdy/guide/tutorials/getting-started.html">getting started</a> tutorial.</h1>
+<p>Full installation instructions are available <a href="https://graeter-group.github.io/kimmdy/guide/how-to/install-ml-plugins.html">here</a></p>
+<section id="documentation-1" class="level2">
+<h2 class="anchored" data-anchor-id="documentation-1">Documentation</h2>
+<p>The documentation is available <a href="https://graeter-group.github.io/kimmdy/">here</a>.</p>
+</section>
+<section id="getting-started-1" class="level2">
+<h2 class="anchored" data-anchor-id="getting-started-1">Getting started</h2>
+<p>Head over to the <a href="https://graeter-group.github.io/kimmdy/guide/tutorials/getting-started.html">getting started</a> tutorial. &gt;&gt;&gt;&gt;&gt;&gt;&gt; main</p>
 </section>
 <section id="development" class="level2">
 <h2 class="anchored" data-anchor-id="development">Development</h2>
 <section id="development-setup" class="level3">
 <h3 class="anchored" data-anchor-id="development-setup">Development setup</h3>
 <p>Clone kimmdy and the default reaction and parameterization plugins and install requirements and kimmdy as editable via</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone git@github.com:graeter-group/kimmdy.git</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone git@github.com:graeter-group/kimmdy-reactions.git</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone git@github.com:graeter-group/kimmdy-grappa.git</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> kimmdy</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> venv .venv</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> ./venv/bin/activate</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="at">-r</span> requirements.txt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;&lt;&lt;&lt;&lt;&lt;&lt;</span> HEAD</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone git@github.com:grater-group/kimmdy.git</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone git@github.com:grater-group/kimmdy-reactions.git</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone git@github.com:grater-group/kimmdy-grappa.git</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="ex">=======</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone git@github.com:graeter-group/kimmdy.git</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone git@github.com:graeter-group/kimmdy-reactions.git</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone git@github.com:graeter-group/kimmdy-grappa.git</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;&gt;&gt;&gt;&gt;</span> main</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> kimmdy</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> venv .venv</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> ./venv/bin/activate</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="at">-r</span> requirements.txt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Conventions:</p>
 <ul>
 <li>code style: black</li>

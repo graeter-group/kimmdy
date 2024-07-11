@@ -1,9 +1,11 @@
 [
   {
-    "listing": "/guide/explanation/index.html",
+    "listing": "/guide/tutorials/index.html",
     "items": [
-      "/guide/explanation/components.html",
-      "/guide/explanation/topology.html"
+      "/guide/tutorials/getting-started.html",
+      "/guide/tutorials/modify-topology.html",
+      "/guide/tutorials/colbuilder.html",
+      "/guide/tutorials/write-plugin.html"
     ]
   },
   {
@@ -18,12 +20,10 @@
     ]
   },
   {
-    "listing": "/guide/tutorials/index.html",
+    "listing": "/guide/explanation/index.html",
     "items": [
-      "/guide/tutorials/getting-started.html",
-      "/guide/tutorials/modify-topology.html",
-      "/guide/tutorials/colbuilder.html",
-      "/guide/tutorials/write-plugin.html"
+      "/guide/explanation/components.html",
+      "/guide/explanation/topology.html"
     ]
   }
 ]

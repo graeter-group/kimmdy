@@ -92,6 +92,25 @@ def load_plugin_schemas() -> dict:
     return schemas
 
 
+def type_from_str(s: str):
+    if s == "int":
+        return int
+    elif s == "float":
+        return float
+    elif s == "str":
+        return str
+    elif s == "bool":
+        return bool
+    elif s == "Path":
+        return Path
+    elif s == "Sequence":
+        return Sequence
+    else:
+        m = f"Type {s} not recognized!"
+        logger.error(m)
+        raise ValueError(m)
+
+
 def convert_schema_to_dict(dictionary: dict) -> dict:
     """Convert a dictionary from a raw json schema to a nested dictionary
 
@@ -128,7 +147,7 @@ def convert_schema_to_dict(dictionary: dict) -> dict:
         enum = value.get("enum")
         additionalProperties = value.get("additionalProperties")
         if pytype is not None:
-            result[key]["pytype"] = eval(pytype)
+            result[key]["pytype"] = type_from_str(pytype)
         if default is not None:
             result[key]["default"] = default
         if description is not None:

@@ -517,7 +517,13 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#kimmdy.recipe.RecipeCollection.to_csv" id="toc-kimmdy.recipe.RecipeCollection.to_csv" class="nav-link" data-scroll-target="#kimmdy.recipe.RecipeCollection.to_csv">to_csv</a></li>
   </ul></li>
   </ul></li>
-  <li><a href="#kimmdy.recipe.RecipeStep" id="toc-kimmdy.recipe.RecipeStep" class="nav-link" data-scroll-target="#kimmdy.recipe.RecipeStep">RecipeStep</a></li>
+  <li><a href="#kimmdy.recipe.RecipeStep" id="toc-kimmdy.recipe.RecipeStep" class="nav-link" data-scroll-target="#kimmdy.recipe.RecipeStep">RecipeStep</a>
+  <ul class="collapse">
+  <li><a href="#methods-2" id="toc-methods-2" class="nav-link" data-scroll-target="#methods-2">Methods</a>
+  <ul class="collapse">
+  <li><a href="#kimmdy.recipe.RecipeStep.from_str" id="toc-kimmdy.recipe.RecipeStep.from_str" class="nav-link" data-scroll-target="#kimmdy.recipe.RecipeStep.from_str">from_str</a></li>
+  </ul></li>
+  </ul></li>
   <li><a href="#kimmdy.recipe.Relax" id="toc-kimmdy.recipe.Relax" class="nav-link" data-scroll-target="#kimmdy.recipe.Relax">Relax</a></li>
   </ul></li>
   </ul></li>
@@ -1050,6 +1056,56 @@ ul.task-list li input[type="checkbox"] {
 <h3 class="anchored" data-anchor-id="kimmdy.recipe.RecipeStep">RecipeStep</h3>
 <p><code>recipe.RecipeStep()</code></p>
 <p>Base class for all RecipeSteps. Indices can be accessed as 0-based or 1-based. ix: 0-based, int id: 1-based, str</p>
+<section id="methods-2" class="level4">
+<h4 class="anchored" data-anchor-id="methods-2">Methods</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="#kimmdy.recipe.RecipeStep.from_str">from_str</a></td>
+<td>Parses expressions of the following forms into RecipeStep objects:</td>
+</tr>
+</tbody>
+</table>
+<section id="kimmdy.recipe.RecipeStep.from_str" class="level5">
+<h5 class="anchored" data-anchor-id="kimmdy.recipe.RecipeStep.from_str">from_str</h5>
+<p><code>recipe.RecipeStep.from_str(s)</code></p>
+<p>Parses expressions of the following forms into RecipeStep objects:</p>
+<ul>
+<li>Place: Place(ix_to_place=0, new_coords=(0.0, 0.0, 0.0))</li>
+<li>Break: Break(atom_ix_1=0, atom_ix_2=1)</li>
+<li>Bind: Bind(atom_ix_1=0, atom_ix_2=1)</li>
+<li>Relax: Relax()</li>
+<li>CustomTopMod: CustomTopMod(f=&lt;function f at 0x7f7f7f7f7f7f&gt;)</li>
+</ul>
+<section id="parameters-8" class="level6">
+<h6 class="anchored" data-anchor-id="parameters-8">Parameters</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>s</code></td>
+<td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
+<td>String representation of a RecipeStep object.</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+</section>
 </section>
 <section id="kimmdy.recipe.Relax" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.recipe.Relax">Relax</h3>

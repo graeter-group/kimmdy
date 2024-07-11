@@ -232,6 +232,30 @@ Indices can be accessed as 0-based or 1-based.
 ix: 0-based, int
 id: 1-based, str
 
+#### Methods
+
+| Name | Description |
+| --- | --- |
+| [from_str](#kimmdy.recipe.RecipeStep.from_str) | Parses expressions of the following forms into RecipeStep objects: |
+
+##### from_str { #kimmdy.recipe.RecipeStep.from_str }
+
+`recipe.RecipeStep.from_str(s)`
+
+Parses expressions of the following forms into RecipeStep objects:
+
+- Place: Place(ix_to_place=0, new_coords=(0.0, 0.0, 0.0))
+- Break: Break(atom_ix_1=0, atom_ix_2=1)
+- Bind: Bind(atom_ix_1=0, atom_ix_2=1)
+- Relax: Relax()
+- CustomTopMod: CustomTopMod(f=<function f at 0x7f7f7f7f7f7f>)
+
+###### Parameters
+
+| Name   | Type         | Description                                   | Default    |
+|--------|--------------|-----------------------------------------------|------------|
+| `s`    | [str](`str`) | String representation of a RecipeStep object. | _required_ |
+
 ### Relax { #kimmdy.recipe.Relax }
 
 `recipe.Relax(self)`
