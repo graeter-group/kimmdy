@@ -1,6 +1,30 @@
 # Changelog
 
 <<<<<<< HEAD
+## [6.9.0](https://github.com/graeter-group/kimmdy/compare/v6.8.3...v6.9.0) (2024-07-11)
+
+
+### Features
+
+* add xtc option to config ([95160df](https://github.com/graeter-group/kimmdy/commit/95160df3b38e4328e67f6f14f6672163c0745eb0))
+* always setup tasks on init of RunManager ([95160df](https://github.com/graeter-group/kimmdy/commit/95160df3b38e4328e67f6f14f6672163c0745eb0))
+* configure logger from init of Config ([95160df](https://github.com/graeter-group/kimmdy/commit/95160df3b38e4328e67f6f14f6672163c0745eb0))
+* link nrexcl of reactive moleculetype to toplevel topology ([#451](https://github.com/graeter-group/kimmdy/issues/451)) ([b100117](https://github.com/graeter-group/kimmdy/commit/b10011724eff1d0ae7572b5d5d9b32b2947ae356))
+
+
+### Bug Fixes
+
+* close task logger handler after taks has run. fixes [#452](https://github.com/graeter-group/kimmdy/issues/452) ([451f3fd](https://github.com/graeter-group/kimmdy/commit/451f3fd02c2bf942939c2576fd13465916be4463))
+* polymer_test ([7485011](https://github.com/graeter-group/kimmdy/commit/7485011fb532b6e8e51813bd1da4f3ebeffe9160))
+* properly compare to empty dicts ([95160df](https://github.com/graeter-group/kimmdy/commit/95160df3b38e4328e67f6f14f6672163c0745eb0))
+* recip parsing without eval ([#448](https://github.com/graeter-group/kimmdy/issues/448)) ([0a5a213](https://github.com/graeter-group/kimmdy/commit/0a5a213254d5c762a3b377305af33f0a62d9c6ab))
+* resolve all non-relative paths in config relative to config.cwd ([95160df](https://github.com/graeter-group/kimmdy/commit/95160df3b38e4328e67f6f14f6672163c0745eb0))
+
+
+### Documentation
+
+* update quarto version ([95160df](https://github.com/graeter-group/kimmdy/commit/95160df3b38e4328e67f6f14f6672163c0745eb0))
+
 ## [6.8.1](https://github.com/graeter-group/kimmdy/compare/v6.8.0...v6.8.1) (2024-06-17)
 =======
 ## [6.8.3](https://github.com/graeter-group/kimmdy/compare/v6.8.2...v6.8.3) (2024-06-25)
