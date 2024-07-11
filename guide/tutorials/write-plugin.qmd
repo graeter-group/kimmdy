@@ -35,11 +35,15 @@ from kimmdy.tasks import TaskFiles
 from kimmdy.utils import (
     get_atomnrs_from_plumedid,
 )
+import logging
 from kimmdy.parsing import (
     read_plumed,
     read_distances_dat,
 )
 
+# start the name of your logger with kimmdy.<plugin name>
+# such that it ends up in the kimmdy log file
+logger = logging.getLogger("kimmdy.hydrolysis")
 
 class BindReaction(ReactionPlugin):
     """Reaction to bind two particles if they are in proximity

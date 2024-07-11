@@ -29,7 +29,7 @@ rest of the program and keeps track of global state.
 |-------------------|-----------------------------------------------------------------------------------------|------------------------------------------------------------|
 | config            | [Config](`kimmdy.config.Config`)                                                        | The configuration object.                                  |
 | tasks             | [queue](`queue`).[Queue](`queue.Queue`)\[[Task](`kimmdy.tasks.Task`)\]                  | Tasks from config.                                         |
-| crr_tasks         | [queue](`queue`).[Queue](`queue.Queue`)\[[Task](`kimmdy.tasks.Task`)\]                  | Current tasks.                                             |
+| slotted_tasks     | [queue](`queue`).[Queue](`queue.Queue`)\[[Task](`kimmdy.tasks.Task`)\]                  | Additional tasks added during the run by other tasks.      |
 | iteration         | [int](`int`)                                                                            | Current iteration.                                         |
 | state             | [State](`kimmdy.runmanager.State`)                                                      | Current state of the system.                               |
 | recipe_collection | [RecipeCollection](`kimmdy.recipe.RecipeCollection`)                                    | Collection of recipes.                                     |

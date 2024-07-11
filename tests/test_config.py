@@ -93,7 +93,7 @@ def test_complains_if_plumed_used_but_not_set(arranged_tmp_path):
         AssertionError,
         match="Plumed requested in md section, but not defined at config root",
     ):
-        _ = Config(recursive_dict=raw)
+        _ = Config(opts=raw)
 
 
 def test_parse_reaction_only(arranged_tmp_path):
@@ -105,7 +105,7 @@ def test_parse_reaction_only(arranged_tmp_path):
     del raw["changer"]["coordinates"]["md"]
     raw["sequence"] = ["homolysis"]
 
-    config = Config(recursive_dict=raw)
+    config = Config(opts=raw)
 
     assert isinstance(config.tpr, Path)
     assert isinstance(config.trr, Path)
@@ -118,7 +118,7 @@ def test_parse_missing_mdp_file(arranged_tmp_path):
         raw = yaml.safe_load(f)
     raw["mds"]["relax"]["mdp"] = "nonexisting.mdp"
     with pytest.raises(LookupError, match="File not found:"):
-        Config(recursive_dict=raw)
+        Config(opts=raw)
 
 
 def test_parse_missing_required_mdp_section(arranged_tmp_path):
@@ -128,7 +128,7 @@ def test_parse_missing_required_mdp_section(arranged_tmp_path):
     with pytest.raises(
         AssertionError, match="MD instance defined but contains no mdp file."
     ):
-        Config(recursive_dict=raw)
+        Config(opts=raw)
 
 
 def test_parse_sequence_missing_entry(arranged_tmp_path):
@@ -139,15 +139,15 @@ def test_parse_sequence_missing_entry(arranged_tmp_path):
         AssertionError,
         match="Task nonexistent_entry listed in sequence, but not defined!",
     ):
-        Config(recursive_dict=raw)
+        Config(opts=raw)
 
 
 def test_parse_sequence_missing(arranged_tmp_path):
     with open(Path("config1.yml"), "r") as f:
         raw = yaml.safe_load(f)
     del raw["sequence"]
-    with pytest.raises(AssertionError, match="No sequence defined!"):
-        Config(recursive_dict=raw)
+    with pytest.raises(AssertionError, match="No sequence defined in config!"):
+        Config(opts=raw)
 
 
 def test_parse_coordinates_bad_reference(arranged_tmp_path):
@@ -157,7 +157,7 @@ def test_parse_coordinates_bad_reference(arranged_tmp_path):
     with pytest.raises(
         AssertionError, match="Relax MD relax_nonexistent.mdp not in MD section!"
     ):
-        Config(recursive_dict=raw)
+        Config(opts=raw)
 
 
 def test_get_existing_files(arranged_tmp_path):
@@ -165,6 +165,7 @@ def test_get_existing_files(arranged_tmp_path):
     file_d = get_existing_files(config)
     assert set(file_d.keys()) == set(
         [
+            "kimmdy.log",
             "top",
             "gro",
             "ndx",
