@@ -12,7 +12,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, Callable, Optional
 
-import dill
 import numpy as np
 
 logger = logging.getLogger(__name__)
