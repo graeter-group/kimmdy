@@ -1,5 +1,6 @@
 name: 'kimmdy_001'
 dryrun: false
+max_tasks: 10
 gromacs_alias: 'gmx'
 gmx_mdrun_flags: -maxh 24 -dlb yes -nt 8 -npme 0 -ntmpi 1
 ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
@@ -17,13 +18,10 @@ mds:
     mdp: 'pullf1500_slow_growth.mdp'
 changer:
   coordinates:
-    md: 'relax'
+    md: 'relax'     
     slow_growth: true
   topology:
     parameterization: 'basic' 
-    parameterization_kwargs: 
-      arg1: hello
-      arg2: 1
 reactions:
   homolysis:
     edis: 'edissoc.dat'

@@ -15,6 +15,5 @@ reactions:
   homolysis:
     edis: 'edissoc.dat'
     itp: 'ffbonded.itp'
-  dummyreaction: {}
 sequence:
   - homolysis
