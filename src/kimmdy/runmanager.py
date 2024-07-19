@@ -413,7 +413,7 @@ class RunManager:
         found_run_end = False
         while not self.tasks.empty() and not found_run_end:
             task: Task = self.tasks.queue[0]
-            if task.name == "_restart_task":
+            if task.name == "restart_task":
                 logger.info("Found restart task.")
                 self.tasks.queue.popleft()
                 break
@@ -454,7 +454,7 @@ class RunManager:
                                 logger.info(
                                     f"Found started but not finished task {task_dir}."
                                 )
-                                if completed_tasks[-1].name == "_run_md":
+                                if completed_tasks[-1].name == "run_md":
                                     symlink_dir.unlink(missing_ok=True)
                                     shutil.copytree(
                                         task_dir, self.config.out / task_dir.name
@@ -484,7 +484,7 @@ class RunManager:
 
         # add completed tasks to queue again until a reliable restart point (i.e after MD) is reached
         while completed_tasks:
-            if completed_tasks[-1].name == "_run_md":
+            if completed_tasks[-1].name == "run_md":
                 logger.info(
                     f"Will continue after task {completed_tasks[-1].kwargs['files'].outputdir}"
                 )
