@@ -349,8 +349,8 @@ class RunManager:
                         logger.error(e)
                         raise RuntimeError(e)
 
-            # discover output files
-            for path in files.outputdir.iterdir():
+            # register discovered output files
+            for path in discovered_files:
                 suffix = path.suffix[1:]
                 if suffix in AMBIGUOUS_SUFFS:
                     suffix = path.name
