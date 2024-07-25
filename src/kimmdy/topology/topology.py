@@ -255,17 +255,21 @@ class MoleculeType:
             "Trying to infer radical status based on AMBER(!!) atomtype bond order."
         )
         self.radicals = {}
+        error_atoms = set()
         for atom in self.atoms.values():
             bo = ATOMTYPE_BONDORDER_FLAT.get(atom.type)
             if bo is None:
-                logger.warning(
-                    f"Atomtype {atom.type} not found in AMBER atomtypes. Cannot infer radical status."
-                )
+                error_atoms.add(atom.type)
             if bo and bo > len(atom.bound_to_nrs):
                 self.radicals[atom.nr] = atom
                 atom.is_radical = True
             else:
                 atom.is_radical = False
+        logger.warning(
+            "Some atomtypes not found in AMBER atomtypes. Cannot infer radical status.\n"
+            "Missing atom types:\n"
+            f"{error_atoms}"
+        )
         return None
 
     def _update_atomics_dict(self):
