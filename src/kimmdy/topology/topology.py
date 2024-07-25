@@ -265,11 +265,12 @@ class MoleculeType:
                 atom.is_radical = True
             else:
                 atom.is_radical = False
-        logger.warning(
-            "Some atomtypes not found in AMBER atomtypes. Cannot infer radical status.\n"
-            "Missing atom types:\n"
-            f"{error_atoms}"
-        )
+        if len(error_atoms) > 0:
+            logger.warning(
+                "Some atomtypes not found in AMBER atomtypes. Cannot infer radical status.\n"
+                "Missing atom types:\n"
+                f"{error_atoms}"
+            )
         return None
 
     def _update_atomics_dict(self):
