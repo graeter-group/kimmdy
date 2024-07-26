@@ -250,7 +250,10 @@ def merge_top_moleculetypes_slow_growth(
     ff: FF,
 ) -> MoleculeType:
     """Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation"""
-    hyperparameters = {"morse_well_depth": 300}  # [kJ mol-1]
+    hyperparameters = {
+        "morse_well_depth": 300,  # [kJ mol-1]
+        "beta": 19,  # matches LJ steepness
+    }
 
     # atoms
     for nr in molA.atoms.keys():
@@ -283,7 +286,54 @@ def merge_top_moleculetypes_slow_growth(
         if interactionA != interactionB:
             parameterizedA = get_explicit_or_type(key, interactionA, ff.bondtypes, molA)
             parameterizedB = get_explicit_or_type(key, interactionB, ff.bondtypes, molB)
+
+            def get_LJ_morse_parameters(atomTypeA, atomTypeB):
+                """Calculate morse terms sigma and epsilon from mixed atom types
+                Uses combination rule type 2 (typically used by amber force fields)
+                """
+                sigmas = [ff.atomtypes[at].sigma for at in (atomTypeA, atomTypeB)]
+                sigmaij = 0.5 * (float(sigmas[0]) + float(sigmas[1]))
+                epsilons = [ff.atomtypes[at].epsilon for at in atomtypes]
+                epsilonij = np.sqrt(float(epsilons[0]) * float(epsilons[1]))
+                return sigmaij, epsilonij
+
+            def build_morse_bond_LJ(idx_a: str, idx_b: str, turn_on: bool):
+                """Build slow growing bond mimicking a LJ potential
+                This bond is for 1-3 and 1-4 interactions that are supposed
+                to vanish or to start existing.
+                """
+                atom_a = molA.atoms[idx_a]
+                atom_b = molA.atoms[idx_b]
+
+                sigmaij, epsilonij = get_LJ_morse_parameters(atom_a.type, atom_b.type)
+
+                c_kwargs = dict(
+                    zip(
+                        [f"c{i}" for i in range(6)],
+                        [
+                            f"{sigmaij*1.12:7.5f}",  # sigmaij* 1.12 = LJ minimum
+                            f"{epsilonij:7.5f}",  # well depth is epsilonij
+                            f"{hyperparameters['beta']:5.3f}",
+                            f"{sigmaij*1.12:7.5f}",  # sigmaij* 1.12 = LJ minimum
+                            f"{epsilonij:7.5f}",  # well depth is epsilonij
+                            f"{hyperparameters['beta']:5.3f}",
+                        ],
+                    )
+                )
+
+                # slow growing beta towards the LJ value
+                if turn_on:
+                    c_kwargs["c2"] = 1
+                else:
+                    c_kwargs["c5"] = 1
+
+                return Bond(idx_a, idx_b, funct="3", **c_kwargs)
+
+            # both bonds exist
             if parameterizedA and parameterizedB:
+                assert (
+                    parameterizedA.funct == parameterizedB.funct == "1"
+                ), "In slow-growth, bond functionals need to be harmonic!"
                 molB.bonds[key] = Bond(
                     *key,
                     funct=parameterizedB.funct,
@@ -292,31 +342,23 @@ def merge_top_moleculetypes_slow_growth(
                     c2=parameterizedB.c0,
                     c3=parameterizedB.c1,
                 )
+
+            # bond only exists in A -> vanish bond
             elif parameterizedA:
                 atomtypes = [molA.atoms[atom_id].type for atom_id in key]
                 break_bind_atoms[key[0]] = atomtypes[0]
                 break_bind_atoms[key[1]] = atomtypes[1]
-                # use combination rule type 2 (typically used by amber force fields)
-                sigmas = [ff.atomtypes[at].sigma for at in atomtypes]
-                sigmaij = 0.5 * (float(sigmas[0]) + float(sigmas[1]))
-                epsilons = [ff.atomtypes[at].epsilon for at in atomtypes]
-                epsilonij = np.sqrt(float(epsilons[0]) * float(epsilons[1]))
-
-                # morse well steepness
-                assert parameterizedA.c1 is not None, f"parameterizedA.c1 is not set"
-                beta = np.sqrt(
-                    float(parameterizedA.c1) / (2 * hyperparameters["morse_well_depth"])
-                )
+                sigmaij, epsilonij = get_LJ_morse_parameters(*atomtypes)
 
                 molB.bonds[key] = Bond(
                     *key,
-                    funct="3",
+                    funct="3",  # Morse potential
                     c0=parameterizedA.c0,
                     c1=f"{hyperparameters['morse_well_depth']:5.3f}",
-                    c2=f"{beta:5.3f}",
+                    c2=f"{hyperparameters['beta']:5.3f}",
                     c3=f"{sigmaij*1.12:7.5f}",  # sigmaij* 1.12 = LJ minimum
                     c4=f"{epsilonij:7.5f}",  # well depth is epsilonij
-                    c5=f"{beta:5.3f}",
+                    c5=f"{hyperparameters['beta']:5.3f}",
                 )
 
                 # update bound_to
@@ -324,34 +366,58 @@ def merge_top_moleculetypes_slow_growth(
                 atompair[0].bound_to_nrs.append(atompair[1].nr)
                 atompair[1].bound_to_nrs.append(atompair[0].nr)
 
+                # Add LJ-imitation Morse bonds for 1-3 and 1-4 interactions
+                bound_atom_sides = []
+                for idx in key:
+                    bonds = list(filter(lambda b: idx in b, molB.bonds.keys()))
+                    bound_atoms = set()
+                    for b in bonds:
+                        bound_atoms.add(b[0])
+                        bound_atoms.add(b[1])
+                    bound_atom_sides.append(bound_atoms)
+
+                for a1 in bound_atom_sides[0]:
+                    for a2 in bound_atom_sides[1]:
+                        molB.bonds[(a1, a2)] = build_morse_bond_LJ(
+                            a1, a2, turn_on=False
+                        )
+
+            # bond only exists in B -> create bond
             elif parameterizedB:
                 atomtypes = [molB.atoms[atom_id].type for atom_id in key]
                 break_bind_atoms[key[0]] = atomtypes[0]
                 break_bind_atoms[key[1]] = atomtypes[1]
-                # use combination rule type 2 (typically used by amber force fields)
-                sigmas = [ff.atomtypes[at].sigma for at in atomtypes]
-                sigmaij = 0.5 * (float(sigmas[0]) + float(sigmas[1]))
-                epsilons = [ff.atomtypes[at].epsilon for at in atomtypes]
-                epsilonij = np.sqrt(float(epsilons[0]) * float(epsilons[1]))
-                # morse well steepness
-                assert parameterizedB.c1 is not None, f"parameterizedB.c1 is not set"
-                beta = np.sqrt(
-                    float(parameterizedB.c1) / (2 * hyperparameters["morse_well_depth"])
-                )
+                sigmaij, epsilonij = get_LJ_morse_parameters(*atomtypes)
+
                 molB.bonds[key] = Bond(
                     *key,
-                    funct="3",
+                    funct="3",  # Morse potential
                     c0=f"{sigmaij*1.12:7.5f}",  # sigmaij* 1.12 = LJ minimum
                     c1=f"{epsilonij:7.5f}",  # well depth is epsilonij
-                    c2=f"{beta:5.3f}",
+                    c2=f"{hyperparameters['beta']:5.3f}",
                     c3=parameterizedB.c0,
                     c4=f"{hyperparameters['morse_well_depth']:5.3f}",
-                    c5=f"{beta:5.3f}",
+                    c5=f"{hyperparameters['beta']:5.3f}",
                 )
+
+                # Add LJ-imitation Morse bonds for 1-3 and 1-4 interactions
+                bound_atom_sides = []
+                for idx in key:
+                    bonds = list(filter(lambda b: idx in b, molB.bonds.keys()))
+                    bound_atoms = set()
+                    for b in bonds:
+                        bound_atoms.add(b[0])
+                        bound_atoms.add(b[1])
+                    bound_atom_sides.append(bound_atoms)
+
+                for a1 in bound_atom_sides[0]:
+                    for a2 in bound_atom_sides[1]:
+                        molB.bonds[(a1, a2)] = build_morse_bond_LJ(a1, a2, turn_on=True)
 
     # pairs and exclusions
     exclusions = molB.exclusions
     for key in keysA - keysB:
+        # for 4-rings in transition state rm pair of breaking bond
         molB.pairs.pop(key, None)
         exclusion = Exclusion(*key)
         exclusions[key] = exclusion
@@ -524,9 +590,7 @@ def merge_top_moleculetypes_slow_growth(
 
 def merge_top_slow_growth(topA: Topology, topB: Topology) -> Topology:
     """Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation.
-
-
-    TODO: for now this assumes that only one moleculeype (the first, index 0) is of interest.
+    For now this assumes that only one moleculeype is of interest.
     """
 
     molA = topA.moleculetypes[REACTIVE_MOLECULEYPE]
