@@ -38,6 +38,9 @@ class FF:
 
         ffdir: Optional[Path] = top["ffdir"]
 
+        if defaults := get_top_section(top, "defaults"):
+            self.defaults = defaults
+
         atomtypes = get_top_section(top, "atomtypes")
         if atomtypes is not None:
             for l in atomtypes:
