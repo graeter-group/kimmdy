@@ -656,7 +656,7 @@ def merge_top_moleculetypes_slow_growth(
                     ff.improper_dihedraltypes,
                     molA,
                     molB,
-                    "9",
+                    "4",
                     periodicity,
                 )
 
@@ -681,6 +681,7 @@ def merge_top_slow_growth(topA: Topology, topB: Topology) -> Topology:
     molA = topA.moleculetypes[REACTIVE_MOLECULEYPE]
     molB = topB.moleculetypes[REACTIVE_MOLECULEYPE]
     molB = merge_top_moleculetypes_slow_growth(molA, molB, topB.ff)
+    topB._update_dict()
 
     return topB
 
