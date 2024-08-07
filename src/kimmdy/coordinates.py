@@ -249,6 +249,7 @@ def merge_top_moleculetypes_slow_growth(
     molA: MoleculeType,
     molB: MoleculeType,
     ff: FF,
+    morph_pairs: bool,
 ) -> MoleculeType:
     """Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation"""
 
@@ -303,14 +304,15 @@ def merge_top_moleculetypes_slow_growth(
                 [f"{0.0:.5f}" for _ in range(4)],
             )
         )
-        # Bind: pair interaction turning off
-        if bind:
-            c_kwargs["c0"] = f"{v:.5f}"
-            c_kwargs["c1"] = f"{w:.5f}"
-        # Break: pair interaction turning on
-        else:
-            c_kwargs["c2"] = f"{v:.5f}"
-            c_kwargs["c3"] = f"{w:.5f}"
+        if morph_pairs:
+            # Bind: pair interaction turning off
+            if bind:
+                c_kwargs["c0"] = f"{v:.5f}"
+                c_kwargs["c1"] = f"{w:.5f}"
+            # Break: pair interaction turning on
+            else:
+                c_kwargs["c2"] = f"{v:.5f}"
+                c_kwargs["c3"] = f"{w:.5f}"
 
         return Pair(idx1, idx2, funct=ff.defaults[0][0], **c_kwargs)
 
@@ -673,14 +675,16 @@ def merge_top_moleculetypes_slow_growth(
     return molB
 
 
-def merge_top_slow_growth(topA: Topology, topB: Topology) -> Topology:
+def merge_top_slow_growth(
+    topA: Topology, topB: Topology, morph_pairs: bool
+) -> Topology:
     """Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation.
     For now this assumes that only one moleculeype is of interest.
     """
 
     molA = topA.moleculetypes[REACTIVE_MOLECULEYPE]
     molB = topB.moleculetypes[REACTIVE_MOLECULEYPE]
-    molB = merge_top_moleculetypes_slow_growth(molA, molB, topB.ff)
+    molB = merge_top_moleculetypes_slow_growth(molA, molB, topB.ff, morph_pairs)
     topB._update_dict()
 
     return topB
