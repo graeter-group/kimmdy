@@ -7,6 +7,7 @@ See [gromacs manual](https://manual.gromacs.org/current/reference-manual/topolog
 from dataclasses import dataclass, field
 from typing import Optional, Union
 
+from kimmdy.constants import FFFUNC
 from kimmdy.utils import field_or_none
 
 
@@ -246,7 +247,7 @@ class Bond:
     def from_top_line(cls, l: list[str]):
         funct = field_or_none(l, 2)
         if funct is None:
-            funct = "1"
+            funct = FFFUNC["harmonic_bond"]
         return cls(
             ai=l[0],
             aj=l[1],
@@ -285,7 +286,7 @@ class BondType:
     def from_top_line(cls, l: list[str]):
         funct = field_or_none(l, 2)
         if funct is None:
-            funct = "1"
+            funct = FFFUNC["harmonic_bond"]
         return cls(
             i=l[0],
             j=l[1],

@@ -67,9 +67,7 @@ Takes two Topologies and joins them for a smooth free-energy like parameter tran
 `coordinates.merge_top_slow_growth(topA, topB)`
 
 Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation.
-
-
-TODO: for now this assumes that only one moleculeype (the first, index 0) is of interest.
+For now this assumes that only one moleculeype is of interest.
 
 ### place_atom { #kimmdy.coordinates.place_atom }
 
