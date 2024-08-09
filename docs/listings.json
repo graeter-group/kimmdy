@@ -1,12 +1,5 @@
 [
   {
-    "listing": "/guide/explanation/index.html",
-    "items": [
-      "/guide/explanation/components.html",
-      "/guide/explanation/topology.html"
-    ]
-  },
-  {
     "listing": "/guide/tutorials/index.html",
     "items": [
       "/guide/tutorials/getting-started.html",
@@ -24,6 +17,13 @@
       "/guide/how-to/hcp.html",
       "/guide/how-to/install-ml-plugins.html",
       "/guide/how-to/reaction_only.html"
+    ]
+  },
+  {
+    "listing": "/guide/explanation/index.html",
+    "items": [
+      "/guide/explanation/components.html",
+      "/guide/explanation/topology.html"
     ]
   }
 ]
