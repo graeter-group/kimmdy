@@ -5,6 +5,7 @@ import textwrap
 from pathlib import Path
 from typing import Optional
 
+from kimmdy.constants import FFFUNC
 from kimmdy.parsing import read_top
 from kimmdy.topology.atomic import (
     AngleId,
@@ -38,6 +39,9 @@ class FF:
 
         ffdir: Optional[Path] = top["ffdir"]
 
+        if defaults := get_top_section(top, "defaults"):
+            self.defaults = defaults
+
         atomtypes = get_top_section(top, "atomtypes")
         if atomtypes is not None:
             for l in atomtypes:
@@ -67,7 +71,7 @@ class FF:
                 dihedraltype = DihedralType.from_top_line(l)
                 # proper dihedrals can be defined multiple times
                 # with a different phase
-                if dihedraltype.funct == "4":
+                if dihedraltype.funct == FFFUNC["mult_improper_dihedral"]:
                     self.improper_dihedraltypes[
                         (dihedraltype.i, dihedraltype.j, dihedraltype.k, dihedraltype.l)
                     ] = dihedraltype

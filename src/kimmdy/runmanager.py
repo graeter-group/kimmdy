@@ -544,7 +544,11 @@ class RunManager:
         )
 
     def _run_md(
-        self, instance: str, files: TaskFiles, continue_md: bool = False
+        self,
+        instance: str,
+        files: TaskFiles,
+        continue_md: bool = False,
+        slow_growth=False,
     ) -> TaskFiles:
         """General MD simulation"""
         logger = files.logger
@@ -614,6 +618,12 @@ class RunManager:
         except CalledProcessError as e:
             write_time_marker(files.outputdir / MARK_FAILED, "failed")
             logger.error(f"Error occured during MD {instance}:\n{e}")
+            if slow_growth:
+                logger.error(
+                    "Note: slow growth of pairs is only supported by >= "
+                    "gromacs 2023.2. To disable morphing pairs in config:"
+                    "md.changer.coordinates.slow_growth_pairs = false"
+                )
             raise e
 
         logger.info(f"Done with MD {instance}")
@@ -799,7 +809,11 @@ class RunManager:
                 if self.config.changer.coordinates.slow_growth:
                     # Create a slow growth topology for sub-task run_md, afterwards, top will be reset properly
                     self.top.update_parameters(focus_nrs)
-                    top_merge = merge_top_slow_growth(top_initial, deepcopy(self.top))
+                    top_merge = merge_top_slow_growth(
+                        top_initial,
+                        deepcopy(self.top),
+                        morph_pairs=self.config.changer.coordinates.slow_growth_pairs,
+                    )
                     top_merge_path = files.outputdir / self.config.top.name.replace(
                         ".", "_mod."
                     )
@@ -807,7 +821,10 @@ class RunManager:
                     self.latest_files["top"] = top_merge_path
                 instance = self.config.changer.coordinates.md
                 task = Task(
-                    self, f=self._run_md, kwargs={"instance": instance}, out=instance
+                    self,
+                    f=self._run_md,
+                    kwargs={"instance": instance, "slow_growth": True},
+                    out=instance,
                 )
                 md_files = task()
                 if md_files is not None:

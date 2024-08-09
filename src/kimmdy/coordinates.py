@@ -8,7 +8,7 @@ from typing import Optional, Union
 import MDAnalysis as mda
 import numpy as np
 
-from kimmdy.constants import REACTIVE_MOLECULEYPE
+from kimmdy.constants import REACTIVE_MOLECULEYPE, FFFUNC
 from kimmdy.parsing import read_plumed, write_plumed
 from kimmdy.recipe import Place
 from kimmdy.tasks import TaskFiles
@@ -17,6 +17,7 @@ from kimmdy.topology.atomic import (
     Bond,
     Dihedral,
     DihedralType,
+    Pair,
     Exclusion,
     ImproperDihedralId,
     Interaction,
@@ -67,8 +68,8 @@ def place_atom(
     trr_out = files.outputdir / "coord_mod.trr"
     gro_out = files.outputdir / "coord_mod.gro"
 
-    u.atoms.write(trr_out)
-    u.atoms.write(gro_out)
+    u.atoms.write(trr_out)  # type: ignore
+    u.atoms.write(gro_out)  # type: ignore
 
     files.output["trr"] = trr_out
     files.output["gro"] = gro_out
@@ -104,7 +105,9 @@ def get_explicit_MultipleDihedrals(
 
     type_key = [mol.atoms[id].type for id in dihedral_key]
 
-    multiple_dihedrals = MultipleDihedrals(*dihedral_key, "9", {})
+    multiple_dihedrals = MultipleDihedrals(
+        *dihedral_key, FFFUNC["mult_proper_dihedral"], {}
+    )
     for periodicity in range(1, periodicity_max + 1):
         match_obj = match_atomic_item_to_atomic_type(
             type_key, ff.proper_dihedraltypes, str(periodicity)
@@ -113,7 +116,7 @@ def get_explicit_MultipleDihedrals(
             assert isinstance(match_obj, DihedralType)
             multiple_dihedrals.dihedrals[str(periodicity)] = Dihedral(
                 *dihedral_key,
-                funct="9",
+                funct=FFFUNC["mult_proper_dihedral"],
                 c0=match_obj.c0,
                 c1=match_obj.c1,
                 periodicity=match_obj.periodicity,
@@ -229,7 +232,7 @@ def merge_dihedrals(
         assert type(parameterizedB) == Dihedral or type(parameterizedB) == DihedralType
         dihedralmerge = Dihedral(
             *dihedral_key,
-            funct="9",
+            funct=funct,
             c0=parameterizedB.c0,
             c1="0.00",
             periodicity=parameterizedB.periodicity,
@@ -248,9 +251,126 @@ def merge_top_moleculetypes_slow_growth(
     molA: MoleculeType,
     molB: MoleculeType,
     ff: FF,
+    morph_pairs: bool,
 ) -> MoleculeType:
     """Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation"""
-    hyperparameters = {"morse_well_depth": 300}  # [kJ mol-1]
+
+    def get_LJ_parameters(idx1: str, idx2: str):
+        """Calculate LJ terms sigma and epsilon from atom types"""
+
+        comb_rule = ff.defaults[0][1]
+        # fudgeLJ = ff.defaults[0][3] # could be used to compensate fudge in pairs
+
+        type1 = ff.atomtypes[molB.atoms[idx1].type]
+        type2 = ff.atomtypes[molB.atoms[idx2].type]
+
+        if comb_rule == "1":
+            v = np.sqrt(float(type1.sigma) * float(type2.sigma))
+            w = np.sqrt(float(type1.epsilon) * float(type2.epsilon))
+        elif comb_rule == "2":
+            v = 0.5 * (float(type1.sigma) + float(type2.sigma))
+            w = np.sqrt(float(type1.epsilon) * float(type2.epsilon))
+        elif comb_rule == "3":
+            v = np.sqrt(float(type1.sigma) * float(type2.sigma))
+            w = np.sqrt(float(type1.epsilon) * float(type2.epsilon))
+        else:
+            raise ValueError("Unknown combination rule of forcefield")
+
+        return v, w
+
+    def make_pair(idx1: str, idx2: str, bind: bool) -> Pair:
+        """Generates morphing pair interaction
+
+        If it is for a binding event, the pair is vanishing, as it will be an
+        exclusion once bound. If a bond is breaking, the pair interaction
+        is slowly turned on, as it was excluded previously.
+
+        Parameters
+        ----------
+        idx1 : str
+            Atom one
+        idx2 : str
+            Atom two
+        bind : bool
+            Binding or breaking event. Determines morphing direction.
+
+        Returns
+        -------
+        Pair
+            Morphing pair
+        """
+        v, w = get_LJ_parameters(idx1, idx2)
+        c_kwargs = dict(
+            zip(
+                [f"c{i}" for i in range(4)],
+                [f"{0.0:.5f}" for _ in range(4)],
+            )
+        )
+        if morph_pairs:
+            # Bind: pair interaction turning off
+            if bind:
+                c_kwargs["c0"] = f"{v:.5f}"
+                c_kwargs["c1"] = f"{w:.5f}"
+            # Break: pair interaction turning on
+            else:
+                c_kwargs["c2"] = f"{v:.5f}"
+                c_kwargs["c3"] = f"{w:.5f}"
+
+        return Pair(idx1, idx2, funct=ff.defaults[0][0], **c_kwargs)
+
+    def merge_pairs(break_pair: Optional[Pair], bind_pair: Optional[Pair]):
+        """Merges two morphing pairs into a morphing pair for slow-growth.
+        Takes starting state of break_pair and end state of bind_pair.
+
+        Parameters
+        ----------
+        break_pair : Optional[Pair]
+            Pair for breaking event
+        bind_pair : Optional[Pair]
+            Pair for binding event
+
+        Returns
+        -------
+        Pair
+            Merged pair containing four parameters.
+        """
+
+        assert len(ps := list(filter(lambda x: x, (break_pair, bind_pair)))) > 0
+        ai = ps[0].ai  # type: ignore
+        aj = ps[0].aj  # type: ignore
+        funct = ps[0].funct  # type: ignore
+
+        for p in ps:
+            assert p.c0 is not None, "Pair must contain c0"  # type: ignore
+            assert p.c1 is not None, "Pair must contain c1"  # type: ignore
+            assert p.c2 is not None, "Pair must contain c2"  # type: ignore
+            assert p.c3 is not None, "Pair must contain c3"  # type: ignore
+
+        if break_pair and bind_pair:
+            assert (
+                break_pair.funct == bind_pair.funct
+            ), "Pair functional must be the same to interpolate"
+            assert (break_pair.ai == bind_pair.ai) or (
+                break_pair.ai == bind_pair.aj
+            ), "Atoms must be the same in pairs to interpolate between"
+            assert (break_pair.aj == bind_pair.ai) or (
+                break_pair.aj == bind_pair.aj
+            ), "Atoms must be the same in pairs to interpolate between"
+
+        return Pair(
+            ai,
+            aj,
+            funct=funct,
+            c0=break_pair.c0 if break_pair else bind_pair.c0,  # type: ignore
+            c1=break_pair.c1 if break_pair else bind_pair.c1,  # type: ignore
+            c2=bind_pair.c2 if bind_pair else break_pair.c2,  # type: ignore
+            c3=bind_pair.c3 if bind_pair else break_pair.c3,  # type: ignore
+        )
+
+    hyperparameters = {
+        "morse_well_depth": 300,  # [kJ mol-1]
+        "beta": 19,  # matches LJ steepness
+    }
 
     # atoms
     for nr in molA.atoms.keys():
@@ -276,6 +396,9 @@ def merge_top_moleculetypes_slow_growth(
     keysB = set(molB.bonds.keys())
     keys = keysA | keysB
 
+    new_pairs_break = {}
+    new_pairs_bind = {}
+
     for key in keys:
         interactionA = molA.bonds.get(key)
         interactionB = molB.bonds.get(key)
@@ -283,7 +406,14 @@ def merge_top_moleculetypes_slow_growth(
         if interactionA != interactionB:
             parameterizedA = get_explicit_or_type(key, interactionA, ff.bondtypes, molA)
             parameterizedB = get_explicit_or_type(key, interactionB, ff.bondtypes, molB)
+
+            # both bonds exist
             if parameterizedA and parameterizedB:
+                assert (
+                    parameterizedA.funct
+                    == parameterizedB.funct
+                    == FFFUNC["harmonic_bond"]
+                ), "In slow-growth, bond functionals need to be harmonic!"
                 molB.bonds[key] = Bond(
                     *key,
                     funct=parameterizedB.funct,
@@ -292,31 +422,23 @@ def merge_top_moleculetypes_slow_growth(
                     c2=parameterizedB.c0,
                     c3=parameterizedB.c1,
                 )
+
+            # bond only exists in A -> vanish bond
             elif parameterizedA:
                 atomtypes = [molA.atoms[atom_id].type for atom_id in key]
                 break_bind_atoms[key[0]] = atomtypes[0]
                 break_bind_atoms[key[1]] = atomtypes[1]
-                # use combination rule type 2 (typically used by amber force fields)
-                sigmas = [ff.atomtypes[at].sigma for at in atomtypes]
-                sigmaij = 0.5 * (float(sigmas[0]) + float(sigmas[1]))
-                epsilons = [ff.atomtypes[at].epsilon for at in atomtypes]
-                epsilonij = np.sqrt(float(epsilons[0]) * float(epsilons[1]))
-
-                # morse well steepness
-                assert parameterizedA.c1 is not None, f"parameterizedA.c1 is not set"
-                beta = np.sqrt(
-                    float(parameterizedA.c1) / (2 * hyperparameters["morse_well_depth"])
-                )
+                sigmaij, epsilonij = get_LJ_parameters(*key)
 
                 molB.bonds[key] = Bond(
                     *key,
-                    funct="3",
-                    c0=parameterizedA.c0,
-                    c1=f"{hyperparameters['morse_well_depth']:5.3f}",
-                    c2=f"{beta:5.3f}",
-                    c3=f"{sigmaij*1.12:7.5f}",  # sigmaij* 1.12 = LJ minimum
-                    c4=f"{epsilonij:7.5f}",  # well depth is epsilonij
-                    c5=f"{beta:5.3f}",
+                    funct=FFFUNC["morse_bond"],
+                    c0=parameterizedA.c0,  # b
+                    c1=f"{hyperparameters['morse_well_depth']:.5f}",  # D
+                    c2=f"{hyperparameters['beta']:.5f}",  # beta
+                    c3=f"{sigmaij*1.12:.5f}",  # sigmaij* 1.12 = LJ minimum
+                    c4=f"{0.0:.5f}",  # well depth -> zero
+                    c5=f"{0.0:.5f}",
                 )
 
                 # update bound_to
@@ -324,37 +446,74 @@ def merge_top_moleculetypes_slow_growth(
                 atompair[0].bound_to_nrs.append(atompair[1].nr)
                 atompair[1].bound_to_nrs.append(atompair[0].nr)
 
+                # Find all neighbors of the bond
+                neighbor_sides = []
+                for idx in key:
+                    bonds = list(filter(lambda b: idx in b, keysB))
+                    neighbor_set = set()
+                    for b in bonds:
+                        neighbor_set.add(b[0])
+                        neighbor_set.add(b[1])
+                    neighbor_sides.append(neighbor_set)
+                neighbor_set.discard(idx)  # avoid double counting central bond
+
+                # handle vanishing exclusions neighbors1 - key[1]
+                for a1 in neighbor_sides[0]:
+                    pk = tuple(sorted((a1, key[1]), key=int))
+                    new_pairs_break[pk] = make_pair(*pk, bind=False)
+
+                # handle vanishing exclusions neighbors2 - key[0]
+                for a2 in neighbor_sides[1]:
+                    pk = tuple(sorted((a2, key[0]), key=int))
+                    new_pairs_break[pk] = make_pair(*pk, bind=False)
+
+            # bond only exists in B -> create bond
             elif parameterizedB:
                 atomtypes = [molB.atoms[atom_id].type for atom_id in key]
                 break_bind_atoms[key[0]] = atomtypes[0]
                 break_bind_atoms[key[1]] = atomtypes[1]
-                # use combination rule type 2 (typically used by amber force fields)
-                sigmas = [ff.atomtypes[at].sigma for at in atomtypes]
-                sigmaij = 0.5 * (float(sigmas[0]) + float(sigmas[1]))
-                epsilons = [ff.atomtypes[at].epsilon for at in atomtypes]
-                epsilonij = np.sqrt(float(epsilons[0]) * float(epsilons[1]))
-                # morse well steepness
-                assert parameterizedB.c1 is not None, f"parameterizedB.c1 is not set"
-                beta = np.sqrt(
-                    float(parameterizedB.c1) / (2 * hyperparameters["morse_well_depth"])
-                )
+                sigmaij, epsilonij = get_LJ_parameters(*key)
+
                 molB.bonds[key] = Bond(
                     *key,
-                    funct="3",
-                    c0=f"{sigmaij*1.12:7.5f}",  # sigmaij* 1.12 = LJ minimum
-                    c1=f"{epsilonij:7.5f}",  # well depth is epsilonij
-                    c2=f"{beta:5.3f}",
-                    c3=parameterizedB.c0,
-                    c4=f"{hyperparameters['morse_well_depth']:5.3f}",
-                    c5=f"{beta:5.3f}",
+                    funct=FFFUNC["morse_bond"],
+                    c0=f"{sigmaij*1.12:.5f}",  # sigmaij* 1.12 = LJ minimum
+                    c1=f"{0.0:.5f}",  # well depth is epsilonij
+                    c2=f"{0.0:.5f}",
+                    c3=parameterizedB.c0,  # b
+                    c4=f"{hyperparameters['morse_well_depth']:.5f}",  # D
+                    c5=f"{hyperparameters['beta']:.5f}",  # beta
                 )
 
-    # pairs and exclusions
-    exclusions = molB.exclusions
-    for key in keysA - keysB:
-        molB.pairs.pop(key, None)
-        exclusion = Exclusion(*key)
-        exclusions[key] = exclusion
+                # Find all neighbors of the bond
+                neighbor_sides = []
+                for idx in key:
+                    bonds = list(filter(lambda b: idx in b, keysA))
+                    neighbor_set = set()
+                    for b in bonds:
+                        neighbor_set.add(b[0])
+                        neighbor_set.add(b[1])
+                    neighbor_sides.append(neighbor_set)
+                neighbor_set.discard(idx)  # avoid double counting central bond
+
+                # handle growing exclusions neighbors1 - key[1]
+                for a1 in neighbor_sides[0]:
+                    pk = tuple(sorted((a1, key[1]), key=int))
+                    new_pairs_bind[pk] = make_pair(*pk, bind=True)
+
+                # handle growing exclusions neighbors2 - key[0]
+                for a2 in neighbor_sides[1]:
+                    pk = tuple(sorted((a2, key[0]), key=int))
+                    new_pairs_bind[pk] = make_pair(*pk, bind=True)
+
+    for key in set(new_pairs_bind.keys()) | set(new_pairs_break.keys()):
+        break_pair = new_pairs_break.get(key)
+        bind_pair = new_pairs_bind.get(key)
+
+        morph_pair = merge_pairs(break_pair, bind_pair)
+
+        molB.pairs[key] = morph_pair
+        molB.exclusions[key] = Exclusion(*key)
 
     # angles
     keys = set(molA.angles.keys()) | set(molB.angles.keys())
@@ -381,7 +540,7 @@ def merge_top_moleculetypes_slow_growth(
             elif parameterizedA:
                 molB.angles[key] = Angle(
                     *key,
-                    funct="1",
+                    funct=FFFUNC["harmonic_angle"],
                     c0=parameterizedA.c0,
                     c1=parameterizedA.c1,
                     c2=parameterizedA.c0,
@@ -390,7 +549,7 @@ def merge_top_moleculetypes_slow_growth(
             elif parameterizedB:
                 molB.angles[key] = Angle(
                     *key,
-                    funct="1",
+                    funct=FFFUNC["harmonic_angle"],
                     c0=parameterizedB.c0,
                     c1="0.00",
                     c2=parameterizedB.c0,
@@ -427,7 +586,9 @@ def merge_top_moleculetypes_slow_growth(
                 else set()
             )
 
-            molB.proper_dihedrals[key] = MultipleDihedrals(*key, "9", {})
+            molB.proper_dihedrals[key] = MultipleDihedrals(
+                *key, FFFUNC["mult_proper_dihedral"], {}
+            )
             periodicities = keysA | keysB
             for periodicity in periodicities:
                 assert isinstance(periodicity, str)
@@ -450,13 +611,11 @@ def merge_top_moleculetypes_slow_growth(
                     ff.proper_dihedraltypes,
                     molA,
                     molB,
-                    "9",
+                    FFFUNC["mult_proper_dihedral"],
                     periodicity,
                 )
 
     # improper dihedrals
-    # TODO: duplicate of proper dihedrals, could refactor
-
     keys = set(molA.improper_dihedrals.keys()) | set(molB.improper_dihedrals.keys())
     for key in keys:
         multiple_dihedralsA = molA.improper_dihedrals.get(key)
@@ -480,7 +639,9 @@ def merge_top_moleculetypes_slow_growth(
                 else set()
             )
 
-            molB.improper_dihedrals[key] = MultipleDihedrals(*key, "9", {})
+            molB.improper_dihedrals[key] = MultipleDihedrals(
+                *key, FFFUNC["mult_improper_dihedral"], {}
+            )
             periodicities = keysA | keysB
             for periodicity in periodicities:
                 assert isinstance(periodicity, str)
@@ -503,13 +664,11 @@ def merge_top_moleculetypes_slow_growth(
                     ff.improper_dihedraltypes,
                     molA,
                     molB,
-                    "9",
+                    FFFUNC["mult_improper_dihedral"],
                     periodicity,
                 )
 
     # amber fix for breaking/binding atom types without LJ potential
-    # breakpoint()
-
     for k, v in break_bind_atoms.items():
         if v in ["HW", "HO"]:
             molB.atoms[k].type = "H1"
@@ -522,16 +681,17 @@ def merge_top_moleculetypes_slow_growth(
     return molB
 
 
-def merge_top_slow_growth(topA: Topology, topB: Topology) -> Topology:
+def merge_top_slow_growth(
+    topA: Topology, topB: Topology, morph_pairs: bool
+) -> Topology:
     """Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation.
-
-
-    TODO: for now this assumes that only one moleculeype (the first, index 0) is of interest.
+    For now this assumes that only one moleculeype is of interest.
     """
 
     molA = topA.moleculetypes[REACTIVE_MOLECULEYPE]
     molB = topB.moleculetypes[REACTIVE_MOLECULEYPE]
-    molB = merge_top_moleculetypes_slow_growth(molA, molB, topB.ff)
+    molB = merge_top_moleculetypes_slow_growth(molA, molB, topB.ff, morph_pairs)
+    topB._update_dict()
 
     return topB
 

@@ -128,18 +128,18 @@ def test_merge_prm_top(arranged_tmp_path):
     top_B = Topology(read_top(Path("topol_stateB.top")))
     top_merge_ref = Topology(read_top(Path("topol_FEP.top")))
 
-    top_merge = merge_top_slow_growth(top_A, top_B)
+    top_merge = merge_top_slow_growth(top_A, top_B, morph_pairs=True)
 
     assert top_merge.atoms == top_merge_ref.atoms
     assert top_merge.bonds.keys() == top_merge_ref.bonds.keys()
     assert top_merge.angles.keys() == top_merge_ref.angles.keys()
     assert top_merge.pairs.keys() == top_merge_ref.pairs.keys()
+    assert top_merge.exclusions.keys() == top_merge_ref.exclusions.keys()
     assert top_merge.proper_dihedrals.keys() == top_merge_ref.proper_dihedrals.keys()
     assert (
         top_merge.improper_dihedrals.keys() == top_merge_ref.improper_dihedrals.keys()
     )
-    assert len(top_merge.exclusions) == 1
-    assert top_merge.exclusions == top_merge_ref.exclusions
+    assert len(top_merge.exclusions) == 7
 
     assert top_merge.bonds[("19", "27")].funct == "3"
     assert top_merge.bonds[("26", "27")].funct == "3"

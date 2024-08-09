@@ -309,6 +309,12 @@
               "description": "MD step from the 'mds' section that is used for relaxation MDs",
               "pytype": "str"
             },
+            "slow_growth_pairs": {
+              "type": "boolean",
+              "description": "Whether to properly treat pairs during slow growth. Does not work with gromacs < 2023.2",
+              "pytype": "bool",
+              "default": true
+            },
             "slow_growth": {
               "type": "boolean",
               "description": "Whether the chosen MD step is a slow growth/free-energy simulation",

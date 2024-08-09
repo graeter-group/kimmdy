@@ -9,7 +9,7 @@ jobs:
   test:
     if:  github.event.label.name == 'testthis' && !startsWith(github.head_ref, 'release-please-')
     runs-on: ubuntu-latest
-    container: riedmiki/gromacs-plumed-python:2021
+    container: riedmiki/gromacs-plumed-python:2023.5-plumed
     steps:
       - uses: actions/checkout@v4
       - name: run tox

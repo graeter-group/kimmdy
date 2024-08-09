@@ -1,13 +1,9 @@
 [
   {
-    "listing": "/guide/how-to/index.html",
+    "listing": "/guide/explanation/index.html",
     "items": [
-      "/guide/how-to/analyze.html",
-      "/guide/how-to/contribute.html",
-      "/guide/how-to/examples.html",
-      "/guide/how-to/hcp.html",
-      "/guide/how-to/install-ml-plugins.html",
-      "/guide/how-to/reaction_only.html"
+      "/guide/explanation/components.html",
+      "/guide/explanation/topology.html"
     ]
   },
   {
@@ -20,10 +16,14 @@
     ]
   },
   {
-    "listing": "/guide/explanation/index.html",
+    "listing": "/guide/how-to/index.html",
     "items": [
-      "/guide/explanation/components.html",
-      "/guide/explanation/topology.html"
+      "/guide/how-to/analyze.html",
+      "/guide/how-to/contribute.html",
+      "/guide/how-to/examples.html",
+      "/guide/how-to/hcp.html",
+      "/guide/how-to/install-ml-plugins.html",
+      "/guide/how-to/reaction_only.html"
     ]
   }
 ]
