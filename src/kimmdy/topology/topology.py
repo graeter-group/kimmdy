@@ -5,8 +5,6 @@ from itertools import permutations
 from pathlib import Path
 from typing import Callable, Optional, Union
 
-from numpy import empty
-
 from kimmdy.constants import (
     ATOM_ID_FIELDS,
     ATOMTYPE_BONDORDER_FLAT,
@@ -85,7 +83,7 @@ class MoleculeType:
             {}
         )
         self.settles: dict[str, Settle] = {}
-        self.exclusions: dict[tuple[str, str], Exclusion] = {}
+        self.exclusions: dict[str, Exclusion] = {}
 
         self._parse_atoms()
         self._parse_bonds()
@@ -124,6 +122,8 @@ class MoleculeType:
         {len(self.bonds)} bonds,
         {len(self.angles)} angles,
         {len(self.pairs)} pairs,
+        {len(self.settles)} settles,
+        {len(self.exclusions)} exclusions,
         {len(self.proper_dihedrals)} proper dihedrals
         {len(self.improper_dihedrals)} improper dihedrals
         {len(self.position_restraints)} position restraints
@@ -236,7 +236,7 @@ class MoleculeType:
             return
         for _, l in enumerate(ls):
             exclusion = Exclusion.from_top_line(l)
-            self.exclusions[(l[0], l[1])] = exclusion
+            self.exclusions[exclusion.ai] = exclusion
 
     def _initialize_graph(self):
         """Add a list of atom nrs bound to an atom to each atom."""
@@ -312,7 +312,7 @@ class MoleculeType:
 
     def _get_atom_pairs(self, _: str) -> list[tuple[str, str]]:
         raise NotImplementedError(
-            "get_atom_pairs is not implementes. Get the pairs as the endpoints of dihedrals instead."
+            "get_atom_pairs is not implemented. Get the pairs as the endpoints of dihedrals instead."
         )
 
     def _get_atom_angles(self, atom_nr: str) -> list[tuple[str, str, str]]:
@@ -712,6 +712,7 @@ class Topology:
         self.bonds = self.reactive_molecule.bonds
         self.angles = self.reactive_molecule.angles
         self.exclusions = self.reactive_molecule.exclusions
+        self.settles = self.reactive_molecule.settles
         self.proper_dihedrals = self.reactive_molecule.proper_dihedrals
         self.improper_dihedrals = self.moleculetypes[
             REACTIVE_MOLECULEYPE
@@ -893,13 +894,6 @@ class Topology:
 
         subsections = section["subsections"]
         for k in list(subsections.keys()):
-            # # if atomics section is empty,
-            # # remove the subsection from the topology
-            # if atomics[k] == []:
-            #     logger.debug(f"Removing subsection {k} from {moleculetype_name}")
-            #     del subsections[k]
-            #     continue
-
             v = subsections[k]
             condition = v.get("condition")
             if condition is not None:
@@ -1323,6 +1317,7 @@ class Topology:
                         "not registed in moleculetype.radicals"
                     )
 
+        # TODO: Do we still need this with grappa?
         # quickfix for jumping hydrogens
         # to make them adopt the correct residuetype and atomtype
         # when bound to a new heavy atom
@@ -1403,7 +1398,7 @@ class Topology:
 
         # add proper and improper dihedrals
         # add proper dihedrals and pairs
-        # TODO; for now this assumes function type 9 for all dihedrals
+        # TODO: for now this assumes function type 9 for all dihedrals
         # and adds all possible dihedrals (and pairs)
         # later we should check the ff if there are multiple
         # dihedrals for the same atoms with different periodicities.
@@ -1445,3 +1440,18 @@ class Topology:
                     periodicity=value.c2,
                 )
             )
+
+
+        # remove settles and explicit exclusions
+        # those are used by solvent molecules
+        # but if a solvent molecule get's bounds to other parts
+        # of the reactive molecule it is no longer a solvent molecule
+        for ai in atompair_nrs:
+            exclusion = reactive_moleculetype.exclusions.get(ai)
+            if exclusion is not None:
+                reactive_moleculetype.exclusions.pop(ai)
+            settles = reactive_moleculetype.settles.get(ai)
+            if settles is not None:
+                reactive_moleculetype.settles.pop(ai)
+
+
