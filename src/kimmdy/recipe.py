@@ -160,7 +160,7 @@ class Place(RecipeStep):
         """Two Placements are equal if their atom indices are equal and they have the same new coordinates."""
 
         if not isinstance(other, Place) or type(self) != type(other):
-            logger.warning(
+            logger.debug(
                 f"Comparing RecipeSteps with different types: {type(self)} and {type(other)}. Returning False."
             )
             return False
@@ -312,7 +312,7 @@ class BondOperation(RecipeStep):
         """Two BondOperations are equal if their atom indices are equal and they are of the same type."""
 
         if not isinstance(other, BondOperation) or type(self) != type(other):
-            logger.warning(
+            logger.debug(
                 f"Comparing RecipeSteps with different types: {type(self)} and {type(other)}. Returning False."
             )
             return False
@@ -396,7 +396,7 @@ class CustomTopMod(RecipeStep):
         """Two CustomTopMods are considered equal if their functions have the same name and hash."""
 
         if not isinstance(other, CustomTopMod):
-            logger.warning(
+            logger.debug(
                 f"Comparing RecipeSteps with different types: {type(self)} and {type(other)}. Returning False."
             )
             return False
@@ -405,7 +405,7 @@ class CustomTopMod(RecipeStep):
     def __almost_eq__(self, other):
         """For reading from a csv file and testing, two CustomTopMods are considered equal if their functions have the same name."""
         if not isinstance(other, CustomTopMod):
-            logger.warning(
+            logger.debug(
                 f"Comparing RecipeSteps with different types: {type(self)} and {type(other)}. Returning False."
             )
             return False
