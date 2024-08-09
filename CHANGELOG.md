@@ -1,6 +1,20 @@
 # Changelog
 
 
+## [6.9.1](https://github.com/graeter-group/kimmdy/compare/v6.9.0...v6.9.1) (2024-08-09)
+
+
+### Bug Fixes
+
+* bug in output file discovery ([9336a91](https://github.com/graeter-group/kimmdy/commit/9336a9111cb6167ba2fa6aecd48ce5272c16cb20))
+* drop dill requirement ([ff3a2c2](https://github.com/graeter-group/kimmdy/commit/ff3a2c241faa5bb9e80065e9b7dcb83f04bc7dc7))
+* more stable slow growth parameters ([aedffe0](https://github.com/graeter-group/kimmdy/commit/aedffe050b1a0b34e993da91cb918ea5b0decc7a))
+* prevent log spam ([2b51a0e](https://github.com/graeter-group/kimmdy/commit/2b51a0ed204caf6769c1ba899aa540a99f1595e0))
+* prevent log spam ([38cbf07](https://github.com/graeter-group/kimmdy/commit/38cbf075071b3c269475d2cac21afa93b8d12195))
+* proper pairs in slow-growth ([#465](https://github.com/graeter-group/kimmdy/issues/465)) ([56db2ce](https://github.com/graeter-group/kimmdy/commit/56db2ce14713b5f955f23dbf3b6ec4260a906473))
+* remove unreachable code ([af0f11d](https://github.com/graeter-group/kimmdy/commit/af0f11da271ae04ba445db06504fad1965cecc70))
+* update task names for restarting changed in [#422](https://github.com/graeter-group/kimmdy/issues/422) ([d31bc2e](https://github.com/graeter-group/kimmdy/commit/d31bc2e28cae7e1ad76614dc66bcb10cbb2af1fe))
+
 ## [6.9.0](https://github.com/graeter-group/kimmdy/compare/v6.8.3...v6.9.0) (2024-07-11)
 
 
