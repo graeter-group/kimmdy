@@ -305,16 +305,10 @@ def read_top(
             else:
                 if parent_section is not None:
                     # add empty section as subsection
-                    if section in CHILD_SECTIONS:
-                        if d[parent_section]["subsections"].get(section) is None:
-                            d[parent_section]["subsections"][section] = empty_section(
-                                condition
-                            )
-                    # add regular section and exit parent_section by setting it to None
-                    else:
-                        parent_section = None
-                        if d.get(section) is None:
-                            d[section] = empty_section(condition)
+                    if d[parent_section]["subsections"].get(section) is None:
+                        d[parent_section]["subsections"][section] = empty_section(
+                            condition
+                        )
                 else:
                     # add regular section
                     if d.get(section) is None:

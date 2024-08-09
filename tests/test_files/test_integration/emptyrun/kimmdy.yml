@@ -2,7 +2,7 @@ name: 'emptyrun_001'
 dryrun: false
 max_tasks: 0
 gromacs_alias: 'gmx'
-gmx_mdrun_flags: -maxh 24 -dlb yes -nt 8 -npme 0 -ntmpi 1
+gmx_mdrun_flags: -maxh 24 -dlb yes
 top: 'emptyrun.txt'
 gro: 'emptyrun.txt'
 ndx: 'emptyrun.txt'

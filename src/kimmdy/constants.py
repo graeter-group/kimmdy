@@ -1,5 +1,5 @@
 """
-Comstants used throughout KIMMDY
+Constants used throughout KIMMDY
 """
 
 MARK_STARTED = ".kimmdy_started"
@@ -17,6 +17,17 @@ ATOM_ID_FIELDS = {
     "exclusions": [0, 1, 2],
     "position_restraints": [0],
     "dihedral_restraints": [0, 1, 2, 3],
+}
+
+# see https://manual.gromacs.org/current/reference-manual/topologies/topology-file-formats.html
+FFFUNC = {
+    "mult_proper_dihedral": "9",
+    "mult_improper_dihedral": "4",
+    "harmonic_bond": "1",
+    "morse_bond": "3",
+    "harmonic_angle": "1",
+    "pair": "1",
+    "coulomb_pair": "2",
 }
 
 RESNR_ID_FIELDS = {

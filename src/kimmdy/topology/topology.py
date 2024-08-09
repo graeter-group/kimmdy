@@ -10,6 +10,7 @@ from kimmdy.constants import (
     ATOMTYPE_BONDORDER_FLAT,
     REACTIVE_MOLECULEYPE,
     RESNR_ID_FIELDS,
+    FFFUNC,
 )
 from kimmdy.parsing import TopologyDict, empty_section
 from kimmdy.plugins import BasicParameterizer, Parameterizer
@@ -188,7 +189,7 @@ class MoleculeType:
         for l in ls:
             dihedral = Dihedral.from_top_line(l)
             key = (dihedral.ai, dihedral.aj, dihedral.ak, dihedral.al)
-            if dihedral.funct == "4":
+            if dihedral.funct == FFFUNC["mult_improper_dihedral"]:
                 if self.improper_dihedrals.get(key) is None:
                     self.improper_dihedrals[key] = MultipleDihedrals(
                         *key, dihedral.funct, dihedrals={}
@@ -255,17 +256,22 @@ class MoleculeType:
             "Trying to infer radical status based on AMBER(!!) atomtype bond order."
         )
         self.radicals = {}
+        error_atoms = set()
         for atom in self.atoms.values():
             bo = ATOMTYPE_BONDORDER_FLAT.get(atom.type)
             if bo is None:
-                logger.warning(
-                    f"Atomtype {atom.type} not found in AMBER atomtypes. Cannot infer radical status."
-                )
+                error_atoms.add(atom.type)
             if bo and bo > len(atom.bound_to_nrs):
                 self.radicals[atom.nr] = atom
                 atom.is_radical = True
             else:
                 atom.is_radical = False
+        if len(error_atoms) > 0:
+            logger.warning(
+                "Some atomtypes not found in AMBER atomtypes. Cannot infer radical status.\n"
+                "Missing atom types:\n"
+                f"{error_atoms}"
+            )
         return None
 
     def _update_atomics_dict(self):
@@ -463,24 +469,30 @@ class MoleculeType:
         for atom in self.atoms.values():
             keys = self._get_atom_bonds(atom.nr)
             for key in keys:
-                self.bonds[key] = Bond(key[0], key[1], "1")
+                self.bonds[key] = Bond(key[0], key[1], FFFUNC["harmonic_bond"])
 
         # angles
         for atom in self.atoms.values():
             keys = self._get_atom_angles(atom.nr)
             for key in keys:
-                self.angles[key] = Angle(key[0], key[1], key[2], "1")
+                self.angles[key] = Angle(
+                    key[0], key[1], key[2], FFFUNC["harmonic_angle"]
+                )
 
         # dihedrals and pass
         for atom in self.atoms.values():
             keys = self._get_atom_proper_dihedrals(atom.nr)
             for key in keys:
                 self.proper_dihedrals[key] = MultipleDihedrals(
-                    *key, "9", dihedrals={"": Dihedral(*key, "9")}
+                    *key,
+                    FFFUNC["mult_proper_dihedral"],
+                    dihedrals={"": Dihedral(*key, FFFUNC["mult_proper_dihedral"])},
                 )
-                pairkey: tuple[str, str] = tuple(str(x) for x in sorted([key[0], key[3]], key=int))  # type: ignore
+                pairkey: tuple[str, str] = tuple(
+                    str(x) for x in sorted([key[0], key[3]], key=int)
+                )  # type: ignore
                 if self.pairs.get(pairkey) is None:
-                    self.pairs[pairkey] = Pair(pairkey[0], pairkey[1], "1")
+                    self.pairs[pairkey] = Pair(pairkey[0], pairkey[1], FFFUNC["pair"])
 
         for atom in self.atoms.values():
             impropers = self._get_atom_improper_dihedrals(atom.nr, ff)
@@ -490,11 +502,11 @@ class MoleculeType:
                     periodicity = improper.c2
                 self.improper_dihedrals[key] = MultipleDihedrals(
                     *key,
-                    "4",
+                    FFFUNC["mult_improper_dihedral"],
                     dihedrals={
                         "": Dihedral(
                             *key,
-                            "4",
+                            FFFUNC["mult_improper_dihedral"],
                             c0=improper.c0,
                             c1=improper.c1,
                             periodicity=periodicity,
@@ -1370,7 +1382,7 @@ class Topology:
 
         # bonds
         # add bond
-        bond = Bond(atompair_nrs[0], atompair_nrs[1], "1")
+        bond = Bond(atompair_nrs[0], atompair_nrs[1], FFFUNC["harmonic_bond"])
         reactive_moleculetype.bonds[atompair_nrs] = bond
         logging.info(f"added bond: {bond}")
 
@@ -1380,7 +1392,9 @@ class Topology:
         ) + reactive_moleculetype._get_atom_angles(atompair_nrs[1])
         for key in angle_keys:
             if reactive_moleculetype.angles.get(key) is None:
-                reactive_moleculetype.angles[key] = Angle(key[0], key[1], key[2], "1")
+                reactive_moleculetype.angles[key] = Angle(
+                    key[0], key[1], key[2], FFFUNC["harmonic_angle"]
+                )
 
         # add proper and improper dihedrals
         # add proper dihedrals and pairs
@@ -1394,11 +1408,17 @@ class Topology:
         for key in dihedral_keys:
             if reactive_moleculetype.proper_dihedrals.get(key) is None:
                 reactive_moleculetype.proper_dihedrals[key] = MultipleDihedrals(
-                    *key, "9", dihedrals={"": Dihedral(*key, "9")}
+                    *key,
+                    FFFUNC["mult_proper_dihedral"],
+                    dihedrals={"": Dihedral(*key, FFFUNC["mult_proper_dihedral"])},
                 )
-            pairkey: tuple[str, str] = tuple(str(x) for x in sorted([key[0], key[3]], key=int))  # type: ignore
+            pairkey: tuple[str, str] = tuple(
+                str(x) for x in sorted([key[0], key[3]], key=int)
+            )  # type: ignore
             if reactive_moleculetype.pairs.get(pairkey) is None:
-                reactive_moleculetype.pairs[pairkey] = Pair(pairkey[0], pairkey[1], "1")
+                reactive_moleculetype.pairs[pairkey] = Pair(
+                    pairkey[0], pairkey[1], FFFUNC["pair"]
+                )
 
         # improper dihedral
         dihedral_k_v = reactive_moleculetype._get_atom_improper_dihedrals(
@@ -1409,10 +1429,16 @@ class Topology:
                 value.c2 = ""
             if reactive_moleculetype.improper_dihedrals.get(key) is None:
                 reactive_moleculetype.improper_dihedrals[key] = MultipleDihedrals(
-                    *key, "4", dihedrals={}
+                    *key, FFFUNC["mult_improper_dihedral"], dihedrals={}
                 )
             reactive_moleculetype.improper_dihedrals[key].dihedrals[value.c2] = (
-                Dihedral(*key, "4", c0=value.c0, c1=value.c1, periodicity=value.c2)
+                Dihedral(
+                    *key,
+                    FFFUNC["mult_improper_dihedral"],
+                    c0=value.c0,
+                    c1=value.c1,
+                    periodicity=value.c2,
+                )
             )
 
 

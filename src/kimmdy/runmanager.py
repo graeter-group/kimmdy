@@ -349,8 +349,8 @@ class RunManager:
                         logger.error(e)
                         raise RuntimeError(e)
 
-            # discover output files
-            for path in files.outputdir.iterdir():
+            # register discovered output files
+            for path in discovered_files:
                 suffix = path.suffix[1:]
                 if suffix in AMBIGUOUS_SUFFS:
                     suffix = path.name
@@ -423,7 +423,7 @@ class RunManager:
         found_run_end = False
         while not self.tasks.empty() and not found_run_end:
             task: Task = self.tasks.queue[0]
-            if task.name == "_restart_task":
+            if task.name == "restart_task":
                 logger.info("Found restart task.")
                 self.tasks.queue.popleft()
                 break
@@ -464,7 +464,7 @@ class RunManager:
                                 logger.info(
                                     f"Found started but not finished task {task_dir}."
                                 )
-                                if completed_tasks[-1].name == "_run_md":
+                                if completed_tasks[-1].name == "run_md":
                                     symlink_dir.unlink(missing_ok=True)
                                     shutil.copytree(
                                         task_dir, self.config.out / task_dir.name
@@ -494,7 +494,7 @@ class RunManager:
 
         # add completed tasks to queue again until a reliable restart point (i.e after MD) is reached
         while completed_tasks:
-            if completed_tasks[-1].name == "_run_md":
+            if completed_tasks[-1].name == "run_md":
                 logger.info(
                     f"Will continue after task {completed_tasks[-1].kwargs['files'].outputdir}"
                 )
@@ -554,7 +554,11 @@ class RunManager:
         )
 
     def _run_md(
-        self, instance: str, files: TaskFiles, continue_md: bool = False
+        self,
+        instance: str,
+        files: TaskFiles,
+        continue_md: bool = False,
+        slow_growth=False,
     ) -> TaskFiles:
         """General MD simulation"""
         logger = files.logger
@@ -624,6 +628,12 @@ class RunManager:
         except CalledProcessError as e:
             write_time_marker(files.outputdir / MARK_FAILED, "failed")
             logger.error(f"Error occured during MD {instance}:\n{e}")
+            if slow_growth:
+                logger.error(
+                    "Note: slow growth of pairs is only supported by >= "
+                    "gromacs 2023.2. To disable morphing pairs in config:"
+                    "md.changer.coordinates.slow_growth_pairs = false"
+                )
             raise e
 
         logger.info(f"Done with MD {instance}")
@@ -809,7 +819,11 @@ class RunManager:
                 if self.config.changer.coordinates.slow_growth:
                     # Create a slow growth topology for sub-task run_md, afterwards, top will be reset properly
                     self.top.update_parameters(focus_nrs)
-                    top_merge = merge_top_slow_growth(top_initial, deepcopy(self.top))
+                    top_merge = merge_top_slow_growth(
+                        top_initial,
+                        deepcopy(self.top),
+                        morph_pairs=self.config.changer.coordinates.slow_growth_pairs,
+                    )
                     top_merge_path = files.outputdir / self.config.top.name.replace(
                         ".", "_mod."
                     )
@@ -817,7 +831,10 @@ class RunManager:
                     self.latest_files["top"] = top_merge_path
                 instance = self.config.changer.coordinates.md
                 task = Task(
-                    self, f=self._run_md, kwargs={"instance": instance}, out=instance
+                    self,
+                    f=self._run_md,
+                    kwargs={"instance": instance, "slow_growth": True},
+                    out=instance,
                 )
                 md_files = task()
                 if md_files is not None:

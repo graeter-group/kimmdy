@@ -2,7 +2,7 @@
 
 `constants`
 
-Comstants used throughout KIMMDY
+Constants used throughout KIMMDY
 
 ## Attributes
 

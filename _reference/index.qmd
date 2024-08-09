@@ -37,7 +37,7 @@ Modules
 | [analysis](analysis.qmd#kimmdy.analysis) | Analysis tools for KIMMDY runs. |
 | [cmd](cmd.qmd#kimmdy.cmd) | Functions for starting KIMMDY either from python or the command line. |
 | [config](config.qmd#kimmdy.config) | Read and validate kimmdy.yml configuration files |
-| [constants](constants.qmd#kimmdy.constants) | Comstants used throughout KIMMDY |
+| [constants](constants.qmd#kimmdy.constants) | Constants used throughout KIMMDY |
 | [coordinates](coordinates.qmd#kimmdy.coordinates) | coordinate, topology and plumed modification functions |
 | [kmc](kmc.qmd#kimmdy.kmc) | Kinetic Monte Carlo (KMC) classes and functions. |
 | [parsing](parsing.qmd#kimmdy.parsing) | All read_<...> and write_<...> functions. |

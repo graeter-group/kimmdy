@@ -1,3 +1,4 @@
+import logging
 import pytest
 import numpy as np
 from numpy.random import default_rng
@@ -128,10 +129,15 @@ def test_frm_no_event(recipe_collection):
 
 def test_compare_extrande_extrande_mod(recipe_collection):
     rng = default_rng(1)
-
-    extrande_list = [extrande(recipe_collection, 1.0, rng=rng) for _ in range(2000)]
+    dummy_logger = logging.Logger("Dummy")
+    dummy_logger.setLevel(logging.DEBUG)
+    extrande_list = [
+        extrande(recipe_collection, 1.0, rng=rng, logger=dummy_logger)
+        for _ in range(2000)
+    ]
     extrande_mod_list = [
-        extrande_mod(recipe_collection, 1.0, rng=rng) for _ in range(2000)
+        extrande_mod(recipe_collection, 1.0, rng=rng, logger=dummy_logger)
+        for _ in range(2000)
     ]
     ext_ts = np.array([r.time_start for r in extrande_list])
     extmod_ts = np.array([r.time_start for r in extrande_mod_list])
