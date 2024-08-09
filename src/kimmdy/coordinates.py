@@ -8,7 +8,7 @@ from typing import Optional, Union
 import MDAnalysis as mda
 import numpy as np
 
-from kimmdy.constants import REACTIVE_MOLECULEYPE
+from kimmdy.constants import REACTIVE_MOLECULEYPE, FFFUNC
 from kimmdy.parsing import read_plumed, write_plumed
 from kimmdy.recipe import Place
 from kimmdy.tasks import TaskFiles
@@ -105,7 +105,9 @@ def get_explicit_MultipleDihedrals(
 
     type_key = [mol.atoms[id].type for id in dihedral_key]
 
-    multiple_dihedrals = MultipleDihedrals(*dihedral_key, "9", {})
+    multiple_dihedrals = MultipleDihedrals(
+        *dihedral_key, FFFUNC["mult_proper_dihedral"], {}
+    )
     for periodicity in range(1, periodicity_max + 1):
         match_obj = match_atomic_item_to_atomic_type(
             type_key, ff.proper_dihedraltypes, str(periodicity)
@@ -114,7 +116,7 @@ def get_explicit_MultipleDihedrals(
             assert isinstance(match_obj, DihedralType)
             multiple_dihedrals.dihedrals[str(periodicity)] = Dihedral(
                 *dihedral_key,
-                funct="9",
+                funct=FFFUNC["mult_proper_dihedral"],
                 c0=match_obj.c0,
                 c1=match_obj.c1,
                 periodicity=match_obj.periodicity,
@@ -230,7 +232,7 @@ def merge_dihedrals(
         assert type(parameterizedB) == Dihedral or type(parameterizedB) == DihedralType
         dihedralmerge = Dihedral(
             *dihedral_key,
-            funct="9",
+            funct=funct,
             c0=parameterizedB.c0,
             c1="0.00",
             periodicity=parameterizedB.periodicity,
@@ -408,7 +410,9 @@ def merge_top_moleculetypes_slow_growth(
             # both bonds exist
             if parameterizedA and parameterizedB:
                 assert (
-                    parameterizedA.funct == parameterizedB.funct == "1"
+                    parameterizedA.funct
+                    == parameterizedB.funct
+                    == FFFUNC["harmonic_bond"]
                 ), "In slow-growth, bond functionals need to be harmonic!"
                 molB.bonds[key] = Bond(
                     *key,
@@ -428,7 +432,7 @@ def merge_top_moleculetypes_slow_growth(
 
                 molB.bonds[key] = Bond(
                     *key,
-                    funct="3",  # Morse potential
+                    funct=FFFUNC["morse_bond"],
                     c0=parameterizedA.c0,  # b
                     c1=f"{hyperparameters['morse_well_depth']:.5f}",  # D
                     c2=f"{hyperparameters['beta']:.5f}",  # beta
@@ -472,7 +476,7 @@ def merge_top_moleculetypes_slow_growth(
 
                 molB.bonds[key] = Bond(
                     *key,
-                    funct="3",  # Morse potential
+                    funct=FFFUNC["morse_bond"],
                     c0=f"{sigmaij*1.12:.5f}",  # sigmaij* 1.12 = LJ minimum
                     c1=f"{0.0:.5f}",  # well depth is epsilonij
                     c2=f"{0.0:.5f}",
@@ -536,7 +540,7 @@ def merge_top_moleculetypes_slow_growth(
             elif parameterizedA:
                 molB.angles[key] = Angle(
                     *key,
-                    funct="1",
+                    funct=FFFUNC["harmonic_angle"],
                     c0=parameterizedA.c0,
                     c1=parameterizedA.c1,
                     c2=parameterizedA.c0,
@@ -545,7 +549,7 @@ def merge_top_moleculetypes_slow_growth(
             elif parameterizedB:
                 molB.angles[key] = Angle(
                     *key,
-                    funct="1",
+                    funct=FFFUNC["harmonic_angle"],
                     c0=parameterizedB.c0,
                     c1="0.00",
                     c2=parameterizedB.c0,
@@ -582,7 +586,9 @@ def merge_top_moleculetypes_slow_growth(
                 else set()
             )
 
-            molB.proper_dihedrals[key] = MultipleDihedrals(*key, "9", {})
+            molB.proper_dihedrals[key] = MultipleDihedrals(
+                *key, FFFUNC["mult_proper_dihedral"], {}
+            )
             periodicities = keysA | keysB
             for periodicity in periodicities:
                 assert isinstance(periodicity, str)
@@ -605,13 +611,11 @@ def merge_top_moleculetypes_slow_growth(
                     ff.proper_dihedraltypes,
                     molA,
                     molB,
-                    "9",
+                    FFFUNC["mult_proper_dihedral"],
                     periodicity,
                 )
 
     # improper dihedrals
-    # TODO: duplicate of proper dihedrals, could refactor
-
     keys = set(molA.improper_dihedrals.keys()) | set(molB.improper_dihedrals.keys())
     for key in keys:
         multiple_dihedralsA = molA.improper_dihedrals.get(key)
@@ -635,7 +639,9 @@ def merge_top_moleculetypes_slow_growth(
                 else set()
             )
 
-            molB.improper_dihedrals[key] = MultipleDihedrals(*key, "9", {})
+            molB.improper_dihedrals[key] = MultipleDihedrals(
+                *key, FFFUNC["mult_improper_dihedral"], {}
+            )
             periodicities = keysA | keysB
             for periodicity in periodicities:
                 assert isinstance(periodicity, str)
@@ -658,7 +664,7 @@ def merge_top_moleculetypes_slow_growth(
                     ff.improper_dihedraltypes,
                     molA,
                     molB,
-                    "4",
+                    FFFUNC["mult_improper_dihedral"],
                     periodicity,
                 )
 
