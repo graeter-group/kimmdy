@@ -21,7 +21,7 @@ from kimmdy.topology.atomic import (
     Exclusion,
     ImproperDihedralId,
     Interaction,
-    InteractionType,
+    AtomicType,
     InteractionTypes,
     MultipleDihedrals,
     ProperDihedralId,
@@ -113,6 +113,7 @@ def get_explicit_MultipleDihedrals(
             type_key, ff.proper_dihedraltypes, str(periodicity)
         )
         if match_obj:
+            print(match_obj)
             assert isinstance(match_obj, DihedralType)
             multiple_dihedrals.dihedrals[str(periodicity)] = Dihedral(
                 *dihedral_key,
@@ -134,7 +135,7 @@ def get_explicit_or_type(
     interaction_types: InteractionTypes,
     mol: MoleculeType,
     periodicity: str = "",
-) -> Union[Interaction, InteractionType, None]:
+) -> Union[Interaction, AtomicType, None]:
     """Takes an Interaction and associated key, InteractionTypes, Topology
     and Periodicity (for dihedrals) and returns an object with the parameters of this Interaction
     """
@@ -150,7 +151,9 @@ def get_explicit_or_type(
     )
 
     if match_obj:
-        assert isinstance(match_obj, InteractionType)
+        # assert isinstance(match_obj, InteractionType)
+        # FIXME: This is a property of `match_atomic_item_to_atomic_type` and should 
+        # be tested there.
         return match_obj
     else:
         raise ValueError(

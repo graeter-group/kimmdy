@@ -14,7 +14,7 @@ ATOM_ID_FIELDS = {
     "dihedrals": [0, 1, 2, 3],
     "pairs": [0, 1],
     "settles": [0],
-    "exclusions": [0, 1, 2],
+    "exclusions": True, # all fields at atom ids
     "position_restraints": [0],
     "dihedral_restraints": [0, 1, 2, 3],
 }

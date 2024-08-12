@@ -173,7 +173,7 @@ class Exclusion:
     """
 
     ai: str
-    aj: str
+    aj: Optional[str] = None
     ak: Optional[str] = None
     al: Optional[str] = None
     am: Optional[str] = None
@@ -185,7 +185,7 @@ class Exclusion:
     def from_top_line(cls, l: list[str]):
         return cls(
             ai=l[0],
-            aj=l[1],
+            aj=field_or_none(l, 2),
             ak=field_or_none(l, 2),
             al=field_or_none(l, 3),
             am=field_or_none(l, 4),

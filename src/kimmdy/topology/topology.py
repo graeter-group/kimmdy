@@ -793,6 +793,12 @@ class Topology:
                     atomnr_fields = ATOM_ID_FIELDS.get(section_name, [])
                     resnr_fields = RESNR_ID_FIELDS.get(section_name, [])
                     for line in section:
+                        if atomnr_fields is True:
+                            # if atomnr_fields is True, then all fields are atomnr fields
+                            # NOTE: This is why this is testing for actually being True, not just truthiness!
+                            for field,_ in enumerate(line):
+                                increment_field(line, field, atomnr_offset)
+                            continue
                         for field in atomnr_fields:
                             increment_field(line, field, atomnr_offset)
                         for field in resnr_fields:
