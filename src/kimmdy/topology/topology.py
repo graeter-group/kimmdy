@@ -34,6 +34,7 @@ from kimmdy.topology.utils import (
     attributes_to_list,
     get_moleculetype_atomics,
     get_moleculetype_header,
+    get_residue_by_bonding,
     get_residue_fragments,
     get_top_section,
     increment_field,
@@ -1331,15 +1332,12 @@ class Topology:
                 aa = self.ff.residuetypes.get(other_res)
                 if not aa:
                     logging.warning(
-                        f"No AA found for {other_res}, to which a H would jump"
+                        f"No residuetype found in ff for {other_res}, to which a H would bind"
                     )
                     continue
 
-                residue_atomnames_current = [
-                    a.atom
-                    for a in reactive_moleculetype.atoms.values()
-                    if a.resnr == other_atom.resnr
-                ]
+                other_residue = get_residue_by_bonding(other_atom, reactive_moleculetype.atoms)
+                residue_atomnames_current = [a.atom for a in other_residue.values()]
                 name_set = False
                 for key, bond in aa.bonds.items():
                     if other_atom.atom in key and any(
@@ -1374,7 +1372,7 @@ class Topology:
                         )
                 if not name_set:
                     atom.atom = "HX"
-                    logger.warning(f"Named newly bonded hydrogen 'HX'")
+                    logger.info(f"Named newly bonded hydrogen 'HX'")
 
         # update bound_to
         atompair[0].bound_to_nrs.append(atompair[1].nr)

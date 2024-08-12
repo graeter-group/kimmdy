@@ -14,6 +14,7 @@ from kimmdy.topology.topology import REACTIVE_MOLECULEYPE, Topology
 from kimmdy.topology.utils import (
     get_protein_section,
     get_reactive_section,
+    get_residue_by_bonding,
     match_atomic_item_to_atomic_type,
 )
 from kimmdy.utils import get_gmx_dir
@@ -768,6 +769,24 @@ class TestHexalaTopology:
         )
 
         assert top.ff.residuetypes["HOH"] == res
+
+    def test_get_residue_by_bonding(self, hexala_top_fix):
+        top = hexala_top_fix
+        a = top.atoms["1"]
+        res = get_residue_by_bonding(a, top.atoms)
+        assert len(res) == 6
+        for a in res.values():
+            assert a.residue == "ACE"
+        a = top.atoms["10"]
+        res = get_residue_by_bonding(a, top.atoms)
+        assert len(res) == 10
+        for a in res.values():
+            assert a.residue == "ALA"
+        a = top.atoms["25"]
+        res = get_residue_by_bonding(a, top.atoms)
+        for a in res.values():
+            assert a.residue == "ALA"
+
 
 
 class TestPolymerFF:
