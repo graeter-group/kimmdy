@@ -479,10 +479,15 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#kimmdy.topology.utils.get_moleculetype_header" id="toc-kimmdy.topology.utils.get_moleculetype_header" class="nav-link" data-scroll-target="#kimmdy.topology.utils.get_moleculetype_header">get_moleculetype_header</a></li>
   <li><a href="#kimmdy.topology.utils.get_protein_section" id="toc-kimmdy.topology.utils.get_protein_section" class="nav-link" data-scroll-target="#kimmdy.topology.utils.get_protein_section">get_protein_section</a></li>
   <li><a href="#kimmdy.topology.utils.get_reactive_section" id="toc-kimmdy.topology.utils.get_reactive_section" class="nav-link" data-scroll-target="#kimmdy.topology.utils.get_reactive_section">get_reactive_section</a></li>
-  <li><a href="#kimmdy.topology.utils.get_residue_fragments" id="toc-kimmdy.topology.utils.get_residue_fragments" class="nav-link" data-scroll-target="#kimmdy.topology.utils.get_residue_fragments">get_residue_fragments</a>
+  <li><a href="#kimmdy.topology.utils.get_residue_by_bonding" id="toc-kimmdy.topology.utils.get_residue_by_bonding" class="nav-link" data-scroll-target="#kimmdy.topology.utils.get_residue_by_bonding">get_residue_by_bonding</a>
   <ul class="collapse">
   <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
+  </ul></li>
+  <li><a href="#kimmdy.topology.utils.get_residue_fragments" id="toc-kimmdy.topology.utils.get_residue_fragments" class="nav-link" data-scroll-target="#kimmdy.topology.utils.get_residue_fragments">get_residue_fragments</a>
+  <ul class="collapse">
+  <li><a href="#parameters-1" id="toc-parameters-1" class="nav-link" data-scroll-target="#parameters-1">Parameters</a></li>
+  <li><a href="#returns-1" id="toc-returns-1" class="nav-link" data-scroll-target="#returns-1">Returns</a></li>
   </ul></li>
   <li><a href="#kimmdy.topology.utils.get_top_section" id="toc-kimmdy.topology.utils.get_top_section" class="nav-link" data-scroll-target="#kimmdy.topology.utils.get_top_section">get_top_section</a></li>
   <li><a href="#kimmdy.topology.utils.is_not_solvent_or_ion" id="toc-kimmdy.topology.utils.is_not_solvent_or_ion" class="nav-link" data-scroll-target="#kimmdy.topology.utils.is_not_solvent_or_ion">is_not_solvent_or_ion</a></li>
@@ -537,22 +542,26 @@ ul.task-list li input[type="checkbox"] {
 <td>Get content of a section in the Reactive moleculetype from a topology dict.</td>
 </tr>
 <tr class="odd">
+<td><a href="#kimmdy.topology.utils.get_residue_by_bonding">get_residue_by_bonding</a></td>
+<td>Get the residue of an atom by its bonding.</td>
+</tr>
+<tr class="even">
 <td><a href="#kimmdy.topology.utils.get_residue_fragments">get_residue_fragments</a></td>
 <td>Splits a residue into fragments after a bond has been broken.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#kimmdy.topology.utils.get_top_section">get_top_section</a></td>
 <td>Get content of a section from a topology dict.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#kimmdy.topology.utils.is_not_solvent_or_ion">is_not_solvent_or_ion</a></td>
 <td>Returns whether a moleculetype name is not solvent or ion.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#kimmdy.topology.utils.set_reactive_section">set_reactive_section</a></td>
 <td>Set content of a section in the first moleculetype (protein) from a topology dict.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#kimmdy.topology.utils.set_top_section">set_top_section</a></td>
 <td>Set content of a section from a topology dict.</td>
 </tr>
@@ -590,12 +599,62 @@ ul.task-list li input[type="checkbox"] {
 <p><code>topology.utils.get_reactive_section(top, name)</code></p>
 <p>Get content of a section in the Reactive moleculetype from a topology dict.</p>
 </section>
+<section id="kimmdy.topology.utils.get_residue_by_bonding" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.topology.utils.get_residue_by_bonding">get_residue_by_bonding</h3>
+<p><code>topology.utils.get_residue_by_bonding(atom, atoms)</code></p>
+<p>Get the residue of an atom by its bonding.</p>
+<p>Avoids traversing the whole topology.</p>
+<section id="parameters" class="level4">
+<h4 class="anchored" data-anchor-id="parameters">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>atom</code></td>
+<td><a href="../_reference/topology.atomic.html#kimmdy.topology.atomic.Atom">Atom</a></td>
+<td>Atom of the residue</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td><code>atoms</code></td>
+<td><a href="https://docs.python.org/3.10/library/stdtypes.html#dict">dict</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>, <a href="../_reference/topology.atomic.html#kimmdy.topology.atomic.Atom">Atom</a>]</td>
+<td>All atoms of a topology</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns" class="level4">
+<h4 class="anchored" data-anchor-id="returns">Returns</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Atoms of the residue</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
 <section id="kimmdy.topology.utils.get_residue_fragments" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.utils.get_residue_fragments">get_residue_fragments</h3>
 <p><code>topology.utils.get_residue_fragments(top, residue, start1, start2, iterations=20)</code></p>
 <p>Splits a residue into fragments after a bond has been broken.</p>
-<section id="parameters" class="level4">
-<h4 class="anchored" data-anchor-id="parameters">Parameters</h4>
+<section id="parameters-1" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-1">Parameters</h4>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -639,8 +698,8 @@ ul.task-list li input[type="checkbox"] {
 </tbody>
 </table>
 </section>
-<section id="returns" class="level4">
-<h4 class="anchored" data-anchor-id="returns">Returns</h4>
+<section id="returns-1" class="level4">
+<h4 class="anchored" data-anchor-id="returns-1">Returns</h4>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 63%">
