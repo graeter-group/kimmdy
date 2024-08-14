@@ -152,7 +152,7 @@ def get_explicit_or_type(
 
     if match_obj:
         assert isinstance(match_obj, InteractionType)
-        # FIXME: This is a property of `match_atomic_item_to_atomic_type` and should 
+        # FIXME: This is a property of `match_atomic_item_to_atomic_type` and should
         # be tested there.
         return match_obj
     else:
@@ -219,7 +219,9 @@ def merge_dihedrals(
         )
     elif parameterizedA is not None:
         # breaking
-        if not (type(parameterizedA) == Dihedral or type(parameterizedA) == DihedralType):
+        if not (
+            type(parameterizedA) == Dihedral or type(parameterizedA) == DihedralType
+        ):
             m = f"parameterizedA {parameterizedA} is not a Dihedral or DihedralType"
             logger.warning(m)
             raise ValueError(m)

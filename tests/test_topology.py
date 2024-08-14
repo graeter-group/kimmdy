@@ -788,7 +788,6 @@ class TestHexalaTopology:
             assert a.residue == "ALA"
 
 
-
 class TestPolymerFF:
     def test_sections_are_complete(self, filedir):
         path = filedir / "polymer/topol.top"

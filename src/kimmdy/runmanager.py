@@ -400,7 +400,7 @@ class RunManager:
         logger.info("Done with setup")
 
         # FIXME: find a better solution for this
-        # 
+        #
         # copy input files that are potentially modified
         # to the setup task directory
         # by applying a recipe (e.g. by trunkate_sim_files)

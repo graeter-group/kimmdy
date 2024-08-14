@@ -341,6 +341,7 @@ def get_residue_fragments(
             return fragment, set()
     return fragments[0], fragments[1]
 
+
 def get_residue_by_bonding(atom: Atom, atoms: dict[str, Atom]) -> dict[str, Atom]:
     """Get the residue of an atom by its bonding.
 
@@ -358,7 +359,9 @@ def get_residue_by_bonding(atom: Atom, atoms: dict[str, Atom]) -> dict[str, Atom
         Atoms of the residue
     """
 
-    def rec(atom: Atom, atoms: dict[str, Atom], residue: dict[str, Atom]) -> dict[str, Atom]:
+    def rec(
+        atom: Atom, atoms: dict[str, Atom], residue: dict[str, Atom]
+    ) -> dict[str, Atom]:
         if atom.nr in residue.keys():
             # already visited
             return residue
@@ -371,8 +374,3 @@ def get_residue_by_bonding(atom: Atom, atoms: dict[str, Atom]) -> dict[str, Atom
     residue = {}
     rec(atom, atoms, residue)
     return residue
-
-
-
-
-

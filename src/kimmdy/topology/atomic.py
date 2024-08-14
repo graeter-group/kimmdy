@@ -162,7 +162,7 @@ class Exclusion:
     A class containing atom information as in the exclusions section of the topology.
 
     It's unlikey we need this many atomnumbers in a single exclusion, but just in case.
-    Because the gromacs manuals just says 
+    Because the gromacs manuals just says
 
     > Each line should start with one atom index, followed by one or more atom indices.
     > All non-bonded interactions between the first atom and the other atoms will be excluded.

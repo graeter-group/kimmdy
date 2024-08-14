@@ -796,7 +796,7 @@ class Topology:
                         if atomnr_fields is True:
                             # if atomnr_fields is True, then all fields are atomnr fields
                             # NOTE: This is why this is testing for actually being True, not just truthiness!
-                            for field,_ in enumerate(line):
+                            for field, _ in enumerate(line):
                                 increment_field(line, field, atomnr_offset)
                             continue
                         for field in atomnr_fields:
@@ -1342,7 +1342,9 @@ class Topology:
                     )
                     continue
 
-                other_residue = get_residue_by_bonding(other_atom, reactive_moleculetype.atoms)
+                other_residue = get_residue_by_bonding(
+                    other_atom, reactive_moleculetype.atoms
+                )
                 residue_atomnames_current = [a.atom for a in other_residue.values()]
                 name_set = False
                 for key, bond in aa.bonds.items():
@@ -1445,7 +1447,6 @@ class Topology:
                 )
             )
 
-
         # remove settles and explicit exclusions
         # those are used by solvent molecules
         # but if a solvent molecule get's bounds to other parts
@@ -1460,5 +1461,3 @@ class Topology:
             settles = reactive_moleculetype.settles.get(ai)
             if settles is not None:
                 reactive_moleculetype.settles.pop(ai)
-
-
