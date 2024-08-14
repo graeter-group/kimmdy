@@ -84,7 +84,7 @@ class MoleculeType:
             {}
         )
         self.settles: dict[str, Settle] = {}
-        self.exclusions: dict[str, Exclusion] = {}
+        self.exclusions: dict[tuple, Exclusion] = {}
 
         self._parse_atoms()
         self._parse_bonds()
@@ -237,7 +237,7 @@ class MoleculeType:
             return
         for _, l in enumerate(ls):
             exclusion = Exclusion.from_top_line(l)
-            self.exclusions[exclusion.ai] = exclusion
+            self.exclusions[exclusion.key()] = exclusion
 
     def _initialize_graph(self):
         """Add a list of atom nrs bound to an atom to each atom."""
@@ -1451,9 +1451,12 @@ class Topology:
         # but if a solvent molecule get's bounds to other parts
         # of the reactive molecule it is no longer a solvent molecule
         for ai in atompair_nrs:
-            exclusion = reactive_moleculetype.exclusions.get(ai)
-            if exclusion is not None:
-                reactive_moleculetype.exclusions.pop(ai)
+            to_delete = []
+            for exclusion_key in reactive_moleculetype.exclusions.keys():
+                if ai in exclusion_key:
+                    to_delete.append(exclusion_key)
+            for key in to_delete:
+                reactive_moleculetype.exclusions.pop(key)
             settles = reactive_moleculetype.settles.get(ai)
             if settles is not None:
                 reactive_moleculetype.settles.pop(ai)

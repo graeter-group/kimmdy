@@ -185,13 +185,20 @@ class Exclusion:
     def from_top_line(cls, l: list[str]):
         return cls(
             ai=l[0],
-            aj=field_or_none(l, 2),
+            aj=field_or_none(l, 1),
             ak=field_or_none(l, 2),
             al=field_or_none(l, 3),
             am=field_or_none(l, 4),
             an=field_or_none(l, 5),
             ao=field_or_none(l, 6),
             ap=field_or_none(l, 7),
+        )
+
+    def key(self):
+        return tuple(
+            field
+            for field in [self.ai, self.aj, self.ak, self.al, self.am, self.an, self.ao]
+            if field is not None
         )
 
 
