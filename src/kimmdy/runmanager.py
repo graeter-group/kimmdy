@@ -399,16 +399,16 @@ class RunManager:
         files.output["top"] = files.outputdir / self.config.top.name
         logger.info("Done with setup")
 
-        # FIXME: find a better solution for this
-        #
+        # TODO: find a better solution for this
+        # 
         # copy input files that are potentially modified
         # to the setup task directory
         # by applying a recipe (e.g. by trunkate_sim_files)
-        # for f in ["xtc", "tpr", "trr"]:
-        #     if hasattr(self.config, f):
-        #         if path := self.latest_files.get(f):
-        #             shutil.copy(path, files.outputdir / path.name)
-        #             files.output[f] = files.outputdir / path.name
+        for f in ["xtc", "tpr", "trr"]:
+            if hasattr(self.config, f):
+                if path := self.latest_files.get(f):
+                    shutil.copy(path, files.outputdir / path.name)
+                    files.output[f] = files.outputdir / path.name
 
         return files
 
