@@ -5,8 +5,10 @@ on:
     types: [labeled]
 
 jobs:
-  test:
+  lint:
     if:  startsWith(github.head_ref, 'release-please-') && github.event.label.name == 'testthis'
+    uses: ./.github/workflows/lint.yml
+  test:
     runs-on: ubuntu-latest
     container: riedmiki/gromacs-plumed-python:2023.5-plumed
     steps:
