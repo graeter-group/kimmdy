@@ -672,10 +672,14 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="kimmdy.topology.atomic.Exclusion" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.Exclusion">Exclusion</h3>
-<p><code>topology.atomic.Exclusion(self, ai, aj, ak=None, al=None)</code></p>
+<p><code>topology.atomic.Exclusion(self, ai, aj=None, ak=None, al=None, am=None, an=None, ao=None, ap=None)</code></p>
 <p>Information about one exclusion</p>
 <p>A class containing atom information as in the exclusions section of the topology.</p>
-<p>From gromacs topology: ; ai aj ak al</p>
+<p>It’s unlikey we need this many atomnumbers in a single exclusion, but just in case. Because the gromacs manuals just says</p>
+<blockquote class="blockquote">
+<p>Each line should start with one atom index, followed by one or more atom indices. All non-bonded interactions between the first atom and the other atoms will be excluded. – https://manual.gromacs.org/current/reference-manual/topologies/molecule-definition.html#exclusions</p>
+</blockquote>
+<p>From gromacs topology: ; ai aj ak al am an ao ap</p>
 </section>
 <section id="kimmdy.topology.atomic.MultipleDihedralTypes" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.atomic.MultipleDihedralTypes">MultipleDihedralTypes</h3>
