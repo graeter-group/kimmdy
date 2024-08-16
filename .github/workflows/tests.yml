@@ -1,14 +1,16 @@
-name: test latest release
+name: test PR
 on:
+  workflow_call:
+  workflow_dispatch:
   pull_request:
     branches: [ main ]
     types: [labeled]
 
 jobs:
   lint:
-    if:  startsWith(github.head_ref, 'release-please-') && github.event.label.name == 'testthis'
+    if:  github.event.label.name == 'testthis'
     uses: ./.github/workflows/lint.yml
-  test-release:
+  test:
     needs: lint
     runs-on: ubuntu-latest
     container: riedmiki/gromacs-plumed-python:2023.5-plumed
