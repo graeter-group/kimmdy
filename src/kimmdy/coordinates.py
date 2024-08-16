@@ -17,11 +17,12 @@ from kimmdy.topology.atomic import (
     Bond,
     Dihedral,
     DihedralType,
+    InteractionType,
     Pair,
     Exclusion,
     ImproperDihedralId,
     Interaction,
-    InteractionType,
+    AtomicType,
     InteractionTypes,
     MultipleDihedrals,
     ProperDihedralId,
@@ -134,7 +135,7 @@ def get_explicit_or_type(
     interaction_types: InteractionTypes,
     mol: MoleculeType,
     periodicity: str = "",
-) -> Union[Interaction, InteractionType, None]:
+) -> Union[Interaction, AtomicType, None]:
     """Takes an Interaction and associated key, InteractionTypes, Topology
     and Periodicity (for dihedrals) and returns an object with the parameters of this Interaction
     """
@@ -151,6 +152,8 @@ def get_explicit_or_type(
 
     if match_obj:
         assert isinstance(match_obj, InteractionType)
+        # FIXME: This is a property of `match_atomic_item_to_atomic_type` and should
+        # be tested there.
         return match_obj
     else:
         raise ValueError(
@@ -216,7 +219,12 @@ def merge_dihedrals(
         )
     elif parameterizedA is not None:
         # breaking
-        assert type(parameterizedA) == Dihedral or type(parameterizedA) == DihedralType
+        if not (
+            type(parameterizedA) == Dihedral or type(parameterizedA) == DihedralType
+        ):
+            m = f"parameterizedA {parameterizedA} is not a Dihedral or DihedralType"
+            logger.warning(m)
+            raise ValueError(m)
         dihedralmerge = Dihedral(
             *dihedral_key,
             funct=funct,
@@ -409,11 +417,14 @@ def merge_top_moleculetypes_slow_growth(
 
             # both bonds exist
             if parameterizedA and parameterizedB:
-                assert (
+                if not (
                     parameterizedA.funct
                     == parameterizedB.funct
                     == FFFUNC["harmonic_bond"]
-                ), "In slow-growth, bond functionals need to be harmonic!"
+                ):
+                    m = f"In slow-growth, bond functionals need to be harmonic, but {key} is not. It is in A: {parameterizedA} and B: {parameterizedB}"
+                    logger.error(m)
+                    raise ValueError(m)
                 molB.bonds[key] = Bond(
                     *key,
                     funct=parameterizedB.funct,

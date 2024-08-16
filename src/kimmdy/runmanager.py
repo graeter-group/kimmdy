@@ -225,7 +225,7 @@ class RunManager:
 
         logger.info(
             f"Finished running tasks, state: {self.state} after "
-            f"{timedelta(seconds=(time.time() - self.start_time))}"
+            f"{timedelta(seconds=(time.time() - self.start_time))} "
             f"In output directory {self.config.out}"
         )
 
@@ -398,6 +398,18 @@ class RunManager:
         write_top(self.top.to_dict(), files.outputdir / self.config.top.name)
         files.output["top"] = files.outputdir / self.config.top.name
         logger.info("Done with setup")
+
+        # TODO: find a better solution for this
+        #
+        # copy input files that are potentially modified
+        # to the setup task directory
+        # by applying a recipe (e.g. by trunkate_sim_files)
+        for f in ["xtc", "tpr", "trr"]:
+            if hasattr(self.config, f):
+                if path := self.latest_files.get(f):
+                    shutil.copy(path, files.outputdir / path.name)
+                    files.output[f] = files.outputdir / path.name
+
         return files
 
     def _restart_from_rundir(self):
