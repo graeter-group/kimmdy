@@ -1,4 +1,4 @@
-name: test PR
+name: tests
 on:
   workflow_call:
   workflow_dispatch:
