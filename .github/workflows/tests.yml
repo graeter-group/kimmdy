@@ -9,7 +9,10 @@ on:
 jobs:
   lint:
     if:  github.event.label.name == 'testthis'
-    uses: ./.github/workflows/lint.yml
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: psf/black@stable
   test:
     needs: lint
     runs-on: ubuntu-latest

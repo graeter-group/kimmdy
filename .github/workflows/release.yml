@@ -25,8 +25,12 @@ jobs:
           git tag -a stable -m "Last Stable Release"
           git push origin stable
 
-  build:
+  docs:
     needs: release
+    uses: ./.github/workflows/build-docs.yml
+
+  build:
+    needs: docs
     if: ${{ needs.release.outputs.created }}
     name: Build distribution 📦
     runs-on: ubuntu-latest
@@ -50,10 +54,6 @@ jobs:
       with:
         name: python-package-distributions
         path: dist/
-
-  docs:
-    needs: build
-    uses: ./.github/workflows/build-docs.yml
 
   publish-to-pypi:
     name: >-
