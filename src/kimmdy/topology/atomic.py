@@ -161,22 +161,44 @@ class Exclusion:
 
     A class containing atom information as in the exclusions section of the topology.
 
+    It's unlikey we need this many atomnumbers in a single exclusion, but just in case.
+    Because the gromacs manuals just says
+
+    > Each line should start with one atom index, followed by one or more atom indices.
+    > All non-bonded interactions between the first atom and the other atoms will be excluded.
+    > -- https://manual.gromacs.org/current/reference-manual/topologies/molecule-definition.html#exclusions
+
     From gromacs topology:
-    ; ai aj ak al
+    ; ai aj ak al am an ao ap
     """
 
     ai: str
-    aj: str
+    aj: Optional[str] = None
     ak: Optional[str] = None
     al: Optional[str] = None
+    am: Optional[str] = None
+    an: Optional[str] = None
+    ao: Optional[str] = None
+    ap: Optional[str] = None
 
     @classmethod
     def from_top_line(cls, l: list[str]):
         return cls(
             ai=l[0],
-            aj=l[1],
+            aj=field_or_none(l, 1),
             ak=field_or_none(l, 2),
             al=field_or_none(l, 3),
+            am=field_or_none(l, 4),
+            an=field_or_none(l, 5),
+            ao=field_or_none(l, 6),
+            ap=field_or_none(l, 7),
+        )
+
+    def key(self):
+        return tuple(
+            field
+            for field in [self.ai, self.aj, self.ak, self.al, self.am, self.an, self.ao]
+            if field is not None
         )
 
 

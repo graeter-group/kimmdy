@@ -14,6 +14,7 @@
 | [get_moleculetype_header](#kimmdy.topology.utils.get_moleculetype_header) | Get content of the header of a moleculetype from a topology dict. |
 | [get_protein_section](#kimmdy.topology.utils.get_protein_section) | Get content of a section in the first moleculetype (protein) from a topology dict. |
 | [get_reactive_section](#kimmdy.topology.utils.get_reactive_section) | Get content of a section in the Reactive moleculetype from a topology dict. |
+| [get_residue_by_bonding](#kimmdy.topology.utils.get_residue_by_bonding) | Get the residue of an atom by its bonding. |
 | [get_residue_fragments](#kimmdy.topology.utils.get_residue_fragments) | Splits a residue into fragments after a bond has been broken. |
 | [get_top_section](#kimmdy.topology.utils.get_top_section) | Get content of a section from a topology dict. |
 | [is_not_solvent_or_ion](#kimmdy.topology.utils.is_not_solvent_or_ion) | Returns whether a moleculetype name is not solvent or ion. |
@@ -61,6 +62,27 @@ Get content of a section in the first moleculetype (protein) from a topology dic
 `topology.utils.get_reactive_section(top, name)`
 
 Get content of a section in the Reactive moleculetype from a topology dict.
+
+### get_residue_by_bonding { #kimmdy.topology.utils.get_residue_by_bonding }
+
+`topology.utils.get_residue_by_bonding(atom, atoms)`
+
+Get the residue of an atom by its bonding.
+
+Avoids traversing the whole topology.
+
+#### Parameters
+
+| Name    | Type                                                                  | Description             | Default    |
+|---------|-----------------------------------------------------------------------|-------------------------|------------|
+| `atom`  | [Atom](`kimmdy.topology.atomic.Atom`)                                 | Atom of the residue     | _required_ |
+| `atoms` | [dict](`dict`)\[[str](`str`), [Atom](`kimmdy.topology.atomic.Atom`)\] | All atoms of a topology | _required_ |
+
+#### Returns
+
+| Type                 | Description   |
+|----------------------|---------------|
+| Atoms of the residue |               |
 
 ### get_residue_fragments { #kimmdy.topology.utils.get_residue_fragments }
 

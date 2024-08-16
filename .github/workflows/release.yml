@@ -51,6 +51,10 @@ jobs:
         name: python-package-distributions
         path: dist/
 
+  docs:
+    needs: build
+    uses: ./.github/workflows/build-docs.yml
+
   publish-to-pypi:
     name: >-
       Publish Python 🐍 distribution 📦 to PyPI
