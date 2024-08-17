@@ -1,6 +1,20 @@
 # Changelog
 
 
+## [6.10.0](https://github.com/graeter-group/kimmdy/compare/v6.9.1...v6.10.0) (2024-08-16)
+
+
+### Features
+
+* handle `Settles` and `Exclusions` when breaking and binding bonds in topology ([#458](https://github.com/graeter-group/kimmdy/issues/458)) ([4b2d96f](https://github.com/graeter-group/kimmdy/commit/4b2d96f10e79323a12ce4caeda0f629c003b029e))
+
+
+### Bug Fixes
+
+* **ci:** fix release tests ([1cf898b](https://github.com/graeter-group/kimmdy/commit/1cf898bd608a408832c5087a0e769ba961375c1d))
+* copy user supplied input data to setup dir ([4b2d96f](https://github.com/graeter-group/kimmdy/commit/4b2d96f10e79323a12ce4caeda0f629c003b029e))
+* simplify ci ([765ed7b](https://github.com/graeter-group/kimmdy/commit/765ed7b98dd1226e1796a31860f6786683a1bda0))
+
 ## [6.9.1](https://github.com/graeter-group/kimmdy/compare/v6.9.0...v6.9.1) (2024-08-09)
 
 
