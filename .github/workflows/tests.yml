@@ -13,14 +13,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: psf/black@stable
-  docs:
-    needs: lint
-    uses: ./.github/workflows/build-docs.yml
   test:
     needs: docs
     runs-on: ubuntu-latest
     container: riedmiki/gromacs-plumed-python:2023.5-plumed
     steps:
+      - uses: ./.github/workflows/build-docs.yml
       - uses: actions/checkout@v4
       - name: run tox
         run: tox
