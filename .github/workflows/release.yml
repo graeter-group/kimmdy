@@ -36,7 +36,7 @@ jobs:
     uses: ./.github/workflows/build-docs.yml
 
   publish:
-    needs: release
+    needs: docs
     if: ${{ needs.release.outputs.created }}
     uses: ./.github/workflows/publish.yml
 
