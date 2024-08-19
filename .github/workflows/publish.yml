@@ -7,6 +7,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  id-token: write
 
 jobs:
   build:
@@ -42,9 +43,6 @@ jobs:
     environment:
       name: pypi
       url: https://pypi.org/p/kimmdy
-    permissions:
-      id-token: write
-
     steps:
     - name: Download all the dists
       uses: actions/download-artifact@v4
