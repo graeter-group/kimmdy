@@ -1,6 +1,13 @@
 # Changelog
 
 
+## [6.10.1](https://github.com/graeter-group/kimmdy/compare/v6.10.0...v6.10.1) (2024-08-19)
+
+
+### Bug Fixes
+
+* **ci:** build docs on release ([ca8fdc2](https://github.com/graeter-group/kimmdy/commit/ca8fdc297add568adff6d07db59a2e430d17eb1c))
+
 ## [6.10.0](https://github.com/graeter-group/kimmdy/compare/v6.9.1...v6.10.0) (2024-08-16)
 
 
