@@ -1,6 +1,13 @@
 # Changelog
 
 
+## [6.10.2](https://github.com/graeter-group/kimmdy/compare/v6.10.1...v6.10.2) (2024-08-19)
+
+
+### Bug Fixes
+
+* pin griffe version for quartodoc ([d4b84ef](https://github.com/graeter-group/kimmdy/commit/d4b84ef1c5bb339aea419d832731d51ff7a84f90))
+
 ## [6.10.1](https://github.com/graeter-group/kimmdy/compare/v6.10.0...v6.10.1) (2024-08-19)
 
 
