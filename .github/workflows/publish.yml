@@ -6,7 +6,6 @@ on:
 
 jobs:
   build:
-    needs: docs
     name: Build distribution 📦
     runs-on: ubuntu-latest
 
@@ -33,7 +32,6 @@ jobs:
   publish-to-pypi:
     name: >-
       Publish Python 🐍 distribution 📦 to PyPI
-    if: ${{ needs.release.outputs.created }}
     needs:
     - build
     runs-on: ubuntu-latest
