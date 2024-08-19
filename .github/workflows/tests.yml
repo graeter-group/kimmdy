@@ -13,8 +13,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: psf/black@stable
-  test:
+  docs:
     needs: lint
+    uses: ./.github/workflows/build-docs.yml
+  test:
+    needs: docs
     runs-on: ubuntu-latest
     container: riedmiki/gromacs-plumed-python:2023.5-plumed
     steps:
