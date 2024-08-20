@@ -3,6 +3,9 @@ name: docs
 on:
   workflow_call:
   workflow_dispatch:
+  pull_request:
+    branches: [ main ]
+    types: [labeled]
 
 permissions:
   contents: write
@@ -10,6 +13,7 @@ permissions:
 jobs:
   build-docs:
     runs-on: ubuntu-latest
+    if:  github.event.label.name == 'testthis'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
