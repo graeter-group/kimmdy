@@ -4,10 +4,6 @@ on:
   workflow_call:
   workflow_dispatch:
 
-permissions:
-  contents: write
-  pull-requests: write
-  id-token: none
 
 jobs:
   build:
@@ -43,6 +39,8 @@ jobs:
     environment:
       name: pypi
       url: https://pypi.org/p/kimmdy
+    permissions:
+      id-token: write
     steps:
     - name: Download all the dists
       uses: actions/download-artifact@v4
