@@ -1,6 +1,13 @@
 # Changelog
 
 
+## [6.10.3](https://github.com/graeter-group/kimmdy/compare/v6.10.2...v6.10.3) (2024-08-20)
+
+
+### Bug Fixes
+
+* run tests on non-draft PRs, render docs manually with label ([#470](https://github.com/graeter-group/kimmdy/issues/470)) ([166f4d0](https://github.com/graeter-group/kimmdy/commit/166f4d08c8e889baf11afd9b75a4a299ba193df1))
+
 ## [6.10.2](https://github.com/graeter-group/kimmdy/compare/v6.10.1...v6.10.2) (2024-08-19)
 
 
