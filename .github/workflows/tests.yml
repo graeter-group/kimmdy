@@ -18,6 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     container: riedmiki/gromacs-plumed-python:2023.5-plumed
     steps:
+      - uses: actions/checkout@v4
       - uses: ./.github/workflows/build-docs.yml
       - uses: actions/checkout@v4
       - name: run tox
