@@ -11,6 +11,7 @@ from kimmdy.constants import AA3
 from kimmdy.utils import get_gmx_dir
 
 def test_that_should_fail():
+    print('hello')
     assert False
 
 ## test topology parser
