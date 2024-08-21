@@ -10,6 +10,7 @@ from kimmdy import parsing
 from kimmdy.constants import AA3
 from kimmdy.utils import get_gmx_dir
 
+
 ## test topology parser
 def test_parser_doesnt_crash_on_example(arranged_tmp_path, caplog):
     """Example file urea.top
