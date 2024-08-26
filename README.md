@@ -5,6 +5,7 @@
 Reactive MD pipeline for GROMACS using Kinetic Monte Carlo / Molecular Dynamics (KIMMDY)
 
 ## Installation
+
 **Note**: KIMMDY requires [GROMACS](https://www.gromacs.org/) to be installed.
 Some reactions need a GROMACS version patched with [PLUMED](https://www.plumed.org/).
 The gromacs version name should then contain `MODIFIED` or `plumed`.
@@ -39,15 +40,7 @@ Full installation instructions are available [here](https://grater-group.github.
 
 The documentation is available [here](https://grater-group.github.io/kimmdy/).
 
-## Getting started
-
-Head over to the [getting started](https://grater-group.github.io/kimmdy/guide/tutorials/getting-started.html) tutorial.
-
-## Documentation
-
-The documentation is available [here](https://graeter-group.github.io/kimmdy/).
-
-## Getting started
+### Getting started
 
 Head over to the [getting started](https://graeter-group.github.io/kimmdy/guide/tutorials/getting-started.html) tutorial.
 
