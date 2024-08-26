@@ -21,7 +21,7 @@ changer:
     md: 'relax'    
     slow_growth: True
   topology:
-    parameterization: 'grappa' 
+    parameterization: 'grappa'
 reactions:
   homolysis:
     edis: 'edissoc.dat'

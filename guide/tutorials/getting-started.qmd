@@ -14,8 +14,9 @@ In this tutorial we will be simulating hydrogen atom transfer in a simple ACE/NM
 
 ### Prerequisites
 
-- `python3.9` or higher
-- `gromacs` (tested with version 2021.4, `gmx` should be available in the `PATH`)
+- `python3.10` or higher
+- `gromacs>=2023.2` 
+  - Version 2021.4 works with everything except slow-growth.
 
 Optional:
 
