@@ -722,6 +722,12 @@ class RunManager:
         if "extrande" in self.kmc_algorithm:
             kmc = partial(kmc, tau_scale=self.config.tau_scale)
         self.kmcresult = kmc(self.recipe_collection, logger=logger)
+        if type(self.kmcresult.recipe) == Callable:
+            if self.kmcresult.pos is None:
+                m = f"KMC algorithm {self.kmc_algorithm} returned a recipe function but no position."
+                logger.error(m)
+                raise ValueError(m)
+            self.kmcresult.recipe = self.kmcresult.recipe(self.kmcresult.pos)
         recipe = self.kmcresult.recipe
 
         if self.config.save_recipes:

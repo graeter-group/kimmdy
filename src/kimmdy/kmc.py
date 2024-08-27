@@ -11,7 +11,7 @@ and because we have one reactant molecule
 import logging
 from dataclasses import dataclass, field
 from itertools import pairwise
-from typing import Optional
+from typing import Callable, Optional
 
 import numpy as np
 from numpy.random import default_rng
@@ -34,12 +34,15 @@ class KMCResult:
     time_start
         Time, from which the reaction starts. The reaction changes the
         geometry/topology of this timestep and continues from there. [ps]
+    pos
+        Position (index) of the chosen recipe in the RecipeCollection
     """
 
-    recipe: Recipe = field(default_factory=lambda: Recipe([], [], []))
+    recipe: Recipe|Callable[[int], Recipe] = field(default_factory=lambda: Recipe([], [], []))
     reaction_probability: Optional[list[float]] = None
     time_delta: Optional[float] = None
     time_start: Optional[float] = None
+    pos: Optional[int] = None
 
 
 def rf_kmc(
@@ -102,6 +105,7 @@ def rf_kmc(
         reaction_probability=reaction_probability,
         time_delta=time_delta,
         time_start=reaction_time,
+        pos=pos
     )
 
 
@@ -176,6 +180,7 @@ def frm(
         reaction_probability=reaction_probability,
         time_delta=time_delta,
         time_start=reaction_time,
+        pos=int(pos_event)
     )
 
 
@@ -295,6 +300,7 @@ def extrande_mod(
         reaction_probability=None,
         time_delta=0,  # instantaneous reaction
         time_start=t,
+        pos=int(idx_rate_max)
     )
 
 
@@ -427,4 +433,5 @@ def extrande(
         reaction_probability=None,
         time_delta=0,  # instantaneous reaction
         time_start=t,
+        pos=int(idx_rate_max)
     )
