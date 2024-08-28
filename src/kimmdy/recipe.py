@@ -560,13 +560,13 @@ class Recipe:
                 raise ValueError(f"rates must be a list, not {type(self.rates)}")
 
         except ValueError as e:
-            raise ValueError(f"Consistency error in Recipe {self.recipe_steps}\n" + e.args[0])
+            raise ValueError(
+                f"Consistency error in Recipe {self.recipe_steps}\n" + e.args[0]
+            )
 
     def get_recipe_name(self):
         if isinstance(self.recipe_steps, DeferredRecipeSteps):
-            return (
-                f"DeferredRecipeSteps({self.recipe_steps.key}, {self.recipe_steps.callback.__name__})"
-            )
+            return f"DeferredRecipeSteps({self.recipe_steps.key}, {self.recipe_steps.callback.__name__})"
         name = ""
         for rs in self.recipe_steps:
             name += " "
@@ -644,7 +644,8 @@ class Recipe:
         ):
             if (
                 self.recipe_steps.key == other.recipe_steps.key
-                and self.recipe_steps.callback.__name__ == other.recipe_steps.callback.__name__
+                and self.recipe_steps.callback.__name__
+                == other.recipe_steps.callback.__name__
             ):
                 return True
 
@@ -661,6 +662,7 @@ class RecipeCollection:
     recipes
         List of Recipe objects.
     """
+
     recipes: list[Recipe]
 
     def aggregate_reactions(self):
@@ -739,7 +741,9 @@ class RecipeCollection:
                 timespans = ast.literal_eval(timespans_s)
                 rates = ast.literal_eval(rates_s)
 
-                recipe = Recipe(recipe_steps=recipe_steps, timespans=timespans, rates=rates)
+                recipe = Recipe(
+                    recipe_steps=recipe_steps, timespans=timespans, rates=rates
+                )
                 recipes.append(recipe)
                 if picked:
                     picked_rp = recipe
