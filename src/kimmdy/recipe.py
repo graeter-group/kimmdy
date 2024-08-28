@@ -27,6 +27,14 @@ def recipe_steps_from_str(recipe_steps_s: str) -> list[RecipeStep]|DeferredRecip
             _ = key
             return []
         dummy_callback.__name__ = callback
+        # NOTE: because this is parsed from a string, we don't have
+        # the actual function, so we just return a dummy function
+        # It can't actually be used to reconstruct the original closure
+        # because we don't have access to the runtime state
+        # of the ReactionPlugin that produced the closure
+        # Likewise, the type of the key is unknown and 
+        # will be a string, not the actual type over which
+        # DeferredRecipeSteps is generic.
         return DeferredRecipeSteps(key=key, callback=dummy_callback)
     steps = []
     for rs in recipe_steps_s.split("<>"):
@@ -451,6 +459,11 @@ T = TypeVar('T')
 class DeferredRecipeSteps(Generic[T]):
     key: T
     callback: Callable[[T], list[RecipeStep]]
+
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, DeferredRecipeSteps):
+            return False
+        return self.key == other.key and self.callback.__name__ == other.callback.__name__
 
 @dataclass
 class Recipe:

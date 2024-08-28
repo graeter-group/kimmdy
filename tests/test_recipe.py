@@ -247,6 +247,11 @@ def test_recipe_steps_from_string_with_deferred():
     assert isinstance(steps, recipe.DeferredRecipeSteps)
     assert steps.key == '1'
 
+    def some_function(key):
+        _ = key
+        return []
+    assert steps == recipe.DeferredRecipeSteps('1', some_function)
+
 def test_recipe_collection_from_csv_picked(
     tmp_path: Path, recipe_collection: recipe.RecipeCollection
 ):

@@ -96,6 +96,7 @@ def test_extrande_mod_calculation(recipe_collection, reference_extrande_KMC):
     # first random numbers are array([0.51182162, 0.9504637])
     KMC_dict = extrande_mod(recipe_collection, 1.0, rng=rng)
     assert KMC_dict.recipe == reference_extrande_KMC.recipe
+    assert KMC_dict.time_start is not None
     assert (
         abs(KMC_dict.time_start - 2.4632908726674225) < 1e-9
     )  # single result different, same distribution?
