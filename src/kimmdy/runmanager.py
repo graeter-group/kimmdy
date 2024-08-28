@@ -32,7 +32,15 @@ from kimmdy.plugins import (
     parameterization_plugins,
     reaction_plugins,
 )
-from kimmdy.recipe import Bind, Break, CustomTopMod, DeferredRecipeSteps, Place, RecipeCollection, Relax
+from kimmdy.recipe import (
+    Bind,
+    Break,
+    CustomTopMod,
+    DeferredRecipeSteps,
+    Place,
+    RecipeCollection,
+    Relax,
+)
 from kimmdy.tasks import Task, TaskFiles, get_plumed_out
 from kimmdy.topology.topology import Topology
 from kimmdy.topology.utils import get_is_reactive_predicate_from_config_f

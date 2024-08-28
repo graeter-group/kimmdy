@@ -20,19 +20,23 @@ if TYPE_CHECKING:
     from kimmdy.topology.topology import Topology
 
 
-def recipe_steps_from_str(recipe_steps_s: str) -> list[RecipeStep]|DeferredRecipeSteps:
+def recipe_steps_from_str(
+    recipe_steps_s: str,
+) -> list[RecipeStep] | DeferredRecipeSteps:
     if recipe_steps_s.startswith("<") and recipe_steps_s.endswith(">"):
         key, callback = recipe_steps_s.removeprefix("<").removesuffix(">").split(",")
+
         def dummy_callback(key):
             _ = key
             return []
+
         dummy_callback.__name__ = callback
         # NOTE: because this is parsed from a string, we don't have
         # the actual function, so we just return a dummy function
         # It can't actually be used to reconstruct the original closure
         # because we don't have access to the runtime state
         # of the ReactionPlugin that produced the closure
-        # Likewise, the type of the key is unknown and 
+        # Likewise, the type of the key is unknown and
         # will be a string, not the actual type over which
         # DeferredRecipeSteps is generic.
         return DeferredRecipeSteps(key=key, callback=dummy_callback)
@@ -453,7 +457,8 @@ class CustomTopMod(RecipeStep):
         return cls(f=f)
 
 
-T = TypeVar('T')
+T = TypeVar("T")
+
 
 @dataclass
 class DeferredRecipeSteps(Generic[T]):
@@ -463,7 +468,10 @@ class DeferredRecipeSteps(Generic[T]):
     def __eq__(self, other) -> bool:
         if not isinstance(other, DeferredRecipeSteps):
             return False
-        return self.key == other.key and self.callback.__name__ == other.callback.__name__
+        return (
+            self.key == other.key and self.callback.__name__ == other.callback.__name__
+        )
+
 
 @dataclass
 class Recipe:
@@ -491,7 +499,7 @@ class Recipe:
 
     """
 
-    steps: list[RecipeStep]|DeferredRecipeSteps
+    steps: list[RecipeStep] | DeferredRecipeSteps
     rates: list[float]
     timespans: list[tuple[float, float]]
 
@@ -540,7 +548,7 @@ class Recipe:
                     f"\trates: {len(self.rates)}\n"
                     f"\ttimespans: {len(self.timespans)}"
                 )
-            if not isinstance(self.steps, list|DeferredRecipeSteps):
+            if not isinstance(self.steps, list | DeferredRecipeSteps):
                 raise ValueError(
                     f"Recipe Steps must be a list (or tuple for deferred evaluation), not {type(self.steps)}"
                 )
@@ -552,13 +560,13 @@ class Recipe:
                 raise ValueError(f"rates must be a list, not {type(self.rates)}")
 
         except ValueError as e:
-            raise ValueError(
-                f"Consistency error in Recipe {self.steps}\n" + e.args[0]
-            )
+            raise ValueError(f"Consistency error in Recipe {self.steps}\n" + e.args[0])
 
     def get_recipe_name(self):
         if isinstance(self.steps, DeferredRecipeSteps):
-            return f"DeferredRecipeSteps({self.steps.key}, {self.steps.callback.__name__})"
+            return (
+                f"DeferredRecipeSteps({self.steps.key}, {self.steps.callback.__name__})"
+            )
         name = ""
         for rs in self.steps:
             name += " "
@@ -618,7 +626,9 @@ class Recipe:
         if type(self.steps) != type(other.steps):
             return False
 
-        if not isinstance(self.steps, DeferredRecipeSteps) and not isinstance(other.steps, DeferredRecipeSteps):
+        if not isinstance(self.steps, DeferredRecipeSteps) and not isinstance(
+            other.steps, DeferredRecipeSteps
+        ):
             if len(self.steps) != len(other.steps):
                 return False
             for rs1, rs2 in zip(self.steps, other.steps):
@@ -629,9 +639,14 @@ class Recipe:
                     if rs1 != rs2:
                         return False
 
-        if isinstance(self.steps, DeferredRecipeSteps) and isinstance(other.steps, DeferredRecipeSteps):
-            if self.steps.key == other.steps.key and self.steps.callback.__name__ == other.steps.callback.__name__:
-                return True 
+        if isinstance(self.steps, DeferredRecipeSteps) and isinstance(
+            other.steps, DeferredRecipeSteps
+        ):
+            if (
+                self.steps.key == other.steps.key
+                and self.steps.callback.__name__ == other.steps.callback.__name__
+            ):
+                return True
 
         return self.rates == other.rates and self.timespans == other.timespans
 
@@ -720,9 +735,7 @@ class RecipeCollection:
                 timespans = ast.literal_eval(timespans_s)
                 rates = ast.literal_eval(rates_s)
 
-                recipe = Recipe(
-                    steps=recipe_steps, timespans=timespans, rates=rates
-                )
+                recipe = Recipe(steps=recipe_steps, timespans=timespans, rates=rates)
                 recipes.append(recipe)
                 if picked:
                     picked_rp = recipe
