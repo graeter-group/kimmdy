@@ -248,11 +248,12 @@ def test_recipe_steps_from_string_with_deferred():
     assert isinstance(steps, recipe.DeferredRecipeSteps)
     assert steps.key == "1"
 
-    def some_function(key):
+    def some_function(key, i):
         _ = key
+        _ = i
         return []
 
-    assert steps == recipe.DeferredRecipeSteps("1", some_function)
+    assert steps == recipe.DeferredRecipeSteps(key="1", callback=some_function)
 
 
 def test_recipe_collection_from_csv_picked(

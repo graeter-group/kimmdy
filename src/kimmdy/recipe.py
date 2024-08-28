@@ -24,10 +24,11 @@ def recipe_steps_from_str(
     recipe_steps_s: str,
 ) -> list[RecipeStep] | DeferredRecipeSteps:
     if recipe_steps_s.startswith("<") and recipe_steps_s.endswith(">"):
-        key, callback = recipe_steps_s.removeprefix("<").removesuffix(">").split(",")
+        key,callback = recipe_steps_s.removeprefix("<").removesuffix(">").split(",")
 
-        def dummy_callback(key):
+        def dummy_callback(key, i):
             _ = key
+            _ = i
             return []
 
         dummy_callback.__name__ = callback
@@ -566,7 +567,7 @@ class Recipe:
 
     def get_recipe_name(self):
         if isinstance(self.recipe_steps, DeferredRecipeSteps):
-            return f"DeferredRecipeSteps({self.recipe_steps.key}, {self.recipe_steps.callback.__name__})"
+            return f"DeferredRecipeSteps({self.recipe_steps.key},{self.recipe_steps.frame_index}, {self.recipe_steps.callback.__name__})"
         name = ""
         for rs in self.recipe_steps:
             name += " "
