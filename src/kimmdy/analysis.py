@@ -471,7 +471,7 @@ def reaction_participation(dir: str, open_plot: bool = False):
             continue
         # get involved atoms
         reaction_atom_ids = set()
-        for step in picked_rp.recipe_steps:
+        for step in picked_rp.steps:
             if isinstance(step, Break) or isinstance(step, Bind):
                 reaction_atom_ids |= set([step.atom_id_1, step.atom_id_2])
             elif isinstance(step, Place):

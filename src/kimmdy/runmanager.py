@@ -32,7 +32,7 @@ from kimmdy.plugins import (
     parameterization_plugins,
     reaction_plugins,
 )
-from kimmdy.recipe import Bind, Break, CustomTopMod, Place, RecipeCollection, Relax
+from kimmdy.recipe import Bind, Break, CustomTopMod, DeferredRecipeSteps, Place, RecipeCollection, Relax
 from kimmdy.tasks import Task, TaskFiles, get_plumed_out
 from kimmdy.topology.topology import Topology
 from kimmdy.topology.utils import get_is_reactive_predicate_from_config_f
@@ -549,7 +549,7 @@ class RunManager:
             residuetypes_path=getattr(self.config, "residuetypes", None),
         )
 
-    def _restart_task(self, files: TaskFiles) -> None:
+    def _restart_task(self, _: TaskFiles) -> None:
         raise RuntimeError(
             "Called restart task. This task is only for finding the restart "
             "point in the sequence and should never be called!"
@@ -722,12 +722,6 @@ class RunManager:
         if "extrande" in self.kmc_algorithm:
             kmc = partial(kmc, tau_scale=self.config.tau_scale)
         self.kmcresult = kmc(self.recipe_collection, logger=logger)
-        if type(self.kmcresult.recipe) == Callable:
-            if self.kmcresult.pos is None:
-                m = f"KMC algorithm {self.kmc_algorithm} returned a recipe function but no position."
-                logger.error(m)
-                raise ValueError(m)
-            self.kmcresult.recipe = self.kmcresult.recipe(self.kmcresult.pos)
         recipe = self.kmcresult.recipe
 
         if self.config.save_recipes:
@@ -781,11 +775,19 @@ class RunManager:
         recipe = self.kmcresult.recipe
         logger.info(f"Start Recipe in KIMMDY iteration {self.iteration}")
         logger.info(f"Recipe: {recipe.get_recipe_name()}")
-        logger.debug(f"Performing recipe steps:\n{pformat(recipe.recipe_steps)}")
+        logger.debug(f"Performing recipe steps:\n{pformat(recipe.steps)}")
 
         # Set time to chosen 'time_start' of KMCResult
         ttime = self.kmcresult.time_start
-        if any([isinstance(step, Place) for step in recipe.recipe_steps]):
+        if isinstance(recipe.steps, list):
+            recipe.steps = recipe.steps
+        elif isinstance(recipe.steps, DeferredRecipeSteps):
+            recipe.steps = recipe.steps.callback(recipe.steps.key)
+        else:
+            m = f"Recipe steps of {recipe} are not a list or a DeferredRecipeSteps object."
+            logger.error(m)
+            raise ValueError(m)
+        if any([isinstance(step, Place) for step in recipe.steps]):
             # only first time of interval is valid for placement
             ttime = recipe.timespans[0][0]
 
@@ -793,7 +795,7 @@ class RunManager:
 
         top_initial = deepcopy(self.top)
         focus_nrs = set()
-        for step in recipe.recipe_steps:
+        for step in recipe.steps:
             if isinstance(step, Break):
                 self.top.break_bond((step.atom_id_1, step.atom_id_2))
                 focus_nrs.update([step.atom_id_1, step.atom_id_2])
@@ -851,7 +853,7 @@ class RunManager:
             elif isinstance(step, CustomTopMod):
                 step.f(self.top)
 
-        self.top.update_partial_charges(recipe.recipe_steps)
+        self.top.update_partial_charges(recipe.steps)
         self.top.update_parameters(focus_nrs)
 
         write_top(self.top.to_dict(), files.outputdir / self.config.top.name)
