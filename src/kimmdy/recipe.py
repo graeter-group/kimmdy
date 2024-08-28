@@ -463,7 +463,7 @@ T = TypeVar("T")
 @dataclass
 class DeferredRecipeSteps(Generic[T]):
     key: T
-    callback: Callable[[T], list[RecipeStep]]
+    callback: Callable[[T, int], list[RecipeStep]]
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, DeferredRecipeSteps):

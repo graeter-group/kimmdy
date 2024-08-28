@@ -741,20 +741,17 @@ class RunManager:
                     "outfile": files.outputdir / "reaction_rates.svg",
                     "highlight_r": recipe,
                 }
-                if (self.kmcresult.time_start is not None) and (
-                    self.kmcresult.time_start != 0
-                ):
+                if self.kmcresult.time_start != 0:
                     kwargs["highlight_t"] = self.kmcresult.time_start
                 self.recipe_collection.plot(**kwargs)
         except Exception as e:
             logger.warning(f"Error occured during plotting:\n{e}")
 
-        if self.kmcresult.time_delta:
-            self.time += self.kmcresult.time_delta
+        self.time += self.kmcresult.time_delta
         logger.info("Done with Decide recipe.")
         if len(recipe.rates) == 0:
             logger.info("No reaction selected")
-        elif self.kmcresult.time_delta:
+        else:
             logger.info(
                 f"Overall time {self.time*1e-12:.4e} s, reaction occured after {self.kmcresult.time_delta*1e-12:.4e} s"
             )
@@ -787,12 +784,13 @@ class RunManager:
 
         # Set time to chosen 'time_start' of KMCResult
         ttime = self.kmcresult.time_start
+        time_index = self.kmcresult.time_start_index
         if isinstance(recipe.recipe_steps, list):
             recipe.recipe_steps = recipe.recipe_steps
         elif isinstance(recipe.recipe_steps, DeferredRecipeSteps):
-            recipe.recipe_steps = recipe.recipe_steps.callback(recipe.recipe_steps.key)
+            recipe.recipe_steps = recipe.recipe_steps.callback(recipe.recipe_steps.key, time_index)
         else:
-            m = f"Recipe steps of {recipe} are not a list or a DeferredRecipeSteps object."
+            m = f"Recipe steps of {recipe} are neither a list nor a DeferredRecipeSteps object."
             logger.error(m)
             raise ValueError(m)
         if any([isinstance(step, Place) for step in recipe.recipe_steps]):
