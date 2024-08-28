@@ -24,7 +24,7 @@ from typing import Callable, Optional
 from kimmdy.config import Config
 from kimmdy.constants import MARK_DONE, MARK_FAILED, MARK_STARTED, MARKERS
 from kimmdy.coordinates import break_bond_plumed, merge_top_slow_growth, place_atom
-from kimmdy.kmc import KMCResult, extrande, extrande_mod, frm, rf_kmc
+from kimmdy.kmc import KMCRejection, KMCResult, extrande, extrande_mod, frm, rf_kmc
 from kimmdy.parsing import read_top, write_json, write_time_marker, write_top
 from kimmdy.plugins import (
     BasicParameterizer,
@@ -142,7 +142,7 @@ class RunManager:
         self.iteration: int = -1  # start at -1 to have iteration 0 be the initial setup
         self.state: State = State.IDLE
         self.recipe_collection: RecipeCollection = RecipeCollection([])
-        self.kmcresult: Optional[KMCResult] = None
+        self.kmcresult: KMCResult|KMCRejection|None = None
         self.time: float = 0.0  # [ps]
         self.latest_files: dict[str, Path] = get_existing_files(config)
         logger.debug(f"Initialized latest files:\n{pformat(self.latest_files)}")
@@ -190,7 +190,7 @@ class RunManager:
             reaction_plugin = Plugin(name, self)
             self.reaction_plugins.append(reaction_plugin)
 
-        self.kmc_mapping: dict[str, Callable[..., KMCResult]] = {
+        self.kmc_mapping: dict[str, Callable[..., KMCResult|KMCRejection]] = {
             "extrande": extrande,
             "rfkmc": rf_kmc,
             "frm": frm,
@@ -730,8 +730,10 @@ class RunManager:
         if "extrande" in self.kmc_algorithm:
             kmc = partial(kmc, tau_scale=self.config.tau_scale)
         self.kmcresult = kmc(self.recipe_collection, logger=logger)
+        if isinstance(self.kmcresult, KMCRejection):
+            # rejection, nothing to be done
+            return files
         recipe = self.kmcresult.recipe
-
         if self.config.save_recipes:
             self.recipe_collection.to_csv(files.outputdir / "recipes.csv", recipe)
 
