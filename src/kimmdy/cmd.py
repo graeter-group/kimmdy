@@ -6,7 +6,6 @@ Other entry points such as `kimmdy-analysis` also live here.
 import argparse
 import logging
 import logging.config
-import os
 import shutil
 import sys
 import textwrap

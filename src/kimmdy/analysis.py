@@ -6,13 +6,12 @@ import argparse
 import json
 import subprocess as sp
 import re
-from datetime import datetime, timedelta
+from datetime import timedelta
 from pathlib import Path
 from typing import Optional, Union
 from collections import defaultdict
 
 import matplotlib as mpl
-import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 import MDAnalysis as mda
 import numpy as np
@@ -22,7 +21,7 @@ import seaborn.objects as so
 from seaborn import axes_style
 
 from kimmdy.parsing import read_json, write_json, read_time_marker
-from kimmdy.recipe import Bind, Break, Place, RecipeCollection
+from kimmdy.recipe import Bind, Break, DeferredRecipeSteps, Place, RecipeCollection
 from kimmdy.utils import run_shell_cmd, get_task_directories
 from kimmdy.constants import MARK_DONE, MARK_STARTED
 
@@ -471,13 +470,16 @@ def reaction_participation(dir: str, open_plot: bool = False):
             continue
         # get involved atoms
         reaction_atom_ids = set()
-        for step in picked_rp.recipe_steps:
-            if isinstance(step, Break) or isinstance(step, Bind):
-                reaction_atom_ids |= set([step.atom_id_1, step.atom_id_2])
-            elif isinstance(step, Place):
-                reaction_atom_ids |= set([step.id_to_place])
-            else:
-                continue
+        if isinstance(picked_rp.recipe_steps, DeferredRecipeSteps):
+            reaction_atom_ids.add(picked_rp.recipe_steps.key)
+        else:
+            for step in picked_rp.recipe_steps:
+                if isinstance(step, Break) or isinstance(step, Bind):
+                    reaction_atom_ids |= set([step.atom_id_1, step.atom_id_2])
+                elif isinstance(step, Place):
+                    reaction_atom_ids |= set([step.id_to_place])
+                else:
+                    continue
         # update count
         for atom_id in reaction_atom_ids:
             if atom_id in reaction_count:

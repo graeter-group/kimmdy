@@ -8,11 +8,10 @@ because of the fundamental premise of chemical kinetics
 and because we have one reactant molecule
 """
 
-import enum
 import logging
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from itertools import pairwise
-from typing import Callable, Optional
+from typing import Optional
 
 import numpy as np
 from numpy.random import default_rng

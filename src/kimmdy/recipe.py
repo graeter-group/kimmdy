@@ -567,7 +567,7 @@ class Recipe:
 
     def get_recipe_name(self):
         if isinstance(self.recipe_steps, DeferredRecipeSteps):
-            return f"DeferredRecipeSteps({self.recipe_steps.key},{self.recipe_steps.frame_index}, {self.recipe_steps.callback.__name__})"
+            return f"DeferredRecipeSteps({self.recipe_steps.key}, {self.recipe_steps.callback.__name__})"
         name = ""
         for rs in self.recipe_steps:
             name += " "
