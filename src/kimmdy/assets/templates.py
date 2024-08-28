@@ -40,7 +40,7 @@ if [ $HOURS -lt $CYCLE ]; then
   exit 3
 else
   echo "jobscript resubmitting"
-  sed -i.bak "s/\(run_directory:\s*\).*/\\1'{config.out.name}'/" {config.input_file}
+  sed -i.bak "s/\\(run_directory:\\s*\\).*/\\1'{config.out.name}'/" {config.input_file}
   kimmdy --generate-jobscript
   sbatch ./jobscript.sh
   exit 2
