@@ -783,19 +783,19 @@ class RunManager:
         recipe = self.kmcresult.recipe
         logger.info(f"Start Recipe in KIMMDY iteration {self.iteration}")
         logger.info(f"Recipe: {recipe.get_recipe_name()}")
-        logger.debug(f"Performing recipe steps:\n{pformat(recipe.steps)}")
+        logger.debug(f"Performing recipe steps:\n{pformat(recipe.recipe_steps)}")
 
         # Set time to chosen 'time_start' of KMCResult
         ttime = self.kmcresult.time_start
-        if isinstance(recipe.steps, list):
-            recipe.steps = recipe.steps
-        elif isinstance(recipe.steps, DeferredRecipeSteps):
-            recipe.steps = recipe.steps.callback(recipe.steps.key)
+        if isinstance(recipe.recipe_steps, list):
+            recipe.recipe_steps = recipe.recipe_steps
+        elif isinstance(recipe.recipe_steps, DeferredRecipeSteps):
+            recipe.recipe_steps = recipe.recipe_steps.callback(recipe.recipe_steps.key)
         else:
             m = f"Recipe steps of {recipe} are not a list or a DeferredRecipeSteps object."
             logger.error(m)
             raise ValueError(m)
-        if any([isinstance(step, Place) for step in recipe.steps]):
+        if any([isinstance(step, Place) for step in recipe.recipe_steps]):
             # only first time of interval is valid for placement
             ttime = recipe.timespans[0][0]
 
@@ -803,7 +803,7 @@ class RunManager:
 
         top_initial = deepcopy(self.top)
         focus_nrs = set()
-        for step in recipe.steps:
+        for step in recipe.recipe_steps:
             if isinstance(step, Break):
                 self.top.break_bond((step.atom_id_1, step.atom_id_2))
                 focus_nrs.update([step.atom_id_1, step.atom_id_2])
@@ -861,7 +861,7 @@ class RunManager:
             elif isinstance(step, CustomTopMod):
                 step.f(self.top)
 
-        self.top.update_partial_charges(recipe.steps)
+        self.top.update_partial_charges(recipe.recipe_steps)
         self.top.update_parameters(focus_nrs)
 
         write_top(self.top.to_dict(), files.outputdir / self.config.top.name)

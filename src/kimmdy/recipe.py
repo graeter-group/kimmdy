@@ -481,7 +481,7 @@ class Recipe:
 
     Parameters
     ----------
-    steps : list[RecipeStep]|DeferredRecipeSteps
+    recipe_steps : list[RecipeStep]|DeferredRecipeSteps
         Can be a single sequence of RecipeSteps to modify the topology
         or a tuple with a key and a function that takes said key to
         generate the RecipeSteps once it has been choosen.
@@ -499,7 +499,7 @@ class Recipe:
 
     """
 
-    steps: list[RecipeStep] | DeferredRecipeSteps
+    recipe_steps: list[RecipeStep] | DeferredRecipeSteps
     rates: list[float]
     timespans: list[tuple[float, float]]
 
@@ -507,12 +507,12 @@ class Recipe:
         self.check_consistency()
 
     def copy(self):
-        if isinstance(self.steps, list):
-            steps = list(self.steps)
+        if isinstance(self.recipe_steps, list):
+            steps = list(self.recipe_steps)
         else:
-            steps = self.steps
+            steps = self.recipe_steps
         return Recipe(
-            steps=steps,
+            recipe_steps=steps,
             rates=list(self.rates),
             timespans=list(self.timespans),
         )
@@ -525,12 +525,12 @@ class Recipe:
         other : Recipe
         """
 
-        if self.steps != other.steps:
+        if self.recipe_steps != other.recipe_steps:
             raise ValueError(
                 "Error: Trying to combine reaction paths with "
                 "different recipe_steps!\n"
-                f"self: {self.steps}\n"
-                f"other: {other.steps}"
+                f"self: {self.recipe_steps}\n"
+                f"other: {other.recipe_steps}"
             )
 
         self.check_consistency()
@@ -548,9 +548,9 @@ class Recipe:
                     f"\trates: {len(self.rates)}\n"
                     f"\ttimespans: {len(self.timespans)}"
                 )
-            if not isinstance(self.steps, list | DeferredRecipeSteps):
+            if not isinstance(self.recipe_steps, list | DeferredRecipeSteps):
                 raise ValueError(
-                    f"Recipe Steps must be a list (or tuple for deferred evaluation), not {type(self.steps)}"
+                    f"Recipe Steps must be a list (or tuple for deferred evaluation), not {type(self.recipe_steps)}"
                 )
             if not isinstance(self.timespans, list):
                 raise ValueError(
@@ -560,15 +560,15 @@ class Recipe:
                 raise ValueError(f"rates must be a list, not {type(self.rates)}")
 
         except ValueError as e:
-            raise ValueError(f"Consistency error in Recipe {self.steps}\n" + e.args[0])
+            raise ValueError(f"Consistency error in Recipe {self.recipe_steps}\n" + e.args[0])
 
     def get_recipe_name(self):
-        if isinstance(self.steps, DeferredRecipeSteps):
+        if isinstance(self.recipe_steps, DeferredRecipeSteps):
             return (
-                f"DeferredRecipeSteps({self.steps.key}, {self.steps.callback.__name__})"
+                f"DeferredRecipeSteps({self.recipe_steps.key}, {self.recipe_steps.callback.__name__})"
             )
         name = ""
-        for rs in self.steps:
+        for rs in self.recipe_steps:
             name += " "
             if isinstance(rs, Place):
                 if (ix := getattr(rs, "ix_to_place", None)) is not None:
@@ -608,7 +608,7 @@ class Recipe:
             )
             return False
         return (
-            self.steps == other.steps
+            self.recipe_steps == other.recipe_steps
             and self.rates == other.rates
             and self.timespans == other.timespans
         )
@@ -623,15 +623,15 @@ class Recipe:
             )
             return False
 
-        if type(self.steps) != type(other.steps):
+        if type(self.recipe_steps) != type(other.recipe_steps):
             return False
 
-        if not isinstance(self.steps, DeferredRecipeSteps) and not isinstance(
-            other.steps, DeferredRecipeSteps
+        if not isinstance(self.recipe_steps, DeferredRecipeSteps) and not isinstance(
+            other.recipe_steps, DeferredRecipeSteps
         ):
-            if len(self.steps) != len(other.steps):
+            if len(self.recipe_steps) != len(other.recipe_steps):
                 return False
-            for rs1, rs2 in zip(self.steps, other.steps):
+            for rs1, rs2 in zip(self.recipe_steps, other.recipe_steps):
                 if isinstance(rs1, CustomTopMod):
                     if not rs1.__almost_eq__(rs2):
                         return False
@@ -639,12 +639,12 @@ class Recipe:
                     if rs1 != rs2:
                         return False
 
-        if isinstance(self.steps, DeferredRecipeSteps) and isinstance(
-            other.steps, DeferredRecipeSteps
+        if isinstance(self.recipe_steps, DeferredRecipeSteps) and isinstance(
+            other.recipe_steps, DeferredRecipeSteps
         ):
             if (
-                self.steps.key == other.steps.key
-                and self.steps.callback.__name__ == other.steps.callback.__name__
+                self.recipe_steps.key == other.recipe_steps.key
+                and self.recipe_steps.callback.__name__ == other.recipe_steps.callback.__name__
             ):
                 return True
 
@@ -653,32 +653,36 @@ class Recipe:
 
 @dataclass
 class RecipeCollection:
-    """A RecipeCollection encompasses a number of reaction paths.
+    """A RecipeCollection encompasses a list of reaction paths.
     They can originate from multiple reaction plugins, but do not need to.
 
-    Returns
-    -------
-    unique_recipes_ixs
-        List of lists binning the old recipe indices and maps to the new
-        recipes list.
+    Parameters
+    ----------
+    recipes
+        List of Recipe objects.
     """
-
     recipes: list[Recipe]
 
     def aggregate_reactions(self):
-        """Combines reactions having the same sequence of RecipeSteps."""
+        """Combines reactions having the same sequence of RecipeSteps.
 
+        Returns
+        -------
+        unique_recipes_ixs
+            List of lists binning the old recipe indices and maps to the new
+            recipes list.
+        """
         logger.debug(f"Aggregating {len(self.recipes)} recipes")
         unique_recipes = []
         unique_recipes_ixs = []
 
         for i, recipe in enumerate(self.recipes):
-            if recipe.steps not in unique_recipes:
-                unique_recipes.append(recipe.steps)
+            if recipe.recipe_steps not in unique_recipes:
+                unique_recipes.append(recipe.recipe_steps)
                 unique_recipes_ixs.append([i])
             else:
                 for j, ur in enumerate(unique_recipes):
-                    if recipe.steps == ur:
+                    if recipe.recipe_steps == ur:
                         unique_recipes_ixs[j].append(i)
 
         # merge every dublicate into first reaction path
@@ -702,10 +706,10 @@ class RecipeCollection:
         rows = []
         for i, rp in enumerate(self.recipes):
             was_picked = rp == picked_recipe
-            if isinstance(rp.steps, list):
-                steps = "<>".join([rs.__repr__() for rs in rp.steps])
+            if isinstance(rp.recipe_steps, list):
+                steps = "<>".join([rs.__repr__() for rs in rp.recipe_steps])
             else:
-                steps = f"<{rp.steps.key},{rp.steps.callback.__name__}>"
+                steps = f"<{rp.recipe_steps.key},{rp.recipe_steps.callback.__name__}>"
             rows.append([i] + [was_picked] + [steps] + [rp.timespans] + [rp.rates])
 
         with open(path, "w", newline="") as f:
@@ -735,7 +739,7 @@ class RecipeCollection:
                 timespans = ast.literal_eval(timespans_s)
                 rates = ast.literal_eval(rates_s)
 
-                recipe = Recipe(steps=recipe_steps, timespans=timespans, rates=rates)
+                recipe = Recipe(recipe_steps=recipe_steps, timespans=timespans, rates=rates)
                 recipes.append(recipe)
                 if picked:
                     picked_rp = recipe
@@ -851,12 +855,12 @@ class RecipeCollection:
         recipes = np.array(self.recipes)
         recipe_steps = np.empty(len(self.recipes), dtype=object)
         for i, r in enumerate(self.recipes):
-            recipe_steps[i] = r.steps
+            recipe_steps[i] = r.recipe_steps
 
         idxs = list(np.argsort(cumprob)[-8:])
         ref = np.empty((1,), dtype=object)
         if highlight_r is not None:
-            ref[0] = highlight_r.steps
+            ref[0] = highlight_r.recipe_steps
             i_to_highlight = np.nonzero(recipe_steps == ref)[0]
             idxs = list(set(np.concatenate([idxs, i_to_highlight])))
 
