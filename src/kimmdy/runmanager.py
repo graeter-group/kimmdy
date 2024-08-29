@@ -567,8 +567,7 @@ class RunManager:
         self,
         instance: str,
         files: TaskFiles,
-        continue_md: bool = False,
-        slow_growth=False,
+        continue_md: bool = False
     ) -> TaskFiles:
         """General MD simulation"""
         logger = files.logger
@@ -853,7 +852,7 @@ class RunManager:
                 task = Task(
                     self,
                     f=self._run_md,
-                    kwargs={"instance": instance, "slow_growth": True},
+                    kwargs={"instance": instance},
                     out=instance,
                 )
                 md_files = task()
