@@ -330,8 +330,9 @@ def check_gmx_version(config):
 
     If PLUMED is meant to be used it additionally checks for the keyword
     'MODIFIED' or 'plumed' in the version name.
+
+    If slow growth pairs are used, it checks for gromacs version >= 2023.2
     """
-    # check for existing installation and get version
     try:
         version = [
             l
@@ -342,7 +343,10 @@ def check_gmx_version(config):
         ][0]
     except Exception as e:
         m = "No system gromacs detected. With error: " + str(e)
-        logger.error(m)
+        # NOTE: The logger is set up with information from the config
+        # the the config can't use the logger.
+        # Instead it collects the logmessages and displays them at the end.
+        config._logmessages["errors"].append(m)
         raise SystemError(m)
     # check version for plumed patch if necessary
     if hasattr(config, "mds"):
@@ -352,11 +356,25 @@ def check_gmx_version(config):
                     m = (
                         "GROMACS version does not contain 'MODIFIED' or "
                         "'plumed', aborting due to apparent lack of PLUMED patch."
+                        f"Version is: {version}"
                     )
-                    logger.error(m)
-                    logger.error("Version was: " + version)
+                    config._logmessages["error"].append(m)
                     if not config.dryrun:
                         raise SystemError(m)
+    if hasattr(config, "changer") and hasattr(config.changer, "coordinates"):
+        if config.changer.coordinates.slow_growth_pairs:
+            m = "Note: slow growth of pairs is only supported by >= gromacs 2023.2. To disable morphing pairs in config: md.changer.coordinates.slow_growth_pairs = false"
+            config._logmessages["debugs"].append(f"Gromacs version: {version}")
+            config._logmessages["errors"].append(m)
+            print(version)
+            # version = "GROMACS version:     2024.2-plumed_2.10.0_dev"
+            major_minor = re.match(r".*(\d{4})\.(\d+).*", version)
+            print(major_minor)
+            if major_minor is not None:
+                year = int(major_minor.group(1))
+                minor = int(major_minor.group(2))
+                if year < 2023 or (year == 2023 and minor < 2):
+                    raise SystemError(m)
     return version
 
 

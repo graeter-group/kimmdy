@@ -638,12 +638,6 @@ class RunManager:
         except CalledProcessError as e:
             write_time_marker(files.outputdir / MARK_FAILED, "failed")
             logger.error(f"Error occured during MD {instance}:\n{e}")
-            if slow_growth:
-                logger.error(
-                    "Note: slow growth of pairs is only supported by >= "
-                    "gromacs 2023.2. To disable morphing pairs in config:"
-                    "md.changer.coordinates.slow_growth_pairs = false"
-                )
             raise e
 
         logger.info(f"Done with MD {instance}")
@@ -733,6 +727,7 @@ class RunManager:
         if isinstance(self.kmcresult, KMCRejection):
             # rejection, nothing to be done
             return files
+        # TODO: are there other types of KMC Results? More nuanced rejections?
         recipe = self.kmcresult.recipe
         if self.config.save_recipes:
             self.recipe_collection.to_csv(files.outputdir / "recipes.csv", recipe)
@@ -779,6 +774,11 @@ class RunManager:
             write_time_marker(files.outputdir / MARK_FAILED, "failed")
             raise RuntimeError(m)
 
+        if isinstance(self.kmcresult, KMCRejection):
+            m = "Attampting to apply a recipe where none has been accepted (KMCRejection)."
+            logger.error(m)
+            raise RuntimeError(m)
+
         recipe = self.kmcresult.recipe
         logger.info(f"Start Recipe in KIMMDY iteration {self.iteration}")
         logger.info(f"Recipe: {recipe.get_recipe_name()}")
@@ -790,7 +790,9 @@ class RunManager:
         if isinstance(recipe.recipe_steps, list):
             recipe.recipe_steps = recipe.recipe_steps
         elif isinstance(recipe.recipe_steps, DeferredRecipeSteps):
+            logger.info(f"Steps of recipe where deferred, calling callback with key {recipe.recipe_steps.key} and time_index {time_index}")
             recipe.recipe_steps = recipe.recipe_steps.callback(recipe.recipe_steps.key, time_index)
+            logger.info(f"Got steps: {recipe.recipe_steps}")
         else:
             m = f"Recipe steps of {recipe} are neither a list nor a DeferredRecipeSteps object."
             logger.error(m)
@@ -835,7 +837,7 @@ class RunManager:
                     continue
 
                 if self.config.changer.coordinates.slow_growth:
-                    # Create a slow growth topology for sub-task run_md, afterwards, top will be reset properly
+                    # Create a temporary slow growth topology for sub-task run_md, afterwards, top will be reset properly
                     self.top.update_parameters(focus_nrs)
                     top_merge = merge_top_slow_growth(
                         top_initial,
