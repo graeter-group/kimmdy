@@ -505,7 +505,7 @@ def merge_top_moleculetypes_slow_growth(
                         neighbor_set.add(b[0])
                         neighbor_set.add(b[1])
                     neighbor_sides.append(neighbor_set)
-                neighbor_set.discard(idx)  # avoid double counting central bond
+                neighbor_set.discard(idx) # type: ignore  # avoid double counting central bond
 
                 # handle growing exclusions neighbors1 - key[1]
                 for a1 in neighbor_sides[0]:
@@ -701,8 +701,9 @@ def merge_top_slow_growth(
 
     molA = topA.moleculetypes[REACTIVE_MOLECULEYPE]
     molB = topB.moleculetypes[REACTIVE_MOLECULEYPE]
-    molB = merge_top_moleculetypes_slow_growth(molA, molB, topB.ff, morph_pairs)
-    topB._update_dict()
+    molB = merge_top_moleculetypes_slow_growth(molA=molA, molB=molB, ff=topB.ff, morph_pairs=morph_pairs)
+    # not necessary, will be updated automatically on `to_dict()`
+    # topB._update_dict()
 
     return topB
 

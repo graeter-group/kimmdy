@@ -531,7 +531,7 @@ class Recipe:
             if isinstance(rs, BondOperation):
                 ixs.add(rs.atom_ix_1)
                 ixs.add(rs.atom_ix_2)
-        return "index" + " ".join([str(ix) for ix in ixs])
+        return "index " + " ".join([str(ix) for ix in ixs])
 
 
 

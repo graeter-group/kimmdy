@@ -791,7 +791,7 @@ class RunManager:
         elif isinstance(recipe.recipe_steps, DeferredRecipeSteps):
             logger.info(f"Steps of recipe where deferred, calling callback with key {recipe.recipe_steps.key} and time_index {time_index}")
             recipe.recipe_steps = recipe.recipe_steps.callback(recipe.recipe_steps.key, time_index)
-            logger.info(f"Got steps: {recipe.recipe_steps}")
+            logger.info(f"Got {len(recipe.recipe_steps)} steps: {recipe.recipe_steps}")
         else:
             m = f"Recipe steps of {recipe} are neither a list nor a DeferredRecipeSteps object."
             logger.error(m)
@@ -802,7 +802,9 @@ class RunManager:
 
         # get vmd selection (after deferred steps are resolved)
         vmd_selection = recipe.get_vmd_selection()
-        logger.info(f"VMD slection: {vmd_selection}")
+        logger.info(f"VMD selection: {vmd_selection}")
+        with open(files.outputdir / "vmd_selection.txt") as f:
+            f.write(vmd_selection)
 
         # truncate simulation files to the chosen time
         m = f"Truncating simulation files to time {ttime} ps"
@@ -810,7 +812,7 @@ class RunManager:
         truncate_sim_files(files=files, time=ttime)
 
         top_initial = deepcopy(self.top)
-        focus_nrs = set()
+        focus_nrs: set[str] = set()
         for step in recipe.recipe_steps:
             if isinstance(step, Break):
                 self.top.break_bond((step.atom_id_1, step.atom_id_2))
@@ -834,7 +836,8 @@ class RunManager:
                 place_files = task()
                 if place_files is not None:
                     self._discover_output_files(task.name, place_files)
-                focus_nrs.update([step.id_to_place])
+                if step.id_to_place is not None:
+                    focus_nrs.update([step.id_to_place])
 
             elif isinstance(step, Relax):
                 logger.info("Starting relaxation md as part of reaction..")
@@ -845,9 +848,50 @@ class RunManager:
                 if self.config.changer.coordinates.slow_growth:
                     # Create a temporary slow growth topology for sub-task run_md, afterwards, top will be reset properly
                     self.top.update_parameters(focus_nrs)
+
+
+                    # top_initial is still the topology before the reaction
+                    # we need to do some (temporary) changes to it to stabilize
+                    # the slow_growth
+                    # First we find out if there are solvent atoms among the involved atoms
+                    solvent_atoms: set[str] = set()
+                    for ai in focus_nrs:
+                        logger.debug(f"Checking atom {ai} for solvent residue")
+                        logger.debug(f"Checking atom {top_initial.atoms[ai]}")
+                        if top_initial.atoms[ai].residue == "SOL":
+                            solvent_atoms.add(ai)
+                    if len(solvent_atoms) > 0:
+                        logger.info(
+                            "Solvent atoms are involved in the reaction, "
+                            "they will get tempoary bonds for the start "
+                            "of the slow growth simulation."
+                        )
+                        logger.info(f"Solvent atoms: {solvent_atoms}")
+                        ow = None
+                        hw1 = None
+                        hw2 = None
+                        for ai in solvent_atoms:
+                            a = top_initial.atoms[ai]
+                            if a.atom == "OW":
+                                ow = a
+                            if a.atom == "HW1":
+                                hw1 = a
+                            if a.atom == "HW2":
+                                hw2 = a
+                        if ow is not None and hw1 is not None and hw2 is not None:
+                            logger.info("Found one complete water molecule that takes part in the reaction.")
+                            top_initial.bind_bond((ow.nr, hw1.nr))
+                            top_initial.bind_bond((ow.nr, hw2.nr))
+                            b1 = top_initial.bonds.get((ow.nr, hw1.nr))
+                            b2 = top_initial.bonds.get((ow.nr, hw2.nr))
+                            logger.info(f"Added bonds: {b1}, {b2}")
+
+
                     top_merge = merge_top_slow_growth(
-                        top_initial,
-                        deepcopy(self.top),
+                        # topA was copied before parameters are updated
+                        topA=top_initial,
+                        # topB is parameterized for after the reaction
+                        topB=deepcopy(self.top),
                         morph_pairs=self.config.changer.coordinates.slow_growth_pairs,
                     )
                     top_merge_path = files.outputdir / self.config.top.name.replace(
@@ -872,6 +916,8 @@ class RunManager:
         self.top.update_partial_charges(recipe.recipe_steps)
         self.top.update_parameters(focus_nrs)
 
+        # this is the new topology after the reaction
+        # not the tempoary topology top_mod for slow_growth
         write_top(self.top.to_dict(), files.outputdir / self.config.top.name)
         files.output["top"] = files.outputdir / self.config.top.name
 

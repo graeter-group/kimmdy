@@ -1461,10 +1461,12 @@ class Topology:
             for exclusion_key in reactive_moleculetype.exclusions.keys():
                 if ai in exclusion_key:
                     to_delete.append(exclusion_key)
+
             if len(to_delete) > 0:
                 logger.info(f"Removing exclusions {to_delete}")
             for key in to_delete:
                 reactive_moleculetype.exclusions.pop(key)
             settles = reactive_moleculetype.settles.get(ai)
             if settles is not None:
+                logger.info(f"Removing settles {ai}")
                 reactive_moleculetype.settles.pop(ai)
