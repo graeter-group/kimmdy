@@ -800,6 +800,13 @@ class RunManager:
             # only first time of interval is valid for placement
             ttime = recipe.timespans[0][0]
 
+        # get vmd selection (after deferred steps are resolved)
+        vmd_selection = recipe.get_vmd_selection()
+        logger.info(f"VMD slection: {vmd_selection}")
+
+        # truncate simulation files to the chosen time
+        m = f"Truncating simulation files to time {ttime} ps"
+        logger.info(m)
         truncate_sim_files(files=files, time=ttime)
 
         top_initial = deepcopy(self.top)

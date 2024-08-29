@@ -518,6 +518,23 @@ class Recipe:
             timespans=list(self.timespans),
         )
 
+    def get_vmd_selection(self) -> str:
+        """Get a VMD selection string
+
+        for the atoms involved in the recipe steps.
+        """
+        if isinstance(self.recipe_steps, DeferredRecipeSteps):
+            return ""
+        ixs = set()
+        for rs in self.recipe_steps:
+            print(self.recipe_steps)
+            if isinstance(rs, BondOperation):
+                ixs.add(rs.atom_ix_1)
+                ixs.add(rs.atom_ix_2)
+        return "index" + " ".join([str(ix) for ix in ixs])
+
+
+
     def combine_with(self, other: Recipe):
         """Combines this Recipe with another with the same RecipeSteps.
 

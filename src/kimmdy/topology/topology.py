@@ -1041,18 +1041,23 @@ class Topology:
                     # check whether bond exists in topology
                     residue = atom1.residue
                     bondtype = (atom1.atom, atom2.atom)
-                    residue_bond_spec = self.ff.residuetypes[residue].bonds.get(
+                    residuetype = self.ff.residuetypes.get(residue)
+                    if residuetype is None:
+                        m = f"Residue {residue} not found in residuetypes. Can't update partial charges!"
+                        logger.warning(m)
+                        continue
+                    residue_bond_spec = residuetype.bonds.get(
                         bondtype,
-                        self.ff.residuetypes[residue].bonds.get(
+                        residuetype.bonds.get(
                             (bondtype[-1], bondtype[-2])
                         ),
                     )
                     if residue_bond_spec:
                         atom1.charge = (
-                            self.ff.residuetypes[residue].atoms[atom1.atom].charge
+                            residuetype.atoms[atom1.atom].charge
                         )
                         atom2.charge = (
-                            self.ff.residuetypes[residue].atoms[atom2.atom].charge
+                            residuetype.atoms[atom2.atom].charge
                         )
                     else:
                         logger.warning(
@@ -1449,13 +1454,15 @@ class Topology:
 
         # remove settles and explicit exclusions
         # those are used by solvent molecules
-        # but if a solvent molecule get's bounds to other parts
+        # but if a solvent molecule get's bound to other parts
         # of the reactive molecule it is no longer a solvent molecule
         for ai in atompair_nrs:
             to_delete = []
             for exclusion_key in reactive_moleculetype.exclusions.keys():
                 if ai in exclusion_key:
                     to_delete.append(exclusion_key)
+            if len(to_delete) > 0:
+                logger.info(f"Removing exclusions {to_delete}")
             for key in to_delete:
                 reactive_moleculetype.exclusions.pop(key)
             settles = reactive_moleculetype.settles.get(ai)
