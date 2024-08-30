@@ -8,9 +8,11 @@ import logging
 import re
 import subprocess as sp
 from pathlib import Path
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, Iterable, Optional, Union
 
 import numpy as np
+
+from kimmdy.recipe import RecipeCollection
 
 if TYPE_CHECKING:
     from kimmdy.parsing import Plumed_dict
@@ -29,6 +31,8 @@ The line number - 2 (for the title and the number of atoms) is always
 the correct the atom id.
 """
 
+def flatten_recipe_collections(d: dict[str, RecipeCollection]) -> RecipeCollection:
+    return RecipeCollection(recipes=[x for v in d.values() for x in v.recipes])
 
 def field_or_none(l: list[str], i) -> Optional[str]:
     try:

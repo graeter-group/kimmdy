@@ -56,6 +56,7 @@ class KMCResult:
     time_delta: float
     time_start: float
     time_start_index: int
+    time_start_index_within_plugin: int|None = None
 
 @dataclass
 class KMCRejection:

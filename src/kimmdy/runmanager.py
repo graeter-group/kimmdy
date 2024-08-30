@@ -44,7 +44,7 @@ from kimmdy.recipe import (
 from kimmdy.tasks import Task, TaskFiles, get_plumed_out
 from kimmdy.topology.topology import Topology
 from kimmdy.topology.utils import get_is_reactive_predicate_from_config_f
-from kimmdy.utils import get_task_directories, run_gmx, truncate_sim_files
+from kimmdy.utils import flatten_recipe_collections, get_task_directories, run_gmx, truncate_sim_files
 
 logger = logging.getLogger(__name__)
 
@@ -119,8 +119,8 @@ class RunManager:
         Current iteration.
     state
         Current state of the system.
-    recipe_collection
-        Collection of recipes.
+    recipe_collections
+        Dictionary of recipe collections. Keyed by the name of the reaction plugin.
     latest_files
         Dictionary of latest files.
     histfile
@@ -141,7 +141,7 @@ class RunManager:
         self.priority_tasks: queue.Queue[Task] = queue.Queue()
         self.iteration: int = -1  # start at -1 to have iteration 0 be the initial setup
         self.state: State = State.IDLE
-        self.recipe_collection: RecipeCollection = RecipeCollection([])
+        self.recipe_collections: dict[str, RecipeCollection] = {}
         self.kmcresult: KMCResult|KMCRejection|None = None
         self.time: float = 0.0  # [ps]
         self.latest_files: dict[str, Path] = get_existing_files(config)
@@ -187,7 +187,7 @@ class RunManager:
         for name in self.config.reactions.get_attributes():
             logger.debug(f"Initializing reaction: {name}")
             Plugin = reaction_plugins[name]
-            reaction_plugin = Plugin(name, self)
+            reaction_plugin = Plugin(name=name, runmng=self)
             self.reaction_plugins.append(reaction_plugin)
 
         self.kmc_mapping: dict[str, Callable[..., KMCResult|KMCRejection]] = {
@@ -645,8 +645,8 @@ class RunManager:
     def _place_reaction_tasks(self, selected: Optional[str] = None) -> None:
         logger.info("Start query reactions")
         self.state = State.REACTION
-        # empty list for every new round of queries
-        self.recipe_collection: RecipeCollection = RecipeCollection([])
+        # empty collection for every new round of queries
+        self.recipe_collections = {}
 
         # placing tasks in priority queue
         strategies = []
@@ -693,7 +693,7 @@ class RunManager:
         logger.info(f"Start query {reaction_plugin.name}")
 
         new_recipes = reaction_plugin.get_recipe_collection(files).recipes
-        self.recipe_collection.recipes.extend(new_recipes)
+        self.recipe_collections[reaction_plugin.name] = RecipeCollection(recipes=new_recipes)
 
         logger.info(
             f"Done with Query reactions, {len(new_recipes)} "
@@ -709,7 +709,8 @@ class RunManager:
         logger = files.logger
         logger.info(
             f"Start Decide recipe using {self.kmc_algorithm}, "
-            f"{len(self.recipe_collection.recipes)} recipes available."
+            f"{sum(len(collection.recipes) for collection in self.recipe_collections.values())} total recipes available. "
+            f"from {len(self.recipe_collections.keys())} reaction plugins."
         )
         kmc = self.kmc_mapping.get(self.kmc_algorithm, None)
         if kmc is None:
@@ -719,17 +720,38 @@ class RunManager:
 
         # FIXME: Hotfix for #355 aggregate not working for big systems
         if "rfkmc" != self.kmc_algorithm:
-            self.recipe_collection.aggregate_reactions()
+            for collection in self.recipe_collections.values():
+                # NOTE: this is making the implicit assumption that
+                # different reaction plugins produce different types
+                # of reactions.
+                # If this changes we can flatten before aggregating
+                # WARN: This can have a subtle bug for
+                # reactions with DeferredRecipeSteps,
+                # if they produce non-unique reactions,
+                # which would aggregate and mess up the time_start_index.
+                # compared to their internal counting
+                collection.aggregate_reactions()
         if "extrande" in self.kmc_algorithm:
             kmc = partial(kmc, tau_scale=self.config.tau_scale)
-        self.kmcresult = kmc(self.recipe_collection, logger=logger)
+
+        self.kmcresult = kmc(flatten_recipe_collections(self.recipe_collections))
         if isinstance(self.kmcresult, KMCRejection):
             # rejection, nothing to be done
+            # TODO: are there other types of KMC Results? More nuanced rejections?
             return files
-        # TODO: are there other types of KMC Results? More nuanced rejections?
+
+        # Correct the offset of time_start_index by the concatenation
+        # of all recipes from all reactions back onto the offset
+        # within the one chosen reaction plugin
+        n_recipes_per_plugin = [len(v.recipes) for v in self.recipe_collections.values()]
+        logger.info(f"Plugins: {[k for k in self.recipe_collections.keys()]}")
+        logger.info(f"Number of recipes per reaction plugin: {n_recipes_per_plugin}")
+
+        self.kmcresult.time_start_index_within_plugin = total_index_to_index_within_plugin(self.kmcresult.time_start_index, n_recipes_per_plugin)
+
         recipe = self.kmcresult.recipe
         if self.config.save_recipes:
-            self.recipe_collection.to_csv(files.outputdir / "recipes.csv", recipe)
+            flatten_recipe_collections(self.recipe_collections).to_csv(files.outputdir / "recipes.csv", recipe)
 
         try:
             if self.config.plot_rates:
@@ -739,7 +761,7 @@ class RunManager:
                 }
                 if self.kmcresult.time_start != 0:
                     kwargs["highlight_t"] = self.kmcresult.time_start
-                self.recipe_collection.plot(**kwargs)
+                flatten_recipe_collections(self.recipe_collections).plot(**kwargs)
         except Exception as e:
             logger.warning(f"Error occured during plotting:\n{e}")
 
@@ -785,12 +807,17 @@ class RunManager:
 
         # Set time to chosen 'time_start' of KMCResult
         ttime = self.kmcresult.time_start
-        time_index = self.kmcresult.time_start_index
+        plugin_time_index = self.kmcresult.time_start_index_within_plugin
+        if plugin_time_index is None:
+            m = f"Time index within plugin is None, this should not happen. Was _apply_recipe called before _decide_recipe?"
+            logger.error(m)
+            raise RuntimeError(m)
+
         if isinstance(recipe.recipe_steps, list):
             recipe.recipe_steps = recipe.recipe_steps
         elif isinstance(recipe.recipe_steps, DeferredRecipeSteps):
-            logger.info(f"Steps of recipe where deferred, calling callback with key {recipe.recipe_steps.key} and time_index {time_index}")
-            recipe.recipe_steps = recipe.recipe_steps.callback(recipe.recipe_steps.key, time_index)
+            logger.info(f"Steps of recipe where deferred, calling callback with key {recipe.recipe_steps.key} and time_index {plugin_time_index}")
+            recipe.recipe_steps = recipe.recipe_steps.callback(recipe.recipe_steps.key, plugin_time_index)
             logger.info(f"Got {len(recipe.recipe_steps)} steps: {recipe.recipe_steps}")
         else:
             m = f"Recipe steps of {recipe} are neither a list nor a DeferredRecipeSteps object."

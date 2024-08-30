@@ -3,7 +3,7 @@ import pytest
 import numpy as np
 from numpy.random import default_rng
 from kimmdy.recipe import Recipe, RecipeCollection, Break, Bind
-from kimmdy.kmc import KMCRejection, rf_kmc, frm, extrande, extrande_mod, KMCResult
+from kimmdy.kmc import KMCRejection, rf_kmc, frm, extrande, extrande_mod, KMCResult, total_index_to_index_within_plugin
 
 
 @pytest.fixture
@@ -139,14 +139,12 @@ def test_frm_no_event(recipe_collection):
 
 def test_compare_extrande_extrande_mod(recipe_collection):
     rng = default_rng(1)
-    dummy_logger = logging.Logger("Dummy")
-    dummy_logger.setLevel(logging.DEBUG)
     extrande_list = [
-        extrande(recipe_collection, 1.0, rng=rng, logger=dummy_logger)
+        extrande(recipe_collection, 1.0, rng=rng)
         for _ in range(2000)
     ]
     extrande_mod_list = [
-        extrande_mod(recipe_collection, 1.0, rng=rng, logger=dummy_logger)
+        extrande_mod(recipe_collection, 1.0, rng=rng)
         for _ in range(2000)
     ]
     ext_ts = np.array([r.time_start for r in extrande_list if isinstance(r, KMCResult)])
@@ -160,3 +158,15 @@ def test_compare_extrande_extrande_mod(recipe_collection):
     extmod_rs = np.concatenate([r.recipe.rates for r in extrande_mod_list if isinstance(r, KMCResult)])
 
     assert abs(ext_rs.mean() - extmod_rs.mean()) < 0.002
+
+def test_total_index_to_index_within_plugin():
+    ns = [3, 2, 4, 1]
+    assert total_index_to_index_within_plugin(0, ns) == 0
+    assert total_index_to_index_within_plugin(1, ns) == 1
+    assert total_index_to_index_within_plugin(2, ns) == 2
+    assert total_index_to_index_within_plugin(3, ns) == 0
+    assert total_index_to_index_within_plugin(4, ns) == 1
+    assert total_index_to_index_within_plugin(5, ns) == 0
+
+
+
