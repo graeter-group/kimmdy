@@ -24,7 +24,7 @@ from typing import Callable, Optional
 from kimmdy.config import Config
 from kimmdy.constants import MARK_DONE, MARK_FAILED, MARK_STARTED, MARKERS
 from kimmdy.coordinates import break_bond_plumed, merge_top_slow_growth, place_atom
-from kimmdy.kmc import KMCRejection, KMCResult, extrande, extrande_mod, frm, rf_kmc
+from kimmdy.kmc import KMCRejection, KMCResult, extrande, extrande_mod, frm, rf_kmc, total_index_to_index_within_plugin
 from kimmdy.parsing import read_top, write_json, write_time_marker, write_top
 from kimmdy.plugins import (
     BasicParameterizer,
@@ -830,7 +830,7 @@ class RunManager:
         # get vmd selection (after deferred steps are resolved)
         vmd_selection = recipe.get_vmd_selection()
         logger.info(f"VMD selection: {vmd_selection}")
-        with open(files.outputdir / "vmd_selection.txt") as f:
+        with open(files.outputdir / "vmd_selection.txt", 'w') as f:
             f.write(vmd_selection)
 
         # truncate simulation files to the chosen time
