@@ -24,7 +24,15 @@ from typing import Callable, Optional
 from kimmdy.config import Config
 from kimmdy.constants import MARK_DONE, MARK_FAILED, MARK_STARTED, MARKERS
 from kimmdy.coordinates import break_bond_plumed, merge_top_slow_growth, place_atom
-from kimmdy.kmc import KMCRejection, KMCResult, extrande, extrande_mod, frm, rf_kmc, total_index_to_index_within_plugin
+from kimmdy.kmc import (
+    KMCRejection,
+    KMCResult,
+    extrande,
+    extrande_mod,
+    frm,
+    rf_kmc,
+    total_index_to_index_within_plugin,
+)
 from kimmdy.parsing import read_top, write_json, write_time_marker, write_top
 from kimmdy.plugins import (
     BasicParameterizer,
@@ -44,7 +52,12 @@ from kimmdy.recipe import (
 from kimmdy.tasks import Task, TaskFiles, get_plumed_out
 from kimmdy.topology.topology import Topology
 from kimmdy.topology.utils import get_is_reactive_predicate_from_config_f
-from kimmdy.utils import flatten_recipe_collections, get_task_directories, run_gmx, truncate_sim_files
+from kimmdy.utils import (
+    flatten_recipe_collections,
+    get_task_directories,
+    run_gmx,
+    truncate_sim_files,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -142,7 +155,7 @@ class RunManager:
         self.iteration: int = -1  # start at -1 to have iteration 0 be the initial setup
         self.state: State = State.IDLE
         self.recipe_collections: dict[str, RecipeCollection] = {}
-        self.kmcresult: KMCResult|KMCRejection|None = None
+        self.kmcresult: KMCResult | KMCRejection | None = None
         self.time: float = 0.0  # [ps]
         self.latest_files: dict[str, Path] = get_existing_files(config)
         logger.debug(f"Initialized latest files:\n{pformat(self.latest_files)}")
@@ -190,7 +203,7 @@ class RunManager:
             reaction_plugin = Plugin(name=name, runmng=self)
             self.reaction_plugins.append(reaction_plugin)
 
-        self.kmc_mapping: dict[str, Callable[..., KMCResult|KMCRejection]] = {
+        self.kmc_mapping: dict[str, Callable[..., KMCResult | KMCRejection]] = {
             "extrande": extrande,
             "rfkmc": rf_kmc,
             "frm": frm,
@@ -564,10 +577,7 @@ class RunManager:
         )
 
     def _run_md(
-        self,
-        instance: str,
-        files: TaskFiles,
-        continue_md: bool = False
+        self, instance: str, files: TaskFiles, continue_md: bool = False
     ) -> TaskFiles:
         """General MD simulation"""
         logger = files.logger
@@ -693,7 +703,9 @@ class RunManager:
         logger.info(f"Start query {reaction_plugin.name}")
 
         new_recipes = reaction_plugin.get_recipe_collection(files).recipes
-        self.recipe_collections[reaction_plugin.name] = RecipeCollection(recipes=new_recipes)
+        self.recipe_collections[reaction_plugin.name] = RecipeCollection(
+            recipes=new_recipes
+        )
 
         logger.info(
             f"Done with Query reactions, {len(new_recipes)} "
@@ -743,15 +755,23 @@ class RunManager:
         # Correct the offset of time_start_index by the concatenation
         # of all recipes from all reactions back onto the offset
         # within the one chosen reaction plugin
-        n_recipes_per_plugin = [len(v.recipes) for v in self.recipe_collections.values()]
+        n_recipes_per_plugin = [
+            len(v.recipes) for v in self.recipe_collections.values()
+        ]
         logger.info(f"Plugins: {[k for k in self.recipe_collections.keys()]}")
         logger.info(f"Number of recipes per reaction plugin: {n_recipes_per_plugin}")
 
-        self.kmcresult.time_start_index_within_plugin = total_index_to_index_within_plugin(self.kmcresult.time_start_index, n_recipes_per_plugin)
+        self.kmcresult.time_start_index_within_plugin = (
+            total_index_to_index_within_plugin(
+                self.kmcresult.time_start_index, n_recipes_per_plugin
+            )
+        )
 
         recipe = self.kmcresult.recipe
         if self.config.save_recipes:
-            flatten_recipe_collections(self.recipe_collections).to_csv(files.outputdir / "recipes.csv", recipe)
+            flatten_recipe_collections(self.recipe_collections).to_csv(
+                files.outputdir / "recipes.csv", recipe
+            )
 
         try:
             if self.config.plot_rates:
@@ -816,8 +836,12 @@ class RunManager:
         if isinstance(recipe.recipe_steps, list):
             recipe.recipe_steps = recipe.recipe_steps
         elif isinstance(recipe.recipe_steps, DeferredRecipeSteps):
-            logger.info(f"Steps of recipe where deferred, calling callback with key {recipe.recipe_steps.key} and time_index {plugin_time_index}")
-            recipe.recipe_steps = recipe.recipe_steps.callback(recipe.recipe_steps.key, plugin_time_index)
+            logger.info(
+                f"Steps of recipe where deferred, calling callback with key {recipe.recipe_steps.key} and time_index {plugin_time_index}"
+            )
+            recipe.recipe_steps = recipe.recipe_steps.callback(
+                recipe.recipe_steps.key, plugin_time_index
+            )
             logger.info(f"Got {len(recipe.recipe_steps)} steps: {recipe.recipe_steps}")
         else:
             m = f"Recipe steps of {recipe} are neither a list nor a DeferredRecipeSteps object."
@@ -830,7 +854,7 @@ class RunManager:
         # get vmd selection (after deferred steps are resolved)
         vmd_selection = recipe.get_vmd_selection()
         logger.info(f"VMD selection: {vmd_selection}")
-        with open(files.outputdir / "vmd_selection.txt", 'w') as f:
+        with open(files.outputdir / "vmd_selection.txt", "w") as f:
             f.write(vmd_selection)
 
         # truncate simulation files to the chosen time
@@ -876,7 +900,6 @@ class RunManager:
                     # Create a temporary slow growth topology for sub-task run_md, afterwards, top will be reset properly
                     self.top.update_parameters(focus_nrs)
 
-
                     # top_initial is still the topology before the reaction
                     # we need to do some (temporary) changes to it to stabilize
                     # the slow_growth
@@ -906,13 +929,14 @@ class RunManager:
                             if a.atom == "HW2":
                                 hw2 = a
                         if ow is not None and hw1 is not None and hw2 is not None:
-                            logger.info("Found one complete water molecule that takes part in the reaction.")
+                            logger.info(
+                                "Found one complete water molecule that takes part in the reaction."
+                            )
                             top_initial.bind_bond((ow.nr, hw1.nr))
                             top_initial.bind_bond((ow.nr, hw2.nr))
                             b1 = top_initial.bonds.get((ow.nr, hw1.nr))
                             b2 = top_initial.bonds.get((ow.nr, hw2.nr))
                             logger.info(f"Added bonds: {b1}, {b2}")
-
 
                     top_merge = merge_top_slow_growth(
                         # topA was copied before parameters are updated

@@ -31,8 +31,10 @@ The line number - 2 (for the title and the number of atoms) is always
 the correct the atom id.
 """
 
+
 def flatten_recipe_collections(d: dict[str, RecipeCollection]) -> RecipeCollection:
     return RecipeCollection(recipes=[x for v in d.values() for x in v.recipes])
+
 
 def field_or_none(l: list[str], i) -> Optional[str]:
     try:

@@ -22,7 +22,9 @@ from kimmdy.recipe import Recipe, RecipeCollection
 logger = logging.getLogger(__name__)
 
 
-def total_index_to_index_within_plugin(total_index: int, n_recipes_per_plugin: list[int]) -> int:
+def total_index_to_index_within_plugin(
+    total_index: int, n_recipes_per_plugin: list[int]
+) -> int:
     i = total_index
     for n in [0] + n_recipes_per_plugin:
         if i - n < 0:
@@ -52,20 +54,22 @@ class KMCResult:
     """
 
     recipe: Recipe
-    reaction_probability: list[float]|None
+    reaction_probability: list[float] | None
     time_delta: float
     time_start: float
     time_start_index: int
-    time_start_index_within_plugin: int|None = None
+    time_start_index_within_plugin: int | None = None
+
 
 @dataclass
 class KMCRejection:
-    reason: str|None = None
+    reason: str | None = None
+
 
 def rf_kmc(
     recipe_collection: RecipeCollection,
     rng: np.random.Generator = default_rng(),
-) -> KMCResult|KMCRejection:
+) -> KMCResult | KMCRejection:
     """Rejection-Free Monte Carlo.
     Takes RecipeCollection and choses a recipe based on the relative propensity of the events.
     The 'start' time of the reaction is the time of the highest rate of the accepted reaction.
@@ -131,7 +135,7 @@ def frm(
     recipe_collection: RecipeCollection,
     rng: np.random.Generator = default_rng(),
     MD_time: Optional[float] = None,
-) -> KMCResult|KMCRejection:
+) -> KMCResult | KMCRejection:
     """First Reaction Method variant of Kinetic Monte Carlo.
     takes RecipeCollection and choses a recipe based on which reaction would occur.
 
@@ -191,9 +195,7 @@ def frm(
         reaction_time = chosen_recipe.timespans[time_index][1]
     except ValueError:
         m = f"FRM recipe selection did not work, probably tau: {tau} is empty."
-        logger.warning(
-            m
-        )
+        logger.warning(m)
         return KMCRejection(m)
 
     return KMCResult(
@@ -201,7 +203,7 @@ def frm(
         reaction_probability=reaction_probability,
         time_delta=time_delta,
         time_start=reaction_time,
-        time_start_index=int(time_index)
+        time_start_index=int(time_index),
     )
 
 
@@ -209,7 +211,7 @@ def extrande_mod(
     recipe_collection: RecipeCollection,
     tau_scale: float,
     rng: np.random.Generator = default_rng(),
-) -> KMCResult|KMCRejection:
+) -> KMCResult | KMCRejection:
     """Modified Extrande KMC
 
     Improved implementation of
@@ -320,7 +322,7 @@ def extrande_mod(
         reaction_probability=None,
         time_delta=0,  # instantaneous reaction
         time_start=t,
-        time_start_index=int(idx_rate_max)
+        time_start_index=int(idx_rate_max),
     )
 
 
@@ -328,7 +330,7 @@ def extrande(
     recipe_collection: RecipeCollection,
     tau_scale: float,
     rng: np.random.Generator = default_rng(),
-) -> KMCResult|KMCRejection:
+) -> KMCResult | KMCRejection:
     """Extrande KMC
 
     Implemented as in
@@ -450,5 +452,5 @@ def extrande(
         reaction_probability=None,
         time_delta=0,  # instantaneous reaction
         time_start=t,
-        time_start_index=int(idx_rate_max)
+        time_start_index=int(idx_rate_max),
     )

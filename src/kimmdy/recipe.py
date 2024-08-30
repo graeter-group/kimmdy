@@ -24,7 +24,7 @@ def recipe_steps_from_str(
     recipe_steps_s: str,
 ) -> list[RecipeStep] | DeferredRecipeSteps:
     if recipe_steps_s.startswith("<") and recipe_steps_s.endswith(">"):
-        key,callback = recipe_steps_s.removeprefix("<").removesuffix(">").split(",")
+        key, callback = recipe_steps_s.removeprefix("<").removesuffix(">").split(",")
 
         def dummy_callback(key, i):
             _ = key
@@ -532,8 +532,6 @@ class Recipe:
                 ixs.add(rs.atom_ix_1)
                 ixs.add(rs.atom_ix_2)
         return "index " + " ".join([str(ix) for ix in ixs])
-
-
 
     def combine_with(self, other: Recipe):
         """Combines this Recipe with another with the same RecipeSteps.

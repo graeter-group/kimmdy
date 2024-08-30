@@ -202,7 +202,12 @@ class Config:
             # NOTE: The logger is set up with information from the config
             # the the config can't use the logger.
             # Instead it collects the logmessages and displays them at the end.
-            self._logmessages = {"infos": [], "warnings": [], "errors": [], "debugs": []}
+            self._logmessages = {
+                "infos": [],
+                "warnings": [],
+                "errors": [],
+                "debugs": [],
+            }
             self._set_defaults(section, scheme)
             self._validate(section=section, cwd=self.cwd)
 

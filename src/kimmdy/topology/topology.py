@@ -1048,17 +1048,11 @@ class Topology:
                         continue
                     residue_bond_spec = residuetype.bonds.get(
                         bondtype,
-                        residuetype.bonds.get(
-                            (bondtype[-1], bondtype[-2])
-                        ),
+                        residuetype.bonds.get((bondtype[-1], bondtype[-2])),
                     )
                     if residue_bond_spec:
-                        atom1.charge = (
-                            residuetype.atoms[atom1.atom].charge
-                        )
-                        atom2.charge = (
-                            residuetype.atoms[atom2.atom].charge
-                        )
+                        atom1.charge = residuetype.atoms[atom1.atom].charge
+                        atom2.charge = residuetype.atoms[atom2.atom].charge
                     else:
                         logger.warning(
                             f"New bond defined in {step} but can't be found in residuetypes definition. Not changing the partial charges!"
