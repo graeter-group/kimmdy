@@ -15,8 +15,21 @@ from typing import Optional
 
 import numpy as np
 from numpy.random import default_rng
+import logging
 
 from kimmdy.recipe import Recipe, RecipeCollection
+
+logger = logging.getLogger(__name__)
+
+
+def total_index_to_index_within_plugin(total_index: int, n_recipes_per_plugin: list[int]) -> int:
+    i = total_index
+    for n in [0] + n_recipes_per_plugin:
+        if i - n < 0:
+            return i
+        else:
+            i -= n
+    return i
 
 
 @dataclass
@@ -50,7 +63,6 @@ class KMCRejection:
 
 def rf_kmc(
     recipe_collection: RecipeCollection,
-    logger: logging.Logger = logging.getLogger(__name__),
     rng: np.random.Generator = default_rng(),
 ) -> KMCResult|KMCRejection:
     """Rejection-Free Monte Carlo.
@@ -116,7 +128,6 @@ def rf_kmc(
 
 def frm(
     recipe_collection: RecipeCollection,
-    logger: logging.Logger = logging.getLogger(__name__),
     rng: np.random.Generator = default_rng(),
     MD_time: Optional[float] = None,
 ) -> KMCResult|KMCRejection:
@@ -196,7 +207,6 @@ def frm(
 def extrande_mod(
     recipe_collection: RecipeCollection,
     tau_scale: float,
-    logger: logging.Logger = logging.getLogger(__name__),
     rng: np.random.Generator = default_rng(),
 ) -> KMCResult|KMCRejection:
     """Modified Extrande KMC
@@ -316,7 +326,6 @@ def extrande_mod(
 def extrande(
     recipe_collection: RecipeCollection,
     tau_scale: float,
-    logger: logging.Logger = logging.getLogger(__name__),
     rng: np.random.Generator = default_rng(),
 ) -> KMCResult|KMCRejection:
     """Extrande KMC
