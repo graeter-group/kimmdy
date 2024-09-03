@@ -120,7 +120,9 @@ def rf_kmc(
 
     # 5. Calculate the time step associated with mu
     time_delta = np.log(1 / u[1]) / probability_sum
-    logger.info(f"Time delta: {time_delta}\nwith cumulative probability {probability_sum}")
+    logger.info(
+        f"Time delta: {time_delta}\nwith cumulative probability {probability_sum}"
+    )
 
     return KMCResult(
         recipe=recipe,
