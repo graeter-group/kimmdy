@@ -372,10 +372,7 @@ def check_gmx_version(config):
             m = "Note: slow growth of pairs is only supported by >= gromacs 2023.2. To disable morphing pairs in config: md.changer.coordinates.slow_growth_pairs = false"
             config._logmessages["debugs"].append(f"Gromacs version: {version}")
             config._logmessages["errors"].append(m)
-            print(version)
-            # version = "GROMACS version:     2024.2-plumed_2.10.0_dev"
             major_minor = re.match(r".*(\d{4})\.(\d+).*", version)
-            print(major_minor)
             if major_minor is not None:
                 year = int(major_minor.group(1))
                 minor = int(major_minor.group(2))

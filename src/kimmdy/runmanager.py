@@ -842,7 +842,9 @@ class RunManager:
             recipe.recipe_steps = recipe.recipe_steps.callback(
                 recipe.recipe_steps.key, plugin_time_index
             )
-            logger.info(f"Got {len(recipe.recipe_steps)} steps: {recipe.recipe_steps}")
+            logger.info(
+                f"Got {len(recipe.recipe_steps)} in recipe {recipe.get_recipe_name()}"
+            )
         else:
             m = f"Recipe steps of {recipe} are neither a list nor a DeferredRecipeSteps object."
             logger.error(m)
