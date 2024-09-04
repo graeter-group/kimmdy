@@ -823,7 +823,6 @@ class RunManager:
         recipe = self.kmcresult.recipe
         logger.info(f"Start Recipe in KIMMDY iteration {self.iteration}")
         logger.info(f"Recipe: {recipe.get_recipe_name()}")
-        logger.debug(f"Performing recipe steps:\n{pformat(recipe.recipe_steps)}")
 
         # Set time to chosen 'time_start' of KMCResult
         ttime = self.kmcresult.time_start

@@ -364,7 +364,7 @@ def check_gmx_version(config):
                         "'plumed', aborting due to apparent lack of PLUMED patch."
                         f"Version is: {version}"
                     )
-                    config._logmessages["error"].append(m)
+                    config._logmessages["errors"].append(m)
                     if not config.dryrun:
                         raise SystemError(m)
     if hasattr(config, "changer") and hasattr(config.changer, "coordinates"):
