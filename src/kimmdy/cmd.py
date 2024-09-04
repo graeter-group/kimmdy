@@ -6,7 +6,6 @@ Other entry points such as `kimmdy-analysis` also live here.
 import argparse
 import logging
 import logging.config
-import os
 import shutil
 import sys
 import textwrap
@@ -104,7 +103,6 @@ def _run(args: argparse.Namespace):
     args
         Command line arguments. See [](`~kimmdy.cmd.get_cmdline_args`)
     """
-
     if args.show_plugins:
         discover_plugins()
 
@@ -146,7 +144,7 @@ def _run(args: argparse.Namespace):
         # from initial config parsing
         # before the logger was configured
         # (because the logger config depends on the config)
-        for info in config._logmessages["debug"]:
+        for info in config._logmessages["debugs"]:
             logger.debug(info)
         for info in config._logmessages["infos"]:
             logger.info(info)

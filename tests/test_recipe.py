@@ -235,10 +235,25 @@ def test_recipe_steps_from_string():
         return x
 
     steps = recipe.recipe_steps_from_str(s)
+    assert isinstance(steps, list)
     assert len(steps) == 8
     assert steps[0] == recipe.Break(1710, 1712)
     assert isinstance(steps[7], recipe.CustomTopMod)
     assert steps[7].__almost_eq__(recipe.CustomTopMod(f=id))
+
+
+def test_recipe_steps_from_string_with_deferred():
+    s = "<1,some_function>"
+    steps = recipe.recipe_steps_from_str(s)
+    assert isinstance(steps, recipe.DeferredRecipeSteps)
+    assert steps.key == "1"
+
+    def some_function(key, i):
+        _ = key
+        _ = i
+        return []
+
+    assert steps == recipe.DeferredRecipeSteps(key="1", callback=some_function)
 
 
 def test_recipe_collection_from_csv_picked(
