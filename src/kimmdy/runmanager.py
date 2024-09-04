@@ -25,6 +25,7 @@ from kimmdy.config import Config
 from kimmdy.constants import MARK_DONE, MARK_FAILED, MARK_STARTED, MARKERS
 from kimmdy.coordinates import break_bond_plumed, merge_top_slow_growth, place_atom
 from kimmdy.kmc import (
+    KMCError,
     KMCReject,
     KMCAccept,
     KMCResult,
@@ -818,11 +819,14 @@ class RunManager:
             logger.error(m)
             write_time_marker(files.outputdir / MARK_FAILED, "failed")
             raise RuntimeError(m)
-
-        if isinstance(self.kmcresult, KMCReject):
-            m = "Attampting to apply a recipe where none has been accepted (KMCRejection)."
-            logger.error(m)
-            raise RuntimeError(m)
+        elif isinstance(self.kmcresult, KMCReject):
+            m = f"No reaction has been accepted (KMCRejection {self.kmcresult})."
+            logger.info(m)
+            return files
+        elif isinstance(self.kmcresult, KMCError):
+            m = f"No reaction has been accepted (KMCError {self.kmcresult})."
+            logger.warning(m)
+            return files
 
         recipe = self.kmcresult.recipe
         logger.info(f"Start Recipe in KIMMDY iteration {self.iteration}")
