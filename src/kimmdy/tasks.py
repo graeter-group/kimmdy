@@ -57,7 +57,7 @@ class TaskFiles:
     >>>     def get_latest(self, s):
     >>>         return f"latest {s}"
     >>> runmng = run()
-    >>> files = TaskFiles(runmng)
+    >>> files = TaskFiles(runmng.get_latest)
     >>> files.input
     >>> files.input["top"]
     {'top': 'latest top'}

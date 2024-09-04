@@ -199,7 +199,15 @@ class Config:
 
         # validate on initial construction
         if section == "config":
-            self._logmessages = {"infos": [], "warnings": [], "errors": [], "debug": []}
+            # NOTE: The logger is set up with information from the config
+            # the the config can't use the logger.
+            # Instead it collects the logmessages and displays them at the end.
+            self._logmessages = {
+                "infos": [],
+                "warnings": [],
+                "errors": [],
+                "debugs": [],
+            }
             self._set_defaults(section, scheme)
             self._validate(section=section, cwd=self.cwd)
 
@@ -297,7 +305,7 @@ class Config:
 
             # make sure self.out is empty
             while self.out.exists():
-                self._logmessages["debug"].append(
+                self._logmessages["debugs"].append(
                     f"Output dir {self.out} exists, incrementing name"
                 )
                 name = self.out.name.split("_")
@@ -417,7 +425,8 @@ class Config:
                         raise AssertionError(
                             "Plumed requested in md section, but not defined at config root"
                         )
-                    check_gmx_version(self)
+
+                check_gmx_version(self)
 
         # individual attributes, recursively
         for name, attr in self.__dict__.items():

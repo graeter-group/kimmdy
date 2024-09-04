@@ -10,7 +10,7 @@ from abc import ABC
 from copy import copy
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, Callable, Optional
+from typing import TYPE_CHECKING, Callable, Generic, Optional, TypeVar
 
 import numpy as np
 
@@ -20,8 +20,33 @@ if TYPE_CHECKING:
     from kimmdy.topology.topology import Topology
 
 
-def recipe_steps_from_str(recipe_steps_s: str) -> list[RecipeStep | None]:
-    return [RecipeStep.from_str(rs) for rs in recipe_steps_s.split("<>")]
+def recipe_steps_from_str(
+    recipe_steps_s: str,
+) -> list[RecipeStep] | DeferredRecipeSteps:
+    if recipe_steps_s.startswith("<") and recipe_steps_s.endswith(">"):
+        key, callback = recipe_steps_s.removeprefix("<").removesuffix(">").split(",")
+
+        def dummy_callback(key, i):
+            _ = key
+            _ = i
+            return []
+
+        dummy_callback.__name__ = callback
+        # NOTE: because this is parsed from a string, we don't have
+        # the actual function, so we just return a dummy function
+        # It can't actually be used to reconstruct the original closure
+        # because we don't have access to the runtime state
+        # of the ReactionPlugin that produced the closure
+        # Likewise, the type of the key is unknown and
+        # will be a string, not the actual type over which
+        # DeferredRecipeSteps is generic.
+        return DeferredRecipeSteps(key=key, callback=dummy_callback)
+    steps = []
+    for rs in recipe_steps_s.split("<>"):
+        s = RecipeStep.from_str(rs)
+        if s is not None:
+            steps.append(s)
+    return steps
 
 
 class RecipeStep(ABC):
@@ -72,7 +97,7 @@ class Relax(RecipeStep):
     """
 
     @classmethod
-    def _from_str(cls, s: str):
+    def _from_str(cls, _: str):
         return Relax()
 
 
@@ -433,6 +458,22 @@ class CustomTopMod(RecipeStep):
         return cls(f=f)
 
 
+T = TypeVar("T")
+
+
+@dataclass
+class DeferredRecipeSteps(Generic[T]):
+    key: T
+    callback: Callable[[T, int], list[RecipeStep]]
+
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, DeferredRecipeSteps):
+            return False
+        return (
+            self.key == other.key and self.callback.__name__ == other.callback.__name__
+        )
+
+
 @dataclass
 class Recipe:
     """A reaction path defined by one series of RecipeSteps.
@@ -441,8 +482,13 @@ class Recipe:
 
     Parameters
     ----------
-    recipe_steps : list[RecipeStep]
-        Single sequence of RecipeSteps to build product
+    recipe_steps : list[RecipeStep]|DeferredRecipeSteps
+        Can be a single sequence of RecipeSteps to modify the topology
+        or a tuple with a key and a function that takes said key to
+        generate the RecipeSteps once it has been choosen.
+        It is up to the ReactionPlugins to choose how to
+        match the key to the their internal state and return
+        the RecipeSteps.
     rates : list[float]
         Reaction rates corresponding 1:1 to timespans.
     timespans : list[list[float, float]]
@@ -454,7 +500,7 @@ class Recipe:
 
     """
 
-    recipe_steps: list[RecipeStep]
+    recipe_steps: list[RecipeStep] | DeferredRecipeSteps
     rates: list[float]
     timespans: list[tuple[float, float]]
 
@@ -462,11 +508,30 @@ class Recipe:
         self.check_consistency()
 
     def copy(self):
+        if isinstance(self.recipe_steps, list):
+            steps = list(self.recipe_steps)
+        else:
+            steps = self.recipe_steps
         return Recipe(
-            list(self.recipe_steps),
-            list(self.rates),
-            list(self.timespans),
+            recipe_steps=steps,
+            rates=list(self.rates),
+            timespans=list(self.timespans),
         )
+
+    def get_vmd_selection(self) -> str:
+        """Get a VMD selection string
+
+        for the atoms involved in the recipe steps.
+        """
+        if isinstance(self.recipe_steps, DeferredRecipeSteps):
+            return ""
+        ixs = set()
+        for rs in self.recipe_steps:
+            print(self.recipe_steps)
+            if isinstance(rs, BondOperation):
+                ixs.add(rs.atom_ix_1)
+                ixs.add(rs.atom_ix_2)
+        return "index " + " ".join([str(ix) for ix in ixs])
 
     def combine_with(self, other: Recipe):
         """Combines this Recipe with another with the same RecipeSteps.
@@ -499,9 +564,9 @@ class Recipe:
                     f"\trates: {len(self.rates)}\n"
                     f"\ttimespans: {len(self.timespans)}"
                 )
-            if not isinstance(self.recipe_steps, list):
+            if not isinstance(self.recipe_steps, list | DeferredRecipeSteps):
                 raise ValueError(
-                    f"Recipe Steps must be a list, not {type(self.recipe_steps)}"
+                    f"Recipe Steps must be a list (or tuple for deferred evaluation), not {type(self.recipe_steps)}"
                 )
             if not isinstance(self.timespans, list):
                 raise ValueError(
@@ -516,6 +581,8 @@ class Recipe:
             )
 
     def get_recipe_name(self):
+        if isinstance(self.recipe_steps, DeferredRecipeSteps):
+            return f"DeferredRecipeSteps({self.recipe_steps.key}, {self.recipe_steps.callback.__name__})"
         name = ""
         for rs in self.recipe_steps:
             name += " "
@@ -572,37 +639,57 @@ class Recipe:
             )
             return False
 
-        if len(self.recipe_steps) != len(other.recipe_steps):
+        if type(self.recipe_steps) != type(other.recipe_steps):
             return False
 
-        for rs1, rs2 in zip(self.recipe_steps, other.recipe_steps):
-            if isinstance(rs1, CustomTopMod):
-                if not rs1.__almost_eq__(rs2):
-                    return False
-            else:
-                if rs1 != rs2:
-                    return False
+        if not isinstance(self.recipe_steps, DeferredRecipeSteps) and not isinstance(
+            other.recipe_steps, DeferredRecipeSteps
+        ):
+            if len(self.recipe_steps) != len(other.recipe_steps):
+                return False
+            for rs1, rs2 in zip(self.recipe_steps, other.recipe_steps):
+                if isinstance(rs1, CustomTopMod):
+                    if not rs1.__almost_eq__(rs2):
+                        return False
+                else:
+                    if rs1 != rs2:
+                        return False
+
+        if isinstance(self.recipe_steps, DeferredRecipeSteps) and isinstance(
+            other.recipe_steps, DeferredRecipeSteps
+        ):
+            if (
+                self.recipe_steps.key == other.recipe_steps.key
+                and self.recipe_steps.callback.__name__
+                == other.recipe_steps.callback.__name__
+            ):
+                return True
 
         return self.rates == other.rates and self.timespans == other.timespans
 
 
 @dataclass
 class RecipeCollection:
-    """A RecipeCollection encompasses a number of reaction paths.
+    """A RecipeCollection encompasses a list of reaction paths.
     They can originate from multiple reaction plugins, but do not need to.
 
-    Returns
-    -------
-    unique_recipes_ixs
-        List of lists binning the old recipe indices and maps to the new
-        recipes list.
+    Parameters
+    ----------
+    recipes
+        List of Recipe objects.
     """
 
     recipes: list[Recipe]
 
     def aggregate_reactions(self):
-        """Combines reactions having the same sequence of RecipeSteps."""
+        """Combines reactions having the same sequence of RecipeSteps.
 
+        Returns
+        -------
+        unique_recipes_ixs
+            List of lists binning the old recipe indices and maps to the new
+            recipes list.
+        """
         logger.debug(f"Aggregating {len(self.recipes)} recipes")
         unique_recipes = []
         unique_recipes_ixs = []
@@ -637,7 +724,10 @@ class RecipeCollection:
         rows = []
         for i, rp in enumerate(self.recipes):
             was_picked = rp == picked_recipe
-            steps = "<>".join([rs.__repr__() for rs in rp.recipe_steps])
+            if isinstance(rp.recipe_steps, list):
+                steps = "<>".join([rs.__repr__() for rs in rp.recipe_steps])
+            else:
+                steps = f"<{rp.recipe_steps.key},{rp.recipe_steps.callback.__name__}>"
             rows.append([i] + [was_picked] + [steps] + [rp.timespans] + [rp.rates])
 
         with open(path, "w", newline="") as f:
@@ -661,11 +751,7 @@ class RecipeCollection:
 
                 picked = ast.literal_eval(picked_s)
                 if recipe_steps_s != "":
-                    recipe_steps = [
-                        rs
-                        for rs in recipe_steps_from_str(recipe_steps_s)
-                        if rs is not None
-                    ]
+                    recipe_steps = recipe_steps_from_str(recipe_steps_s)
                 else:
                     recipe_steps = []
                 timespans = ast.literal_eval(timespans_s)

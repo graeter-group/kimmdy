@@ -24,7 +24,17 @@ from typing import Callable, Optional
 from kimmdy.config import Config
 from kimmdy.constants import MARK_DONE, MARK_FAILED, MARK_STARTED, MARKERS
 from kimmdy.coordinates import break_bond_plumed, merge_top_slow_growth, place_atom
-from kimmdy.kmc import KMCResult, extrande, extrande_mod, frm, rf_kmc
+from kimmdy.kmc import (
+    KMCError,
+    KMCReject,
+    KMCAccept,
+    KMCResult,
+    extrande,
+    extrande_mod,
+    frm,
+    rf_kmc,
+    total_index_to_index_within_plugin,
+)
 from kimmdy.parsing import read_top, write_json, write_time_marker, write_top
 from kimmdy.plugins import (
     BasicParameterizer,
@@ -32,11 +42,24 @@ from kimmdy.plugins import (
     parameterization_plugins,
     reaction_plugins,
 )
-from kimmdy.recipe import Bind, Break, CustomTopMod, Place, RecipeCollection, Relax
+from kimmdy.recipe import (
+    Bind,
+    Break,
+    CustomTopMod,
+    DeferredRecipeSteps,
+    Place,
+    RecipeCollection,
+    Relax,
+)
 from kimmdy.tasks import Task, TaskFiles, get_plumed_out
 from kimmdy.topology.topology import Topology
 from kimmdy.topology.utils import get_is_reactive_predicate_from_config_f
-from kimmdy.utils import get_task_directories, run_gmx, truncate_sim_files
+from kimmdy.utils import (
+    flatten_recipe_collections,
+    get_task_directories,
+    run_gmx,
+    truncate_sim_files,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -111,8 +134,8 @@ class RunManager:
         Current iteration.
     state
         Current state of the system.
-    recipe_collection
-        Collection of recipes.
+    recipe_collections
+        Dictionary of recipe collections. Keyed by the name of the reaction plugin.
     latest_files
         Dictionary of latest files.
     histfile
@@ -133,8 +156,8 @@ class RunManager:
         self.priority_tasks: queue.Queue[Task] = queue.Queue()
         self.iteration: int = -1  # start at -1 to have iteration 0 be the initial setup
         self.state: State = State.IDLE
-        self.recipe_collection: RecipeCollection = RecipeCollection([])
-        self.kmcresult: Optional[KMCResult] = None
+        self.recipe_collections: dict[str, RecipeCollection] = {}
+        self.kmcresult: KMCResult | None = None
         self.time: float = 0.0  # [ps]
         self.latest_files: dict[str, Path] = get_existing_files(config)
         logger.debug(f"Initialized latest files:\n{pformat(self.latest_files)}")
@@ -179,7 +202,7 @@ class RunManager:
         for name in self.config.reactions.get_attributes():
             logger.debug(f"Initializing reaction: {name}")
             Plugin = reaction_plugins[name]
-            reaction_plugin = Plugin(name, self)
+            reaction_plugin = Plugin(name=name, runmng=self)
             self.reaction_plugins.append(reaction_plugin)
 
         self.kmc_mapping: dict[str, Callable[..., KMCResult]] = {
@@ -549,18 +572,14 @@ class RunManager:
             residuetypes_path=getattr(self.config, "residuetypes", None),
         )
 
-    def _restart_task(self, files: TaskFiles) -> None:
+    def _restart_task(self, _: TaskFiles) -> None:
         raise RuntimeError(
             "Called restart task. This task is only for finding the restart "
             "point in the sequence and should never be called!"
         )
 
     def _run_md(
-        self,
-        instance: str,
-        files: TaskFiles,
-        continue_md: bool = False,
-        slow_growth=False,
+        self, instance: str, files: TaskFiles, continue_md: bool = False
     ) -> TaskFiles:
         """General MD simulation"""
         logger = files.logger
@@ -630,12 +649,6 @@ class RunManager:
         except CalledProcessError as e:
             write_time_marker(files.outputdir / MARK_FAILED, "failed")
             logger.error(f"Error occured during MD {instance}:\n{e}")
-            if slow_growth:
-                logger.error(
-                    "Note: slow growth of pairs is only supported by >= "
-                    "gromacs 2023.2. To disable morphing pairs in config:"
-                    "md.changer.coordinates.slow_growth_pairs = false"
-                )
             raise e
 
         logger.info(f"Done with MD {instance}")
@@ -644,8 +657,8 @@ class RunManager:
     def _place_reaction_tasks(self, selected: Optional[str] = None) -> None:
         logger.info("Start query reactions")
         self.state = State.REACTION
-        # empty list for every new round of queries
-        self.recipe_collection: RecipeCollection = RecipeCollection([])
+        # empty collection for every new round of queries
+        self.recipe_collections = {}
 
         # placing tasks in priority queue
         strategies = []
@@ -692,7 +705,9 @@ class RunManager:
         logger.info(f"Start query {reaction_plugin.name}")
 
         new_recipes = reaction_plugin.get_recipe_collection(files).recipes
-        self.recipe_collection.recipes.extend(new_recipes)
+        self.recipe_collections[reaction_plugin.name] = RecipeCollection(
+            recipes=new_recipes
+        )
 
         logger.info(
             f"Done with Query reactions, {len(new_recipes)} "
@@ -708,7 +723,8 @@ class RunManager:
         logger = files.logger
         logger.info(
             f"Start Decide recipe using {self.kmc_algorithm}, "
-            f"{len(self.recipe_collection.recipes)} recipes available."
+            f"{sum(len(collection.recipes) for collection in self.recipe_collections.values())} total recipes available. "
+            f"from {len(self.recipe_collections.keys())} reaction plugins."
         )
         kmc = self.kmc_mapping.get(self.kmc_algorithm, None)
         if kmc is None:
@@ -718,14 +734,49 @@ class RunManager:
 
         # FIXME: Hotfix for #355 aggregate not working for big systems
         if "rfkmc" != self.kmc_algorithm:
-            self.recipe_collection.aggregate_reactions()
+            for collection in self.recipe_collections.values():
+                # NOTE: this is making the implicit assumption that
+                # different reaction plugins produce different types
+                # of reactions.
+                # If this changes we can flatten before aggregating
+                # WARN: This can have a subtle bug for
+                # reactions with DeferredRecipeSteps,
+                # if they produce non-unique reactions,
+                # which would aggregate and mess up the time_start_index.
+                # compared to their internal counting
+                collection.aggregate_reactions()
         if "extrande" in self.kmc_algorithm:
             kmc = partial(kmc, tau_scale=self.config.tau_scale)
-        self.kmcresult = kmc(self.recipe_collection, logger=logger)
-        recipe = self.kmcresult.recipe
 
+        self.kmcresult = kmc(flatten_recipe_collections(self.recipe_collections))
+        if not isinstance(self.kmcresult, KMCAccept):
+            # rejection or error, nothing to be done
+            if isinstance(self.kmcresult, KMCReject):
+                logger.info(f"Rejected recipe: {self.kmcresult.reason}")
+            elif isinstance(self.kmcresult, Exception):
+                logger.error(f"Error during KMC: {self.kmcresult}")
+            return files
+
+        # Correct the offset of time_start_index by the concatenation
+        # of all recipes from all reactions back onto the offset
+        # within the one chosen reaction plugin
+        n_recipes_per_plugin = [
+            len(v.recipes) for v in self.recipe_collections.values()
+        ]
+        logger.info(f"Plugins: {[k for k in self.recipe_collections.keys()]}")
+        logger.info(f"Number of recipes per reaction plugin: {n_recipes_per_plugin}")
+
+        self.kmcresult.time_start_index_within_plugin = (
+            total_index_to_index_within_plugin(
+                self.kmcresult.time_start_index, n_recipes_per_plugin
+            )
+        )
+
+        recipe = self.kmcresult.recipe
         if self.config.save_recipes:
-            self.recipe_collection.to_csv(files.outputdir / "recipes.csv", recipe)
+            flatten_recipe_collections(self.recipe_collections).to_csv(
+                files.outputdir / "recipes.csv", recipe
+            )
 
         try:
             if self.config.plot_rates:
@@ -733,20 +784,17 @@ class RunManager:
                     "outfile": files.outputdir / "reaction_rates.svg",
                     "highlight_r": recipe,
                 }
-                if (self.kmcresult.time_start is not None) and (
-                    self.kmcresult.time_start != 0
-                ):
+                if self.kmcresult.time_start != 0:
                     kwargs["highlight_t"] = self.kmcresult.time_start
-                self.recipe_collection.plot(**kwargs)
+                flatten_recipe_collections(self.recipe_collections).plot(**kwargs)
         except Exception as e:
             logger.warning(f"Error occured during plotting:\n{e}")
 
-        if self.kmcresult.time_delta:
-            self.time += self.kmcresult.time_delta
+        self.time += self.kmcresult.time_delta
         logger.info("Done with Decide recipe.")
         if len(recipe.rates) == 0:
             logger.info("No reaction selected")
-        elif self.kmcresult.time_delta:
+        else:
             logger.info(
                 f"Overall time {self.time*1e-12:.4e} s, reaction occured after {self.kmcresult.time_delta*1e-12:.4e} s"
             )
@@ -771,22 +819,60 @@ class RunManager:
             logger.error(m)
             write_time_marker(files.outputdir / MARK_FAILED, "failed")
             raise RuntimeError(m)
+        elif isinstance(self.kmcresult, KMCReject):
+            m = f"No reaction has been accepted (KMCRejection {self.kmcresult})."
+            logger.info(m)
+            return files
+        elif isinstance(self.kmcresult, KMCError):
+            m = f"No reaction has been accepted (KMCError {self.kmcresult})."
+            logger.warning(m)
+            return files
 
         recipe = self.kmcresult.recipe
         logger.info(f"Start Recipe in KIMMDY iteration {self.iteration}")
         logger.info(f"Recipe: {recipe.get_recipe_name()}")
-        logger.debug(f"Performing recipe steps:\n{pformat(recipe.recipe_steps)}")
 
         # Set time to chosen 'time_start' of KMCResult
         ttime = self.kmcresult.time_start
+        plugin_time_index = self.kmcresult.time_start_index_within_plugin
+        if plugin_time_index is None:
+            m = f"Time index within plugin is None, this should not happen. Was _apply_recipe called before _decide_recipe?"
+            logger.error(m)
+            raise RuntimeError(m)
+
+        if isinstance(recipe.recipe_steps, list):
+            recipe.recipe_steps = recipe.recipe_steps
+        elif isinstance(recipe.recipe_steps, DeferredRecipeSteps):
+            logger.info(
+                f"Steps of recipe where deferred, calling callback with key {recipe.recipe_steps.key} and time_index {plugin_time_index}"
+            )
+            recipe.recipe_steps = recipe.recipe_steps.callback(
+                recipe.recipe_steps.key, plugin_time_index
+            )
+            logger.info(
+                f"Got {len(recipe.recipe_steps)} in recipe {recipe.get_recipe_name()}"
+            )
+        else:
+            m = f"Recipe steps of {recipe} are neither a list nor a DeferredRecipeSteps object."
+            logger.error(m)
+            raise ValueError(m)
         if any([isinstance(step, Place) for step in recipe.recipe_steps]):
             # only first time of interval is valid for placement
             ttime = recipe.timespans[0][0]
 
+        # get vmd selection (after deferred steps are resolved)
+        vmd_selection = recipe.get_vmd_selection()
+        logger.info(f"VMD selection: {vmd_selection}")
+        with open(files.outputdir / "vmd_selection.txt", "w") as f:
+            f.write(vmd_selection)
+
+        # truncate simulation files to the chosen time
+        m = f"Truncating simulation files to time {ttime} ps"
+        logger.info(m)
         truncate_sim_files(files=files, time=ttime)
 
         top_initial = deepcopy(self.top)
-        focus_nrs = set()
+        focus_nrs: set[str] = set()
         for step in recipe.recipe_steps:
             if isinstance(step, Break):
                 self.top.break_bond((step.atom_id_1, step.atom_id_2))
@@ -810,7 +896,8 @@ class RunManager:
                 place_files = task()
                 if place_files is not None:
                     self._discover_output_files(task.name, place_files)
-                focus_nrs.update([step.id_to_place])
+                if step.id_to_place is not None:
+                    focus_nrs.update([step.id_to_place])
 
             elif isinstance(step, Relax):
                 logger.info("Starting relaxation md as part of reaction..")
@@ -819,11 +906,52 @@ class RunManager:
                     continue
 
                 if self.config.changer.coordinates.slow_growth:
-                    # Create a slow growth topology for sub-task run_md, afterwards, top will be reset properly
+                    # Create a temporary slow growth topology for sub-task run_md, afterwards, top will be reset properly
                     self.top.update_parameters(focus_nrs)
+
+                    # top_initial is still the topology before the reaction
+                    # we need to do some (temporary) changes to it to stabilize
+                    # the slow_growth
+                    # First we find out if there are solvent atoms among the involved atoms
+                    solvent_atoms: set[str] = set()
+                    for ai in focus_nrs:
+                        logger.debug(f"Checking atom {ai} for solvent residue")
+                        logger.debug(f"Checking atom {top_initial.atoms[ai]}")
+                        if top_initial.atoms[ai].residue == "SOL":
+                            solvent_atoms.add(ai)
+                    if len(solvent_atoms) > 0:
+                        logger.info(
+                            "Solvent atoms are involved in the reaction, "
+                            "they will get tempoary bonds for the start "
+                            "of the slow growth simulation."
+                        )
+                        logger.info(f"Solvent atoms: {solvent_atoms}")
+                        ow = None
+                        hw1 = None
+                        hw2 = None
+                        for ai in solvent_atoms:
+                            a = top_initial.atoms[ai]
+                            if a.atom == "OW":
+                                ow = a
+                            if a.atom == "HW1":
+                                hw1 = a
+                            if a.atom == "HW2":
+                                hw2 = a
+                        if ow is not None and hw1 is not None and hw2 is not None:
+                            logger.info(
+                                "Found one complete water molecule that takes part in the reaction."
+                            )
+                            top_initial.bind_bond((ow.nr, hw1.nr))
+                            top_initial.bind_bond((ow.nr, hw2.nr))
+                            b1 = top_initial.bonds.get((ow.nr, hw1.nr))
+                            b2 = top_initial.bonds.get((ow.nr, hw2.nr))
+                            logger.info(f"Added bonds: {b1}, {b2}")
+
                     top_merge = merge_top_slow_growth(
-                        top_initial,
-                        deepcopy(self.top),
+                        # topA was copied before parameters are updated
+                        topA=top_initial,
+                        # topB is parameterized for after the reaction
+                        topB=deepcopy(self.top),
                         morph_pairs=self.config.changer.coordinates.slow_growth_pairs,
                     )
                     top_merge_path = files.outputdir / self.config.top.name.replace(
@@ -835,7 +963,7 @@ class RunManager:
                 task = Task(
                     self,
                     f=self._run_md,
-                    kwargs={"instance": instance, "slow_growth": True},
+                    kwargs={"instance": instance},
                     out=instance,
                 )
                 md_files = task()
@@ -848,6 +976,8 @@ class RunManager:
         self.top.update_partial_charges(recipe.recipe_steps)
         self.top.update_parameters(focus_nrs)
 
+        # this is the new topology after the reaction
+        # not the tempoary topology top_mod for slow_growth
         write_top(self.top.to_dict(), files.outputdir / self.config.top.name)
         files.output["top"] = files.outputdir / self.config.top.name
 
