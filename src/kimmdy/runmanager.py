@@ -25,7 +25,8 @@ from kimmdy.config import Config
 from kimmdy.constants import MARK_DONE, MARK_FAILED, MARK_STARTED, MARKERS
 from kimmdy.coordinates import break_bond_plumed, merge_top_slow_growth, place_atom
 from kimmdy.kmc import (
-    KMCRejection,
+    KMCReject,
+    KMCAccept,
     KMCResult,
     extrande,
     extrande_mod,
@@ -155,7 +156,7 @@ class RunManager:
         self.iteration: int = -1  # start at -1 to have iteration 0 be the initial setup
         self.state: State = State.IDLE
         self.recipe_collections: dict[str, RecipeCollection] = {}
-        self.kmcresult: KMCResult | KMCRejection | None = None
+        self.kmcresult: KMCResult | None = None
         self.time: float = 0.0  # [ps]
         self.latest_files: dict[str, Path] = get_existing_files(config)
         logger.debug(f"Initialized latest files:\n{pformat(self.latest_files)}")
@@ -203,7 +204,7 @@ class RunManager:
             reaction_plugin = Plugin(name=name, runmng=self)
             self.reaction_plugins.append(reaction_plugin)
 
-        self.kmc_mapping: dict[str, Callable[..., KMCResult | KMCRejection]] = {
+        self.kmc_mapping: dict[str, Callable[..., KMCResult]] = {
             "extrande": extrande,
             "rfkmc": rf_kmc,
             "frm": frm,
@@ -747,9 +748,12 @@ class RunManager:
             kmc = partial(kmc, tau_scale=self.config.tau_scale)
 
         self.kmcresult = kmc(flatten_recipe_collections(self.recipe_collections))
-        if isinstance(self.kmcresult, KMCRejection):
-            # rejection, nothing to be done
-            # TODO: are there other types of KMC Results? More nuanced rejections?
+        if not isinstance(self.kmcresult, KMCAccept):
+            # rejection or error, nothing to be done
+            if isinstance(self.kmcresult, KMCReject):
+                logger.info(f"Rejected recipe: {self.kmcresult.reason}")
+            elif isinstance(self.kmcresult, Exception):
+                logger.error(f"Error during KMC: {self.kmcresult}")
             return files
 
         # Correct the offset of time_start_index by the concatenation
@@ -815,7 +819,7 @@ class RunManager:
             write_time_marker(files.outputdir / MARK_FAILED, "failed")
             raise RuntimeError(m)
 
-        if isinstance(self.kmcresult, KMCRejection):
+        if isinstance(self.kmcresult, KMCReject):
             m = "Attampting to apply a recipe where none has been accepted (KMCRejection)."
             logger.error(m)
             raise RuntimeError(m)

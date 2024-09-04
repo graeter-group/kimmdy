@@ -35,7 +35,7 @@ def total_index_to_index_within_plugin(
 
 
 @dataclass
-class KMCResult:
+class KMCAccept:
     """The result of a KMC step. Similar to a Recipe but for the concrete realization of a reaction.
 
     Attributes
@@ -62,14 +62,22 @@ class KMCResult:
 
 
 @dataclass
-class KMCRejection:
+class KMCReject:
     reason: str | None = None
+
+
+@dataclass
+class KMCError(BaseException):
+    reason: str | None = None
+
+
+KMCResult = KMCAccept | KMCReject | KMCError
 
 
 def rf_kmc(
     recipe_collection: RecipeCollection,
     rng: np.random.Generator = default_rng(),
-) -> KMCResult | KMCRejection:
+) -> KMCResult:
     """Rejection-Free Monte Carlo.
     Takes RecipeCollection and choses a recipe based on the relative propensity of the events.
     The 'start' time of the reaction is the time of the highest rate of the accepted reaction.
@@ -90,7 +98,7 @@ def rf_kmc(
     if len(recipe_collection.recipes) == 0:
         m = "Empty ReactionResult; no reaction chosen"
         logger.warning(m)
-        return KMCRejection(m)
+        return KMCError(m)
 
     # 0. Initialization
     reaction_probability = []
@@ -124,7 +132,7 @@ def rf_kmc(
         f"Time delta: {time_delta}\nwith cumulative probability {probability_sum}"
     )
 
-    return KMCResult(
+    return KMCAccept(
         recipe=recipe,
         reaction_probability=reaction_probability,
         time_delta=time_delta,
@@ -137,7 +145,7 @@ def frm(
     recipe_collection: RecipeCollection,
     rng: np.random.Generator = default_rng(),
     MD_time: Optional[float] = None,
-) -> KMCResult | KMCRejection:
+) -> KMCResult:
     """First Reaction Method variant of Kinetic Monte Carlo.
     takes RecipeCollection and choses a recipe based on which reaction would occur.
 
@@ -163,7 +171,7 @@ def frm(
     if len(recipe_collection.recipes) == 0:
         m = "Empty ReactionResult; no reaction chosen"
         logger.warning(m)
-        return KMCRejection(m)
+        return KMCError(m)
 
     # 0. Initialization
     reaction_probability = []
@@ -198,9 +206,9 @@ def frm(
     except ValueError:
         m = f"FRM recipe selection did not work, probably tau: {tau} is empty."
         logger.warning(m)
-        return KMCRejection(m)
+        return KMCError(m)
 
-    return KMCResult(
+    return KMCAccept(
         recipe=chosen_recipe,
         reaction_probability=reaction_probability,
         time_delta=time_delta,
@@ -213,7 +221,7 @@ def extrande_mod(
     recipe_collection: RecipeCollection,
     tau_scale: float,
     rng: np.random.Generator = default_rng(),
-) -> KMCResult | KMCRejection:
+) -> KMCResult:
     """Modified Extrande KMC
 
     Improved implementation of
@@ -246,7 +254,7 @@ def extrande_mod(
     if len(recipe_collection.recipes) == 0:
         m = "Empty ReactionResult; no reaction chosen"
         logger.warning(m)
-        return KMCRejection(m)
+        return KMCError(m)
 
     # initialize
     t = 0
@@ -308,7 +316,7 @@ def extrande_mod(
             f"Extrande stats:\n\tb:\t\t{b}"
             f"\n\tTau:\t{tau}\n\tl:\t\t{l}\n\tt:\t\t{t}\n\tt_max:\t{t_max}"
         )
-        return KMCRejection(m)
+        return KMCReject(m)
 
     logger.info(
         f"Reaction {chosen_recipe.get_recipe_name()} was chose at time {t}\n"
@@ -319,7 +327,7 @@ def extrande_mod(
         f"\n\tTau:\t{tau}\n\tl:\t\t{l}\n\tt:\t\t{t}\n\tt_max:\t{t_max}"
     )
 
-    return KMCResult(
+    return KMCAccept(
         recipe=chosen_recipe,
         reaction_probability=None,
         time_delta=0,  # instantaneous reaction
@@ -332,7 +340,7 @@ def extrande(
     recipe_collection: RecipeCollection,
     tau_scale: float,
     rng: np.random.Generator = default_rng(),
-) -> KMCResult | KMCRejection:
+) -> KMCResult:
     """Extrande KMC
 
     Implemented as in
@@ -358,7 +366,7 @@ def extrande(
     if len(recipe_collection.recipes) == 0:
         m = "Empty ReactionResult; no reaction chosen"
         logger.warning(m)
-        return KMCRejection(m)
+        return KMCError(m)
 
     # initialize t
     t = 0
@@ -403,7 +411,7 @@ def extrande(
                 f"Extrande stats:\n\tb:\t\t{b}\n\tTau:\t{tau}"
                 f"\n\tl:\t\t{l}\n\tt:\t\t{t}\n\tt_max:\t{t_max}"
             )
-            return KMCRejection(m)
+            return KMCReject(m)
 
         t += tau
         new_window_idx = np.searchsorted(boarders, t, side="right") - 1
@@ -439,7 +447,7 @@ def extrande(
             f"Extrande stats:\n\ta0:\t\t{a0}\n\tb:\t\t{b}\n\tb*u:\t{b*u}"
             f"\n\tTau:\t{tau}\n\tl:\t\t{l}\n\tt:\t\t{t}\n\tt_max:\t{t_max}"
         )
-        return KMCRejection(m)
+        return KMCReject(m)
 
     logger.info(
         f"Reaction {chosen_recipe.get_recipe_name()} was chose at time {t}\n"
@@ -449,7 +457,7 @@ def extrande(
         f"Extrande stats:\n\ta0:\t\t{a0}\n\tb:\t\t{b}\n\tb*u:\t{b*u}"
         f"\n\tTau:\t{tau}\n\tl:\t\t{l}\n\tt:\t\t{t}\n\tt_max:\t{t_max}"
     )
-    return KMCResult(
+    return KMCAccept(
         recipe=chosen_recipe,
         reaction_probability=None,
         time_delta=0,  # instantaneous reaction
