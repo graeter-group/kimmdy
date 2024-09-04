@@ -1,6 +1,19 @@
 # Changelog
 
 
+## [6.11.0](https://github.com/graeter-group/kimmdy/compare/v6.10.3...v6.11.0) (2024-09-04)
+
+
+### Features
+
+* recipes with deferred RecipeSteps ([#476](https://github.com/graeter-group/kimmdy/issues/476)) ([b953130](https://github.com/graeter-group/kimmdy/commit/b95313021c0e9f869e1772fdd50de771d9d1fadc))
+
+
+### Bug Fixes
+
+* **ci:** always mark draft PRs as not green ([#473](https://github.com/graeter-group/kimmdy/issues/473)) ([bb8ce10](https://github.com/graeter-group/kimmdy/commit/bb8ce105f7aefbcdf40a6791c6f671a228b7a025))
+* **ci:** we don't actually need the fail-if-draft action ([b953130](https://github.com/graeter-group/kimmdy/commit/b95313021c0e9f869e1772fdd50de771d9d1fadc))
+
 ## [6.10.3](https://github.com/graeter-group/kimmdy/compare/v6.10.2...v6.10.3) (2024-08-20)
 
 
