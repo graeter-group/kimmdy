@@ -76,6 +76,7 @@ def test_frm_empty():
     kmc = frm(RecipeCollection([]))
     assert isinstance(kmc, KMCError)
 
+
 def test_extrande_empty():
     kmc = extrande(RecipeCollection([]), 1.0)
     assert isinstance(kmc, KMCError)
