@@ -69,22 +69,21 @@ def compare_to_ref(result: KMCAccept, reference: KMCAccept):
 
 def test_rf_kmc_empty():
     kmc = rf_kmc(RecipeCollection([]))
-    assert isinstance(kmc, KMCReject)
+    assert isinstance(kmc, KMCError)
 
 
 def test_frm_empty():
     kmc = frm(RecipeCollection([]))
-    assert isinstance(kmc, KMCReject)
-
+    assert isinstance(kmc, KMCError)
 
 def test_extrande_empty():
     kmc = extrande(RecipeCollection([]), 1.0)
-    assert isinstance(kmc, KMCReject)
+    assert isinstance(kmc, KMCError)
 
 
 def test_extrande_mod_empty():
     kmc = extrande_mod(RecipeCollection([]), 1.0)
-    assert isinstance(kmc, KMCReject)
+    assert isinstance(kmc, KMCError)
 
 
 def test_rf_kmc_unlike_ref(reference_KMC):
@@ -143,7 +142,7 @@ def test_frm_no_event(recipe_collection):
     # first random numbers are array([0.51182162, 0.9504637 , 0.14415961, 0.94864945])
     new_recipes = recipe_collection.recipes[2:4]
     kmc = frm(RecipeCollection(new_recipes), rng=rng, MD_time=None)
-    assert isinstance(kmc, KMCReject)
+    assert isinstance(kmc, KMCError)
 
 
 def test_compare_extrande_extrande_mod(recipe_collection):
