@@ -25,20 +25,20 @@ rest of the program and keeps track of global state.
 
 #### Attributes
 
-| Name              | Type                                                                                    | Description                                                |
-|-------------------|-----------------------------------------------------------------------------------------|------------------------------------------------------------|
-| config            | [Config](`kimmdy.config.Config`)                                                        | The configuration object.                                  |
-| tasks             | [queue](`queue`).[Queue](`queue.Queue`)\[[Task](`kimmdy.tasks.Task`)\]                  | Tasks from config.                                         |
-| priority_tasks    | [queue](`queue`).[Queue](`queue.Queue`)\[[Task](`kimmdy.tasks.Task`)\]                  | Additional tasks added during the run by other tasks.      |
-| iteration         | [int](`int`)                                                                            | Current iteration.                                         |
-| state             | [State](`kimmdy.runmanager.State`)                                                      | Current state of the system.                               |
-| recipe_collection | [RecipeCollection](`kimmdy.recipe.RecipeCollection`)                                    | Collection of recipes.                                     |
-| latest_files      | [dict](`dict`)\[[str](`str`), [Path](`pathlib.Path`)\]                                  | Dictionary of latest files.                                |
-| histfile          | [Path](`pathlib.Path`)                                                                  | Path to history file.                                      |
-| top               |                                                                                         | Topology object.                                           |
-| filehist          | [list](`list`)\[[dict](`dict`)\[[str](`str`), [TaskFiles](`kimmdy.tasks.TaskFiles`)\]\] | List of dictionaries of TaskFiles.                         |
-| task_mapping      |                                                                                         | Mapping of task names to runmanager methods.               |
-| reaction_plugins  | [list](`list`)\[[ReactionPlugin](`kimmdy.plugins.ReactionPlugin`)\]                     | List of initialized reaction plugins used in the sequence. |
+| Name               | Type                                                                                    | Description                                                                 |
+|--------------------|-----------------------------------------------------------------------------------------|-----------------------------------------------------------------------------|
+| config             | [Config](`kimmdy.config.Config`)                                                        | The configuration object.                                                   |
+| tasks              | [queue](`queue`).[Queue](`queue.Queue`)\[[Task](`kimmdy.tasks.Task`)\]                  | Tasks from config.                                                          |
+| priority_tasks     | [queue](`queue`).[Queue](`queue.Queue`)\[[Task](`kimmdy.tasks.Task`)\]                  | Additional tasks added during the run by other tasks.                       |
+| iteration          | [int](`int`)                                                                            | Current iteration.                                                          |
+| state              | [State](`kimmdy.runmanager.State`)                                                      | Current state of the system.                                                |
+| recipe_collections | [dict](`dict`)\[[str](`str`), [RecipeCollection](`kimmdy.recipe.RecipeCollection`)\]    | Dictionary of recipe collections. Keyed by the name of the reaction plugin. |
+| latest_files       | [dict](`dict`)\[[str](`str`), [Path](`pathlib.Path`)\]                                  | Dictionary of latest files.                                                 |
+| histfile           | [Path](`pathlib.Path`)                                                                  | Path to history file.                                                       |
+| top                |                                                                                         | Topology object.                                                            |
+| filehist           | [list](`list`)\[[dict](`dict`)\[[str](`str`), [TaskFiles](`kimmdy.tasks.TaskFiles`)\]\] | List of dictionaries of TaskFiles.                                          |
+| task_mapping       |                                                                                         | Mapping of task names to runmanager methods.                                |
+| reaction_plugins   | [list](`list`)\[[ReactionPlugin](`kimmdy.plugins.ReactionPlugin`)\]                     | List of initialized reaction plugins used in the sequence.                  |
 
 #### Methods
 
