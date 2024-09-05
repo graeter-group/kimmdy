@@ -6,6 +6,8 @@ project:
     - index.qmd
     - _reference
     - guide
+  resources:
+    - objects.json
 
 
 website:
