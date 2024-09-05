@@ -14,22 +14,23 @@ and because we have one reactant molecule
 
 | Name | Description |
 | --- | --- |
-| [KMCResult](#kimmdy.kmc.KMCResult) | The result of a KMC step. Similar to a Recipe but for the concrete realization of a reaction. |
+| [KMCAccept](#kimmdy.kmc.KMCAccept) | The result of a KMC step. Similar to a Recipe but for the concrete realization of a reaction. |
 
-### KMCResult { #kimmdy.kmc.KMCResult }
+### KMCAccept { #kimmdy.kmc.KMCAccept }
 
-`kmc.KMCResult(self, recipe=lambda: Recipe([], [], [])(), reaction_probability=None, time_delta=None, time_start=None)`
+`kmc.KMCAccept(self, recipe, reaction_probability, time_delta, time_start, time_start_index, time_start_index_within_plugin=None)`
 
 The result of a KMC step. Similar to a Recipe but for the concrete realization of a reaction.
 
 #### Attributes
 
-| Name                 | Type                                                                | Description                                                                                                                      |
-|----------------------|---------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|
-| recipe               | [Recipe](`kimmdy.recipe.Recipe`)                                    | Single sequence of RecipeSteps to build product                                                                                  |
-| reaction_probability | [Optional](`typing.Optional`)\[[list](`list`)\[[float](`float`)\]\] | Integral of reaction propensity with respect to time                                                                             |
-| time_delta           | [Optional](`typing.Optional`)\[[float](`float`)\]                   | MC time jump during which the reaction occurs [ps]                                                                               |
-| time_start           | [Optional](`typing.Optional`)\[[float](`float`)\]                   | Time, from which the reaction starts. The reaction changes the geometry/topology of this timestep and continues from there. [ps] |
+| Name                 | Type                                       | Description                                                                                                                      |
+|----------------------|--------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|
+| recipe               | [Recipe](`kimmdy.recipe.Recipe`)           | Single sequence of RecipeSteps to build product                                                                                  |
+| reaction_probability | [list](`list`)\[[float](`float`)\] \| None | Integral of reaction propensity with respect to time                                                                             |
+| time_delta           | [float](`float`)                           | MC time jump during which the reaction occurs [ps]                                                                               |
+| time_start           | [float](`float`)                           | Time, from which the reaction starts. The reaction changes the geometry/topology of this timestep and continues from there. [ps] |
+| time_start_index     | [int](`int`)                               | Index into the list of timesteps or rates of the timestep where the reaction starts                                              |
 
 ## Functions
 
@@ -42,7 +43,7 @@ The result of a KMC step. Similar to a Recipe but for the concrete realization o
 
 ### extrande { #kimmdy.kmc.extrande }
 
-`kmc.extrande(recipe_collection, tau_scale, logger=logging.getLogger(__name__), rng=default_rng())`
+`kmc.extrande(recipe_collection, tau_scale, rng=default_rng())`
 
 Extrande KMC
 
@@ -66,7 +67,7 @@ Implemented as in
 
 ### extrande_mod { #kimmdy.kmc.extrande_mod }
 
-`kmc.extrande_mod(recipe_collection, tau_scale, logger=logging.getLogger(__name__), rng=default_rng())`
+`kmc.extrande_mod(recipe_collection, tau_scale, rng=default_rng())`
 
 Modified Extrande KMC
 
@@ -97,7 +98,7 @@ containing constant rates.
 
 ### frm { #kimmdy.kmc.frm }
 
-`kmc.frm(recipe_collection, logger=logging.getLogger(__name__), rng=default_rng(), MD_time=None)`
+`kmc.frm(recipe_collection, rng=default_rng(), MD_time=None)`
 
 First Reaction Method variant of Kinetic Monte Carlo.
 takes RecipeCollection and choses a recipe based on which reaction would occur.
@@ -114,7 +115,7 @@ Compare e.g. [Wikipedia KMC - time dependent](https://en.wikipedia.org/wiki/Kine
 
 ### rf_kmc { #kimmdy.kmc.rf_kmc }
 
-`kmc.rf_kmc(recipe_collection, logger=logging.getLogger(__name__), rng=default_rng())`
+`kmc.rf_kmc(recipe_collection, rng=default_rng())`
 
 Rejection-Free Monte Carlo.
 Takes RecipeCollection and choses a recipe based on the relative propensity of the events.

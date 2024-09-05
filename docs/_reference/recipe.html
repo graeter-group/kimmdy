@@ -502,11 +502,12 @@ ul.task-list li input[type="checkbox"] {
   <ul class="collapse">
   <li><a href="#kimmdy.recipe.Recipe.check_consistency" id="toc-kimmdy.recipe.Recipe.check_consistency" class="nav-link" data-scroll-target="#kimmdy.recipe.Recipe.check_consistency">check_consistency</a></li>
   <li><a href="#kimmdy.recipe.Recipe.combine_with" id="toc-kimmdy.recipe.Recipe.combine_with" class="nav-link" data-scroll-target="#kimmdy.recipe.Recipe.combine_with">combine_with</a></li>
+  <li><a href="#kimmdy.recipe.Recipe.get_vmd_selection" id="toc-kimmdy.recipe.Recipe.get_vmd_selection" class="nav-link" data-scroll-target="#kimmdy.recipe.Recipe.get_vmd_selection">get_vmd_selection</a></li>
   </ul></li>
   </ul></li>
   <li><a href="#kimmdy.recipe.RecipeCollection" id="toc-kimmdy.recipe.RecipeCollection" class="nav-link" data-scroll-target="#kimmdy.recipe.RecipeCollection">RecipeCollection</a>
   <ul class="collapse">
-  <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
+  <li><a href="#parameters-7" id="toc-parameters-7" class="nav-link" data-scroll-target="#parameters-7">Parameters</a></li>
   <li><a href="#methods-1" id="toc-methods-1" class="nav-link" data-scroll-target="#methods-1">Methods</a>
   <ul class="collapse">
   <li><a href="#kimmdy.recipe.RecipeCollection.aggregate_reactions" id="toc-kimmdy.recipe.RecipeCollection.aggregate_reactions" class="nav-link" data-scroll-target="#kimmdy.recipe.RecipeCollection.aggregate_reactions">aggregate_reactions</a></li>
@@ -576,7 +577,7 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 <tr class="odd">
 <td><a href="#kimmdy.recipe.RecipeCollection">RecipeCollection</a></td>
-<td>A RecipeCollection encompasses a number of reaction paths.</td>
+<td>A RecipeCollection encompasses a list of reaction paths.</td>
 </tr>
 <tr class="even">
 <td><a href="#kimmdy.recipe.RecipeStep">RecipeStep</a></td>
@@ -825,8 +826,8 @@ ul.task-list li input[type="checkbox"] {
 <tbody>
 <tr class="odd">
 <td><code>recipe_steps</code></td>
-<td><a href="https://docs.python.org/3.10/library/stdtypes.html#list">list</a>[<a href="../_reference/recipe.html#kimmdy.recipe.RecipeStep">RecipeStep</a>]</td>
-<td>Single sequence of RecipeSteps to build product</td>
+<td><a href="https://docs.python.org/3.10/library/stdtypes.html#list">list</a>[<a href="../_reference/recipe.html#kimmdy.recipe.RecipeStep">RecipeStep</a>] | <code>DeferredRecipeSteps</code></td>
+<td>Can be a single sequence of RecipeSteps to modify the topology or a tuple with a key and a function that takes said key to generate the RecipeSteps once it has been choosen. It is up to the ReactionPlugins to choose how to match the key to the their internal state and return the RecipeSteps.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
@@ -862,6 +863,10 @@ ul.task-list li input[type="checkbox"] {
 <td><a href="#kimmdy.recipe.Recipe.combine_with">combine_with</a></td>
 <td>Combines this Recipe with another with the same RecipeSteps.</td>
 </tr>
+<tr class="odd">
+<td><a href="#kimmdy.recipe.Recipe.get_vmd_selection">get_vmd_selection</a></td>
+<td>Get a VMD selection string</td>
+</tr>
 </tbody>
 </table>
 <section id="kimmdy.recipe.Recipe.check_consistency" class="level5">
@@ -895,29 +900,35 @@ ul.task-list li input[type="checkbox"] {
 </table>
 </section>
 </section>
+<section id="kimmdy.recipe.Recipe.get_vmd_selection" class="level5">
+<h5 class="anchored" data-anchor-id="kimmdy.recipe.Recipe.get_vmd_selection">get_vmd_selection</h5>
+<p><code>recipe.Recipe.get_vmd_selection()</code></p>
+<p>Get a VMD selection string</p>
+<p>for the atoms involved in the recipe steps.</p>
+</section>
 </section>
 </section>
 <section id="kimmdy.recipe.RecipeCollection" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.recipe.RecipeCollection">RecipeCollection</h3>
 <p><code>recipe.RecipeCollection(self, recipes)</code></p>
-<p>A RecipeCollection encompasses a number of reaction paths. They can originate from multiple reaction plugins, but do not need to.</p>
-<section id="returns" class="level4">
-<h4 class="anchored" data-anchor-id="returns">Returns</h4>
+<p>A RecipeCollection encompasses a list of reaction paths. They can originate from multiple reaction plugins, but do not need to.</p>
+<section id="parameters-7" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-7">Parameters</h4>
 <table class="caption-top table">
-<colgroup>
-<col style="width: 35%">
-<col style="width: 64%">
-</colgroup>
 <thead>
 <tr class="header">
+<th>Name</th>
 <th>Type</th>
 <th>Description</th>
+<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>unique_recipes_ixs</code></td>
-<td>List of lists binning the old recipe indices and maps to the new recipes list.</td>
+<td><code>recipes</code></td>
+<td><a href="https://docs.python.org/3.10/library/stdtypes.html#list">list</a>[<a href="../_reference/recipe.html#kimmdy.recipe.Recipe">Recipe</a>]</td>
+<td>List of Recipe objects.</td>
+<td><em>required</em></td>
 </tr>
 </tbody>
 </table>
@@ -962,6 +973,27 @@ ul.task-list li input[type="checkbox"] {
 <h5 class="anchored" data-anchor-id="kimmdy.recipe.RecipeCollection.aggregate_reactions">aggregate_reactions</h5>
 <p><code>recipe.RecipeCollection.aggregate_reactions()</code></p>
 <p>Combines reactions having the same sequence of RecipeSteps.</p>
+<section id="returns" class="level6">
+<h6 class="anchored" data-anchor-id="returns">Returns</h6>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 35%">
+<col style="width: 64%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>unique_recipes_ixs</code></td>
+<td>List of lists binning the old recipe indices and maps to the new recipes list.</td>
+</tr>
+</tbody>
+</table>
+</section>
 </section>
 <section id="kimmdy.recipe.RecipeCollection.calc_cumprob" class="level5">
 <h5 class="anchored" data-anchor-id="kimmdy.recipe.RecipeCollection.calc_cumprob">calc_cumprob</h5>
@@ -1011,8 +1043,8 @@ ul.task-list li input[type="checkbox"] {
 <h5 class="anchored" data-anchor-id="kimmdy.recipe.RecipeCollection.plot">plot</h5>
 <p><code>recipe.RecipeCollection.plot(outfile, highlight_r=None, highlight_t=None)</code></p>
 <p>Plot reaction rates over time</p>
-<section id="parameters-7" class="level6">
-<h6 class="anchored" data-anchor-id="parameters-7">Parameters</h6>
+<section id="parameters-8" class="level6">
+<h6 class="anchored" data-anchor-id="parameters-8">Parameters</h6>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -1083,8 +1115,8 @@ ul.task-list li input[type="checkbox"] {
 <li>Relax: Relax()</li>
 <li>CustomTopMod: CustomTopMod(f=&lt;function f at 0x7f7f7f7f7f7f&gt;)</li>
 </ul>
-<section id="parameters-8" class="level6">
-<h6 class="anchored" data-anchor-id="parameters-8">Parameters</h6>
+<section id="parameters-9" class="level6">
+<h6 class="anchored" data-anchor-id="parameters-9">Parameters</h6>
 <table class="caption-top table">
 <thead>
 <tr class="header">

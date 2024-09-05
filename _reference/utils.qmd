@@ -36,6 +36,8 @@ Check for an existing gromacs installation.
 If PLUMED is meant to be used it additionally checks for the keyword
 'MODIFIED' or 'plumed' in the version name.
 
+If slow growth pairs are used, it checks for gromacs version >= 2023.2
+
 ### get_atominfo_from_atomnrs { #kimmdy.utils.get_atominfo_from_atomnrs }
 
 `utils.get_atominfo_from_atomnrs(atomnrs, top)`
