@@ -555,8 +555,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="prerequisites" class="level3">
 <h3 class="anchored" data-anchor-id="prerequisites">Prerequisites</h3>
 <ul>
-<li><code>python3.9</code> or higher</li>
-<li><code>gromacs</code> (tested with version 2021.4, <code>gmx</code> should be available in the <code>PATH</code>)</li>
+<li><code>python3.10</code> or higher</li>
+<li><code>gromacs&gt;=2023.2</code>
+<ul>
+<li>Version 2021.4 works with everything except slow-growth.</li>
+</ul></li>
 </ul>
 <p>Optional:</p>
 <ul>
@@ -622,7 +625,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Our starting structure is a simple ACE/NME-capped Alanine molecule in a box of water. Note, how it has a missing hydrogen atom on the alpha carbon. This is a radical. We will use the builtin <code>hat_reaction</code> to simulate hydrogen atom transfer reactions from nearby hydrogens to the radical position.</p>
     <div id="app-./getting-started-files/vis-ala.molj" class="molstar-app"></div>
     <script type="text/javascript">
-    molstar.Viewer.create("app-./getting-started-files/vis-ala.molj", {"layoutShowControls":false,"pdbProvider":"rcsb","viewportShowExpand":true,"layoutShowSequence":false,"emdbProvider":"rcsb","layoutShowLog":false,"viewportShowAnimation":true,"layoutIsExpanded":false,"layoutShowRemoteState":false,"viewportShowSelectionMode":false,"layoutShowLeftPanel":true}).then(viewer => {
+    molstar.Viewer.create("app-./getting-started-files/vis-ala.molj", {"layoutIsExpanded":false,"viewportShowExpand":true,"layoutShowSequence":false,"layoutShowRemoteState":false,"emdbProvider":"rcsb","viewportShowSelectionMode":false,"pdbProvider":"rcsb","layoutShowControls":false,"viewportShowAnimation":true,"layoutShowLog":false,"layoutShowLeftPanel":true}).then(viewer => {
     viewer.loadSnapshotFromUrl(url="./getting-started-files/vis-ala.molj", "molj");    });
     </script>
     
