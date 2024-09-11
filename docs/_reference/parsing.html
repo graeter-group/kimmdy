@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.56">
+<meta name="generator" content="quarto-1.5.53">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -670,6 +670,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="kimmdy.parsing.read_distances_dat">read_distances_dat</h3>
 <p><code>parsing.read_distances_dat(distances_dat)</code></p>
 <p>Read a distances.dat plumed output file.</p>
+<p>A typical file looks like this:</p>
+<pre><code>#! FIELDS time d0 d1 d2 d3 d4 d5 d6  ...
+0.000000 0.153211 0.157662 0.139923 ...</code></pre>
 </section>
 <section id="kimmdy.parsing.read_edissoc" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.parsing.read_edissoc">read_edissoc</h3>
@@ -823,84 +826,84 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="examples" class="level4">
 <h4 class="anchored" data-anchor-id="examples">Examples</h4>
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>raw_top <span class="op">=</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>{<span class="st">'ffdir'</span>: PosixPath(<span class="st">'/usr/share/gromacs/top/amber99.ff'</span>),</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="st">'define'</span>: {<span class="st">'_FF_AMBER'</span>: [], <span class="st">'_FF_AMBER99'</span>: []},</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="st">'defaults'</span>: {<span class="st">'content'</span>: [[<span class="st">'1'</span>, <span class="st">'2'</span>, <span class="st">'yes'</span>, <span class="st">'0.5'</span>, <span class="st">'0.8333'</span>]],</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="st">'else_content'</span>: [],</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="st">'extra'</span>: [],</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="st">'condition'</span>: <span class="va">None</span>},</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="st">'atomtypes'</span>: {<span class="st">'content'</span>: [</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>[<span class="st">'C'</span>, <span class="st">'6'</span>, <span class="st">'12.01'</span>, <span class="st">'0.0000'</span>, <span class="st">'A'</span>, <span class="st">'3.39967e-01'</span>, <span class="st">'3.59824e-01'</span>],</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>[<span class="st">'MNH3'</span>, <span class="st">'0'</span>, <span class="st">'0.0000'</span>, <span class="st">'0.0000'</span>, <span class="st">'A'</span>, <span class="st">'0.00000e+00'</span>, <span class="st">'0.00000e+00'</span>]],</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="st">'else_content'</span>: [],</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="st">'extra'</span>: [],</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="st">'condition'</span>: <span class="va">None</span>},</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="st">'moleculetype_Urea'</span>: {<span class="st">'content'</span>: [[<span class="st">'Urea'</span>, <span class="st">'3'</span>]],</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="st">'else_content'</span>: [],</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="st">'extra'</span>: [],</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="st">'condition'</span>: <span class="va">None</span>,</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="st">'subsections'</span>: {<span class="st">'atoms'</span>: {<span class="st">'content'</span>: [[<span class="st">'1'</span>,</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">'C'</span>,</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    <span class="st">'1'</span>,</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    <span class="st">'URE'</span>,</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    <span class="st">'C'</span>,</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    <span class="st">'1'</span>,</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    <span class="st">'0.880229'</span>,</span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    <span class="st">'12.01000'</span>],</span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'2'</span>, <span class="st">'O'</span>, <span class="st">'1'</span>, <span class="st">'URE'</span>, <span class="st">'O'</span>, <span class="st">'2'</span>, <span class="st">'-0.613359'</span>, <span class="st">'16.00000'</span>],</span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'3'</span>, <span class="st">'N'</span>, <span class="st">'1'</span>, <span class="st">'URE'</span>, <span class="st">'N1'</span>, <span class="st">'3'</span>, <span class="st">'-0.923545'</span>, <span class="st">'14.01000'</span>],</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'4'</span>, <span class="st">'H'</span>, <span class="st">'1'</span>, <span class="st">'URE'</span>, <span class="st">'H11'</span>, <span class="st">'4'</span>, <span class="st">'0.395055'</span>, <span class="st">'1.00800'</span>],</span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'5'</span>, <span class="st">'H'</span>, <span class="st">'1'</span>, <span class="st">'URE'</span>, <span class="st">'H12'</span>, <span class="st">'5'</span>, <span class="st">'0.395055'</span>, <span class="st">'1.00800'</span>],</span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'6'</span>, <span class="st">'N'</span>, <span class="st">'1'</span>, <span class="st">'URE'</span>, <span class="st">'N2'</span>, <span class="st">'6'</span>, <span class="st">'-0.923545'</span>, <span class="st">'14.01000'</span>],</span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'7'</span>, <span class="st">'H'</span>, <span class="st">'1'</span>, <span class="st">'URE'</span>, <span class="st">'H21'</span>, <span class="st">'7'</span>, <span class="st">'0.395055'</span>, <span class="st">'1.00800'</span>],</span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'8'</span>, <span class="st">'H'</span>, <span class="st">'1'</span>, <span class="st">'URE'</span>, <span class="st">'H22'</span>, <span class="st">'8'</span>, <span class="st">'0.395055'</span>, <span class="st">'1.00800'</span>]],</span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    <span class="st">'else_content'</span>: [],</span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    <span class="st">'extra'</span>: [],</span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>    <span class="st">'condition'</span>: <span class="va">None</span>},</span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="st">'bonds'</span>: {<span class="st">'content'</span>: [[<span class="st">'1'</span>, <span class="st">'2'</span>],</span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'1'</span>, <span class="st">'3'</span>],</span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'1'</span>, <span class="st">'6'</span>],</span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'3'</span>, <span class="st">'4'</span>],</span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'3'</span>, <span class="st">'5'</span>],</span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'6'</span>, <span class="st">'7'</span>],</span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'6'</span>, <span class="st">'8'</span>]],</span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>    <span class="st">'else_content'</span>: [],</span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>    <span class="st">'extra'</span>: [],</span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>    <span class="st">'condition'</span>: <span class="va">None</span>},</span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a><span class="st">'dihedrals'</span>: {<span class="st">'content'</span>: [[<span class="st">'2'</span>, <span class="st">'1'</span>, <span class="st">'3'</span>, <span class="st">'4'</span>, <span class="st">'9'</span>],</span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'2'</span>, <span class="st">'1'</span>, <span class="st">'3'</span>, <span class="st">'5'</span>, <span class="st">'9'</span>],</span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'2'</span>, <span class="st">'1'</span>, <span class="st">'6'</span>, <span class="st">'7'</span>, <span class="st">'9'</span>],</span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'2'</span>, <span class="st">'1'</span>, <span class="st">'6'</span>, <span class="st">'8'</span>, <span class="st">'9'</span>],</span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'3'</span>, <span class="st">'1'</span>, <span class="st">'6'</span>, <span class="st">'7'</span>, <span class="st">'9'</span>],</span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'3'</span>, <span class="st">'1'</span>, <span class="st">'6'</span>, <span class="st">'8'</span>, <span class="st">'9'</span>],</span>
-<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'6'</span>, <span class="st">'1'</span>, <span class="st">'3'</span>, <span class="st">'4'</span>, <span class="st">'9'</span>],</span>
-<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'6'</span>, <span class="st">'1'</span>, <span class="st">'3'</span>, <span class="st">'5'</span>, <span class="st">'9'</span>],</span>
-<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'3'</span>, <span class="st">'6'</span>, <span class="st">'1'</span>, <span class="st">'2'</span>, <span class="st">'4'</span>],</span>
-<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'1'</span>, <span class="st">'4'</span>, <span class="st">'3'</span>, <span class="st">'5'</span>, <span class="st">'4'</span>],</span>
-<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'1'</span>, <span class="st">'7'</span>, <span class="st">'6'</span>, <span class="st">'8'</span>, <span class="st">'4'</span>]],</span>
-<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>    <span class="st">'else_content'</span>: [],</span>
-<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>    <span class="st">'extra'</span>: [],</span>
-<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>    <span class="st">'condition'</span>: <span class="va">None</span>},</span>
-<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a><span class="st">'position_restraints'</span>: {<span class="st">'content'</span>: [[<span class="st">'1'</span>, <span class="st">'1'</span>, <span class="st">'1000'</span>, <span class="st">'1000'</span>, <span class="st">'1000'</span>],</span>
-<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'2'</span>, <span class="st">'1'</span>, <span class="st">'1000'</span>, <span class="st">'0'</span>, <span class="st">'1000'</span>],</span>
-<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'3'</span>, <span class="st">'1'</span>, <span class="st">'1000'</span>, <span class="st">'0'</span>, <span class="st">'0'</span>]],</span>
-<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>    <span class="st">'else_content'</span>: [],</span>
-<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>    <span class="st">'extra'</span>: [],</span>
-<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>    <span class="st">'condition'</span>: <span class="va">None</span>},</span>
-<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a><span class="st">'dihedral_restraints'</span>: {<span class="st">'content'</span>: [[<span class="st">'3'</span>,</span>
-<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>    <span class="st">'6'</span>,</span>
-<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>    <span class="st">'1'</span>,</span>
-<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a>    <span class="st">'2'</span>,</span>
-<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a>    <span class="st">'1'</span>,</span>
-<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a>    <span class="st">'180'</span>,</span>
-<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a>    <span class="st">'0'</span>,</span>
-<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a>    <span class="st">'10'</span>],</span>
-<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'1'</span>, <span class="st">'4'</span>, <span class="st">'3'</span>, <span class="st">'5'</span>, <span class="st">'1'</span>, <span class="st">'180'</span>, <span class="st">'0'</span>, <span class="st">'10'</span>]],</span>
-<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a>    <span class="st">'else_content'</span>: [],</span>
-<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a>    <span class="st">'extra'</span>: [],</span>
-<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a>    <span class="st">'condition'</span>: <span class="va">None</span>}}},</span>
-<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>raw_top <span class="op">=</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>{<span class="st">'ffdir'</span>: PosixPath(<span class="st">'/usr/share/gromacs/top/amber99.ff'</span>),</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="st">'define'</span>: {<span class="st">'_FF_AMBER'</span>: [], <span class="st">'_FF_AMBER99'</span>: []},</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="st">'defaults'</span>: {<span class="st">'content'</span>: [[<span class="st">'1'</span>, <span class="st">'2'</span>, <span class="st">'yes'</span>, <span class="st">'0.5'</span>, <span class="st">'0.8333'</span>]],</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="st">'else_content'</span>: [],</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="st">'extra'</span>: [],</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="st">'condition'</span>: <span class="va">None</span>},</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="st">'atomtypes'</span>: {<span class="st">'content'</span>: [</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>[<span class="st">'C'</span>, <span class="st">'6'</span>, <span class="st">'12.01'</span>, <span class="st">'0.0000'</span>, <span class="st">'A'</span>, <span class="st">'3.39967e-01'</span>, <span class="st">'3.59824e-01'</span>],</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>[<span class="st">'MNH3'</span>, <span class="st">'0'</span>, <span class="st">'0.0000'</span>, <span class="st">'0.0000'</span>, <span class="st">'A'</span>, <span class="st">'0.00000e+00'</span>, <span class="st">'0.00000e+00'</span>]],</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="st">'else_content'</span>: [],</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="st">'extra'</span>: [],</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="st">'condition'</span>: <span class="va">None</span>},</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="st">'moleculetype_Urea'</span>: {<span class="st">'content'</span>: [[<span class="st">'Urea'</span>, <span class="st">'3'</span>]],</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="st">'else_content'</span>: [],</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="st">'extra'</span>: [],</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="st">'condition'</span>: <span class="va">None</span>,</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="st">'subsections'</span>: {<span class="st">'atoms'</span>: {<span class="st">'content'</span>: [[<span class="st">'1'</span>,</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">'C'</span>,</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    <span class="st">'1'</span>,</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    <span class="st">'URE'</span>,</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    <span class="st">'C'</span>,</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    <span class="st">'1'</span>,</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    <span class="st">'0.880229'</span>,</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    <span class="st">'12.01000'</span>],</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'2'</span>, <span class="st">'O'</span>, <span class="st">'1'</span>, <span class="st">'URE'</span>, <span class="st">'O'</span>, <span class="st">'2'</span>, <span class="st">'-0.613359'</span>, <span class="st">'16.00000'</span>],</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'3'</span>, <span class="st">'N'</span>, <span class="st">'1'</span>, <span class="st">'URE'</span>, <span class="st">'N1'</span>, <span class="st">'3'</span>, <span class="st">'-0.923545'</span>, <span class="st">'14.01000'</span>],</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'4'</span>, <span class="st">'H'</span>, <span class="st">'1'</span>, <span class="st">'URE'</span>, <span class="st">'H11'</span>, <span class="st">'4'</span>, <span class="st">'0.395055'</span>, <span class="st">'1.00800'</span>],</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'5'</span>, <span class="st">'H'</span>, <span class="st">'1'</span>, <span class="st">'URE'</span>, <span class="st">'H12'</span>, <span class="st">'5'</span>, <span class="st">'0.395055'</span>, <span class="st">'1.00800'</span>],</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'6'</span>, <span class="st">'N'</span>, <span class="st">'1'</span>, <span class="st">'URE'</span>, <span class="st">'N2'</span>, <span class="st">'6'</span>, <span class="st">'-0.923545'</span>, <span class="st">'14.01000'</span>],</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'7'</span>, <span class="st">'H'</span>, <span class="st">'1'</span>, <span class="st">'URE'</span>, <span class="st">'H21'</span>, <span class="st">'7'</span>, <span class="st">'0.395055'</span>, <span class="st">'1.00800'</span>],</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'8'</span>, <span class="st">'H'</span>, <span class="st">'1'</span>, <span class="st">'URE'</span>, <span class="st">'H22'</span>, <span class="st">'8'</span>, <span class="st">'0.395055'</span>, <span class="st">'1.00800'</span>]],</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>    <span class="st">'else_content'</span>: [],</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>    <span class="st">'extra'</span>: [],</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>    <span class="st">'condition'</span>: <span class="va">None</span>},</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a><span class="st">'bonds'</span>: {<span class="st">'content'</span>: [[<span class="st">'1'</span>, <span class="st">'2'</span>],</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'1'</span>, <span class="st">'3'</span>],</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'1'</span>, <span class="st">'6'</span>],</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'3'</span>, <span class="st">'4'</span>],</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'3'</span>, <span class="st">'5'</span>],</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'6'</span>, <span class="st">'7'</span>],</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'6'</span>, <span class="st">'8'</span>]],</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>    <span class="st">'else_content'</span>: [],</span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>    <span class="st">'extra'</span>: [],</span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>    <span class="st">'condition'</span>: <span class="va">None</span>},</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a><span class="st">'dihedrals'</span>: {<span class="st">'content'</span>: [[<span class="st">'2'</span>, <span class="st">'1'</span>, <span class="st">'3'</span>, <span class="st">'4'</span>, <span class="st">'9'</span>],</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'2'</span>, <span class="st">'1'</span>, <span class="st">'3'</span>, <span class="st">'5'</span>, <span class="st">'9'</span>],</span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'2'</span>, <span class="st">'1'</span>, <span class="st">'6'</span>, <span class="st">'7'</span>, <span class="st">'9'</span>],</span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'2'</span>, <span class="st">'1'</span>, <span class="st">'6'</span>, <span class="st">'8'</span>, <span class="st">'9'</span>],</span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'3'</span>, <span class="st">'1'</span>, <span class="st">'6'</span>, <span class="st">'7'</span>, <span class="st">'9'</span>],</span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'3'</span>, <span class="st">'1'</span>, <span class="st">'6'</span>, <span class="st">'8'</span>, <span class="st">'9'</span>],</span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'6'</span>, <span class="st">'1'</span>, <span class="st">'3'</span>, <span class="st">'4'</span>, <span class="st">'9'</span>],</span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'6'</span>, <span class="st">'1'</span>, <span class="st">'3'</span>, <span class="st">'5'</span>, <span class="st">'9'</span>],</span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'3'</span>, <span class="st">'6'</span>, <span class="st">'1'</span>, <span class="st">'2'</span>, <span class="st">'4'</span>],</span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'1'</span>, <span class="st">'4'</span>, <span class="st">'3'</span>, <span class="st">'5'</span>, <span class="st">'4'</span>],</span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'1'</span>, <span class="st">'7'</span>, <span class="st">'6'</span>, <span class="st">'8'</span>, <span class="st">'4'</span>]],</span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>    <span class="st">'else_content'</span>: [],</span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>    <span class="st">'extra'</span>: [],</span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>    <span class="st">'condition'</span>: <span class="va">None</span>},</span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a><span class="st">'position_restraints'</span>: {<span class="st">'content'</span>: [[<span class="st">'1'</span>, <span class="st">'1'</span>, <span class="st">'1000'</span>, <span class="st">'1000'</span>, <span class="st">'1000'</span>],</span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'2'</span>, <span class="st">'1'</span>, <span class="st">'1000'</span>, <span class="st">'0'</span>, <span class="st">'1000'</span>],</span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'3'</span>, <span class="st">'1'</span>, <span class="st">'1000'</span>, <span class="st">'0'</span>, <span class="st">'0'</span>]],</span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a>    <span class="st">'else_content'</span>: [],</span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a>    <span class="st">'extra'</span>: [],</span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a>    <span class="st">'condition'</span>: <span class="va">None</span>},</span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a><span class="st">'dihedral_restraints'</span>: {<span class="st">'content'</span>: [[<span class="st">'3'</span>,</span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a>    <span class="st">'6'</span>,</span>
+<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a>    <span class="st">'1'</span>,</span>
+<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a>    <span class="st">'2'</span>,</span>
+<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a>    <span class="st">'1'</span>,</span>
+<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a>    <span class="st">'180'</span>,</span>
+<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a>    <span class="st">'0'</span>,</span>
+<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a>    <span class="st">'10'</span>],</span>
+<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'1'</span>, <span class="st">'4'</span>, <span class="st">'3'</span>, <span class="st">'5'</span>, <span class="st">'1'</span>, <span class="st">'180'</span>, <span class="st">'0'</span>, <span class="st">'10'</span>]],</span>
+<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a>    <span class="st">'else_content'</span>: [],</span>
+<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a>    <span class="st">'extra'</span>: [],</span>
+<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a>    <span class="st">'condition'</span>: <span class="va">None</span>}}},</span>
+<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 </section>
 <section id="kimmdy.parsing.resolve_includes" class="level3">
