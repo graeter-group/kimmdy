@@ -525,7 +525,7 @@ def read_distances_dat(distances_dat: Path) -> dict:
             # floating point errors
             # find the . :
             i = time.index(".")
-            d['time'].append(float(time[: i + 4]))
+            d["time"].append(float(time[: i + 4]))
             # iterate over the rest of the columns
             for k, v in zip(colnames[1:], values[1:]):
                 d[k].append(float(v))
