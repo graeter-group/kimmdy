@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.56">
+<meta name="generator" content="quarto-1.5.53">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -503,10 +503,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#kimmdy" id="toc-kimmdy" class="nav-link active" data-scroll-target="#kimmdy">KIMMDY</a></li>
-  <li><a href="#analysis" id="toc-analysis" class="nav-link" data-scroll-target="#analysis">Analysis</a></li>
+  <li><a href="#cli-arguments" id="toc-cli-arguments" class="nav-link active" data-scroll-target="#cli-arguments">CLI Arguments</a>
+  <ul>
+  <li><a href="#kimmdy" id="toc-kimmdy" class="nav-link" data-scroll-target="#kimmdy">KIMMDY</a></li>
+  <li><a href="#create-plumed-input" id="toc-create-plumed-input" class="nav-link" data-scroll-target="#create-plumed-input">Create plumed input</a></li>
   <li><a href="#remove-hydrogen" id="toc-remove-hydrogen" class="nav-link" data-scroll-target="#remove-hydrogen">Remove Hydrogen</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  </ul></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/graeter-group/kimmdy/edit/main/guide/references/cmd_ref.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/graeter-group/kimmdy/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
@@ -515,7 +518,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../_reference/index.html">Reference</a></li><li class="breadcrumb-item"><a href="../../guide/references/cmd_ref.html">CLI Arguments</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">CLI Arguments</h1>
+<h1 class="title">Analysis</h1>
 </div>
 
 
@@ -532,15 +535,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
+<section id="cli-arguments" class="level1">
+<h1>CLI Arguments</h1>
 <p>The prefered method of starting a KIMMDY run is via the command line, though <a href="../../_reference/cmd.html">Python entry points</a> are supported as well.</p>
 <section id="kimmdy" class="level2">
 <h2 class="anchored" data-anchor-id="kimmdy">KIMMDY</h2>
-<div id="f025a1ca" class="cell" data-execution_count="1">
+<div id="3b93130d" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>kimmdy <span class="op">--</span><span class="bu">help</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>usage: kimmdy [-h] [--input INPUT] [--checkpoint CHECKPOINT]
-              [--loglevel LOGLEVEL] [--logfile LOGFILE] [--show-plugins]
-              [--generate-jobscript] [--version] [--debug] [--callgraph]
+<pre><code>usage: kimmdy [-h] [--input INPUT] [--loglevel LOGLEVEL] [--logfile LOGFILE]
+              [--show-plugins] [--generate-jobscript] [--version] [--debug]
+              [--callgraph]
 
 Welcome to KIMMDY. `kimmdy` runs KIMMDY, further tools are available as
 `kimmdy-...` commands. These are `-analysis`, `-modify-top` and `-build-
@@ -550,10 +555,6 @@ options:
   -h, --help            show this help message and exit
   --input INPUT, -i INPUT
                         Kimmdy input file. Default `kimmdy.yml`
-  --checkpoint CHECKPOINT, -c CHECKPOINT
-                        File path of a kimmdy.cpt file to restart KIMMDY from
-                        a checkpoint. If a directory is given, the file
-                        kimmdy.cpt in that directory is used.
   --loglevel LOGLEVEL, -l LOGLEVEL
                         logging level (CRITICAL, ERROR, WARNING, INFO, DEBUG)
   --logfile LOGFILE, -f LOGFILE
@@ -568,10 +569,7 @@ options:
                         useful for debugging and documentation.</code></pre>
 </div>
 </div>
-</section>
-<section id="analysis" class="level2">
-<h2 class="anchored" data-anchor-id="analysis">Analysis</h2>
-<div id="ae57bf41" class="cell" data-execution_count="2">
+<div id="da853220" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>kimmdy<span class="op">-</span>analysis <span class="op">--</span><span class="bu">help</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>usage: kimmdy-analysis [-h] module ...
@@ -581,60 +579,115 @@ KIMMDY runs.
 
 positional arguments:
   module
-    trjcat            Concatenate trajectories of a KIMMDY run
-    energy            Plot GROMACS energy for a KIMMDY run
-    radical_population
-                      Plot population of radicals for one or multiple KIMMDY
-                      run(s)
-    rates             Plot rates of all possible reactions after a MD run.
-                      Rates must have been saved!
-    runtime           Plot runtime of the tasks of a kimmdy run.
+    trjcat              Concatenate trajectories of a KIMMDY run
+    energy              Plot GROMACS energy for a KIMMDY run
+    radical_population  Plot population of radicals for one or multiple KIMMDY
+                        run(s)
+    radical_migration   Create a json of radical migration events for further
+                        analysis.
+    rates               Plot rates of all possible reactions after a MD run.
+                        Rates must have been saved!
+    runtime             Plot runtime of the tasks of a kimmdy run.
+    reaction_participation
+                        Plot counts of reaction participation per atom id
 
 options:
-  -h, --help          show this help message and exit</code></pre>
+  -h, --help            show this help message and exit</code></pre>
+</div>
+</div>
+</section>
+<section id="create-plumed-input" class="level2">
+<h2 class="anchored" data-anchor-id="create-plumed-input">Create plumed input</h2>
+<p>This module creates input files for plumed based on a topology and index file.</p>
+<div id="62f32141" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>kimmdy<span class="op">-</span>create<span class="op">-</span>plumed <span class="op">--</span><span class="bu">help</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>usage: kimmdy-create-plumed [-h] [--entries-to-remove [ENTRIES_TO_REMOVE ...]]
+                            [--stride STRIDE] -p TOP -i INDEX --indexgroup
+                            INDEXGROUP
+
+Build plumed input file. Requires a topology file and a gromacs index file.
+
+options:
+  -h, --help            show this help message and exit
+  --entries-to-remove [ENTRIES_TO_REMOVE ...]
+                        Either atomnames or bonds, i.e. atomnames separated by
+                        a hyphen that should not be written to the plumed
+                        configuration file. Default: C-N H* O*
+  --stride STRIDE       Frequency of plumed output as multiple of the md
+                        timestep. Default: 100
+  -p TOP, --top TOP     Gromacs topology file path.
+  -i INDEX, --index INDEX
+                        Gromacs index file path.
+  --indexgroup INDEXGROUP
+                        Index group name out of which bonds will be written to
+                        the plumed configuration file.</code></pre>
 </div>
 </div>
 </section>
 <section id="remove-hydrogen" class="level2">
 <h2 class="anchored" data-anchor-id="remove-hydrogen">Remove Hydrogen</h2>
 <p>This module builds or restores the example directory in the package.</p>
-<div id="d354a57c" class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>kimmdy<span class="op">-</span>modify<span class="op">-</span>top <span class="op">--</span><span class="bu">help</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="5f68f86b" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>kimmdy<span class="op">-</span>modify<span class="op">-</span>top <span class="op">--</span><span class="bu">help</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>usage: kimmdy-modify-top [-h] [-p] [-r REMOVEH [REMOVEH ...]] [-c GROFILE]
-                         [-t RESIDUETYPES] [-x RADICALS]
+<pre><code>usage: kimmdy-modify-top [-h] [-p] [--grappa_tag GRAPPA_TAG]
+                         [--grappa_charge_model GRAPPA_CHARGE_MODEL]
+                         [-r REMOVEH [REMOVEH ...]] [-c GRO] [-a]
+                         [-t RESIDUETYPES] [-x RADICALS [RADICALS ...]]
+                         [-w INCLUDE] [-b EXCLUDE]
                          top out
 
 Welcome to the KIMMDY modify top module
 
 positional arguments:
   top                   GROMACS top file
-  out                   Output top file name
+  out                   Output top file name. Stem reused for gro if
+                        applicabel.
 
 options:
   -h, --help            show this help message and exit
   -p, --parameterize    Parameterize topology with grappa. (default: False)
+  --grappa_tag GRAPPA_TAG
+                        Set grappa model tag for parameterization. (default:
+                        latest)
+  --grappa_charge_model GRAPPA_CHARGE_MODEL
+                        Set grappa charge model for parameterization.
+                        (default: amber99)
   -r REMOVEH [REMOVEH ...], --removeH REMOVEH [REMOVEH ...]
                         Remove one or more hydrogens by atom nrs in the top
                         file. (default: None)
-  -c GROFILE, --grofile GROFILE
-                        If necessary, also apply actions on gro file to create
-                        a compatible gro/top file pair. (default: None)
+  -c GRO, --gro GRO     If necessary, also apply actions on gro file to create
+                        a compatible gro/top file pair. Output analog to top.
+                        (default: None)
+  -a, --search_amber_rad
+                        Automatic radical search only implemented for amber.
+                        If you douse another ff, set this to false, and
+                        provide a list of radicalsmanually, if necessary.
+                        (default: False)
   -t RESIDUETYPES, --residuetypes RESIDUETYPES
                         GROMACS style residuetypes file. Necessary for
                         parameterization with non-amber atom types. (default:
                         None)
-  -x RADICALS, --radicals RADICALS
+  -x RADICALS [RADICALS ...], --radicals RADICALS [RADICALS ...]
                         Radicals in the system PRIOR to removing hydrogens
-                        with the removeH option. (default: )</code></pre>
+                        with the removeH option. (default: None)
+  -w INCLUDE, --include INCLUDE
+                        Include certain GROMACS topology molecules in
+                        `Reactive` molecule. Reads molecule names from a csv
+                        file. (default: None)
+  -b EXCLUDE, --exclude EXCLUDE
+                        Exclude certain GROMACS topology molecules in
+                        `Reactive` molecule. Reads molecule names from a csv
+                        file. (default: None)</code></pre>
 </div>
 </div>
 </section>
 <section id="examples" class="level2">
 <h2 class="anchored" data-anchor-id="examples">Examples</h2>
 <p>This module builds or restores the example directory in the package.</p>
-<div id="8f4df5b5" class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>kimmdy<span class="op">-</span>build<span class="op">-</span>examples <span class="op">--</span><span class="bu">help</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="ab9478d8" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>kimmdy<span class="op">-</span>build<span class="op">-</span>examples <span class="op">--</span><span class="bu">help</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>usage: kimmdy-build-examples [-h] [-r [RESTORE]]
 
@@ -649,6 +702,7 @@ options:
 </div>
 
 
+</section>
 </section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
