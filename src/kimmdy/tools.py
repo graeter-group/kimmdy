@@ -445,6 +445,7 @@ def create_plumed_dat(
     out_file = top_path.with_name("plumed.dat")
     if out_file.exists():
         print(f"Error: {out_file} does exists!")
+        return
 
     top = Topology(read_top(top_path))
     idx = read_top(idx_path)
@@ -543,7 +544,6 @@ def entry_point_create_plumed():
     parser.add_argument(
         "--indexgroup",
         type=str,
-        required=True,
         help="Index group name out of which bonds will be written to the plumed configuration file.",
     )
     p = parser.parse_args()
