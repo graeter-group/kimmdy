@@ -19,6 +19,14 @@ The prefered method of starting a KIMMDY run is via the command line, though [Py
 !kimmdy-analysis --help
 ```
 
+## Create plumed input
+
+This module creates input files for plumed based on a topology and index file.
+
+```{python}
+!kimmdy-create-plumed --help
+```
+
 ## Remove Hydrogen
 
 This module builds or restores the example directory in the package.

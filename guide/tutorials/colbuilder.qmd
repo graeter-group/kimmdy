@@ -135,7 +135,7 @@ The next entry in the config file is plumed and references a plumed configuratio
 
 For homolysis, the plumed.dat file should contain instructions to sample distances between bonds.
 Homolysis can then occur for the bonds mentioned in this file.
-A script to create a plumed.dat file (`create_plumed_config.py`) can be found in the tutorial files. Check out the script to understand its input and output!
+To create the input file, kimmdy provides the command line interface [`kimmdy-create-plumed`](../references/cmd_ref.qmd).
 
 
 We want to sample homolysis in the backbone and in crosslinks.
