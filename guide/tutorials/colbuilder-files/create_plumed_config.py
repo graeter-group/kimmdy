@@ -6,7 +6,7 @@ from kimmdy.parsing import read_top
 
 
 def create_plumed_dat(
-    top_path: Path, idx_path: Path, idx_group: str, entries_to_remove: list
+    top_path: Path, idx_path: Path, idx_group: str, entries_to_remove: list, stride: int
 ):
     print(
         "Creating plumed file with following settings:\n\n"
@@ -19,7 +19,6 @@ def create_plumed_dat(
     # init variables
     top = Topology(read_top(top_path))
     idx = read_top(idx_path)
-    plumed_stride = 100
     plumed_distances_out = "distances.dat"
 
     # prepare remove variables
@@ -71,36 +70,46 @@ def create_plumed_dat(
         print_arg += f"d{i},"
     file.write(" \n#Print distances ARG to FILE every STRIDE steps \n")
     file.write(
-        "PRINT ARG="
-        + print_arg
-        + f" STRIDE={plumed_stride} FILE={plumed_distances_out}"
+        "PRINT ARG=" + print_arg + f" STRIDE={stride} FILE={plumed_distances_out}"
     )
     file.close()
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Build examples for KIMMDY.")
-    parser.add_argument("topfile", type=str, help="Gromacs topology file path.")
-    parser.add_argument("indexfile", type=str, help="Gromacs index file path.")
-    parser.add_argument(
-        "indexgroup",
-        type=str,
-        help="Index group name out of which bonds will be written to the plumed configuration file.",
-    )
     parser.add_argument(
         "--entries-to-remove",
         nargs="*",
         default=["C-N", "H*", "O*"],
-        help="Either atomnames or bonds, i.e. atomnames separated by a hyphen that should not be written to the plumed configuration file.",
+        help=(
+            "Either atomnames or bonds, i.e. atomnames separated by a hyphen "
+            "that should not be written to the plumed configuration file. Default: C-N H* O*"
+        ),
+    )
+    parser.add_argument(
+        "--stride",
+        type=int,
+        default=100,
+        help="Frequency of plumed output as multiple of the md timestep. Default: 100",
+    )
+    parser.add_argument(
+        "-p", "--top", type=str, required=True, help="Gromacs topology file path."
+    )
+    parser.add_argument(
+        "-i", "--index", type=str, required=True, help="Gromacs index file path."
+    )
+    parser.add_argument(
+        "--indexgroup",
+        type=str,
+        required=True,
+        help="Index group name out of which bonds will be written to the plumed configuration file.",
     )
     p = parser.parse_args()
 
-    top_path = Path(p.topfile)
-    idx_path = Path(p.indexfile)
-
     create_plumed_dat(
-        top_path,
-        idx_path,
+        Path(p.top),
+        Path(p.index),
         idx_group=p.indexgroup,
         entries_to_remove=p.entries_to_remove,
+        stride=p.stride,
     )
