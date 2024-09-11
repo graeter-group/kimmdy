@@ -434,10 +434,9 @@ class RunManager:
                     shutil.copy(path, files.outputdir / path.name)
                     files.output[f] = files.outputdir / path.name
 
-
         # for starting reactions from existing trajectories,
         # we need to read the name of the plumed output file
-        # from the plumed input file and interpret it 
+        # from the plumed input file and interpret it
         # relative to the parent directory of the trajectory
         # (xtc, trr, tpr) files
         if hasattr(self.config, "plumed"):
@@ -446,7 +445,9 @@ class RunManager:
                     plumed_out = get_plumed_out(self.latest_files["plumed"])
                     trajectory_dir = self.latest_files[f].parent
                     self.latest_files["plumed_out"] = trajectory_dir / plumed_out
-                    logger.debug(f"Setting up plumed_out from {f} file. Plumed out: {plumed_out} in {trajectory_dir}")
+                    logger.debug(
+                        f"Setting up plumed_out from {f} file. Plumed out: {plumed_out} in {trajectory_dir}"
+                    )
                     break
 
         return files
