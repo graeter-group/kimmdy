@@ -504,13 +504,30 @@ def write_plumed(d: Plumed_dict, path: Path) -> None:
 
 
 def read_distances_dat(distances_dat: Path) -> dict:
-    """Read a distances.dat plumed output file."""
+    """Read a distances.dat plumed output file.
+
+    A typical file looks like this:
+
+    ```
+    #! FIELDS time d0 d1 d2 d3 d4 d5 d6  ...
+    0.000000 0.153211 0.157662 0.139923 ...
+    ```
+    """
     with open(distances_dat, "r") as f:
-        colnames = f.readline()[10:].split()
+        colnames = f.readline()[10:].strip().split()
         d = {c: [] for c in colnames}
         for l in f:
-            values = l.split()
-            for k, v in zip(colnames, values):
+            values = l.strip().split()
+            time = values[0]
+            # time is in ps
+            # but needs to be truncated to
+            # 3 decimal places (1fs) to avoid
+            # floating point errors
+            # find the . :
+            i = time.index(".")
+            d["time"].append(float(time[: i + 4]))
+            # iterate over the rest of the columns
+            for k, v in zip(colnames[1:], values[1:]):
                 d[k].append(float(v))
 
     return d
