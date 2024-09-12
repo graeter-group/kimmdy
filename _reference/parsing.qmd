@@ -58,6 +58,13 @@ Used for topology like files that use ';' for comments.
 
 Read a distances.dat plumed output file.
 
+A typical file looks like this:
+
+```
+#! FIELDS time d0 d1 d2 d3 d4 d5 d6  ...
+0.000000 0.153211 0.157662 0.139923 ...
+```
+
 ### read_edissoc { #kimmdy.parsing.read_edissoc }
 
 `parsing.read_edissoc(path)`
