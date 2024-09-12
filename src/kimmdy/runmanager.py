@@ -427,7 +427,7 @@ class RunManager:
         # copy input files that are potentially modified
         # to the setup task directory
         # by applying a recipe (e.g. by trunkate_sim_files)
-        for f in ["xtc", "tpr", "trr"]:
+        for f in ["xtc", "tpr", "trr", "plumed"]:
             if hasattr(self.config, f):
                 if path := self.latest_files.get(f):
                     logger.debug(f"Copying {path} to {files.outputdir}")
