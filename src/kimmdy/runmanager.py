@@ -108,7 +108,6 @@ def get_existing_files(config: Config) -> dict:
 
             if attr_name == "plumed":
                 key = "plumed"
-                file_d["plumed_out"] = attr.parent / get_plumed_out(attr)
 
             file_d[key] = attr
         elif isinstance(attr, Config):
