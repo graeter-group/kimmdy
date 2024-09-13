@@ -215,12 +215,6 @@
       "pytype": "Path",
       "default": "*.ff"
     },
-    "residuetypesdat": {
-      "title": "residuetypesdat",
-      "description": "GROMACS dat file that matches group names to residuetypes. Will be linked everywhere the forecfield will be.",
-      "type": "string",
-      "pytype": "Path"
-    },
     "residuetypes": {
       "title": "residuetypes",
       "description": "GROMACS rtp file that contains residuetypes. Looks for `aminoacids.rtp` it not set. KIMMDY will first look in the current working directory and then relative to the forecfield directory.",
