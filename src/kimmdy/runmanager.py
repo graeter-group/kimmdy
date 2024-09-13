@@ -106,10 +106,6 @@ def get_existing_files(config: Config) -> dict:
             if key in AMBIGUOUS_SUFFS:
                 key = attr.name
 
-            if attr_name == "plumed":
-                key = "plumed"
-                file_d["plumed_out"] = attr.parent / get_plumed_out(attr)
-
             file_d[key] = attr
         elif isinstance(attr, Config):
             file_d.update(get_existing_files(attr))
