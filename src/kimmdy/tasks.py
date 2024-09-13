@@ -111,8 +111,6 @@ def create_task_directory(runmng, postfix: str) -> TaskFiles:
                 runmng.config.ff / "residuetypes.dat"
             )
 
-    if resdat := getattr(runmng.config, "residuetypesdat", None):
-        (files.outputdir / resdat.name).symlink_to(resdat)
     return files
 
 
