@@ -249,7 +249,8 @@ class RunManager:
         logger.info("Start run")
         self.start_time = time.time()
 
-        if getattr(self.config.restart, "run_directory", None):
+        if restart_dir := getattr(self.config.restart, "run_directory", None):
+            logger.info(f"Restarting from: {restart_dir}")
             self._restart_from_rundir()
 
         while (
@@ -447,7 +448,9 @@ class RunManager:
             if hasattr(self.config, f):
                 if path := self.latest_files.get(f):
                     logger.debug(f"Copying {path} to {files.outputdir}")
-                    shutil.copy(path, files.outputdir / path.name)
+                    shutil.copy(
+                        path, files.outputdir / path.name, follow_symlinks=False
+                    )
                     files.output[f] = files.outputdir / path.name
 
         return files
