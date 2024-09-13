@@ -440,7 +440,7 @@ class RunManager:
         # relative to the parent directory of the trajectory
         # (xtc, trr, tpr) files
         if hasattr(self.config, "plumed"):
-            for f in ["xtc", "tpr", "trr"]:
+            for f in ["xtc", "tpr", "trr", "gro"]:
                 if hasattr(self.config, f):
                     plumed_out = get_plumed_out(self.latest_files["plumed"])
                     trajectory_dir = self.latest_files[f].parent
