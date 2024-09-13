@@ -309,7 +309,7 @@ class RunManager:
                 raise ValueError(m)
         logger.info(f"Task list build:\n{pformat(list(self.tasks.queue), indent=8)}")
 
-    def get_latest(self, suffix: str):
+    def get_latest(self, suffix: str) -> Path|None:
         """Returns path to latest file of given type.
 
         For .dat files (in general ambiguous extensions) use full file name.
@@ -320,10 +320,10 @@ class RunManager:
             path = self.latest_files[suffix]
             logger.debug("Found: " + str(path))
             return path
-        except Exception:
+        except KeyError:
             m = f"File {suffix} requested but not found!"
-            logger.error(m)
-            raise FileNotFoundError(m)
+            logger.warning(m)
+            return None
 
     def __iter__(self):
         return self
