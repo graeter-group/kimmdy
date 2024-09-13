@@ -309,7 +309,7 @@ class RunManager:
                 raise ValueError(m)
         logger.info(f"Task list build:\n{pformat(list(self.tasks.queue), indent=8)}")
 
-    def get_latest(self, suffix: str) -> Path|None:
+    def get_latest(self, suffix: str) -> Path | None:
         """Returns path to latest file of given type.
 
         For .dat files (in general ambiguous extensions) use full file name.
