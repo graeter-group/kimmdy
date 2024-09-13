@@ -90,9 +90,9 @@ class State(Enum):
     DONE = auto()
 
 
-def get_existing_files(config: Config) -> dict:
+def get_existing_files(config: Config, section: str = "config") -> dict:
     """Initialize latest_files with every existing file defined in config"""
-    file_d = {}
+    files = {}
     attr_names = config.get_attributes()
     for attr_name in attr_names:
         attr = getattr(config, attr_name)
@@ -109,10 +109,27 @@ def get_existing_files(config: Config) -> dict:
             if attr_name == "plumed":
                 key = "plumed"
 
-            file_d[key] = attr
+            files[key] = attr
         elif isinstance(attr, Config):
-            file_d.update(get_existing_files(attr))
-    return file_d
+            files.update(get_existing_files(attr, section=attr_name))
+
+    # for starting reactions from existing trajectories,
+    # we need to read the name of the plumed output file
+    # from the plumed input file and interpret it
+    # relative to the parent directory of the trajectory
+    # or coordinate files (xtc, trr, tpr, gro).
+    if section == "config" and hasattr(config, "plumed"):
+        for f in ["xtc", "tpr", "trr", "gro"]:
+            if hasattr(config, f):
+                plumed_out = get_plumed_out(files["plumed"])
+                trajectory_dir = files[f].parent
+                files["plumed_out"] = trajectory_dir / plumed_out
+                logger.debug(
+                    f"Setting up plumed_out from {f} file. Plumed out: {plumed_out} in {trajectory_dir}"
+                )
+                break
+
+    return files
 
 
 class RunManager:
@@ -432,22 +449,6 @@ class RunManager:
                     logger.debug(f"Copying {path} to {files.outputdir}")
                     shutil.copy(path, files.outputdir / path.name)
                     files.output[f] = files.outputdir / path.name
-
-        # for starting reactions from existing trajectories,
-        # we need to read the name of the plumed output file
-        # from the plumed input file and interpret it
-        # relative to the parent directory of the trajectory
-        # (xtc, trr, tpr) files
-        if hasattr(self.config, "plumed"):
-            for f in ["xtc", "tpr", "trr", "gro"]:
-                if hasattr(self.config, f):
-                    plumed_out = get_plumed_out(self.latest_files["plumed"])
-                    trajectory_dir = self.latest_files[f].parent
-                    self.latest_files["plumed_out"] = trajectory_dir / plumed_out
-                    logger.debug(
-                        f"Setting up plumed_out from {f} file. Plumed out: {plumed_out} in {trajectory_dir}"
-                    )
-                    break
 
         return files
 
