@@ -325,7 +325,7 @@ class RunManager:
                 raise ValueError(m)
         logger.info(f"Task list build:\n{pformat(list(self.tasks.queue), indent=8)}")
 
-    def get_latest(self, suffix: str):
+    def get_latest(self, suffix: str) -> Path|None:
         """Returns path to latest file of given type.
 
         For .dat files (in general ambiguous extensions) use full file name.
@@ -336,10 +336,10 @@ class RunManager:
             path = self.latest_files[suffix]
             logger.debug("Found: " + str(path))
             return path
-        except Exception:
+        except KeyError:
             m = f"File {suffix} requested but not found!"
-            logger.error(m)
-            raise FileNotFoundError(m)
+            logger.warning(m)
+            return None
 
     def __iter__(self):
         return self
@@ -571,16 +571,22 @@ class RunManager:
         # plumed fix
         for md_config in self.config.mds.__dict__.values():
             if getattr(md_config, "use_plumed"):
-                try:
-                    plumed_out_name = get_plumed_out(self.latest_files["plumed"]).name
-                    self.latest_files["plumed_out"] = self.get_latest(plumed_out_name)
+                plumed_out_name = get_plumed_out(self.latest_files["plumed"]).name
+                plumed_out = self.get_latest(plumed_out_name)
+                if plumed_out is not None:
+                    self.latest_files["plumed_out"] = plumed_out
                     self.latest_files.pop(plumed_out_name)
-                except FileNotFoundError as e:
-                    logger.debug(e)
+                else:
+                    logger.warning(
+                        f"Plumed out file {plumed_out_name} not found in latest files."
+                    )
 
         # use latest top file
+        top_path = self.get_latest("top")
+        if top_path is None:
+            raise RuntimeError("No topology file found in latest files.")
         self.top = Topology(
-            top=read_top(self.get_latest("top"), self.config.ff),
+            top=read_top(top_path, self.config.ff),
             parametrizer=self.parameterizer,
             is_reactive_predicate_f=get_is_reactive_predicate_from_config_f(
                 self.config.topology.reactive
