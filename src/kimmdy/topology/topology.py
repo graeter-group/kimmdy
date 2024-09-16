@@ -103,7 +103,7 @@ class MoleculeType:
                 logger.debug(
                     f"Using 'radicals' section from config file with entries: '{radicals}'."
                 )
-            for radical in radicals.split(sep=" "):
+            for radical in radicals.strip().split(sep=" "):
                 atom = self.atoms.get(radical)
                 if atom:
                     self.radicals[radical] = atom
@@ -862,7 +862,7 @@ class Topology:
                 )
                 continue
             name = header.name
-            self.moleculetypes[name] = MoleculeType(header, atomics, radicals="")
+            self.moleculetypes[name] = MoleculeType(header, atomics)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Topology):
