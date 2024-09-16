@@ -98,20 +98,21 @@ class MoleculeType:
 
         # must be after self._parse_atoms
         self.radicals: dict[str, Atom] = {}
-        if radicals is not None:
+        if radicals is not None and len(radicals) > 0:
             if self.name == "Reactive":
                 logger.debug(
                     f"Using 'radicals' section from config file with entries: '{radicals}'."
                 )
-            for radical in radicals.split(sep=" "):
-                atom = self.atoms.get(radical)
-                if atom:
-                    self.radicals[radical] = atom
-                    atom.is_radical = True
-                else:
-                    logger.debug(
-                        f"Atom nr {radical} from 'radicals' section in config file not in topology. Ignoring this entry."
-                    )
+                for radical in radicals.strip().split(sep=" "):
+                    atom = self.atoms.get(radical)
+                    if atom:
+                        self.radicals[radical] = atom
+                        atom.is_radical = True
+                    else:
+                        logger.debug(
+                            f"Atom nr {radical} from 'radicals' section in "
+                            "config file not in topology. Ignoring this entry."
+                        )
         else:
             self.find_radicals()
 
@@ -254,7 +255,8 @@ class MoleculeType:
         fewer bounds than their natural bond order.
         """
         logger.debug(
-            "Trying to infer radical status based on AMBER(!!) atomtype bond order."
+            "Trying to infer radical status based on AMBER(!!) atomtype bond "
+            f"order in molecule {self.name}."
         )
         self.radicals = {}
         error_atoms = set()
@@ -862,6 +864,7 @@ class Topology:
                 )
                 continue
             name = header.name
+            # Only search for radicals in reactive MoleculeType during merging
             self.moleculetypes[name] = MoleculeType(header, atomics, radicals="")
 
     def __eq__(self, other: object) -> bool:
