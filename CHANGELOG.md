@@ -1,6 +1,22 @@
 # Changelog
 
 
+## [6.12.0](https://github.com/graeter-group/kimmdy/compare/v6.11.0...v6.12.0) (2024-09-16)
+
+
+### Features
+
+* expose create_plumed_input ([#483](https://github.com/graeter-group/kimmdy/issues/483)) ([505c823](https://github.com/graeter-group/kimmdy/commit/505c823afdd523f3c7170be270f06c8aa1fc18bf))
+
+
+### Bug Fixes
+
+* copy gro to setup ([#487](https://github.com/graeter-group/kimmdy/issues/487)) ([25ac265](https://github.com/graeter-group/kimmdy/commit/25ac2650800c6a07b051b815b4b1b60308cc498e))
+* do not log empty edissoc lines ([774d338](https://github.com/graeter-group/kimmdy/commit/774d33820dd70110ce6147e1a976ff0c8c726e2d))
+* link residuetypedat ([#488](https://github.com/graeter-group/kimmdy/issues/488)) ([2576440](https://github.com/graeter-group/kimmdy/commit/2576440e3360f6a87257019eda56385c075ccafd))
+* truncate time in plumed output to 1 fs ([#484](https://github.com/graeter-group/kimmdy/issues/484)) ([b73104a](https://github.com/graeter-group/kimmdy/commit/b73104a5e81974c7864703fa5e2162f6b7d4575d))
+* use correct distances.dat when starting from existing traj ([#485](https://github.com/graeter-group/kimmdy/issues/485)) ([d0c9859](https://github.com/graeter-group/kimmdy/commit/d0c985967fbd9d879ae2f0c813788a91c9492779))
+
 ## [6.11.0](https://github.com/graeter-group/kimmdy/compare/v6.10.3...v6.11.0) (2024-09-04)
 
 
