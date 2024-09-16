@@ -603,8 +603,8 @@ def read_edissoc(path: Path) -> dict:
             elif len(l.split(sep=";")[0].split()) == 3:
                 at1, at2, edissoc, *_ = l.split()
                 edissocs[key][frozenset([at1, at2])] = float(edissoc)
-            else:
-                logger.debug(f"Unexpected line in edissoc file: {l}")
+            elif len(l.strip()) > 0:
+                logger.warning(f"Unexpected line in edissoc file: {l}")
     return edissocs
 
 
