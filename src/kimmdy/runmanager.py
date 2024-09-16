@@ -938,7 +938,9 @@ class RunManager:
                     for ai in focus_nrs:
                         if top_initial.atoms[ai].residue == "SOL":
                             solvent_atoms.add(ai)
-                            logger.debug(f"Reacting solvent atom: {top_initial.atoms[ai]}")
+                            logger.debug(
+                                f"Reacting solvent atom: {top_initial.atoms[ai]}"
+                            )
                     if len(solvent_atoms) > 0:
                         logger.info(
                             f"{len(solvent_atoms)} solvent atoms are involved "
