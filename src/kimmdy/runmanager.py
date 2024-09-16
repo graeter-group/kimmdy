@@ -934,18 +934,19 @@ class RunManager:
                     # the slow_growth
                     # First we find out if there are solvent atoms among the involved atoms
                     solvent_atoms: set[str] = set()
+                    logger.debug(f"Checking for reacting solvent residues..")
                     for ai in focus_nrs:
-                        logger.debug(f"Checking atom {ai} for solvent residue")
-                        logger.debug(f"Checking atom {top_initial.atoms[ai]}")
                         if top_initial.atoms[ai].residue == "SOL":
                             solvent_atoms.add(ai)
+                            logger.debug(
+                                f"Reacting solvent atom: {top_initial.atoms[ai]}"
+                            )
                     if len(solvent_atoms) > 0:
                         logger.info(
-                            "Solvent atoms are involved in the reaction, "
-                            "they will get tempoary bonds for the start "
-                            "of the slow growth simulation."
+                            f"{len(solvent_atoms)} solvent atoms are involved "
+                            "in the reaction, they will get tempoary bonds for "
+                            "the start of the slow growth simulation."
                         )
-                        logger.info(f"Solvent atoms: {solvent_atoms}")
                         ow = None
                         hw1 = None
                         hw2 = None
