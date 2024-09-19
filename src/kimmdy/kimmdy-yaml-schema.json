@@ -54,6 +54,13 @@
       "pytype": "bool",
       "default": false
     },
+    "norelax": {
+      "title": "no relax",
+      "description": "Don't execute `Relax` steps of reaction recipes. Useful if you only want to get reaction rates for one trajectory and don't care about continuing MD afterwards.",
+      "type": "boolean",
+      "pytype": "bool",
+      "default": false
+    },
     "parameterize_at_setup": {
       "title": "parameterize_at_setup",
       "description": "parameterize the topology during the setup task",

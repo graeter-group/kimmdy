@@ -919,7 +919,7 @@ class RunManager:
                 if step.id_to_place is not None:
                     focus_nrs.update([step.id_to_place])
 
-            elif isinstance(step, Relax):
+            elif isinstance(step, Relax) and not self.config.norelax:
                 logger.info("Starting relaxation md as part of reaction..")
                 if not hasattr(self.config.changer.coordinates, "md"):
                     logger.warning("Relax task requested but no MD specified for it!")
