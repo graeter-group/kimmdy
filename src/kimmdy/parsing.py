@@ -520,12 +520,10 @@ def read_distances_dat(distances_dat: Path) -> dict:
             values = l.strip().split()
             time = values[0]
             # time is in ps
-            # but needs to be truncated to
+            # but needs to be rounded to
             # 3 decimal places (1fs) to avoid
             # floating point errors
-            # find the . :
-            i = time.index(".")
-            d["time"].append(float(time[: i + 4]))
+            d["time"].append(round(float(time), 3))
             # iterate over the rest of the columns
             for k, v in zip(colnames[1:], values[1:]):
                 d[k].append(float(v))
