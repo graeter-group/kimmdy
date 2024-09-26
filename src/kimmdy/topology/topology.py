@@ -98,8 +98,8 @@ class MoleculeType:
 
         # must be after self._parse_atoms
         self.radicals: dict[str, Atom] = {}
-        if radicals is not None and len(radicals) > 0:
-            if self.name == "Reactive":
+        if radicals is not None:
+            if self.name == "Reactive" and len(radicals) > 0:
                 logger.debug(
                     f"Using 'radicals' section from config file with entries: '{radicals}'."
                 )
