@@ -17,7 +17,7 @@ import numpy as np
 from numpy.random import default_rng
 import logging
 
-from kimmdy.recipe import Recipe, RecipeCollection
+from kimmdy.recipe import Recipe, RecipeCollection, BondOperation, Relax
 
 logger = logging.getLogger(__name__)
 
@@ -463,4 +463,124 @@ def extrande(
         time_delta=0,  # instantaneous reaction
         time_start=t,
         time_start_index=int(idx_rate_max),
+    )
+
+
+def multi_rfkmc(
+    recipe_collection: RecipeCollection,
+    n: int,
+    rng: np.random.Generator = default_rng(),
+) -> KMCResult:
+    """Rejection-Free Monte Carlo.
+    Takes RecipeCollection and choses a recipe based on the relative propensity of the events.
+    The 'start' time of the reaction is the time of the highest rate of the accepted reaction.
+
+    Compare e.g. [Wikipedia KMC - rejection free](https://en.wikipedia.org/wiki/Kinetic_Monte_Carlo#Rejection-free_KMC)
+
+    Parameters
+    ---------
+    recipe_collection
+        from which one will be choosen
+    rng
+        function to generate random numbers in the KMC step
+    """
+
+    recipes = recipe_collection.recipes
+    logger.debug(f"Start multi-KMC, {len(recipes)} recipes. Picking {n} recipes.")
+    results = []
+
+    for i in range(n):
+        # check for empty ReactionResult
+        if len(recipes) == 0 and len(results) == 0:
+            m = "Empty ReactionResult; no reaction chosen"
+            logger.warning(m)
+            results.append(KMCError(m))
+            break
+        elif len(recipes) == 0:
+            break
+
+        # 0. Initialization
+        reaction_probability = []
+
+        # 1. Calculate the probability for each reaction
+        for recipe in recipes:
+            dt = [x[1] - x[0] for x in recipe.timespans]
+            reaction_probability.append(sum(np.multiply(dt, recipe.rates)))
+
+        # 2. Set the total rate to the sum of individual rates
+        probability_cumulative = np.cumsum(reaction_probability)
+        probability_sum = probability_cumulative[-1]
+
+        # 3. Generate two independent uniform (0,1) random numbers u1,u2
+        u = rng.random(2)
+        logger.debug(
+            f"\tRandom values u: {u}, number cumulative probabilities "
+            f"{len(probability_cumulative)}, probability sum {probability_sum}"
+        )
+
+        # 4. Find the even to carry out, mu, using binary search (np.searchsorted)
+        pos = np.searchsorted(probability_cumulative, u[0] * probability_sum)
+        recipe = recipes.pop(pos)
+        time_index = np.argmax(recipe.rates)
+        reaction_time = recipe.timespans[time_index][1]
+        logger.info(f"Chosen Recipe: {recipe} at time {reaction_time}")
+
+        # 5. Calculate the time step associated with mu
+        time_delta = np.log(1 / u[1]) / probability_sum
+        logger.info(
+            f"Time delta: {time_delta}\nwith cumulative probability {probability_sum}"
+        )
+
+        results.append(
+            KMCAccept(
+                recipe=recipe,
+                reaction_probability=reaction_probability,
+                time_delta=time_delta,
+                time_start=reaction_time,
+                time_start_index=int(time_index),
+            )
+        )
+
+    merged_recipesteps = []
+    merged_rates = []
+    merged_timespans = []
+    merged_reaction_probability = None
+    merged_timedelta = 0
+    merged_time_start = 0
+    merged_time_start_index = 0
+    merge_relax = False
+
+    for result in results:
+        if isinstance(result, KMCError):
+            return result
+        for step in result.recipe.recipe_steps:
+            if isinstance(step, BondOperation):
+                merged_recipesteps.append(step)
+            if isinstance(step, Relax):
+                merge_relax = True
+
+        merged_rates.extend(result.recipe.rates)
+        merged_timespans.extend(result.recipe.timespans)
+
+        if merged_timedelta < result.time_delta:
+            merged_timedelta = result.time_delta
+
+        if merged_time_start < result.time_start:
+            merged_time_start = result.time_start
+
+        if merged_time_start_index < result.time_start_index:
+            merged_time_start_index = result.time_start_index
+
+        if merged_reaction_probability is None:
+            merged_reaction_probability = result.reaction_probability
+
+    if merge_relax:
+        merged_recipesteps.append(Relax())
+
+    return KMCAccept(
+        recipe=Recipe(merged_recipesteps, merged_rates, merged_timespans),
+        reaction_probability=merged_reaction_probability,
+        time_delta=merged_timedelta,
+        time_start=merged_time_start,
+        time_start_index=merged_time_start_index,
     )
