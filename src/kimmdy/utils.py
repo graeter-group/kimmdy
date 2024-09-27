@@ -368,7 +368,7 @@ def check_gmx_version(config):
                     if not config.dryrun:
                         raise SystemError(m)
     if hasattr(config, "changer") and hasattr(config.changer, "coordinates"):
-        if config.changer.coordinates.slow_growth_pairs:
+        if config.changer.coordinates.slow_growth_pairs and config.changer.coordinates.slow_growth:
             m = "Note: slow growth of pairs is only supported by >= gromacs 2023.2. To disable morphing pairs in config: md.changer.coordinates.slow_growth_pairs = false"
             config._logmessages["debugs"].append(f"Gromacs version: {version}")
             config._logmessages["errors"].append(m)
