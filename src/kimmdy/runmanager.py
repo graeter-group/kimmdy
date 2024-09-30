@@ -33,6 +33,7 @@ from kimmdy.kmc import (
     extrande_mod,
     frm,
     rf_kmc,
+    multi_rfkmc,
     total_index_to_index_within_plugin,
 )
 from kimmdy.parsing import read_top, write_json, write_time_marker, write_top
@@ -226,6 +227,7 @@ class RunManager:
             "rfkmc": rf_kmc,
             "frm": frm,
             "extrande_mod": extrande_mod,
+            "multi_rfkmc": multi_rfkmc,
         }
 
         self.task_mapping = {
@@ -767,6 +769,12 @@ class RunManager:
                 collection.aggregate_reactions()
         if "extrande" in self.kmc_algorithm:
             kmc = partial(kmc, tau_scale=self.config.tau_scale)
+        elif "multi" in self.kmc_algorithm:
+            logger.debug(
+                f"Setting {self.kmc_algorithm} up to pick "
+                f"{self.config.multi_kmc} reactions."
+            )
+            kmc = partial(kmc, n=self.config.multi_kmc)
 
         self.kmcresult = kmc(flatten_recipe_collections(self.recipe_collections))
         if not isinstance(self.kmcresult, KMCAccept):

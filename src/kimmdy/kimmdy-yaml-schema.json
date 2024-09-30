@@ -131,9 +131,17 @@
         "rfkmc",
         "frm",
         "extrande",
-        "extrande_mod"
+        "extrande_mod",
+        "multi_rfkmc"
       ],
       "default": ""
+    },
+    "multi_kmc": {
+      "title": "multi_kmc",
+      "description": "Number of reactions to be executed in one step by a `multi` variant of a KMC algorithm.",
+      "type": "integer",
+      "pytype": "int",
+      "default": 1
     },
     "tau_scale": {
       "title": "tau_scale",
