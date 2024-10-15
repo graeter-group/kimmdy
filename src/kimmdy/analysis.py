@@ -426,13 +426,15 @@ def radical_migration(
     print("Done!")
 
 
-def plot_rates(dir: str):
+def plot_rates(dir: str, open: bool = False):
     """Plot rates of all possible reactions for each 'decide_recipe' step.
 
     Parameters
     ----------
     dir
         Directory of KIMMDY run
+    open
+        open plots in default system viewer
     """
     run_dir = Path(dir).expanduser().resolve()
     analysis_dir = get_analysis_dir(run_dir)
@@ -440,7 +442,12 @@ def plot_rates(dir: str):
     for recipes in run_dir.glob("*decide_recipe/recipes.csv"):
         rc, picked_rp = RecipeCollection.from_csv(recipes)
         i = recipes.parent.name.split("_")[0]
-        rc.plot(analysis_dir / f"{i}_reaction_rates.svg", highlight_r=picked_rp)
+        path = analysis_dir / f"{i}_reaction_rates.svg"
+        rc.plot(path, highlight_r=picked_rp)
+        print("Wrote:")
+        print(path)
+        if open:
+            sp.Popen(("xdg-open", path))
 
 
 def reaction_participation(dir: str, open_plot: bool = False):
@@ -815,6 +822,12 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
     parser_rates.add_argument(
         "dir", type=str, help="KIMMDY run directory to be analysed."
     )
+    parser_rates.add_argument(
+        "--open",
+        "-o",
+        action="store_true",
+        help="Open plot in default system viewer.",
+    )
 
     parser_runtime = subparsers.add_parser(
         name="runtime",
@@ -867,7 +880,7 @@ def entry_point_analysis():
     elif args.module == "radical_migration":
         radical_migration(args.dirs, args.type, args.cutoff)
     elif args.module == "rates":
-        plot_rates(args.dir)
+        plot_rates(args.dir, args.open)
     elif args.module == "runtime":
         runtime_analysis(args.dir, args.open_plot)
     elif args.module == "reaction_participation":
