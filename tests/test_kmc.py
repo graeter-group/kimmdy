@@ -11,6 +11,7 @@ from kimmdy.kmc import (
     extrande_mod,
     KMCAccept,
     total_index_to_index_within_plugin,
+    multi_rfkmc,
 )
 
 
@@ -38,6 +39,21 @@ def reference_KMC() -> KMCAccept:
         time_delta=0.04032167624965666,
         reaction_probability=[0.0, 0.72, 0.54, 0.0],
         time_start=0,
+        time_start_index=0,
+    )
+
+
+@pytest.fixture
+def reference_multi2_KMC() -> KMCAccept:
+    return KMCAccept(
+        recipe=Recipe(
+            recipe_steps=[Bind(2, 3), Break(3, 4), Bind(4, 5)],
+            rates=[0.12, 0.0, 0.15, 0.06],
+            timespans=[(0.0, 6.0), (6.0, 10.0), (2.0, 4.0), (4.0, 8.0)],
+        ),
+        time_delta=0.09762211196506274,
+        reaction_probability=[0.0, 0.72, 0.54, 0.0],
+        time_start=6.0,
         time_start_index=0,
     )
 
@@ -126,6 +142,26 @@ def test_rf_kmc_calculation(recipe_collection, reference_KMC):
     assert isinstance(kmc, KMCAccept)
     compare_to_ref(kmc, reference_KMC)
     assert abs(kmc.time_delta - reference_KMC.time_delta) < 1e-9
+
+
+def test_multi_rf_kmc_calculation(recipe_collection, reference_KMC):
+    # n=1 should be identical to standard rfkmc
+    rng = default_rng(1)
+    # first random numbers are array([0.51182162, 0.9504637])
+    kmc = multi_rfkmc(recipe_collection, n=1, rng=rng)
+    assert isinstance(kmc, KMCAccept)
+    compare_to_ref(kmc, reference_KMC)
+    assert abs(kmc.time_delta - reference_KMC.time_delta) < 1e-9
+
+
+def test_multi2_rf_kmc_calculation(recipe_collection, reference_multi2_KMC):
+    rng = default_rng(1)
+    # first random numbers are array([0.51182162, 0.9504637])
+    kmc = multi_rfkmc(recipe_collection, n=2, rng=rng)
+
+    assert isinstance(kmc, KMCAccept)
+    compare_to_ref(kmc, reference_multi2_KMC)
+    assert abs(kmc.time_delta - reference_multi2_KMC.time_delta) < 1e-9
 
 
 def test_frm_calculation(recipe_collection, reference_KMC):
