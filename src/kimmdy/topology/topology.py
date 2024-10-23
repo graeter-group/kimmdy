@@ -1099,26 +1099,27 @@ class Topology:
             logger.debug(
                 f"Deleting Atom nr {atom.nr}, type {atom.type}, res {atom.residue}"
             )
-            # move charge to first neighbor
-            self.atoms[atom.bound_to_nrs[0]].charge = (
-                f"{float(self.atoms[atom.bound_to_nrs[0]].charge) + float(atom.charge):7.4f}"
-            )
+            if len(atom.bound_to_nrs) > 0:
+                # move charge to first neighbor
+                self.atoms[atom.bound_to_nrs[0]].charge = (
+                    f"{float(self.atoms[atom.bound_to_nrs[0]].charge) + float(atom.charge):7.4f}"
+                )
 
-            # break all bonds and delete all pairs, diheadrals with these bonds
-            for bound_nr in copy(atom.bound_to_nrs):
-                self.break_bond((bound_nr, _atom_nr))
+                # break all bonds and delete all pairs, diheadrals with these bonds
+                for bound_nr in copy(atom.bound_to_nrs):
+                    self.break_bond((bound_nr, _atom_nr))
 
-            for an in tuple(self.angles.keys()):
-                if _atom_nr in an:
-                    self.angles.pop(an)
+                for an in tuple(self.angles.keys()):
+                    if _atom_nr in an:
+                        self.angles.pop(an)
 
-            for pd in tuple(self.proper_dihedrals.keys()):
-                if _atom_nr in pd:
-                    self.proper_dihedrals.pop(pd)
+                for pd in tuple(self.proper_dihedrals.keys()):
+                    if _atom_nr in pd:
+                        self.proper_dihedrals.pop(pd)
 
-            for id in tuple(self.improper_dihedrals.keys()):
-                if _atom_nr in id:
-                    self.improper_dihedrals.pop(id)
+                for id in tuple(self.improper_dihedrals.keys()):
+                    if _atom_nr in id:
+                        self.improper_dihedrals.pop(id)
 
             self.radicals.pop(_atom_nr)
             self.atoms.pop(_atom_nr)
@@ -1128,8 +1129,8 @@ class Topology:
 
         if parameterize:
             self.update_parameters()
-        # Overwriting in case of no parameterization wanted
-        self.needs_parameterization = False
+            # Overwriting in case of no parameterization wanted
+            self.needs_parameterization = False
 
         return update_map
 
