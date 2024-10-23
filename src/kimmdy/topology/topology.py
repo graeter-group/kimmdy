@@ -1129,8 +1129,8 @@ class Topology:
 
         if parameterize:
             self.update_parameters()
-        # Overwriting in case of no parameterization wanted
-        self.needs_parameterization = False
+            # Overwriting in case of no parameterization wanted
+            self.needs_parameterization = False
 
         return update_map
 
