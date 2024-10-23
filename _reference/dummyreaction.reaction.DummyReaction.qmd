@@ -1,5 +1,7 @@
 # dummyreaction.reaction.DummyReaction { #dummyreaction.reaction.DummyReaction }
 
-`reaction.DummyReaction(self, name, runmng)`
+```python
+reaction.DummyReaction(self, name, runmng)
+```
 
 Dummy reaction, returns empty RecipeCollection

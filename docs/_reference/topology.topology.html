@@ -20,6 +20,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -531,10 +565,10 @@ ul.task-list li input[type="checkbox"] {
 </table>
 <section id="kimmdy.topology.topology.MoleculeType" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.topology.MoleculeType">MoleculeType</h3>
-<p><code>topology.topology.MoleculeType(self, header, atomics, radicals=None)</code></p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>topology.topology.MoleculeType(<span class="va">self</span>, header, atomics, radicals<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>One moleculetype in the topology</p>
-<section id="attributes" class="level4">
-<h4 class="anchored" data-anchor-id="attributes">Attributes</h4>
+<section id="attributes" class="level4 doc-section doc-section-attributes">
+<h4 class="doc-section doc-section-attributes anchored" data-anchor-id="attributes">Attributes</h4>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -614,13 +648,13 @@ ul.task-list li input[type="checkbox"] {
 </table>
 <section id="kimmdy.topology.topology.MoleculeType.find_radicals" class="level5">
 <h5 class="anchored" data-anchor-id="kimmdy.topology.topology.MoleculeType.find_radicals">find_radicals</h5>
-<p><code>topology.topology.MoleculeType.find_radicals()</code></p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>topology.topology.MoleculeType.find_radicals()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Find atoms that are radicals and update self.radicals.</p>
 <p>Iterate over all atoms and designate them as radicals if they have fewer bounds than their natural bond order.</p>
 </section>
 <section id="kimmdy.topology.topology.MoleculeType.reindex_atomnrs" class="level5">
 <h5 class="anchored" data-anchor-id="kimmdy.topology.topology.MoleculeType.reindex_atomnrs">reindex_atomnrs</h5>
-<p><code>topology.topology.MoleculeType.reindex_atomnrs()</code></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>topology.topology.MoleculeType.reindex_atomnrs()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Reindex atom numbers in topology.</p>
 <p>Starts at index 1. This also updates the numbers for bonds, angles, dihedrals and pairs. Returns a dict, mapping of old atom number strings to new ones</p>
 </section>
@@ -628,15 +662,23 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="kimmdy.topology.topology.Topology" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.topology.Topology">Topology</h3>
-<p><code>topology.topology.Topology(self, top, parametrizer=BasicParameterizer(), is_reactive_predicate_f=is_not_solvent_or_ion, radicals=None, residuetypes_path=None, reactive_nrexcl=None)</code></p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>topology.topology.Topology(</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">self</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    top</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    parametrizer<span class="op">=</span>BasicParameterizer()</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    is_reactive_predicate_f<span class="op">=</span>is_not_solvent_or_ion</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    radicals<span class="op">=</span><span class="va">None</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    residuetypes_path<span class="op">=</span><span class="va">None</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    reactive_nrexcl<span class="op">=</span><span class="va">None</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Smart container for parsed topology data.</p>
 <p>A topology keeps track of connections when bonds are broken or formed. Reparametrization is triggerd automatically if <code>to_dict</code> is called after bonds have changed.</p>
 <p>Assumptions:</p>
 <ul>
 <li>the topology of interest (the Reactive moleculetype) consists of the first moleculetypes (non-solvent).</li>
 </ul>
-<section id="parameters" class="level4">
-<h4 class="anchored" data-anchor-id="parameters">Parameters</h4>
+<section id="parameters" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h4>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -648,37 +690,37 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>top</code></td>
+<td>top</td>
 <td><a href="../_reference/parsing.TopologyDict.html#kimmdy.parsing.TopologyDict">TopologyDict</a></td>
 <td>A dictionary containing the parsed topology data, produced by <a href="../_reference/parsing.html#kimmdy.parsing.read_top"><code>kimmdy.parsing.read_top</code></a></td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
-<td><code>parametrizer</code></td>
+<td>parametrizer</td>
 <td><code>Parameterizer</code></td>
 <td>The parametrizer to use when reparametrizing the topology.</td>
 <td><code>BasicParameterizer()</code></td>
 </tr>
 <tr class="odd">
-<td><code>is_reactive_predicate_f</code></td>
+<td>is_reactive_predicate_f</td>
 <td><a href="https://docs.python.org/3.10/library/typing.html#typing.Callable">Callable</a>[[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>], <a href="https://docs.python.org/3.10/library/functions.html#bool">bool</a>]</td>
 <td>A function that takes a moleculetype name and returns True if the moleculetype should be merged into the reactive moleculetype.</td>
 <td><code>is_not_solvent_or_ion</code></td>
 </tr>
 <tr class="even">
-<td><code>radicals</code></td>
+<td>radicals</td>
 <td><a href="https://docs.python.org/3.10/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>]</td>
 <td>A string of atom numbers that are radicals.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="odd">
-<td><code>residuetypes_path</code></td>
+<td>residuetypes_path</td>
 <td><a href="https://docs.python.org/3.10/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path">Path</a>]</td>
 <td>Path to the residue types file.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="even">
-<td><code>reactive_nrexcl</code></td>
+<td>reactive_nrexcl</td>
 <td><a href="https://docs.python.org/3.10/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>]</td>
 <td>Overwrite nrexcl value for the reactive moleculetype. Otherwise takes the nrexcl of the first reactive moleculetype.</td>
 <td><code>None</code></td>
@@ -724,11 +766,11 @@ ul.task-list li input[type="checkbox"] {
 </table>
 <section id="kimmdy.topology.topology.Topology.bind_bond" class="level5">
 <h5 class="anchored" data-anchor-id="kimmdy.topology.topology.Topology.bind_bond">bind_bond</h5>
-<p><code>topology.topology.Topology.bind_bond(atompair_addresses)</code></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>topology.topology.Topology.bind_bond(atompair_addresses)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Add a bond in topology.</p>
 <p>Modifies the topology dictionary in place. It keeps track of affected terms in the topology via a graph representation of the topology and applies the necessary changes to bonds, angles and dihedrals (proper and improper). Furthermore, it modifies to function types in the topology to account for radicals.</p>
-<section id="parameters-1" class="level6">
-<h6 class="anchored" data-anchor-id="parameters-1">Parameters</h6>
+<section id="parameters-1" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-1">Parameters</h6>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -740,7 +782,7 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>atompair_addresses</code></td>
+<td>atompair_addresses</td>
 <td><a href="https://docs.python.org/3.10/library/stdtypes.html#tuple">tuple</a>[<a href="../_reference/utils.html#kimmdy.utils.TopologyAtomAddress">TopologyAtomAddress</a>, <a href="../_reference/utils.html#kimmdy.utils.TopologyAtomAddress">TopologyAtomAddress</a>]</td>
 <td>Atoms to bind together.</td>
 <td><em>required</em></td>
@@ -751,11 +793,11 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="kimmdy.topology.topology.Topology.break_bond" class="level5">
 <h5 class="anchored" data-anchor-id="kimmdy.topology.topology.Topology.break_bond">break_bond</h5>
-<p><code>topology.topology.Topology.break_bond(atompair_addresses)</code></p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>topology.topology.Topology.break_bond(atompair_addresses)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Break bonds in topology homolytically.</p>
 <p>Removes bond, angles and dihedrals where atompair was involved. Modifies the topology dictionary in place. Atom pairs become radicals.</p>
-<section id="parameters-2" class="level6">
-<h6 class="anchored" data-anchor-id="parameters-2">Parameters</h6>
+<section id="parameters-2" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-2">Parameters</h6>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -767,7 +809,7 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>atompair_addresses</code></td>
+<td>atompair_addresses</td>
 <td><a href="https://docs.python.org/3.10/library/stdtypes.html#tuple">tuple</a>[<a href="../_reference/utils.html#kimmdy.utils.TopologyAtomAddress">TopologyAtomAddress</a>, <a href="../_reference/utils.html#kimmdy.utils.TopologyAtomAddress">TopologyAtomAddress</a>]</td>
 <td>Between which atoms to break the bond.</td>
 <td><em>required</em></td>
@@ -778,11 +820,11 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="kimmdy.topology.topology.Topology.del_atom" class="level5">
 <h5 class="anchored" data-anchor-id="kimmdy.topology.topology.Topology.del_atom">del_atom</h5>
-<p><code>topology.topology.Topology.del_atom(atom_nr, parameterize=True)</code></p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>topology.topology.Topology.del_atom(atom_nr, parameterize<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Deletes atom</p>
 <p>Deletes atom and all attached bonds. Reindexes the top and updates the parameters if requested. Also moves charges to first bound_nrs atom.</p>
-<section id="parameters-3" class="level6">
-<h6 class="anchored" data-anchor-id="parameters-3">Parameters</h6>
+<section id="parameters-3" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-3">Parameters</h6>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -794,13 +836,13 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>atom_nr</code></td>
+<td>atom_nr</td>
 <td><a href="https://docs.python.org/3.10/library/typing.html#typing.Union">Union</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#list">list</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>], <a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>]</td>
 <td>1-based atom number as string to delete</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
-<td><code>parameterize</code></td>
+<td>parameterize</td>
 <td><a href="https://docs.python.org/3.10/library/functions.html#bool">bool</a></td>
 <td>If true and bonds are removed triggers reparameterization, by default True</td>
 <td><code>True</code></td>
@@ -808,21 +850,24 @@ ul.task-list li input[type="checkbox"] {
 </tbody>
 </table>
 </section>
-<section id="returns" class="level6">
-<h6 class="anchored" data-anchor-id="returns">Returns</h6>
+<section id="returns" class="level6 doc-section doc-section-returns">
+<h6 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h6>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 33%">
-<col style="width: 66%">
+<col style="width: 8%">
+<col style="width: 30%">
+<col style="width: 60%">
 </colgroup>
 <thead>
 <tr class="header">
+<th>Name</th>
 <th>Type</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
+<td></td>
 <td><code>update_map</code></td>
 <td>Dict, mapping of old atom number strings to new ones.</td>
 </tr>
@@ -832,19 +877,19 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="kimmdy.topology.topology.Topology.reindex_atomnrs" class="level5">
 <h5 class="anchored" data-anchor-id="kimmdy.topology.topology.Topology.reindex_atomnrs">reindex_atomnrs</h5>
-<p><code>topology.topology.Topology.reindex_atomnrs()</code></p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>topology.topology.Topology.reindex_atomnrs()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Reindex atom numbers in topology.</p>
 <p>Starts at index 1. This also updates the numbers for bonds, angles, dihedrals and pairs. Returns a dict of all moleculetypes to their update maps (old -&gt; new).</p>
 </section>
 <section id="kimmdy.topology.topology.Topology.update_partial_charges" class="level5">
 <h5 class="anchored" data-anchor-id="kimmdy.topology.topology.Topology.update_partial_charges">update_partial_charges</h5>
-<p><code>topology.topology.Topology.update_partial_charges(recipe_steps)</code></p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>topology.topology.Topology.update_partial_charges(recipe_steps)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Update the topology atom partial charges.</p>
 <p>This function must be called after the recipe_steps are applied. Changes are based on the recipe_steps. Update rules follow a simple assignment scheme that works well with grappa. If fragments are created, their partial charges are kept integers. If previously broken bonds are formed again, the original partial charges are restored.</p>
 </section>
 <section id="kimmdy.topology.topology.Topology.validate_bond" class="level5">
 <h5 class="anchored" data-anchor-id="kimmdy.topology.topology.Topology.validate_bond">validate_bond</h5>
-<p><code>topology.topology.Topology.validate_bond(atm1, atm2)</code></p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>topology.topology.Topology.validate_bond(atm1, atm2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Validates bond consistency between both atoms and top Returns True if bond exists, False if not. Raises RuntimeError if bond is not consistent.</p>
 
 

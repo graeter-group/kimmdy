@@ -19,13 +19,17 @@ All read_<...> and write_<...> functions.
 
 ### JSONEncoder { #kimmdy.parsing.JSONEncoder }
 
-`parsing.JSONEncoder()`
+```python
+parsing.JSONEncoder()
+```
 
 Encoder that enables writing JSONs with numpy types.
 
 ### Plumed_dict { #kimmdy.parsing.Plumed_dict }
 
-`parsing.Plumed_dict()`
+```python
+parsing.Plumed_dict()
+```
 
 Dict representation of a plumed.dat file.
 
@@ -46,7 +50,9 @@ Dict representation of a plumed.dat file.
 
 ### is_not_comment { #kimmdy.parsing.is_not_comment }
 
-`parsing.is_not_comment(c)`
+```python
+parsing.is_not_comment(c)
+```
 
 Returns whether a string is not a comment.
 
@@ -54,7 +60,9 @@ Used for topology like files that use ';' for comments.
 
 ### read_distances_dat { #kimmdy.parsing.read_distances_dat }
 
-`parsing.read_distances_dat(distances_dat)`
+```python
+parsing.read_distances_dat(distances_dat)
+```
 
 Read a distances.dat plumed output file.
 
@@ -67,48 +75,56 @@ A typical file looks like this:
 
 ### read_edissoc { #kimmdy.parsing.read_edissoc }
 
-`parsing.read_edissoc(path)`
+```python
+parsing.read_edissoc(path)
+```
 
 Reads a edissoc file and turns it into a dict.
 
 The dissociation energy is assigned per pair of atom names. Atom names are unique to a residue, and the dict is nested by residues.
 The set of bond atoms make up the key, the dissociation energy E_dissoc [kJ mol-1] is the value.
 
-#### Parameters
+#### Parameters {.doc-section .doc-section-parameters}
 
 | Name   | Type                   | Description                                | Default    |
 |--------|------------------------|--------------------------------------------|------------|
-| `path` | [Path](`pathlib.Path`) | Path to the file. E.g. Path("edissoc.dat") | _required_ |
+| path   | [Path](`pathlib.Path`) | Path to the file. E.g. Path("edissoc.dat") | _required_ |
 
 ### read_json { #kimmdy.parsing.read_json }
 
-`parsing.read_json(path)`
+```python
+parsing.read_json(path)
+```
 
 Return JSON file content as dict.
 
 ### read_plumed { #kimmdy.parsing.read_plumed }
 
-`parsing.read_plumed(path)`
+```python
+parsing.read_plumed(path)
+```
 
 Read a plumed.dat configuration file.
 
 Follows the plumed naming scheme of label, keyword, action.
 
-#### Parameters
+#### Parameters {.doc-section .doc-section-parameters}
 
 | Name   | Type                   | Description                         | Default    |
 |--------|------------------------|-------------------------------------|------------|
-| `path` | [Path](`pathlib.Path`) | Path to the file. E.g. "plumed.dat" | _required_ |
+| path   | [Path](`pathlib.Path`) | Path to the file. E.g. "plumed.dat" | _required_ |
 
-#### Returns
+#### Returns {.doc-section .doc-section-returns}
 
-| Type                                        | Description                                                                                      |
-|---------------------------------------------|--------------------------------------------------------------------------------------------------|
-| [Plumed_dict](`kimmdy.parsing.Plumed_dict`) | dict with keys: 'distances' and 'prints' Each is a dict/list of dicts containing plumed keywords |
+| Name   | Type                                        | Description                                                                                      |
+|--------|---------------------------------------------|--------------------------------------------------------------------------------------------------|
+| dict   | [Plumed_dict](`kimmdy.parsing.Plumed_dict`) | dict with keys: 'distances' and 'prints' Each is a dict/list of dicts containing plumed keywords |
 
 ### read_top { #kimmdy.parsing.read_top }
 
-`parsing.read_top(path, ffdir=None, use_gmx_dir=True)`
+```python
+parsing.read_top(path, ffdir=None, use_gmx_dir=True)
+```
 
 Read a topology file (*.top,*.itp,*.rtp) into a raw TopologyDict represenation.
 
@@ -129,23 +145,23 @@ Assumptions and limitation:
 - sections that can have subsections can also exist multiple, separate times
   e.g. moleculetype will appear multiple times and they should not be merged
 
-#### Parameters
+#### Parameters {.doc-section .doc-section-parameters}
 
 | Name   | Type                   | Description                | Default    |
 |--------|------------------------|----------------------------|------------|
-| `path` | [Path](`pathlib.Path`) | Path to the topology file. | _required_ |
+| path   | [Path](`pathlib.Path`) | Path to the topology file. | _required_ |
 
-#### Returns
+#### Returns {.doc-section .doc-section-returns}
 
-| Type                                                               | Description   |
-|--------------------------------------------------------------------|---------------|
-| Every section, apart from `ffdir` and `define`,                    |               |
-| comes with a condition that can be checked against the             |               |
-| `define`s by the helper functions to determine if the content      |               |
-| (a list of lists) should come from `content` or `else_content`.    |               |
-| Some sections such as `moleculetype` also come with `subsections`. |               |
+| Name   | Type                                                               | Description   |
+|--------|--------------------------------------------------------------------|---------------|
+|        | Every section, apart from `ffdir` and `define`,                    |               |
+|        | comes with a condition that can be checked against the             |               |
+|        | `define`s by the helper functions to determine if the content      |               |
+|        | (a list of lists) should come from `content` or `else_content`.    |               |
+|        | Some sections such as `moleculetype` also come with `subsections`. |               |
 
-#### Examples
+#### Examples {.doc-section .doc-section-examples}
 
 ```python
 raw_top =
@@ -230,51 +246,59 @@ raw_top =
 
 ### resolve_includes { #kimmdy.parsing.resolve_includes }
 
-`parsing.resolve_includes(path, gmx_builtin_ffs=None)`
+```python
+parsing.resolve_includes(path, gmx_builtin_ffs=None)
+```
 
 Resolve #include statements in a (top/itp) file.
 
-#### Parameters
+#### Parameters {.doc-section .doc-section-parameters}
 
 | Name   | Type                   | Description       | Default    |
 |--------|------------------------|-------------------|------------|
-| `path` | [Path](`pathlib.Path`) | Filepath to read. | _required_ |
+| path   | [Path](`pathlib.Path`) | Filepath to read. | _required_ |
 
-#### Returns
+#### Returns {.doc-section .doc-section-returns}
 
-| Type                                                    | Description                                                          |
-|---------------------------------------------------------|----------------------------------------------------------------------|
-| [list](`list`)\[[str](`str`)\]                          | List of lines.                                                       |
-| [Optional](`typing.Optional`)\[[Path](`pathlib.Path`)\] | Path to the ff directory if one of the includes used a file from it. |
+| Name   | Type                                                    | Description                                                          |
+|--------|---------------------------------------------------------|----------------------------------------------------------------------|
+| lines  | [list](`list`)\[[str](`str`)\]                          | List of lines.                                                       |
+| ffdir  | [Optional](`typing.Optional`)\[[Path](`pathlib.Path`)\] | Path to the ff directory if one of the includes used a file from it. |
 
 ### write_json { #kimmdy.parsing.write_json }
 
-`parsing.write_json(d, path)`
+```python
+parsing.write_json(d, path)
+```
 
 Write dict to file according to JSON format.
 
 ### write_plumed { #kimmdy.parsing.write_plumed }
 
-`parsing.write_plumed(d, path)`
+```python
+parsing.write_plumed(d, path)
+```
 
 Write a plumed.dat configuration file.
 
-#### Parameters
+#### Parameters {.doc-section .doc-section-parameters}
 
 | Name   | Type                                        | Description                                                  | Default    |
 |--------|---------------------------------------------|--------------------------------------------------------------|------------|
-| `d`    | [Plumed_dict](`kimmdy.parsing.Plumed_dict`) | Dictionary containing 'labeled_action', 'other' and 'prints' | _required_ |
-| `path` | [Path](`pathlib.Path`)                      | Path to the file. E.g. "plumed.dat"                          | _required_ |
+| d      | [Plumed_dict](`kimmdy.parsing.Plumed_dict`) | Dictionary containing 'labeled_action', 'other' and 'prints' | _required_ |
+| path   | [Path](`pathlib.Path`)                      | Path to the file. E.g. "plumed.dat"                          | _required_ |
 
 ### write_top { #kimmdy.parsing.write_top }
 
-`parsing.write_top(top, outfile)`
+```python
+parsing.write_top(top, outfile)
+```
 
 Write a TopologyDict to a topology file.
 
-#### Parameters
+#### Parameters {.doc-section .doc-section-parameters}
 
-| Name      | Type                                          | Description                                   | Default    |
-|-----------|-----------------------------------------------|-----------------------------------------------|------------|
-| `top`     | [TopologyDict](`kimmdy.parsing.TopologyDict`) | Raw dictionary represenation of the topology. | _required_ |
-| `outfile` | [Path](`pathlib.Path`)                        | Path to the topology file to write to.        | _required_ |
+| Name    | Type                                          | Description                                   | Default    |
+|---------|-----------------------------------------------|-----------------------------------------------|------------|
+| top     | [TopologyDict](`kimmdy.parsing.TopologyDict`) | Raw dictionary represenation of the topology. | _required_ |
+| outfile | [Path](`pathlib.Path`)                        | Path to the topology file to write to.        | _required_ |

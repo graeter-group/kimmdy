@@ -18,11 +18,21 @@ and because we have one reactant molecule
 
 ### KMCAccept { #kimmdy.kmc.KMCAccept }
 
-`kmc.KMCAccept(self, recipe, reaction_probability, time_delta, time_start, time_start_index, time_start_index_within_plugin=None)`
+```python
+kmc.KMCAccept(
+    self
+    recipe
+    reaction_probability
+    time_delta
+    time_start
+    time_start_index
+    time_start_index_within_plugin=None
+)
+```
 
 The result of a KMC step. Similar to a Recipe but for the concrete realization of a reaction.
 
-#### Attributes
+#### Attributes {.doc-section .doc-section-attributes}
 
 | Name                 | Type                                       | Description                                                                                                                      |
 |----------------------|--------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|
@@ -39,11 +49,14 @@ The result of a KMC step. Similar to a Recipe but for the concrete realization o
 | [extrande](#kimmdy.kmc.extrande) | Extrande KMC |
 | [extrande_mod](#kimmdy.kmc.extrande_mod) | Modified Extrande KMC |
 | [frm](#kimmdy.kmc.frm) | First Reaction Method variant of Kinetic Monte Carlo. |
+| [multi_rfkmc](#kimmdy.kmc.multi_rfkmc) | Rejection-Free Monte Carlo. |
 | [rf_kmc](#kimmdy.kmc.rf_kmc) | Rejection-Free Monte Carlo. |
 
 ### extrande { #kimmdy.kmc.extrande }
 
-`kmc.extrande(recipe_collection, tau_scale, rng=default_rng())`
+```python
+kmc.extrande(recipe_collection, tau_scale, rng=default_rng())
+```
 
 Extrande KMC
 
@@ -51,23 +64,25 @@ Implemented as in
 `Stochastic Simulation of Biomolecular Networks in Dynamic Environments`
 [10.1371/journal.pcbi.1004923](https://doi.org/10.1371/journal.pcbi.1004923)
 
-#### Parameters
+#### Parameters {.doc-section .doc-section-parameters}
 
-| Name                | Type                                                                         | Description                                         | Default         |
-|---------------------|------------------------------------------------------------------------------|-----------------------------------------------------|-----------------|
-| `recipe_collection` | [RecipeCollection](`kimmdy.recipe.RecipeCollection`)                         | from which one will be choosen                      | _required_      |
-| `rng`               | [np](`numpy`).[random](`numpy.random`).[Generator](`numpy.random.Generator`) | function to generate random numbers in the KMC step | `default_rng()` |
-| `tau_scale`         | [float](`float`)                                                             | Scaling factor for tau, by default 1.0              | _required_      |
+| Name              | Type                                                                         | Description                                         | Default         |
+|-------------------|------------------------------------------------------------------------------|-----------------------------------------------------|-----------------|
+| recipe_collection | [RecipeCollection](`kimmdy.recipe.RecipeCollection`)                         | from which one will be choosen                      | _required_      |
+| rng               | [np](`numpy`).[random](`numpy.random`).[Generator](`numpy.random.Generator`) | function to generate random numbers in the KMC step | `default_rng()` |
+| tau_scale         | [float](`float`)                                                             | Scaling factor for tau, by default 1.0              | _required_      |
 
-#### Returns
+#### Returns {.doc-section .doc-section-returns}
 
-| Type                                | Description         |
-|-------------------------------------|---------------------|
-| [KMCResult](`kimmdy.kmc.KMCResult`) | time delta set to 0 |
+| Name   | Type                                | Description         |
+|--------|-------------------------------------|---------------------|
+|        | [KMCResult](`kimmdy.kmc.KMCResult`) | time delta set to 0 |
 
 ### extrande_mod { #kimmdy.kmc.extrande_mod }
 
-`kmc.extrande_mod(recipe_collection, tau_scale, rng=default_rng())`
+```python
+kmc.extrande_mod(recipe_collection, tau_scale, rng=default_rng())
+```
 
 Modified Extrande KMC
 
@@ -82,40 +97,44 @@ a0 are the same, and the 'extra' side channel can not be triggered anymore.
 This should be more efficient given a limited number of time windows
 containing constant rates.
 
-#### Parameters
+#### Parameters {.doc-section .doc-section-parameters}
 
-| Name                | Type                                                                         | Description                                         | Default         |
-|---------------------|------------------------------------------------------------------------------|-----------------------------------------------------|-----------------|
-| `recipe_collection` | [RecipeCollection](`kimmdy.recipe.RecipeCollection`)                         | from which one will be choosen                      | _required_      |
-| `rng`               | [np](`numpy`).[random](`numpy.random`).[Generator](`numpy.random.Generator`) | function to generate random numbers in the KMC step | `default_rng()` |
-| `tau_scale`         | [float](`float`)                                                             | Scaling factor for tau, by default 1.0              | _required_      |
+| Name              | Type                                                                         | Description                                         | Default         |
+|-------------------|------------------------------------------------------------------------------|-----------------------------------------------------|-----------------|
+| recipe_collection | [RecipeCollection](`kimmdy.recipe.RecipeCollection`)                         | from which one will be choosen                      | _required_      |
+| rng               | [np](`numpy`).[random](`numpy.random`).[Generator](`numpy.random.Generator`) | function to generate random numbers in the KMC step | `default_rng()` |
+| tau_scale         | [float](`float`)                                                             | Scaling factor for tau, by default 1.0              | _required_      |
 
-#### Returns
+#### Returns {.doc-section .doc-section-returns}
 
-| Type                                | Description         |
-|-------------------------------------|---------------------|
-| [KMCResult](`kimmdy.kmc.KMCResult`) | time delta set to 0 |
+| Name   | Type                                | Description         |
+|--------|-------------------------------------|---------------------|
+|        | [KMCResult](`kimmdy.kmc.KMCResult`) | time delta set to 0 |
 
 ### frm { #kimmdy.kmc.frm }
 
-`kmc.frm(recipe_collection, rng=default_rng(), MD_time=None)`
+```python
+kmc.frm(recipe_collection, rng=default_rng(), MD_time=None)
+```
 
 First Reaction Method variant of Kinetic Monte Carlo.
 takes RecipeCollection and choses a recipe based on which reaction would occur.
 
 Compare e.g. [Wikipedia KMC - time dependent](https://en.wikipedia.org/wiki/Kinetic_Monte_Carlo#Time-dependent_Algorithms)
 
-#### Parameters
+#### Parameters {.doc-section .doc-section-parameters}
 
-| Name                | Type                                                                         | Description                                                                        | Default         |
-|---------------------|------------------------------------------------------------------------------|------------------------------------------------------------------------------------|-----------------|
-| `recipe_collection` | [RecipeCollection](`kimmdy.recipe.RecipeCollection`)                         | from which one will be choosen                                                     | _required_      |
-| `rng`               | [np](`numpy`).[random](`numpy.random`).[Generator](`numpy.random.Generator`) | to generate random numbers in the KMC step                                         | `default_rng()` |
-| `MD_time`           | [Optional](`typing.Optional`)\[[float](`float`)\]                            | time [ps] to compare conformational events with reaction events in the time domain | `None`          |
+| Name              | Type                                                                         | Description                                                                        | Default         |
+|-------------------|------------------------------------------------------------------------------|------------------------------------------------------------------------------------|-----------------|
+| recipe_collection | [RecipeCollection](`kimmdy.recipe.RecipeCollection`)                         | from which one will be choosen                                                     | _required_      |
+| rng               | [np](`numpy`).[random](`numpy.random`).[Generator](`numpy.random.Generator`) | to generate random numbers in the KMC step                                         | `default_rng()` |
+| MD_time           | [Optional](`typing.Optional`)\[[float](`float`)\]                            | time [ps] to compare conformational events with reaction events in the time domain | `None`          |
 
-### rf_kmc { #kimmdy.kmc.rf_kmc }
+### multi_rfkmc { #kimmdy.kmc.multi_rfkmc }
 
-`kmc.rf_kmc(recipe_collection, rng=default_rng())`
+```python
+kmc.multi_rfkmc(recipe_collection, n, rng=default_rng())
+```
 
 Rejection-Free Monte Carlo.
 Takes RecipeCollection and choses a recipe based on the relative propensity of the events.
@@ -123,9 +142,28 @@ The 'start' time of the reaction is the time of the highest rate of the accepted
 
 Compare e.g. [Wikipedia KMC - rejection free](https://en.wikipedia.org/wiki/Kinetic_Monte_Carlo#Rejection-free_KMC)
 
-#### Parameters
+#### Parameters {.doc-section .doc-section-parameters}
 
-| Name                | Type                                                                         | Description                                         | Default         |
-|---------------------|------------------------------------------------------------------------------|-----------------------------------------------------|-----------------|
-| `recipe_collection` | [RecipeCollection](`kimmdy.recipe.RecipeCollection`)                         | from which one will be choosen                      | _required_      |
-| `rng`               | [np](`numpy`).[random](`numpy.random`).[Generator](`numpy.random.Generator`) | function to generate random numbers in the KMC step | `default_rng()` |
+| Name              | Type                                                                         | Description                                         | Default         |
+|-------------------|------------------------------------------------------------------------------|-----------------------------------------------------|-----------------|
+| recipe_collection | [RecipeCollection](`kimmdy.recipe.RecipeCollection`)                         | from which one will be choosen                      | _required_      |
+| rng               | [np](`numpy`).[random](`numpy.random`).[Generator](`numpy.random.Generator`) | function to generate random numbers in the KMC step | `default_rng()` |
+
+### rf_kmc { #kimmdy.kmc.rf_kmc }
+
+```python
+kmc.rf_kmc(recipe_collection, rng=default_rng())
+```
+
+Rejection-Free Monte Carlo.
+Takes RecipeCollection and choses a recipe based on the relative propensity of the events.
+The 'start' time of the reaction is the time of the highest rate of the accepted reaction.
+
+Compare e.g. [Wikipedia KMC - rejection free](https://en.wikipedia.org/wiki/Kinetic_Monte_Carlo#Rejection-free_KMC)
+
+#### Parameters {.doc-section .doc-section-parameters}
+
+| Name              | Type                                                                         | Description                                         | Default         |
+|-------------------|------------------------------------------------------------------------------|-----------------------------------------------------|-----------------|
+| recipe_collection | [RecipeCollection](`kimmdy.recipe.RecipeCollection`)                         | from which one will be choosen                      | _required_      |
+| rng               | [np](`numpy`).[random](`numpy.random`).[Generator](`numpy.random.Generator`) | function to generate random numbers in the KMC step | `default_rng()` |

@@ -21,78 +21,107 @@ Standalone tools that are complementary to KIMMDY.
 
 ### build_examples { #kimmdy.tools.build_examples }
 
-`tools.build_examples(restore)`
+```python
+tools.build_examples(restore)
+```
 
 Build example directories for KIMMDY from integration tests.
 
-#### Parameters
+#### Parameters {.doc-section .doc-section-parameters}
 
-| Name      | Type         | Description                                                                                          | Default    |
-|-----------|--------------|------------------------------------------------------------------------------------------------------|------------|
-| `restore` | [str](`str`) | If True, overwrite input files in existing example directories. If "hard", also delete output files. | _required_ |
+| Name    | Type         | Description                                                                                          | Default    |
+|---------|--------------|------------------------------------------------------------------------------------------------------|------------|
+| restore | [str](`str`) | If True, overwrite input files in existing example directories. If "hard", also delete output files. | _required_ |
 
 ### edgelist_to_dot_graph { #kimmdy.tools.edgelist_to_dot_graph }
 
-`tools.edgelist_to_dot_graph(ls, overlap='true')`
+```python
+tools.edgelist_to_dot_graph(ls, overlap='true')
+```
 
 Convert a list of edges to a dot graph.
 
 ### entry_point_build_examples { #kimmdy.tools.entry_point_build_examples }
 
-`tools.entry_point_build_examples()`
+```python
+tools.entry_point_build_examples()
+```
 
 Build examples from the command line.
 
 ### entry_point_modify_top { #kimmdy.tools.entry_point_modify_top }
 
-`tools.entry_point_modify_top()`
+```python
+tools.entry_point_modify_top()
+```
 
 Modify topology file in various ways
 
 ### get_build_example_cmdline_args { #kimmdy.tools.get_build_example_cmdline_args }
 
-`tools.get_build_example_cmdline_args()`
+```python
+tools.get_build_example_cmdline_args()
+```
 
 Parse command line arguments.
 
-#### Returns
+#### Returns {.doc-section .doc-section-returns}
 
-| Type                     | Description                   |
-|--------------------------|-------------------------------|
-| [Namespace](`Namespace`) | parsed command line arguments |
+| Name   | Type                     | Description                   |
+|--------|--------------------------|-------------------------------|
+|        | [Namespace](`Namespace`) | parsed command line arguments |
 
 ### get_modify_top_cmdline_args { #kimmdy.tools.get_modify_top_cmdline_args }
 
-`tools.get_modify_top_cmdline_args()`
+```python
+tools.get_modify_top_cmdline_args()
+```
 
 parse cmdline args for modify_top
 
 ### modify_top { #kimmdy.tools.modify_top }
 
-`tools.modify_top(topology, out, parameterize=False, grappa_tag='latest', grappa_charge_model='amber99', removeH=None, gro=None, residuetypes=None, radicals=None, search_amber_rad=True, include=None, exclude=None)`
+```python
+tools.modify_top(
+    topology
+    out
+    parameterize=False
+    grappa_tag='latest'
+    grappa_charge_model='amber99'
+    removeH=None
+    gro=None
+    residuetypes=None
+    radicals=None
+    search_amber_rad=True
+    include=None
+    exclude=None
+)
+```
 
 Modify topology in various ways.
 
-#### Parameters
+#### Parameters {.doc-section .doc-section-parameters}
 
-| Name                  | Type                                                            | Description                                                                                                                                              | Default     |
-|-----------------------|-----------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|-------------|
-| `topology`            | [str](`str`)                                                    | Path to GROMACS top file                                                                                                                                 | _required_  |
-| `out`                 | [str](`str`)                                                    | Output topology file path, stem also used for gro. Can be relative to cwd.                                                                               | _required_  |
-| `parameterize`        | [bool](`bool`)                                                  | Parameterize topology with grappa after removing hydrogen                                                                                                | `False`     |
-| `grappa_tag`          | [str](`str`)                                                    | grappa model tag for parameterization.                                                                                                                   | `'latest'`  |
-| `grappa_charge_model` | [str](`str`)                                                    | grappa charge model for parameterization.                                                                                                                | `'amber99'` |
-| `removeH`             | [Optional](`typing.Optional`)\[[list](`list`)\[[int](`int`)\]\] | Remove one or more hydrogens by atom nrs in the top file. One based.                                                                                     | `None`      |
-| `gro`                 | [Optional](`typing.Optional`)\[[str](`str`)\]                   | GROMACS gro input file. Updates structure when deleting H. Output named like top output.                                                                 | `None`      |
-| `residuetypes`        | [Optional](`typing.Optional`)\[[str](`str`)\]                   | GROMACS style residuetypes file. Necessary for parameterization with non-amber atom types.                                                               | `None`      |
-| `radicals`            | [Optional](`typing.Optional`)\[[list](`list`)\[[int](`int`)\]\] | Radicals in the system PRIOR to removing hydrogens with the removeH option. One based. Can be detected automatically in amber topologies.                | `None`      |
-| `search_amber_rad`    | [bool](`bool`)                                                  | Automatic radical search only implemented for amber. If you do use another ff, set this to false, and provide a list of radicals manually, if necessary. | `True`      |
-| `include`             | [Optional](`typing.Optional`)\[[str](`str`)\]                   | Include certain GROMACS topology molecules in `Reactive` molecule. Reads molecule names from a csv file.                                                 | `None`      |
-| `exclude`             | [Optional](`typing.Optional`)\[[str](`str`)\]                   | Exclude certain GROMACS topology molecules in `Reactive` molecule. Reads molecule names from a csv file.                                                 | `None`      |
+| Name                | Type                                                            | Description                                                                                                                                              | Default     |
+|---------------------|-----------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|-------------|
+| topology            | [str](`str`)                                                    | Path to GROMACS top file                                                                                                                                 | _required_  |
+| out                 | [str](`str`)                                                    | Output topology file path, stem also used for gro. Can be relative to cwd.                                                                               | _required_  |
+| parameterize        | [bool](`bool`)                                                  | Parameterize topology with grappa after removing hydrogen                                                                                                | `False`     |
+| grappa_tag          | [str](`str`)                                                    | grappa model tag for parameterization.                                                                                                                   | `'latest'`  |
+| grappa_charge_model | [str](`str`)                                                    | grappa charge model for parameterization.                                                                                                                | `'amber99'` |
+| removeH             | [Optional](`typing.Optional`)\[[list](`list`)\[[int](`int`)\]\] | Remove one or more hydrogens by atom nrs in the top file. One based.                                                                                     | `None`      |
+| gro                 | [Optional](`typing.Optional`)\[[str](`str`)\]                   | GROMACS gro input file. Updates structure when deleting H. Output named like top output.                                                                 | `None`      |
+| residuetypes        | [Optional](`typing.Optional`)\[[str](`str`)\]                   | GROMACS style residuetypes file. Necessary for parameterization with non-amber atom types.                                                               | `None`      |
+| radicals            | [Optional](`typing.Optional`)\[[list](`list`)\[[int](`int`)\]\] | Radicals in the system PRIOR to removing hydrogens with the removeH option. One based. Can be detected automatically in amber topologies.                | `None`      |
+| search_amber_rad    | [bool](`bool`)                                                  | Automatic radical search only implemented for amber. If you do use another ff, set this to false, and provide a list of radicals manually, if necessary. | `True`      |
+| include             | [Optional](`typing.Optional`)\[[str](`str`)\]                   | Include certain GROMACS topology molecules in `Reactive` molecule. Reads molecule names from a csv file.                                                 | `None`      |
+| exclude             | [Optional](`typing.Optional`)\[[str](`str`)\]                   | Exclude certain GROMACS topology molecules in `Reactive` molecule. Reads molecule names from a csv file.                                                 | `None`      |
 
 ### top_to_graph { #kimmdy.tools.top_to_graph }
 
-`tools.top_to_graph(top, overlap='true')`
+```python
+tools.top_to_graph(top, overlap='true')
+```
 
 Convert a topology to a dot graph.
 
@@ -100,13 +129,17 @@ Can be used in notebooks to write a dot file and render with quarto.
 
 ### topology_to_edgelist { #kimmdy.tools.topology_to_edgelist }
 
-`tools.topology_to_edgelist(top)`
+```python
+tools.topology_to_edgelist(top)
+```
 
 Convert a topology to a list of edges for a dot graph.
 
 ### write_top_as_dot { #kimmdy.tools.write_top_as_dot }
 
-`tools.write_top_as_dot(top, path, overlap='true')`
+```python
+tools.write_top_as_dot(top, path, overlap='true')
+```
 
 Write a topology as a dot graph to a file.
 
