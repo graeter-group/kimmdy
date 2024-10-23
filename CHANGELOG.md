@@ -1,6 +1,22 @@
 # Changelog
 
 
+## [6.13.0](https://github.com/graeter-group/kimmdy/compare/v6.12.0...v6.13.0) (2024-10-23)
+
+
+### Features
+
+* multi rfkmc ([#494](https://github.com/graeter-group/kimmdy/issues/494)) ([3e64242](https://github.com/graeter-group/kimmdy/commit/3e64242b90bd4a098d59b8bde7a66e5e982f1f37))
+
+
+### Bug Fixes
+
+* 495 ([#496](https://github.com/graeter-group/kimmdy/issues/496)) ([e1d3700](https://github.com/graeter-group/kimmdy/commit/e1d370009108e8f8ccc7c75d1f99f9a126db3210))
+* delete last atom of a chain ([9ca51e3](https://github.com/graeter-group/kimmdy/commit/9ca51e300a2e9241e157b97b6cc32db55c81f3da))
+* need parametrization after delete ([c3b5793](https://github.com/graeter-group/kimmdy/commit/c3b579314a5d242d2314b118fb28b13f8e3447f6))
+* only check gmx version if applicable ([0d7e96c](https://github.com/graeter-group/kimmdy/commit/0d7e96c8d3b9f8bd543818e0c987d776fd1a4d3e))
+* search for radicals only in REACTIVE molecule ([e0cd397](https://github.com/graeter-group/kimmdy/commit/e0cd397f9f9f3b2977e3603d5867e53061ad3f58))
+
 ## [6.12.0](https://github.com/graeter-group/kimmdy/compare/v6.11.0...v6.12.0) (2024-09-16)
 
 

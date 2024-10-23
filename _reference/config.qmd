@@ -13,20 +13,30 @@ and package into a parsed format for internal use.
 
 ### Config { #kimmdy.config.Config }
 
-`config.Config(self, input_file=None, opts=None, scheme=None, section='config', logfile=None, loglevel=None)`
+```python
+config.Config(
+    self
+    input_file=None
+    opts=None
+    scheme=None
+    section='config'
+    logfile=None
+    loglevel=None
+)
+```
 
 Internal representation of the configuration generated
 from the input file, which enables validation before running
 and computationally expensive operations.
 
-#### Parameters
+#### Parameters {.doc-section .doc-section-parameters}
 
-| Name             | Type                           | Description                                                                                                                            | Default    |
-|------------------|--------------------------------|----------------------------------------------------------------------------------------------------------------------------------------|------------|
-| `input_file`     | [Path](`pathlib.Path`) \| None | Path to the config yaml file.                                                                                                          | `None`     |
-| `recursive_dict` |                                | For internal use only, used in reading settings in recursively.                                                                        | _required_ |
-| `scheme`         | [dict](`dict`) \| None         | dict containing types and defaults for casting and validating settings.                                                                | `None`     |
-| `section`        | [str](`str`)                   | current section e.g. to determine the level of recursion in nested configs e.g. "config", "config.mds" or "config.reactions.homolysis" | `'config'` |
+| Name           | Type                           | Description                                                                                                                            | Default    |
+|----------------|--------------------------------|----------------------------------------------------------------------------------------------------------------------------------------|------------|
+| input_file     | [Path](`pathlib.Path`) \| None | Path to the config yaml file.                                                                                                          | `None`     |
+| recursive_dict |                                | For internal use only, used in reading settings in recursively.                                                                        | _required_ |
+| scheme         | [dict](`dict`) \| None         | dict containing types and defaults for casting and validating settings.                                                                | `None`     |
+| section        | [str](`str`)                   | current section e.g. to determine the level of recursion in nested configs e.g. "config", "config.mds" or "config.reactions.homolysis" | `'config'` |
 
 #### Methods
 
@@ -37,14 +47,18 @@ and computationally expensive operations.
 
 ##### attr { #kimmdy.config.Config.attr }
 
-`config.Config.attr(attribute)`
+```python
+config.Config.attr(attribute)
+```
 
 Get the value of a specific attribute.
 Alias for self.__getattribute__
 
 ##### get_attributes { #kimmdy.config.Config.get_attributes }
 
-`config.Config.get_attributes()`
+```python
+config.Config.get_attributes()
+```
 
 Get a list of all attributes without hidden ones (_<...>).
 
@@ -56,12 +70,14 @@ Get a list of all attributes without hidden ones (_<...>).
 
 ### configure_logger { #kimmdy.config.configure_logger }
 
-`config.configure_logger(config)`
+```python
+config.configure_logger(config)
+```
 
 Configure logging.
 
-#### Parameters
+#### Parameters {.doc-section .doc-section-parameters}
 
-| Name     | Type                             | Description                                        | Default    |
-|----------|----------------------------------|----------------------------------------------------|------------|
-| `config` | [Config](`kimmdy.config.Config`) | configuration that contains log.level and log.file | _required_ |
+| Name   | Type                             | Description                                        | Default    |
+|--------|----------------------------------|----------------------------------------------------|------------|
+| config | [Config](`kimmdy.config.Config`) | configuration that contains log.level and log.file | _required_ |

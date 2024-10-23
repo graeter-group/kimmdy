@@ -20,6 +20,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -545,10 +579,10 @@ ul.task-list li input[type="checkbox"] {
 </table>
 <section id="kimmdy.coordinates.break_bond_plumed" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.coordinates.break_bond_plumed">break_bond_plumed</h3>
-<p><code>coordinates.break_bond_plumed(files, breakpair, newplumed)</code></p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>coordinates.break_bond_plumed(files, breakpair, newplumed)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Break bond in plumed configuration file.</p>
-<section id="parameters" class="level4">
-<h4 class="anchored" data-anchor-id="parameters">Parameters</h4>
+<section id="parameters" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h4>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -560,13 +594,13 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>files</code></td>
+<td>files</td>
 <td><a href="../_reference/tasks.html#kimmdy.tasks.TaskFiles">TaskFiles</a></td>
 <td></td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
-<td><code>breakpair</code></td>
+<td>breakpair</td>
 <td><a href="https://docs.python.org/3.10/library/stdtypes.html#tuple">tuple</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>, <a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>]</td>
 <td></td>
 <td><em>required</em></td>
@@ -577,37 +611,59 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="kimmdy.coordinates.get_explicit_MultipleDihedrals" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.coordinates.get_explicit_MultipleDihedrals">get_explicit_MultipleDihedrals</h3>
-<p><code>coordinates.get_explicit_MultipleDihedrals(dihedral_key, mol, dihedrals_in, ff, periodicity_max=6)</code></p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>coordinates.get_explicit_MultipleDihedrals(</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    dihedral_key</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    mol</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    dihedrals_in</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    ff</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    periodicity_max<span class="op">=</span><span class="dv">6</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Takes a valid dihedral key and returns explicit dihedral parameters for a given topology</p>
 </section>
 <section id="kimmdy.coordinates.get_explicit_or_type" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.coordinates.get_explicit_or_type">get_explicit_or_type</h3>
-<p><code>coordinates.get_explicit_or_type(key, interaction, interaction_types, mol, periodicity='')</code></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>coordinates.get_explicit_or_type(</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    key</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    interaction</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    interaction_types</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    mol</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    periodicity<span class="op">=</span><span class="st">''</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Takes an Interaction and associated key, InteractionTypes, Topology and Periodicity (for dihedrals) and returns an object with the parameters of this Interaction</p>
 </section>
 <section id="kimmdy.coordinates.is_parameterized" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.coordinates.is_parameterized">is_parameterized</h3>
-<p><code>coordinates.is_parameterized(entry)</code></p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>coordinates.is_parameterized(entry)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Parameterized topology entries have c0 and c1 attributes != None</p>
 </section>
 <section id="kimmdy.coordinates.merge_dihedrals" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.coordinates.merge_dihedrals">merge_dihedrals</h3>
-<p><code>coordinates.merge_dihedrals(dihedral_key, dihedral_a, dihedral_b, dihedral_types_a, dihedral_types_b, molA, molB, funct, periodicity)</code></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>coordinates.merge_dihedrals(</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    dihedral_key</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    dihedral_a</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    dihedral_b</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    dihedral_types_a</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    dihedral_types_b</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    molA</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    molB</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    funct</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    periodicity</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Merge one to two Dihedrals or -Types into a Dihedral in free-energy syntax</p>
 </section>
 <section id="kimmdy.coordinates.merge_top_moleculetypes_slow_growth" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.coordinates.merge_top_moleculetypes_slow_growth">merge_top_moleculetypes_slow_growth</h3>
-<p><code>coordinates.merge_top_moleculetypes_slow_growth(molA, molB, ff, morph_pairs)</code></p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>coordinates.merge_top_moleculetypes_slow_growth(molA, molB, ff, morph_pairs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation</p>
 </section>
 <section id="kimmdy.coordinates.merge_top_slow_growth" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.coordinates.merge_top_slow_growth">merge_top_slow_growth</h3>
-<p><code>coordinates.merge_top_slow_growth(topA, topB, morph_pairs)</code></p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>coordinates.merge_top_slow_growth(topA, topB, morph_pairs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation. For now this assumes that only one moleculeype is of interest.</p>
 </section>
 <section id="kimmdy.coordinates.place_atom" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.coordinates.place_atom">place_atom</h3>
-<p><code>coordinates.place_atom(files, step, ttime=None)</code></p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>coordinates.place_atom(files, step, ttime<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Place an atom to new coords at the last time point of the trajectory</p>
 
 

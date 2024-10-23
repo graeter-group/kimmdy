@@ -23,19 +23,25 @@
 
 ### get_is_reactive_predicate_f { #kimmdy.topology.utils.get_is_reactive_predicate_f }
 
-`topology.utils.get_is_reactive_predicate_f(include, exclude)`
+```python
+topology.utils.get_is_reactive_predicate_f(include, exclude)
+```
 
 Returns whether a moleculetype name is configured to be recognized as reactive.
 
 ### get_is_reactive_predicate_from_config_f { #kimmdy.topology.utils.get_is_reactive_predicate_from_config_f }
 
-`topology.utils.get_is_reactive_predicate_from_config_f(cfg)`
+```python
+topology.utils.get_is_reactive_predicate_from_config_f(cfg)
+```
 
 Returns whether a moleculetype name is configured to be recognized as reactive.
 
 ### get_moleculetype_atomics { #kimmdy.topology.utils.get_moleculetype_atomics }
 
-`topology.utils.get_moleculetype_atomics(top, moleculetype)`
+```python
+topology.utils.get_moleculetype_atomics(top, moleculetype)
+```
 
 Get content of subsections (atoms/bonds/angles etc.) of a moleculetype from a topology dict.
 
@@ -44,7 +50,9 @@ and chooses the 'content' or 'else_content' depending on the result.
 
 ### get_moleculetype_header { #kimmdy.topology.utils.get_moleculetype_header }
 
-`topology.utils.get_moleculetype_header(top, moleculetype)`
+```python
+topology.utils.get_moleculetype_header(top, moleculetype)
+```
 
 Get content of the header of a moleculetype from a topology dict.
 
@@ -53,62 +61,78 @@ and chooses the 'content' or 'else_content' depending on the result.
 
 ### get_protein_section { #kimmdy.topology.utils.get_protein_section }
 
-`topology.utils.get_protein_section(top, name)`
+```python
+topology.utils.get_protein_section(top, name)
+```
 
 Get content of a section in the first moleculetype (protein) from a topology dict.
 
 ### get_reactive_section { #kimmdy.topology.utils.get_reactive_section }
 
-`topology.utils.get_reactive_section(top, name)`
+```python
+topology.utils.get_reactive_section(top, name)
+```
 
 Get content of a section in the Reactive moleculetype from a topology dict.
 
 ### get_residue_by_bonding { #kimmdy.topology.utils.get_residue_by_bonding }
 
-`topology.utils.get_residue_by_bonding(atom, atoms)`
+```python
+topology.utils.get_residue_by_bonding(atom, atoms)
+```
 
 Get the residue of an atom by its bonding.
 
 Avoids traversing the whole topology.
 
-#### Parameters
+#### Parameters {.doc-section .doc-section-parameters}
 
-| Name    | Type                                                                  | Description             | Default    |
-|---------|-----------------------------------------------------------------------|-------------------------|------------|
-| `atom`  | [Atom](`kimmdy.topology.atomic.Atom`)                                 | Atom of the residue     | _required_ |
-| `atoms` | [dict](`dict`)\[[str](`str`), [Atom](`kimmdy.topology.atomic.Atom`)\] | All atoms of a topology | _required_ |
+| Name   | Type                                                                  | Description             | Default    |
+|--------|-----------------------------------------------------------------------|-------------------------|------------|
+| atom   | [Atom](`kimmdy.topology.atomic.Atom`)                                 | Atom of the residue     | _required_ |
+| atoms  | [dict](`dict`)\[[str](`str`), [Atom](`kimmdy.topology.atomic.Atom`)\] | All atoms of a topology | _required_ |
 
-#### Returns
+#### Returns {.doc-section .doc-section-returns}
 
-| Type                 | Description   |
-|----------------------|---------------|
-| Atoms of the residue |               |
+| Name   | Type                 | Description   |
+|--------|----------------------|---------------|
+|        | Atoms of the residue |               |
 
 ### get_residue_fragments { #kimmdy.topology.utils.get_residue_fragments }
 
-`topology.utils.get_residue_fragments(top, residue, start1, start2, iterations=20)`
+```python
+topology.utils.get_residue_fragments(
+    top
+    residue
+    start1
+    start2
+    iterations=20
+)
+```
 
 Splits a residue into fragments after a bond has been broken.
 
-#### Parameters
+#### Parameters {.doc-section .doc-section-parameters}
 
-| Name         | Type                                                    | Description                                                                                                      | Default    |
-|--------------|---------------------------------------------------------|------------------------------------------------------------------------------------------------------------------|------------|
-| `top`        | [Topology](`kimmdy.topology.topology.Topology`)         | Topology                                                                                                         | _required_ |
-| `residue`    | [list](`list`)\[[Atom](`kimmdy.topology.atomic.Atom`)\] | All atoms of current residue. Ok, when it contains more atoms as long as those are not connected to broken bond. | _required_ |
-| `start1`     | [Atom](`kimmdy.topology.atomic.Atom`)                   | First atom with broken bond                                                                                      | _required_ |
-| `start2`     | [Atom](`kimmdy.topology.atomic.Atom`)                   | Second atom with broken bond                                                                                     | _required_ |
-| `iterations` | [int](`int`)                                            | Max number of bonds from start atoms to be included when building fragmets, by default 20                        | `20`       |
+| Name       | Type                                                    | Description                                                                                                      | Default    |
+|------------|---------------------------------------------------------|------------------------------------------------------------------------------------------------------------------|------------|
+| top        | [Topology](`kimmdy.topology.topology.Topology`)         | Topology                                                                                                         | _required_ |
+| residue    | [list](`list`)\[[Atom](`kimmdy.topology.atomic.Atom`)\] | All atoms of current residue. Ok, when it contains more atoms as long as those are not connected to broken bond. | _required_ |
+| start1     | [Atom](`kimmdy.topology.atomic.Atom`)                   | First atom with broken bond                                                                                      | _required_ |
+| start2     | [Atom](`kimmdy.topology.atomic.Atom`)                   | Second atom with broken bond                                                                                     | _required_ |
+| iterations | [int](`int`)                                            | Max number of bonds from start atoms to be included when building fragmets, by default 20                        | `20`       |
 
-#### Returns
+#### Returns {.doc-section .doc-section-returns}
 
-| Type                                                     | Description                      |
-|----------------------------------------------------------|----------------------------------|
-| Two fragments, or one fragment and empty set in case the | residue did not change its size. |
+| Name   | Type                                                     | Description                      |
+|--------|----------------------------------------------------------|----------------------------------|
+|        | Two fragments, or one fragment and empty set in case the | residue did not change its size. |
 
 ### get_top_section { #kimmdy.topology.utils.get_top_section }
 
-`topology.utils.get_top_section(top, name, moleculetype=None)`
+```python
+topology.utils.get_top_section(top, name, moleculetype=None)
+```
 
 Get content of a section from a topology dict.
 
@@ -117,19 +141,25 @@ and chooses the 'content' or 'else_content' depending on the result.
 
 ### is_not_solvent_or_ion { #kimmdy.topology.utils.is_not_solvent_or_ion }
 
-`topology.utils.is_not_solvent_or_ion(name)`
+```python
+topology.utils.is_not_solvent_or_ion(name)
+```
 
 Returns whether a moleculetype name is not solvent or ion.
 
 ### set_reactive_section { #kimmdy.topology.utils.set_reactive_section }
 
-`topology.utils.set_reactive_section(top, name, value)`
+```python
+topology.utils.set_reactive_section(top, name, value)
+```
 
 Set content of a section in the first moleculetype (protein) from a topology dict.
 
 ### set_top_section { #kimmdy.topology.utils.set_top_section }
 
-`topology.utils.set_top_section(top, name, value, moleculetype=None)`
+```python
+topology.utils.set_top_section(top, name, value, moleculetype=None)
+```
 
 Set content of a section from a topology dict.
 

@@ -20,104 +20,134 @@ Contains the Reaction Recipe, RecipeStep and RecipeCollection.
 
 ### Bind { #kimmdy.recipe.Bind }
 
-`recipe.Bind(self, atom_ix_1=None, atom_ix_2=None, atom_id_1=None, atom_id_2=None)`
+```python
+recipe.Bind(
+    self
+    atom_ix_1=None
+    atom_ix_2=None
+    atom_id_1=None
+    atom_id_2=None
+)
+```
 
 Change topology to form a bond
 
-#### Parameters
+#### Parameters {.doc-section .doc-section-parameters}
 
-| Name        | Type         | Description                                               | Default   |
-|-------------|--------------|-----------------------------------------------------------|-----------|
-| `atom_ix_1` | [int](`int`) | The index of the first atom. zero-based, by default None  | `None`    |
-| `atom_ix_2` | [int](`int`) | The index of the second atom. zero-based, by default None | `None`    |
-| `atom_id_1` | [str](`str`) | The ID of the first atom. one-based, by default None      | `None`    |
-| `atom_id_2` | [str](`str`) | The ID of the second atom. one-based, by default None     | `None`    |
+| Name      | Type         | Description                                               | Default   |
+|-----------|--------------|-----------------------------------------------------------|-----------|
+| atom_ix_1 | [int](`int`) | The index of the first atom. zero-based, by default None  | `None`    |
+| atom_ix_2 | [int](`int`) | The index of the second atom. zero-based, by default None | `None`    |
+| atom_id_1 | [str](`str`) | The ID of the first atom. one-based, by default None      | `None`    |
+| atom_id_2 | [str](`str`) | The ID of the second atom. one-based, by default None     | `None`    |
 
 ### BondOperation { #kimmdy.recipe.BondOperation }
 
-`recipe.BondOperation(self, atom_ix_1=None, atom_ix_2=None, atom_id_1=None, atom_id_2=None)`
+```python
+recipe.BondOperation(
+    self
+    atom_ix_1=None
+    atom_ix_2=None
+    atom_id_1=None
+    atom_id_2=None
+)
+```
 
 Handle a bond operation on the recipe step.
 
 This class takes in either zero-based indices or one-base IDs for two atoms.
 
-#### Parameters
+#### Parameters {.doc-section .doc-section-parameters}
 
-| Name        | Type         | Description                                               | Default   |
-|-------------|--------------|-----------------------------------------------------------|-----------|
-| `atom_ix_1` | [int](`int`) | The index of the first atom. zero-based, by default None  | `None`    |
-| `atom_ix_2` | [int](`int`) | The index of the second atom. zero-based, by default None | `None`    |
-| `atom_id_1` | [str](`str`) | The ID of the first atom. one-based, by default None      | `None`    |
-| `atom_id_2` | [str](`str`) | The ID of the second atom. one-based, by default None     | `None`    |
+| Name      | Type         | Description                                               | Default   |
+|-----------|--------------|-----------------------------------------------------------|-----------|
+| atom_ix_1 | [int](`int`) | The index of the first atom. zero-based, by default None  | `None`    |
+| atom_ix_2 | [int](`int`) | The index of the second atom. zero-based, by default None | `None`    |
+| atom_id_1 | [str](`str`) | The ID of the first atom. one-based, by default None      | `None`    |
+| atom_id_2 | [str](`str`) | The ID of the second atom. one-based, by default None     | `None`    |
 
-#### Raises
+#### Raises {.doc-section .doc-section-raises}
 
-| Type                       | Description                                                     |
-|----------------------------|-----------------------------------------------------------------|
-| [ValueError](`ValueError`) | If neither an index nor an ID is provided for any of the atoms. |
+| Name   | Type                       | Description                                                     |
+|--------|----------------------------|-----------------------------------------------------------------|
+|        | [ValueError](`ValueError`) | If neither an index nor an ID is provided for any of the atoms. |
 
-#### Notes
+#### Notes {.doc-section .doc-section-notes}
 
 Internally, this class stores the atom indices and converts IDs to indices as needed.
 
 ### Break { #kimmdy.recipe.Break }
 
-`recipe.Break(self, atom_ix_1=None, atom_ix_2=None, atom_id_1=None, atom_id_2=None)`
+```python
+recipe.Break(
+    self
+    atom_ix_1=None
+    atom_ix_2=None
+    atom_id_1=None
+    atom_id_2=None
+)
+```
 
 Change topology to break a bond
 
-#### Parameters
+#### Parameters {.doc-section .doc-section-parameters}
 
-| Name        | Type         | Description                                               | Default   |
-|-------------|--------------|-----------------------------------------------------------|-----------|
-| `atom_ix_1` | [int](`int`) | The index of the first atom. zero-based, by default None  | `None`    |
-| `atom_ix_2` | [int](`int`) | The index of the second atom. zero-based, by default None | `None`    |
-| `atom_id_1` | [str](`str`) | The ID of the first atom. one-based, by default None      | `None`    |
-| `atom_id_2` | [str](`str`) | The ID of the second atom. one-based, by default None     | `None`    |
+| Name      | Type         | Description                                               | Default   |
+|-----------|--------------|-----------------------------------------------------------|-----------|
+| atom_ix_1 | [int](`int`) | The index of the first atom. zero-based, by default None  | `None`    |
+| atom_ix_2 | [int](`int`) | The index of the second atom. zero-based, by default None | `None`    |
+| atom_id_1 | [str](`str`) | The ID of the first atom. one-based, by default None      | `None`    |
+| atom_id_2 | [str](`str`) | The ID of the second atom. one-based, by default None     | `None`    |
 
 ### CustomTopMod { #kimmdy.recipe.CustomTopMod }
 
-`recipe.CustomTopMod(self, f)`
+```python
+recipe.CustomTopMod(self, f)
+```
 
 A custom recipe step that can be used to define a custom topology modification.
 
-#### Parameters
+#### Parameters {.doc-section .doc-section-parameters}
 
 | Name   | Type                                                                                                                                  | Description                                                       | Default    |
 |--------|---------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------|------------|
-| `f`    | [Callable](`typing.Callable`)\[\[[Topology](`kimmdy.topology.topology.Topology`)\], [Topology](`kimmdy.topology.topology.Topology`)\] | A function that takes a Topology object and modifies it in place. | _required_ |
+| f      | [Callable](`typing.Callable`)\[\[[Topology](`kimmdy.topology.topology.Topology`)\], [Topology](`kimmdy.topology.topology.Topology`)\] | A function that takes a Topology object and modifies it in place. | _required_ |
 
 ### Place { #kimmdy.recipe.Place }
 
-`recipe.Place(self, new_coords, ix_to_place=None, id_to_place=None)`
+```python
+recipe.Place(self, new_coords, ix_to_place=None, id_to_place=None)
+```
 
 Change topology and/or coordinates to place an atom.
 
 Either provide the index (ix_to_place) or the ID (id_to_place) of the atom to place.
 
-#### Parameters
+#### Parameters {.doc-section .doc-section-parameters}
 
-| Name          | Type                                                                     | Description                                                                               | Default    |
-|---------------|--------------------------------------------------------------------------|-------------------------------------------------------------------------------------------|------------|
-| `new_coords`  | [tuple](`tuple`)\[[float](`float`), [float](`float`), [float](`float`)\] | New xyz coordinates for atom to place to. Valid for the end point of the recipe timespan. | _required_ |
-| `ix_to_place` | [int](`int`)                                                             | Index of atom to place. 0-based.                                                          | `None`     |
-| `id_to_place` | [str](`str`)                                                             | Index of atom to place. 1-based                                                           | `None`     |
+| Name        | Type                                                                     | Description                                                                               | Default    |
+|-------------|--------------------------------------------------------------------------|-------------------------------------------------------------------------------------------|------------|
+| new_coords  | [tuple](`tuple`)\[[float](`float`), [float](`float`), [float](`float`)\] | New xyz coordinates for atom to place to. Valid for the end point of the recipe timespan. | _required_ |
+| ix_to_place | [int](`int`)                                                             | Index of atom to place. 0-based.                                                          | `None`     |
+| id_to_place | [str](`str`)                                                             | Index of atom to place. 1-based                                                           | `None`     |
 
 ### Recipe { #kimmdy.recipe.Recipe }
 
-`recipe.Recipe(self, recipe_steps, rates, timespans)`
+```python
+recipe.Recipe(self, recipe_steps, rates, timespans)
+```
 
 A reaction path defined by one series of RecipeSteps.
 Defines everything necessart to build the
 product state from the educt state.
 
-#### Parameters
+#### Parameters {.doc-section .doc-section-parameters}
 
-| Name           | Type                                                                                                                     | Description                                                                                                                                                                                                                                                                                          | Default    |
-|----------------|--------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
-| `recipe_steps` | [list](`list`)\[[RecipeStep](`kimmdy.recipe.RecipeStep`)\] \| [DeferredRecipeSteps](`kimmdy.recipe.DeferredRecipeSteps`) | Can be a single sequence of RecipeSteps to modify the topology or a tuple with a key and a function that takes said key to generate the RecipeSteps once it has been choosen. It is up to the ReactionPlugins to choose how to match the key to the their internal state and return the RecipeSteps. | _required_ |
-| `rates`        | [list](`list`)\[[float](`float`)\]                                                                                       | Reaction rates corresponding 1:1 to timespans.                                                                                                                                                                                                                                                       | _required_ |
-| `timespans`    | [list](`list`)\[[list](`list`)\[[float](`float`), [float](`float`)\]\]                                                   | List of half-open timespans (t1, t2] in ps, at which this rate is valid. Recipe steps which change the coordinates only need to be applicable at the first time in the interval. Must have same number of timespans as rates. t1 can equal t2 for the last frame.                                    | _required_ |
+| Name         | Type                                                                                                                     | Description                                                                                                                                                                                                                                                                                          | Default    |
+|--------------|--------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| recipe_steps | [list](`list`)\[[RecipeStep](`kimmdy.recipe.RecipeStep`)\] \| [DeferredRecipeSteps](`kimmdy.recipe.DeferredRecipeSteps`) | Can be a single sequence of RecipeSteps to modify the topology or a tuple with a key and a function that takes said key to generate the RecipeSteps once it has been choosen. It is up to the ReactionPlugins to choose how to match the key to the their internal state and return the RecipeSteps. | _required_ |
+| rates        | [list](`list`)\[[float](`float`)\]                                                                                       | Reaction rates corresponding 1:1 to timespans.                                                                                                                                                                                                                                                       | _required_ |
+| timespans    | [list](`list`)\[[list](`list`)\[[float](`float`), [float](`float`)\]\]                                                   | List of half-open timespans (t1, t2] in ps, at which this rate is valid. Recipe steps which change the coordinates only need to be applicable at the first time in the interval. Must have same number of timespans as rates. t1 can equal t2 for the last frame.                                    | _required_ |
 
 #### Methods
 
@@ -129,25 +159,31 @@ product state from the educt state.
 
 ##### check_consistency { #kimmdy.recipe.Recipe.check_consistency }
 
-`recipe.Recipe.check_consistency()`
+```python
+recipe.Recipe.check_consistency()
+```
 
 Run consistency checks for correct size of variables
 
 ##### combine_with { #kimmdy.recipe.Recipe.combine_with }
 
-`recipe.Recipe.combine_with(other)`
+```python
+recipe.Recipe.combine_with(other)
+```
 
 Combines this Recipe with another with the same RecipeSteps.
 
-###### Parameters
+###### Parameters {.doc-section .doc-section-parameters}
 
-| Name    | Type                             | Description   | Default    |
-|---------|----------------------------------|---------------|------------|
-| `other` | [Recipe](`kimmdy.recipe.Recipe`) |               | _required_ |
+| Name   | Type                             | Description   | Default    |
+|--------|----------------------------------|---------------|------------|
+| other  | [Recipe](`kimmdy.recipe.Recipe`) |               | _required_ |
 
 ##### get_vmd_selection { #kimmdy.recipe.Recipe.get_vmd_selection }
 
-`recipe.Recipe.get_vmd_selection()`
+```python
+recipe.Recipe.get_vmd_selection()
+```
 
 Get a VMD selection string
 
@@ -155,16 +191,18 @@ for the atoms involved in the recipe steps.
 
 ### RecipeCollection { #kimmdy.recipe.RecipeCollection }
 
-`recipe.RecipeCollection(self, recipes)`
+```python
+recipe.RecipeCollection(self, recipes)
+```
 
 A RecipeCollection encompasses a list of reaction paths.
 They can originate from multiple reaction plugins, but do not need to.
 
-#### Parameters
+#### Parameters {.doc-section .doc-section-parameters}
 
-| Name      | Type                                               | Description             | Default    |
-|-----------|----------------------------------------------------|-------------------------|------------|
-| `recipes` | [list](`list`)\[[Recipe](`kimmdy.recipe.Recipe`)\] | List of Recipe objects. | _required_ |
+| Name    | Type                                               | Description             | Default    |
+|---------|----------------------------------------------------|-------------------------|------------|
+| recipes | [list](`list`)\[[Recipe](`kimmdy.recipe.Recipe`)\] | List of Recipe objects. | _required_ |
 
 #### Methods
 
@@ -179,19 +217,23 @@ They can originate from multiple reaction plugins, but do not need to.
 
 ##### aggregate_reactions { #kimmdy.recipe.RecipeCollection.aggregate_reactions }
 
-`recipe.RecipeCollection.aggregate_reactions()`
+```python
+recipe.RecipeCollection.aggregate_reactions()
+```
 
 Combines reactions having the same sequence of RecipeSteps.
 
-###### Returns
+###### Returns {.doc-section .doc-section-returns}
 
-| Type                                       | Description                                                                    |
-|--------------------------------------------|--------------------------------------------------------------------------------|
-| [unique_recipes_ixs](`unique_recipes_ixs`) | List of lists binning the old recipe indices and maps to the new recipes list. |
+| Name   | Type                                       | Description                                                                    |
+|--------|--------------------------------------------|--------------------------------------------------------------------------------|
+|        | [unique_recipes_ixs](`unique_recipes_ixs`) | List of lists binning the old recipe indices and maps to the new recipes list. |
 
 ##### calc_cumprob { #kimmdy.recipe.RecipeCollection.calc_cumprob }
 
-`recipe.RecipeCollection.calc_cumprob()`
+```python
+recipe.RecipeCollection.calc_cumprob()
+```
 
 Calculate cumulative probability of all contained recipe steps.
 Sums up to 1 over all recipes. Assumes constant rate for given timespan
@@ -199,48 +241,58 @@ and rate zero otherwise.
 
 ##### calc_ratesum { #kimmdy.recipe.RecipeCollection.calc_ratesum }
 
-`recipe.RecipeCollection.calc_ratesum()`
+```python
+recipe.RecipeCollection.calc_ratesum()
+```
 
 Calculate the sum of rates over all timesteps
 
-###### Returns
+###### Returns {.doc-section .doc-section-returns}
 
-| Type                               | Description                                                                                            |
-|------------------------------------|--------------------------------------------------------------------------------------------------------|
-| [boarders](`boarders`)             | flat list containing times of rate changes marking the boarders of the windows                         |
-| [rate_windows](`rate_windows`)     | flat list containing all rates in between the boarders. Each window is orderd as in recipe_windows     |
-| [recipe_windows](`recipe_windows`) | flat list containing the recipes of the corresponding window. Each window is orderd as in rate_windows |
+| Name   | Type                               | Description                                                                                            |
+|--------|------------------------------------|--------------------------------------------------------------------------------------------------------|
+|        | [boarders](`boarders`)             | flat list containing times of rate changes marking the boarders of the windows                         |
+|        | [rate_windows](`rate_windows`)     | flat list containing all rates in between the boarders. Each window is orderd as in recipe_windows     |
+|        | [recipe_windows](`recipe_windows`) | flat list containing the recipes of the corresponding window. Each window is orderd as in rate_windows |
 
 ##### from_csv { #kimmdy.recipe.RecipeCollection.from_csv }
 
-`recipe.RecipeCollection.from_csv(path)`
+```python
+recipe.RecipeCollection.from_csv(path)
+```
 
 Create a RecipeCollection object from a CSV file
 Returns the recipe collection and a single recipe that was picked, otherwise None
 
 ##### plot { #kimmdy.recipe.RecipeCollection.plot }
 
-`recipe.RecipeCollection.plot(outfile, highlight_r=None, highlight_t=None)`
+```python
+recipe.RecipeCollection.plot(outfile, highlight_r=None, highlight_t=None)
+```
 
 Plot reaction rates over time
 
-###### Parameters
+###### Parameters {.doc-section .doc-section-parameters}
 
-| Name          | Type                             | Description                                          | Default    |
-|---------------|----------------------------------|------------------------------------------------------|------------|
-| `outfile`     | [Path](`pathlib.Path`)           | Where to save the plot, must have compatible suffix. | _required_ |
-| `highlight_r` | [Recipe](`kimmdy.recipe.Recipe`) | Recipe to highlight, by default None                 | `None`     |
-| `highlight_t` | [float](`float`)                 | Time at which the reactions starts                   | `None`     |
+| Name        | Type                             | Description                                          | Default    |
+|-------------|----------------------------------|------------------------------------------------------|------------|
+| outfile     | [Path](`pathlib.Path`)           | Where to save the plot, must have compatible suffix. | _required_ |
+| highlight_r | [Recipe](`kimmdy.recipe.Recipe`) | Recipe to highlight, by default None                 | `None`     |
+| highlight_t | [float](`float`)                 | Time at which the reactions starts                   | `None`     |
 
 ##### to_csv { #kimmdy.recipe.RecipeCollection.to_csv }
 
-`recipe.RecipeCollection.to_csv(path, picked_recipe=None)`
+```python
+recipe.RecipeCollection.to_csv(path, picked_recipe=None)
+```
 
 Write a ReactionResult as defined in the reaction module to a csv file
 
 ### RecipeStep { #kimmdy.recipe.RecipeStep }
 
-`recipe.RecipeStep()`
+```python
+recipe.RecipeStep()
+```
 
 Base class for all RecipeSteps.
 Indices can be accessed as 0-based or 1-based.
@@ -255,7 +307,9 @@ id: 1-based, str
 
 ##### from_str { #kimmdy.recipe.RecipeStep.from_str }
 
-`recipe.RecipeStep.from_str(s)`
+```python
+recipe.RecipeStep.from_str(s)
+```
 
 Parses expressions of the following forms into RecipeStep objects:
 
@@ -265,15 +319,17 @@ Parses expressions of the following forms into RecipeStep objects:
 - Relax: Relax()
 - CustomTopMod: CustomTopMod(f=<function f at 0x7f7f7f7f7f7f>)
 
-###### Parameters
+###### Parameters {.doc-section .doc-section-parameters}
 
 | Name   | Type         | Description                                   | Default    |
 |--------|--------------|-----------------------------------------------|------------|
-| `s`    | [str](`str`) | String representation of a RecipeStep object. | _required_ |
+| s      | [str](`str`) | String representation of a RecipeStep object. | _required_ |
 
 ### Relax { #kimmdy.recipe.Relax }
 
-`recipe.Relax(self)`
+```python
+recipe.Relax(self)
+```
 
 Start a relaxation MD.
 

@@ -19,58 +19,96 @@ coordinate, topology and plumed modification functions
 
 ### break_bond_plumed { #kimmdy.coordinates.break_bond_plumed }
 
-`coordinates.break_bond_plumed(files, breakpair, newplumed)`
+```python
+coordinates.break_bond_plumed(files, breakpair, newplumed)
+```
 
 Break bond in plumed configuration file.
 
-#### Parameters
+#### Parameters {.doc-section .doc-section-parameters}
 
-| Name        | Type                                           | Description   | Default    |
-|-------------|------------------------------------------------|---------------|------------|
-| `files`     | [TaskFiles](`kimmdy.tasks.TaskFiles`)          |               | _required_ |
-| `breakpair` | [tuple](`tuple`)\[[str](`str`), [str](`str`)\] |               | _required_ |
+| Name      | Type                                           | Description   | Default    |
+|-----------|------------------------------------------------|---------------|------------|
+| files     | [TaskFiles](`kimmdy.tasks.TaskFiles`)          |               | _required_ |
+| breakpair | [tuple](`tuple`)\[[str](`str`), [str](`str`)\] |               | _required_ |
 
 ### get_explicit_MultipleDihedrals { #kimmdy.coordinates.get_explicit_MultipleDihedrals }
 
-`coordinates.get_explicit_MultipleDihedrals(dihedral_key, mol, dihedrals_in, ff, periodicity_max=6)`
+```python
+coordinates.get_explicit_MultipleDihedrals(
+    dihedral_key
+    mol
+    dihedrals_in
+    ff
+    periodicity_max=6
+)
+```
 
 Takes a valid dihedral key and returns explicit
 dihedral parameters for a given topology
 
 ### get_explicit_or_type { #kimmdy.coordinates.get_explicit_or_type }
 
-`coordinates.get_explicit_or_type(key, interaction, interaction_types, mol, periodicity='')`
+```python
+coordinates.get_explicit_or_type(
+    key
+    interaction
+    interaction_types
+    mol
+    periodicity=''
+)
+```
 
 Takes an Interaction and associated key, InteractionTypes, Topology
 and Periodicity (for dihedrals) and returns an object with the parameters of this Interaction
 
 ### is_parameterized { #kimmdy.coordinates.is_parameterized }
 
-`coordinates.is_parameterized(entry)`
+```python
+coordinates.is_parameterized(entry)
+```
 
 Parameterized topology entries have c0 and c1 attributes != None
 
 ### merge_dihedrals { #kimmdy.coordinates.merge_dihedrals }
 
-`coordinates.merge_dihedrals(dihedral_key, dihedral_a, dihedral_b, dihedral_types_a, dihedral_types_b, molA, molB, funct, periodicity)`
+```python
+coordinates.merge_dihedrals(
+    dihedral_key
+    dihedral_a
+    dihedral_b
+    dihedral_types_a
+    dihedral_types_b
+    molA
+    molB
+    funct
+    periodicity
+)
+```
 
 Merge one to two Dihedrals or -Types into a Dihedral in free-energy syntax
 
 ### merge_top_moleculetypes_slow_growth { #kimmdy.coordinates.merge_top_moleculetypes_slow_growth }
 
-`coordinates.merge_top_moleculetypes_slow_growth(molA, molB, ff, morph_pairs)`
+```python
+coordinates.merge_top_moleculetypes_slow_growth(molA, molB, ff, morph_pairs)
+```
 
 Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation
 
 ### merge_top_slow_growth { #kimmdy.coordinates.merge_top_slow_growth }
 
-`coordinates.merge_top_slow_growth(topA, topB, morph_pairs)`
+```python
+coordinates.merge_top_slow_growth(topA, topB, morph_pairs)
+```
 
 Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation.
 For now this assumes that only one moleculeype is of interest.
 
 ### place_atom { #kimmdy.coordinates.place_atom }
 
-`coordinates.place_atom(files, step, ttime=None)`
+```python
+coordinates.place_atom(files, step, ttime=None)
+```
 
 Place an atom to new coords at the last time point of the trajectory

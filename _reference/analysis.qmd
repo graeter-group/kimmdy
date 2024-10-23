@@ -22,138 +22,166 @@ For command line usage, run `kimmdy-analysis -h`.
 
 ### concat_traj { #kimmdy.analysis.concat_traj }
 
-`analysis.concat_traj(dir, filetype, steps, open_vmd=False, output_group=None)`
+```python
+analysis.concat_traj(dir, filetype, steps, open_vmd=False, output_group=None)
+```
 
 Find and concatenate trajectories (.xtc files) from a KIMMDY run into one trajectory.
 The concatenated trajectory is centered and pbc corrected.
 
-#### Parameters
+#### Parameters {.doc-section .doc-section-parameters}
 
-| Name           | Type                                                                    | Description                                                                                      | Default    |
-|----------------|-------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|------------|
-| `dir`          | [str](`str`)                                                            | Directory to search for subdirectories                                                           | _required_ |
-| `steps`        | [Union](`typing.Union`)\[[list](`list`)\[[str](`str`)\], [str](`str`)\] | List of steps e.g. ["equilibrium", "production"]. Or a string "all" to return all subdirectories | _required_ |
-| `open_vmd`     | [bool](`bool`)                                                          | Open concatenated trajectory in VMD                                                              | `False`    |
-| `output_group` | [Optional](`typing.Optional`)\[[str](`str`)\]                           | index group for output. Default is "Protein" for xtc and "System" for trr.                       | `None`     |
+| Name         | Type                                                                    | Description                                                                                      | Default    |
+|--------------|-------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|------------|
+| dir          | [str](`str`)                                                            | Directory to search for subdirectories                                                           | _required_ |
+| steps        | [Union](`typing.Union`)\[[list](`list`)\[[str](`str`)\], [str](`str`)\] | List of steps e.g. ["equilibrium", "production"]. Or a string "all" to return all subdirectories | _required_ |
+| open_vmd     | [bool](`bool`)                                                          | Open concatenated trajectory in VMD                                                              | `False`    |
+| output_group | [Optional](`typing.Optional`)\[[str](`str`)\]                           | index group for output. Default is "Protein" for xtc and "System" for trr.                       | `None`     |
 
 ### entry_point_analysis { #kimmdy.analysis.entry_point_analysis }
 
-`analysis.entry_point_analysis()`
+```python
+analysis.entry_point_analysis()
+```
 
 Analyse existing KIMMDY runs.
 
 ### get_analysis_cmdline_args { #kimmdy.analysis.get_analysis_cmdline_args }
 
-`analysis.get_analysis_cmdline_args()`
+```python
+analysis.get_analysis_cmdline_args()
+```
 
 Parse command line arguments.
 
-#### Returns
+#### Returns {.doc-section .doc-section-returns}
 
-| Type                          | Description   |
-|-------------------------------|---------------|
-| Parsed command line arguments |               |
+| Name   | Type                          | Description   |
+|--------|-------------------------------|---------------|
+|        | Parsed command line arguments |               |
 
 ### get_analysis_dir { #kimmdy.analysis.get_analysis_dir }
 
-`analysis.get_analysis_dir(dir)`
+```python
+analysis.get_analysis_dir(dir)
+```
 
 Get analysis directory for a KIMMDY run.
 
 Creates the directory if it does not exist.
 
-#### Parameters
+#### Parameters {.doc-section .doc-section-parameters}
 
 | Name   | Type                   | Description             | Default    |
 |--------|------------------------|-------------------------|------------|
-| `dir`  | [Path](`pathlib.Path`) | Directory of KIMMDY run | _required_ |
+| dir    | [Path](`pathlib.Path`) | Directory of KIMMDY run | _required_ |
 
-#### Returns
+#### Returns {.doc-section .doc-section-returns}
 
-| Type                       | Description   |
-|----------------------------|---------------|
-| Path to analysis directory |               |
+| Name   | Type                       | Description   |
+|--------|----------------------------|---------------|
+|        | Path to analysis directory |               |
 
 ### plot_energy { #kimmdy.analysis.plot_energy }
 
-`analysis.plot_energy(dir, steps, terms, open_plot=False)`
+```python
+analysis.plot_energy(dir, steps, terms, open_plot=False)
+```
 
 Plot GROMACS energy for a KIMMDY run.
 
-#### Parameters
+#### Parameters {.doc-section .doc-section-parameters}
 
-| Name        | Type                                                                    | Description                                                                                                         | Default    |
-|-------------|-------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------|------------|
-| `dir`       | [str](`str`)                                                            | Directory to search for subdirectories                                                                              | _required_ |
-| `steps`     | [Union](`typing.Union`)\[[list](`list`)\[[str](`str`)\], [str](`str`)\] | List of steps e.g. ["equilibrium", "production"]. Or a string "all" to return all subdirectories. Default is "all". | _required_ |
-| `terms`     | [list](`list`)\[[str](`str`)\]                                          | Terms from gmx energy that will be plotted. Uses 'Potential' by default.                                            | _required_ |
-| `open_plot` | [bool](`bool`)                                                          | Open plot in default system viewer.                                                                                 | `False`    |
+| Name      | Type                                                                    | Description                                                                                                         | Default    |
+|-----------|-------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------|------------|
+| dir       | [str](`str`)                                                            | Directory to search for subdirectories                                                                              | _required_ |
+| steps     | [Union](`typing.Union`)\[[list](`list`)\[[str](`str`)\], [str](`str`)\] | List of steps e.g. ["equilibrium", "production"]. Or a string "all" to return all subdirectories. Default is "all". | _required_ |
+| terms     | [list](`list`)\[[str](`str`)\]                                          | Terms from gmx energy that will be plotted. Uses 'Potential' by default.                                            | _required_ |
+| open_plot | [bool](`bool`)                                                          | Open plot in default system viewer.                                                                                 | `False`    |
 
 ### plot_rates { #kimmdy.analysis.plot_rates }
 
-`analysis.plot_rates(dir)`
+```python
+analysis.plot_rates(dir, open=False)
+```
 
 Plot rates of all possible reactions for each 'decide_recipe' step.
 
-#### Parameters
+#### Parameters {.doc-section .doc-section-parameters}
 
-| Name   | Type         | Description             | Default    |
-|--------|--------------|-------------------------|------------|
-| `dir`  | [str](`str`) | Directory of KIMMDY run | _required_ |
+| Name   | Type           | Description                         | Default    |
+|--------|----------------|-------------------------------------|------------|
+| dir    | [str](`str`)   | Directory of KIMMDY run             | _required_ |
+| open   | [bool](`bool`) | open plots in default system viewer | `False`    |
 
 ### radical_migration { #kimmdy.analysis.radical_migration }
 
-`analysis.radical_migration(dirs, type='qualitative', cutoff=1)`
+```python
+analysis.radical_migration(dirs, type='qualitative', cutoff=1)
+```
 
 Plot population of radicals for a KIMMDY run.
 
-#### Parameters
+#### Parameters {.doc-section .doc-section-parameters}
 
-| Name     | Type                           | Description                                                                                | Default         |
-|----------|--------------------------------|--------------------------------------------------------------------------------------------|-----------------|
-| `dirs`   | [list](`list`)\[[str](`str`)\] | KIMMDY run directories to be analysed.                                                     | _required_      |
-| `type`   | [str](`str`)                   | How to analyse radical migration. Available are 'qualitative','occurence' and 'min_rate'", | `'qualitative'` |
-| `cutoff` | [int](`int`)                   | Ignore migration between two atoms if it happened less often than the specified value.     | `1`             |
+| Name   | Type                           | Description                                                                                | Default         |
+|--------|--------------------------------|--------------------------------------------------------------------------------------------|-----------------|
+| dirs   | [list](`list`)\[[str](`str`)\] | KIMMDY run directories to be analysed.                                                     | _required_      |
+| type   | [str](`str`)                   | How to analyse radical migration. Available are 'qualitative','occurence' and 'min_rate'", | `'qualitative'` |
+| cutoff | [int](`int`)                   | Ignore migration between two atoms if it happened less often than the specified value.     | `1`             |
 
 ### radical_population { #kimmdy.analysis.radical_population }
 
-`analysis.radical_population(dir, population_type='frequency', steps='all', select_atoms='protein', open_plot=False, open_vmd=False)`
+```python
+analysis.radical_population(
+    dir
+    population_type='frequency'
+    steps='all'
+    select_atoms='protein'
+    open_plot=False
+    open_vmd=False
+)
+```
 
 Plot population of radicals for a KIMMDY run.
 
-#### Parameters
+#### Parameters {.doc-section .doc-section-parameters}
 
-| Name              | Type                                                                    | Description                                                                                                         | Default       |
-|-------------------|-------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------|---------------|
-| `dir`             | [str](`str`)                                                            | KIMMDY run directory to be analysed.                                                                                | _required_    |
-| `population_type` | [str](`str`)                                                            | How to calculate the fractional radical occupancy. Available are 'frequency' and 'time'                             | `'frequency'` |
-| `steps`           | [Union](`typing.Union`)\[[list](`list`)\[[str](`str`)\], [str](`str`)\] | List of steps e.g. ["equilibrium", "production"]. Or a string "all" to return all subdirectories. Default is "all". | `'all'`       |
-| `select_atoms`    | [str](`str`)                                                            | Atoms chosen for radical population analysis, default is protein (uses MDAnalysis selection syntax)                 | `'protein'`   |
-| `open_plot`       | [bool](`bool`)                                                          | Open plot in default system viewer.                                                                                 | `False`       |
-| `open_vmd`        | [bool](`bool`)                                                          | Open a pdb in VMD with the radical occupation as B-factors.                                                         | `False`       |
+| Name            | Type                                                                    | Description                                                                                                         | Default       |
+|-----------------|-------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------|---------------|
+| dir             | [str](`str`)                                                            | KIMMDY run directory to be analysed.                                                                                | _required_    |
+| population_type | [str](`str`)                                                            | How to calculate the fractional radical occupancy. Available are 'frequency' and 'time'                             | `'frequency'` |
+| steps           | [Union](`typing.Union`)\[[list](`list`)\[[str](`str`)\], [str](`str`)\] | List of steps e.g. ["equilibrium", "production"]. Or a string "all" to return all subdirectories. Default is "all". | `'all'`       |
+| select_atoms    | [str](`str`)                                                            | Atoms chosen for radical population analysis, default is protein (uses MDAnalysis selection syntax)                 | `'protein'`   |
+| open_plot       | [bool](`bool`)                                                          | Open plot in default system viewer.                                                                                 | `False`       |
+| open_vmd        | [bool](`bool`)                                                          | Open a pdb in VMD with the radical occupation as B-factors.                                                         | `False`       |
 
 ### reaction_participation { #kimmdy.analysis.reaction_participation }
 
-`analysis.reaction_participation(dir, open_plot=False)`
+```python
+analysis.reaction_participation(dir, open_plot=False)
+```
 
 Plot which atoms participate in reactions.
 
-#### Parameters
+#### Parameters {.doc-section .doc-section-parameters}
 
-| Name        | Type           | Description                         | Default    |
-|-------------|----------------|-------------------------------------|------------|
-| `dir`       | [str](`str`)   | Directory of KIMMDY run             | _required_ |
-| `open_plot` | [bool](`bool`) | Open plot in default system viewer. | `False`    |
+| Name      | Type           | Description                         | Default    |
+|-----------|----------------|-------------------------------------|------------|
+| dir       | [str](`str`)   | Directory of KIMMDY run             | _required_ |
+| open_plot | [bool](`bool`) | Open plot in default system viewer. | `False`    |
 
 ### runtime_analysis { #kimmdy.analysis.runtime_analysis }
 
-`analysis.runtime_analysis(dir, open_plot=False)`
+```python
+analysis.runtime_analysis(dir, open_plot=False)
+```
 
 Plot which atoms participate in reactions.
 
-#### Parameters
+#### Parameters {.doc-section .doc-section-parameters}
 
-| Name        | Type           | Description                         | Default    |
-|-------------|----------------|-------------------------------------|------------|
-| `dir`       | [str](`str`)   | Directory of KIMMDY run             | _required_ |
-| `open_plot` | [bool](`bool`) | Open plot in default system viewer. | `False`    |
+| Name      | Type           | Description                         | Default    |
+|-----------|----------------|-------------------------------------|------------|
+| dir       | [str](`str`)   | Directory of KIMMDY run             | _required_ |
+| open_plot | [bool](`bool`) | Open plot in default system viewer. | `False`    |

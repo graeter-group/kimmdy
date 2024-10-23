@@ -1,5 +1,16 @@
 [
   {
+    "listing": "/guide/how-to/index.html",
+    "items": [
+      "/guide/how-to/analyze.html",
+      "/guide/how-to/contribute.html",
+      "/guide/how-to/examples.html",
+      "/guide/how-to/hcp.html",
+      "/guide/how-to/install-ml-plugins.html",
+      "/guide/how-to/reaction_only.html"
+    ]
+  },
+  {
     "listing": "/guide/explanation/index.html",
     "items": [
       "/guide/explanation/components.html",
@@ -13,17 +24,6 @@
       "/guide/tutorials/modify-topology.html",
       "/guide/tutorials/colbuilder.html",
       "/guide/tutorials/write-plugin.html"
-    ]
-  },
-  {
-    "listing": "/guide/how-to/index.html",
-    "items": [
-      "/guide/how-to/analyze.html",
-      "/guide/how-to/contribute.html",
-      "/guide/how-to/examples.html",
-      "/guide/how-to/hcp.html",
-      "/guide/how-to/install-ml-plugins.html",
-      "/guide/how-to/reaction_only.html"
     ]
   }
 ]

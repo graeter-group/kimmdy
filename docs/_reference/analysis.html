@@ -20,6 +20,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -580,10 +614,10 @@ ul.task-list li input[type="checkbox"] {
 </table>
 <section id="kimmdy.analysis.concat_traj" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.analysis.concat_traj">concat_traj</h3>
-<p><code>analysis.concat_traj(dir, filetype, steps, open_vmd=False, output_group=None)</code></p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>analysis.concat_traj(<span class="bu">dir</span>, filetype, steps, open_vmd<span class="op">=</span><span class="va">False</span>, output_group<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Find and concatenate trajectories (.xtc files) from a KIMMDY run into one trajectory. The concatenated trajectory is centered and pbc corrected.</p>
-<section id="parameters" class="level4">
-<h4 class="anchored" data-anchor-id="parameters">Parameters</h4>
+<section id="parameters" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h4>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -595,25 +629,25 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>dir</code></td>
+<td>dir</td>
 <td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
 <td>Directory to search for subdirectories</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
-<td><code>steps</code></td>
+<td>steps</td>
 <td><a href="https://docs.python.org/3.10/library/typing.html#typing.Union">Union</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#list">list</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>], <a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>]</td>
 <td>List of steps e.g.&nbsp;[“equilibrium”, “production”]. Or a string “all” to return all subdirectories</td>
 <td><em>required</em></td>
 </tr>
 <tr class="odd">
-<td><code>open_vmd</code></td>
+<td>open_vmd</td>
 <td><a href="https://docs.python.org/3.10/library/functions.html#bool">bool</a></td>
 <td>Open concatenated trajectory in VMD</td>
 <td><code>False</code></td>
 </tr>
 <tr class="even">
-<td><code>output_group</code></td>
+<td>output_group</td>
 <td><a href="https://docs.python.org/3.10/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>]</td>
 <td>index group for output. Default is “Protein” for xtc and “System” for trr.</td>
 <td><code>None</code></td>
@@ -624,24 +658,26 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="kimmdy.analysis.entry_point_analysis" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.analysis.entry_point_analysis">entry_point_analysis</h3>
-<p><code>analysis.entry_point_analysis()</code></p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>analysis.entry_point_analysis()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Analyse existing KIMMDY runs.</p>
 </section>
 <section id="kimmdy.analysis.get_analysis_cmdline_args" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.analysis.get_analysis_cmdline_args">get_analysis_cmdline_args</h3>
-<p><code>analysis.get_analysis_cmdline_args()</code></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>analysis.get_analysis_cmdline_args()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Parse command line arguments.</p>
-<section id="returns" class="level4">
-<h4 class="anchored" data-anchor-id="returns">Returns</h4>
+<section id="returns" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h4>
 <table class="caption-top table">
 <thead>
 <tr class="header">
+<th>Name</th>
 <th>Type</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
+<td></td>
 <td>Parsed command line arguments</td>
 <td></td>
 </tr>
@@ -651,11 +687,11 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="kimmdy.analysis.get_analysis_dir" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.analysis.get_analysis_dir">get_analysis_dir</h3>
-<p><code>analysis.get_analysis_dir(dir)</code></p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>analysis.get_analysis_dir(<span class="bu">dir</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Get analysis directory for a KIMMDY run.</p>
 <p>Creates the directory if it does not exist.</p>
-<section id="parameters-1" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-1">Parameters</h4>
+<section id="parameters-1" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-1">Parameters</h4>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -667,7 +703,7 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>dir</code></td>
+<td>dir</td>
 <td><a href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path">Path</a></td>
 <td>Directory of KIMMDY run</td>
 <td><em>required</em></td>
@@ -675,17 +711,19 @@ ul.task-list li input[type="checkbox"] {
 </tbody>
 </table>
 </section>
-<section id="returns-1" class="level4">
-<h4 class="anchored" data-anchor-id="returns-1">Returns</h4>
+<section id="returns-1" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-1">Returns</h4>
 <table class="caption-top table">
 <thead>
 <tr class="header">
+<th>Name</th>
 <th>Type</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
+<td></td>
 <td>Path to analysis directory</td>
 <td></td>
 </tr>
@@ -695,10 +733,10 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="kimmdy.analysis.plot_energy" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.analysis.plot_energy">plot_energy</h3>
-<p><code>analysis.plot_energy(dir, steps, terms, open_plot=False)</code></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>analysis.plot_energy(<span class="bu">dir</span>, steps, terms, open_plot<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Plot GROMACS energy for a KIMMDY run.</p>
-<section id="parameters-2" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-2">Parameters</h4>
+<section id="parameters-2" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-2">Parameters</h4>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -710,25 +748,25 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>dir</code></td>
+<td>dir</td>
 <td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
 <td>Directory to search for subdirectories</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
-<td><code>steps</code></td>
+<td>steps</td>
 <td><a href="https://docs.python.org/3.10/library/typing.html#typing.Union">Union</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#list">list</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>], <a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>]</td>
 <td>List of steps e.g.&nbsp;[“equilibrium”, “production”]. Or a string “all” to return all subdirectories. Default is “all”.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="odd">
-<td><code>terms</code></td>
+<td>terms</td>
 <td><a href="https://docs.python.org/3.10/library/stdtypes.html#list">list</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>]</td>
 <td>Terms from gmx energy that will be plotted. Uses ‘Potential’ by default.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
-<td><code>open_plot</code></td>
+<td>open_plot</td>
 <td><a href="https://docs.python.org/3.10/library/functions.html#bool">bool</a></td>
 <td>Open plot in default system viewer.</td>
 <td><code>False</code></td>
@@ -739,10 +777,10 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="kimmdy.analysis.plot_rates" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.analysis.plot_rates">plot_rates</h3>
-<p><code>analysis.plot_rates(dir)</code></p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>analysis.plot_rates(<span class="bu">dir</span>, <span class="bu">open</span><span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Plot rates of all possible reactions for each ‘decide_recipe’ step.</p>
-<section id="parameters-3" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-3">Parameters</h4>
+<section id="parameters-3" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-3">Parameters</h4>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -754,10 +792,16 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>dir</code></td>
+<td>dir</td>
 <td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
 <td>Directory of KIMMDY run</td>
 <td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>open</td>
+<td><a href="https://docs.python.org/3.10/library/functions.html#bool">bool</a></td>
+<td>open plots in default system viewer</td>
+<td><code>False</code></td>
 </tr>
 </tbody>
 </table>
@@ -765,10 +809,10 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="kimmdy.analysis.radical_migration" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.analysis.radical_migration">radical_migration</h3>
-<p><code>analysis.radical_migration(dirs, type='qualitative', cutoff=1)</code></p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>analysis.radical_migration(dirs, <span class="bu">type</span><span class="op">=</span><span class="st">'qualitative'</span>, cutoff<span class="op">=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Plot population of radicals for a KIMMDY run.</p>
-<section id="parameters-4" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-4">Parameters</h4>
+<section id="parameters-4" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-4">Parameters</h4>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -780,19 +824,19 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>dirs</code></td>
+<td>dirs</td>
 <td><a href="https://docs.python.org/3.10/library/stdtypes.html#list">list</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>]</td>
 <td>KIMMDY run directories to be analysed.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
-<td><code>type</code></td>
+<td>type</td>
 <td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
 <td>How to analyse radical migration. Available are ‘qualitative’,‘occurence’ and ‘min_rate’“,</td>
 <td><code>'qualitative'</code></td>
 </tr>
 <tr class="odd">
-<td><code>cutoff</code></td>
+<td>cutoff</td>
 <td><a href="https://docs.python.org/3.10/library/functions.html#int">int</a></td>
 <td>Ignore migration between two atoms if it happened less often than the specified value.</td>
 <td><code>1</code></td>
@@ -803,10 +847,17 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="kimmdy.analysis.radical_population" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.analysis.radical_population">radical_population</h3>
-<p><code>analysis.radical_population(dir, population_type='frequency', steps='all', select_atoms='protein', open_plot=False, open_vmd=False)</code></p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>analysis.radical_population(</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">dir</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    population_type<span class="op">=</span><span class="st">'frequency'</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    steps<span class="op">=</span><span class="st">'all'</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    select_atoms<span class="op">=</span><span class="st">'protein'</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    open_plot<span class="op">=</span><span class="va">False</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    open_vmd<span class="op">=</span><span class="va">False</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Plot population of radicals for a KIMMDY run.</p>
-<section id="parameters-5" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-5">Parameters</h4>
+<section id="parameters-5" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-5">Parameters</h4>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -818,37 +869,37 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>dir</code></td>
+<td>dir</td>
 <td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
 <td>KIMMDY run directory to be analysed.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
-<td><code>population_type</code></td>
+<td>population_type</td>
 <td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
 <td>How to calculate the fractional radical occupancy. Available are ‘frequency’ and ‘time’</td>
 <td><code>'frequency'</code></td>
 </tr>
 <tr class="odd">
-<td><code>steps</code></td>
+<td>steps</td>
 <td><a href="https://docs.python.org/3.10/library/typing.html#typing.Union">Union</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#list">list</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>], <a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>]</td>
 <td>List of steps e.g.&nbsp;[“equilibrium”, “production”]. Or a string “all” to return all subdirectories. Default is “all”.</td>
 <td><code>'all'</code></td>
 </tr>
 <tr class="even">
-<td><code>select_atoms</code></td>
+<td>select_atoms</td>
 <td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
 <td>Atoms chosen for radical population analysis, default is protein (uses MDAnalysis selection syntax)</td>
 <td><code>'protein'</code></td>
 </tr>
 <tr class="odd">
-<td><code>open_plot</code></td>
+<td>open_plot</td>
 <td><a href="https://docs.python.org/3.10/library/functions.html#bool">bool</a></td>
 <td>Open plot in default system viewer.</td>
 <td><code>False</code></td>
 </tr>
 <tr class="even">
-<td><code>open_vmd</code></td>
+<td>open_vmd</td>
 <td><a href="https://docs.python.org/3.10/library/functions.html#bool">bool</a></td>
 <td>Open a pdb in VMD with the radical occupation as B-factors.</td>
 <td><code>False</code></td>
@@ -859,10 +910,10 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="kimmdy.analysis.reaction_participation" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.analysis.reaction_participation">reaction_participation</h3>
-<p><code>analysis.reaction_participation(dir, open_plot=False)</code></p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>analysis.reaction_participation(<span class="bu">dir</span>, open_plot<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Plot which atoms participate in reactions.</p>
-<section id="parameters-6" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-6">Parameters</h4>
+<section id="parameters-6" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-6">Parameters</h4>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -874,13 +925,13 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>dir</code></td>
+<td>dir</td>
 <td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
 <td>Directory of KIMMDY run</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
-<td><code>open_plot</code></td>
+<td>open_plot</td>
 <td><a href="https://docs.python.org/3.10/library/functions.html#bool">bool</a></td>
 <td>Open plot in default system viewer.</td>
 <td><code>False</code></td>
@@ -891,10 +942,10 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="kimmdy.analysis.runtime_analysis" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.analysis.runtime_analysis">runtime_analysis</h3>
-<p><code>analysis.runtime_analysis(dir, open_plot=False)</code></p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>analysis.runtime_analysis(<span class="bu">dir</span>, open_plot<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Plot which atoms participate in reactions.</p>
-<section id="parameters-7" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-7">Parameters</h4>
+<section id="parameters-7" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-7">Parameters</h4>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -906,13 +957,13 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>dir</code></td>
+<td>dir</td>
 <td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
 <td>Directory of KIMMDY run</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
-<td><code>open_plot</code></td>
+<td>open_plot</td>
 <td><a href="https://docs.python.org/3.10/library/functions.html#bool">bool</a></td>
 <td>Open plot in default system viewer.</td>
 <td><code>False</code></td>

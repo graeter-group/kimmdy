@@ -29,7 +29,9 @@ Utilities for building plugins, shell convenience functions and GROMACS related 
 
 ### check_gmx_version { #kimmdy.utils.check_gmx_version }
 
-`utils.check_gmx_version(config)`
+```python
+utils.check_gmx_version(config)
+```
 
 Check for an existing gromacs installation.
 
@@ -40,79 +42,102 @@ If slow growth pairs are used, it checks for gromacs version >= 2023.2
 
 ### get_atominfo_from_atomnrs { #kimmdy.utils.get_atominfo_from_atomnrs }
 
-`utils.get_atominfo_from_atomnrs(atomnrs, top)`
+```python
+utils.get_atominfo_from_atomnrs(atomnrs, top)
+```
 
 Use topology atoms section to convert from atomnr to atomtype
 
 ### get_atomnrs_from_plumedid { #kimmdy.utils.get_atomnrs_from_plumedid }
 
-`utils.get_atomnrs_from_plumedid(plumedid, plumed)`
+```python
+utils.get_atomnrs_from_plumedid(plumedid, plumed)
+```
 
 Convert from plumedid to atomnr, information from the plumed file is used.
 
-#### Parameters
+#### Parameters {.doc-section .doc-section-parameters}
 
-| Name       | Type                                        | Description                                   | Default    |
-|------------|---------------------------------------------|-----------------------------------------------|------------|
-| `plumedid` | [str](`str`)                                | Identifier from a plumed input file (e.g d0). | _required_ |
-| `plumed`   | [Plumed_dict](`kimmdy.parsing.Plumed_dict`) | Parsed plumed input file                      | _required_ |
+| Name     | Type                                        | Description                                   | Default    |
+|----------|---------------------------------------------|-----------------------------------------------|------------|
+| plumedid | [str](`str`)                                | Identifier from a plumed input file (e.g d0). | _required_ |
+| plumed   | [Plumed_dict](`kimmdy.parsing.Plumed_dict`) | Parsed plumed input file                      | _required_ |
 
 ### get_bondprm_from_atomtypes { #kimmdy.utils.get_bondprm_from_atomtypes }
 
-`utils.get_bondprm_from_atomtypes(atomtypes, ffbonded)`
+```python
+utils.get_bondprm_from_atomtypes(atomtypes, ffbonded)
+```
 
 Returns bond parameters (b0, kb) for a set of two atomtypes.
 
-#### Parameters
+#### Parameters {.doc-section .doc-section-parameters}
 
-| Name        | Type                           | Description                                                 | Default    |
-|-------------|--------------------------------|-------------------------------------------------------------|------------|
-| `atomtypes` | [list](`list`)\[[str](`str`)\] | Two atomtypes as defined in the respective force field      | _required_ |
-| `ffbonded`  | [dict](`dict`)                 | Force field ffbonded.itp file parsed through the rtp parser | _required_ |
+| Name      | Type                           | Description                                                 | Default    |
+|-----------|--------------------------------|-------------------------------------------------------------|------------|
+| atomtypes | [list](`list`)\[[str](`str`)\] | Two atomtypes as defined in the respective force field      | _required_ |
+| ffbonded  | [dict](`dict`)                 | Force field ffbonded.itp file parsed through the rtp parser | _required_ |
 
 ### get_edissoc_from_atomnames { #kimmdy.utils.get_edissoc_from_atomnames }
 
-`utils.get_edissoc_from_atomnames(atomnames, edissoc, residue='_')`
+```python
+utils.get_edissoc_from_atomnames(atomnames, edissoc, residue='_')
+```
 
 Returns dissociation energy E_dissoc for a set of two atomnames.
 
-#### Parameters
+#### Parameters {.doc-section .doc-section-parameters}
 
-| Name        | Type                           | Description                                                                       | Default    |
-|-------------|--------------------------------|-----------------------------------------------------------------------------------|------------|
-| `atomnames` | [list](`list`)\[[str](`str`)\] | Two atomnames as defined in the respective force field                            | _required_ |
-| `edissoc`   | [dict](`dict`)                 | Parsed file with dissociation energies per bond between two atomtypes or elements | _required_ |
-| `residue`   | [str](`str`)                   | Residue for which the atomnames are defined                                       | `'_'`      |
+| Name      | Type                           | Description                                                                       | Default    |
+|-----------|--------------------------------|-----------------------------------------------------------------------------------|------------|
+| atomnames | [list](`list`)\[[str](`str`)\] | Two atomnames as defined in the respective force field                            | _required_ |
+| edissoc   | [dict](`dict`)                 | Parsed file with dissociation energies per bond between two atomtypes or elements | _required_ |
+| residue   | [str](`str`)                   | Residue for which the atomnames are defined                                       | `'_'`      |
 
 ### get_gmx_dir { #kimmdy.utils.get_gmx_dir }
 
-`utils.get_gmx_dir(gromacs_alias='gmx')`
+```python
+utils.get_gmx_dir(gromacs_alias='gmx')
+```
 
 Returns the path to the gromacs installation
 
 ### get_shell_stdout { #kimmdy.utils.get_shell_stdout }
 
-`utils.get_shell_stdout(s)`
+```python
+utils.get_shell_stdout(s)
+```
 
 Run command in shell and capture stdout.
 
 ### get_task_directories { #kimmdy.utils.get_task_directories }
 
-`utils.get_task_directories(dir, tasks='all')`
+```python
+utils.get_task_directories(dir, tasks='all')
+```
 
 create list of subdirectories that match the tasks.
 If tasks is "all", all subdirectories are returned.
 
-#### Parameters
+#### Parameters {.doc-section .doc-section-parameters}
 
-| Name    | Type                                                                    | Description                                                                                      | Default    |
-|---------|-------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|------------|
-| `dir`   | [Path](`pathlib.Path`)                                                  | Directory to search for subdirectories                                                           | _required_ |
-| `tasks` | [Union](`typing.Union`)\[[list](`list`)\[[str](`str`)\], [str](`str`)\] | List of steps e.g. ["equilibrium", "production"]. Or a string "all" to return all subdirectories | `'all'`    |
+| Name   | Type                                                                    | Description                                                                                      | Default    |
+|--------|-------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|------------|
+| dir    | [Path](`pathlib.Path`)                                                  | Directory to search for subdirectories                                                           | _required_ |
+| tasks  | [Union](`typing.Union`)\[[list](`list`)\[[str](`str`)\], [str](`str`)\] | List of steps e.g. ["equilibrium", "production"]. Or a string "all" to return all subdirectories | `'all'`    |
 
 ### morse_transition_rate { #kimmdy.utils.morse_transition_rate }
 
-`utils.morse_transition_rate(r_curr, r_0, dissociation_energy, k_f, frequency_factor=0.288, temperature=300)`
+```python
+utils.morse_transition_rate(
+    r_curr
+    r_0
+    dissociation_energy
+    k_f
+    frequency_factor=0.288
+    temperature=300
+)
+```
 
 Calculates reaction rate constant for a bond breaking event.
 
@@ -123,20 +148,22 @@ For intramolecular reactions, the reaction rate constant is equal to the reactio
 
 The calculation should be according to the derivation in the original KIMMDY paper: DOI: 10.1021/acs.jctc.9b00786
 
-#### Parameters
+#### Parameters {.doc-section .doc-section-parameters}
 
-| Name               | Type                               | Description                                                                                                                                                               | Default    |
-|--------------------|------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
-| `r_curr`           | [list](`list`)\[[float](`float`)\] | Bond distances for a single bond, typically from a time series.                                                                                                           | _required_ |
-| `r_0`              | [float](`float`)                   | Equilibrium bond length of the bond.                                                                                                                                      | _required_ |
-| `dissociation`     |                                    | Dissociation energy of the bond.                                                                                                                                          | _required_ |
-| `k_f`              | [float](`float`)                   | Spring constant of the bond.                                                                                                                                              | _required_ |
-| `frequency_factor` | [float](`float`)                   | Prefactor of the Arrhenius equation in [1/ps]. Default value from fitting averaged C_a - N data to gromacs data, see original KIMMDY paper Alternatively 1/2pi sqrt(k/m). | `0.288`    |
-| `temperature`      | [float](`float`)                   | Temperature for the Arrhenius equation in GROMACS units.                                                                                                                  | `300`      |
+| Name             | Type                               | Description                                                                                                                                                               | Default    |
+|------------------|------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| r_curr           | [list](`list`)\[[float](`float`)\] | Bond distances for a single bond, typically from a time series.                                                                                                           | _required_ |
+| r_0              | [float](`float`)                   | Equilibrium bond length of the bond.                                                                                                                                      | _required_ |
+| dissociation     |                                    | Dissociation energy of the bond.                                                                                                                                          | _required_ |
+| k_f              | [float](`float`)                   | Spring constant of the bond.                                                                                                                                              | _required_ |
+| frequency_factor | [float](`float`)                   | Prefactor of the Arrhenius equation in [1/ps]. Default value from fitting averaged C_a - N data to gromacs data, see original KIMMDY paper Alternatively 1/2pi sqrt(k/m). | `0.288`    |
+| temperature      | [float](`float`)                   | Temperature for the Arrhenius equation in GROMACS units.                                                                                                                  | `300`      |
 
 ### run_gmx { #kimmdy.utils.run_gmx }
 
-`utils.run_gmx(s, cwd=None)`
+```python
+utils.run_gmx(s, cwd=None)
+```
 
 Run GROMACS command in shell.
 
@@ -144,13 +171,17 @@ Adds a '-quiet' flag to the command and checks the return code.
 
 ### run_shell_cmd { #kimmdy.utils.run_shell_cmd }
 
-`utils.run_shell_cmd(s, cwd=None)`
+```python
+utils.run_shell_cmd(s, cwd=None)
+```
 
 Run command in shell.
 
 ### truncate_sim_files { #kimmdy.utils.truncate_sim_files }
 
-`utils.truncate_sim_files(files, time, keep_tail=True)`
+```python
+utils.truncate_sim_files(files, time, keep_tail=True)
+```
 
 Truncates latest trr, xtc, edr, and gro to the time to a previous
 point in time.
@@ -158,9 +189,9 @@ point in time.
 The files stay in place, the truncated tail is by default kept and renamed
 to '[...xtc].tail'
 
-#### Parameters
+#### Parameters {.doc-section .doc-section-parameters}
 
-| Name    | Type                                              | Description                                          | Default    |
-|---------|---------------------------------------------------|------------------------------------------------------|------------|
-| `time`  | [Optional](`typing.Optional`)\[[float](`float`)\] | Time in ps up to which the data should be truncated. | _required_ |
-| `files` | [TaskFiles](`kimmdy.tasks.TaskFiles`)             | TaskFiles to get the latest files.                   | _required_ |
+| Name   | Type                                              | Description                                          | Default    |
+|--------|---------------------------------------------------|------------------------------------------------------|------------|
+| time   | [Optional](`typing.Optional`)\[[float](`float`)\] | Time in ps up to which the data should be truncated. | _required_ |
+| files  | [TaskFiles](`kimmdy.tasks.TaskFiles`)             | TaskFiles to get the latest files.                   | _required_ |

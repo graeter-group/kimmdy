@@ -91,6 +91,7 @@ kimmdy.kmc.KMCAccept py:class 1 _reference/kmc.html#kimmdy.kmc.KMCAccept -
 kimmdy.kmc.extrande py:function 1 _reference/kmc.html#kimmdy.kmc.extrande -
 kimmdy.kmc.extrande_mod py:function 1 _reference/kmc.html#kimmdy.kmc.extrande_mod -
 kimmdy.kmc.frm py:function 1 _reference/kmc.html#kimmdy.kmc.frm -
+kimmdy.kmc.multi_rfkmc py:function 1 _reference/kmc.html#kimmdy.kmc.multi_rfkmc -
 kimmdy.kmc.rf_kmc py:function 1 _reference/kmc.html#kimmdy.kmc.rf_kmc -
 kimmdy.kmc py:module 1 _reference/kmc.html#kimmdy.kmc -
 kimmdy.parsing.JSONEncoder py:class 1 _reference/parsing.html#kimmdy.parsing.JSONEncoder -

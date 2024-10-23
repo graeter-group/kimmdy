@@ -20,6 +20,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -526,7 +560,7 @@ ul.task-list li input[type="checkbox"] {
 </table>
 <section id="kimmdy.plugins.BasicParameterizer" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.plugins.BasicParameterizer">BasicParameterizer</h3>
-<p><code>plugins.BasicParameterizer(self, **kwargs)</code></p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>plugins.BasicParameterizer(<span class="va">self</span>, <span class="op">**</span>kwargs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>reconstruct base force field state</p>
 <section id="methods" class="level4">
 <h4 class="anchored" data-anchor-id="methods">Methods</h4>
@@ -546,17 +580,20 @@ ul.task-list li input[type="checkbox"] {
 </table>
 <section id="kimmdy.plugins.BasicParameterizer.parameterize_topology" class="level5">
 <h5 class="anchored" data-anchor-id="kimmdy.plugins.BasicParameterizer.parameterize_topology">parameterize_topology</h5>
-<p><code>plugins.BasicParameterizer.parameterize_topology(current_topology, focus_nrs=None)</code></p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>plugins.BasicParameterizer.parameterize_topology(</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    current_topology</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    focus_nrs<span class="op">=</span><span class="va">None</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Do nothing, all necessary actions should already have happened in bind_bond and break_bond of Topology</p>
 </section>
 </section>
 </section>
 <section id="kimmdy.plugins.ReactionPlugin" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.plugins.ReactionPlugin">ReactionPlugin</h3>
-<p><code>plugins.ReactionPlugin(self, name, runmng)</code></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>plugins.ReactionPlugin(<span class="va">self</span>, name, runmng)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Reaction base class</p>
-<section id="parameters" class="level4">
-<h4 class="anchored" data-anchor-id="parameters">Parameters</h4>
+<section id="parameters" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h4>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -568,19 +605,19 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>name</code></td>
+<td>name</td>
 <td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
 <td>Name of the reaction.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
-<td><code>runmng</code></td>
+<td>runmng</td>
 <td><a href="../_reference/runmanager.html#kimmdy.runmanager.RunManager">RunManager</a></td>
 <td>RunManager instance.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="odd">
-<td><code>config</code></td>
+<td>config</td>
 <td></td>
 <td>Subconfig of the reaction (i.e.&nbsp;<code>self.runmng.config.reactions.__getattribute__(self.name)</code>. Use this to access and pass settings to the reaction.</td>
 <td><em>required</em></td>
@@ -606,11 +643,11 @@ ul.task-list li input[type="checkbox"] {
 </table>
 <section id="kimmdy.plugins.ReactionPlugin.get_recipe_collection" class="level5">
 <h5 class="anchored" data-anchor-id="kimmdy.plugins.ReactionPlugin.get_recipe_collection">get_recipe_collection</h5>
-<p><code>plugins.ReactionPlugin.get_recipe_collection(files)</code></p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>plugins.ReactionPlugin.get_recipe_collection(files)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Get a RecipeCollection as a result of the reaction.</p>
 <p>This is run as a <a href="../_reference/tasks.html#kimmdy.tasks.Task"><code>Task</code></a> in the RunManager. How the RecipeCollection is built is up to the reaction. It has access to the current state of the system via the runmanager <code>self.runmng</code> and the files.</p>
-<section id="parameters-1" class="level6">
-<h6 class="anchored" data-anchor-id="parameters-1">Parameters</h6>
+<section id="parameters-1" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-1">Parameters</h6>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -622,7 +659,7 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>files</code></td>
+<td>files</td>
 <td><a href="../_reference/tasks.html#kimmdy.tasks.TaskFiles">TaskFiles</a></td>
 <td>TaskFiles instance</td>
 <td><em>required</em></td>
