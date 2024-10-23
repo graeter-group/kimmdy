@@ -20,6 +20,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -523,11 +557,11 @@ ul.task-list li input[type="checkbox"] {
 </table>
 <section id="kimmdy.schema.Sequence" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.schema.Sequence">Sequence</h3>
-<p><code>schema.Sequence(self, tasks)</code></p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>schema.Sequence(<span class="va">self</span>, tasks)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>A sequence of tasks.</p>
 <p>Tasks can be grouped together by using a dictionary with the following keys: - mult: number of times to repeat the tasks - tasks: list of tasks to repeat</p>
-<section id="attributes" class="level4">
-<h4 class="anchored" data-anchor-id="attributes">Attributes</h4>
+<section id="attributes" class="level4 doc-section doc-section-attributes">
+<h4 class="doc-section doc-section-attributes anchored" data-anchor-id="attributes">Attributes</h4>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -589,10 +623,10 @@ ul.task-list li input[type="checkbox"] {
 </table>
 <section id="kimmdy.schema.convert_schema_to_dict" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.schema.convert_schema_to_dict">convert_schema_to_dict</h3>
-<p><code>schema.convert_schema_to_dict(dictionary)</code></p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>schema.convert_schema_to_dict(dictionary)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Convert a dictionary from a raw json schema to a nested dictionary</p>
-<section id="parameters" class="level4">
-<h4 class="anchored" data-anchor-id="parameters">Parameters</h4>
+<section id="parameters" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h4>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -604,7 +638,7 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>dictionary</code></td>
+<td>dictionary</td>
 <td><a href="https://docs.python.org/3.10/library/stdtypes.html#dict">dict</a></td>
 <td>dictionary from a raw json schema</td>
 <td><em>required</em></td>
@@ -612,21 +646,24 @@ ul.task-list li input[type="checkbox"] {
 </tbody>
 </table>
 </section>
-<section id="returns" class="level4">
-<h4 class="anchored" data-anchor-id="returns">Returns</h4>
+<section id="returns" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h4>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 59%">
-<col style="width: 40%">
+<col style="width: 6%">
+<col style="width: 55%">
+<col style="width: 37%">
 </colgroup>
 <thead>
 <tr class="header">
+<th>Name</th>
 <th>Type</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
+<td></td>
 <td>nested dictionary where each leaf entry is a dictionary with the</td>
 <td>“pytype”, “default” and “description” keys.</td>
 </tr>
@@ -636,34 +673,34 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="kimmdy.schema.flatten_scheme" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.schema.flatten_scheme">flatten_scheme</h3>
-<p><code>schema.flatten_scheme(scheme, section='')</code></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>schema.flatten_scheme(scheme, section<span class="op">=</span><span class="st">''</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Recursively get properties and their desicripions from the scheme</p>
 </section>
 <section id="kimmdy.schema.generate_markdown_table" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.schema.generate_markdown_table">generate_markdown_table</h3>
-<p><code>schema.generate_markdown_table(scheme, append=False)</code></p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>schema.generate_markdown_table(scheme, append<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Generate markdown table from scheme</p>
 <p>Used in documentation generation.</p>
 </section>
 <section id="kimmdy.schema.get_combined_scheme" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.schema.get_combined_scheme">get_combined_scheme</h3>
-<p><code>schema.get_combined_scheme()</code></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>schema.get_combined_scheme()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Return the schema for the config file.</p>
 <p>Nested scheme where each leaf entry is a dictionary with the “pytype”, “default” and “description”. Contains the schema for the main kimmdy config file and all the plugins known at runtime.</p>
 </section>
 <section id="kimmdy.schema.load_kimmdy_schema" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.schema.load_kimmdy_schema">load_kimmdy_schema</h3>
-<p><code>schema.load_kimmdy_schema()</code></p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>schema.load_kimmdy_schema()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Return the schema for the config file</p>
 </section>
 <section id="kimmdy.schema.load_plugin_schemas" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.schema.load_plugin_schemas">load_plugin_schemas</h3>
-<p><code>schema.load_plugin_schemas()</code></p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>schema.load_plugin_schemas()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Return the schemas for the reaction plugins known to kimmdy</p>
 </section>
 <section id="kimmdy.schema.prune" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.schema.prune">prune</h3>
-<p><code>schema.prune(d)</code></p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>schema.prune(d)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Remove empty dicts from a nested dict</p>
 
 

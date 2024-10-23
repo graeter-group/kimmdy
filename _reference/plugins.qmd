@@ -15,7 +15,9 @@ Also discovers and loads KIMMDY plugins.
 
 ### BasicParameterizer { #kimmdy.plugins.BasicParameterizer }
 
-`plugins.BasicParameterizer(self, **kwargs)`
+```python
+plugins.BasicParameterizer(self, **kwargs)
+```
 
 reconstruct base force field state
 
@@ -27,24 +29,31 @@ reconstruct base force field state
 
 ##### parameterize_topology { #kimmdy.plugins.BasicParameterizer.parameterize_topology }
 
-`plugins.BasicParameterizer.parameterize_topology(current_topology, focus_nrs=None)`
+```python
+plugins.BasicParameterizer.parameterize_topology(
+    current_topology
+    focus_nrs=None
+)
+```
 
 Do nothing,
 all necessary actions should already have happened in bind_bond and break_bond of Topology
 
 ### ReactionPlugin { #kimmdy.plugins.ReactionPlugin }
 
-`plugins.ReactionPlugin(self, name, runmng)`
+```python
+plugins.ReactionPlugin(self, name, runmng)
+```
 
 Reaction base class
 
-#### Parameters
+#### Parameters {.doc-section .doc-section-parameters}
 
-| Name     | Type                                         | Description                                                                                                                                       | Default    |
-|----------|----------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|------------|
-| `name`   | [str](`str`)                                 | Name of the reaction.                                                                                                                             | _required_ |
-| `runmng` | [RunManager](`kimmdy.runmanager.RunManager`) | RunManager instance.                                                                                                                              | _required_ |
-| `config` |                                              | Subconfig of the reaction (i.e. `self.runmng.config.reactions.__getattribute__(self.name)`. Use this to access and pass settings to the reaction. | _required_ |
+| Name   | Type                                         | Description                                                                                                                                       | Default    |
+|--------|----------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| name   | [str](`str`)                                 | Name of the reaction.                                                                                                                             | _required_ |
+| runmng | [RunManager](`kimmdy.runmanager.RunManager`) | RunManager instance.                                                                                                                              | _required_ |
+| config |                                              | Subconfig of the reaction (i.e. `self.runmng.config.reactions.__getattribute__(self.name)`. Use this to access and pass settings to the reaction. | _required_ |
 
 #### Methods
 
@@ -54,7 +63,9 @@ Reaction base class
 
 ##### get_recipe_collection { #kimmdy.plugins.ReactionPlugin.get_recipe_collection }
 
-`plugins.ReactionPlugin.get_recipe_collection(files)`
+```python
+plugins.ReactionPlugin.get_recipe_collection(files)
+```
 
 Get a RecipeCollection as a result of the reaction.
 
@@ -63,8 +74,8 @@ How the RecipeCollection is built is up to the reaction.
 It has access to the current state of the system via the
 runmanager `self.runmng` and the files.
 
-###### Parameters
+###### Parameters {.doc-section .doc-section-parameters}
 
-| Name    | Type                                  | Description        | Default    |
-|---------|---------------------------------------|--------------------|------------|
-| `files` | [TaskFiles](`kimmdy.tasks.TaskFiles`) | TaskFiles instance | _required_ |
+| Name   | Type                                  | Description        | Default    |
+|--------|---------------------------------------|--------------------|------------|
+| files  | [TaskFiles](`kimmdy.tasks.TaskFiles`) | TaskFiles instance | _required_ |

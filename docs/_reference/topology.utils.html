@@ -20,6 +20,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -569,43 +603,43 @@ ul.task-list li input[type="checkbox"] {
 </table>
 <section id="kimmdy.topology.utils.get_is_reactive_predicate_f" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.utils.get_is_reactive_predicate_f">get_is_reactive_predicate_f</h3>
-<p><code>topology.utils.get_is_reactive_predicate_f(include, exclude)</code></p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>topology.utils.get_is_reactive_predicate_f(include, exclude)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Returns whether a moleculetype name is configured to be recognized as reactive.</p>
 </section>
 <section id="kimmdy.topology.utils.get_is_reactive_predicate_from_config_f" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.utils.get_is_reactive_predicate_from_config_f">get_is_reactive_predicate_from_config_f</h3>
-<p><code>topology.utils.get_is_reactive_predicate_from_config_f(cfg)</code></p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>topology.utils.get_is_reactive_predicate_from_config_f(cfg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Returns whether a moleculetype name is configured to be recognized as reactive.</p>
 </section>
 <section id="kimmdy.topology.utils.get_moleculetype_atomics" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.utils.get_moleculetype_atomics">get_moleculetype_atomics</h3>
-<p><code>topology.utils.get_moleculetype_atomics(top, moleculetype)</code></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>topology.utils.get_moleculetype_atomics(top, moleculetype)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Get content of subsections (atoms/bonds/angles etc.) of a moleculetype from a topology dict.</p>
 <p>Resolves any <code>#ifdef</code> statements by check in the top[‘define’] dict and chooses the ‘content’ or ‘else_content’ depending on the result.</p>
 </section>
 <section id="kimmdy.topology.utils.get_moleculetype_header" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.utils.get_moleculetype_header">get_moleculetype_header</h3>
-<p><code>topology.utils.get_moleculetype_header(top, moleculetype)</code></p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>topology.utils.get_moleculetype_header(top, moleculetype)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Get content of the header of a moleculetype from a topology dict.</p>
 <p>Resolves any <code>#ifdef</code> statements by check in the top[‘define’] dict and chooses the ‘content’ or ‘else_content’ depending on the result.</p>
 </section>
 <section id="kimmdy.topology.utils.get_protein_section" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.utils.get_protein_section">get_protein_section</h3>
-<p><code>topology.utils.get_protein_section(top, name)</code></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>topology.utils.get_protein_section(top, name)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Get content of a section in the first moleculetype (protein) from a topology dict.</p>
 </section>
 <section id="kimmdy.topology.utils.get_reactive_section" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.utils.get_reactive_section">get_reactive_section</h3>
-<p><code>topology.utils.get_reactive_section(top, name)</code></p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>topology.utils.get_reactive_section(top, name)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Get content of a section in the Reactive moleculetype from a topology dict.</p>
 </section>
 <section id="kimmdy.topology.utils.get_residue_by_bonding" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.utils.get_residue_by_bonding">get_residue_by_bonding</h3>
-<p><code>topology.utils.get_residue_by_bonding(atom, atoms)</code></p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>topology.utils.get_residue_by_bonding(atom, atoms)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Get the residue of an atom by its bonding.</p>
 <p>Avoids traversing the whole topology.</p>
-<section id="parameters" class="level4">
-<h4 class="anchored" data-anchor-id="parameters">Parameters</h4>
+<section id="parameters" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h4>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -617,13 +651,13 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>atom</code></td>
+<td>atom</td>
 <td><a href="../_reference/topology.atomic.html#kimmdy.topology.atomic.Atom">Atom</a></td>
 <td>Atom of the residue</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
-<td><code>atoms</code></td>
+<td>atoms</td>
 <td><a href="https://docs.python.org/3.10/library/stdtypes.html#dict">dict</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>, <a href="../_reference/topology.atomic.html#kimmdy.topology.atomic.Atom">Atom</a>]</td>
 <td>All atoms of a topology</td>
 <td><em>required</em></td>
@@ -631,17 +665,19 @@ ul.task-list li input[type="checkbox"] {
 </tbody>
 </table>
 </section>
-<section id="returns" class="level4">
-<h4 class="anchored" data-anchor-id="returns">Returns</h4>
+<section id="returns" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h4>
 <table class="caption-top table">
 <thead>
 <tr class="header">
+<th>Name</th>
 <th>Type</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
+<td></td>
 <td>Atoms of the residue</td>
 <td></td>
 </tr>
@@ -651,10 +687,16 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="kimmdy.topology.utils.get_residue_fragments" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.utils.get_residue_fragments">get_residue_fragments</h3>
-<p><code>topology.utils.get_residue_fragments(top, residue, start1, start2, iterations=20)</code></p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>topology.utils.get_residue_fragments(</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    top</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    residue</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    start1</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    start2</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    iterations<span class="op">=</span><span class="dv">20</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Splits a residue into fragments after a bond has been broken.</p>
-<section id="parameters-1" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-1">Parameters</h4>
+<section id="parameters-1" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-1">Parameters</h4>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -666,31 +708,31 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>top</code></td>
+<td>top</td>
 <td><a href="../_reference/topology.topology.html#kimmdy.topology.topology.Topology">Topology</a></td>
 <td>Topology</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
-<td><code>residue</code></td>
+<td>residue</td>
 <td><a href="https://docs.python.org/3.10/library/stdtypes.html#list">list</a>[<a href="../_reference/topology.atomic.html#kimmdy.topology.atomic.Atom">Atom</a>]</td>
 <td>All atoms of current residue. Ok, when it contains more atoms as long as those are not connected to broken bond.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="odd">
-<td><code>start1</code></td>
+<td>start1</td>
 <td><a href="../_reference/topology.atomic.html#kimmdy.topology.atomic.Atom">Atom</a></td>
 <td>First atom with broken bond</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
-<td><code>start2</code></td>
+<td>start2</td>
 <td><a href="../_reference/topology.atomic.html#kimmdy.topology.atomic.Atom">Atom</a></td>
 <td>Second atom with broken bond</td>
 <td><em>required</em></td>
 </tr>
 <tr class="odd">
-<td><code>iterations</code></td>
+<td>iterations</td>
 <td><a href="https://docs.python.org/3.10/library/functions.html#int">int</a></td>
 <td>Max number of bonds from start atoms to be included when building fragmets, by default 20</td>
 <td><code>20</code></td>
@@ -698,21 +740,24 @@ ul.task-list li input[type="checkbox"] {
 </tbody>
 </table>
 </section>
-<section id="returns-1" class="level4">
-<h4 class="anchored" data-anchor-id="returns-1">Returns</h4>
+<section id="returns-1" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-1">Returns</h4>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 63%">
-<col style="width: 36%">
+<col style="width: 8%">
+<col style="width: 57%">
+<col style="width: 34%">
 </colgroup>
 <thead>
 <tr class="header">
+<th>Name</th>
 <th>Type</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
+<td></td>
 <td>Two fragments, or one fragment and empty set in case the</td>
 <td>residue did not change its size.</td>
 </tr>
@@ -722,23 +767,23 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="kimmdy.topology.utils.get_top_section" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.utils.get_top_section">get_top_section</h3>
-<p><code>topology.utils.get_top_section(top, name, moleculetype=None)</code></p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>topology.utils.get_top_section(top, name, moleculetype<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Get content of a section from a topology dict.</p>
 <p>Resolves any <code>#ifdef</code> statements by check in the top[‘define’] dict and chooses the ‘content’ or ‘else_content’ depending on the result.</p>
 </section>
 <section id="kimmdy.topology.utils.is_not_solvent_or_ion" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.utils.is_not_solvent_or_ion">is_not_solvent_or_ion</h3>
-<p><code>topology.utils.is_not_solvent_or_ion(name)</code></p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>topology.utils.is_not_solvent_or_ion(name)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Returns whether a moleculetype name is not solvent or ion.</p>
 </section>
 <section id="kimmdy.topology.utils.set_reactive_section" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.utils.set_reactive_section">set_reactive_section</h3>
-<p><code>topology.utils.set_reactive_section(top, name, value)</code></p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>topology.utils.set_reactive_section(top, name, value)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Set content of a section in the first moleculetype (protein) from a topology dict.</p>
 </section>
 <section id="kimmdy.topology.utils.set_top_section" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.utils.set_top_section">set_top_section</h3>
-<p><code>topology.utils.set_top_section(top, name, value, moleculetype=None)</code></p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>topology.utils.set_top_section(top, name, value, moleculetype<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Set content of a section from a topology dict.</p>
 <p>Resolves any <code>#ifdef</code> statements by check in the top[‘define’] dict and chooses the ‘content’ or ‘else_content’ depending on the result.</p>
 
