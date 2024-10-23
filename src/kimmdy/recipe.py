@@ -867,6 +867,7 @@ class RecipeCollection:
         """
 
         import matplotlib.pyplot as plt
+        from matplotlib.axes import Axes
         import numpy as np
         import seaborn as sns
 
@@ -907,9 +908,10 @@ class RecipeCollection:
                         kwargs["label"] = name
                         name_to_args[name] = kwargs
 
-        plt.figure()
+        ax: Axes
+        fig, ax = plt.subplots()
         if highlight_t is not None:
-            plt.axvline(highlight_t, color="red")
+            ax.axvline(highlight_t, color="red")
         for r_i, re in enumerate(recipes):
             name = re.get_recipe_name()
             if highlight_r is not None and name == highlight_r.get_recipe_name():
@@ -920,19 +922,20 @@ class RecipeCollection:
                 marker = ""
                 if dt[0] == dt[1]:
                     marker = "."
-                plt.plot(
+                ax.plot(
                     np.array(dt),
                     (r, r),
                     marker=marker,
                     **name_to_args[name],
                 )
-        plt.xlabel("time [ps]")
-        plt.ylabel("reaction rate")
-        plt.yscale("log")
+        ax.set_xlabel("time [ps]")
+        ax.set_ylabel("reaction rate")
+        ax.set_yscale("log")
         # removing duplicates in legend
-        handles, labels = plt.gca().get_legend_handles_labels()
+        handles, labels = ax.get_legend_handles_labels()
         by_label = dict(zip(labels, handles))
         by_label.pop("REMOVE", None)
-        plt.legend(by_label.values(), by_label.keys())
+        fig.legend(by_label.values(), by_label.keys())
 
-        plt.savefig(outfile)
+        fig.savefig(outfile)
+        fig.clear()
