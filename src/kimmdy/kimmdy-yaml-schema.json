@@ -440,13 +440,6 @@
         }
       }
     },
-    "plot_rates": {
-      "title": "plot_rates",
-      "description": "Plot the reaction rates during the reactions step",
-      "type": "boolean",
-      "pytype": "bool",
-      "default": true
-    },
     "save_recipes": {
       "title": "save_recipes",
       "description": "Save recipes as csv during the reactions step",

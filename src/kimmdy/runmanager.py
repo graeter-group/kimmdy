@@ -806,18 +806,6 @@ class RunManager:
                 files.outputdir / "recipes.csv", recipe
             )
 
-        try:
-            if self.config.plot_rates:
-                kwargs = {
-                    "outfile": files.outputdir / "reaction_rates.svg",
-                    "highlight_r": recipe,
-                }
-                if self.kmcresult.time_start != 0:
-                    kwargs["highlight_t"] = self.kmcresult.time_start
-                flatten_recipe_collections(self.recipe_collections).plot(**kwargs)
-        except Exception as e:
-            logger.warning(f"Error occured during plotting:\n{e}")
-
         self.time += self.kmcresult.time_delta
         logger.info("Done with Decide recipe.")
         if len(recipe.rates) == 0:
