@@ -11,6 +11,7 @@ project:
 
 
 website:
+  favicon: ./www/favicon.png
   page-navigation: true
   site-url: http://graeter-group.github.io/kimmdy
   repo-url: https://github.com/graeter-group/kimmdy
@@ -38,6 +39,7 @@ website:
       - file: _reference/index.qmd
         text: Reference
   sidebar:
+    logo: ./www/kimmdy_logo.png
     subtitle: "Reactive MD pipeline for GROMACS using Kinetic Monte Carlo / Molecular Dynamic"
     style: "floating"
     collapse-level: 1
