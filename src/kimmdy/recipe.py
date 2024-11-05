@@ -681,7 +681,7 @@ class RecipeCollection:
 
     recipes: list[Recipe]
 
-    def aggregate_reactions(self):
+    def aggregate_reactions(self) -> list[int]:
         """Combines reactions having the same sequence of RecipeSteps.
 
         Returns
@@ -736,7 +736,7 @@ class RecipeCollection:
             writer.writerows(rows)
 
     @classmethod
-    def from_csv(cls, path: Path):
+    def from_csv(cls, path: Path) -> tuple[RecipeCollection, Recipe | None]:
         """Create a RecipeCollection object from a CSV file
         Returns the recipe collection and a single recipe that was picked, otherwise None
         """

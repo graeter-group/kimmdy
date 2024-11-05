@@ -67,6 +67,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <meta name="quarto:offset" content="../../">
 <link href="../../guide/tutorials/write-plugin.html" rel="next">
 <link href="../../guide/tutorials/getting-started.html" rel="prev">
+<link href="../.././www/favicon.png" rel="icon" type="image/png">
 <script src="../../site_libs/quarto-html/quarto.js"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -191,6 +192,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+      <a href="../../index.html" class="sidebar-logo-link">
+      <img src="../.././www/kimmdy_logo.png" alt="" class="sidebar-logo py-0 d-lg-inline d-none">
+      </a>
+      </div>
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
@@ -617,7 +623,7 @@ GROMACS mdp file (minim.mdp)
 <h3 class="anchored" data-anchor-id="minimized-structure-of-native-peptide">Minimized structure of native peptide</h3>
     <div id="app-./modify-topology-files/minim.pdb" class="molstar-app"></div>
     <script type="text/javascript">
-    molstar.Viewer.create("app-./modify-topology-files/minim.pdb", {"layoutShowRemoteState":false,"layoutShowLog":false,"layoutShowSequence":false,"layoutShowLeftPanel":true,"layoutIsExpanded":false,"pdbProvider":"rcsb","emdbProvider":"rcsb","layoutShowControls":false,"viewportShowAnimation":true,"viewportShowSelectionMode":false,"viewportShowExpand":true}).then(viewer => {
+    molstar.Viewer.create("app-./modify-topology-files/minim.pdb", {"emdbProvider":"rcsb","layoutShowSequence":false,"viewportShowSelectionMode":false,"viewportShowAnimation":true,"layoutShowLog":false,"layoutShowLeftPanel":true,"viewportShowExpand":true,"layoutShowControls":false,"layoutShowRemoteState":false,"layoutIsExpanded":false,"pdbProvider":"rcsb"}).then(viewer => {
     viewer.loadStructureFromUrl("./modify-topology-files/minim.pdb", format="pdb");    });
     </script>
     
@@ -626,7 +632,7 @@ GROMACS mdp file (minim.mdp)
 <h3 class="anchored" data-anchor-id="minimized-structure-with-deleted-hydrogen">Minimized structure with deleted hydrogen</h3>
     <div id="app-./modify-topology-files/minim_delH.pdb" class="molstar-app"></div>
     <script type="text/javascript">
-    molstar.Viewer.create("app-./modify-topology-files/minim_delH.pdb", {"layoutShowRemoteState":false,"layoutShowLog":false,"layoutShowSequence":false,"layoutShowLeftPanel":true,"layoutIsExpanded":false,"pdbProvider":"rcsb","emdbProvider":"rcsb","layoutShowControls":false,"viewportShowAnimation":true,"viewportShowSelectionMode":false,"viewportShowExpand":true}).then(viewer => {
+    molstar.Viewer.create("app-./modify-topology-files/minim_delH.pdb", {"emdbProvider":"rcsb","layoutShowSequence":false,"viewportShowSelectionMode":false,"viewportShowAnimation":true,"layoutShowLog":false,"layoutShowLeftPanel":true,"viewportShowExpand":true,"layoutShowControls":false,"layoutShowRemoteState":false,"layoutIsExpanded":false,"pdbProvider":"rcsb"}).then(viewer => {
     viewer.loadStructureFromUrl("./modify-topology-files/minim_delH.pdb", format="pdb");    });
     </script>
     
