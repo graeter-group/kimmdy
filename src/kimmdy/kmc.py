@@ -121,15 +121,17 @@ def rf_kmc(
 
     # 4. Find the even to carry out, mu, using binary search (np.searchsorted)
     pos = np.searchsorted(probability_cumulative, u[0] * probability_sum)
-    recipe = recipe_collection.recipes[pos]
+    recipe: Recipe = recipe_collection.recipes[pos]
     time_index = np.argmax(recipe.rates)
     reaction_time = recipe.timespans[time_index][1]
-    logger.info(f"Chosen Recipe: {recipe} at time {reaction_time}")
+    logger.info(
+        f"Chosen Recipe with steps: {recipe.recipe_steps} at time {reaction_time} and {len(recipe.rates)} time-depdendent rates"
+    )
 
-    # 5. Calculate the time step associated with mu
+    # 5. Calculate the time step associated with uu
     time_delta = np.log(1 / u[1]) / probability_sum
     logger.info(
-        f"Time delta: {time_delta}\nwith cumulative probability {probability_sum}"
+        f"Time delta: {time_delta} ps with cumulative probability: {probability_sum}"
     )
 
     return KMCAccept(

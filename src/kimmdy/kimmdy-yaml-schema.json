@@ -54,6 +54,13 @@
       "pytype": "bool",
       "default": false
     },
+    "skip_truncation": {
+      "title": "skip_truncation",
+      "description": "Don't truncate trajectories to the time at which a reaction occurs. This is useful when only the reaction rates are interesting and it is not required to continue the simulation after a reaction.",
+      "type": "boolean",
+      "pytype": "bool",
+      "default": false
+    },
     "parameterize_at_setup": {
       "title": "parameterize_at_setup",
       "description": "parameterize the topology during the setup task",

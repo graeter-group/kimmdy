@@ -807,12 +807,11 @@ class RunManager:
             )
 
         self.time += self.kmcresult.time_delta
-        logger.info("Done with Decide recipe.")
         if len(recipe.rates) == 0:
             logger.info("No reaction selected")
         else:
             logger.info(
-                f"Overall time {self.time*1e-12:.4e} s, reaction occured after {self.kmcresult.time_delta*1e-12:.4e} s"
+                f"Reaction jumps ahead in time: {self.kmcresult.time_delta*10e-12:.4e} s. Overall new time {self.time*10e-12:.4e} s"
             )
 
         # capture state of radicals
@@ -825,6 +824,7 @@ class RunManager:
             files.outputdir / "radicals.json",
         )
 
+        logger.info("Done with Decide recipe.")
         return files
 
     def _apply_recipe(self, files: TaskFiles) -> TaskFiles:
@@ -851,6 +851,8 @@ class RunManager:
         # Set time to chosen 'time_start' of KMCResult
         ttime = self.kmcresult.time_start
         plugin_time_index = self.kmcresult.time_start_index_within_plugin
+        logger.info(f"Chosen time_start: {ttime} ps")
+        logger.info(f"Time index within plugin: {plugin_time_index}")
         if plugin_time_index is None:
             m = f"Time index within plugin is None, this should not happen. Was _apply_recipe called before _decide_recipe?"
             logger.error(m)
@@ -882,10 +884,11 @@ class RunManager:
         with open(files.outputdir / "vmd_selection.txt", "w") as f:
             f.write(vmd_selection)
 
-        # truncate simulation files to the chosen time
-        m = f"Truncating simulation files to time {ttime} ps"
-        logger.info(m)
-        truncate_sim_files(files=files, time=ttime)
+        if not self.config.skip_truncation:
+            # truncate simulation files to the chosen time
+            m = f"Truncating simulation files to time {ttime} ps"
+            logger.info(m)
+            truncate_sim_files(files=files, time=ttime)
 
         top_initial = deepcopy(self.top)
         focus_nrs: set[str] = set()
