@@ -203,7 +203,7 @@ class MoleculeType:
                         *key, dihedral.funct, dihedrals={}
                     )
                 self.proper_dihedrals[key].dihedrals[dihedral.periodicity] = dihedral
-        ls = self.atomics.get("impropers")
+        ls = self.atomics.pop("impropers", None)
         if ls is None:
             return
         for l in ls:
