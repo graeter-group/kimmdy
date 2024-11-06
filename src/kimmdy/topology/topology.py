@@ -214,6 +214,7 @@ class MoleculeType:
                     *key, dihedral.funct, dihedrals={}
                 )
             self.improper_dihedrals[key].dihedrals[dihedral.periodicity] = dihedral
+
     def _parse_restraints(self):
         """Parse restraints from topology dictionary."""
         ls = self.atomics.get("position_restraints")
