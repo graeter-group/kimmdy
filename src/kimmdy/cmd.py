@@ -84,6 +84,10 @@ def get_cmdline_args() -> argparse.Namespace:
         "--debug", action="store_true", help=("on error, drop into debugger")
     )
 
+    parser.add_argument(
+        "--restart", "-r", action="store_true", help=("Restart from a previous run instead of incrementing the run number for the output directory.")
+    )
+
     # visualize call stack
     parser.add_argument(
         "--callgraph",
@@ -135,7 +139,8 @@ def _run(args: argparse.Namespace):
     try:
         discover_plugins()
         config = Config(
-            input_file=args.input, logfile=args.logfile, loglevel=args.loglevel
+            input_file=args.input, logfile=args.logfile, loglevel=args.loglevel,
+            restart=args.restart
         )
 
         logger.info("Welcome to KIMMDY")
@@ -154,6 +159,10 @@ def _run(args: argparse.Namespace):
         runmgr = RunManager(config)
 
         if args.generate_jobscript:
+            if config.max_hours == 0:
+                m = f"kimmdy.config.max_hours is set to 0, which would create a non-sensical jobscript."
+                logger.error(m)
+                raise ValueError(m)
             content = jobscript.format(config=config).strip("\n")
             path = "jobscript.sh"
 
@@ -197,8 +206,6 @@ def _run(args: argparse.Namespace):
             raise e
     finally:
         logging.shutdown()
-        if args.generate_jobscript:
-            shutil.rmtree(config.out)
 
 
 def kimmdy_run(
@@ -209,6 +216,7 @@ def kimmdy_run(
     generate_jobscript: bool = False,
     debug: bool = False,
     callgraph: bool = False,
+    restart: bool = False,
 ):
     """Run KIMMDY from python.
 
@@ -225,7 +233,13 @@ def kimmdy_run(
     show_plugins
         Show available plugins and exit.
     generate_jobscript
-        Instead of running KIMMDY directly, generate at jobscript.sh for slurm HPC clusters
+        Instead of running KIMMDY directly, generate at jobscript.sh for slurm HPC clusters.
+    debug
+        on error, drop into debugger.
+    callgraph
+        Generate visualization of function calls. Mostly useful for debugging and documentation.
+    restart
+        Restart from a previous run instead of incrementing the run number for the output directory.
     """
     args = argparse.Namespace(
         input=input,
@@ -235,6 +249,7 @@ def kimmdy_run(
         generate_jobscript=generate_jobscript,
         debug=debug,
         callgraph=callgraph,
+        restart=restart,
     )
     _run(args)
 

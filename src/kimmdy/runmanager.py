@@ -251,9 +251,9 @@ class RunManager:
         logger.info("Start run")
         self.start_time = time.time()
 
-        if restart_dir := getattr(self.config.restart, "run_directory", None):
-            logger.info(f"Restarting from: {restart_dir}")
-            self._restart_from_rundir()
+        if self.config.restart:
+            logger.info(f"Restarting from previous run in: {self.config.out}")
+            self.restart_run()
 
         while (
             self.state is not State.DONE
@@ -269,6 +269,134 @@ class RunManager:
             f"Finished running tasks, state: {self.state} after "
             f"{timedelta(seconds=(time.time() - self.start_time))} "
             f"In output directory {self.config.out}"
+        )
+
+    def restart_run(self):
+        """Set up RunManager to restart from an existing run directory"""
+
+        task_dirs = get_task_directories(self.config.out, "all")
+        logger.debug(f"Found task directories in restart run directory: {task_dirs}")
+        logger.debug(f"Task queue: {self.tasks.queue}")
+
+        completed_tasks: list[Task] = []
+        nested_tasks: dict[Task, list[Path]] = {}
+        self.iteration = 0
+        found_run_end = False
+        while not self.tasks.empty() and not found_run_end:
+            task: Task = self.tasks.queue[0]
+            if task.name == "restart_task":
+                logger.info("Found restart task.")
+                self.tasks.queue.popleft()
+                break
+            if task.out is None:
+                completed_tasks.append(self.tasks.queue.popleft())
+            else:
+                if task_dirs[self.iteration :] == []:
+                    logger.info(
+                        f"Found last finished task with task number {self.iteration}."
+                    )
+                    # Condition 1: Continue from the last finished task
+                    found_run_end = True
+                for task_dir in task_dirs[self.iteration :]:
+                    if (task_dir / MARK_FAILED).exists():
+                        raise RuntimeError(
+                            f"Task in directory `{task_dir}` is indicated to "
+                            "have failed. Aborting restart. Remove this task "
+                            "directory if you want to restart from before the failed task."
+                        )
+                    if (task_dir / MARK_STARTED).exists():
+                        self.iteration += 1
+
+                        task_name = "_".join(task_dir.name.split(sep="_")[1:])
+                        if task_name == task.out:
+                            task.kwargs.update(
+                                {
+                                    "files": TaskFiles(
+                                        self.get_latest, {}, {}, task_dir
+                                    )
+                                }
+                            )
+                            completed_tasks.append(self.tasks.queue.popleft())
+                            if not (task_dir / MARK_DONE).exists():
+                                logger.info(
+                                    f"Found started but not finished task {task_dir}."
+                                )
+                                if completed_tasks[-1].name == "run_md":
+                                    kwargs: dict = copy(task.kwargs)
+                                    continue_md_task = Task(
+                                        self, f=self._run_md, kwargs=kwargs, out=None
+                                    )
+
+                                    continue_md_task.kwargs.update(
+                                        {"continue_md": True}
+                                    )
+                                    self.priority_tasks.put(continue_md_task)
+                                # Condition 2: Continue from started but not finished task
+                                found_run_end = True
+                            break
+                        else:
+                            # task probably not unique but having the latest of one kind should suffice
+                            if not completed_tasks[-1] in nested_tasks.keys():
+                                nested_tasks[completed_tasks[-1]] = []
+                            nested_tasks[completed_tasks[-1]].append(task_dir)
+                    else:
+                        raise RuntimeError(
+                            f"Encountered task directory {task_dir.name} but the"
+                            " task is not indicated to have started. Aborting restart."
+                        )
+
+        # add completed tasks to queue again until a reliable restart point (i.e after MD) is reached
+        while completed_tasks:
+            if completed_tasks[-1].name == "run_md":
+                logger.info(
+                    f"Will continue after task {completed_tasks[-1].kwargs['files'].outputdir}"
+                )
+
+                self.iteration -= 1
+                break
+            else:
+                current_nested_task_dirs = nested_tasks.get(completed_tasks[-1], [])
+                try:
+                    current_task_dir = [completed_tasks[-1].kwargs["files"].outputdir]
+                except KeyError:
+                    current_task_dir = []
+                for task_dir in [
+                    *current_nested_task_dirs,
+                    *current_task_dir,
+                ]:
+                    self.iteration -= 1
+                completed_tasks[-1].kwargs.pop("files", None)
+                self.tasks.queue.appendleft(completed_tasks.pop())
+        else:
+            self.iteration -= 1
+
+        # discover after it is clear which tasks will be in queue
+        for task_dir in get_task_directories(self.config.out, "all"):
+            task_name = "_".join(task_dir.name.split(sep="_")[1:])
+            task_files = TaskFiles(
+                self.get_latest, {}, {}, self.config.out / task_dir.name
+            )
+            self._discover_output_files(task_name, task_files)
+
+        # plumed fix
+        for md_config in self.config.mds.__dict__.values():
+            if getattr(md_config, "use_plumed"):
+                try:
+                    plumed_out_name = get_plumed_out(self.latest_files["plumed"]).name
+                    self.latest_files["plumed_out"] = self.get_latest(plumed_out_name)
+                    self.latest_files.pop(plumed_out_name)
+                except FileNotFoundError as e:
+                    logger.debug(e)
+
+        # use latest top file
+        self.top = Topology(
+            top=read_top(self.get_latest("top"), self.config.ff),
+            parametrizer=self.parameterizer,
+            is_reactive_predicate_f=get_is_reactive_predicate_from_config_f(
+                self.config.topology.reactive
+            ),
+            radicals=getattr(self.config, "radicals", None),
+            residuetypes_path=getattr(self.config, "residuetypes", None),
         )
 
     def _setup_tasks(self):
@@ -456,143 +584,6 @@ class RunManager:
                     files.output[f] = files.outputdir / path.name
 
         return files
-
-    def _restart_from_rundir(self):
-        """Set up RunManager to restart from a run directory"""
-
-        task_dirs = get_task_directories(self.config.restart.run_directory, "all")
-        logger.debug(f"Found task directories in restart run directory: {task_dirs}")
-        logger.debug(f"Task queue: {self.tasks.queue}")
-
-        completed_tasks: list[Task] = []
-        nested_tasks: dict = {}
-        self.iteration = 0
-        found_run_end = False
-        while not self.tasks.empty() and not found_run_end:
-            task: Task = self.tasks.queue[0]
-            if task.name == "restart_task":
-                logger.info("Found restart task.")
-                self.tasks.queue.popleft()
-                break
-            if task.out is None:
-                completed_tasks.append(self.tasks.queue.popleft())
-
-            else:
-                if task_dirs[self.iteration :] == []:
-                    logger.info(
-                        f"Found last finished task with task number {self.iteration}."
-                    )
-                    # Condition 1: Continue from the last finished task
-                    found_run_end = True
-                for task_dir in task_dirs[self.iteration :]:
-                    if (task_dir / MARK_FAILED).exists():
-                        raise RuntimeError(
-                            f"Task in directory `{task_dir}` is indicated to "
-                            "have failed. Aborting restart. Remove this task "
-                            "directory if you want to restart from before the failed task."
-                        )
-                    if (task_dir / MARK_STARTED).exists():
-                        # symlink task directories from previous output and discover their files
-                        symlink_dir = self.config.out / task_dir.name
-                        symlink_dir.symlink_to(task_dir, target_is_directory=True)
-                        self.iteration += 1
-
-                        task_name = "_".join(task_dir.name.split(sep="_")[1:])
-                        if task_name == task.out:
-                            task.kwargs.update(
-                                {
-                                    "files": TaskFiles(
-                                        self.get_latest, {}, {}, symlink_dir
-                                    )
-                                }
-                            )
-                            completed_tasks.append(self.tasks.queue.popleft())
-                            if not (task_dir / MARK_DONE).exists():
-                                logger.info(
-                                    f"Found started but not finished task {task_dir}."
-                                )
-                                if completed_tasks[-1].name == "run_md":
-                                    symlink_dir.unlink(missing_ok=True)
-                                    shutil.copytree(
-                                        task_dir, self.config.out / task_dir.name
-                                    )
-                                    kwargs: dict = copy(task.kwargs)
-                                    continue_md_task = Task(
-                                        self, f=self._run_md, kwargs=kwargs, out=None
-                                    )
-
-                                    continue_md_task.kwargs.update(
-                                        {"continue_md": True}
-                                    )
-                                    self.priority_tasks.put(continue_md_task)
-                                # Condition 2: Continue from started but not finished task
-                                found_run_end = True
-                            break
-                        else:
-                            # task probably not unique but having the latest of one kind should suffice
-                            if not completed_tasks[-1] in nested_tasks.keys():
-                                nested_tasks[completed_tasks[-1]] = []
-                            nested_tasks[completed_tasks[-1]].append(symlink_dir)
-                    else:
-                        raise RuntimeError(
-                            f"Encountered task directory {task_dir.name} but the"
-                            " task is not indicated to have started. Aborting restart."
-                        )
-
-        # add completed tasks to queue again until a reliable restart point (i.e after MD) is reached
-        while completed_tasks:
-            if completed_tasks[-1].name == "run_md":
-                logger.info(
-                    f"Will continue after task {completed_tasks[-1].kwargs['files'].outputdir}"
-                )
-
-                self.iteration -= 1
-                break
-            else:
-                current_nested_task_dirs = nested_tasks.get(completed_tasks[-1], [])
-                try:
-                    current_task_dir = [completed_tasks[-1].kwargs["files"].outputdir]
-                except KeyError:
-                    current_task_dir = []
-                for task_dir in [
-                    *current_nested_task_dirs,
-                    *current_task_dir,
-                ]:
-                    task_dir.unlink(missing_ok=True)
-                    self.iteration -= 1
-                completed_tasks[-1].kwargs.pop("files", None)
-                self.tasks.queue.appendleft(completed_tasks.pop())
-        else:
-            self.iteration -= 1
-
-        # discover after it is clear which tasks will be in queue
-        for task_dir in get_task_directories(self.config.out, "all"):
-            task_name = "_".join(task_dir.name.split(sep="_")[1:])
-            task_files = TaskFiles(
-                self.get_latest, {}, {}, self.config.out / task_dir.name
-            )
-            self._discover_output_files(task_name, task_files)
-
-        # plumed fix
-        for md_config in self.config.mds.__dict__.values():
-            if getattr(md_config, "use_plumed"):
-                try:
-                    plumed_out_name = get_plumed_out(self.latest_files["plumed"]).name
-                    self.latest_files["plumed_out"] = self.get_latest(plumed_out_name)
-                    self.latest_files.pop(plumed_out_name)
-                except FileNotFoundError as e:
-                    logger.debug(e)
-
-        # use latest top file
-        self.top = Topology(
-            top=read_top(self.get_latest("top"), self.config.ff),
-            parametrizer=self.parameterizer,
-            is_reactive_predicate_f=get_is_reactive_predicate_from_config_f(
-                self.config.topology.reactive
-            ),
-            radicals=getattr(self.config, "radicals", None),
-            residuetypes_path=getattr(self.config, "residuetypes", None),
-        )
 
     def _restart_task(self, _: TaskFiles) -> None:
         raise RuntimeError(

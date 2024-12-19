@@ -126,8 +126,9 @@ class Config:
         opts: dict | None = None,
         scheme: dict | None = None,
         section: str = "config",
-        logfile: Optional[Path] = None,
-        loglevel: Optional[str] = None,
+        logfile: Path | None = None,
+        loglevel: str | None = None,
+        restart: bool | None = None,
     ):
 
         # initial scheme
@@ -208,7 +209,9 @@ class Config:
                 "errors": [],
                 "debugs": [],
             }
-            self._set_defaults(section, scheme)
+
+            # defaults from the scheme
+            self._set_defaults(section=section, scheme=scheme, restart=restart)
             self._validate(section=section, cwd=self.cwd)
 
             # merge with command line arguments
@@ -233,7 +236,9 @@ class Config:
             # use the constructed config to set up the logger
             configure_logger(self)
 
-    def _set_defaults(self, section: str = "config", scheme: dict = {}):
+    def _set_defaults(
+        self, section: str = "config", scheme: dict = {}, restart: bool | None = None
+    ):
         """
         Set defaults for attributes not set in yaml file but
         specified in scheme (generated from the schema).
@@ -296,15 +301,19 @@ class Config:
 
         # implicit defaults not in the schema
         # but defined in terms of other attributes
+        # or from the cli
         if section == "config":
+            if restart is not None:
+                self.restart = restart
+
             self.name = self.name.replace(" ", "_")
             if not hasattr(self, "cwd"):
                 self.cwd = Path.cwd()
             if not hasattr(self, "out"):
                 self.out = self.cwd / Path(self.name)
 
-            # make sure self.out is empty
-            while self.out.exists():
+            # make sure self.out is empty unless restart is set
+            while self.out.exists() and not self.restart:
                 self._logmessages["debugs"].append(
                     f"Output dir {self.out} exists, incrementing name"
                 )
@@ -317,8 +326,13 @@ class Config:
                 else:
                     self.out = self.out.with_name(self.out.name + "_001")
 
-            self.out.mkdir()
-            self._logmessages["infos"].append(f"Created output dir {self.out}")
+            if not self.out.exists():
+                self.out.mkdir()
+                self._logmessages["infos"].append(f"Created output dir {self.out}")
+            else:
+                self._logmessages["infos"].append(
+                    f"Restarting in output dir {self.out}"
+                )
 
     def _validate(self, section: str = "config", cwd: Path = Path(".")):
         """Validates config."""
