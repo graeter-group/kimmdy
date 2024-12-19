@@ -282,14 +282,15 @@ class RunManager:
         nested_tasks: dict[Task, list[Path]] = {}
         self.iteration = 0
         found_run_end = False
+
+        # discover completed or half completed tasks
         while not self.tasks.empty() and not found_run_end:
-            task: Task = self.tasks.queue[0]
+            task: Task = self.tasks.get()
             if task.name == "restart_task":
                 logger.info("Found restart task.")
-                self.tasks.queue.popleft()
                 break
             if task.out is None:
-                completed_tasks.append(self.tasks.queue.popleft())
+                completed_tasks.append(task)
             else:
                 if task_dirs[self.iteration :] == []:
                     logger.info(
@@ -316,7 +317,7 @@ class RunManager:
                                     )
                                 }
                             )
-                            completed_tasks.append(self.tasks.queue.popleft())
+                            completed_tasks.append(task)
                             if not (task_dir / MARK_DONE).exists():
                                 logger.info(
                                     f"Found started but not finished task {task_dir}."
