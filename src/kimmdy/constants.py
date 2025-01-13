@@ -206,3 +206,22 @@ AA3 = [
     "ACE",
     "NME",
 ]
+
+CROSSLINK_RESIDUES = [
+    "L4Y",
+    "L5Y",
+    "LY2",
+    "LY3",
+    "L2Y",
+    "L3Y",
+    "LX2",
+    "LX3",
+    "LX4",
+    "L4X",
+    "LYX",
+    "LXY",
+    "LXX",
+    "L5S",
+    "L44",
+    "HIH",
+]

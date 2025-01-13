@@ -297,7 +297,7 @@ def get_is_reactive_predicate_f(include: list, exclude: list) -> Callable[[str],
 
 def get_residue_fragments(
     top: Topology,
-    residue: list[Atom],
+    residue: dict[str, Atom],
     start1: Atom,
     start2: Atom,
     iterations: int = 20,
@@ -324,7 +324,7 @@ def get_residue_fragments(
         Two fragments, or one fragment and empty set in case the
         residue did not change its size.
     """
-    residue_nrs = set([atom.nr for atom in residue])
+    residue_nrs = set([atom.nr for atom in residue.values()])
     # could remove duplicate calculations
     fragments = [set([start1.nr]), set([start2.nr])]
     for fragment in fragments:

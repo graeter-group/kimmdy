@@ -11,6 +11,7 @@ from kimmdy.constants import (
     REACTIVE_MOLECULEYPE,
     RESNR_ID_FIELDS,
     FFFUNC,
+    CROSSLINK_RESIDUES,
 )
 from kimmdy.parsing import TopologyDict, empty_section
 from kimmdy.plugins import BasicParameterizer, Parameterizer
@@ -985,26 +986,52 @@ class Topology:
         formed again, the original partial charges are restored.
         """
 
-        # build updated list of atoms by residue for topology so that this does
-        # not need to be repeated
-        # Warning: resnr not unique for each residue, 'residues' can map to
-        # more than one real residue
-        residues = {}
-        for atom in self.atoms.values():
-            if residues.get(atom.resnr) is None:
-                residues[atom.resnr] = []
-            residues[atom.resnr].append(atom)
-
-        logger.debug(f'updating partial charges! {recipe_steps}')
+        logger.debug(f"updating partial charges! {recipe_steps}")
         for step in recipe_steps:
             if isinstance(step, Break):
                 # make partial charges on either side of the break integer
                 if self.atoms[step.atom_id_1].resnr == self.atoms[step.atom_id_2].resnr:
                     atom1 = self.atoms[step.atom_id_1]
                     atom2 = self.atoms[step.atom_id_2]
-                    fragment1, fragment2 = get_residue_fragments(
-                        self, residues[atom1.resnr], atom1, atom2
-                    )
+                    residue = get_residue_by_bonding(
+                        atom1, self.atoms
+                    ) | get_residue_by_bonding(atom2, self.atoms)
+                    if atom1.residue not in CROSSLINK_RESIDUES:
+                        fragment1, fragment2 = get_residue_fragments(
+                            self, residue, atom1, atom2
+                        )
+                    else:
+                        # Crosslink residues from Zapp et al. (https://doi.org/10.1038/s41467-020-15567-4) have non-integer charge for individual residues of the crosslink (at least for HLNKNL). This means all crosslink residues have to be considered for charge equilibration.
+                        if atom1.residue == "L5Y":
+                            # find atoms of interresidue bond to get both residue ids
+                            for curr_atom in residue.values():
+                                if curr_atom.atom == "NZ":
+                                    specbond_atom1 = curr_atom
+                                    break
+                            for atom_nr in specbond_atom1.bound_to_nrs:
+                                if self.atoms[atom_nr].atom == "CE":
+                                    specbond_atom2 = self.atoms[atom_nr]
+                                    break
+
+                        elif atom1.residue == "L4Y":
+                            for curr_atom in residue.values():
+                                if curr_atom.atom == "CE":
+                                    specbond_atom1 = curr_atom
+                                    break
+                            for atom_nr in specbond_atom1.bound_to_nrs:
+                                if self.atoms[atom_nr].atom == "NZ":
+                                    specbond_atom2 = self.atoms[atom_nr]
+                                    break
+                        else:
+                            raise NotImplementedError(
+                                f"Updating partial charges for crosslink {atom1.residue} not implemented!"
+                            )
+                        # get fragments from combined residue list
+                        residue2 = get_residue_by_bonding(specbond_atom2, self.atoms)
+                        fragment1, fragment2 = get_residue_fragments(
+                            self, residue | residue2, atom1, atom2
+                        )
+
                     if len(fragment2) in (0, 1):
                         # intra-residue HAT case (or similar)
                         if atom1.type.upper().startswith("H"):
@@ -1024,7 +1051,6 @@ class Topology:
                             continue
                     else:
                         # homolysis case (or similar)
-
                         charge_fragment1 = [
                             float(self.atoms[nr].charge) for nr in fragment1
                         ]
@@ -1033,7 +1059,10 @@ class Topology:
                         ]
                         diff1 = sum(charge_fragment1) - round(sum(charge_fragment1))
                         diff2 = sum(charge_fragment2) - round(sum(charge_fragment2))
-                        logger.debug(f"Fragments for atoms {step.atom_id_1} and {step.atom_id_2} have charges of {diff1} and {diff2}. Compensating via break atom charges.")
+                        breakpoint()
+                        logger.debug(
+                            f"Fragments for atoms {step.atom_id_1} and {step.atom_id_2} have charges of {diff1} and {diff2}. Compensating via break atom charges."
+                        )
                         atom1.charge = f"{float(atom1.charge) - diff1:7.4f}"
                         atom2.charge = f"{float(atom2.charge) - diff2:7.4f}"
                 else:
