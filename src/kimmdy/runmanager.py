@@ -305,7 +305,7 @@ class RunManager:
                             "have failed. Aborting restart. Remove this task "
                             "directory if you want to restart from before the failed task."
                         )
-                    if (task_dir / MARK_STARTED).exists():
+                    elif (task_dir / MARK_STARTED).exists():
                         self.iteration += 1
 
                         task_name = "_".join(task_dir.name.split(sep="_")[1:])
@@ -337,9 +337,10 @@ class RunManager:
                             break
                         else:
                             # task probably not unique but having the latest of one kind should suffice
-                            if not completed_tasks[-1] in nested_tasks.keys():
-                                nested_tasks[completed_tasks[-1]] = []
-                            nested_tasks[completed_tasks[-1]].append(task_dir)
+                            if len(completed_tasks) > 0:
+                                if not completed_tasks[-1] in nested_tasks.keys():
+                                    nested_tasks[completed_tasks[-1]] = []
+                                nested_tasks[completed_tasks[-1]].append(task_dir)
                     else:
                         raise RuntimeError(
                             f"Encountered task directory {task_dir.name} but the"
