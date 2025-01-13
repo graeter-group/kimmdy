@@ -60,6 +60,8 @@ from kimmdy.utils import (
     get_task_directories,
     run_gmx,
     truncate_sim_files,
+    write_gro_file_at_reaction_time,
+    write_reaction_time_marker,
 )
 
 logger = logging.getLogger(__name__)
@@ -266,7 +268,7 @@ class RunManager:
             next(self)
 
         logger.info(
-            f"Finished running tasks, state: {self.state} after "
+            f"Finished running last task, state: {self.state} after "
             f"{timedelta(seconds=(time.time() - self.start_time))} "
             f"In output directory {self.config.out}"
         )
@@ -275,8 +277,12 @@ class RunManager:
         """Set up RunManager to restart from an existing run directory"""
 
         task_dirs = get_task_directories(self.config.out, "all")
-        logger.debug(f"Found task directories in restart run directory: {task_dirs}")
-        logger.debug(f"Task queue: {self.tasks.queue}")
+        if task_dirs == []:
+            # no tasks found in the output directory. this is a fresh run
+            return
+
+        # logger.info(f"Found task directories in restart run directory: {task_dirs}")
+        # logger.info(f"Task queue: {self.tasks.queue}")
 
         completed_tasks: list[Task] = []
         nested_tasks: dict[Task, list[Path]] = {}
@@ -284,8 +290,11 @@ class RunManager:
         found_run_end = False
 
         # discover completed or half completed tasks
+        logger.info("Checking for restart point.")
+        logger.info(f"Found task directories: {[p.name for p in task_dirs]}")
         while not self.tasks.empty() and not found_run_end:
             task: Task = self.tasks.get()
+            logger.info(f"Checking task: {task.name}")
             if task.name == "restart_task":
                 logger.info("Found restart task.")
                 break
@@ -293,15 +302,17 @@ class RunManager:
                 completed_tasks.append(task)
             else:
                 if task_dirs[self.iteration :] == []:
-                    logger.info(
-                        f"Found last finished task with task number {self.iteration}."
-                    )
+                    if len(completed_tasks) == 0:
+                        m = "No tasks found in the output directory and no remaining tasks to check. Aborting restart."
+                        logger.error(m)
+                        raise FileNotFoundError(m)
                     # Condition 1: Continue from the last finished task
+                    logger.info(f"Found last finished task with task number {self.iteration}: {completed_tasks[-1].name}")
                     found_run_end = True
                 for task_dir in task_dirs[self.iteration :]:
                     if (task_dir / MARK_FAILED).exists():
                         raise RuntimeError(
-                            f"Task in directory `{task_dir}` is indicated to "
+                            f"Task in directory `{task_dir.name}` is indicated to "
                             "have failed. Aborting restart. Remove this task "
                             "directory if you want to restart from before the failed task."
                         )
@@ -320,7 +331,7 @@ class RunManager:
                             completed_tasks.append(task)
                             if not (task_dir / MARK_DONE).exists():
                                 logger.info(
-                                    f"Found started but not finished task {task_dir}."
+                                    f"Found started but not finished task {task_dir.name}."
                                 )
                                 if completed_tasks[-1].name == "run_md":
                                     kwargs: dict = copy(task.kwargs)
@@ -333,6 +344,7 @@ class RunManager:
                                     )
                                     self.priority_tasks.put(continue_md_task)
                                 # Condition 2: Continue from started but not finished task
+                                logger.info(f"Will continue at task {task_dir.name}")
                                 found_run_end = True
                             break
                         else:
@@ -351,7 +363,7 @@ class RunManager:
         while completed_tasks:
             if completed_tasks[-1].name == "run_md":
                 logger.info(
-                    f"Will continue after task {completed_tasks[-1].kwargs['files'].outputdir}"
+                    f"Will continue at task {completed_tasks[-1].kwargs['files'].outputdir}"
                 )
 
                 self.iteration -= 1
@@ -458,7 +470,7 @@ class RunManager:
                 raise ValueError(m)
         logger.info(f"Task list build:\n{pformat(list(self.tasks.queue), indent=8)}")
 
-    def get_latest(self, suffix: str):
+    def get_latest(self, suffix: str) -> Path:
         """Returns path to latest file of given type.
 
         For .dat files (in general ambiguous extensions) use full file name.
@@ -509,8 +521,18 @@ class RunManager:
                 if not any(re.search(s, p.name) for s in IGNORE_SUBSTR)
             ]
             suffs = [p.suffix[1:] for p in discovered_files]
+            # if gro file is found and we wrote a <name>._reaction.gro file
+            # explicitly make this the latest gro file
+            gros = [p for p in discovered_files if p.suffix[1:] == "gro"]
+            for gro in gros:
+                if "_reaction" in gro.name:
+                    files.output["gro"] = gro
+                    logger.info(f"Found reaction gro file: {gro} and set as latest")
+                    break
+
+
             counts = [suffs.count(s) for s in suffs]
-            for suff, c in zip(suffs, counts):
+            for suff, c, path in zip(suffs, counts, discovered_files):
                 if c != 1 and suff not in AMBIGUOUS_SUFFS:
                     if files.output.get(suff) is None:
                         e = (
@@ -877,11 +899,20 @@ class RunManager:
         with open(files.outputdir / "vmd_selection.txt", "w") as f:
             f.write(vmd_selection)
 
-        if not self.config.skip_truncation:
-            # truncate simulation files to the chosen time
-            m = f"Truncating simulation files to time {ttime} ps"
-            logger.info(m)
-            truncate_sim_files(files=files, time=ttime)
+        # TODO: truncate during run is deprecated
+        # kimmdy writes marker files for the reaction
+        # time instead
+        # if not self.config.skip_truncation:
+        #     # truncate simulation files to the chosen time
+        #     m = f"Truncating simulation files to time {ttime} ps"
+        #     logger.info(m)
+        #     truncate_sim_files(files=files, time=ttime)
+
+        write_reaction_time_marker(dir=files.outputdir, time=ttime)
+        # because the gro_reaction file is written to files.output
+        # it will be discovered by _discover_output_files
+        # and set as the latest gro file for the next tasks
+        write_gro_file_at_reaction_time(files=files, time=ttime)
 
         top_initial = deepcopy(self.top)
         focus_nrs: set[str] = set()

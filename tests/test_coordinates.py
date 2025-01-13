@@ -151,31 +151,34 @@ def test_merge_prm_top(arranged_tmp_path):
     # assert one dihedral merge improper/proper
 
 
-@pytest.mark.require_gmx
-def test_truncate_sim_files(arranged_tmp_path):
-    files = DummyFiles()
-    files.input = {
-        "trr": arranged_tmp_path / "relax.trr",
-        "xtc": arranged_tmp_path / "relax.xtc",
-        "edr": arranged_tmp_path / "relax.edr",
-        "gro": arranged_tmp_path / "relax.gro",
-    }
-    files.outputdir = arranged_tmp_path
-    time = 5.2
-    truncate_sim_files(files, time)
-
-    for p in files.input.values():
-        assert p.exists()
-        assert p.with_name(p.name + ".tail").exists()
-
-    p = sp.run(
-        f"gmx -quiet -nocopyright check -f {files.input['trr']}",
-        text=True,
-        capture_output=True,
-        shell=True,
-    )
-    # FOR SOME REASON gmx check writes in stderr instead of stdout
-    m = re.search(r"Last frame.*time\s+(\d+\.\d+)", p.stderr)
-    assert m, p.stderr
-    last_time = m.group(1)
-    assert last_time == "5.000"
+# @pytest.mark.require_gmx
+# def test_truncate_sim_files(arranged_tmp_path):
+#     files = DummyFiles()
+#     files.input = {
+#         "trr": arranged_tmp_path / "relax.trr",
+#         "xtc": arranged_tmp_path / "relax.xtc",
+#         "edr": arranged_tmp_path / "relax.edr",
+#         "gro": arranged_tmp_path / "relax.gro",
+#     }
+#     files.outputdir = arranged_tmp_path
+#     # time = 5.2
+#     # TODO: truncate during run is deprecated
+#     # kimmdy writes marker files for the reaction
+#     # time instead
+#     # truncate_sim_files(files, time)
+#
+#     for p in files.input.values():
+#         assert p.exists()
+#         assert p.with_name(p.name + ".tail").exists()
+#
+#     p = sp.run(
+#         f"gmx -quiet -nocopyright check -f {files.input['trr']}",
+#         text=True,
+#         capture_output=True,
+#         shell=True,
+#     )
+#     # FOR SOME REASON gmx check writes in stderr instead of stdout
+#     m = re.search(r"Last frame.*time\s+(\d+\.\d+)", p.stderr)
+#     assert m, p.stderr
+#     last_time = m.group(1)
+#     assert last_time == "5.000"

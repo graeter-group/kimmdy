@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING, Iterable, Optional, Union
 
 import numpy as np
 
+from kimmdy.constants import MARK_REACION_TIME
 from kimmdy.recipe import RecipeCollection
 
 if TYPE_CHECKING:
@@ -64,15 +65,15 @@ def run_shell_cmd(s, cwd=None) -> sp.CompletedProcess:
     return sp.run(s, shell=True, cwd=cwd, capture_output=True, text=True)
 
 
-def run_gmx(s: str, cwd=None) -> Optional[sp.CalledProcessError]:
+def run_gmx(cmd: str, cwd=None) -> Optional[sp.CalledProcessError]:
     """Run GROMACS command in shell.
 
     Adds a '-quiet' flag to the command and checks the return code.
     """
-    logger.debug(f"Starting Gromacs process with command {s} in {cwd}.")
-    result = run_shell_cmd(f"{s} -quiet", cwd)
+    logger.debug(f"Starting Gromacs process with command {cmd} in {cwd}.")
+    result = run_shell_cmd(f"{cmd} -quiet", cwd)
     if result.returncode != 0:
-        logger.error(f"Gromacs process with command {s} in {cwd} failed.")
+        logger.error(f"Gromacs process with command {cmd} in {cwd} failed.")
         logger.error(f"Gromacs exit code {result.returncode}.")
         logger.error(f"Gromacs stdout:\n{result.stdout}.")
         logger.error(f"Gromacs stderr:\n{result.stderr}.")
@@ -383,6 +384,51 @@ def check_gmx_version(config):
                     raise SystemError(m)
     return version
 
+def write_reaction_time_marker(dir: Path, time: float):
+    logger.info(f"Writing reaction time marker {time} to {dir / MARK_REACION_TIME}")
+    with open(dir / MARK_REACION_TIME, "w") as f:
+        f.write(str(time))
+
+def read_reaction_time_marker(dir: Path) -> float|None:
+    if not (dir / MARK_REACION_TIME).exists():
+        return None
+    with open(dir / MARK_REACION_TIME, "r") as f:
+        return float(f.read())
+
+
+def write_gro_file_at_reaction_time(files: TaskFiles, time: float|None):
+    """Write out a gro file from the trajectory (xtc or trr) at the reaction time."""
+    if time is None:
+        return
+    gro = files.input["gro"]
+    if gro is None:
+        m = "No gro file found from the previous md run."
+        logger.error(m)
+        raise FileNotFoundError(m)
+    tpr = files.input["tpr"]
+    if tpr is None:
+        m = "No tpr file found from the previous md run."
+        logger.error(m)
+        raise FileNotFoundError(m)
+
+    logger.info(f"Writing out gro file at reaction time {time} ps in {gro.parent}")
+    gro_reaction = gro.with_name(gro.stem + f"_reaction.gro")
+    files.output["gro"] = gro_reaction
+
+    # prefer xtc over trr
+    # (should have more frames and be smaller)
+    if files.input["xtc"] is not None:
+        run_gmx(f"echo '0' | gmx trjconv -f {files.input['xtc']} -s {tpr} -b {time} -dump {time} -o {gro_reaction}")
+    elif files.input["trr"] is not None:
+        run_gmx(
+            f"echo '0' | gmx trjconv -f {files.input['trr']} -s {tpr} -b {time} -dump {time} -o {gro_reaction}"
+        )
+    else:
+        m = f"No trajectory file found to write out gro file at reaction time in {gro.parent}"
+        logger.error(m)
+        raise FileNotFoundError(m)
+
+
 
 def truncate_sim_files(
     files: TaskFiles,
@@ -517,8 +563,5 @@ def get_task_directories(dir: Path, tasks: Union[list[str], str] = "all") -> lis
         matching_directories = list(
             filter(lambda d: d.name.split("_")[1] in tasks, directories)
         )
-
-    if not matching_directories:
-        print(f"WARNING: Could not find directories {tasks} in {dir}.")
 
     return matching_directories

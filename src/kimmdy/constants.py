@@ -5,6 +5,7 @@ Constants used throughout KIMMDY
 MARK_STARTED = ".kimmdy_started"
 MARK_DONE = ".kimmdy_done"
 MARK_FAILED = ".kimmdy_failed"
+MARK_REACION_TIME = ".kimmdy_reaction_time"
 MARKERS = [MARK_STARTED, MARK_DONE, MARK_FAILED]
 
 ATOM_ID_FIELDS = {

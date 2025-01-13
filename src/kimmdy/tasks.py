@@ -19,10 +19,10 @@ logger = logging.getLogger(__name__)
 class AutoFillDict(dict):
     """Dictionary that gets populated by calling get_missing."""
 
-    def __init__(self, get_missing: Callable):
+    def __init__(self, get_missing: Callable[[str], Path|None]):
         self.get_missing = get_missing
 
-    def __missing__(self, key) -> None|Any:
+    def __missing__(self, key: str) -> None|Path:
         self[key] = self.get_missing(key)
         return self.get(key)
 
@@ -63,7 +63,7 @@ class TaskFiles:
     {'top': 'latest top'}
     """
 
-    get_latest: Callable
+    get_latest: Callable[[str], Path]
     input: dict[str, Path|None] = field(default_factory=dict)
     output: dict[str, Path] = field(default_factory=dict)
     outputdir: Path = Path()
@@ -151,7 +151,7 @@ class Task:
         logger.debug(f"Init task {self.name}\tkwargs: {self.kwargs}\tOut: {self.out}")
 
     def __call__(self) -> Optional[TaskFiles]:
-        logger.info(f"Starting task: {self.name} with args: {self.kwargs}")
+        logger.info(f"Starting task: {self.name} with args: {self.kwargs} in {self.runmng.iteration}_{self.out}")
         if self.out is not None:
             self.kwargs.update({"files": create_task_directory(self.runmng, self.out)})
             write_time_marker(self.kwargs["files"].outputdir / MARK_STARTED, self.name)
