@@ -926,6 +926,7 @@ class RunManager:
 
                 if self.config.changer.coordinates.slow_growth:
                     # Create a temporary slow growth topology for sub-task run_md, afterwards, top will be reset properly
+                    self.top.update_partial_charges(recipe.recipe_steps)
                     self.top.update_parameters(focus_nrs)
 
                     # top_initial is still the topology before the reaction

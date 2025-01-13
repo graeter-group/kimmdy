@@ -995,6 +995,7 @@ class Topology:
                 residues[atom.resnr] = []
             residues[atom.resnr].append(atom)
 
+        logger.debug(f'updating partial charges! {recipe_steps}')
         for step in recipe_steps:
             if isinstance(step, Break):
                 # make partial charges on either side of the break integer
@@ -1032,6 +1033,7 @@ class Topology:
                         ]
                         diff1 = sum(charge_fragment1) - round(sum(charge_fragment1))
                         diff2 = sum(charge_fragment2) - round(sum(charge_fragment2))
+                        logger.debug(f"Fragments for atoms {step.atom_id_1} and {step.atom_id_2} have charges of {diff1} and {diff2}. Compensating via break atom charges.")
                         atom1.charge = f"{float(atom1.charge) - diff1:7.4f}"
                         atom2.charge = f"{float(atom2.charge) - diff2:7.4f}"
                 else:
