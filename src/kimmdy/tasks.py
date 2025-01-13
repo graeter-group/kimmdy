@@ -22,9 +22,9 @@ class AutoFillDict(dict):
     def __init__(self, get_missing: Callable):
         self.get_missing = get_missing
 
-    def __missing__(self, key):
+    def __missing__(self, key) -> None|Any:
         self[key] = self.get_missing(key)
-        return self[key]
+        return self.get(key)
 
 
 @dataclass
@@ -64,7 +64,7 @@ class TaskFiles:
     """
 
     get_latest: Callable
-    input: dict[str, Path] = field(default_factory=dict)
+    input: dict[str, Path|None] = field(default_factory=dict)
     output: dict[str, Path] = field(default_factory=dict)
     outputdir: Path = Path()
     logger: logging.Logger = logging.getLogger("kimmdy.basetask")
