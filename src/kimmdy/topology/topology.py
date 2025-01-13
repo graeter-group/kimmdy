@@ -1059,7 +1059,6 @@ class Topology:
                         ]
                         diff1 = sum(charge_fragment1) - round(sum(charge_fragment1))
                         diff2 = sum(charge_fragment2) - round(sum(charge_fragment2))
-                        breakpoint()
                         logger.debug(
                             f"Fragments for atoms {step.atom_id_1} and {step.atom_id_2} have charges of {diff1} and {diff2}. Compensating via break atom charges."
                         )
