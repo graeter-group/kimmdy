@@ -22,7 +22,7 @@ from subprocess import CalledProcessError
 from typing import Callable, Optional
 
 from kimmdy.config import Config
-from kimmdy.constants import MARK_DONE, MARK_FAILED, MARK_STARTED, MARKERS
+from kimmdy.constants import MARK_DONE, MARK_FAILED, MARK_FINISHED, MARK_STARTED, MARKERS
 from kimmdy.coordinates import break_bond_plumed, merge_top_slow_growth, place_atom
 from kimmdy.kmc import (
     KMCError,
@@ -232,17 +232,16 @@ class RunManager:
         }
 
         self.task_mapping = {
-            "md": {"f": self._run_md, "kwargs": {}, "out": None},
+            "md": {"f": self._run_md, "kwargs": {}, "out": None}, # name of out director is inferred from the instance
             "reactions": [
-                {"f": self._place_reaction_tasks, "kwargs": {}, "out": None},
+                {"f": self._place_reaction_tasks, "kwargs": {}, "out": None}, # has no output directory
                 {
                     "f": self._decide_recipe,
                     "kwargs": {},
                     "out": "decide_recipe",
                 },
                 {"f": self._apply_recipe, "kwargs": {}, "out": "apply_recipe"},
-            ],
-            "restart": {"f": self._restart_task, "kwargs": {}, "out": None},
+            ]
         }
         """Mapping of task names to functions and their keyword arguments."""
 
@@ -254,6 +253,10 @@ class RunManager:
 
         if self.config.restart:
             logger.info(f"Restarting from previous run in: {self.config.out}")
+            if (self.config.out / MARK_FINISHED).exists():
+                m = f"Run in {self.config.out} already finished. Exiting."
+                logger.info(m)
+                return
             self._setup_restart()
 
         while (
@@ -266,6 +269,7 @@ class RunManager:
         ):
             next(self)
 
+        write_time_marker(self.config.out / MARK_FINISHED, "finished")
         logger.info(
             f"Finished running last task, state: {self.state} after "
             f"{timedelta(seconds=(time.time() - self.start_time))} "
@@ -280,8 +284,8 @@ class RunManager:
             # no tasks found in the output directory. this is a fresh run
             return
 
-        # logger.info(f"Found task directories in restart run directory: {task_dirs}")
-        # logger.info(f"Task queue: {self.tasks.queue}")
+        logger.info(f"Found task directories in restart run directory: {task_dirs}")
+        logger.info(f"Task queue: {self.tasks.queue}")
 
         completed_tasks: list[Task] = []
         nested_tasks: dict[Task, list[Path]] = {}
@@ -294,10 +298,9 @@ class RunManager:
         while not self.tasks.empty() and not found_run_end:
             task: Task = self.tasks.get()
             logger.info(f"Checking task: {task.name}")
-            if task.name == "restart_task":
-                logger.info("Found restart task.")
-                break
             if task.out is None:
+                # task without output directory are not valid restart points
+                # and assumed to be ephemeral
                 completed_tasks.append(task)
             else:
                 if task_dirs[self.iteration :] == []:
@@ -343,7 +346,7 @@ class RunManager:
                                     )
                                     self.priority_tasks.put(continue_md_task)
                                 # Condition 2: Continue from started but not finished task
-                                logger.info(f"Will continue at task {task_dir.name}")
+                                logger.info(f"Will continue task {task_dir.name}")
                                 found_run_end = True
                             break
                         else:
@@ -362,7 +365,7 @@ class RunManager:
         while completed_tasks:
             if completed_tasks[-1].name == "run_md":
                 logger.info(
-                    f"Will continue at task {completed_tasks[-1].kwargs['files'].outputdir}"
+                    f"Will continue after completed task {completed_tasks[-1].kwargs['files'].outputdir}"
                 )
 
                 self.iteration -= 1
@@ -383,8 +386,14 @@ class RunManager:
         else:
             self.iteration -= 1
 
+        all_task_dirs = get_task_directories(self.config.out)
+
+        # clean up old task directories that will be overwritten
+        for task_dir in all_task_dirs[self.iteration+1:]:
+            shutil.rmtree(task_dir)
+
         # discover after it is clear which tasks will be in queue
-        for task_dir in get_task_directories(self.config.out, "all"):
+        for task_dir in all_task_dirs[: self.iteration + 1]:
             task_name = "_".join(task_dir.name.split(sep="_")[1:])
             task_files = TaskFiles(
                 self.get_latest, {}, {}, self.config.out / task_dir.name
@@ -432,6 +441,8 @@ class RunManager:
                 md = self.task_mapping["md"]
                 kwargs: dict = copy(md["kwargs"])
                 kwargs.update({"instance": task_name})
+                if task_name is None:
+                    raise ValueError("MD task name is None")
                 task = Task(
                     self,
                     f=md["f"],
@@ -453,16 +464,6 @@ class RunManager:
                 # check all reactions
                 for task_kwargs in self.task_mapping["reactions"]:
                     self.tasks.put(Task(self, **task_kwargs))
-            elif task_name == "restart":
-                restart = self.task_mapping["restart"]
-                kwargs: dict = copy(restart["kwargs"])
-                task = Task(
-                    self,
-                    f=restart["f"],
-                    kwargs=kwargs,
-                    out=task_name,
-                )
-                self.tasks.put(task)
             else:
                 m = f"Unknown task encountered in the sequence: {task_name}"
                 logger.error(m)

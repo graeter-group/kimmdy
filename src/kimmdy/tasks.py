@@ -155,9 +155,11 @@ class Task:
         if self.out is not None:
             self.kwargs.update({"files": create_task_directory(self.runmng, self.out)})
             write_time_marker(self.kwargs["files"].outputdir / MARK_STARTED, self.name)
+            logger.info(f"Wrote kimmdy start marker for task: {self.name} in {self.runmng.iteration}_{self.out}")
         files = self.f(**self.kwargs)
         if self.out is not None:
             write_time_marker(self.kwargs["files"].outputdir / MARK_DONE, self.name)
+            logger.info(f"Wrote kimmdy done marker for task: {self.name} in {self.runmng.iteration}_{self.out}")
         logger.info(f"Finished task: {self.name}")
         if files is not None and files.logger:
             for h in files.logger.handlers:

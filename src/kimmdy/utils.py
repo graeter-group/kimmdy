@@ -411,14 +411,15 @@ def write_gro_file_at_reaction_time(files: TaskFiles, time: float|None):
         logger.error(m)
         raise FileNotFoundError(m)
 
-    logger.info(f"Writing out gro file at reaction time {time} ps in {gro.parent}")
     gro_reaction = gro.with_name(gro.stem + f"_reaction.gro")
-    files.output["gro"] = gro_reaction
 
     if gro_reaction.exists():
         m = f"gro file at reaction time {time} already exists in {gro.parent}. Removing it."
         logger.error(m)
         gro_reaction.unlink()
+
+    logger.info(f"Writing out gro file at reaction time {time} ps in {gro.parent}")
+    files.output["gro"] = gro_reaction
 
     # prefer xtc over trr
     # (should have more frames and be smaller)
