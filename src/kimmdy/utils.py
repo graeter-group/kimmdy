@@ -419,8 +419,6 @@ def write_gro_file_at_reaction_time(files: TaskFiles, time: float|None):
         m = f"gro file at reaction time {time} already exists in {gro.parent}. Removing it."
         logger.error(m)
         gro_reaction.unlink()
-        # FIXME: raise an error for now to debug
-        raise FileExistsError(m)
 
     # prefer xtc over trr
     # (should have more frames and be smaller)

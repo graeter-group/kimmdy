@@ -23,7 +23,7 @@ from seaborn import axes_style
 from kimmdy.parsing import read_json, write_json, read_time_marker
 from kimmdy.recipe import Bind, Break, DeferredRecipeSteps, Place, RecipeCollection
 from kimmdy.utils import read_reaction_time_marker, run_shell_cmd, get_task_directories
-from kimmdy.constants import MARK_DONE, MARK_STARTED
+from kimmdy.constants import MARK_DONE, MARK_REACION_TIME, MARK_STARTED
 
 
 def get_analysis_dir(dir: Path) -> Path:
@@ -99,54 +99,58 @@ def concat_traj(
     for d in directories:
         trjs = list(d.glob(f"*.{filetype}"))
         if len(trjs) > 0:
-            trajectories.append(trjs)
+            trajectories.append([t for t in trjs if not '.kimmdytrunc.' in t.name])
             trajectories_task_nrs.append(int(d.name.split("_")[0]))
-        tprs.extend(d.glob("*.tpr"))
-        gros.extend(d.glob("*.gro"))
+            tprs.extend(d.glob("*.tpr"))
+            gros.extend(d.glob("*.gro"))
 
     assert (
         len(trajectories) > 0
     ), f"No trrs found to concatenate in {run_dir} with subdirectory names {steps}"
 
-
-    print(trajectories)
-    print(trajectories_task_nrs)
+    assert len(trajectories) == len(trajectories_task_nrs), "Mismatch in trajectory list"
 
     # check if there is a <n>_apply_reipce directory between a trajectory and the next or the end
     # if so, write a truncated trajectory based on the `.kimmdy_reaction_time` file in the apply_recipe directory
     for i, n in enumerate(trajectories_task_nrs):
         # i is the index into trajectories list of lists
         # n is the index into all_directories
-        next_n = min(trajectories_task_nrs[i + 1], len(all_directories))
-        for j in range(n, next_n):
-            print(j)
+        if i == len(trajectories_task_nrs) - 1:
+            next_n = len(all_directories)
+        else:
+            next_n = min(trajectories_task_nrs[i + 1], len(all_directories))
+        for j in range(n+1, next_n):
+            task_dir = all_directories[j]
+            if task_dir.stem.endswith("apply_recipe"):
+                time = read_reaction_time_marker(task_dir)
+                if time is not None:
+                    ts = trajectories[i]
+                    new_ts = []
+                    for t in ts:
+                        new_t = t.with_suffix('.kimmdytrunc.xtc')
+                        run_shell_cmd(
+                            f"echo '0' | gmx trjconv -f {t} -s {tprs[i]} -e {time} -o {new_t}",
+                            cwd=run_dir,
+                        )
+                        new_ts.append(new_t)
+                    trajectories[i] = new_ts
+                break
 
-        # next_dir = Path(trajectories[i + 1]).parent
-        # if next_dir.stem.endswith("apply_recipe"):
-        #     reaction_time = next_dir / ".kimmdy_reaction_time"
-        #     time = read_reaction_time_marker(reaction_time)
-        #     if time is not None:
-        #         # run_shell_cmd(
-        #         #     f"echo 'Protein\n{output}' | gmx trjconv -dt {time} -f {t} -s {tprs[0]} -o {t.with_suffix('.truncated.xtc')} -center -pbc mol",
-        #         #     cwd=run_dir,
-        #         # )
-        #         trajectories[i] = str(t.with_suffix(".truncated.xtc"))
+    flat_trajectories: list[str] = [str(t) for ts in trajectories for t in ts]
 
-    trajectories = [str(t) for t in trajectories]
-    print(trajectories)
-    return
     ## write concatenated trajectory
     tmp_xtc = str(out_xtc.with_name("tmp.xtc"))
     run_shell_cmd(
-        f"gmx trjcat -f {' '.join(trajectories)} -o {tmp_xtc} -cat",
+        fr"gmx trjcat -f {' '.join(flat_trajectories)} -o {tmp_xtc} -cat",
         cwd=run_dir,
     )
     run_shell_cmd(
-        f"echo 'Protein\n{output}' | gmx trjconv -dt 0 -f {tmp_xtc} -s {tprs[0]} -o {str(out_xtc)} -center -pbc mol",
+        s=fr"echo -e 'Protein\n{output}' | gmx trjconv -dt 0 -f {tmp_xtc} -s {tprs[0]} -o {str(out_xtc)} -center -pbc mol",
         cwd=run_dir,
     )
+    assert out_xtc.exists(), f"Concatenated trajectory {out_xtc} not found."
     run_shell_cmd(
-        f"echo 'Protein\n{output}' | gmx trjconv -dump 0 -f {tmp_xtc} -s {tprs[0]} -o {str(out_gro)} -center -pbc mol",
+        fr"echo -e 'Protein\n{output}' | gmx trjconv -dt 0 -dump 0 -f {tmp_xtc} -s {tprs[0]} -o {str(out_gro)} -center -pbc mol",
         cwd=run_dir,
     )
     run_shell_cmd(f"rm {tmp_xtc}", cwd=run_dir)
