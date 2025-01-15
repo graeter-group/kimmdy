@@ -17,7 +17,9 @@ jobscript = """
 
 # Setup up your environment here
 # modules.sh might load lmod modules, set environment variables, etc.
-source ./_modules.sh
+if [ -f ./_modules.sh ]; then
+    source ./_modules.sh
+fi
 
 CYCLE={config.max_hours}
 CYCLE_buffered=$(echo "scale=2; $CYCLE - 0.08" | bc)
@@ -25,7 +27,7 @@ CYCLE_buffered=$(echo "scale=2; $CYCLE - 0.08" | bc)
 
 START=$(date +"%s")
 
-timeout ${{CYCLE_buffered}}h kimmdy -i {config.input_file}
+timeout ${{CYCLE_buffered}}h kimmdy -i {config.input_file} --restart
 
 END=$(date +"%s")
 
