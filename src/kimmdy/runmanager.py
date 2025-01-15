@@ -59,7 +59,6 @@ from kimmdy.utils import (
     flatten_recipe_collections,
     get_task_directories,
     run_gmx,
-    truncate_sim_files,
     write_gro_file_at_reaction_time,
     write_reaction_time_marker,
 )

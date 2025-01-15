@@ -16,7 +16,6 @@ from kimmdy.coordinates import (
     place_atom,
     break_bond_plumed,
 )
-from kimmdy.utils import truncate_sim_files
 
 
 def test_get_explicit_MultipleDihedrals(arranged_tmp_path):
