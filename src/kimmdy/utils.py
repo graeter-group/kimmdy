@@ -415,6 +415,13 @@ def write_gro_file_at_reaction_time(files: TaskFiles, time: float|None):
     gro_reaction = gro.with_name(gro.stem + f"_reaction.gro")
     files.output["gro"] = gro_reaction
 
+    if gro_reaction.exists():
+        m = f"gro file at reaction time {time} already exists in {gro.parent}. Removing it."
+        logger.error(m)
+        gro_reaction.unlink()
+        # FIXME: raise an error for now to debug
+        raise FileExistsError(m)
+
     # prefer xtc over trr
     # (should have more frames and be smaller)
     if files.input["xtc"] is not None:
@@ -558,10 +565,6 @@ def get_task_directories(dir: Path, tasks: Union[list[str], str] = "all") -> lis
         key=lambda p: int(p.name.split("_")[0]),
     )
     if tasks == "all":
-        matching_directories = directories
+        return directories
     else:
-        matching_directories = list(
-            filter(lambda d: d.name.split("_")[1] in tasks, directories)
-        )
-
-    return matching_directories
+        return [d for d in directories if d.name.split("_")[1] in tasks]
