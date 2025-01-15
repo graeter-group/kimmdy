@@ -276,7 +276,7 @@ class RunManager:
     def _setup_restart(self):
         """Set up RunManager to restart from an existing run directory"""
 
-        task_dirs = get_task_directories(self.config.out, "all")
+        task_dirs = get_task_directories(self.config.out)
         if task_dirs == []:
             # no tasks found in the output directory. this is a fresh run
             return
@@ -667,9 +667,14 @@ class RunManager:
         )
 
         if getattr(md_config, "use_plumed"):
-            mdrun_cmd += f" -plumed {files.input['plumed']}"
+            plumed_in = files.input['plumed']
+            if plumed_in is None:
+                m = "Plumed input file not found in input files."
+                logger.error(m)
+                raise FileNotFoundError(m)
+            mdrun_cmd += f" -plumed {plumed_in}"
 
-            plumed_out = files.outputdir / get_plumed_out(files.input["plumed"])
+            plumed_out = files.outputdir / get_plumed_out(plumed_in)
             files.output["plumed_out"] = plumed_out
 
         logger.debug(f"grompp cmd: {grompp_cmd}")
