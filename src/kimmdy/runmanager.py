@@ -74,7 +74,7 @@ IGNORE_SUBSTR = [
     r"step\d+[bc]\.pdb",
     r"\.tail",
     r"_mod\.top",
-    r"\.1#",
+    r"\.\d+#",
     "rotref",
 ] + MARKERS
 # are there cases where we have multiple trr files?
@@ -255,7 +255,7 @@ class RunManager:
 
         if self.config.restart:
             logger.info(f"Restarting from previous run in: {self.config.out}")
-            self.restart_run()
+            self._setup_restart()
 
         while (
             self.state is not State.DONE
@@ -273,7 +273,7 @@ class RunManager:
             f"In output directory {self.config.out}"
         )
 
-    def restart_run(self):
+    def _setup_restart(self):
         """Set up RunManager to restart from an existing run directory"""
 
         task_dirs = get_task_directories(self.config.out, "all")
@@ -898,15 +898,6 @@ class RunManager:
         logger.info(f"VMD selection: {vmd_selection}")
         with open(files.outputdir / "vmd_selection.txt", "w") as f:
             f.write(vmd_selection)
-
-        # TODO: truncate during run is deprecated
-        # kimmdy writes marker files for the reaction
-        # time instead
-        # if not self.config.skip_truncation:
-        #     # truncate simulation files to the chosen time
-        #     m = f"Truncating simulation files to time {ttime} ps"
-        #     logger.info(m)
-        #     truncate_sim_files(files=files, time=ttime)
 
         write_reaction_time_marker(dir=files.outputdir, time=ttime)
         # because the gro_reaction file is written to files.output

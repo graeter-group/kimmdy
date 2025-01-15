@@ -22,7 +22,7 @@ from seaborn import axes_style
 
 from kimmdy.parsing import read_json, write_json, read_time_marker
 from kimmdy.recipe import Bind, Break, DeferredRecipeSteps, Place, RecipeCollection
-from kimmdy.utils import run_shell_cmd, get_task_directories
+from kimmdy.utils import read_reaction_time_marker, run_shell_cmd, get_task_directories
 from kimmdy.constants import MARK_DONE, MARK_STARTED
 
 
@@ -69,6 +69,8 @@ def concat_traj(
     run_dir = Path(dir).expanduser().resolve()
     analysis_dir = get_analysis_dir(run_dir)
 
+    all_directories = get_task_directories(run_dir)
+
     directories = get_task_directories(run_dir, steps)
     if not directories:
         raise ValueError(
@@ -90,11 +92,15 @@ def concat_traj(
         output = output_group
 
     ## gather trajectories
-    trajectories = []
+    trajectories: list[list] = []
+    trajectories_task_nrs: list[int] = []
     tprs = []
     gros = []
     for d in directories:
-        trajectories.extend(d.glob(f"*.{filetype}"))
+        trjs = list(d.glob(f"*.{filetype}"))
+        if len(trjs) > 0:
+            trajectories.append(trjs)
+            trajectories_task_nrs.append(int(d.name.split("_")[0]))
         tprs.extend(d.glob("*.tpr"))
         gros.extend(d.glob("*.gro"))
 
@@ -102,9 +108,33 @@ def concat_traj(
         len(trajectories) > 0
     ), f"No trrs found to concatenate in {run_dir} with subdirectory names {steps}"
 
+
+    print(trajectories)
+    print(trajectories_task_nrs)
+
+    # check if there is a <n>_apply_reipce directory between a trajectory and the next or the end
+    # if so, write a truncated trajectory based on the `.kimmdy_reaction_time` file in the apply_recipe directory
+    for i, n in enumerate(trajectories_task_nrs):
+        # i is the index into trajectories list of lists
+        # n is the index into all_directories
+        next_n = min(trajectories_task_nrs[i + 1], len(all_directories))
+        for j in range(n, next_n):
+            print(j)
+
+        # next_dir = Path(trajectories[i + 1]).parent
+        # if next_dir.stem.endswith("apply_recipe"):
+        #     reaction_time = next_dir / ".kimmdy_reaction_time"
+        #     time = read_reaction_time_marker(reaction_time)
+        #     if time is not None:
+        #         # run_shell_cmd(
+        #         #     f"echo 'Protein\n{output}' | gmx trjconv -dt {time} -f {t} -s {tprs[0]} -o {t.with_suffix('.truncated.xtc')} -center -pbc mol",
+        #         #     cwd=run_dir,
+        #         # )
+        #         trajectories[i] = str(t.with_suffix(".truncated.xtc"))
+
     trajectories = [str(t) for t in trajectories]
     print(trajectories)
-
+    return
     ## write concatenated trajectory
     tmp_xtc = str(out_xtc.with_name("tmp.xtc"))
     run_shell_cmd(
