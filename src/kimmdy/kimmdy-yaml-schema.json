@@ -269,17 +269,9 @@
     "restart": {
       "title": "restart",
       "type": "object",
-      "description": "Restart from a previous run.",
-      "properties": {
-        "run_directory": {
-          "type": "string",
-          "pytype": "Path",
-          "description": "KIMMDY run directory to restart from"
-        }
-      },
-      "required": [
-        "run_directory"
-      ]
+      "description": "Restart or continue from a previous run (in config.out) instead of starting from scratch",
+      "pytype": "bool",
+      "default": false
     },
     "mds": {
       "title": "mds",

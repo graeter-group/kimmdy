@@ -128,7 +128,7 @@ class Config:
         section: str = "config",
         logfile: Path | None = None,
         loglevel: str | None = None,
-        restart: bool | None = None,
+        restart: bool = False,
     ):
 
         # initial scheme
@@ -237,7 +237,7 @@ class Config:
             configure_logger(self)
 
     def _set_defaults(
-        self, section: str = "config", scheme: dict = {}, restart: bool | None = None
+        self, section: str = "config", scheme: dict = {}, restart: bool = False
     ):
         """
         Set defaults for attributes not set in yaml file but
@@ -303,7 +303,8 @@ class Config:
         # but defined in terms of other attributes
         # or from the cli
         if section == "config":
-            if restart is not None:
+            # restart flag is true if set, otherwise false
+            if restart is True:
                 self.restart = restart
 
             self.name = self.name.replace(" ", "_")

@@ -84,7 +84,7 @@ def get_cmdline_args() -> argparse.Namespace:
     )
 
     parser.add_argument(
-        "--restart", "-r", action="store_true", help=("Restart from a previous run instead of incrementing the run number for the output directory.")
+        "--restart", "-r", action="store_true", help=("Restart or continue from a previous run instead of incrementing the run number for the output directory. It the output directory does not exist, it will be like a regular fresh run.")
     )
 
     # visualize call stack
