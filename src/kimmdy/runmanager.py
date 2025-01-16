@@ -287,9 +287,8 @@ class RunManager:
             return
 
         logger.info(f"Found task directories in existing output directory ({self.config.out.name}): {[p.name for p in task_dirs]}")
-        logger.info(f"Task queue: {self.tasks.queue}")
+        logger.info(f"Task queue: {self.tasks}")
 
-        completed_tasks: list[Task] = []
         found_restart_point = False
         restart_task_name = None
         restart_from_incomplete = False
@@ -327,7 +326,13 @@ class RunManager:
                 else:
                     exit(1)
             elif (task_dir / MARK_STARTED).exists() and not (task_dir / MARK_DONE).exists() and task_name in md_task_names:
-                # Continue from started but not finished task is a valid restart point
+                # Continue from started but not finished md task is a valid restart point
+                # if it got so far that is has written at least one checkpoint file
+                checkpoint_files = list(task_dir.glob("*.cpt"))
+                if len(checkpoint_files) == 0:
+                    m = f"Last started but not done task is {task_dir.name}, but no checkpoint file found. Using an earlier MD or setup task as restart point instead."
+                    logger.warning(m)
+                    continue
                 logger.info(f"Found started but not finished task {task_dir.name}.")
                 logger.info(f"Will continue task {task_dir.name}")
                 found_restart_point = True
@@ -347,6 +352,12 @@ class RunManager:
                 restart_task_name = task_name
                 restart_from_incomplete = False
                 md_instance_dir_counter[task_name] += 1
+            elif (task_dir / MARK_STARTED).exists() and (task_dir / MARK_DONE).exists() and task_name == "setup":
+                # Continuing just after 0_setup is a valid restart point
+                found_restart_point = True
+                self.iteration = task_n
+                restart_task_name = task_name
+                restart_from_incomplete = False
             elif (task_dir/ MARK_STARTED).exists() and (task_dir / MARK_DONE).exists():
                 # Completed task, but not an MD task
                 pass
@@ -367,7 +378,7 @@ class RunManager:
 
         m = f"Restarting from iteration (task number) {self.iteration} with name {restart_task_name}"
         logger.info(m)
-        
+
         # pop from the task queue until the restart point
         # all md tasks from which we may restart are in the task queue.
         # Only e.g. relax mds would just show up in the runtime prioroty queue,
@@ -378,20 +389,27 @@ class RunManager:
         md_instance_task_counter = 0
         while not self.tasks.empty():
             task = self.tasks.get()
-            print(task.name)
+            if task.name == restart_task_name and restart_task_name == "setup":
+                # this is the case if setup ends up as the restart point
+                instance = "setup"
+                found_restart_task = True
+                break
             if task.name == "run_md":
                 instance = task.kwargs["instance"]
                 md_instance_task_counter += 1
                 if instance == restart_task_name and md_instance_task_counter == md_instance_dir_counter[instance]:
-                    # restart from the last completed (or half completed) MD task
+                    # restart from the last completed (or half completed) valid restart point
                     found_restart_task = True
                     # put the task back in the queue
                     if restart_from_incomplete:
                         logger.info("Restarting from incomplete task. Will continue this task.")
-                        self.tasks.put(task)
+                        # append to the front of the queue
+                        task.kwargs.update({"continue_md": True})
+                        self.tasks.queue.appendleft(task);
                     else:
                         logger.info("Restarting after completed task.")
                     break
+
 
         if not isinstance(task, Task) or not found_restart_task or not instance:
             m = f"Could not find task {restart_task_name} in task queue. Aborting restart."
@@ -408,7 +426,7 @@ class RunManager:
             shutil.rmtree(task_dir)
 
         # discover after it is clear which tasks will be in queue
-        for task_dir in task_dirs[: self.iteration + 1]:
+        for task_dir in task_dirs[:self.iteration+1]:
             task_name = "_".join(task_dir.name.split(sep="_")[1:])
             task_files = TaskFiles(
                 self.get_latest, {}, {}, self.config.out / task_dir.name
@@ -435,6 +453,12 @@ class RunManager:
             radicals=getattr(self.config, "radicals", None),
             residuetypes_path=getattr(self.config, "residuetypes", None),
         )
+
+        # if we restart from within an imcomplete task,
+        # decrement the iteration because if will be incremented
+        # when the task starts again
+        if restart_from_incomplete:
+            self.iteration -= 1
 
 
     def _setup_tasks(self):
@@ -624,12 +648,6 @@ class RunManager:
                     files.output[f] = files.outputdir / path.name
 
         return files
-
-    def _restart_task(self, _: TaskFiles) -> None:
-        raise RuntimeError(
-            "Called restart task. This task is only for finding the restart "
-            "point in the sequence and should never be called!"
-        )
 
     def _run_md(
         self, instance: str, files: TaskFiles, continue_md: bool = False

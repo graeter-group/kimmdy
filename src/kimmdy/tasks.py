@@ -73,7 +73,7 @@ class TaskFiles:
         self.input = AutoFillDict(self.get_latest)
 
 
-def create_task_directory(runmng, postfix: str) -> TaskFiles:
+def create_task_directory(runmng, postfix: str, is_continuation: bool=False) -> TaskFiles:
     """Creates TaskFiles object, output directory, logger and symlinks ff.
 
     Gets called when a Task is called (from the runmanager.tasks queue).
@@ -86,12 +86,13 @@ def create_task_directory(runmng, postfix: str) -> TaskFiles:
     # create outputdir
     files.outputdir = runmng.config.out / taskname
     logger.debug(f"Creating Output directory: {files.outputdir}")
-    if files.outputdir.exists():
+    if files.outputdir.exists() and not is_continuation:
         logger.warning(
             f"Output directory {files.outputdir} for the task already exists. Deleting."
         )
         shutil.rmtree(files.outputdir)
-    files.outputdir.mkdir()
+    if not is_continuation:
+        files.outputdir.mkdir()
 
     # set up logger
     files.logger = logging.getLogger(f"kimmdy.{taskname}")
@@ -153,7 +154,11 @@ class Task:
     def __call__(self) -> Optional[TaskFiles]:
         logger.info(f"Starting task: {self.name} with args: {self.kwargs} in {self.runmng.iteration}_{self.out}")
         if self.out is not None:
-            self.kwargs.update({"files": create_task_directory(self.runmng, self.out)})
+            is_continuation = False
+            if self.kwargs.get('continue_md') is True:
+                logger.info(f"Continuing task: {self.name} in {self.runmng.iteration}_{self.out}")
+                is_continuation = True
+            self.kwargs.update({"files": create_task_directory(self.runmng, self.out, is_continuation=is_continuation)})
             write_time_marker(self.kwargs["files"].outputdir / MARK_STARTED, self.name)
             logger.info(f"Wrote kimmdy start marker for task: {self.name} in {self.runmng.iteration}_{self.out}")
         files = self.f(**self.kwargs)

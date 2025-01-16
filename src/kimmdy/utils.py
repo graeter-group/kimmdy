@@ -414,7 +414,7 @@ def write_gro_file_at_reaction_time(files: TaskFiles, time: float|None):
     gro_reaction = gro.with_name(gro.stem + f"_reaction.gro")
 
     if gro_reaction.exists():
-        m = f"gro file at reaction time {time} already exists in {gro.parent}. Removing it."
+        m = f"gro file at reaction time {time} already exists in {gro.parent}. Removing it. This may happen by restarting from a previous run."
         logger.error(m)
         gro_reaction.unlink()
 
