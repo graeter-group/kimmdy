@@ -23,8 +23,12 @@ class AutoFillDict(dict):
         self.get_missing = get_missing
 
     def __missing__(self, key: str) -> None|Path:
-        self[key] = self.get_missing(key)
-        return self.get(key)
+        v = self.get_missing(key)
+        if v is not None:
+            self[key] = v
+            return v
+        else:
+            return None
 
 
 @dataclass

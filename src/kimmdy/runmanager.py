@@ -510,11 +510,11 @@ class RunManager:
                 raise ValueError(m)
         logger.info(f"Task list build:\n{pformat(list(self.tasks.queue), indent=8)}")
 
-    def get_latest(self, suffix: str) -> Path:
+    def get_latest(self, suffix: str) -> Path|None:
         """Returns path to latest file of given type.
 
         For .dat files (in general ambiguous extensions) use full file name.
-        Errors if file is not found.
+        Return None if file is not found.
         """
         logger.debug("Getting latest suffix: " + suffix)
         try:
@@ -523,8 +523,8 @@ class RunManager:
             return path
         except Exception:
             m = f"File {suffix} requested but not found!"
-            logger.error(m)
-            raise FileNotFoundError(m)
+            logger.warning(m)
+            return None
 
     def __iter__(self):
         return self
@@ -942,6 +942,7 @@ class RunManager:
         # because the gro_reaction file is written to files.output
         # it will be discovered by _discover_output_files
         # and set as the latest gro file for the next tasks
+        print({k: v.name for k, v in self.latest_files.items()})
         write_gro_file_at_reaction_time(files=files, time=ttime)
 
         top_initial = deepcopy(self.top)

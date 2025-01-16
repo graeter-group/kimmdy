@@ -400,14 +400,10 @@ def write_gro_file_at_reaction_time(files: TaskFiles, time: float|None):
     """Write out a gro file from the trajectory (xtc or trr) at the reaction time."""
     if time is None:
         return
+
     gro = files.input["gro"]
     if gro is None:
         m = "No gro file found from the previous md run."
-        logger.error(m)
-        raise FileNotFoundError(m)
-    tpr = files.input["tpr"]
-    if tpr is None:
-        m = "No tpr file found from the previous md run."
         logger.error(m)
         raise FileNotFoundError(m)
 
@@ -424,10 +420,10 @@ def write_gro_file_at_reaction_time(files: TaskFiles, time: float|None):
     # prefer xtc over trr
     # (should have more frames and be smaller)
     if files.input["xtc"] is not None:
-        run_gmx(f"echo '0' | gmx trjconv -f {files.input['xtc']} -s {tpr} -b {time} -dump {time} -o {gro_reaction}")
+        run_gmx(f"echo '0' | gmx trjconv -f {files.input['xtc']} -s {gro} -b {time} -dump {time} -o {gro_reaction}")
     elif files.input["trr"] is not None:
         run_gmx(
-            f"echo '0' | gmx trjconv -f {files.input['trr']} -s {tpr} -b {time} -dump {time} -o {gro_reaction}"
+            f"echo '0' | gmx trjconv -f {files.input['trr']} -s {gro} -b {time} -dump {time} -o {gro_reaction}"
         )
     else:
         m = f"No trajectory file found to write out gro file at reaction time in {gro.parent}"
