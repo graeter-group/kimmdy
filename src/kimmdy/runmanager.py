@@ -269,7 +269,8 @@ class RunManager:
         ):
             next(self)
 
-        write_time_marker(self.config.out / MARK_FINISHED, "finished")
+        if not self.config.dryrun:
+            write_time_marker(self.config.out / MARK_FINISHED, "finished")
         logger.info(
             f"Finished running last task, state: {self.state} after "
             f"{timedelta(seconds=(time.time() - self.start_time))} "
@@ -284,116 +285,113 @@ class RunManager:
             # no tasks found in the output directory. this is a fresh run
             return
 
-        logger.info(f"Found task directories in restart run directory: {task_dirs}")
+        logger.info(f"Found task directories in existing output directory ({self.config.out.name}): {[p.name for p in task_dirs]}")
         logger.info(f"Task queue: {self.tasks.queue}")
 
         completed_tasks: list[Task] = []
-        nested_tasks: dict[Task, list[Path]] = {}
-        self.iteration = 0
-        found_run_end = False
+        found_restart_point = False
+        restart_task_name = None
+        restart_from_incomplete = False
+
+        # restarting during or after MD except for relaxation/slow_growth MDs are valid restart points
+        if hasattr(self.config.changer, "coordinates") and hasattr(self.config.changer.coordinates, "md"):
+            relax_md_name = self.config.changer.coordinates.md
+        else:
+            relax_md_name = None
+        if hasattr(self.config, "mds"):
+            md_task_names = [name for name in self.config.mds.get_attributes() if name != relax_md_name]
+        else:
+            md_task_names = []
 
         # discover completed or half completed tasks
-        logger.info("Checking for restart point.")
-        logger.info(f"Found task directories: {[p.name for p in task_dirs]}")
-        while not self.tasks.empty() and not found_run_end:
-            task: Task = self.tasks.get()
-            logger.info(f"Checking task: {task.name}")
-            if task.out is None:
-                # task without output directory are not valid restart points
-                # and assumed to be ephemeral
-                completed_tasks.append(task)
-            else:
-                if task_dirs[self.iteration :] == []:
-                    if len(completed_tasks) == 0:
-                        m = "No tasks found in the output directory and no remaining tasks to check. Aborting restart."
-                        logger.error(m)
-                        raise FileNotFoundError(m)
-                    # Condition 1: Continue from the last finished task
-                    logger.info(f"Found last finished task with task number {self.iteration}: {completed_tasks[-1].name}")
-                    found_run_end = True
-                for task_dir in task_dirs[self.iteration :]:
-                    if (task_dir / MARK_FAILED).exists():
-                        raise RuntimeError(
-                            f"Task in directory `{task_dir.name}` is indicated to "
-                            "have failed. Aborting restart. Remove this task "
-                            "directory if you want to restart from before the failed task."
-                        )
-                    elif (task_dir / MARK_STARTED).exists():
-                        self.iteration += 1
+        logger.info("Checking for restart point in existing task dirs.")
+        for task_dir in task_dirs:
+            task_n, task_name = task_dir.name.split(sep="_", maxsplit=1)
+            task_n = int(task_n)
+            logger.info(f"Checking task: {task_n}_{task_name}")
+            if (task_dir / MARK_FAILED).exists():
+                m = f"Task in directory `{task_dir.name}` is indicated to " \
+                    "have failed. Aborting restart. Remove this task " \
+                    "directory if you want to restart from before the failed task."
 
-                        task_name = "_".join(task_dir.name.split(sep="_")[1:])
-                        if task_name == task.out:
-                            task.kwargs.update(
-                                {
-                                    "files": TaskFiles(
-                                        self.get_latest, {}, {}, task_dir
-                                    )
-                                }
-                            )
-                            completed_tasks.append(task)
-                            if not (task_dir / MARK_DONE).exists():
-                                logger.info(
-                                    f"Found started but not finished task {task_dir.name}."
-                                )
-                                if completed_tasks[-1].name == "run_md":
-                                    kwargs: dict = copy(task.kwargs)
-                                    continue_md_task = Task(
-                                        self, f=self._run_md, kwargs=kwargs, out=None
-                                    )
-
-                                    continue_md_task.kwargs.update(
-                                        {"continue_md": True}
-                                    )
-                                    self.priority_tasks.put(continue_md_task)
-                                # Condition 2: Continue from started but not finished task
-                                logger.info(f"Will continue task {task_dir.name}")
-                                found_run_end = True
-                            break
-                        else:
-                            # task probably not unique but having the latest of one kind should suffice
-                            if len(completed_tasks) > 0:
-                                if not completed_tasks[-1] in nested_tasks.keys():
-                                    nested_tasks[completed_tasks[-1]] = []
-                                nested_tasks[completed_tasks[-1]].append(task_dir)
-                    else:
-                        raise RuntimeError(
-                            f"Encountered task directory {task_dir.name} but the"
-                            " task is not indicated to have started. Aborting restart."
-                        )
-
-        # add completed tasks to queue again until a reliable restart point (i.e after MD) is reached
-        while completed_tasks:
-            if completed_tasks[-1].name == "run_md":
-                logger.info(
-                    f"Will continue after completed task {completed_tasks[-1].kwargs['files'].outputdir}"
-                )
-
-                self.iteration -= 1
+                inp = input("Do you want to delete this task directory? [y/n]")
+                if inp == "y":
+                    shutil.rmtree(task_dir)
+                else:
+                    exit(1)
+            elif (task_dir / MARK_STARTED).exists() and not (task_dir / MARK_DONE).exists() and task_name in md_task_names:
+                # Continue from started but not finished task is a valid restart point
+                logger.info(f"Found started but not finished task {task_dir.name}.")
+                logger.info(f"Will continue task {task_dir.name}")
+                found_restart_point = True
+                self.iteration = task_n
+                restart_task_name = task_name
+                restart_from_incomplete = True
+                # no need to search further, as this task is unfinished
+                break
+            elif (task_dir / MARK_STARTED).exists() and (task_dir / MARK_DONE).exists() and task_name in md_task_names:
+                # Continue after last finished MD task is a valid restart point
+                # but continue searching for newer tasks after this
+                logger.info(f"Found completed task {task_dir.name}")
+                logger.info(f"Will continue after task {task_dir.name}")
+                found_restart_point = True
+                self.iteration = task_n
+                restart_task_name = task_name
+                restart_from_incomplete = False
+            elif (task_dir/ MARK_STARTED).exists() and (task_dir / MARK_DONE).exists():
+                # Completed task, but not an MD task
+                pass
+            elif (task_dir/ MARK_STARTED).exists() and not (task_dir / MARK_DONE).exists():
+                # Started but not done task, not an MD task
+                m = f"Last started but not done task is {task_dir.name}, which can not be restarted from. Restarting instead from after the last completed MD task."
+                logger.info(m)
                 break
             else:
-                current_nested_task_dirs = nested_tasks.get(completed_tasks[-1], [])
-                try:
-                    current_task_dir = [completed_tasks[-1].kwargs["files"].outputdir]
-                except KeyError:
-                    current_task_dir = []
-                for task_dir in [
-                    *current_nested_task_dirs,
-                    *current_task_dir,
-                ]:
-                    self.iteration -= 1
-                completed_tasks[-1].kwargs.pop("files", None)
-                self.tasks.queue.appendleft(completed_tasks.pop())
-        else:
-            self.iteration -= 1
+                m = f"Encountered task directory {task_dir.name} but kimmdy does not know how to handle this task. Aborting restart."
+                logger.error(m)
+                raise RuntimeError(m)
 
-        all_task_dirs = get_task_directories(self.config.out)
+        if not found_restart_point or not restart_task_name:
+            m = "No valid restart point found in existing task directories."
+            logger.error(m)
+            raise RuntimeError(m)
+
+        m = f"Restarting from iteration (task number) {self.iteration} with name {restart_task_name}"
+        logger.info(m)
+        
+        # pop from the task queue until the restart point
+        # all md tasks from which we may restart are in the task queue.
+        # Only e.g. relax mds would just show up in the runtime prioroty queue,
+        # regular md tasks are known before the run starts from the config.sequence.
+        task = None
+        instance = None
+        found_restart_task = False
+        while not self.tasks.empty():
+            task = self.tasks.get()
+            if task.name == "run_md":
+                instance = task.kwargs["instance"]
+                if instance == restart_task_name:
+                    found_restart_task = True
+                    # put the task back in the queue
+                    self.tasks.put(task)
+                    break
+
+        if not isinstance(task, Task) or not found_restart_task or not instance:
+            m = f"Could not find task {restart_task_name} in task queue. Aborting restart."
+            logger.error(m)
+            raise RuntimeError(m)
+        if restart_from_incomplete:
+            fragment = "within"
+        else:
+            fragment = "after"
+        logger.info(f"Restarting from {fragment} task {task.name} with instance {instance}")
 
         # clean up old task directories that will be overwritten
-        for task_dir in all_task_dirs[self.iteration+1:]:
+        for task_dir in task_dirs[self.iteration+1:]:
             shutil.rmtree(task_dir)
 
         # discover after it is clear which tasks will be in queue
-        for task_dir in all_task_dirs[: self.iteration + 1]:
+        for task_dir in task_dirs[: self.iteration + 1]:
             task_name = "_".join(task_dir.name.split(sep="_")[1:])
             task_files = TaskFiles(
                 self.get_latest, {}, {}, self.config.out / task_dir.name
@@ -420,6 +418,11 @@ class RunManager:
             radicals=getattr(self.config, "radicals", None),
             residuetypes_path=getattr(self.config, "residuetypes", None),
         )
+
+        # print(self.iteration)
+        # print(self.tasks.queue)
+        # print({k: v.name for k, v in self.latest_files.items()})
+        # exit(0)
 
     def _setup_tasks(self):
         """Populates the tasks queue.
