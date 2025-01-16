@@ -69,11 +69,12 @@ logger = logging.getLogger(__name__)
 AMBIGUOUS_SUFFS = ["dat", "xvg", "log", "itp", "mdp"]
 # file strings which to ignore
 IGNORE_SUBSTR = [
-    "_prev.cpt",
-    r"step\d+[bc]\.pdb",
-    r"\.tail",
-    r"_mod\.top",
-    r"\.\d+#",
+    "_prev.cpt$",
+    r"step\d+[bc]\.pdb$",
+    r"\.tail$",
+    r"_mod\.top$",
+    r"\.\d+#$",
+    r"\.log$",
     "rotref",
 ] + MARKERS
 # are there cases where we have multiple trr files?
@@ -303,6 +304,12 @@ class RunManager:
         else:
             md_task_names = []
 
+        # keep track of how often we have completed each md instance
+        # such that we can later restart correctly at the latest instance
+        md_instance_dir_counter = {}
+        for name in md_task_names:
+            md_instance_dir_counter[name] = 0
+
         # discover completed or half completed tasks
         logger.info("Checking for restart point in existing task dirs.")
         for task_dir in task_dirs:
@@ -327,6 +334,7 @@ class RunManager:
                 self.iteration = task_n
                 restart_task_name = task_name
                 restart_from_incomplete = True
+                md_instance_dir_counter[task_name] += 1
                 # no need to search further, as this task is unfinished
                 break
             elif (task_dir / MARK_STARTED).exists() and (task_dir / MARK_DONE).exists() and task_name in md_task_names:
@@ -338,6 +346,7 @@ class RunManager:
                 self.iteration = task_n
                 restart_task_name = task_name
                 restart_from_incomplete = False
+                md_instance_dir_counter[task_name] += 1
             elif (task_dir/ MARK_STARTED).exists() and (task_dir / MARK_DONE).exists():
                 # Completed task, but not an MD task
                 pass
@@ -366,14 +375,22 @@ class RunManager:
         task = None
         instance = None
         found_restart_task = False
+        md_instance_task_counter = 0
         while not self.tasks.empty():
             task = self.tasks.get()
+            print(task.name)
             if task.name == "run_md":
                 instance = task.kwargs["instance"]
-                if instance == restart_task_name:
+                md_instance_task_counter += 1
+                if instance == restart_task_name and md_instance_task_counter == md_instance_dir_counter[instance]:
+                    # restart from the last completed (or half completed) MD task
                     found_restart_task = True
                     # put the task back in the queue
-                    self.tasks.put(task)
+                    if restart_from_incomplete:
+                        logger.info("Restarting from incomplete task. Will continue this task.")
+                        self.tasks.put(task)
+                    else:
+                        logger.info("Restarting after completed task.")
                     break
 
         if not isinstance(task, Task) or not found_restart_task or not instance:
@@ -419,10 +436,6 @@ class RunManager:
             residuetypes_path=getattr(self.config, "residuetypes", None),
         )
 
-        # print(self.iteration)
-        # print(self.tasks.queue)
-        # print({k: v.name for k, v in self.latest_files.items()})
-        # exit(0)
 
     def _setup_tasks(self):
         """Populates the tasks queue.
@@ -530,7 +543,7 @@ class RunManager:
             for gro in gros:
                 if "_reaction" in gro.name:
                     files.output["gro"] = gro
-                    logger.info(f"Found reaction gro file: {gro} and set as latest")
+                    logger.info(f"Found reaction gro file: {gro} and set as latest or the the non-reaction gro file")
                     break
 
 
