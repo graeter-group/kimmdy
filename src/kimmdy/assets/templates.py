@@ -42,7 +42,7 @@ if [ $HOURS -lt $CYCLE ]; then
   exit 3
 else
   echo "jobscript resubmitting"
-  sbatch ./jobscript.sh
+  {config.slurm.runcmd} ./jobscript.sh
   exit 2
 fi
 """
