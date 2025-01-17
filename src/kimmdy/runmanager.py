@@ -937,11 +937,21 @@ class RunManager:
         with open(files.outputdir / "vmd_selection.txt", "w") as f:
             f.write(vmd_selection)
 
+        # write time marker for reaction time
+        # in the current task dir (<n>_apply_recipe)
+        # but also in the output dir of the MD task
+        # onto which the reaction is applied
         write_reaction_time_marker(dir=files.outputdir, time=ttime)
+        gro = files.input["gro"]
+        if gro is None:
+            m = "No gro file found from the previous md run."
+            logger.error(m)
+        else:
+            write_reaction_time_marker(dir=gro.parent, time=ttime)
+
         # because the gro_reaction file is written to files.output
         # it will be discovered by _discover_output_files
         # and set as the latest gro file for the next tasks
-        print({k: v.name for k, v in self.latest_files.items()})
         write_gro_file_at_reaction_time(files=files, time=ttime)
 
         top_initial = deepcopy(self.top)
