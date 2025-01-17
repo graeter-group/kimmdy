@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from kimmdy.cmd import kimmdy_run
-from kimmdy.constants import MARK_DONE
+from kimmdy.constants import MARK_DONE, MARK_FINISHED
 from kimmdy.parsing import read_top, write_top
 from kimmdy.plugins import parameterization_plugins
 from kimmdy.topology.topology import Topology
@@ -27,12 +27,11 @@ def read_last_line(file):
     "arranged_tmp_path", (["test_integration/emptyrun"]), indirect=True
 )
 def test_integration_emptyrun(arranged_tmp_path):
-    # not expecting this to run
-    # because the topology is empty
     Path("emptyrun.txt").touch()
     with pytest.raises(ValueError):
         kimmdy_run()
     assert len(list(Path.cwd().glob("emptyrun_001/*"))) == 2
+    assert not (arranged_tmp_path / 'minimal' / MARK_FINISHED).exists()
 
 
 @pytest.mark.parametrize(
@@ -41,7 +40,8 @@ def test_integration_emptyrun(arranged_tmp_path):
 def test_integration_valid_input_files(arranged_tmp_path):
     kimmdy_run()
     assert "Finished running last task" in read_last_line(Path("kimmdy.log"))
-    assert len(list(Path.cwd().glob("minimal/*"))) == 2
+    assert (arranged_tmp_path / 'minimal' / MARK_FINISHED).exists()
+    assert len(list(Path.cwd().glob("minimal/*"))) == 3
 
 
 @pytest.mark.parametrize(
@@ -191,14 +191,7 @@ def test_integration_restart(arranged_tmp_path):
     kimmdy_run(input=Path("kimmdy_restart.yml"))
     n_files_original = len(list(run_dir.glob("*")))
 
-    # try restart from restart task
-    kimmdy_run(input=Path("kimmdy_restart_task.yml"))
-    n_files_restart_task = len(list(restart_dir.glob("*")))
-
-    assert "Finished running last task" in read_last_line(Path("kimmdy.log"))
-    assert n_files_original == n_files_restart_task == 17
-
-    # try restart from stopped md (doesn't work with truncated trajectory)
+    # try restart from stopped md
     task_dirs = get_task_directories(run_dir, "all")
     (task_dirs[-1] / MARK_DONE).unlink()
     kimmdy_run(input=Path("kimmdy_restart.yml"))

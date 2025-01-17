@@ -270,8 +270,7 @@ class RunManager:
         ):
             next(self)
 
-        if not self.config.dryrun:
-            write_time_marker(self.config.out / MARK_FINISHED, "finished")
+        write_time_marker(self.config.out / MARK_FINISHED, "finished")
         logger.info(
             f"Finished running last task, state: {self.state} after "
             f"{timedelta(seconds=(time.time() - self.start_time))} "
