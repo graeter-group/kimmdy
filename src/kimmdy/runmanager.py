@@ -435,16 +435,22 @@ class RunManager:
         # plumed fix
         for md_config in self.config.mds.__dict__.values():
             if getattr(md_config, "use_plumed"):
-                try:
-                    plumed_out_name = get_plumed_out(self.latest_files["plumed"]).name
-                    self.latest_files["plumed_out"] = self.get_latest(plumed_out_name)
+                plumed_out_name = get_plumed_out(self.latest_files["plumed"]).name
+                plumed_out = self.get_latest(plumed_out_name)
+                if plumed_out is not None:
+                    self.latest_files["plumed_out"] = plumed_out
                     self.latest_files.pop(plumed_out_name)
-                except FileNotFoundError as e:
-                    logger.debug(e)
+                else:
+                    logger.warning(f"Plumed out file {plumed_out_name} not found. Continuing without it.")
 
         # use latest top file
+        top_path = self.get_latest("top")
+        if top_path is None:
+            m = "No topology file found in output directory."
+            logger.error(m)
+            raise FileNotFoundError(m)
         self.top = Topology(
-            top=read_top(self.get_latest("top"), self.config.ff),
+            top=read_top(top_path, self.config.ff),
             parametrizer=self.parameterizer,
             is_reactive_predicate_f=get_is_reactive_predicate_from_config_f(
                 self.config.topology.reactive

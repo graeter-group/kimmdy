@@ -491,7 +491,7 @@ def multi_rfkmc(
     logger.debug(f"Start multi-KMC, {len(recipes)} recipes. Picking {n} recipes.")
     results = []
 
-    for i in range(n):
+    for _ in range(n):
         # check for empty ReactionResult
         if len(recipes) == 0 and len(results) == 0:
             m = "Empty ReactionResult; no reaction chosen"

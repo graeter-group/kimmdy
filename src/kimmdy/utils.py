@@ -8,7 +8,7 @@ import logging
 import re
 import subprocess as sp
 from pathlib import Path
-from typing import TYPE_CHECKING, Iterable, Optional, Union
+from typing import TYPE_CHECKING, Optional, Union
 
 import numpy as np
 

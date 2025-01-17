@@ -11,7 +11,7 @@ import os
 import shutil
 from pathlib import Path
 from pprint import pformat
-from typing import Any, Optional
+from typing import Any
 
 import yaml
 

@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Optional, Union
 from collections import defaultdict
 
-import matplotlib as mpl
+import matplotlib.axis
 import matplotlib.pyplot as plt
 import MDAnalysis as mda
 import numpy as np
@@ -25,7 +25,7 @@ from kimmdy.parsing import read_json, write_json, read_time_marker
 from kimmdy.plugins import discover_plugins
 from kimmdy.recipe import Bind, Break, DeferredRecipeSteps, Place, RecipeCollection
 from kimmdy.utils import read_reaction_time_marker, run_shell_cmd, get_task_directories
-from kimmdy.constants import MARK_DONE, MARK_REACION_TIME, MARK_STARTED
+from kimmdy.constants import MARK_DONE, MARK_STARTED
 
 
 def get_analysis_dir(dir: Path) -> Path:
@@ -241,7 +241,7 @@ def plot_energy(
         plt.text(x=t, y=v + 0.5, s=s, fontsize=6)
 
     ax = plt.gca()
-    steps_y_axis = [c for c in ax.get_children() if isinstance(c, mpl.axis.YAxis)][0]
+    steps_y_axis = [c for c in ax.get_children() if isinstance(c, matplotlib.axis.YAxis)][0]
     steps_y_axis.set_visible(False)
     output_path = str(run_dir / "analysis" / "energy.png")
     plt.savefig(output_path, dpi=300)

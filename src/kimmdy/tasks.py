@@ -67,7 +67,7 @@ class TaskFiles:
     {'top': 'latest top'}
     """
 
-    get_latest: Callable[[str], Path]
+    get_latest: Callable[[str], Path|None]
     input: dict[str, Path|None] = field(default_factory=dict)
     output: dict[str, Path] = field(default_factory=dict)
     outputdir: Path = Path()
