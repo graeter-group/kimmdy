@@ -96,7 +96,7 @@ def concat_traj(
     gros = []
     for d in directories:
         trjs = list(d.glob(f"*.{filetype}"))
-        trajectories.extend([t for t in trjs if not '.kimmdytrunc.' in t.name])
+        trajectories.extend([t for t in trjs if not ".kimmdytrunc." in t.name])
         tprs.extend(d.glob("*.tpr"))
         gros.extend(d.glob("*.gro"))
 
@@ -108,7 +108,7 @@ def concat_traj(
         task_dir = trj.parent
         time = read_reaction_time_marker(task_dir)
         if time is not None:
-            new_trj = trj.with_suffix('.kimmdytrunc.xtc')
+            new_trj = trj.with_suffix(".kimmdytrunc.xtc")
             run_shell_cmd(
                 f"echo '0' | gmx trjconv -f {trj} -s {tprs[i]} -e {time} -o {new_trj}",
                 cwd=run_dir,
@@ -120,16 +120,16 @@ def concat_traj(
     ## write concatenated trajectory
     tmp_xtc = str(out_xtc.with_name("tmp.xtc"))
     run_shell_cmd(
-        fr"gmx trjcat -f {' '.join(flat_trajectories)} -o {tmp_xtc} -cat",
+        rf"gmx trjcat -f {' '.join(flat_trajectories)} -o {tmp_xtc} -cat",
         cwd=run_dir,
     )
     run_shell_cmd(
-        s=fr"echo -e 'Protein\n{output}' | gmx trjconv -dt 0 -f {tmp_xtc} -s {tprs[0]} -o {str(out_xtc)} -center -pbc mol",
+        s=rf"echo -e 'Protein\n{output}' | gmx trjconv -dt 0 -f {tmp_xtc} -s {tprs[0]} -o {str(out_xtc)} -center -pbc mol",
         cwd=run_dir,
     )
     assert out_xtc.exists(), f"Concatenated trajectory {out_xtc} not found."
     run_shell_cmd(
-        fr"echo -e 'Protein\n{output}' | gmx trjconv -dt 0 -dump 0 -f {tmp_xtc} -s {tprs[0]} -o {str(out_gro)} -center -pbc mol",
+        rf"echo -e 'Protein\n{output}' | gmx trjconv -dt 0 -dump 0 -f {tmp_xtc} -s {tprs[0]} -o {str(out_gro)} -center -pbc mol",
         cwd=run_dir,
     )
     run_shell_cmd(f"rm {tmp_xtc}", cwd=run_dir)
@@ -139,7 +139,11 @@ def concat_traj(
 
 
 def plot_energy(
-    dir: str, steps: Union[list[str], str], terms: list[str], open_plot: bool = False, truncate: bool = True
+    dir: str,
+    steps: Union[list[str], str],
+    terms: list[str],
+    open_plot: bool = False,
+    truncate: bool = True,
 ):
     """Plot GROMACS energy for a KIMMDY run.
 
@@ -171,7 +175,7 @@ def plot_energy(
     edrs: list[Path] = []
     for d in subdirs_matched:
         new_edrs = d.glob("*.edr")
-        edrs.extend([edr for edr in new_edrs if not '.kimmdytrunc.' in edr.name])
+        edrs.extend([edr for edr in new_edrs if not ".kimmdytrunc." in edr.name])
     assert (
         len(edrs) > 0
     ), f"No GROMACS energy files in {run_dir} with subdirectory names {steps}"
@@ -188,7 +192,7 @@ def plot_energy(
         time = read_reaction_time_marker(task_dir)
         if time is not None and truncate:
             print(f"Truncating {edr} to {time} ps.")
-            new_edr = edr.with_suffix('.kimmdytrunc.edr')
+            new_edr = edr.with_suffix(".kimmdytrunc.edr")
             run_shell_cmd(f"gmx eneconv -f {edr} -e {time} -o {new_edr}")
             edr = new_edr
 
@@ -241,7 +245,9 @@ def plot_energy(
         plt.text(x=t, y=v + 0.5, s=s, fontsize=6)
 
     ax = plt.gca()
-    steps_y_axis = [c for c in ax.get_children() if isinstance(c, matplotlib.axis.YAxis)][0]
+    steps_y_axis = [
+        c for c in ax.get_children() if isinstance(c, matplotlib.axis.YAxis)
+    ][0]
     steps_y_axis.set_visible(False)
     output_path = str(run_dir / "analysis" / "energy.png")
     plt.savefig(output_path, dpi=300)
@@ -725,7 +731,7 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         name="trjcat", help="Concatenate trajectories of a KIMMDY run"
     )
     parser_trjcat.add_argument(
-        "dir", type=str, help="KIMMDY run directory to be analysed.", nargs='?'
+        "dir", type=str, help="KIMMDY run directory to be analysed.", nargs="?"
     )
     parser_trjcat.add_argument("--filetype", "-f", default="xtc")
     parser_trjcat.add_argument(
@@ -754,7 +760,7 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         name="energy", help="Plot GROMACS energy for a KIMMDY run"
     )
     parser_energy.add_argument(
-        "dir", type=str, help="KIMMDY run directory to be analysed.", nargs='?'
+        "dir", type=str, help="KIMMDY run directory to be analysed.", nargs="?"
     )
     parser_energy.add_argument(
         "--steps",
@@ -790,7 +796,7 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         help="Plot population of radicals for one or multiple KIMMDY run(s)",
     )
     parser_radical_population.add_argument(
-        "dir", type=str, help="KIMMDY run directory to be analysed.", nargs='?'
+        "dir", type=str, help="KIMMDY run directory to be analysed.", nargs="?"
     )
     parser_radical_population.add_argument(
         "--population_type",
@@ -857,7 +863,7 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         help="Plot rates of all possible reactions after a MD run. Rates must have been saved!",
     )
     parser_rates.add_argument(
-        "dir", type=str, help="KIMMDY run directory to be analysed.", nargs='?'
+        "dir", type=str, help="KIMMDY run directory to be analysed.", nargs="?"
     )
     parser_rates.add_argument(
         "--open",
@@ -871,7 +877,7 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         help="Plot runtime of the tasks of a kimmdy run.",
     )
     parser_runtime.add_argument(
-        "dir", type=str, help="KIMMDY run directory to be analysed.", nargs='?'
+        "dir", type=str, help="KIMMDY run directory to be analysed.", nargs="?"
     )
     parser_runtime.add_argument(
         "--open-plot",
@@ -884,7 +890,7 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         help="Plot counts of reaction participation per atom id",
     )
     parser_reaction_participation.add_argument(
-        "dir", type=str, help="KIMMDY run directory to be analysed.", nargs='?'
+        "dir", type=str, help="KIMMDY run directory to be analysed.", nargs="?"
     )
     parser_reaction_participation.add_argument(
         "--open-plot",
@@ -908,7 +914,9 @@ def entry_point_analysis():
             args.dir, args.filetype, args.steps, args.open_vmd, args.output_group
         )
     elif args.module == "energy":
-        plot_energy(args.dir, args.steps, args.terms, args.open_plot, not args.no_truncate)
+        plot_energy(
+            args.dir, args.steps, args.terms, args.open_plot, not args.no_truncate
+        )
     elif args.module == "radical_population":
         radical_population(
             args.dir,

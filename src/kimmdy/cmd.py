@@ -84,7 +84,12 @@ def get_cmdline_args() -> argparse.Namespace:
     )
 
     parser.add_argument(
-        "--restart", "-r", action="store_true", help=("Restart or continue from a previous run instead of incrementing the run number for the output directory. It the output directory does not exist, it will be like a regular fresh run.")
+        "--restart",
+        "-r",
+        action="store_true",
+        help=(
+            "Restart or continue from a previous run instead of incrementing the run number for the output directory. It the output directory does not exist, it will be like a regular fresh run."
+        ),
     )
 
     # visualize call stack
@@ -138,8 +143,10 @@ def _run(args: argparse.Namespace):
     try:
         discover_plugins()
         config = Config(
-            input_file=args.input, logfile=args.logfile, loglevel=args.loglevel,
-            restart=args.restart
+            input_file=args.input,
+            logfile=args.logfile,
+            loglevel=args.loglevel,
+            restart=args.restart,
         )
 
         logger.info("Welcome to KIMMDY")

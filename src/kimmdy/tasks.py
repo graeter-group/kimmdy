@@ -19,10 +19,10 @@ logger = logging.getLogger(__name__)
 class AutoFillDict(dict):
     """Dictionary that gets populated by calling get_missing."""
 
-    def __init__(self, get_missing: Callable[[str], Path|None]):
+    def __init__(self, get_missing: Callable[[str], Path | None]):
         self.get_missing = get_missing
 
-    def __missing__(self, key: str) -> None|Path:
+    def __missing__(self, key: str) -> None | Path:
         v = self.get_missing(key)
         if v is not None:
             self[key] = v
@@ -67,8 +67,8 @@ class TaskFiles:
     {'top': 'latest top'}
     """
 
-    get_latest: Callable[[str], Path|None]
-    input: dict[str, Path|None] = field(default_factory=dict)
+    get_latest: Callable[[str], Path | None]
+    input: dict[str, Path | None] = field(default_factory=dict)
     output: dict[str, Path] = field(default_factory=dict)
     outputdir: Path = Path()
     logger: logging.Logger = logging.getLogger("kimmdy.basetask")
@@ -77,7 +77,9 @@ class TaskFiles:
         self.input = AutoFillDict(self.get_latest)
 
 
-def create_task_directory(runmng, postfix: str, is_continuation: bool=False) -> TaskFiles:
+def create_task_directory(
+    runmng, postfix: str, is_continuation: bool = False
+) -> TaskFiles:
     """Creates TaskFiles object, output directory, logger and symlinks ff.
 
     Gets called when a Task is called (from the runmanager.tasks queue).
@@ -156,19 +158,33 @@ class Task:
         logger.debug(f"Init task {self.name}\tkwargs: {self.kwargs}\tOut: {self.out}")
 
     def __call__(self) -> Optional[TaskFiles]:
-        logger.info(f"Starting task: {self.name} with args: {self.kwargs} in {self.runmng.iteration}_{self.out}")
+        logger.info(
+            f"Starting task: {self.name} with args: {self.kwargs} in {self.runmng.iteration}_{self.out}"
+        )
         if self.out is not None:
             is_continuation = False
-            if self.kwargs.get('continue_md') is True:
-                logger.info(f"Continuing task: {self.name} in {self.runmng.iteration}_{self.out}")
+            if self.kwargs.get("continue_md") is True:
+                logger.info(
+                    f"Continuing task: {self.name} in {self.runmng.iteration}_{self.out}"
+                )
                 is_continuation = True
-            self.kwargs.update({"files": create_task_directory(self.runmng, self.out, is_continuation=is_continuation)})
+            self.kwargs.update(
+                {
+                    "files": create_task_directory(
+                        self.runmng, self.out, is_continuation=is_continuation
+                    )
+                }
+            )
             write_time_marker(self.kwargs["files"].outputdir / MARK_STARTED, self.name)
-            logger.info(f"Wrote kimmdy start marker for task: {self.name} in {self.runmng.iteration}_{self.out}")
+            logger.info(
+                f"Wrote kimmdy start marker for task: {self.name} in {self.runmng.iteration}_{self.out}"
+            )
         files = self.f(**self.kwargs)
         if self.out is not None:
             write_time_marker(self.kwargs["files"].outputdir / MARK_DONE, self.name)
-            logger.info(f"Wrote kimmdy done marker for task: {self.name} in {self.runmng.iteration}_{self.out}")
+            logger.info(
+                f"Wrote kimmdy done marker for task: {self.name} in {self.runmng.iteration}_{self.out}"
+            )
         logger.info(f"Finished task: {self.name}")
         if files is not None and files.logger:
             for h in files.logger.handlers:

@@ -22,7 +22,13 @@ from subprocess import CalledProcessError
 from typing import Callable, Optional
 
 from kimmdy.config import Config
-from kimmdy.constants import MARK_DONE, MARK_FAILED, MARK_FINISHED, MARK_STARTED, MARKERS
+from kimmdy.constants import (
+    MARK_DONE,
+    MARK_FAILED,
+    MARK_FINISHED,
+    MARK_STARTED,
+    MARKERS,
+)
 from kimmdy.coordinates import break_bond_plumed, merge_top_slow_growth, place_atom
 from kimmdy.kmc import (
     KMCError,
@@ -233,16 +239,24 @@ class RunManager:
         }
 
         self.task_mapping = {
-            "md": {"f": self._run_md, "kwargs": {}, "out": None}, # name of out director is inferred from the instance
+            "md": {
+                "f": self._run_md,
+                "kwargs": {},
+                "out": None,
+            },  # name of out director is inferred from the instance
             "reactions": [
-                {"f": self._place_reaction_tasks, "kwargs": {}, "out": None}, # has no output directory
+                {
+                    "f": self._place_reaction_tasks,
+                    "kwargs": {},
+                    "out": None,
+                },  # has no output directory
                 {
                     "f": self._decide_recipe,
                     "kwargs": {},
                     "out": "decide_recipe",
                 },
                 {"f": self._apply_recipe, "kwargs": {}, "out": "apply_recipe"},
-            ]
+            ],
         }
         """Mapping of task names to functions and their keyword arguments."""
 
@@ -285,7 +299,9 @@ class RunManager:
             # no tasks found in the output directory. this is a fresh run
             return
 
-        logger.info(f"Found task directories in existing output directory ({self.config.out.name}): {[p.name for p in task_dirs]}")
+        logger.info(
+            f"Found task directories in existing output directory ({self.config.out.name}): {[p.name for p in task_dirs]}"
+        )
         logger.info(f"Task queue: {self.tasks}")
 
         found_restart_point = False
@@ -293,12 +309,18 @@ class RunManager:
         restart_from_incomplete = False
 
         # restarting during or after MD except for relaxation/slow_growth MDs are valid restart points
-        if hasattr(self.config.changer, "coordinates") and hasattr(self.config.changer.coordinates, "md"):
+        if hasattr(self.config.changer, "coordinates") and hasattr(
+            self.config.changer.coordinates, "md"
+        ):
             relax_md_name = self.config.changer.coordinates.md
         else:
             relax_md_name = None
         if hasattr(self.config, "mds"):
-            md_task_names = [name for name in self.config.mds.get_attributes() if name != relax_md_name]
+            md_task_names = [
+                name
+                for name in self.config.mds.get_attributes()
+                if name != relax_md_name
+            ]
         else:
             md_task_names = []
 
@@ -315,16 +337,22 @@ class RunManager:
             task_n = int(task_n)
             logger.info(f"Checking task: {task_n}_{task_name}")
             if (task_dir / MARK_FAILED).exists():
-                m = f"Task in directory `{task_dir.name}` is indicated to " \
-                    "have failed. Aborting restart. Remove this task " \
+                m = (
+                    f"Task in directory `{task_dir.name}` is indicated to "
+                    "have failed. Aborting restart. Remove this task "
                     "directory if you want to restart from before the failed task."
+                )
 
                 inp = input("Do you want to delete this task directory? [y/n]")
                 if inp == "y":
                     shutil.rmtree(task_dir)
                 else:
                     exit(1)
-            elif (task_dir / MARK_STARTED).exists() and not (task_dir / MARK_DONE).exists() and task_name in md_task_names:
+            elif (
+                (task_dir / MARK_STARTED).exists()
+                and not (task_dir / MARK_DONE).exists()
+                and task_name in md_task_names
+            ):
                 # Continue from started but not finished md task is a valid restart point
                 # if it got so far that is has written at least one checkpoint file
                 checkpoint_files = list(task_dir.glob("*.cpt"))
@@ -341,7 +369,11 @@ class RunManager:
                 md_instance_dir_counter[task_name] += 1
                 # no need to search further, as this task is unfinished
                 break
-            elif (task_dir / MARK_STARTED).exists() and (task_dir / MARK_DONE).exists() and task_name in md_task_names:
+            elif (
+                (task_dir / MARK_STARTED).exists()
+                and (task_dir / MARK_DONE).exists()
+                and task_name in md_task_names
+            ):
                 # Continue after last finished MD task is a valid restart point
                 # but continue searching for newer tasks after this
                 logger.info(f"Found completed task {task_dir.name}")
@@ -351,16 +383,22 @@ class RunManager:
                 restart_task_name = task_name
                 restart_from_incomplete = False
                 md_instance_dir_counter[task_name] += 1
-            elif (task_dir / MARK_STARTED).exists() and (task_dir / MARK_DONE).exists() and task_name == "setup":
+            elif (
+                (task_dir / MARK_STARTED).exists()
+                and (task_dir / MARK_DONE).exists()
+                and task_name == "setup"
+            ):
                 # Continuing just after 0_setup is a valid restart point
                 found_restart_point = True
                 self.iteration = task_n
                 restart_task_name = task_name
                 restart_from_incomplete = False
-            elif (task_dir/ MARK_STARTED).exists() and (task_dir / MARK_DONE).exists():
+            elif (task_dir / MARK_STARTED).exists() and (task_dir / MARK_DONE).exists():
                 # Completed task, but not an MD task
                 pass
-            elif (task_dir/ MARK_STARTED).exists() and not (task_dir / MARK_DONE).exists():
+            elif (task_dir / MARK_STARTED).exists() and not (
+                task_dir / MARK_DONE
+            ).exists():
                 # Started but not done task, not an MD task
                 m = f"Last started but not done task is {task_dir.name}, which can not be restarted from. Restarting instead from after the last completed MD task."
                 logger.info(m)
@@ -396,19 +434,23 @@ class RunManager:
             if task.name == "run_md":
                 instance = task.kwargs["instance"]
                 md_instance_task_counter += 1
-                if instance == restart_task_name and md_instance_task_counter == md_instance_dir_counter[instance]:
+                if (
+                    instance == restart_task_name
+                    and md_instance_task_counter == md_instance_dir_counter[instance]
+                ):
                     # restart from the last completed (or half completed) valid restart point
                     found_restart_task = True
                     # put the task back in the queue
                     if restart_from_incomplete:
-                        logger.info("Restarting from incomplete task. Will continue this task.")
+                        logger.info(
+                            "Restarting from incomplete task. Will continue this task."
+                        )
                         # append to the front of the queue
                         task.kwargs.update({"continue_md": True})
-                        self.tasks.queue.appendleft(task);
+                        self.tasks.queue.appendleft(task)
                     else:
                         logger.info("Restarting after completed task.")
                     break
-
 
         if not isinstance(task, Task) or not found_restart_task or not instance:
             m = f"Could not find task {restart_task_name} in task queue. Aborting restart."
@@ -418,14 +460,16 @@ class RunManager:
             fragment = "within"
         else:
             fragment = "after"
-        logger.info(f"Restarting from {fragment} task {task.name} with instance {instance}")
+        logger.info(
+            f"Restarting from {fragment} task {task.name} with instance {instance}"
+        )
 
         # clean up old task directories that will be overwritten
-        for task_dir in task_dirs[self.iteration+1:]:
+        for task_dir in task_dirs[self.iteration + 1 :]:
             shutil.rmtree(task_dir)
 
         # discover after it is clear which tasks will be in queue
-        for task_dir in task_dirs[:self.iteration+1]:
+        for task_dir in task_dirs[: self.iteration + 1]:
             task_name = "_".join(task_dir.name.split(sep="_")[1:])
             task_files = TaskFiles(
                 self.get_latest, {}, {}, self.config.out / task_dir.name
@@ -441,7 +485,9 @@ class RunManager:
                     self.latest_files["plumed_out"] = plumed_out
                     self.latest_files.pop(plumed_out_name)
                 else:
-                    logger.warning(f"Plumed out file {plumed_out_name} not found. Continuing without it.")
+                    logger.warning(
+                        f"Plumed out file {plumed_out_name} not found. Continuing without it."
+                    )
 
         # use latest top file
         top_path = self.get_latest("top")
@@ -464,7 +510,6 @@ class RunManager:
         # when the task starts again
         if restart_from_incomplete:
             self.iteration -= 1
-
 
     def _setup_tasks(self):
         """Populates the tasks queue.
@@ -515,7 +560,7 @@ class RunManager:
                 raise ValueError(m)
         logger.info(f"Task list build:\n{pformat(list(self.tasks.queue), indent=8)}")
 
-    def get_latest(self, suffix: str) -> Path|None:
+    def get_latest(self, suffix: str) -> Path | None:
         """Returns path to latest file of given type.
 
         For .dat files (in general ambiguous extensions) use full file name.
@@ -572,9 +617,10 @@ class RunManager:
             for gro in gros:
                 if "_reaction" in gro.name:
                     files.output["gro"] = gro
-                    logger.info(f"Found reaction gro file: {gro} and set as latest or the the non-reaction gro file")
+                    logger.info(
+                        f"Found reaction gro file: {gro} and set as latest or the the non-reaction gro file"
+                    )
                     break
-
 
             counts = [suffs.count(s) for s in suffs]
             for suff, c, path in zip(suffs, counts, discovered_files):
@@ -706,7 +752,7 @@ class RunManager:
         )
 
         if getattr(md_config, "use_plumed"):
-            plumed_in = files.input['plumed']
+            plumed_in = files.input["plumed"]
             if plumed_in is None:
                 m = "Plumed input file not found in input files."
                 logger.error(m)

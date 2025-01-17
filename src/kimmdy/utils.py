@@ -384,21 +384,22 @@ def check_gmx_version(config):
                     raise SystemError(m)
     return version
 
+
 def write_reaction_time_marker(dir: Path, time: float):
-    """Write out a file as marker for the reaction time.
-    """
+    """Write out a file as marker for the reaction time."""
     logger.info(f"Writing reaction time marker {time} to {dir / MARK_REACION_TIME}")
     with open(dir / MARK_REACION_TIME, "w") as f:
         f.write(str(time))
 
-def read_reaction_time_marker(dir: Path) -> float|None:
+
+def read_reaction_time_marker(dir: Path) -> float | None:
     if not (dir / MARK_REACION_TIME).exists():
         return None
     with open(dir / MARK_REACION_TIME, "r") as f:
         return float(f.read())
 
 
-def write_gro_file_at_reaction_time(files: TaskFiles, time: float|None):
+def write_gro_file_at_reaction_time(files: TaskFiles, time: float | None):
     """Write out a gro file from the trajectory (xtc or trr) at the reaction time."""
     if time is None:
         return
@@ -425,20 +426,30 @@ def write_gro_file_at_reaction_time(files: TaskFiles, time: float|None):
     # in which case it fails and we try the trr
     if files.input["xtc"] is not None:
         try:
-            run_gmx(f"echo '0' | gmx trjconv -f {files.input['xtc']} -s {gro} -b {time} -dump {time} -o {gro_reaction}")
-            logger.info(f"Successfully wrote out gro file at reaction time in {gro.parent} from xtc file.")
+            run_gmx(
+                f"echo '0' | gmx trjconv -f {files.input['xtc']} -s {gro} -b {time} -dump {time} -o {gro_reaction}"
+            )
+            logger.info(
+                f"Successfully wrote out gro file at reaction time in {gro.parent} from xtc file."
+            )
             return
         except sp.CalledProcessError:
-            logger.error(f"Failed to write out gro file at reaction time in {gro.parent} from xtc file because the xtc doesn't contain all atoms. Will try trr file.")
+            logger.error(
+                f"Failed to write out gro file at reaction time in {gro.parent} from xtc file because the xtc doesn't contain all atoms. Will try trr file."
+            )
     if files.input["trr"] is not None:
         try:
             run_gmx(
                 f"echo '0' | gmx trjconv -f {files.input['trr']} -s {gro} -b {time} -dump {time} -o {gro_reaction}"
             )
-            logger.info(f"Successfully wrote out gro file at reaction time in {gro.parent} from trr file.")
+            logger.info(
+                f"Successfully wrote out gro file at reaction time in {gro.parent} from trr file."
+            )
             return
         except sp.CalledProcessError:
-            logger.error(f"Failed to write out gro file at reaction time in {gro.parent} from trr file.")
+            logger.error(
+                f"Failed to write out gro file at reaction time in {gro.parent} from trr file."
+            )
     m = f"No trajectory file found to write out gro file at reaction time in {gro.parent}"
     logger.error(m)
     raise FileNotFoundError(m)
