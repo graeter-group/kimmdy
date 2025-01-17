@@ -428,15 +428,15 @@ def write_gro_file_at_reaction_time(files: TaskFiles, time: float|None):
             return
         except sp.CalledProcessError:
             logger.error(f"Failed to write out gro file at reaction time in {gro.parent} from xtc file because the xtc doesn't contain all atoms. Will try trr file.")
-            if files.input["trr"] is not None:
-                try:
-                    run_gmx(
-                        f"echo '0' | gmx trjconv -f {files.input['trr']} -s {gro} -b {time} -dump {time} -o {gro_reaction}"
-                    )
-                    logger.info(f"Successfully wrote out gro file at reaction time in {gro.parent} from trr file.")
-                    return
-                except sp.CalledProcessError:
-                    logger.error(f"Failed to write out gro file at reaction time in {gro.parent} from trr file.")
+    if files.input["trr"] is not None:
+        try:
+            run_gmx(
+                f"echo '0' | gmx trjconv -f {files.input['trr']} -s {gro} -b {time} -dump {time} -o {gro_reaction}"
+            )
+            logger.info(f"Successfully wrote out gro file at reaction time in {gro.parent} from trr file.")
+            return
+        except sp.CalledProcessError:
+            logger.error(f"Failed to write out gro file at reaction time in {gro.parent} from trr file.")
     m = f"No trajectory file found to write out gro file at reaction time in {gro.parent}"
     logger.error(m)
     raise FileNotFoundError(m)
