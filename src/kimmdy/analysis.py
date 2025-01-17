@@ -20,7 +20,9 @@ import seaborn as sns
 import seaborn.objects as so
 from seaborn import axes_style
 
+from kimmdy.config import Config
 from kimmdy.parsing import read_json, write_json, read_time_marker
+from kimmdy.plugins import discover_plugins
 from kimmdy.recipe import Bind, Break, DeferredRecipeSteps, Place, RecipeCollection
 from kimmdy.utils import read_reaction_time_marker, run_shell_cmd, get_task_directories
 from kimmdy.constants import MARK_DONE, MARK_REACION_TIME, MARK_STARTED
@@ -722,13 +724,20 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Welcome to the KIMMDY analysis module. Use this module to analyse existing KIMMDY runs.",
     )
+    parser.add_argument(
+        "--input",
+        "-i",
+        type=str,
+        help="Kimmdy input file. Default `kimmdy.yml`",
+        default="kimmdy.yml",
+    )
     subparsers = parser.add_subparsers(metavar="module", dest="module")
 
     parser_trjcat = subparsers.add_parser(
         name="trjcat", help="Concatenate trajectories of a KIMMDY run"
     )
     parser_trjcat.add_argument(
-        "dir", type=str, help="KIMMDY run directory to be analysed."
+        "dir", type=str, help="KIMMDY run directory to be analysed.", nargs='?'
     )
     parser_trjcat.add_argument("--filetype", "-f", default="xtc")
     parser_trjcat.add_argument(
@@ -755,7 +764,7 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         name="energy", help="Plot GROMACS energy for a KIMMDY run"
     )
     parser_energy.add_argument(
-        "dir", type=str, help="KIMMDY run directory to be analysed."
+        "dir", type=str, help="KIMMDY run directory to be analysed.", nargs='?'
     )
     parser_energy.add_argument(
         "--steps",
@@ -787,7 +796,7 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         help="Plot population of radicals for one or multiple KIMMDY run(s)",
     )
     parser_radical_population.add_argument(
-        "dir", type=str, help="KIMMDY run directory to be analysed."
+        "dir", type=str, help="KIMMDY run directory to be analysed.", nargs='?'
     )
     parser_radical_population.add_argument(
         "--population_type",
@@ -854,7 +863,7 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         help="Plot rates of all possible reactions after a MD run. Rates must have been saved!",
     )
     parser_rates.add_argument(
-        "dir", type=str, help="KIMMDY run directory to be analysed."
+        "dir", type=str, help="KIMMDY run directory to be analysed.", nargs='?'
     )
     parser_rates.add_argument(
         "--open",
@@ -868,7 +877,7 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         help="Plot runtime of the tasks of a kimmdy run.",
     )
     parser_runtime.add_argument(
-        "dir", type=str, help="KIMMDY run directory to be analysed."
+        "dir", type=str, help="KIMMDY run directory to be analysed.", nargs='?'
     )
     parser_runtime.add_argument(
         "--open-plot",
@@ -881,7 +890,7 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         help="Plot counts of reaction participation per atom id",
     )
     parser_reaction_participation.add_argument(
-        "dir", type=str, help="KIMMDY run directory to be analysed."
+        "dir", type=str, help="KIMMDY run directory to be analysed.", nargs='?'
     )
     parser_reaction_participation.add_argument(
         "--open-plot",
@@ -895,6 +904,10 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
 def entry_point_analysis():
     """Analyse existing KIMMDY runs."""
     args = get_analysis_cmdline_args()
+    if args.dir is None:
+        discover_plugins()
+        config = Config(input_file=args.input)
+        args.dir = str(config.out)
 
     if args.module == "trjcat":
         concat_traj(
