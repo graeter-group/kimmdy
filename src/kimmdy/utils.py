@@ -385,6 +385,8 @@ def check_gmx_version(config):
     return version
 
 def write_reaction_time_marker(dir: Path, time: float):
+    """Write out a file as marker for the reaction time.
+    """
     logger.info(f"Writing reaction time marker {time} to {dir / MARK_REACION_TIME}")
     with open(dir / MARK_REACION_TIME, "w") as f:
         f.write(str(time))

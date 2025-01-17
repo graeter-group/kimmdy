@@ -70,9 +70,6 @@ def concat_traj(
     """
     run_dir = Path(dir).expanduser().resolve()
     analysis_dir = get_analysis_dir(run_dir)
-
-    all_directories = get_task_directories(run_dir)
-
     directories = get_task_directories(run_dir, steps)
     if not directories:
         raise ValueError(
@@ -94,51 +91,31 @@ def concat_traj(
         output = output_group
 
     ## gather trajectories
-    trajectories: list[list] = []
-    trajectories_task_nrs: list[int] = []
+    trajectories: list[Path] = []
     tprs = []
     gros = []
     for d in directories:
         trjs = list(d.glob(f"*.{filetype}"))
-        if len(trjs) > 0:
-            trajectories.append([t for t in trjs if not '.kimmdytrunc.' in t.name])
-            trajectories_task_nrs.append(int(d.name.split("_")[0]))
-            tprs.extend(d.glob("*.tpr"))
-            gros.extend(d.glob("*.gro"))
+        trajectories.extend([t for t in trjs if not '.kimmdytrunc.' in t.name])
+        tprs.extend(d.glob("*.tpr"))
+        gros.extend(d.glob("*.gro"))
 
     assert (
         len(trajectories) > 0
-    ), f"No trrs found to concatenate in {run_dir} with subdirectory names {steps}"
+    ), f"No trajectories found to concatenate in {run_dir} with subdirectory names {steps}"
 
-    assert len(trajectories) == len(trajectories_task_nrs), "Mismatch in trajectory list"
+    for i, trj in enumerate(trajectories):
+        task_dir = trj.parent
+        time = read_reaction_time_marker(task_dir)
+        if time is not None:
+            new_trj = trj.with_suffix('.kimmdytrunc.xtc')
+            run_shell_cmd(
+                f"echo '0' | gmx trjconv -f {trj} -s {tprs[i]} -e {time} -o {new_trj}",
+                cwd=run_dir,
+            )
+            trajectories[i] = new_trj
 
-    # check if there is a <n>_apply_reipce directory between a trajectory and the next or the end
-    # if so, write a truncated trajectory based on the `.kimmdy_reaction_time` file in the apply_recipe directory
-    for i, n in enumerate(trajectories_task_nrs):
-        # i is the index into trajectories list of lists
-        # n is the index into all_directories
-        if i == len(trajectories_task_nrs) - 1:
-            next_n = len(all_directories)
-        else:
-            next_n = min(trajectories_task_nrs[i + 1], len(all_directories))
-        for j in range(n+1, next_n):
-            task_dir = all_directories[j]
-            if task_dir.stem.endswith("apply_recipe"):
-                time = read_reaction_time_marker(task_dir)
-                if time is not None:
-                    ts = trajectories[i]
-                    new_ts = []
-                    for t in ts:
-                        new_t = t.with_suffix('.kimmdytrunc.xtc')
-                        run_shell_cmd(
-                            f"echo '0' | gmx trjconv -f {t} -s {tprs[i]} -e {time} -o {new_t}",
-                            cwd=run_dir,
-                        )
-                        new_ts.append(new_t)
-                    trajectories[i] = new_ts
-                break
-
-    flat_trajectories: list[str] = [str(t) for ts in trajectories for t in ts]
+    flat_trajectories: list[str] = [str(trj) for trj in trajectories]
 
     ## write concatenated trajectory
     tmp_xtc = str(out_xtc.with_name("tmp.xtc"))
@@ -162,7 +139,7 @@ def concat_traj(
 
 
 def plot_energy(
-    dir: str, steps: Union[list[str], str], terms: list[str], open_plot: bool = False
+    dir: str, steps: Union[list[str], str], terms: list[str], open_plot: bool = False, truncate: bool = True
 ):
     """Plot GROMACS energy for a KIMMDY run.
 
@@ -175,8 +152,10 @@ def plot_energy(
         Default is "all".
     terms
         Terms from gmx energy that will be plotted. Uses 'Potential' by default.
-    open_plot :
+    open_plot
         Open plot in default system viewer.
+    truncate
+        Truncate energy files to the reaction time marker.
     """
     run_dir = Path(dir).expanduser().resolve()
     xvg_entries = ["time"] + terms
@@ -189,9 +168,10 @@ def plot_energy(
     xvgs_dir.mkdir(exist_ok=True)
 
     ## gather energy files
-    edrs = []
+    edrs: list[Path] = []
     for d in subdirs_matched:
-        edrs.extend(d.glob("*.edr"))
+        new_edrs = d.glob("*.edr")
+        edrs.extend([edr for edr in new_edrs if not '.kimmdytrunc.' in edr.name])
     assert (
         len(edrs) > 0
     ), f"No GROMACS energy files in {run_dir} with subdirectory names {steps}"
@@ -201,11 +181,19 @@ def plot_energy(
     time_offset = 0
     for i, edr in enumerate(edrs):
         ## write energy .xvg file
+        task_dir = edr.parent
         xvg = str(xvgs_dir / edr.parents[0].with_suffix(".xvg").name)
         step_name = edr.parents[0].name.split("_")[1]
 
+        time = read_reaction_time_marker(task_dir)
+        if time is not None and truncate:
+            print(f"Truncating {edr} to {time} ps.")
+            new_edr = edr.with_suffix('.kimmdytrunc.edr')
+            run_shell_cmd(f"gmx eneconv -f {edr} -e {time} -o {new_edr}")
+            edr = new_edr
+
         run_shell_cmd(
-            f"echo '{terms_str} \n\n' | gmx energy -f {str(edr)} -o {xvg}",
+            f"echo '{terms_str} \n\n' | gmx energy -f {edr} -o {xvg}",
             cwd=run_dir,
         )
 
@@ -751,11 +739,13 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
     )
     parser_trjcat.add_argument(
         "--open-vmd",
+        "-o",
         action="store_true",
         help="Open VMD with the concatenated trajectory.",
     )
     parser_trjcat.add_argument(
         "--output-group",
+        "-g",
         type=str,
         help="Index group to include in the output. Default is 'Protein' for xtc and 'System' for trr.",
     )
@@ -786,11 +776,15 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
     )
     parser_energy.add_argument(
         "--open-plot",
-        "-p",
+        "-o",
         action="store_true",
         help="Open plot in default system viewer.",
     )
-
+    parser_energy.add_argument(
+        "--no-truncate",
+        action="store_true",
+        help="Open plot in default system viewer.",
+    )
     parser_radical_population = subparsers.add_parser(
         name="radical_population",
         help="Plot population of radicals for one or multiple KIMMDY run(s)",
@@ -914,7 +908,7 @@ def entry_point_analysis():
             args.dir, args.filetype, args.steps, args.open_vmd, args.output_group
         )
     elif args.module == "energy":
-        plot_energy(args.dir, args.steps, args.terms, args.open_plot)
+        plot_energy(args.dir, args.steps, args.terms, args.open_plot, not args.no_truncate)
     elif args.module == "radical_population":
         radical_population(
             args.dir,
