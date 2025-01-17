@@ -417,18 +417,29 @@ def write_gro_file_at_reaction_time(files: TaskFiles, time: float|None):
     logger.info(f"Writing out gro file at reaction time {time} ps in {gro.parent}")
     files.output["gro"] = gro_reaction
 
-    # prefer xtc over trr
-    # (should have more frames and be smaller)
+    # Prefer xtc over trr
+    # It should have more frames and be smaller,
+    # but sometimes the people only write a specific index group to the xtc,
+    # in which case it fails and we try the trr
     if files.input["xtc"] is not None:
-        run_gmx(f"echo '0' | gmx trjconv -f {files.input['xtc']} -s {gro} -b {time} -dump {time} -o {gro_reaction}")
-    elif files.input["trr"] is not None:
-        run_gmx(
-            f"echo '0' | gmx trjconv -f {files.input['trr']} -s {gro} -b {time} -dump {time} -o {gro_reaction}"
-        )
-    else:
-        m = f"No trajectory file found to write out gro file at reaction time in {gro.parent}"
-        logger.error(m)
-        raise FileNotFoundError(m)
+        try:
+            run_gmx(f"echo '0' | gmx trjconv -f {files.input['xtc']} -s {gro} -b {time} -dump {time} -o {gro_reaction}")
+            logger.info(f"Successfully wrote out gro file at reaction time in {gro.parent} from xtc file.")
+            return
+        except sp.CalledProcessError:
+            logger.error(f"Failed to write out gro file at reaction time in {gro.parent} from xtc file because the xtc doesn't contain all atoms. Will try trr file.")
+            if files.input["trr"] is not None:
+                try:
+                    run_gmx(
+                        f"echo '0' | gmx trjconv -f {files.input['trr']} -s {gro} -b {time} -dump {time} -o {gro_reaction}"
+                    )
+                    logger.info(f"Successfully wrote out gro file at reaction time in {gro.parent} from trr file.")
+                    return
+                except sp.CalledProcessError:
+                    logger.error(f"Failed to write out gro file at reaction time in {gro.parent} from trr file.")
+    m = f"No trajectory file found to write out gro file at reaction time in {gro.parent}"
+    logger.error(m)
+    raise FileNotFoundError(m)
 
 
 def get_task_directories(dir: Path, tasks: Union[list[str], str] = "all") -> list[Path]:
