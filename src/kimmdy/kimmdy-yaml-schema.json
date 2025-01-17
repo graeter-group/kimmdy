@@ -43,6 +43,12 @@
           "description": "n gpus",
           "pytype": "int",
           "default": 1
+        },
+        "runcmd": {
+          "type": "string",
+          "description": "Command to (re)submit the jobscript. Default is `sbatch`. For local testing replace with an empty string do run the jobscript directly.",
+          "pytype": "str",
+          "default": "sbatch"
         }
       },
       "additionalProperties": false
