@@ -387,7 +387,9 @@ def check_gmx_version(config):
 
 def write_reaction_time_marker(dir: Path, time: float):
     """Write out a file as marker for the reaction time."""
-    logger.info(f"Writing reaction time marker {time} to {dir / MARK_REACION_TIME}")
+    logger.info(
+        f"Writing reaction time marker {time} to {dir.name}/{MARK_REACION_TIME}"
+    )
     with open(dir / MARK_REACION_TIME, "w") as f:
         f.write(str(time))
 
@@ -410,6 +412,10 @@ def write_gro_file_at_reaction_time(files: TaskFiles, time: float | None):
         logger.error(m)
         raise FileNotFoundError(m)
 
+    if gro.name.endswith("_reaction.gro"):
+        m = f"The latest gro file registered already ends in _reaction.gro. This state should not be possible unless multiple reactions where run in sequence without any MD in between (even relaxation)."
+        logger.error(m)
+
     gro_reaction = gro.with_name(gro.stem + f"_reaction.gro")
 
     if gro_reaction.exists():
@@ -417,7 +423,9 @@ def write_gro_file_at_reaction_time(files: TaskFiles, time: float | None):
         logger.error(m)
         gro_reaction.unlink()
 
-    logger.info(f"Writing out gro file at reaction time {time} ps in {gro.parent}")
+    logger.info(
+        f"Writing out gro file {gro_reaction.name} at reaction time {time} ps in {gro.parent.name}"
+    )
     files.output["gro"] = gro_reaction
 
     # Prefer xtc over trr
@@ -430,12 +438,12 @@ def write_gro_file_at_reaction_time(files: TaskFiles, time: float | None):
                 f"echo '0' | gmx trjconv -f {files.input['xtc']} -s {gro} -b {time} -dump {time} -o {gro_reaction}"
             )
             logger.info(
-                f"Successfully wrote out gro file at reaction time in {gro.parent} from xtc file."
+                f"Successfully wrote out gro file {gro_reaction.name} at reaction time in {gro.parent.name} from xtc file."
             )
             return
         except sp.CalledProcessError:
             logger.error(
-                f"Failed to write out gro file at reaction time in {gro.parent} from xtc file because the xtc doesn't contain all atoms. Will try trr file."
+                f"Failed to write out gro file {gro_reaction.name} at reaction time in {gro.parent.name} from xtc file because the xtc doesn't contain all atoms. Will try trr file."
             )
     if files.input["trr"] is not None:
         try:

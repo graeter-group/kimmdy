@@ -190,9 +190,8 @@ class RunManager:
         self.cptfile: Path = self.config.out / "kimmdy.cpt"
         self.kmc_algorithm: str
 
-        logger.info(
-            f"Initialized RunManager at cwd: {config.cwd} with output directory {config.out}"
-        )
+        logger.info(f"Initialized KIMMDY at cwd: {config.cwd}")
+        logger.info(f"with output directory {config.out}")
         try:
             if self.config.changer.topology.parameterization == "basic":
                 self.parameterizer = BasicParameterizer()
@@ -267,7 +266,7 @@ class RunManager:
         self.start_time = time.time()
 
         if self.config.restart:
-            logger.info(f"Restarting from previous run in: {self.config.out}")
+            logger.info(f"Restarting from previous run in: {self.config.out.name}")
             if (self.config.out / MARK_FINISHED).exists():
                 m = f"Run in {self.config.out} already finished. Exiting."
                 logger.info(m)
