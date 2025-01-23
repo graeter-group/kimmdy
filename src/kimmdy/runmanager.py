@@ -35,6 +35,7 @@ from kimmdy.kmc import (
     KMCReject,
     KMCAccept,
     KMCResult,
+    dummy_first_kmc,
     extrande,
     extrande_mod,
     frm,
@@ -235,6 +236,7 @@ class RunManager:
             "frm": frm,
             "extrande_mod": extrande_mod,
             "multi_rfkmc": multi_rfkmc,
+            "dummy_first": dummy_first_kmc,
         }
 
         self.task_mapping = {
