@@ -1,0 +1,174 @@
+project:
+  title: KIMMDY
+  type: website
+  output-dir: docs
+  render:
+    - index.qmd
+    - _reference
+    - guide
+  resources:
+    - objects.txt
+
+
+website:
+  favicon: ./www/favicon.png
+  page-navigation: true
+  site-url: http://graeter-group.github.io/kimmdy
+  repo-url: https://github.com/graeter-group/kimmdy
+  repo-actions: [edit, issue]
+  reader-mode: true
+  back-to-top-navigation: true
+  navbar:
+    background: light
+    tools:
+      - icon: github
+        menu:
+          - text: Source Code
+            url:  https://github.com/graeter-group/kimmdy
+          - text: Report a Bug
+            url:  https://github.com/graeter-group/kimmdy/issues/new
+    left:
+      - file: ./guide/tutorials/getting-started.qmd
+        text: Getting Started
+      - file: ./guide/how-to/index.qmd
+        text: How-To
+      - file: ./guide/tutorials/index.qmd
+        text: Tutorials
+      - file: ./guide/explanation/index.qmd
+        text: Explanations
+      - file: _reference/index.qmd
+        text: Reference
+  sidebar:
+    logo: ./www/kimmdy_logo.png
+    subtitle: "Reactive MD pipeline for GROMACS using Kinetic Monte Carlo / Molecular Dynamic"
+    style: "floating"
+    collapse-level: 1
+    contents:
+      - text: KIMMDY
+        file: index.qmd
+      - section: Tutorials
+        contents: guide/tutorials/**
+      - section: How-To
+        contents: guide/how-to/**
+      - section: Explanation
+        contents: guide/explanation/**
+      - section: Reference
+        href: _reference/index.qmd
+        contents:
+        - guide/references/input.qmd
+        - guide/references/cmd_ref.qmd
+        - section: Python API
+          contents:
+            - _reference/cmd.qmd
+            - contents:
+              - _reference/topology.topology.qmd
+              - _reference/topology.ff.qmd
+              - _reference/topology.utils.qmd
+              - _reference/topology.atomic.qmd
+              - _reference/parsing.TopologyDict.qmd
+              section: Topology
+            - contents:
+              - _reference/homolysis.reaction.Homolysis.qmd
+              - _reference/hat_naive.reaction.NaiveHAT.qmd
+              - _reference/dummyreaction.reaction.DummyReaction.qmd
+              section: Reaction Plugins
+            - contents:
+              - _reference/constants.qmd
+              - _reference/coordinates.qmd
+              - _reference/config.qmd
+              - _reference/kmc.qmd
+              - _reference/parsing.qmd
+              - _reference/runmanager.qmd
+              - _reference/tasks.qmd
+              - _reference/recipe.qmd
+              - _reference/plugins.qmd
+              - _reference/analysis.qmd
+              - _reference/utils.qmd
+              - _reference/tools.qmd
+              section: Other Modules
+
+# metadata-files:
+#   - _sidebar.yml
+
+execute:
+  warning: false
+  echo: true
+  freeze: auto
+
+format:
+  html:
+    toc: true
+    toc-depth: 5
+    toc-expand: true
+    mainfont: Roboto
+    number-depth: 0
+    highlight-style: arrow
+    theme:
+      light:
+      - www/theme.scss
+      dark:
+      - www/theme.scss
+      - www/theme-dark.scss
+    code-copy: true
+
+filters:
+  - interlinks
+
+interlinks:
+  fast: true
+  sources:
+    numpy:
+      url: https://numpy.org/doc/stable/
+    python:
+      url: https://docs.python.org/3.10/
+
+quartodoc:
+  sidebar: "_sidebar.yml"
+  render_interlinks: true
+  title: "References"
+  package: kimmdy
+  style: pkgdown
+  dir: _reference
+  sections:
+    - title: Input file
+      desc: "[Options of the main KIMMDY input file](/guide/references/input.qmd)"
+    - title: Command Line Interface
+      desc: "[Arguments of all KIMMDY parts.](../guide/references/cmd_ref.qmd)"
+    - title: Python API
+      desc: Start KIMMDY from a python script or the command line
+      contents:
+        - name: cmd
+    - title: Topology
+      desc: Topology modules
+      contents:
+        - name: topology.topology
+        - name: topology.ff
+        - name: topology.utils
+        - name: topology.atomic
+        - name: parsing.TopologyDict
+    - title: Modules
+      desc: Modules
+      contents:
+        - name: analysis
+        - name: cmd
+        - name: config
+        - name: constants
+        - name: coordinates
+        - name: kmc
+        - name: parsing
+        - name: plugins
+        - name: recipe
+        - name: runmanager
+        - name: schema
+        - name: tasks
+        - name: tools
+        - name: utils
+    - title: Reaction Plugins
+      desc: Reaction plugins bundled with KIMMDY and the protocol to add a new reaction plugin to KIMMDY
+      package: null
+      contents:
+        - homolysis.reaction.Homolysis
+        - hat_naive.reaction.NaiveHAT
+        - dummyreaction.reaction.DummyReaction
+
+

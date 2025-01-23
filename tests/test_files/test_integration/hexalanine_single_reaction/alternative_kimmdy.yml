@@ -1,0 +1,19 @@
+dryrun: false
+name: 'single_reaction_000'
+gmx_mdrun_flags: -maxh 24 -dlb yes
+ff: 'amber99sb-star-ildnp.ff'
+top: 'hexala_out.top'
+gro: 'npt.gro'
+ndx: 'index.ndx'
+plumed: 'plumed.dat'
+trr: 'pull.trr'
+changer:
+  coordinates: {}
+  topology:
+    parameterization: 'basic' 
+reactions:
+  homolysis:
+    edis: 'edissoc.dat'
+    itp: 'ffbonded.itp'
+sequence:
+  - reactions

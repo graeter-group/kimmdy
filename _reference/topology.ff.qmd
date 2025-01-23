@@ -1,0 +1,19 @@
+# topology.ff { #kimmdy.topology.ff }
+
+`topology.ff`
+
+
+
+## Classes
+
+| Name | Description |
+| --- | --- |
+| [FF](#kimmdy.topology.ff.FF) | Container for parsed forcefield data. |
+
+### FF { #kimmdy.topology.ff.FF }
+
+```python
+topology.ff.FF(self, top, residuetypes_path=None)
+```
+
+Container for parsed forcefield data.

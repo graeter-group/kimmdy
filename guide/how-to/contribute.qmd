@@ -1,0 +1,74 @@
+---
+title: "Contribute"
+subtitle: "How to contribute to KIMMDY"
+---
+
+KIMMDY uses conventional commits and semantic versioning,
+automated via [release please](https://github.com/googleapis/release-please).
+
+If a PR adds multiple commits, we use the `squash and merge` option to keep the commit history clean.
+If a PR unavoidably contains changes the message can be edited before merging to ensure release please
+picks up all changes.
+
+The following example message (first line is the title in the GitHub UI, the rest is the body in the window below):
+
+```
+feat: this is a release-please test
+
+It should add 3 features and a 2 fixes
+Maybe this first body is the important
+part of the commit message
+
+fix(ci): release please adds all the things
+  BREAKING-CHANGE: does this work?
+
+feat(ci): update encode to support unicode
+  do I add a body here?
+
+feat(ci): what if this doesn't have a body?
+
+fix(ci): or this?
+```
+
+Generates the following changelog:
+
+```
+:robot: I have created a release *beep* *boop*
+---
+
+
+## [4.0.0](https://github.com/graeter-group/kimmdy/compare/v3.6.0...v4.0.0) (2023-08-11)
+
+
+### ⚠ BREAKING CHANGES
+
+* **ci:** does this work?
+
+### Features
+
+* **ci:** update encode to support unicode ([d9f16ad](https://github.com/graeter-group/kimmdy/commit/d9f16adb7470479a9e700ffd86597784caa2afe7))
+* **ci:** what if this doesn't have a body? ([d9f16ad](https://github.com/graeter-group/kimmdy/commit/d9f16adb7470479a9e700ffd86597784caa2afe7))
+* this is a release-please test ([d9f16ad](https://github.com/graeter-group/kimmdy/commit/d9f16adb7470479a9e700ffd86597784caa2afe7))
+
+
+### Bug Fixes
+
+* **ci:** or this? ([d9f16ad](https://github.com/graeter-group/kimmdy/commit/d9f16adb7470479a9e700ffd86597784caa2afe7))
+* **ci:** release please adds all the things ([d9f16ad](https://github.com/graeter-group/kimmdy/commit/d9f16adb7470479a9e700ffd86597784caa2afe7))
+
+---
+This PR was generated with [Release Please](https://github.com/googleapis/release-please). See [documentation](https://github.com/googleapis/release-please#release-please).
+```
+
+## Local testing
+
+For developoment, we provide a docker image containing gromacs and multiple python versions to test against.  
+To run the test locally, you must:
+
+- install docker
+- install [act](https://github.com/nektos/act), easiest option is with github cli
+    - install github cli (`gh`)
+    - `gh extension install https://github.com/nektos/gh-act`
+- run tests with `gh extension exec act -j test --artifact-server-path ./artifacts`
+    - customize which python versions to test in `tox.ini` 
+    - html coverage report is exported into `artifacts`

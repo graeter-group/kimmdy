@@ -1,0 +1,33 @@
+dryrun: false
+name: 'alanine_hat_000'
+max_tasks: 100
+gromacs_alias: 'gmx'
+gmx_mdrun_flags: -maxh 24 -dlb yes
+ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
+top: 'Ala_out.top'
+gro: 'npt.gro'
+ndx: 'index.ndx'
+kmc: "rfkmc"
+mds:
+  equilibrium:
+    mdp: 'md.mdp'
+  relax:
+    mdp: 'md_slow_growth.mdp'
+changer:
+  coordinates:
+    md: 'relax'  
+    slow_growth: True
+  topology:
+    parameterization: 'basic'
+reactions:
+  hat_naive:
+    frequency_factor: 100000000
+    h_cutoff: 3
+    polling_rate: 1
+
+sequence:
+- equilibrium
+- mult: 2
+  tasks:
+  - equilibrium
+  - reactions

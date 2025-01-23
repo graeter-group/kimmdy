@@ -1,0 +1,5 @@
+# parsing.TopologyDict { #kimmdy.parsing.TopologyDict }
+
+`parsing.TopologyDict`
+
+A raw representation of a topology file returned by [](`~kimmdy.parsing.read_top`).

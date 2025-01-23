@@ -1,0 +1,36 @@
+name: 'kimmdy_001'
+dryrun: false
+max_tasks: 10
+gromacs_alias: 'gmx'
+gmx_mdrun_flags: -maxh 24 -dlb yes
+ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
+top: 'topol.top'
+gro: 'npt.gro'
+ndx: 'index_backbone.ndx'
+plumed: 'plumed.dat'
+mds:
+  equilibrium:
+    mdp: 'pullf1500_equil.mdp'
+  prod:
+    mdp: 'pullf1500.mdp'
+    use_plumed: true
+  relax:
+    mdp: 'pullf1500_slow_growth.mdp'
+changer:
+  coordinates:
+    md: 'relax'     
+    slow_growth: true
+  topology:
+    parameterization: 'basic' 
+reactions:
+  homolysis:
+    edis: 'edissoc.dat'
+    itp: 'ffbonded.itp'
+sequence:
+  - equilibrium
+  - mult: 1
+    tasks:
+      - prod
+      - reactions
+  - equilibrium
+

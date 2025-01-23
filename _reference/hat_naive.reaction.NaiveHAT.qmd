@@ -1,0 +1,7 @@
+# hat_naive.reaction.NaiveHAT { #hat_naive.reaction.NaiveHAT }
+
+```python
+reaction.NaiveHAT(self, name, runmng)
+```
+
+Naive HAT reaction, selects hydrogens at random

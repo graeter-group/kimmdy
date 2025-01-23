@@ -1,0 +1,207 @@
+# topology.topology { #kimmdy.topology.topology }
+
+`topology.topology`
+
+
+
+## Classes
+
+| Name | Description |
+| --- | --- |
+| [MoleculeType](#kimmdy.topology.topology.MoleculeType) | One moleculetype in the topology |
+| [Topology](#kimmdy.topology.topology.Topology) | Smart container for parsed topology data. |
+
+### MoleculeType { #kimmdy.topology.topology.MoleculeType }
+
+```python
+topology.topology.MoleculeType(self, header, atomics, radicals=None)
+```
+
+One moleculetype in the topology
+
+#### Attributes {.doc-section .doc-section-attributes}
+
+| Name                | Type                                                                                                                                                          | Description                                                             |
+|---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------|
+| atoms               | [dict](`dict`)\[[str](`str`), [Atom](`kimmdy.topology.atomic.Atom`)\]                                                                                         |                                                                         |
+| bonds               | [dict](`dict`)\[[tuple](`tuple`)\[[str](`str`), [str](`str`)\], [Bond](`kimmdy.topology.atomic.Bond`)\]                                                       |                                                                         |
+| pairs               | [dict](`dict`)\[[tuple](`tuple`)\[[str](`str`), [str](`str`)\], [Pair](`kimmdy.topology.atomic.Pair`)\]                                                       |                                                                         |
+| angles              | [dict](`dict`)\[[tuple](`tuple`)\[[str](`str`), [str](`str`), [str](`str`)\], [Angle](`kimmdy.topology.atomic.Angle`)\]                                       |                                                                         |
+| proper_dihedrals    | [dict](`dict`)\[[tuple](`tuple`)\[[str](`str`), [str](`str`), [str](`str`), [str](`str`)\], [MultipleDihedrals](`kimmdy.topology.atomic.MultipleDihedrals`)\] |                                                                         |
+| improper_dihedrals  | [dict](`dict`)\[[tuple](`tuple`)\[[str](`str`), [str](`str`), [str](`str`), [str](`str`)\], [Dihedral](`kimmdy.topology.atomic.Dihedral`)\]                   |                                                                         |
+| position_restraints | [dict](`dict`)\[[str](`str`), [PositionRestraint](`kimmdy.topology.atomic.PositionRestraint`)\]                                                               |                                                                         |
+| dihedral_restraints | [dict](`dict`)\[[tuple](`tuple`)\[[str](`str`), [str](`str`), [str](`str`), [str](`str`)\], [DihedralRestraint](`kimmdy.topology.atomic.DihedralRestraint`)\] |                                                                         |
+| radicals            | [dict](`dict`)\[[str](`str`), [Atom](`kimmdy.topology.atomic.Atom`)\]                                                                                         | dict mapping atom indices to atom objects for storing all radical atoms |
+
+#### Methods
+
+| Name | Description |
+| --- | --- |
+| [find_radicals](#kimmdy.topology.topology.MoleculeType.find_radicals) | Find atoms that are radicals and update self.radicals. |
+| [reindex_atomnrs](#kimmdy.topology.topology.MoleculeType.reindex_atomnrs) | Reindex atom numbers in topology. |
+
+##### find_radicals { #kimmdy.topology.topology.MoleculeType.find_radicals }
+
+```python
+topology.topology.MoleculeType.find_radicals()
+```
+
+Find atoms that are radicals and update self.radicals.
+
+Iterate over all atoms and designate them as radicals if they have
+fewer bounds than their natural bond order.
+
+##### reindex_atomnrs { #kimmdy.topology.topology.MoleculeType.reindex_atomnrs }
+
+```python
+topology.topology.MoleculeType.reindex_atomnrs()
+```
+
+Reindex atom numbers in topology.
+
+Starts at index 1.
+This also updates the numbers for bonds, angles, dihedrals and pairs.
+Returns a dict, mapping of old atom number strings to new ones
+
+### Topology { #kimmdy.topology.topology.Topology }
+
+```python
+topology.topology.Topology(
+    self
+    top
+    parametrizer=BasicParameterizer()
+    is_reactive_predicate_f=is_not_solvent_or_ion
+    radicals=None
+    residuetypes_path=None
+    reactive_nrexcl=None
+)
+```
+
+Smart container for parsed topology data.
+
+A topology keeps track of connections when bonds are broken or formed.
+Reparametrization is triggerd automatically if `to_dict` is called
+after bonds have changed.
+
+Assumptions:
+
+- the topology of interest (the Reactive moleculetype) consists of the first moleculetypes (non-solvent).
+
+#### Parameters {.doc-section .doc-section-parameters}
+
+| Name                    | Type                                                              | Description                                                                                                                     | Default                 |
+|-------------------------|-------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------|-------------------------|
+| top                     | [TopologyDict](`kimmdy.parsing.TopologyDict`)                     | A dictionary containing the parsed topology data, produced by [](`kimmdy.parsing.read_top`)                                     | _required_              |
+| parametrizer            | [Parameterizer](`kimmdy.plugins.Parameterizer`)                   | The parametrizer to use when reparametrizing the topology.                                                                      | `BasicParameterizer()`  |
+| is_reactive_predicate_f | [Callable](`typing.Callable`)\[\[[str](`str`)\], [bool](`bool`)\] | A function that takes a moleculetype name and returns True if the moleculetype should be merged into the reactive moleculetype. | `is_not_solvent_or_ion` |
+| radicals                | [Optional](`typing.Optional`)\[[str](`str`)\]                     | A string of atom numbers that are radicals.                                                                                     | `None`                  |
+| residuetypes_path       | [Optional](`typing.Optional`)\[[Path](`pathlib.Path`)\]           | Path to the residue types file.                                                                                                 | `None`                  |
+| reactive_nrexcl         | [Optional](`typing.Optional`)\[[str](`str`)\]                     | Overwrite nrexcl value for the reactive moleculetype. Otherwise takes the nrexcl of the first reactive moleculetype.            | `None`                  |
+
+#### Methods
+
+| Name | Description |
+| --- | --- |
+| [bind_bond](#kimmdy.topology.topology.Topology.bind_bond) | Add a bond in topology. |
+| [break_bond](#kimmdy.topology.topology.Topology.break_bond) | Break bonds in topology homolytically. |
+| [del_atom](#kimmdy.topology.topology.Topology.del_atom) | Deletes atom |
+| [reindex_atomnrs](#kimmdy.topology.topology.Topology.reindex_atomnrs) | Reindex atom numbers in topology. |
+| [update_partial_charges](#kimmdy.topology.topology.Topology.update_partial_charges) | Update the topology atom partial charges. |
+| [validate_bond](#kimmdy.topology.topology.Topology.validate_bond) | Validates bond consistency between both atoms and top |
+
+##### bind_bond { #kimmdy.topology.topology.Topology.bind_bond }
+
+```python
+topology.topology.Topology.bind_bond(atompair_addresses)
+```
+
+Add a bond in topology.
+
+Modifies the topology dictionary in place.
+It keeps track of affected terms in the topology via a graph representation of the topology
+and applies the necessary changes to bonds, angles and dihedrals (proper and improper).
+Furthermore, it modifies to function types in the topology to account for radicals.
+
+###### Parameters {.doc-section .doc-section-parameters}
+
+| Name               | Type                                                                                                                                     | Description             | Default    |
+|--------------------|------------------------------------------------------------------------------------------------------------------------------------------|-------------------------|------------|
+| atompair_addresses | [tuple](`tuple`)\[[TopologyAtomAddress](`kimmdy.utils.TopologyAtomAddress`), [TopologyAtomAddress](`kimmdy.utils.TopologyAtomAddress`)\] | Atoms to bind together. | _required_ |
+
+##### break_bond { #kimmdy.topology.topology.Topology.break_bond }
+
+```python
+topology.topology.Topology.break_bond(atompair_addresses)
+```
+
+Break bonds in topology homolytically.
+
+Removes bond, angles and dihedrals where atompair was involved.
+Modifies the topology dictionary in place.
+Atom pairs become radicals.
+
+###### Parameters {.doc-section .doc-section-parameters}
+
+| Name               | Type                                                                                                                                     | Description                            | Default    |
+|--------------------|------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------|------------|
+| atompair_addresses | [tuple](`tuple`)\[[TopologyAtomAddress](`kimmdy.utils.TopologyAtomAddress`), [TopologyAtomAddress](`kimmdy.utils.TopologyAtomAddress`)\] | Between which atoms to break the bond. | _required_ |
+
+##### del_atom { #kimmdy.topology.topology.Topology.del_atom }
+
+```python
+topology.topology.Topology.del_atom(atom_nr, parameterize=True)
+```
+
+Deletes atom
+
+Deletes atom and all attached bonds. Reindexes the top and updates the
+parameters if requested. Also moves charges to first bound_nrs atom.
+
+###### Parameters {.doc-section .doc-section-parameters}
+
+| Name         | Type                                                                    | Description                                                                | Default    |
+|--------------|-------------------------------------------------------------------------|----------------------------------------------------------------------------|------------|
+| atom_nr      | [Union](`typing.Union`)\[[list](`list`)\[[str](`str`)\], [str](`str`)\] | 1-based atom number as string to delete                                    | _required_ |
+| parameterize | [bool](`bool`)                                                          | If true and bonds are removed triggers reparameterization, by default True | `True`     |
+
+###### Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                       | Description                                           |
+|--------|----------------------------|-------------------------------------------------------|
+|        | [update_map](`update_map`) | Dict, mapping of old atom number strings to new ones. |
+
+##### reindex_atomnrs { #kimmdy.topology.topology.Topology.reindex_atomnrs }
+
+```python
+topology.topology.Topology.reindex_atomnrs()
+```
+
+Reindex atom numbers in topology.
+
+Starts at index 1.
+This also updates the numbers for bonds, angles, dihedrals and pairs.
+Returns a dict of all moleculetypes to their update maps (old -> new).
+
+##### update_partial_charges { #kimmdy.topology.topology.Topology.update_partial_charges }
+
+```python
+topology.topology.Topology.update_partial_charges(recipe_steps)
+```
+
+Update the topology atom partial charges.
+
+This function must be called after the recipe_steps are applied.
+Changes are based on the recipe_steps. Update rules follow a simple
+assignment scheme that works well with grappa. If fragments are created,
+their partial charges are kept integers. If previously broken bonds are
+formed again, the original partial charges are restored.
+
+##### validate_bond { #kimmdy.topology.topology.Topology.validate_bond }
+
+```python
+topology.topology.Topology.validate_bond(atm1, atm2)
+```
+
+Validates bond consistency between both atoms and top
+Returns True if bond exists, False if not.
+Raises RuntimeError if bond is not consistent.

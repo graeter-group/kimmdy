@@ -1,0 +1,38 @@
+---
+title: "Examples"
+subtitle: "Examples for running KIMMDY with different options for various systems"
+---
+
+## Further Examples
+
+KIMMDY contains examples generated from our internal test systems.
+Those examples don't currently have extensive documentation,
+but they can be used as a starting point for your own simulations.
+
+The examples are located in the `examples` directory of the KIMMDY source code
+[here](https://github.com/graeter-group/kimmdy/tree/main/example).
+
+Here are their `kimmdy.yml` files at a glance:
+
+
+```{python}
+#| output: asis
+#| echo: false
+# list directories in examples
+import os
+path = '../../example'
+dirs = os.listdir(path)
+for dir in dirs:
+  kimmdy_config = path + '/' + dir + '/kimmdy.yml'
+  if os.path.isfile(kimmdy_config):
+    header = f"### {dir}\n"
+    print(header)
+    content = open(kimmdy_config, 'r').read()
+    print('```yaml')
+    print(content)
+    print('```')
+```
+
+
+
+

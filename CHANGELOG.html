@@ -1,0 +1,1930 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.53">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>changelog – KIMMDY Examples</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body>
+
+<div id="quarto-search-results"></div>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active" data-toc-expanded="99">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#changelog" id="toc-changelog" class="nav-link active" data-scroll-target="#changelog">Changelog</a>
+  <ul>
+  <li><a href="#section" id="toc-section" class="nav-link" data-scroll-target="#section">6.8.3 (2024-06-25)</a>
+  <ul>
+  <li><a href="#bug-fixes" id="toc-bug-fixes" class="nav-link" data-scroll-target="#bug-fixes">Bug Fixes</a></li>
+  </ul></li>
+  <li><a href="#section-1" id="toc-section-1" class="nav-link" data-scroll-target="#section-1">6.8.1 (2024-06-17)</a>
+  <ul>
+  <li><a href="#bug-fixes-1" id="toc-bug-fixes-1" class="nav-link" data-scroll-target="#bug-fixes-1">Bug Fixes</a></li>
+  <li><a href="#documentation" id="toc-documentation" class="nav-link" data-scroll-target="#documentation">Documentation</a></li>
+  </ul></li>
+  <li><a href="#section-2" id="toc-section-2" class="nav-link" data-scroll-target="#section-2">6.8.0 (2024-06-11)</a>
+  <ul>
+  <li><a href="#features" id="toc-features" class="nav-link" data-scroll-target="#features">Features</a></li>
+  </ul></li>
+  <li><a href="#section-3" id="toc-section-3" class="nav-link" data-scroll-target="#section-3">6.7.0 (2024-05-20)</a>
+  <ul>
+  <li><a href="#features-1" id="toc-features-1" class="nav-link" data-scroll-target="#features-1">Features</a></li>
+  </ul></li>
+  <li><a href="#section-4" id="toc-section-4" class="nav-link" data-scroll-target="#section-4">6.6.1 (2024-05-07)</a>
+  <ul>
+  <li><a href="#bug-fixes-2" id="toc-bug-fixes-2" class="nav-link" data-scroll-target="#bug-fixes-2">Bug Fixes</a></li>
+  </ul></li>
+  <li><a href="#section-5" id="toc-section-5" class="nav-link" data-scroll-target="#section-5">6.6.0 (2024-04-25)</a>
+  <ul>
+  <li><a href="#features-2" id="toc-features-2" class="nav-link" data-scroll-target="#features-2">Features</a></li>
+  <li><a href="#bug-fixes-3" id="toc-bug-fixes-3" class="nav-link" data-scroll-target="#bug-fixes-3">Bug Fixes</a></li>
+  <li><a href="#documentation-1" id="toc-documentation-1" class="nav-link" data-scroll-target="#documentation-1">Documentation</a></li>
+  </ul></li>
+  <li><a href="#section-6" id="toc-section-6" class="nav-link" data-scroll-target="#section-6">6.5.0 (2024-03-25)</a>
+  <ul>
+  <li><a href="#features-3" id="toc-features-3" class="nav-link" data-scroll-target="#features-3">Features</a></li>
+  <li><a href="#bug-fixes-4" id="toc-bug-fixes-4" class="nav-link" data-scroll-target="#bug-fixes-4">Bug Fixes</a></li>
+  </ul></li>
+  <li><a href="#section-7" id="toc-section-7" class="nav-link" data-scroll-target="#section-7">6.4.1 (2024-03-21)</a>
+  <ul>
+  <li><a href="#bug-fixes-5" id="toc-bug-fixes-5" class="nav-link" data-scroll-target="#bug-fixes-5">Bug Fixes</a></li>
+  <li><a href="#documentation-2" id="toc-documentation-2" class="nav-link" data-scroll-target="#documentation-2">Documentation</a></li>
+  </ul></li>
+  <li><a href="#section-8" id="toc-section-8" class="nav-link" data-scroll-target="#section-8">6.4.0 (2024-03-07)</a>
+  <ul>
+  <li><a href="#features-4" id="toc-features-4" class="nav-link" data-scroll-target="#features-4">Features</a></li>
+  </ul></li>
+  <li><a href="#section-9" id="toc-section-9" class="nav-link" data-scroll-target="#section-9">6.3.0 (2024-03-07)</a>
+  <ul>
+  <li><a href="#features-5" id="toc-features-5" class="nav-link" data-scroll-target="#features-5">Features</a></li>
+  <li><a href="#bug-fixes-6" id="toc-bug-fixes-6" class="nav-link" data-scroll-target="#bug-fixes-6">Bug Fixes</a></li>
+  </ul></li>
+  <li><a href="#section-10" id="toc-section-10" class="nav-link" data-scroll-target="#section-10">6.2.5 (2024-02-27)</a>
+  <ul>
+  <li><a href="#bug-fixes-7" id="toc-bug-fixes-7" class="nav-link" data-scroll-target="#bug-fixes-7">Bug Fixes</a></li>
+  </ul></li>
+  <li><a href="#section-11" id="toc-section-11" class="nav-link" data-scroll-target="#section-11">6.2.4 (2024-02-27)</a>
+  <ul>
+  <li><a href="#bug-fixes-8" id="toc-bug-fixes-8" class="nav-link" data-scroll-target="#bug-fixes-8">Bug Fixes</a></li>
+  </ul></li>
+  <li><a href="#section-12" id="toc-section-12" class="nav-link" data-scroll-target="#section-12">6.2.3 (2024-02-27)</a>
+  <ul>
+  <li><a href="#bug-fixes-9" id="toc-bug-fixes-9" class="nav-link" data-scroll-target="#bug-fixes-9">Bug Fixes</a></li>
+  </ul></li>
+  <li><a href="#section-13" id="toc-section-13" class="nav-link" data-scroll-target="#section-13">6.2.2 (2024-02-23)</a>
+  <ul>
+  <li><a href="#bug-fixes-10" id="toc-bug-fixes-10" class="nav-link" data-scroll-target="#bug-fixes-10">Bug Fixes</a></li>
+  </ul></li>
+  <li><a href="#section-14" id="toc-section-14" class="nav-link" data-scroll-target="#section-14">6.2.1 (2024-02-22)</a>
+  <ul>
+  <li><a href="#features-6" id="toc-features-6" class="nav-link" data-scroll-target="#features-6">Features</a></li>
+  <li><a href="#bug-fixes-11" id="toc-bug-fixes-11" class="nav-link" data-scroll-target="#bug-fixes-11">Bug Fixes</a></li>
+  <li><a href="#documentation-3" id="toc-documentation-3" class="nav-link" data-scroll-target="#documentation-3">Documentation</a></li>
+  </ul></li>
+  <li><a href="#section-15" id="toc-section-15" class="nav-link" data-scroll-target="#section-15">6.2.0 (2024-02-16)</a>
+  <ul>
+  <li><a href="#features-7" id="toc-features-7" class="nav-link" data-scroll-target="#features-7">Features</a></li>
+  </ul></li>
+  <li><a href="#section-16" id="toc-section-16" class="nav-link" data-scroll-target="#section-16">6.1.0 (2024-02-14)</a>
+  <ul>
+  <li><a href="#features-8" id="toc-features-8" class="nav-link" data-scroll-target="#features-8">Features</a></li>
+  </ul></li>
+  <li><a href="#section-17" id="toc-section-17" class="nav-link" data-scroll-target="#section-17">6.0.1 (2024-01-03)</a>
+  <ul>
+  <li><a href="#documentation-4" id="toc-documentation-4" class="nav-link" data-scroll-target="#documentation-4">Documentation</a></li>
+  </ul></li>
+  <li><a href="#section-18" id="toc-section-18" class="nav-link" data-scroll-target="#section-18">6.0.0 (2024-01-03)</a>
+  <ul>
+  <li><a href="#breaking-changes" id="toc-breaking-changes" class="nav-link" data-scroll-target="#breaking-changes">⚠ BREAKING CHANGES</a></li>
+  <li><a href="#features-9" id="toc-features-9" class="nav-link" data-scroll-target="#features-9">Features</a></li>
+  <li><a href="#bug-fixes-12" id="toc-bug-fixes-12" class="nav-link" data-scroll-target="#bug-fixes-12">Bug Fixes</a></li>
+  </ul></li>
+  <li><a href="#section-19" id="toc-section-19" class="nav-link" data-scroll-target="#section-19">5.3.2 (2023-12-19)</a>
+  <ul>
+  <li><a href="#bug-fixes-13" id="toc-bug-fixes-13" class="nav-link" data-scroll-target="#bug-fixes-13">Bug Fixes</a></li>
+  </ul></li>
+  <li><a href="#section-20" id="toc-section-20" class="nav-link" data-scroll-target="#section-20">5.3.1 (2023-12-15)</a>
+  <ul>
+  <li><a href="#bug-fixes-14" id="toc-bug-fixes-14" class="nav-link" data-scroll-target="#bug-fixes-14">Bug Fixes</a></li>
+  </ul></li>
+  <li><a href="#section-21" id="toc-section-21" class="nav-link" data-scroll-target="#section-21">5.3.0 (2023-12-12)</a>
+  <ul>
+  <li><a href="#features-10" id="toc-features-10" class="nav-link" data-scroll-target="#features-10">Features</a></li>
+  </ul></li>
+  <li><a href="#section-22" id="toc-section-22" class="nav-link" data-scroll-target="#section-22">5.2.3 (2023-12-08)</a>
+  <ul>
+  <li><a href="#bug-fixes-15" id="toc-bug-fixes-15" class="nav-link" data-scroll-target="#bug-fixes-15">Bug Fixes</a></li>
+  </ul></li>
+  <li><a href="#section-23" id="toc-section-23" class="nav-link" data-scroll-target="#section-23">5.2.2 (2023-12-08)</a>
+  <ul>
+  <li><a href="#bug-fixes-16" id="toc-bug-fixes-16" class="nav-link" data-scroll-target="#bug-fixes-16">Bug Fixes</a></li>
+  </ul></li>
+  <li><a href="#section-24" id="toc-section-24" class="nav-link" data-scroll-target="#section-24">5.2.1 (2023-12-07)</a>
+  <ul>
+  <li><a href="#bug-fixes-17" id="toc-bug-fixes-17" class="nav-link" data-scroll-target="#bug-fixes-17">Bug Fixes</a></li>
+  </ul></li>
+  <li><a href="#section-25" id="toc-section-25" class="nav-link" data-scroll-target="#section-25">5.2.0 (2023-11-14)</a>
+  <ul>
+  <li><a href="#features-11" id="toc-features-11" class="nav-link" data-scroll-target="#features-11">Features</a></li>
+  <li><a href="#bug-fixes-18" id="toc-bug-fixes-18" class="nav-link" data-scroll-target="#bug-fixes-18">Bug Fixes</a></li>
+  <li><a href="#documentation-5" id="toc-documentation-5" class="nav-link" data-scroll-target="#documentation-5">Documentation</a></li>
+  </ul></li>
+  <li><a href="#section-26" id="toc-section-26" class="nav-link" data-scroll-target="#section-26">5.1.12 (2023-11-13)</a>
+  <ul>
+  <li><a href="#bug-fixes-19" id="toc-bug-fixes-19" class="nav-link" data-scroll-target="#bug-fixes-19">Bug Fixes</a></li>
+  </ul></li>
+  <li><a href="#section-27" id="toc-section-27" class="nav-link" data-scroll-target="#section-27">5.1.11 (2023-11-08)</a>
+  <ul>
+  <li><a href="#documentation-6" id="toc-documentation-6" class="nav-link" data-scroll-target="#documentation-6">Documentation</a></li>
+  </ul></li>
+  <li><a href="#section-28" id="toc-section-28" class="nav-link" data-scroll-target="#section-28">5.1.10 (2023-11-08)</a>
+  <ul>
+  <li><a href="#bug-fixes-20" id="toc-bug-fixes-20" class="nav-link" data-scroll-target="#bug-fixes-20">Bug Fixes</a></li>
+  </ul></li>
+  <li><a href="#section-29" id="toc-section-29" class="nav-link" data-scroll-target="#section-29">5.1.9 (2023-11-08)</a>
+  <ul>
+  <li><a href="#bug-fixes-21" id="toc-bug-fixes-21" class="nav-link" data-scroll-target="#bug-fixes-21">Bug Fixes</a></li>
+  </ul></li>
+  <li><a href="#section-30" id="toc-section-30" class="nav-link" data-scroll-target="#section-30">5.1.8 (2023-11-07)</a>
+  <ul>
+  <li><a href="#bug-fixes-22" id="toc-bug-fixes-22" class="nav-link" data-scroll-target="#bug-fixes-22">Bug Fixes</a></li>
+  </ul></li>
+  <li><a href="#section-31" id="toc-section-31" class="nav-link" data-scroll-target="#section-31">5.1.7 (2023-11-06)</a>
+  <ul>
+  <li><a href="#bug-fixes-23" id="toc-bug-fixes-23" class="nav-link" data-scroll-target="#bug-fixes-23">Bug Fixes</a></li>
+  </ul></li>
+  <li><a href="#section-32" id="toc-section-32" class="nav-link" data-scroll-target="#section-32">5.1.6 (2023-10-27)</a>
+  <ul>
+  <li><a href="#bug-fixes-24" id="toc-bug-fixes-24" class="nav-link" data-scroll-target="#bug-fixes-24">Bug Fixes</a></li>
+  </ul></li>
+  <li><a href="#section-33" id="toc-section-33" class="nav-link" data-scroll-target="#section-33">5.1.5 (2023-10-27)</a>
+  <ul>
+  <li><a href="#bug-fixes-25" id="toc-bug-fixes-25" class="nav-link" data-scroll-target="#bug-fixes-25">Bug Fixes</a></li>
+  </ul></li>
+  <li><a href="#section-34" id="toc-section-34" class="nav-link" data-scroll-target="#section-34">5.1.4 (2023-10-27)</a>
+  <ul>
+  <li><a href="#bug-fixes-26" id="toc-bug-fixes-26" class="nav-link" data-scroll-target="#bug-fixes-26">Bug Fixes</a></li>
+  </ul></li>
+  <li><a href="#section-35" id="toc-section-35" class="nav-link" data-scroll-target="#section-35">5.1.3 (2023-10-27)</a>
+  <ul>
+  <li><a href="#bug-fixes-27" id="toc-bug-fixes-27" class="nav-link" data-scroll-target="#bug-fixes-27">Bug Fixes</a></li>
+  </ul></li>
+  <li><a href="#section-36" id="toc-section-36" class="nav-link" data-scroll-target="#section-36">5.1.2 (2023-10-27)</a>
+  <ul>
+  <li><a href="#bug-fixes-28" id="toc-bug-fixes-28" class="nav-link" data-scroll-target="#bug-fixes-28">Bug Fixes</a></li>
+  </ul></li>
+  <li><a href="#section-37" id="toc-section-37" class="nav-link" data-scroll-target="#section-37">5.1.1 (2023-10-27)</a>
+  <ul>
+  <li><a href="#bug-fixes-29" id="toc-bug-fixes-29" class="nav-link" data-scroll-target="#bug-fixes-29">Bug Fixes</a></li>
+  </ul></li>
+  <li><a href="#section-38" id="toc-section-38" class="nav-link" data-scroll-target="#section-38">5.1.0 (2023-10-27)</a>
+  <ul>
+  <li><a href="#features-12" id="toc-features-12" class="nav-link" data-scroll-target="#features-12">Features</a></li>
+  <li><a href="#bug-fixes-30" id="toc-bug-fixes-30" class="nav-link" data-scroll-target="#bug-fixes-30">Bug Fixes</a></li>
+  <li><a href="#documentation-7" id="toc-documentation-7" class="nav-link" data-scroll-target="#documentation-7">Documentation</a></li>
+  </ul></li>
+  <li><a href="#section-39" id="toc-section-39" class="nav-link" data-scroll-target="#section-39">5.0.0 (2023-10-25)</a>
+  <ul>
+  <li><a href="#breaking-changes-1" id="toc-breaking-changes-1" class="nav-link" data-scroll-target="#breaking-changes-1">⚠ BREAKING CHANGES</a></li>
+  <li><a href="#features-13" id="toc-features-13" class="nav-link" data-scroll-target="#features-13">Features</a></li>
+  <li><a href="#bug-fixes-31" id="toc-bug-fixes-31" class="nav-link" data-scroll-target="#bug-fixes-31">Bug Fixes</a></li>
+  <li><a href="#documentation-8" id="toc-documentation-8" class="nav-link" data-scroll-target="#documentation-8">Documentation</a></li>
+  </ul></li>
+  <li><a href="#section-40" id="toc-section-40" class="nav-link" data-scroll-target="#section-40">4.4.1 (2023-09-13)</a>
+  <ul>
+  <li><a href="#bug-fixes-32" id="toc-bug-fixes-32" class="nav-link" data-scroll-target="#bug-fixes-32">Bug Fixes</a></li>
+  </ul></li>
+  <li><a href="#section-41" id="toc-section-41" class="nav-link" data-scroll-target="#section-41">4.4.0 (2023-09-13)</a>
+  <ul>
+  <li><a href="#features-14" id="toc-features-14" class="nav-link" data-scroll-target="#features-14">Features</a></li>
+  <li><a href="#bug-fixes-33" id="toc-bug-fixes-33" class="nav-link" data-scroll-target="#bug-fixes-33">Bug Fixes</a></li>
+  </ul></li>
+  <li><a href="#section-42" id="toc-section-42" class="nav-link" data-scroll-target="#section-42">4.3.0 (2023-09-08)</a>
+  <ul>
+  <li><a href="#features-15" id="toc-features-15" class="nav-link" data-scroll-target="#features-15">Features</a></li>
+  <li><a href="#bug-fixes-34" id="toc-bug-fixes-34" class="nav-link" data-scroll-target="#bug-fixes-34">Bug Fixes</a></li>
+  </ul></li>
+  <li><a href="#section-43" id="toc-section-43" class="nav-link" data-scroll-target="#section-43">4.2.1 (2023-09-07)</a>
+  <ul>
+  <li><a href="#bug-fixes-35" id="toc-bug-fixes-35" class="nav-link" data-scroll-target="#bug-fixes-35">Bug Fixes</a></li>
+  </ul></li>
+  <li><a href="#section-44" id="toc-section-44" class="nav-link" data-scroll-target="#section-44">4.2.0 (2023-09-04)</a>
+  <ul>
+  <li><a href="#features-16" id="toc-features-16" class="nav-link" data-scroll-target="#features-16">Features</a></li>
+  <li><a href="#bug-fixes-36" id="toc-bug-fixes-36" class="nav-link" data-scroll-target="#bug-fixes-36">Bug Fixes</a></li>
+  </ul></li>
+  <li><a href="#section-45" id="toc-section-45" class="nav-link" data-scroll-target="#section-45">4.1.0 (2023-08-28)</a>
+  <ul>
+  <li><a href="#features-17" id="toc-features-17" class="nav-link" data-scroll-target="#features-17">Features</a></li>
+  <li><a href="#bug-fixes-37" id="toc-bug-fixes-37" class="nav-link" data-scroll-target="#bug-fixes-37">Bug Fixes</a></li>
+  <li><a href="#documentation-9" id="toc-documentation-9" class="nav-link" data-scroll-target="#documentation-9">Documentation</a></li>
+  </ul></li>
+  <li><a href="#section-46" id="toc-section-46" class="nav-link" data-scroll-target="#section-46">4.0.1 (2023-08-11)</a>
+  <ul>
+  <li><a href="#documentation-10" id="toc-documentation-10" class="nav-link" data-scroll-target="#documentation-10">Documentation</a></li>
+  </ul></li>
+  <li><a href="#section-47" id="toc-section-47" class="nav-link" data-scroll-target="#section-47">4.0.0 (2023-08-11)</a>
+  <ul>
+  <li><a href="#breaking-changes-2" id="toc-breaking-changes-2" class="nav-link" data-scroll-target="#breaking-changes-2">⚠ BREAKING CHANGES</a></li>
+  <li><a href="#features-18" id="toc-features-18" class="nav-link" data-scroll-target="#features-18">Features</a></li>
+  <li><a href="#bug-fixes-38" id="toc-bug-fixes-38" class="nav-link" data-scroll-target="#bug-fixes-38">Bug Fixes</a></li>
+  </ul></li>
+  <li><a href="#section-48" id="toc-section-48" class="nav-link" data-scroll-target="#section-48">3.6.0 (2023-08-11)</a>
+  <ul>
+  <li><a href="#features-19" id="toc-features-19" class="nav-link" data-scroll-target="#features-19">Features</a></li>
+  <li><a href="#bug-fixes-39" id="toc-bug-fixes-39" class="nav-link" data-scroll-target="#bug-fixes-39">Bug Fixes</a></li>
+  </ul></li>
+  <li><a href="#section-49" id="toc-section-49" class="nav-link" data-scroll-target="#section-49">3.5.1 (2023-08-08)</a>
+  <ul>
+  <li><a href="#bug-fixes-40" id="toc-bug-fixes-40" class="nav-link" data-scroll-target="#bug-fixes-40">Bug Fixes</a></li>
+  </ul></li>
+  <li><a href="#section-50" id="toc-section-50" class="nav-link" data-scroll-target="#section-50">3.5.0 (2023-08-08)</a>
+  <ul>
+  <li><a href="#features-20" id="toc-features-20" class="nav-link" data-scroll-target="#features-20">Features</a></li>
+  <li><a href="#bug-fixes-41" id="toc-bug-fixes-41" class="nav-link" data-scroll-target="#bug-fixes-41">Bug Fixes</a></li>
+  </ul></li>
+  <li><a href="#section-51" id="toc-section-51" class="nav-link" data-scroll-target="#section-51">3.4.0 (2023-08-08)</a>
+  <ul>
+  <li><a href="#features-21" id="toc-features-21" class="nav-link" data-scroll-target="#features-21">Features</a></li>
+  <li><a href="#bug-fixes-42" id="toc-bug-fixes-42" class="nav-link" data-scroll-target="#bug-fixes-42">Bug Fixes</a></li>
+  <li><a href="#documentation-11" id="toc-documentation-11" class="nav-link" data-scroll-target="#documentation-11">Documentation</a></li>
+  </ul></li>
+  <li><a href="#section-52" id="toc-section-52" class="nav-link" data-scroll-target="#section-52">3.3.1 (2023-07-12)</a>
+  <ul>
+  <li><a href="#documentation-12" id="toc-documentation-12" class="nav-link" data-scroll-target="#documentation-12">Documentation</a></li>
+  </ul></li>
+  <li><a href="#section-53" id="toc-section-53" class="nav-link" data-scroll-target="#section-53">3.3.0 (2023-07-05)</a>
+  <ul>
+  <li><a href="#features-22" id="toc-features-22" class="nav-link" data-scroll-target="#features-22">Features</a></li>
+  <li><a href="#bug-fixes-43" id="toc-bug-fixes-43" class="nav-link" data-scroll-target="#bug-fixes-43">Bug Fixes</a></li>
+  </ul></li>
+  <li><a href="#section-54" id="toc-section-54" class="nav-link" data-scroll-target="#section-54">3.2.0 (2023-07-03)</a>
+  <ul>
+  <li><a href="#features-23" id="toc-features-23" class="nav-link" data-scroll-target="#features-23">Features</a></li>
+  </ul></li>
+  <li><a href="#section-55" id="toc-section-55" class="nav-link" data-scroll-target="#section-55">3.1.0 (2023-06-30)</a>
+  <ul>
+  <li><a href="#features-24" id="toc-features-24" class="nav-link" data-scroll-target="#features-24">Features</a></li>
+  </ul></li>
+  <li><a href="#section-56" id="toc-section-56" class="nav-link" data-scroll-target="#section-56">3.0.1 (2023-06-28)</a>
+  <ul>
+  <li><a href="#bug-fixes-44" id="toc-bug-fixes-44" class="nav-link" data-scroll-target="#bug-fixes-44">Bug Fixes</a></li>
+  </ul></li>
+  <li><a href="#section-57" id="toc-section-57" class="nav-link" data-scroll-target="#section-57">3.0.0 (2023-06-26)</a>
+  <ul>
+  <li><a href="#breaking-changes-3" id="toc-breaking-changes-3" class="nav-link" data-scroll-target="#breaking-changes-3">⚠ BREAKING CHANGES</a></li>
+  <li><a href="#features-25" id="toc-features-25" class="nav-link" data-scroll-target="#features-25">Features</a></li>
+  <li><a href="#bug-fixes-45" id="toc-bug-fixes-45" class="nav-link" data-scroll-target="#bug-fixes-45">Bug Fixes</a></li>
+  <li><a href="#documentation-13" id="toc-documentation-13" class="nav-link" data-scroll-target="#documentation-13">Documentation</a></li>
+  </ul></li>
+  <li><a href="#section-58" id="toc-section-58" class="nav-link" data-scroll-target="#section-58">2.4.0 (2023-06-22)</a>
+  <ul>
+  <li><a href="#features-26" id="toc-features-26" class="nav-link" data-scroll-target="#features-26">Features</a></li>
+  <li><a href="#bug-fixes-46" id="toc-bug-fixes-46" class="nav-link" data-scroll-target="#bug-fixes-46">Bug Fixes</a></li>
+  <li><a href="#documentation-14" id="toc-documentation-14" class="nav-link" data-scroll-target="#documentation-14">Documentation</a></li>
+  </ul></li>
+  <li><a href="#section-59" id="toc-section-59" class="nav-link" data-scroll-target="#section-59">2.3.0 (2023-05-11)</a>
+  <ul>
+  <li><a href="#features-27" id="toc-features-27" class="nav-link" data-scroll-target="#features-27">Features</a></li>
+  <li><a href="#bug-fixes-47" id="toc-bug-fixes-47" class="nav-link" data-scroll-target="#bug-fixes-47">Bug Fixes</a></li>
+  <li><a href="#documentation-15" id="toc-documentation-15" class="nav-link" data-scroll-target="#documentation-15">Documentation</a></li>
+  </ul></li>
+  <li><a href="#section-60" id="toc-section-60" class="nav-link" data-scroll-target="#section-60">2.2.0 (2023-03-07)</a>
+  <ul>
+  <li><a href="#features-28" id="toc-features-28" class="nav-link" data-scroll-target="#features-28">Features</a></li>
+  <li><a href="#bug-fixes-48" id="toc-bug-fixes-48" class="nav-link" data-scroll-target="#bug-fixes-48">Bug Fixes</a></li>
+  </ul></li>
+  <li><a href="#section-61" id="toc-section-61" class="nav-link" data-scroll-target="#section-61">2.1.0 (2023-02-27)</a>
+  <ul>
+  <li><a href="#features-29" id="toc-features-29" class="nav-link" data-scroll-target="#features-29">Features</a></li>
+  <li><a href="#bug-fixes-49" id="toc-bug-fixes-49" class="nav-link" data-scroll-target="#bug-fixes-49">Bug Fixes</a></li>
+  </ul></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+
+
+<section id="changelog" class="level1">
+<h1>Changelog</h1>
+<section id="section" class="level2">
+<h2 class="anchored" data-anchor-id="section"><a href="https://github.com/graeter-group/kimmdy/compare/v6.8.2...v6.8.3">6.8.3</a> (2024-06-25)</h2>
+<section id="bug-fixes" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes">Bug Fixes</h3>
+<ul>
+<li>more robust output checking for gmx check (<a href="https://github.com/graeter-group/kimmdy/issues/445">#445</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/0a2516158110b3ab16421e513d203006a6cfc076">0a25161</a>)</li>
+<li>name (<a href="https://github.com/graeter-group/kimmdy/commit/595df32480d4dd1d2902cef0e5fa9dd0289392bd">595df32</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-1" class="level2">
+<h2 class="anchored" data-anchor-id="section-1"><a href="https://github.com/graeter-group/kimmdy/compare/v6.8.0...v6.8.1">6.8.1</a> (2024-06-17)</h2>
+<section id="bug-fixes-1" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-1">Bug Fixes</h3>
+<ul>
+<li>check for residuetypes.rtp existence (<a href="https://github.com/graeter-group/kimmdy/commit/c4e831c85b061b1f1916d9a8855908deb7ed6580">c4e831c</a>)</li>
+<li>fix <a href="https://github.com/graeter-group/kimmdy/issues/440">#440</a> (<a href="https://github.com/graeter-group/kimmdy/commit/c4e831c85b061b1f1916d9a8855908deb7ed6580">c4e831c</a>)</li>
+<li>onlye require xtc or trr, not both (<a href="https://github.com/graeter-group/kimmdy/issues/439">#439</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/c4e831c85b061b1f1916d9a8855908deb7ed6580">c4e831c</a>)</li>
+<li>use nrexcl from first reactive molecultetype (<a href="https://github.com/graeter-group/kimmdy/commit/c4e831c85b061b1f1916d9a8855908deb7ed6580">c4e831c</a>)</li>
+</ul>
+</section>
+<section id="documentation" class="level3">
+<h3 class="anchored" data-anchor-id="documentation">Documentation</h3>
+<ul>
+<li>make docs of kimmdy.yml much more readable (<a href="https://github.com/graeter-group/kimmdy/commit/c4e831c85b061b1f1916d9a8855908deb7ed6580">c4e831c</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-2" class="level2">
+<h2 class="anchored" data-anchor-id="section-2"><a href="https://github.com/graeter-group/kimmdy/compare/v6.7.0...v6.8.0">6.8.0</a> (2024-06-11)</h2>
+<section id="features" class="level3">
+<h3 class="anchored" data-anchor-id="features">Features</h3>
+<ul>
+<li>parse coarse-grained polymer ffs (<a href="https://github.com/graeter-group/kimmdy/issues/435">#435</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/ab696dc8ab73c464ff1076c4ec7e3a97f8b778d6">ab696dc</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-3" class="level2">
+<h2 class="anchored" data-anchor-id="section-3"><a href="https://github.com/graeter-group/kimmdy/compare/v6.6.1...v6.7.0">6.7.0</a> (2024-05-20)</h2>
+<section id="features-1" class="level3">
+<h3 class="anchored" data-anchor-id="features-1">Features</h3>
+<ul>
+<li>pass slurm options via kimmdy.yml config (<a href="https://github.com/graeter-group/kimmdy/issues/432">#432</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/11d3056aef19cd71d4ab265daf29e6eaf75457dd">11d3056</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-4" class="level2">
+<h2 class="anchored" data-anchor-id="section-4"><a href="https://github.com/graeter-group/kimmdy/compare/v6.6.0...v6.6.1">6.6.1</a> (2024-05-07)</h2>
+<section id="bug-fixes-2" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-2">Bug Fixes</h3>
+<ul>
+<li>generate matching gro for xtc in trjconv (<a href="https://github.com/graeter-group/kimmdy/commit/800de0ac16f1b21af8d41c94718fd34bdf3ab4df">800de0a</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-5" class="level2">
+<h2 class="anchored" data-anchor-id="section-5"><a href="https://github.com/graeter-group/kimmdy/compare/v6.5.0...v6.6.0">6.6.0</a> (2024-04-25)</h2>
+<section id="features-2" class="level3">
+<h3 class="anchored" data-anchor-id="features-2">Features</h3>
+<ul>
+<li>add explicit includes and excludes for modify_top (<a href="https://github.com/graeter-group/kimmdy/issues/427">#427</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/c1318c3d55bb21e6ee0e82e32301cc45ca8e7f24">c1318c3</a>)</li>
+<li>Expose grappa model and charge type (<a href="https://github.com/graeter-group/kimmdy/issues/430">#430</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/57af38808dd510640cc53420803d2299f5e172f5">57af388</a>)</li>
+<li>modify top tut (<a href="https://github.com/graeter-group/kimmdy/issues/428">#428</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/823b7ffe631c13501266804a90ecd11f8397886b">823b7ff</a>)</li>
+</ul>
+</section>
+<section id="bug-fixes-3" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-3">Bug Fixes</h3>
+<ul>
+<li>handle time windows w/ no rates in extrande_mod correctly (<a href="https://github.com/graeter-group/kimmdy/commit/f5c3f7c76f4c18a7e98cf2fe13afbe1c47041ead">f5c3f7c</a>)</li>
+<li>typo (<a href="https://github.com/graeter-group/kimmdy/commit/7130aff8f09dbe56231b1d2c20ee2b620db8aaca">7130aff</a>)</li>
+</ul>
+</section>
+<section id="documentation-1" class="level3">
+<h3 class="anchored" data-anchor-id="documentation-1">Documentation</h3>
+<ul>
+<li>how_to page for analysis (<a href="https://github.com/graeter-group/kimmdy/issues/424">#424</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/b35e1c86534dc59090150d2a94c912f9903f0c83">b35e1c8</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-6" class="level2">
+<h2 class="anchored" data-anchor-id="section-6"><a href="https://github.com/graeter-group/kimmdy/compare/v6.4.1...v6.5.0">6.5.0</a> (2024-03-25)</h2>
+<section id="features-3" class="level3">
+<h3 class="anchored" data-anchor-id="features-3">Features</h3>
+<ul>
+<li>Restart from run directory(<a href="https://github.com/graeter-group/kimmdy/issues/410">#410</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/40ee0d20a2a8c704eb2dd3a0898101a46702c695">40ee0d2</a>)</li>
+</ul>
+</section>
+<section id="bug-fixes-4" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-4">Bug Fixes</h3>
+<ul>
+<li>import get_task_directories from utils (<a href="https://github.com/graeter-group/kimmdy/commit/8d4ba4de90d33dc9b5b90f450a5d417fcb7d288a">8d4ba4d</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-7" class="level2">
+<h2 class="anchored" data-anchor-id="section-7"><a href="https://github.com/graeter-group/kimmdy/compare/v6.4.0...v6.4.1">6.4.1</a> (2024-03-21)</h2>
+<section id="bug-fixes-5" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-5">Bug Fixes</h3>
+<ul>
+<li>allow reactions with no chosen recipe (<a href="https://github.com/graeter-group/kimmdy/commit/171c7e1df818b8da71198a99e9dbcb0738b7f800">171c7e1</a>)</li>
+<li>colormap normalization (<a href="https://github.com/graeter-group/kimmdy/issues/415">#415</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/12383974b1930af38a89ccdcd7b9d1f5c74ed60a">1238397</a>)</li>
+<li>energy labels sorted correctly (<a href="https://github.com/graeter-group/kimmdy/commit/855272f44f965d9240abd2cb529449597badd8da">855272f</a>)</li>
+<li>expose arrhenius equation in morse function and fix wrong default value (<a href="https://github.com/graeter-group/kimmdy/issues/417">#417</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/58c47b31dda698f6005e52e5fc8cf4e7736a5774">58c47b3</a>)</li>
+<li>plot_energy now handles numbers in terms correctly. (<a href="https://github.com/graeter-group/kimmdy/commit/c16888bf6fc08715c0819638a2869fd435831d90">c16888b</a>)</li>
+<li>remove pd warning (<a href="https://github.com/graeter-group/kimmdy/commit/abc4afe11fa0ddb5e35bfdd7889afe1114c0a576">abc4afe</a>)</li>
+<li>runmanager now handles empty kmcresults correctly. (<a href="https://github.com/graeter-group/kimmdy/commit/c94bd2a2a92765a4e2d88496ea377725fd11d3b5">c94bd2a</a>)</li>
+</ul>
+</section>
+<section id="documentation-2" class="level3">
+<h3 class="anchored" data-anchor-id="documentation-2">Documentation</h3>
+<ul>
+<li>fix docstring (<a href="https://github.com/graeter-group/kimmdy/commit/9572791ef4e3375bcb82def24c9cf1af2d7c4678">9572791</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-8" class="level2">
+<h2 class="anchored" data-anchor-id="section-8"><a href="https://github.com/graeter-group/kimmdy/compare/v6.3.0...v6.4.0">6.4.0</a> (2024-03-07)</h2>
+<section id="features-4" class="level3">
+<h3 class="anchored" data-anchor-id="features-4">Features</h3>
+<ul>
+<li>add focus to grappa parameterizer (<a href="https://github.com/graeter-group/kimmdy/issues/408">#408</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/9abe7546cf0ec9b3c1283c30e0412df5902b2e85">9abe754</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-9" class="level2">
+<h2 class="anchored" data-anchor-id="section-9"><a href="https://github.com/graeter-group/kimmdy/compare/v6.2.5...v6.3.0">6.3.0</a> (2024-03-07)</h2>
+<section id="features-5" class="level3">
+<h3 class="anchored" data-anchor-id="features-5">Features</h3>
+<ul>
+<li>allow customizing trjconv output group (<a href="https://github.com/graeter-group/kimmdy/issues/396">#396</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/97b55880a791436c22d8c474d2d88541051f831b">97b5588</a>)</li>
+<li>analysis radical migration tool (<a href="https://github.com/graeter-group/kimmdy/issues/388">#388</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/ba4cb0f12224c6801e21a2961a52e3f3c3172fc1">ba4cb0f</a>)</li>
+</ul>
+</section>
+<section id="bug-fixes-6" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-6">Bug Fixes</h3>
+<ul>
+<li>squiggly lines begone (<a href="https://github.com/graeter-group/kimmdy/issues/399">#399</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/b1210e44f222204a67e1385ce8467ff7e41dabd2">b1210e4</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-10" class="level2">
+<h2 class="anchored" data-anchor-id="section-10"><a href="https://github.com/graeter-group/kimmdy/compare/v6.2.4...v6.2.5">6.2.5</a> (2024-02-27)</h2>
+<section id="bug-fixes-7" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-7">Bug Fixes</h3>
+<ul>
+<li>integration tests (<a href="https://github.com/graeter-group/kimmdy/issues/390">#390</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/526d888d9198b450a654a5a9de03429a5c6f2e95">526d888</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-11" class="level2">
+<h2 class="anchored" data-anchor-id="section-11"><a href="https://github.com/graeter-group/kimmdy/compare/v6.2.3...v6.2.4">6.2.4</a> (2024-02-27)</h2>
+<section id="bug-fixes-8" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-8">Bug Fixes</h3>
+<ul>
+<li>commit rendered docs with force (<a href="https://github.com/graeter-group/kimmdy/issues/391">#391</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/144d5acdfcd3e92371a19be57303eae2f715d8b9">144d5ac</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-12" class="level2">
+<h2 class="anchored" data-anchor-id="section-12"><a href="https://github.com/graeter-group/kimmdy/compare/v6.2.2...v6.2.3">6.2.3</a> (2024-02-27)</h2>
+<section id="bug-fixes-9" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-9">Bug Fixes</h3>
+<ul>
+<li>update dihedrals, make pairs unique (<a href="https://github.com/graeter-group/kimmdy/issues/383">#383</a>) fixes <a href="https://github.com/graeter-group/kimmdy/issues/376">#376</a> (<a href="https://github.com/graeter-group/kimmdy/commit/9283e68065108566c7e0162d7aec543a5b9c41f8">9283e68</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-13" class="level2">
+<h2 class="anchored" data-anchor-id="section-13"><a href="https://github.com/graeter-group/kimmdy/compare/v6.2.1...v6.2.2">6.2.2</a> (2024-02-23)</h2>
+<section id="bug-fixes-10" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-10">Bug Fixes</h3>
+<ul>
+<li>release-please config (<a href="https://github.com/graeter-group/kimmdy/commit/b9a362288ab1b650975d2e072b6f34eb8ca993e3">b9a3622</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-14" class="level2">
+<h2 class="anchored" data-anchor-id="section-14"><a href="https://github.com/graeter-group/kimmdy/compare/v6.2.0...v6.2.1">6.2.1</a> (2024-02-22)</h2>
+<section id="features-6" class="level3">
+<h3 class="anchored" data-anchor-id="features-6">Features</h3>
+<ul>
+<li>analyse reaction participation (<a href="https://github.com/graeter-group/kimmdy/issues/365">#365</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/c9c7898d429dfbb65a1dabb26cdad7cb2aad1ada">c9c7898</a>)</li>
+</ul>
+</section>
+<section id="bug-fixes-11" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-11">Bug Fixes</h3>
+<ul>
+<li>merge regression (<a href="https://github.com/graeter-group/kimmdy/commit/9f9b162c40aaf91f691b3963578030592f0ec0a5">9f9b162</a>)</li>
+</ul>
+</section>
+<section id="documentation-3" class="level3">
+<h3 class="anchored" data-anchor-id="documentation-3">Documentation</h3>
+<ul>
+<li>add how-to for starting with reaction (<a href="https://github.com/graeter-group/kimmdy/issues/369">#369</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/937c7864c530d000fb4475d1b33c746265b8c599">937c786</a>)</li>
+<li>fix make_ndx command (<a href="https://github.com/graeter-group/kimmdy/commit/69b3d74172c2f50171e85ab56500abef2adc200d">69b3d74</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-15" class="level2">
+<h2 class="anchored" data-anchor-id="section-15"><a href="https://github.com/graeter-group/kimmdy/compare/v6.1.0...v6.2.0">6.2.0</a> (2024-02-16)</h2>
+<section id="features-7" class="level3">
+<h3 class="anchored" data-anchor-id="features-7">Features</h3>
+<ul>
+<li>Generalize ff interaction (<a href="https://github.com/graeter-group/kimmdy/issues/360">#360</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/49bdb54c4f46909125df954915c7a061b5eaed11">49bdb54</a>)</li>
+<li>improve edissoc (<a href="https://github.com/graeter-group/kimmdy/issues/366">#366</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/37bb8da0bfe2e1a69a24e3440b702d7c39430e17">37bb8da</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-16" class="level2">
+<h2 class="anchored" data-anchor-id="section-16"><a href="https://github.com/graeter-group/kimmdy/compare/v6.0.1...v6.1.0">6.1.0</a> (2024-02-14)</h2>
+<section id="features-8" class="level3">
+<h3 class="anchored" data-anchor-id="features-8">Features</h3>
+<ul>
+<li>modify_top saves mapping of old and new indices (<a href="https://github.com/graeter-group/kimmdy/issues/364">#364</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/0086bbe2ff7cab9e900ea879da293f7b1f02757c">0086bbe</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-17" class="level2">
+<h2 class="anchored" data-anchor-id="section-17"><a href="https://github.com/graeter-group/kimmdy/compare/v6.0.0...v6.0.1">6.0.1</a> (2024-01-03)</h2>
+<section id="documentation-4" class="level3">
+<h3 class="anchored" data-anchor-id="documentation-4">Documentation</h3>
+<ul>
+<li>minor improvement (<a href="https://github.com/graeter-group/kimmdy/commit/111112ebcbd3ef79e5a3fea7026c1df9b64402ce">111112e</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-18" class="level2">
+<h2 class="anchored" data-anchor-id="section-18"><a href="https://github.com/graeter-group/kimmdy/compare/v5.3.2...v6.0.0">6.0.0</a> (2024-01-03)</h2>
+<section id="breaking-changes" class="level3">
+<h3 class="anchored" data-anchor-id="breaking-changes">⚠ BREAKING CHANGES</h3>
+<ul>
+<li>Partial charge treatment (<a href="https://github.com/graeter-group/kimmdy/issues/353">#353</a>)</li>
+</ul>
+</section>
+<section id="features-9" class="level3">
+<h3 class="anchored" data-anchor-id="features-9">Features</h3>
+<ul>
+<li>Partial charge treatment (<a href="https://github.com/graeter-group/kimmdy/issues/353">#353</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/1c057b36f3afe8b027eb07b215923f611e72cd0a">1c057b3</a>)</li>
+</ul>
+</section>
+<section id="bug-fixes-12" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-12">Bug Fixes</h3>
+<ul>
+<li>don’t truncate if there is no trajectory. (<a href="https://github.com/graeter-group/kimmdy/commit/4e6e01183ae084b120bf4f0970c327cc9d7f91ee">4e6e011</a>)</li>
+<li>don’t try to truncate to time 0 (<a href="https://github.com/graeter-group/kimmdy/commit/52099e50adec95022d69c0001b9ddb8a9913975d">52099e5</a>)</li>
+<li>hotfix for aggregate_reactions hangs <a href="https://github.com/graeter-group/kimmdy/issues/355">#355</a> (<a href="https://github.com/graeter-group/kimmdy/commit/b5bc285524041338565b54e7dd29cc311d22eca3">b5bc285</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-19" class="level2">
+<h2 class="anchored" data-anchor-id="section-19"><a href="https://github.com/graeter-group/kimmdy/compare/v5.3.1...v5.3.2">5.3.2</a> (2023-12-19)</h2>
+<section id="bug-fixes-13" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-13">Bug Fixes</h3>
+<ul>
+<li>Improve slowgrowth (<a href="https://github.com/graeter-group/kimmdy/issues/338">#338</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/31a046447ed50d8a545ec1eda138a30a24dd939f">31a0464</a>)</li>
+<li>more verbose debugger in rf kmc (<a href="https://github.com/graeter-group/kimmdy/commit/97f4a9a0e20f370202d2b70a1e7209af7eecc99f">97f4a9a</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-20" class="level2">
+<h2 class="anchored" data-anchor-id="section-20"><a href="https://github.com/graeter-group/kimmdy/compare/v5.3.0...v5.3.1">5.3.1</a> (2023-12-15)</h2>
+<section id="bug-fixes-14" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-14">Bug Fixes</h3>
+<ul>
+<li>don’t write top section headers for empty sections (<a href="https://github.com/graeter-group/kimmdy/issues/351">#351</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/1632f6f2f78c7c63cf97f3a77821bbef54ea0863">1632f6f</a>)</li>
+<li>update scheme url in examples and docs (<a href="https://github.com/graeter-group/kimmdy/issues/348">#348</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/2a72b905d6cdd9a914106554de791a1abd346bf8">2a72b90</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-21" class="level2">
+<h2 class="anchored" data-anchor-id="section-21"><a href="https://github.com/graeter-group/kimmdy/compare/v5.2.3...v5.3.0">5.3.0</a> (2023-12-12)</h2>
+<section id="features-10" class="level3">
+<h3 class="anchored" data-anchor-id="features-10">Features</h3>
+<ul>
+<li>custom step (<a href="https://github.com/graeter-group/kimmdy/issues/346">#346</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/5b28f049dda4ca6e56b959b413778eb73ba3de0d">5b28f04</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-22" class="level2">
+<h2 class="anchored" data-anchor-id="section-22"><a href="https://github.com/graeter-group/kimmdy/compare/v5.2.2...v5.2.3">5.2.3</a> (2023-12-08)</h2>
+<section id="bug-fixes-15" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-15">Bug Fixes</h3>
+<ul>
+<li>fix an issue where merging multiples of a moleculetype incremented the residuenumbers too fast (<a href="https://github.com/graeter-group/kimmdy/issues/344">#344</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/7e78665ea1593d65b4b49daa7c1a71a99c87e94d">7e78665</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-23" class="level2">
+<h2 class="anchored" data-anchor-id="section-23"><a href="https://github.com/graeter-group/kimmdy/compare/v5.2.1...v5.2.2">5.2.2</a> (2023-12-08)</h2>
+<section id="bug-fixes-16" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-16">Bug Fixes</h3>
+<ul>
+<li>escape file paths for shell commands (<a href="https://github.com/graeter-group/kimmdy/commit/914550ae57cf6428845a57cb95b388b33f29ee40">914550a</a>)</li>
+<li>make ff dir optional in config (<a href="https://github.com/graeter-group/kimmdy/commit/02c5d9f3cb157b8ffc1db9ceec9285f667e73d1c">02c5d9f</a>)</li>
+<li>replace spaces in name and out in config (<a href="https://github.com/graeter-group/kimmdy/commit/304de69b4047ad56df6caa64b381f60bc8c16ce0">304de69</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-24" class="level2">
+<h2 class="anchored" data-anchor-id="section-24"><a href="https://github.com/graeter-group/kimmdy/compare/v5.2.0...v5.2.1">5.2.1</a> (2023-12-07)</h2>
+<section id="bug-fixes-17" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-17">Bug Fixes</h3>
+<ul>
+<li>add title to scheme (<a href="https://github.com/graeter-group/kimmdy/issues/341">#341</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/a1b1ae5f429d86555c3429ee9a4e01f5df618882">a1b1ae5</a>)</li>
+<li>kimmdy run bugs (<a href="https://github.com/graeter-group/kimmdy/issues/336">#336</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/ce558e7fb528800f75ac0133e8dde871179bd70c">ce558e7</a>)</li>
+<li>make forcefield directory optional, only warn (<a href="https://github.com/graeter-group/kimmdy/issues/332">#332</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/eac41311e2230bdf014c3df15d141993ac2617ae">eac4131</a>)</li>
+<li>renumber atomnrs (<a href="https://github.com/graeter-group/kimmdy/issues/331">#331</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/e88f8cc809056462249b828960b98565f3768908">e88f8cc</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-25" class="level2">
+<h2 class="anchored" data-anchor-id="section-25"><a href="https://github.com/graeter-group/kimmdy/compare/v5.1.12...v5.2.0">5.2.0</a> (2023-11-14)</h2>
+<section id="features-11" class="level3">
+<h3 class="anchored" data-anchor-id="features-11">Features</h3>
+<ul>
+<li>add config for exclude and include in reactive moleculetype (<a href="https://github.com/graeter-group/kimmdy/commit/44121e4c253decb8b2af566e3c72dff10ed8b251">44121e4</a>)</li>
+<li>merge react-able molecules and make multiples explicit (<a href="https://github.com/graeter-group/kimmdy/issues/327">#327</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/ae8d45ea714713180989a59043d8c21224697700">ae8d45e</a>)</li>
+<li>parse settles and exclusions (<a href="https://github.com/graeter-group/kimmdy/commit/44121e4c253decb8b2af566e3c72dff10ed8b251">44121e4</a>)</li>
+<li>use parsed exclusions for top merge (<a href="https://github.com/graeter-group/kimmdy/commit/44121e4c253decb8b2af566e3c72dff10ed8b251">44121e4</a>)</li>
+</ul>
+</section>
+<section id="bug-fixes-18" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-18">Bug Fixes</h3>
+<ul>
+<li>declare kimmdy as being a typed library (<a href="https://github.com/graeter-group/kimmdy/commit/44121e4c253decb8b2af566e3c72dff10ed8b251">44121e4</a>)</li>
+<li>expected length of output folders including the new setup task (<a href="https://github.com/graeter-group/kimmdy/commit/8fd2b4462e664c0ad374eeff161388e6f1010040">8fd2b44</a>)</li>
+<li>make molecules section a list instead of dict because order is important (<a href="https://github.com/graeter-group/kimmdy/commit/44121e4c253decb8b2af566e3c72dff10ed8b251">44121e4</a>)</li>
+<li>start iteration at -1 such that setup task has index 0 (<a href="https://github.com/graeter-group/kimmdy/commit/44121e4c253decb8b2af566e3c72dff10ed8b251">44121e4</a>)</li>
+<li>tasklist test after integrating setup task (<a href="https://github.com/graeter-group/kimmdy/commit/44121e4c253decb8b2af566e3c72dff10ed8b251">44121e4</a>)</li>
+</ul>
+</section>
+<section id="documentation-5" class="level3">
+<h3 class="anchored" data-anchor-id="documentation-5">Documentation</h3>
+<ul>
+<li>improve dark theme (<a href="https://github.com/graeter-group/kimmdy/commit/44121e4c253decb8b2af566e3c72dff10ed8b251">44121e4</a>)</li>
+<li>more detailed ML installation instructions for upcoming plugins (<a href="https://github.com/graeter-group/kimmdy/commit/c128069beb5940b27d2833de1135560bd7eedd5f">c128069</a>)</li>
+<li>use freeze to only re-render changed qmd docs (<a href="https://github.com/graeter-group/kimmdy/commit/44121e4c253decb8b2af566e3c72dff10ed8b251">44121e4</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-26" class="level2">
+<h2 class="anchored" data-anchor-id="section-26"><a href="https://github.com/graeter-group/kimmdy/compare/v5.1.11...v5.1.12">5.1.12</a> (2023-11-13)</h2>
+<section id="bug-fixes-19" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-19">Bug Fixes</h3>
+<ul>
+<li>remove show schema path option (<a href="https://github.com/graeter-group/kimmdy/commit/2285246c355b0f52cc65f1edd24645af7f4e4e9b">2285246</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-27" class="level2">
+<h2 class="anchored" data-anchor-id="section-27"><a href="https://github.com/graeter-group/kimmdy/compare/v5.1.10...v5.1.11">5.1.11</a> (2023-11-08)</h2>
+<section id="documentation-6" class="level3">
+<h3 class="anchored" data-anchor-id="documentation-6">Documentation</h3>
+<ul>
+<li>clean up docs and error messages (<a href="https://github.com/graeter-group/kimmdy/issues/325">#325</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/74589405f998406847f54faa514d290c2c6a4564">7458940</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-28" class="level2">
+<h2 class="anchored" data-anchor-id="section-28"><a href="https://github.com/graeter-group/kimmdy/compare/v5.1.9...v5.1.10">5.1.10</a> (2023-11-08)</h2>
+<section id="bug-fixes-20" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-20">Bug Fixes</h3>
+<ul>
+<li>discover plugins for building docs (<a href="https://github.com/graeter-group/kimmdy/commit/22018e42d0ccb3768379f82d68a5521f1985101e">22018e4</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-29" class="level2">
+<h2 class="anchored" data-anchor-id="section-29"><a href="https://github.com/graeter-group/kimmdy/compare/v5.1.8...v5.1.9">5.1.9</a> (2023-11-08)</h2>
+<section id="bug-fixes-21" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-21">Bug Fixes</h3>
+<ul>
+<li>add dev dependencies to build docs on gh pages (<a href="https://github.com/graeter-group/kimmdy/commit/9bd83dfa8eb17bcfebbca3c0e27462af0e095a50">9bd83df</a>)</li>
+<li>tox, ci (<a href="https://github.com/graeter-group/kimmdy/commit/1e3826afdad54d2e6bb38c7d3b617d74198fc669">1e3826a</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-30" class="level2">
+<h2 class="anchored" data-anchor-id="section-30"><a href="https://github.com/graeter-group/kimmdy/compare/v5.1.7...v5.1.8">5.1.8</a> (2023-11-07)</h2>
+<section id="bug-fixes-22" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-22">Bug Fixes</h3>
+<ul>
+<li>building docs (<a href="https://github.com/graeter-group/kimmdy/commit/99506c592d0a8e1e25eb9ff2566542f23dd40628">99506c5</a>)</li>
+<li>tests with plugins (<a href="https://github.com/graeter-group/kimmdy/commit/218adf6b66455ec34c1dde5c33394cf5d81e0a05">218adf6</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-31" class="level2">
+<h2 class="anchored" data-anchor-id="section-31"><a href="https://github.com/graeter-group/kimmdy/compare/v5.1.6...v5.1.7">5.1.7</a> (2023-11-06)</h2>
+<section id="bug-fixes-23" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-23">Bug Fixes</h3>
+<ul>
+<li>always write system and molecules top sections last (<a href="https://github.com/graeter-group/kimmdy/commit/c49aa9c552cfacd605121c39a17846226b84c0c0">c49aa9c</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-32" class="level2">
+<h2 class="anchored" data-anchor-id="section-32"><a href="https://github.com/graeter-group/kimmdy/compare/v5.1.5...v5.1.6">5.1.6</a> (2023-10-27)</h2>
+<section id="bug-fixes-24" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-24">Bug Fixes</h3>
+<ul>
+<li><strong>ci:</strong> set markdown content type for description (<a href="https://github.com/graeter-group/kimmdy/commit/6dc116c0568f27437b55acf5c9cedcf0e7ae0eec">6dc116c</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-33" class="level2">
+<h2 class="anchored" data-anchor-id="section-33"><a href="https://github.com/graeter-group/kimmdy/compare/v5.1.4...v5.1.5">5.1.5</a> (2023-10-27)</h2>
+<section id="bug-fixes-25" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-25">Bug Fixes</h3>
+<ul>
+<li><strong>ci:</strong> set markdown content type for description (<a href="https://github.com/graeter-group/kimmdy/commit/ca9963e6a2c4cd5792872980687be281a34270c5">ca9963e</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-34" class="level2">
+<h2 class="anchored" data-anchor-id="section-34"><a href="https://github.com/graeter-group/kimmdy/compare/v5.1.3...v5.1.4">5.1.4</a> (2023-10-27)</h2>
+<section id="bug-fixes-26" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-26">Bug Fixes</h3>
+<ul>
+<li><strong>ci:</strong> markdown in readme (<a href="https://github.com/graeter-group/kimmdy/commit/8a41e39e346e5c6aaaa25dde63eebbc821f9e2b7">8a41e39</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-35" class="level2">
+<h2 class="anchored" data-anchor-id="section-35"><a href="https://github.com/graeter-group/kimmdy/compare/v5.1.2...v5.1.3">5.1.3</a> (2023-10-27)</h2>
+<section id="bug-fixes-27" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-27">Bug Fixes</h3>
+<ul>
+<li><strong>ci:</strong> add testpyi (<a href="https://github.com/graeter-group/kimmdy/commit/390217b5f29cce34e784437f053f0f8a6e1e1222">390217b</a>)</li>
+<li>setup.cfg long description type (<a href="https://github.com/graeter-group/kimmdy/commit/1c31db5ec26399699df0465aa21f401dbda421e5">1c31db5</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-36" class="level2">
+<h2 class="anchored" data-anchor-id="section-36"><a href="https://github.com/graeter-group/kimmdy/compare/v5.1.1...v5.1.2">5.1.2</a> (2023-10-27)</h2>
+<section id="bug-fixes-28" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-28">Bug Fixes</h3>
+<ul>
+<li><strong>ci:</strong> unify release workflow (<a href="https://github.com/graeter-group/kimmdy/commit/488779fc4271c9112136d5c1e9f4496f433fc0c1">488779f</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-37" class="level2">
+<h2 class="anchored" data-anchor-id="section-37"><a href="https://github.com/graeter-group/kimmdy/compare/v5.1.0...v5.1.1">5.1.1</a> (2023-10-27)</h2>
+<section id="bug-fixes-29" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-29">Bug Fixes</h3>
+<ul>
+<li><strong>ci:</strong> only build package on tag push ‘stable’ (<a href="https://github.com/graeter-group/kimmdy/commit/3a839a32121de8b9c7cf3038a7cd3b16a36c68dc">3a839a3</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-38" class="level2">
+<h2 class="anchored" data-anchor-id="section-38"><a href="https://github.com/graeter-group/kimmdy/compare/v5.0.0...v5.1.0">5.1.0</a> (2023-10-27)</h2>
+<section id="features-12" class="level3">
+<h3 class="anchored" data-anchor-id="features-12">Features</h3>
+<ul>
+<li>adjust resnum of a moving hydrogen (<a href="https://github.com/graeter-group/kimmdy/issues/312">#312</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/481cd84582620a6ee486253638a7ed1db2299934">481cd84</a>)</li>
+<li>Checkpoints optional (<a href="https://github.com/graeter-group/kimmdy/issues/311">#311</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/5e939139c867f51a7208049a2a94bef49947ebbf">5e93913</a>)</li>
+<li><strong>ci:</strong> publish to PyPi (<a href="https://github.com/graeter-group/kimmdy/commit/e513fb645c38ca2b3e791262b8c43c9baa1f8f49">e513fb6</a>)</li>
+<li><strong>dev:</strong> visualize call graph with Pycallgraph (<a href="https://github.com/graeter-group/kimmdy/issues/303">#303</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/ab6ffe527041d76cedc3cc5edeb893c297ddb47d">ab6ffe5</a>)</li>
+<li>show gmx errors in log. fixes <a href="https://github.com/graeter-group/kimmdy/issues/260">#260</a> (<a href="https://github.com/graeter-group/kimmdy/issues/313">#313</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/489eb2d9c0927db2a5a52712bef2632c15f89037">489eb2d</a>)</li>
+</ul>
+</section>
+<section id="bug-fixes-30" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-30">Bug Fixes</h3>
+<ul>
+<li>id in scheme (<a href="https://github.com/graeter-group/kimmdy/commit/a597bbab89f87e8284c8e4aa4ba188468653ce92">a597bba</a>)</li>
+</ul>
+</section>
+<section id="documentation-7" class="level3">
+<h3 class="anchored" data-anchor-id="documentation-7">Documentation</h3>
+<ul>
+<li>add missing config descriptions and remove unused config.run option (<a href="https://github.com/graeter-group/kimmdy/issues/305">#305</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/1696f6679245ca0306d3d6fe021b594cbd11a24b">1696f66</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-39" class="level2">
+<h2 class="anchored" data-anchor-id="section-39"><a href="https://github.com/graeter-group/kimmdy/compare/v4.4.1...v5.0.0">5.0.0</a> (2023-10-25)</h2>
+<section id="breaking-changes-1" class="level3">
+<h3 class="anchored" data-anchor-id="breaking-changes-1">⚠ BREAKING CHANGES</h3>
+<ul>
+<li>choose highest rate as reaction start time</li>
+</ul>
+</section>
+<section id="features-13" class="level3">
+<h3 class="anchored" data-anchor-id="features-13">Features</h3>
+<ul>
+<li>Allow having single optional file for mdrun (<a href="https://github.com/graeter-group/kimmdy/issues/151">#151</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/6b61a8c44db785bedcc762bc5689486adc061703">6b61a8c</a>)</li>
+<li>choose highest rate as reaction start time (<a href="https://github.com/graeter-group/kimmdy/commit/fc822b32d1b3c34a5f5930574e7daa2ad8f7547a">fc822b3</a>)</li>
+<li>display residue name for radical population (<a href="https://github.com/graeter-group/kimmdy/commit/77a8d726c223d45233c15100437d641c0c1cfc65">77a8d72</a>)</li>
+<li>extrande KMC algorithm (<a href="https://github.com/graeter-group/kimmdy/commit/d1671db75d6d86f34d9f925adbd8d42747f05c34">d1671db</a>)</li>
+<li>only plot radical occupied atoms (<a href="https://github.com/graeter-group/kimmdy/issues/308">#308</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/77a8d726c223d45233c15100437d641c0c1cfc65">77a8d72</a>)</li>
+<li>Runtime analysis tool (<a href="https://github.com/graeter-group/kimmdy/issues/283">#283</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/e302be358fdf77c749d8c9a369871ad7a3cc353e">e302be3</a>)</li>
+<li>trr without edr can now be used. (<a href="https://github.com/graeter-group/kimmdy/commit/6b61a8c44db785bedcc762bc5689486adc061703">6b61a8c</a>)</li>
+</ul>
+</section>
+<section id="bug-fixes-31" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-31">Bug Fixes</h3>
+<ul>
+<li><a href="https://github.com/graeter-group/kimmdy/issues/261">#261</a> improve error message if ff is not found in cwd (<a href="https://github.com/graeter-group/kimmdy/issues/307">#307</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/ab03cbe8b4c93b1db4e52b78e119de7fb91ece7a">ab03cbe</a>)</li>
+<li>after truncating place doesn’t need a time (<a href="https://github.com/graeter-group/kimmdy/commit/233d83cbba88396194d989a200f9f420e862aae3">233d83c</a>)</li>
+<li>catch edge cases in extrande algorithm (<a href="https://github.com/graeter-group/kimmdy/commit/01d4df9b0e8fba921337f24cf2b4a1927885e016">01d4df9</a>)</li>
+<li>closes <a href="https://github.com/graeter-group/kimmdy/issues/286">#286</a> don’t modify task mapping inplace (<a href="https://github.com/graeter-group/kimmdy/commit/c40f360acd8d5282b4adc4c2eba56777be6f708b">c40f360</a>)</li>
+<li>consistent naming for remove hydrogen cli (<a href="https://github.com/graeter-group/kimmdy/commit/e615370a0bec48ead5f66a351f2bc682a0234028">e615370</a>)</li>
+<li>coordinates and runmanager (<a href="https://github.com/graeter-group/kimmdy/issues/271">#271</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/695026cc76d2311923c6a4b78608c3abee9d45a3">695026c</a>)</li>
+<li>correct error message (<a href="https://github.com/graeter-group/kimmdy/commit/facda238da55f887635728b01afb0a05861e68ef">facda23</a>)</li>
+<li>correct truncated gro (<a href="https://github.com/graeter-group/kimmdy/commit/2c49c809de992bee9f6da516fbe76734460b7c2f">2c49c80</a>)</li>
+<li>duplicate key in yaml (<a href="https://github.com/graeter-group/kimmdy/commit/6204e1e52d151ca53af13b122dbce45c6e66acd3">6204e1e</a>)</li>
+<li>error handling (<a href="https://github.com/graeter-group/kimmdy/commit/d0dc8e7ee770711f63fa5544190d1269e3f77b2b">d0dc8e7</a>)</li>
+<li>execute <code>place</code> at first time in recipe (<a href="https://github.com/graeter-group/kimmdy/commit/7234d721a54e25ef8d43ebb2b7444a914adb37da">7234d72</a>)</li>
+<li>gmx trjconv –trunc not working with xtc (<a href="https://github.com/graeter-group/kimmdy/commit/ba0b92255b0aecaac67f341d1dfeb9db9a7621fe">ba0b922</a>)</li>
+<li>improved rate plotting (<a href="https://github.com/graeter-group/kimmdy/commit/d0f6d19a42c705082c8cdd5e498885d426256bca">d0f6d19</a>)</li>
+<li>improved reliability of rate plotting (<a href="https://github.com/graeter-group/kimmdy/commit/6a355d439683c44b9fcef68874ff548c6b24d8a4">6a355d4</a>)</li>
+<li>make plugins and plugin schemas discoverable by pip install (<a href="https://github.com/graeter-group/kimmdy/commit/73da927a01de4570bf5c0571cb1bd07f8c225b10">73da927</a>)</li>
+<li>only use mpme and ntmpi in test config. fixes <a href="https://github.com/graeter-group/kimmdy/issues/302">#302</a> (<a href="https://github.com/graeter-group/kimmdy/issues/304">#304</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/764b0830127f0faa2181d15069c405e3385fa3f1">764b083</a>)</li>
+<li>parametrize before slow growth (<a href="https://github.com/graeter-group/kimmdy/commit/ff146945531795b9179b220db3bf0d97b7b2d870">ff14694</a>)</li>
+<li>rate plot with less than 9 recipes (<a href="https://github.com/graeter-group/kimmdy/commit/eb557d474b5f829b9ed67e9eb6fdc155113ceaf3">eb557d4</a>)</li>
+<li>remove double log message (<a href="https://github.com/graeter-group/kimmdy/issues/290">#290</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/0182d204636f9ea67bd198f0acd06b687bac928a">0182d20</a>)</li>
+<li>rename idx to ix for moleculetype for consistency (<a href="https://github.com/graeter-group/kimmdy/commit/e615370a0bec48ead5f66a351f2bc682a0234028">e615370</a>)</li>
+<li>runtime analysis double counting (<a href="https://github.com/graeter-group/kimmdy/commit/14a875a3dc6b47550976f1635a74123285c45f9f">14a875a</a>)</li>
+<li>set needs_parametrization (<a href="https://github.com/graeter-group/kimmdy/commit/e7a29963724d09b7979c5a27792d27519d182d60">e7a2996</a>)</li>
+<li>truncate bug (<a href="https://github.com/graeter-group/kimmdy/commit/bfc175c819564dd73c0c30b53ed2ce489aa9ca2c">bfc175c</a>)</li>
+<li>type issue in log message formatting (<a href="https://github.com/graeter-group/kimmdy/commit/fdee7684a5756ac3f75938ecdf3775703151c834">fdee768</a>)</li>
+<li>write backups of truncated trajectories to the correct directory (<a href="https://github.com/graeter-group/kimmdy/commit/e615370a0bec48ead5f66a351f2bc682a0234028">e615370</a>)</li>
+<li>wrong type of top when parametrizing (<a href="https://github.com/graeter-group/kimmdy/commit/fb2eb08af86c12be3a175e3cca2e20819e705da4">fb2eb08</a>)</li>
+</ul>
+</section>
+<section id="documentation-8" class="level3">
+<h3 class="anchored" data-anchor-id="documentation-8">Documentation</h3>
+<ul>
+<li>document kimmdy.yml yaml language server config (<a href="https://github.com/graeter-group/kimmdy/issues/309">#309</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/2fa494ec3f8bca78ba3e707b0091171d34eb3bf2">2fa494e</a>)</li>
+<li>render (<a href="https://github.com/graeter-group/kimmdy/commit/86379905c0b18086874cc76e134de3c9b059d245">8637990</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-40" class="level2">
+<h2 class="anchored" data-anchor-id="section-40"><a href="https://github.com/graeter-group/kimmdy/compare/v4.4.0...v4.4.1">4.4.1</a> (2023-09-13)</h2>
+<section id="bug-fixes-32" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-32">Bug Fixes</h3>
+<ul>
+<li><strong>test:</strong> increase hypothesis deadline (<a href="https://github.com/graeter-group/kimmdy/commit/f7d8867560600c04099da99a28be12311cb3b0af">f7d8867</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-41" class="level2">
+<h2 class="anchored" data-anchor-id="section-41"><a href="https://github.com/graeter-group/kimmdy/compare/v4.3.0...v4.4.0">4.4.0</a> (2023-09-13)</h2>
+<section id="features-14" class="level3">
+<h3 class="anchored" data-anchor-id="features-14">Features</h3>
+<ul>
+<li><strong>dummy:</strong> this is not a feature, just a release trigger (<a href="https://github.com/graeter-group/kimmdy/commit/6aa1190fb0eca93388a8e9d7e95c8b2f5945a55d">6aa1190</a>)</li>
+</ul>
+</section>
+<section id="bug-fixes-33" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-33">Bug Fixes</h3>
+<ul>
+<li><strong>analysis:</strong> remove y axis label for steps panel in plot_energy (<a href="https://github.com/graeter-group/kimmdy/commit/a2bc88ac4b8405ae940f0f241fe4778c2039552e">a2bc88a</a>)</li>
+<li><strong>test:</strong> increase hypothesis deadline (<a href="https://github.com/graeter-group/kimmdy/commit/4b9823d45265aecfada2d7bd1f4b90640164d31a">4b9823d</a>)</li>
+<li><strong>test:</strong> increase hypothesis deadline (<a href="https://github.com/graeter-group/kimmdy/commit/9810e8478375e43311e0458d71cc9748ae80d684">9810e84</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-42" class="level2">
+<h2 class="anchored" data-anchor-id="section-42"><a href="https://github.com/graeter-group/kimmdy/compare/v4.2.1...v4.3.0">4.3.0</a> (2023-09-08)</h2>
+<section id="features-15" class="level3">
+<h3 class="anchored" data-anchor-id="features-15">Features</h3>
+<ul>
+<li>unify output location (<a href="https://github.com/graeter-group/kimmdy/issues/255">#255</a>)! (<a href="https://github.com/graeter-group/kimmdy/commit/cbd4d5db913b38f1ea02ce37d6ccfae0c50053e5">cbd4d5d</a>)</li>
+</ul>
+</section>
+<section id="bug-fixes-34" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-34">Bug Fixes</h3>
+<ul>
+<li>closes <a href="https://github.com/graeter-group/kimmdy/issues/265">#265</a> , cleanup with flake8 (<a href="https://github.com/graeter-group/kimmdy/commit/d79adbcd798cbe56ded35a96c09679eaf5e4b2c2">d79adbc</a>)</li>
+<li>jobscript and logging (<a href="https://github.com/graeter-group/kimmdy/commit/cbd4d5db913b38f1ea02ce37d6ccfae0c50053e5">cbd4d5d</a>)</li>
+<li>place_atom (<a href="https://github.com/graeter-group/kimmdy/commit/0e0dc1dbf4537f12b5af3cca32aba11c7a1ba4fc">0e0dc1d</a>)</li>
+<li>properly merge mds general ’.*’ section and general options with defaults (<a href="https://github.com/graeter-group/kimmdy/commit/cbd4d5db913b38f1ea02ce37d6ccfae0c50053e5">cbd4d5d</a>)</li>
+<li>set defaults on non-existent sections. fixes <a href="https://github.com/graeter-group/kimmdy/issues/264">#264</a> (<a href="https://github.com/graeter-group/kimmdy/commit/cbd4d5db913b38f1ea02ce37d6ccfae0c50053e5">cbd4d5d</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-43" class="level2">
+<h2 class="anchored" data-anchor-id="section-43"><a href="https://github.com/graeter-group/kimmdy/compare/v4.2.0...v4.2.1">4.2.1</a> (2023-09-07)</h2>
+<section id="bug-fixes-35" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-35">Bug Fixes</h3>
+<ul>
+<li>apply_recipe naming (<a href="https://github.com/graeter-group/kimmdy/commit/65738861ccc4c9418f4a1c7da3fd5f56afd33d14">6573886</a>)</li>
+<li>handle <code>Relax</code> in plot_rates (<a href="https://github.com/graeter-group/kimmdy/commit/3099210335a38504dced4aa5ceffaeaa23617dd3">3099210</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-44" class="level2">
+<h2 class="anchored" data-anchor-id="section-44"><a href="https://github.com/graeter-group/kimmdy/compare/v4.1.0...v4.2.0">4.2.0</a> (2023-09-04)</h2>
+<section id="features-16" class="level3">
+<h3 class="anchored" data-anchor-id="features-16">Features</h3>
+<ul>
+<li><strong>analysis:</strong> open-plot and open-vmd options (<a href="https://github.com/graeter-group/kimmdy/commit/d306e66b893a72280bffbe12e26ab05c8777a8a9">d306e66</a>)</li>
+<li>plot multiple energy terms (<a href="https://github.com/graeter-group/kimmdy/commit/d306e66b893a72280bffbe12e26ab05c8777a8a9">d306e66</a>)</li>
+<li>review analysis (<a href="https://github.com/graeter-group/kimmdy/issues/245">#245</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/d306e66b893a72280bffbe12e26ab05c8777a8a9">d306e66</a>)</li>
+</ul>
+</section>
+<section id="bug-fixes-36" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-36">Bug Fixes</h3>
+<ul>
+<li><a href="https://github.com/graeter-group/kimmdy/issues/236">#236</a> rm concat cmd option (<a href="https://github.com/graeter-group/kimmdy/issues/240">#240</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/675ded537a6b241b59b02560c286945e76916f22">675ded5</a>)</li>
+<li>missing test file (<a href="https://github.com/graeter-group/kimmdy/commit/1e805c19a13d4f590a0c8f8e7841428f64ef1c71">1e805c1</a>)</li>
+<li>no grappa in tox tests (<a href="https://github.com/graeter-group/kimmdy/commit/feaff46e0d44316cf5cbf46c8045d9e0507850ed">feaff46</a>)</li>
+<li>Recipe aggregation broken, closes <a href="https://github.com/graeter-group/kimmdy/issues/252">#252</a> (<a href="https://github.com/graeter-group/kimmdy/issues/253">#253</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/a6177e3d99af093700167d03311718c9ce571f63">a6177e3</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-45" class="level2">
+<h2 class="anchored" data-anchor-id="section-45"><a href="https://github.com/graeter-group/kimmdy/compare/v4.0.1...v4.1.0">4.1.0</a> (2023-08-28)</h2>
+<section id="features-17" class="level3">
+<h3 class="anchored" data-anchor-id="features-17">Features</h3>
+<ul>
+<li>–debug for post-mortem debugging (<a href="https://github.com/graeter-group/kimmdy/issues/214">#214</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/91360d156a86094bb46111b8a3858404bc3d8daf">91360d1</a>)</li>
+<li>add remove_hydrogen tool (<a href="https://github.com/graeter-group/kimmdy/issues/213">#213</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/b7f7e78273458cc89532f5db8c17e58f1d6c6e50">b7f7e78</a>)</li>
+<li>Automatic Radical Parameterization (<a href="https://github.com/graeter-group/kimmdy/issues/144">#144</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/4b4641bce00812be0859acd8200fce658577a316">4b4641b</a>)</li>
+<li>automatically stop and restart KIMMDY for joblength-restricted HPC clusters (<a href="https://github.com/graeter-group/kimmdy/issues/162">#162</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/602d86483aff2f6bf039f4bd74d018e63cd9b7c4">602d864</a>)</li>
+<li>cleanup cmd.py (<a href="https://github.com/graeter-group/kimmdy/issues/228">#228</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/f77b6dcf00e77800bd8899dec6c3f40652f200b9">f77b6dc</a>)</li>
+<li>config: use_plumed in md section (<a href="https://github.com/graeter-group/kimmdy/issues/234">#234</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/22dfacbe38bf167ab79b391b40ba1883cf090881">22dfacb</a>)</li>
+<li>multimolecule topology (<a href="https://github.com/graeter-group/kimmdy/issues/211">#211</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/153af8ce6780dbff928160c89ff17a5a3c373969">153af8c</a>)</li>
+<li>single reaction tasks in config (<a href="https://github.com/graeter-group/kimmdy/issues/215">#215</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/1c076897f429673dbe0d7dfec9caaf86a7018a71">1c07689</a>)</li>
+<li>workflow for local testing (<a href="https://github.com/graeter-group/kimmdy/commit/092b89e5fcb1addcd2a3d09f9104c0ddc2b3c3eb">092b89e</a>)</li>
+</ul>
+</section>
+<section id="bug-fixes-37" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-37">Bug Fixes</h3>
+<ul>
+<li>212 (<a href="https://github.com/graeter-group/kimmdy/commit/016aa56a630f64b953cb6cab7c9a25584c47a692">016aa56</a>)</li>
+<li>allow reading topology with an empty forcefield (<a href="https://github.com/graeter-group/kimmdy/issues/238">#238</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/a0824c37379f0ebdf87bbf73dd50a0b114bbeafe">a0824c3</a>)</li>
+<li>also fix <a href="https://github.com/graeter-group/kimmdy/issues/200">#200</a> (<a href="https://github.com/graeter-group/kimmdy/commit/f2b2be2169bc7f91eeb925cf0e125a321733cb1c">f2b2be2</a>)</li>
+<li>catch plugin loading exception (<a href="https://github.com/graeter-group/kimmdy/commit/268f77fdda7abee65d8347f6a14b8cfb5be57274">268f77f</a>)</li>
+<li><strong>ci:</strong> render docs (<a href="https://github.com/graeter-group/kimmdy/commit/a62f35162bbbd4b10f9f7f39138a52734cff65c7">a62f351</a>)</li>
+<li>consolidate cmd interface with previous changes by <a href="https://github.com/ehhartmann"><span class="citation" data-cites="ehhartmann">@ehhartmann</span></a> (<a href="https://github.com/graeter-group/kimmdy/commit/f77b6dcf00e77800bd8899dec6c3f40652f200b9">f77b6dc</a>)</li>
+<li><strong>docs:</strong> getting started molstar resources (<a href="https://github.com/graeter-group/kimmdy/commit/f77b6dcf00e77800bd8899dec6c3f40652f200b9">f77b6dc</a>)</li>
+<li>don’t increment logfile if starting from a checkpoint (<a href="https://github.com/graeter-group/kimmdy/commit/f77b6dcf00e77800bd8899dec6c3f40652f200b9">f77b6dc</a>)</li>
+<li>don’t run tasks twice (<a href="https://github.com/graeter-group/kimmdy/commit/c7567932bce51ded317d689e2bec7d74e2dbae4d">c756793</a>)</li>
+<li>examples use new plumed field (<a href="https://github.com/graeter-group/kimmdy/commit/9493a4582b57ce6cba065aaa11930a701d5d494c">9493a45</a>)</li>
+<li>fix docstring references after https://github.com/graeter-group/kimmdy/pull/229 (<a href="https://github.com/graeter-group/kimmdy/commit/7c4ba75e2e72430f0691a4fa9019a87a2f507ee4">7c4ba75</a>)</li>
+<li>install order and tox rquirements (<a href="https://github.com/graeter-group/kimmdy/commit/e7d5957ca1bf757298c6a4eff5f9b4160f3290ef">e7d5957</a>)</li>
+<li>logger instead of logging (<a href="https://github.com/graeter-group/kimmdy/commit/272dd411d31ffbd7bb49ed3a1bd31364e9b4ad0f">272dd41</a>)</li>
+<li>missing import (<a href="https://github.com/graeter-group/kimmdy/commit/0ac234f8ce88279e0d48843dc7c71c51d28fd847">0ac234f</a>)</li>
+<li>morse transition rate homolysis tests fails on ci but not locally <a href="https://github.com/graeter-group/kimmdy/issues/197">#197</a> (<a href="https://github.com/graeter-group/kimmdy/issues/201">#201</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/f2b2be2169bc7f91eeb925cf0e125a321733cb1c">f2b2be2</a>)</li>
+<li>new build example (<a href="https://github.com/graeter-group/kimmdy/commit/4c6b93e813acc7eedcd45cbc2f86acc2aefb4fb8">4c6b93e</a>)</li>
+<li>plugins use task-logger (<a href="https://github.com/graeter-group/kimmdy/issues/207">#207</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/d5c419d1dfe741958c0052465ad83c28b58ded65">d5c419d</a>)</li>
+<li>proper usage of <strong>str</strong> and <strong>repr</strong> for topology (<a href="https://github.com/graeter-group/kimmdy/issues/210">#210</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/6fd070f6ec2dcafcb0d5329a7ff60a431eee743c">6fd070f</a>)</li>
+<li>removed need for strict bind break order (<a href="https://github.com/graeter-group/kimmdy/issues/231">#231</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/a7859ec1100d8bd89eddbfa4816e2be0ada358e7">a7859ec</a>)</li>
+<li>requirements typo (<a href="https://github.com/graeter-group/kimmdy/commit/2f998d232b62dbc802ba871fcb91efdb4b72f507">2f998d2</a>)</li>
+<li>runmng logger getting overwritten (<a href="https://github.com/graeter-group/kimmdy/commit/27baee9fd3a716930e99f3e8cb9a677e44e95047">27baee9</a>)</li>
+<li>show plugins (<a href="https://github.com/graeter-group/kimmdy/commit/dcb92c8737b71efaaa8429cf2343d53000bef39c">dcb92c8</a>)</li>
+</ul>
+</section>
+<section id="documentation-9" class="level3">
+<h3 class="anchored" data-anchor-id="documentation-9">Documentation</h3>
+<ul>
+<li>improve layout and linking (<a href="https://github.com/graeter-group/kimmdy/commit/f77b6dcf00e77800bd8899dec6c3f40652f200b9">f77b6dc</a>)</li>
+<li>more expressive docstrings (<a href="https://github.com/graeter-group/kimmdy/commit/f77b6dcf00e77800bd8899dec6c3f40652f200b9">f77b6dc</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-46" class="level2">
+<h2 class="anchored" data-anchor-id="section-46"><a href="https://github.com/graeter-group/kimmdy/compare/v4.0.0...v4.0.1">4.0.1</a> (2023-08-11)</h2>
+<section id="documentation-10" class="level3">
+<h3 class="anchored" data-anchor-id="documentation-10">Documentation</h3>
+<ul>
+<li><strong>ci:</strong> add docs build workflow (<a href="https://github.com/graeter-group/kimmdy/issues/190">#190</a>) (<a href="https://github.com/graeter-group/kimmdy/issues/198">#198</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/5fdec0b4903a578abd2fe75cfadfc9b842168be1">5fdec0b</a>)</li>
+<li><strong>dev:</strong> add information for developers about conventional commits (<a href="https://github.com/graeter-group/kimmdy/commit/5fdec0b4903a578abd2fe75cfadfc9b842168be1">5fdec0b</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-47" class="level2">
+<h2 class="anchored" data-anchor-id="section-47"><a href="https://github.com/graeter-group/kimmdy/compare/v3.6.0...v4.0.0">4.0.0</a> (2023-08-11)</h2>
+<section id="breaking-changes-2" class="level3">
+<h3 class="anchored" data-anchor-id="breaking-changes-2">⚠ BREAKING CHANGES</h3>
+<ul>
+<li><strong>ci:</strong> does this work?</li>
+</ul>
+</section>
+<section id="features-18" class="level3">
+<h3 class="anchored" data-anchor-id="features-18">Features</h3>
+<ul>
+<li><strong>ci:</strong> update encode to support unicode (<a href="https://github.com/graeter-group/kimmdy/commit/d9f16adb7470479a9e700ffd86597784caa2afe7">d9f16ad</a>)</li>
+<li><strong>ci:</strong> what if this doesn’t have a body? (<a href="https://github.com/graeter-group/kimmdy/commit/d9f16adb7470479a9e700ffd86597784caa2afe7">d9f16ad</a>)</li>
+<li>this is a release-please test (<a href="https://github.com/graeter-group/kimmdy/commit/d9f16adb7470479a9e700ffd86597784caa2afe7">d9f16ad</a>)</li>
+</ul>
+</section>
+<section id="bug-fixes-38" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-38">Bug Fixes</h3>
+<ul>
+<li><strong>ci:</strong> or this? (<a href="https://github.com/graeter-group/kimmdy/commit/d9f16adb7470479a9e700ffd86597784caa2afe7">d9f16ad</a>)</li>
+<li><strong>ci:</strong> release please adds all the things (<a href="https://github.com/graeter-group/kimmdy/commit/d9f16adb7470479a9e700ffd86597784caa2afe7">d9f16ad</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-48" class="level2">
+<h2 class="anchored" data-anchor-id="section-48"><a href="https://github.com/graeter-group/kimmdy/compare/v3.5.1...v3.6.0">3.6.0</a> (2023-08-11)</h2>
+<section id="features-19" class="level3">
+<h3 class="anchored" data-anchor-id="features-19">Features</h3>
+<ul>
+<li>Analysis Module (<a href="https://github.com/graeter-group/kimmdy/issues/176">#176</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/f37d6c8fecc97c4f256c4992d63ceaf68633629c">f37d6c8</a>)</li>
+<li><strong>ci:</strong> run test on PR with testthis label (<a href="https://github.com/graeter-group/kimmdy/commit/072b4bf2d9b8a0d8f9bbddede28701d59b79f6bf">072b4bf</a>)</li>
+</ul>
+</section>
+<section id="bug-fixes-39" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-39">Bug Fixes</h3>
+<ul>
+<li><a href="https://github.com/graeter-group/kimmdy/issues/185">#185</a> find gromacs data dir in docker container (<a href="https://github.com/graeter-group/kimmdy/issues/191">#191</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/7c0b90cec39c625f780024ec0e766481113a274d">7c0b90c</a>)</li>
+<li><strong>ci:</strong> use correct event context variable (<a href="https://github.com/graeter-group/kimmdy/commit/33003a93be90470306410071f42a5b3cd880afe0">33003a9</a>)</li>
+<li>don’t run tests on pr twice (<a href="https://github.com/graeter-group/kimmdy/commit/79572694e360db4e528a122afecfd2f61b106f6d">7957269</a>)</li>
+<li>fix <a href="https://github.com/graeter-group/kimmdy/issues/187">#187</a> (<a href="https://github.com/graeter-group/kimmdy/commit/587c426621cb9b403bed23ff008f5e3039e628f4">587c426</a>)</li>
+<li>merge issues (<a href="https://github.com/graeter-group/kimmdy/commit/5880dbb67ae029a827dca77222b84a0c9e653cf1">5880dbb</a>)</li>
+<li>plumed_mod updating (<a href="https://github.com/graeter-group/kimmdy/commit/3f815a21b00aa0b7e3556ad9159c8f84e0b95b2b">3f815a2</a>)</li>
+<li>register pytest mark properly (<a href="https://github.com/graeter-group/kimmdy/commit/6c56ed9892a9fe72b83e21b9da5c286289ad8df1">6c56ed9</a>)</li>
+<li>remove unused tests (<a href="https://github.com/graeter-group/kimmdy/commit/8632f8b5bf7fcd3f3da8b5090b01f2d115d897a9">8632f8b</a>)</li>
+<li>test releases in separate workflow to get easy link for a badge (<a href="https://github.com/graeter-group/kimmdy/commit/0a3e11cd6d08d35dfd7b8c781ecf9f07e3614b01">0a3e11c</a>)</li>
+<li>tests compatible with local gh act (<a href="https://github.com/graeter-group/kimmdy/commit/71d8204c60e9134af21663c8fc6abe7a05a06c8c">71d8204</a>)</li>
+<li>trigger workflow (<a href="https://github.com/graeter-group/kimmdy/commit/e86dccd13fd06be4f27a4265df1b0d4b0fb7f399">e86dccd</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-49" class="level2">
+<h2 class="anchored" data-anchor-id="section-49"><a href="https://github.com/graeter-group/kimmdy/compare/v3.5.0...v3.5.1">3.5.1</a> (2023-08-08)</h2>
+<section id="bug-fixes-40" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-40">Bug Fixes</h3>
+<ul>
+<li><strong>ci:</strong> testing (<a href="https://github.com/graeter-group/kimmdy/commit/e9b4b19b5801f342f0e75e5ccd819e5ae55a9473">e9b4b19</a>)</li>
+<li><strong>ci:</strong> trigger another release PR (<a href="https://github.com/graeter-group/kimmdy/commit/9c824a890628c7995fa40cca77c974d8fa35644d">9c824a8</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-50" class="level2">
+<h2 class="anchored" data-anchor-id="section-50"><a href="https://github.com/graeter-group/kimmdy/compare/v3.4.0...v3.5.0">3.5.0</a> (2023-08-08)</h2>
+<section id="features-20" class="level3">
+<h3 class="anchored" data-anchor-id="features-20">Features</h3>
+<ul>
+<li><strong>ci:</strong> first try! (<a href="https://github.com/graeter-group/kimmdy/commit/f2c686f5336f5e3e5e0c819990c0fb89bec9f647">f2c686f</a>)</li>
+</ul>
+</section>
+<section id="bug-fixes-41" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-41">Bug Fixes</h3>
+<ul>
+<li>ci (<a href="https://github.com/graeter-group/kimmdy/commit/3bcc81a3231ddc2e4a6b7b3d8f112228e2c10226">3bcc81a</a>)</li>
+<li><strong>ci:</strong> almost did it first try… (<a href="https://github.com/graeter-group/kimmdy/commit/2850379ca5c0d3d0e1e755a1e2170caa4bef38b8">2850379</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-51" class="level2">
+<h2 class="anchored" data-anchor-id="section-51"><a href="https://github.com/graeter-group/kimmdy/compare/v3.3.1...v3.4.0">3.4.0</a> (2023-08-08)</h2>
+<section id="features-21" class="level3">
+<h3 class="anchored" data-anchor-id="features-21">Features</h3>
+<ul>
+<li>add gmx_mdrun_flags option. fixes <a href="https://github.com/graeter-group/kimmdy/issues/145">#145</a> (<a href="https://github.com/graeter-group/kimmdy/issues/161">#161</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/e780402e33e796d2672fc286a81031154ecd1569">e780402</a>)</li>
+<li><strong>config:</strong> validation, completion and defaults for kimmdy.yml (<a href="https://github.com/graeter-group/kimmdy/issues/153">#153</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/de7c78f30de9fb5d5075bff239e82888abc0e35d">de7c78f</a>)</li>
+<li>example from tests (<a href="https://github.com/graeter-group/kimmdy/issues/175">#175</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/a096a45af9a3cd0f7974301a307265404b105424">a096a45</a>)</li>
+</ul>
+</section>
+<section id="bug-fixes-42" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-42">Bug Fixes</h3>
+<ul>
+<li>consistent use of <code>edis</code> in homolysis config (<a href="https://github.com/graeter-group/kimmdy/issues/170">#170</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/e8477074810a523f2cde79f49bc3cc103fa869a5">e847707</a>)</li>
+<li>don’t allow <code>Move</code> w/o ix/id_to_move (<a href="https://github.com/graeter-group/kimmdy/commit/10c9231f6dd98e2d51613ad94a2c690058bb84b2">10c9231</a>)</li>
+<li>inconsistent inheritance (<a href="https://github.com/graeter-group/kimmdy/issues/154">#154</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/2bec67167207bf3c38e2985e5bef7ed1f3a60870">2bec671</a>)</li>
+<li>load plugins only once in <strong>init</strong> (<a href="https://github.com/graeter-group/kimmdy/issues/171">#171</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/88b55ee281f0e9c39b5f527aa21eed88c57e5c8a">88b55ee</a>)</li>
+<li>merge dihedrals (<a href="https://github.com/graeter-group/kimmdy/issues/174">#174</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/37f6be3b322cdba4175817d40fcf489be992a1f8">37f6be3</a>)</li>
+<li>scheme keys not plugin names but entrypoints (<a href="https://github.com/graeter-group/kimmdy/commit/b878b6966ead7dee83a21d274d3de0a8e6aa5291">b878b69</a>)</li>
+<li>test input files now compatible (<a href="https://github.com/graeter-group/kimmdy/commit/eda027a297d0d33bef404907ac7090f5b0b29204">eda027a</a>)</li>
+<li>test_merge_prm_top (<a href="https://github.com/graeter-group/kimmdy/commit/9d333bc37423ae007019bc742b5eba36a70192e3">9d333bc</a>)</li>
+<li>update scheme paths after building examples (<a href="https://github.com/graeter-group/kimmdy/commit/5076ca4c5196a0d1f12e8f8245f6110ed24417cb">5076ca4</a>)</li>
+</ul>
+</section>
+<section id="documentation-11" class="level3">
+<h3 class="anchored" data-anchor-id="documentation-11">Documentation</h3>
+<ul>
+<li>improve config option descriptions, names and error reporting (<a href="https://github.com/graeter-group/kimmdy/issues/163">#163</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/3318bdc0f16fff99efb7493e03d6f9a086814325">3318bdc</a>)</li>
+<li><strong>types:</strong> add custom renderer (<a href="https://github.com/graeter-group/kimmdy/commit/3318bdc0f16fff99efb7493e03d6f9a086814325">3318bdc</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-52" class="level2">
+<h2 class="anchored" data-anchor-id="section-52"><a href="https://github.com/graeter-group/kimmdy/compare/v3.3.0...v3.3.1">3.3.1</a> (2023-07-12)</h2>
+<section id="documentation-12" class="level3">
+<h3 class="anchored" data-anchor-id="documentation-12">Documentation</h3>
+<ul>
+<li>add a lot more docstrings to functions, classes, modules (<a href="https://github.com/graeter-group/kimmdy/issues/149">#149</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/a0d2a43ca257934222227897e586ba81d7507497">a0d2a43</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-53" class="level2">
+<h2 class="anchored" data-anchor-id="section-53"><a href="https://github.com/graeter-group/kimmdy/compare/v3.2.0...v3.3.0">3.3.0</a> (2023-07-05)</h2>
+<section id="features-22" class="level3">
+<h3 class="anchored" data-anchor-id="features-22">Features</h3>
+<ul>
+<li>linked ixs and ids for RecipSteps (<a href="https://github.com/graeter-group/kimmdy/issues/137">#137</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/8238df91ffed28568443cdd20e0ff46fdba328c6">8238df9</a>)</li>
+<li><strong>topology:</strong> enable multiple dihedrals (unique by their periodicity) for proper dihedrals (<a href="https://github.com/graeter-group/kimmdy/commit/8238df91ffed28568443cdd20e0ff46fdba328c6">8238df9</a>)</li>
+</ul>
+</section>
+<section id="bug-fixes-43" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-43">Bug Fixes</h3>
+<ul>
+<li>add default funct for Bonds and BondTypes (<a href="https://github.com/graeter-group/kimmdy/commit/8238df91ffed28568443cdd20e0ff46fdba328c6">8238df9</a>)</li>
+<li>add more nestable sections in topology parsing (<a href="https://github.com/graeter-group/kimmdy/commit/8238df91ffed28568443cdd20e0ff46fdba328c6">8238df9</a>)</li>
+<li>match X as wildcards for atomic types (<a href="https://github.com/graeter-group/kimmdy/commit/8238df91ffed28568443cdd20e0ff46fdba328c6">8238df9</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-54" class="level2">
+<h2 class="anchored" data-anchor-id="section-54"><a href="https://github.com/graeter-group/kimmdy/compare/v3.1.0...v3.2.0">3.2.0</a> (2023-07-03)</h2>
+<section id="features-23" class="level3">
+<h3 class="anchored" data-anchor-id="features-23">Features</h3>
+<ul>
+<li>quartodoc (<a href="https://github.com/graeter-group/kimmdy/commit/f10e53152d7a9ddc2655bb3744972d06d64eb2b2">f10e531</a>)</li>
+<li>quartodoc (<a href="https://github.com/graeter-group/kimmdy/issues/142">#142</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/f10e53152d7a9ddc2655bb3744972d06d64eb2b2">f10e531</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-55" class="level2">
+<h2 class="anchored" data-anchor-id="section-55"><a href="https://github.com/graeter-group/kimmdy/compare/v3.0.1...v3.1.0">3.1.0</a> (2023-06-30)</h2>
+<section id="features-24" class="level3">
+<h3 class="anchored" data-anchor-id="features-24">Features</h3>
+<ul>
+<li>changemanager <a href="https://github.com/graeter-group/kimmdy/issues/129">#129</a> (<a href="https://github.com/graeter-group/kimmdy/commit/087d652dba53857c561c8e028133d5f035e099d3">087d652</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-56" class="level2">
+<h2 class="anchored" data-anchor-id="section-56"><a href="https://github.com/graeter-group/kimmdy/compare/v3.0.0...v3.0.1">3.0.1</a> (2023-06-28)</h2>
+<section id="bug-fixes-44" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-44">Bug Fixes</h3>
+<ul>
+<li>dihedraltypes sections in ff/topology (<a href="https://github.com/graeter-group/kimmdy/commit/affa5468ab537bcb37d7ae99ceded4fcf48cbc60">affa546</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-57" class="level2">
+<h2 class="anchored" data-anchor-id="section-57"><a href="https://github.com/graeter-group/kimmdy/compare/v2.4.0...v3.0.0">3.0.0</a> (2023-06-26)</h2>
+<section id="breaking-changes-3" class="level3">
+<h3 class="anchored" data-anchor-id="breaking-changes-3">⚠ BREAKING CHANGES</h3>
+<ul>
+<li>put restrictions on the way top files are accepted</li>
+<li>deprecate generate_top_from_atom_list</li>
+</ul>
+</section>
+<section id="features-25" class="level3">
+<h3 class="anchored" data-anchor-id="features-25">Features</h3>
+<ul>
+<li>handle else macros (<a href="https://github.com/graeter-group/kimmdy/commit/bcb6121e73a1e54a832cad45f2dd406ac25a26da">bcb6121</a>)</li>
+<li>handle multiple moleculetype sections (<a href="https://github.com/graeter-group/kimmdy/commit/bcb6121e73a1e54a832cad45f2dd406ac25a26da">bcb6121</a>)</li>
+<li>parse top files with includes (<a href="https://github.com/graeter-group/kimmdy/issues/124">#124</a>) (<a href="https://github.com/graeter-group/kimmdy/commit/bcb6121e73a1e54a832cad45f2dd406ac25a26da">bcb6121</a>)</li>
+<li>resolve includes in gromacs data dir (located relative to gmx executable) if not in cwd (<a href="https://github.com/graeter-group/kimmdy/commit/bcb6121e73a1e54a832cad45f2dd406ac25a26da">bcb6121</a>)</li>
+<li>stop if no ff found, warn if multiple found (<a href="https://github.com/graeter-group/kimmdy/commit/bcb6121e73a1e54a832cad45f2dd406ac25a26da">bcb6121</a>)</li>
+<li>topology dictionary helpers to get and set sections (<a href="https://github.com/graeter-group/kimmdy/commit/bcb6121e73a1e54a832cad45f2dd406ac25a26da">bcb6121</a>)</li>
+<li>udpate top dict with parsed ff parameters (<a href="https://github.com/graeter-group/kimmdy/commit/bcb6121e73a1e54a832cad45f2dd406ac25a26da">bcb6121</a>)</li>
+</ul>
+</section>
+<section id="bug-fixes-45" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-45">Bug Fixes</h3>
+<ul>
+<li>deprecate generate_top_from_atom_list (<a href="https://github.com/graeter-group/kimmdy/commit/bcb6121e73a1e54a832cad45f2dd406ac25a26da">bcb6121</a>)</li>
+<li>put restrictions on the way top files are accepted (<a href="https://github.com/graeter-group/kimmdy/commit/bcb6121e73a1e54a832cad45f2dd406ac25a26da">bcb6121</a>)</li>
+<li>use hat_naive instead of hat_reaction (<a href="https://github.com/graeter-group/kimmdy/commit/bcb6121e73a1e54a832cad45f2dd406ac25a26da">bcb6121</a>)</li>
+<li>use logging.warning instead of depcrecated warn (<a href="https://github.com/graeter-group/kimmdy/commit/bcb6121e73a1e54a832cad45f2dd406ac25a26da">bcb6121</a>)</li>
+</ul>
+</section>
+<section id="documentation-13" class="level3">
+<h3 class="anchored" data-anchor-id="documentation-13">Documentation</h3>
+<ul>
+<li>add tutorial section (with markdown support) (<a href="https://github.com/graeter-group/kimmdy/commit/bcb6121e73a1e54a832cad45f2dd406ac25a26da">bcb6121</a>)</li>
+<li>move qmd to preview topology to docs (<a href="https://github.com/graeter-group/kimmdy/commit/bcb6121e73a1e54a832cad45f2dd406ac25a26da">bcb6121</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-58" class="level2">
+<h2 class="anchored" data-anchor-id="section-58"><a href="https://github.com/graeter-group/kimmdy/compare/v2.3.0...v2.4.0">2.4.0</a> (2023-06-22)</h2>
+<section id="features-26" class="level3">
+<h3 class="anchored" data-anchor-id="features-26">Features</h3>
+<ul>
+<li>homolysis module and homolysis tests (<a href="https://github.com/graeter-group/kimmdy/commit/32676421c3d087ed4e38777117b6ffe334883cf3">3267642</a>)</li>
+<li>KMC module testing (<a href="https://github.com/graeter-group/kimmdy/commit/ebb771fbbcd730d70a0c5fc7a879a8e0705d48b8">ebb771f</a>)</li>
+<li>Move coordinates include time (<a href="https://github.com/graeter-group/kimmdy/commit/10bb3a78ac6a53e7f48ef3cf37113518987cedf3">10bb3a7</a>)</li>
+<li>Use proper HAT plugin (<a href="https://github.com/graeter-group/kimmdy/commit/6a4b0eb4e13a800545b2ff234a30fe6d773439c1">6a4b0eb</a>)</li>
+</ul>
+</section>
+<section id="bug-fixes-46" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-46">Bug Fixes</h3>
+<ul>
+<li>allow restarting from checkpoint from python (<a href="https://github.com/graeter-group/kimmdy/commit/2163173495ea5e325b2cd3c278df1bb6c100c026">2163173</a>)</li>
+<li>correct assignment of charge and mass in ff (<a href="https://github.com/graeter-group/kimmdy/commit/c5f92a672ba6932d64a1ee206fd27c13762d8fe4">c5f92a6</a>)</li>
+<li>homolysis test (<a href="https://github.com/graeter-group/kimmdy/commit/178590d503ff0d58ad6098cc62e6ef150e197dec">178590d</a>)</li>
+<li>initialize radical list (<a href="https://github.com/graeter-group/kimmdy/commit/3196747bfd5d724e805e5c892c6c74d1964ec86a">3196747</a>)</li>
+<li>initialize Topology.radicals (<a href="https://github.com/graeter-group/kimmdy/commit/5e0f335c0f7472c30bf1e154913d6afdfc514b6e">5e0f335</a>)</li>
+<li>remove deprecated imports in tests (<a href="https://github.com/graeter-group/kimmdy/commit/d078109062a4960984591d283be9de647212a284">d078109</a>)</li>
+<li>rename variables in test_kmc (<a href="https://github.com/graeter-group/kimmdy/commit/4df479d4a8c1f0c656368322d02606b5f74a5044">4df479d</a>)</li>
+<li>test_integration_move_top (<a href="https://github.com/graeter-group/kimmdy/commit/e0f71b6506ecab1c14742568f8c47c7a30a15418">e0f71b6</a>)</li>
+</ul>
+</section>
+<section id="documentation-14" class="level3">
+<h3 class="anchored" data-anchor-id="documentation-14">Documentation</h3>
+<ul>
+<li><strong>general:</strong> add make preview command (<a href="https://github.com/graeter-group/kimmdy/commit/9806e63171cec8d4fc3532bbbab13499d7084089">9806e63</a>)</li>
+<li>render docs (<a href="https://github.com/graeter-group/kimmdy/commit/f306a6c5a09176703c6fe12d3df8a51646fe5a81">f306a6c</a>)</li>
+</ul>
+</section>
+</section>
+<section id="section-59" class="level2">
+<h2 class="anchored" data-anchor-id="section-59"><a href="https://github.com/graeter-group/kimmdy/compare/v2.2.0...v2.3.0">2.3.0</a> (2023-05-11)</h2>
+<section id="features-27" class="level3">
+<h3 class="anchored" data-anchor-id="features-27">Features</h3>
+<ul>
+<li>add MOVE conversion for HAT (<a href="https://github.com/graeter-group/kimmdy/commit/0dbe4b1b53272bd9c813550cae875134bc679f55">0dbe4b1</a>)</li>
+<li>make periodicity part of the id for dihedrals (<a href="https://github.com/graeter-group/kimmdy/commit/0710086473a81878d86ed8ca4daa2b31b921e868">0710086</a>)</li>
+<li>parse dihedral and position restraints (<a href="https://github.com/graeter-group/kimmdy/commit/12097148ff8fe64b4f40eb0d19ad30def6070c7f">1209714</a>)</li>
+<li>test for radicals based on bondorder in top initialization (<a href="https://github.com/graeter-group/kimmdy/commit/a446a70348bc575b5e5212a23301c51cd9c41233">a446a70</a>)</li>
+</ul>
+</section>
+<section id="bug-fixes-47" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-47">Bug Fixes</h3>
+<ul>
+<li>more robust fix for <a href="https://github.com/graeter-group/kimmdy/issues/93">#93</a> (<a href="https://github.com/graeter-group/kimmdy/commit/3cea31394cb7c4abb02439796f724642e4b42e2b">3cea313</a>)</li>
+<li>rtp parsing for aminoacids.rtp (<a href="https://github.com/graeter-group/kimmdy/commit/025e6c14fc50982db7809079b8418644e3d474df">025e6c1</a>)</li>
+</ul>
+</section>
+<section id="documentation-15" class="level3">
+<h3 class="anchored" data-anchor-id="documentation-15">Documentation</h3>
+<ul>
+<li>Updates reaction api documentation (<a href="https://github.com/graeter-group/kimmdy/commit/87007b485c23262451fe86cb1fb8a9ac0a90fce6">87007b4</a>), closes <a href="https://github.com/graeter-group/kimmdy/issues/114">#114</a></li>
+</ul>
+</section>
+</section>
+<section id="section-60" class="level2">
+<h2 class="anchored" data-anchor-id="section-60"><a href="https://github.com/graeter-group/kimmdy/compare/v2.1.0...v2.2.0">2.2.0</a> (2023-03-07)</h2>
+<section id="features-28" class="level3">
+<h3 class="anchored" data-anchor-id="features-28">Features</h3>
+<ul>
+<li>add –version command (<a href="https://github.com/graeter-group/kimmdy/commit/bf3e183ee57c7b78b3913070bde861a198adc441">bf3e183</a>)</li>
+</ul>
+</section>
+<section id="bug-fixes-48" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-48">Bug Fixes</h3>
+<ul>
+<li>update importlib syntax and and importlib dependency (<a href="https://github.com/graeter-group/kimmdy/commit/abc89e00cbdc8e4bc5a235bd4a5f8e387deb866e">abc89e0</a>), closes <a href="https://github.com/graeter-group/kimmdy/issues/93">#93</a></li>
+</ul>
+</section>
+</section>
+<section id="section-61" class="level2">
+<h2 class="anchored" data-anchor-id="section-61"><a href="https://github.com/graeter-group/kimmdy/compare/v2.0.0...v2.1.0">2.1.0</a> (2023-02-27)</h2>
+<section id="features-29" class="level3">
+<h3 class="anchored" data-anchor-id="features-29">Features</h3>
+<ul>
+<li>add kimmdy checkpoint files (<a href="https://github.com/graeter-group/kimmdy/commit/b468378bf57219e9b55e7a15b164b82d5fe4a7d3">b468378</a>)</li>
+<li>test CI (<a href="https://github.com/graeter-group/kimmdy/commit/d3dff988f0810e3035a4b06c20f842f98135a390">d3dff98</a>)</li>
+<li>write task file history to separate file (<a href="https://github.com/graeter-group/kimmdy/commit/bdefba17dc21a6ad20d79031f70f6c120da1ce9e">bdefba1</a>)</li>
+</ul>
+</section>
+<section id="bug-fixes-49" class="level3">
+<h3 class="anchored" data-anchor-id="bug-fixes-49">Bug Fixes</h3>
+<ul>
+<li><a href="https://github.com/graeter-group/kimmdy/issues/84">#84</a> (<a href="https://github.com/graeter-group/kimmdy/commit/1bef00994e841c77e5510ad5a5d807ec8b61a76a">1bef009</a>)</li>
+<li>23 (<a href="https://github.com/graeter-group/kimmdy/commit/a6eb2b7c4c57ad51fd56de0bc95d1c4f4219144c">a6eb2b7</a>)</li>
+<li>abort kimmdy if gromacs fails (<a href="https://github.com/graeter-group/kimmdy/commit/080ecc098b09feeac4b166e5639e6ccf26982650">080ecc0</a>), closes <a href="https://github.com/graeter-group/kimmdy/issues/83">#83</a></li>
+<li>allow existing directories of starting from checkpoint (<a href="https://github.com/graeter-group/kimmdy/commit/83707135c42534b31824bac5393d1d24fcb1642d">8370713</a>)</li>
+<li>correctly apply atomtype and residue to jumping H (<a href="https://github.com/graeter-group/kimmdy/commit/dbdd21e629a9cadac40e4573bd9dde5fc453f97e">dbdd21e</a>), closes <a href="https://github.com/graeter-group/kimmdy/issues/84">#84</a></li>
+<li>don’t create empty task files if no files are changed (<a href="https://github.com/graeter-group/kimmdy/commit/615d11cb582da0604d005433ee340eaa208c98e6">615d11c</a>)</li>
+<li>don’t create logfile christmas trees. (<a href="https://github.com/graeter-group/kimmdy/commit/fca231f5805ffbfbdf34a043a3cf5b84fc9c7bbf">fca231f</a>), closes <a href="https://github.com/graeter-group/kimmdy/issues/82">#82</a></li>
+<li>make plumed really optional (<a href="https://github.com/graeter-group/kimmdy/commit/beb09cde189ce3f110537def1bc3450c75e4500f">beb09cd</a>)</li>
+<li>minimization path to mdp (<a href="https://github.com/graeter-group/kimmdy/commit/971453b8f2fa34f15cbad1d4256a6bd0cf8408ee">971453b</a>)</li>
+<li>use output file dir for histfile name (<a href="https://github.com/graeter-group/kimmdy/commit/a069c3cce53987eeb3966373361d3d3054753239">a069c3c</a>)</li>
+</ul>
+
+
+</section>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeGiscusTheme = () => {
+      // From: https://github.com/giscus/giscus/issues/336
+      const sendMessage = (message) => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+      sendMessage({
+        setConfig: {
+          theme: newTheme
+        }
+      });
+    }
+    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+    if (isGiscussLoaded) {
+      changeGiscusTheme();
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  const darkModeDefault = false;
+  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+    toggleGiscusIfUsed(toAlternate, darkModeDefault);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

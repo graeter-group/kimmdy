@@ -1,0 +1,8 @@
+# homolysis.reaction.Homolysis { #homolysis.reaction.Homolysis }
+
+```python
+reaction.Homolysis(self, name, runmng)
+```
+
+Homolytic bond breaking leading to 2 radicals.
+Implementation for time-varying rates

@@ -1,0 +1,20 @@
+name: 'minimal'
+dryrun: true
+max_tasks: 0
+gromacs_alias: 'gmx'
+top: 'minimal.top'
+gro: 'minimal.gro'
+ndx: 'minimal.ndx'
+gmx_mdrun_flags: -maxh 24 -dlb yes
+mds:
+  prod:
+    mdp: 'minimal.mdp'
+reactions:
+  hat_naive: {}
+changer:
+  coordinates: {}
+  topology:
+    parameterization: basic
+
+sequence:
+  - reactions

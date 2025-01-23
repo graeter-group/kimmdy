@@ -1,0 +1,83 @@
+# runmanager { #kimmdy.runmanager }
+
+`runmanager`
+
+The Runmanager is the main entry point of the program.
+
+It manages the queue of tasks, communicates with the
+rest of the program and keeps track of global state.
+
+## Classes
+
+| Name | Description |
+| --- | --- |
+| [RunManager](#kimmdy.runmanager.RunManager) | The Runmanager is the main entry point of the program. |
+| [State](#kimmdy.runmanager.State) | State of the system. |
+
+### RunManager { #kimmdy.runmanager.RunManager }
+
+```python
+runmanager.RunManager(self, config)
+```
+
+The Runmanager is the main entry point of the program.
+
+Manages the queue of tasks, communicates with the
+rest of the program and keeps track of global state.
+
+#### Attributes {.doc-section .doc-section-attributes}
+
+| Name               | Type                                                                                    | Description                                                                 |
+|--------------------|-----------------------------------------------------------------------------------------|-----------------------------------------------------------------------------|
+| config             | [Config](`kimmdy.config.Config`)                                                        | The configuration object.                                                   |
+| tasks              | [queue](`queue`).[Queue](`queue.Queue`)\[[Task](`kimmdy.tasks.Task`)\]                  | Tasks from config.                                                          |
+| priority_tasks     | [queue](`queue`).[Queue](`queue.Queue`)\[[Task](`kimmdy.tasks.Task`)\]                  | Additional tasks added during the run by other tasks.                       |
+| iteration          | [int](`int`)                                                                            | Current iteration.                                                          |
+| state              | [State](`kimmdy.runmanager.State`)                                                      | Current state of the system.                                                |
+| recipe_collections | [dict](`dict`)\[[str](`str`), [RecipeCollection](`kimmdy.recipe.RecipeCollection`)\]    | Dictionary of recipe collections. Keyed by the name of the reaction plugin. |
+| latest_files       | [dict](`dict`)\[[str](`str`), [Path](`pathlib.Path`)\]                                  | Dictionary of latest files.                                                 |
+| histfile           | [Path](`pathlib.Path`)                                                                  | Path to history file.                                                       |
+| top                |                                                                                         | Topology object.                                                            |
+| filehist           | [list](`list`)\[[dict](`dict`)\[[str](`str`), [TaskFiles](`kimmdy.tasks.TaskFiles`)\]\] | List of dictionaries of TaskFiles.                                          |
+| task_mapping       |                                                                                         | Mapping of task names to runmanager methods.                                |
+| reaction_plugins   | [list](`list`)\[[ReactionPlugin](`kimmdy.plugins.ReactionPlugin`)\]                     | List of initialized reaction plugins used in the sequence.                  |
+
+#### Methods
+
+| Name | Description |
+| --- | --- |
+| [get_latest](#kimmdy.runmanager.RunManager.get_latest) | Returns path to latest file of given type. |
+
+##### get_latest { #kimmdy.runmanager.RunManager.get_latest }
+
+```python
+runmanager.RunManager.get_latest(suffix)
+```
+
+Returns path to latest file of given type.
+
+For .dat files (in general ambiguous extensions) use full file name.
+Errors if file is not found.
+
+### State { #kimmdy.runmanager.State }
+
+```python
+runmanager.State()
+```
+
+State of the system.
+one of IDLE, MD, REACTION, SETUP, DONE.
+
+## Functions
+
+| Name | Description |
+| --- | --- |
+| [get_existing_files](#kimmdy.runmanager.get_existing_files) | Initialize latest_files with every existing file defined in config |
+
+### get_existing_files { #kimmdy.runmanager.get_existing_files }
+
+```python
+runmanager.get_existing_files(config, section='config')
+```
+
+Initialize latest_files with every existing file defined in config

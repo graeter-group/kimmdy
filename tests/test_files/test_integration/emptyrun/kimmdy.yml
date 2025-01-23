@@ -1,0 +1,19 @@
+name: 'emptyrun_001'
+dryrun: false
+max_tasks: 0
+gromacs_alias: 'gmx'
+gmx_mdrun_flags: -maxh 24 -dlb yes
+top: 'emptyrun.txt'
+gro: 'emptyrun.txt'
+ndx: 'emptyrun.txt'
+mds:
+  prod:
+    mdp: 'emptyrun.txt'
+changer:
+  coordinates: {}
+  topology:
+    parameterization: basic
+reactions:
+  hat_naive: {}
+sequence:
+  - reactions

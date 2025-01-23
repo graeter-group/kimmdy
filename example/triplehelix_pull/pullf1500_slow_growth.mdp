@@ -1,0 +1,175 @@
+title                   = free-energy simulation
+; Run parameters
+;define                   =      -DPOSRES_NC
+integrator  = md
+dt          = 0.001
+tinit       = 0
+nsteps      = 10000    ; 
+nstcomm     = 10
+; Output parameters
+nstxout     = 500      ; every x ps
+nstvout     = 500 
+nstfout     = 500
+nstxtcout   = 500       ; every x ps
+nstlog	    = 500
+nstenergy   = 500
+; Bond parameters
+constraint_algorithm    = lincs
+constraints             = none
+continuation            = yes       ; continuing from NPT 
+morse                   = no        ; Convert harmonic bonds to morse potentials
+
+
+; Single-range cutoff scheme
+nstlist     = 5
+ns_type     = grid 
+rlist       = 1.0
+rcoulomb    = 1.0
+rvdw        = 1.0
+
+
+; PME electrostatics parameters
+coulombtype     = PME
+fourierspacing  = 0.12
+fourier_nx      = 0
+fourier_ny      = 0
+fourier_nz      = 0
+pme_order       = 4
+ewald_rtol      = 1e-5
+optimize_fft    = yes
+; Berendsen temperature coupling is on in two groups
+Tcoupl      = v-rescale
+tc_grps     = Protein   Non-Protein 
+tau_t       = 0.1       0.1
+ref_t       = 310       310
+; Pressure coupling is on
+Pcoupl          = Parrinello-Rahman 
+pcoupltype      = isotropic
+tau_p           = 2.0       
+compressibility = 4.5e-5
+ref_p           = 1.0
+refcoord_scaling = com
+; Generate velocities is off
+gen_vel     = no 
+; Periodic boundary conditions are on in all directions
+pbc     = xyz
+; Long-range dispersion correction
+DispCorr    = EnerPres
+
+; This selects the subset of atoms for the compressed
+; trajectory file. You can select multiple groups. By
+; default, all atoms will be written.
+compressed-x-grps        = Protein
+; Selection of energy groups
+
+; free-energy parameters
+free-energy             = yes
+init-lambda             = 0.0
+delta-lambda            = 0.0001		; should be 1/nsteps
+separate-dhdl-file      = yes
+nstdhdl                 = 100 
+
+; COM PULLING
+pull                     = yes
+;pull-print-com           = yes
+pull-print-ref-value     = yes
+pull-print-components    = yes
+pull-nstxout             = 10000
+pull-nstfout             = 10000
+pull-ngroups             = 6
+pull-ncoords             = 6
+;parameters for all groups
+pull-group1-name         = 1_ACE_1
+pull-group2-name         = 1_NME_1
+pull-group3-name         = 1_ACE_2
+pull-group4-name         = 1_NME_2
+pull-group5-name         = 1_ACE_3
+pull-group6-name         = 1_NME_3
+
+pull-coord1-type         = constant-force
+;pull-coord1-rate         = -0.01 ; 0.01 nm per ps = 10 nm per ns
+pull-coord1-k            = 1500
+pull-coord1-geometry     = direction
+pull-coord1-groups       = 0 2
+pull-coord1-dim          = N N Y
+pull-coord1-vec          = 0 0 1
+pull-coord1-start        = yes
+;pull-coord1-origin       = 0 0 0
+
+pull-coord2-type         = constant-force
+;pull-coord2-rate         = 0.01 ; 0.01 nm per ps = 10 nm per ns
+pull-coord2-k            = -1500
+pull-coord2-geometry     = direction
+pull-coord2-groups       = 0 1
+pull-coord2-dim          = N N Y
+pull-coord2-vec          = 0 0 1
+pull-coord2-start        = yes
+;pull-coord2-origin       = 0 0 0
+
+pull-coord3-type         = constant-force
+;pull-coord3-rate         = -0.01 ; 0.01 nm per ps = 10 nm per ns
+pull-coord3-k            = 1500
+pull-coord3-geometry     = direction
+pull-coord3-groups       = 0 4
+pull-coord3-dim          = N N Y
+pull-coord3-vec          = 0 0 1
+pull-coord3-start        = yes
+;pull-coord3-origin       = 0 0 0
+
+pull-coord4-type         = constant-force
+;pull-coord4-rate         = 0.01 ; 0.01 nm per ps = 10 nm per ns
+pull-coord4-k            = -1500
+pull-coord4-geometry     = direction
+pull-coord4-groups       = 0 3
+pull-coord4-dim          = N N Y
+pull-coord4-vec          = 0 0 1
+pull-coord4-start        = yes
+;pull-coord4-origin       = 0 0 0
+
+
+pull-coord5-type         = constant-force
+;pull-coord5-rate         = -0.01 ; 0.01 nm per ps = 10 nm per ns
+pull-coord5-k            = 1500
+pull-coord5-geometry     = direction
+pull-coord5-groups       = 0 6
+pull-coord5-dim          = N N Y
+pull-coord5-vec          = 0 0 1
+pull-coord5-start        = yes
+;pull-coord5-origin       = 0 0 0
+
+pull-coord6-type         = constant-force
+;pull-coord6-rate         = 0.01 ; 0.01 nm per ps = 10 nm per ns
+pull-coord6-k            = -1500
+pull-coord6-geometry     = direction
+pull-coord6-groups       = 0 5
+pull-coord6-dim          = N N Y
+pull-coord6-vec          = 0 0 1
+pull-coord6-start        = yes
+;pull-coord6-origin       = 0 0 0
+
+
+; Enforced rotation: No or Yes
+rotation                 = Yes
+; Output frequency for angle, torque and rotation potential energy for the whole group
+rot-nstrout              = 1
+; Output frequency for per-slab data (angles, torques and slab centers)
+rot-nstsout              = 10
+; Number of rotation groups
+rot-ngroups              = 2
+; Rotation group name   
+rot-group0               = 1_NME
+rot-group1               = 1_ACE
+; Rotation potential. Can be iso, iso-pf, pm, pm-pf, rm, rm-pf, rm2, rm2-pf, flex, flex-t, flex2, flex2-t
+rot-type0                = rm-pf
+rot-type1                = rm-pf
+; Rotation vector, will get normalized
+rot-vec0                 = 0 0 1
+rot-vec1                 = 0 0 1
+; Pivot point for the potentials iso, pm, rm, and rm2 [nm]
+;rot-pivot0               = 2.31852e+00  2.73201e+00  10.89800e+00
+; Rotation rate [degree/ps] and force constant [kJ/(mol*nm^2)]
+rot-rate0                = 0.0
+rot-rate1                = 0.0
+; Fitting method to determine angle of rotation group (rmsd, norm, or potential)
+rot-fit-method0          = norm
+rot-fit-method1          = norm

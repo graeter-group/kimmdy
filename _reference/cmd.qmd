@@ -1,0 +1,69 @@
+# cmd { #kimmdy.cmd }
+
+`cmd`
+
+Functions for starting KIMMDY either from python or the command line.
+Other entry points such as `kimmdy-analysis` also live here.
+
+## Functions
+
+| Name | Description |
+| --- | --- |
+| [entry_point_kimmdy](#kimmdy.cmd.entry_point_kimmdy) | Run KIMMDY from the command line. |
+| [get_cmdline_args](#kimmdy.cmd.get_cmdline_args) | Parse command line arguments. |
+| [kimmdy_run](#kimmdy.cmd.kimmdy_run) | Run KIMMDY from python. |
+
+### entry_point_kimmdy { #kimmdy.cmd.entry_point_kimmdy }
+
+```python
+cmd.entry_point_kimmdy()
+```
+
+Run KIMMDY from the command line.
+
+The configuration is gathered from the input file,
+which is `kimmdy.yml` by default.
+See [](`~kimmdy.cmd.get_cmdline_args`) or `kimmdy --help`
+for the descriptions of the arguments.
+
+### get_cmdline_args { #kimmdy.cmd.get_cmdline_args }
+
+```python
+cmd.get_cmdline_args()
+```
+
+Parse command line arguments.
+
+#### Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                          | Description   |
+|--------|-------------------------------|---------------|
+|        | Parsed command line arguments |               |
+
+### kimmdy_run { #kimmdy.cmd.kimmdy_run }
+
+```python
+cmd.kimmdy_run(
+    input=Path('kimmdy.yml')
+    loglevel=None
+    logfile=None
+    show_plugins=False
+    generate_jobscript=False
+    debug=False
+    callgraph=False
+)
+```
+
+Run KIMMDY from python.
+
+Also see See [](`~kimmdy.cmd.get_cmdline_args`) or `kimmdy --help` for the descriptions of the arguments.
+
+#### Parameters {.doc-section .doc-section-parameters}
+
+| Name               | Type                                                    | Description                                                                         | Default              |
+|--------------------|---------------------------------------------------------|-------------------------------------------------------------------------------------|----------------------|
+| input              | [Path](`pathlib.Path`)                                  | kimmdy input yml file.                                                              | `Path('kimmdy.yml')` |
+| loglevel           | [Optional](`typing.Optional`)\[[str](`str`)\]           | Loglevel. One of ["INFO", "WARNING", "MESSAGE", "DEBUG"]                            | `None`               |
+| logfile            | [Optional](`typing.Optional`)\[[Path](`pathlib.Path`)\] | File path of the logfile.                                                           | `None`               |
+| show_plugins       | [bool](`bool`)                                          | Show available plugins and exit.                                                    | `False`              |
+| generate_jobscript | [bool](`bool`)                                          | Instead of running KIMMDY directly, generate at jobscript.sh for slurm HPC clusters | `False`              |

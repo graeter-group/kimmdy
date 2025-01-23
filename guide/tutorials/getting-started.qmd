@@ -1,0 +1,184 @@
+---
+title: Get Started
+resources:
+  - './getting-started-files/*'
+image: ./img/getting-started-vmd-radicals.png
+author: Jannik Buhr
+categories:
+  - user
+---
+
+In this tutorial we will be simulating hydrogen atom transfer in a simple ACE/NME-capped Alanine molecule in a box of water.
+
+## Installation
+
+### Prerequisites
+
+- `python3.10` or higher
+- `gromacs>=2023.2` 
+  - Version 2021.4 works with everything except slow-growth.
+
+Optional:
+
+- `plumed`-patched version of `gromacs` (for the homolysis reaction).
+
+::: {.callout-tip appearance="simple"}
+If you plan to use our machine-learning plugins, take a look at the [full installation instruction](../how-to/install-ml-plugins.qmd)
+:::
+
+Let's first create a directory and a virtual environment for `kimmdy`:
+
+```bash
+mkdir kimmdy-tutorial
+cd kimmdy-tutorial
+python -m venv .venv
+source .venv/bin/activate
+```
+
+To install KIMMDY, the builtin reaction plugins and the analysis tools use
+
+```bash
+pip install kimmdy[reactions,analysis]
+```
+
+## Setup the Simulation
+
+Download and unzip the [input files](./getting-started-files/setup.zip) to this directory.
+
+```bash
+wget https://graeter-group.github.io/kimmdy/guide/tutorials/getting-started-files/setup.zip
+unzip setup.zip
+```
+
+The `kimmdy.yml` file should look like this:
+
+```{.yaml filename='kimmdy.yml'}
+dryrun: false
+max_tasks: 100
+name: 'hat_tf_000'
+gromacs_alias: 'gmx'
+top: 'Ala_out.top'
+gro: 'npt.gro'
+ndx: 'index.ndx'
+mds:
+  equilibrium:
+    mdp: 'md.mdp'
+  relax:
+    mdp: 'md_slow.mdp'
+changer:
+  coordinates:
+    md: 'relax'      
+reactions:
+  hat_reaction:
+    frequency_factor: 100000000
+    h_cutoff: 3
+    polling_rate: 1
+
+sequence:
+- equilibrium
+- mult: 2
+  tasks:
+  - equilibrium
+  - reactions
+```
+
+
+Our starting structure is a simple ACE/NME-capped Alanine molecule in a box of water.
+Note, how it has a missing hydrogen atom on the alpha carbon.
+This is a radical.
+We will use the builtin `hat_reaction` to simulate hydrogen atom transfer reactions
+from nearby hydrogens to the radical position.
+
+{{< mol-snapshot ./getting-started-files/vis-ala.molj >}}
+
+Start the KIMMDY run with the `kimmdy` command:
+
+## Run the Simulation
+
+```bash
+kimmdy
+```
+
+You can also run kimmdy directly from python with
+
+```python
+from kimmdy.cmd import kimmdy_run
+kimmdy_run()
+```
+
+:::callout-tip
+KIMMDY parses your topology to generate its internal representation and writes
+out a new topology to be used in future steps.
+This topology includes everything gromacs needs to run the simulation,
+including forcefield parameters.
+KIMMDY combines all moleculetypes that are meant to take part in reactions
+into one moleculetype named "Reactive".
+It also makes multiples explicit (e.g. 10 molecules of a peptide), such that each reactive atom has a unique
+representation.
+You can always find this topology in the output directory for the kimmdy setup task, e.g. `alanine_hat_000/0_setup/<name-of-your-top.top`.
+By default, everything that is not a solvent or ion is considered reactive.
+To exclude or include certain moleculetypes from this (e.g. in a lipid bilayer simulation),
+check out the `topology.reactive` options in the [input file documentation](/guide/references/input.qmd).
+You can find another example of merging topologies in [the topology explanation](/guide/explanation/topology.qmd).
+:::
+
+## Analyse the Simulation
+
+Concatenate the trajectories from the individual steps into one for viewing:
+
+```bash
+kimmdy-analysis trjcat alanine_hat_000 --open-vmd
+```
+
+Check the energy of the system:
+
+```bash
+kimmdy-analysis energy alanine_hat_000 --open-plot --terms Potential Kinetic
+```
+
+![Energy plot](./img/getting-started-energy.png)
+
+Visualize where the radicals end up:
+
+```bash
+kimmdy-analysis radical_population alanine_hat_000 --open-plot --open-vmd
+```
+
+In VMD, color the atoms by beta factor to show the radical occupancy.
+
+![VMD representation settings](./img/getting-started-vmd-radicals.png)
+
+![Radical population plot](./img/getting-started-radicals.png)
+
+Plot the reaction rates:
+
+```bash
+kimmdy-analysis rates alanine_hat_000
+```
+
+In the `alanine_hat_000/analysis` directory you will then find a plot of rates
+for each possible reaction at every step they were queried, e.g.
+
+![Reaction rates plot](./img/getting-started-rates.svg)
+
+Or do all of the above directly from python:
+
+```python
+from kimmdy.analysis import concat_trj, plot_energy, radical_population, plot_rates
+concat_trj('alanine_hat_000', open_vmd=True)
+plot_energy('alanine_hat_000', terms=['Potential', 'Kinetic'], open_plot=True)
+radical_population('alanine_hat_000', open_plot=True, open_vmd=True)
+plot_rates('alanine_hat_000')
+```
+
+Congratulations, you have successfully run your first KIMMDY simulation!
+
+## Next steps
+
+- [Learn more about the `kimmdy.yml` input file](../references/input.qmd)
+- [Run KIMMDY with a collagen fibril from Colbuilder](./colbuilder.qmd)
+- [Write your own reaction plugin](./write-plugin.qmd)
+- [Discover more plugins by looking for the `kimmdy` tag on GitHub](https://github.com/topics/kimmdy)
+
+
+

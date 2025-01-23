@@ -1,0 +1,32 @@
+/*-- scss:defaults --*/
+
+// Base document colors
+$body-bg: #050725;
+$body-color: #ffffffde;
+$link-color: #75AADB;
+
+$input-color: $link-color;
+
+$input-group-text-color: orange;
+
+// Navigation element colors
+$footer-bg: #030316;
+$navbar-bg: #030316;
+$sidebar-bg: #030316;
+
+// Code blocks
+$code-block-bg-alpha: -.90;
+
+/*-- scss:rules --*/
+.navbar-light .navbar-brand {
+    color: #ffffffde;
+}
+
+pre code {
+  color: $body-color;
+}
+
+:root {
+// inline code
+  --bs-code-color: #769dff;
+}

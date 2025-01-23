@@ -1,0 +1,19 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "KIMMDY Alanine Hat Naive",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/kimmdy/cmd.py",
+            "cwd": "${workspaceFolder}/example/alanine_hat_naive/"
+        },
+        {
+            "name": "KIMMDY custom run",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/kimmdy/cmd.py",
+            "cwd": "${workspaceFolder}/../../examples/gly-hydrolysis/"
+        }
+    ]
+}

@@ -1,0 +1,12 @@
+# constants { #kimmdy.constants }
+
+`constants`
+
+Constants used throughout KIMMDY
+
+## Attributes
+
+| Name | Description |
+| --- | --- |
+| [ATOMTYPE_BONDORDER](#kimmdy.constants.ATOMTYPE_BONDORDER) | To determin if an atom is a radical. |
+| [ATOMTYPE_BONDORDER_FLAT](#kimmdy.constants.ATOMTYPE_BONDORDER_FLAT) | To determin if an atom is a radical. |

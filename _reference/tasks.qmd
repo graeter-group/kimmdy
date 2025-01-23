@@ -1,0 +1,104 @@
+# tasks { #kimmdy.tasks }
+
+`tasks`
+
+The tasks module holds the TaskFiles class which organizes input and 
+output paths and the Task class for tasks in the runmanager queue.
+
+## Classes
+
+| Name | Description |
+| --- | --- |
+| [AutoFillDict](#kimmdy.tasks.AutoFillDict) | Dictionary that gets populated by calling get_missing. |
+| [Task](#kimmdy.tasks.Task) | A task to be performed as part of the RunManager Queue. |
+| [TaskFiles](#kimmdy.tasks.TaskFiles) | Class for Task input and output files and directories. |
+
+### AutoFillDict { #kimmdy.tasks.AutoFillDict }
+
+```python
+tasks.AutoFillDict(self, get_missing)
+```
+
+Dictionary that gets populated by calling get_missing.
+
+### Task { #kimmdy.tasks.Task }
+
+```python
+tasks.Task(self, runmng, f, kwargs=None, out=None)
+```
+
+A task to be performed as part of the RunManager Queue.
+
+A task consists of a function and its keyword arguments.
+Calling a taks calls the stored function.
+The function must return a TaskFiles object.
+
+#### Parameters {.doc-section .doc-section-parameters}
+
+| Name   | Type                                                                                                         | Description                                               | Default    |
+|--------|--------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------|------------|
+| runmng |                                                                                                              | Runmanager instance from which the task is called         | _required_ |
+| f      | [Callable](`typing.Callable`)\[..., [Optional](`typing.Optional`)\[[TaskFiles](`kimmdy.tasks.TaskFiles`)\]\] | Function that will be called when the task is called      | _required_ |
+| kwargs | [Optional](`typing.Optional`)\[[dict](`dict`)\[[str](`str`), [Any](`typing.Any`)\]\]                         | kwargs to be passed to f                                  | `None`     |
+| out    | [Optional](`typing.Optional`)\[[str](`str`)\]                                                                | If not None, an output dir will be created with this name | `None`     |
+
+### TaskFiles { #kimmdy.tasks.TaskFiles }
+
+```python
+tasks.TaskFiles(
+    self
+    get_latest
+    input=dict()
+    output=dict()
+    outputdir=Path()
+    logger=logging.getLogger('kimmdy.basetask')
+)
+```
+
+Class for Task input and output files and directories.
+
+Hosts the input and output file paths belonging to a task.
+A function or method that wants to be callable as a Task
+has to return a TaskFiles object.
+The input defaultdict is populated on the fly using
+get_latest of the runmanager to find newest files.
+Files which can not be found by get_latest must be added manually.
+
+#### Attributes {.doc-section .doc-section-attributes}
+
+| Name       | Type                                                   | Description                                                                                  |
+|------------|--------------------------------------------------------|----------------------------------------------------------------------------------------------|
+| get_latest | [Callable](`typing.Callable`)                          | Runmanager.get_latest function that returns paths to the latest file of given type.          |
+| input      | [dict](`dict`)\[[str](`str`), [Path](`pathlib.Path`)\] | Input file paths for a Task. Is populated by get_latest or manually.                         |
+| output     | [dict](`dict`)\[[str](`str`), [Path](`pathlib.Path`)\] | Output file paths for a Task. Is populated by runmanager._discover_output_files or manually. |
+| outputdir  | [Path](`pathlib.Path`)                                 | Output directory for a Task. Typically populated by create_task_directory called by Task.    |
+| logger     | [logging](`logging`).[Logger](`logging.Logger`)        | Logger for a Task. Initialized in create_task_directory.                                     |
+
+#### Examples {.doc-section .doc-section-examples}
+
+```python
+>>> class run():
+>>>     def get_latest(self, s):
+>>>         return f"latest {s}"
+>>> runmng = run()
+>>> files = TaskFiles(runmng.get_latest)
+>>> files.input
+>>> files.input["top"]
+{'top': 'latest top'}
+```
+
+## Functions
+
+| Name | Description |
+| --- | --- |
+| [create_task_directory](#kimmdy.tasks.create_task_directory) | Creates TaskFiles object, output directory, logger and symlinks ff. |
+
+### create_task_directory { #kimmdy.tasks.create_task_directory }
+
+```python
+tasks.create_task_directory(runmng, postfix)
+```
+
+Creates TaskFiles object, output directory, logger and symlinks ff.
+
+Gets called when a Task is called (from the runmanager.tasks queue).

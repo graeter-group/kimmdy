@@ -1,0 +1,55 @@
+@import url('https://fonts.googleapis.com/css2?family=Miriam+Libre&family=Roboto&display=swap');
+
+/*-- scss:defaults --*/
+$brand-primary: #1E4287; 
+$primary: #1E4287; 
+/*$link-color: $brand-primary !default;*/
+$font-family-sans-serif: "Roboto", "Helvetica Neue", sans-serif !default;
+$headings-font-family: "Miriam Libre";
+$font-family-monospace: "Fira Mono", Menlo, Consolas, monospace !default;
+$gray-base:              #000 !default;
+$gray-dark:              lighten($gray-base, 20%) !default;   // #333
+
+$code-color: #1E4287;
+
+/*-- scss:rules --*/
+
+.video-container {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%;
+}
+
+.video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.code-copy-button {
+    z-index: 1;
+}
+
+/*
+* {
+  scrollbar-width: thin;
+  scrollbar-color: $brand-primary;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: $gray-dark $brand-primary;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: $brand-primary;
+  border-radius: 20px;
+  border: 1px solid $brand-primary;
+}
+*/

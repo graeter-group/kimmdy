@@ -1,0 +1,7 @@
+-e .[dev]
+# git+ssh://git@github.com/graeter-group/grappa.git
+## replace with path to your local copy of the plugins
+## for plugin development and kimmdy testing
+grappa-ff --index-url https://download.pytorch.org/whl/cpu
+-e ../kimmdy-grappa
+-e ../kimmdy-reactions

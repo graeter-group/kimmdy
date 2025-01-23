@@ -1,0 +1,41 @@
+website:
+  sidebar:
+  - contents:
+    - _reference/index.qmd
+    - contents: []
+      section: Input file
+    - contents: []
+      section: Command Line Interface
+    - contents:
+      - _reference/cmd.qmd
+      section: Python API
+    - contents:
+      - _reference/topology.topology.qmd
+      - _reference/topology.ff.qmd
+      - _reference/topology.utils.qmd
+      - _reference/topology.atomic.qmd
+      - _reference/parsing.TopologyDict.qmd
+      section: Topology
+    - contents:
+      - _reference/analysis.qmd
+      - _reference/cmd.qmd
+      - _reference/config.qmd
+      - _reference/constants.qmd
+      - _reference/coordinates.qmd
+      - _reference/kmc.qmd
+      - _reference/parsing.qmd
+      - _reference/plugins.qmd
+      - _reference/recipe.qmd
+      - _reference/runmanager.qmd
+      - _reference/schema.qmd
+      - _reference/tasks.qmd
+      - _reference/tools.qmd
+      - _reference/utils.qmd
+      section: Modules
+    - contents:
+      - _reference/homolysis.reaction.Homolysis.qmd
+      - _reference/hat_naive.reaction.NaiveHAT.qmd
+      - _reference/dummyreaction.reaction.DummyReaction.qmd
+      section: Reaction Plugins
+    id: _reference
+  - id: dummy-sidebar
