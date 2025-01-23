@@ -94,6 +94,7 @@ def dummy_first_kmc(
         time_start_index=int(time_index),
     )
 
+
 def rf_kmc(
     recipe_collection: RecipeCollection,
     rng: np.random.Generator = default_rng(),
