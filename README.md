@@ -31,8 +31,7 @@ pip install kimmdy[reactions,analysis]
 However, this is only half the fun!
 
 KIMMDY has two exciting plugins in the making, which properly parameterize your molecules
-for radicals using GrAPPa (Graph Attentional Protein Parametrization) and predict
-Hydrogen Atom Transfer (HAT) rates.
+for radicals using GrAPPa (Graph Attentional Protein Parametrization) and predict Hydrogen Atom Transfer (HAT) rates.
 
 Full installation instructions are available [here](https://grater-group.github.io/kimmdy/guide/how-to/install-ml-plugins.html)
 
