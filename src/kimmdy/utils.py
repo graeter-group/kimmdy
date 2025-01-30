@@ -476,7 +476,11 @@ def get_task_directories(dir: Path, tasks: Union[list[str], str] = "all") -> lis
         List of steps e.g. ["equilibrium", "production"]. Or a string "all" to return all subdirectories
     """
     directories = sorted(
-        [p for p in dir.glob("*_*/") if p.is_dir() and "_" in p.name and p.name[0].isdigit()],
+        [
+            p
+            for p in dir.glob("*_*/")
+            if p.is_dir() and "_" in p.name and p.name[0].isdigit()
+        ],
         key=lambda p: int(p.name.split("_")[0]),
     )
     if tasks == "all":

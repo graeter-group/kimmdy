@@ -49,7 +49,9 @@ def get_cmdline_args() -> argparse.Namespace:
         "--input",
         "-i",
         type=str,
-        help=("Kimmdy input file. Defaults to `kimmdy.yml`. See <https://graeter-group.github.io/kimmdy/guide/references/input.html> for all options. CLI flags (e.g. --restart or --loglevel) have precedence over their counterparts in the input file."),
+        help=(
+            "Kimmdy input file. Defaults to `kimmdy.yml`. See <https://graeter-group.github.io/kimmdy/guide/references/input.html> for all options. CLI flags (e.g. --restart or --loglevel) have precedence over their counterparts in the input file."
+        ),
         default="kimmdy.yml",
     )
     parser.add_argument(
@@ -84,7 +86,10 @@ def get_cmdline_args() -> argparse.Namespace:
     )
 
     parser.add_argument(
-        "--version", action="version", version=f'KIMMDY {version("kimmdy")}', help=("Show version and exit.")
+        "--version",
+        action="version",
+        version=f'KIMMDY {version("kimmdy")}',
+        help=("Show version and exit."),
     )
 
     # on error, drop into debugger

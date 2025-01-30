@@ -27,6 +27,7 @@ from kimmdy.recipe import Bind, Break, DeferredRecipeSteps, Place, RecipeCollect
 from kimmdy.utils import read_reaction_time_marker, run_shell_cmd, get_task_directories
 from kimmdy.constants import MARK_DONE, MARK_STARTED
 
+
 def get_analysis_dir(dir: Path) -> Path:
     """Get analysis directory for a KIMMDY run.
 
@@ -905,7 +906,7 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
 def entry_point_analysis():
     """Analyse existing KIMMDY runs."""
     args = get_analysis_cmdline_args()
-    if hasattr(args, 'dir') and args.dir is None:
+    if hasattr(args, "dir") and args.dir is None:
         discover_plugins()
         # the restart option is used here to avoid creating a new
         # output directory and instead use the one from the config verbatim
