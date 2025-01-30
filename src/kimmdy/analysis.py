@@ -27,7 +27,6 @@ from kimmdy.recipe import Bind, Break, DeferredRecipeSteps, Place, RecipeCollect
 from kimmdy.utils import read_reaction_time_marker, run_shell_cmd, get_task_directories
 from kimmdy.constants import MARK_DONE, MARK_STARTED
 
-
 def get_analysis_dir(dir: Path) -> Path:
     """Get analysis directory for a KIMMDY run.
 
@@ -453,7 +452,6 @@ def radical_migration(
     out_path = analysis_dir / "radical_migration.json"
     with open(out_path, "w") as json_file:
         json.dump(unique_migrations, json_file)
-    print("Done!")
 
 
 def plot_rates(dir: str, open: bool = False):
@@ -718,13 +716,6 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Welcome to the KIMMDY analysis module. Use this module to analyse existing KIMMDY runs.",
     )
-    parser.add_argument(
-        "--input",
-        "-i",
-        type=str,
-        help="Kimmdy input file. Default `kimmdy.yml`",
-        default="kimmdy.yml",
-    )
     subparsers = parser.add_subparsers(metavar="module", dest="module")
 
     parser_trjcat = subparsers.add_parser(
@@ -898,15 +889,28 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         action="store_true",
         help="Open plot in default system viewer.",
     )
+
+    for subparser in subparsers.choices.values():
+        subparser.add_argument(
+            "--input",
+            "-i",
+            type=str,
+            help="Kimmdy input file. Default `kimmdy.yml`. Only used to infer the output directory if `dir` is not provided.",
+            default="kimmdy.yml",
+        )
+
     return parser.parse_args()
 
 
 def entry_point_analysis():
     """Analyse existing KIMMDY runs."""
     args = get_analysis_cmdline_args()
-    if args.dir is None:
+    if hasattr(args, 'dir') and args.dir is None:
         discover_plugins()
-        config = Config(input_file=args.input)
+        # the restart option is used here to avoid creating a new
+        # output directory and instead use the one from the config verbatim
+        # without incrementing a number
+        config = Config(input_file=args.input, restart=True)
         args.dir = str(config.out)
 
     if args.module == "trjcat":
@@ -939,5 +943,5 @@ def entry_point_analysis():
         )
     else:
         print(
-            "No analysis module specified. Use -h for help and a list of available modules."
+            "No analysis module specified. Use -h for --help and a list of available modules."
         )
