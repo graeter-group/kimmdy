@@ -66,7 +66,7 @@ from kimmdy.utils import (
     flatten_recipe_collections,
     get_task_directories,
     run_gmx,
-    write_gro_file_at_reaction_time,
+    write_coordinate_files_at_reaction_time,
     write_reaction_time_marker,
 )
 
@@ -612,16 +612,19 @@ class RunManager:
                 if not any(re.search(s, p.name) for s in IGNORE_SUBSTR)
             ]
             suffs = [p.suffix[1:] for p in discovered_files]
-            # if gro file is found and we wrote a <name>._reaction.gro file
+            # if gro/trr file is found and we wrote a <name>._reaction.gro file
             # explicitly make this the latest gro file
-            gros = [p for p in discovered_files if p.suffix[1:] == "gro"]
-            for gro in gros:
-                if "_reaction" in gro.name:
-                    files.output["gro"] = gro
-                    logger.info(
-                        f"Found reaction gro file: {gro} and set as latest or the the non-reaction gro file"
-                    )
-                    break
+            for duplicate_suffix in ["gro", "trr"]:
+                duplicates = [
+                    p for p in discovered_files if p.suffix[1:] == duplicate_suffix
+                ]
+                for duplicate in duplicates:
+                    if "_reaction" in duplicate.name:
+                        files.output[duplicate_suffix] = duplicate
+                        logger.info(
+                            f"Found reaction coordinate file: {duplicate} and set as latest or the non-reaction file"
+                        )
+                        break
 
             counts = [suffs.count(s) for s in suffs]
             for suff, c, path in zip(suffs, counts, discovered_files):
@@ -930,6 +933,10 @@ class RunManager:
             files.outputdir / "radicals.json",
         )
 
+        logger.info(f"Writing coordinates for reaction.")
+        ttime = self.kmcresult.recipe.timespans[0][0]
+        write_coordinate_files_at_reaction_time(files=files, time=ttime)
+
         logger.info("Done with Decide recipe.")
         return files
 
@@ -1005,7 +1012,7 @@ class RunManager:
         # because the gro_reaction file is written to files.output
         # it will be discovered by _discover_output_files
         # and set as the latest gro file for the next tasks
-        write_gro_file_at_reaction_time(files=files, time=ttime)
+        # write_coordinate_files_at_reaction_time(files=files, time=ttime)
 
         top_initial = deepcopy(self.top)
         focus_nrs: set[str] = set()

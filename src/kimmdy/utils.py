@@ -401,7 +401,7 @@ def read_reaction_time_marker(dir: Path) -> float | None:
         return float(f.read())
 
 
-def write_gro_file_at_reaction_time(files: TaskFiles, time: float | None):
+def write_coordinate_files_at_reaction_time(files: TaskFiles, time: float | None):
     """Write out a gro file from the trajectory (xtc or trr) at the reaction time."""
     if time is None:
         return
@@ -417,16 +417,19 @@ def write_gro_file_at_reaction_time(files: TaskFiles, time: float | None):
         logger.error(m)
 
     gro_reaction = gro.with_name(gro.stem + f"_reaction.gro")
+    trr_reaction = gro.with_name(gro.stem + f"_reaction.trr")
 
-    if gro_reaction.exists():
-        m = f"gro file at reaction time {time} already exists in {gro.parent}. Removing it. This may happen by restarting from a previous run."
+    if gro_reaction.exists() or trr_reaction.exists():
+        m = f"gro/trr file at reaction time {time} already exists in {gro.parent}. Removing it. This may happen by restarting from a previous run."
         logger.error(m)
         gro_reaction.unlink()
+        trr_reaction.unlink()
 
     logger.info(
-        f"Writing out gro file {gro_reaction.name} at reaction time {time} ps in {gro.parent.name}"
+        f"Writing out gro/trr file {gro_reaction.name}/{trr_reaction.name} at reaction time {time} ps in {gro.parent.name}"
     )
     files.output["gro"] = gro_reaction
+    files.output["trr"] = trr_reaction
 
     # Prefer xtc over trr
     # It should have more frames and be smaller,
@@ -437,28 +440,34 @@ def write_gro_file_at_reaction_time(files: TaskFiles, time: float | None):
             run_gmx(
                 f"echo '0' | gmx trjconv -f {files.input['xtc']} -s {gro} -b {time} -dump {time} -o {gro_reaction}"
             )
+            run_gmx(
+                f"echo '0' | gmx trjconv -f {files.input['xtc']} -s {gro} -b {time} -dump {time} -o {trr_reaction}"
+            )
             logger.info(
-                f"Successfully wrote out gro file {gro_reaction.name} at reaction time in {gro.parent.name} from xtc file."
+                f"Successfully wrote out gro/trr file {gro_reaction.name}/{trr_reaction.name} at reaction time in {gro.parent.name} from xtc file."
             )
             return
         except sp.CalledProcessError:
             logger.error(
-                f"Failed to write out gro file {gro_reaction.name} at reaction time in {gro.parent.name} from xtc file because the xtc doesn't contain all atoms. Will try trr file."
+                f"Failed to write out gro/trr file {gro_reaction.name}/{trr_reaction.name} at reaction time in {gro.parent.name} from xtc file because the xtc doesn't contain all atoms. Will try trr file."
             )
     if files.input["trr"] is not None:
         try:
             run_gmx(
                 f"echo '0' | gmx trjconv -f {files.input['trr']} -s {gro} -b {time} -dump {time} -o {gro_reaction}"
             )
+            run_gmx(
+                f"echo '0' | gmx trjconv -f {files.input['trr']} -s {gro} -b {time} -dump {time} -o {trr_reaction}"
+            )
             logger.info(
-                f"Successfully wrote out gro file at reaction time in {gro.parent} from trr file."
+                f"Successfully wrote out gro/trr file at reaction time in {gro.parent} from trr file."
             )
             return
         except sp.CalledProcessError:
             logger.error(
-                f"Failed to write out gro file at reaction time in {gro.parent} from trr file."
+                f"Failed to write out gro/trr file at reaction time in {gro.parent} from trr file."
             )
-    m = f"No trajectory file found to write out gro file at reaction time in {gro.parent}"
+    m = f"No trajectory file found to write out gro/trr file at reaction time in {gro.parent}"
     logger.error(m)
     raise FileNotFoundError(m)
 
