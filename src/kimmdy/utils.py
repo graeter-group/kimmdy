@@ -401,11 +401,8 @@ def read_reaction_time_marker(dir: Path) -> float | None:
         return float(f.read())
 
 
-def write_coordinate_files_at_reaction_time(files: TaskFiles, time: float | None):
+def write_coordinate_files_at_reaction_time(files: TaskFiles, time: float):
     """Write out a gro file from the trajectory (xtc or trr) at the reaction time."""
-    if time is None:
-        return
-
     gro = files.input["gro"]
     if gro is None:
         m = "No gro file found from the previous md run."

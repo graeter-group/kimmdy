@@ -191,6 +191,10 @@ class RunManager:
         self.cptfile: Path = self.config.out / "kimmdy.cpt"
         self.kmc_algorithm: str
 
+        with open(self.histfile, "w") as f:
+            f.write("KIMMDY task file history\n")
+            f.write("Filepaths in the output directory are shortened to be relative to the output directory.\n\n")
+
         logger.info(f"Initialized KIMMDY at cwd: {config.cwd}")
         logger.info(f"with output directory {config.out}")
         try:
@@ -219,7 +223,7 @@ class RunManager:
             reactive_nrexcl=nrexcl,
         )
         self.filehist: list[dict[str, TaskFiles]] = [
-            {"setup": TaskFiles(self.get_latest)}
+            {"0_setup": TaskFiles(self.get_latest)}
         ]
 
         # Initialize reaction plugins used in the sequence
@@ -602,75 +606,82 @@ class RunManager:
 
         and add those files to the `files` as well as
         the file history and latest files.
+        and check if double suffs are properly defined declared files by the task
         """
-        # discover other files written by the task
-        if hasattr(files, "outputdir"):
-            # check whether double suffs are properly defined in files by the task
-            discovered_files = [
-                p
-                for p in files.outputdir.iterdir()
-                if not any(re.search(s, p.name) for s in IGNORE_SUBSTR)
-            ]
-            suffs = [p.suffix[1:] for p in discovered_files]
-            # if gro/trr file is found and we wrote a <name>._reaction.gro file
-            # explicitly make this the latest gro file
-            for duplicate_suffix in ["gro", "trr"]:
-                duplicates = [
-                    p for p in discovered_files if p.suffix[1:] == duplicate_suffix
-                ]
-                for duplicate in duplicates:
-                    if "_reaction" in duplicate.name:
-                        files.output[duplicate_suffix] = duplicate
-                        logger.info(
-                            f"Found reaction coordinate file: {duplicate} and set as latest or the non-reaction file"
-                        )
-                        break
 
-            counts = [suffs.count(s) for s in suffs]
-            for suff, c, path in zip(suffs, counts, discovered_files):
-                if c != 1 and suff not in AMBIGUOUS_SUFFS:
-                    if files.output.get(suff) is None:
-                        e = (
-                            "ERROR: Task produced multiple files with same suffix but "
-                            "did not define with which to continue!\n"
-                            f"Task {taskname}, Suffix {suff} found {c} times"
-                        )
-                        logger.error(e)
-                        raise RuntimeError(e)
-
-            # register discovered output files
-            for path in discovered_files:
-                suffix = path.suffix[1:]
-                if suffix in AMBIGUOUS_SUFFS:
-                    suffix = path.name
-                # don't overwrite manually added keys in files.output
-                if files.output.get(suffix) is not None:
-                    continue
-                files.output[suffix] = files.outputdir / path
-
-            # remove double entries
-            if "plumed" in files.input.keys():
-                if plumed := files.output.get("plumed"):
-                    files.output.pop(plumed.name)
-                if plumed_out := files.output.get("plumed_out"):
-                    files.output.pop(plumed_out.name)
-
-            logger.debug(f"Update latest files with:\n{pformat(files.output)}")
-            self.latest_files.update(files.output)
-            self.filehist.append({taskname: files})
-
-            m = f"""
-            Task: {taskname} with output directory: {files.outputdir}
-            Task: {taskname}, input:\n{pformat(files.input)}
-            Task: {taskname}, output:\n{pformat(files.output)}
-            """
-            with open(self.histfile, "a") as f:
-                f.write(m)
-
-            return files
-        else:
+        if not hasattr(files, "outputdir"):
             logger.debug("No output directory found for task: " + taskname)
             return None
+
+        discovered_files = [
+            p
+            for p in files.outputdir.iterdir()
+            if not any(re.search(s, p.name) for s in IGNORE_SUBSTR)
+        ]
+        suffs = [p.suffix[1:] for p in discovered_files]
+        # if gro/trr file is found and we wrote a <name>._reaction.gro file
+        # explicitly make this the latest gro file
+        for duplicate_suffix in ["gro", "trr"]:
+            duplicates = [
+                p for p in discovered_files if p.suffix[1:] == duplicate_suffix
+            ]
+            for duplicate in duplicates:
+                if "_reaction" in duplicate.name:
+                    files.output[duplicate_suffix] = duplicate
+                    logger.info(
+                        f"Found reaction coordinate file: {duplicate} and set as latest or the non-reaction file"
+                    )
+                    break
+
+        counts = [suffs.count(s) for s in suffs]
+        for suff, c, path in zip(suffs, counts, discovered_files):
+            if c != 1 and suff not in AMBIGUOUS_SUFFS:
+                if files.output.get(suff) is None:
+                    e = (
+                        "ERROR: Task produced multiple files with same suffix but "
+                        "did not define with which to continue!\n"
+                        f"Task {taskname}, Suffix {suff} found {c} times"
+                    )
+                    logger.error(e)
+                    raise RuntimeError(e)
+
+        # register discovered output files
+        for path in discovered_files:
+            suffix = path.suffix[1:]
+            if suffix in AMBIGUOUS_SUFFS:
+                suffix = path.name
+            # don't overwrite manually added keys in files.output
+            if files.output.get(suffix) is not None:
+                continue
+            files.output[suffix] = files.outputdir / path
+
+        # remove double entries
+        if "plumed" in files.input.keys():
+            if plumed := files.output.get("plumed"):
+                files.output.pop(plumed.name)
+            if plumed_out := files.output.get("plumed_out"):
+                files.output.pop(plumed_out.name)
+
+        logger.debug(f"Update latest files with:\n{pformat(files.output)}")
+        self.latest_files.update(files.output)
+        self.filehist.append({files.outputdir.name: files})
+
+        shortpaths_input = ""
+        for k, v in files.input.items():
+            if v is not None:
+                shortpaths_input += f'  {k}: {str(v).removeprefix(str(self.config.out) + "/")}\n'
+
+        shortpaths_output = ""
+        for k, v in files.output.items():
+            if v is not None:
+                shortpaths_output += f'  {k}: {str(v).removeprefix(str(self.config.out) + "/")}\n'
+
+        with open(self.histfile, "a") as f:
+            f.write(f"Task: {files.outputdir.name}\n")
+            f.write(f"Input:\n{shortpaths_input}")
+            f.write(f"Output:\n{shortpaths_output}\n")
+
+        return files
 
     def _setup(self, files: TaskFiles) -> TaskFiles:
         """A setup task to collect files processed by kimmdy such as the topology"""
@@ -933,10 +944,6 @@ class RunManager:
             files.outputdir / "radicals.json",
         )
 
-        logger.info(f"Writing coordinates for reaction.")
-        ttime = self.kmcresult.recipe.timespans[0][0]
-        write_coordinate_files_at_reaction_time(files=files, time=ttime)
-
         logger.info("Done with Decide recipe.")
         return files
 
@@ -964,6 +971,9 @@ class RunManager:
         # Set time to chosen 'time_start' of KMCResult
         ttime = self.kmcresult.time_start
         plugin_time_index = self.kmcresult.time_start_index_within_plugin
+
+        shadow_files_binding = None
+
         logger.info(f"Chosen time_start: {ttime} ps")
         logger.info(f"Time index within plugin: {plugin_time_index}")
         if plugin_time_index is None:
@@ -1012,7 +1022,14 @@ class RunManager:
         # because the gro_reaction file is written to files.output
         # it will be discovered by _discover_output_files
         # and set as the latest gro file for the next tasks
-        # write_coordinate_files_at_reaction_time(files=files, time=ttime)
+        # but this only happens after the apply_recipe task
+        # so we need to set it manually here for intermediate tasks
+        # like Relax and Place to have the correct coordinates
+        logger.info(f"Writing coordinates (gro and trr) for reaction.")
+        if ttime is not None:
+            write_coordinate_files_at_reaction_time(files=files, time=ttime)
+            self.latest_files["gro"] = files.output["gro"]
+            self.latest_files["trr"] = files.output["trr"]
 
         top_initial = deepcopy(self.top)
         focus_nrs: set[str] = set()
@@ -1030,15 +1047,16 @@ class RunManager:
                 self.top.bind_bond((step.atom_id_1, step.atom_id_2))
                 focus_nrs.update([step.atom_id_1, step.atom_id_2])
             elif isinstance(step, Place):
-                task = Task(
+                relax_task = Task(
                     self,
                     f=place_atom,
                     kwargs={"step": step, "ttime": None},
                     out="place_atom",
                 )
-                place_files = task()
+                place_files = relax_task()
                 if place_files is not None:
-                    self._discover_output_files(task.name, place_files)
+                    self._discover_output_files(relax_task.name, place_files)
+                    shadow_files_binding = place_files
                 if step.id_to_place is not None:
                     focus_nrs.update([step.id_to_place])
 
@@ -1104,15 +1122,16 @@ class RunManager:
                     write_top(top_merge.to_dict(), top_merge_path)
                     self.latest_files["top"] = top_merge_path
                 instance = self.config.changer.coordinates.md
-                task = Task(
+                relax_task = Task(
                     self,
                     f=self._run_md,
                     kwargs={"instance": instance},
                     out=instance,
                 )
-                md_files = task()
-                if md_files is not None:
-                    self._discover_output_files(task.name, md_files)
+                relax_task_files = relax_task()
+                if relax_task_files is not None:
+                    self._discover_output_files(relax_task.name, relax_task_files)
+                    shadow_files_binding = relax_task_files
 
             elif isinstance(step, CustomTopMod):
                 step.f(self.top)
@@ -1127,6 +1146,18 @@ class RunManager:
 
         # Recipe done, reset runmanger state
         self.kmcresult = None
+
+        if shadow_files_binding is not None:
+            # if a relaxation or placement task was run,
+            # we overwrite the coordinate output files of
+            # the files object with the files from the relaxation or placement task
+            # (whichever was later)
+            # such that the next task will use these files
+            files.output['gro'] = shadow_files_binding.output['gro']
+            files.output['trr'] = shadow_files_binding.output['trr']
+            files.output['xtc'] = shadow_files_binding.output['xtc']
+            # but not the `top`, because the top for the relaxation
+            # is only temporary and should not be used for the next task
 
         logger.info("Done with Apply recipe")
         return files
