@@ -193,7 +193,9 @@ class RunManager:
 
         with open(self.histfile, "w") as f:
             f.write("KIMMDY task file history\n")
-            f.write("Filepaths in the output directory are shortened to be relative to the output directory.\n\n")
+            f.write(
+                "Filepaths in the output directory are shortened to be relative to the output directory.\n\n"
+            )
 
         logger.info(f"Initialized KIMMDY at cwd: {config.cwd}")
         logger.info(f"with output directory {config.out}")
@@ -669,12 +671,16 @@ class RunManager:
         shortpaths_input = ""
         for k, v in files.input.items():
             if v is not None:
-                shortpaths_input += f'  {k}: {str(v).removeprefix(str(self.config.out) + "/")}\n'
+                shortpaths_input += (
+                    f'  {k}: {str(v).removeprefix(str(self.config.out) + "/")}\n'
+                )
 
         shortpaths_output = ""
         for k, v in files.output.items():
             if v is not None:
-                shortpaths_output += f'  {k}: {str(v).removeprefix(str(self.config.out) + "/")}\n'
+                shortpaths_output += (
+                    f'  {k}: {str(v).removeprefix(str(self.config.out) + "/")}\n'
+                )
 
         with open(self.histfile, "a") as f:
             f.write(f"Task: {files.outputdir.name}\n")
@@ -1153,9 +1159,9 @@ class RunManager:
             # the files object with the files from the relaxation or placement task
             # (whichever was later)
             # such that the next task will use these files
-            files.output['gro'] = shadow_files_binding.output['gro']
-            files.output['trr'] = shadow_files_binding.output['trr']
-            files.output['xtc'] = shadow_files_binding.output['xtc']
+            files.output["gro"] = shadow_files_binding.output["gro"]
+            files.output["trr"] = shadow_files_binding.output["trr"]
+            files.output["xtc"] = shadow_files_binding.output["xtc"]
             # but not the `top`, because the top for the relaxation
             # is only temporary and should not be used for the next task
 

@@ -215,6 +215,7 @@ def test_integration_restart(arranged_tmp_path):
     assert "Finished running last task" in read_last_line(Path("kimmdy.log"))
     assert n_files_original == n_files_restart == 17
 
+
 @pytest.mark.slow
 @pytest.mark.parametrize(
     "arranged_tmp_path", (["test_integration/alanine_hat_naive"]), indirect=True
@@ -232,32 +233,33 @@ def test_integration_file_usage(arranged_tmp_path):
     for block in blocks:
         lines = block.split("\n")
         name = lines[0].removeprefix("Task: ")
-        tasks[name] = {'input':{}, 'output':{}}
-        section = 'input'
-        for l in lines[1: ]:
+        tasks[name] = {"input": {}, "output": {}}
+        section = "input"
+        for l in lines[1:]:
             if l.startswith("Input:"):
-                section = 'input'
+                section = "input"
             elif l.startswith("Output:"):
-                section = 'output'
-            elif l.startswith(' '):
-                tasks[name][section][l.split(": ")[0].strip()] = l.split(": ")[1].strip()
+                section = "output"
+            elif l.startswith(" "):
+                tasks[name][section][l.split(": ")[0].strip()] = l.split(": ")[
+                    1
+                ].strip()
 
-    assert tasks['0_setup']['output']['gro'] == '0_setup/npt.gro'
+    assert tasks["0_setup"]["output"]["gro"] == "0_setup/npt.gro"
 
-    assert tasks['5_apply_recipe']['output']['gro'] == '6_relax/relax.gro'
-    assert tasks['5_apply_recipe']['output']['trr'] == '6_relax/relax.trr'
-    assert tasks['5_apply_recipe']['output']['xtc'] == '6_relax/relax.xtc'
-    assert tasks['5_apply_recipe']['output']['top'] == '5_apply_recipe/Ala_out.top'
+    assert tasks["5_apply_recipe"]["output"]["gro"] == "6_relax/relax.gro"
+    assert tasks["5_apply_recipe"]["output"]["trr"] == "6_relax/relax.trr"
+    assert tasks["5_apply_recipe"]["output"]["xtc"] == "6_relax/relax.xtc"
+    assert tasks["5_apply_recipe"]["output"]["top"] == "5_apply_recipe/Ala_out.top"
 
-    assert tasks['6_relax']['input']['top'] == '5_apply_recipe/Ala_out_mod.top'
-    assert tasks['6_relax']['input']['gro'] == '2_equilibrium/equilibrium_reaction.gro'
-    assert tasks['6_relax']['input']['trr'] == '2_equilibrium/equilibrium_reaction.trr'
-    assert tasks['6_relax']['output']['trr'] == '6_relax/relax.trr'
-    assert tasks['6_relax']['output']['xtc'] == '6_relax/relax.xtc'
+    assert tasks["6_relax"]["input"]["top"] == "5_apply_recipe/Ala_out_mod.top"
+    assert tasks["6_relax"]["input"]["gro"] == "2_equilibrium/equilibrium_reaction.gro"
+    assert tasks["6_relax"]["input"]["trr"] == "2_equilibrium/equilibrium_reaction.trr"
+    assert tasks["6_relax"]["output"]["trr"] == "6_relax/relax.trr"
+    assert tasks["6_relax"]["output"]["xtc"] == "6_relax/relax.xtc"
 
-    assert tasks['7_equilibrium']['input']['gro'] == '6_relax/relax.gro'
-    assert tasks['7_equilibrium']['input']['trr'] == '6_relax/relax.trr'
-    assert tasks['7_equilibrium']['output']['trr'] == '7_equilibrium/equilibrium.trr'
-    assert tasks['7_equilibrium']['output']['cpt'] == '7_equilibrium/equilibrium.cpt'
-    assert tasks['7_equilibrium']['output']['xtc'] == '7_equilibrium/equilibrium.xtc'
-
+    assert tasks["7_equilibrium"]["input"]["gro"] == "6_relax/relax.gro"
+    assert tasks["7_equilibrium"]["input"]["trr"] == "6_relax/relax.trr"
+    assert tasks["7_equilibrium"]["output"]["trr"] == "7_equilibrium/equilibrium.trr"
+    assert tasks["7_equilibrium"]["output"]["cpt"] == "7_equilibrium/equilibrium.cpt"
+    assert tasks["7_equilibrium"]["output"]["xtc"] == "7_equilibrium/equilibrium.xtc"
