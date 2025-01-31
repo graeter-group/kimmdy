@@ -32,7 +32,7 @@ def test_integration_emptyrun(arranged_tmp_path):
     Path("emptyrun.txt").touch()
     with pytest.raises(ValueError):
         kimmdy_run()
-    assert len(list(Path.cwd().glob("emptyrun_001/*"))) == 2
+    assert len(list(Path.cwd().glob("emptyrun_001/*"))) == 3
     assert not (arranged_tmp_path / "minimal" / MARK_FINISHED).exists()
 
 
@@ -43,7 +43,7 @@ def test_integration_valid_input_files(arranged_tmp_path):
     kimmdy_run()
     assert "Finished running last task" in read_last_line(Path("kimmdy.log"))
     assert (arranged_tmp_path / "minimal" / MARK_FINISHED).exists()
-    assert len(list(Path.cwd().glob("minimal/*"))) == 3
+    assert len(list(Path.cwd().glob("minimal/*"))) == 4
 
 
 @pytest.mark.parametrize(
