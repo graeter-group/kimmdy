@@ -127,3 +127,4 @@ package-lock.json
 /.quarto/
 
 /.luarc.json
+_modules.sh

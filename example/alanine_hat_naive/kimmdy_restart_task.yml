@@ -8,8 +8,7 @@ top: 'Ala_out.top'
 gro: 'npt.gro'
 ndx: 'index.ndx'
 kmc: "rfkmc"
-restart:
-  run_directory: 'alanine_hat_000'
+restart: true
 mds:
   equilibrium:
     mdp: 'md.mdp'

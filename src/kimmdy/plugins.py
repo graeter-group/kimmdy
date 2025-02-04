@@ -25,6 +25,11 @@ broken_parameterization_plugins: dict[str, Exception] = {}
 
 
 def discover_plugins():
+    """Discover and load KIMMDY plugins.
+
+    This has to be called before initialzing the [](`~kimmdy.config.Config`) such that
+    in can be validated against the registered plugins.
+    """
     if sys.version_info > (3, 10):
         from importlib_metadata import entry_points
 

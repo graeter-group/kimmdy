@@ -1,15 +1,15 @@
 name: publish
 
 on:
-  workflow_call:
   workflow_dispatch:
-
+  push:
+    branches: [ main ]
 
 jobs:
   build:
+    if: contains(github.event.head_commit.message, 'release-please--branches--main')
     name: Build distribution 📦
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python

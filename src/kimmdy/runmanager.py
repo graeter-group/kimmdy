@@ -22,13 +22,20 @@ from subprocess import CalledProcessError
 from typing import Callable, Optional
 
 from kimmdy.config import Config
-from kimmdy.constants import MARK_DONE, MARK_FAILED, MARK_STARTED, MARKERS
+from kimmdy.constants import (
+    MARK_DONE,
+    MARK_FAILED,
+    MARK_FINISHED,
+    MARK_STARTED,
+    MARKERS,
+)
 from kimmdy.coordinates import break_bond_plumed, merge_top_slow_growth, place_atom
 from kimmdy.kmc import (
     KMCError,
     KMCReject,
     KMCAccept,
     KMCResult,
+    dummy_first_kmc,
     extrande,
     extrande_mod,
     frm,
@@ -59,7 +66,8 @@ from kimmdy.utils import (
     flatten_recipe_collections,
     get_task_directories,
     run_gmx,
-    truncate_sim_files,
+    write_coordinate_files_at_reaction_time,
+    write_reaction_time_marker,
 )
 
 logger = logging.getLogger(__name__)
@@ -68,11 +76,12 @@ logger = logging.getLogger(__name__)
 AMBIGUOUS_SUFFS = ["dat", "xvg", "log", "itp", "mdp"]
 # file strings which to ignore
 IGNORE_SUBSTR = [
-    "_prev.cpt",
-    r"step\d+[bc]\.pdb",
-    r"\.tail",
-    r"_mod\.top",
-    r"\.1#",
+    "_prev.cpt$",
+    r"step\d+[bc]\.pdb$",
+    r"\.tail$",
+    r"_mod\.top$",
+    r"\.\d+#$",
+    r"\.log$",
     "rotref",
 ] + MARKERS
 # are there cases where we have multiple trr files?
@@ -182,9 +191,14 @@ class RunManager:
         self.cptfile: Path = self.config.out / "kimmdy.cpt"
         self.kmc_algorithm: str
 
-        logger.info(
-            f"Initialized RunManager at cwd: {config.cwd} with output directory {config.out}"
-        )
+        with open(self.histfile, "w") as f:
+            f.write("KIMMDY task file history\n")
+            f.write(
+                "Filepaths in the output directory are shortened to be relative to the output directory.\n\n"
+            )
+
+        logger.info(f"Initialized KIMMDY at cwd: {config.cwd}")
+        logger.info(f"with output directory {config.out}")
         try:
             if self.config.changer.topology.parameterization == "basic":
                 self.parameterizer = BasicParameterizer()
@@ -211,7 +225,7 @@ class RunManager:
             reactive_nrexcl=nrexcl,
         )
         self.filehist: list[dict[str, TaskFiles]] = [
-            {"setup": TaskFiles(self.get_latest)}
+            {"0_setup": TaskFiles(self.get_latest)}
         ]
 
         # Initialize reaction plugins used in the sequence
@@ -228,12 +242,21 @@ class RunManager:
             "frm": frm,
             "extrande_mod": extrande_mod,
             "multi_rfkmc": multi_rfkmc,
+            "dummy_first": dummy_first_kmc,
         }
 
         self.task_mapping = {
-            "md": {"f": self._run_md, "kwargs": {}, "out": None},
+            "md": {
+                "f": self._run_md,
+                "kwargs": {},
+                "out": None,
+            },  # name of out director is inferred from the instance
             "reactions": [
-                {"f": self._place_reaction_tasks, "kwargs": {}, "out": None},
+                {
+                    "f": self._place_reaction_tasks,
+                    "kwargs": {},
+                    "out": None,
+                },  # has no output directory
                 {
                     "f": self._decide_recipe,
                     "kwargs": {},
@@ -241,7 +264,6 @@ class RunManager:
                 },
                 {"f": self._apply_recipe, "kwargs": {}, "out": "apply_recipe"},
             ],
-            "restart": {"f": self._restart_task, "kwargs": {}, "out": None},
         }
         """Mapping of task names to functions and their keyword arguments."""
 
@@ -251,9 +273,13 @@ class RunManager:
         logger.info("Start run")
         self.start_time = time.time()
 
-        if restart_dir := getattr(self.config.restart, "run_directory", None):
-            logger.info(f"Restarting from: {restart_dir}")
-            self._restart_from_rundir()
+        if self.config.restart:
+            logger.info(f"Restarting from previous run in: {self.config.out.name}")
+            if (self.config.out / MARK_FINISHED).exists():
+                m = f"Run in {self.config.out} already finished. Exiting."
+                logger.info(m)
+                return
+            self._setup_restart()
 
         while (
             self.state is not State.DONE
@@ -265,11 +291,236 @@ class RunManager:
         ):
             next(self)
 
+        write_time_marker(self.config.out / MARK_FINISHED, "finished")
         logger.info(
-            f"Finished running tasks, state: {self.state} after "
+            f"Finished running last task, state: {self.state} after "
             f"{timedelta(seconds=(time.time() - self.start_time))} "
             f"In output directory {self.config.out}"
         )
+
+    def _setup_restart(self):
+        """Set up RunManager to restart from an existing run directory"""
+
+        task_dirs = get_task_directories(self.config.out)
+        if task_dirs == []:
+            # no tasks found in the output directory. this is a fresh run
+            return
+
+        logger.info(
+            f"Found task directories in existing output directory ({self.config.out.name}): {[p.name for p in task_dirs]}"
+        )
+        logger.info(f"Task queue: {self.tasks}")
+
+        found_restart_point = False
+        restart_task_name = None
+        restart_from_incomplete = False
+
+        # restarting during or after MD except for relaxation/slow_growth MDs are valid restart points
+        if hasattr(self.config.changer, "coordinates") and hasattr(
+            self.config.changer.coordinates, "md"
+        ):
+            relax_md_name = self.config.changer.coordinates.md
+        else:
+            relax_md_name = None
+        if hasattr(self.config, "mds"):
+            md_task_names = [
+                name
+                for name in self.config.mds.get_attributes()
+                if name != relax_md_name
+            ]
+        else:
+            md_task_names = []
+
+        # keep track of how often we have completed each md instance
+        # such that we can later restart correctly at the latest instance
+        md_instance_dir_counter = {}
+        for name in md_task_names:
+            md_instance_dir_counter[name] = 0
+
+        # discover completed or half completed tasks
+        logger.info("Checking for restart point in existing task dirs.")
+        for task_dir in task_dirs:
+            task_n, task_name = task_dir.name.split(sep="_", maxsplit=1)
+            task_n = int(task_n)
+            logger.info(f"Checking task: {task_n}_{task_name}")
+            if (task_dir / MARK_FAILED).exists():
+                m = (
+                    f"Task in directory `{task_dir.name}` is indicated to "
+                    "have failed. Aborting restart. Remove this task "
+                    "directory if you want to restart from before the failed task."
+                )
+
+                inp = input("Do you want to delete this task directory? [y/n]")
+                if inp == "y":
+                    shutil.rmtree(task_dir)
+                else:
+                    exit(1)
+            elif (
+                (task_dir / MARK_STARTED).exists()
+                and not (task_dir / MARK_DONE).exists()
+                and task_name in md_task_names
+            ):
+                # Continue from started but not finished md task is a valid restart point
+                # if it got so far that is has written at least one checkpoint file
+                checkpoint_files = list(task_dir.glob("*.cpt"))
+                if len(checkpoint_files) == 0:
+                    m = f"Last started but not done task is {task_dir.name}, but no checkpoint file found. Using an earlier MD or setup task as restart point instead."
+                    logger.warning(m)
+                    continue
+                logger.info(f"Found started but not finished task {task_dir.name}.")
+                logger.info(f"Will continue task {task_dir.name}")
+                found_restart_point = True
+                self.iteration = task_n
+                restart_task_name = task_name
+                restart_from_incomplete = True
+                md_instance_dir_counter[task_name] += 1
+                # no need to search further, as this task is unfinished
+                break
+            elif (
+                (task_dir / MARK_STARTED).exists()
+                and (task_dir / MARK_DONE).exists()
+                and task_name in md_task_names
+            ):
+                # Continue after last finished MD task is a valid restart point
+                # but continue searching for newer tasks after this
+                logger.info(f"Found completed task {task_dir.name}")
+                logger.info(f"Will continue after task {task_dir.name}")
+                found_restart_point = True
+                self.iteration = task_n
+                restart_task_name = task_name
+                restart_from_incomplete = False
+                md_instance_dir_counter[task_name] += 1
+            elif (
+                (task_dir / MARK_STARTED).exists()
+                and (task_dir / MARK_DONE).exists()
+                and task_name == "setup"
+            ):
+                # Continuing just after 0_setup is a valid restart point
+                found_restart_point = True
+                self.iteration = task_n
+                restart_task_name = task_name
+                restart_from_incomplete = False
+            elif (task_dir / MARK_STARTED).exists() and (task_dir / MARK_DONE).exists():
+                # Completed task, but not an MD task
+                pass
+            elif (task_dir / MARK_STARTED).exists() and not (
+                task_dir / MARK_DONE
+            ).exists():
+                # Started but not done task, not an MD task
+                m = f"Last started but not done task is {task_dir.name}, which can not be restarted from. Restarting instead from after the last completed MD task."
+                logger.info(m)
+                break
+            else:
+                m = f"Encountered task directory {task_dir.name} but kimmdy does not know how to handle this task. Aborting restart."
+                logger.error(m)
+                raise RuntimeError(m)
+
+        if not found_restart_point or not restart_task_name:
+            m = "No valid restart point found in existing task directories."
+            logger.error(m)
+            raise RuntimeError(m)
+
+        m = f"Restarting from iteration (task number) {self.iteration} with name {restart_task_name}"
+        logger.info(m)
+
+        # pop from the task queue until the restart point
+        # all md tasks from which we may restart are in the task queue.
+        # Only e.g. relax mds would just show up in the runtime prioroty queue,
+        # regular md tasks are known before the run starts from the config.sequence.
+        task = None
+        instance = None
+        found_restart_task = False
+        md_instance_task_counter = {k: 0 for k in md_instance_dir_counter.keys()}
+        while not self.tasks.empty():
+            task = self.tasks.get()
+            if task.name == restart_task_name and restart_task_name == "setup":
+                # this is the case if setup ends up as the restart point
+                instance = "setup"
+                found_restart_task = True
+                break
+            if task.name == "run_md":
+                instance = task.kwargs["instance"]
+                md_instance_task_counter[instance] += 1
+                logger.debug(
+                    f"{task}, {md_instance_task_counter[instance]}, {md_instance_dir_counter[instance]}"
+                )
+                if (
+                    instance == restart_task_name
+                    and md_instance_task_counter[instance]
+                    == md_instance_dir_counter[instance]
+                ):
+                    # restart from the last completed (or half completed) valid restart point
+                    found_restart_task = True
+                    # put the task back in the queue
+                    if restart_from_incomplete:
+                        logger.info(
+                            "Restarting from incomplete task. Will continue this task."
+                        )
+                        # append to the front of the queue
+                        task.kwargs.update({"continue_md": True})
+                        self.tasks.queue.appendleft(task)
+                    else:
+                        logger.info("Restarting after completed task.")
+                    break
+
+        if not isinstance(task, Task) or not found_restart_task or not instance:
+            m = f"Could not find task {restart_task_name} in task queue. Either '{task}' is no 'Task', restart task found state is False: '{found_restart_task}' or MD task instance is None: '{instance}'. Aborting restart."
+            logger.error(m)
+            raise RuntimeError(m)
+        if restart_from_incomplete:
+            fragment = "within"
+        else:
+            fragment = "after"
+        logger.info(
+            f"Restarting from {fragment} task {task.name} with instance {instance}"
+        )
+
+        # clean up old task directories that will be overwritten
+        for task_dir in task_dirs[self.iteration + 1 :]:
+            shutil.rmtree(task_dir)
+
+        # discover after it is clear which tasks will be in queue
+        for task_dir in task_dirs[: self.iteration + 1]:
+            task_name = "_".join(task_dir.name.split(sep="_")[1:])
+            task_files = TaskFiles(
+                self.get_latest, {}, {}, self.config.out / task_dir.name
+            )
+            self._discover_output_files(task_name, task_files)
+
+        # plumed fix
+        for md_config in self.config.mds.__dict__.values():
+            if getattr(md_config, "use_plumed"):
+                plumed_out_name = get_plumed_out(self.latest_files["plumed"]).name
+                plumed_out = self.get_latest(plumed_out_name)
+                if plumed_out is not None:
+                    self.latest_files["plumed_out"] = plumed_out
+                    self.latest_files.pop(plumed_out_name)
+                else:
+                    logger.warning(
+                        f"Plumed out file {plumed_out_name} not found. Continuing without it."
+                    )
+
+        # use latest top file
+        top_path = self.get_latest("top")
+        if top_path is None:
+            m = "No topology file found in output directory."
+            logger.error(m)
+            raise FileNotFoundError(m)
+        self.top = Topology(
+            top=read_top(top_path, self.config.ff),
+            parametrizer=self.parameterizer,
+            is_reactive_predicate_f=get_is_reactive_predicate_from_config_f(
+                self.config.topology.reactive
+            ),
+            radicals=getattr(self.config, "radicals", None),
+            residuetypes_path=getattr(self.config, "residuetypes", None),
+        )
+
+        # if we restart from within an imcomplete task,
+        # decrement the iteration because if will be incremented
+        # when the task starts again
+        if restart_from_incomplete:
+            self.iteration -= 1
 
     def _setup_tasks(self):
         """Populates the tasks queue.
@@ -291,6 +542,8 @@ class RunManager:
                 md = self.task_mapping["md"]
                 kwargs: dict = copy(md["kwargs"])
                 kwargs.update({"instance": task_name})
+                if task_name is None:
+                    raise ValueError("MD task name is None")
                 task = Task(
                     self,
                     f=md["f"],
@@ -312,27 +565,17 @@ class RunManager:
                 # check all reactions
                 for task_kwargs in self.task_mapping["reactions"]:
                     self.tasks.put(Task(self, **task_kwargs))
-            elif task_name == "restart":
-                restart = self.task_mapping["restart"]
-                kwargs: dict = copy(restart["kwargs"])
-                task = Task(
-                    self,
-                    f=restart["f"],
-                    kwargs=kwargs,
-                    out=task_name,
-                )
-                self.tasks.put(task)
             else:
                 m = f"Unknown task encountered in the sequence: {task_name}"
                 logger.error(m)
                 raise ValueError(m)
         logger.info(f"Task list build:\n{pformat(list(self.tasks.queue), indent=8)}")
 
-    def get_latest(self, suffix: str):
+    def get_latest(self, suffix: str) -> Path | None:
         """Returns path to latest file of given type.
 
         For .dat files (in general ambiguous extensions) use full file name.
-        Errors if file is not found.
+        Return None if file is not found.
         """
         logger.debug("Getting latest suffix: " + suffix)
         try:
@@ -341,8 +584,8 @@ class RunManager:
             return path
         except Exception:
             m = f"File {suffix} requested but not found!"
-            logger.error(m)
-            raise FileNotFoundError(m)
+            logger.warning(m)
+            return None
 
     def __iter__(self):
         return self
@@ -369,61 +612,86 @@ class RunManager:
 
         and add those files to the `files` as well as
         the file history and latest files.
+        and check if double suffs are properly defined declared files by the task
         """
-        # discover other files written by the task
-        if hasattr(files, "outputdir"):
-            # check whether double suffs are properly defined in files by the task
-            discovered_files = [
-                p
-                for p in files.outputdir.iterdir()
-                if not any(re.search(s, p.name) for s in IGNORE_SUBSTR)
-            ]
-            suffs = [p.suffix[1:] for p in discovered_files]
-            counts = [suffs.count(s) for s in suffs]
-            for suff, c in zip(suffs, counts):
-                if c != 1 and suff not in AMBIGUOUS_SUFFS:
-                    if files.output.get(suff) is None:
-                        e = (
-                            "ERROR: Task produced multiple files with same suffix but "
-                            "did not define with which to continue!\n"
-                            f"Task {taskname}, Suffix {suff} found {c} times"
-                        )
-                        logger.error(e)
-                        raise RuntimeError(e)
 
-            # register discovered output files
-            for path in discovered_files:
-                suffix = path.suffix[1:]
-                if suffix in AMBIGUOUS_SUFFS:
-                    suffix = path.name
-                # don't overwrite manually added keys in files.output
-                if files.output.get(suffix) is not None:
-                    continue
-                files.output[suffix] = files.outputdir / path
-
-            # remove double entries
-            if "plumed" in files.input.keys():
-                if plumed := files.output.get("plumed"):
-                    files.output.pop(plumed.name)
-                if plumed_out := files.output.get("plumed_out"):
-                    files.output.pop(plumed_out.name)
-
-            logger.debug(f"Update latest files with:\n{pformat(files.output)}")
-            self.latest_files.update(files.output)
-            self.filehist.append({taskname: files})
-
-            m = f"""
-            Task: {taskname} with output directory: {files.outputdir}
-            Task: {taskname}, input:\n{pformat(files.input)}
-            Task: {taskname}, output:\n{pformat(files.output)}
-            """
-            with open(self.histfile, "a") as f:
-                f.write(m)
-
-            return files
-        else:
+        if not hasattr(files, "outputdir"):
             logger.debug("No output directory found for task: " + taskname)
             return None
+
+        discovered_files = [
+            p
+            for p in files.outputdir.iterdir()
+            if not any(re.search(s, p.name) for s in IGNORE_SUBSTR)
+        ]
+        suffs = [p.suffix[1:] for p in discovered_files]
+        # if gro/trr file is found and we wrote a <name>._reaction.gro file
+        # explicitly make this the latest gro file
+        for duplicate_suffix in ["gro", "trr"]:
+            duplicates = [
+                p for p in discovered_files if p.suffix[1:] == duplicate_suffix
+            ]
+            for duplicate in duplicates:
+                if "_reaction" in duplicate.name:
+                    files.output[duplicate_suffix] = duplicate
+                    logger.info(
+                        f"Found reaction coordinate file: {duplicate} and set as latest or the non-reaction file"
+                    )
+                    break
+
+        counts = [suffs.count(s) for s in suffs]
+        for suff, c, path in zip(suffs, counts, discovered_files):
+            if c != 1 and suff not in AMBIGUOUS_SUFFS:
+                if files.output.get(suff) is None:
+                    e = (
+                        "ERROR: Task produced multiple files with same suffix but "
+                        "did not define with which to continue!\n"
+                        f"Task {taskname}, Suffix {suff} found {c} times"
+                    )
+                    logger.error(e)
+                    raise RuntimeError(e)
+
+        # register discovered output files
+        for path in discovered_files:
+            suffix = path.suffix[1:]
+            if suffix in AMBIGUOUS_SUFFS:
+                suffix = path.name
+            # don't overwrite manually added keys in files.output
+            if files.output.get(suffix) is not None:
+                continue
+            files.output[suffix] = files.outputdir / path
+
+        # remove double entries
+        if "plumed" in files.input.keys():
+            if plumed := files.output.get("plumed"):
+                files.output.pop(plumed.name)
+            if plumed_out := files.output.get("plumed_out"):
+                files.output.pop(plumed_out.name)
+
+        logger.debug(f"Update latest files with:\n{pformat(files.output)}")
+        self.latest_files.update(files.output)
+        self.filehist.append({files.outputdir.name: files})
+
+        shortpaths_input = ""
+        for k, v in files.input.items():
+            if v is not None:
+                shortpaths_input += (
+                    f'  {k}: {str(v).removeprefix(str(self.config.out) + "/")}\n'
+                )
+
+        shortpaths_output = ""
+        for k, v in files.output.items():
+            if v is not None:
+                shortpaths_output += (
+                    f'  {k}: {str(v).removeprefix(str(self.config.out) + "/")}\n'
+                )
+
+        with open(self.histfile, "a") as f:
+            f.write(f"Task: {files.outputdir.name}\n")
+            f.write(f"Input:\n{shortpaths_input}")
+            f.write(f"Output:\n{shortpaths_output}\n")
+
+        return files
 
     def _setup(self, files: TaskFiles) -> TaskFiles:
         """A setup task to collect files processed by kimmdy such as the topology"""
@@ -457,149 +725,6 @@ class RunManager:
 
         return files
 
-    def _restart_from_rundir(self):
-        """Set up RunManager to restart from a run directory"""
-
-        task_dirs = get_task_directories(self.config.restart.run_directory, "all")
-        logger.debug(f"Found task directories in restart run directory: {task_dirs}")
-        logger.debug(f"Task queue: {self.tasks.queue}")
-
-        completed_tasks: list[Task] = []
-        nested_tasks: dict = {}
-        self.iteration = 0
-        found_run_end = False
-        while not self.tasks.empty() and not found_run_end:
-            task: Task = self.tasks.queue[0]
-            if task.name == "restart_task":
-                logger.info("Found restart task.")
-                self.tasks.queue.popleft()
-                break
-            if task.out is None:
-                completed_tasks.append(self.tasks.queue.popleft())
-
-            else:
-                if task_dirs[self.iteration :] == []:
-                    logger.info(
-                        f"Found last finished task with task number {self.iteration}."
-                    )
-                    # Condition 1: Continue from the last finished task
-                    found_run_end = True
-                for task_dir in task_dirs[self.iteration :]:
-                    if (task_dir / MARK_FAILED).exists():
-                        raise RuntimeError(
-                            f"Task in directory `{task_dir}` is indicated to "
-                            "have failed. Aborting restart. Remove this task "
-                            "directory if you want to restart from before the failed task."
-                        )
-                    if (task_dir / MARK_STARTED).exists():
-                        # symlink task directories from previous output and discover their files
-                        symlink_dir = self.config.out / task_dir.name
-                        symlink_dir.symlink_to(task_dir, target_is_directory=True)
-                        self.iteration += 1
-
-                        task_name = "_".join(task_dir.name.split(sep="_")[1:])
-                        if task_name == task.out:
-                            task.kwargs.update(
-                                {
-                                    "files": TaskFiles(
-                                        self.get_latest, {}, {}, symlink_dir
-                                    )
-                                }
-                            )
-                            completed_tasks.append(self.tasks.queue.popleft())
-                            if not (task_dir / MARK_DONE).exists():
-                                logger.info(
-                                    f"Found started but not finished task {task_dir}."
-                                )
-                                if completed_tasks[-1].name == "run_md":
-                                    symlink_dir.unlink(missing_ok=True)
-                                    shutil.copytree(
-                                        task_dir, self.config.out / task_dir.name
-                                    )
-                                    kwargs: dict = copy(task.kwargs)
-                                    continue_md_task = Task(
-                                        self, f=self._run_md, kwargs=kwargs, out=None
-                                    )
-
-                                    continue_md_task.kwargs.update(
-                                        {"continue_md": True}
-                                    )
-                                    self.priority_tasks.put(continue_md_task)
-                                # Condition 2: Continue from started but not finished task
-                                found_run_end = True
-                            break
-                        else:
-                            # task probably not unique but having the latest of one kind should suffice
-                            if not completed_tasks[-1] in nested_tasks.keys():
-                                nested_tasks[completed_tasks[-1]] = []
-                            nested_tasks[completed_tasks[-1]].append(symlink_dir)
-                    else:
-                        raise RuntimeError(
-                            f"Encountered task directory {task_dir.name} but the"
-                            " task is not indicated to have started. Aborting restart."
-                        )
-
-        # add completed tasks to queue again until a reliable restart point (i.e after MD) is reached
-        while completed_tasks:
-            if completed_tasks[-1].name == "run_md":
-                logger.info(
-                    f"Will continue after task {completed_tasks[-1].kwargs['files'].outputdir}"
-                )
-
-                self.iteration -= 1
-                break
-            else:
-                current_nested_task_dirs = nested_tasks.get(completed_tasks[-1], [])
-                try:
-                    current_task_dir = [completed_tasks[-1].kwargs["files"].outputdir]
-                except KeyError:
-                    current_task_dir = []
-                for task_dir in [
-                    *current_nested_task_dirs,
-                    *current_task_dir,
-                ]:
-                    task_dir.unlink(missing_ok=True)
-                    self.iteration -= 1
-                completed_tasks[-1].kwargs.pop("files", None)
-                self.tasks.queue.appendleft(completed_tasks.pop())
-        else:
-            self.iteration -= 1
-
-        # discover after it is clear which tasks will be in queue
-        for task_dir in get_task_directories(self.config.out, "all"):
-            task_name = "_".join(task_dir.name.split(sep="_")[1:])
-            task_files = TaskFiles(
-                self.get_latest, {}, {}, self.config.out / task_dir.name
-            )
-            self._discover_output_files(task_name, task_files)
-
-        # plumed fix
-        for md_config in self.config.mds.__dict__.values():
-            if getattr(md_config, "use_plumed"):
-                try:
-                    plumed_out_name = get_plumed_out(self.latest_files["plumed"]).name
-                    self.latest_files["plumed_out"] = self.get_latest(plumed_out_name)
-                    self.latest_files.pop(plumed_out_name)
-                except FileNotFoundError as e:
-                    logger.debug(e)
-
-        # use latest top file
-        self.top = Topology(
-            top=read_top(self.get_latest("top"), self.config.ff),
-            parametrizer=self.parameterizer,
-            is_reactive_predicate_f=get_is_reactive_predicate_from_config_f(
-                self.config.topology.reactive
-            ),
-            radicals=getattr(self.config, "radicals", None),
-            residuetypes_path=getattr(self.config, "residuetypes", None),
-        )
-
-    def _restart_task(self, _: TaskFiles) -> None:
-        raise RuntimeError(
-            "Called restart task. This task is only for finding the restart "
-            "point in the sequence and should never be called!"
-        )
-
     def _run_md(
         self, instance: str, files: TaskFiles, continue_md: bool = False
     ) -> TaskFiles:
@@ -617,6 +742,8 @@ class RunManager:
         mdp = files.input["mdp"]
         ndx = files.input["ndx"]
 
+        outputdir = files.outputdir
+
         # to continue MD after timeout
         if continue_md:
             cpt = files.input["cpt"]
@@ -624,21 +751,20 @@ class RunManager:
         else:
             cpt = f"{instance}.cpt"
 
-        outputdir = files.outputdir
-
-        grompp_cmd = (
-            f"{gmx_alias} grompp -p {top} -c {gro} "
-            f"-f {mdp} -n {ndx} -o {instance}.tpr -maxwarn 5"
-        )
-
-        # optional files for grompp:
-        if self.latest_files.get("trr") is not None:
-            trr = files.input["trr"]
-            grompp_cmd += f" -t {trr}"
-        ## disable use of edr for now
-        # if self.latest_files.get("edr") is not None:
-        #     edr = files.input["edr"]
-        #     grompp_cmd += f" -e {edr}"
+            # running grompp again fails for pulling MD, skip it for restart because it is not necessary
+            grompp_cmd = (
+                f"{gmx_alias} grompp -p {top} -c {gro} "
+                f"-f {mdp} -n {ndx} -o {instance}.tpr -maxwarn 5"
+            )
+            # optional files for grompp:
+            if self.latest_files.get("trr") is not None:
+                trr = files.input["trr"]
+                grompp_cmd += f" -t {trr}"
+            ## disable use of edr for now
+            # if self.latest_files.get("edr") is not None:
+            #     edr = files.input["edr"]
+            #     grompp_cmd += f" -e {edr}"
+            logger.debug(f"grompp cmd: {grompp_cmd}")
 
         mdrun_cmd = (
             f"{gmx_alias} mdrun -s {instance}.tpr -cpi {cpt} "
@@ -652,15 +778,20 @@ class RunManager:
         )
 
         if getattr(md_config, "use_plumed"):
-            mdrun_cmd += f" -plumed {files.input['plumed']}"
+            plumed_in = files.input["plumed"]
+            if plumed_in is None:
+                m = "Plumed input file not found in input files."
+                logger.error(m)
+                raise FileNotFoundError(m)
+            mdrun_cmd += f" -plumed {plumed_in}"
 
-            plumed_out = files.outputdir / get_plumed_out(files.input["plumed"])
+            plumed_out = files.outputdir / get_plumed_out(plumed_in)
             files.output["plumed_out"] = plumed_out
 
-        logger.debug(f"grompp cmd: {grompp_cmd}")
         logger.debug(f"mdrun cmd: {mdrun_cmd}")
         try:
-            run_gmx(grompp_cmd, outputdir)
+            if continue_md is False:
+                run_gmx(grompp_cmd, outputdir)
             run_gmx(mdrun_cmd, outputdir)
 
             # specify trr to prevent rotref trr getting set as standard trr
@@ -851,6 +982,9 @@ class RunManager:
         # Set time to chosen 'time_start' of KMCResult
         ttime = self.kmcresult.time_start
         plugin_time_index = self.kmcresult.time_start_index_within_plugin
+
+        shadow_files_binding = None
+
         logger.info(f"Chosen time_start: {ttime} ps")
         logger.info(f"Time index within plugin: {plugin_time_index}")
         if plugin_time_index is None:
@@ -884,11 +1018,29 @@ class RunManager:
         with open(files.outputdir / "vmd_selection.txt", "w") as f:
             f.write(vmd_selection)
 
-        if not self.config.skip_truncation:
-            # truncate simulation files to the chosen time
-            m = f"Truncating simulation files to time {ttime} ps"
-            logger.info(m)
-            truncate_sim_files(files=files, time=ttime)
+        # write time marker for reaction time
+        # in the current task dir (<n>_apply_recipe)
+        # but also in the output dir of the MD task
+        # onto which the reaction is applied
+        write_reaction_time_marker(dir=files.outputdir, time=ttime)
+        gro = files.input["gro"]
+        if gro is None:
+            m = "No gro file found from the previous md run."
+            logger.error(m)
+        else:
+            write_reaction_time_marker(dir=gro.parent, time=ttime)
+
+        # because the gro_reaction file is written to files.output
+        # it will be discovered by _discover_output_files
+        # and set as the latest gro file for the next tasks
+        # but this only happens after the apply_recipe task
+        # so we need to set it manually here for intermediate tasks
+        # like Relax and Place to have the correct coordinates
+        logger.info(f"Writing coordinates (gro and trr) for reaction.")
+        if ttime is not None:
+            write_coordinate_files_at_reaction_time(files=files, time=ttime)
+            self.latest_files["gro"] = files.output["gro"]
+            self.latest_files["trr"] = files.output["trr"]
 
         top_initial = deepcopy(self.top)
         focus_nrs: set[str] = set()
@@ -906,15 +1058,16 @@ class RunManager:
                 self.top.bind_bond((step.atom_id_1, step.atom_id_2))
                 focus_nrs.update([step.atom_id_1, step.atom_id_2])
             elif isinstance(step, Place):
-                task = Task(
+                relax_task = Task(
                     self,
                     f=place_atom,
                     kwargs={"step": step, "ttime": None},
                     out="place_atom",
                 )
-                place_files = task()
+                place_files = relax_task()
                 if place_files is not None:
-                    self._discover_output_files(task.name, place_files)
+                    self._discover_output_files(relax_task.name, place_files)
+                    shadow_files_binding = place_files
                 if step.id_to_place is not None:
                     focus_nrs.update([step.id_to_place])
 
@@ -980,15 +1133,16 @@ class RunManager:
                     write_top(top_merge.to_dict(), top_merge_path)
                     self.latest_files["top"] = top_merge_path
                 instance = self.config.changer.coordinates.md
-                task = Task(
+                relax_task = Task(
                     self,
                     f=self._run_md,
                     kwargs={"instance": instance},
                     out=instance,
                 )
-                md_files = task()
-                if md_files is not None:
-                    self._discover_output_files(task.name, md_files)
+                relax_task_files = relax_task()
+                if relax_task_files is not None:
+                    self._discover_output_files(relax_task.name, relax_task_files)
+                    shadow_files_binding = relax_task_files
 
             elif isinstance(step, CustomTopMod):
                 step.f(self.top)
@@ -1003,6 +1157,18 @@ class RunManager:
 
         # Recipe done, reset runmanger state
         self.kmcresult = None
+
+        if shadow_files_binding is not None:
+            # if a relaxation or placement task was run,
+            # we overwrite the coordinate output files of
+            # the files object with the files from the relaxation or placement task
+            # (whichever was later)
+            # such that the next task will use these files
+            files.output["gro"] = shadow_files_binding.output["gro"]
+            files.output["trr"] = shadow_files_binding.output["trr"]
+            files.output["xtc"] = shadow_files_binding.output["xtc"]
+            # but not the `top`, because the top for the relaxation
+            # is only temporary and should not be used for the next task
 
         logger.info("Done with Apply recipe")
         return files

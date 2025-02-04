@@ -527,7 +527,6 @@ class Recipe:
             return ""
         ixs = set()
         for rs in self.recipe_steps:
-            print(self.recipe_steps)
             if isinstance(rs, BondOperation):
                 ixs.add(rs.atom_ix_1)
                 ixs.add(rs.atom_ix_2)

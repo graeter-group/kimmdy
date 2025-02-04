@@ -29,10 +29,4 @@ jobs:
           git push origin :stable || true
           git tag -a stable -m "Last Stable Release"
           git push origin stable
-  publish:
-    needs: release
-    if: ${{ needs.release.outputs.created }}
-    permissions:
-      id-token: write
-    uses: ./.github/workflows/publish.yml
 

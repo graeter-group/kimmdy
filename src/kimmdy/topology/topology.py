@@ -759,11 +759,11 @@ class Topology:
                 new_molecules += [(m, n)]
 
         self.molecules = new_molecules
-        logger.info(
+        logger.debug(
             "Merging the following molecules into the Reactive moleculetype and making their multiples explicit:"
         )
         for m, n in reactive_molecules.items():
-            logger.info(f"\t{m} {n}")
+            logger.debug(f"\t{m} {n}")
         return reactive_molecules
 
     def _merge_moleculetypes(
@@ -889,7 +889,7 @@ class Topology:
         section = top.get(moleculetype_name)
         if section is None:
             if create:
-                logger.info(
+                logger.debug(
                     f"topology does not contain {moleculetype_name}. Creating new section."
                 )
                 section = empty_section()
@@ -1370,7 +1370,7 @@ class Topology:
                             atom.atom = "HX"
                             name_set = True
                             continue
-                        logger.info(f"Hydrogen will be bound to {other_atom}.")
+                        logger.debug(f"Hydrogen will be bound to {other_atom}.")
                         break
                 else:
                     if name_set:
@@ -1383,7 +1383,7 @@ class Topology:
                         )
                 if not name_set:
                     atom.atom = "HX"
-                    logger.info(f"Named newly bonded hydrogen 'HX'")
+                    logger.debug(f"Named newly bonded hydrogen 'HX'")
 
         # update bound_to
         atompair[0].bound_to_nrs.append(atompair[1].nr)
@@ -1461,10 +1461,10 @@ class Topology:
                     to_delete.append(exclusion_key)
 
             if len(to_delete) > 0:
-                logger.info(f"Removing exclusions {to_delete}")
+                logger.debug(f"Removing exclusions {to_delete}")
             for key in to_delete:
                 reactive_moleculetype.exclusions.pop(key)
             settles = reactive_moleculetype.settles.get(ai)
             if settles is not None:
-                logger.info(f"Removing settles {ai}")
+                logger.debug(f"Removing settles {ai}")
                 reactive_moleculetype.settles.pop(ai)
