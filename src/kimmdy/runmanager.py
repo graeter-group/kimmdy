@@ -430,7 +430,7 @@ class RunManager:
         task = None
         instance = None
         found_restart_task = False
-        md_instance_task_counter = 0
+        md_instance_task_counter = {k: 0 for k in md_instance_dir_counter.keys()}
         while not self.tasks.empty():
             task = self.tasks.get()
             if task.name == restart_task_name and restart_task_name == "setup":
@@ -440,10 +440,14 @@ class RunManager:
                 break
             if task.name == "run_md":
                 instance = task.kwargs["instance"]
-                md_instance_task_counter += 1
+                md_instance_task_counter[instance] += 1
+                logger.debug(
+                    f"{task}, {md_instance_task_counter[instance]}, {md_instance_dir_counter[instance]}"
+                )
                 if (
                     instance == restart_task_name
-                    and md_instance_task_counter == md_instance_dir_counter[instance]
+                    and md_instance_task_counter[instance]
+                    == md_instance_dir_counter[instance]
                 ):
                     # restart from the last completed (or half completed) valid restart point
                     found_restart_task = True
@@ -460,7 +464,7 @@ class RunManager:
                     break
 
         if not isinstance(task, Task) or not found_restart_task or not instance:
-            m = f"Could not find task {restart_task_name} in task queue. Aborting restart."
+            m = f"Could not find task {restart_task_name} in task queue. Either '{task}' is no 'Task', restart task found state is False: '{found_restart_task}' or MD task instance is None: '{instance}'. Aborting restart."
             logger.error(m)
             raise RuntimeError(m)
         if restart_from_incomplete:
