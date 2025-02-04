@@ -742,6 +742,8 @@ class RunManager:
         mdp = files.input["mdp"]
         ndx = files.input["ndx"]
 
+        outputdir = files.outputdir
+
         # to continue MD after timeout
         if continue_md:
             cpt = files.input["cpt"]
@@ -749,21 +751,20 @@ class RunManager:
         else:
             cpt = f"{instance}.cpt"
 
-        outputdir = files.outputdir
-
-        grompp_cmd = (
-            f"{gmx_alias} grompp -p {top} -c {gro} "
-            f"-f {mdp} -n {ndx} -o {instance}.tpr -maxwarn 5"
-        )
-
-        # optional files for grompp:
-        if self.latest_files.get("trr") is not None:
-            trr = files.input["trr"]
-            grompp_cmd += f" -t {trr}"
-        ## disable use of edr for now
-        # if self.latest_files.get("edr") is not None:
-        #     edr = files.input["edr"]
-        #     grompp_cmd += f" -e {edr}"
+            # running grompp again fails for pulling MD, skip it for restart because it is not necessary
+            grompp_cmd = (
+                f"{gmx_alias} grompp -p {top} -c {gro} "
+                f"-f {mdp} -n {ndx} -o {instance}.tpr -maxwarn 5"
+            )
+            # optional files for grompp:
+            if self.latest_files.get("trr") is not None:
+                trr = files.input["trr"]
+                grompp_cmd += f" -t {trr}"
+            ## disable use of edr for now
+            # if self.latest_files.get("edr") is not None:
+            #     edr = files.input["edr"]
+            #     grompp_cmd += f" -e {edr}"
+            logger.debug(f"grompp cmd: {grompp_cmd}")
 
         mdrun_cmd = (
             f"{gmx_alias} mdrun -s {instance}.tpr -cpi {cpt} "
@@ -787,10 +788,10 @@ class RunManager:
             plumed_out = files.outputdir / get_plumed_out(plumed_in)
             files.output["plumed_out"] = plumed_out
 
-        logger.debug(f"grompp cmd: {grompp_cmd}")
         logger.debug(f"mdrun cmd: {mdrun_cmd}")
         try:
-            run_gmx(grompp_cmd, outputdir)
+            if continue_md is False:
+                run_gmx(grompp_cmd, outputdir)
             run_gmx(mdrun_cmd, outputdir)
 
             # specify trr to prevent rotref trr getting set as standard trr
