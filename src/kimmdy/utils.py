@@ -8,10 +8,11 @@ import logging
 import re
 import subprocess as sp
 from pathlib import Path
-from typing import TYPE_CHECKING, Iterable, Optional, Union
+from typing import TYPE_CHECKING, Optional, Union
 
 import numpy as np
 
+from kimmdy.constants import MARK_REACION_TIME
 from kimmdy.recipe import RecipeCollection
 
 if TYPE_CHECKING:
@@ -64,15 +65,15 @@ def run_shell_cmd(s, cwd=None) -> sp.CompletedProcess:
     return sp.run(s, shell=True, cwd=cwd, capture_output=True, text=True)
 
 
-def run_gmx(s: str, cwd=None) -> Optional[sp.CalledProcessError]:
+def run_gmx(cmd: str, cwd=None) -> Optional[sp.CalledProcessError]:
     """Run GROMACS command in shell.
 
     Adds a '-quiet' flag to the command and checks the return code.
     """
-    logger.debug(f"Starting Gromacs process with command {s} in {cwd}.")
-    result = run_shell_cmd(f"{s} -quiet", cwd)
+    logger.debug(f"Starting Gromacs process with command {cmd} in {cwd}.")
+    result = run_shell_cmd(f"{cmd} -quiet", cwd)
     if result.returncode != 0:
-        logger.error(f"Gromacs process with command {s} in {cwd} failed.")
+        logger.error(f"Gromacs process with command {cmd} in {cwd} failed.")
         logger.error(f"Gromacs exit code {result.returncode}.")
         logger.error(f"Gromacs stdout:\n{result.stdout}.")
         logger.error(f"Gromacs stderr:\n{result.stderr}.")
@@ -384,115 +385,88 @@ def check_gmx_version(config):
     return version
 
 
-def truncate_sim_files(
-    files: TaskFiles,
-    time: Optional[float],
-    keep_tail: bool = True,
-):
-    """Truncates latest trr, xtc, edr, and gro to the time to a previous
-    point in time.
+def write_reaction_time_marker(dir: Path, time: float):
+    """Write out a file as marker for the reaction time."""
+    logger.info(
+        f"Writing reaction time marker {time} to {dir.name}/{MARK_REACION_TIME}"
+    )
+    with open(dir / MARK_REACION_TIME, "w") as f:
+        f.write(str(time))
 
-    The files stay in place, the truncated tail is by default kept and renamed
-    to '[...xtc].tail'
 
-    Parameters
-    ----------
-    time
-        Time in ps up to which the data should be truncated.
-    files
-        TaskFiles to get the latest files.
-    """
+def read_reaction_time_marker(dir: Path) -> float | None:
+    if not (dir / MARK_REACION_TIME).exists():
+        return None
+    with open(dir / MARK_REACION_TIME, "r") as f:
+        return float(f.read())
 
-    # TODO: fix this to correctly use the working directory
-    # and do things in it's own directory and not
-    # modify the input files in place
 
-    if time is None:
-        logger.debug("time is None, nothing to truncate")
-        return
+def write_coordinate_files_at_reaction_time(files: TaskFiles, time: float):
+    """Write out a gro file from the trajectory (xtc or trr) at the reaction time."""
+    gro = files.input["gro"]
+    if gro is None:
+        m = "No gro file found from the previous md run."
+        logger.error(m)
+        raise FileNotFoundError(m)
 
-    paths = {}
-    paths["gro"] = files.input["gro"]
-    for s in ["trr", "xtc", "edr"]:
+    if gro.name.endswith("_reaction.gro"):
+        m = f"The latest gro file registered already ends in _reaction.gro. This state should not be possible unless multiple reactions where run in sequence without any MD in between (even relaxation)."
+        logger.error(m)
+
+    gro_reaction = gro.with_name(gro.stem + f"_reaction.gro")
+    trr_reaction = gro.with_name(gro.stem + f"_reaction.trr")
+
+    if gro_reaction.exists() or trr_reaction.exists():
+        m = f"gro/trr file at reaction time {time} already exists in {gro.parent}. Removing it. This may happen by restarting from a previous run."
+        logger.error(m)
+        gro_reaction.unlink()
+        trr_reaction.unlink()
+
+    logger.info(
+        f"Writing out gro/trr file {gro_reaction.name}/{trr_reaction.name} at reaction time {time} ps in {gro.parent.name}"
+    )
+    files.output["gro"] = gro_reaction
+    files.output["trr"] = trr_reaction
+
+    # Prefer xtc over trr
+    # It should have more frames and be smaller,
+    # but sometimes the people only write a specific index group to the xtc,
+    # in which case it fails and we try the trr
+    if files.input["xtc"] is not None:
         try:
-            paths[s] = files.input[s]
-        except FileNotFoundError:
-            paths[s] = None
-
-    trjs = [p for p in [paths["trr"], paths["xtc"]] if p is not None and p.exists()]
-
-    # trr or xtc must be present
-    if len(trjs) == 0:
-        logger.info("No trajectory files found, nothing to truncate.")
-        return
-
-    for trj in trjs:
-        # check time exists in traj
-        p = sp.run(
-            f"gmx -quiet -nocopyright check -f {trj}",
-            text=True,
-            capture_output=True,
-            shell=True,
-        )
-        # FOR SOME REASON gmx check writes in stderr instead of stdout
-        if ms := re.findall(r"Reading frame\s.*time\s+(\d+\.\d+)", p.stderr):
-            if len(ms) == 0:
-                m = f"Could not find time in trajectory {trj} with gmx check."
-                logger.warning(m)
-                return
-            last_time = float(ms[-1])
-            if last_time == 0.0:
-                logger.info(
-                    "Last traj contains single frame, will not truncate anything."
-                )
-                return
-            if last_time * 1.01 <= time:
-                m = f"Requested to truncate trajectory at time {time} but last frame according to gmx check is at {last_time:.4} ps. This might led to unexpected results."
-                logger.warning(m)
-        else:
-            m = f"gmx check failed:\n{p.stdout}\n{p.stderr}.\nMay not be able to truncate trajectory {trj}."
-            logger.error(m)
-            raise RuntimeError(m)
-        logger.info(
-            f"Truncating trajectories to {time:.4} ps. Trajectory time was {last_time:.4} ps"
-        )
-
-    # backup the tails of trajectories
-    for trj in trjs:
-        tmp = trj.rename(trj.with_name("tmp_backup_" + trj.name))
-        if keep_tail:
             run_gmx(
-                f"gmx trjconv -f {tmp} -b {time} -o {trj}",
+                f"echo '0' | gmx trjconv -f {files.input['xtc']} -s {gro} -b {time} -dump {time} -o {gro_reaction}"
             )
-            trj.rename(str(trj) + ".tail")
-
-        run_gmx(f"gmx trjconv -f {tmp} -e {time} -o {trj}")
-        tmp.unlink()
-
-    # backup the gro
-    bck_gro = paths["gro"].rename(
-        paths["gro"].with_name("tmp_backup_" + paths["gro"].name)
-    )
-    sp.run(
-        f"gmx trjconv -f {trjs[0]} -s {bck_gro} -dump -1 -o {paths['gro']}",
-        text=True,
-        input="0",
-        shell=True,
-    )
-    bck_gro.rename(str(paths["gro"]) + ".tail")
-    if not keep_tail:
-        bck_gro.unlink()
-
-    # backup the edr
-    if paths["edr"] is not None:
-        bck_edr = paths["edr"].rename(
-            paths["edr"].with_name("tmp_backup_" + paths["edr"].name)
-        )
-        run_shell_cmd(f"gmx eneconv -f {bck_edr} -e {time} -o {paths['edr']}")
-        bck_edr.rename(str(paths["edr"]) + ".tail")
-        if not keep_tail:
-            bck_edr.unlink()
-    return
+            run_gmx(
+                f"echo '0' | gmx trjconv -f {files.input['xtc']} -s {gro} -b {time} -dump {time} -o {trr_reaction}"
+            )
+            logger.info(
+                f"Successfully wrote out gro/trr file {gro_reaction.name}/{trr_reaction.name} at reaction time in {gro.parent.name} from xtc file."
+            )
+            return
+        except sp.CalledProcessError:
+            logger.error(
+                f"Failed to write out gro/trr file {gro_reaction.name}/{trr_reaction.name} at reaction time in {gro.parent.name} from xtc file because the xtc doesn't contain all atoms. Will try trr file."
+            )
+    if files.input["trr"] is not None:
+        try:
+            run_gmx(
+                f"echo '0' | gmx trjconv -f {files.input['trr']} -s {gro} -b {time} -dump {time} -o {gro_reaction}"
+            )
+            run_gmx(
+                f"echo '0' | gmx trjconv -f {files.input['trr']} -s {gro} -b {time} -dump {time} -o {trr_reaction}"
+            )
+            logger.info(
+                f"Successfully wrote out gro/trr file at reaction time in {gro.parent} from trr file."
+            )
+            return
+        except sp.CalledProcessError:
+            logger.error(
+                f"Failed to write out gro/trr file at reaction time in {gro.parent} from trr file."
+            )
+    m = f"No trajectory file found to write out gro/trr file at reaction time in {gro.parent}"
+    logger.error(m)
+    raise FileNotFoundError(m)
 
 
 def get_task_directories(dir: Path, tasks: Union[list[str], str] = "all") -> list[Path]:
@@ -508,17 +482,14 @@ def get_task_directories(dir: Path, tasks: Union[list[str], str] = "all") -> lis
         List of steps e.g. ["equilibrium", "production"]. Or a string "all" to return all subdirectories
     """
     directories = sorted(
-        [p for p in dir.glob("*_*/") if p.is_dir()],
+        [
+            p
+            for p in dir.glob("*_*/")
+            if p.is_dir() and "_" in p.name and p.name[0].isdigit()
+        ],
         key=lambda p: int(p.name.split("_")[0]),
     )
     if tasks == "all":
-        matching_directories = directories
+        return directories
     else:
-        matching_directories = list(
-            filter(lambda d: d.name.split("_")[1] in tasks, directories)
-        )
-
-    if not matching_directories:
-        print(f"WARNING: Could not find directories {tasks} in {dir}.")
-
-    return matching_directories
+        return [d for d in directories if d.name.split("_")[1] in tasks]

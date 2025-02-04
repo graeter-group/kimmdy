@@ -74,6 +74,27 @@ class KMCError(BaseException):
 KMCResult = KMCAccept | KMCReject | KMCError
 
 
+def dummy_first_kmc(
+    recipe_collection: RecipeCollection,
+) -> KMCResult:
+    """Dummy KMC method that always chooses the first reaction in the list."""
+    if len(recipe_collection.recipes) == 0:
+        m = "Empty ReactionResult; no reaction chosen"
+        logger.warning(m)
+        return KMCError(m)
+    recipe = recipe_collection.recipes[0]
+    time_index = np.argmax(recipe.rates)
+    reaction_time = recipe.timespans[time_index][1]
+    logger.info(f"Chosen Recipe: {recipe} at time {reaction_time}")
+    return KMCAccept(
+        recipe=recipe,
+        reaction_probability=None,
+        time_delta=0,
+        time_start=reaction_time,
+        time_start_index=int(time_index),
+    )
+
+
 def rf_kmc(
     recipe_collection: RecipeCollection,
     rng: np.random.Generator = default_rng(),
@@ -491,7 +512,7 @@ def multi_rfkmc(
     logger.debug(f"Start multi-KMC, {len(recipes)} recipes. Picking {n} recipes.")
     results = []
 
-    for i in range(n):
+    for _ in range(n):
         # check for empty ReactionResult
         if len(recipes) == 0 and len(results) == 0:
             m = "Empty ReactionResult; no reaction chosen"

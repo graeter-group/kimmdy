@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Optional, Union
 from collections import defaultdict
 
-import matplotlib as mpl
+import matplotlib.axis
 import matplotlib.pyplot as plt
 import MDAnalysis as mda
 import numpy as np
@@ -20,9 +20,11 @@ import seaborn as sns
 import seaborn.objects as so
 from seaborn import axes_style
 
+from kimmdy.config import Config
 from kimmdy.parsing import read_json, write_json, read_time_marker
+from kimmdy.plugins import discover_plugins
 from kimmdy.recipe import Bind, Break, DeferredRecipeSteps, Place, RecipeCollection
-from kimmdy.utils import run_shell_cmd, get_task_directories
+from kimmdy.utils import read_reaction_time_marker, run_shell_cmd, get_task_directories
 from kimmdy.constants import MARK_DONE, MARK_STARTED
 
 
@@ -68,7 +70,6 @@ def concat_traj(
     """
     run_dir = Path(dir).expanduser().resolve()
     analysis_dir = get_analysis_dir(run_dir)
-
     directories = get_task_directories(run_dir, steps)
     if not directories:
         raise ValueError(
@@ -90,33 +91,45 @@ def concat_traj(
         output = output_group
 
     ## gather trajectories
-    trajectories = []
+    trajectories: list[Path] = []
     tprs = []
     gros = []
     for d in directories:
-        trajectories.extend(d.glob(f"*.{filetype}"))
+        trjs = list(d.glob(f"*.{filetype}"))
+        trajectories.extend([t for t in trjs if not ".kimmdytrunc." in t.name])
         tprs.extend(d.glob("*.tpr"))
         gros.extend(d.glob("*.gro"))
 
     assert (
         len(trajectories) > 0
-    ), f"No trrs found to concatenate in {run_dir} with subdirectory names {steps}"
+    ), f"No trajectories found to concatenate in {run_dir} with subdirectory names {steps}"
 
-    trajectories = [str(t) for t in trajectories]
-    print(trajectories)
+    for i, trj in enumerate(trajectories):
+        task_dir = trj.parent
+        time = read_reaction_time_marker(task_dir)
+        if time is not None:
+            new_trj = trj.with_suffix(".kimmdytrunc.xtc")
+            run_shell_cmd(
+                f"echo '0' | gmx trjconv -f {trj} -s {tprs[i]} -e {time} -o {new_trj}",
+                cwd=run_dir,
+            )
+            trajectories[i] = new_trj
+
+    flat_trajectories: list[str] = [str(trj) for trj in trajectories]
 
     ## write concatenated trajectory
     tmp_xtc = str(out_xtc.with_name("tmp.xtc"))
     run_shell_cmd(
-        f"gmx trjcat -f {' '.join(trajectories)} -o {tmp_xtc} -cat",
+        rf"gmx trjcat -f {' '.join(flat_trajectories)} -o {tmp_xtc} -cat",
         cwd=run_dir,
     )
     run_shell_cmd(
-        f"echo 'Protein\n{output}' | gmx trjconv -dt 0 -f {tmp_xtc} -s {tprs[0]} -o {str(out_xtc)} -center -pbc mol",
+        s=rf"echo -e 'Protein\n{output}' | gmx trjconv -dt 0 -f {tmp_xtc} -s {tprs[0]} -o {str(out_xtc)} -center -pbc mol",
         cwd=run_dir,
     )
+    assert out_xtc.exists(), f"Concatenated trajectory {out_xtc} not found."
     run_shell_cmd(
-        f"echo 'Protein\n{output}' | gmx trjconv -dump 0 -f {tmp_xtc} -s {tprs[0]} -o {str(out_gro)} -center -pbc mol",
+        rf"echo -e 'Protein\n{output}' | gmx trjconv -dt 0 -dump 0 -f {tmp_xtc} -s {tprs[0]} -o {str(out_gro)} -center -pbc mol",
         cwd=run_dir,
     )
     run_shell_cmd(f"rm {tmp_xtc}", cwd=run_dir)
@@ -126,7 +139,11 @@ def concat_traj(
 
 
 def plot_energy(
-    dir: str, steps: Union[list[str], str], terms: list[str], open_plot: bool = False
+    dir: str,
+    steps: Union[list[str], str],
+    terms: list[str],
+    open_plot: bool = False,
+    truncate: bool = True,
 ):
     """Plot GROMACS energy for a KIMMDY run.
 
@@ -139,8 +156,10 @@ def plot_energy(
         Default is "all".
     terms
         Terms from gmx energy that will be plotted. Uses 'Potential' by default.
-    open_plot :
+    open_plot
         Open plot in default system viewer.
+    truncate
+        Truncate energy files to the reaction time marker.
     """
     run_dir = Path(dir).expanduser().resolve()
     xvg_entries = ["time"] + terms
@@ -153,9 +172,10 @@ def plot_energy(
     xvgs_dir.mkdir(exist_ok=True)
 
     ## gather energy files
-    edrs = []
+    edrs: list[Path] = []
     for d in subdirs_matched:
-        edrs.extend(d.glob("*.edr"))
+        new_edrs = d.glob("*.edr")
+        edrs.extend([edr for edr in new_edrs if not ".kimmdytrunc." in edr.name])
     assert (
         len(edrs) > 0
     ), f"No GROMACS energy files in {run_dir} with subdirectory names {steps}"
@@ -165,11 +185,19 @@ def plot_energy(
     time_offset = 0
     for i, edr in enumerate(edrs):
         ## write energy .xvg file
+        task_dir = edr.parent
         xvg = str(xvgs_dir / edr.parents[0].with_suffix(".xvg").name)
         step_name = edr.parents[0].name.split("_")[1]
 
+        time = read_reaction_time_marker(task_dir)
+        if time is not None and truncate:
+            print(f"Truncating {edr} to {time} ps.")
+            new_edr = edr.with_suffix(".kimmdytrunc.edr")
+            run_shell_cmd(f"gmx eneconv -f {edr} -e {time} -o {new_edr}")
+            edr = new_edr
+
         run_shell_cmd(
-            f"echo '{terms_str} \n\n' | gmx energy -f {str(edr)} -o {xvg}",
+            f"echo '{terms_str} \n\n' | gmx energy -f {edr} -o {xvg}",
             cwd=run_dir,
         )
 
@@ -217,7 +245,9 @@ def plot_energy(
         plt.text(x=t, y=v + 0.5, s=s, fontsize=6)
 
     ax = plt.gca()
-    steps_y_axis = [c for c in ax.get_children() if isinstance(c, mpl.axis.YAxis)][0]
+    steps_y_axis = [
+        c for c in ax.get_children() if isinstance(c, matplotlib.axis.YAxis)
+    ][0]
     steps_y_axis.set_visible(False)
     output_path = str(run_dir / "analysis" / "energy.png")
     plt.savefig(output_path, dpi=300)
@@ -423,7 +453,6 @@ def radical_migration(
     out_path = analysis_dir / "radical_migration.json"
     with open(out_path, "w") as json_file:
         json.dump(unique_migrations, json_file)
-    print("Done!")
 
 
 def plot_rates(dir: str, open: bool = False):
@@ -694,7 +723,7 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         name="trjcat", help="Concatenate trajectories of a KIMMDY run"
     )
     parser_trjcat.add_argument(
-        "dir", type=str, help="KIMMDY run directory to be analysed."
+        "dir", type=str, help="KIMMDY run directory to be analysed.", nargs="?"
     )
     parser_trjcat.add_argument("--filetype", "-f", default="xtc")
     parser_trjcat.add_argument(
@@ -708,11 +737,13 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
     )
     parser_trjcat.add_argument(
         "--open-vmd",
+        "-o",
         action="store_true",
         help="Open VMD with the concatenated trajectory.",
     )
     parser_trjcat.add_argument(
         "--output-group",
+        "-g",
         type=str,
         help="Index group to include in the output. Default is 'Protein' for xtc and 'System' for trr.",
     )
@@ -721,7 +752,7 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         name="energy", help="Plot GROMACS energy for a KIMMDY run"
     )
     parser_energy.add_argument(
-        "dir", type=str, help="KIMMDY run directory to be analysed."
+        "dir", type=str, help="KIMMDY run directory to be analysed.", nargs="?"
     )
     parser_energy.add_argument(
         "--steps",
@@ -743,17 +774,21 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
     )
     parser_energy.add_argument(
         "--open-plot",
-        "-p",
+        "-o",
         action="store_true",
         help="Open plot in default system viewer.",
     )
-
+    parser_energy.add_argument(
+        "--no-truncate",
+        action="store_true",
+        help="Open plot in default system viewer.",
+    )
     parser_radical_population = subparsers.add_parser(
         name="radical_population",
         help="Plot population of radicals for one or multiple KIMMDY run(s)",
     )
     parser_radical_population.add_argument(
-        "dir", type=str, help="KIMMDY run directory to be analysed."
+        "dir", type=str, help="KIMMDY run directory to be analysed.", nargs="?"
     )
     parser_radical_population.add_argument(
         "--population_type",
@@ -820,7 +855,7 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         help="Plot rates of all possible reactions after a MD run. Rates must have been saved!",
     )
     parser_rates.add_argument(
-        "dir", type=str, help="KIMMDY run directory to be analysed."
+        "dir", type=str, help="KIMMDY run directory to be analysed.", nargs="?"
     )
     parser_rates.add_argument(
         "--open",
@@ -834,7 +869,7 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         help="Plot runtime of the tasks of a kimmdy run.",
     )
     parser_runtime.add_argument(
-        "dir", type=str, help="KIMMDY run directory to be analysed."
+        "dir", type=str, help="KIMMDY run directory to be analysed.", nargs="?"
     )
     parser_runtime.add_argument(
         "--open-plot",
@@ -847,7 +882,7 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         help="Plot counts of reaction participation per atom id",
     )
     parser_reaction_participation.add_argument(
-        "dir", type=str, help="KIMMDY run directory to be analysed."
+        "dir", type=str, help="KIMMDY run directory to be analysed.", nargs="?"
     )
     parser_reaction_participation.add_argument(
         "--open-plot",
@@ -855,19 +890,38 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         action="store_true",
         help="Open plot in default system viewer.",
     )
+
+    for subparser in subparsers.choices.values():
+        subparser.add_argument(
+            "--input",
+            "-i",
+            type=str,
+            help="Kimmdy input file. Default `kimmdy.yml`. Only used to infer the output directory if `dir` is not provided.",
+            default="kimmdy.yml",
+        )
+
     return parser.parse_args()
 
 
 def entry_point_analysis():
     """Analyse existing KIMMDY runs."""
     args = get_analysis_cmdline_args()
+    if hasattr(args, "dir") and args.dir is None:
+        discover_plugins()
+        # the restart option is used here to avoid creating a new
+        # output directory and instead use the one from the config verbatim
+        # without incrementing a number
+        config = Config(input_file=args.input, restart=True)
+        args.dir = str(config.out)
 
     if args.module == "trjcat":
         concat_traj(
             args.dir, args.filetype, args.steps, args.open_vmd, args.output_group
         )
     elif args.module == "energy":
-        plot_energy(args.dir, args.steps, args.terms, args.open_plot)
+        plot_energy(
+            args.dir, args.steps, args.terms, args.open_plot, not args.no_truncate
+        )
     elif args.module == "radical_population":
         radical_population(
             args.dir,
@@ -890,5 +944,5 @@ def entry_point_analysis():
         )
     else:
         print(
-            "No analysis module specified. Use -h for help and a list of available modules."
+            "No analysis module specified. Use -h for --help and a list of available modules."
         )

@@ -30,7 +30,6 @@ reactions:
     frequency_factor: 100000000
     h_cutoff: 3
     polling_rate: 1
-plot_rates: true
 save_recipes: true
 sequence:
   - equilibrium

@@ -6,7 +6,6 @@ Other entry points such as `kimmdy-analysis` also live here.
 import argparse
 import logging
 import logging.config
-import shutil
 import sys
 import textwrap
 from os import chmod
@@ -40,26 +39,37 @@ def get_cmdline_args() -> argparse.Namespace:
         Parsed command line arguments
     """
     parser = argparse.ArgumentParser(
-        description="Welcome to KIMMDY. `kimmdy` runs KIMMDY, further tools "
+        description="Welcome to KIMMDY. `kimmdy` runs KIMMDY. Additinal tools "
         "are available as `kimmdy-...` commands. These are `-analysis`, "
         "`-modify-top` and `-build-examples`. Access their help with "
         "`kimmdy-... -h.`"
+        "Visit the documentation online at <https://graeter-group.github.io/kimmdy/>"
     )
     parser.add_argument(
         "--input",
         "-i",
         type=str,
-        help="Kimmdy input file. Default `kimmdy.yml`",
+        help=(
+            "Kimmdy input file. Defaults to `kimmdy.yml`. See <https://graeter-group.github.io/kimmdy/guide/references/input.html> for all options. CLI flags (e.g. --restart or --loglevel) have precedence over their counterparts in the input file."
+        ),
         default="kimmdy.yml",
+    )
+    parser.add_argument(
+        "--restart",
+        "-r",
+        action="store_true",
+        help=(
+            "Restart or continue from a previous run instead of incrementing the run number for the output directory. It the output directory does not exist, it will be like a regular fresh run."
+        ),
     )
     parser.add_argument(
         "--loglevel",
         "-l",
         type=str,
-        help="logging level (CRITICAL, ERROR, WARNING, INFO, DEBUG)",
+        help="Logging level (CRITICAL, ERROR, WARNING, INFO, DEBUG)",
         default=None,
     )
-    parser.add_argument("--logfile", "-f", type=Path, help="logfile", default=None)
+    parser.add_argument("--logfile", "-f", type=Path, help="Logfile", default=None)
 
     # flag to show available plugins
     parser.add_argument(
@@ -70,26 +80,28 @@ def get_cmdline_args() -> argparse.Namespace:
     parser.add_argument(
         "--generate-jobscript",
         action="store_true",
-        help="Instead of running KIMMDY directly, generate at jobscript.sh for"
+        help="Instead of running KIMMDY directly, generate the output directory and a jobscript `jobscript.sh` for"
         " slurm HPC clusters."
-        "You can then run this jobscript with sbatch jobscript.sh",
+        " You can then run this jobscript with sbatch jobscript.sh.",
     )
 
     parser.add_argument(
-        "--version", action="version", version=f'KIMMDY {version("kimmdy")}'
+        "--version",
+        action="version",
+        version=f'KIMMDY {version("kimmdy")}',
+        help=("Show version and exit."),
     )
 
     # on error, drop into debugger
     parser.add_argument(
-        "--debug", action="store_true", help=("on error, drop into debugger")
+        "--debug", action="store_true", help=("On error, drop into debugger")
     )
 
     # visualize call stack
     parser.add_argument(
         "--callgraph",
         action="store_true",
-        help="Generate visualization of function calls. Mostly useful for "
-        "debugging and documentation.",
+        help="Generate a visualization of function calls for debugging and documentation.",
     )
 
     return parser.parse_args()
@@ -135,7 +147,10 @@ def _run(args: argparse.Namespace):
     try:
         discover_plugins()
         config = Config(
-            input_file=args.input, logfile=args.logfile, loglevel=args.loglevel
+            input_file=args.input,
+            logfile=args.logfile,
+            loglevel=args.loglevel,
+            restart=args.restart,
         )
 
         logger.info("Welcome to KIMMDY")
@@ -154,6 +169,10 @@ def _run(args: argparse.Namespace):
         runmgr = RunManager(config)
 
         if args.generate_jobscript:
+            if config.max_hours == 0:
+                m = f"kimmdy.config.max_hours is set to 0, which would create a non-sensical jobscript."
+                logger.error(m)
+                raise ValueError(m)
             content = jobscript.format(config=config).strip("\n")
             path = "jobscript.sh"
 
@@ -197,8 +216,6 @@ def _run(args: argparse.Namespace):
             raise e
     finally:
         logging.shutdown()
-        if args.generate_jobscript:
-            shutil.rmtree(config.out)
 
 
 def kimmdy_run(
@@ -209,6 +226,7 @@ def kimmdy_run(
     generate_jobscript: bool = False,
     debug: bool = False,
     callgraph: bool = False,
+    restart: bool = False,
 ):
     """Run KIMMDY from python.
 
@@ -225,7 +243,13 @@ def kimmdy_run(
     show_plugins
         Show available plugins and exit.
     generate_jobscript
-        Instead of running KIMMDY directly, generate at jobscript.sh for slurm HPC clusters
+        Instead of running KIMMDY directly, generate at jobscript.sh for slurm HPC clusters.
+    debug
+        on error, drop into debugger.
+    callgraph
+        Generate visualization of function calls. Mostly useful for debugging and documentation.
+    restart
+        Restart from a previous run instead of incrementing the run number for the output directory.
     """
     args = argparse.Namespace(
         input=input,
@@ -235,6 +259,7 @@ def kimmdy_run(
         generate_jobscript=generate_jobscript,
         debug=debug,
         callgraph=callgraph,
+        restart=restart,
     )
     _run(args)
 

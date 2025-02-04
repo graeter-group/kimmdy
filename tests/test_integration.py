@@ -5,9 +5,11 @@ from pathlib import Path
 import pytest
 
 from kimmdy.cmd import kimmdy_run
-from kimmdy.constants import MARK_DONE
+from kimmdy.config import Config
+from kimmdy.constants import MARK_DONE, MARK_FINISHED
 from kimmdy.parsing import read_top, write_top
-from kimmdy.plugins import parameterization_plugins
+from kimmdy.plugins import discover_plugins, parameterization_plugins
+from kimmdy.runmanager import RunManager
 from kimmdy.topology.topology import Topology
 from kimmdy.utils import get_task_directories
 
@@ -27,12 +29,11 @@ def read_last_line(file):
     "arranged_tmp_path", (["test_integration/emptyrun"]), indirect=True
 )
 def test_integration_emptyrun(arranged_tmp_path):
-    # not expecting this to run
-    # because the topology is empty
     Path("emptyrun.txt").touch()
     with pytest.raises(ValueError):
         kimmdy_run()
-    assert len(list(Path.cwd().glob("emptyrun_001/*"))) == 2
+    assert len(list(Path.cwd().glob("emptyrun_001/*"))) == 3
+    assert not (arranged_tmp_path / "minimal" / MARK_FINISHED).exists()
 
 
 @pytest.mark.parametrize(
@@ -40,8 +41,9 @@ def test_integration_emptyrun(arranged_tmp_path):
 )
 def test_integration_valid_input_files(arranged_tmp_path):
     kimmdy_run()
-    assert "Finished running tasks" in read_last_line(Path("kimmdy.log"))
-    assert len(list(Path.cwd().glob("minimal/*"))) == 2
+    assert "Finished running last task" in read_last_line(Path("kimmdy.log"))
+    assert (arranged_tmp_path / "minimal" / MARK_FINISHED).exists()
+    assert len(list(Path.cwd().glob("minimal/*"))) == 4
 
 
 @pytest.mark.parametrize(
@@ -121,8 +123,8 @@ def test_grappa_partial_parameterization(arranged_tmp_path):
 )
 def test_integration_single_reaction(arranged_tmp_path):
     kimmdy_run(input=Path("kimmdy.yml"))
-    assert "Finished running tasks" in read_last_line(Path("kimmdy.log"))
-    assert len(list(Path.cwd().glob("single_reaction_000/*"))) == 7
+    assert "Finished running last task" in read_last_line(Path("kimmdy.log"))
+    assert len(list(Path.cwd().glob("single_reaction_000/*"))) == 8
 
 
 @pytest.mark.parametrize(
@@ -132,8 +134,8 @@ def test_integration_single_reaction(arranged_tmp_path):
 )
 def test_integration_just_reactions(arranged_tmp_path):
     kimmdy_run(input=Path("alternative_kimmdy.yml"))
-    assert "Finished running tasks" in read_last_line(Path("kimmdy.log"))
-    assert len(list(Path.cwd().glob("single_reaction_000/*"))) == 7
+    assert "Finished running last task" in read_last_line(Path("kimmdy.log"))
+    assert len(list(Path.cwd().glob("single_reaction_000/*"))) == 8
 
 
 @pytest.mark.slow
@@ -142,8 +144,9 @@ def test_integration_just_reactions(arranged_tmp_path):
 )
 def test_integration_hat_naive_reaction(arranged_tmp_path):
     kimmdy_run()
-    assert "Finished running tasks" in read_last_line(Path("kimmdy.log"))
-    assert len(list(Path.cwd().glob("alanine_hat_000/*"))) == 15
+    assert "Finished running last task" in read_last_line(Path("kimmdy.log"))
+    print(list(Path.cwd().glob("alanine_hat_000/*")))
+    assert len(list(Path.cwd().glob("alanine_hat_000/*"))) == 16
 
 
 @pytest.mark.slow
@@ -152,8 +155,8 @@ def test_integration_hat_naive_reaction(arranged_tmp_path):
 )
 def test_integration_homolysis_reaction(arranged_tmp_path):
     kimmdy_run()
-    assert "Finished running tasks" in read_last_line(Path("kimmdy.log"))
-    assert len(list(Path.cwd().glob("hexalanine_homolysis_000/*"))) == 12
+    assert "Finished running last task" in read_last_line(Path("kimmdy.log"))
+    assert len(list(Path.cwd().glob("hexalanine_homolysis_000/*"))) == 13
 
 
 @pytest.mark.slow
@@ -162,8 +165,8 @@ def test_integration_homolysis_reaction(arranged_tmp_path):
 )
 def test_integration_pull(arranged_tmp_path):
     kimmdy_run()
-    assert "Finished running tasks" in read_last_line(Path("kimmdy.log"))
-    assert len(list(Path.cwd().glob("kimmdy_001/*"))) == 11
+    assert "Finished running last task" in read_last_line(Path("kimmdy.log"))
+    assert len(list(Path.cwd().glob("kimmdy_001/*"))) == 12
 
 
 @pytest.mark.require_grappa
@@ -175,8 +178,8 @@ def test_integration_pull(arranged_tmp_path):
 )
 def test_integration_whole_run(arranged_tmp_path):
     kimmdy_run()
-    assert "Finished running tasks" in read_last_line(Path("kimmdy.log"))
-    assert len(list(Path.cwd().glob("kimmdy_001/*"))) == 24
+    assert "Finished running last task" in read_last_line(Path("kimmdy.log"))
+    assert len(list(Path.cwd().glob("kimmdy_001/*"))) == 25
 
 
 @pytest.mark.slow
@@ -185,32 +188,78 @@ def test_integration_whole_run(arranged_tmp_path):
 )
 def test_integration_restart(arranged_tmp_path):
     run_dir = Path("alanine_hat_000")
-    restart_dir = Path("alanine_hat_001")
-    # get reference
     kimmdy_run(input=Path("kimmdy_restart.yml"))
     n_files_original = len(list(run_dir.glob("*")))
 
-    # try restart from restart task
-    kimmdy_run(input=Path("kimmdy_restart_task.yml"))
-    n_files_restart_task = len(list(restart_dir.glob("*")))
+    # restart already finished run
+    kimmdy_run(input=Path("kimmdy_restart.yml"))
+    assert "already finished" in read_last_line(Path("kimmdy.log"))
 
-    assert "Finished running tasks" in read_last_line(Path("kimmdy.log"))
-    assert n_files_original == n_files_restart_task == 16
-
-    # try restart from stopped md (doesn't work with truncated trajectory)
-    task_dirs = get_task_directories(run_dir, "all")
+    # try restart from stopped md
+    task_dirs = get_task_directories(run_dir)
     (task_dirs[-1] / MARK_DONE).unlink()
+    (arranged_tmp_path / run_dir / MARK_FINISHED).unlink()
     kimmdy_run(input=Path("kimmdy_restart.yml"))
-    n_files_continue_md = len(list(restart_dir.glob("*")))
+    n_files_continue_md = len(list(run_dir.glob("*")))
 
-    assert "Finished running tasks" in read_last_line(Path("kimmdy.log"))
-    assert n_files_original == n_files_continue_md == 16
+    assert "Finished running last task" in read_last_line(Path("kimmdy.log"))
+    assert n_files_original == n_files_continue_md == 17
 
-    # try restart from finished task
-    task_dirs = get_task_directories(run_dir, "all")
+    # try restart from finished md
+    task_dirs = get_task_directories(run_dir)
     (task_dirs[-4] / MARK_DONE).unlink()
+    (arranged_tmp_path / run_dir / MARK_FINISHED).unlink()
     kimmdy_run(input=Path("kimmdy_restart.yml"))
-    n_files_restart = len(list(restart_dir.glob("*")))
+    n_files_restart = len(list(run_dir.glob("*")))
 
-    assert "Finished running tasks" in read_last_line(Path("kimmdy.log"))
-    assert n_files_original == n_files_restart == 16
+    assert "Finished running last task" in read_last_line(Path("kimmdy.log"))
+    assert n_files_original == n_files_restart == 17
+
+
+@pytest.mark.slow
+@pytest.mark.parametrize(
+    "arranged_tmp_path", (["test_integration/alanine_hat_naive"]), indirect=True
+)
+def test_integration_file_usage(arranged_tmp_path):
+    """Do a kimmdy run
+    and verify that at each task the correct files are used
+    specifically when writing out gro and trr files when
+    applying a reaction.
+    """
+    kimmdy_run()
+    histfile = Path("alanine_hat_000/kimmdy.history").read_text().split("\n\n")
+    header, blocks = histfile[0], histfile[1:]
+    tasks = {}
+    for block in blocks:
+        lines = block.split("\n")
+        name = lines[0].removeprefix("Task: ")
+        tasks[name] = {"input": {}, "output": {}}
+        section = "input"
+        for l in lines[1:]:
+            if l.startswith("Input:"):
+                section = "input"
+            elif l.startswith("Output:"):
+                section = "output"
+            elif l.startswith(" "):
+                tasks[name][section][l.split(": ")[0].strip()] = l.split(": ")[
+                    1
+                ].strip()
+
+    assert tasks["0_setup"]["output"]["gro"] == "0_setup/npt.gro"
+
+    assert tasks["5_apply_recipe"]["output"]["gro"] == "6_relax/relax.gro"
+    assert tasks["5_apply_recipe"]["output"]["trr"] == "6_relax/relax.trr"
+    assert tasks["5_apply_recipe"]["output"]["xtc"] == "6_relax/relax.xtc"
+    assert tasks["5_apply_recipe"]["output"]["top"] == "5_apply_recipe/Ala_out.top"
+
+    assert tasks["6_relax"]["input"]["top"] == "5_apply_recipe/Ala_out_mod.top"
+    assert tasks["6_relax"]["input"]["gro"] == "2_equilibrium/equilibrium_reaction.gro"
+    assert tasks["6_relax"]["input"]["trr"] == "2_equilibrium/equilibrium_reaction.trr"
+    assert tasks["6_relax"]["output"]["trr"] == "6_relax/relax.trr"
+    assert tasks["6_relax"]["output"]["xtc"] == "6_relax/relax.xtc"
+
+    assert tasks["7_equilibrium"]["input"]["gro"] == "6_relax/relax.gro"
+    assert tasks["7_equilibrium"]["input"]["trr"] == "6_relax/relax.trr"
+    assert tasks["7_equilibrium"]["output"]["trr"] == "7_equilibrium/equilibrium.trr"
+    assert tasks["7_equilibrium"]["output"]["cpt"] == "7_equilibrium/equilibrium.cpt"
+    assert tasks["7_equilibrium"]["output"]["xtc"] == "7_equilibrium/equilibrium.xtc"
