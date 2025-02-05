@@ -53,6 +53,7 @@ def concat_traj(
     steps: Union[list[str], str],
     open_vmd: bool = False,
     output_group: Optional[str] = None,
+    use_last_names: bool = False,
 ):
     """Find and concatenate trajectories (.xtc files) from a KIMMDY run into one trajectory.
     The concatenated trajectory is centered and pbc corrected.
@@ -67,6 +68,9 @@ def concat_traj(
         Open concatenated trajectory in VMD
     output_group
         index group for output. Default is "Protein" for xtc and "System" for trr.
+    use_last_names
+        Use the tpr/topology of the last trajectory for the output, default is the first.
+        This influences the names and types of the atoms in the output, which can be useful for VMD.
     """
     run_dir = Path(dir).expanduser().resolve()
     analysis_dir = get_analysis_dir(run_dir)
@@ -123,6 +127,10 @@ def concat_traj(
         rf"gmx trjcat -f {' '.join(flat_trajectories)} -o {tmp_xtc} -cat",
         cwd=run_dir,
     )
+    if use_last_names:
+        i = -1
+    else:
+        i = 0
     run_shell_cmd(
         s=rf"echo -e 'Protein\n{output}' | gmx trjconv -dt 0 -f {tmp_xtc} -s {tprs[0]} -o {str(out_xtc)} -center -pbc mol",
         cwd=run_dir,
@@ -134,8 +142,7 @@ def concat_traj(
     )
     run_shell_cmd(f"rm {tmp_xtc}", cwd=run_dir)
     if open_vmd:
-        gro = str(gros[0])
-        run_shell_cmd(f"vmd {gro} {str(out_xtc)}", cwd=run_dir)
+        run_shell_cmd(f"vmd {out_gro} {out_xtc}", cwd=run_dir)
 
 
 def plot_energy(
@@ -747,6 +754,12 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         type=str,
         help="Index group to include in the output. Default is 'Protein' for xtc and 'System' for trr.",
     )
+    parser_trjcat.add_argument(
+        "--use-last-names",
+        "-l",
+        action="store_true",
+        help="Use the tpr/topology of the last trajectory for the output, default is the first. This influences the names and types of the atoms in the output, which can be useful for VMD.",
+    )
 
     parser_energy = subparsers.add_parser(
         name="energy", help="Plot GROMACS energy for a KIMMDY run"
@@ -906,6 +919,11 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
 def entry_point_analysis():
     """Analyse existing KIMMDY runs."""
     args = get_analysis_cmdline_args()
+    if args.module is None:
+        print(
+            "No analysis module specified. Use -h for --help and a list of available modules."
+        )
+        return
     if hasattr(args, "dir") and args.dir is None:
         discover_plugins()
         # the restart option is used here to avoid creating a new
@@ -916,33 +934,42 @@ def entry_point_analysis():
 
     if args.module == "trjcat":
         concat_traj(
-            args.dir, args.filetype, args.steps, args.open_vmd, args.output_group
+            dir=args.dir,
+            filetype=args.filetype,
+            steps=args.steps,
+            open_vmd=args.open_vmd,
+            output_group=args.output_group,
+            use_last_names=args.use_last_names,
         )
     elif args.module == "energy":
         plot_energy(
-            args.dir, args.steps, args.terms, args.open_plot, not args.no_truncate
+            dir=args.dir,
+            steps=args.steps,
+            terms=args.terms,
+            open_plot=args.open_plot,
+            truncate=not args.no_truncate,
         )
     elif args.module == "radical_population":
         radical_population(
-            args.dir,
-            args.population_type,
-            args.steps,
-            args.select_atoms,
-            args.open_plot,
-            args.open_vmd,
+            dir=args.dir,
+            population_type=args.population_type,
+            steps=args.steps,
+            select_atoms=args.select_atoms,
+            open_plot=args.open_plot,
+            open_vmd=args.open_vmd,
         )
     elif args.module == "radical_migration":
-        radical_migration(args.dirs, args.type, args.cutoff)
+        radical_migration(dirs=args.dirs, type=args.type, cutoff=args.cutoff)
     elif args.module == "rates":
-        plot_rates(args.dir, args.open)
+        plot_rates(dir=args.dir, open=args.open)
     elif args.module == "runtime":
-        runtime_analysis(args.dir, args.open_plot)
+        runtime_analysis(dir=args.dir, open_plot=args.open_plot)
     elif args.module == "reaction_participation":
         reaction_participation(
-            args.dir,
-            args.open_plot,
+            dir=args.dir,
+            open_plot=args.open_plot,
         )
     else:
         print(
-            "No analysis module specified. Use -h for --help and a list of available modules."
+            "No known analysis module specified. Use -h for --help and a list of available modules."
         )
