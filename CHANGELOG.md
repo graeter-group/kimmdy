@@ -1,6 +1,19 @@
 # Changelog
 
 
+## [6.14.0](https://github.com/graeter-group/kimmdy/compare/v6.13.0...v6.14.0) (2025-02-05)
+
+
+### Features
+
+* flag to skip truncation for fast rate calculation without follow-up ([#500](https://github.com/graeter-group/kimmdy/issues/500)) ([fe031fa](https://github.com/graeter-group/kimmdy/commit/fe031fad7d4c94be21ab7e5ec1880e82c2731939))
+
+
+### Bug Fixes
+
+* fix jobscript for re-submission ([caa3383](https://github.com/graeter-group/kimmdy/commit/caa3383b6c07ed81495c4d79ff815235f780e513))
+* restarting ([#504](https://github.com/graeter-group/kimmdy/issues/504)) ([151bb2e](https://github.com/graeter-group/kimmdy/commit/151bb2e2397764f2c88afd36ad7987a193903d50))
+
 ## [6.13.0](https://github.com/graeter-group/kimmdy/compare/v6.12.0...v6.13.0) (2024-10-23)
 
 
