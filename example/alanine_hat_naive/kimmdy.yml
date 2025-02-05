@@ -16,10 +16,10 @@ mds:
     mdp: 'md_slow_growth.mdp'
 changer:
   coordinates:
-    md: 'relax'  
+    md: 'relax'
     slow_growth: True
   topology:
-    parameterization: 'basic'
+    parameterization: grappa
 reactions:
   hat_naive:
     frequency_factor: 100000000
@@ -27,8 +27,7 @@ reactions:
     polling_rate: 1
 
 sequence:
-- equilibrium
-- mult: 2
+- mult: 20
   tasks:
   - equilibrium
   - reactions
