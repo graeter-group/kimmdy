@@ -38,6 +38,7 @@ HOURS=$((LEN/3600))
 echo "$LEN seconds ran"
 echo "$HOURS full hours ran"
 
+let "CYCLE--"
 if [ $HOURS -lt $CYCLE ]; then
   echo "last cycle was just $HOURS h long, KIMMDY is done."
   exit 3
