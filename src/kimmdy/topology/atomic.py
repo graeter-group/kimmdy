@@ -4,11 +4,14 @@ The order of the fields comes from the gromacs topology file format.
 See [gromacs manual](https://manual.gromacs.org/current/reference-manual/topologies/topology-file-formats.html#topology-file)
 """
 
+import logging
 from dataclasses import dataclass, field
 from typing import Optional, Union
 
 from kimmdy.constants import FFFUNC
 from kimmdy.utils import field_or_none
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -39,8 +42,9 @@ class Atom:
     typeB: Optional[str] = None
     chargeB: Optional[str] = None
     massB: Optional[str] = None
-    bound_to_nrs: list[str] = field(default_factory=list)
-    is_radical: bool = False
+    bound_to_nrs: list[str] = field(default_factory=list, compare=False)
+    is_radical: bool = field(default=False, compare=False)
+    comment: Optional[str] = field(default=None, compare=False)
 
     @classmethod
     def from_top_line(cls, l: list[str]):
@@ -180,6 +184,7 @@ class Exclusion:
     an: Optional[str] = None
     ao: Optional[str] = None
     ap: Optional[str] = None
+    comment: Optional[str] = field(default=None, compare=False)
 
     @classmethod
     def from_top_line(cls, l: list[str]):
@@ -264,6 +269,7 @@ class Bond:
     c3: Optional[str] = None
     c4: Optional[str] = None
     c5: Optional[str] = None
+    comment: Optional[str] = field(default=None, compare=False)
 
     @classmethod
     def from_top_line(cls, l: list[str]):
@@ -365,7 +371,7 @@ class Pair:
     A class containing pair information as in the pair section of the topology.
 
     From gromacs topology:
-    ; ai aj funct c0 c1 c2 c3
+    ; ai aj funct c0 c1 c2 c3 ; comment
     """
 
     ai: str
@@ -375,6 +381,7 @@ class Pair:
     c1: Optional[str] = None
     c2: Optional[str] = None
     c3: Optional[str] = None
+    comment: Optional[str] = field(default=None, compare=False)
 
     @classmethod
     def from_top_line(cls, l: list[str]):
@@ -408,6 +415,7 @@ class Angle:
     c1: Optional[str] = None
     c2: Optional[str] = None
     c3: Optional[str] = None
+    comment: Optional[str] = field(default=None, compare=False)
 
     @classmethod
     def from_top_line(cls, l: list[str]):
@@ -487,6 +495,7 @@ class Dihedral:
     c3: Optional[str] = None
     c4: Optional[str] = None
     c5: Optional[str] = None
+    comment: Optional[str] = field(default=None, compare=False)
 
     @classmethod
     def from_top_line(cls, l: list[str]):
