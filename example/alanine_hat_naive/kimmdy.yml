@@ -9,6 +9,7 @@ top: 'Ala_out.top'
 gro: 'npt.gro'
 ndx: 'index.ndx'
 kmc: rfkmc
+# kmc: dummy_first
 mds:
   equilibrium:
     mdp: 'md.mdp'
