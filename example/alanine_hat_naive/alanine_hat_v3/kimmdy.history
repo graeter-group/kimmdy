@@ -1,0 +1,142 @@
+KIMMDY task file history
+Filepaths in the output directory are shortened to be relative to the output directory.
+
+Task: 0_setup
+Input:
+Output:
+  top: 0_setup/Ala_out.top
+  gro: 0_setup/npt.gro
+  residuetypes.dat: 0_setup/residuetypes.dat
+  ff: 0_setup/amber99sb-star-ildnp.ff
+
+Task: 1_equilibrium
+Input:
+  top: 0_setup/Ala_out.top
+  gro: 0_setup/npt.gro
+  mdp: /home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/md.mdp
+  ndx: /home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/index.ndx
+Output:
+  trr: 1_equilibrium/equilibrium.trr
+  cpt: 1_equilibrium/equilibrium.cpt
+  xtc: 1_equilibrium/equilibrium.xtc
+  residuetypes.dat: 1_equilibrium/residuetypes.dat
+  gro: 1_equilibrium/equilibrium.gro
+  tpr: 1_equilibrium/equilibrium.tpr
+  mdout.mdp: 1_equilibrium/mdout.mdp
+  edr: 1_equilibrium/equilibrium.edr
+  ff: 1_equilibrium/amber99sb-star-ildnp.ff
+
+Task: 2_hat_naive
+Input:
+  gro: 1_equilibrium/equilibrium.gro
+  trr: 1_equilibrium/equilibrium.trr
+Output:
+  residuetypes.dat: 2_hat_naive/residuetypes.dat
+  ff: 2_hat_naive/amber99sb-star-ildnp.ff
+
+Task: 3_decide_recipe
+Input:
+Output:
+  csv: 3_decide_recipe/recipes.csv
+  json: 3_decide_recipe/radicals.json
+  residuetypes.dat: 3_decide_recipe/residuetypes.dat
+  ff: 3_decide_recipe/amber99sb-star-ildnp.ff
+
+Task: 5_relax
+Input:
+  top: 4_apply_recipe/Ala_out_relax.top
+  gro: 1_equilibrium/equilibrium_reaction.gro
+  mdp: /home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/md_slow_growth.mdp
+  ndx: /home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/index.ndx
+  trr: 1_equilibrium/equilibrium_reaction.trr
+Output:
+  trr: 5_relax/relax.trr
+  xtc: 5_relax/relax.xtc
+  residuetypes.dat: 5_relax/residuetypes.dat
+  cpt: 5_relax/relax.cpt
+  gro: 5_relax/relax.gro
+  edr: 5_relax/relax.edr
+  mdout.mdp: 5_relax/mdout.mdp
+  dhdl.xvg: 5_relax/dhdl.xvg
+  tpr: 5_relax/relax.tpr
+  ff: 5_relax/amber99sb-star-ildnp.ff
+
+Task: 4_apply_recipe
+Input:
+  gro: 1_equilibrium/equilibrium.gro
+  xtc: 1_equilibrium/equilibrium.xtc
+Output:
+  gro: 5_relax/relax.gro
+  trr: 5_relax/relax.trr
+  top: 4_apply_recipe/Ala_out.top
+  xtc: 5_relax/relax.xtc
+  txt: 4_apply_recipe/vmd_selection.txt
+  residuetypes.dat: 4_apply_recipe/residuetypes.dat
+  ff: 4_apply_recipe/amber99sb-star-ildnp.ff
+
+Task: 6_equilibrium
+Input:
+  top: 4_apply_recipe/Ala_out.top
+  gro: 5_relax/relax.gro
+  mdp: /home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/md.mdp
+  ndx: /home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/index.ndx
+  trr: 5_relax/relax.trr
+Output:
+  trr: 6_equilibrium/equilibrium.trr
+  cpt: 6_equilibrium/equilibrium.cpt
+  xtc: 6_equilibrium/equilibrium.xtc
+  residuetypes.dat: 6_equilibrium/residuetypes.dat
+  gro: 6_equilibrium/equilibrium.gro
+  tpr: 6_equilibrium/equilibrium.tpr
+  mdout.mdp: 6_equilibrium/mdout.mdp
+  edr: 6_equilibrium/equilibrium.edr
+  ff: 6_equilibrium/amber99sb-star-ildnp.ff
+
+Task: 7_hat_naive
+Input:
+  gro: 6_equilibrium/equilibrium.gro
+  trr: 6_equilibrium/equilibrium.trr
+Output:
+  residuetypes.dat: 7_hat_naive/residuetypes.dat
+  ff: 7_hat_naive/amber99sb-star-ildnp.ff
+
+Task: 8_decide_recipe
+Input:
+Output:
+  csv: 8_decide_recipe/recipes.csv
+  json: 8_decide_recipe/radicals.json
+  residuetypes.dat: 8_decide_recipe/residuetypes.dat
+  ff: 8_decide_recipe/amber99sb-star-ildnp.ff
+
+Task: 10_relax
+Input:
+  top: 9_apply_recipe/Ala_out_relax.top
+  gro: 6_equilibrium/equilibrium_reaction.gro
+  mdp: /home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/md_slow_growth.mdp
+  ndx: /home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/index.ndx
+  trr: 6_equilibrium/equilibrium_reaction.trr
+Output:
+  trr: 10_relax/relax.trr
+  xtc: 10_relax/relax.xtc
+  residuetypes.dat: 10_relax/residuetypes.dat
+  cpt: 10_relax/relax.cpt
+  gro: 10_relax/relax.gro
+  edr: 10_relax/relax.edr
+  mdout.mdp: 10_relax/mdout.mdp
+  dhdl.xvg: 10_relax/dhdl.xvg
+  tpr: 10_relax/relax.tpr
+  ff: 10_relax/amber99sb-star-ildnp.ff
+
+Task: 9_apply_recipe
+Input:
+  gro: 6_equilibrium/equilibrium.gro
+  xtc: 6_equilibrium/equilibrium.xtc
+Output:
+  gro: 10_relax/relax.gro
+  trr: 10_relax/relax.trr
+  top: 9_apply_recipe/Ala_out.top
+  xtc: 10_relax/relax.xtc
+  txt: 9_apply_recipe/vmd_selection.txt
+  residuetypes.dat: 9_apply_recipe/residuetypes.dat
+  ff: 9_apply_recipe/amber99sb-star-ildnp.ff
+

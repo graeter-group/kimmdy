@@ -10,24 +10,83 @@ from kimmdy.parsing import read_top
 from kimmdy.topology.topology import Topology
 from pathlib import Path
 from kimmdy.tools import write_top_as_dot
+import copy
 ```
 
+This is the same reaction that would occur in the naive alanine HAT example (and integration test) if
+if where used with the `dummy_first` kmc method instead of standard `rfkmc`.
 
 ```{python}
 #| eval: true
-ala_top = read_top(Path('../../tests/test_files/test_topology/Ala_R_prm.top'), use_gmx_dir=False)
-top = Topology(ala_top)
+path_a = read_top(Path('../../tests/test_files/test_integration/alanine_hat_naive/Ala_out.top'), use_gmx_dir=False)
+top = Topology(path_a)
+top_a = copy.deepcopy(top)
+top_b = top
 
-write_top_as_dot(top, "ala-top.dot")
+top_b.break_bond(('7', '8'))
+top_b.bind_bond(('8', '9'))
+
+write_top_as_dot(top_a, "ala-top-a.dot")
+write_top_as_dot(top_b, "ala-top-b.dot")
 ```
 
-
+:::{layout-ncol=2}
 ```{dot}
 //| echo: false
 //| label: fig-ala
 //| fig-cap: "A diagram of the Ala topology"
-//| file: ala-top.dot
+//| fig-width: 100%
+//| file: ala-top-a.dot
 ```
+
+```{dot}
+//| echo: false
+//| label: fig-ala
+//| fig-cap: "A diagram of the Ala topology after HAT"
+//| fig-width: 100%
+//| file: ala-top-b.dot
+```
+:::
+
+Or we can look at a different HAT used in the unit tests:
+
+```{python}
+#| eval: true
+path_a = read_top(Path('../../tests/test_files/test_integration/alanine_hat_naive/Ala_out.top'), use_gmx_dir=False)
+top = Topology(path_a)
+
+# move the radical to N16 before we start the reaction
+top.break_bond(("16", "17"))
+top.bind_bond(("9", "17"))
+top_a = copy.deepcopy(top)
+top_b = top
+
+top_b.break_bond(("18", "21"))
+top_b.bind_bond(("16", "21"))
+
+write_top_as_dot(top_a, "ala-top-2-a.dot")
+write_top_as_dot(top_b, "ala-top-2-b.dot")
+```
+
+:::{layout-ncol=2}
+```{dot}
+//| echo: false
+//| label: fig-ala
+//| fig-cap: "A diagram of the Ala topology"
+//| fig-width: 100%
+//| file: ala-top-2-a.dot
+```
+
+```{dot}
+//| echo: false
+//| label: fig-ala
+//| fig-cap: "A diagram of the Ala topology after HAT"
+//| fig-width: 100%
+//| file: ala-top-2-b.dot
+```
+:::
+
+
 
 ## Multiple molecules
 
@@ -37,14 +96,12 @@ urea = Topology(urea_dict)
 write_top_as_dot(urea, "urea-top.dot")
 ```
 
-
 ```{dot}
 //| echo: false
 //| label: fig-ala
 //| fig-cap: "Topology of one molecule of urea"
 //| file: urea-top.dot
 ```
-
 
 When we want to run reactions within molecules that are either
 separate moleculetypes or multiples of the same moleculetype,

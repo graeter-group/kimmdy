@@ -26,9 +26,10 @@ def recipe_steps_from_str(
     if recipe_steps_s.startswith("<") and recipe_steps_s.endswith(">"):
         key, callback = recipe_steps_s.removeprefix("<").removesuffix(">").split(",")
 
-        def dummy_callback(key, i):
+        def dummy_callback(key: str, i: int, t: float) -> list[RecipeStep]:
             _ = key
             _ = i
+            _ = t
             return []
 
         dummy_callback.__name__ = callback
@@ -463,8 +464,16 @@ T = TypeVar("T")
 
 @dataclass
 class DeferredRecipeSteps(Generic[T]):
+    """DeferredRecipeSteps
+
+    Are called by the kimmdy runmanager if the recipe is chosen.
+    The callback is given the chosen key (generic over type T) as well
+    as the index into the rates (and time ranges for said rates) and
+    the time in ps at which the reaction occurs.
+    """
+
     key: T
-    callback: Callable[[T, int], list[RecipeStep]]
+    callback: Callable[[T, int, float], list[RecipeStep]]
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, DeferredRecipeSteps):
@@ -582,30 +591,27 @@ class Recipe:
     def get_recipe_name(self):
         if isinstance(self.recipe_steps, DeferredRecipeSteps):
             return f"DeferredRecipeSteps({self.recipe_steps.key}, {self.recipe_steps.callback.__name__})"
-        name = ""
+        name = "(1-based top IDs)"
         for rs in self.recipe_steps:
             name += " "
             if isinstance(rs, Place):
-                if (ix := getattr(rs, "ix_to_place", None)) is not None:
-                    name += str(ix)
+                if (id := getattr(rs, "id_to_place", None)) is not None:
+                    name += id
                     name += "\u27A1"  # ➡
             elif isinstance(rs, Bind):
-                if (ix := getattr(rs, "atom_ix_1", None)) is not None:
-                    name += str(ix)
+                if (id := getattr(rs, "atom_id_1", None)) is not None:
+                    name += id
                     name += "\u27A1"  # ➡
-                if (ix := getattr(rs, "atom_ix_2", None)) is not None:
-                    name += str(ix)
-
+                if (id := getattr(rs, "atom_id_2", None)) is not None:
+                    name += id
             elif isinstance(rs, Break):
-                if (ix := getattr(rs, "atom_ix_1", None)) is not None:
-                    name += str(ix)
+                if (id := getattr(rs, "atom_id_1", None)) is not None:
+                    name += id
                     name += "\u26A1"  # ➡
-                if (ix := getattr(rs, "atom_ix_2", None)) is not None:
-                    name += str(ix)
-
+                if (id := getattr(rs, "atom_id_2", None)) is not None:
+                    name += id
             elif isinstance(rs, Relax):
                 pass
-
             elif isinstance(rs, CustomTopMod):
                 name += "f"
 

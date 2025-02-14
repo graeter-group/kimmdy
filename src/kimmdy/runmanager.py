@@ -79,7 +79,10 @@ IGNORE_SUBSTR = [
     "_prev.cpt$",
     r"step\d+[bc]\.pdb$",
     r"\.tail$",
-    r"_mod\.top$",
+    r"_relax\.top$",
+    r"_before_with_solvent_bonds\.top$",
+    r"_before\.top$",
+    r"_after\.top$",
     r"\.\d+#$",
     r"\.log$",
     "rotref",
@@ -223,6 +226,7 @@ class RunManager:
             radicals=getattr(self.config, "radicals", None),
             residuetypes_path=getattr(self.config, "residuetypes", None),
             reactive_nrexcl=nrexcl,
+            gromacs_alias=self.config.gromacs_alias,
         )
         self.filehist: list[dict[str, TaskFiles]] = [
             {"0_setup": TaskFiles(self.get_latest)}
@@ -701,9 +705,9 @@ class RunManager:
         logger.info("Writing initial topology after parsing")
 
         if self.config.parameterize_at_setup:
-            focus_nrs = set(self.top.atoms.keys())
+            self.top.parameterization_focus_ids = set(self.top.atoms.keys())
             self.top.needs_parameterization = True
-            self.top.update_parameters(focus_nrs)
+            self.top.update_parameters()
 
         write_top(self.top.to_dict(), files.outputdir / self.config.top.name)
         files.output["top"] = files.outputdir / self.config.top.name
@@ -741,6 +745,7 @@ class RunManager:
         files.input["mdp"] = md_config.mdp
         mdp = files.input["mdp"]
         ndx = files.input["ndx"]
+        logger.debug(f"Using the following input files: top: {top}, gro: {gro}")
 
         outputdir = files.outputdir
 
@@ -802,6 +807,13 @@ class RunManager:
         except CalledProcessError as e:
             write_time_marker(files.outputdir / MARK_FAILED, "failed")
             logger.error(f"Error occured during MD {instance}:\n{e}")
+
+            # TODO: debug
+            # attempt to write out the first frame as gro
+            # for easier debugging in VMD
+            dump_cmd = rf"echo '0\n' | {gmx_alias} trjconv -s {instance}.tpr -f {instance}.xtc -dump 0 -o {instance}_start.gro"
+            run_gmx(dump_cmd, outputdir)
+
             raise e
 
         logger.info(f"Done with MD {instance}")
@@ -917,10 +929,11 @@ class RunManager:
             return files
 
         # Correct the offset of time_start_index by the concatenation
-        # of all recipes from all reactions back onto the offset
+        # of all rates of all recipes from all reactions back onto the offset
         # within the one chosen reaction plugin
         n_recipes_per_plugin = [
-            len(v.recipes) for v in self.recipe_collections.values()
+            sum([len(r.rates) for r in v.recipes])
+            for v in self.recipe_collections.values()
         ]
         logger.info(f"Plugins: {[k for k in self.recipe_collections.keys()]}")
         logger.info(f"Number of recipes per reaction plugin: {n_recipes_per_plugin}")
@@ -999,10 +1012,10 @@ class RunManager:
                 f"Steps of recipe where deferred, calling callback with key {recipe.recipe_steps.key} and time_index {plugin_time_index}"
             )
             recipe.recipe_steps = recipe.recipe_steps.callback(
-                recipe.recipe_steps.key, plugin_time_index
+                recipe.recipe_steps.key, plugin_time_index, ttime
             )
             logger.info(
-                f"Got {len(recipe.recipe_steps)} in recipe {recipe.get_recipe_name()}"
+                f"Got {len(recipe.recipe_steps)} steps in recipe {recipe.get_recipe_name()}"
             )
         else:
             m = f"Recipe steps of {recipe} are neither a list nor a DeferredRecipeSteps object."
@@ -1043,11 +1056,9 @@ class RunManager:
             self.latest_files["trr"] = files.output["trr"]
 
         top_initial = deepcopy(self.top)
-        focus_nrs: set[str] = set()
         for step in recipe.recipe_steps:
             if isinstance(step, Break):
                 self.top.break_bond((step.atom_id_1, step.atom_id_2))
-                focus_nrs.update([step.atom_id_1, step.atom_id_2])
                 if hasattr(self.config, "plumed"):
                     break_bond_plumed(
                         files,
@@ -1056,7 +1067,6 @@ class RunManager:
                     )
             elif isinstance(step, Bind):
                 self.top.bind_bond((step.atom_id_1, step.atom_id_2))
-                focus_nrs.update([step.atom_id_1, step.atom_id_2])
             elif isinstance(step, Place):
                 relax_task = Task(
                     self,
@@ -1069,8 +1079,7 @@ class RunManager:
                     self._discover_output_files(relax_task.name, place_files)
                     shadow_files_binding = place_files
                 if step.id_to_place is not None:
-                    focus_nrs.update([step.id_to_place])
-
+                    self.top.parameterization_focus_ids.update([step.id_to_place])
             elif isinstance(step, Relax):
                 logger.info("Starting relaxation md as part of reaction..")
                 if not hasattr(self.config.changer.coordinates, "md"):
@@ -1078,8 +1087,21 @@ class RunManager:
                     continue
 
                 if self.config.changer.coordinates.slow_growth:
-                    # Create a temporary slow growth topology for sub-task run_md, afterwards, top will be reset properly
-                    self.top.update_parameters(focus_nrs)
+                    # Create a temporary slow growth topology for sub-task run_md, afterwards, top will be reset properly.
+
+                    self.top.update_parameters()
+
+                    # write out original topology (topA) and target (topB) for easier debugging
+                    write_top(
+                        top_initial.to_dict(),
+                        files.outputdir
+                        / self.config.top.name.replace(".top", "_before.top"),
+                    )
+                    write_top(
+                        self.top.to_dict(),
+                        files.outputdir
+                        / self.config.top.name.replace(".top", "_after.top"),
+                    )
 
                     # top_initial is still the topology before the reaction
                     # we need to do some (temporary) changes to it to stabilize
@@ -1087,7 +1109,7 @@ class RunManager:
                     # First we find out if there are solvent atoms among the involved atoms
                     solvent_atoms: set[str] = set()
                     logger.debug(f"Checking for reacting solvent residues..")
-                    for ai in focus_nrs:
+                    for ai in self.top.parameterization_focus_ids:
                         if top_initial.atoms[ai].residue == "SOL":
                             solvent_atoms.add(ai)
                             logger.debug(
@@ -1120,24 +1142,37 @@ class RunManager:
                             b2 = top_initial.bonds.get((ow.nr, hw2.nr))
                             logger.info(f"Added bonds: {b1}, {b2}")
 
+                    write_top(
+                        top_initial.to_dict(),
+                        files.outputdir
+                        / self.config.top.name.replace(
+                            ".top", "_before_with_solvent_bonds.top"
+                        ),
+                    )
+
                     top_merge = merge_top_slow_growth(
-                        # topA was copied before parameters are updated
-                        topA=top_initial,
-                        # topB is parameterized for after the reaction
-                        topB=deepcopy(self.top),
-                        morph_pairs=self.config.changer.coordinates.slow_growth_pairs,
+                        # top_a was copied before parameters are updated
+                        top_a=top_initial,
+                        # top_b is parameterized for after the reaction
+                        # top_b is modified and returned as the merged top
+                        # hence it must be copied here to not modify self.top
+                        top_b=deepcopy(self.top),
+                        use_pairs=self.config.changer.coordinates.slow_growth_pairs,
+                        use_simplified=self.config.changer.coordinates.use_simplified_slow_growth,
                     )
                     top_merge_path = files.outputdir / self.config.top.name.replace(
-                        ".", "_mod."
+                        ".top", "_relax.top"
                     )
                     write_top(top_merge.to_dict(), top_merge_path)
+                    # declare this temporary topolgy the latest topology
+                    # such that it will be used for the subsequent relax md task
                     self.latest_files["top"] = top_merge_path
-                instance = self.config.changer.coordinates.md
+                md_instance = self.config.changer.coordinates.md
                 relax_task = Task(
                     self,
                     f=self._run_md,
-                    kwargs={"instance": instance},
-                    out=instance,
+                    kwargs={"instance": md_instance},
+                    out=md_instance,
                 )
                 relax_task_files = relax_task()
                 if relax_task_files is not None:
@@ -1147,11 +1182,12 @@ class RunManager:
             elif isinstance(step, CustomTopMod):
                 step.f(self.top)
 
+        logger.info(f"Updating partial charges")
         self.top.update_partial_charges(recipe.recipe_steps)
-        self.top.update_parameters(focus_nrs)
+        self.top.update_parameters()
 
         # this is the new topology after the reaction
-        # not the tempoary topology top_mod for slow_growth
+        # not the temporay topology <name>_relax.top for slow_growth
         write_top(self.top.to_dict(), files.outputdir / self.config.top.name)
         files.output["top"] = files.outputdir / self.config.top.name
 
