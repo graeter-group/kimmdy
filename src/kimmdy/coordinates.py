@@ -183,21 +183,24 @@ class MoleculeTypeMerger:
         mol_a: MoleculeType,
         mol_b: MoleculeType,
         ff: FF,
-        enable_morph_pairs: bool,
+        use_pairs: bool,
+        use_simplified: bool,
     ) -> None:
         self.mol_a = mol_a
         self.mol_b = mol_b
         self.ff = ff
-        self.enable_morph_pairs = enable_morph_pairs
+        if use_simplified:
+            use_pairs = False
+        self.use_pairs = use_pairs
+        self.use_simplified = use_simplified
         self.default_morse_well_depth = 300  # [kJ mol^-1]
         self.default_beta_for_lj = 19  # matches LJ steepness
-        self.stateA_morse_dist_factor = 1.12  # sigmaij* 1.12 = LJ minimum
-        self.stateB_morse_dist_factor = 1.12  # sigmaij* 1.12 = LJ minimum
+        self.default_morse_dist_factor = 1.12  # sigmaij* 1.12 = LJ minimum
         logger.info(
             f"Using default morse well depth of {self.default_morse_well_depth} and beta of {self.default_beta_for_lj}"
         )
         logger.info(
-            f"Using default morse distance factor of {self.stateA_morse_dist_factor}"
+            f"Using default morse distance factor of {self.default_morse_dist_factor}"
         )
 
         self.affected_interactions = AffectedInteractions()
@@ -209,8 +212,16 @@ class MoleculeTypeMerger:
         self.merge_bonds()
         self.merge_angles()
         self.merge_dihedrals()
-        self.merge_pairs()
-        self.add_helper_pairs()
+
+        if self.use_pairs:
+            self.merge_pairs()
+            self.add_helper_pairs()
+        else:
+            # same as in (keysA - keysB) in v1
+            for key in self.affected_interactions.bonds.removed:
+                self.mol_b.pairs.pop(key, None)
+                self.mol_b.exclusions[key] = Exclusion(*key)
+
         self.mol_b.find_radicals()
         return self.mol_b
 
@@ -625,19 +636,32 @@ class MoleculeTypeMerger:
                 )
             elif isinstance(bond_a, (Bond, BondType)):
                 # bond only exists in A -> vanish bond
-                self.mol_b.bonds[bond_key] = Bond(
-                    *bond_key,
-                    funct=FFFUNC["morse_bond"],
-                    c0=bond_a.c0,  # original bond distance in A
-                    c1=f"{depth_a:.5f}",  # original well depth in A
-                    c2=f"{beta_a:.5f}",  # original steepness in A
-                    c3=f"{bond_a.c0}",  # new r0 in B (=stays the same, because bond vanishes anyways)
-                    c4=f"{0.0:.5f}",  # well depth goes to 0
-                    c5=f"{self.default_beta_for_lj:.5f}",  # default beta for LJ
-                    comment=f"; vanishing bond from morse to nothing",
-                )
                 pairkey = to_pairkey(bond_key)
                 self.affected_interactions.bonds.removed.add(pairkey)
+                if self.use_simplified:
+                    self.mol_b.bonds[bond_key] = Bond(
+                        *bond_key,
+                        funct=FFFUNC["morse_bond"],
+                        c0=bond_a.c0,  # original bond distance in A
+                        c1=f"{depth_a:.5f}",  # original well depth in A
+                        c2=f"{beta_a:.5f}",  # original steepness in A
+                        c3=f"{self.default_morse_dist_factor*sigmaij_b}",  # r0 goes to eq distance for LJ
+                        c4=f"{epsilonij_b:.5f}",  # well depth is epsilon
+                        c5=f"{self.default_beta_for_lj:.5f}",  # default beta for LJ
+                        comment=f"; vanishing bond from morse to LJ",
+                    )
+                else:
+                    self.mol_b.bonds[bond_key] = Bond(
+                        *bond_key,
+                        funct=FFFUNC["morse_bond"],
+                        c0=bond_a.c0,  # original bond distance in A
+                        c1=f"{depth_a:.5f}",  # original well depth in A
+                        c2=f"{beta_a:.5f}",  # original steepness in A
+                        c3=f"{bond_a.c0}",  # new r0 in B (=stays the same, because bond vanishes anyways)
+                        c4=f"{0.0:.5f}",  # well depth goes to 0
+                        c5=f"{self.default_beta_for_lj:.5f}",  # default beta for LJ
+                        comment=f"; vanishing bond from morse to nothing",
+                    )
 
             elif isinstance(bond_b, (Bond, BondType)):
                 # bond only exists in B -> create bond
@@ -645,20 +669,34 @@ class MoleculeTypeMerger:
                     m = f"epsilonij_a is 0 for {bond_key}"
                     logger.error(m)
                     raise ValueError(m)
-                self.mol_b.bonds[bond_key] = Bond(
-                    *bond_key,
-                    funct=FFFUNC["morse_bond"],
-                    # starts further away, so it can pull in atoms of the bond
-                    c0=f"{sigmaij_a*self.stateA_morse_dist_factor:.5f}",  # sigmaij* 1.12 = LJ minimum at lambda 0, where the atom types are still from A
-                    c1=f"{0.0:.5f}",  # well depth from 0
-                    c2=f"{0.0:.5f}",  # beta from 0 = flat
-                    c3=bond_b.c0,  # final bond distance
-                    c4=f"{depth_b:.5f}",  # final well depth
-                    c5=f"{beta_b:.5f}",  # final steepness (beta)
-                    comment=f"; creating bond from nothing to morse",
-                )
                 pairkey = to_pairkey(bond_key)
                 self.affected_interactions.bonds.added.add(pairkey)
+                if self.use_simplified:
+                    self.mol_b.bonds[bond_key] = Bond(
+                        *bond_key,
+                        funct=FFFUNC["morse_bond"],
+                        # starts further away, so it can pull in atoms of the bond
+                        c0=f"{sigmaij_a*self.default_morse_dist_factor:.5f}",  # sigmaij* 1.12 = LJ minimum at lambda 0, where the atom types are still from A
+                        c1=f"{self.default_morse_well_depth:.5f}",  # well depth from default well depth
+                        c2=f"{self.default_beta_for_lj:.5f}",  # beta from default beta for LJ
+                        c3=bond_b.c0,  # final bond distance
+                        c4=f"{depth_b:.5f}",  # final well depth
+                        c5=f"{beta_b:.5f}",  # final steepness (beta)
+                        comment=f"; creating bond from LJ to morse",
+                    )
+                else:
+                    self.mol_b.bonds[bond_key] = Bond(
+                        *bond_key,
+                        funct=FFFUNC["morse_bond"],
+                        # starts further away, so it can pull in atoms of the bond
+                        c0=f"{sigmaij_a*self.default_morse_dist_factor:.5f}",  # sigmaij* 1.12 = LJ minimum at lambda 0, where the atom types are still from A
+                        c1=f"{0.0:.5f}",  # well depth from 0
+                        c2=f"{0.0:.5f}",  # beta from 0 = flat
+                        c3=bond_b.c0,  # final bond distance
+                        c4=f"{depth_b:.5f}",  # final well depth
+                        c5=f"{beta_b:.5f}",  # final steepness (beta)
+                        comment=f"; creating bond from nothing to morse",
+                    )
 
     def merge_angles(self):
         keys = set(self.mol_a.angles.keys()) | set(self.mol_b.angles.keys())
@@ -866,9 +904,6 @@ class MoleculeTypeMerger:
 
     def merge_pairs(self):
         """Merge pairs that are from the respective pairs sections of the topologies"""
-        if not self.enable_morph_pairs:
-            return
-
         new_pairs = {}
         keys = set(self.mol_a.pairs.keys()) | set(self.mol_b.pairs.keys())
         for key in keys:
@@ -930,9 +965,6 @@ class MoleculeTypeMerger:
         exclusion once bound. If a bond is breaking, the pair interaction
         is slowly turned on, as it was excluded previously.
         """
-        if not self.enable_morph_pairs:
-            return
-
         # pairs that stem from bonds breaking or forming
         # collected by looking at the changing bonds, angles and dihedrals (=higher order interactions)
         self.helper_pairs: dict[tuple[str, str], Pair] = {}
@@ -1090,7 +1122,7 @@ class MoleculeTypeMerger:
 
 
 def merge_top_slow_growth(
-    top_a: Topology, top_b: Topology, enable_morph_pairs: bool
+    top_a: Topology, top_b: Topology, use_pairs: bool, use_simplified: bool
 ) -> Topology:
     """Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation.
     Modifies topB in place.
@@ -1101,7 +1133,8 @@ def merge_top_slow_growth(
         mol_a=top_a.moleculetypes[REACTIVE_MOLECULEYPE],
         mol_b=top_b.moleculetypes[REACTIVE_MOLECULEYPE],
         ff=top_b.ff,
-        enable_morph_pairs=enable_morph_pairs,
+        use_pairs=use_pairs,
+        use_simplified=use_simplified,
     ).merge()
     return top_b
 

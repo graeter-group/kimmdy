@@ -1,0 +1,144 @@
+
+            Task: setup with output directory: /home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/0_setup
+            Task: setup, input:
+{}
+            Task: setup, output:
+{'0_setup.log': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/0_setup/0_setup.log'),
+ 'ff': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/0_setup/amber99sb-star-ildnp.ff'),
+ 'top': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/0_setup/Ala_out.top')}
+            
+            Task: run_md with output directory: /home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/1_equilibrium
+            Task: run_md, input:
+{'gro': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/npt.gro'),
+ 'mdp': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/md.mdp'),
+ 'ndx': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/index.ndx'),
+ 'top': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/0_setup/Ala_out.top')}
+            Task: run_md, output:
+{'1_equilibrium.log': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/1_equilibrium/1_equilibrium.log'),
+ 'cpt': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/1_equilibrium/equilibrium.cpt'),
+ 'edr': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/1_equilibrium/equilibrium.edr'),
+ 'equilibrium.log': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/1_equilibrium/equilibrium.log'),
+ 'ff': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/1_equilibrium/amber99sb-star-ildnp.ff'),
+ 'gro': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/1_equilibrium/equilibrium.gro'),
+ 'mdout.mdp': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/1_equilibrium/mdout.mdp'),
+ 'tpr': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/1_equilibrium/equilibrium.tpr'),
+ 'trr': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/1_equilibrium/equilibrium.trr'),
+ 'xtc': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/1_equilibrium/equilibrium.xtc')}
+            
+            Task: query_reaction with output directory: /home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/2_hat_naive
+            Task: query_reaction, input:
+{'gro': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/1_equilibrium/equilibrium.gro'),
+ 'trr': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/1_equilibrium/equilibrium.trr')}
+            Task: query_reaction, output:
+{'2_hat_naive.log': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/2_hat_naive/2_hat_naive.log'),
+ 'ff': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/2_hat_naive/amber99sb-star-ildnp.ff')}
+            
+            Task: decide_recipe with output directory: /home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/3_decide_recipe
+            Task: decide_recipe, input:
+{}
+            Task: decide_recipe, output:
+{'3_decide_recipe.log': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/3_decide_recipe/3_decide_recipe.log'),
+ 'csv': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/3_decide_recipe/recipes.csv'),
+ 'ff': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/3_decide_recipe/amber99sb-star-ildnp.ff'),
+ 'json': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/3_decide_recipe/radicals.json'),
+ 'svg': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/3_decide_recipe/reaction_rates.svg')}
+            
+            Task: run_md with output directory: /home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/5_relax
+            Task: run_md, input:
+{'gro': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/1_equilibrium/equilibrium.gro'),
+ 'mdp': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/md_slow_growth.mdp'),
+ 'ndx': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/index.ndx'),
+ 'top': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/4_apply_recipe/Ala_out_mod.top'),
+ 'trr': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/1_equilibrium/equilibrium.trr')}
+            Task: run_md, output:
+{'5_relax.log': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/5_relax/5_relax.log'),
+ 'cpt': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/5_relax/relax.cpt'),
+ 'dhdl.xvg': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/5_relax/dhdl.xvg'),
+ 'edr': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/5_relax/relax.edr'),
+ 'ff': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/5_relax/amber99sb-star-ildnp.ff'),
+ 'gro': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/5_relax/relax.gro'),
+ 'mdout.mdp': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/5_relax/mdout.mdp'),
+ 'relax.log': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/5_relax/relax.log'),
+ 'tpr': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/5_relax/relax.tpr'),
+ 'trr': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/5_relax/relax.trr'),
+ 'xtc': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/5_relax/relax.xtc')}
+            
+            Task: apply_recipe with output directory: /home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/4_apply_recipe
+            Task: apply_recipe, input:
+{'edr': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/1_equilibrium/equilibrium.edr'),
+ 'gro': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/1_equilibrium/equilibrium.gro'),
+ 'trr': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/1_equilibrium/equilibrium.trr'),
+ 'xtc': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/1_equilibrium/equilibrium.xtc')}
+            Task: apply_recipe, output:
+{'4_apply_recipe.log': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/4_apply_recipe/4_apply_recipe.log'),
+ 'ff': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/4_apply_recipe/amber99sb-star-ildnp.ff'),
+ 'top': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/4_apply_recipe/Ala_out.top')}
+            
+            Task: run_md with output directory: /home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/6_equilibrium
+            Task: run_md, input:
+{'gro': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/5_relax/relax.gro'),
+ 'mdp': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/md.mdp'),
+ 'ndx': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/index.ndx'),
+ 'top': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/4_apply_recipe/Ala_out.top'),
+ 'trr': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/5_relax/relax.trr')}
+            Task: run_md, output:
+{'6_equilibrium.log': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/6_equilibrium/6_equilibrium.log'),
+ 'cpt': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/6_equilibrium/equilibrium.cpt'),
+ 'edr': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/6_equilibrium/equilibrium.edr'),
+ 'equilibrium.log': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/6_equilibrium/equilibrium.log'),
+ 'ff': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/6_equilibrium/amber99sb-star-ildnp.ff'),
+ 'gro': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/6_equilibrium/equilibrium.gro'),
+ 'mdout.mdp': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/6_equilibrium/mdout.mdp'),
+ 'tpr': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/6_equilibrium/equilibrium.tpr'),
+ 'trr': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/6_equilibrium/equilibrium.trr'),
+ 'xtc': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/6_equilibrium/equilibrium.xtc')}
+            
+            Task: query_reaction with output directory: /home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/7_hat_naive
+            Task: query_reaction, input:
+{'gro': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/6_equilibrium/equilibrium.gro'),
+ 'trr': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/6_equilibrium/equilibrium.trr')}
+            Task: query_reaction, output:
+{'7_hat_naive.log': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/7_hat_naive/7_hat_naive.log'),
+ 'ff': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/7_hat_naive/amber99sb-star-ildnp.ff')}
+            
+            Task: decide_recipe with output directory: /home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/8_decide_recipe
+            Task: decide_recipe, input:
+{}
+            Task: decide_recipe, output:
+{'8_decide_recipe.log': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/8_decide_recipe/8_decide_recipe.log'),
+ 'csv': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/8_decide_recipe/recipes.csv'),
+ 'ff': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/8_decide_recipe/amber99sb-star-ildnp.ff'),
+ 'json': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/8_decide_recipe/radicals.json'),
+ 'svg': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/8_decide_recipe/reaction_rates.svg')}
+            
+            Task: run_md with output directory: /home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/10_relax
+            Task: run_md, input:
+{'gro': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/6_equilibrium/equilibrium.gro'),
+ 'mdp': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/md_slow_growth.mdp'),
+ 'ndx': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/index.ndx'),
+ 'top': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/9_apply_recipe/Ala_out_mod.top'),
+ 'trr': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/6_equilibrium/equilibrium.trr')}
+            Task: run_md, output:
+{'10_relax.log': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/10_relax/10_relax.log'),
+ 'cpt': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/10_relax/relax.cpt'),
+ 'dhdl.xvg': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/10_relax/dhdl.xvg'),
+ 'edr': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/10_relax/relax.edr'),
+ 'ff': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/10_relax/amber99sb-star-ildnp.ff'),
+ 'gro': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/10_relax/relax.gro'),
+ 'mdout.mdp': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/10_relax/mdout.mdp'),
+ 'relax.log': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/10_relax/relax.log'),
+ 'tpr': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/10_relax/relax.tpr'),
+ 'trr': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/10_relax/relax.trr'),
+ 'xtc': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/10_relax/relax.xtc')}
+            
+            Task: apply_recipe with output directory: /home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/9_apply_recipe
+            Task: apply_recipe, input:
+{'edr': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/6_equilibrium/equilibrium.edr'),
+ 'gro': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/6_equilibrium/equilibrium.gro'),
+ 'trr': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/6_equilibrium/equilibrium.trr'),
+ 'xtc': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/6_equilibrium/equilibrium.xtc')}
+            Task: apply_recipe, output:
+{'9_apply_recipe.log': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/9_apply_recipe/9_apply_recipe.log'),
+ 'ff': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/9_apply_recipe/amber99sb-star-ildnp.ff'),
+ 'top': PosixPath('/home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_005/9_apply_recipe/Ala_out.top')}
+            

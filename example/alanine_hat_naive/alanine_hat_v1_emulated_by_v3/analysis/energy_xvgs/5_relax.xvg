@@ -1,0 +1,30 @@
+# This file was created Fri Feb 14 15:35:31 2025
+# Created by:
+#          :-) GROMACS - gmx energy, 2024.3-dev-20240612-c7cf7c6af4 (-:
+# 
+# Executable:   /usr/local/gromacs/bin/gmx
+# Data prefix:  /usr/local/gromacs
+# Working dir:  /home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_v1_emulated_by_v3
+# Command line:
+#   gmx energy -f /home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_v1_emulated_by_v3/5_relax/relax.edr -o /home/jannik/phd/kimmdy-examples/deps/kimmdy/example/alanine_hat_naive/alanine_hat_v1_emulated_by_v3/analysis/energy_xvgs/5_relax.xvg
+# gmx energy is part of G R O M A C S:
+#
+# Good gRace! Old Maple Actually Chews Slate
+#
+@    title "GROMACS Energies"
+@    xaxis  label "Time (ps)"
+@    yaxis  label "(kJ/mol)"
+@TYPE xy
+@ view 0.15, 0.15, 0.75, 0.85
+@ legend on
+@ legend box on
+@ legend loctype view
+@ legend 0.78, 0.8
+@ legend length 2
+@ s0 legend "LJ-14"
+@ s1 legend "Coulomb-14"
+@ s2 legend "LJ (SR)"
+@ s3 legend "Coulomb (SR)"
+@ s4 legend "Coul. recip."
+@ s5 legend "Potential"
+    0.000000   15.558640  198.159378  3534.922119  -27405.921875  156.923904  -21792.285156
