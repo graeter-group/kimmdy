@@ -432,6 +432,13 @@ def write_coordinate_files_at_reaction_time(files: TaskFiles, time: float):
     # It should have more frames and be smaller,
     # but sometimes the people only write a specific index group to the xtc,
     # in which case it fails and we try the trr
+    #FIXME: fixme
+    # this needs proper documetation for plugin authors
+    # because one would want the trr file for the precision and velocities
+    # at the raction time, but plugins may use the xtc file (smaller)
+    # to determine the reaction and reaction time.
+    # this can lead to a mismatch!
+    wrote_file = False
     if files.input["xtc"] is not None:
         try:
             run_gmx(
@@ -443,7 +450,7 @@ def write_coordinate_files_at_reaction_time(files: TaskFiles, time: float):
             logger.info(
                 f"Successfully wrote out gro/trr file {gro_reaction.name}/{trr_reaction.name} at reaction time in {gro.parent.name} from xtc file."
             )
-            return
+            wrote_file = True
         except sp.CalledProcessError:
             logger.error(
                 f"Failed to write out gro/trr file {gro_reaction.name}/{trr_reaction.name} at reaction time in {gro.parent.name} from xtc file because the xtc doesn't contain all atoms. Will try trr file."
@@ -459,14 +466,15 @@ def write_coordinate_files_at_reaction_time(files: TaskFiles, time: float):
             logger.info(
                 f"Successfully wrote out gro/trr file at reaction time in {gro.parent} from trr file."
             )
-            return
+            wrote_file = True
         except sp.CalledProcessError:
             logger.error(
                 f"Failed to write out gro/trr file at reaction time in {gro.parent} from trr file."
             )
-    m = f"No trajectory file found to write out gro/trr file at reaction time in {gro.parent}"
-    logger.error(m)
-    raise FileNotFoundError(m)
+    if not wrote_file:
+        m = f"No trajectory file found to write out gro/trr file at reaction time in {gro.parent}"
+        logger.error(m)
+        raise FileNotFoundError(m)
 
 
 def get_task_directories(dir: Path, tasks: Union[list[str], str] = "all") -> list[Path]:
