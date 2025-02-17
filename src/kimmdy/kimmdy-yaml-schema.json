@@ -329,6 +329,12 @@
               "pytype": "bool",
               "default": true
             },
+            "use_simplified_slow_growth": {
+              "type": "boolean",
+              "description": "Only use bonds that use the morse potential to transition between a bond and a LJ potential and don't handle higher order interactions. This also implies slow_growth_pairs = false.",
+              "pytype": "bool",
+              "default": false
+            },
             "slow_growth": {
               "type": "boolean",
               "description": "Whether the chosen MD step is a slow growth/free-energy simulation",

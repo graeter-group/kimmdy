@@ -1,10 +1,10 @@
 title                   = OPLS Lysozyme NPT equilibration 
 ; Run parameters
 integrator              = md        ; leap-frog integrator
-nsteps                  = 50000      ; 0.002 * 5000 = 10ps 
-dt                      = 0.002     ; 2 fs
+nsteps                  = 20000      ; 0.002 * 5000 = 10ps 
+dt                      = 0.001     ; 2 fs
 ; Output control
-nstenergy               = 100       ; save energies every 200.0 fs
+nstenergy               = 1       ; save energies every 1.0 fs
 nstlog                  = 100       ; update log file every 200.0 fs
 nstxout                 = 500
 nstvout                 = 500

@@ -653,6 +653,8 @@ class Topology:
     Reparametrization is triggerd automatically if `to_dict` is called
     after bonds have changed.
 
+    Also see <https://manual.gromacs.org/current/reference-manual/topologies/topology-file-formats.html#topology-file>
+
     Assumptions:
 
     - the topology of interest (the Reactive moleculetype) consists of the first moleculetypes (non-solvent).
@@ -909,6 +911,7 @@ class Topology:
                 return None
 
         subsections = section["subsections"]
+        section["content"] = [[name, moleculetype.nrexcl]]
         for k in list(subsections.keys()):
             v = subsections[k]
             condition = v.get("condition")
