@@ -21,6 +21,21 @@ ATOM_ID_FIELDS = {
     "dihedral_restraints": [0, 1, 2, 3],
 }
 
+# from gmx data dir
+DEFAULT_EDISSOC: dict[tuple[str, str], float] = {  # type: ignore
+    tuple(sorted(list(k))): v
+    for k, v in {
+        ("C", "N"): 500.0,
+        ("CA", "C"): 341.0,
+        ("CA", "N"): 379.0,
+        ("CA", "CB"): 400.0,
+        ("CB", "CG"): 400.0,
+        ("CG", "CD"): 400.0,
+        ("CD", "CE"): 400.0,
+        ("CE", "NZ"): 400.0,
+    }.items()
+}
+
 # see https://manual.gromacs.org/current/reference-manual/topologies/topology-file-formats.html
 FFFUNC = {
     "mult_proper_dihedral": "9",

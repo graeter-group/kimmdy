@@ -4,7 +4,10 @@ integrator              = md        ; leap-frog integrator
 nsteps                  = 20000     ; = 20ps
 dt                      = 0.001     ; 1 fs
 ; Output control
-nstenergy               = 100       ; save energies every 200.0 fs
+nstenergy               = 1       ; save energies every 1.0 fs
+
+energygrps = Protein Water
+
 nstlog                  = 100       ; update log file every 200.0 fs
 nstxout                 = 500
 nstvout                 = 500
@@ -44,9 +47,10 @@ pbc                     = xyz       ; 3-D PBC
 DispCorr                = EnerPres  ; account for cut-off vdW scheme
 ; Velocity generation
 gen_vel                 = no        ; Velocity generation is off 
+
 ; free-energy parameters
 free-energy             = yes
 init-lambda             = 0.0
-delta-lambda            = 0.00005		; should be 1/nsteps
+delta-lambda            = 0.00005 ; should be 1/nsteps
 separate-dhdl-file      = yes
 nstdhdl                 = 100 
