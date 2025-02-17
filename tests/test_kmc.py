@@ -207,7 +207,7 @@ def test_compare_extrande_extrande_mod(recipe_collection):
     assert abs(ext_rs.mean() - extmod_rs.mean()) < 0.002
 
 
-def test_total_index_to_index_within_plugin():
+def test_total_index_to_index_within_plugin_for_multiple_plugins():
     ns = [3, 2, 4, 1]
     assert total_index_to_index_within_plugin(0, ns) == 0
     assert total_index_to_index_within_plugin(1, ns) == 1
@@ -215,3 +215,10 @@ def test_total_index_to_index_within_plugin():
     assert total_index_to_index_within_plugin(3, ns) == 0
     assert total_index_to_index_within_plugin(4, ns) == 1
     assert total_index_to_index_within_plugin(5, ns) == 0
+
+
+def test_total_index_to_index_within_plugin_for_one_plugin():
+    ns = [5]
+    assert total_index_to_index_within_plugin(0, ns) == 0
+    assert total_index_to_index_within_plugin(1, ns) == 1
+    assert total_index_to_index_within_plugin(2, ns) == 2

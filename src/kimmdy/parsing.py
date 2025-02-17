@@ -575,7 +575,7 @@ def read_csv_to_list(csv_file: Path) -> list:
 
 
 ## Miscellaneous files
-def read_edissoc(path: Path) -> dict:
+def read_edissoc(path: Path) -> dict[str, dict[tuple[str, str], float]]:
     """Reads a edissoc file and turns it into a dict.
 
     The dissociation energy is assigned per pair of atom names. Atom names are unique to a residue, and the dict is nested by residues.
@@ -602,7 +602,8 @@ def read_edissoc(path: Path) -> dict:
                 edissocs[key] = {}
             elif len(l.split(sep=";")[0].split()) == 3:
                 at1, at2, edissoc, *_ = l.split()
-                edissocs[key][frozenset([at1, at2])] = float(edissoc)
+                interaction_key = tuple(sorted([at1, at2]))
+                edissocs[key][interaction_key] = float(edissoc)
             elif len(l.strip()) > 0:
                 logger.warning(f"Unexpected line in edissoc file: {l}")
     return edissocs

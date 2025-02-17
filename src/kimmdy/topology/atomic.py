@@ -738,7 +738,10 @@ class ResidueType:
 AtomId = str
 BondId = tuple[str, str]
 AngleId = tuple[str, str, str]
-ProperDihedralId = tuple[str, str, str, str, str]
+DihedralId = tuple[str, str, str, str]
+ProperDihedralId = tuple[
+    str, str, str, str, str
+]  # the complete proper dihedral id also includes the periodicity
 ImproperDihedralId = tuple[str, str, str, str]
 Atomic = Union[Atom, Bond, Pair, Angle, Dihedral]
 AtomicType = Union[AtomType, BondType, AngleType, DihedralType]
