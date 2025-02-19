@@ -132,12 +132,12 @@ def concat_traj(
     else:
         i = 0
     run_shell_cmd(
-        s=rf"echo -e 'Protein\n{output}' | gmx trjconv -dt 0 -f {tmp_xtc} -s {tprs[0]} -o {str(out_xtc)} -center -pbc mol",
+        s=rf"echo -e 'Protein\n{output}' | gmx trjconv -dt 0 -f {tmp_xtc} -s {tprs[i]} -o {str(out_xtc)} -center -pbc mol",
         cwd=run_dir,
     )
     assert out_xtc.exists(), f"Concatenated trajectory {out_xtc} not found."
     run_shell_cmd(
-        rf"echo -e 'Protein\n{output}' | gmx trjconv -dt 0 -dump 0 -f {tmp_xtc} -s {tprs[0]} -o {str(out_gro)} -center -pbc mol",
+        rf"echo -e 'Protein\n{output}' | gmx trjconv -dt 0 -dump 0 -f {tmp_xtc} -s {tprs[i]} -o {str(out_gro)} -center -pbc mol",
         cwd=run_dir,
     )
     run_shell_cmd(f"rm {tmp_xtc}", cwd=run_dir)
