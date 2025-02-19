@@ -8,7 +8,8 @@ ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default
 top: 'Ala_out.top'
 gro: 'npt.gro'
 ndx: 'index.ndx'
-kmc: rfkmc
+# kmc: rfkmc
+kmc: dummy_first
 mds:
   equilibrium:
     mdp: 'md.mdp'
@@ -16,10 +17,10 @@ mds:
     mdp: 'md_slow_growth.mdp'
 changer:
   coordinates:
-    md: 'relax'  
+    md: 'relax'
     slow_growth: True
   topology:
-    parameterization: 'basic'
+    parameterization: grappa
 reactions:
   hat_naive:
     frequency_factor: 100000000
@@ -27,7 +28,6 @@ reactions:
     polling_rate: 1
 
 sequence:
-- equilibrium
 - mult: 2
   tasks:
   - equilibrium

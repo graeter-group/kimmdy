@@ -1,37 +1,59 @@
 """coordinate, topology and plumed modification functions"""
 
+from dataclasses import dataclass, field
+from enum import Enum
 import logging
 from copy import deepcopy
 from pathlib import Path
 from typing import Optional, Union
+from math import sqrt
 
 import MDAnalysis as mda
 import numpy as np
 
-from kimmdy.constants import REACTIVE_MOLECULEYPE, FFFUNC
+from kimmdy.constants import DEFAULT_EDISSOC, REACTIVE_MOLECULEYPE, FFFUNC
 from kimmdy.parsing import read_plumed, write_plumed
 from kimmdy.recipe import Place
 from kimmdy.tasks import TaskFiles
 from kimmdy.topology.atomic import (
     Angle,
+    AngleId,
+    AngleType,
     Bond,
+    BondId,
+    BondType,
     Dihedral,
+    DihedralId,
     DihedralType,
-    InteractionType,
     Pair,
     Exclusion,
-    ImproperDihedralId,
     Interaction,
     AtomicType,
     InteractionTypes,
     MultipleDihedrals,
-    ProperDihedralId,
 )
 from kimmdy.topology.ff import FF
 from kimmdy.topology.topology import MoleculeType, Topology
 from kimmdy.topology.utils import match_atomic_item_to_atomic_type
+from enum import Enum, auto
 
 logger = logging.getLogger(__name__)
+
+
+class PairTransition(Enum):
+    Morph = auto()
+    Create = auto()
+    Vanish = auto()
+
+
+def to_pairkey(key: BondId | AngleId | DihedralId) -> tuple[str, str]:
+    """Turn key into a pair key
+    Takes the key for a higher ordre interaction (bond, angle, dihedral)
+    and from this takes the outermost atoms and returns them as a key for the corresponding
+    pair interaction by sorting them in ascending order.
+    """
+    pairkey: tuple[str, str] = tuple(sorted([key[0], key[-1]], key=int))  # type: ignore
+    return pairkey
 
 
 # coordinates
@@ -87,54 +109,13 @@ def is_parameterized(entry: Interaction):
     return entry.c0 is not None and entry.c1 is not None
 
 
-def get_explicit_MultipleDihedrals(
-    dihedral_key: tuple[str, str, str, str],
-    mol: MoleculeType,
-    dihedrals_in: Optional[MultipleDihedrals],
-    ff: FF,
-    periodicity_max: int = 6,
-) -> Optional[MultipleDihedrals]:
-    """Takes a valid dihedral key and returns explicit
-    dihedral parameters for a given topology
-    """
-    if not dihedrals_in:
-        return None
-
-    if "" not in dihedrals_in.dihedrals.keys():
-        # empty string means implicit parameters
-        return dihedrals_in
-
-    type_key = [mol.atoms[id].type for id in dihedral_key]
-
-    multiple_dihedrals = MultipleDihedrals(
-        *dihedral_key, FFFUNC["mult_proper_dihedral"], {}
-    )
-    for periodicity in range(1, periodicity_max + 1):
-        match_obj = match_atomic_item_to_atomic_type(
-            type_key, ff.proper_dihedraltypes, str(periodicity)
-        )
-        if match_obj:
-            assert isinstance(match_obj, DihedralType)
-            multiple_dihedrals.dihedrals[str(periodicity)] = Dihedral(
-                *dihedral_key,
-                funct=FFFUNC["mult_proper_dihedral"],
-                c0=match_obj.c0,
-                c1=match_obj.c1,
-                periodicity=match_obj.periodicity,
-            )
-
-    if not multiple_dihedrals.dihedrals:
-        return None
-
-    return multiple_dihedrals
-
-
 def get_explicit_or_type(
     key: tuple[str, ...],
     interaction: Optional[Interaction],
     interaction_types: InteractionTypes,
     mol: MoleculeType,
     periodicity: str = "",
+    use_state_b: bool = False,
 ) -> Union[Interaction, AtomicType, None]:
     """Takes an Interaction and associated key, InteractionTypes, Topology
     and Periodicity (for dihedrals) and returns an object with the parameters of this Interaction
@@ -145,148 +126,257 @@ def get_explicit_or_type(
     if is_parameterized(interaction):
         return interaction
 
-    type_key = [mol.atoms[x].type for x in key]
-    match_obj = match_atomic_item_to_atomic_type(
+    if use_state_b:
+        type_key = []
+        for id in key:
+            t = getattr(mol.atoms[id], "typeB", None)
+            t = t if t else mol.atoms[id].type
+            type_key.append(t)
+    else:
+        type_key = [mol.atoms[x].type for x in key]
+
+    atomic_type = match_atomic_item_to_atomic_type(
         type_key, interaction_types, periodicity
     )
 
-    if match_obj:
-        assert isinstance(match_obj, InteractionType)
-        # FIXME: This is a property of `match_atomic_item_to_atomic_type` and should
-        # be tested there.
-        return match_obj
-    else:
-        raise ValueError(
-            f"Could not find explicit parameters for {[type_key,interaction]} in line or in {interaction_types}."
-        )
-
-
-def merge_dihedrals(
-    dihedral_key: tuple[str, str, str, str],
-    dihedral_a: Optional[Dihedral],
-    dihedral_b: Optional[Dihedral],
-    dihedral_types_a: Union[
-        dict[ProperDihedralId, DihedralType], dict[ImproperDihedralId, DihedralType]
-    ],
-    dihedral_types_b: Union[
-        dict[ProperDihedralId, DihedralType], dict[ImproperDihedralId, DihedralType]
-    ],
-    molA: MoleculeType,
-    molB: MoleculeType,
-    funct: str,
-    periodicity: str,
-) -> Dihedral:
-    """Merge one to two Dihedrals or -Types into a Dihedral in free-energy syntax"""
-    # convert implicit standard ff parameters to explicit, if necessary
-    if dihedral_a:
-        parameterizedA = get_explicit_or_type(
-            dihedral_key,
-            dihedral_a,
-            dihedral_types_a,
-            molA,
-            periodicity,
-        )
-    else:
-        parameterizedA = None
-
-    if dihedral_b:
-        parameterizedB = get_explicit_or_type(
-            dihedral_key,
-            dihedral_b,
-            dihedral_types_b,
-            molB,
-            periodicity,
-        )
-    else:
-        parameterizedB = None
-
-    # construct parameterized Dihedral
-    if parameterizedA is not None and parameterizedB is not None:
-        # same
-
-        assert type(parameterizedA) == Dihedral or type(parameterizedA) == DihedralType
-        assert type(parameterizedB) == Dihedral or type(parameterizedB) == DihedralType
-
-        dihedralmerge = Dihedral(
-            *dihedral_key,
-            funct=funct,
-            c0=parameterizedA.c0,
-            c1=parameterizedA.c1,
-            periodicity=parameterizedA.periodicity,
-            c3=parameterizedB.c0,
-            c4=parameterizedB.c1,
-            c5=parameterizedB.periodicity,
-        )
-    elif parameterizedA is not None:
-        # breaking
-        if not (
-            type(parameterizedA) == Dihedral or type(parameterizedA) == DihedralType
-        ):
-            m = f"parameterizedA {parameterizedA} is not a Dihedral or DihedralType"
-            logger.warning(m)
-            raise ValueError(m)
-        dihedralmerge = Dihedral(
-            *dihedral_key,
-            funct=funct,
-            c0=parameterizedA.c0,
-            c1=parameterizedA.c1,
-            periodicity=parameterizedA.periodicity,
-            c3=parameterizedA.c0,
-            c4="0.00",
-            c5=parameterizedA.periodicity,
-        )
-    elif parameterizedB is not None:
-        # binding
-        assert type(parameterizedB) == Dihedral or type(parameterizedB) == DihedralType
-        dihedralmerge = Dihedral(
-            *dihedral_key,
-            funct=funct,
-            c0=parameterizedB.c0,
-            c1="0.00",
-            periodicity=parameterizedB.periodicity,
-            c3=parameterizedB.c0,
-            c4=parameterizedB.c1,
-            c5=parameterizedB.periodicity,
-        )
-    else:
-        m = f"Tried to merge two dihedrals of {dihedral_key} but no parameterized dihedrals found!"
+    if atomic_type is None:
+        m = f"Could not find explicit parameters for {[type_key,interaction]} in the FF. Consider setting the parameterizer to `grappa` to generate missing parameters in the fly."
         logger.error(m)
         raise ValueError(m)
-    return dihedralmerge
+
+    return atomic_type
 
 
-def merge_top_moleculetypes_slow_growth(
-    molA: MoleculeType,
-    molB: MoleculeType,
-    ff: FF,
-    morph_pairs: bool,
-) -> MoleculeType:
+@dataclass
+class PairSets:
+    added: set[tuple[str, str]] = field(default_factory=set)
+    removed: set[tuple[str, str]] = field(default_factory=set)
+    morphed: set[tuple[str, str]] = field(default_factory=set)
+
+
+class BondsPairSets(PairSets):
+    pass
+
+
+class AnglesPairSets(PairSets):
+    pass
+
+
+class DihedralsPairSets(PairSets):
+    pass
+
+
+@dataclass
+class AffectedInteractions:
+    """keeping track of affected interactions during the merge process to add the correct helper pairs"""
+
+    bonds: BondsPairSets = field(default_factory=BondsPairSets)
+    angles: AnglesPairSets = field(default_factory=AnglesPairSets)
+    dihedrals: DihedralsPairSets = field(default_factory=DihedralsPairSets)
+
+
+class MoleculeTypeMerger:
     """Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation"""
 
-    def get_LJ_parameters(idx1: str, idx2: str):
+    def __init__(
+        self,
+        mol_a: MoleculeType,
+        mol_b: MoleculeType,
+        ff: FF,
+        use_pairs: bool = True,
+        use_simplified: bool = False,
+    ) -> None:
+        self.mol_a = mol_a
+        self.mol_b = mol_b
+        self.ff = ff
+        if use_simplified:
+            use_pairs = False
+        self.use_pairs = use_pairs
+        self.use_simplified = use_simplified
+        self.default_morse_well_depth = 300  # [kJ mol^-1]
+        self.default_beta_for_lj = 19  # matches LJ steepness
+        self.default_morse_dist_factor = 1.12  # sigmaij* 1.12 = LJ minimum
+        logger.info(
+            f"Using default morse well depth of {self.default_morse_well_depth} and beta of {self.default_beta_for_lj}"
+        )
+        logger.info(
+            f"Using default morse distance factor of {self.default_morse_dist_factor}"
+        )
+
+        self.affected_interactions = AffectedInteractions()
+
+    def merge(self) -> MoleculeType:
+        """modiefies mol_b, the reactive moleculetype of of top_b, in place"""
+        logger.info(f"Merging topologies for slow growth")
+        self.merge_atoms()
+        self.merge_bonds()
+        self.merge_angles()
+        self.merge_dihedrals()
+
+        if self.use_pairs:
+            self.merge_pairs()
+            self.add_helper_pairs()
+        else:
+            # same as in (keysA - keysB) in v1
+            for key in self.affected_interactions.bonds.removed:
+                self.mol_b.pairs.pop(key, None)
+                self.mol_b.exclusions[key] = Exclusion(*key)
+
+        self.mol_b.find_radicals()
+        return self.mol_b
+
+    def _get_explicit_MultipleDihedrals(
+        self,
+        key: tuple[str, str, str, str],
+        use_state_b: bool,
+        use_improper: bool = False,
+        periodicity_max: int = 6,
+    ) -> Optional[MultipleDihedrals]:
+        """Takes a valid dihedral key and returns explicit
+        dihedral parameters for a given topology
+        """
+        if use_improper:
+            funct = FFFUNC["mult_improper_dihedral"]
+            dihedraltypes = self.ff.improper_dihedraltypes
+        else:
+            dihedraltypes = self.ff.proper_dihedraltypes
+            funct = FFFUNC["mult_proper_dihedral"]
+
+        if use_state_b:
+            if use_improper:
+                dihedrals_in = self.mol_b.improper_dihedrals.get(key)
+            else:
+                dihedrals_in = self.mol_b.proper_dihedrals.get(key)
+        else:
+            if use_improper:
+                dihedrals_in = self.mol_a.improper_dihedrals.get(key)
+            else:
+                dihedrals_in = self.mol_a.proper_dihedrals.get(key)
+
+        if not dihedrals_in:
+            return None
+
+        if "" not in dihedrals_in.dihedrals.keys():
+            # empty string means implicit parameters
+            # not having that means the dihedral is already
+            # explicitly parameterized
+            return dihedrals_in
+
+        type_key = []
+        for id in key:
+            if use_state_b:
+                t = getattr(self.mol_b.atoms[id], "typeB", None)
+                t = t if t else self.mol_b.atoms[id].type
+            else:
+                t = self.mol_a.atoms[id].type
+
+            type_key.append(t)
+
+        multiple_dihedrals = MultipleDihedrals(*key, funct=funct, dihedrals={})
+        for periodicity in range(1, periodicity_max + 1):
+            p = str(periodicity)
+            match_obj = match_atomic_item_to_atomic_type(
+                id=type_key, types=dihedraltypes, periodicity=p
+            )
+            if match_obj:
+                assert isinstance(match_obj, DihedralType)
+                multiple_dihedrals.dihedrals[p] = Dihedral(
+                    *key,
+                    funct=funct,
+                    c0=match_obj.c0,
+                    c1=match_obj.c1,
+                    periodicity=match_obj.periodicity,
+                )
+
+        if not multiple_dihedrals.dihedrals:
+            return None
+
+        return multiple_dihedrals
+
+    def _get_LJ_parameters(
+        self, id1: str, id2: str, use_state_b: bool, is_1_4: bool = False
+    ):
         """Calculate LJ terms sigma and epsilon from atom types"""
 
-        comb_rule = ff.defaults[0][1]
-        # fudgeLJ = ff.defaults[0][3] # could be used to compensate fudge in pairs
+        # defaults top line:
+        # non-bonded function type; combination rule; generate pairs (no/yes); fudge LJ (); fudge QQ ()
+        comb_rule = self.ff.defaults[0][1]
+        fudgeLJ = float(self.ff.defaults[0][3])
+        fudgeQQ = float(self.ff.defaults[0][4])  # not used for now
 
-        type1 = ff.atomtypes[molB.atoms[idx1].type]
-        type2 = ff.atomtypes[molB.atoms[idx2].type]
+        if use_state_b:
+            t1 = getattr(self.mol_b.atoms[id1], "typeB", None)
+            t2 = getattr(self.mol_b.atoms[id2], "typeB", None)
+            t1 = t1 if t1 else self.mol_b.atoms[id1].type
+            t2 = t2 if t2 else self.mol_b.atoms[id2].type
+            type1 = self.ff.atomtypes[t1]
+            type2 = self.ff.atomtypes[t2]
+        else:
+            t1 = self.mol_a.atoms[id1].type
+            t2 = self.mol_a.atoms[id2].type
 
+        # amber fix for breaking/binding atom types without LJ potential
+        if t1 in ["HW", "HO"]:
+            logger.debug(f"amber fix for {id1} of type {t1} typeA set to H1")
+            t1 = "H1"
+        if t2 in ["HW", "HO"]:
+            logger.debug(f"amber fix for {id2} of type {t2} typeA set to H1")
+            t2 = "H1"
+
+        type1 = self.ff.atomtypes[t1]
+        type2 = self.ff.atomtypes[t2]
+
+        # see <https://manual.gromacs.org/current/reference-manual/topologies/parameter-files.html#nbpar>
         if comb_rule == "1":
-            v = np.sqrt(float(type1.sigma) * float(type2.sigma))
-            w = np.sqrt(float(type1.epsilon) * float(type2.epsilon))
+            sigma = np.sqrt(float(type1.sigma) * float(type2.sigma))
+            epsilon = np.sqrt(float(type1.epsilon) * float(type2.epsilon))
         elif comb_rule == "2":
-            v = 0.5 * (float(type1.sigma) + float(type2.sigma))
-            w = np.sqrt(float(type1.epsilon) * float(type2.epsilon))
+            sigma = 0.5 * (float(type1.sigma) + float(type2.sigma))
+            epsilon = np.sqrt(float(type1.epsilon) * float(type2.epsilon))
         elif comb_rule == "3":
-            v = np.sqrt(float(type1.sigma) * float(type2.sigma))
-            w = np.sqrt(float(type1.epsilon) * float(type2.epsilon))
+            sigma = np.sqrt(float(type1.sigma) * float(type2.sigma))
+            epsilon = np.sqrt(float(type1.epsilon) * float(type2.epsilon))
         else:
             raise ValueError("Unknown combination rule of forcefield")
 
-        return v, w
+        logger.debug(
+            f"Got LJ parameters for {id1}-{id2} of types {type1.type}-{type2.type}: sigma {sigma} and epsilon {epsilon} from mol_b ({use_state_b})"
+        )
 
-    def make_pair(idx1: str, idx2: str, bind: bool) -> Pair:
+        if is_1_4:
+            # apply fudgeLJ
+            epsilon = epsilon * fudgeLJ
+
+        return sigma, epsilon
+
+    def _get_morse_parameters(
+        self, atomtypes: tuple[str, str], bond: Bond | None = None
+    ):
+        # fall back to defaults if no parameters are found
+        well_depth = self.default_morse_well_depth
+        beta = self.default_beta_for_lj
+        type_key: tuple[str, str] = tuple(sorted(atomtypes))  # type: ignore
+        d = DEFAULT_EDISSOC.get(type_key)
+        if d is not None:
+            well_depth = d
+        k = bond.c1 if bond else None
+        if k is not None:
+            # like in gmx /src/gromacs/gmxpreprocess/tomorse.cpp
+            # https://github.com/gromacs/gromacs/blob/beca834f6269e0f6028cc7b62a0cd72e9ff446cf/src/gromacs/gmxpreprocess/tomorse.cpp#L195
+            beta = sqrt(float(k) / (2 * well_depth))
+            # k = beta^2 * (2 * well_depth)
+        return well_depth, beta
+
+    # 400.0 19.0
+
+    def _make_pair(
+        self,
+        id1: str,
+        id2: str,
+        transition: PairTransition,
+        from_1_4: bool = False,
+        to_1_4: bool = False,
+    ) -> Pair:
         """Generates morphing pair interaction
 
         If it is for a binding event, the pair is vanishing, as it will be an
@@ -295,296 +385,489 @@ def merge_top_moleculetypes_slow_growth(
 
         Parameters
         ----------
-        idx1 : str
+        id1
             Atom one
-        idx2 : str
+        id2
             Atom two
-        bind : bool
-            Binding or breaking event. Determines morphing direction.
+        transition
+            Is the pair turning on or off or morphing
+        from_1_4
+            Is the pair a 1-4 interaction in the A state
+        to_1_4
+            Will the pair be a 1-4 interaction in the B state
 
         Returns
         -------
         Pair
             Morphing pair
         """
-        v, w = get_LJ_parameters(idx1, idx2)
+        sigmaij_a, epsilonij_a = self._get_LJ_parameters(
+            id1=id1, id2=id2, use_state_b=False, is_1_4=from_1_4
+        )
+        sigmaij_b, epsilonij_b = self._get_LJ_parameters(
+            id1=id1, id2=id2, use_state_b=True, is_1_4=to_1_4
+        )
+        comment = ""
+
+        # if all parameters are the same, the pair doesn't change
+        # so we can keep the default from the forcefield
+        if (
+            transition == PairTransition.Morph
+            and sigmaij_a == sigmaij_b
+            and epsilonij_a == epsilonij_b
+        ):
+            logger.debug(f"Pair {id1}-{id2} doesn't change, keeping default")
+            return Pair(id1, id2, funct=self.ff.defaults[0][0])
+
+        # defaults are 0.0 for all c0-c3
         c_kwargs = dict(
             zip(
                 [f"c{i}" for i in range(4)],
                 [f"{0.0:.5f}" for _ in range(4)],
             )
         )
-        if morph_pairs:
-            # Bind: pair interaction turning off
-            if bind:
-                c_kwargs["c0"] = f"{v:.5f}"
-                c_kwargs["c1"] = f"{w:.5f}"
-            # Break: pair interaction turning on
-            else:
-                c_kwargs["c2"] = f"{v:.5f}"
-                c_kwargs["c3"] = f"{w:.5f}"
+        if transition == PairTransition.Morph:
+            comment += " morphing pair"
+        elif transition == PairTransition.Vanish:
+            comment += " vanishing pair"
+        elif transition == PairTransition.Create:
+            comment += " creating pair"
 
-        return Pair(idx1, idx2, funct=ff.defaults[0][0], **c_kwargs)
+        if from_1_4:
+            comment += " from 1-4 interaction in A"
+        if to_1_4:
+            comment += " to 1-4 interaction in B"
 
-    def merge_pairs(break_pair: Optional[Pair], bind_pair: Optional[Pair]):
-        """Merges two morphing pairs into a morphing pair for slow-growth.
-        Takes starting state of break_pair and end state of bind_pair.
-
-        Parameters
-        ----------
-        break_pair : Optional[Pair]
-            Pair for breaking event
-        bind_pair : Optional[Pair]
-            Pair for binding event
-
-        Returns
-        -------
-        Pair
-            Merged pair containing four parameters.
-        """
-
-        assert len(ps := list(filter(lambda x: x, (break_pair, bind_pair)))) > 0
-        ai = ps[0].ai  # type: ignore
-        aj = ps[0].aj  # type: ignore
-        funct = ps[0].funct  # type: ignore
-
-        for p in ps:
-            assert p.c0 is not None, "Pair must contain c0"  # type: ignore
-            assert p.c1 is not None, "Pair must contain c1"  # type: ignore
-            assert p.c2 is not None, "Pair must contain c2"  # type: ignore
-            assert p.c3 is not None, "Pair must contain c3"  # type: ignore
-
-        if break_pair and bind_pair:
-            assert (
-                break_pair.funct == bind_pair.funct
-            ), "Pair functional must be the same to interpolate"
-            assert (break_pair.ai == bind_pair.ai) or (
-                break_pair.ai == bind_pair.aj
-            ), "Atoms must be the same in pairs to interpolate between"
-            assert (break_pair.aj == bind_pair.ai) or (
-                break_pair.aj == bind_pair.aj
-            ), "Atoms must be the same in pairs to interpolate between"
+        if transition == PairTransition.Vanish or transition == PairTransition.Morph:
+            # pair interaction turning off (bind or morph)
+            c_kwargs["c0"] = f"{sigmaij_a:.5f}"
+            c_kwargs["c1"] = f"{epsilonij_a:.5f}"
+        if transition == PairTransition.Create or transition == PairTransition.Morph:
+            # pair interaction turning on (break or morph)
+            c_kwargs["c2"] = f"{sigmaij_b:.5f}"
+            c_kwargs["c3"] = f"{epsilonij_b:.5f}"
 
         return Pair(
-            ai,
-            aj,
-            funct=funct,
-            c0=break_pair.c0 if break_pair else bind_pair.c0,  # type: ignore
-            c1=break_pair.c1 if break_pair else bind_pair.c1,  # type: ignore
-            c2=bind_pair.c2 if bind_pair else break_pair.c2,  # type: ignore
-            c3=bind_pair.c3 if bind_pair else break_pair.c3,  # type: ignore
+            id1, id2, funct=self.ff.defaults[0][0], **c_kwargs, comment=f"; {comment}"
         )
 
-    hyperparameters = {
-        "morse_well_depth": 300,  # [kJ mol-1]
-        "beta": 19,  # matches LJ steepness
-    }
+    def _interpolate_two_dihedrals(
+        self,
+        key: tuple[str, str, str, str],
+        dihedral_a: Optional[Dihedral],
+        dihedral_b: Optional[Dihedral],
+        funct: str,
+    ) -> Dihedral:
+        """Merge one to two Dihedrals into a Dihedral in free-energy syntax.
 
-    # atoms
-    for nr in molA.atoms.keys():
-        atomA = molA.atoms[nr]
-        atomB = molB.atoms[nr]
-        if atomA != atomB:
-            if atomA.charge != atomB.charge:
+        Only one of the dihedrals can be None at any given time.
+        """
+        if funct not in [
+            FFFUNC["mult_proper_dihedral"],
+            FFFUNC["mult_improper_dihedral"],
+        ]:
+            m = f"Can only interpolate between proper (type {FFFUNC['mult_proper_dihedral']}) or improper (type {FFFUNC['mult_proper_dihedral']}) dihedrals"
+            logger.error(m)
+            raise ValueError(m)
+
+        # construct parameterized Dihedral
+        if dihedral_a is not None and dihedral_b is not None:
+            # both parameters are given
+            # transition between parameters
+            # this can be the case when both dihedrals exist
+            # but the atomtypes of participating atoms change from A to B state
+            # or the parameters are specified explicitly
+            dihedralmerge = Dihedral(
+                *key,
+                funct=funct,
+                c0=dihedral_a.c0,
+                c1=dihedral_a.c1,
+                periodicity=dihedral_a.periodicity,
+                c3=dihedral_b.c0,
+                c4=dihedral_b.c1,
+                c5=dihedral_b.periodicity,
+                comment=f"; morphing dihedral",
+            )
+        elif dihedral_a is not None:
+            # dihedral only in A
+            # vanish it by transitiononing to 0
+            dihedralmerge = Dihedral(
+                *key,
+                funct=funct,
+                c0=dihedral_a.c0,
+                c1=dihedral_a.c1,
+                periodicity=dihedral_a.periodicity,
+                c3=dihedral_a.c0,
+                c4="0.00",
+                c5=dihedral_a.periodicity,
+                comment=f"; vanishing dihedral",
+            )
+        elif dihedral_b is not None:
+            # dihedral only in B
+            # create it by transitioning from 0
+            dihedralmerge = Dihedral(
+                *key,
+                funct=funct,
+                c0=dihedral_b.c0,
+                c1="0.00",
+                periodicity=dihedral_b.periodicity,
+                c3=dihedral_b.c0,
+                c4=dihedral_b.c1,
+                c5=dihedral_b.periodicity,
+                comment=f"; creating dihedral",
+            )
+        else:
+            m = f"Tried to merge two dihedrals of {key} but no parameterized dihedrals found!"
+            logger.error(m)
+            raise ValueError(m)
+        return dihedralmerge
+
+    def merge_atoms(self):
+        # only iterating over the keys of mol_a
+        # because KIMMDY can't add or remove atoms,
+        # the the keys should be the same in a and b
+        for nr in self.mol_a.atoms.keys():
+            atomA = self.mol_a.atoms[nr]
+            atomB = self.mol_b.atoms[nr]
+            if atomA != atomB and not (self.use_simplified and atomA.charge == atomB.charge):
+                # the simplified version doesn't change if the charges are the same
+                # set B parameters first
+                # to not overwrite them
+                # keep the name of the atom
+                atomB.atom = deepcopy(atomA.atom)
+                # but transition the type, charge and mass
                 atomB.typeB = deepcopy(atomB.type)
                 atomB.type = deepcopy(atomA.type)
                 atomB.chargeB = deepcopy(atomB.charge)
                 atomB.charge = deepcopy(atomA.charge)
                 atomB.massB = deepcopy(atomB.mass)
                 atomB.mass = deepcopy(atomA.mass)
-            else:
-                logger.debug(
-                    f"Atom {nr} changed but not the charges!\n\tA:{atomA}\n\tB:{atomB} "
+                atomB.comment = "; morphing atomtypes"
+
+    def merge_bonds(self):
+        bond_keys_a = set(self.mol_a.bonds.keys())
+        bond_keys_b = set(self.mol_b.bonds.keys())
+        bond_keys = bond_keys_a | bond_keys_b
+
+        for bond_key in bond_keys:
+            bond_a = self.mol_a.bonds.get(bond_key)
+            bond_b = self.mol_b.bonds.get(bond_key)
+            # the bond can either be in A, B or both
+            # in the first two cases the respective other will be None
+
+            if bond_a is None and bond_b is None:
+                m = f"Can't find parameters for bond with key {bond_key}, got None for both bonds. This should be an impossible state."
+                logger.error(m)
+                raise ValueError(m)
+
+            bond_a = get_explicit_or_type(
+                bond_key, bond_a, self.ff.bondtypes, self.mol_a
+            )
+            bond_b = get_explicit_or_type(
+                bond_key, bond_b, self.ff.bondtypes, self.mol_b, use_state_b=True
+            )
+
+            if isinstance(bond_a, BondType):
+                bond_a = Bond(
+                    bond_a.i, bond_a.j, funct=bond_a.funct, c0=bond_a.c0, c1=bond_a.c1
                 )
+            if isinstance(bond_b, BondType):
+                bond_b = Bond(
+                    bond_b.i, bond_b.j, funct=bond_b.funct, c0=bond_b.c0, c1=bond_b.c1
+                )
+            assert isinstance(bond_a, Bond) or bond_a is None
+            assert isinstance(bond_b, Bond) or bond_b is None
+            if bond_a == bond_b:
+                # bonds are equal because none of their atomtypes changed,
+                # and the bond is still there
+                # nothing to be done
+                continue
 
-    break_bind_atoms = {}
+            atomtypes_a: tuple[str, str] = tuple([self.mol_a.atoms[atom_id].type for atom_id in bond_key])  # type: ignore
+            atomtypes_b: tuple[str, str] = tuple(
+                [
+                    (
+                        t
+                        if (t := getattr(self.mol_b.atoms[id], "typeB", None))
+                        else self.mol_b.atoms[id].type
+                    )
+                    for id in bond_key
+                ]
+            )  # type: ignore
 
-    # bonds
-    keysA = set(molA.bonds.keys())
-    keysB = set(molB.bonds.keys())
-    keys = keysA | keysB
+            sigmaij_a, epsilonij_a = self._get_LJ_parameters(
+                *bond_key, use_state_b=False
+            )
+            sigmaij_b, epsilonij_b = self._get_LJ_parameters(
+                *bond_key, use_state_b=True
+            )
 
-    new_pairs_break = {}
-    new_pairs_bind = {}
+            depth_a, beta_a = self._get_morse_parameters(
+                atomtypes=atomtypes_a, bond=bond_a
+            )
+            depth_b, beta_b = self._get_morse_parameters(
+                atomtypes=atomtypes_b, bond=bond_b
+            )
 
-    for key in keys:
-        interactionA = molA.bonds.get(key)
-        interactionB = molB.bonds.get(key)
-
-        if interactionA != interactionB:
-            parameterizedA = get_explicit_or_type(key, interactionA, ff.bondtypes, molA)
-            parameterizedB = get_explicit_or_type(key, interactionB, ff.bondtypes, molB)
-
-            # both bonds exist
-            if parameterizedA and parameterizedB:
+            # both bonds exist-> transition between parameters
+            if bond_a is not None and bond_b is not None:
                 if not (
-                    parameterizedA.funct
-                    == parameterizedB.funct
-                    == FFFUNC["harmonic_bond"]
+                    isinstance(bond_a, (Bond, BondType))
+                    and isinstance(bond_b, (Bond, BondType))
                 ):
-                    m = f"In slow-growth, bond functionals need to be harmonic, but {key} is not. It is in A: {parameterizedA} and B: {parameterizedB}"
+                    m = f"Can't find parameters for bond with key {bond_key}, got explicits/types: {bond_a} and {bond_b} for a bonds: {bond_a}, {bond_b}"
                     logger.error(m)
                     raise ValueError(m)
-                molB.bonds[key] = Bond(
-                    *key,
-                    funct=parameterizedB.funct,
-                    c0=parameterizedA.c0,
-                    c1=parameterizedA.c1,
-                    c2=parameterizedB.c0,
-                    c3=parameterizedB.c1,
+                if not (bond_a.funct == bond_b.funct == FFFUNC["harmonic_bond"]):
+                    m = f"In slow-growth, bond functionals need to be harmonic, but {bond_key} is not. It is in A: {bond_a} and B: {bond_b}"
+                    logger.error(m)
+                    raise ValueError(m)
+                self.mol_b.bonds[bond_key] = Bond(
+                    *bond_key,
+                    funct=bond_b.funct,
+                    c0=bond_a.c0,
+                    c1=bond_a.c1,
+                    c2=bond_b.c0,
+                    c3=bond_b.c1,
+                    comment=f"; morphing harmonic bond",
                 )
-
-            # bond only exists in A -> vanish bond
-            elif parameterizedA:
-                atomtypes = [molA.atoms[atom_id].type for atom_id in key]
-                break_bind_atoms[key[0]] = atomtypes[0]
-                break_bind_atoms[key[1]] = atomtypes[1]
-                sigmaij, epsilonij = get_LJ_parameters(*key)
-
-                molB.bonds[key] = Bond(
-                    *key,
-                    funct=FFFUNC["morse_bond"],
-                    c0=parameterizedA.c0,  # b
-                    c1=f"{hyperparameters['morse_well_depth']:.5f}",  # D
-                    c2=f"{hyperparameters['beta']:.5f}",  # beta
-                    c3=f"{sigmaij*1.12:.5f}",  # sigmaij* 1.12 = LJ minimum
-                    c4=f"{0.0:.5f}",  # well depth -> zero
-                    c5=f"{0.0:.5f}",
+                logger.debug(
+                    f"Created harmonic bond to bond transition for {bond_key} (transition): {self.mol_b.bonds[bond_key]}"
                 )
+            elif isinstance(bond_a, (Bond, BondType)):
+                # bond only exists in A -> vanish bond
+                pairkey = to_pairkey(bond_key)
+                self.affected_interactions.bonds.removed.add(pairkey)
+                if self.use_simplified:
+                    # use a bond that pretends to be LJ via morse
+                    # because `simplified` will not touch the pairs
+                    self.mol_b.bonds[bond_key] = Bond(
+                        *bond_key,
+                        funct=FFFUNC["morse_bond"],
+                        c0=bond_a.c0,  # original bond distance in A
+                        c1=f"{depth_a:.5f}",  # original well depth in A
+                        c2=f"{beta_a:.5f}",  # original steepness in A
+                        c3=f"{sigmaij_b*self.default_morse_dist_factor:.5f}",  # r0 goes to eq distance for LJ
+                        c4=f"{epsilonij_b:.5f}",  # well depth is epsilon
+                        c5=f"{self.default_beta_for_lj:.5f}",  # default beta for LJ
+                        comment=f"; vanishing bond from morse to LJ",
+                    )
+                else:
+                    # just remove the bond, LJ interactions will be done by the Pair
+                    self.mol_b.bonds[bond_key] = Bond(
+                        *bond_key,
+                        funct=FFFUNC["morse_bond"],
+                        c0=bond_a.c0,  # original bond distance in A
+                        c1=f"{depth_a:.5f}",  # original well depth in A
+                        c2=f"{beta_a:.5f}",  # original steepness in A
+                        c3=f"{bond_a.c0}",  # new r0 in B (=stays the same, because bond vanishes anyways)
+                        c4=f"{0.0:.5f}",  # well depth goes to 0
+                        c5=f"{self.default_beta_for_lj:.5f}",  # default beta for LJ
+                        comment=f"; vanishing bond from morse to nothing",
+                    )
 
-                # update bound_to
-                atompair = [molB.atoms[key[0]], molB.atoms[key[1]]]
-                atompair[0].bound_to_nrs.append(atompair[1].nr)
-                atompair[1].bound_to_nrs.append(atompair[0].nr)
+            elif isinstance(bond_b, (Bond, BondType)):
+                # bond only exists in B -> create bond
+                if epsilonij_a == 0:
+                    m = f"epsilonij_a is 0 for {bond_key}"
+                    logger.error(m)
+                    raise ValueError(m)
+                pairkey = to_pairkey(bond_key)
+                self.affected_interactions.bonds.added.add(pairkey)
+                if self.use_simplified:
+                    # use a bond that pretends to be LJ via morse
+                    self.mol_b.bonds[bond_key] = Bond(
+                        *bond_key,
+                        funct=FFFUNC["morse_bond"],
+                        # starts further away, so it can pull in atoms of the bond
+                        c0=f"{sigmaij_a*self.default_morse_dist_factor:.5f}", # sigmaij* 1.12 = LJ minimum at lambda 0, where the atom types are still from A
+                        c1=f"{epsilonij_a:.5f}",  # epsilon is well depth of LJ
+                        c2=f"{self.default_beta_for_lj:.5f}",  # beta from default beta for LJ
+                        c3=bond_b.c0,  # final bond distance
+                        c4=f"{depth_b:.5f}",  # final well depth
+                        c5=f"{beta_b:.5f}",  # final steepness (beta)
+                        comment=f"; creating bond from LJ to morse",
+                    )
+                else:
+                    # just add the bond, LJ interactions will be done by the Pair
+                    self.mol_b.bonds[bond_key] = Bond(
+                        *bond_key,
+                        funct=FFFUNC["morse_bond"],
+                        # starts further away, so it can pull in atoms of the bond
+                        c0=f"{sigmaij_a*self.default_morse_dist_factor:.5f}",  # sigmaij* 1.12 = LJ minimum at lambda 0, where the atom types are still from A
+                        c1=f"{0.0:.5f}",  # well depth from 0
+                        c2=f"{0.0:.5f}",  # beta from 0 = flat
+                        c3=bond_b.c0,  # final bond distance
+                        c4=f"{depth_b:.5f}",  # final morse well depth
+                        c5=f"{beta_b:.5f}",  # final morse steepness (beta)
+                        comment=f"; creating bond from nothing to morse",
+                    )
 
-                # Find all neighbors of the bond
-                neighbor_sides = []
-                for idx in key:
-                    bonds = list(filter(lambda b: idx in b, keysB))
-                    neighbor_set = set()
-                    for b in bonds:
-                        neighbor_set.add(b[0])
-                        neighbor_set.add(b[1])
-                    neighbor_sides.append(neighbor_set)
-                neighbor_set.discard(idx)  # avoid double counting central bond
+    def merge_angles(self):
+        keys = set(self.mol_a.angles.keys()) | set(self.mol_b.angles.keys())
+        for key in keys:
+            angle_a = self.mol_a.angles.get(key)
+            angle_b = self.mol_b.angles.get(key)
 
-                # handle vanishing exclusions neighbors1 - key[1]
-                for a1 in neighbor_sides[0]:
-                    pk = tuple(sorted((a1, key[1]), key=int))
-                    new_pairs_break[pk] = make_pair(*pk, bind=False)
+            if angle_a == angle_b:
+                # angles are the same, nothing to be done.
+                # atoms will also continue to be automatically excluded
+                # so nothing to be done with pairs
+                # but we can be extra sure that they are excluded:
+                pairkey = to_pairkey(key)
+                self.affected_interactions.angles.morphed.add(pairkey)
+                continue
 
-                # handle vanishing exclusions neighbors2 - key[0]
-                for a2 in neighbor_sides[1]:
-                    pk = tuple(sorted((a2, key[0]), key=int))
-                    new_pairs_break[pk] = make_pair(*pk, bind=False)
-
-            # bond only exists in B -> create bond
-            elif parameterizedB:
-                atomtypes = [molB.atoms[atom_id].type for atom_id in key]
-                break_bind_atoms[key[0]] = atomtypes[0]
-                break_bind_atoms[key[1]] = atomtypes[1]
-                sigmaij, epsilonij = get_LJ_parameters(*key)
-
-                molB.bonds[key] = Bond(
-                    *key,
-                    funct=FFFUNC["morse_bond"],
-                    c0=f"{sigmaij*1.12:.5f}",  # sigmaij* 1.12 = LJ minimum
-                    c1=f"{0.0:.5f}",  # well depth is epsilonij
-                    c2=f"{0.0:.5f}",
-                    c3=parameterizedB.c0,  # b
-                    c4=f"{hyperparameters['morse_well_depth']:.5f}",  # D
-                    c5=f"{hyperparameters['beta']:.5f}",  # beta
-                )
-
-                # Find all neighbors of the bond
-                neighbor_sides = []
-                for idx in key:
-                    bonds = list(filter(lambda b: idx in b, keysA))
-                    neighbor_set = set()
-                    for b in bonds:
-                        neighbor_set.add(b[0])
-                        neighbor_set.add(b[1])
-                    neighbor_sides.append(neighbor_set)
-                neighbor_set.discard(idx)  # type: ignore  # avoid double counting central bond
-
-                # handle growing exclusions neighbors1 - key[1]
-                for a1 in neighbor_sides[0]:
-                    pk = tuple(sorted((a1, key[1]), key=int))
-                    new_pairs_bind[pk] = make_pair(*pk, bind=True)
-
-                # handle growing exclusions neighbors2 - key[0]
-                for a2 in neighbor_sides[1]:
-                    pk = tuple(sorted((a2, key[0]), key=int))
-                    new_pairs_bind[pk] = make_pair(*pk, bind=True)
-
-    for key in set(new_pairs_bind.keys()) | set(new_pairs_break.keys()):
-        break_pair = new_pairs_break.get(key)
-        bind_pair = new_pairs_bind.get(key)
-
-        morph_pair = merge_pairs(break_pair, bind_pair)
-
-        molB.pairs[key] = morph_pair
-        molB.exclusions[key] = Exclusion(*key)
-
-    # angles
-    keys = set(molA.angles.keys()) | set(molB.angles.keys())
-    for key in keys:
-        interactionA = molA.angles.get(key)
-        interactionB = molB.angles.get(key)
-
-        if interactionA != interactionB:
             parameterizedA = get_explicit_or_type(
-                key, interactionA, ff.angletypes, molA
+                key, angle_a, self.ff.angletypes, self.mol_a
             )
+
             parameterizedB = get_explicit_or_type(
-                key, interactionB, ff.angletypes, molB
+                key, angle_b, self.ff.angletypes, self.mol_b, use_state_b=True
             )
-            if parameterizedA and parameterizedB:
-                molB.angles[key] = Angle(
+
+            if parameterizedA is not None and parameterizedB is not None:
+                if not (
+                    isinstance(parameterizedA, (Angle, AngleType))
+                    and isinstance(parameterizedB, (Angle, AngleType))
+                ):
+                    m = f"Can't find parameters for angle with key {key}, got explicits/types: {parameterizedA} and {parameterizedB} for a bonds: {angle_a}, {angle_b}"
+                    logger.error(m)
+                    raise ValueError(m)
+                # both angles exist -> transition between parameters
+                self.mol_b.angles[key] = Angle(
                     *key,
                     funct=parameterizedB.funct,
                     c0=parameterizedA.c0,
                     c1=parameterizedA.c1,
                     c2=parameterizedB.c0,
                     c3=parameterizedB.c1,
+                    comment=f"; morphing angle",
                 )
-            elif parameterizedA:
-                molB.angles[key] = Angle(
+                pairkey = to_pairkey(key)
+                self.affected_interactions.angles.morphed.add(pairkey)
+            elif isinstance(parameterizedA, (Angle, AngleType)):
+                # angle only exists in A -> vanish angle
+                self.mol_b.angles[key] = Angle(
                     *key,
                     funct=FFFUNC["harmonic_angle"],
                     c0=parameterizedA.c0,
                     c1=parameterizedA.c1,
                     c2=parameterizedA.c0,
                     c3="0.00",
+                    comment=f"; vanishing angle",
                 )
-            elif parameterizedB:
-                molB.angles[key] = Angle(
+                pairkey = to_pairkey(key)
+                self.affected_interactions.angles.removed.add(pairkey)
+            elif isinstance(parameterizedB, (Angle, AngleType)):
+                # angle only exists in B -> create angle
+                self.mol_b.angles[key] = Angle(
                     *key,
                     funct=FFFUNC["harmonic_angle"],
                     c0=parameterizedB.c0,
                     c1="0.00",
                     c2=parameterizedB.c0,
                     c3=parameterizedB.c1,
+                    comment=f"; creating angle",
                 )
+                pairkey = to_pairkey(key)
+                self.affected_interactions.angles.added.add(pairkey)
             else:
                 logger.warning(f"Could not parameterize angle {key}.")
 
-    # dihedrals
-    # proper dihedrals
-    # proper dihedrals have a nested structure and need a different treatment from bonds, angles and improper dihedrals
-    # if indices change atomtypes and parameters change because of that, it will ignore these parameter change
-
-    keys = set(molA.proper_dihedrals.keys()) | set(molB.proper_dihedrals.keys())
-    for key in keys:
-        multiple_dihedralsA = molA.proper_dihedrals.get(key)
-        multiple_dihedralsB = molB.proper_dihedrals.get(key)
-
-        if multiple_dihedralsA != multiple_dihedralsB:
-            multiple_dihedralsA = get_explicit_MultipleDihedrals(
-                key, molA, multiple_dihedralsA, ff
+    def merge_dihedrals(self):
+        # proper dihedrals
+        # proper dihedrals have a nested structure and need a different treatment from bonds, angles and improper dihedrals
+        keys = set(self.mol_a.proper_dihedrals.keys()) | set(
+            self.mol_b.proper_dihedrals.keys()
+        )
+        for key in keys:
+            multiple_dihedralsA = self._get_explicit_MultipleDihedrals(
+                key=key, use_state_b=False, use_improper=False
             )
-            multiple_dihedralsB = get_explicit_MultipleDihedrals(
-                key, molB, multiple_dihedralsB, ff
+            multiple_dihedralsB = self._get_explicit_MultipleDihedrals(
+                key=key, use_state_b=True, use_improper=False
+            )
+
+            if multiple_dihedralsA is None and multiple_dihedralsB is None:
+                m = f"Can't find parameters for dihedral with key {key}, got None for both dihedrals. This should be an impossible state."
+                logger.error(m)
+                raise ValueError(m)
+            elif multiple_dihedralsA is not None and multiple_dihedralsB is not None:
+                # dihedrals exist in both A and B -> transition between parameters for the 1-4 interactions
+                # in case their atomtypes changed
+                logger.debug(
+                    f"Adding pair for dihedral {key} being morphed to affected_pairs"
+                )
+                pairkey = to_pairkey(key)
+                self.affected_interactions.dihedrals.morphed.add(pairkey)
+            elif isinstance(multiple_dihedralsA, MultipleDihedrals):
+                # dihedral only exists in A -> vanishing dihedral
+                # pair transitions from half strength 1-4 interaction to full strength
+                logger.debug(
+                    f"Adding pair for dihedral {key} breaking to affected_pairs"
+                )
+                pairkey = to_pairkey(key)
+                self.affected_interactions.dihedrals.removed.add(pairkey)
+            elif isinstance(multiple_dihedralsB, MultipleDihedrals):
+                # dihedral only exists in B -> creating dihedral
+                # corresponding pair transitions from full strength to half strength 1-4 interaction
+                logger.debug(
+                    f"Adding pair for dihedral {key} being created to affected_pairs"
+                )
+                pairkey = to_pairkey(key)
+                self.affected_interactions.dihedrals.added.add(pairkey)
+
+            if multiple_dihedralsA == multiple_dihedralsB:
+                # dihedrals are exactly the same, nothing further to be done
+                continue
+
+            keysA = (
+                set(multiple_dihedralsA.dihedrals.keys())
+                if multiple_dihedralsA
+                else set()
+            )
+            keysB = (
+                set(multiple_dihedralsB.dihedrals.keys())
+                if multiple_dihedralsB
+                else set()
+            )
+
+            self.mol_b.proper_dihedrals[key] = MultipleDihedrals(
+                *key, funct=FFFUNC["mult_proper_dihedral"], dihedrals={}
+            )
+
+            periodicity_keys = keysA | keysB
+            for periodicity_key in periodicity_keys:
+                interactionA = (
+                    multiple_dihedralsA.dihedrals.get(periodicity_key)
+                    if multiple_dihedralsA
+                    else None
+                )
+                interactionB = (
+                    multiple_dihedralsB.dihedrals.get(periodicity_key)
+                    if multiple_dihedralsB
+                    else None
+                )
+                self.mol_b.proper_dihedrals[key].dihedrals[periodicity_key] = (
+                    self._interpolate_two_dihedrals(
+                        key=key,
+                        dihedral_a=interactionA,
+                        dihedral_b=interactionB,
+                        funct=FFFUNC["mult_proper_dihedral"],
+                    )
+                )
+
+        # improper dihedrals
+        keys = set(self.mol_a.improper_dihedrals.keys()) | set(
+            self.mol_b.improper_dihedrals.keys()
+        )
+        for key in keys:
+            multiple_dihedralsA = self._get_explicit_MultipleDihedrals(
+                key=key, use_state_b=False, use_improper=True
+            )
+            multiple_dihedralsB = self._get_explicit_MultipleDihedrals(
+                key=key, use_state_b=True, use_improper=True
             )
             keysA = (
                 set(multiple_dihedralsA.dihedrals.keys())
@@ -597,117 +880,268 @@ def merge_top_moleculetypes_slow_growth(
                 else set()
             )
 
-            molB.proper_dihedrals[key] = MultipleDihedrals(
-                *key, FFFUNC["mult_proper_dihedral"], {}
+            self.mol_b.improper_dihedrals[key] = MultipleDihedrals(
+                *key, funct=FFFUNC["mult_improper_dihedral"], dihedrals={}
             )
-            periodicities = keysA | keysB
-            for periodicity in periodicities:
-                assert isinstance(periodicity, str)
+
+            periodicity_keys = keysA | keysB
+            for periodicity_key in periodicity_keys:
+                assert isinstance(periodicity_key, str)
                 interactionA = (
-                    multiple_dihedralsA.dihedrals.get(periodicity)
+                    multiple_dihedralsA.dihedrals.get(periodicity_key)
                     if multiple_dihedralsA
                     else None
                 )
                 interactionB = (
-                    multiple_dihedralsB.dihedrals.get(periodicity)
+                    multiple_dihedralsB.dihedrals.get(periodicity_key)
                     if multiple_dihedralsB
                     else None
                 )
 
-                molB.proper_dihedrals[key].dihedrals[periodicity] = merge_dihedrals(
-                    key,
-                    interactionA,
-                    interactionB,
-                    ff.proper_dihedraltypes,
-                    ff.proper_dihedraltypes,
-                    molA,
-                    molB,
-                    FFFUNC["mult_proper_dihedral"],
-                    periodicity,
+                self.mol_b.improper_dihedrals[key].dihedrals[periodicity_key] = (
+                    self._interpolate_two_dihedrals(
+                        key=key,
+                        dihedral_a=interactionA,
+                        dihedral_b=interactionB,
+                        funct=FFFUNC["mult_improper_dihedral"],
+                    )
                 )
 
-    # improper dihedrals
-    keys = set(molA.improper_dihedrals.keys()) | set(molB.improper_dihedrals.keys())
-    for key in keys:
-        multiple_dihedralsA = molA.improper_dihedrals.get(key)
-        multiple_dihedralsB = molB.improper_dihedrals.get(key)
+    def merge_pairs(self):
+        """Merge pairs that are from the respective pairs sections of the topologies"""
+        new_pairs = {}
+        keys = set(self.mol_a.pairs.keys()) | set(self.mol_b.pairs.keys())
+        for key in keys:
+            pair_a = self.mol_a.pairs.get(key)
+            pair_b = self.mol_b.pairs.get(key)
 
-        if multiple_dihedralsA != multiple_dihedralsB:
-            multiple_dihedralsA = get_explicit_MultipleDihedrals(
-                key, molA, multiple_dihedralsA, ff
-            )
-            multiple_dihedralsB = get_explicit_MultipleDihedrals(
-                key, molB, multiple_dihedralsB, ff
-            )
-            keysA = (
-                set(multiple_dihedralsA.dihedrals.keys())
-                if multiple_dihedralsA
-                else set()
-            )
-            keysB = (
-                set(multiple_dihedralsB.dihedrals.keys())
-                if multiple_dihedralsB
-                else set()
-            )
+            if pair_a is None and pair_b is None:
+                m = f"Can't find parameters for bond with key {key}, got None for both bonds. This should be an impossible state."
+                logger.error(m)
+                raise ValueError(m)
 
-            molB.improper_dihedrals[key] = MultipleDihedrals(
-                *key, FFFUNC["mult_improper_dihedral"], {}
-            )
-            periodicities = keysA | keysB
-            for periodicity in periodicities:
-                assert isinstance(periodicity, str)
-                interactionA = (
-                    multiple_dihedralsA.dihedrals.get(periodicity)
-                    if multiple_dihedralsA
-                    else None
+            if pair_a is not None and pair_b is not None:
+                logger.debug(
+                    f"Pair {key} is in both topologies, transitioning between them"
                 )
-                interactionB = (
-                    multiple_dihedralsB.dihedrals.get(periodicity)
-                    if multiple_dihedralsB
-                    else None
+                if is_parameterized(pair_a) or is_parameterized(pair_b):
+                    new_pairs[key] = Pair(
+                        key[0],
+                        key[1],
+                        funct=self.ff.defaults[0][0],
+                        c0=pair_a.c0,
+                        c1=pair_a.c1,
+                        c2=pair_b.c0,
+                        c3=pair_b.c1,
+                    )
+                else:
+                    new_pairs[key] = self._make_pair(
+                        key[0], key[1], PairTransition.Morph, from_1_4=True, to_1_4=True
+                    )
+            elif pair_a is not None:
+                logger.debug(
+                    f"Pair {key} is only in A, going from 1-4 to full strength LJ"
                 )
-
-                molB.improper_dihedrals[key].dihedrals[periodicity] = merge_dihedrals(
-                    key,
-                    interactionA,
-                    interactionB,
-                    ff.improper_dihedraltypes,
-                    ff.improper_dihedraltypes,
-                    molA,
-                    molB,
-                    FFFUNC["mult_improper_dihedral"],
-                    periodicity,
+                new_pairs[key] = self._make_pair(
+                    key[0], key[1], PairTransition.Morph, from_1_4=True
+                )
+            elif pair_b is not None:
+                logger.debug(
+                    f"Pair {key} is only in B, going from full strength LJ to 1-4"
+                )
+                new_pairs[key] = self._make_pair(
+                    key[0], key[1], PairTransition.Morph, to_1_4=True
                 )
 
-    # amber fix for breaking/binding atom types without LJ potential
-    for k, v in break_bind_atoms.items():
-        if v in ["HW", "HO"]:
-            molB.atoms[k].type = "H1"
-            if molB.atoms[k].typeB is not None:
-                molB.atoms[k].typeB = "H1"
+            for key, pair in new_pairs.items():
+                if pair is not None:
+                    self.mol_b.pairs[key] = pair
 
-    # update is_radical attribute of Atom objects in topology
-    molB.find_radicals()
+                # Add general exclusions for each pair
+                # such that automatic non-bonded interactions
+                # don't interfer with our efforts
+                self.mol_b.exclusions[key] = Exclusion(*key)
 
-    return molB
+    def add_helper_pairs(self):
+        """
+        growing/shrinking pairs are used to turn on/off
+        LJ / non-bonded interactions.
+        If it is for a binding event, the pair is vanishing, as it will be an
+        exclusion once bound. If a bond is breaking, the pair interaction
+        is slowly turned on, as it was excluded previously.
+        """
+        # pairs that stem from bonds breaking or forming
+        # collected by looking at the changing bonds, angles and dihedrals (=higher order interactions)
+        self.helper_pairs: dict[tuple[str, str], Pair] = {}
+        self.helper_exclusions: set[tuple[str, str]] = set()
+
+        # a bond is either added or removed, but can't be both.
+        # but for higher order interactions the end-atoms (of the angle or dihedral) can be involved
+        # in multiple changing higher order interactions
+        # e.g. two atoms may loose a dihedral between them and gain a different one
+        added_bonds = (
+            self.affected_interactions.bonds.added
+            - self.affected_interactions.bonds.removed
+        )
+        removed_bonds = (
+            self.affected_interactions.bonds.removed
+            - self.affected_interactions.bonds.added
+        )
+        added_angles = (
+            self.affected_interactions.angles.added
+            - self.affected_interactions.angles.removed
+        )
+        removed_angles = (
+            self.affected_interactions.angles.removed
+            - self.affected_interactions.angles.added
+        )
+        swapping_angles = (
+            self.affected_interactions.angles.added
+            & self.affected_interactions.angles.removed
+        )
+        morphing_angles = self.affected_interactions.angles.morphed
+        added_dihedrals = (
+            self.affected_interactions.dihedrals.added
+            - self.affected_interactions.dihedrals.removed
+        )
+        removed_dihedrals = (
+            self.affected_interactions.dihedrals.removed
+            - self.affected_interactions.dihedrals.added
+        )
+        swapping_dihedrals = (
+            self.affected_interactions.dihedrals.added
+            & self.affected_interactions.dihedrals.removed
+        )
+        morphing_dihedrals = self.affected_interactions.dihedrals.morphed
+
+        for pair_key in added_bonds:
+            if pair_key in removed_angles:
+                # the bond is added, but the atoms where in an angle in A
+                # so they where excluded before and will be excluded again
+                self.helper_exclusions.add(pair_key)
+            if pair_key in removed_dihedrals:
+                # the bond is added, but the atoms where in a dihedral in A
+                # so they had 1-4 interactions in A and will be excluded in B
+                self.helper_pairs[pair_key] = self._make_pair(
+                    *pair_key, transition=PairTransition.Vanish, from_1_4=True
+                )
+            if pair_key not in removed_angles | removed_dihedrals | morphing_angles | morphing_dihedrals:
+                # the bond is added and the atoms didn't see each other in A
+                # so the full strength LJ interaction is turned off to 0
+                self.helper_pairs[pair_key] = self._make_pair(
+                    *pair_key, transition=PairTransition.Vanish
+                )
+
+        for pair_key in removed_bonds:
+            if pair_key not in added_angles | added_dihedrals | morphing_angles | morphing_angles:
+                # the bond is removed and the atoms will not see each other in B
+                # so the pair interaction is turned on (at full strength)
+                self.helper_pairs[pair_key] = self._make_pair(
+                    *pair_key, transition=PairTransition.Create
+                )
+
+        # pairs of atoms that end up with an angle between them where there was none before
+        for pairkey in added_angles:
+            if pairkey in removed_dihedrals:
+                # these atoms shared a dihedral in A, so they start as a 1-4 interaction
+                self.helper_pairs[pairkey] = self._make_pair(
+                    *pairkey, transition=PairTransition.Vanish, from_1_4=True
+                )
+            if pairkey in removed_bonds:
+                # atoms where in a bond together and will be in an angle together, so they are just excluded
+                self.helper_exclusions.add(pairkey)
+            if pairkey not in removed_bonds | removed_dihedrals | morphing_dihedrals | morphing_angles:
+                # the angle is added and the atoms saw each other in A, LJ is turned off
+                self.helper_pairs[pairkey] = self._make_pair(
+                    *pairkey, transition=PairTransition.Vanish
+                )
+
+        # pairs that end up with no angle between them where there was one before
+        for pairkey in removed_angles:
+            if not pairkey in added_bonds | added_dihedrals | morphing_dihedrals | morphing_angles:
+                # the atoms where in an angle A and will not see each other in B
+                # we morph from 0 to full strength
+                self.helper_pairs[pairkey] = self._make_pair(
+                    *pairkey, transition=PairTransition.Create
+                )
+
+        # atoms involved in angles that stay involved in angles but the parameters or atomtypes my change
+        for pairkey in swapping_angles | morphing_angles:
+            # we just want the exclusion
+            self.helper_exclusions.add(pairkey)
+
+        # atoms that end up with a dihedral between them where there was none before
+        for pairkey in added_dihedrals:
+            if pairkey in removed_bonds | removed_angles:
+                # if the atoms had some lower order interaction in A, they where excluded before
+                # and should transition from 0 to 1-4
+                self.helper_pairs[pairkey] = self._make_pair(
+                    *pairkey, transition=PairTransition.Create, to_1_4=True
+                )
+            if pairkey not in removed_bonds | removed_angles | morphing_angles:
+                # if the atoms didn't see each other in A, we morph from full strength LJ to 1-4
+                # dihedral only exists in B -> creating dihedral
+                # corresponding pair transitions from full strength to half strength 1-4 interaction
+                self.helper_pairs[pairkey] = self._make_pair(
+                    *pairkey, transition=PairTransition.Morph, to_1_4=True
+                )
+
+        # atoms that end up with no dihedral between them where there was one before
+        for pairkey in removed_dihedrals:
+            if not pairkey in added_bonds | added_angles:
+                # dihedral only exists in A -> vanishing dihedral
+                # pair transitions from half strength 1-4 interaction to full strength
+                # but only if it's not already handled by a bond or angle
+                self.helper_pairs[pairkey] = self._make_pair(
+                    *pairkey, transition=PairTransition.Morph, from_1_4=True
+                )
+
+        for pairkey in morphing_dihedrals:
+            if pairkey not in swapping_angles:
+                # dihedrals exist in both A and B -> transition between parameters for the 1-4 interactions
+                # in case their atomtypes changed
+                self.helper_pairs[pairkey] = self._make_pair(
+                    *pairkey, transition=PairTransition.Morph, from_1_4=True, to_1_4=True
+                )
+
+        # these pairs of atoms are first involved on one dihedral and end up still involved together in a dihedral
+        # but it's a different dihedral
+        for pairkey in swapping_dihedrals:
+            if pairkey not in swapping_angles:
+                # dihedrals exist in both A and B -> transition between parameters for the 1-4 interactions
+                self.helper_pairs[pairkey] = self._make_pair(
+                    *pairkey, transition=PairTransition.Morph, from_1_4=True, to_1_4=True
+                )
+
+        for key, pair in self.helper_pairs.items():
+            if pair is not None:
+                self.mol_b.pairs[key] = pair
+
+            # add general exclusions for each pair
+            self.mol_b.exclusions[key] = Exclusion(*key)
+
+        # add additional exclusions for atoms we know should be excluded
+        # just in case
+        for key in self.helper_exclusions:
+            self.mol_b.exclusions[key] = Exclusion(*key)
 
 
 def merge_top_slow_growth(
-    topA: Topology, topB: Topology, morph_pairs: bool
+    top_a: Topology, top_b: Topology, use_pairs: bool = True, use_simplified: bool = False
 ) -> Topology:
     """Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation.
-    For now this assumes that only one moleculeype is of interest.
+    Modifies topB in place.
+    All changes are contained to the `Reactive` moleculetype.
     """
 
-    molA = topA.moleculetypes[REACTIVE_MOLECULEYPE]
-    molB = topB.moleculetypes[REACTIVE_MOLECULEYPE]
-    molB = merge_top_moleculetypes_slow_growth(
-        molA=molA, molB=molB, ff=topB.ff, morph_pairs=morph_pairs
-    )
-    # not necessary, will be updated automatically on `to_dict()`
-    # topB._update_dict()
-
-    return topB
+    MoleculeTypeMerger(
+        mol_a=top_a.moleculetypes[REACTIVE_MOLECULEYPE],
+        mol_b=top_b.moleculetypes[REACTIVE_MOLECULEYPE],
+        ff=top_b.ff,
+        use_pairs=use_pairs,
+        use_simplified=use_simplified,
+    ).merge()
+    return top_b
 
 
 def break_bond_plumed(
@@ -726,6 +1160,7 @@ def break_bond_plumed(
     # if break_bond_plumed is called multiple times in one _apply_recipe task
     if "plumed" in files.output.keys():
         plumed_path = files.output["plumed"]
+    assert plumed_path is not None, "plumed_path should not be None"
     plumed_dict = read_plumed(plumed_path)
 
     files.output["plumed"] = newplumed

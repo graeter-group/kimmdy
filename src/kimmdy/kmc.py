@@ -82,7 +82,15 @@ def dummy_first_kmc(
         m = "Empty ReactionResult; no reaction chosen"
         logger.warning(m)
         return KMCError(m)
-    recipe = recipe_collection.recipes[0]
+
+    i = 0
+    logger.info(f"Chosen first Recipe: {i}")
+
+    # or use the last one for testing
+    # i = len(recipe_collection.recipes) - 1
+    # logger.info(f"Chosen last Recipe: {i}")
+
+    recipe = recipe_collection.recipes[i]
     time_index = np.argmax(recipe.rates)
     reaction_time = recipe.timespans[time_index][1]
     logger.info(f"Chosen Recipe: {recipe} at time {reaction_time}")

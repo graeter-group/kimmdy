@@ -168,6 +168,15 @@ class TestMatch:
 
 
 class TestUrea:
+    def test_find_edissoc(self, raw_urea_top_fix):
+        raw = deepcopy(raw_urea_top_fix)
+        top = Topology(raw)
+        assert top.ff.default_edissoc != {}
+        assert len(top.ff.default_edissoc.keys()) == 1
+        assert top.ff.default_edissoc["_"] is not None
+        assert top.ff.default_edissoc["_"][("C", "O")] == 743
+        assert top.ff.default_edissoc["_"][("H", "O")] == 463
+
     def test_urea(self, raw_urea_top_fix):
         raw = deepcopy(raw_urea_top_fix)
         top = Topology(raw)
