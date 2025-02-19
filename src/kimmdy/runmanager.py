@@ -353,11 +353,9 @@ class RunManager:
                     "have failed. Aborting restart. Remove this task "
                     "directory if you want to restart from before the failed task."
                 )
-
-                inp = input("Do you want to delete this task directory? [y/n]")
-                if inp == "y":
-                    shutil.rmtree(task_dir)
-                else:
+                logger.warning(m)
+                inp = input("Do you want to continue and delete this task directory? [y/n]")
+                if inp.lower() != "y":
                     exit(1)
             elif (
                 (task_dir / MARK_STARTED).exists()
