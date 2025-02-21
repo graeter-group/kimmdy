@@ -317,10 +317,8 @@ class MoleculeTypeMerger:
 
         # amber fix for breaking/binding atom types without LJ potential
         if t1 in ["HW", "HO"]:
-            logger.debug(f"amber fix for {id1} of type {t1} typeA set to H1")
             t1 = "H1"
         if t2 in ["HW", "HO"]:
-            logger.debug(f"amber fix for {id2} of type {t2} typeA set to H1")
             t2 = "H1"
 
         type1 = self.ff.atomtypes[t1]
@@ -339,12 +337,8 @@ class MoleculeTypeMerger:
         else:
             raise ValueError("Unknown combination rule of forcefield")
 
-        logger.debug(
-            f"Got LJ parameters for {id1}-{id2} of types {type1.type}-{type2.type}: sigma {sigma} and epsilon {epsilon} from mol_b ({use_state_b})"
-        )
-
         if is_1_4:
-            # apply fudgeLJ
+            # scale interaction for 1-4 interactions
             epsilon = epsilon * fudgeLJ
 
         return sigma, epsilon
@@ -416,7 +410,6 @@ class MoleculeTypeMerger:
             and sigmaij_a == sigmaij_b
             and epsilonij_a == epsilonij_b
         ):
-            logger.debug(f"Pair {id1}-{id2} doesn't change, keeping default")
             return Pair(id1, id2, funct=self.ff.defaults[0][0])
 
         # defaults are 0.0 for all c0-c3
@@ -529,7 +522,9 @@ class MoleculeTypeMerger:
         for nr in self.mol_a.atoms.keys():
             atomA = self.mol_a.atoms[nr]
             atomB = self.mol_b.atoms[nr]
-            if atomA != atomB and not (self.use_simplified and atomA.charge == atomB.charge):
+            if atomA != atomB and not (
+                self.use_simplified and atomA.charge == atomB.charge
+            ):
                 # the simplified version doesn't change if the charges are the same
                 # set B parameters first
                 # to not overwrite them
@@ -631,9 +626,6 @@ class MoleculeTypeMerger:
                     c3=bond_b.c1,
                     comment=f"; morphing harmonic bond",
                 )
-                logger.debug(
-                    f"Created harmonic bond to bond transition for {bond_key} (transition): {self.mol_b.bonds[bond_key]}"
-                )
             elif isinstance(bond_a, (Bond, BondType)):
                 # bond only exists in A -> vanish bond
                 pairkey = to_pairkey(bond_key)
@@ -680,7 +672,7 @@ class MoleculeTypeMerger:
                         *bond_key,
                         funct=FFFUNC["morse_bond"],
                         # starts further away, so it can pull in atoms of the bond
-                        c0=f"{sigmaij_a*self.default_morse_dist_factor:.5f}", # sigmaij* 1.12 = LJ minimum at lambda 0, where the atom types are still from A
+                        c0=f"{sigmaij_a*self.default_morse_dist_factor:.5f}",  # sigmaij* 1.12 = LJ minimum at lambda 0, where the atom types are still from A
                         c1=f"{epsilonij_a:.5f}",  # epsilon is well depth of LJ
                         c2=f"{self.default_beta_for_lj:.5f}",  # beta from default beta for LJ
                         c3=bond_b.c0,  # final bond distance
@@ -796,25 +788,16 @@ class MoleculeTypeMerger:
             elif multiple_dihedralsA is not None and multiple_dihedralsB is not None:
                 # dihedrals exist in both A and B -> transition between parameters for the 1-4 interactions
                 # in case their atomtypes changed
-                logger.debug(
-                    f"Adding pair for dihedral {key} being morphed to affected_pairs"
-                )
                 pairkey = to_pairkey(key)
                 self.affected_interactions.dihedrals.morphed.add(pairkey)
             elif isinstance(multiple_dihedralsA, MultipleDihedrals):
                 # dihedral only exists in A -> vanishing dihedral
                 # pair transitions from half strength 1-4 interaction to full strength
-                logger.debug(
-                    f"Adding pair for dihedral {key} breaking to affected_pairs"
-                )
                 pairkey = to_pairkey(key)
                 self.affected_interactions.dihedrals.removed.add(pairkey)
             elif isinstance(multiple_dihedralsB, MultipleDihedrals):
                 # dihedral only exists in B -> creating dihedral
                 # corresponding pair transitions from full strength to half strength 1-4 interaction
-                logger.debug(
-                    f"Adding pair for dihedral {key} being created to affected_pairs"
-                )
                 pairkey = to_pairkey(key)
                 self.affected_interactions.dihedrals.added.add(pairkey)
 
@@ -921,9 +904,6 @@ class MoleculeTypeMerger:
                 raise ValueError(m)
 
             if pair_a is not None and pair_b is not None:
-                logger.debug(
-                    f"Pair {key} is in both topologies, transitioning between them"
-                )
                 if is_parameterized(pair_a) or is_parameterized(pair_b):
                     new_pairs[key] = Pair(
                         key[0],
@@ -939,16 +919,10 @@ class MoleculeTypeMerger:
                         key[0], key[1], PairTransition.Morph, from_1_4=True, to_1_4=True
                     )
             elif pair_a is not None:
-                logger.debug(
-                    f"Pair {key} is only in A, going from 1-4 to full strength LJ"
-                )
                 new_pairs[key] = self._make_pair(
                     key[0], key[1], PairTransition.Morph, from_1_4=True
                 )
             elif pair_b is not None:
-                logger.debug(
-                    f"Pair {key} is only in B, going from full strength LJ to 1-4"
-                )
                 new_pairs[key] = self._make_pair(
                     key[0], key[1], PairTransition.Morph, to_1_4=True
                 )
@@ -1025,7 +999,13 @@ class MoleculeTypeMerger:
                 self.helper_pairs[pair_key] = self._make_pair(
                     *pair_key, transition=PairTransition.Vanish, from_1_4=True
                 )
-            if pair_key not in removed_angles | removed_dihedrals | morphing_angles | morphing_dihedrals:
+            if (
+                pair_key
+                not in removed_angles
+                | removed_dihedrals
+                | morphing_angles
+                | morphing_dihedrals
+            ):
                 # the bond is added and the atoms didn't see each other in A
                 # so the full strength LJ interaction is turned off to 0
                 self.helper_pairs[pair_key] = self._make_pair(
@@ -1033,7 +1013,13 @@ class MoleculeTypeMerger:
                 )
 
         for pair_key in removed_bonds:
-            if pair_key not in added_angles | added_dihedrals | morphing_angles | morphing_angles:
+            if (
+                pair_key
+                not in added_angles
+                | added_dihedrals
+                | morphing_angles
+                | morphing_angles
+            ):
                 # the bond is removed and the atoms will not see each other in B
                 # so the pair interaction is turned on (at full strength)
                 self.helper_pairs[pair_key] = self._make_pair(
@@ -1050,7 +1036,13 @@ class MoleculeTypeMerger:
             if pairkey in removed_bonds:
                 # atoms where in a bond together and will be in an angle together, so they are just excluded
                 self.helper_exclusions.add(pairkey)
-            if pairkey not in removed_bonds | removed_dihedrals | morphing_dihedrals | morphing_angles:
+            if (
+                pairkey
+                not in removed_bonds
+                | removed_dihedrals
+                | morphing_dihedrals
+                | morphing_angles
+            ):
                 # the angle is added and the atoms saw each other in A, LJ is turned off
                 self.helper_pairs[pairkey] = self._make_pair(
                     *pairkey, transition=PairTransition.Vanish
@@ -1058,7 +1050,10 @@ class MoleculeTypeMerger:
 
         # pairs that end up with no angle between them where there was one before
         for pairkey in removed_angles:
-            if not pairkey in added_bonds | added_dihedrals | morphing_dihedrals | morphing_angles:
+            if (
+                not pairkey
+                in added_bonds | added_dihedrals | morphing_dihedrals | morphing_angles
+            ):
                 # the atoms where in an angle A and will not see each other in B
                 # we morph from 0 to full strength
                 self.helper_pairs[pairkey] = self._make_pair(
@@ -1101,7 +1096,10 @@ class MoleculeTypeMerger:
                 # dihedrals exist in both A and B -> transition between parameters for the 1-4 interactions
                 # in case their atomtypes changed
                 self.helper_pairs[pairkey] = self._make_pair(
-                    *pairkey, transition=PairTransition.Morph, from_1_4=True, to_1_4=True
+                    *pairkey,
+                    transition=PairTransition.Morph,
+                    from_1_4=True,
+                    to_1_4=True,
                 )
 
         # these pairs of atoms are first involved on one dihedral and end up still involved together in a dihedral
@@ -1110,7 +1108,10 @@ class MoleculeTypeMerger:
             if pairkey not in swapping_angles:
                 # dihedrals exist in both A and B -> transition between parameters for the 1-4 interactions
                 self.helper_pairs[pairkey] = self._make_pair(
-                    *pairkey, transition=PairTransition.Morph, from_1_4=True, to_1_4=True
+                    *pairkey,
+                    transition=PairTransition.Morph,
+                    from_1_4=True,
+                    to_1_4=True,
                 )
 
         for key, pair in self.helper_pairs.items():
@@ -1127,7 +1128,10 @@ class MoleculeTypeMerger:
 
 
 def merge_top_slow_growth(
-    top_a: Topology, top_b: Topology, use_pairs: bool = True, use_simplified: bool = False
+    top_a: Topology,
+    top_b: Topology,
+    use_pairs: bool = True,
+    use_simplified: bool = False,
 ) -> Topology:
     """Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation.
     Modifies topB in place.
