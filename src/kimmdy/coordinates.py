@@ -222,7 +222,7 @@ class MoleculeTypeMerger:
                 self.mol_b.pairs.pop(key, None)
                 self.mol_b.exclusions[key] = Exclusion(*key)
 
-        self.mol_b.find_radicals()
+        logger.info(f"Finished merging topologies")
         return self.mol_b
 
     def _get_explicit_MultipleDihedrals(
@@ -519,6 +519,7 @@ class MoleculeTypeMerger:
         # only iterating over the keys of mol_a
         # because KIMMDY can't add or remove atoms,
         # the the keys should be the same in a and b
+        logger.info("Merging atoms")
         for nr in self.mol_a.atoms.keys():
             atomA = self.mol_a.atoms[nr]
             atomB = self.mol_b.atoms[nr]
@@ -540,6 +541,7 @@ class MoleculeTypeMerger:
                 atomB.comment = "; morphing atomtypes"
 
     def merge_bonds(self):
+        logger.info("Merging bonds")
         bond_keys_a = set(self.mol_a.bonds.keys())
         bond_keys_b = set(self.mol_b.bonds.keys())
         bond_keys = bond_keys_a | bond_keys_b
@@ -696,6 +698,7 @@ class MoleculeTypeMerger:
                     )
 
     def merge_angles(self):
+        logger.info("Merging angles")
         keys = set(self.mol_a.angles.keys()) | set(self.mol_b.angles.keys())
         for key in keys:
             angle_a = self.mol_a.angles.get(key)
@@ -770,9 +773,11 @@ class MoleculeTypeMerger:
     def merge_dihedrals(self):
         # proper dihedrals
         # proper dihedrals have a nested structure and need a different treatment from bonds, angles and improper dihedrals
+        logger.info("Merging dihedrals")
         keys = set(self.mol_a.proper_dihedrals.keys()) | set(
             self.mol_b.proper_dihedrals.keys()
         )
+        logger.info(f"Found {len(keys)} dihedrals to merge")
         for key in keys:
             multiple_dihedralsA = self._get_explicit_MultipleDihedrals(
                 key=key, use_state_b=False, use_improper=False
@@ -892,49 +897,39 @@ class MoleculeTypeMerger:
 
     def merge_pairs(self):
         """Merge pairs that are from the respective pairs sections of the topologies"""
+        logger.info("Merging pairs")
         new_pairs = {}
         keys = set(self.mol_a.pairs.keys()) | set(self.mol_b.pairs.keys())
         for key in keys:
             pair_a = self.mol_a.pairs.get(key)
             pair_b = self.mol_b.pairs.get(key)
 
-            if pair_a is None and pair_b is None:
-                m = f"Can't find parameters for bond with key {key}, got None for both bonds. This should be an impossible state."
-                logger.error(m)
-                raise ValueError(m)
-
             if pair_a is not None and pair_b is not None:
                 if is_parameterized(pair_a) or is_parameterized(pair_b):
+                    new_pairs[key] = self._make_pair(
+                        key[0], key[1], PairTransition.Morph, from_1_4=True, to_1_4=True
+                    )
+                else:
                     new_pairs[key] = Pair(
                         key[0],
                         key[1],
                         funct=self.ff.defaults[0][0],
-                        c0=pair_a.c0,
-                        c1=pair_a.c1,
-                        c2=pair_b.c0,
-                        c3=pair_b.c1,
-                    )
-                else:
-                    new_pairs[key] = self._make_pair(
-                        key[0], key[1], PairTransition.Morph, from_1_4=True, to_1_4=True
                     )
             elif pair_a is not None:
+                logger.info(f"Pair {key} is only in A")
                 new_pairs[key] = self._make_pair(
                     key[0], key[1], PairTransition.Morph, from_1_4=True
                 )
             elif pair_b is not None:
+                logger.info(f"Pair {key} is only in B")
                 new_pairs[key] = self._make_pair(
                     key[0], key[1], PairTransition.Morph, to_1_4=True
                 )
 
-            for key, pair in new_pairs.items():
-                if pair is not None:
-                    self.mol_b.pairs[key] = pair
-
-                # Add general exclusions for each pair
-                # such that automatic non-bonded interactions
-                # don't interfer with our efforts
-                self.mol_b.exclusions[key] = Exclusion(*key)
+        self.mol_b.pairs = {}
+        for key, pair in new_pairs.items():
+            self.mol_b.pairs[key] = pair
+            self.mol_b.exclusions[key] = Exclusion(*key)
 
     def add_helper_pairs(self):
         """
@@ -944,6 +939,7 @@ class MoleculeTypeMerger:
         exclusion once bound. If a bond is breaking, the pair interaction
         is slowly turned on, as it was excluded previously.
         """
+        logger.info(f"Adding helper pairs")
         # pairs that stem from bonds breaking or forming
         # collected by looking at the changing bonds, angles and dihedrals (=higher order interactions)
         self.helper_pairs: dict[tuple[str, str], Pair] = {}
