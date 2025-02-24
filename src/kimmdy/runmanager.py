@@ -734,7 +734,9 @@ class RunManager:
         self.state = State.MD
 
         md_config = self.config.mds.attr(instance)
+        grompp_prefix = self.config.grompp_prefix
         gmx_alias = self.config.gromacs_alias
+        mdrun_prefix = self.config.mdrun_prefix
         gmx_mdrun_flags = self.config.gmx_mdrun_flags
         top = files.input["top"]
         gro = files.input["gro"]
@@ -753,7 +755,7 @@ class RunManager:
 
             # running grompp again fails for pulling MD, skip it for restart because it is not necessary
             grompp_cmd = (
-                f"{gmx_alias} grompp -p {top} -c {gro} "
+                f"{grompp_prefix + ' ' if grompp_prefix else ''}{gmx_alias} grompp -p {top} -c {gro} "
                 f"-f {mdp} -n {ndx} -o {instance}.tpr -maxwarn 5"
             )
             # optional files for grompp:
@@ -767,7 +769,7 @@ class RunManager:
             logger.debug(f"grompp cmd: {grompp_cmd}")
 
         mdrun_cmd = (
-            f"{gmx_alias} mdrun -s {instance}.tpr -cpi {cpt} "
+            f"{mdrun_prefix + ' ' if mdrun_prefix else ''}{gmx_alias} mdrun -s {instance}.tpr -cpi {cpt} "
             f"-x {instance}.xtc -o {instance}.trr "
             f"-cpo {instance}.cpt "
             f"-c {instance}.gro -g {instance}.log -e {instance}.edr "
