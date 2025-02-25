@@ -637,7 +637,7 @@ class RunManager:
                 if "_reaction" in duplicate.name:
                     files.output[duplicate_suffix] = duplicate
                     logger.info(
-                        f"Found reaction coordinate file: {duplicate} and set as latest or the non-reaction file"
+                        f"Found reaction coordinate file: {duplicate} and set as latest"
                     )
                     break
 
