@@ -14,6 +14,7 @@ import numpy as np
 
 from kimmdy.constants import MARK_REACION_TIME
 from kimmdy.recipe import RecipeCollection
+from kimmdy.constants import CONFIG_LOGS
 
 if TYPE_CHECKING:
     from kimmdy.parsing import Plumed_dict
@@ -353,7 +354,7 @@ def check_gmx_version(config):
         # NOTE: The logger is set up with information from the config
         # the the config can't use the logger.
         # Instead it collects the logmessages and displays them at the end.
-        config._logmessages["errors"].append(m)
+        CONFIG_LOGS["errors"].append(m)
         raise SystemError(m)
     # check version for plumed patch if necessary
     if hasattr(config, "mds"):
@@ -365,22 +366,21 @@ def check_gmx_version(config):
                         "'plumed', aborting due to apparent lack of PLUMED patch."
                         f"Version is: {version}"
                     )
-                    config._logmessages["errors"].append(m)
+                    CONFIG_LOGS["errors"].append(m)
                     if not config.dryrun:
                         raise SystemError(m)
     if hasattr(config, "changer") and hasattr(config.changer, "coordinates"):
         if (
-            config.changer.coordinates.slow_growth_pairs
-            and config.changer.coordinates.slow_growth
+            config.changer.coordinates.slow_growth not in ["", "morse_only"]
         ):
-            m = "Note: slow growth of pairs is only supported by >= gromacs 2023.2. To disable morphing pairs in config: md.changer.coordinates.slow_growth_pairs = false"
-            config._logmessages["debugs"].append(f"Gromacs version: {version}")
-            config._logmessages["errors"].append(m)
+            CONFIG_LOGS["debugs"].append(f"Gromacs version: {version}")
             major_minor = re.match(r".*(\d{4})\.(\d+).*", version)
             if major_minor is not None:
                 year = int(major_minor.group(1))
                 minor = int(major_minor.group(2))
                 if year < 2023 or (year == 2023 and minor < 2):
+                    m = "Note: slow growth of pairs is only supported by >= gromacs 2023.2. To disable morphing pairs in config: md.changer.coordinates.slow_growth: morse_only"
+                    CONFIG_LOGS["errors"].append(m)
                     raise SystemError(m)
     return version
 
