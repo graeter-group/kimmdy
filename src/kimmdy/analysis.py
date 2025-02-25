@@ -182,7 +182,7 @@ def plot_energy(
     edrs: list[Path] = []
     for d in subdirs_matched:
         new_edrs = d.glob("*.edr")
-        edrs.extend([edr for edr in new_edrs if not ".kimmdytrunc." in edr.name])
+        edrs.extend([edr for edr in new_edrs if not ".kimmdytrunc." in edr.name and not "_reaction.edr" in edr.name])
     assert (
         len(edrs) > 0
     ), f"No GROMACS energy files in {run_dir} with subdirectory names {steps}"
