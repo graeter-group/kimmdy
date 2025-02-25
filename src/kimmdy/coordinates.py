@@ -777,7 +777,6 @@ class MoleculeTypeMerger:
         keys = set(self.mol_a.proper_dihedrals.keys()) | set(
             self.mol_b.proper_dihedrals.keys()
         )
-        logger.info(f"Found {len(keys)} dihedrals to merge")
         for key in keys:
             multiple_dihedralsA = self._get_explicit_MultipleDihedrals(
                 key=key, use_state_b=False, use_improper=False
@@ -916,12 +915,10 @@ class MoleculeTypeMerger:
                         funct=self.ff.defaults[0][0],
                     )
             elif pair_a is not None:
-                logger.info(f"Pair {key} is only in A")
                 new_pairs[key] = self._make_pair(
                     key[0], key[1], PairTransition.Morph, from_1_4=True
                 )
             elif pair_b is not None:
-                logger.info(f"Pair {key} is only in B")
                 new_pairs[key] = self._make_pair(
                     key[0], key[1], PairTransition.Morph, to_1_4=True
                 )
