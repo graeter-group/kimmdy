@@ -183,16 +183,12 @@ class MoleculeTypeMerger:
         mol_a: MoleculeType,
         mol_b: MoleculeType,
         ff: FF,
-        use_pairs: bool = True,
-        use_simplified: bool = False,
+        morse_only: bool = False,
     ) -> None:
         self.mol_a = mol_a
         self.mol_b = mol_b
         self.ff = ff
-        if use_simplified:
-            use_pairs = False
-        self.use_pairs = use_pairs
-        self.use_simplified = use_simplified
+        self.morse_only = morse_only
         self.default_morse_well_depth = 300  # [kJ mol^-1]
         self.default_beta_for_lj = 19  # matches LJ steepness
         self.default_morse_dist_factor = 1.12  # sigmaij* 1.12 = LJ minimum
@@ -213,7 +209,7 @@ class MoleculeTypeMerger:
         self.merge_angles()
         self.merge_dihedrals()
 
-        if self.use_pairs:
+        if not self.morse_only:
             self.merge_pairs()
             self.add_helper_pairs()
         else:
@@ -524,7 +520,7 @@ class MoleculeTypeMerger:
             atomA = self.mol_a.atoms[nr]
             atomB = self.mol_b.atoms[nr]
             if atomA != atomB and not (
-                self.use_simplified and atomA.charge == atomB.charge
+                self.morse_only and atomA.charge == atomB.charge
             ):
                 # the simplified version doesn't change if the charges are the same
                 # set B parameters first
@@ -632,7 +628,7 @@ class MoleculeTypeMerger:
                 # bond only exists in A -> vanish bond
                 pairkey = to_pairkey(bond_key)
                 self.affected_interactions.bonds.removed.add(pairkey)
-                if self.use_simplified:
+                if self.morse_only:
                     # use a bond that pretends to be LJ via morse
                     # because `simplified` will not touch the pairs
                     self.mol_b.bonds[bond_key] = Bond(
@@ -668,7 +664,7 @@ class MoleculeTypeMerger:
                     raise ValueError(m)
                 pairkey = to_pairkey(bond_key)
                 self.affected_interactions.bonds.added.add(pairkey)
-                if self.use_simplified:
+                if self.morse_only:
                     # use a bond that pretends to be LJ via morse
                     self.mol_b.bonds[bond_key] = Bond(
                         *bond_key,
@@ -1123,8 +1119,7 @@ class MoleculeTypeMerger:
 def merge_top_slow_growth(
     top_a: Topology,
     top_b: Topology,
-    use_pairs: bool = True,
-    use_simplified: bool = False,
+    morse_only: bool = False,
 ) -> Topology:
     """Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation.
     Modifies topB in place.
@@ -1135,8 +1130,7 @@ def merge_top_slow_growth(
         mol_a=top_a.moleculetypes[REACTIVE_MOLECULEYPE],
         mol_b=top_b.moleculetypes[REACTIVE_MOLECULEYPE],
         ff=top_b.ff,
-        use_pairs=use_pairs,
-        use_simplified=use_simplified,
+        morse_only=morse_only,
     ).merge()
     return top_b
 

@@ -1155,8 +1155,7 @@ class RunManager:
                         # top_b is modified and returned as the merged top
                         # hence it must be copied here to not modify self.top
                         top_b=deepcopy(self.top),
-                        use_pairs=self.config.changer.coordinates.slow_growth_pairs,
-                        use_simplified=self.config.changer.coordinates.use_simplified_slow_growth,
+                        morse_only=self.config.changer.coordinates.slow_growth == "morse_only",
                     )
                     top_merge_path = files.outputdir / self.config.top.name.replace(
                         ".top", "_relax.top"
