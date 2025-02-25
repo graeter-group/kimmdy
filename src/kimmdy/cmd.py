@@ -14,6 +14,7 @@ from typing import Optional
 
 from kimmdy.assets.templates import jobscript
 from kimmdy.config import Config
+from kimmdy.constants import CONFIG_LOGS
 from kimmdy.plugins import (
     broken_parameterization_plugins,
     broken_reaction_plugins,
@@ -159,11 +160,11 @@ def _run(args: argparse.Namespace):
         # from initial config parsing
         # before the logger was configured
         # (because the logger config depends on the config)
-        for info in config._logmessages["debugs"]:
+        for info in CONFIG_LOGS["debugs"]:
             logger.debug(info)
-        for info in config._logmessages["infos"]:
+        for info in CONFIG_LOGS["infos"]:
             logger.info(info)
-        for warning in config._logmessages["warnings"]:
+        for warning in CONFIG_LOGS["warnings"]:
             logger.warning(warning)
 
         runmgr = RunManager(config)

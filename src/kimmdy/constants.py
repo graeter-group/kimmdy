@@ -2,6 +2,18 @@
 Constants used throughout KIMMDY
 """
 
+CONFIG_LOGS = {
+    "infos": [],
+    "warnings": [],
+    "errors": [],
+    "debugs": [],
+}
+"""The logger is set up with information from the config
+the the config can't use the logger.
+Instead it collects the logmessages and displays them at the end.
+"""
+
+
 MARK_STARTED = ".kimmdy_started"
 MARK_DONE = ".kimmdy_done"
 MARK_FINISHED = ".kimmdy_finished"

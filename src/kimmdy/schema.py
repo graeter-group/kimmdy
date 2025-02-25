@@ -145,6 +145,7 @@ def convert_schema_to_dict(dictionary: dict) -> dict:
         default = value.get("default")
         description = value.get("description")
         enum = value.get("enum")
+        deprecated = value.get("deprecated")
         additionalProperties = value.get("additionalProperties")
         if pytype is not None:
             result[key]["pytype"] = type_from_str(pytype)
@@ -152,6 +153,8 @@ def convert_schema_to_dict(dictionary: dict) -> dict:
             result[key]["default"] = default
         if description is not None:
             result[key]["description"] = description
+        if deprecated is not None:
+            result[key]["deprecated"] = deprecated
         if enum is not None:
             result[key]["enum"] = enum
         if additionalProperties is not None:
