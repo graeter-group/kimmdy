@@ -188,19 +188,19 @@ class Config:
                     if "reactions." in section:
                         m += "\nCheck installed plugins with --show-plugins and your input .yml"
                     raise ValueError(m)
-                pytype = subscheme.get("pytype")
-                if pytype is None:
-                    m = f"No type found for {section}.{k}"
-                    raise ValueError(m)
                 deprecated = subscheme.get("deprecated")
                 if deprecated is not None:
                     description = subscheme.get("description")
                     m = f"Deprecated option in {section}.{k}: {deprecated}, {description}"
                     CONFIG_LOGS["warnings"].append(m)
+                pytype = subscheme.get("pytype")
+                if pytype is None and not deprecated:
+                    m = f"No type found for {section}.{k}"
+                    raise ValueError(m)
 
-                # cast to type
-                v = pytype(v)
-                self.__setattr__(k, v)
+                if not deprecated:
+                    v = pytype(v)
+                    self.__setattr__(k, v)
 
         # validate on initial construction
         if section == "config":
