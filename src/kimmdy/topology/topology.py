@@ -715,8 +715,10 @@ class Topology:
         self._link_atomics()
 
     def _link_atomics(self):
-        """
-        link atoms, bonds etc. to the main moleculeype, REACTIVE_MOLECULEYPE
+        """link atoms, bonds etc. properties of self (=top) to the reactive moleculeype.
+
+        Call this any time a large change is made to the reactive moleculetype
+        that re-assigns a property and not just modifies parts of it in place.
         """
         self.reactive_molecule = self.moleculetypes[REACTIVE_MOLECULEYPE]
         self.atoms = self.reactive_molecule.atoms
@@ -725,16 +727,10 @@ class Topology:
         self.exclusions = self.reactive_molecule.exclusions
         self.settles = self.reactive_molecule.settles
         self.proper_dihedrals = self.reactive_molecule.proper_dihedrals
-        self.improper_dihedrals = self.moleculetypes[
-            REACTIVE_MOLECULEYPE
-        ].improper_dihedrals
+        self.improper_dihedrals = self.reactive_molecule.improper_dihedrals
         self.pairs = self.reactive_molecule.pairs
-        self.position_restraints = self.moleculetypes[
-            REACTIVE_MOLECULEYPE
-        ].position_restraints
-        self.dihedral_restraints = self.moleculetypes[
-            REACTIVE_MOLECULEYPE
-        ].dihedral_restraints
+        self.position_restraints = self.reactive_molecule.position_restraints
+        self.dihedral_restraints = self.reactive_molecule.dihedral_restraints
         self.radicals = self.reactive_molecule.radicals
         self.nrexcl = self.reactive_molecule.nrexcl
 
