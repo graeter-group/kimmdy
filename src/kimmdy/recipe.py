@@ -1,5 +1,4 @@
-"""Contains the Reaction Recipe, RecipeStep and RecipeCollection.
-"""
+"""Contains the Reaction Recipe, RecipeStep and RecipeCollection."""
 
 from __future__ import annotations
 
@@ -597,17 +596,17 @@ class Recipe:
             if isinstance(rs, Place):
                 if (id := getattr(rs, "id_to_place", None)) is not None:
                     name += id
-                    name += "\u27A1"  # ➡
+                    name += "\u27a1"  # ➡
             elif isinstance(rs, Bind):
                 if (id := getattr(rs, "atom_id_1", None)) is not None:
                     name += id
-                    name += "\u27A1"  # ➡
+                    name += "\u27a1"  # ➡
                 if (id := getattr(rs, "atom_id_2", None)) is not None:
                     name += id
             elif isinstance(rs, Break):
                 if (id := getattr(rs, "atom_id_1", None)) is not None:
                     name += id
-                    name += "\u26A1"  # ➡
+                    name += "\u26a1"  # ➡
                 if (id := getattr(rs, "atom_id_2", None)) is not None:
                     name += id
             elif isinstance(rs, Relax):

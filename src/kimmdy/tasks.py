@@ -1,5 +1,5 @@
 """
-The tasks module holds the TaskFiles class which organizes input and 
+The tasks module holds the TaskFiles class which organizes input and
 output paths and the Task class for tasks in the runmanager queue.
 """
 
