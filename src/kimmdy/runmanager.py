@@ -86,7 +86,7 @@ IGNORE_SUBSTR = [
     r"\.\d+#$",
     r"\.log$",
     "rotref",
-    r"^\." # all hidden files
+    r"^\.",  # all hidden files
 ] + MARKERS
 # are there cases where we have multiple trr files?
 TASKS_WITHOUT_DIR = ["place_reaction_task"]
@@ -355,7 +355,9 @@ class RunManager:
                     "directory if you want to restart from before the failed task."
                 )
                 logger.warning(m)
-                inp = input("Do you want to continue and delete this task directory? [y/n]")
+                inp = input(
+                    "Do you want to continue and delete this task directory? [y/n]"
+                )
                 if inp.lower() != "y":
                     exit(1)
             elif (
@@ -1038,7 +1040,7 @@ class RunManager:
             write_coordinate_files_at_reaction_time(files=files, time=ttime)
             self.latest_files["gro"] = files.output["gro"]
             self.latest_files["trr"] = files.output["trr"]
-            self.latest_files['edr'] = files.output["edr"]
+            self.latest_files["edr"] = files.output["edr"]
 
         top_initial = deepcopy(self.top)
         for step in recipe.recipe_steps:
@@ -1061,7 +1063,9 @@ class RunManager:
                 )
                 place_files = relax_task()
                 if place_files is not None:
-                    self._discover_output_files(taskname=relax_task.name, files=place_files)
+                    self._discover_output_files(
+                        taskname=relax_task.name, files=place_files
+                    )
                     shadow_files_binding = place_files
                 if step.id_to_place is not None:
                     self.top.parameterization_focus_ids.update([step.id_to_place])
@@ -1142,7 +1146,8 @@ class RunManager:
                         # top_b is modified and returned as the merged top
                         # hence it must be copied here to not modify self.top
                         top_b=deepcopy(self.top),
-                        morse_only=self.config.changer.coordinates.slow_growth == "morse_only",
+                        morse_only=self.config.changer.coordinates.slow_growth
+                        == "morse_only",
                     )
                     top_merge_path = files.outputdir / self.config.top.name.replace(
                         ".top", "_relax.top"

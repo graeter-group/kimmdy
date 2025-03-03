@@ -370,9 +370,7 @@ def check_gmx_version(config):
                     if not config.dryrun:
                         raise SystemError(m)
     if hasattr(config, "changer") and hasattr(config.changer, "coordinates"):
-        if (
-            config.changer.coordinates.slow_growth not in ["", "morse_only"]
-        ):
+        if config.changer.coordinates.slow_growth not in ["", "morse_only"]:
             CONFIG_LOGS["debugs"].append(f"Gromacs version: {version}")
             major_minor = re.match(r".*(\d{4})\.(\d+).*", version)
             if major_minor is not None:
@@ -435,7 +433,7 @@ def write_coordinate_files_at_reaction_time(files: TaskFiles, time: float):
     # It should have more frames and be smaller,
     # but sometimes the people only write a specific index group to the xtc,
     # in which case it fails and we try the trr
-    #FIXME: fixme
+    # FIXME: fixme
     # this needs proper documetation for plugin authors
     # because one would want the trr file for the precision and velocities
     # at the raction time, but plugins may use the xtc file (smaller)
@@ -479,7 +477,7 @@ def write_coordinate_files_at_reaction_time(files: TaskFiles, time: float):
     if files.input["edr"]:
         try:
             run_gmx(
-            f"gmx eneconv -f {files.input['edr']} -b {time} -e {time} -o {edr_reaction}"
+                f"gmx eneconv -f {files.input['edr']} -b {time} -e {time} -o {edr_reaction}"
             )
             logger.info(
                 f"Successfully wrote out edr file at reaction time in {gro.parent.name} from edr file."
