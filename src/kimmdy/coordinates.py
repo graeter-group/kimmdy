@@ -212,6 +212,14 @@ class MoleculeTypeMerger:
         if not self.morse_only:
             self.merge_pairs()
             self.add_helper_pairs()
+            # sort pairs because their order can get messed up
+            # by adding the helper pairs after the already existing pairs
+            self.mol_b.pairs = dict(
+                sorted(
+                    self.mol_b.pairs.items(),
+                    key=lambda item: (int(item[0][0]), int(item[0][1])),
+                )
+            )
         else:
             # same as in (keysA - keysB) in v1
             for key in self.affected_interactions.bonds.removed:
