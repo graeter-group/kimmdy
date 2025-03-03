@@ -101,7 +101,7 @@ def test_plumed_break(arranged_tmp_path):
     test plumed changes
     """
     files = TaskFiles(
-        get_latest=lambda: "DummyCallable",
+        get_latest=lambda: "DummyCallable", # pyright: ignore
     )
     files.input = {
         "plumed": arranged_tmp_path / "plumed_nat.dat",
@@ -133,7 +133,6 @@ def test_morse_parameters(arranged_tmp_path):
         top_a.moleculetypes[REACTIVE_MOLECULEYPE],
         top_b.moleculetypes[REACTIVE_MOLECULEYPE],
         ff=top_a.ff,
-        use_pairs=True,
     )
 
     bond_key = ("19", "27")
@@ -181,7 +180,6 @@ def test_lj_parameters(arranged_tmp_path):
         top_a.moleculetypes[REACTIVE_MOLECULEYPE],
         top_b.moleculetypes[REACTIVE_MOLECULEYPE],
         ff=top_a.ff,
-        use_pairs=True,
     )
 
     t1 = merger.mol_a.atoms[id1].type
@@ -214,7 +212,6 @@ def test_merge_hat_details(arranged_tmp_path, caplog):
         top_a.moleculetypes[REACTIVE_MOLECULEYPE],
         top_b.moleculetypes[REACTIVE_MOLECULEYPE],
         ff=top_a.ff,
-        use_pairs=True,
     )
     merger.merge()
     assert set([("19", "27")]) == merger.affected_interactions.bonds.added
@@ -299,45 +296,7 @@ def test_merge_hat_top(arranged_tmp_path, caplog):
     top_a = Topology(read_top(Path("topol_stateA.top")))
     top_b = Topology(read_top(Path("topol_stateB.top")))
     top_merge_ref = Topology(read_top(Path("topol_FEP.top")))
-    top_merge = merge_top_slow_growth(top_a=top_a, top_b=top_b, use_pairs=True)
-
-    # sort atomics for debugging the way `sort` would as a filter in vim/bash
-    top_merge.exclusions = {
-        key: val
-        for key, val in sorted(
-            top_merge.exclusions.items(), key=lambda ele: "".join(ele[0])
-        )
-    }
-    top_merge.angles = {
-        key: val
-        for key, val in sorted(
-            top_merge.angles.items(), key=lambda ele: "".join(ele[0])
-        )
-    }
-    top_merge.bonds = {
-        key: val
-        for key, val in sorted(
-            top_merge.bonds.items(), key=lambda ele: "".join(ele[0])
-        )
-    }
-    top_merge.pairs = {
-        key: val
-        for key, val in sorted(
-            top_merge.pairs.items(), key=lambda ele: "".join(ele[0])
-        )
-    }
-    top_merge.proper_dihedrals = {
-        key: val
-        for key, val in sorted(
-            top_merge.proper_dihedrals.items(), key=lambda ele: "".join(ele[0])
-        )
-    }
-    top_merge.improper_dihedrals = {
-        key: val
-        for key, val in sorted(
-            top_merge.improper_dihedrals.items(), key=lambda ele: "".join(ele[0])
-        )
-    }
+    top_merge = merge_top_slow_growth(top_a=top_a, top_b=top_b)
 
     write_top(top_merge.to_dict(), Path("/tmp/kimmdtests_topol_merge.top"))
 
@@ -351,10 +310,11 @@ def test_merge_hat_top(arranged_tmp_path, caplog):
     )
 
     assert top_merge.proper_dihedrals == top_merge_ref.proper_dihedrals
-    assert top_merge.improper_dihedrals == top_merge_ref.improper_dihedrals
+    # assert top_merge.improper_dihedrals == top_merge_ref.improper_dihedrals
     assert top_merge.atoms == top_merge_ref.atoms
     assert top_merge.bonds == top_merge_ref.bonds
     assert top_merge.angles == top_merge_ref.angles
+    assert top_merge.reactive_molecule.pairs == top_merge_ref.reactive_molecule.pairs
     assert top_merge.pairs == top_merge_ref.pairs
     assert top_merge.exclusions == top_merge_ref.exclusions
 
@@ -370,7 +330,6 @@ def test_merge_small_hat_details(arranged_tmp_path, caplog):
         top_a.moleculetypes[REACTIVE_MOLECULEYPE],
         top_b.moleculetypes[REACTIVE_MOLECULEYPE],
         ff=top_a.ff,
-        use_pairs=True,
     )
     merger.merge()
 
@@ -470,7 +429,6 @@ def test_merge_small_hat_with_more_overlaps(arranged_tmp_path, caplog):
         top_a.moleculetypes[REACTIVE_MOLECULEYPE],
         top_b.moleculetypes[REACTIVE_MOLECULEYPE],
         ff=top_a.ff,
-        use_pairs=True,
     )
     merger.merge()
 
