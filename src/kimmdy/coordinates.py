@@ -176,7 +176,7 @@ class AffectedInteractions:
 
 
 class MoleculeTypeMerger:
-    """Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation"""
+    """Takes two MoleculeTypes and joins them for a smooth free-energy like parameter transition simulation"""
 
     def __init__(
         self,
@@ -1127,11 +1127,19 @@ def merge_top_slow_growth(
     """
 
     MoleculeTypeMerger(
-        mol_a=top_a.moleculetypes[REACTIVE_MOLECULEYPE],
-        mol_b=top_b.moleculetypes[REACTIVE_MOLECULEYPE],
+        mol_a=top_a.reactive_molecule,
+        mol_b=top_b.reactive_molecule,
         ff=top_b.ff,
         morse_only=morse_only,
     ).merge()
+
+    # because we clear some sections of the moleculetype,
+    # like self.mol_b.pairs = {},
+    # breaking the link between
+    # `top.pairs` and `top.reactive_molecule.pairs`,
+    # we need to re-link them for convenient access
+    top_b._link_atomics()
+
     return top_b
 
 
