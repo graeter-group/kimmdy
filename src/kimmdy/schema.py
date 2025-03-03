@@ -200,7 +200,7 @@ def flatten_scheme(scheme, section="") -> list:
     enum = scheme.get("enum", "")
     deprecated = scheme.get("deprecated", "")
 
-    if section != '':
+    if section != "":
         ls.append(
             {
                 "key": section,
@@ -214,11 +214,19 @@ def flatten_scheme(scheme, section="") -> list:
 
     # sub schemes
     for key, value in scheme.items():
-        if key not in ["pytype", "default", "description", "type", "enum", "additionalProperties", "deprecated"]:
+        if key not in [
+            "pytype",
+            "default",
+            "description",
+            "type",
+            "enum",
+            "additionalProperties",
+            "deprecated",
+        ]:
             k_esc = key
             if key == ".*":
                 k_esc = "\\*"
-            if section != '':
+            if section != "":
                 s = f"{section}.{k_esc}"
             else:
                 s = k_esc

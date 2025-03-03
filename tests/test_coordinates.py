@@ -101,7 +101,7 @@ def test_plumed_break(arranged_tmp_path):
     test plumed changes
     """
     files = TaskFiles(
-        get_latest=lambda: "DummyCallable", # pyright: ignore
+        get_latest=lambda: "DummyCallable",  # pyright: ignore
     )
     files.input = {
         "plumed": arranged_tmp_path / "plumed_nat.dat",
@@ -360,36 +360,36 @@ def test_merge_small_hat_details(arranged_tmp_path, caplog):
 
     added_bonds = (
         merger.affected_interactions.bonds.added
-            - merger.affected_interactions.bonds.removed
+        - merger.affected_interactions.bonds.removed
     )
     removed_bonds = (
         merger.affected_interactions.bonds.removed
-            - merger.affected_interactions.bonds.added
+        - merger.affected_interactions.bonds.added
     )
     added_angles = (
         merger.affected_interactions.angles.added
-            - merger.affected_interactions.angles.removed
+        - merger.affected_interactions.angles.removed
     )
     removed_angles = (
         merger.affected_interactions.angles.removed
-            - merger.affected_interactions.angles.added
+        - merger.affected_interactions.angles.added
     )
     swapping_angles = (
         merger.affected_interactions.angles.added
-            & merger.affected_interactions.angles.removed
+        & merger.affected_interactions.angles.removed
     )
     morphing_angles = merger.affected_interactions.angles.morphed
     added_dihedrals = (
         merger.affected_interactions.dihedrals.added
-            - merger.affected_interactions.dihedrals.removed
+        - merger.affected_interactions.dihedrals.removed
     )
     removed_dihedrals = (
         merger.affected_interactions.dihedrals.removed
-            - merger.affected_interactions.dihedrals.added
+        - merger.affected_interactions.dihedrals.added
     )
     swapping_dihedrals = (
         merger.affected_interactions.dihedrals.added
-            & merger.affected_interactions.dihedrals.removed
+        & merger.affected_interactions.dihedrals.removed
     )
     morphing_dihedrals = merger.affected_interactions.dihedrals.morphed
 
@@ -406,10 +406,10 @@ def test_merge_small_hat_details(arranged_tmp_path, caplog):
 
     # the atoms of the changing bond still stay in an angle
     # so they keep being excluded
-    assert ('8', '9') not in merger.helper_pairs
-    assert ('7', '8') not in merger.helper_pairs
-    assert ('8', '9') in merger.helper_exclusions
-    assert ('7', '8') in merger.helper_exclusions
+    assert ("8", "9") not in merger.helper_pairs
+    assert ("7", "8") not in merger.helper_pairs
+    assert ("8", "9") in merger.helper_exclusions
+    assert ("7", "8") in merger.helper_exclusions
 
 
 def test_merge_small_hat_with_more_overlaps(arranged_tmp_path, caplog):
@@ -438,13 +438,17 @@ def test_merge_small_hat_with_more_overlaps(arranged_tmp_path, caplog):
         ("14", "21"),
         ("18", "21"),
     }
-    assert merger.affected_interactions.angles.removed == {("19", "21"), ("20", "21"), ("16", "21")}
+    assert merger.affected_interactions.angles.removed == {
+        ("19", "21"),
+        ("20", "21"),
+        ("16", "21"),
+    }
 
     assert merger.affected_interactions.dihedrals.added == {
         ("20", "21"),
         ("19", "21"),
         ("15", "21"),
-        ('9', '21'),
+        ("9", "21"),
     }
 
     assert merger.affected_interactions.dihedrals.removed == {
@@ -455,5 +459,6 @@ def test_merge_small_hat_with_more_overlaps(arranged_tmp_path, caplog):
     # but added as a dihedral
     # so we expect a Pair transition from exlcusion (all 0.0000) to half-strengh 1-4 interactions
     # sigma and epsilon being for CR and H1
-    merger.helper_pairs[('14', '21')] = Pair('14', '21', '1', '0.00000', '0.00000', '0.22344', '0.17340')
-
+    merger.helper_pairs[("14", "21")] = Pair(
+        "14", "21", "1", "0.00000", "0.00000", "0.22344", "0.17340"
+    )
