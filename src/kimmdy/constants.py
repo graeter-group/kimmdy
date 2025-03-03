@@ -21,6 +21,10 @@ MARK_FAILED = ".kimmdy_failed"
 MARK_REACION_TIME = ".kimmdy_reaction_time"
 MARKERS = [MARK_STARTED, MARK_DONE, MARK_FAILED, MARK_FINISHED, MARK_REACION_TIME]
 
+REACTION_GRO = ".kimmdy_reaction.gro"
+REACTION_TRR = ".kimmdy_reaction.trr"
+REACTION_EDR = ".kimmdy_reaction.edr"
+
 ATOM_ID_FIELDS = {
     "atoms": [0, 5],  # atomnr, chargegroup
     "bonds": [0, 1],
