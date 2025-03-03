@@ -275,7 +275,7 @@
     },
     "restart": {
       "title": "restart",
-      "type": "object",
+      "type": "boolean",
       "description": "Restart or continue from a previous run (in config.out) instead of starting from scratch",
       "pytype": "bool",
       "default": false
