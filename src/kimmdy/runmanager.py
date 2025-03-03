@@ -86,6 +86,7 @@ IGNORE_SUBSTR = [
     r"\.\d+#$",
     r"\.log$",
     "rotref",
+    r"^\." # all hidden files
 ] + MARKERS
 # are there cases where we have multiple trr files?
 TASKS_WITHOUT_DIR = ["place_reaction_task"]
@@ -481,13 +482,13 @@ class RunManager:
         for task_dir in task_dirs[self.iteration + 1 :]:
             shutil.rmtree(task_dir)
 
-        # discover after it is clear which tasks will be in queue
+        # discover after it is clear which tasks are in queue
         for task_dir in task_dirs[: self.iteration + 1]:
             task_name = "_".join(task_dir.name.split(sep="_")[1:])
             task_files = TaskFiles(
                 self.get_latest, {}, {}, self.config.out / task_dir.name
             )
-            self._discover_output_files(task_name, task_files)
+            self._discover_output_files(taskname=task_name, files=task_files)
 
         # plumed fix
         for md_config in self.config.mds.__dict__.values():
@@ -605,7 +606,7 @@ class RunManager:
             return
         files = task()
         if files is not None:
-            self._discover_output_files(task.name, files)
+            self._discover_output_files(taskname=task.name, files=files)
 
     def _discover_output_files(
         self, taskname: str, files: TaskFiles
@@ -627,20 +628,6 @@ class RunManager:
             if not any(re.search(s, p.name) for s in IGNORE_SUBSTR)
         ]
         suffs = [p.suffix[1:] for p in discovered_files]
-        # if gro/trr file is found and we wrote a <name>._reaction.gro file
-        # explicitly make this the latest gro file
-        for duplicate_suffix in ["gro", "trr"]:
-            duplicates = [
-                p for p in discovered_files if p.suffix[1:] == duplicate_suffix
-            ]
-            for duplicate in duplicates:
-                if "_reaction" in duplicate.name:
-                    files.output[duplicate_suffix] = duplicate
-                    logger.info(
-                        f"Found reaction coordinate file: {duplicate} and set as latest"
-                    )
-                    break
-
         counts = [suffs.count(s) for s in suffs]
         for suff, c, path in zip(suffs, counts, discovered_files):
             if c != 1 and suff not in AMBIGUOUS_SUFFS:
@@ -763,10 +750,9 @@ class RunManager:
             if self.latest_files.get("trr") is not None:
                 trr = files.input["trr"]
                 grompp_cmd += f" -t {trr}"
-            ## disable use of edr for now
-            # if self.latest_files.get("edr") is not None:
-            #     edr = files.input["edr"]
-            #     grompp_cmd += f" -e {edr}"
+            if self.latest_files.get("edr") is not None:
+                edr = files.input["edr"]
+                grompp_cmd += f" -e {edr}"
             logger.debug(f"grompp cmd: {grompp_cmd}")
 
         mdrun_cmd = (
@@ -1047,11 +1033,12 @@ class RunManager:
         # but this only happens after the apply_recipe task
         # so we need to set it manually here for intermediate tasks
         # like Relax and Place to have the correct coordinates
-        logger.info(f"Writing coordinates (gro and trr) for reaction.")
+        logger.info(f"Writing coordinates (gro and trr) and energy (edr) for reaction.")
         if ttime is not None:
             write_coordinate_files_at_reaction_time(files=files, time=ttime)
             self.latest_files["gro"] = files.output["gro"]
             self.latest_files["trr"] = files.output["trr"]
+            self.latest_files['edr'] = files.output["edr"]
 
         top_initial = deepcopy(self.top)
         for step in recipe.recipe_steps:
@@ -1074,7 +1061,7 @@ class RunManager:
                 )
                 place_files = relax_task()
                 if place_files is not None:
-                    self._discover_output_files(relax_task.name, place_files)
+                    self._discover_output_files(taskname=relax_task.name, files=place_files)
                     shadow_files_binding = place_files
                 if step.id_to_place is not None:
                     self.top.parameterization_focus_ids.update([step.id_to_place])
@@ -1197,9 +1184,10 @@ class RunManager:
             # the files object with the files from the relaxation or placement task
             # (whichever was later)
             # such that the next task will use these files
-            files.output["gro"] = shadow_files_binding.output["gro"]
-            files.output["trr"] = shadow_files_binding.output["trr"]
-            files.output["xtc"] = shadow_files_binding.output["xtc"]
+            for ext in ["gro", "trr", "xtc", "edr"]:
+                out = shadow_files_binding.output.get(ext)
+                if out is not None:
+                    files.output[ext] = out
             # but not the `top`, because the top for the relaxation
             # is only temporary and should not be used for the next task
 
