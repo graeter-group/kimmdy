@@ -30,6 +30,7 @@ from kimmdy.utils import (
     longFormatter,
 )
 
+
 def configure_logger(config: Config):
     """Configure logging.
 
@@ -325,9 +326,7 @@ class Config:
                 self.out.mkdir()
                 CONFIG_LOGS["infos"].append(f"Created output dir {self.out}")
             else:
-                CONFIG_LOGS["infos"].append(
-                    f"Restarting in output dir {self.out}"
-                )
+                CONFIG_LOGS["infos"].append(f"Restarting in output dir {self.out}")
 
     def _validate(self, section: str = "config", cwd: Path = Path(".")):
         """Validates config."""
