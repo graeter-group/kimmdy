@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING, Optional, Union
 
 import numpy as np
 
-from kimmdy.constants import MARK_REACION_TIME
+from kimmdy.constants import MARK_REACION_TIME, REACTION_EDR, REACTION_GRO, REACTION_TRR
 from kimmdy.recipe import RecipeCollection
 from kimmdy.constants import CONFIG_LOGS
 
@@ -409,13 +409,13 @@ def write_coordinate_files_at_reaction_time(files: TaskFiles, time: float):
         logger.error(m)
         raise FileNotFoundError(m)
 
-    if gro.name.endswith("_reaction.gro"):
-        m = f"The latest gro file registered already ends in _reaction.gro. This state should not be possible unless multiple reactions where run in sequence without any MD in between (even relaxation)."
+    if gro.name == REACTION_GRO:
+        m = f"The latest gro file registered already is a kimmdy reaction file. This state should not be possible unless multiple reactions where run in sequence without any MD in between (even relaxation)."
         logger.error(m)
 
-    gro_reaction = gro.with_name(gro.stem + f"_reaction.gro")
-    trr_reaction = gro.with_name(gro.stem + f"_reaction.trr")
-    edr_reaction = gro.with_name(gro.stem + f"_reaction.edr")
+    gro_reaction = gro.with_name(REACTION_GRO)
+    trr_reaction = gro.with_name(REACTION_TRR)
+    edr_reaction = gro.with_name(REACTION_EDR)
 
     if gro_reaction.exists() or trr_reaction.exists() or edr_reaction.exists():
         m = f"gro/trr/edr file at reaction time {time} already exists in {gro.parent.name}. Removing it. This may happen by restarting from a previous run."

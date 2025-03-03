@@ -253,8 +253,8 @@ def test_integration_file_usage(arranged_tmp_path):
     assert tasks["5_apply_recipe"]["output"]["top"] == "5_apply_recipe/Ala_out.top"
 
     assert tasks["6_relax"]["input"]["top"] == "5_apply_recipe/Ala_out_relax.top"
-    assert tasks["6_relax"]["input"]["gro"] == "2_equilibrium/equilibrium_reaction.gro"
-    assert tasks["6_relax"]["input"]["trr"] == "2_equilibrium/equilibrium_reaction.trr"
+    assert tasks["6_relax"]["input"]["gro"] == "2_equilibrium/.kimmdy_reaction.gro"
+    assert tasks["6_relax"]["input"]["trr"] == "2_equilibrium/.kimmdy_reaction.trr"
     assert tasks["6_relax"]["output"]["trr"] == "6_relax/relax.trr"
     assert tasks["6_relax"]["output"]["xtc"] == "6_relax/relax.xtc"
 

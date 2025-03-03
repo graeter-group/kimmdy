@@ -182,7 +182,7 @@ def plot_energy(
     edrs: list[Path] = []
     for d in subdirs_matched:
         new_edrs = d.glob("*.edr")
-        edrs.extend([edr for edr in new_edrs if not ".kimmdytrunc." in edr.name and not "_reaction.edr" in edr.name])
+        edrs.extend([edr for edr in new_edrs if not ".kimmdy_" in edr.name])
     assert (
         len(edrs) > 0
     ), f"No GROMACS energy files in {run_dir} with subdirectory names {steps}"
@@ -199,7 +199,7 @@ def plot_energy(
         time = read_reaction_time_marker(task_dir)
         if time is not None and truncate:
             print(f"Truncating {edr} to {time} ps.")
-            new_edr = edr.with_suffix(".kimmdytrunc.edr")
+            new_edr = edr.with_name(f".kimmdy_trunc{edr.name}")
             run_shell_cmd(f"gmx eneconv -f {edr} -e {time} -o {new_edr}")
             edr = new_edr
 
