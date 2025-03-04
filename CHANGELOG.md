@@ -1,6 +1,51 @@
 # Changelog
 
 
+## [7.0.0](https://github.com/graeter-group/kimmdy/compare/v6.13.0...v7.0.0) (2025-03-04)
+
+
+### ⚠ BREAKING CHANGES
+
+* merge `slow_growth_pairs` option into `slow_growth` enum
+* **top:** make slow growth relaxation more robust for complex topology changes (e.g. hydrolysis)
+
+### Features
+
+* allow deprecation notices in yaml schema ([89d9828](https://github.com/graeter-group/kimmdy/commit/89d98287c02392d2bea8142aeb2d9a9d58cd66b6))
+* **analysis:** `trjcat` gained the `use_last_names` flag ([1e636bc](https://github.com/graeter-group/kimmdy/commit/1e636bca0f968585db4c21850e71ec991b2da283))
+* flag to skip truncation for fast rate calculation without follow-up ([#500](https://github.com/graeter-group/kimmdy/issues/500)) ([fe031fa](https://github.com/graeter-group/kimmdy/commit/fe031fad7d4c94be21ab7e5ec1880e82c2731939))
+* initial edr file config for starting directly with reactions ([985b52d](https://github.com/graeter-group/kimmdy/commit/985b52d8eb0738f38dbadb2960f0389a7e1f4624))
+* The topology now keeps track of whether it needs parameterization and the focus_ids for said ([ac4a195](https://github.com/graeter-group/kimmdy/commit/ac4a1956fbe96abbe36d0e000aeee9412cb98d73))
+* **top:** make slow growth relaxation more robust for complex topology changes (e.g. hydrolysis) ([772c0d1](https://github.com/graeter-group/kimmdy/commit/772c0d165a6af6b4a7dea63d903d9ce735a7bddb))
+* **top:** The `atomic` types like `Atom`, `Bond` etc. gained a `comment` field ([b327268](https://github.com/graeter-group/kimmdy/commit/b32726862828f6c650885a679aa948d74a729092))
+* write 1-frame edr file at reaction time ([5b2557c](https://github.com/graeter-group/kimmdy/commit/5b2557ca4a708b2e2e242881a4fbb0fa77772c3e))
+
+
+### Bug Fixes
+
+* always write reaction coordinates from trr file if it exists ([280ed83](https://github.com/graeter-group/kimmdy/commit/280ed8343baf949352e697d90645431e1598e0d4))
+* correct yaml hint for restart flag ([f1edaa0](https://github.com/graeter-group/kimmdy/commit/f1edaa0d8da5bd29bbf52cc844baff8453af8c01))
+* fix --use-last-names option for trjcat analysis ([901e0b0](https://github.com/graeter-group/kimmdy/commit/901e0b0860b4ed980198e3029cd7e4bb045bf7e3))
+* fix [#518](https://github.com/graeter-group/kimmdy/issues/518) ([2832c04](https://github.com/graeter-group/kimmdy/commit/2832c04511f878a369bc06d7abdbd610f8b14389))
+* fix jobscript for re-submission ([caa3383](https://github.com/graeter-group/kimmdy/commit/caa3383b6c07ed81495c4d79ff815235f780e513))
+* fix removing failed task dir after prompt ([771277c](https://github.com/graeter-group/kimmdy/commit/771277c830fc6a6c5be2bac542e141ec9b198442))
+* fix restarting and use edr file of previous MD task for starting next MD ([a8e8f5e](https://github.com/graeter-group/kimmdy/commit/a8e8f5e360fe2d469970c014db39b92729206595))
+* only create helper pairs for morphing dihedrals where there are no ([5d2b61b](https://github.com/graeter-group/kimmdy/commit/5d2b61bd1f342387cb4b6ae7496cb0cb08b66713))
+* re-link atomics after merging moleculetypes ([3dc445d](https://github.com/graeter-group/kimmdy/commit/3dc445d0fb220f0044cfb2510d9086a0d3a8d08c))
+* restarting ([#504](https://github.com/graeter-group/kimmdy/issues/504)) ([151bb2e](https://github.com/graeter-group/kimmdy/commit/151bb2e2397764f2c88afd36ad7987a193903d50))
+
+
+### Documentation
+
+* **guide:** The topology explanation now includes a before-after of a HAT ([ee5d04b](https://github.com/graeter-group/kimmdy/commit/ee5d04bfd9a9d4d2d7a5c69193c684ea0bcb2b9d))
+* **log:** `Recipe`s printed in the log now transparently use 1-based topology IDs. ([ee84094](https://github.com/graeter-group/kimmdy/commit/ee8409413b91f069b028a2b0b27b9ac46541b8d9))
+* render all sub-options on the docs site ([db933e8](https://github.com/graeter-group/kimmdy/commit/db933e8a8a47b250ab67fed431831f3cffe02653))
+
+
+### Code Refactoring
+
+* merge `slow_growth_pairs` option into `slow_growth` enum ([ec16d29](https://github.com/graeter-group/kimmdy/commit/ec16d2903de2ccf1dd239c9608856affd8684b52))
+
 ## [6.13.0](https://github.com/graeter-group/kimmdy/compare/v6.12.0...v6.13.0) (2024-10-23)
 
 
