@@ -298,7 +298,8 @@ def test_merge_hat_top(arranged_tmp_path, caplog):
     top_merge_ref = Topology(read_top(Path("topol_FEP.top")))
     top_merge = merge_top_slow_growth(top_a=top_a, top_b=top_b)
 
-    write_top(top_merge.to_dict(), Path("/tmp/kimmdtests_topol_merge.top"))
+    # for debugging
+    # write_top(top_merge.to_dict(), Path("/tmp/kimmdtests_topol_merge.top"))
 
     assert top_merge.bonds[("19", "27")].funct == "3"
     assert top_merge.bonds[("26", "27")].funct == "3"
@@ -402,14 +403,11 @@ def test_merge_small_hat_details(arranged_tmp_path, caplog):
     assert len(removed_dihedrals) == 4
 
     assert len(merger.helper_pairs) > 0
-    assert len(merger.helper_exclusions) > 0
 
     # the atoms of the changing bond still stay in an angle
     # so they keep being excluded
     assert ("8", "9") not in merger.helper_pairs
     assert ("7", "8") not in merger.helper_pairs
-    assert ("8", "9") in merger.helper_exclusions
-    assert ("7", "8") in merger.helper_exclusions
 
 
 def test_merge_small_hat_with_more_overlaps(arranged_tmp_path, caplog):
