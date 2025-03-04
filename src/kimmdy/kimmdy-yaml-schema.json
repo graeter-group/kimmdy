@@ -273,6 +273,12 @@
       "type": "string",
       "pytype": "Path"
     },
+    "edr": {
+      "title": "edr",
+      "description": ".edr file of a finished simulation for starting directly with a reaction",
+      "type": "string",
+      "pytype": "Path"
+    },
     "restart": {
       "title": "restart",
       "type": "boolean",
