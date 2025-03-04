@@ -170,6 +170,7 @@ class DihedralsPairSets(PairSets):
 class AffectedInteractions:
     """keeping track of affected interactions during the merge process to add the correct helper pairs"""
 
+    atoms: set[str] = field(default_factory=set)
     bonds: BondsPairSets = field(default_factory=BondsPairSets)
     angles: AnglesPairSets = field(default_factory=AnglesPairSets)
     dihedrals: DihedralsPairSets = field(default_factory=DihedralsPairSets)
@@ -543,6 +544,7 @@ class MoleculeTypeMerger:
                 atomB.massB = deepcopy(atomB.mass)
                 atomB.mass = deepcopy(atomA.mass)
                 atomB.comment = "; morphing atomtypes"
+                self.affected_interactions.atoms.add(nr)
 
     def merge_bonds(self):
         logger.info("Merging bonds")
@@ -797,7 +799,11 @@ class MoleculeTypeMerger:
                 # dihedrals exist in both A and B -> transition between parameters for the 1-4 interactions
                 # in case their atomtypes changed
                 pairkey = to_pairkey(key)
-                self.affected_interactions.dihedrals.morphed.add(pairkey)
+                if (
+                    pairkey[0] in self.affected_interactions.atoms
+                    or pairkey[1] in self.affected_interactions.atoms
+                ):
+                    self.affected_interactions.dihedrals.morphed.add(pairkey)
             elif isinstance(multiple_dihedralsA, MultipleDihedrals):
                 # dihedral only exists in A -> vanishing dihedral
                 # pair transitions from half strength 1-4 interaction to full strength
@@ -971,6 +977,10 @@ class MoleculeTypeMerger:
             & self.affected_interactions.angles.removed
         )
         morphing_angles = self.affected_interactions.angles.morphed
+        all_angles = {
+            to_pairkey(key)
+            for key in set(self.mol_a.angles.keys()) | set(self.mol_b.angles.keys())
+        }
         added_dihedrals = (
             self.affected_interactions.dihedrals.added
             - self.affected_interactions.dihedrals.removed
@@ -1089,7 +1099,7 @@ class MoleculeTypeMerger:
                 )
 
         for pairkey in morphing_dihedrals:
-            if pairkey not in swapping_angles:
+            if pairkey not in all_angles:
                 # dihedrals exist in both A and B -> transition between parameters for the 1-4 interactions
                 # in case their atomtypes changed
                 self.helper_pairs[pairkey] = self._make_pair(
