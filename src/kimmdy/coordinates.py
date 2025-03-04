@@ -11,7 +11,7 @@ from math import sqrt
 import MDAnalysis as mda
 import numpy as np
 
-from kimmdy.constants import DEFAULT_EDISSOC, REACTIVE_MOLECULEYPE, FFFUNC
+from kimmdy.constants import DEFAULT_EDISSOC, FFFUNC
 from kimmdy.parsing import read_plumed, write_plumed
 from kimmdy.recipe import Place
 from kimmdy.tasks import TaskFiles
@@ -209,6 +209,7 @@ class MoleculeTypeMerger:
         self.merge_bonds()
         self.merge_angles()
         self.merge_dihedrals()
+        self.merge_exclusions()
 
         if not self.morse_only:
             self.merge_pairs()
@@ -219,6 +220,14 @@ class MoleculeTypeMerger:
                 sorted(
                     self.mol_b.pairs.items(),
                     key=lambda item: (int(item[0][0]), int(item[0][1])),
+                )
+            )
+            # sort exclusions after adding helper pairs because they
+            # come with their own exclusions
+            self.mol_b.exclusions = dict(
+                sorted(
+                    self.mol_b.exclusions.items(),
+                    key=lambda item: [int(i) for i in item[0]],
                 )
             )
         else:
@@ -936,6 +945,11 @@ class MoleculeTypeMerger:
         self.mol_b.pairs = {}
         for key, pair in new_pairs.items():
             self.mol_b.pairs[key] = pair
+
+    def merge_exclusions(self):
+        """Merge exclusions by adding the exclusions from the A state to the B state"""
+        logger.info("Merging exclusions")
+        for key in self.mol_a.exclusions.keys():
             self.mol_b.exclusions[key] = Exclusion(*key)
 
     def add_helper_pairs(self):
@@ -950,7 +964,6 @@ class MoleculeTypeMerger:
         # pairs that stem from bonds breaking or forming
         # collected by looking at the changing bonds, angles and dihedrals (=higher order interactions)
         self.helper_pairs: dict[tuple[str, str], Pair] = {}
-        self.helper_exclusions: set[tuple[str, str]] = set()
 
         # a bond is either added or removed, but can't be both.
         # but for higher order interactions the end-atoms (of the angle or dihedral) can be involved
@@ -996,10 +1009,6 @@ class MoleculeTypeMerger:
         morphing_dihedrals = self.affected_interactions.dihedrals.morphed
 
         for pair_key in added_bonds:
-            if pair_key in removed_angles:
-                # the bond is added, but the atoms where in an angle in A
-                # so they where excluded before and will be excluded again
-                self.helper_exclusions.add(pair_key)
             if pair_key in removed_dihedrals:
                 # the bond is added, but the atoms where in a dihedral in A
                 # so they had 1-4 interactions in A and will be excluded in B
@@ -1040,9 +1049,6 @@ class MoleculeTypeMerger:
                 self.helper_pairs[pairkey] = self._make_pair(
                     *pairkey, transition=PairTransition.Vanish, from_1_4=True
                 )
-            if pairkey in removed_bonds:
-                # atoms where in a bond together and will be in an angle together, so they are just excluded
-                self.helper_exclusions.add(pairkey)
             if (
                 pairkey
                 not in removed_bonds
@@ -1066,11 +1072,6 @@ class MoleculeTypeMerger:
                 self.helper_pairs[pairkey] = self._make_pair(
                     *pairkey, transition=PairTransition.Create
                 )
-
-        # atoms involved in angles that stay involved in angles but the parameters or atomtypes my change
-        for pairkey in swapping_angles | morphing_angles:
-            # we just want the exclusion
-            self.helper_exclusions.add(pairkey)
 
         # atoms that end up with a dihedral between them where there was none before
         for pairkey in added_dihedrals:
@@ -1126,11 +1127,6 @@ class MoleculeTypeMerger:
                 self.mol_b.pairs[key] = pair
 
             # add general exclusions for each pair
-            self.mol_b.exclusions[key] = Exclusion(*key)
-
-        # add additional exclusions for atoms we know should be excluded
-        # just in case
-        for key in self.helper_exclusions:
             self.mol_b.exclusions[key] = Exclusion(*key)
 
 
