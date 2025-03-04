@@ -186,17 +186,14 @@ def get_edissoc_from_atomnames(
             raise KeyError(f"Did not find residue {residue} in edissoc file")
 
     try:
-        E_dis = edissoc[residue][frozenset(atomnames)]
+        interaction_key = tuple(sorted(atomnames))
+        E_dis = edissoc[residue][interaction_key]
     except KeyError:
         # continue with guessed edissoc
         logger.warning(
             f"Did not find dissociation energy for atomtypes {atomnames}, residue {residue} in edissoc file, using standard value of 400.0"
         )
         E_dis = 400.0
-        # # raise Error
-        # raise KeyError(
-        #     f"Did not find dissociation energy for atomtypes {atomnames}, residue {residue} in edissoc file"
-        # ) from e
 
     return E_dis
 
