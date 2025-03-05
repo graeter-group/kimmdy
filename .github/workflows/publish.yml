@@ -7,10 +7,13 @@ on:
 
 jobs:
   build:
-    if: contains(github.event.head_commit.message, 'release-please--branches--main')
+    if: |
+      contains(github.event.head_commit.message, 'chore(main): release')
     name: Build distribution 📦
     runs-on: ubuntu-latest
     steps:
+    - name: Build docs
+      uses: ./github/workflows/build-docs.yml
     - uses: actions/checkout@v4
     - name: Set up Python
       uses: actions/setup-python@v5
