@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Optional
 
 from kimmdy.constants import FFFUNC
-from kimmdy.parsing import read_top
+from kimmdy.parsing import read_top, read_edissoc
 from kimmdy.topology.atomic import (
     AngleId,
     AngleType,
@@ -21,14 +21,23 @@ from kimmdy.topology.atomic import (
     ResidueType,
 )
 from kimmdy.topology.utils import get_top_section
+from kimmdy.utils import get_gmx_dir
 
 logger = logging.getLogger(__name__)
 
 
 class FF:
-    """Container for parsed forcefield data."""
+    """Container for parsed forcefield data.
 
-    def __init__(self, top: dict, residuetypes_path: Optional[Path] = None):
+    Also see <https://manual.gromacs.org/current/reference-manual/topologies/topology-file-formats.html#topology-file>
+    """
+
+    def __init__(
+        self,
+        top: dict,
+        residuetypes_path: Optional[Path] = None,
+        gromacs_alias: str = "gmx",
+    ):
         self.atomtypes: dict[AtomId, AtomType] = {}
         self.bondtypes: dict[BondId, BondType] = {}
         self.angletypes: dict[AngleId, AngleType] = {}
@@ -36,8 +45,16 @@ class FF:
         self.improper_dihedraltypes: dict[ImproperDihedralId, DihedralType] = {}
         self.residuetypes: dict[str, ResidueType] = {}
         self.nonbond_params: dict[BondId, NonbondParamType] = {}
+        self.default_edissoc: dict[str, dict[tuple[str, str], float]] = {}
 
         ffdir: Optional[Path] = top["ffdir"]
+
+        gmxdir = get_gmx_dir(gromacs_alias)
+        if gmxdir is not None:
+            gmx_builtin_ffs = gmxdir / "top"
+            self.default_edissoc = read_edissoc(gmx_builtin_ffs / "edissoc.dat")
+        else:
+            logger.warning(f"Could not find gromacs data directory for {gromacs_alias}")
 
         if defaults := get_top_section(top, "defaults"):
             self.defaults = defaults

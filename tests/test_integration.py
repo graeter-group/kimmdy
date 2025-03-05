@@ -89,7 +89,8 @@ def test_grappa_partial_parameterization(arranged_tmp_path):
     top_del.update_parameters()
     top_del.break_bond(("1", "5"))
     top_del.needs_parameterization = True
-    top_del.update_parameters(focus_nrs=set(["1", "5"]))
+    top_del.parameterization_focus_ids = set(["1", "5"])
+    top_del.update_parameters()
 
     # check values are changed around homolysis atoms
     assert top.bonds[("5", "6")] != top_del.bonds[("5", "6")]
@@ -145,7 +146,6 @@ def test_integration_just_reactions(arranged_tmp_path):
 def test_integration_hat_naive_reaction(arranged_tmp_path):
     kimmdy_run()
     assert "Finished running last task" in read_last_line(Path("kimmdy.log"))
-    print(list(Path.cwd().glob("alanine_hat_000/*")))
     assert len(list(Path.cwd().glob("alanine_hat_000/*"))) == 16
 
 
@@ -252,9 +252,9 @@ def test_integration_file_usage(arranged_tmp_path):
     assert tasks["5_apply_recipe"]["output"]["xtc"] == "6_relax/relax.xtc"
     assert tasks["5_apply_recipe"]["output"]["top"] == "5_apply_recipe/Ala_out.top"
 
-    assert tasks["6_relax"]["input"]["top"] == "5_apply_recipe/Ala_out_mod.top"
-    assert tasks["6_relax"]["input"]["gro"] == "2_equilibrium/equilibrium_reaction.gro"
-    assert tasks["6_relax"]["input"]["trr"] == "2_equilibrium/equilibrium_reaction.trr"
+    assert tasks["6_relax"]["input"]["top"] == "5_apply_recipe/Ala_out_relax.top"
+    assert tasks["6_relax"]["input"]["gro"] == "2_equilibrium/.kimmdy_reaction.gro"
+    assert tasks["6_relax"]["input"]["trr"] == "2_equilibrium/.kimmdy_reaction.trr"
     assert tasks["6_relax"]["output"]["trr"] == "6_relax/relax.trr"
     assert tasks["6_relax"]["output"]["xtc"] == "6_relax/relax.xtc"
 

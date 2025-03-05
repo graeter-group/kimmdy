@@ -21,6 +21,7 @@ from kimmdy.plugins import (
     parameterization_plugins,
     reaction_plugins,
 )
+from kimmdy.constants import CONFIG_LOGS
 from kimmdy.schema import get_combined_scheme
 from kimmdy.utils import (
     check_file_exists,
@@ -130,7 +131,6 @@ class Config:
         loglevel: str | None = None,
         restart: bool = False,
     ):
-
         # initial scheme
         if scheme is None:
             scheme = get_combined_scheme()
@@ -189,27 +189,22 @@ class Config:
                     if "reactions." in section:
                         m += "\nCheck installed plugins with --show-plugins and your input .yml"
                     raise ValueError(m)
+                deprecated = subscheme.get("deprecated")
+                if deprecated is not None:
+                    description = subscheme.get("description")
+                    m = f"Deprecated option in {section}.{k}: {deprecated}, {description}"
+                    CONFIG_LOGS["warnings"].append(m)
                 pytype = subscheme.get("pytype")
-                if pytype is None:
+                if pytype is None and not deprecated:
                     m = f"No type found for {section}.{k}"
                     raise ValueError(m)
 
-                # cast to type
-                v = pytype(v)
-                self.__setattr__(k, v)
+                if not deprecated:
+                    v = pytype(v)
+                    self.__setattr__(k, v)
 
         # validate on initial construction
         if section == "config":
-            # NOTE: The logger is set up with information from the config
-            # the the config can't use the logger.
-            # Instead it collects the logmessages and displays them at the end.
-            self._logmessages = {
-                "infos": [],
-                "warnings": [],
-                "errors": [],
-                "debugs": [],
-            }
-
             # defaults from the scheme
             self._set_defaults(section=section, scheme=scheme, restart=restart)
             self._validate(section=section, cwd=self.cwd)
@@ -229,7 +224,7 @@ class Config:
             if input_file is not None:
                 shutil.copy(input_file, self.out)
             else:
-                self._logmessages["infos"].append(
+                CONFIG_LOGS["infos"].append(
                     "Config initialized without input file, can't copy to output directory."
                 )
 
@@ -315,7 +310,7 @@ class Config:
 
             # make sure self.out is empty unless restart is set
             while self.out.exists() and not self.restart:
-                self._logmessages["debugs"].append(
+                CONFIG_LOGS["debugs"].append(
                     f"Output dir {self.out} exists, incrementing name"
                 )
                 name = self.out.name.split("_")
@@ -329,11 +324,9 @@ class Config:
 
             if not self.out.exists():
                 self.out.mkdir()
-                self._logmessages["infos"].append(f"Created output dir {self.out}")
+                CONFIG_LOGS["infos"].append(f"Created output dir {self.out}")
             else:
-                self._logmessages["infos"].append(
-                    f"Restarting in output dir {self.out}"
-                )
+                CONFIG_LOGS["infos"].append(f"Restarting in output dir {self.out}")
 
     def _validate(self, section: str = "config", cwd: Path = Path(".")):
         """Validates config."""
@@ -343,12 +336,12 @@ class Config:
             if ffdir == Path("*.ff"):
                 ffs = list(self.cwd.glob("*.ff"))
                 if len(ffs) > 1:
-                    self._logmessages["warnings"].append(
+                    CONFIG_LOGS["warnings"].append(
                         f"Found {len(ffs)} forcefields in cwd, using first one: {ffs[0]}"
                     )
                 if len(ffs) == 0:
                     m = f"Found 0 forcefields in cwd. Please specify a forcefield to be used from the gromacs directory or add a .ff folder to the cwd or preceed at your own risk."
-                    self._logmessages["warnings"].append(m)
+                    CONFIG_LOGS["warnings"].append(m)
                     ffdir = None
                 else:
                     ffdir = ffs[0].resolve()
@@ -356,14 +349,14 @@ class Config:
             elif ffdir is not None and not ffdir.exists():
                 gmxdir = get_gmx_dir(self.gromacs_alias, self.grompp_prefix)
                 if gmxdir is None:
-                    self._logmessages["warnings"].append(
+                    CONFIG_LOGS["warnings"].append(
                         f"Could not find gromacs data directory for {self.gromacs_alias}"
                     )
                     gmxdir = self.cwd
                 gmx_builtin_ffs = gmxdir / "top"
                 ffdir = gmx_builtin_ffs / ffdir
                 if not ffdir.exists():
-                    self._logmessages["warnings"].append(
+                    CONFIG_LOGS["warnings"].append(
                         f"Could not find forcefield {ffdir} in cwd or gromacs data directory"
                     )
             self.ff = ffdir
@@ -382,11 +375,11 @@ class Config:
                     if reaction_name not in (ks := list(reaction_plugins.keys())):
                         if reaction_name in (list(broken_reaction_plugins.keys())):
                             m = f"Reaction plugin {reaction_name} could not be loaded."
-                            self._logmessages["errors"].append(m)
+                            CONFIG_LOGS["errors"].append(m)
                             raise broken_reaction_plugins[reaction_name]
                         else:
                             m = f"Reaction plugin {reaction_name} not found!\nAvailable plugins: {ks}"
-                            self._logmessages["errors"].append(m)
+                            CONFIG_LOGS["errors"].append(m)
                             raise ModuleNotFoundError(m)
 
             # Validate parameterization plugins
@@ -399,17 +392,17 @@ class Config:
                         list(broken_parameterization_plugins.keys())
                     ):
                         m = f"Parameterization plugin {parameterizer_name} could not be loaded."
-                        self._logmessages["errors"].append(m)
+                        CONFIG_LOGS["errors"].append(m)
                         raise broken_parameterization_plugins[parameterizer_name]
                     else:
                         m = f"Parameterization plugin {parameterizer_name} not found!\nAvailable plugins: {ks}"
-                        self._logmessages["errors"].append(m)
+                        CONFIG_LOGS["errors"].append(m)
                         raise ModuleNotFoundError(m)
 
             # Validate sequence
             if not hasattr(self, "sequence"):
                 m = "No sequence defined in config!"
-                self._logmessages["warnings"].append(m)
+                CONFIG_LOGS["warnings"].append(m)
                 raise AssertionError(m)
 
             for task in self.sequence:

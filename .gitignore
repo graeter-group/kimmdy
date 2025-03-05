@@ -14,6 +14,8 @@ tmp/
 *.log
 *.csv
 example/**/*[0-9][0-9][0-9]/
+example/**/run.sh
+example/**/*.xvg
 pytest_topol.top
 \#*\#
 *.xtc

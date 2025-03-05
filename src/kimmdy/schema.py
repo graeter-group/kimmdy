@@ -145,6 +145,7 @@ def convert_schema_to_dict(dictionary: dict) -> dict:
         default = value.get("default")
         description = value.get("description")
         enum = value.get("enum")
+        deprecated = value.get("deprecated")
         additionalProperties = value.get("additionalProperties")
         if pytype is not None:
             result[key]["pytype"] = type_from_str(pytype)
@@ -152,6 +153,8 @@ def convert_schema_to_dict(dictionary: dict) -> dict:
             result[key]["default"] = default
         if description is not None:
             result[key]["description"] = description
+        if deprecated is not None:
+            result[key]["deprecated"] = deprecated
         if enum is not None:
             result[key]["enum"] = enum
         if additionalProperties is not None:
@@ -178,54 +181,56 @@ def get_combined_scheme() -> dict:
     return kimmdy_dict
 
 
-def prune(d: dict) -> dict:
-    """Remove empty dicts from a nested dict"""
-    if not isinstance(d, dict):
-        return d
-    return {
-        k: v
-        for k, v in ((k, prune(v)) for k, v in d.items())
-        if v is not None and v != {}
-    }
-
-
 def flatten_scheme(scheme, section="") -> list:
-    """Recursively get properties and their desicripions from the scheme"""
+    """Recursively get properties and their descriptions from the scheme"""
     ls = []
+
+    # base case
     if not isinstance(scheme, dict):
         return ls
-    for key, value in scheme.items():
-        if not isinstance(value, dict):
-            continue
-        if section:
-            key = f"{section}.{key}"
 
-        description = value.get("description", "")
-        pytype = value.get("pytype")
-        if pytype is not None:
-            pytype = pytype.__name__
-        else:
-            pytype = ""
-        default = value.get("default", "")
-        enum = value.get("enum", "")
+    # handle node
+    description = scheme.get("description", "")
+    pytype = scheme.get("pytype")
+    if pytype is not None:
+        pytype = pytype.__name__
+    else:
+        pytype = ""
+    default = scheme.get("default", "")
+    enum = scheme.get("enum", "")
+    deprecated = scheme.get("deprecated", "")
 
+    if section != "":
         ls.append(
             {
-                "key": key,
+                "key": section,
                 "desc": description,
                 "type": pytype,
                 "default": default,
                 "enum": enum,
+                "deprecated": deprecated,
             }
         )
 
-        for k in value.keys():
-            if k not in ["pytype", "default", "description", "type", "enum"]:
-                k_esc = k
-                if k == ".*":
-                    k_esc = "\\*"
-                s = f"{key}.{k_esc}"
-                ls.extend(flatten_scheme(value[k], section=s))
+    # sub schemes
+    for key, value in scheme.items():
+        if key not in [
+            "pytype",
+            "default",
+            "description",
+            "type",
+            "enum",
+            "additionalProperties",
+            "deprecated",
+        ]:
+            k_esc = key
+            if key == ".*":
+                k_esc = "\\*"
+            if section != "":
+                s = f"{section}.{k_esc}"
+            else:
+                s = k_esc
+            ls.extend(flatten_scheme(value, section=s))
 
     return ls
 

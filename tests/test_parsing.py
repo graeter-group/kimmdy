@@ -50,8 +50,12 @@ def test_ff_includes_with_gmxdir(arranged_tmp_path):
     assert top_dict["moleculetype_SOL"] == tip3_dict["moleculetype_SOL"]
 
 
+import os
+
+
 def test_ff_includes_with_ff_in_cwd(arranged_tmp_path):
     top_dict = parsing.read_top(Path("hexala.top"))
+    l = os.listdir("amber99sb-star-ildnp.ff")
     ions_dict = parsing.read_top(Path("amber99sb-star-ildnp.ff/ions.itp"))
     assert top_dict["atomtypes"]
     assert top_dict["bondtypes"]
@@ -225,7 +229,7 @@ def test_edissoc_read(arranged_tmp_path):
     assert edissoc_dict.get("GLY") is not None
     for k, v in edissoc_dict.items():
         for kv, vv in v.items():
-            assert isinstance(kv, frozenset)
+            assert isinstance(kv, tuple)
             assert isinstance(vv, float)
 
 

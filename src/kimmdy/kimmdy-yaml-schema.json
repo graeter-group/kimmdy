@@ -287,9 +287,15 @@
       "type": "string",
       "pytype": "Path"
     },
+    "edr": {
+      "title": "edr",
+      "description": ".edr file of a finished simulation for starting directly with a reaction",
+      "type": "string",
+      "pytype": "Path"
+    },
     "restart": {
       "title": "restart",
-      "type": "object",
+      "type": "boolean",
       "description": "Restart or continue from a previous run (in config.out) instead of starting from scratch",
       "pytype": "bool",
       "default": false
@@ -338,16 +344,21 @@
               "pytype": "str"
             },
             "slow_growth_pairs": {
-              "type": "boolean",
-              "description": "Whether to properly treat pairs during slow growth. Does not work with gromacs < 2023.2",
-              "pytype": "bool",
-              "default": true
+              "deprecated": true,
+              "description": "This is deprecated. Specify in `config.changer.coordinates.slow_growth` instead."
             },
             "slow_growth": {
-              "type": "boolean",
-              "description": "Whether the chosen MD step is a slow growth/free-energy simulation",
-              "pytype": "bool",
-              "default": false
+              "type": "string",
+              "description": "Whether the chosen MD step is a slow growth/free-energy simulation to relax after applying a reaction recipe. `true` and `yes` are equivalent to `full` for backwards compatibility. `morse_only` disables using pairs to transition non-bonded interactions as well and only uses morse bonds to emulate simple non-bonded interactions. The empty string means no slow growth.",
+              "pytype": "str",
+              "enum": [
+                "yes",
+                "true",
+                "full",
+                "morse_only",
+                ""
+              ],
+              "default": ""
             }
           }
         },

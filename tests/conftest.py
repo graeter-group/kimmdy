@@ -63,10 +63,11 @@ def arranged_tmp_path(tmp_path: Path, request: pytest.FixtureRequest):
     # arrange tmp_path
     shutil.copytree(file_dir, tmp_path, dirs_exist_ok=True)
     assetsdir = Path(__file__).parent / "test_files" / "assets"
-    Path(tmp_path / "amber99sb-star-ildnp.ff").symlink_to(
-        assetsdir / "amber99sb-star-ildnp.ff",
-        target_is_directory=True,
-    )
+    if not (tmp_path / "amber99sb-star-ildnp.ff").exists():
+        Path(tmp_path / "amber99sb-star-ildnp.ff").symlink_to(
+            assetsdir / "amber99sb-star-ildnp.ff",
+            target_is_directory=True,
+        )
     # change cwd to tmp_path
     os.chdir(tmp_path.resolve())
     return tmp_path

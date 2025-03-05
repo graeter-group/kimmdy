@@ -2,12 +2,28 @@
 Constants used throughout KIMMDY
 """
 
+CONFIG_LOGS = {
+    "infos": [],
+    "warnings": [],
+    "errors": [],
+    "debugs": [],
+}
+"""The logger is set up with information from the config
+the the config can't use the logger.
+Instead it collects the logmessages and displays them at the end.
+"""
+
+
 MARK_STARTED = ".kimmdy_started"
 MARK_DONE = ".kimmdy_done"
 MARK_FINISHED = ".kimmdy_finished"
 MARK_FAILED = ".kimmdy_failed"
 MARK_REACION_TIME = ".kimmdy_reaction_time"
 MARKERS = [MARK_STARTED, MARK_DONE, MARK_FAILED, MARK_FINISHED, MARK_REACION_TIME]
+
+REACTION_GRO = ".kimmdy_reaction.gro"
+REACTION_TRR = ".kimmdy_reaction.trr"
+REACTION_EDR = ".kimmdy_reaction.edr"
 
 ATOM_ID_FIELDS = {
     "atoms": [0, 5],  # atomnr, chargegroup
@@ -19,6 +35,21 @@ ATOM_ID_FIELDS = {
     "exclusions": True,  # all fields at atom ids
     "position_restraints": [0],
     "dihedral_restraints": [0, 1, 2, 3],
+}
+
+# from gmx data dir
+DEFAULT_EDISSOC: dict[tuple[str, str], float] = {  # type: ignore
+    tuple(sorted(list(k))): v
+    for k, v in {
+        ("C", "N"): 500.0,
+        ("CA", "C"): 341.0,
+        ("CA", "N"): 379.0,
+        ("CA", "CB"): 400.0,
+        ("CB", "CG"): 400.0,
+        ("CG", "CD"): 400.0,
+        ("CD", "CE"): 400.0,
+        ("CE", "NZ"): 400.0,
+    }.items()
 }
 
 # see https://manual.gromacs.org/current/reference-manual/topologies/topology-file-formats.html

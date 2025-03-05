@@ -12,8 +12,9 @@ from typing import TYPE_CHECKING, Optional, Union
 
 import numpy as np
 
-from kimmdy.constants import MARK_REACION_TIME
+from kimmdy.constants import MARK_REACION_TIME, REACTION_EDR, REACTION_GRO, REACTION_TRR
 from kimmdy.recipe import RecipeCollection
+from kimmdy.constants import CONFIG_LOGS
 
 if TYPE_CHECKING:
     from kimmdy.parsing import Plumed_dict
@@ -185,17 +186,14 @@ def get_edissoc_from_atomnames(
             raise KeyError(f"Did not find residue {residue} in edissoc file")
 
     try:
-        E_dis = edissoc[residue][frozenset(atomnames)]
+        interaction_key = tuple(sorted(atomnames))
+        E_dis = edissoc[residue][interaction_key]
     except KeyError:
         # continue with guessed edissoc
         logger.warning(
             f"Did not find dissociation energy for atomtypes {atomnames}, residue {residue} in edissoc file, using standard value of 400.0"
         )
         E_dis = 400.0
-        # # raise Error
-        # raise KeyError(
-        #     f"Did not find dissociation energy for atomtypes {atomnames}, residue {residue} in edissoc file"
-        # ) from e
 
     return E_dis
 
@@ -358,7 +356,7 @@ def check_gmx_version(config):
         # NOTE: The logger is set up with information from the config
         # the the config can't use the logger.
         # Instead it collects the logmessages and displays them at the end.
-        config._logmessages["errors"].append(m)
+        CONFIG_LOGS["errors"].append(m)
         raise SystemError(m)
     # check version for plumed patch if necessary
     if hasattr(config, "mds"):
@@ -370,22 +368,19 @@ def check_gmx_version(config):
                         "'plumed', aborting due to apparent lack of PLUMED patch."
                         f"Version is: {version}"
                     )
-                    config._logmessages["errors"].append(m)
+                    CONFIG_LOGS["errors"].append(m)
                     if not config.dryrun:
                         raise SystemError(m)
     if hasattr(config, "changer") and hasattr(config.changer, "coordinates"):
-        if (
-            config.changer.coordinates.slow_growth_pairs
-            and config.changer.coordinates.slow_growth
-        ):
-            m = "Note: slow growth of pairs is only supported by >= gromacs 2023.2. To disable morphing pairs in config: md.changer.coordinates.slow_growth_pairs = false"
-            config._logmessages["debugs"].append(f"Gromacs version: {version}")
-            config._logmessages["errors"].append(m)
+        if config.changer.coordinates.slow_growth not in ["", "morse_only"]:
+            CONFIG_LOGS["debugs"].append(f"Gromacs version: {version}")
             major_minor = re.match(r".*(\d{4})\.(\d+).*", version)
             if major_minor is not None:
                 year = int(major_minor.group(1))
                 minor = int(major_minor.group(2))
                 if year < 2023 or (year == 2023 and minor < 2):
+                    m = "Note: slow growth of pairs is only supported by >= gromacs 2023.2. To disable morphing pairs in config: md.changer.coordinates.slow_growth: morse_only"
+                    CONFIG_LOGS["errors"].append(m)
                     raise SystemError(m)
     return version
 
@@ -414,29 +409,39 @@ def write_coordinate_files_at_reaction_time(files: TaskFiles, time: float):
         logger.error(m)
         raise FileNotFoundError(m)
 
-    if gro.name.endswith("_reaction.gro"):
-        m = f"The latest gro file registered already ends in _reaction.gro. This state should not be possible unless multiple reactions where run in sequence without any MD in between (even relaxation)."
+    if gro.name == REACTION_GRO:
+        m = f"The latest gro file registered already is a kimmdy reaction file. This state should not be possible unless multiple reactions where run in sequence without any MD in between (even relaxation)."
         logger.error(m)
 
-    gro_reaction = gro.with_name(gro.stem + f"_reaction.gro")
-    trr_reaction = gro.with_name(gro.stem + f"_reaction.trr")
+    gro_reaction = gro.with_name(REACTION_GRO)
+    trr_reaction = gro.with_name(REACTION_TRR)
+    edr_reaction = gro.with_name(REACTION_EDR)
 
-    if gro_reaction.exists() or trr_reaction.exists():
-        m = f"gro/trr file at reaction time {time} already exists in {gro.parent}. Removing it. This may happen by restarting from a previous run."
+    if gro_reaction.exists() or trr_reaction.exists() or edr_reaction.exists():
+        m = f"gro/trr/edr file at reaction time {time} already exists in {gro.parent.name}. Removing it. This may happen by restarting from a previous run."
         logger.error(m)
-        gro_reaction.unlink()
-        trr_reaction.unlink()
+        gro_reaction.unlink(True)
+        trr_reaction.unlink(True)
+        edr_reaction.unlink(True)
 
     logger.info(
-        f"Writing out gro/trr file {gro_reaction.name}/{trr_reaction.name} at reaction time {time} ps in {gro.parent.name}"
+        f"Writing out gro/trr/edr files at reaction time {time} ps in {gro.parent.name}"
     )
     files.output["gro"] = gro_reaction
     files.output["trr"] = trr_reaction
+    files.output["edr"] = edr_reaction
 
     # Prefer xtc over trr
     # It should have more frames and be smaller,
     # but sometimes the people only write a specific index group to the xtc,
     # in which case it fails and we try the trr
+    # FIXME: fixme
+    # this needs proper documetation for plugin authors
+    # because one would want the trr file for the precision and velocities
+    # at the raction time, but plugins may use the xtc file (smaller)
+    # to determine the reaction and reaction time.
+    # this can lead to a mismatch!
+    wrote_file = False
     if files.input["xtc"] is not None:
         try:
             run_gmx(
@@ -446,13 +451,14 @@ def write_coordinate_files_at_reaction_time(files: TaskFiles, time: float):
                 f"echo '0' | gmx trjconv -f {files.input['xtc']} -s {gro} -b {time} -dump {time} -o {trr_reaction}"
             )
             logger.info(
-                f"Successfully wrote out gro/trr file {gro_reaction.name}/{trr_reaction.name} at reaction time in {gro.parent.name} from xtc file."
+                f"Successfully wrote out gro/trr file {trr_reaction.name} at reaction time in {gro.parent.name} from xtc file."
             )
-            return
+            wrote_file = True
         except sp.CalledProcessError:
             logger.error(
-                f"Failed to write out gro/trr file {gro_reaction.name}/{trr_reaction.name} at reaction time in {gro.parent.name} from xtc file because the xtc doesn't contain all atoms. Will try trr file."
+                f"Failed to write out gro/trr file {trr_reaction.name} at reaction time in {gro.parent.name} from xtc file because the xtc doesn't contain all atoms. Will try trr file."
             )
+
     if files.input["trr"] is not None:
         try:
             run_gmx(
@@ -462,16 +468,31 @@ def write_coordinate_files_at_reaction_time(files: TaskFiles, time: float):
                 f"echo '0' | gmx trjconv -f {files.input['trr']} -s {gro} -b {time} -dump {time} -o {trr_reaction}"
             )
             logger.info(
-                f"Successfully wrote out gro/trr file at reaction time in {gro.parent} from trr file."
+                f"Successfully wrote out gro/trr file at reaction time in {gro.parent.name} from trr file."
             )
-            return
+            wrote_file = True
         except sp.CalledProcessError:
             logger.error(
-                f"Failed to write out gro/trr file at reaction time in {gro.parent} from trr file."
+                f"Failed to write out gro/trr file at reaction time in {gro.parent.name} from trr file."
             )
-    m = f"No trajectory file found to write out gro/trr file at reaction time in {gro.parent}"
-    logger.error(m)
-    raise FileNotFoundError(m)
+
+    if files.input["edr"]:
+        try:
+            run_gmx(
+                f"gmx eneconv -f {files.input['edr']} -b {time} -e {time} -o {edr_reaction}"
+            )
+            logger.info(
+                f"Successfully wrote out edr file at reaction time in {gro.parent.name} from edr file."
+            )
+        except sp.CalledProcessError:
+            logger.error(
+                f"Failed to write out edr file at reaction time in {gro.parent.name} from edr file."
+            )
+
+    if not wrote_file:
+        m = f"No trajectory file found to write out gro/trr file at reaction time in {gro.parent.name}"
+        logger.error(m)
+        raise FileNotFoundError(m)
 
 
 def get_task_directories(dir: Path, tasks: Union[list[str], str] = "all") -> list[Path]:

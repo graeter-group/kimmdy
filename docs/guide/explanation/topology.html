@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.53">
+<meta name="generator" content="quarto-1.5.57">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -538,25 +538,38 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="capped-alanine-with-a-radical" class="level2">
 <h2 class="anchored" data-anchor-id="capped-alanine-with-a-radical">Capped Alanine with a radical</h2>
-<div id="e416bbb7" class="cell" data-execution_count="1">
+<div id="b9413d2b" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> kimmdy.parsing <span class="im">import</span> read_top</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> kimmdy.topology.topology <span class="im">import</span> Topology</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> kimmdy.tools <span class="im">import</span> write_top_as_dot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> kimmdy.tools <span class="im">import</span> write_top_as_dot</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> copy</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="f063962d" class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>ala_top <span class="op">=</span> read_top(Path(<span class="st">'../../tests/test_files/test_topology/Ala_R_prm.top'</span>), use_gmx_dir<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>top <span class="op">=</span> Topology(ala_top)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>write_top_as_dot(top, <span class="st">"ala-top.dot"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This is the same reaction that would occur in the naive alanine HAT example (and integration test) if if where used with the <code>dummy_first</code> kmc method instead of standard <code>rfkmc</code>.</p>
+<div id="12f71256" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>path_a <span class="op">=</span> read_top(Path(<span class="st">'../../tests/test_files/test_integration/alanine_hat_naive/Ala_out.top'</span>), use_gmx_dir<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>top <span class="op">=</span> Topology(path_a)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>top_a <span class="op">=</span> copy.deepcopy(top)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>top_b <span class="op">=</span> top</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>top_b.break_bond((<span class="st">'7'</span>, <span class="st">'8'</span>))</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>top_b.bind_bond((<span class="st">'8'</span>, <span class="st">'9'</span>))</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>write_top_as_dot(top_a, <span class="st">"ala-top-a.dot"</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>write_top_as_dot(top_b, <span class="st">"ala-top-b.dot"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-file="ala-top.dot" data-layout-align="default">
+<div>
+
+</div>
+<div class="quarto-layout-panel" data-layout-ncol="2">
+<div class="quarto-layout-row">
+<div class="cell quarto-layout-cell" data-fig-width="100%" data-file="ala-top-a.dot" style="flex-basis: 50.0%;justify-content: flex-start;">
 <div class="cell-output-display">
 <div id="fig-ala" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-ala-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div>
-<svg width="672" height="480" viewbox="0.00 0.00 511.20 642.95" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="; max-width: none; max-height: none">
+<svg width="NaN" height="480" viewbox="0.00 0.00 511.20 642.95" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="; max-width: none; max-height: none">
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 638.95)">
 <title>G</title>
 <polygon fill="white" stroke="transparent" points="-4,4 -4,-638.95 507.2,-638.95 507.2,4 -4,4"></polygon>
@@ -797,13 +810,780 @@ Figure&nbsp;1: A diagram of the Ala topology
 </div>
 </div>
 </div>
+<div class="cell quarto-layout-cell" data-fig-width="100%" data-file="ala-top-b.dot" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="cell-output-display">
+<div id="fig-ala" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-ala-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div>
+<svg width="NaN" height="480" viewbox="0.00 0.00 537.82 571.14" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="; max-width: none; max-height: none">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 567.14)">
+<title>G</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-567.14 533.82,-567.14 533.82,4 -4,4"></polygon>
+<!-- 1 CT -->
+<g id="node1" class="node">
+<title>1 CT</title>
+<ellipse fill="none" stroke="black" cx="107.05" cy="-114.88" rx="30.74" ry="30.74"></ellipse>
+<text text-anchor="middle" x="107.05" y="-110.68" font-family="Times,serif" font-size="14.00">1 CT</text>
+</g>
+<!-- 2 HC -->
+<g id="node2" class="node">
+<title>2 HC</title>
+<ellipse fill="none" stroke="black" cx="111.07" cy="-31.69" rx="31.89" ry="31.89"></ellipse>
+<text text-anchor="middle" x="111.07" y="-27.49" font-family="Times,serif" font-size="14.00">2 HC</text>
+</g>
+<!-- 1 CT&#45;&#45;2 HC -->
+<g id="edge1" class="edge">
+<title>1 CT--2 HC</title>
+<path fill="none" stroke="black" d="M108.55,-83.9C108.87,-77.25 109.21,-70.21 109.53,-63.53"></path>
+</g>
+<!-- 3 HC -->
+<g id="node3" class="node">
+<title>3 HC</title>
+<ellipse fill="none" stroke="black" cx="41.03" cy="-72.67" rx="31.89" ry="31.89"></ellipse>
+<text text-anchor="middle" x="41.03" y="-68.47" font-family="Times,serif" font-size="14.00">3 HC</text>
+</g>
+<!-- 1 CT&#45;&#45;3 HC -->
+<g id="edge2" class="edge">
+<title>1 CT--3 HC</title>
+<path fill="none" stroke="black" d="M80.96,-98.2C76.63,-95.43 72.14,-92.56 67.8,-89.79"></path>
+</g>
+<!-- 4 HC -->
+<g id="node4" class="node">
+<title>4 HC</title>
+<ellipse fill="none" stroke="black" cx="31.69" cy="-155.01" rx="31.89" ry="31.89"></ellipse>
+<text text-anchor="middle" x="31.69" y="-150.81" font-family="Times,serif" font-size="14.00">4 HC</text>
+</g>
+<!-- 1 CT&#45;&#45;4 HC -->
+<g id="edge3" class="edge">
+<title>1 CT--4 HC</title>
+<path fill="none" stroke="black" d="M79.85,-129.37C73.35,-132.82 66.41,-136.52 59.88,-140"></path>
+</g>
+<!-- 5 C -->
+<g id="node5" class="node">
+<title>5 C</title>
+<ellipse fill="none" stroke="black" cx="172.78" cy="-168.37" rx="24.94" ry="24.94"></ellipse>
+<text text-anchor="middle" x="172.78" y="-164.17" font-family="Times,serif" font-size="14.00">5 C</text>
+</g>
+<!-- 1 CT&#45;&#45;5 C -->
+<g id="edge4" class="edge">
+<title>1 CT--5 C</title>
+<path fill="none" stroke="black" d="M131.15,-134.49C138.48,-140.46 146.44,-146.93 153.41,-152.61"></path>
+</g>
+<!-- 6 O -->
+<g id="node6" class="node">
+<title>6 O</title>
+<ellipse fill="none" stroke="black" cx="124.37" cy="-236.33" rx="25.01" ry="25.01"></ellipse>
+<text text-anchor="middle" x="124.37" y="-232.13" font-family="Times,serif" font-size="14.00">6 O</text>
+</g>
+<!-- 5 C&#45;&#45;6 O -->
+<g id="edge5" class="edge">
+<title>5 C--6 O</title>
+<path fill="none" stroke="black" d="M158.26,-188.76C152.24,-197.21 145.27,-206.99 139.22,-215.49"></path>
+</g>
+<!-- 7 N -->
+<g id="node7" class="node">
+<title>7 N</title>
+<ellipse fill="none" stroke="red" cx="257.21" cy="-178.68" rx="25.01" ry="25.01"></ellipse>
+<text text-anchor="middle" x="257.21" y="-174.48" font-family="Times,serif" font-size="14.00">7 N</text>
+</g>
+<!-- 5 C&#45;&#45;7 N -->
+<g id="edge6" class="edge">
+<title>5 C--7 N</title>
+<path fill="none" stroke="black" d="M197.65,-171.41C208.45,-172.73 221.08,-174.27 231.93,-175.59"></path>
+</g>
+<!-- 9 CT -->
+<g id="node8" class="node">
+<title>9 CT</title>
+<ellipse fill="none" stroke="black" cx="345.4" cy="-201.2" rx="30.74" ry="30.74"></ellipse>
+<text text-anchor="middle" x="345.4" y="-197" font-family="Times,serif" font-size="14.00">9 CT</text>
+</g>
+<!-- 7 N&#45;&#45;9 CT -->
+<g id="edge7" class="edge">
+<title>7 N--9 CT</title>
+<path fill="none" stroke="black" d="M281.77,-184.95C292.27,-187.63 304.62,-190.79 315.64,-193.6"></path>
+</g>
+<!-- 10 CT -->
+<g id="node9" class="node">
+<title>10 CT</title>
+<ellipse fill="none" stroke="black" cx="395.44" cy="-128.73" rx="35.4" ry="35.4"></ellipse>
+<text text-anchor="middle" x="395.44" y="-124.53" font-family="Times,serif" font-size="14.00">10 CT</text>
+</g>
+<!-- 9 CT&#45;&#45;10 CT -->
+<g id="edge8" class="edge">
+<title>9 CT--10 CT</title>
+<path fill="none" stroke="black" d="M362.9,-175.85C366.9,-170.06 371.19,-163.85 375.29,-157.91"></path>
+</g>
+<!-- 14 C -->
+<g id="node10" class="node">
+<title>14 C</title>
+<ellipse fill="none" stroke="black" cx="392.65" cy="-280.56" rx="29.6" ry="29.6"></ellipse>
+<text text-anchor="middle" x="392.65" y="-276.36" font-family="Times,serif" font-size="14.00">14 C</text>
+</g>
+<!-- 9 CT&#45;&#45;14 C -->
+<g id="edge9" class="edge">
+<title>9 CT--14 C</title>
+<path fill="none" stroke="black" d="M361.13,-227.62C366.39,-236.46 372.25,-246.29 377.47,-255.06"></path>
+</g>
+<!-- 11 HC -->
+<g id="node11" class="node">
+<title>11 HC</title>
+<ellipse fill="none" stroke="black" cx="441.23" cy="-60.4" rx="36.55" ry="36.55"></ellipse>
+<text text-anchor="middle" x="441.23" y="-56.2" font-family="Times,serif" font-size="14.00">11 HC</text>
+</g>
+<!-- 10 CT&#45;&#45;11 HC -->
+<g id="edge10" class="edge">
+<title>10 CT--11 HC</title>
+<path fill="none" stroke="black" d="M415.39,-98.96C417.12,-96.37 418.88,-93.75 420.62,-91.15"></path>
+</g>
+<!-- 12 HC -->
+<g id="node12" class="node">
+<title>12 HC</title>
+<ellipse fill="none" stroke="black" cx="371.53" cy="-51.93" rx="36.55" ry="36.55"></ellipse>
+<text text-anchor="middle" x="371.53" y="-47.73" font-family="Times,serif" font-size="14.00">12 HC</text>
+</g>
+<!-- 10 CT&#45;&#45;12 HC -->
+<g id="edge11" class="edge">
+<title>10 CT--12 HC</title>
+<path fill="none" stroke="black" d="M384.88,-94.82C384.08,-92.25 383.27,-89.65 382.47,-87.07"></path>
+</g>
+<!-- 13 HC -->
+<g id="node13" class="node">
+<title>13 HC</title>
+<ellipse fill="none" stroke="black" cx="477.97" cy="-118.78" rx="36.55" ry="36.55"></ellipse>
+<text text-anchor="middle" x="477.97" y="-114.58" font-family="Times,serif" font-size="14.00">13 HC</text>
+</g>
+<!-- 10 CT&#45;&#45;13 HC -->
+<g id="edge12" class="edge">
+<title>10 CT--13 HC</title>
+<path fill="none" stroke="black" d="M430.92,-124.45C434.41,-124.03 437.96,-123.6 441.47,-123.18"></path>
+</g>
+<!-- 15 O -->
+<g id="node14" class="node">
+<title>15 O</title>
+<ellipse fill="none" stroke="black" cx="470.95" cy="-261.74" rx="30.16" ry="30.16"></ellipse>
+<text text-anchor="middle" x="470.95" y="-257.54" font-family="Times,serif" font-size="14.00">15 O</text>
+</g>
+<!-- 14 C&#45;&#45;15 O -->
+<g id="edge13" class="edge">
+<title>14 C--15 O</title>
+<path fill="none" stroke="black" d="M421.81,-273.55C428.24,-272.01 435.06,-270.37 441.51,-268.82"></path>
+</g>
+<!-- 16 N -->
+<g id="node15" class="node">
+<title>16 N</title>
+<ellipse fill="none" stroke="black" cx="414.76" cy="-364.73" rx="30.16" ry="30.16"></ellipse>
+<text text-anchor="middle" x="414.76" y="-360.53" font-family="Times,serif" font-size="14.00">16 N</text>
+</g>
+<!-- 14 C&#45;&#45;16 N -->
+<g id="edge14" class="edge">
+<title>14 C--16 N</title>
+<path fill="none" stroke="black" d="M400.26,-309.53C402.46,-317.9 404.86,-327.04 407.06,-335.43"></path>
+</g>
+<!-- 17 H -->
+<g id="node16" class="node">
+<title>17 H</title>
+<ellipse fill="none" stroke="black" cx="499.74" cy="-370.36" rx="30.16" ry="30.16"></ellipse>
+<text text-anchor="middle" x="499.74" y="-366.16" font-family="Times,serif" font-size="14.00">17 H</text>
+</g>
+<!-- 16 N&#45;&#45;17 H -->
+<g id="edge15" class="edge">
+<title>16 N--17 H</title>
+<path fill="none" stroke="black" d="M444.96,-366.73C452.98,-367.26 461.63,-367.84 469.64,-368.37"></path>
+</g>
+<!-- 18 CT -->
+<g id="node17" class="node">
+<title>18 CT</title>
+<ellipse fill="none" stroke="black" cx="406.47" cy="-449.35" rx="35.4" ry="35.4"></ellipse>
+<text text-anchor="middle" x="406.47" y="-445.15" font-family="Times,serif" font-size="14.00">18 CT</text>
+</g>
+<!-- 16 N&#45;&#45;18 CT -->
+<g id="edge16" class="edge">
+<title>16 N--18 CT</title>
+<path fill="none" stroke="black" d="M411.81,-394.8C411.21,-400.98 410.57,-407.53 409.94,-413.88"></path>
+</g>
+<!-- 19 H1 -->
+<g id="node18" class="node">
+<title>19 H1</title>
+<ellipse fill="none" stroke="black" cx="407.31" cy="-528.23" rx="34.82" ry="34.82"></ellipse>
+<text text-anchor="middle" x="407.31" y="-524.03" font-family="Times,serif" font-size="14.00">19 H1</text>
+</g>
+<!-- 18 CT&#45;&#45;19 H1 -->
+<g id="edge17" class="edge">
+<title>18 CT--19 H1</title>
+<path fill="none" stroke="black" d="M406.85,-485.1C406.88,-487.7 406.91,-490.34 406.93,-492.94"></path>
+</g>
+<!-- 20 H1 -->
+<g id="node19" class="node">
+<title>20 H1</title>
+<ellipse fill="none" stroke="black" cx="337.1" cy="-494.33" rx="34.82" ry="34.82"></ellipse>
+<text text-anchor="middle" x="337.1" y="-490.13" font-family="Times,serif" font-size="14.00">20 H1</text>
+</g>
+<!-- 18 CT&#45;&#45;20 H1 -->
+<g id="edge18" class="edge">
+<title>18 CT--20 H1</title>
+<path fill="none" stroke="black" d="M376.65,-468.68C373.27,-470.88 369.83,-473.11 366.45,-475.29"></path>
+</g>
+<!-- 21 H1 -->
+<g id="node20" class="node">
+<title>21 H1</title>
+<ellipse fill="none" stroke="black" cx="480.93" cy="-490.8" rx="34.82" ry="34.82"></ellipse>
+<text text-anchor="middle" x="480.93" y="-486.6" font-family="Times,serif" font-size="14.00">21 H1</text>
+</g>
+<!-- 18 CT&#45;&#45;21 H1 -->
+<g id="edge19" class="edge">
+<title>18 CT--21 H1</title>
+<path fill="none" stroke="black" d="M437.62,-466.69C441.76,-468.99 446.01,-471.36 450.15,-473.66"></path>
+</g>
+<!-- 8 H -->
+<g id="node21" class="node">
+<title>8 H</title>
+<ellipse fill="none" stroke="black" cx="301.58" cy="-251.7" rx="25.01" ry="25.01"></ellipse>
+<text text-anchor="middle" x="301.58" y="-247.5" font-family="Times,serif" font-size="14.00">8 H</text>
+</g>
+<!-- 8 H&#45;&#45;9 CT -->
+<g id="edge20" class="edge">
+<title>8 H--9 CT</title>
+<path fill="none" stroke="black" d="M318.15,-232.6C320.47,-229.92 322.88,-227.14 325.27,-224.39"></path>
+</g>
+</g>
+</svg>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-ala-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: A diagram of the Ala topology after HAT
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p>Or we can look at a different HAT used in the unit tests:</p>
+<div id="60e690b1" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>path_a <span class="op">=</span> read_top(Path(<span class="st">'../../tests/test_files/test_integration/alanine_hat_naive/Ala_out.top'</span>), use_gmx_dir<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>top <span class="op">=</span> Topology(path_a)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># move the radical to N16 before we start the reaction</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>top.break_bond((<span class="st">"16"</span>, <span class="st">"17"</span>))</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>top.bind_bond((<span class="st">"9"</span>, <span class="st">"17"</span>))</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>top_a <span class="op">=</span> copy.deepcopy(top)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>top_b <span class="op">=</span> top</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>top_b.break_bond((<span class="st">"18"</span>, <span class="st">"21"</span>))</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>top_b.bind_bond((<span class="st">"16"</span>, <span class="st">"21"</span>))</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>write_top_as_dot(top_a, <span class="st">"ala-top-2-a.dot"</span>)</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>write_top_as_dot(top_b, <span class="st">"ala-top-2-b.dot"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div>
+
+</div>
+<div class="quarto-layout-panel" data-layout-ncol="2">
+<div class="quarto-layout-row">
+<div class="cell quarto-layout-cell" data-fig-width="100%" data-file="ala-top-2-a.dot" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="cell-output-display">
+<div id="fig-ala" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-ala-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div>
+<svg width="NaN" height="480" viewbox="0.00 0.00 518.20 647.37" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="; max-width: none; max-height: none">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 643.37)">
+<title>G</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-643.37 514.2,-643.37 514.2,4 -4,4"></polygon>
+<!-- 1 CT -->
+<g id="node1" class="node">
+<title>1 CT</title>
+<ellipse fill="none" stroke="black" cx="114.76" cy="-112.57" rx="30.74" ry="30.74"></ellipse>
+<text text-anchor="middle" x="114.76" y="-108.37" font-family="Times,serif" font-size="14.00">1 CT</text>
+</g>
+<!-- 2 HC -->
+<g id="node2" class="node">
+<title>2 HC</title>
+<ellipse fill="none" stroke="black" cx="138.09" cy="-31.69" rx="31.89" ry="31.89"></ellipse>
+<text text-anchor="middle" x="138.09" y="-27.49" font-family="Times,serif" font-size="14.00">2 HC</text>
+</g>
+<!-- 1 CT&#45;&#45;2 HC -->
+<g id="edge1" class="edge">
+<title>1 CT--2 HC</title>
+<path fill="none" stroke="black" d="M123.32,-82.92C125.27,-76.15 127.34,-68.96 129.3,-62.16"></path>
+</g>
+<!-- 3 HC -->
+<g id="node3" class="node">
+<title>3 HC</title>
+<ellipse fill="none" stroke="black" cx="60.94" cy="-55.81" rx="31.89" ry="31.89"></ellipse>
+<text text-anchor="middle" x="60.94" y="-51.61" font-family="Times,serif" font-size="14.00">3 HC</text>
+</g>
+<!-- 1 CT&#45;&#45;3 HC -->
+<g id="edge2" class="edge">
+<title>1 CT--3 HC</title>
+<path fill="none" stroke="black" d="M93.49,-90.14C89.96,-86.42 86.3,-82.56 82.76,-78.83"></path>
+</g>
+<!-- 4 HC -->
+<g id="node4" class="node">
+<title>4 HC</title>
+<ellipse fill="none" stroke="black" cx="31.69" cy="-132.4" rx="31.89" ry="31.89"></ellipse>
+<text text-anchor="middle" x="31.69" y="-128.2" font-family="Times,serif" font-size="14.00">4 HC</text>
+</g>
+<!-- 1 CT&#45;&#45;4 HC -->
+<g id="edge3" class="edge">
+<title>1 CT--4 HC</title>
+<path fill="none" stroke="black" d="M84.77,-119.73C77.62,-121.44 69.96,-123.26 62.76,-124.98"></path>
+</g>
+<!-- 5 C -->
+<g id="node5" class="node">
+<title>5 C</title>
+<ellipse fill="none" stroke="black" cx="166.17" cy="-181.34" rx="24.94" ry="24.94"></ellipse>
+<text text-anchor="middle" x="166.17" y="-177.14" font-family="Times,serif" font-size="14.00">5 C</text>
+</g>
+<!-- 1 CT&#45;&#45;5 C -->
+<g id="edge4" class="edge">
+<title>1 CT--5 C</title>
+<path fill="none" stroke="black" d="M133.32,-137.4C139.19,-145.25 145.6,-153.82 151.18,-161.29"></path>
+</g>
+<!-- 6 O -->
+<g id="node6" class="node">
+<title>6 O</title>
+<ellipse fill="none" stroke="black" cx="101.89" cy="-232.58" rx="25.01" ry="25.01"></ellipse>
+<text text-anchor="middle" x="101.89" y="-228.38" font-family="Times,serif" font-size="14.00">6 O</text>
+</g>
+<!-- 5 C&#45;&#45;6 O -->
+<g id="edge5" class="edge">
+<title>5 C--6 O</title>
+<path fill="none" stroke="black" d="M146.54,-196.99C138.71,-203.23 129.71,-210.4 121.85,-216.67"></path>
+</g>
+<!-- 7 N -->
+<g id="node7" class="node">
+<title>7 N</title>
+<ellipse fill="none" stroke="black" cx="248.62" cy="-210.96" rx="25.01" ry="25.01"></ellipse>
+<text text-anchor="middle" x="248.62" y="-206.76" font-family="Times,serif" font-size="14.00">7 N</text>
+</g>
+<!-- 5 C&#45;&#45;7 N -->
+<g id="edge6" class="edge">
+<title>5 C--7 N</title>
+<path fill="none" stroke="black" d="M189.58,-189.75C200.53,-193.68 213.56,-198.36 224.58,-202.32"></path>
+</g>
+<!-- 8 H -->
+<g id="node8" class="node">
+<title>8 H</title>
+<ellipse fill="none" stroke="black" cx="278.4" cy="-137.49" rx="25.01" ry="25.01"></ellipse>
+<text text-anchor="middle" x="278.4" y="-133.29" font-family="Times,serif" font-size="14.00">8 H</text>
+</g>
+<!-- 7 N&#45;&#45;8 H -->
+<g id="edge7" class="edge">
+<title>7 N--8 H</title>
+<path fill="none" stroke="black" d="M258.21,-187.31C261.61,-178.92 265.43,-169.48 268.83,-161.09"></path>
+</g>
+<!-- 9 CT -->
+<g id="node9" class="node">
+<title>9 CT</title>
+<ellipse fill="none" stroke="black" cx="318.38" cy="-271.67" rx="30.74" ry="30.74"></ellipse>
+<text text-anchor="middle" x="318.38" y="-267.47" font-family="Times,serif" font-size="14.00">9 CT</text>
+</g>
+<!-- 7 N&#45;&#45;9 CT -->
+<g id="edge8" class="edge">
+<title>7 N--9 CT</title>
+<path fill="none" stroke="black" d="M267.68,-227.55C276.15,-234.92 286.2,-243.67 295.11,-251.42"></path>
+</g>
+<!-- 10 CT -->
+<g id="node10" class="node">
+<title>10 CT</title>
+<ellipse fill="none" stroke="black" cx="398.86" cy="-234.26" rx="35.4" ry="35.4"></ellipse>
+<text text-anchor="middle" x="398.86" y="-230.06" font-family="Times,serif" font-size="14.00">10 CT</text>
+</g>
+<!-- 9 CT&#45;&#45;10 CT -->
+<g id="edge9" class="edge">
+<title>9 CT--10 CT</title>
+<path fill="none" stroke="black" d="M346.53,-258.59C352.97,-255.59 359.86,-252.39 366.46,-249.32"></path>
+</g>
+<!-- 14 C -->
+<g id="node11" class="node">
+<title>14 C</title>
+<ellipse fill="none" stroke="black" cx="326.29" cy="-363.79" rx="29.6" ry="29.6"></ellipse>
+<text text-anchor="middle" x="326.29" y="-359.59" font-family="Times,serif" font-size="14.00">14 C</text>
+</g>
+<!-- 9 CT&#45;&#45;14 C -->
+<g id="edge10" class="edge">
+<title>9 CT--14 C</title>
+<path fill="none" stroke="black" d="M321.01,-302.34C321.89,-312.6 322.87,-324.01 323.75,-334.19"></path>
+</g>
+<!-- 17 H -->
+<g id="node21" class="node">
+<title>17 H</title>
+<ellipse fill="none" stroke="black" cx="260.61" cy="-305.28" rx="30.16" ry="30.16"></ellipse>
+<text text-anchor="middle" x="260.61" y="-301.08" font-family="Times,serif" font-size="14.00">17 H</text>
+</g>
+<!-- 9 CT&#45;&#45;17 H -->
+<g id="edge20" class="edge">
+<title>9 CT--17 H</title>
+<path fill="none" stroke="black" d="M291.86,-287.1C290.2,-288.06 288.53,-289.04 286.87,-290"></path>
+</g>
+<!-- 11 HC -->
+<g id="node12" class="node">
+<title>11 HC</title>
+<ellipse fill="none" stroke="black" cx="421.67" cy="-155.04" rx="36.55" ry="36.55"></ellipse>
+<text text-anchor="middle" x="421.67" y="-150.84" font-family="Times,serif" font-size="14.00">11 HC</text>
+</g>
+<!-- 10 CT&#45;&#45;11 HC -->
+<g id="edge11" class="edge">
+<title>10 CT--11 HC</title>
+<path fill="none" stroke="black" d="M408.8,-199.75C409.71,-196.58 410.64,-193.36 411.55,-190.19"></path>
+</g>
+<!-- 12 HC -->
+<g id="node13" class="node">
+<title>12 HC</title>
+<ellipse fill="none" stroke="black" cx="473.67" cy="-199.98" rx="36.55" ry="36.55"></ellipse>
+<text text-anchor="middle" x="473.67" y="-195.78" font-family="Times,serif" font-size="14.00">12 HC</text>
+</g>
+<!-- 10 CT&#45;&#45;12 HC -->
+<g id="edge12" class="edge">
+<title>10 CT--12 HC</title>
+<path fill="none" stroke="black" d="M431.46,-219.33C434.29,-218.03 437.17,-216.71 440.01,-215.41"></path>
+</g>
+<!-- 13 HC -->
+<g id="node14" class="node">
+<title>13 HC</title>
+<ellipse fill="none" stroke="black" cx="473.3" cy="-269.41" rx="36.55" ry="36.55"></ellipse>
+<text text-anchor="middle" x="473.3" y="-265.21" font-family="Times,serif" font-size="14.00">13 HC</text>
+</g>
+<!-- 10 CT&#45;&#45;13 HC -->
+<g id="edge13" class="edge">
+<title>10 CT--13 HC</title>
+<path fill="none" stroke="black" d="M431.3,-249.58C434.12,-250.91 436.97,-252.26 439.8,-253.59"></path>
+</g>
+<!-- 15 O -->
+<g id="node15" class="node">
+<title>15 O</title>
+<ellipse fill="none" stroke="black" cx="401.01" cy="-392.15" rx="30.16" ry="30.16"></ellipse>
+<text text-anchor="middle" x="401.01" y="-387.95" font-family="Times,serif" font-size="14.00">15 O</text>
+</g>
+<!-- 14 C&#45;&#45;15 O -->
+<g id="edge14" class="edge">
+<title>14 C--15 O</title>
+<path fill="none" stroke="black" d="M354.11,-374.35C360.09,-376.62 366.41,-379.02 372.42,-381.3"></path>
+</g>
+<!-- 16 N -->
+<g id="node16" class="node">
+<title>16 N</title>
+<ellipse fill="none" stroke="red" cx="300" cy="-444.92" rx="30.16" ry="30.16"></ellipse>
+<text text-anchor="middle" x="300" y="-440.72" font-family="Times,serif" font-size="14.00">16 N</text>
+</g>
+<!-- 14 C&#45;&#45;16 N -->
+<g id="edge15" class="edge">
+<title>14 C--16 N</title>
+<path fill="none" stroke="black" d="M317.09,-392.17C314.58,-399.93 311.85,-408.36 309.32,-416.15"></path>
+</g>
+<!-- 18 CT -->
+<g id="node17" class="node">
+<title>18 CT</title>
+<ellipse fill="none" stroke="black" cx="291.25" cy="-527.25" rx="35.4" ry="35.4"></ellipse>
+<text text-anchor="middle" x="291.25" y="-523.05" font-family="Times,serif" font-size="14.00">18 CT</text>
+</g>
+<!-- 16 N&#45;&#45;18 CT -->
+<g id="edge16" class="edge">
+<title>16 N--18 CT</title>
+<path fill="none" stroke="black" d="M296.79,-475.11C296.21,-480.52 295.61,-486.21 295.02,-491.76"></path>
+</g>
+<!-- 19 H1 -->
+<g id="node18" class="node">
+<title>19 H1</title>
+<ellipse fill="none" stroke="black" cx="281.1" cy="-604.46" rx="34.82" ry="34.82"></ellipse>
+<text text-anchor="middle" x="281.1" y="-600.26" font-family="Times,serif" font-size="14.00">19 H1</text>
+</g>
+<!-- 18 CT&#45;&#45;19 H1 -->
+<g id="edge17" class="edge">
+<title>18 CT--19 H1</title>
+<path fill="none" stroke="black" d="M286.59,-562.69C286.28,-565.07 285.96,-567.46 285.65,-569.83"></path>
+</g>
+<!-- 20 H1 -->
+<g id="node19" class="node">
+<title>20 H1</title>
+<ellipse fill="none" stroke="black" cx="212.87" cy="-557.28" rx="34.82" ry="34.82"></ellipse>
+<text text-anchor="middle" x="212.87" y="-553.08" font-family="Times,serif" font-size="14.00">20 H1</text>
+</g>
+<!-- 18 CT&#45;&#45;20 H1 -->
+<g id="edge18" class="edge">
+<title>18 CT--20 H1</title>
+<path fill="none" stroke="black" d="M258.01,-539.99C254.01,-541.52 249.92,-543.09 245.91,-544.62"></path>
+</g>
+<!-- 21 H1 -->
+<g id="node20" class="node">
+<title>21 H1</title>
+<ellipse fill="none" stroke="black" cx="361.17" cy="-575.07" rx="34.82" ry="34.82"></ellipse>
+<text text-anchor="middle" x="361.17" y="-570.87" font-family="Times,serif" font-size="14.00">21 H1</text>
+</g>
+<!-- 18 CT&#45;&#45;21 H1 -->
+<g id="edge19" class="edge">
+<title>18 CT--21 H1</title>
+<path fill="none" stroke="black" d="M320.9,-547.53C324.62,-550.07 328.43,-552.68 332.14,-555.22"></path>
+</g>
+</g>
+</svg>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-ala-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: A diagram of the Ala topology
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell quarto-layout-cell" data-fig-width="100%" data-file="ala-top-2-b.dot" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="cell-output-display">
+<div id="fig-ala" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-ala-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div>
+<svg width="NaN" height="480" viewbox="0.00 0.00 522.60 635.42" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="; max-width: none; max-height: none">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 631.42)">
+<title>G</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-631.42 518.6,-631.42 518.6,4 -4,4"></polygon>
+<!-- 1 CT -->
+<g id="node1" class="node">
+<title>1 CT</title>
+<ellipse fill="none" stroke="black" cx="114.1" cy="-113.39" rx="30.74" ry="30.74"></ellipse>
+<text text-anchor="middle" x="114.1" y="-109.19" font-family="Times,serif" font-size="14.00">1 CT</text>
+</g>
+<!-- 2 HC -->
+<g id="node2" class="node">
+<title>2 HC</title>
+<ellipse fill="none" stroke="black" cx="134.57" cy="-31.69" rx="31.89" ry="31.89"></ellipse>
+<text text-anchor="middle" x="134.57" y="-27.49" font-family="Times,serif" font-size="14.00">2 HC</text>
+</g>
+<!-- 1 CT&#45;&#45;2 HC -->
+<g id="edge1" class="edge">
+<title>1 CT--2 HC</title>
+<path fill="none" stroke="black" d="M121.6,-83.43C123.32,-76.6 125.14,-69.33 126.86,-62.47"></path>
+</g>
+<!-- 3 HC -->
+<g id="node3" class="node">
+<title>3 HC</title>
+<ellipse fill="none" stroke="black" cx="58.48" cy="-58.39" rx="31.89" ry="31.89"></ellipse>
+<text text-anchor="middle" x="58.48" y="-54.19" font-family="Times,serif" font-size="14.00">3 HC</text>
+</g>
+<!-- 1 CT&#45;&#45;3 HC -->
+<g id="edge2" class="edge">
+<title>1 CT--3 HC</title>
+<path fill="none" stroke="black" d="M92.11,-91.66C88.47,-88.05 84.69,-84.31 81.03,-80.69"></path>
+</g>
+<!-- 4 HC -->
+<g id="node4" class="node">
+<title>4 HC</title>
+<ellipse fill="none" stroke="black" cx="31.69" cy="-135.88" rx="31.89" ry="31.89"></ellipse>
+<text text-anchor="middle" x="31.69" y="-131.68" font-family="Times,serif" font-size="14.00">4 HC</text>
+</g>
+<!-- 1 CT&#45;&#45;4 HC -->
+<g id="edge3" class="edge">
+<title>1 CT--4 HC</title>
+<path fill="none" stroke="black" d="M84.35,-121.51C77.25,-123.45 69.66,-125.52 62.51,-127.47"></path>
+</g>
+<!-- 5 C -->
+<g id="node5" class="node">
+<title>5 C</title>
+<ellipse fill="none" stroke="black" cx="167.79" cy="-180.43" rx="24.94" ry="24.94"></ellipse>
+<text text-anchor="middle" x="167.79" y="-176.23" font-family="Times,serif" font-size="14.00">5 C</text>
+</g>
+<!-- 1 CT&#45;&#45;5 C -->
+<g id="edge4" class="edge">
+<title>1 CT--5 C</title>
+<path fill="none" stroke="black" d="M133.48,-137.59C139.61,-145.25 146.3,-153.6 152.13,-160.88"></path>
+</g>
+<!-- 6 O -->
+<g id="node6" class="node">
+<title>6 O</title>
+<ellipse fill="none" stroke="black" cx="105.09" cy="-233.58" rx="25.01" ry="25.01"></ellipse>
+<text text-anchor="middle" x="105.09" y="-229.38" font-family="Times,serif" font-size="14.00">6 O</text>
+</g>
+<!-- 5 C&#45;&#45;6 O -->
+<g id="edge5" class="edge">
+<title>5 C--6 O</title>
+<path fill="none" stroke="black" d="M148.64,-196.67C141,-203.14 132.22,-210.58 124.56,-217.08"></path>
+</g>
+<!-- 7 N -->
+<g id="node7" class="node">
+<title>7 N</title>
+<ellipse fill="none" stroke="black" cx="251.08" cy="-207.62" rx="25.01" ry="25.01"></ellipse>
+<text text-anchor="middle" x="251.08" y="-203.42" font-family="Times,serif" font-size="14.00">7 N</text>
+</g>
+<!-- 5 C&#45;&#45;7 N -->
+<g id="edge6" class="edge">
+<title>5 C--7 N</title>
+<path fill="none" stroke="black" d="M191.43,-188.15C202.5,-191.76 215.66,-196.06 226.8,-199.69"></path>
+</g>
+<!-- 8 H -->
+<g id="node8" class="node">
+<title>8 H</title>
+<ellipse fill="none" stroke="black" cx="277.99" cy="-133.08" rx="25.01" ry="25.01"></ellipse>
+<text text-anchor="middle" x="277.99" y="-128.88" font-family="Times,serif" font-size="14.00">8 H</text>
+</g>
+<!-- 7 N&#45;&#45;8 H -->
+<g id="edge7" class="edge">
+<title>7 N--8 H</title>
+<path fill="none" stroke="black" d="M259.75,-183.63C262.82,-175.11 266.27,-165.54 269.34,-157.03"></path>
+</g>
+<!-- 9 CT -->
+<g id="node9" class="node">
+<title>9 CT</title>
+<ellipse fill="none" stroke="black" cx="322.74" cy="-266.07" rx="30.74" ry="30.74"></ellipse>
+<text text-anchor="middle" x="322.74" y="-261.87" font-family="Times,serif" font-size="14.00">9 CT</text>
+</g>
+<!-- 7 N&#45;&#45;9 CT -->
+<g id="edge8" class="edge">
+<title>7 N--9 CT</title>
+<path fill="none" stroke="black" d="M270.66,-223.59C279.37,-230.69 289.69,-239.11 298.84,-246.58"></path>
+</g>
+<!-- 10 CT -->
+<g id="node10" class="node">
+<title>10 CT</title>
+<ellipse fill="none" stroke="black" cx="401.44" cy="-224.45" rx="35.4" ry="35.4"></ellipse>
+<text text-anchor="middle" x="401.44" y="-220.25" font-family="Times,serif" font-size="14.00">10 CT</text>
+</g>
+<!-- 9 CT&#45;&#45;10 CT -->
+<g id="edge9" class="edge">
+<title>9 CT--10 CT</title>
+<path fill="none" stroke="black" d="M349.82,-251.75C356.31,-248.31 363.3,-244.62 369.97,-241.09"></path>
+</g>
+<!-- 14 C -->
+<g id="node11" class="node">
+<title>14 C</title>
+<ellipse fill="none" stroke="black" cx="333.74" cy="-358.16" rx="29.6" ry="29.6"></ellipse>
+<text text-anchor="middle" x="333.74" y="-353.96" font-family="Times,serif" font-size="14.00">14 C</text>
+</g>
+<!-- 9 CT&#45;&#45;14 C -->
+<g id="edge10" class="edge">
+<title>9 CT--14 C</title>
+<path fill="none" stroke="black" d="M326.37,-296.48C327.61,-306.85 329,-318.43 330.23,-328.72"></path>
+</g>
+<!-- 17 H -->
+<g id="node20" class="node">
+<title>17 H</title>
+<ellipse fill="none" stroke="black" cx="265.63" cy="-300.97" rx="30.16" ry="30.16"></ellipse>
+<text text-anchor="middle" x="265.63" y="-296.77" font-family="Times,serif" font-size="14.00">17 H</text>
+</g>
+<!-- 9 CT&#45;&#45;17 H -->
+<g id="edge19" class="edge">
+<title>9 CT--17 H</title>
+<path fill="none" stroke="black" d="M296.52,-282.09C294.88,-283.1 293.23,-284.11 291.59,-285.11"></path>
+</g>
+<!-- 11 HC -->
+<g id="node12" class="node">
+<title>11 HC</title>
+<ellipse fill="none" stroke="black" cx="420.51" cy="-144.26" rx="36.55" ry="36.55"></ellipse>
+<text text-anchor="middle" x="420.51" y="-140.06" font-family="Times,serif" font-size="14.00">11 HC</text>
+</g>
+<!-- 10 CT&#45;&#45;11 HC -->
+<g id="edge11" class="edge">
+<title>10 CT--11 HC</title>
+<path fill="none" stroke="black" d="M409.75,-189.51C410.51,-186.3 411.29,-183.05 412.05,-179.83"></path>
+</g>
+<!-- 12 HC -->
+<g id="node13" class="node">
+<title>12 HC</title>
+<ellipse fill="none" stroke="black" cx="474.46" cy="-186.22" rx="36.55" ry="36.55"></ellipse>
+<text text-anchor="middle" x="474.46" y="-182.02" font-family="Times,serif" font-size="14.00">12 HC</text>
+</g>
+<!-- 10 CT&#45;&#45;12 HC -->
+<g id="edge12" class="edge">
+<title>10 CT--12 HC</title>
+<path fill="none" stroke="black" d="M433.26,-207.79C436.18,-206.26 439.14,-204.71 442.06,-203.18"></path>
+</g>
+<!-- 13 HC -->
+<g id="node14" class="node">
+<title>13 HC</title>
+<ellipse fill="none" stroke="black" cx="478.07" cy="-255.09" rx="36.55" ry="36.55"></ellipse>
+<text text-anchor="middle" x="478.07" y="-250.89" font-family="Times,serif" font-size="14.00">13 HC</text>
+</g>
+<!-- 10 CT&#45;&#45;13 HC -->
+<g id="edge13" class="edge">
+<title>10 CT--13 HC</title>
+<path fill="none" stroke="black" d="M434.38,-237.62C437.47,-238.85 440.6,-240.1 443.69,-241.34"></path>
+</g>
+<!-- 15 O -->
+<g id="node15" class="node">
+<title>15 O</title>
+<ellipse fill="none" stroke="black" cx="411.16" cy="-377.87" rx="30.16" ry="30.16"></ellipse>
+<text text-anchor="middle" x="411.16" y="-373.67" font-family="Times,serif" font-size="14.00">15 O</text>
+</g>
+<!-- 14 C&#45;&#45;15 O -->
+<g id="edge14" class="edge">
+<title>14 C--15 O</title>
+<path fill="none" stroke="black" d="M362.57,-365.5C368.85,-367.1 375.49,-368.79 381.79,-370.39"></path>
+</g>
+<!-- 16 N -->
+<g id="node16" class="node">
+<title>16 N</title>
+<ellipse fill="none" stroke="black" cx="319.39" cy="-443.98" rx="30.16" ry="30.16"></ellipse>
+<text text-anchor="middle" x="319.39" y="-439.78" font-family="Times,serif" font-size="14.00">16 N</text>
+</g>
+<!-- 14 C&#45;&#45;16 N -->
+<g id="edge15" class="edge">
+<title>14 C--16 N</title>
+<path fill="none" stroke="black" d="M328.8,-387.69C327.38,-396.23 325.82,-405.55 324.39,-414.1"></path>
+</g>
+<!-- 18 CT -->
+<g id="node17" class="node">
+<title>18 CT</title>
+<ellipse fill="none" stroke="red" cx="276.33" cy="-515.39" rx="35.4" ry="35.4"></ellipse>
+<text text-anchor="middle" x="276.33" y="-511.19" font-family="Times,serif" font-size="14.00">18 CT</text>
+</g>
+<!-- 16 N&#45;&#45;18 CT -->
+<g id="edge16" class="edge">
+<title>16 N--18 CT</title>
+<path fill="none" stroke="black" d="M303.84,-469.76C300.86,-474.72 297.7,-479.95 294.64,-485.03"></path>
+</g>
+<!-- 21 H1 -->
+<g id="node21" class="node">
+<title>21 H1</title>
+<ellipse fill="none" stroke="black" cx="389.91" cy="-490.79" rx="34.82" ry="34.82"></ellipse>
+<text text-anchor="middle" x="389.91" y="-486.59" font-family="Times,serif" font-size="14.00">21 H1</text>
+</g>
+<!-- 16 N&#45;&#45;21 H1 -->
+<g id="edge20" class="edge">
+<title>16 N--21 H1</title>
+<path fill="none" stroke="black" d="M344.85,-460.88C349.9,-464.23 355.24,-467.78 360.41,-471.21"></path>
+</g>
+<!-- 19 H1 -->
+<g id="node18" class="node">
+<title>19 H1</title>
+<ellipse fill="none" stroke="black" cx="303.73" cy="-592.51" rx="34.82" ry="34.82"></ellipse>
+<text text-anchor="middle" x="303.73" y="-588.31" font-family="Times,serif" font-size="14.00">19 H1</text>
+</g>
+<!-- 18 CT&#45;&#45;19 H1 -->
+<g id="edge17" class="edge">
+<title>18 CT--19 H1</title>
+<path fill="none" stroke="black" d="M288.27,-548.99C289.48,-552.4 290.71,-555.87 291.92,-559.27"></path>
+</g>
+<!-- 20 H1 -->
+<g id="node19" class="node">
+<title>20 H1</title>
+<ellipse fill="none" stroke="black" cx="207.52" cy="-555.52" rx="34.82" ry="34.82"></ellipse>
+<text text-anchor="middle" x="207.52" y="-551.32" font-family="Times,serif" font-size="14.00">20 H1</text>
+</g>
+<!-- 18 CT&#45;&#45;20 H1 -->
+<g id="edge18" class="edge">
+<title>18 CT--20 H1</title>
+<path fill="none" stroke="black" d="M245.55,-533.34C242.97,-534.85 240.37,-536.37 237.79,-537.87"></path>
+</g>
+</g>
+</svg>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-ala-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: A diagram of the Ala topology after HAT
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
 </section>
 <section id="multiple-molecules" class="level2">
 <h2 class="anchored" data-anchor-id="multiple-molecules">Multiple molecules</h2>
-<div id="3d5b8d8c" class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>urea_dict <span class="op">=</span> read_top(Path(<span class="st">'../../tests/test_files/test_topology/urea.top'</span>), use_gmx_dir<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>urea <span class="op">=</span> Topology(urea_dict)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>write_top_as_dot(urea, <span class="st">"urea-top.dot"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="8a41d695" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>urea_dict <span class="op">=</span> read_top(Path(<span class="st">'../../tests/test_files/test_topology/urea.top'</span>), use_gmx_dir<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>urea <span class="op">=</span> Topology(urea_dict)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>write_top_as_dot(urea, <span class="st">"urea-top.dot"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-file="urea-top.dot" data-layout-align="default">
 <div class="cell-output-display">
@@ -903,7 +1683,7 @@ Figure&nbsp;1: A diagram of the Ala topology
 </div>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-ala-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;2: Topology of one molecule of urea
+Figure&nbsp;5: Topology of one molecule of urea
 </figcaption>
 </figure>
 </div>
@@ -911,17 +1691,17 @@ Figure&nbsp;2: Topology of one molecule of urea
 </div>
 <p>When we want to run reactions within molecules that are either separate moleculetypes or multiples of the same moleculetype, KIMMDY can combine those into a single moleculetype and make multiples explicit.</p>
 <p>i.e.&nbsp;if we have a topology with two molecules of urea defined as:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode ini code-with-copy"><code class="sourceCode ini"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">[ system ]</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Urea in Water</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="kw">[ molecules ]</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co">;molecule name   nr.</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="dt">Urea             2</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="dt">SOL              1000</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div id="796fa027" class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>urea_dict <span class="op">=</span> read_top(Path(<span class="st">'../../tests/test_files/test_topology/urea-times-2.top'</span>), use_gmx_dir<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>urea <span class="op">=</span> Topology(urea_dict)</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>write_top_as_dot(urea, <span class="st">"urea-2-top.dot"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode ini code-with-copy"><code class="sourceCode ini"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">[ system ]</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Urea in Water</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="kw">[ molecules ]</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co">;molecule name   nr.</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="dt">Urea             2</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="dt">SOL              1000</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="8725e8c5" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>urea_dict <span class="op">=</span> read_top(Path(<span class="st">'../../tests/test_files/test_topology/urea-times-2.top'</span>), use_gmx_dir<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>urea <span class="op">=</span> Topology(urea_dict)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>write_top_as_dot(urea, <span class="st">"urea-2-top.dot"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>We end up with</p>
 <div class="cell" data-file="urea-2-top.dot" data-layout-align="default">
@@ -1105,7 +1885,7 @@ Figure&nbsp;2: Topology of one molecule of urea
 </div>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-ala-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;3: A diagram of the two urea molecules topology
+Figure&nbsp;6: A diagram of the two urea molecules topology
 </figcaption>
 </figure>
 </div>

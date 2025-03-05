@@ -653,6 +653,8 @@ class Topology:
     Reparametrization is triggerd automatically if `to_dict` is called
     after bonds have changed.
 
+    Also see <https://manual.gromacs.org/current/reference-manual/topologies/topology-file-formats.html#topology-file>
+
     Assumptions:
 
     - the topology of interest (the Reactive moleculetype) consists of the first moleculetypes (non-solvent).
@@ -673,6 +675,10 @@ class Topology:
         Path to the residue types file.
     reactive_nrexcl
         Overwrite nrexcl value for the reactive moleculetype. Otherwise takes the nrexcl of the first reactive moleculetype.
+    needs_parameterization
+        Does the topology currently need to be re-parameterized due to changes?
+    parameterization_focus_ids
+        list of atoms ids around which the parameterization happens (to avoid re-parameterizing the whole Reactive moleculetype)
     """
 
     def __init__(
@@ -683,6 +689,7 @@ class Topology:
         radicals: Optional[str] = None,
         residuetypes_path: Optional[Path] = None,
         reactive_nrexcl: Optional[str] = None,
+        gromacs_alias: str = "gmx",
     ) -> None:
         if top == {}:
             raise NotImplementedError(
@@ -701,14 +708,17 @@ class Topology:
         self.parametrizer = parametrizer
         self._check_is_reactive_molecule = is_reactive_predicate_f
 
-        self.needs_parameterization = False
+        self.needs_parameterization: bool = False
+        self.parameterization_focus_ids: set[str] = set()
 
         self._merge_moleculetypes(radicals=radicals, nrexcl=reactive_nrexcl)
         self._link_atomics()
 
     def _link_atomics(self):
-        """
-        link atoms, bonds etc. to the main moleculeype, REACTIVE_MOLECULEYPE
+        """link atoms, bonds etc. properties of self (=top) to the reactive moleculeype.
+
+        Call this any time a large change is made to the reactive moleculetype
+        that re-assigns a property and not just modifies parts of it in place.
         """
         self.reactive_molecule = self.moleculetypes[REACTIVE_MOLECULEYPE]
         self.atoms = self.reactive_molecule.atoms
@@ -717,16 +727,10 @@ class Topology:
         self.exclusions = self.reactive_molecule.exclusions
         self.settles = self.reactive_molecule.settles
         self.proper_dihedrals = self.reactive_molecule.proper_dihedrals
-        self.improper_dihedrals = self.moleculetypes[
-            REACTIVE_MOLECULEYPE
-        ].improper_dihedrals
+        self.improper_dihedrals = self.reactive_molecule.improper_dihedrals
         self.pairs = self.reactive_molecule.pairs
-        self.position_restraints = self.moleculetypes[
-            REACTIVE_MOLECULEYPE
-        ].position_restraints
-        self.dihedral_restraints = self.moleculetypes[
-            REACTIVE_MOLECULEYPE
-        ].dihedral_restraints
+        self.position_restraints = self.reactive_molecule.position_restraints
+        self.dihedral_restraints = self.reactive_molecule.dihedral_restraints
         self.radicals = self.reactive_molecule.radicals
         self.nrexcl = self.reactive_molecule.nrexcl
 
@@ -903,6 +907,7 @@ class Topology:
                 return None
 
         subsections = section["subsections"]
+        section["content"] = [[name, moleculetype.nrexcl]]
         for k in list(subsections.keys()):
             v = subsections[k]
             condition = v.get("condition")
@@ -964,13 +969,14 @@ class Topology:
             [attributes_to_list(x) for x in self.ff.angletypes.values()],
         )
 
-    def update_parameters(self, focus_nrs: Optional[set[str]] = None):
+    def update_parameters(self):
         if self.needs_parameterization:
             if self.parametrizer is not None:
+                focus_ids = self.parameterization_focus_ids
                 logger.info(
-                    f"Starting parametrization using {self.parametrizer.__class__.__name__}"
+                    f"Starting parametrization using {self.parametrizer.__class__.__name__} with focus on {focus_ids}"
                 )
-                self.parametrizer.parameterize_topology(self, focus_nrs)
+                self.parametrizer.parameterize_topology(self, focus_nrs=focus_ids)
             else:
                 raise RuntimeError("No Parametrizer was initialized in this topology!")
             self.needs_parameterization = False
@@ -1131,6 +1137,7 @@ class Topology:
             self.update_parameters()
             # Overwriting in case of no parameterization wanted
             self.needs_parameterization = False
+            self.parameterization_focus_ids = set()
 
         return update_map
 
@@ -1222,6 +1229,7 @@ class Topology:
             )
 
         self.needs_parameterization = True
+        self.parameterization_focus_ids.update(atompair_nrs)
 
         # mark atoms as radicals
         for atom in atompair:
@@ -1315,6 +1323,7 @@ class Topology:
             )
 
         self.needs_parameterization = True
+        self.parameterization_focus_ids.update(atompair_nrs)
 
         # de-radialize if re-combining two radicals
         if all(map(lambda x: x.is_radical, atompair)):
