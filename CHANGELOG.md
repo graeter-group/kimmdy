@@ -1,6 +1,14 @@
 # Changelog
 
 
+## [7.1.2](https://github.com/graeter-group/kimmdy/compare/v7.1.1...v7.1.2) (2025-03-05)
+
+
+### Bug Fixes
+
+* **ci:** fix building docs before running tests ([#527](https://github.com/graeter-group/kimmdy/issues/527)) ([2b9f969](https://github.com/graeter-group/kimmdy/commit/2b9f969d22956cf64ae600472f9f4cfa8a59d735))
+* **ci:** only trigger docs manually ([2f3c4ee](https://github.com/graeter-group/kimmdy/commit/2f3c4ee3a585f88febc5be13886075a54be910da))
+
 ## [7.1.1](https://github.com/graeter-group/kimmdy/compare/v7.1.0...v7.1.1) (2025-03-05)
 
 
