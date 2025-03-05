@@ -6,13 +6,9 @@ on:
     branches: [ main ]
 
 jobs:
-  docs:
+  build:
     if: |
       contains(github.event.head_commit.message, 'chore(main): release')
-    uses: ./.github/workflows/build-docs.yml
-  build:
-    needs:
-      - docs
     name: Build distribution 📦
     runs-on: ubuntu-latest
     steps:
