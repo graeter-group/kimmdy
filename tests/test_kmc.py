@@ -36,8 +36,8 @@ def reference_KMC() -> KMCAccept:
         recipe=Recipe(
             [Bind(2, 3)], rates=[0.12, 0.0], timespans=[(0.0, 6.0), (6.0, 10.0)]
         ),
-        time_delta=0.04032167624965666,
-        reaction_probability=[0.0, 0.72, 0.54, 0.0],
+        time_delta=0.4032167624965666,
+        reaction_probability=[0.0, 0.072, 0.054, 0.0],
         time_start=0,
         time_start_index=0,
     )
@@ -51,8 +51,8 @@ def reference_multi2_KMC() -> KMCAccept:
             rates=[0.12, 0.0, 0.15, 0.06],
             timespans=[(0.0, 6.0), (6.0, 10.0), (2.0, 4.0), (4.0, 8.0)],
         ),
-        time_delta=0.09762211196506274,
-        reaction_probability=[0.0, 0.72, 0.54, 0.0],
+        time_delta=0.7809768957205019,
+        reaction_probability=[0.0, 0.072, 0.054, 0.0],
         time_start=6.0,
         time_start_index=0,
     )
