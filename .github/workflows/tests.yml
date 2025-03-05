@@ -7,8 +7,18 @@ on:
     types: [opened, synchronize, reopened, ready_for_review]
 
 jobs:
+  docs:
+    if: |
+      github.event.pull_request.draft == false && contains(github.event.pull_request.title, 'chore(main): release')
+    uses: ./.github/workflows/build-docs.yml
   test:
-    if: github.event.pull_request.draft == false
+
+    # together this means the test are run after the docs (which create a new commit)
+    # but don't require the docs to have run, so it also runs on non-release PRs
+    if: ${{ github.event.pull_request.draft == false && always() }}
+    needs:
+      - docs
+
     runs-on: ubuntu-latest
     container: riedmiki/gromacs-plumed-python:2023.5-plumed
     steps:
