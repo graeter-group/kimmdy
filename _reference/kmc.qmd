@@ -20,13 +20,13 @@ and because we have one reactant molecule
 
 ```python
 kmc.KMCAccept(
-    self
-    recipe
-    reaction_probability
-    time_delta
-    time_start
-    time_start_index
-    time_start_index_within_plugin=None
+    self,
+    recipe,
+    reaction_probability,
+    time_delta,
+    time_start,
+    time_start_index,
+    time_start_index_within_plugin=None,
 )
 ```
 
@@ -46,11 +46,20 @@ The result of a KMC step. Similar to a Recipe but for the concrete realization o
 
 | Name | Description |
 | --- | --- |
+| [dummy_first_kmc](#kimmdy.kmc.dummy_first_kmc) | Dummy KMC method that always chooses the first reaction in the list. |
 | [extrande](#kimmdy.kmc.extrande) | Extrande KMC |
 | [extrande_mod](#kimmdy.kmc.extrande_mod) | Modified Extrande KMC |
 | [frm](#kimmdy.kmc.frm) | First Reaction Method variant of Kinetic Monte Carlo. |
 | [multi_rfkmc](#kimmdy.kmc.multi_rfkmc) | Rejection-Free Monte Carlo. |
 | [rf_kmc](#kimmdy.kmc.rf_kmc) | Rejection-Free Monte Carlo. |
+
+### dummy_first_kmc { #kimmdy.kmc.dummy_first_kmc }
+
+```python
+kmc.dummy_first_kmc(recipe_collection)
+```
+
+Dummy KMC method that always chooses the first reaction in the list.
 
 ### extrande { #kimmdy.kmc.extrande }
 

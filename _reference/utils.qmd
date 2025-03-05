@@ -25,7 +25,8 @@ Utilities for building plugins, shell convenience functions and GROMACS related 
 | [morse_transition_rate](#kimmdy.utils.morse_transition_rate) | Calculates reaction rate constant for a bond breaking event. |
 | [run_gmx](#kimmdy.utils.run_gmx) | Run GROMACS command in shell. |
 | [run_shell_cmd](#kimmdy.utils.run_shell_cmd) | Run command in shell. |
-| [truncate_sim_files](#kimmdy.utils.truncate_sim_files) | Truncates latest trr, xtc, edr, and gro to the time to a previous |
+| [write_coordinate_files_at_reaction_time](#kimmdy.utils.write_coordinate_files_at_reaction_time) | Write out a gro file from the trajectory (xtc or trr) at the reaction time. |
+| [write_reaction_time_marker](#kimmdy.utils.write_reaction_time_marker) | Write out a file as marker for the reaction time. |
 
 ### check_gmx_version { #kimmdy.utils.check_gmx_version }
 
@@ -97,7 +98,7 @@ Returns dissociation energy E_dissoc for a set of two atomnames.
 ### get_gmx_dir { #kimmdy.utils.get_gmx_dir }
 
 ```python
-utils.get_gmx_dir(gromacs_alias='gmx')
+utils.get_gmx_dir(gromacs_alias='gmx', grompp_prefix=None)
 ```
 
 Returns the path to the gromacs installation
@@ -130,12 +131,12 @@ If tasks is "all", all subdirectories are returned.
 
 ```python
 utils.morse_transition_rate(
-    r_curr
-    r_0
-    dissociation_energy
-    k_f
-    frequency_factor=0.288
-    temperature=300
+    r_curr,
+    r_0,
+    dissociation_energy,
+    k_f,
+    frequency_factor=0.288,
+    temperature=300,
 )
 ```
 
@@ -162,7 +163,7 @@ The calculation should be according to the derivation in the original KIMMDY pap
 ### run_gmx { #kimmdy.utils.run_gmx }
 
 ```python
-utils.run_gmx(s, cwd=None)
+utils.run_gmx(cmd, cwd=None)
 ```
 
 Run GROMACS command in shell.
@@ -177,21 +178,18 @@ utils.run_shell_cmd(s, cwd=None)
 
 Run command in shell.
 
-### truncate_sim_files { #kimmdy.utils.truncate_sim_files }
+### write_coordinate_files_at_reaction_time { #kimmdy.utils.write_coordinate_files_at_reaction_time }
 
 ```python
-utils.truncate_sim_files(files, time, keep_tail=True)
+utils.write_coordinate_files_at_reaction_time(files, time)
 ```
 
-Truncates latest trr, xtc, edr, and gro to the time to a previous
-point in time.
+Write out a gro file from the trajectory (xtc or trr) at the reaction time.
 
-The files stay in place, the truncated tail is by default kept and renamed
-to '[...xtc].tail'
+### write_reaction_time_marker { #kimmdy.utils.write_reaction_time_marker }
 
-#### Parameters {.doc-section .doc-section-parameters}
+```python
+utils.write_reaction_time_marker(dir, time)
+```
 
-| Name   | Type                                              | Description                                          | Default    |
-|--------|---------------------------------------------------|------------------------------------------------------|------------|
-| time   | [Optional](`typing.Optional`)\[[float](`float`)\] | Time in ps up to which the data should be truncated. | _required_ |
-| files  | [TaskFiles](`kimmdy.tasks.TaskFiles`)             | TaskFiles to get the latest files.                   | _required_ |
+Write out a file as marker for the reaction time.

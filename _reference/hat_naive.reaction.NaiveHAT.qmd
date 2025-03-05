@@ -4,4 +4,4 @@
 reaction.NaiveHAT(self, name, runmng)
 ```
 
-Naive HAT reaction, selects hydrogens at random
+Naive HAT reaction, selects all neighboring hydrogens and assigns random rates.
