@@ -13,7 +13,9 @@
 ### FF { #kimmdy.topology.ff.FF }
 
 ```python
-topology.ff.FF(self, top, residuetypes_path=None)
+topology.ff.FF(self, top, residuetypes_path=None, gromacs_alias='gmx')
 ```
 
 Container for parsed forcefield data.
+
+Also see <https://manual.gromacs.org/current/reference-manual/topologies/topology-file-formats.html#topology-file>

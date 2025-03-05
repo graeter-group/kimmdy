@@ -15,13 +15,14 @@ and package into a parsed format for internal use.
 
 ```python
 config.Config(
-    self
-    input_file=None
-    opts=None
-    scheme=None
-    section='config'
-    logfile=None
-    loglevel=None
+    self,
+    input_file=None,
+    opts=None,
+    scheme=None,
+    section='config',
+    logfile=None,
+    loglevel=None,
+    restart=False,
 )
 ```
 

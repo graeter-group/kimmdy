@@ -619,12 +619,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="kimmdy.tasks.TaskFiles" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.tasks.TaskFiles">TaskFiles</h3>
 <div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>tasks.TaskFiles(</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">self</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    get_latest</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">input</span><span class="op">=</span><span class="bu">dict</span>()</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    output<span class="op">=</span><span class="bu">dict</span>()</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    outputdir<span class="op">=</span>Path()</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    logger<span class="op">=</span>logging.getLogger(<span class="st">'kimmdy.basetask'</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">self</span>,</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    get_latest,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">input</span><span class="op">=</span><span class="bu">dict</span>(),</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    output<span class="op">=</span><span class="bu">dict</span>(),</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    outputdir<span class="op">=</span>Path(),</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    logger<span class="op">=</span>logging.getLogger(<span class="st">'kimmdy.basetask'</span>),</span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Class for Task input and output files and directories.</p>
 <p>Hosts the input and output file paths belonging to a task. A function or method that wants to be callable as a Task has to return a TaskFiles object. The input defaultdict is populated on the fly using get_latest of the runmanager to find newest files. Files which can not be found by get_latest must be added manually.</p>
@@ -641,12 +641,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td>get_latest</td>
-<td><a href="https://docs.python.org/3.10/library/typing.html#typing.Callable">Callable</a></td>
+<td><a href="https://docs.python.org/3.10/library/typing.html#typing.Callable">Callable</a>[[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>], <a href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path">Path</a> | None]</td>
 <td>Runmanager.get_latest function that returns paths to the latest file of given type.</td>
 </tr>
 <tr class="even">
 <td>input</td>
-<td><a href="https://docs.python.org/3.10/library/stdtypes.html#dict">dict</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>, <a href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path">Path</a>]</td>
+<td><a href="https://docs.python.org/3.10/library/stdtypes.html#dict">dict</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>, <a href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path">Path</a> | None]</td>
 <td>Input file paths for a Task. Is populated by get_latest or manually.</td>
 </tr>
 <tr class="odd">
@@ -698,7 +698,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </table>
 <section id="kimmdy.tasks.create_task_directory" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.tasks.create_task_directory">create_task_directory</h3>
-<div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>tasks.create_task_directory(runmng, postfix)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>tasks.create_task_directory(runmng, postfix, is_continuation<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Creates TaskFiles object, output directory, logger and symlinks ff.</p>
 <p>Gets called when a Task is called (from the runmanager.tasks queue).</p>
 

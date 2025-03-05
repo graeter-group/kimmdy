@@ -1,6 +1,13 @@
 # Changelog
 
 
+## [7.1.0](https://github.com/graeter-group/kimmdy/compare/v7.0.0...v7.1.0) (2025-03-05)
+
+
+### Features
+
+* **config:** Add prefixes for running KIMMDY on HPC Clusters that require srun/mpirun for gromacs binaries ([#517](https://github.com/graeter-group/kimmdy/issues/517)) ([a5d4ace](https://github.com/graeter-group/kimmdy/commit/a5d4acea552503a1e1d8f13af5c90128a7fb15a3))
+
 ## [7.0.0](https://github.com/graeter-group/kimmdy/compare/v6.13.0...v7.0.0) (2025-03-04)
 
 

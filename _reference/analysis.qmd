@@ -23,7 +23,14 @@ For command line usage, run `kimmdy-analysis -h`.
 ### concat_traj { #kimmdy.analysis.concat_traj }
 
 ```python
-analysis.concat_traj(dir, filetype, steps, open_vmd=False, output_group=None)
+analysis.concat_traj(
+    dir,
+    filetype,
+    steps,
+    open_vmd=False,
+    output_group=None,
+    use_last_names=False,
+)
 ```
 
 Find and concatenate trajectories (.xtc files) from a KIMMDY run into one trajectory.
@@ -31,12 +38,13 @@ The concatenated trajectory is centered and pbc corrected.
 
 #### Parameters {.doc-section .doc-section-parameters}
 
-| Name         | Type                                                                    | Description                                                                                      | Default    |
-|--------------|-------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|------------|
-| dir          | [str](`str`)                                                            | Directory to search for subdirectories                                                           | _required_ |
-| steps        | [Union](`typing.Union`)\[[list](`list`)\[[str](`str`)\], [str](`str`)\] | List of steps e.g. ["equilibrium", "production"]. Or a string "all" to return all subdirectories | _required_ |
-| open_vmd     | [bool](`bool`)                                                          | Open concatenated trajectory in VMD                                                              | `False`    |
-| output_group | [Optional](`typing.Optional`)\[[str](`str`)\]                           | index group for output. Default is "Protein" for xtc and "System" for trr.                       | `None`     |
+| Name           | Type                                                                    | Description                                                                                                                                                                    | Default    |
+|----------------|-------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| dir            | [str](`str`)                                                            | Directory to search for subdirectories                                                                                                                                         | _required_ |
+| steps          | [Union](`typing.Union`)\[[list](`list`)\[[str](`str`)\], [str](`str`)\] | List of steps e.g. ["equilibrium", "production"]. Or a string "all" to return all subdirectories                                                                               | _required_ |
+| open_vmd       | [bool](`bool`)                                                          | Open concatenated trajectory in VMD                                                                                                                                            | `False`    |
+| output_group   | [Optional](`typing.Optional`)\[[str](`str`)\]                           | index group for output. Default is "Protein" for xtc and "System" for trr.                                                                                                     | `None`     |
+| use_last_names | [bool](`bool`)                                                          | Use the tpr/topology of the last trajectory for the output, default is the first. This influences the names and types of the atoms in the output, which can be useful for VMD. | `False`    |
 
 ### entry_point_analysis { #kimmdy.analysis.entry_point_analysis }
 
@@ -85,7 +93,7 @@ Creates the directory if it does not exist.
 ### plot_energy { #kimmdy.analysis.plot_energy }
 
 ```python
-analysis.plot_energy(dir, steps, terms, open_plot=False)
+analysis.plot_energy(dir, steps, terms, open_plot=False, truncate=True)
 ```
 
 Plot GROMACS energy for a KIMMDY run.
@@ -98,6 +106,7 @@ Plot GROMACS energy for a KIMMDY run.
 | steps     | [Union](`typing.Union`)\[[list](`list`)\[[str](`str`)\], [str](`str`)\] | List of steps e.g. ["equilibrium", "production"]. Or a string "all" to return all subdirectories. Default is "all". | _required_ |
 | terms     | [list](`list`)\[[str](`str`)\]                                          | Terms from gmx energy that will be plotted. Uses 'Potential' by default.                                            | _required_ |
 | open_plot | [bool](`bool`)                                                          | Open plot in default system viewer.                                                                                 | `False`    |
+| truncate  | [bool](`bool`)                                                          | Truncate energy files to the reaction time marker.                                                                  | `True`     |
 
 ### plot_rates { #kimmdy.analysis.plot_rates }
 
@@ -134,12 +143,12 @@ Plot population of radicals for a KIMMDY run.
 
 ```python
 analysis.radical_population(
-    dir
-    population_type='frequency'
-    steps='all'
-    select_atoms='protein'
-    open_plot=False
-    open_vmd=False
+    dir,
+    population_type='frequency',
+    steps='all',
+    select_atoms='protein',
+    open_plot=False,
+    open_vmd=False,
 )
 ```
 

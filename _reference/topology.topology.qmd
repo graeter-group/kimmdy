@@ -67,13 +67,14 @@ Returns a dict, mapping of old atom number strings to new ones
 
 ```python
 topology.topology.Topology(
-    self
-    top
-    parametrizer=BasicParameterizer()
-    is_reactive_predicate_f=is_not_solvent_or_ion
-    radicals=None
-    residuetypes_path=None
-    reactive_nrexcl=None
+    self,
+    top,
+    parametrizer=BasicParameterizer(),
+    is_reactive_predicate_f=is_not_solvent_or_ion,
+    radicals=None,
+    residuetypes_path=None,
+    reactive_nrexcl=None,
+    gromacs_alias='gmx',
 )
 ```
 
@@ -83,20 +84,24 @@ A topology keeps track of connections when bonds are broken or formed.
 Reparametrization is triggerd automatically if `to_dict` is called
 after bonds have changed.
 
+Also see <https://manual.gromacs.org/current/reference-manual/topologies/topology-file-formats.html#topology-file>
+
 Assumptions:
 
 - the topology of interest (the Reactive moleculetype) consists of the first moleculetypes (non-solvent).
 
 #### Parameters {.doc-section .doc-section-parameters}
 
-| Name                    | Type                                                              | Description                                                                                                                     | Default                 |
-|-------------------------|-------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------|-------------------------|
-| top                     | [TopologyDict](`kimmdy.parsing.TopologyDict`)                     | A dictionary containing the parsed topology data, produced by [](`kimmdy.parsing.read_top`)                                     | _required_              |
-| parametrizer            | [Parameterizer](`kimmdy.plugins.Parameterizer`)                   | The parametrizer to use when reparametrizing the topology.                                                                      | `BasicParameterizer()`  |
-| is_reactive_predicate_f | [Callable](`typing.Callable`)\[\[[str](`str`)\], [bool](`bool`)\] | A function that takes a moleculetype name and returns True if the moleculetype should be merged into the reactive moleculetype. | `is_not_solvent_or_ion` |
-| radicals                | [Optional](`typing.Optional`)\[[str](`str`)\]                     | A string of atom numbers that are radicals.                                                                                     | `None`                  |
-| residuetypes_path       | [Optional](`typing.Optional`)\[[Path](`pathlib.Path`)\]           | Path to the residue types file.                                                                                                 | `None`                  |
-| reactive_nrexcl         | [Optional](`typing.Optional`)\[[str](`str`)\]                     | Overwrite nrexcl value for the reactive moleculetype. Otherwise takes the nrexcl of the first reactive moleculetype.            | `None`                  |
+| Name                       | Type                                                              | Description                                                                                                                     | Default                 |
+|----------------------------|-------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------|-------------------------|
+| top                        | [TopologyDict](`kimmdy.parsing.TopologyDict`)                     | A dictionary containing the parsed topology data, produced by [](`kimmdy.parsing.read_top`)                                     | _required_              |
+| parametrizer               | [Parameterizer](`kimmdy.plugins.Parameterizer`)                   | The parametrizer to use when reparametrizing the topology.                                                                      | `BasicParameterizer()`  |
+| is_reactive_predicate_f    | [Callable](`typing.Callable`)\[\[[str](`str`)\], [bool](`bool`)\] | A function that takes a moleculetype name and returns True if the moleculetype should be merged into the reactive moleculetype. | `is_not_solvent_or_ion` |
+| radicals                   | [Optional](`typing.Optional`)\[[str](`str`)\]                     | A string of atom numbers that are radicals.                                                                                     | `None`                  |
+| residuetypes_path          | [Optional](`typing.Optional`)\[[Path](`pathlib.Path`)\]           | Path to the residue types file.                                                                                                 | `None`                  |
+| reactive_nrexcl            | [Optional](`typing.Optional`)\[[str](`str`)\]                     | Overwrite nrexcl value for the reactive moleculetype. Otherwise takes the nrexcl of the first reactive moleculetype.            | `None`                  |
+| needs_parameterization     |                                                                   | Does the topology currently need to be re-parameterized due to changes?                                                         | _required_              |
+| parameterization_focus_ids |                                                                   | list of atoms ids around which the parameterization happens (to avoid re-parameterizing the whole Reactive moleculetype)        | _required_              |
 
 #### Methods
 
