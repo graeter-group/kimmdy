@@ -36,15 +36,16 @@ See [gromacs manual](https://manual.gromacs.org/current/reference-manual/topolog
 
 ```python
 topology.atomic.Angle(
-    self
-    ai
-    aj
-    ak
-    funct
-    c0=None
-    c1=None
-    c2=None
-    c3=None
+    self,
+    ai,
+    aj,
+    ak,
+    funct,
+    c0=None,
+    c1=None,
+    c2=None,
+    c3=None,
+    comment=None,
 )
 ```
 
@@ -60,17 +61,17 @@ With aj < ai < ak
 
 ```python
 topology.atomic.AngleType(
-    self
-    i
-    j
-    k
-    id
-    id_sym
-    funct
-    c0=None
-    c1=None
-    c2=None
-    c3=None
+    self,
+    i,
+    j,
+    k,
+    id,
+    id_sym,
+    funct,
+    c0=None,
+    c1=None,
+    c2=None,
+    c3=None,
 )
 ```
 
@@ -85,20 +86,21 @@ From gromacs version of the amber* ff:
 
 ```python
 topology.atomic.Atom(
-    self
-    nr
-    type
-    resnr
-    residue
-    atom
-    cgnr
-    charge
-    mass=None
-    typeB=None
-    chargeB=None
-    massB=None
-    bound_to_nrs=list()
-    is_radical=False
+    self,
+    nr,
+    type,
+    resnr,
+    residue,
+    atom,
+    cgnr,
+    charge,
+    mass=None,
+    typeB=None,
+    chargeB=None,
+    massB=None,
+    bound_to_nrs=list(),
+    is_radical=False,
+    comment=None,
 )
 ```
 
@@ -114,16 +116,16 @@ From gromacs topology:
 
 ```python
 topology.atomic.AtomType(
-    self
-    type
-    id
-    id_sym
-    at_num
-    mass
-    charge
-    ptype
-    sigma
-    epsilon
+    self,
+    type,
+    id,
+    id_sym,
+    at_num,
+    mass,
+    charge,
+    ptype,
+    sigma,
+    epsilon,
 )
 ```
 
@@ -138,16 +140,17 @@ From gromacs version of the amber* ff:
 
 ```python
 topology.atomic.Bond(
-    self
-    ai
-    aj
-    funct
-    c0=None
-    c1=None
-    c2=None
-    c3=None
-    c4=None
-    c5=None
+    self,
+    ai,
+    aj,
+    funct,
+    c0=None,
+    c1=None,
+    c2=None,
+    c3=None,
+    c4=None,
+    c5=None,
+    comment=None,
 )
 ```
 
@@ -163,16 +166,16 @@ With ai < aj
 
 ```python
 topology.atomic.BondType(
-    self
-    i
-    j
-    id
-    id_sym
-    funct
-    c0=None
-    c1=None
-    c2=None
-    c3=None
+    self,
+    i,
+    j,
+    id,
+    id_sym,
+    funct,
+    c0=None,
+    c1=None,
+    c2=None,
+    c3=None,
 )
 ```
 
@@ -188,18 +191,19 @@ Where i and j are atomtypes
 
 ```python
 topology.atomic.Dihedral(
-    self
-    ai
-    aj
-    ak
-    al
-    funct
-    c0=None
-    c1=None
-    periodicity=''
-    c3=None
-    c4=None
-    c5=None
+    self,
+    ai,
+    aj,
+    ak,
+    al,
+    funct,
+    c0=None,
+    c1=None,
+    periodicity='',
+    c3=None,
+    c4=None,
+    c5=None,
+    comment=None,
 )
 ```
 
@@ -233,20 +237,20 @@ From gromacs topology:
 
 ```python
 topology.atomic.DihedralType(
-    self
-    i
-    j
-    k
-    l
-    id
-    id_sym
-    funct
-    c0
-    c1
-    periodicity
-    c3=None
-    c4=None
-    c5=None
+    self,
+    i,
+    j,
+    k,
+    l,
+    id,
+    id_sym,
+    funct,
+    c0,
+    c1,
+    periodicity,
+    c3=None,
+    c4=None,
+    c5=None,
 )
 ```
 
@@ -267,15 +271,16 @@ From gromacs version of the amber* ff:
 
 ```python
 topology.atomic.Exclusion(
-    self
-    ai
-    aj=None
-    ak=None
-    al=None
-    am=None
-    an=None
-    ao=None
-    ap=None
+    self,
+    ai,
+    aj=None,
+    ak=None,
+    al=None,
+    am=None,
+    an=None,
+    ao=None,
+    ap=None,
+    comment=None,
 )
 ```
 
@@ -297,13 +302,13 @@ From gromacs topology:
 
 ```python
 topology.atomic.MultipleDihedralTypes(
-    self
-    ai
-    aj
-    ak
-    al
-    funct
-    dihedral_types
+    self,
+    ai,
+    aj,
+    ak,
+    al,
+    funct,
+    dihedral_types,
 )
 ```
 
@@ -327,15 +332,15 @@ The key of the dihedrals dict is the periodicity (c2).
 
 ```python
 topology.atomic.NonbondParamType(
-    self
-    i
-    j
-    id
-    id_sym
-    funct
-    c0=None
-    c1=None
-    c2=None
+    self,
+    i,
+    j,
+    id,
+    id_sym,
+    funct,
+    c0=None,
+    c1=None,
+    c2=None,
 )
 ```
 
@@ -352,7 +357,17 @@ Where i and j are atomtypes
 ### Pair { #kimmdy.topology.atomic.Pair }
 
 ```python
-topology.atomic.Pair(self, ai, aj, funct, c0=None, c1=None, c2=None, c3=None)
+topology.atomic.Pair(
+    self,
+    ai,
+    aj,
+    funct,
+    c0=None,
+    c1=None,
+    c2=None,
+    c3=None,
+    comment=None,
+)
 ```
 
 Information about one pair
@@ -360,7 +375,7 @@ Information about one pair
 A class containing pair information as in the pair section of the topology.
 
 From gromacs topology:
-; ai aj funct c0 c1 c2 c3
+; ai aj funct c0 c1 c2 c3 ; comment
 
 ### PositionRestraint { #kimmdy.topology.atomic.PositionRestraint }
 
@@ -399,14 +414,14 @@ Information about one bond in a residue
 
 ```python
 topology.atomic.ResidueImproperSpec(
-    self
-    atom1
-    atom2
-    atom3
-    atom4
-    c0
-    c1
-    c2
+    self,
+    atom1,
+    atom2,
+    atom3,
+    atom4,
+    c0,
+    c1,
+    c2,
 )
 ```
 
@@ -428,12 +443,12 @@ Information about one proper dihedral in a residue
 
 ```python
 topology.atomic.ResidueType(
-    self
-    residue
-    atoms
-    bonds
-    proper_dihedrals
-    improper_dihedrals
+    self,
+    residue,
+    atoms,
+    bonds,
+    proper_dihedrals,
+    improper_dihedrals,
 )
 ```
 

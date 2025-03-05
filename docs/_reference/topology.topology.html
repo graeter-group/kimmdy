@@ -669,16 +669,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="kimmdy.topology.topology.Topology" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.topology.Topology">Topology</h3>
 <div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>topology.topology.Topology(</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">self</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    top</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    parametrizer<span class="op">=</span>BasicParameterizer()</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    is_reactive_predicate_f<span class="op">=</span>is_not_solvent_or_ion</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    radicals<span class="op">=</span><span class="va">None</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    residuetypes_path<span class="op">=</span><span class="va">None</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    reactive_nrexcl<span class="op">=</span><span class="va">None</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">self</span>,</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    top,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    parametrizer<span class="op">=</span>BasicParameterizer(),</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    is_reactive_predicate_f<span class="op">=</span>is_not_solvent_or_ion,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    radicals<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    residuetypes_path<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    reactive_nrexcl<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    gromacs_alias<span class="op">=</span><span class="st">'gmx'</span>,</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Smart container for parsed topology data.</p>
 <p>A topology keeps track of connections when bonds are broken or formed. Reparametrization is triggerd automatically if <code>to_dict</code> is called after bonds have changed.</p>
+<p>Also see <a href="https://manual.gromacs.org/current/reference-manual/topologies/topology-file-formats.html#topology-file" class="uri">https://manual.gromacs.org/current/reference-manual/topologies/topology-file-formats.html#topology-file</a></p>
 <p>Assumptions:</p>
 <ul>
 <li>the topology of interest (the Reactive moleculetype) consists of the first moleculetypes (non-solvent).</li>
@@ -730,6 +732,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td><a href="https://docs.python.org/3.10/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>]</td>
 <td>Overwrite nrexcl value for the reactive moleculetype. Otherwise takes the nrexcl of the first reactive moleculetype.</td>
 <td><code>None</code></td>
+</tr>
+<tr class="odd">
+<td>needs_parameterization</td>
+<td></td>
+<td>Does the topology currently need to be re-parameterized due to changes?</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>parameterization_focus_ids</td>
+<td></td>
+<td>list of atoms ids around which the parameterization happens (to avoid re-parameterizing the whole Reactive moleculetype)</td>
+<td><em>required</em></td>
 </tr>
 </tbody>
 </table>

@@ -43,12 +43,11 @@ keys:
 | Name | Description |
 | --- | --- |
 | [convert_schema_to_dict](#kimmdy.schema.convert_schema_to_dict) | Convert a dictionary from a raw json schema to a nested dictionary |
-| [flatten_scheme](#kimmdy.schema.flatten_scheme) | Recursively get properties and their desicripions from the scheme |
+| [flatten_scheme](#kimmdy.schema.flatten_scheme) | Recursively get properties and their descriptions from the scheme |
 | [generate_markdown_table](#kimmdy.schema.generate_markdown_table) | Generate markdown table from scheme |
 | [get_combined_scheme](#kimmdy.schema.get_combined_scheme) | Return the schema for the config file. |
 | [load_kimmdy_schema](#kimmdy.schema.load_kimmdy_schema) | Return the schema for the config file |
 | [load_plugin_schemas](#kimmdy.schema.load_plugin_schemas) | Return the schemas for the reaction plugins known to kimmdy |
-| [prune](#kimmdy.schema.prune) | Remove empty dicts from a nested dict |
 
 ### convert_schema_to_dict { #kimmdy.schema.convert_schema_to_dict }
 
@@ -76,7 +75,7 @@ Convert a dictionary from a raw json schema to a nested dictionary
 schema.flatten_scheme(scheme, section='')
 ```
 
-Recursively get properties and their desicripions from the scheme
+Recursively get properties and their descriptions from the scheme
 
 ### generate_markdown_table { #kimmdy.schema.generate_markdown_table }
 
@@ -116,11 +115,3 @@ schema.load_plugin_schemas()
 ```
 
 Return the schemas for the reaction plugins known to kimmdy
-
-### prune { #kimmdy.schema.prune }
-
-```python
-schema.prune(d)
-```
-
-Remove empty dicts from a nested dict

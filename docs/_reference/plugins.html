@@ -529,6 +529,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </ul></li>
   </ul></li>
   </ul></li>
+  <li><a href="#functions" id="toc-functions" class="nav-link" data-scroll-target="#functions">Functions</a>
+  <ul>
+  <li><a href="#kimmdy.plugins.discover_plugins" id="toc-kimmdy.plugins.discover_plugins" class="nav-link" data-scroll-target="#kimmdy.plugins.discover_plugins">discover_plugins</a></li>
+  </ul></li>
   </ul></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/graeter-group/kimmdy/edit/main/_reference/plugins.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/graeter-group/kimmdy/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
@@ -587,8 +591,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="kimmdy.plugins.BasicParameterizer.parameterize_topology" class="level5">
 <h5 class="anchored" data-anchor-id="kimmdy.plugins.BasicParameterizer.parameterize_topology">parameterize_topology</h5>
 <div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>plugins.BasicParameterizer.parameterize_topology(</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    current_topology</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    focus_nrs<span class="op">=</span><span class="va">None</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    current_topology,</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    focus_nrs<span class="op">=</span><span class="va">None</span>,</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Do nothing, all necessary actions should already have happened in bind_bond and break_bond of Topology</p>
 </section>
@@ -672,11 +676,34 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 </tbody>
 </table>
+</section>
+</section>
+</section>
+</section>
+</section>
+<section id="functions" class="level2">
+<h2 class="anchored" data-anchor-id="functions">Functions</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="#kimmdy.plugins.discover_plugins">discover_plugins</a></td>
+<td>Discover and load KIMMDY plugins.</td>
+</tr>
+</tbody>
+</table>
+<section id="kimmdy.plugins.discover_plugins" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.plugins.discover_plugins">discover_plugins</h3>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>plugins.discover_plugins()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Discover and load KIMMDY plugins.</p>
+<p>This has to be called before initialzing the <a href="../_reference/config.html#kimmdy.config.Config"><code>Config</code></a> such that in can be validated against the registered plugins.</p>
 
 
-</section>
-</section>
-</section>
 </section>
 </section>
 </section>
