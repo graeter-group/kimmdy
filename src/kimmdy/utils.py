@@ -300,13 +300,15 @@ def morse_transition_rate(
 ### GROMACS related functions ###
 
 
-def get_gmx_dir(gromacs_alias: str = "gmx", grompp_prefix: Optional[str] = None) -> Optional[Path]:
+def get_gmx_dir(
+    gromacs_alias: str = "gmx", grompp_prefix: Optional[str] = None
+) -> Optional[Path]:
     """Returns the path to the gromacs installation"""
 
     # get the stder from calling `gmx` to search for the `Data prefix:`
     # line which contains the path to the gromacs installation
 
-    #Add prefix if necesarry
+    # Add prefix if necesarry
     cmd = [gromacs_alias]
     if grompp_prefix:
         cmd.insert(0, grompp_prefix)
