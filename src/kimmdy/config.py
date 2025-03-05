@@ -347,7 +347,7 @@ class Config:
                     ffdir = ffs[0].resolve()
                     assert ffdir.is_dir(), "Forcefield should be a directory!"
             elif ffdir is not None and not ffdir.exists():
-                gmxdir = get_gmx_dir(self.gromacs_alias)
+                gmxdir = get_gmx_dir(self.gromacs_alias, self.grompp_prefix)
                 if gmxdir is None:
                     CONFIG_LOGS["warnings"].append(
                         f"Could not find gromacs data directory for {self.gromacs_alias}"

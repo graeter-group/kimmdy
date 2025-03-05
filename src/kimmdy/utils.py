@@ -300,13 +300,20 @@ def morse_transition_rate(
 ### GROMACS related functions ###
 
 
-def get_gmx_dir(gromacs_alias: str = "gmx") -> Optional[Path]:
+def get_gmx_dir(
+    gromacs_alias: str = "gmx", grompp_prefix: Optional[str] = None
+) -> Optional[Path]:
     """Returns the path to the gromacs installation"""
 
     # get the stder from calling `gmx` to search for the `Data prefix:`
     # line which contains the path to the gromacs installation
+
+    # Add prefix if necesarry
+    cmd = [gromacs_alias]
+    if grompp_prefix:
+        cmd.insert(0, grompp_prefix)
     try:
-        r = sp.run([gromacs_alias], check=False, capture_output=True, text=True)
+        r = sp.run(cmd, check=False, capture_output=True, text=True)
     except FileNotFoundError:
         logger.warning("GROMACS not found.")
         return None
@@ -342,7 +349,7 @@ def check_gmx_version(config):
         version = [
             l
             for l in get_shell_stdout(
-                f"{config.gromacs_alias} --quiet --version"
+                f"{config.grompp_prefix + ' ' if config.grompp_prefix else ''}{config.gromacs_alias} --quiet --version"
             ).split("\n")
             if "GROMACS version:" in l
         ][0]
