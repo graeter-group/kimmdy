@@ -1,6 +1,13 @@
 # Changelog
 
 
+## [7.1.1](https://github.com/graeter-group/kimmdy/compare/v7.1.0...v7.1.1) (2025-03-05)
+
+
+### Bug Fixes
+
+* **ci:** build docs on publish and publish to pypi after release commit ([7c9af68](https://github.com/graeter-group/kimmdy/commit/7c9af68b8be3ecfbbbcc65c808ec3071471f5593))
+
 ## [7.1.0](https://github.com/graeter-group/kimmdy/compare/v7.0.0...v7.1.0) (2025-03-05)
 
 
