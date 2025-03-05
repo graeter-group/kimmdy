@@ -31,8 +31,8 @@ reconstruct base force field state
 
 ```python
 plugins.BasicParameterizer.parameterize_topology(
-    current_topology
-    focus_nrs=None
+    current_topology,
+    focus_nrs=None,
 )
 ```
 
@@ -79,3 +79,20 @@ runmanager `self.runmng` and the files.
 | Name   | Type                                  | Description        | Default    |
 |--------|---------------------------------------|--------------------|------------|
 | files  | [TaskFiles](`kimmdy.tasks.TaskFiles`) | TaskFiles instance | _required_ |
+
+## Functions
+
+| Name | Description |
+| --- | --- |
+| [discover_plugins](#kimmdy.plugins.discover_plugins) | Discover and load KIMMDY plugins. |
+
+### discover_plugins { #kimmdy.plugins.discover_plugins }
+
+```python
+plugins.discover_plugins()
+```
+
+Discover and load KIMMDY plugins.
+
+This has to be called before initialzing the [](`~kimmdy.config.Config`) such that
+in can be validated against the registered plugins.

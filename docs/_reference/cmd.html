@@ -594,14 +594,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="kimmdy.cmd.kimmdy_run" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.cmd.kimmdy_run">kimmdy_run</h3>
 <div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>cmd.kimmdy_run(</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">input</span><span class="op">=</span>Path(<span class="st">'kimmdy.yml'</span>)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    loglevel<span class="op">=</span><span class="va">None</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    logfile<span class="op">=</span><span class="va">None</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    show_plugins<span class="op">=</span><span class="va">False</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    generate_jobscript<span class="op">=</span><span class="va">False</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    debug<span class="op">=</span><span class="va">False</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    callgraph<span class="op">=</span><span class="va">False</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">input</span><span class="op">=</span>Path(<span class="st">'kimmdy.yml'</span>),</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    loglevel<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    logfile<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    show_plugins<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    generate_jobscript<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    debug<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    callgraph<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    restart<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Run KIMMDY from python.</p>
 <p>Also see See <a href="../_reference/cmd.html#kimmdy.cmd.get_cmdline_args"><code>get_cmdline_args</code></a> or <code>kimmdy --help</code> for the descriptions of the arguments.</p>
 <section id="parameters" class="level4 doc-section doc-section-parameters">
@@ -643,7 +644,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td>generate_jobscript</td>
 <td><a href="https://docs.python.org/3.10/library/functions.html#bool">bool</a></td>
-<td>Instead of running KIMMDY directly, generate at jobscript.sh for slurm HPC clusters</td>
+<td>Instead of running KIMMDY directly, generate at jobscript.sh for slurm HPC clusters.</td>
+<td><code>False</code></td>
+</tr>
+<tr class="even">
+<td>debug</td>
+<td><a href="https://docs.python.org/3.10/library/functions.html#bool">bool</a></td>
+<td>on error, drop into debugger.</td>
+<td><code>False</code></td>
+</tr>
+<tr class="odd">
+<td>callgraph</td>
+<td><a href="https://docs.python.org/3.10/library/functions.html#bool">bool</a></td>
+<td>Generate visualization of function calls. Mostly useful for debugging and documentation.</td>
+<td><code>False</code></td>
+</tr>
+<tr class="even">
+<td>restart</td>
+<td><a href="https://docs.python.org/3.10/library/functions.html#bool">bool</a></td>
+<td>Restart from a previous run instead of incrementing the run number for the output directory.</td>
 <td><code>False</code></td>
 </tr>
 </tbody>

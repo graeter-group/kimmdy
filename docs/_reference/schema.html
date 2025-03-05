@@ -528,7 +528,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#kimmdy.schema.get_combined_scheme" id="toc-kimmdy.schema.get_combined_scheme" class="nav-link" data-scroll-target="#kimmdy.schema.get_combined_scheme">get_combined_scheme</a></li>
   <li><a href="#kimmdy.schema.load_kimmdy_schema" id="toc-kimmdy.schema.load_kimmdy_schema" class="nav-link" data-scroll-target="#kimmdy.schema.load_kimmdy_schema">load_kimmdy_schema</a></li>
   <li><a href="#kimmdy.schema.load_plugin_schemas" id="toc-kimmdy.schema.load_plugin_schemas" class="nav-link" data-scroll-target="#kimmdy.schema.load_plugin_schemas">load_plugin_schemas</a></li>
-  <li><a href="#kimmdy.schema.prune" id="toc-kimmdy.schema.prune" class="nav-link" data-scroll-target="#kimmdy.schema.prune">prune</a></li>
   </ul></li>
   </ul></li>
   </ul>
@@ -603,7 +602,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 <tr class="even">
 <td><a href="#kimmdy.schema.flatten_scheme">flatten_scheme</a></td>
-<td>Recursively get properties and their desicripions from the scheme</td>
+<td>Recursively get properties and their descriptions from the scheme</td>
 </tr>
 <tr class="odd">
 <td><a href="#kimmdy.schema.generate_markdown_table">generate_markdown_table</a></td>
@@ -620,10 +619,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="even">
 <td><a href="#kimmdy.schema.load_plugin_schemas">load_plugin_schemas</a></td>
 <td>Return the schemas for the reaction plugins known to kimmdy</td>
-</tr>
-<tr class="odd">
-<td><a href="#kimmdy.schema.prune">prune</a></td>
-<td>Remove empty dicts from a nested dict</td>
 </tr>
 </tbody>
 </table>
@@ -680,7 +675,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="kimmdy.schema.flatten_scheme" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.schema.flatten_scheme">flatten_scheme</h3>
 <div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>schema.flatten_scheme(scheme, section<span class="op">=</span><span class="st">''</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Recursively get properties and their desicripions from the scheme</p>
+<p>Recursively get properties and their descriptions from the scheme</p>
 </section>
 <section id="kimmdy.schema.generate_markdown_table" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.schema.generate_markdown_table">generate_markdown_table</h3>
@@ -703,11 +698,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="kimmdy.schema.load_plugin_schemas">load_plugin_schemas</h3>
 <div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>schema.load_plugin_schemas()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Return the schemas for the reaction plugins known to kimmdy</p>
-</section>
-<section id="kimmdy.schema.prune" class="level3">
-<h3 class="anchored" data-anchor-id="kimmdy.schema.prune">prune</h3>
-<div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>schema.prune(d)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Remove empty dicts from a nested dict</p>
 
 
 </section>
