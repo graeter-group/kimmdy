@@ -102,11 +102,11 @@ Avoids traversing the whole topology.
 
 ```python
 topology.utils.get_residue_fragments(
-    top
-    residue
-    start1
-    start2
-    iterations=20
+    top,
+    residue,
+    start1,
+    start2,
+    iterations=20,
 )
 ```
 

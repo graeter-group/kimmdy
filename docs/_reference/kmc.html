@@ -520,6 +520,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </ul></li>
   <li><a href="#functions" id="toc-functions" class="nav-link" data-scroll-target="#functions">Functions</a>
   <ul>
+  <li><a href="#kimmdy.kmc.dummy_first_kmc" id="toc-kimmdy.kmc.dummy_first_kmc" class="nav-link" data-scroll-target="#kimmdy.kmc.dummy_first_kmc">dummy_first_kmc</a></li>
   <li><a href="#kimmdy.kmc.extrande" id="toc-kimmdy.kmc.extrande" class="nav-link" data-scroll-target="#kimmdy.kmc.extrande">extrande</a>
   <ul class="collapse">
   <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
@@ -577,13 +578,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="kimmdy.kmc.KMCAccept" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.kmc.KMCAccept">KMCAccept</h3>
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>kmc.KMCAccept(</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">self</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    recipe</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    reaction_probability</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    time_delta</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    time_start</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    time_start_index</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    time_start_index_within_plugin<span class="op">=</span><span class="va">None</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">self</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    recipe,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    reaction_probability,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    time_delta,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    time_start,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    time_start_index,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    time_start_index_within_plugin<span class="op">=</span><span class="va">None</span>,</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>The result of a KMC step. Similar to a Recipe but for the concrete realization of a reaction.</p>
 <section id="attributes" class="level4 doc-section doc-section-attributes">
@@ -638,30 +639,39 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody>
 <tr class="odd">
+<td><a href="#kimmdy.kmc.dummy_first_kmc">dummy_first_kmc</a></td>
+<td>Dummy KMC method that always chooses the first reaction in the list.</td>
+</tr>
+<tr class="even">
 <td><a href="#kimmdy.kmc.extrande">extrande</a></td>
 <td>Extrande KMC</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#kimmdy.kmc.extrande_mod">extrande_mod</a></td>
 <td>Modified Extrande KMC</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#kimmdy.kmc.frm">frm</a></td>
 <td>First Reaction Method variant of Kinetic Monte Carlo.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#kimmdy.kmc.multi_rfkmc">multi_rfkmc</a></td>
 <td>Rejection-Free Monte Carlo.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#kimmdy.kmc.rf_kmc">rf_kmc</a></td>
 <td>Rejection-Free Monte Carlo.</td>
 </tr>
 </tbody>
 </table>
+<section id="kimmdy.kmc.dummy_first_kmc" class="level3">
+<h3 class="anchored" data-anchor-id="kimmdy.kmc.dummy_first_kmc">dummy_first_kmc</h3>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>kmc.dummy_first_kmc(recipe_collection)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Dummy KMC method that always chooses the first reaction in the list.</p>
+</section>
 <section id="kimmdy.kmc.extrande" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.kmc.extrande">extrande</h3>
-<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>kmc.extrande(recipe_collection, tau_scale, rng<span class="op">=</span>default_rng())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>kmc.extrande(recipe_collection, tau_scale, rng<span class="op">=</span>default_rng())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Extrande KMC</p>
 <p>Implemented as in <code>Stochastic Simulation of Biomolecular Networks in Dynamic Environments</code> <a href="https://doi.org/10.1371/journal.pcbi.1004923">10.1371/journal.pcbi.1004923</a></p>
 <section id="parameters" class="level4 doc-section doc-section-parameters">
@@ -719,7 +729,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="kimmdy.kmc.extrande_mod" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.kmc.extrande_mod">extrande_mod</h3>
-<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>kmc.extrande_mod(recipe_collection, tau_scale, rng<span class="op">=</span>default_rng())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>kmc.extrande_mod(recipe_collection, tau_scale, rng<span class="op">=</span>default_rng())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Modified Extrande KMC</p>
 <p>Improved implementation of <code>Stochastic Simulation of Biomolecular Networks in Dynamic Environments</code> <a href="https://doi.org/10.1371/journal.pcbi.1004923">10.1371/journal.pcbi.1004923</a> Changes: The considered time window is chosen to be a window containing constant rates. This prevents very small tau caused by a spike in the rate at a later point. As a side effect, the upper rate bound b and current rate a0 are the same, and the ‘extra’ side channel can not be triggered anymore.</p>
 <p>This should be more efficient given a limited number of time windows containing constant rates.</p>
@@ -778,7 +788,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="kimmdy.kmc.frm" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.kmc.frm">frm</h3>
-<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>kmc.frm(recipe_collection, rng<span class="op">=</span>default_rng(), MD_time<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>kmc.frm(recipe_collection, rng<span class="op">=</span>default_rng(), MD_time<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>First Reaction Method variant of Kinetic Monte Carlo. takes RecipeCollection and choses a recipe based on which reaction would occur.</p>
 <p>Compare e.g.&nbsp;<a href="https://en.wikipedia.org/wiki/Kinetic_Monte_Carlo#Time-dependent_Algorithms">Wikipedia KMC - time dependent</a></p>
 <section id="parameters-2" class="level4 doc-section doc-section-parameters">
@@ -817,7 +827,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="kimmdy.kmc.multi_rfkmc" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.kmc.multi_rfkmc">multi_rfkmc</h3>
-<div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>kmc.multi_rfkmc(recipe_collection, n, rng<span class="op">=</span>default_rng())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>kmc.multi_rfkmc(recipe_collection, n, rng<span class="op">=</span>default_rng())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Rejection-Free Monte Carlo. Takes RecipeCollection and choses a recipe based on the relative propensity of the events. The ‘start’ time of the reaction is the time of the highest rate of the accepted reaction.</p>
 <p>Compare e.g.&nbsp;<a href="https://en.wikipedia.org/wiki/Kinetic_Monte_Carlo#Rejection-free_KMC">Wikipedia KMC - rejection free</a></p>
 <section id="parameters-3" class="level4 doc-section doc-section-parameters">
@@ -850,7 +860,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="kimmdy.kmc.rf_kmc" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.kmc.rf_kmc">rf_kmc</h3>
-<div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>kmc.rf_kmc(recipe_collection, rng<span class="op">=</span>default_rng())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>kmc.rf_kmc(recipe_collection, rng<span class="op">=</span>default_rng())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Rejection-Free Monte Carlo. Takes RecipeCollection and choses a recipe based on the relative propensity of the events. The ‘start’ time of the reaction is the time of the highest rate of the accepted reaction.</p>
 <p>Compare e.g.&nbsp;<a href="https://en.wikipedia.org/wiki/Kinetic_Monte_Carlo#Rejection-free_KMC">Wikipedia KMC - rejection free</a></p>
 <section id="parameters-4" class="level4 doc-section doc-section-parameters">

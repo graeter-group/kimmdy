@@ -83,18 +83,18 @@ parse cmdline args for modify_top
 
 ```python
 tools.modify_top(
-    topology
-    out
-    parameterize=False
-    grappa_tag='latest'
-    grappa_charge_model='amber99'
-    removeH=None
-    gro=None
-    residuetypes=None
-    radicals=None
-    search_amber_rad=True
-    include=None
-    exclude=None
+    topology,
+    out,
+    parameterize=False,
+    grappa_tag='latest',
+    grappa_charge_model='amber99',
+    removeH=None,
+    gro=None,
+    residuetypes=None,
+    radicals=None,
+    search_amber_rad=True,
+    include=None,
+    exclude=None,
 )
 ```
 

@@ -45,7 +45,7 @@ Modules
 | [recipe](recipe.qmd#kimmdy.recipe) | Contains the Reaction Recipe, RecipeStep and RecipeCollection. |
 | [runmanager](runmanager.qmd#kimmdy.runmanager) | The Runmanager is the main entry point of the program. |
 | [schema](schema.qmd#kimmdy.schema) | Handle the schema for the config file. |
-| [tasks](tasks.qmd#kimmdy.tasks) | The tasks module holds the TaskFiles class which organizes input and  |
+| [tasks](tasks.qmd#kimmdy.tasks) | The tasks module holds the TaskFiles class which organizes input and |
 | [tools](tools.qmd#kimmdy.tools) | Standalone tools that are complementary to KIMMDY. |
 | [utils](utils.qmd#kimmdy.utils) | Utilities for building plugins, shell convenience functions and GROMACS related functions |
 
@@ -56,5 +56,5 @@ Reaction plugins bundled with KIMMDY and the protocol to add a new reaction plug
 | | |
 | --- | --- |
 | [homolysis.reaction.Homolysis](homolysis.reaction.Homolysis.qmd#homolysis.reaction.Homolysis) | Homolytic bond breaking leading to 2 radicals. |
-| [hat_naive.reaction.NaiveHAT](hat_naive.reaction.NaiveHAT.qmd#hat_naive.reaction.NaiveHAT) | Naive HAT reaction, selects hydrogens at random |
+| [hat_naive.reaction.NaiveHAT](hat_naive.reaction.NaiveHAT.qmd#hat_naive.reaction.NaiveHAT) | Naive HAT reaction, selects all neighboring hydrogens and assigns random rates. |
 | [dummyreaction.reaction.DummyReaction](dummyreaction.reaction.DummyReaction.qmd#dummyreaction.reaction.DummyReaction) | Dummy reaction, returns empty RecipeCollection |

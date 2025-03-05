@@ -4,18 +4,90 @@
 
 coordinate, topology and plumed modification functions
 
+## Classes
+
+| Name | Description |
+| --- | --- |
+| [AffectedInteractions](#kimmdy.coordinates.AffectedInteractions) | keeping track of affected interactions during the merge process to add the correct helper pairs |
+| [MoleculeTypeMerger](#kimmdy.coordinates.MoleculeTypeMerger) | Takes two MoleculeTypes and joins them for a smooth free-energy like parameter transition simulation |
+
+### AffectedInteractions { #kimmdy.coordinates.AffectedInteractions }
+
+```python
+coordinates.AffectedInteractions(
+    self,
+    atoms=set(),
+    bonds=BondsPairSets(),
+    angles=AnglesPairSets(),
+    dihedrals=DihedralsPairSets(),
+)
+```
+
+keeping track of affected interactions during the merge process to add the correct helper pairs
+
+### MoleculeTypeMerger { #kimmdy.coordinates.MoleculeTypeMerger }
+
+```python
+coordinates.MoleculeTypeMerger(self, mol_a, mol_b, ff, morse_only=False)
+```
+
+Takes two MoleculeTypes and joins them for a smooth free-energy like parameter transition simulation
+
+#### Methods
+
+| Name | Description |
+| --- | --- |
+| [add_helper_pairs](#kimmdy.coordinates.MoleculeTypeMerger.add_helper_pairs) | growing/shrinking pairs are used to turn on/off |
+| [merge](#kimmdy.coordinates.MoleculeTypeMerger.merge) | modiefies mol_b, the reactive moleculetype of of top_b, in place |
+| [merge_exclusions](#kimmdy.coordinates.MoleculeTypeMerger.merge_exclusions) | Merge exclusions by adding the exclusions from the A state to the B state |
+| [merge_pairs](#kimmdy.coordinates.MoleculeTypeMerger.merge_pairs) | Merge pairs that are from the respective pairs sections of the topologies |
+
+##### add_helper_pairs { #kimmdy.coordinates.MoleculeTypeMerger.add_helper_pairs }
+
+```python
+coordinates.MoleculeTypeMerger.add_helper_pairs()
+```
+
+growing/shrinking pairs are used to turn on/off
+LJ / non-bonded interactions.
+If it is for a binding event, the pair is vanishing, as it will be an
+exclusion once bound. If a bond is breaking, the pair interaction
+is slowly turned on, as it was excluded previously.
+
+##### merge { #kimmdy.coordinates.MoleculeTypeMerger.merge }
+
+```python
+coordinates.MoleculeTypeMerger.merge()
+```
+
+modiefies mol_b, the reactive moleculetype of of top_b, in place
+
+##### merge_exclusions { #kimmdy.coordinates.MoleculeTypeMerger.merge_exclusions }
+
+```python
+coordinates.MoleculeTypeMerger.merge_exclusions()
+```
+
+Merge exclusions by adding the exclusions from the A state to the B state
+
+##### merge_pairs { #kimmdy.coordinates.MoleculeTypeMerger.merge_pairs }
+
+```python
+coordinates.MoleculeTypeMerger.merge_pairs()
+```
+
+Merge pairs that are from the respective pairs sections of the topologies
+
 ## Functions
 
 | Name | Description |
 | --- | --- |
 | [break_bond_plumed](#kimmdy.coordinates.break_bond_plumed) | Break bond in plumed configuration file. |
-| [get_explicit_MultipleDihedrals](#kimmdy.coordinates.get_explicit_MultipleDihedrals) | Takes a valid dihedral key and returns explicit |
 | [get_explicit_or_type](#kimmdy.coordinates.get_explicit_or_type) | Takes an Interaction and associated key, InteractionTypes, Topology |
 | [is_parameterized](#kimmdy.coordinates.is_parameterized) | Parameterized topology entries have c0 and c1 attributes != None |
-| [merge_dihedrals](#kimmdy.coordinates.merge_dihedrals) | Merge one to two Dihedrals or -Types into a Dihedral in free-energy syntax |
-| [merge_top_moleculetypes_slow_growth](#kimmdy.coordinates.merge_top_moleculetypes_slow_growth) | Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation |
 | [merge_top_slow_growth](#kimmdy.coordinates.merge_top_slow_growth) | Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation. |
 | [place_atom](#kimmdy.coordinates.place_atom) | Place an atom to new coords at the last time point of the trajectory |
+| [to_pairkey](#kimmdy.coordinates.to_pairkey) | Turn key into a pair key |
 
 ### break_bond_plumed { #kimmdy.coordinates.break_bond_plumed }
 
@@ -32,30 +104,16 @@ Break bond in plumed configuration file.
 | files     | [TaskFiles](`kimmdy.tasks.TaskFiles`)          |               | _required_ |
 | breakpair | [tuple](`tuple`)\[[str](`str`), [str](`str`)\] |               | _required_ |
 
-### get_explicit_MultipleDihedrals { #kimmdy.coordinates.get_explicit_MultipleDihedrals }
-
-```python
-coordinates.get_explicit_MultipleDihedrals(
-    dihedral_key
-    mol
-    dihedrals_in
-    ff
-    periodicity_max=6
-)
-```
-
-Takes a valid dihedral key and returns explicit
-dihedral parameters for a given topology
-
 ### get_explicit_or_type { #kimmdy.coordinates.get_explicit_or_type }
 
 ```python
 coordinates.get_explicit_or_type(
-    key
-    interaction
-    interaction_types
-    mol
-    periodicity=''
+    key,
+    interaction,
+    interaction_types,
+    mol,
+    periodicity='',
+    use_state_b=False,
 )
 ```
 
@@ -70,40 +128,15 @@ coordinates.is_parameterized(entry)
 
 Parameterized topology entries have c0 and c1 attributes != None
 
-### merge_dihedrals { #kimmdy.coordinates.merge_dihedrals }
-
-```python
-coordinates.merge_dihedrals(
-    dihedral_key
-    dihedral_a
-    dihedral_b
-    dihedral_types_a
-    dihedral_types_b
-    molA
-    molB
-    funct
-    periodicity
-)
-```
-
-Merge one to two Dihedrals or -Types into a Dihedral in free-energy syntax
-
-### merge_top_moleculetypes_slow_growth { #kimmdy.coordinates.merge_top_moleculetypes_slow_growth }
-
-```python
-coordinates.merge_top_moleculetypes_slow_growth(molA, molB, ff, morph_pairs)
-```
-
-Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation
-
 ### merge_top_slow_growth { #kimmdy.coordinates.merge_top_slow_growth }
 
 ```python
-coordinates.merge_top_slow_growth(topA, topB, morph_pairs)
+coordinates.merge_top_slow_growth(top_a, top_b, morse_only=False)
 ```
 
 Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation.
-For now this assumes that only one moleculeype is of interest.
+Modifies topB in place.
+All changes are contained to the `Reactive` moleculetype.
 
 ### place_atom { #kimmdy.coordinates.place_atom }
 
@@ -112,3 +145,14 @@ coordinates.place_atom(files, step, ttime=None)
 ```
 
 Place an atom to new coords at the last time point of the trajectory
+
+### to_pairkey { #kimmdy.coordinates.to_pairkey }
+
+```python
+coordinates.to_pairkey(key)
+```
+
+Turn key into a pair key
+Takes the key for a higher ordre interaction (bond, angle, dihedral)
+and from this takes the outermost atoms and returns them as a key for the corresponding
+pair interaction by sorting them in ascending order.
