@@ -216,12 +216,26 @@
       "pytype": "Path",
       "default": "index.ndx"
     },
+    "grompp_prefix": {
+      "title": "grompp_prefix",
+      "description": "Prefix command for grompp execution on non MPI compiled clusters, e.g., 'srun --ntasks=1'.",
+      "type": "string",
+      "pytype": "str",
+      "default": ""
+    },
     "gromacs_alias": {
       "title": "gromacs_alias",
       "description": "Gromacs alias. e.g. `gmx` or `mpirun gmx_mpi`",
       "type": "string",
       "pytype": "str",
       "default": "gmx"
+    },
+    "mdrun_prefix": {
+      "title": "mdrun_prefix",
+      "description": "Prefix command for mdrun execution on non MPI compiled clusters, e.g., 'srun --ntasks=1'.",
+      "type": "string",
+      "pytype": "str",
+      "default": ""
     },
     "gmx_mdrun_flags": {
       "title": "gmx_mdrun_flags",
