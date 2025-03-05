@@ -27,6 +27,6 @@ jobs:
           git remote add gh-token "https://${{ secrets.GITHUB_TOKEN }}@github.com/google-github-actions/release-please-action.git"
           git tag -d stable || true
           git push origin :stable || true
-          git tag -a stable -m "Last Stable Release"
+          git tag -a stable -m "Latest Stable Release"
           git push origin stable
 
