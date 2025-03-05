@@ -224,11 +224,27 @@ def frm(
     # 1. Generate M independent uniform (0,1) random numbers
     u = rng.random(len(recipe_collection.recipes))
     # 2. Calculate the cumulative probabilities for each event
+    # get overall sampling time
+    # TODO: Can be replaced if we parse mdps for the simulation time
+    t_min = recipe_collection.recipes[0].timespans[0][0]
+    t_max = recipe_collection.recipes[0].timespans[0][1]
+    for recipe in recipe_collection.recipes:
+        for ts in recipe.timespans:
+            t1 = ts[0]
+            t2 = ts[1]
+            t_min = t1 if t1 < t_min else t_min
+            t_max = t2 if t2 > t_max else t_max
+    sampling_time = t_max - t_min
+    logger.debug(f"Sampling time: {sampling_time}ps")
+
     for i, recipe in enumerate(recipe_collection.recipes):
         dt = [x[1] - x[0] for x in recipe.timespans]
         cumulative_probability = np.cumsum(
             list(map(lambda x, y: x * y, dt, recipe.rates))
         )
+        cumulative_probability = (
+            cumulative_probability / sampling_time
+        )  # calculate mean instead of sum
         reaction_probability.append(cumulative_probability[-1])
         # 3. For each event k, find the time until the this reaction takes place tau_k,
         #    if it is during the time when the propensities are defined (simulation time)
@@ -545,9 +561,24 @@ def multi_rfkmc(
         reaction_probability = []
 
         # 1. Calculate the probability for each reaction
-        for recipe in recipes:
+        # get overall sampling time
+        # TODO: Can be replaced if we parse mdps for the simulation time
+        t_min = recipe_collection.recipes[0].timespans[0][0]
+        t_max = recipe_collection.recipes[0].timespans[0][1]
+        for recipe in recipe_collection.recipes:
+            for ts in recipe.timespans:
+                t1 = ts[0]
+                t2 = ts[1]
+                t_min = t1 if t1 < t_min else t_min
+                t_max = t2 if t2 > t_max else t_max
+        sampling_time = t_max - t_min
+        logger.debug(f"Sampling time: {sampling_time}ps")
+
+        for recipe in recipe_collection.recipes:
             dt = [x[1] - x[0] for x in recipe.timespans]
-            reaction_probability.append(sum(np.multiply(dt, recipe.rates)))
+            reaction_probability.append(
+                sum(np.multiply(dt, recipe.rates)) / sampling_time
+            )
 
         # 2. Set the total rate to the sum of individual rates
         probability_cumulative = np.cumsum(reaction_probability)
