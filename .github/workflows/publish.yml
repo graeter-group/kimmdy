@@ -14,7 +14,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Build docs
-      uses: ./github/workflows/build-docs.yml
+      uses: ./.github/workflows/build-docs.yml
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
