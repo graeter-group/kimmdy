@@ -43,7 +43,7 @@ from kimmdy.kmc import (
     multi_rfkmc,
     total_index_to_index_within_plugin,
 )
-from kimmdy.parsing import read_top, write_json, write_time_marker, write_top
+from kimmdy.parsing import read_mdp, read_top, write_json, write_time_marker, write_top
 from kimmdy.plugins import (
     BasicParameterizer,
     ReactionPlugin,
@@ -194,6 +194,7 @@ class RunManager:
         self.histfile: Path = self.config.out / "kimmdy.history"
         self.cptfile: Path = self.config.out / "kimmdy.cpt"
         self.kmc_algorithm: str
+        self.mdps = {} # keep track of mdp files for MD instances
 
         with open(self.histfile, "w") as f:
             f.write("KIMMDY task file history\n")
@@ -272,6 +273,7 @@ class RunManager:
         }
         """Mapping of task names to functions and their keyword arguments."""
 
+        self._setup_mdps()
         self._setup_tasks()
 
     def run(self):
@@ -540,18 +542,19 @@ class RunManager:
             out="setup",
         )
         self.tasks.put(task)
+
         # configured sequence
         for task_name in self.config.sequence:
             if task_name in self.config.mds.get_attributes():
                 # entry is a type of MD
-                md = self.task_mapping["md"]
-                kwargs: dict = copy(md["kwargs"])
+                md_task = self.task_mapping["md"]
+                kwargs: dict = copy(md_task["kwargs"])
                 kwargs.update({"instance": task_name})
                 if task_name is None:
                     raise ValueError("MD task name is None")
                 task = Task(
                     self,
-                    f=md["f"],
+                    f=md_task["f"],
                     kwargs=kwargs,
                     out=task_name,
                 )
@@ -575,6 +578,37 @@ class RunManager:
                 logger.error(m)
                 raise ValueError(m)
         logger.info(f"Task list build:\n{pformat(list(self.tasks.queue), indent=8)}")
+
+    def _setup_mdps(self):
+        self.timesteps
+
+        # parse mdps
+        if hasattr(self.config, 'mds'):
+            for md_name in self.config.mds.get_attributes():
+                md_config = self.config.mds.attr(md_name)
+                mdp_path: Path = md_config.mdp
+                mdp = read_mdp(mdp_path)
+                self.mdps[md_name] = mdp
+
+        # validate
+        relax_md = None
+        if hasattr(self.config.changer.coordinates, 'md'):
+            relax_config = self.config.changer.coordinates
+            relax_md = relax_config.md
+            relax_is_slow_growth = relax_config.slow_growth not in ['', 'no', 'false']
+        for k,v in self.mdps.items():
+            if k == relax_md:
+                if v.get('free-energy') not in ['yes', 'true', 'True']:
+                    m = f"Specified relaxation md {relax_md} designated as slow-growth md, but its mdp file doesn't set free-energy = true/yes."
+                    logger.error(m)
+                    raise ValueError(m)
+            else:
+                # this is an md from which we potentially sample and
+                # which we pass on to the reaction plugins, so we need to know
+                # its dt and the writeout frequency for trr and xtc
+                # TODO: this
+                pass
+
 
     def get_latest(self, suffix: str) -> Path | None:
         """Returns path to latest file of given type.
