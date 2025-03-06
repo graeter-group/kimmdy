@@ -1,18 +1,17 @@
 name: docs
 
 on:
-  workflow_call: {}
-  workflow_dispatch: {}
   pull_request:
     branches: [ main ]
-    types: [labeled]
+    types: [opened, synchronize, reopened, ready_for_review]
 
 permissions:
   contents: write
 
 jobs:
   build-docs:
-    if: github.event.label.name == 'docthis'
+    if: |
+      contains(github.event.pull_request.title, 'chore(main): release') && github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
