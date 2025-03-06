@@ -8,6 +8,7 @@ on:
 
 jobs:
   test:
+    if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     container: riedmiki/gromacs-plumed-python:2023.5-plumed
     steps:
