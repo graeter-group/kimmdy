@@ -3,15 +3,14 @@ name: docs
 on:
   pull_request:
     branches: [ main ]
-    types: [opened, synchronize, reopened, labeled]
+    types: [labeled]
 
 permissions:
   contents: write
 
 jobs:
   build-docs:
-    if: |
-      (contains(github.event.pull_request.title, 'chore(main): release') && github.event.pull_request.draft == false) || github.event.label == 'docthis'
+    if: github.event.label.name == 'docthis'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
