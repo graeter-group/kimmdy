@@ -1,6 +1,19 @@
 # Changelog
 
 
+## [7.1.3](https://github.com/graeter-group/kimmdy/compare/v7.1.2...v7.1.3) (2025-03-07)
+
+
+### Bug Fixes
+
+* render docs on trigger ([72430ea](https://github.com/graeter-group/kimmdy/commit/72430eaca7f8cdea47645a7f00edd1a67ebfc013))
+* try different ci triggers ([ec3aaf4](https://github.com/graeter-group/kimmdy/commit/ec3aaf47da450b2848bb341912b7e916b100674b))
+
+
+### Documentation
+
+* add deprecation warning rendering in docs ([1d98764](https://github.com/graeter-group/kimmdy/commit/1d987648f647eff1b67538d770deca68ee4c1212))
+
 ## [7.1.2](https://github.com/graeter-group/kimmdy/compare/v7.1.1...v7.1.2) (2025-03-05)
 
 
