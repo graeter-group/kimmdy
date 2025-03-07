@@ -54,7 +54,8 @@ flat_scheme = flatten_scheme(scheme)
 
 for item in flat_scheme:
   print(f"### {item['key']}\n")
-  print(f"{item['desc']}\n\n")
+  deprecatd = ' (deprecated)' if item['deprecated'] else ''
+  print(f"{item['desc']}{deprecatd}\n\n")
   if item['type'] != "":
     print(f"**Type**: {item['type']}\n\n")
   if item['enum'] != "":
