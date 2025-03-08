@@ -782,7 +782,7 @@ class RunManager:
         return files
 
     def _run_md(
-        self, instance: str, files: TaskFiles, continue_md: bool = False
+        self, instance: str, files: TaskFiles, continue_md: bool = False, time: float|None = None
     ) -> TaskFiles:
         """General MD simulation"""
         logger = files.logger
@@ -820,12 +820,20 @@ class RunManager:
             if self.latest_files.get("trr") is not None:
                 trr = files.input["trr"]
                 grompp_cmd += f" -t {trr}"
-            if self.latest_files.get("edr") is not None:
-                edr = files.input["edr"]
-                if edr is not None and edr.exists():
-                    grompp_cmd += f" -e {edr}"
-                else:
-                    logger.warning(f"edr file {edr} not found")
+                if time is not None:
+                    # start the relaxation or next MD from the chosen reaction time
+                    # that is already rounded to the nearest trr frame in _decide_recipe.
+                    grompp_cmd += f" -time {time}"
+                    logger.info(f"Starting MD from time: {time} ps of the trr")
+
+            # TODO: remove this, edr files just do weird things.
+            # if self.latest_files.get("edr") is not None:
+            #     edr = files.input["edr"]
+            #     if edr is not None and edr.exists():
+            #         grompp_cmd += f" -e {edr}"
+            #     else:
+            #         logger.warning(f"edr file {edr} not found")
+
             logger.debug(f"grompp cmd: {grompp_cmd}")
 
         mdrun_cmd = (
@@ -1124,8 +1132,9 @@ class RunManager:
         if ttime is not None:
             write_coordinate_files_at_reaction_time(files=files, time=ttime)
             self.latest_files["gro"] = files.output["gro"]
-            self.latest_files["trr"] = files.output["trr"]
-            self.latest_files["edr"] = files.output["edr"]
+            # don't use trr and edr, use the `-time` flag of gmx grompp instead
+            # self.latest_files["trr"] = files.output["trr"]
+            # self.latest_files["edr"] = files.output["edr"]
 
         top_initial = deepcopy(self.top)
         for step in recipe.recipe_steps:
@@ -1245,7 +1254,7 @@ class RunManager:
                 relax_task = Task(
                     self,
                     f=self._run_md,
-                    kwargs={"instance": md_instance},
+                    kwargs={"instance": md_instance, "time": self.kmcresult.time_start},
                     out=md_instance,
                 )
                 relax_task_files = relax_task()
