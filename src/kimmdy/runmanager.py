@@ -606,7 +606,11 @@ class RunManager:
         if hasattr(self.config.changer.coordinates, "md"):
             relax_config = self.config.changer.coordinates
             relax_md = relax_config.md
-            relax_is_slow_growth[relax_md] = relax_config.slow_growth not in ["", "no", "false"]
+            relax_is_slow_growth[relax_md] = relax_config.slow_growth not in [
+                "",
+                "no",
+                "false",
+            ]
         for k, v in self.mdps.items():
             if k == relax_md and relax_is_slow_growth.get(k) is True:
                 if v.get("free-energy") not in ["yes", "true", "True"]:
@@ -638,7 +642,10 @@ class RunManager:
 
             # keep track of time info for each md instance
             self.timeinfos[k] = TimeInfo(
-                nsteps=int(nsteps), dt=float(dt), trr_nst=int(trr_nst), xtc_nst=int(xtc_nst)
+                nsteps=int(nsteps),
+                dt=float(dt),
+                trr_nst=int(trr_nst),
+                xtc_nst=int(xtc_nst),
             )
 
     def get_latest(self, suffix: str) -> Path | None:
@@ -782,7 +789,11 @@ class RunManager:
         return files
 
     def _run_md(
-        self, instance: str, files: TaskFiles, continue_md: bool = False, time: float|None = None
+        self,
+        instance: str,
+        files: TaskFiles,
+        continue_md: bool = False,
+        time: float | None = None,
     ) -> TaskFiles:
         """General MD simulation"""
         logger = files.logger
@@ -1005,7 +1016,9 @@ class RunManager:
             logger.info(f"time_start: {self.kmcresult.time_start}")
             dt_trr = timings.dt * timings.trr_nst
             self.kmcresult.time_start = (self.kmcresult.time_start // dt_trr) * dt_trr
-            logger.info(f"adjustes time_start: {self.kmcresult.time_start} to nearest trr frame of {md_instance_name}")
+            logger.info(
+                f"adjustes time_start: {self.kmcresult.time_start} to nearest trr frame of {md_instance_name}"
+            )
 
         # Correct the offset of time_start_index by the concatenation
         # of all rates of all recipes from all reactions back onto the offset
