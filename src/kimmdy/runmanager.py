@@ -592,13 +592,32 @@ class RunManager:
         logger.info(f"Task list build:\n{pformat(list(self.tasks.queue), indent=8)}")
 
     def _setup_mdps(self):
-        # parse mdps
+        # parse mdps of md tasks
         if hasattr(self.config, "mds"):
             for md_name in self.config.mds.get_attributes():
                 md_config = self.config.mds.attr(md_name)
                 mdp_path: Path = md_config.mdp
                 mdp = read_mdp(mdp_path)
                 self.mdps[md_name] = mdp
+
+        # parse mdp of trajectories used as input
+        if hasattr(self.config, "trr"):
+            trr_path: Path = self.config.trr
+            if hasattr(self.config, "mdp"):
+                mdp_path: Path = self.config.mdp
+                mdp = read_mdp(mdp_path)
+                self.mdps[mdp_path.stem] = mdp
+            else:
+                # if mdp is not defined, try to infer it from the name of the input trr
+                mdp_path = trr_path.with_suffix(".mdp")
+                if not mdp_path.exists():
+                    m = f"MDP file for {trr_path} with name {mdp_path} does not exist. Specify the path to the mdp file manually with the mdp: option in the config."
+                    logger.error(m)
+                    raise FileNotFoundError(m)
+                mdp = read_mdp(mdp_path)
+                self.mdps[mdp_path.stem] = mdp
+
+
 
         # validate
         relax_md = None
