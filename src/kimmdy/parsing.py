@@ -627,3 +627,22 @@ def read_time_marker(p: Path) -> tuple[list[str], list[datetime]]:
         except ValueError as err:
             logger.error(f"Error trying to read time for event {e}: {err}\nfile: {p}")
     return events, times
+
+
+def read_mdp(p: Path) -> dict[str, str]:
+    """Reads a mdp file and returns a dict.
+
+    MDP files are key-value pairs separated by '='.
+    ; denotes a comment, the rest of the line is ignored.
+    whitespace is ignored.
+    """
+    d = {}
+    with open(p) as f:
+        for l in f:
+            l = "".join(takewhile(is_not_comment, l)).strip()
+            if not l:
+                continue
+            k, v = l.split("=")
+            d[k.strip()] = v.strip()
+
+    return d
