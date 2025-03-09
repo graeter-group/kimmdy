@@ -287,6 +287,12 @@
       "type": "string",
       "pytype": "Path"
     },
+    "mdp": {
+      "title": "mdp",
+      "description": ".mdp file of a finished simulation for starting directly with a reaction",
+      "type": "string",
+      "pytype": "Path"
+    },
     "edr": {
       "title": "edr",
       "description": ".edr file of a finished simulation for starting directly with a reaction",
