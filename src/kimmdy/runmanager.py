@@ -617,8 +617,6 @@ class RunManager:
                 mdp = read_mdp(mdp_path)
                 self.mdps[mdp_path.stem] = mdp
 
-
-
         # validate
         relax_md = None
         relax_is_slow_growth = {}
