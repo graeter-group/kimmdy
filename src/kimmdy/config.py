@@ -371,11 +371,10 @@ class Config:
                             self.changer.coordinates.md in self.mds.get_attributes()
                         ), f"Relax MD {self.changer.coordinates.md} not in MD section!"
                         relax_config = self.changer.coordinates
-                        if relax_config.slow_growth in ['yes', 'true', 'full']:
+                        if relax_config.slow_growth in ["yes", "true", "full"]:
                             relax_config.slow_growth = True
-                        elif relax_config.slow_growth in ['no', 'false', '']:
+                        elif relax_config.slow_growth in ["no", "false", ""]:
                             relax_config.slow_growth = False
-
 
             # Validate reaction plugins
             if hasattr(self, "reactions"):
