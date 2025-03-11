@@ -4,7 +4,6 @@ from numpy.random import default_rng
 from kimmdy.recipe import Recipe, RecipeCollection, Break, Bind
 from kimmdy.kmc import (
     KMCError,
-    KMCReject,
     rf_kmc,
     frm,
     extrande,
