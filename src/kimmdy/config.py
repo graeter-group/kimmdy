@@ -201,6 +201,8 @@ class Config:
 
                 if not deprecated:
                     v = pytype(v)
+                    if pytype is str:
+                        v = v.lower()
                     self.__setattr__(k, v)
 
         # validate on initial construction
@@ -364,14 +366,20 @@ class Config:
             # Validate changer reference
             if hasattr(self, "changer"):
                 if hasattr(self.changer, "coordinates"):
-                    if "md" in self.changer.coordinates.__dict__.keys():
+                    if "md" in self.changer.coordinates.get_attributes():
                         assert (
-                            self.changer.coordinates.md in self.mds.__dict__.keys()
+                            self.changer.coordinates.md in self.mds.get_attributes()
                         ), f"Relax MD {self.changer.coordinates.md} not in MD section!"
+                        relax_config = self.changer.coordinates
+                        if relax_config.slow_growth in ['yes', 'true', 'full']:
+                            relax_config.slow_growth = True
+                        elif relax_config.slow_growth in ['no', 'false', '']:
+                            relax_config.slow_growth = False
+
 
             # Validate reaction plugins
             if hasattr(self, "reactions"):
-                for reaction_name in self.reactions.__dict__.keys():
+                for reaction_name in self.reactions.get_attributes():
                     if reaction_name not in (ks := list(reaction_plugins.keys())):
                         if reaction_name in (list(broken_reaction_plugins.keys())):
                             m = f"Reaction plugin {reaction_name} could not be loaded."
