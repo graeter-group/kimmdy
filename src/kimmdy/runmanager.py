@@ -68,7 +68,7 @@ from kimmdy.utils import (
     flatten_recipe_collections,
     get_task_directories,
     run_gmx,
-    write_coordinate_files_at_reaction_time,
+    write_gro_at_reaction_time,
     write_reaction_time_marker,
 )
 
@@ -789,20 +789,6 @@ class RunManager:
         files.output["top"] = files.outputdir / self.config.top.name
         logger.info("Done with setup")
 
-        # TODO: find a better solution for this
-        #
-        # copy input files that are potentially modified
-        # to the setup task directory
-        # by applying a recipe (e.g. by trunkate_sim_files)
-        for f in ["xtc", "tpr", "trr", "plumed", "gro"]:
-            if hasattr(self.config, f):
-                if path := self.latest_files.get(f):
-                    logger.debug(f"Copying {path} to {files.outputdir}")
-                    shutil.copy(
-                        path, files.outputdir / path.name, follow_symlinks=False
-                    )
-                    files.output[f] = files.outputdir / path.name
-
         return files
 
     def _run_md(
@@ -1160,11 +1146,9 @@ class RunManager:
         # like Relax and Place to have the correct coordinates
         logger.info(f"Writing coordinates (gro and trr) and energy (edr) for reaction.")
         if ttime is not None:
-            write_coordinate_files_at_reaction_time(files=files, time=ttime)
-            self.latest_files["gro"] = files.output["gro"]
             # don't use trr and edr, use the `-time` flag of gmx grompp instead
-            # self.latest_files["trr"] = files.output["trr"]
-            # self.latest_files["edr"] = files.output["edr"]
+            write_gro_at_reaction_time(files=files, time=ttime)
+            self.latest_files["gro"] = files.output["gro"]
 
         top_initial = deepcopy(self.top)
         for step in recipe.recipe_steps:
