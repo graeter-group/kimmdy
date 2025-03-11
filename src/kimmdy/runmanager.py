@@ -623,17 +623,17 @@ class RunManager:
         if hasattr(self.config.changer.coordinates, "md"):
             relax_config = self.config.changer.coordinates
             relax_md = relax_config.md
-            relax_is_slow_growth[relax_md] = relax_config.slow_growth not in [
-                "",
-                "no",
-                "false",
-            ]
+            relax_is_slow_growth[relax_md] = relax_config.slow_growth is not False # it's either morse_only or True
         for k, v in self.mdps.items():
             if k == relax_md and relax_is_slow_growth.get(k) is True:
-                if v.get("free-energy") not in ["yes", "true", "True"]:
+                if v.get("free-energy") is not True:
                     m = f"Specified relaxation md {relax_md} designated as slow-growth md, but its mdp file doesn't set free-energy = true/yes."
                     logger.error(m)
                     raise ValueError(m)
+                if v.get("gen-vel") is True:
+                    m = f"Specified relaxation md {relax_md} has gen-vel true, which may make the trajectory less continuous and the transition."
+                    logger.warning(m)
+
             nsteps = v.get("nsteps")
             dt = v.get("dt")
             trr_nst = v.get("nstxout")

@@ -269,10 +269,10 @@ def test_read_mdp(arranged_tmp_path: Path):
     relax = parsing.read_mdp(Path("md_slow_growth.mdp"))
 
     assert md["integrator"] == "md"
-    assert md["nsteps"] == "5000"
-    assert md["dt"] == "0.002"
-    assert md["nstxout"] == "500"
-    assert md["nstxout-compressed"] == "500"
+    assert md["nsteps"] == 5000
+    assert md["dt"] == 0.002
+    assert md["nstxout"] == 500
+    assert md["nstxout-compressed"] == 500
 
     assert relax["integrator"] == "md"
-    assert relax["free-energy"] == "yes"
+    assert relax["free-energy"] == True

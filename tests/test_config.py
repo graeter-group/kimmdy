@@ -57,7 +57,7 @@ def test_subsections_with_defaults_are_kept(arranged_tmp_path):
     config = Config(Path("config2.yml"))
 
     assert config.log.file.name == "kimmdy.log"
-    assert config.log.level == "DEBUG"
+    assert config.log.level == "debug"
     assert config.topology.reactive
     assert getattr(config.topology.reactive, "nrexcl", None) is None
 

@@ -643,6 +643,15 @@ def read_mdp(p: Path) -> dict[str, str]:
             if not l:
                 continue
             k, v = l.split("=")
-            d[k.strip()] = v.strip()
+            v = v.strip()
+            if v.lower() in ["yes", "true"]:
+                v = True
+            elif v.lower() in ["no", "false"]:
+                v = False
+            elif v.replace(".", "").isnumeric():
+                v = float(v)
+            elif v.isnumeric():
+                v = int(v)
+            d[k.strip().replace('_', '-')] = v
 
     return d
