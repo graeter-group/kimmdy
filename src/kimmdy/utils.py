@@ -422,9 +422,7 @@ def write_gro_at_reaction_time(files: TaskFiles, time: float):
         logger.error(m)
         gro_reaction.unlink(True)
 
-    logger.info(
-        f"Writing out gro file at reaction time {time} ps in {gro.parent.name}"
-    )
+    logger.info(f"Writing out gro file at reaction time {time} ps in {gro.parent.name}")
     files.output["gro"] = gro_reaction
 
     wrote_file = False
