@@ -652,6 +652,6 @@ def read_mdp(p: Path) -> dict[str, str]:
                 v = float(v)
             elif v.isnumeric():
                 v = int(v)
-            d[k.strip().replace('_', '-')] = v
+            d[k.strip().replace("_", "-")] = v
 
     return d
