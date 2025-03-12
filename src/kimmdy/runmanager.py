@@ -832,7 +832,8 @@ class RunManager:
         outputdir = files.outputdir
 
         # copy mdp file to output directory for reference
-        shutil.copy(mdp, outputdir / mdp.name)
+        # using the name of the instance for inferability
+        shutil.copy(mdp, outputdir / f"{instance}.mdp")
 
         # to continue MD after timeout
         if continue_md:
