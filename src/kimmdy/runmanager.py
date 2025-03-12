@@ -1036,9 +1036,10 @@ class RunManager:
                 raise ValueError(m)
             logger.info(f"time_start: {self.kmcresult.time_start}")
             dt_trr = timings.dt * timings.trr_nst
-            self.kmcresult.time_start = (self.kmcresult.time_start // dt_trr) * dt_trr
+            # round to nearest frame and then to 3 decimals (1 fs) to avoid floating point errors
+            self.kmcresult.time_start = round(round(self.kmcresult.time_start / dt_trr) * dt_trr, 3)
             logger.info(
-                f"adjustes time_start: {self.kmcresult.time_start} to nearest trr frame of {md_instance_name}"
+                f"adjusted time_start: {self.kmcresult.time_start} to nearest trr frame of {md_instance_name} with timings {timings} and dt_trr {dt_trr}"
             )
 
         # Correct the offset of time_start_index by the concatenation
