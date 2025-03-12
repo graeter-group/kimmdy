@@ -789,6 +789,16 @@ class RunManager:
 
         write_top(self.top.to_dict(), files.outputdir / self.config.top.name)
         files.output["top"] = files.outputdir / self.config.top.name
+        # copy small configuration files, but not full trajectories, to 0_setup
+        for f in ["tpr", "gro", "mdp", "plumed"]:
+            if hasattr(self.config, f):
+                if path := self.latest_files.get(f):
+                    logger.debug(f"Copying {path} to {files.outputdir}")
+                    shutil.copy(
+                        path, files.outputdir / path.name, follow_symlinks=False
+                    )
+                    files.output[f] = files.outputdir / path.name
+
         logger.info("Done with setup")
 
         return files
@@ -815,9 +825,14 @@ class RunManager:
         files.input["mdp"] = md_config.mdp
         mdp = files.input["mdp"]
         ndx = files.input["ndx"]
-        logger.debug(f"Using the following input files: top: {top}, gro: {gro}")
+        logger.debug(
+            f"Using the following input files: top: {top}, gro: {gro}, mdp: {mdp}"
+        )
 
         outputdir = files.outputdir
+
+        # copy mdp file to output directory for reference
+        shutil.copy(mdp, outputdir / mdp.name)
 
         # to continue MD after timeout
         if continue_md:
