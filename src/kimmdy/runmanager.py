@@ -655,7 +655,7 @@ class RunManager:
                 logger.error(m)
                 raise ValueError(m)
             if xtc_nst is None:
-                m = f"MDP file for {k} does not contain nstxtcout of nstxout-compressed."
+                m = f"MDP file for {k} does not contain nstxtcout or nstxout-compressed."
                 logger.error(m)
                 raise ValueError(m)
 
