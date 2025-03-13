@@ -1,6 +1,14 @@
 # Changelog
 
 
+## [7.1.4](https://github.com/graeter-group/kimmdy/compare/v7.1.3...v7.1.4) (2025-03-13)
+
+
+### Bug Fixes
+
+* apply amber fix globally to atoms affected ([#536](https://github.com/graeter-group/kimmdy/issues/536)) ([30a4cc5](https://github.com/graeter-group/kimmdy/commit/30a4cc55cc6ef3e3f9a52a36663e50f0e10dcd72))
+* make get_is_reactive_predicate_f case-insensitive. closes [#513](https://github.com/graeter-group/kimmdy/issues/513) ([4f8407f](https://github.com/graeter-group/kimmdy/commit/4f8407fdb1c95befbdadfab8a5d321aa0bc2bddc))
+
 ## [7.1.3](https://github.com/graeter-group/kimmdy/compare/v7.1.2...v7.1.3) (2025-03-07)
 
 
