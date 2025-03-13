@@ -1132,9 +1132,11 @@ class MoleculeTypeMerger:
             self.mol_b.exclusions[key] = Exclusion(*key)
 
     def amber_fix(self):
-        """Amber fix for breaking/binding atom types without LJ potential
-        """
-        bonds = self.affected_interactions.bonds.added | self.affected_interactions.bonds.removed
+        """Amber fix for breaking/binding atom types without LJ potential"""
+        bonds = (
+            self.affected_interactions.bonds.added
+            | self.affected_interactions.bonds.removed
+        )
         atoms = set([atom for bond in bonds for atom in bond])
         for nr in atoms:
             atom = self.mol_b.atoms[nr]
