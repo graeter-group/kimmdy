@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING, Optional, Union
 
 import numpy as np
 
-from kimmdy.constants import MARK_REACION_TIME, REACTION_EDR, REACTION_GRO, REACTION_TRR
+from kimmdy.constants import MARK_REACION_TIME, REACTION_GRO
 from kimmdy.recipe import RecipeCollection
 from kimmdy.constants import CONFIG_LOGS
 

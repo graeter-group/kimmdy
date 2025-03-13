@@ -5,11 +5,9 @@ from pathlib import Path
 import pytest
 
 from kimmdy.cmd import kimmdy_run
-from kimmdy.config import Config
 from kimmdy.constants import MARK_DONE, MARK_FINISHED
 from kimmdy.parsing import read_top, write_top
-from kimmdy.plugins import discover_plugins, parameterization_plugins
-from kimmdy.runmanager import RunManager
+from kimmdy.plugins import parameterization_plugins
 from kimmdy.topology.topology import Topology
 from kimmdy.utils import get_task_directories
 
