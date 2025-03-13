@@ -282,7 +282,9 @@ def get_is_reactive_predicate_from_config_f(cfg: Config) -> Callable[[str], bool
     return get_is_reactive_predicate_f(include, exclude)
 
 
-def get_is_reactive_predicate_f(include: list[str], exclude: list[str]) -> Callable[[str], bool]:
+def get_is_reactive_predicate_f(
+    include: list[str], exclude: list[str]
+) -> Callable[[str], bool]:
     """Returns whether a moleculetype name is configured to be recognized as reactive."""
     default_excludes = [x.lower() for x in SOLVENT_NAMES + ION_NAMES]
     exclude = [s.lower() for s in exclude]
