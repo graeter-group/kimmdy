@@ -789,6 +789,7 @@ class RunManager:
 
         write_top(self.top.to_dict(), files.outputdir / self.config.top.name)
         files.output["top"] = files.outputdir / self.config.top.name
+
         # copy small configuration files, but not full trajectories, to 0_setup
         for f in ["tpr", "gro", "mdp", "plumed"]:
             if hasattr(self.config, f):
@@ -798,6 +799,15 @@ class RunManager:
                         path, files.outputdir / path.name, follow_symlinks=False
                     )
                     files.output[f] = files.outputdir / path.name
+
+        if hasattr(self.config, "mds"):
+            for md_name in self.config.mds.get_attributes():
+                md_config = self.config.mds.attr(md_name)
+                mdp_path: Path = md_config.mdp
+                logger.debug(f"Copying {mdp_path} to {files.outputdir}")
+                shutil.copy(
+                    mdp_path, files.outputdir / mdp_path.name, follow_symlinks=False
+                )
 
         logger.info("Done with setup")
 
@@ -1037,7 +1047,9 @@ class RunManager:
             logger.info(f"time_start: {self.kmcresult.time_start}")
             dt_trr = timings.dt * timings.trr_nst
             # round to nearest frame and then to 3 decimals (1 fs) to avoid floating point errors
-            self.kmcresult.time_start = round(round(self.kmcresult.time_start / dt_trr) * dt_trr, 3)
+            self.kmcresult.time_start = round(
+                round(self.kmcresult.time_start / dt_trr) * dt_trr, 3
+            )
             logger.info(
                 f"adjusted time_start: {self.kmcresult.time_start} to nearest trr frame of {md_instance_name} with timings {timings} and dt_trr {dt_trr}"
             )
