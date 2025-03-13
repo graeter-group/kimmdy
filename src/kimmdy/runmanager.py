@@ -240,7 +240,6 @@ class RunManager:
             radicals=getattr(self.config, "radicals", None),
             residuetypes_path=getattr(self.config, "residuetypes", None),
             reactive_nrexcl=nrexcl,
-            gromacs_alias=self.config.gromacs_alias,
         )
         self.filehist: list[dict[str, TaskFiles]] = [
             {"0_setup": TaskFiles(self.get_latest)}
@@ -601,21 +600,32 @@ class RunManager:
                 self.mdps[md_name] = mdp
 
         # parse mdp of trajectories used as input
+        trr_path: Path | None = None
+        xtc_path: Path | None = None
         if hasattr(self.config, "trr"):
-            trr_path: Path = self.config.trr
-            if hasattr(self.config, "mdp"):
-                mdp_path: Path = self.config.mdp
-                mdp = read_mdp(mdp_path)
-                self.mdps[mdp_path.stem] = mdp
-            else:
-                # if mdp is not defined, try to infer it from the name of the input trr
+            trr_path = self.config.trr
+        if hasattr(self.config, "xtc"):
+            xtc_path = self.config.xtc
+        if hasattr(self.config, "mdp"):
+            mdp_path: Path = self.config.mdp
+            mdp = read_mdp(mdp_path)
+            self.mdps[mdp_path.stem] = mdp
+        elif trr_path is not None or xtc_path is not None:
+            # if mdp is not defined, try to infer it from the name of the input trr or xtc
+            if trr_path is not None:
                 mdp_path = trr_path.with_suffix(".mdp")
-                if not mdp_path.exists():
-                    m = f"MDP file for {trr_path} with name {mdp_path} does not exist. Specify the path to the mdp file manually with the mdp: option in the config."
-                    logger.error(m)
-                    raise FileNotFoundError(m)
-                mdp = read_mdp(mdp_path)
-                self.mdps[mdp_path.stem] = mdp
+            elif xtc_path is not None:
+                mdp_path = xtc_path.with_suffix(".mdp")
+            else:
+                m = "No trr or xtc file defined in the config. Specify the path to the mdp file manually with the mdp: option in the config."
+                logger.error(m)
+                raise FileNotFoundError(m)
+            if not mdp_path.exists():
+                m = f"MDP file for {trr_path} with name {mdp_path} does not exist. Specify the path to the mdp file manually with the mdp: option in the config."
+                logger.error(m)
+                raise FileNotFoundError(m)
+            mdp = read_mdp(mdp_path)
+            self.mdps[mdp_path.stem] = mdp
 
         # validate
         relax_md = None
@@ -650,20 +660,36 @@ class RunManager:
                 m = f"MDP file for {k} does not contain dt."
                 logger.error(m)
                 raise ValueError(m)
-            if trr_nst is None:
-                m = f"MDP file for {k} does not contain nstxout."
-                logger.error(m)
-                raise ValueError(m)
             if xtc_nst is None:
                 m = f"MDP file for {k} does not contain nstxtcout or nstxout-compressed."
                 logger.error(m)
                 raise ValueError(m)
+            if trr_nst is None:
+                m = f"MDP file for {k} does not contain nstxout."
+                logger.error(m)
+                raise ValueError(m)
+            else:
+                trr_nst = int(trr_nst)
+
+            if trr_nst == 0:
+                vout = v.get("nstvout")
+                fout = v.get("nstfout")
+                if vout is not None and vout != 0:
+                    m = f"nstvout is {vout} for mdp {k}, but nstxout is 0. This will create useless trr files."
+                    logger.error(m)
+                    raise ValueError(m)
+                if fout is not None and fout != 0:
+                    m = f"nstfout is {fout} for mdp {k}, but nstxout is 0. This will create useless trr files."
+                    logger.error(m)
+                    raise ValueError(m)
+                m = "This MD will not write trr files because nstxout is 0. This will be a pure xtc run."
+                logger.warning(m)
 
             # keep track of time info for each md instance
             self.timeinfos[k] = TimeInfo(
                 nsteps=int(nsteps),
                 dt=float(dt),
-                trr_nst=int(trr_nst),
+                trr_nst=trr_nst,
                 xtc_nst=int(xtc_nst),
             )
 
@@ -868,19 +894,24 @@ class RunManager:
                     grompp_cmd += f" -time {time}"
                     logger.info(f"Starting MD from time: {time} ps of the trr")
 
-            # TODO: remove this, edr files just do weird things.
-            # if self.latest_files.get("edr") is not None:
-            #     edr = files.input["edr"]
-            #     if edr is not None and edr.exists():
-            #         grompp_cmd += f" -e {edr}"
-            #     else:
-            #         logger.warning(f"edr file {edr} not found")
-
             logger.debug(f"grompp cmd: {grompp_cmd}")
+
+        timings = self.timeinfos.get(instance)
+        if timings is None:
+            m = f"Time info from mdp file for instance {instance} not found."
+            logger.error(m)
+            raise ValueError(m)
+
+        if timings.trr_nst is not None:
+            # no trr output, only xtc
+            trr_out = f"-o {instance}.trr "
+        else:
+            trr_out = ""
 
         mdrun_cmd = (
             f"{mdrun_prefix + ' ' if mdrun_prefix else ''}{gmx_alias} mdrun -s {instance}.tpr -cpi {cpt} "
-            f"-x {instance}.xtc -o {instance}.trr "
+            f"-x {instance}.xtc "
+            f"{trr_out}"
             f"-cpo {instance}.cpt "
             f"-c {instance}.gro -g {instance}.log -e {instance}.edr "
             f"-px {instance}_pullx.xvg -pf {instance}_pullf.xvg "
@@ -1035,7 +1066,7 @@ class RunManager:
                 logger.error(f"Error during KMC: {self.kmcresult}")
             return files
 
-        # round time_start to the nearest frame in the trr
+        # round time_start to the nearest frame in the trr or xtc if no trr is written
         latest_trr = self.get_latest("trr")
         if latest_trr is not None:
             md_instance_name = latest_trr.stem
@@ -1045,13 +1076,16 @@ class RunManager:
                 logger.error(m)
                 raise ValueError(m)
             logger.info(f"time_start: {self.kmcresult.time_start}")
-            dt_trr = timings.dt * timings.trr_nst
+            nst = timings.trr_nst
+            if nst is None:
+                nst = timings.xtc_nst
+            dt_frame = timings.dt * nst
             # round to nearest frame and then to 3 decimals (1 fs) to avoid floating point errors
             self.kmcresult.time_start = round(
-                round(self.kmcresult.time_start / dt_trr) * dt_trr, 3
+                round(self.kmcresult.time_start / dt_frame) * dt_frame, 3
             )
             logger.info(
-                f"adjusted time_start: {self.kmcresult.time_start} to nearest trr frame of {md_instance_name} with timings {timings} and dt_trr {dt_trr}"
+                f"adjusted time_start: {self.kmcresult.time_start} to nearest trr frame of {md_instance_name} with timings {timings} and dt_trr {dt_frame}"
             )
 
         # Correct the offset of time_start_index by the concatenation
@@ -1175,7 +1209,7 @@ class RunManager:
         # but this only happens after the apply_recipe task
         # so we need to set it manually here for intermediate tasks
         # like Relax and Place to have the correct coordinates
-        logger.info(f"Writing coordinates (gro and trr) and energy (edr) for reaction.")
+        logger.info(f"Writing coordinates gro for starting time of the reaction.")
         if ttime is not None:
             # don't use trr and edr, use the `-time` flag of gmx grompp instead
             write_gro_at_reaction_time(files=files, time=ttime)
