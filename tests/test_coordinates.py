@@ -295,29 +295,27 @@ def test_merge_hat_top(arranged_tmp_path, caplog):
     caplog.set_level(logging.INFO)
     top_a = Topology(read_top(Path("topol_stateA.top")))
     top_b = Topology(read_top(Path("topol_stateB.top")))
-    top_merge_ref = Topology(read_top(Path("topol_FEP.top")))
-    top_merge = merge_top_slow_growth(top_a=top_a, top_b=top_b)
+    top_a_ref = Topology(read_top(Path("topol_FEP.top")))
+    merge_top_slow_growth(top_a=top_a, top_b=top_b)
 
     # for debugging
-    # write_top(top_merge.to_dict(), Path("/tmp/kimmdtests_topol_merge.top"))
+    # write_top(top_a.to_dict(), Path("/tmp/kimmdtests_topol_merge.top"))
 
-    assert top_merge.bonds[("19", "27")].funct == "3"
-    assert top_merge.bonds[("26", "27")].funct == "3"
-    assert top_merge.angles[("17", "19", "20")].c3 is not None
+    assert top_a.bonds[("19", "27")].funct == "3"
+    assert top_a.bonds[("26", "27")].funct == "3"
+    assert top_a.angles[("17", "19", "20")].c3 is not None
 
-    assert top_merge.proper_dihedrals[("15", "17", "19", "24")].dihedrals["3"].c5 == "3"
-    assert (
-        top_merge.improper_dihedrals[("17", "20", "19", "24")].dihedrals["2"].c5 == "2"
-    )
+    assert top_a.proper_dihedrals[("15", "17", "19", "24")].dihedrals["3"].c5 == "3"
+    assert top_a.improper_dihedrals[("17", "20", "19", "24")].dihedrals["2"].c5 == "2"
 
-    assert top_merge.proper_dihedrals == top_merge_ref.proper_dihedrals
-    # assert top_merge.improper_dihedrals == top_merge_ref.improper_dihedrals
-    assert top_merge.atoms == top_merge_ref.atoms
-    assert top_merge.bonds == top_merge_ref.bonds
-    assert top_merge.angles == top_merge_ref.angles
-    assert top_merge.reactive_molecule.pairs == top_merge_ref.reactive_molecule.pairs
-    assert top_merge.pairs == top_merge_ref.pairs
-    assert top_merge.exclusions == top_merge_ref.exclusions
+    assert top_a.proper_dihedrals == top_a_ref.proper_dihedrals
+    # assert top_a.improper_dihedrals == top_a_ref.improper_dihedrals
+    assert top_a.atoms == top_a_ref.atoms
+    assert top_a.bonds == top_a_ref.bonds
+    assert top_a.angles == top_a_ref.angles
+    assert top_a.reactive_molecule.pairs == top_a_ref.reactive_molecule.pairs
+    assert top_a.pairs == top_a_ref.pairs
+    assert top_a.exclusions == top_a_ref.exclusions
 
 
 def test_merge_small_hat_details(arranged_tmp_path, caplog):
