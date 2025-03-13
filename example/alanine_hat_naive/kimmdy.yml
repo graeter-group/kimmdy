@@ -16,7 +16,7 @@ mds:
 changer:
   coordinates:
     md: 'relax'  
-    slow_growth: True
+    slow_growth: yes
   topology:
     parameterization: 'basic'
 reactions:

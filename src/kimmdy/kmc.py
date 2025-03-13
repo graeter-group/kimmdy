@@ -167,7 +167,7 @@ def rf_kmc(
     time_index = np.argmax(recipe.rates)
     reaction_time = recipe.timespans[time_index][1]
     logger.info(
-        f"Chosen Recipe with steps: {recipe.recipe_steps} at time {reaction_time} and {len(recipe.rates)} time-depdendent rates"
+        f"Chosen Recipe with steps: {recipe.recipe_steps} at time {reaction_time} and {len(recipe.rates)} time-dependent rates"
     )
 
     # 5. Calculate the time step associated with uu

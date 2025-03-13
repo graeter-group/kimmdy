@@ -6,7 +6,6 @@ from itertools import permutations
 from typing import TYPE_CHECKING, Any, Callable, Optional
 
 from kimmdy.constants import ION_NAMES, REACTIVE_MOLECULEYPE, SOLVENT_NAMES
-from kimmdy.parsing import empty_section
 from kimmdy.topology.atomic import MoleculeTypeHeader
 
 if TYPE_CHECKING:

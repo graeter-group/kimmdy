@@ -159,9 +159,11 @@ class Task:
 
     def __call__(self) -> Optional[TaskFiles]:
         logger.debug(
-            f"Starting task: {self.name} with args: {self.kwargs} in {self.runmng.iteration}_{self.out}"
+            f"Starting task: {self.name} with args: {self.kwargs} in {self.runmng.iteration+1}_{self.out}"
         )
-        logger.info(f"Starting task: {self.name} in {self.runmng.iteration}_{self.out}")
+        logger.info(
+            f"Starting task: {self.name} in {self.runmng.iteration+1}_{self.out}"
+        )
         if self.out is not None:
             is_continuation = False
             if self.kwargs.get("continue_md") is True:
