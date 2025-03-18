@@ -60,6 +60,13 @@
       "pytype": "bool",
       "default": false
     },
+    "just_sample": {
+      "title": "just sample",
+      "description": "Don't execute the recipes returned by the chosen reaction, just get the rates (and choose one). KIMMDY will exit after reactions have been queried for the first time in the sequence.",
+      "type": "boolean",
+      "pytype": "bool",
+      "default": false
+    },
     "parameterize_at_setup": {
       "title": "parameterize_at_setup",
       "description": "parameterize the topology during the setup task",
