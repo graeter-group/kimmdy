@@ -201,7 +201,10 @@ class Config:
 
                 if not deprecated:
                     v = pytype(v)
-                    if pytype is str:
+                    if pytype is str and k != "name":
+                        # make sure all strings are lowercase
+                        # except for the name, because it is used
+                        # in the output directory name
                         v = v.lower()
                     self.__setattr__(k, v)
 
