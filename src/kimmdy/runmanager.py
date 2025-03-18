@@ -1128,6 +1128,11 @@ class RunManager:
             files.outputdir / "radicals.json",
         )
 
+        if self.config.just_sample:
+            logger.info("Just sampling reactions, not applying recipes. KIMMDY will exit.")
+            self.state = State.DONE
+            return files
+
         logger.info("Done with Decide recipe.")
         return files
 
