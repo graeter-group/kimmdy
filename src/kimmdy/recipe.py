@@ -467,12 +467,11 @@ class DeferredRecipeSteps(Generic[T]):
 
     Are called by the kimmdy runmanager if the recipe is chosen.
     The callback is given the chosen key (generic over type T) as well
-    as the index into the rates (and time ranges for said rates) and
     the time in ps at which the reaction occurs.
     """
 
     key: T
-    callback: Callable[[T, int, float], list[RecipeStep]]
+    callback: Callable[[T, float], list[RecipeStep]]
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, DeferredRecipeSteps):
