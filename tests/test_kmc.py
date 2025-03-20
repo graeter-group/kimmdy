@@ -9,7 +9,6 @@ from kimmdy.kmc import (
     extrande,
     extrande_mod,
     KMCAccept,
-    total_index_to_index_within_plugin,
     multi_rfkmc,
 )
 
@@ -38,7 +37,6 @@ def reference_KMC() -> KMCAccept:
         time_delta=0.4032167624965666,
         reaction_probability=[0.0, 0.072, 0.054, 0.0],
         time_start=0,
-        time_start_index=0,
     )
 
 
@@ -53,7 +51,6 @@ def reference_multi2_KMC() -> KMCAccept:
         time_delta=0.7809768957205019,
         reaction_probability=[0.0, 0.072, 0.054, 0.0],
         time_start=6.0,
-        time_start_index=0,
     )
 
 
@@ -63,7 +60,6 @@ def reference_extrande_KMC() -> KMCAccept:
         recipe=Recipe([Bind(2, 3)], rates=[0.12], timespans=[(0.0, 6.0)]),
         time_delta=0,
         time_start=3.85725338647224,
-        time_start_index=0,
         reaction_probability=None,
     )
 
@@ -206,18 +202,3 @@ def test_compare_extrande_extrande_mod(recipe_collection):
     assert abs(ext_rs.mean() - extmod_rs.mean()) < 0.002
 
 
-def test_total_index_to_index_within_plugin_for_multiple_plugins():
-    ns = [3, 2, 4, 1]
-    assert total_index_to_index_within_plugin(0, ns) == 0
-    assert total_index_to_index_within_plugin(1, ns) == 1
-    assert total_index_to_index_within_plugin(2, ns) == 2
-    assert total_index_to_index_within_plugin(3, ns) == 0
-    assert total_index_to_index_within_plugin(4, ns) == 1
-    assert total_index_to_index_within_plugin(5, ns) == 0
-
-
-def test_total_index_to_index_within_plugin_for_one_plugin():
-    ns = [5]
-    assert total_index_to_index_within_plugin(0, ns) == 0
-    assert total_index_to_index_within_plugin(1, ns) == 1
-    assert total_index_to_index_within_plugin(2, ns) == 2
