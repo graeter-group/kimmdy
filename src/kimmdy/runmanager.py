@@ -1266,7 +1266,7 @@ class RunManager:
                     if len(solvent_atoms) > 0:
                         logger.info(
                             f"{len(solvent_atoms)} solvent atoms are involved "
-                            "in the reaction, they will get tempoary bonds for "
+                            "in the reaction, they will get temporary bonds for "
                             "the start of the slow growth simulation."
                         )
                         ow = None
