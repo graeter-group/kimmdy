@@ -295,9 +295,8 @@
     },
     "edr": {
       "title": "edr",
-      "description": ".edr file of a finished simulation for starting directly with a reaction",
-      "type": "string",
-      "pytype": "Path"
+      "deprecated": true,
+      "description": "This is deprecated and no longer required."
     },
     "restart": {
       "title": "restart",
