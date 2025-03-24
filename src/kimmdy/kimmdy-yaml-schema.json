@@ -49,6 +49,12 @@
           "description": "Command to (re)submit the jobscript. Default is `sbatch`. For local testing replace with an empty string do run the jobscript directly.",
           "pytype": "str",
           "default": "sbatch"
+        },
+        "partition": {
+          "type": "string",
+          "description": "HPC partition",
+          "pytype": "str",
+          "default": "<your-partition>"
         }
       },
       "additionalProperties": false
