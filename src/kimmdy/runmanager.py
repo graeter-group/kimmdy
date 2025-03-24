@@ -893,7 +893,7 @@ class RunManager:
                     grompp_cmd += f" -time {time}"
                     logger.info(f"Starting MD from time: {time} ps of the trr")
 
-            logger.debug(f"grompp cmd: {grompp_cmd}")
+            logger.info(f"grompp cmd: {grompp_cmd}")
 
         timings = self.timeinfos.get(instance)
         if timings is None:
