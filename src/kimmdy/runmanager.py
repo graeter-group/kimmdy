@@ -893,8 +893,6 @@ class RunManager:
                     grompp_cmd += f" -time {time}"
                     logger.info(f"Starting MD from time: {time} ps of the trr")
 
-            logger.info(f"grompp cmd: {grompp_cmd}")
-
         timings = self.timeinfos.get(instance)
         if timings is None:
             m = f"Time info from mdp file for instance {instance} not found."
@@ -930,10 +928,12 @@ class RunManager:
             plumed_out = files.outputdir / get_plumed_out(plumed_in)
             files.output["plumed_out"] = plumed_out
 
-        logger.debug(f"mdrun cmd: {mdrun_cmd}")
         try:
             if not continue_md and grompp_cmd is not None:
+                logger.info(f"starting grompp: {grompp_cmd}")
                 run_gmx(grompp_cmd, outputdir)
+
+            logger.info(f"starting mdrun: {mdrun_cmd}")
             run_gmx(mdrun_cmd, outputdir)
 
             # specify trr to prevent rotref trr getting set as standard trr
@@ -944,13 +944,6 @@ class RunManager:
         except CalledProcessError as e:
             write_time_marker(files.outputdir / MARK_FAILED, "failed")
             logger.error(f"Error occured during MD {instance}:\n{e}")
-
-            # TODO: debug
-            # attempt to write out the first frame as gro
-            # for easier debugging in VMD
-            dump_cmd = rf"echo '0\n' | {gmx_alias} trjconv -s {instance}.tpr -f {instance}.xtc -dump 0 -o {instance}_start.gro"
-            run_gmx(dump_cmd, outputdir)
-
             raise e
 
         logger.info(f"Done with MD {instance}")
