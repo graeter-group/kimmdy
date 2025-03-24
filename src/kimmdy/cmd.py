@@ -175,7 +175,7 @@ def _run(args: argparse.Namespace):
                 logger.error(m)
                 raise ValueError(m)
             content = jobscript.format(config=config).strip("\n")
-            path = "jobscript.sh"
+            path = f"jobscript-{config.out.name}.sh"
 
             with open(path, "w") as f:
                 f.write(textwrap.dedent(content))
