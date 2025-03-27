@@ -75,6 +75,7 @@ def configure_logger(config: Config):
             "kimmdy": {
                 "level": config.log.level.upper(),
                 "handlers": ["cmd", "file"],
+                "propagate": False,
             },
         },
         # Mute others, e.g. tensorflow, matplotlib
@@ -83,6 +84,17 @@ def configure_logger(config: Config):
             "handlers": ["null"],
         },
     }
+
+    # flush all handlers
+    logging.shutdown()
+
+    # clean up old loggers and handlers
+    logger_names = list(logging.Logger.manager.loggerDict.keys())
+    for name in logger_names:
+        logger = logging.getLogger(name)
+        logger.handlers = []
+
+
     logging.config.dictConfig(log_conf)
 
     # symlink logfile of the latest run to kimmdy.log in cwd
@@ -233,7 +245,6 @@ class Config:
                     "Config initialized without input file, can't copy to output directory."
                 )
 
-            # use the constructed config to set up the logger
             configure_logger(self)
 
     def _set_defaults(
