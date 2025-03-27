@@ -5,7 +5,6 @@ Other entry points such as `kimmdy-analysis` also live here.
 
 import argparse
 import logging
-import logging.config
 import sys
 import textwrap
 from os import chmod
@@ -28,8 +27,6 @@ if sys.version_info > (3, 10):
     from importlib_metadata import version
 else:
     from importlib.metadata import version
-
-logger = logging.getLogger(__name__)
 
 
 def get_cmdline_args() -> argparse.Namespace:
@@ -154,6 +151,7 @@ def _run(args: argparse.Namespace):
             restart=args.restart,
         )
 
+        logger = logging.getLogger(__name__)
         logger.info("Welcome to KIMMDY")
 
         # write out collected log messages
@@ -167,45 +165,55 @@ def _run(args: argparse.Namespace):
         for warning in CONFIG_LOGS["warnings"]:
             logger.warning(warning)
 
-        runmgr = RunManager(config)
+        # reset log messages
+        # so they are not printed again
+        # for a new run in the same python session
+        CONFIG_LOGS["infos"] = []
+        CONFIG_LOGS["warnings"] = []
+        CONFIG_LOGS["errors"] = []
+        CONFIG_LOGS["debugs"] = []
 
         if args.generate_jobscript:
+            path = f"jobscript-{config.out.name}.sh"
+            logger.info(f"Generating jobscript {path}")
             if config.max_hours == 0:
                 m = f"kimmdy.config.max_hours is set to 0, which would create a non-sensical jobscript."
                 logger.error(m)
                 raise ValueError(m)
             content = jobscript.format(config=config).strip("\n")
-            path = f"jobscript-{config.out.name}.sh"
 
             with open(path, "w") as f:
                 f.write(textwrap.dedent(content))
 
             chmod(path, 0o755)
-        else:
-            if args.callgraph:
-                try:
-                    from pycallgraph2 import PyCallGraph
-                    from pycallgraph2.config import Config as Vis_conf
-                    from pycallgraph2.globbing_filter import GlobbingFilter
-                    from pycallgraph2.output import GraphvizOutput
-                except ImportError as e:
-                    logger.error(
-                        "pycallgraph2 needed for call visualization. Get it with `pip install pycallgraph2`"
-                    )
-                    exit()
+            return
 
-                out = GraphvizOutput()
-                out.output_type = "svg"
-                trace_filter = GlobbingFilter(
-                    exclude=["pycallgraph.*"],
-                    include=["kimmdy.*"],
+        runmgr = RunManager(config)
+
+        if args.callgraph:
+            try:
+                from pycallgraph2 import PyCallGraph
+                from pycallgraph2.config import Config as Vis_conf
+                from pycallgraph2.globbing_filter import GlobbingFilter
+                from pycallgraph2.output import GraphvizOutput
+            except ImportError as e:
+                logger.error(
+                    "pycallgraph2 needed for call visualization. Get it with `pip install pycallgraph2`"
                 )
-                vis_conf = Vis_conf(trace_filter=trace_filter)
-                with PyCallGraph(output=out, config=vis_conf):
-                    runmgr.run()
+                exit()
 
-            else:
+            out = GraphvizOutput()
+            out.output_type = "svg"
+            trace_filter = GlobbingFilter(
+                exclude=["pycallgraph.*"],
+                include=["kimmdy.*"],
+            )
+            vis_conf = Vis_conf(trace_filter=trace_filter)
+            with PyCallGraph(output=out, config=vis_conf):
                 runmgr.run()
+                return
+
+        runmgr.run()
 
     except Exception as e:
         if args.debug:
