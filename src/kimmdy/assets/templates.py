@@ -1,8 +1,8 @@
 jobscript = """
 #!/bin/env bash
 #SBATCH --job-name={config.out.name}
-#SBATCH --output={config.out.name}-job.log
-#SBATCH --error={config.out.name}-job.log
+#SBATCH --output={config.out.name}.slurm.out
+#SBATCH --error={config.out.name}.slurm.err
 #SBATCH --time={config.max_hours}:00:00
 #SBATCH --nodes={config.slurm.N}
 #SBATCH --ntasks-per-node={config.slurm.ntasks_per_node}
