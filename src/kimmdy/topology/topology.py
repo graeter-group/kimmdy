@@ -12,7 +12,7 @@ from kimmdy.constants import (
     RESNR_ID_FIELDS,
     FFFUNC,
 )
-from kimmdy.parsing import TopologyDict, empty_section
+from kimmdy.parsing import TopologyDict, empty_section, read_top
 from kimmdy.plugins import BasicParameterizer, Parameterizer
 from kimmdy.recipe import Bind, Break, RecipeStep
 from kimmdy.topology.atomic import (
@@ -681,6 +681,29 @@ class Topology:
         list of atoms ids around which the parameterization happens (to avoid re-parameterizing the whole Reactive moleculetype)
     """
 
+    @classmethod
+    def from_path(cls, path: str|Path, ffdir: str|Path|None=None, **kwargs):
+        """Load a Topology object from a file path.
+
+        Simplifies the `Topology(read_top(...), ...)` pattern.
+
+        Parameters
+        ----------
+        path
+            Path to the topology file.
+        kwargs
+            Additional keyword arguments to pass to the Topology constructor.
+
+        Returns
+        -------
+        Topology
+        """
+        if isinstance(path, str):
+            path = Path(path)
+        if isinstance(ffdir, str):
+            ffdir = Path(ffdir)
+        return cls(read_top(path=path, ffdir=ffdir), **kwargs)
+
     def __init__(
         self,
         top: TopologyDict,
@@ -689,7 +712,7 @@ class Topology:
         radicals: Optional[str] = None,
         residuetypes_path: Optional[Path] = None,
         reactive_nrexcl: Optional[str] = None,
-    ) -> None:
+    ):
         if top == {}:
             raise NotImplementedError(
                 "Generating an empty Topology from an empty TopologyDict is not implemented."
