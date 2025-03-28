@@ -2,6 +2,9 @@
 Constants used throughout KIMMDY
 """
 
+import sys
+
+
 CONFIG_LOGS = {
     "infos": [],
     "warnings": [],
@@ -13,6 +16,9 @@ the the config can't use the logger.
 Instead it collects the logmessages and displays them at the end.
 """
 
+FIELD_SIZE_LIMIT = sys.maxsize
+"""Maximum size of a field when reading a RecipeCollection from csv file.
+"""
 
 MARK_STARTED = ".kimmdy_started"
 MARK_DONE = ".kimmdy_done"
