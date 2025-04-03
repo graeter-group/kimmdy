@@ -503,7 +503,7 @@ def write_plumed(d: Plumed_dict, path: Path) -> None:
             )
 
 
-def read_distances_dat(distances_dat: Path, stride: int=1) -> dict:
+def read_distances_dat(path: Path, stride: int=1) -> dict:
     """Read a distances.dat plumed output file.
 
     A typical file looks like this:
@@ -513,7 +513,7 @@ def read_distances_dat(distances_dat: Path, stride: int=1) -> dict:
     0.000000 0.153211 0.157662 0.139923 ...
     ```
     """
-    with open(distances_dat, "r") as f:
+    with open(path, "r") as f:
         colnames = f.readline()[10:].strip().split()
         d = {c: [] for c in colnames}
         for i,l in enumerate(f):
@@ -521,7 +521,7 @@ def read_distances_dat(distances_dat: Path, stride: int=1) -> dict:
                 continue
             if '#' in l:
                 i = l.find('#')
-                logger.warning(f'Found second header in plumed file {distances_dat.name} in {distances_dat.parent.name}. Ignoring the rest of the line.')
+                logger.warning(f'Found second header in plumed file {path.name} in {path.parent.name}. Ignoring the rest of the line.')
                 l = l[:i]
 
             values = l.strip().split()
