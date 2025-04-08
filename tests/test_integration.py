@@ -5,11 +5,9 @@ from pathlib import Path
 import pytest
 
 from kimmdy.cmd import kimmdy_run
-from kimmdy.config import Config
 from kimmdy.constants import MARK_DONE, MARK_FINISHED
 from kimmdy.parsing import read_top, write_top
-from kimmdy.plugins import discover_plugins, parameterization_plugins
-from kimmdy.runmanager import RunManager
+from kimmdy.plugins import parameterization_plugins
 from kimmdy.topology.topology import Topology
 from kimmdy.utils import get_task_directories
 
@@ -245,8 +243,6 @@ def test_integration_file_usage(arranged_tmp_path):
                     1
                 ].strip()
 
-    assert tasks["0_setup"]["output"]["gro"] == "0_setup/npt.gro"
-
     assert tasks["5_apply_recipe"]["output"]["gro"] == "6_relax/relax.gro"
     assert tasks["5_apply_recipe"]["output"]["trr"] == "6_relax/relax.trr"
     assert tasks["5_apply_recipe"]["output"]["xtc"] == "6_relax/relax.xtc"
@@ -254,7 +250,7 @@ def test_integration_file_usage(arranged_tmp_path):
 
     assert tasks["6_relax"]["input"]["top"] == "5_apply_recipe/Ala_out_relax.top"
     assert tasks["6_relax"]["input"]["gro"] == "2_equilibrium/.kimmdy_reaction.gro"
-    assert tasks["6_relax"]["input"]["trr"] == "2_equilibrium/.kimmdy_reaction.trr"
+    assert tasks["6_relax"]["input"]["trr"] == "2_equilibrium/equilibrium.trr"
     assert tasks["6_relax"]["output"]["trr"] == "6_relax/relax.trr"
     assert tasks["6_relax"]["output"]["xtc"] == "6_relax/relax.xtc"
 

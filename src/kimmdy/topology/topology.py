@@ -689,7 +689,6 @@ class Topology:
         radicals: Optional[str] = None,
         residuetypes_path: Optional[Path] = None,
         reactive_nrexcl: Optional[str] = None,
-        gromacs_alias: str = "gmx",
     ) -> None:
         if top == {}:
             raise NotImplementedError(

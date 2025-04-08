@@ -21,6 +21,8 @@ from pprint import pformat
 from subprocess import CalledProcessError
 from typing import Callable, Optional
 
+from attr import dataclass
+
 from kimmdy.config import Config
 from kimmdy.constants import (
     MARK_DONE,
@@ -43,7 +45,7 @@ from kimmdy.kmc import (
     multi_rfkmc,
     total_index_to_index_within_plugin,
 )
-from kimmdy.parsing import read_top, write_json, write_time_marker, write_top
+from kimmdy.parsing import read_mdp, read_top, write_json, write_time_marker, write_top
 from kimmdy.plugins import (
     BasicParameterizer,
     ReactionPlugin,
@@ -66,7 +68,7 @@ from kimmdy.utils import (
     flatten_recipe_collections,
     get_task_directories,
     run_gmx,
-    write_coordinate_files_at_reaction_time,
+    write_gro_at_reaction_time,
     write_reaction_time_marker,
 )
 
@@ -102,6 +104,14 @@ class State(Enum):
     MD = auto()
     REACTION = auto()
     DONE = auto()
+
+
+@dataclass
+class TimeInfo:
+    nsteps: int
+    dt: float
+    trr_nst: int
+    xtc_nst: int
 
 
 def get_existing_files(config: Config, section: str = "config") -> dict:
@@ -194,6 +204,9 @@ class RunManager:
         self.histfile: Path = self.config.out / "kimmdy.history"
         self.cptfile: Path = self.config.out / "kimmdy.cpt"
         self.kmc_algorithm: str
+        # keep track of mdp files for MD instances
+        self.mdps = {}
+        self.timeinfos: dict[str, TimeInfo] = {}
 
         with open(self.histfile, "w") as f:
             f.write("KIMMDY task file history\n")
@@ -227,7 +240,6 @@ class RunManager:
             radicals=getattr(self.config, "radicals", None),
             residuetypes_path=getattr(self.config, "residuetypes", None),
             reactive_nrexcl=nrexcl,
-            gromacs_alias=self.config.gromacs_alias,
         )
         self.filehist: list[dict[str, TaskFiles]] = [
             {"0_setup": TaskFiles(self.get_latest)}
@@ -272,6 +284,7 @@ class RunManager:
         }
         """Mapping of task names to functions and their keyword arguments."""
 
+        self._setup_mdps()
         self._setup_tasks()
 
     def run(self):
@@ -540,18 +553,19 @@ class RunManager:
             out="setup",
         )
         self.tasks.put(task)
+
         # configured sequence
         for task_name in self.config.sequence:
             if task_name in self.config.mds.get_attributes():
                 # entry is a type of MD
-                md = self.task_mapping["md"]
-                kwargs: dict = copy(md["kwargs"])
+                md_task = self.task_mapping["md"]
+                kwargs: dict = copy(md_task["kwargs"])
                 kwargs.update({"instance": task_name})
                 if task_name is None:
                     raise ValueError("MD task name is None")
                 task = Task(
                     self,
-                    f=md["f"],
+                    f=md_task["f"],
                     kwargs=kwargs,
                     out=task_name,
                 )
@@ -575,6 +589,109 @@ class RunManager:
                 logger.error(m)
                 raise ValueError(m)
         logger.info(f"Task list build:\n{pformat(list(self.tasks.queue), indent=8)}")
+
+    def _setup_mdps(self):
+        # parse mdps of md tasks
+        if hasattr(self.config, "mds"):
+            for md_name in self.config.mds.get_attributes():
+                md_config = self.config.mds.attr(md_name)
+                mdp_path: Path = md_config.mdp
+                mdp = read_mdp(mdp_path)
+                self.mdps[md_name] = mdp
+
+        # parse mdp of trajectories used as input
+        trr_path: Path | None = None
+        xtc_path: Path | None = None
+        if hasattr(self.config, "trr"):
+            trr_path = self.config.trr
+        if hasattr(self.config, "xtc"):
+            xtc_path = self.config.xtc
+        if hasattr(self.config, "mdp"):
+            mdp_path: Path = self.config.mdp
+            mdp = read_mdp(mdp_path)
+            self.mdps[mdp_path.stem] = mdp
+        elif trr_path is not None or xtc_path is not None:
+            # if mdp is not defined, try to infer it from the name of the input trr or xtc
+            if trr_path is not None:
+                mdp_path = trr_path.with_suffix(".mdp")
+            elif xtc_path is not None:
+                mdp_path = xtc_path.with_suffix(".mdp")
+            else:
+                m = "No trr or xtc file defined in the config. Specify the path to the mdp file manually with the mdp: option in the config."
+                logger.error(m)
+                raise FileNotFoundError(m)
+            if not mdp_path.exists():
+                m = f"MDP file for {trr_path} with name {mdp_path} does not exist. Specify the path to the mdp file manually with the mdp: option in the config."
+                logger.error(m)
+                raise FileNotFoundError(m)
+            mdp = read_mdp(mdp_path)
+            self.mdps[mdp_path.stem] = mdp
+
+        # validate
+        relax_md = None
+        relax_is_slow_growth = {}
+        if hasattr(self.config.changer.coordinates, "md"):
+            relax_config = self.config.changer.coordinates
+            relax_md = relax_config.md
+            relax_is_slow_growth[relax_md] = (
+                relax_config.slow_growth is not False
+            )  # it's either morse_only or True
+        for k, v in self.mdps.items():
+            if k == relax_md and relax_is_slow_growth.get(k) is True:
+                if v.get("free-energy") is not True:
+                    m = f"Specified relaxation md {relax_md} designated as slow-growth md, but its mdp file doesn't set free-energy = true/yes."
+                    logger.error(m)
+                    raise ValueError(m)
+                if v.get("gen-vel") is True:
+                    m = f"Specified relaxation md {relax_md} has gen-vel true, which may make the trajectory less continuous and the transition."
+                    logger.warning(m)
+
+            nsteps = v.get("nsteps")
+            dt = v.get("dt")
+            trr_nst = v.get("nstxout")
+            xtc_nst = v.get("nstxtcout")
+            if xtc_nst is None:
+                xtc_nst = v.get("nstxout-compressed")
+            if nsteps is None:
+                m = f"MDP file for {k} does not contain nsteps."
+                logger.error(m)
+                raise ValueError(m)
+            if dt is None:
+                m = f"MDP file for {k} does not contain dt."
+                logger.error(m)
+                raise ValueError(m)
+            if xtc_nst is None:
+                m = f"MDP file for {k} does not contain nstxtcout or nstxout-compressed."
+                logger.error(m)
+                raise ValueError(m)
+            if trr_nst is None:
+                m = f"MDP file for {k} does not contain nstxout."
+                logger.error(m)
+                raise ValueError(m)
+            else:
+                trr_nst = int(trr_nst)
+
+            if trr_nst == 0:
+                vout = v.get("nstvout")
+                fout = v.get("nstfout")
+                if vout is not None and vout != 0:
+                    m = f"nstvout is {vout} for mdp {k}, but nstxout is 0. This will create useless trr files."
+                    logger.error(m)
+                    raise ValueError(m)
+                if fout is not None and fout != 0:
+                    m = f"nstfout is {fout} for mdp {k}, but nstxout is 0. This will create useless trr files."
+                    logger.error(m)
+                    raise ValueError(m)
+                m = "This MD will not write trr files because nstxout is 0. This will be a pure xtc run."
+                logger.warning(m)
+
+            # keep track of time info for each md instance
+            self.timeinfos[k] = TimeInfo(
+                nsteps=int(nsteps),
+                dt=float(dt),
+                trr_nst=trr_nst,
+                xtc_nst=int(xtc_nst),
+            )
 
     def get_latest(self, suffix: str) -> Path | None:
         """Returns path to latest file of given type.
@@ -698,14 +815,9 @@ class RunManager:
 
         write_top(self.top.to_dict(), files.outputdir / self.config.top.name)
         files.output["top"] = files.outputdir / self.config.top.name
-        logger.info("Done with setup")
 
-        # TODO: find a better solution for this
-        #
-        # copy input files that are potentially modified
-        # to the setup task directory
-        # by applying a recipe (e.g. by trunkate_sim_files)
-        for f in ["xtc", "tpr", "trr", "plumed", "gro"]:
+        # copy small configuration files, but not full trajectories, to 0_setup
+        for f in ["tpr", "gro", "mdp", "plumed"]:
             if hasattr(self.config, f):
                 if path := self.latest_files.get(f):
                     logger.debug(f"Copying {path} to {files.outputdir}")
@@ -714,10 +826,25 @@ class RunManager:
                     )
                     files.output[f] = files.outputdir / path.name
 
+        if hasattr(self.config, "mds"):
+            for md_name in self.config.mds.get_attributes():
+                md_config = self.config.mds.attr(md_name)
+                mdp_path: Path = md_config.mdp
+                logger.debug(f"Copying {mdp_path} to {files.outputdir}")
+                shutil.copy(
+                    mdp_path, files.outputdir / mdp_path.name, follow_symlinks=False
+                )
+
+        logger.info("Done with setup")
+
         return files
 
     def _run_md(
-        self, instance: str, files: TaskFiles, continue_md: bool = False
+        self,
+        instance: str,
+        files: TaskFiles,
+        continue_md: bool = False,
+        time: float | None = None,
     ) -> TaskFiles:
         """General MD simulation"""
         logger = files.logger
@@ -734,14 +861,21 @@ class RunManager:
         files.input["mdp"] = md_config.mdp
         mdp = files.input["mdp"]
         ndx = files.input["ndx"]
-        logger.debug(f"Using the following input files: top: {top}, gro: {gro}")
+        logger.debug(
+            f"Using the following input files: top: {top}, gro: {gro}, mdp: {mdp}"
+        )
 
         outputdir = files.outputdir
+
+        # copy mdp file to output directory for reference
+        # using the name of the instance for inferability
+        shutil.copy(mdp, outputdir / f"{instance}.mdp")
 
         # to continue MD after timeout
         if continue_md:
             cpt = files.input["cpt"]
             logger.info(f"Restart from checkpoint file: {cpt}")
+            grompp_cmd = None
         else:
             cpt = f"{instance}.cpt"
 
@@ -754,17 +888,30 @@ class RunManager:
             if self.latest_files.get("trr") is not None:
                 trr = files.input["trr"]
                 grompp_cmd += f" -t {trr}"
-            if self.latest_files.get("edr") is not None:
-                edr = files.input["edr"]
-                if edr is not None and edr.exists():
-                    grompp_cmd += f" -e {edr}"
-                else:
-                    logger.warning(f"edr file {edr} not found")
+                if time is not None:
+                    # start the relaxation or next MD from the chosen reaction time
+                    # that is already rounded to the nearest trr frame in _decide_recipe.
+                    grompp_cmd += f" -time {time}"
+                    logger.info(f"Starting MD from time: {time} ps of the trr")
+
             logger.debug(f"grompp cmd: {grompp_cmd}")
+
+        timings = self.timeinfos.get(instance)
+        if timings is None:
+            m = f"Time info from mdp file for instance {instance} not found."
+            logger.error(m)
+            raise ValueError(m)
+
+        if timings.trr_nst is not None:
+            # no trr output, only xtc
+            trr_out = f"-o {instance}.trr "
+        else:
+            trr_out = ""
 
         mdrun_cmd = (
             f"{mdrun_prefix + ' ' if mdrun_prefix else ''}{gmx_alias} mdrun -s {instance}.tpr -cpi {cpt} "
-            f"-x {instance}.xtc -o {instance}.trr "
+            f"-x {instance}.xtc "
+            f"{trr_out}"
             f"-cpo {instance}.cpt "
             f"-c {instance}.gro -g {instance}.log -e {instance}.edr "
             f"-px {instance}_pullx.xvg -pf {instance}_pullf.xvg "
@@ -786,7 +933,7 @@ class RunManager:
 
         logger.debug(f"mdrun cmd: {mdrun_cmd}")
         try:
-            if continue_md is False:
+            if not continue_md and grompp_cmd is not None:
                 run_gmx(grompp_cmd, outputdir)
             run_gmx(mdrun_cmd, outputdir)
 
@@ -919,6 +1066,28 @@ class RunManager:
                 logger.error(f"Error during KMC: {self.kmcresult}")
             return files
 
+        # round time_start to the nearest frame in the trr or xtc if no trr is written
+        latest_trr = self.get_latest("trr")
+        if latest_trr is not None:
+            md_instance_name = latest_trr.stem
+            timings = self.timeinfos.get(md_instance_name)
+            if timings is None:
+                m = f"MD instance {md_instance_name} not found in timeinfos."
+                logger.error(m)
+                raise ValueError(m)
+            logger.info(f"time_start: {self.kmcresult.time_start}")
+            nst = timings.trr_nst
+            if nst is None:
+                nst = timings.xtc_nst
+            dt_frame = timings.dt * nst
+            # round to nearest frame and then to 3 decimals (1 fs) to avoid floating point errors
+            self.kmcresult.time_start = round(
+                round(self.kmcresult.time_start / dt_frame) * dt_frame, 3
+            )
+            logger.info(
+                f"adjusted time_start: {self.kmcresult.time_start} to nearest trr frame of {md_instance_name} with timings {timings} and dt_trr {dt_frame}"
+            )
+
         # Correct the offset of time_start_index by the concatenation
         # of all rates of all recipes from all reactions back onto the offset
         # within the one chosen reaction plugin
@@ -1040,12 +1209,11 @@ class RunManager:
         # but this only happens after the apply_recipe task
         # so we need to set it manually here for intermediate tasks
         # like Relax and Place to have the correct coordinates
-        logger.info(f"Writing coordinates (gro and trr) and energy (edr) for reaction.")
+        logger.info(f"Writing coordinates gro for starting time of the reaction.")
         if ttime is not None:
-            write_coordinate_files_at_reaction_time(files=files, time=ttime)
+            # don't use trr and edr, use the `-time` flag of gmx grompp instead
+            write_gro_at_reaction_time(files=files, time=ttime)
             self.latest_files["gro"] = files.output["gro"]
-            self.latest_files["trr"] = files.output["trr"]
-            self.latest_files["edr"] = files.output["edr"]
 
         top_initial = deepcopy(self.top)
         for step in recipe.recipe_steps:
@@ -1166,7 +1334,7 @@ class RunManager:
                 relax_task = Task(
                     self,
                     f=self._run_md,
-                    kwargs={"instance": md_instance},
+                    kwargs={"instance": md_instance, "time": self.kmcresult.time_start},
                     out=md_instance,
                 )
                 relax_task_files = relax_task()

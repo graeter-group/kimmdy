@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING, Optional, Union
 
 import numpy as np
 
-from kimmdy.constants import MARK_REACION_TIME, REACTION_EDR, REACTION_GRO, REACTION_TRR
+from kimmdy.constants import MARK_REACION_TIME, REACTION_GRO
 from kimmdy.recipe import RecipeCollection
 from kimmdy.constants import CONFIG_LOGS
 
@@ -403,7 +403,7 @@ def read_reaction_time_marker(dir: Path) -> float | None:
         return float(f.read())
 
 
-def write_coordinate_files_at_reaction_time(files: TaskFiles, time: float):
+def write_gro_at_reaction_time(files: TaskFiles, time: float):
     """Write out a gro file from the trajectory (xtc or trr) at the reaction time."""
     gro = files.input["gro"]
     if gro is None:
@@ -416,49 +416,28 @@ def write_coordinate_files_at_reaction_time(files: TaskFiles, time: float):
         logger.error(m)
 
     gro_reaction = gro.with_name(REACTION_GRO)
-    trr_reaction = gro.with_name(REACTION_TRR)
-    edr_reaction = gro.with_name(REACTION_EDR)
 
-    if gro_reaction.exists() or trr_reaction.exists() or edr_reaction.exists():
-        m = f"gro/trr/edr file at reaction time {time} already exists in {gro.parent.name}. Removing it. This may happen by restarting from a previous run."
+    if gro_reaction.exists():
+        m = f"gro file at reaction time {time} already exists in {gro.parent.name}. Removing it. This may happen by restarting from a previous run."
         logger.error(m)
         gro_reaction.unlink(True)
-        trr_reaction.unlink(True)
-        edr_reaction.unlink(True)
 
-    logger.info(
-        f"Writing out gro/trr/edr files at reaction time {time} ps in {gro.parent.name}"
-    )
+    logger.info(f"Writing out gro file at reaction time {time} ps in {gro.parent.name}")
     files.output["gro"] = gro_reaction
-    files.output["trr"] = trr_reaction
-    files.output["edr"] = edr_reaction
 
-    # Prefer xtc over trr
-    # It should have more frames and be smaller,
-    # but sometimes the people only write a specific index group to the xtc,
-    # in which case it fails and we try the trr
-    # FIXME: fixme
-    # this needs proper documetation for plugin authors
-    # because one would want the trr file for the precision and velocities
-    # at the raction time, but plugins may use the xtc file (smaller)
-    # to determine the reaction and reaction time.
-    # this can lead to a mismatch!
     wrote_file = False
     if files.input["xtc"] is not None:
         try:
             run_gmx(
                 f"echo '0' | gmx trjconv -f {files.input['xtc']} -s {gro} -b {time} -dump {time} -o {gro_reaction}"
             )
-            run_gmx(
-                f"echo '0' | gmx trjconv -f {files.input['xtc']} -s {gro} -b {time} -dump {time} -o {trr_reaction}"
-            )
             logger.info(
-                f"Successfully wrote out gro/trr file {trr_reaction.name} at reaction time in {gro.parent.name} from xtc file."
+                f"Successfully wrote out gro file {gro_reaction.name} at reaction time in {gro.parent.name} from xtc file."
             )
             wrote_file = True
         except sp.CalledProcessError:
             logger.error(
-                f"Failed to write out gro/trr file {trr_reaction.name} at reaction time in {gro.parent.name} from xtc file because the xtc doesn't contain all atoms. Will try trr file."
+                f"Failed to write out gro/trr file {gro_reaction.name} at reaction time in {gro.parent.name} from xtc file because the xtc doesn't contain all atoms. Will try trr file."
             )
 
     if files.input["trr"] is not None:
@@ -466,29 +445,13 @@ def write_coordinate_files_at_reaction_time(files: TaskFiles, time: float):
             run_gmx(
                 f"echo '0' | gmx trjconv -f {files.input['trr']} -s {gro} -b {time} -dump {time} -o {gro_reaction}"
             )
-            run_gmx(
-                f"echo '0' | gmx trjconv -f {files.input['trr']} -s {gro} -b {time} -dump {time} -o {trr_reaction}"
-            )
             logger.info(
-                f"Successfully wrote out gro/trr file at reaction time in {gro.parent.name} from trr file."
+                f"Successfully wrote out gro file at reaction time in {gro.parent.name} from trr file."
             )
             wrote_file = True
         except sp.CalledProcessError:
             logger.error(
-                f"Failed to write out gro/trr file at reaction time in {gro.parent.name} from trr file."
-            )
-
-    if files.input["edr"]:
-        try:
-            run_gmx(
-                f"gmx eneconv -f {files.input['edr']} -b {time} -e {time} -o {edr_reaction}"
-            )
-            logger.info(
-                f"Successfully wrote out edr file at reaction time in {gro.parent.name} from edr file."
-            )
-        except sp.CalledProcessError:
-            logger.error(
-                f"Failed to write out edr file at reaction time in {gro.parent.name} from edr file."
+                f"Failed to write out gro file at reaction time in {gro.parent.name} from trr file."
             )
 
     if not wrote_file:
