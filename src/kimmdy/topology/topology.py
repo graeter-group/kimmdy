@@ -203,6 +203,21 @@ class MoleculeType:
                         *key, dihedral.funct, dihedrals={}
                     )
                 self.proper_dihedrals[key].dihedrals[dihedral.periodicity] = dihedral
+        ls = self.atomics.pop("impropers", None)
+        if ls is None:
+            return
+        for l in ls:
+            l[4] = FFFUNC["mult_improper_dihedral"]
+            dihedral = Dihedral.from_top_line(l)
+            key = (dihedral.ai, dihedral.aj, dihedral.ak, dihedral.al)
+            # TODO this will break with different improper types (eg charmm) but I dont know how to deal with several _parse_dihedrals_ calls
+            if self.improper_dihedrals.get(key) is None:
+                self.improper_dihedrals[key] = MultipleDihedrals(
+                    *key, dihedral.funct, dihedrals={}
+                )
+
+            self.improper_dihedrals[key].dihedrals[dihedral.periodicity] = dihedral
+        self.atomics["dihedrals"].extend(ls)
 
     def _parse_restraints(self):
         """Parse restraints from topology dictionary."""
