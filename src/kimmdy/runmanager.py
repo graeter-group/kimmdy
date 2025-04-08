@@ -1227,6 +1227,8 @@ class RunManager:
                     )
             elif isinstance(step, Bind):
                 self.top.bind_bond((step.atom_id_1, step.atom_id_2))
+            elif isinstance(step, CustomTopMod):
+                self.top = step.f(self.top)
             elif isinstance(step, Place):
                 relax_task = Task(
                     self,
@@ -1312,20 +1314,19 @@ class RunManager:
                         ),
                     )
 
-                    top_merge = merge_top_slow_growth(
-                        # top_a was copied before parameters are updated
+                    # top_a was copied before parameters are updated
+                    # top_b is parameterized for after the reaction
+                    # top_a is modified and returned as the merged top
+                    merge_top_slow_growth(
                         top_a=top_initial,
-                        # top_b is parameterized for after the reaction
-                        # top_b is modified and returned as the merged top
-                        # hence it must be copied here to not modify self.top
-                        top_b=deepcopy(self.top),
+                        top_b=self.top,
                         morse_only=self.config.changer.coordinates.slow_growth
                         == "morse_only",
                     )
                     top_merge_path = files.outputdir / self.config.top.name.replace(
                         ".top", "_relax.top"
                     )
-                    write_top(top_merge.to_dict(), top_merge_path)
+                    write_top(top_initial.to_dict(), top_merge_path)
                     # declare this temporary topolgy the latest topology
                     # such that it will be used for the subsequent relax md task
                     self.latest_files["top"] = top_merge_path
@@ -1340,9 +1341,6 @@ class RunManager:
                 if relax_task_files is not None:
                     self._discover_output_files(relax_task.name, relax_task_files)
                     shadow_files_binding = relax_task_files
-
-            elif isinstance(step, CustomTopMod):
-                step.f(self.top)
 
         logger.info(f"Updating partial charges")
         self.top.update_partial_charges(recipe.recipe_steps)

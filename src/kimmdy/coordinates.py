@@ -115,7 +115,6 @@ def get_explicit_or_type(
     interaction_types: InteractionTypes,
     mol: MoleculeType,
     periodicity: str = "",
-    use_state_b: bool = False,
 ) -> Union[Interaction, AtomicType, None]:
     """Takes an Interaction and associated key, InteractionTypes, Topology
     and Periodicity (for dihedrals) and returns an object with the parameters of this Interaction
@@ -126,14 +125,7 @@ def get_explicit_or_type(
     if is_parameterized(interaction):
         return interaction
 
-    if use_state_b:
-        type_key = []
-        for id in key:
-            t = getattr(mol.atoms[id], "typeB", None)
-            t = t if t else mol.atoms[id].type
-            type_key.append(t)
-    else:
-        type_key = [mol.atoms[x].type for x in key]
+    type_key = [mol.atoms[x].type for x in key]
 
     atomic_type = match_atomic_item_to_atomic_type(
         type_key, interaction_types, periodicity
@@ -177,7 +169,10 @@ class AffectedInteractions:
 
 
 class MoleculeTypeMerger:
-    """Takes two MoleculeTypes and joins them for a smooth free-energy like parameter transition simulation"""
+    """Takes two MoleculeTypes and joins them for a smooth free-energy like parameter transition simulation.
+
+    mol_a is modified in place.
+    """
 
     def __init__(
         self,
@@ -202,8 +197,8 @@ class MoleculeTypeMerger:
 
         self.affected_interactions = AffectedInteractions()
 
-    def merge(self) -> MoleculeType:
-        """modiefies mol_b, the reactive moleculetype of of top_b, in place"""
+    def merge(self):
+        """modiefies mol_a, the reactive moleculetype of of top_a, in place"""
         logger.info(f"Merging topologies for slow growth")
         self.merge_atoms()
         self.merge_bonds()
@@ -216,30 +211,29 @@ class MoleculeTypeMerger:
             self.add_helper_pairs()
             # sort pairs because their order can get messed up
             # by adding the helper pairs after the already existing pairs
-            self.mol_b.pairs = dict(
+            self.mol_a.pairs = dict(
                 sorted(
-                    self.mol_b.pairs.items(),
+                    self.mol_a.pairs.items(),
                     key=lambda item: (int(item[0][0]), int(item[0][1])),
                 )
             )
             # sort exclusions after adding helper pairs because they
             # come with their own exclusions
-            self.mol_b.exclusions = dict(
+            self.mol_a.exclusions = dict(
                 sorted(
-                    self.mol_b.exclusions.items(),
+                    self.mol_a.exclusions.items(),
                     key=lambda item: [int(i) for i in item[0]],
                 )
             )
         else:
             # same as in (keysA - keysB) in v1
             for key in self.affected_interactions.bonds.removed:
-                self.mol_b.pairs.pop(key, None)
-                self.mol_b.exclusions[key] = Exclusion(*key)
+                self.mol_a.pairs.pop(key, None)
+                self.mol_a.exclusions[key] = Exclusion(*key)
 
         self.amber_fix()
 
         logger.info(f"Finished merging topologies")
-        return self.mol_b
 
     def _get_explicit_MultipleDihedrals(
         self,
@@ -259,15 +253,14 @@ class MoleculeTypeMerger:
             funct = FFFUNC["mult_proper_dihedral"]
 
         if use_state_b:
-            if use_improper:
-                dihedrals_in = self.mol_b.improper_dihedrals.get(key)
-            else:
-                dihedrals_in = self.mol_b.proper_dihedrals.get(key)
+            mol = self.mol_b
         else:
-            if use_improper:
-                dihedrals_in = self.mol_a.improper_dihedrals.get(key)
-            else:
-                dihedrals_in = self.mol_a.proper_dihedrals.get(key)
+            mol = self.mol_a
+
+        if use_improper:
+            dihedrals_in = mol.improper_dihedrals.get(key)
+        else:
+            dihedrals_in = mol.proper_dihedrals.get(key)
 
         if not dihedrals_in:
             return None
@@ -280,12 +273,7 @@ class MoleculeTypeMerger:
 
         type_key = []
         for id in key:
-            if use_state_b:
-                t = getattr(self.mol_b.atoms[id], "typeB", None)
-                t = t if t else self.mol_b.atoms[id].type
-            else:
-                t = self.mol_a.atoms[id].type
-
+            t = mol.atoms[id].type
             type_key.append(t)
 
         multiple_dihedrals = MultipleDihedrals(*key, funct=funct, dihedrals={})
@@ -321,15 +309,12 @@ class MoleculeTypeMerger:
         fudgeQQ = float(self.ff.defaults[0][4])  # not used for now
 
         if use_state_b:
-            t1 = getattr(self.mol_b.atoms[id1], "typeB", None)
-            t2 = getattr(self.mol_b.atoms[id2], "typeB", None)
-            t1 = t1 if t1 else self.mol_b.atoms[id1].type
-            t2 = t2 if t2 else self.mol_b.atoms[id2].type
-            type1 = self.ff.atomtypes[t1]
-            type2 = self.ff.atomtypes[t2]
+            mol = self.mol_b
         else:
-            t1 = self.mol_a.atoms[id1].type
-            t2 = self.mol_a.atoms[id2].type
+            mol = self.mol_a
+
+        t1 = mol.atoms[id1].type
+        t2 = mol.atoms[id2].type
 
         # amber fix for breaking/binding atom types without LJ potential
         if t1 in ["HW", "HO"]:
@@ -546,15 +531,11 @@ class MoleculeTypeMerger:
                 # set B parameters first
                 # to not overwrite them
                 # keep the name of the atom
-                atomB.atom = deepcopy(atomA.atom)
                 # but transition the type, charge and mass
-                atomB.typeB = deepcopy(atomB.type)
-                atomB.type = deepcopy(atomA.type)
-                atomB.chargeB = deepcopy(atomB.charge)
-                atomB.charge = deepcopy(atomA.charge)
-                atomB.massB = deepcopy(atomB.mass)
-                atomB.mass = deepcopy(atomA.mass)
-                atomB.comment = "; morphing atomtypes"
+                atomA.typeB = deepcopy(atomB.type)
+                atomA.chargeB = deepcopy(atomB.charge)
+                atomA.massB = deepcopy(atomB.mass)
+                atomA.comment = "; morphing atomtypes"
                 self.affected_interactions.atoms.add(nr)
 
     def merge_bonds(self):
@@ -578,7 +559,7 @@ class MoleculeTypeMerger:
                 bond_key, bond_a, self.ff.bondtypes, self.mol_a
             )
             bond_b = get_explicit_or_type(
-                bond_key, bond_b, self.ff.bondtypes, self.mol_b, use_state_b=True
+                bond_key, bond_b, self.ff.bondtypes, self.mol_b
             )
 
             if isinstance(bond_a, BondType):
@@ -598,16 +579,7 @@ class MoleculeTypeMerger:
                 continue
 
             atomtypes_a: tuple[str, str] = tuple([self.mol_a.atoms[atom_id].type for atom_id in bond_key])  # type: ignore
-            atomtypes_b: tuple[str, str] = tuple(
-                [
-                    (
-                        t
-                        if (t := getattr(self.mol_b.atoms[id], "typeB", None))
-                        else self.mol_b.atoms[id].type
-                    )
-                    for id in bond_key
-                ]
-            )  # type: ignore
+            atomtypes_b: tuple[str, str] = tuple([self.mol_b.atoms[atom_id].type for atom_id in bond_key])  # type: ignore
 
             sigmaij_a, epsilonij_a = self._get_LJ_parameters(
                 *bond_key, use_state_b=False
@@ -636,7 +608,7 @@ class MoleculeTypeMerger:
                     m = f"In slow-growth, bond functionals need to be harmonic, but {bond_key} is not. It is in A: {bond_a} and B: {bond_b}"
                     logger.error(m)
                     raise ValueError(m)
-                self.mol_b.bonds[bond_key] = Bond(
+                self.mol_a.bonds[bond_key] = Bond(
                     *bond_key,
                     funct=bond_b.funct,
                     c0=bond_a.c0,
@@ -652,7 +624,7 @@ class MoleculeTypeMerger:
                 if self.morse_only:
                     # use a bond that pretends to be LJ via morse
                     # because `simplified` will not touch the pairs
-                    self.mol_b.bonds[bond_key] = Bond(
+                    self.mol_a.bonds[bond_key] = Bond(
                         *bond_key,
                         funct=FFFUNC["morse_bond"],
                         c0=bond_a.c0,  # original bond distance in A
@@ -665,7 +637,7 @@ class MoleculeTypeMerger:
                     )
                 else:
                     # just remove the bond, LJ interactions will be done by the Pair
-                    self.mol_b.bonds[bond_key] = Bond(
+                    self.mol_a.bonds[bond_key] = Bond(
                         *bond_key,
                         funct=FFFUNC["morse_bond"],
                         c0=bond_a.c0,  # original bond distance in A
@@ -687,7 +659,7 @@ class MoleculeTypeMerger:
                 self.affected_interactions.bonds.added.add(pairkey)
                 if self.morse_only:
                     # use a bond that pretends to be LJ via morse
-                    self.mol_b.bonds[bond_key] = Bond(
+                    self.mol_a.bonds[bond_key] = Bond(
                         *bond_key,
                         funct=FFFUNC["morse_bond"],
                         # starts further away, so it can pull in atoms of the bond
@@ -701,7 +673,7 @@ class MoleculeTypeMerger:
                     )
                 else:
                     # just add the bond, LJ interactions will be done by the Pair
-                    self.mol_b.bonds[bond_key] = Bond(
+                    self.mol_a.bonds[bond_key] = Bond(
                         *bond_key,
                         funct=FFFUNC["morse_bond"],
                         # starts further away, so it can pull in atoms of the bond
@@ -735,7 +707,7 @@ class MoleculeTypeMerger:
             )
 
             parameterizedB = get_explicit_or_type(
-                key, angle_b, self.ff.angletypes, self.mol_b, use_state_b=True
+                key, angle_b, self.ff.angletypes, self.mol_b
             )
 
             if parameterizedA is not None and parameterizedB is not None:
@@ -747,7 +719,7 @@ class MoleculeTypeMerger:
                     logger.error(m)
                     raise ValueError(m)
                 # both angles exist -> transition between parameters
-                self.mol_b.angles[key] = Angle(
+                self.mol_a.angles[key] = Angle(
                     *key,
                     funct=parameterizedB.funct,
                     c0=parameterizedA.c0,
@@ -760,7 +732,7 @@ class MoleculeTypeMerger:
                 self.affected_interactions.angles.morphed.add(pairkey)
             elif isinstance(parameterizedA, (Angle, AngleType)):
                 # angle only exists in A -> vanish angle
-                self.mol_b.angles[key] = Angle(
+                self.mol_a.angles[key] = Angle(
                     *key,
                     funct=FFFUNC["harmonic_angle"],
                     c0=parameterizedA.c0,
@@ -773,7 +745,7 @@ class MoleculeTypeMerger:
                 self.affected_interactions.angles.removed.add(pairkey)
             elif isinstance(parameterizedB, (Angle, AngleType)):
                 # angle only exists in B -> create angle
-                self.mol_b.angles[key] = Angle(
+                self.mol_a.angles[key] = Angle(
                     *key,
                     funct=FFFUNC["harmonic_angle"],
                     c0=parameterizedB.c0,
@@ -841,7 +813,7 @@ class MoleculeTypeMerger:
                 else set()
             )
 
-            self.mol_b.proper_dihedrals[key] = MultipleDihedrals(
+            self.mol_a.proper_dihedrals[key] = MultipleDihedrals(
                 *key, funct=FFFUNC["mult_proper_dihedral"], dihedrals={}
             )
 
@@ -857,7 +829,7 @@ class MoleculeTypeMerger:
                     if multiple_dihedralsB
                     else None
                 )
-                self.mol_b.proper_dihedrals[key].dihedrals[periodicity_key] = (
+                self.mol_a.proper_dihedrals[key].dihedrals[periodicity_key] = (
                     self._interpolate_two_dihedrals(
                         key=key,
                         dihedral_a=interactionA,
@@ -888,7 +860,7 @@ class MoleculeTypeMerger:
                 else set()
             )
 
-            self.mol_b.improper_dihedrals[key] = MultipleDihedrals(
+            self.mol_a.improper_dihedrals[key] = MultipleDihedrals(
                 *key, funct=FFFUNC["mult_improper_dihedral"], dihedrals={}
             )
 
@@ -906,7 +878,7 @@ class MoleculeTypeMerger:
                     else None
                 )
 
-                self.mol_b.improper_dihedrals[key].dihedrals[periodicity_key] = (
+                self.mol_a.improper_dihedrals[key].dihedrals[periodicity_key] = (
                     self._interpolate_two_dihedrals(
                         key=key,
                         dihedral_a=interactionA,
@@ -944,15 +916,17 @@ class MoleculeTypeMerger:
                     key[0], key[1], PairTransition.Morph, to_1_4=True
                 )
 
-        self.mol_b.pairs = {}
+        # NOTE: this reqires re-linking top.pairs to top.reactive_molecule.pairs
+        # after wards, because the pairs are not the same objects anymore
+        self.mol_a.pairs = {}
         for key, pair in new_pairs.items():
-            self.mol_b.pairs[key] = pair
+            self.mol_a.pairs[key] = pair
 
     def merge_exclusions(self):
-        """Merge exclusions by adding the exclusions from the A state to the B state"""
+        """Merge exclusions by adding the exclusions from the B state to the A state"""
         logger.info("Merging exclusions")
-        for key in self.mol_a.exclusions.keys():
-            self.mol_b.exclusions[key] = Exclusion(*key)
+        for key in self.mol_b.exclusions.keys():
+            self.mol_a.exclusions[key] = Exclusion(*key)
 
     def add_helper_pairs(self):
         """
@@ -1126,10 +1100,10 @@ class MoleculeTypeMerger:
 
         for key, pair in self.helper_pairs.items():
             if pair is not None:
-                self.mol_b.pairs[key] = pair
+                self.mol_a.pairs[key] = pair
 
             # add general exclusions for each pair
-            self.mol_b.exclusions[key] = Exclusion(*key)
+            self.mol_a.exclusions[key] = Exclusion(*key)
 
     def amber_fix(self):
         """Amber fix for breaking/binding atom types without LJ potential"""
@@ -1138,8 +1112,9 @@ class MoleculeTypeMerger:
             | self.affected_interactions.bonds.removed
         )
         atoms = set([atom for bond in bonds for atom in bond])
+        atoms = atoms | self.affected_interactions.atoms
         for nr in atoms:
-            atom = self.mol_b.atoms[nr]
+            atom = self.mol_a.atoms[nr]
             if atom.type in ["HW", "HO"]:
                 atom.type = "H1"
             if atom.typeB in ["HW", "HO"]:
@@ -1150,7 +1125,7 @@ def merge_top_slow_growth(
     top_a: Topology,
     top_b: Topology,
     morse_only: bool = False,
-) -> Topology:
+):
     """Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation.
     Modifies topB in place.
     All changes are contained to the `Reactive` moleculetype.
@@ -1159,18 +1134,18 @@ def merge_top_slow_growth(
     MoleculeTypeMerger(
         mol_a=top_a.reactive_molecule,
         mol_b=top_b.reactive_molecule,
-        ff=top_b.ff,
+        ff=top_a.ff,
         morse_only=morse_only,
     ).merge()
 
     # because we clear some sections of the moleculetype,
-    # like self.mol_b.pairs = {},
+    # like self.mol_a.pairs = {},
     # breaking the link between
     # `top.pairs` and `top.reactive_molecule.pairs`,
     # we need to re-link them for convenient access
-    top_b._link_atomics()
+    top_a._link_atomics()
 
-    return top_b
+    return
 
 
 def break_bond_plumed(
