@@ -503,7 +503,7 @@ def write_plumed(d: Plumed_dict, path: Path) -> None:
             )
 
 
-def read_distances_dat(path: Path, stride: int=1) -> dict:
+def read_distances_dat(path: Path, dt: float=0) -> dict[float, dict[str, float]]:
     """Read a distances.dat plumed output file.
 
     A typical file looks like this:
@@ -515,27 +515,35 @@ def read_distances_dat(path: Path, stride: int=1) -> dict:
     """
     with open(path, "r") as f:
         colnames = f.readline()[10:].strip().split()
-        d = {c: [] for c in colnames}
+        d = {}
         for i,l in enumerate(f):
-            if i % stride != 0:
-                continue
             if '#' in l:
                 i = l.find('#')
                 logger.warning(f'Found second header in plumed file {path.name} in {path.parent.name}. Ignoring the rest of the line.')
-                l = l[:i]
+                continue
 
-            values = l.strip().split()
-            time = values[0]
+            l = l.strip().split()
+            time = l[0]
             # time is in ps
             # but needs to be truncated to
             # 3 decimal places (1fs) to avoid
             # floating point errors
             # find the . :
             i = time.index(".")
-            d["time"].append(float(time[: i + 4]))
+            time = float(time[:i+4])
+
+            # if we went back in time that's because PLUMED started from earlier during a restart
+            # we want to keep only the latest data
+            # this is achieved by using a dictionary indexed by time
+
+            # if the time is not a multiple of dt, skip it
+            if dt != 0 and round(i % dt, 3) != 0:
+                continue
+
             # iterate over the rest of the columns
-            for k, v in zip(colnames[1:], values[1:]):
-                d[k].append(float(v))
+            d[time] = {}
+            for k, v in zip(colnames[1:], l[1:]):
+                d[time][k] = float(v)
 
     return d
 
