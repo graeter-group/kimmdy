@@ -111,6 +111,7 @@ class TimeInfo:
     dt: float
     trr_nst: int
     xtc_nst: int
+    t_max: float
 
 
 def get_existing_files(config: Config, section: str = "config") -> dict:
@@ -690,6 +691,7 @@ class RunManager:
                 dt=float(dt),
                 trr_nst=trr_nst,
                 xtc_nst=int(xtc_nst),
+                t_max=int(nsteps) * float(dt),
             )
 
     def get_latest(self, suffix: str) -> Path | None:
