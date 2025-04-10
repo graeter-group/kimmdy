@@ -4,6 +4,13 @@ Constants used throughout KIMMDY
 
 import sys
 
+nN_per_kJ_per_mol_nm = 0.001661
+
+OPTIONAL_INPUT_PATHS = ["config.cwd", "config.out", "config.edissoc"]
+"""Paths that may or may not be defined in the input
+config and are thus not meant to be checked for existence
+or only checked if they are using in conjunction with a certain plugin/option.
+"""
 
 CONFIG_LOGS = {
     "infos": [],

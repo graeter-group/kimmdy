@@ -222,6 +222,13 @@
       "pytype": "Path",
       "default": "index.ndx"
     },
+    "edissoc": {
+      "title": "edissoc",
+      "description": "File with additional dissociation energy terms. This is used for the homolysis and hydrolysis reactions.",
+      "type": "string",
+      "pytype": "Path",
+      "default": "edissoc.dat"
+    },
     "grompp_prefix": {
       "title": "grompp_prefix",
       "description": "Prefix command for grompp execution on non MPI compiled clusters, e.g., 'srun --ntasks=1'.",
