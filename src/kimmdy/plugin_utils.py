@@ -1,16 +1,16 @@
+import logging
 from pathlib import Path
 from typing import Optional, TypeAlias, TypedDict
-import numpy as np
-from kimmdy.constants import (
-    nN_per_kJ_per_mol_nm,
-)
-from kimmdy.parsing import read_distances_dat, read_edissoc, read_plumed
-from kimmdy.topology.topology import Topology
-from kimmdy.parsing import Plumed_dict
-import logging
 
+import numpy as np
+
+from kimmdy.constants import R, nN_per_kJ_per_mol_nm
+from kimmdy.parsing import Plumed_dict, read_distances_dat, read_edissoc, read_plumed
+from kimmdy.topology.atomic import BondId
+from kimmdy.topology.topology import Topology
 
 logger = logging.getLogger(__name__)
+
 
 ### reaction plugin building blocks ###
 class Stats(TypedDict):
@@ -21,9 +21,14 @@ class Stats(TypedDict):
     b0: float
 
 
-BondStats: TypeAlias = dict[tuple[str, str], Stats]
+BondStats: TypeAlias = dict[BondId, Stats]
+PlumedId: TypeAlias = str
+Time: TypeAlias = float
+Distance: TypeAlias = float
 BONDSTATS_COLUMNS = "ai,aj,plumed_id,mean_d,mean_f,delta_d,b0"
-BondToPlumedID: TypeAlias = dict[tuple[str, str], str]
+BondToPlumedID: TypeAlias = dict[BondId, PlumedId]
+PlumedDistances: TypeAlias = dict[Time, dict[PlumedId, Distance]]
+
 
 def bondstats_to_csv(stats: BondStats, path: str | Path):
     ls = []
@@ -70,7 +75,11 @@ def read_plumed_input(path: str | Path) -> BondToPlumedID:
 
 
 def calculate_bondstats(
-    top: Topology, plumed_in: Path, plumed_out: Path, dt: float = 0.0, edissoc_dat: Optional[Path] = None
+    top: Topology,
+    plumed_in: Path,
+    plumed_out: Path,
+    dt: float = 0.0,
+    edissoc_dat: Optional[Path] = None,
 ) -> BondStats:
     distances = read_distances_dat(path=plumed_out, dt=dt)
     bond_to_plumed_id = read_plumed_input(plumed_in)
@@ -84,9 +93,9 @@ def calculate_bondstats(
 
 def get_bondstats(
     top: Topology,
-    distances: dict[float, dict[str, float]],
-    bond_to_plumed_id: dict[tuple[str, str], str],
-    edissoc_dat: Optional[Path] = None,
+    distances: PlumedDistances,
+    bond_to_plumed_id: BondToPlumedID,
+    edissoc_dat: Path | None = None,
 ) -> BondStats:
     if edissoc_dat is not None:
         edissoc = read_edissoc(edissoc_dat)
@@ -120,16 +129,8 @@ def get_bondstats(
             edis = 500
 
         ds = np.asarray([values[plumed_id] for values in distances.values()])
-        beta = np.sqrt(kb / (2 * edis))
-        d_inflection = (beta * b0 + np.log(2)) / beta
-        # if the bond is stretched beyond the inflection point,
-        # take the inflection point force because this force must have acted on the bond at some point
-        ds_mask = ds > d_inflection
-        ds[ds_mask] = d_inflection
-        dds = ds - b0
-        forces = (
-            2 * beta * edis * np.exp(-beta * dds) * (1 - np.exp(-beta * dds))
-        ) * nN_per_kJ_per_mol_nm
+        beta = calculate_beta(kb=kb, edis=edis)
+        forces = calculate_forces(ds=ds, b0=b0, edis=edis, beta=beta)
 
         mean_d = float(np.mean(ds))
         mean_f = float(np.mean(forces))
@@ -142,6 +143,110 @@ def get_bondstats(
             "b0": b0,
         }
     return stats
+
+
+def calculate_beta(kb: float, edis: float) -> float:
+    return np.sqrt(kb / (2 * edis))
+
+
+def calculate_forces(ds: np.ndarray, b0: float, edis: float, beta: float) -> np.ndarray:
+    d_inflection = (beta * b0 + np.log(2)) / beta
+    # if the bond is stretched beyond the inflection point,
+    # take the inflection point force because this force must have acted on the bond at some point
+    ds_mask = ds > d_inflection
+    ds[ds_mask] = d_inflection
+    dds = ds - b0
+    return (
+        2 * beta * edis * np.exp(-beta * dds) * (1 - np.exp(-beta * dds))
+    ) * nN_per_kJ_per_mol_nm
+
+
+def morse_transition_rate(
+    r_curr: list[float],
+    r_0: float,
+    dissociation_energy: float,
+    k_f: float,
+    frequency_factor: float = 0.288,
+    temperature: float = 300,
+) -> tuple[list[float], list[float]]:
+    """Calculates reaction rate constant for a bond breaking event.
+
+    Uses the Morse potential model for this calculation. For an array of bond distances of the same bond,
+    first calculates the forces on the bond, then the minima and maxima of the shifted Morse potential
+    to get an energy barrier and finally a reaction rate constant using the Arrhenius equation.
+    For intramolecular reactions, the reaction rate constant is equal to the reaction rate.
+
+    The calculation should be according to the derivation in the original KIMMDY paper: DOI: 10.1021/acs.jctc.9b00786
+
+    Parameters
+    ----------
+    r_curr:
+        Bond distances for a single bond, typically from a time series.
+    r_0:
+        Equilibrium bond length of the bond.
+    dissociation energy:
+        Dissociation energy of the bond.
+    k_f:
+        Spring constant of the bond.
+    frequency_factor:
+        Prefactor of the Arrhenius equation in [1/ps]. Default value from fitting averaged C_a - N data to gromacs data, see original KIMMDY paper
+        Alternatively 1/2pi sqrt(k/m).
+    temperature:
+        Temperature for the Arrhenius equation in GROMACS units.
+
+    """
+    rs = np.asarray(r_curr)
+    beta = calculate_beta(kb=k_f, edis=dissociation_energy)
+    fs = calculate_forces(ds=rs, b0=r_0, edis=dissociation_energy, beta=beta)
+    ks = morse_rates_from_forces(
+        fs=fs,
+        r_0=r_0,
+        dissociation_energy=dissociation_energy,
+        beta=beta,
+        frequency_factor=frequency_factor,
+        temperature=temperature,
+    )
+
+    return list(ks), list(fs)
+
+
+def morse_rates_from_forces(fs: np.ndarray, r_0: float, dissociation_energy: float, beta: float, frequency_factor: float = 0.288, temperature: float = 300) -> np.ndarray:
+    # calculate extrema of shifted potential i.e. get barrier height of V_eff = V_morse - F*X
+    r_min = r_0 - 1 / beta * np.log(
+        (
+            beta * dissociation_energy
+            + np.sqrt(
+                (beta**2 * dissociation_energy**2 - 2 * dissociation_energy * beta * fs)
+                + 1e-7  # prevent rounding issue close to zero
+            )
+        )
+        / (2 * beta * dissociation_energy)
+    )
+    r_max = r_0 - 1 / beta * np.log(
+        (
+            beta * dissociation_energy
+            - np.sqrt(
+                (beta**2 * dissociation_energy**2 - 2 * dissociation_energy * beta * fs)
+                + 1e-7  # prevent rounding issue close to zero
+            )
+        )
+        / (2 * beta * dissociation_energy)
+    )
+    r_max = np.where(
+        ~np.isfinite(r_max), 10 * r_0, r_max
+    )  # set rmax to r0 * 10 where no rmax can be found
+
+    v_max = dissociation_energy * (1 - np.exp(-beta * (r_max - r_0))) ** 2 - fs * (
+        r_max - r_0
+    )
+    v_min = dissociation_energy * (1 - np.exp(-beta * (r_min - r_0))) ** 2 - fs * (
+        r_min - r_0
+    )
+    # Note: F*r should lead to same result as F*(r-r_0) since the shifts in Vmax-Vmin adds up to zero
+    delta_v = v_max - v_min
+
+    # calculate reaction rate constant from barrier heigth
+    return frequency_factor * np.exp(-delta_v / (R * temperature))  # [1/ps]
 
 
 def get_atomnrs_from_plumedid(
@@ -248,103 +353,3 @@ def get_edissoc_from_atomnames(
         E_dis = 400.0
 
     return E_dis
-
-
-def morse_transition_rate(
-    r_curr: list[float],
-    r_0: float,
-    dissociation_energy: float,
-    k_f: float,
-    frequency_factor: float = 0.288,
-    temperature: float = 300,
-) -> tuple[list[float], list[float]]:
-    """Calculates reaction rate constant for a bond breaking event.
-
-    Uses the Morse potential model for this calculation. For an array of bond distances of the same bond,
-    first calculates the forces on the bond, then the minima and maxima of the shifted Morse potential
-    to get an energy barrier and finally a reaction rate constant using the Arrhenius equation.
-    For intramolecular reactions, the reaction rate constant is equal to the reaction rate.
-
-    The calculation should be according to the derivation in the original KIMMDY paper: DOI: 10.1021/acs.jctc.9b00786
-
-    Parameters
-    ----------
-    r_curr:
-        Bond distances for a single bond, typically from a time series.
-    r_0:
-        Equilibrium bond length of the bond.
-    dissociation energy:
-        Dissociation energy of the bond.
-    k_f:
-        Spring constant of the bond.
-    frequency_factor:
-        Prefactor of the Arrhenius equation in [1/ps]. Default value from fitting averaged C_a - N data to gromacs data, see original KIMMDY paper
-        Alternatively 1/2pi sqrt(k/m).
-    temperature:
-        Temperature for the Arrhenius equation in GROMACS units.
-
-    """
-    rs = np.asarray(r_curr)
-    beta = np.sqrt(k_f / (2 * dissociation_energy))
-
-    # calculate forces on bond
-    fs = (
-        2
-        * beta
-        * dissociation_energy
-        * np.exp(-beta * (rs - r_0))
-        * (1 - np.exp(-beta * (rs - r_0)))
-    )
-
-    # if the bond is stretched beyond the inflection point, take the inflection point force because this force must have acted on the bond at some point
-    r_inflection = (beta * r_0 + np.log(2)) / beta
-    f_inflection = (
-        2
-        * beta
-        * dissociation_energy
-        * np.exp(-beta * (r_inflection - r_0))
-        * (1 - np.exp(-beta * (r_inflection - r_0)))
-    )
-    fs_mask = rs > r_inflection
-    fs[fs_mask] = f_inflection
-
-    # calculate extrema of shifted potential i.e. get barrier height of V_eff = V_morse - F*X
-    r_min = r_0 - 1 / beta * np.log(
-        (
-            beta * dissociation_energy
-            + np.sqrt(
-                (beta**2 * dissociation_energy**2 - 2 * dissociation_energy * beta * fs)
-                + 1e-7  # prevent rounding issue close to zero
-            )
-        )
-        / (2 * beta * dissociation_energy)
-    )
-    r_max = r_0 - 1 / beta * np.log(
-        (
-            beta * dissociation_energy
-            - np.sqrt(
-                (beta**2 * dissociation_energy**2 - 2 * dissociation_energy * beta * fs)
-                + 1e-7  # prevent rounding issue close to zero
-            )
-        )
-        / (2 * beta * dissociation_energy)
-    )
-    r_max = np.where(
-        ~np.isfinite(r_max), 10 * r_0, r_max
-    )  # set rmax to r0 * 10 where no rmax can be found
-
-    v_max = dissociation_energy * (1 - np.exp(-beta * (r_max - r_0))) ** 2 - fs * (
-        r_max - r_0
-    )
-    v_min = dissociation_energy * (1 - np.exp(-beta * (r_min - r_0))) ** 2 - fs * (
-        r_min - r_0
-    )
-    # Note: F*r should lead to same result as F*(r-r_0) since the shifts in Vmax-Vmin adds up to zero
-    delta_v = v_max - v_min
-
-    # calculate reaction rate constant from barrier heigth
-    R = 8.31446261815324e-3  # [kJ K-1 mol-1]
-    k = frequency_factor * np.exp(-delta_v / (R * temperature))  # [1/ps]
-
-    return k, fs
-
