@@ -210,7 +210,14 @@ def morse_transition_rate(
     return list(ks), list(fs)
 
 
-def morse_rates_from_forces(fs: np.ndarray, r_0: float, dissociation_energy: float, beta: float, frequency_factor: float = 0.288, temperature: float = 300) -> np.ndarray:
+def morse_rates_from_forces(
+    fs: np.ndarray,
+    r_0: float,
+    dissociation_energy: float,
+    beta: float,
+    frequency_factor: float = 0.288,
+    temperature: float = 300,
+) -> np.ndarray:
     # calculate extrema of shifted potential i.e. get barrier height of V_eff = V_morse - F*X
     r_min = r_0 - 1 / beta * np.log(
         (
