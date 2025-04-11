@@ -4,7 +4,7 @@ from typing import Optional, TypeAlias, TypedDict
 
 import numpy as np
 
-from kimmdy.constants import R, nN_per_kJ_per_mol_nm
+from kimmdy.constants import R
 from kimmdy.parsing import Plumed_dict, read_distances_dat, read_edissoc, read_plumed
 from kimmdy.topology.atomic import BondId
 from kimmdy.topology.topology import Topology
@@ -150,6 +150,10 @@ def calculate_beta(kb: float, edis: float) -> float:
 
 
 def calculate_forces(ds: np.ndarray, b0: float, edis: float, beta: float) -> np.ndarray:
+    """Calculate forces from distances using the Morse potential.
+
+    Forces are returned in gromacs units kJ/mol/nm.
+    """
     d_inflection = (beta * b0 + np.log(2)) / beta
     # if the bond is stretched beyond the inflection point,
     # take the inflection point force because this force must have acted on the bond at some point
@@ -158,8 +162,7 @@ def calculate_forces(ds: np.ndarray, b0: float, edis: float, beta: float) -> np.
     dds = ds - b0
     return (
         2 * beta * edis * np.exp(-beta * dds) * (1 - np.exp(-beta * dds))
-    ) * nN_per_kJ_per_mol_nm
-
+    )
 
 def morse_transition_rate(
     r_curr: list[float],
