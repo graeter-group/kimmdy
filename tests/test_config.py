@@ -42,12 +42,12 @@ def test_no_sections_are_created_for_not_mentioned_reactions(arranged_tmp_path):
     config_2 = Config(Path("config2.yml"))
 
     assert config_1.reactions.homolysis
-    assert config_1.reactions.homolysis.edis.name == "edissoc.dat"
+    assert config_1.edissoc.name == "edissoc.dat"
     assert len(config_1.reactions.__dict__) == 1
 
     assert len(config_2.reactions.__dict__) == 2
     assert config_2.reactions.homolysis
-    assert config_2.reactions.homolysis.edis.name == "edissoc.dat"
+    assert config_2.edissoc.name == "edissoc.dat"
     assert config_2.reactions.hat_naive
     assert config_2.reactions.hat_naive.polling_rate == 1
     assert config_2.reactions.hat_naive.h_cutoff == 4
@@ -175,7 +175,6 @@ def test_get_existing_files(arranged_tmp_path):
             "pullf1500.mdp",
             "broken_equil_f1000.mdp",
             "edissoc.dat",
-            "ffbonded.itp",
             "yml",
         ]
     )

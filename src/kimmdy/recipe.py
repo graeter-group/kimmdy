@@ -10,6 +10,7 @@ from copy import copy
 from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, Callable, Generic, Optional, TypeVar
+from kimmdy.constants import FIELD_SIZE_LIMIT
 
 import numpy as np
 
@@ -25,9 +26,8 @@ def recipe_steps_from_str(
     if recipe_steps_s.startswith("<") and recipe_steps_s.endswith(">"):
         key, callback = recipe_steps_s.removeprefix("<").removesuffix(">").split(",")
 
-        def dummy_callback(key: str, i: int, t: float) -> list[RecipeStep]:
+        def dummy_callback(key: str, t: float) -> list[RecipeStep]:
             _ = key
-            _ = i
             _ = t
             return []
 
@@ -196,12 +196,6 @@ class Place(RecipeStep):
 
     def __hash__(self):
         return hash((self._ix_to_place, self.new_coords, type(self).__name__))
-
-    def __repr__(self):
-        return f"{type(self).__name__}(ix_to_place={self._ix_to_place}, new_coords={self.new_coords})"
-
-    def __str__(self):
-        return f"{type(self).__name__}({self._ix_to_place}, {self.new_coords})"
 
     @classmethod
     def _from_str(cls, s: str):
@@ -467,12 +461,11 @@ class DeferredRecipeSteps(Generic[T]):
 
     Are called by the kimmdy runmanager if the recipe is chosen.
     The callback is given the chosen key (generic over type T) as well
-    as the index into the rates (and time ranges for said rates) and
     the time in ps at which the reaction occurs.
     """
 
     key: T
-    callback: Callable[[T, int, float], list[RecipeStep]]
+    callback: Callable[[T, float], list[RecipeStep]]
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, DeferredRecipeSteps):
@@ -671,6 +664,12 @@ class Recipe:
 
         return self.rates == other.rates and self.timespans == other.timespans
 
+    def _str__(self):
+        return f"Recipe({self.recipe_steps}, {len(self.rates)} rates)"
+
+    def __repr__(self):
+        return self._str__()
+
 
 @dataclass
 class RecipeCollection:
@@ -740,11 +739,15 @@ class RecipeCollection:
             writer.writerows(rows)
 
     @classmethod
-    def from_csv(cls, path: Path) -> tuple[RecipeCollection, Recipe | None]:
+    def from_csv(
+        cls, path: Path, field_size_limit: int = FIELD_SIZE_LIMIT
+    ) -> tuple[RecipeCollection, Recipe | None]:
         """Create a RecipeCollection object from a CSV file
         Returns the recipe collection and a single recipe that was picked, otherwise None
         """
         recipes = []
+
+        csv.field_size_limit(field_size_limit)
 
         with open(path, "r") as f:
             reader = csv.reader(f)

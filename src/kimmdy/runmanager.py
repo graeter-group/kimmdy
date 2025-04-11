@@ -43,7 +43,6 @@ from kimmdy.kmc import (
     frm,
     rf_kmc,
     multi_rfkmc,
-    total_index_to_index_within_plugin,
 )
 from kimmdy.parsing import read_mdp, read_top, write_json, write_time_marker, write_top
 from kimmdy.plugins import (
@@ -112,6 +111,7 @@ class TimeInfo:
     dt: float
     trr_nst: int
     xtc_nst: int
+    t_max: float
 
 
 def get_existing_files(config: Config, section: str = "config") -> dict:
@@ -691,6 +691,7 @@ class RunManager:
                 dt=float(dt),
                 trr_nst=trr_nst,
                 xtc_nst=int(xtc_nst),
+                t_max=int(nsteps) * float(dt),
             )
 
     def get_latest(self, suffix: str) -> Path | None:
@@ -894,8 +895,6 @@ class RunManager:
                     grompp_cmd += f" -time {time}"
                     logger.info(f"Starting MD from time: {time} ps of the trr")
 
-            logger.debug(f"grompp cmd: {grompp_cmd}")
-
         timings = self.timeinfos.get(instance)
         if timings is None:
             m = f"Time info from mdp file for instance {instance} not found."
@@ -931,10 +930,12 @@ class RunManager:
             plumed_out = files.outputdir / get_plumed_out(plumed_in)
             files.output["plumed_out"] = plumed_out
 
-        logger.debug(f"mdrun cmd: {mdrun_cmd}")
         try:
             if not continue_md and grompp_cmd is not None:
+                logger.info(f"starting grompp: {grompp_cmd}")
                 run_gmx(grompp_cmd, outputdir)
+
+            logger.info(f"starting mdrun: {mdrun_cmd}")
             run_gmx(mdrun_cmd, outputdir)
 
             # specify trr to prevent rotref trr getting set as standard trr
@@ -945,13 +946,6 @@ class RunManager:
         except CalledProcessError as e:
             write_time_marker(files.outputdir / MARK_FAILED, "failed")
             logger.error(f"Error occured during MD {instance}:\n{e}")
-
-            # TODO: debug
-            # attempt to write out the first frame as gro
-            # for easier debugging in VMD
-            dump_cmd = rf"echo '0\n' | {gmx_alias} trjconv -s {instance}.tpr -f {instance}.xtc -dump 0 -o {instance}_start.gro"
-            run_gmx(dump_cmd, outputdir)
-
             raise e
 
         logger.info(f"Done with MD {instance}")
@@ -1042,11 +1036,6 @@ class RunManager:
                 # different reaction plugins produce different types
                 # of reactions.
                 # If this changes we can flatten before aggregating
-                # WARN: This can have a subtle bug for
-                # reactions with DeferredRecipeSteps,
-                # if they produce non-unique reactions,
-                # which would aggregate and mess up the time_start_index.
-                # compared to their internal counting
                 collection.aggregate_reactions()
         if "extrande" in self.kmc_algorithm:
             kmc = partial(kmc, tau_scale=self.config.tau_scale)
@@ -1088,21 +1077,12 @@ class RunManager:
                 f"adjusted time_start: {self.kmcresult.time_start} to nearest trr frame of {md_instance_name} with timings {timings} and dt_trr {dt_frame}"
             )
 
-        # Correct the offset of time_start_index by the concatenation
-        # of all rates of all recipes from all reactions back onto the offset
-        # within the one chosen reaction plugin
         n_recipes_per_plugin = [
             sum([len(r.rates) for r in v.recipes])
             for v in self.recipe_collections.values()
         ]
         logger.info(f"Plugins: {[k for k in self.recipe_collections.keys()]}")
         logger.info(f"Number of recipes per reaction plugin: {n_recipes_per_plugin}")
-
-        self.kmcresult.time_start_index_within_plugin = (
-            total_index_to_index_within_plugin(
-                self.kmcresult.time_start_index, n_recipes_per_plugin
-            )
-        )
 
         recipe = self.kmcresult.recipe
         if self.config.save_recipes:
@@ -1127,6 +1107,13 @@ class RunManager:
             },
             files.outputdir / "radicals.json",
         )
+
+        if self.config.just_sample:
+            logger.info(
+                "Just sampling reactions, not applying recipes. KIMMDY will exit."
+            )
+            self.state = State.DONE
+            return files
 
         logger.info("Done with Decide recipe.")
         return files
@@ -1154,25 +1141,19 @@ class RunManager:
 
         # Set time to chosen 'time_start' of KMCResult
         ttime = self.kmcresult.time_start
-        plugin_time_index = self.kmcresult.time_start_index_within_plugin
 
         shadow_files_binding = None
 
         logger.info(f"Chosen time_start: {ttime} ps")
-        logger.info(f"Time index within plugin: {plugin_time_index}")
-        if plugin_time_index is None:
-            m = f"Time index within plugin is None, this should not happen. Was _apply_recipe called before _decide_recipe?"
-            logger.error(m)
-            raise RuntimeError(m)
 
         if isinstance(recipe.recipe_steps, list):
             recipe.recipe_steps = recipe.recipe_steps
         elif isinstance(recipe.recipe_steps, DeferredRecipeSteps):
             logger.info(
-                f"Steps of recipe where deferred, calling callback with key {recipe.recipe_steps.key} and time_index {plugin_time_index}"
+                f"Steps of recipe where deferred, calling callback with key {recipe.recipe_steps.key} and time {ttime}"
             )
             recipe.recipe_steps = recipe.recipe_steps.callback(
-                recipe.recipe_steps.key, plugin_time_index, ttime
+                recipe.recipe_steps.key, ttime
             )
             logger.info(
                 f"Got {len(recipe.recipe_steps)} steps in recipe {recipe.get_recipe_name()}"
@@ -1282,7 +1263,7 @@ class RunManager:
                     if len(solvent_atoms) > 0:
                         logger.info(
                             f"{len(solvent_atoms)} solvent atoms are involved "
-                            "in the reaction, they will get tempoary bonds for "
+                            "in the reaction, they will get temporary bonds for "
                             "the start of the slow growth simulation."
                         )
                         ow = None

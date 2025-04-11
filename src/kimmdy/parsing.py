@@ -9,7 +9,7 @@ import os
 from datetime import datetime
 from itertools import takewhile
 from pathlib import Path
-from typing import Optional, TypedDict, Union
+from typing import Optional, TypeAlias, TypedDict, Union
 
 import numpy as np
 
@@ -248,8 +248,30 @@ def read_top(
     ls, parsed_ffdir = resolve_includes(path, gmx_builtin_ffs)
     if ffdir is None and parsed_ffdir is not None:
         ffdir = parsed_ffdir
+
     if ffdir is None:
-        logger.debug(f"No #include for a forcefield directory found in {path}.")
+        # try to find a forcefield directory in the parent directory of the topology
+        # or in the current working directory
+        # with the *.ff glob
+        dir = path.parent
+        cwd = Path.cwd()
+        dirs = list(dir.glob("*.ff"))
+        if dirs:
+            ffdir = dirs[0]
+            logger.debug(f"Found forcefield directory {ffdir} in {path.parent}")
+        else:
+            # check the current working directory
+            dirs = list(cwd.glob("*.ff"))
+            if dirs:
+                ffdir = dirs[0]
+                logger.debug(f"Found forcefield directory {ffdir} in {cwd}")
+            else:
+                ffdir = None
+
+    if ffdir is None:
+        logger.debug(
+            f"No #include for a forcefield directory found in {path} and no directory *.ff found in parent directory of the topology or the cwd."
+        )
 
     ls = [l for l in ls if not l.startswith("*")]
     d = {}
@@ -503,7 +525,7 @@ def write_plumed(d: Plumed_dict, path: Path) -> None:
             )
 
 
-def read_distances_dat(distances_dat: Path) -> dict:
+def read_distances_dat(path: Path, dt: float = 0) -> dict[float, dict[str, float]]:
     """Read a distances.dat plumed output file.
 
     A typical file looks like this:
@@ -513,22 +535,37 @@ def read_distances_dat(distances_dat: Path) -> dict:
     0.000000 0.153211 0.157662 0.139923 ...
     ```
     """
-    with open(distances_dat, "r") as f:
+    with open(path, "r") as f:
         colnames = f.readline()[10:].strip().split()
-        d = {c: [] for c in colnames}
-        for l in f:
-            values = l.strip().split()
-            time = values[0]
+        d = {}
+        for i, l in enumerate(f):
+            if "#" in l:
+                i = l.find("#")
+                logger.warning(
+                    f"Found second header in plumed file {path.name} in {path.parent.name}. Ignoring the rest of the line."
+                )
+                continue
+
+            l = l.strip().split()
+            time = l[0]
             # time is in ps
             # but needs to be truncated to
             # 3 decimal places (1fs) to avoid
             # floating point errors
-            # find the . :
-            i = time.index(".")
-            d["time"].append(float(time[: i + 4]))
+            time = round(float(time), 3)
+
+            # if we went back in time that's because PLUMED started from earlier during a restart
+            # we want to keep only the latest data
+            # this is achieved by using a dictionary indexed by time
+
+            # if the time is not a multiple of dt, skip it
+            if dt != 0 and round(i % dt, 3) != 0:
+                continue
+
             # iterate over the rest of the columns
-            for k, v in zip(colnames[1:], values[1:]):
-                d[k].append(float(v))
+            d[time] = {}
+            for k, v in zip(colnames[1:], l[1:]):
+                d[time][k] = float(v)
 
     return d
 
@@ -574,8 +611,11 @@ def read_csv_to_list(csv_file: Path) -> list:
     return data
 
 
+EdissocDict: TypeAlias = dict[str, dict[tuple[str, str], float]]
+
+
 ## Miscellaneous files
-def read_edissoc(path: Path) -> dict[str, dict[tuple[str, str], float]]:
+def read_edissoc(path: Path) -> EdissocDict:
     """Reads a edissoc file and turns it into a dict.
 
     The dissociation energy is assigned per pair of atom names. Atom names are unique to a residue, and the dict is nested by residues.

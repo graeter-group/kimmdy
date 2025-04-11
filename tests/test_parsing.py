@@ -189,8 +189,7 @@ def test_plumed_read(arranged_tmp_path):
 def test_plumed_read_distances(arranged_tmp_path):
     distances = parsing.read_distances_dat(Path("distances.dat"))
     assert distances
-    assert list(distances.keys()) == [
-        "time",
+    assert list(distances[0.0]) == [
         "d0",
         "d1",
         "d2",
@@ -204,8 +203,8 @@ def test_plumed_read_distances(arranged_tmp_path):
         "d10",
         "d11",
     ]
-    assert distances["time"][0] == 0
-    assert distances["time"][-1] == 100
+    assert list(distances.keys())[0] == 0.0
+    assert list(distances.keys())[-1] == 100.0
 
 
 def test_plumed_write_identity(arranged_tmp_path):

@@ -49,6 +49,12 @@
           "description": "Command to (re)submit the jobscript. Default is `sbatch`. For local testing replace with an empty string do run the jobscript directly.",
           "pytype": "str",
           "default": "sbatch"
+        },
+        "partition": {
+          "type": "string",
+          "description": "HPC partition",
+          "pytype": "str",
+          "default": "<your-partition>"
         }
       },
       "additionalProperties": false
@@ -60,9 +66,9 @@
       "pytype": "bool",
       "default": false
     },
-    "skip_truncation": {
-      "title": "skip_truncation",
-      "description": "Don't truncate trajectories to the time at which a reaction occurs. This is useful when only the reaction rates are interesting and it is not required to continue the simulation after a reaction.",
+    "just_sample": {
+      "title": "just sample",
+      "description": "Don't execute the recipes returned by the chosen reaction, just get the rates (and choose one). KIMMDY will exit after reactions have been queried for the first time in the sequence.",
       "type": "boolean",
       "pytype": "bool",
       "default": false
@@ -216,6 +222,13 @@
       "pytype": "Path",
       "default": "index.ndx"
     },
+    "edissoc": {
+      "title": "edissoc",
+      "description": "File with additional dissociation energy terms. This is used for the homolysis and hydrolysis reactions.",
+      "type": "string",
+      "pytype": "Path",
+      "default": "edissoc.dat"
+    },
     "grompp_prefix": {
       "title": "grompp_prefix",
       "description": "Prefix command for grompp execution on non MPI compiled clusters, e.g., 'srun --ntasks=1'.",
@@ -295,9 +308,8 @@
     },
     "edr": {
       "title": "edr",
-      "description": ".edr file of a finished simulation for starting directly with a reaction",
-      "type": "string",
-      "pytype": "Path"
+      "deprecated": true,
+      "description": "This is deprecated and no longer required."
     },
     "restart": {
       "title": "restart",

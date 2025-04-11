@@ -231,8 +231,7 @@ def match_atomic_item_to_atomic_type(
     def escape_re_atomtypes(s: str) -> str:
         """
         escape special regex characters
-        that can appear in a forcecield
-        use X as the wildcard
+        that can appear in a forcefield
         """
         return s.replace("*", "STAR").replace("+", "PLUS")
 

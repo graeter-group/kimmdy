@@ -21,7 +21,7 @@ from kimmdy.plugins import (
     parameterization_plugins,
     reaction_plugins,
 )
-from kimmdy.constants import CONFIG_LOGS
+from kimmdy.constants import CONFIG_LOGS, OPTIONAL_CONFIG_PATHS
 from kimmdy.schema import get_combined_scheme
 from kimmdy.utils import (
     check_file_exists,
@@ -75,6 +75,7 @@ def configure_logger(config: Config):
             "kimmdy": {
                 "level": config.log.level.upper(),
                 "handlers": ["cmd", "file"],
+                "propagate": False,
             },
         },
         # Mute others, e.g. tensorflow, matplotlib
@@ -83,10 +84,20 @@ def configure_logger(config: Config):
             "handlers": ["null"],
         },
     }
+
+    # flush all handlers
+    logging.shutdown()
+
+    # clean up old loggers and handlers
+    logger_names = list(logging.Logger.manager.loggerDict.keys())
+    for name in logger_names:
+        logger = logging.getLogger(name)
+        logger.handlers = []
+
     logging.config.dictConfig(log_conf)
 
     # symlink logfile of the latest run to kimmdy.log in cwd
-    log: Path = config.cwd.joinpath("kimmdy.log")
+    log: Path = config.cwd.joinpath(f"{config.out.name}.kimmdy.log")
     if log.is_symlink():
         log.unlink()
     if log.exists():
@@ -201,7 +212,10 @@ class Config:
 
                 if not deprecated:
                     v = pytype(v)
-                    if pytype is str:
+                    if pytype is str and k != "name":
+                        # make sure all strings are lowercase
+                        # except for the name, because it is used
+                        # in the output directory name
                         v = v.lower()
                     self.__setattr__(k, v)
 
@@ -230,7 +244,6 @@ class Config:
                     "Config initialized without input file, can't copy to output directory."
                 )
 
-            # use the constructed config to set up the logger
             configure_logger(self)
 
     def _set_defaults(
@@ -459,7 +472,10 @@ class Config:
                     path = cwd / path
                 path = path.resolve()
                 self.__setattr__(name, path)
-                if not path.is_dir():
+                if (
+                    not path.is_dir()
+                    and not f"{section}.{name}" in OPTIONAL_CONFIG_PATHS
+                ):
                     check_file_exists(
                         path=path,
                         option_name=f"{section}.{name}",

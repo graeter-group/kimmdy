@@ -4,6 +4,7 @@ out: 'test_config_1'
 gromacs_alias: 'gmx'
 top: 'topol.top'
 gro: 'npt.gro'
+edissoc: 'edissoc.dat'
 ndx: 'index_backbone.ndx'
 plumed: 'plumed.dat'
 mds:
@@ -20,14 +21,10 @@ changer:
   topology:
     parameterization: 'basic' 
 reactions:
-  homolysis:
-    edis: 'edissoc.dat'
-    itp: 'ffbonded.itp'
+  homolysis: {}
 sequence:
   - equilibrium1
-  -
-    mult: 1
+  - mult: 1
     tasks:
       - pull1
       - reactions
-     

@@ -49,16 +49,12 @@ class KMCAccept:
     time_start
         Time, from which the reaction starts. The reaction changes the
         geometry/topology of this timestep and continues from there. [ps]
-    time_start_index
-        Index into the list of timesteps or rates of the timestep where the reaction starts
     """
 
     recipe: Recipe
     reaction_probability: list[float] | None
     time_delta: float
     time_start: float
-    time_start_index: int
-    time_start_index_within_plugin: int | None = None
 
 
 @dataclass
@@ -99,7 +95,6 @@ def dummy_first_kmc(
         reaction_probability=None,
         time_delta=0,
         time_start=reaction_time,
-        time_start_index=int(time_index),
     )
 
 
@@ -161,7 +156,7 @@ def rf_kmc(
         f"{len(rate_cumulative)}, total rate {total_rate}"
     )
 
-    # 4. Find the even to carry out, mu, using binary search (np.searchsorted)
+    # 4. Find the event to carry out, mu, using binary search (np.searchsorted)
     pos = np.searchsorted(rate_cumulative, u[0] * total_rate)
     recipe: Recipe = recipe_collection.recipes[pos]
     time_index = np.argmax(recipe.rates)
@@ -179,7 +174,6 @@ def rf_kmc(
         reaction_probability=reaction_probability,
         time_delta=time_delta,
         time_start=reaction_time,
-        time_start_index=int(time_index),
     )
 
 
@@ -271,7 +265,6 @@ def frm(
         reaction_probability=reaction_probability,
         time_delta=time_delta,
         time_start=reaction_time,
-        time_start_index=int(time_index),
     )
 
 
@@ -390,7 +383,6 @@ def extrande_mod(
         reaction_probability=None,
         time_delta=0,  # instantaneous reaction
         time_start=t,
-        time_start_index=int(idx_rate_max),
     )
 
 
@@ -520,7 +512,6 @@ def extrande(
         reaction_probability=None,
         time_delta=0,  # instantaneous reaction
         time_start=t,
-        time_start_index=int(idx_rate_max),
     )
 
 
@@ -610,7 +601,6 @@ def multi_rfkmc(
                 reaction_probability=reaction_probability,
                 time_delta=time_delta,
                 time_start=reaction_time,
-                time_start_index=int(time_index),
             )
         )
 
@@ -620,7 +610,6 @@ def multi_rfkmc(
     merged_reaction_probability = None
     merged_timedelta = 0
     merged_time_start = 0
-    merged_time_start_index = 0
     merge_relax = False
 
     for result in results:
@@ -641,9 +630,6 @@ def multi_rfkmc(
         if merged_time_start < result.time_start:
             merged_time_start = result.time_start
 
-        if merged_time_start_index < result.time_start_index:
-            merged_time_start_index = result.time_start_index
-
         if merged_reaction_probability is None:
             merged_reaction_probability = result.reaction_probability
 
@@ -655,5 +641,4 @@ def multi_rfkmc(
         reaction_probability=merged_reaction_probability,
         time_delta=merged_timedelta,
         time_start=merged_time_start,
-        time_start_index=merged_time_start_index,
     )

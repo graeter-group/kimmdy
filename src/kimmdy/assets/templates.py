@@ -1,8 +1,8 @@
 jobscript = """
 #!/bin/env bash
 #SBATCH --job-name={config.out.name}
-#SBATCH --output={config.out.name}-job.log
-#SBATCH --error={config.out.name}-job.log
+#SBATCH --output={config.out.name}.slurm.out
+#SBATCH --error={config.out.name}.slurm.err
 #SBATCH --time={config.max_hours}:00:00
 #SBATCH --nodes={config.slurm.N}
 #SBATCH --ntasks-per-node={config.slurm.ntasks_per_node}
@@ -11,8 +11,8 @@ jobscript = """
 #SBATCH --cpus-per-task={config.slurm.cpus_per_task}
 #SBATCH --gpus={config.slurm.gpus}
 #SBATCH --mail-type=ALL
+#SBATCH --partition {config.slurm.partition}
 # # uncomment these to use:
-# #SBATCH --partition <your-partition>.p
 # #SBATCH --mail-user=<your-email>
 
 
@@ -44,7 +44,7 @@ if [ $HOURS -lt $CYCLE ]; then
   exit 3
 else
   echo "jobscript resubmitting"
-  {config.slurm.runcmd} ./jobscript.sh
+  {config.slurm.runcmd} ./jobscript-{config.out.name}.sh
   exit 2
 fi
 """
