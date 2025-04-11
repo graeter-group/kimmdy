@@ -2,6 +2,7 @@ dryrun: true
 max_tasks: 10
 name: 'config2'
 gromacs_alias: 'gmx'
+edissoc: edissoc.dat
 top: 'topol.top'
 gro: 'npt.gro'
 ndx: 'index_backbone.ndx'
@@ -23,9 +24,7 @@ changer:
   topology:
     parameterization: 'basic' 
 reactions:
-  homolysis:
-    edis: 'edissoc.dat'
-    itp: 'ffbonded.itp'
+  homolysis: {}
   hat_naive: {}
 sequence:
   - equilibrium1

@@ -21,7 +21,7 @@ from kimmdy.plugins import (
     parameterization_plugins,
     reaction_plugins,
 )
-from kimmdy.constants import CONFIG_LOGS, OPTIONAL_INPUT_PATHS
+from kimmdy.constants import CONFIG_LOGS, OPTIONAL_CONFIG_PATHS
 from kimmdy.schema import get_combined_scheme
 from kimmdy.utils import (
     check_file_exists,
@@ -467,13 +467,13 @@ class Config:
             elif isinstance(attr, Path):
                 path = attr
                 if (
-                    not f"{section}.{name}" in OPTIONAL_INPUT_PATHS
+                    not f"{section}.{name}" in ["config.cwd", "config.out"]
                     and not path.is_absolute()
                 ):
                     path = cwd / path
                 path = path.resolve()
                 self.__setattr__(name, path)
-                if not path.is_dir():
+                if not path.is_dir() and not f"{section}.{name}" in OPTIONAL_CONFIG_PATHS:
                     check_file_exists(
                         path=path,
                         option_name=f"{section}.{name}",

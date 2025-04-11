@@ -610,7 +610,6 @@ def multi_rfkmc(
     merged_reaction_probability = None
     merged_timedelta = 0
     merged_time_start = 0
-    merged_time_start_index = 0
     merge_relax = False
 
     for result in results:
@@ -630,9 +629,6 @@ def multi_rfkmc(
 
         if merged_time_start < result.time_start:
             merged_time_start = result.time_start
-
-        if merged_time_start_index < result.time_start_index:
-            merged_time_start_index = result.time_start_index
 
         if merged_reaction_probability is None:
             merged_reaction_probability = result.reaction_probability
