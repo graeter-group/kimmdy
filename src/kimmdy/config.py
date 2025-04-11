@@ -94,7 +94,6 @@ def configure_logger(config: Config):
         logger = logging.getLogger(name)
         logger.handlers = []
 
-
     logging.config.dictConfig(log_conf)
 
     # symlink logfile of the latest run to kimmdy.log in cwd
@@ -473,7 +472,10 @@ class Config:
                     path = cwd / path
                 path = path.resolve()
                 self.__setattr__(name, path)
-                if not path.is_dir() and not f"{section}.{name}" in OPTIONAL_CONFIG_PATHS:
+                if (
+                    not path.is_dir()
+                    and not f"{section}.{name}" in OPTIONAL_CONFIG_PATHS
+                ):
                     check_file_exists(
                         path=path,
                         option_name=f"{section}.{name}",

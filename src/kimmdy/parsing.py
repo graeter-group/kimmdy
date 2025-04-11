@@ -269,7 +269,9 @@ def read_top(
                 ffdir = None
 
     if ffdir is None:
-        logger.debug(f"No #include for a forcefield directory found in {path} and no directory *.ff found in parent directory of the topology or the cwd.")
+        logger.debug(
+            f"No #include for a forcefield directory found in {path} and no directory *.ff found in parent directory of the topology or the cwd."
+        )
 
     ls = [l for l in ls if not l.startswith("*")]
     d = {}
@@ -523,7 +525,7 @@ def write_plumed(d: Plumed_dict, path: Path) -> None:
             )
 
 
-def read_distances_dat(path: Path, dt: float=0) -> dict[float, dict[str, float]]:
+def read_distances_dat(path: Path, dt: float = 0) -> dict[float, dict[str, float]]:
     """Read a distances.dat plumed output file.
 
     A typical file looks like this:
@@ -536,10 +538,12 @@ def read_distances_dat(path: Path, dt: float=0) -> dict[float, dict[str, float]]
     with open(path, "r") as f:
         colnames = f.readline()[10:].strip().split()
         d = {}
-        for i,l in enumerate(f):
-            if '#' in l:
-                i = l.find('#')
-                logger.warning(f'Found second header in plumed file {path.name} in {path.parent.name}. Ignoring the rest of the line.')
+        for i, l in enumerate(f):
+            if "#" in l:
+                i = l.find("#")
+                logger.warning(
+                    f"Found second header in plumed file {path.name} in {path.parent.name}. Ignoring the rest of the line."
+                )
                 continue
 
             l = l.strip().split()
@@ -606,7 +610,9 @@ def read_csv_to_list(csv_file: Path) -> list:
             data.extend(row)
     return data
 
+
 EdissocDict: TypeAlias = dict[str, dict[tuple[str, str], float]]
+
 
 ## Miscellaneous files
 def read_edissoc(path: Path) -> EdissocDict:

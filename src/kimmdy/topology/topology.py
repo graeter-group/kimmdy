@@ -682,7 +682,7 @@ class Topology:
     """
 
     @classmethod
-    def from_path(cls, path: str|Path, ffdir: str|Path|None=None, **kwargs):
+    def from_path(cls, path: str | Path, ffdir: str | Path | None = None, **kwargs):
         """Load a Topology object from a file path.
 
         Simplifies the `Topology(read_top(...), ...)` pattern.

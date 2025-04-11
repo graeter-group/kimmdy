@@ -739,7 +739,9 @@ class RecipeCollection:
             writer.writerows(rows)
 
     @classmethod
-    def from_csv(cls, path: Path, field_size_limit: int=FIELD_SIZE_LIMIT) -> tuple[RecipeCollection, Recipe | None]:
+    def from_csv(
+        cls, path: Path, field_size_limit: int = FIELD_SIZE_LIMIT
+    ) -> tuple[RecipeCollection, Recipe | None]:
         """Create a RecipeCollection object from a CSV file
         Returns the recipe collection and a single recipe that was picked, otherwise None
         """

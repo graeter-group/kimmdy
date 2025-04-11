@@ -200,5 +200,3 @@ def test_compare_extrande_extrande_mod(recipe_collection):
     )
 
     assert abs(ext_rs.mean() - extmod_rs.mean()) < 0.002
-
-

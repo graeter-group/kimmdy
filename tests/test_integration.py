@@ -122,7 +122,9 @@ def test_grappa_partial_parameterization(arranged_tmp_path):
 )
 def test_integration_single_reaction(arranged_tmp_path):
     kimmdy_run(input=Path("kimmdy.yml"))
-    assert "Finished running last task" in read_last_line(Path("single_reaction_000.kimmdy.log"))
+    assert "Finished running last task" in read_last_line(
+        Path("single_reaction_000.kimmdy.log")
+    )
     assert len(list(Path.cwd().glob("single_reaction_000/*"))) == 8
 
 
@@ -133,7 +135,9 @@ def test_integration_single_reaction(arranged_tmp_path):
 )
 def test_integration_just_reactions(arranged_tmp_path):
     kimmdy_run(input=Path("alternative_kimmdy.yml"))
-    assert "Finished running last task" in read_last_line(Path("single_reaction_000.kimmdy.log"))
+    assert "Finished running last task" in read_last_line(
+        Path("single_reaction_000.kimmdy.log")
+    )
     assert len(list(Path.cwd().glob("single_reaction_000/*"))) == 8
 
 
@@ -143,7 +147,9 @@ def test_integration_just_reactions(arranged_tmp_path):
 )
 def test_integration_hat_naive_reaction(arranged_tmp_path):
     kimmdy_run()
-    assert "Finished running last task" in read_last_line(Path("alanine_hat_000.kimmdy.log"))
+    assert "Finished running last task" in read_last_line(
+        Path("alanine_hat_000.kimmdy.log")
+    )
     assert len(list(Path.cwd().glob("alanine_hat_000/*"))) == 16
 
 
@@ -153,7 +159,9 @@ def test_integration_hat_naive_reaction(arranged_tmp_path):
 )
 def test_integration_homolysis_reaction(arranged_tmp_path):
     kimmdy_run()
-    assert "Finished running last task" in read_last_line(Path("hexalanine_homolysis_000.kimmdy.log"))
+    assert "Finished running last task" in read_last_line(
+        Path("hexalanine_homolysis_000.kimmdy.log")
+    )
     assert len(list(Path.cwd().glob("hexalanine_homolysis_000/*"))) == 13
 
 
@@ -200,7 +208,9 @@ def test_integration_restart(arranged_tmp_path):
     kimmdy_run(input=Path("kimmdy_restart.yml"))
     n_files_continue_md = len(list(run_dir.glob("*")))
 
-    assert "Finished running last task" in read_last_line(Path("alanine_hat_000.kimmdy.log"))
+    assert "Finished running last task" in read_last_line(
+        Path("alanine_hat_000.kimmdy.log")
+    )
     assert n_files_original == n_files_continue_md == 17
 
     # try restart from finished md
@@ -210,7 +220,9 @@ def test_integration_restart(arranged_tmp_path):
     kimmdy_run(input=Path("kimmdy_restart.yml"))
     n_files_restart = len(list(run_dir.glob("*")))
 
-    assert "Finished running last task" in read_last_line(Path("alanine_hat_000.kimmdy.log"))
+    assert "Finished running last task" in read_last_line(
+        Path("alanine_hat_000.kimmdy.log")
+    )
     assert n_files_original == n_files_restart == 17
 
 
