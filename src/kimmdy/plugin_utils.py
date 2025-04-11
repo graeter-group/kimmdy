@@ -160,9 +160,8 @@ def calculate_forces(ds: np.ndarray, b0: float, edis: float, beta: float) -> np.
     ds_mask = ds > d_inflection
     ds[ds_mask] = d_inflection
     dds = ds - b0
-    return (
-        2 * beta * edis * np.exp(-beta * dds) * (1 - np.exp(-beta * dds))
-    )
+    return 2 * beta * edis * np.exp(-beta * dds) * (1 - np.exp(-beta * dds))
+
 
 def morse_transition_rate(
     r_curr: list[float],
@@ -203,8 +202,8 @@ def morse_transition_rate(
     fs = calculate_forces(ds=rs, b0=r_0, edis=dissociation_energy, beta=beta)
     ks = morse_rates_from_forces(
         fs=fs,
-        r_0=r_0,
-        dissociation_energy=dissociation_energy,
+        b0=r_0,
+        edis=dissociation_energy,
         beta=beta,
         frequency_factor=frequency_factor,
         temperature=temperature,
@@ -215,43 +214,39 @@ def morse_transition_rate(
 
 def morse_rates_from_forces(
     fs: np.ndarray,
-    r_0: float,
-    dissociation_energy: float,
+    b0: float,
+    edis: float,
     beta: float,
     frequency_factor: float = 0.288,
     temperature: float = 300,
 ) -> np.ndarray:
     # calculate extrema of shifted potential i.e. get barrier height of V_eff = V_morse - F*X
-    r_min = r_0 - 1 / beta * np.log(
+    r_min = b0 - 1 / beta * np.log(
         (
-            beta * dissociation_energy
+            beta * edis
             + np.sqrt(
-                (beta**2 * dissociation_energy**2 - 2 * dissociation_energy * beta * fs)
+                (beta**2 * edis**2 - 2 * edis * beta * fs)
                 + 1e-7  # prevent rounding issue close to zero
             )
         )
-        / (2 * beta * dissociation_energy)
+        / (2 * beta * edis)
     )
-    r_max = r_0 - 1 / beta * np.log(
+    r_max = b0 - 1 / beta * np.log(
         (
-            beta * dissociation_energy
+            beta * edis
             - np.sqrt(
-                (beta**2 * dissociation_energy**2 - 2 * dissociation_energy * beta * fs)
+                (beta**2 * edis**2 - 2 * edis * beta * fs)
                 + 1e-7  # prevent rounding issue close to zero
             )
         )
-        / (2 * beta * dissociation_energy)
+        / (2 * beta * edis)
     )
     r_max = np.where(
-        ~np.isfinite(r_max), 10 * r_0, r_max
+        ~np.isfinite(r_max), 10 * b0, r_max
     )  # set rmax to r0 * 10 where no rmax can be found
 
-    v_max = dissociation_energy * (1 - np.exp(-beta * (r_max - r_0))) ** 2 - fs * (
-        r_max - r_0
-    )
-    v_min = dissociation_energy * (1 - np.exp(-beta * (r_min - r_0))) ** 2 - fs * (
-        r_min - r_0
-    )
+    v_max = edis * (1 - np.exp(-beta * (r_max - b0))) ** 2 - fs * (r_max - b0)
+    v_min = edis * (1 - np.exp(-beta * (r_min - b0))) ** 2 - fs * (r_min - b0)
     # Note: F*r should lead to same result as F*(r-r_0) since the shifts in Vmax-Vmin adds up to zero
     delta_v = v_max - v_min
 
