@@ -1109,7 +1109,9 @@ class RunManager:
         )
 
         if self.config.just_sample:
-            logger.info("Just sampling reactions, not applying recipes. KIMMDY will exit.")
+            logger.info(
+                "Just sampling reactions, not applying recipes. KIMMDY will exit."
+            )
             self.state = State.DONE
             return files
 
