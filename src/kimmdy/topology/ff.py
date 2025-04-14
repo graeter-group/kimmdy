@@ -131,7 +131,7 @@ class FF:
                 return
         residuetypes_dict = read_top(residuetypes_path, use_gmx_dir=False)
         for k, v in residuetypes_dict.items():
-            if k.startswith("BLOCK") or k in ["bondedtypes", "ffdir", "define"]:
+            if k.startswith("BLOCK") or k in ["bondedtypes", "ffdir", "define", "cmap"]:
                 continue
             if not v.get("subsections"):
                 raise AssertionError(f"key {k} has no subsections, only {v}.")
