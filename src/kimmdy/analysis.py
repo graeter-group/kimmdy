@@ -6,6 +6,7 @@ import argparse
 import json
 import subprocess as sp
 import re
+from tqdm import tqdm
 from datetime import timedelta
 from pathlib import Path
 from typing import Optional, Union
@@ -251,6 +252,8 @@ def plot_energy(
         plt.axvline(x=t, color="black", linestyle="--")
         plt.text(x=t, y=v + 0.5, s=s, fontsize=6)
 
+    fig = plt.gcf()
+    fig.set_size_inches(int(4+len(edrs)/10),int(4+len(terms)/2))
     ax = plt.gca()
     steps_y_axis = [
         c for c in ax.get_children() if isinstance(c, matplotlib.axis.YAxis)
@@ -264,7 +267,7 @@ def plot_energy(
 
 
 def radical_population(
-    dir: str,
+    dirs: list[str],
     population_type: str = "frequency",
     steps: Union[list[str], str] = "all",
     select_atoms: str = "protein",
@@ -275,8 +278,8 @@ def radical_population(
 
     Parameters
     ----------
-    dir
-        KIMMDY run directory to be analysed.
+    dirs
+        KIMMDY run directories to be analysed.
     population_type
         How to calculate the fractional radical occupancy. Available are 'frequency' and 'time'
     steps
@@ -289,38 +292,45 @@ def radical_population(
     open_vmd
         Open a pdb in VMD with the radical occupation as B-factors.
     """
-    run_dir = Path(dir).expanduser().resolve()
-    analysis_dir = get_analysis_dir(run_dir)
-
-    subdirs_matched = get_task_directories(run_dir, steps)
-    radical_jsons = list(run_dir.glob("**/radicals.json"))
-    radical_jsons.sort(
-        key=lambda x: int(x.parents[0].name.split("_")[0])
-    )  # sort by task number
+    run_dirs = [Path(run_dir).expanduser().resolve() for run_dir in dirs]
+    print(f"Run dirs: {run_dirs}")
+    main_run_dir = run_dirs[0]
+    analysis_dir = get_analysis_dir(main_run_dir)
 
     radical_info = {"overall_time": [], "residence_time": [], "radicals": []}
-    for radical_json in radical_jsons:
-        data = read_json(radical_json)
-        for k in radical_info.keys():
-            radical_info[k].append(data[k])
+    for run_dir in tqdm(run_dirs,desc='Reading radical data'):
+        radical_jsons = list(run_dir.glob("**/radicals.json"))
+        radical_jsons.sort(
+            key=lambda x: int(x.parents[0].name.split("_")[0])
+        )  # sort by task number
+
+        for radical_json in radical_jsons:
+            data = read_json(radical_json)
+            for k in radical_info.keys():
+                radical_info[k].append(data[k])
 
     write_json(radical_info, analysis_dir / "radical_population.json")
 
-    ## get atoms from gro file
-    gro = None
-    for subdir in subdirs_matched:
-        gro = list(subdir.glob("*.gro"))
-        if gro:
+    print(f"Matching radical data with structure")
+    subdirs_matched = get_task_directories(main_run_dir, steps)
+    ## get atoms from tpr+trr file
+    for subdir in subdirs_matched[::-1]:
+        tpr = None
+        trr = None
+        tpr = list(subdir.glob("*.tpr"))
+        trr = list(subdir.glob("*.trr"))
+        if (tpr and trr):
             break
-    if not gro:
-        raise ValueError(f"No .gro file found in {run_dir}")
+    if not (trr and tpr):
+        raise ValueError(f"No simulation files found in {run_dir}")
 
-    u = mda.Universe(str(gro[0]), format="gro")
+    u = mda.Universe(tpr[0].as_posix(),trr[0].as_posix())
+    u.atoms.ids = u.atoms.indices + 1
     atoms = u.select_atoms(select_atoms)
     atoms_identifier = [
         "-".join(str(x) for x in [a.resid, a.resname, a.name]) for a in atoms
     ]
-    atom_ids = atoms.ids
+    atom_ids = atoms.ids.tolist()
     # print(f"Found {len(atom_ids)} atom ids: {atom_ids}")
 
     ## plot fingerprint
@@ -349,18 +359,21 @@ def radical_population(
         )
 
     # filter out atoms with zero occupancy
-    print(f"Occupancy: {occupancy}.")
     occupied_counts = {
-        atoms_identifier[k - 1]: v for k, v in occupancy.items() if v > 0
+        atoms_identifier[atom_ids.index(k)]: v for k, v in occupancy.items() if v > 0
     }
+    print(f"Nonzero occupancy: {occupied_counts}.")
 
+    plt.figure(figsize=(2+len(occupied_counts)/2,4))
     sns.barplot(
         x=list(occupied_counts.keys()), y=list(occupied_counts.values()), errorbar=None
     )
+    plt.xticks(rotation=45)
 
     plt.xlabel("Atom identifier")
     plt.ylabel("Fractional Radical Occupancy")
     output_path = str(analysis_dir / "radical_population_fingerprint.png")
+    plt.tight_layout()
     plt.savefig(output_path, dpi=300)
 
     u.add_TopologyAttr("tempfactors")
@@ -383,7 +396,7 @@ def radical_population(
 
 
 def radical_migration(
-    dirs: list[str],
+    run_dirs: list[str],
     type: str = "qualitative",
     cutoff: int = 1,
 ):
@@ -394,29 +407,34 @@ def radical_migration(
     dirs
         KIMMDY run directories to be analysed.
     type
-        How to analyse radical migration. Available are 'qualitative','occurence' and 'min_rate'",
+        How to analyse radical migration. Available are 'qualitative','occurence' and 'max_rate'",
     cutoff
         Ignore migration between two atoms if it happened less often than the specified value.
 
     """
     print(
         "Running radical migration analysis\n"
-        f"dirs: \t\t{dirs}\n"
+        f"dirs: \t\t{run_dirs}\n"
         f"type: \t\t{type}\n"
         f"cutoff: \t{cutoff}\n\n"
-        f"Writing analysis files in {dirs[0]}"
+        f"Writing analysis files in {run_dirs[0]}"
     )
 
-    migrations = []
-    analysis_dir = get_analysis_dir(Path(dirs[0]))
-    for d in dirs:
-        run_dir = Path(d).expanduser().resolve()
+    run_dirs = [Path(run_dir).expanduser().resolve() for run_dir in run_dirs]
+    print(f"Run dirs: {run_dirs}")
+    main_run_dir = run_dirs[0]
+    analysis_dir = get_analysis_dir(main_run_dir)
 
+    migrations = []
+    for run_dir in tqdm(run_dirs):
         picked_recipes = {}
         for recipes in run_dir.glob("*decide_recipe/recipes.csv"):
             task_nr = int(recipes.parents[0].stem.split(sep="_")[0])
             _, picked_recipe = RecipeCollection.from_csv(recipes)
-            picked_recipes[task_nr] = picked_recipe
+            if picked_recipe is not None:
+                picked_recipes[task_nr] = picked_recipe
+            else:
+                print(f'No recipe for {run_dir}')
         sorted_recipes = [v for _, v in sorted(picked_recipes.items())]
 
         for sorted_recipe in sorted_recipes:
@@ -555,6 +573,16 @@ def runtime_analysis(dir: str, open_plot: bool = False):
         Open plot in default system viewer.
     """
 
+    t_unit = 'hour'
+    if t_unit == 'hour':
+        t_label = 'Time [h]'
+        t_factor = 1/60
+    elif t_unit == 'minute':
+        t_label = 'Time [min]'
+        t_factor = 1
+    else:
+        raise ValueError
+
     run_dir = Path(dir).expanduser().resolve()
     analysis_dir = get_analysis_dir(run_dir)
 
@@ -571,9 +599,14 @@ def runtime_analysis(dir: str, open_plot: bool = False):
         e_started, t_started = read_time_marker(marker)
         e_done, t_done = read_time_marker(marker.with_name(MARK_DONE))
 
+        if e_started[0] == 'run_md' and (len(e_started) > 1 and len(e_done) == 1):
+            print(f'Restart during MD {marker.parent.name}. Taking first start time')
+            e_started = [e_started[0]]
+            t_started = [t_started[0]]
+
         assert sorted(e_started) == sorted(
             e_done
-        ), f"Not all tasks have finished! Error in {marker.parent.name}"
+        ), f"Not all tasks have finished! Error in {marker.parent.name}."
 
         for event, time_s in zip(e_started, t_started):
             time_e = t_done[e_done.index(event)]
@@ -627,6 +660,8 @@ def runtime_analysis(dir: str, open_plot: bool = False):
         dt_all.total_seconds() / 60,
     ]
 
+    df["Durations"] = df['Durations'] * t_factor
+
     # get longest stage
     cum_times = defaultdict(timedelta)
     for e, dt in zip(events, pure_dts):
@@ -654,7 +689,7 @@ def runtime_analysis(dir: str, open_plot: bool = False):
         legend=False,
         palette="viridis",
     )
-    plt.xlabel("Minutes")
+    plt.xlabel(t_label)
     plt.title("Runtime per stage")
     plt.tight_layout()
 
@@ -674,7 +709,7 @@ def runtime_analysis(dir: str, open_plot: bool = False):
         legend=False,
         palette="viridis",
     )
-    plt.xlabel("Minutes")
+    plt.xlabel(t_label)
     plt.title("Runtime per task")
     plt.tight_layout()
 
@@ -692,7 +727,7 @@ def runtime_analysis(dir: str, open_plot: bool = False):
         multiple="stack",
     )
     plt.title("Runtime per step")
-    plt.xlabel("Minutes")
+    plt.xlabel(t_label)
     plt.tight_layout()
 
     output_path = str(analysis_dir / "runtime_all.svg")
@@ -801,7 +836,7 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         help="Plot population of radicals for one or multiple KIMMDY run(s)",
     )
     parser_radical_population.add_argument(
-        "dir", type=str, help="KIMMDY run directory to be analysed.", nargs="?"
+        "dirs", help="KIMMDY run directories to be analysed.", nargs="*"
     )
     parser_radical_population.add_argument(
         "--population_type",
@@ -951,7 +986,7 @@ def entry_point_analysis():
         )
     elif args.module == "radical_population":
         radical_population(
-            dir=args.dir,
+            dirs=args.dirs,
             population_type=args.population_type,
             steps=args.steps,
             select_atoms=args.select_atoms,
@@ -961,7 +996,7 @@ def entry_point_analysis():
     elif args.module == "radical_migration":
         radical_migration(dirs=args.dirs, type=args.type, cutoff=args.cutoff)
     elif args.module == "rates":
-        plot_rates(dir=args.dir, open=args.open)
+        plot_rates(dir=argrun_dirsr, open=args.open)
     elif args.module == "runtime":
         runtime_analysis(dir=args.dir, open_plot=args.open_plot)
     elif args.module == "reaction_participation":

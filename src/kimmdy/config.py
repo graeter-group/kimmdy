@@ -86,13 +86,13 @@ def configure_logger(config: Config):
     logging.config.dictConfig(log_conf)
 
     # symlink logfile of the latest run to kimmdy.log in cwd
-    log: Path = config.cwd.joinpath("kimmdy.log")
-    if log.is_symlink():
-        log.unlink()
-    if log.exists():
-        os.remove(log)
+    # log: Path = config.cwd.joinpath("kimmdy.log")
+    # if log.is_symlink():
+    #     log.unlink()
+    # if log.exists():
+    #     os.remove(log)
 
-    log.symlink_to(config.out / config.log.file)
+    # log.symlink_to(config.out / config.log.file)
 
 
 class Config:

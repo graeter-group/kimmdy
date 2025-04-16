@@ -754,12 +754,12 @@ class RunManager:
             if self.latest_files.get("trr") is not None:
                 trr = files.input["trr"]
                 grompp_cmd += f" -t {trr}"
-            if self.latest_files.get("edr") is not None:
-                edr = files.input["edr"]
-                if edr is not None and edr.exists():
-                    grompp_cmd += f" -e {edr}"
-                else:
-                    logger.warning(f"edr file {edr} not found")
+            # if self.latest_files.get("edr") is not None:
+            #     edr = files.input["edr"]
+            #     if edr is not None and edr.exists():
+            #         grompp_cmd += f" -e {edr}"
+            #     else:
+            #         logger.warning(f"edr file {edr} not found")
             logger.debug(f"grompp cmd: {grompp_cmd}")
 
         mdrun_cmd = (

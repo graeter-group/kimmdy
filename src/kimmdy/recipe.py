@@ -751,22 +751,25 @@ class RecipeCollection:
             _ = next(reader)  # Skip the header row
             picked_rp = None
             for row in reader:
-                _, picked_s, recipe_steps_s, timespans_s, rates_s = row
+                try:
+                    _, picked_s, recipe_steps_s, timespans_s, rates_s = row
 
-                picked = ast.literal_eval(picked_s)
-                if recipe_steps_s != "":
-                    recipe_steps = recipe_steps_from_str(recipe_steps_s)
-                else:
-                    recipe_steps = []
-                timespans = ast.literal_eval(timespans_s)
-                rates = ast.literal_eval(rates_s)
+                    picked = ast.literal_eval(picked_s)
+                    if recipe_steps_s != "":
+                        recipe_steps = recipe_steps_from_str(recipe_steps_s)
+                    else:
+                        recipe_steps = []
+                    timespans = ast.literal_eval(timespans_s)
+                    rates = ast.literal_eval(rates_s)
 
-                recipe = Recipe(
-                    recipe_steps=recipe_steps, timespans=timespans, rates=rates
-                )
-                recipes.append(recipe)
-                if picked:
-                    picked_rp = recipe
+                    recipe = Recipe(
+                        recipe_steps=recipe_steps, timespans=timespans, rates=rates
+                    )
+                    recipes.append(recipe)
+                    if picked:
+                        picked_rp = recipe
+                except ValueError as e:
+                    logger.debug(e)
 
         return cls(recipes=recipes), picked_rp
 
