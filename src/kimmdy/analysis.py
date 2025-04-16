@@ -253,7 +253,7 @@ def plot_energy(
         plt.text(x=t, y=v + 0.5, s=s, fontsize=6)
 
     fig = plt.gcf()
-    fig.set_size_inches(int(4+len(edrs)/10),int(4+len(terms)/2))
+    fig.set_size_inches(int(4 + len(edrs) / 10), int(4 + len(terms) / 2))
     ax = plt.gca()
     steps_y_axis = [
         c for c in ax.get_children() if isinstance(c, matplotlib.axis.YAxis)
@@ -298,7 +298,7 @@ def radical_population(
     analysis_dir = get_analysis_dir(main_run_dir)
 
     radical_info = {"overall_time": [], "residence_time": [], "radicals": []}
-    for run_dir in tqdm(run_dirs,desc='Reading radical data'):
+    for run_dir in tqdm(run_dirs, desc="Reading radical data"):
         radical_jsons = list(run_dir.glob("**/radicals.json"))
         radical_jsons.sort(
             key=lambda x: int(x.parents[0].name.split("_")[0])
@@ -319,12 +319,12 @@ def radical_population(
         trr = None
         tpr = list(subdir.glob("*.tpr"))
         trr = list(subdir.glob("*.trr"))
-        if (tpr and trr):
+        if tpr and trr:
             break
     if not (trr and tpr):
         raise ValueError(f"No simulation files found in {run_dir}")
 
-    u = mda.Universe(tpr[0].as_posix(),trr[0].as_posix())
+    u = mda.Universe(tpr[0].as_posix(), trr[0].as_posix())
     u.atoms.ids = u.atoms.indices + 1
     atoms = u.select_atoms(select_atoms)
     atoms_identifier = [
@@ -364,7 +364,7 @@ def radical_population(
     }
     print(f"Nonzero occupancy: {occupied_counts}.")
 
-    plt.figure(figsize=(2+len(occupied_counts)/2,4))
+    plt.figure(figsize=(2 + len(occupied_counts) / 2, 4))
     sns.barplot(
         x=list(occupied_counts.keys()), y=list(occupied_counts.values()), errorbar=None
     )
@@ -434,7 +434,7 @@ def radical_migration(
             if picked_recipe is not None:
                 picked_recipes[task_nr] = picked_recipe
             else:
-                print(f'No recipe for {run_dir}')
+                print(f"No recipe for {run_dir}")
         sorted_recipes = [v for _, v in sorted(picked_recipes.items())]
 
         for sorted_recipe in sorted_recipes:
@@ -573,12 +573,12 @@ def runtime_analysis(dir: str, open_plot: bool = False):
         Open plot in default system viewer.
     """
 
-    t_unit = 'hour'
-    if t_unit == 'hour':
-        t_label = 'Time [h]'
-        t_factor = 1/60
-    elif t_unit == 'minute':
-        t_label = 'Time [min]'
+    t_unit = "hour"
+    if t_unit == "hour":
+        t_label = "Time [h]"
+        t_factor = 1 / 60
+    elif t_unit == "minute":
+        t_label = "Time [min]"
         t_factor = 1
     else:
         raise ValueError
@@ -599,8 +599,8 @@ def runtime_analysis(dir: str, open_plot: bool = False):
         e_started, t_started = read_time_marker(marker)
         e_done, t_done = read_time_marker(marker.with_name(MARK_DONE))
 
-        if e_started[0] == 'run_md' and (len(e_started) > 1 and len(e_done) == 1):
-            print(f'Restart during MD {marker.parent.name}. Taking first start time')
+        if e_started[0] == "run_md" and (len(e_started) > 1 and len(e_done) == 1):
+            print(f"Restart during MD {marker.parent.name}. Taking first start time")
             e_started = [e_started[0]]
             t_started = [t_started[0]]
 
@@ -660,7 +660,7 @@ def runtime_analysis(dir: str, open_plot: bool = False):
         dt_all.total_seconds() / 60,
     ]
 
-    df["Durations"] = df['Durations'] * t_factor
+    df["Durations"] = df["Durations"] * t_factor
 
     # get longest stage
     cum_times = defaultdict(timedelta)
