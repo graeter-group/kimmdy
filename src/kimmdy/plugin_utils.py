@@ -1,3 +1,5 @@
+"""Reaction plugin building blocks
+"""
 import logging
 from pathlib import Path
 from typing import Optional, TypeAlias, TypedDict
@@ -12,7 +14,6 @@ from kimmdy.topology.topology import Topology
 logger = logging.getLogger(__name__)
 
 
-### reaction plugin building blocks ###
 class Stats(TypedDict):
     plumed_id: str
     mean_d: float
@@ -129,10 +130,11 @@ def get_bondstats(
             edis = 500
 
         ds = np.asarray([values[plumed_id] for values in distances.values()])
+        mean_d = float(np.mean(ds))
+
         beta = calculate_beta(kb=kb, edis=edis)
         forces = calculate_forces(ds=ds, b0=b0, edis=edis, beta=beta)
 
-        mean_d = float(np.mean(ds))
         mean_f = float(np.mean(forces))
 
         stats[bondkey] = {
@@ -149,17 +151,18 @@ def calculate_beta(kb: float, edis: float) -> float:
     return np.sqrt(kb / (2 * edis))
 
 
-def calculate_forces(ds: np.ndarray, b0: float, edis: float, beta: float) -> np.ndarray:
+def calculate_forces(ds: np.ndarray, b0: float, edis: float, beta: float, max_f: bool=True) -> np.ndarray:
     """Calculate forces from distances using the Morse potential.
 
     Forces are returned in gromacs units kJ/mol/nm.
     """
     d_inflection = (beta * b0 + np.log(2)) / beta
-    # if the bond is stretched beyond the inflection point,
-    # take the inflection point force because this force must have acted on the bond at some point
-    ds_mask = ds > d_inflection
-    ds[ds_mask] = d_inflection
     dds = ds - b0
+    if max_f:
+        # if the bond is stretched beyond the inflection point,
+        # take the inflection point force because this force must have acted on the bond at some point
+        ds_mask = ds > d_inflection
+        dds[ds_mask] = d_inflection - b0
     return 2 * beta * edis * np.exp(-beta * dds) * (1 - np.exp(-beta * dds))
 
 
