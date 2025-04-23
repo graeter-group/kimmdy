@@ -33,16 +33,16 @@ from kimmdy.constants import (
 )
 from kimmdy.coordinates import break_bond_plumed, merge_top_slow_growth, place_atom
 from kimmdy.kmc import (
+    KMCAccept,
     KMCError,
     KMCReject,
-    KMCAccept,
     KMCResult,
     dummy_first_kmc,
     extrande,
     extrande_mod,
     frm,
-    rf_kmc,
     multi_rfkmc,
+    rf_kmc,
 )
 from kimmdy.parsing import read_mdp, read_top, write_json, write_time_marker, write_top
 from kimmdy.plugins import (
@@ -1200,7 +1200,10 @@ class RunManager:
         for step in recipe.recipe_steps:
             if isinstance(step, Break):
                 self.top.break_bond((step.atom_id_1, step.atom_id_2))
-                if hasattr(self.config, "plumed"):
+                if (
+                    hasattr(self.config, "plumed")
+                    and self.config.changer.topology.break_plumed
+                ):
                     break_bond_plumed(
                         files,
                         (step.atom_id_1, step.atom_id_2),
