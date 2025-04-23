@@ -385,6 +385,12 @@
           "type": "object",
           "description": "Settings for parameter changes in the topology file",
           "properties": {
+            "break_plumed": {
+              "type": "boolean",
+              "description": "Whether to remove bonds from the plumed.dat input file when applying a reaction recipe that breaks a bond.",
+              "pytype": "bool",
+              "default": true
+            },
             "parameterization": {
               "type": "string",
               "description": "Parameterization scheme that is used on the topology file after changes to it",
