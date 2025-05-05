@@ -388,9 +388,10 @@ class TestTopology:
                 assert new_d.ak == update.get(old_d.ak)
                 assert new_d.al == update.get(old_d.al)
 
-    def test_break_bind_bond_hexala(self, hexala_top_fix):
+    def test_break_bind_bond_hexala(self, hexala_top_fix: Topology):
         top = deepcopy(hexala_top_fix)
         og_top = deepcopy(top)
+        og_top.to_path("/tmp/og.top")
 
         bondindex = 24
         bond_key = list(top.bonds.keys())[bondindex]
@@ -408,6 +409,8 @@ class TestTopology:
         assert top.validate_bond(top.atoms[bond_key[0]], top.atoms[bond_key[1]])
         with pytest.raises(ValueError):
             top.bind_bond(bond_key)
+
+        top.to_path("/tmp/top.top")
 
         assert top.bonds == og_top.bonds
         assert top.pairs == og_top.pairs
@@ -760,7 +763,7 @@ class TestHexalaTopology:
         top = deepcopy(hexala_top_fix)
 
         residues = list(top.ff.residuetypes.keys())
-        assert len(residues) == 121
+        assert len(residues) == 153
 
         res = ResidueType(
             "HOH",
@@ -913,4 +916,117 @@ class TestChargeAssignment:
         fragment1_nrs = [str(i) for i in range(50, 66)]
         assert np.isclose(
             sum([float(top_charged.atoms[nr].charge) for nr in fragment1_nrs]), 0
+        )
+
+
+class TestDimerization:
+    @pytest.fixture
+    def top_init(self, filedir) -> Topology:
+        return Topology.from_path(
+            filedir / "TdT_inital.top", ffdir=filedir / "amber14sb_OL21_mod.ff"
+        )
+
+    @pytest.fixture
+    def top_target(self, filedir) -> Topology:
+        return Topology.from_path(
+            filedir / "TdT_from_pdb2gmx.top", ffdir=filedir / "amber14sb_OL21_mod.ff"
+        )
+
+    def test_get_improper_dihedrals_dimer(self, top_target: Topology):
+        """
+
+        [ atoms ]
+        12 CT 1 DD5 C6 12 0.01612 12.01
+
+        14 CT 1 DD5 C5 14 -0.09999 12.01
+
+        44 CT 2 DD3 C6 44 0.01612 12.01
+
+        46 CT 2 DD3 C5 46 -0.09999 12.01
+
+        from pdb2gmx
+        [dihedrals ]
+        9 11 12 23 4
+        11 21 23 24 4
+        14 21 19 20 4
+        19 23 21 22 4
+        41 43 44 55 4
+        43 53 55 56 4
+        46 53 51 52 4
+        51 55 53 54 4
+
+        from [dd5 ]
+         [ impropers ]
+            C2    C6    N1   C1'
+            N1    N3    C2    O2
+            C5    N3    C4    O4
+            C4    C2    N3    H3  
+
+        from [dd3]
+         [ impropers ]
+            C2    C6    N1   C1'
+            N1    N3    C2    O2
+            C5    N3    C4    O4
+            C4    C2    N3    H3  
+        """
+        dihedral_k_v = top_target.reactive_molecule._get_atom_improper_dihedrals(
+            "12", top_target.ff
+        )
+        keys = [k for k, _ in dihedral_k_v]
+        assert keys == [('23', '12', '11', '9')]
+
+        dihedral_k_v = top_target.reactive_molecule._get_atom_improper_dihedrals(
+            "14", top_target.ff
+        )
+        keys = [k for k, _ in dihedral_k_v]
+        assert keys == [('14', '21', '19', '20')]
+
+        dihedral_k_v = top_target.reactive_molecule._get_atom_improper_dihedrals(
+            "44", top_target.ff
+        )
+        keys = [k for k, _ in dihedral_k_v]
+        assert keys == [('55', '44', '43', '41')]
+
+        dihedral_k_v = top_target.reactive_molecule._get_atom_improper_dihedrals(
+            "46", top_target.ff
+        )
+        keys = [k for k, _ in dihedral_k_v]
+        assert keys == [('46', '53', '51', '52')]
+
+
+    def test_dimerization(self, top_init: Topology, top_target: Topology):
+        top_init.to_path("/tmp/init.top")
+        top_target.to_path("/tmp/target.top")
+
+        top = deepcopy(top_init)
+        # Change residue types
+        change_dict = {"C6": "CT", "C5": "CT", "H6": "H1", "N1": "N"}
+        res_a = "1"
+        res_b = "2"
+        for atom in top.atoms.values():
+            if atom.resnr == res_a or atom.resnr == res_b:
+                atom.residue = atom.residue.replace("T", "D")
+        # Change atomtypes
+        for atom in top.atoms.values():
+            if atom.resnr == res_a or atom.resnr == res_b:
+                if atom.atom in change_dict.keys():
+                    atom.type = change_dict[atom.atom]
+
+        top.bind_bond(("14", "46"))
+        top.bind_bond(("12", "44"))
+
+        top.to_path("/tmp/updated.top")
+
+        assert set(top.bonds.keys()) == set(top_target.bonds.keys())
+        assert set(top.angles.keys()) == set(top_target.angles.keys())
+        assert set(top.pairs.keys()) == set(top_target.pairs.keys())
+        assert set(top.proper_dihedrals.keys()) == set(
+            top_target.proper_dihedrals.keys()
+        )
+
+        assert len(top.improper_dihedrals.keys()) == len(
+            top_target.improper_dihedrals.keys()
+        )
+        assert set(top.improper_dihedrals.keys()) == set(
+            top_target.improper_dihedrals.keys()
         )
