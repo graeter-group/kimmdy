@@ -118,24 +118,29 @@ class FF:
 
         if residuetypes_path:
             logger.debug(f"Using specified residuetypes file: {residuetypes_path}")
+            residuetypes_paths = [residuetypes_path]
         else:
             logger.debug("Trying to use default amber protein residuetypes file.")
             if ffdir is None:
                 logger.warning("ffdir is None. No residuetypes will be parsed.")
                 return
-            residuetypes_path = ffdir / "aminoacids.rtp"
+            residuetypes_paths = [
+                ffdir / x for x in ["rna.rtp", "dna.rtp", "aminoacids.rtp"]
+            ]
+
+        for residuetypes_path in residuetypes_paths:
             if not residuetypes_path.exists():
                 logger.warning(
-                    "aminoacids.rtp not found in ffdir. No residuetypes will be parsed."
+                    f"{residuetypes_path} not found in ffdir."
                 )
-                return
-        residuetypes_dict = read_top(residuetypes_path, use_gmx_dir=False)
-        for k, v in residuetypes_dict.items():
-            if k.startswith("BLOCK") or k in ["bondedtypes", "ffdir", "define"]:
                 continue
-            if not v.get("subsections"):
-                raise AssertionError(f"key {k} has no subsections, only {v}.")
-            self.residuetypes[k] = ResidueType.from_section(k, v["subsections"])
+            residuetypes_dict = read_top(residuetypes_path, use_gmx_dir=False)
+            for k, v in residuetypes_dict.items():
+                if k.startswith("BLOCK") or k in ["bondedtypes", "ffdir", "define"]:
+                    continue
+                if not v.get("subsections"):
+                    raise AssertionError(f"key {k} has no subsections, only {v}.")
+                self.residuetypes[k] = ResidueType.from_section(k, v["subsections"])
 
     def __str__(self) -> str:
         return textwrap.dedent(
