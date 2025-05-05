@@ -1456,9 +1456,14 @@ class Topology:
                 str(x) for x in sorted([key[0], key[3]], key=int)
             )  # type: ignore
             if reactive_moleculetype.pairs.get(pairkey) is None:
-                reactive_moleculetype.pairs[pairkey] = Pair(
-                    pairkey[0], pairkey[1], FFFUNC["pair"]
-                )
+                # only add pair if the atoms are not otherwise bound (in a circle)
+                if (
+                    pairkey[0]
+                    not in reactive_moleculetype.atoms[pairkey[1]].bound_to_nrs
+                ):
+                    reactive_moleculetype.pairs[pairkey] = Pair(
+                        pairkey[0], pairkey[1], FFFUNC["pair"]
+                    )
 
         # improper dihedral
         dihedral_k_v = reactive_moleculetype._get_atom_improper_dihedrals(
