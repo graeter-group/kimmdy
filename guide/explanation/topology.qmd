@@ -140,4 +140,19 @@ This way, explicit atom numbers match up with the atom numbers
 in the coordinate file (or rather, line numbers - 2, since the
 numbers in the actual `atomnr` column can overflow due to the fixed-width file format).
 
+## Rings
+
+```{python}
+top = Topology.from_path('../../tests/test_files/test_topology/TdT_from_pdb2gmx.top')
+write_top_as_dot(top, "dna.dot")
+```
+
+
+```{python}
+len(top.improper_dihedrals.keys())
+```
+
+```{python}
+top
+```
 

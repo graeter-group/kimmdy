@@ -6,7 +6,7 @@ from itertools import permutations
 from typing import TYPE_CHECKING, Any, Callable, Optional
 
 from kimmdy.constants import ION_NAMES, REACTIVE_MOLECULEYPE, SOLVENT_NAMES
-from kimmdy.topology.atomic import MoleculeTypeHeader
+from kimmdy.topology.atomic import AtomId, MoleculeTypeHeader
 
 if TYPE_CHECKING:
     from kimmdy.config import Config
@@ -344,7 +344,7 @@ def get_residue_fragments(
     return fragments[0], fragments[1]
 
 
-def get_residue_by_bonding(atom: Atom, atoms: dict[str, Atom]) -> dict[str, Atom]:
+def get_residue_by_bonding(atom: Atom, atoms: dict[AtomId, Atom]) -> dict[AtomId, Atom]:
     """Get the residue of an atom by its bonding.
 
     Avoids traversing the whole topology.
