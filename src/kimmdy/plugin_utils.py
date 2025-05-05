@@ -1,5 +1,5 @@
-"""Reaction plugin building blocks
-"""
+"""Reaction plugin building blocks"""
+
 import logging
 from pathlib import Path
 from typing import Optional, TypeAlias, TypedDict
@@ -151,7 +151,9 @@ def calculate_beta(kb: float, edis: float) -> float:
     return np.sqrt(kb / (2 * edis))
 
 
-def calculate_forces(ds: np.ndarray, b0: float, edis: float, beta: float, max_f: bool=True) -> np.ndarray:
+def calculate_forces(
+    ds: np.ndarray, b0: float, edis: float, beta: float, max_f: bool = True
+) -> np.ndarray:
     """Calculate forces from distances using the Morse potential.
 
     Forces are returned in gromacs units kJ/mol/nm.
