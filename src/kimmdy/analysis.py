@@ -53,6 +53,7 @@ def concat_traj(
     steps: Union[list[str], str],
     open_vmd: bool = False,
     output_group: Optional[str] = None,
+    center_group: Optional[str] = None,
     use_last_names: bool = False,
 ):
     """Find and concatenate trajectories (.xtc files) from a KIMMDY run into one trajectory.
@@ -68,6 +69,8 @@ def concat_traj(
         Open concatenated trajectory in VMD
     output_group
         index group for output. Default is "Protein" for xtc and "System" for trr.
+    output_group
+        index group for centering.
     use_last_names
         Use the tpr/topology of the last trajectory for the output, default is the first.
         This influences the names and types of the atoms in the output, which can be useful for VMD.
@@ -90,9 +93,11 @@ def concat_traj(
 
     filetype_ouput_group_default = {"xtc": "Protein", "trr": "System"}
     if output_group is None:
-        output = filetype_ouput_group_default[filetype]
+        output_group = filetype_ouput_group_default[filetype]
     else:
-        output = output_group
+        output_group = output_group
+    if center_group is None:
+        center_group = "Protein"
 
     ## gather trajectories
     trajectories: list[Path] = []
@@ -132,12 +137,12 @@ def concat_traj(
     else:
         i = 0
     run_shell_cmd(
-        s=rf"echo -e 'Protein\n{output}' | gmx trjconv -dt 0 -f {tmp_xtc} -s {tprs[i]} -o {str(out_xtc)} -center -pbc mol",
+        s=rf"echo -e '{center_group}\n{output_group}' | gmx trjconv -dt 0 -f {tmp_xtc} -s {tprs[i]} -o {str(out_xtc)} -center -pbc mol",
         cwd=run_dir,
     )
     assert out_xtc.exists(), f"Concatenated trajectory {out_xtc} not found."
     run_shell_cmd(
-        rf"echo -e 'Protein\n{output}' | gmx trjconv -dt 0 -dump 0 -f {tmp_xtc} -s {tprs[i]} -o {str(out_gro)} -center -pbc mol",
+        rf"echo -e '{center_group}\n{output_group}' | gmx trjconv -dt 0 -dump 0 -f {tmp_xtc} -s {tprs[i]} -o {str(out_gro)} -center -pbc mol",
         cwd=run_dir,
     )
     run_shell_cmd(f"rm {tmp_xtc}", cwd=run_dir)
@@ -755,6 +760,12 @@ def get_analysis_cmdline_args() -> argparse.Namespace:
         help="Index group to include in the output. Default is 'Protein' for xtc and 'System' for trr.",
     )
     parser_trjcat.add_argument(
+        "--center-group",
+        "-c",
+        type=str,
+        help="Index group for centering.",
+    )
+    parser_trjcat.add_argument(
         "--use-last-names",
         "-l",
         action="store_true",
@@ -939,6 +950,7 @@ def entry_point_analysis():
             steps=args.steps,
             open_vmd=args.open_vmd,
             output_group=args.output_group,
+            center_group=args.center_group,
             use_last_names=args.use_last_names,
         )
     elif args.module == "energy":
