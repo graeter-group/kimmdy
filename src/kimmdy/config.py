@@ -386,6 +386,8 @@ class Config:
                         relax_config = self.changer.coordinates
                         if relax_config.slow_growth in ["yes", "true", "full"]:
                             relax_config.slow_growth = True
+                        elif relax_config.slow_growth in ["morse_only"]:
+                            relax_config.slow_growth = "morse_only"
                         elif relax_config.slow_growth in ["no", "false", ""]:
                             relax_config.slow_growth = False
 

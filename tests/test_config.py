@@ -5,7 +5,7 @@ import yaml
 
 from kimmdy.config import Config
 from kimmdy.parsing import read_top
-from kimmdy.runmanager import get_existing_files
+from kimmdy.runmanager import RunManager, get_existing_files
 from kimmdy.topology.ff import FF
 from kimmdy.topology.topology import Topology
 
@@ -203,3 +203,11 @@ def test_config_retains_additional_kwargs(
 ):
     config = Config(Path("config4.yml"))
     assert config.changer.topology.parameterization_kwargs.test_arg == "hello"
+
+
+def test_config_works_for_no_slow_growth_relax(
+    arranged_tmp_path,
+):
+    config = Config(Path("conf5.yml"))
+    runmgr = RunManager(config)
+    assert runmgr

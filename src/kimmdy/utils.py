@@ -173,14 +173,14 @@ def check_gmx_version(config):
                     if not config.dryrun:
                         raise SystemError(m)
     if hasattr(config, "changer") and hasattr(config.changer, "coordinates"):
-        if config.changer.coordinates.slow_growth not in ["", "morse_only"]:
+        if config.changer.coordinates.slow_growth not in ["morse_only", False]:
             CONFIG_LOGS["debugs"].append(f"Gromacs version: {version}")
             major_minor = re.match(r".*(\d{4})\.(\d+).*", version)
             if major_minor is not None:
                 year = int(major_minor.group(1))
                 minor = int(major_minor.group(2))
                 if year < 2023 or (year == 2023 and minor < 2):
-                    m = "Note: slow growth of pairs is only supported by >= gromacs 2023.2. To disable morphing pairs in config: md.changer.coordinates.slow_growth: morse_only"
+                    m = "Note: slow growth of pairs is only supported by >= gromacs 2023.2. To disable morphing pairs in config: md.changer.coordinates.slow_growth: morse_only or remove it entirely to disable slow growth entirely."
                     CONFIG_LOGS["errors"].append(m)
                     raise SystemError(m)
     return version
