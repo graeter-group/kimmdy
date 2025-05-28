@@ -7,7 +7,7 @@ import pytest
 from hypothesis import HealthCheck, Phase, given, settings
 from hypothesis import strategies as st
 
-from kimmdy.parsing import TopologyDict, read_top, write_top
+from kimmdy.parsing import TopologyDict, read_top
 from kimmdy.recipe import Bind, Break
 from kimmdy.topology.atomic import *
 from kimmdy.topology.topology import REACTIVE_MOLECULEYPE, Topology
@@ -417,6 +417,18 @@ class TestTopology:
         assert top.pairs == og_top.pairs
         assert top.angles == og_top.angles
         assert top.proper_dihedrals == og_top.proper_dihedrals
+
+        atom = og_top.atoms["25"]
+        residuetype = og_top.ff.residuetypes.get(atom.residue)
+        assert isinstance(residuetype, ResidueType)
+        print(residuetype.improper_dihedrals.keys())
+
+        for k in ["25", "29", "27", "28"]:
+            print(og_top.atoms[k].atom)
+        # ('25', '29', '27', '28')
+        # in og_top, but not in top
+        # bond_key: ('25', '26')
+
         assert top.improper_dihedrals == og_top.improper_dihedrals
 
     @given(bondindex=st.integers(min_value=0, max_value=70))
@@ -688,19 +700,30 @@ class TestHexalaTopology:
         for atom in top.atoms.values():
             assert len(atom.bound_to_nrs) > 0
 
-    def test_find_terms_around_atom(self, hexala_top_fix):
+    def test_find_terms_around_atom(self, hexala_top_fix: Topology):
         top = deepcopy(hexala_top_fix)
         protein = top.moleculetypes[REACTIVE_MOLECULEYPE]
+
         atomnr = "29"
         bonds = protein._get_atom_bonds(atomnr)
         angles = protein._get_atom_angles(atomnr)
         proper_dihedrals = protein._get_atom_proper_dihedrals(atomnr)
         improper_dihedrals = protein._get_atom_improper_dihedrals(atomnr, top.ff)
-
         assert len(bonds) == 4
         assert len(angles) == 13
         assert len(proper_dihedrals) == 25
-        assert len(improper_dihedrals) == 3
+        assert len(improper_dihedrals.keys()) == 3
+
+        # TODO: this
+        atomnr = "25" # C
+        bonds = protein._get_atom_bonds(atomnr)
+        angles = protein._get_atom_angles(atomnr)
+        proper_dihedrals = protein._get_atom_proper_dihedrals(atomnr)
+        improper_dihedrals = protein._get_atom_improper_dihedrals(atomnr, top.ff)
+        assert len(bonds) == 3
+        assert len(angles) == 8
+        assert len(proper_dihedrals) == 18
+        assert len(improper_dihedrals.keys()) == 3
 
         atomnr = "9"
         bonds = protein._get_atom_bonds(atomnr)
@@ -970,29 +993,23 @@ class TestDimerization:
             C5    N3    C4    O4
             C4    C2    N3    H3
         """
-        dihedral_k_v = top_target.reactive_molecule._get_atom_improper_dihedrals(
-            "12", top_target.ff
-        )
-        keys = [k for k, _ in dihedral_k_v]
-        assert keys == [("23", "12", "11", "9")]
+        atom_impropers = top_target.reactive_molecule._get_atom_improper_dihedrals("12", top_target.ff)
+        assert list(atom_impropers.keys()) == [("23", "12", "11", "9")]
 
-        dihedral_k_v = top_target.reactive_molecule._get_atom_improper_dihedrals(
+        atom_impropers = top_target.reactive_molecule._get_atom_improper_dihedrals(
             "14", top_target.ff
         )
-        keys = [k for k, _ in dihedral_k_v]
-        assert keys == [("14", "21", "19", "20")]
+        assert list(atom_impropers.keys()) == [("14", "21", "19", "20")]
 
-        dihedral_k_v = top_target.reactive_molecule._get_atom_improper_dihedrals(
+        atom_impropers = top_target.reactive_molecule._get_atom_improper_dihedrals(
             "44", top_target.ff
         )
-        keys = [k for k, _ in dihedral_k_v]
-        assert keys == [("55", "44", "43", "41")]
+        assert list(atom_impropers.keys()) == [("55", "44", "43", "41")]
 
-        dihedral_k_v = top_target.reactive_molecule._get_atom_improper_dihedrals(
+        atom_impropers = top_target.reactive_molecule._get_atom_improper_dihedrals(
             "46", top_target.ff
         )
-        keys = [k for k, _ in dihedral_k_v]
-        assert keys == [("46", "53", "51", "52")]
+        assert list(atom_impropers.keys()) == [("46", "53", "51", "52")]
 
     def test_dimerization(self, top_init: Topology, top_target: Topology):
         top_init.to_path("/tmp/init.top")
