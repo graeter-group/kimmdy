@@ -395,6 +395,7 @@ class TestTopology:
 
         bondindex = 24
         bond_key = list(top.bonds.keys())[bondindex]
+        print(f"bond_key: {bond_key}")
         logging.info(f"bond_key: {bond_key}")
         assert top.bonds.get(bond_key) is not None
 

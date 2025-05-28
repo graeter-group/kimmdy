@@ -46,6 +46,8 @@ from kimmdy.utils import TopologyAtomAddress
 
 logger = logging.getLogger("kimmdy.topology")
 
+USE_NEW_DIHEDRAL_IMPLEMENTATION = False
+
 
 class MoleculeType:
     """One moleculetype in the topology
@@ -418,49 +420,92 @@ class MoleculeType:
         # belong to an adjacent atom, not just the the specified one
         # <https://manual.gromacs.org/current/reference-manual/functions/bonded-interactions.html#improper-dihedrals>
 
-        # FIXME: this
         atom = self.atoms[atom_nr]
         residuetype = ff.residuetypes.get(atom.residue)
         if not isinstance(residuetype, ResidueType):
             return []
 
-        residue = get_residue_by_bonding(atom=atom, atoms=self.atoms)
-        lowest_atomnr = min(residue.keys(), key=int)
-        highest_atomnr = max(residue.keys(), key=int)
-        previous_atom = self.atoms[str(int(lowest_atomnr) - 1)]
-        next_atom = self.atoms[str(int(highest_atomnr) + 1)]
-        previous_residue = get_residue_by_bonding(
-            atom=previous_atom, atoms=self.atoms
-        )
-        next_residue = get_residue_by_bonding(atom=next_atom, atoms=self.atoms)
+        if USE_NEW_DIHEDRAL_IMPLEMENTATION:
+            # FIXME: this
+            residue = get_residue_by_bonding(atom=atom, atoms=self.atoms)
+            lowest_atomnr = min(residue.keys(), key=int)
+            highest_atomnr = max(residue.keys(), key=int)
+            previous_atom = self.atoms[str(int(lowest_atomnr) - 1)]
+            next_atom = self.atoms[str(int(highest_atomnr) + 1)]
+            previous_residue = get_residue_by_bonding(
+                atom=previous_atom, atoms=self.atoms
+            )
+            next_residue = get_residue_by_bonding(atom=next_atom, atoms=self.atoms)
 
-        atomname_to_nr = {atom.atom: atom_nr for atom_nr, atom in residue.items()}
-        # residues on aminoacids.rtp specify a dihedral to the next or previous
-        # AA with -C and +N as the atomname
-        # replace entries for -C and +N with the actual atom numbers
-        # based on the previous and next residue
-        previous_atomnames = {atom.atom: atom_nr for atom_nr, atom in previous_residue.items()}
-        previous_c = previous_atomnames.get("-C")
-        if previous_c is not None:
-            atomname_to_nr["-C"] = previous_c
+            atomname_to_nr = {atom.atom: atom_nr for atom_nr, atom in residue.items()}
+            # residues on aminoacids.rtp specify a dihedral to the next or previous
+            # AA with -C and +N as the atomname
+            # replace entries for -C and +N with the actual atom numbers
+            # based on the previous and next residue
+            previous_atomnames = {atom.atom: atom_nr for atom_nr, atom in previous_residue.items()}
+            previous_c = previous_atomnames.get("-C")
+            if previous_c is not None:
+                atomname_to_nr["-C"] = previous_c
 
-        next_atomnames = {atom.atom: atom_nr for atom_nr, atom in next_residue.items()}
-        next_n = next_atomnames.get("+N")
-        if next_n is not None:
-            atomname_to_nr["+N"] = next_n
+            next_atomnames = {atom.atom: atom_nr for atom_nr, atom in next_residue.items()}
+            next_n = next_atomnames.get("+N")
+            if next_n is not None:
+                atomname_to_nr["+N"] = next_n
 
-        dihedrals = []
-        for key, improper in residuetype.improper_dihedrals.items():
-            nr_key = tuple(atomname_to_nr.get(x) for x in key) # pyright: ignore
-            if None in nr_key:
-                m = f"Improper dihedral {key} not found in residue {atom.residue}."
-                logger.warning(m)
-                continue
-            if atom_nr not in nr_key:
-                continue
-            dihedrals.append((nr_key, improper))
+            dihedrals = []
+            for key, improper in residuetype.improper_dihedrals.items():
+                nr_key = tuple(atomname_to_nr.get(x) for x in key) # pyright: ignore
+                if None in nr_key:
+                    m = f"Improper dihedral {key} not found in residue {atom.residue}."
+                    logger.warning(m)
+                    continue
+                if atom_nr not in nr_key:
+                    continue
+                dihedrals.append((nr_key, improper))
 
-        return dihedrals
+            return dihedrals
+        else:
+            # https://manual.gromacs.org/current/reference-manual/functions/bonded-interactions.html#improper-dihedrals
+            # atom in a line, like a regular dihedral:
+            dihedrals = []
+            dihedral_candidate_keys = self._get_margin_atom_dihedrals(
+                atom_nr
+            ) + self._get_center_atom_dihedrals(atom_nr)
+
+            # atom in the center of a triangle:
+            ai = atom_nr
+            partners = self.atoms[ai].bound_to_nrs
+            if len(partners) >= 3:
+                combs = permutations(partners, 3)
+                for comb in combs:
+                    aj, ak, al = comb
+                    # center atom is at position 3
+                    dihedral_candidate_keys.append((aj, ak, ai, al))
+
+            # atom in corner of a triangle:
+            for a in self.atoms[atom_nr].bound_to_nrs:
+                partners = self.atoms[a].bound_to_nrs
+                if len(partners) >= 3:
+                    combs = permutations(partners + [a], 4)
+                    for comb in combs:
+                        ai, aj, ak, al = comb
+                        dihedral_candidate_keys.append((ai, aj, ak, al))
+
+            # residues on aminoacids.rtp specify a dihedral to the next or previous
+            # AA with -C and +N as the atomname
+            for candidate in dihedral_candidate_keys:
+                candidate_key = [self.atoms[atom_nr].atom for atom_nr in candidate]
+                for i, nr in enumerate(candidate):
+                    if self.atoms[nr].resnr != atom.resnr:
+                        if candidate_key[i] == "C":
+                            candidate_key[i] = "-C"
+                        elif candidate_key[i] == "N":
+                            candidate_key[i] = "+N"
+
+                dihedral = residuetype.improper_dihedrals.get(tuple(candidate_key)) # pyright: ignore
+                if dihedral:
+                    dihedrals.append((candidate, dihedral))
+            return dihedrals
 
     def _regenerate_topology_from_bound_to(self, ff):
         # clear all bonds, angles, dihedrals
@@ -1441,22 +1486,24 @@ class Topology:
         reactive_moleculetype.bonds[atompair_nrs] = bond
         logging.info(f"added bond: {bond}")
 
-        # make sure that there are no additional pairs
-        # where bonds or angles are already between the atoms
-        bond_pairkey: tuple[str, str] = tuple(
-            str(x) for x in sorted([atompair[0].nr, atompair[1].nr], key=int)
-        )  # type: ignore
-        reactive_moleculetype.pairs.pop(bond_pairkey, None)
+        if USE_NEW_DIHEDRAL_IMPLEMENTATION:
+            # FIXME: this
+            # make sure that there are no additional pairs
+            # where bonds or angles are already between the atoms
+            bond_pairkey: tuple[str, str] = tuple(
+                str(x) for x in sorted([atompair[0].nr, atompair[1].nr], key=int)
+            )  # type: ignore
+            reactive_moleculetype.pairs.pop(bond_pairkey, None)
 
-        # and remove improper dihedrals connected to the bonds,
-        # as they will be re-added based on potentially changed residuetypes
-        to_pop = []
-        for key in reactive_moleculetype.improper_dihedrals.keys():
-            if atompair_nrs[0] in key or atompair_nrs[1] in key:
-                to_pop.append(key)
+            # and remove improper dihedrals connected to the bonds,
+            # as they will be re-added based on potentially changed residuetypes
+            to_pop = []
+            for key in reactive_moleculetype.improper_dihedrals.keys():
+                if atompair_nrs[0] in key or atompair_nrs[1] in key:
+                    to_pop.append(key)
 
-        for key in to_pop:
-            reactive_moleculetype.improper_dihedrals.pop(key, None)
+            for key in to_pop:
+                reactive_moleculetype.improper_dihedrals.pop(key, None)
 
 
         # add angles
@@ -1468,12 +1515,14 @@ class Topology:
                 reactive_moleculetype.angles[key] = Angle(
                     key[0], key[1], key[2], FFFUNC["harmonic_angle"]
                 )
-            # make sure that there are no additional pairs
-            # where bonds or angles are already between the atoms
-            angle_pairkey: tuple[str, str] = tuple(
-                str(x) for x in sorted([key[0], key[2]], key=int)
-            )  # type: ignore
-            reactive_moleculetype.pairs.pop(angle_pairkey, None)
+            if USE_NEW_DIHEDRAL_IMPLEMENTATION:
+                # FIXME: this
+                # make sure that there are no additional pairs
+                # where bonds or angles are already between the atoms
+                angle_pairkey: tuple[str, str] = tuple(
+                    str(x) for x in sorted([key[0], key[2]], key=int)
+                )  # type: ignore
+                reactive_moleculetype.pairs.pop(angle_pairkey, None)
 
         # add proper and improper dihedrals
         # add proper dihedrals and pairs
@@ -1506,7 +1555,6 @@ class Topology:
         dihedral_k_v = reactive_moleculetype._get_atom_improper_dihedrals(
             atompair_nrs[0], self.ff
         ) + reactive_moleculetype._get_atom_improper_dihedrals(atompair_nrs[1], self.ff)
-        print(dihedral_k_v)
         for key, value in dihedral_k_v:
             if value.c2 is None:
                 value.c2 = ""
