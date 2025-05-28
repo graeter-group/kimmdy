@@ -961,39 +961,38 @@ class TestDimerization:
             C2    C6    N1   C1'
             N1    N3    C2    O2
             C5    N3    C4    O4
-            C4    C2    N3    H3  
+            C4    C2    N3    H3
 
         from [dd3]
          [ impropers ]
             C2    C6    N1   C1'
             N1    N3    C2    O2
             C5    N3    C4    O4
-            C4    C2    N3    H3  
+            C4    C2    N3    H3
         """
         dihedral_k_v = top_target.reactive_molecule._get_atom_improper_dihedrals(
             "12", top_target.ff
         )
         keys = [k for k, _ in dihedral_k_v]
-        assert keys == [('23', '12', '11', '9')]
+        assert keys == [("23", "12", "11", "9")]
 
         dihedral_k_v = top_target.reactive_molecule._get_atom_improper_dihedrals(
             "14", top_target.ff
         )
         keys = [k for k, _ in dihedral_k_v]
-        assert keys == [('14', '21', '19', '20')]
+        assert keys == [("14", "21", "19", "20")]
 
         dihedral_k_v = top_target.reactive_molecule._get_atom_improper_dihedrals(
             "44", top_target.ff
         )
         keys = [k for k, _ in dihedral_k_v]
-        assert keys == [('55', '44', '43', '41')]
+        assert keys == [("55", "44", "43", "41")]
 
         dihedral_k_v = top_target.reactive_molecule._get_atom_improper_dihedrals(
             "46", top_target.ff
         )
         keys = [k for k, _ in dihedral_k_v]
-        assert keys == [('46', '53', '51', '52')]
-
+        assert keys == [("46", "53", "51", "52")]
 
     def test_dimerization(self, top_init: Topology, top_target: Topology):
         top_init.to_path("/tmp/init.top")

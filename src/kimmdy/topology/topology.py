@@ -369,7 +369,7 @@ class MoleculeType:
         ) + self._get_margin_atom_dihedrals(atom_nr)
 
     def _get_center_atom_dihedrals(
-        self, atom_nr: str, improper: bool=False
+        self, atom_nr: str, improper: bool = False
     ) -> list[tuple[str, str, str, str]]:
         """
         propers are ordered by the middle atoms j,k
@@ -392,7 +392,7 @@ class MoleculeType:
         return dihedrals
 
     def _get_margin_atom_dihedrals(
-        self, atom_nr: str, improper: bool=False
+        self, atom_nr: str, improper: bool = False
     ) -> list[tuple[str, str, str, str]]:
         """
         propers are ordered by the middle atoms j,k
@@ -442,19 +442,23 @@ class MoleculeType:
             # AA with -C and +N as the atomname
             # replace entries for -C and +N with the actual atom numbers
             # based on the previous and next residue
-            previous_atomnames = {atom.atom: atom_nr for atom_nr, atom in previous_residue.items()}
+            previous_atomnames = {
+                atom.atom: atom_nr for atom_nr, atom in previous_residue.items()
+            }
             previous_c = previous_atomnames.get("-C")
             if previous_c is not None:
                 atomname_to_nr["-C"] = previous_c
 
-            next_atomnames = {atom.atom: atom_nr for atom_nr, atom in next_residue.items()}
+            next_atomnames = {
+                atom.atom: atom_nr for atom_nr, atom in next_residue.items()
+            }
             next_n = next_atomnames.get("+N")
             if next_n is not None:
                 atomname_to_nr["+N"] = next_n
 
             dihedrals = []
             for key, improper in residuetype.improper_dihedrals.items():
-                nr_key = tuple(atomname_to_nr.get(x) for x in key) # pyright: ignore
+                nr_key = tuple(atomname_to_nr.get(x) for x in key)  # pyright: ignore
                 if None in nr_key:
                     m = f"Improper dihedral {key} not found in residue {atom.residue}."
                     logger.warning(m)
@@ -502,7 +506,9 @@ class MoleculeType:
                         elif candidate_key[i] == "N":
                             candidate_key[i] = "+N"
 
-                dihedral = residuetype.improper_dihedrals.get(tuple(candidate_key)) # pyright: ignore
+                dihedral = residuetype.improper_dihedrals.get(
+                    tuple(candidate_key)
+                )  # pyright: ignore
                 if dihedral:
                     dihedrals.append((candidate, dihedral))
             return dihedrals
@@ -1504,7 +1510,6 @@ class Topology:
 
             for key in to_pop:
                 reactive_moleculetype.improper_dihedrals.pop(key, None)
-
 
         # add angles
         angle_keys = reactive_moleculetype._get_atom_angles(

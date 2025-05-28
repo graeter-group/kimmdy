@@ -130,9 +130,7 @@ class FF:
 
         for residuetypes_path in residuetypes_paths:
             if not residuetypes_path.exists():
-                logger.warning(
-                    f"{residuetypes_path} not found in ffdir."
-                )
+                logger.warning(f"{residuetypes_path} not found in ffdir.")
                 continue
             residuetypes_dict = read_top(residuetypes_path, use_gmx_dir=False)
             for k, v in residuetypes_dict.items():
