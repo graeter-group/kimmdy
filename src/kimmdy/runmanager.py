@@ -635,7 +635,7 @@ class RunManager:
             relax_md = relax_config.md
             relax_is_slow_growth[relax_md] = (
                 relax_config.slow_growth is not False
-            ) # it's either morse_only or True
+            )  # it's either morse_only or True
         for k, v in self.mdps.items():
             if k == relax_md and relax_is_slow_growth.get(k) is True:
                 if v.get("free-energy") is not True:
