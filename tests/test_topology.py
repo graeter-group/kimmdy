@@ -714,7 +714,7 @@ class TestHexalaTopology:
         assert len(proper_dihedrals) == 25
         assert len(improper_dihedrals.keys()) == 3
 
-        atomnr = "25" # C
+        atomnr = "25"  # C
         bonds = protein._get_atom_bonds(atomnr)
         angles = protein._get_atom_angles(atomnr)
         proper_dihedrals = protein._get_atom_proper_dihedrals(atomnr)
@@ -992,7 +992,9 @@ class TestDimerization:
             C5    N3    C4    O4
             C4    C2    N3    H3
         """
-        atom_impropers = top_target.reactive_molecule._get_atom_improper_dihedrals("12", top_target.ff)
+        atom_impropers = top_target.reactive_molecule._get_atom_improper_dihedrals(
+            "12", top_target.ff
+        )
         assert list(atom_impropers.keys()) == [("9", "11", "12", "23")]
 
         atom_impropers = top_target.reactive_molecule._get_atom_improper_dihedrals(
@@ -1050,4 +1052,3 @@ class TestDimerization:
         assert set(top.improper_dihedrals.keys()) == set(
             top_target.improper_dihedrals.keys()
         )
-
