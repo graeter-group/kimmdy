@@ -665,6 +665,18 @@ class ResidueImproperSpec:
             c1=field_or_none(l, 5),
             c2=field_or_none(l, 6),
         )
+ 
+    def reversed(self):
+        """Return a reversed version of the improper dihedral"""
+        return ResidueImproperSpec(
+            atom1=self.atom4,
+            atom2=self.atom3,
+            atom3=self.atom2,
+            atom4=self.atom1,
+            c0=self.c0,
+            c1=self.c1,
+            c2=self.c2,
+        )
 
 
 @dataclass()
