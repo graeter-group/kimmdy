@@ -665,7 +665,7 @@ class ResidueImproperSpec:
             c1=field_or_none(l, 5),
             c2=field_or_none(l, 6),
         )
- 
+
     def reversed(self):
         """Return a reversed version of the improper dihedral"""
         return ResidueImproperSpec(

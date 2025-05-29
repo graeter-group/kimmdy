@@ -46,6 +46,7 @@ from kimmdy.utils import TopologyAtomAddress
 
 logger = logging.getLogger("kimmdy.topology")
 
+
 class MoleculeType:
     """One moleculetype in the topology
 
@@ -446,8 +447,12 @@ class MoleculeType:
         atomname_to_nr = {atom.atom: atom_nr for atom_nr, atom in residue.items()}
         # residues on aminoacids.rtp specify a dihedral to the next or previous
         # AA with -C and +N as the atomname
-        prev_atomname_to_nr = {atom.atom: atom_nr for atom_nr, atom in previous_residue.items()}
-        next_atomname_to_nr = {atom.atom: atom_nr for atom_nr, atom in next_residue.items()}
+        prev_atomname_to_nr = {
+            atom.atom: atom_nr for atom_nr, atom in previous_residue.items()
+        }
+        next_atomname_to_nr = {
+            atom.atom: atom_nr for atom_nr, atom in next_residue.items()
+        }
 
         dihedrals: dict[ImproperDihedralId, ResidueImproperSpec] = {}
         if previous_residuetype is not None and atom.atom == "N":
@@ -458,7 +463,7 @@ class MoleculeType:
                 if any(["+" in k for k in key]):
                     nr_key: ImproperDihedralId = tuple(
                         atom.nr if "+" in x else prev_atomname_to_nr.get(x) for x in key
-                    ) # pyright: ignore
+                    )  # pyright: ignore
                     dihedrals[nr_key] = improper
 
         if next_residuetype is not None and atom.atom == "C":
@@ -486,9 +491,7 @@ class MoleculeType:
 
         # regularly defined improper dihedrals of the same residue
         for key, improper in residuetype.improper_dihedrals.items():
-            nr_key = tuple(
-                get_number(x) for x in key
-            )  # pyright: ignore
+            nr_key = tuple(get_number(x) for x in key)  # pyright: ignore
             if None in nr_key:
                 m = f"Improper dihedral {key} not found in residue {atom.residue}."
                 logger.warning(m)
