@@ -714,7 +714,6 @@ class TestHexalaTopology:
         assert len(proper_dihedrals) == 25
         assert len(improper_dihedrals.keys()) == 3
 
-        # TODO: this
         atomnr = "25" # C
         bonds = protein._get_atom_bonds(atomnr)
         angles = protein._get_atom_angles(atomnr)
@@ -994,7 +993,7 @@ class TestDimerization:
             C4    C2    N3    H3
         """
         atom_impropers = top_target.reactive_molecule._get_atom_improper_dihedrals("12", top_target.ff)
-        assert list(atom_impropers.keys()) == [("23", "12", "11", "9")]
+        assert list(atom_impropers.keys()) == [("9", "11", "12", "23")]
 
         atom_impropers = top_target.reactive_molecule._get_atom_improper_dihedrals(
             "14", top_target.ff
@@ -1004,7 +1003,7 @@ class TestDimerization:
         atom_impropers = top_target.reactive_molecule._get_atom_improper_dihedrals(
             "44", top_target.ff
         )
-        assert list(atom_impropers.keys()) == [("55", "44", "43", "41")]
+        assert list(atom_impropers.keys()) == [("41", "43", "44", "55")]
 
         atom_impropers = top_target.reactive_molecule._get_atom_improper_dihedrals(
             "46", top_target.ff
@@ -1023,11 +1022,15 @@ class TestDimerization:
         for atom in top.atoms.values():
             if atom.resnr == res_a or atom.resnr == res_b:
                 atom.residue = atom.residue.replace("T", "D")
+
         # Change atomtypes
         for atom in top.atoms.values():
             if atom.resnr == res_a or atom.resnr == res_b:
                 if atom.atom in change_dict.keys():
                     atom.type = change_dict[atom.atom]
+
+        # NOTE: the plugin would also update partial charges,
+        # we don't test that here
 
         top.bind_bond(("14", "46"))
         top.bind_bond(("12", "44"))
@@ -1047,3 +1050,4 @@ class TestDimerization:
         assert set(top.improper_dihedrals.keys()) == set(
             top_target.improper_dihedrals.keys()
         )
+
