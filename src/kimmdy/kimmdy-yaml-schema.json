@@ -387,9 +387,9 @@
           "properties": {
             "break_plumed": {
               "type": "boolean",
-              "description": "Whether to remove bonds from the plumed.dat input file when applying a reaction recipe that breaks a bond.",
+              "description": "Whether to remove bonds from the plumed.dat input file when applying a reaction recipe that breaks a bond. Unless needed for performance optimization, this can be left at `false`, because the homolysis plugin in kimmdy-reactions also cheeckts to not break non-existing bonds by default (which can be turned off).",
               "pytype": "bool",
-              "default": true
+              "default": false
             },
             "parameterization": {
               "type": "string",
