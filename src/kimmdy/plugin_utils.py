@@ -49,7 +49,15 @@ def bondstats_from_csv(path: str | Path) -> BondStats:
         next(f)
         for line in f:
             line = line.strip()
-            ai, aj, plumed_id, mean_d, mean_f, delta_d, b0 = line.split(",")
+            (
+                ai,
+                aj,
+                plumed_id,
+                mean_d,
+                mean_f,
+                delta_d,
+                b0,
+            ) = line.split(",")
             stats[(ai, aj)] = {
                 "plumed_id": plumed_id,
                 "mean_d": float(mean_d),
@@ -134,7 +142,6 @@ def get_bondstats(
 
         beta = calculate_beta(kb=kb, edis=edis)
         forces = calculate_forces(ds=ds, b0=b0, edis=edis, beta=beta)
-
         mean_f = float(np.mean(forces))
 
         stats[bondkey] = {
@@ -148,13 +155,62 @@ def get_bondstats(
 
 
 def calculate_beta(kb: float, edis: float) -> float:
+    """Calculate the beta parameter for the Morse potential.
+
+    parameters are in gromacs units with kb as kJ/mol/nm^2 and edis in kJ/mol.
+    """
     return np.sqrt(kb / (2 * edis))
+
+def calculate_x_dagger(kb: float, edis: float) -> float:
+    return np.sqrt(2*edis / kb)
+
+def calculate_harmonic_forces(ds: np.ndarray, b0: float, k: float) -> np.ndarray:
+    """Calculate harmonic forces in a bond from a distances using the harmonic potential.
+
+    Forces are returned in gromacs units kJ/mol/nm.
+    The force is returned without a sign, i.e. it is positive for a stretched bond and negative for a compressed bond.
+    """
+    dds = ds - b0
+    return k * dds
+
+def harmonic_transition_rate(
+    r_curr: list[float],
+    r_0: float,
+    dissociation_energy: float,
+    k_f: float,
+    frequency_factor: float = 0.288,
+    temperature: float = 300,
+) -> tuple[list[float], list[float]]:
+    rs = np.asarray(r_curr)
+    fs = calculate_harmonic_forces(ds=rs, b0=r_0, k=k_f)
+    ks = harmonic_rates_from_forces(
+        fs=fs,
+        edis=dissociation_energy,
+        kb=k_f,
+        frequency_factor=frequency_factor,
+        temperature=temperature,
+    )
+    return list(ks), list(fs)
+
+
+def harmonic_rates_from_forces(
+    fs: np.ndarray,
+    edis: float,
+    kb: float,
+    frequency_factor: float = 0.288,
+    temperature: float = 300,
+) -> np.ndarray:
+    """Calculate reaction rate constant from forces using the harmonic potential.
+    """
+    x_dagger = calculate_x_dagger(kb=kb, edis=edis)
+    delta_v = edis - fs * x_dagger
+    return frequency_factor * np.exp(-delta_v / (R * temperature))  # [1/ps]
 
 
 def calculate_forces(
     ds: np.ndarray, b0: float, edis: float, beta: float, max_f: bool = True
 ) -> np.ndarray:
-    """Calculate forces from distances using the Morse potential.
+    """Calculate force in a bond from a distances using the Morse potential.
 
     Forces are returned in gromacs units kJ/mol/nm.
     """
@@ -166,7 +222,6 @@ def calculate_forces(
         ds_mask = ds > d_inflection
         dds[ds_mask] = d_inflection - b0
     return 2 * beta * edis * np.exp(-beta * dds) * (1 - np.exp(-beta * dds))
-
 
 def morse_transition_rate(
     r_curr: list[float],
@@ -200,7 +255,6 @@ def morse_transition_rate(
         Alternatively 1/2pi sqrt(k/m).
     temperature:
         Temperature for the Arrhenius equation in GROMACS units.
-
     """
     rs = np.asarray(r_curr)
     beta = calculate_beta(kb=k_f, edis=dissociation_energy)
@@ -226,26 +280,12 @@ def morse_rates_from_forces(
     temperature: float = 300,
 ) -> np.ndarray:
     # calculate extrema of shifted potential i.e. get barrier height of V_eff = V_morse - F*X
-    r_min = b0 - 1 / beta * np.log(
-        (
-            beta * edis
-            + np.sqrt(
-                (beta**2 * edis**2 - 2 * edis * beta * fs)
-                + 1e-7  # prevent rounding issue close to zero
-            )
-        )
-        / (2 * beta * edis)
+    s = np.sqrt(
+        (beta**2 * edis**2 - 2 * edis * beta * fs)
+        + 1e-7  # prevent rounding issue close to zero
     )
-    r_max = b0 - 1 / beta * np.log(
-        (
-            beta * edis
-            - np.sqrt(
-                (beta**2 * edis**2 - 2 * edis * beta * fs)
-                + 1e-7  # prevent rounding issue close to zero
-            )
-        )
-        / (2 * beta * edis)
-    )
+    r_min = b0 - 1 / beta * np.log((beta * edis + s) / (2 * beta * edis))
+    r_max = b0 - 1 / beta * np.log((beta * edis - s) / (2 * beta * edis))
     r_max = np.where(
         ~np.isfinite(r_max), 10 * b0, r_max
     )  # set rmax to r0 * 10 where no rmax can be found
@@ -255,7 +295,7 @@ def morse_rates_from_forces(
     # Note: F*r should lead to same result as F*(r-r_0) since the shifts in Vmax-Vmin adds up to zero
     delta_v = v_max - v_min
 
-    # calculate reaction rate constant from barrier heigth
+    # calculate reaction rate constant from barrier height
     return frequency_factor * np.exp(-delta_v / (R * temperature))  # [1/ps]
 
 
