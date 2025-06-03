@@ -13,6 +13,7 @@ import re
 import shutil
 import time
 from copy import copy, deepcopy
+from dataclasses import dataclass
 from datetime import timedelta
 from enum import Enum, auto
 from functools import partial
@@ -20,8 +21,6 @@ from pathlib import Path
 from pprint import pformat
 from subprocess import CalledProcessError
 from typing import Callable, Optional
-
-from attr import dataclass
 
 from kimmdy.config import Config
 from kimmdy.constants import (
@@ -89,7 +88,7 @@ IGNORE_SUBSTR = [
     "rotref",
     r"^\.",  # all hidden files
 ] + MARKERS
-# are there cases where we have multiple trr files?
+# NOTE: are there cases where we have multiple trr files?
 TASKS_WITHOUT_DIR = ["place_reaction_task"]
 
 
