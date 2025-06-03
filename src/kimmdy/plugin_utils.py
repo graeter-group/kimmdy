@@ -20,13 +20,14 @@ class Stats(TypedDict):
     mean_f: float
     delta_d: float
     b0: float
+    harmonic_force: Optional[float]  # Optional, only if calculated
 
 
 BondStats: TypeAlias = dict[BondId, Stats]
 PlumedId: TypeAlias = str
 Time: TypeAlias = float
 Distance: TypeAlias = float
-BONDSTATS_COLUMNS = "ai,aj,plumed_id,mean_d,mean_f,delta_d,b0"
+BONDSTATS_COLUMNS = "ai,aj,plumed_id,mean_d,mean_f,delta_d,b0,harmonic_force"
 BondToPlumedID: TypeAlias = dict[BondId, PlumedId]
 PlumedDistances: TypeAlias = dict[Time, dict[PlumedId, Distance]]
 
@@ -35,9 +36,10 @@ def bondstats_to_csv(stats: BondStats, path: str | Path):
     ls = []
     ls.append(BONDSTATS_COLUMNS)
     for k, s in stats.items():
-        ls.append(
-            f"{k[0]},{k[1]},{s['plumed_id']},{s['mean_d']:.6f},{s['mean_f']:.6f},{s['delta_d']:.6f},{s['b0']:.6f}"
-        )
+        l = f"{k[0]},{k[1]},{s['plumed_id']},{s['mean_d']:.6f},{s['mean_f']:.6f},{s['delta_d']:.6f},{s['b0']:.6f}"
+        if s.get("harmonic_force") is not None:
+            l += f",{s['harmonic_force']:.6f}"
+        ls.append(l)
 
     with open(path, "w") as f:
         f.write("\n".join(ls))
@@ -48,22 +50,26 @@ def bondstats_from_csv(path: str | Path) -> BondStats:
     with open(path, "r") as f:
         next(f)
         for line in f:
-            line = line.strip()
-            (
-                ai,
-                aj,
-                plumed_id,
-                mean_d,
-                mean_f,
-                delta_d,
-                b0,
-            ) = line.split(",")
+            line = line.strip().split(",")
+            harmonic_force = None
+            if len(line) == 7:
+                (ai, aj, plumed_id, mean_d, mean_f, delta_d, b0) = line
+            if len(line) == 8:
+                (ai, aj, plumed_id, mean_d, mean_f, delta_d, b0, harmonic_force) = line
+            else:
+                m = f"Line in bondstats csv file does not have 7 or 8 columns: {line}"
+                logger.error(m)
+                raise ValueError(m)
+
             stats[(ai, aj)] = {
                 "plumed_id": plumed_id,
                 "mean_d": float(mean_d),
                 "mean_f": float(mean_f),
                 "delta_d": float(delta_d),
                 "b0": float(b0),
+                "harmonic_force": (
+                    float(harmonic_force) if harmonic_force is not None else None
+                ),
             }
 
     return stats
@@ -143,6 +149,7 @@ def get_bondstats(
         beta = calculate_beta(kb=kb, edis=edis)
         forces = calculate_forces(ds=ds, b0=b0, edis=edis, beta=beta)
         mean_f = float(np.mean(forces))
+        harmonic_force = float(np.mean(calculate_harmonic_forces(ds=ds, b0=b0, k=kb)))
 
         stats[bondkey] = {
             "plumed_id": plumed_id,
@@ -150,6 +157,7 @@ def get_bondstats(
             "mean_f": mean_f,
             "delta_d": mean_d - b0,
             "b0": b0,
+            "harmonic_force": harmonic_force,
         }
     return stats
 
@@ -161,8 +169,10 @@ def calculate_beta(kb: float, edis: float) -> float:
     """
     return np.sqrt(kb / (2 * edis))
 
+
 def calculate_x_dagger(kb: float, edis: float) -> float:
-    return np.sqrt(2*edis / kb)
+    return np.sqrt(2 * edis / kb)
+
 
 def calculate_harmonic_forces(ds: np.ndarray, b0: float, k: float) -> np.ndarray:
     """Calculate harmonic forces in a bond from a distances using the harmonic potential.
@@ -172,6 +182,7 @@ def calculate_harmonic_forces(ds: np.ndarray, b0: float, k: float) -> np.ndarray
     """
     dds = ds - b0
     return k * dds
+
 
 def harmonic_transition_rate(
     r_curr: list[float],
@@ -200,8 +211,7 @@ def harmonic_rates_from_forces(
     frequency_factor: float = 0.288,
     temperature: float = 300,
 ) -> np.ndarray:
-    """Calculate reaction rate constant from forces using the harmonic potential.
-    """
+    """Calculate reaction rate constant from forces using the harmonic potential."""
     x_dagger = calculate_x_dagger(kb=kb, edis=edis)
     delta_v = edis - fs * x_dagger
     return frequency_factor * np.exp(-delta_v / (R * temperature))  # [1/ps]
@@ -222,6 +232,7 @@ def calculate_forces(
         ds_mask = ds > d_inflection
         dds[ds_mask] = d_inflection - b0
     return 2 * beta * edis * np.exp(-beta * dds) * (1 - np.exp(-beta * dds))
+
 
 def morse_transition_rate(
     r_curr: list[float],
