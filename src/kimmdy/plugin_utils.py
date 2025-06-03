@@ -20,14 +20,14 @@ class Stats(TypedDict):
     mean_f: float
     delta_d: float
     b0: float
-    harmonic_force: Optional[float]  # Optional, only if calculated
+    harmonic_f: Optional[float]  # Optional, only if calculated
 
 
 BondStats: TypeAlias = dict[BondId, Stats]
 PlumedId: TypeAlias = str
 Time: TypeAlias = float
 Distance: TypeAlias = float
-BONDSTATS_COLUMNS = "ai,aj,plumed_id,mean_d,mean_f,delta_d,b0,harmonic_force"
+BONDSTATS_COLUMNS = "ai,aj,plumed_id,mean_d,mean_f,delta_d,b0,harmonic_f"
 BondToPlumedID: TypeAlias = dict[BondId, PlumedId]
 PlumedDistances: TypeAlias = dict[Time, dict[PlumedId, Distance]]
 
@@ -37,8 +37,8 @@ def bondstats_to_csv(stats: BondStats, path: str | Path):
     ls.append(BONDSTATS_COLUMNS)
     for k, s in stats.items():
         l = f"{k[0]},{k[1]},{s['plumed_id']},{s['mean_d']:.6f},{s['mean_f']:.6f},{s['delta_d']:.6f},{s['b0']:.6f}"
-        if s.get("harmonic_force") is not None:
-            l += f",{s['harmonic_force']:.6f}"
+        if s.get("harmonic_f") is not None:
+            l += f",{s['harmonic_f']:.6f}"
         ls.append(l)
 
     with open(path, "w") as f:
@@ -51,11 +51,11 @@ def bondstats_from_csv(path: str | Path) -> BondStats:
         next(f)
         for line in f:
             line = line.strip().split(",")
-            harmonic_force = None
+            harmonic_f = None
             if len(line) == 7:
                 (ai, aj, plumed_id, mean_d, mean_f, delta_d, b0) = line
             if len(line) == 8:
-                (ai, aj, plumed_id, mean_d, mean_f, delta_d, b0, harmonic_force) = line
+                (ai, aj, plumed_id, mean_d, mean_f, delta_d, b0, harmonic_f) = line
             else:
                 m = f"Line in bondstats csv file does not have 7 or 8 columns: {line}"
                 logger.error(m)
@@ -67,8 +67,8 @@ def bondstats_from_csv(path: str | Path) -> BondStats:
                 "mean_f": float(mean_f),
                 "delta_d": float(delta_d),
                 "b0": float(b0),
-                "harmonic_force": (
-                    float(harmonic_force) if harmonic_force is not None else None
+                "harmonic_f": (
+                    float(harmonic_f) if harmonic_f is not None else None
                 ),
             }
 
@@ -149,7 +149,7 @@ def get_bondstats(
         beta = calculate_beta(kb=kb, edis=edis)
         forces = calculate_forces(ds=ds, b0=b0, edis=edis, beta=beta)
         mean_f = float(np.mean(forces))
-        harmonic_force = float(np.mean(calculate_harmonic_forces(ds=ds, b0=b0, k=kb)))
+        harmonic_f = float(np.mean(calculate_harmonic_forces(ds=ds, b0=b0, k=kb)))
 
         stats[bondkey] = {
             "plumed_id": plumed_id,
@@ -157,7 +157,7 @@ def get_bondstats(
             "mean_f": mean_f,
             "delta_d": mean_d - b0,
             "b0": b0,
-            "harmonic_force": harmonic_force,
+            "harmonic_f": harmonic_f,
         }
     return stats
 
