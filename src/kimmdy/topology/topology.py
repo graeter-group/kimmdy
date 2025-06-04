@@ -7,9 +7,9 @@ from typing import Callable, Optional, Union
 from kimmdy.constants import (
     ATOM_ID_FIELDS,
     ATOMTYPE_BONDORDER_FLAT,
+    FFFUNC,
     REACTIVE_MOLECULEYPE,
     RESNR_ID_FIELDS,
-    FFFUNC,
 )
 from kimmdy.parsing import TopologyDict, empty_section, read_top, write_top
 from kimmdy.plugins import BasicParameterizer, Parameterizer
@@ -381,12 +381,13 @@ class MoleculeType:
                 if ai == ak:
                     continue
                 for al in self.atoms[ak].bound_to_nrs:
-                    if al == ak or aj == al:
-                        continue
                     if int(aj) < int(ak) or improper:
-                        dihedrals.append((ai, aj, ak, al))
+                        key = (ai, aj, ak, al)
                     else:
-                        dihedrals.append((al, ak, aj, ai))
+                        key = (al, ak, aj, ai)
+                    if len(key) == len(set(key)):
+                        # one atom can not be in two positions
+                        dihedrals.append(key)
         return dihedrals
 
     def _get_margin_atom_dihedrals(
@@ -403,12 +404,13 @@ class MoleculeType:
                 if ai == ak:
                     continue
                 for al in self.atoms[ak].bound_to_nrs:
-                    if al == ak or aj == al:
-                        continue
                     if int(aj) < int(ak) or improper:
-                        dihedrals.append((ai, aj, ak, al))
+                        key = (ai, aj, ak, al)
                     else:
-                        dihedrals.append((al, ak, aj, ai))
+                        key = (al, ak, aj, ai)
+                    if len(key) == len(set(key)):
+                        # one atom can not be in two positions
+                        dihedrals.append(key)
         return dihedrals
 
     def _get_atom_improper_dihedrals(
