@@ -67,9 +67,7 @@ def bondstats_from_csv(path: str | Path) -> BondStats:
                 "mean_f": float(mean_f),
                 "delta_d": float(delta_d),
                 "b0": float(b0),
-                "harmonic_f": (
-                    float(harmonic_f) if harmonic_f is not None else None
-                ),
+                "harmonic_f": (float(harmonic_f) if harmonic_f is not None else None),
             }
 
     return stats
