@@ -14,7 +14,7 @@
 ### MoleculeType { #kimmdy.topology.topology.MoleculeType }
 
 ```python
-topology.topology.MoleculeType(self, header, atomics, radicals=None)
+topology.topology.MoleculeType(header, atomics, radicals=None)
 ```
 
 One moleculetype in the topology
@@ -67,14 +67,12 @@ Returns a dict, mapping of old atom number strings to new ones
 
 ```python
 topology.topology.Topology(
-    self,
     top,
     parametrizer=BasicParameterizer(),
     is_reactive_predicate_f=is_not_solvent_or_ion,
     radicals=None,
     residuetypes_path=None,
     reactive_nrexcl=None,
-    gromacs_alias='gmx',
 )
 ```
 
@@ -110,7 +108,9 @@ Assumptions:
 | [bind_bond](#kimmdy.topology.topology.Topology.bind_bond) | Add a bond in topology. |
 | [break_bond](#kimmdy.topology.topology.Topology.break_bond) | Break bonds in topology homolytically. |
 | [del_atom](#kimmdy.topology.topology.Topology.del_atom) | Deletes atom |
+| [from_path](#kimmdy.topology.topology.Topology.from_path) | Load a Topology object from a file path. |
 | [reindex_atomnrs](#kimmdy.topology.topology.Topology.reindex_atomnrs) | Reindex atom numbers in topology. |
+| [to_path](#kimmdy.topology.topology.Topology.to_path) | Write the topology to a file. |
 | [update_partial_charges](#kimmdy.topology.topology.Topology.update_partial_charges) | Update the topology atom partial charges. |
 | [validate_bond](#kimmdy.topology.topology.Topology.validate_bond) | Validates bond consistency between both atoms and top |
 
@@ -175,6 +175,29 @@ parameters if requested. Also moves charges to first bound_nrs atom.
 |--------|----------------------------|-------------------------------------------------------|
 |        | [update_map](`update_map`) | Dict, mapping of old atom number strings to new ones. |
 
+##### from_path { #kimmdy.topology.topology.Topology.from_path }
+
+```python
+topology.topology.Topology.from_path(path, ffdir=None, **kwargs)
+```
+
+Load a Topology object from a file path.
+
+Simplifies the `Topology(read_top(...), ...)` pattern.
+
+###### Parameters {.doc-section .doc-section-parameters}
+
+| Name   | Type                                   | Description                                                       | Default    |
+|--------|----------------------------------------|-------------------------------------------------------------------|------------|
+| path   | [str](`str`) \| [Path](`pathlib.Path`) | Path to the topology file.                                        | _required_ |
+| kwargs |                                        | Additional keyword arguments to pass to the Topology constructor. | `{}`       |
+
+###### Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                            | Description   |
+|--------|-------------------------------------------------|---------------|
+|        | [Topology](`kimmdy.topology.topology.Topology`) |               |
+
 ##### reindex_atomnrs { #kimmdy.topology.topology.Topology.reindex_atomnrs }
 
 ```python
@@ -186,6 +209,20 @@ Reindex atom numbers in topology.
 Starts at index 1.
 This also updates the numbers for bonds, angles, dihedrals and pairs.
 Returns a dict of all moleculetypes to their update maps (old -> new).
+
+##### to_path { #kimmdy.topology.topology.Topology.to_path }
+
+```python
+topology.topology.Topology.to_path(path)
+```
+
+Write the topology to a file.
+
+###### Parameters {.doc-section .doc-section-parameters}
+
+| Name   | Type                                   | Description                | Default    |
+|--------|----------------------------------------|----------------------------|------------|
+| path   | [str](`str`) \| [Path](`pathlib.Path`) | Path to the topology file. | _required_ |
 
 ##### update_partial_charges { #kimmdy.topology.topology.Topology.update_partial_charges }
 

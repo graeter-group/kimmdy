@@ -36,7 +36,6 @@ See [gromacs manual](https://manual.gromacs.org/current/reference-manual/topolog
 
 ```python
 topology.atomic.Angle(
-    self,
     ai,
     aj,
     ak,
@@ -61,7 +60,6 @@ With aj < ai < ak
 
 ```python
 topology.atomic.AngleType(
-    self,
     i,
     j,
     k,
@@ -86,7 +84,6 @@ From gromacs version of the amber* ff:
 
 ```python
 topology.atomic.Atom(
-    self,
     nr,
     type,
     resnr,
@@ -116,7 +113,6 @@ From gromacs topology:
 
 ```python
 topology.atomic.AtomType(
-    self,
     type,
     id,
     id_sym,
@@ -140,7 +136,6 @@ From gromacs version of the amber* ff:
 
 ```python
 topology.atomic.Bond(
-    self,
     ai,
     aj,
     funct,
@@ -166,7 +161,6 @@ With ai < aj
 
 ```python
 topology.atomic.BondType(
-    self,
     i,
     j,
     id,
@@ -191,7 +185,6 @@ Where i and j are atomtypes
 
 ```python
 topology.atomic.Dihedral(
-    self,
     ai,
     aj,
     ak,
@@ -223,7 +216,7 @@ For proper dihedrals (funct 9): aj < ak
 ### DihedralRestraint { #kimmdy.topology.atomic.DihedralRestraint }
 
 ```python
-topology.atomic.DihedralRestraint(self, ai, aj, ak, al, type, phi, dphi, fc)
+topology.atomic.DihedralRestraint(ai, aj, ak, al, type, phi, dphi, fc)
 ```
 
 Information about one dihedral restraint.
@@ -237,7 +230,6 @@ From gromacs topology:
 
 ```python
 topology.atomic.DihedralType(
-    self,
     i,
     j,
     k,
@@ -271,7 +263,6 @@ From gromacs version of the amber* ff:
 
 ```python
 topology.atomic.Exclusion(
-    self,
     ai,
     aj=None,
     ak=None,
@@ -301,15 +292,7 @@ From gromacs topology:
 ### MultipleDihedralTypes { #kimmdy.topology.atomic.MultipleDihedralTypes }
 
 ```python
-topology.atomic.MultipleDihedralTypes(
-    self,
-    ai,
-    aj,
-    ak,
-    al,
-    funct,
-    dihedral_types,
-)
+topology.atomic.MultipleDihedralTypes(ai, aj, ak, al, funct, dihedral_types)
 ```
 
 Multiple ``DihedralTypes``s with the same ai, aj, ak, al
@@ -320,7 +303,7 @@ The key of the dihedral_types dict is the periodicity (c2).
 ### MultipleDihedrals { #kimmdy.topology.atomic.MultipleDihedrals }
 
 ```python
-topology.atomic.MultipleDihedrals(self, ai, aj, ak, al, funct, dihedrals)
+topology.atomic.MultipleDihedrals(ai, aj, ak, al, funct, dihedrals)
 ```
 
 Multiple ``Dihedral``s with the same ai, aj, ak, al
@@ -332,7 +315,6 @@ The key of the dihedrals dict is the periodicity (c2).
 
 ```python
 topology.atomic.NonbondParamType(
-    self,
     i,
     j,
     id,
@@ -358,7 +340,6 @@ Where i and j are atomtypes
 
 ```python
 topology.atomic.Pair(
-    self,
     ai,
     aj,
     funct,
@@ -380,7 +361,7 @@ From gromacs topology:
 ### PositionRestraint { #kimmdy.topology.atomic.PositionRestraint }
 
 ```python
-topology.atomic.PositionRestraint(self, ai, funct, fc, condition=None)
+topology.atomic.PositionRestraint(ai, funct, fc, condition=None)
 ```
 
 Information about one position restraint.
@@ -393,7 +374,7 @@ From gromacs topology:
 ### ResidueAtomSpec { #kimmdy.topology.atomic.ResidueAtomSpec }
 
 ```python
-topology.atomic.ResidueAtomSpec(self, name, type, charge, cgrp)
+topology.atomic.ResidueAtomSpec(name, type, charge, cgrp)
 ```
 
 Information about one atom in a residue
@@ -403,7 +384,7 @@ Information about one atom in a residue
 ### ResidueBondSpec { #kimmdy.topology.atomic.ResidueBondSpec }
 
 ```python
-topology.atomic.ResidueBondSpec(self, atom1, atom2, b0=None, kb=None)
+topology.atomic.ResidueBondSpec(atom1, atom2, b0=None, kb=None)
 ```
 
 Information about one bond in a residue
@@ -413,26 +394,31 @@ Information about one bond in a residue
 ### ResidueImproperSpec { #kimmdy.topology.atomic.ResidueImproperSpec }
 
 ```python
-topology.atomic.ResidueImproperSpec(
-    self,
-    atom1,
-    atom2,
-    atom3,
-    atom4,
-    c0,
-    c1,
-    c2,
-)
+topology.atomic.ResidueImproperSpec(atom1, atom2, atom3, atom4, c0, c1, c2)
 ```
 
 Information about one improper dihedral in a residue
 
 ; atom1 atom2 atom3 atom4 c0(q0) c1(cp) c2(mult)
 
+#### Methods
+
+| Name | Description |
+| --- | --- |
+| [reversed](#kimmdy.topology.atomic.ResidueImproperSpec.reversed) | Return a reversed version of the improper dihedral |
+
+##### reversed { #kimmdy.topology.atomic.ResidueImproperSpec.reversed }
+
+```python
+topology.atomic.ResidueImproperSpec.reversed()
+```
+
+Return a reversed version of the improper dihedral
+
 ### ResidueProperSpec { #kimmdy.topology.atomic.ResidueProperSpec }
 
 ```python
-topology.atomic.ResidueProperSpec(self, atom1, atom2, atom3, atom4, c0, c1, c2)
+topology.atomic.ResidueProperSpec(atom1, atom2, atom3, atom4, c0, c1, c2)
 ```
 
 Information about one proper dihedral in a residue
@@ -443,7 +429,6 @@ Information about one proper dihedral in a residue
 
 ```python
 topology.atomic.ResidueType(
-    self,
     residue,
     atoms,
     bonds,
@@ -457,7 +442,7 @@ Information about one residuetype from aminoacids.rtp
 ### Settle { #kimmdy.topology.atomic.Settle }
 
 ```python
-topology.atomic.Settle(self, nr, funct, doh, dhh)
+topology.atomic.Settle(nr, funct, doh, dhh)
 ```
 
 Information about one settles

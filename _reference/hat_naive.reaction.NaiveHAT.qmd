@@ -1,7 +1,7 @@
 # hat_naive.reaction.NaiveHAT { #hat_naive.reaction.NaiveHAT }
 
 ```python
-reaction.NaiveHAT(self, name, runmng)
+reaction.NaiveHAT(name, runmng)
 ```
 
 Naive HAT reaction, selects all neighboring hydrogens and assigns random rates.

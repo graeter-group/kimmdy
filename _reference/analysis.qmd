@@ -29,6 +29,7 @@ analysis.concat_traj(
     steps,
     open_vmd=False,
     output_group=None,
+    center_group=None,
     use_last_names=False,
 )
 ```
@@ -44,6 +45,7 @@ The concatenated trajectory is centered and pbc corrected.
 | steps          | [Union](`typing.Union`)\[[list](`list`)\[[str](`str`)\], [str](`str`)\] | List of steps e.g. ["equilibrium", "production"]. Or a string "all" to return all subdirectories                                                                               | _required_ |
 | open_vmd       | [bool](`bool`)                                                          | Open concatenated trajectory in VMD                                                                                                                                            | `False`    |
 | output_group   | [Optional](`typing.Optional`)\[[str](`str`)\]                           | index group for output. Default is "Protein" for xtc and "System" for trr.                                                                                                     | `None`     |
+| output_group   | [Optional](`typing.Optional`)\[[str](`str`)\]                           | index group for centering.                                                                                                                                                     | `None`     |
 | use_last_names | [bool](`bool`)                                                          | Use the tpr/topology of the last trajectory for the output, default is the first. This influences the names and types of the atoms in the output, which can be useful for VMD. | `False`    |
 
 ### entry_point_analysis { #kimmdy.analysis.entry_point_analysis }
