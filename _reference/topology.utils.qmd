@@ -87,10 +87,10 @@ Avoids traversing the whole topology.
 
 #### Parameters {.doc-section .doc-section-parameters}
 
-| Name   | Type                                                                  | Description             | Default    |
-|--------|-----------------------------------------------------------------------|-------------------------|------------|
-| atom   | [Atom](`kimmdy.topology.atomic.Atom`)                                 | Atom of the residue     | _required_ |
-| atoms  | [dict](`dict`)\[[str](`str`), [Atom](`kimmdy.topology.atomic.Atom`)\] | All atoms of a topology | _required_ |
+| Name   | Type                                                                                               | Description             | Default    |
+|--------|----------------------------------------------------------------------------------------------------|-------------------------|------------|
+| atom   | [Atom](`kimmdy.topology.atomic.Atom`)                                                              | Atom of the residue     | _required_ |
+| atoms  | [dict](`dict`)\[[AtomId](`kimmdy.topology.atomic.AtomId`), [Atom](`kimmdy.topology.atomic.Atom`)\] | All atoms of a topology | _required_ |
 
 #### Returns {.doc-section .doc-section-returns}
 

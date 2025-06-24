@@ -1,6 +1,6 @@
 # Sphinx inventory version 2
 # Project: NumPy
-# Version: 2.2
+# Version: 2.3
 # The remainder of this file is compressed using zlib.
 NO_IMPORT_ARRAY c:macro 1 reference/c-api/array.html#c.$ -
 NO_IMPORT_UFUNC c:macro 1 reference/c-api/ufunc.html#c.$ -
@@ -513,6 +513,8 @@ NpyIter_GetReadFlags.outreadflags c:functionParam 1 reference/c-api/iterator.htm
 NpyIter_GetShape c:function 1 reference/c-api/iterator.html#c.$ -
 NpyIter_GetShape.iter c:functionParam 1 reference/c-api/iterator.html#c.NpyIter_GetShape -
 NpyIter_GetShape.outshape c:functionParam 1 reference/c-api/iterator.html#c.NpyIter_GetShape -
+NpyIter_GetTransferFlags c:function 1 reference/c-api/iterator.html#c.$ -
+NpyIter_GetTransferFlags.iter c:functionParam 1 reference/c-api/iterator.html#c.NpyIter_GetTransferFlags -
 NpyIter_GetWriteFlags c:function 1 reference/c-api/iterator.html#c.$ -
 NpyIter_GetWriteFlags.iter c:functionParam 1 reference/c-api/iterator.html#c.NpyIter_GetWriteFlags -
 NpyIter_GetWriteFlags.outwriteflags c:functionParam 1 reference/c-api/iterator.html#c.NpyIter_GetWriteFlags -
@@ -2325,6 +2327,22 @@ random_weibull.bitgen_state c:functionParam 1 reference/random/c-api.html#c.rand
 random_zipf c:function 1 reference/random/c-api.html#c.$ -
 random_zipf.a c:functionParam 1 reference/random/c-api.html#c.random_zipf -
 random_zipf.bitgen_state c:functionParam 1 reference/random/c-api.html#c.random_zipf -
+DoxyLimbo cpp:class 1 dev/howto-docs.html#_CPPv4I0_NSt6size_tEE9$ -
+DoxyLimbo::DoxyLimbo cpp:function 1 dev/howto-docs.html#_CPPv4N9DoxyLimbo9DoxyLimboERK9DoxyLimboI2Tp1NE -
+DoxyLimbo::DoxyLimbo cpp:function 1 dev/howto-docs.html#_CPPv4N9DoxyLimbo9DoxyLimboERK9DoxyLimboI2Tp1NE -
+DoxyLimbo::DoxyLimbo cpp:function 1 dev/howto-docs.html#_CPPv4N9DoxyLimbo9DoxyLimboERK9DoxyLimboI2Tp1NE -
+DoxyLimbo::DoxyLimbo cpp:function 1 dev/howto-docs.html#_CPPv4N9DoxyLimbo9DoxyLimboEv -
+DoxyLimbo::DoxyLimbo cpp:function 1 dev/howto-docs.html#_CPPv4N9DoxyLimbo9DoxyLimboEv -
+DoxyLimbo::DoxyLimbo cpp:function 1 dev/howto-docs.html#_CPPv4N9DoxyLimbo9DoxyLimboEv -
+DoxyLimbo::DoxyLimbo::l cpp:functionParam 1 dev/howto-docs.html#_CPPv4N9DoxyLimbo9DoxyLimboERK9DoxyLimboI2Tp1NE -
+DoxyLimbo::DoxyLimbo::l cpp:functionParam 1 dev/howto-docs.html#_CPPv4N9DoxyLimbo9DoxyLimboERK9DoxyLimboI2Tp1NE -
+DoxyLimbo::DoxyLimbo::l cpp:functionParam 1 dev/howto-docs.html#_CPPv4N9DoxyLimbo9DoxyLimboERK9DoxyLimboI2Tp1NE -
+DoxyLimbo::N cpp:templateParam 1 dev/howto-docs.html#_CPPv4I0_NSt6size_tEE9DoxyLimbo -
+DoxyLimbo::Tp cpp:templateParam 1 dev/howto-docs.html#_CPPv4I0_NSt6size_tEE9DoxyLimbo -
+DoxyLimbo::data cpp:function 1 dev/howto-docs.html#_CPPv4N9DoxyLimbo4dataEv -
+DoxyLimbo::data cpp:function 1 dev/howto-docs.html#_CPPv4N9DoxyLimbo4dataEv -
+DoxyLimbo::data cpp:function 1 dev/howto-docs.html#_CPPv4N9DoxyLimbo4dataEv -
+DoxyLimbo::p_data cpp:member 1 dev/howto-docs.html#_CPPv4N9DoxyLimbo6p_dataE -
 ndarray.__array_finalize__ py:attribute 1 user/c-info.beyond-basics.html#$ -
 ndarray.__array_priority__ py:attribute 1 user/c-info.beyond-basics.html#$ -
 ndarray.__array_wrap__ py:attribute 1 user/c-info.beyond-basics.html#$ -
@@ -2537,7 +2555,6 @@ numpy.char.chararray.to_device py:method 1 reference/generated/numpy.char.charar
 numpy.char.chararray.tobytes py:method 1 reference/generated/numpy.char.chararray.tobytes.html#$ -
 numpy.char.chararray.tofile py:method 1 reference/generated/numpy.char.chararray.tofile.html#$ -
 numpy.char.chararray.tolist py:method 1 reference/generated/numpy.char.chararray.tolist.html#$ -
-numpy.char.chararray.tostring py:method 1 reference/generated/numpy.char.chararray.tostring.html#$ -
 numpy.char.chararray.trace py:method 1 reference/generated/numpy.char.chararray.trace.html#$ -
 numpy.char.chararray.translate py:method 1 reference/generated/numpy.char.chararray.translate.html#$ -
 numpy.char.chararray.transpose py:method 1 reference/generated/numpy.char.chararray.transpose.html#$ -
@@ -3142,7 +3159,6 @@ numpy.lib.user_array.container.astype py:method 1 reference/generated/numpy.lib.
 numpy.lib.user_array.container.byteswap py:method 1 reference/generated/numpy.lib.user_array.container.byteswap.html#$ -
 numpy.lib.user_array.container.copy py:method 1 reference/generated/numpy.lib.user_array.container.copy.html#$ -
 numpy.lib.user_array.container.tobytes py:method 1 reference/generated/numpy.lib.user_array.container.tobytes.html#$ -
-numpy.lib.user_array.container.tostring py:method 1 reference/generated/numpy.lib.user_array.container.tostring.html#$ -
 numpy.linalg py:module 0 reference/routines.linalg.html#module-$ -
 numpy.linalg.LinAlgError py:exception 1 reference/generated/numpy.linalg.LinAlgError.html#$ -
 numpy.linalg.cholesky py:function 1 reference/generated/numpy.linalg.cholesky.html#$ -
@@ -3277,7 +3293,6 @@ numpy.ma.MaskedArray.__contains__ py:method 1 reference/generated/numpy.ma.Maske
 numpy.ma.MaskedArray.__copy__ py:method 1 reference/generated/numpy.ma.MaskedArray.__copy__.html#$ -
 numpy.ma.MaskedArray.__deepcopy__ py:method 1 reference/generated/numpy.ma.MaskedArray.__deepcopy__.html#$ -
 numpy.ma.MaskedArray.__delitem__ py:method 1 reference/generated/numpy.ma.MaskedArray.__delitem__.html#$ -
-numpy.ma.MaskedArray.__div__ py:method 1 reference/generated/numpy.ma.MaskedArray.__div__.html#$ -
 numpy.ma.MaskedArray.__divmod__ py:method 1 reference/generated/numpy.ma.MaskedArray.__divmod__.html#$ -
 numpy.ma.MaskedArray.__eq__ py:method 1 reference/generated/numpy.ma.MaskedArray.__eq__.html#$ -
 numpy.ma.MaskedArray.__float__ py:method 1 reference/generated/numpy.ma.MaskedArray.__float__.html#$ -
@@ -3288,7 +3303,6 @@ numpy.ma.MaskedArray.__getstate__ py:method 1 reference/generated/numpy.ma.Maske
 numpy.ma.MaskedArray.__gt__ py:method 1 reference/generated/numpy.ma.MaskedArray.__gt__.html#$ -
 numpy.ma.MaskedArray.__iadd__ py:method 1 reference/generated/numpy.ma.MaskedArray.__iadd__.html#$ -
 numpy.ma.MaskedArray.__iand__ py:method 1 reference/generated/numpy.ma.MaskedArray.__iand__.html#$ -
-numpy.ma.MaskedArray.__idiv__ py:method 1 reference/generated/numpy.ma.MaskedArray.__idiv__.html#$ -
 numpy.ma.MaskedArray.__ifloordiv__ py:method 1 reference/generated/numpy.ma.MaskedArray.__ifloordiv__.html#$ -
 numpy.ma.MaskedArray.__ilshift__ py:method 1 reference/generated/numpy.ma.MaskedArray.__ilshift__.html#$ -
 numpy.ma.MaskedArray.__imod__ py:method 1 reference/generated/numpy.ma.MaskedArray.__imod__.html#$ -
@@ -3410,7 +3424,6 @@ numpy.ma.MaskedArray.tofile py:method 1 reference/generated/numpy.ma.MaskedArray
 numpy.ma.MaskedArray.toflex py:method 1 reference/generated/numpy.ma.MaskedArray.toflex.html#$ -
 numpy.ma.MaskedArray.tolist py:method 1 reference/generated/numpy.ma.MaskedArray.tolist.html#$ -
 numpy.ma.MaskedArray.torecords py:method 1 reference/generated/numpy.ma.MaskedArray.torecords.html#$ -
-numpy.ma.MaskedArray.tostring py:method 1 reference/generated/numpy.ma.MaskedArray.tostring.html#$ -
 numpy.ma.MaskedArray.trace py:method 1 reference/generated/numpy.ma.MaskedArray.trace.html#$ -
 numpy.ma.MaskedArray.transpose py:method 1 reference/generated/numpy.ma.MaskedArray.transpose.html#$ -
 numpy.ma.MaskedArray.unshare_mask py:method 1 reference/generated/numpy.ma.MaskedArray.unshare_mask.html#$ -
@@ -3601,7 +3614,6 @@ numpy.ma.masked_array.tofile py:method 1 reference/generated/numpy.ma.masked_arr
 numpy.ma.masked_array.toflex py:method 1 reference/generated/numpy.ma.masked_array.toflex.html#$ -
 numpy.ma.masked_array.tolist py:method 1 reference/generated/numpy.ma.masked_array.tolist.html#$ -
 numpy.ma.masked_array.torecords py:method 1 reference/generated/numpy.ma.masked_array.torecords.html#$ -
-numpy.ma.masked_array.tostring py:method 1 reference/generated/numpy.ma.masked_array.tostring.html#$ -
 numpy.ma.masked_array.trace py:method 1 reference/generated/numpy.ma.masked_array.trace.html#$ -
 numpy.ma.masked_array.transpose py:method 1 reference/generated/numpy.ma.masked_array.transpose.html#$ -
 numpy.ma.masked_array.unshare_mask py:method 1 reference/generated/numpy.ma.masked_array.unshare_mask.html#$ -
@@ -3762,7 +3774,6 @@ numpy.matrix.to_device py:method 1 reference/generated/numpy.matrix.to_device.ht
 numpy.matrix.tobytes py:method 1 reference/generated/numpy.matrix.tobytes.html#$ -
 numpy.matrix.tofile py:method 1 reference/generated/numpy.matrix.tofile.html#$ -
 numpy.matrix.tolist py:method 1 reference/generated/numpy.matrix.tolist.html#$ -
-numpy.matrix.tostring py:method 1 reference/generated/numpy.matrix.tostring.html#$ -
 numpy.matrix.trace py:method 1 reference/generated/numpy.matrix.trace.html#$ -
 numpy.matrix.transpose py:method 1 reference/generated/numpy.matrix.transpose.html#$ -
 numpy.matrix.var py:method 1 reference/generated/numpy.matrix.var.html#$ -
@@ -3845,7 +3856,6 @@ numpy.memmap.to_device py:method 1 reference/generated/numpy.memmap.to_device.ht
 numpy.memmap.tobytes py:method 1 reference/generated/numpy.memmap.tobytes.html#$ -
 numpy.memmap.tofile py:method 1 reference/generated/numpy.memmap.tofile.html#$ -
 numpy.memmap.tolist py:method 1 reference/generated/numpy.memmap.tolist.html#$ -
-numpy.memmap.tostring py:method 1 reference/generated/numpy.memmap.tostring.html#$ -
 numpy.memmap.trace py:method 1 reference/generated/numpy.memmap.trace.html#$ -
 numpy.memmap.transpose py:method 1 reference/generated/numpy.memmap.transpose.html#$ -
 numpy.memmap.var py:method 1 reference/generated/numpy.memmap.var.html#$ -
@@ -4000,7 +4010,6 @@ numpy.ndarray.to_device py:method 1 reference/generated/numpy.ndarray.to_device.
 numpy.ndarray.tobytes py:method 1 reference/generated/numpy.ndarray.tobytes.html#$ -
 numpy.ndarray.tofile py:method 1 reference/generated/numpy.ndarray.tofile.html#$ -
 numpy.ndarray.tolist py:method 1 reference/generated/numpy.ndarray.tolist.html#$ -
-numpy.ndarray.tostring py:method 1 reference/generated/numpy.ndarray.tostring.html#$ -
 numpy.ndarray.trace py:method 1 reference/generated/numpy.ndarray.trace.html#$ -
 numpy.ndarray.transpose py:method 1 reference/generated/numpy.ndarray.transpose.html#$ -
 numpy.ndarray.var py:method 1 reference/generated/numpy.ndarray.var.html#$ -
@@ -4734,7 +4743,6 @@ numpy.recarray.to_device py:method 1 reference/generated/numpy.recarray.to_devic
 numpy.recarray.tobytes py:method 1 reference/generated/numpy.recarray.tobytes.html#$ -
 numpy.recarray.tofile py:method 1 reference/generated/numpy.recarray.tofile.html#$ -
 numpy.recarray.tolist py:method 1 reference/generated/numpy.recarray.tolist.html#$ -
-numpy.recarray.tostring py:method 1 reference/generated/numpy.recarray.tostring.html#$ -
 numpy.recarray.trace py:method 1 reference/generated/numpy.recarray.trace.html#$ -
 numpy.recarray.transpose py:method 1 reference/generated/numpy.recarray.transpose.html#$ -
 numpy.recarray.var py:method 1 reference/generated/numpy.recarray.var.html#$ -
@@ -4898,6 +4906,7 @@ numpy.strings.rindex py:function 1 reference/generated/numpy.strings.rindex.html
 numpy.strings.rjust py:function 1 reference/generated/numpy.strings.rjust.html#$ -
 numpy.strings.rpartition py:function 1 reference/generated/numpy.strings.rpartition.html#$ -
 numpy.strings.rstrip py:function 1 reference/generated/numpy.strings.rstrip.html#$ -
+numpy.strings.slice py:function 1 reference/generated/numpy.strings.slice.html#$ -
 numpy.strings.startswith py:function 1 reference/generated/numpy.strings.startswith.html#$ -
 numpy.strings.str_len py:data 1 reference/generated/numpy.strings.str_len.html#$ -
 numpy.strings.strip py:function 1 reference/generated/numpy.strings.strip.html#$ -
@@ -5123,6 +5132,8 @@ call-back arguments std:label -1 f2py/python-usage.html#call-back-arguments Call
 canonical-python-and-c-types std:label -1 user/basics.types.html#$ Relationship Between NumPy Data Types and C Data Types
 casting std:term -1 glossary.html#term-$ -
 character strings std:label -1 f2py/advanced/use_cases.html#character-strings Character strings
+classDoxyLimbo std:label -1 dev/howto-docs.html#$ -
+classDoxyLimbo_1a952dd83b3eeb92013adcf2c065a98b77 std:label -1 dev/howto-docs.html#$ -
 column-major std:term -1 glossary.html#term-$ -
 combining-advanced-and-basic-indexing std:label -1 user/basics.indexing.html#$ Combining advanced and basic indexing
 complex-numbers std:label -1 reference/c-api/coremath.html#$ Support for complex numbers
@@ -5140,6 +5151,7 @@ dev/alignment std:doc -1 dev/alignment.html Memory alignment
 dev/depending_on_numpy std:doc -1 dev/depending_on_numpy.html For downstream package authors
 dev/development_advanced_debugging std:doc -1 dev/development_advanced_debugging.html Advanced debugging tools
 dev/development_environment std:doc -1 dev/development_environment.html Setting up and using your development environment
+dev/development_ghcodespaces std:doc -1 dev/development_ghcodespaces.html Using GitHub Codespaces for NumPy development
 dev/development_workflow std:doc -1 dev/development_workflow.html Development workflow
 dev/governance/governance std:doc -1 dev/governance/governance.html NumPy project governance and decision-making
 dev/governance/index std:doc -1 dev/governance/index.html NumPy governance
@@ -5153,6 +5165,7 @@ dev/reviewer_guidelines std:doc -1 dev/reviewer_guidelines.html Reviewer guideli
 dev/underthehood std:doc -1 dev/underthehood.html Under-the-hood documentation for developers
 development-environment std:label -1 dev/development_environment.html#$ Setting up and using your development environment
 development-workflow std:label -1 dev/development_workflow.html#$ Development workflow
+development_ghcodespaces std:label -1 dev/development_ghcodespaces.html#development-ghcodespaces Using GitHub Codespaces for NumPy development
 devindex std:label -1 dev/index.html#$ Contributing to NumPy
 dimension std:term -1 glossary.html#term-$ -
 dimensional-indexing-tools std:label -1 user/basics.indexing.html#$ Dimensional indexing tools
@@ -5164,6 +5177,7 @@ doc_c_code std:label -1 dev/howto-docs.html#doc-c-code Documenting C/C++ code
 docstring_intro std:label -1 dev/howto-docs.html#docstring-intro Docstrings
 dtype std:term -1 glossary.html#term-$ -
 dtype-api std:label -1 reference/c-api/array.html#$ Custom Data Types
+dtype-constructing-from-python-types std:label -1 reference/arrays.dtypes.html#$ Built-in Python types
 dtype-flags std:label -1 reference/c-api/array.html#$ Flags
 dtype-slots std:label -1 reference/c-api/array.html#$ Slot IDs and API Function Typedefs
 dtypemeta std:label -1 reference/c-api/types-and-structures.html#$ PyArray_DTypeMeta and PyArrayDTypeMeta_Spec
@@ -5276,7 +5290,7 @@ new-or-different std:label -1 reference/random/new-or-different.html#$ What’s 
 note std:label -1 reference/random/examples/cython/index.html#$ -
 numpy-2-abi-handling std:label -1 dev/depending_on_numpy.html#$ NumPy 2.0-specific advice
 numpy-2-migration-guide std:label -1 numpy_2_0_migration_guide.html#$ NumPy 2.0 migration guide
-numpy-distutils-refguide std:label -1 reference/distutils.html#$ Packaging (numpy.distutils)
+numpy-distutils-refguide std:label -1 reference/distutils.html#$ Packaging
 numpy-for-matlab-users std:label -1 user/numpy-for-matlab-users.html#$ NumPy for MATLAB users
 numpy-for-matlab-users.notes std:label -1 user/numpy-for-matlab-users.html#numpy-for-matlab-users-notes Notes
 numpy-internals std:label -1 dev/internals.html#$ Internal organization of NumPy arrays
@@ -5286,7 +5300,7 @@ numpy.ma.constants std:label -1 reference/maskedarray.baseclass.html#numpy-ma-co
 numpy_2_0_migration_guide std:doc -1 numpy_2_0_migration_guide.html NumPy 2.0 migration guide
 numpy_docs_mainpage std:label -1 index.html#numpy-docs-mainpage NumPy documentation
 numpy_tutorials std:label -1 dev/howto-docs.html#numpy-tutorials NumPy tutorials
-numpyrandom std:label -1 reference/random/index.html#$ Random sampling (numpy.random)
+numpyrandom std:label -1 reference/random/index.html#$ Random sampling
 numpysimd std:label -1 reference/simd/index.html#$ CPU/SIMD optimizations
 object array std:term -1 glossary.html#term-object-array -
 offsets-and-alignment std:label -1 user/basics.rec.html#$ Automatic byte offsets and alignment
@@ -5645,7 +5659,7 @@ reference/c-api/strings std:doc -1 reference/c-api/strings.html NpyString API
 reference/c-api/types-and-structures std:doc -1 reference/c-api/types-and-structures.html Python types and C-structures
 reference/c-api/ufunc std:doc -1 reference/c-api/ufunc.html ufunc API
 reference/constants std:doc -1 reference/constants.html Constants
-reference/distutils std:doc -1 reference/distutils.html Packaging (numpy.distutils)
+reference/distutils std:doc -1 reference/distutils.html Packaging
 reference/distutils/misc_util std:doc -1 reference/distutils/misc_util.html distutils.misc_util
 reference/distutils_guide std:doc -1 reference/distutils_guide.html numpy.distutils user guide
 reference/distutils_status_migration std:doc -1 reference/distutils_status_migration.html Status of numpy.distutils and migration advice
@@ -5850,7 +5864,6 @@ reference/generated/numpy.char.chararray.to_device std:doc -1 reference/generate
 reference/generated/numpy.char.chararray.tobytes std:doc -1 reference/generated/numpy.char.chararray.tobytes.html numpy.char.chararray.tobytes
 reference/generated/numpy.char.chararray.tofile std:doc -1 reference/generated/numpy.char.chararray.tofile.html numpy.char.chararray.tofile
 reference/generated/numpy.char.chararray.tolist std:doc -1 reference/generated/numpy.char.chararray.tolist.html numpy.char.chararray.tolist
-reference/generated/numpy.char.chararray.tostring std:doc -1 reference/generated/numpy.char.chararray.tostring.html numpy.char.chararray.tostring
 reference/generated/numpy.char.chararray.trace std:doc -1 reference/generated/numpy.char.chararray.trace.html numpy.char.chararray.trace
 reference/generated/numpy.char.chararray.translate std:doc -1 reference/generated/numpy.char.chararray.translate.html numpy.char.chararray.translate
 reference/generated/numpy.char.chararray.transpose std:doc -1 reference/generated/numpy.char.chararray.transpose.html numpy.char.chararray.transpose
@@ -6282,7 +6295,6 @@ reference/generated/numpy.lib.user_array.container.astype std:doc -1 reference/g
 reference/generated/numpy.lib.user_array.container.byteswap std:doc -1 reference/generated/numpy.lib.user_array.container.byteswap.html numpy.lib.user_array.container.byteswap
 reference/generated/numpy.lib.user_array.container.copy std:doc -1 reference/generated/numpy.lib.user_array.container.copy.html numpy.lib.user_array.container.copy
 reference/generated/numpy.lib.user_array.container.tobytes std:doc -1 reference/generated/numpy.lib.user_array.container.tobytes.html numpy.lib.user_array.container.tobytes
-reference/generated/numpy.lib.user_array.container.tostring std:doc -1 reference/generated/numpy.lib.user_array.container.tostring.html numpy.lib.user_array.container.tostring
 reference/generated/numpy.linalg.LinAlgError std:doc -1 reference/generated/numpy.linalg.LinAlgError.html numpy.linalg.LinAlgError
 reference/generated/numpy.linalg.cholesky std:doc -1 reference/generated/numpy.linalg.cholesky.html numpy.linalg.cholesky
 reference/generated/numpy.linalg.cond std:doc -1 reference/generated/numpy.linalg.cond.html numpy.linalg.cond
@@ -6411,7 +6423,6 @@ reference/generated/numpy.ma.MaskedArray.__contains__ std:doc -1 reference/gener
 reference/generated/numpy.ma.MaskedArray.__copy__ std:doc -1 reference/generated/numpy.ma.MaskedArray.__copy__.html numpy.ma.MaskedArray.__copy__
 reference/generated/numpy.ma.MaskedArray.__deepcopy__ std:doc -1 reference/generated/numpy.ma.MaskedArray.__deepcopy__.html numpy.ma.MaskedArray.__deepcopy__
 reference/generated/numpy.ma.MaskedArray.__delitem__ std:doc -1 reference/generated/numpy.ma.MaskedArray.__delitem__.html numpy.ma.MaskedArray.__delitem__
-reference/generated/numpy.ma.MaskedArray.__div__ std:doc -1 reference/generated/numpy.ma.MaskedArray.__div__.html numpy.ma.MaskedArray.__div__
 reference/generated/numpy.ma.MaskedArray.__divmod__ std:doc -1 reference/generated/numpy.ma.MaskedArray.__divmod__.html numpy.ma.MaskedArray.__divmod__
 reference/generated/numpy.ma.MaskedArray.__eq__ std:doc -1 reference/generated/numpy.ma.MaskedArray.__eq__.html numpy.ma.MaskedArray.__eq__
 reference/generated/numpy.ma.MaskedArray.__float__ std:doc -1 reference/generated/numpy.ma.MaskedArray.__float__.html numpy.ma.MaskedArray.__float__
@@ -6422,7 +6433,6 @@ reference/generated/numpy.ma.MaskedArray.__getstate__ std:doc -1 reference/gener
 reference/generated/numpy.ma.MaskedArray.__gt__ std:doc -1 reference/generated/numpy.ma.MaskedArray.__gt__.html numpy.ma.MaskedArray.__gt__
 reference/generated/numpy.ma.MaskedArray.__iadd__ std:doc -1 reference/generated/numpy.ma.MaskedArray.__iadd__.html numpy.ma.MaskedArray.__iadd__
 reference/generated/numpy.ma.MaskedArray.__iand__ std:doc -1 reference/generated/numpy.ma.MaskedArray.__iand__.html numpy.ma.MaskedArray.__iand__
-reference/generated/numpy.ma.MaskedArray.__idiv__ std:doc -1 reference/generated/numpy.ma.MaskedArray.__idiv__.html numpy.ma.MaskedArray.__idiv__
 reference/generated/numpy.ma.MaskedArray.__ifloordiv__ std:doc -1 reference/generated/numpy.ma.MaskedArray.__ifloordiv__.html numpy.ma.MaskedArray.__ifloordiv__
 reference/generated/numpy.ma.MaskedArray.__ilshift__ std:doc -1 reference/generated/numpy.ma.MaskedArray.__ilshift__.html numpy.ma.MaskedArray.__ilshift__
 reference/generated/numpy.ma.MaskedArray.__imod__ std:doc -1 reference/generated/numpy.ma.MaskedArray.__imod__.html numpy.ma.MaskedArray.__imod__
@@ -6537,7 +6547,6 @@ reference/generated/numpy.ma.MaskedArray.tofile std:doc -1 reference/generated/n
 reference/generated/numpy.ma.MaskedArray.toflex std:doc -1 reference/generated/numpy.ma.MaskedArray.toflex.html numpy.ma.MaskedArray.toflex
 reference/generated/numpy.ma.MaskedArray.tolist std:doc -1 reference/generated/numpy.ma.MaskedArray.tolist.html numpy.ma.MaskedArray.tolist
 reference/generated/numpy.ma.MaskedArray.torecords std:doc -1 reference/generated/numpy.ma.MaskedArray.torecords.html numpy.ma.MaskedArray.torecords
-reference/generated/numpy.ma.MaskedArray.tostring std:doc -1 reference/generated/numpy.ma.MaskedArray.tostring.html numpy.ma.MaskedArray.tostring
 reference/generated/numpy.ma.MaskedArray.trace std:doc -1 reference/generated/numpy.ma.MaskedArray.trace.html numpy.ma.MaskedArray.trace
 reference/generated/numpy.ma.MaskedArray.transpose std:doc -1 reference/generated/numpy.ma.MaskedArray.transpose.html numpy.ma.MaskedArray.transpose
 reference/generated/numpy.ma.MaskedArray.unshare_mask std:doc -1 reference/generated/numpy.ma.MaskedArray.unshare_mask.html numpy.ma.MaskedArray.unshare_mask
@@ -6727,7 +6736,6 @@ reference/generated/numpy.ma.masked_array.tofile std:doc -1 reference/generated/
 reference/generated/numpy.ma.masked_array.toflex std:doc -1 reference/generated/numpy.ma.masked_array.toflex.html numpy.ma.masked_array.toflex
 reference/generated/numpy.ma.masked_array.tolist std:doc -1 reference/generated/numpy.ma.masked_array.tolist.html numpy.ma.masked_array.tolist
 reference/generated/numpy.ma.masked_array.torecords std:doc -1 reference/generated/numpy.ma.masked_array.torecords.html numpy.ma.masked_array.torecords
-reference/generated/numpy.ma.masked_array.tostring std:doc -1 reference/generated/numpy.ma.masked_array.tostring.html numpy.ma.masked_array.tostring
 reference/generated/numpy.ma.masked_array.trace std:doc -1 reference/generated/numpy.ma.masked_array.trace.html numpy.ma.masked_array.trace
 reference/generated/numpy.ma.masked_array.transpose std:doc -1 reference/generated/numpy.ma.masked_array.transpose.html numpy.ma.masked_array.transpose
 reference/generated/numpy.ma.masked_array.unshare_mask std:doc -1 reference/generated/numpy.ma.masked_array.unshare_mask.html numpy.ma.masked_array.unshare_mask
@@ -6885,7 +6893,6 @@ reference/generated/numpy.matrix.to_device std:doc -1 reference/generated/numpy.
 reference/generated/numpy.matrix.tobytes std:doc -1 reference/generated/numpy.matrix.tobytes.html numpy.matrix.tobytes
 reference/generated/numpy.matrix.tofile std:doc -1 reference/generated/numpy.matrix.tofile.html numpy.matrix.tofile
 reference/generated/numpy.matrix.tolist std:doc -1 reference/generated/numpy.matrix.tolist.html numpy.matrix.tolist
-reference/generated/numpy.matrix.tostring std:doc -1 reference/generated/numpy.matrix.tostring.html numpy.matrix.tostring
 reference/generated/numpy.matrix.trace std:doc -1 reference/generated/numpy.matrix.trace.html numpy.matrix.trace
 reference/generated/numpy.matrix.transpose std:doc -1 reference/generated/numpy.matrix.transpose.html numpy.matrix.transpose
 reference/generated/numpy.matrix.var std:doc -1 reference/generated/numpy.matrix.var.html numpy.matrix.var
@@ -6968,7 +6975,6 @@ reference/generated/numpy.memmap.to_device std:doc -1 reference/generated/numpy.
 reference/generated/numpy.memmap.tobytes std:doc -1 reference/generated/numpy.memmap.tobytes.html numpy.memmap.tobytes
 reference/generated/numpy.memmap.tofile std:doc -1 reference/generated/numpy.memmap.tofile.html numpy.memmap.tofile
 reference/generated/numpy.memmap.tolist std:doc -1 reference/generated/numpy.memmap.tolist.html numpy.memmap.tolist
-reference/generated/numpy.memmap.tostring std:doc -1 reference/generated/numpy.memmap.tostring.html numpy.memmap.tostring
 reference/generated/numpy.memmap.trace std:doc -1 reference/generated/numpy.memmap.trace.html numpy.memmap.trace
 reference/generated/numpy.memmap.transpose std:doc -1 reference/generated/numpy.memmap.transpose.html numpy.memmap.transpose
 reference/generated/numpy.memmap.var std:doc -1 reference/generated/numpy.memmap.var.html numpy.memmap.var
@@ -7122,7 +7128,6 @@ reference/generated/numpy.ndarray.to_device std:doc -1 reference/generated/numpy
 reference/generated/numpy.ndarray.tobytes std:doc -1 reference/generated/numpy.ndarray.tobytes.html numpy.ndarray.tobytes
 reference/generated/numpy.ndarray.tofile std:doc -1 reference/generated/numpy.ndarray.tofile.html numpy.ndarray.tofile
 reference/generated/numpy.ndarray.tolist std:doc -1 reference/generated/numpy.ndarray.tolist.html numpy.ndarray.tolist
-reference/generated/numpy.ndarray.tostring std:doc -1 reference/generated/numpy.ndarray.tostring.html numpy.ndarray.tostring
 reference/generated/numpy.ndarray.trace std:doc -1 reference/generated/numpy.ndarray.trace.html numpy.ndarray.trace
 reference/generated/numpy.ndarray.transpose std:doc -1 reference/generated/numpy.ndarray.transpose.html numpy.ndarray.transpose
 reference/generated/numpy.ndarray.var std:doc -1 reference/generated/numpy.ndarray.var.html numpy.ndarray.var
@@ -7642,7 +7647,6 @@ reference/generated/numpy.recarray.to_device std:doc -1 reference/generated/nump
 reference/generated/numpy.recarray.tobytes std:doc -1 reference/generated/numpy.recarray.tobytes.html numpy.recarray.tobytes
 reference/generated/numpy.recarray.tofile std:doc -1 reference/generated/numpy.recarray.tofile.html numpy.recarray.tofile
 reference/generated/numpy.recarray.tolist std:doc -1 reference/generated/numpy.recarray.tolist.html numpy.recarray.tolist
-reference/generated/numpy.recarray.tostring std:doc -1 reference/generated/numpy.recarray.tostring.html numpy.recarray.tostring
 reference/generated/numpy.recarray.trace std:doc -1 reference/generated/numpy.recarray.trace.html numpy.recarray.trace
 reference/generated/numpy.recarray.transpose std:doc -1 reference/generated/numpy.recarray.transpose.html numpy.recarray.transpose
 reference/generated/numpy.recarray.var std:doc -1 reference/generated/numpy.recarray.var.html numpy.recarray.var
@@ -7801,6 +7805,7 @@ reference/generated/numpy.strings.rindex std:doc -1 reference/generated/numpy.st
 reference/generated/numpy.strings.rjust std:doc -1 reference/generated/numpy.strings.rjust.html numpy.strings.rjust
 reference/generated/numpy.strings.rpartition std:doc -1 reference/generated/numpy.strings.rpartition.html numpy.strings.rpartition
 reference/generated/numpy.strings.rstrip std:doc -1 reference/generated/numpy.strings.rstrip.html numpy.strings.rstrip
+reference/generated/numpy.strings.slice std:doc -1 reference/generated/numpy.strings.slice.html numpy.strings.slice
 reference/generated/numpy.strings.startswith std:doc -1 reference/generated/numpy.strings.startswith.html numpy.strings.startswith
 reference/generated/numpy.strings.str_len std:doc -1 reference/generated/numpy.strings.str_len.html numpy.strings.str_len
 reference/generated/numpy.strings.strip std:doc -1 reference/generated/numpy.strings.strip.html numpy.strings.strip
@@ -8106,7 +8111,7 @@ reference/random/generated/numpy.random.wald std:doc -1 reference/random/generat
 reference/random/generated/numpy.random.weibull std:doc -1 reference/random/generated/numpy.random.weibull.html numpy.random.weibull
 reference/random/generated/numpy.random.zipf std:doc -1 reference/random/generated/numpy.random.zipf.html numpy.random.zipf
 reference/random/generator std:doc -1 reference/random/generator.html Random Generator
-reference/random/index std:doc -1 reference/random/index.html Random sampling (numpy.random)
+reference/random/index std:doc -1 reference/random/index.html Random sampling
 reference/random/legacy std:doc -1 reference/random/legacy.html Legacy random generation
 reference/random/multithreading std:doc -1 reference/random/multithreading.html Multithreaded generation
 reference/random/new-or-different std:doc -1 reference/random/new-or-different.html What’s new or different
@@ -8124,13 +8129,13 @@ reference/routines.dtype std:doc -1 reference/routines.dtype.html Data type rout
 reference/routines.dtypes std:doc -1 reference/routines.dtypes.html Data type classes (numpy.dtypes)
 reference/routines.emath std:doc -1 reference/routines.emath.html Mathematical functions with automatic domain
 reference/routines.err std:doc -1 reference/routines.err.html Floating point error handling
-reference/routines.exceptions std:doc -1 reference/routines.exceptions.html Exceptions and Warnings (numpy.exceptions)
-reference/routines.fft std:doc -1 reference/routines.fft.html Discrete Fourier Transform (numpy.fft)
+reference/routines.exceptions std:doc -1 reference/routines.exceptions.html Exceptions and Warnings
+reference/routines.fft std:doc -1 reference/routines.fft.html Discrete Fourier Transform
 reference/routines.functional std:doc -1 reference/routines.functional.html Functional programming
 reference/routines.indexing std:doc -1 reference/routines.indexing.html Indexing routines
 reference/routines.io std:doc -1 reference/routines.io.html Input and output
 reference/routines.lib std:doc -1 reference/routines.lib.html Lib module (numpy.lib)
-reference/routines.linalg std:doc -1 reference/routines.linalg.html Linear algebra (numpy.linalg)
+reference/routines.linalg std:doc -1 reference/routines.linalg.html Linear algebra
 reference/routines.logic std:doc -1 reference/routines.logic.html Logic functions
 reference/routines.ma std:doc -1 reference/routines.ma.html Masked array operations
 reference/routines.math std:doc -1 reference/routines.math.html Mathematical functions
@@ -8152,7 +8157,7 @@ reference/routines.set std:doc -1 reference/routines.set.html Set routines
 reference/routines.sort std:doc -1 reference/routines.sort.html Sorting, searching, and counting
 reference/routines.statistics std:doc -1 reference/routines.statistics.html Statistics
 reference/routines.strings std:doc -1 reference/routines.strings.html String functionality
-reference/routines.testing std:doc -1 reference/routines.testing.html Test support (numpy.testing)
+reference/routines.testing std:doc -1 reference/routines.testing.html Test support
 reference/routines.version std:doc -1 reference/routines.version.html Version information
 reference/routines.window std:doc -1 reference/routines.window.html Window functions
 reference/security std:doc -1 reference/security.html NumPy security
@@ -8278,6 +8283,13 @@ release/2.1.1-notes std:doc -1 release/2.1.1-notes.html NumPy 2.1.1 Release Note
 release/2.1.2-notes std:doc -1 release/2.1.2-notes.html NumPy 2.1.2 Release Notes
 release/2.1.3-notes std:doc -1 release/2.1.3-notes.html NumPy 2.1.3 Release Notes
 release/2.2.0-notes std:doc -1 release/2.2.0-notes.html NumPy 2.2.0 Release Notes
+release/2.2.1-notes std:doc -1 release/2.2.1-notes.html NumPy 2.2.1 Release Notes
+release/2.2.2-notes std:doc -1 release/2.2.2-notes.html NumPy 2.2.2 Release Notes
+release/2.2.3-notes std:doc -1 release/2.2.3-notes.html NumPy 2.2.3 Release Notes
+release/2.2.4-notes std:doc -1 release/2.2.4-notes.html NumPy 2.2.4 Release Notes
+release/2.2.5-notes std:doc -1 release/2.2.5-notes.html NumPy 2.2.5 Release Notes
+release/2.2.6-notes std:doc -1 release/2.2.6-notes.html NumPy 2.2.6 Release Notes
+release/2.3.0-notes std:doc -1 release/2.3.0-notes.html NumPy 2.3.0 Release Notes
 release/notes-towncrier std:doc -1 release/notes-towncrier.html <no title>
 release/template std:doc -1 release/template.html NumPy 2.xx.x Release Notes
 reviewer-guidelines std:label -1 dev/reviewer_guidelines.html#$ Reviewer guidelines
@@ -8317,19 +8329,19 @@ routines.datetime std:label -1 reference/routines.datetime.html#routines-datetim
 routines.dtype std:label -1 reference/routines.dtype.html#routines-dtype Data type routines
 routines.dtypes std:label -1 reference/routines.dtypes.html#routines-dtypes Data type classes (numpy.dtypes)
 routines.emath std:label -1 reference/routines.emath.html#routines-emath Mathematical functions with automatic domain
-routines.exceptions std:label -1 reference/routines.exceptions.html#routines-exceptions Exceptions and Warnings (numpy.exceptions)
-routines.fft std:label -1 reference/routines.fft.html#routines-fft Discrete Fourier Transform (numpy.fft)
+routines.exceptions std:label -1 reference/routines.exceptions.html#routines-exceptions Exceptions and Warnings
+routines.fft std:label -1 reference/routines.fft.html#routines-fft Discrete Fourier Transform
 routines.indexing std:label -1 reference/routines.indexing.html#routines-indexing Indexing routines
 routines.io std:label -1 reference/routines.io.html#routines-io Input and output
 routines.lib std:label -1 reference/routines.lib.html#routines-lib Lib module (numpy.lib)
-routines.linalg std:label -1 reference/routines.linalg.html#routines-linalg Linear algebra (numpy.linalg)
+routines.linalg std:label -1 reference/routines.linalg.html#routines-linalg Linear algebra
 routines.linalg-broadcasting std:label -1 reference/routines.linalg.html#routines-linalg-broadcasting Linear algebra on several matrices at once
 routines.ma std:label -1 reference/routines.ma.html#routines-ma Masked array operations
 routines.matlib std:label -1 reference/routines.matlib.html#routines-matlib Matrix library (numpy.matlib)
 routines.polynomial std:label -1 reference/routines.polynomials.html#routines-polynomial Polynomials
 routines.rec std:label -1 reference/routines.rec.html#routines-rec Record Arrays (numpy.rec)
 routines.strings std:label -1 reference/routines.strings.html#routines-strings String functionality
-routines.testing std:label -1 reference/routines.testing.html#routines-testing Test support (numpy.testing)
+routines.testing std:label -1 reference/routines.testing.html#routines-testing Test support
 routines.version std:label -1 reference/routines.version.html#routines-version Version information
 row-major std:term -1 glossary.html#term-$ -
 runtime-simd-dispatch std:label -1 reference/simd/build-options.html#$ Runtime dispatch
