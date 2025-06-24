@@ -12795,7 +12795,7 @@ bpo-36817-whatsnew std:label -1 whatsnew/3.8.html#$ f-strings support = for self
 break std:label -1 reference/simple_stmts.html#$ The break statement
 break std:pdbcommand 1 library/pdb.html#pdbcommand-$ -
 browser-controllers std:label -1 library/webbrowser.html#$ Browser Controller Objects
-bsd0 std:label -1 license.html#$ ZERO-CLAUSE BSD LICENSE FOR CODE IN THE PYTHON 3.10.16 DOCUMENTATION
+bsd0 std:label -1 license.html#$ ZERO-CLAUSE BSD LICENSE FOR CODE IN THE PYTHON 3.10.17 DOCUMENTATION
 buffer std:2to3fixer 1 library/2to3.html#to3fixer-$ -
 buffer-request-types std:label -1 c-api/buffer.html#$ Buffer request types
 buffer-structs std:label -1 c-api/typeobj.html#$ Buffer Object Structures
@@ -14303,7 +14303,7 @@ provisional package std:term -1 glossary.html#term-provisional-package -
 proxy-basic-auth-handler std:label -1 library/urllib.request.html#$ ProxyBasicAuthHandler Objects
 proxy-digest-auth-handler std:label -1 library/urllib.request.html#$ ProxyDigestAuthHandler Objects
 proxy-handler std:label -1 library/urllib.request.html#$ ProxyHandler Objects
-psf-license std:label -1 license.html#$ PSF LICENSE AGREEMENT FOR PYTHON 3.10.16
+psf-license std:label -1 license.html#$ PSF LICENSE AGREEMENT FOR PYTHON 3.10.17
 publishing-python-packages std:label -1 distributing/index.html#$ Reading the Python Packaging User Guide
 pure-embedding std:label -1 extending/embedding.html#$ Pure Embedding
 pure-mod std:label -1 distutils/examples.html#$ Pure Python distribution (by module)

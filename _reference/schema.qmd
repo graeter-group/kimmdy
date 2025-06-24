@@ -22,7 +22,7 @@ Reserved keywords:
 ### Sequence { #kimmdy.schema.Sequence }
 
 ```python
-schema.Sequence(self, tasks)
+schema.Sequence(tasks)
 ```
 
 A sequence of tasks.

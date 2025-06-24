@@ -41,6 +41,7 @@ Dict representation of a plumed.dat file.
 | [read_distances_dat](#kimmdy.parsing.read_distances_dat) | Read a distances.dat plumed output file. |
 | [read_edissoc](#kimmdy.parsing.read_edissoc) | Reads a edissoc file and turns it into a dict. |
 | [read_json](#kimmdy.parsing.read_json) | Return JSON file content as dict. |
+| [read_mdp](#kimmdy.parsing.read_mdp) | Reads a mdp file and returns a dict. |
 | [read_plumed](#kimmdy.parsing.read_plumed) | Read a plumed.dat configuration file. |
 | [read_top](#kimmdy.parsing.read_top) | Read a topology file (*.top,*.itp,*.rtp) into a raw TopologyDict represenation. |
 | [resolve_includes](#kimmdy.parsing.resolve_includes) | Resolve #include statements in a (top/itp) file. |
@@ -61,7 +62,7 @@ Used for topology like files that use ';' for comments.
 ### read_distances_dat { #kimmdy.parsing.read_distances_dat }
 
 ```python
-parsing.read_distances_dat(distances_dat)
+parsing.read_distances_dat(path, dt=0)
 ```
 
 Read a distances.dat plumed output file.
@@ -97,6 +98,18 @@ parsing.read_json(path)
 ```
 
 Return JSON file content as dict.
+
+### read_mdp { #kimmdy.parsing.read_mdp }
+
+```python
+parsing.read_mdp(p)
+```
+
+Reads a mdp file and returns a dict.
+
+MDP files are key-value pairs separated by '='.
+; denotes a comment, the rest of the line is ignored.
+whitespace is ignored.
 
 ### read_plumed { #kimmdy.parsing.read_plumed }
 

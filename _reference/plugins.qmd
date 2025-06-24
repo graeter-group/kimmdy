@@ -16,7 +16,7 @@ Also discovers and loads KIMMDY plugins.
 ### BasicParameterizer { #kimmdy.plugins.BasicParameterizer }
 
 ```python
-plugins.BasicParameterizer(self, **kwargs)
+plugins.BasicParameterizer(**kwargs)
 ```
 
 reconstruct base force field state
@@ -42,7 +42,7 @@ all necessary actions should already have happened in bind_bond and break_bond o
 ### ReactionPlugin { #kimmdy.plugins.ReactionPlugin }
 
 ```python
-plugins.ReactionPlugin(self, name, runmng)
+plugins.ReactionPlugin(name, runmng)
 ```
 
 Reaction base class

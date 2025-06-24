@@ -13,7 +13,7 @@
 ### FF { #kimmdy.topology.ff.FF }
 
 ```python
-topology.ff.FF(self, top, residuetypes_path=None, gromacs_alias='gmx')
+topology.ff.FF(top, residuetypes_path=None, gromacs_alias='gmx')
 ```
 
 Container for parsed forcefield data.

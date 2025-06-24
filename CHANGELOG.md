@@ -1,6 +1,71 @@
 # Changelog
 
 
+## [8.0.0](https://github.com/graeter-group/kimmdy/compare/v7.1.3...v8.0.0) (2025-06-24)
+
+
+### ⚠ BREAKING CHANGES
+
+* more sensible default to not remove bonds from plumed on breaking
+* deprecate edr toplevel config input
+* use chosen time as single source of truth
+* don't copy input files into setup task dir
+
+### Features
+
+* add config.changer.topology.break_plumed option ([0b25103](https://github.com/graeter-group/kimmdy/commit/0b2510399e08be5c4aa84dbd81b41c205f633d6a))
+* add parser for mdp files ([fd406b5](https://github.com/graeter-group/kimmdy/commit/fd406b5a2d2da80da2e03832aa5270b85f23745d))
+* add pure xtc mode ([0d3af49](https://github.com/graeter-group/kimmdy/commit/0d3af49de96b4759a01c76f245236ddfdce7f5bf))
+* add Topology.from_path classmethod ([43fee89](https://github.com/graeter-group/kimmdy/commit/43fee89230adb8e73a70f7ff732008c0c503a31d))
+* always log grompp command as info ([35508a4](https://github.com/graeter-group/kimmdy/commit/35508a43d47f039118981281450aa06ffcc0c52d))
+* **analysis:** chose group for centering the output of trjcat ([d7491a8](https://github.com/graeter-group/kimmdy/commit/d7491a83cb9ba15115dcad827cc80027253a4e4c))
+* **config:** add config.slurm.partition ([4f288b1](https://github.com/graeter-group/kimmdy/commit/4f288b14c3fb13bcd0c6fbb5c384c68ceb5083d4))
+* copy all md mdps to setup ([ad71893](https://github.com/graeter-group/kimmdy/commit/ad71893e691582d7f27d16f43c96f2ff35d0c107))
+* copy small config files such as mdp to 0_setup and write mdps to md ([733604d](https://github.com/graeter-group/kimmdy/commit/733604d7c3d575763302bf2f6c78aa4031a5db00))
+* don't copy input files into setup task dir ([7d1fdc6](https://github.com/graeter-group/kimmdy/commit/7d1fdc6b1fe44c7f48cacf773ca132325976331a))
+* helper functions to use a harmonic potential for energy barriers instead of morse ([10da947](https://github.com/graeter-group/kimmdy/commit/10da947d92a9c5fb5deb225e5fa915134cac87de))
+* **hpc:** use name of output directory as part of the jobscript name ([e8145c2](https://github.com/graeter-group/kimmdy/commit/e8145c229b2b313b16fa388b16debdb1d3973883))
+* just_sample mode (see config) without recipe application ([fac4b42](https://github.com/graeter-group/kimmdy/commit/fac4b42bf92ef7d7f56109abfbccd730089009a0))
+* more sensible default to not remove bonds from plumed on breaking ([dd6defc](https://github.com/graeter-group/kimmdy/commit/dd6defc50690a85a0dd18903b30fd1a2c4ff152b))
+* parse mdp values into python datatypes and make keys canonical ([e9e0f38](https://github.com/graeter-group/kimmdy/commit/e9e0f385219ee18cfd5c881bd46483bdf02a8364))
+* round chosen time of kmc result to nearest trr frame. closes [#522](https://github.com/graeter-group/kimmdy/issues/522) ([d732f9a](https://github.com/graeter-group/kimmdy/commit/d732f9ac8128f0a36d6c860cb818ccb42f533aff))
+* save harmonic forces to bondstats ([0ce0a3c](https://github.com/graeter-group/kimmdy/commit/0ce0a3c04ed5c7f10eabc293405f069c16760815))
+* specify mdp file for input trr or infer from trr name ([34fd3f7](https://github.com/graeter-group/kimmdy/commit/34fd3f767b78948b21926eb6bba35888645f6dab))
+* unify hydrolysis and homolysis resources ([90ae1b8](https://github.com/graeter-group/kimmdy/commit/90ae1b8cc462cdc8982daaf7102de136391ef7f4))
+* validate mdp file for slow growth relax md fixes [#523](https://github.com/graeter-group/kimmdy/issues/523) ([a8470f5](https://github.com/graeter-group/kimmdy/commit/a8470f5bd8010080b64347df71e561caa5288496))
+
+
+### Bug Fixes
+
+* allow reading recipes with more rates from csv (increase field_size_limit of csv reader) ([52119a8](https://github.com/graeter-group/kimmdy/commit/52119a83ed05d63b36b1fef9ad48af715ba7f6f4))
+* apply amber fix globally to atoms affected ([#536](https://github.com/graeter-group/kimmdy/issues/536)) ([30a4cc5](https://github.com/graeter-group/kimmdy/commit/30a4cc55cc6ef3e3f9a52a36663e50f0e10dcd72))
+* deprecate edr toplevel config input ([5a341f8](https://github.com/graeter-group/kimmdy/commit/5a341f89d6b855c8114d1b276c849c60fc2fdee0))
+* don't add pair in bind_bond if atoms are directly bound ([f2a424c](https://github.com/graeter-group/kimmdy/commit/f2a424c28563eb9a7910673d444671b83427104c))
+* don't invent dihedrals with duplicate atoms (when rings exist) ([549e7ab](https://github.com/graeter-group/kimmdy/commit/549e7ab2f808475ec726db703aff95a4b659f09c))
+* don't lowercase name of the kimmdy run (used in output path) ([4f13d3a](https://github.com/graeter-group/kimmdy/commit/4f13d3aa6655efd2173578b6bcf61db32b0ba61c))
+* don't modify distances on place when calculating forces ([4ce43bd](https://github.com/graeter-group/kimmdy/commit/4ce43bd1c12a49b4cd83eaca08b62e7979623834))
+* fix floating point errors when rounding time to nearest trr frame ([58830be](https://github.com/graeter-group/kimmdy/commit/58830be4e59d4f03de7298b9b2f47de8fe23a0d1))
+* get correct improper dihedrals from previous or next residues when ([c382a3f](https://github.com/graeter-group/kimmdy/commit/c382a3ffbfc42d41da6bafef84991087c804c9ff))
+* log grompp and mdrun commands just before actually running ([6d8b1f7](https://github.com/graeter-group/kimmdy/commit/6d8b1f7083132f0bc428ca4e0d2a9445442b1860))
+* make get_is_reactive_predicate_f case-insensitive. closes [#513](https://github.com/graeter-group/kimmdy/issues/513) ([4f8407f](https://github.com/graeter-group/kimmdy/commit/4f8407fdb1c95befbdadfab8a5d321aa0bc2bddc))
+* make kimmdy log symlink in cwd unique per run ([fa74235](https://github.com/graeter-group/kimmdy/commit/fa742356468a3fb55bc505719cd0ac165ab57183))
+* make pulling test shorter to avoid pulling across the pbc ([2bf9e53](https://github.com/graeter-group/kimmdy/commit/2bf9e5313e1cc6ac4da3d2d33e88d466b4e02c3b))
+* only check gmx version of slow growth is enabled ([d74bef9](https://github.com/graeter-group/kimmdy/commit/d74bef91a19a1db07c67b6e5952745c80acd6a49))
+* put slurm in slurm outuput file name ([3c3ff73](https://github.com/graeter-group/kimmdy/commit/3c3ff7334e117a4210d3d311638e202cdf088d7f))
+* remove deprecated skip_truncation config ([99a0975](https://github.com/graeter-group/kimmdy/commit/99a09751751ccceaf294221bf1852485dec7b056))
+* reset loggers for multiple runs in the same python session ([5b779de](https://github.com/graeter-group/kimmdy/commit/5b779deaf751f7baf793d0be34c6051306453e44))
+* skip additional headers in plumed distances.dat files ([5b71e67](https://github.com/graeter-group/kimmdy/commit/5b71e6704b1260df1d150a69dfdcd533ebf52d96))
+* sort improper dihedral keys in the order that gromacs would ([5429d4a](https://github.com/graeter-group/kimmdy/commit/5429d4a97e2b800d76652e5e06ae54593e5a03f3))
+* use chosen time as single source of truth ([1160296](https://github.com/graeter-group/kimmdy/commit/11602966bab4800551c4832de6c0a308857141c3))
+* use the -time flag of grompp instead of .reaction trr and edr ([d547b2a](https://github.com/graeter-group/kimmdy/commit/d547b2a6724509ba82608cffdffe40a02d86c987)), closes [#531](https://github.com/graeter-group/kimmdy/issues/531) [#519](https://github.com/graeter-group/kimmdy/issues/519)
+* **wip:** handle impropers and DNA residutypes when binding ([b7836ab](https://github.com/graeter-group/kimmdy/commit/b7836ab6b126c466b035e4e992a8505f09242606))
+* write correct task directory to logmessage when starting task ([fb14d31](https://github.com/graeter-group/kimmdy/commit/fb14d31b86c2c0a467e61c2e8b751ed722b14244))
+
+
+### Performance Improvements
+
+* modify the "before" topology for relax ([#539](https://github.com/graeter-group/kimmdy/issues/539)) ([62a6282](https://github.com/graeter-group/kimmdy/commit/62a62829fb42ddaa09831be48d622c80963c3dda))
+
 ## [7.1.3](https://github.com/graeter-group/kimmdy/compare/v7.1.2...v7.1.3) (2025-03-07)
 
 

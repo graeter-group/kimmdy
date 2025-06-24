@@ -11,3 +11,5 @@ Constants used throughout KIMMDY
 | [ATOMTYPE_BONDORDER](#kimmdy.constants.ATOMTYPE_BONDORDER) | To determin if an atom is a radical. |
 | [ATOMTYPE_BONDORDER_FLAT](#kimmdy.constants.ATOMTYPE_BONDORDER_FLAT) | To determin if an atom is a radical. |
 | [CONFIG_LOGS](#kimmdy.constants.CONFIG_LOGS) | The logger is set up with information from the config |
+| [FIELD_SIZE_LIMIT](#kimmdy.constants.FIELD_SIZE_LIMIT) | Maximum size of a field when reading a RecipeCollection from csv file. |
+| [OPTIONAL_CONFIG_PATHS](#kimmdy.constants.OPTIONAL_CONFIG_PATHS) | Paths that may or may not be defined in the input |

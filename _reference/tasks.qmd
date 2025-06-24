@@ -16,7 +16,7 @@ output paths and the Task class for tasks in the runmanager queue.
 ### AutoFillDict { #kimmdy.tasks.AutoFillDict }
 
 ```python
-tasks.AutoFillDict(self, get_missing)
+tasks.AutoFillDict(get_missing)
 ```
 
 Dictionary that gets populated by calling get_missing.
@@ -24,7 +24,7 @@ Dictionary that gets populated by calling get_missing.
 ### Task { #kimmdy.tasks.Task }
 
 ```python
-tasks.Task(self, runmng, f, kwargs=None, out=None)
+tasks.Task(runmng, f, kwargs=None, out=None)
 ```
 
 A task to be performed as part of the RunManager Queue.
@@ -46,7 +46,6 @@ The function must return a TaskFiles object.
 
 ```python
 tasks.TaskFiles(
-    self,
     get_latest,
     input=dict(),
     output=dict(),

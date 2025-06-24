@@ -9,13 +9,12 @@ coordinate, topology and plumed modification functions
 | Name | Description |
 | --- | --- |
 | [AffectedInteractions](#kimmdy.coordinates.AffectedInteractions) | keeping track of affected interactions during the merge process to add the correct helper pairs |
-| [MoleculeTypeMerger](#kimmdy.coordinates.MoleculeTypeMerger) | Takes two MoleculeTypes and joins them for a smooth free-energy like parameter transition simulation |
+| [MoleculeTypeMerger](#kimmdy.coordinates.MoleculeTypeMerger) | Takes two MoleculeTypes and joins them for a smooth free-energy like parameter transition simulation. |
 
 ### AffectedInteractions { #kimmdy.coordinates.AffectedInteractions }
 
 ```python
 coordinates.AffectedInteractions(
-    self,
     atoms=set(),
     bonds=BondsPairSets(),
     angles=AnglesPairSets(),
@@ -28,18 +27,21 @@ keeping track of affected interactions during the merge process to add the corre
 ### MoleculeTypeMerger { #kimmdy.coordinates.MoleculeTypeMerger }
 
 ```python
-coordinates.MoleculeTypeMerger(self, mol_a, mol_b, ff, morse_only=False)
+coordinates.MoleculeTypeMerger(mol_a, mol_b, ff, morse_only=False)
 ```
 
-Takes two MoleculeTypes and joins them for a smooth free-energy like parameter transition simulation
+Takes two MoleculeTypes and joins them for a smooth free-energy like parameter transition simulation.
+
+mol_a is modified in place.
 
 #### Methods
 
 | Name | Description |
 | --- | --- |
 | [add_helper_pairs](#kimmdy.coordinates.MoleculeTypeMerger.add_helper_pairs) | growing/shrinking pairs are used to turn on/off |
-| [merge](#kimmdy.coordinates.MoleculeTypeMerger.merge) | modiefies mol_b, the reactive moleculetype of of top_b, in place |
-| [merge_exclusions](#kimmdy.coordinates.MoleculeTypeMerger.merge_exclusions) | Merge exclusions by adding the exclusions from the A state to the B state |
+| [amber_fix](#kimmdy.coordinates.MoleculeTypeMerger.amber_fix) | Amber fix for breaking/binding atom types without LJ potential |
+| [merge](#kimmdy.coordinates.MoleculeTypeMerger.merge) | modiefies mol_a, the reactive moleculetype of of top_a, in place |
+| [merge_exclusions](#kimmdy.coordinates.MoleculeTypeMerger.merge_exclusions) | Merge exclusions by adding the exclusions from the B state to the A state |
 | [merge_pairs](#kimmdy.coordinates.MoleculeTypeMerger.merge_pairs) | Merge pairs that are from the respective pairs sections of the topologies |
 
 ##### add_helper_pairs { #kimmdy.coordinates.MoleculeTypeMerger.add_helper_pairs }
@@ -54,13 +56,21 @@ If it is for a binding event, the pair is vanishing, as it will be an
 exclusion once bound. If a bond is breaking, the pair interaction
 is slowly turned on, as it was excluded previously.
 
+##### amber_fix { #kimmdy.coordinates.MoleculeTypeMerger.amber_fix }
+
+```python
+coordinates.MoleculeTypeMerger.amber_fix()
+```
+
+Amber fix for breaking/binding atom types without LJ potential
+
 ##### merge { #kimmdy.coordinates.MoleculeTypeMerger.merge }
 
 ```python
 coordinates.MoleculeTypeMerger.merge()
 ```
 
-modiefies mol_b, the reactive moleculetype of of top_b, in place
+modiefies mol_a, the reactive moleculetype of of top_a, in place
 
 ##### merge_exclusions { #kimmdy.coordinates.MoleculeTypeMerger.merge_exclusions }
 
@@ -68,7 +78,7 @@ modiefies mol_b, the reactive moleculetype of of top_b, in place
 coordinates.MoleculeTypeMerger.merge_exclusions()
 ```
 
-Merge exclusions by adding the exclusions from the A state to the B state
+Merge exclusions by adding the exclusions from the B state to the A state
 
 ##### merge_pairs { #kimmdy.coordinates.MoleculeTypeMerger.merge_pairs }
 
@@ -113,7 +123,6 @@ coordinates.get_explicit_or_type(
     interaction_types,
     mol,
     periodicity='',
-    use_state_b=False,
 )
 ```
 

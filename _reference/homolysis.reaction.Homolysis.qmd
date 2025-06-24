@@ -1,7 +1,7 @@
 # homolysis.reaction.Homolysis { #homolysis.reaction.Homolysis }
 
 ```python
-reaction.Homolysis(self, name, runmng)
+reaction.Homolysis(name, runmng)
 ```
 
 Homolytic bond breaking leading to 2 radicals.

@@ -76,8 +76,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-42a732b0e032c2683810a815e6a6abd1.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-447055c273ea4a21403eeda218134273.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../site_libs/bootstrap/bootstrap-dark-5c9dcc8c1f5d1bbca3fb8cd37090e5e0.min.css" rel="prefetch" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-6a0c4f2d4b257849dc0b4050951cab8b.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-44eb3be652de046713af1075ccaae16b.min.css" rel="prefetch" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -530,7 +530,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#kimmdy.topology.topology.Topology.bind_bond" id="toc-kimmdy.topology.topology.Topology.bind_bond" class="nav-link" data-scroll-target="#kimmdy.topology.topology.Topology.bind_bond">bind_bond</a></li>
   <li><a href="#kimmdy.topology.topology.Topology.break_bond" id="toc-kimmdy.topology.topology.Topology.break_bond" class="nav-link" data-scroll-target="#kimmdy.topology.topology.Topology.break_bond">break_bond</a></li>
   <li><a href="#kimmdy.topology.topology.Topology.del_atom" id="toc-kimmdy.topology.topology.Topology.del_atom" class="nav-link" data-scroll-target="#kimmdy.topology.topology.Topology.del_atom">del_atom</a></li>
+  <li><a href="#kimmdy.topology.topology.Topology.from_path" id="toc-kimmdy.topology.topology.Topology.from_path" class="nav-link" data-scroll-target="#kimmdy.topology.topology.Topology.from_path">from_path</a></li>
   <li><a href="#kimmdy.topology.topology.Topology.reindex_atomnrs" id="toc-kimmdy.topology.topology.Topology.reindex_atomnrs" class="nav-link" data-scroll-target="#kimmdy.topology.topology.Topology.reindex_atomnrs">reindex_atomnrs</a></li>
+  <li><a href="#kimmdy.topology.topology.Topology.to_path" id="toc-kimmdy.topology.topology.Topology.to_path" class="nav-link" data-scroll-target="#kimmdy.topology.topology.Topology.to_path">to_path</a></li>
   <li><a href="#kimmdy.topology.topology.Topology.update_partial_charges" id="toc-kimmdy.topology.topology.Topology.update_partial_charges" class="nav-link" data-scroll-target="#kimmdy.topology.topology.Topology.update_partial_charges">update_partial_charges</a></li>
   <li><a href="#kimmdy.topology.topology.Topology.validate_bond" id="toc-kimmdy.topology.topology.Topology.validate_bond" class="nav-link" data-scroll-target="#kimmdy.topology.topology.Topology.validate_bond">validate_bond</a></li>
   </ul></li>
@@ -571,7 +573,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </table>
 <section id="kimmdy.topology.topology.MoleculeType" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.topology.MoleculeType">MoleculeType</h3>
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>topology.topology.MoleculeType(<span class="va">self</span>, header, atomics, radicals<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>topology.topology.MoleculeType(header, atomics, radicals<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>One moleculetype in the topology</p>
 <section id="attributes" class="level4 doc-section doc-section-attributes">
 <h4 class="doc-section doc-section-attributes anchored" data-anchor-id="attributes">Attributes</h4>
@@ -669,15 +671,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="kimmdy.topology.topology.Topology" class="level3">
 <h3 class="anchored" data-anchor-id="kimmdy.topology.topology.Topology">Topology</h3>
 <div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>topology.topology.Topology(</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">self</span>,</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    top,</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    parametrizer<span class="op">=</span>BasicParameterizer(),</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    is_reactive_predicate_f<span class="op">=</span>is_not_solvent_or_ion,</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    radicals<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    residuetypes_path<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    reactive_nrexcl<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    gromacs_alias<span class="op">=</span><span class="st">'gmx'</span>,</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    top,</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    parametrizer<span class="op">=</span>BasicParameterizer(),</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    is_reactive_predicate_f<span class="op">=</span>is_not_solvent_or_ion,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    radicals<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    residuetypes_path<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    reactive_nrexcl<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Smart container for parsed topology data.</p>
 <p>A topology keeps track of connections when bonds are broken or formed. Reparametrization is triggerd automatically if <code>to_dict</code> is called after bonds have changed.</p>
 <p>Also see <a href="https://manual.gromacs.org/current/reference-manual/topologies/topology-file-formats.html#topology-file" class="uri">https://manual.gromacs.org/current/reference-manual/topologies/topology-file-formats.html#topology-file</a></p>
@@ -771,8 +771,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>Deletes atom</td>
 </tr>
 <tr class="even">
+<td><a href="#kimmdy.topology.topology.Topology.from_path">from_path</a></td>
+<td>Load a Topology object from a file path.</td>
+</tr>
+<tr class="odd">
 <td><a href="#kimmdy.topology.topology.Topology.reindex_atomnrs">reindex_atomnrs</a></td>
 <td>Reindex atom numbers in topology.</td>
+</tr>
+<tr class="even">
+<td><a href="#kimmdy.topology.topology.Topology.to_path">to_path</a></td>
+<td>Write the topology to a file.</td>
 </tr>
 <tr class="odd">
 <td><a href="#kimmdy.topology.topology.Topology.update_partial_charges">update_partial_charges</a></td>
@@ -895,21 +903,99 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </table>
 </section>
 </section>
+<section id="kimmdy.topology.topology.Topology.from_path" class="level5">
+<h5 class="anchored" data-anchor-id="kimmdy.topology.topology.Topology.from_path">from_path</h5>
+<div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>topology.topology.Topology.from_path(path, ffdir<span class="op">=</span><span class="va">None</span>, <span class="op">**</span>kwargs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Load a Topology object from a file path.</p>
+<p>Simplifies the <code>Topology(read_top(...), ...)</code> pattern.</p>
+<section id="parameters-4" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-4">Parameters</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>path</td>
+<td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a> | <a href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path">Path</a></td>
+<td>Path to the topology file.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>kwargs</td>
+<td></td>
+<td>Additional keyword arguments to pass to the Topology constructor.</td>
+<td><code>{}</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-1" class="level6 doc-section doc-section-returns">
+<h6 class="doc-section doc-section-returns anchored" data-anchor-id="returns-1">Returns</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td><a href="../_reference/topology.topology.html#kimmdy.topology.topology.Topology">Topology</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
 <section id="kimmdy.topology.topology.Topology.reindex_atomnrs" class="level5">
 <h5 class="anchored" data-anchor-id="kimmdy.topology.topology.Topology.reindex_atomnrs">reindex_atomnrs</h5>
-<div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>topology.topology.Topology.reindex_atomnrs()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>topology.topology.Topology.reindex_atomnrs()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Reindex atom numbers in topology.</p>
 <p>Starts at index 1. This also updates the numbers for bonds, angles, dihedrals and pairs. Returns a dict of all moleculetypes to their update maps (old -&gt; new).</p>
 </section>
+<section id="kimmdy.topology.topology.Topology.to_path" class="level5">
+<h5 class="anchored" data-anchor-id="kimmdy.topology.topology.Topology.to_path">to_path</h5>
+<div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>topology.topology.Topology.to_path(path)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Write the topology to a file.</p>
+<section id="parameters-5" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-5">Parameters</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>path</td>
+<td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a> | <a href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path">Path</a></td>
+<td>Path to the topology file.</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
 <section id="kimmdy.topology.topology.Topology.update_partial_charges" class="level5">
 <h5 class="anchored" data-anchor-id="kimmdy.topology.topology.Topology.update_partial_charges">update_partial_charges</h5>
-<div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>topology.topology.Topology.update_partial_charges(recipe_steps)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>topology.topology.Topology.update_partial_charges(recipe_steps)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Update the topology atom partial charges.</p>
 <p>This function must be called after the recipe_steps are applied. Changes are based on the recipe_steps. Update rules follow a simple assignment scheme that works well with grappa. If fragments are created, their partial charges are kept integers. If previously broken bonds are formed again, the original partial charges are restored.</p>
 </section>
 <section id="kimmdy.topology.topology.Topology.validate_bond" class="level5">
 <h5 class="anchored" data-anchor-id="kimmdy.topology.topology.Topology.validate_bond">validate_bond</h5>
-<div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>topology.topology.Topology.validate_bond(atm1, atm2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>topology.topology.Topology.validate_bond(atm1, atm2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Validates bond consistency between both atoms and top Returns True if bond exists, False if not. Raises RuntimeError if bond is not consistent.</p>
 
 

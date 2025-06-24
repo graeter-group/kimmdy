@@ -19,15 +19,7 @@ and because we have one reactant molecule
 ### KMCAccept { #kimmdy.kmc.KMCAccept }
 
 ```python
-kmc.KMCAccept(
-    self,
-    recipe,
-    reaction_probability,
-    time_delta,
-    time_start,
-    time_start_index,
-    time_start_index_within_plugin=None,
-)
+kmc.KMCAccept(recipe, reaction_probability, time_delta, time_start)
 ```
 
 The result of a KMC step. Similar to a Recipe but for the concrete realization of a reaction.
@@ -40,7 +32,6 @@ The result of a KMC step. Similar to a Recipe but for the concrete realization o
 | reaction_probability | [list](`list`)\[[float](`float`)\] \| None | Integral of reaction propensity with respect to time                                                                             |
 | time_delta           | [float](`float`)                           | MC time jump during which the reaction occurs [ps]                                                                               |
 | time_start           | [float](`float`)                           | Time, from which the reaction starts. The reaction changes the geometry/topology of this timestep and continues from there. [ps] |
-| time_start_index     | [int](`int`)                               | Index into the list of timesteps or rates of the timestep where the reaction starts                                              |
 
 ## Functions
 
