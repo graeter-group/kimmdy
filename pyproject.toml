@@ -1,3 +1,62 @@
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools>=61.2"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "kimmdy"
+version = "8.0.0"
+license-files = ["LICEN[CS]E*"]
+description = "Kinetic Monte Carlo Molecular Dynamics"
+authors = [{ name = "graeter-group", email = "mbm@h-its.org" }]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: GNU General Public License (GPL)",
+  "Operating System :: OS Independent",
+]
+requires-python = ">= 3.10"
+dependencies = ["pyyaml", "numpy", "importlib_metadata", "MDAnalysis"]
+
+[project.readme]
+file = "README.md"
+content-type = "text/markdown"
+
+[project.optional-dependencies]
+reactions = ["kimmdy-reactions"]
+grappa = ["kimmdy-grappa"]
+hat = ["HAT_reaction_plugin"]
+plugins = ["kimmdy-reactions", "kimmdy-grappa"]
+analysis = ["pandas", "matplotlib", "seaborn"]
+dev = [
+  "pytest",
+  "pytest-cov",
+  "tox",
+  "black",
+  "hypothesis",
+  "jupyter",
+  "griffe >= 0.33, < 1.0.0",
+  "quartodoc",
+  "pycallgraph2",
+  "kimmdy-reactions",
+  "kimmdy-grappa",
+  "pandas",
+  "matplotlib",
+  "seaborn",
+]
+
+[project.scripts]
+kimmdy = "kimmdy.cmd:entry_point_kimmdy"
+kimmdy-analysis = "kimmdy.analysis:entry_point_analysis"
+kimmdy-build-examples = "kimmdy.tools:entry_point_build_examples"
+kimmdy-modify-top = "kimmdy.tools:entry_point_modify_top"
+kimmdy-create-plumed = "kimmdy.tools:entry_point_create_plumed"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+include-package-data = true
+
+[tool.setuptools.package-data]
+kimmdy = ["*.json", "py.typed"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+namespaces = false

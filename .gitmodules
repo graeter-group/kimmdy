@@ -1,9 +1,9 @@
 [submodule "plugins/kimmdy-hydrolysis"]
 	path = plugins/kimmdy-hydrolysis
 	url = https://github.com/graeter-group/kimmdy-hydrolysis.git
-[submodule "plugins/HAT_reaction_plugin"]
-	path = plugins/HAT_reaction_plugin
-	url = https://github.com/graeter-group/HAT_reaction_plugin.git
+[submodule "plugins/kimmdy-hat"]
+	path = plugins/kimmdy-hat
+	url = https://github.com/graeter-group/kimmdy-hat.git
 [submodule "plugins/kimmdy-grappa"]
 	path = plugins/kimmdy-grappa
 	url = https://github.com/graeter-group/kimmdy-grappa.git
