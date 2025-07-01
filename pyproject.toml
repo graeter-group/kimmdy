@@ -23,25 +23,9 @@ content-type = "text/markdown"
 [project.optional-dependencies]
 reactions = ["kimmdy-reactions"]
 grappa = ["kimmdy-grappa"]
-hat = ["HAT_reaction_plugin"]
+hat = ["kimmdy-hat"]
 plugins = ["kimmdy-reactions", "kimmdy-grappa"]
 analysis = ["pandas", "matplotlib", "seaborn"]
-dev = [
-  "pytest",
-  "pytest-cov",
-  "tox",
-  "black",
-  "hypothesis",
-  "jupyter",
-  "griffe >= 0.33, < 1.0.0",
-  "quartodoc",
-  "pycallgraph2",
-  "kimmdy-reactions",
-  "kimmdy-grappa",
-  "pandas",
-  "matplotlib",
-  "seaborn",
-]
 
 [project.scripts]
 kimmdy = "kimmdy.cmd:entry_point_kimmdy"
@@ -60,3 +44,28 @@ kimmdy = ["*.json", "py.typed"]
 [tool.setuptools.packages.find]
 where = ["src"]
 namespaces = false
+
+[tool.uv.sources]
+kimmdy-hat = { workspace = true }
+
+[tool.uv.workspace]
+members = ["plugins/kimmdy-hat"]
+
+[dependency-groups]
+hat = ["kimmdy-hat"]
+dev = [
+  "pytest",
+  "pytest-cov",
+  "tox",
+  "black",
+  "hypothesis",
+  "jupyter",
+  "griffe >= 0.33, < 1.0.0",
+  "quartodoc",
+  "pycallgraph2",
+  "kimmdy-reactions",
+  "kimmdy-grappa",
+  "pandas",
+  "matplotlib",
+  "seaborn",
+]
