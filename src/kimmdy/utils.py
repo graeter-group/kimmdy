@@ -239,7 +239,7 @@ def write_gro_at_reaction_time(files: TaskFiles, time: float):
                 f"Failed to write out gro/trr file {gro_reaction.name} at reaction time in {gro.parent.name} from xtc file because the xtc doesn't contain all atoms. Will try trr file."
             )
 
-    if files.input["trr"] is not None:
+    if files.input["trr"] is not None and not wrote_file:
         try:
             run_gmx(
                 f"echo '0' | gmx trjconv -f {files.input['trr']} -s {gro} -b {time} -dump {time} -o {gro_reaction}"
