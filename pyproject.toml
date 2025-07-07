@@ -10,7 +10,6 @@ description = "Kinetic Monte Carlo Molecular Dynamics"
 authors = [{ name = "graeter-group", email = "mbm@h-its.org" }]
 classifiers = [
   "Programming Language :: Python :: 3",
-  "License :: OSI Approved :: GNU General Public License (GPL)",
   "Operating System :: OS Independent",
 ]
 requires-python = ">= 3.10"
@@ -21,10 +20,21 @@ file = "README.md"
 content-type = "text/markdown"
 
 [project.optional-dependencies]
-reactions = ["kimmdy-reactions"]
-grappa = ["kimmdy-grappa"]
+dimerization = ["kimmdy-dimerization"]
+grappa = ["kimmdy-grappa", "grappa-ff", "torch"]
 hat = ["kimmdy-hat"]
-plugins = ["kimmdy-reactions", "kimmdy-grappa"]
+hydrolysis = ["kimmdy-hydrolysis"]
+reactions = ["kimmdy-reactions"]
+
+plugins = [
+  # "kimmdy-dimerization", # excluded until pypi release
+  "kimmdy-reactions",
+  "kimmdy-grappa",
+  "kimmdy-hat",
+  "grappa-ff",
+  "torch",
+  "kimmdy-hydrolysis",
+]
 analysis = ["pandas", "matplotlib", "seaborn"]
 
 [project.scripts]
@@ -46,13 +56,24 @@ where = ["src"]
 namespaces = false
 
 [tool.uv.sources]
+kimmdy = { workspace = true }
+kimmdy-dimerization = { path = "./plugins/kimmdy-dimerization/" }
+kimmdy-grappa = { path = "./plugins/kimmdy-grappa/" }
 kimmdy-hat = { workspace = true }
+kimmdy-hydrolysis = { path = "./plugins/kimmdy-hydrolysis/" }
+kimmdy-reactions = { path = "./plugins/kimmdy-reactions/" }
+torch = [{ index = "pytorch-cpu" }]
+torchvision = [{ index = "pytorch-cpu" }]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
 
 [tool.uv.workspace]
 members = ["plugins/kimmdy-hat"]
 
 [dependency-groups]
-hat = ["kimmdy-hat"]
 dev = [
   "pytest",
   "pytest-cov",
@@ -64,8 +85,21 @@ dev = [
   "quartodoc",
   "pycallgraph2",
   "kimmdy-reactions",
-  "kimmdy-grappa",
   "pandas",
   "matplotlib",
   "seaborn",
+  # Everything below is to speed up pip package resolution.
+  "certifi>=2025.6",
+  "jsonschema>=4.24",
+  "jsonschema-specifications>=2025.4",
+  "markdown-it-py>=3.0",
+  "pytz>=2025.2",
+  "referencing>=0.36",
+  "rich>=14.0",
+  "rpds-py>=0.26",
+  "six>=1.17",
+  "typing-extensions>=4.14",
+  "tzdata>=2025.2",
+  "watchdog>=6.0",
+  "zipp>=3.23",
 ]
