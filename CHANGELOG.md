@@ -1,6 +1,13 @@
 # Changelog
 
 
+## [8.1.0](https://github.com/graeter-group/kimmdy/compare/v8.0.0...v8.1.0) (2025-07-07)
+
+
+### Features
+
+* support gromacs 2025 ([#549](https://github.com/graeter-group/kimmdy/issues/549)) ([cd1e58d](https://github.com/graeter-group/kimmdy/commit/cd1e58d06412e1853f74dadb1396b0d2025f8065))
+
 ## [8.0.0](https://github.com/graeter-group/kimmdy/compare/v7.1.3...v8.0.0) (2025-06-24)
 
 
