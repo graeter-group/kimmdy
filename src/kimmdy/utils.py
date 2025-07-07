@@ -163,7 +163,7 @@ def check_gmx_version(config):
     if hasattr(config, "mds"):
         for md in config.mds.get_attributes():
             if config.mds.attr(md).use_plumed:
-                if not ("MODIFIED" in version or "plumed" in version):
+                if not any([m in version for m in ("2025", "MODIFIED", "plumed")]):
                     m = (
                         "GROMACS version does not contain 'MODIFIED' or "
                         "'plumed', aborting due to apparent lack of PLUMED patch."
