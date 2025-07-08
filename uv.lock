@@ -1535,7 +1535,6 @@ hydrolysis = [
 ]
 plugins = [
     { name = "grappa-ff" },
-    { name = "kimmdy-dimerization" },
     { name = "kimmdy-grappa" },
     { name = "kimmdy-hat" },
     { name = "kimmdy-hydrolysis" },
@@ -1583,7 +1582,6 @@ requires-dist = [
     { name = "grappa-ff", marker = "extra == 'plugins'" },
     { name = "importlib-metadata" },
     { name = "kimmdy-dimerization", marker = "extra == 'dimerization'", directory = "plugins/kimmdy-dimerization" },
-    { name = "kimmdy-dimerization", marker = "extra == 'plugins'", directory = "plugins/kimmdy-dimerization" },
     { name = "kimmdy-grappa", marker = "extra == 'grappa'", directory = "plugins/kimmdy-grappa" },
     { name = "kimmdy-grappa", marker = "extra == 'plugins'", directory = "plugins/kimmdy-grappa" },
     { name = "kimmdy-hat", marker = "extra == 'hat'", editable = "plugins/kimmdy-hat" },
