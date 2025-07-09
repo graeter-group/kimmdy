@@ -78,6 +78,7 @@ dev = [
   "pytest",
   "pytest-cov",
   "tox",
+  "tox-uv",
   "black",
   "hypothesis",
   "jupyter",
