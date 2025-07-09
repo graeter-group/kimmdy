@@ -12,6 +12,10 @@ jobs:
     runs-on: ubuntu-latest
     container: riedmiki/gromacs-plumed-python:2023.5-plumed
     steps:
+      - name: Update git on container
+        run: |
+          apt update
+          apt install -y git
       - uses: actions/checkout@v4
         with:
           submodules: "recursive"
