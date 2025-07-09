@@ -20,6 +20,8 @@ jobs:
         with:
           submodules: "recursive"
       - uses: psf/black@stable
+        with:
+          src: "./src ./tests"
       - name: Install uv
         uses: astral-sh/setup-uv@v5
       - name: run tox
