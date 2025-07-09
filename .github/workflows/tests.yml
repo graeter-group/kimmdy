@@ -17,15 +17,13 @@ jobs:
           apt update
           apt install -y git
       - uses: actions/checkout@v4
-        with:
-          submodules: "recursive"
       - uses: psf/black@stable
         with:
           src: "./src ./tests"
       - name: Install uv
         uses: astral-sh/setup-uv@v5
       - name: run tox
-        run: uv run tox
+        run: uv run tox --no-sources
       - name: zip coverage report
         if: ${{ !cancelled() }}
         run: zip -r htmlcov.zip htmlcov || true
