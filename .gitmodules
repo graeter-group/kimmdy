@@ -1,0 +1,15 @@
+[submodule "plugins/kimmdy-hydrolysis"]
+	path = plugins/kimmdy-hydrolysis
+	url = git@github.com:graeter-group/kimmdy-hydrolysis.git
+[submodule "plugins/kimmdy-hat"]
+	path = plugins/kimmdy-hat
+	url = git@github.com:graeter-group/kimmdy-hat.git
+[submodule "plugins/kimmdy-grappa"]
+	path = plugins/kimmdy-grappa
+	url = git@github.com:graeter-group/kimmdy-grappa.git
+[submodule "plugins/kimmdy-reactions"]
+	path = plugins/kimmdy-reactions
+	url = git@github.com:graeter-group/kimmdy-reactions.git
+[submodule "plugins/kimmdy-dimerization"]
+	path = plugins/kimmdy-dimerization
+	url = git@github.com:graeter-group/kimmdy-dimerization.git
