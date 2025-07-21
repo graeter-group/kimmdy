@@ -942,6 +942,32 @@ class TestChargeAssignment:
         )
 
 
+class TestChainedReactions:
+    @pytest.fixture
+    def top_init(self, filedir) -> Topology:
+        return Topology.from_path(
+            filedir / "IMREE.top", ffdir=filedir / "amber99sb-star-ildnp.ff"
+        )
+
+    def test_hat_after_hom(self, top_init: Topology):
+        """
+        This would previously fail because a HAT after a homolysis
+        can jump the H onto a position where there would be no H
+        in the standard residue type (ARG in this case),
+        which gives it the atomname HX.
+        There are no improper dihedrals defined
+        mentioning HX in the residuetype, so it needed another Null check.
+        """
+        top = deepcopy(top_init)
+
+        # homolysis
+        top.break_bond(("28", "48"))
+
+        # hat
+        top.break_bond(("50", "51"))
+        top.bind_bond(("51", "48"))
+
+
 class TestDimerization:
     @pytest.fixture
     def top_init(self, filedir) -> Topology:
