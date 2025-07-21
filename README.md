@@ -10,6 +10,10 @@ Reactive MD pipeline for GROMACS using Kinetic Monte Carlo / Molecular Dynamics 
 Some reactions need a GROMACS version patched with [PLUMED](https://www.plumed.org/).
 The gromacs version name should then contain `MODIFIED` or `plumed`.
 
+While it is possible to install KIMMDY with just `pip install kimmdy`,
+this can take a while due to dependency resolution.
+We recommend installing KIMMDY with [uv](https://docs.astral.sh/uv/) instead:
+
 ```bash
 uv tool install kimmdy
 ```
@@ -22,7 +26,7 @@ To install the builtin reaction plugins, use
 uv tool install --from kimmdy[reactions] kimmdy
 ```
 
-To install the builtin reactions and analysis tools use
+To install the builtin example reactions and analysis tools use
 
 ```bash
 uv tool install --from kimmdy[reactions,analysis] kimmdy
@@ -30,16 +34,13 @@ uv tool install --from kimmdy[reactions,analysis] kimmdy
 
 However, this is only half the fun!
 
-KIMMDY has two exciting plugins in the making, which properly parameterize
+To install KIMMDY with all currently available official plugins, like kimmdy-grappa, which properly parameterizes
 your molecules for radicals using GrAPPa (Graph Attentional Protein
-Parametrization) and predict Hydrogen Atom Transfer (HAT) rates.  
-To install all plugins use
+Parametrization) and reaction plugins like kimmdy-hat (for Hydrogen Atom Transfer) or kimmdy-hydrolysis use
 
 ```bash
 uv tool install --from kimmdy[plugins] kimmdy
 ```
-
-Full installation instructions are available [here](https://graeter-group.github.io/kimmdy/guide/how-to/install-ml-plugins.html)
 
 ## Documentation
 
