@@ -10,8 +10,12 @@ Reactive MD pipeline for GROMACS using Kinetic Monte Carlo / Molecular Dynamics 
 Some reactions need a GROMACS version patched with [PLUMED](https://www.plumed.org/).
 The gromacs version name should then contain `MODIFIED` or `plumed`.
 
+While it is possible to install KIMMDY with just `pip install kimmdy`,
+this can take a while due to dependency resolution.
+We recommend installing KIMMDY with [uv](https://docs.astral.sh/uv/) instead:
+
 ```bash
-pip install kimmdy
+uv tool install kimmdy
 ```
 
 This installation includes only the most basic functionality as no plugins and analysis tools are installed.
@@ -19,21 +23,24 @@ This installation includes only the most basic functionality as no plugins and a
 To install the builtin reaction plugins, use
 
 ```bash
-pip install kimmdy[reactions]
+uv tool install --from kimmdy[reactions] kimmdy
 ```
 
-To install the builtin reactions and analysis tools use
+To install the builtin example reactions and analysis tools use
 
 ```bash
-pip install kimmdy[reactions,analysis]
+uv tool install --from kimmdy[reactions,analysis] kimmdy
 ```
 
 However, this is only half the fun!
 
-KIMMDY has two exciting plugins in the making, which properly parameterize your molecules
-for radicals using GrAPPa (Graph Attentional Protein Parametrization) and predict Hydrogen Atom Transfer (HAT) rates.
+To install KIMMDY with all currently available official plugins, like kimmdy-grappa, which properly parameterizes
+your molecules for radicals using GrAPPa (Graph Attentional Protein
+Parametrization) and reaction plugins like kimmdy-hat (for Hydrogen Atom Transfer) or kimmdy-hydrolysis use
 
-Full installation instructions are available [here](https://graeter-group.github.io/kimmdy/guide/how-to/install-ml-plugins.html)
+```bash
+uv tool install --from kimmdy[plugins] kimmdy
+```
 
 ## Documentation
 
@@ -50,13 +57,9 @@ Head over to the [getting started](https://graeter-group.github.io/kimmdy/guide/
 Clone kimmdy and the default reaction and parameterization plugins and install requirements and kimmdy as editable via
 
 ```bash
-git clone git@github.com:graeter-group/kimmdy.git
-git clone git@github.com:graeter-group/kimmdy-reactions.git
-git clone git@github.com:graeter-group/kimmdy-grappa.git
+git clone git@github.com:graeter-group/kimmdy.git --recurse-submodules
 cd kimmdy
-python -m venv .venv
-source ./venv/bin/activate
-pip install -r requirements.txt
+uv sync --extra plugins
 ```
 
 Conventions:
@@ -70,8 +73,7 @@ Conventions:
 For developoment, we provide a docker image containing gromacs and multiple python versions to test against.  
 To run the test locally, you must:
 
-- install docker
-- install [act](https://github.com/nektos/act), the easiest option is with github cli via `gh extension install https://github.com/nektos/gh-act`
-- run tests with `gh extension exec act -j test --artifact-server-path ./artifacts`
-- html coverage report is exported into `artifacts`
-
+* install docker
+* install [act](https://github.com/nektos/act), the easiest option is with github cli via `gh extension install https://github.com/nektos/gh-act`
+* run tests with `gh extension exec act -j test --artifact-server-path ./artifacts`
+* html coverage report is exported into `artifacts`

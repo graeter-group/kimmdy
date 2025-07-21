@@ -1,0 +1,76 @@
+---
+title: "Install KIMMDY with Plugins"
+author: "Kai Riedmiller"
+---
+
+## Complete Installation with ML Plugins
+
+### Prerequisites
+
+- `uv`: recommended package manager to install kimmdy. [Get it here](https://docs.astral.sh/uv/getting-started/installation/)
+- `gromacs>=2023.2` 
+  - Version 2021.4 works with everything except slow-growth.
+
+Optional:
+
+- `plumed`-patched version of `gromacs` (for the homolysis reaction).
+  Gromacs 2025 and above do not need to be patched with plumed, only the `PLUMED_KERNEL` variabel needs to be set.
+    ([See plumded documentation](https://www.plumed.org/doc-v2.9/user-doc/html/_installation.html))
+
+### Installation
+
+::: {.panel-tabset}
+
+## User installation
+
+```bash
+uv tool install kimmdy[plugins] kimmdy
+```
+
+`kimmdy`, its subcommands, and its plugins are now availabe, test it with:
+
+```bash
+kimmdy --help
+```
+
+
+## Developer installation
+
+```bash
+git clone git@github.com:graeter-group/kimmdy.git --recurse-submodules
+cd kimmdy
+uv sync --extra plugins
+```
+
+To run kimmdy, either activate the venv:
+
+```bash
+source .venv/bin/activate
+kimmdy --help
+```
+
+.. or use `uv run`:
+
+```bash
+uv run kimmdy --help
+```
+:::
+
+`plugins` can be also more specific, like `hat`, `hydrolysis`, `grappa`, 
+`dimerization`, or `reactions` (containing homolysis, hat_naive and a dummyreaction).
+
+
+## Notes on the project strucure
+
+Plugins are developed in separate git repositories.
+Officially supported ones are linked as subrepositories of kimmdy inside 
+the `plugins` directory.
+
+These are by default *not* pulled *via* `git clone`, to clone them add `--recurse-submodules`.
+
+To update them, get new ones, or pull them after initially omitting them, use:  
+`git submodule update --init --recursive`
+
+
+
+
