@@ -459,24 +459,32 @@ class MoleculeType:
         dihedrals: dict[ImproperDihedralId, ResidueImproperSpec] = {}
         if previous_residuetype is not None and atom.atom == "N":
             # the atom is N, so it may have an improper defined
-            # in the previous residue, where is would be referred to as +N
+            # in the previous residue, where it would be referred to as +N
             for key, improper in previous_residuetype.improper_dihedrals.items():
                 # find the dihedral with +N
                 if any(["+" in k for k in key]):
                     nr_key: ImproperDihedralId = tuple(
                         atom.nr if "+" in x else prev_atomname_to_nr.get(x) for x in key
                     )  # pyright: ignore
+                    if None in nr_key:
+                        m = f"Improper dihedral {key} with {nr_key} not found in residue {atom.residue}."
+                        logger.debug(m)
+                        continue
                     dihedrals[nr_key] = improper
 
         if next_residuetype is not None and atom.atom == "C":
             # the atom is C, so it may have an improper defined
-            # in the previous residue, where is would be referred to as -C
+            # in the previous residue, where it would be referred to as -C
             for key, improper in next_residuetype.improper_dihedrals.items():
                 # find the dihedral with -C
                 if any(["-" in k for k in key]):
                     nr_key = tuple(
                         atom.nr if "-" in x else next_atomname_to_nr.get(x) for x in key
                     )  # pyright: ignore
+                    if None in nr_key:
+                        m = f"Improper dihedral {key} with {nr_key} not found in residue {atom.residue}."
+                        logger.debug(m)
+                        continue
                     dihedrals[nr_key] = improper
 
         def get_number(name):
@@ -494,11 +502,11 @@ class MoleculeType:
         # regularly defined improper dihedrals of the same residue
         for key, improper in residuetype.improper_dihedrals.items():
             nr_key = tuple(get_number(x) for x in key)  # pyright: ignore
-            if None in nr_key:
-                m = f"Improper dihedral {key} not found in residue {atom.residue}."
-                logger.warning(m)
-                continue
             if atom_nr not in nr_key:
+                continue
+            if None in nr_key:
+                m = f"Improper dihedral {key} {nr_key} not found in residue {atom.residue}."
+                logger.debug(m)
                 continue
             dihedrals[nr_key] = improper
 
