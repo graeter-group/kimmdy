@@ -184,7 +184,7 @@ def test_explicit_residuetypes(arranged_tmp_path):
     config = Config(Path("config3.yml"))
     ff = FF(top=read_top(config.top), residuetypes_path=config.residuetypes)
 
-    assert len(ff.residuetypes.keys()) == 5
+    assert len(ff.residuetypes.keys()) == 121
     assert ff.residuetypes["ALA"]
 
 
