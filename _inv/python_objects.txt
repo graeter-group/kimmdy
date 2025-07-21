@@ -8301,6 +8301,7 @@ os.open py:function 1 library/os.html#$ -
 os.openpty py:function 1 library/os.html#$ -
 os.pardir py:data 1 library/os.html#$ -
 os.path py:module 0 library/os.path.html#module-$ -
+os.path.ALLOW_MISSING py:data 1 library/os.path.html#$ -
 os.path.abspath py:function 1 library/os.path.html#$ -
 os.path.basename py:function 1 library/os.path.html#$ -
 os.path.commonpath py:function 1 library/os.path.html#$ -
@@ -10108,6 +10109,7 @@ tarfile.FilterError py:exception 1 library/tarfile.html#$ -
 tarfile.FilterError.tarinfo py:attribute 1 library/tarfile.html#$ -
 tarfile.GNU_FORMAT py:data 1 library/tarfile.html#$ -
 tarfile.HeaderError py:exception 1 library/tarfile.html#$ -
+tarfile.LinkFallbackError py:exception 1 library/tarfile.html#$ -
 tarfile.LinkOutsideDestinationError py:exception 1 library/tarfile.html#$ -
 tarfile.OutsideDestinationError py:exception 1 library/tarfile.html#$ -
 tarfile.PAX_FORMAT py:data 1 library/tarfile.html#$ -
@@ -12795,7 +12797,7 @@ bpo-36817-whatsnew std:label -1 whatsnew/3.8.html#$ f-strings support = for self
 break std:label -1 reference/simple_stmts.html#$ The break statement
 break std:pdbcommand 1 library/pdb.html#pdbcommand-$ -
 browser-controllers std:label -1 library/webbrowser.html#$ Browser Controller Objects
-bsd0 std:label -1 license.html#$ ZERO-CLAUSE BSD LICENSE FOR CODE IN THE PYTHON 3.10.17 DOCUMENTATION
+bsd0 std:label -1 license.html#$ ZERO-CLAUSE BSD LICENSE FOR CODE IN THE PYTHON 3.10.18 DOCUMENTATION
 buffer std:2to3fixer 1 library/2to3.html#to3fixer-$ -
 buffer-request-types std:label -1 c-api/buffer.html#$ Buffer request types
 buffer-structs std:label -1 c-api/typeobj.html#$ Buffer Object Structures
@@ -14303,7 +14305,7 @@ provisional package std:term -1 glossary.html#term-provisional-package -
 proxy-basic-auth-handler std:label -1 library/urllib.request.html#$ ProxyBasicAuthHandler Objects
 proxy-digest-auth-handler std:label -1 library/urllib.request.html#$ ProxyDigestAuthHandler Objects
 proxy-handler std:label -1 library/urllib.request.html#$ ProxyHandler Objects
-psf-license std:label -1 license.html#$ PSF LICENSE AGREEMENT FOR PYTHON 3.10.17
+psf-license std:label -1 license.html#$ PSF LICENSE AGREEMENT FOR PYTHON 3.10.18
 publishing-python-packages std:label -1 distributing/index.html#$ Reading the Python Packaging User Guide
 pure-embedding std:label -1 extending/embedding.html#$ Pure Embedding
 pure-mod std:label -1 distutils/examples.html#$ Pure Python distribution (by module)

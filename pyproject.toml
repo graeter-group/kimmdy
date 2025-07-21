@@ -1,3 +1,106 @@
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools>=61.2"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "kimmdy"
+version = "8.0.0"
+license-files = ["LICEN[CS]E*"]
+description = "Kinetic Monte Carlo Molecular Dynamics"
+authors = [{ name = "graeter-group", email = "mbm@h-its.org" }]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Operating System :: OS Independent",
+]
+requires-python = ">= 3.10"
+dependencies = ["pyyaml", "numpy", "importlib_metadata", "MDAnalysis"]
+
+[project.readme]
+file = "README.md"
+content-type = "text/markdown"
+
+[project.optional-dependencies]
+dimerization = ["kimmdy-dimerization"]
+grappa = ["kimmdy-grappa", "grappa-ff", "torch"]
+hat = ["kimmdy-hat"]
+hydrolysis = ["kimmdy-hydrolysis"]
+reactions = ["kimmdy-reactions"]
+
+plugins = [
+  # "kimmdy-dimerization", # excluded until pypi release
+  "kimmdy-reactions",
+  "kimmdy-grappa",
+  "kimmdy-hat",
+  "grappa-ff",
+  "torch",
+  "kimmdy-hydrolysis",
+]
+analysis = ["pandas", "matplotlib", "seaborn"]
+
+[project.scripts]
+kimmdy = "kimmdy.cmd:entry_point_kimmdy"
+kimmdy-analysis = "kimmdy.analysis:entry_point_analysis"
+kimmdy-build-examples = "kimmdy.tools:entry_point_build_examples"
+kimmdy-modify-top = "kimmdy.tools:entry_point_modify_top"
+kimmdy-create-plumed = "kimmdy.tools:entry_point_create_plumed"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+include-package-data = true
+
+[tool.setuptools.package-data]
+kimmdy = ["*.json", "py.typed"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+namespaces = false
+
+[tool.uv.sources]
+kimmdy = { workspace = true }
+kimmdy-dimerization = { path = "./plugins/kimmdy-dimerization/" }
+kimmdy-grappa = { path = "./plugins/kimmdy-grappa/" }
+kimmdy-hat = { workspace = true }
+kimmdy-hydrolysis = { path = "./plugins/kimmdy-hydrolysis/" }
+kimmdy-reactions = { path = "./plugins/kimmdy-reactions/" }
+torch = [{ index = "pytorch-cpu" }]
+torchvision = [{ index = "pytorch-cpu" }]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.workspace]
+members = ["plugins/kimmdy-hat"]
+
+[dependency-groups]
+dev = [
+  "pytest",
+  "pytest-cov",
+  "tox",
+  "tox-uv",
+  "black",
+  "hypothesis",
+  "jupyter",
+  "griffe >= 0.33, < 1.0.0",
+  "quartodoc",
+  "pycallgraph2",
+  "kimmdy-reactions",
+  "pandas",
+  "matplotlib",
+  "seaborn",
+  # Everything below is to speed up pip package resolution.
+  "certifi>=2025.6",
+  "jsonschema>=4.24",
+  "jsonschema-specifications>=2025.4",
+  "markdown-it-py>=3.0",
+  "pytz>=2025.2",
+  "referencing>=0.36",
+  "rich>=14.0",
+  "rpds-py>=0.26",
+  "six>=1.17",
+  "typing-extensions>=4.14",
+  "tzdata>=2025.2",
+  "watchdog>=6.0",
+  "zipp>=3.23",
+]
