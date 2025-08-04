@@ -324,9 +324,9 @@ def read_top(
                         parent_section = f"{parent_section}_{moleculetype_name}"
                     d[parent_section] = empty_section(condition)
                     d[parent_section]["subsections"] = {}
-                    
-                #specific case that can occur during testing
-                elif parent_section in d.keys(): 
+
+                # specific case that can occur during testing
+                elif parent_section in d.keys():
                     parent_section = parent_section + "_repeat"
                     d[parent_section] = empty_section(condition)
                     d[parent_section]["subsections"] = {}
