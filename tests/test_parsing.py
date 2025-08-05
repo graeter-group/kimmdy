@@ -84,7 +84,7 @@ allowed_text = st.text(
     # a list of lists that correspond to a sections of a top file
     sections=st.lists(
         st.lists(
-            allowed_text.filter(lambda x: x not in ["ffdir","define"]),
+            allowed_text.filter(lambda x: x not in ["ffdir", "define"]),
             min_size=2,
             max_size=5,
         ),
