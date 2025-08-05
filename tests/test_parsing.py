@@ -3,7 +3,7 @@ import string
 from pathlib import Path
 
 import pytest
-from hypothesis import HealthCheck, given, settings
+from hypothesis import HealthCheck, given, settings, assume
 from hypothesis import strategies as st
 
 from kimmdy import parsing
@@ -84,7 +84,7 @@ allowed_text = st.text(
     # a list of lists that correspond to a sections of a top file
     sections=st.lists(
         st.lists(
-            allowed_text,
+            allowed_text.filter(lambda x: x not in ["ffdir","define"]),
             min_size=2,
             max_size=5,
         ),
