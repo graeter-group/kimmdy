@@ -23,13 +23,13 @@ This installation includes only the most basic functionality as no plugins and a
 To install the builtin reaction plugins, use
 
 ```bash
-uv tool install --from kimmdy[reactions] kimmdy
+uv tool install kimmdy[reactions]
 ```
 
 To install the builtin example reactions and analysis tools use
 
 ```bash
-uv tool install --from kimmdy[reactions,analysis] kimmdy
+uv tool install kimmdy[reactions,analysis]
 ```
 
 However, this is only half the fun!
@@ -39,7 +39,13 @@ your molecules for radicals using GrAPPa (Graph Attentional Protein
 Parametrization) and reaction plugins like kimmdy-hat (for Hydrogen Atom Transfer) or kimmdy-hydrolysis use
 
 ```bash
-uv tool install --from kimmdy[plugins] kimmdy
+uv tool install kimmdy[plugins]
+```
+
+To uninstall KIMMDY again, use
+
+```bash
+uv tool uninstall kimmdy
 ```
 
 ## Documentation
