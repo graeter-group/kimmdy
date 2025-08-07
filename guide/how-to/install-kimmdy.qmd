@@ -24,13 +24,19 @@ Optional:
 ## User installation
 
 ```bash
-uv tool install kimmdy[plugins] kimmdy
+uv tool install kimmdy[plugins]
 ```
 
 `kimmdy`, its subcommands, and its plugins are now availabe, test it with:
 
 ```bash
 kimmdy --help
+```
+
+Uninstall by using:
+
+```bash
+uv tool uninstall kimmdy
 ```
 
 
