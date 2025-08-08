@@ -12,12 +12,6 @@ resolution-markers = [
     "python_full_version < '3.11' and sys_platform == 'darwin'",
 ]
 
-[manifest]
-members = [
-    "kimmdy",
-    "kimmdy-hat",
-]
-
 [[package]]
 name = "absl-py"
 version = "2.3.0"
@@ -1585,8 +1579,8 @@ requires-dist = [
     { name = "kimmdy-dimerization", marker = "extra == 'dimerization'", directory = "plugins/kimmdy-dimerization" },
     { name = "kimmdy-grappa", marker = "extra == 'grappa'", directory = "plugins/kimmdy-grappa" },
     { name = "kimmdy-grappa", marker = "extra == 'plugins'", directory = "plugins/kimmdy-grappa" },
-    { name = "kimmdy-hat", marker = "extra == 'hat'", editable = "plugins/kimmdy-hat" },
-    { name = "kimmdy-hat", marker = "extra == 'plugins'", editable = "plugins/kimmdy-hat" },
+    { name = "kimmdy-hat", marker = "extra == 'hat'", directory = "plugins/kimmdy-hat" },
+    { name = "kimmdy-hat", marker = "extra == 'plugins'", directory = "plugins/kimmdy-hat" },
     { name = "kimmdy-hydrolysis", marker = "extra == 'hydrolysis'", directory = "plugins/kimmdy-hydrolysis" },
     { name = "kimmdy-hydrolysis", marker = "extra == 'plugins'", directory = "plugins/kimmdy-hydrolysis" },
     { name = "kimmdy-reactions", marker = "extra == 'plugins'", directory = "plugins/kimmdy-reactions" },
@@ -1674,7 +1668,7 @@ provides-extras = ["dev"]
 [[package]]
 name = "kimmdy-hat"
 version = "0.1.0"
-source = { editable = "plugins/kimmdy-hat" }
+source = { directory = "plugins/kimmdy-hat" }
 dependencies = [
     { name = "ase" },
     { name = "kgcnn" },
@@ -1684,20 +1678,11 @@ dependencies = [
     { name = "tensorflow" },
 ]
 
-[package.dev-dependencies]
-dev = [
-    { name = "black" },
-    { name = "hypothesis" },
-    { name = "nglview" },
-    { name = "pytest" },
-    { name = "pytest-cov" },
-]
-
 [package.metadata]
 requires-dist = [
     { name = "ase" },
     { name = "kgcnn", specifier = "==2.1.0" },
-    { name = "kimmdy", editable = "." },
+    { name = "kimmdy" },
     { name = "mdanalysis", specifier = ">=2.5.0" },
     { name = "numpy", specifier = "<1.24" },
     { name = "tensorflow", specifier = "<2.16" },
@@ -2252,19 +2237,6 @@ sdist = { url = "https://files.pythonhosted.org/packages/6c/4f/ccdb8ad3a38e583f2
 wheels = [
     { url = "https://files.pythonhosted.org/packages/eb/8d/776adee7bbf76365fdd7f2552710282c79a4ead5d2a46408c9043a2b70ba/networkx-3.5-py3-none-any.whl", hash = "sha256:0030d386a9a06dee3565298b4a734b68589749a544acbb6c412dc9e2489ec6ec", size = 2034406, upload-time = "2025-05-29T11:35:04.961Z" },
 ]
-
-[[package]]
-name = "nglview"
-version = "3.1.4"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "ipywidgets" },
-    { name = "jupyterlab" },
-    { name = "jupyterlab-widgets" },
-    { name = "notebook" },
-    { name = "numpy" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/55/fe/bd1c2aaa7e38055116e22467ccbc3600936d977afddf91ec049ee900c909/nglview-3.1.4.tar.gz", hash = "sha256:e12b725c92add01174a933899db84bd63beba266d8fa9c3d2926ea453fa0829d", size = 21897115, upload-time = "2024-11-25T05:49:23.046Z" }
 
 [[package]]
 name = "notebook"
