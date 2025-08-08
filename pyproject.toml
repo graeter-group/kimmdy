@@ -12,7 +12,7 @@ classifiers = [
   "Programming Language :: Python :: 3",
   "Operating System :: OS Independent",
 ]
-requires-python = ">= 3.10"
+requires-python = ">= 3.10, < 3.12"
 dependencies = ["pyyaml", "numpy", "importlib_metadata", "MDAnalysis"]
 
 [project.readme]
@@ -59,7 +59,7 @@ namespaces = false
 kimmdy = { workspace = true }
 kimmdy-dimerization = { path = "./plugins/kimmdy-dimerization/" }
 kimmdy-grappa = { path = "./plugins/kimmdy-grappa/" }
-kimmdy-hat = { workspace = true }
+kimmdy-hat = { path = "./plugins/kimmdy-hat/" }
 kimmdy-hydrolysis = { path = "./plugins/kimmdy-hydrolysis/" }
 kimmdy-reactions = { path = "./plugins/kimmdy-reactions/" }
 torch = [{ index = "pytorch-cpu" }]
@@ -70,8 +70,10 @@ name = "pytorch-cpu"
 url = "https://download.pytorch.org/whl/cpu"
 explicit = true
 
-[tool.uv.workspace]
-members = ["plugins/kimmdy-hat"]
+## add plugins to the workspace when developing
+## a specific plugin e.g.
+# [tool.uv.workspace]
+# members = ["plugins/kimmdy-hat"]
 
 [dependency-groups]
 dev = [
