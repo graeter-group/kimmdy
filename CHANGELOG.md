@@ -1,6 +1,20 @@
 # Changelog
 
 
+## [8.1.1](https://github.com/graeter-group/kimmdy/compare/v8.1.0...v8.1.1) (2025-08-08)
+
+
+### Bug Fixes
+
+* rm libs of previous python version during tox run ([#562](https://github.com/graeter-group/kimmdy/issues/562)) ([03218c7](https://github.com/graeter-group/kimmdy/commit/03218c7628852142e9421ccbc7f0afa51dd8c30d))
+* **testing:** TypeError raised during test_parser_invertible fixes [#557](https://github.com/graeter-group/kimmdy/issues/557) ([#558](https://github.com/graeter-group/kimmdy/issues/558)) ([dfe6b03](https://github.com/graeter-group/kimmdy/commit/dfe6b036ea31079297166fd3726b37dae3ff7647))
+
+
+### Documentation
+
+* tell uv tool which python version to use ([#563](https://github.com/graeter-group/kimmdy/issues/563)) ([be30ae5](https://github.com/graeter-group/kimmdy/commit/be30ae5578b84951b389376e3431a93f80576da1))
+* update installation instructions ([#560](https://github.com/graeter-group/kimmdy/issues/560)) ([93f03b9](https://github.com/graeter-group/kimmdy/commit/93f03b91017926cd928e16eabcb424d61c75f4b6))
+
 ## [8.1.0](https://github.com/graeter-group/kimmdy/compare/v8.0.0...v8.1.0) (2025-07-21)
 
 
