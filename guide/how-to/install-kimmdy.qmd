@@ -24,7 +24,7 @@ Optional:
 ## User installation
 
 ```bash
-uv tool install kimmdy[plugins]
+uv tool install -p 3.11 kimmdy[plugins]
 ```
 
 `kimmdy`, its subcommands, and its plugins are now availabe, test it with:
