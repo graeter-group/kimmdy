@@ -15,7 +15,7 @@ this can take a while due to dependency resolution.
 We recommend installing KIMMDY with [uv](https://docs.astral.sh/uv/) instead:
 
 ```bash
-uv tool install kimmdy
+uv tool install -p 3.11 kimmdy
 ```
 
 This installation includes only the most basic functionality as no plugins and analysis tools are installed.
@@ -23,13 +23,13 @@ This installation includes only the most basic functionality as no plugins and a
 To install the builtin reaction plugins, use
 
 ```bash
-uv tool install kimmdy[reactions]
+uv tool install -p 3.11 kimmdy[plugins]
 ```
 
 To install the builtin example reactions and analysis tools use
 
 ```bash
-uv tool install kimmdy[reactions,analysis]
+uv tool install -p 3.11 kimmdy[reactions,analysis]
 ```
 
 However, this is only half the fun!
@@ -39,7 +39,7 @@ your molecules for radicals using GrAPPa (Graph Attentional Protein
 Parametrization) and reaction plugins like kimmdy-hat (for Hydrogen Atom Transfer) or kimmdy-hydrolysis use
 
 ```bash
-uv tool install kimmdy[plugins]
+uv tool install -p 3.11 kimmdy[plugins]
 ```
 
 To uninstall KIMMDY again, use
