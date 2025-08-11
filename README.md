@@ -83,3 +83,4 @@ To run the test locally, you must:
 * install [act](https://github.com/nektos/act), the easiest option is with github cli via `gh extension install https://github.com/nektos/gh-act`
 * run tests with `gh extension exec act -j test --artifact-server-path ./artifacts`
 * html coverage report is exported into `artifacts`
+
