@@ -27,7 +27,7 @@ hydrolysis = ["kimmdy-hydrolysis"]
 reactions = ["kimmdy-reactions"]
 
 plugins = [
-  # "kimmdy-dimerization", # excluded until pypi release
+  "kimmdy-dimerization",
   "kimmdy-reactions",
   "kimmdy-grappa",
   "kimmdy-hat",
