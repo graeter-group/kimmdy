@@ -12,6 +12,16 @@ resolution-markers = [
     "python_full_version < '3.11' and sys_platform == 'darwin'",
 ]
 
+[manifest]
+members = [
+    "kimmdy",
+    "kimmdy-dimerization",
+    "kimmdy-grappa",
+    "kimmdy-hat",
+    "kimmdy-hydrolysis",
+    "kimmdy-reactions",
+]
+
 [[package]]
 name = "absl-py"
 version = "2.3.0"
@@ -1576,15 +1586,15 @@ requires-dist = [
     { name = "grappa-ff", marker = "extra == 'grappa'" },
     { name = "grappa-ff", marker = "extra == 'plugins'" },
     { name = "importlib-metadata" },
-    { name = "kimmdy-dimerization", marker = "extra == 'dimerization'", directory = "plugins/kimmdy-dimerization" },
-    { name = "kimmdy-grappa", marker = "extra == 'grappa'", directory = "plugins/kimmdy-grappa" },
-    { name = "kimmdy-grappa", marker = "extra == 'plugins'", directory = "plugins/kimmdy-grappa" },
-    { name = "kimmdy-hat", marker = "extra == 'hat'", directory = "plugins/kimmdy-hat" },
-    { name = "kimmdy-hat", marker = "extra == 'plugins'", directory = "plugins/kimmdy-hat" },
-    { name = "kimmdy-hydrolysis", marker = "extra == 'hydrolysis'", directory = "plugins/kimmdy-hydrolysis" },
-    { name = "kimmdy-hydrolysis", marker = "extra == 'plugins'", directory = "plugins/kimmdy-hydrolysis" },
-    { name = "kimmdy-reactions", marker = "extra == 'plugins'", directory = "plugins/kimmdy-reactions" },
-    { name = "kimmdy-reactions", marker = "extra == 'reactions'", directory = "plugins/kimmdy-reactions" },
+    { name = "kimmdy-dimerization", marker = "extra == 'dimerization'", editable = "plugins/kimmdy-dimerization" },
+    { name = "kimmdy-grappa", marker = "extra == 'grappa'", editable = "plugins/kimmdy-grappa" },
+    { name = "kimmdy-grappa", marker = "extra == 'plugins'", editable = "plugins/kimmdy-grappa" },
+    { name = "kimmdy-hat", marker = "extra == 'hat'", editable = "plugins/kimmdy-hat" },
+    { name = "kimmdy-hat", marker = "extra == 'plugins'", editable = "plugins/kimmdy-hat" },
+    { name = "kimmdy-hydrolysis", marker = "extra == 'hydrolysis'", editable = "plugins/kimmdy-hydrolysis" },
+    { name = "kimmdy-hydrolysis", marker = "extra == 'plugins'", editable = "plugins/kimmdy-hydrolysis" },
+    { name = "kimmdy-reactions", marker = "extra == 'plugins'", editable = "plugins/kimmdy-reactions" },
+    { name = "kimmdy-reactions", marker = "extra == 'reactions'", editable = "plugins/kimmdy-reactions" },
     { name = "matplotlib", marker = "extra == 'analysis'" },
     { name = "mdanalysis" },
     { name = "numpy" },
@@ -1605,7 +1615,7 @@ dev = [
     { name = "jsonschema", specifier = ">=4.24" },
     { name = "jsonschema-specifications", specifier = ">=2025.4" },
     { name = "jupyter" },
-    { name = "kimmdy-reactions", directory = "plugins/kimmdy-reactions" },
+    { name = "kimmdy-reactions", editable = "plugins/kimmdy-reactions" },
     { name = "markdown-it-py", specifier = ">=3.0" },
     { name = "matplotlib" },
     { name = "pandas" },
@@ -1630,7 +1640,7 @@ dev = [
 [[package]]
 name = "kimmdy-dimerization"
 version = "0.1"
-source = { directory = "plugins/kimmdy-dimerization" }
+source = { editable = "plugins/kimmdy-dimerization" }
 dependencies = [
     { name = "kimmdy" },
     { name = "mdanalysis" },
@@ -1638,26 +1648,39 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "kimmdy" },
+    { name = "kimmdy", editable = "." },
     { name = "mdanalysis" },
 ]
 
 [[package]]
 name = "kimmdy-grappa"
 version = "0.3.2"
-source = { directory = "plugins/kimmdy-grappa" }
+source = { editable = "plugins/kimmdy-grappa" }
 dependencies = [
+    { name = "grappa-ff" },
     { name = "kimmdy" },
     { name = "mdanalysis" },
+]
+
+[package.optional-dependencies]
+dev = [
+    { name = "black" },
+    { name = "griffe" },
+    { name = "hypothesis" },
+    { name = "jupyter" },
+    { name = "pytest" },
+    { name = "quartodoc" },
+    { name = "tox" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "black", marker = "extra == 'dev'" },
+    { name = "grappa-ff" },
     { name = "griffe", marker = "extra == 'dev'", specifier = ">=0.33,<1.0.0" },
     { name = "hypothesis", marker = "extra == 'dev'" },
     { name = "jupyter", marker = "extra == 'dev'" },
-    { name = "kimmdy" },
+    { name = "kimmdy", editable = "." },
     { name = "mdanalysis" },
     { name = "pytest", marker = "extra == 'dev'" },
     { name = "quartodoc", marker = "extra == 'dev'" },
@@ -1668,7 +1691,7 @@ provides-extras = ["dev"]
 [[package]]
 name = "kimmdy-hat"
 version = "0.1.0"
-source = { directory = "plugins/kimmdy-hat" }
+source = { editable = "plugins/kimmdy-hat" }
 dependencies = [
     { name = "ase" },
     { name = "kgcnn" },
@@ -1678,11 +1701,20 @@ dependencies = [
     { name = "tensorflow" },
 ]
 
+[package.dev-dependencies]
+dev = [
+    { name = "black" },
+    { name = "hypothesis" },
+    { name = "nglview" },
+    { name = "pytest" },
+    { name = "pytest-cov" },
+]
+
 [package.metadata]
 requires-dist = [
     { name = "ase" },
     { name = "kgcnn", specifier = "==2.1.0" },
-    { name = "kimmdy" },
+    { name = "kimmdy", editable = "." },
     { name = "mdanalysis", specifier = ">=2.5.0" },
     { name = "numpy", specifier = "<1.24" },
     { name = "tensorflow", specifier = "<2.16" },
@@ -1699,12 +1731,26 @@ dev = [
 
 [[package]]
 name = "kimmdy-hydrolysis"
-version = "0.2.2"
-source = { directory = "plugins/kimmdy-hydrolysis" }
+version = "0.2.3"
+source = { editable = "plugins/kimmdy-hydrolysis" }
 dependencies = [
     { name = "freesasa" },
     { name = "kimmdy" },
     { name = "mdanalysis" },
+]
+
+[package.optional-dependencies]
+dev = [
+    { name = "black" },
+    { name = "griffe" },
+    { name = "jupyter" },
+    { name = "numpy" },
+    { name = "pandas" },
+    { name = "plotnine" },
+    { name = "pytest" },
+    { name = "quartodoc" },
+    { name = "statsmodels" },
+    { name = "tox" },
 ]
 
 [package.metadata]
@@ -1713,7 +1759,7 @@ requires-dist = [
     { name = "freesasa" },
     { name = "griffe", marker = "extra == 'dev'", specifier = ">=0.33,<1.0.0" },
     { name = "jupyter", marker = "extra == 'dev'" },
-    { name = "kimmdy" },
+    { name = "kimmdy", editable = "." },
     { name = "mdanalysis" },
     { name = "numpy", marker = "extra == 'dev'" },
     { name = "pandas", marker = "extra == 'dev'" },
@@ -1728,9 +1774,21 @@ provides-extras = ["dev"]
 [[package]]
 name = "kimmdy-reactions"
 version = "1.0.0"
-source = { directory = "plugins/kimmdy-reactions" }
+source = { editable = "plugins/kimmdy-reactions" }
 dependencies = [
     { name = "mdanalysis" },
+]
+
+[package.optional-dependencies]
+dev = [
+    { name = "black" },
+    { name = "griffe" },
+    { name = "hypothesis" },
+    { name = "jupyter" },
+    { name = "kimmdy" },
+    { name = "pytest" },
+    { name = "quartodoc" },
+    { name = "tox" },
 ]
 
 [package.metadata]
@@ -1739,7 +1797,7 @@ requires-dist = [
     { name = "griffe", marker = "extra == 'dev'", specifier = ">=0.33,<1.0.0" },
     { name = "hypothesis", marker = "extra == 'dev'" },
     { name = "jupyter", marker = "extra == 'dev'" },
-    { name = "kimmdy", marker = "extra == 'dev'" },
+    { name = "kimmdy", marker = "extra == 'dev'", editable = "." },
     { name = "mdanalysis" },
     { name = "pytest", marker = "extra == 'dev'" },
     { name = "quartodoc", marker = "extra == 'dev'" },
@@ -2008,6 +2066,21 @@ wheels = [
 ]
 
 [[package]]
+name = "mizani"
+version = "0.14.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy" },
+    { name = "pandas" },
+    { name = "scipy" },
+    { name = "tzdata", marker = "sys_platform == 'emscripten' or sys_platform == 'win32'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/ee/5c/044d2b46ceff3437585ff733db7a78b33ac3c4bd7c9f25a5368faac94b5c/mizani-0.14.2.tar.gz", hash = "sha256:d7180bf7c6fa60a7aa5b78da903bc6b2ffc30602d479a4a07b5240bc5330491d", size = 772272, upload-time = "2025-06-30T11:24:51.811Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/50/8b/8231e2493b454e2514e56843e842321b125d1f25da06f8ab55029a94d12a/mizani-0.14.2-py3-none-any.whl", hash = "sha256:c35fdfa9a68824e80c724ffbd9bb776db23bf73ea94b90b46dbc7f58cb2233cb", size = 133476, upload-time = "2025-06-30T11:24:49.899Z" },
+]
+
+[[package]]
 name = "ml-dtypes"
 version = "0.3.2"
 source = { registry = "https://pypi.org/simple" }
@@ -2239,6 +2312,19 @@ wheels = [
 ]
 
 [[package]]
+name = "nglview"
+version = "3.1.4"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "ipywidgets" },
+    { name = "jupyterlab" },
+    { name = "jupyterlab-widgets" },
+    { name = "notebook" },
+    { name = "numpy" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/55/fe/bd1c2aaa7e38055116e22467ccbc3600936d977afddf91ec049ee900c909/nglview-3.1.4.tar.gz", hash = "sha256:e12b725c92add01174a933899db84bd63beba266d8fa9c3d2926ea453fa0829d", size = 21897115, upload-time = "2024-11-25T05:49:23.046Z" }
+
+[[package]]
 name = "notebook"
 version = "7.4.4"
 source = { registry = "https://pypi.org/simple" }
@@ -2391,6 +2477,18 @@ wheels = [
 ]
 
 [[package]]
+name = "patsy"
+version = "1.0.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/d1/81/74f6a65b848ffd16c18f920620ce999fe45fe27f01ab3911260ce4ed85e4/patsy-1.0.1.tar.gz", hash = "sha256:e786a9391eec818c054e359b737bbce692f051aee4c661f4141cc88fb459c0c4", size = 396010, upload-time = "2024-11-12T14:10:54.642Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/87/2b/b50d3d08ea0fc419c183a84210571eba005328efa62b6b98bc28e9ead32a/patsy-1.0.1-py2.py3-none-any.whl", hash = "sha256:751fb38f9e97e62312e921a1954b81e1bb2bcda4f5eeabaf94db251ee791509c", size = 232923, upload-time = "2024-11-12T14:10:52.85Z" },
+]
+
+[[package]]
 name = "pexpect"
 version = "4.9.0"
 source = { registry = "https://pypi.org/simple" }
@@ -2453,6 +2551,23 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/fe/8b/3c73abc9c759ecd3f1f7ceff6685840859e8070c4d947c93fae71f6a0bf2/platformdirs-4.3.8.tar.gz", hash = "sha256:3d512d96e16bcb959a814c9f348431070822a6496326a4be0911c40b5a74c2bc", size = 21362, upload-time = "2025-05-07T22:47:42.121Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/fe/39/979e8e21520d4e47a0bbe349e2713c0aac6f3d853d0e5b34d76206c439aa/platformdirs-4.3.8-py3-none-any.whl", hash = "sha256:ff7059bb7eb1179e2685604f4aaf157cfd9535242bd23742eadc3c13542139b4", size = 18567, upload-time = "2025-05-07T22:47:40.376Z" },
+]
+
+[[package]]
+name = "plotnine"
+version = "0.15.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "matplotlib" },
+    { name = "mizani" },
+    { name = "numpy" },
+    { name = "pandas" },
+    { name = "scipy" },
+    { name = "statsmodels" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/fd/b9/80577326c7011d0dc4e2c303070b3906f791b0de3c4b7888d7505eba0a87/plotnine-0.15.0.tar.gz", hash = "sha256:8dc491f5000062f6af7cf29429ee78b617daa8b2c22a1dd4e8b593f08bb51c20", size = 6785533, upload-time = "2025-07-15T15:55:32.336Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/eb/93/304341b5b949cba71c8413722e168aa60947ea0cac55a5d8cc448ea9917a/plotnine-0.15.0-py3-none-any.whl", hash = "sha256:1ce9a109c124fc9b657039591ebb8acbc1c5ae238c9d9256aea9284bc6188436", size = 1331490, upload-time = "2025-07-15T15:55:30.794Z" },
 ]
 
 [[package]]
@@ -3272,6 +3387,33 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/28/e3/55dcc2cfbc3ca9c29519eb6884dd1415ecb53b0e934862d3559ddcb7e20b/stack_data-0.6.3.tar.gz", hash = "sha256:836a778de4fec4dcd1dcd89ed8abff8a221f58308462e1c4aa2a3cf30148f0b9", size = 44707, upload-time = "2023-09-30T13:58:05.479Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/f1/7b/ce1eafaf1a76852e2ec9b22edecf1daa58175c090266e9f6c64afcd81d91/stack_data-0.6.3-py3-none-any.whl", hash = "sha256:d5558e0c25a4cb0853cddad3d77da9891a08cb85dd9f9f91b9f8cd66e511e695", size = 24521, upload-time = "2023-09-30T13:58:03.53Z" },
+]
+
+[[package]]
+name = "statsmodels"
+version = "0.14.5"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy" },
+    { name = "packaging" },
+    { name = "pandas" },
+    { name = "patsy" },
+    { name = "scipy" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/64/cc/8c1bf59bf8203dea1bf2ea811cfe667d7bcc6909c83d8afb02b08e30f50b/statsmodels-0.14.5.tar.gz", hash = "sha256:de260e58cccfd2ceddf835b55a357233d6ca853a1aa4f90f7553a52cc71c6ddf", size = 20525016, upload-time = "2025-07-07T12:14:23.195Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/3a/2c/55b2a5d10c1a211ecab3f792021d2581bbe1c5ca0a1059f6715dddc6899d/statsmodels-0.14.5-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:9fc2b5cdc0c95cba894849651fec1fa1511d365e3eb72b0cc75caac44077cd48", size = 10058241, upload-time = "2025-07-07T12:13:16.286Z" },
+    { url = "https://files.pythonhosted.org/packages/66/d9/6967475805de06691e951072d05e40e3f1c71b6221bb92401193ee19bd2a/statsmodels-0.14.5-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:b8d96b0bbaeabd3a557c35cc7249baa9cfbc6dd305c32a9f2cbdd7f46c037e7f", size = 9734017, upload-time = "2025-07-07T12:05:08.498Z" },
+    { url = "https://files.pythonhosted.org/packages/df/a8/803c280419a7312e2472969fe72cf461c1210a27770a662cbe3b5cd7c6fe/statsmodels-0.14.5-cp310-cp310-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:145bc39b2cb201efb6c83cc3f2163c269e63b0d4809801853dec6f440bd3bc37", size = 10459677, upload-time = "2025-07-07T14:21:51.809Z" },
+    { url = "https://files.pythonhosted.org/packages/a1/25/edf20acbd670934b02cd9344e29c9a03ce040122324b3491bb075ae76b2d/statsmodels-0.14.5-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:d7c14fb2617bb819fb2532e1424e1da2b98a3419a80e95f33365a72d437d474e", size = 10678631, upload-time = "2025-07-07T14:22:05.496Z" },
+    { url = "https://files.pythonhosted.org/packages/64/22/8b1e38310272e766abd6093607000a81827420a3348f09eff08a9e54cbaf/statsmodels-0.14.5-cp310-cp310-musllinux_1_2_x86_64.whl", hash = "sha256:1e9742d8a5ac38a3bfc4b7f4b0681903920f20cbbf466d72b1fd642033846108", size = 10699273, upload-time = "2025-07-07T14:22:19.487Z" },
+    { url = "https://files.pythonhosted.org/packages/d1/6f/6de51f1077b7cef34611f1d6721392ea170153251b4d977efcf6d100f779/statsmodels-0.14.5-cp310-cp310-win_amd64.whl", hash = "sha256:1cab9e6fce97caf4239cdb2df375806937da5d0b7ba2699b13af33a07f438464", size = 9644785, upload-time = "2025-07-07T12:05:20.927Z" },
+    { url = "https://files.pythonhosted.org/packages/14/30/fd49902b30416b828de763e161c0d6e2cc04d119ae4fbdd3f3b43dc8f1be/statsmodels-0.14.5-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:4b7091a8442076c708c926de3603653a160955e80a2b6d931475b7bb8ddc02e5", size = 10053330, upload-time = "2025-07-07T12:07:39.689Z" },
+    { url = "https://files.pythonhosted.org/packages/ca/c1/2654541ff6f5790d01d1e5ba36405fde873f4a854f473e90b4fe56b37333/statsmodels-0.14.5-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:128872be8f3208f4446d91ea9e4261823902fc7997fee7e1a983eb62fd3b7c6e", size = 9735555, upload-time = "2025-07-07T12:13:28.935Z" },
+    { url = "https://files.pythonhosted.org/packages/ce/da/6ebb64d0db4e86c0d2d9cde89e03247702da0ab191789f7813d4f9a348da/statsmodels-0.14.5-cp311-cp311-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:f2ad5aee04ae7196c429df2174df232c057e478c5fa63193d01c8ec9aae04d31", size = 10307522, upload-time = "2025-07-07T14:22:32.853Z" },
+    { url = "https://files.pythonhosted.org/packages/67/49/ac803ca093ec3845184a752a91cd84511245e1f97103b15cfe32794a3bb0/statsmodels-0.14.5-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:f402fc793458dd6d96e099acb44cd1de1428565bf7ef3030878a8daff091f08a", size = 10474665, upload-time = "2025-07-07T14:22:46.011Z" },
+    { url = "https://files.pythonhosted.org/packages/f0/c8/ae82feb00582f4814fac5d2cb3ec32f93866b413cf5878b2fe93688ec63c/statsmodels-0.14.5-cp311-cp311-musllinux_1_2_x86_64.whl", hash = "sha256:26c028832730aebfbfd4e7501694e1f9ad31ec8536e776716673f4e7afd4059a", size = 10713120, upload-time = "2025-07-07T14:23:00.067Z" },
+    { url = "https://files.pythonhosted.org/packages/05/ac/4276459ea71aa46e2967ea283fc88ee5631c11f29a06787e16cf4aece1b8/statsmodels-0.14.5-cp311-cp311-win_amd64.whl", hash = "sha256:ec56f771d9529cdc17ed2fb2a950d100b6e83a7c5372aae8ac5bb065c474b856", size = 9640980, upload-time = "2025-07-07T12:05:33.085Z" },
 ]
 
 [[package]]

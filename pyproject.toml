@@ -57,11 +57,11 @@ namespaces = false
 
 [tool.uv.sources]
 kimmdy = { workspace = true }
-kimmdy-dimerization = { path = "./plugins/kimmdy-dimerization/" }
-kimmdy-grappa = { path = "./plugins/kimmdy-grappa/" }
-kimmdy-hat = { path = "./plugins/kimmdy-hat/" }
-kimmdy-hydrolysis = { path = "./plugins/kimmdy-hydrolysis/" }
-kimmdy-reactions = { path = "./plugins/kimmdy-reactions/" }
+kimmdy-dimerization = { workspace = true }
+kimmdy-grappa = { workspace = true }
+kimmdy-hat = { workspace = true }
+kimmdy-hydrolysis = { workspace = true }
+kimmdy-reactions = { workspace = true}
 torch = [{ index = "pytorch-cpu" }]
 torchvision = [{ index = "pytorch-cpu" }]
 
@@ -71,9 +71,8 @@ url = "https://download.pytorch.org/whl/cpu"
 explicit = true
 
 ## add plugins to the workspace when developing
-## a specific plugin e.g.
-# [tool.uv.workspace]
-# members = ["plugins/kimmdy-hat"]
+[tool.uv.workspace]
+members = ["plugins/*"]
 
 [dependency-groups]
 dev = [
