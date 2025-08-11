@@ -784,14 +784,14 @@ class RunManager:
         for k, v in files.input.items():
             if v is not None:
                 shortpaths_input += (
-                    f'  {k}: {str(v).removeprefix(str(self.config.out) + "/")}\n'
+                    f"  {k}: {str(v).removeprefix(str(self.config.out) + '/')}\n"
                 )
 
         shortpaths_output = ""
         for k, v in files.output.items():
             if v is not None:
                 shortpaths_output += (
-                    f'  {k}: {str(v).removeprefix(str(self.config.out) + "/")}\n'
+                    f"  {k}: {str(v).removeprefix(str(self.config.out) + '/')}\n"
                 )
 
         with open(self.histfile, "a") as f:
@@ -987,7 +987,7 @@ class RunManager:
                     "Incompatible kmc algorithms chosen in the same reaction.\n"
                     "Split the reactions in separate tasks or choose different algorithms\n"
                     "Attempted to combine:\n"
-                    f"{ {rp.name:rp.config.kmc for rp in self.reaction_plugins} }"
+                    f"{ {rp.name: rp.config.kmc for rp in self.reaction_plugins} }"
                 )
             self.kmc_algorithm = strategies[0].lower()
 
@@ -1094,7 +1094,7 @@ class RunManager:
             logger.info("No reaction selected")
         else:
             logger.info(
-                f"Reaction jumps ahead in time: {self.kmcresult.time_delta*10e-12:.4e} s. Overall new time {self.time*10e-12:.4e} s"
+                f"Reaction jumps ahead in time: {self.kmcresult.time_delta * 10e-12:.4e} s. Overall new time {self.time * 10e-12:.4e} s"
             )
 
         # capture state of radicals
