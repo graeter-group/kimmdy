@@ -1,34 +1,34 @@
 dryrun: false
-name: 'hexalanine_homolysis_000'
+name: "hexalanine_homolysis_000"
 max_tasks: 100
-gromacs_alias: 'gmx'
+gromacs_alias: "gmx"
 gmx_mdrun_flags: -maxh 24 -dlb yes
-ff: 'amber99sb-star-ildnp.ff'
-top: 'hexala_out.top'
-gro: 'npt.gro'
-ndx: 'index.ndx'
-plumed: 'plumed.dat'
+ff: "amber99sb-star-ildnp.ff"
+top: "hexala_out.top"
+gro: "npt.gro"
+ndx: "index.ndx"
+plumed: "plumed.dat"
 mds:
   equilibrium:
-    mdp: 'md.mdp'
+    mdp: "md.mdp"
   pull:
-    mdp: 'md.mdp'
+    mdp: "md.mdp"
     use_plumed: true
   relax:
-    mdp: 'md_slow_growth.mdp'
+    mdp: "md_slow_growth.mdp"
 changer:
   coordinates:
-    md: 'relax'
-    slow_growth: True
+    md: "relax"
+    slow_growth: "true"
   topology:
-    parameterization: 'basic' 
+    parameterization: "basic"
 reactions:
   homolysis:
-    edis: 'edissoc.dat'
-    itp: 'ffbonded.itp'
+    edis: "edissoc.dat"
+    itp: "ffbonded.itp"
 sequence:
   - equilibrium
-  - pull  
+  - pull
   - reactions
   - equilibrium
   - pull

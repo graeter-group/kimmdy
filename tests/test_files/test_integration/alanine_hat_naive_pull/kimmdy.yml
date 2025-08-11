@@ -1,24 +1,23 @@
-# yaml-language-server: $schema=../../src/kimmdy/kimmdy-yaml-schema.json
 dryrun: false
-name: 'alanine_hat_000'
+name: "alanine_hat_000"
 max_hours: 23
 max_tasks: 100
-gromacs_alias: 'gmx'
+gromacs_alias: "gmx"
 gmx_mdrun_flags: -maxh 24 -dlb yes
-ff: 'amber99sb-star-ildnp.ff' # optional, dir endinng with .ff by default 
+ff: "amber99sb-star-ildnp.ff" # optional, dir endinng with .ff by default
 top: topol.top
-gro: 'npt.gro'
-ndx: 'index.ndx'
+gro: "npt.gro"
+ndx: "index.ndx"
 # kmc: rfkmc
 kmc: dummy_first
 mds:
   equilibrium:
-    mdp: 'md.mdp'
+    mdp: "md.mdp"
   relax:
-    mdp: 'md_slow_growth.mdp'
+    mdp: "md_slow_growth.mdp"
 changer:
   coordinates:
-    md: 'relax'
+    md: "relax"
     slow_growth: full
   topology:
     parameterization: grappa
@@ -29,8 +28,8 @@ reactions:
     polling_rate: 1
 
 sequence:
-- mult: 2
-  tasks:
-  - equilibrium
-  - equilibrium
-  - reactions
+  - mult: 2
+    tasks:
+      - equilibrium
+      - equilibrium
+      - reactions
