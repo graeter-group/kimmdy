@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  build-docs:
+  build-examples:
     if: github.event.label.name == 'build_examples'
     runs-on: ubuntu-latest
     steps:
