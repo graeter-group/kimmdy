@@ -1,6 +1,28 @@
 # Changelog
 
 
+## [8.2.0](https://github.com/graeter-group/kimmdy/compare/v8.1.0...v8.2.0) (2025-08-11)
+
+
+### Features
+
+* include kimmdy-dimerization in plugins extra ([0c4c3c0](https://github.com/graeter-group/kimmdy/commit/0c4c3c020fd0d4fc65f9c30df0304aa837db79c5))
+* use all plugins from workspace ([04ce27f](https://github.com/graeter-group/kimmdy/commit/04ce27f8fccfb8e69427397c266bb3f0fc63fbe5))
+
+
+### Bug Fixes
+
+* **ci:** fix release permissions ([cb9bfe7](https://github.com/graeter-group/kimmdy/commit/cb9bfe7631a882b89b2cbcdd985a69002ae8b8c8))
+* pin python version in pyproject.toml ([5d14663](https://github.com/graeter-group/kimmdy/commit/5d14663a526596301e642c0ecbe9ffa54409795d))
+* rm libs of previous python version during tox run ([#562](https://github.com/graeter-group/kimmdy/issues/562)) ([03218c7](https://github.com/graeter-group/kimmdy/commit/03218c7628852142e9421ccbc7f0afa51dd8c30d))
+* **testing:** TypeError raised during test_parser_invertible fixes [#557](https://github.com/graeter-group/kimmdy/issues/557) ([#558](https://github.com/graeter-group/kimmdy/issues/558)) ([dfe6b03](https://github.com/graeter-group/kimmdy/commit/dfe6b036ea31079297166fd3726b37dae3ff7647))
+
+
+### Documentation
+
+* tell uv tool which python version to use ([#563](https://github.com/graeter-group/kimmdy/issues/563)) ([be30ae5](https://github.com/graeter-group/kimmdy/commit/be30ae5578b84951b389376e3431a93f80576da1))
+* update installation instructions ([#560](https://github.com/graeter-group/kimmdy/issues/560)) ([93f03b9](https://github.com/graeter-group/kimmdy/commit/93f03b91017926cd928e16eabcb424d61c75f4b6))
+
 ## [8.1.0](https://github.com/graeter-group/kimmdy/compare/v8.0.0...v8.1.0) (2025-07-21)
 
 
