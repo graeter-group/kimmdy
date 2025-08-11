@@ -1,29 +1,31 @@
-name: 'kimmdy_001'
+name: "kimmdy_001"
 dryrun: false
 max_tasks: 100
-gromacs_alias: 'gmx'
+gromacs_alias: "gmx"
 gmx_mdrun_flags: -maxh 24 -dlb yes
-top: 'IMREE.top'
-gro: 'IMREE_npt.gro'
-ndx: 'index.ndx'
+top: "IMREE.top"
+gro: "IMREE_npt.gro"
+ndx: "index.ndx"
 kmc: rfkmc
-plumed: 'plumed.dat'
+plumed: "plumed.dat"
 mds:
   equilibrium:
-    mdp: 'md.mdp'
+    mdp: "md.mdp"
   pull:
-    mdp: 'md.mdp'
+    mdp: "md.mdp"
     use_plumed: true
   relax:
-    mdp: 'md_slow_growth.mdp'
+    mdp: "md_slow_growth.mdp"
 changer:
   coordinates:
-    md: 'relax'
-    slow_growth: True
+    md: "relax"
+    slow_growth: "true"
   topology:
-    parameterization: 'grappa' 
+    parameterization: "grappa"
 reactions:
-  homolysis: {}
+  homolysis:
+    edis: "edissoc.dat"
+    itp: "ffbonded.itp"
   hat_naive:
     frequency_factor: 100000000
     h_cutoff: 3
