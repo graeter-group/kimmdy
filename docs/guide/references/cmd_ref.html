@@ -713,36 +713,47 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>The prefered method of starting a KIMMDY run is via the command line, though <a href="../../_reference/cmd.html">Python entry points</a> are supported as well.</p>
 <section id="kimmdy" class="level2">
 <h2 class="anchored" data-anchor-id="kimmdy">KIMMDY</h2>
-<div id="3b93130d" class="cell" data-execution_count="1">
+<div id="dd8868fc" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>kimmdy <span class="op">--</span><span class="bu">help</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>usage: kimmdy [-h] [--input INPUT] [--loglevel LOGLEVEL] [--logfile LOGFILE]
-              [--show-plugins] [--generate-jobscript] [--version] [--debug]
-              [--callgraph]
+<pre><code>usage: kimmdy [-h] [--input INPUT] [--restart] [--loglevel LOGLEVEL]
+              [--logfile LOGFILE] [--show-plugins] [--generate-jobscript]
+              [--version] [--debug] [--callgraph]
 
-Welcome to KIMMDY. `kimmdy` runs KIMMDY, further tools are available as
+Welcome to KIMMDY. `kimmdy` runs KIMMDY. Additinal tools are available as
 `kimmdy-...` commands. These are `-analysis`, `-modify-top` and `-build-
-examples`. Access their help with `kimmdy-... -h.`
+examples`. Access their help with `kimmdy-... -h.`Visit the documentation
+online at &lt;https://graeter-group.github.io/kimmdy/&gt;
 
 options:
   -h, --help            show this help message and exit
   --input INPUT, -i INPUT
-                        Kimmdy input file. Default `kimmdy.yml`
+                        Kimmdy input file. Defaults to `kimmdy.yml`. See
+                        &lt;https://graeter-
+                        group.github.io/kimmdy/guide/references/input.html&gt;
+                        for all options. CLI flags (e.g. --restart or
+                        --loglevel) have precedence over their counterparts in
+                        the input file.
+  --restart, -r         Restart or continue from a previous run instead of
+                        incrementing the run number for the output directory.
+                        It the output directory does not exist, it will be
+                        like a regular fresh run.
   --loglevel LOGLEVEL, -l LOGLEVEL
-                        logging level (CRITICAL, ERROR, WARNING, INFO, DEBUG)
+                        Logging level (CRITICAL, ERROR, WARNING, INFO, DEBUG)
   --logfile LOGFILE, -f LOGFILE
-                        logfile
+                        Logfile
   --show-plugins        List available plugins
-  --generate-jobscript  Instead of running KIMMDY directly, generate at
-                        jobscript.sh for slurm HPC clusters.You can then run
-                        this jobscript with sbatch jobscript.sh
-  --version             show program's version number and exit
-  --debug               on error, drop into debugger
-  --callgraph           Generate visualization of function calls. Mostly
-                        useful for debugging and documentation.</code></pre>
+  --generate-jobscript  Instead of running KIMMDY directly, generate the
+                        output directory and a jobscript `jobscript.sh` for
+                        slurm HPC clusters. You can then run this jobscript
+                        with sbatch jobscript.sh.
+  --version             Show version and exit.
+  --debug               On error, drop into debugger
+  --callgraph           Generate a visualization of function calls for
+                        debugging and documentation.</code></pre>
 </div>
 </div>
-<div id="da853220" class="cell" data-execution_count="2">
+<div id="f387136e" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>kimmdy<span class="op">-</span>analysis <span class="op">--</span><span class="bu">help</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>usage: kimmdy-analysis [-h] module ...
@@ -772,12 +783,12 @@ options:
 <section id="create-plumed-input" class="level2">
 <h2 class="anchored" data-anchor-id="create-plumed-input">Create plumed input</h2>
 <p>This module creates input files for plumed based on a topology and index file.</p>
-<div id="62f32141" class="cell" data-execution_count="3">
+<div id="b0497844" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>kimmdy<span class="op">-</span>create<span class="op">-</span>plumed <span class="op">--</span><span class="bu">help</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>usage: kimmdy-create-plumed [-h] [--entries-to-remove [ENTRIES_TO_REMOVE ...]]
-                            [--stride STRIDE] -p TOP -i INDEX --indexgroup
-                            INDEXGROUP
+                            [--stride STRIDE] -p TOP -i INDEX
+                            [--indexgroup INDEXGROUP]
 
 Build plumed input file. Requires a topology file and a gromacs index file.
 
@@ -801,7 +812,7 @@ options:
 <section id="remove-hydrogen" class="level2">
 <h2 class="anchored" data-anchor-id="remove-hydrogen">Remove Hydrogen</h2>
 <p>This module builds or restores the example directory in the package.</p>
-<div id="5f68f86b" class="cell" data-execution_count="4">
+<div id="1bb00676" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>kimmdy<span class="op">-</span>modify<span class="op">-</span>top <span class="op">--</span><span class="bu">help</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>usage: kimmdy-modify-top [-h] [-p] [--grappa_tag GRAPPA_TAG]
@@ -858,8 +869,8 @@ options:
 </section>
 <section id="examples" class="level2">
 <h2 class="anchored" data-anchor-id="examples">Examples</h2>
-<p>This module builds or restores the example directory in the package.</p>
-<div id="ab9478d8" class="cell" data-execution_count="5">
+<p>This module builds or restores the example directory in the package. Only works if installed from a git repository!</p>
+<div id="32415bb0" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>kimmdy<span class="op">-</span>build<span class="op">-</span>examples <span class="op">--</span><span class="bu">help</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>usage: kimmdy-build-examples [-h] [-r [RESTORE]]

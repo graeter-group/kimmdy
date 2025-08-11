@@ -37,7 +37,8 @@ This module builds or restores the example directory in the package.
 
 ## Examples
 
-This module builds or restores the example directory in the package.
+This module builds or restores the example directory in the package. Only works if installed from a git repository!
+
 
 ```{python}
 !kimmdy-build-examples --help

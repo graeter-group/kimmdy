@@ -5,7 +5,7 @@ title                    = Pulling simulation
 integrator  = md
 dt          = 0.002
 tinit       = 0
-nsteps      = 1000    ; 
+nsteps      = 1000    ;
 nstcomm     = 10
 ; Output parameters
 nstxout     = 100      ; every x ps
@@ -18,7 +18,7 @@ nstenergy   = 200
 constraint_algorithm    = lincs
 constraints             = h-bonds
 continuation            = yes       ; continuing from NPT 
-morse                       = yes	; Convert harmonic bonds to morse potentials
+morse                   = yes       ; Convert harmonic bonds to morse potentials
 
 
 ; Single-range cutoff scheme
@@ -62,7 +62,7 @@ DispCorr    = EnerPres
 ; default, all atoms will be written.
 compressed-x-grps        = Protein
 ; Selection of energy groups
-			 
+
 ; COM PULLING
 pull                     = yes
 ;pull-print-com           = yes
@@ -82,7 +82,7 @@ pull-group6-name         = 1_NME_3
 
 pull-coord1-type         = constant-force
 ;pull-coord1-rate         = -0.01 ; 0.01 nm per ps = 10 nm per ns
-pull-coord1-k            = 1500
+pull-coord1-k            = 500
 pull-coord1-geometry     = direction
 pull-coord1-groups       = 0 2
 pull-coord1-dim          = N N Y
@@ -92,7 +92,7 @@ pull-coord1-start        = yes
 
 pull-coord2-type         = constant-force
 ;pull-coord2-rate         = 0.01 ; 0.01 nm per ps = 10 nm per ns
-pull-coord2-k            = -1500
+pull-coord2-k            = -500
 pull-coord2-geometry     = direction
 pull-coord2-groups       = 0 1
 pull-coord2-dim          = N N Y
@@ -102,7 +102,7 @@ pull-coord2-start        = yes
 
 pull-coord3-type         = constant-force
 ;pull-coord3-rate         = -0.01 ; 0.01 nm per ps = 10 nm per ns
-pull-coord3-k            = 1500
+pull-coord3-k            = 500
 pull-coord3-geometry     = direction
 pull-coord3-groups       = 0 4
 pull-coord3-dim          = N N Y
@@ -112,7 +112,7 @@ pull-coord3-start        = yes
 
 pull-coord4-type         = constant-force
 ;pull-coord4-rate         = 0.01 ; 0.01 nm per ps = 10 nm per ns
-pull-coord4-k            = -1500
+pull-coord4-k            = -500
 pull-coord4-geometry     = direction
 pull-coord4-groups       = 0 3
 pull-coord4-dim          = N N Y
@@ -123,7 +123,7 @@ pull-coord4-start        = yes
 
 pull-coord5-type         = constant-force
 ;pull-coord5-rate         = -0.01 ; 0.01 nm per ps = 10 nm per ns
-pull-coord5-k            = 1500
+pull-coord5-k            = 500
 pull-coord5-geometry     = direction
 pull-coord5-groups       = 0 6
 pull-coord5-dim          = N N Y
@@ -133,7 +133,7 @@ pull-coord5-start        = yes
 
 pull-coord6-type         = constant-force
 ;pull-coord6-rate         = 0.01 ; 0.01 nm per ps = 10 nm per ns
-pull-coord6-k            = -1500
+pull-coord6-k            = -500
 pull-coord6-geometry     = direction
 pull-coord6-groups       = 0 5
 pull-coord6-dim          = N N Y
