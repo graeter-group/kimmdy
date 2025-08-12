@@ -199,12 +199,18 @@ class Place(RecipeStep):
 
     @classmethod
     def _from_str(cls, s: str):
-        args = s.split("Place(")[1].split(")")[0]
+        args = s.split("Place(")[1].rsplit(")", maxsplit=1)[0]
         # args = ix_to_place=0, new_coords=(0.0, 0.0, 0.0)
         args = args.split(", ", maxsplit=1)
         ix_to_place = int(args[0].split("=")[1])
         new_coords = ast.literal_eval(args[1].split("=")[1])
         return cls(ix_to_place=ix_to_place, new_coords=new_coords)
+
+    def __repr__(self):
+        return f"{type(self).__name__}(ix_to_place={self._ix_to_place}, new_coords={self.new_coords})"
+
+    def __str__(self):
+        return f"{type(self).__name__}({self.new_coords}, {self._ix_to_place})"
 
 
 class BondOperation(RecipeStep):
