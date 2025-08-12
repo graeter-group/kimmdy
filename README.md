@@ -84,3 +84,4 @@ To run the test locally, you must:
 * run tests with `gh extension exec act -j test --artifact-server-path ./artifacts`
 * html coverage report is exported into `artifacts`
 
+
