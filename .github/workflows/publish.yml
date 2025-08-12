@@ -8,7 +8,7 @@ on:
 jobs:
   build:
     if: |
-      contains(github.event.head_commit.message, 'chore(main): release')
+      contains(github.event.head_commit.message, 'chore(main): release') || github.event_name == 'workflow_dispatch'
     name: Build distribution 📦
     runs-on: ubuntu-latest
     steps:
