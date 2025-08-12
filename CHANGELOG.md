@@ -1,6 +1,19 @@
 # Changelog
 
 
+## [8.2.1](https://github.com/graeter-group/kimmdy/compare/v8.2.0...v8.2.1) (2025-08-12)
+
+
+### Bug Fixes
+
+* support place from string ([#569](https://github.com/graeter-group/kimmdy/issues/569)) ([5085b0f](https://github.com/graeter-group/kimmdy/commit/5085b0f85b795b18ed7be820393cf6159ae53b60))
+* update yaml files in tests and examples ([#567](https://github.com/graeter-group/kimmdy/issues/567)) ([04f344c](https://github.com/graeter-group/kimmdy/commit/04f344c3791acbc16fd183307dc436d8df25e1f0))
+
+
+### Documentation
+
+* update examples ([33214a7](https://github.com/graeter-group/kimmdy/commit/33214a70e8b5c714f4cb512f167ac56029af5df5))
+
 ## [8.2.0](https://github.com/graeter-group/kimmdy/compare/v8.1.0...v8.2.0) (2025-08-11)
 
 
