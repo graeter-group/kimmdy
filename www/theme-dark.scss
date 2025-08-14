@@ -26,7 +26,14 @@ pre code {
   color: $body-color;
 }
 
+p code:not(.sourceCode), li code:not(.sourceCode), td code:not(.sourceCode) {
+  background: none;
+}
+
+.nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link {
+  color: $body-color;
+}
+
 :root {
-// inline code
-  --bs-code-color: #769dff;
+  --bs-code-color: $body-color;
 }
