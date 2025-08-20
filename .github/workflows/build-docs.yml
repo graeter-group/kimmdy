@@ -25,7 +25,7 @@ jobs:
           version: "1.7.31"
       - name: Install dependencies
         run: |
-          uv sync
+          uv sync --extra plugins
       - name: Build docs
         run: |
           uv run make docs
