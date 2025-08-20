@@ -492,6 +492,15 @@
         },
         "dummyreaction": {
           "$ref": "https://raw.githubusercontent.com/graeter-group/kimmdy-reactions/main/src/dummyreaction/kimmdy-yaml-schema.json"
+        },
+        "hydrolysis": {
+          "$ref": "https://raw.githubusercontent.com/graeter-group/kimmdy-hydrolysis/refs/heads/main/src/kimmdy_hydrolysis/kimmdy-yaml-schema.json"
+        },
+        "dimerization": {
+          "$ref": "https://raw.githubusercontent.com/graeter-group/kimmdy-dimerization/refs/heads/main/src/kimmdy_dimerization/kimmdy-yaml-schema.json"
+        },
+        "hat_reaction": {
+          "$ref": "https://raw.githubusercontent.com/graeter-group/kimmdy-hat/refs/heads/main/src/kimmdy_hat/kimmdy-yaml-schema.json"
         }
       }
     },
