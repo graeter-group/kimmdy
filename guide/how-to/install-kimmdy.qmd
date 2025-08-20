@@ -24,7 +24,7 @@ Optional:
 ## User installation
 
 ```bash
-uv tool install -p 3.11 kimmdy[plugins]
+uv tool install -p 3.11 kimmdy[all]
 ```
 
 `kimmdy`, its subcommands, and its plugins are now availabe, test it with:
@@ -62,20 +62,28 @@ uv run kimmdy --help
 ```
 :::
 
-`plugins` can be also more specific, like `hat`, `hydrolysis`, `grappa`, 
-`dimerization`, or `reactions` (containing homolysis, hat_naive and a dummyreaction).
+Instead of installing all plugins, you can also pick the plugins you want, 
+the available extras are:
 
+- `reactions`: makes `homolysis`, `hat-naive`  and `dummyreaction` reactions available.
+- `grappa`: allows parametrization of any system on-the-fly.
+- `hat`: hydrogen atom transfer reaction plugin
+- `hydrolysis`: hydrolysis reaction plugin
+- `dimerization`: dimerization reaction plugin
 
 ## Notes on the project strucure
 
 Plugins are developed in separate git repositories.
-Officially supported ones are linked as subrepositories of kimmdy inside 
-the `plugins` directory.
+Check the [`kimmdy` github topic](https://github.com/topics/kimmdy) to find them all.
 
+Officially supported plugins are linked as subrepositories of kimmdy inside 
+the `plugins` directory.
 These are by default *not* pulled *via* `git clone`, to clone them add `--recurse-submodules`.
 
 To update them, get new ones, or pull them after initially omitting them, use:  
-`git submodule update --init --recursive`
+```bash
+git submodule update --init --recursive
+```
 
 
 

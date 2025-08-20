@@ -35,7 +35,7 @@ If you plan to use our machine-learning plugins, take a look at the [full instal
 Install kimmdy as a tool:
 
 ```bash
-uv tool install --from kimmdy[reactions,analysis] kimmdy
+uv tool install -p 3.11 kimmdy[all]
 ```
 
 Now all kimmdy commands should be available from everywhere. Try `kimmdy --help`.
@@ -57,7 +57,7 @@ source .venv/bin/activate
 To install KIMMDY, the builtin reaction plugins and the analysis tools use
 
 ```bash
-pip install kimmdy[reactions,analysis]
+pip install kimmdy[all]
 ```
 
 :::
