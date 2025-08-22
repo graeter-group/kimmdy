@@ -14,7 +14,8 @@ author: "Kai Riedmiller"
 Optional:
 
 - `plumed`-patched version of `gromacs` (for the homolysis reaction).
-  Gromacs 2025 and above do not need to be patched with plumed, only the `PLUMED_KERNEL` variabel needs to be set.
+  Gromacs 2025 and above does not need to be patched with plumed, 
+only the `PLUMED_KERNEL` variabel needs to be set to your `lib/libplumedKernel.so`.
     ([See plumded documentation](https://www.plumed.org/doc-v2.9/user-doc/html/_installation.html))
 
 ### Installation

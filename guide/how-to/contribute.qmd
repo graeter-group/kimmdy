@@ -3,12 +3,40 @@ title: "Contribute"
 subtitle: "How to contribute to KIMMDY"
 ---
 
+## Setup
+
+See [Installation](./install-kimmdy.qmd). 
+
+For new plugins, make a separate repo, and add your entrypoint in the 
+`pyproject.toml` to the `kimmdy.reaction_plugins` entrypoint:
+
+```pyproject.toml
+[project.entry-points."kimmdy.reaction_plugins"]
+my_reaction = "kimmdy_my_reaction.reaction:My_Reaction_Class"
+```
+
+
+## Code Style
+
+Doc strings in numpy style, formatting using `black`.
+
+## Docs and Examples
+
+You can add labels to PR's to trigger CI to rebuild the documentation 
+or the `examples` directory. Just add the `docthis` or `build_examples` label.
+
+
+## PR's
+
+If a PR adds multiple commits, we use the `squash and merge` option to keep 
+the commit history clean. If a PR unavoidably contains changes the message 
+can be edited before merging to ensure `release please` picks up all changes.
+
 KIMMDY uses conventional commits and semantic versioning,
 automated via [release please](https://github.com/googleapis/release-please).
 
-If a PR adds multiple commits, we use the `squash and merge` option to keep the commit history clean.
-If a PR unavoidably contains changes the message can be edited before merging to ensure release please
-picks up all changes.
+::: {.callout-tip collapse=true}
+## Example changelog
 
 The following example message (first line is the title in the GitHub UI, the rest is the body in the window below):
 
@@ -59,10 +87,25 @@ Generates the following changelog:
 ---
 This PR was generated with [Release Please](https://github.com/googleapis/release-please). See [documentation](https://github.com/googleapis/release-please#release-please).
 ```
+:::
 
-## Local testing
+## Releases
 
-For developoment, we provide a docker image containing gromacs and multiple python versions to test against.  
+KIMMDY uses `release-please` to create releases. 
+PR's to `main` must use conventional commits. 
+`release-please` creates a new PR collecting the changelog and version bumps.
+To make a new release, merge this `chore(main): release` PR into main. 
+This triggers the bot to create the release.
+
+Fixes increase the third digit of the version, features the second.
+To create a new major version, mark a commit as `breaking` by adding a `!` like:
+`feat!: new big version`, `fix!: Fix breakes old things`.
+
+
+## Local testing of github-actions
+
+For developoment, we provide a docker image containing gromacs and multiple 
+python versions to test against.  
 To run the test locally, you must:
 
 - install docker

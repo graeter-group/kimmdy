@@ -79,12 +79,5 @@ Conventions:
 - docstrings: numpy
 - [Conventional commit](https://www.conventionalcommits.org/en/v1.0.0/) messages when possible for pretty release notes.
 
-### Local testing
-
-For developoment, we provide a docker image containing gromacs and multiple python versions to test against.  
-To run the test locally, you must:
-
-- install docker
-- install [act](https://github.com/nektos/act), the easiest option is with github cli via `gh extension install https://github.com/nektos/gh-act`
-- run tests with `gh extension exec act -j test --artifact-server-path ./artifacts`
-- html coverage report is exported into `artifacts`
+For more information, head to
+[the documentation](https://graeter-group.github.io/kimmdy/guide/how-to/contribute.html)
