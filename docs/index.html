@@ -430,6 +430,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./guide/how-to/faq.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Common Issues</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./guide/how-to/hcp.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">High Performance Computing</span></a>
   </div>
@@ -684,7 +690,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#development" id="toc-development" class="nav-link" data-scroll-target="#development">Development</a>
   <ul>
   <li><a href="#development-setup" id="toc-development-setup" class="nav-link" data-scroll-target="#development-setup">Development setup</a></li>
-  <li><a href="#local-testing" id="toc-local-testing" class="nav-link" data-scroll-target="#local-testing">Local testing</a></li>
   </ul></li>
   </ul></li>
   </ul>
@@ -705,17 +710,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="installation">Installation</h2>
 <p><strong>Note</strong>: KIMMDY requires <a href="https://www.gromacs.org/">GROMACS</a> to be installed. Some reactions need a GROMACS version patched with <a href="https://www.plumed.org/">PLUMED</a>. The gromacs version name should then contain <code>MODIFIED</code> or <code>plumed</code>.</p>
 <p>While it is possible to install KIMMDY with just <code>pip install kimmdy</code>, this can take a while due to dependency resolution. We recommend installing KIMMDY with <a href="https://docs.astral.sh/uv/">uv</a> instead:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> tool install <span class="at">-p</span> 3.11 kimmdy</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>This installation includes only the most basic functionality as no plugins and analysis tools are installed.</p>
-<p>To install the builtin reaction plugins, use</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> tool install <span class="at">-p</span> 3.11 kimmdy<span class="pp">[</span><span class="ss">plugins</span><span class="pp">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>To install the builtin example reactions and analysis tools use</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> tool install <span class="at">-p</span> 3.11 kimmdy<span class="pp">[</span><span class="ss">reactions,analysis</span><span class="pp">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>However, this is only half the fun!</p>
-<p>To install KIMMDY with all currently available official plugins, like kimmdy-grappa, which properly parameterizes your molecules for radicals using GrAPPa (Graph Attentional Protein Parametrization) and reaction plugins like kimmdy-hat (for Hydrogen Atom Transfer) or kimmdy-hydrolysis use</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> tool install <span class="at">-p</span> 3.11 kimmdy<span class="pp">[</span><span class="ss">plugins</span><span class="pp">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> tool install <span class="at">-p</span> 3.11 kimmdy<span class="pp">[</span><span class="ss">all</span><span class="pp">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This installation includes all official reaction plugins and analysis tools.</p>
+<p>To install only the most basic functionality, run:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> tool install <span class="at">-p</span> 3.11 kimmdy</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>You can also pick the plugins you want, the available extras are:</p>
+<ul>
+<li><code>reactions</code>: makes <code>homolysis</code>, <code>hat-naive</code> and <code>dummyreaction</code> reactions available.</li>
+<li><code>grappa</code>: allows parametrization of any system on-the-fly.</li>
+<li><code>hat</code>: hydrogen atom transfer reaction plugin</li>
+<li><code>hydrolysis</code>: hydrolysis reaction plugin</li>
+<li><code>dimerization</code>: dimerization reaction plugin</li>
+</ul>
 <p>To uninstall KIMMDY again, use</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> tool uninstall kimmdy</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> tool uninstall kimmdy</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="documentation" class="level2">
 <h2 class="anchored" data-anchor-id="documentation">Documentation</h2>
@@ -729,27 +737,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="development">Development</h2>
 <section id="development-setup" class="level3">
 <h3 class="anchored" data-anchor-id="development-setup">Development setup</h3>
-<p>Clone kimmdy and the default reaction and parameterization plugins and install requirements and kimmdy as editable via</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone git@github.com:graeter-group/kimmdy.git <span class="at">--recurse-submodules</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> kimmdy</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> sync <span class="at">--extra</span> plugins</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Clone kimmdy, the default reaction and parameterization plugins, then install kimmdy as editable module via</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone git@github.com:graeter-group/kimmdy.git <span class="at">--recurse-submodules</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> kimmdy</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> sync <span class="at">--extra</span> all</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>To load or update the submodules, run:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> submodule update <span class="at">--init</span> <span class="at">--recursive</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Run kimmdy either using <code>uv run kimmdy</code>, or activate the virtual environment uv has created:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> .venv/bin/activate</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">kimmdy</span> <span class="at">--help</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Conventions:</p>
 <ul>
 <li>code style: black</li>
 <li>docstrings: numpy</li>
 <li><a href="https://www.conventionalcommits.org/en/v1.0.0/">Conventional commit</a> messages when possible for pretty release notes.</li>
 </ul>
-</section>
-<section id="local-testing" class="level3">
-<h3 class="anchored" data-anchor-id="local-testing">Local testing</h3>
-<p>For developoment, we provide a docker image containing gromacs and multiple python versions to test against.<br>
-To run the test locally, you must:</p>
-<ul>
-<li>install docker</li>
-<li>install <a href="https://github.com/nektos/act">act</a>, the easiest option is with github cli via <code>gh extension install https://github.com/nektos/gh-act</code></li>
-<li>run tests with <code>gh extension exec act -j test --artifact-server-path ./artifacts</code></li>
-<li>html coverage report is exported into <code>artifacts</code></li>
-</ul>
+<p>For more information, head to <a href="https://graeter-group.github.io/kimmdy/guide/how-to/contribute.html">the documentation</a></p>
 
 
 </section>

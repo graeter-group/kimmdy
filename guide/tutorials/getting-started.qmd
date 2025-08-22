@@ -21,7 +21,8 @@ In this tutorial we will be simulating hydrogen atom transfer in a simple ACE/NM
 Optional:
 
 - `plumed`-patched version of `gromacs` (for the homolysis reaction).
-  Gromacs 2025 and above do not need to be patched with plumed, only the `PLUMED_KERNEL` variabel needs to be set.
+  Gromacs 2025 and above does not need to be patched with plumed, 
+only the `PLUMED_KERNEL` variabel needs to be set to your `lib/libplumedKernel.so`.
     ([See plumded documentation](https://www.plumed.org/doc-v2.9/user-doc/html/_installation.html))
 
 ::: {.callout-tip appearance="simple"}
@@ -35,7 +36,7 @@ If you plan to use our machine-learning plugins, take a look at the [full instal
 Install kimmdy as a tool:
 
 ```bash
-uv tool install --from kimmdy[reactions,analysis] kimmdy
+uv tool install -p 3.11 kimmdy[all]
 ```
 
 Now all kimmdy commands should be available from everywhere. Try `kimmdy --help`.
@@ -57,7 +58,7 @@ source .venv/bin/activate
 To install KIMMDY, the builtin reaction plugins and the analysis tools use
 
 ```bash
-pip install kimmdy[reactions,analysis]
+pip install kimmdy[all]
 ```
 
 :::

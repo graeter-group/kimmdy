@@ -431,6 +431,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../guide/how-to/faq.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Common Issues</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../guide/how-to/hcp.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">High Performance Computing</span></a>
   </div>
@@ -763,19 +769,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 <tr class="even">
 <td>f</td>
-<td><a href="https://docs.python.org/3.10/library/typing.html#typing.Callable">Callable</a>[…, <a href="https://docs.python.org/3.10/library/typing.html#typing.Optional">Optional</a>[<a href="../_reference/tasks.html#kimmdy.tasks.TaskFiles">TaskFiles</a>]]</td>
+<td><a href="https://docs.python.org/3.11/library/typing.html#typing.Callable">Callable</a>[…, <a href="https://docs.python.org/3.11/library/typing.html#typing.Optional">Optional</a>[<a href="../_reference/tasks.html#kimmdy.tasks.TaskFiles">TaskFiles</a>]]</td>
 <td>Function that will be called when the task is called</td>
 <td><em>required</em></td>
 </tr>
 <tr class="odd">
 <td>kwargs</td>
-<td><a href="https://docs.python.org/3.10/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#dict">dict</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>, <a href="https://docs.python.org/3.10/library/typing.html#typing.Any">Any</a>]]</td>
+<td><a href="https://docs.python.org/3.11/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3.11/library/stdtypes.html#dict">dict</a>[<a href="https://docs.python.org/3.11/library/stdtypes.html#str">str</a>, <a href="https://docs.python.org/3.11/library/typing.html#typing.Any">Any</a>]]</td>
 <td>kwargs to be passed to f</td>
 <td><code>None</code></td>
 </tr>
 <tr class="even">
 <td>out</td>
-<td><a href="https://docs.python.org/3.10/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>]</td>
+<td><a href="https://docs.python.org/3.11/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3.11/library/stdtypes.html#str">str</a>]</td>
 <td>If not None, an output dir will be created with this name</td>
 <td><code>None</code></td>
 </tr>
@@ -807,27 +813,27 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td>get_latest</td>
-<td><a href="https://docs.python.org/3.10/library/typing.html#typing.Callable">Callable</a>[[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>], <a href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path">Path</a> | None]</td>
+<td><a href="https://docs.python.org/3.11/library/typing.html#typing.Callable">Callable</a>[[<a href="https://docs.python.org/3.11/library/stdtypes.html#str">str</a>], <a href="https://docs.python.org/3.11/library/pathlib.html#pathlib.Path">Path</a> | None]</td>
 <td>Runmanager.get_latest function that returns paths to the latest file of given type.</td>
 </tr>
 <tr class="even">
 <td>input</td>
-<td><a href="https://docs.python.org/3.10/library/stdtypes.html#dict">dict</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>, <a href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path">Path</a> | None]</td>
+<td><a href="https://docs.python.org/3.11/library/stdtypes.html#dict">dict</a>[<a href="https://docs.python.org/3.11/library/stdtypes.html#str">str</a>, <a href="https://docs.python.org/3.11/library/pathlib.html#pathlib.Path">Path</a> | None]</td>
 <td>Input file paths for a Task. Is populated by get_latest or manually.</td>
 </tr>
 <tr class="odd">
 <td>output</td>
-<td><a href="https://docs.python.org/3.10/library/stdtypes.html#dict">dict</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>, <a href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path">Path</a>]</td>
+<td><a href="https://docs.python.org/3.11/library/stdtypes.html#dict">dict</a>[<a href="https://docs.python.org/3.11/library/stdtypes.html#str">str</a>, <a href="https://docs.python.org/3.11/library/pathlib.html#pathlib.Path">Path</a>]</td>
 <td>Output file paths for a Task. Is populated by runmanager._discover_output_files or manually.</td>
 </tr>
 <tr class="even">
 <td>outputdir</td>
-<td><a href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path">Path</a></td>
+<td><a href="https://docs.python.org/3.11/library/pathlib.html#pathlib.Path">Path</a></td>
 <td>Output directory for a Task. Typically populated by create_task_directory called by Task.</td>
 </tr>
 <tr class="odd">
 <td>logger</td>
-<td><a href="https://docs.python.org/3.10/library/logging.html#module-logging">logging</a>.<a href="https://docs.python.org/3.10/library/logging.html#logging.Logger">Logger</a></td>
+<td><a href="https://docs.python.org/3.11/library/logging.html#module-logging">logging</a>.<a href="https://docs.python.org/3.11/library/logging.html#logging.Logger">Logger</a></td>
 <td>Logger for a Task. Initialized in create_task_directory.</td>
 </tr>
 </tbody>

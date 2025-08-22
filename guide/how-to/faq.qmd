@@ -1,0 +1,41 @@
+---
+title: "Common Issues"
+author: "Kai Riedmiller"
+---
+
+## Submodules
+
+Clone with added `--recurse-submodules`.  
+Update submodules with `git submodule update --init --recursive`.  
+See [Project Structure](../how-to/install-kimmdy.qmd#notes-on-the-project-strucure).
+
+## Plumed
+
+Plumed is required for the homolysis plugin.
+Historically, gromacs would need to be compiled with Plumed, however
+since gromacs 2025, no patching is required.
+Plumed needs still to get compiled and installed 
+([See plumded documentation](https://www.plumed.org/doc-v2.9/user-doc/html/_installation.html))!
+Make sure the `PLUMED_KERNEL` env variable is set to the path to your 
+`libplumedKernel.so` (should be in `plumed/lib/`).
+
+## What plugins do exist?
+
+Check the [`kimmdy` github topic](https://github.com/topics/kimmdy) to find them all.
+
+## uv related issues
+
+For the tool installation, try uninstalling and re-installing.
+
+For the dev installation, here are the most useful commands you might need:
+
+Update dependencies to `pyproject.toml` content, run from kimmdy directory:
+```bash
+uv sync --extra all
+```
+
+Use a known set of dependency versions from `uv.lock`: 
+(For downgrading pull an older `uv.lock` from github)
+```bash
+uv run --frozen kimmdy
+```
