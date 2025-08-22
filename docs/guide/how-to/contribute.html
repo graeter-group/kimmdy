@@ -731,8 +731,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="prs" class="level2">
 <h2 class="anchored" data-anchor-id="prs">PR’s</h2>
-<p>If a PR adds multiple commits, we use the <code>squash and merge</code> option to keep the commit history clean. If a PR unavoidably contains changes the message can be edited before merging to ensure <code>release please</code> picks up all changes.</p>
 <p>KIMMDY uses conventional commits and semantic versioning, automated via <a href="https://github.com/googleapis/release-please">release please</a>.</p>
+<p>PR’s should contain single changes/fixes. To keep the commit history clean we use <code>squash and merge</code> to merge PR’s.</p>
+<p>If a PR unavoidably contains <strong>multiple</strong> changes the message, rebase instead of squashing your commits to ensure <code>release please</code> picks up all changes. Optionally, clean up your commit history with interactive rebasing.</p>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
