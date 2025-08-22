@@ -432,6 +432,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../../guide/how-to/faq.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Common Issues</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../../guide/how-to/hcp.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">High Performance Computing</span></a>
   </div>
@@ -727,7 +733,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul>
 <p>Optional:</p>
 <ul>
-<li><code>plumed</code>-patched version of <code>gromacs</code> (for the homolysis reaction). Gromacs 2025 and above do not need to be patched with plumed, only the <code>PLUMED_KERNEL</code> variabel needs to be set. (<a href="https://www.plumed.org/doc-v2.9/user-doc/html/_installation.html">See plumded documentation</a>)</li>
+<li><code>plumed</code>-patched version of <code>gromacs</code> (for the homolysis reaction). Gromacs 2025 and above does not need to be patched with plumed, only the <code>PLUMED_KERNEL</code> variabel needs to be set to your <code>lib/libplumedKernel.so</code>. (<a href="https://www.plumed.org/doc-v2.9/user-doc/html/_installation.html">See plumded documentation</a>)</li>
 </ul>
 </section>
 <section id="installation" class="level3">
@@ -736,7 +742,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">User installation</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">Developer installation</a></li></ul>
 <div class="tab-content">
 <div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> tool install <span class="at">-p</span> 3.11 kimmdy<span class="pp">[</span><span class="ss">plugins</span><span class="pp">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> tool install <span class="at">-p</span> 3.11 kimmdy<span class="pp">[</span><span class="ss">all</span><span class="pp">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p><code>kimmdy</code>, its subcommands, and its plugins are now availabe, test it with:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kimmdy</span> <span class="at">--help</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Uninstall by using:</p>
@@ -754,15 +760,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p><code>plugins</code> can be also more specific, like <code>hat</code>, <code>hydrolysis</code>, <code>grappa</code>, <code>dimerization</code>, or <code>reactions</code> (containing homolysis, hat_naive and a dummyreaction).</p>
+<p>Instead of installing all plugins, you can also pick the plugins you want, the available extras are:</p>
+<ul>
+<li><code>reactions</code>: makes <code>homolysis</code>, <code>hat-naive</code> and <code>dummyreaction</code> reactions available.</li>
+<li><code>grappa</code>: allows parametrization of any system on-the-fly.</li>
+<li><code>hat</code>: hydrogen atom transfer reaction plugin</li>
+<li><code>hydrolysis</code>: hydrolysis reaction plugin</li>
+<li><code>dimerization</code>: dimerization reaction plugin</li>
+</ul>
 </section>
 </section>
 <section id="notes-on-the-project-strucure" class="level2">
 <h2 class="anchored" data-anchor-id="notes-on-the-project-strucure">Notes on the project strucure</h2>
-<p>Plugins are developed in separate git repositories. Officially supported ones are linked as subrepositories of kimmdy inside the <code>plugins</code> directory.</p>
-<p>These are by default <em>not</em> pulled <em>via</em> <code>git clone</code>, to clone them add <code>--recurse-submodules</code>.</p>
-<p>To update them, get new ones, or pull them after initially omitting them, use:<br>
-<code>git submodule update --init --recursive</code></p>
+<p>Plugins are developed in separate git repositories. Check the <a href="https://github.com/topics/kimmdy"><code>kimmdy</code> github topic</a> to find them all.</p>
+<p>Officially supported plugins are linked as subrepositories of kimmdy inside the <code>plugins</code> directory. These are by default <em>not</em> pulled <em>via</em> <code>git clone</code>, to clone them add <code>--recurse-submodules</code>.</p>
+<p>To update them, get new ones, or pull them after initially omitting them, use:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> submodule update <span class="at">--init</span> <span class="at">--recursive</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 
 </section>

@@ -9,7 +9,6 @@ project:
   resources:
     - objects.txt
 
-
 website:
   favicon: ./www/favicon.png
   page-navigation: true
@@ -24,9 +23,9 @@ website:
       - icon: github
         menu:
           - text: Source Code
-            url:  https://github.com/graeter-group/kimmdy
+            url: https://github.com/graeter-group/kimmdy
           - text: Report a Bug
-            url:  https://github.com/graeter-group/kimmdy/issues/new
+            url: https://github.com/graeter-group/kimmdy/issues/new
     left:
       - file: ./guide/tutorials/getting-started.qmd
         text: Getting Started
@@ -55,37 +54,37 @@ website:
       - section: Reference
         href: _reference/index.qmd
         contents:
-        - guide/references/input.qmd
-        - guide/references/cmd_ref.qmd
-        - section: Python API
-          contents:
-            - _reference/cmd.qmd
-            - contents:
-              - _reference/topology.topology.qmd
-              - _reference/topology.ff.qmd
-              - _reference/topology.utils.qmd
-              - _reference/topology.atomic.qmd
-              - _reference/parsing.TopologyDict.qmd
-              section: Topology
-            - contents:
-              - _reference/homolysis.reaction.Homolysis.qmd
-              - _reference/hat_naive.reaction.NaiveHAT.qmd
-              - _reference/dummyreaction.reaction.DummyReaction.qmd
-              section: Reaction Plugins
-            - contents:
-              - _reference/constants.qmd
-              - _reference/coordinates.qmd
-              - _reference/config.qmd
-              - _reference/kmc.qmd
-              - _reference/parsing.qmd
-              - _reference/runmanager.qmd
-              - _reference/tasks.qmd
-              - _reference/recipe.qmd
-              - _reference/plugins.qmd
-              - _reference/analysis.qmd
-              - _reference/utils.qmd
-              - _reference/tools.qmd
-              section: Other Modules
+          - guide/references/input.qmd
+          - guide/references/cmd_ref.qmd
+          - section: Python API
+            contents:
+              - _reference/cmd.qmd
+              - contents:
+                  - _reference/topology.topology.qmd
+                  - _reference/topology.ff.qmd
+                  - _reference/topology.utils.qmd
+                  - _reference/topology.atomic.qmd
+                  - _reference/parsing.TopologyDict.qmd
+                section: Topology
+              - contents:
+                  - _reference/homolysis.reaction.Homolysis.qmd
+                  - _reference/hat_naive.reaction.NaiveHAT.qmd
+                  - _reference/dummyreaction.reaction.DummyReaction.qmd
+                section: Reaction Plugins
+              - contents:
+                  - _reference/constants.qmd
+                  - _reference/coordinates.qmd
+                  - _reference/config.qmd
+                  - _reference/kmc.qmd
+                  - _reference/parsing.qmd
+                  - _reference/runmanager.qmd
+                  - _reference/tasks.qmd
+                  - _reference/recipe.qmd
+                  - _reference/plugins.qmd
+                  - _reference/analysis.qmd
+                  - _reference/utils.qmd
+                  - _reference/tools.qmd
+                section: Other Modules
 
 # metadata-files:
 #   - _sidebar.yml
@@ -105,10 +104,10 @@ format:
     highlight-style: arrow
     theme:
       light:
-      - www/theme.scss
+        - www/theme.scss
       dark:
-      - www/theme.scss
-      - www/theme-dark.scss
+        - www/theme.scss
+        - www/theme-dark.scss
     code-copy: true
 
 filters:
@@ -120,7 +119,7 @@ interlinks:
     numpy:
       url: https://numpy.org/doc/stable/
     python:
-      url: https://docs.python.org/3.10/
+      url: https://docs.python.org/3.11/
 
 quartodoc:
   sidebar: "_sidebar.yml"
@@ -170,5 +169,3 @@ quartodoc:
         - homolysis.reaction.Homolysis
         - hat_naive.reaction.NaiveHAT
         - dummyreaction.reaction.DummyReaction
-
-

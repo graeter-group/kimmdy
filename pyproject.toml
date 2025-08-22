@@ -27,15 +27,15 @@ hydrolysis = ["kimmdy-hydrolysis"]
 reactions = ["kimmdy-reactions"]
 
 plugins = [
-  "kimmdy-dimerization",
-  "kimmdy-reactions",
-  "kimmdy-grappa",
-  "kimmdy-hat",
-  "grappa-ff",
-  "torch",
-  "kimmdy-hydrolysis",
+  "kimmdy[dimerization]",
+  "kimmdy[reactions]",
+  "kimmdy[hat]",
+  "kimmdy[grappa]",
+  "kimmdy[hydrolysis]",
 ]
 analysis = ["pandas", "matplotlib", "seaborn"]
+
+all = ["kimmdy[plugins]", "kimmdy[analysis]",]
 
 [project.scripts]
 kimmdy = "kimmdy.cmd:entry_point_kimmdy"
@@ -61,7 +61,7 @@ kimmdy-dimerization = { workspace = true }
 kimmdy-grappa = { workspace = true }
 kimmdy-hat = { workspace = true }
 kimmdy-hydrolysis = { workspace = true }
-kimmdy-reactions = { workspace = true}
+kimmdy-reactions = { workspace = true }
 torch = [{ index = "pytorch-cpu" }]
 torchvision = [{ index = "pytorch-cpu" }]
 
@@ -78,6 +78,7 @@ members = ["plugins/*"]
 dev = [
   "pytest",
   "pytest-cov",
+  "pytest-mock",
   "tox",
   "tox-uv",
   "black",

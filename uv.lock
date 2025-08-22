@@ -1517,6 +1517,19 @@ dependencies = [
 ]
 
 [package.optional-dependencies]
+all = [
+    { name = "grappa-ff" },
+    { name = "kimmdy-dimerization" },
+    { name = "kimmdy-grappa" },
+    { name = "kimmdy-hat" },
+    { name = "kimmdy-hydrolysis" },
+    { name = "kimmdy-reactions" },
+    { name = "matplotlib" },
+    { name = "pandas" },
+    { name = "seaborn" },
+    { name = "torch", version = "2.0.0", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(platform_machine == 'aarch64' and sys_platform == 'linux') or sys_platform == 'darwin'" },
+    { name = "torch", version = "2.0.0+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(platform_machine != 'aarch64' and sys_platform == 'linux') or (sys_platform != 'darwin' and sys_platform != 'linux')" },
+]
 analysis = [
     { name = "matplotlib" },
     { name = "pandas" },
@@ -1567,6 +1580,7 @@ dev = [
     { name = "pycallgraph2" },
     { name = "pytest" },
     { name = "pytest-cov" },
+    { name = "pytest-mock" },
     { name = "pytz" },
     { name = "quartodoc" },
     { name = "referencing" },
@@ -1585,17 +1599,18 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "grappa-ff", marker = "extra == 'grappa'" },
-    { name = "grappa-ff", marker = "extra == 'plugins'" },
     { name = "importlib-metadata" },
+    { name = "kimmdy", extras = ["analysis"], marker = "extra == 'all'", editable = "." },
+    { name = "kimmdy", extras = ["dimerization"], marker = "extra == 'plugins'", editable = "." },
+    { name = "kimmdy", extras = ["grappa"], marker = "extra == 'plugins'", editable = "." },
+    { name = "kimmdy", extras = ["hat"], marker = "extra == 'plugins'", editable = "." },
+    { name = "kimmdy", extras = ["hydrolysis"], marker = "extra == 'plugins'", editable = "." },
+    { name = "kimmdy", extras = ["plugins"], marker = "extra == 'all'", editable = "." },
+    { name = "kimmdy", extras = ["reactions"], marker = "extra == 'plugins'", editable = "." },
     { name = "kimmdy-dimerization", marker = "extra == 'dimerization'", editable = "plugins/kimmdy-dimerization" },
-    { name = "kimmdy-dimerization", marker = "extra == 'plugins'", editable = "plugins/kimmdy-dimerization" },
     { name = "kimmdy-grappa", marker = "extra == 'grappa'", editable = "plugins/kimmdy-grappa" },
-    { name = "kimmdy-grappa", marker = "extra == 'plugins'", editable = "plugins/kimmdy-grappa" },
     { name = "kimmdy-hat", marker = "extra == 'hat'", editable = "plugins/kimmdy-hat" },
-    { name = "kimmdy-hat", marker = "extra == 'plugins'", editable = "plugins/kimmdy-hat" },
     { name = "kimmdy-hydrolysis", marker = "extra == 'hydrolysis'", editable = "plugins/kimmdy-hydrolysis" },
-    { name = "kimmdy-hydrolysis", marker = "extra == 'plugins'", editable = "plugins/kimmdy-hydrolysis" },
-    { name = "kimmdy-reactions", marker = "extra == 'plugins'", editable = "plugins/kimmdy-reactions" },
     { name = "kimmdy-reactions", marker = "extra == 'reactions'", editable = "plugins/kimmdy-reactions" },
     { name = "matplotlib", marker = "extra == 'analysis'" },
     { name = "mdanalysis" },
@@ -1604,9 +1619,8 @@ requires-dist = [
     { name = "pyyaml" },
     { name = "seaborn", marker = "extra == 'analysis'" },
     { name = "torch", marker = "extra == 'grappa'", index = "https://download.pytorch.org/whl/cpu" },
-    { name = "torch", marker = "extra == 'plugins'", index = "https://download.pytorch.org/whl/cpu" },
 ]
-provides-extras = ["dimerization", "grappa", "hat", "hydrolysis", "reactions", "plugins", "analysis"]
+provides-extras = ["dimerization", "grappa", "hat", "hydrolysis", "reactions", "plugins", "analysis", "all"]
 
 [package.metadata.requires-dev]
 dev = [
@@ -1624,6 +1638,7 @@ dev = [
     { name = "pycallgraph2" },
     { name = "pytest" },
     { name = "pytest-cov" },
+    { name = "pytest-mock" },
     { name = "pytz", specifier = ">=2025.2" },
     { name = "quartodoc" },
     { name = "referencing", specifier = ">=0.36" },

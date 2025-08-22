@@ -435,6 +435,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../../guide/how-to/faq.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Common Issues</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../../guide/how-to/hcp.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">High Performance Computing</span></a>
   </div>
@@ -736,7 +742,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul>
 <p>Optional:</p>
 <ul>
-<li><code>plumed</code>-patched version of <code>gromacs</code> (for the homolysis reaction). Gromacs 2025 and above do not need to be patched with plumed, only the <code>PLUMED_KERNEL</code> variabel needs to be set. (<a href="https://www.plumed.org/doc-v2.9/user-doc/html/_installation.html">See plumded documentation</a>)</li>
+<li><code>plumed</code>-patched version of <code>gromacs</code> (for the homolysis reaction). Gromacs 2025 and above does not need to be patched with plumed, only the <code>PLUMED_KERNEL</code> variabel needs to be set to your <code>lib/libplumedKernel.so</code>. (<a href="https://www.plumed.org/doc-v2.9/user-doc/html/_installation.html">See plumded documentation</a>)</li>
 </ul>
 <div class="callout callout-style-simple callout-tip">
 <div class="callout-body d-flex">
@@ -753,7 +759,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="tab-content">
 <div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
 <p>Install kimmdy as a tool:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> tool install <span class="at">--from</span> kimmdy<span class="pp">[</span><span class="ss">reactions,analysis</span><span class="pp">]</span> kimmdy</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> tool install <span class="at">-p</span> 3.11 kimmdy<span class="pp">[</span><span class="ss">all</span><span class="pp">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Now all kimmdy commands should be available from everywhere. Try <code>kimmdy --help</code>.</p>
 <p>To uninstall kimmdy again use <code>uv tool uninstall kimmdy</code></p>
 </div>
@@ -764,7 +770,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> venv .venv</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> .venv/bin/activate</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>To install KIMMDY, the builtin reaction plugins and the analysis tools use</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install kimmdy<span class="pp">[</span><span class="ss">reactions,analysis</span><span class="pp">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install kimmdy<span class="pp">[</span><span class="ss">all</span><span class="pp">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
