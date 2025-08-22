@@ -28,12 +28,16 @@ or the `examples` directory. Just add the `docthis` or `build_examples` label.
 
 ## PR's
 
-If a PR adds multiple commits, we use the `squash and merge` option to keep 
-the commit history clean. If a PR unavoidably contains changes the message 
-can be edited before merging to ensure `release please` picks up all changes.
-
 KIMMDY uses conventional commits and semantic versioning,
 automated via [release please](https://github.com/googleapis/release-please).
+
+PR's should contain single changes/fixes.
+To keep the commit history clean we use `squash and merge` to merge PR's.
+
+If a PR unavoidably contains **multiple** changes the message, rebase instead 
+of squashing your commits to ensure `release please` picks up all changes.
+Optionally, clean up your commit history with interactive rebasing.
+
 
 ::: {.callout-tip collapse=true}
 ## Example changelog
