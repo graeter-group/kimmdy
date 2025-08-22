@@ -20,6 +20,41 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -396,6 +431,12 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../../guide/how-to/faq.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Common Issues</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../../guide/how-to/hcp.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">High Performance Computing</span></a>
   </div>
@@ -640,7 +681,12 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#local-testing" id="toc-local-testing" class="nav-link active" data-scroll-target="#local-testing">Local testing</a></li>
+  <li><a href="#setup" id="toc-setup" class="nav-link active" data-scroll-target="#setup">Setup</a></li>
+  <li><a href="#code-style" id="toc-code-style" class="nav-link" data-scroll-target="#code-style">Code Style</a></li>
+  <li><a href="#docs-and-examples" id="toc-docs-and-examples" class="nav-link" data-scroll-target="#docs-and-examples">Docs and Examples</a></li>
+  <li><a href="#prs" id="toc-prs" class="nav-link" data-scroll-target="#prs">PR’s</a></li>
+  <li><a href="#releases" id="toc-releases" class="nav-link" data-scroll-target="#releases">Releases</a></li>
+  <li><a href="#local-testing-of-github-actions" id="toc-local-testing-of-github-actions" class="nav-link" data-scroll-target="#local-testing-of-github-actions">Local testing of github-actions</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/graeter-group/kimmdy/edit/main/guide/how-to/contribute.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/graeter-group/kimmdy/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
@@ -668,8 +714,37 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<section id="setup" class="level2">
+<h2 class="anchored" data-anchor-id="setup">Setup</h2>
+<p>See <a href="../../guide/how-to/install-kimmdy.html">Installation</a>.</p>
+<p>For new plugins, make a separate repo, and add your entrypoint in the <code>pyproject.toml</code> to the <code>kimmdy.reaction_plugins</code> entrypoint:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode pyproject.toml code-with-copy"><code class="sourceCode toml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">[project.entry-points."</span><span class="dt">kimmdy.reaction_plugins"</span><span class="kw">]</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="dt">my_reaction</span> <span class="op">=</span> <span class="st">"kimmdy_my_reaction.reaction:My_Reaction_Class"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="code-style" class="level2">
+<h2 class="anchored" data-anchor-id="code-style">Code Style</h2>
+<p>Doc strings in numpy style, formatting using <code>black</code>.</p>
+</section>
+<section id="docs-and-examples" class="level2">
+<h2 class="anchored" data-anchor-id="docs-and-examples">Docs and Examples</h2>
+<p>You can add labels to PR’s to trigger CI to rebuild the documentation or the <code>examples</code> directory. Just add the <code>docthis</code> or <code>build_examples</code> label.</p>
+</section>
+<section id="prs" class="level2">
+<h2 class="anchored" data-anchor-id="prs">PR’s</h2>
+<p>If a PR adds multiple commits, we use the <code>squash and merge</code> option to keep the commit history clean. If a PR unavoidably contains changes the message can be edited before merging to ensure <code>release please</code> picks up all changes.</p>
 <p>KIMMDY uses conventional commits and semantic versioning, automated via <a href="https://github.com/googleapis/release-please">release please</a>.</p>
-<p>If a PR adds multiple commits, we use the <code>squash and merge</code> option to keep the commit history clean. If a PR unavoidably contains changes the message can be edited before merging to ensure release please picks up all changes.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Example changelog
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
 <p>The following example message (first line is the title in the GitHub UI, the rest is the body in the window below):</p>
 <pre><code>feat: this is a release-please test
 
@@ -712,8 +787,17 @@ fix(ci): or this?</code></pre>
 
 ---
 This PR was generated with [Release Please](https://github.com/googleapis/release-please). See [documentation](https://github.com/googleapis/release-please#release-please).</code></pre>
-<section id="local-testing" class="level2">
-<h2 class="anchored" data-anchor-id="local-testing">Local testing</h2>
+</div>
+</div>
+</div>
+</section>
+<section id="releases" class="level2">
+<h2 class="anchored" data-anchor-id="releases">Releases</h2>
+<p>KIMMDY uses <code>release-please</code> to create releases. PR’s to <code>main</code> must use conventional commits. <code>release-please</code> creates a new PR collecting the changelog and version bumps. To make a new release, merge this <code>chore(main): release</code> PR into main. This triggers the bot to create the release.</p>
+<p>Fixes increase the third digit of the version, features the second. To create a new major version, mark a commit as <code>breaking</code> by adding a <code>!</code> like: <code>feat!: new big version</code>, <code>fix!: Fix breakes old things</code>.</p>
+</section>
+<section id="local-testing-of-github-actions" class="level2">
+<h2 class="anchored" data-anchor-id="local-testing-of-github-actions">Local testing of github-actions</h2>
 <p>For developoment, we provide a docker image containing gromacs and multiple python versions to test against.<br>
 To run the test locally, you must:</p>
 <ul>

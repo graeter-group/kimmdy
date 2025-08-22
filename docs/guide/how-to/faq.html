@@ -6,9 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Jannik Buhr">
+<meta name="author" content="Kai Riedmiller">
 
-<title>Get Started – KIMMDY</title>
+<title>Common Issues – KIMMDY</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -66,8 +66,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
-<link href="../../guide/tutorials/modify-topology.html" rel="next">
-<link href="../../guide/tutorials/colbuilder.html" rel="prev">
+<link href="../../guide/how-to/hcp.html" rel="next">
+<link href="../../guide/how-to/examples.html" rel="prev">
 <link href="../.././www/favicon.png" rel="icon" type="image/png">
 <script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
@@ -83,9 +83,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/bootstrap/bootstrap-aae88ecde7ebe58ee0c698ef0f62b428.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
 <link href="../../site_libs/bootstrap/bootstrap-dark-d854a8aa814a5cf5d934d479f4603a12.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <link href="../../site_libs/bootstrap/bootstrap-aae88ecde7ebe58ee0c698ef0f62b428.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
-<script src="../../site_libs/quarto-contrib/molstar-v3.13.0/molstar.js"></script>
-<link href="../../site_libs/quarto-contrib/molstar-v3.13.0/molstar.css" rel="stylesheet">
-<link href="../../site_libs/quarto-contrib/molstar-v3.13.0/app-container.css" rel="stylesheet">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -348,7 +345,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../guide/tutorials/index.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../../guide/tutorials/getting-started.html">Get Started</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../guide/how-to/index.html">How-To</a></li><li class="breadcrumb-item"><a href="../../guide/how-to/faq.html">Common Issues</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -375,11 +372,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <div class="sidebar-item-container"> 
             <a href="../../guide/tutorials/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Tutorials</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../guide/tutorials/colbuilder.html" class="sidebar-item-text sidebar-link">
@@ -388,7 +385,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../guide/tutorials/getting-started.html" class="sidebar-item-text sidebar-link active">
+  <a href="../../guide/tutorials/getting-started.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Get Started</span></a>
   </div>
 </li>
@@ -410,11 +407,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <div class="sidebar-item-container"> 
             <a href="../../guide/how-to/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">How-To</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../guide/how-to/analyze.html" class="sidebar-item-text sidebar-link">
@@ -435,7 +432,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../guide/how-to/faq.html" class="sidebar-item-text sidebar-link">
+  <a href="../../guide/how-to/faq.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Common Issues</span></a>
   </div>
 </li>
@@ -685,28 +682,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#installation" id="toc-installation" class="nav-link active" data-scroll-target="#installation">Installation</a>
-  <ul>
-  <li><a href="#prerequisites" id="toc-prerequisites" class="nav-link" data-scroll-target="#prerequisites">Prerequisites</a></li>
-  </ul></li>
-  <li><a href="#setup-the-simulation" id="toc-setup-the-simulation" class="nav-link" data-scroll-target="#setup-the-simulation">Setup the Simulation</a></li>
-  <li><a href="#run-the-simulation" id="toc-run-the-simulation" class="nav-link" data-scroll-target="#run-the-simulation">Run the Simulation</a></li>
-  <li><a href="#analyse-the-simulation" id="toc-analyse-the-simulation" class="nav-link" data-scroll-target="#analyse-the-simulation">Analyse the Simulation</a></li>
-  <li><a href="#next-steps" id="toc-next-steps" class="nav-link" data-scroll-target="#next-steps">Next steps</a></li>
+  <li><a href="#submodules" id="toc-submodules" class="nav-link active" data-scroll-target="#submodules">Submodules</a></li>
+  <li><a href="#plumed" id="toc-plumed" class="nav-link" data-scroll-target="#plumed">Plumed</a></li>
+  <li><a href="#what-plugins-do-exist" id="toc-what-plugins-do-exist" class="nav-link" data-scroll-target="#what-plugins-do-exist">What plugins do exist?</a></li>
+  <li><a href="#uv-related-issues" id="toc-uv-related-issues" class="nav-link" data-scroll-target="#uv-related-issues">uv related issues</a></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/graeter-group/kimmdy/edit/main/guide/tutorials/getting-started.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/graeter-group/kimmdy/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/graeter-group/kimmdy/edit/main/guide/how-to/faq.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/graeter-group/kimmdy/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../guide/tutorials/index.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../../guide/tutorials/getting-started.html">Get Started</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../guide/how-to/index.html">How-To</a></li><li class="breadcrumb-item"><a href="../../guide/how-to/faq.html">Common Issues</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Get Started</h1>
-  <div class="quarto-categories">
-    <div class="quarto-category">user</div>
-  </div>
-  </div>
+<h1 class="title">Common Issues</h1>
+</div>
 
 
 
@@ -715,7 +705,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Author</div>
     <div class="quarto-title-meta-contents">
-             <p>Jannik Buhr </p>
+             <p>Kai Riedmiller </p>
           </div>
   </div>
     
@@ -728,173 +718,28 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p>In this tutorial we will be simulating hydrogen atom transfer in a simple ACE/NME-capped Alanine molecule in a box of water.</p>
-<section id="installation" class="level2">
-<h2 class="anchored" data-anchor-id="installation">Installation</h2>
-<section id="prerequisites" class="level3">
-<h3 class="anchored" data-anchor-id="prerequisites">Prerequisites</h3>
-<ul>
-<li>uv: recommended to install kimmdy. <a href="https://docs.astral.sh/uv/getting-started/installation/">Get it here</a></li>
-<li><code>gromacs&gt;=2023.2</code>
-<ul>
-<li>Version 2021.4 works with everything except slow-growth.</li>
-</ul></li>
-</ul>
-<p>Optional:</p>
-<ul>
-<li><code>plumed</code>-patched version of <code>gromacs</code> (for the homolysis reaction). Gromacs 2025 and above does not need to be patched with plumed, only the <code>PLUMED_KERNEL</code> variabel needs to be set to your <code>lib/libplumedKernel.so</code>. (<a href="https://www.plumed.org/doc-v2.9/user-doc/html/_installation.html">See plumded documentation</a>)</li>
-</ul>
-<div class="callout callout-style-simple callout-tip">
-<div class="callout-body d-flex">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-body-container">
-<p>If you plan to use our machine-learning plugins, take a look at the <a href="../../guide/how-to/install-kimmdy.html">full installation instruction</a></p>
-</div>
-</div>
-</div>
-<div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">uv</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">venv</a></li></ul>
-<div class="tab-content">
-<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
-<p>Install kimmdy as a tool:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> tool install <span class="at">-p</span> 3.11 kimmdy<span class="pp">[</span><span class="ss">all</span><span class="pp">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Now all kimmdy commands should be available from everywhere. Try <code>kimmdy --help</code>.</p>
-<p>To uninstall kimmdy again use <code>uv tool uninstall kimmdy</code></p>
-</div>
-<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
-<p>Let’s first create a directory and a virtual environment for <code>kimmdy</code>:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> kimmdy-tutorial</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> kimmdy-tutorial</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> venv .venv</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> .venv/bin/activate</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>To install KIMMDY, the builtin reaction plugins and the analysis tools use</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install kimmdy<span class="pp">[</span><span class="ss">all</span><span class="pp">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div>
-</div>
+<section id="submodules" class="level2">
+<h2 class="anchored" data-anchor-id="submodules">Submodules</h2>
+<p>Clone with added <code>--recurse-submodules</code>.<br>
+Update submodules with <code>git submodule update --init --recursive</code>.<br>
+See <a href="../../guide/how-to/install-kimmdy.html#notes-on-the-project-strucure">Project Structure</a>.</p>
 </section>
+<section id="plumed" class="level2">
+<h2 class="anchored" data-anchor-id="plumed">Plumed</h2>
+<p>Plumed is required for the homolysis plugin. Historically, gromacs would need to be compiled with Plumed, however since gromacs 2025, no patching is required. Plumed needs still to get compiled and installed (<a href="https://www.plumed.org/doc-v2.9/user-doc/html/_installation.html">See plumded documentation</a>)! Make sure the <code>PLUMED_KERNEL</code> env variable is set to the path to your <code>libplumedKernel.so</code> (should be in <code>plumed/lib/</code>).</p>
 </section>
-<section id="setup-the-simulation" class="level2">
-<h2 class="anchored" data-anchor-id="setup-the-simulation">Setup the Simulation</h2>
-<p>Download and unzip the <a href="./getting-started-files/setup.zip">input files</a> to this directory.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">wget</span> https://graeter-group.github.io/kimmdy/guide/tutorials/getting-started-files/setup.zip</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">unzip</span> setup.zip</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>The <code>kimmdy.yml</code> file should look like this:</p>
-<div class="code-with-filename">
-<div class="code-with-filename-file">
-<pre><strong>kimmdy.yml</strong></pre>
-</div>
-<div class="sourceCode" id="cb5" data-filename="kimmdy.yml"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dryrun</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">max_tasks</span><span class="kw">:</span><span class="at"> </span><span class="dv">100</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">name</span><span class="kw">:</span><span class="at"> </span><span class="st">'hat_tf_000'</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="fu">gromacs_alias</span><span class="kw">:</span><span class="at"> </span><span class="st">'gmx'</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">top</span><span class="kw">:</span><span class="at"> </span><span class="st">'Ala_out.top'</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="fu">gro</span><span class="kw">:</span><span class="at"> </span><span class="st">'npt.gro'</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ndx</span><span class="kw">:</span><span class="at"> </span><span class="st">'index.ndx'</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="fu">mds</span><span class="kw">:</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">equilibrium</span><span class="kw">:</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">mdp</span><span class="kw">:</span><span class="at"> </span><span class="st">'md.mdp'</span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">relax</span><span class="kw">:</span></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">mdp</span><span class="kw">:</span><span class="at"> </span><span class="st">'md_slow.mdp'</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="fu">changer</span><span class="kw">:</span></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">coordinates</span><span class="kw">:</span></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">md</span><span class="kw">:</span><span class="at"> </span><span class="st">'relax'</span><span class="at">      </span></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="fu">reactions</span><span class="kw">:</span></span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">hat_reaction</span><span class="kw">:</span></span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">frequency_factor</span><span class="kw">:</span><span class="at"> </span><span class="dv">100000000</span></span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">h_cutoff</span><span class="kw">:</span><span class="at"> </span><span class="dv">3</span></span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">polling_rate</span><span class="kw">:</span><span class="at"> </span><span class="dv">1</span></span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="fu">sequence</span><span class="kw">:</span></span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> equilibrium</span></span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">mult</span><span class="kw">:</span><span class="at"> </span><span class="dv">2</span></span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">tasks</span><span class="kw">:</span></span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> equilibrium</span></span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> reactions</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Our starting structure is a simple ACE/NME-capped Alanine molecule in a box of water. Note, how it has a missing hydrogen atom on the alpha carbon. This is a radical. We will use the builtin <code>hat_reaction</code> to simulate hydrogen atom transfer reactions from nearby hydrogens to the radical position.</p>
-    <div id="app-./getting-started-files/vis-ala.molj" class="molstar-app"></div>
-    <script type="text/javascript">
-    molstar.Viewer.create("app-./getting-started-files/vis-ala.molj", {"emdbProvider":"rcsb","layoutIsExpanded":false,"layoutShowControls":false,"layoutShowLeftPanel":true,"layoutShowLog":false,"layoutShowRemoteState":false,"layoutShowSequence":false,"pdbProvider":"rcsb","viewportShowAnimation":true,"viewportShowExpand":true,"viewportShowSelectionMode":false}).then(viewer => {
-    viewer.loadSnapshotFromUrl(url="./getting-started-files/vis-ala.molj", "molj");    });
-    </script>
-    
-<p>Start the KIMMDY run with the <code>kimmdy</code> command:</p>
+<section id="what-plugins-do-exist" class="level2">
+<h2 class="anchored" data-anchor-id="what-plugins-do-exist">What plugins do exist?</h2>
+<p>Check the <a href="https://github.com/topics/kimmdy"><code>kimmdy</code> github topic</a> to find them all.</p>
 </section>
-<section id="run-the-simulation" class="level2">
-<h2 class="anchored" data-anchor-id="run-the-simulation">Run the Simulation</h2>
-<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kimmdy</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>You can also run kimmdy directly from python with</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> kimmdy.cmd <span class="im">import</span> kimmdy_run</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>kimmdy_run()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Tip
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>KIMMDY parses your topology to generate its internal representation and writes out a new topology to be used in future steps. This topology includes everything gromacs needs to run the simulation, including forcefield parameters. KIMMDY combines all moleculetypes that are meant to take part in reactions into one moleculetype named “Reactive”. It also makes multiples explicit (e.g.&nbsp;10 molecules of a peptide), such that each reactive atom has a unique representation. You can always find this topology in the output directory for the kimmdy setup task, e.g.&nbsp;<code>alanine_hat_000/0_setup/&lt;name-of-your-top.top</code>. By default, everything that is not a solvent or ion is considered reactive. To exclude or include certain moleculetypes from this (e.g.&nbsp;in a lipid bilayer simulation), check out the <code>topology.reactive</code> options in the <a href="../../guide/references/input.html">input file documentation</a>. You can find another example of merging topologies in <a href="../../guide/explanation/topology.html">the topology explanation</a>.</p>
-</div>
-</div>
-</section>
-<section id="analyse-the-simulation" class="level2">
-<h2 class="anchored" data-anchor-id="analyse-the-simulation">Analyse the Simulation</h2>
-<p>Concatenate the trajectories from the individual steps into one for viewing:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kimmdy-analysis</span> trjcat alanine_hat_000 <span class="at">--open-vmd</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Check the energy of the system:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kimmdy-analysis</span> energy alanine_hat_000 <span class="at">--open-plot</span> <span class="at">--terms</span> Potential Kinetic</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="./img/getting-started-energy.png" class="img-fluid figure-img"></p>
-<figcaption>Energy plot</figcaption>
-</figure>
-</div>
-<p>Visualize where the radicals end up:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kimmdy-analysis</span> radical_population alanine_hat_000 <span class="at">--open-plot</span> <span class="at">--open-vmd</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>In VMD, color the atoms by beta factor to show the radical occupancy.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="./img/getting-started-vmd-radicals.png" class="img-fluid figure-img"></p>
-<figcaption>VMD representation settings</figcaption>
-</figure>
-</div>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="./img/getting-started-radicals.png" class="img-fluid figure-img"></p>
-<figcaption>Radical population plot</figcaption>
-</figure>
-</div>
-<p>Plot the reaction rates:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kimmdy-analysis</span> rates alanine_hat_000</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>In the <code>alanine_hat_000/analysis</code> directory you will then find a plot of rates for each possible reaction at every step they were queried, e.g.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="./img/getting-started-rates.svg" class="img-fluid figure-img"></p>
-<figcaption>Reaction rates plot</figcaption>
-</figure>
-</div>
-<p>Or do all of the above directly from python:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> kimmdy.analysis <span class="im">import</span> concat_trj, plot_energy, radical_population, plot_rates</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>concat_trj(<span class="st">'alanine_hat_000'</span>, open_vmd<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>plot_energy(<span class="st">'alanine_hat_000'</span>, terms<span class="op">=</span>[<span class="st">'Potential'</span>, <span class="st">'Kinetic'</span>], open_plot<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>radical_population(<span class="st">'alanine_hat_000'</span>, open_plot<span class="op">=</span><span class="va">True</span>, open_vmd<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>plot_rates(<span class="st">'alanine_hat_000'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Congratulations, you have successfully run your first KIMMDY simulation!</p>
-</section>
-<section id="next-steps" class="level2">
-<h2 class="anchored" data-anchor-id="next-steps">Next steps</h2>
-<ul>
-<li><a href="../../guide/references/input.html">Learn more about the <code>kimmdy.yml</code> input file</a></li>
-<li><a href="../../guide/tutorials/colbuilder.html">Run KIMMDY with a collagen fibril from Colbuilder</a></li>
-<li><a href="../../guide/tutorials/write-plugin.html">Write your own reaction plugin</a></li>
-<li><a href="https://github.com/topics/kimmdy">Discover more plugins by looking for the <code>kimmdy</code> tag on GitHub</a></li>
-</ul>
+<section id="uv-related-issues" class="level2">
+<h2 class="anchored" data-anchor-id="uv-related-issues">uv related issues</h2>
+<p>For the tool installation, try uninstalling and re-installing.</p>
+<p>For the dev installation, here are the most useful commands you might need:</p>
+<p>Update dependencies to <code>pyproject.toml</code> content, run from kimmdy directory:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> sync <span class="at">--extra</span> all</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Use a known set of dependency versions from <code>uv.lock</code>: (For downgrading pull an older <code>uv.lock</code> from github)</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run <span class="at">--frozen</span> kimmdy</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 
 </section>
@@ -1314,13 +1159,13 @@ Tip
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../../guide/tutorials/colbuilder.html" class="pagination-link" aria-label="Run KIMMDY from Colbuilder fibril">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Run KIMMDY from Colbuilder fibril</span>
+      <a href="../../guide/how-to/examples.html" class="pagination-link" aria-label="Examples">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Examples</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../../guide/tutorials/modify-topology.html" class="pagination-link" aria-label="Modify a Topology">
-        <span class="nav-page-text">Modify a Topology</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../../guide/how-to/hcp.html" class="pagination-link" aria-label="High Performance Computing">
+        <span class="nav-page-text">High Performance Computing</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
@@ -1329,4 +1174,4 @@ Tip
 
 
 
-<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/graeter-group/kimmdy/edit/main/guide/tutorials/getting-started.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/graeter-group/kimmdy/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/graeter-group/kimmdy/edit/main/guide/how-to/faq.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/graeter-group/kimmdy/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>

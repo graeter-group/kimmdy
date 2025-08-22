@@ -431,6 +431,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../guide/how-to/faq.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Common Issues</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../guide/how-to/hcp.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">High Performance Computing</span></a>
   </div>
@@ -811,37 +817,37 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td>dir</td>
-<td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
+<td><a href="https://docs.python.org/3.11/library/stdtypes.html#str">str</a></td>
 <td>Directory to search for subdirectories</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
 <td>steps</td>
-<td><a href="https://docs.python.org/3.10/library/typing.html#typing.Union">Union</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#list">list</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>], <a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>]</td>
+<td><a href="https://docs.python.org/3.11/library/typing.html#typing.Union">Union</a>[<a href="https://docs.python.org/3.11/library/stdtypes.html#list">list</a>[<a href="https://docs.python.org/3.11/library/stdtypes.html#str">str</a>], <a href="https://docs.python.org/3.11/library/stdtypes.html#str">str</a>]</td>
 <td>List of steps e.g.&nbsp;[“equilibrium”, “production”]. Or a string “all” to return all subdirectories</td>
 <td><em>required</em></td>
 </tr>
 <tr class="odd">
 <td>open_vmd</td>
-<td><a href="https://docs.python.org/3.10/library/functions.html#bool">bool</a></td>
+<td><a href="https://docs.python.org/3.11/library/functions.html#bool">bool</a></td>
 <td>Open concatenated trajectory in VMD</td>
 <td><code>False</code></td>
 </tr>
 <tr class="even">
 <td>output_group</td>
-<td><a href="https://docs.python.org/3.10/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>]</td>
+<td><a href="https://docs.python.org/3.11/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3.11/library/stdtypes.html#str">str</a>]</td>
 <td>index group for output. Default is “Protein” for xtc and “System” for trr.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="odd">
 <td>output_group</td>
-<td><a href="https://docs.python.org/3.10/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>]</td>
+<td><a href="https://docs.python.org/3.11/library/typing.html#typing.Optional">Optional</a>[<a href="https://docs.python.org/3.11/library/stdtypes.html#str">str</a>]</td>
 <td>index group for centering.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="even">
 <td>use_last_names</td>
-<td><a href="https://docs.python.org/3.10/library/functions.html#bool">bool</a></td>
+<td><a href="https://docs.python.org/3.11/library/functions.html#bool">bool</a></td>
 <td>Use the tpr/topology of the last trajectory for the output, default is the first. This influences the names and types of the atoms in the output, which can be useful for VMD.</td>
 <td><code>False</code></td>
 </tr>
@@ -897,7 +903,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td>dir</td>
-<td><a href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path">Path</a></td>
+<td><a href="https://docs.python.org/3.11/library/pathlib.html#pathlib.Path">Path</a></td>
 <td>Directory of KIMMDY run</td>
 <td><em>required</em></td>
 </tr>
@@ -942,31 +948,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td>dir</td>
-<td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
+<td><a href="https://docs.python.org/3.11/library/stdtypes.html#str">str</a></td>
 <td>Directory to search for subdirectories</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
 <td>steps</td>
-<td><a href="https://docs.python.org/3.10/library/typing.html#typing.Union">Union</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#list">list</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>], <a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>]</td>
+<td><a href="https://docs.python.org/3.11/library/typing.html#typing.Union">Union</a>[<a href="https://docs.python.org/3.11/library/stdtypes.html#list">list</a>[<a href="https://docs.python.org/3.11/library/stdtypes.html#str">str</a>], <a href="https://docs.python.org/3.11/library/stdtypes.html#str">str</a>]</td>
 <td>List of steps e.g.&nbsp;[“equilibrium”, “production”]. Or a string “all” to return all subdirectories. Default is “all”.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="odd">
 <td>terms</td>
-<td><a href="https://docs.python.org/3.10/library/stdtypes.html#list">list</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>]</td>
+<td><a href="https://docs.python.org/3.11/library/stdtypes.html#list">list</a>[<a href="https://docs.python.org/3.11/library/stdtypes.html#str">str</a>]</td>
 <td>Terms from gmx energy that will be plotted. Uses ‘Potential’ by default.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
 <td>open_plot</td>
-<td><a href="https://docs.python.org/3.10/library/functions.html#bool">bool</a></td>
+<td><a href="https://docs.python.org/3.11/library/functions.html#bool">bool</a></td>
 <td>Open plot in default system viewer.</td>
 <td><code>False</code></td>
 </tr>
 <tr class="odd">
 <td>truncate</td>
-<td><a href="https://docs.python.org/3.10/library/functions.html#bool">bool</a></td>
+<td><a href="https://docs.python.org/3.11/library/functions.html#bool">bool</a></td>
 <td>Truncate energy files to the reaction time marker.</td>
 <td><code>True</code></td>
 </tr>
@@ -992,13 +998,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td>dir</td>
-<td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
+<td><a href="https://docs.python.org/3.11/library/stdtypes.html#str">str</a></td>
 <td>Directory of KIMMDY run</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
 <td>open</td>
-<td><a href="https://docs.python.org/3.10/library/functions.html#bool">bool</a></td>
+<td><a href="https://docs.python.org/3.11/library/functions.html#bool">bool</a></td>
 <td>open plots in default system viewer</td>
 <td><code>False</code></td>
 </tr>
@@ -1024,19 +1030,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td>dirs</td>
-<td><a href="https://docs.python.org/3.10/library/stdtypes.html#list">list</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>]</td>
+<td><a href="https://docs.python.org/3.11/library/stdtypes.html#list">list</a>[<a href="https://docs.python.org/3.11/library/stdtypes.html#str">str</a>]</td>
 <td>KIMMDY run directories to be analysed.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
 <td>type</td>
-<td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
+<td><a href="https://docs.python.org/3.11/library/stdtypes.html#str">str</a></td>
 <td>How to analyse radical migration. Available are ‘qualitative’,‘occurence’ and ‘min_rate’“,</td>
 <td><code>'qualitative'</code></td>
 </tr>
 <tr class="odd">
 <td>cutoff</td>
-<td><a href="https://docs.python.org/3.10/library/functions.html#int">int</a></td>
+<td><a href="https://docs.python.org/3.11/library/functions.html#int">int</a></td>
 <td>Ignore migration between two atoms if it happened less often than the specified value.</td>
 <td><code>1</code></td>
 </tr>
@@ -1069,37 +1075,37 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td>dir</td>
-<td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
+<td><a href="https://docs.python.org/3.11/library/stdtypes.html#str">str</a></td>
 <td>KIMMDY run directory to be analysed.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
 <td>population_type</td>
-<td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
+<td><a href="https://docs.python.org/3.11/library/stdtypes.html#str">str</a></td>
 <td>How to calculate the fractional radical occupancy. Available are ‘frequency’ and ‘time’</td>
 <td><code>'frequency'</code></td>
 </tr>
 <tr class="odd">
 <td>steps</td>
-<td><a href="https://docs.python.org/3.10/library/typing.html#typing.Union">Union</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#list">list</a>[<a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>], <a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a>]</td>
+<td><a href="https://docs.python.org/3.11/library/typing.html#typing.Union">Union</a>[<a href="https://docs.python.org/3.11/library/stdtypes.html#list">list</a>[<a href="https://docs.python.org/3.11/library/stdtypes.html#str">str</a>], <a href="https://docs.python.org/3.11/library/stdtypes.html#str">str</a>]</td>
 <td>List of steps e.g.&nbsp;[“equilibrium”, “production”]. Or a string “all” to return all subdirectories. Default is “all”.</td>
 <td><code>'all'</code></td>
 </tr>
 <tr class="even">
 <td>select_atoms</td>
-<td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
+<td><a href="https://docs.python.org/3.11/library/stdtypes.html#str">str</a></td>
 <td>Atoms chosen for radical population analysis, default is protein (uses MDAnalysis selection syntax)</td>
 <td><code>'protein'</code></td>
 </tr>
 <tr class="odd">
 <td>open_plot</td>
-<td><a href="https://docs.python.org/3.10/library/functions.html#bool">bool</a></td>
+<td><a href="https://docs.python.org/3.11/library/functions.html#bool">bool</a></td>
 <td>Open plot in default system viewer.</td>
 <td><code>False</code></td>
 </tr>
 <tr class="even">
 <td>open_vmd</td>
-<td><a href="https://docs.python.org/3.10/library/functions.html#bool">bool</a></td>
+<td><a href="https://docs.python.org/3.11/library/functions.html#bool">bool</a></td>
 <td>Open a pdb in VMD with the radical occupation as B-factors.</td>
 <td><code>False</code></td>
 </tr>
@@ -1125,13 +1131,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td>dir</td>
-<td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
+<td><a href="https://docs.python.org/3.11/library/stdtypes.html#str">str</a></td>
 <td>Directory of KIMMDY run</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
 <td>open_plot</td>
-<td><a href="https://docs.python.org/3.10/library/functions.html#bool">bool</a></td>
+<td><a href="https://docs.python.org/3.11/library/functions.html#bool">bool</a></td>
 <td>Open plot in default system viewer.</td>
 <td><code>False</code></td>
 </tr>
@@ -1157,13 +1163,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td>dir</td>
-<td><a href="https://docs.python.org/3.10/library/stdtypes.html#str">str</a></td>
+<td><a href="https://docs.python.org/3.11/library/stdtypes.html#str">str</a></td>
 <td>Directory of KIMMDY run</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
 <td>open_plot</td>
-<td><a href="https://docs.python.org/3.10/library/functions.html#bool">bool</a></td>
+<td><a href="https://docs.python.org/3.11/library/functions.html#bool">bool</a></td>
 <td>Open plot in default system viewer.</td>
 <td><code>False</code></td>
 </tr>
