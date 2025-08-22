@@ -47,7 +47,7 @@ def resolve_includes(
     ffdir:
         Path to the ff directory if one of the includes used a file from it.
     """
-    path = path.resolve()
+    path = path.absolute()
     dir = path.parent
     cwd = Path.cwd()
     if not dir.exists() or not path.exists():
@@ -71,7 +71,7 @@ def resolve_includes(
                     # test if the path is in the cwd, otherwise search in gmx ff dir
                     if not ffdir.exists() and gmx_builtin_ffs is not None:
                         ffdir = gmx_builtin_ffs / ffdir
-                    ffdir = ffdir.resolve()
+                    ffdir = ffdir.absolute()
                 ls_prime, _ = resolve_includes(include_path, gmx_builtin_ffs)
                 if not ls_prime and gmx_builtin_ffs is not None:
                     ls_prime, _ = resolve_includes(
