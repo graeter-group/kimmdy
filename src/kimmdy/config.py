@@ -332,7 +332,7 @@ class Config:
                 out_end = name[-1]
                 if out_end.isdigit():
                     self.out = self.out.with_name(
-                        f"{'_'.join(name[:-1])}_{int(out_end)+1:03}"
+                        f"{'_'.join(name[:-1])}_{int(out_end) + 1:03}"
                     )
                 else:
                     self.out = self.out.with_name(self.out.name + "_001")
@@ -472,7 +472,7 @@ class Config:
                     and not path.is_absolute()
                 ):
                     path = cwd / path
-                path = path.resolve()
+                path = path.absolute()
                 self.__setattr__(name, path)
                 if (
                     not path.is_dir()
