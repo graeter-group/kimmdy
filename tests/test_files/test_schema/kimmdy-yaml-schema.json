@@ -1,0 +1,515 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "title": "kimmdy config",
+  "$id": "https://raw.githubusercontent.com/graeter-group/kimmdy/main/src/kimmdy/kimmdy-yaml-schema.json",
+  "additionalProperties": false,
+  "required": [
+    "sequence",
+    "changer"
+  ],
+  "properties": {
+    "slurm": {
+      "title": "slurm",
+      "type": "object",
+      "description": "SLURM HPC options",
+      "properties": {
+        "N": {
+          "type": "integer",
+          "description": "Number of nodes",
+          "pytype": "int",
+          "default": 1
+        },
+        "ntasks_per_node": {
+          "type": "integer",
+          "description": "n tasks per node",
+          "pytype": "int",
+          "default": 20
+        },
+        "mincpus": {
+          "type": "integer",
+          "description": "mincpus",
+          "pytype": "int",
+          "default": 20
+        },
+        "cpus_per_task": {
+          "type": "integer",
+          "description": "cpus per task",
+          "pytype": "int",
+          "default": 1
+        },
+        "gpus": {
+          "type": "integer",
+          "description": "n gpus",
+          "pytype": "int",
+          "default": 1
+        },
+        "runcmd": {
+          "type": "string",
+          "description": "Command to (re)submit the jobscript. Default is `sbatch`. For local testing replace with an empty string do run the jobscript directly.",
+          "pytype": "str",
+          "default": "sbatch"
+        },
+        "partition": {
+          "type": "string",
+          "description": "HPC partition",
+          "pytype": "str",
+          "default": "<your-partition>"
+        }
+      },
+      "additionalProperties": false
+    },
+    "dryrun": {
+      "title": "dryrun",
+      "description": "Don't run the actual simulations, just print the tasks",
+      "type": "boolean",
+      "pytype": "bool",
+      "default": false
+    },
+    "just_sample": {
+      "title": "just sample",
+      "description": "Don't execute the recipes returned by the chosen reaction, just get the rates (and choose one). KIMMDY will exit after reactions have been queried for the first time in the sequence.",
+      "type": "boolean",
+      "pytype": "bool",
+      "default": false
+    },
+    "parameterize_at_setup": {
+      "title": "parameterize_at_setup",
+      "description": "parameterize the topology during the setup task",
+      "type": "boolean",
+      "pytype": "bool",
+      "default": true
+    },
+    "cwd": {
+      "title": "cwd",
+      "description": "Working directory. Default is current working directory",
+      "type": "string",
+      "pytype": "Path"
+    },
+    "name": {
+      "title": "name",
+      "description": "Used for output folder if `out` is not specified",
+      "type": "string",
+      "pytype": "str",
+      "default": "kimmdy"
+    },
+    "out": {
+      "title": "out",
+      "description": "Output folder",
+      "type": "string",
+      "pytype": "Path"
+    },
+    "log": {
+      "title": "log",
+      "type": "object",
+      "description": "Settings for logging",
+      "additionalProperties": false,
+      "properties": {
+        "file": {
+          "description": "Logfile name (will result in a path relative to `out`)",
+          "type": "string",
+          "pytype": "str",
+          "default": "kimmdy.log"
+        },
+        "level": {
+          "description": "Loglevel",
+          "type": "string",
+          "pytype": "str",
+          "default": "INFO",
+          "enum": [
+            "DEBUG",
+            "INFO",
+            "WARNING",
+            "ERROR",
+            "CRITICAL"
+          ]
+        }
+      }
+    },
+    "max_tasks": {
+      "title": "max_tasks",
+      "description": "Maximum number of tasks to run. This is useful when a task in the sequence can dymanically add more tasks. 0 means no limit.",
+      "type": "integer",
+      "pytype": "int",
+      "default": 0
+    },
+    "max_hours": {
+      "title": "max_hours",
+      "description": "Stop KIMMDY after max_hours hours. Set this lower than the limit of your HPC cluster for use with a re-submit jobscript. 0 Means no limit.",
+      "type": "integer",
+      "pytype": "int",
+      "default": 0
+    },
+    "kmc": {
+      "title": "kmc",
+      "description": "KMC algorithm overwrite. Should be set by the reactions, but can be changed here. Not all reactions may support all algorithms.",
+      "type": "string",
+      "pytype": "str",
+      "enum": [
+        "",
+        "rfkmc",
+        "frm",
+        "extrande",
+        "extrande_mod",
+        "multi_rfkmc",
+        "dummy_first"
+      ],
+      "default": ""
+    },
+    "multi_kmc": {
+      "title": "multi_kmc",
+      "description": "Number of reactions to be executed in one step by a `multi` variant of a KMC algorithm.",
+      "type": "integer",
+      "pytype": "int",
+      "default": 1
+    },
+    "tau_scale": {
+      "title": "tau_scale",
+      "description": "Scaling parameter for tau in the extrande kmc algorithm.",
+      "type": "number",
+      "pytype": "float",
+      "default": "1.0"
+    },
+    "top": {
+      "title": "top",
+      "description": "Topology file",
+      "type": "string",
+      "pytype": "Path",
+      "default": "topol.top"
+    },
+    "topology": {
+      "title": "topology",
+      "type": "object",
+      "description": "Settings for handling the topology file.",
+      "properties": {
+        "reactive": {
+          "title": "reactive",
+          "type": "object",
+          "description": "Specify what moleculetypes will be part of the Reactive moleculetype. By default, solvent and ions are excluded.",
+          "properties": {
+            "include": {
+              "description": "Explicitly include a moleculetype or list of moleculetypes as a space-separated string.",
+              "type": "string",
+              "pytype": "str",
+              "default": ""
+            },
+            "exclude": {
+              "description": "Explicitly exclude a moleculetype or a list as a space-separated string. For example the lipid moleculetype in a bilayer simulation e.g. `DPPC POPC'`",
+              "type": "string",
+              "pytype": "str",
+              "default": ""
+            },
+            "nrexcl": {
+              "description": "Explictly set the nrexcl value for the Reactive moleculetype. By default the value is taken from the first found reactive moleculetype.",
+              "type": "integer",
+              "pytype": "int"
+            }
+          }
+        }
+      }
+    },
+    "gro": {
+      "title": "gro",
+      "description": "Coordinate file",
+      "type": "string",
+      "pytype": "Path",
+      "default": "conf.gro"
+    },
+    "ndx": {
+      "title": "ndx",
+      "description": "Gromaxs index file",
+      "type": "string",
+      "pytype": "Path",
+      "default": "index.ndx"
+    },
+    "edissoc": {
+      "title": "edissoc",
+      "description": "File with additional dissociation energy terms. This is used for the homolysis and hydrolysis reactions.",
+      "type": "string",
+      "pytype": "Path",
+      "default": "edissoc.dat"
+    },
+    "grompp_prefix": {
+      "title": "grompp_prefix",
+      "description": "Prefix command for grompp execution on non MPI compiled clusters, e.g., 'srun --ntasks=1'.",
+      "type": "string",
+      "pytype": "str",
+      "default": ""
+    },
+    "gromacs_alias": {
+      "title": "gromacs_alias",
+      "description": "Gromacs alias. e.g. `gmx` or `mpirun gmx_mpi`",
+      "type": "string",
+      "pytype": "str",
+      "default": "gmx"
+    },
+    "mdrun_prefix": {
+      "title": "mdrun_prefix",
+      "description": "Prefix command for mdrun execution on non MPI compiled clusters, e.g., 'srun --ntasks=1'.",
+      "type": "string",
+      "pytype": "str",
+      "default": ""
+    },
+    "gmx_mdrun_flags": {
+      "title": "gmx_mdrun_flags",
+      "description": "Flags passed to gmx mdrun. Default `-maxh 24 -dlb yes`",
+      "type": "string",
+      "pytype": "str",
+      "default": "-maxh 24 -dlb yes"
+    },
+    "ff": {
+      "title": "ff",
+      "description": "Force field directory (looks for .ff in cwd if not set)",
+      "type": "string",
+      "pytype": "Path",
+      "default": "*.ff"
+    },
+    "residuetypes": {
+      "title": "residuetypes",
+      "description": "GROMACS rtp file that contains residuetypes. Looks for `aminoacids.rtp` it not set. KIMMDY will first look in the current working directory and then relative to the forecfield directory.",
+      "type": "string",
+      "pytype": "Path"
+    },
+    "radicals": {
+      "title": "radicals",
+      "description": "space-separated string of radical atom ids, can be empty",
+      "type": "string",
+      "pytype": "str"
+    },
+    "plumed": {
+      "title": "plumed",
+      "description": ".dat file containing plumed config",
+      "type": "string",
+      "pytype": "Path"
+    },
+    "tpr": {
+      "title": "tpr",
+      "description": ".tpr file of a finished simulation for starting directly with a reaction",
+      "type": "string",
+      "pytype": "Path"
+    },
+    "trr": {
+      "title": "trr",
+      "description": ".trr file of a finished simulation for starting directly with a reaction",
+      "type": "string",
+      "pytype": "Path"
+    },
+    "xtc": {
+      "title": "xtc",
+      "description": ".xtc file of a finished simulation for starting directly with a reaction",
+      "type": "string",
+      "pytype": "Path"
+    },
+    "mdp": {
+      "title": "mdp",
+      "description": ".mdp file of a finished simulation for starting directly with a reaction",
+      "type": "string",
+      "pytype": "Path"
+    },
+    "edr": {
+      "title": "edr",
+      "deprecated": true,
+      "description": "This is deprecated and no longer required."
+    },
+    "restart": {
+      "title": "restart",
+      "type": "boolean",
+      "description": "Restart or continue from a previous run (in config.out) instead of starting from scratch",
+      "pytype": "bool",
+      "default": false
+    },
+    "mds": {
+      "title": "mds",
+      "type": "object",
+      "description": "Settings for MD steps, e.g. mdp files, plumed files, etc.",
+      "patternProperties": {
+        ".*": {
+          "type": "object",
+          "description": "Name of an MD step",
+          "properties": {
+            "mdp": {
+              "type": "string",
+              "pytype": "Path",
+              "description": "MDP file for the MD step"
+            },
+            "use_plumed": {
+              "type": "boolean",
+              "pytype": "bool",
+              "default": false,
+              "description": "Whether plumed should be used for this run or not"
+            }
+          },
+          "required": [
+            "mdp"
+          ],
+          "additionalProperties": false
+        }
+      }
+    },
+    "changer": {
+      "title": "changer",
+      "type": "object",
+      "description": "Settings for applying a reaction recipe",
+      "properties": {
+        "coordinates": {
+          "title": "coordinates",
+          "type": "object",
+          "description": "Settings related to coordinate/geometry changes when applying a recipe",
+          "properties": {
+            "md": {
+              "type": "string",
+              "description": "MD step from the 'mds' section that is used for relaxation MDs",
+              "pytype": "str"
+            },
+            "slow_growth_pairs": {
+              "deprecated": true,
+              "description": "This is deprecated. Specify in `config.changer.coordinates.slow_growth` instead."
+            },
+            "slow_growth": {
+              "type": "string",
+              "description": "Whether the chosen MD step is a slow growth/free-energy simulation to relax after applying a reaction recipe. `true` and `yes` are equivalent to `full` for backwards compatibility. `morse_only` disables using pairs to transition non-bonded interactions as well and only uses morse bonds to emulate simple non-bonded interactions. The empty string means no slow growth.",
+              "pytype": "str",
+              "enum": [
+                "yes",
+                "true",
+                "full",
+                "morse_only",
+                ""
+              ],
+              "default": ""
+            }
+          }
+        },
+        "topology": {
+          "title": "topology",
+          "type": "object",
+          "description": "Settings for parameter changes in the topology file",
+          "properties": {
+            "break_plumed": {
+              "type": "boolean",
+              "description": "Whether to remove bonds from the plumed.dat input file when applying a reaction recipe that breaks a bond. Unless needed for performance optimization, this can be left at `false`, because the homolysis plugin in kimmdy-reactions also cheeckts to not break non-existing bonds by default (which can be turned off).",
+              "pytype": "bool",
+              "default": false
+            },
+            "parameterization": {
+              "type": "string",
+              "description": "Parameterization scheme that is used on the topology file after changes to it",
+              "pytype": "str",
+              "enum": [
+                "grappa",
+                "basic"
+              ],
+              "default": "basic"
+            },
+            "parameterization_kwargs": {
+              "type": "object",
+              "description": "Keyword argument container for the selected parameterization scheme",
+              "additionalProperties": true
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "coordinates",
+        "topology"
+      ]
+    },
+    "sequence": {
+      "title": "sequence",
+      "description": "List of tasks. Each task can be a string (the name of the task) or an object with the task name and a multiplicity `mult: <int>`",
+      "pytype": "Sequence",
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "mult": {
+                "type": "integer",
+                "description": "Multiplicity of the task",
+                "default": 2,
+                "minimum": 1
+              },
+              "tasks": {
+                "type": "array",
+                "description": "List of tasks",
+                "items": {
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "mult": {
+                          "type": "integer",
+                          "description": "Multiplicity of the task",
+                          "default": 2,
+                          "minimum": 1
+                        },
+                        "tasks": {
+                          "type": "array",
+                          "description": "List of tasks",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "required": [
+                        "mult",
+                        "tasks"
+                      ],
+                      "additionalProperties": false
+                    }
+                  ]
+                }
+              }
+            },
+            "required": [
+              "mult",
+              "tasks"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      }
+    },
+    "reactions": {
+      "title": "reactions",
+      "type": "object",
+      "description": "Settings for reactions",
+      "additionalProperties": true,
+      "properties": {
+        "homolysis": {
+          "$ref": "https://raw.githubusercontent.com/graeter-group/kimmdy-reactions/main/src/homolysis/kimmdy-yaml-schema.json"
+        },
+        "hat_naive": {
+          "$ref": "https://raw.githubusercontent.com/graeter-group/kimmdy-reactions/main/src/hat_naive/kimmdy-yaml-schema.json"
+        },
+        "dummyreaction": {
+          "$ref": "https://raw.githubusercontent.com/graeter-group/kimmdy-reactions/main/src/dummyreaction/kimmdy-yaml-schema.json"
+        },
+        "hydrolysis": {
+          "$ref": "https://raw.githubusercontent.com/graeter-group/kimmdy-hydrolysis/refs/heads/main/src/kimmdy_hydrolysis/kimmdy-yaml-schema.json"
+        },
+        "dimerization": {
+          "$ref": "https://raw.githubusercontent.com/graeter-group/kimmdy-dimerization/refs/heads/main/src/kimmdy_dimerization/kimmdy-yaml-schema.json"
+        },
+        "hat_reaction": {
+          "$ref": "https://raw.githubusercontent.com/graeter-group/kimmdy-hat/refs/heads/main/src/kimmdy_hat/kimmdy-yaml-schema.json"
+        }
+      }
+    },
+    "save_recipes": {
+      "title": "save_recipes",
+      "description": "Save recipes as csv during the reactions step",
+      "type": "boolean",
+      "pytype": "bool",
+      "default": true
+    }
+  }
+}
