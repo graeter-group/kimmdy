@@ -41,6 +41,40 @@ def test_bo_initialization_strings(id_1, id_2):
     assert m.atom_ix_2 == int(id_2) - 1
 
 
+@given(
+    id_1=st.integers(min_value=1, max_value=1001).map(str),
+    id_2=st.integers(min_value=1, max_value=1001).map(str),
+)
+def test_bo_setter_strings(id_1, id_2):
+    # Initialize with random strings
+    m = recipe.BondOperation(atom_id_1="1", atom_id_2="2")
+    m.atom_id_1 = id_1
+    m.atom_id_2 = id_2
+
+    # Check that properties match input
+    assert m.atom_id_1 == id_1
+    assert m.atom_id_2 == id_2
+    assert m.atom_ix_1 == int(id_1) - 1
+    assert m.atom_ix_2 == int(id_2) - 1
+
+
+@given(
+    ix_1=st.integers(min_value=0, max_value=1000),
+    ix_2=st.integers(min_value=0, max_value=1000),
+)
+def test_bo_setter_integers(ix_1, ix_2):
+    # Initialize with random strings
+    m = recipe.BondOperation(atom_id_1="1", atom_id_2="2")
+    m.atom_ix_1 = ix_1
+    m.atom_ix_2 = ix_2
+
+    # Check that properties match input
+    assert m.atom_ix_1 == ix_1
+    assert m.atom_ix_2 == ix_2
+    assert m.atom_id_1 == str(ix_1 + 1)
+    assert m.atom_id_2 == str(ix_2 + 1)
+
+
 def test_bo_initialization_mixed():
     # Initialize with a mix of integers and strings
     m1 = recipe.BondOperation(atom_ix_1=5, atom_id_2="4")
@@ -134,6 +168,16 @@ def test_place_initialization():
         recipe.Place(id_to_place=1, new_coords=(0, 0, 0))  # type: ignore
 
 
+def test_place_setter():
+    m1 = recipe.Place(ix_to_place=2, new_coords=(0, 0, 0))
+    m2 = recipe.Place(ix_to_place=1, new_coords=(0, 0, 0))
+    m3 = recipe.Place(ix_to_place=1, new_coords=(0, 0, 0))
+    m2.ix_to_place = 2
+    m3.id_to_place = "3"
+    assert m2 == m1
+    assert m3 == m1
+
+
 def test_relax_initialization():
     recipe.Relax()
 
@@ -215,6 +259,13 @@ def test_aggregate_recipe_collection(recipe_collection: recipe.RecipeCollection)
         (1.0, 2.0),
     ]
     assert recipe_collection.recipes[2].timespans == [(2.0, 3.0), (4.0, 5.0)]
+
+
+def test_calc_ratesum(recipe_collection: recipe.RecipeCollection):
+    boarders, rate_windows, recipe_windows = recipe_collection.calc_ratesum()
+    assert len(rate_windows) + 1 == len(boarders)
+    assert all([len(ra) == len(re) for ra, re in zip(rate_windows, recipe_windows)])
+    assert boarders == [0.0, 1.0, 2.0, 3.0, 4.0, 5.0]
 
 
 def test_recipe_collection_from_csv(
@@ -313,3 +364,10 @@ def test_recipe_collection_to_csv_picked(
             if org_val == "None":
                 org_val = ""
             assert org_val == read_rp[key], f"{org_rp_d[key]} != {read_rp[key]}"
+
+
+def test_plot(tmp_path, recipe_collection: recipe.RecipeCollection):
+    recipe_collection.plot(tmp_path / "plot.png")
+    recipe_collection.plot(tmp_path / "plot.svg")
+    assert (tmp_path / "plot.png").exists()
+    assert (tmp_path / "plot.svg").exists()
