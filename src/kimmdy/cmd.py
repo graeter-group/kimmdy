@@ -86,7 +86,7 @@ def get_cmdline_args() -> argparse.Namespace:
     parser.add_argument(
         "--version",
         action="version",
-        version=f'KIMMDY {version("kimmdy")}',
+        version=f"KIMMDY {version('kimmdy')}",
         help=("Show version and exit."),
     )
 
@@ -177,7 +177,10 @@ def _run(args: argparse.Namespace):
             path = f"jobscript-{config.out.name}.sh"
             logger.info(f"Generating jobscript {path}")
             if config.max_hours == 0:
-                m = f"kimmdy.config.max_hours is set to 0, which would create a non-sensical jobscript."
+                m = (
+                    "kimmdy.config.max_hours is set to 0, "
+                    "which would create a non-sensical jobscript."
+                )
                 logger.error(m)
                 raise ValueError(m)
             content = jobscript.format(config=config).strip("\n")
@@ -198,7 +201,8 @@ def _run(args: argparse.Namespace):
                 from pycallgraph2.output import GraphvizOutput
             except ImportError as e:
                 logger.error(
-                    "pycallgraph2 needed for call visualization. Get it with `pip install pycallgraph2`"
+                    "pycallgraph2 needed for call visualization. "
+                    "Getit with `pip install pycallgraph2`"
                 )
                 exit()
 
