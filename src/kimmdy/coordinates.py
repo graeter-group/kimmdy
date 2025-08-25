@@ -231,8 +231,6 @@ class MoleculeTypeMerger:
                 self.mol_a.pairs.pop(key, None)
                 self.mol_a.exclusions[key] = Exclusion(*key)
 
-        self.amber_fix()
-
         logger.info(f"Finished merging topologies")
 
     def _get_explicit_MultipleDihedrals(
@@ -1104,21 +1102,6 @@ class MoleculeTypeMerger:
 
             # add general exclusions for each pair
             self.mol_a.exclusions[key] = Exclusion(*key)
-
-    def amber_fix(self):
-        """Amber fix for breaking/binding atom types without LJ potential"""
-        bonds = (
-            self.affected_interactions.bonds.added
-            | self.affected_interactions.bonds.removed
-        )
-        atoms = set([atom for bond in bonds for atom in bond])
-        atoms = atoms | self.affected_interactions.atoms
-        for nr in atoms:
-            atom = self.mol_a.atoms[nr]
-            if atom.type in ["HW", "HO"]:
-                atom.type = "H1"
-            if atom.typeB in ["HW", "HO"]:
-                atom.typeB = "H1"
 
 
 def merge_top_slow_growth(
