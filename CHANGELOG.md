@@ -1,6 +1,26 @@
 # Changelog
 
 
+## [8.3.0](https://github.com/graeter-group/kimmdy/compare/v8.2.1...v8.3.0) (2025-08-25)
+
+
+### Features
+
+* ref plugin schemas in main config schema ([#573](https://github.com/graeter-group/kimmdy/issues/573)) ([1f261f7](https://github.com/graeter-group/kimmdy/commit/1f261f766c28ba92473a3768c96028d6d5c38bc3))
+
+
+### Bug Fixes
+
+* don't resolve symlinks ([#576](https://github.com/graeter-group/kimmdy/issues/576)) ([0058b8a](https://github.com/graeter-group/kimmdy/commit/0058b8a39e19415f80f9366f23dd860e1d0b70b7))
+* remove residual amber fix ([5dc0a90](https://github.com/graeter-group/kimmdy/commit/5dc0a9021151d22414207e13f187921345bc3add))
+
+
+### Documentation
+
+* fix darkmode colors ([6b78e58](https://github.com/graeter-group/kimmdy/commit/6b78e5853427494b508bf6da88bf12654ce99817))
+* install plugins during ci docs build ([#572](https://github.com/graeter-group/kimmdy/issues/572)) ([f2edd9e](https://github.com/graeter-group/kimmdy/commit/f2edd9e8db9407b2d852880414fd53c7415c190f))
+* installation and contributing ([#574](https://github.com/graeter-group/kimmdy/issues/574)) ([e986279](https://github.com/graeter-group/kimmdy/commit/e986279ea03a2cf6637673f92f44df4c8b481b86))
+
 ## [8.2.1](https://github.com/graeter-group/kimmdy/compare/v8.2.0...v8.2.1) (2025-08-12)
 
 
