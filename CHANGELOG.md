@@ -1,6 +1,13 @@
 # Changelog
 
 
+## [8.3.1](https://github.com/graeter-group/kimmdy/compare/v8.3.0...v8.3.1) (2025-09-04)
+
+
+### Bug Fixes
+
+* catch error in case of time windows with length 0 ([#579](https://github.com/graeter-group/kimmdy/issues/579)) ([7cfbcf1](https://github.com/graeter-group/kimmdy/commit/7cfbcf1c1813f90f8c491ae3ffcbc85cfd8e645c))
+
 ## [8.3.0](https://github.com/graeter-group/kimmdy/compare/v8.2.1...v8.3.0) (2025-08-25)
 
 
