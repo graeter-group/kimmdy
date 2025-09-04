@@ -1507,7 +1507,7 @@ wheels = [
 
 [[package]]
 name = "kimmdy"
-version = "8.2.1"
+version = "8.3.0"
 source = { editable = "." }
 dependencies = [
     { name = "importlib-metadata" },
@@ -1656,11 +1656,20 @@ dev = [
 
 [[package]]
 name = "kimmdy-dimerization"
-version = "0.1"
+version = "0.2.0"
 source = { editable = "plugins/kimmdy-dimerization" }
 dependencies = [
     { name = "kimmdy" },
     { name = "mdanalysis" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "black" },
+    { name = "pytest" },
+    { name = "pytest-cov" },
+    { name = "tox" },
+    { name = "tox-uv" },
 ]
 
 [package.metadata]
@@ -1669,9 +1678,18 @@ requires-dist = [
     { name = "mdanalysis" },
 ]
 
+[package.metadata.requires-dev]
+dev = [
+    { name = "black" },
+    { name = "pytest" },
+    { name = "pytest-cov" },
+    { name = "tox" },
+    { name = "tox-uv" },
+]
+
 [[package]]
 name = "kimmdy-grappa"
-version = "0.3.2"
+version = "0.4.0"
 source = { editable = "plugins/kimmdy-grappa" }
 dependencies = [
     { name = "kimmdy" },
@@ -1705,7 +1723,7 @@ provides-extras = ["dev"]
 
 [[package]]
 name = "kimmdy-hat"
-version = "0.2.1"
+version = "1.1.0"
 source = { editable = "plugins/kimmdy-hat" }
 dependencies = [
     { name = "ase" },
@@ -1715,6 +1733,14 @@ dependencies = [
     { name = "mdanalysis" },
     { name = "numpy" },
     { name = "tensorflow", extra = ["and-cuda"] },
+]
+
+[package.optional-dependencies]
+grappa = [
+    { name = "grappa-ff" },
+    { name = "kimmdy-grappa" },
+    { name = "torch", version = "2.0.0", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(platform_machine == 'aarch64' and sys_platform == 'linux') or sys_platform == 'darwin'" },
+    { name = "torch", version = "2.0.0+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(platform_machine != 'aarch64' and sys_platform == 'linux') or (sys_platform != 'darwin' and sys_platform != 'linux')" },
 ]
 
 [package.dev-dependencies]
@@ -1731,12 +1757,16 @@ dev = [
 requires-dist = [
     { name = "ase" },
     { name = "certifi", specifier = ">=2025.6.15" },
+    { name = "grappa-ff", marker = "extra == 'grappa'" },
     { name = "kgcnn", specifier = "==2.1.0" },
     { name = "kimmdy", editable = "." },
+    { name = "kimmdy-grappa", marker = "extra == 'grappa'", editable = "plugins/kimmdy-grappa" },
     { name = "mdanalysis", specifier = ">=2.5.0" },
     { name = "numpy", specifier = "<1.24" },
     { name = "tensorflow", extras = ["and-cuda"], specifier = "<2.16" },
+    { name = "torch", marker = "extra == 'grappa'", index = "https://download.pytorch.org/whl/cpu" },
 ]
+provides-extras = ["grappa"]
 
 [package.metadata.requires-dev]
 dev = [
