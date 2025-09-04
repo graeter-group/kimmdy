@@ -314,13 +314,17 @@ def extrande_mod(
     chosen_recipe = None
 
     boarders, rate_windows, recipe_windows = recipe_collection.calc_ratesum()
+    if len(rate_windows) == 0:
+        m = "No reaction with valid timespan possible!"
+        logger.info(m)
+        return KMCReject(m)
 
     rate_sums = [float(sum(l)) for l in rate_windows]
     idx_rate_max = np.argmax(rate_sums)
     expected_tau = np.mean(tau_scale * rng.exponential(1 / max(rate_sums), 50))
     logger.debug(
         f"Max of summed rate of {rate_sums[idx_rate_max]:.2} between t "
-        f"{boarders[idx_rate_max]} - {boarders[idx_rate_max+1]}\n"
+        f"{boarders[idx_rate_max]} - {boarders[idx_rate_max + 1]}\n"
         f"\t\texpected tau: {expected_tau}"
     )
 
@@ -435,7 +439,7 @@ def extrande(
     expected_tau = np.mean(tau_scale * rng.exponential(1 / max(rate_sums), 10))
     logger.debug(
         f"Max of summed rate of {rate_sums[idx_rate_max]:.2} between t "
-        f"{boarders[idx_rate_max]} - {boarders[idx_rate_max+1]}\n"
+        f"{boarders[idx_rate_max]} - {boarders[idx_rate_max + 1]}\n"
         f"\t\texpected tau: {expected_tau}"
     )
 
@@ -494,7 +498,7 @@ def extrande(
         m = f"No reaction was chosen\naccepted: 0, rejected: 1, extra: {n_extra}"
         logger.info(m)
         logger.debug(
-            f"Extrande stats:\n\ta0:\t\t{a0}\n\tb:\t\t{b}\n\tb*u:\t{b*u}"
+            f"Extrande stats:\n\ta0:\t\t{a0}\n\tb:\t\t{b}\n\tb*u:\t{b * u}"
             f"\n\tTau:\t{tau}\n\tl:\t\t{l}\n\tt:\t\t{t}\n\tt_max:\t{t_max}"
         )
         return KMCReject(m)
@@ -504,7 +508,7 @@ def extrande(
         f"accepted: 1, rejected: 0, extra: {n_extra}"
     )
     logger.debug(
-        f"Extrande stats:\n\ta0:\t\t{a0}\n\tb:\t\t{b}\n\tb*u:\t{b*u}"
+        f"Extrande stats:\n\ta0:\t\t{a0}\n\tb:\t\t{b}\n\tb*u:\t{b * u}"
         f"\n\tTau:\t{tau}\n\tl:\t\t{l}\n\tt:\t\t{t}\n\tt_max:\t{t_max}"
     )
     return KMCAccept(
