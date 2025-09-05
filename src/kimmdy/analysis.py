@@ -109,9 +109,9 @@ def concat_traj(
         tprs.extend(d.glob("*.tpr"))
         gros.extend(d.glob("*.gro"))
 
-    assert len(trajectories) > 0, (
-        f"No trajectories found to concatenate in {run_dir} with subdirectory names {steps}"
-    )
+    assert (
+        len(trajectories) > 0
+    ), f"No trajectories found to concatenate in {run_dir} with subdirectory names {steps}"
 
     for i, trj in enumerate(trajectories):
         task_dir = trj.parent
@@ -188,9 +188,9 @@ def plot_energy(
     for d in subdirs_matched:
         new_edrs = d.glob("*.edr")
         edrs.extend([edr for edr in new_edrs if not ".kimmdy_" in edr.name])
-    assert len(edrs) > 0, (
-        f"No GROMACS energy files in {run_dir} with subdirectory names {steps}"
-    )
+    assert (
+        len(edrs) > 0
+    ), f"No GROMACS energy files in {run_dir} with subdirectory names {steps}"
 
     energy = defaultdict(list)
 
@@ -574,9 +574,9 @@ def runtime_analysis(dir: str, open_plot: bool = False):
         e_started, t_started = read_time_marker(marker)
         e_done, t_done = read_time_marker(marker.with_name(MARK_DONE))
 
-        assert sorted(e_started) == sorted(e_done), (
-            f"Not all tasks have finished! Error in {marker.parent.name}"
-        )
+        assert sorted(e_started) == sorted(
+            e_done
+        ), f"Not all tasks have finished! Error in {marker.parent.name}"
 
         for event, time_s in zip(e_started, t_started):
             time_e = t_done[e_done.index(event)]
