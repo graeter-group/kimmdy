@@ -10,6 +10,12 @@ import subprocess as sp
 from pathlib import Path
 from typing import TYPE_CHECKING, Optional, Union
 
+from gmx_top4py.utils import (
+    TopologyAtomAddress,
+    field_or_none,
+    get_gmx_dir,
+)
+
 
 from kimmdy.constants import (
     CONFIG_LOGS,
@@ -19,32 +25,13 @@ from kimmdy.constants import (
 from kimmdy.recipe import RecipeCollection
 
 if TYPE_CHECKING:
-    from kimmdy.parsing import Plumed_dict
     from kimmdy.tasks import TaskFiles
-    from kimmdy.topology.topology import Topology
 
 logger = logging.getLogger(__name__)
-
-TopologyAtomAddress = str
-"""Address to an atom in the topology.
-
-Corresponds to the 1-based id in the topology and coordinates file.
-Note, that gromacs ids in the atomnr column of the gro file
-can overflow due to the fixed width file format.
-The line number - 2 (for the title and the number of atoms) is always
-the correct the atom id.
-"""
 
 
 def flatten_recipe_collections(d: dict[str, RecipeCollection]) -> RecipeCollection:
     return RecipeCollection(recipes=[x for v in d.values() for x in v.recipes])
-
-
-def field_or_none(l: list[str], i) -> Optional[str]:
-    try:
-        return l[i]
-    except IndexError as _:
-        return None
 
 
 class longFormatter(logging.Formatter):
@@ -99,41 +86,6 @@ def check_file_exists(path: Path, option_name: str | None = None):
 
 
 ### GROMACS related functions ###
-def get_gmx_dir(
-    gromacs_alias: str = "gmx", grompp_prefix: Optional[str] = None
-) -> Optional[Path]:
-    """Returns the path to the gromacs installation"""
-
-    # get the stder from calling `gmx` to search for the `Data prefix:`
-    # line which contains the path to the gromacs installation
-
-    # Add prefix if necesarry
-    cmd = [gromacs_alias]
-    if grompp_prefix:
-        cmd.insert(0, grompp_prefix)
-    try:
-        r = sp.run(cmd, check=False, capture_output=True, text=True)
-    except FileNotFoundError:
-        logger.warning("GROMACS not found.")
-        return None
-
-    from_source = False
-    gmx_prefix = None
-    for l in r.stderr.splitlines():
-        if l.startswith("Data prefix:"):
-            gmx_prefix = Path(l.split()[2])
-            if "(source tree)" in l:
-                from_source = True
-            break
-
-    if gmx_prefix is None:
-        logger.warning("GROMACS data directory not found in gromacs message.")
-        return None
-
-    if from_source:
-        return Path(gmx_prefix) / "share"
-    else:
-        return Path(gmx_prefix) / "share" / "gromacs"
 
 
 def check_gmx_version(config):
