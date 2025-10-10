@@ -3,6 +3,7 @@ from __future__ import annotations  # for 3.7 <= Python version < 3.10
 import logging
 from typing import TYPE_CHECKING, Callable, Optional
 
+from gmx_top4py.constants import ION_NAMES, SOLVENT_NAMES
 from gmx_top4py.topology.utils import (
     get_top_section,
     get_moleculetype_header,
@@ -20,12 +21,11 @@ from gmx_top4py.topology.utils import (
     get_residue_by_bonding,
 )
 
-from kimmdy.constants import ION_NAMES, REACTIVE_MOLECULEYPE, SOLVENT_NAMES
-from kimmdy.topology.atomic import AtomId, MoleculeTypeHeader
+from kimmdy.constants import REACTIVE_MOLECULEYPE
 
 if TYPE_CHECKING:
+    from gmx_top4py.topology.atomic import Atom
     from kimmdy.config import Config
-    from kimmdy.topology.atomic import Atom, AtomicType, AtomicTypes
     from kimmdy.topology.topology import Topology
 
 logger = logging.getLogger(__name__)
