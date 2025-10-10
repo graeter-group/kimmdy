@@ -1,3 +1,4 @@
+# Keep unused imports for backwards compatibility
 from gmx_top4py.topology.atomic import (
     MoleculeTypeHeader, 
     Atomic,

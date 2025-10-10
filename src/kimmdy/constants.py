@@ -4,6 +4,7 @@ Constants used throughout KIMMDY
 
 import sys
 
+# Keep unused imports for backwards compatibility
 from gmx_top4py.constants import (
     ATOM_ID_FIELDS,
     FFFUNC,

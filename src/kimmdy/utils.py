@@ -10,6 +10,7 @@ import subprocess as sp
 from pathlib import Path
 from typing import TYPE_CHECKING, Optional, Union
 
+# Keep unused imports for backwards compatibility
 from gmx_top4py.utils import (
     TopologyAtomAddress,
     field_or_none,

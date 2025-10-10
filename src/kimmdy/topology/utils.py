@@ -3,6 +3,7 @@ from __future__ import annotations  # for 3.7 <= Python version < 3.10
 import logging
 from typing import TYPE_CHECKING, Callable, Optional
 
+# Keep unused imports for backwards compatibility
 from gmx_top4py.topology.utils import (
     get_top_section,
     get_moleculetype_header,

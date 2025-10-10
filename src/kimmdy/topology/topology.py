@@ -74,7 +74,7 @@ class Topology(BasicTopology):
         residuetypes_path: Optional[Path] = None,
         reactive_nrexcl: Optional[str] = None,
     ):  
-        self.selected_moleculetype = REACTIVE_MOLECULEYPE # In kimmdy the slected_moleculetype is always the REACTIVE_MOLECULEYPE.
+        self.selected_moleculetype = REACTIVE_MOLECULEYPE # In kimmdy: selected_moleculetype = REACTIVE_MOLECULEYPE = "reactive".
         super().__init__(top, 
                         parametrizer=parametrizer, 
                         is_selected_moleculetype_f=is_reactive_predicate_f,
