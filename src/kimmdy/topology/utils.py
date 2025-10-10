@@ -3,13 +3,11 @@ from __future__ import annotations  # for 3.7 <= Python version < 3.10
 import logging
 from typing import TYPE_CHECKING, Callable, Optional
 
-from gmx_top4py.constants import ION_NAMES, SOLVENT_NAMES
 from gmx_top4py.topology.utils import (
     get_top_section,
     get_moleculetype_header,
     get_moleculetype_atomics,
     get_protein_section,
-    get_selected_section, ######## necessary???
     set_top_section,
     attributes_to_list,
     is_not_none,
@@ -17,7 +15,7 @@ from gmx_top4py.topology.utils import (
     match_atomic_item_to_atomic_type,
     increment_field,
     is_not_solvent_or_ion,
-    get_is_selected_moleculetype_f, ####### necessary???
+    get_is_selected_moleculetype_f,
     get_residue_by_bonding,
 )
 
@@ -40,6 +38,7 @@ def set_reactive_section(top: dict, name: str, value: list) -> Optional[list[lis
     """Set content of a section in the first moleculetype (protein) from a topology dict."""
     set_top_section(top, name, value, moleculetype=REACTIVE_MOLECULEYPE)
 
+
 def get_is_reactive_predicate_from_config_f(cfg: Config) -> Callable[[str], bool]:
     """Returns whether a moleculetype name is configured to be recognized as reactive."""
     include = [x.lower() for x in cfg.include.split()]
@@ -51,17 +50,7 @@ def get_is_reactive_predicate_f(
     include: list[str], exclude: list[str]
 ) -> Callable[[str], bool]:
     """Returns whether a moleculetype name is configured to be recognized as reactive."""
-    default_excludes = [x.lower() for x in SOLVENT_NAMES + ION_NAMES]
-    exclude = [s.lower() for s in exclude]
-    include = [s.lower() for s in include]
-
-    def f(name: str) -> bool:
-        lower_name = name.lower()
-        return lower_name not in exclude and (
-            lower_name not in default_excludes or lower_name in include
-        )
-
-    return f
+    return get_is_selected_moleculetype_f(selected=include, deselected=exclude)
 
 
 def get_residue_fragments(
