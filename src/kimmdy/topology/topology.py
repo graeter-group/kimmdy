@@ -1,35 +1,30 @@
 import logging
-import textwrap
-from copy import copy, deepcopy
+from copy import copy
 from pathlib import Path
 from typing import Callable, Optional, Union
 
-from gmx_top4py.topology.topology import (
-    MoleculeType,
-    Topology as BasicTopology,
-)
-
-from kimmdy.constants import (
-    FFFUNC,
-    REACTIVE_MOLECULEYPE,
-)
-from kimmdy.parsing import TopologyDict
-from kimmdy.plugins import BasicParameterizer, Parameterizer
-from kimmdy.recipe import Bind, Break, RecipeStep
-from kimmdy.topology.atomic import (
+from gmx_top4py.parsing import TopologyDict
+from gmx_top4py.parameterizing import Parameterizer, BasicParameterizer
+from gmx_top4py.constants import FFFUNC
+from gmx_top4py.topology.atomic import (
     Angle,
     Atom,
     Bond,
     Dihedral,
     MultipleDihedrals,
-    Pair,  
+    Pair, 
 )
+from gmx_top4py.topology.utils import is_not_solvent_or_ion, get_residue_by_bonding
+from gmx_top4py.topology.topology import (
+    MoleculeType,
+    Topology as BasicTopology,
+)
+
+from kimmdy.constants import REACTIVE_MOLECULEYPE
+from kimmdy.recipe import Bind, Break, RecipeStep
 from kimmdy.topology.ff import FF
-from kimmdy.topology.utils import (
-    get_residue_by_bonding,
-    get_residue_fragments,
-    is_not_solvent_or_ion,
-)
+from kimmdy.topology.utils import get_residue_fragments
+
 from kimmdy.utils import TopologyAtomAddress
 
 logger = logging.getLogger("kimmdy.topology")
