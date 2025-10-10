@@ -10,13 +10,10 @@ from gmx_top4py.topology.topology import (
 )
 
 from kimmdy.constants import (
-    ATOM_ID_FIELDS,
-    ATOMTYPE_BONDORDER_FLAT,
     FFFUNC,
     REACTIVE_MOLECULEYPE,
-    RESNR_ID_FIELDS,
 )
-from kimmdy.parsing import TopologyDict, empty_section, read_top, write_top
+from kimmdy.parsing import TopologyDict
 from kimmdy.plugins import BasicParameterizer, Parameterizer
 from kimmdy.recipe import Bind, Break, RecipeStep
 from kimmdy.topology.atomic import (
@@ -24,28 +21,14 @@ from kimmdy.topology.atomic import (
     Atom,
     Bond,
     Dihedral,
-    DihedralRestraint,
-    Exclusion,
-    ImproperDihedralId,
-    MoleculeTypeHeader,
     MultipleDihedrals,
-    Pair,
-    PositionRestraint,
-    ResidueImproperSpec,
-    ResidueType,
-    Settle,
+    Pair,  
 )
 from kimmdy.topology.ff import FF
 from kimmdy.topology.utils import (
-    attributes_to_list,
-    get_moleculetype_atomics,
-    get_moleculetype_header,
     get_residue_by_bonding,
     get_residue_fragments,
-    get_top_section,
-    increment_field,
     is_not_solvent_or_ion,
-    set_top_section,
 )
 from kimmdy.utils import TopologyAtomAddress
 
@@ -125,10 +108,11 @@ class Topology(BasicTopology):
     ##########################################################################
 
     def _parse_ff(self, top: TopologyDict, residuetypes_path: Optional[Path] = None):
+        """Parse force field data from topology dict into a container."""
         self.ff = FF(top, residuetypes_path)
 
     def _link_atomics(self):
-        """link atoms, bonds etc. properties of self (=top) to the reactive moleculeype.
+        """Link atoms, bonds etc. properties of self (=top) to the reactive moleculeype.
 
         Call this any time a large change is made to the reactive moleculetype
         that re-assigns a property and not just modifies parts of it in place.
