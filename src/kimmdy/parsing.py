@@ -11,7 +11,8 @@ from pathlib import Path
 from typing import TypeAlias, TypedDict, Union
 import numpy as np
 
-from gmx_top4py.parsing import (
+# Keep unused imports for backwards compatibility
+from gmx_top4py.parsing import ( 
     TopologyDict,
     is_not_comment,
     resolve_includes,
