@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from gmx_top4py.topology.ff import FF as BasicFF 
+from gmx_top4py.topology.ff import FF as BasicFF
 
 from kimmdy.parsing import read_edissoc
 
@@ -14,6 +14,7 @@ class FF(BasicFF):
 
     Also see <https://manual.gromacs.org/current/reference-manual/topologies/topology-file-formats.html#topology-file>
     """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.default_edissoc: dict[str, dict[tuple[str, str], float]] = {}

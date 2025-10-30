@@ -12,7 +12,7 @@ from typing import TypeAlias, TypedDict, Union
 import numpy as np
 
 # Keep unused imports for backwards compatibility
-from gmx_top4py.parsing import ( 
+from gmx_top4py.parsing import (
     TopologyDict,
     is_not_comment,
     resolve_includes,

@@ -12,7 +12,7 @@ from gmx_top4py.topology.atomic import (
     Bond,
     Dihedral,
     MultipleDihedrals,
-    Pair, 
+    Pair,
 )
 from gmx_top4py.topology.utils import is_not_solvent_or_ion, get_residue_by_bonding
 from gmx_top4py.topology.topology import (
@@ -73,33 +73,34 @@ class Topology(BasicTopology):
         radicals: Optional[str] = None,
         residuetypes_path: Optional[Path] = None,
         reactive_nrexcl: Optional[str] = None,
-    ):  
-        self.selected_moleculetype = REACTIVE_MOLECULEYPE # In kimmdy: selected_moleculetype = REACTIVE_MOLECULEYPE = "reactive".
-        super().__init__(top, 
-                        parametrizer=parametrizer, 
-                        is_selected_moleculetype_f=is_reactive_predicate_f,
-                        radicals=radicals, 
-                        residuetypes_path=residuetypes_path, 
-                        nrexcl=reactive_nrexcl,
-                        )
-        
-       
+    ):
+        self.selected_moleculetype = REACTIVE_MOLECULEYPE  # In kimmdy: selected_moleculetype = REACTIVE_MOLECULEYPE = "reactive".
+        super().__init__(
+            top,
+            parametrizer=parametrizer,
+            is_selected_moleculetype_f=is_reactive_predicate_f,
+            radicals=radicals,
+            residuetypes_path=residuetypes_path,
+            nrexcl=reactive_nrexcl,
+        )
+
     ################## Wrapper for backward compatibility ##################
     @property
     def _check_is_reactive_molecule(self) -> Callable[[str], bool]:
         return self._check_is_selected_molecule
-    
-    @_check_is_reactive_molecule.setter # Is the setter necessary? Not sure but doesn't hurt to have.
+
+    @_check_is_reactive_molecule.setter  # Is the setter necessary? Not sure but doesn't hurt to have.
     def _check_is_reactive_molecule(self, f: Callable[[str], bool]) -> None:
         self._check_is_selected_molecule = f
-    
+
     @property
     def reactive_molecule(self) -> MoleculeType:
         return self.selected_molecule
-    
-    @reactive_molecule.setter # Is the setter necessary? Not sure but doesn't hurt to have.
+
+    @reactive_molecule.setter  # Is the setter necessary? Not sure but doesn't hurt to have.
     def reactive_molecule(self, molecule: MoleculeType) -> None:
         self.selected_molecule = molecule
+
     ##########################################################################
 
     def _parse_ff(self, top: TopologyDict, residuetypes_path: Optional[Path] = None):

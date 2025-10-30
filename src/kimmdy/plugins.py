@@ -103,4 +103,3 @@ class ReactionPlugin(ABC):
             TaskFiles instance
         """
         pass
-

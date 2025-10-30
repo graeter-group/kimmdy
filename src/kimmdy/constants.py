@@ -13,7 +13,7 @@ from gmx_top4py.constants import (
     ION_NAMES,
     ATOMTYPE_BONDORDER,
     ATOMTYPE_BONDORDER_FLAT,
-    AA3
+    AA3,
 )
 
 nN_per_kJ_per_mol_nm = 0.001661
