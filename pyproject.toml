@@ -13,7 +13,7 @@ classifiers = [
   "Operating System :: OS Independent",
 ]
 requires-python = ">= 3.10, < 3.12"
-dependencies = ["pyyaml", "numpy", "importlib_metadata", "MDAnalysis"]
+dependencies = ["pyyaml", "numpy", "importlib_metadata", "MDAnalysis", "gmx-top4py"]
 
 [project.readme]
 file = "README.md"
