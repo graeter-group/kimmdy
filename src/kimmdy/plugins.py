@@ -8,14 +8,16 @@ from __future__ import annotations
 import logging
 import sys
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
+
+# Keep unused imports for backwards compatibility
+from gmxtop.parameterizing import Parameterizer, BasicParameterizer
 
 if TYPE_CHECKING:
     from kimmdy.config import Config
     from kimmdy.recipe import RecipeCollection
     from kimmdy.runmanager import RunManager
     from kimmdy.tasks import TaskFiles
-    from kimmdy.topology.topology import Topology
 
 
 reaction_plugins: dict[str, type[ReactionPlugin]] = {}
@@ -101,26 +103,3 @@ class ReactionPlugin(ABC):
             TaskFiles instance
         """
         pass
-
-
-class Parameterizer(ABC):
-    def __init__(self, **kwargs):
-        self.type_scheme = dict()
-
-    @abstractmethod
-    def parameterize_topology(
-        self, current_topology: Topology, focus_nrs: Optional[set[str]]
-    ) -> Topology:
-        pass
-
-
-class BasicParameterizer(Parameterizer):
-    """reconstruct base force field state"""
-
-    def parameterize_topology(
-        self, current_topology: Topology, focus_nrs: Optional[set[str]] = None
-    ) -> Topology:
-        """Do nothing,
-        all necessary actions should already have happened in bind_bond and break_bond of Topology
-        """
-        return current_topology
