@@ -4,7 +4,7 @@ import logging
 from typing import TYPE_CHECKING, Callable, Optional
 
 # Keep unused imports for backwards compatibility
-from gmx_top4py.topology.utils import (
+from gmxtop.topology.utils import (
     get_top_section,
     get_moleculetype_header,
     get_moleculetype_atomics,
@@ -23,7 +23,7 @@ from gmx_top4py.topology.utils import (
 from kimmdy.constants import REACTIVE_MOLECULEYPE
 
 if TYPE_CHECKING:
-    from gmx_top4py.topology.atomic import Atom
+    from gmxtop.topology.atomic import Atom
     from kimmdy.config import Config
     from kimmdy.topology.topology import Topology
 

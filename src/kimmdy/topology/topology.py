@@ -3,10 +3,10 @@ from copy import copy
 from pathlib import Path
 from typing import Callable, Optional, Union
 
-from gmx_top4py.parsing import TopologyDict
-from gmx_top4py.parameterizing import Parameterizer, BasicParameterizer
-from gmx_top4py.constants import FFFUNC
-from gmx_top4py.topology.atomic import (
+from gmxtop.parsing import TopologyDict
+from gmxtop.parameterizing import Parameterizer, BasicParameterizer
+from gmxtop.constants import FFFUNC
+from gmxtop.topology.atomic import (
     Angle,
     Atom,
     Bond,
@@ -14,8 +14,8 @@ from gmx_top4py.topology.atomic import (
     MultipleDihedrals,
     Pair,
 )
-from gmx_top4py.topology.utils import is_not_solvent_or_ion, get_residue_by_bonding
-from gmx_top4py.topology.topology import (
+from gmxtop.topology.utils import is_not_solvent_or_ion, get_residue_by_bonding
+from gmxtop.topology.topology import (
     MoleculeType,
     Topology as BasicTopology,
 )
@@ -47,7 +47,7 @@ class Topology(BasicTopology):
     ----------
     top
         A dictionary containing the parsed topology data, produced by
-        [](`gmx_top4py.parsing.read_top`) or deprecated by [](`kimmdy.parsing.read_top`)
+        [](`gmxtop.parsing.read_top`) or deprecated by [](`kimmdy.parsing.read_top`)
     parametrizer
         The parametrizer to use when reparametrizing the topology.
     is_reactive_predicate_f

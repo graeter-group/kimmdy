@@ -11,7 +11,7 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 # Keep unused imports for backwards compatibility
-from gmx_top4py.parameterizing import Parameterizer, BasicParameterizer
+from gmxtop.parameterizing import Parameterizer, BasicParameterizer
 
 if TYPE_CHECKING:
     from kimmdy.config import Config

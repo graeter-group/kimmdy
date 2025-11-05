@@ -13,7 +13,7 @@ classifiers = [
   "Operating System :: OS Independent",
 ]
 requires-python = ">= 3.10, < 3.12"
-dependencies = ["pyyaml", "numpy", "importlib_metadata", "MDAnalysis", "gmx-top4py"]
+dependencies = ["pyyaml", "numpy", "importlib_metadata", "MDAnalysis", "gmxtop"]
 
 [project.readme]
 file = "README.md"
@@ -56,6 +56,7 @@ where = ["src"]
 namespaces = false
 
 [tool.uv.sources]
+gmxtop = { workspace = true }
 kimmdy = { workspace = true }
 kimmdy-dimerization = { workspace = true }
 kimmdy-grappa = { workspace = true }

@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Optional, Union
 
 # Keep unused imports for backwards compatibility
-from gmx_top4py.utils import (
+from gmxtop.utils import (
     TopologyAtomAddress,
     field_or_none,
     get_gmx_dir,

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from gmx_top4py.topology.ff import FF as BasicFF
+from gmxtop.topology.ff import FF as BasicFF
 
 from kimmdy.parsing import read_edissoc
 
