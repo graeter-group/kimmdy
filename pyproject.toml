@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "kimmdy"
-version = "8.3.0"
+version = "8.3.1"
 license-files = ["LICEN[CS]E*"]
 description = "Kinetic Monte Carlo Molecular Dynamics"
 authors = [{ name = "graeter-group", email = "mbm@h-its.org" }]
