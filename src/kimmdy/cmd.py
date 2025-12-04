@@ -57,7 +57,7 @@ def get_cmdline_args() -> argparse.Namespace:
         "-r",
         action="store_true",
         help=(
-            "Restart or continue from a previous run instead of incrementing the run number for the output directory. It the output directory does not exist, it will be like a regular fresh run."
+            "Restart or continue from a previous run instead of incrementing the run number for the output directory. If the output directory does not exist, it will be like a regular fresh run."
         ),
     )
     parser.add_argument(
