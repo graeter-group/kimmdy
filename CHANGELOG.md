@@ -1,6 +1,18 @@
 # Changelog
 
 
+## [8.3.1](https://github.com/graeter-group/kimmdy/compare/v8.3.0...v8.3.1) (2025-12-11)
+
+
+### Bug Fixes
+
+* catch error in case of time windows with length 0 ([#579](https://github.com/graeter-group/kimmdy/issues/579)) ([7cfbcf1](https://github.com/graeter-group/kimmdy/commit/7cfbcf1c1813f90f8c491ae3ffcbc85cfd8e645c))
+
+
+### Documentation
+
+* more descriptive molecule merging error ([a6a972c](https://github.com/graeter-group/kimmdy/commit/a6a972ce18dd39dc80e948ef6edb83a3d171efe5))
+
 ## [8.3.0](https://github.com/graeter-group/kimmdy/compare/v8.2.1...v8.3.0) (2025-08-25)
 
 
