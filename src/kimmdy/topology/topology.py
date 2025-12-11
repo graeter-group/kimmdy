@@ -839,12 +839,14 @@ class Topology:
         started_merging = False
         stopped_merging = False
         added_reactive_molecule = False
+        non_reactive = None
         for m, n in self.molecules:
             if self._check_is_reactive_molecule(m):
                 if stopped_merging:
-                    m = f"""Attempting to merge a moleculetype {m} interspersed with non-merging moleculetypes.
+                    m = f"""Attempting to merge a moleculetype {m} interspersed with non-reactive moleculetypes.
             Please make sure that all moleculetypes to be merged (all non-solvent molecules or ions by default)
-            are listed consecutively in the [molecules] section of the topology and in the coordinates file (.gro)
+            are listed consecutively in the [molecules] section of the topology and in the coordinates file (.gro).
+            The latest non-reactive molecule was {non_reactive}.
             """
                     logger.error(m)
                     raise ValueError(m)
@@ -856,6 +858,7 @@ class Topology:
             else:
                 if started_merging:
                     stopped_merging = True
+                    non_reactive = m
                 new_molecules += [(m, n)]
 
         self.molecules = new_molecules
