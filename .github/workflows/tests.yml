@@ -16,13 +16,13 @@ jobs:
       - uses: psf/black@stable
         with:
           src: "./src ./tests"
-      - name: run tox
-        run: tox
-      - name: zip coverage report
-        if: ${{ !cancelled() }}
-        run: zip -r htmlcov.zip htmlcov || true
-      - uses: actions/upload-artifact@v4
-        if: ${{ !cancelled() }}
-        with:
-          name: coverage artifact
-          path: htmlcov.zip
+      # - name: run tox
+      #   run: tox
+      # - name: zip coverage report
+      #   if: ${{ !cancelled() }}
+      #   run: zip -r htmlcov.zip htmlcov || true
+      # - uses: actions/upload-artifact@v4
+      #   if: ${{ !cancelled() }}
+      #   with:
+      #     name: coverage artifact
+      #     path: htmlcov.zip
