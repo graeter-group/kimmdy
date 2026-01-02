@@ -57,6 +57,9 @@ namespaces = false
 
 [tool.uv.sources]
 kimmdy = { workspace = true }
+# TODO: use workspace versions
+# once docker build is updated to handle
+# submodules
 # kimmdy-dimerization = { workspace = true }
 # kimmdy-grappa = { workspace = true }
 # kimmdy-hat = { workspace = true }
@@ -71,8 +74,9 @@ url = "https://download.pytorch.org/whl/cpu"
 explicit = true
 
 ## add plugins to the workspace when developing
-[tool.uv.workspace]
-members = ["plugins/*"]
+# TODO: uncomment once docker build is updated
+# [tool.uv.workspace]
+# members = ["plugins/*"]
 
 [dependency-groups]
 dev = [
