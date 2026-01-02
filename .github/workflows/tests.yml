@@ -12,17 +12,48 @@ jobs:
     runs-on: ubuntu-latest
     container: riedmiki/gromacs-plumed-python:2023.5-plumed
     steps:
-      - uses: actions/checkout@v4
-      - uses: psf/black@stable
+
+      # NOTE: try this if we ever run out of space again
+      # - name: Free Disk Space (Ubuntu)
+      #   uses: jlumbroso/free-disk-space@main
+      #   with:
+      #     # this might remove tools that are actually needed,
+      #     # if set to "true" but frees about 6 GB
+      #     tool-cache: false
+      #     # all of these default to true, but feel free to set to
+      #     # "false" if necessary for your workflow
+      #     android: true
+      #     dotnet: true
+      #     haskell: true
+      #     large-packages: true
+      #     docker-images: true
+      #     swap-storage: true
+
+      - uses: actions/checkout@v6
+        # with:
+        #   submodules: recursive
+        # TODO: need updated container for that
+        # but docker currently has some repository issues:
+        # <https://github.com/containerd/containerd/issues/12741>
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
         with:
-          src: "./src ./tests"
-      - name: run tox
-        run: tox
-      - name: zip coverage report
-        if: ${{ !cancelled() }}
-        run: zip -r htmlcov.zip htmlcov || true
-      - uses: actions/upload-artifact@v4
-        if: ${{ !cancelled() }}
-        with:
-          name: coverage artifact
-          path: htmlcov.zip
+          python-version: 3.11
+          enable-cache: true
+      - name: Install the project
+        run: uv sync --locked --dev --extra reactions --extra grappa
+      - name: Run tests
+        run: uv run black src tests
+      - name: Run tests
+        run: uv run pytest -m "not slow" --durations=15 --cache-clear tests
+
+      # - name: run tox
+      #   run: tox
+      # - name: zip coverage report
+      #   if: ${{ !cancelled() }}
+      #   run: zip -r htmlcov.zip htmlcov || true
+      # - uses: actions/upload-artifact@v4
+      #   if: ${{ !cancelled() }}
+      #   with:
+      #     name: coverage artifact
+      #     path: htmlcov.zip
