@@ -13,8 +13,11 @@ jobs:
     container: riedmiki/gromacs-plumed-python:2023.5-plumed
     steps:
       - uses: actions/checkout@v6
-        with:
-          submodules: recursive
+        # with:
+        #   submodules: recursive
+      - name: Checkout submodules
+        run: |
+          git submodule update --init --recursive
       - name: Install uv
         uses: astral-sh/setup-uv@v7
         with:
