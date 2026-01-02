@@ -7,15 +7,20 @@ jobs:
     runs-on: ubuntu-latest
     container: riedmiki/gromacs-plumed-python:2023.5-plumed
     steps:
-      - uses: actions/checkout@v3
-      - name: run tox
-        run: tox
-      - name: zip coverage report
-        if: ${{ !cancelled() }}
-        run: zip -r htmlcov.zip htmlcov || true
-      - uses: actions/upload-artifact@v3
-        if: ${{ !cancelled() }}
+      - uses: actions/checkout@v6
+        # with:
+        #   submodules: recursive
+        # TODO: need updated container for that
+        # but docker currently has some repository issues:
+        # <https://github.com/containerd/containerd/issues/12741>
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
         with:
-          name: coverage artifact
-          path: htmlcov.zip
+          enable-cache: true
+      - name: Install the project
+        run: uv sync --locked --dev --extra reactions --extra grappa
+      - name: Run tests
+        run: uv run black src tests
+      - name: Run tests
+        run: uv run pytest -m "not slow" --durations=15 --cache-clear tests
 
