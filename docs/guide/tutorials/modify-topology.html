@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.31">
+<meta name="generator" content="quarto-1.8.26">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -71,18 +71,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../.././www/favicon.png" rel="icon" type="image/png">
 <script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-5e60667765669bb6306165cd3017bc53.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-2f7b4a8194157b4673ebbbbaae900d24.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-5e60667765669bb6306165cd3017bc53.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-011bf460f815becf10cece6f010410d3.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-3efd7a6bfd44a7a0cd53a0a8623dff48.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-011bf460f815becf10cece6f010410d3.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-aae88ecde7ebe58ee0c698ef0f62b428.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-d854a8aa814a5cf5d934d479f4603a12.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-aae88ecde7ebe58ee0c698ef0f62b428.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-5c56204ce4b2b032007f0dd64c837bd5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-03934a2b656eafa3f8bcbbfe76b61243.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-5c56204ce4b2b032007f0dd64c837bd5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script src="../../site_libs/quarto-contrib/molstar-v3.13.0/molstar.js"></script>
 <link href="../../site_libs/quarto-contrib/molstar-v3.13.0/molstar.css" rel="stylesheet">
 <link href="../../site_libs/quarto-contrib/molstar-v3.13.0/app-container.css" rel="stylesheet">
@@ -360,7 +361,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
       <a href="../../index.html" class="sidebar-logo-link">
-      <img src="../.././www/kimmdy_logo.png" alt="" class="sidebar-logo py-0 d-lg-inline d-none">
+      <img src="../.././www/kimmdy_logo.png" alt="" class="sidebar-logo light-content py-0 d-lg-inline d-none">
+      <img src="../.././www/kimmdy_logo.png" alt="" class="sidebar-logo dark-content py-0 d-lg-inline d-none">
       </a>
       </div>
     <div class="sidebar-menu-container"> 
@@ -731,34 +733,34 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="parameterize-a-molecule-with-grappa" class="level1">
 <h1>Parameterize a Molecule with Grappa</h1>
 <p>To parameterize a molecule with grappa using <code>kimmdy-modify-top</code>, you first need to have a GROMACS topology file for your system. Here, we will use a Ace-Ala-Nme peptide. First, download the peptide pdb and create a topology file using a grappa-compatible force field.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># set up your directory</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># set up your directory</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="op">&lt;</span>tutorial-directory<span class="op">&gt;</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span>  <span class="op">&lt;</span>tutorial-directory<span class="op">&gt;</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># use an environment with kimmdy</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># download files and create topology</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">wget</span> https://graeter-group.github.io/kimmdy/guide/tutorials/modify-topology-files/pep.pdb</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ex">gmx</span> pdb2gmx <span class="at">-f</span> pep.pdb <span class="at">-ignh</span>  <span class="co"># select an appropriate force field from which partial charges and LJ parameters will be taken, e.g. amber99sbildn</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ex">gmx</span> pdb2gmx <span class="at">-f</span> pep.pdb <span class="at">-ignh</span>  <span class="co"># select an appropriate force field from which partial charges and LJ parameters will be taken, e.g. amber99sbildn</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Next, re-parameterize the peptide with grappa and check out the resulting topology file. Make sure to change the values for <code>-grappa_tag</code> and <code>grappa_charge_model</code> if the defaults are not applicable.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># parameterize peptide with grappa</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># parameterize peptide with grappa</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">kimmdy-modify-top</span> topol.top topol_grappa.top <span class="at">-p</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># check out the output file; use a text editor of your choice</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">gedit</span> topol_grappa.top</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">gedit</span> topol_grappa.top</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>For this task you can also use the command-line interface of grappa <code>grappa-gmx</code>. The same results as with the <code>kimmdy-modify-top</code> command above can be achieved with the command below.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">grappa_gmx</span> <span class="at">-f</span> topol.top <span class="at">-o</span> topol_grappa.top <span class="at">-t</span> <span class="st">'latest'</span> <span class="at">-c</span> <span class="st">'amber99'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">grappa_gmx</span> <span class="at">-f</span> topol.top <span class="at">-o</span> topol_grappa.top <span class="at">-t</span> <span class="st">'latest'</span> <span class="at">-c</span> <span class="st">'amber99'</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>You will notice many changes compared to the topology file generated by <code>gmx pdb2gmx</code>. First, all includes were resolved to create a standalone topology file. That’s the reason for having the <code>[ atomtypes ]</code>, <code>[ bondtypes ]</code> and other parameter definitions as well as ion and water topology definitions with <code>[ moleculetype ]</code>, <code>[atoms]</code> and <code>[bonds]</code> sections.</p>
 <p>The change through parameterization will become more apparent by comparing with a non-parameterized, converted topology file.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># parameterize peptide</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># parameterize peptide</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">kimmdy-modify-top</span> topol.top topol_vanilla.top </span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># compare results</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="ex">vimdiff</span> topol_grappa.top topol_vanilla.top</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="ex">vimdiff</span> topol_grappa.top topol_vanilla.top</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>You should see explicit parameters for bonds, angles dihedrals (e.g <code>2 1 5 6 9 180.0 1.5141575 1</code>) in the grappa parameterized file while the non-parameterized file has implicit parameters which are defined in the interaction type section (<code>2 1 5 6 9</code>). If that’s the case, you have successfully parameterized a molecule with grappa and are finished with this section of the tutorial!</p>
 </section>
 <section id="remove-hydrogens-and-parameterize-for-radical-starting-structures" class="level1">
 <h1>Remove Hydrogens and parameterize for radical starting structures</h1>
 <p>An additional capability of the tool is to remove hydrogens to create radicals. Which hydrogen will be removed is defined by its atom nr in the topology file (first column). Additionally, the structure file has to be modified to get a compatible pair of structure and topology file. Look for the atom nr of the hydrogen connected to the Ala C-alpha and remove it. Keep the <code>-p</code> flag to reparameterize the molecule using grappa. Use a text editor or molecule visualization program to verify the successful removal of the hydrogen of choice. The nonbonded parameters all stay the same, except for the partial charge of the heavy atom from which the hydrogen is detached: The partial charge of the hydrogen will be added to the heavy atom upon removal of the hydrogen.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># remove hydrogen and re-parameterize peptide with grappa</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># remove hydrogen and re-parameterize peptide with grappa</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">kimmdy-modify-top</span> topol.top topol_grappa_CA.top <span class="at">-p</span> <span class="at">-c</span> conf.gro <span class="at">-r</span> <span class="op">&lt;</span>hydrogen nr<span class="op">&gt;</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># look at the result</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># look at the result</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>To see how removal of a hydrogen changes the minimum energy structure, run a minimization on both the native and radical peptide. Most strikingly, you should see the radical C-alpha become planar, as expected from QM calculations. Use the mdp file mentioned below. Both structures are also shown in molstar panels.</p>
 <details>
 <summary>
@@ -768,7 +770,7 @@ GROMACS mdp file (minim.mdp)
 <div class="code-with-filename-file">
 <pre><strong>minim.mdp</strong></pre>
 </div>
-<div class="sourceCode" id="cb6" data-filename="minim.mdp"><pre class="sourceCode yml code-with-copy"><code class="sourceCode yaml"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6" data-filename="minim.mdp"><pre class="sourceCode yml code-with-copy"><code class="sourceCode yaml"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="at">; minim.mdp - used as input into grompp to generate em.tpr</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="at">; Parameters describing what to do, when to stop and what to save</span></span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="at">integrator  = steep         ; Algorithm (steep = steepest descent minimization)</span></span>
@@ -783,15 +785,15 @@ GROMACS mdp file (minim.mdp)
 <span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="at">coulombtype     = PME       ; Treatment of long range electrostatic interactions</span></span>
 <span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="at">rcoulomb        = 1.0       ; Short-range electrostatic cut-off</span></span>
 <span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="at">rvdw            = 1.0       ; Short-range Van der Waals cut-off</span></span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="at">pbc             = xyz       ; Periodic Boundary Conditions in all 3 dimensions</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="at">pbc             = xyz       ; Periodic Boundary Conditions in all 3 dimensions</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </details>
-<div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># minimize radical peptide</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># minimize radical peptide</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">gmx</span> editconf <span class="at">-f</span> topol_grappa_CA.gro <span class="at">-o</span> topol_grappa_CA_box.gro <span class="at">-d</span> 1 <span class="at">-bt</span> cubic</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="ex">gmx</span> grompp <span class="at">-f</span> minim.mdp <span class="at">-c</span> topol_grappa_CA_box.gro <span class="at">-p</span> topol_grappa_CA.top <span class="at">-o</span> minim.tpr</span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="ex">gmx</span> mdrun <span class="at">-deffnm</span> minim</span>
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co"># do the same for the native peptide</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co"># look at the result</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co"># look at the result</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <section id="minimized-structure-of-native-peptide" class="level3">
 <h3 class="anchored" data-anchor-id="minimized-structure-of-native-peptide">Minimized structure of native peptide</h3>
     <div id="app-./modify-topology-files/minim.pdb" class="molstar-app"></div>
@@ -912,13 +914,14 @@ GROMACS mdp file (minim.mdp)
       e.clearSelection();
     }
     const getTextToCopy = function(trigger) {
-        const codeEl = trigger.previousElementSibling.cloneNode(true);
-        for (const childEl of codeEl.children) {
-          if (isCodeAnnotation(childEl)) {
-            childEl.remove();
-          }
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
         }
-        return codeEl.innerText;
+      }
+      return codeEl.innerText;
     }
     const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
       text: getTextToCopy
