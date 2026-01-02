@@ -15,9 +15,9 @@ jobs:
       - uses: actions/checkout@v6
         # with:
         #   submodules: recursive
-      - name: Checkout submodules
-        run: |
-          git submodule update --init --recursive
+        # TODO: need updated container for that
+        # but docker currently has some repository issues:
+        # <https://github.com/containerd/containerd/issues/12741>
       - name: Install uv
         uses: astral-sh/setup-uv@v7
         with:

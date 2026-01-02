@@ -57,11 +57,11 @@ namespaces = false
 
 [tool.uv.sources]
 kimmdy = { workspace = true }
-kimmdy-dimerization = { workspace = true }
-kimmdy-grappa = { workspace = true }
-kimmdy-hat = { workspace = true }
-kimmdy-hydrolysis = { workspace = true }
-kimmdy-reactions = { workspace = true }
+# kimmdy-dimerization = { workspace = true }
+# kimmdy-grappa = { workspace = true }
+# kimmdy-hat = { workspace = true }
+# kimmdy-hydrolysis = { workspace = true }
+# kimmdy-reactions = { workspace = true }
 torch = [{ index = "pytorch-cpu" }]
 torchvision = [{ index = "pytorch-cpu" }]
 
