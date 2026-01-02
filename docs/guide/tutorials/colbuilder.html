@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.31">
+<meta name="generator" content="quarto-1.8.26">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -71,18 +71,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../.././www/favicon.png" rel="icon" type="image/png">
 <script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-5e60667765669bb6306165cd3017bc53.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-2f7b4a8194157b4673ebbbbaae900d24.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-5e60667765669bb6306165cd3017bc53.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-011bf460f815becf10cece6f010410d3.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-3efd7a6bfd44a7a0cd53a0a8623dff48.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-011bf460f815becf10cece6f010410d3.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-aae88ecde7ebe58ee0c698ef0f62b428.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-d854a8aa814a5cf5d934d479f4603a12.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-aae88ecde7ebe58ee0c698ef0f62b428.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-5c56204ce4b2b032007f0dd64c837bd5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-03934a2b656eafa3f8bcbbfe76b61243.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-5c56204ce4b2b032007f0dd64c837bd5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -357,7 +358,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
       <a href="../../index.html" class="sidebar-logo-link">
-      <img src="../.././www/kimmdy_logo.png" alt="" class="sidebar-logo py-0 d-lg-inline d-none">
+      <img src="../.././www/kimmdy_logo.png" alt="" class="sidebar-logo light-content py-0 d-lg-inline d-none">
+      <img src="../.././www/kimmdy_logo.png" alt="" class="sidebar-logo dark-content py-0 d-lg-inline d-none">
       </a>
       </div>
     <div class="sidebar-menu-container"> 
@@ -749,12 +751,12 @@ Caution
 <p>Due to some issues in GROMACS, <code>pdb2gmx</code> may take a while (~16 hours). The majority of the time is actually spend on checks that happen just before the final lines are written to the file. It is possible to stop the process early and add the final lines manually.</p>
 </div>
 </div>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">gmx</span> pdb2gmx <span class="at">-f</span> Homo_sapiens_aln_N_HLKNL_12_C_PYD_2_fibril.pdb <span class="at">-o</span> fibril2.gro <span class="at">-ignh</span> <span class="at">-water</span> tip3p <span class="at">-merge</span> all <span class="op">&lt;&lt;&lt;</span>1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">gmx</span> pdb2gmx <span class="at">-f</span> Homo_sapiens_aln_N_HLKNL_12_C_PYD_2_fibril.pdb <span class="at">-o</span> fibril2.gro <span class="at">-ignh</span> <span class="at">-water</span> tip3p <span class="at">-merge</span> all <span class="op">&lt;&lt;&lt;</span>1</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <section id="equilibration" class="level2">
 <h2 class="anchored" data-anchor-id="equilibration">Equilibration</h2>
 <p><code>mdp</code> files for the following steps are located in <code>&lt;kimmdy root&gt;/www/colbuilder_files.</code></p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">gmx</span> editconf <span class="at">-f</span> fibril.gro <span class="at">-o</span> fibril_x.gro <span class="at">-c</span> <span class="at">-princ</span>  <span class="op">&lt;&lt;&lt;</span>1</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">gmx</span> editconf <span class="at">-f</span> fibril.gro <span class="at">-o</span> fibril_x.gro <span class="at">-c</span> <span class="at">-princ</span>  <span class="op">&lt;&lt;&lt;</span>1</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">gmx</span> editconf <span class="at">-f</span> fibril_x.gro <span class="at">-o</span> fibril_z.gro <span class="at">-rotate</span> 0 270 0 <span class="at">-c</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
@@ -770,7 +772,7 @@ Caution
 <span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="ex">gmx</span> grompp <span class="at">-f</span> minim.mdp <span class="at">-c</span> fibril_ion.gro <span class="at">-p</span> topol.top <span class="at">-o</span> fibril_min.tpr</span>
 <span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="ex">gmx</span> mdrun <span class="at">-deffnm</span> fibril_min <span class="at">-v</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="ex">gmx</span> mdrun <span class="at">-deffnm</span> fibril_min <span class="at">-v</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="callout callout-style-default callout-caution callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -784,13 +786,13 @@ Caution
 <p>Heavy computational load from here on.</p>
 </div>
 </div>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">gmx</span> grompp <span class="at">-f</span> nvt.mdp <span class="at">-c</span> fibril_min.gro <span class="at">-r</span> fibril_min.gro <span class="at">-p</span> topol.top <span class="at">-o</span> fibril_nvt.tpr</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">gmx</span> grompp <span class="at">-f</span> nvt.mdp <span class="at">-c</span> fibril_min.gro <span class="at">-r</span> fibril_min.gro <span class="at">-p</span> topol.top <span class="at">-o</span> fibril_nvt.tpr</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="ex">gmx</span> mdrun <span class="at">-deffnm</span> fibril_nvt <span class="at">-v</span> <span class="at">-dlb</span> yes <span class="at">-ntomp</span> 4 <span class="at">-ntmpi</span> 10  <span class="at">-pme</span> gpu <span class="at">-bonded</span> gpu <span class="at">-npme</span> 1</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="ex">gmx</span> grompp <span class="at">-f</span> npt.mdp <span class="at">-c</span> fibril_nvt.gro <span class="at">-r</span> fibril_nvt.gro <span class="at">-p</span> topol.top <span class="at">-o</span> fibril_npt.tpr</span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="ex">gmx</span> mdrun <span class="at">-deffnm</span> fibril_npt <span class="at">-v</span> <span class="at">-dlb</span> yes <span class="at">-ntomp</span> 4 <span class="at">-ntmpi</span> 10  <span class="at">-pme</span> gpu <span class="at">-bonded</span> gpu <span class="at">-npme</span> 1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="ex">gmx</span> mdrun <span class="at">-deffnm</span> fibril_npt <span class="at">-v</span> <span class="at">-dlb</span> yes <span class="at">-ntomp</span> 4 <span class="at">-ntmpi</span> 10  <span class="at">-pme</span> gpu <span class="at">-bonded</span> gpu <span class="at">-npme</span> 1</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -818,7 +820,7 @@ KIMMDY config file (kimmdy.yml)
 <div class="code-with-filename-file">
 <pre><strong>kimmdy.yml</strong></pre>
 </div>
-<div class="sourceCode" id="cb4" data-filename="kimmdy.yml"><pre class="sourceCode yml code-with-copy"><code class="sourceCode yaml"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dryrun</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4" data-filename="kimmdy.yml"><pre class="sourceCode yml code-with-copy"><code class="sourceCode yaml"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dryrun</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">name</span><span class="kw">:</span><span class="at"> </span><span class="st">'hexalanine_homolysis_000'</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">max_tasks</span><span class="kw">:</span><span class="at"> </span><span class="dv">100</span></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">gromacs_alias</span><span class="kw">:</span><span class="at"> </span><span class="st">'gmx'</span></span>
@@ -851,21 +853,21 @@ KIMMDY config file (kimmdy.yml)
 <span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> pull  </span></span>
 <span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> reactions</span></span>
 <span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> equilibrium</span></span>
-<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> pull</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> pull</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </details>
 </section>
 <section id="gromacs-index-file-v1" class="level4">
 <h4 class="anchored" data-anchor-id="gromacs-index-file-v1">Gromacs index file v1</h4>
 <p>The config file mentions three important gromacs file for your system: top, gro, idx. We have the top and gro file from the equilibration and can update the file names in the config file. A basic index file can be generated with</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">'q'</span> <span class="kw">|</span> <span class="ex">gmx</span> make_ndx <span class="at">-f</span> fibril_npt.gro <span class="at">-o</span> index.ndx</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">'q'</span> <span class="kw">|</span> <span class="ex">gmx</span> make_ndx <span class="at">-f</span> fibril_npt.gro <span class="at">-o</span> index.ndx</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <section id="plumed.dat-and-index-file-v2" class="level4">
 <h4 class="anchored" data-anchor-id="plumed.dat-and-index-file-v2">Plumed.dat and index file v2</h4>
 <p>The next entry in the config file is plumed and references a plumed configuration file (plumed.dat) which we don’t yet have. This file is needed for the homolysis reaction plugin.</p>
 <p>For homolysis, the plumed.dat file should contain instructions to sample distances between bonds. Homolysis can then occur for the bonds mentioned in this file. To create the input file, kimmdy provides the command line interface <a href="../../guide/references/cmd_ref.html"><code>kimmdy-create-plumed</code></a>.</p>
 <p>We want to sample homolysis in the backbone and in crosslinks. By providing a gromacs index file with all backbone and crosslink atoms, the script generates the necessary plumed.dat file. Our initial index file does not contain those sections, so we have to create them ourselves. Such a index file can be generated with</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="at">-ne</span> <span class="st">"</span><span class="dt">\"</span><span class="st">Backbone</span><span class="dt">\"</span><span class="st">| r LY2 LY3 L4Y L5Y LYX\nq\n"</span><span class="kw">|</span> <span class="ex">gmx</span> make_ndx <span class="at">-f</span> fibril_npt.gro <span class="at">-o</span> index.ndx</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="at">-ne</span> <span class="st">"</span><span class="dt">\"</span><span class="st">Backbone</span><span class="dt">\"</span><span class="st">| r LY2 LY3 L4Y L5Y LYX\nq\n"</span><span class="kw">|</span> <span class="ex">gmx</span> make_ndx <span class="at">-f</span> fibril_npt.gro <span class="at">-o</span> index.ndx</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Now run the python script to generate a plumed.dat file and check its contents.</p>
 </section>
 <section id="homolysis-plugin-files-edissoc.dat-and-ffbonded.itp" class="level4">
@@ -879,7 +881,7 @@ KIMMDY config file (kimmdy.yml)
 <p>Running the script <code>prepare_enforced_rotation.py</code> creates mdp and index files that only have to be appended to the current file of the respective type to use torque restraints. However, you will get an error saying that some index group is missing. Use gmx make_ndx to add these groups to your file and then run the script.</p>
 <p>Bond distance sampling can be turned on for a md run by the tag <code>use_plumed</code>. You want to use this option for the MD run before checking for homolysis reactions. Another md run, in this case called relax, is mentioned under <code>changer.coordinates.md</code>. It is used after the homolysis reaction to interpolate between new and old parameters. An example mdp file is included in the tutorial files.</p>
 <p>In a mdp file you would also define temperature coupling groups. To separate between protein and solvent, you might have to create new index groups to include the crosslinks in the protein group:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="at">-ne</span> <span class="st">"r ACE &amp; a CH3\nr NME &amp; a CH3\n</span><span class="dt">\"</span><span class="st">Protein</span><span class="dt">\"</span><span class="st">|</span><span class="dt">\"</span><span class="st">Other</span><span class="dt">\"</span><span class="st">\n</span><span class="dt">\"</span><span class="st">Backbone</span><span class="dt">\"</span><span class="st">| r LY2 LY3 L4Y L5Y LYX\nq\n"</span><span class="kw">|</span> <span class="ex">gmx</span> make_ndx <span class="at">-f</span> fibril_npt.gro <span class="at">-o</span> index.ndx</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="at">-ne</span> <span class="st">"r ACE &amp; a CH3\nr NME &amp; a CH3\n</span><span class="dt">\"</span><span class="st">Protein</span><span class="dt">\"</span><span class="st">|</span><span class="dt">\"</span><span class="st">Other</span><span class="dt">\"</span><span class="st">\n</span><span class="dt">\"</span><span class="st">Backbone</span><span class="dt">\"</span><span class="st">| r LY2 LY3 L4Y L5Y LYX\nq\n"</span><span class="kw">|</span> <span class="ex">gmx</span> make_ndx <span class="at">-f</span> fibril_npt.gro <span class="at">-o</span> index.ndx</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Finally, the KIMMDY run name and gmx_mdrun_flags can be adjusted. For large systems, writing checkpoints takes considerable time. This is why the write_checkpoint setting is on False for our tutorial run. A final KIMMDY config file could look like this:</p>
 <details>
 <summary>
@@ -889,7 +891,7 @@ KIMMDY config file (kimmdy.yml)
 <div class="code-with-filename-file">
 <pre><strong>kimmdy.yml</strong></pre>
 </div>
-<div class="sourceCode" id="cb8" data-filename="kimmdy.yml"><pre class="sourceCode yml code-with-copy"><code class="sourceCode yaml"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># yaml-language-server: $schema=../../src/kimmdy/kimmdy-yaml-schema.json</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8" data-filename="kimmdy.yml"><pre class="sourceCode yml code-with-copy"><code class="sourceCode yaml"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># yaml-language-server: $schema=../../src/kimmdy/kimmdy-yaml-schema.json</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">dryrun</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span></span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="fu">name</span><span class="kw">:</span><span class="at"> </span><span class="st">'fibril_000'</span></span>
@@ -924,7 +926,7 @@ KIMMDY config file (kimmdy.yml)
 <span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> pull</span></span>
 <span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> sample  </span></span>
 <span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> reactions</span></span>
-<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> pull</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> pull</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </details>
 <p>The run can be started by typing <code>kimmdy</code> in the command line. The output files are located in <code>fibril_000</code></p>
@@ -1002,13 +1004,14 @@ KIMMDY config file (kimmdy.yml)
       e.clearSelection();
     }
     const getTextToCopy = function(trigger) {
-        const codeEl = trigger.previousElementSibling.cloneNode(true);
-        for (const childEl of codeEl.children) {
-          if (isCodeAnnotation(childEl)) {
-            childEl.remove();
-          }
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
         }
-        return codeEl.innerText;
+      }
+      return codeEl.innerText;
     }
     const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
       text: getTextToCopy

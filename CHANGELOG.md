@@ -1,6 +1,21 @@
 # Changelog
 
 
+## [8.3.1](https://github.com/graeter-group/kimmdy/compare/v8.3.0...v8.3.1) (2026-01-02)
+
+
+### Bug Fixes
+
+* catch error in case of time windows with length 0 ([#579](https://github.com/graeter-group/kimmdy/issues/579)) ([7cfbcf1](https://github.com/graeter-group/kimmdy/commit/7cfbcf1c1813f90f8c491ae3ffcbc85cfd8e645c))
+* ci lockfile ([1cfd8ae](https://github.com/graeter-group/kimmdy/commit/1cfd8aef2f9bde0fd984d6f63c12282605246c28))
+* ci lockfile ([4bc3862](https://github.com/graeter-group/kimmdy/commit/4bc3862005972af7277dd1009ab9cc80739c27d5))
+* fix ci `No space left on device` gh actions error ([#584](https://github.com/graeter-group/kimmdy/issues/584)) ([86f3aea](https://github.com/graeter-group/kimmdy/commit/86f3aead82c18e88c02a03efe64c0d4d73c517ff))
+
+
+### Documentation
+
+* more descriptive molecule merging error ([a6a972c](https://github.com/graeter-group/kimmdy/commit/a6a972ce18dd39dc80e948ef6edb83a3d171efe5))
+
 ## [8.3.0](https://github.com/graeter-group/kimmdy/compare/v8.2.1...v8.3.0) (2025-08-25)
 
 
