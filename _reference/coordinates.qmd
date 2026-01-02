@@ -39,7 +39,6 @@ mol_a is modified in place.
 | Name | Description |
 | --- | --- |
 | [add_helper_pairs](#kimmdy.coordinates.MoleculeTypeMerger.add_helper_pairs) | growing/shrinking pairs are used to turn on/off |
-| [amber_fix](#kimmdy.coordinates.MoleculeTypeMerger.amber_fix) | Amber fix for breaking/binding atom types without LJ potential |
 | [merge](#kimmdy.coordinates.MoleculeTypeMerger.merge) | modiefies mol_a, the reactive moleculetype of of top_a, in place |
 | [merge_exclusions](#kimmdy.coordinates.MoleculeTypeMerger.merge_exclusions) | Merge exclusions by adding the exclusions from the B state to the A state |
 | [merge_pairs](#kimmdy.coordinates.MoleculeTypeMerger.merge_pairs) | Merge pairs that are from the respective pairs sections of the topologies |
@@ -55,14 +54,6 @@ LJ / non-bonded interactions.
 If it is for a binding event, the pair is vanishing, as it will be an
 exclusion once bound. If a bond is breaking, the pair interaction
 is slowly turned on, as it was excluded previously.
-
-##### amber_fix { #kimmdy.coordinates.MoleculeTypeMerger.amber_fix }
-
-```python
-coordinates.MoleculeTypeMerger.amber_fix()
-```
-
-Amber fix for breaking/binding atom types without LJ potential
 
 ##### merge { #kimmdy.coordinates.MoleculeTypeMerger.merge }
 
