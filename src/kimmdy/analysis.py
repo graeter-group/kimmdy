@@ -502,9 +502,7 @@ def reaction_participation(dir: str, open_plot: bool = False):
         Open plot in default system viewer.
     """
     print(
-        "Count reaction participation\n"
-        f"dir: \t\t\t{dir}\n"
-        f"open_plot: \t\t{open_plot}\n"
+        f"Count reaction participation\ndir: \t\t\t{dir}\nopen_plot: \t\t{open_plot}\n"
     )
 
     run_dir = Path(dir).expanduser().resolve()
@@ -705,8 +703,11 @@ def runtime_analysis(dir: str, open_plot: bool = False):
     if open_plot:
         sp.Popen(("xdg-open", output_path))
 
-    print(
-        f"""
+    # Save stats
+    by_tasks = "\n" + str(df.groupby("Task").Durations.sum()) + "\n"
+    by_stage = "\n" + str(df.groupby("Stage").Durations.sum()) + "\n"
+
+    summary = f"""
     Summary of KIMMDY run in \
     {"/".join(run_dir.parts[-2:])}
 
@@ -714,9 +715,15 @@ def runtime_analysis(dir: str, open_plot: bool = False):
     Longest single step: {longest_task}
     Duration of longest step: {longest_task_dt}
     Longest stage, cumulative: {longest_stage}
-    Longest stage time, cumulative: {longest_stage_dt}
+    Longest stage time, cumulative: {longest_stage_dt}\n
     """
-    )
+
+    with open(analysis_dir / "runtimes.txt", "w") as f:
+        f.write(summary)
+        f.write(by_tasks)
+        f.write(by_stage)
+
+    print(summary)
 
 
 def get_analysis_cmdline_args() -> argparse.Namespace:
