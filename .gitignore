@@ -130,3 +130,5 @@ package-lock.json
 
 /.luarc.json
 _modules.sh
+
+**/*.quarto_ipynb
