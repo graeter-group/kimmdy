@@ -211,3 +211,17 @@ def test_config_works_for_no_slow_growth_relax(
     config = Config(Path("conf5.yml"))
     runmgr = RunManager(config)
     assert runmgr
+
+
+def test_config_parses_product_template_settings(arranged_tmp_path):
+    with open(Path("config1.yml"), "r") as f:
+        raw = yaml.safe_load(f)
+    raw["topology"] = {
+        "product_template_sources": ["itp", "rtp"],
+        "product_template_itp_glob": "DOPA*.itp",
+    }
+
+    config = Config(opts=raw)
+
+    assert list(config.topology.product_template_sources) == ["itp", "rtp"]
+    assert config.topology.product_template_itp_glob == "DOPA*.itp"

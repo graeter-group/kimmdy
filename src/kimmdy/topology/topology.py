@@ -31,6 +31,7 @@ from kimmdy.topology.atomic import (
     Settle,
 )
 from kimmdy.topology.ff import FF
+from kimmdy.topology.product_templates import ProductTemplateMatch
 from kimmdy.topology.utils import (
     attributes_to_list,
     get_moleculetype_atomics,
@@ -786,6 +787,8 @@ class Topology:
         radicals: Optional[str] = None,
         residuetypes_path: Optional[Path] = None,
         reactive_nrexcl: Optional[str] = None,
+        product_template_sources: tuple[str, ...] = ("rtp",),
+        product_template_itp_glob: str = "*.itp",
     ):
         if top == {}:
             raise NotImplementedError(
@@ -799,7 +802,15 @@ class Topology:
             raise ValueError("molecules not found in top file")
         self.molecules = [(l[0], l[1]) for l in molecules]
 
-        self.ff = FF(top, residuetypes_path)
+        self.ff = FF(
+            top,
+            residuetypes_path,
+            product_template_sources=product_template_sources,
+            product_template_itp_glob=product_template_itp_glob,
+        )
+        self.pending_product_template_matches: dict[
+            tuple[str, str], ProductTemplateMatch
+        ] = {}
         self._parse_molecules()
         self.parametrizer = parametrizer
         self._check_is_reactive_molecule = is_reactive_predicate_f
@@ -1146,6 +1157,48 @@ class Topology:
                 if self.atoms[step.atom_id_1].resnr == self.atoms[step.atom_id_2].resnr:
                     atom1 = self.atoms[step.atom_id_1]
                     atom2 = self.atoms[step.atom_id_2]
+                    match_key = tuple(
+                        sorted((step.atom_id_1, step.atom_id_2), key=int)
+                    )
+                    template_match = self.pending_product_template_matches.pop(
+                        match_key,
+                        None,
+                    )
+                    if template_match is not None:
+                        for atom_nr, template_atom in (
+                            template_match.atom_mapping.items()
+                        ):
+                            current_atom = self.atoms.get(atom_nr)
+                            if current_atom is None:
+                                raise RuntimeError(
+                                    "Exact ITP product template match became "
+                                    f"invalid: atom {atom_nr} no longer exists."
+                                )
+                            if current_atom.atom != template_atom.name:
+                                raise RuntimeError(
+                                    "Exact ITP product template match became "
+                                    f"invalid for atom {atom_nr}: expected name "
+                                    f"{template_atom.name!r}, found "
+                                    f"{current_atom.atom!r}."
+                                )
+                            current_atom.type = template_atom.atom_type
+                            current_atom.charge = template_atom.charge
+                            current_atom.mass = (
+                                template_atom.mass
+                                if template_atom.mass is not None
+                                else self.ff.atomtypes[
+                                    template_atom.atom_type
+                                ].mass
+                            )
+                        logger.info(
+                            "Restored atom types, masses, and charges from exact "
+                            "ITP product template %s:%s (%s).",
+                            template_match.template.moleculetype,
+                            template_match.template.local_resnr,
+                            template_match.template.residue,
+                        )
+                        continue
+
                     # check whether bond exists in topology
                     residue = atom1.residue
                     bondtype = (atom1.atom, atom2.atom)
@@ -1446,6 +1499,52 @@ class Topology:
                 other_res = other_atom.residue
                 atom.residue = other_res
                 atom.resnr = other_atom.resnr
+
+                template_match = None
+                if "itp" in self.ff.product_template_sources:
+                    template_match = (
+                        self.ff.product_templates.match_hydrogenated_residue(
+                            topology=self,
+                            acceptor=other_atom,
+                            transferred_h=atom,
+                        )
+                    )
+                if template_match is not None:
+                    template_h = template_match.template.atoms[
+                        template_match.transferred_h_template_name
+                    ]
+                    atom.atom = template_h.name
+                    atom.type = template_h.atom_type
+                    atom.mass = (
+                        template_h.mass
+                        if template_h.mass is not None
+                        else self.ff.atomtypes[template_h.atom_type].mass
+                    )
+                    self.pending_product_template_matches[
+                        atompair_nrs
+                    ] = template_match
+                    logger.info(
+                        "Matched hydrogenated product to ITP template "
+                        "%s:%s (%s); assigned transferred H as %s with type %s.",
+                        template_match.template.moleculetype,
+                        template_match.template.local_resnr,
+                        template_match.template.residue,
+                        template_h.name,
+                        template_h.atom_type,
+                    )
+                    continue
+
+                if "rtp" not in self.ff.product_template_sources:
+                    logger.warning(
+                        "No exact ITP product template matched hydrogen binding "
+                        "to %s:%s (atom %s). Keeping the legacy atom identity "
+                        "and using Grappa bonded-parameter fallback.",
+                        other_atom.residue,
+                        other_atom.atom,
+                        other_atom.nr,
+                    )
+                    continue
+
                 aa = self.ff.residuetypes.get(other_res)
                 if not aa:
                     logging.warning(

@@ -212,10 +212,14 @@ class Config:
 
                 if not deprecated:
                     v = pytype(v)
-                    if pytype is str and k != "name":
+                    if pytype is str and k not in {
+                        "name",
+                        "product_template_itp_glob",
+                    }:
                         # make sure all strings are lowercase
-                        # except for the name, because it is used
-                        # in the output directory name
+                        # except for values whose case has external meaning:
+                        # names are used for output directories and ITP globs
+                        # are matched against case-sensitive file systems.
                         v = v.lower()
                     self.__setattr__(k, v)
 

@@ -205,6 +205,30 @@
               "pytype": "int"
             }
           }
+        },
+        "product_template_sources": {
+          "title": "Product template sources",
+          "description": "Sources used to restore hydrogenated product atom identities, atom types, masses, and charges. Exact ITP templates are attempted before legacy RTP handling.",
+          "type": "array",
+          "pytype": "Sequence",
+          "items": {
+            "type": "string",
+            "enum": [
+              "itp",
+              "rtp"
+            ]
+          },
+          "uniqueItems": true,
+          "default": [
+            "rtp"
+          ]
+        },
+        "product_template_itp_glob": {
+          "title": "Product template ITP glob",
+          "description": "Glob used to discover molecule ITP files in the configured force-field directory.",
+          "type": "string",
+          "pytype": "str",
+          "default": "*.itp"
         }
       }
     },

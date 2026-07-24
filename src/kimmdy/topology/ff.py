@@ -20,6 +20,7 @@ from kimmdy.topology.atomic import (
     ProperDihedralId,
     ResidueType,
 )
+from kimmdy.topology.product_templates import ProductTemplateLibrary
 from kimmdy.topology.utils import get_top_section
 from kimmdy.utils import get_gmx_dir
 
@@ -37,6 +38,8 @@ class FF:
         top: dict,
         residuetypes_path: Optional[Path] = None,
         gromacs_alias: str = "gmx",
+        product_template_sources: tuple[str, ...] = ("rtp",),
+        product_template_itp_glob: str = "*.itp",
     ):
         self.atomtypes: dict[AtomId, AtomType] = {}
         self.bondtypes: dict[BondId, BondType] = {}
@@ -46,6 +49,14 @@ class FF:
         self.residuetypes: dict[str, ResidueType] = {}
         self.nonbond_params: dict[BondId, NonbondParamType] = {}
         self.default_edissoc: dict[str, dict[tuple[str, str], float]] = {}
+        self.product_template_sources = set(product_template_sources)
+        unknown_sources = self.product_template_sources - {"itp", "rtp"}
+        if unknown_sources:
+            raise ValueError(
+                f"Unknown product template sources: {sorted(unknown_sources)}. "
+                "Supported sources are 'itp' and 'rtp'."
+            )
+        self.product_templates = ProductTemplateLibrary()
 
         ffdir: Optional[Path] = top["ffdir"]
 
@@ -116,6 +127,20 @@ class FF:
                             )
                         ] = dihedraltype
 
+        if "itp" in self.product_template_sources:
+            if ffdir is None:
+                raise ValueError(
+                    "ITP product templates require a configured force-field "
+                    "directory. Set 'ff' in the KIMMDY configuration."
+                )
+            self.product_templates = ProductTemplateLibrary.from_itp_directory(
+                ffdir=ffdir,
+                pattern=product_template_itp_glob,
+            )
+            self.product_templates.validate_atomtypes(self.atomtypes)
+
+        if "rtp" not in self.product_template_sources:
+            return
         if residuetypes_path:
             logger.debug(f"Using specified residuetypes file: {residuetypes_path}")
             residuetypes_paths = [residuetypes_path]

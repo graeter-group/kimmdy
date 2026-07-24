@@ -230,6 +230,14 @@ class RunManager:
             ) from e
 
         nrexcl = getattr(self.config.topology, "nrexcl", None)
+        product_template_sources = tuple(
+            getattr(self.config.topology, "product_template_sources", ["rtp"])
+        )
+        product_template_itp_glob = getattr(
+            self.config.topology,
+            "product_template_itp_glob",
+            "*.itp",
+        )
         self.top = Topology(
             top=read_top(self.config.top, self.config.ff),
             parametrizer=self.parameterizer,
@@ -239,6 +247,8 @@ class RunManager:
             radicals=getattr(self.config, "radicals", None),
             residuetypes_path=getattr(self.config, "residuetypes", None),
             reactive_nrexcl=nrexcl,
+            product_template_sources=product_template_sources,
+            product_template_itp_glob=product_template_itp_glob,
         )
         self.filehist: list[dict[str, TaskFiles]] = [
             {"0_setup": TaskFiles(self.get_latest)}

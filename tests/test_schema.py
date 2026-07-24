@@ -25,3 +25,20 @@ def test_flatten_scheme(arranged_tmp_path):
                 "type",
             ]
         )
+
+
+def test_product_template_schema_definition():
+    loaded = schema.load_kimmdy_schema()
+    topology_properties = loaded["properties"]["topology"]["properties"]
+
+    sources = topology_properties["product_template_sources"]
+    assert sources["type"] == "array"
+    assert sources["pytype"] == "Sequence"
+    assert sources["default"] == ["rtp"]
+    assert set(sources["items"]["enum"]) == {"itp", "rtp"}
+    assert sources["uniqueItems"] is True
+
+    itp_glob = topology_properties["product_template_itp_glob"]
+    assert itp_glob["type"] == "string"
+    assert itp_glob["pytype"] == "str"
+    assert itp_glob["default"] == "*.itp"
