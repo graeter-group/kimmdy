@@ -47,14 +47,15 @@ def test_integration_valid_input_files(arranged_tmp_path):
 @pytest.mark.parametrize(
     "arranged_tmp_path", (["test_integration/minimal_input_files"]), indirect=True
 )
-def test_grompp_with_kimmdy_topology(arranged_tmp_path):
+def test_grompp_with_kimmdy_topology(arranged_tmp_path, gromacs_launch):
+    gromacs_alias, _mdrun_prefix = gromacs_launch
     raw_top = read_top(Path("minimal.top"))
     top = Topology(raw_top)
     top_dict = top.to_dict()
     write_top(top.to_dict(), Path("output.top"))
     assert sp.run(
         [
-            "gmx",
+            gromacs_alias,
             "grompp",
             "-f",
             "minimal.mdp",
