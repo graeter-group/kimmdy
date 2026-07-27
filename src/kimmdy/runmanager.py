@@ -1206,6 +1206,7 @@ class RunManager:
             self.latest_files["gro"] = files.output["gro"]
 
         top_initial = deepcopy(self.top)
+        pending_charge_steps: list[Break | Bind] = []
         for step in recipe.recipe_steps:
             if isinstance(step, Break):
                 self.top.break_bond((step.atom_id_1, step.atom_id_2))
@@ -1218,8 +1219,33 @@ class RunManager:
                         (step.atom_id_1, step.atom_id_2),
                         files.outputdir / self.config.plumed.name.replace(".", "_mod."),
                     )
+                # Keep standalone breaks pending through Relax, preserving the
+                # established homolysis slow-growth topology.
+                pending_charge_steps.append(step)
             elif isinstance(step, Bind):
+                bind_atom_ids = {step.atom_id_1, step.atom_id_2}
+                associated_breaks = [
+                    pending_step
+                    for pending_step in pending_charge_steps
+                    if isinstance(pending_step, Break)
+                    and bind_atom_ids
+                    & {pending_step.atom_id_1, pending_step.atom_id_2}
+                ]
+                if associated_breaks:
+                    # Apply a transfer-related break before bind_bond() moves
+                    # the shared atom, usually H, into the acceptor residue.
+                    self.top.update_partial_charges(associated_breaks)
+                    pending_charge_steps = [
+                        pending_step
+                        for pending_step in pending_charge_steps
+                        if pending_step not in associated_breaks
+                    ]
                 self.top.bind_bond((step.atom_id_1, step.atom_id_2))
+                if associated_breaks:
+                    # Product templates become available during bind_bond().
+                    self.top.update_partial_charges([step])
+                else:
+                    pending_charge_steps.append(step)
             elif isinstance(step, CustomTopMod):
                 self.top = step.f(self.top)
             elif isinstance(step, Place):
@@ -1335,8 +1361,10 @@ class RunManager:
                     self._discover_output_files(relax_task.name, relax_task_files)
                     shadow_files_binding = relax_task_files
 
-        logger.info(f"Updating partial charges")
-        self.top.update_partial_charges(recipe.recipe_steps)
+        if pending_charge_steps:
+            logger.info("Updating partial charges for remaining recipe steps")
+            self.top.update_partial_charges(pending_charge_steps)
+        logger.info("Updating parameters")
         self.top.update_parameters()
 
         # this is the new topology after the reaction

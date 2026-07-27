@@ -1094,11 +1094,17 @@ class Topology:
     def update_partial_charges(self, recipe_steps: list[RecipeStep]) -> None:
         """Update the topology atom partial charges.
 
-        This function must be called after the recipe_steps are applied.
-        Changes are based on the recipe_steps. Update rules follow a simple
-        assignment scheme that works well with grappa. If fragments are created,
-        their partial charges are kept integers. If previously broken bonds are
-        formed again, the original partial charges are restored.
+        Calls must reflect the topology state represented by their steps. A
+        standalone Break can be processed after the recipe, preserving legacy
+        slow-growth behavior. A Break associated with a later Bind must be
+        processed before ``bind_bond()`` changes the shared atom's residue;
+        that Bind is then processed afterward, when product-template
+        information is available.
+
+        Update rules follow a simple assignment scheme that works well with
+        grappa. If fragments are created, their partial charges are kept
+        integers. If previously broken bonds are formed again, the original
+        partial charges are restored.
         """
 
         # build updated list of atoms by residue for topology so that this does

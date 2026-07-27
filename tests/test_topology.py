@@ -1128,12 +1128,13 @@ def test_itp_hat_restores_closed_product_and_conserves_charge(dopa_itp_topology)
         Bind(atom_id_1=acceptor.nr, atom_id_2=donor_h.nr),
     ]
     top.break_bond((donor.nr, donor_h.nr))
+    top.update_partial_charges([recipe_steps[0]])
     top.bind_bond((acceptor.nr, donor_h.nr))
 
     match_key = tuple(sorted((acceptor.nr, donor_h.nr), key=int))
     assert match_key in top.pending_product_template_matches
 
-    top.update_partial_charges(recipe_steps)
+    top.update_partial_charges([recipe_steps[1]])
 
     assert tuple(sorted((donor.nr, donor_h.nr), key=int)) not in top.bonds
     assert tuple(sorted((acceptor.nr, donor_h.nr), key=int)) in top.bonds
@@ -1176,13 +1177,28 @@ def test_itp_hat_fails_closed_when_no_exact_template_matches(dopa_itp_topology):
     acceptor.type = "CG321"
     original_h_name = donor_h.atom
     original_h_type = donor_h.type
+    initial_total_charge = sum(float(atom.charge) for atom in top.atoms.values())
+    expected_donor_charge = float(donor.charge) + float(donor_h.charge)
+    initial_acceptor_charge = float(acceptor.charge)
+    break_step = Break(atom_id_1=donor.nr, atom_id_2=donor_h.nr)
+    bind_step = Bind(atom_id_1=acceptor.nr, atom_id_2=donor_h.nr)
+
     top.break_bond((donor.nr, donor_h.nr))
+    top.update_partial_charges([break_step])
     top.bind_bond((acceptor.nr, donor_h.nr))
+    top.update_partial_charges([bind_step])
 
     match_key = tuple(sorted((acceptor.nr, donor_h.nr), key=int))
     assert match_key not in top.pending_product_template_matches
     assert donor_h.atom == original_h_name
     assert donor_h.type == original_h_type
+    assert np.isclose(float(donor.charge), expected_donor_charge)
+    assert np.isclose(float(donor_h.charge), 0.0)
+    assert np.isclose(float(acceptor.charge), initial_acceptor_charge)
+    assert np.isclose(
+        sum(float(atom.charge) for atom in top.atoms.values()),
+        initial_total_charge,
+    )
 
 
 def test_itp_template_precedes_rtp_fallback():
