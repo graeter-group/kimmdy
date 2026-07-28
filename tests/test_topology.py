@@ -892,6 +892,7 @@ class TestChargeAssignment:
         recipe_steps = [Break(atom_id_1="7", atom_id_2="9")]
         top_charged.break_bond((recipe_steps[0].atom_id_1, recipe_steps[0].atom_id_2))
         top_charged.update_partial_charges(recipe_steps)
+        assert top_charged.pending_transferred_h_charges == {}
         fragment1_nrs = ["7", "8"]
         fragment2_nrs = [str(i) for i in range(9, 26)]
         assert np.isclose(
@@ -1129,6 +1130,7 @@ def test_itp_hat_restores_closed_product_and_conserves_charge(dopa_itp_topology)
     ]
     top.break_bond((donor.nr, donor_h.nr))
     top.update_partial_charges([recipe_steps[0]])
+    assert donor_h.nr in top.pending_transferred_h_charges
     top.bind_bond((acceptor.nr, donor_h.nr))
 
     match_key = tuple(sorted((acceptor.nr, donor_h.nr), key=int))
@@ -1167,16 +1169,30 @@ def test_itp_hat_restores_closed_product_and_conserves_charge(dopa_itp_topology)
         initial_total_charge,
     )
     assert match_key not in top.pending_product_template_matches
+    assert donor_h.nr not in top.pending_transferred_h_charges
     assert {donor.nr, donor_h.nr, acceptor.nr} <= top.parameterization_focus_ids
 
 
 def test_itp_hat_fails_closed_when_no_exact_template_matches(dopa_itp_topology):
-    """An incompatible acceptor must not receive a partial template update."""
+    """No template keeps atom identity but conserves both residue charges."""
     top = dopa_itp_topology
     donor_h, donor, acceptor = _dopa_itp_hat_atoms(top)
     acceptor.type = "CG321"
     original_h_name = donor_h.atom
     original_h_type = donor_h.type
+    original_h_charge = float(donor_h.charge)
+    donor_resnr = donor.resnr
+    acceptor_resnr = acceptor.resnr
+    initial_donor_residue_charge = sum(
+        float(atom.charge)
+        for atom in top.atoms.values()
+        if atom.resnr == donor_resnr
+    )
+    initial_acceptor_residue_charge = sum(
+        float(atom.charge)
+        for atom in top.atoms.values()
+        if atom.resnr == acceptor_resnr
+    )
     initial_total_charge = sum(float(atom.charge) for atom in top.atoms.values())
     expected_donor_charge = float(donor.charge) + float(donor_h.charge)
     initial_acceptor_charge = float(acceptor.charge)
@@ -1193,12 +1209,32 @@ def test_itp_hat_fails_closed_when_no_exact_template_matches(dopa_itp_topology):
     assert donor_h.atom == original_h_name
     assert donor_h.type == original_h_type
     assert np.isclose(float(donor.charge), expected_donor_charge)
-    assert np.isclose(float(donor_h.charge), 0.0)
-    assert np.isclose(float(acceptor.charge), initial_acceptor_charge)
+    assert np.isclose(float(donor_h.charge), original_h_charge)
+    assert np.isclose(
+        float(acceptor.charge),
+        initial_acceptor_charge - original_h_charge,
+    )
+    assert np.isclose(
+        sum(
+            float(atom.charge)
+            for atom in top.atoms.values()
+            if atom.resnr == donor_resnr
+        ),
+        initial_donor_residue_charge,
+    )
+    assert np.isclose(
+        sum(
+            float(atom.charge)
+            for atom in top.atoms.values()
+            if atom.resnr == acceptor_resnr
+        ),
+        initial_acceptor_residue_charge,
+    )
     assert np.isclose(
         sum(float(atom.charge) for atom in top.atoms.values()),
         initial_total_charge,
     )
+    assert donor_h.nr not in top.pending_transferred_h_charges
 
 
 def test_itp_template_precedes_rtp_fallback():

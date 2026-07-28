@@ -811,6 +811,7 @@ class Topology:
         self.pending_product_template_matches: dict[
             tuple[str, str], ProductTemplateMatch
         ] = {}
+        self.pending_transferred_h_charges: dict[str, str] = {}
         self._parse_molecules()
         self.parametrizer = parametrizer
         self._check_is_reactive_molecule = is_reactive_predicate_f
@@ -1105,6 +1106,8 @@ class Topology:
         grappa. If fragments are created, their partial charges are kept
         integers. If previously broken bonds are formed again, the original
         partial charges are restored.
+        If no product template matches a transferred H, its original charge
+        is restored and balanced locally by the acceptor atom.
         """
 
         # build updated list of atoms by residue for topology so that this does
@@ -1129,11 +1132,17 @@ class Topology:
                     if len(fragment2) in (0, 1):
                         # intra-residue HAT case (or similar)
                         if atom1.type.upper().startswith("H"):
+                            self.pending_transferred_h_charges[atom1.nr] = (
+                                atom1.charge
+                            )
                             atom2.charge = (
                                 f"{float(atom2.charge) + float(atom1.charge):7.4f}"
                             )
                             atom1.charge = "0.0"
                         elif atom2.type.upper().startswith("H"):
+                            self.pending_transferred_h_charges[atom2.nr] = (
+                                atom2.charge
+                            )
                             atom1.charge = (
                                 f"{float(atom1.charge) + float(atom2.charge):7.4f}"
                             )
@@ -1203,6 +1212,7 @@ class Topology:
                             template_match.template.local_resnr,
                             template_match.template.residue,
                         )
+                        self._discard_pending_transferred_h_charge(atom1, atom2)
                         continue
 
                     # check whether bond exists in topology
@@ -1212,6 +1222,7 @@ class Topology:
                     if residuetype is None:
                         m = f"Residue {residue} not found in residuetypes. Can't update partial charges!"
                         logger.warning(m)
+                        self._apply_transferred_h_charge_fallback(atom1, atom2)
                         continue
                     residue_bond_spec = residuetype.bonds.get(
                         bondtype,
@@ -1220,15 +1231,49 @@ class Topology:
                     if residue_bond_spec:
                         atom1.charge = residuetype.atoms[atom1.atom].charge
                         atom2.charge = residuetype.atoms[atom2.atom].charge
+                        self._discard_pending_transferred_h_charge(atom1, atom2)
                     else:
                         logger.warning(
                             f"New bond defined in {step} but can't be found in residuetypes definition. Not changing the partial charges!"
                         )
+                        self._apply_transferred_h_charge_fallback(atom1, atom2)
                 else:
                     # no change in partial charges necessary
                     continue
             else:
                 continue
+
+    def _discard_pending_transferred_h_charge(
+        self, atom1: Atom, atom2: Atom
+    ) -> None:
+        """Discard saved H charge after a product template restored charges."""
+        self.pending_transferred_h_charges.pop(atom1.nr, None)
+        self.pending_transferred_h_charges.pop(atom2.nr, None)
+
+    def _apply_transferred_h_charge_fallback(
+        self, atom1: Atom, atom2: Atom
+    ) -> bool:
+        """Conserve residue charges when no product charge template is available."""
+        if atom1.nr in self.pending_transferred_h_charges:
+            hydrogen, acceptor = atom1, atom2
+        elif atom2.nr in self.pending_transferred_h_charges:
+            hydrogen, acceptor = atom2, atom1
+        else:
+            return False
+
+        hydrogen_charge = self.pending_transferred_h_charges.pop(hydrogen.nr)
+        acceptor.charge = (
+            f"{float(acceptor.charge) - float(hydrogen_charge):7.4f}"
+        )
+        hydrogen.charge = hydrogen_charge
+        logger.warning(
+            "No exact product charge template was available for transferred "
+            "hydrogen %s. Restored its pre-transfer charge and subtracted that "
+            "charge from acceptor atom %s.",
+            hydrogen.nr,
+            acceptor.nr,
+        )
+        return True
 
     def to_dict(self) -> TopologyDict:
         self.update_parameters()
