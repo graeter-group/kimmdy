@@ -789,6 +789,7 @@ class Topology:
         reactive_nrexcl: Optional[str] = None,
         product_template_sources: tuple[str, ...] = ("rtp",),
         product_template_itp_glob: str = "*.itp",
+        product_template_transitions: Optional[dict[str, str]] = None,
     ):
         if top == {}:
             raise NotImplementedError(
@@ -807,6 +808,7 @@ class Topology:
             residuetypes_path,
             product_template_sources=product_template_sources,
             product_template_itp_glob=product_template_itp_glob,
+            product_template_transitions=product_template_transitions,
         )
         self.pending_product_template_matches: dict[
             tuple[str, str], ProductTemplateMatch

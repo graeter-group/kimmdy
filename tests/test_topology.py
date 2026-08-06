@@ -1256,3 +1256,60 @@ def test_itp_template_precedes_rtp_fallback():
     match = top.pending_product_template_matches[match_key]
     assert match.template.moleculetype == "DOPA"
     assert donor_h.atom == "H38"
+
+
+def test_ohr_transition_restores_tip3_like_product_and_conserves_charge():
+    """An explicit OHR transition restores product types and charges."""
+    template_dir = Path(__file__).parent / "test_files" / "test_itp_templates"
+    raw_top = read_top(template_dir / "ohr_topol.top", ffdir=template_dir)
+    top = Topology(
+        raw_top,
+        product_template_sources=("itp",),
+        product_template_itp_glob="*.itp",
+        product_template_transitions={"OHR": "OHRH"},
+    )
+    acceptor = next(atom for atom in top.atoms.values() if atom.type == "ORA")
+    donor = next(atom for atom in top.atoms.values() if atom.type == "OT")
+    donor_h = next(
+        top.atoms[atom_nr]
+        for atom_nr in donor.bound_to_nrs
+        if top.atoms[atom_nr].atom == "H2"
+    )
+    acceptor_resnr = acceptor.resnr
+    initial_total_charge = sum(float(atom.charge) for atom in top.atoms.values())
+    break_step = Break(atom_id_1=donor.nr, atom_id_2=donor_h.nr)
+    bind_step = Bind(atom_id_1=acceptor.nr, atom_id_2=donor_h.nr)
+
+    top.break_bond((donor.nr, donor_h.nr))
+    top.update_partial_charges([break_step])
+    assert donor_h.nr in top.pending_transferred_h_charges
+
+    top.bind_bond((acceptor.nr, donor_h.nr))
+    match_key = tuple(sorted((acceptor.nr, donor_h.nr), key=int))
+    assert match_key in top.pending_product_template_matches
+    top.update_partial_charges([bind_step])
+
+    product_atoms = {
+        atom.atom: atom
+        for atom in top.atoms.values()
+        if atom.resnr == acceptor_resnr
+    }
+    assert set(product_atoms) == {"O1", "H1", "H2"}
+    assert {name: atom.type for name, atom in product_atoms.items()} == {
+        "O1": "OT",
+        "H1": "HT",
+        "H2": "HT",
+    }
+    assert np.isclose(float(product_atoms["O1"].charge), -0.834)
+    assert np.isclose(float(product_atoms["H1"].charge), 0.417)
+    assert np.isclose(float(product_atoms["H2"].charge), 0.417)
+    assert np.isclose(
+        sum(float(atom.charge) for atom in product_atoms.values()),
+        0.0,
+    )
+    assert np.isclose(
+        sum(float(atom.charge) for atom in top.atoms.values()),
+        initial_total_charge,
+    )
+    assert match_key not in top.pending_product_template_matches
+    assert donor_h.nr not in top.pending_transferred_h_charges

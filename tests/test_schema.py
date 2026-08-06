@@ -42,3 +42,8 @@ def test_product_template_schema_definition():
     assert itp_glob["type"] == "string"
     assert itp_glob["pytype"] == "str"
     assert itp_glob["default"] == "*.itp"
+
+    transitions = topology_properties["product_template_transitions"]
+    assert transitions["type"] == "object"
+    assert transitions["additionalProperties"] == {"type": "string"}
+    assert transitions["default"] == {}

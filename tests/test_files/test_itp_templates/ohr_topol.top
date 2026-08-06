@@ -1,0 +1,11 @@
+#include "charmm36.itp"
+#include "OHR.itp"
+#include "OHRH.itp"
+
+[ system ]
+Minimal OHR product-template transition test
+
+[ molecules ]
+; Compound  #mols
+OHR   1
+OHRH  1

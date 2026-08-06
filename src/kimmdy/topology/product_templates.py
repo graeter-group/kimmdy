@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import math
 from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, Optional
@@ -76,6 +77,7 @@ class ProductTemplateLibrary:
     def __init__(self) -> None:
         self.templates: dict[str, list[ProductTemplate]] = {}
         self._signatures: set[tuple] = set()
+        self.transitions: dict[str, str] = {}
 
     def add(self, template: ProductTemplate) -> None:
         signature = template.signature()
@@ -133,6 +135,32 @@ class ProductTemplateLibrary:
                             "the parsed force-field [ atomtypes ] section."
                         )
 
+    def set_transitions(self, transitions: dict[str, str]) -> None:
+        """Configure explicit precursor-to-product moleculetype transitions."""
+        known_moleculetypes = {
+            template.moleculetype
+            for templates in self.templates.values()
+            for template in templates
+        }
+        for precursor, product in transitions.items():
+            if not isinstance(precursor, str) or not isinstance(product, str):
+                raise TypeError(
+                    "Product template transition names must be strings, got "
+                    f"{precursor!r} -> {product!r}."
+                )
+            if precursor == product:
+                raise ValueError(
+                    "Product template transition precursor and product must "
+                    f"differ, got {precursor!r}."
+                )
+            unknown = {precursor, product} - known_moleculetypes
+            if unknown:
+                raise ValueError(
+                    "Unknown moleculetype(s) in product template transition "
+                    f"{precursor!r} -> {product!r}: {sorted(unknown)}."
+                )
+        self.transitions = dict(transitions)
+
     def match_hydrogenated_residue(
         self,
         topology: Topology,
@@ -167,7 +195,69 @@ class ProductTemplateLibrary:
                 acceptor.nr,
                 descriptions,
             )
+            return None
+
+        transition_matches = self._match_configured_transition(
+            topology=topology,
+            acceptor=acceptor,
+            transferred_h=transferred_h,
+        )
+        if len(transition_matches) == 1:
+            return transition_matches[0]
+        if len(transition_matches) > 1:
+            descriptions = [
+                f"{match.template.source.name}:"
+                f"{match.template.moleculetype}:"
+                f"{match.template.local_resnr}"
+                for match in transition_matches
+            ]
+            logger.warning(
+                "Multiple configured ITP product transitions matched hydrogen "
+                "binding to %s:%s (atom %s): %s. Using the legacy fallback.",
+                acceptor.residue,
+                acceptor.atom,
+                acceptor.nr,
+                descriptions,
+            )
         return None
+
+    def _match_configured_transition(
+        self,
+        topology: Topology,
+        acceptor: Atom,
+        transferred_h: Atom,
+    ) -> list[ProductTemplateMatch]:
+        if not self.transitions:
+            return []
+
+        residue_templates = self.templates.get(acceptor.residue, [])
+        precursor_templates = [
+            template
+            for template in residue_templates
+            if template.moleculetype in self.transitions
+            and _matches_precursor_template(
+                template,
+                topology,
+                acceptor,
+                transferred_h,
+            )
+        ]
+        matches = []
+        for precursor in precursor_templates:
+            product_moleculetype = self.transitions[precursor.moleculetype]
+            for product in residue_templates:
+                if product.moleculetype != product_moleculetype:
+                    continue
+                match = _match_template(
+                    template=product,
+                    topology=topology,
+                    acceptor=acceptor,
+                    transferred_h=transferred_h,
+                    allow_existing_type_changes=True,
+                )
+                if match is not None:
+                    matches.append(match)
+        return matches
 
 
 def _templates_from_moleculetype(
@@ -257,6 +347,7 @@ def _match_template(
     topology: Topology,
     acceptor: Atom,
     transferred_h: Atom,
+    allow_existing_type_changes: bool = False,
 ) -> Optional[ProductTemplateMatch]:
     current_atoms = [
         atom
@@ -291,7 +382,10 @@ def _match_template(
     atom_mapping = {transferred_h.nr: template_h}
     for name, current_atom in current_by_name.items():
         template_atom = template.atoms[name]
-        if current_atom.type != template_atom.atom_type:
+        if (
+            not allow_existing_type_changes
+            and current_atom.type != template_atom.atom_type
+        ):
             return None
         atom_mapping[current_atom.nr] = template_atom
 
@@ -329,6 +423,69 @@ def _match_template(
         acceptor_id=acceptor.nr,
         transferred_h_template_name=missing_name,
         atom_mapping=atom_mapping,
+    )
+
+
+def _matches_precursor_template(
+    template: ProductTemplate,
+    topology: Topology,
+    acceptor: Atom,
+    transferred_h: Atom,
+) -> bool:
+    """Return whether the acceptor residue exactly matches a precursor ITP."""
+    current_atoms = [
+        atom
+        for atom in topology.atoms.values()
+        if atom.resnr == acceptor.resnr
+        and atom.residue == acceptor.residue
+        and atom.nr != transferred_h.nr
+    ]
+    if len(current_atoms) != len(template.atoms):
+        return False
+
+    current_by_name = {atom.atom: atom for atom in current_atoms}
+    if set(current_by_name) != set(template.atoms):
+        return False
+
+    for name, current_atom in current_by_name.items():
+        template_atom = template.atoms[name]
+        if current_atom.type != template_atom.atom_type:
+            return False
+        if not math.isclose(
+            float(current_atom.charge),
+            float(template_atom.charge),
+            rel_tol=0.0,
+            abs_tol=1e-8,
+        ):
+            return False
+        if template_atom.mass is not None and (
+            current_atom.mass is None
+            or not math.isclose(
+                float(current_atom.mass),
+                float(template_atom.mass),
+                rel_tol=0.0,
+                abs_tol=1e-8,
+            )
+        ):
+            return False
+
+    current_ids = {atom.nr for atom in current_atoms}
+    current_bonds: set[tuple[str, str]] = set()
+    current_boundary_bonds: set[tuple[str, str, str]] = set()
+    for atom in current_atoms:
+        for neighbor_nr in atom.bound_to_nrs:
+            neighbor = topology.atoms[neighbor_nr]
+            if neighbor_nr in current_ids:
+                if int(atom.nr) < int(neighbor_nr):
+                    current_bonds.add(_canonical_bond(atom.atom, neighbor.atom))
+            elif neighbor_nr != transferred_h.nr:
+                current_boundary_bonds.add(
+                    (atom.atom, neighbor.residue, neighbor.atom)
+                )
+
+    return (
+        current_bonds == set(template.bonds)
+        and current_boundary_bonds == set(template.boundary_bonds)
     )
 
 

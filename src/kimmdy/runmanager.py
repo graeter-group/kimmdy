@@ -238,6 +238,17 @@ class RunManager:
             "product_template_itp_glob",
             "*.itp",
         )
+        transition_config = getattr(
+            self.config.topology,
+            "product_template_transitions",
+            None,
+        )
+        if transition_config is None:
+            product_template_transitions = {}
+        elif isinstance(transition_config, dict):
+            product_template_transitions = dict(transition_config)
+        else:
+            product_template_transitions = dict(vars(transition_config))
         self.top = Topology(
             top=read_top(self.config.top, self.config.ff),
             parametrizer=self.parameterizer,
@@ -249,6 +260,7 @@ class RunManager:
             reactive_nrexcl=nrexcl,
             product_template_sources=product_template_sources,
             product_template_itp_glob=product_template_itp_glob,
+            product_template_transitions=product_template_transitions,
         )
         self.filehist: list[dict[str, TaskFiles]] = [
             {"0_setup": TaskFiles(self.get_latest)}

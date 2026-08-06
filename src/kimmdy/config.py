@@ -259,6 +259,10 @@ class Config:
         """
         # don't do anything for the description of a section
         scheme.pop("description", None)
+        # Object-level schema metadata describes the section itself; it must
+        # not be materialized as configuration attributes during recursion.
+        scheme.pop("additionalProperties", None)
+        scheme.pop("default", None)
 
         # if the section has a general subscheme
         # merge it into all specific subschemes

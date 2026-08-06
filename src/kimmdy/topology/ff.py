@@ -40,6 +40,7 @@ class FF:
         gromacs_alias: str = "gmx",
         product_template_sources: tuple[str, ...] = ("rtp",),
         product_template_itp_glob: str = "*.itp",
+        product_template_transitions: Optional[dict[str, str]] = None,
     ):
         self.atomtypes: dict[AtomId, AtomType] = {}
         self.bondtypes: dict[BondId, BondType] = {}
@@ -55,6 +56,14 @@ class FF:
             raise ValueError(
                 f"Unknown product template sources: {sorted(unknown_sources)}. "
                 "Supported sources are 'itp' and 'rtp'."
+            )
+        if (
+            product_template_transitions
+            and "itp" not in self.product_template_sources
+        ):
+            raise ValueError(
+                "Product template transitions require itp in "
+                "product_template_sources."
             )
         self.product_templates = ProductTemplateLibrary()
 
@@ -138,6 +147,9 @@ class FF:
                 pattern=product_template_itp_glob,
             )
             self.product_templates.validate_atomtypes(self.atomtypes)
+            self.product_templates.set_transitions(
+                product_template_transitions or {}
+            )
 
         if "rtp" not in self.product_template_sources:
             return

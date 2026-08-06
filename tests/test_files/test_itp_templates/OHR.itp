@@ -1,0 +1,14 @@
+; Minimal hydroxyl-radical precursor template
+
+[ moleculetype ]
+; name  nrexcl
+OHR  1
+
+[ atoms ]
+; nr  type  resnr  residue  atom  cgnr  charge  mass
+1  ORA  1  OHR  O1  1  -0.436  15.9994
+2  HRA  1  OHR  H1  1   0.436   1.0080
+
+[ bonds ]
+; ai  aj  funct  b0  kb
+1  2  1  0.09762048  425085.128256

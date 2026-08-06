@@ -219,9 +219,13 @@ def test_config_parses_product_template_settings(arranged_tmp_path):
     raw["topology"] = {
         "product_template_sources": ["itp", "rtp"],
         "product_template_itp_glob": "DOPA*.itp",
+        "product_template_transitions": {"OHR": "OHRH"},
     }
 
     config = Config(opts=raw)
 
     assert list(config.topology.product_template_sources) == ["itp", "rtp"]
     assert config.topology.product_template_itp_glob == "DOPA*.itp"
+    assert vars(config.topology.product_template_transitions) == {
+        "OHR": "OHRH",
+    }

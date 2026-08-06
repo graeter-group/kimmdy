@@ -229,6 +229,15 @@
           "type": "string",
           "pytype": "str",
           "default": "*.itp"
+        },
+        "product_template_transitions": {
+          "title": "Product template transitions",
+          "description": "Explicit case-sensitive precursor-to-product moleculetype mappings that permit atom-type changes after an exact precursor ITP match.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {}
         }
       }
     },
