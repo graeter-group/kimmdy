@@ -408,6 +408,57 @@ def test_merge_small_hat_details(arranged_tmp_path, caplog):
     assert ("7", "8") not in merger.helper_pairs
 
 
+def test_merge_restores_pairs_excluded_only_by_union_graph(arranged_tmp_path):
+    top = Topology(read_top(Path("AlaCaR_out.top")))
+    # Split the peptide so donor and acceptor are physically disconnected in
+    # both endpoints, like a lipid donating H to a hydroxyl radical.
+    top.break_bond(("14", "16"))
+    top_a = copy.deepcopy(top)
+    top_b = copy.deepcopy(top)
+
+    top_b.break_bond(("7", "8"))
+    top_b.bind_bond(("8", "16"))
+
+    merger = MoleculeTypeMerger(
+        top_a.moleculetypes[REACTIVE_MOLECULEYPE],
+        top_b.moleculetypes[REACTIVE_MOLECULEYPE],
+        ff=top_a.ff,
+    )
+    merger.merge()
+
+    # These pairs are fully nonbonded in A and B, but the union graph contains
+    # the artificial paths N7-H8-N16 and C5-N7-H8-N16.
+    expected_restored_pairs = {("7", "16"), ("5", "16")}
+    assert expected_restored_pairs <= merger.union_exclusion_helper_pairs
+    for pair_key in expected_restored_pairs:
+        pair = merger.mol_a.pairs[pair_key]
+        assert pair.c0 is not None
+        assert pair.c1 is not None
+        assert pair.c2 is not None
+        assert pair.c3 is not None
+        assert pair_key in merger.mol_a.exclusions
+
+
+def test_union_exclusion_reconciliation_keeps_connected_hat_behavior(
+    arranged_tmp_path,
+):
+    top = Topology(read_top(Path("AlaCaR_out.top")))
+    top_a = copy.deepcopy(top)
+    top_b = copy.deepcopy(top)
+
+    top_b.break_bond(("7", "8"))
+    top_b.bind_bond(("8", "9"))
+
+    merger = MoleculeTypeMerger(
+        top_a.moleculetypes[REACTIVE_MOLECULEYPE],
+        top_b.moleculetypes[REACTIVE_MOLECULEYPE],
+        ff=top_a.ff,
+    )
+    merger.merge()
+
+    assert merger.union_exclusion_helper_pairs == set()
+
+
 def test_merge_small_hat_with_more_overlaps(arranged_tmp_path, caplog):
     top = Topology(read_top(Path("AlaCaR_out.top")))
     # move the radical to N16 before we start

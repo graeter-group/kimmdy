@@ -46,6 +46,12 @@ class PairTransition(Enum):
     Vanish = auto()
 
 
+class NonbondedState(Enum):
+    Excluded = auto()
+    OneFour = auto()
+    Full = auto()
+
+
 def to_pairkey(key: BondId | AngleId | DihedralId) -> tuple[str, str]:
     """Turn key into a pair key
     Takes the key for a higher ordre interaction (bond, angle, dihedral)
@@ -196,6 +202,15 @@ class MoleculeTypeMerger:
         )
 
         self.affected_interactions = AffectedInteractions()
+        # Keep the physical endpoint graphs before mol_a is mutated into the
+        # union topology used for slow growth.
+        self._bond_graph_a = self._build_bond_graph(mol_a)
+        self._bond_graph_b = self._build_bond_graph(mol_b)
+        self._pairs_a = {to_pairkey(key) for key in mol_a.pairs}
+        self._pairs_b = {to_pairkey(key) for key in mol_b.pairs}
+        self._explicit_exclusions_a = self._expand_exclusions(mol_a)
+        self._explicit_exclusions_b = self._expand_exclusions(mol_b)
+        self.union_exclusion_helper_pairs: set[tuple[str, str]] = set()
 
     def merge(self):
         """modiefies mol_a, the reactive moleculetype of of top_a, in place"""
@@ -209,6 +224,7 @@ class MoleculeTypeMerger:
         if not self.morse_only:
             self.merge_pairs()
             self.add_helper_pairs()
+            self.add_union_exclusion_helper_pairs()
             # sort pairs because their order can get messed up
             # by adding the helper pairs after the already existing pairs
             self.mol_a.pairs = dict(
@@ -232,6 +248,124 @@ class MoleculeTypeMerger:
                 self.mol_a.exclusions[key] = Exclusion(*key)
 
         logger.info(f"Finished merging topologies")
+
+    @staticmethod
+    def _build_bond_graph(mol: MoleculeType) -> dict[str, set[str]]:
+        graph = {atom_nr: set() for atom_nr in mol.atoms}
+        for atom_1, atom_2 in mol.bonds:
+            graph[atom_1].add(atom_2)
+            graph[atom_2].add(atom_1)
+        return graph
+
+    @staticmethod
+    def _expand_exclusions(mol: MoleculeType) -> set[tuple[str, str]]:
+        pairs: set[tuple[str, str]] = set()
+        for exclusion in mol.exclusions.values():
+            atom_nrs = exclusion.key()
+            if len(atom_nrs) < 2:
+                continue
+            for excluded_atom in atom_nrs[1:]:
+                pairs.add(to_pairkey((atom_nrs[0], excluded_atom)))
+        return pairs
+
+    @staticmethod
+    def _nrexcl(mol: MoleculeType) -> int:
+        try:
+            return int(mol.nrexcl)
+        except (TypeError, ValueError) as error:
+            raise ValueError(
+                f"Invalid nrexcl value {mol.nrexcl!r} for moleculetype "
+                f"{mol.name!r}."
+            ) from error
+
+    @staticmethod
+    def _atoms_within_bond_distance(
+        graph: dict[str, set[str]],
+        initial_atoms: set[str],
+        max_distance: int,
+    ) -> set[str]:
+        atoms = set(initial_atoms)
+        frontier = set(initial_atoms)
+        for _ in range(max_distance):
+            next_frontier = {
+                neighbor
+                for atom_nr in frontier
+                for neighbor in graph.get(atom_nr, set())
+                if neighbor not in atoms
+            }
+            if not next_frontier:
+                break
+            atoms.update(next_frontier)
+            frontier = next_frontier
+        return atoms
+
+    @staticmethod
+    def _pairs_within_bond_distance(
+        graph: dict[str, set[str]],
+        initial_atoms: set[str],
+        max_distance: int,
+    ) -> set[tuple[str, str]]:
+        pairs: set[tuple[str, str]] = set()
+        for atom_1 in initial_atoms:
+            visited = {atom_1}
+            frontier = {atom_1}
+            for _ in range(max_distance):
+                next_frontier = {
+                    neighbor
+                    for atom_nr in frontier
+                    for neighbor in graph.get(atom_nr, set())
+                    if neighbor not in visited
+                }
+                if not next_frontier:
+                    break
+                pairs.update(
+                    to_pairkey((atom_1, atom_2)) for atom_2 in next_frontier
+                )
+                visited.update(next_frontier)
+                frontier = next_frontier
+        return pairs
+
+    @staticmethod
+    def _is_within_bond_distance(
+        graph: dict[str, set[str]],
+        atom_1: str,
+        atom_2: str,
+        max_distance: int,
+    ) -> bool:
+        if max_distance < 1:
+            return False
+        visited = {atom_1}
+        frontier = {atom_1}
+        for _ in range(max_distance):
+            next_frontier = {
+                neighbor
+                for atom_nr in frontier
+                for neighbor in graph.get(atom_nr, set())
+                if neighbor not in visited
+            }
+            if atom_2 in next_frontier:
+                return True
+            if not next_frontier:
+                return False
+            visited.update(next_frontier)
+            frontier = next_frontier
+        return False
+
+    def _nonbonded_state(
+        self,
+        pair_key: tuple[str, str],
+        graph: dict[str, set[str]],
+        explicit_pairs: set[tuple[str, str]],
+        explicit_exclusions: set[tuple[str, str]],
+        nrexcl: int,
+    ) -> NonbondedState:
+        if pair_key in explicit_pairs:
+            return NonbondedState.OneFour
+        if pair_key in explicit_exclusions or self._is_within_bond_distance(
+            graph, *pair_key, max_distance=nrexcl
+        ):
+            return NonbondedState.Excluded
+        return NonbondedState.Full
 
     def _get_explicit_MultipleDihedrals(
         self,
@@ -369,6 +503,7 @@ class MoleculeTypeMerger:
         transition: PairTransition,
         from_1_4: bool = False,
         to_1_4: bool = False,
+        force_explicit: bool = False,
     ) -> Pair:
         """Generates morphing pair interaction
 
@@ -388,6 +523,8 @@ class MoleculeTypeMerger:
             Is the pair a 1-4 interaction in the A state
         to_1_4
             Will the pair be a 1-4 interaction in the B state
+        force_explicit
+            Always write A/B LJ parameters, even when they are identical.
 
         Returns
         -------
@@ -408,6 +545,7 @@ class MoleculeTypeMerger:
             transition == PairTransition.Morph
             and sigmaij_a == sigmaij_b
             and epsilonij_a == epsilonij_b
+            and not force_explicit
         ):
             return Pair(id1, id2, funct=self.ff.defaults[0][0])
 
@@ -1102,6 +1240,99 @@ class MoleculeTypeMerger:
 
             # add general exclusions for each pair
             self.mol_a.exclusions[key] = Exclusion(*key)
+
+    def add_union_exclusion_helper_pairs(self):
+        """Restore endpoint interactions hidden by the merged bond graph.
+
+        Vanishing and creating bonds coexist in the slow-growth topology.
+        Together they can form short paths that exist in neither physical
+        endpoint. GROMACS applies nrexcl to that union graph, so these paths
+        can accidentally suppress otherwise full nonbonded interactions.
+        """
+        changed_bonds = (
+            self.affected_interactions.bonds.added
+            | self.affected_interactions.bonds.removed
+        )
+        if not changed_bonds:
+            return
+
+        merged_graph = self._build_bond_graph(self.mol_a)
+        merged_nrexcl = self._nrexcl(self.mol_a)
+        changed_atoms = {atom_nr for bond in changed_bonds for atom_nr in bond}
+        local_atoms = self._atoms_within_bond_distance(
+            merged_graph,
+            changed_atoms,
+            merged_nrexcl,
+        )
+        merged_excluded_pairs = self._pairs_within_bond_distance(
+            merged_graph,
+            local_atoms,
+            merged_nrexcl,
+        )
+
+        nrexcl_a = self._nrexcl(self.mol_a)
+        nrexcl_b = self._nrexcl(self.mol_b)
+        for pair_key in sorted(
+            merged_excluded_pairs,
+            key=lambda pair: (int(pair[0]), int(pair[1])),
+        ):
+            # Explicit endpoint pairs and the established helper-pair logic
+            # have already been merged and remain authoritative.
+            if pair_key in self.mol_a.pairs:
+                continue
+
+            state_a = self._nonbonded_state(
+                pair_key,
+                self._bond_graph_a,
+                self._pairs_a,
+                self._explicit_exclusions_a,
+                nrexcl_a,
+            )
+            state_b = self._nonbonded_state(
+                pair_key,
+                self._bond_graph_b,
+                self._pairs_b,
+                self._explicit_exclusions_b,
+                nrexcl_b,
+            )
+            if (
+                state_a == NonbondedState.Excluded
+                and state_b == NonbondedState.Excluded
+            ):
+                continue
+
+            if state_a == NonbondedState.Excluded:
+                transition = PairTransition.Create
+            elif state_b == NonbondedState.Excluded:
+                transition = PairTransition.Vanish
+            else:
+                transition = PairTransition.Morph
+
+            pair = self._make_pair(
+                *pair_key,
+                transition=transition,
+                from_1_4=state_a == NonbondedState.OneFour,
+                to_1_4=state_b == NonbondedState.OneFour,
+                force_explicit=(
+                    state_a == NonbondedState.Full
+                    or state_b == NonbondedState.Full
+                ),
+            )
+            pair.comment = (
+                f"{pair.comment or ''} "
+                "; restoring interaction excluded only by merged bond graph"
+            ).strip()
+            self.helper_pairs[pair_key] = pair
+            self.union_exclusion_helper_pairs.add(pair_key)
+            self.mol_a.pairs[pair_key] = pair
+            self.mol_a.exclusions[pair_key] = Exclusion(*pair_key)
+
+        if self.union_exclusion_helper_pairs:
+            logger.info(
+                "Added %d helper pairs for interactions excluded only by the "
+                "merged slow-growth bond graph.",
+                len(self.union_exclusion_helper_pairs),
+            )
 
 
 def merge_top_slow_growth(
