@@ -834,6 +834,7 @@ class RunManager:
             self.top.parameterization_focus_ids = set(self.top.atoms.keys())
             self.top.needs_parameterization = True
             self.top.update_parameters()
+            self.top.parameterization_focus_ids = set(self.top.radicals)
 
         write_top(self.top.to_dict(), files.outputdir / self.config.top.name)
         files.output["top"] = files.outputdir / self.config.top.name
@@ -1284,7 +1285,7 @@ class RunManager:
                 if self.config.changer.coordinates.slow_growth:
                     # Create a temporary slow growth topology for sub-task run_md, afterwards, top will be reset properly.
 
-                    self.top.update_parameters()
+                    parameterization = self.top.prepare_product_parameters()
 
                     # write out original topology (topA) and target (topB) for easier debugging
                     write_top(
@@ -1304,7 +1305,7 @@ class RunManager:
                     # First we find out if there are solvent atoms among the involved atoms
                     solvent_atoms: set[str] = set()
                     logger.debug(f"Checking for reacting solvent residues..")
-                    for ai in self.top.parameterization_focus_ids:
+                    for ai in parameterization.event_focus_ids:
                         if top_initial.atoms[ai].residue == "SOL":
                             solvent_atoms.add(ai)
                             logger.debug(
@@ -1377,7 +1378,7 @@ class RunManager:
             logger.info("Updating partial charges for remaining recipe steps")
             self.top.update_partial_charges(pending_charge_steps)
         logger.info("Updating parameters")
-        self.top.update_parameters()
+        self.top.prepare_product_parameters()
 
         # this is the new topology after the reaction
         # not the temporay topology <name>_relax.top for slow_growth

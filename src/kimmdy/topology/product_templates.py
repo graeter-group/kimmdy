@@ -38,8 +38,14 @@ class ProductTemplate:
     local_resnr: str
     residue: str
     atoms: dict[str, ProductTemplateAtom]
+    atoms_by_local_nr: dict[str, ProductTemplateAtom]
     bonds: frozenset[tuple[str, str]]
     boundary_bonds: frozenset[tuple[str, str, str]]
+    bond_lines: tuple[tuple[str, ...], ...]
+    pair_lines: tuple[tuple[str, ...], ...]
+    angle_lines: tuple[tuple[str, ...], ...]
+    dihedral_lines: tuple[tuple[str, ...], ...]
+    supports_bonded_restoration: bool
 
     def signature(self) -> tuple:
         """Return the chemistry-relevant signature used to remove duplicates."""
@@ -59,6 +65,10 @@ class ProductTemplate:
             atoms,
             tuple(sorted(self.bonds)),
             tuple(sorted(self.boundary_bonds)),
+            self.bond_lines,
+            self.pair_lines,
+            self.angle_lines,
+            self.dihedral_lines,
         )
 
 
@@ -69,6 +79,7 @@ class ProductTemplateMatch:
     acceptor_id: str
     transferred_h_template_name: str
     atom_mapping: dict[str, ProductTemplateAtom]
+    local_to_global: dict[str, str]
 
 
 class ProductTemplateLibrary:
@@ -315,6 +326,7 @@ def _templates_from_moleculetype(
             )
 
     templates = []
+    supports_bonded_restoration = len(atoms_by_resnr) == 1
     for local_resnr, residue_atoms in atoms_by_resnr.items():
         residue_names = {atom.residue for atom in residue_atoms}
         if len(residue_names) != 1:
@@ -335,11 +347,43 @@ def _templates_from_moleculetype(
                 local_resnr=local_resnr,
                 residue=next(iter(residue_names)),
                 atoms={atom.name: atom for atom in residue_atoms},
+                atoms_by_local_nr=dict(atoms_by_nr),
                 bonds=frozenset(internal_bonds[local_resnr]),
                 boundary_bonds=frozenset(boundary_bonds[local_resnr]),
+                bond_lines=_internal_interaction_lines(
+                    atomics.get("bonds") or [], atoms_by_nr, local_resnr, 2
+                ),
+                pair_lines=_internal_interaction_lines(
+                    atomics.get("pairs") or [], atoms_by_nr, local_resnr, 2
+                ),
+                angle_lines=_internal_interaction_lines(
+                    atomics.get("angles") or [], atoms_by_nr, local_resnr, 3
+                ),
+                dihedral_lines=_internal_interaction_lines(
+                    atomics.get("dihedrals") or [], atoms_by_nr, local_resnr, 4
+                ),
+                supports_bonded_restoration=supports_bonded_restoration,
             )
         )
     return templates
+
+
+def _internal_interaction_lines(
+    lines: list[list[str]],
+    atoms_by_nr: dict[str, ProductTemplateAtom],
+    local_resnr: str,
+    atom_count: int,
+) -> tuple[tuple[str, ...], ...]:
+    """Return interactions whose participating atoms belong to one residue."""
+    internal = []
+    for line in lines:
+        atom_nrs = line[:atom_count]
+        if len(atom_nrs) == atom_count and all(
+            atoms_by_nr[atom_nr].local_resnr == local_resnr
+            for atom_nr in atom_nrs
+        ):
+            internal.append(tuple(line))
+    return tuple(internal)
 
 
 def _match_template(
@@ -423,6 +467,10 @@ def _match_template(
         acceptor_id=acceptor.nr,
         transferred_h_template_name=missing_name,
         atom_mapping=atom_mapping,
+        local_to_global={
+            template_atom.local_nr: atom_nr
+            for atom_nr, template_atom in atom_mapping.items()
+        },
     )
 
 

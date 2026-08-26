@@ -822,6 +822,83 @@ class MoleculeTypeMerger:
                         comment=f"; creating bond from nothing to morse",
                     )
 
+    @staticmethod
+    def _urey_bradley_state(
+        angle: Angle | AngleType,
+        fallback_r13: str,
+        disabled: bool = False,
+    ) -> tuple[str, str, str, str]:
+        if angle.c0 is None or angle.c1 is None:
+            raise ValueError(f"Angle is missing explicit parameters: {angle}")
+        if angle.funct == FFFUNC["harmonic_angle"]:
+            return (
+                angle.c0,
+                "0.00" if disabled else angle.c1,
+                fallback_r13,
+                "0.00",
+            )
+        if angle.funct == FFFUNC["urey_bradley_angle"]:
+            if angle.c2 is None or angle.c3 is None:
+                raise ValueError(
+                    f"Urey-Bradley angle is missing r13 or kUB: {angle}"
+                )
+            if disabled:
+                return angle.c0, "0.00", angle.c2, "0.00"
+            return angle.c0, angle.c1, angle.c2, angle.c3
+        raise ValueError(
+            "Slow growth supports only harmonic (1) and Urey-Bradley (5) "
+            f"angles, got function {angle.funct}: {angle}"
+        )
+
+    def _merge_urey_bradley_angles(
+        self,
+        key: tuple[str, str, str],
+        angle_a: Angle | AngleType | None,
+        angle_b: Angle | AngleType | None,
+    ) -> Angle:
+        urey_angle = (
+            angle_b
+            if angle_b is not None
+            and angle_b.funct == FFFUNC["urey_bradley_angle"]
+            else angle_a
+        )
+        if urey_angle is None or urey_angle.c2 is None:
+            raise ValueError(
+                f"Cannot establish Urey-Bradley r13 for angle {key}: "
+                f"A={angle_a}, B={angle_b}"
+            )
+        fallback_r13 = urey_angle.c2
+
+        if angle_a is None:
+            assert angle_b is not None
+            state_a = self._urey_bradley_state(
+                angle_b, fallback_r13, disabled=True
+            )
+        else:
+            state_a = self._urey_bradley_state(angle_a, fallback_r13)
+
+        if angle_b is None:
+            assert angle_a is not None
+            state_b = self._urey_bradley_state(
+                angle_a, fallback_r13, disabled=True
+            )
+        else:
+            state_b = self._urey_bradley_state(angle_b, fallback_r13)
+
+        return Angle(
+            *key,
+            funct=FFFUNC["urey_bradley_angle"],
+            c0=state_a[0],
+            c1=state_a[1],
+            c2=state_a[2],
+            c3=state_a[3],
+            c4=state_b[0],
+            c5=state_b[1],
+            c6=state_b[2],
+            c7=state_b[3],
+            comment="; morphing Urey-Bradley angle",
+        )
+
     def merge_angles(self):
         logger.info("Merging angles")
         keys = set(self.mol_a.angles.keys()) | set(self.mol_b.angles.keys())
@@ -830,70 +907,90 @@ class MoleculeTypeMerger:
             angle_b = self.mol_b.angles.get(key)
 
             if angle_a == angle_b:
-                # angles are the same, nothing to be done.
-                # atoms will also continue to be automatically excluded
-                # so nothing to be done with pairs
-                # but we can be extra sure that they are excluded:
-                pairkey = to_pairkey(key)
-                self.affected_interactions.angles.morphed.add(pairkey)
+                self.affected_interactions.angles.morphed.add(to_pairkey(key))
                 continue
 
-            parameterizedA = get_explicit_or_type(
+            parameterized_a = get_explicit_or_type(
                 key, angle_a, self.ff.angletypes, self.mol_a
             )
-
-            parameterizedB = get_explicit_or_type(
+            parameterized_b = get_explicit_or_type(
                 key, angle_b, self.ff.angletypes, self.mol_b
             )
+            if parameterized_a is not None and not isinstance(
+                parameterized_a, (Angle, AngleType)
+            ):
+                raise ValueError(
+                    f"Cannot resolve A-state angle parameters for {key}: "
+                    f"{parameterized_a}"
+                )
+            if parameterized_b is not None and not isinstance(
+                parameterized_b, (Angle, AngleType)
+            ):
+                raise ValueError(
+                    f"Cannot resolve B-state angle parameters for {key}: "
+                    f"{parameterized_b}"
+                )
 
-            if parameterizedA is not None and parameterizedB is not None:
-                if not (
-                    isinstance(parameterizedA, (Angle, AngleType))
-                    and isinstance(parameterizedB, (Angle, AngleType))
-                ):
-                    m = f"Can't find parameters for angle with key {key}, got explicits/types: {parameterizedA} and {parameterizedB} for a bonds: {angle_a}, {angle_b}"
-                    logger.error(m)
-                    raise ValueError(m)
-                # both angles exist -> transition between parameters
-                self.mol_a.angles[key] = Angle(
-                    *key,
-                    funct=parameterizedB.funct,
-                    c0=parameterizedA.c0,
-                    c1=parameterizedA.c1,
-                    c2=parameterizedB.c0,
-                    c3=parameterizedB.c1,
-                    comment=f"; morphing angle",
+            functions = {
+                angle.funct
+                for angle in (parameterized_a, parameterized_b)
+                if angle is not None
+            }
+            if FFFUNC["urey_bradley_angle"] in functions:
+                self.mol_a.angles[key] = self._merge_urey_bradley_angles(
+                    key, parameterized_a, parameterized_b
                 )
                 pairkey = to_pairkey(key)
-                self.affected_interactions.angles.morphed.add(pairkey)
-            elif isinstance(parameterizedA, (Angle, AngleType)):
-                # angle only exists in A -> vanish angle
+                if parameterized_a is None:
+                    self.affected_interactions.angles.added.add(pairkey)
+                elif parameterized_b is None:
+                    self.affected_interactions.angles.removed.add(pairkey)
+                else:
+                    self.affected_interactions.angles.morphed.add(pairkey)
+                continue
+
+            unsupported = functions - {FFFUNC["harmonic_angle"]}
+            if unsupported:
+                raise ValueError(
+                    f"Unsupported slow-growth angle functions {unsupported} "
+                    f"for angle {key}."
+                )
+
+            if parameterized_a is not None and parameterized_b is not None:
                 self.mol_a.angles[key] = Angle(
                     *key,
                     funct=FFFUNC["harmonic_angle"],
-                    c0=parameterizedA.c0,
-                    c1=parameterizedA.c1,
-                    c2=parameterizedA.c0,
+                    c0=parameterized_a.c0,
+                    c1=parameterized_a.c1,
+                    c2=parameterized_b.c0,
+                    c3=parameterized_b.c1,
+                    comment="; morphing angle",
+                )
+                self.affected_interactions.angles.morphed.add(to_pairkey(key))
+            elif parameterized_a is not None:
+                self.mol_a.angles[key] = Angle(
+                    *key,
+                    funct=FFFUNC["harmonic_angle"],
+                    c0=parameterized_a.c0,
+                    c1=parameterized_a.c1,
+                    c2=parameterized_a.c0,
                     c3="0.00",
-                    comment=f"; vanishing angle",
+                    comment="; vanishing angle",
                 )
-                pairkey = to_pairkey(key)
-                self.affected_interactions.angles.removed.add(pairkey)
-            elif isinstance(parameterizedB, (Angle, AngleType)):
-                # angle only exists in B -> create angle
+                self.affected_interactions.angles.removed.add(to_pairkey(key))
+            elif parameterized_b is not None:
                 self.mol_a.angles[key] = Angle(
                     *key,
                     funct=FFFUNC["harmonic_angle"],
-                    c0=parameterizedB.c0,
+                    c0=parameterized_b.c0,
                     c1="0.00",
-                    c2=parameterizedB.c0,
-                    c3=parameterizedB.c1,
-                    comment=f"; creating angle",
+                    c2=parameterized_b.c0,
+                    c3=parameterized_b.c1,
+                    comment="; creating angle",
                 )
-                pairkey = to_pairkey(key)
-                self.affected_interactions.angles.added.add(pairkey)
+                self.affected_interactions.angles.added.add(to_pairkey(key))
             else:
-                logger.warning(f"Could not parameterize angle {key}.")
+                logger.warning("Could not parameterize angle %s.", key)
 
     def merge_dihedrals(self):
         # proper dihedrals

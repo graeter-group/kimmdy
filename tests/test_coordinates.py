@@ -10,7 +10,7 @@ from kimmdy.parsing import read_plumed, read_top, write_top
 from kimmdy.constants import DEFAULT_EDISSOC, REACTIVE_MOLECULEYPE
 from conftest import DummyFiles
 from kimmdy.tasks import TaskFiles
-from kimmdy.topology.atomic import Bond, BondType, Dihedral, Pair
+from kimmdy.topology.atomic import Angle, Bond, BondType, Dihedral, Pair
 from kimmdy.topology.topology import Topology
 from kimmdy.coordinates import (
     MoleculeTypeMerger,
@@ -19,6 +19,36 @@ from kimmdy.coordinates import (
     place_atom,
     break_bond_plumed,
 )
+
+
+def test_merge_harmonic_to_urey_bradley_angle():
+    merger = object.__new__(MoleculeTypeMerger)
+    key = ("1", "2", "3")
+    harmonic = Angle(*key, funct="1", c0="109.5", c1="300.0")
+    urey_bradley = Angle(
+        *key,
+        funct="5",
+        c0="112.0",
+        c1="450.0",
+        c2="0.245",
+        c3="5000.0",
+    )
+
+    merged = merger._merge_urey_bradley_angles(key, harmonic, urey_bradley)
+
+    assert merged.funct == "5"
+    assert (merged.c0, merged.c1, merged.c2, merged.c3) == (
+        "109.5",
+        "300.0",
+        "0.245",
+        "0.00",
+    )
+    assert (merged.c4, merged.c5, merged.c6, merged.c7) == (
+        "112.0",
+        "450.0",
+        "0.245",
+        "5000.0",
+    )
 
 
 def test_get_explicit_MultipleDihedrals(arranged_tmp_path):

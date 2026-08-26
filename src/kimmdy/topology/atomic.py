@@ -403,7 +403,9 @@ class Angle:
     A class containing angle information as in the angles section of the topology.
 
     From gromacs topology:
-    ; ai aj ak funct c0 c1 c2 c3
+    ; ai aj ak funct c0 c1 c2 c3 c4 c5 c6 c7
+
+    Urey-Bradley angles use c0-c3 for state A and c4-c7 for state B.
     With aj < ai < ak
     """
 
@@ -415,6 +417,10 @@ class Angle:
     c1: Optional[str] = None
     c2: Optional[str] = None
     c3: Optional[str] = None
+    c4: Optional[str] = None
+    c5: Optional[str] = None
+    c6: Optional[str] = None
+    c7: Optional[str] = None
     comment: Optional[str] = field(default=None, compare=False)
 
     @classmethod
@@ -428,6 +434,10 @@ class Angle:
             c1=field_or_none(l, 5),
             c2=field_or_none(l, 6),
             c3=field_or_none(l, 7),
+            c4=field_or_none(l, 8),
+            c5=field_or_none(l, 9),
+            c6=field_or_none(l, 10),
+            c7=field_or_none(l, 11),
         )
 
 

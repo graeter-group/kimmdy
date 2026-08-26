@@ -73,6 +73,7 @@ FFFUNC = {
     "harmonic_bond": "1",
     "morse_bond": "3",
     "harmonic_angle": "1",
+    "urey_bradley_angle": "5",
     "pair": "1",
     "coulomb_pair": "2",
 }

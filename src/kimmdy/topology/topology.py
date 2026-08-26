@@ -1,6 +1,7 @@
 import logging
 import textwrap
 from copy import copy, deepcopy
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable, Optional, Union
 
@@ -16,9 +17,12 @@ from kimmdy.plugins import BasicParameterizer, Parameterizer
 from kimmdy.recipe import Bind, Break, RecipeStep
 from kimmdy.topology.atomic import (
     Angle,
+    AngleType,
     Atom,
     Bond,
+    BondType,
     Dihedral,
+    DihedralType,
     DihedralRestraint,
     Exclusion,
     ImproperDihedralId,
@@ -41,11 +45,19 @@ from kimmdy.topology.utils import (
     get_top_section,
     increment_field,
     is_not_solvent_or_ion,
+    match_atomic_item_to_atomic_type,
     set_top_section,
 )
 from kimmdy.utils import TopologyAtomAddress
 
 logger = logging.getLogger("kimmdy.topology")
+
+
+@dataclass(frozen=True)
+class ParameterizationReport:
+    event_focus_ids: set[str]
+    active_radical_ids: set[str]
+    restored_templates: int
 
 
 class MoleculeType:
@@ -814,6 +826,9 @@ class Topology:
             tuple[str, str], ProductTemplateMatch
         ] = {}
         self.pending_transferred_h_charges: dict[str, str] = {}
+        self.pending_product_template_restorations: list[
+            ProductTemplateMatch
+        ] = []
         self._parse_molecules()
         self.parametrizer = parametrizer
         self._check_is_reactive_molecule = is_reactive_predicate_f
@@ -1082,17 +1097,262 @@ class Topology:
             [attributes_to_list(x) for x in self.ff.angletypes.values()],
         )
 
+    def _parameterize_focus(self, focus_ids: set[str]) -> None:
+        if self.parametrizer is None:
+            raise RuntimeError("No Parametrizer was initialized in this topology!")
+        logger.info(
+            "Starting parametrization using %s with focus on %s",
+            self.parametrizer.__class__.__name__,
+            focus_ids,
+        )
+        self.parametrizer.parameterize_topology(self, focus_nrs=focus_ids)
+
     def update_parameters(self):
         if self.needs_parameterization:
-            if self.parametrizer is not None:
-                focus_ids = self.parameterization_focus_ids
-                logger.info(
-                    f"Starting parametrization using {self.parametrizer.__class__.__name__} with focus on {focus_ids}"
-                )
-                self.parametrizer.parameterize_topology(self, focus_nrs=focus_ids)
-            else:
-                raise RuntimeError("No Parametrizer was initialized in this topology!")
+            self._parameterize_focus(set(self.parameterization_focus_ids))
             self.needs_parameterization = False
+
+    def prepare_product_parameters(self) -> ParameterizationReport:
+        """Prepare topology B and retain only still-active radical focus IDs."""
+        event_focus_ids = set(self.parameterization_focus_ids)
+        if self.needs_parameterization:
+            self._parameterize_focus(event_focus_ids)
+
+        restored_templates = self.restore_pending_product_templates()
+        active_radical_ids = set(self.radicals)
+        if restored_templates and active_radical_ids:
+            # Active radical regions own overlapping interactions.
+            self._parameterize_focus(active_radical_ids)
+
+        self.parameterization_focus_ids = active_radical_ids
+        self.needs_parameterization = False
+        return ParameterizationReport(
+            event_focus_ids=event_focus_ids,
+            active_radical_ids=active_radical_ids,
+            restored_templates=restored_templates,
+        )
+
+    def restore_pending_product_templates(self) -> int:
+        """Restore exact single-residue ITP products after Grappa parameterization."""
+        restored = 0
+        pending = self.pending_product_template_restorations
+        self.pending_product_template_restorations = []
+        for match in pending:
+            if not match.template.supports_bonded_restoration:
+                logger.info(
+                    "ITP template %s:%s spans multiple residues; retaining "
+                    "Grappa bonded parameters.",
+                    match.template.moleculetype,
+                    match.template.local_resnr,
+                )
+                continue
+            self._restore_product_template_interactions(match)
+            restored += 1
+        return restored
+
+    def _restore_product_template_interactions(
+        self, match: ProductTemplateMatch
+    ) -> None:
+        template = match.template
+        mapped_ids = set(match.local_to_global.values())
+
+        bonds = [
+            self._resolve_template_bond(match, line)
+            for line in template.bond_lines
+        ]
+        pairs = [self._map_template_pair(match, line) for line in template.pair_lines]
+        angles = [
+            self._resolve_template_angle(match, line) for line in template.angle_lines
+        ]
+        proper_dihedrals, improper_dihedrals = self._resolve_template_dihedrals(
+            match
+        )
+
+        for key in list(self.bonds):
+            if set(key) <= mapped_ids:
+                self.bonds.pop(key)
+        self.bonds.update({(bond.ai, bond.aj): bond for bond in bonds})
+
+        for key in list(self.pairs):
+            if set(key) <= mapped_ids:
+                self.pairs.pop(key)
+        self.pairs.update({(pair.ai, pair.aj): pair for pair in pairs})
+
+        for key in list(self.angles):
+            if set(key) <= mapped_ids:
+                self.angles.pop(key)
+        self.angles.update(
+            {(angle.ai, angle.aj, angle.ak): angle for angle in angles}
+        )
+
+        for key, interaction in list(self.proper_dihedrals.items()):
+            if (
+                set(key) <= mapped_ids
+                and interaction.funct == FFFUNC["mult_proper_dihedral"]
+            ):
+                self.proper_dihedrals.pop(key)
+        self.proper_dihedrals.update(proper_dihedrals)
+
+        # Only replace periodic impropers KIMMDY can interpolate safely. CHARMM
+        # harmonic function-2 impropers remain under Grappa ownership for now.
+        for key in improper_dihedrals:
+            self.improper_dihedrals.pop(key, None)
+        self.improper_dihedrals.update(improper_dihedrals)
+
+        logger.info(
+            "Restored bonded parameters from exact ITP product template %s:%s "
+            "(%d bonds, %d pairs, %d angles, %d proper and %d improper dihedrals).",
+            template.moleculetype,
+            template.local_resnr,
+            len(bonds),
+            len(pairs),
+            len(angles),
+            len(proper_dihedrals),
+            len(improper_dihedrals),
+        )
+
+    def _mapped_template_line(
+        self,
+        match: ProductTemplateMatch,
+        line: tuple[str, ...],
+        atom_count: int,
+    ) -> list[str]:
+        mapped = list(line)
+        try:
+            mapped[:atom_count] = [
+                match.local_to_global[atom_nr] for atom_nr in line[:atom_count]
+            ]
+        except KeyError as error:
+            raise RuntimeError(
+                "Exact ITP product-template interaction references an unmapped "
+                f"atom {error.args[0]!r} in {match.template.source}."
+            ) from error
+        return mapped
+
+    def _resolve_template_bond(
+        self, match: ProductTemplateMatch, line: tuple[str, ...]
+    ) -> Bond:
+        mapped = self._mapped_template_line(match, line, 2)
+        key = tuple(sorted(mapped[:2], key=int))
+        bond = Bond.from_top_line([*key, *mapped[2:]])
+        if bond.c0 is not None and bond.c1 is not None:
+            return bond
+        atom_types = [self.atoms[atom_nr].type for atom_nr in key]
+        bond_type = match_atomic_item_to_atomic_type(atom_types, self.ff.bondtypes)
+        if not isinstance(bond_type, BondType):
+            raise ValueError(
+                f"Could not resolve ITP bond parameters for {atom_types} in "
+                f"{match.template.source}."
+            )
+        return Bond(*key, funct=bond_type.funct, c0=bond_type.c0, c1=bond_type.c1)
+
+    def _map_template_pair(
+        self, match: ProductTemplateMatch, line: tuple[str, ...]
+    ) -> Pair:
+        mapped = self._mapped_template_line(match, line, 2)
+        key = tuple(sorted(mapped[:2], key=int))
+        return Pair.from_top_line([*key, *mapped[2:]])
+
+    def _resolve_template_angle(
+        self, match: ProductTemplateMatch, line: tuple[str, ...]
+    ) -> Angle:
+        mapped = self._mapped_template_line(match, line, 3)
+        if int(mapped[0]) > int(mapped[2]):
+            mapped[0], mapped[2] = mapped[2], mapped[0]
+        angle = Angle.from_top_line(mapped)
+        if angle.c0 is not None and angle.c1 is not None:
+            return angle
+        key = (angle.ai, angle.aj, angle.ak)
+        atom_types = [self.atoms[atom_nr].type for atom_nr in key]
+        angle_type = match_atomic_item_to_atomic_type(atom_types, self.ff.angletypes)
+        if not isinstance(angle_type, AngleType):
+            raise ValueError(
+                f"Could not resolve ITP angle parameters for {atom_types} in "
+                f"{match.template.source}."
+            )
+        return Angle(
+            *key,
+            funct=angle_type.funct,
+            c0=angle_type.c0,
+            c1=angle_type.c1,
+            c2=angle_type.c2,
+            c3=angle_type.c3,
+        )
+
+    def _resolve_template_dihedrals(
+        self, match: ProductTemplateMatch
+    ) -> tuple[
+        dict[tuple[str, str, str, str], MultipleDihedrals],
+        dict[tuple[str, str, str, str], MultipleDihedrals],
+    ]:
+        proper: dict[tuple[str, str, str, str], MultipleDihedrals] = {}
+        improper: dict[tuple[str, str, str, str], MultipleDihedrals] = {}
+        unsupported_functions: set[str] = set()
+
+        for line in match.template.dihedral_lines:
+            mapped = self._mapped_template_line(match, line, 4)
+            funct = mapped[4]
+            if funct not in {
+                FFFUNC["mult_proper_dihedral"],
+                FFFUNC["mult_improper_dihedral"],
+            }:
+                unsupported_functions.add(funct)
+                continue
+            if (
+                funct == FFFUNC["mult_proper_dihedral"]
+                and int(mapped[1]) > int(mapped[2])
+            ):
+                mapped[:4] = reversed(mapped[:4])
+
+            dihedral = Dihedral.from_top_line(mapped)
+            key = (dihedral.ai, dihedral.aj, dihedral.ak, dihedral.al)
+            target = proper if funct == FFFUNC["mult_proper_dihedral"] else improper
+            types = (
+                self.ff.proper_dihedraltypes
+                if target is proper
+                else self.ff.improper_dihedraltypes
+            )
+
+            resolved: list[Dihedral] = []
+            if dihedral.c0 is not None and dihedral.c1 is not None:
+                resolved.append(dihedral)
+            else:
+                atom_types = [self.atoms[atom_nr].type for atom_nr in key]
+                for periodicity in map(str, range(1, 7)):
+                    dihedral_type = match_atomic_item_to_atomic_type(
+                        atom_types, types, periodicity
+                    )
+                    if isinstance(dihedral_type, DihedralType):
+                        resolved.append(
+                            Dihedral(
+                                *key,
+                                funct=funct,
+                                c0=dihedral_type.c0,
+                                c1=dihedral_type.c1,
+                                periodicity=dihedral_type.periodicity,
+                            )
+                        )
+
+            if not resolved:
+                raise ValueError(
+                    "Could not resolve ITP dihedral parameters for "
+                    f"{[self.atoms[atom_nr].type for atom_nr in key]} in "
+                    f"{match.template.source}."
+                )
+            multiple = target.setdefault(
+                key, MultipleDihedrals(*key, funct=funct, dihedrals={})
+            )
+            for item in resolved:
+                multiple.dihedrals[item.periodicity] = item
+
+        if unsupported_functions:
+            logger.warning(
+                "ITP template %s contains unsupported dihedral functions %s; "
+                "retaining Grappa parameters for those interactions.",
+                match.template.source,
+                sorted(unsupported_functions),
+            )
+        return proper, improper
 
     def update_partial_charges(self, recipe_steps: list[RecipeStep]) -> None:
         """Update the topology atom partial charges.
@@ -1213,6 +1473,9 @@ class Topology:
                             template_match.template.moleculetype,
                             template_match.template.local_resnr,
                             template_match.template.residue,
+                        )
+                        self.pending_product_template_restorations.append(
+                            template_match
                         )
                         self._discard_pending_transferred_h_charge(atom1, atom2)
                         continue

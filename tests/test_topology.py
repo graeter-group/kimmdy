@@ -1173,6 +1173,59 @@ def test_itp_hat_restores_closed_product_and_conserves_charge(dopa_itp_topology)
     assert {donor.nr, donor_h.nr, acceptor.nr} <= top.parameterization_focus_ids
 
 
+def test_itp_product_restores_bonded_terms_and_compacts_focus(
+    dopa_itp_topology,
+):
+    """Exact products regain ITP terms before active radicals take precedence."""
+
+    class RecordingParameterizer:
+        def __init__(self):
+            self.calls = []
+
+        def parameterize_topology(self, current_topology, focus_nrs=None):
+            self.calls.append(set(focus_nrs or set()))
+            return current_topology
+
+    top = dopa_itp_topology
+    recorder = RecordingParameterizer()
+    top.parametrizer = recorder
+    donor_h, donor, acceptor = _dopa_itp_hat_atoms(top)
+    break_step = Break(atom_id_1=donor.nr, atom_id_2=donor_h.nr)
+    bind_step = Bind(atom_id_1=acceptor.nr, atom_id_2=donor_h.nr)
+
+    top.break_bond((donor.nr, donor_h.nr))
+    top.update_partial_charges([break_step])
+    top.bind_bond((acceptor.nr, donor_h.nr))
+    top.update_partial_charges([bind_step])
+
+    assert len(top.pending_product_template_restorations) == 1
+    match = top.pending_product_template_restorations[0]
+    template_angle = next(
+        line for line in match.template.angle_lines if line[3] == "5"
+    )
+    mapped = [match.local_to_global[atom_nr] for atom_nr in template_angle[:3]]
+    if int(mapped[0]) > int(mapped[2]):
+        mapped[0], mapped[2] = mapped[2], mapped[0]
+    angle_key = tuple(mapped)
+    top.angles[angle_key] = Angle(
+        *angle_key, funct="1", c0="1.0", c1="1.0"
+    )
+    event_focus = set(top.parameterization_focus_ids)
+
+    report = top.prepare_product_parameters()
+
+    restored_angle = top.angles[angle_key]
+    assert restored_angle.funct == "5"
+    assert restored_angle.c2 is not None
+    assert restored_angle.c3 is not None
+    assert report.event_focus_ids == event_focus
+    assert report.active_radical_ids == {donor.nr}
+    assert report.restored_templates == 1
+    assert recorder.calls == [event_focus, {donor.nr}]
+    assert top.parameterization_focus_ids == {donor.nr}
+    assert top.pending_product_template_restorations == []
+
+
 def test_itp_hat_fails_closed_when_no_exact_template_matches(dopa_itp_topology):
     """No template keeps atom identity but conserves both residue charges."""
     top = dopa_itp_topology
