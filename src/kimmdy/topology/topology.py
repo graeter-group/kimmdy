@@ -1124,6 +1124,8 @@ class Topology:
             # Active radical regions own overlapping interactions.
             self._parameterize_focus(active_radical_ids)
 
+        # TODO: Restore exact classical RTP bonded templates before compacting
+        # focus IDs; RTP products currently retain their final Grappa terms.
         self.parameterization_focus_ids = active_radical_ids
         self.needs_parameterization = False
         return ParameterizationReport(
@@ -1861,6 +1863,8 @@ class Topology:
                     )
                     continue
 
+                # TODO: Extend exact RTP product matching to restore resolved
+                # bonded interactions, including cross-residue boundary terms.
                 aa = self.ff.residuetypes.get(other_res)
                 if not aa:
                     logging.warning(
