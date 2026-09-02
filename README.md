@@ -157,7 +157,11 @@ After running `uv sync` again later, reinstall the CUDA Torch wheel:
 uv pip install --reinstall "torch==2.0.0" --torch-backend=cu118
 ```
 
+#### 7. Development
 
+If you plan to modify the software, create a separate development branch in the main KIMMDY repository and in every submodule you intend to modify, such as the `kimmdy-hat` repository.
+
+Changes made inside a submodule must be committed in that submodule first. The resulting submodule commit must then be recorded and committed in the parent KIMMDY repository.
 
 ## Documentation
 
