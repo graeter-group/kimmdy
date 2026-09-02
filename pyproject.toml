@@ -22,7 +22,8 @@ content-type = "text/markdown"
 [project.optional-dependencies]
 dimerization = ["kimmdy-dimerization"]
 grappa = ["kimmdy-grappa", "grappa-ff", "torch"]
-hat = ["kimmdy-hat"]
+hat = ["kimmdy-hat[mace]", "mace-torch"]
+hat-legacy = ["kimmdy-hat[legacy-painn]"]
 hydrolysis = ["kimmdy-hydrolysis"]
 reactions = ["kimmdy-reactions"]
 
@@ -57,14 +58,12 @@ namespaces = false
 
 [tool.uv.sources]
 kimmdy = { workspace = true }
-# TODO: use workspace versions
-# once docker build is updated to handle
-# submodules
-# kimmdy-dimerization = { workspace = true }
-# kimmdy-grappa = { workspace = true }
-# kimmdy-hat = { workspace = true }
-# kimmdy-hydrolysis = { workspace = true }
-# kimmdy-reactions = { workspace = true }
+kimmdy-dimerization = { path = "plugins/kimmdy-dimerization", editable = true }
+kimmdy-grappa = { path = "plugins/kimmdy-grappa", editable = true }
+kimmdy-hat = { path = "plugins/kimmdy-hat", editable = true }
+kimmdy-hydrolysis = { path = "plugins/kimmdy-hydrolysis", editable = true }
+kimmdy-reactions = { path = "plugins/kimmdy-reactions", editable = true }
+mace-torch = { path = "plugins/kimmdy-hat/src/HATmodels/mace_barrier", editable = true }
 torch = [{ index = "pytorch-cpu" }]
 torchvision = [{ index = "pytorch-cpu" }]
 
