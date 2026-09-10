@@ -47,3 +47,40 @@ def test_product_template_schema_definition():
     assert transitions["type"] == "object"
     assert transitions["additionalProperties"] == {"type": "string"}
     assert transitions["default"] == {}
+
+
+def test_schema_preserves_rate_constraints_without_flattening_metadata():
+    loaded = {
+        "type": "object",
+        "required": ["rates"],
+        "properties": {
+            "rates": {
+                "type": "object",
+                "required": ["temperature", "coefficient"],
+                "properties": {
+                    "temperature": {
+                        "type": "number",
+                        "pytype": "float",
+                        "exclusiveMinimum": 0,
+                        "default": 300,
+                    },
+                    "coefficient": {
+                        "type": "number",
+                        "pytype": "float",
+                        "minimum": 0,
+                        "default": 1,
+                    },
+                },
+            }
+        },
+    }
+    converted = schema.convert_schema_to_dict(loaded)
+    assert converted["required"] == ["rates"]
+    assert converted["rates"]["required"] == ["temperature", "coefficient"]
+    assert converted["rates"]["temperature"]["exclusiveMinimum"] == 0
+    assert converted["rates"]["coefficient"]["minimum"] == 0
+    assert {row["key"] for row in schema.flatten_scheme(converted)} == {
+        "rates",
+        "rates.temperature",
+        "rates.coefficient",
+    }

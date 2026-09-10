@@ -125,6 +125,8 @@ def convert_schema_to_dict(dictionary: dict) -> dict:
         "pytype", "default" and "description" keys.
     """
     result = {}
+    if "required" in dictionary:
+        result["required"] = list(dictionary["required"])
     properties = dictionary.get("properties")
     patternProperties = dictionary.get("patternProperties")
     if properties is None and patternProperties is not None:
@@ -159,6 +161,9 @@ def convert_schema_to_dict(dictionary: dict) -> dict:
             result[key]["enum"] = enum
         if additionalProperties is not None:
             result[key]["additionalProperties"] = additionalProperties
+        for constraint in ("minimum", "exclusiveMinimum"):
+            if constraint in value:
+                result[key][constraint] = value[constraint]
 
     return result
 
@@ -222,6 +227,9 @@ def flatten_scheme(scheme, section="") -> list:
             "enum",
             "additionalProperties",
             "deprecated",
+            "required",
+            "minimum",
+            "exclusiveMinimum",
         ]:
             k_esc = key
             if key == ".*":

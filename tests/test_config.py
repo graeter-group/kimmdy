@@ -229,3 +229,131 @@ def test_config_parses_product_template_settings(arranged_tmp_path):
     assert vars(config.topology.product_template_transitions) == {
         "OHR": "OHRH",
     }
+
+
+@pytest.fixture
+def schema_startup_config(tmp_path, monkeypatch):
+    """Exercise Config construction without GROMACS or installed plugins."""
+    from copy import deepcopy
+    from kimmdy import config as config_module
+    from kimmdy.schema import convert_schema_to_dict, load_kimmdy_schema
+
+    scheme = convert_schema_to_dict(load_kimmdy_schema())
+    scheme["reactions"]["test_rates"] = {
+        "rate_equation": {
+            "pytype": str,
+            "enum": ["arrhenius", "eyring"],
+            "default": "eyring",
+        },
+        "temperature": {"pytype": float, "exclusiveMinimum": 0, "default": 300},
+        "coefficient": {"pytype": float, "minimum": 0, "default": 1},
+        "unit": {"pytype": str, "enum": ["eV", "kcal/mol"], "default": "eV"},
+        "required": ["temperature", "coefficient"],
+    }
+    monkeypatch.setattr(config_module, "reaction_plugins", {"test_rates": object()})
+    monkeypatch.setattr(config_module, "check_file_exists", lambda **kwargs: None)
+    monkeypatch.setattr(config_module, "check_gmx_version", lambda config: None)
+    monkeypatch.setattr(config_module, "configure_logger", lambda config: None)
+    base = {
+        "cwd": tmp_path,
+        "ff": tmp_path,
+        "mds": {"sample": {"mdp": "sample.mdp"}},
+        "changer": {"coordinates": {"md": "sample", "slow_growth": "full"}},
+        "reactions": {"test_rates": {}},
+        "sequence": ["sample", "reactions"],
+    }
+
+    def build(rate_options=None, overrides=None):
+        opts = deepcopy(base)
+        if rate_options is not None:
+            opts["reactions"]["test_rates"] = rate_options
+        opts.update(overrides or {})
+        return Config(opts=opts, scheme=deepcopy(scheme))
+
+    return build, scheme
+
+
+@pytest.mark.parametrize(
+    "options, message",
+    [
+        ({"rate_equation": "unknown"}, "test_rates.rate_equation must be one of"),
+        ({"temperature": 0}, "test_rates.temperature must be > 0"),
+        ({"temperature": -1}, "test_rates.temperature must be > 0"),
+        ({"coefficient": -1}, "test_rates.coefficient must be >= 0"),
+        ({"temperature": float("nan")}, "test_rates.temperature must be finite"),
+        ({"temperature": float("inf")}, "test_rates.temperature must be finite"),
+        ({"coefficient": float("-inf")}, "test_rates.coefficient must be finite"),
+    ],
+)
+def test_schema_rejects_invalid_settings_during_initialization(
+    schema_startup_config, options, message
+):
+    build, _ = schema_startup_config
+    with pytest.raises(ValueError, match=message):
+        build(options)
+
+
+def test_schema_validates_defaults_and_allows_zero_coefficient(schema_startup_config):
+    build, _ = schema_startup_config
+    config = build({"coefficient": 0})
+    assert config.reactions.test_rates.rate_equation == "eyring"
+    assert config.reactions.test_rates.temperature == 300.0
+    assert config.reactions.test_rates.coefficient == 0.0
+
+
+@pytest.mark.parametrize("level", ["INFO", "debug"])
+@pytest.mark.parametrize(
+    "slow_growth, expected",
+    [
+        ("full", True),
+        ("yes", True),
+        (True, True),
+        ("no", False),
+        (False, False),
+        ("", False),
+        ("morse_only", "morse_only"),
+    ],
+)
+def test_schema_preserves_enum_casing_and_slow_growth_aliases(
+    schema_startup_config, level, slow_growth, expected
+):
+    build, _ = schema_startup_config
+    config = build(
+        {"unit": "eV", "temperature": 310, "coefficient": 1},
+        overrides={
+            "log": {"level": level},
+            "changer": {"coordinates": {"md": "sample", "slow_growth": slow_growth}},
+        },
+    )
+    assert config.log.level == level.lower()
+    assert config.reactions.test_rates.unit == "ev"
+    assert config.changer.coordinates.slow_growth == expected
+
+
+def test_schema_does_not_require_unconfigured_reaction(schema_startup_config):
+    build, scheme = schema_startup_config
+    scheme["reactions"]["test_rates"]["required"].append("missing")
+    config = build(overrides={"reactions": {}, "sequence": ["sample"]})
+    assert config.reactions.get_attributes() == []
+
+
+def test_schema_reports_required_setting_without_default(schema_startup_config):
+    build, scheme = schema_startup_config
+    scheme["reactions"]["test_rates"]["coefficient"].pop("default")
+    with pytest.raises(ValueError, match="required.*test_rates.coefficient"):
+        build()
+
+
+def test_schema_keeps_deprecated_required_options_optional(schema_startup_config):
+    build, scheme = schema_startup_config
+    scheme["reactions"]["test_rates"]["old_option"] = {"deprecated": True}
+    scheme["reactions"]["test_rates"]["required"].append("old_option")
+    config = build()
+    assert config.reactions.test_rates.rate_equation == "eyring"
+
+
+def test_schema_checks_numeric_constraints_in_wildcard_sections(schema_startup_config):
+    build, scheme = schema_startup_config
+    scheme["mds"][".*"]["stride"] = {"pytype": int, "minimum": 1}
+    with pytest.raises(ValueError, match="mds.sample.stride must be >= 1"):
+        build(overrides={"mds": {"sample": {"mdp": "sample.mdp", "stride": 0}}})

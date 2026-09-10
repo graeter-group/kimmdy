@@ -7,8 +7,10 @@ from __future__ import annotations
 
 import logging
 import logging.config
+import math
 import os
 import shutil
+from copy import deepcopy
 from pathlib import Path
 from pprint import pformat
 from typing import Any
@@ -104,6 +106,19 @@ def configure_logger(config: Config):
         os.remove(log)
 
     log.symlink_to(config.out / config.log.file)
+
+
+def _schema_enum_value(value, option):
+    """Compare enum values using the parser's existing casing and aliases."""
+    if not isinstance(value, str):
+        return value
+    if option.rsplit(".", 1)[-1] not in {"name", "product_template_itp_glob"}:
+        value = value.lower()
+    if option == "config.changer.coordinates.slow_growth":
+        value = {"yes": "full", "true": "full", "no": "", "false": ""}.get(
+            value, value
+        )
+    return value
 
 
 class Config:
@@ -226,8 +241,14 @@ class Config:
         # validate on initial construction
         if section == "config":
             # defaults from the scheme
-            self._set_defaults(section=section, scheme=scheme, restart=restart)
+            self._set_defaults(
+                section=section, scheme=deepcopy(scheme), restart=restart
+            )
+            # Existing validation converts settings such as slow_growth into
+            # runtime values. Check the schema against their original form.
+            schema_config = deepcopy(self)
             self._validate(section=section, cwd=self.cwd)
+            schema_config._validate_schema(scheme=scheme, section=section)
 
             # merge with command line arguments
             self.input_file = input_file
@@ -263,6 +284,7 @@ class Config:
         # not be materialized as configuration attributes during recursion.
         scheme.pop("additionalProperties", None)
         scheme.pop("default", None)
+        scheme.pop("required", None)
 
         # if the section has a general subscheme
         # merge it into all specific subschemes
@@ -492,6 +514,51 @@ class Config:
                     )
 
         return
+
+    def _validate_schema(self, scheme: dict, section: str = "config"):
+        """Check supported schema constraints after defaults are populated."""
+        for name in scheme.get("required", []):
+            # Deprecated inputs are deliberately ignored during parsing.
+            if scheme.get(name, {}).get("deprecated") is not None:
+                continue
+            if not hasattr(self, name):
+                raise ValueError(
+                    f"Missing required configuration option {section}.{name}."
+                )
+
+        for name in self.get_attributes():
+            value = getattr(self, name)
+            constraints = {**scheme.get(".*", {}), **scheme.get(name, {})}
+            if not constraints:
+                continue
+            option = f"{section}.{name}"
+            if isinstance(value, Config):
+                value._validate_schema(constraints, section=option)
+                continue
+
+            if constraints.get("pytype") is float and not math.isfinite(value):
+                raise ValueError(f"{option} must be finite; got {value!r}.")
+            if "enum" in constraints:
+                allowed = [
+                    _schema_enum_value(item, option) for item in constraints["enum"]
+                ]
+                if _schema_enum_value(value, option) not in allowed:
+                    raise ValueError(
+                        f"{option} must be one of {constraints['enum']!r}; "
+                        f"got {value!r}."
+                    )
+            if "minimum" in constraints and value < constraints["minimum"]:
+                raise ValueError(
+                    f"{option} must be >= {constraints['minimum']}; got {value!r}."
+                )
+            if (
+                "exclusiveMinimum" in constraints
+                and value <= constraints["exclusiveMinimum"]
+            ):
+                raise ValueError(
+                    f"{option} must be > {constraints['exclusiveMinimum']}; "
+                    f"got {value!r}."
+                )
 
     def attr(self, attribute):
         """Get the value of a specific attribute.
