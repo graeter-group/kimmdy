@@ -23,7 +23,6 @@ content-type = "text/markdown"
 dimerization = ["kimmdy-dimerization"]
 grappa = ["kimmdy-grappa", "grappa-ff", "torch"]
 hat = ["kimmdy-hat[mace]", "mace-torch"]
-hat-legacy = ["kimmdy-hat[legacy-painn]"]
 hydrolysis = ["kimmdy-hydrolysis"]
 reactions = ["kimmdy-reactions"]
 
