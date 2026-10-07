@@ -366,6 +366,7 @@ class RunManager:
             for name in (
                 "improper_neighbors_by_bonding",
                 "keep_all_improper_periodicities",
+                "combine_same_periodicity_dihedrals",
             )
         }
 

@@ -495,6 +495,13 @@
               "type": "boolean",
               "pytype": "bool",
               "default": true
+            },
+            "combine_same_periodicity_dihedrals": {
+              "title": "Combine same-periodicity dihedrals",
+              "description": "Merge funct-4 terms that share atoms and periodicity (a99SB-disp lists two periodicity-1 terms on every backbone psi) into one equivalent term, in topologies and residue templates. Forces are unchanged and the energy shifts by a constant. Without it, only the last such term is kept. Default: True",
+              "type": "boolean",
+              "pytype": "bool",
+              "default": true
             }
           },
           "additionalProperties": false

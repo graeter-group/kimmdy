@@ -5,6 +5,7 @@ See [gromacs manual](https://manual.gromacs.org/current/reference-manual/topolog
 """
 
 import logging
+import math
 from dataclasses import dataclass, field
 from typing import Optional, Union
 
@@ -12,6 +13,24 @@ from kimmdy.constants import FFFUNC
 from kimmdy.utils import field_or_none
 
 logger = logging.getLogger(__name__)
+
+
+def combine_periodic_terms(terms: list[tuple[str, str]]) -> tuple[str, str]:
+    """Merge several dihedral terms with the same periodicity into one equivalent term.
+
+    Input: a list of (phase in degrees, force constant) pairs, all for the
+    same atoms and periodicity n, each meaning k (1 + cos(n phi - phase)).
+    Their sum equals one term K (1 + cos(n phi - Phase)) plus a constant, so
+    the forces are exactly the same; only the energy shifts by a constant.
+    Returns (Phase, K) as text. Needed because KIMMDY keeps one term per
+    periodicity, so a second term with the same periodicity would otherwise
+    replace the first (a99SB-disp lists two periodicity-1 psi terms).
+    """
+    # add the terms like arrows of length k pointing at angle phase
+    x = sum(float(k) * math.cos(math.radians(float(phase))) for phase, k in terms)
+    y = sum(float(k) * math.sin(math.radians(float(phase))) for phase, k in terms)
+    # the summed arrow gives the new phase (its direction) and strength (its length)
+    return f"{math.degrees(math.atan2(y, x)) % 360.0:.6f}", f"{math.hypot(x, y):.6f}"
 
 
 @dataclass
@@ -733,12 +752,16 @@ class ResidueType:
         residue,
         d: dict[str, dict[str, list[list[str]]]],
         keep_all_periodicities: bool = True,
+        combine_same_periodicity: bool = True,
     ):
         """Build one residue template from its section of the force field's .rtp file.
 
         Reads the atoms, bonds, dihedrals and impropers of the residue. With
         keep_all_periodicities, every improper line for the same four atom
         names is kept (as a list); otherwise only the last one is, as before.
+        With combine_same_periodicity, two lines with the same atoms and
+        periodicity are merged into one equivalent term (see
+        combine_periodic_terms) instead of the later replacing the earlier.
         """
         atoms = {}
         bonds = {}
@@ -774,6 +797,12 @@ class ResidueType:
                 same = next((s for s in specs if s.c2 == improper.c2), None)
                 if same is None:
                     specs.append(improper)
+                elif combine_same_periodicity and None not in (
+                    same.c0, same.c1, improper.c0, improper.c1
+                ):
+                    same.c0, same.c1 = combine_periodic_terms(
+                        [(same.c0, same.c1), (improper.c0, improper.c1)]
+                    )
                 else:
                     specs[specs.index(same)] = improper
 

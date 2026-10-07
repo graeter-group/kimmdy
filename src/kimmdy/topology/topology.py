@@ -31,6 +31,7 @@ from kimmdy.topology.atomic import (
     Pair,
     PositionRestraint,
     ResidueImproperSpec,
+    combine_periodic_terms,
     ResidueType,
     Settle,
 )
@@ -79,8 +80,14 @@ class MoleculeType:
     """
 
     def __init__(
-        self, header: MoleculeTypeHeader, atomics: dict, radicals: Optional[str] = None
+        self,
+        header: MoleculeTypeHeader,
+        atomics: dict,
+        radicals: Optional[str] = None,
+        combine_same_periodicity: bool = True,
     ) -> None:
+        # merge funct-4 terms that share atoms and periodicity while parsing
+        self.combine_same_periodicity = combine_same_periodicity
         self.name = header.name
         self.nrexcl = header.nrexcl
         self.atomics = atomics
@@ -205,10 +212,24 @@ class MoleculeType:
         for l in ls:
             dihedral = Dihedral.from_top_line(l)
             key = (dihedral.ai, dihedral.aj, dihedral.ak, dihedral.al)
+            # periodic improper dihedrals (function 4)
             if dihedral.funct == FFFUNC["mult_improper_dihedral"]:
                 if self.improper_dihedrals.get(key) is None:
                     self.improper_dihedrals[key] = MultipleDihedrals(
                         *key, dihedral.funct, dihedrals={}
+                    )
+                existing = self.improper_dihedrals[key].dihedrals.get(
+                    dihedral.periodicity
+                )
+                if (
+                    self.combine_same_periodicity
+                    and existing is not None
+                    and None not in (existing.c0, existing.c1, dihedral.c0, dihedral.c1)
+                ):
+                    # same atoms and periodicity listed twice (a99SB-disp psi):
+                    # keep both contributions instead of the later one only
+                    dihedral.c0, dihedral.c1 = combine_periodic_terms(
+                        [(existing.c0, existing.c1), (dihedral.c0, dihedral.c1)]
                     )
                 self.improper_dihedrals[key].dihedrals[dihedral.periodicity] = dihedral
             else:
@@ -856,6 +877,7 @@ class Topology:
         product_template_transitions: Optional[dict[str, str]] = None,
         improper_neighbors_by_bonding: bool = True,
         keep_all_improper_periodicities: bool = True,
+        combine_same_periodicity_dihedrals: bool = True,
     ):
         """Topology fixes, all on by default; set to False for the 16ce888 behaviour:
 
@@ -865,7 +887,12 @@ class Topology:
         keep_all_improper_periodicities
             Keep every periodic term a residue template lists for one atom
             quadruple when impropers are rebuilt after a reaction.
+        combine_same_periodicity_dihedrals
+            Merge funct-4 terms with the same atoms and periodicity into one
+            equivalent term (forces unchanged, energy shifted by a constant)
+            instead of keeping only the last one.
         """
+        self.combine_same_periodicity_dihedrals = combine_same_periodicity_dihedrals
         if top == {}:
             raise NotImplementedError(
                 "Generating an empty Topology from an empty TopologyDict is not implemented."
@@ -886,6 +913,7 @@ class Topology:
             product_template_transitions=product_template_transitions,
             improper_neighbors_by_bonding=improper_neighbors_by_bonding,
             keep_all_improper_periodicities=keep_all_improper_periodicities,
+            combine_same_periodicity_dihedrals=combine_same_periodicity_dihedrals,
         )
         self.pending_product_template_matches: dict[
             tuple[str, str], ProductTemplateMatch
@@ -1018,6 +1046,7 @@ class Topology:
             MoleculeTypeHeader(name=REACTIVE_MOLECULEYPE, nrexcl=nrexcl),
             reactive_atomics,
             radicals,
+            combine_same_periodicity=self.combine_same_periodicity_dihedrals,
         )
         self.moleculetypes[REACTIVE_MOLECULEYPE] = reactive_moleculetype
         # update topology dict
@@ -1062,7 +1091,12 @@ class Topology:
                 continue
             name = header.name
             # Only search for radicals in reactive MoleculeType during merging
-            self.moleculetypes[name] = MoleculeType(header, atomics, radicals="")
+            self.moleculetypes[name] = MoleculeType(
+                header,
+                atomics,
+                radicals="",
+                combine_same_periodicity=self.combine_same_periodicity_dihedrals,
+            )
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Topology):

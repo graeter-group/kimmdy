@@ -96,6 +96,17 @@ original behaviour.
   Files: `src/kimmdy/topology/atomic.py`, `src/kimmdy/topology/topology.py`,
   `src/kimmdy/topology/ff.py`, `src/kimmdy/runmanager.py`,
   `src/kimmdy/kimmdy-yaml-schema.json`.
+* Same-periodicity dihedral terms are merged. New key
+  `changer.topology.combine_same_periodicity_dihedrals` (default true) merges
+  function-4 terms with the same atoms and periodicity (a99SB-disp lists two
+  periodicity-1 terms on every backbone psi) into one equivalent term, in
+  topologies and residue templates. Before, the later term replaced the
+  earlier one from the first step on. **Forces are unchanged by merging; the
+  energy shifts by a constant per merged term (0.923 kJ/mol per a99SB-disp
+  psi).**
+  Files: `src/kimmdy/topology/atomic.py`, `src/kimmdy/topology/topology.py`,
+  `src/kimmdy/topology/ff.py`, `src/kimmdy/runmanager.py`,
+  `src/kimmdy/kimmdy-yaml-schema.json`.
 
 ## [8.3.1](https://github.com/graeter-group/kimmdy/compare/v8.3.0...v8.3.1) (2026-01-02)
 
