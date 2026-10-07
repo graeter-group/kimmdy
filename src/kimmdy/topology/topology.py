@@ -878,6 +878,7 @@ class Topology:
         improper_neighbors_by_bonding: bool = True,
         keep_all_improper_periodicities: bool = True,
         combine_same_periodicity_dihedrals: bool = True,
+        conserve_transferred_h_charge: bool = True,
     ):
         """Topology fixes, all on by default; set to False for the 16ce888 behaviour:
 
@@ -891,6 +892,9 @@ class Topology:
             Merge funct-4 terms with the same atoms and periodicity into one
             equivalent term (forces unchanged, energy shifted by a constant)
             instead of keeping only the last one.
+        conserve_transferred_h_charge
+            A transferred H keeps its charge and the acceptor gives up the
+            same amount, instead of both taking residue-template charges.
         """
         self.combine_same_periodicity_dihedrals = combine_same_periodicity_dihedrals
         if top == {}:
@@ -919,6 +923,7 @@ class Topology:
             tuple[str, str], ProductTemplateMatch
         ] = {}
         self.pending_transferred_h_charges: dict[str, str] = {}
+        self.conserve_transferred_h_charge = conserve_transferred_h_charge
         self.pending_product_template_restorations: list[
             ProductTemplateMatch
         ] = []
@@ -1470,7 +1475,9 @@ class Topology:
         integers. If previously broken bonds are formed again, the original
         partial charges are restored.
         If no product template matches a transferred H, its original charge
-        is restored and balanced locally by the acceptor atom.
+        is restored and balanced locally by the acceptor atom. With
+        ``conserve_transferred_h_charge`` this local balancing is used for
+        every transferred H, so templates only provide names and atom types.
         """
 
         # build updated list of atoms by residue for topology so that this does
@@ -1535,6 +1542,19 @@ class Topology:
                 if self.atoms[step.atom_id_1].resnr == self.atoms[step.atom_id_2].resnr:
                     atom1 = self.atoms[step.atom_id_1]
                     atom2 = self.atoms[step.atom_id_2]
+                    if self.conserve_transferred_h_charge and (
+                        atom1.nr in self.pending_transferred_h_charges
+                        or atom2.nr in self.pending_transferred_h_charges
+                    ):
+                        # charge-conserving transfer (conserve_transferred_h_charge):
+                        # the H keeps its old charge and the acceptor gives up the
+                        # same amount, instead of taking the template charges
+                        self.pending_product_template_matches.pop(
+                            tuple(sorted((step.atom_id_1, step.atom_id_2), key=int)),
+                            None,
+                        )
+                        self._apply_transferred_h_charge_fallback(atom1, atom2)
+                        continue
                     match_key = tuple(
                         sorted((step.atom_id_1, step.atom_id_2), key=int)
                     )

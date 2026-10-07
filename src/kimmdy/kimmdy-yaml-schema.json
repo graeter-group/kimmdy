@@ -502,6 +502,13 @@
               "type": "boolean",
               "pytype": "bool",
               "default": true
+            },
+            "conserve_transferred_h_charge": {
+              "title": "Conserve transferred-H charge",
+              "description": "After a hydrogen transfer, keep the hydrogen's pre-transfer partial charge and subtract it from the acceptor atom, instead of assigning residue-template charges to both. Templates still provide the hydrogen's name and atom type and the rebuilt impropers. The net charge then never changes, including at chain-terminal residues. Default: True",
+              "type": "boolean",
+              "pytype": "bool",
+              "default": true
             }
           },
           "additionalProperties": false

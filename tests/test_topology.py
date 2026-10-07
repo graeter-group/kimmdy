@@ -1091,6 +1091,9 @@ def dopa_itp_topology() -> Topology:
         radicals="92",
         product_template_sources=("itp",),
         product_template_itp_glob="*.itp",
+        # these tests check the product-template charges, which the default
+        # charge-conserving transfer skips on purpose
+        conserve_transferred_h_charge=False,
     )
 
 
@@ -1320,6 +1323,9 @@ def test_ohr_transition_restores_tip3_like_product_and_conserves_charge():
         product_template_sources=("itp",),
         product_template_itp_glob="*.itp",
         product_template_transitions={"OHR": "OHRH"},
+        # this test checks the product-template charges, which the default
+        # charge-conserving transfer skips on purpose
+        conserve_transferred_h_charge=False,
     )
     acceptor = next(atom for atom in top.atoms.values() if atom.type == "ORA")
     donor = next(atom for atom in top.atoms.values() if atom.type == "OT")

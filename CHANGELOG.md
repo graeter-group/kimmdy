@@ -107,6 +107,14 @@ original behaviour.
   Files: `src/kimmdy/topology/atomic.py`, `src/kimmdy/topology/topology.py`,
   `src/kimmdy/topology/ff.py`, `src/kimmdy/runmanager.py`,
   `src/kimmdy/kimmdy-yaml-schema.json`.
+* Charge is conserved when an H is transferred. New key
+  `changer.topology.conserve_transferred_h_charge` (default true): the H keeps
+  its charge and the acceptor gives up the same amount; residue templates still
+  give names and atom types. Before, both took template charges, which made the
+  net charge drift at chain-end residues. **Acceptor charges differ from the
+  template values.** The product-template tests switch it off.
+  Files: `src/kimmdy/topology/topology.py`, `src/kimmdy/runmanager.py`,
+  `src/kimmdy/kimmdy-yaml-schema.json`, `tests/test_topology.py`.
 
 ## [8.3.1](https://github.com/graeter-group/kimmdy/compare/v8.3.0...v8.3.1) (2026-01-02)
 
