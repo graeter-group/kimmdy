@@ -14,6 +14,13 @@ original behaviour.
   and a restart that redoes a task gets the same numbers. Ignored for
   `dummy_first`.
   Files: `src/kimmdy/runmanager.py`, `src/kimmdy/kimmdy-yaml-schema.json`.
+* Optional whole molecules in the reaction frame. New top-level key
+  `reaction_frame_whole_molecules` (default false) extracts the frame at the
+  reaction time against the MD run's .tpr with `-pbc mol -ur compact`, so no
+  molecule is split across the box; without a .tpr it warns and extracts as
+  before.
+  Files: `src/kimmdy/utils.py`, `src/kimmdy/runmanager.py`,
+  `src/kimmdy/kimmdy-yaml-schema.json`.
 
 ### Bug Fixes
 

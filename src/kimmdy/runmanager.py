@@ -1381,7 +1381,13 @@ class RunManager:
         logger.info(f"Writing coordinates gro for starting time of the reaction.")
         if ttime is not None:
             # don't use trr and edr, use the `-time` flag of gmx grompp instead
-            write_gro_at_reaction_time(files=files, time=ttime)
+            write_gro_at_reaction_time(
+                files=files,
+                time=ttime,
+                whole_molecules=bool(
+                    getattr(self.config, "reaction_frame_whole_molecules", False)
+                ),
+            )
             self.latest_files["gro"] = files.output["gro"]
 
         top_initial = deepcopy(self.top)

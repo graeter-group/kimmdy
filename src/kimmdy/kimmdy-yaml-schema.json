@@ -146,6 +146,13 @@
       "type": "integer",
       "pytype": "int"
     },
+    "reaction_frame_whole_molecules": {
+      "title": "reaction_frame_whole_molecules",
+      "description": "Extract the coordinates at the reaction time against the MD run's TPR with `-pbc mol -ur compact`, so no molecule is split across the box. Default: False",
+      "type": "boolean",
+      "pytype": "bool",
+      "default": false
+    },
     "kmc": {
       "title": "kmc",
       "description": "KMC algorithm overwrite. Should be set by the reactions, but can be changed here. Not all reactions may support all algorithms.",
