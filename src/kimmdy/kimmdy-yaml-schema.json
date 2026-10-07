@@ -140,6 +140,12 @@
       "pytype": "int",
       "default": 0
     },
+    "kmc_seed": {
+      "title": "kmc_seed",
+      "description": "Seed for the KMC random number generator. Each decide task draws from its own stream built from (kmc_seed, task number), so cycles get different random numbers while a run, and a restart that redoes a task, stays reproducible. If unset, an unseeded generator is used and the picked recipe differs between runs.",
+      "type": "integer",
+      "pytype": "int"
+    },
     "kmc": {
       "title": "kmc",
       "description": "KMC algorithm overwrite. Should be set by the reactions, but can be changed here. Not all reactions may support all algorithms.",

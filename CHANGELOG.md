@@ -6,6 +6,15 @@ New options keep the original behaviour when they are not set, except the
 correctness fixes marked "default true"; set those to false to get the
 original behaviour.
 
+### Features
+
+* Optional seeded KMC recipe selection. New top-level key `kmc_seed` (unset by
+  default). Each decide task draws from `default_rng([seed, task number])`, so
+  a rerun picks the same recipes, every cycle gets different random numbers,
+  and a restart that redoes a task gets the same numbers. Ignored for
+  `dummy_first`.
+  Files: `src/kimmdy/runmanager.py`, `src/kimmdy/kimmdy-yaml-schema.json`.
+
 ### Bug Fixes
 
 * Restart inside an unfinished task no longer crashes on the force-field

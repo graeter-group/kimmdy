@@ -8,6 +8,7 @@ rest of the program and keeps track of global state.
 from __future__ import annotations
 
 import json
+from numpy.random import default_rng
 import logging
 import queue
 import re
@@ -1220,6 +1221,18 @@ class RunManager:
                 f"{self.config.multi_kmc} reactions."
             )
             kmc = partial(kmc, n=self.config.multi_kmc)
+
+        # fixed seed (kmc_seed): every decide step draws its own random numbers
+        # from (seed, task number). Without a seed each run picks different
+        # reactions; with the seed alone every cycle would draw the same numbers.
+        # A restart redoes a task with the same number, so it picks the same reaction.
+        kmc_seed = getattr(self.config, "kmc_seed", None)
+        if kmc_seed is not None and self.kmc_algorithm != "dummy_first":
+            task_number = int(files.outputdir.name.split("_")[0])
+            logger.info(
+                f"Seeding the KMC generator with seed {kmc_seed} and task number {task_number}"
+            )
+            kmc = partial(kmc, rng=default_rng([int(kmc_seed), task_number]))
 
         self.kmcresult = kmc(flatten_recipe_collections(self.recipe_collections))
         if not isinstance(self.kmcresult, KMCAccept):
