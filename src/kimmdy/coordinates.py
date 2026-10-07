@@ -3,6 +3,9 @@
 from dataclasses import dataclass, field
 from enum import Enum
 import logging
+import multiprocessing as mp  # to start helper processes
+import os  # to read the number of helpers from the environment
+from concurrent.futures import ProcessPoolExecutor  # runs the work on several helpers at once
 from copy import deepcopy
 from pathlib import Path
 from typing import Optional, Union
@@ -174,6 +177,80 @@ class AffectedInteractions:
     dihedrals: DihedralsPairSets = field(default_factory=DihedralsPairSets)
 
 
+# the main process puts its merger here so the helpers can read it
+_PARALLEL_DIHEDRAL_MERGER = None
+
+
+def _merge_dihedral_worker(payload):
+    """Work out the relax parameters of one dihedral (runs in a helper process).
+
+    Input: the dihedral's four atoms, and whether it is an improper.
+    It looks up the dihedral before and after the reaction and mixes them
+    into one dihedral that changes from "before" to "after" during the relax.
+    It only returns the result; the main process puts it into the topology.
+
+    Returns: the atoms, the mixed dihedral (None if nothing changes), whether
+    the dihedral is new, removed or changed, and whether it is an improper.
+    """
+    key, use_improper = payload  # the four atoms of one dihedral, and whether it is an improper
+    merger = _PARALLEL_DIHEDRAL_MERGER  # the main process's merger (only read here)
+    if merger is None:
+        raise RuntimeError("parallel dihedral worker was not initialized")
+    # look up the dihedral before (A) and after (B) the reaction
+    dihedral_a = merger._get_explicit_MultipleDihedrals(
+        key=key, use_state_b=False, use_improper=use_improper
+    )
+    dihedral_b = merger._get_explicit_MultipleDihedrals(
+        key=key, use_state_b=True, use_improper=use_improper
+    )
+
+    # note whether the dihedral is new, removed or changed
+    category = None
+    if not use_improper:
+        if dihedral_a is None and dihedral_b is None:
+            raise ValueError(
+                f"Can't find parameters for dihedral with key {key}, got None for both dihedrals."
+            )
+        pairkey = to_pairkey(key)
+        if dihedral_a is not None and dihedral_b is not None:
+            if (
+                pairkey[0] in merger.affected_interactions.atoms
+                or pairkey[1] in merger.affected_interactions.atoms
+            ):
+                category = "morphed"
+        elif dihedral_a is not None:
+            category = "removed"
+        else:
+            category = "added"
+        if dihedral_a == dihedral_b:
+            return key, None, category, use_improper  # unchanged dihedral: nothing to do
+
+    # mix every periodicity of A and B into one before-to-after dihedral
+    keys_a = set(dihedral_a.dihedrals.keys()) if dihedral_a else set()
+    keys_b = set(dihedral_b.dihedrals.keys()) if dihedral_b else set()
+    merged = MultipleDihedrals(
+        *key,
+        funct=(
+            FFFUNC["mult_improper_dihedral"]
+            if use_improper
+            else FFFUNC["mult_proper_dihedral"]
+        ),
+        dihedrals={},
+    )
+    for periodicity in sorted(
+        keys_a | keys_b, key=lambda value: int(value) if value else -1
+    ):
+        interaction_a = dihedral_a.dihedrals.get(periodicity) if dihedral_a else None
+        interaction_b = dihedral_b.dihedrals.get(periodicity) if dihedral_b else None
+        merged.dihedrals[periodicity] = merger._interpolate_two_dihedrals(
+            key=key,
+            dihedral_a=interaction_a,
+            dihedral_b=interaction_b,
+            funct=merged.funct,
+        )
+    return key, merged, category, use_improper  # the main process writes the result
+
+
 class MoleculeTypeMerger:
     """Takes two MoleculeTypes and joins them for a smooth free-energy like parameter transition simulation.
 
@@ -186,11 +263,23 @@ class MoleculeTypeMerger:
         mol_b: MoleculeType,
         ff: FF,
         morse_only: bool = False,
+        parallel_dihedral_merge: bool = False,
+        parallel_dihedral_workers: int | None = None,
     ) -> None:
         self.mol_a = mol_a
         self.mol_b = mol_b
         self.ff = ff
         self.morse_only = morse_only
+        self.parallel_dihedral_merge = bool(parallel_dihedral_merge)
+        if parallel_dihedral_workers is None:  # no number in kimmdy.yml: take it from the environment
+            try:
+                parallel_dihedral_workers = int(
+                    os.environ.get("KIMMDY_DIHEDRAL_WORKERS", "1")
+                )
+            except ValueError:
+                logger.warning("Ignoring invalid KIMMDY_DIHEDRAL_WORKERS; using one worker")
+                parallel_dihedral_workers = 1
+        self.parallel_dihedral_workers = max(1, int(parallel_dihedral_workers))  # at least one helper
         self.default_morse_well_depth = 300  # [kJ mol^-1]
         self.default_beta_for_lj = 19  # matches LJ steepness
         self.default_morse_dist_factor = 1.12  # sigmaij* 1.12 = LJ minimum
@@ -993,6 +1082,10 @@ class MoleculeTypeMerger:
                 logger.warning("Could not parameterize angle %s.", key)
 
     def merge_dihedrals(self):
+        # parallel code when switched on; otherwise the one-CPU code below runs
+        if self.parallel_dihedral_merge and self.parallel_dihedral_workers > 1:
+            self._merge_dihedrals_parallel()
+            return
         # proper dihedrals
         # proper dihedrals have a nested structure and need a different treatment from bonds, angles and improper dihedrals
         logger.info("Merging dihedrals")
@@ -1119,6 +1212,68 @@ class MoleculeTypeMerger:
                         funct=FFFUNC["mult_improper_dihedral"],
                     )
                 )
+
+    def _merge_dihedrals_parallel(self):
+        """Do the work of merge_dihedrals on several CPUs at once.
+
+        Every dihedral is sent to _merge_dihedral_worker in a helper process.
+        They are sent in a fixed order (sorted by atom number) and the results
+        come back in the same order, so every run gives the same topology.
+        The main process then writes the results into the relax topology.
+        If helper processes cannot be started, the normal one-CPU code is used.
+        """
+        global _PARALLEL_DIHEDRAL_MERGER
+        logger.info(
+            "Merging dihedrals in parallel with %d workers",
+            self.parallel_dihedral_workers,
+        )
+        # list all dihedrals, sorted by atom number so the order never changes
+        proper_keys = sorted(
+            set(self.mol_a.proper_dihedrals) | set(self.mol_b.proper_dihedrals),
+            key=lambda key: tuple(int(atom) for atom in key),
+        )
+        improper_keys = sorted(
+            set(self.mol_a.improper_dihedrals) | set(self.mol_b.improper_dihedrals),
+            key=lambda key: tuple(int(atom) for atom in key),
+        )
+        payload = [(key, False) for key in proper_keys] + [
+            (key, True) for key in improper_keys
+        ]
+        if not payload:
+            return
+        _PARALLEL_DIHEDRAL_MERGER = self  # let the helpers read this merger
+        try:
+            context = mp.get_context("fork")
+        except ValueError:
+            logger.warning("Fork workers are unavailable; using serial dihedral merging")
+            _PARALLEL_DIHEDRAL_MERGER = None
+            self.parallel_dihedral_merge = False
+            self.merge_dihedrals()  # helpers not possible: use the normal one-CPU code
+            return
+        try:
+            with ProcessPoolExecutor(
+                max_workers=self.parallel_dihedral_workers, mp_context=context
+            ) as executor:
+                # results come back in the order they were sent
+                results = list(executor.map(_merge_dihedral_worker, payload))
+        finally:
+            _PARALLEL_DIHEDRAL_MERGER = None  # clean up when the helpers are done
+
+        # write each result into the topology, in the same sorted order
+        for key, merged, category, use_improper in results:
+            if category == "morphed":
+                self.affected_interactions.dihedrals.morphed.add(to_pairkey(key))
+            elif category == "added":
+                self.affected_interactions.dihedrals.added.add(to_pairkey(key))
+            elif category == "removed":
+                self.affected_interactions.dihedrals.removed.add(to_pairkey(key))
+            if merged is not None:
+                target = (
+                    self.mol_a.improper_dihedrals
+                    if use_improper
+                    else self.mol_a.proper_dihedrals
+                )
+                target[key] = merged
 
     def merge_pairs(self):
         """Merge pairs that are from the respective pairs sections of the topologies"""
@@ -1436,6 +1591,8 @@ def merge_top_slow_growth(
     top_a: Topology,
     top_b: Topology,
     morse_only: bool = False,
+    parallel_dihedral_merge: bool = False,
+    parallel_dihedral_workers: int | None = None,
 ):
     """Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation.
     Modifies topB in place.
@@ -1447,6 +1604,8 @@ def merge_top_slow_growth(
         mol_b=top_b.reactive_molecule,
         ff=top_a.ff,
         morse_only=morse_only,
+        parallel_dihedral_merge=parallel_dihedral_merge,
+        parallel_dihedral_workers=parallel_dihedral_workers,
     ).merge()
 
     # because we clear some sections of the moleculetype,

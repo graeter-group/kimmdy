@@ -1663,6 +1663,17 @@ class RunManager:
                         top_b=self.top,
                         morse_only=self.config.changer.coordinates.slow_growth
                         == "morse_only",
+                        # parallel dihedral merge: read the two settings from kimmdy.yml
+                        parallel_dihedral_merge=getattr(
+                            self.config.changer.coordinates,
+                            "parallel_dihedral_merge",
+                            False,
+                        ),
+                        parallel_dihedral_workers=getattr(
+                            self.config.changer.coordinates,
+                            "parallel_dihedral_workers",
+                            None,
+                        ),
                     )
                     top_merge_path = files.outputdir / self.config.top.name.replace(
                         ".top", "_relax.top"

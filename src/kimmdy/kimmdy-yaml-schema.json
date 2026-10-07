@@ -423,6 +423,18 @@
                 ""
               ],
               "default": ""
+            },
+            "parallel_dihedral_merge": {
+              "type": "boolean",
+              "pytype": "bool",
+              "default": false,
+              "description": "Merge slow-growth dihedrals in parallel while applying results deterministically."
+            },
+            "parallel_dihedral_workers": {
+              "type": "integer",
+              "pytype": "int",
+              "minimum": 1,
+              "description": "Number of worker processes for parallel_dihedral_merge; when omitted, KIMMDY_DIHEDRAL_WORKERS is used (otherwise one)."
             }
           }
         },
