@@ -42,9 +42,11 @@ class FF:
         product_template_itp_glob: str = "*.itp",
         product_template_transitions: Optional[dict[str, str]] = None,
         improper_neighbors_by_bonding: bool = True,
+        keep_all_improper_periodicities: bool = True,
     ):
         # fixes for residue-template impropers, on by default, see Topology
         self.improper_neighbors_by_bonding = improper_neighbors_by_bonding
+        self.keep_all_improper_periodicities = keep_all_improper_periodicities
         self.atomtypes: dict[AtomId, AtomType] = {}
         self.bondtypes: dict[BondId, BondType] = {}
         self.angletypes: dict[AngleId, AngleType] = {}
@@ -178,7 +180,11 @@ class FF:
                     continue
                 if not v.get("subsections"):
                     raise AssertionError(f"key {k} has no subsections, only {v}.")
-                self.residuetypes[k] = ResidueType.from_section(k, v["subsections"])
+                self.residuetypes[k] = ResidueType.from_section(
+                    k,
+                    v["subsections"],
+                    keep_all_periodicities=keep_all_improper_periodicities,
+                )
 
     def __str__(self) -> str:
         return textwrap.dedent(

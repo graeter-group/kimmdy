@@ -365,6 +365,7 @@ class RunManager:
             name: bool(getattr(changer_topology, name, True))
             for name in (
                 "improper_neighbors_by_bonding",
+                "keep_all_improper_periodicities",
             )
         }
 

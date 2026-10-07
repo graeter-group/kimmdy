@@ -725,10 +725,21 @@ class ResidueType:
     atoms: dict[str, ResidueAtomSpec]
     bonds: dict[tuple[str, str], ResidueBondSpec]
     proper_dihedrals: dict[tuple[str, str, str, str], ResidueProperSpec]
-    improper_dihedrals: dict[tuple[str, str, str, str], ResidueImproperSpec]
+    improper_dihedrals: dict[tuple[str, str, str, str], list[ResidueImproperSpec]]
 
     @classmethod
-    def from_section(cls, residue, d: dict[str, dict[str, list[list[str]]]]):
+    def from_section(
+        cls,
+        residue,
+        d: dict[str, dict[str, list[list[str]]]],
+        keep_all_periodicities: bool = True,
+    ):
+        """Build one residue template from its section of the force field's .rtp file.
+
+        Reads the atoms, bonds, dihedrals and impropers of the residue. With
+        keep_all_periodicities, every improper line for the same four atom
+        names is kept (as a list); otherwise only the last one is, as before.
+        """
         atoms = {}
         bonds = {}
         propers = {}
@@ -747,12 +758,24 @@ class ResidueType:
                 propers[(proper.atom1, proper.atom2, proper.atom3, proper.atom4)] = (
                     proper
                 )
+        # impropers: one atom quadruple can carry several periodic terms
+        # (a99SB-disp's backbone psi correction lists periodicities
+        # 1, 1, 2, 3, 4, 5 on N CA C +N), so each key holds a list
         if ls := d.get("impropers"):
             for l in ls["content"]:
                 improper = ResidueImproperSpec.from_top_line(l)
-                impropers[
-                    (improper.atom1, improper.atom2, improper.atom3, improper.atom4)
-                ] = improper
+                key = (improper.atom1, improper.atom2, improper.atom3, improper.atom4)
+                if not keep_all_periodicities:
+                    # legacy behaviour: the last listed term wins
+                    impropers[key] = [improper]
+                    continue
+                # add a new periodicity to the list, or merge a repeated one
+                specs = impropers.setdefault(key, [])
+                same = next((s for s in specs if s.c2 == improper.c2), None)
+                if same is None:
+                    specs.append(improper)
+                else:
+                    specs[specs.index(same)] = improper
 
         return cls(residue, atoms, bonds, propers, impropers)
 

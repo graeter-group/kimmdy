@@ -88,6 +88,14 @@ original behaviour.
   switches from kimmdy.yml at start and restart.
   Files: `src/kimmdy/topology/topology.py`, `src/kimmdy/topology/ff.py`,
   `src/kimmdy/runmanager.py`, `src/kimmdy/kimmdy-yaml-schema.json`.
+* All periodic terms of a template improper are kept. New key
+  `changer.topology.keep_all_improper_periodicities` (default true): residue
+  templates keep a list of terms per atom quadruple, and rebuilds after a
+  reaction re-add all of them. Before, only the last listed term survived (for
+  example one of the a99SB-disp backbone psi terms).
+  Files: `src/kimmdy/topology/atomic.py`, `src/kimmdy/topology/topology.py`,
+  `src/kimmdy/topology/ff.py`, `src/kimmdy/runmanager.py`,
+  `src/kimmdy/kimmdy-yaml-schema.json`.
 
 ## [8.3.1](https://github.com/graeter-group/kimmdy/compare/v8.3.0...v8.3.1) (2026-01-02)
 
