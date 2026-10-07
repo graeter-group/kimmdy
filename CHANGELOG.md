@@ -19,6 +19,15 @@ original behaviour.
   `product_template_itp_glob`, `product_template_transitions`) to the
   topology, as a fresh start does; before, it silently used the defaults.
   Files: `src/kimmdy/runmanager.py`.
+* Correct radicals after a restart. A restart used the `radicals:` list of
+  kimmdy.yml (the start of the run) or found radicals from atom types. It now
+  reads the newest `radicals.json` from the kept decide folders and replays
+  the recipe picked after it was saved (from `recipes.csv`), because
+  `radicals.json` is written before that recipe is applied. The kimmdy.yml list
+  is used only when no reaction has been applied; a missing or unreadable
+  `radicals.json` or `recipes.csv` after a reaction stops the restart with an
+  error. There is no switch; it always runs.
+  Files: `src/kimmdy/runmanager.py`.
 
 ## [8.3.1](https://github.com/graeter-group/kimmdy/compare/v8.3.0...v8.3.1) (2026-01-02)
 

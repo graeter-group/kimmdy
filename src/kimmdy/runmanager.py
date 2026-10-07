@@ -7,6 +7,7 @@ rest of the program and keeps track of global state.
 
 from __future__ import annotations
 
+import json
 import logging
 import queue
 import re
@@ -27,6 +28,7 @@ from kimmdy.constants import (
     MARK_DONE,
     MARK_FAILED,
     MARK_FINISHED,
+    MARK_REACION_TIME,
     MARK_STARTED,
     MARKERS,
 )
@@ -337,6 +339,135 @@ class RunManager:
             f"In output directory {self.config.out}"
         )
 
+    def _radicals_after_picked_recipe(
+        self, radicals: list[str], radicals_file: Path, kept_task_dirs: list[Path]
+    ) -> list[str]:
+        """Bring a saved radical list up to date with the reaction applied after it was saved.
+
+        radicals.json is written in the decide step, before the chosen reaction
+        is applied. If that reaction was applied before the job stopped, the
+        saved list is one reaction behind. This reads the chosen reaction from
+        recipes.csv in the same folder and replays it on the list: a broken
+        bond makes both atoms radicals, a new bond takes both off the list.
+        Returns the updated list; stops the restart if recipes.csv cannot be read.
+        """
+        # nothing to do unless the list comes from a decide folder whose
+        # reaction was applied later (a later apply_recipe folder that wrote
+        # the reaction-time marker; an apply step after a rejected choice
+        # leaves an empty folder without it)
+        decide_dir = radicals_file.parent
+        if not decide_dir.name.endswith("_decide_recipe"):
+            return radicals
+        decide_nr = int(decide_dir.name.split("_")[0])
+        applied = any(
+            d.name.endswith("_apply_recipe")
+            and int(d.name.split("_")[0]) > decide_nr
+            and (d / MARK_REACION_TIME).exists()
+            for d in kept_task_dirs
+        )
+        if not applied:
+            return radicals
+
+        # read the chosen reaction; without it the radicals are unknown
+        recipes_csv = decide_dir / "recipes.csv"
+        try:
+            _, picked = RecipeCollection.from_csv(recipes_csv)
+        except (OSError, ValueError, SyntaxError) as error:
+            m = (
+                f"{radicals_file} was written before the recipe of a later "
+                f"apply_recipe task, and the picked recipe could not be read from "
+                f"{recipes_csv} (needs save_recipes: true): {error}. Aborting restart."
+            )
+            logger.error(m)
+            raise RuntimeError(m) from error
+        if picked is None:
+            return radicals
+
+        # replay its steps on the list, in order
+        updated = list(radicals)
+        for step in picked.recipe_steps:
+            if isinstance(step, Break):
+                for atom_id in (step.atom_id_1, step.atom_id_2):
+                    if atom_id not in updated:
+                        updated.append(atom_id)
+            elif isinstance(step, Bind):
+                for atom_id in (step.atom_id_1, step.atom_id_2):
+                    if atom_id in updated:
+                        updated.remove(atom_id)
+        logger.info(
+            "Applied the recipe picked in %s to the restored radicals: %s",
+            decide_dir.name,
+            picked.recipe_steps,
+        )
+        return updated
+
+    def _restore_restart_radicals(self, kept_task_dirs: list[Path]) -> Optional[str]:
+        """Find the radicals a restarted run must continue with.
+
+        Uses the newest radicals.json among the task folders kept for the
+        restart, brought up to date with _radicals_after_picked_recipe. The
+        radicals: list of kimmdy.yml is only used when no reaction has been
+        applied yet, because it is the state at the start of the run. If a
+        reaction was applied but no readable radicals.json exists, the
+        restart stops with an error. Returns the atom ids as one
+        space-separated string, as Topology expects.
+        """
+        # radicals.json files are looked up in the decide folders directly,
+        # because get_latest("json") can also return other json files (for
+        # example a sample folder's xtc cleanup record)
+        restart_radicals = getattr(self.config, "radicals", None)
+        radicals_files = [
+            d / "radicals.json"
+            for d in kept_task_dirs
+            if d.name.endswith("_decide_recipe") and (d / "radicals.json").is_file()
+        ]
+        # a reaction was applied if an apply_recipe folder wrote the reaction-time
+        # marker; when every reaction was rejected the folder exists but stays
+        # empty, and the decide step writes no radicals.json either
+        reaction_applied = any(
+            d.name.endswith("_apply_recipe") and (d / MARK_REACION_TIME).exists()
+            for d in kept_task_dirs
+        )
+
+        # no saved list: fine before the first reaction, an error after it
+        if not radicals_files:
+            if reaction_applied:
+                m = (
+                    "A reaction was already applied in this run, but no "
+                    "radicals.json was found in the kept decide_recipe folders, "
+                    "so the current radicals are unknown. Aborting restart."
+                )
+                logger.error(m)
+                raise RuntimeError(m)
+            logger.info(
+                "No reaction applied yet; using the radicals from the config."
+            )
+
+        # otherwise read the newest saved list and bring it up to date
+        else:
+            radicals_file = radicals_files[-1]
+            try:
+                with open(radicals_file) as handle:
+                    saved_radicals = json.load(handle).get("radicals")
+                if not isinstance(saved_radicals, list):
+                    raise ValueError("it has no 'radicals' list")
+            except (OSError, TypeError, ValueError, AttributeError) as error:
+                m = f"Could not restore radicals from {radicals_file}: {error}. Aborting restart."
+                logger.error(m)
+                raise RuntimeError(m) from error
+            saved_radicals = self._radicals_after_picked_recipe(
+                [str(radical) for radical in saved_radicals],
+                radicals_file,
+                kept_task_dirs,
+            )
+            restart_radicals = " ".join(saved_radicals)
+            logger.info(
+                "Restored %d radical atom(s) from %s",
+                len(saved_radicals),
+                radicals_file,
+            )
+        return restart_radicals
+
     def _setup_restart(self):
         """Set up RunManager to restart from an existing run directory"""
 
@@ -526,6 +657,8 @@ class RunManager:
             )
             self._discover_output_files(taskname=task_name, files=task_files)
 
+        restart_radicals = self._restore_restart_radicals(task_dirs[: self.iteration + 1])
+
         # plumed fix
         for md_config in self.config.mds.__dict__.values():
             if getattr(md_config, "use_plumed"):
@@ -563,7 +696,7 @@ class RunManager:
             is_reactive_predicate_f=get_is_reactive_predicate_from_config_f(
                 self.config.topology.reactive
             ),
-            radicals=getattr(self.config, "radicals", None),
+            radicals=restart_radicals,
             residuetypes_path=getattr(self.config, "residuetypes", None),
             reactive_nrexcl=getattr(self.config.topology, "nrexcl", None),
             product_template_sources=tuple(
