@@ -539,3 +539,33 @@ def test_merge_small_hat_with_more_overlaps(arranged_tmp_path, caplog):
     merger.helper_pairs[("14", "21")] = Pair(
         "14", "21", "1", "0.00000", "0.00000", "0.22344", "0.17340"
     )
+
+
+def test_merge_small_hat_harmonic_acceptor_h_term(arranged_tmp_path):
+    """The optional relax helper adds one growing type-6 H-acceptor bond and nothing else."""
+
+    def merged_dict(helper: bool) -> dict:
+        """Move the H from atom 7 to atom 9, build the relax topology with or without the spring, and return it as text sections."""
+        top = Topology(read_top(Path("AlaCaR_out.top")))
+        top_a = copy.deepcopy(top)
+        top.break_bond(("7", "8"))
+        top.bind_bond(("8", "9"))
+        merge_top_slow_growth(top_a, top, harmonic_acceptor_h_relax_term=helper)
+        return top_a.to_dict()
+
+    plain = merged_dict(False)
+    helped = merged_dict(True)
+    bonds_plain = plain["moleculetype_Reactive"]["subsections"]["bonds"]["content"]
+    bonds_helped = helped["moleculetype_Reactive"]["subsections"]["bonds"]["content"]
+    extra = [line for line in bonds_helped if line not in bonds_plain]
+    assert len(bonds_helped) == len(bonds_plain) + 1
+    assert len(extra) == 1
+    ai, aj, funct, b0_a, k_a, b0_b, k_b = extra[0][:7]
+    assert (ai, aj, funct) == ("8", "9", "6")
+    assert float(k_a) == 0.0 and float(k_b) == 50000.0
+    assert b0_a == b0_b
+    for section in ("pairs", "exclusions", "angles", "atoms"):
+        assert (
+            plain["moleculetype_Reactive"]["subsections"][section]
+            == helped["moleculetype_Reactive"]["subsections"][section]
+        )

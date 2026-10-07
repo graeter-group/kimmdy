@@ -266,12 +266,18 @@ class MoleculeTypeMerger:
         retype_transferred_h: bool = True,
         parallel_dihedral_merge: bool = False,
         parallel_dihedral_workers: int | None = None,
+        harmonic_acceptor_h_relax_term: bool = False,
+        harmonic_acceptor_h_relax_k: float = 50000.0,
     ) -> None:
         self.mol_a = mol_a
         self.mol_b = mol_b
         self.ff = ff
         self.morse_only = morse_only
         self.retype_transferred_h = bool(retype_transferred_h)
+        self.harmonic_acceptor_h_relax_term = bool(harmonic_acceptor_h_relax_term)
+        self.harmonic_acceptor_h_relax_k = float(harmonic_acceptor_h_relax_k)
+        # created bond key -> its state-B equilibrium length, filled by merge_bonds
+        self._created_bond_lengths: dict[tuple[str, str], str] = {}
         self.parallel_dihedral_merge = bool(parallel_dihedral_merge)
         if parallel_dihedral_workers is None:  # no number in kimmdy.yml: take it from the environment
             try:
@@ -343,6 +349,7 @@ class MoleculeTypeMerger:
         # transferred H is written with explicit parameters by then, so the new
         # type needs no <type>-H1 entry in the force field
         self._retype_transferred_hydrogens()
+        self._add_harmonic_acceptor_h_terms()
 
         logger.info(f"Finished merging topologies")
 
@@ -780,6 +787,57 @@ class MoleculeTypeMerger:
                 continue
         return None
 
+    def _add_harmonic_acceptor_h_terms(self):
+        """Add a spring between the moving H and its new atom, for the relax only.
+
+        The moving H is the hydrogen that loses one bond and gains a new one in
+        the reaction. The spring has the normal length of the new bond and its
+        strength grows from 0 at the start of the relax to
+        harmonic_acceptor_h_relax_k at the end, so it pulls the H onto its new
+        atom while the old bond fades. It is written as bond type 6, a plain
+        spring that does not switch off any other forces between the atoms.
+        Does nothing when the option is off.
+        """
+        if not self.harmonic_acceptor_h_relax_term:
+            return
+
+        # atoms that lost a bond in this reaction (the moving H is one of them)
+        broken_atoms = {nr for key in self.affected_interactions.bonds.removed for nr in key}
+
+        # for every new bond whose H also lost a bond, add the spring
+        added = 0
+        for bond_key, b0 in self._created_bond_lengths.items():
+            moving_h = [
+                nr
+                for nr in bond_key
+                if nr in broken_atoms
+                and nr in self.mol_a.atoms
+                and self._is_hydrogen(self.mol_a.atoms[nr])
+            ]
+            if len(moving_h) != 1:
+                continue
+            # third key element keeps the helper next to the Morse bond of the
+            # same atom pair; only the values are written to the topology
+            self.mol_a.bonds[(*bond_key, "harmonic_acceptor_h")] = Bond(
+                *bond_key,
+                funct="6",
+                c0=f"{float(b0):.5f}",  # length at the start of the relax
+                c1=f"{0.0:.5f}",  # strength at the start: zero
+                c2=f"{float(b0):.5f}",  # length at the end (same)
+                c3=f"{self.harmonic_acceptor_h_relax_k:.5f}",  # strength at the end
+                comment="; harmonic acceptor-H helper growing with lambda (relax only)",
+            )
+            added += 1
+        logger.info("Added %d harmonic acceptor-H relax helper bond(s)", added)
+
+    @staticmethod
+    def _is_hydrogen(atom) -> bool:
+        """Tell whether an atom is a hydrogen: by its mass, or by its type name if the mass is missing."""
+        try:
+            return float(atom.mass) < 1.5
+        except (TypeError, ValueError):
+            return str(atom.type).upper().startswith("H")
+
     def _retype_transferred_hydrogens(self):
         """Give a moved hydroxyl or water H a Lennard-Jones size at the end of the relax.
 
@@ -1007,6 +1065,7 @@ class MoleculeTypeMerger:
                     raise ValueError(m)
                 pairkey = to_pairkey(bond_key)
                 self.affected_interactions.bonds.added.add(pairkey)
+                self._created_bond_lengths[bond_key] = bond_b.c0
                 if self.morse_only:
                     # use a bond that pretends to be LJ via morse
                     self.mol_a.bonds[bond_key] = Bond(
@@ -1719,6 +1778,8 @@ def merge_top_slow_growth(
     retype_transferred_h: bool = True,
     parallel_dihedral_merge: bool = False,
     parallel_dihedral_workers: int | None = None,
+    harmonic_acceptor_h_relax_term: bool = False,
+    harmonic_acceptor_h_relax_k: float = 50000.0,
 ):
     """Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation.
     Modifies topB in place.
@@ -1733,6 +1794,8 @@ def merge_top_slow_growth(
         retype_transferred_h=retype_transferred_h,
         parallel_dihedral_merge=parallel_dihedral_merge,
         parallel_dihedral_workers=parallel_dihedral_workers,
+        harmonic_acceptor_h_relax_term=harmonic_acceptor_h_relax_term,
+        harmonic_acceptor_h_relax_k=harmonic_acceptor_h_relax_k,
     ).merge()
 
     # because we clear some sections of the moleculetype,

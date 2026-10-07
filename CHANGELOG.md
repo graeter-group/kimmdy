@@ -38,6 +38,16 @@ original behaviour.
   are written in a different order.
   Files: `src/kimmdy/coordinates.py`, `src/kimmdy/runmanager.py`,
   `src/kimmdy/kimmdy-yaml-schema.json`.
+* Optional spring on the moving H during the relax. New keys
+  `changer.coordinates.harmonic_acceptor_h_relax_term` (default false) and
+  `harmonic_acceptor_h_relax_k` (default 50,000 kJ mol^-1 nm^-2). The moving H
+  gets an extra harmonic bond (function type 6, no exclusions) to its new
+  atom, at that bond's force-field length, with a strength growing from 0 to
+  the set value over the relax. It keeps the H from being left unbound on long
+  hops, which could make GROMACS stop with excluded pairs beyond the pair-list
+  cut-off. **Changes the relax trajectory; the final topology is unchanged.**
+  Files: `src/kimmdy/coordinates.py`, `src/kimmdy/runmanager.py`,
+  `src/kimmdy/kimmdy-yaml-schema.json`, `tests/test_coordinates.py`.
 
 ### Bug Fixes
 

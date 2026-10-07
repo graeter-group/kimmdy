@@ -430,6 +430,18 @@
               "default": true,
               "description": "Retype transferred HW/HO hydrogen atoms as a force-field LJ-bearing hydrogen type (H1 in Amber) in state B of the temporary relaxation topology. State A keeps the original type, so the H's Lennard-Jones parameters grow in linearly with lambda. The final reaction topology is unchanged."
             },
+            "harmonic_acceptor_h_relax_term": {
+              "type": "boolean",
+              "pytype": "bool",
+              "default": false,
+              "description": "In the relaxation topology only, add a harmonic helper bond (function type 6, no exclusions) between the transferred hydrogen and its acceptor. Its length is the new bond's equilibrium length and its force constant grows linearly from 0 at lambda 0 to harmonic_acceptor_h_relax_k at lambda 1, pulling the H onto the acceptor while the old bond fades. The final reaction topology is unchanged."
+            },
+            "harmonic_acceptor_h_relax_k": {
+              "type": "float",
+              "pytype": "float",
+              "default": 50000.0,
+              "description": "Force constant at lambda 1 of the harmonic acceptor-H relax helper bond, in kJ mol^-1 nm^-2 (an Amber O-H bond is 462,750)."
+            },
             "parallel_dihedral_merge": {
               "type": "boolean",
               "pytype": "bool",

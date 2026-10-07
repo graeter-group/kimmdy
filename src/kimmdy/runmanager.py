@@ -1681,6 +1681,16 @@ class RunManager:
                             "parallel_dihedral_workers",
                             None,
                         ),
+                        harmonic_acceptor_h_relax_term=getattr(
+                            self.config.changer.coordinates,
+                            "harmonic_acceptor_h_relax_term",
+                            False,
+                        ),
+                        harmonic_acceptor_h_relax_k=getattr(
+                            self.config.changer.coordinates,
+                            "harmonic_acceptor_h_relax_k",
+                            50000.0,
+                        ),
                     )
                     top_merge_path = files.outputdir / self.config.top.name.replace(
                         ".top", "_relax.top"
