@@ -368,6 +368,7 @@ class RunManager:
                 "keep_all_improper_periodicities",
                 "combine_same_periodicity_dihedrals",
                 "conserve_transferred_h_charge",
+                "handle_duplicate_topology_lines",
             )
         }
 

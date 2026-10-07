@@ -85,9 +85,13 @@ class MoleculeType:
         atomics: dict,
         radicals: Optional[str] = None,
         combine_same_periodicity: bool = True,
+        handle_duplicate_lines: bool = True,
     ) -> None:
         # merge funct-4 terms that share atoms and periodicity while parsing
         self.combine_same_periodicity = combine_same_periodicity
+        # merge repeated explicit proper dihedral lines and stop on any other
+        # repeated line instead of silently keeping only the last one
+        self.handle_duplicate_lines = handle_duplicate_lines
         self.name = header.name
         self.nrexcl = header.nrexcl
         self.atomics = atomics
@@ -184,7 +188,11 @@ class MoleculeType:
             return
         for l in ls:
             bond = Bond.from_top_line(l)
-            self.bonds[(bond.ai, bond.aj)] = bond
+            key = (bond.ai, bond.aj)
+            # a repeated line stops with an error (handle_duplicate_lines)
+            if key in self.bonds:
+                self._reject_duplicate_line("bonds", key)
+            self.bonds[key] = bond
 
     def _parse_pairs(self):
         """Parse pairs from topology dictionary."""
@@ -193,7 +201,11 @@ class MoleculeType:
             return
         for l in ls:
             pair = Pair.from_top_line(l)
-            self.pairs[(pair.ai, pair.aj)] = pair
+            key = (pair.ai, pair.aj)
+            # a repeated line stops with an error (handle_duplicate_lines)
+            if key in self.pairs:
+                self._reject_duplicate_line("pairs", key)
+            self.pairs[key] = pair
 
     def _parse_angles(self):
         """Parse angles from topology dictionary."""
@@ -202,10 +214,22 @@ class MoleculeType:
             return
         for l in ls:
             angle = Angle.from_top_line(l)
-            self.angles[(angle.ai, angle.aj, angle.ak)] = angle
+            key = (angle.ai, angle.aj, angle.ak)
+            # a repeated line stops with an error (handle_duplicate_lines)
+            if key in self.angles:
+                self._reject_duplicate_line("angles", key)
+            self.angles[key] = angle
 
     def _parse_dihedrals(self):
-        """Parse improper and proper dihedrals from topology dictionary."""
+        """Read the [ dihedrals ] lines of this molecule into proper and improper dihedrals.
+
+        Each dihedral is stored under its four atoms, with one term per
+        periodicity. If a line repeats atoms and periodicity of an earlier
+        line, the two terms are merged into one equivalent term where that is
+        exact (see combine_periodic_terms); any other repeat stops with an
+        error (see _reject_duplicate_line), because GROMACS would use both
+        lines but only one can be stored.
+        """
         ls = self.atomics.get("dihedrals")
         if ls is None:
             return
@@ -231,13 +255,60 @@ class MoleculeType:
                     dihedral.c0, dihedral.c1 = combine_periodic_terms(
                         [(existing.c0, existing.c1), (dihedral.c0, dihedral.c1)]
                     )
+                elif existing is not None:
+                    self._reject_duplicate_line(
+                        "dihedrals (improper)", key, dihedral.periodicity
+                    )
                 self.improper_dihedrals[key].dihedrals[dihedral.periodicity] = dihedral
+            # all other dihedrals (proper dihedrals, function 1 or 9)
             else:
                 if self.proper_dihedrals.get(key) is None:
                     self.proper_dihedrals[key] = MultipleDihedrals(
                         *key, dihedral.funct, dihedrals={}
                     )
+                existing = self.proper_dihedrals[key].dihedrals.get(
+                    dihedral.periodicity
+                )
+                if existing is not None:
+                    if (
+                        self.handle_duplicate_lines
+                        and dihedral.funct in ("1", "9")
+                        and existing.funct == dihedral.funct
+                        and None not in (existing.c0, existing.c1, dihedral.c0, dihedral.c1)
+                    ):
+                        # same atoms and periodicity listed twice with numbers:
+                        # GROMACS adds both terms, so merge them into one
+                        # equivalent term instead of keeping the later one only
+                        dihedral.c0, dihedral.c1 = combine_periodic_terms(
+                            [(existing.c0, existing.c1), (dihedral.c0, dihedral.c1)]
+                        )
+                    else:
+                        self._reject_duplicate_line(
+                            "dihedrals (proper)", key, dihedral.periodicity
+                        )
                 self.proper_dihedrals[key].dihedrals[dihedral.periodicity] = dihedral
+
+    def _reject_duplicate_line(self, section: str, key: tuple, periodicity: str = ""):
+        """Stop with an error when a topology line repeats an earlier one that cannot be merged.
+
+        KIMMDY keeps one term per atom set (and per periodicity for
+        dihedrals), while GROMACS uses every line, so silently keeping only
+        the last line would change the simulation. The error names the
+        molecule, section and atoms. With handle_duplicate_lines off it does
+        nothing, so the later line replaces the earlier as before.
+        """
+        if not self.handle_duplicate_lines:
+            return
+        where = f" with periodicity {periodicity}" if periodicity else ""
+        m = (
+            f"Molecule {self.name}: [ {section} ] lists atoms {' '.join(key)}{where} "
+            "more than once. KIMMDY can keep only one such term, but GROMACS would "
+            "apply every line, so the topology cannot be represented without "
+            "changing it. Merge or remove the repeated line, or set "
+            "changer.topology.handle_duplicate_topology_lines to false to keep only the last one."
+        )
+        logger.error(m)
+        raise ValueError(m)
 
     def _parse_restraints(self):
         """Parse restraints from topology dictionary."""
@@ -879,6 +950,7 @@ class Topology:
         keep_all_improper_periodicities: bool = True,
         combine_same_periodicity_dihedrals: bool = True,
         conserve_transferred_h_charge: bool = True,
+        handle_duplicate_topology_lines: bool = True,
     ):
         """Topology fixes, all on by default; set to False for the 16ce888 behaviour:
 
@@ -895,8 +967,13 @@ class Topology:
         conserve_transferred_h_charge
             A transferred H keeps its charge and the acceptor gives up the
             same amount, instead of both taking residue-template charges.
+        handle_duplicate_topology_lines
+            Merge repeated explicit proper dihedral lines (function 1 or 9)
+            with the same atoms and periodicity, and stop with an error on any
+            other repeated line, instead of keeping only the last one.
         """
         self.combine_same_periodicity_dihedrals = combine_same_periodicity_dihedrals
+        self.handle_duplicate_topology_lines = handle_duplicate_topology_lines
         if top == {}:
             raise NotImplementedError(
                 "Generating an empty Topology from an empty TopologyDict is not implemented."
@@ -927,6 +1004,8 @@ class Topology:
         self.pending_product_template_restorations: list[
             ProductTemplateMatch
         ] = []
+        if self.handle_duplicate_topology_lines:
+            self._expand_parameter_macros()
         self._parse_molecules()
         self.parametrizer = parametrizer
         self._check_is_reactive_molecule = is_reactive_predicate_f
@@ -1052,6 +1131,7 @@ class Topology:
             reactive_atomics,
             radicals,
             combine_same_periodicity=self.combine_same_periodicity_dihedrals,
+            handle_duplicate_lines=self.handle_duplicate_topology_lines,
         )
         self.moleculetypes[REACTIVE_MOLECULEYPE] = reactive_moleculetype
         # update topology dict
@@ -1081,6 +1161,47 @@ class Topology:
             f"\tatm2.bound_to_nrs {atm2.bound_to_nrs}\n"
         )
 
+    def _expand_parameter_macros(self):
+        """Replace #define shortcut names in bonded lines by the numbers they stand for.
+
+        Some force fields (for example Amber99SB-ILDN) write torsions as named
+        shortcuts: `180 165 167 170 9 torsion_LEU_C_CA_CB_CG_mult1`, with
+        `_mult2` and `_mult3` on the same four atoms. The periodicity is hidden
+        inside the name, so KIMMDY stored all three in one slot and kept only
+        the last. This swaps each name for its numbers (phase, strength,
+        periodicity), exactly as GROMACS does when it reads the file, so every
+        line is kept. Changes the topology dict in place.
+        """
+        # shortcuts that stand for numbers (defines without a value are flags)
+        defines = {k: v for k, v in (self.top.get("define") or {}).items() if v}
+        if not defines:
+            return
+        # in each section, the numbers start after the function-type column
+        funct_index = {"bonds": 2, "pairs": 2, "angles": 3, "dihedrals": 4}
+
+        # replace the shortcut names in every bonded line of every molecule
+        expanded = 0
+        for name, section in self.top.items():
+            if not name.startswith("moleculetype"):
+                continue
+            subsections = section.get("subsections") or {}
+            for sec, index in funct_index.items():
+                block = subsections.get(sec)
+                if not block:
+                    continue
+                for key in ("content", "else_content"):
+                    lines = block.get(key) or []
+                    for i, line in enumerate(lines):
+                        if not any(tok in defines for tok in line[index + 1 :]):
+                            continue
+                        new = list(line[: index + 1])
+                        for tok in line[index + 1 :]:
+                            new.extend(defines.get(tok, [tok]))
+                        lines[i] = new
+                        expanded += 1
+        if expanded:
+            logger.info(f"Expanded {expanded} parameter macro line(s) into explicit numbers")
+
     def _parse_molecules(self):
         moleculetypes = [k for k in self.top.keys() if k.startswith("moleculetype")]
         for moleculetype in moleculetypes:
@@ -1101,6 +1222,7 @@ class Topology:
                 atomics,
                 radicals="",
                 combine_same_periodicity=self.combine_same_periodicity_dihedrals,
+                handle_duplicate_lines=self.handle_duplicate_topology_lines,
             )
 
     def __eq__(self, other: object) -> bool:

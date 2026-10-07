@@ -115,6 +115,20 @@ original behaviour.
   template values.** The product-template tests switch it off.
   Files: `src/kimmdy/topology/topology.py`, `src/kimmdy/runmanager.py`,
   `src/kimmdy/kimmdy-yaml-schema.json`, `tests/test_topology.py`.
+* Repeated topology lines are no longer dropped silently. New key
+  `changer.topology.handle_duplicate_topology_lines` (default true). GROMACS
+  applies every line, while KIMMDY kept only the last of repeated ones. Now
+  `#define` names in bonded lines (for example Amber99SB-ILDN torsions) are
+  replaced by their numbers, repeated proper dihedral lines with numbers are
+  merged into one equivalent term, and any other repeated line stops KIMMDY
+  with an error. Also fixed: `write_top` wrote `#define` lines without a space
+  between name and value. On an Amber99SB-ILDN test system every interaction
+  now equals GROMACS's reading of the file (41 proper-dihedral terms were lost
+  before). **Changes the physics only for topologies with repeated lines or
+  macro torsions.** The `Ala_R_noprm.top` tests switch the check off.
+  Files: `src/kimmdy/topology/topology.py`, `src/kimmdy/parsing.py`,
+  `src/kimmdy/runmanager.py`, `src/kimmdy/kimmdy-yaml-schema.json`,
+  `tests/test_topology.py`.
 
 ## [8.3.1](https://github.com/graeter-group/kimmdy/compare/v8.3.0...v8.3.1) (2026-01-02)
 

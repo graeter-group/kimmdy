@@ -861,12 +861,15 @@ class TestRadicalAla:
     @pytest.fixture
     def top_noprm_fix(self, filedir) -> Topology:
         hexala_top = read_top(filedir / "Ala_R_noprm.top")
-        return Topology(hexala_top)
+        # this test file lists the dihedral 5-7-9-14 three times without
+        # numbers (GROMACS would apply it three times); keep the old behaviour
+        return Topology(hexala_top, handle_duplicate_topology_lines=False)
 
     @pytest.fixture
     def top_noprm_explicitR_fix(self, filedir) -> Topology:
         hexala_top = read_top(filedir / "Ala_R_noprm.top")
-        return Topology(hexala_top, radicals="9")
+        # see top_noprm_fix
+        return Topology(hexala_top, radicals="9", handle_duplicate_topology_lines=False)
 
     @pytest.fixture
     def top_prm_fix(self, filedir) -> Topology:
@@ -1372,3 +1375,48 @@ def test_ohr_transition_restores_tip3_like_product_and_conserves_charge():
     )
     assert match_key not in top.pending_product_template_matches
     assert donor_h.nr not in top.pending_transferred_h_charges
+
+
+def _alacar_with_extra_lines(section: str, extra: list[list[str]]) -> dict:
+    """Read the small Ala test topology and append extra lines to one section of its molecule."""
+    raw = read_top(Path("AlaCaR_out.top"))
+    mol = next(key for key in raw if key.startswith("moleculetype_"))
+    raw[mol]["subsections"][section]["content"].extend(extra)
+    return raw
+
+
+@pytest.mark.parametrize("arranged_tmp_path", ["test_coordinates"], indirect=True)
+def test_duplicate_bond_line_stops_parsing(arranged_tmp_path):
+    """A repeated bond line would be dropped silently, so reading stops with an error."""
+    raw = _alacar_with_extra_lines("bonds", [["1", "2", "1"]])
+    with pytest.raises(ValueError, match="more than once"):
+        Topology(raw)
+
+
+@pytest.mark.parametrize("arranged_tmp_path", ["test_coordinates"], indirect=True)
+def test_duplicate_explicit_proper_lines_are_merged(arranged_tmp_path):
+    """Two explicit proper lines with the same atoms and periodicity become one equivalent term."""
+    extra = [
+        ["2", "1", "5", "6", "9", "0.0", "1.0", "3"],
+        ["2", "1", "5", "6", "9", "180.0", "2.0", "3"],
+    ]
+    top = Topology(_alacar_with_extra_lines("dihedrals", extra))
+    merged = top.proper_dihedrals[("2", "1", "5", "6")].dihedrals["3"]
+    # 1.0 cos(3phi) - 2.0 cos(3phi) = -1.0 cos(3phi) = 1.0 cos(3phi - 180)
+    assert float(merged.c0) == pytest.approx(180.0)
+    assert float(merged.c1) == pytest.approx(1.0)
+
+
+@pytest.mark.parametrize("arranged_tmp_path", ["test_coordinates"], indirect=True)
+def test_duplicate_lines_old_behaviour_when_switched_off(arranged_tmp_path):
+    """With handle_duplicate_topology_lines off, the later line replaces the earlier one."""
+    raw = _alacar_with_extra_lines("bonds", [["1", "2", "1"]])
+    extra = [
+        ["2", "1", "5", "6", "9", "0.0", "1.0", "3"],
+        ["2", "1", "5", "6", "9", "180.0", "2.0", "3"],
+    ]
+    mol = next(key for key in raw if key.startswith("moleculetype_"))
+    raw[mol]["subsections"]["dihedrals"]["content"].extend(extra)
+    top = Topology(raw, handle_duplicate_topology_lines=False)
+    kept = top.proper_dihedrals[("2", "1", "5", "6")].dihedrals["3"]
+    assert (kept.c0, kept.c1) == ("180.0", "2.0")
