@@ -1,5 +1,19 @@
 # Changelog
 
+## Unreleased
+
+New options keep the original behaviour when they are not set, except the
+correctness fixes marked "default true"; set those to false to get the
+original behaviour.
+
+### Bug Fixes
+
+* Restart inside an unfinished task no longer crashes on the force-field
+  links. `create_task_directory` checked `exists()`, which is False for a link
+  that points to nothing (a force field without `residuetypes.dat`), so
+  reusing a task folder raised `FileExistsError`. It now also checks
+  `is_symlink()`. There is no switch; it always runs.
+  Files: `src/kimmdy/tasks.py`.
 
 ## [8.3.1](https://github.com/graeter-group/kimmdy/compare/v8.3.0...v8.3.1) (2026-01-02)
 
