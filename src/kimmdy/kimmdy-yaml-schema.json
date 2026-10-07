@@ -424,6 +424,12 @@
               ],
               "default": ""
             },
+            "retype_transferred_h": {
+              "type": "boolean",
+              "pytype": "bool",
+              "default": true,
+              "description": "Retype transferred HW/HO hydrogen atoms as a force-field LJ-bearing hydrogen type (H1 in Amber) in state B of the temporary relaxation topology. State A keeps the original type, so the H's Lennard-Jones parameters grow in linearly with lambda. The final reaction topology is unchanged."
+            },
             "parallel_dihedral_merge": {
               "type": "boolean",
               "pytype": "bool",

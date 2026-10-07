@@ -1663,6 +1663,13 @@ class RunManager:
                         top_b=self.top,
                         morse_only=self.config.changer.coordinates.slow_growth
                         == "morse_only",
+                        # relax-only fixes for the moving H: its size grows in
+                        # during the relax, and an optional spring pulls it in
+                        retype_transferred_h=getattr(
+                            self.config.changer.coordinates,
+                            "retype_transferred_h",
+                            True,
+                        ),
                         # parallel dihedral merge: read the two settings from kimmdy.yml
                         parallel_dihedral_merge=getattr(
                             self.config.changer.coordinates,

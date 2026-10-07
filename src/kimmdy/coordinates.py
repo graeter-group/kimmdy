@@ -263,6 +263,7 @@ class MoleculeTypeMerger:
         mol_b: MoleculeType,
         ff: FF,
         morse_only: bool = False,
+        retype_transferred_h: bool = True,
         parallel_dihedral_merge: bool = False,
         parallel_dihedral_workers: int | None = None,
     ) -> None:
@@ -270,6 +271,7 @@ class MoleculeTypeMerger:
         self.mol_b = mol_b
         self.ff = ff
         self.morse_only = morse_only
+        self.retype_transferred_h = bool(retype_transferred_h)
         self.parallel_dihedral_merge = bool(parallel_dihedral_merge)
         if parallel_dihedral_workers is None:  # no number in kimmdy.yml: take it from the environment
             try:
@@ -280,6 +282,7 @@ class MoleculeTypeMerger:
                 logger.warning("Ignoring invalid KIMMDY_DIHEDRAL_WORKERS; using one worker")
                 parallel_dihedral_workers = 1
         self.parallel_dihedral_workers = max(1, int(parallel_dihedral_workers))  # at least one helper
+        self.transferred_h_type = self._find_lj_hydrogen_type()
         self.default_morse_well_depth = 300  # [kJ mol^-1]
         self.default_beta_for_lj = 19  # matches LJ steepness
         self.default_morse_dist_factor = 1.12  # sigmaij* 1.12 = LJ minimum
@@ -335,6 +338,11 @@ class MoleculeTypeMerger:
             for key in self.affected_interactions.bonds.removed:
                 self.mol_a.pairs.pop(key, None)
                 self.mol_a.exclusions[key] = Exclusion(*key)
+
+        # after the bonded terms are merged: every interaction that touches a
+        # transferred H is written with explicit parameters by then, so the new
+        # type needs no <type>-H1 entry in the force field
+        self._retype_transferred_hydrogens()
 
         logger.info(f"Finished merging topologies")
 
@@ -537,11 +545,17 @@ class MoleculeTypeMerger:
         t1 = mol.atoms[id1].type
         t2 = mol.atoms[id2].type
 
-        # amber fix for breaking/binding atom types without LJ potential
+        # Protect breaking/binding hydrogen types without LJ potential. Keep
+        # the historical H1 lookup when the opt-in relaxation retyping is off.
+        replacement_h_type = (
+            self.transferred_h_type
+            if self.retype_transferred_h and self.transferred_h_type is not None
+            else "H1"
+        )
         if t1 in ["HW", "HO"]:
-            t1 = "H1"
+            t1 = replacement_h_type
         if t2 in ["HW", "HO"]:
-            t2 = "H1"
+            t2 = replacement_h_type
 
         type1 = self.ff.atomtypes[t1]
         type2 = self.ff.atomtypes[t2]
@@ -740,6 +754,117 @@ class MoleculeTypeMerger:
             logger.error(m)
             raise ValueError(m)
         return dihedralmerge
+
+    def _find_lj_hydrogen_type(self) -> str | None:
+        """Pick a hydrogen atom type of the force field that has a Lennard-Jones size.
+
+        A hydroxyl or water H (type HO or HW) has no size of its own. When such
+        an H moves onto another atom it needs a type with a size; this returns
+        the first one found (H1 in Amber force fields), or None if there is none.
+        """
+        # try the usual names first, then every other type whose name starts with H
+        preferred = ("H1", "H", "HC", "HGA")
+        candidates = list(preferred) + sorted(
+            name for name in self.ff.atomtypes if name not in preferred and name.upper().startswith("H")
+        )
+
+        # return the first candidate with a non-zero size (epsilon)
+        for name in candidates:
+            atomtype = self.ff.atomtypes.get(name)
+            if atomtype is None:
+                continue
+            try:
+                if float(atomtype.epsilon) != 0.0:
+                    return name
+            except (TypeError, ValueError):
+                continue
+        return None
+
+    def _retype_transferred_hydrogens(self):
+        """Give a moved hydroxyl or water H a Lennard-Jones size at the end of the relax.
+
+        A hydroxyl or water H (type HO or HW) has no size of its own. This
+        keeps its old type at the start of the relax and sets the type with a
+        size (from _find_lj_hydrogen_type) only for the end state, so the H's
+        size grows in gradually. Only the relax topology is changed. Does
+        nothing when the option is off.
+        """
+        if not self.retype_transferred_h:
+            return
+
+        # atoms whose bonds changed in this reaction
+        candidate_atoms = set(self.affected_interactions.atoms)
+        for pair in (
+            self.affected_interactions.bonds.added
+            | self.affected_interactions.bonds.removed
+        ):
+            candidate_atoms.update(pair)
+        for bond_key in set(self.mol_a.bonds) ^ set(self.mol_b.bonds):
+            candidate_atoms.update(bond_key)
+        if self.transferred_h_type is None:
+            logger.warning("No LJ-bearing hydrogen type found in the force field; skipping transferred-H retyping")
+            return
+
+        # retype every hydroxyl or water H among them, in the end state only
+        retyped = 0
+        for atom_nr in candidate_atoms:
+            atom = self.mol_a.atoms.get(atom_nr)
+            if atom is None or atom.type not in {"HW", "HO"}:
+                continue
+            implicit = self._implicit_interactions(atom_nr)
+            if implicit:
+                logger.warning(
+                    "Not retyping transferred H %s: %s still take their parameters "
+                    "from the force field by atom type, which has no entry for %s",
+                    atom_nr,
+                    ", ".join(implicit),
+                    self.transferred_h_type,
+                )
+                continue
+            # state B only: state A keeps the original (LJ-free) type, so an H
+            # that sits in a tight hydrogen bond at the reaction frame does not
+            # get its full Lennard-Jones radius at lambda 0 and blow the relax
+            # up; its LJ parameters grow in linearly with lambda instead
+            atom.typeB = self.transferred_h_type
+            atom.comment = (
+                f"; transferred H retyped {atom.type} -> "
+                f"{self.transferred_h_type} in state B only"
+            )
+            retyped += 1
+        if retyped:
+            logger.info(
+                "Retyped %d transferred H atom(s) in relaxation topology (state B only)",
+                retyped,
+            )
+
+    def _implicit_interactions(self, atom_nr: str) -> list[str]:
+        """List the terms of one atom that still get their numbers from the force field by type.
+
+        Retyping an H is only safe when every term it is part of already has
+        explicit numbers: the force field has no bond, angle or dihedral entry
+        for the new H type on a hydroxyl oxygen. Returns names such as
+        "bond 12-13" for every term that still has no numbers.
+        """
+        # look through bonds, angles, dihedrals and pairs that contain the atom
+        implicit: list[str] = []
+        sections = (
+            ("bond", self.mol_a.bonds),
+            ("angle", self.mol_a.angles),
+            ("dihedral", self.mol_a.proper_dihedrals),
+            ("improper dihedral", self.mol_a.improper_dihedrals),
+            ("pair", self.mol_a.pairs),
+        )
+        for name, interactions in sections:
+            for key, interaction in interactions.items():
+                if atom_nr not in key:
+                    continue
+                # proper and improper dihedrals are grouped by periodicity
+                terms = list(getattr(interaction, "dihedrals", {}).values()) or [
+                    interaction
+                ]
+                if any(getattr(term, "c0", None) is None for term in terms):
+                    implicit.append(f"{name} {'-'.join(key)}")
+        return implicit
 
     def merge_atoms(self):
         # only iterating over the keys of mol_a
@@ -1591,6 +1716,7 @@ def merge_top_slow_growth(
     top_a: Topology,
     top_b: Topology,
     morse_only: bool = False,
+    retype_transferred_h: bool = True,
     parallel_dihedral_merge: bool = False,
     parallel_dihedral_workers: int | None = None,
 ):
@@ -1604,6 +1730,7 @@ def merge_top_slow_growth(
         mol_b=top_b.reactive_molecule,
         ff=top_a.ff,
         morse_only=morse_only,
+        retype_transferred_h=retype_transferred_h,
         parallel_dihedral_merge=parallel_dihedral_merge,
         parallel_dihedral_workers=parallel_dihedral_workers,
     ).merge()

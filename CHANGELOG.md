@@ -61,6 +61,14 @@ original behaviour.
   `radicals.json` or `recipes.csv` after a reaction stops the restart with an
   error. There is no switch; it always runs.
   Files: `src/kimmdy/runmanager.py`.
+* Transferred hydroxyl H grows its size during the relax. New key
+  `changer.coordinates.retype_transferred_h` (default true) gives a moved
+  HO/HW hydrogen (no Lennard-Jones size) the type `H1` in the end state of the
+  relax topology only, so its size grows in with lambda. Giving it the full
+  size at once crashed relaxes of H atoms in tight hydrogen bonds. **Changes
+  the relax trajectory; the final topology is unchanged.**
+  Files: `src/kimmdy/coordinates.py`, `src/kimmdy/runmanager.py`,
+  `src/kimmdy/kimmdy-yaml-schema.json`.
 
 ## [8.3.1](https://github.com/graeter-group/kimmdy/compare/v8.3.0...v8.3.1) (2026-01-02)
 
