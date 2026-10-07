@@ -14,6 +14,11 @@ original behaviour.
   reusing a task folder raised `FileExistsError`. It now also checks
   `is_symlink()`. There is no switch; it always runs.
   Files: `src/kimmdy/tasks.py`.
+* Same topology settings after a restart. The restart now passes `nrexcl` and
+  the product-template options (`product_template_sources`,
+  `product_template_itp_glob`, `product_template_transitions`) to the
+  topology, as a fresh start does; before, it silently used the defaults.
+  Files: `src/kimmdy/runmanager.py`.
 
 ## [8.3.1](https://github.com/graeter-group/kimmdy/compare/v8.3.0...v8.3.1) (2026-01-02)
 

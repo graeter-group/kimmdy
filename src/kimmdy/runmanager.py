@@ -539,6 +539,18 @@ class RunManager:
                         f"Plumed out file {plumed_out_name} not found. Continuing without it."
                     )
 
+        # product-template settings in the same form as at a fresh start,
+        # so the restarted topology is built with the same settings
+        restart_transition_config = getattr(
+            self.config.topology, "product_template_transitions", None
+        )
+        if restart_transition_config is None:
+            restart_product_template_transitions = {}
+        elif isinstance(restart_transition_config, dict):
+            restart_product_template_transitions = dict(restart_transition_config)
+        else:
+            restart_product_template_transitions = dict(vars(restart_transition_config))
+
         # use latest top file
         top_path = self.get_latest("top")
         if top_path is None:
@@ -553,6 +565,14 @@ class RunManager:
             ),
             radicals=getattr(self.config, "radicals", None),
             residuetypes_path=getattr(self.config, "residuetypes", None),
+            reactive_nrexcl=getattr(self.config.topology, "nrexcl", None),
+            product_template_sources=tuple(
+                getattr(self.config.topology, "product_template_sources", ["rtp"])
+            ),
+            product_template_itp_glob=getattr(
+                self.config.topology, "product_template_itp_glob", "*.itp"
+            ),
+            product_template_transitions=restart_product_template_transitions,
         )
 
         # if we restart from within an imcomplete task,
