@@ -21,6 +21,13 @@ original behaviour.
   before.
   Files: `src/kimmdy/utils.py`, `src/kimmdy/runmanager.py`,
   `src/kimmdy/kimmdy-yaml-schema.json`.
+* Restart-safe deletion of reaction-input trajectories. When a reaction sets
+  `delete_sample_xtc_after_relax: true` (default false), the .xtc a reaction
+  read is deleted once a later regular MD task has finished, and the remaining
+  ones when the run is done. KIMMDY restarts only from regular MD tasks, so no
+  restart can need a deleted file. Each deletion writes
+  `<instance>_xtc_cleanup.json` next to the removed file.
+  Files: `src/kimmdy/runmanager.py`.
 
 ### Bug Fixes
 

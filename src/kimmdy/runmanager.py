@@ -333,6 +333,18 @@ class RunManager:
         ):
             next(self)
 
+        # run finished: delete the remaining reaction-input trajectories
+        if self.state is State.DONE and self._reaction_trajectory_cleanup_enabled():
+            try:
+                for reaction_md_dir in self._reaction_input_md_dirs():
+                    self._delete_trajectory(
+                        reaction_md_dir,
+                        reason="the run finished (state DONE); no restart will re-read this trajectory",
+                        verified_by="RunManager.state == DONE",
+                    )
+            except Exception:
+                logger.exception("Final reaction-trajectory cleanup failed")
+
         write_time_marker(self.config.out / MARK_FINISHED, "finished")
         logger.info(
             f"Finished running last task, state: {self.state} after "
@@ -902,6 +914,131 @@ class RunManager:
         files = task()
         if files is not None:
             self._discover_output_files(taskname=task.name, files=files)
+        # after every task: delete trajectories no restart can need any more;
+        # a failure here is logged but never stops the run
+        try:
+            self._delete_reaction_trajectories(task)
+        except Exception:
+            logger.exception(
+                "Reaction-trajectory cleanup failed; continuing without aborting KIMMDY"
+            )
+
+    def _reaction_trajectory_cleanup_enabled(self) -> bool:
+        """Tell whether any reaction in kimmdy.yml asks for its input trajectories to be deleted.
+
+        True if at least one reaction sets delete_sample_xtc_after_relax: true.
+        """
+        reactions = getattr(self.config, "reactions", None)
+        if reactions is None:
+            return False
+        return any(
+            bool(getattr(getattr(reactions, name), "delete_sample_xtc_after_relax", False))
+            for name in reactions.get_attributes()
+        )
+
+    def _regular_md_instances(self) -> set[str]:
+        """Return the names of the normal MD steps (all MD steps except the relax).
+
+        KIMMDY restarts only from these, never from a relax.
+        """
+        if not hasattr(self.config, "mds"):
+            return set()
+        relax = None
+        if hasattr(self.config.changer, "coordinates") and hasattr(
+            self.config.changer.coordinates, "md"
+        ):
+            relax = self.config.changer.coordinates.md
+        return set(self.config.mds.get_attributes()) - {relax}
+
+    def _reaction_input_md_dirs(self) -> list[Path]:
+        """List the MD folders whose trajectory a reaction read.
+
+        That is every normal MD folder directly followed by a reaction folder,
+        for example 20_sample when 21_hat_reaction comes next. Returned in
+        folder-number order.
+        """
+        # map folder number -> (folder, step name)
+        reaction_names = set(self.config.reactions.get_attributes())
+        md_names = self._regular_md_instances()
+        by_number = {}
+        for path in self.config.out.iterdir():
+            head, _, name = path.name.partition("_")
+            if path.is_dir() and head.isdigit():
+                by_number[int(head)] = (path, name)
+
+        # keep MD folders whose next folder is a reaction
+        return [
+            path
+            for number, (path, name) in sorted(by_number.items())
+            if name in md_names and by_number.get(number + 1, (None, ""))[1] in reaction_names
+        ]
+
+    def _delete_trajectory(self, md_dir: Path, reason: str, verified_by: str) -> None:
+        """Delete the trajectory (.xtc) of one MD folder and leave a note why.
+
+        Also removes the small index files MDAnalysis made for it, and writes
+        <step>_xtc_cleanup.json in the folder with the file name, its size,
+        the reason and what showed that deleting is safe. Does nothing if the
+        trajectory is already gone.
+        """
+        # delete the trajectory
+        instance = md_dir.name.partition("_")[2]
+        xtc = md_dir / f"{instance}.xtc"
+        if not xtc.is_file():
+            return
+        deleted_bytes = xtc.stat().st_size
+        xtc.unlink()
+
+        # delete MDAnalysis's index files for it
+        removed_offsets = []
+        for suffix in ("npz", "lock"):
+            offsets = md_dir / f".{xtc.name}_offsets.{suffix}"
+            if offsets.is_file():
+                offsets.unlink()
+                removed_offsets.append(offsets.name)
+
+        # write the note next to where the file was
+        record = {
+            "deleted_file": xtc.name,
+            "deleted_bytes": deleted_bytes,
+            "removed_offset_files": removed_offsets,
+            "reason": reason,
+            "verified_by": verified_by,
+        }
+        with open(md_dir / f"{instance}_xtc_cleanup.json", "w") as handle:
+            json.dump(record, handle, indent=2)
+        logger.info(
+            f"Deleted {xtc} ({deleted_bytes / 1024**3:.3f} GiB): {reason}"
+        )
+
+    def _delete_reaction_trajectories(self, task: Task) -> None:
+        """After a normal MD step finishes, delete the older trajectories no restart can need.
+
+        Only when a reaction sets delete_sample_xtc_after_relax. KIMMDY
+        restarts from normal MD steps only, never from a relax, so once a
+        normal MD step has finished, a restart begins there or later and
+        never reads an earlier reaction-input trajectory again. The last
+        ones are deleted when the run finishes (see run).
+        """
+        # only after a finished normal MD step, and only when switched on
+        if task.name != "run_md" or not self._reaction_trajectory_cleanup_enabled():
+            return
+        if task.kwargs.get("instance") not in self._regular_md_instances():
+            return
+        files = task.kwargs.get("files")
+        md_dir = getattr(files, "outputdir", None)
+        if md_dir is None or not (md_dir / MARK_DONE).exists():
+            return
+
+        # delete every reaction-input trajectory from an earlier folder
+        md_number = int(md_dir.name.partition("_")[0])
+        for reaction_md_dir in self._reaction_input_md_dirs():
+            if int(reaction_md_dir.name.partition("_")[0]) < md_number:
+                self._delete_trajectory(
+                    reaction_md_dir,
+                    reason="a later regular MD task completed, so a restart begins there and never re-reads this trajectory",
+                    verified_by=str(md_dir / MARK_DONE),
+                )
 
     def _discover_output_files(
         self, taskname: str, files: TaskFiles
