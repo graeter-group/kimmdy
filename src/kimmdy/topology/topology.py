@@ -438,12 +438,18 @@ class MoleculeType:
         if not isinstance(residuetype, ResidueType):
             return {}
 
+        # find the previous and next residue (needed for -C and +N)
         residue = get_residue_by_bonding(atom=atom, atoms=self.atoms)
-        lowest_atomnr = min(residue.keys(), key=int)
-        highest_atomnr = max(residue.keys(), key=int)
-
-        previous_atom = self.atoms.get(str(int(lowest_atomnr) - 1))
-        next_atom = self.atoms.get(str(int(highest_atomnr) + 1))
+        if getattr(ff, "improper_neighbors_by_bonding", True):
+            previous_atom, next_atom = self._get_neighbor_residue_atoms(residue)
+        else:
+            # legacy: neighbours are the atoms numbered just outside the
+            # residue, which is wrong once a moved H with a distant number
+            # belongs to the residue
+            lowest_atomnr = min(residue.keys(), key=int)
+            highest_atomnr = max(residue.keys(), key=int)
+            previous_atom = self.atoms.get(str(int(lowest_atomnr) - 1))
+            next_atom = self.atoms.get(str(int(highest_atomnr) + 1))
         if previous_atom is not None:
             previous_residue = get_residue_by_bonding(
                 atom=previous_atom, atoms=self.atoms
@@ -533,6 +539,43 @@ class MoleculeType:
                 new_dihedrals[key] = improper
 
         return new_dihedrals
+
+    def _get_neighbor_residue_atoms(
+        self, residue: dict[str, Atom]
+    ) -> tuple[Optional[Atom], Optional[Atom]]:
+        """Find one atom of the previous residue and one of the next residue, through bonds.
+
+        The previous residue is the one whose C is bonded to this residue's N;
+        the next residue is the one whose N is bonded to this residue's C.
+        Atom numbers cannot be used for this: an H that moved into this residue
+        keeps its old, possibly distant number, so "highest number + 1" can
+        point into another chain. Returns (atom of previous residue, atom of
+        next residue), None where there is none. Residues without atoms named
+        N or C (not protein) keep the old atom-number rule.
+        """
+
+        def across(own: str, other: str) -> Optional[Atom]:
+            """Follow a bond from this residue's atom named own to an atom named other outside the residue; None if there is no such bond."""
+            for atom in residue.values():
+                if atom.atom != own:
+                    continue
+                for nr in atom.bound_to_nrs:
+                    if nr not in residue and self.atoms[nr].atom == other:
+                        return self.atoms[nr]
+            return None
+
+        # protein residue: previous through N-C, next through C-N
+        names = {atom.atom for atom in residue.values()}
+        if "N" in names or "C" in names:
+            return across("N", "C"), across("C", "N")
+
+        # anything else: the atoms numbered just below and above the residue
+        lowest_atomnr = min(residue.keys(), key=int)
+        highest_atomnr = max(residue.keys(), key=int)
+        return (
+            self.atoms.get(str(int(lowest_atomnr) - 1)),
+            self.atoms.get(str(int(highest_atomnr) + 1)),
+        )
 
     def _regenerate_topology_from_bound_to(self, ff):
         # clear all bonds, angles, dihedrals
@@ -802,7 +845,14 @@ class Topology:
         product_template_sources: tuple[str, ...] = ("rtp",),
         product_template_itp_glob: str = "*.itp",
         product_template_transitions: Optional[dict[str, str]] = None,
+        improper_neighbors_by_bonding: bool = True,
     ):
+        """Topology fixes, all on by default; set to False for the 16ce888 behaviour:
+
+        improper_neighbors_by_bonding
+            Find the previous/next residue for residue-template impropers
+            (+N, -C) through the backbone C-N bond instead of by atom number.
+        """
         if top == {}:
             raise NotImplementedError(
                 "Generating an empty Topology from an empty TopologyDict is not implemented."
@@ -821,6 +871,7 @@ class Topology:
             product_template_sources=product_template_sources,
             product_template_itp_glob=product_template_itp_glob,
             product_template_transitions=product_template_transitions,
+            improper_neighbors_by_bonding=improper_neighbors_by_bonding,
         )
         self.pending_product_template_matches: dict[
             tuple[str, str], ProductTemplateMatch

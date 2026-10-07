@@ -264,6 +264,7 @@ class RunManager:
             product_template_sources=product_template_sources,
             product_template_itp_glob=product_template_itp_glob,
             product_template_transitions=product_template_transitions,
+            **self._topology_fix_options(),
         )
         self.filehist: list[dict[str, TaskFiles]] = [
             {"0_setup": TaskFiles(self.get_latest)}
@@ -351,6 +352,21 @@ class RunManager:
             f"{timedelta(seconds=(time.time() - self.start_time))} "
             f"In output directory {self.config.out}"
         )
+
+    def _topology_fix_options(self) -> dict[str, bool]:
+        """Read the on/off switches of the topology fixes from kimmdy.yml.
+
+        Looks in changer.topology and returns a dict such as
+        {"keep_all_improper_periodicities": True, ...}, ready to pass to
+        Topology(...). A switch that is not in kimmdy.yml counts as on.
+        """
+        changer_topology = getattr(self.config.changer, "topology", None)
+        return {
+            name: bool(getattr(changer_topology, name, True))
+            for name in (
+                "improper_neighbors_by_bonding",
+            )
+        }
 
     def _radicals_after_picked_recipe(
         self, radicals: list[str], radicals_file: Path, kept_task_dirs: list[Path]
@@ -719,6 +735,7 @@ class RunManager:
                 self.config.topology, "product_template_itp_glob", "*.itp"
             ),
             product_template_transitions=restart_product_template_transitions,
+            **self._topology_fix_options(),
         )
 
         # if we restart from within an imcomplete task,
