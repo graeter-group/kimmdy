@@ -386,6 +386,24 @@ def test_schema_keeps_value_of_untyped_deprecated_option(
     )
 
 
+def test_plumed_options_are_deprecated_but_kept(schema_startup_config, monkeypatch):
+    from kimmdy.constants import CONFIG_LOGS
+
+    monkeypatch.setitem(CONFIG_LOGS, "warnings", [])
+    build, _ = schema_startup_config
+    config = build(
+        overrides={
+            "plumed": "plumed.dat",
+            "mds": {"sample": {"mdp": "sample.mdp", "use_plumed": True}},
+        }
+    )
+    assert isinstance(config.plumed, Path)
+    assert config.mds.sample.use_plumed is True
+    warnings = "\n".join(CONFIG_LOGS["warnings"])
+    assert "config.plumed" in warnings
+    assert "config.mds.sample.use_plumed" in warnings
+
+
 def test_schema_checks_numeric_constraints_in_wildcard_sections(schema_startup_config):
     build, scheme = schema_startup_config
     scheme["mds"][".*"]["stride"] = {"pytype": int, "minimum": 1}

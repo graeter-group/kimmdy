@@ -547,6 +547,11 @@ def entry_point_create_plumed():
         help="Index group name out of which bonds will be written to the plumed configuration file.",
     )
     p = parser.parse_args()
+    print(
+        "Warning: kimmdy-create-plumed is deprecated and will be removed in a "
+        "future release. The homolysis plugin computes bond distances with "
+        "MDAnalysis and no longer needs a plumed.dat file."
+    )
 
     create_plumed_dat(
         Path(p.top),
