@@ -87,6 +87,67 @@ def read_plumed_input(path: str | Path) -> BondToPlumedID:
     return d
 
 
+def select_bonds(
+    top: Topology,
+    atom_nrs: Optional[set[str]] = None,
+    exclude: Optional[list[str]] = None,
+) -> list[BondId]:
+    """Select bonds of a topology for bond distance sampling.
+
+    Parameters
+    ----------
+    top
+        Topology to take the bonds from.
+    atom_nrs
+        Only keep bonds with both atoms in this set of atom numbers.
+        All bonds are considered if None.
+    exclude
+        Atom names or bonds to leave out. An atom name (e.g. "O") excludes
+        bonds containing that atom, a trailing `*` (e.g. "H*") excludes
+        all atom names starting with the prefix and two atom names joined
+        by a hyphen (e.g. "C-N") exclude bonds between those atoms.
+
+    Returns
+    -------
+    Selected bonds as tuples of atom numbers.
+    """
+    atoms_to_remove = []
+    atoms_start_to_remove = []
+    bonds_to_remove = []
+    for entry in exclude or []:
+        entrysplit = entry.split(sep="-")
+        if len(entrysplit) == 1:
+            if entrysplit[0].endswith("*"):
+                atoms_start_to_remove.append(entrysplit[0][:-1])
+            else:
+                atoms_to_remove.append(entrysplit[0])
+        elif len(entrysplit) == 2:
+            bonds_to_remove.append(set(entrysplit))
+        else:
+            logger.warning(f"Don't know how to deal with entry {entry}, skipping it!")
+
+    bonds = []
+    for bond in top.bonds.keys():
+        if atom_nrs is not None and not (bond[0] in atom_nrs and bond[1] in atom_nrs):
+            continue
+        ai_name = top.atoms[bond[0]].atom
+        aj_name = top.atoms[bond[1]].atom
+        if set([ai_name, aj_name]) in bonds_to_remove:
+            continue
+        if any([b in atoms_to_remove for b in [ai_name, aj_name]]):
+            continue
+        if any(
+            [
+                b.startswith(prefix)
+                for b in [ai_name, aj_name]
+                for prefix in atoms_start_to_remove
+            ]
+        ):
+            continue
+        bonds.append(bond)
+    return bonds
+
+
 def calculate_bondstats(
     top: Topology,
     plumed_in: Path,

@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Optional
 
 from kimmdy.parsing import read_top, write_top, read_csv_to_list
+from kimmdy.plugin_utils import select_bonds
 from kimmdy.plugins import discover_plugins, parameterization_plugins
 from kimmdy.topology.topology import Topology
 from kimmdy.topology.utils import get_is_reactive_predicate_f
@@ -451,22 +452,6 @@ def create_plumed_dat(
     idx = read_top(idx_path)
     plumed_distances_out = "distances.dat"
 
-    # prepare remove variables
-    atoms_to_remove = []
-    atoms_start_to_remove = []
-    bonds_to_remove = []
-    for entry in entries_to_remove:
-        entrysplit = entry.split(sep="-")
-        if len(entrysplit) == 1:
-            if entrysplit[0].endswith("*"):
-                atoms_start_to_remove.append(entrysplit[0][:-1])
-            else:
-                atoms_to_remove.append(entrysplit[0])
-        elif len(entrysplit) == 2:
-            bonds_to_remove.append(set(entrysplit))
-        else:
-            print(f"Don't know how to deal with entry {entry}, skipping it!")
-
     if idx_group is None:
         print("Which index group should be written to the plumed input?")
         for g in idx.keys():
@@ -490,18 +475,9 @@ def create_plumed_dat(
     idxs_set = set([entry for l in idxs_parsed for entry in l])
 
     # find bonds with both indices in the index group
-    plumed_distance_idxs = []
-    for bond in top.bonds.keys():
-        if bond[0] in idxs_set and bond[1] in idxs_set:
-            ai_name = top.atoms[bond[0]].atom
-            aj_name = top.atoms[bond[1]].atom
-            if set([ai_name, aj_name]) in bonds_to_remove:
-                continue
-            if any([b in atoms_to_remove for b in [ai_name, aj_name]]):
-                continue
-            if any([b[0] in atoms_start_to_remove for b in [ai_name, aj_name]]):
-                continue
-            plumed_distance_idxs.append(bond)
+    plumed_distance_idxs = select_bonds(
+        top=top, atom_nrs=idxs_set, exclude=entries_to_remove
+    )
 
     # write plumed configuration file
     print_arg = ""
