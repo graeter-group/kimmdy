@@ -5,7 +5,7 @@ subtitle: "Run KIMMDY on HPC clusters"
 
 ## Setup
 
-You need an installation of python (`>= 3.10`) and (possibly PLUMED patched) GROMACS in your
+You need an installation of python (`>= 3.10`) and GROMACS in your
 HPC environment.
 
 Example setup:

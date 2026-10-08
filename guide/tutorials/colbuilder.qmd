@@ -90,13 +90,11 @@ ff: 'amber99sb-star-ildnp.ff'
 top: 'hexala_out.top'
 gro: 'npt.gro'
 ndx: 'index.ndx'
-plumed: 'plumed.dat'
 mds:
   pull:
     mdp: 'pull_fibril.mdp'
   pull:
     mdp: 'md.mdp'
-    use_plumed: true
   relax:
     mdp: 'md_slow_growth.mdp'
 changer:
@@ -130,23 +128,18 @@ A basic index file can be generated with
 echo 'q' | gmx make_ndx -f fibril_npt.gro -o index.ndx
 ```
 
-#### Plumed.dat and index file v2
-The next entry in the config file is plumed and references a plumed configuration file (plumed.dat) which we don't yet have. This file is needed for the homolysis reaction plugin.
+#### Bonds for homolysis
+The homolysis reaction plugin calculates bond distances with MDAnalysis from the trajectory of the MD run before the reaction.
+Homolysis can occur for all bonds of the topology with both atoms in the MDAnalysis selection `bond_selection`, except for the bonds excluded by `bond_exclude`.
+By default, `bond_selection` is `backbone` and `bond_exclude` is `C-N H* O*`, which excludes peptide bonds and bonds to hydrogen and oxygen atoms.
 
-For homolysis, the plumed.dat file should contain instructions to sample distances between bonds.
-Homolysis can then occur for the bonds mentioned in this file.
-To create the input file, kimmdy provides the command line interface [`kimmdy-create-plumed`](../references/cmd_ref.qmd).
+We want to sample homolysis in the backbone and in crosslinks, so we add the crosslink residues to the selection in the homolysis section of the config file:
 
-
-We want to sample homolysis in the backbone and in crosslinks.
-By providing a gromacs index file with all backbone and crosslink atoms, the script generates the necessary plumed.dat file.
-Our initial index file does not contain those sections, so we have to create them ourselves. Such a index file can be generated with 
-
-```bash
-echo -ne "\"Backbone\"| r LY2 LY3 L4Y L5Y LYX\nq\n"| gmx make_ndx -f fibril_npt.gro -o index.ndx
+```{.yml}
+reactions:
+  homolysis:
+    bond_selection: 'backbone or resname LY2 LY3 L4Y L5Y LYX'
 ```
-
-Now run the python script to generate a plumed.dat file and check its contents.
 
 #### Homolysis Plugin Files: edissoc.dat and ffbonded.itp
 In the reactions section, other files which are necessary for the homolysis reaction can also be seen: `edissoc.dat` and `ffbonded.itp.`
@@ -167,7 +160,9 @@ The torque restraints can be set in the mdp file and are applied to the capping 
 Running the script `prepare_enforced_rotation.py` creates mdp and index files that only have to be appended to the current file of the respective type to use torque restraints. However, you will get an error saying that some index group is missing. Use gmx make_ndx to add these groups to your file and then run the script.
 
 
-Bond distance sampling can be turned on for a md run by the tag `use_plumed`. You want to use this option for the MD run before checking for homolysis reactions.
+Bond distances for homolysis are calculated from the xtc trajectory of the MD run before checking for homolysis reactions, here `sample`.
+The number of distance samples is set by `nstxout-compressed` in its mdp file.
+If `compressed-x-grps` only contains a part of the system, it has to be `Protein` or a group with all non-solvent atoms (including the crosslinks); alternatively, use `trajectory: trr` in the homolysis section.
 Another md run, in this case called relax, is mentioned under `changer.coordinates.md`.
 It is used after the homolysis reaction to interpolate between new and old parameters.
 An example mdp file is included in the tutorial files. 
@@ -198,13 +193,11 @@ ff: 'amber99sb-star-ildnp.ff'
 top: 'topol.top'
 gro: 'fibril_npt.gro'
 ndx: 'index.ndx'
-plumed: 'plumed.dat'
 mds:
   pull:
     mdp: 'pull_fibril.mdp'
   sample:
     mdp: 'pull_fibril.mdp'
-    use_plumed: true
   relax:
     mdp: 'pull_fibril_slow_growth.mdp'
 changer:
@@ -215,11 +208,12 @@ changer:
     parameterization: 'basic' 
 reactions:
   homolysis:
+    bond_selection: 'backbone or resname LY2 LY3 L4Y L5Y LYX'
     edis: 'edissoc.dat'
     itp: 'ffbonded.itp'
 sequence:
   - pull
-  - sample  
+  - sample
   - reactions
   - pull
 ```
