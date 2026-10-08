@@ -409,3 +409,20 @@ def test_schema_checks_numeric_constraints_in_wildcard_sections(schema_startup_c
     scheme["mds"][".*"]["stride"] = {"pytype": int, "minimum": 1}
     with pytest.raises(ValueError, match="mds.sample.stride must be >= 1"):
         build(overrides={"mds": {"sample": {"mdp": "sample.mdp", "stride": 0}}})
+
+
+def test_bond_selection_options_keep_case(schema_startup_config):
+    build, scheme = schema_startup_config
+    scheme["reactions"]["test_rates"]["bond_selection"] = {"pytype": str}
+    scheme["reactions"]["test_rates"]["bond_exclude"] = {"pytype": str}
+    scheme["reactions"]["test_rates"]["other_option"] = {"pytype": str}
+    config = build(
+        {
+            "bond_selection": "backbone or resname L4Y",
+            "bond_exclude": "C-N H* O*",
+            "other_option": "MiXeD",
+        }
+    )
+    assert config.reactions.test_rates.bond_selection == "backbone or resname L4Y"
+    assert config.reactions.test_rates.bond_exclude == "C-N H* O*"
+    assert config.reactions.test_rates.other_option == "mixed"
