@@ -54,7 +54,7 @@ def bondstats_from_csv(path: str | Path) -> BondStats:
             harmonic_f = None
             if len(line) == 7:
                 (ai, aj, plumed_id, mean_d, mean_f, delta_d, b0) = line
-            if len(line) == 8:
+            elif len(line) == 8:
                 (ai, aj, plumed_id, mean_d, mean_f, delta_d, b0, harmonic_f) = line
             else:
                 m = f"Line in bondstats csv file does not have 7 or 8 columns: {line}"
