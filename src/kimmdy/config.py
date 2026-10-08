@@ -354,24 +354,32 @@ class Config:
                 self.out = self.cwd / Path(self.name)
 
             # make sure self.out is empty unless restart is set
-            while self.out.exists() and not self.restart:
-                CONFIG_LOGS["debugs"].append(
-                    f"Output dir {self.out} exists, incrementing name"
-                )
-                name = self.out.name.split("_")
-                out_end = name[-1]
-                if out_end.isdigit():
-                    self.out = self.out.with_name(
-                        f"{'_'.join(name[:-1])}_{int(out_end) + 1:03}"
-                    )
-                else:
-                    self.out = self.out.with_name(self.out.name + "_001")
+            # Atomic creation loop to prevent race conditions
+            while True:
+                try:
+                    # Atomic directory creation: fails with FileExistsError if another process created it
+                    self.out.mkdir(parents=True, exist_ok=False)
+                    CONFIG_LOGS["infos"].append(f"Created output dir {self.out}")
+                    break
+                except FileExistsError:
+                    if self.restart:
+                        CONFIG_LOGS["infos"].append(
+                            f"Restarting in output dir {self.out}"
+                        )
+                        break
 
-            if not self.out.exists():
-                self.out.mkdir()
-                CONFIG_LOGS["infos"].append(f"Created output dir {self.out}")
-            else:
-                CONFIG_LOGS["infos"].append(f"Restarting in output dir {self.out}")
+                    # Directory exists and self.restart is False: increment name and retry
+                    CONFIG_LOGS["debugs"].append(
+                        f"Output dir {self.out} exists, incrementing name"
+                    )
+                    name = self.out.name.split("_")
+                    out_end = name[-1]
+                    if out_end.isdigit():
+                        self.out = self.out.with_name(
+                            f"{'_'.join(name[:-1])}_{int(out_end) + 1:03}"
+                        )
+                    else:
+                        self.out = self.out.with_name(self.out.name + "_001")
 
     def _validate(self, section: str = "config", cwd: Path = Path(".")):
         """Validates config."""
