@@ -4,7 +4,9 @@ import logging
 from pathlib import Path
 from typing import Optional, TypeAlias, TypedDict
 
+import MDAnalysis as mda
 import numpy as np
+from MDAnalysis.lib.distances import calc_bonds
 
 from kimmdy.constants import R
 from kimmdy.parsing import Plumed_dict, read_distances_dat, read_edissoc, read_plumed
@@ -178,46 +180,220 @@ def get_bondstats(
 
     stats: BondStats = {}
     for bondkey, plumed_id in bond_to_plumed_id.items():
-        ai = top.atoms[bondkey[0]]
-        aj = top.atoms[bondkey[1]]
-        typekey = (ai.type, aj.type)
-        bondtype = top.ff.bondtypes.get(typekey)
-        if bondtype is None:
-            # attempt the reverse key
-            typekey = (aj.type, ai.type)
-            bondtype = top.ff.bondtypes.get(typekey)
-        if not bondtype or bondtype.c0 is None or bondtype.c1 is None:
-            m = f"Could not find bondtype of atoms with ids {ai.nr} and {aj.nr}"
-            logger.error(m)
-            raise ValueError(m)
-        b0 = float(bondtype.c0)
-        kb = float(bondtype.c1)
-
-        if edissoc is not None:
-            edis = get_edissoc_from_atomnames(
-                atomnames=[ai.atom, aj.atom], edissoc=edissoc, residue=ai.residue
-            )
-        else:
-            m = f"Could not find dissociation energy for atoms with ids {ai.nr} and {aj.nr}. Using default."
-            logger.debug(m)
-            edis = 500
-
         ds = np.asarray([values[plumed_id] for values in distances.values()])
-        mean_d = float(np.mean(ds))
+        stats[bondkey] = _stats_for_bond(
+            top=top, bondkey=bondkey, bond_id=plumed_id, ds=ds, edissoc=edissoc
+        )
+    return stats
 
-        beta = calculate_beta(kb=kb, edis=edis)
-        forces = calculate_forces(ds=ds, b0=b0, edis=edis, beta=beta)
-        mean_f = float(np.mean(forces))
-        harmonic_f = float(np.mean(calculate_harmonic_forces(ds=ds, b0=b0, k=kb)))
 
-        stats[bondkey] = {
-            "plumed_id": plumed_id,
-            "mean_d": mean_d,
-            "mean_f": mean_f,
-            "delta_d": mean_d - b0,
-            "b0": b0,
-            "harmonic_f": harmonic_f,
-        }
+def _stats_for_bond(
+    top: Topology,
+    bondkey: BondId,
+    bond_id: str,
+    ds: np.ndarray,
+    edissoc: Optional[dict],
+) -> Stats:
+    """Mean distance and forces of one bond from its distances in nm."""
+    ai = top.atoms[bondkey[0]]
+    aj = top.atoms[bondkey[1]]
+    typekey = (ai.type, aj.type)
+    bondtype = top.ff.bondtypes.get(typekey)
+    if bondtype is None:
+        # attempt the reverse key
+        typekey = (aj.type, ai.type)
+        bondtype = top.ff.bondtypes.get(typekey)
+    if not bondtype or bondtype.c0 is None or bondtype.c1 is None:
+        m = f"Could not find bondtype of atoms with ids {ai.nr} and {aj.nr}"
+        logger.error(m)
+        raise ValueError(m)
+    b0 = float(bondtype.c0)
+    kb = float(bondtype.c1)
+
+    if edissoc is not None:
+        edis = get_edissoc_from_atomnames(
+            atomnames=[ai.atom, aj.atom], edissoc=edissoc, residue=ai.residue
+        )
+    else:
+        m = f"Could not find dissociation energy for atoms with ids {ai.nr} and {aj.nr}. Using default."
+        logger.debug(m)
+        edis = 500
+
+    mean_d = float(np.mean(ds))
+
+    beta = calculate_beta(kb=kb, edis=edis)
+    forces = calculate_forces(ds=ds, b0=b0, edis=edis, beta=beta)
+    mean_f = float(np.mean(forces))
+    harmonic_f = float(np.mean(calculate_harmonic_forces(ds=ds, b0=b0, k=kb)))
+
+    return {
+        "plumed_id": bond_id,
+        "mean_d": mean_d,
+        "mean_f": mean_f,
+        "delta_d": mean_d - b0,
+        "b0": b0,
+        "harmonic_f": harmonic_f,
+    }
+
+
+# Residue names that are not part of a "Protein" compressed-x-grps output.
+# NOTE: duplicated from kimmdy-hat (kimmdy_hat/reaction.py, which additionally
+# excludes dummy atoms). Both could be merged into a shared util in the future.
+SOL_RESNAMES = ["SOL", "WAT", "TIP3", "TIP4", "CL", "NA", "K", "CLA", "POT"]
+
+
+def load_trajectory_universe(
+    structure: Path,
+    trajectory: Path,
+    compressed_group: Optional[str] = None,
+) -> mda.Universe:
+    """Load a trajectory onto a structure, accounting for compressed-x-grps.
+
+    xtc files may only contain the atoms of the `compressed-x-grps` group of the
+    mdp file. Following kimmdy-hat, the group "System" (or no group) uses all
+    atoms of the structure, while "Protein" and unknown groups use all atoms
+    that are not solvent or ions.
+    NOTE: duplicated from kimmdy-hat (kimmdy_hat/reaction.py), could be merged
+    into a shared util in the future.
+
+    Parameters
+    ----------
+    structure
+        Structure file with all atoms of the system, e.g. a gro file.
+    trajectory
+        xtc or trr trajectory file.
+    compressed_group
+        Value of `compressed-x-grps` in the mdp file of the MD run.
+        Only used for xtc files.
+
+    Returns
+    -------
+    MDAnalysis Universe with the trajectory loaded. `u.atoms.ids` are the
+    1-based atom numbers of the full system.
+    """
+    u = mda.Universe(str(structure))
+    system_indices = u.atoms.indices
+    if (
+        trajectory.suffix == ".xtc"
+        and compressed_group
+        and str(compressed_group).lower() != "system"
+    ):
+        if str(compressed_group).lower() != "protein":
+            logger.warning(
+                f"Unknown compressed-x-grps {compressed_group}, "
+                "assuming it contains all non-solvent atoms."
+            )
+        selection = u.select_atoms(f"not resname {' '.join(SOL_RESNAMES)}")
+        system_indices = selection.indices
+        u = mda.Merge(selection)
+
+    try:
+        u.load_new(str(trajectory))
+    except ValueError as e:
+        m = (
+            f"Number of atoms in {trajectory.name} does not match the "
+            f"{len(u.atoms)} atoms taken from {structure.name}. Check that "
+            "compressed-x-grps is set to System or Protein in the mdp file "
+            f"or use the trr trajectory instead. ({e})"
+        )
+        logger.error(m)
+        raise ValueError(m) from e
+
+    u.atoms.ids = system_indices + 1
+    return u
+
+
+def atom_nrs_from_selection(u: mda.Universe, selection: str) -> set[str]:
+    """Atom numbers of an MDAnalysis selection in a Universe from
+    `load_trajectory_universe`."""
+    return {str(i) for i in u.select_atoms(selection).ids}
+
+
+def calculate_bond_distances(
+    u: mda.Universe, bonds: list[BondId], dt: float = 0.0
+) -> tuple[np.ndarray, np.ndarray]:
+    """Calculate bond distances over a trajectory.
+
+    Distances use the minimum image convention.
+
+    Parameters
+    ----------
+    u
+        Universe from `load_trajectory_universe`.
+    bonds
+        Bonds as tuples of atom numbers.
+    dt
+        Minimum time in ps between used frames. 0 uses every frame.
+
+    Returns
+    -------
+    Times in ps with shape (n_frames,) and distances in nm with shape
+    (n_frames, n_bonds).
+    """
+    nr_to_index = {str(nr): i for i, nr in enumerate(u.atoms.ids)}
+    missing = {nr for bond in bonds for nr in bond if nr not in nr_to_index}
+    if missing:
+        m = f"Atoms {sorted(missing, key=int)} of selected bonds are not in the trajectory."
+        logger.error(m)
+        raise ValueError(m)
+    idx_i = np.array([nr_to_index[b[0]] for b in bonds], dtype=int)
+    idx_j = np.array([nr_to_index[b[1]] for b in bonds], dtype=int)
+
+    times = []
+    distances = []
+    t_last = None
+    for ts in u.trajectory:
+        # truncate to 1 fs to avoid floating point errors
+        time = round(float(ts.time), 3)
+        if dt > 0 and t_last is not None and time - t_last < dt - 1e-6:
+            continue
+        t_last = time
+        times.append(time)
+        # MDAnalysis works in Angstrom, GROMACS in nm
+        ds = calc_bonds(ts.positions[idx_i], ts.positions[idx_j], box=ts.dimensions)
+        distances.append(ds / 10.0)
+
+    return np.asarray(times), np.asarray(distances).reshape(len(times), len(bonds))
+
+
+def calculate_bondstats_from_trajectory(
+    top: Topology,
+    u: mda.Universe,
+    bonds: list[BondId],
+    dt: float = 0.0,
+    edissoc_dat: Optional[Path] = None,
+) -> BondStats:
+    """Mean bond distances and forces from a trajectory.
+
+    Parameters
+    ----------
+    top
+        Topology with the bond parameters.
+    u
+        Universe from `load_trajectory_universe`.
+    bonds
+        Bonds as tuples of atom numbers, e.g. from `select_bonds`.
+    dt
+        Minimum time in ps between used frames. 0 uses every frame.
+    edissoc_dat
+        File with dissociation energies.
+    """
+    times, distances = calculate_bond_distances(u=u, bonds=bonds, dt=dt)
+    if len(times) == 0:
+        m = "No trajectory frames found for calculating bond statistics."
+        logger.error(m)
+        raise ValueError(m)
+    edissoc = read_edissoc(edissoc_dat) if edissoc_dat is not None else None
+
+    stats: BondStats = {}
+    for i, bondkey in enumerate(bonds):
+        stats[bondkey] = _stats_for_bond(
+            top=top,
+            bondkey=bondkey,
+            bond_id=f"{bondkey[0]}-{bondkey[1]}",
+            ds=distances[:, i],
+            edissoc=edissoc,
+        )
     return stats
 
 
