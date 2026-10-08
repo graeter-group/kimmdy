@@ -7,13 +7,11 @@ ff: "amber99sb-star-ildnp.ff"
 top: "hexala_out.top"
 gro: "npt.gro"
 ndx: "index.ndx"
-plumed: "plumed.dat"
 mds:
   equilibrium:
     mdp: "md.mdp"
   pull:
     mdp: "md.mdp"
-    use_plumed: true
   relax:
     mdp: "md_slow_growth.mdp"
 changer:

@@ -7,13 +7,11 @@ top: "IMREE.top"
 gro: "IMREE_npt.gro"
 ndx: "index.ndx"
 kmc: rfkmc
-plumed: "plumed.dat"
 mds:
   equilibrium:
     mdp: "md.mdp"
   pull:
     mdp: "md.mdp"
-    use_plumed: true
   relax:
     mdp: "md_slow_growth.mdp"
 changer:

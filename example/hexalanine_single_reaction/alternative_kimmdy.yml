@@ -5,7 +5,6 @@ ff: 'amber99sb-star-ildnp.ff'
 top: 'hexala_out.top'
 gro: 'npt.gro'
 ndx: 'index.ndx'
-plumed: 'plumed.dat'
 trr: 'pull.trr'
 changer:
   coordinates: {}
@@ -13,6 +12,7 @@ changer:
     parameterization: 'basic' 
 reactions:
   homolysis:
+    trajectory: 'trr'
     edis: 'edissoc.dat'
     itp: 'ffbonded.itp'
 sequence:
