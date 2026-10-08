@@ -11,7 +11,7 @@ nstcomm     = 10
 nstxout     = 100      ; every x ps
 nstvout     = 100 
 nstfout     = 100
-nstxtcout   = 100       ; every x ps
+nstxtcout   = 50        ; every x ps
 nstlog	    = 100
 nstenergy   = 200
 ; Bond parameters
