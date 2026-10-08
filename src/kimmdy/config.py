@@ -221,22 +221,25 @@ class Config:
                     m = f"Deprecated option in {section}.{k}: {deprecated}, {description}"
                     CONFIG_LOGS["warnings"].append(m)
                 pytype = subscheme.get("pytype")
-                if pytype is None and not deprecated:
+                if pytype is None:
+                    if deprecated:
+                        # untyped deprecated options are kept as given
+                        self.__setattr__(k, v)
+                        continue
                     m = f"No type found for {section}.{k}"
                     raise ValueError(m)
 
-                if not deprecated:
-                    v = pytype(v)
-                    if pytype is str and k not in {
-                        "name",
-                        "product_template_itp_glob",
-                    }:
-                        # make sure all strings are lowercase
-                        # except for values whose case has external meaning:
-                        # names are used for output directories and ITP globs
-                        # are matched against case-sensitive file systems.
-                        v = v.lower()
-                    self.__setattr__(k, v)
+                v = pytype(v)
+                if pytype is str and k not in {
+                    "name",
+                    "product_template_itp_glob",
+                }:
+                    # make sure all strings are lowercase
+                    # except for values whose case has external meaning:
+                    # names are used for output directories and ITP globs
+                    # are matched against case-sensitive file systems.
+                    v = v.lower()
+                self.__setattr__(k, v)
 
         # validate on initial construction
         if section == "config":
@@ -307,6 +310,10 @@ class Config:
                 continue
 
             pytype = v.get("pytype")
+            if pytype is None and v.get("deprecated") is not None:
+                # untyped deprecated options are leaves without defaults,
+                # not sections
+                continue
             if pytype is not None:
                 # this is a base case since
                 # only leaves have a pytype
@@ -526,7 +533,7 @@ class Config:
     def _validate_schema(self, scheme: dict, section: str = "config"):
         """Check supported schema constraints after defaults are populated."""
         for name in scheme.get("required", []):
-            # Deprecated inputs are deliberately ignored during parsing.
+            # Deprecated options stay optional even if listed as required.
             if scheme.get(name, {}).get("deprecated") is not None:
                 continue
             if not hasattr(self, name):
