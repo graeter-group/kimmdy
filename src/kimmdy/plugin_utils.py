@@ -33,6 +33,15 @@ BONDSTATS_COLUMNS = "ai,aj,plumed_id,mean_d,mean_f,delta_d,b0,harmonic_f"
 BondToPlumedID: TypeAlias = dict[BondId, PlumedId]
 PlumedDistances: TypeAlias = dict[Time, dict[PlumedId, Distance]]
 
+PLUMED_DEPRECATION = (
+    "the homolysis plugin computes bond statistics with MDAnalysis "
+    "(calculate_bondstats_from_trajectory) and no longer needs PLUMED"
+)
+
+
+def _log_deprecated(name: str, reason: str) -> None:
+    logger.warning(f"Deprecated function {name}: {reason}")
+
 
 def bondstats_to_csv(stats: BondStats, path: str | Path):
     ls = []
@@ -76,6 +85,11 @@ def bondstats_from_csv(path: str | Path) -> BondStats:
 
 
 def read_plumed_input(path: str | Path) -> BondToPlumedID:
+    """Map bonds to the labels of DISTANCE actions in a plumed input file.
+
+    Deprecated: will be removed together with the PLUMED-based bondstats.
+    """
+    _log_deprecated("read_plumed_input", PLUMED_DEPRECATION)
     if not isinstance(path, Path):
         path = Path(path)
     plumed = read_plumed(path)
@@ -157,6 +171,11 @@ def calculate_bondstats(
     dt: float = 0.0,
     edissoc_dat: Optional[Path] = None,
 ) -> BondStats:
+    """Bond statistics from a plumed input and distances output file.
+
+    Deprecated: use `calculate_bondstats_from_trajectory`.
+    """
+    _log_deprecated("calculate_bondstats", PLUMED_DEPRECATION)
     distances = read_distances_dat(path=plumed_out, dt=dt)
     bond_to_plumed_id = read_plumed_input(plumed_in)
     return get_bondstats(
@@ -173,6 +192,11 @@ def get_bondstats(
     bond_to_plumed_id: BondToPlumedID,
     edissoc_dat: Path | None = None,
 ) -> BondStats:
+    """Bond statistics from parsed plumed distances.
+
+    Deprecated: use `calculate_bondstats_from_trajectory`.
+    """
+    _log_deprecated("get_bondstats", PLUMED_DEPRECATION)
     if edissoc_dat is not None:
         edissoc = read_edissoc(edissoc_dat)
     else:
@@ -552,6 +576,8 @@ def get_atomnrs_from_plumedid(
     """
     Convert from plumedid to atomnr, information from the plumed file is used.
 
+    Deprecated: will be removed together with the PLUMED-based bondstats.
+
     Parameters
     ----------
     plumedid:
@@ -559,6 +585,7 @@ def get_atomnrs_from_plumedid(
     plumed:
         Parsed plumed input file
     """
+    _log_deprecated("get_atomnrs_from_plumedid", PLUMED_DEPRECATION)
     # lookup_atomnr_plumedid = {k: frozenset(v["atoms"])
     plumed_action = plumed["labeled_action"][plumedid]
     if a := plumed_action.get("atoms"):
@@ -580,7 +607,14 @@ def get_atominfo_from_atomnrs(
     ),
     top: Topology,
 ) -> tuple[list[str], list[str]]:
-    """Use topology atoms section to convert from atomnr to atomtype"""
+    """Use topology atoms section to convert from atomnr to atomtype
+
+    Deprecated: use `top.atoms[nr].type` and `top.atoms[nr].atom`.
+    """
+    _log_deprecated(
+        "get_atominfo_from_atomnrs",
+        "use top.atoms[nr].type and top.atoms[nr].atom instead",
+    )
     atomtypes = []
     atomnames = []
     for atomnr in atomnrs:
@@ -595,6 +629,8 @@ def get_bondprm_from_atomtypes(
 ) -> tuple[float, float]:
     """Returns bond parameters (b0, kb) for a set of two atomtypes.
 
+    Deprecated: use `top.ff.bondtypes`.
+
     Parameters
     ----------
     atomtypes:
@@ -602,6 +638,7 @@ def get_bondprm_from_atomtypes(
     ffbonded:
         Force field ffbonded.itp file parsed through the rtp parser
     """
+    _log_deprecated("get_bondprm_from_atomtypes", "use top.ff.bondtypes instead")
     # search for b0 and kb for the given atomtypes in ffbonded bondtypes
     for bondtype in ffbonded["bondtypes"]["content"]:
         if set(atomtypes) == set(bondtype[:2]):
