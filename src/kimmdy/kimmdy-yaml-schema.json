@@ -428,7 +428,7 @@
               "type": "boolean",
               "pytype": "bool",
               "default": true,
-              "description": "Retype transferred HW/HO hydrogen atoms as a force-field LJ-bearing hydrogen type (H1 in Amber) in state B of the temporary relaxation topology. State A keeps the original type, so the H's Lennard-Jones parameters grow in linearly with lambda. The explicit relax pair terms of the moving H also use its original, size-free type in state A. The final reaction topology is unchanged."
+              "description": "Retype transferred HW/HO hydrogen atoms as a force-field LJ-bearing hydrogen type (H1 in Amber) in state B of the temporary relaxation topology. State A keeps the original type, so the H's Lennard-Jones parameters grow in linearly with lambda. The explicit relax pair terms of the moving H also use its original, size-free type in state A, unless the H lands on an oxygen again. The final reaction topology is unchanged."
             },
             "harmonic_acceptor_h_relax_term": {
               "type": "boolean",

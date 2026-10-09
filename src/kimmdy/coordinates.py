@@ -305,12 +305,16 @@ class MoleculeTypeMerger:
         self._bond_graph_a = self._build_bond_graph(mol_a)
         self._bond_graph_b = self._build_bond_graph(mol_b)
         # hydroxyl or water H atoms (type HO or HW) whose bonded partners change
-        # in this reaction, i.e. the moving H; used by _get_LJ_parameters
+        # in this reaction, i.e. the moving H; used by _get_LJ_parameters.
+        # An H that lands on an oxygen again (product type HO/HW) is left out:
+        # its pairs keep the H1 size in both states, so the push off the donor
+        # oxygen is balanced by the fading push from the acceptor oxygen
         self.moved_lj_free_hydrogens = {
             atom_nr
             for atom_nr, atom in mol_a.atoms.items()
             if atom.type in ("HO", "HW")
             and self._bond_graph_a[atom_nr] != self._bond_graph_b.get(atom_nr, set())
+            and mol_b.atoms[atom_nr].type not in ("HO", "HW")
         }
         self._pairs_a = {to_pairkey(key) for key in mol_a.pairs}
         self._pairs_b = {to_pairkey(key) for key in mol_b.pairs}

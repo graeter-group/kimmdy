@@ -86,6 +86,10 @@ original behaviour.
   with an atom hydrogen-bonded to the H, for example the acceptor residue's
   hydroxyl O, no longer pushes the H off its donor at lambda 0. **Changes the
   relax trajectory; the final topology is unchanged.**
+  An H that lands on an oxygen again (product type HO/HW, e.g. Tyr OH -> Tyr
+  O*) keeps the H1 pair values in both states, as before: there the fading
+  push from the acceptor oxygen balances the growing push off the donor
+  oxygen.
   Files: `src/kimmdy/coordinates.py`, `src/kimmdy/kimmdy-yaml-schema.json`.
 * Neighbour residues of template impropers found through bonds. New key
   `changer.topology.improper_neighbors_by_bonding` (default true) finds the
