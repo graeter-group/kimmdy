@@ -304,6 +304,14 @@ class MoleculeTypeMerger:
         # union topology used for slow growth.
         self._bond_graph_a = self._build_bond_graph(mol_a)
         self._bond_graph_b = self._build_bond_graph(mol_b)
+        # hydroxyl or water H atoms (type HO or HW) whose bonded partners change
+        # in this reaction, i.e. the moving H; used by _get_LJ_parameters
+        self.moved_lj_free_hydrogens = {
+            atom_nr
+            for atom_nr, atom in mol_a.atoms.items()
+            if atom.type in ("HO", "HW")
+            and self._bond_graph_a[atom_nr] != self._bond_graph_b.get(atom_nr, set())
+        }
         self._pairs_a = {to_pairkey(key) for key in mol_a.pairs}
         self._pairs_b = {to_pairkey(key) for key in mol_b.pairs}
         self._explicit_exclusions_a = self._expand_exclusions(mol_a)
@@ -534,9 +542,21 @@ class MoleculeTypeMerger:
         return multiple_dihedrals
 
     def _get_LJ_parameters(
-        self, id1: str, id2: str, use_state_b: bool, is_1_4: bool = False
+        self,
+        id1: str,
+        id2: str,
+        use_state_b: bool,
+        is_1_4: bool = False,
+        lj_free_h_in_a: bool = False,
     ):
-        """Calculate LJ terms sigma and epsilon from atom types"""
+        """Calculate LJ terms sigma and epsilon from atom types.
+
+        A hydroxyl or water H (type HO or HW) has no LJ size, so it is normally
+        looked up as an H type with a size (H1). With lj_free_h_in_a and
+        retype_transferred_h on, the moving H keeps its real, size-free type in
+        state A instead, so a pair term with it starts at zero and grows in
+        with lambda. Returns sigma and epsilon for the atom pair.
+        """
 
         # defaults top line:
         # non-bonded function type; combination rule; generate pairs (no/yes); fudge LJ (); fudge QQ ()
@@ -559,9 +579,18 @@ class MoleculeTypeMerger:
             if self.retype_transferred_h and self.transferred_h_type is not None
             else "H1"
         )
-        if t1 in ["HW", "HO"]:
+        # with retype_transferred_h, the moving H keeps its size-free type in
+        # state A of a pair term, like its atom type in the relax topology
+        keep_real_a_type = (
+            lj_free_h_in_a and self.retype_transferred_h and not use_state_b
+        )
+        if t1 in ["HW", "HO"] and not (
+            keep_real_a_type and id1 in self.moved_lj_free_hydrogens
+        ):
             t1 = replacement_h_type
-        if t2 in ["HW", "HO"]:
+        if t2 in ["HW", "HO"] and not (
+            keep_real_a_type and id2 in self.moved_lj_free_hydrogens
+        ):
             t2 = replacement_h_type
 
         type1 = self.ff.atomtypes[t1]
@@ -641,8 +670,9 @@ class MoleculeTypeMerger:
         Pair
             Morphing pair
         """
+        # state A: the moving H is size-free here (only pairs, not Morse bond lengths)
         sigmaij_a, epsilonij_a = self._get_LJ_parameters(
-            id1=id1, id2=id2, use_state_b=False, is_1_4=from_1_4
+            id1=id1, id2=id2, use_state_b=False, is_1_4=from_1_4, lj_free_h_in_a=True
         )
         sigmaij_b, epsilonij_b = self._get_LJ_parameters(
             id1=id1, id2=id2, use_state_b=True, is_1_4=to_1_4

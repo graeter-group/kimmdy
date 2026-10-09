@@ -79,6 +79,14 @@ original behaviour.
   the relax trajectory; the final topology is unchanged.**
   Files: `src/kimmdy/coordinates.py`, `src/kimmdy/runmanager.py`,
   `src/kimmdy/kimmdy-yaml-schema.json`.
+* Pair terms of the transferred hydroxyl H also start without size. With
+  `changer.coordinates.retype_transferred_h`, the explicit relax pairs between
+  the moving HO/HW hydrogen and the atoms whose bonding to it changes now use
+  its real, size-free type in state A (before: `H1` in both states). A pair
+  with an atom hydrogen-bonded to the H, for example the acceptor residue's
+  hydroxyl O, no longer pushes the H off its donor at lambda 0. **Changes the
+  relax trajectory; the final topology is unchanged.**
+  Files: `src/kimmdy/coordinates.py`, `src/kimmdy/kimmdy-yaml-schema.json`.
 * Neighbour residues of template impropers found through bonds. New key
   `changer.topology.improper_neighbors_by_bonding` (default true) finds the
   previous and next residue (-C, +N) through the backbone C-N bond instead of
