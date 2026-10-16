@@ -221,22 +221,25 @@ class Config:
                     m = f"Deprecated option in {section}.{k}: {deprecated}, {description}"
                     CONFIG_LOGS["warnings"].append(m)
                 pytype = subscheme.get("pytype")
-                if pytype is None and not deprecated:
+                if pytype is None:
+                    if deprecated:
+                        # untyped deprecated options are kept as given
+                        self.__setattr__(k, v)
+                        continue
                     m = f"No type found for {section}.{k}"
                     raise ValueError(m)
 
-                if not deprecated:
-                    v = pytype(v)
-                    if pytype is str and k not in {
-                        "name",
-                        "product_template_itp_glob",
-                    }:
-                        # make sure all strings are lowercase
-                        # except for values whose case has external meaning:
-                        # names are used for output directories and ITP globs
-                        # are matched against case-sensitive file systems.
-                        v = v.lower()
-                    self.__setattr__(k, v)
+                v = pytype(v)
+                if pytype is str and k not in {
+                    "name",
+                    "product_template_itp_glob",
+                }:
+                    # make sure all strings are lowercase
+                    # except for values whose case has external meaning:
+                    # names are used for output directories and ITP globs
+                    # are matched against case-sensitive file systems.
+                    v = v.lower()
+                self.__setattr__(k, v)
 
         # validate on initial construction
         if section == "config":
@@ -307,6 +310,10 @@ class Config:
                 continue
 
             pytype = v.get("pytype")
+            if pytype is None and v.get("deprecated") is not None:
+                # untyped deprecated options are leaves without defaults,
+                # not sections
+                continue
             if pytype is not None:
                 # this is a base case since
                 # only leaves have a pytype
@@ -354,24 +361,32 @@ class Config:
                 self.out = self.cwd / Path(self.name)
 
             # make sure self.out is empty unless restart is set
-            while self.out.exists() and not self.restart:
-                CONFIG_LOGS["debugs"].append(
-                    f"Output dir {self.out} exists, incrementing name"
-                )
-                name = self.out.name.split("_")
-                out_end = name[-1]
-                if out_end.isdigit():
-                    self.out = self.out.with_name(
-                        f"{'_'.join(name[:-1])}_{int(out_end) + 1:03}"
-                    )
-                else:
-                    self.out = self.out.with_name(self.out.name + "_001")
+            # Atomic creation loop to prevent race conditions
+            while True:
+                try:
+                    # Atomic directory creation: fails with FileExistsError if another process created it
+                    self.out.mkdir(parents=True, exist_ok=False)
+                    CONFIG_LOGS["infos"].append(f"Created output dir {self.out}")
+                    break
+                except FileExistsError:
+                    if self.restart:
+                        CONFIG_LOGS["infos"].append(
+                            f"Restarting in output dir {self.out}"
+                        )
+                        break
 
-            if not self.out.exists():
-                self.out.mkdir()
-                CONFIG_LOGS["infos"].append(f"Created output dir {self.out}")
-            else:
-                CONFIG_LOGS["infos"].append(f"Restarting in output dir {self.out}")
+                    # Directory exists and self.restart is False: increment name and retry
+                    CONFIG_LOGS["debugs"].append(
+                        f"Output dir {self.out} exists, incrementing name"
+                    )
+                    name = self.out.name.split("_")
+                    out_end = name[-1]
+                    if out_end.isdigit():
+                        self.out = self.out.with_name(
+                            f"{'_'.join(name[:-1])}_{int(out_end) + 1:03}"
+                        )
+                    else:
+                        self.out = self.out.with_name(self.out.name + "_001")
 
     def _validate(self, section: str = "config", cwd: Path = Path(".")):
         """Validates config."""
@@ -518,7 +533,7 @@ class Config:
     def _validate_schema(self, scheme: dict, section: str = "config"):
         """Check supported schema constraints after defaults are populated."""
         for name in scheme.get("required", []):
-            # Deprecated inputs are deliberately ignored during parsing.
+            # Deprecated options stay optional even if listed as required.
             if scheme.get(name, {}).get("deprecated") is not None:
                 continue
             if not hasattr(self, name):

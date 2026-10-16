@@ -352,6 +352,40 @@ def test_schema_keeps_deprecated_required_options_optional(schema_startup_config
     assert config.reactions.test_rates.rate_equation == "eyring"
 
 
+def test_schema_keeps_value_of_typed_deprecated_option(
+    schema_startup_config, monkeypatch
+):
+    from kimmdy.constants import CONFIG_LOGS
+
+    monkeypatch.setitem(CONFIG_LOGS, "warnings", [])
+    build, scheme = schema_startup_config
+    scheme["reactions"]["test_rates"]["old_option"] = {
+        "deprecated": True,
+        "pytype": int,
+        "description": "Old option.",
+    }
+    config = build({"old_option": "3"})
+    assert config.reactions.test_rates.old_option == 3
+    assert any(
+        "config.reactions.test_rates.old_option" in m for m in CONFIG_LOGS["warnings"]
+    )
+
+
+def test_schema_keeps_value_of_untyped_deprecated_option(
+    schema_startup_config, monkeypatch
+):
+    from kimmdy.constants import CONFIG_LOGS
+
+    monkeypatch.setitem(CONFIG_LOGS, "warnings", [])
+    build, scheme = schema_startup_config
+    scheme["reactions"]["test_rates"]["old_option"] = {"deprecated": True}
+    config = build({"old_option": "Some Value"})
+    assert config.reactions.test_rates.old_option == "Some Value"
+    assert any(
+        "config.reactions.test_rates.old_option" in m for m in CONFIG_LOGS["warnings"]
+    )
+
+
 def test_schema_checks_numeric_constraints_in_wildcard_sections(schema_startup_config):
     build, scheme = schema_startup_config
     scheme["mds"][".*"]["stride"] = {"pytype": int, "minimum": 1}
