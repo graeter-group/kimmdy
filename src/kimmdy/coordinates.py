@@ -345,6 +345,14 @@ class MoleculeTypeMerger:
     def _get_morse_parameters(
         self, atomtypes: tuple[str, str], bond: Bond | None = None
     ):
+        if (
+            bond is not None
+            and bond.funct == FFFUNC["morse_bond"]
+            and bond.c1 is not None
+            and bond.c2 is not None
+        ):
+            # explicit morse bond, e.g. from `kimmdy-modify-top --morse`
+            return float(bond.c1), float(bond.c2)
         # fall back to defaults if no parameters are found
         well_depth = self.default_morse_well_depth
         beta = self.default_beta_for_lj
@@ -562,11 +570,21 @@ class MoleculeTypeMerger:
 
             if isinstance(bond_a, BondType):
                 bond_a = Bond(
-                    bond_a.i, bond_a.j, funct=bond_a.funct, c0=bond_a.c0, c1=bond_a.c1
+                    bond_a.i,
+                    bond_a.j,
+                    funct=bond_a.funct,
+                    c0=bond_a.c0,
+                    c1=bond_a.c1,
+                    c2=bond_a.c2,
                 )
             if isinstance(bond_b, BondType):
                 bond_b = Bond(
-                    bond_b.i, bond_b.j, funct=bond_b.funct, c0=bond_b.c0, c1=bond_b.c1
+                    bond_b.i,
+                    bond_b.j,
+                    funct=bond_b.funct,
+                    c0=bond_b.c0,
+                    c1=bond_b.c1,
+                    c2=bond_b.c2,
                 )
             assert isinstance(bond_a, Bond) or bond_a is None
             assert isinstance(bond_b, Bond) or bond_b is None
@@ -602,19 +620,34 @@ class MoleculeTypeMerger:
                     m = f"Can't find parameters for bond with key {bond_key}, got explicits/types: {bond_a} and {bond_b} for a bonds: {bond_a}, {bond_b}"
                     logger.error(m)
                     raise ValueError(m)
-                if not (bond_a.funct == bond_b.funct == FFFUNC["harmonic_bond"]):
-                    m = f"In slow-growth, bond functionals need to be harmonic, but {bond_key} is not. It is in A: {bond_a} and B: {bond_b}"
+                functs = {bond_a.funct, bond_b.funct}
+                if functs == {FFFUNC["harmonic_bond"]}:
+                    self.mol_a.bonds[bond_key] = Bond(
+                        *bond_key,
+                        funct=bond_b.funct,
+                        c0=bond_a.c0,
+                        c1=bond_a.c1,
+                        c2=bond_b.c0,
+                        c3=bond_b.c1,
+                        comment=f"; morphing harmonic bond",
+                    )
+                elif functs <= {FFFUNC["harmonic_bond"], FFFUNC["morse_bond"]}:
+                    # at least one explicit morse bond -> morph as morse
+                    self.mol_a.bonds[bond_key] = Bond(
+                        *bond_key,
+                        funct=FFFUNC["morse_bond"],
+                        c0=bond_a.c0,
+                        c1=f"{depth_a:.5f}",
+                        c2=f"{beta_a:.5f}",
+                        c3=bond_b.c0,
+                        c4=f"{depth_b:.5f}",
+                        c5=f"{beta_b:.5f}",
+                        comment=f"; morphing morse bond",
+                    )
+                else:
+                    m = f"In slow-growth, bond functionals need to be harmonic or morse, but {bond_key} is not. It is in A: {bond_a} and B: {bond_b}"
                     logger.error(m)
                     raise ValueError(m)
-                self.mol_a.bonds[bond_key] = Bond(
-                    *bond_key,
-                    funct=bond_b.funct,
-                    c0=bond_a.c0,
-                    c1=bond_a.c1,
-                    c2=bond_b.c0,
-                    c3=bond_b.c1,
-                    comment=f"; morphing harmonic bond",
-                )
             elif isinstance(bond_a, (Bond, BondType)):
                 # bond only exists in A -> vanish bond
                 pairkey = to_pairkey(bond_key)

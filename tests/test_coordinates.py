@@ -171,6 +171,49 @@ def test_morse_parameters(arranged_tmp_path):
     assert beta_b == pytest.approx(21.9393, rel=1e-5)
 
 
+def test_merge_vanishing_explicit_morse_bond(arranged_tmp_path):
+    """Breaking an explicit morse bond starts from its own parameters"""
+    top_a = Topology(read_top(Path("topol_stateA.top")))
+    top_b = Topology(read_top(Path("topol_stateB.top")))
+    bond_key = ("26", "27")
+    top_a.bonds[bond_key] = Bond(
+        *bond_key, funct="3", c0="0.10100", c1="379.00000", c2="22.00000"
+    )
+    merger = MoleculeTypeMerger(
+        top_a.moleculetypes[REACTIVE_MOLECULEYPE],
+        top_b.moleculetypes[REACTIVE_MOLECULEYPE],
+        ff=top_a.ff,
+    )
+    merger.merge()
+
+    bond = merger.mol_a.bonds[bond_key]
+    assert bond.funct == "3"
+    assert (bond.c0, bond.c1, bond.c2) == ("0.10100", "379.00000", "22.00000")
+
+
+def test_merge_morphing_explicit_morse_bond(arranged_tmp_path):
+    """A bond that is morse in A and harmonic in B is morphed as morse"""
+    top_a = Topology(read_top(Path("topol_stateA.top")))
+    top_b = Topology(read_top(Path("topol_stateB.top")))
+    bond_key = ("19", "20")
+    top_a.bonds[bond_key] = Bond(
+        *bond_key, funct="3", c0="0.14955", c1="400.00000", c2="18.00000"
+    )
+    merger = MoleculeTypeMerger(
+        top_a.moleculetypes[REACTIVE_MOLECULEYPE],
+        top_b.moleculetypes[REACTIVE_MOLECULEYPE],
+        ff=top_a.ff,
+    )
+    merger.merge()
+
+    bond = merger.mol_a.bonds[bond_key]
+    assert bond.funct == "3"
+    assert (bond.c0, bond.c1, bond.c2) == ("0.14955", "400.00000", "18.00000")
+    assert bond.c3 == "0.15260"
+    assert float(bond.c4) == merger.default_morse_well_depth
+    assert float(bond.c5) == pytest.approx(sqrt(259408.0 / (2 * 300)), rel=1e-4)
+
+
 def test_lj_parameters(arranged_tmp_path):
     id1 = "20"
     id2 = "27"
