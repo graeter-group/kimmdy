@@ -51,6 +51,9 @@ ATOM_ID_FIELDS = {
     "dihedral_restraints": [0, 1, 2, 3],
 }
 
+# dissociation energy if none is found in the edissoc file [kJ mol^-1]
+DEFAULT_EDISSOC_FALLBACK = 400.0
+
 # from gmx data dir
 DEFAULT_EDISSOC: dict[tuple[str, str], float] = {  # type: ignore
     tuple(sorted(list(k))): v

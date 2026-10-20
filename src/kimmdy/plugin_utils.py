@@ -6,7 +6,7 @@ from typing import Optional, TypeAlias, TypedDict
 
 import numpy as np
 
-from kimmdy.constants import R
+from kimmdy.constants import DEFAULT_EDISSOC_FALLBACK, R
 from kimmdy.parsing import Plumed_dict, read_distances_dat, read_edissoc, read_plumed
 from kimmdy.topology.atomic import BondId
 from kimmdy.topology.topology import Topology
@@ -378,37 +378,56 @@ def get_bondprm_from_atomtypes(
     return b0, kb
 
 
-def get_edissoc_from_atomnames(
+def find_edissoc(
     atomnames: list[str], edissoc: dict, residue: str = "_"
-) -> float:
-    """Returns dissociation energy E_dissoc for a set of two atomnames.
+) -> Optional[float]:
+    """Looks up the dissociation energy E_dissoc for a set of two atomnames.
+
+    Searches the section of the residue first, then the 'general' section.
 
     Parameters
     ----------
     atomnames:
         Two atomnames as defined in the respective force field
     edissoc:
-        Parsed file with dissociation energies per bond between two atomtypes or elements
+        Parsed file with dissociation energies per residue and pair of atomnames
+    residue:
+        Residue for which the atomnames are defined
+
+    Returns
+    -------
+    E_dis
+        Dissociation energy or None if not found.
+    """
+    interaction_key = tuple(sorted(atomnames))
+    for section in (residue, "general"):
+        E_dis = edissoc.get(section, {}).get(interaction_key)
+        if E_dis is not None:
+            return E_dis
+    return None
+
+
+def get_edissoc_from_atomnames(
+    atomnames: list[str], edissoc: dict, residue: str = "_"
+) -> float:
+    """Returns dissociation energy E_dissoc for a set of two atomnames.
+
+    Searches the section of the residue first, then the 'general' section,
+    and falls back to DEFAULT_EDISSOC_FALLBACK with a warning.
+
+    Parameters
+    ----------
+    atomnames:
+        Two atomnames as defined in the respective force field
+    edissoc:
+        Parsed file with dissociation energies per residue and pair of atomnames
     residue:
         Residue for which the atomnames are defined
     """
-    if residue not in edissoc.keys():
-        if "general" in edissoc.keys():
-            logger.debug(
-                f"residue {residue} not in edissoc keys: {edissoc.keys()}, using 'general' as residue."
-            )
-            residue = "general"
-        else:
-            raise KeyError(f"Did not find residue {residue} in edissoc file")
-
-    try:
-        interaction_key = tuple(sorted(atomnames))
-        E_dis = edissoc[residue][interaction_key]
-    except KeyError:
-        # continue with guessed edissoc
+    E_dis = find_edissoc(atomnames=atomnames, edissoc=edissoc, residue=residue)
+    if E_dis is None:
         logger.warning(
-            f"Did not find dissociation energy for atomtypes {atomnames}, residue {residue} in edissoc file, using standard value of 400.0"
+            f"Did not find dissociation energy for atomnames {atomnames} in residue {residue} or 'general' of edissoc file, using standard value of {DEFAULT_EDISSOC_FALLBACK}"
         )
-        E_dis = 400.0
-
+        E_dis = DEFAULT_EDISSOC_FALLBACK
     return E_dis

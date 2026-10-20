@@ -9,9 +9,9 @@ from collections import Counter
 from pathlib import Path
 from typing import Optional
 
-from kimmdy.constants import FFFUNC
+from kimmdy.constants import DEFAULT_EDISSOC_FALLBACK, FFFUNC
 from kimmdy.parsing import read_top, write_top, read_csv_to_list, read_edissoc
-from kimmdy.plugin_utils import calculate_beta
+from kimmdy.plugin_utils import calculate_beta, find_edissoc
 from kimmdy.plugins import discover_plugins, parameterization_plugins
 from kimmdy.topology.topology import Topology
 from kimmdy.topology.utils import get_is_reactive_predicate_f
@@ -102,7 +102,8 @@ def harmonic_to_morse(
         Topology, modified in place.
     edissoc_path
         Edissoc file in the KIMMDY format (dissociation energies per residue
-        and pair of atom names). Missing entries default to 400 kJ/mol.
+        and pair of atom names). Looks up the residue section, then 'general',
+        missing entries default to DEFAULT_EDISSOC_FALLBACK (400 kJ/mol).
 
     Returns
     -------
@@ -110,7 +111,7 @@ def harmonic_to_morse(
         Number of converted bonds.
     missing
         Number of converted bonds without dissociation energy in the edissoc
-        file by (residue, atom name, atom name). These use 400 kJ/mol.
+        file by (residue, atom name, atom name). These use DEFAULT_EDISSOC_FALLBACK.
     """
     edissoc = read_edissoc(edissoc_path)
     n_converted = 0
@@ -132,13 +133,12 @@ def harmonic_to_morse(
                 )
             b0, kb = float(bondtype.c0), float(bondtype.c1)
 
-        # same lookup as get_edissoc_from_atomnames, without a warning per bond
-        residue = ai.residue if ai.residue in edissoc else "general"
-        atomnames = tuple(sorted([ai.atom, aj.atom]))
-        edis = edissoc.get(residue, {}).get(atomnames)
+        # no warning per bond, missing entries are summarized by modify_top
+        atomnames = sorted([ai.atom, aj.atom])
+        edis = find_edissoc(atomnames=atomnames, edissoc=edissoc, residue=ai.residue)
         if edis is None:
             missing[(ai.residue, *atomnames)] += 1
-            edis = 400.0
+            edis = DEFAULT_EDISSOC_FALLBACK
 
         bond.funct = FFFUNC["morse_bond"]
         bond.c0 = f"{b0:.5f}"
@@ -353,7 +353,7 @@ def modify_top(
     if morse_missing:
         print(
             f"\nNo dissociation energy found in {morse} for "
-            f"{sum(morse_missing.values())} morse bonds, used 400.0 kJ/mol:"
+            f"{sum(morse_missing.values())} morse bonds, used {DEFAULT_EDISSOC_FALLBACK} kJ/mol:"
         )
         print("residue\tatoms\tbonds")
         for (residue, at1, at2), n in sorted(morse_missing.items()):
