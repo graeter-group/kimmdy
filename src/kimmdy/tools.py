@@ -8,7 +8,9 @@ import shutil
 from pathlib import Path
 from typing import Optional
 
-from kimmdy.parsing import read_top, write_top, read_csv_to_list
+from kimmdy.constants import FFFUNC
+from kimmdy.parsing import read_top, write_top, read_csv_to_list, read_edissoc
+from kimmdy.plugin_utils import calculate_beta, get_edissoc_from_atomnames
 from kimmdy.plugins import discover_plugins, parameterization_plugins
 from kimmdy.topology.topology import Topology
 from kimmdy.topology.utils import get_is_reactive_predicate_f
@@ -84,6 +86,65 @@ def entry_point_build_examples():
     build_examples(args.restore)
 
 
+def harmonic_to_morse(top: Topology, edissoc_path: Path) -> int:
+    """Convert all harmonic bonds of the reactive moleculetype to morse bonds.
+
+    The well depth is the dissociation energy from the edissoc file, beta is
+    chosen to match the harmonic force constant at the minimum, like in
+    `gmx grompp -morse`.
+
+    Parameters
+    ----------
+    top
+        Topology, modified in place.
+    edissoc_path
+        Edissoc file in the KIMMDY format (dissociation energies per residue
+        and pair of atom names). Missing entries default to 400 kJ/mol.
+
+    Returns
+    -------
+    n_converted
+        Number of converted bonds.
+    """
+    edissoc = read_edissoc(edissoc_path)
+    n_converted = 0
+    for bond in top.bonds.values():
+        if bond.funct != FFFUNC["harmonic_bond"]:
+            continue
+        ai = top.atoms[bond.ai]
+        aj = top.atoms[bond.aj]
+        if bond.c0 is not None and bond.c1 is not None:
+            b0, kb = float(bond.c0), float(bond.c1)
+        else:
+            bondtype = top.ff.bondtypes.get((ai.type, aj.type))
+            if bondtype is None:
+                bondtype = top.ff.bondtypes.get((aj.type, ai.type))
+            if not bondtype or bondtype.c0 is None or bondtype.c1 is None:
+                raise ValueError(
+                    f"Could not find bondtype of atoms with ids {ai.nr} and {aj.nr}"
+                )
+            b0, kb = float(bondtype.c0), float(bondtype.c1)
+
+        try:
+            edis = get_edissoc_from_atomnames(
+                atomnames=[ai.atom, aj.atom], edissoc=edissoc, residue=ai.residue
+            )
+        except KeyError:
+            print(
+                f"Warning: Did not find residue {ai.residue} or 'general' in edissoc "
+                f"file, using 400.0 for bond {ai.nr}-{aj.nr}."
+            )
+            edis = 400.0
+
+        bond.funct = FFFUNC["morse_bond"]
+        bond.c0 = f"{b0:.5f}"
+        bond.c1 = f"{edis:.5f}"
+        bond.c2 = f"{calculate_beta(kb=kb, edis=edis):.5f}"
+        bond.c3 = bond.c4 = bond.c5 = None
+        n_converted += 1
+    return n_converted
+
+
 def modify_top(
     topology: str,
     out: str,
@@ -97,6 +158,7 @@ def modify_top(
     search_amber_rad: bool = True,
     include: Optional[str] = None,
     exclude: Optional[str] = None,
+    morse: Optional[str] = None,
 ):
     """Modify topology in various ways.
 
@@ -133,6 +195,9 @@ def modify_top(
         Include certain GROMACS topology molecules in `Reactive` molecule. Reads molecule names from a csv file.
     exclude
         Exclude certain GROMACS topology molecules in `Reactive` molecule. Reads molecule names from a csv file.
+    morse
+        Convert all harmonic bonds in the `Reactive` molecule to morse bonds
+        using dissociation energies from this edissoc file (KIMMDY format).
     """
 
     top_path = Path(topology).with_suffix(".top").resolve()
@@ -171,6 +236,7 @@ def modify_top(
         f"search_amber_rad: \t{search_amber_rad}\n"
         f"include: \t\t{include}\n"
         f"exclude: \t\t{exclude}\n"
+        f"morse: \t\t\t{morse}\n"
     )
 
     print("Reading topology..", end="")
@@ -244,6 +310,14 @@ def modify_top(
         top.needs_parameterization = True
         print("Done")
         print("Parameterizing and ", end="")
+
+    # convert harmonic bonds to morse
+    if morse:
+        # parameterize first, so morse parameters derive from the new harmonic ones
+        top.update_parameters()
+        print("Converting harmonic bonds to morse..")
+        n_converted = harmonic_to_morse(top, Path(morse))
+        print(f"Converted {n_converted} bonds..Done")
 
     # write top file
     print("Writing top..", end="")
@@ -352,6 +426,14 @@ def get_modify_top_cmdline_args() -> argparse.Namespace:
         help="Exclude certain GROMACS topology molecules in `Reactive` molecule. Reads molecule names from a csv file.",
         type=str,
     )
+    parser.add_argument(
+        "-m",
+        "--morse",
+        help="Convert all harmonic bonds in the `Reactive` molecule to morse bonds "
+        "using dissociation energies from an edissoc file (KIMMDY format). "
+        "Use explicit morse bonds instead of the `morse = yes` mdp option.",
+        type=str,
+    )
     return parser.parse_args()
 
 
@@ -372,6 +454,7 @@ def entry_point_modify_top():
         search_amber_rad=args.search_amber_rad,
         include=args.include,
         exclude=args.exclude,
+        morse=args.morse,
     )
 
 
