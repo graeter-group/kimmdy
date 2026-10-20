@@ -5,12 +5,13 @@ Standalone tools that are complementary to KIMMDY.
 import argparse
 import json
 import shutil
+from collections import Counter
 from pathlib import Path
 from typing import Optional
 
 from kimmdy.constants import FFFUNC
 from kimmdy.parsing import read_top, write_top, read_csv_to_list, read_edissoc
-from kimmdy.plugin_utils import calculate_beta, get_edissoc_from_atomnames
+from kimmdy.plugin_utils import calculate_beta
 from kimmdy.plugins import discover_plugins, parameterization_plugins
 from kimmdy.topology.topology import Topology
 from kimmdy.topology.utils import get_is_reactive_predicate_f
@@ -86,7 +87,9 @@ def entry_point_build_examples():
     build_examples(args.restore)
 
 
-def harmonic_to_morse(top: Topology, edissoc_path: Path) -> int:
+def harmonic_to_morse(
+    top: Topology, edissoc_path: Path
+) -> tuple[int, Counter[tuple[str, str, str]]]:
     """Convert all harmonic bonds of the reactive moleculetype to morse bonds.
 
     The well depth is the dissociation energy from the edissoc file, beta is
@@ -105,9 +108,13 @@ def harmonic_to_morse(top: Topology, edissoc_path: Path) -> int:
     -------
     n_converted
         Number of converted bonds.
+    missing
+        Number of converted bonds without dissociation energy in the edissoc
+        file by (residue, atom name, atom name). These use 400 kJ/mol.
     """
     edissoc = read_edissoc(edissoc_path)
     n_converted = 0
+    missing: Counter[tuple[str, str, str]] = Counter()
     for bond in top.bonds.values():
         if bond.funct != FFFUNC["harmonic_bond"]:
             continue
@@ -125,15 +132,12 @@ def harmonic_to_morse(top: Topology, edissoc_path: Path) -> int:
                 )
             b0, kb = float(bondtype.c0), float(bondtype.c1)
 
-        try:
-            edis = get_edissoc_from_atomnames(
-                atomnames=[ai.atom, aj.atom], edissoc=edissoc, residue=ai.residue
-            )
-        except KeyError:
-            print(
-                f"Warning: Did not find residue {ai.residue} or 'general' in edissoc "
-                f"file, using 400.0 for bond {ai.nr}-{aj.nr}."
-            )
+        # same lookup as get_edissoc_from_atomnames, without a warning per bond
+        residue = ai.residue if ai.residue in edissoc else "general"
+        atomnames = tuple(sorted([ai.atom, aj.atom]))
+        edis = edissoc.get(residue, {}).get(atomnames)
+        if edis is None:
+            missing[(ai.residue, *atomnames)] += 1
             edis = 400.0
 
         bond.funct = FFFUNC["morse_bond"]
@@ -142,7 +146,7 @@ def harmonic_to_morse(top: Topology, edissoc_path: Path) -> int:
         bond.c2 = f"{calculate_beta(kb=kb, edis=edis):.5f}"
         bond.c3 = bond.c4 = bond.c5 = None
         n_converted += 1
-    return n_converted
+    return n_converted, missing
 
 
 def modify_top(
@@ -311,12 +315,13 @@ def modify_top(
         print("Done")
         print("Parameterizing and ", end="")
 
+    morse_missing: Counter[tuple[str, str, str]] = Counter()
     # convert harmonic bonds to morse
     if morse:
         # parameterize first, so morse parameters derive from the new harmonic ones
         top.update_parameters()
         print("Converting harmonic bonds to morse..")
-        n_converted = harmonic_to_morse(top, Path(morse))
+        n_converted, morse_missing = harmonic_to_morse(top, Path(morse))
         print(f"Converted {n_converted} bonds..Done")
 
     # write top file
@@ -344,6 +349,15 @@ def modify_top(
             print(
                 "Gro file supplied but no action requested that requires changes to it."
             )
+
+    if morse_missing:
+        print(
+            f"\nNo dissociation energy found in {morse} for "
+            f"{sum(morse_missing.values())} morse bonds, used 400.0 kJ/mol:"
+        )
+        print("residue\tatoms\tbonds")
+        for (residue, at1, at2), n in sorted(morse_missing.items()):
+            print(f"{residue}\t{at1}-{at2}\t{n}")
     return update_map
 
 
