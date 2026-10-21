@@ -135,6 +135,11 @@ def _pbc_frames():
     return frames
 
 
+def test_eyring_prefactor():
+    assert plugin_utils.eyring_prefactor(300) == pytest.approx(6.251, rel=1e-3)
+    assert plugin_utils.eyring_prefactor(300, 0.5) == pytest.approx(3.1255, rel=1e-3)
+
+
 def test_bond_distances_from_trajectory_use_minimum_image(tmp_path):
     gro, xtc = _write_trajectory(tmp_path, _pbc_frames(), ["ALA", "ALA", "SOL", "SOL"])
     u = plugin_utils.load_trajectory_universe(gro, xtc)

@@ -8,7 +8,7 @@ import MDAnalysis as mda
 import numpy as np
 from MDAnalysis.lib.distances import calc_bonds
 
-from kimmdy.constants import R
+from kimmdy.constants import H_PLANCK, KB, R
 from kimmdy.parsing import Plumed_dict, read_distances_dat, read_edissoc, read_plumed
 from kimmdy.topology.atomic import BondId
 from kimmdy.topology.topology import Topology
@@ -434,6 +434,13 @@ def calculate_beta(kb: float, edis: float) -> float:
     parameters are in gromacs units with kb as kJ/mol/nm^2 and edis in kJ/mol.
     """
     return np.sqrt(kb / (2 * edis))
+
+
+def eyring_prefactor(
+    temperature: float, transmission_coefficient: float = 1.0
+) -> float:
+    """Prefactor kappa * kB * T / h of the Eyring equation in [1/ps]."""
+    return transmission_coefficient * KB * temperature / H_PLANCK * 1e-12
 
 
 def calculate_x_dagger(kb: float, edis: float) -> float:
