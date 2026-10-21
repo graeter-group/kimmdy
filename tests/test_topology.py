@@ -1082,20 +1082,20 @@ class TestDimerization:
 
 
 @pytest.fixture()
-def dopa_itp_topology() -> Topology:
-    """Minimal closed/radical DOPA topology with ITP product templates."""
+def plpc_itp_topology() -> Topology:
+    """Minimal closed/radical PLPC topology with ITP product templates."""
     template_dir = Path(__file__).parent / "test_files" / "test_itp_templates"
     raw_top = read_top(template_dir / "topol.top", ffdir=template_dir)
     return Topology(
         raw_top,
-        radicals="92",
+        radicals="222",  # Radical C33: 132 closed-shell atoms + local atom 90.
         product_template_sources=("itp",),
         product_template_itp_glob="*.itp",
     )
 
 
-def _dopa_itp_hat_atoms(topology: Topology):
-    """Return donor H37/O2 and radical acceptor O3 by topology semantics."""
+def _plpc_itp_hat_atoms(topology: Topology):
+    """Return donor H3Y/C33 and radical acceptor C33 by topology semantics."""
     residues: dict[str, list[Atom]] = {}
     for atom in topology.atoms.values():
         residues.setdefault(atom.resnr, []).append(atom)
@@ -1103,23 +1103,23 @@ def _dopa_itp_hat_atoms(topology: Topology):
     donor_h = next(
         atom
         for atom in topology.atoms.values()
-        if atom.atom == "H37"
-        and any(candidate.atom == "H38" for candidate in residues[atom.resnr])
+        if atom.atom == "H3Y"
+        and any(candidate.atom == "H3X" for candidate in residues[atom.resnr])
     )
     donor = topology.atoms[donor_h.bound_to_nrs[0]]
     acceptor = next(
         atom
         for atom in topology.atoms.values()
-        if atom.atom == "O3"
-        and not any(candidate.atom == "H38" for candidate in residues[atom.resnr])
+        if atom.atom == "C33"
+        and not any(candidate.atom == "H3X" for candidate in residues[atom.resnr])
     )
     return donor_h, donor, acceptor
 
 
-def test_itp_hat_restores_closed_product_and_conserves_charge(dopa_itp_topology):
+def test_itp_hat_restores_closed_product_and_conserves_charge(plpc_itp_topology):
     """A full HAT applies the exact ITP product state without changing charge."""
-    top = dopa_itp_topology
-    donor_h, donor, acceptor = _dopa_itp_hat_atoms(top)
+    top = plpc_itp_topology
+    donor_h, donor, acceptor = _plpc_itp_hat_atoms(top)
     initial_total_charge = sum(float(atom.charge) for atom in top.atoms.values())
     expected_donor_charge = float(donor.charge) + float(donor_h.charge)
     acceptor_resnr = acceptor.resnr
@@ -1142,13 +1142,13 @@ def test_itp_hat_restores_closed_product_and_conserves_charge(dopa_itp_topology)
     assert tuple(sorted((acceptor.nr, donor_h.nr), key=int)) in top.bonds
     assert donor_h.resnr == acceptor_resnr
     assert donor_h.residue == acceptor.residue
-    assert donor_h.atom == "H38"
+    assert donor_h.atom == "H3X"
     assert np.isclose(float(donor.charge), expected_donor_charge)
 
     closed_template = next(
         template
-        for template in top.ff.product_templates.templates["DOPA"]
-        if template.moleculetype == "DOPA"
+        for template in top.ff.product_templates.templates["PLPC"]
+        if template.moleculetype == "PLPC"
     )
     product_atoms = [
         atom for atom in top.atoms.values() if atom.resnr == acceptor_resnr
@@ -1174,7 +1174,7 @@ def test_itp_hat_restores_closed_product_and_conserves_charge(dopa_itp_topology)
 
 
 def test_itp_product_restores_bonded_terms_and_compacts_focus(
-    dopa_itp_topology,
+    plpc_itp_topology,
 ):
     """Exact products regain ITP terms before active radicals take precedence."""
 
@@ -1186,10 +1186,10 @@ def test_itp_product_restores_bonded_terms_and_compacts_focus(
             self.calls.append(set(focus_nrs or set()))
             return current_topology
 
-    top = dopa_itp_topology
+    top = plpc_itp_topology
     recorder = RecordingParameterizer()
     top.parametrizer = recorder
-    donor_h, donor, acceptor = _dopa_itp_hat_atoms(top)
+    donor_h, donor, acceptor = _plpc_itp_hat_atoms(top)
     break_step = Break(atom_id_1=donor.nr, atom_id_2=donor_h.nr)
     bind_step = Bind(atom_id_1=acceptor.nr, atom_id_2=donor_h.nr)
 
@@ -1226,11 +1226,11 @@ def test_itp_product_restores_bonded_terms_and_compacts_focus(
     assert top.pending_product_template_restorations == []
 
 
-def test_itp_hat_fails_closed_when_no_exact_template_matches(dopa_itp_topology):
+def test_itp_hat_fails_closed_when_no_exact_template_matches(plpc_itp_topology):
     """No template keeps atom identity but conserves both residue charges."""
-    top = dopa_itp_topology
-    donor_h, donor, acceptor = _dopa_itp_hat_atoms(top)
-    acceptor.type = "CG321"
+    top = plpc_itp_topology
+    donor_h, donor, acceptor = _plpc_itp_hat_atoms(top)
+    acceptor.type = "CTL3"
     original_h_name = donor_h.atom
     original_h_type = donor_h.type
     original_h_charge = float(donor_h.charge)
@@ -1296,19 +1296,19 @@ def test_itp_template_precedes_rtp_fallback():
     raw_top = read_top(template_dir / "topol.top", ffdir=template_dir)
     top = Topology(
         raw_top,
-        radicals="92",
+        radicals="222",  # Radical C33: 132 closed-shell atoms + local atom 90.
         product_template_sources=("itp", "rtp"),
         product_template_itp_glob="*.itp",
     )
-    donor_h, donor, acceptor = _dopa_itp_hat_atoms(top)
+    donor_h, donor, acceptor = _plpc_itp_hat_atoms(top)
 
     top.break_bond((donor.nr, donor_h.nr))
     top.bind_bond((acceptor.nr, donor_h.nr))
 
     match_key = tuple(sorted((acceptor.nr, donor_h.nr), key=int))
     match = top.pending_product_template_matches[match_key]
-    assert match.template.moleculetype == "DOPA"
-    assert donor_h.atom == "H38"
+    assert match.template.moleculetype == "PLPC"
+    assert donor_h.atom == "H3X"
 
 
 def test_ohr_transition_restores_tip3_like_product_and_conserves_charge():

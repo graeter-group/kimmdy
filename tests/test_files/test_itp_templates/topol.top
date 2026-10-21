@@ -11,14 +11,14 @@
 
 ; Include forcefield parameters
 #include "charmm36.itp"
-#include "DOPA.itp"
-#include "DOPA_rad.itp"
+#include "PLPC.itp"
+#include "PLPC_rad.itp"
 
 [ system ]
 ; Name
-Minimal DOPA-lipid HAT template test
+Minimal PLPC-lipid HAT template test
 
 [ molecules ]
 ; Compound	#mols
-DOPA  	           1
-DOPA_rad	   1
+PLPC  	           1
+PLPC_rad	   1
