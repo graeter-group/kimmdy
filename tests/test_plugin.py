@@ -1,3 +1,5 @@
+import logging
+
 from kimmdy import plugin_utils
 from kimmdy.parsing import read_top
 from kimmdy.topology.topology import Topology
@@ -142,12 +144,24 @@ def test_bond_distances_from_trajectory_use_minimum_image(tmp_path):
     assert distances[:, 0] == pytest.approx([0.10, 0.12, 0.14], abs=1e-3)
 
 
-def test_bond_distances_from_trajectory_dt(tmp_path):
+def test_bond_distances_from_trajectory_stride(tmp_path):
     gro, xtc = _write_trajectory(tmp_path, _pbc_frames(), ["ALA", "ALA", "SOL", "SOL"])
     u = plugin_utils.load_trajectory_universe(gro, xtc)
-    times, distances = plugin_utils.calculate_bond_distances(u, [("1", "2")], dt=4.0)
+    times, distances = plugin_utils.calculate_bond_distances(u, [("1", "2")], stride=2)
     assert times == pytest.approx([0.0, 4.0])
     assert distances[:, 0] == pytest.approx([0.10, 0.14], abs=1e-3)
+
+
+def test_bond_distances_from_trajectory_logs_frames(tmp_path, caplog, monkeypatch):
+    monkeypatch.setattr(logging.getLogger("kimmdy"), "propagate", True)
+    caplog.set_level(logging.INFO, logger="kimmdy.plugin_utils")
+    gro, xtc = _write_trajectory(tmp_path, _pbc_frames(), ["ALA", "ALA", "SOL", "SOL"])
+    u = plugin_utils.load_trajectory_universe(gro, xtc)
+    plugin_utils.calculate_bond_distances(u, [("1", "2")], stride=2)
+    assert "Analysed 2 of 3 trajectory frames (0 to 4 ps, stride 2)" in caplog.text
+
+    with pytest.raises(ValueError, match="stride must be at least 1"):
+        plugin_utils.calculate_bond_distances(u, [("1", "2")], stride=0)
 
 
 def test_trajectory_with_protein_compressed_group(tmp_path):

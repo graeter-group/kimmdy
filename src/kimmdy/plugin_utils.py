@@ -334,7 +334,7 @@ def atom_nrs_from_selection(u: mda.Universe, selection: str) -> set[str]:
 
 
 def calculate_bond_distances(
-    u: mda.Universe, bonds: list[BondId], dt: float = 0.0
+    u: mda.Universe, bonds: list[BondId], stride: int = 1
 ) -> tuple[np.ndarray, np.ndarray]:
     """Calculate bond distances over a trajectory.
 
@@ -346,8 +346,8 @@ def calculate_bond_distances(
         Universe from `load_trajectory_universe`.
     bonds
         Bonds as tuples of atom numbers.
-    dt
-        Minimum time in ps between used frames. 0 uses every frame.
+    stride
+        Use every stride-th frame. 1 uses every frame.
 
     Returns
     -------
@@ -363,20 +363,27 @@ def calculate_bond_distances(
     idx_i = np.array([nr_to_index[b[0]] for b in bonds], dtype=int)
     idx_j = np.array([nr_to_index[b[1]] for b in bonds], dtype=int)
 
+    if stride < 1:
+        m = f"stride must be at least 1, got {stride}."
+        logger.error(m)
+        raise ValueError(m)
+
     times = []
     distances = []
-    t_last = None
-    for ts in u.trajectory:
+    for ts in u.trajectory[::stride]:
         # truncate to 1 fs to avoid floating point errors
         time = round(float(ts.time), 3)
-        if dt > 0 and t_last is not None and time - t_last < dt - 1e-6:
-            continue
-        t_last = time
         times.append(time)
         # MDAnalysis works in Angstrom, GROMACS in nm
         ds = calc_bonds(ts.positions[idx_i], ts.positions[idx_j], box=ts.dimensions)
         distances.append(ds / 10.0)
 
+    if times:
+        logger.info(
+            f"Analysed {len(times)} of {u.trajectory.n_frames} trajectory frames "
+            f"({times[0]:g} to {times[-1]:g} ps, stride {stride}) "
+            f"for {len(bonds)} bonds."
+        )
     return np.asarray(times), np.asarray(distances).reshape(len(times), len(bonds))
 
 
@@ -384,7 +391,7 @@ def calculate_bondstats_from_trajectory(
     top: Topology,
     u: mda.Universe,
     bonds: list[BondId],
-    dt: float = 0.0,
+    stride: int = 1,
     edissoc_dat: Optional[Path] = None,
 ) -> BondStats:
     """Mean bond distances and forces from a trajectory.
@@ -397,12 +404,12 @@ def calculate_bondstats_from_trajectory(
         Universe from `load_trajectory_universe`.
     bonds
         Bonds as tuples of atom numbers, e.g. from `select_bonds`.
-    dt
-        Minimum time in ps between used frames. 0 uses every frame.
+    stride
+        Use every stride-th frame. 1 uses every frame.
     edissoc_dat
         File with dissociation energies.
     """
-    times, distances = calculate_bond_distances(u=u, bonds=bonds, dt=dt)
+    times, distances = calculate_bond_distances(u=u, bonds=bonds, stride=stride)
     if len(times) == 0:
         m = "No trajectory frames found for calculating bond statistics."
         logger.error(m)
