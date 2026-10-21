@@ -14,7 +14,5 @@ changer:
 reactions:
   homolysis:
     trajectory: "trr"
-    edis: "edissoc.dat"
-    itp: "ffbonded.itp"
 sequence:
   - homolysis
