@@ -483,13 +483,6 @@
               "description": "Keyword argument container for the selected parameterization scheme",
               "additionalProperties": true
             },
-            "improper_neighbors_by_bonding": {
-              "title": "Improper neighbours by bonding",
-              "description": "Find the previous and next residue for residue-template impropers (-C, +N) through the backbone C-N bond instead of by atom number. Without it, a hydrogen that moved into a residue (and keeps its distant atom number) makes the rebuilt impropers point into an unrelated residue. Default: True",
-              "type": "boolean",
-              "pytype": "bool",
-              "default": true
-            },
             "keep_all_improper_periodicities": {
               "title": "Keep all improper periodicities",
               "description": "Keep every periodic term a residue template lists for one atom quadruple (for example the five-term a99SB-disp backbone psi correction) when impropers are rebuilt after a reaction. Without it, only the last listed term is kept. Default: True",

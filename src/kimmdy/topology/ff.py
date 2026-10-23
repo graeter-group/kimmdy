@@ -41,12 +41,10 @@ class FF:
         product_template_sources: tuple[str, ...] = ("rtp",),
         product_template_itp_glob: str = "*.itp",
         product_template_transitions: Optional[dict[str, str]] = None,
-        improper_neighbors_by_bonding: bool = True,
         keep_all_improper_periodicities: bool = True,
         combine_same_periodicity_dihedrals: bool = True,
     ):
         # fixes for residue-template impropers, on by default, see Topology
-        self.improper_neighbors_by_bonding = improper_neighbors_by_bonding
         self.keep_all_improper_periodicities = keep_all_improper_periodicities
         self.combine_same_periodicity_dihedrals = combine_same_periodicity_dihedrals
         self.atomtypes: dict[AtomId, AtomType] = {}

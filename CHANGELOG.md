@@ -90,13 +90,13 @@ original behaviour.
   push from the acceptor oxygen balances the growing push off the donor
   oxygen.
   Files: `src/kimmdy/coordinates.py`, `src/kimmdy/kimmdy-yaml-schema.json`.
-* Neighbour residues of template impropers found through bonds. New key
-  `changer.topology.improper_neighbors_by_bonding` (default true) finds the
-  previous and next residue (-C, +N) through the backbone C-N bond instead of
-  by atom number. A moved H keeps its old, distant atom number, so an H
-  landing on a backbone CA put that residue's backbone impropers onto atoms of
-  another chain. `RunManager._topology_fix_options` reads the topology
-  switches from kimmdy.yml at start and restart.
+* Neighbour residues of template impropers found through bonds. The
+  previous and next residue (-C, +N) are always found through the backbone
+  C-N bond instead of by atom number (no option). A moved H keeps its old,
+  distant atom number, so an H landing on a backbone CA put that residue's
+  backbone impropers onto atoms of another chain.
+  `RunManager._topology_fix_options` reads the topology switches from
+  kimmdy.yml at start and restart.
   Files: `src/kimmdy/topology/topology.py`, `src/kimmdy/topology/ff.py`,
   `src/kimmdy/runmanager.py`, `src/kimmdy/kimmdy-yaml-schema.json`.
 * All periodic terms of a template improper are kept. New key

@@ -538,16 +538,7 @@ class MoleculeType:
 
         # find the previous and next residue (needed for -C and +N)
         residue = get_residue_by_bonding(atom=atom, atoms=self.atoms)
-        if getattr(ff, "improper_neighbors_by_bonding", True):
-            previous_atom, next_atom = self._get_neighbor_residue_atoms(residue)
-        else:
-            # legacy: neighbours are the atoms numbered just outside the
-            # residue, which is wrong once a moved H with a distant number
-            # belongs to the residue
-            lowest_atomnr = min(residue.keys(), key=int)
-            highest_atomnr = max(residue.keys(), key=int)
-            previous_atom = self.atoms.get(str(int(lowest_atomnr) - 1))
-            next_atom = self.atoms.get(str(int(highest_atomnr) + 1))
+        previous_atom, next_atom = self._get_neighbor_residue_atoms(residue)
         if previous_atom is not None:
             previous_residue = get_residue_by_bonding(
                 atom=previous_atom, atoms=self.atoms
@@ -650,6 +641,8 @@ class MoleculeType:
         point into another chain. Returns (atom of previous residue, atom of
         next residue), None where there is none. Residues without atoms named
         N or C (not protein) keep the old atom-number rule.
+
+        ToDo: Generalise the protein recognition, maybe using residuetypes.dat
         """
 
         def across(own: str, other: str) -> Optional[Atom]:
@@ -946,7 +939,6 @@ class Topology:
         product_template_sources: tuple[str, ...] = ("rtp",),
         product_template_itp_glob: str = "*.itp",
         product_template_transitions: Optional[dict[str, str]] = None,
-        improper_neighbors_by_bonding: bool = True,
         keep_all_improper_periodicities: bool = True,
         combine_same_periodicity_dihedrals: bool = True,
         conserve_transferred_h_charge: bool = True,
@@ -954,9 +946,6 @@ class Topology:
     ):
         """Topology fixes, all on by default; set to False for the 16ce888 behaviour:
 
-        improper_neighbors_by_bonding
-            Find the previous/next residue for residue-template impropers
-            (+N, -C) through the backbone C-N bond instead of by atom number.
         keep_all_improper_periodicities
             Keep every periodic term a residue template lists for one atom
             quadruple when impropers are rebuilt after a reaction.
@@ -992,7 +981,6 @@ class Topology:
             product_template_sources=product_template_sources,
             product_template_itp_glob=product_template_itp_glob,
             product_template_transitions=product_template_transitions,
-            improper_neighbors_by_bonding=improper_neighbors_by_bonding,
             keep_all_improper_periodicities=keep_all_improper_periodicities,
             combine_same_periodicity_dihedrals=combine_same_periodicity_dihedrals,
         )

@@ -76,6 +76,13 @@ def hexala_top_fix(assetsdir, filedir) -> Topology:
     return Topology(hexala_top)
 
 
+@pytest.fixture()
+def hexala_radical_top_fix(assetsdir, filedir) -> Topology:
+    """Hexala without HA of residue 2, so CA 9 is a radical (HA charge moved onto CA 9)."""
+    hexala_radical_top = read_top(filedir / "hexala_radical.top")
+    return Topology(hexala_radical_top)
+
+
 @st.composite
 def random_atomlist(draw):
     n = draw(st.integers(min_value=3, max_value=5))
@@ -821,6 +828,49 @@ class TestHexalaTopology:
         res = get_residue_by_bonding(a, top.atoms)
         for a in res.values():
             assert a.residue == "ALA"
+
+    def test_improper_neighbors_after_h_transfer(self, hexala_radical_top_fix):
+        """H atoms that moved between residues keep their distant numbers; -C/+N impropers must still use the bonded neighbours.
+
+        After the two transfers, residue 2 holds H 61 and residue 7 holds H 11.
+        Old rule (atom number +/- 1): the next residue of residue 2 is atom 62
+        (residue 7) and the previous residue of residue 7 is atom 10 (residue 2),
+        so the rebuilt impropers wrongly join C 14 of residue 2 to N 56 of
+        residue 7, e.g. (9, 56, 14, 15). New rule (C-N bonds): N 16 and C 54,
+        so the impropers stay as before the transfers, e.g. (9, 16, 14, 15).
+        """
+        top = deepcopy(hexala_radical_top_fix)
+        mol = top.reactive_molecule
+        assert list(top.radicals) == ["9"]
+
+        # backbone impropers on C 14 (residue 2) and N 56 (residue 7) before any transfer
+        before = {
+            nr: set(mol._get_atom_improper_dihedrals(nr, top.ff)) for nr in ("14", "56")
+        }
+
+        # H 61 (residue 7) moves onto the radical CA 9 (residue 2),
+        # then H 11 (residue 2) moves onto the new radical CB 60 (residue 7)
+        top.break_bond(("60", "61"))
+        top.bind_bond(("9", "61"))
+        top.break_bond(("10", "11"))
+        top.bind_bond(("60", "11"))
+        residue_2 = get_residue_by_bonding(atom=mol.atoms["14"], atoms=mol.atoms)
+        residue_7 = get_residue_by_bonding(atom=mol.atoms["64"], atoms=mol.atoms)
+        assert "61" in residue_2 and "11" in residue_7
+
+        # numbering just outside the residues now points into the wrong residue
+        assert mol.atoms[str(int(max(residue_2, key=int)) + 1)].resnr == "7"
+        assert mol.atoms[str(int(min(residue_7, key=int)) - 1)].resnr == "2"
+
+        # the neighbours are found through the C-N bonds instead
+        previous_atom, next_atom = mol._get_neighbor_residue_atoms(residue_2)
+        assert (previous_atom.nr, next_atom.nr) == ("5", "16")
+        previous_atom, next_atom = mol._get_neighbor_residue_atoms(residue_7)
+        assert (previous_atom.nr, next_atom.nr) == ("54", "66")
+
+        # so the backbone impropers are the same as before the transfers
+        for nr in ("14", "56"):
+            assert set(mol._get_atom_improper_dihedrals(nr, top.ff)) == before[nr]
 
 
 class TestPolymerFF:
