@@ -41,11 +41,9 @@ class FF:
         product_template_sources: tuple[str, ...] = ("rtp",),
         product_template_itp_glob: str = "*.itp",
         product_template_transitions: Optional[dict[str, str]] = None,
-        keep_all_improper_periodicities: bool = True,
         combine_same_periodicity_dihedrals: bool = True,
     ):
         # fixes for residue-template impropers, on by default, see Topology
-        self.keep_all_improper_periodicities = keep_all_improper_periodicities
         self.combine_same_periodicity_dihedrals = combine_same_periodicity_dihedrals
         self.atomtypes: dict[AtomId, AtomType] = {}
         self.bondtypes: dict[BondId, BondType] = {}
@@ -183,7 +181,6 @@ class FF:
                 self.residuetypes[k] = ResidueType.from_section(
                     k,
                     v["subsections"],
-                    keep_all_periodicities=keep_all_improper_periodicities,
                     combine_same_periodicity=combine_same_periodicity_dihedrals,
                 )
 

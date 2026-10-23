@@ -99,8 +99,7 @@ original behaviour.
   kimmdy.yml at start and restart.
   Files: `src/kimmdy/topology/topology.py`, `src/kimmdy/topology/ff.py`,
   `src/kimmdy/runmanager.py`, `src/kimmdy/kimmdy-yaml-schema.json`.
-* All periodic terms of a template improper are kept. New key
-  `changer.topology.keep_all_improper_periodicities` (default true): residue
+* All periodic terms of a template improper are kept (no option): residue
   templates keep a list of terms per atom quadruple, and rebuilds after a
   reaction re-add all of them. Before, only the last listed term survived (for
   example one of the a99SB-disp backbone psi terms).

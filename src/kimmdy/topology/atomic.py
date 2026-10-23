@@ -751,17 +751,16 @@ class ResidueType:
         cls,
         residue,
         d: dict[str, dict[str, list[list[str]]]],
-        keep_all_periodicities: bool = True,
         combine_same_periodicity: bool = True,
     ):
         """Build one residue template from its section of the force field's .rtp file.
 
-        Reads the atoms, bonds, dihedrals and impropers of the residue. With
-        keep_all_periodicities, every improper line for the same four atom
-        names is kept (as a list); otherwise only the last one is, as before.
-        With combine_same_periodicity, two lines with the same atoms and
-        periodicity are merged into one equivalent term (see
-        combine_periodic_terms) instead of the later replacing the earlier.
+        Reads the atoms, bonds, dihedrals and impropers of the residue. Every
+        improper line for the same four atom names is kept (as a list, one
+        entry per periodicity). With combine_same_periodicity, two lines with
+        the same atoms and periodicity are merged into one equivalent term
+        (see combine_periodic_terms) instead of the later replacing the
+        earlier.
         """
         atoms = {}
         bonds = {}
@@ -788,10 +787,6 @@ class ResidueType:
             for l in ls["content"]:
                 improper = ResidueImproperSpec.from_top_line(l)
                 key = (improper.atom1, improper.atom2, improper.atom3, improper.atom4)
-                if not keep_all_periodicities:
-                    # legacy behaviour: the last listed term wins
-                    impropers[key] = [improper]
-                    continue
                 # add a new periodicity to the list, or merge a repeated one
                 specs = impropers.setdefault(key, [])
                 same = next((s for s in specs if s.c2 == improper.c2), None)

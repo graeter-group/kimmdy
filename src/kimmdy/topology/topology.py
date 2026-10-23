@@ -706,17 +706,18 @@ class MoleculeType:
                 if self.pairs.get(pairkey) is None:
                     self.pairs[pairkey] = Pair(pairkey[0], pairkey[1], FFFUNC["pair"])
 
-        # impropers from the residue templates: all their terms, or only the
-        # last one when keep_all_improper_periodicities is off
+        # impropers from the residue templates, with all their periodic terms
+        # TODO: terminal residues are rebuilt from the plain residue template.
+        # pdb2gmx applies its terminus rules (.n.tdb/.c.tdb) and, for example,
+        # writes no a99SB-disp psi correction (N CA C +N) for the N-terminal
+        # residue, so a rebuild there adds a psi term pdb2gmx does not have.
         for atom in self.atoms.values():
             impropers = self._get_atom_improper_dihedrals(atom.nr, ff)
-            keep_all = getattr(ff, "keep_all_improper_periodicities", True)
             for key, specs in impropers.items():
                 dihedrals = {}
-                for improper in specs if keep_all else specs[-1:]:
+                for improper in specs:
                     periodicity = "" if improper.c2 is None else improper.c2
-                    # legacy behaviour stored the single term under key ""
-                    dihedrals[periodicity if keep_all else ""] = Dihedral(
+                    dihedrals[periodicity] = Dihedral(
                         *key,
                         FFFUNC["mult_improper_dihedral"],
                         c0=improper.c0,
@@ -939,16 +940,12 @@ class Topology:
         product_template_sources: tuple[str, ...] = ("rtp",),
         product_template_itp_glob: str = "*.itp",
         product_template_transitions: Optional[dict[str, str]] = None,
-        keep_all_improper_periodicities: bool = True,
         combine_same_periodicity_dihedrals: bool = True,
         conserve_transferred_h_charge: bool = True,
         handle_duplicate_topology_lines: bool = True,
     ):
         """Topology fixes, all on by default; set to False for the 16ce888 behaviour:
 
-        keep_all_improper_periodicities
-            Keep every periodic term a residue template lists for one atom
-            quadruple when impropers are rebuilt after a reaction.
         combine_same_periodicity_dihedrals
             Merge funct-4 terms with the same atoms and periodicity into one
             equivalent term (forces unchanged, energy shifted by a constant)
@@ -981,7 +978,6 @@ class Topology:
             product_template_sources=product_template_sources,
             product_template_itp_glob=product_template_itp_glob,
             product_template_transitions=product_template_transitions,
-            keep_all_improper_periodicities=keep_all_improper_periodicities,
             combine_same_periodicity_dihedrals=combine_same_periodicity_dihedrals,
         )
         self.pending_product_template_matches: dict[

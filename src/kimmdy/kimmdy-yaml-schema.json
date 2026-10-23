@@ -483,13 +483,6 @@
               "description": "Keyword argument container for the selected parameterization scheme",
               "additionalProperties": true
             },
-            "keep_all_improper_periodicities": {
-              "title": "Keep all improper periodicities",
-              "description": "Keep every periodic term a residue template lists for one atom quadruple (for example the five-term a99SB-disp backbone psi correction) when impropers are rebuilt after a reaction. Without it, only the last listed term is kept. Default: True",
-              "type": "boolean",
-              "pytype": "bool",
-              "default": true
-            },
             "combine_same_periodicity_dihedrals": {
               "title": "Combine same-periodicity dihedrals",
               "description": "Merge funct-4 terms that share atoms and periodicity (a99SB-disp lists two periodicity-1 terms on every backbone psi) into one equivalent term, in topologies and residue templates. Forces are unchanged and the energy shifts by a constant. Without it, only the last such term is kept. Default: True",

@@ -77,6 +77,40 @@ def hexala_top_fix(assetsdir, filedir) -> Topology:
 
 
 @pytest.fixture()
+def r10_a99sbdisp_top_fix(filedir) -> Topology:
+    """A pdb2gmx topology of one SSGP-[GRGDSPYS]10-GY chain (86 residues) with the a99SB-disp force field."""
+    top = read_top(filedir / "R10_a99SBdisp.top", ffdir=filedir / "a99SBdisp.ff")
+    return Topology(top)
+
+
+def rtp_psi_terms(rtp: Path, residue: str) -> dict[str, tuple[float, float]]:
+    """Read the N CA C +N lines of one residue straight from an .rtp file, merged per periodicity.
+
+    Returns {periodicity: (phase, force constant)}; two lines with the same
+    periodicity are added up with combine_periodic_terms, as KIMMDY does.
+    """
+    lines, inside = [], False
+    for line in rtp.read_text().splitlines():
+        stripped = line.split(";")[0].strip()
+        if stripped.startswith("[") and not stripped.startswith("[ "):
+            stripped = "[ " + stripped[1:]
+        if stripped.startswith("[ ") and stripped.strip("[] ") not in (
+            "atoms", "bonds", "impropers", "dihedrals", "cmap"
+        ):
+            inside = stripped.strip("[] ") == residue
+            continue
+        parts = stripped.split()
+        if inside and parts[:4] == ["N", "CA", "C", "+N"] and len(parts) >= 7:
+            lines.append(parts[4:7])
+    terms = {}
+    for phase, k, n in lines:
+        if n in terms:
+            phase, k = combine_periodic_terms([terms[n], (phase, k)])
+        terms[n] = (phase, k)
+    return {n: (float(phase), float(k)) for n, (phase, k) in terms.items()}
+
+
+@pytest.fixture()
 def hexala_radical_top_fix(assetsdir, filedir) -> Topology:
     """Hexala without HA of residue 2, so CA 9 is a radical (HA charge moved onto CA 9)."""
     hexala_radical_top = read_top(filedir / "hexala_radical.top")
@@ -871,6 +905,46 @@ class TestHexalaTopology:
         # so the backbone impropers are the same as before the transfers
         for nr in ("14", "56"):
             assert set(mol._get_atom_improper_dihedrals(nr, top.ff)) == before[nr]
+
+
+class TestA99SBdispPsi:
+    def test_rebuilt_impropers_keep_all_periodicities(self, r10_a99sbdisp_top_fix, filedir):
+        """Rebuilding impropers from the .rtp keeps every periodic term of the a99SB-disp psi correction.
+
+        a99SB-disp lists N CA C +N with periodicities 1, 1, 2, 3, 4, 5 under
+        [ impropers ]. Before, only the last line (n = 5) survived a rebuild;
+        now all are kept (the two n = 1 lines merged), so the rebuilt psi terms
+        equal those pdb2gmx wrote and those in the .rtp. The N-terminal residue
+        is not compared: pdb2gmx's terminus rules leave out its psi term.
+        """
+        top = deepcopy(r10_a99sbdisp_top_fix)
+        mol = top.reactive_molecule
+
+        def psi_terms() -> dict:
+            """All N CA C +N impropers of the chain as {atoms: {periodicity: (phase, k)}}."""
+            return {
+                key: {n: (float(d.c0), float(d.c1)) for n, d in terms.dihedrals.items()}
+                for key, terms in mol.improper_dihedrals.items()
+                if [mol.atoms[nr].atom for nr in key] == ["N", "CA", "C", "N"]
+                and mol.atoms[key[0]].resnr != "1"
+            }
+
+        # psi terms as pdb2gmx wrote them, then rebuilt from the residue templates
+        from_file = psi_terms()
+        top._regenerate_topology_from_bound_to()
+        rebuilt = psi_terms()
+
+        # psi corrections: R, D, S, Y, S in each of the 10 blocks plus S 2;
+        # GLY and PRO have none, the C-terminal TYR has no next N
+        assert len(from_file) == 51
+        assert rebuilt.keys() == from_file.keys()
+        rtp = filedir / "a99SBdisp.ff" / "aminoacids.rtp"
+        for key, terms in rebuilt.items():
+            assert sorted(terms) == ["1", "2", "3", "4", "5"]
+            expected = rtp_psi_terms(rtp, mol.atoms[key[0]].residue)
+            for n, (phase, k) in terms.items():
+                assert (phase, k) == pytest.approx(from_file[key][n], abs=1e-4)
+                assert (phase, k) == pytest.approx(expected[n], abs=1e-4)
 
 
 class TestPolymerFF:
