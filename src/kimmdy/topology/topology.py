@@ -226,67 +226,60 @@ class MoleculeType:
         Each dihedral is stored under its four atoms, with one term per
         periodicity. If a line repeats atoms and periodicity of an earlier
         line, the two terms are merged into one equivalent term where that is
-        exact (see combine_periodic_terms); any other repeat stops with an
-        error (see _reject_duplicate_line), because GROMACS would use both
-        lines but only one can be stored.
+        exact (see _may_combine and combine_periodic_terms); any other repeat
+        stops with an error (see _reject_duplicate_line), because GROMACS
+        would use both lines but only one can be stored.
         """
         ls = self.atomics.get("dihedrals")
         if ls is None:
             return
+        merged = 0
         for l in ls:
             dihedral = Dihedral.from_top_line(l)
             key = (dihedral.ai, dihedral.aj, dihedral.ak, dihedral.al)
-            # periodic improper dihedrals (function 4)
-            if dihedral.funct == FFFUNC["mult_improper_dihedral"]:
-                if self.improper_dihedrals.get(key) is None:
-                    self.improper_dihedrals[key] = MultipleDihedrals(
-                        *key, dihedral.funct, dihedrals={}
+            # periodic impropers (function 4) and everything else (propers) are kept apart
+            is_improper = dihedral.funct == FFFUNC["mult_improper_dihedral"]
+            kind = "improper" if is_improper else "proper"
+            store = self.improper_dihedrals if is_improper else self.proper_dihedrals
+            if key not in store:
+                store[key] = MultipleDihedrals(*key, dihedral.funct, dihedrals={})
+            terms = store[key].dihedrals
+
+            existing = terms.get(dihedral.periodicity)
+            if existing is not None:
+                if self._may_combine(existing, dihedral, is_improper):
+                    # same atoms and periodicity listed twice: GROMACS adds both,
+                    # so store one equivalent term instead of only the later one
+                    old_terms = [(existing.c0, existing.c1), (dihedral.c0, dihedral.c1)]
+                    dihedral.c0, dihedral.c1 = combine_periodic_terms(old_terms)
+                    inputs = " + ".join(f"(phase {p}, k {k})" for p, k in old_terms)
+                    logger.debug(
+                        f"Molecule {self.name}: merged repeated {kind} dihedral {' '.join(key)} "
+                        f"(funct {dihedral.funct}, periodicity {dihedral.periodicity}): "
+                        f"{inputs} -> phase {dihedral.c0}, k {dihedral.c1} "
+                        "(same forces, energy shifted by a constant)"
                     )
-                existing = self.improper_dihedrals[key].dihedrals.get(
-                    dihedral.periodicity
-                )
-                if (
-                    self.combine_same_periodicity
-                    and existing is not None
-                    and None not in (existing.c0, existing.c1, dihedral.c0, dihedral.c1)
-                ):
-                    # same atoms and periodicity listed twice (a99SB-disp psi):
-                    # keep both contributions instead of the later one only
-                    dihedral.c0, dihedral.c1 = combine_periodic_terms(
-                        [(existing.c0, existing.c1), (dihedral.c0, dihedral.c1)]
-                    )
-                elif existing is not None:
-                    self._reject_duplicate_line(
-                        "dihedrals (improper)", key, dihedral.periodicity
-                    )
-                self.improper_dihedrals[key].dihedrals[dihedral.periodicity] = dihedral
-            # all other dihedrals (proper dihedrals, function 1 or 9)
-            else:
-                if self.proper_dihedrals.get(key) is None:
-                    self.proper_dihedrals[key] = MultipleDihedrals(
-                        *key, dihedral.funct, dihedrals={}
-                    )
-                existing = self.proper_dihedrals[key].dihedrals.get(
-                    dihedral.periodicity
-                )
-                if existing is not None:
-                    if (
-                        self.handle_duplicate_lines
-                        and dihedral.funct in ("1", "9")
-                        and existing.funct == dihedral.funct
-                        and None not in (existing.c0, existing.c1, dihedral.c0, dihedral.c1)
-                    ):
-                        # same atoms and periodicity listed twice with numbers:
-                        # GROMACS adds both terms, so merge them into one
-                        # equivalent term instead of keeping the later one only
-                        dihedral.c0, dihedral.c1 = combine_periodic_terms(
-                            [(existing.c0, existing.c1), (dihedral.c0, dihedral.c1)]
-                        )
-                    else:
-                        self._reject_duplicate_line(
-                            "dihedrals (proper)", key, dihedral.periodicity
-                        )
-                self.proper_dihedrals[key].dihedrals[dihedral.periodicity] = dihedral
+                    merged += 1
+                else:
+                    self._reject_duplicate_line(f"dihedrals ({kind})", key, dihedral.periodicity)
+            terms[dihedral.periodicity] = dihedral
+
+        # one summary line per molecule; the single merges are logged at debug level
+        if merged:
+            logger.info(
+                f"Molecule {self.name}: merged {merged} repeated dihedral term(s) "
+                "with the same atoms and periodicity (same forces, energy shifted by a constant)"
+            )
+
+    def _may_combine(self, existing: Dihedral, new: Dihedral, is_improper: bool) -> bool:
+        """Tell whether two dihedral lines with the same atoms and periodicity can be merged exactly."""
+        if None in (existing.c0, existing.c1, new.c0, new.c1):
+            return False  # without numbers there is nothing to add up
+        if existing.funct != new.funct:
+            return False
+        if is_improper:
+            return self.combine_same_periodicity
+        return self.handle_duplicate_lines and new.funct in ("1", "9")
 
     def _reject_duplicate_line(self, section: str, key: tuple, periodicity: str = ""):
         """Stop with an error when a topology line repeats an earlier one that cannot be merged.
