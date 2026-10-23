@@ -334,18 +334,6 @@ class RunManager:
         ):
             next(self)
 
-        # run finished: delete the remaining reaction-input trajectories
-        if self.state is State.DONE and self._reaction_trajectory_cleanup_enabled():
-            try:
-                for reaction_md_dir in self._reaction_input_md_dirs():
-                    self._delete_trajectory(
-                        reaction_md_dir,
-                        reason="the run finished (state DONE); no restart will re-read this trajectory",
-                        verified_by="RunManager.state == DONE",
-                    )
-            except Exception:
-                logger.exception("Final reaction-trajectory cleanup failed")
-
         write_time_marker(self.config.out / MARK_FINISHED, "finished")
         logger.info(
             f"Finished running last task, state: {self.state} after "
@@ -936,24 +924,15 @@ class RunManager:
         # after every task: delete trajectories no restart can need any more;
         # a failure here is logged but never stops the run
         try:
-            self._delete_reaction_trajectories(task)
+            self._delete_xtc_before_reactions(task)
         except Exception:
             logger.exception(
                 "Reaction-trajectory cleanup failed; continuing without aborting KIMMDY"
             )
 
     def _reaction_trajectory_cleanup_enabled(self) -> bool:
-        """Tell whether any reaction in kimmdy.yml asks for its input trajectories to be deleted.
-
-        True if at least one reaction sets delete_sample_xtc_after_relax: true.
-        """
-        reactions = getattr(self.config, "reactions", None)
-        if reactions is None:
-            return False
-        return any(
-            bool(getattr(getattr(reactions, name), "delete_sample_xtc_after_relax", False))
-            for name in reactions.get_attributes()
-        )
+        """Tell whether kimmdy.yml asks for reaction-input trajectories to be deleted (delete_xtc_before_reactions)."""
+        return self.config.delete_xtc_before_reactions
 
     def _regular_md_instances(self) -> set[str]:
         """Return the names of the normal MD steps (all MD steps except the relax).
@@ -1006,6 +985,8 @@ class RunManager:
         if not xtc.is_file():
             return
         deleted_bytes = xtc.stat().st_size
+        # log the intention first, so the log shows it even if deleting fails
+        logger.info(f"Deleting {xtc} ({deleted_bytes} bytes): {reason}")
         xtc.unlink()
 
         # delete MDAnalysis's index files for it
@@ -1030,14 +1011,14 @@ class RunManager:
             f"Deleted {xtc} ({deleted_bytes / 1024**3:.3f} GiB): {reason}"
         )
 
-    def _delete_reaction_trajectories(self, task: Task) -> None:
+    def _delete_xtc_before_reactions(self, task: Task) -> None:
         """After a normal MD step finishes, delete the older trajectories no restart can need.
 
-        Only when a reaction sets delete_sample_xtc_after_relax. KIMMDY
-        restarts from normal MD steps only, never from a relax, so once a
-        normal MD step has finished, a restart begins there or later and
-        never reads an earlier reaction-input trajectory again. The last
-        ones are deleted when the run finishes (see run).
+        Only with delete_xtc_before_reactions. KIMMDY restarts from normal
+        MD steps only, never from a relax, so once a normal MD step has
+        finished, a restart begins there or later and never reads an earlier
+        reaction-input trajectory again. Trajectories without a later
+        completed normal MD step are kept, also when the run finishes.
         """
         # only after a finished normal MD step, and only when switched on
         if task.name != "run_md" or not self._reaction_trajectory_cleanup_enabled():

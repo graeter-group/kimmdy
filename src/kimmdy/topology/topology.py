@@ -249,6 +249,8 @@ class MoleculeType:
                     # so store one equivalent term instead of only the later one
                     old_terms = [(existing.c0, existing.c1), (dihedral.c0, dihedral.c1)]
                     dihedral.c0, dihedral.c1 = combine_periodic_terms(old_terms)
+                    # written at the end of the line, so the file shows why one line is missing
+                    dihedral.comment = "; merged from 2 lines with the same atoms and periodicity"
                     inputs = " + ".join(f"(phase {p}, k {k})" for p, k in old_terms)
                     logger.debug(
                         f"Molecule {self.name}: merged repeated {kind} dihedral {' '.join(key)} "

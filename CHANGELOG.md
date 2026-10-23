@@ -21,13 +21,15 @@ original behaviour.
   before.
   Files: `src/kimmdy/utils.py`, `src/kimmdy/runmanager.py`,
   `src/kimmdy/kimmdy-yaml-schema.json`.
-* Restart-safe deletion of reaction-input trajectories. When a reaction sets
-  `delete_sample_xtc_after_relax: true` (default false), the .xtc a reaction
-  read is deleted once a later regular MD task has finished, and the remaining
-  ones when the run is done. KIMMDY restarts only from regular MD tasks, so no
-  restart can need a deleted file. Each deletion writes
-  `<instance>_xtc_cleanup.json` next to the removed file.
-  Files: `src/kimmdy/runmanager.py`.
+* Restart-safe deletion of reaction-input trajectories. New top-level key
+  `delete_xtc_before_reactions` (default false): the .xtc of the MD task right
+  before each reaction (the one the reaction read) is deleted once a later
+  regular MD task has finished. KIMMDY restarts only from regular MD tasks,
+  so no restart can need a deleted file; trajectories without a later
+  completed regular MD task are kept, also at the end of the run. Each
+  deletion is logged first and writes `<instance>_xtc_cleanup.json` next to
+  the removed file.
+  Files: `src/kimmdy/runmanager.py`, `src/kimmdy/kimmdy-yaml-schema.json`.
 * Optional parallel dihedral merging for slow-growth topologies. New keys
   under `changer.coordinates`: `parallel_dihedral_merge` (default false) and
   `parallel_dihedral_workers` (default 1). Dihedrals are merged in fork helper

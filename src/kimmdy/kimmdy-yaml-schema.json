@@ -140,6 +140,13 @@
       "pytype": "int",
       "default": 0
     },
+    "delete_xtc_before_reactions": {
+      "title": "delete_xtc_before_reactions",
+      "description": "Delete the trajectory (.xtc) of the MD task right before each reaction (the one the reaction read, e.g. sample) once a later regular MD task has finished, to save disk space. KIMMDY restarts only from regular MD tasks, so a restart never needs a deleted file; the newest reaction-input trajectory is always kept. Each deletion is logged first and noted in <instance>_xtc_cleanup.json next to the removed file. Default: false",
+      "type": "boolean",
+      "pytype": "bool",
+      "default": false
+    },
     "kmc_seed": {
       "title": "kmc_seed",
       "description": "Seed for the KMC random number generator. Each decide task draws from its own stream built from (kmc_seed, task number), so cycles get different random numbers while a run, and a restart that redoes a task, stays reproducible. If unset, an unseeded generator is used and the picked recipe differs between runs.",
