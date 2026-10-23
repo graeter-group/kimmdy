@@ -352,7 +352,9 @@ class MoleculeTypeMerger:
         # transferred H is written with explicit parameters by then, so the new
         # type needs no <type>-H1 entry in the force field
         self._retype_transferred_hydrogens()
-        self._add_harmonic_acceptor_h_terms()
+        # optional spring pulling the moving H onto its new atom
+        if self.harmonic_acceptor_h_relax_term:
+            self._add_harmonic_acceptor_h_terms()
 
         logger.info(f"Finished merging topologies")
 
@@ -821,11 +823,15 @@ class MoleculeTypeMerger:
         harmonic_acceptor_h_relax_k at the end, so it pulls the H onto its new
         atom while the old bond fades. It is written as bond type 6, a plain
         spring that does not switch off any other forces between the atoms.
-        Does nothing when the option is off.
-        """
-        if not self.harmonic_acceptor_h_relax_term:
-            return
+        Only called when harmonic_acceptor_h_relax_term is on.
 
+        The spring is a second [ bonds ] line for the same atom pair as the new
+        (Morse) bond. KIMMDY stores one bond per atom pair, so a topology
+        written with this spring cannot be read back into KIMMDY without
+        losing one of the two lines: with handle_duplicate_topology_lines on,
+        reading it stops with an error; with it off, only the last line is
+        kept. The relax topology is only meant for GROMACS, not to be re-read.
+        """
         # atoms that lost a bond in this reaction (the moving H is one of them)
         broken_atoms = {nr for key in self.affected_interactions.bonds.removed for nr in key}
 
@@ -842,7 +848,8 @@ class MoleculeTypeMerger:
             if len(moving_h) != 1:
                 continue
             # third key element keeps the helper next to the Morse bond of the
-            # same atom pair; only the values are written to the topology
+            # same atom pair; only the values are written to the topology, so
+            # the written file has two bond lines for this pair (see docstring)
             self.mol_a.bonds[(*bond_key, "harmonic_acceptor_h")] = Bond(
                 *bond_key,
                 funct="6",
@@ -850,7 +857,10 @@ class MoleculeTypeMerger:
                 c1=f"{0.0:.5f}",  # strength at the start: zero
                 c2=f"{float(b0):.5f}",  # length at the end (same)
                 c3=f"{self.harmonic_acceptor_h_relax_k:.5f}",  # strength at the end
-                comment="; harmonic acceptor-H helper growing with lambda (relax only)",
+                comment=(
+                    "; harmonic acceptor-H helper growing with lambda (relax only);"
+                    " second line for this atom pair, KIMMDY cannot re-read it"
+                ),
             )
             added += 1
         logger.info("Added %d harmonic acceptor-H relax helper bond(s)", added)
