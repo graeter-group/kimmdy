@@ -35,8 +35,10 @@ original behaviour.
   `parallel_dihedral_workers` (default 1). Dihedrals are merged in fork helper
   processes and written back in sorted atom order; the log says "Merging
   dihedrals in parallel with N workers". On a 283k-atom system `apply_recipe`
-  went from 8,526 s to 617 s. The parameters are the same; the dihedral lines
-  are written in a different order.
+  went from 8,526 s to 617 s. The one-CPU merge now goes through the
+  dihedrals in the same order (sorted by atom numbers, periodicities as
+  numbers), so both write identical topologies and every run gives the same
+  line order; before, the one-CPU order changed from run to run.
   Files: `src/kimmdy/coordinates.py`, `src/kimmdy/runmanager.py`,
   `src/kimmdy/kimmdy-yaml-schema.json`.
 * Optional spring on the moving H during the relax. New keys

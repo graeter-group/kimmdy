@@ -1,4 +1,5 @@
 import copy
+import multiprocessing as mp
 import logging
 import numpy as np
 from math import sqrt
@@ -569,3 +570,74 @@ def test_merge_small_hat_harmonic_acceptor_h_term(arranged_tmp_path):
             plain["moleculetype_Reactive"]["subsections"][section]
             == helped["moleculetype_Reactive"]["subsections"][section]
         )
+
+
+def _hat_states(case: str) -> tuple[Topology, Topology]:
+    """Return the topologies before (A) and after (B) one HAT reaction of the test files.
+
+    small: H 8 moves from atom 7 to atom 9 in AlaCaR_out.top.
+    large: H 27 moves from N 26 to C 19 (topol_stateA.top -> topol_stateB.top).
+    """
+    if case == "small":
+        top_b = Topology(read_top(Path("AlaCaR_out.top")))
+        top_a = copy.deepcopy(top_b)
+        top_b.break_bond(("7", "8"))
+        top_b.bind_bond(("8", "9"))
+        return top_a, top_b
+    return Topology(read_top(Path("topol_stateA.top"))), Topology(read_top(Path("topol_stateB.top")))
+
+
+@pytest.mark.skipif(
+    "fork" not in mp.get_all_start_methods(),
+    reason="parallel dihedral merging needs fork helper processes",
+)
+@pytest.mark.parametrize("case", ["small", "large"])
+def test_parallel_dihedral_merge_matches_serial(arranged_tmp_path, case):
+    """Merging the dihedrals on 4 helper processes gives the same relax topology as on one CPU.
+
+    Compares the affected interactions (which steer the later pair handling),
+    every merged proper and improper dihedral with all its values, the pairs
+    and exclusions, and the written [ dihedrals ] lines including their order
+    (both merges go through the dihedrals sorted by atom numbers).
+    """
+
+    def merged(parallel: bool):
+        """Merge the reaction once, serially or in parallel; return the merger and the written dihedral lines."""
+        top_a, top_b = _hat_states(case)
+        merger = MoleculeTypeMerger(
+            top_a.moleculetypes[REACTIVE_MOLECULEYPE],
+            top_b.moleculetypes[REACTIVE_MOLECULEYPE],
+            ff=top_a.ff,
+            parallel_dihedral_merge=parallel,
+            parallel_dihedral_workers=4,
+        )
+        merger.merge()
+
+        # the written relax topology, from a second identical merge
+        top_a, top_b = _hat_states(case)
+        merge_top_slow_growth(
+            top_a=top_a,
+            top_b=top_b,
+            parallel_dihedral_merge=parallel,
+            parallel_dihedral_workers=4,
+        )
+        lines = top_a.to_dict()["moleculetype_Reactive"]["subsections"]["dihedrals"]["content"]
+        return merger, [tuple(line) for line in lines]
+
+    serial, serial_lines = merged(parallel=False)
+    parallel, parallel_lines = merged(parallel=True)
+
+    # the interactions the reaction touched
+    assert parallel.affected_interactions == serial.affected_interactions
+    assert serial.affected_interactions.dihedrals.added or serial.affected_interactions.dihedrals.removed
+
+    # every merged dihedral with all its periodicities and values
+    assert parallel.mol_a.proper_dihedrals == serial.mol_a.proper_dihedrals
+    assert parallel.mol_a.improper_dihedrals == serial.mol_a.improper_dihedrals
+
+    # pairs and exclusions, which follow from the affected interactions
+    assert parallel.mol_a.pairs == serial.mol_a.pairs
+    assert parallel.mol_a.exclusions == serial.mol_a.exclusions
+
+    # the same written lines, in the same order
+    assert parallel_lines == serial_lines

@@ -180,6 +180,16 @@ class AffectedInteractions:
 _PARALLEL_DIHEDRAL_MERGER = None
 
 
+def _dihedral_order(key: tuple[str, ...]) -> tuple[int, ...]:
+    """Sort key for dihedrals: by their atom numbers, so serial and parallel merges write the same order."""
+    return tuple(int(atom) for atom in key)
+
+
+def _periodicity_order(value: str) -> int:
+    """Sort key for the periodic terms of one dihedral: by periodicity (a missing periodicity first)."""
+    return int(value) if value else -1
+
+
 def _merge_dihedral_worker(payload):
     """Work out the relax parameters of one dihedral (runs in a helper process).
 
@@ -236,9 +246,7 @@ def _merge_dihedral_worker(payload):
         ),
         dihedrals={},
     )
-    for periodicity in sorted(
-        keys_a | keys_b, key=lambda value: int(value) if value else -1
-    ):
+    for periodicity in sorted(keys_a | keys_b, key=_periodicity_order):
         interaction_a = dihedral_a.dihedrals.get(periodicity) if dihedral_a else None
         interaction_b = dihedral_b.dihedrals.get(periodicity) if dihedral_b else None
         merged.dihedrals[periodicity] = merger._interpolate_two_dihedrals(
@@ -1309,8 +1317,12 @@ class MoleculeTypeMerger:
         # proper dihedrals
         # proper dihedrals have a nested structure and need a different treatment from bonds, angles and improper dihedrals
         logger.info("Merging dihedrals")
-        keys = set(self.mol_a.proper_dihedrals.keys()) | set(
-            self.mol_b.proper_dihedrals.keys()
+        # fixed order (by atom numbers), the same as in the parallel merge, so
+        # every run writes the dihedrals in the same order
+        keys = sorted(
+            set(self.mol_a.proper_dihedrals.keys())
+            | set(self.mol_b.proper_dihedrals.keys()),
+            key=_dihedral_order,
         )
         for key in keys:
             multiple_dihedralsA = self._get_explicit_MultipleDihedrals(
@@ -1363,7 +1375,7 @@ class MoleculeTypeMerger:
                 *key, funct=FFFUNC["mult_proper_dihedral"], dihedrals={}
             )
 
-            periodicity_keys = keysA | keysB
+            periodicity_keys = sorted(keysA | keysB, key=_periodicity_order)
             for periodicity_key in periodicity_keys:
                 interactionA = (
                     multiple_dihedralsA.dihedrals.get(periodicity_key)
@@ -1384,9 +1396,11 @@ class MoleculeTypeMerger:
                     )
                 )
 
-        # improper dihedrals
-        keys = set(self.mol_a.improper_dihedrals.keys()) | set(
-            self.mol_b.improper_dihedrals.keys()
+        # improper dihedrals, in the same fixed order
+        keys = sorted(
+            set(self.mol_a.improper_dihedrals.keys())
+            | set(self.mol_b.improper_dihedrals.keys()),
+            key=_dihedral_order,
         )
         for key in keys:
             multiple_dihedralsA = self._get_explicit_MultipleDihedrals(
@@ -1410,7 +1424,7 @@ class MoleculeTypeMerger:
                 *key, funct=FFFUNC["mult_improper_dihedral"], dihedrals={}
             )
 
-            periodicity_keys = keysA | keysB
+            periodicity_keys = sorted(keysA | keysB, key=_periodicity_order)
             for periodicity_key in periodicity_keys:
                 assert isinstance(periodicity_key, str)
                 interactionA = (
@@ -1450,11 +1464,11 @@ class MoleculeTypeMerger:
         # list all dihedrals, sorted by atom number so the order never changes
         proper_keys = sorted(
             set(self.mol_a.proper_dihedrals) | set(self.mol_b.proper_dihedrals),
-            key=lambda key: tuple(int(atom) for atom in key),
+            key=_dihedral_order,
         )
         improper_keys = sorted(
             set(self.mol_a.improper_dihedrals) | set(self.mol_b.improper_dihedrals),
-            key=lambda key: tuple(int(atom) for atom in key),
+            key=_dihedral_order,
         )
         payload = [(key, False) for key in proper_keys] + [
             (key, True) for key in improper_keys
