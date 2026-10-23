@@ -4,7 +4,6 @@ from dataclasses import dataclass, field
 from enum import Enum
 import logging
 import multiprocessing as mp  # to start helper processes
-import os  # to read the number of helpers from the environment
 from concurrent.futures import ProcessPoolExecutor  # runs the work on several helpers at once
 from copy import deepcopy
 from pathlib import Path
@@ -265,7 +264,7 @@ class MoleculeTypeMerger:
         morse_only: bool = False,
         retype_transferred_h: bool = True,
         parallel_dihedral_merge: bool = False,
-        parallel_dihedral_workers: int | None = None,
+        parallel_dihedral_workers: int = 1,
         harmonic_acceptor_h_relax_term: bool = False,
         harmonic_acceptor_h_relax_k: float = 50000.0,
     ) -> None:
@@ -279,15 +278,7 @@ class MoleculeTypeMerger:
         # created bond key -> its state-B equilibrium length, filled by merge_bonds
         self._created_bond_lengths: dict[tuple[str, str], str] = {}
         self.parallel_dihedral_merge = bool(parallel_dihedral_merge)
-        if parallel_dihedral_workers is None:  # no number in kimmdy.yml: take it from the environment
-            try:
-                parallel_dihedral_workers = int(
-                    os.environ.get("KIMMDY_DIHEDRAL_WORKERS", "1")
-                )
-            except ValueError:
-                logger.warning("Ignoring invalid KIMMDY_DIHEDRAL_WORKERS; using one worker")
-                parallel_dihedral_workers = 1
-        self.parallel_dihedral_workers = max(1, int(parallel_dihedral_workers))  # at least one helper
+        self.parallel_dihedral_workers = parallel_dihedral_workers
         self.transferred_h_type = self._find_lj_hydrogen_type()
         self.default_morse_well_depth = 300  # [kJ mol^-1]
         self.default_beta_for_lj = 19  # matches LJ steepness
@@ -1811,7 +1802,7 @@ def merge_top_slow_growth(
     morse_only: bool = False,
     retype_transferred_h: bool = True,
     parallel_dihedral_merge: bool = False,
-    parallel_dihedral_workers: int | None = None,
+    parallel_dihedral_workers: int = 1,
     harmonic_acceptor_h_relax_term: bool = False,
     harmonic_acceptor_h_relax_k: float = 50000.0,
 ):

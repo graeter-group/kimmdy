@@ -1464,6 +1464,23 @@ class RunManager:
         logger.info("Done with Decide recipe.")
         return files
 
+    def _slow_growth_options(self) -> dict:
+        """Collect the relax options for merge_top_slow_growth from kimmdy.yml.
+
+        Unset options already hold their schema defaults, so they are read directly.
+        """
+        coordinates = self.config.changer.coordinates
+        return {
+            # the moving H's size grows in during the relax
+            "retype_transferred_h": coordinates.retype_transferred_h,
+            # merge the relax dihedrals on several CPUs
+            "parallel_dihedral_merge": coordinates.parallel_dihedral_merge,
+            "parallel_dihedral_workers": coordinates.parallel_dihedral_workers,
+            # optional spring pulling the moving H onto its acceptor
+            "harmonic_acceptor_h_relax_term": coordinates.harmonic_acceptor_h_relax_term,
+            "harmonic_acceptor_h_relax_k": coordinates.harmonic_acceptor_h_relax_k,
+        }
+
     def _apply_recipe(self, files: TaskFiles) -> TaskFiles:
         logger = files.logger
 
@@ -1684,34 +1701,7 @@ class RunManager:
                         top_b=self.top,
                         morse_only=self.config.changer.coordinates.slow_growth
                         == "morse_only",
-                        # relax-only fixes for the moving H: its size grows in
-                        # during the relax, and an optional spring pulls it in
-                        retype_transferred_h=getattr(
-                            self.config.changer.coordinates,
-                            "retype_transferred_h",
-                            True,
-                        ),
-                        # parallel dihedral merge: read the two settings from kimmdy.yml
-                        parallel_dihedral_merge=getattr(
-                            self.config.changer.coordinates,
-                            "parallel_dihedral_merge",
-                            False,
-                        ),
-                        parallel_dihedral_workers=getattr(
-                            self.config.changer.coordinates,
-                            "parallel_dihedral_workers",
-                            None,
-                        ),
-                        harmonic_acceptor_h_relax_term=getattr(
-                            self.config.changer.coordinates,
-                            "harmonic_acceptor_h_relax_term",
-                            False,
-                        ),
-                        harmonic_acceptor_h_relax_k=getattr(
-                            self.config.changer.coordinates,
-                            "harmonic_acceptor_h_relax_k",
-                            50000.0,
-                        ),
+                        **self._slow_growth_options(),
                     )
                     top_merge_path = files.outputdir / self.config.top.name.replace(
                         ".top", "_relax.top"
