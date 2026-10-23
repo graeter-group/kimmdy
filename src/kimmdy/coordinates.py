@@ -828,9 +828,10 @@ class MoleculeTypeMerger:
         The spring is a second [ bonds ] line for the same atom pair as the new
         (Morse) bond. KIMMDY stores one bond per atom pair, so a topology
         written with this spring cannot be read back into KIMMDY without
-        losing one of the two lines: with handle_duplicate_topology_lines on,
-        reading it stops with an error; with it off, only the last line is
-        kept. The relax topology is only meant for GROMACS, not to be re-read.
+        losing one of the two lines: with repeated_topology_lines merge or
+        error, reading it stops with an error; with last, only the last line
+        is kept. The relax topology is only meant for GROMACS, not to be
+        re-read.
         """
         # atoms that lost a bond in this reaction (the moving H is one of them)
         broken_atoms = {nr for key in self.affected_interactions.bonds.removed for nr in key}

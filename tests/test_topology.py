@@ -986,14 +986,14 @@ class TestRadicalAla:
     def top_noprm_fix(self, filedir) -> Topology:
         hexala_top = read_top(filedir / "Ala_R_noprm.top")
         # this test file lists the dihedral 5-7-9-14 three times without
-        # numbers (GROMACS would apply it three times); keep the old behaviour
-        return Topology(hexala_top, handle_duplicate_topology_lines=False)
+        # numbers (GROMACS would apply it three times); keep only the last line
+        return Topology(hexala_top, repeated_topology_lines="last")
 
     @pytest.fixture
     def top_noprm_explicitR_fix(self, filedir) -> Topology:
         hexala_top = read_top(filedir / "Ala_R_noprm.top")
         # see top_noprm_fix
-        return Topology(hexala_top, radicals="9", handle_duplicate_topology_lines=False)
+        return Topology(hexala_top, radicals="9", repeated_topology_lines="last")
 
     @pytest.fixture
     def top_prm_fix(self, filedir) -> Topology:
@@ -1532,8 +1532,8 @@ def test_duplicate_explicit_proper_lines_are_merged(arranged_tmp_path):
 
 
 @pytest.mark.parametrize("arranged_tmp_path", ["test_coordinates"], indirect=True)
-def test_duplicate_lines_old_behaviour_when_switched_off(arranged_tmp_path):
-    """With handle_duplicate_topology_lines off, the later line replaces the earlier one."""
+def test_repeated_lines_last_keeps_the_later_line(arranged_tmp_path):
+    """With repeated_topology_lines last, the later line replaces the earlier one, as older KIMMDY did."""
     raw = _alacar_with_extra_lines("bonds", [["1", "2", "1"]])
     extra = [
         ["2", "1", "5", "6", "9", "0.0", "1.0", "3"],
@@ -1541,6 +1541,126 @@ def test_duplicate_lines_old_behaviour_when_switched_off(arranged_tmp_path):
     ]
     mol = next(key for key in raw if key.startswith("moleculetype_"))
     raw[mol]["subsections"]["dihedrals"]["content"].extend(extra)
-    top = Topology(raw, handle_duplicate_topology_lines=False)
+    top = Topology(raw, repeated_topology_lines="last")
     kept = top.proper_dihedrals[("2", "1", "5", "6")].dihedrals["3"]
     assert (kept.c0, kept.c1) == ("180.0", "2.0")
+
+
+# repeated_topology_lines: merge, error and last for repeated explicit dihedral
+# terms (same atoms and periodicity), for propers (function 9) and impropers
+# (function 4); the two lines add up to phase 180, k 1.0
+REPEATED_TERMS = {
+    "proper": (
+        "9",
+        "3",
+        [
+            ["2", "1", "5", "6", "9", "0.0", "1.0", "3"],
+            ["2", "1", "5", "6", "9", "180.0", "2.0", "3"],
+        ],
+    ),
+    "improper": (
+        "4",
+        "2",
+        [
+            ["2", "1", "5", "6", "4", "0.0", "1.0", "2"],
+            ["2", "1", "5", "6", "4", "180.0", "2.0", "2"],
+        ],
+    ),
+}
+
+
+@pytest.mark.parametrize("kind", ["proper", "improper"])
+@pytest.mark.parametrize("arranged_tmp_path", ["test_coordinates"], indirect=True)
+def test_repeated_dihedral_terms_in_all_modes(arranged_tmp_path, kind):
+    """merge adds up two repeated terms, error stops, last keeps the second line; for propers and impropers."""
+    funct, periodicity, extra = REPEATED_TERMS[kind]
+
+    def terms(mode):
+        """Read the Ala test topology with the two extra lines in the given mode and return the stored terms."""
+        top = Topology(_alacar_with_extra_lines("dihedrals", extra), repeated_topology_lines=mode)
+        store = top.improper_dihedrals if kind == "improper" else top.proper_dihedrals
+        return store[("2", "1", "5", "6")].dihedrals
+
+    # merge: one equivalent term, 1.0 cos(n phi) - 2.0 cos(n phi) = 1.0 cos(n phi - 180)
+    merged = terms("merge")[periodicity]
+    assert merged.funct == funct
+    assert float(merged.c0) == pytest.approx(180.0)
+    assert float(merged.c1) == pytest.approx(1.0)
+
+    # error: any repeat stops
+    with pytest.raises(ValueError, match=rf"\[ dihedrals \({kind}\) \] lists atoms 2 1 5 6"):
+        terms("error")
+
+    # last: only the second line is kept
+    last = terms("last")[periodicity]
+    assert (last.c0, last.c1) == ("180.0", "2.0")
+
+
+@pytest.mark.parametrize("arranged_tmp_path", ["test_coordinates"], indirect=True)
+def test_macro_and_numerical_dihedrals_are_equivalent(arranged_tmp_path):
+    """A proper dihedral written with #define names gives the same terms as the same dihedral written with numbers.
+
+    Two copies of the Ala test topology: in one, the dihedral 2-1-5-6 is written
+    as two lines with #define names, in the other with the numbers themselves.
+    """
+    text = Path("AlaCaR_out.top").read_text()
+    original = "2        1        5        6        9       \n"
+    assert text.count(original) == 1
+
+    # macro version: two #define lines and two dihedral lines that use them
+    defines = (
+        "#define test_torsion_1 0.0 1.5 1\n"
+        "#define test_torsion_2 180.0 2.5 2\n\n"
+        "[ moleculetype ]"
+    )
+    macro = text.replace("[ moleculetype ]", defines, 1).replace(
+        original, "2 1 5 6 9 test_torsion_1\n2 1 5 6 9 test_torsion_2\n"
+    )
+    numerical = text.replace(
+        original, "2 1 5 6 9 0.0   1.5 1\n2 1 5 6 9 180.0 2.5 2\n"
+    )
+    Path("macro.top").write_text(macro)
+    Path("numerical.top").write_text(numerical)
+
+    # read both and compare the stored terms of 2-1-5-6
+    stored = []
+    for name in ("macro.top", "numerical.top"):
+        top = Topology(read_top(Path(name)))
+        terms = top.proper_dihedrals[("2", "1", "5", "6")].dihedrals
+        stored.append(
+            {n: (d.funct, float(d.c0), float(d.c1), d.periodicity) for n, d in terms.items()}
+        )
+    from_macro, from_numbers = stored
+    assert sorted(from_macro) == ["1", "2"]
+    assert from_macro == from_numbers
+    assert from_macro["1"] == ("9", pytest.approx(0.0), pytest.approx(1.5), "1")
+    assert from_macro["2"] == ("9", pytest.approx(180.0), pytest.approx(2.5), "2")
+
+
+def test_repeated_proper_without_numbers_stops_in_merge_mode(filedir):
+    """Ala_R_noprm.top lists the proper dihedral 5-7-9-14 three times without numbers; merge cannot add them up and stops."""
+    with pytest.raises(ValueError, match=r"\[ dihedrals \(proper\) \] lists atoms 5 7 9 14"):
+        Topology(read_top(filedir / "Ala_R_noprm.top"))
+
+
+@pytest.mark.parametrize(
+    "mode, expected",
+    [("merge", ("180.000000", "1.000000")), ("last", ("180.0", "2.0")), ("error", None)],
+)
+def test_repeated_template_impropers_in_all_modes(mode, expected):
+    """A residue template that lists one improper with the same periodicity twice follows repeated_topology_lines too."""
+    section = {
+        "impropers": {
+            "content": [
+                ["N", "CA", "C", "+N", "0.0", "1.0", "1"],
+                ["N", "CA", "C", "+N", "180.0", "2.0", "1"],
+            ]
+        }
+    }
+    if expected is None:
+        with pytest.raises(ValueError, match="more than once"):
+            ResidueType.from_section("ALA", section, repeated_lines=mode)
+        return
+    template = ResidueType.from_section("ALA", section, repeated_lines=mode)
+    (term,) = template.improper_dihedrals[("N", "CA", "C", "+N")]
+    assert (term.c0, term.c1) == expected

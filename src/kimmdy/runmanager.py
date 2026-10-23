@@ -357,7 +357,7 @@ class RunManager:
         """Read the on/off switches of the topology fixes from kimmdy.yml.
 
         Looks in changer.topology and returns a dict such as
-        {"combine_same_periodicity_dihedrals": True, ...}, ready to pass to
+        {"repeated_topology_lines": "merge", ...}, ready to pass to
         Topology(...). A switch that is not in kimmdy.yml holds its schema
         default.
         """
@@ -365,9 +365,8 @@ class RunManager:
         return {
             name: getattr(changer_topology, name)
             for name in (
-                "combine_same_periodicity_dihedrals",
+                "repeated_topology_lines",
                 "conserve_transferred_h_charge",
-                "handle_duplicate_topology_lines",
             )
         }
 

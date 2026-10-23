@@ -483,19 +483,13 @@
               "description": "Keyword argument container for the selected parameterization scheme",
               "additionalProperties": true
             },
-            "combine_same_periodicity_dihedrals": {
-              "title": "Combine same-periodicity dihedrals",
-              "description": "Merge funct-4 terms that share atoms and periodicity (a99SB-disp lists two periodicity-1 terms on every backbone psi) into one equivalent term, in topologies and residue templates. Forces are unchanged and the energy shifts by a constant. Without it, only the last such term is kept. Default: True",
-              "type": "boolean",
-              "pytype": "bool",
-              "default": true
-            },
-            "handle_duplicate_topology_lines": {
-              "title": "Handle duplicate topology lines",
-              "description": "When reading a topology, merge repeated proper dihedral lines (function 1 or 9) that share atoms and periodicity and carry explicit numbers into one equivalent term, and stop with an error on any other repeated line (bonds, angles, pairs, dihedrals without numbers, impropers when combine_same_periodicity_dihedrals is off). KIMMDY keeps one term per atom set, while GROMACS applies every line, so silently keeping only the last line would change the physics. Default: True",
-              "type": "boolean",
-              "pytype": "bool",
-              "default": true
+            "repeated_topology_lines": {
+              "title": "Repeated topology lines",
+              "description": "What to do when a topology ([ bonds ], [ pairs ], [ angles ], [ dihedrals ]) or a residue template ([ impropers ] in the .rtp) lists the same atoms (and, for dihedrals, the same periodicity) more than once. KIMMDY keeps one term per atom set, while GROMACS applies every line. merge: add up repeated dihedral terms that have numbers into one equivalent term (same forces, energy shifted by a constant) and warn; any other repeat stops with an error. error: any repeat stops with an error. last: keep only the last line, as older KIMMDY did; this can silently drop interactions. #define names are replaced by their numbers first in every mode. Default: merge",
+              "type": "string",
+              "pytype": "str",
+              "enum": ["merge", "error", "last"],
+              "default": "merge"
             },
             "conserve_transferred_h_charge": {
               "title": "Conserve transferred-H charge",

@@ -84,14 +84,11 @@ class MoleculeType:
         header: MoleculeTypeHeader,
         atomics: dict,
         radicals: Optional[str] = None,
-        combine_same_periodicity: bool = True,
-        handle_duplicate_lines: bool = True,
+        repeated_lines: str = "merge",
     ) -> None:
-        # merge funct-4 terms that share atoms and periodicity while parsing
-        self.combine_same_periodicity = combine_same_periodicity
-        # merge repeated explicit proper dihedral lines and stop on any other
-        # repeated line instead of silently keeping only the last one
-        self.handle_duplicate_lines = handle_duplicate_lines
+        # what to do with repeated topology lines: merge, error or last
+        # (changer.topology.repeated_topology_lines)
+        self.repeated_lines = repeated_lines
         self.name = header.name
         self.nrexcl = header.nrexcl
         self.atomics = atomics
@@ -189,7 +186,7 @@ class MoleculeType:
         for l in ls:
             bond = Bond.from_top_line(l)
             key = (bond.ai, bond.aj)
-            # a repeated line stops with an error (handle_duplicate_lines)
+            # a repeated line stops with an error (see _reject_duplicate_line)
             if key in self.bonds:
                 self._reject_duplicate_line("bonds", key)
             self.bonds[key] = bond
@@ -202,7 +199,7 @@ class MoleculeType:
         for l in ls:
             pair = Pair.from_top_line(l)
             key = (pair.ai, pair.aj)
-            # a repeated line stops with an error (handle_duplicate_lines)
+            # a repeated line stops with an error (see _reject_duplicate_line)
             if key in self.pairs:
                 self._reject_duplicate_line("pairs", key)
             self.pairs[key] = pair
@@ -215,7 +212,7 @@ class MoleculeType:
         for l in ls:
             angle = Angle.from_top_line(l)
             key = (angle.ai, angle.aj, angle.ak)
-            # a repeated line stops with an error (handle_duplicate_lines)
+            # a repeated line stops with an error (see _reject_duplicate_line)
             if key in self.angles:
                 self._reject_duplicate_line("angles", key)
             self.angles[key] = angle
@@ -264,22 +261,26 @@ class MoleculeType:
                     self._reject_duplicate_line(f"dihedrals ({kind})", key, dihedral.periodicity)
             terms[dihedral.periodicity] = dihedral
 
-        # one summary line per molecule; the single merges are logged at debug level
+        # one summary warning per molecule; the single merges are logged at debug level
         if merged:
-            logger.info(
+            logger.warning(
                 f"Molecule {self.name}: merged {merged} repeated dihedral term(s) "
                 "with the same atoms and periodicity (same forces, energy shifted by a constant)"
             )
 
     def _may_combine(self, existing: Dihedral, new: Dihedral, is_improper: bool) -> bool:
-        """Tell whether two dihedral lines with the same atoms and periodicity can be merged exactly."""
+        """Tell whether two dihedral lines with the same atoms and periodicity can be merged exactly.
+
+        Only in merge mode, only when both lines have numbers and the same
+        function, and for propers only for the periodic functions 1 and 9.
+        """
+        if self.repeated_lines != "merge":
+            return False
         if None in (existing.c0, existing.c1, new.c0, new.c1):
             return False  # without numbers there is nothing to add up
         if existing.funct != new.funct:
             return False
-        if is_improper:
-            return self.combine_same_periodicity
-        return self.handle_duplicate_lines and new.funct in ("1", "9")
+        return is_improper or new.funct in ("1", "9")
 
     def _reject_duplicate_line(self, section: str, key: tuple, periodicity: str = ""):
         """Stop with an error when a topology line repeats an earlier one that cannot be merged.
@@ -287,10 +288,10 @@ class MoleculeType:
         KIMMDY keeps one term per atom set (and per periodicity for
         dihedrals), while GROMACS uses every line, so silently keeping only
         the last line would change the simulation. The error names the
-        molecule, section and atoms. With handle_duplicate_lines off it does
-        nothing, so the later line replaces the earlier as before.
+        molecule, section and atoms. In last mode it does nothing, so the
+        later line replaces the earlier as older KIMMDY did.
         """
-        if not self.handle_duplicate_lines:
+        if self.repeated_lines == "last":
             return
         where = f" with periodicity {periodicity}" if periodicity else ""
         m = (
@@ -298,7 +299,8 @@ class MoleculeType:
             "more than once. KIMMDY can keep only one such term, but GROMACS would "
             "apply every line, so the topology cannot be represented without "
             "changing it. Merge or remove the repeated line, or set "
-            "changer.topology.handle_duplicate_topology_lines to false to keep only the last one."
+            "changer.topology.repeated_topology_lines to last to keep only the last one "
+            "(this can drop interactions)."
         )
         logger.error(m)
         raise ValueError(m)
@@ -933,26 +935,28 @@ class Topology:
         product_template_sources: tuple[str, ...] = ("rtp",),
         product_template_itp_glob: str = "*.itp",
         product_template_transitions: Optional[dict[str, str]] = None,
-        combine_same_periodicity_dihedrals: bool = True,
+        repeated_topology_lines: str = "merge",
         conserve_transferred_h_charge: bool = True,
-        handle_duplicate_topology_lines: bool = True,
     ):
-        """Topology fixes, all on by default; set to False for the 16ce888 behaviour:
+        """Topology options (changer.topology in kimmdy.yml):
 
-        combine_same_periodicity_dihedrals
-            Merge funct-4 terms with the same atoms and periodicity into one
-            equivalent term (forces unchanged, energy shifted by a constant)
-            instead of keeping only the last one.
+        repeated_topology_lines
+            What to do when a topology or residue template repeats the same
+            atoms (and periodicity): "merge" adds up repeated dihedral terms
+            with numbers into one equivalent term (forces unchanged, energy
+            shifted by a constant) and warns, and stops on any other repeat;
+            "error" stops on any repeat; "last" keeps only the last line, as
+            older KIMMDY did. #define names are replaced first in every mode.
         conserve_transferred_h_charge
             A transferred H keeps its charge and the acceptor gives up the
             same amount, instead of both taking residue-template charges.
-        handle_duplicate_topology_lines
-            Merge repeated explicit proper dihedral lines (function 1 or 9)
-            with the same atoms and periodicity, and stop with an error on any
-            other repeated line, instead of keeping only the last one.
         """
-        self.combine_same_periodicity_dihedrals = combine_same_periodicity_dihedrals
-        self.handle_duplicate_topology_lines = handle_duplicate_topology_lines
+        if repeated_topology_lines not in ("merge", "error", "last"):
+            raise ValueError(
+                "repeated_topology_lines must be merge, error or last; "
+                f"got {repeated_topology_lines!r}"
+            )
+        self.repeated_topology_lines = repeated_topology_lines
         if top == {}:
             raise NotImplementedError(
                 "Generating an empty Topology from an empty TopologyDict is not implemented."
@@ -971,7 +975,7 @@ class Topology:
             product_template_sources=product_template_sources,
             product_template_itp_glob=product_template_itp_glob,
             product_template_transitions=product_template_transitions,
-            combine_same_periodicity_dihedrals=combine_same_periodicity_dihedrals,
+            repeated_topology_lines=repeated_topology_lines,
         )
         self.pending_product_template_matches: dict[
             tuple[str, str], ProductTemplateMatch
@@ -981,8 +985,8 @@ class Topology:
         self.pending_product_template_restorations: list[
             ProductTemplateMatch
         ] = []
-        if self.handle_duplicate_topology_lines:
-            self._expand_parameter_macros()
+        # #define names first, so periodicities are known whatever the mode
+        self._expand_parameter_macros()
         self._parse_molecules()
         self.parametrizer = parametrizer
         self._check_is_reactive_molecule = is_reactive_predicate_f
@@ -1107,8 +1111,7 @@ class Topology:
             MoleculeTypeHeader(name=REACTIVE_MOLECULEYPE, nrexcl=nrexcl),
             reactive_atomics,
             radicals,
-            combine_same_periodicity=self.combine_same_periodicity_dihedrals,
-            handle_duplicate_lines=self.handle_duplicate_topology_lines,
+            repeated_lines=self.repeated_topology_lines,
         )
         self.moleculetypes[REACTIVE_MOLECULEYPE] = reactive_moleculetype
         # update topology dict
@@ -1148,6 +1151,9 @@ class Topology:
         the last. This swaps each name for its numbers (phase, strength,
         periodicity), exactly as GROMACS does when it reads the file, so every
         line is kept. Changes the topology dict in place.
+
+        Names are replaced in one pass: a #define whose value is another
+        #define name (a nested alias) is not supported and stays unresolved.
         """
         # shortcuts that stand for numbers (defines without a value are flags)
         defines = {k: v for k, v in (self.top.get("define") or {}).items() if v}
@@ -1198,8 +1204,7 @@ class Topology:
                 header,
                 atomics,
                 radicals="",
-                combine_same_periodicity=self.combine_same_periodicity_dihedrals,
-                handle_duplicate_lines=self.handle_duplicate_topology_lines,
+                repeated_lines=self.repeated_topology_lines,
             )
 
     def __eq__(self, other: object) -> bool:

@@ -106,14 +106,14 @@ original behaviour.
   Files: `src/kimmdy/topology/atomic.py`, `src/kimmdy/topology/topology.py`,
   `src/kimmdy/topology/ff.py`, `src/kimmdy/runmanager.py`,
   `src/kimmdy/kimmdy-yaml-schema.json`.
-* Same-periodicity dihedral terms are merged. New key
-  `changer.topology.combine_same_periodicity_dihedrals` (default true) merges
+* Same-periodicity dihedral terms are merged (with
+  `changer.topology.repeated_topology_lines: merge`, the default, see below):
   function-4 terms with the same atoms and periodicity (a99SB-disp lists two
   periodicity-1 terms on every backbone psi) into one equivalent term, in
   topologies and residue templates. Before, the later term replaced the
   earlier one from the first step on. **Forces are unchanged by merging; the
   energy shifts by a constant per merged term (0.923 kJ/mol per a99SB-disp
-  psi).**
+  psi).** A warning reports how many terms were merged.
   Files: `src/kimmdy/topology/atomic.py`, `src/kimmdy/topology/topology.py`,
   `src/kimmdy/topology/ff.py`, `src/kimmdy/runmanager.py`,
   `src/kimmdy/kimmdy-yaml-schema.json`.
@@ -126,16 +126,19 @@ original behaviour.
   Files: `src/kimmdy/topology/topology.py`, `src/kimmdy/runmanager.py`,
   `src/kimmdy/kimmdy-yaml-schema.json`, `tests/test_topology.py`.
 * Repeated topology lines are no longer dropped silently. New key
-  `changer.topology.handle_duplicate_topology_lines` (default true). GROMACS
-  applies every line, while KIMMDY kept only the last of repeated ones. Now
-  `#define` names in bonded lines (for example Amber99SB-ILDN torsions) are
-  replaced by their numbers, repeated proper dihedral lines with numbers are
-  merged into one equivalent term, and any other repeated line stops KIMMDY
-  with an error. Also fixed: `write_top` wrote `#define` lines without a space
-  between name and value. On an Amber99SB-ILDN test system every interaction
+  `changer.topology.repeated_topology_lines` (`merge`, `error` or `last`,
+  default `merge`), for topologies and residue templates. GROMACS applies
+  every line, while KIMMDY kept only the last of repeated ones. `#define`
+  names in bonded lines (for example Amber99SB-ILDN torsions) are always
+  replaced by their numbers first (one pass; nested aliases are not
+  supported). With `merge`, repeated dihedral lines with numbers are merged
+  into one equivalent term and any other repeated line stops KIMMDY with an
+  error; `error` stops on any repeat; `last` keeps the old behaviour (only
+  the last line, which can drop interactions). Also fixed: `write_top` wrote
+  `#define` lines without a space between name and value. On an Amber99SB-ILDN test system every interaction
   now equals GROMACS's reading of the file (41 proper-dihedral terms were lost
   before). **Changes the physics only for topologies with repeated lines or
-  macro torsions.** The `Ala_R_noprm.top` tests switch the check off.
+  macro torsions.** The `Ala_R_noprm.top` tests use `last`.
   Files: `src/kimmdy/topology/topology.py`, `src/kimmdy/parsing.py`,
   `src/kimmdy/runmanager.py`, `src/kimmdy/kimmdy-yaml-schema.json`,
   `tests/test_topology.py`.
