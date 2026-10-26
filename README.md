@@ -16,18 +16,18 @@ Further please keep this branch and clones private for now, as it may contain st
 
 ## Installation
 
-**Note**: KIMMDY requires [GROMACS](https://www.gromacs.org/) to be installed, or be available as a loadable plugin on your cluster.
+**Note**: KIMMDY requires [GROMACS](https://www.gromacs.org/) to be installed, or be available as a loadable module on your cluster.
 PLUMED support is deprecated and will be removed in a future release. The homolysis reaction no longer needs it.
 Until then, MD steps with `use_plumed: true` need a GROMACS version patched with [PLUMED](https://www.plumed.org/), whose version name contains `MODIFIED` or `plumed`.
 
-Further this new branch requires the new HAT-plugin found in a different repository (https://github.com/graeter-group/KIMMDY-MACE-HAT-plugin)
+This branch requires the new HAT plugin from the private repository https://github.com/graeter-group/KIMMDY-MACE-HAT-plugin. Core `MACE_HAT` is public; initializing the HAT submodule requires access to the private plugin repository.
 
 ### Installation on MPCDF login nodes (optimized for Otter)
 
 Prerequisites:
 
 - SSH access to GitHub
-- Access to both private repositories
+- Access to the private HAT plugin repository and Evgenis Barrier Model
 
 #### 1. Create The uv Environment
 
@@ -38,6 +38,7 @@ module load anaconda/3/2023.03
 eval "$(conda shell.bash hook)"
 
 conda create \
+    --name uv \
     --channel conda-forge \
     python=3.11 \
     uv=0.9.10 \
@@ -50,7 +51,7 @@ This environment only provides `uv`. The actual KIMMDY environment will be the r
 
 #### 2. Clone KIMMDY
 
-Do not initialize submodules immediately because the committed `.gitmodules` still points to the public HAT repository.
+Use a fresh clone of the cleaned `MACE_HAT` history. If an old checkout already exists at the destination, choose a different directory.
 
 ```bash
 mkdir -p "$HOME/software/KIMMDY"
@@ -58,19 +59,17 @@ cd "$HOME/software/KIMMDY"
 
 git clone \
     --branch MACE_HAT \
-    git@github.com:graeter-group/KIMMDY-MACE-HAT.git \
+    git@github.com:graeter-group/kimmdy.git \
     kimmdy
 
 cd kimmdy
 ```
 
-#### 3. Configure The Private HAT Submodule
+#### 3. Initialize The Submodules
+
+The committed `.gitmodules` already points to the private HAT repository. No manual URL override is needed.
 
 ```bash
-git config \
-    submodule.plugins/kimmdy-hat.url \
-    git@github.com:graeter-group/KIMMDY-MACE-HAT-plugin.git
-
 git submodule update --init --recursive
 ```
 
@@ -80,7 +79,9 @@ Verify that everything was initialized:
 git submodule status --recursive
 ```
 
-There should be no submodule lines beginning with `-`.
+There should be no submodule lines beginning with `-`, `+` or `U`.
+
+Core pins an exact HAT commit. Submodules initially use detached HEAD; this is normal.
 
 #### 4. Install KIMMDY
 
@@ -123,7 +124,6 @@ repeat step 5 after syncing if necessary.
 
 #### 5. Install GPU-Enabled Torch
 
-
 The login node does not expose the compute-node GPU, so select the tested backend explicitly:
 
 Activate the kimmdy environment:
@@ -160,7 +160,7 @@ module load anaconda/3/2023.03
 module load gromacs-plumed/2024.6
 
 eval "$(conda shell.bash hook)"
-conda activate "$HOME/conda-envs/uv"
+conda activate uv
 
 source "$HOME/software/KIMMDY/kimmdy/.venv/bin/activate"
 
@@ -180,11 +180,17 @@ After running `uv sync` again later, reinstall the CUDA Torch wheel:
 uv pip install --reinstall "torch==2.0.0" --torch-backend=cu118
 ```
 
+Run simulations, Python checks and tests on compute nodes.
+
 #### 7. Development
 
-If you plan to modify the software, create a separate development branch in the main KIMMDY repository and in every submodule you intend to modify, such as the `kimmdy-hat` repository.
+If you plan to modify the software, create a separate development branch from the cleaned `MACE_HAT` branch in the main KIMMDY repository and in every submodule you intend to modify, such as the `kimmdy-hat` repository.
+
+Core pull requests should target `MACE_HAT` in public `graeter-group/kimmdy`. HAT plugin pull requests should target `MACE_HAT` in private `graeter-group/KIMMDY-MACE-HAT-plugin`.
 
 Changes made inside a submodule must be committed in that submodule first. The resulting submodule commit must then be recorded and committed in the parent KIMMDY repository.
+
+Do not merge branches based on the old history into the cleaned branches. Recover unfinished work by transferring only the relevant changes onto a new branch based on the cleaned history.
 
 ## Documentation
 
