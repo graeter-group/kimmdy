@@ -7,6 +7,8 @@ rest of the program and keeps track of global state.
 
 from __future__ import annotations
 
+import json
+from numpy.random import default_rng
 import logging
 import queue
 import re
@@ -27,6 +29,7 @@ from kimmdy.constants import (
     MARK_DONE,
     MARK_FAILED,
     MARK_FINISHED,
+    MARK_REACION_TIME,
     MARK_STARTED,
     MARKERS,
 )
@@ -261,6 +264,7 @@ class RunManager:
             product_template_sources=product_template_sources,
             product_template_itp_glob=product_template_itp_glob,
             product_template_transitions=product_template_transitions,
+            **self._topology_fix_options(),
         )
         self.filehist: list[dict[str, TaskFiles]] = [
             {"0_setup": TaskFiles(self.get_latest)}
@@ -336,6 +340,152 @@ class RunManager:
             f"{timedelta(seconds=(time.time() - self.start_time))} "
             f"In output directory {self.config.out}"
         )
+
+    def _topology_fix_options(self) -> dict[str, bool]:
+        """Read the on/off switches of the topology fixes from kimmdy.yml.
+
+        Looks in changer.topology and returns a dict such as
+        {"repeated_topology_lines": "merge", ...}, ready to pass to
+        Topology(...). A switch that is not in kimmdy.yml holds its schema
+        default.
+        """
+        changer_topology = self.config.changer.topology
+        return {
+            name: getattr(changer_topology, name)
+            for name in (
+                "repeated_topology_lines",
+                "conserve_transferred_h_charge",
+            )
+        }
+
+    def _radicals_after_picked_recipe(
+        self, radicals: list[str], radicals_file: Path, kept_task_dirs: list[Path]
+    ) -> list[str]:
+        """Bring a saved radical list up to date with the reaction applied after it was saved.
+
+        radicals.json is written in the decide step, before the chosen reaction
+        is applied. If that reaction was applied before the job stopped, the
+        saved list is one reaction behind. This reads the chosen reaction from
+        recipes.csv in the same folder and replays it on the list: a broken
+        bond makes both atoms radicals, a new bond takes both off the list.
+        Returns the updated list; stops the restart if recipes.csv cannot be read.
+        """
+        # nothing to do unless the list comes from a decide folder whose
+        # reaction was applied later (a later apply_recipe folder that wrote
+        # the reaction-time marker; an apply step after a rejected choice
+        # leaves an empty folder without it)
+        decide_dir = radicals_file.parent
+        if not decide_dir.name.endswith("_decide_recipe"):
+            return radicals
+        decide_nr = int(decide_dir.name.split("_")[0])
+        applied = any(
+            d.name.endswith("_apply_recipe")
+            and int(d.name.split("_")[0]) > decide_nr
+            and (d / MARK_REACION_TIME).exists()
+            for d in kept_task_dirs
+        )
+        if not applied:
+            return radicals
+
+        # read the chosen reaction; without it the radicals are unknown
+        recipes_csv = decide_dir / "recipes.csv"
+        try:
+            _, picked = RecipeCollection.from_csv(recipes_csv)
+        except (OSError, ValueError, SyntaxError) as error:
+            m = (
+                f"{radicals_file} was written before the recipe of a later "
+                f"apply_recipe task, and the picked recipe could not be read from "
+                f"{recipes_csv} (needs save_recipes: true): {error}. Aborting restart."
+            )
+            logger.error(m)
+            raise RuntimeError(m) from error
+        if picked is None:
+            return radicals
+
+        # replay its steps on the list, in order
+        updated = list(radicals)
+        for step in picked.recipe_steps:
+            if isinstance(step, Break):
+                for atom_id in (step.atom_id_1, step.atom_id_2):
+                    if atom_id not in updated:
+                        updated.append(atom_id)
+            elif isinstance(step, Bind):
+                for atom_id in (step.atom_id_1, step.atom_id_2):
+                    if atom_id in updated:
+                        updated.remove(atom_id)
+        logger.info(
+            "Applied the recipe picked in %s to the restored radicals: %s",
+            decide_dir.name,
+            picked.recipe_steps,
+        )
+        return updated
+
+    def _restore_restart_radicals(self, kept_task_dirs: list[Path]) -> Optional[str]:
+        """Find the radicals a restarted run must continue with.
+
+        Uses the newest radicals.json among the task folders kept for the
+        restart, brought up to date with _radicals_after_picked_recipe. The
+        radicals: list of kimmdy.yml is only used when no reaction has been
+        applied yet, because it is the state at the start of the run. If a
+        reaction was applied but no readable radicals.json exists, the
+        restart stops with an error. Returns the atom ids as one
+        space-separated string, as Topology expects.
+        """
+        # radicals.json files are looked up in the decide folders directly,
+        # because get_latest("json") can also return other json files (for
+        # example a sample folder's xtc cleanup record)
+        restart_radicals = getattr(self.config, "radicals", None)
+        radicals_files = [
+            d / "radicals.json"
+            for d in kept_task_dirs
+            if d.name.endswith("_decide_recipe") and (d / "radicals.json").is_file()
+        ]
+        # a reaction was applied if an apply_recipe folder wrote the reaction-time
+        # marker; when every reaction was rejected the folder exists but stays
+        # empty, and the decide step writes no radicals.json either
+        reaction_applied = any(
+            d.name.endswith("_apply_recipe") and (d / MARK_REACION_TIME).exists()
+            for d in kept_task_dirs
+        )
+
+        # no saved list: fine before the first reaction, an error after it
+        if not radicals_files:
+            if reaction_applied:
+                m = (
+                    "A reaction was already applied in this run, but no "
+                    "radicals.json was found in the kept decide_recipe folders, "
+                    "so the current radicals are unknown. Aborting restart."
+                )
+                logger.error(m)
+                raise RuntimeError(m)
+            logger.info(
+                "No reaction applied yet; using the radicals from the config."
+            )
+
+        # otherwise read the newest saved list and bring it up to date
+        else:
+            radicals_file = radicals_files[-1]
+            try:
+                with open(radicals_file) as handle:
+                    saved_radicals = json.load(handle).get("radicals")
+                if not isinstance(saved_radicals, list):
+                    raise ValueError("it has no 'radicals' list")
+            except (OSError, TypeError, ValueError, AttributeError) as error:
+                m = f"Could not restore radicals from {radicals_file}: {error}. Aborting restart."
+                logger.error(m)
+                raise RuntimeError(m) from error
+            saved_radicals = self._radicals_after_picked_recipe(
+                [str(radical) for radical in saved_radicals],
+                radicals_file,
+                kept_task_dirs,
+            )
+            restart_radicals = " ".join(saved_radicals)
+            logger.info(
+                "Restored %d radical atom(s) from %s",
+                len(saved_radicals),
+                radicals_file,
+            )
+        return restart_radicals
 
     def _setup_restart(self):
         """Set up RunManager to restart from an existing run directory"""
@@ -526,6 +676,8 @@ class RunManager:
             )
             self._discover_output_files(taskname=task_name, files=task_files)
 
+        restart_radicals = self._restore_restart_radicals(task_dirs[: self.iteration + 1])
+
         # plumed fix
         for md_config in self.config.mds.__dict__.values():
             if getattr(md_config, "use_plumed"):
@@ -539,6 +691,18 @@ class RunManager:
                         f"Plumed out file {plumed_out_name} not found. Continuing without it."
                     )
 
+        # product-template settings in the same form as at a fresh start,
+        # so the restarted topology is built with the same settings
+        restart_transition_config = getattr(
+            self.config.topology, "product_template_transitions", None
+        )
+        if restart_transition_config is None:
+            restart_product_template_transitions = {}
+        elif isinstance(restart_transition_config, dict):
+            restart_product_template_transitions = dict(restart_transition_config)
+        else:
+            restart_product_template_transitions = dict(vars(restart_transition_config))
+
         # use latest top file
         top_path = self.get_latest("top")
         if top_path is None:
@@ -551,8 +715,17 @@ class RunManager:
             is_reactive_predicate_f=get_is_reactive_predicate_from_config_f(
                 self.config.topology.reactive
             ),
-            radicals=getattr(self.config, "radicals", None),
+            radicals=restart_radicals,
             residuetypes_path=getattr(self.config, "residuetypes", None),
+            reactive_nrexcl=getattr(self.config.topology, "nrexcl", None),
+            product_template_sources=tuple(
+                getattr(self.config.topology, "product_template_sources", ["rtp"])
+            ),
+            product_template_itp_glob=getattr(
+                self.config.topology, "product_template_itp_glob", "*.itp"
+            ),
+            product_template_transitions=restart_product_template_transitions,
+            **self._topology_fix_options(),
         )
 
         # if we restart from within an imcomplete task,
@@ -748,6 +921,124 @@ class RunManager:
         files = task()
         if files is not None:
             self._discover_output_files(taskname=task.name, files=files)
+        # after every task: delete trajectories no restart can need any more;
+        # a failure here is logged but never stops the run
+        try:
+            self._delete_xtc_before_reactions(task)
+        except Exception:
+            logger.exception(
+                "Reaction-trajectory cleanup failed; continuing without aborting KIMMDY"
+            )
+
+    def _reaction_trajectory_cleanup_enabled(self) -> bool:
+        """Tell whether kimmdy.yml asks for reaction-input trajectories to be deleted (delete_xtc_before_reactions)."""
+        return self.config.delete_xtc_before_reactions
+
+    def _regular_md_instances(self) -> set[str]:
+        """Return the names of the normal MD steps (all MD steps except the relax).
+
+        KIMMDY restarts only from these, never from a relax.
+        """
+        if not hasattr(self.config, "mds"):
+            return set()
+        relax = None
+        if hasattr(self.config.changer, "coordinates") and hasattr(
+            self.config.changer.coordinates, "md"
+        ):
+            relax = self.config.changer.coordinates.md
+        return set(self.config.mds.get_attributes()) - {relax}
+
+    def _reaction_input_md_dirs(self) -> list[Path]:
+        """List the MD folders whose trajectory a reaction read.
+
+        That is every normal MD folder directly followed by a reaction folder,
+        for example 20_sample when 21_hat_reaction comes next. Returned in
+        folder-number order.
+        """
+        # map folder number -> (folder, step name)
+        reaction_names = set(self.config.reactions.get_attributes())
+        md_names = self._regular_md_instances()
+        by_number = {}
+        for path in self.config.out.iterdir():
+            head, _, name = path.name.partition("_")
+            if path.is_dir() and head.isdigit():
+                by_number[int(head)] = (path, name)
+
+        # keep MD folders whose next folder is a reaction
+        return [
+            path
+            for number, (path, name) in sorted(by_number.items())
+            if name in md_names and by_number.get(number + 1, (None, ""))[1] in reaction_names
+        ]
+
+    def _delete_trajectory(self, md_dir: Path, reason: str, verified_by: str) -> None:
+        """Delete the trajectory (.xtc) of one MD folder and leave a note why.
+
+        Also removes the small index files MDAnalysis made for it, and writes
+        <step>_xtc_cleanup.json in the folder with the file name, its size,
+        the reason and what showed that deleting is safe. Does nothing if the
+        trajectory is already gone.
+        """
+        # delete the trajectory
+        instance = md_dir.name.partition("_")[2]
+        xtc = md_dir / f"{instance}.xtc"
+        if not xtc.is_file():
+            return
+        deleted_bytes = xtc.stat().st_size
+        # log the intention first, so the log shows it even if deleting fails
+        logger.info(f"Deleting {xtc} ({deleted_bytes} bytes): {reason}")
+        xtc.unlink()
+
+        # delete MDAnalysis's index files for it
+        removed_offsets = []
+        for suffix in ("npz", "lock"):
+            offsets = md_dir / f".{xtc.name}_offsets.{suffix}"
+            if offsets.is_file():
+                offsets.unlink()
+                removed_offsets.append(offsets.name)
+
+        # write the note next to where the file was
+        record = {
+            "deleted_file": xtc.name,
+            "deleted_bytes": deleted_bytes,
+            "removed_offset_files": removed_offsets,
+            "reason": reason,
+            "verified_by": verified_by,
+        }
+        with open(md_dir / f"{instance}_xtc_cleanup.json", "w") as handle:
+            json.dump(record, handle, indent=2)
+        logger.info(
+            f"Deleted {xtc} ({deleted_bytes / 1024**3:.3f} GiB): {reason}"
+        )
+
+    def _delete_xtc_before_reactions(self, task: Task) -> None:
+        """After a normal MD step finishes, delete the older trajectories no restart can need.
+
+        Only with delete_xtc_before_reactions. KIMMDY restarts from normal
+        MD steps only, never from a relax, so once a normal MD step has
+        finished, a restart begins there or later and never reads an earlier
+        reaction-input trajectory again. Trajectories without a later
+        completed normal MD step are kept, also when the run finishes.
+        """
+        # only after a finished normal MD step, and only when switched on
+        if task.name != "run_md" or not self._reaction_trajectory_cleanup_enabled():
+            return
+        if task.kwargs.get("instance") not in self._regular_md_instances():
+            return
+        files = task.kwargs.get("files")
+        md_dir = getattr(files, "outputdir", None)
+        if md_dir is None or not (md_dir / MARK_DONE).exists():
+            return
+
+        # delete every reaction-input trajectory from an earlier folder
+        md_number = int(md_dir.name.partition("_")[0])
+        for reaction_md_dir in self._reaction_input_md_dirs():
+            if int(reaction_md_dir.name.partition("_")[0]) < md_number:
+                self._delete_trajectory(
+                    reaction_md_dir,
+                    reason="a later regular MD task completed, so a restart begins there and never re-reads this trajectory",
+                    verified_by=str(md_dir / MARK_DONE),
+                )
 
     def _discover_output_files(
         self, taskname: str, files: TaskFiles
@@ -1068,6 +1359,18 @@ class RunManager:
             )
             kmc = partial(kmc, n=self.config.multi_kmc)
 
+        # fixed seed (kmc_seed): every decide step draws its own random numbers
+        # from (seed, task number). Without a seed each run picks different
+        # reactions; with the seed alone every cycle would draw the same numbers.
+        # A restart redoes a task with the same number, so it picks the same reaction.
+        kmc_seed = getattr(self.config, "kmc_seed", None)
+        if kmc_seed is not None and self.kmc_algorithm != "dummy_first":
+            task_number = int(files.outputdir.name.split("_")[0])
+            logger.info(
+                f"Seeding the KMC generator with seed {kmc_seed} and task number {task_number}"
+            )
+            kmc = partial(kmc, rng=default_rng([int(kmc_seed), task_number]))
+
         self.kmcresult = kmc(flatten_recipe_collections(self.recipe_collections))
         if not isinstance(self.kmcresult, KMCAccept):
             # rejection or error, nothing to be done
@@ -1139,6 +1442,23 @@ class RunManager:
 
         logger.info("Done with Decide recipe.")
         return files
+
+    def _slow_growth_options(self) -> dict:
+        """Collect the relax options for merge_top_slow_growth from kimmdy.yml.
+
+        Unset options already hold their schema defaults, so they are read directly.
+        """
+        coordinates = self.config.changer.coordinates
+        return {
+            # the moving H's size grows in during the relax
+            "retype_transferred_h": coordinates.retype_transferred_h,
+            # merge the relax dihedrals on several CPUs
+            "parallel_dihedral_merge": coordinates.parallel_dihedral_merge,
+            "parallel_dihedral_workers": coordinates.parallel_dihedral_workers,
+            # optional spring pulling the moving H onto its acceptor
+            "harmonic_acceptor_h_relax_term": coordinates.harmonic_acceptor_h_relax_term,
+            "harmonic_acceptor_h_relax_k": coordinates.harmonic_acceptor_h_relax_k,
+        }
 
     def _apply_recipe(self, files: TaskFiles) -> TaskFiles:
         logger = files.logger
@@ -1215,7 +1535,13 @@ class RunManager:
         logger.info(f"Writing coordinates gro for starting time of the reaction.")
         if ttime is not None:
             # don't use trr and edr, use the `-time` flag of gmx grompp instead
-            write_gro_at_reaction_time(files=files, time=ttime)
+            write_gro_at_reaction_time(
+                files=files,
+                time=ttime,
+                whole_molecules=bool(
+                    getattr(self.config, "reaction_frame_whole_molecules", False)
+                ),
+            )
             self.latest_files["gro"] = files.output["gro"]
 
         top_initial = deepcopy(self.top)
@@ -1354,6 +1680,7 @@ class RunManager:
                         top_b=self.top,
                         morse_only=self.config.changer.coordinates.slow_growth
                         == "morse_only",
+                        **self._slow_growth_options(),
                     )
                     top_merge_path = files.outputdir / self.config.top.name.replace(
                         ".top", "_relax.top"

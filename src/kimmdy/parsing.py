@@ -410,8 +410,9 @@ def write_top(top: TopologyDict, outfile: Path):
         define = top.get("define")
         if define is not None:
             for name, value in define.items():
-                f.writelines("#define " + name + " ".join(value))
-                f.write("\n")
+                # space between the name and its value, otherwise a define with
+                # a value is written as one fused, unknown name
+                f.write(f"#define {name} {' '.join(value)}".rstrip() + "\n")
 
         for name, section in top.items():
             if name in ["define", "ffdir", "system", "molecules"]:

@@ -202,8 +202,16 @@ def read_reaction_time_marker(dir: Path) -> float | None:
         return float(f.read())
 
 
-def write_gro_at_reaction_time(files: TaskFiles, time: float):
-    """Write out a gro file from the trajectory (xtc or trr) at the reaction time."""
+def write_gro_at_reaction_time(
+    files: TaskFiles, time: float, whole_molecules: bool = False
+):
+    """Write the frame at the reaction time from the MD trajectory (xtc or trr) as a gro file.
+
+    With whole_molecules, every molecule is written in one piece: the frame is
+    taken with the MD run's .tpr (which knows the bonds) and gmx trjconv
+    -pbc mol -ur compact. Without a .tpr next to the MD's gro, it warns and
+    writes the frame as stored in the trajectory.
+    """
     gro = files.input["gro"]
     if gro is None:
         m = "No gro file found from the previous md run."
@@ -224,11 +232,25 @@ def write_gro_at_reaction_time(files: TaskFiles, time: float):
     logger.info(f"Writing out gro file at reaction time {time} ps in {gro.parent.name}")
     files.output["gro"] = gro_reaction
 
+    # choose the structure file and periodic-box options for gmx trjconv
+    structure = gro
+    pbc_flags = ""
+    if whole_molecules:
+        tpr = gro.with_suffix(".tpr")
+        if tpr.exists():
+            structure = tpr
+            pbc_flags = "-pbc mol -ur compact "
+            logger.info("Extracting reaction frame with molecule-whole PBC handling")
+        else:
+            logger.warning(
+                f"No {tpr.name} next to {gro.name}; extracting the reaction frame without molecule-whole PBC handling."
+            )
+
     wrote_file = False
     if files.input["xtc"] is not None:
         try:
             run_gmx(
-                f"echo '0' | gmx trjconv -f {files.input['xtc']} -s {gro} -b {time} -dump {time} -o {gro_reaction}"
+                f"echo '0' | gmx trjconv -f {files.input['xtc']} -s {structure} -b {time} -dump {time} {pbc_flags}-o {gro_reaction}"
             )
             logger.info(
                 f"Successfully wrote out gro file {gro_reaction.name} at reaction time in {gro.parent.name} from xtc file."
@@ -242,7 +264,7 @@ def write_gro_at_reaction_time(files: TaskFiles, time: float):
     if files.input["trr"] is not None and not wrote_file:
         try:
             run_gmx(
-                f"echo '0' | gmx trjconv -f {files.input['trr']} -s {gro} -b {time} -dump {time} -o {gro_reaction}"
+                f"echo '0' | gmx trjconv -f {files.input['trr']} -s {structure} -b {time} -dump {time} {pbc_flags}-o {gro_reaction}"
             )
             logger.info(
                 f"Successfully wrote out gro file at reaction time in {gro.parent.name} from trr file."

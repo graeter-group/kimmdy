@@ -3,6 +3,8 @@
 from dataclasses import dataclass, field
 from enum import Enum
 import logging
+import multiprocessing as mp  # to start helper processes
+from concurrent.futures import ProcessPoolExecutor  # runs the work on several helpers at once
 from copy import deepcopy
 from pathlib import Path
 from typing import Optional, Union
@@ -174,6 +176,88 @@ class AffectedInteractions:
     dihedrals: DihedralsPairSets = field(default_factory=DihedralsPairSets)
 
 
+# the main process puts its merger here so the helpers can read it
+_PARALLEL_DIHEDRAL_MERGER = None
+
+
+def _dihedral_order(key: tuple[str, ...]) -> tuple[int, ...]:
+    """Sort key for dihedrals: by their atom numbers, so serial and parallel merges write the same order."""
+    return tuple(int(atom) for atom in key)
+
+
+def _periodicity_order(value: str) -> int:
+    """Sort key for the periodic terms of one dihedral: by periodicity (a missing periodicity first)."""
+    return int(value) if value else -1
+
+
+def _merge_dihedral_worker(payload):
+    """Work out the relax parameters of one dihedral (runs in a helper process).
+
+    Input: the dihedral's four atoms, and whether it is an improper.
+    It looks up the dihedral before and after the reaction and mixes them
+    into one dihedral that changes from "before" to "after" during the relax.
+    It only returns the result; the main process puts it into the topology.
+
+    Returns: the atoms, the mixed dihedral (None if nothing changes), whether
+    the dihedral is new, removed or changed, and whether it is an improper.
+    """
+    key, use_improper = payload  # the four atoms of one dihedral, and whether it is an improper
+    merger = _PARALLEL_DIHEDRAL_MERGER  # the main process's merger (only read here)
+    if merger is None:
+        raise RuntimeError("parallel dihedral worker was not initialized")
+    # look up the dihedral before (A) and after (B) the reaction
+    dihedral_a = merger._get_explicit_MultipleDihedrals(
+        key=key, use_state_b=False, use_improper=use_improper
+    )
+    dihedral_b = merger._get_explicit_MultipleDihedrals(
+        key=key, use_state_b=True, use_improper=use_improper
+    )
+
+    # note whether the dihedral is new, removed or changed
+    category = None
+    if not use_improper:
+        if dihedral_a is None and dihedral_b is None:
+            raise ValueError(
+                f"Can't find parameters for dihedral with key {key}, got None for both dihedrals."
+            )
+        pairkey = to_pairkey(key)
+        if dihedral_a is not None and dihedral_b is not None:
+            if (
+                pairkey[0] in merger.affected_interactions.atoms
+                or pairkey[1] in merger.affected_interactions.atoms
+            ):
+                category = "morphed"
+        elif dihedral_a is not None:
+            category = "removed"
+        else:
+            category = "added"
+        if dihedral_a == dihedral_b:
+            return key, None, category, use_improper  # unchanged dihedral: nothing to do
+
+    # mix every periodicity of A and B into one before-to-after dihedral
+    keys_a = set(dihedral_a.dihedrals.keys()) if dihedral_a else set()
+    keys_b = set(dihedral_b.dihedrals.keys()) if dihedral_b else set()
+    merged = MultipleDihedrals(
+        *key,
+        funct=(
+            FFFUNC["mult_improper_dihedral"]
+            if use_improper
+            else FFFUNC["mult_proper_dihedral"]
+        ),
+        dihedrals={},
+    )
+    for periodicity in sorted(keys_a | keys_b, key=_periodicity_order):
+        interaction_a = dihedral_a.dihedrals.get(periodicity) if dihedral_a else None
+        interaction_b = dihedral_b.dihedrals.get(periodicity) if dihedral_b else None
+        merged.dihedrals[periodicity] = merger._interpolate_two_dihedrals(
+            key=key,
+            dihedral_a=interaction_a,
+            dihedral_b=interaction_b,
+            funct=merged.funct,
+        )
+    return key, merged, category, use_improper  # the main process writes the result
+
+
 class MoleculeTypeMerger:
     """Takes two MoleculeTypes and joins them for a smooth free-energy like parameter transition simulation.
 
@@ -186,11 +270,24 @@ class MoleculeTypeMerger:
         mol_b: MoleculeType,
         ff: FF,
         morse_only: bool = False,
+        retype_transferred_h: bool = True,
+        parallel_dihedral_merge: bool = False,
+        parallel_dihedral_workers: int = 1,
+        harmonic_acceptor_h_relax_term: bool = False,
+        harmonic_acceptor_h_relax_k: float = 50000.0,
     ) -> None:
         self.mol_a = mol_a
         self.mol_b = mol_b
         self.ff = ff
         self.morse_only = morse_only
+        self.retype_transferred_h = bool(retype_transferred_h)
+        self.harmonic_acceptor_h_relax_term = bool(harmonic_acceptor_h_relax_term)
+        self.harmonic_acceptor_h_relax_k = float(harmonic_acceptor_h_relax_k)
+        # created bond key -> its state-B equilibrium length, filled by merge_bonds
+        self._created_bond_lengths: dict[tuple[str, str], str] = {}
+        self.parallel_dihedral_merge = bool(parallel_dihedral_merge)
+        self.parallel_dihedral_workers = parallel_dihedral_workers
+        self.transferred_h_type = self._find_lj_hydrogen_type()
         self.default_morse_well_depth = 300  # [kJ mol^-1]
         self.default_beta_for_lj = 19  # matches LJ steepness
         self.default_morse_dist_factor = 1.12  # sigmaij* 1.12 = LJ minimum
@@ -206,6 +303,18 @@ class MoleculeTypeMerger:
         # union topology used for slow growth.
         self._bond_graph_a = self._build_bond_graph(mol_a)
         self._bond_graph_b = self._build_bond_graph(mol_b)
+        # hydroxyl or water H atoms (type HO or HW) whose bonded partners change
+        # in this reaction, i.e. the moving H; used by _get_LJ_parameters.
+        # An H that lands on an oxygen again (product type HO/HW) is left out:
+        # its pairs keep the H1 size in both states, so the push off the donor
+        # oxygen is balanced by the fading push from the acceptor oxygen
+        self.moved_lj_free_hydrogens = {
+            atom_nr
+            for atom_nr, atom in mol_a.atoms.items()
+            if atom.type in ("HO", "HW")
+            and self._bond_graph_a[atom_nr] != self._bond_graph_b.get(atom_nr, set())
+            and mol_b.atoms[atom_nr].type not in ("HO", "HW")
+        }
         self._pairs_a = {to_pairkey(key) for key in mol_a.pairs}
         self._pairs_b = {to_pairkey(key) for key in mol_b.pairs}
         self._explicit_exclusions_a = self._expand_exclusions(mol_a)
@@ -246,6 +355,14 @@ class MoleculeTypeMerger:
             for key in self.affected_interactions.bonds.removed:
                 self.mol_a.pairs.pop(key, None)
                 self.mol_a.exclusions[key] = Exclusion(*key)
+
+        # after the bonded terms are merged: every interaction that touches a
+        # transferred H is written with explicit parameters by then, so the new
+        # type needs no <type>-H1 entry in the force field
+        self._retype_transferred_hydrogens()
+        # optional spring pulling the moving H onto its new atom
+        if self.harmonic_acceptor_h_relax_term:
+            self._add_harmonic_acceptor_h_terms()
 
         logger.info(f"Finished merging topologies")
 
@@ -430,9 +547,21 @@ class MoleculeTypeMerger:
         return multiple_dihedrals
 
     def _get_LJ_parameters(
-        self, id1: str, id2: str, use_state_b: bool, is_1_4: bool = False
+        self,
+        id1: str,
+        id2: str,
+        use_state_b: bool,
+        is_1_4: bool = False,
+        lj_free_h_in_a: bool = False,
     ):
-        """Calculate LJ terms sigma and epsilon from atom types"""
+        """Calculate LJ terms sigma and epsilon from atom types.
+
+        A hydroxyl or water H (type HO or HW) has no LJ size, so it is normally
+        looked up as an H type with a size (H1). With lj_free_h_in_a and
+        retype_transferred_h on, the moving H keeps its real, size-free type in
+        state A instead, so a pair term with it starts at zero and grows in
+        with lambda. Returns sigma and epsilon for the atom pair.
+        """
 
         # defaults top line:
         # non-bonded function type; combination rule; generate pairs (no/yes); fudge LJ (); fudge QQ ()
@@ -448,11 +577,26 @@ class MoleculeTypeMerger:
         t1 = mol.atoms[id1].type
         t2 = mol.atoms[id2].type
 
-        # amber fix for breaking/binding atom types without LJ potential
-        if t1 in ["HW", "HO"]:
-            t1 = "H1"
-        if t2 in ["HW", "HO"]:
-            t2 = "H1"
+        # Protect breaking/binding hydrogen types without LJ potential. Keep
+        # the historical H1 lookup when the opt-in relaxation retyping is off.
+        replacement_h_type = (
+            self.transferred_h_type
+            if self.retype_transferred_h and self.transferred_h_type is not None
+            else "H1"
+        )
+        # with retype_transferred_h, the moving H keeps its size-free type in
+        # state A of a pair term, like its atom type in the relax topology
+        keep_real_a_type = (
+            lj_free_h_in_a and self.retype_transferred_h and not use_state_b
+        )
+        if t1 in ["HW", "HO"] and not (
+            keep_real_a_type and id1 in self.moved_lj_free_hydrogens
+        ):
+            t1 = replacement_h_type
+        if t2 in ["HW", "HO"] and not (
+            keep_real_a_type and id2 in self.moved_lj_free_hydrogens
+        ):
+            t2 = replacement_h_type
 
         type1 = self.ff.atomtypes[t1]
         type2 = self.ff.atomtypes[t2]
@@ -531,8 +675,9 @@ class MoleculeTypeMerger:
         Pair
             Morphing pair
         """
+        # state A: the moving H is size-free here (only pairs, not Morse bond lengths)
         sigmaij_a, epsilonij_a = self._get_LJ_parameters(
-            id1=id1, id2=id2, use_state_b=False, is_1_4=from_1_4
+            id1=id1, id2=id2, use_state_b=False, is_1_4=from_1_4, lj_free_h_in_a=True
         )
         sigmaij_b, epsilonij_b = self._get_LJ_parameters(
             id1=id1, id2=id2, use_state_b=True, is_1_4=to_1_4
@@ -651,6 +796,177 @@ class MoleculeTypeMerger:
             logger.error(m)
             raise ValueError(m)
         return dihedralmerge
+
+    def _find_lj_hydrogen_type(self) -> str | None:
+        """Pick a hydrogen atom type of the force field that has a Lennard-Jones size.
+
+        A hydroxyl or water H (type HO or HW) has no size of its own. When such
+        an H moves onto another atom it needs a type with a size; this returns
+        the first one found (H1 in Amber force fields), or None if there is none.
+        """
+        # try the usual names first, then every other type whose name starts with H
+        preferred = ("H1", "H", "HC", "HGA")
+        candidates = list(preferred) + sorted(
+            name for name in self.ff.atomtypes if name not in preferred and name.upper().startswith("H")
+        )
+
+        # return the first candidate with a non-zero size (epsilon)
+        for name in candidates:
+            atomtype = self.ff.atomtypes.get(name)
+            if atomtype is None:
+                continue
+            try:
+                if float(atomtype.epsilon) != 0.0:
+                    return name
+            except (TypeError, ValueError):
+                continue
+        return None
+
+    def _add_harmonic_acceptor_h_terms(self):
+        """Add a spring between the moving H and its new atom, for the relax only.
+
+        The moving H is the hydrogen that loses one bond and gains a new one in
+        the reaction. The spring has the normal length of the new bond and its
+        strength grows from 0 at the start of the relax to
+        harmonic_acceptor_h_relax_k at the end, so it pulls the H onto its new
+        atom while the old bond fades. It is written as bond type 6, a plain
+        spring that does not switch off any other forces between the atoms.
+        Only called when harmonic_acceptor_h_relax_term is on.
+
+        The spring is a second [ bonds ] line for the same atom pair as the new
+        (Morse) bond. KIMMDY stores one bond per atom pair, so a topology
+        written with this spring cannot be read back into KIMMDY without
+        losing one of the two lines: with repeated_topology_lines merge or
+        error, reading it stops with an error; with last, only the last line
+        is kept. The relax topology is only meant for GROMACS, not to be
+        re-read.
+        """
+        # atoms that lost a bond in this reaction (the moving H is one of them)
+        broken_atoms = {nr for key in self.affected_interactions.bonds.removed for nr in key}
+
+        # for every new bond whose H also lost a bond, add the spring
+        added = 0
+        for bond_key, b0 in self._created_bond_lengths.items():
+            moving_h = [
+                nr
+                for nr in bond_key
+                if nr in broken_atoms
+                and nr in self.mol_a.atoms
+                and self._is_hydrogen(self.mol_a.atoms[nr])
+            ]
+            if len(moving_h) != 1:
+                continue
+            # third key element keeps the helper next to the Morse bond of the
+            # same atom pair; only the values are written to the topology, so
+            # the written file has two bond lines for this pair (see docstring)
+            self.mol_a.bonds[(*bond_key, "harmonic_acceptor_h")] = Bond(
+                *bond_key,
+                funct="6",
+                c0=f"{float(b0):.5f}",  # length at the start of the relax
+                c1=f"{0.0:.5f}",  # strength at the start: zero
+                c2=f"{float(b0):.5f}",  # length at the end (same)
+                c3=f"{self.harmonic_acceptor_h_relax_k:.5f}",  # strength at the end
+                comment=(
+                    "; harmonic acceptor-H helper growing with lambda (relax only);"
+                    " second line for this atom pair, KIMMDY cannot re-read it"
+                ),
+            )
+            added += 1
+        logger.info("Added %d harmonic acceptor-H relax helper bond(s)", added)
+
+    @staticmethod
+    def _is_hydrogen(atom) -> bool:
+        """Tell whether an atom is a hydrogen: by its mass, or by its type name if the mass is missing."""
+        try:
+            return float(atom.mass) < 1.5
+        except (TypeError, ValueError):
+            return str(atom.type).upper().startswith("H")
+
+    def _retype_transferred_hydrogens(self):
+        """Give a moved hydroxyl or water H a Lennard-Jones size at the end of the relax.
+
+        A hydroxyl or water H (type HO or HW) has no size of its own. This
+        keeps its old type at the start of the relax and sets the type with a
+        size (from _find_lj_hydrogen_type) only for the end state, so the H's
+        size grows in gradually. Only the relax topology is changed. Does
+        nothing when the option is off.
+        """
+        if not self.retype_transferred_h:
+            return
+
+        # atoms whose bonds changed in this reaction
+        candidate_atoms = set(self.affected_interactions.atoms)
+        for pair in (
+            self.affected_interactions.bonds.added
+            | self.affected_interactions.bonds.removed
+        ):
+            candidate_atoms.update(pair)
+        for bond_key in set(self.mol_a.bonds) ^ set(self.mol_b.bonds):
+            candidate_atoms.update(bond_key)
+        if self.transferred_h_type is None:
+            logger.warning("No LJ-bearing hydrogen type found in the force field; skipping transferred-H retyping")
+            return
+
+        # retype every hydroxyl or water H among them, in the end state only
+        retyped = 0
+        for atom_nr in candidate_atoms:
+            atom = self.mol_a.atoms.get(atom_nr)
+            if atom is None or atom.type not in {"HW", "HO"}:
+                continue
+            implicit = self._implicit_interactions(atom_nr)
+            if implicit:
+                logger.warning(
+                    "Not retyping transferred H %s: %s still take their parameters "
+                    "from the force field by atom type, which has no entry for %s",
+                    atom_nr,
+                    ", ".join(implicit),
+                    self.transferred_h_type,
+                )
+                continue
+            # state B only: state A keeps the original (LJ-free) type, so an H
+            # that sits in a tight hydrogen bond at the reaction frame does not
+            # get its full Lennard-Jones radius at lambda 0 and blow the relax
+            # up; its LJ parameters grow in linearly with lambda instead
+            atom.typeB = self.transferred_h_type
+            atom.comment = (
+                f"; transferred H retyped {atom.type} -> "
+                f"{self.transferred_h_type} in state B only"
+            )
+            retyped += 1
+        if retyped:
+            logger.info(
+                "Retyped %d transferred H atom(s) in relaxation topology (state B only)",
+                retyped,
+            )
+
+    def _implicit_interactions(self, atom_nr: str) -> list[str]:
+        """List the terms of one atom that still get their numbers from the force field by type.
+
+        Retyping an H is only safe when every term it is part of already has
+        explicit numbers: the force field has no bond, angle or dihedral entry
+        for the new H type on a hydroxyl oxygen. Returns names such as
+        "bond 12-13" for every term that still has no numbers.
+        """
+        # look through bonds, angles, dihedrals and pairs that contain the atom
+        implicit: list[str] = []
+        sections = (
+            ("bond", self.mol_a.bonds),
+            ("angle", self.mol_a.angles),
+            ("dihedral", self.mol_a.proper_dihedrals),
+            ("improper dihedral", self.mol_a.improper_dihedrals),
+            ("pair", self.mol_a.pairs),
+        )
+        for name, interactions in sections:
+            for key, interaction in interactions.items():
+                if atom_nr not in key:
+                    continue
+                # proper and improper dihedrals are grouped by periodicity
+                terms = list(getattr(interaction, "dihedrals", {}).values()) or [
+                    interaction
+                ]
+                if any(getattr(term, "c0", None) is None for term in terms):
+                    implicit.append(f"{name} {'-'.join(key)}")
+        return implicit
 
     def merge_atoms(self):
         # only iterating over the keys of mol_a
@@ -793,6 +1109,7 @@ class MoleculeTypeMerger:
                     raise ValueError(m)
                 pairkey = to_pairkey(bond_key)
                 self.affected_interactions.bonds.added.add(pairkey)
+                self._created_bond_lengths[bond_key] = bond_b.c0
                 if self.morse_only:
                     # use a bond that pretends to be LJ via morse
                     self.mol_a.bonds[bond_key] = Bond(
@@ -993,11 +1310,19 @@ class MoleculeTypeMerger:
                 logger.warning("Could not parameterize angle %s.", key)
 
     def merge_dihedrals(self):
+        # parallel code when switched on; otherwise the one-CPU code below runs
+        if self.parallel_dihedral_merge and self.parallel_dihedral_workers > 1:
+            self._merge_dihedrals_parallel()
+            return
         # proper dihedrals
         # proper dihedrals have a nested structure and need a different treatment from bonds, angles and improper dihedrals
         logger.info("Merging dihedrals")
-        keys = set(self.mol_a.proper_dihedrals.keys()) | set(
-            self.mol_b.proper_dihedrals.keys()
+        # fixed order (by atom numbers), the same as in the parallel merge, so
+        # every run writes the dihedrals in the same order
+        keys = sorted(
+            set(self.mol_a.proper_dihedrals.keys())
+            | set(self.mol_b.proper_dihedrals.keys()),
+            key=_dihedral_order,
         )
         for key in keys:
             multiple_dihedralsA = self._get_explicit_MultipleDihedrals(
@@ -1050,7 +1375,7 @@ class MoleculeTypeMerger:
                 *key, funct=FFFUNC["mult_proper_dihedral"], dihedrals={}
             )
 
-            periodicity_keys = keysA | keysB
+            periodicity_keys = sorted(keysA | keysB, key=_periodicity_order)
             for periodicity_key in periodicity_keys:
                 interactionA = (
                     multiple_dihedralsA.dihedrals.get(periodicity_key)
@@ -1071,9 +1396,11 @@ class MoleculeTypeMerger:
                     )
                 )
 
-        # improper dihedrals
-        keys = set(self.mol_a.improper_dihedrals.keys()) | set(
-            self.mol_b.improper_dihedrals.keys()
+        # improper dihedrals, in the same fixed order
+        keys = sorted(
+            set(self.mol_a.improper_dihedrals.keys())
+            | set(self.mol_b.improper_dihedrals.keys()),
+            key=_dihedral_order,
         )
         for key in keys:
             multiple_dihedralsA = self._get_explicit_MultipleDihedrals(
@@ -1097,7 +1424,7 @@ class MoleculeTypeMerger:
                 *key, funct=FFFUNC["mult_improper_dihedral"], dihedrals={}
             )
 
-            periodicity_keys = keysA | keysB
+            periodicity_keys = sorted(keysA | keysB, key=_periodicity_order)
             for periodicity_key in periodicity_keys:
                 assert isinstance(periodicity_key, str)
                 interactionA = (
@@ -1119,6 +1446,68 @@ class MoleculeTypeMerger:
                         funct=FFFUNC["mult_improper_dihedral"],
                     )
                 )
+
+    def _merge_dihedrals_parallel(self):
+        """Do the work of merge_dihedrals on several CPUs at once.
+
+        Every dihedral is sent to _merge_dihedral_worker in a helper process.
+        They are sent in a fixed order (sorted by atom number) and the results
+        come back in the same order, so every run gives the same topology.
+        The main process then writes the results into the relax topology.
+        If helper processes cannot be started, the normal one-CPU code is used.
+        """
+        global _PARALLEL_DIHEDRAL_MERGER
+        logger.info(
+            "Merging dihedrals in parallel with %d workers",
+            self.parallel_dihedral_workers,
+        )
+        # list all dihedrals, sorted by atom number so the order never changes
+        proper_keys = sorted(
+            set(self.mol_a.proper_dihedrals) | set(self.mol_b.proper_dihedrals),
+            key=_dihedral_order,
+        )
+        improper_keys = sorted(
+            set(self.mol_a.improper_dihedrals) | set(self.mol_b.improper_dihedrals),
+            key=_dihedral_order,
+        )
+        payload = [(key, False) for key in proper_keys] + [
+            (key, True) for key in improper_keys
+        ]
+        if not payload:
+            return
+        _PARALLEL_DIHEDRAL_MERGER = self  # let the helpers read this merger
+        try:
+            context = mp.get_context("fork")
+        except ValueError:
+            logger.warning("Fork workers are unavailable; using serial dihedral merging")
+            _PARALLEL_DIHEDRAL_MERGER = None
+            self.parallel_dihedral_merge = False
+            self.merge_dihedrals()  # helpers not possible: use the normal one-CPU code
+            return
+        try:
+            with ProcessPoolExecutor(
+                max_workers=self.parallel_dihedral_workers, mp_context=context
+            ) as executor:
+                # results come back in the order they were sent
+                results = list(executor.map(_merge_dihedral_worker, payload))
+        finally:
+            _PARALLEL_DIHEDRAL_MERGER = None  # clean up when the helpers are done
+
+        # write each result into the topology, in the same sorted order
+        for key, merged, category, use_improper in results:
+            if category == "morphed":
+                self.affected_interactions.dihedrals.morphed.add(to_pairkey(key))
+            elif category == "added":
+                self.affected_interactions.dihedrals.added.add(to_pairkey(key))
+            elif category == "removed":
+                self.affected_interactions.dihedrals.removed.add(to_pairkey(key))
+            if merged is not None:
+                target = (
+                    self.mol_a.improper_dihedrals
+                    if use_improper
+                    else self.mol_a.proper_dihedrals
+                )
+                target[key] = merged
 
     def merge_pairs(self):
         """Merge pairs that are from the respective pairs sections of the topologies"""
@@ -1436,6 +1825,11 @@ def merge_top_slow_growth(
     top_a: Topology,
     top_b: Topology,
     morse_only: bool = False,
+    retype_transferred_h: bool = True,
+    parallel_dihedral_merge: bool = False,
+    parallel_dihedral_workers: int = 1,
+    harmonic_acceptor_h_relax_term: bool = False,
+    harmonic_acceptor_h_relax_k: float = 50000.0,
 ):
     """Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation.
     Modifies topB in place.
@@ -1447,6 +1841,11 @@ def merge_top_slow_growth(
         mol_b=top_b.reactive_molecule,
         ff=top_a.ff,
         morse_only=morse_only,
+        retype_transferred_h=retype_transferred_h,
+        parallel_dihedral_merge=parallel_dihedral_merge,
+        parallel_dihedral_workers=parallel_dihedral_workers,
+        harmonic_acceptor_h_relax_term=harmonic_acceptor_h_relax_term,
+        harmonic_acceptor_h_relax_k=harmonic_acceptor_h_relax_k,
     ).merge()
 
     # because we clear some sections of the moleculetype,

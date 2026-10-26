@@ -76,6 +76,47 @@ def hexala_top_fix(assetsdir, filedir) -> Topology:
     return Topology(hexala_top)
 
 
+@pytest.fixture()
+def r10_a99sbdisp_top_fix(filedir) -> Topology:
+    """A pdb2gmx topology of one SSGP-[GRGDSPYS]10-GY chain (86 residues) with the a99SB-disp force field."""
+    top = read_top(filedir / "R10_a99SBdisp.top", ffdir=filedir / "a99SBdisp.ff")
+    return Topology(top)
+
+
+def rtp_psi_terms(rtp: Path, residue: str) -> dict[str, tuple[float, float]]:
+    """Read the N CA C +N lines of one residue straight from an .rtp file, merged per periodicity.
+
+    Returns {periodicity: (phase, force constant)}; two lines with the same
+    periodicity are added up with combine_periodic_terms, as KIMMDY does.
+    """
+    lines, inside = [], False
+    for line in rtp.read_text().splitlines():
+        stripped = line.split(";")[0].strip()
+        if stripped.startswith("[") and not stripped.startswith("[ "):
+            stripped = "[ " + stripped[1:]
+        if stripped.startswith("[ ") and stripped.strip("[] ") not in (
+            "atoms", "bonds", "impropers", "dihedrals", "cmap"
+        ):
+            inside = stripped.strip("[] ") == residue
+            continue
+        parts = stripped.split()
+        if inside and parts[:4] == ["N", "CA", "C", "+N"] and len(parts) >= 7:
+            lines.append(parts[4:7])
+    terms = {}
+    for phase, k, n in lines:
+        if n in terms:
+            phase, k = combine_periodic_terms([terms[n], (phase, k)])
+        terms[n] = (phase, k)
+    return {n: (float(phase), float(k)) for n, (phase, k) in terms.items()}
+
+
+@pytest.fixture()
+def hexala_radical_top_fix(assetsdir, filedir) -> Topology:
+    """Hexala without HA of residue 2, so CA 9 is a radical (HA charge moved onto CA 9)."""
+    hexala_radical_top = read_top(filedir / "hexala_radical.top")
+    return Topology(hexala_radical_top)
+
+
 @st.composite
 def random_atomlist(draw):
     n = draw(st.integers(min_value=3, max_value=5))
@@ -822,6 +863,89 @@ class TestHexalaTopology:
         for a in res.values():
             assert a.residue == "ALA"
 
+    def test_improper_neighbors_after_h_transfer(self, hexala_radical_top_fix):
+        """H atoms that moved between residues keep their distant numbers; -C/+N impropers must still use the bonded neighbours.
+
+        After the two transfers, residue 2 holds H 61 and residue 7 holds H 11.
+        Old rule (atom number +/- 1): the next residue of residue 2 is atom 62
+        (residue 7) and the previous residue of residue 7 is atom 10 (residue 2),
+        so the rebuilt impropers wrongly join C 14 of residue 2 to N 56 of
+        residue 7, e.g. (9, 56, 14, 15). New rule (C-N bonds): N 16 and C 54,
+        so the impropers stay as before the transfers, e.g. (9, 16, 14, 15).
+        """
+        top = deepcopy(hexala_radical_top_fix)
+        mol = top.reactive_molecule
+        assert list(top.radicals) == ["9"]
+
+        # backbone impropers on C 14 (residue 2) and N 56 (residue 7) before any transfer
+        before = {
+            nr: set(mol._get_atom_improper_dihedrals(nr, top.ff)) for nr in ("14", "56")
+        }
+
+        # H 61 (residue 7) moves onto the radical CA 9 (residue 2),
+        # then H 11 (residue 2) moves onto the new radical CB 60 (residue 7)
+        top.break_bond(("60", "61"))
+        top.bind_bond(("9", "61"))
+        top.break_bond(("10", "11"))
+        top.bind_bond(("60", "11"))
+        residue_2 = get_residue_by_bonding(atom=mol.atoms["14"], atoms=mol.atoms)
+        residue_7 = get_residue_by_bonding(atom=mol.atoms["64"], atoms=mol.atoms)
+        assert "61" in residue_2 and "11" in residue_7
+
+        # numbering just outside the residues now points into the wrong residue
+        assert mol.atoms[str(int(max(residue_2, key=int)) + 1)].resnr == "7"
+        assert mol.atoms[str(int(min(residue_7, key=int)) - 1)].resnr == "2"
+
+        # the neighbours are found through the C-N bonds instead
+        previous_atom, next_atom = mol._get_neighbor_residue_atoms(residue_2)
+        assert (previous_atom.nr, next_atom.nr) == ("5", "16")
+        previous_atom, next_atom = mol._get_neighbor_residue_atoms(residue_7)
+        assert (previous_atom.nr, next_atom.nr) == ("54", "66")
+
+        # so the backbone impropers are the same as before the transfers
+        for nr in ("14", "56"):
+            assert set(mol._get_atom_improper_dihedrals(nr, top.ff)) == before[nr]
+
+
+class TestA99SBdispPsi:
+    def test_rebuilt_impropers_keep_all_periodicities(self, r10_a99sbdisp_top_fix, filedir):
+        """Rebuilding impropers from the .rtp keeps every periodic term of the a99SB-disp psi correction.
+
+        a99SB-disp lists N CA C +N with periodicities 1, 1, 2, 3, 4, 5 under
+        [ impropers ]. Before, only the last line (n = 5) survived a rebuild;
+        now all are kept (the two n = 1 lines merged), so the rebuilt psi terms
+        equal those pdb2gmx wrote and those in the .rtp. The N-terminal residue
+        is not compared: pdb2gmx's terminus rules leave out its psi term.
+        """
+        top = deepcopy(r10_a99sbdisp_top_fix)
+        mol = top.reactive_molecule
+
+        def psi_terms() -> dict:
+            """All N CA C +N impropers of the chain as {atoms: {periodicity: (phase, k)}}."""
+            return {
+                key: {n: (float(d.c0), float(d.c1)) for n, d in terms.dihedrals.items()}
+                for key, terms in mol.improper_dihedrals.items()
+                if [mol.atoms[nr].atom for nr in key] == ["N", "CA", "C", "N"]
+                and mol.atoms[key[0]].resnr != "1"
+            }
+
+        # psi terms as pdb2gmx wrote them, then rebuilt from the residue templates
+        from_file = psi_terms()
+        top._regenerate_topology_from_bound_to()
+        rebuilt = psi_terms()
+
+        # psi corrections: R, D, S, Y, S in each of the 10 blocks plus S 2;
+        # GLY and PRO have none, the C-terminal TYR has no next N
+        assert len(from_file) == 51
+        assert rebuilt.keys() == from_file.keys()
+        rtp = filedir / "a99SBdisp.ff" / "aminoacids.rtp"
+        for key, terms in rebuilt.items():
+            assert sorted(terms) == ["1", "2", "3", "4", "5"]
+            expected = rtp_psi_terms(rtp, mol.atoms[key[0]].residue)
+            for n, (phase, k) in terms.items():
+                assert (phase, k) == pytest.approx(from_file[key][n], abs=1e-4)
+                assert (phase, k) == pytest.approx(expected[n], abs=1e-4)
+
 
 class TestPolymerFF:
     def test_sections_are_complete(self, filedir):
@@ -861,12 +985,15 @@ class TestRadicalAla:
     @pytest.fixture
     def top_noprm_fix(self, filedir) -> Topology:
         hexala_top = read_top(filedir / "Ala_R_noprm.top")
-        return Topology(hexala_top)
+        # this test file lists the dihedral 5-7-9-14 three times without
+        # numbers (GROMACS would apply it three times); keep only the last line
+        return Topology(hexala_top, repeated_topology_lines="last")
 
     @pytest.fixture
     def top_noprm_explicitR_fix(self, filedir) -> Topology:
         hexala_top = read_top(filedir / "Ala_R_noprm.top")
-        return Topology(hexala_top, radicals="9")
+        # see top_noprm_fix
+        return Topology(hexala_top, radicals="9", repeated_topology_lines="last")
 
     @pytest.fixture
     def top_prm_fix(self, filedir) -> Topology:
@@ -1091,6 +1218,9 @@ def dopa_itp_topology() -> Topology:
         radicals="92",
         product_template_sources=("itp",),
         product_template_itp_glob="*.itp",
+        # these tests check the product-template charges, which the default
+        # charge-conserving transfer skips on purpose
+        conserve_transferred_h_charge=False,
     )
 
 
@@ -1320,6 +1450,9 @@ def test_ohr_transition_restores_tip3_like_product_and_conserves_charge():
         product_template_sources=("itp",),
         product_template_itp_glob="*.itp",
         product_template_transitions={"OHR": "OHRH"},
+        # this test checks the product-template charges, which the default
+        # charge-conserving transfer skips on purpose
+        conserve_transferred_h_charge=False,
     )
     acceptor = next(atom for atom in top.atoms.values() if atom.type == "ORA")
     donor = next(atom for atom in top.atoms.values() if atom.type == "OT")
@@ -1366,3 +1499,168 @@ def test_ohr_transition_restores_tip3_like_product_and_conserves_charge():
     )
     assert match_key not in top.pending_product_template_matches
     assert donor_h.nr not in top.pending_transferred_h_charges
+
+
+def _alacar_with_extra_lines(section: str, extra: list[list[str]]) -> dict:
+    """Read the small Ala test topology and append extra lines to one section of its molecule."""
+    raw = read_top(Path("AlaCaR_out.top"))
+    mol = next(key for key in raw if key.startswith("moleculetype_"))
+    raw[mol]["subsections"][section]["content"].extend(extra)
+    return raw
+
+
+@pytest.mark.parametrize("arranged_tmp_path", ["test_coordinates"], indirect=True)
+def test_duplicate_bond_line_stops_parsing(arranged_tmp_path):
+    """A repeated bond line would be dropped silently, so reading stops with an error."""
+    raw = _alacar_with_extra_lines("bonds", [["1", "2", "1"]])
+    with pytest.raises(ValueError, match="more than once"):
+        Topology(raw)
+
+
+@pytest.mark.parametrize("arranged_tmp_path", ["test_coordinates"], indirect=True)
+def test_duplicate_explicit_proper_lines_are_merged(arranged_tmp_path):
+    """Two explicit proper lines with the same atoms and periodicity become one equivalent term."""
+    extra = [
+        ["2", "1", "5", "6", "9", "0.0", "1.0", "3"],
+        ["2", "1", "5", "6", "9", "180.0", "2.0", "3"],
+    ]
+    top = Topology(_alacar_with_extra_lines("dihedrals", extra))
+    merged = top.proper_dihedrals[("2", "1", "5", "6")].dihedrals["3"]
+    # 1.0 cos(3phi) - 2.0 cos(3phi) = -1.0 cos(3phi) = 1.0 cos(3phi - 180)
+    assert float(merged.c0) == pytest.approx(180.0)
+    assert float(merged.c1) == pytest.approx(1.0)
+
+
+@pytest.mark.parametrize("arranged_tmp_path", ["test_coordinates"], indirect=True)
+def test_repeated_lines_last_keeps_the_later_line(arranged_tmp_path):
+    """With repeated_topology_lines last, the later line replaces the earlier one, as older KIMMDY did."""
+    raw = _alacar_with_extra_lines("bonds", [["1", "2", "1"]])
+    extra = [
+        ["2", "1", "5", "6", "9", "0.0", "1.0", "3"],
+        ["2", "1", "5", "6", "9", "180.0", "2.0", "3"],
+    ]
+    mol = next(key for key in raw if key.startswith("moleculetype_"))
+    raw[mol]["subsections"]["dihedrals"]["content"].extend(extra)
+    top = Topology(raw, repeated_topology_lines="last")
+    kept = top.proper_dihedrals[("2", "1", "5", "6")].dihedrals["3"]
+    assert (kept.c0, kept.c1) == ("180.0", "2.0")
+
+
+# repeated_topology_lines: merge, error and last for repeated explicit dihedral
+# terms (same atoms and periodicity), for propers (function 9) and impropers
+# (function 4); the two lines add up to phase 180, k 1.0
+REPEATED_TERMS = {
+    "proper": (
+        "9",
+        "3",
+        [
+            ["2", "1", "5", "6", "9", "0.0", "1.0", "3"],
+            ["2", "1", "5", "6", "9", "180.0", "2.0", "3"],
+        ],
+    ),
+    "improper": (
+        "4",
+        "2",
+        [
+            ["2", "1", "5", "6", "4", "0.0", "1.0", "2"],
+            ["2", "1", "5", "6", "4", "180.0", "2.0", "2"],
+        ],
+    ),
+}
+
+
+@pytest.mark.parametrize("kind", ["proper", "improper"])
+@pytest.mark.parametrize("arranged_tmp_path", ["test_coordinates"], indirect=True)
+def test_repeated_dihedral_terms_in_all_modes(arranged_tmp_path, kind):
+    """merge adds up two repeated terms, error stops, last keeps the second line; for propers and impropers."""
+    funct, periodicity, extra = REPEATED_TERMS[kind]
+
+    def terms(mode):
+        """Read the Ala test topology with the two extra lines in the given mode and return the stored terms."""
+        top = Topology(_alacar_with_extra_lines("dihedrals", extra), repeated_topology_lines=mode)
+        store = top.improper_dihedrals if kind == "improper" else top.proper_dihedrals
+        return store[("2", "1", "5", "6")].dihedrals
+
+    # merge: one equivalent term, 1.0 cos(n phi) - 2.0 cos(n phi) = 1.0 cos(n phi - 180)
+    merged = terms("merge")[periodicity]
+    assert merged.funct == funct
+    assert float(merged.c0) == pytest.approx(180.0)
+    assert float(merged.c1) == pytest.approx(1.0)
+
+    # error: any repeat stops
+    with pytest.raises(ValueError, match=rf"\[ dihedrals \({kind}\) \] lists atoms 2 1 5 6"):
+        terms("error")
+
+    # last: only the second line is kept
+    last = terms("last")[periodicity]
+    assert (last.c0, last.c1) == ("180.0", "2.0")
+
+
+@pytest.mark.parametrize("arranged_tmp_path", ["test_coordinates"], indirect=True)
+def test_macro_and_numerical_dihedrals_are_equivalent(arranged_tmp_path):
+    """A proper dihedral written with #define names gives the same terms as the same dihedral written with numbers.
+
+    Two copies of the Ala test topology: in one, the dihedral 2-1-5-6 is written
+    as two lines with #define names, in the other with the numbers themselves.
+    """
+    text = Path("AlaCaR_out.top").read_text()
+    original = "2        1        5        6        9       \n"
+    assert text.count(original) == 1
+
+    # macro version: two #define lines and two dihedral lines that use them
+    defines = (
+        "#define test_torsion_1 0.0 1.5 1\n"
+        "#define test_torsion_2 180.0 2.5 2\n\n"
+        "[ moleculetype ]"
+    )
+    macro = text.replace("[ moleculetype ]", defines, 1).replace(
+        original, "2 1 5 6 9 test_torsion_1\n2 1 5 6 9 test_torsion_2\n"
+    )
+    numerical = text.replace(
+        original, "2 1 5 6 9 0.0   1.5 1\n2 1 5 6 9 180.0 2.5 2\n"
+    )
+    Path("macro.top").write_text(macro)
+    Path("numerical.top").write_text(numerical)
+
+    # read both and compare the stored terms of 2-1-5-6
+    stored = []
+    for name in ("macro.top", "numerical.top"):
+        top = Topology(read_top(Path(name)))
+        terms = top.proper_dihedrals[("2", "1", "5", "6")].dihedrals
+        stored.append(
+            {n: (d.funct, float(d.c0), float(d.c1), d.periodicity) for n, d in terms.items()}
+        )
+    from_macro, from_numbers = stored
+    assert sorted(from_macro) == ["1", "2"]
+    assert from_macro == from_numbers
+    assert from_macro["1"] == ("9", pytest.approx(0.0), pytest.approx(1.5), "1")
+    assert from_macro["2"] == ("9", pytest.approx(180.0), pytest.approx(2.5), "2")
+
+
+def test_repeated_proper_without_numbers_stops_in_merge_mode(filedir):
+    """Ala_R_noprm.top lists the proper dihedral 5-7-9-14 three times without numbers; merge cannot add them up and stops."""
+    with pytest.raises(ValueError, match=r"\[ dihedrals \(proper\) \] lists atoms 5 7 9 14"):
+        Topology(read_top(filedir / "Ala_R_noprm.top"))
+
+
+@pytest.mark.parametrize(
+    "mode, expected",
+    [("merge", ("180.000000", "1.000000")), ("last", ("180.0", "2.0")), ("error", None)],
+)
+def test_repeated_template_impropers_in_all_modes(mode, expected):
+    """A residue template that lists one improper with the same periodicity twice follows repeated_topology_lines too."""
+    section = {
+        "impropers": {
+            "content": [
+                ["N", "CA", "C", "+N", "0.0", "1.0", "1"],
+                ["N", "CA", "C", "+N", "180.0", "2.0", "1"],
+            ]
+        }
+    }
+    if expected is None:
+        with pytest.raises(ValueError, match="more than once"):
+            ResidueType.from_section("ALA", section, repeated_lines=mode)
+        return
+    template = ResidueType.from_section("ALA", section, repeated_lines=mode)
+    (term,) = template.improper_dihedrals[("N", "CA", "C", "+N")]
+    assert (term.c0, term.c1) == expected

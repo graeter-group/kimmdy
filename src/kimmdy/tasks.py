@@ -109,11 +109,17 @@ def create_task_directory(
         )
     )
     files.logger.addHandler(hand)
-    # symlink force field
+    # link the force field folder and its residuetypes.dat into the task folder,
+    # unless the link is already there. is_symlink() is checked as well because
+    # exists() is False for a link whose target is missing (a force field
+    # without residuetypes.dat); re-creating that link when a restart reuses
+    # the folder would fail with FileExistsError.
     if runmng.config.ff is not None:
-        if not (files.outputdir / runmng.config.ff.name).exists():
-            (files.outputdir / runmng.config.ff.name).symlink_to(runmng.config.ff)
-        if not (files.outputdir / "residuetypes.dat").exists():
+        ff_link = files.outputdir / runmng.config.ff.name
+        if not (ff_link.exists() or ff_link.is_symlink()):
+            ff_link.symlink_to(runmng.config.ff)
+        residuetypes_link = files.outputdir / "residuetypes.dat"
+        if not (residuetypes_link.exists() or residuetypes_link.is_symlink()):
             (files.outputdir / "residuetypes.dat").symlink_to(
                 runmng.config.ff / "residuetypes.dat"
             )

@@ -41,6 +41,7 @@ class FF:
         product_template_sources: tuple[str, ...] = ("rtp",),
         product_template_itp_glob: str = "*.itp",
         product_template_transitions: Optional[dict[str, str]] = None,
+        repeated_topology_lines: str = "merge",
     ):
         self.atomtypes: dict[AtomId, AtomType] = {}
         self.bondtypes: dict[BondId, BondType] = {}
@@ -175,7 +176,24 @@ class FF:
                     continue
                 if not v.get("subsections"):
                     raise AssertionError(f"key {k} has no subsections, only {v}.")
-                self.residuetypes[k] = ResidueType.from_section(k, v["subsections"])
+                self.residuetypes[k] = ResidueType.from_section(
+                    k,
+                    v["subsections"],
+                    repeated_lines=repeated_topology_lines,
+                )
+
+        # one warning for all residue templates whose repeated impropers were merged
+        merged = {
+            name: rt.merged_impropers
+            for name, rt in self.residuetypes.items()
+            if isinstance(rt, ResidueType) and rt.merged_impropers
+        }
+        if merged:
+            logger.warning(
+                f"Merged {sum(merged.values())} repeated improper term(s) with the same "
+                f"atoms and periodicity in {len(merged)} residue template(s) "
+                f"({', '.join(sorted(merged))}); same forces, energy shifted by a constant."
+            )
 
     def __str__(self) -> str:
         return textwrap.dedent(

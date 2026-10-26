@@ -1,5 +1,151 @@
 # Changelog
 
+## Unreleased
+
+New options keep the original behaviour when they are not set, except the
+correctness fixes marked "default true"; set those to false to get the
+original behaviour.
+
+### Features
+
+* Optional seeded KMC recipe selection. New top-level key `kmc_seed` (unset by
+  default). Each decide task draws from `default_rng([seed, task number])`, so
+  a rerun picks the same recipes, every cycle gets different random numbers,
+  and a restart that redoes a task gets the same numbers. Ignored for
+  `dummy_first`.
+  Files: `src/kimmdy/runmanager.py`, `src/kimmdy/kimmdy-yaml-schema.json`.
+* Optional whole molecules in the reaction frame. New top-level key
+  `reaction_frame_whole_molecules` (default false) extracts the frame at the
+  reaction time against the MD run's .tpr with `-pbc mol -ur compact`, so no
+  molecule is split across the box; without a .tpr it warns and extracts as
+  before.
+  Files: `src/kimmdy/utils.py`, `src/kimmdy/runmanager.py`,
+  `src/kimmdy/kimmdy-yaml-schema.json`.
+* Restart-safe deletion of reaction-input trajectories. New top-level key
+  `delete_xtc_before_reactions` (default false): the .xtc of the MD task right
+  before each reaction (the one the reaction read) is deleted once a later
+  regular MD task has finished. KIMMDY restarts only from regular MD tasks,
+  so no restart can need a deleted file; trajectories without a later
+  completed regular MD task are kept, also at the end of the run. Each
+  deletion is logged first and writes `<instance>_xtc_cleanup.json` next to
+  the removed file.
+  Files: `src/kimmdy/runmanager.py`, `src/kimmdy/kimmdy-yaml-schema.json`.
+* Optional parallel dihedral merging for slow-growth topologies. New keys
+  under `changer.coordinates`: `parallel_dihedral_merge` (default false) and
+  `parallel_dihedral_workers` (default 1). Dihedrals are merged in fork helper
+  processes and written back in sorted atom order; the log says "Merging
+  dihedrals in parallel with N workers". On a 283k-atom system `apply_recipe`
+  went from 8,526 s to 617 s. The one-CPU merge now goes through the
+  dihedrals in the same order (sorted by atom numbers, periodicities as
+  numbers), so both write identical topologies and every run gives the same
+  line order; before, the one-CPU order changed from run to run.
+  Files: `src/kimmdy/coordinates.py`, `src/kimmdy/runmanager.py`,
+  `src/kimmdy/kimmdy-yaml-schema.json`.
+* Optional spring on the moving H during the relax. New keys
+  `changer.coordinates.harmonic_acceptor_h_relax_term` (default false) and
+  `harmonic_acceptor_h_relax_k` (default 50,000 kJ mol^-1 nm^-2). The moving H
+  gets an extra harmonic bond (function type 6, no exclusions) to its new
+  atom, at that bond's force-field length, with a strength growing from 0 to
+  the set value over the relax. It keeps the H from being left unbound on long
+  hops, which could make GROMACS stop with excluded pairs beyond the pair-list
+  cut-off. **Changes the relax trajectory; the final topology is unchanged.**
+  Files: `src/kimmdy/coordinates.py`, `src/kimmdy/runmanager.py`,
+  `src/kimmdy/kimmdy-yaml-schema.json`, `tests/test_coordinates.py`.
+
+### Bug Fixes
+
+* Restart inside an unfinished task no longer crashes on the force-field
+  links. `create_task_directory` checked `exists()`, which is False for a link
+  that points to nothing (a force field without `residuetypes.dat`), so
+  reusing a task folder raised `FileExistsError`. It now also checks
+  `is_symlink()`. There is no switch; it always runs.
+  Files: `src/kimmdy/tasks.py`.
+* Same topology settings after a restart. The restart now passes `nrexcl` and
+  the product-template options (`product_template_sources`,
+  `product_template_itp_glob`, `product_template_transitions`) to the
+  topology, as a fresh start does; before, it silently used the defaults.
+  Files: `src/kimmdy/runmanager.py`.
+* Correct radicals after a restart. A restart used the `radicals:` list of
+  kimmdy.yml (the start of the run) or found radicals from atom types. It now
+  reads the newest `radicals.json` from the kept decide folders and replays
+  the recipe picked after it was saved (from `recipes.csv`), because
+  `radicals.json` is written before that recipe is applied. The kimmdy.yml list
+  is used only when no reaction has been applied; a missing or unreadable
+  `radicals.json` or `recipes.csv` after a reaction stops the restart with an
+  error. There is no switch; it always runs.
+  Files: `src/kimmdy/runmanager.py`.
+* Transferred hydroxyl H grows its size during the relax. New key
+  `changer.coordinates.retype_transferred_h` (default true) gives a moved
+  HO/HW hydrogen (no Lennard-Jones size) the type `H1` in the end state of the
+  relax topology only, so its size grows in with lambda. Giving it the full
+  size at once crashed relaxes of H atoms in tight hydrogen bonds. **Changes
+  the relax trajectory; the final topology is unchanged.**
+  Files: `src/kimmdy/coordinates.py`, `src/kimmdy/runmanager.py`,
+  `src/kimmdy/kimmdy-yaml-schema.json`.
+* Pair terms of the transferred hydroxyl H also start without size. With
+  `changer.coordinates.retype_transferred_h`, the explicit relax pairs between
+  the moving HO/HW hydrogen and the atoms whose bonding to it changes now use
+  its real, size-free type in state A (before: `H1` in both states). A pair
+  with an atom hydrogen-bonded to the H, for example the acceptor residue's
+  hydroxyl O, no longer pushes the H off its donor at lambda 0. **Changes the
+  relax trajectory; the final topology is unchanged.**
+  An H that lands on an oxygen again (product type HO/HW, e.g. Tyr OH -> Tyr
+  O*) keeps the H1 pair values in both states, as before: there the fading
+  push from the acceptor oxygen balances the growing push off the donor
+  oxygen.
+  Files: `src/kimmdy/coordinates.py`, `src/kimmdy/kimmdy-yaml-schema.json`.
+* Neighbour residues of template impropers found through bonds. The
+  previous and next residue (-C, +N) are always found through the backbone
+  C-N bond instead of by atom number (no option). A moved H keeps its old,
+  distant atom number, so an H landing on a backbone CA put that residue's
+  backbone impropers onto atoms of another chain.
+  `RunManager._topology_fix_options` reads the topology switches from
+  kimmdy.yml at start and restart.
+  Files: `src/kimmdy/topology/topology.py`, `src/kimmdy/topology/ff.py`,
+  `src/kimmdy/runmanager.py`, `src/kimmdy/kimmdy-yaml-schema.json`.
+* All periodic terms of a template improper are kept (no option): residue
+  templates keep a list of terms per atom quadruple, and rebuilds after a
+  reaction re-add all of them. Before, only the last listed term survived (for
+  example one of the a99SB-disp backbone psi terms).
+  Files: `src/kimmdy/topology/atomic.py`, `src/kimmdy/topology/topology.py`,
+  `src/kimmdy/topology/ff.py`, `src/kimmdy/runmanager.py`,
+  `src/kimmdy/kimmdy-yaml-schema.json`.
+* Same-periodicity dihedral terms are merged (with
+  `changer.topology.repeated_topology_lines: merge`, the default, see below):
+  function-4 terms with the same atoms and periodicity (a99SB-disp lists two
+  periodicity-1 terms on every backbone psi) into one equivalent term, in
+  topologies and residue templates. Before, the later term replaced the
+  earlier one from the first step on. **Forces are unchanged by merging; the
+  energy shifts by a constant per merged term (0.923 kJ/mol per a99SB-disp
+  psi).** A warning reports how many terms were merged.
+  Files: `src/kimmdy/topology/atomic.py`, `src/kimmdy/topology/topology.py`,
+  `src/kimmdy/topology/ff.py`, `src/kimmdy/runmanager.py`,
+  `src/kimmdy/kimmdy-yaml-schema.json`.
+* Charge is conserved when an H is transferred. New key
+  `changer.topology.conserve_transferred_h_charge` (default true): the H keeps
+  its charge and the acceptor gives up the same amount; residue templates still
+  give names and atom types. Before, both took template charges, which made the
+  net charge drift at chain-end residues. **Acceptor charges differ from the
+  template values.** The product-template tests switch it off.
+  Files: `src/kimmdy/topology/topology.py`, `src/kimmdy/runmanager.py`,
+  `src/kimmdy/kimmdy-yaml-schema.json`, `tests/test_topology.py`.
+* Repeated topology lines are no longer dropped silently. New key
+  `changer.topology.repeated_topology_lines` (`merge`, `error` or `last`,
+  default `merge`), for topologies and residue templates. GROMACS applies
+  every line, while KIMMDY kept only the last of repeated ones. `#define`
+  names in bonded lines (for example Amber99SB-ILDN torsions) are always
+  replaced by their numbers first (one pass; nested aliases are not
+  supported). With `merge`, repeated dihedral lines with numbers are merged
+  into one equivalent term and any other repeated line stops KIMMDY with an
+  error; `error` stops on any repeat; `last` keeps the old behaviour (only
+  the last line, which can drop interactions). Also fixed: `write_top` wrote
+  `#define` lines without a space between name and value. On an Amber99SB-ILDN test system every interaction
+  now equals GROMACS's reading of the file (41 proper-dihedral terms were lost
+  before). **Changes the physics only for topologies with repeated lines or
+  macro torsions.** The `Ala_R_noprm.top` tests use `last`.
+  Files: `src/kimmdy/topology/topology.py`, `src/kimmdy/parsing.py`,
+  `src/kimmdy/runmanager.py`, `src/kimmdy/kimmdy-yaml-schema.json`,
+  `tests/test_topology.py`.
 
 ## [8.3.1](https://github.com/graeter-group/kimmdy/compare/v8.3.0...v8.3.1) (2026-01-02)
 

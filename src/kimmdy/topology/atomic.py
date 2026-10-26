@@ -5,6 +5,7 @@ See [gromacs manual](https://manual.gromacs.org/current/reference-manual/topolog
 """
 
 import logging
+import math
 from dataclasses import dataclass, field
 from typing import Optional, Union
 
@@ -12,6 +13,24 @@ from kimmdy.constants import FFFUNC
 from kimmdy.utils import field_or_none
 
 logger = logging.getLogger(__name__)
+
+
+def combine_periodic_terms(terms: list[tuple[str, str]]) -> tuple[str, str]:
+    """Merge several dihedral terms with the same periodicity into one equivalent term.
+
+    Input: a list of (phase in degrees, force constant) pairs, all for the
+    same atoms and periodicity n, each meaning k (1 + cos(n phi - phase)).
+    Their sum equals one term K (1 + cos(n phi - Phase)) plus a constant, so
+    the forces are exactly the same; only the energy shifts by a constant.
+    Returns (Phase, K) as text. Needed because KIMMDY keeps one term per
+    periodicity, so a second term with the same periodicity would otherwise
+    replace the first (a99SB-disp lists two periodicity-1 psi terms).
+    """
+    # add the terms like arrows of length k pointing at angle phase
+    x = sum(float(k) * math.cos(math.radians(float(phase))) for phase, k in terms)
+    y = sum(float(k) * math.sin(math.radians(float(phase))) for phase, k in terms)
+    # the summed arrow gives the new phase (its direction) and strength (its length)
+    return f"{math.degrees(math.atan2(y, x)) % 360.0:.6f}", f"{math.hypot(x, y):.6f}"
 
 
 @dataclass
@@ -725,14 +744,32 @@ class ResidueType:
     atoms: dict[str, ResidueAtomSpec]
     bonds: dict[tuple[str, str], ResidueBondSpec]
     proper_dihedrals: dict[tuple[str, str, str, str], ResidueProperSpec]
-    improper_dihedrals: dict[tuple[str, str, str, str], ResidueImproperSpec]
+    improper_dihedrals: dict[tuple[str, str, str, str], list[ResidueImproperSpec]]
+    # how many repeated improper terms were merged while reading the template
+    merged_impropers: int = field(default=0, compare=False)
 
     @classmethod
-    def from_section(cls, residue, d: dict[str, dict[str, list[list[str]]]]):
+    def from_section(
+        cls,
+        residue,
+        d: dict[str, dict[str, list[list[str]]]],
+        repeated_lines: str = "merge",
+    ):
+        """Build one residue template from its section of the force field's .rtp file.
+
+        Reads the atoms, bonds, dihedrals and impropers of the residue. Every
+        improper line for the same four atom names is kept (as a list, one
+        entry per periodicity). Two improper lines with the same atoms and
+        periodicity follow repeated_lines (changer.topology.repeated_topology_lines):
+        merge adds them up into one equivalent term (see combine_periodic_terms)
+        when both have numbers and stops with an error otherwise; error always
+        stops; last keeps the later line.
+        """
         atoms = {}
         bonds = {}
         propers = {}
         impropers = {}
+        merged = 0
         if ls := d.get("atoms"):
             for l in ls["content"]:
                 atom = ResidueAtomSpec.from_top_line(l)
@@ -747,14 +784,45 @@ class ResidueType:
                 propers[(proper.atom1, proper.atom2, proper.atom3, proper.atom4)] = (
                     proper
                 )
+        # impropers: one atom quadruple can carry several periodic terms
+        # (a99SB-disp's backbone psi correction lists periodicities
+        # 1, 1, 2, 3, 4, 5 on N CA C +N), so each key holds a list
         if ls := d.get("impropers"):
             for l in ls["content"]:
                 improper = ResidueImproperSpec.from_top_line(l)
-                impropers[
-                    (improper.atom1, improper.atom2, improper.atom3, improper.atom4)
-                ] = improper
+                key = (improper.atom1, improper.atom2, improper.atom3, improper.atom4)
+                # add a new periodicity to the list, or handle a repeated one
+                specs = impropers.setdefault(key, [])
+                same = next((s for s in specs if s.c2 == improper.c2), None)
+                if same is None:
+                    specs.append(improper)
+                elif repeated_lines == "last":
+                    specs[specs.index(same)] = improper
+                elif repeated_lines == "merge" and None not in (
+                    same.c0, same.c1, improper.c0, improper.c1
+                ):
+                    same.c0, same.c1 = combine_periodic_terms(
+                        [(same.c0, same.c1), (improper.c0, improper.c1)]
+                    )
+                    merged += 1
+                else:
+                    # error mode, or lines without numbers that cannot be added up
+                    reason = (
+                        "repeated_topology_lines is error"
+                        if repeated_lines == "error"
+                        else "the lines have no numbers to add up"
+                    )
+                    m = (
+                        f"Residue template {residue}: [ impropers ] lists {' '.join(key)} "
+                        f"with periodicity {improper.c2} more than once ({reason}). "
+                        "Remove the repeated line, or set "
+                        "changer.topology.repeated_topology_lines to last to keep only "
+                        "the last one (this can drop interactions)."
+                    )
+                    logger.error(m)
+                    raise ValueError(m)
 
-        return cls(residue, atoms, bonds, propers, impropers)
+        return cls(residue, atoms, bonds, propers, impropers, merged_impropers=merged)
 
 
 AtomId = str

@@ -31,6 +31,7 @@ from kimmdy.topology.atomic import (
     Pair,
     PositionRestraint,
     ResidueImproperSpec,
+    combine_periodic_terms,
     ResidueType,
     Settle,
 )
@@ -79,8 +80,15 @@ class MoleculeType:
     """
 
     def __init__(
-        self, header: MoleculeTypeHeader, atomics: dict, radicals: Optional[str] = None
+        self,
+        header: MoleculeTypeHeader,
+        atomics: dict,
+        radicals: Optional[str] = None,
+        repeated_lines: str = "merge",
     ) -> None:
+        # what to do with repeated topology lines: merge, error or last
+        # (changer.topology.repeated_topology_lines)
+        self.repeated_lines = repeated_lines
         self.name = header.name
         self.nrexcl = header.nrexcl
         self.atomics = atomics
@@ -177,7 +185,11 @@ class MoleculeType:
             return
         for l in ls:
             bond = Bond.from_top_line(l)
-            self.bonds[(bond.ai, bond.aj)] = bond
+            key = (bond.ai, bond.aj)
+            # a repeated line stops with an error (see _reject_duplicate_line)
+            if key in self.bonds:
+                self._reject_duplicate_line("bonds", key)
+            self.bonds[key] = bond
 
     def _parse_pairs(self):
         """Parse pairs from topology dictionary."""
@@ -186,7 +198,11 @@ class MoleculeType:
             return
         for l in ls:
             pair = Pair.from_top_line(l)
-            self.pairs[(pair.ai, pair.aj)] = pair
+            key = (pair.ai, pair.aj)
+            # a repeated line stops with an error (see _reject_duplicate_line)
+            if key in self.pairs:
+                self._reject_duplicate_line("pairs", key)
+            self.pairs[key] = pair
 
     def _parse_angles(self):
         """Parse angles from topology dictionary."""
@@ -195,28 +211,101 @@ class MoleculeType:
             return
         for l in ls:
             angle = Angle.from_top_line(l)
-            self.angles[(angle.ai, angle.aj, angle.ak)] = angle
+            key = (angle.ai, angle.aj, angle.ak)
+            # a repeated line stops with an error (see _reject_duplicate_line)
+            if key in self.angles:
+                self._reject_duplicate_line("angles", key)
+            self.angles[key] = angle
 
     def _parse_dihedrals(self):
-        """Parse improper and proper dihedrals from topology dictionary."""
+        """Read the [ dihedrals ] lines of this molecule into proper and improper dihedrals.
+
+        Each dihedral is stored under its four atoms, with one term per
+        periodicity. If a line repeats atoms and periodicity of an earlier
+        line, the two terms are merged into one equivalent term where that is
+        exact (see _may_combine and combine_periodic_terms); any other repeat
+        stops with an error (see _reject_duplicate_line), because GROMACS
+        would use both lines but only one can be stored.
+        """
         ls = self.atomics.get("dihedrals")
         if ls is None:
             return
+        merged = 0
         for l in ls:
             dihedral = Dihedral.from_top_line(l)
             key = (dihedral.ai, dihedral.aj, dihedral.ak, dihedral.al)
-            if dihedral.funct == FFFUNC["mult_improper_dihedral"]:
-                if self.improper_dihedrals.get(key) is None:
-                    self.improper_dihedrals[key] = MultipleDihedrals(
-                        *key, dihedral.funct, dihedrals={}
+            # periodic impropers (function 4) and everything else (propers) are kept apart
+            is_improper = dihedral.funct == FFFUNC["mult_improper_dihedral"]
+            kind = "improper" if is_improper else "proper"
+            store = self.improper_dihedrals if is_improper else self.proper_dihedrals
+            if key not in store:
+                store[key] = MultipleDihedrals(*key, dihedral.funct, dihedrals={})
+            terms = store[key].dihedrals
+
+            existing = terms.get(dihedral.periodicity)
+            if existing is not None:
+                if self._may_combine(existing, dihedral, is_improper):
+                    # same atoms and periodicity listed twice: GROMACS adds both,
+                    # so store one equivalent term instead of only the later one
+                    old_terms = [(existing.c0, existing.c1), (dihedral.c0, dihedral.c1)]
+                    dihedral.c0, dihedral.c1 = combine_periodic_terms(old_terms)
+                    # written at the end of the line, so the file shows why one line is missing
+                    dihedral.comment = "; merged from 2 lines with the same atoms and periodicity"
+                    inputs = " + ".join(f"(phase {p}, k {k})" for p, k in old_terms)
+                    logger.debug(
+                        f"Molecule {self.name}: merged repeated {kind} dihedral {' '.join(key)} "
+                        f"(funct {dihedral.funct}, periodicity {dihedral.periodicity}): "
+                        f"{inputs} -> phase {dihedral.c0}, k {dihedral.c1} "
+                        "(same forces, energy shifted by a constant)"
                     )
-                self.improper_dihedrals[key].dihedrals[dihedral.periodicity] = dihedral
-            else:
-                if self.proper_dihedrals.get(key) is None:
-                    self.proper_dihedrals[key] = MultipleDihedrals(
-                        *key, dihedral.funct, dihedrals={}
-                    )
-                self.proper_dihedrals[key].dihedrals[dihedral.periodicity] = dihedral
+                    merged += 1
+                else:
+                    self._reject_duplicate_line(f"dihedrals ({kind})", key, dihedral.periodicity)
+            terms[dihedral.periodicity] = dihedral
+
+        # one summary warning per molecule; the single merges are logged at debug level
+        if merged:
+            logger.warning(
+                f"Molecule {self.name}: merged {merged} repeated dihedral term(s) "
+                "with the same atoms and periodicity (same forces, energy shifted by a constant)"
+            )
+
+    def _may_combine(self, existing: Dihedral, new: Dihedral, is_improper: bool) -> bool:
+        """Tell whether two dihedral lines with the same atoms and periodicity can be merged exactly.
+
+        Only in merge mode, only when both lines have numbers and the same
+        function, and for propers only for the periodic functions 1 and 9.
+        """
+        if self.repeated_lines != "merge":
+            return False
+        if None in (existing.c0, existing.c1, new.c0, new.c1):
+            return False  # without numbers there is nothing to add up
+        if existing.funct != new.funct:
+            return False
+        return is_improper or new.funct in ("1", "9")
+
+    def _reject_duplicate_line(self, section: str, key: tuple, periodicity: str = ""):
+        """Stop with an error when a topology line repeats an earlier one that cannot be merged.
+
+        KIMMDY keeps one term per atom set (and per periodicity for
+        dihedrals), while GROMACS uses every line, so silently keeping only
+        the last line would change the simulation. The error names the
+        molecule, section and atoms. In last mode it does nothing, so the
+        later line replaces the earlier as older KIMMDY did.
+        """
+        if self.repeated_lines == "last":
+            return
+        where = f" with periodicity {periodicity}" if periodicity else ""
+        m = (
+            f"Molecule {self.name}: [ {section} ] lists atoms {' '.join(key)}{where} "
+            "more than once. KIMMDY can keep only one such term, but GROMACS would "
+            "apply every line, so the topology cannot be represented without "
+            "changing it. Merge or remove the repeated line, or set "
+            "changer.topology.repeated_topology_lines to last to keep only the last one "
+            "(this can drop interactions)."
+        )
+        logger.error(m)
+        raise ValueError(m)
 
     def _parse_restraints(self):
         """Parse restraints from topology dictionary."""
@@ -428,8 +517,14 @@ class MoleculeType:
 
     def _get_atom_improper_dihedrals(
         self, atom_nr: str, ff: FF
-    ) -> dict[ImproperDihedralId, ResidueImproperSpec]:
-        """
+    ) -> dict[ImproperDihedralId, list[ResidueImproperSpec]]:
+        """Find the residue-template impropers that contain one atom, with real atom numbers.
+
+        Looks up the atom's residue template, translates the template's atom
+        names (including -C, the previous residue's C, and +N, the next
+        residue's N) into atom numbers, and returns every improper term that
+        contains the atom: {four atom numbers: list of terms, one per
+        periodicity}.
         <https://manual.gromacs.org/current/reference-manual/functions/bonded-interactions.html#improper-dihedrals>
         """
 
@@ -438,12 +533,9 @@ class MoleculeType:
         if not isinstance(residuetype, ResidueType):
             return {}
 
+        # find the previous and next residue (needed for -C and +N)
         residue = get_residue_by_bonding(atom=atom, atoms=self.atoms)
-        lowest_atomnr = min(residue.keys(), key=int)
-        highest_atomnr = max(residue.keys(), key=int)
-
-        previous_atom = self.atoms.get(str(int(lowest_atomnr) - 1))
-        next_atom = self.atoms.get(str(int(highest_atomnr) + 1))
+        previous_atom, next_atom = self._get_neighbor_residue_atoms(residue)
         if previous_atom is not None:
             previous_residue = get_residue_by_bonding(
                 atom=previous_atom, atoms=self.atoms
@@ -469,11 +561,11 @@ class MoleculeType:
             atom.atom: atom_nr for atom_nr, atom in next_residue.items()
         }
 
-        dihedrals: dict[ImproperDihedralId, ResidueImproperSpec] = {}
+        dihedrals: dict[ImproperDihedralId, list[ResidueImproperSpec]] = {}
         if previous_residuetype is not None and atom.atom == "N":
             # the atom is N, so it may have an improper defined
             # in the previous residue, where it would be referred to as +N
-            for key, improper in previous_residuetype.improper_dihedrals.items():
+            for key, impropers in previous_residuetype.improper_dihedrals.items():
                 # find the dihedral with +N
                 if any(["+" in k for k in key]):
                     nr_key: ImproperDihedralId = tuple(
@@ -483,12 +575,12 @@ class MoleculeType:
                         m = f"Improper dihedral {key} with {nr_key} not found in residue {atom.residue}."
                         logger.debug(m)
                         continue
-                    dihedrals[nr_key] = improper
+                    dihedrals[nr_key] = impropers
 
         if next_residuetype is not None and atom.atom == "C":
             # the atom is C, so it may have an improper defined
             # in the previous residue, where it would be referred to as -C
-            for key, improper in next_residuetype.improper_dihedrals.items():
+            for key, impropers in next_residuetype.improper_dihedrals.items():
                 # find the dihedral with -C
                 if any(["-" in k for k in key]):
                     nr_key = tuple(
@@ -498,7 +590,7 @@ class MoleculeType:
                         m = f"Improper dihedral {key} with {nr_key} not found in residue {atom.residue}."
                         logger.debug(m)
                         continue
-                    dihedrals[nr_key] = improper
+                    dihedrals[nr_key] = impropers
 
         def get_number(name):
             """Get the atom number for an atom name from a dihedral specification"""
@@ -513,7 +605,7 @@ class MoleculeType:
                 return atomname_to_nr.get(name, None)
 
         # regularly defined improper dihedrals of the same residue
-        for key, improper in residuetype.improper_dihedrals.items():
+        for key, impropers in residuetype.improper_dihedrals.items():
             nr_key = tuple(get_number(x) for x in key)  # pyright: ignore
             if atom_nr not in nr_key:
                 continue
@@ -521,18 +613,57 @@ class MoleculeType:
                 m = f"Improper dihedral {key} {nr_key} not found in residue {atom.residue}."
                 logger.debug(m)
                 continue
-            dihedrals[nr_key] = improper
+            dihedrals[nr_key] = impropers
 
         # gromacs sorts the keys such that the first atom is the lowest numbered
-        new_dihedrals: dict[ImproperDihedralId, ResidueImproperSpec] = {}
-        for key, improper in dihedrals.items():
+        new_dihedrals: dict[ImproperDihedralId, list[ResidueImproperSpec]] = {}
+        for key, impropers in dihedrals.items():
             if int(key[0]) > int(key[3]):
                 key = (key[3], key[2], key[1], key[0])
-                new_dihedrals[key] = improper.reversed()
+                new_dihedrals[key] = [improper.reversed() for improper in impropers]
             else:
-                new_dihedrals[key] = improper
+                new_dihedrals[key] = list(impropers)
 
         return new_dihedrals
+
+    def _get_neighbor_residue_atoms(
+        self, residue: dict[str, Atom]
+    ) -> tuple[Optional[Atom], Optional[Atom]]:
+        """Find one atom of the previous residue and one of the next residue, through bonds.
+
+        The previous residue is the one whose C is bonded to this residue's N;
+        the next residue is the one whose N is bonded to this residue's C.
+        Atom numbers cannot be used for this: an H that moved into this residue
+        keeps its old, possibly distant number, so "highest number + 1" can
+        point into another chain. Returns (atom of previous residue, atom of
+        next residue), None where there is none. Residues without atoms named
+        N or C (not protein) keep the old atom-number rule.
+
+        ToDo: Generalise the protein recognition, maybe using residuetypes.dat
+        """
+
+        def across(own: str, other: str) -> Optional[Atom]:
+            """Follow a bond from this residue's atom named own to an atom named other outside the residue; None if there is no such bond."""
+            for atom in residue.values():
+                if atom.atom != own:
+                    continue
+                for nr in atom.bound_to_nrs:
+                    if nr not in residue and self.atoms[nr].atom == other:
+                        return self.atoms[nr]
+            return None
+
+        # protein residue: previous through N-C, next through C-N
+        names = {atom.atom for atom in residue.values()}
+        if "N" in names or "C" in names:
+            return across("N", "C"), across("C", "N")
+
+        # anything else: the atoms numbered just below and above the residue
+        lowest_atomnr = min(residue.keys(), key=int)
+        highest_atomnr = max(residue.keys(), key=int)
+        return (
+            self.atoms.get(str(int(lowest_atomnr) - 1)),
+            self.atoms.get(str(int(highest_atomnr) + 1)),
+        )
 
     def _regenerate_topology_from_bound_to(self, ff):
         # clear all bonds, angles, dihedrals
@@ -572,24 +703,28 @@ class MoleculeType:
                 if self.pairs.get(pairkey) is None:
                     self.pairs[pairkey] = Pair(pairkey[0], pairkey[1], FFFUNC["pair"])
 
+        # impropers from the residue templates, with all their periodic terms
+        # TODO: terminal residues are rebuilt from the plain residue template.
+        # pdb2gmx applies its terminus rules (.n.tdb/.c.tdb) and, for example,
+        # writes no a99SB-disp psi correction (N CA C +N) for the N-terminal
+        # residue, so a rebuild there adds a psi term pdb2gmx does not have.
         for atom in self.atoms.values():
             impropers = self._get_atom_improper_dihedrals(atom.nr, ff)
-            for key, improper in impropers.items():
-                periodicity = ""
-                if improper.c2 is not None:
-                    periodicity = improper.c2
+            for key, specs in impropers.items():
+                dihedrals = {}
+                for improper in specs:
+                    periodicity = "" if improper.c2 is None else improper.c2
+                    dihedrals[periodicity] = Dihedral(
+                        *key,
+                        FFFUNC["mult_improper_dihedral"],
+                        c0=improper.c0,
+                        c1=improper.c1,
+                        periodicity=periodicity,
+                    )
                 self.improper_dihedrals[key] = MultipleDihedrals(
                     *key,
                     FFFUNC["mult_improper_dihedral"],
-                    dihedrals={
-                        "": Dihedral(
-                            *key,
-                            FFFUNC["mult_improper_dihedral"],
-                            c0=improper.c0,
-                            c1=improper.c1,
-                            periodicity=periodicity,
-                        )
-                    },
+                    dihedrals=dihedrals,
                 )
 
     def reindex_atomnrs(self) -> dict[str, str]:
@@ -802,7 +937,28 @@ class Topology:
         product_template_sources: tuple[str, ...] = ("rtp",),
         product_template_itp_glob: str = "*.itp",
         product_template_transitions: Optional[dict[str, str]] = None,
+        repeated_topology_lines: str = "merge",
+        conserve_transferred_h_charge: bool = True,
     ):
+        """Topology options (changer.topology in kimmdy.yml):
+
+        repeated_topology_lines
+            What to do when a topology or residue template repeats the same
+            atoms (and periodicity): "merge" adds up repeated dihedral terms
+            with numbers into one equivalent term (forces unchanged, energy
+            shifted by a constant) and warns, and stops on any other repeat;
+            "error" stops on any repeat; "last" keeps only the last line, as
+            older KIMMDY did. #define names are replaced first in every mode.
+        conserve_transferred_h_charge
+            A transferred H keeps its charge and the acceptor gives up the
+            same amount, instead of both taking residue-template charges.
+        """
+        if repeated_topology_lines not in ("merge", "error", "last"):
+            raise ValueError(
+                "repeated_topology_lines must be merge, error or last; "
+                f"got {repeated_topology_lines!r}"
+            )
+        self.repeated_topology_lines = repeated_topology_lines
         if top == {}:
             raise NotImplementedError(
                 "Generating an empty Topology from an empty TopologyDict is not implemented."
@@ -821,14 +977,18 @@ class Topology:
             product_template_sources=product_template_sources,
             product_template_itp_glob=product_template_itp_glob,
             product_template_transitions=product_template_transitions,
+            repeated_topology_lines=repeated_topology_lines,
         )
         self.pending_product_template_matches: dict[
             tuple[str, str], ProductTemplateMatch
         ] = {}
         self.pending_transferred_h_charges: dict[str, str] = {}
+        self.conserve_transferred_h_charge = conserve_transferred_h_charge
         self.pending_product_template_restorations: list[
             ProductTemplateMatch
         ] = []
+        # #define names first, so periodicities are known whatever the mode
+        self._expand_parameter_macros()
         self._parse_molecules()
         self.parametrizer = parametrizer
         self._check_is_reactive_molecule = is_reactive_predicate_f
@@ -953,6 +1113,7 @@ class Topology:
             MoleculeTypeHeader(name=REACTIVE_MOLECULEYPE, nrexcl=nrexcl),
             reactive_atomics,
             radicals,
+            repeated_lines=self.repeated_topology_lines,
         )
         self.moleculetypes[REACTIVE_MOLECULEYPE] = reactive_moleculetype
         # update topology dict
@@ -982,6 +1143,50 @@ class Topology:
             f"\tatm2.bound_to_nrs {atm2.bound_to_nrs}\n"
         )
 
+    def _expand_parameter_macros(self):
+        """Replace #define shortcut names in bonded lines by the numbers they stand for.
+
+        Some force fields (for example Amber99SB-ILDN) write torsions as named
+        shortcuts: `180 165 167 170 9 torsion_LEU_C_CA_CB_CG_mult1`, with
+        `_mult2` and `_mult3` on the same four atoms. The periodicity is hidden
+        inside the name, so KIMMDY stored all three in one slot and kept only
+        the last. This swaps each name for its numbers (phase, strength,
+        periodicity), exactly as GROMACS does when it reads the file, so every
+        line is kept. Changes the topology dict in place.
+
+        Names are replaced in one pass: a #define whose value is another
+        #define name (a nested alias) is not supported and stays unresolved.
+        """
+        # shortcuts that stand for numbers (defines without a value are flags)
+        defines = {k: v for k, v in (self.top.get("define") or {}).items() if v}
+        if not defines:
+            return
+        # in each section, the numbers start after the function-type column
+        funct_index = {"bonds": 2, "pairs": 2, "angles": 3, "dihedrals": 4}
+
+        # replace the shortcut names in every bonded line of every molecule
+        expanded = 0
+        for name, section in self.top.items():
+            if not name.startswith("moleculetype"):
+                continue
+            subsections = section.get("subsections") or {}
+            for sec, index in funct_index.items():
+                block = subsections.get(sec)
+                if not block:
+                    continue
+                for key in ("content", "else_content"):
+                    lines = block.get(key) or []
+                    for i, line in enumerate(lines):
+                        if not any(tok in defines for tok in line[index + 1 :]):
+                            continue
+                        new = list(line[: index + 1])
+                        for tok in line[index + 1 :]:
+                            new.extend(defines.get(tok, [tok]))
+                        lines[i] = new
+                        expanded += 1
+        if expanded:
+            logger.info(f"Expanded {expanded} parameter macro line(s) into explicit numbers")
+
     def _parse_molecules(self):
         moleculetypes = [k for k in self.top.keys() if k.startswith("moleculetype")]
         for moleculetype in moleculetypes:
@@ -997,7 +1202,12 @@ class Topology:
                 continue
             name = header.name
             # Only search for radicals in reactive MoleculeType during merging
-            self.moleculetypes[name] = MoleculeType(header, atomics, radicals="")
+            self.moleculetypes[name] = MoleculeType(
+                header,
+                atomics,
+                radicals="",
+                repeated_lines=self.repeated_topology_lines,
+            )
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Topology):
@@ -1371,7 +1581,9 @@ class Topology:
         integers. If previously broken bonds are formed again, the original
         partial charges are restored.
         If no product template matches a transferred H, its original charge
-        is restored and balanced locally by the acceptor atom.
+        is restored and balanced locally by the acceptor atom. With
+        ``conserve_transferred_h_charge`` this local balancing is used for
+        every transferred H, so templates only provide names and atom types.
         """
 
         # build updated list of atoms by residue for topology so that this does
@@ -1436,6 +1648,19 @@ class Topology:
                 if self.atoms[step.atom_id_1].resnr == self.atoms[step.atom_id_2].resnr:
                     atom1 = self.atoms[step.atom_id_1]
                     atom2 = self.atoms[step.atom_id_2]
+                    if self.conserve_transferred_h_charge and (
+                        atom1.nr in self.pending_transferred_h_charges
+                        or atom2.nr in self.pending_transferred_h_charges
+                    ):
+                        # charge-conserving transfer (conserve_transferred_h_charge):
+                        # the H keeps its old charge and the acceptor gives up the
+                        # same amount, instead of taking the template charges
+                        self.pending_product_template_matches.pop(
+                            tuple(sorted((step.atom_id_1, step.atom_id_2), key=int)),
+                            None,
+                        )
+                        self._apply_transferred_h_charge_fallback(atom1, atom2)
+                        continue
                     match_key = tuple(
                         sorted((step.atom_id_1, step.atom_id_2), key=int)
                     )
@@ -1982,29 +2207,30 @@ class Topology:
                         pairkey[0], pairkey[1], FFFUNC["pair"]
                     )
 
-        # improper dihedral
+        # improper dihedral: re-add the template impropers of both atoms,
+        # every listed term (one per periodicity)
         atom_impropers = reactive_moleculetype._get_atom_improper_dihedrals(
             atompair_nrs[0], self.ff
         )
         atom_impropers.update(
             reactive_moleculetype._get_atom_improper_dihedrals(atompair_nrs[1], self.ff)
         )
-        for key, value in atom_impropers.items():
-            if value.c2 is None:
-                value.c2 = ""
+        for key, specs in atom_impropers.items():
             if reactive_moleculetype.improper_dihedrals.get(key) is None:
                 reactive_moleculetype.improper_dihedrals[key] = MultipleDihedrals(
                     *key, FFFUNC["mult_improper_dihedral"], dihedrals={}
                 )
-            reactive_moleculetype.improper_dihedrals[key].dihedrals[value.c2] = (
-                Dihedral(
-                    *key,
-                    FFFUNC["mult_improper_dihedral"],
-                    c0=value.c0,
-                    c1=value.c1,
-                    periodicity=value.c2,
+            for value in specs:
+                periodicity = "" if value.c2 is None else value.c2
+                reactive_moleculetype.improper_dihedrals[key].dihedrals[periodicity] = (
+                    Dihedral(
+                        *key,
+                        FFFUNC["mult_improper_dihedral"],
+                        c0=value.c0,
+                        c1=value.c1,
+                        periodicity=periodicity,
+                    )
                 )
-            )
 
         # remove settles and explicit exclusions
         # those are used by solvent molecules

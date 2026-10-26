@@ -140,6 +140,26 @@
       "pytype": "int",
       "default": 0
     },
+    "delete_xtc_before_reactions": {
+      "title": "delete_xtc_before_reactions",
+      "description": "Delete the trajectory (.xtc) of the MD task right before each reaction (the one the reaction read, e.g. sample) once a later regular MD task has finished, to save disk space. KIMMDY restarts only from regular MD tasks, so a restart never needs a deleted file; the newest reaction-input trajectory is always kept. Each deletion is logged first and noted in <instance>_xtc_cleanup.json next to the removed file. Default: false",
+      "type": "boolean",
+      "pytype": "bool",
+      "default": false
+    },
+    "kmc_seed": {
+      "title": "kmc_seed",
+      "description": "Seed for the KMC random number generator. Each decide task draws from its own stream built from (kmc_seed, task number), so cycles get different random numbers while a run, and a restart that redoes a task, stays reproducible. If unset, an unseeded generator is used and the picked recipe differs between runs.",
+      "type": "integer",
+      "pytype": "int"
+    },
+    "reaction_frame_whole_molecules": {
+      "title": "reaction_frame_whole_molecules",
+      "description": "Extract the coordinates at the reaction time against the MD run's TPR with `-pbc mol -ur compact`, so no molecule is split across the box. Default: False",
+      "type": "boolean",
+      "pytype": "bool",
+      "default": false
+    },
     "kmc": {
       "title": "kmc",
       "description": "KMC algorithm overwrite. Should be set by the reactions, but can be changed here. Not all reactions may support all algorithms.",
@@ -410,6 +430,37 @@
                 ""
               ],
               "default": ""
+            },
+            "retype_transferred_h": {
+              "type": "boolean",
+              "pytype": "bool",
+              "default": true,
+              "description": "Retype transferred HW/HO hydrogen atoms as a force-field LJ-bearing hydrogen type (H1 in Amber) in state B of the temporary relaxation topology. State A keeps the original type, so the H's Lennard-Jones parameters grow in linearly with lambda. The explicit relax pair terms of the moving H also use its original, size-free type in state A, unless the H lands on an oxygen again. The final reaction topology is unchanged."
+            },
+            "harmonic_acceptor_h_relax_term": {
+              "type": "boolean",
+              "pytype": "bool",
+              "default": false,
+              "description": "In the relaxation topology only, add a harmonic helper bond (function type 6, no exclusions) between the transferred hydrogen and its acceptor. Its length is the new bond's equilibrium length and its force constant grows linearly from 0 at lambda 0 to harmonic_acceptor_h_relax_k at lambda 1, pulling the H onto the acceptor while the old bond fades. The final reaction topology is unchanged."
+            },
+            "harmonic_acceptor_h_relax_k": {
+              "type": "float",
+              "pytype": "float",
+              "default": 50000.0,
+              "description": "Force constant at lambda 1 of the harmonic acceptor-H relax helper bond, in kJ mol^-1 nm^-2 (an Amber O-H bond is 462,750)."
+            },
+            "parallel_dihedral_merge": {
+              "type": "boolean",
+              "pytype": "bool",
+              "default": false,
+              "description": "Merge slow-growth dihedrals in parallel while applying results deterministically."
+            },
+            "parallel_dihedral_workers": {
+              "type": "integer",
+              "pytype": "int",
+              "minimum": 1,
+              "default": 1,
+              "description": "Number of worker processes for parallel_dihedral_merge."
             }
           }
         },
@@ -438,6 +489,21 @@
               "type": "object",
               "description": "Keyword argument container for the selected parameterization scheme",
               "additionalProperties": true
+            },
+            "repeated_topology_lines": {
+              "title": "Repeated topology lines",
+              "description": "What to do when a topology ([ bonds ], [ pairs ], [ angles ], [ dihedrals ]) or a residue template ([ impropers ] in the .rtp) lists the same atoms (and, for dihedrals, the same periodicity) more than once. KIMMDY keeps one term per atom set, while GROMACS applies every line. merge: add up repeated dihedral terms that have numbers into one equivalent term (same forces, energy shifted by a constant) and warn; any other repeat stops with an error. error: any repeat stops with an error. last: keep only the last line, as older KIMMDY did; this can silently drop interactions. #define names are replaced by their numbers first in every mode. Default: merge",
+              "type": "string",
+              "pytype": "str",
+              "enum": ["merge", "error", "last"],
+              "default": "merge"
+            },
+            "conserve_transferred_h_charge": {
+              "title": "Conserve transferred-H charge",
+              "description": "After a hydrogen transfer, keep the hydrogen's pre-transfer partial charge and subtract it from the acceptor atom, instead of assigning residue-template charges to both. Templates still provide the hydrogen's name and atom type and the rebuilt impropers. The net charge then never changes, including at chain-terminal residues. Default: True",
+              "type": "boolean",
+              "pytype": "bool",
+              "default": true
             }
           },
           "additionalProperties": false
