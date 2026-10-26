@@ -9,6 +9,13 @@
     "changer"
   ],
   "properties": {
+    "replay_radicals_on_restart": {
+      "title": "Replay radicals on restart",
+      "description": "Opt in to restoring saved radical IDs and replaying the selected recipe when restarting. Requires saved radical lists and, when replay is needed, recipe CSV output. Combined multi-KMC recipes, deferred recipes and custom topology modifications are not reliably supported. When false, retain the previous restart behavior using configured radicals or topology-based inference. Default: false",
+      "type": "boolean",
+      "pytype": "bool",
+      "default": false
+    },
     "slurm": {
       "title": "slurm",
       "type": "object",
@@ -503,10 +510,10 @@
             },
             "conserve_transferred_h_charge": {
               "title": "Conserve transferred-H charge",
-              "description": "After a hydrogen transfer, keep the hydrogen's pre-transfer partial charge and subtract it from the acceptor atom, instead of assigning residue-template charges to both. Templates still provide the hydrogen's name and atom type and the rebuilt impropers. The net charge then never changes, including at chain-terminal residues. Default: True",
+              "description": "Opt in to keeping a transferred hydrogen's pre-transfer partial charge and subtracting it from the acceptor instead of restoring template charges. This also bypasses complete exact-ITP product restoration, including residue-wide atom types, masses and queued bonded parameters. When false, retain product-template restoration and use local charge balancing when no suitable charge template is available. Default: false",
               "type": "boolean",
               "pytype": "bool",
-              "default": true
+              "default": false
             }
           },
           "additionalProperties": false

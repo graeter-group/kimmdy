@@ -676,7 +676,21 @@ class RunManager:
             )
             self._discover_output_files(taskname=task_name, files=task_files)
 
-        restart_radicals = self._restore_restart_radicals(task_dirs[: self.iteration + 1])
+        # Preserve the pre-replay restart behavior unless explicitly enabled.
+        restart_radicals = getattr(self.config, "radicals", None)
+        if self.config.replay_radicals_on_restart:
+            logger.warning(
+                "Radical replay on restart is enabled. This requires saved "
+                "radical lists and, when replay is needed, recipe CSV output "
+                "(save_recipes: true). Combined multi-KMC recipes, deferred "
+                "recipes and custom topology modifications are not reliably "
+                "supported and may cause restart failure or incorrect radical "
+                "IDs. Set replay_radicals_on_restart: false to use the "
+                "previous restart behavior."
+            )
+            restart_radicals = self._restore_restart_radicals(
+                task_dirs[: self.iteration + 1]
+            )
 
         # plumed fix
         for md_config in self.config.mds.__dict__.values():

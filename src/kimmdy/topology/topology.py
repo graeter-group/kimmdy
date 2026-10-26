@@ -938,7 +938,7 @@ class Topology:
         product_template_itp_glob: str = "*.itp",
         product_template_transitions: Optional[dict[str, str]] = None,
         repeated_topology_lines: str = "merge",
-        conserve_transferred_h_charge: bool = True,
+        conserve_transferred_h_charge: bool = False,
     ):
         """Topology options (changer.topology in kimmdy.yml):
 
@@ -950,8 +950,12 @@ class Topology:
             "error" stops on any repeat; "last" keeps only the last line, as
             older KIMMDY did. #define names are replaced first in every mode.
         conserve_transferred_h_charge
-            A transferred H keeps its charge and the acceptor gives up the
-            same amount, instead of both taking residue-template charges.
+            Opt-in local charge balancing; defaults to False. When enabled,
+            a transferred H keeps its charge and the acceptor gives up the
+            same amount. This bypasses template charge assignment and complete
+            exact-ITP product restoration, including atom types, masses and
+            queued bonded parameters. When disabled, retain template restoration
+            and the existing fallback when no suitable charge template exists.
         """
         if repeated_topology_lines not in ("merge", "error", "last"):
             raise ValueError(

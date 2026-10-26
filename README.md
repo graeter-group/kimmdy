@@ -98,6 +98,29 @@ This installs:
 - development and testing dependencies
 - no legacy TensorFlow/PaiNN stack
 
+#### 4a. Use the Checked-Out Reactions Plugin
+
+The project's uv configuration already selects `kimmdy-reactions` as a local
+editable source. To repair an older environment that still loads an installed
+copy, or explicitly ensure that the checked-out `homolysis`, `hat_naive`, and
+`dummyreaction` implementations are used, run:
+
+```bash
+uv pip install \
+    --python .venv/bin/python \
+    --no-deps \
+    -e ./plugins/kimmdy-reactions
+```
+
+Updating the Git submodule alone does not update a regular package installation.
+Editable mode makes subsequent source changes in this checkout available directly.
+The `--no-deps` flag leaves dependencies installed by `uv sync` unchanged. If the
+plugin's dependency requirements change, those must be updated too.
+
+With the current uv configuration, `uv sync --extra all` also selects this local
+editable source. However, it can reset the manual CUDA Torch installation below;
+repeat step 5 after syncing if necessary.
+
 #### 5. Install GPU-Enabled Torch
 
 
