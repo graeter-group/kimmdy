@@ -13,8 +13,17 @@ If you want to start your sequence of tasks with a reaction, you have to
 give KIMMDY a trajectory.
 This, you do with the `trr` key in the [`kimmdy.yml`](/guide/references/input.qmd) file.
 
+The homolysis reaction calculates bond distances from this trajectory with MDAnalysis.
+Set `trajectory: trr` in its section of the `kimmdy.yml`, as it uses the xtc file by default.
+The `gro` file has to contain the same atoms as the trajectory.
+
 
 ## Pre-averaged plumed input
+
+::: {.callout-note}
+This only applies to reactions that still read PLUMED output, which is deprecated.
+The homolysis reaction no longer uses PLUMED.
+:::
 
 Sometimes it is handy to pre-compute the averages of the distances plumed recordes.
 Usually, the plumed output (`distances.dat`) contains one line per 

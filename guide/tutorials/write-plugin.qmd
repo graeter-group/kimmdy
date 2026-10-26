@@ -21,6 +21,8 @@ A reaction plugin has to be a derived class from the `ReactionPlugin` base class
 
 The `name` is a simple string and may be useful for logging. `runmng` is the central `RunManager` of a kimmdy run and has plenty of useful attributes for your plugin, especially the system `Topology`, which can be accessed via `self.runmg.top`. `config` contains the reaction plugin configuration as specified in the kimmdy configuration file (typically named kimmdy.yml). A `RecipeCollection` contains `Recipe`s with predefined `RecipeStep`s that can be used to define the modification to the system for the reaction. A `Recipe` also contains the `rates` of the specified reaction and the `timespans` during which the corresponding rates are valid. An example plugin can be seen below.
 
+The example reads bond distances from PLUMED output, which is deprecated. New plugins can calculate distances from the trajectory with `load_trajectory_universe` and `calculate_bond_distances` from `kimmdy.plugin_utils` instead.
+
 ```{python}
 #| code-fold: true
 #| code-summary: "Plugin main code (reaction.py)"

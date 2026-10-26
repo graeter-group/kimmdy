@@ -6,6 +6,8 @@ import sys
 
 nN_per_kJ_per_mol_nm = 0.001661
 R = 8.31446261815324e-3  # [kJ K-1 mol-1]
+KB = 1.380649e-23  # [J K-1]
+H_PLANCK = 6.62607015e-34  # [J s]
 
 OPTIONAL_CONFIG_PATHS = ["config.edissoc"]
 """Paths that may or may not be defined in the input

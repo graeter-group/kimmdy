@@ -11,8 +11,12 @@ See [Project Structure](../how-to/install-kimmdy.qmd#notes-on-the-project-strucu
 
 ## Plumed
 
-Plumed is required for the homolysis plugin.
-Historically, gromacs would need to be compiled with Plumed, however
+Plumed is no longer required for the homolysis plugin, which calculates bond
+distances directly from the trajectory with MDAnalysis.
+PLUMED support in KIMMDY (`plumed`, `use_plumed`, `break_plumed`) is deprecated
+and will be removed in a future release.
+If you still use it,
+note that historically, gromacs would need to be compiled with Plumed, however
 since gromacs 2025, no patching is required.
 Plumed needs still to get compiled and installed 
 ([See plumded documentation](https://www.plumed.org/doc-v2.9/user-doc/html/_installation.html))!

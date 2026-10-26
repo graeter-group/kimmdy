@@ -17,8 +17,8 @@ Further please keep this branch and clones private for now, as it may contain st
 ## Installation
 
 **Note**: KIMMDY requires [GROMACS](https://www.gromacs.org/) to be installed, or be available as a loadable plugin on your cluster.
-Some reactions need a GROMACS version patched with [PLUMED](https://www.plumed.org/).
-The gromacs version name should then contain `MODIFIED` or `plumed`.
+PLUMED support is deprecated and will be removed in a future release. The homolysis reaction no longer needs it.
+Until then, MD steps with `use_plumed: true` need a GROMACS version patched with [PLUMED](https://www.plumed.org/), whose version name contains `MODIFIED` or `plumed`.
 
 Further this new branch requires the new HAT-plugin found in a different repository (https://github.com/graeter-group/KIMMDY-MACE-HAT-plugin)
 

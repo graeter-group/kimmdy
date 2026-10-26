@@ -108,16 +108,26 @@ def configure_logger(config: Config):
     log.symlink_to(config.out / config.log.file)
 
 
+# string options whose case has external meaning and is not lowered:
+# names are used for output directories, ITP globs are matched against
+# case-sensitive file systems and bond selections refer to case-sensitive
+# atom and residue names.
+CASE_SENSITIVE_OPTIONS = {
+    "name",
+    "product_template_itp_glob",
+    "bond_selection",
+    "bond_exclude",
+}
+
+
 def _schema_enum_value(value, option):
     """Compare enum values using the parser's existing casing and aliases."""
     if not isinstance(value, str):
         return value
-    if option.rsplit(".", 1)[-1] not in {"name", "product_template_itp_glob"}:
+    if option.rsplit(".", 1)[-1] not in CASE_SENSITIVE_OPTIONS:
         value = value.lower()
     if option == "config.changer.coordinates.slow_growth":
-        value = {"yes": "full", "true": "full", "no": "", "false": ""}.get(
-            value, value
-        )
+        value = {"yes": "full", "true": "full", "no": "", "false": ""}.get(value, value)
     return value
 
 
@@ -230,14 +240,9 @@ class Config:
                     raise ValueError(m)
 
                 v = pytype(v)
-                if pytype is str and k not in {
-                    "name",
-                    "product_template_itp_glob",
-                }:
+                if pytype is str and k not in CASE_SENSITIVE_OPTIONS:
                     # make sure all strings are lowercase
-                    # except for values whose case has external meaning:
-                    # names are used for output directories and ITP globs
-                    # are matched against case-sensitive file systems.
+                    # except for values whose case has external meaning
                     v = v.lower()
                 self.__setattr__(k, v)
 

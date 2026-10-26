@@ -22,6 +22,7 @@ The prefered method of starting a KIMMDY run is via the command line, though [Py
 ## Create plumed input
 
 This module creates input files for plumed based on a topology and index file.
+It is deprecated and will be removed in a future release, as the homolysis reaction no longer needs a plumed input file.
 
 ```{python}
 !kimmdy-create-plumed --help

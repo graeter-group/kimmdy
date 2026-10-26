@@ -386,8 +386,43 @@ def test_schema_keeps_value_of_untyped_deprecated_option(
     )
 
 
+def test_plumed_options_are_deprecated_but_kept(schema_startup_config, monkeypatch):
+    from kimmdy.constants import CONFIG_LOGS
+
+    monkeypatch.setitem(CONFIG_LOGS, "warnings", [])
+    build, _ = schema_startup_config
+    config = build(
+        overrides={
+            "plumed": "plumed.dat",
+            "mds": {"sample": {"mdp": "sample.mdp", "use_plumed": True}},
+        }
+    )
+    assert isinstance(config.plumed, Path)
+    assert config.mds.sample.use_plumed is True
+    warnings = "\n".join(CONFIG_LOGS["warnings"])
+    assert "config.plumed" in warnings
+    assert "config.mds.sample.use_plumed" in warnings
+
+
 def test_schema_checks_numeric_constraints_in_wildcard_sections(schema_startup_config):
     build, scheme = schema_startup_config
     scheme["mds"][".*"]["stride"] = {"pytype": int, "minimum": 1}
     with pytest.raises(ValueError, match="mds.sample.stride must be >= 1"):
         build(overrides={"mds": {"sample": {"mdp": "sample.mdp", "stride": 0}}})
+
+
+def test_bond_selection_options_keep_case(schema_startup_config):
+    build, scheme = schema_startup_config
+    scheme["reactions"]["test_rates"]["bond_selection"] = {"pytype": str}
+    scheme["reactions"]["test_rates"]["bond_exclude"] = {"pytype": str}
+    scheme["reactions"]["test_rates"]["other_option"] = {"pytype": str}
+    config = build(
+        {
+            "bond_selection": "backbone or resname L4Y",
+            "bond_exclude": "C-N H* O*",
+            "other_option": "MiXeD",
+        }
+    )
+    assert config.reactions.test_rates.bond_selection == "backbone or resname L4Y"
+    assert config.reactions.test_rates.bond_exclude == "C-N H* O*"
+    assert config.reactions.test_rates.other_option == "mixed"

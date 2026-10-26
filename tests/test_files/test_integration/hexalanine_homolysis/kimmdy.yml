@@ -5,15 +5,14 @@ gromacs_alias: "gmx"
 gmx_mdrun_flags: -maxh 24 -dlb yes
 ff: "amber99sb-star-ildnp.ff"
 top: "hexala_out.top"
+edissoc: "edissoc.dat"
 gro: "npt.gro"
 ndx: "index.ndx"
-plumed: "plumed.dat"
 mds:
   equilibrium:
     mdp: "md.mdp"
   pull:
     mdp: "md.mdp"
-    use_plumed: true
   relax:
     mdp: "md_slow_growth.mdp"
 changer:
@@ -23,9 +22,7 @@ changer:
   topology:
     parameterization: "basic"
 reactions:
-  homolysis:
-    edis: "edissoc.dat"
-    itp: "ffbonded.itp"
+  homolysis: {}
 sequence:
   - equilibrium
   - pull
