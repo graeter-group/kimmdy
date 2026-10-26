@@ -7,12 +7,12 @@ from kimmdy.topology.topology import Topology
 
 
 @pytest.fixture
-def dopa_topology() -> Topology:
+def plpc_topology() -> Topology:
     filedir = Path(__file__).parent / "test_files" / "test_itp_templates"
     raw_top = read_top(filedir / "topol.top", ffdir=filedir)
     return Topology(
         raw_top,
-        radicals="92",
+        radicals="222",  # Radical C33: 132 closed-shell atoms + local atom 90.
         product_template_sources=("itp",),
         product_template_itp_glob="*.itp",
     )
@@ -23,13 +23,13 @@ def _atoms_in_residue(topology: Topology, resnr: str):
 
 
 def _hat_atoms(topology: Topology):
-    """Return donor H37, its O2 donor, and radical O3 from the fixture."""
+    """Return donor H3Y, its C33 donor, and radical C33 from the fixture."""
     donor_h = next(
         atom
         for atom in topology.atoms.values()
-        if atom.atom == "H37"
+        if atom.atom == "H3Y"
         and any(
-            candidate.atom == "H38"
+            candidate.atom == "H3X"
             for candidate in _atoms_in_residue(topology, atom.resnr)
         )
     )
@@ -37,62 +37,62 @@ def _hat_atoms(topology: Topology):
     acceptor = next(
         atom
         for atom in topology.atoms.values()
-        if atom.atom == "O3"
+        if atom.atom == "C33"
         and not any(
-            candidate.atom == "H38"
+            candidate.atom == "H3X"
             for candidate in _atoms_in_residue(topology, atom.resnr)
         )
     )
     return donor_h, donor, acceptor
 
 
-def test_loads_closed_and_radical_dopa_templates(dopa_topology):
-    templates = dopa_topology.ff.product_templates.templates["DOPA"]
+def test_loads_closed_and_radical_plpc_templates(plpc_topology):
+    templates = plpc_topology.ff.product_templates.templates["PLPC"]
     templates_by_moleculetype = {
         template.moleculetype: template for template in templates
     }
 
-    assert set(templates_by_moleculetype) == {"DOPA", "DOPA_rad"}
+    assert set(templates_by_moleculetype) == {"PLPC", "PLPC_rad"}
 
-    closed = templates_by_moleculetype["DOPA"]
-    radical = templates_by_moleculetype["DOPA_rad"]
+    closed = templates_by_moleculetype["PLPC"]
+    radical = templates_by_moleculetype["PLPC_rad"]
 
-    assert set(closed.atoms) - set(radical.atoms) == {"H38"}
+    assert set(closed.atoms) - set(radical.atoms) == {"H3X"}
     assert set(radical.atoms) < set(closed.atoms)
-    assert set(closed.bonds) - set(radical.bonds) == {("H38", "O3")}
+    assert set(closed.bonds) - set(radical.bonds) == {("C33", "H3X")}
 
 
-def test_matches_hydrogenated_dopa_radical(dopa_topology):
-    donor_h, donor, acceptor = _hat_atoms(dopa_topology)
+def test_matches_hydrogenated_plpc_radical(plpc_topology):
+    donor_h, donor, acceptor = _hat_atoms(plpc_topology)
 
-    dopa_topology.break_bond((donor.nr, donor_h.nr))
+    plpc_topology.break_bond((donor.nr, donor_h.nr))
     donor_h.residue = acceptor.residue
     donor_h.resnr = acceptor.resnr
 
-    match = dopa_topology.ff.product_templates.match_hydrogenated_residue(
-        topology=dopa_topology,
+    match = plpc_topology.ff.product_templates.match_hydrogenated_residue(
+        topology=plpc_topology,
         acceptor=acceptor,
         transferred_h=donor_h,
     )
 
     assert match is not None
-    assert match.template.moleculetype == "DOPA"
+    assert match.template.moleculetype == "PLPC"
     assert match.transferred_h_id == donor_h.nr
     assert match.acceptor_id == acceptor.nr
-    assert match.transferred_h_template_name == "H38"
-    assert match.atom_mapping[donor_h.nr] == match.template.atoms["H38"]
-    assert match.atom_mapping[acceptor.nr] == match.template.atoms["O3"]
+    assert match.transferred_h_template_name == "H3X"
+    assert match.atom_mapping[donor_h.nr] == match.template.atoms["H3X"]
+    assert match.atom_mapping[acceptor.nr] == match.template.atoms["C33"]
 
 
-def test_rejects_template_when_existing_atom_type_differs(dopa_topology):
-    donor_h, donor, acceptor = _hat_atoms(dopa_topology)
-    dopa_topology.break_bond((donor.nr, donor_h.nr))
+def test_rejects_template_when_existing_atom_type_differs(plpc_topology):
+    donor_h, donor, acceptor = _hat_atoms(plpc_topology)
+    plpc_topology.break_bond((donor.nr, donor_h.nr))
     donor_h.residue = acceptor.residue
     donor_h.resnr = acceptor.resnr
-    acceptor.type = "CG321"
+    acceptor.type = "CTL3"
 
-    match = dopa_topology.ff.product_templates.match_hydrogenated_residue(
-        topology=dopa_topology,
+    match = plpc_topology.ff.product_templates.match_hydrogenated_residue(
+        topology=plpc_topology,
         acceptor=acceptor,
         transferred_h=donor_h,
     )
@@ -100,12 +100,12 @@ def test_rejects_template_when_existing_atom_type_differs(dopa_topology):
     assert match is None
 
 
-def test_rejects_template_with_unknown_atomtype(dopa_topology):
-    known_atomtypes = dict(dopa_topology.ff.atomtypes)
-    known_atomtypes.pop("HGP1")
+def test_rejects_template_with_unknown_atomtype(plpc_topology):
+    known_atomtypes = dict(plpc_topology.ff.atomtypes)
+    known_atomtypes.pop("HAL2")
 
-    with pytest.raises(ValueError, match="atom type 'HGP1'.*missing"):
-        dopa_topology.ff.product_templates.validate_atomtypes(known_atomtypes)
+    with pytest.raises(ValueError, match="atom type 'HAL2'.*missing"):
+        plpc_topology.ff.product_templates.validate_atomtypes(known_atomtypes)
 
 
 def test_rejects_unknown_product_template_source():
