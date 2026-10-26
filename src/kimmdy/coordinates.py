@@ -940,6 +940,10 @@ class MoleculeTypeMerger:
         explicit numbers: the force field has no bond, angle or dihedral entry
         for the new H type on a hydroxyl oxygen. Returns names such as
         "bond 12-13" for every term that still has no numbers.
+        Pairs only count when the force field does not generate pairs: with
+        gen-pairs = yes, grompp builds every pair from the atom types of each
+        state, so a pair of the retyped H gets its numbers from the new type in
+        state B.
         """
         # look through bonds, angles, dihedrals and pairs that contain the atom
         implicit: list[str] = []
@@ -948,8 +952,9 @@ class MoleculeTypeMerger:
             ("angle", self.mol_a.angles),
             ("dihedral", self.mol_a.proper_dihedrals),
             ("improper dihedral", self.mol_a.improper_dihedrals),
-            ("pair", self.mol_a.pairs),
         )
+        if not self._ff_generates_pairs():
+            sections += (("pair", self.mol_a.pairs),)
         for name, interactions in sections:
             for key, interaction in interactions.items():
                 if atom_nr not in key:
@@ -961,6 +966,13 @@ class MoleculeTypeMerger:
                 if any(getattr(term, "c0", None) is None for term in terms):
                     implicit.append(f"{name} {'-'.join(key)}")
         return implicit
+
+    def _ff_generates_pairs(self) -> bool:
+        """Tell whether the force field sets gen-pairs = yes in [ defaults ] (GROMACS default: no)."""
+        defaults = getattr(self.ff, "defaults", None)
+        if not defaults or len(defaults[0]) < 3:
+            return False
+        return str(defaults[0][2]).lower() == "yes"
 
     def merge_atoms(self):
         # only iterating over the keys of mol_a
