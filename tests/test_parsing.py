@@ -224,7 +224,7 @@ def test_plumed_write_identity(arranged_tmp_path):
 
 
 def test_edissoc_read(arranged_tmp_path):
-    edissoc_dict = parsing.read_edissoc(Path("edissoc.dat"))
+    edissoc_dict = parsing.read_edissoc(Path("edissoc_kimmdy.dat"))
     assert len(edissoc_dict.keys()) == 14
     assert edissoc_dict.get("ALA") is not None
     assert edissoc_dict.get("GLY") is not None
@@ -238,7 +238,7 @@ def test_edissoc_read_correct_error(arranged_tmp_path):
     # works with and without spacs around keys in `[ ... ]`
     # should throw ValueError if the file is not formatted correctly
     with pytest.raises(ValueError):
-        edissoc_dict = parsing.read_edissoc(Path("edissoc-error.dat"))
+        edissoc_dict = parsing.read_edissoc(Path("edissoc_kimmdy-error.dat"))
 
 
 def test_marker_file_parsing(tmp_path: Path):

@@ -248,6 +248,15 @@ class Config:
 
         # validate on initial construction
         if section == "config":
+            # edissoc was renamed to edissoc_kimmdy, because GROMACS needs
+            # a separate file in its own format (edissoc_gromacs)
+            if hasattr(self, "edissoc"):
+                if hasattr(self, "edissoc_kimmdy"):
+                    m = "Both the deprecated config.edissoc and config.edissoc_kimmdy are set. Only set edissoc_kimmdy."
+                    raise ValueError(m)
+                self.edissoc_kimmdy = self.edissoc
+                del self.edissoc
+
             # defaults from the scheme
             self._set_defaults(
                 section=section, scheme=deepcopy(scheme), restart=restart

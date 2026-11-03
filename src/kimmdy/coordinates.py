@@ -13,7 +13,7 @@ from math import sqrt
 import MDAnalysis as mda
 import numpy as np
 
-from kimmdy.constants import DEFAULT_EDISSOC, FFFUNC
+from kimmdy.constants import FFFUNC
 from kimmdy.parsing import read_plumed, write_plumed
 from kimmdy.recipe import Place
 from kimmdy.tasks import TaskFiles
@@ -288,6 +288,7 @@ class MoleculeTypeMerger:
         self.parallel_dihedral_merge = bool(parallel_dihedral_merge)
         self.parallel_dihedral_workers = parallel_dihedral_workers
         self.transferred_h_type = self._find_lj_hydrogen_type()
+        # values optimized for smooth transition between morse wells, not supposed to be realistic Morse barriers
         self.default_morse_well_depth = 300  # [kJ mol^-1]
         self.default_beta_for_lj = 19  # matches LJ steepness
         self.default_morse_dist_factor = 1.12  # sigmaij* 1.12 = LJ minimum
@@ -620,16 +621,9 @@ class MoleculeTypeMerger:
 
         return sigma, epsilon
 
-    def _get_morse_parameters(
-        self, atomtypes: tuple[str, str], bond: Bond | None = None
-    ):
-        # fall back to defaults if no parameters are found
+    def _get_morse_parameters(self, bond: Bond | None = None):
         well_depth = self.default_morse_well_depth
         beta = self.default_beta_for_lj
-        type_key: tuple[str, str] = tuple(sorted(atomtypes))  # type: ignore
-        d = DEFAULT_EDISSOC.get(type_key)
-        if d is not None:
-            well_depth = d
         k = bond.c1 if bond else None
         if k is not None:
             # like in gmx /src/gromacs/gmxpreprocess/tomorse.cpp
@@ -946,6 +940,10 @@ class MoleculeTypeMerger:
         explicit numbers: the force field has no bond, angle or dihedral entry
         for the new H type on a hydroxyl oxygen. Returns names such as
         "bond 12-13" for every term that still has no numbers.
+        Pairs only count when the force field does not generate pairs: with
+        gen-pairs = yes, grompp builds every pair from the atom types of each
+        state, so a pair of the retyped H gets its numbers from the new type in
+        state B.
         """
         # look through bonds, angles, dihedrals and pairs that contain the atom
         implicit: list[str] = []
@@ -954,8 +952,9 @@ class MoleculeTypeMerger:
             ("angle", self.mol_a.angles),
             ("dihedral", self.mol_a.proper_dihedrals),
             ("improper dihedral", self.mol_a.improper_dihedrals),
-            ("pair", self.mol_a.pairs),
         )
+        if not self._ff_generates_pairs():
+            sections += (("pair", self.mol_a.pairs),)
         for name, interactions in sections:
             for key, interaction in interactions.items():
                 if atom_nr not in key:
@@ -967,6 +966,13 @@ class MoleculeTypeMerger:
                 if any(getattr(term, "c0", None) is None for term in terms):
                     implicit.append(f"{name} {'-'.join(key)}")
         return implicit
+
+    def _ff_generates_pairs(self) -> bool:
+        """Tell whether the force field sets gen-pairs = yes in [ defaults ] (GROMACS default: no)."""
+        defaults = getattr(self.ff, "defaults", None)
+        if not defaults or len(defaults[0]) < 3:
+            return False
+        return str(defaults[0][2]).lower() == "yes"
 
     def merge_atoms(self):
         # only iterating over the keys of mol_a
@@ -1030,9 +1036,6 @@ class MoleculeTypeMerger:
                 # nothing to be done
                 continue
 
-            atomtypes_a: tuple[str, str] = tuple([self.mol_a.atoms[atom_id].type for atom_id in bond_key])  # type: ignore
-            atomtypes_b: tuple[str, str] = tuple([self.mol_b.atoms[atom_id].type for atom_id in bond_key])  # type: ignore
-
             sigmaij_a, epsilonij_a = self._get_LJ_parameters(
                 *bond_key, use_state_b=False
             )
@@ -1040,12 +1043,8 @@ class MoleculeTypeMerger:
                 *bond_key, use_state_b=True
             )
 
-            depth_a, beta_a = self._get_morse_parameters(
-                atomtypes=atomtypes_a, bond=bond_a
-            )
-            depth_b, beta_b = self._get_morse_parameters(
-                atomtypes=atomtypes_b, bond=bond_b
-            )
+            depth_a, beta_a = self._get_morse_parameters(bond=bond_a)
+            depth_b, beta_b = self._get_morse_parameters(bond=bond_b)
 
             # both bonds exist-> transition between parameters
             if bond_a is not None and bond_b is not None:

@@ -844,7 +844,19 @@ class RunManager:
             relax_is_slow_growth[relax_md] = (
                 relax_config.slow_growth is not False
             )  # it's either morse_only or True
+        md_names = (
+            self.config.mds.get_attributes() if hasattr(self.config, "mds") else []
+        )
         for k, v in self.mdps.items():
+            # only mds run by kimmdy get the edissoc_gromacs copy for grompp
+            if (
+                v.get("morse") is True
+                and k in md_names
+                and not hasattr(self.config, "edissoc_gromacs")
+            ):
+                m = f"MDP file for {k} sets morse = yes, but edissoc_gromacs is not set in the config. GROMACS will use its built-in edissoc.dat."
+                logger.warning(m)
+
             if k == relax_md and relax_is_slow_growth.get(k) is True:
                 if v.get("free-energy") is not True:
                     m = f"Specified relaxation md {relax_md} designated as slow-growth md, but its mdp file doesn't set free-energy = true/yes."
@@ -1198,6 +1210,10 @@ class RunManager:
         # copy mdp file to output directory for reference
         # using the name of the instance for inferability
         shutil.copy(mdp, outputdir / f"{instance}.mdp")
+
+        # grompp reads Morse dissociation energies from ./edissoc.dat
+        if hasattr(self.config, "edissoc_gromacs"):
+            shutil.copy(self.config.edissoc_gromacs, outputdir / "edissoc.dat")
 
         # to continue MD after timeout
         if continue_md:

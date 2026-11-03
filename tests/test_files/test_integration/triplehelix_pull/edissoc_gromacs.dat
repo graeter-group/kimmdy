@@ -1,0 +1,13 @@
+C   N   500
+CT  C   341
+CT  N   379
+N3  CT  379
+CT  N*  437
+N*  CM  500
+CM  C   500
+CM  CA  500
+C   CA  500
+CA  CA  500
+CT  CA  480
+CT  CT  400
+CA  N2  400
