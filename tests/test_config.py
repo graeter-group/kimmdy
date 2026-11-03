@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 
 import pytest
@@ -42,12 +43,12 @@ def test_no_sections_are_created_for_not_mentioned_reactions(arranged_tmp_path):
     config_2 = Config(Path("config2.yml"))
 
     assert config_1.reactions.homolysis
-    assert config_1.edissoc.name == "edissoc.dat"
+    assert config_1.edissoc_kimmdy.name == "edissoc_kimmdy.dat"
     assert len(config_1.reactions.__dict__) == 1
 
     assert len(config_2.reactions.__dict__) == 2
     assert config_2.reactions.homolysis
-    assert config_2.edissoc.name == "edissoc.dat"
+    assert config_2.edissoc_kimmdy.name == "edissoc_kimmdy.dat"
     assert config_2.reactions.hat_naive
     assert config_2.reactions.hat_naive.polling_rate == 1
     assert config_2.reactions.hat_naive.h_cutoff == 4
@@ -174,7 +175,7 @@ def test_get_existing_files(arranged_tmp_path):
             "pullf1500_equil.mdp",
             "pullf1500.mdp",
             "broken_equil_f1000.mdp",
-            "edissoc.dat",
+            "edissoc_kimmdy.dat",
             "yml",
         ]
     )
@@ -211,6 +212,68 @@ def test_config_works_for_no_slow_growth_relax(
     config = Config(Path("conf5.yml"))
     runmgr = RunManager(config)
     assert runmgr
+
+
+def test_deprecated_edissoc_is_used_as_edissoc_kimmdy(arranged_tmp_path):
+    with open(Path("config1.yml"), "r") as f:
+        raw = yaml.safe_load(f)
+    raw["edissoc"] = raw.pop("edissoc_kimmdy")
+
+    config = Config(opts=raw)
+
+    assert config.edissoc_kimmdy.name == "edissoc_kimmdy.dat"
+    assert not hasattr(config, "edissoc")
+
+
+def test_deprecated_edissoc_and_edissoc_kimmdy_raises(arranged_tmp_path):
+    with open(Path("config1.yml"), "r") as f:
+        raw = yaml.safe_load(f)
+    raw["edissoc"] = raw["edissoc_kimmdy"]
+
+    with pytest.raises(ValueError, match="Only set edissoc_kimmdy"):
+        Config(opts=raw)
+
+
+def test_morse_without_edissoc_gromacs_warns(arranged_tmp_path, caplog, monkeypatch):
+    # pullf1500_equil.mdp and pullf1500.mdp set morse = yes
+    config = Config(Path("conf5.yml"))
+    runmgr = RunManager(config)
+    # Config's logging setup replaces the root handlers, including caplog's
+    kimmdy_logger = logging.getLogger("kimmdy")
+    monkeypatch.setattr(
+        kimmdy_logger, "handlers", [*kimmdy_logger.handlers, caplog.handler]
+    )
+
+    with caplog.at_level(logging.WARNING, logger="kimmdy.runmanager"):
+        runmgr._setup_mdps()
+
+    morse_warnings = [
+        r.message for r in caplog.records if "edissoc_gromacs is not set" in r.message
+    ]
+    assert len(morse_warnings) == 2
+    assert any("equilibrium1" in m for m in morse_warnings)
+    assert any("pull1" in m for m in morse_warnings)
+
+
+def test_morse_with_edissoc_gromacs_does_not_warn(
+    arranged_tmp_path, caplog, monkeypatch
+):
+    Path("edissoc_gromacs.dat").write_text("C   N   500\n")
+    with open(Path("conf5.yml"), "r") as f:
+        raw = yaml.safe_load(f)
+    raw["edissoc_gromacs"] = "edissoc_gromacs.dat"
+    config = Config(opts=raw)
+    runmgr = RunManager(config)
+    # Config's logging setup replaces the root handlers, including caplog's
+    kimmdy_logger = logging.getLogger("kimmdy")
+    monkeypatch.setattr(
+        kimmdy_logger, "handlers", [*kimmdy_logger.handlers, caplog.handler]
+    )
+
+    with caplog.at_level(logging.WARNING, logger="kimmdy.runmanager"):
+        runmgr._setup_mdps()
+
+    assert "edissoc_gromacs is not set" not in caplog.text
 
 
 def test_config_parses_product_template_settings(arranged_tmp_path):

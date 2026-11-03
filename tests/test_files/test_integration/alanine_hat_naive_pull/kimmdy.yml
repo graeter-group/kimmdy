@@ -8,6 +8,7 @@ ff: "amber99sb-star-ildnp.ff" # optional, dir endinng with .ff by default
 top: topol.top
 gro: "npt.gro"
 ndx: "index.ndx"
+edissoc_gromacs: "edissoc_gromacs.dat"
 # kmc: rfkmc
 kmc: dummy_first
 mds:

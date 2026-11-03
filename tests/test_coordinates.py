@@ -8,7 +8,7 @@ from pathlib import Path
 import MDAnalysis as mda
 from kimmdy.recipe import Break, Place
 from kimmdy.parsing import read_plumed, read_top, write_top
-from kimmdy.constants import DEFAULT_EDISSOC, REACTIVE_MOLECULEYPE
+from kimmdy.constants import REACTIVE_MOLECULEYPE
 from conftest import DummyFiles
 from kimmdy.tasks import TaskFiles
 from kimmdy.topology.atomic import Angle, Bond, BondType, Dihedral, Pair
@@ -184,11 +184,9 @@ def test_morse_parameters(arranged_tmp_path):
     assert atomtypes_a == ("CT", "H")
     assert atomtypes_b == ("CT", "H1")
 
-    depth_a, beta_a = merger._get_morse_parameters(atomtypes=atomtypes_a, bond=bond_a)
-    depth_b, beta_b = merger._get_morse_parameters(atomtypes=atomtypes_b, bond=bond_b)
-    type_key: tuple[str, str] = tuple(sorted(atomtypes_b))  # type: ignore
-    d = DEFAULT_EDISSOC.get(type_key)
-    assert d is None
+    depth_a, beta_a = merger._get_morse_parameters(bond=bond_a)
+    depth_b, beta_b = merger._get_morse_parameters(bond=bond_b)
+    # always the default well depth
     assert depth_a == 300
     assert depth_b == 300
 

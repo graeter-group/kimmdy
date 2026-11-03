@@ -2,7 +2,7 @@ dryrun: true
 max_tasks: 10
 name: 'config2'
 gromacs_alias: 'gmx'
-edissoc: edissoc.dat
+edissoc_kimmdy: edissoc_kimmdy.dat
 top: 'topol.top'
 gro: 'npt.gro'
 ndx: 'index_backbone.ndx'

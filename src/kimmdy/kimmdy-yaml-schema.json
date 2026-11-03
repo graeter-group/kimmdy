@@ -284,10 +284,22 @@
     },
     "edissoc": {
       "title": "edissoc",
-      "description": "File with additional dissociation energy terms. This is used for the homolysis and hydrolysis reactions.",
+      "description": "Use edissoc_kimmdy instead. Renamed because the GROMACS Morse potential needs a separate file in GROMACS format (edissoc_gromacs). If set, the value is used as edissoc_kimmdy.",
+      "deprecated": true,
       "type": "string",
-      "pytype": "Path",
-      "default": "edissoc.dat"
+      "pytype": "Path"
+    },
+    "edissoc_kimmdy": {
+      "title": "edissoc_kimmdy",
+      "description": "Dissociation energies used by KIMMDY reaction plugins to compute reaction rates. Required by homolysis, and by hydrolysis with external_force -1. KIMMDY format: atom names, grouped in [ residue ] sections, with an optional [ general ] fallback. Not passed to GROMACS (see edissoc_gromacs).",
+      "type": "string",
+      "pytype": "Path"
+    },
+    "edissoc_gromacs": {
+      "title": "edissoc_gromacs",
+      "description": "Dissociation energies for the GROMACS Morse potential, in GROMACS edissoc.dat format (atom types, no residue sections). Copied as edissoc.dat into each MD task directory before grompp, so that `morse = yes` in the mdp uses these values instead of the GROMACS built-in table. Has no effect without `morse = yes`, and is not used by KIMMDY itself (see edissoc_kimmdy).",
+      "type": "string",
+      "pytype": "Path"
     },
     "grompp_prefix": {
       "title": "grompp_prefix",
