@@ -4,7 +4,7 @@ max_tasks: 100
 gromacs_alias: "gmx"
 gmx_mdrun_flags: -maxh 24 -dlb yes
 top: "IMREE.top"
-edissoc: "edissoc.dat"
+edissoc_kimmdy: "edissoc_kimmdy.dat"
 gro: "IMREE_npt.gro"
 ndx: "index.ndx"
 kmc: rfkmc

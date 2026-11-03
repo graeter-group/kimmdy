@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Optional
 
 from kimmdy.constants import FFFUNC
-from kimmdy.parsing import read_top, read_edissoc
+from kimmdy.parsing import read_top
 from kimmdy.topology.atomic import (
     AngleId,
     AngleType,
@@ -22,7 +22,6 @@ from kimmdy.topology.atomic import (
 )
 from kimmdy.topology.product_templates import ProductTemplateLibrary
 from kimmdy.topology.utils import get_top_section
-from kimmdy.utils import get_gmx_dir
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +36,6 @@ class FF:
         self,
         top: dict,
         residuetypes_path: Optional[Path] = None,
-        gromacs_alias: str = "gmx",
         product_template_sources: tuple[str, ...] = ("rtp",),
         product_template_itp_glob: str = "*.itp",
         product_template_transitions: Optional[dict[str, str]] = None,
@@ -50,7 +48,6 @@ class FF:
         self.improper_dihedraltypes: dict[ImproperDihedralId, DihedralType] = {}
         self.residuetypes: dict[str, ResidueType] = {}
         self.nonbond_params: dict[BondId, NonbondParamType] = {}
-        self.default_edissoc: dict[str, dict[tuple[str, str], float]] = {}
         self.product_template_sources = set(product_template_sources)
         unknown_sources = self.product_template_sources - {"itp", "rtp"}
         if unknown_sources:
@@ -69,13 +66,6 @@ class FF:
         self.product_templates = ProductTemplateLibrary()
 
         ffdir: Optional[Path] = top["ffdir"]
-
-        gmxdir = get_gmx_dir(gromacs_alias)
-        if gmxdir is not None:
-            gmx_builtin_ffs = gmxdir / "top"
-            self.default_edissoc = read_edissoc(gmx_builtin_ffs / "edissoc.dat")
-        else:
-            logger.warning(f"Could not find gromacs data directory for {gromacs_alias}")
 
         if defaults := get_top_section(top, "defaults"):
             self.defaults = defaults

@@ -7,7 +7,8 @@ ff: "amber99sb-star-ildnp.ff" # optional, dir ending with .ff by default
 top: "topol.top"
 gro: "npt.gro"
 ndx: "index_backbone.ndx"
-edissoc: "edissoc.dat"
+edissoc_kimmdy: "edissoc_kimmdy.dat"
+edissoc_gromacs: "edissoc_gromacs.dat"
 mds:
   equilibrium:
     mdp: "pullf1500_equil.mdp"

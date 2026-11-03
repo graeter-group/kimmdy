@@ -5,7 +5,8 @@ gromacs_alias: "gmx"
 gmx_mdrun_flags: -maxh 24 -dlb yes
 ff: "amber99sb-star-ildnp.ff"
 top: "hexala_out.top"
-edissoc: "edissoc.dat"
+edissoc_kimmdy: "edissoc_kimmdy.dat"
+edissoc_gromacs: "edissoc_gromacs.dat"
 gro: "npt.gro"
 ndx: "index.ndx"
 mds:
