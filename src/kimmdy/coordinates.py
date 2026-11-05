@@ -982,9 +982,13 @@ class MoleculeTypeMerger:
         for nr in self.mol_a.atoms.keys():
             atomA = self.mol_a.atoms[nr]
             atomB = self.mol_b.atoms[nr]
-            if atomA != atomB and not (
-                self.morse_only and atomA.charge == atomB.charge
-            ):
+            same_charge = atomA.charge == atomB.charge
+            # the relaxation uses the charges of B in both states: interpolated
+            # charges make atoms perturbed, and GROMACS does not support
+            # perturbed, excluded pairs beyond the pair-list cut-off, such as
+            # the atoms of a broken bond that separate during the relaxation
+            atomA.charge = deepcopy(atomB.charge)
+            if atomA != atomB and not (self.morse_only and same_charge):
                 # the simplified version doesn't change if the charges are the same
                 # set B parameters first
                 # to not overwrite them
@@ -1882,6 +1886,8 @@ def merge_top_slow_growth(
     """Takes two Topologies and joins them for a smooth free-energy like parameter transition simulation.
     Modifies topB in place.
     All changes are contained to the `Reactive` moleculetype.
+    The relaxation uses the charges of B in both states; atom types, masses
+    and bonded terms are interpolated.
     """
 
     MoleculeTypeMerger(

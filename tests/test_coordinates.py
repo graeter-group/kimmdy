@@ -343,6 +343,20 @@ def test_merge_hat_top(arranged_tmp_path, caplog):
     assert top_a.exclusions == top_a_ref.exclusions
 
 
+@pytest.mark.parametrize("arranged_tmp_path", ["test_coordinates"], indirect=True)
+def test_merge_uses_b_charges_in_both_states(arranged_tmp_path):
+    """The relaxation topology carries the charges of B; only types and masses are interpolated."""
+    top_a = Topology(read_top(Path("topol_stateA.top")))
+    top_b = Topology(read_top(Path("topol_stateB.top")))
+    merge_top_slow_growth(top_a=top_a, top_b=top_b)
+
+    for nr, atom in top_a.atoms.items():
+        assert atom.charge == top_b.atoms[nr].charge
+        assert atom.chargeB in (None, atom.charge)
+    assert top_a.atoms["26"].typeB is None  # only the charge differed
+    assert top_a.atoms["27"].typeB == "H1"  # the moved hydrogen still changes type
+
+
 def test_merge_small_hat_details(arranged_tmp_path, caplog):
     top = Topology(read_top(Path("AlaCaR_out.top")))
     top_a = copy.deepcopy(top)
