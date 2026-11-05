@@ -60,6 +60,7 @@ from kimmdy.recipe import (
     DeferredRecipeSteps,
     Place,
     RecipeCollection,
+    RecipeStep,
     Relax,
 )
 from kimmdy.tasks import Task, TaskFiles, get_plumed_out
@@ -341,22 +342,15 @@ class RunManager:
             f"In output directory {self.config.out}"
         )
 
-    def _topology_fix_options(self) -> dict[str, bool]:
-        """Read the on/off switches of the topology fixes from kimmdy.yml.
-
-        Looks in changer.topology and returns a dict such as
-        {"repeated_topology_lines": "merge", ...}, ready to pass to
-        Topology(...). A switch that is not in kimmdy.yml holds its schema
-        default.
-        """
+    def _topology_fix_options(self) -> dict:
+        """Read the topology options of changer.topology from kimmdy.yml, ready to pass to Topology(...)."""
         changer_topology = self.config.changer.topology
-        return {
-            name: getattr(changer_topology, name)
-            for name in (
-                "repeated_topology_lines",
-                "conserve_transferred_h_charge",
+        if getattr(changer_topology, "conserve_transferred_h_charge", None) is not None:
+            logger.warning(
+                "changer.topology.conserve_transferred_h_charge was removed and is "
+                "ignored; see changer.apply_recipe.charges."
             )
-        }
+        return {"repeated_topology_lines": changer_topology.repeated_topology_lines}
 
     def _radicals_after_picked_recipe(
         self, radicals: list[str], radicals_file: Path, kept_task_dirs: list[Path]
@@ -1518,11 +1512,9 @@ class RunManager:
 
         logger.info(f"Chosen time_start: {ttime} ps")
 
-        if isinstance(recipe.recipe_steps, list):
-            recipe.recipe_steps = recipe.recipe_steps
-        elif isinstance(recipe.recipe_steps, DeferredRecipeSteps):
+        if isinstance(recipe.recipe_steps, DeferredRecipeSteps):
             logger.info(
-                f"Steps of recipe where deferred, calling callback with key {recipe.recipe_steps.key} and time {ttime}"
+                f"Steps of recipe were deferred, calling callback with key {recipe.recipe_steps.key} and time {ttime}"
             )
             recipe.recipe_steps = recipe.recipe_steps.callback(
                 recipe.recipe_steps.key, ttime
@@ -1530,7 +1522,7 @@ class RunManager:
             logger.info(
                 f"Got {len(recipe.recipe_steps)} steps in recipe {recipe.get_recipe_name()}"
             )
-        else:
+        elif not isinstance(recipe.recipe_steps, list):
             m = f"Recipe steps of {recipe} are neither a list nor a DeferredRecipeSteps object."
             logger.error(m)
             raise ValueError(m)
@@ -1574,90 +1566,82 @@ class RunManager:
             )
             self.latest_files["gro"] = files.output["gro"]
 
-        top_initial = deepcopy(self.top)
-        pending_charge_steps: list[Break | Bind] = []
+        # Applying the recipes starts here
+        # A Relax ends a segment of the recipe: the topology after the steps
+        # so far (B) gets its charges and bonded parameters, and the
+        # relaxation goes from the topology before them (A) to B.
+        # The steps after it start from B.
+        charge_options = self.config.changer.apply_recipe.charges
+        charge_kwargs = dict(
+            template_tolerance=charge_options.template_tolerance,
+            conservation_tolerance=charge_options.conservation_tolerance,
+            conservation_check=charge_options.conservation_check,
+        )
+        # topology before the current segment (A), copied at the segment's
+        # first step that changes the topology; None until then
+        top_a: Optional[Topology] = None
+        segment_steps: list[RecipeStep] = []
         for step in recipe.recipe_steps:
+            if not isinstance(step, Relax):
+                segment_steps.append(step)
+            if isinstance(step, (Break, Bind, CustomTopMod)) and top_a is None:
+                # the copy shares the parameterizer (e.g. the Grappa model)
+                top_a = deepcopy(
+                    self.top, memo={id(self.top.parametrizer): self.top.parametrizer}
+                )
             if isinstance(step, Break):
                 self.top.break_bond((step.atom_id_1, step.atom_id_2))
-                # Keep standalone breaks pending through Relax, preserving the
-                # established homolysis slow-growth topology.
-                pending_charge_steps.append(step)
             elif isinstance(step, Bind):
-                bind_atom_ids = {step.atom_id_1, step.atom_id_2}
-                associated_breaks = [
-                    pending_step
-                    for pending_step in pending_charge_steps
-                    if isinstance(pending_step, Break)
-                    and bind_atom_ids
-                    & {pending_step.atom_id_1, pending_step.atom_id_2}
-                ]
-                if associated_breaks:
-                    # Apply a transfer-related break before bind_bond() moves
-                    # the shared atom, usually H, into the acceptor residue.
-                    self.top.update_partial_charges(associated_breaks)
-                    pending_charge_steps = [
-                        pending_step
-                        for pending_step in pending_charge_steps
-                        if pending_step not in associated_breaks
-                    ]
                 self.top.bind_bond((step.atom_id_1, step.atom_id_2))
-                if associated_breaks:
-                    # Product templates become available during bind_bond().
-                    self.top.update_partial_charges([step])
-                else:
-                    pending_charge_steps.append(step)
             elif isinstance(step, CustomTopMod):
                 self.top = step.f(self.top)
             elif isinstance(step, Place):
-                relax_task = Task(
+                place_task = Task(
                     self,
                     f=place_atom,
                     kwargs={"step": step, "ttime": None},
                     out="place_atom",
                 )
-                place_files = relax_task()
+                place_files = place_task()
                 if place_files is not None:
                     self._discover_output_files(
-                        taskname=relax_task.name, files=place_files
+                        taskname=place_task.name, files=place_files
                     )
                     shadow_files_binding = place_files
                 if step.id_to_place is not None:
                     self.top.parameterization_focus_ids.update([step.id_to_place])
             elif isinstance(step, Relax):
-                logger.info("Starting relaxation md as part of reaction..")
+                # B is finished before the relaxation goes to it
+                parameterization = self.top.update_charges_bonded(
+                    top_a, segment_steps, **charge_kwargs
+                )
                 if not hasattr(self.config.changer.coordinates, "md"):
                     logger.warning("Relax task requested but no MD specified for it!")
+                    top_a, segment_steps = None, []
                     continue
+                logger.info("Starting relaxation md as part of reaction..")
 
-                if self.config.changer.coordinates.slow_growth:
-                    # Create a temporary slow growth topology for sub-task run_md, afterwards, top will be reset properly.
+                top_stem = self.config.top.name.removesuffix(".top")
+                relax_top_path = files.outputdir / f"{top_stem}_relax.top"
+                write_intermediates = (
+                    self.config.changer.apply_recipe.write_intermediate_topologies
+                )
+                if self.config.changer.coordinates.slow_growth and top_a is not None:
+                    if write_intermediates:
+                        # original topology (topA) and target (topB) for easier debugging
+                        write_top(top_a.to_dict(), files.outputdir / f"{top_stem}_before.top")
+                        write_top(self.top.to_dict(), files.outputdir / f"{top_stem}_after.top")
 
-                    parameterization = self.top.prepare_product_parameters()
-
-                    # write out original topology (topA) and target (topB) for easier debugging
-                    write_top(
-                        top_initial.to_dict(),
-                        files.outputdir
-                        / self.config.top.name.replace(".top", "_before.top"),
-                    )
-                    write_top(
-                        self.top.to_dict(),
-                        files.outputdir
-                        / self.config.top.name.replace(".top", "_after.top"),
-                    )
-
-                    # top_initial is still the topology before the reaction
-                    # we need to do some (temporary) changes to it to stabilize
-                    # the slow_growth
-                    # First we find out if there are solvent atoms among the involved atoms
+                    # A is not needed after the relaxation, so it takes the
+                    # temporary changes that stabilize the slow growth:
+                    # a water held rigid by SETTLES has no bonds that could
+                    # fade out, so a reacting water gets temporary O-H bonds
                     solvent_atoms: set[str] = set()
                     logger.debug(f"Checking for reacting solvent residues..")
                     for ai in parameterization.event_focus_ids:
-                        if top_initial.atoms[ai].residue == "SOL":
+                        if top_a.atoms[ai].residue == "SOL":
                             solvent_atoms.add(ai)
-                            logger.debug(
-                                f"Reacting solvent atom: {top_initial.atoms[ai]}"
-                            )
+                            logger.debug(f"Reacting solvent atom: {top_a.atoms[ai]}")
                     if len(solvent_atoms) > 0:
                         logger.info(
                             f"{len(solvent_atoms)} solvent atoms are involved "
@@ -1668,7 +1652,7 @@ class RunManager:
                         hw1 = None
                         hw2 = None
                         for ai in solvent_atoms:
-                            a = top_initial.atoms[ai]
+                            a = top_a.atoms[ai]
                             if a.atom == "OW":
                                 ow = a
                             if a.atom == "HW1":
@@ -1679,37 +1663,40 @@ class RunManager:
                             logger.info(
                                 "Found one complete water molecule that takes part in the reaction."
                             )
-                            top_initial.bind_bond((ow.nr, hw1.nr))
-                            top_initial.bind_bond((ow.nr, hw2.nr))
-                            b1 = top_initial.bonds.get((ow.nr, hw1.nr))
-                            b2 = top_initial.bonds.get((ow.nr, hw2.nr))
+                            top_a.bind_bond((ow.nr, hw1.nr))
+                            top_a.bind_bond((ow.nr, hw2.nr))
+                            # the temporary bonds keep their force-field parameters,
+                            # writing this topology must not parameterize it
+                            top_a.needs_parameterization = False
+                            b1 = top_a.bonds.get((ow.nr, hw1.nr))
+                            b2 = top_a.bonds.get((ow.nr, hw2.nr))
                             logger.info(f"Added bonds: {b1}, {b2}")
+                    if write_intermediates:
+                        write_top(
+                            top_a.to_dict(),
+                            files.outputdir / f"{top_stem}_before_with_solvent_bonds.top",
+                        )
 
-                    write_top(
-                        top_initial.to_dict(),
-                        files.outputdir
-                        / self.config.top.name.replace(
-                            ".top", "_before_with_solvent_bonds.top"
-                        ),
-                    )
-
-                    # top_a was copied before parameters are updated
-                    # top_b is parameterized for after the reaction
-                    # top_a is modified and returned as the merged top
+                    # top_a is modified in place and becomes the merged topology
                     merge_top_slow_growth(
-                        top_a=top_initial,
+                        top_a=top_a,
                         top_b=self.top,
                         morse_only=self.config.changer.coordinates.slow_growth
                         == "morse_only",
                         **self._slow_growth_options(),
                     )
-                    top_merge_path = files.outputdir / self.config.top.name.replace(
-                        ".top", "_relax.top"
-                    )
-                    write_top(top_initial.to_dict(), top_merge_path)
-                    # declare this temporary topolgy the latest topology
-                    # such that it will be used for the subsequent relax md task
-                    self.latest_files["top"] = top_merge_path
+                    write_top(top_a.to_dict(), relax_top_path)
+                else:
+                    if self.config.changer.coordinates.slow_growth:
+                        logger.info(
+                            "Topology unchanged since the last relaxation; "
+                            "relaxing without slow growth."
+                        )
+                    write_top(self.top.to_dict(), relax_top_path)
+
+                # declare this temporary topology the latest topology
+                # such that it will be used for the subsequent relax md task
+                self.latest_files["top"] = relax_top_path
                 md_instance = self.config.changer.coordinates.md
                 relax_task = Task(
                     self,
@@ -1721,19 +1708,19 @@ class RunManager:
                 if relax_task_files is not None:
                     self._discover_output_files(relax_task.name, relax_task_files)
                     shadow_files_binding = relax_task_files
+                # the steps after the relaxation start from B
+                top_a, segment_steps = None, []
 
-        if pending_charge_steps:
-            logger.info("Updating partial charges for remaining recipe steps")
-            self.top.update_partial_charges(pending_charge_steps)
-        logger.info("Updating parameters")
-        self.top.prepare_product_parameters()
+        if not recipe.recipe_steps or not isinstance(recipe.recipe_steps[-1], Relax):
+            # steps after the last Relax, or a recipe without one
+            self.top.update_charges_bonded(top_a, segment_steps, **charge_kwargs)
 
         # this is the new topology after the reaction
-        # not the temporay topology <name>_relax.top for slow_growth
+        # not the temporary topology <name>_relax.top for the relaxation
         write_top(self.top.to_dict(), files.outputdir / self.config.top.name)
         files.output["top"] = files.outputdir / self.config.top.name
 
-        # Recipe done, reset runmanger state
+        # Recipe done, reset runmanager state
         self.kmcresult = None
 
         if shadow_files_binding is not None:

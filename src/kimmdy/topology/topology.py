@@ -14,7 +14,7 @@ from kimmdy.constants import (
 )
 from kimmdy.parsing import TopologyDict, empty_section, read_top, write_top
 from kimmdy.plugins import BasicParameterizer, Parameterizer
-from kimmdy.recipe import Bind, Break, RecipeStep
+from kimmdy.recipe import RecipeStep
 from kimmdy.topology.atomic import (
     Angle,
     AngleType,
@@ -35,6 +35,11 @@ from kimmdy.topology.atomic import (
     ResidueType,
     Settle,
 )
+from kimmdy.topology.charges import (
+    DEFAULT_TEMPLATE_TOLERANCE,
+    assign_recipe_charges,
+    check_charge_conservation,
+)
 from kimmdy.topology.ff import FF
 from kimmdy.topology.product_templates import ProductTemplateMatch
 from kimmdy.topology.utils import (
@@ -42,7 +47,6 @@ from kimmdy.topology.utils import (
     get_moleculetype_atomics,
     get_moleculetype_header,
     get_residue_by_bonding,
-    get_residue_fragments,
     get_top_section,
     increment_field,
     is_not_solvent_or_ion,
@@ -58,7 +62,6 @@ logger = logging.getLogger("kimmdy.topology")
 class ParameterizationReport:
     event_focus_ids: set[str]
     active_radical_ids: set[str]
-    restored_templates: int
 
 
 class MoleculeType:
@@ -938,7 +941,6 @@ class Topology:
         product_template_itp_glob: str = "*.itp",
         product_template_transitions: Optional[dict[str, str]] = None,
         repeated_topology_lines: str = "merge",
-        conserve_transferred_h_charge: bool = False,
     ):
         """Topology options (changer.topology in kimmdy.yml):
 
@@ -949,13 +951,6 @@ class Topology:
             shifted by a constant) and warns, and stops on any other repeat;
             "error" stops on any repeat; "last" keeps only the last line, as
             older KIMMDY did. #define names are replaced first in every mode.
-        conserve_transferred_h_charge
-            Opt-in local charge balancing; defaults to False. When enabled,
-            a transferred H keeps its charge and the acceptor gives up the
-            same amount. This bypasses template charge assignment and complete
-            exact-ITP product restoration, including atom types, masses and
-            queued bonded parameters. When disabled, retain template restoration
-            and the existing fallback when no suitable charge template exists.
         """
         if repeated_topology_lines not in ("merge", "error", "last"):
             raise ValueError(
@@ -986,11 +981,6 @@ class Topology:
         self.pending_product_template_matches: dict[
             tuple[str, str], ProductTemplateMatch
         ] = {}
-        self.pending_transferred_h_charges: dict[str, str] = {}
-        self.conserve_transferred_h_charge = conserve_transferred_h_charge
-        self.pending_product_template_restorations: list[
-            ProductTemplateMatch
-        ] = []
         # #define names first, so periodicities are known whatever the mode
         self._expand_parameter_macros()
         self._parse_molecules()
@@ -1327,449 +1317,51 @@ class Topology:
             self.needs_parameterization = False
 
     def prepare_product_parameters(self) -> ParameterizationReport:
-        """Prepare topology B and retain only still-active radical focus IDs."""
+        """Parameterize the product (topology B) once, then keep only active radicals in focus.
+
+        Partial charges must be final before this call, because the
+        parameterizer may use them.
+        """
         event_focus_ids = set(self.parameterization_focus_ids)
         if self.needs_parameterization:
             self._parameterize_focus(event_focus_ids)
 
-        restored_templates = self.restore_pending_product_templates()
         active_radical_ids = set(self.radicals)
-        if restored_templates and active_radical_ids:
-            # Active radical regions own overlapping interactions.
-            self._parameterize_focus(active_radical_ids)
-
-        # TODO: Restore exact classical RTP bonded templates before compacting
-        # focus IDs; RTP products currently retain their final Grappa terms.
         self.parameterization_focus_ids = active_radical_ids
         self.needs_parameterization = False
         return ParameterizationReport(
             event_focus_ids=event_focus_ids,
             active_radical_ids=active_radical_ids,
-            restored_templates=restored_templates,
         )
 
-    def restore_pending_product_templates(self) -> int:
-        """Restore exact single-residue ITP products after Grappa parameterization."""
-        restored = 0
-        pending = self.pending_product_template_restorations
-        self.pending_product_template_restorations = []
-        for match in pending:
-            if not match.template.supports_bonded_restoration:
-                logger.info(
-                    "ITP template %s:%s spans multiple residues; retaining "
-                    "Grappa bonded parameters.",
-                    match.template.moleculetype,
-                    match.template.local_resnr,
-                )
-                continue
-            self._restore_product_template_interactions(match)
-            restored += 1
-        return restored
-
-    def _restore_product_template_interactions(
-        self, match: ProductTemplateMatch
-    ) -> None:
-        template = match.template
-        mapped_ids = set(match.local_to_global.values())
-
-        bonds = [
-            self._resolve_template_bond(match, line)
-            for line in template.bond_lines
-        ]
-        pairs = [self._map_template_pair(match, line) for line in template.pair_lines]
-        angles = [
-            self._resolve_template_angle(match, line) for line in template.angle_lines
-        ]
-        proper_dihedrals, improper_dihedrals = self._resolve_template_dihedrals(
-            match
-        )
-
-        for key in list(self.bonds):
-            if set(key) <= mapped_ids:
-                self.bonds.pop(key)
-        self.bonds.update({(bond.ai, bond.aj): bond for bond in bonds})
-
-        for key in list(self.pairs):
-            if set(key) <= mapped_ids:
-                self.pairs.pop(key)
-        self.pairs.update({(pair.ai, pair.aj): pair for pair in pairs})
-
-        for key in list(self.angles):
-            if set(key) <= mapped_ids:
-                self.angles.pop(key)
-        self.angles.update(
-            {(angle.ai, angle.aj, angle.ak): angle for angle in angles}
-        )
-
-        for key, interaction in list(self.proper_dihedrals.items()):
-            if (
-                set(key) <= mapped_ids
-                and interaction.funct == FFFUNC["mult_proper_dihedral"]
-            ):
-                self.proper_dihedrals.pop(key)
-        self.proper_dihedrals.update(proper_dihedrals)
-
-        # Only replace periodic impropers KIMMDY can interpolate safely. CHARMM
-        # harmonic function-2 impropers remain under Grappa ownership for now.
-        for key in improper_dihedrals:
-            self.improper_dihedrals.pop(key, None)
-        self.improper_dihedrals.update(improper_dihedrals)
-
-        logger.info(
-            "Restored bonded parameters from exact ITP product template %s:%s "
-            "(%d bonds, %d pairs, %d angles, %d proper and %d improper dihedrals).",
-            template.moleculetype,
-            template.local_resnr,
-            len(bonds),
-            len(pairs),
-            len(angles),
-            len(proper_dihedrals),
-            len(improper_dihedrals),
-        )
-
-    def _mapped_template_line(
+    def update_charges_bonded(
         self,
-        match: ProductTemplateMatch,
-        line: tuple[str, ...],
-        atom_count: int,
-    ) -> list[str]:
-        mapped = list(line)
-        try:
-            mapped[:atom_count] = [
-                match.local_to_global[atom_nr] for atom_nr in line[:atom_count]
-            ]
-        except KeyError as error:
-            raise RuntimeError(
-                "Exact ITP product-template interaction references an unmapped "
-                f"atom {error.args[0]!r} in {match.template.source}."
-            ) from error
-        return mapped
+        top_a: Optional["Topology"],
+        recipe_steps: list[RecipeStep],
+        template_tolerance: float = DEFAULT_TEMPLATE_TOLERANCE,
+        conservation_tolerance: float = DEFAULT_TEMPLATE_TOLERANCE,
+        conservation_check: str = "warn",
+    ) -> ParameterizationReport:
+        """Update the charges, then the bonded parameters, after recipe steps.
 
-    def _resolve_template_bond(
-        self, match: ProductTemplateMatch, line: tuple[str, ...]
-    ) -> Bond:
-        mapped = self._mapped_template_line(match, line, 2)
-        key = tuple(sorted(mapped[:2], key=int))
-        bond = Bond.from_top_line([*key, *mapped[2:]])
-        if bond.c0 is not None and bond.c1 is not None:
-            return bond
-        atom_types = [self.atoms[atom_nr].type for atom_nr in key]
-        bond_type = match_atomic_item_to_atomic_type(atom_types, self.ff.bondtypes)
-        if not isinstance(bond_type, BondType):
-            raise ValueError(
-                f"Could not resolve ITP bond parameters for {atom_types} in "
-                f"{match.template.source}."
-            )
-        return Bond(*key, funct=bond_type.funct, c0=bond_type.c0, c1=bond_type.c1)
-
-    def _map_template_pair(
-        self, match: ProductTemplateMatch, line: tuple[str, ...]
-    ) -> Pair:
-        mapped = self._mapped_template_line(match, line, 2)
-        key = tuple(sorted(mapped[:2], key=int))
-        return Pair.from_top_line([*key, *mapped[2:]])
-
-    def _resolve_template_angle(
-        self, match: ProductTemplateMatch, line: tuple[str, ...]
-    ) -> Angle:
-        mapped = self._mapped_template_line(match, line, 3)
-        if int(mapped[0]) > int(mapped[2]):
-            mapped[0], mapped[2] = mapped[2], mapped[0]
-        angle = Angle.from_top_line(mapped)
-        if angle.c0 is not None and angle.c1 is not None:
-            return angle
-        key = (angle.ai, angle.aj, angle.ak)
-        atom_types = [self.atoms[atom_nr].type for atom_nr in key]
-        angle_type = match_atomic_item_to_atomic_type(atom_types, self.ff.angletypes)
-        if not isinstance(angle_type, AngleType):
-            raise ValueError(
-                f"Could not resolve ITP angle parameters for {atom_types} in "
-                f"{match.template.source}."
-            )
-        return Angle(
-            *key,
-            funct=angle_type.funct,
-            c0=angle_type.c0,
-            c1=angle_type.c1,
-            c2=angle_type.c2,
-            c3=angle_type.c3,
-        )
-
-    def _resolve_template_dihedrals(
-        self, match: ProductTemplateMatch
-    ) -> tuple[
-        dict[tuple[str, str, str, str], MultipleDihedrals],
-        dict[tuple[str, str, str, str], MultipleDihedrals],
-    ]:
-        proper: dict[tuple[str, str, str, str], MultipleDihedrals] = {}
-        improper: dict[tuple[str, str, str, str], MultipleDihedrals] = {}
-        unsupported_functions: set[str] = set()
-
-        for line in match.template.dihedral_lines:
-            mapped = self._mapped_template_line(match, line, 4)
-            funct = mapped[4]
-            if funct not in {
-                FFFUNC["mult_proper_dihedral"],
-                FFFUNC["mult_improper_dihedral"],
-            }:
-                unsupported_functions.add(funct)
-                continue
-            if (
-                funct == FFFUNC["mult_proper_dihedral"]
-                and int(mapped[1]) > int(mapped[2])
-            ):
-                mapped[:4] = reversed(mapped[:4])
-
-            dihedral = Dihedral.from_top_line(mapped)
-            key = (dihedral.ai, dihedral.aj, dihedral.ak, dihedral.al)
-            target = proper if funct == FFFUNC["mult_proper_dihedral"] else improper
-            types = (
-                self.ff.proper_dihedraltypes
-                if target is proper
-                else self.ff.improper_dihedraltypes
-            )
-
-            resolved: list[Dihedral] = []
-            if dihedral.c0 is not None and dihedral.c1 is not None:
-                resolved.append(dihedral)
-            else:
-                atom_types = [self.atoms[atom_nr].type for atom_nr in key]
-                for periodicity in map(str, range(1, 7)):
-                    dihedral_type = match_atomic_item_to_atomic_type(
-                        atom_types, types, periodicity
-                    )
-                    if isinstance(dihedral_type, DihedralType):
-                        resolved.append(
-                            Dihedral(
-                                *key,
-                                funct=funct,
-                                c0=dihedral_type.c0,
-                                c1=dihedral_type.c1,
-                                periodicity=dihedral_type.periodicity,
-                            )
-                        )
-
-            if not resolved:
-                raise ValueError(
-                    "Could not resolve ITP dihedral parameters for "
-                    f"{[self.atoms[atom_nr].type for atom_nr in key]} in "
-                    f"{match.template.source}."
-                )
-            multiple = target.setdefault(
-                key, MultipleDihedrals(*key, funct=funct, dihedrals={})
-            )
-            for item in resolved:
-                multiple.dihedrals[item.periodicity] = item
-
-        if unsupported_functions:
-            logger.warning(
-                "ITP template %s contains unsupported dihedral functions %s; "
-                "retaining Grappa parameters for those interactions.",
-                match.template.source,
-                sorted(unsupported_functions),
-            )
-        return proper, improper
-
-    def update_partial_charges(self, recipe_steps: list[RecipeStep]) -> None:
-        """Update the topology atom partial charges.
-
-        Calls must reflect the topology state represented by their steps. A
-        standalone Break can be processed after the recipe, preserving legacy
-        slow-growth behavior. A Break associated with a later Bind must be
-        processed before ``bind_bond()`` changes the shared atom's residue;
-        that Bind is then processed afterward, when product-template
-        information is available.
-
-        Update rules follow a simple assignment scheme that works well with
-        grappa. If fragments are created, their partial charges are kept
-        integers. If previously broken bonds are formed again, the original
-        partial charges are restored.
-        If no product template matches a transferred H, its original charge
-        is restored and balanced locally by the acceptor atom. With
-        ``conserve_transferred_h_charge`` this local balancing is used for
-        every transferred H, so templates only provide names and atom types.
+        This topology is the one after the steps (B), top_a the one before
+        them (A), which stays unchanged. If top_a is None the steps did not
+        change the topology, and only the parameters are prepared. The
+        parameterizer may use the charges, so they are final before it runs.
         """
-
-        # build updated list of atoms by residue for topology so that this does
-        # not need to be repeated
-        # Warning: resnr not unique for each residue, 'residues' can map to
-        # more than one real residue
-        residues = {}
-        for atom in self.atoms.values():
-            if residues.get(atom.resnr) is None:
-                residues[atom.resnr] = []
-            residues[atom.resnr].append(atom)
-
-        for step in recipe_steps:
-            if isinstance(step, Break):
-                # make partial charges on either side of the break integer
-                if self.atoms[step.atom_id_1].resnr == self.atoms[step.atom_id_2].resnr:
-                    atom1 = self.atoms[step.atom_id_1]
-                    atom2 = self.atoms[step.atom_id_2]
-                    fragment1, fragment2 = get_residue_fragments(
-                        self, residues[atom1.resnr], atom1, atom2
-                    )
-                    if len(fragment2) in (0, 1):
-                        # intra-residue HAT case (or similar)
-                        if atom1.type.upper().startswith("H"):
-                            self.pending_transferred_h_charges[atom1.nr] = (
-                                atom1.charge
-                            )
-                            atom2.charge = (
-                                f"{float(atom2.charge) + float(atom1.charge):7.4f}"
-                            )
-                            atom1.charge = "0.0"
-                        elif atom2.type.upper().startswith("H"):
-                            self.pending_transferred_h_charges[atom2.nr] = (
-                                atom2.charge
-                            )
-                            atom1.charge = (
-                                f"{float(atom1.charge) + float(atom2.charge):7.4f}"
-                            )
-                            atom2.charge = "0.0"
-                        else:
-                            logger.warning(
-                                "Residue is not fragmented and no break atom is hydrogen. Doing nothing!"
-                            )
-                            continue
-                    else:
-                        # homolysis case (or similar)
-
-                        charge_fragment1 = [
-                            float(self.atoms[nr].charge) for nr in fragment1
-                        ]
-                        charge_fragment2 = [
-                            float(self.atoms[nr].charge) for nr in fragment2
-                        ]
-                        diff1 = sum(charge_fragment1) - round(sum(charge_fragment1))
-                        diff2 = sum(charge_fragment2) - round(sum(charge_fragment2))
-                        atom1.charge = f"{float(atom1.charge) - diff1:7.4f}"
-                        atom2.charge = f"{float(atom2.charge) - diff2:7.4f}"
-                else:
-                    # no change in partial charges necessary for break between residues
-                    continue
-            elif isinstance(step, Bind):
-                if self.atoms[step.atom_id_1].resnr == self.atoms[step.atom_id_2].resnr:
-                    atom1 = self.atoms[step.atom_id_1]
-                    atom2 = self.atoms[step.atom_id_2]
-                    if self.conserve_transferred_h_charge and (
-                        atom1.nr in self.pending_transferred_h_charges
-                        or atom2.nr in self.pending_transferred_h_charges
-                    ):
-                        # charge-conserving transfer (conserve_transferred_h_charge):
-                        # the H keeps its old charge and the acceptor gives up the
-                        # same amount, instead of taking the template charges
-                        self.pending_product_template_matches.pop(
-                            tuple(sorted((step.atom_id_1, step.atom_id_2), key=int)),
-                            None,
-                        )
-                        self._apply_transferred_h_charge_fallback(atom1, atom2)
-                        continue
-                    match_key = tuple(
-                        sorted((step.atom_id_1, step.atom_id_2), key=int)
-                    )
-                    template_match = self.pending_product_template_matches.pop(
-                        match_key,
-                        None,
-                    )
-                    if template_match is not None:
-                        for atom_nr, template_atom in (
-                            template_match.atom_mapping.items()
-                        ):
-                            current_atom = self.atoms.get(atom_nr)
-                            if current_atom is None:
-                                raise RuntimeError(
-                                    "Exact ITP product template match became "
-                                    f"invalid: atom {atom_nr} no longer exists."
-                                )
-                            if current_atom.atom != template_atom.name:
-                                raise RuntimeError(
-                                    "Exact ITP product template match became "
-                                    f"invalid for atom {atom_nr}: expected name "
-                                    f"{template_atom.name!r}, found "
-                                    f"{current_atom.atom!r}."
-                                )
-                            current_atom.type = template_atom.atom_type
-                            current_atom.charge = template_atom.charge
-                            current_atom.mass = (
-                                template_atom.mass
-                                if template_atom.mass is not None
-                                else self.ff.atomtypes[
-                                    template_atom.atom_type
-                                ].mass
-                            )
-                        logger.info(
-                            "Restored atom types, masses, and charges from exact "
-                            "ITP product template %s:%s (%s).",
-                            template_match.template.moleculetype,
-                            template_match.template.local_resnr,
-                            template_match.template.residue,
-                        )
-                        self.pending_product_template_restorations.append(
-                            template_match
-                        )
-                        self._discard_pending_transferred_h_charge(atom1, atom2)
-                        continue
-
-                    # check whether bond exists in topology
-                    residue = atom1.residue
-                    bondtype = (atom1.atom, atom2.atom)
-                    residuetype = self.ff.residuetypes.get(residue)
-                    if residuetype is None:
-                        m = f"Residue {residue} not found in residuetypes. Can't update partial charges!"
-                        logger.warning(m)
-                        self._apply_transferred_h_charge_fallback(atom1, atom2)
-                        continue
-                    residue_bond_spec = residuetype.bonds.get(
-                        bondtype,
-                        residuetype.bonds.get((bondtype[-1], bondtype[-2])),
-                    )
-                    if residue_bond_spec:
-                        atom1.charge = residuetype.atoms[atom1.atom].charge
-                        atom2.charge = residuetype.atoms[atom2.atom].charge
-                        self._discard_pending_transferred_h_charge(atom1, atom2)
-                    else:
-                        logger.warning(
-                            f"New bond defined in {step} but can't be found in residuetypes definition. Not changing the partial charges!"
-                        )
-                        self._apply_transferred_h_charge_fallback(atom1, atom2)
-                else:
-                    # no change in partial charges necessary
-                    continue
-            else:
-                continue
-
-    def _discard_pending_transferred_h_charge(
-        self, atom1: Atom, atom2: Atom
-    ) -> None:
-        """Discard saved H charge after a product template restored charges."""
-        self.pending_transferred_h_charges.pop(atom1.nr, None)
-        self.pending_transferred_h_charges.pop(atom2.nr, None)
-
-    def _apply_transferred_h_charge_fallback(
-        self, atom1: Atom, atom2: Atom
-    ) -> bool:
-        """Conserve residue charges when no product charge template is available."""
-        if atom1.nr in self.pending_transferred_h_charges:
-            hydrogen, acceptor = atom1, atom2
-        elif atom2.nr in self.pending_transferred_h_charges:
-            hydrogen, acceptor = atom2, atom1
-        else:
-            return False
-
-        hydrogen_charge = self.pending_transferred_h_charges.pop(hydrogen.nr)
-        acceptor.charge = (
-            f"{float(acceptor.charge) - float(hydrogen_charge):7.4f}"
-        )
-        hydrogen.charge = hydrogen_charge
-        logger.warning(
-            "No exact product charge template was available for transferred "
-            "hydrogen %s. Restored its pre-transfer charge and subtracted that "
-            "charge from acceptor atom %s.",
-            hydrogen.nr,
-            acceptor.nr,
-        )
-        return True
+        if top_a is not None:
+            logger.info("Updating partial charges")
+            assign_recipe_charges(
+                top_a, self, recipe_steps, tolerance=template_tolerance
+            )
+            check_charge_conservation(
+                top_a,
+                self,
+                tolerance=conservation_tolerance,
+                action=conservation_check,
+            )
+        logger.info("Updating parameters")
+        return self.prepare_product_parameters()
 
     def to_dict(self) -> TopologyDict:
         self.update_parameters()

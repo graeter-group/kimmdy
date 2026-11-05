@@ -10,6 +10,7 @@ from hypothesis import strategies as st
 from kimmdy.parsing import TopologyDict, read_top
 from kimmdy.recipe import Bind, Break
 from kimmdy.topology.atomic import *
+from kimmdy.topology.charges import assign_recipe_charges
 from kimmdy.topology.topology import REACTIVE_MOLECULEYPE, Topology
 from kimmdy.topology.utils import (
     get_protein_section,
@@ -1008,9 +1009,9 @@ class TestChargeAssignment:
 
     def test_break_neutral(self, top_charged: Topology):
         recipe_steps = [Break(atom_id_1="7", atom_id_2="9")]
+        top_a = deepcopy(top_charged)
         top_charged.break_bond((recipe_steps[0].atom_id_1, recipe_steps[0].atom_id_2))
-        top_charged.update_partial_charges(recipe_steps)
-        assert top_charged.pending_transferred_h_charges == {}
+        assign_recipe_charges(top_a, top_charged, recipe_steps)
         fragment1_nrs = ["7", "8"]
         fragment2_nrs = [str(i) for i in range(9, 26)]
         assert np.isclose(
@@ -1022,8 +1023,9 @@ class TestChargeAssignment:
 
     def test_break_negative(self, top_charged: Topology):
         recipe_steps = [Break(atom_id_1="69", atom_id_2="80")]
+        top_a = deepcopy(top_charged)
         top_charged.break_bond((recipe_steps[0].atom_id_1, recipe_steps[0].atom_id_2))
-        top_charged.update_partial_charges(recipe_steps)
+        assign_recipe_charges(top_a, top_charged, recipe_steps)
         fragment1_nrs = [str(i) for i in range(67, 80)]
         fragment2_nrs = ["80", "81"]
         assert np.isclose(
@@ -1035,8 +1037,9 @@ class TestChargeAssignment:
 
     def test_break_positive(self, top_charged: Topology):
         recipe_steps = [Break(atom_id_1="33", atom_id_2="36")]
+        top_a = deepcopy(top_charged)
         top_charged.break_bond((recipe_steps[0].atom_id_1, recipe_steps[0].atom_id_2))
-        top_charged.update_partial_charges(recipe_steps)
+        assign_recipe_charges(top_a, top_charged, recipe_steps)
         fragment1_nrs = [str(i) for i in range(26, 36)] + ["48", "49"]
         fragment2_nrs = [str(i) for i in range(36, 48)]
         assert np.isclose(
@@ -1052,9 +1055,10 @@ class TestChargeAssignment:
             Bind(atom_id_1="52", atom_id_2="51"),
         ]
         top_charged.del_atom("53")
+        top_a = deepcopy(top_charged)
         top_charged.break_bond((recipe_steps[0].atom_id_1, recipe_steps[0].atom_id_2))
         top_charged.bind_bond((recipe_steps[1].atom_id_1, recipe_steps[1].atom_id_2))
-        top_charged.update_partial_charges(recipe_steps)
+        assign_recipe_charges(top_a, top_charged, recipe_steps)
         fragment1_nrs = [str(i) for i in range(50, 66)]
         assert np.isclose(
             sum([float(top_charged.atoms[nr].charge) for nr in fragment1_nrs]), 0
@@ -1209,8 +1213,6 @@ def plpc_itp_topology() -> Topology:
         radicals="222",  # Radical C33: 132 closed-shell atoms + local atom 90.
         product_template_sources=("itp",),
         product_template_itp_glob="*.itp",
-        # Explicitly retain product-template restoration for these tests.
-        conserve_transferred_h_charge=False,
     )
 
 
@@ -1240,6 +1242,7 @@ def test_itp_hat_restores_closed_product_and_conserves_charge(plpc_itp_topology)
     """A full HAT applies the exact ITP product state without changing charge."""
     top = plpc_itp_topology
     donor_h, donor, acceptor = _plpc_itp_hat_atoms(top)
+    top_a = deepcopy(top)
     initial_total_charge = sum(float(atom.charge) for atom in top.atoms.values())
     expected_donor_charge = float(donor.charge) + float(donor_h.charge)
     acceptor_resnr = acceptor.resnr
@@ -1249,14 +1252,12 @@ def test_itp_hat_restores_closed_product_and_conserves_charge(plpc_itp_topology)
         Bind(atom_id_1=acceptor.nr, atom_id_2=donor_h.nr),
     ]
     top.break_bond((donor.nr, donor_h.nr))
-    top.update_partial_charges([recipe_steps[0]])
-    assert donor_h.nr in top.pending_transferred_h_charges
     top.bind_bond((acceptor.nr, donor_h.nr))
 
     match_key = tuple(sorted((acceptor.nr, donor_h.nr), key=int))
     assert match_key in top.pending_product_template_matches
 
-    top.update_partial_charges([recipe_steps[1]])
+    assign_recipe_charges(top_a, top, recipe_steps)
 
     assert tuple(sorted((donor.nr, donor_h.nr), key=int)) not in top.bonds
     assert tuple(sorted((acceptor.nr, donor_h.nr), key=int)) in top.bonds
@@ -1277,7 +1278,7 @@ def test_itp_hat_restores_closed_product_and_conserves_charge(plpc_itp_topology)
     for atom in product_atoms:
         expected = closed_template.atoms[atom.atom]
         assert atom.type == expected.atom_type
-        assert atom.charge == expected.charge
+        assert np.isclose(float(atom.charge), float(expected.charge))
         assert atom.mass == (
             expected.mass
             if expected.mass is not None
@@ -1289,61 +1290,7 @@ def test_itp_hat_restores_closed_product_and_conserves_charge(plpc_itp_topology)
         initial_total_charge,
     )
     assert match_key not in top.pending_product_template_matches
-    assert donor_h.nr not in top.pending_transferred_h_charges
     assert {donor.nr, donor_h.nr, acceptor.nr} <= top.parameterization_focus_ids
-
-
-def test_itp_product_restores_bonded_terms_and_compacts_focus(
-    plpc_itp_topology,
-):
-    """Exact products regain ITP terms before active radicals take precedence."""
-
-    class RecordingParameterizer:
-        def __init__(self):
-            self.calls = []
-
-        def parameterize_topology(self, current_topology, focus_nrs=None):
-            self.calls.append(set(focus_nrs or set()))
-            return current_topology
-
-    top = plpc_itp_topology
-    recorder = RecordingParameterizer()
-    top.parametrizer = recorder
-    donor_h, donor, acceptor = _plpc_itp_hat_atoms(top)
-    break_step = Break(atom_id_1=donor.nr, atom_id_2=donor_h.nr)
-    bind_step = Bind(atom_id_1=acceptor.nr, atom_id_2=donor_h.nr)
-
-    top.break_bond((donor.nr, donor_h.nr))
-    top.update_partial_charges([break_step])
-    top.bind_bond((acceptor.nr, donor_h.nr))
-    top.update_partial_charges([bind_step])
-
-    assert len(top.pending_product_template_restorations) == 1
-    match = top.pending_product_template_restorations[0]
-    template_angle = next(
-        line for line in match.template.angle_lines if line[3] == "5"
-    )
-    mapped = [match.local_to_global[atom_nr] for atom_nr in template_angle[:3]]
-    if int(mapped[0]) > int(mapped[2]):
-        mapped[0], mapped[2] = mapped[2], mapped[0]
-    angle_key = tuple(mapped)
-    top.angles[angle_key] = Angle(
-        *angle_key, funct="1", c0="1.0", c1="1.0"
-    )
-    event_focus = set(top.parameterization_focus_ids)
-
-    report = top.prepare_product_parameters()
-
-    restored_angle = top.angles[angle_key]
-    assert restored_angle.funct == "5"
-    assert restored_angle.c2 is not None
-    assert restored_angle.c3 is not None
-    assert report.event_focus_ids == event_focus
-    assert report.active_radical_ids == {donor.nr}
-    assert report.restored_templates == 1
-    assert recorder.calls == [event_focus, {donor.nr}]
-    assert top.parameterization_focus_ids == {donor.nr}
-    assert top.pending_product_template_restorations == []
 
 
 def test_itp_hat_fails_closed_when_no_exact_template_matches(plpc_itp_topology):
@@ -1371,11 +1318,11 @@ def test_itp_hat_fails_closed_when_no_exact_template_matches(plpc_itp_topology):
     initial_acceptor_charge = float(acceptor.charge)
     break_step = Break(atom_id_1=donor.nr, atom_id_2=donor_h.nr)
     bind_step = Bind(atom_id_1=acceptor.nr, atom_id_2=donor_h.nr)
+    top_a = deepcopy(top)
 
     top.break_bond((donor.nr, donor_h.nr))
-    top.update_partial_charges([break_step])
     top.bind_bond((acceptor.nr, donor_h.nr))
-    top.update_partial_charges([bind_step])
+    assign_recipe_charges(top_a, top, [break_step, bind_step])
 
     match_key = tuple(sorted((acceptor.nr, donor_h.nr), key=int))
     assert match_key not in top.pending_product_template_matches
@@ -1407,7 +1354,6 @@ def test_itp_hat_fails_closed_when_no_exact_template_matches(plpc_itp_topology):
         sum(float(atom.charge) for atom in top.atoms.values()),
         initial_total_charge,
     )
-    assert donor_h.nr not in top.pending_transferred_h_charges
 
 
 def test_itp_template_precedes_rtp_fallback():
@@ -1440,8 +1386,6 @@ def test_ohr_transition_restores_tip3_like_product_and_conserves_charge():
         product_template_sources=("itp",),
         product_template_itp_glob="*.itp",
         product_template_transitions={"OHR": "OHRH"},
-        # Explicitly retain product-template restoration for this test.
-        conserve_transferred_h_charge=False,
     )
     acceptor = next(atom for atom in top.atoms.values() if atom.type == "ORA")
     donor = next(atom for atom in top.atoms.values() if atom.type == "OT")
@@ -1455,14 +1399,12 @@ def test_ohr_transition_restores_tip3_like_product_and_conserves_charge():
     break_step = Break(atom_id_1=donor.nr, atom_id_2=donor_h.nr)
     bind_step = Bind(atom_id_1=acceptor.nr, atom_id_2=donor_h.nr)
 
+    top_a = deepcopy(top)
     top.break_bond((donor.nr, donor_h.nr))
-    top.update_partial_charges([break_step])
-    assert donor_h.nr in top.pending_transferred_h_charges
-
     top.bind_bond((acceptor.nr, donor_h.nr))
     match_key = tuple(sorted((acceptor.nr, donor_h.nr), key=int))
     assert match_key in top.pending_product_template_matches
-    top.update_partial_charges([bind_step])
+    assign_recipe_charges(top_a, top, [break_step, bind_step])
 
     product_atoms = {
         atom.atom: atom
@@ -1487,7 +1429,6 @@ def test_ohr_transition_restores_tip3_like_product_and_conserves_charge():
         initial_total_charge,
     )
     assert match_key not in top.pending_product_template_matches
-    assert donor_h.nr not in top.pending_transferred_h_charges
 
 
 def _alacar_with_extra_lines(section: str, extra: list[list[str]]) -> dict:

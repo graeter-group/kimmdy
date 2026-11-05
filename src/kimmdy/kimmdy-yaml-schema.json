@@ -522,10 +522,57 @@
             },
             "conserve_transferred_h_charge": {
               "title": "Conserve transferred-H charge",
-              "description": "Opt in to keeping a transferred hydrogen's pre-transfer partial charge and subtracting it from the acceptor instead of restoring template charges. This also bypasses complete exact-ITP product restoration, including residue-wide atom types, masses and queued bonded parameters. When false, retain product-template restoration and use local charge balancing when no suitable charge template is available. Default: false",
+              "description": "Removed and ignored with a warning. Transferred hydrogens always get the charge of the residue template they fit, compensated on the acceptor (see changer.apply_recipe.charges).",
+              "deprecated": true,
+              "type": "boolean",
+              "pytype": "bool"
+            }
+          },
+          "additionalProperties": false
+        },
+        "apply_recipe": {
+          "title": "apply_recipe",
+          "type": "object",
+          "description": "Settings for the steps of applying a recipe. The steps run in recipe order. Each Relax ends a segment: the topology after the steps so far gets its partial charges and then its parameters, and the relaxation runs from the topology before the segment to it. Steps after the last Relax are finished the same way at the end, before the new topology is written.",
+          "properties": {
+            "charges": {
+              "title": "charges",
+              "type": "object",
+              "description": "Partial charges of the product topology, set once per recipe segment (the steps up to a Relax or the end of the recipe), after its topology changes and before the parameterization. A transferred hydrogen gets the charge of the residue template the acceptor residue fits (exact ITP match, or the rtp entries <name>, N<name> and C<name>, checked by atom names and charges) and the acceptor gives up exactly that charge; without a fitting template the one with the best atom-name match is used, and without any template the hydrogen keeps its old charge.",
+              "properties": {
+                "template_tolerance": {
+                  "title": "Template charge tolerance",
+                  "description": "Largest charge difference in e for which an atom still carries its template charge, and for which the residue charge change of a template counts as zero. Charges are written with 4 decimals, so 0.001 separates rounding from a real mismatch. Default: 0.001",
+                  "type": "number",
+                  "pytype": "float",
+                  "minimum": 0,
+                  "default": 0.001
+                },
+                "conservation_check": {
+                  "title": "Charge conservation check",
+                  "description": "What to do if a recipe changes the net charge of the reactive molecule by more than conservation_tolerance: warn, error (stop the run) or off. Default: warn",
+                  "type": "string",
+                  "pytype": "str",
+                  "enum": ["warn", "error", "off"],
+                  "default": "warn"
+                },
+                "conservation_tolerance": {
+                  "title": "Charge conservation tolerance",
+                  "description": "Largest change of the net charge of the reactive molecule in e that conservation_check accepts. Default: 0.001",
+                  "type": "number",
+                  "pytype": "float",
+                  "minimum": 0,
+                  "default": 0.001
+                }
+              },
+              "additionalProperties": false
+            },
+            "write_intermediate_topologies": {
+              "title": "Write intermediate topologies",
+              "description": "Write the topologies before and after the reaction (<top>_before.top, <top>_after.top) and the start of the slow growth (<top>_before_with_solvent_bonds.top) next to the relaxation topology, for debugging. Default: true",
               "type": "boolean",
               "pytype": "bool",
-              "default": false
+              "default": true
             }
           },
           "additionalProperties": false

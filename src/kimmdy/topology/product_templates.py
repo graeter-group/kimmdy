@@ -80,6 +80,8 @@ class ProductTemplateMatch:
     transferred_h_template_name: str
     atom_mapping: dict[str, ProductTemplateAtom]
     local_to_global: dict[str, str]
+    # matched through a configured precursor -> product transition
+    from_transition: bool = False
 
 
 class ProductTemplateLibrary:
@@ -471,6 +473,7 @@ def _match_template(
             template_atom.local_nr: atom_nr
             for atom_nr, template_atom in atom_mapping.items()
         },
+        from_transition=allow_existing_type_changes,
     )
 
 
