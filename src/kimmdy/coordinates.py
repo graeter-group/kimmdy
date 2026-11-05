@@ -1,4 +1,4 @@
-"""coordinate, topology and plumed modification functions"""
+"""coordinate and topology modification functions"""
 
 from dataclasses import dataclass, field
 from enum import Enum
@@ -6,7 +6,6 @@ import logging
 import multiprocessing as mp  # to start helper processes
 from concurrent.futures import ProcessPoolExecutor  # runs the work on several helpers at once
 from copy import deepcopy
-from pathlib import Path
 from typing import Optional, Union
 from math import sqrt
 
@@ -14,7 +13,6 @@ import MDAnalysis as mda
 import numpy as np
 
 from kimmdy.constants import FFFUNC
-from kimmdy.parsing import read_plumed, write_plumed
 from kimmdy.recipe import Place
 from kimmdy.tasks import TaskFiles
 from kimmdy.topology.atomic import (
@@ -1855,46 +1853,3 @@ def merge_top_slow_growth(
     top_a._link_atomics()
 
     return
-
-
-def break_bond_plumed(
-    files: TaskFiles, breakpair: tuple[str, str], newplumed: Path
-) -> None:
-    """Break bond in plumed configuration file.
-
-    Parameters
-    ----------
-    files:
-
-    breakpair:
-    """
-
-    plumed_path = files.input["plumed"]
-    # if break_bond_plumed is called multiple times in one _apply_recipe task
-    if "plumed" in files.output.keys():
-        plumed_path = files.output["plumed"]
-    assert plumed_path is not None, "plumed_path should not be None"
-    plumed_dict = read_plumed(plumed_path)
-
-    files.output["plumed"] = newplumed
-
-    logger.debug(
-        f"Reading: {files.input['plumed']} and writing modified plumed input to "
-        f"{files.output['plumed']}."
-    )
-
-    new_distances = {}
-    broken_distances = []
-    for k, v in plumed_dict["labeled_action"].items():
-        if all(x in v["atoms"] for x in breakpair):
-            broken_distances.append(k)
-        else:
-            new_distances[k] = v
-
-    plumed_dict["labeled_action"] = new_distances
-
-    for line in plumed_dict["prints"]:
-        line["ARG"] = [id for id in line["ARG"] if id not in broken_distances]
-        line["FILE"] = files.input["plumed_out"]
-
-    write_plumed(plumed_dict, newplumed)

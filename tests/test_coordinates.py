@@ -7,11 +7,10 @@ from math import sqrt
 import pytest
 from pathlib import Path
 import MDAnalysis as mda
-from kimmdy.recipe import Break, Place
-from kimmdy.parsing import read_plumed, read_top, write_top
+from kimmdy.recipe import Place
+from kimmdy.parsing import read_top, write_top
 from kimmdy.constants import REACTIVE_MOLECULEYPE
 from conftest import DummyFiles
-from kimmdy.tasks import TaskFiles
 from kimmdy.topology.atomic import Angle, Bond, BondType, Dihedral, Pair
 from kimmdy.topology.topology import Topology
 from kimmdy.coordinates import (
@@ -19,7 +18,6 @@ from kimmdy.coordinates import (
     merge_top_slow_growth,
     get_explicit_or_type,
     place_atom,
-    break_bond_plumed,
 )
 
 
@@ -153,36 +151,6 @@ def test_place_atom(arranged_tmp_path):
     u = mda.Universe(str(files.output["gro"]))
     coords = tuple(u.select_atoms(f"id {step.id_to_place}")[0].position)
     assert coords == step.new_coords
-
-
-def test_plumed_break(arranged_tmp_path):
-    """
-    test plumed changes
-    """
-    files = TaskFiles(
-        get_latest=lambda: "DummyCallable",  # pyright: ignore
-    )
-    files.input = {
-        "plumed": arranged_tmp_path / "plumed_nat.dat",
-        "plumed_out": Path("distances.dat"),
-    }
-    files.outputdir = arranged_tmp_path
-    recipe_steps = [Break(28, 34)]
-    breakpair = (recipe_steps[0].atom_id_1, recipe_steps[0].atom_id_2)
-
-    break_bond_plumed(files, breakpair, Path("plumed_mod.dat"))
-    plumed_path = files.input["plumed"]
-    assert plumed_path is not None
-    plumed_nat = read_plumed(plumed_path)
-    plumed_break_ref = read_plumed(arranged_tmp_path / "plumed_break29-35.dat")
-    plumed_break_test = read_plumed(files.output["plumed"])
-
-    assert plumed_break_test["labeled_action"] == plumed_break_ref["labeled_action"]
-    assert plumed_break_test["prints"] == plumed_break_ref["prints"]
-    assert (
-        len(plumed_break_test["labeled_action"])
-        == len(plumed_nat["labeled_action"]) - 1
-    )
 
 
 def test_morse_parameters(arranged_tmp_path):

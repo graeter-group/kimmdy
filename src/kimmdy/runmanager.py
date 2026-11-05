@@ -33,7 +33,7 @@ from kimmdy.constants import (
     MARK_STARTED,
     MARKERS,
 )
-from kimmdy.coordinates import break_bond_plumed, merge_top_slow_growth, place_atom
+from kimmdy.coordinates import merge_top_slow_growth, place_atom
 from kimmdy.kmc import (
     KMCAccept,
     KMCError,
@@ -1579,15 +1579,6 @@ class RunManager:
         for step in recipe.recipe_steps:
             if isinstance(step, Break):
                 self.top.break_bond((step.atom_id_1, step.atom_id_2))
-                if (
-                    hasattr(self.config, "plumed")
-                    and self.config.changer.topology.break_plumed
-                ):
-                    break_bond_plumed(
-                        files,
-                        (step.atom_id_1, step.atom_id_2),
-                        files.outputdir / self.config.plumed.name.replace(".", "_mod."),
-                    )
                 # Keep standalone breaks pending through Relax, preserving the
                 # established homolysis slow-growth topology.
                 pending_charge_steps.append(step)

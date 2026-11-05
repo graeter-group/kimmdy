@@ -493,7 +493,7 @@
             "break_plumed": {
               "type": "boolean",
               "deprecated": true,
-              "description": "Deprecated: PLUMED support will be removed in a future release. Whether to remove bonds from the plumed.dat input file when applying a reaction recipe that breaks a bond. Unless needed for performance optimization, this can be left at `false`, because the homolysis plugin in kimmdy-reactions also cheeckts to not break non-existing bonds by default (which can be turned off).",
+              "description": "Removed: has no effect. Bonds broken by a reaction recipe are no longer removed from the plumed.dat input file. Kept so that existing config files still load. PLUMED support will be removed in a future release.",
               "pytype": "bool",
               "default": false
             },
