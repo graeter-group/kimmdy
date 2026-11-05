@@ -33,7 +33,7 @@ from kimmdy.constants import (
     MARK_STARTED,
     MARKERS,
 )
-from kimmdy.coordinates import merge_top_slow_growth, place_atom
+from kimmdy.coordinates import add_reacting_water_bonds, merge_top_slow_growth, place_atom
 from kimmdy.kmc import (
     KMCAccept,
     KMCError,
@@ -1633,49 +1633,16 @@ class RunManager:
                         write_top(self.top.to_dict(), files.outputdir / f"{top_stem}_after.top")
 
                     # A is not needed after the relaxation, so it takes the
-                    # temporary changes that stabilize the slow growth:
-                    # a water held rigid by SETTLES has no bonds that could
-                    # fade out, so a reacting water gets temporary O-H bonds
-                    solvent_atoms: set[str] = set()
-                    logger.debug(f"Checking for reacting solvent residues..")
-                    for ai in parameterization.event_focus_ids:
-                        if top_a.atoms[ai].residue == "SOL":
-                            solvent_atoms.add(ai)
-                            logger.debug(f"Reacting solvent atom: {top_a.atoms[ai]}")
-                    if len(solvent_atoms) > 0:
-                        logger.info(
-                            f"{len(solvent_atoms)} solvent atoms are involved "
-                            "in the reaction, they will get temporary bonds for "
-                            "the start of the slow growth simulation."
-                        )
-                        ow = None
-                        hw1 = None
-                        hw2 = None
-                        for ai in solvent_atoms:
-                            a = top_a.atoms[ai]
-                            if a.atom == "OW":
-                                ow = a
-                            if a.atom == "HW1":
-                                hw1 = a
-                            if a.atom == "HW2":
-                                hw2 = a
-                        if ow is not None and hw1 is not None and hw2 is not None:
-                            logger.info(
-                                "Found one complete water molecule that takes part in the reaction."
-                            )
-                            top_a.bind_bond((ow.nr, hw1.nr))
-                            top_a.bind_bond((ow.nr, hw2.nr))
-                            # the temporary bonds keep their force-field parameters,
-                            # writing this topology must not parameterize it
-                            top_a.needs_parameterization = False
-                            b1 = top_a.bonds.get((ow.nr, hw1.nr))
-                            b2 = top_a.bonds.get((ow.nr, hw2.nr))
-                            logger.info(f"Added bonds: {b1}, {b2}")
-                    if write_intermediates:
-                        write_top(
-                            top_a.to_dict(),
-                            files.outputdir / f"{top_stem}_before_with_solvent_bonds.top",
-                        )
+                    # temporary changes that stabilize the slow growth
+                    add_reacting_water_bonds(
+                        top_a,
+                        parameterization.event_focus_ids,
+                        out_path=(
+                            files.outputdir / f"{top_stem}_before_with_solvent_bonds.top"
+                            if write_intermediates
+                            else None
+                        ),
+                    )
 
                     # top_a is modified in place and becomes the merged topology
                     merge_top_slow_growth(
