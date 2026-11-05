@@ -569,7 +569,7 @@
             },
             "write_intermediate_topologies": {
               "title": "Write intermediate topologies",
-              "description": "Write the topologies before and after the reaction (<top>_before.top, <top>_after.top) and the start of the slow growth (<top>_before_with_solvent_bonds.top) next to the relaxation topology, for debugging. Default: true",
+              "description": "Write the topologies before and after the reaction (<top>_before.top, <top>_after.top) and, if a water takes part in it, the start of the slow growth with its temporary bonds (<top>_before_with_solvent_bonds.top) next to the relaxation topology, for debugging. Default: true",
               "type": "boolean",
               "pytype": "bool",
               "default": true

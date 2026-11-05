@@ -6,6 +6,7 @@ import logging
 import multiprocessing as mp  # to start helper processes
 from concurrent.futures import ProcessPoolExecutor  # runs the work on several helpers at once
 from copy import deepcopy
+from pathlib import Path
 from typing import Optional, Union
 from math import sqrt
 
@@ -13,6 +14,7 @@ import MDAnalysis as mda
 import numpy as np
 
 from kimmdy.constants import FFFUNC
+from kimmdy.parsing import write_top
 from kimmdy.recipe import Place
 from kimmdy.tasks import TaskFiles
 from kimmdy.topology.atomic import (
@@ -1816,6 +1818,55 @@ class MoleculeTypeMerger:
                 "merged slow-growth bond graph.",
                 len(self.union_exclusion_helper_pairs),
             )
+
+
+def add_reacting_water_bonds(
+    top_a: Topology, reaction_atom_nrs: set[str], out_path: Optional[Path] = None
+) -> None:
+    """Give a reacting water in A temporary O-H bonds for the start of the slow growth.
+
+    A water held rigid by SETTLES has no bonds that could fade out. If OW,
+    HW1 and HW2 of a water are among the reaction atoms, they get bonds (and
+    the angle) with force-field parameters instead. top_a is modified in place.
+    If bonds were added and out_path is given, top_a with them is written
+    there for debugging.
+    """
+    solvent_atoms: set[str] = set()
+    logger.debug(f"Checking for reacting solvent residues..")
+    for ai in reaction_atom_nrs:
+        if top_a.atoms[ai].residue == "SOL":
+            solvent_atoms.add(ai)
+            logger.debug(f"Reacting solvent atom: {top_a.atoms[ai]}")
+    if len(solvent_atoms) == 0:
+        return
+    logger.info(
+        f"{len(solvent_atoms)} solvent atoms are involved "
+        "in the reaction, they will get temporary bonds for "
+        "the start of the slow growth simulation."
+    )
+    ow = None
+    hw1 = None
+    hw2 = None
+    for ai in solvent_atoms:
+        a = top_a.atoms[ai]
+        if a.atom == "OW":
+            ow = a
+        if a.atom == "HW1":
+            hw1 = a
+        if a.atom == "HW2":
+            hw2 = a
+    if ow is not None and hw1 is not None and hw2 is not None:
+        logger.info("Found one complete water molecule that takes part in the reaction.")
+        top_a.bind_bond((ow.nr, hw1.nr))
+        top_a.bind_bond((ow.nr, hw2.nr))
+        # the temporary bonds keep their force-field parameters,
+        # writing this topology must not parameterize it
+        top_a.needs_parameterization = False
+        b1 = top_a.bonds.get((ow.nr, hw1.nr))
+        b2 = top_a.bonds.get((ow.nr, hw2.nr))
+        logger.info(f"Added bonds: {b1}, {b2}")
+        if out_path is not None:
+            write_top(top_a.to_dict(), out_path)
 
 
 def merge_top_slow_growth(
