@@ -1000,6 +1000,33 @@ class TestRadicalAla:
         assert top_noprm_explicitR_fix.atoms["9"].is_radical == True
         assert top_noprm_explicitR_fix.atoms["10"].is_radical == False
 
+    def test_find_radicals_multiple_bond_orders(self, top_noprm_fix):
+        # N3 is used for neutral (3 bonds) and protonated (4 bonds) amines
+        moltype = top_noprm_fix.moleculetypes[REACTIVE_MOLECULEYPE]
+        assert len(moltype.atoms["9"].bound_to_nrs) == 3
+        assert len(moltype.atoms["10"].bound_to_nrs) == 4
+        assert len(moltype.atoms["8"].bound_to_nrs) == 1
+        for nr in ["8", "9", "10"]:
+            moltype.atoms[nr].type = "N3"
+        moltype.find_radicals()
+        assert moltype.atoms["9"].is_radical == False
+        assert moltype.atoms["10"].is_radical == False
+        assert moltype.atoms["8"].is_radical == True
+        assert set(moltype.radicals.keys()) == {"8"}
+
+    def test_find_radicals_warns_on_too_many_bonds(
+        self, top_noprm_fix, caplog, monkeypatch
+    ):
+        # earlier tests may configure the kimmdy logger with propagate=False
+        monkeypatch.setattr(logging.getLogger("kimmdy"), "propagate", True)
+        moltype = top_noprm_fix.moleculetypes[REACTIVE_MOLECULEYPE]
+        # CB has 4 bonds, but N only allows 3
+        moltype.atoms["10"].type = "N"
+        with caplog.at_level(logging.WARNING, logger="kimmdy.topology"):
+            moltype.find_radicals()
+        assert moltype.atoms["10"].is_radical == False
+        assert "('N', 4)" in caplog.text
+
 
 class TestChargeAssignment:
     @pytest.fixture
