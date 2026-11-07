@@ -994,18 +994,14 @@ class MoleculeTypeMerger:
         for nr in self.mol_a.atoms.keys():
             atomA = self.mol_a.atoms[nr]
             atomB = self.mol_b.atoms[nr]
-            same_charge = atomA.charge == atomB.charge
             # the relaxation uses the charges of B in both states: interpolated
             # charges make atoms perturbed, and GROMACS does not support
             # perturbed, excluded pairs beyond the pair-list cut-off, such as
             # the atoms of a broken bond that separate during the relaxation
             atomA.charge = deepcopy(atomB.charge)
-            if atomA != atomB and not (self.morse_only and same_charge):
-                # the simplified version doesn't change if the charges are the same
-                # set B parameters first
-                # to not overwrite them
-                # keep the name of the atom
-                # but transition the type, charge and mass
+            if atomA != atomB:
+                # in both modes (full and morse_only): keep the name of the
+                # atom, but transition the type and mass to those of B
                 atomA.typeB = deepcopy(atomB.type)
                 atomA.chargeB = deepcopy(atomB.charge)
                 atomA.massB = deepcopy(atomB.mass)
