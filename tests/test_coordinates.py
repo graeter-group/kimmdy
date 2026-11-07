@@ -371,6 +371,23 @@ def _hat(top: Topology, donor: str, hydrogen: str, acceptor: str) -> None:
     )
 
 
+def test_hat_keeps_impropers_of_acceptor_residue(arranged_tmp_path):
+    """An H that moves into a residue with an atom of its name keeps that atom's impropers.
+
+    H 17 (H of NME) moves to CA 9 of ALA, which has its own H 8. bind_bond
+    builds the impropers of CA 9 while 17 is still named H; once
+    update_names_LJ names it HA, the amide improper of ALA is (5 9 7 8) again.
+    """
+    top = Topology(read_top(Path("AlaCaR_out.top")))
+    assert ("5", "9", "7", "8") in top.improper_dihedrals
+
+    _hat(top, "16", "17", "9")
+
+    assert top.atoms["17"].atom == "HA"
+    assert ("5", "9", "7", "8") in top.improper_dihedrals
+    assert ("5", "9", "7", "17") not in top.improper_dihedrals
+
+
 def test_merge_small_hat_details(arranged_tmp_path, caplog):
     top = Topology(read_top(Path("AlaCaR_out.top")))
     top_a = copy.deepcopy(top)
