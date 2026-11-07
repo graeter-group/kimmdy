@@ -876,12 +876,21 @@ class MoleculeTypeMerger:
         except (TypeError, ValueError):
             return str(atom.type).upper().startswith("H")
 
-    def _retype_transferred_hydrogens(self):
-        """Give a moved hydroxyl or water H a Lennard-Jones size at the end of the relax.
+    def _has_lj_size(self, atom_type: str) -> bool:
+        """Tell whether an atom type has Lennard-Jones parameters (a non-zero epsilon); an unknown type counts as having them."""
+        atomtype = self.ff.atomtypes.get(atom_type)
+        try:
+            return atomtype is None or float(atomtype.epsilon) != 0.0
+        except (TypeError, ValueError):
+            return True
 
-        A hydroxyl or water H (type HO or HW) has no size of its own. This
-        keeps its old type at the start of the relax and sets the type with a
-        size (from _find_lj_hydrogen_type) only for the end state, so the H's
+    def _retype_transferred_hydrogens(self):
+        """Give a moved H whose type in B has no Lennard-Jones size one at the end of the relax.
+
+        State B of the relax uses the atom types of B (merge_atoms). A moved H
+        whose B type has no LJ size (HO or HW in Amber, e.g. an H that lands
+        on an oxygen) gets the type with a size from _find_lj_hydrogen_type
+        (H1 in Amber) in state B instead. State A keeps its type, so the H's
         size grows in gradually. Only the relax topology is changed. Does
         nothing when the option is off.
         """
@@ -901,11 +910,14 @@ class MoleculeTypeMerger:
             logger.warning("No LJ-bearing hydrogen type found in the force field; skipping transferred-H retyping")
             return
 
-        # retype every hydroxyl or water H among them, in the end state only
+        # retype every H among them whose B type has no LJ size, in the end state only
         retyped = 0
         for atom_nr in candidate_atoms:
             atom = self.mol_a.atoms.get(atom_nr)
-            if atom is None or atom.type not in {"HW", "HO"}:
+            atom_b = self.mol_b.atoms.get(atom_nr)
+            if atom is None or atom_b is None:
+                continue
+            if not self._is_hydrogen(atom_b) or self._has_lj_size(atom_b.type):
                 continue
             implicit = self._implicit_interactions(atom_nr)
             if implicit:
@@ -917,14 +929,14 @@ class MoleculeTypeMerger:
                     self.transferred_h_type,
                 )
                 continue
-            # state B only: state A keeps the original (LJ-free) type, so an H
+            # state B only: state A keeps its original type, so an H
             # that sits in a tight hydrogen bond at the reaction frame does not
             # get its full Lennard-Jones radius at lambda 0 and blow the relax
             # up; its LJ parameters grow in linearly with lambda instead
             atom.typeB = self.transferred_h_type
             atom.comment = (
-                f"; transferred H retyped {atom.type} -> "
-                f"{self.transferred_h_type} in state B only"
+                f"; transferred H: B type {atom_b.type} has no LJ size, "
+                f"{self.transferred_h_type} in state B"
             )
             retyped += 1
         if retyped:
