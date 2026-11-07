@@ -407,6 +407,18 @@ def test_merge_uses_b_charges_in_both_states(arranged_tmp_path):
     assert top_a.atoms["27"].typeB == "H1"  # the moved hydrogen still changes type
 
 
+@pytest.mark.parametrize("arranged_tmp_path", ["test_coordinates"], indirect=True)
+def test_merge_morse_only_writes_b_types(arranged_tmp_path):
+    """morse_only gives an atom its B type even if its charge did not change."""
+    top_a = Topology(read_top(Path("topol_stateA.top")))
+    top_b = Topology(read_top(Path("topol_stateB.top")))
+    merge_top_slow_growth(top_a=top_a, top_b=top_b, morse_only=True)
+
+    # the moved H 27 has the same charge in A and B, but goes from H to H1
+    assert top_a.atoms["27"].type == "H"
+    assert top_a.atoms["27"].typeB == "H1"
+
+
 def _hat(top: Topology, donor: str, hydrogen: str, acceptor: str) -> None:
     """Move a hydrogen from donor to acceptor as a recipe segment does: bonds, then names and types."""
     top_before = copy.deepcopy(top)
